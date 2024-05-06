@@ -1,167 +1,143 @@
-Return-Path: <netdev+bounces-93777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6BCD8BD2FC
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:41:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1596A8BD304
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:46:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA0221C21129
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:41:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5D3D284485
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:46:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020D6157486;
-	Mon,  6 May 2024 16:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BA7156962;
+	Mon,  6 May 2024 16:46:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="t6hJqNY+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R0SKbmS9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5991156F38;
-	Mon,  6 May 2024 16:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8E713DDD8;
+	Mon,  6 May 2024 16:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715013639; cv=none; b=hZ74AwNZGXVUfG7YRHoOH7etpMiS5NPPbyZr6BAOdr+AA++OdUnh6pfcm2r1+mJQhvrRe2xRNZhJvQYipSS9w9T1aMbKh7Tgc9amZuwIj+LvwCOgPggwPcZfFWhXzCbvVsAAJ3lvkz4YkPsudPYrGxWZ8bDQAGTrXrgGDYjDRII=
+	t=1715013982; cv=none; b=QU6++bH4LeUbcYwURinvmkcd7L3hrIVeRJe8sWUTGLw7eBcfWt+V4sRy857ynhtth4XobEWqfEI39j3EjngLt6CWdY36NHp5+KlIWh7rb7YUsYSkiSJz7Y4jHcLm7gZOzXVIhYMYMS1Swuk3W1jfrqjjpXj6KSjvavtgeorK8G0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715013639; c=relaxed/simple;
-	bh=UoWcNP9kwzro3u5AXtDZDkiZxrJZfG6cM+wLlIflkXU=;
-	h=MIME-Version:Message-ID:From:To:Cc:Subject:Content-Type:Date:
-	 In-Reply-To:References; b=WRR1Ni2mD/Z8fIJNR/rsUZkbfFQXwvccN/YUPKwYDRl2atyeubIdNbrQ7Zg+96FMJrs0cG4dAqeZOqc+HbSNn95kQWQ/Q/YSWBuPF6EuWajwhkgGzReDiDEyWVorN9L9JdUKcZPBxuNvocTEr3KXVsPCdj0Vx6wYmdBlNnGwwlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=t6hJqNY+; arc=none smtp.client-ip=212.227.17.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
-	s=s31663417; t=1715013613; x=1715618413; i=frank-w@public-files.de;
-	bh=N/q68vb1HhT4JSLgDcC9dSoHLwhoZYQX/ai2pcy/liw=;
-	h=X-UI-Sender-Class:MIME-Version:Message-ID:From:To:Cc:Subject:
-	 Content-Type:Date:In-Reply-To:References:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=t6hJqNY+EegHoajk9Pc+0pWAlS4Yd+wbC9xc5foY7mtoj5E+fzQVfHHijIB3uE04
-	 5VyK4YgptBC7x7st6WEqdeX2qPsC+J86rnyWLBBN77iVXPT2s1X1TV3YKTbtq9ZFu
-	 epowDLQMSQo4r72jPe/EbZxBWKTISd4SseBQQsNjoMXYY+XdadrzOqJEBK9qL3amQ
-	 TU98n6PEsJ3AjGOpG4tvnJiS2lGqC0p6VbbSZIU7cWb70rENueYpkQsYmvgDu/Kd/
-	 TM4lhtWwmgO9Afx87wRcFU/49sjq60Xe5rvbG9pQBe2GX920Hbpu5+eyjQnCDPFp/
-	 IOX6KGGVXeLBpBluiQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [80.245.77.247] ([80.245.77.247]) by web-mail.gmx.net
- (3c-app-gmx-bap23.server.lan [172.19.172.93]) (via HTTP); Mon, 6 May 2024
- 18:40:13 +0200
+	s=arc-20240116; t=1715013982; c=relaxed/simple;
+	bh=GOY7uF74aXtTWOzHLTtpIX38L22Nw4vV7OVkQIRNXrY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=CjPno55+1RrWJFkm6RbByiCPUGByfh5tRfQIk4JxNDDLc7H5Ag8rzsS7Wq+VQSd0+FlDV0Y6W5KmElRA72IxyhqPBaNeU+yCvPvj5Wve0FHJdGvPmQ7CpOThuzkXh44iNbeYVHpApb+9gaJUJmn18eAtaVi9lTfC6LSRsqbLo0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R0SKbmS9; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-69b50b8239fso21392856d6.0;
+        Mon, 06 May 2024 09:46:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715013980; x=1715618780; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rzTio4TEar79DkyEXWbqorclupsXYPTSGL7v/jrECRU=;
+        b=R0SKbmS9+RrK+17ALX/uTTzUIcJPqIkDgCsKfQ2KbzcuZ+MbzZOhI/OXXTNe92feOu
+         x9KwMqgRSkbg38Bi4REhmvekBVfBso7hZHOQzeVdHmjWHZfI7R6wbrwOJT4K5mv6Q1W5
+         oA7vPBUdpjlywN84koic/MFFsZz8zdlsmUII02hvJKfqeCyP5nCSkOuwS+QtkmFQznrO
+         3A3yjrOoctfM2hbld9/U5mFLO2S2SepWoYmUC9w72k9YNm97QDZ1/RYzlhgskirHIIYA
+         CtfvyWzVbmzv2YP39GBs/jLva2aAd7jfUyGkRw3VAv9BZRcF89JTGipm8PgMZMuyZNSU
+         Qd2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715013980; x=1715618780;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rzTio4TEar79DkyEXWbqorclupsXYPTSGL7v/jrECRU=;
+        b=aTM/OUUsUBMN6mJtmwitWMKx3pkA/TC6DoNY0/wzFMefZXU/iRAmwbsnMlPJ240Bvv
+         OruDLxQtVgkTi//dF3526uRXJpi32GV4PnuW7O1A14MAY6zUOFfN0ioOJwEI1wLsAMbf
+         BpDhDEE6ooIXc+CARbAlD45+DZgw+KeQgvaqYync03FEK7Czd3Ts4/GRLVd6rJbpYa53
+         gJqDPIy5aP1KLl5We1bH1Ueaf+ujO/GxDku4bIK+8+C0N/LSg0eED08K3P7gkrf2UmMg
+         dmZ/yVUp1Ay2VveQfUpD7l6zPVVZJIY3cSIkVa3YBcfBGsAuYPtQOLbdKY9eJNPdvTHe
+         RfqA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWdtOrE6J6fzEi30VSNe16hw9t0N5Q5HxgudOnn7LOtP2y7xBCHsW8l4gs0DBBilYKiXJXTozJv85C71zt9/NklGnzPptJL/fVY0wAOwymB/zkBl+SzHQnhYPhOpCT7/Kkp9/abFowJX4zu1XEvOEs60Tl18R8Bz/OXmXCxSjR87Obtpej
+X-Gm-Message-State: AOJu0YzaNg3HKgAugJXp+7qc7PmQkCSL8s6WWgZF0fHhQcBXiXYovpJq
+	bSSG7qZEMtxL9vkiyWNulQjzbQ72iJcu1x/W3xRoFdujtw8YEhkbdsFAWA==
+X-Google-Smtp-Source: AGHT+IE3xtdUWGdZUHh2WDdnuoZ14EOUNPk8DJIeSttgiBQGOaGlyoUoPStBZlUyVBxOrITd/5wEug==
+X-Received: by 2002:a05:6214:c84:b0:6a0:b3ec:9032 with SMTP id r4-20020a0562140c8400b006a0b3ec9032mr403317qvr.12.1715013979573;
+        Mon, 06 May 2024 09:46:19 -0700 (PDT)
+Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
+        by smtp.gmail.com with ESMTPSA id l13-20020ad4408d000000b006a0ee5b6ee6sm3869966qvp.123.2024.05.06.09.46.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 May 2024 09:46:19 -0700 (PDT)
+Date: Mon, 06 May 2024 12:46:18 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ willemdebruijn.kernel@gmail.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ alobakin@pm.me, 
+ shuah@kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Cc: Richard Gobert <richardbgobert@gmail.com>
+Message-ID: <6639095ab4887_516de294d8@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240506093550.128210-2-richardbgobert@gmail.com>
+References: <20240506093550.128210-1-richardbgobert@gmail.com>
+ <20240506093550.128210-2-richardbgobert@gmail.com>
+Subject: Re: [PATCH net-next v8 1/3] net: gro: use cb instead of
+ skb->network_header
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-ID: <trinity-0d9eb74a-bce9-48cb-b119-e75a41404ed5-1715013613002@3c-app-gmx-bap23>
-From: Frank Wunderlich <frank-w@public-files.de>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Frank Wunderlich <linux@fw-web.de>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
- <conor+dt@kernel.org>, Michael Turquette <mturquette@baylibre.com>, Stephen
- Boyd <sboyd@kernel.org>, Pavel Machek <pavel@ucw.cz>, Lee Jones
- <lee@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Eric
- Woudstra <ericwouds@gmail.com>, Tianling Shen <cnsztl@immortalwrt.org>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-leds@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, Tianling Shen <cnsztl@gmail.com>
-Subject: Aw: Re: [RFC v1 5/5] arm64: dts: mediatek: Add mt7986 based
- Bananapi R3 Mini
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 6 May 2024 18:40:13 +0200
-Importance: normal
-Sensitivity: Normal
-In-Reply-To: <174a8bfe-7a9e-4816-9bde-de48f04b07f6@linaro.org>
-References: <20240505164549.65644-1-linux@fw-web.de>
- <20240505164549.65644-6-linux@fw-web.de>
- <174a8bfe-7a9e-4816-9bde-de48f04b07f6@linaro.org>
-X-UI-Message-Type: mail
-X-Priority: 3
-X-Provags-ID: V03:K1:2Nu5/Rcmkcng/UFjyKhDHjpn72TCN/RAt4hU+RXwahNi4GUC7U3bepBAbLf1/WtG/b/mc
- t6MPfrxxMJsTe4yPWQxfhski+CBd2KW4LQeby40cGG+V+QIV8lqQ0xS7yYsAEz+CMmQa13jGQFhi
- 2944XqxVKJOLH0oXg0nwGY63i78FubKggNYWioQX+V3voIYs9DzcS5cILQkCHW8bYHOX7/JDsvmP
- LhJHTfMbERqZQ6bTLsKnRFQ4gq4iUsl3GG50s3H5NWtVDPooARWP/BGSP0wWwvNz45q74h5vUIDn
- 70=
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:NAsoPtlBBgM=;BO2DCb+S9ohdLnwa8Hpcq1GUEPe
- ilz3XZSkDGWrCrCKCACKqkcaiUa3wfr8CjuUbPiYkzg97H6S4+RqA8LaV2FcKRZ3uds0NXycD
- D9EnmfoBshiYg8IK1Q5RFLrBgSIZA6WSsVjxYvJ6VGYgMyL7RRTWG/Ewjbn4PayddcyzPNSWi
- Mp/XSio46j41O9XFKrWnLoRlH2rpubf/IwWyVxktBG6cVo5c2i+Vkfi5ZmoxqF9+ofnUulvps
- bTfOfofFnd5C/BG12if5dmY0t9s2oeXXLrVa+y5Z3p9uI7dlsEiDdQUJ0I8dRjrUDi0VvqnX5
- VNaplCpHWOUSndjDdf/QeGXpy33ZrxpCFttFsoLR82hwhA96N13p3PYm1VX2clM+8tXNVqFE0
- M/+I6QlD2ryJDVK5jJW/0CP7TcaRZoPEeF25ogGpKe2QDBBhAQ5lz3K05MiirheaJ3fHeDMYZ
- 7yMvt14o54Ba+QMSyyEhYt+bFEwWcMfGQYBRjpyGMdhJftxyN2wDl5b2saxrRPyG25RGYJFWm
- Ht02j5lFtl1vnaKMw3ZwPhxlctR8D8ozfzOy7+eNlJUGIiwvfH5f71qXh06eFUizFtOH7iupA
- S4wk1ufIzGfDUUeNnwe0Oc88WqigKDg1NWm/qZfQElsHx9DcnpRQ646moiYPapqjEch033K7r
- 1Bn6ZkKsiHXPRHA26QIGBBqFUf2YeD/iHIN4lrmoZakXmhLGIFeEi4VSr3EweFY=
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi
+Richard Gobert wrote:
+> This patch converts references of skb->network_header to napi_gro_cb's
+> network_offset and inner_network_offset.
+> 
+> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+> ---
+>  include/net/gro.h        | 9 +++++++--
+>  net/ipv4/af_inet.c       | 4 ----
+>  net/ipv4/tcp_offload.c   | 3 ++-
+>  net/ipv6/ip6_offload.c   | 5 ++---
+>  net/ipv6/tcpv6_offload.c | 3 ++-
+>  5 files changed, 13 insertions(+), 11 deletions(-)
+> 
+> diff --git a/include/net/gro.h b/include/net/gro.h
+> index c1d4ca0463a1..1faff23b66e8 100644
+> --- a/include/net/gro.h
+> +++ b/include/net/gro.h
+> @@ -181,12 +181,17 @@ static inline void *skb_gro_header(struct sk_buff *skb, unsigned int hlen,
+>  	return ptr;
+>  }
+>  
+> +static inline int skb_gro_network_offset(const struct sk_buff *skb)
+> +{
+> +	return NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark];
+> +}
+> +
 
-Thanks for review
+The fact that .._receive sets encap_mark, but .._complete must read
+encapsulation, due to the clear in udp_gro_complete, is non-obvious.
 
+Can you add a comment to clarify this or rename this to
+skb_gro_receive_network_offset?
 
-
-> Gesendet: Montag, 06. Mai 2024 um 10:20 Uhr
-> Von: "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>
-> An: "Frank Wunderlich" <linux@fw-web.de>, "Rob Herring" <robh@kernel.org=
->, "Krzysztof Kozlowski"
-> > +	dcin: regulator-12vd {
->
-> Please use name for all fixed regulators which matches current format
-> recommendation: 'regulator-[0-9]+v[0-9]+'
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator.git/co=
-mmit/?id=3Db6d4b3500d57370f5b3abf0701c9166b384db976
->
-> > +		compatible =3D "regulator-fixed";
-> > +		regulator-name =3D "12vd";
-> > +		regulator-min-microvolt =3D <12000000>;
-> > +		regulator-max-microvolt =3D <12000000>;
-> > +		regulator-boot-on;
-> > +		regulator-always-on;
-> > +	};
-> > +
-> > +	fan: pwm-fan {
-> > +		compatible =3D "pwm-fan";
-> > +		#cooling-cells =3D <2>;
-> > +		/* cooling level (0, 1, 2) - pwm inverted */
-> > +		cooling-levels =3D <255 96 0>;
-> > +		pwms =3D <&pwm 0 10000>;
-> > +		status =3D "okay";
->
-> Why? Where is it disabled?
-
-you're right, i'll drop it
-
-> > +	};
-> > +
-> > +	reg_1p8v: regulator-1p8v {
->
-> Please use name for all fixed regulators which matches current format
-> recommendation: 'regulator-[0-9]+v[0-9]+'
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator.git/co=
-mmit/?id=3Db6d4b3500d57370f5b3abf0701c9166b384db976
->
-> In other places as well.
-
-ok i change it like this (label doesn't matter, right?):
-
-dcin: regulator-12v {
-reg_1p8v: regulator-1v8 {
-reg_3p3v: regulator-3v3 {
-usb_vbus: regulator-5v {
-
-
-> Best regards,
-> Krzysztof
-
-regards Frank
+>  static inline void *skb_gro_network_header(const struct sk_buff *skb)
+>  {
+>  	if (skb_gro_may_pull(skb, skb_gro_offset(skb)))
+> -		return skb_gro_header_fast(skb, skb_network_offset(skb));
+> +		return skb_gro_header_fast(skb, skb_gro_network_offset(skb));
+>  
+> -	return skb_network_header(skb);
+> +	return skb->data + skb_gro_network_offset(skb);
+>  }
 
