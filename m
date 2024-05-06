@@ -1,190 +1,136 @@
-Return-Path: <netdev+bounces-93653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6F4E8BC9CA
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 10:42:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3149F8BCA07
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 10:51:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 427311F22B79
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 08:42:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA9E21F2118D
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 08:51:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0769F1419B3;
-	Mon,  6 May 2024 08:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70AB3142910;
+	Mon,  6 May 2024 08:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aFlhn0qM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SEiBd/u8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949F71420DE
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 08:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C7A1422AD;
+	Mon,  6 May 2024 08:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714984934; cv=none; b=hsElspUwBpHomxBGYcVG5QLJnQILgJyOjKm22rUoSBSdCcwB8b9cDshlk0DsV/+W0QjKIdOPiRpr5XzgKHlzjfkDVNfW4BbdzIH3Qp7ChktdFXzK9drtWaHnrHcf7XazNEJKWPP4kFWuLw6N9JJU0tq8iJzeckiNv1uW2NRCdIg=
+	t=1714985415; cv=none; b=gDXwMAEmkoB8FqvvLgtVcJutM+fnP+eplXgLSmx62NCNVO/5nToqZZu4bD0lmaYbdj+X9yYTpEUxEZEvud6Oq1oBRyKgikrcbJ1QxQa6AkO1fUWWcnQwjMFfXg0vS+cHPFxosGUUQ0sgjWSf8N2kkJr/GHvvvXnElZYRuUTbDEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714984934; c=relaxed/simple;
-	bh=jwrUkSiP9mBvhULzR57jthYOrcdWsPsw+csazW5uF+s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p3QE2zFRW7wA9dZ/3QD9d8QFGxP/EReLSGnCYmJtcJmXGY2kJUfjafyFDFrsUCDsXOV30z6/9dOcuNE1a/Aqc3t99uF+Kr7D8KcxPFfKMZKnJbALPXRgbxMsgzhyGuas4bysEUQZkcDa3wz2MrZxB8Lxz1zcjG+jvVy2me2bxys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aFlhn0qM; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714984934; x=1746520934;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jwrUkSiP9mBvhULzR57jthYOrcdWsPsw+csazW5uF+s=;
-  b=aFlhn0qMy9J6LG93jT5Fkvnss8DIqDYAUdvn/y5ojsWVXOnLLUL9TIhe
-   rbIcMfj27NgR5/4lL4GtrJDHa8ulR1iZfgp988OuNVX9GJbvJanM/tY5g
-   rtD01NevWWiOSGeO1tkeCIKgU6rRqZBQ8OTp2sr4/l6Crp9Uu/Vx2EgVU
-   tDVYN+EPvSYF2AqrDqeqS3zTVhe7eZr+cJKsjjAkHpQ0pSwus1LTDSdbL
-   ZoiooF/iGcPxLHzPyZ5cE2Ijux5teU3bXNJ8+5KBS+nM5/+BcWi0kP/qc
-   HnOlOdvSxYNiOygCxy7R28XH7j/9ZBYckYYuXdP4TvGcjXbhMpqk/5HXG
-   A==;
-X-CSE-ConnectionGUID: A9QIwe19QwOglFXQnOa7kQ==
-X-CSE-MsgGUID: ew78xZA3SqGY7jQqkkob8w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11064"; a="14505131"
-X-IronPort-AV: E=Sophos;i="6.07,257,1708416000"; 
-   d="scan'208";a="14505131"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 01:42:14 -0700
-X-CSE-ConnectionGUID: bHstSGC+RyWUUZW3FO7I0A==
-X-CSE-MsgGUID: kVNIWsRQR12AWPKckmnStg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,257,1708416000"; 
-   d="scan'208";a="28050174"
-Received: from wasp.igk.intel.com (HELO GK3153-DR2-R750-36946.localdomain.com) ([10.102.20.192])
-  by fmviesa009.fm.intel.com with ESMTP; 06 May 2024 01:42:11 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	jacob.e.keller@intel.com,
-	michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com,
-	sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com,
-	wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com,
-	jiri@nvidia.com,
-	mateusz.polchlopek@intel.com,
-	shayd@nvidia.com
-Subject: [iwl-next v2 4/4] ice: update representor when VSI is ready
-Date: Mon,  6 May 2024 10:46:53 +0200
-Message-ID: <20240506084653.532111-5-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240506084653.532111-1-michal.swiatkowski@linux.intel.com>
-References: <20240506084653.532111-1-michal.swiatkowski@linux.intel.com>
+	s=arc-20240116; t=1714985415; c=relaxed/simple;
+	bh=PVEtpu+l2zGGzojDwX0WQr6+h4fSUImOuCn79HwWJeQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Eb13zwdcPBSHbsf3XdmszaiSH8gN8AcQUdImgbeHmJPzYYh01RF2SLqEBPGqQjx/VxwewL9RmvpqUtjTVh1H8uApuP7T5CRT58tTjlpqUtxT3DAjbT8EIB95ALp6vX6ua/uJaQeC2EywUfXfeAKfF9o1R+TrgklDXAMGxnxRyZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SEiBd/u8; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-51ab4ee9df8so2037841e87.1;
+        Mon, 06 May 2024 01:50:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714985412; x=1715590212; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0W3OM+PzsAuNXqvgrbwYe/sYHFhkCcz6xsmFOfCjwNc=;
+        b=SEiBd/u8pmlvxUXZjrcU4UPetWt2M6K20xyF312lftD5ydDohCH3IJWKOy86vMk+oG
+         tD0YqAEDYWneIjG6BuQsjQDaIkpDFswSzFTniEcVs+geQL/pHAiS9hGEy6lVVaDzTHXn
+         EHQNYmFxzqWfUkUSM7sRsyVMvAqkmRNryWfqTzRQLVRuJjWsw6a2qKHeAc/ZZHqKSv5j
+         nfTc9PHTo5kLi9vdjV6ac9ttLmgw65TzrLyOb91obntNsxWenT0AbIT+bctGqjwBRJVT
+         2iLPA5/DXcjVnnXTS0UVrpeGr5d8aO/eSrltmGVUQoXkfv2Dgh9AwTsD9ByEsmSvXgVu
+         yJsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714985412; x=1715590212;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0W3OM+PzsAuNXqvgrbwYe/sYHFhkCcz6xsmFOfCjwNc=;
+        b=doCGPtvzn8JY38X1I4I9rE7MygsKTzskocmse4x/akJytCBMjelbfGUETOEgCakget
+         iQ7X8iyjDMZ0+N2fdkzy5q9+gQHjn+kclnqn2qJD1fUsyQsqM2mvlYFrf6BT27WKEP+M
+         C35KJVQ13ZyQ//2Xk2ZFhFTVJ/gqHWmjAWPyzImnDTXT0h1YwQ4H0ggeJpZZoHbzEUFN
+         3Zc5Gm0JNCXE5w2cxU61ZPdx2YJcOMLukWPhJm5RA7BBzyjer9Cyucy+O3MQq/NViuyo
+         yyD4L3PnGqBdz3RlA81eKT21LWEPDV3XBmcUC0mRizxnhcyska/VYH8bEwpuXmxHuwYd
+         HXNw==
+X-Forwarded-Encrypted: i=1; AJvYcCVrLuxkIa45W8B1vHYSBuVYKrXfHnHg0qQzYbRqajN2t3rKh38Q8CLmzt+YNFI4kFwwQn9eEvsr2PM46/A71ENqjW/2u1pvO+OGvSyzMOo8HxaE15Xvik6nDEuxzvuUAF0ap/B3kqkXfnjbaFw8Prj41yXw4kWNFJpgUbqq+vQixYBvweanI43NyRJ8WpItKfy9Ju4YovjuQddxgJDmdF/DYZNV
+X-Gm-Message-State: AOJu0Ywausg1AT+iw7Yt2RQ6ou8txgpoKd+aoqtxHCNK0erB3MCPpDXt
+	bqdUGm/qsvcGWrGoo7zPfJj07wzYe+oatHvWFhWXWE5l4aLcmCB7
+X-Google-Smtp-Source: AGHT+IEh+fGA+MGksiXkeu45MPOZ4U+YR5N+ndBcztXInjKnEGGz7Iui8cqavnJNkkCV9JKVT3Rxsw==
+X-Received: by 2002:ac2:46e3:0:b0:51d:2a27:9574 with SMTP id q3-20020ac246e3000000b0051d2a279574mr5758742lfo.6.1714985411631;
+        Mon, 06 May 2024 01:50:11 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id y6-20020a0565123f0600b0051e16048adesm1569125lfa.48.2024.05.06.01.50.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 May 2024 01:50:11 -0700 (PDT)
+Date: Mon, 6 May 2024 11:50:08 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v5 2/7] net: stmmac: Add dedicated XPCS cleanup
+ method
+Message-ID: <ljlbqz3o5btsufgc4jx3rqldmgvyl6k3raezcaur5g6qg44jje@ql2ws5ntt6eq>
+References: <20240430-rzn1-gmac1-v5-0-62f65a84f418@bootlin.com>
+ <20240430-rzn1-gmac1-v5-2-62f65a84f418@bootlin.com>
+ <4wdcmcb2yxneynxtppestl6cp25z5xge3hfv7o47bxwpafn4cg@mtvc3ls2cxij>
+ <ec3e6c1b-1a5e-f7c9-4782-bc8f01a67f5f@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ec3e6c1b-1a5e-f7c9-4782-bc8f01a67f5f@bootlin.com>
 
-In case of reset of VF VSI can be reallocated. To handle this case it
-should be properly updated.
+On Mon, May 06, 2024 at 09:07:41AM +0200, Romain Gantois wrote:
+> Hi Serge,
+> 
+> On Fri, 3 May 2024, Serge Semin wrote:
+> 
+> > 
+> > > +void stmmac_pcs_clean(struct stmmac_priv *priv)
+> > 
+> > Ideally it would have been great to have the entire driver fixed to
+> > accept the stmmac_priv pointer as the functions argument. But this
+> > would be too tiresome. Anyway seeing the PCS-setup protagonist method
+> > has the net_device pointer passed I would implement the same prototype
+> > for the antagonist even though it would require an additional local
+> > variable. That will make the MDIO and PCS local interface-functions
+> > looking alike and as if unified. That is the reason of why I made
+> > stmmac_xpcs_clean() accepting the net_device pointer. 
+> > 
+> > Alternatively both stmmac_pcs_setup() and stmmac_pcs_clean() could be
+> > converted to just accepting a pointer to the stmmac_priv instance.
+>
+ 
+> I think that adapting stmmac_pcs_clean() to take a net_device struct would be 
+> more appropriate since it's the simpler of the two methods. I'll implement this 
+> in the next version.
 
-Reload representor as vsi->vsi_num can be different than the one stored
-when representor was created.
+Awesome! Thanks.
 
-Instead of only changing antispoof do whole VSI configuration for
-eswitch.
+-Serge(y)
 
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_eswitch.c | 21 +++++++++++++-------
- drivers/net/ethernet/intel/ice/ice_eswitch.h |  4 ++--
- drivers/net/ethernet/intel/ice/ice_vf_lib.c  |  2 +-
- 3 files changed, 17 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index 3f73f46111fc..4f539b1c7781 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -178,16 +178,16 @@ void ice_eswitch_decfg_vsi(struct ice_vsi *vsi, const u8 *mac)
-  * @repr_id: representor ID
-  * @vsi: VSI for which port representor is configured
-  */
--void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi)
-+void ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi)
- {
- 	struct ice_pf *pf = vsi->back;
- 	struct ice_repr *repr;
--	int ret;
-+	int err;
- 
- 	if (!ice_is_switchdev_running(pf))
- 		return;
- 
--	repr = xa_load(&pf->eswitch.reprs, repr_id);
-+	repr = xa_load(&pf->eswitch.reprs, *repr_id);
- 	if (!repr)
- 		return;
- 
-@@ -197,12 +197,19 @@ void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi)
- 	if (repr->br_port)
- 		repr->br_port->vsi = vsi;
- 
--	ret = ice_vsi_update_security(vsi, ice_vsi_ctx_clear_antispoof);
--	if (ret) {
--		ice_fltr_add_mac_and_broadcast(vsi, repr->parent_mac,
--					       ICE_FWD_TO_VSI);
-+	err = ice_eswitch_cfg_vsi(vsi, repr->parent_mac);
-+	if (err)
- 		dev_err(ice_pf_to_dev(pf), "Failed to update VSI of port representor %d",
- 			repr->id);
-+
-+	/* The VSI number is different, reload the PR with new id */
-+	if (repr->id != vsi->vsi_num) {
-+		xa_erase(&pf->eswitch.reprs, repr->id);
-+		repr->id = vsi->vsi_num;
-+		if (xa_insert(&pf->eswitch.reprs, repr->id, repr, GFP_KERNEL))
-+			dev_err(ice_pf_to_dev(pf), "Failed to reload port representor %d",
-+				repr->id);
-+		*repr_id = repr->id;
- 	}
- }
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.h b/drivers/net/ethernet/intel/ice/ice_eswitch.h
-index 9a25606e9740..09194d514f9b 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.h
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.h
-@@ -18,7 +18,7 @@ ice_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 		     struct netlink_ext_ack *extack);
- bool ice_is_eswitch_mode_switchdev(struct ice_pf *pf);
- 
--void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi);
-+void ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi);
- 
- void ice_eswitch_stop_all_tx_queues(struct ice_pf *pf);
- 
-@@ -47,7 +47,7 @@ ice_eswitch_set_target_vsi(struct sk_buff *skb,
- 			   struct ice_tx_offload_params *off) { }
- 
- static inline void
--ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi) { }
-+ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi) { }
- 
- static inline int ice_eswitch_configure(struct ice_pf *pf)
- {
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-index 48a8d462d76a..5635e9da2212 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-@@ -948,7 +948,7 @@ int ice_reset_vf(struct ice_vf *vf, u32 flags)
- 		goto out_unlock;
- 	}
- 
--	ice_eswitch_update_repr(vf->repr_id, vsi);
-+	ice_eswitch_update_repr(&vf->repr_id, vsi);
- 
- 	/* if the VF has been reset allow it to come up again */
- 	ice_mbx_clear_malvf(&vf->mbx_info);
--- 
-2.42.0
-
+> 
+> Thanks,
+> 
+> -- 
+> Romain Gantois, Bootlin
+> Embedded Linux and Kernel engineering
+> https://bootlin.com
 
