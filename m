@@ -1,153 +1,92 @@
-Return-Path: <netdev+bounces-93725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C22488BCFA8
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:05:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA918BCFB4
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:09:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77C06289100
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:05:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEDFC1F22816
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F105081749;
-	Mon,  6 May 2024 14:05:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="fp9mKMuN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="X9VhyV+K"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A538824B9;
+	Mon,  6 May 2024 14:09:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from wfout6-smtp.messagingengine.com (wfout6-smtp.messagingengine.com [64.147.123.149])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B824215A5;
-	Mon,  6 May 2024 14:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.149
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B09882497;
+	Mon,  6 May 2024 14:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715004341; cv=none; b=NHfCGPqHjSqWObdwpWdKPkubKreJQap33Av6nl9m5EAYilNspZU3HnMTiKk3AkUgbFyF0PRsflh+mZZRXWLYUuUUiD0zSLxUC5u8/bJ7/tk8AHr18EVWXIuaAemt1ZL1JovrS+VHQunMq1WxG98G0uJdQkemlEyIEgIIJJyMl50=
+	t=1715004549; cv=none; b=BlXxs2ME6Z23oOcp6vPFWzR1pcYqiB54EwK+9dOgPt2J3b6Ik1h/bJAiw3D9UgIg+BGaoMsXnp/22hBraDSO8KyJQ0zHekYhkEOKd0+PvzOolQ6Byv5QuiAjTZxdDCmSkE3z5bnW1lfQeyKaq1lAW1CEpU+wvoCpAtSKFkHbw04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715004341; c=relaxed/simple;
-	bh=kJvurmAd4Huzk7xJLL+fdoKaaexCaT28q6J9IH5vbUY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k63C1EL9fKVjk61Hh0MZ0wRsJ5R7bQXbbH+EynHltbgKNc19iBFlQBwkqVOacJ4AUMeTkhyaKBX0GwXorZcD4t4jh3oAdnv83ag3w828yXToedOiHORsRc7BGPwS3FE18MH0+LObbOl0+hsVZW6id834JybmiuD3wikQgRRspIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=fp9mKMuN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=X9VhyV+K; arc=none smtp.client-ip=64.147.123.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-	by mailfout.west.internal (Postfix) with ESMTP id 2831D1C0017D;
-	Mon,  6 May 2024 10:05:37 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Mon, 06 May 2024 10:05:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1715004336;
-	 x=1715090736; bh=5m5LZqjJlr1xGKll64ocIdbEm6uTXlrNkLO3vlro68Y=; b=
-	fp9mKMuN93Sc0IuPN8x7Yb6mF8aRMErIV9HymDtHmNUVDgBsBhXC4QBQvcYTOL4u
-	cY8actE6R4jd2+OTAr4/OycBLIN+08cGaZa16XUoOsYQnA4VCDlHsCXiRt2P4c0P
-	O1IpCPijtJ0Iu/SdhI9pRDEkSuGEHJV/yFVfHKmxAQlOyctitfwTd1o9TSz3QNut
-	e/z1xGXMLTZisuwhX0VE1xUiQtDRgufsyjnTxmXAa1N2Oo83Zy9dTMTEoPRYKXNK
-	pWCuRVhRPpidJY00UZPuXq+1J61P3YOU7atAL1sz32SEcWhRohXXb4tpQzri7UF5
-	PtXKJx0s9+GOLCzevmgpVA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1715004336; x=
-	1715090736; bh=5m5LZqjJlr1xGKll64ocIdbEm6uTXlrNkLO3vlro68Y=; b=X
-	9VhyV+KrfZcfqEgHUFjX4gjOzW3SBJPV8NUkQbknlTFklcIkCTJFG78cexMtk44F
-	DmocTDXbCK3YsiDEVhz0GZRmt1Y1WsEy3+MExVNypDtJ2ZS652BJm7o0zNvo5cGb
-	+hJ05tW8Q8mQZV3jAAjEVpmgQxtXpxDM7DNktJ+yQUp3cR4DWcV+fqKuV3UWQUAV
-	nla5ZwIHKBqY9Tnn2W/BYb0TShM8nkRU2Vr/KmMEEoRxNG4QQtrcLtpAN3LM07Cq
-	8ZEYxlCn0UrvVfFC+LIHgMKpBCLKhMijjZOiSDvWfpAj5AMsr3cUeYC15DFfz+Sk
-	30qHx6mRhhsJnow2JTlsw==
-X-ME-Sender: <xms:r-M4Zt6-Z9mX3wMOHE3DiTpWXLPFQq7c7LMGz411J9Dzj8xzG38vcw>
-    <xme:r-M4Zq7URYc5NtYX7coGypvjnim9F74sFQuXLmEj1pA4G_cagqk-tSQy45kZMiZFh
-    CkXwSeCtH79DLwmHNo>
-X-ME-Received: <xmr:r-M4Zkc6mEE1tm1Z6UsfO6bVLKMwpoOBPBHM-eck0ERI9pr-ATVHv67ftb96XApu-Gd_lkFvVi-2Vd8IolJYGfefny5A4Nc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvddviedgjedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
-    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
-    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeefhfellefh
-    ffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvdelieenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggv
-    rhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
-X-ME-Proxy: <xmx:r-M4ZmIGhEL3HfghWvgAYCRm3bMISo4f9g51N5Cte23dastfxWQxMg>
-    <xmx:r-M4ZhKIjgo10dTCS9MtF1d45sq-vBjDFnF4ggGU8vJ8acrPBxLr4w>
-    <xmx:r-M4Zvy3bhp1TtCL073bEaJaWOZq0q-J9JhEd3X7grh9QQP1FFzMrg>
-    <xmx:r-M4ZtJPXlFXXBe4sDx_PNjI8nAR89tsl-wwjfB1IJWjsRMvGs_zXQ>
-    <xmx:sOM4Zo9C9heV7vBH3ibK2guf23iZrjdTVfC1jXsU5484lHVMVCMYBpun>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 6 May 2024 10:05:35 -0400 (EDT)
-Date: Mon, 6 May 2024 16:05:33 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <20240506140533.GD720810@ragnatech.se>
-References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
- <5fd25c58-b421-4ec0-8b4f-24f86f054a44@lunn.ch>
- <20240503102006.GI3927860@ragnatech.se>
- <e3ce12b0-fb5d-49d7-a529-9ea7392b80ca@lunn.ch>
- <20240503133033.GJ3927860@ragnatech.se>
- <d5f6f31a-6ecc-48a9-a2ca-9d22fc6acb21@lunn.ch>
+	s=arc-20240116; t=1715004549; c=relaxed/simple;
+	bh=xfREskp0aFFmWPukql0qe6jAozQgtsD58tDf97zGEGg=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=eFiN95ZCdY/lDUA91LUlfkDrE75Kt/p5lxgv/mLn6Cpe2Dob8O1949Ag4gUJQxVL/7T0XhXHd8MqhOsvySJxTd85XcZqIgs/8UVFpmp6v08139k5r3JTebN7KImqfVIrulvMCqTvPKGJVcZUZVhmrhSb3+1OI0OxR1+80WxM5Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=206.189.21.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from ubuntu.localdomain (unknown [221.192.180.207])
+	by mail-app2 (Coremail) with SMTP id by_KCgCXtaRj5DhmI_s4AA--.15255S2;
+	Mon, 06 May 2024 22:08:38 +0800 (CST)
+From: Duoming Zhou <duoming@zju.edu.cn>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-hams@vger.kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	jreuter@yaina.de,
+	horms@kernel.org,
+	Markus.Elfring@web.de,
+	dan.carpenter@linaro.org,
+	lars@oddbit.com,
+	Duoming Zhou <duoming@zju.edu.cn>
+Subject: [PATCH net v3 0/2] ax25: Fix issues of ax25_dev and net_device
+Date: Mon,  6 May 2024 22:08:33 +0800
+Message-Id: <cover.1715002910.git.duoming@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:by_KCgCXtaRj5DhmI_s4AA--.15255S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrCr4xZw13ZryUCw4xtrW5Wrg_yoWxXwc_uF
+	y8AFW5Zw18JFWDGFW0yF48Jr9rCF4jgw1rXFnIqFZ5try3Zr1UJr4DWr48Xr18WFWjyr4k
+	t3WrAr4fAr13JjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbTAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_Xryl42xK82IYc2Ij64vIr4
+	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
+	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
+	v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOzuWDUUUU
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwINAWY3qokcfgAZsE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d5f6f31a-6ecc-48a9-a2ca-9d22fc6acb21@lunn.ch>
 
-Hi Andrew,
+The first patch fixes reference count leak issues the object of
+"ax25_dev" and "net_device". The second patch uses ax25_dev_put()
+to replace kfree() in ax25_dev_free().
 
-Thanks for this explanation, it helps understand what's going on.
+You can see the former discussion in the following link:
+https://lore.kernel.org/netdev/20240501060218.32898-1-duoming@zju.edu.cn/
 
-On 2024-05-06 03:51:45 +0200, Andrew Lunn wrote:
+Duoming Zhou (2):
+  ax25: Fix reference count leak issues of ax25_dev and net_device
+  ax25: Change kfree() in ax25_dev_free() to ax25_dev_put()
 
-> What PHY is this? Does it have C22 registers? Can it be identified via
-> C22 registers 2 and 3?
-
-The PHY in question is mv88q2110 (drivers/net/phy/marvell-88q2xxx.c), 
-unfortunately I do not have a datasheet for it so I can't tell you much 
-about it.
-
-<snip>
-
-> 
-> So i would drop the compatible. See if C22 is sufficient to get the
-> correct driver loaded.
-
-- Remove C45 compatible; Remove C45 read/write in driver
-
-  The PHY is identified as "Generic PHY", and the correct PHY driver is 
-  not used. I can't test more than that as the generic PHY driver do not 
-  implement some quirks I need to get the link up.
-
-- Remove C45 compatible; Keep C45 read/write in driver
-
-  The correct PHY driver is used and everything works.
-
-- Keep C45 compatible; Remove C45 read/write in driver
-
-  As described earlier in this thread, the MAC driver can't connect to 
-  the PHY as the call-chain described earlier fails.
-
-How would you suggest I move forward here? Shall I keep the C45 over C22 
-read/write in the driver or can I do something else more clever?
+ include/net/ax25.h  |  4 ++--
+ net/ax25/ax25_dev.c | 49 ++++++++++++++++-----------------------------
+ 2 files changed, 19 insertions(+), 34 deletions(-)
 
 -- 
-Kind Regards,
-Niklas Söderlund
+2.17.1
+
 
