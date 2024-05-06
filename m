@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-93827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 971728BD4E5
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 20:51:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFB778BD511
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 21:00:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C38691C2259B
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:51:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67DDD28158A
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2B4158D94;
-	Mon,  6 May 2024 18:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967D1158DDF;
+	Mon,  6 May 2024 19:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YfHVYz/1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OeAxvAQp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F6615886A;
-	Mon,  6 May 2024 18:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD08158DD5;
+	Mon,  6 May 2024 19:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715021498; cv=none; b=aRm/iU0mghxYuHtG78Wyn8cVyDPKBAH00JX0yjRN7suYwbeXHMA/LZD/CYHopwKNlNDLYoXdi5QHzuU5uBQCYJh6hD7xfQaEw3uxOgIC5ClgdLb5ZKG3xVLfckkqD5C1iGuYn5PeyvgwBQsNEs0l+2dWX2lORPGYOFeDn1sE2tA=
+	t=1715022013; cv=none; b=WRmd7TTD/7k+Dkpp37m3S9SHHJa3fFNuEA5NnD7Mj1mgxBxc9DowM5ye4q/EHnnqz2BEUfP1U18gA/yLZOYMRfi5trYnq/u0nzVVkEZ6/uuV7Gl8+dVTcmoH6QAH1U2XnIBTEMybfzGXDv2l5by2m5T3J70ZRXoCnu1NSffqiAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715021498; c=relaxed/simple;
-	bh=8R4ZPMsVAW+UX7HqHWTfTC7cyZevPvFz9AU2FQlodBI=;
+	s=arc-20240116; t=1715022013; c=relaxed/simple;
+	bh=Euxs9KJIZ78yPcSwjEnEjjpolNGSmMSxOuzS39fMApw=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=SL2wFRH2XTWQVnwjJQQBWAeACCfw6FO0lo9YYn3AVAhXM0NGhvvBK1S/XxAJB32p8CglD/uf3mDqqjy0FQT+ZnYvGpR+hfmFHmkdXSQO06uDxajze27f7XKq37qhFClt1q/ao7mpqW0/4QqNSD5fEnqbzgC2AbVM1xpB8Xnmgmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YfHVYz/1; arc=none smtp.client-ip=209.85.167.177
+	 Mime-Version:Content-Type; b=gxS8sxH5uUbNERvJUpxWDag+DVNVP49QMQ5NNhpziyfZ2rooldAsxf8eaX/12AhMLA92ayQrLrPtzJC3XYy/5n1/1hsv6pA9UPMCu9u1b0QZDWIxQfkpYnMn/IqP9o6OTOYIRimxwR0pQtWoY8FhHVFfgJpJbAeSA8W7uug1V1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OeAxvAQp; arc=none smtp.client-ip=209.85.167.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3c9691e1e78so972929b6e.3;
-        Mon, 06 May 2024 11:51:36 -0700 (PDT)
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3c963880aecso795535b6e.3;
+        Mon, 06 May 2024 12:00:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715021496; x=1715626296; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1715022011; x=1715626811; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cV6bIWj1XAD1mDEysW3PzxfMR0Aa4OzBGgrUMASIDvU=;
-        b=YfHVYz/1PhBHOBu35FkuMhydcdJJGEA30s4oObg1HoTeXMqATCLWww9Hmfukg5Pyy0
-         ZrSw46zFFevA0M2GBEZ8RQ/YH/mpQqfx1uR/cSJLuG51VLsPNQKzgx38rn4DBZCBs9nl
-         MJzHKbdFGVS7oASgJeBCylufFlKpqjLr+LYAjtlIDYZaOjOaSvF2rI4OKcNv/PRxvSq/
-         My36degVJT9wCFOuY50LvruhPB46iDfMQInI6LnLhTKhruc302vxajndUtNcuNvcsLr4
-         pFX/vk1F0sr3cnjutyCwiYTycJlaOA0brY1wHApGNxYqsFIojx2RLK7rTOamvbVGKlXE
-         aF6Q==
+        bh=10T5rur33Yqm4wo0EFQIMeMbzR3ugz/vLCFUG/913qA=;
+        b=OeAxvAQpS0YniMgCoUR7YYDNOp0zS9aKqAPwAvr/cZ06DL+oy7ypZtDEe+RgZgYySC
+         bUhx4XMML2WQxLBjuv5UkVa/TZWIYqfHvD1XEezF+UPUDYZV0sEHCLmY37w959q6YnkN
+         iCioqbXs8nv28rxqyfAl4EndCnEExtUWqc6t15uMHum4q3aQCBn3kZHcgZHI5oGt9+Wm
+         bOClfzdTMOd/J0Iq0DmWXENHkOXosCsT3H8gI6s0XzMYRVTXELtxgU4AFN5ylsnLqVDX
+         r89PZI4a9yCtsCIiKYgcYLIC8FPnEZ2eOimZZWA4B3y225HavEveczTkQY6gs4xLLkkP
+         3YYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715021496; x=1715626296;
+        d=1e100.net; s=20230601; t=1715022011; x=1715626811;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=cV6bIWj1XAD1mDEysW3PzxfMR0Aa4OzBGgrUMASIDvU=;
-        b=bw4jnjwPRab4zDhxmoDguwVw/Eql3iULJNOkL+28jBY8gSZbAKD3eIYkDkY8JqPSWL
-         NIQrb+A+t/Z0JI+JqEmTXMP1AnPAS7VHI86sM2hLXDYtFvgHdGTl16oWuGHsxztnfC4x
-         WH66cpuWBHENfyEgr/QGWjJhNU3Xs9ynEIjNRwr1RpzevGQNNYFH8UOAVwKaqVowrpYe
-         GD4PgFkBTb8Kjt6jAT+sJtYhAXmzhH4tiOYtn1g1iTSC8OtfesRYzlMRu+fI6tN4v3RH
-         9E28dbtsiZjLW4fO8fv2IT5YQlprjN3DerOVud1mxS7tX8ty6iWgNJIP+Inw7+V+ljhg
-         NoYg==
-X-Forwarded-Encrypted: i=1; AJvYcCUHc1IQY4jrt0TmwTeUjbijsHc8NHVOofFFNToE2S9hfFQm6DNwNdYtryMIFX3TK3DtmESACPPUc72iE4Ya0T07224weo4g7ZMoei1lLtXHl/SoNiJvczh5o+bsXxwtkojvgm7oVF9tXNI66lINjqyhyHLIYPE/3mfA
-X-Gm-Message-State: AOJu0YyZ+vuTHcjEpqJekKK873MLzxQFAvSVcNS9SO1FrZZ88ZKB05vi
-	evVLQ2HU7N9asduSq5tvjlNNqj6afBBJtfPFTkhzoSM8JVr9JK0s
-X-Google-Smtp-Source: AGHT+IHshUHD7rX/miFmKb49aF7IGeRm84VGByYTEoXu41Q3MLA0lnEG6e4eefO5gUEkXOkxr4vDeQ==
-X-Received: by 2002:a05:6808:1b23:b0:3c9:64ad:da93 with SMTP id bx35-20020a0568081b2300b003c964adda93mr8466950oib.29.1715021495815;
-        Mon, 06 May 2024 11:51:35 -0700 (PDT)
+        bh=10T5rur33Yqm4wo0EFQIMeMbzR3ugz/vLCFUG/913qA=;
+        b=MeJLOqDXYW464WUF5nG/1iEVWgKeJzTciyjVPc/hRitysoO3mqR7kLkjQuLPQXN5nk
+         fzW/Sww+YsAAJvc3jGWt+36omiumajgV4gichR2Gi6Luy+s66DhKZ2Y+LDoSg509Q1fe
+         F7Uj7VmY7qC/1m7cSPic2sQMTStE2SaUzrNMCN94MK63pzONg+mmMXCIp+kaeXtsJKuz
+         9x0RXH1zcc4hEY2c5He07JRLz81ONXYGT6A62jjaWFvuiixEqNpEe4HhANuKdPC+Jjud
+         6zwxarYbRW6gIwqrUSCHhV2rQvMI/xktLW+ZSH83ppJgUHJMTcfV5M+dWagzA/E0z2G1
+         pTiA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWOHIxEQ5v2zD84A1Mrgp10Ccv2RCMa2Rzb1keE8Y8Cfcj9MlLUu+/jnvBN+esqGyRFugGWw1XWcClStK7PufNAz2ybeSObX47i6v3RNm+2SCySdMaxg50XkVcRTa6z4Ty0nNpEZRtgZRMFC0i+EZzVCTbbTNG3Eo+
+X-Gm-Message-State: AOJu0YyoqZAwGKDhTLyeoXVmTU3gZVBauj5laTeHAXEGlhBwtOvcuJMD
+	y0Dq5ffqvVSDWVEJjAnkQzMnJCVdyW2z4gXVR3aGSyhApV7T5Fsa
+X-Google-Smtp-Source: AGHT+IH81W3pk5PMOmTI1vvKSy20nxCJhSKpPacLnEmZF16zekZuYD1rSSrd9+9/uqXptPu8aJqqWw==
+X-Received: by 2002:aca:d01:0:b0:3c9:6c3b:77a with SMTP id 1-20020aca0d01000000b003c96c3b077amr4420310oin.13.1715022010764;
+        Mon, 06 May 2024 12:00:10 -0700 (PDT)
 Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id de17-20020ad45851000000b006a0f3c93325sm3958744qvb.84.2024.05.06.11.51.35
+        by smtp.gmail.com with ESMTPSA id x12-20020a0ceb8c000000b006a0f012fab9sm3982949qvo.52.2024.05.06.12.00.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 11:51:35 -0700 (PDT)
-Date: Mon, 06 May 2024 14:51:35 -0400
+        Mon, 06 May 2024 12:00:10 -0700 (PDT)
+Date: Mon, 06 May 2024 15:00:10 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
  "David S. Miller" <davem@davemloft.net>, 
@@ -83,12 +83,12 @@ To: Abhishek Chauhan <quic_abchauha@quicinc.com>,
  Daniel Borkmann <daniel@iogearbox.net>, 
  bpf <bpf@vger.kernel.org>
 Cc: kernel@quicinc.com
-Message-ID: <663926b74cbbd_516de29466@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240504031331.2737365-2-quic_abchauha@quicinc.com>
+Message-ID: <663928ba373e3_516de294d5@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240504031331.2737365-3-quic_abchauha@quicinc.com>
 References: <20240504031331.2737365-1-quic_abchauha@quicinc.com>
- <20240504031331.2737365-2-quic_abchauha@quicinc.com>
-Subject: Re: [RFC PATCH bpf-next v6 1/3] net: Rename mono_delivery_time to
- tstamp_type for scalabilty
+ <20240504031331.2737365-3-quic_abchauha@quicinc.com>
+Subject: Re: [RFC PATCH bpf-next v6 2/3] net: Add additional bit to support
+ clockid_t timestamp type
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,143 +100,209 @@ Content-Type: text/plain;
 Content-Transfer-Encoding: 7bit
 
 Abhishek Chauhan wrote:
-> mono_delivery_time was added to check if skb->tstamp has delivery
-> time in mono clock base (i.e. EDT) otherwise skb->tstamp has
-> timestamp in ingress and delivery_time at egress.
+> tstamp_type is now set based on actual clockid_t compressed
+> into 2 bits.
 > 
-> Renaming the bitfield from mono_delivery_time to tstamp_type is for
-> extensibilty for other timestamps such as userspace timestamp
-> (i.e. SO_TXTIME) set via sock opts.
+> To make the design scalable for future needs this commit bring in
+> the change to extend the tstamp_type:1 to tstamp_type:2 to support
+> other clockid_t timestamp.
 > 
-> As we are renaming the mono_delivery_time to tstamp_type, it makes
-> sense to start assigning tstamp_type based on enum defined
-> in this commit.
-> 
-> Earlier we used bool arg flag to check if the tstamp is mono in
-> function skb_set_delivery_time, Now the signature of the functions
-> accepts tstamp_type to distinguish between mono and real time.
-> 
-> Also skb_set_delivery_type_by_clockid is a new function which accepts
-> clockid to determine the tstamp_type.
-> 
-> In future tstamp_type:1 can be extended to support userspace timestamp
-> by increasing the bitfield.
+> We now support CLOCK_TAI as part of tstamp_type as part of this
+> commit with exisiting support CLOCK_MONOTONIC and CLOCK_REALTIME.
 > 
 > Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
 > Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
 > ---
 > Changes since v5
-> - Avoided using garble function names as mentioned by
->   Willem.
-> - Implemented a conversion function stead of duplicating 
->   the same logic as mentioned by Willem.
-> - Fixed indentation problems and minor documentation issues
->   which mentions tstamp_type as a whole instead of bitfield
->   notations. (Mentioned both by Willem and Martin)
->   
+> - Took care of documentation comments of tstamp_type 
+>   in skbuff.h as mentioned by Willem.
+> - Use of complete words instead of abbrevation in 
+>   macro definitions as mentioned by Willem.
+> - Fixed indentation problems 
+> - Removed BPF_SKB_TSTAMP_UNSPEC and marked it 
+>   Deprecated as documentation, and introduced 
+>   BPF_SKB_CLOCK_REALTIME instead. 
+> - BUILD_BUG_ON for additional enums introduced.
+> - __ip_make_skb and ip6_make_skb now has 
+>   tcp checks to mark tcp packet as mono tstamp base. 
+> - separated the selftests/bpf changes into another patch.
+> - Made changes as per Martin in selftest bpf code and 
+>   tool/include/uapi/linux/bpf.h 
+> 
 > Changes since v4
-> - Introduce new function to directly delivery_time and
->   another to set tstamp_type based on clockid. 
-> - Removed un-necessary comments in skbuff.h as 
->   enums were obvious and understood.
+> - Made changes to BPF code in filter.c as per 
+>   Martin's comments
+> - Minor fixes on comments given on documentation
+>   from Willem in skbuff.h (removed obvious ones)
+> - Made changes to ctx_rewrite.c and test_tc_dtime.c
+> - test_tc_dtime.c i am not really sure if i took care 
+>   of all the changes as i am not too familiar with 
+>   the framework.
+> - Introduce common mask SKB_TSTAMP_TYPE_MASK instead
+>   of multiple SKB mask.
+> - Optimisation on BPF code as suggested by Martin.
+> - Set default case to SKB_CLOCK_REALTME.  
 > 
 > Changes since v3
-> - Fixed inconsistent capitalization in skbuff.h
-> - remove reference to MONO_DELIVERY_TIME_MASK in skbuff.h
->   and point it to skb_tstamp_type now.
-> - Explicitely setting SKB_CLOCK_MONO if valid transmit_time
->   ip_send_unicast_reply 
-> - Keeping skb_tstamp inline with skb_clear_tstamp. 
-> - skb_set_delivery_time checks if timstamp is 0 and 
->   sets the tstamp_type to SKB_CLOCK_REAL.
-> - Above comments are given by Willem 
-> - Found out that skbuff.h has access to uapi/linux/time.h
->   So now instead of using  CLOCK_REAL/CLOCK_MONO 
->   i am checking actual clockid_t directly to set tstamp_type 
->   example:- CLOCK_REALTIME/CLOCK_MONOTONIC 
-> - Compilation error fixed in 
->   net/ieee802154/6lowpan/reassembly.c
+> - Carefully reviewed BPF APIs and made changes in 
+>   BPF code as well. 
+> - Re-used actual clockid_t values since skbuff.h 
+>   indirectly includes uapi/linux/time.h
+> - Added CLOCK_TAI as part of the skb_set_delivery_time
+>   handling instead of CLOCK_USER
+> - Added default in switch for unsupported and invalid 
+>   timestamp with an WARN_ONCE
+> - All of the above comments were given by Willem  
+> - Made changes in filter.c as per Martin's comments
+>   to handle invalid cases in bpf code with addition of
+>   SKB_TAI_DELIVERY_TIME_MASK
 > 
 > Changes since v2
 > - Minor changes to commit subject
 > 
-> Changes since v1
-> - Squashed the two commits into one as mentioned by Willem.
-> - Introduced switch in skb_set_delivery_time.
-> - Renamed and removed directionality aspects w.r.t tstamp_type 
->   as mentioned by Willem.
+> Changes since v1 
+> - identified additional changes in BPF framework.
+> - Bit shift in SKB_MONO_DELIVERY_TIME_MASK and TC_AT_INGRESS_MASK.
+> - Made changes in skb_set_delivery_time to keep changes similar to 
+>   previous code for mono_delivery_time and just setting tstamp_type
+>   bit 1 for userspace timestamp.
 > 
->  include/linux/skbuff.h                     | 53 ++++++++++++++++------
->  include/net/inet_frag.h                    |  4 +-
->  net/bridge/netfilter/nf_conntrack_bridge.c |  6 +--
->  net/core/dev.c                             |  2 +-
->  net/core/filter.c                          | 10 ++--
->  net/ieee802154/6lowpan/reassembly.c        |  2 +-
->  net/ipv4/inet_fragment.c                   |  2 +-
->  net/ipv4/ip_fragment.c                     |  2 +-
->  net/ipv4/ip_output.c                       |  9 ++--
->  net/ipv4/tcp_output.c                      | 16 +++----
->  net/ipv6/ip6_output.c                      |  6 +--
->  net/ipv6/netfilter.c                       |  6 +--
->  net/ipv6/netfilter/nf_conntrack_reasm.c    |  2 +-
->  net/ipv6/reassembly.c                      |  2 +-
->  net/ipv6/tcp_ipv6.c                        |  2 +-
->  net/sched/act_bpf.c                        |  4 +-
->  net/sched/cls_bpf.c                        |  4 +-
->  17 files changed, 80 insertions(+), 52 deletions(-)
+> 
+>  include/linux/skbuff.h   | 21 +++++++++++--------
+>  include/uapi/linux/bpf.h | 15 +++++++++-----
+>  net/core/filter.c        | 44 +++++++++++++++++++++++-----------------
+>  net/ipv4/ip_output.c     |  5 ++++-
+>  net/ipv4/raw.c           |  2 +-
+>  net/ipv6/ip6_output.c    |  5 ++++-
+>  net/ipv6/raw.c           |  2 +-
+>  net/packet/af_packet.c   |  7 +++----
+>  8 files changed, 61 insertions(+), 40 deletions(-)
 > 
 > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 1c2902eaebd3..de3915e2bfdb 100644
+> index de3915e2bfdb..fe7d8dbef77e 100644
 > --- a/include/linux/skbuff.h
 > +++ b/include/linux/skbuff.h
-> @@ -706,6 +706,11 @@ typedef unsigned int sk_buff_data_t;
->  typedef unsigned char *sk_buff_data_t;
->  #endif
+> @@ -709,6 +709,8 @@ typedef unsigned char *sk_buff_data_t;
+>  enum skb_tstamp_type {
+>  	SKB_CLOCK_REALTIME,
+>  	SKB_CLOCK_MONOTONIC,
+> +	SKB_CLOCK_TAI,
+> +	__SKB_CLOCK_MAX = SKB_CLOCK_TAI,
+>  };
 >  
-> +enum skb_tstamp_type {
-> +	SKB_CLOCK_REALTIME,
-> +	SKB_CLOCK_MONOTONIC,
-> +};
-> +
 >  /**
->   * DOC: Basic sk_buff geometry
->   *
-> @@ -823,10 +828,9 @@ typedef unsigned char *sk_buff_data_t;
->   *	@dst_pending_confirm: need to confirm neighbour
+> @@ -829,8 +831,7 @@ enum skb_tstamp_type {
 >   *	@decrypted: Decrypted SKB
 >   *	@slow_gro: state present at GRO time, slower prepare step required
-> - *	@mono_delivery_time: When set, skb->tstamp has the
-> - *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
-> - *		skb->tstamp has the (rcv) timestamp at ingress and
-> - *		delivery_time at egress.
-> + *	@tstamp_type: When set, skb->tstamp has the
-> + *		delivery_time in mono clock base Otherwise, the
-> + *		timestamp is considered real clock base.
-
-Missing period. More importantly, no longer conditional. It always
-captures the type of skb->tstamp.
-
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -1301,7 +1301,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
->  	tp = tcp_sk(sk);
->  	prior_wstamp = tp->tcp_wstamp_ns;
->  	tp->tcp_wstamp_ns = max(tp->tcp_wstamp_ns, tp->tcp_clock_cache);
-> -	skb_set_delivery_time(skb, tp->tcp_wstamp_ns, true);
-> +	skb_set_delivery_type_by_clockid(skb, tp->tcp_wstamp_ns, CLOCK_MONOTONIC);
->  	if (clone_it) {
->  		oskb = skb;
+>   *	@tstamp_type: When set, skb->tstamp has the
+> - *		delivery_time in mono clock base Otherwise, the
+> - *		timestamp is considered real clock base.
+> + *		delivery_time clock base of skb->tstamp.
+>   *	@napi_id: id of the NAPI struct this skb came from
+>   *	@sender_cpu: (aka @napi_id) source CPU in XPS
+>   *	@alloc_cpu: CPU which did the skb allocation.
+> @@ -958,7 +959,7 @@ struct sk_buff {
+>  	/* private: */
+>  	__u8			__mono_tc_offset[0];
+>  	/* public: */
+> -	__u8			tstamp_type:1;	/* See skb_tstamp_type */
+> +	__u8			tstamp_type:2;	/* See skb_tstamp_type */
+>  #ifdef CONFIG_NET_XGRESS
+>  	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
+>  	__u8			tc_skip_classify:1;
+> @@ -1088,15 +1089,16 @@ struct sk_buff {
+>  #endif
+>  #define PKT_TYPE_OFFSET		offsetof(struct sk_buff, __pkt_type_offset)
 >  
-> @@ -1655,7 +1655,7 @@ int tcp_fragment(struct sock *sk, enum tcp_queue tcp_queue,
+> -/* if you move tc_at_ingress or mono_delivery_time
+> +/* if you move tc_at_ingress or tstamp_type
+>   * around, you also must adapt these constants.
+>   */
+>  #ifdef __BIG_ENDIAN_BITFIELD
+> -#define SKB_MONO_DELIVERY_TIME_MASK	(1 << 7)
+> -#define TC_AT_INGRESS_MASK		(1 << 6)
+> +#define SKB_TSTAMP_TYPE_MASK		(3 << 6)
+> +#define SKB_TSTAMP_TYPE_RSHIFT		(6)
+> +#define TC_AT_INGRESS_MASK		(1 << 5)
+>  #else
+> -#define SKB_MONO_DELIVERY_TIME_MASK	(1 << 0)
+> -#define TC_AT_INGRESS_MASK		(1 << 1)
+> +#define SKB_TSTAMP_TYPE_MASK		(3)
+> +#define TC_AT_INGRESS_MASK		(1 << 2)
+>  #endif
+>  #define SKB_BF_MONO_TC_OFFSET		offsetof(struct sk_buff, __mono_tc_offset)
 >  
->  	skb_split(skb, buff, len);
+> @@ -4213,6 +4215,9 @@ static inline void skb_set_delivery_type_by_clockid(struct sk_buff *skb,
+>  	case CLOCK_MONOTONIC:
+>  		tstamp_type = SKB_CLOCK_MONOTONIC;
+>  		break;
+> +	case CLOCK_TAI:
+> +		tstamp_type = SKB_CLOCK_TAI;
+> +		break;
+>  	default:
+>  		WARN_ON_ONCE(1);
+>  		kt = 0;
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index 90706a47f6ff..25ea393cf084 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -6207,12 +6207,17 @@ union {					\
+>  	__u64 :64;			\
+>  } __attribute__((aligned(8)))
 >  
-> -	skb_set_delivery_time(buff, skb->tstamp, true);
-> +	skb_set_delivery_type_by_clockid(buff, skb->tstamp, CLOCK_MONOTONIC);
->  	tcp_fragment_tstamp(skb, buff);
+> +/* The enum used in skb->tstamp_type. It specifies the clock type
+> + * of the time stored in the skb->tstamp.
+> + */
+>  enum {
+> -	BPF_SKB_TSTAMP_UNSPEC,
+> -	BPF_SKB_TSTAMP_DELIVERY_MONO,	/* tstamp has mono delivery time */
+> -	/* For any BPF_SKB_TSTAMP_* that the bpf prog cannot handle,
+> -	 * the bpf prog should handle it like BPF_SKB_TSTAMP_UNSPEC
+> -	 * and try to deduce it by ingress, egress or skb->sk->sk_clockid.
+> +	BPF_SKB_TSTAMP_UNSPEC = 0,		/* DEPRECATED */
+> +	BPF_SKB_TSTAMP_DELIVERY_MONO = 1,	/* DEPRECATED */
+> +	BPF_SKB_CLOCK_REALTIME = 0,
+> +	BPF_SKB_CLOCK_MONOTONIC = 1,
+> +	BPF_SKB_CLOCK_TAI = 2,
+> +	/* For any future BPF_SKB_CLOCK_* that the bpf prog cannot handle,
+> +	 * the bpf prog can try to deduce it by ingress/egress/skb->sk->sk_clockid.
+>  	 */
+>  };
+>  
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index a3781a796da4..9f3df4a0d1ee 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -7726,16 +7726,20 @@ BPF_CALL_3(bpf_skb_set_tstamp, struct sk_buff *, skb,
+>  		return -EOPNOTSUPP;
+>  
+>  	switch (tstamp_type) {
+> -	case BPF_SKB_TSTAMP_DELIVERY_MONO:
+> +	case BPF_SKB_CLOCK_MONOTONIC:
+>  		if (!tstamp)
+>  			return -EINVAL;
+>  		skb->tstamp = tstamp;
+>  		skb->tstamp_type = SKB_CLOCK_MONOTONIC;
+>  		break;
+> -	case BPF_SKB_TSTAMP_UNSPEC:
+> -		if (tstamp)
+> +	case BPF_SKB_CLOCK_TAI:
+> +		if (!tstamp)
+>  			return -EINVAL;
+> -		skb->tstamp = 0;
+> +		skb->tstamp = tstamp;
+> +		skb->tstamp_type = SKB_CLOCK_TAI;
+> +		break;
+> +	case BPF_SKB_CLOCK_REALTIME:
+> +		skb->tstamp = tstamp;
+>  		skb->tstamp_type = SKB_CLOCK_REALTIME;
 
-All these hardcoded monotonic calls in TCP can be the shorter version
+Only since there is another reason to respin.
 
-    skb_set_delivery_type(.., SKB_CLOCK_MONOTONIC);
-  
+The previous code did not do this, but let's order cases by their enum
+value, starting with realtime.
+
+Also in anticipation with possible future expansions.
+
+
 
