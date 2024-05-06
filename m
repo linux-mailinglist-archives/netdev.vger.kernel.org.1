@@ -1,110 +1,168 @@
-Return-Path: <netdev+bounces-93754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 405A88BD15A
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:14:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CABA38BD162
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:15:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAAB31F22109
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:14:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 081371C21A89
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:15:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A42615622F;
-	Mon,  6 May 2024 15:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="HiHEFrOu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0322F154C15;
+	Mon,  6 May 2024 15:14:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA3D155359;
-	Mon,  6 May 2024 15:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA731553A1
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 15:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715008332; cv=none; b=I2qW41PaDzvAR9YTaonMOOKNGCFGhfa5imZZpe4ktGFkGRtGhfB2ik0o0UMZQhcu99OaYteseQpSZ6RTJDdlnZA0zmfzMiSeYng6NyJM9P8UOweRzFRnrA1VNsy/NbY78E9BANiWiDj8gD+Qkm3ZlpDCYGi4wC9up4UbxpuPGxI=
+	t=1715008485; cv=none; b=nCKvwDhXwA6ph2OZMVHdO0LxYAhGUiSYI0ZcRJogsXgqUi9Wx/o+RmRCNmFABWM9GjHTfgwKyMr6i86qfb+XF1OxSRqWFDlWz4gHrDFPzsIkEksNoQ4uxIM0ItjjB1JISoKGEHGDrAYSDbr+b72WKsLFMX4nIk2+jKcZU4Bwol4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715008332; c=relaxed/simple;
-	bh=6e1q5SzxhmAt8bpTfbd7aZEK9sXTlPjzcbJlbx0Ai7A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZtGdHM1av4Py71rYqMRWub+wdE3BvqhOFSw9q4OrMj8+6L/IEgy8eyJG71vDCEmgABOy6SR+xwKPpaNuIL0bpI4cEpl3SuaKRbiZdEKXE0fgCyNI2dKFdmaUIhOJo6/yHMTt/7+FpBZX+bZ9IwPPKYZ10vv/SXXkzhKSqcq9Mzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=HiHEFrOu; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1715008294; x=1715613094; i=markus.elfring@web.de;
-	bh=6e1q5SzxhmAt8bpTfbd7aZEK9sXTlPjzcbJlbx0Ai7A=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=HiHEFrOub7F+MIrA3Zj8Ntt+oJDAnR+dTaRqRwUPNpxLGCLrBizgl3kcBX/SpzLZ
-	 BAYHu5MCB5bGBvhWXaHYffMjgUr0o5DQ/ViUhe6S7iSke29JPCHGK+C2xanKDVEcU
-	 fSkXgRlz5X2hkJz9xAaxZosgaUzo9WfkV7dBPl+xO2YfWihAuzJwp5RclXjb9ZabI
-	 7CaicpEmVyKOxLECttQPBSCv5DX7uhFsXiSVbtMH0dIyuPWw4STFGBMa0lvI3dUZy
-	 EnwXqIHoT4DFMdiJNgAdy7u+ICAtWxf5FQHWXSt8qggYG/jOxDjx1F9KZhc5SdpWf
-	 wNA9Gf89gak5j5k2lQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MlbLM-1sUm1s1VPW-00ijig; Mon, 06
- May 2024 17:11:34 +0200
-Message-ID: <7582e197-122c-4682-b9e2-53bfc386d870@web.de>
-Date: Mon, 6 May 2024 17:11:31 +0200
+	s=arc-20240116; t=1715008485; c=relaxed/simple;
+	bh=jgGBM1di0T0Mxh3GNCKZQk+nKLdzZaWHV4xpYN6qKrI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XJGx1jVXWVFUjLNgUZZ3Ka5u8AZwENhPY/pvFbOaX/2B5kxxPh7oxjFijDVzehVYj4DfVLfV1HZ1NMkeI/Hr6yIXH0nVdIanvxCHekyfszW/llOyv/00kbIoGnDonYzru199x5PkvgZLtIz7W+S4oUuLPMi/stkv5uRo1tlgoT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1s402l-0000sN-R5; Mon, 06 May 2024 17:14:19 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1s402j-00GHyB-Up; Mon, 06 May 2024 17:14:17 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 89ACC2CB730;
+	Mon, 06 May 2024 15:14:17 +0000 (UTC)
+Date: Mon, 6 May 2024 17:14:17 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Vitor Soares <ivitro@gmail.com>
+Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+	Thomas Kopp <thomas.kopp@microchip.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Vitor Soares <vitor.soares@toradex.com>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v4] can: mcp251xfd: fix infinite loop when xmit fails
+Message-ID: <20240506-bronze-snake-of-imagination-1db027-mkl@pengutronix.de>
+References: <20240506144918.419536-1-ivitro@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 1/2] ax25: Fix reference count leak issues of
- ax25_dev and net_device
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- =?UTF-8?Q?J=C3=B6rg_Reuter?= <jreuter@yaina.de>,
- Paolo Abeni <pabeni@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
- Lars Kellogg-Stedman <lars@oddbit.com>, Simon Horman <horms@kernel.org>
-References: <cover.1715002910.git.duoming@zju.edu.cn>
- <8338a74098bc1aafbca14d4612a10d6930fcef1b.1715002910.git.duoming@zju.edu.cn>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <8338a74098bc1aafbca14d4612a10d6930fcef1b.1715002910.git.duoming@zju.edu.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:RONyq3fALCbJADN/0hRJ9hnA+UEEvs4z1ucA3GyJCmX8Q4rDgTa
- 6wj6ykFbxKOL5vSvLYE4XP0123sYErDGuWLbvES+gCymF4t2thrkeQAhDi5ARN7HyqnP1Fw
- l433K7dS9GeQQaRK1uz6k06q5elOAqGh+5JjuCrjZM+LDauN3uE3TC2rvQyEr/yVpwwElvW
- eAfOiAet6R/jYSiNA7mUA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:7y0mQykGYLA=;p9lu1MtTvq61ZoI2zU7ntxmR31A
- BOwLVU6vjClWt23iGroruQIO/KBwzUylCl4EWal+Pbht/Peh00tmUnp7H+vf51jrlsaHdB5KQ
- zq3SuPkUuryho61EVxKTbUbbdJnQtvpOD9P2wszErdhVfPtV01llhr+gRlbObWkq4fjzaWQ2W
- d4apuw3PReVFPWAsB/EKbd3a4GQWuOOF3j2FWsycHNpQr6Y/sFhKEicUosYo74VIelFvtrZmc
- R3mEUBBk6jgkosx7VjajUr6c0LWzxCG7tizApfNA2wE3doXqARhGEkxlTKpNfsIYULNSQ68gD
- WJeE1lAAUtItHNKnHMlc8NWP5Fmjxm7lqkl6FjneIvnrf/ig+izSSS1bqkkozNTC3NnbnqSq1
- 0415Oy0+MY8rasHgQmWrhgkDFbyuo5mJrBvIyfrywz3grg+ofbRmkxnroD2+S01SquoEjIswY
- BcTvzaPeFXYgJKcidPedAsmRvY3fTjPwaqo7DlGw/3xQc5BPK35uSUig4IUtoJQI4ET5+1U9C
- ZZ7kiiupMQwcJJNiRd2eoQIpTDNsxX6SUVCrtwtrqpNvdg/5dDE01a2DIkUDFnHRBJXt9m+o1
- mdIWJG5IeyxYMFz9RDaxypTQ7LqTVL5K8kmXQIsZRzYPywtgT644NEceG72OO/WnhAASX/2o1
- 1UMNbMLdOCOZDc2ysz8syMG1nrkRb8xcCP0bV+Dpzje22MAroXxFQef/6EtCOBL+ydoQ5psQu
- rfp3zAJjCZiBioAgYOu2REHmBEU4Q9M0rpuLb+iYRvilR2FeRXx03JHffIWBNNFXY1nqoTwdN
- J4UEseE1nNXwXAset/IyBLLSq7W52+WB93OMIoZJUq/D4=
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="6xvopgmhifp6pdtd"
+Content-Disposition: inline
+In-Reply-To: <20240506144918.419536-1-ivitro@gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-> The ax25_addr_ax25dev() exists a reference count leak issue of the
-> object "ax25_dev" and the ax25_dev_device_down() exists reference
-> count leak issues of the objects "ax25_dev" and "net_device".
 
-I find that such a wording for the introduction of adjustments needs
-further improvements.
+--6xvopgmhifp6pdtd
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-How do you think about to offer changes for the affected two function
-implementations as separate update steps?
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.9-rc7#n81
+On 06.05.2024 15:49:18, Vitor Soares wrote:
+> From: Vitor Soares <vitor.soares@toradex.com>
+>=20
+> When the mcp251xfd_start_xmit() function fails, the driver stops
+> processing messages, and the interrupt routine does not return,
+> running indefinitely even after killing the running application.
+>=20
+> Error messages:
+> [  441.298819] mcp251xfd spi2.0 can0: ERROR in mcp251xfd_start_xmit: -16
+> [  441.306498] mcp251xfd spi2.0 can0: Transmit Event FIFO buffer not empt=
+y. (seq=3D0x000017c7, tef_tail=3D0x000017cf, tef_head=3D0x000017d0, tx_head=
+=3D0x000017d3).
+> ... and repeat forever.
+>=20
+> The issue can be triggered when multiple devices share the same
+> SPI interface. And there is concurrent access to the bus.
+>=20
+> The problem occurs because tx_ring->head increments even if
+> mcp251xfd_start_xmit() fails. Consequently, the driver skips one
+> TX package while still expecting a response in
+> mcp251xfd_handle_tefif_one().
+>=20
+> This patch resolves the issue by decreasing tx_ring->head and removing
+> the skb from the echo stack if mcp251xfd_start_xmit() fails.
+> Consequently, the package is dropped not been possible to re-transmit.
+>=20
+> Fixes: 55e5b97f003e ("can: mcp25xxfd: add driver for Microchip MCP25xxFD =
+SPI CAN")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Vitor Soares <vitor.soares@toradex.com>
+> ---
+> With this approach, some packages get lost in concurrent SPI bus access
+> due to can_put_echo_skb() being called before mcp251xfd_tx_obj_write().
+> The can_put_echo_skb() calls can_create_echo_skb() that consumes the orig=
+inal skb
+> resulting in a Kernel NULL pointer dereference error if return NETDEV_TX_=
+BUSY on
+> mcp251xfd_tx_obj_write() failure.
+> A potential solution would be to change the code to use spi_sync(), which=
+ would
+> wait for SPI bus to be unlocked. Any thoughts about this?
 
-Regards,
-Markus
+This is not an option. I think you need a echo_skb function that does
+the necessary cleanup, something like:
+
+void can_remove_echo_skb(struct net_device *dev, unsigned int idx)
+{
+	struct can_priv *priv =3D netdev_priv(dev);
+
+        priv->echo_skb[idx] =3D NULL;
+}
+
+I think you can open-code the "priv->echo_skb[idx] =3D NULL;" directly in
+the driver.
+
+And you have to take care of calling netdev_completed_queue(priv->ndev,
+1, frame_len);
+
+Another option would be to start a workqueue and use spi_sync() in case
+the spi_async() is busy.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--6xvopgmhifp6pdtd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmY488UACgkQKDiiPnot
+vG9FFggAit859fJ+935r7xsgkOImOZCO1B2qbEmNRJCx3IOcusNr1j74fL935i6a
+0rAdqHU7qndcGynpBbClTarptUjDRy0OH7PS/WGhucNdwPpJqXat3uGqgMJw06WQ
+EsDrS2iYiXCbj9rgcxl5EMaW7RSRz2mOzrAMkPzWtpIRxNetha+PKa9fDc9iEq01
+5J+8DlRIa4tMgy1Y1OOEkHvObg8iVg55e1v1+MKJ2wti/WS7dvU0m/QEwbPqXre+
+k+TozqXogUNIMA8BuVwhrKjtfxQyCyyk9SIt+aLsXt8PwgvQTab3hiEwkd6B5B53
+NPURQbFDCPVvTKX0aiJpchxMHCCZ2g==
+=/BDM
+-----END PGP SIGNATURE-----
+
+--6xvopgmhifp6pdtd--
 
