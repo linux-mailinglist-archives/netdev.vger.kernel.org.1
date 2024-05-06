@@ -1,154 +1,246 @@
-Return-Path: <netdev+bounces-93807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE8AB8BD3D6
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:30:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39D098BD3D0
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 19:26:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88EE12854A3
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:30:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C348B21F54
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:26:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA539158200;
-	Mon,  6 May 2024 17:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EC5615747F;
+	Mon,  6 May 2024 17:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HJBhM3hI"
 X-Original-To: netdev@vger.kernel.org
-Received: from 17.mo550.mail-out.ovh.net (17.mo550.mail-out.ovh.net [87.98.179.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0750157487
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 17:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=87.98.179.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCCB15747A;
+	Mon,  6 May 2024 17:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715016610; cv=none; b=MZtk2JleQiAVwoX65zYZjLDRU0lpvqClW/ZXuguOj+B7nM8iooU6ZTkCE8VLOnwNmEi6jl/hvdU2ZFrQq34jlFr0La0lDrvWVERtGsNg35J6SAnAV1V7YsZuD0rHKG3r+Re3jxWMKK+tHsooUWQlH3s4I5p16euyy1abUFNMJHI=
+	t=1715016379; cv=none; b=JtUKAK04uttzmASPpnfijSWUjwma3T6YjScq9ew01FvRjcrtLdi0GppnYv6Z6TimejOI1wpei0+jEHQr0aFuMApPLfkZZJVanFQLjRMr0Yu9SGW5g+0y4xtlOTFO0sLF20ZkLLpYVgD1F21gCMYRoicWsVvloAkCFVccpLiqp/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715016610; c=relaxed/simple;
-	bh=CN7xj+uT67o2sW+rYXo0f2Ugt7Pg1ggjIzoYJUkAXa4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HpXdOHueNOA0S37qm4zRNC+0ZefzL58RE7OnhndqrIhk3Zr+kjF/dTl49fGnva3wj2CVxLraKGXI6tTZMv1LhVQ/RqbZT+2ITdhobRlWuU7KsAq/6k/qufs3NbW2av8hq1kxcKffRhT/JFKJfo+pGEempCnz4xqrlgBWibE/rRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net; spf=pass smtp.mailfrom=remlab.net; arc=none smtp.client-ip=87.98.179.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=remlab.net
-Received: from director9.ghost.mail-out.ovh.net (unknown [10.108.25.63])
-	by mo550.mail-out.ovh.net (Postfix) with ESMTP id 4VY7Xv6Kb8z1Qyy
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 17:23:27 +0000 (UTC)
-Received: from ghost-submission-6684bf9d7b-cbxrr (unknown [10.108.42.240])
-	by director9.ghost.mail-out.ovh.net (Postfix) with ESMTPS id D229C1FD18;
-	Mon,  6 May 2024 17:23:26 +0000 (UTC)
-Received: from courmont.net ([37.59.142.110])
-	by ghost-submission-6684bf9d7b-cbxrr with ESMTPSA
-	id p9Y0Jw4SOWZvcQEA0aWcsA
-	(envelope-from <remi@remlab.net>); Mon, 06 May 2024 17:23:26 +0000
-Authentication-Results:garm.ovh; auth=pass (GARM-110S004dc6be723-f41b-49f6-a08b-4a8adaab5caa,
-                    E32D9AD65A977E9A62F8B07C7527B734663DD0F5) smtp.auth=postmaster@courmont.net
-X-OVh-ClientIp:87.92.194.88
-From: =?ISO-8859-1?Q?R=E9mi?= Denis-Courmont <remi@remlab.net>
-To: "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
- Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next] phonet: no longer hold RTNL in route_dumpit()
-Date: Mon, 06 May 2024 20:23:23 +0300
-Message-ID: <4256876.Znljf6yrvc@basile.remlab.net>
-Organization: Remlab
-In-Reply-To: <20240506121156.3180991-1-edumazet@google.com>
-References: <20240506121156.3180991-1-edumazet@google.com>
+	s=arc-20240116; t=1715016379; c=relaxed/simple;
+	bh=MItOV8hMg+olosaIlnJ6NDr65xwqJcwU8Z4bEj8wYQM=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=HD0WzOnUcs7hxKZr7VJWBWLviKyRVd78BESihp4VUdmrzXRppniHu6AB/d71dHW7zVtGQmvP8bvMwQNA8+Vcr7/Wy4vpi0wjyPLAUbkKD40sggZPuOnXiUaoyjdHKM8jP0n+cljHIpP2I02sKLeSWzQ9Oqe//SKqmSx2qv1K29g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HJBhM3hI; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-6181d032bf9so20260647b3.3;
+        Mon, 06 May 2024 10:26:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715016376; x=1715621176; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wuju28aY+PFkQvxmGZtNIpSACxyjaEw9XjsWh02SLLA=;
+        b=HJBhM3hI8u5uZrHbSWD1yp+4e2reEiMwfXVl/VQAGWVHom1pTgJLGVn1csrx/pYVen
+         LpaVqLvSgYySRof+/rYrEitfRb+gpbsW0oHDHwgDdEc6zpsq09kIwAwqD4sKEd2/RgRZ
+         tghGCt/q7UzAW1PkZcn33Xsw/qkzKLWSmc86FO2JPzikG62DVIJJamyjOleNJxmd6jRo
+         Qwfj9HAnTYW/+0q7oDi18++ljs3CSNxsMBaJaky5iKHqYAvyb09rTtTFX2ZsQGH0Kr/j
+         OlLwQoK9r1QOGHy0/431F/Eo5W41BOnnV9SuV5C4w50ecRs34if2BCP6yH7zEoJK0fcU
+         JWJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715016376; x=1715621176;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Wuju28aY+PFkQvxmGZtNIpSACxyjaEw9XjsWh02SLLA=;
+        b=RuTgPy7MEw1Xci306xbRcnjGow8Uz5giHwT7XMV7pSqBm7b8jq7Iyou46uyPFbWByP
+         P86qzLOTEhvVHKPEszyB/2rnpHR/MYsV2YxUWDLDDKsHF3q82rD4tBPI09fck6lGNRTD
+         sHlKX8bxDFt6IsqL9UOwxfdSYavufq121vPRgZO1eyLKhGeVegTMgME+/b4I+rR56LcJ
+         bAKs55YEnGG2U0eGYNSKgrE4Um6nHvHEL+x5Lakxg3DNHqi2Uae1M2/LF6RNfhJBj/7F
+         5xmjDOShsYGUdd0Adp9UPx1HBIT/1f/h7KJIOsAVfQ3sIp1dyK8N/+P2MzSk+1nbQLSf
+         pJeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUA4cXFCJukcuMhHbMMdBU6ql39tevvp2Na/eTrUvHL9hk3i4WFGBI/WmCtzoIxsA38wAQ42TvHXggOFMfgzdBOdDIzpvvOB9D/JsrqXmjavwT/goj6mpbGTru8tYFnrgb+VkSxgDm2HjgSF40OYa4JHZ3Qo771toEV6LrVmyyAAgvqhmc
+X-Gm-Message-State: AOJu0YyUz7MCNLxhjWFq5SVXDuI0AfM8u1agWi7AcyUY2r9zy+eByPDL
+	tgywtwOz+1hkvD00t5cH5Lp4jXk1+UP6cCI/1nGiJbf17oauc02m
+X-Google-Smtp-Source: AGHT+IEEIhRzQPPWEZapafecc9KRrti7+Bx4/RcP1LezidWSb31RwV6jcaEupYJ/c+5oIEANg7Pjpw==
+X-Received: by 2002:a5b:a0d:0:b0:de5:9f30:e40c with SMTP id k13-20020a5b0a0d000000b00de59f30e40cmr10395194ybq.4.1715016376437;
+        Mon, 06 May 2024 10:26:16 -0700 (PDT)
+Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
+        by smtp.gmail.com with ESMTPSA id bx9-20020a05622a090900b0043490cc5254sm5352234qtb.32.2024.05.06.10.26.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 May 2024 10:26:15 -0700 (PDT)
+Date: Mon, 06 May 2024 13:26:15 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ willemdebruijn.kernel@gmail.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ alobakin@pm.me, 
+ shuah@kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <663912b7b9746_516de29445@willemb.c.googlers.com.notmuch>
+In-Reply-To: <761374d3-1c76-4dc2-a4cc-7bd693deb453@gmail.com>
+References: <20240506093550.128210-1-richardbgobert@gmail.com>
+ <761374d3-1c76-4dc2-a4cc-7bd693deb453@gmail.com>
+Subject: Re: [PATCH net-next v8 3/3] selftests/net: add flush id selftests
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-X-Ovh-Tracer-Id: 1301258819392510364
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvledrvddviedguddugecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkfhojghfggfgtgesthhqredttddtjeenucfhrhhomheptformhhiucffvghnihhsqdevohhurhhmohhnthcuoehrvghmihesrhgvmhhlrggsrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhfegfeefvdefueetleefffduuedvjeefheduueekieeltdetueetueeugfevffenucffohhmrghinheprhgvmhhlrggsrdhnvghtnecukfhppeduvdejrddtrddtrddupdekjedrledvrdduleegrdekkedpfeejrdehledrudegvddruddutdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomheprhgvmhhisehrvghmlhgrsgdrnhgvthdpnhgspghrtghpthhtohepuddprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdpoffvtefjohhsthepmhhoheehtddpmhhouggvpehsmhhtphhouhht
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Le maanantaina 6. toukokuuta 2024, 15.11.56 EEST Eric Dumazet a =C3=A9crit :
-> route_dumpit() already relies on RCU, RTNL is not needed.
->=20
-> Also change return value at the end of a dump.
-> This allows NLMSG_DONE to be appended to the current
-> skb at the end of a dump, saving a couple of recvmsg()
-> system calls.
->=20
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Remi Denis-Courmont <courmisch@gmail.com>
-
-No objections from me, but TBH I am not familiar with the underlying RTNL=20
-locking so my ack wouldn't be worth anything.
-
+Richard Gobert wrote:
+> Added flush id selftests to test different cases where DF flag is set or
+> unset and id value changes in the following packets. All cases where the
+> packets should coalesce or should not coalesce are tested.
+> 
+> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
 > ---
->  net/phonet/pn_netlink.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
->=20
-> diff --git a/net/phonet/pn_netlink.c b/net/phonet/pn_netlink.c
-> index
-> 59aebe29689077bfa77d37516aea4617fe3b8a50..c11764ff72d6ac86e643123e2c49de6=
-f0
-> 758bf97 100644 --- a/net/phonet/pn_netlink.c
-> +++ b/net/phonet/pn_netlink.c
-> @@ -178,7 +178,7 @@ static int fill_route(struct sk_buff *skb, struct
-> net_device *dev, u8 dst, rtm->rtm_type =3D RTN_UNICAST;
->  	rtm->rtm_flags =3D 0;
->  	if (nla_put_u8(skb, RTA_DST, dst) ||
-> -	    nla_put_u32(skb, RTA_OIF, dev->ifindex))
-> +	    nla_put_u32(skb, RTA_OIF, READ_ONCE(dev->ifindex)))
->  		goto nla_put_failure;
->  	nlmsg_end(skb, nlh);
->  	return 0;
-> @@ -263,6 +263,7 @@ static int route_doit(struct sk_buff *skb, struct
-> nlmsghdr *nlh, static int route_dumpit(struct sk_buff *skb, struct
-> netlink_callback *cb) {
->  	struct net *net =3D sock_net(skb->sk);
-> +	int err =3D 0;
->  	u8 addr;
->=20
->  	rcu_read_lock();
-> @@ -272,16 +273,16 @@ static int route_dumpit(struct sk_buff *skb, struct
-> netlink_callback *cb) if (!dev)
->  			continue;
->=20
-> -		if (fill_route(skb, dev, addr << 2, NETLINK_CB(cb-
->skb).portid,
-> -			       cb->nlh->nlmsg_seq, RTM_NEWROUTE) <=20
-0)
-> -			goto out;
-> +		err =3D fill_route(skb, dev, addr << 2,
-> +				 NETLINK_CB(cb->skb).portid,
-> +				 cb->nlh->nlmsg_seq,=20
-RTM_NEWROUTE);
-> +		if (err < 0)
-> +			break;;
->  	}
-> -
-> -out:
->  	rcu_read_unlock();
->  	cb->args[0] =3D addr;
->=20
-> -	return skb->len;
-> +	return err;
+>  tools/testing/selftests/net/gro.c | 147 ++++++++++++++++++++++++++++++
+>  1 file changed, 147 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/gro.c b/tools/testing/selftests/net/gro.c
+> index 353e1e867fbb..5dc7b539ccbf 100644
+> --- a/tools/testing/selftests/net/gro.c
+> +++ b/tools/testing/selftests/net/gro.c
+> @@ -617,6 +617,123 @@ static void add_ipv6_exthdr(void *buf, void *optpkt, __u8 exthdr_type, char *ext
+>  	iph->payload_len = htons(ntohs(iph->payload_len) + MIN_EXTHDR_SIZE);
 >  }
->=20
->  int __init phonet_netlink_register(void)
-> @@ -301,6 +302,6 @@ int __init phonet_netlink_register(void)
->  	rtnl_register_module(THIS_MODULE, PF_PHONET, RTM_DELROUTE,
->  			     route_doit, NULL, 0);
->  	rtnl_register_module(THIS_MODULE, PF_PHONET, RTM_GETROUTE,
-> -			     NULL, route_dumpit, 0);
-> +			     NULL, route_dumpit,=20
-RTNL_FLAG_DUMP_UNLOCKED);
->  	return 0;
->  }
+>  
+> +static void fix_ip4_checksum(struct iphdr *iph)
+> +{
+> +	iph->check = 0;
+> +	iph->check = checksum_fold(iph, sizeof(struct iphdr), 0);
+> +}
+> +
+> +static void send_flush_id_case(int fd, struct sockaddr_ll *daddr, int tcase)
+> +{
+> +	static char buf1[MAX_HDR_LEN + PAYLOAD_LEN];
+> +	static char buf2[MAX_HDR_LEN + PAYLOAD_LEN];
+> +	static char buf3[MAX_HDR_LEN + PAYLOAD_LEN];
+> +	bool send_three = false;
+> +	struct iphdr *iph1;
+> +	struct iphdr *iph2;
+> +	struct iphdr *iph3;
+> +
+> +	iph1 = (struct iphdr *)(buf1 + ETH_HLEN);
+> +	iph2 = (struct iphdr *)(buf2 + ETH_HLEN);
+> +	iph3 = (struct iphdr *)(buf3 + ETH_HLEN);
+> +
+> +	create_packet(buf1, 0, 0, PAYLOAD_LEN, 0);
+> +	create_packet(buf2, PAYLOAD_LEN, 0, PAYLOAD_LEN, 0);
+> +	create_packet(buf3, PAYLOAD_LEN * 2, 0, PAYLOAD_LEN, 0);
+> +
+> +	switch (tcase) {
+> +	case 0: /* DF=1, Incrementing - should coalesce */
+> +		iph1->frag_off |= htons(IP_DF);
+> +		iph1->id = htons(8);
+> +		fix_ip4_checksum(iph1);
+> +
+> +		iph2->frag_off |= htons(IP_DF);
+> +		iph2->id = htons(9);
+> +		fix_ip4_checksum(iph2);
+> +		break;
+> +
+> +	case 1: /* DF=1, Fixed - should coalesce */
+> +		iph1->frag_off |= htons(IP_DF);
+> +		iph1->id = htons(8);
+> +		fix_ip4_checksum(iph1);
+> +
+> +		iph2->frag_off |= htons(IP_DF);
+> +		iph2->id = htons(8);
+> +		fix_ip4_checksum(iph2);
+> +		break;
+> +
+> +	case 2: /* DF=0, Incrementing - should coalesce */
+> +		iph1->frag_off &= ~htons(IP_DF);
+> +		iph1->id = htons(8);
+> +		fix_ip4_checksum(iph1);
+> +
+> +		iph2->frag_off &= ~htons(IP_DF);
+> +		iph2->id = htons(9);
+> +		fix_ip4_checksum(iph2);
+> +		break;
+> +
+> +	case 3: /* DF=0, Fixed - should not coalesce */
+> +		iph1->frag_off &= ~htons(IP_DF);
+> +		iph1->id = htons(8);
+> +		fix_ip4_checksum(iph1);
+> +
+> +		iph2->frag_off &= ~htons(IP_DF);
+> +		iph2->id = htons(8);
+> +		fix_ip4_checksum(iph2);
+> +		break;
+> +
+> +	case 4: /* DF=1, two packets incrementing, and one fixed - should
+> +		 * coalesce only the first two packets
+> +		 */
+> +		iph1->frag_off |= htons(IP_DF);
+> +		iph1->id = htons(8);
+> +		fix_ip4_checksum(iph1);
+> +
+> +		iph2->frag_off |= htons(IP_DF);
+> +		iph2->id = htons(9);
+> +		fix_ip4_checksum(iph2);
+> +
+> +		iph3->frag_off |= htons(IP_DF);
+> +		iph3->id = htons(9);
+> +		fix_ip4_checksum(iph3);
+> +		send_three = true;
+> +		break;
+> +
+> +	case 5: /* DF=1, two packets fixed, and one incrementing - should
+> +		 * coalesce only the first two packets
+> +		 */
+> +		iph1->frag_off |= htons(IP_DF);
+> +		iph1->id = htons(8);
+> +		fix_ip4_checksum(iph1);
+> +
+> +		iph2->frag_off |= htons(IP_DF);
+> +		iph2->id = htons(8);
+> +		fix_ip4_checksum(iph2);
+> +
+> +		iph3->frag_off |= htons(IP_DF);
+> +		iph3->id = htons(9);
+> +		fix_ip4_checksum(iph3);
+> +		send_three = true;
+> +		break;
+> +	}
 
+Consider moving the fix_ip4_checksum calls out of the switch to reduce
+duplication.
 
-=2D-=20
-R=C3=A9mi Denis-Courmont
-http://www.remlab.net/
+> +
+> +	write_packet(fd, buf1, total_hdr_len + PAYLOAD_LEN, daddr);
+> +	write_packet(fd, buf2, total_hdr_len + PAYLOAD_LEN, daddr);
+> +
+> +	if (send_three)
+> +		write_packet(fd, buf3, total_hdr_len + PAYLOAD_LEN, daddr);
+> +}
+> +
+> +static void test_flush_id(int fd, struct sockaddr_ll *daddr, char *fin_pkt)
+> +{
+> +	for (int i = 0; i < 6; i++) {
 
+Please avoid unnamed magic constants. Something like
 
+const int num_flush_id_cases = 6;	/* See switch in send_flush_id_case */
 
+Or even define an enum with named tests and and _MAX val. It's
+verbose, but helpful to readers.
+
+> +		sleep(1);
+> +		send_flush_id_case(fd, daddr, i);
+> +		sleep(1);
+> +		write_packet(fd, fin_pkt, total_hdr_len, daddr);
+> +	}
+> +}
+> +
 
