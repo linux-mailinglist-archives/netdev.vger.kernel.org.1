@@ -1,333 +1,310 @@
-Return-Path: <netdev+bounces-93690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 595AB8BCC20
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 12:39:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12FE38BCC3F
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 12:45:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9EC11F237D8
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 10:39:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 923211F21E8E
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 10:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC38C4204B;
-	Mon,  6 May 2024 10:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4D678C71;
+	Mon,  6 May 2024 10:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AaY81R1k"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P/3nixcc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106753FB01
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 10:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BAF578C65
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 10:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714991971; cv=none; b=KzqJOGYLEW9BQdte9SrgNmEwBb3PzgNoFEIUu6Io5MCzPcCX6db+omkljswmNUQ01TUqyBX3aAI2/YeXDIg79CVE4loMdqib2zZ1hF0uD89yTal1BLQ6PTGiYw99h5Sbnz1GIDBfAQbm0RBIRKivNob+iPVjmHBiVqCfUhP8TV4=
+	t=1714992332; cv=none; b=ZozIWrqK4MGCJU28/+l1MYvTY5G7rY2vYXiuUEJLR80IYlIOLdzNXA2UxCBUIXsJRWi3sGy6f7ioRfiHc1hhOSbN4PgtrvlGhTfsoRZ3cLEPu++BCPJN6X8cVkWqMvzgmQ4Zq/SFX4S9k7fUFAE3dEEbFsr2MOCOjbRHhayRe7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714991971; c=relaxed/simple;
-	bh=9i2/+ErYcB9oz2880zKRUydc6iDuCpjZ6d4276pkhoo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZlFiBl7gPMHoavHJP1hOk+cF5QQf9+txp7p28CVoejcmlVP0VK6lgsbQgDqCodp7FLuIs2QePtPjJDJw3YP+5kyOW6lNIhWp3ZE5K/ApjKaGSTzJYT7hgea7S76rUZz+w49gnn+5DJ5SGUuOjzEMxCWiXXt+JnNB65clZyfLOgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AaY81R1k; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-51ab4ee9df8so2133029e87.1
-        for <netdev@vger.kernel.org>; Mon, 06 May 2024 03:39:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714991968; x=1715596768; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z6nsA7vG8OvNMmMvn9MeDr3P9BPT2uDIXSUCPJvJfIY=;
-        b=AaY81R1ktKy89dbg/xZ+5+Wsp0xAnQtvyqeuSzKVnp+a+l/1/xHVvBQZ/CwLUijKNF
-         wZ5mLrZ8I4Mvg3Q6UMr6j75dxqXWKrfGAOAscn+ub3HtuN1Xsd5x8o0fte4ASldraNjx
-         atWK3pSfBUf0+g0Ya/DhH0iM10aFddLmN1PuacM/5tnOgbCYerPcpBnvmMn/PF82RDt3
-         RQvoluzvWeMPh8r08SHQfamHQQZHDS3MaoiMQY/ETTuCCuYNCHLkhDXTlNQX4NZIzFjR
-         xfdZ5AQsawFRQi4T5JnmMhefo5hATUkVLD/t60xYJmBnsrJFzmt+47VbfRbY2byiQZBN
-         +C7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714991968; x=1715596768;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z6nsA7vG8OvNMmMvn9MeDr3P9BPT2uDIXSUCPJvJfIY=;
-        b=dhkMueP3LGmEUXVJ/zb900jDRf2cPO0QeXYMWrg3O7SywA458jM1o3Zwei4cV57VIB
-         EXcbSQ13zNlvpTpDjukGgeiaLK9lk7IgplYhF7iDjZoBJlf1z1nrOIAudgFmner+/j6s
-         a6BiDPju8EjkqnXhN+sDsDWUHe3w1WzN7ocZVg2/tt2j5189Aav7DXhzmkbezCInU+tO
-         KYMsaVDJdcF06kobtTV0Bix7t16o8cIAd/dVGfusRNKidRmT2YHtP+oR0akBn27II+pD
-         PeYX+855WFOx9z1hNR6qtWuyCTsCGYqPMh0zm1FGh+AhpJEhu8y+mBml6G/fB8TNt4km
-         34vA==
-X-Forwarded-Encrypted: i=1; AJvYcCUyhj8NwDxTZLsChA8c7XawWiNaxDuiilr9RsHtYItSFWYC5QV6tP4OgRdQJyAEpptdfx8CtxdyaBqmeibU0lQHXFUYL8c/
-X-Gm-Message-State: AOJu0YxsefME09ivYHINVfEj01La+fe7aPnO1IGHkjc6R4QSVNaGpjWC
-	95r/hYNGbha7GuE6M+A0H52lavmilJwg7sioeXvN/K+LJm9MeUFH
-X-Google-Smtp-Source: AGHT+IER9z9ChzD/DpmIGdDY5jwDtt3ZmD2FE4YmuB8kOwlE6HDW9cZnWLfhJpaoZREkcyBp4TC34g==
-X-Received: by 2002:ac2:5b01:0:b0:520:107f:8375 with SMTP id v1-20020ac25b01000000b00520107f8375mr4078974lfn.50.1714991967928;
-        Mon, 06 May 2024 03:39:27 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 7-20020ac25f07000000b0051f1b4709d9sm1585080lfq.163.2024.05.06.03.39.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 03:39:27 -0700 (PDT)
-Date: Mon, 6 May 2024 13:39:24 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-Subject: Re: [PATCH net-next v12 13/15] net: stmmac: dwmac-loongson: Add
- Loongson GNET support
-Message-ID: <jkjgjraqvih4zu7wvqykerq5wisgkhqf2n2pouha7qhfoeif7v@tkwyx53dfrdw>
-References: <cover.1714046812.git.siyanteng@loongson.cn>
- <c97cb15ab77fb9dfdd281640f48dcfc08c6988c0.1714046812.git.siyanteng@loongson.cn>
+	s=arc-20240116; t=1714992332; c=relaxed/simple;
+	bh=rh2Ar8NEVYORh2nTOkEhsEa4/2+ATTTIAflKB4aW6SE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XtrmOa1V2WcEVb3lkyMiOc+I0scqruKPruca4NJj/IbqPSXrL3WWyWG9QEgfjx6XOAwZqUgrA51RbH7cx7ej77u5KcQyPwxf93LgWC0TvVNg9QzYeo/o2NXi7gVZRhfcqanwo4GTeaGqyTefKIaPzPnmE8eUMloRsnSXbzFU7wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P/3nixcc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714992329;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=KfAUP/Qe8J+92OKse0L5wlCLRqCihZyzz/M2yt0viis=;
+	b=P/3nixccM8zub8Jc2COhVndISeUnnoldQCd+OnUXs5RYnM7oGiG88Kx79VHzyFo/aSNerN
+	9JCH6Q7JbsFa+TD67q54fnjzQ9mvcwgz1qgC8X80DtcNQx9vEuGZhNtr8dXvR9hPLJ3zI+
+	Qcnn4yTbemRVgcAsuK5y77KWh1rJ6Eg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-395-EReE25dBNuquhrJDmlFDpQ-1; Mon, 06 May 2024 06:45:27 -0400
+X-MC-Unique: EReE25dBNuquhrJDmlFDpQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 79EB78943A0;
+	Mon,  6 May 2024 10:45:27 +0000 (UTC)
+Received: from dcaratti.users.ipa.redhat.com (unknown [10.45.225.109])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4A5141121306;
+	Mon,  6 May 2024 10:45:25 +0000 (UTC)
+From: Davide Caratti <dcaratti@redhat.com>
+To: paul@paul-moore.com
+Cc: casey@schaufler-ca.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-security-module@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	xmu@redhat.com
+Subject: [PATCH net v3] netlabel: fix RCU annotation for IPv4 options on socket creation
+Date: Mon,  6 May 2024 12:45:09 +0200
+Message-ID: <ce1a2b59831d74cf8395501f1138923bb842dbce.1714992251.git.dcaratti@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c97cb15ab77fb9dfdd281640f48dcfc08c6988c0.1714046812.git.siyanteng@loongson.cn>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Thu, Apr 25, 2024 at 09:11:36PM +0800, Yanteng Si wrote:
-> ...
->  
-> +static int loongson_dwmac_config_msi(struct pci_dev *pdev,
-> +				     struct plat_stmmacenet_data *plat,
-> +				     struct stmmac_resources *res,
-> +				     struct device_node *np)
-> +{
-> +	int i, ret, vecs;
-> +
-> +	vecs = roundup_pow_of_two(CHANNEL_NUM * 2 + 1);
-> +	ret = pci_alloc_irq_vectors(pdev, vecs, vecs, PCI_IRQ_MSI);
-> +	if (ret < 0) {
-> +		dev_info(&pdev->dev,
-> +			 "MSI enable failed, Fallback to legacy interrupt\n");
-> +		return loongson_dwmac_config_legacy(pdev, plat, res, np);
-> +	}
-> +
-> +	res->irq = pci_irq_vector(pdev, 0);
-> +	res->wol_irq = 0;
-> +
-> +	/* INT NAME | MAC | CH7 rx | CH7 tx | ... | CH0 rx | CH0 tx |
-> +	 * --------- ----- -------- --------  ...  -------- --------
-> +	 * IRQ NUM  |  0  |   1    |   2    | ... |   15   |   16   |
-> +	 */
-> +	for (i = 0; i < CHANNEL_NUM; i++) {
-> +		res->rx_irq[CHANNEL_NUM - 1 - i] =
-> +			pci_irq_vector(pdev, 1 + i * 2);
-> +		res->tx_irq[CHANNEL_NUM - 1 - i] =
-> +			pci_irq_vector(pdev, 2 + i * 2);
-> +	}
-> +
-> +	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
-> +
-> +	return 0;
-> +}
-> +
-> ...
->  static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  {
->  	struct plat_stmmacenet_data *plat;
->  	int ret, i, bus_id, phy_mode;
->  	struct stmmac_pci_info *info;
->  	struct stmmac_resources res;
-> +	struct loongson_data *ld;
->  	struct device_node *np;
->  
->  	np = dev_of_node(&pdev->dev);
-> @@ -122,10 +460,12 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->  		return -ENOMEM;
->  
->  	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
-> -	if (!plat->dma_cfg) {
-> -		ret = -ENOMEM;
-> -		goto err_put_node;
-> -	}
-> +	if (!plat->dma_cfg)
-> +		return -ENOMEM;
-> +
-> +	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
-> +	if (!ld)
-> +		return -ENOMEM;
->  
->  	/* Enable pci device */
->  	ret = pci_enable_device(pdev);
-> @@ -171,14 +511,34 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->  		plat->phy_interface = phy_mode;
->  	}
->  
-> -	pci_enable_msi(pdev);
-> +	plat->bsp_priv = ld;
-> +	plat->setup = loongson_dwmac_setup;
-> +	ld->dev = &pdev->dev;
-> +
->  	memset(&res, 0, sizeof(res));
->  	res.addr = pcim_iomap_table(pdev)[0];
-> +	ld->gmac_verion = readl(res.addr + GMAC_VERSION) & 0xff;
-> +
-> +	switch (ld->gmac_verion) {
-> +	case LOONGSON_DWMAC_CORE_1_00:
-> +		plat->rx_queues_to_use = CHANNEL_NUM;
-> +		plat->tx_queues_to_use = CHANNEL_NUM;
-> +
-> +		/* Only channel 0 supports checksum,
-> +		 * so turn off checksum to enable multiple channels.
-> +		 */
-> +		for (i = 1; i < CHANNEL_NUM; i++)
-> +			plat->tx_queues_cfg[i].coe_unsupported = 1;
->  
-> -	plat->tx_queues_to_use = 1;
-> -	plat->rx_queues_to_use = 1;
-> +		ret = loongson_dwmac_config_msi(pdev, plat, &res, np);
-> +		break;
-> +	default:	/* 0x35 device and 0x37 device. */
-> +		plat->tx_queues_to_use = 1;
-> +		plat->rx_queues_to_use = 1;
->  
-> -	ret = loongson_dwmac_config_legacy(pdev, plat, &res, np);
-> +		ret = loongson_dwmac_config_legacy(pdev, plat, &res, np);
-> +		break;
-> +	}
->  
+Xiumei reports the following splat when netlabel and TCP socket are used:
 
-Let's now talk about this change.
+ =============================
+ WARNING: suspicious RCU usage
+ 6.9.0-rc2+ #637 Not tainted
+ -----------------------------
+ net/ipv4/cipso_ipv4.c:1880 suspicious rcu_dereference_protected() usage!
 
-First of all, one more time. You can't miss the return value check
-because if any of the IRQ config method fails then the driver won't
-work! The first change that introduces the problem is in the patch
-[PATCH net-next v12 11/15] net: stmmac: dwmac-loongson: Add loongson_dwmac_config_legacy
+ other info that might help us debug this:
 
-Second, as I already mentioned in another message sent to this patch
-you are missing the PCI MSI IRQs freeing in the cleanup-on-error path
-and in the device/driver remove() function. It's definitely wrong.
+ rcu_scheduler_active = 2, debug_locks = 1
+ 1 lock held by ncat/23333:
+  #0: ffffffff906030c0 (rcu_read_lock){....}-{1:2}, at: netlbl_sock_setattr+0x25/0x1b0
 
-Thirdly, you said that the node-pointer is now optional and introduced
-the patch 
-[PATCH net-next v12 10/15] net: stmmac: dwmac-loongson: Add full PCI support
-If so and the DT-based setting up isn't mandatory then I would
-suggest to proceed with the entire so called legacy setups only if the
-node-pointer has been found, otherwise the pure PCI-based setup would
-be performed. So the patches 10-13 (in your v12 order) would look
-like this:
+ stack backtrace:
+ CPU: 11 PID: 23333 Comm: ncat Kdump: loaded Not tainted 6.9.0-rc2+ #637
+ Hardware name: Supermicro SYS-6027R-72RF/X9DRH-7TF/7F/iTF/iF, BIOS 3.0  07/26/2013
+ Call Trace:
+  <TASK>
+  dump_stack_lvl+0xa9/0xc0
+  lockdep_rcu_suspicious+0x117/0x190
+  cipso_v4_sock_setattr+0x1ab/0x1b0
+  netlbl_sock_setattr+0x13e/0x1b0
+  selinux_netlbl_socket_post_create+0x3f/0x80
+  selinux_socket_post_create+0x1a0/0x460
+  security_socket_post_create+0x42/0x60
+  __sock_create+0x342/0x3a0
+  __sys_socket_create.part.22+0x42/0x70
+  __sys_socket+0x37/0xb0
+  __x64_sys_socket+0x16/0x20
+  do_syscall_64+0x96/0x180
+  ? do_user_addr_fault+0x68d/0xa30
+  ? exc_page_fault+0x171/0x280
+  ? asm_exc_page_fault+0x22/0x30
+  entry_SYSCALL_64_after_hwframe+0x71/0x79
+ RIP: 0033:0x7fbc0ca3fc1b
+ Code: 73 01 c3 48 8b 0d 05 f2 1b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 29 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d d5 f1 1b 00 f7 d8 64 89 01 48
+ RSP: 002b:00007fff18635208 EFLAGS: 00000246 ORIG_RAX: 0000000000000029
+ RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007fbc0ca3fc1b
+ RDX: 0000000000000006 RSI: 0000000000000001 RDI: 0000000000000002
+ RBP: 000055d24f80f8a0 R08: 0000000000000003 R09: 0000000000000001
 
-1. Patch 10 introduces the two types of the configs - DT and PCI plus
-the bus_id initialized based on the PCI domain and device ID.
-[PATCH net-next v13 10/15] net: stmmac: dwmac-loongson: Add DT-less GMAC PCI-device support
-The DT and PCI config functions can look like this:
+R10: 0000000000020000 R11: 0000000000000246 R12: 000055d24f80f8a0
+ R13: 0000000000000000 R14: 000055d24f80fb88 R15: 0000000000000000
+  </TASK>
 
-static int loongson_dwmac_config_dt(struct pci_dev *pdev,
-				    struct plat_stmmacenet_data *plat,
-				    struct stmmac_resources *res)
-{
-	struct device_node *np = dev_of_node(&pdev->dev);
-	int ret;
+The current implementation of cipso_v4_sock_setattr() replaces IP options
+under the assumption that the caller holds the socket lock; however, such
+assumption is not true, nor needed, in selinux_socket_post_create() hook.
 
-	plat->mdio_node = of_get_child_by_name(np, "mdio");
-	if (plat->mdio_node) {
-		dev_info(&pdev->dev, "Found MDIO subnode\n");
-		plat->mdio_bus_data->needs_reset = true;
-	}
+Let all callers of cipso_v4_sock_setattr() specify the "socket lock held"
+condition, except selinux_socket_post_create() _ where such condition can
+safely be set as true even without holding the socket lock.
 
-	ret = of_alias_get_id(np, "ethernet");
-	if (ret >= 0)
-		plat->bus_id = ret;
+v3:
+ - rename variable to 'sk_locked' (thanks Paul Moore)
+ - keep rcu_replace_pointer() open-coded and re-add NULL check of 'old',
+   these two changes will be posted in another patch (thanks Paul Moore)
 
-	res->irq = of_irq_get_byname(np, "macirq");
-	if (res->irq < 0) {
-		dev_err(&pdev->dev, "IRQ macirq not found\n");
-		return -ENODEV;
-	}
+v2:
+ - pass lockdep_sock_is_held() through a boolean variable in the stack
+   (thanks Eric Dumazet, Paul Moore, Casey Schaufler)
+ - use rcu_replace_pointer() instead of rcu_dereference_protected() +
+   rcu_assign_pointer()
+ - remove NULL check of 'old' before kfree_rcu()
 
-	res->wol_irq = of_irq_get_byname(np, "eth_wake_irq");
-	if (res->wol_irq < 0) {
-		dev_info(&pdev->dev,
-			 "IRQ eth_wake_irq not found, using macirq\n");
-		res->wol_irq = res->irq;
-	}
+Fixes: f6d8bd051c39 ("inet: add RCU protection to inet->opt")
+Reported-by: Xiumei Mu <xmu@redhat.com>
+Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+---
+ include/net/cipso_ipv4.h     | 6 ++++--
+ include/net/netlabel.h       | 6 ++++--
+ net/ipv4/cipso_ipv4.c        | 7 ++++---
+ net/netlabel/netlabel_kapi.c | 9 ++++++---
+ security/selinux/netlabel.c  | 5 ++++-
+ security/smack/smack_lsm.c   | 3 ++-
+ 6 files changed, 24 insertions(+), 12 deletions(-)
 
-	res->lpi_irq = of_irq_get_byname(np, "eth_lpi");
-	if (res->lpi_irq < 0) {
-		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
-		return -ENODEV;
-	}
-
-	return 0;
-}
-
-static int loongson_dwmac_config_pci(struct pci_dev *pdev,
-				     struct plat_stmmacenet_data *plat,
-				     struct stmmac_resources *res)
-{
-	res.irq = pdev->irq;
-
-	return 0;
-}
-
-...
-
-static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-{
-	...
-	if (dev_of_node(&pdev->dev))
-		ret = loongson_dwmac_dt_config(pdev, plat, res);
-	else
-		ret = loongson_dwmac_pci_config(pdev, plat, res);
-	if (ret)
-		goto err_disable_msi;
-
-	...
-}
-
-2. Patch 11 introduces the stmmac_pci_info structure, makes the
-stmmac_pci_info::setup() callback called in the probe() function and
-assigns the loongson_gmac_data() method pointer to the GMAC info data. 
-[PATCH net-next v13 11/15] net: stmmac: dwmac-loongson: Introduce PCI device info data
-
-3. Patch 12 can be preserved as is (but see my notes regarding moving
-a part of it to the patch 13).
-[PATCH net-next v13 12/15] net: stmmac: dwmac-loongson: Add flag disabling AN-less 1Gbps setup
-
-4. Patch 13 introduces the GNET support as it's mainly done in your
-patch (see my notes in there though)
-[PATCH net-next v13 13/15] net: stmmac: dwmac-loongson: Add Loongson GNET support
-but the loongson_dwmac_config_pci() method would now look as follows:
-
-static int loongson_dwmac_config_pci(struct pci_dev *pdev,
-				     struct plat_stmmacenet_data *plat,
-				     struct stmmac_resources *res)
-{
-	int i, ret, vecs;
-
-	/* INT NAME | MAC | CH7 rx | CH7 tx | ... | CH0 rx | CH0 tx |
-	 * --------- ----- -------- --------  ...  -------- --------
-	 * IRQ NUM  |  0  |   1    |   2    | ... |   15   |   16   |
-	 */
-	vecs = roundup_pow_of_two(CHANNEL_NUM * 2 + 1);
-	ret = pci_alloc_irq_vectors(pdev, 1, vecs, PCI_IRQ_MSI | PCI_IRQ_LEGACY);
-	if (ret < 0) {
-		dev_err(&pdev->dev, "Failed to allocate PCI IRQs\n");
-		return ret;
-	} else if (ret >= vecs) {
-		for (i = 0; i < CHANNEL_NUM; i++) {
-			res->rx_irq[CHANNEL_NUM - 1 - i] =
-				pci_irq_vector(pdev, 1 + i * 2);
-			res->tx_irq[CHANNEL_NUM - 1 - i] =
-				pci_irq_vector(pdev, 2 + i * 2);
-		}
-
-		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
-	} else {
-		dev_warn(&pdev->dev, "Fall back to PCIe INTx IRQs\n");
-	}
-
-	res->irq = pci_irq_vector(pdev, 0);
-
-	return 0;
-}
-
-What do you think?
-
--Serge(y)
+diff --git a/include/net/cipso_ipv4.h b/include/net/cipso_ipv4.h
+index 53dd7d988a2d..c9111bb2f59b 100644
+--- a/include/net/cipso_ipv4.h
++++ b/include/net/cipso_ipv4.h
+@@ -183,7 +183,8 @@ int cipso_v4_getattr(const unsigned char *cipso,
+ 		     struct netlbl_lsm_secattr *secattr);
+ int cipso_v4_sock_setattr(struct sock *sk,
+ 			  const struct cipso_v4_doi *doi_def,
+-			  const struct netlbl_lsm_secattr *secattr);
++			  const struct netlbl_lsm_secattr *secattr,
++			  bool sk_locked);
+ void cipso_v4_sock_delattr(struct sock *sk);
+ int cipso_v4_sock_getattr(struct sock *sk, struct netlbl_lsm_secattr *secattr);
+ int cipso_v4_req_setattr(struct request_sock *req,
+@@ -214,7 +215,8 @@ static inline int cipso_v4_getattr(const unsigned char *cipso,
+ 
+ static inline int cipso_v4_sock_setattr(struct sock *sk,
+ 				      const struct cipso_v4_doi *doi_def,
+-				      const struct netlbl_lsm_secattr *secattr)
++				      const struct netlbl_lsm_secattr *secattr,
++				      bool sk_locked)
+ {
+ 	return -ENOSYS;
+ }
+diff --git a/include/net/netlabel.h b/include/net/netlabel.h
+index f3ab0b8a4b18..d532f9ba752f 100644
+--- a/include/net/netlabel.h
++++ b/include/net/netlabel.h
+@@ -470,7 +470,8 @@ void netlbl_bitmap_setbit(unsigned char *bitmap, u32 bit, u8 state);
+ int netlbl_enabled(void);
+ int netlbl_sock_setattr(struct sock *sk,
+ 			u16 family,
+-			const struct netlbl_lsm_secattr *secattr);
++			const struct netlbl_lsm_secattr *secattr,
++			bool sk_locked);
+ void netlbl_sock_delattr(struct sock *sk);
+ int netlbl_sock_getattr(struct sock *sk,
+ 			struct netlbl_lsm_secattr *secattr);
+@@ -614,7 +615,8 @@ static inline int netlbl_enabled(void)
+ }
+ static inline int netlbl_sock_setattr(struct sock *sk,
+ 				      u16 family,
+-				      const struct netlbl_lsm_secattr *secattr)
++				      const struct netlbl_lsm_secattr *secattr,
++				      bool sk_locked)
+ {
+ 	return -ENOSYS;
+ }
+diff --git a/net/ipv4/cipso_ipv4.c b/net/ipv4/cipso_ipv4.c
+index 8b17d83e5fde..dd6d46015058 100644
+--- a/net/ipv4/cipso_ipv4.c
++++ b/net/ipv4/cipso_ipv4.c
+@@ -1815,6 +1815,7 @@ static int cipso_v4_genopt(unsigned char *buf, u32 buf_len,
+  * @sk: the socket
+  * @doi_def: the CIPSO DOI to use
+  * @secattr: the specific security attributes of the socket
++ * @sk_locked: true if caller holds the socket lock
+  *
+  * Description:
+  * Set the CIPSO option on the given socket using the DOI definition and
+@@ -1826,7 +1827,8 @@ static int cipso_v4_genopt(unsigned char *buf, u32 buf_len,
+  */
+ int cipso_v4_sock_setattr(struct sock *sk,
+ 			  const struct cipso_v4_doi *doi_def,
+-			  const struct netlbl_lsm_secattr *secattr)
++			  const struct netlbl_lsm_secattr *secattr,
++			  bool sk_locked)
+ {
+ 	int ret_val = -EPERM;
+ 	unsigned char *buf = NULL;
+@@ -1876,8 +1878,7 @@ int cipso_v4_sock_setattr(struct sock *sk,
+ 
+ 	sk_inet = inet_sk(sk);
+ 
+-	old = rcu_dereference_protected(sk_inet->inet_opt,
+-					lockdep_sock_is_held(sk));
++	old = rcu_dereference_protected(sk_inet->inet_opt, sk_locked);
+ 	if (inet_test_bit(IS_ICSK, sk)) {
+ 		sk_conn = inet_csk(sk);
+ 		if (old)
+diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
+index 1ba4f58e1d35..c043fb46243c 100644
+--- a/net/netlabel/netlabel_kapi.c
++++ b/net/netlabel/netlabel_kapi.c
+@@ -965,6 +965,7 @@ int netlbl_enabled(void)
+  * @sk: the socket to label
+  * @family: protocol family
+  * @secattr: the security attributes
++ * @sk_locked: true if caller holds the socket lock
+  *
+  * Description:
+  * Attach the correct label to the given socket using the security attributes
+@@ -977,7 +978,8 @@ int netlbl_enabled(void)
+  */
+ int netlbl_sock_setattr(struct sock *sk,
+ 			u16 family,
+-			const struct netlbl_lsm_secattr *secattr)
++			const struct netlbl_lsm_secattr *secattr,
++			bool sk_locked)
+ {
+ 	int ret_val;
+ 	struct netlbl_dom_map *dom_entry;
+@@ -997,7 +999,7 @@ int netlbl_sock_setattr(struct sock *sk,
+ 		case NETLBL_NLTYPE_CIPSOV4:
+ 			ret_val = cipso_v4_sock_setattr(sk,
+ 							dom_entry->def.cipso,
+-							secattr);
++							secattr, sk_locked);
+ 			break;
+ 		case NETLBL_NLTYPE_UNLABELED:
+ 			ret_val = 0;
+@@ -1126,7 +1128,8 @@ int netlbl_conn_setattr(struct sock *sk,
+ 		switch (entry->type) {
+ 		case NETLBL_NLTYPE_CIPSOV4:
+ 			ret_val = cipso_v4_sock_setattr(sk,
+-							entry->cipso, secattr);
++							entry->cipso, secattr,
++							lockdep_sock_is_held(sk));
+ 			break;
+ 		case NETLBL_NLTYPE_UNLABELED:
+ 			/* just delete the protocols we support for right now
+diff --git a/security/selinux/netlabel.c b/security/selinux/netlabel.c
+index 8f182800e412..55885634e880 100644
+--- a/security/selinux/netlabel.c
++++ b/security/selinux/netlabel.c
+@@ -402,7 +402,10 @@ int selinux_netlbl_socket_post_create(struct sock *sk, u16 family)
+ 	secattr = selinux_netlbl_sock_genattr(sk);
+ 	if (secattr == NULL)
+ 		return -ENOMEM;
+-	rc = netlbl_sock_setattr(sk, family, secattr);
++	/* On socket creation, replacement of IP options is safe even if
++	 * the caller does not hold the socket lock.
++	 */
++	rc = netlbl_sock_setattr(sk, family, secattr, true);
+ 	switch (rc) {
+ 	case 0:
+ 		sksec->nlbl_state = NLBL_LABELED;
+diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
+index 146667937811..1ab2125d352d 100644
+--- a/security/smack/smack_lsm.c
++++ b/security/smack/smack_lsm.c
+@@ -2565,7 +2565,8 @@ static int smack_netlbl_add(struct sock *sk)
+ 	local_bh_disable();
+ 	bh_lock_sock_nested(sk);
+ 
+-	rc = netlbl_sock_setattr(sk, sk->sk_family, &skp->smk_netlabel);
++	rc = netlbl_sock_setattr(sk, sk->sk_family, &skp->smk_netlabel,
++				 lockdep_sock_is_held(sk));
+ 	switch (rc) {
+ 	case 0:
+ 		ssp->smk_state = SMK_NETLBL_LABELED;
+-- 
+2.44.0
 
 
