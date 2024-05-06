@@ -1,152 +1,162 @@
-Return-Path: <netdev+bounces-93814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F2988BD458
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 20:04:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB03E8BD460
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 20:08:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE12F1C21973
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:04:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91E9B282964
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99991586F5;
-	Mon,  6 May 2024 18:04:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760FC1586F5;
+	Mon,  6 May 2024 18:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="TugZZ1HB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gXriRHbE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA0E1586CD
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 18:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0664C14293
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 18:08:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715018666; cv=none; b=elVTR+w6M/1rf9YRAIPYvcPkYDb5ZXz7/YHJ9H2VdLj7zpg57t35rjAV3fTyg6QAAJARMY6KaPCT6P/OTSNw/n5fT50ZtV0S8B4p3KuFSomnKGBz2W//vahfAMbX3IjDmqo9Sbpl4tcywf4vWglU76LaTihhGg4bD6APAywLYAs=
+	t=1715018887; cv=none; b=j4Ixyrua1HE213HiLiHPtRztKgB6BgEmQUIffJ3+DsiUdZhqxD+dDf1+uExzYviHndmmbt4ljYf7j90UBHtALd1A7ETvolsHkV9d/E1rIH6iutYPzmSSTiiF7xQwAcAMKet5Pjt2uBj+T18UfvTpbZYUaenFt6xlXGJN7Rh0OKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715018666; c=relaxed/simple;
-	bh=cAhKDATngg5XYWtp3wm/gO2bAzCF+ksynWN1+HGqIgw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ank8FzavNSYdsqgZk9tlpdbh6t7O6JsYrDjVCXt89Gw+cVLyRX4HtrxvR3EH1qwi5YSaDth0ZzDGarUvrYl1pOnxLOmx0Zd+4C1aSX3XvJmNidtwOWzqJ720H4SGmmh+fbtG/pPrhSfYcun1VedsUeFlQpAST70QMqn+z3t9bZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=TugZZ1HB; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6f489e64eb3so445976b3a.1
-        for <netdev@vger.kernel.org>; Mon, 06 May 2024 11:04:25 -0700 (PDT)
+	s=arc-20240116; t=1715018887; c=relaxed/simple;
+	bh=QP6FRxG6izbbETvcs9/jzLHheE3s6g4CGohTi/a49lk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MQ70nIeHkR5QGjIIWp9R5f9QQusOpgEJlu/0auJdVcdSRKyt5PGyDJrOpGRbxWmJLukeqXEVxccXiGBHimCqfx16OiQ+QXIkewEhnrbVPAjTHiV5P8Nc83pRPjGcHwy9iZZmy1qZnitl0Ta1/ypyswHpAtKNnhPYJMhhOpm8sbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gXriRHbE; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2b239b5fedaso1772538a91.0
+        for <netdev@vger.kernel.org>; Mon, 06 May 2024 11:08:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1715018664; x=1715623464; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=te4/Y4Ex1bU5Fl7piJ8mgbBAfhUkYcVHwGSxY1/VZ2Y=;
-        b=TugZZ1HBqBbqQJ0K9saySdstreGXiIszyp88wotUwvoyvynHcYwBlsink1K5vY5+vB
-         UViW3LprrUOoanxZz4WB+JNvqRb/eZNluV57t/dZMA0dSyZ3e1HgxBhnSdvDT79DOG7U
-         hiW9T5mqSVcklTiUifQHdYDYKtPfLnW7lAFhE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715018664; x=1715623464;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1715018885; x=1715623685; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=te4/Y4Ex1bU5Fl7piJ8mgbBAfhUkYcVHwGSxY1/VZ2Y=;
-        b=LslFm7lJkCV7aDjAjVm+MMK91UGMh2svpDLVDenXIY7mP12DN7Z5RZEW1NUE/ySkgb
-         L42ULKPfyvu3R1vmMkovE0jiZ1yQUXAdKgzQ/o16KDChQnoNStuLDjfpeVd0sc6L903h
-         ri/YXhpuU7BcIGvT8rrHEWwhoAG3PfBiprph03GfI8eHwOqOwKwYgnmKWn5byti8DaFc
-         W6m/7sH7idYDbzUZPvSm+w4TZPrWD0rpOuzvBxLrpdTsI06VG+cLLpteTWjIlJm0G30s
-         jSK9A5ekJsdKJsh/83O03EPLV6CUmxVLTHn0ZHHHKtpamJMsFquGApamO4bBOVjfqzED
-         sj4A==
-X-Forwarded-Encrypted: i=1; AJvYcCVPGHKelECgERwHw8PZc9qo4PNud1RzkrxQ4DnS00PWeR6DMbq7mgtxx2w7v2wvhGn/V4dIoJi8Af8/rRKUnx+9nA5i7/qv
-X-Gm-Message-State: AOJu0YxoMdJ9NWY0e3wdH65wI+kyOcuBv+cyGCyzKsFP+oNKG7wP6hKv
-	TNQhZ0zYFrklPUqCFIm11TQlOTxNxaIoS6FizjeQ11jvebwwmyVv3UV74AgbVP8=
-X-Google-Smtp-Source: AGHT+IGwppSbySl31uGPw1FvJc3LjfLZLPlCmVQ1KC7Gq3CDOyzgBuo4ezyM24BqAPTlNNPjdcMqUA==
-X-Received: by 2002:a05:6a21:620:b0:1af:a4f7:cba1 with SMTP id ll32-20020a056a21062000b001afa4f7cba1mr4246826pzb.31.1715018664422;
-        Mon, 06 May 2024 11:04:24 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id p28-20020a631e5c000000b005e438fe702dsm8248238pgm.65.2024.05.06.11.04.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 11:04:23 -0700 (PDT)
-Date: Mon, 6 May 2024 11:04:20 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Zhu Yanjun <zyjzyj2000@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, tariqt@nvidia.com, saeedm@nvidia.com,
-	gal@nvidia.com, nalramli@fastly.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
-Message-ID: <ZjkbpLRyZ9h0U01_@LQ3V64L9R2>
-References: <20240503022549.49852-1-jdamato@fastly.com>
- <c3f4f1a4-303d-4d57-ae83-ed52e5a08f69@linux.dev>
- <ZjUwT_1SA9tF952c@LQ3V64L9R2>
- <20240503145808.4872fbb2@kernel.org>
- <ZjV5BG8JFGRBoKaz@LQ3V64L9R2>
- <20240503173429.10402325@kernel.org>
+        bh=pP9dyoQZ5fA2mpoQHygzS0WYvlyAhM1QTGT8OrcLdU8=;
+        b=gXriRHbELK8CRPsFK1/laUJT8OEww7PGXBeoDk2NZV3MjvQ3v/RR3XVCpDrmO7tKuC
+         fDmaNBRv4jlptnRcg+k8d/5qNIxj8rBrEx6k+ZKdPSFxnRJRvGBc0Co0hSEr+lr5pOcM
+         U6RkNzoEqrix3Ryt97bZXN7X2mi6s1K4iGKkzUU00MYdrHp6oqzYQtovWleuL3DZ9jhA
+         PI24LRClQR2ksJRyXHMkVp3ockrar1UWipg9yKhCFLZ0d1aDwYqJ0N0BSC0FPrxW76/4
+         FdbtW3rQZC1waWRSDpVOVeHpc78LaQDnVAECnVEjv3A+RQq4fGycPqnzClv0OAi/Hv6r
+         S/Ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715018885; x=1715623685;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pP9dyoQZ5fA2mpoQHygzS0WYvlyAhM1QTGT8OrcLdU8=;
+        b=Tbb1jF4NSzaFr4sNvJwxBcQAvCFNnmtGf5npIizZF8bKLRVZglZnLQl8wODXxccbel
+         XhiTerWymgnOU5P0RQOxNz/x9uKcKAadYIf/io9+/zuib5Ros4d2KjmAG7DAo69weMqN
+         p9w6SVDCAdLm8PNP3H6+U8RgOVjkIhtxU/3nfONbnSE4ABalWtqdnmdpxD7r7AhjzjOh
+         klJHOF9RmSF1vP7cStkHNPbkFikR9kdY3E9X2+oQ0Gu6KpFUryWM8YK/pUFY6/sfbX9z
+         ofzRgFdJlTwFPvhMlNrwEt7nbo8tZzoS0KQd4Jv0wFI1ZZAQs6n8kcfhow6hwM9ItOgD
+         dhyA==
+X-Gm-Message-State: AOJu0Yxpids6J7vBgTTRhwf9VSRUgv5ce9e1Wfvnrwdm+NYomKDCPblu
+	5Hr8JM60SXZDaAP2ib9lqkd6Csj92o+7nErODlbzBIixo2h9XQXr+loR1rW80D9rnZ0lkz3g35A
+	OAEeYwYU/As6MX3MHiaU1PN5MUFENpIGykSQY
+X-Google-Smtp-Source: AGHT+IFbxkwXDaKGwMkB6EpnS2NAsZy54b96oMIudF9Dg7BdW41XUab2WsG7IIsGX+2vIeJrAd9/FYf3WxcSMSUsJQo=
+X-Received: by 2002:a17:90a:c284:b0:2b1:8210:56bb with SMTP id
+ f4-20020a17090ac28400b002b1821056bbmr9064564pjt.3.1715018884851; Mon, 06 May
+ 2024 11:08:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240503173429.10402325@kernel.org>
+References: <20240501232549.1327174-1-shailend@google.com> <171491642897.19257.15217395970936349981.git-patchwork-notify@kernel.org>
+ <CANLc=autjsuVO3NLhfL6wBg3SH8u9SsWQGUn=oSHHVjhdnn38w@mail.gmail.com>
+In-Reply-To: <CANLc=autjsuVO3NLhfL6wBg3SH8u9SsWQGUn=oSHHVjhdnn38w@mail.gmail.com>
+From: Shailend Chand <shailend@google.com>
+Date: Mon, 6 May 2024 11:07:52 -0700
+Message-ID: <CANLc=avO2Xmkjh=VsvCkN=jUEOpSFN-74MkbtByicsRs+GANNQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 00/10] gve: Implement queue api
+To: davem@davemloft.net, kuba@kernel.org
+Cc: netdev@vger.kernel.org, almasrymina@google.com, edumazet@google.com, 
+	hramamurthy@google.com, jeroendb@google.com, pabeni@redhat.com, 
+	pkaligineedi@google.com, rushilg@google.com, willemb@google.com, 
+	ziweixiao@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 03, 2024 at 05:34:29PM -0700, Jakub Kicinski wrote:
-> On Fri, 3 May 2024 16:53:40 -0700 Joe Damato wrote:
-> > > diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-> > > index c7ac4539eafc..f5d9f3ad5b66 100644
-> > > --- a/include/net/netdev_queues.h
-> > > +++ b/include/net/netdev_queues.h
-> > > @@ -59,6 +59,8 @@ struct netdev_queue_stats_tx {
-> > >   * statistics will not generally add up to the total number of events for
-> > >   * the device. The @get_base_stats callback allows filling in the delta
-> > >   * between events for currently live queues and overall device history.
-> > > + * @get_base_stats can also be used to report any miscellaneous packets
-> > > + * transferred outside of the main set of queues used by the networking stack.
-> > >   * When the statistics for the entire device are queried, first @get_base_stats
-> > >   * is issued to collect the delta, and then a series of per-queue callbacks.
-> > >   * Only statistics which are set in @get_base_stats will be reported
-> > > 
-> > > 
-> > > SG?  
-> > 
-> > I think that sounds good and makes sense, yea. By that definition, then I
-> > should leave the PTP stats as shown above. If you agree, I'll add that
-> > to the v2.
-> 
-> Yup, agreed.
-> 
-> > I feel like I should probably wait before sending a v2 with PTP included in
-> > get_base_stats to see if the Mellanox folks have any hints about why rtnl
-> > != queue stats on mlx5?
-> > 
-> > What do you think?
-> 
-> Very odd, the code doesn't appear to be doing any magic :S Did you try
-> to print what the delta in values is? Does bringing the interface up and
-> down affect the size of it?
+On Mon, May 6, 2024 at 10:41=E2=80=AFAM Shailend Chand <shailend@google.com=
+> wrote:
+>
+> On Sun, May 5, 2024 at 6:40=E2=80=AFAM <patchwork-bot+netdevbpf@kernel.or=
+g> wrote:
+> >
+> > Hello:
+> >
+> > This series was applied to netdev/net-next.git (main)
+> > by David S. Miller <davem@davemloft.net>:
+> >
+> > On Wed,  1 May 2024 23:25:39 +0000 you wrote:
+> > > Following the discussion on
+> > > https://patchwork.kernel.org/project/linux-media/patch/20240305020153=
+.2787423-2-almasrymina@google.com/,
+> > > the queue api defined by Mina is implemented for gve.
+> > >
+> > > The first patch is just Mina's introduction of the api. The rest of t=
+he
+> > > patches make surgical changes in gve to enable it to work correctly w=
+ith
+> > > only a subset of queues present (thus far it had assumed that either =
+all
+> > > queues are up or all are down). The final patch has the api
+> > > implementation.
+> > >
+> > > [...]
+> >
+> > Here is the summary with links:
+> >   - [net-next,v2,01/10] queue_api: define queue api
+> >     https://git.kernel.org/netdev/net-next/c/087b24de5c82
+> >   - [net-next,v2,02/10] gve: Make the GQ RX free queue funcs idempotent
+> >     https://git.kernel.org/netdev/net-next/c/dcecfcf21bd1
+> >   - [net-next,v2,03/10] gve: Add adminq funcs to add/remove a single Rx=
+ queue
+> >     https://git.kernel.org/netdev/net-next/c/242f30fe692e
+> >   - [net-next,v2,04/10] gve: Make gve_turn(up|down) ignore stopped queu=
+es
+> >     https://git.kernel.org/netdev/net-next/c/5abc37bdcbc5
+> >   - [net-next,v2,05/10] gve: Make gve_turnup work for nonempty queues
+> >     https://git.kernel.org/netdev/net-next/c/864616d97a45
+> >   - [net-next,v2,06/10] gve: Avoid rescheduling napi if on wrong cpu
+> >     https://git.kernel.org/netdev/net-next/c/9a5e0776d11f
+> >   - [net-next,v2,07/10] gve: Reset Rx ring state in the ring-stop funcs
+> >     https://git.kernel.org/netdev/net-next/c/770f52d5a0ed
+> >   - [net-next,v2,08/10] gve: Account for stopped queues when reading NI=
+C stats
+> >     https://git.kernel.org/netdev/net-next/c/af9bcf910b1f
+> >   - [net-next,v2,09/10] gve: Alloc and free QPLs with the rings
+> >     https://git.kernel.org/netdev/net-next/c/ee24284e2a10
+> >   - [net-next,v2,10/10] gve: Implement queue api
+> >     (no matching commit)
+>
+> The last patch of this patchset did not get applied:
+> https://patchwork.kernel.org/project/netdevbpf/patch/20240430231420.69917=
+7-11-shailend@google.com/,
+> not sure why there is a "no matching commit" message.
 
-I booted the kernel which includes PTP stats in the base stats as you've
-suggested (as shown in the diff in this thread) and I've brought the
-interface down and back up:
+This is the v2 patch that did not get applied
+https://patchwork.kernel.org/project/netdevbpf/patch/20240501232549.1327174=
+-11-shailend@google.com/.
+The subjects of the cover letter and this patch both are the same,
+differing only in their number prefix, maybe that could be triggering
+some issue.
 
-$ sudo ip link set dev eth0 down
-$ sudo ip link set dev eth0 up
-
-Re ran the test script, which includes some mild debugging print out I
-added to show the delta for rx-packets (but I think all stats are off):
-
-  # Exception| Exception: Qstats are lower, fetched later
-
-key: rx-packets rstat: 1192281902 qstat: 1186755777
-key: rx-packets rstat: 1192281902 qstat: 1186755781
-
-So qstat is lower by (1192281902 - 1186755781) = 5,526,121
-
-Not really sure why, but I'll take another look at the code this morning to
-see if I can figure out what's going on.
-
-I'm clearly doing something wrong or misunderstanding something about the
-accounting that will seem extremely obvious in retrospect.
+>
+>
+> >
+> > You are awesome, thank you!
+> > --
+> > Deet-doot-dot, I am a bot.
+> > https://korg.docs.kernel.org/patchwork/pwbot.html
+> >
+> >
 
