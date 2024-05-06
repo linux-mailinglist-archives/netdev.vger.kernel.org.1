@@ -1,309 +1,129 @@
-Return-Path: <netdev+bounces-93738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16AF38BD061
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:34:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C35F58BD074
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:39:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C149428965D
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:34:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1BB0B2114F
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 14:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B1D152196;
-	Mon,  6 May 2024 14:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301471534E5;
+	Mon,  6 May 2024 14:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X9LW5EhB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UV0jgXkC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB8F3613D
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 14:34:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715006093; cv=fail; b=XWm7NizjD8qp5BkxB4tfCVHn+krZbTpSc6qrcKlWaMKa298ZtGCZC4CIKonPfdDa85CRfk2ufFFmiQu2WIJzzJQ+oK9k1vF+Cs5Hvx9NKqKwufJ8qpvl4Oh5CE5rbMrzlEbUtBdlr90mARe/r93kn6IRL2CV8P8Vrl3ipD8Ol9M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715006093; c=relaxed/simple;
-	bh=JxbXQmyrfzSJctJWaA3nK2Qyz2bWIYqOMDwgmYd/Sbc=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=caqGkyWRTYuzuv1wyXHwTUJ+CKTUyWfYr6i3J30wrx30BB4W4QnnMsmCJe1cNZ5zdEts310wslQZaScV9+SPxUFE375KeJbewrSCI5aoEweb6pust0rEtFJJ+7f/jrOqMWcFdxmNp9hsCFngopHeCaAIHTG9RXeqa3VdDOUjKPo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X9LW5EhB; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715006091; x=1746542091;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=JxbXQmyrfzSJctJWaA3nK2Qyz2bWIYqOMDwgmYd/Sbc=;
-  b=X9LW5EhBsmwXfqNokzfxADE4INgbezjMUBEGUTFgWgHwrtQ8dfPsXhzx
-   NgJZpvkIWl93K1C7+R4Mr67mLP3BCBUFlKuDrZYhWprJomYeffHv9Hy5b
-   6Me7Gano7FjZk/UjvbTo786lHG+zJB5adnw8yQsvxbt9mBCBfARmt80Uz
-   jt+CZ6sJ5t4Nu5PEKgDylGYkMCD+mXDpbChRGKVHeMJQKyVkQTbBXiQSG
-   1RxSPzz9mDyzFONxo0bP4KfT+B1xDyKkrnywdtalp32QFpUIjc6e2ECQU
-   wvDyY7R14S79iLhjVnxNfjJKP5hhNZP4iGH1yn1xiODEs1f+WCefviocF
-   w==;
-X-CSE-ConnectionGUID: OzTJYXH5RByngFlQBEv/AQ==
-X-CSE-MsgGUID: fU4/+Q5fSN2aq7G34mEQYg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="10633263"
-X-IronPort-AV: E=Sophos;i="6.07,258,1708416000"; 
-   d="scan'208";a="10633263"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 07:34:47 -0700
-X-CSE-ConnectionGUID: PwrKswT1SFyKgQ/JkMhSZg==
-X-CSE-MsgGUID: nXtDtKZiTw2BRe/eB2iaDg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,258,1708416000"; 
-   d="scan'208";a="32656002"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 May 2024 07:34:47 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 6 May 2024 07:34:47 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 6 May 2024 07:34:47 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 6 May 2024 07:34:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YACLfFEFHGFfNS80G8Ed326MFIWjHUeW1x5LVaQpgk21UWyxDOYa7LLaR7HMF5r8Ta4pHVjuWetvgRdbWQPJ1lvwo56ecvJms6/TxkRX49CKC9sQqezbG1AfIEVwgS1jjtWwk0cHIqUnPal+TV8KQQUi+bDUEna6TYtOgDlsbxAbJ7DtkIqvzUIClFvn3zXYO/yFYpYVAkWkMxl0lMyhS6Q69ATguDTeBhNCtiIP326QoSdlfs2HleFKJN/XQa8FLpKpjs1azI8RpOouUS6AVBiI7tAzvo0uaTIRGB4Dp5KNOa82PWBvcYC9KpONbRiLhh5n730Go9va2il9CdlJDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=06ZqC4BeyICve1MU/VD5WFGXE42FAUzd5hnSnNSviek=;
- b=ee/gBkLJhBCrXCliKt1gcLEqhmXj0H1gxlMkwVgDlX0w5T8UFErpk9wqchVgjasQh7jfDKaoXCqJtiyYXxHCov3e4mCDX1SdmnuyQuwX67NpTtJbrN8SJAEA0IYwOoeauNUmVS8po07zFZRXqU/KKBQanEnnsUyuGWo4q0X3J8CyIcKSRJT/Wllb7mIbrtNDwEkpd0Rc3/YKtlz2PbV9DVi5/nr0lI3RKReBlvtoZUctkyn2oOWy9nRiTzUbZhJgRMdY56WOkOVZXbjEXfXAxqZojrS8xp+Wo87oVNpQkqtCEHHnZ0sVl1RKL2i+ZHf+PIaTdN9T2Dq+cxS7Ee8hxg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by CH3PR11MB8435.namprd11.prod.outlook.com (2603:10b6:610:169::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34; Mon, 6 May
- 2024 14:34:44 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::bfb:c63:7490:93eb]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::bfb:c63:7490:93eb%3]) with mapi id 15.20.7544.041; Mon, 6 May 2024
- 14:34:44 +0000
-Message-ID: <9be9efee-6adc-4812-b07b-007c0922183a@intel.com>
-Date: Mon, 6 May 2024 16:34:38 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next (what uAPI?) ice: add support for more than 16 RSS
- queues for VF
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Knitter, Konrad" <konrad.knitter@intel.com>, "Samudrala, Sridhar"
-	<sridhar.samudrala@intel.com>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>, Mateusz Polchlopek
-	<mateusz.polchlopek@intel.com>, Ahmed Zaki <ahmed.zaki@intel.com>, "Simon
- Horman" <horms@kernel.org>, Michal Schmidt <mschmidt@redhat.com>, Paolo Abeni
-	<pabeni@redhat.com>, Pawel Chmielewski <pawel.chmielewski@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
-References: <73ac167e-abc5-4e7b-96e3-7c6689b5665a@intel.com>
- <20240429185941.6229b944@kernel.org>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20240429185941.6229b944@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA2P291CA0013.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1e::14) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92DF811FE
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 14:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715006383; cv=none; b=QKyVCxYjdAgE24wZmF0N6AFWpMWhxqZVRO31rQbHBE5v2XAt1HM6WRETErBxOqvScfhT3f2XVLCZIWdhomVJo/00Y65fVSwHsYqjdEC5lkrT382uSv1xq32GVww42zlbAkq4QrjsXvrMcxUjZbPBS9y9ds4a92LOO3FhjaAqZH8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715006383; c=relaxed/simple;
+	bh=HX4HJ17rUPKwmnDqUum3oNFhD/RZLT1GbLHnk4RahlM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oCtDhcDY0CVm8RXUg7cpjJ4mJJltExBBX6sMQj8HtET7tYNp6I1Av6RRlqExCtEYnsZHDOJJ4bL23mnpM6UianG1E98fTl2pz4+xHvxJlU2N3WZE7IzYyghJcUfWk8YB+iTOrUKG3pY5/+bcSryAVWvNVKG8EKv7ooJCpkPNO3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UV0jgXkC; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de59ff8af0bso3040301276.2
+        for <netdev@vger.kernel.org>; Mon, 06 May 2024 07:39:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715006380; x=1715611180; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7puXbU/MeoB4y7uDUxX4C5/0n37QnPJGeNtzkvM6INU=;
+        b=UV0jgXkCfrcXFDbajuBbRjghyfgz9/7i09WukoaXTKifbgGEbOhc2pkdgNK3NurjhY
+         CdV2/1DpGS7aHurLSFwL2YbxGXWzM5Mca2ORpbUQy17jVIEZsE73nCXy+Ja7hOANK106
+         x5uNLMwgYstD5QQ0IHQ73Y5s9K+CFJlmyxqFSQtD6OhZdcG3mnr+o4CzzS+OAz7QQowA
+         FWaaUCoaeA8MNK+qdVU8hxRNIVa0D7n4ra4L+BLil/SjS7+EgxzAXUBzJlwyZjn9tqUB
+         ZWtA8sEPhze6GGnLVT4OhGgyJ1qtobBaECR25q/LhIbaggFnsfWdoTrXCks+1jIM/sfA
+         Duhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715006380; x=1715611180;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7puXbU/MeoB4y7uDUxX4C5/0n37QnPJGeNtzkvM6INU=;
+        b=jePeoBt395U4H9r15S/EkJhN24BexWoMApgAivEU3XrJG3Tx6+qGG5KMB0IGLUURtW
+         tq2qISVBLoPJa6JiKJZoZ7FrZQWQ//QMP1m7Nj3aMGxEqeqETlRTxXdepsWQEy1mZ7g+
+         +qXyZYYPB0K5DS1N9TtX/rPg0x8VKwTcuHDF0F5HVb0fK7VZPwK4B4rfaRVyvw7KzvfE
+         7c/uMAnwUbVKOp7B8j+YbDgdJoh2I76tFy8Z1BCumk1QVGiPoU19uboZGZauIU6TxmHt
+         H4Eljf1k4KiMaYFHY4P6glbKyf2MCrwqgF4hJPaszuikJbkorC7PxjYZbVCtPlbcNYd5
+         qh5g==
+X-Gm-Message-State: AOJu0YxSTbdr5L4ZSjK5kCMdGfSso3i4jRo/uAvcKNBCyl67hKyb/QRC
+	HpbdY60iJ3S5LvIolWjQvXQ9a44mDNmXUrA9yCKpZJFUMkUTLmkaK1KwsGxjtE5WX5unzv541Dh
+	CFoRAsxGf6Q==
+X-Google-Smtp-Source: AGHT+IEfD4pHZbhIiPZ8sG1iiRadnfmcmA9i+ig4Km8G6KGW3jJ+5GrYKDYIr3d+1Jj9l4AXpFXGZHG5VqkUIQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:d309:0:b0:de5:5be3:709f with SMTP id
+ e9-20020a25d309000000b00de55be3709fmr1148782ybf.6.1715006380638; Mon, 06 May
+ 2024 07:39:40 -0700 (PDT)
+Date: Mon,  6 May 2024 14:39:39 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CH3PR11MB8435:EE_
-X-MS-Office365-Filtering-Correlation-Id: 61c94585-d9a0-49e1-9242-08dc6dd9abe5
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|1800799015;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?QTl4KzhCaUpXaVlmTHNhWDhiTzBFcnprWkk3MnNSRDlIZDZXSktIeEF2a1hC?=
- =?utf-8?B?bVpzenN3Y0N5bkFpL3EvUzUyMVp0UmYzMGlibVVlOU9RU3RUckJoOHRmZ0E4?=
- =?utf-8?B?b2toYVcyOFBwcjhEZ2tMUnhGbmNIS0Q3clZteFZEZUFDVUd4bWdpWlRIa3lD?=
- =?utf-8?B?ZnpvUUZqNTJHb2UvLzk1cmNGNTBUL0VXTDBPOUszSmhRbXMxNWpadWR6TXFB?=
- =?utf-8?B?ckVQZHpFYmtqbTFqUDNRTXVvWmpyOTg1dXN6NEgraHYxQUF0cWV4YW4wY3Rs?=
- =?utf-8?B?QU0ycHVST3RCaEY4OXRxeDJFcnp3Ukd6SmRjaVpYeU1NK3U4Q05kU2dkM05r?=
- =?utf-8?B?RVBQQU8wUmFaeUpkL0tSdlNGOVg4VEJpUlBqd1N6WjZEazdSVjdjdGlaTzZI?=
- =?utf-8?B?U25wSENWRk9WaVRkU3dlM291ZVRJbktXUVRtRkdBSG1Zc2xTR0pDcUVBMHNB?=
- =?utf-8?B?TCszM3VwTlgxWDh5YmFvWnNuTFI1QXBubTRDcmgxN0ZDcGJoT0ZnUFRVa1h6?=
- =?utf-8?B?aEE1QzViVElDbGsrNTFEaWE4N3YyUW1CRy95cGlMVVU2a3J0cmZueEZiN2N2?=
- =?utf-8?B?ZU9XN3VIZGdaYWJ0bWs5NEFMMWxWZzZPVlJHV0NXcmNkZ0RaY1BneWlDQXRX?=
- =?utf-8?B?MGVPbi9BTHVlU0thcGk0NGtYRjBpcVN0SHFNU1ZrT0RSTTlZOU1SK2cyRllT?=
- =?utf-8?B?dVRYeWFybXVyTHpkSUdJT0Q4bmRmMWdheS9SWlBML0QyeEhDRktvMHhCYUVR?=
- =?utf-8?B?Zkh5MUJ2STdNQ3loKyt0SEVSaEZTVkMxT3FTa0dsUWwyU201L2pjbXZ0V1dz?=
- =?utf-8?B?czJLVG9acDhoL1Y1Ulhka1lTRWpnT2E1TDNPNm4wQUR1OUpmTzJ2aUdBVDFa?=
- =?utf-8?B?ZlJVbDRVdjIrT0J3QUdwOG1pbUREN3UyYk5jVkxUcXZhRzVwdXBVNjJMa2ZT?=
- =?utf-8?B?V0d4SmVTaEYwWnUyTHdqb210cGd6c2dzeTFQdVRTMkVQVml2d3lqRkVLNjFH?=
- =?utf-8?B?TnhDemtmUWhnOE1ZTTBVVHhsN0l1amVXbFNGbVRYZ1lYQWRWdFBOaDBVWnpJ?=
- =?utf-8?B?WDFxRC82azVreC9tYXM0amZ1TGExNnVweG0wOTNVV3FXNmdKZkYzc0VUcnZK?=
- =?utf-8?B?TnhueU8yNXpPRzhOckVERkE1UWt1WnZwazBGZVR6Y0Zkb2tLWVpseFVIZTEz?=
- =?utf-8?B?cGt1elBoOEp4emFCTDh5N2VjUzN6VW5ZS0Z5QTFRSUVLTHNvVnNsUXpUTnov?=
- =?utf-8?B?ZTF6ZzRJMnhQY2p5WnM4cVhSaGVKUzlhWDkySXJUT1RlNUtERGxDWHpTYTBt?=
- =?utf-8?B?MHBnN2JkSVNrVzVwb1VnWHk0RjJwV083REVMVDlncU10OVUrSTRqYnQ3MlU2?=
- =?utf-8?B?RCtpaW5RdnhFUFRmeEFYa1cxVGhtNTJwckVkaHdwSXdrMkVranNIWmZOUGFu?=
- =?utf-8?B?dnZEaExCNmM0Q0lWNFkxSFIxdlhTcEhWTW9PU1hia3ZjMCtCRDB3YVhneXFE?=
- =?utf-8?B?ZXZjZzRZb2U1dFRFTXlKSkEvZkxDTkF5MXRIbWxSa0lta0RaUjVpQnVETEp6?=
- =?utf-8?B?QkJkQVRNc0VtL09YbmVPbVVFNlArZ3FjRm03Wm0rZXRBZlZZbmRObS8zQ2xF?=
- =?utf-8?B?ZTdzeDlXWlo1WU9XcWJiNy9aSmdvQ3gwUmRKZktkY0N4cFR1Z1N1UlpwL1hn?=
- =?utf-8?B?TzFiYUtHOThLTDRrb0V1bkpRa08vWmw3VVBiQXZyR2VBWTVVQ2t1bXhBPT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bEhWcDErbVhKZDVKVmJrWlFkcStJcHZPbDVqekV1Q3kzWFdJWW5BaFFvdVB3?=
- =?utf-8?B?SU5hUlZJeVE0anU4UEpXMi9XRWpLUE1JVGM3T2twem9vaTkrbGRZRzRybDVU?=
- =?utf-8?B?ZXVZR3hEU3MyUk0xdno5OWdPeU1CdmJHRVkrQVVVVzh6MStDM1lVNW16bUJV?=
- =?utf-8?B?Qkl2Zi9tSWloYlEyMENBQTFaU3E3aVZMQ2hUaVU0eWUxNlp2TzllbkFSOTFw?=
- =?utf-8?B?czV6dXVaV1pkLzJ3UTVmbE45QnNiRTFmc1F3Y0lvUExWMGNwZjFhY21XbUdU?=
- =?utf-8?B?T1d3S21EbWNlb2ErZlBKVEx0QTlkMzVvcFh5eWg4QXpTV0NSTkxha1kxQWdB?=
- =?utf-8?B?Q2oxTGlwREM2QUhnVVY3ZVBvVjVteEF2ZHB3MDAvUHVXaDB1Unc0TS9qTVpD?=
- =?utf-8?B?Z2NxQlk1c3dwTUZPdWlzeU8xR0tGOUpMTjhWanFHZWQySy9qTVFQcGYyYkhB?=
- =?utf-8?B?SDdYeUFJczFwa25tVHNad3JKQjdNL1RTdEhFQkt3Qi9Vb0xWMExRUnJaak0w?=
- =?utf-8?B?Q3BvL05mdFRZRmdHNkJ3alpOcitVVk11Q1lKRjhnRk5DUjYwOFdHTEliSTcy?=
- =?utf-8?B?V0JFZStCK1dUNUgvWmY1M2VReFFPdXZWTnBaMzFYbWtDQVpyd0YzRS9oVEky?=
- =?utf-8?B?N0k0Z2pEM2FhRlMrNUV5RDJwV0NReFV0YmVpdUt5eE1RV3F4RWtQb0dxaDBu?=
- =?utf-8?B?UUhvaEl2VTNBbEpZTlFMWFRyc3hKajgwREdlS2x2UytUYTc1dlpJQVVTZXNp?=
- =?utf-8?B?bXJybkZaZ1YxOHkweElKTUNFcmo2dk8yd1FkcStONUk4UitKZ2xZNkRqbkh2?=
- =?utf-8?B?YjNaQ2taNkNjRStmYVAzOFQ3eFFmWE1tS2xiWEdDcDVGbTJnclZtSUdLRnNo?=
- =?utf-8?B?dDUyNVArZnNIakcvMisxbjdsRDVESmJoaU9hczRCK0pqaU42RHQxSUpwZGJ1?=
- =?utf-8?B?VTI0OXM3Wk5rSnlhRUxjMDA3Z29kckZRUXYrTTU3ck1mTlUyMkhFY0RTTkRY?=
- =?utf-8?B?M3RUUE81Vm1UQ29uUEFrWHpCRTdSZFdxWkVzQVlVOXJLYWs3YzhqcEN4N0RO?=
- =?utf-8?B?VUJnSlJCOEZFdE5hRjBjT1VCUElEN0wyUnU2cmlqMkIyQzNOTE1OYWJCb245?=
- =?utf-8?B?L2JiTU16c2xZNW5IcFhrekNSdmQ4ai9ia25zVnZkOTVFSG9kODRPY2VsVWV6?=
- =?utf-8?B?R25MSk9yUmxBRlo2ZG9RaW9ZM3BqQW52ZitPM3d3bGJaak91U0lwYTRycWdp?=
- =?utf-8?B?VHBRUER1WmN3ZUlVT2RIMzBlaXN1Z2J2Y3prT2tpUjI4bk85YzBsNW9JRlJJ?=
- =?utf-8?B?VmRnT1hqdU1nNWZvNklWSkkycVZsNDNwM1pBK050TlVXVjd2MDFDYUs1NmRk?=
- =?utf-8?B?ZFVWc1RENm82NmxxZ1pHRk5nSmFzQk9PSnNqbVp3dkd5dGZ2VjJkYzhDSUpE?=
- =?utf-8?B?ejU1ditrZURhTmpmK2Z4Rk1yV2ttMjZnVnZHV3kzQmlBOFAwZ0x3UGRKR2tQ?=
- =?utf-8?B?UWRlTkFPVDFaKzFhL2xIN1BIUUNGK211OFJVNlBQRlk5NHRYRERDampXV21X?=
- =?utf-8?B?dGlvSndDdTZ4NWowQ0d4ZTlUdkhUblRyV1V3NEE2SFdZRlQxM0t0VE1vV0oy?=
- =?utf-8?B?aVhtSWFkMmRyUjU4MHpBWHhxVnQvbDF3Mmk0TjlJSEZOMVVQdUUrZGFLTXM5?=
- =?utf-8?B?SFo1dHh5bWplTXZtZGVmbndTTFRHZW9LbTdxNEhaSkcyZ1Rkbm55bTA1c1cw?=
- =?utf-8?B?a3c0NS9KUm4xKzVvc2VDak9yUWFFTDZIbXFvYmtiVnlEdzhiMnB4UWhNTU13?=
- =?utf-8?B?RUltRkhqS1I5aWRja2l5K0JMNFBFRXE0cUpEdVU3dlhNOS9OOFJMKzhpV2xz?=
- =?utf-8?B?blFTcEhUVWxzMkVHS1RJYmxFVjNZUjNhWkFWMU03N3VEM00yYXgzeWdVVnF5?=
- =?utf-8?B?Y0lhbWRRL2YxQUs2blJzUUxvK2tWb24reWpDL2w1Tmtacm50ZncvYTVBaHlq?=
- =?utf-8?B?UXB3dHlmVi9nTzloeHNyc3JWemZDbVd4UmhMS09jbmJ1VCtWSkIzRVBqRnpZ?=
- =?utf-8?B?ZEZ0dEJEUnBPU24zVnU1Tnh3UGFKV0RERGFEbUM1Skl4aytCcW5sZWVmTjNx?=
- =?utf-8?B?TG1SSFRpeTlLT0FpaTZZc2JtTXZRV3Vpa0dpMm9IbTI0TGwvVXc3NXk4UEpH?=
- =?utf-8?B?alE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 61c94585-d9a0-49e1-9242-08dc6dd9abe5
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2024 14:34:44.0227
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ITvheUqLqmCVlka2h8B7bSQcC41/7G3cIIUymdg9Py74TZHJwcvyDfvrYuaBdMB9luADkYo5H/k7aIOtzxKXZqtpSxJmPrOe1TCljFsxMJU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8435
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
+Message-ID: <20240506143939.3673865-1-edumazet@google.com>
+Subject: [PATCH net-next] net: usb: sr9700: stop lying about skb->truesize
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 4/30/24 03:59, Jakub Kicinski wrote:
-> On Fri, 26 Apr 2024 15:22:02 +0200 Przemek Kitszel wrote:
->> ## devlink resources (with current API)
->> `devlink resource` is compelling, partially given the name sounds like a
->> perfect match. But when we dig just a little bit, the current Path+sizes
->> (min,max,step) is totally off to what is the most elegant picture of the
->> situation. In order to fit into existing uAPI, I would need to register
->> VFs as PF's resource, then GLOBAL LUT and PF LUT as a sub resource to
->> that (each VF gets two entries under it; plus two additional ones for
->> PF) I don't like it, I also feel like there is not that much use of
->> current resources API (it's not natural to use it for distribution, only
->> for limitation).
-> 
-> Can you share more on how that would look like?
+Some usb drivers set small skb->truesize and break
+core networking stacks.
 
-something like below (though I have added one more layer to illustrate
-broader idea, it could be chopped down)
+In this patch, I removed one of the skb->truesize override.
 
-[1]
+I also replaced one skb_clone() by an allocation of a fresh
+and small skb, to get minimally sized skbs, like we did
+in commit 1e2c61172342 ("net: cdc_ncm: reduce skb truesize
+in rx path") and 4ce62d5b2f7a ("net: usb: ax88179_178a:
+stop lying about skb->truesize")
 
-> 
->  From the description it does not sound so bad. Maybe with some CLI / UI
-> changes it will be fine?
-> 
->> ## devlink resources (with extended API)
->> It is possible to extend current `devlink resource` so instead of only
->> Path+size, there would be also Path+Owner option to use.
->> The default state for ice driver would be that PFs owns PF LUTs, GLOBAL
->> LUTs are all free.
->>
->> example proposed flow to assign a GLOBAL LUT to VF0 and PF LUT to VF1:
->> pf=0000:03:00.0  # likely more meaningful than VSI idx, but open for
->> vf0=0000:03:00.1 #                                       suggestions
->> vf1=0000:03:00.2
->> devlink resource set pci/$pf path /lut/lut_table_512 owner $pf
->> devlink resource set pci/$pf path /lut/lut_table_2048 owner free
->> devlink resource set pci/$pf path /lut/lut_table_512 owner $vf0
->> devlink resource set pci/$pf path /lut/lut_table_2048 owner $vf1
-> 
-> Don't we want some level of over-subscription to be allowed?
+Fixes: c9b37458e956 ("USB2NET : SR9700 : One chip USB 1.1 USB2NET SR9700Device Driver Support")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ drivers/net/usb/sr9700.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-In theory we could reuse/share tables, especially with the case of auto
-filled ones, not sure if I would want to implement that with the very
-first series, but good point to design interface with that in mind.
-To move in this direction we could make numbered LUTs an entity that is
-set/show'ed (digression: this would feel more like mmap() than malloc())
-(The imaginary output below does not do that).
+diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
+index 3164451e1010cc80a67e2fddc89a9e59a6721cab..0a662e42ed96593cf20d4209af2bc64a74f307df 100644
+--- a/drivers/net/usb/sr9700.c
++++ b/drivers/net/usb/sr9700.c
+@@ -421,19 +421,15 @@ static int sr9700_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
+ 			skb_pull(skb, 3);
+ 			skb->len = len;
+ 			skb_set_tail_pointer(skb, len);
+-			skb->truesize = len + sizeof(struct sk_buff);
+ 			return 2;
+ 		}
+ 
+-		/* skb_clone is used for address align */
+-		sr_skb = skb_clone(skb, GFP_ATOMIC);
++		sr_skb = netdev_alloc_skb_ip_align(dev->net, len);
+ 		if (!sr_skb)
+ 			return 0;
+ 
+-		sr_skb->len = len;
+-		sr_skb->data = skb->data + 3;
+-		skb_set_tail_pointer(sr_skb, len);
+-		sr_skb->truesize = len + sizeof(struct sk_buff);
++		skb_put(sr_skb, len);
++		memcpy(sr_skb->data, skb->data + 3, len);
+ 		usbnet_skb_return(dev, sr_skb);
+ 
+ 		skb_pull(skb, len + SR_RX_OVERHEAD);
+-- 
+2.45.0.rc1.225.g2a3ae87e7f-goog
 
-The main problem with the [1] above for "current API" for me is lack of
-aggregate device [2] in the structures represented by devlink. Let me
-show what it would be with one more layer (so I put PFs under that, and
-VFs one layer down).
-
-Here is an example with 2 PFs, one of with with 3 VFs, each of them with
-different LUT
-
-$ devlink resource show $device
-$device:
-   name lut size 4 unit entry
-     resources:
-       name lut_table_2048 size 2 unit entry size_min 0 size_max 8 
-size_gran 1
-       name lut_table_512 size 2 unit entry size_min 0 size_max 16 
-size_gran 1
-   name functions size 5 unit entry
-     resources:
-       name pf0
-         resources:
-           name lut_table_2048 size 0 size_max 1 ...
-           name lut_table_512 size 1 size_max 1 ...
-           name vf0
-             resources:
-               name lut_table_2048 size 1 size_max 1 ...
-               name lut_table_512 size 0 size_max 1 ...
-           name vf1
-             resources:
-               name lut_table_2048 size 0 size_max 1 ...
-               name lut_table_512 size 1 size_max 1 ...
-           name vf2
-             resources:
-               name lut_table_2048 size 0 size_max 1 ...
-               name lut_table_512 size 0 size_max 1 ...
-       name pf1
-         resources:
-           name lut_table_2048 size 1 ...
-           name lut_table_512 size 0 ...
-
-where $device stands for the aggregate device (covers 8 PFs in case of
-8-port split used)
-and all named PF/VFs in the output would need "dummy" size calculations
-(I would like to remove this need though)
-
-When all resources are assigned, all "size 0" entries should have also
-"size_max 0" to indicate no room for growth.
-
-[2] aggregate device discussion:
-https://lore.kernel.org/intel-wired-lan/cfe84890-f999-4b97-a012-6f9fd16da8e3@intel.com/
 
