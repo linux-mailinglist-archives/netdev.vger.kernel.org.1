@@ -1,114 +1,127 @@
-Return-Path: <netdev+bounces-93655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B6258BC9D3
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 10:44:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 144808BC9C1
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 10:42:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B2C21F22BF5
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 08:44:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3513282FC9
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 08:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D9B1411CE;
-	Mon,  6 May 2024 08:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3FE6CDAC;
+	Mon,  6 May 2024 08:42:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="SD98I92z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bHJV42c0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32CBF28DD1;
-	Mon,  6 May 2024 08:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92275A788
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 08:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714985065; cv=none; b=eMwExnrgYThh3CbyQlRCyae/TqEWA8r0rRnUxbZ68OpOmkouqtSAY1DJZ/Xf+aZW64mVgA0MD64eAtE9AVHWIWhmykRvDoS0G4pgQwL9vJtp3rmhw+MhrAzO632LoXn6j+vQEjLvJXqXJGxvCwmV5VQJi1c/98EwbmTDf4PgJg8=
+	t=1714984924; cv=none; b=bsLRH5V187L5xWQZ05lDDe2cMYMyI0Qs9/QYvpWjdBPwxuAwZIYZeyhVWS0Hp4TK1jMb1bnp2UWF2pxHKtx1DxaQajGHnRAZjPqmNC/7X4Q6K+VJTtC0PXxB37yzokA8KI2yIe4jNFjoUk3nSZB3RX/6qC8sXejRd1wuY0VnftU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714985065; c=relaxed/simple;
-	bh=TjbpkkZ794tR7dnJwl4XSmaecxKfYD4Yj3mozjWLP7A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A+7nzBfnWWebA9+PevCt+uO6Xamv9EHAHiZTEX6DvtvR6URDiKUkNA++IuJfuww7lV02eOlb59Y0o6SZHN/OAlmBHKd0opRoCKGqiPHKxa/gIb9USs6vmHTulyJSuAilL8LTsWrN8YPoB9jdHwukq81sIjli57/HY9kILMYLx5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=SD98I92z; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 13B00600A2;
-	Mon,  6 May 2024 08:44:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1714985052;
-	bh=TjbpkkZ794tR7dnJwl4XSmaecxKfYD4Yj3mozjWLP7A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SD98I92zttS3zulSx8ejP2fSeKAcPByx/Tk9hNJtL/s8/JxxsT9KejIppr9a5m7Yi
-	 q4xX/FaXcc5L19iCg/oqS7fJpmRqGtI8je3AHnkBNeodjQJhYHHMNdWPZY2LFUijAC
-	 GCiH38AaP6z/jTb8hJTyDKGFl4ARvMyDufooc6K+tWFjstlSNJ9nz6FXLxqI6bBreG
-	 wJWpyAjxDnr/Nv09mimFV8ty4WhZhA9ScIIFm+GoU6Z6ovWeGSNS4lqnQwTikRJ8yG
-	 jw3BHiNUjRk+hxhm2t/ntRXjJblVyKI/+WoEjqMbObzi4BryiVzynDa65pQFOgAPml
-	 AAx4rdg/dPNnA==
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 3F41820146D;
-	Mon, 06 May 2024 08:44:03 +0000 (UTC)
-Message-ID: <7cf42f1b-d7e2-4957-bee9-e875c61d19e2@fiberby.net>
-Date: Mon, 6 May 2024 08:44:03 +0000
+	s=arc-20240116; t=1714984924; c=relaxed/simple;
+	bh=VufGN84yFM1G4uypzEns0FUOmUjQkqvEB/lAaxOygas=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gJpeun6aW1y091P1/FnDVPxOPzQ/NBH6VO0Hov9Q1XQhY4bMVW3sCqGMvZQxC7W4pBv4gNRb3ly4gD9VSThxw77nwv+HXepIjXr0fn6qyGXYs5OrpHi/YWZEoYlPreDc0pH6s2+Xh1UYmOkgX4XD+lVI0lKBWd0KWldTpjGARe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bHJV42c0; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714984923; x=1746520923;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VufGN84yFM1G4uypzEns0FUOmUjQkqvEB/lAaxOygas=;
+  b=bHJV42c0hfy6Nee3hGK21h6g1L72miXld8gTKCi2fwpGxMB1Nt0p5x84
+   s1PUP2Av5jFTHIybrMnOiyAZnVRwHjh3O4SrKBb43NrmnJHhKdDd0j33K
+   L3cyOvv6zuyhVS9IoRKdfy7kaSV7xz6nH8Q7ywR0ocBWiwo6U2vby72bw
+   TU8lLWS7MVXveNci24IS0ucZ2v655mjLJI9TuCkd+5SpiCgHxkSsQWMXo
+   uZGjJCC1SEsuyEvYDsXiaZkjOI5LG90CBnso5uQCVn03pfbu3vprENnP4
+   Uw7/fwWJ1Jn3YOgEFKKWJDmCcrwoA602nGwoDau3jMQg3b7q1zyMG9pSP
+   g==;
+X-CSE-ConnectionGUID: fLFSgXVaSwqtQhHkaL5a9A==
+X-CSE-MsgGUID: Di3qYLKpSIGtijSmcbpnVw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11064"; a="14505073"
+X-IronPort-AV: E=Sophos;i="6.07,257,1708416000"; 
+   d="scan'208";a="14505073"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 01:42:03 -0700
+X-CSE-ConnectionGUID: j0V75Ua5RWaVwFj2/wfZLg==
+X-CSE-MsgGUID: ADU2y4hgQPSAHL1KzP645Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,257,1708416000"; 
+   d="scan'208";a="28050115"
+Received: from wasp.igk.intel.com (HELO GK3153-DR2-R750-36946.localdomain.com) ([10.102.20.192])
+  by fmviesa009.fm.intel.com with ESMTP; 06 May 2024 01:41:59 -0700
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	jacob.e.keller@intel.com,
+	michal.kubiak@intel.com,
+	maciej.fijalkowski@intel.com,
+	sridhar.samudrala@intel.com,
+	przemyslaw.kitszel@intel.com,
+	wojciech.drewek@intel.com,
+	pio.raczynski@gmail.com,
+	jiri@nvidia.com,
+	mateusz.polchlopek@intel.com,
+	shayd@nvidia.com
+Subject: [iwl-next v2 0/4] ice: prepare representor for SF support
+Date: Mon,  6 May 2024 10:46:49 +0200
+Message-ID: <20240506084653.532111-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] i40e: flower: validate control
- flags
-To: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Eric Dumazet <edumazet@google.com>,
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-References: <20240416144320.15300-1-ast@fiberby.net>
- <PH0PR11MB5013807F66C976477212B27C961C2@PH0PR11MB5013.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <PH0PR11MB5013807F66C976477212B27C961C2@PH0PR11MB5013.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Sujai,
+Hi,
 
-Thank you for testing.
+This is a series to prepare port representor for supporting also
+subfunctions. We need correct devlink locking and the possibility to
+update parent VSI after port representor is created.
 
-On 5/6/24 5:32 AM, Buvaneswaran, Sujai wrote:
-> HW offload is not supported on the i40e interface. This patch cannot be tested on i40e interface.
+Refactor how devlink lock is taken to suite the subfunction use case.
 
-To me it looks like it's supported (otherwise there is a lot of dead flower code in i40e_main.c),
-although it's a bit limited in functionality, and is called "cloud filters".
+VSI configuration needs to be done after port representor is created.
+Port representor needs only allocated VSI. It doesn't need to be
+configured before.
 
-static const struct net_device_ops i40e_netdev_ops = {
-	[...]
-	.ndo_setup_tc           = __i40e_setup_tc,
-	[...]
-};
+VSI needs to be reconfigured when update function is called.
 
-There is a path from __i40e_setup_tc() to i40e_parse_cls_flower(),
-so it should be possible to test this patch.
+The code for this patchset was split from (too big) patchset [1].
 
-Most of the gatekeeping is in i40e_configure_clsflower().
+v1 --> v2 [2]:
+ * add returns for kdoc in ice_eswitch_cfg_vsi
 
-I think you should be able to get past the gatekeeping with this:
+[1] https://lore.kernel.org/netdev/20240213072724.77275-1-michal.swiatkowski@linux.intel.com/
+[2] https://lore.kernel.org/netdev/20240419171336.11617-1-michal.swiatkowski@linux.intel.com/
 
-ethtool -K $iface ntuple off
-ethtool -K $iface hw-tc-offload on
-tc qdisc add dev $iface ingress
-tc filter add dev $iface protocol ip parent ffff: prio 1 flower dst_mac 3c:fd:fe:a0:d6:70 ip_flags frag skip_sw hw_tc 1
+Michal Swiatkowski (4):
+  ice: store representor ID in bridge port
+  ice: move devlink locking outside the port creation
+  ice: move VSI configuration outside repr setup
+  ice: update representor when VSI is ready
 
-The above filter is based on the first example in:
-   [jkirsher/next-queue PATCH v5 6/6] i40e: Enable cloud filters via tc-flower
-   https://lore.kernel.org/netdev/150909696126.48377.794676088838721605.stgit@anamdev.jf.intel.com/
+ .../net/ethernet/intel/ice/devlink/devlink.c  |  2 -
+ .../ethernet/intel/ice/devlink/devlink_port.c |  4 +-
+ drivers/net/ethernet/intel/ice/ice_eswitch.c  | 85 +++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_eswitch.h  | 14 ++-
+ .../net/ethernet/intel/ice/ice_eswitch_br.c   |  4 +-
+ .../net/ethernet/intel/ice/ice_eswitch_br.h   |  1 +
+ drivers/net/ethernet/intel/ice/ice_repr.c     | 16 ++--
+ drivers/net/ethernet/intel/ice/ice_repr.h     |  1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  2 +-
+ 9 files changed, 90 insertions(+), 39 deletions(-)
 
 -- 
-Best regards
-Asbjørn Sloth Tønnesen
-Network Engineer
-Fiberby - AS42541
+2.42.0
+
 
