@@ -1,186 +1,196 @@
-Return-Path: <netdev+bounces-93773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67DE88BD2C5
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:27:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A7878BD2C9
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:29:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 197F0280FD9
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:27:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28EA61C21871
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F6015665D;
-	Mon,  6 May 2024 16:27:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1163156657;
+	Mon,  6 May 2024 16:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="f+j3JvGf"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Y3k0j3IG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57E9156249
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 16:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583F9156646
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 16:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715012870; cv=none; b=kcItZyHLSm2X54CIckPWol/xtQSbcMBGWqJ77dcmy2UbS4SagVSjXazgBmCaVRRgWs9ESZvIpi9MAK7wfrkgV6vChzP0gJF4wkcGA621wxYNRunSqht+o2ryNuB7BEjYFbW+rMPftyTcySi/U4IHdIf8TdsrsmI21LJLDFjFSD4=
+	t=1715012934; cv=none; b=QZnI4zdhpNOGM7mAgQNFUZutTmXnzUY8rOji64ju1Ak9WBWMJyqDsE7unDgbDVwAKD+PIdR+8SphbqsJ9X//TJw/fKA3rVMhYAoQi12IK4T5wzEvzIRJjX7u9vkNZ10MT7E1vEngY5Ynns3jjUtN9NeM31XdYoprYW7PU36vUnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715012870; c=relaxed/simple;
-	bh=BIZlorch0tOfWgLcDNbvKqrhtK4P+bKgxAxpz0AQEf4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=grZlb7CpMIvEhYtcAZ5OLUbj1NLthJqj7NuTEzZQw3hYKFgSCvjbScjhA40FOh3bKHfcCN8JdpnyASs+H0rMcB0LiaE/HeJ8a0xXgENRgsdVbbjfZ9bWVBqzn9KQV5lQ18lusvLXNDCxL41uwDE8cMrz32c206K6/vJNMxxEsqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=f+j3JvGf; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6f44dc475f4so1309399b3a.2
-        for <netdev@vger.kernel.org>; Mon, 06 May 2024 09:27:47 -0700 (PDT)
+	s=arc-20240116; t=1715012934; c=relaxed/simple;
+	bh=yBy+qbkhiVAGOfJz494tYdqv5oV8MVNOabfY1NO2uRM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YizDJGnzAnPd9agVh62AA+MYsHYqBQdpTbRIaniHRyHeJX2X9qK/znV1+4mLyEqNsCigJQJNOAEFr+73v3huge1FDCCZAOBx3iZbpfnaJYlRicR07XqhqtNTeb0P7q1FkVIMKVKSjC5V/GjC13p7KOB44EgS/mUv60NJF6hJH/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Y3k0j3IG; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-61bb219737dso23790797b3.2
+        for <netdev@vger.kernel.org>; Mon, 06 May 2024 09:28:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1715012867; x=1715617667; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=odqzrPs//hj8WC38Rhd4Ch2SctDBzFte4EXtwtCBz3k=;
-        b=f+j3JvGf9+SLwdCCRoh/z+fBVTIciFD5uSUUmWj75mZrNrDttntkSwcWRBdvK3WIlq
-         TOlkOc06ETMXZzPvHfZHq/LThTBcKQC0gs6QEyjPuAkS5sT3HWfTEW4q5ZVuKhzQDU4e
-         Vljfnhf+8twqOwCv/OVQSAa9xBsqSCKxEBIRA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715012867; x=1715617667;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=cloudflare.com; s=google09082023; t=1715012932; x=1715617732; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=odqzrPs//hj8WC38Rhd4Ch2SctDBzFte4EXtwtCBz3k=;
-        b=vqDsVBABQhKl8NryP43Bk25ydJdilPgsRDHoZUZEQDKou5avBe0D7nz7ryVvx5Aa2J
-         g01baZWbLcOlOeF9DYsUcMK2UAOIqvz64Ksxh3/2UrDpaJ0OzlMrVnXOp0AwmlNOhZ1m
-         0KCiLFtRMIebn0HCKm8HONp5kfgG9Drd3Ct93bxMXdn1IQzCkFbul4xa29jjTKwkNExU
-         WJOC//vMmjzVp0BtAdYqqSIgZk8jIEo7ZhOU6RAqBnx0iny24aBBMpCA8J5HJe8eHPLu
-         B7pRIY3qq5qU5WJ65DpVPR4a+VPFIjoauxBp0OIUtZwb3dLU7RKjccp0BFWa3aYIO2qN
-         lOEw==
-X-Forwarded-Encrypted: i=1; AJvYcCUnIZMB0P1zk58Mp7YVGEClCe8J5+jgYDOJuBL1lJIF6F93DRlWXXNF4uPpuGoG0GvhYIsS/xuoCsYcqOAi2DpPvMcWgGAV
-X-Gm-Message-State: AOJu0YxdRkcVWpOYAbI3RXfUbi3ESukH3mVLGAeyiVdnXwZ3su5gHDJx
-	WpDkdC+WrvQ5KGxpzD4ijsNqZQTXHZxkJmN9tC8EqgSzgHJqtoqMFwxBt+incQ==
-X-Google-Smtp-Source: AGHT+IFx5A8ojwQhkf5tzPyoBV+wXS8DrLII4KW7i+NfXJRNfcIe8ljx+OJPW04VragyCU8v5vFkvw==
-X-Received: by 2002:a05:6a00:2342:b0:6f3:ea4b:d1c1 with SMTP id j2-20020a056a00234200b006f3ea4bd1c1mr12045012pfj.1.1715012867078;
-        Mon, 06 May 2024 09:27:47 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id ls30-20020a056a00741e00b006f4123491d2sm7951997pfb.108.2024.05.06.09.27.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 09:27:46 -0700 (PDT)
-Date: Mon, 6 May 2024 09:27:46 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Erick Archer <erick.archer@outlook.com>
-Cc: Sven Eckelmann <sven@narfation.org>,
-	Marek Lindner <mareklindner@neomailbox.ch>,
-	Simon Wunderlich <sw@simonwunderlich.de>,
-	Antonio Quartulli <a@unstable.cc>,
-	"David S.  Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	b.a.t.m.a.n@lists.open-mesh.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org,
-	llvm@lists.linux.dev,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: Re: [PATCH v3] batman-adv: Add flex array to struct
- batadv_tvlv_tt_data
-Message-ID: <202405060924.4001F77D@keescook>
-References: <AS8PR02MB72371F89D188B047410B755E8B192@AS8PR02MB7237.eurprd02.prod.outlook.com>
- <3932737.ElGaqSPkdT@sven-l14>
- <AS8PR02MB723738E5107C240933E4E0F28B1E2@AS8PR02MB7237.eurprd02.prod.outlook.com>
+        bh=xCCkT3u7JpEp6mJ5QsHOybd1FYzd1g8E4PkeVAusjAE=;
+        b=Y3k0j3IG2OMbjastaYHXwkSTG5lGUUZnk4+LN5E7tCNvv1w2iP0rcdS8AIXV8XbN0d
+         5nlfIrexO5bzL7EjjkgHQXbNJfdwTD//ribKD0EjrMVUFfWh3W8q87V612CZ3BxF6A/4
+         ScacCcw2bRdVNKeVoa9PTaml7WlxXrHZxJRed55zPqnwrublz41Q46OMzZtRymAyruT5
+         ZtjgljkH5HHYevpVwDgMJD43qpOO783DeW+WuNmJMQNbhN0ql/7QbNwG18t7dkiVccUZ
+         cM64C6M++2e0nfSdbwIiMcbx8EuJnPesFfldbVuvT93nA7qM1nwKb0KwsXBnJujkoy43
+         8dUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715012932; x=1715617732;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xCCkT3u7JpEp6mJ5QsHOybd1FYzd1g8E4PkeVAusjAE=;
+        b=DgMb6EvdV4aZ6vlIjflvwILkkMnqq+dvSQdq7bZgTsDRmsYyVbzuEeSKz49K1zzgvv
+         LeJDkHrxMvIdigCS/jP7FMkEHxiME4YrmTbfc813O9/smTdwP3x1xiiRrcatfU5rfaM0
+         xNKRYAQH4Bqbggcz3IcYj+CPHMtsAF6TE9Ac/ztSuQUbbdlyJ5e2I/lOkAS57tORyj2f
+         /gTCSdOArxjnN+r//eSk853BdHR25ejZrxokev2K+x7oasDmHjBoMA259fAWrztMM63X
+         30yW/d3H4L+/vK6bagopzwbYsd0pSpjTJIMCOJdurM6W02yZlwKR58Qj1ShQ+80/13ts
+         ZFZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW4RKVGWdrGxrG8Py3E4qyGjVnxcN93wFKz/LoV7QE0tJtd1E489Ov1Tx52qYD7K1cpZPZySmI1fqv1XgqlO+oFyEDrI5Y6
+X-Gm-Message-State: AOJu0Yyr9uDGnb5JE0MDdccn5HxsaNkj8bPIczxbMlef0aFxz/0GqpmG
+	MTWO1SPORks9CDb7SjDT0CMHMN8+4z4PhoVmFcJlWfz333xpBvQ4JNvC2+nrkx/QYCeJmmZU3RQ
+	tvebfZsK1M/YQ/rNobjAK0maFNO5CZTxWpSXAzA==
+X-Google-Smtp-Source: AGHT+IFvfA2ywVbCWpHObc2hhQu6/bp+dPE34bgiOyDlARIZkevuDZ413NE2Lsv3j8JUxB1ePQsIlKXeHYj5RqeHUtk=
+X-Received: by 2002:a81:af12:0:b0:61a:d372:8767 with SMTP id
+ n18-20020a81af12000000b0061ad3728767mr9829158ywh.51.1715012932189; Mon, 06
+ May 2024 09:28:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AS8PR02MB723738E5107C240933E4E0F28B1E2@AS8PR02MB7237.eurprd02.prod.outlook.com>
+References: <171457225108.4159924.12821205549807669839.stgit@firesoul>
+ <30d64e25-561a-41c6-ab95-f0820248e9b6@redhat.com> <4a680b80-b296-4466-895a-13239b982c85@kernel.org>
+ <203fdb35-f4cf-4754-9709-3c024eecade9@redhat.com> <b74c4e6b-82cc-4b26-b817-0b36fbfcc2bd@kernel.org>
+ <b161e21f-9d66-4aac-8cc1-83ed75f14025@redhat.com> <42a6d218-206b-4f87-a8fa-ef42d107fb23@kernel.org>
+ <4gdfgo3njmej7a42x6x6x4b6tm267xmrfwedis4mq7f4mypfc7@4egtwzrfqkhp>
+ <55854a94-681e-4142-9160-98b22fa64d61@kernel.org> <mnakwztmiskni3k6ia5mynqfllb3dw5kicuv4wp4e4ituaezwt@2pzkuuqg6r3e>
+In-Reply-To: <mnakwztmiskni3k6ia5mynqfllb3dw5kicuv4wp4e4ituaezwt@2pzkuuqg6r3e>
+From: Ivan Babrou <ivan@cloudflare.com>
+Date: Mon, 6 May 2024 09:28:41 -0700
+Message-ID: <CABWYdi2pTg5Yc23XAV_ZLJepF42b8L3R5syhocDVJS-Po=ZYOA@mail.gmail.com>
+Subject: Re: [PATCH v1] cgroup/rstat: add cgroup_rstat_cpu_lock helpers and tracepoints
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Waiman Long <longman@redhat.com>, tj@kernel.org, 
+	hannes@cmpxchg.org, lizefan.x@bytedance.com, cgroups@vger.kernel.org, 
+	yosryahmed@google.com, netdev@vger.kernel.org, linux-mm@kvack.org, 
+	kernel-team@cloudflare.com, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Daniel Dao <dqminh@cloudflare.com>, jr@cloudflare.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, May 04, 2024 at 07:08:39PM +0200, Erick Archer wrote:
-> Hi Sven,
-> 
-> On Sat, May 04, 2024 at 11:35:38AM +0200, Sven Eckelmann wrote:
-> > On Wednesday, 1 May 2024 17:02:42 CEST Erick Archer wrote:
-> > > diff --git a/include/uapi/linux/batadv_packet.h b/include/uapi/linux/batadv_packet.h
-> > > index 6e25753015df..dfbe30536995 100644
-> > > --- a/include/uapi/linux/batadv_packet.h
-> > > +++ b/include/uapi/linux/batadv_packet.h
-> > [...]
-> > > +/**
-> > > + * struct batadv_tvlv_tt_data - tt data propagated through the tt tvlv container
-> > > + * @flags: translation table flags (see batadv_tt_data_flags)
-> > > + * @ttvn: translation table version number
-> > > + * @num_vlan: number of announced VLANs. In the TVLV this struct is followed by
-> > > + *  one batadv_tvlv_tt_vlan_data object per announced vlan
-> > > + * @vlan_data: array of batadv_tvlv_tt_vlan_data objects
-> > > + */
-> > > +struct batadv_tvlv_tt_data {
-> > > +       __u8   flags;
-> > > +       __u8   ttvn;
-> > > +       __be16 num_vlan;
-> > > +       struct batadv_tvlv_tt_vlan_data vlan_data[] __counted_by_be(num_vlan);
-> > > +};
-> > 
-> > Thanks for the updates. But I can't accept this at the moment because 
-> > __counted_by_be is used in an uapi header without it being defined
-> > include/uapi/linux/stddef.h (and this file is also not included in this 
-> > header).
-> > 
-> > See commit c8248faf3ca2 ("Compiler Attributes: counted_by: Adjust name and 
-> > identifier expansion") as an example for the similar __counted_by macro.
-> 
-> If I understand correctly, the following changes are also needed because
-> the annotated struct is defined in a "uapi" header. Sorry if it's a stupid
-> question, but I'm new to these topics.
-> 
-> diff --git a/include/uapi/linux/batadv_packet.h b/include/uapi/linux/batadv_packet.h
-> index 6e25753015df..41f39d7661c9 100644
-> --- a/include/uapi/linux/batadv_packet.h
-> +++ b/include/uapi/linux/batadv_packet.h
-> @@ -9,6 +9,7 @@
-> 
->  #include <asm/byteorder.h>
->  #include <linux/if_ether.h>
-> +#include <linux/stddef.h>
->  #include <linux/types.h>
-> 
->  /**
-> diff --git a/include/uapi/linux/stddef.h b/include/uapi/linux/stddef.h
-> index 2ec6f35cda32..58154117d9b0 100644
-> --- a/include/uapi/linux/stddef.h
-> +++ b/include/uapi/linux/stddef.h
-> @@ -55,4 +55,12 @@
->  #define __counted_by(m)
->  #endif
-> 
-> +#ifndef __counted_by_le
-> +#define __counted_by_le(m)
-> +#endif
-> +
-> +#ifndef __counted_by_be
-> +#define __counted_by_be(m)
-> +#endif
-> +
->  #endif /* _UAPI_LINUX_STDDEF_H */
+On Mon, May 6, 2024 at 9:22=E2=80=AFAM Shakeel Butt <shakeel.butt@linux.dev=
+> wrote:
+>
+> On Mon, May 06, 2024 at 02:03:47PM +0200, Jesper Dangaard Brouer wrote:
+> >
+> >
+> > On 03/05/2024 21.18, Shakeel Butt wrote:
+> [...]
+> > >
+> > > Hmm 128 usec is actually unexpectedly high.
+> >
+> > > How does the cgroup hierarchy on your system looks like?
+> > I didn't design this, so hopefully my co-workers can help me out here? =
+(To
+> > @Daniel or @Jon)
+> >
+> > My low level view is that, there are 17 top-level directories in
+> > /sys/fs/cgroup/.
+> > There are 649 cgroups (counting occurrence of memory.stat).
+> > There are two directories that contain the major part.
+> >  - /sys/fs/cgroup/system.slice =3D 379
+> >  - /sys/fs/cgroup/production.slice =3D 233
+> >  - (production.slice have directory two levels)
+> >  - remaining 37
+> >
+> > We are open to changing this if you have any advice?
+> > (@Daniel and @Jon are actually working on restructuring this)
+> >
+> > > How many cgroups have actual workloads running?
+> > Do you have a command line trick to determine this?
+> >
+>
+> The rstat infra maintains a per-cpu cgroup update tree to only flush
+> stats of cgroups which have seen updates. So, even if you have large
+> number of cgroups but the workload is active in small number of cgroups,
+> the update tree should be much smaller. That is the reason I asked these
+> questions. I don't have any advise yet. At the I am trying to understand
+> the usage and then hopefully work on optimizing those.
+>
+> >
+> > > Can the network softirqs run on any cpus or smaller
+> > > set of cpus? I am assuming these softirqs are processing packets from
+> > > any or all cgroups and thus have larger cgroup update tree.
+> >
+> > Softirq and specifically NET_RX is running half of the cores (e.g. 64).
+> > (I'm looking at restructuring this allocation)
+> >
+> > > I wonder if
+> > > you comment out MEMCG_SOCK stat update and still see the same holding
+> > > time.
+> > >
+> >
+> > It doesn't look like MEMCG_SOCK is used.
+> >
+> > I deduct you are asking:
+> >  - What is the update count for different types of mod_memcg_state() ca=
+lls?
+> >
+> > // Dumped via BTF info
+> > enum memcg_stat_item {
+> >         MEMCG_SWAP =3D 43,
+> >         MEMCG_SOCK =3D 44,
+> >         MEMCG_PERCPU_B =3D 45,
+> >         MEMCG_VMALLOC =3D 46,
+> >         MEMCG_KMEM =3D 47,
+> >         MEMCG_ZSWAP_B =3D 48,
+> >         MEMCG_ZSWAPPED =3D 49,
+> >         MEMCG_NR_STAT =3D 50,
+> > };
+> >
+> > sudo bpftrace -e 'kfunc:vmlinux:__mod_memcg_state{@[args->idx]=3Dcount(=
+)}
+> > END{printf("\nEND time elapsed: %d sec\n", elapsed / 1000000000);}'
+> > Attaching 2 probes...
+> > ^C
+> > END time elapsed: 99 sec
+> >
+> > @[45]: 17996
+> > @[46]: 18603
+> > @[43]: 61858
+> > @[47]: 21398919
+> >
+> > It seems clear that MEMCG_KMEM =3D 47 is the main "user".
+> >  - 21398919/99 =3D 216150 calls per sec
+> >
+> > Could someone explain to me what this MEMCG_KMEM is used for?
+> >
+>
+> MEMCG_KMEM is the kernel memory charged to a cgroup. It also contains
+> the untyped kernel memory which is not included in kernel_stack,
+> pagetables, percpu, vmalloc, slab e.t.c.
+>
+> The reason I asked about MEMCG_SOCK was that it might be causing larger
+> update trees (more cgroups) on CPUs processing the NET_RX.
 
-Yup, this is needed for UAPI as you have it. Thanks! I should have noticed
-the need for this when I reviewed commit ca7e324e8ad3 ("compiler_types:
-add Endianness-dependent __counted_by_{le,be}").
+We pass cgroup.memory=3Dnosocket in the kernel cmdline:
 
-> If this is the right path, can these changes be merged into a
-> single patch or is it better to add a previous patch to define
-> __counted_by{le,be}?
+* https://lore.kernel.org/lkml/CABWYdi0G7cyNFbndM-ELTDAR3x4Ngm0AehEp5aP0tfN=
+kXUE+Uw@mail.gmail.com/
 
-We're almost on top of the merge window, so how about this: send me a
-patch for just the UAPI addition, and I'll include it in this coming (next
-week expected) merge window. Once -rc2 is out, re-send this batman-adv
-patch since then netdev will be merged with -rc2 and the UAPI change
-will be there.
-
--Kees
-
--- 
-Kees Cook
+> Anyways did the mutex change helped your production workload regarding
+> latencies?
 
