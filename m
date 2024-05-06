@@ -1,238 +1,242 @@
-Return-Path: <netdev+bounces-93826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14DDE8BD4E2
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 20:51:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 971728BD4E5
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 20:51:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF25F281F7A
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:51:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C38691C2259B
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE53F158D84;
-	Mon,  6 May 2024 18:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2B4158D94;
+	Mon,  6 May 2024 18:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="O358p5mK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YfHVYz/1"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2056.outbound.protection.outlook.com [40.107.243.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7EC4AECA;
-	Mon,  6 May 2024 18:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715021460; cv=fail; b=vD2l5O9mMkIHGUo0kvwM7o23bEw7vgZsL5VbFRzs3bV717W+MotbpPvrYTXDFY9pN9Wc9kSxiZKVSKst1mM1vPXr31JyoynFW88a8z/QlFSm9GG/44TOLPaZeaxW9HxjkmzOy7TUUguRXuf89i5sqa3prMNlGi2CpDsdLlyHs6c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715021460; c=relaxed/simple;
-	bh=6TjPXwDHMrKam3heobAM+nTr0wZ3G8FQxnuyGqSXeJ0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=DaSbrHD7zQP53hG+vUDwy5fM/f76rxzrOyMA56Wo8yzo6i4KHGEGwNoqpVvLvCCsvmnds2RthJTG7PhTPZQo27CcLK1IeyFxsbEpIo0Sa2kgZeLNyfqwnmCC7nDsw3FADwEXbGs4Irhut8MVxzD+xQV9P/u9hueMB1E2T+iKmSo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=O358p5mK; arc=fail smtp.client-ip=40.107.243.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hzN1dJdyuYUTJsvfVc7ETNFmW+c82qhGKnuyWDjAx4wjE3l3lQ2lV4TiO/g4bJyi0D+gEVu6M4iwa7WDx4Kkj4tRhYzm+4f+zVF+cDi3R0LAAXyPZrLKIn21jZSbPQG8DLawsfoHSvjRjWSVlXPYzR29JHdFcrJmSN41lLViEWbeY1X1lWPSLpqnaWyfe8VMbOa09MgEY4WiDk1iRzFwgVVROXfj9haGylWlOpqUhJUKChUH6es+ILR0rlpU3aR91eK1aAhBGwWw1kn6+GYvszNlUgIpNuYNSXR99b24XwwkpVlit752IEoVVmFI1w5og2pg0fEOtrq5itIs0FkWJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ShH1y5EJvLyw8L8Y3VMDX0hBH3YYOJ6GcUoiYqKBN0Y=;
- b=MRUkF7bRgX7ohPDHtfV1qrfIMQuZM7BpU4pQpmijJOfvQlVki6iTCpbSuSviDsuR4yDxovcHxEbIn3A0KE8+evad3NviGMVt283jxmiwX95kb4CThwzzRxGqLemOKucrgnK/Tk9MJ9J+yIrKzfG4dmY33Ff+Py2dPQ7i61C/0CQrHngpQtahWuqK6OrDn3PH2iteUoCDEYKpOds6meXbWT2kLyCIkBZY/XRCNfTJJ5I0hp34BuJwraLFAymKXTc03enh2KPPmucUhSUM2ESf7D4FMrWQdY6LvuyEtKG+Cy8UkUfiHIErIozLBN5+5XjMGiPWlnuVFlxnLWxyS1rfAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ShH1y5EJvLyw8L8Y3VMDX0hBH3YYOJ6GcUoiYqKBN0Y=;
- b=O358p5mK8ZHZxd1/qFLNJ+XfkRF8vb+WIHQ359kiZLQgUrwajC0c8SrQkgawfeSDRKrZaqBW8O7DOj/8/beCzyF+5pmK3oyqNzXaTQ8o2c5+doledFa7sA953+aFHtpyjOm/yvkFTuvFXYonqhtZFlIXNu9CbkPbHPo3keswf31P7x4yX0kxwL12cpqLDZUkRlj5137nTqicJ2a6MAQ1DbjjIPZ2GxmBLDII7ozAPoVWGW7M8CwrnlO1G3WTYfDtNWbKV5FeHmNoa211s5feif8a5rvIJtw4FxAJlgroAXRHovhCEYbMMKtRzFrdVFK9yoKMO1rNXgeiikO3OpQgiQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
- by PH7PR12MB6907.namprd12.prod.outlook.com (2603:10b6:510:1b9::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.41; Mon, 6 May
- 2024 18:50:51 +0000
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::2cf4:5198:354a:cd07]) by BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::2cf4:5198:354a:cd07%4]) with mapi id 15.20.7544.041; Mon, 6 May 2024
- 18:50:51 +0000
-Message-ID: <fd74de9a-4deb-4fb7-9461-65c38ff1443c@nvidia.com>
-Date: Mon, 6 May 2024 11:50:40 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] selftests/net: fix uninitialized variables
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, richardbgobert@gmail.com
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
- <afaerber@suse.de>, Manivannan Sadhasivam
- <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>,
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- Pravin B Shelar <pshelar@ovn.org>,
- Alexander Mikhalitsyn <alexander@mihalicyn.com>,
- zhujun2 <zhujun2@cmss.chinamobile.com>, Petr Machata <petrm@nvidia.com>,
- Ido Schimmel <idosch@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>,
- Nikolay Aleksandrov <razor@blackwall.org>,
- Benjamin Poirier <bpoirier@nvidia.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Dmitry Safonov <0x7f454c46@gmail.com>, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-actions@lists.infradead.org,
- mptcp@lists.linux.dev, dev@openvswitch.org,
- Valentin Obst <kernel@valentinobst.de>, linux-kselftest@vger.kernel.org,
- LKML <linux-kernel@vger.kernel.org>, llvm@lists.linux.dev
-References: <20240505222639.70317-1-jhubbard@nvidia.com>
- <20240505222639.70317-2-jhubbard@nvidia.com>
- <66391ab83771c_516de294d7@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <66391ab83771c_516de294d7@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR08CA0001.namprd08.prod.outlook.com
- (2603:10b6:a03:100::14) To BY5PR12MB4130.namprd12.prod.outlook.com
- (2603:10b6:a03:20b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F6615886A;
+	Mon,  6 May 2024 18:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715021498; cv=none; b=aRm/iU0mghxYuHtG78Wyn8cVyDPKBAH00JX0yjRN7suYwbeXHMA/LZD/CYHopwKNlNDLYoXdi5QHzuU5uBQCYJh6hD7xfQaEw3uxOgIC5ClgdLb5ZKG3xVLfckkqD5C1iGuYn5PeyvgwBQsNEs0l+2dWX2lORPGYOFeDn1sE2tA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715021498; c=relaxed/simple;
+	bh=8R4ZPMsVAW+UX7HqHWTfTC7cyZevPvFz9AU2FQlodBI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=SL2wFRH2XTWQVnwjJQQBWAeACCfw6FO0lo9YYn3AVAhXM0NGhvvBK1S/XxAJB32p8CglD/uf3mDqqjy0FQT+ZnYvGpR+hfmFHmkdXSQO06uDxajze27f7XKq37qhFClt1q/ao7mpqW0/4QqNSD5fEnqbzgC2AbVM1xpB8Xnmgmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YfHVYz/1; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3c9691e1e78so972929b6e.3;
+        Mon, 06 May 2024 11:51:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715021496; x=1715626296; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cV6bIWj1XAD1mDEysW3PzxfMR0Aa4OzBGgrUMASIDvU=;
+        b=YfHVYz/1PhBHOBu35FkuMhydcdJJGEA30s4oObg1HoTeXMqATCLWww9Hmfukg5Pyy0
+         ZrSw46zFFevA0M2GBEZ8RQ/YH/mpQqfx1uR/cSJLuG51VLsPNQKzgx38rn4DBZCBs9nl
+         MJzHKbdFGVS7oASgJeBCylufFlKpqjLr+LYAjtlIDYZaOjOaSvF2rI4OKcNv/PRxvSq/
+         My36degVJT9wCFOuY50LvruhPB46iDfMQInI6LnLhTKhruc302vxajndUtNcuNvcsLr4
+         pFX/vk1F0sr3cnjutyCwiYTycJlaOA0brY1wHApGNxYqsFIojx2RLK7rTOamvbVGKlXE
+         aF6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715021496; x=1715626296;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=cV6bIWj1XAD1mDEysW3PzxfMR0Aa4OzBGgrUMASIDvU=;
+        b=bw4jnjwPRab4zDhxmoDguwVw/Eql3iULJNOkL+28jBY8gSZbAKD3eIYkDkY8JqPSWL
+         NIQrb+A+t/Z0JI+JqEmTXMP1AnPAS7VHI86sM2hLXDYtFvgHdGTl16oWuGHsxztnfC4x
+         WH66cpuWBHENfyEgr/QGWjJhNU3Xs9ynEIjNRwr1RpzevGQNNYFH8UOAVwKaqVowrpYe
+         GD4PgFkBTb8Kjt6jAT+sJtYhAXmzhH4tiOYtn1g1iTSC8OtfesRYzlMRu+fI6tN4v3RH
+         9E28dbtsiZjLW4fO8fv2IT5YQlprjN3DerOVud1mxS7tX8ty6iWgNJIP+Inw7+V+ljhg
+         NoYg==
+X-Forwarded-Encrypted: i=1; AJvYcCUHc1IQY4jrt0TmwTeUjbijsHc8NHVOofFFNToE2S9hfFQm6DNwNdYtryMIFX3TK3DtmESACPPUc72iE4Ya0T07224weo4g7ZMoei1lLtXHl/SoNiJvczh5o+bsXxwtkojvgm7oVF9tXNI66lINjqyhyHLIYPE/3mfA
+X-Gm-Message-State: AOJu0YyZ+vuTHcjEpqJekKK873MLzxQFAvSVcNS9SO1FrZZ88ZKB05vi
+	evVLQ2HU7N9asduSq5tvjlNNqj6afBBJtfPFTkhzoSM8JVr9JK0s
+X-Google-Smtp-Source: AGHT+IHshUHD7rX/miFmKb49aF7IGeRm84VGByYTEoXu41Q3MLA0lnEG6e4eefO5gUEkXOkxr4vDeQ==
+X-Received: by 2002:a05:6808:1b23:b0:3c9:64ad:da93 with SMTP id bx35-20020a0568081b2300b003c964adda93mr8466950oib.29.1715021495815;
+        Mon, 06 May 2024 11:51:35 -0700 (PDT)
+Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
+        by smtp.gmail.com with ESMTPSA id de17-20020ad45851000000b006a0f3c93325sm3958744qvb.84.2024.05.06.11.51.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 May 2024 11:51:35 -0700 (PDT)
+Date: Mon, 06 May 2024 14:51:35 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Andrew Halaney <ahalaney@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Martin KaFai Lau <martin.lau@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ bpf <bpf@vger.kernel.org>
+Cc: kernel@quicinc.com
+Message-ID: <663926b74cbbd_516de29466@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240504031331.2737365-2-quic_abchauha@quicinc.com>
+References: <20240504031331.2737365-1-quic_abchauha@quicinc.com>
+ <20240504031331.2737365-2-quic_abchauha@quicinc.com>
+Subject: Re: [RFC PATCH bpf-next v6 1/3] net: Rename mono_delivery_time to
+ tstamp_type for scalabilty
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4130:EE_|PH7PR12MB6907:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5bbd65d5-4849-4563-a88d-08dc6dfd735c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|7416005|376005|366007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TnJ0RzJocjcyVjVTa3lCWnhBMGVzSlJoaUtEdHExN3JvK2lFcVJwQnZ2S2F1?=
- =?utf-8?B?N1pyS0NJWXNCdjVHejlBYkRFZjNVeG1kUjhLNTdOTWRpUFZWQVVGOWQ4SGd4?=
- =?utf-8?B?dHErdVUrOXpoZGNJQ1J4TVJ2MG5GWVVYb21Cc2hZRDhFV1NIK3hlakFkRDVJ?=
- =?utf-8?B?YUsrVEdnRFg0TlF0aUxZTEJQT01KY1E2bE9kOEZ0aTE1clVSdjZVOUZyTFdo?=
- =?utf-8?B?MUk0eDZsNkxJRjNYV3N0NmdYQlRSM3dCTUlNdFBTSG1PbTBKY0kzcEV1K2t5?=
- =?utf-8?B?R2lwQ3lkVnhFOW1yUXp4bENzcGZRbWRLWU9hUWFiYWdKK205QjEweWQyRnJ2?=
- =?utf-8?B?Y1pySzd1WSs3Q1BxYTJvUTJjdlV6d0pBaVQ4ckNRdHVjelNyQTlDeksrNzRl?=
- =?utf-8?B?QzVwWkJmbktBbktDM2FRWm1KMU9abUtqazJ0ZUtIOGNTOEZKNnhjdmVxSFZJ?=
- =?utf-8?B?Sm8vUmQxTFIzd281M3RDVUlReXRVUElXSFJNQ1FRRHBZVGV1cEVuOW9lbnFo?=
- =?utf-8?B?L3hUNEJTZ05nbm9veko4dWYya2tubHYySnhJa1hkM0traHhpZU92RHBlZmJl?=
- =?utf-8?B?Q3BMVVovZWF6YlNCNjg5NlFyR3B3aDZKTHJtZkJVRTV0VHdDaEFCam9PSE9F?=
- =?utf-8?B?OCtmT0hxMUVBdThHNk04dGVnbC9FTDhlcEUyY0ZYTWlxWTdValJOaktNUHhx?=
- =?utf-8?B?QkpXd0pJR3ViVjRRVlI0aW5scWp3ajcxZURHSjI3aFdpSXQxM2RkZHo3d2NM?=
- =?utf-8?B?TWZOWTlzSFRrYk9uU1FYTFh3K0ExaElBcTRuallUK1VDUklNUXRiTEI4dnlu?=
- =?utf-8?B?RzRvaDJvSlh1Y1duMjNxaS9ITTJNaDJDZU5jMGo5aTFEbTlSRFdzYklVZG8w?=
- =?utf-8?B?dDVxakVBakxLUnU2c2V5bk1WNXRkUmV2bDVUbm1GUDlHSEhnRUIrTWJoTFNt?=
- =?utf-8?B?elhzVzRKR2lxSFBDTDJ6VW4yZGUwbVl4a2FsZkUwVUJJUUFvRklUQXY5NDdL?=
- =?utf-8?B?YytrUjNKVlRlb1VNajR1aWxWSjhTRHhIQlZsd2lPVHpRaTF0bGwwT2hEREVo?=
- =?utf-8?B?Z0s0NG8yb0c5bjVYWFlocHphOTJRMUxQWXZVaWFKd1U5V1UzN3JoVmx5eW1P?=
- =?utf-8?B?UVVxeGNLVUczMWdoU3FHc0xVeGh2Mi9PUTZ5Z29oUmowR1ZpUGRtNlRIanFo?=
- =?utf-8?B?YnpCZGUySGJiMnVmVFljdE5NemN2eTRSTG13d0p5c0ZhVy9MQkJZU3hmL01K?=
- =?utf-8?B?cG14NHNTb0VSTWpycGcrcDJCdzFocXVYQUtCRUdWSEhWbVpYNjkwTUZ0OU51?=
- =?utf-8?B?cmh6bGpkYllLYmgwMGhBVzFKNHpHWHdrOHA2ZXM4djFjQVNGRnlQdnNjRnZH?=
- =?utf-8?B?SVZXM29MMG9icDhDK3lrYk4xTDIzblhWWDAzdzFkNFprYmpjTTJ3WnpxSkIr?=
- =?utf-8?B?cm56ZkRrdjJmWU1tKzlqempmL1o2a1pMUmZGM3EvQ1BrSzFENUh0aXVkMGtn?=
- =?utf-8?B?TWxaM1ovOHdVUWpINXdGc29NV3ByWXUzUWhWUzJ6SW9ieDAvV3NWRzVMTFll?=
- =?utf-8?B?UlNtbzBtek5mQ28wa2dPd2trVmlKd0dZUWd6TUdMT2I1bCtLaUlDZjQzOVlM?=
- =?utf-8?B?WDZCL2pJQjZuUUxhNSt5ZFBQc1BiUThvdU5LTmUzUHp2STlNSDQ3R1pxaGRJ?=
- =?utf-8?B?ekxGekQxZStrVWhtVVdYRldaejdiOVErMGNIQ0tPRkJPeHBDQXBLNHBnPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VVJpSUdGdmRRSWVTZkRpbTNZZEtVNlE0R2NNNnZlZ3ZCWW1pcFlZQno2Y0U1?=
- =?utf-8?B?cmZnR21PVGFZM3BxeXVUTkE2dkRmY3QwM0dNUU5sM0o4czJtZlgwK1VMbGUy?=
- =?utf-8?B?U05JTXVHL1Bud3VLUlNRS2xKeGpQTG80UlhkUG1XODVVWE9tanZvR1hEeXRw?=
- =?utf-8?B?S1NCWHJKRVNoaWlKSWtHUU9WNnphYUhIM1FYQzJLSFN2OEpXTWYyc3RvRy9F?=
- =?utf-8?B?bk9nNmRaZHpqSjJFVkV4cTVnMGxEcU5kbWNDVVErKzQ0OGFWcDErUjEwdnFk?=
- =?utf-8?B?My9RMHJNRHpxSTBHc2Vub1d1NDJBb1ZLcSswWU9lbUVkRm83VlkwakVHNGxL?=
- =?utf-8?B?Qno2c21yT1FHNGhuaHgrS09ub0ZOc3IxWHR6dGU2dkVDWGptOVhQbVRuMDZh?=
- =?utf-8?B?ZnhEVTRLQVVNZDZBOTUvekRIWkx1eHhsZ2pvSXgwVlBLZjJPN3I3TnNEZ3ph?=
- =?utf-8?B?SEdtT2g3RGlGaEZsbS9FSHpNMURYMUFHbDRucnY5bnNyNzhseThQVzExNVlq?=
- =?utf-8?B?N2hnVVh2QmFKSU5zeDYzSWV2dFdDYWxyamxTaTRkdy82YS8rdEZaNnZJT2lQ?=
- =?utf-8?B?a3lOYnRmcGlvNHREUGExdmhSOHVQdE9meElqTFJwelZILzZZbFIrcjBVM1Jz?=
- =?utf-8?B?OEN4KzdKelJtNGdvdUZVRmZHbTRVaUZHSXEwZGpUYXhuVElDQUNwd0VkV0ZM?=
- =?utf-8?B?eU9Cb1A1MGhlTWQzVnBWWS95QXlXV0FiSmczblV1azJOQmtmTnhOMHh0TDVn?=
- =?utf-8?B?dVdmMVZXV3BoajVzWjdYWlJWWVliOVBHbjVEL2NMTEdid1pnWHZvK3VOcUt0?=
- =?utf-8?B?QldFOFdqZTdRZk9Pa1AzRUErcFJNK0FRRkVjNHEyd2xyTGNkeFIvbkJRS0kr?=
- =?utf-8?B?VTQySUJ1Ny81QWdkU1pycHJld04yMm05c2hWcGdheXR2L0ZaVFd3dG8zRXBJ?=
- =?utf-8?B?RmI3TFNUak4rQ3NaL2ppc21BMXp3MGpVRzNHTDBnMytEbUZxT2Z6RnBPK3NV?=
- =?utf-8?B?Q0t4UFZsUHV5TGQ0WE05eFg0NEwzVGZNNm9GbjF3VUVxVVNiOCsraUdrOEx1?=
- =?utf-8?B?dWtLcW42S0ZRSFlFZFpzZ3dDWno4aFplYmQ2MnhHZG5iUUdzYStRcFV0MXRV?=
- =?utf-8?B?cHFzcHBKdDg1dVhnRzVmTER3VnoweXJmNlhHenM3b0ZGT29ibkx2eVVZL3VR?=
- =?utf-8?B?aGt6Qkp3MzRSSlhxdXhHQkNHNUh5SGJjTlJrWk0wcXNCTE5xSXhNeFZYL1Vz?=
- =?utf-8?B?T1dwcVpsQjBEVlM4NzVBS1poa1hDQXRYeXdsY1JRUTZaOXlrcmc1eWYxZkE0?=
- =?utf-8?B?Tm8zYTVtWDFjTU8yRDBOVmIvNXdBeHVlRmdkZEpBK0hIcGJlc1ZYajZmV3hr?=
- =?utf-8?B?eld3TmpsbTlTR1UrVmNhVC9SdUVnZ05ZTTJvQzRZTXhTU0o2TW56YkhvU1l2?=
- =?utf-8?B?UVRCYlN4d3J1a1M2NlFyOFVuRnJjQWE5ZkgvWFYrY0thK1hUaGVOMUV0ZXVV?=
- =?utf-8?B?Y0JvNlMwcW8wbkF5WE9oZ1dQaWxCc1ViUllZL2JYWG9zQWYwMGtTM3d3RmZL?=
- =?utf-8?B?WHowVnlSbDNQam9MKzN6Y0lqQ1RXcmRaaWdzWFJZZWZlbHQrYUdZOFkwam81?=
- =?utf-8?B?TUxtWmxuTndRSDhMeXhWTkI5aVE2b1lJOGVUOFJ6bEtCUTBKQ2xrcmtaVXQw?=
- =?utf-8?B?MU9Ca1J2dzAyMlVXUUxUNWh0c09CZDVnK0dVZnRCQkdTUWZMaWl3UFV3bHJr?=
- =?utf-8?B?UTlsc3RSVDRtMGtsRmFQVGhVQitHdUZVV1NROXlHSHdQMzg4RkkwSFYxNDRC?=
- =?utf-8?B?THloWWFET1gxVVZLSjlvK1VCLzhLTHJ3YWlQUmJ3UWZydzRiTGo0OFM1TVA0?=
- =?utf-8?B?MmtWYnExSjc4ZkJMSHg4ZW4xR0VtdXZrY21TcG15eGlPcGpyU21od1U3eFRo?=
- =?utf-8?B?WWF3VGdGYTZaRjdOSVJXTlZTL0JrQmtERDdHSkR3Qm5sbUtpUkVzaDV4S29t?=
- =?utf-8?B?TWZKYXFpTU1UV2VwOHJXNFF0VURBcjBPZjlHTmY0eE9sUjJKN2F4V2RlT3Nu?=
- =?utf-8?B?V2dZNk4rVG4vYVZ4QlFkMVZMWnY3YXpNOTMzUmJBOGhQVUxVQjJ5TlhTNXNu?=
- =?utf-8?B?U0s1TWlFOXVqcWJJUVZuQlZ6Ty95cGpMZkRUaDUySnVUdkdzQWNtL3A3ZGps?=
- =?utf-8?B?dWc9PQ==?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5bbd65d5-4849-4563-a88d-08dc6dfd735c
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2024 18:50:51.0532
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2f8NpaO4jd299OLB4e3wBJRlDjcwtczrITcuICw1vmSfGPBjf0Uoecj8fCKtKMcL933qucbdc+o1B18fTon1Rg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6907
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On 5/6/24 11:00 AM, Willem de Bruijn wrote:
-> John Hubbard wrote:
-...
->> diff --git a/tools/testing/selftests/net/gro.c b/tools/testing/selftests/net/gro.c
->> index 353e1e867fbb..0eb61edaad83 100644
->> --- a/tools/testing/selftests/net/gro.c
->> +++ b/tools/testing/selftests/net/gro.c
->> @@ -110,7 +110,8 @@ static void setup_sock_filter(int fd)
->>   	const int dport_off = tcp_offset + offsetof(struct tcphdr, dest);
->>   	const int ethproto_off = offsetof(struct ethhdr, h_proto);
->>   	int optlen = 0;
->> -	int ipproto_off, opt_ipproto_off;
->> +	int ipproto_off;
->> +	int opt_ipproto_off = 0;
+Abhishek Chauhan wrote:
+> mono_delivery_time was added to check if skb->tstamp has delivery
+> time in mono clock base (i.e. EDT) otherwise skb->tstamp has
+> timestamp in ingress and delivery_time at egress.
 > 
-> This is only intended to be used in the case where the IP proto is not TCP:
+> Renaming the bitfield from mono_delivery_time to tstamp_type is for
+> extensibilty for other timestamps such as userspace timestamp
+> (i.e. SO_TXTIME) set via sock opts.
 > 
->                          BPF_STMT(BPF_LD  + BPF_B   + BPF_ABS, ipproto_off),
-> +                       BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, IPPROTO_TCP, 2, 0),
-> +                       BPF_STMT(BPF_LD  + BPF_B   + BPF_ABS, opt_ipproto_off),
->                          BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, IPPROTO_TCP, 0, 5),
+> As we are renaming the mono_delivery_time to tstamp_type, it makes
+> sense to start assigning tstamp_type based on enum defined
+> in this commit.
 > 
-> In that case the test tries again at a different offset that accounts
-> for optional IPv6 extension headers.
+> Earlier we used bool arg flag to check if the tstamp is mono in
+> function skb_set_delivery_time, Now the signature of the functions
+> accepts tstamp_type to distinguish between mono and real time.
 > 
-> This is indeed buggy, in that it might accidentally accept packets
-> that should be dropped.
+> Also skb_set_delivery_type_by_clockid is a new function which accepts
+> clockid to determine the tstamp_type.
 > 
-> Initializing to 0 compares against against the first byte of the
-> Ethernet header. Which is an external argument to the test. So
-> safest is to initialize opt_ipproto_off to ipproto_off and just
-> repeat the previous check. Perhaps:
+> In future tstamp_type:1 can be extended to support userspace timestamp
+> by increasing the bitfield.
 > 
-> @@ -118,6 +118,7 @@ static void setup_sock_filter(int fd)
->          else
->                  next_off = offsetof(struct ipv6hdr, nexthdr);
->          ipproto_off = ETH_HLEN + next_off;
-> +       opt_ipproto_off = ipproto_off;  /* overridden later if may have exthdrs */
+> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
+> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+> ---
+> Changes since v5
+> - Avoided using garble function names as mentioned by
+>   Willem.
+> - Implemented a conversion function stead of duplicating 
+>   the same logic as mentioned by Willem.
+> - Fixed indentation problems and minor documentation issues
+>   which mentions tstamp_type as a whole instead of bitfield
+>   notations. (Mentioned both by Willem and Martin)
+>   
+> Changes since v4
+> - Introduce new function to directly delivery_time and
+>   another to set tstamp_type based on clockid. 
+> - Removed un-necessary comments in skbuff.h as 
+>   enums were obvious and understood.
+> 
+> Changes since v3
+> - Fixed inconsistent capitalization in skbuff.h
+> - remove reference to MONO_DELIVERY_TIME_MASK in skbuff.h
+>   and point it to skb_tstamp_type now.
+> - Explicitely setting SKB_CLOCK_MONO if valid transmit_time
+>   ip_send_unicast_reply 
+> - Keeping skb_tstamp inline with skb_clear_tstamp. 
+> - skb_set_delivery_time checks if timstamp is 0 and 
+>   sets the tstamp_type to SKB_CLOCK_REAL.
+> - Above comments are given by Willem 
+> - Found out that skbuff.h has access to uapi/linux/time.h
+>   So now instead of using  CLOCK_REAL/CLOCK_MONO 
+>   i am checking actual clockid_t directly to set tstamp_type 
+>   example:- CLOCK_REALTIME/CLOCK_MONOTONIC 
+> - Compilation error fixed in 
+>   net/ieee802154/6lowpan/reassembly.c
+> 
+> Changes since v2
+> - Minor changes to commit subject
+> 
+> Changes since v1
+> - Squashed the two commits into one as mentioned by Willem.
+> - Introduced switch in skb_set_delivery_time.
+> - Renamed and removed directionality aspects w.r.t tstamp_type 
+>   as mentioned by Willem.
+> 
+>  include/linux/skbuff.h                     | 53 ++++++++++++++++------
+>  include/net/inet_frag.h                    |  4 +-
+>  net/bridge/netfilter/nf_conntrack_bridge.c |  6 +--
+>  net/core/dev.c                             |  2 +-
+>  net/core/filter.c                          | 10 ++--
+>  net/ieee802154/6lowpan/reassembly.c        |  2 +-
+>  net/ipv4/inet_fragment.c                   |  2 +-
+>  net/ipv4/ip_fragment.c                     |  2 +-
+>  net/ipv4/ip_output.c                       |  9 ++--
+>  net/ipv4/tcp_output.c                      | 16 +++----
+>  net/ipv6/ip6_output.c                      |  6 +--
+>  net/ipv6/netfilter.c                       |  6 +--
+>  net/ipv6/netfilter/nf_conntrack_reasm.c    |  2 +-
+>  net/ipv6/reassembly.c                      |  2 +-
+>  net/ipv6/tcp_ipv6.c                        |  2 +-
+>  net/sched/act_bpf.c                        |  4 +-
+>  net/sched/cls_bpf.c                        |  4 +-
+>  17 files changed, 80 insertions(+), 52 deletions(-)
+> 
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index 1c2902eaebd3..de3915e2bfdb 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -706,6 +706,11 @@ typedef unsigned int sk_buff_data_t;
+>  typedef unsigned char *sk_buff_data_t;
+>  #endif
+>  
+> +enum skb_tstamp_type {
+> +	SKB_CLOCK_REALTIME,
+> +	SKB_CLOCK_MONOTONIC,
+> +};
+> +
+>  /**
+>   * DOC: Basic sk_buff geometry
+>   *
+> @@ -823,10 +828,9 @@ typedef unsigned char *sk_buff_data_t;
+>   *	@dst_pending_confirm: need to confirm neighbour
+>   *	@decrypted: Decrypted SKB
+>   *	@slow_gro: state present at GRO time, slower prepare step required
+> - *	@mono_delivery_time: When set, skb->tstamp has the
+> - *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
+> - *		skb->tstamp has the (rcv) timestamp at ingress and
+> - *		delivery_time at egress.
+> + *	@tstamp_type: When set, skb->tstamp has the
+> + *		delivery_time in mono clock base Otherwise, the
+> + *		timestamp is considered real clock base.
 
-OK, thanks for pointing out the right fix, I'll send a v2 that does that.
+Missing period. More importantly, no longer conditional. It always
+captures the type of skb->tstamp.
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -1301,7 +1301,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
+>  	tp = tcp_sk(sk);
+>  	prior_wstamp = tp->tcp_wstamp_ns;
+>  	tp->tcp_wstamp_ns = max(tp->tcp_wstamp_ns, tp->tcp_clock_cache);
+> -	skb_set_delivery_time(skb, tp->tcp_wstamp_ns, true);
+> +	skb_set_delivery_type_by_clockid(skb, tp->tcp_wstamp_ns, CLOCK_MONOTONIC);
+>  	if (clone_it) {
+>  		oskb = skb;
+>  
+> @@ -1655,7 +1655,7 @@ int tcp_fragment(struct sock *sk, enum tcp_queue tcp_queue,
+>  
+>  	skb_split(skb, buff, len);
+>  
+> -	skb_set_delivery_time(buff, skb->tstamp, true);
+> +	skb_set_delivery_type_by_clockid(buff, skb->tstamp, CLOCK_MONOTONIC);
+>  	tcp_fragment_tstamp(skb, buff);
 
+All these hardcoded monotonic calls in TCP can be the shorter version
+
+    skb_set_delivery_type(.., SKB_CLOCK_MONOTONIC);
+  
 
