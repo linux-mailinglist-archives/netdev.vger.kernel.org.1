@@ -1,119 +1,430 @@
-Return-Path: <netdev+bounces-93764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 707CC8BD1F2
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:57:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29AC98BD20A
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 18:01:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 105DD1F249D5
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:57:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B94E1C21D75
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 16:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43CC0155737;
-	Mon,  6 May 2024 15:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 804A215574E;
+	Mon,  6 May 2024 16:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="o2fWO0P7"
+	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="lECczozP"
 X-Original-To: netdev@vger.kernel.org
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.167])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56B9155A4F
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 15:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.167
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B51155385;
+	Mon,  6 May 2024 16:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715011049; cv=none; b=KoXM7le+zX7VEc0BhgdvIVH/cW8r9mkiqSfyTwYEDp8UMiqZKi7RG5NHJzDJtJyDOHJ6FZ6UaZ2Ogz6rwIH2z1EW5WmqA2q6BlYz+AhEWtdlVK40X/dzUrY/rY3NnGuXYHPyOMfxqnOmPnNEqL2HqbKT6TysUpiEjkPjs8FXmWg=
+	t=1715011267; cv=none; b=SiiKVXEW9Ve0EnOf2IWgCEwJxPADC/ekmGvJ7WapiuMXpFQkHl+2icQrbmsn7Vz3/wLYeeCo/YsLk/g5TEvNvrBpGF5KaCF4bN9ZxX+Iuja7Ymtz/UQFt/nJqgg/ID/tVIlWzA8+95dmOFGe3wjl+e/ABQv+mkkNedRbU6A2LQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715011049; c=relaxed/simple;
-	bh=iiKrYKylxLJGKkdodAnRvX5ipn2c1qK7DHCqWXkLqMs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oKeqtlNZD8sqeWbTZvFdeuIfnWFxXZusWGW6uk/JZn0Z34bV8nGb3ekNMXIXuZ4/iWczOgg/6gGC3qPoWIfRXdjAZn3JYf732Mm/QT/tmSVZJkfnYodPD8gb1+pikyXV9ievOv00WPB3emzeLIOGDAc/Ult2BOWNiidDg3EyHwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=o2fWO0P7; arc=none smtp.client-ip=195.121.94.167
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
-X-KPN-MessageId: 517d0a94-0bc1-11ef-93a8-005056abbe64
-Received: from smtp.kpnmail.nl (unknown [10.31.155.39])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id 517d0a94-0bc1-11ef-93a8-005056abbe64;
-	Mon, 06 May 2024 17:57:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=kpnmail.nl; s=kpnmail01;
-	h=content-type:mime-version:message-id:subject:to:from:date;
-	bh=RUHm1EWr1K/7L/9ocw0nmD0PbDFVhkil+phJ070GL4Q=;
-	b=o2fWO0P7FvqbEG/2cJ180+MP80HbMrtRuNbEML9KheS4F7idO9tbdqnWyUeem/9buafR2onUCZTz2
-	 YorC4i1exN684EXZdi+V/MYLmaRVqxYj1H4BbHYl0RS/fkXF3Sgi5WuQH5hrHaQ1aReh13drCBHt5k
-	 UZUGlF3aPjk10HL8=
-X-KPN-MID: 33|/Ph3iBiQzufTV4TSUee1KZp+q26aevXSrQGrnCyXEi8ZSlgUNTjH+xt/TX00Qj2
- YUphs9Gquhk2zkw9fcqcXHazx/PX1p7W3bpmbRrNBtzI=
-X-KPN-VerifiedSender: No
-X-CMASSUN: 33|kNFyKwD6mBehpBEBTeKAMu+IAPoxC0+39Qm5wKamm0JqDcEu6s5sQcd7CJhaRz2
- +VNFkBc2XQfM3lHNGIjGmRQ==
-Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
-	by smtp.xs4all.nl (Halon) with ESMTPSA
-	id 53dd6200-0bc1-11ef-8793-005056ab7447;
-	Mon, 06 May 2024 17:57:24 +0200 (CEST)
-Date: Mon, 6 May 2024 17:57:23 +0200
-From: Antony Antony <antony@phenome.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Antony Antony <antony.antony@secunet.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Shuah Khan <shuah@kernel.org>, devel@linux-ipsec.org
-Subject: Re: [PATCH net-next v3 0/2] fix icmp error source address over xfrm
- tunnel
-Message-ID: <Zjj94y2JW4uPg_Iz@Antony2201.local>
-References: <cover.1714982035.git.antony.antony@secunet.com>
- <ZjjczzsSz6wwUHd5@hog>
+	s=arc-20240116; t=1715011267; c=relaxed/simple;
+	bh=Not41Q6h3ptm7vf5+S5xcpNg3zIel9+F2NHBCSQ7NhI=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=kUVLXvXFoA3pqNInCqqdA3s0rJxrhd1LPYwrRzFoaAnECa3/H+4IQZqE4ap8MVdXsq2dXtUSvBhhNJgrl8cMGkTP82za0oqnIg7lygZLRTEycn+9ltAnI5CnuUHFIpYY3HogSxTXcKhqxLgKC3VvWK3bNTSdivALHWUOW+JoSO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=lECczozP; arc=none smtp.client-ip=212.227.17.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
+	s=s31663417; t=1715011232; x=1715616032; i=frank-w@public-files.de;
+	bh=zFAoAFMPSDAF2hSbEFLdE/+HaXvlvZ8+PKbWUnzgWKA=;
+	h=X-UI-Sender-Class:Date:From:To:CC:Subject:Reply-to:In-Reply-To:
+	 References:Message-ID:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=lECczozPYgtFgQrcICyUzEC0UxuR1o1hopHkKbOVEyykpM0jdqUUY8p2nSe8y20b
+	 hGiVtNmSas2qQYnWkGO+An73APii4lR5aEaU3SuIZfHUETHTSwaBuqKGXZav+2Nbd
+	 1jO0a4MhqzarlsHnF40ihJJ8IRz51lD/TaQkNVQYj5bTW1v3Y2BVAv0m+E6bcdDx8
+	 HuN52MDjiQvGcJIuW7z2qgMoubGGYXkAmb49w4s6fYE716L/pdfAa37l1XM62PSt9
+	 o2iXiT8oGWhVdXy3aNU+uQH1H0tGwb4v7n522e4d+8tggh6K5/bL59RNY248fytfq
+	 LT+YYi6wrSUm++9i8w==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [IPv6:::1] ([80.187.68.153]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1M9Wuq-1s0gqB3iIW-0053Rs; Mon, 06
+ May 2024 18:00:32 +0200
+Date: Mon, 06 May 2024 18:00:30 +0200
+From: Frank Wunderlich <frank-w@public-files.de>
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Frank Wunderlich <linux@fw-web.de>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>,
+ Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>
+CC: Eric Woudstra <ericwouds@gmail.com>, Tianling Shen <cnsztl@immortalwrt.org>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-leds@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Tianling Shen <cnsztl@gmail.com>
+Subject: =?US-ASCII?Q?Re=3A_=5BRFC_v1_5/5=5D_arm64=3A_dts=3A_mediate?=
+ =?US-ASCII?Q?k=3A_Add_mt7986_based_Bananapi_R3_Mini?=
+User-Agent: K-9 Mail for Android
+Reply-to: frank-w@public-files.de
+In-Reply-To: <a4099612-a4ae-4211-9674-c7053d2a995a@collabora.com>
+References: <20240505164549.65644-1-linux@fw-web.de> <20240505164549.65644-6-linux@fw-web.de> <a4099612-a4ae-4211-9674-c7053d2a995a@collabora.com>
+Message-ID: <3E013BA7-0264-4AC3-B677-BDD16B1F8D90@public-files.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZjjczzsSz6wwUHd5@hog>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:1dgAYaFHtc7EJBv4muaawIW5tkqlZguEe0+jz8+syRMCYxnVPhv
+ X8CKcSrs+AZOloZfdprln+g2RDW58Z9+M8nBBC2GhWB/XvKA7q3+Y06W8GfdXi5rsoJ95sL
+ nMF7/TJ9ZAMCzgdIatsSwa3M0Ow9mm0TEe0rFNFHj2EVU85xIiNnxy/sfwdjtsucAnT9/HK
+ Vz7ZLUpgpncF7rzUmGp3g==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:yZZXYFhajyk=;jIsWIYDIG590kXssQqWzksnl0jK
+ HESedwIkaVtq/L8KOVlJtOOT3E58mruCCzM1QXINqtwt5poGVjQDm/EC2BFIcr0F+Y9D9dmXK
+ YSjELakaX682EVxztKaV/2NuBuADqTdOE9xAnN1YPKPlCHXIL5L/Nt5OR/3LLXVbv4IXs7LpS
+ 5tuYs4aPskKdRPRyoDArVGyIDdBMJ/fezE+Zqn2WdDTFPgB+Tw/+ZNWbEz4r1JHTPRawbAo4w
+ +L/0b6LMGy54rcShlQneoEFENwiSBGxx6uKmeh0MRBE/cgREcn6ZHNE1K4tpxnP2ewg/jY5ZP
+ 7SfxJKQ9SzfzsK5EtSrltpAWI7pdneUUCsQRERYru7lee2E4XuJNijZ2s66J84LbQfBAjbvsu
+ vHgXrZxkJZ1TZ/xydaHp2YLtNDLcmj3Ta5DJAs9uwkZX5DTSQBNidePO4qRoYAM8AGVOfTwiH
+ k1qxuJCbSrkQK6EgdnIbbfjY3//UIXKPVSHsGkRIEohNAHbqYxLgaI7w95urYgSVZQu/ft6UH
+ nbcJhtzVVXo6EwZd4wfufXMvZ21WJYFgGwCnkmkqIjD0axFy/8/+rxYiyNWhq44z1mE0BnO31
+ 69ybdSpGWE8kdj8xTUFBYJ1mCEWxPzlSG2hn/Mv2ONhv2ylJ09oyV9zgK1/m9qcmbDAri7aZb
+ WMTYFRpr5ZOzJ+522cRhunp/JmNGiRfS4uRF5N1J182v1ICJIlcfgXFgM5cZZ+2ofpD9A9M6/
+ JhQ6MSUPEm1hdpBJD62NdgJpPGrpZMg0URUCwCZD8dFBLIBEypYlXeCpax/mI/K8PlXztUMLu
+ pp6VCA8jnQAXphLzN851vKizwQUUTLbnYXyYBPibWma90=
 
-Hi Sabrina,
+Hi
 
-On Mon, May 06, 2024 at 03:36:15PM +0200, Sabrina Dubroca via Devel wrote:
-> 2024-05-06, 09:58:26 +0200, Antony Antony wrote:
-> > Hi,
-> > This fix, originally intended for XFRM/IPsec, has been recommended by
-> > Steffen Klassert to submit to the net tree.
-> > 
-> > The patch addresses a minor issue related to the IPv4 source address of
-> > ICMP error messages, which originated from an old 2011 commit:
-> > 
-> > 415b3334a21a ("icmp: Fix regression in nexthop resolution during replies.")
-> > 
-> > The omission of a "Fixes" tag  in the following commit is deliberate
-> > to prevent potential test failures and subsequent regression issues
-> > that may arise from backporting this patch all stable kerenels.
-> 
-> What kind of regression do you expect? If there's a risk of
+Thanks for review=2E
 
-For example, an old testing scripts with hardcoded source IP address assume
-that the "Unreachable response" will have the previous behavior. Such 
-testing script may trigger regression when this patch is backported.  
-Consequently, there may be discussions on whether this patch has broken the 
-10-year-old test scripts, which may be hard to fix.
+Am 6=2E Mai 2024 14:48:59 MESZ schrieb AngeloGioacchino Del Regno <angelog=
+ioacchino=2Edelregno@collabora=2Ecom>:
+>Il 05/05/24 18:45, Frank Wunderlich ha scritto:
+>> From: Frank Wunderlich <frank-w@public-files=2Ede>
+>>=20
+>> Add device Tree for Bananapi R3 Mini SBC=2E
+>>=20
+>> Co-developed-by: Eric Woudstra <ericwouds@gmail=2Ecom>
+>> Signed-off-by: Eric Woudstra <ericwouds@gmail=2Ecom>
+>> Co-developed-by: Tianling Shen <cnsztl@gmail=2Ecom>
+>> Signed-off-by: Tianling Shen <cnsztl@gmail=2Ecom>
+>> Signed-off-by: Frank Wunderlich <frank-w@public-files=2Ede>
+>> ---
+>>   arch/arm64/boot/dts/mediatek/Makefile         |   1 +
+>>   =2E=2E=2E/mediatek/mt7986a-bananapi-bpi-r3-mini=2Edts | 486 +++++++++=
++++++++++
+>>   2 files changed, 487 insertions(+)
+>>   create mode 100644 arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-=
+r3-mini=2Edts
+>>=20
+>> diff --git a/arch/arm64/boot/dts/mediatek/Makefile b/arch/arm64/boot/dt=
+s/mediatek/Makefile
+>> index 37b4ca3a87c9=2E=2E1763b001ab06 100644
+>> --- a/arch/arm64/boot/dts/mediatek/Makefile
+>> +++ b/arch/arm64/boot/dts/mediatek/Makefile
+>> @@ -11,6 +11,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) +=3D mt7622-bananapi-bpi-=
+r64=2Edtb
+>>   dtb-$(CONFIG_ARCH_MEDIATEK) +=3D mt7981b-xiaomi-ax3000t=2Edtb
+>>   dtb-$(CONFIG_ARCH_MEDIATEK) +=3D mt7986a-acelink-ew-7886cax=2Edtb
+>>   dtb-$(CONFIG_ARCH_MEDIATEK) +=3D mt7986a-bananapi-bpi-r3=2Edtb
+>> +dtb-$(CONFIG_ARCH_MEDIATEK) +=3D mt7986a-bananapi-bpi-r3-mini=2Edtb
+>>   dtb-$(CONFIG_ARCH_MEDIATEK) +=3D mt7986a-bananapi-bpi-r3-emmc=2Edtbo
+>>   dtb-$(CONFIG_ARCH_MEDIATEK) +=3D mt7986a-bananapi-bpi-r3-nand=2Edtbo
+>>   dtb-$(CONFIG_ARCH_MEDIATEK) +=3D mt7986a-bananapi-bpi-r3-nor=2Edtbo
+>> diff --git a/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini=
+=2Edts b/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini=2Edts
+>> new file mode 100644
+>> index 000000000000=2E=2Ec764b4dc4752
+>> --- /dev/null
+>> +++ b/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini=2Edts
+>> @@ -0,0 +1,486 @@
+>> +// SPDX-License-Identifier: (GPL-2=2E0 OR MIT)
+>> +/*
+>> + * Copyright (C) 2021 MediaTek Inc=2E
+>> + * Authors: Frank Wunderlich <frank-w@public-files=2Ede>
+>> + *          Eric Woudstra <ericwouds@gmail=2Ecom>
+>> + *          Tianling Shen <cnsztl@immortalwrt=2Eorg>
+>> + */
+>> +
+>> +/dts-v1/;
+>> +
+>> +#include <dt-bindings/gpio/gpio=2Eh>
+>> +#include <dt-bindings/input/input=2Eh>
+>> +#include <dt-bindings/leds/common=2Eh>
+>> +#include <dt-bindings/pinctrl/mt65xx=2Eh>
+>> +
+>> +#include "mt7986a=2Edtsi"
+>> +
+>> +/ {
+>> +	model =3D "Bananapi BPI-R3 Mini";
+>> +	chassis-type =3D "embedded";
+>> +	compatible =3D "bananapi,bpi-r3mini", "mediatek,mt7986a";
+>> +
+>> +	aliases {
+>> +		serial0 =3D &uart0;
+>> +		ethernet0 =3D &gmac0;
+>> +		ethernet1 =3D &gmac1;
+>> +	};
+>> +
+>> +	chosen {
+>> +		stdout-path =3D "serial0:115200n8";
+>> +	};
+>> +
+>> +	dcin: regulator-12vd {
+>> +		compatible =3D "regulator-fixed";
+>> +		regulator-name =3D "12vd";
+>> +		regulator-min-microvolt =3D <12000000>;
+>> +		regulator-max-microvolt =3D <12000000>;
+>> +		regulator-boot-on;
+>> +		regulator-always-on;
+>> +	};
+>> +
+>> +	fan: pwm-fan {
+>> +		compatible =3D "pwm-fan";
+>> +		#cooling-cells =3D <2>;
+>> +		/* cooling level (0, 1, 2) - pwm inverted */
+>> +		cooling-levels =3D <255 96 0>;
+>
+>Did you try to actually invert the PWM?
+>
+>Look for PWM_POLARITY_INVERTED ;-)
 
-> regression, I'm not sure net-next is that much "better" than net or
-> stable. If a user complains about the new behavior breaking their
-> setup, my understanding is that you would likely have to revert the
-> patch anyway, or at least add some way to toggle the behavior.
+Mtk pwm driver does not support it
 
-My hope is that if this patch is applied to net-next without a "Fixes" tag,
-users would fix their testing scripts properly. Additionally, another piece
-of the puzzle for a complete fix is "forwarding of ICMP Error messages" 
-patch that is in the kerenl 6.8, which is new feature and applied via 
-ipsec-next.
+https://elixir=2Ebootlin=2Ecom/linux/latest/source/drivers/pwm/pwm-mediate=
+k=2Ec#L211
 
--antony
+>> +		pwms =3D <&pwm 0 10000>;
+>> +		status =3D "okay";
+>> +	};
+>> +
+>> +	reg_1p8v: regulator-1p8v {
+>> +		compatible =3D "regulator-fixed";
+>> +		regulator-name =3D "1=2E8vd";
+>> +		regulator-min-microvolt =3D <1800000>;
+>> +		regulator-max-microvolt =3D <1800000>;
+>> +		regulator-boot-on;
+>> +		regulator-always-on;
+>> +		vin-supply =3D <&dcin>;
+>> +	};
+>> +
+>> +	reg_3p3v: regulator-3p3v {
+>> +		compatible =3D "regulator-fixed";
+>> +		regulator-name =3D "3=2E3vd";
+>> +		regulator-min-microvolt =3D <3300000>;
+>> +		regulator-max-microvolt =3D <3300000>;
+>> +		regulator-boot-on;
+>> +		regulator-always-on;
+>> +		vin-supply =3D <&dcin>;
+>> +	};
+>> +
+>> +	usb_vbus: regulator-usb-vbus {
+>> +		compatible =3D "regulator-fixed";
+>> +		regulator-name =3D "usb_vbus";
+>> +		regulator-min-microvolt =3D <5000000>;
+>> +		regulator-max-microvolt =3D <5000000>;
+>> +		gpios =3D <&pio 20 GPIO_ACTIVE_LOW>;
+>> +		regulator-boot-on;
+>> +	};
+>> +
+>> +	en8811_a: regulator-phy1 {
+>> +		compatible =3D "regulator-fixed";
+>> +		regulator-name =3D "phy1";
+>> +		regulator-min-microvolt =3D <3300000>;
+>> +		regulator-max-microvolt =3D <3300000>;
+>> +		gpio =3D <&pio 16 GPIO_ACTIVE_LOW>;
+>> +		regulator-always-on;
+>> +	};
+>> +
+>> +	en8811_b: regulator-phy2 {
+>> +		compatible =3D "regulator-fixed";
+>> +		regulator-name =3D "phy2";
+>> +		regulator-min-microvolt =3D <3300000>;
+>> +		regulator-max-microvolt =3D <3300000>;
+>> +		gpio =3D <&pio 17 GPIO_ACTIVE_LOW>;
+>> +		regulator-always-on;
+>> +	};
+>> +
+>> +	leds {
+>> +		compatible =3D "gpio-leds";
+>> +
+>> +		green_led: led-0 {
+>> +			color =3D <LED_COLOR_ID_GREEN>;
+>> +			function =3D LED_FUNCTION_POWER;
+>> +			gpios =3D <&pio 19 GPIO_ACTIVE_HIGH>;
+>> +			default-state =3D "on";
+>> +		};
+>> +	};
+>> +
+>> +	gpio-keys {
+>> +		compatible =3D "gpio-keys";
+>> +
+>> +		reset-key {
+>> +			label =3D "reset";
+>> +			linux,code =3D <KEY_RESTART>;
+>> +			gpios =3D <&pio 7 GPIO_ACTIVE_LOW>;
+>> +		};
+>> +	};
+>> +
+>> +};
+>> +
+>> +&cpu_thermal {
+>> +	cooling-maps {
+>> +		map0 {
+>> +			/* active: set fan to cooling level 2 */
+>> +			cooling-device =3D <&fan 2 2>;
+>> +			trip =3D <&cpu_trip_active_high>;
+>> +		};
+>> +
+>> +		map1 {
+>> +			/* active: set fan to cooling level 1 */
+>> +			cooling-device =3D <&fan 1 1>;
+>> +			trip =3D <&cpu_trip_active_med>;
+>> +		};
+>> +
+>> +		map2 {
+>> +			/* active: set fan to cooling level 0 */
+>> +			cooling-device =3D <&fan 0 0>;
+>> +			trip =3D <&cpu_trip_active_low>;
+>> +		};
+>> +	};
+>> +};
+>> +
+>> +&crypto {
+>> +	status =3D "okay";
+>> +};
+>> +
+>> +&eth {
+>> +	status =3D "okay";
+>> +
+>> +	gmac0: mac@0 {
+>> +		compatible =3D "mediatek,eth-mac";
+>> +		reg =3D <0>;
+>> +		phy-mode =3D "2500base-x";
+>> +		phy-handle =3D <&phy14>;
+>> +	};
+>> +
+>> +	gmac1: mac@1 {
+>> +		compatible =3D "mediatek,eth-mac";
+>> +		reg =3D <1>;
+>> +		phy-mode =3D "2500base-x";
+>> +		phy-handle =3D <&phy15>;
+>> +	};
+>> +
+>> +	mdio: mdio-bus {
+>> +		#address-cells =3D <1>;
+>> +		#size-cells =3D <0>;
+>> +	};
+>> +};
+>> +
+>> +&mmc0 {
+>> +	pinctrl-names =3D "default", "state_uhs";
+>> +	pinctrl-0 =3D <&mmc0_pins_default>;
+>> +	pinctrl-1 =3D <&mmc0_pins_uhs>;
+>> +	vmmc-supply =3D <&reg_3p3v>;
+>> +	vqmmc-supply =3D <&reg_1p8v>;
+>> +};
+>> +
+>> +
+>> +&i2c0 {
+>> +	pinctrl-names =3D "default";
+>> +	pinctrl-0 =3D <&i2c_pins>;
+>> +	status =3D "okay";
+>> +
+>> +	/* MAC Address EEPROM */
+>> +	eeprom@50 {
+>> +		compatible =3D "atmel,24c02";
+>> +		reg =3D <0x50>;
+>> +
+>> +		address-width =3D <8>;
+>> +		pagesize =3D <8>;
+>> +		size =3D <256>;
+>> +	};
+>> +};
+>> +
+>> +&mdio {
+>
+>You can just move all this stuff to where you declare the mdio-bus=2E=2E=
+=2E=2E
+
+Ok,see these 2 lines are already above,so can be dropped here=2E
+
+>> +	#address-cells =3D <1>;
+>> +	#size-cells =3D <0>;
+>> +
+>> +	phy14: ethernet-phy@14 {
+>
+>I say that this is `phy0: ethernet-phy@14` - because this is the first PH=
+Y on this
+>board=2E
+
+Ok,i change this and phy15
+
+>> +		reg =3D <14>;
+>
+>Uhm=2E=2E doesn't this require the ethernet-phy-id03a2=2Ea411 compatible?
+
+I can add it,but worked without it=2E
+
+There was a discussion about that and result was we don't need it in board=
+ dts,maybe add compatible in binding example=2E
+
+https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch/20240206194751=2E=
+1901802-2-ericwouds@gmail=2Ecom/#25703356
+
+>> +		interrupts-extended =3D <&pio 48 IRQ_TYPE_EDGE_FALLING>;
+>> +		reset-gpios =3D <&pio 49 GPIO_ACTIVE_LOW>;
+>> +		reset-assert-us =3D <10000>;
+>> +		reset-deassert-us =3D <20000>;
+>> +		phy-mode =3D "2500base-x";
+>> +		full-duplex;
+>> +		pause;
+>> +		airoha,pnswap-rx;
+>> +
+>> +		leds {
+>> +			#address-cells =3D <1>;
+>> +			#size-cells =3D <0>;
+>> +
+>> +			led@0 { /* en8811_a_gpio5 */
+>> +				reg =3D <0>;
+>> +				color =3D <LED_COLOR_ID_YELLOW>;
+>> +				function =3D LED_FUNCTION_LAN;
+>> +				function-enumerator =3D <1>;
+>
+>Why aren't you simply using a label?
+
+You mean the comment? I can add it of course like for regulators=2E
+
+>> +				default-state =3D "keep";
+>> +				linux,default-trigger =3D "netdev";
+>> +			};
+>> +			led@1 { /* en8811_a_gpio4 */
+>> +				reg =3D <1>;
+>> +				color =3D <LED_COLOR_ID_GREEN>;
+>> +				function =3D LED_FUNCTION_LAN;
+>> +				function-enumerator =3D <2>;
+>> +				default-state =3D "keep";
+>> +				linux,default-trigger =3D "netdev";
+>> +			};
+>> +		};
+>> +	};
+>> +
+>> +	phy15: ethernet-phy@15 {
+>> +		reg =3D <15>;
+>
+>Same here=2E
+>
+>Cheers,
+>Angelo
+>
+
+
+regards Frank
 
