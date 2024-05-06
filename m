@@ -1,131 +1,148 @@
-Return-Path: <netdev+bounces-93751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12D718BD0FE
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:04:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C19C78BD14D
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 17:13:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DC3E1C218D7
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:04:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8277B289D21
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 15:13:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F3613CFA5;
-	Mon,  6 May 2024 15:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E821552ED;
+	Mon,  6 May 2024 15:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pl4WC63Q"
+	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="EMgTAb78"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD66B154C08;
-	Mon,  6 May 2024 15:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8B0158A2E;
+	Mon,  6 May 2024 15:10:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715007884; cv=none; b=gaIXn3sOBSsrTkz5FLMzoajUpgncjxa/oYowoEkr3QyHGI8uyFq3SW27JAW3HCjGKZP3EyiUevFSBvDiSNK2dN0qXtzEo0sz0yrzBqLN2rYl0OelNJ/W/W+A4DQP86gh4TxNsbasp6BzsmkHudcKJKuCAOdro9/Obn6icdIsLB0=
+	t=1715008225; cv=none; b=rgS7iJcbC+rdvIWBY9P5XQ+hdFijNbSNX/JaBtMsZK351fEJey57KZUWPAclbatThpNv2TMiFP7+PmHU/a7+ZBEwLsyxx0g3//cerVjA7RjU+9yQPKPUnstXPQHKYWBXtwJ5QcIdzBnwQO6v47IGrdw/4c6XQ2Pou5+LIN3CZro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715007884; c=relaxed/simple;
-	bh=Nc2BLlY2msSNff0dIc/i8A1dbggiS89ie/JJ6ON2I2Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mFZFPyoeYzPMpQh3lEE5JYl8Yu51Eb93dfL92PmuFrGi+3bOSN6v2dvJvnI3DftRULUIdOv8+zU8CPBBrbd46Ql6xxJkzlSCxj/efxehO8Fl4Z5xMGdKtNDA7FomOEhzLTw3StU43/xNobP4q87RgDP5dVqha8TkLEnviiBq+Vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pl4WC63Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7535CC116B1;
-	Mon,  6 May 2024 15:04:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715007884;
-	bh=Nc2BLlY2msSNff0dIc/i8A1dbggiS89ie/JJ6ON2I2Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Pl4WC63QcXMbqG9wexTrPOJUYCrmp6k459NDHlidaYxs1qJMFG4ASypjtfKLCTxak
-	 UOs5YlQ5ZINzkXlzSwIpbl68bd/Ms/rpwC6caCRtXvDKtzIbtAGDVwPCO7NLDN+ztA
-	 3eCAWzpo6PI2sMV5uR7gf3ShXih6ZrHRxG4zVv8s0ODEkCTIbbKFvGUeDQ52gV1O09
-	 VE8Xh/SNmq90WE+WADoiTlmtJOB/9X9szdX5cLOjnTFq6Mqrrpg5ZSQF5D6A5sugtd
-	 Y0JiXUWrHZsthCVsXTTciq5lte5DWDCfh+DtiECbyNKAZNyVEef758VS6cdyAnRXw+
-	 NSPK6NzlRSxUA==
-Message-ID: <48d71ee4-7b01-48a8-a2ec-9030204eac07@kernel.org>
-Date: Mon, 6 May 2024 17:04:34 +0200
+	s=arc-20240116; t=1715008225; c=relaxed/simple;
+	bh=o3NLpDCX56xR1aoEOXwK+SJTzlGjlHNBo9hf9W3BY3g=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=nLLvHASsxbmgtds0QRlaFLCoINImfjPNls9uLkemXkC9/fCE/eooPrtc77Js0CRYmNzBoywPVxZu3Xz97QEmK0EfdK8YdIiOLaTVFytCDlX7+Dioq4rzLE1x3jOPWw9QbSfMpRGy3EB8GxY5JLE3PgtZWGJ3+xfHmLCTw4mSPuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=EMgTAb78; arc=none smtp.client-ip=193.238.174.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mg.ssi.bg (localhost [127.0.0.1])
+	by mg.ssi.bg (Proxmox) with ESMTP id 1AF1218691;
+	Mon,  6 May 2024 18:10:12 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.ssi.bg (Proxmox) with ESMTPS;
+	Mon,  6 May 2024 18:10:11 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id C343C90029B;
+	Mon,  6 May 2024 18:10:07 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1715008208; bh=o3NLpDCX56xR1aoEOXwK+SJTzlGjlHNBo9hf9W3BY3g=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=EMgTAb78a/hMj2iIUDd4+im1E+d5ZN5X8lI0GMoAohzK6B79qaH5WBmR+U3B05IIc
+	 vLXrsfCJ21hvQZcHLvmGsle1b7rZcYdxflDvdQDj6b512KvS4+2U8ANbXsX+J4/CTu
+	 BqYuXdWz8F3/YdOA+EjqMZdlZQWzhzSVMSXwwCkk=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 446F9xB1093238;
+	Mon, 6 May 2024 18:10:00 +0300
+Date: Mon, 6 May 2024 18:09:59 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+cc: horms@verge.net.au, netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>
+Subject: Re: [PATCH v4 1/2] ipvs: add READ_ONCE barrier for
+ ipvs->sysctl_amemthresh
+In-Reply-To: <20240506141444.145946-1-aleksandr.mikhalitsyn@canonical.com>
+Message-ID: <04e3e7bb-7f9f-816d-492f-1f17565719d8@ssi.bg>
+References: <20240506141444.145946-1-aleksandr.mikhalitsyn@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next] mptcp: fix possible NULL dereferences
-Content-Language: en-GB
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot <syzkaller@googlegroups.com>, Jason Xing <kernelxing@tencent.com>,
- MPTCP Upstream <mptcp@lists.linux.dev>
-References: <20240506123032.3351895-1-edumazet@google.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240506123032.3351895-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 
-Hi Eric,
 
-(+cc MPTCP ML for the CI, patch tracking, and other devs)
+	Hello,
 
-On 06/05/2024 14:30, Eric Dumazet wrote:
-> subflow_add_reset_reason(skb, ...) can fail.
+On Mon, 6 May 2024, Alexander Mikhalitsyn wrote:
+
+> Cc: Julian Anastasov <ja@ssi.bg>
+> Cc: Simon Horman <horms@verge.net.au>
+> Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+> Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+> Cc: Florian Westphal <fw@strlen.de>
+> Suggested-by: Julian Anastasov <ja@ssi.bg>
+> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+
+	Looks good to me for net-next, thanks!
+
+Acked-by: Julian Anastasov <ja@ssi.bg>
+
+> ---
+>  net/netfilter/ipvs/ip_vs_ctl.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 > 
-> We can not assume mptcp_get_ext(skb) always return a non NULL pointer.
+> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+> index 50b5dbe40eb8..e122fa367b81 100644
+> --- a/net/netfilter/ipvs/ip_vs_ctl.c
+> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
+> @@ -94,6 +94,7 @@ static void update_defense_level(struct netns_ipvs *ipvs)
+>  {
+>  	struct sysinfo i;
+>  	int availmem;
+> +	int amemthresh;
+>  	int nomem;
+>  	int to_change = -1;
+>  
+> @@ -105,7 +106,8 @@ static void update_defense_level(struct netns_ipvs *ipvs)
+>  	/* si_swapinfo(&i); */
+>  	/* availmem = availmem - (i.totalswap - i.freeswap); */
+>  
+> -	nomem = (availmem < ipvs->sysctl_amemthresh);
+> +	amemthresh = max(READ_ONCE(ipvs->sysctl_amemthresh), 0);
+> +	nomem = (availmem < amemthresh);
+>  
+>  	local_bh_disable();
+>  
+> @@ -145,9 +147,8 @@ static void update_defense_level(struct netns_ipvs *ipvs)
+>  		break;
+>  	case 1:
+>  		if (nomem) {
+> -			ipvs->drop_rate = ipvs->drop_counter
+> -				= ipvs->sysctl_amemthresh /
+> -				(ipvs->sysctl_amemthresh-availmem);
+> +			ipvs->drop_counter = amemthresh / (amemthresh - availmem);
+> +			ipvs->drop_rate = ipvs->drop_counter;
+>  			ipvs->sysctl_drop_packet = 2;
+>  		} else {
+>  			ipvs->drop_rate = 0;
+> @@ -155,9 +156,8 @@ static void update_defense_level(struct netns_ipvs *ipvs)
+>  		break;
+>  	case 2:
+>  		if (nomem) {
+> -			ipvs->drop_rate = ipvs->drop_counter
+> -				= ipvs->sysctl_amemthresh /
+> -				(ipvs->sysctl_amemthresh-availmem);
+> +			ipvs->drop_counter = amemthresh / (amemthresh - availmem);
+> +			ipvs->drop_rate = ipvs->drop_counter;
+>  		} else {
+>  			ipvs->drop_rate = 0;
+>  			ipvs->sysctl_drop_packet = 1;
+> -- 
+> 2.34.1
 
-Good catch! Thank you for the fix!
+Regards
 
-It looks good to me:
-
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+--
+Julian Anastasov <ja@ssi.bg>
 
 
