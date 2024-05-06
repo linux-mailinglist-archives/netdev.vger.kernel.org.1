@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-93883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 157CF8BD846
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 01:53:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D41DB8BD848
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 01:53:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58B0EB22076
-	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 23:53:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63E45284041
+	for <lists+netdev@lfdr.de>; Mon,  6 May 2024 23:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0FF115D5B2;
-	Mon,  6 May 2024 23:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2664015DBA5;
+	Mon,  6 May 2024 23:53:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B2315CD7D
-	for <netdev@vger.kernel.org>; Mon,  6 May 2024 23:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D152415D5A9
+	for <netdev@vger.kernel.org>; Mon,  6 May 2024 23:53:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715039587; cv=none; b=PT3WfwGeYWApQWAbgCTpK8zCVDY8zqvVNjFWdF5r4FtexkoO0uJGPRo9+YVPf4k6u1tdoxZ6HZWTOgYkLHqAoW5MFC5pdoOMbJgEwM0IP+xwmOtQtMxuxzBNpP1/oy3QSZoFeSN8P/Jm4C211FoLasRwUZL1SppYXFvq4gtE2d0=
+	t=1715039589; cv=none; b=Arz76GW4a/frlkvJDnDOKdU+eeKGJgofL4HlMzEhigPN/K3rltRoayd5qowVBeTLPElBhoSD4JaoMShBuQuzotla5GmFW3GF2spx9G06VnKUZ2ez3e/8VDyyAcAftG/sNyfJ4a+V4BF3Vl97m5gWvfgeGaOzQSMeplAUceDcBFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715039587; c=relaxed/simple;
-	bh=E8rECKVrF0LLgYahIg6B13VopTKRoZf0/8uNUvkXSWw=;
+	s=arc-20240116; t=1715039589; c=relaxed/simple;
+	bh=ES3OtS6qAnhrD/F3yTrFfTO8G9isqay+2/IG0Y7vJiA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ItKaZcbhGEJn3F2z47dutiupkGc004S+BfL+bWinMsEOiOIspqS+u7HtTlZab0DkUnt+Xok3UCx94Jv9+u2hy+DLvd1taeKhjXC1ITWQQnPsCFrZgNMfLwOJnV4W1CgH1XqBFAE8r+krOBp/xaOPW07qs2DwPu7Gz7XtTaSyeZQ=
+	 MIME-Version; b=JT0EbksqE/mkirIrvvRXOGrRUepJVQdJDPI93hS+oawZL6Ib6dO1RN5VEXUkI/ndrOYQd40D7F32alzzGEYOg52pkzyxrnWJ4fZ3q1hwvayHPH5YS9nwoCUW/IzZAxJIRRcWXSg/hr04dG5/BaBvPo+YFghVsAEoy0LphoeTP2c=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
@@ -37,9 +37,9 @@ Cc: davem@davemloft.net,
 	pespin@sysmocom.de,
 	osmith@sysmocom.de,
 	horms@kernel.org
-Subject: [PATCH net-next,v3 01/12] gtp: remove useless initialization
-Date: Tue,  7 May 2024 01:52:40 +0200
-Message-Id: <20240506235251.3968262-2-pablo@netfilter.org>
+Subject: [PATCH net-next,v3 02/12] gtp: properly parse extension headers
+Date: Tue,  7 May 2024 01:52:41 +0200
+Message-Id: <20240506235251.3968262-3-pablo@netfilter.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240506235251.3968262-1-pablo@netfilter.org>
 References: <20240506235251.3968262-1-pablo@netfilter.org>
@@ -51,30 +51,106 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Update b20dc3c68458 ("gtp: Allow to create GTP device without FDs") to
-remove useless initialization to NULL, sockets are initialized to
-non-NULL just a few lines of code after this.
+Currently GTP packets are dropped if the next extension field is set to
+non-zero value, but this are valid GTP packets.
+
+TS 29.281 provides a longer header format, which is defined as struct
+gtp1_header_long. Such long header format is used if any of the S, PN, E
+flags is set.
+
+This long header is 4 bytes longer than struct gtp1_header, plus
+variable length (optional) extension headers. The next extension header
+field is zero is no extension header is provided.
+
+The extension header is composed of a length field which includes total
+number of 4 byte words including the extension header itself (1 byte),
+payload (variable length) and next type (1 byte). The extension header
+size and its payload is aligned to 4 bytes.
+
+A GTP packet might come with a chain extensions headers, which makes it
+slightly cumbersome to parse because the extension next header field
+comes at the end of the extension header, and there is a need to check
+if this field becomes zero to stop the extension header parser.
 
 Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 ---
- drivers/net/gtp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/gtp.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ include/net/gtp.h |  5 +++++
+ 2 files changed, 46 insertions(+)
 
 diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index e62d6cbdf9bc..dffb99a97e0f 100644
+index dffb99a97e0f..0522b20242ba 100644
 --- a/drivers/net/gtp.c
 +++ b/drivers/net/gtp.c
-@@ -1009,8 +1009,8 @@ static struct sock *gtp_create_sock(int type, struct gtp_dev *gtp)
+@@ -567,6 +567,43 @@ static int gtp1u_handle_echo_resp(struct gtp_dev *gtp, struct sk_buff *skb)
+ 				       msg, 0, GTP_GENL_MCGRP, GFP_ATOMIC);
+ }
  
- static int gtp_create_sockets(struct gtp_dev *gtp, struct nlattr *data[])
++static int gtp_parse_exthdrs(struct sk_buff *skb, unsigned int *hdrlen)
++{
++	struct gtp_ext_hdr *gtp_exthdr, _gtp_exthdr;
++	unsigned int offset = *hdrlen;
++	__u8 *next_type, _next_type;
++
++	/* From 29.060: "The Extension Header Length field specifies the length
++	 * of the particular Extension header in 4 octets units."
++	 *
++	 * This length field includes length field size itself (1 byte),
++	 * payload (variable length) and next type (1 byte). The extension
++	 * header is aligned to to 4 bytes.
++	 */
++
++	do {
++		gtp_exthdr = skb_header_pointer(skb, offset, sizeof(*gtp_exthdr),
++						&_gtp_exthdr);
++		if (!gtp_exthdr || !gtp_exthdr->len)
++			return -1;
++
++		offset += gtp_exthdr->len * 4;
++
++		/* From 29.060: "If no such Header follows, then the value of
++		 * the Next Extension Header Type shall be 0."
++		 */
++		next_type = skb_header_pointer(skb, offset - 1,
++					       sizeof(_next_type), &_next_type);
++		if (!next_type)
++			return -1;
++
++	} while (*next_type != 0);
++
++	*hdrlen = offset;
++
++	return 0;
++}
++
+ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
  {
--	struct sock *sk1u = NULL;
--	struct sock *sk0 = NULL;
-+	struct sock *sk1u;
-+	struct sock *sk0;
+ 	unsigned int hdrlen = sizeof(struct udphdr) +
+@@ -616,6 +653,10 @@ static int gtp1u_udp_encap_recv(struct gtp_dev *gtp, struct sk_buff *skb)
+ 		return 1;
+ 	}
  
- 	sk0 = gtp_create_sock(UDP_ENCAP_GTP0, gtp);
- 	if (IS_ERR(sk0))
++	if (gtp1->flags & GTP1_F_EXTHDR &&
++	    gtp_parse_exthdrs(skb, &hdrlen) < 0)
++		return -1;
++
+ 	return gtp_rx(pctx, skb, hdrlen, gtp->role);
+ }
+ 
+diff --git a/include/net/gtp.h b/include/net/gtp.h
+index 2a503f035d18..c0253c8702d0 100644
+--- a/include/net/gtp.h
++++ b/include/net/gtp.h
+@@ -78,4 +78,9 @@ static inline bool netif_is_gtp(const struct net_device *dev)
+ #define GTP1_F_EXTHDR	0x04
+ #define GTP1_F_MASK	0x07
+ 
++struct gtp_ext_hdr {
++	__u8	len;
++	__u8	data[];
++};
++
+ #endif
 -- 
 2.30.2
 
