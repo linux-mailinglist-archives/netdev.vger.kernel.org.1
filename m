@@ -1,291 +1,292 @@
-Return-Path: <netdev+bounces-93978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A10788BDCEE
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:08:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B93568BDCF3
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:10:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BCC52845C2
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 08:08:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE6931C21552
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 08:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5095513C8F7;
-	Tue,  7 May 2024 08:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SDqLOHt7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE96113C83F;
+	Tue,  7 May 2024 08:10:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD6A10E3
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 08:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC3613C667
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 08:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715069303; cv=none; b=uW07Gk1MD6XEjDSQPtx7NUQd1VZtyeazHf24EJfcBg9NFrly8ZcE4+uAAdPelC28dt3Iy9dIyn5IrTimfsHdZ6z/6tD/yaR6hm2TXG53LECCJ/AhC8PCuL4QO19tz0LeKUxCnTHpURJ6OmAwEUNfUkQJJnD6fDS65zRuhncVZGI=
+	t=1715069431; cv=none; b=n+6DTPaIRWKp/Ud26o0luhCmYpSsMrNsM+9TqjupbFcBMoxhfU874/jd2pSBLjfljtl0J8mERDYJ2BIaXAbQUi8x/C98Zuuoem+m1ip3E+EyU8ntiZ4LCf/OjKIECkjJfwsRMUmMgRLi8z1PHZfWC55/yUBu/dhklH/D68flgUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715069303; c=relaxed/simple;
-	bh=Ddn1VNGItzdsWA45trh+gGxmlymXdQHn0cHiYXpmuHo=;
+	s=arc-20240116; t=1715069431; c=relaxed/simple;
+	bh=jTkQ2oHkgrxfh36TeRiIIbjWG8m6rDerANzQ6w/pY10=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KTQv4+3nE9bU4OgmpS7JSEVvk+Ji1fBP/pG859n371X8DmA7CeEs1tStH43OIYHLYwXIkq+a1+AvCYaiyfptG2dmmqjCRai1vknBDCFNmgBUBmv33/Tpe9+BwBtYd2zBIKWapcqc2wnhC6G/YoEFoWy04VMAZwImUUO/4kyLn4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SDqLOHt7; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-34f0e55787aso1441988f8f.2
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 01:08:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1715069299; x=1715674099; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JwnUMMgXN/Wsuo8wQ8xw0lvYZHuA8pjKO6osAN4WAm0=;
-        b=SDqLOHt7dCI45kvQwLXxgzToIVid6VAE1pqeNt8x+7FGAlmmAWEaUzacNTopxvPAcY
-         h2dOhjsLRLmA6XhcFedZyojW6rrjUK+JJz2mk+3o79DAWqk7LoSloZIACUzCW90d1x+7
-         I74Bzl8ampQJPQJFQ1RIdp7bysYry8qBRLucsvQNNL5T3YBzHLOmm6MCOaSCI8+e7+C6
-         gQn0taRvk8JlPQUPrpuNSTkHB7bQ+VyegxvadaK44pS3shU5U9zEvztid6sHfipmLG/M
-         ooBFQqe+aejF6a70Vn59/ObFW/y72XwC3s4NRA5futZg9STSrOyKoLQeTr8o7oyZ4Ucp
-         ZpnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715069299; x=1715674099;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JwnUMMgXN/Wsuo8wQ8xw0lvYZHuA8pjKO6osAN4WAm0=;
-        b=GUKKQzZHF+oWKILApxMn1FupEGklgOGffoFIijR3832LEhFD/iK3siICzLLBqN+ddO
-         uxLNJdA0nOwwczXTrqCsOt1DB6Y/d5i/sUi8iQbBFgGM6l8MHNMl8m9+vYdPezxMA/gi
-         rGnhIgDuV/tKE4hs90VdNRxPfKSbxCBvt7VYsZtBjMZ/+2rWFHx9WUBegKgkD1xBEUdR
-         ynwQKLvkP3/ja0cVMcu8Tkyc1cRAH2/1S+532Dui2U3ivOsSyjfQbXza/N6ndKfs8lAG
-         PRSwLqD4MCBvvuAHC7kZxhjchKhkFJfBSPgDIF2VLtpXHkp5qeuBkM4PgnwngAdSbAa8
-         zAiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWgsjYb/TLeA5lL7oa6FpchQT1Otksmq8D2OAbQYGEVCyuItSULj6OcMd9MxZ2NaJ+W88AWtpGlC1fLtOPf8mCnFHMIoTc6
-X-Gm-Message-State: AOJu0YyTlDMzMbQuyazhWdRExgO9cfUHpaWsMvqmCSHgwczG3eszpj+w
-	F5RqufTU8oYz1bevTaYkxXGUIiu2N7L6t+YArIDdkZmVQDI2PzcijTA72ji1CW8=
-X-Google-Smtp-Source: AGHT+IHqmQLgl9Xz8cz4mPbBXMEtaAgjCTg++laQLsGNn99J2GLAx77yo3TSr95zHIwcTpNcgqKpPQ==
-X-Received: by 2002:adf:f606:0:b0:34d:414:5f99 with SMTP id t6-20020adff606000000b0034d04145f99mr7323220wrp.25.1715069298429;
-        Tue, 07 May 2024 01:08:18 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id e30-20020a5d595e000000b0034e8784473dsm9418578wri.41.2024.05.07.01.08.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 01:08:18 -0700 (PDT)
-Date: Tue, 7 May 2024 11:08:14 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Lars Kellogg-Stedman <lars@oddbit.com>
-Cc: Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, jreuter@yaina.de
-Subject: Re: [PATCH net] ax25: Fix refcount leak issues of ax25_dev
-Message-ID: <79dc1067-76dc-43b2-9413-7754f96fe08e@moroto.mountain>
-References: <20240501060218.32898-1-duoming@zju.edu.cn>
- <my4l7ljo35dnwxl33maqhyvw7666dmuwtduwtyhnzdlb6bbf5m@5sbp4tvg246f>
- <78ae8aa0-eac5-4ade-8e85-0479a22e98a3@moroto.mountain>
- <ekgwuycs3hioz6vve57e6z7igovpls6s644rvdxpxqqr7v7is6@u5lqegkuwcex>
- <1e14f4f1-29dd-4fe5-8010-de7df0866e93@moroto.mountain>
- <movur4qy7wwavdyw2ugwfsz6kvshrqlvx32ym3fyx5gg66llge@citxuw5ztgwc>
- <eb5oil2exor2bq5n3pn62575phxjdex6wdjwwjxjd3pd4je55o@4k4iu2xobel5>
+	 In-Reply-To:Content-Type:Content-Disposition; b=eHKNr/8JsnaoNRDyaC4pF34Pr7o/mlJ0BWEWWptCwVN2MjMciuPE+pdCJg7ETYOxetAV8N9H0tow6t0pak6UuQV3kyb0n393u2eKJrVFmicDYfTHPCYnsJVULX3m5IFjaxjWL4NO3O6MufhJjeDvXhd+VlTPBP757Ml0fYhX1Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-686-DB0ZtvnFNuy02KVPE8Zoug-1; Tue,
+ 07 May 2024 04:10:22 -0400
+X-MC-Unique: DB0ZtvnFNuy02KVPE8Zoug-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0C4073803512;
+	Tue,  7 May 2024 08:10:22 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E998C3C27;
+	Tue,  7 May 2024 08:10:19 +0000 (UTC)
+Date: Tue, 7 May 2024 10:10:18 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Shuah Khan <shuah@kernel.org>, devel@linux-ipsec.org
+Subject: Re: [PATCH net-next v3 2/2] selftests/net: add ICMP unreachable over
+ IPsec tunnel
+Message-ID: <Zjnh6vrHH47L05uY@hog>
+References: <cover.1714982035.git.antony.antony@secunet.com>
+ <053f57d79058138d09a0e606c0500a40cb78596d.1714982035.git.antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <053f57d79058138d09a0e606c0500a40cb78596d.1714982035.git.antony.antony@secunet.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
-In-Reply-To: <eb5oil2exor2bq5n3pn62575phxjdex6wdjwwjxjd3pd4je55o@4k4iu2xobel5>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 06, 2024 at 11:18:06PM -0400, Lars Kellogg-Stedman wrote:
-> On Sat, May 04, 2024 at 06:16:14PM GMT, Lars Kellogg-Stedman wrote:
-> > My original patch corrected this by adding the call to netdev_hold()
-> > right next to the ax25_cb_add() in ax25_rcv(), which solves this
-> > problem. If it seems weird to have this login in ax25_rcv, we could move
-> > it to ax25_accept, right around line 1430 [3]; that would look
-> > something like:
-> 
-> The same patch applies cleanly against the Raspberry Pi 6.6.30 kernel,
-> and clears up the frequeny crashes I was experiencing in that
-> environment as well.
+Hi Antony,
 
-I have reviewed this code some more.  My theory is:
+2024-05-06, 10:05:54 +0200, Antony Antony wrote:
+> diff --git a/tools/testing/selftests/net/xfrm_state.sh b/tools/testing/se=
+lftests/net/xfrm_state.sh
+> new file mode 100755
+> index 000000000000..26eac013abcf
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/xfrm_state.sh
+[...]
+> +run_test() {
+> +=09(
+> +=09tname=3D"$1"
+> +=09tdesc=3D"$2"
+> +
+> +
+> +=09unset IFS
+> +
+> +=09fail=3D"yes"
+> +
+> +=09# Since cleanup() relies on variables modified by this sub shell, it
+> +=09# has to run in this context.
+> +=09trap cleanup EXIT
+> +
+> +=09if [ "$VERBOSE" -gt 0 ]; then
+> +=09=09printf "\n########################################################=
+#############\n\n"
+> +=09fi
+> +
+> +=09# if errexit was not set, set it and unset after test eval
+> +=09errexit=3D0
+> +=09if [[ $- =3D~ "e" ]]; then
+> +=09=09errexit=3D1
+> +=09else
+> +=09=09set -e
+> +=09fi
+> +
+> +=09eval test_${tname}
+> +=09ret=3D$?
+> +=09fail=3D"no"
+> +=09[ $errexit -eq 0 ] && set +e # hack until exception is fixed
 
-ax25_dev_device_up() <- sets refcount to 1
-ax25_dev_device_down() <- set refcount to 0 and frees it
+What needs to be fixed?
 
-If the refcount is not 1 at ax25_dev_device_down() then something is
-screwed up.  So why do we even need more refcounting than that?  But
-apparently we do.  I don't really understand networking that well so
-maybe we can have lingering connections after the device is down.
 
-So the next rule is if we set ax25->ax25_dev from NULL to non-NULL then
-bump the refcount and decrement it if we set it back to NULL or we free
-ax25. Right now that's happening in ax25_bind() and ax25_release().  And
-also in ax25_kill_by_device() but not consistently.
+> +
+> +setup_namespace() {
 
-But it needs to happen *everywhere* we set ax25->ax25_dev and we need to
-decrement it when ax25 is freed in ax25_cb_put().  My patch is similar
-to yours in that every ax25_rcv() will now bump the reference through
-calling ax25_fillin_cb() or ax25_make_new().  The send path also bumps
-the reference.
+Is this one actually used? I can't find a reference to "namespace"
+(singular) in this script.
 
-There are a few questions I don't know how to answer.  I added two
--EBUSY paths to this patch.  I'm not sure if this is correct.
-Second, I don't understand the netdev_put(ax25_dev->dev, &s->dev_tracker);
-stuff.  Maybe that should be done in ax25_dev_hold/put().
+> +=09setup_ns NS_A
+> +=09ns_a=3D"ip netns exec ${NS_A}"
+> +}
+> +
 
-This patch might not work because of the netdev_hold/put() thing...
 
-I used the Smatch cross function database to show where ax25->ax25_dev
-is set to NULL/non-NULL.
+> +veth_add() {
+> +=09local ns_cmd=3D$(nscmd $1)
+> +=09local tn=3D"veth${2}1"
+> +=09local ln=3D${3:-eth0}
+> +=09run_cmd ${ns_cmd} ip link add ${ln} type veth peer name ${tn}
 
-$ smdb.py where ax25_cb ax25_dev | grep -v "min-max"
-net/ax25/ax25_route.c          | ax25_rt_autobind               | (struct ax25_cb)->ax25_dev | 0-u64max
-net/ax25/af_ax25.c             | ax25_kill_by_device            | (struct ax25_cb)->ax25_dev | 0-u64max
-net/ax25/af_ax25.c             | ax25_fillin_cb                 | (struct ax25_cb)->ax25_dev | 0-u64max
-net/ax25/af_ax25.c             | ax25_setsockopt                | (struct ax25_cb)->ax25_dev | 0-u64max
-net/ax25/af_ax25.c             | ax25_make_new                  | (struct ax25_cb)->ax25_dev | 0-u64max
-net/ax25/af_ax25.c             | ax25_bind                      | (struct ax25_cb)->ax25_dev | 4096-ptr_max
-net/ax25/ax25_in.c             | ax25_rcv                       | (struct ax25_cb)->ax25_dev | 0-u64max
-net/ax25/ax25_out.c            | ax25_send_frame                | (struct ax25_cb)->ax25_dev | 0-u64max
+Why not just create the peer directly in the correct namespace and
+with the correct name? That would avoid the mess of moving/renaming
+with veth_mv, and the really hard to read loop in setup_veths.
 
-regards,
-dan carpenter
+> +}
 
-diff --git a/include/net/ax25.h b/include/net/ax25.h
-index eb9cee8252c8..2cc94352b13d 100644
---- a/include/net/ax25.h
-+++ b/include/net/ax25.h
-@@ -275,25 +275,30 @@ static inline struct ax25_cb *sk_to_ax25(const struct sock *sk)
- #define ax25_cb_hold(__ax25) \
- 	refcount_inc(&((__ax25)->refcount))
- 
--static __inline__ void ax25_cb_put(ax25_cb *ax25)
-+static inline ax25_dev *ax25_dev_hold(ax25_dev *ax25_dev)
- {
--	if (refcount_dec_and_test(&ax25->refcount)) {
--		kfree(ax25->digipeat);
--		kfree(ax25);
--	}
-+	if (ax25_dev)
-+		refcount_inc(&ax25_dev->refcount);
-+	return ax25_dev;
- }
- 
--static inline void ax25_dev_hold(ax25_dev *ax25_dev)
-+static inline void ax25_dev_put(ax25_dev *ax25_dev)
- {
--	refcount_inc(&ax25_dev->refcount);
-+	if (ax25_dev && refcount_dec_and_test(&ax25_dev->refcount)) {
-+		kfree(ax25_dev);
-+	}
- }
- 
--static inline void ax25_dev_put(ax25_dev *ax25_dev)
-+static __inline__ void ax25_cb_put(ax25_cb *ax25)
- {
--	if (refcount_dec_and_test(&ax25_dev->refcount)) {
--		kfree(ax25_dev);
-+	if (refcount_dec_and_test(&ax25->refcount)) {
-+		if (ax25->ax25_dev)
-+			ax25_dev_put(ax25->ax25_dev);
-+		kfree(ax25->digipeat);
-+		kfree(ax25);
- 	}
- }
-+
- static inline __be16 ax25_type_trans(struct sk_buff *skb, struct net_device *dev)
- {
- 	skb->dev      = dev;
-diff --git a/net/ax25/af_ax25.c b/net/ax25/af_ax25.c
-index 9169efb2f43a..4d1ab296d52c 100644
---- a/net/ax25/af_ax25.c
-+++ b/net/ax25/af_ax25.c
-@@ -92,6 +92,7 @@ static void ax25_kill_by_device(struct net_device *dev)
- 				spin_unlock_bh(&ax25_list_lock);
- 				ax25_disconnect(s, ENETUNREACH);
- 				s->ax25_dev = NULL;
-+				ax25_dev_put(ax25_dev);
- 				ax25_cb_del(s);
- 				spin_lock_bh(&ax25_list_lock);
- 				goto again;
-@@ -101,11 +102,8 @@ static void ax25_kill_by_device(struct net_device *dev)
- 			lock_sock(sk);
- 			ax25_disconnect(s, ENETUNREACH);
- 			s->ax25_dev = NULL;
--			if (sk->sk_socket) {
--				netdev_put(ax25_dev->dev,
--					   &s->dev_tracker);
--				ax25_dev_put(ax25_dev);
--			}
-+			netdev_put(ax25_dev->dev, &s->dev_tracker);
-+			ax25_dev_put(ax25_dev);
- 			ax25_cb_del(s);
- 			release_sock(sk);
- 			spin_lock_bh(&ax25_list_lock);
-@@ -496,6 +494,7 @@ void ax25_fillin_cb(ax25_cb *ax25, ax25_dev *ax25_dev)
- 	ax25->ax25_dev = ax25_dev;
- 
- 	if (ax25->ax25_dev != NULL) {
-+		ax25_dev_hold(ax25->ax25_dev);
- 		ax25_fillin_cb_from_dev(ax25, ax25_dev);
- 		return;
- 	}
-@@ -685,6 +684,11 @@ static int ax25_setsockopt(struct socket *sock, int level, int optname,
- 			break;
- 		}
- 
-+		if (ax25->ax25_dev) {
-+			rtnl_unlock();
-+			res = -EBUSY;
-+			break;
-+		}
- 		ax25->ax25_dev = ax25_dev_ax25dev(dev);
- 		if (!ax25->ax25_dev) {
- 			rtnl_unlock();
-@@ -961,7 +965,7 @@ struct sock *ax25_make_new(struct sock *osk, struct ax25_dev *ax25_dev)
- 	ax25->paclen  = oax25->paclen;
- 	ax25->window  = oax25->window;
- 
--	ax25->ax25_dev    = ax25_dev;
-+	ax25->ax25_dev    = ax25_dev_hold(ax25_dev);
- 	ax25->source_addr = oax25->source_addr;
- 
- 	if (oax25->digipeat != NULL) {
-@@ -995,6 +999,11 @@ static int ax25_release(struct socket *sock)
- 	sock_orphan(sk);
- 	ax25 = sk_to_ax25(sk);
- 	ax25_dev = ax25->ax25_dev;
-+	/*
-+	 * The ax25_destroy_socket() function decrements the reference but we
-+	 * need to keep a reference until the end of the function.
-+	 */
-+	ax25_dev_hold(ax25_dev);
- 
- 	if (sk->sk_type == SOCK_SEQPACKET) {
- 		switch (ax25->state) {
-@@ -1147,6 +1156,12 @@ static int ax25_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
- 
- 	if (ax25_dev) {
- 		ax25_fillin_cb(ax25, ax25_dev);
-+		/*
-+		 * both ax25_addr_ax25dev() and ax25_fillin_cb() take a
-+		 * reference but we only want to take one reference so drop
-+		 * the extra reference.
-+		 */
-+		ax25_dev_put(ax25_dev);
- 		netdev_hold(ax25_dev->dev, &ax25->dev_tracker, GFP_ATOMIC);
- 	}
- 
-diff --git a/net/ax25/ax25_route.c b/net/ax25/ax25_route.c
-index b7c4d656a94b..d7f6d9f4f20c 100644
---- a/net/ax25/ax25_route.c
-+++ b/net/ax25/ax25_route.c
-@@ -406,6 +406,10 @@ int ax25_rt_autobind(ax25_cb *ax25, ax25_address *addr)
- 		ax25_route_lock_unuse();
- 		return -EHOSTUNREACH;
- 	}
-+	if (ax25->ax25_dev) {
-+		err = -EBUSY;
-+		goto put;
-+	}
- 	if ((ax25->ax25_dev = ax25_dev_ax25dev(ax25_rt->dev)) == NULL) {
- 		err = -EHOSTUNREACH;
- 		goto put;
+[...]
+> +
+> +setup_vm_set_v4x() {
+> +=09ns_set=3D"a r1 s1 r2 s2 b" # Network topology: x
+> +=09imax=3D6
+
+It would be more robust to set ns_set, imax, and all other parameters
+in every setup, so that the right topology is always used even if the
+test order changes. Currently I'm not sure which topology is used in
+which test, except the ones that use setup_vm_set_v4x and
+setup_vm_set_v6x.
+
+> +=09prefix=3D${prefix4}
+> +=09s=3D"."
+> +=09S=3D"."
+> +=09src=3D"10.1.3.1"
+> +=09dst=3D"10.1.4.2"
+> +=09src_net=3D"10.1.1.0/24"
+> +=09dst_net=3D"10.1.5.0/24"
+> +=09prefix_len=3D24
+> +
+> +=09vm_set
+> +}
+
+[...]
+> +setup_veths() {
+> +=09i=3D1
+> +=09for ns in ${ns_active}; do
+> +=09=09[ ${i} =3D ${imax} ] && continue
+
+IIUC imax should be the last, so s/continue/break/ ?
+
+> +=09=09veth_add ${ns} ${i}
+> +=09=09i=3D$((i + 1))
+> +=09done
+> +
+> +=09j=3D1
+> +=09for ns in ${ns_active}; do
+> +=09=09if [ ${j} -eq 1 ]; then
+> +=09=09=09p=3D${ns};
+> +=09=09=09pj=3D${j}
+> +=09=09=09j=3D$((j + 1))
+> +=09=09=09continue
+> +=09=09fi
+> +=09=09veth_mv ${ns} "${p}" ${pj}
+> +=09=09p=3D${ns}
+> +=09=09pj=3D${j}
+> +=09=09j=3D$((j + 1))
+> +=09done
+> +}
+> +
+> +setup_routes() {
+> +=09ip1=3D""
+> +=09i=3D1
+> +=09for ns in ${ns_active}; do
+> +=09=09# 10.1.C.1/24
+> +=09=09ip0=3D"${prefix}${s}${i}${S}1/${prefix_len}"
+> +=09=09[ "${ns}" =3D b ] && ip0=3D""
+> +=09=09setup_addr_add ${ns} "${ip0}" "${ip1}"
+> +=09=09# 10.1.C.2/24
+> +=09=09ip1=3D"${prefix}${s}${i}${S}2/${prefix_len}"
+> +=09=09i=3D$((i + 1))
+
+This loop is really hard to follow :/
+It would probably be easier to read if setup_addr_add only installed
+exactly one address (instead of conditionally adding maybe 2), and
+checking here whether the address needs to be added ("${ns}" !=3D b,
+i -ne 1).
+
+> +=09done
+> +
+> +=09i=3D1
+> +=09nhr=3D""
+> +=09for ns in ${ns_active}; do
+> +=09=09nhf=3D"${prefix}${s}${i}${S}2"
+> +=09=09[ "${ns}" =3D b ] && nhf=3D""
+> +=09=09route_add ${ns} "${nhf}" "${nhr}" ${i}
+> +=09=09nhr=3D"${prefix}${s}${i}${S}1"
+> +=09=09i=3D$((i + 1))
+
+I'd suggest the same here, split route_add into
+route_add_{forward,reverse} and only call the right one (or both) for
+the current iteration.
+
+> +=09done
+> +}
+
+[...]
+> +setup() {
+> +=09[ "$(id -u)" -ne 0 ] && echo "  need to run as root" && return $ksft_=
+skip
+> +
+> +=09for arg do
+> +=09=09eval setup_${arg} || { echo "  ${arg} not supported"; return 1; }
+> +=09done
+> +}
+> +
+> +trace() {
+
+Unused?
+
+> +=09[ $TRACING -eq 0 ] && return
+
+Then you can also get rid of that variable at the top.
+
+
+[...]
+> +mtu() {
+> +=09ns_cmd=3D"${1}"
+> +=09dev=3D"${2}"
+> +=09mtu=3D"${3}"
+> +
+> +=09${ns_cmd} ip link set dev ${dev} mtu ${mtu}
+> +}
+> +
+> +mtu_parse() {
+> +=09input=3D"${1}"
+> +
+> +=09next=3D0
+> +=09for i in ${input}; do
+> +=09=09[ ${next} -eq 1 -a "${i}" =3D "lock" ] && next=3D2 && continue
+> +=09=09[ ${next} -eq 1 ] && echo "${i}" && return
+> +=09=09[ ${next} -eq 2 ] && echo "lock ${i}" && return
+> +=09=09[ "${i}" =3D "mtu" ] && next=3D1
+> +=09done
+> +}
+> +
+> +link_get() {
+> +=09ns_cmd=3D"${1}"
+> +=09name=3D"${2}"
+> +
+> +=09${ns_cmd} ip link show dev "${name}"
+> +}
+> +
+> +link_get_mtu() {
+> +=09ns_cmd=3D"${1}"
+> +=09name=3D"${2}"
+> +
+> +=09mtu_parse "$(link_get "${ns_cmd}" ${name})"
+> +}
+
+All those also seem completely unused by this script. Please don't
+just c/p from other selftests without checking.
+
+--=20
+Sabrina
+
 
