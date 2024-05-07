@@ -1,115 +1,125 @@
-Return-Path: <netdev+bounces-93997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8BB28BDDDD
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:15:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80A428BDDD8
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:15:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5971D1F221E9
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:15:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B12D81C20B07
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:14:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F018B14D6E7;
-	Tue,  7 May 2024 09:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Dqbd9DaC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2479A13D52C;
+	Tue,  7 May 2024 09:14:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0F914D2BF;
-	Tue,  7 May 2024 09:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727D410E3
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 09:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715073311; cv=none; b=aq4fm5ZZ88NyXcvLlQZ39R3CyR/3mset49BlwxS4fHx4QWT9cE6TaiuedK/wQeWjdeR74HK++YnhVftZNKLCsg00Oeo4P1UkF0cJpkG6LWu+NI4sJw53NY/lkzP0QnjNxHnAu2gRqCGOBHvl7ku75PeQwD9+6Dz4V/h935WUId4=
+	t=1715073297; cv=none; b=VDS+g/FeHW/0D6aFpDi8Vp3An43bpo3DcJpfyVzwEDTiChkeU7lVpqNhtdLaUg61+mMm5Gtb2gWojOOeE6cql+LWN2IlIdELSHMW1mM8wV6lcNw/wIC5GguBxf5Yw3HxTqPWNYg0BF5wrzo899nkTNtzHB9ncgu0zQvNCfP3edU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715073311; c=relaxed/simple;
-	bh=p2Sw5egmhJ8iO8j3y++LQsz5uCOkVobYnG2RRGBZZ74=;
+	s=arc-20240116; t=1715073297; c=relaxed/simple;
+	bh=84PzSkVoxsxqnDfdk4SwskS87IcYHsVzOtDxcWZitvc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A1TVgjHSOpX9yM2slxv6ApVISTcSEkRjEj/+WfMxdw2uDzN+HQbKqME4TZ59Qe7u2L2owIdrf/4n0Pgm2SL1drhXEepQnyjg9mt7F6uNmffZs8CFQdPTQA97CnnSePc8ut7PEoR4n9D4rqluH+Tjd4OxQ4Q377EPnOX8wvpnlOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Dqbd9DaC; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5B0DF40E024C;
-	Tue,  7 May 2024 09:15:00 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id t-Ir9M_E86JN; Tue,  7 May 2024 09:14:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1715073296; bh=hA/EMMoeb0yie87OtKrLxzw3vDjsbX8N+BD3HDiz4bA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Dqbd9DaChjaUs6Gf5ijBOtLj75ALUwFjP33YhDNe96oth7dWvkwSAEYC6w6/7goFD
-	 rF3sHKacblkoCoAaw6E4bRh3zB+G4kCZz2QRn44ov6MB23bLu6TqDs8OhiBMpFM9R8
-	 Tj6zCtBBQvudwFAgI3aqf2cZwmsCXLPds2SHZ4BG1jM4M01Gu+iid4/l3HDXXImTBx
-	 DaXGgVxur9yr4aq4+EqVrAkRD0wJ9foGFlKI1QpGnyT96/cRqGdHK+Nkns/sSW3EAt
-	 8hlAB886/1B5el3/zg+9MNf7KFK8o7v+ELDYRiIkLGGF5quh5mwvpgeFhgg87u8MFL
-	 ibZuTFuEUuIXPhmi3tzmJbxBX2O3reR7H9KHSqMIS8EQ8/XlMTe3QdoQSwxjvsSG/7
-	 NzriVHS6gNn1dad88kcY/bvtdRBAqCkPXaKaac5PnYYlFifKw7yjclffpi4vRBZx5t
-	 /6mo3hw1y2IE/5s3v7fgK0ts97gSdfiTveDHo+40CnpQRPdGfNcU9wivREWdmbRJb1
-	 9qCYczwdKUNfw1OqL8AhCa33w6OE2cOtJpiAkXA0kP5OkrBqJGTJx/inq43sk/WRKo
-	 VxIym094m9x2zxhcJciuWm7sQy1cB12gsVF6jEAnmOnAI/tWEqSflNX7C88meKZuzw
-	 eF3nqOHBWbG+ACJ+MBC682cU=
-Received: from zn.tnic (pd953020b.dip0.t-ipconnect.de [217.83.2.11])
+	 In-Reply-To:Content-Type:Content-Disposition; b=WVuclXESRcfp6b83sv3CWSx6ltp9ok3PvmlfWpZGoQWHydaN4VOU3yXdG1el+J6bYXI1q/N5pGFFTfWCh62bWLrwn2DjV3o9DK1JpILMaNPrZidntf4pin0w8AIqU1fpC2uZ0eZjXndrbtJuSIbfq5xW++m15ZkGSBQcSaOhCMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-374-bDl7cRjoNSSYkQZOs43efQ-1; Tue, 07 May 2024 05:14:48 -0400
+X-MC-Unique: bDl7cRjoNSSYkQZOs43efQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0A3C340E0249;
-	Tue,  7 May 2024 09:14:30 +0000 (UTC)
-Date: Tue, 7 May 2024 11:14:24 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com,
-	tglx@linutronix.de, x86@kernel.org, netdev@vger.kernel.org,
-	richardcochran@gmail.com, linux-input@vger.kernel.org,
-	dmitry.torokhov@gmail.com, zackr@vmware.com,
-	linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
-	timothym@vmware.com, akaher@vmware.com,
-	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
-	tzimmermann@suse.de, mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com, horms@kernel.org,
-	kirill.shutemov@linux.intel.com, Nadav Amit <nadav.amit@gmail.com>
-Subject: Re: [PATCH v9 1/8] x86/vmware: Move common macros to vmware.h
-Message-ID: <20240507091424.GUZjnw8ErpQT6XJLVM@fat_crate.local>
-References: <20240505182829.GBZjfPzeEijTsBUth5@fat_crate.local>
- <20240506215305.30756-1-alexey.makhalov@broadcom.com>
- <20240506215305.30756-2-alexey.makhalov@broadcom.com>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E38D38007BC;
+	Tue,  7 May 2024 09:14:47 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B7B72022F10;
+	Tue,  7 May 2024 09:14:46 +0000 (UTC)
+Date: Tue, 7 May 2024 11:14:45 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vasiliy Kovalev <kovalev@altlinux.org>,
+	Guillaume Nault <gnault@redhat.com>
+Subject: Re: [PATCH net] ipv6: sr: fix invalid unregister error path
+Message-ID: <ZjnxBVJDNkyGgNE6@hog>
+References: <20240507081100.363677-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20240507081100.363677-1-liuhangbin@gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
-In-Reply-To: <20240506215305.30756-2-alexey.makhalov@broadcom.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 06, 2024 at 02:52:58PM -0700, Alexey Makhalov wrote:
-> +#define VMWARE_HYPERVISOR_PORT		0x5658
-> +#define VMWARE_HYPERVISOR_PORT_HB	(VMWARE_HYPERVISOR_PORT | \
-> +					 VMWARE_HYPERVISOR_HB)
+2024-05-07, 16:11:00 +0800, Hangbin Liu wrote:
+> The error path of seg6_init() is wrong in case CONFIG_IPV6_SEG6_LWTUNNEL
+> is not defined. In that case if seg6_hmac_init() fails, the
+> genl_unregister_family() isn't called.
+>=20
+> At the same time, add seg6_local_exit() and fix the genl unregister order
+> in seg6_exit().
+>=20
+> Fixes: 5559cea2d5aa ("ipv6: sr: fix possible use-after-free and null-ptr-=
+deref")
+> Reported-by: Guillaume Nault <gnault@redhat.com>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>  net/ipv6/seg6.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/net/ipv6/seg6.c b/net/ipv6/seg6.c
+> index 35508abd76f4..3c5ccc52d0e1 100644
+> --- a/net/ipv6/seg6.c
+> +++ b/net/ipv6/seg6.c
+> @@ -549,10 +549,8 @@ int __init seg6_init(void)
+>  =09seg6_iptunnel_exit();
+>  #endif
+>  #endif
+> -#ifdef CONFIG_IPV6_SEG6_LWTUNNEL
+>  out_unregister_genl:
+>  =09genl_unregister_family(&seg6_genl_family);
 
-You can't help yourself not sneaking in any changes which are not code
-movement, can ya?
+That label will be defined but unused for !CONFIG_IPV6_SEG6_LWTUNNEL.
 
-The purpose of a sole code movement patch is to ease the review. Not to
-have to look at the code movement *and* some *additional* changes which
-you've done in-flight. Just because you felt like it. But which is nasty
-to review.
+> -#endif
+>  out_unregister_pernet:
+>  =09unregister_pernet_subsys(&ip6_segments_ops);
+>  =09goto out;
+> @@ -564,8 +562,9 @@ void seg6_exit(void)
+>  =09seg6_hmac_exit();
+>  #endif
+>  #ifdef CONFIG_IPV6_SEG6_LWTUNNEL
+> +=09seg6_local_exit();
+>  =09seg6_iptunnel_exit();
+>  #endif
+> -=09unregister_pernet_subsys(&ip6_segments_ops);
+>  =09genl_unregister_family(&seg6_genl_family);
+> +=09unregister_pernet_subsys(&ip6_segments_ops);
+>  }
+> --=20
+> 2.43.0
+>=20
+>=20
 
-Maybe you'll understand that better when you get to review someone
-else's patch which does crap like that.
+--=20
+Sabrina
 
-Make sure you remember that in the future, when sending patches.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
