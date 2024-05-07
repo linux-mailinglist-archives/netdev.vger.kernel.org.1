@@ -1,98 +1,105 @@
-Return-Path: <netdev+bounces-94046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58CE58BE01C
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:49:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DB9A8BE027
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:50:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89D2D1C23553
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:49:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C65FD1F2354C
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155491514E0;
-	Tue,  7 May 2024 10:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDBE614EC77;
+	Tue,  7 May 2024 10:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="JOGXTRwM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KH0y71ey"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BDF14F100;
-	Tue,  7 May 2024 10:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C645F502B3;
+	Tue,  7 May 2024 10:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715078821; cv=none; b=SIaAf1U9Wr8Nf+9UVNK9i7G3U+mXWgvSjesIvFUteq54+pDnLcjHVwG8vBIm2hKiRLpUnsUqxHPj+jHMap+KRD6ylx16/5GQpNlm3MFWYzm4WNFG7k8HS2BVFbt2gt3ZsQXbnE09HYl0+JMt7/5oEU3kx2Pu7wzPgmKW5B85/Uc=
+	t=1715079027; cv=none; b=oeUYNIUh1KJaA7ivDI+gTYLRXHMHqmz8Z7c2LZeJlh/O+e7XplNgEO2tewm1eSAluhIyEHrYVXKXe/+aoBVzzg5sgkeqwdasTWuYWf8MQsXXWk0KXD/qPrBQRGDFcaaK5KjcjmycK/UsKZSQ0NDxbIPIjuUVByrmJdcc0j4+goU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715078821; c=relaxed/simple;
-	bh=E25vMthg3vqCpG+5zSE+AGNII/5x83tzP1t01yygGhw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jJQdez2qLdZpKSlPM5uIaCEfNqzAY5UFYVenHUM5fL0lxPhhlquQevjdGRyyFDg3gD6HDV6pwwcB7r20C8iDQlOZaxn7p+KHvd+rXohd6yvHs7TIlN8AtX7P7dmIcuhuWUJ1sGCw21FgSvdens2uVsQ1P0eXpFF/t7mAAKdgtpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=JOGXTRwM; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=E25vMthg3vqCpG+5zSE+AGNII/5x83tzP1t01yygGhw=;
-	t=1715078817; x=1716288417; b=JOGXTRwMyMWrvYnvWFxB5FrsebDM2UbKoW5UJ1/M+IS5FKx
-	SLAtQ+ggip1Fle+eQsaZGwmw6Ggar32LEIIlQufAIrZFIKZqohzdNs0SUHQgZz1j2QMfXdvLubk2V
-	4ujasEp/Vpcd8u/W1F8oIT5DzdleY/tjgM5GALv38xw2yU6hWAQZcJpK0X2rP+r3XYehY7eZOfNNZ
-	ufQkVb77+w8ebBBRwJG22HR6LY2GAYOHWvHjlmwOmHAi7czzE/ANT/qjGGqineI3bs+TSoIQvJr8W
-	FhnPvAVCJl7o8OYJkWLSiYkN5SYvOb+gk7E9wMvCK6d5vc6ALOv4jAgglQK5yVmQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1s4ILQ-00000009X6J-0VJr;
-	Tue, 07 May 2024 12:46:48 +0200
-Message-ID: <10256004963b6e1a1813c6f07c5d21abfc843070.camel@sipsolutions.net>
-Subject: Re: [PATCH] wifi: nl80211: Avoid address calculations via out of
- bounds array indexing
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Nathan Chancellor <nathan@kernel.org>, Kees Cook <keescook@chromium.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>,  linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, Jeff Johnson <quic_jjohnson@quicinc.com>, "Gustavo
- A. R. Silva" <gustavoars@kernel.org>,  linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-Date: Tue, 07 May 2024 12:46:46 +0200
-In-Reply-To: <20240425181342.GA657080@dev-arch.thelio-3990X>
-References: <20240424220057.work.819-kees@kernel.org>
-	 <20240425181342.GA657080@dev-arch.thelio-3990X>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1715079027; c=relaxed/simple;
+	bh=k7OVsW1CLhpS+Sgr4gaW6u0i/WxY3RLczvnY1bpnXJU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Cx5eRPTKO0zqr/jfVHBq5iZIXBfqlBMMiAGCjYGFuuDYg8aG+86m6JfAlmyIqwUbwlDVjLdX1x8nZ1w6x8QNkVQGxwr2G3DdDhyGsRquBzqRYvOQX5cB5JSBuFZ1TW0x9KdCj/nIkdswMUl2n2zHUL72GeShARMXhg6AzpUjIWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KH0y71ey; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5A333C3277B;
+	Tue,  7 May 2024 10:50:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715079027;
+	bh=k7OVsW1CLhpS+Sgr4gaW6u0i/WxY3RLczvnY1bpnXJU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KH0y71eySxSSRI3mzAnyQ/eExmgX+b/8gskMdb8lLE81Xr0ltANmmilripIiFpvwf
+	 S5oOdFTRP+zp+vM+e12zZc34OCUg4Ns5oxufBmiB17745Dy3RFKrh3WER7bQmbRjWe
+	 hAYX06cHPCGTSwK67M3ZiJPZXzxAhV0D6NJseYhVLrDc9sP53MD1NeA8ZLy+fTufmP
+	 lnrq/ZlbalLSgvX4QsgCU7F4KS77V7R7fFEDnauSslGrtUpRjt6aNtK0vh4Qxji9V7
+	 u4n7WS8+yzNfuHIUFEMe5veuvH9csRYfitoDKFegbbiZNiy/48JmZdJyCtSRn7RV9j
+	 vmFcTX25kzB3g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4A519C43331;
+	Tue,  7 May 2024 10:50:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v6 0/6] Remove RTNL lock protection of CVQ
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171507902730.3484.10843035496334670534.git-patchwork-notify@kernel.org>
+Date: Tue, 07 May 2024 10:50:27 +0000
+References: <20240503202445.1415560-1-danielj@nvidia.com>
+In-Reply-To: <20240503202445.1415560-1-danielj@nvidia.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+ xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ jiri@nvidia.com
 
-On Thu, 2024-04-25 at 11:13 -0700, Nathan Chancellor wrote:
-> On Wed, Apr 24, 2024 at 03:01:01PM -0700, Kees Cook wrote:
-> > Before request->channels[] can be used, request->n_channels must be set=
-.
-> > Additionally, address calculations for memory after the "channels" arra=
-y
-> > need to be calculated from the allocation base ("request") rather than
-> > via the first "out of bounds" index of "channels", otherwise run-time
-> > bounds checking will throw a warning.
-> >=20
-> > Reported-by: Nathan Chancellor <nathan@kernel.org>
-> > Fixes: e3eac9f32ec0 ("wifi: cfg80211: Annotate struct cfg80211_scan_req=
-uest with __counted_by")
-> > Signed-off-by: Kees Cook <keescook@chromium.org>
->=20
-> Tested-by: Nathan Chancellor <nathan@kernel.org>
->=20
+Hello:
 
-How do you get this tested? We have the same, and more, bugs in
-cfg80211_scan_6ghz() which I'm fixing right now, but no idea how to
-actually get the checks done?
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-johannes
+On Fri, 3 May 2024 23:24:39 +0300 you wrote:
+> Currently the buffer used for control VQ commands is protected by the
+> RTNL lock. Previously this wasn't a major concern because the control VQ
+> was only used during device setup and user interaction. With the recent
+> addition of dynamic interrupt moderation the control VQ may be used
+> frequently during normal operation.
+> 
+> This series removes the RNTL lock dependency by introducing a mutex
+> to protect the control buffer and writing SGs to the control VQ.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v6,1/6] virtio_net: Store RSS setting in virtnet_info
+    https://git.kernel.org/netdev/net-next/c/fce29030c565
+  - [net-next,v6,2/6] virtio_net: Remove command data from control_buf
+    https://git.kernel.org/netdev/net-next/c/ff7c7d9f5261
+  - [net-next,v6,3/6] virtio_net: Add a lock for the command VQ.
+    https://git.kernel.org/netdev/net-next/c/6f45ab3e0409
+  - [net-next,v6,4/6] virtio_net: Do DIM update for specified queue only
+    https://git.kernel.org/netdev/net-next/c/650d77c51e24
+  - [net-next,v6,5/6] virtio_net: Add a lock for per queue RX coalesce
+    https://git.kernel.org/netdev/net-next/c/4d4ac2ececd3
+  - [net-next,v6,6/6] virtio_net: Remove rtnl lock protection of command buffers
+    https://git.kernel.org/netdev/net-next/c/f8befdb21be0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
