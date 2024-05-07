@@ -1,187 +1,125 @@
-Return-Path: <netdev+bounces-94279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DFE78BEF26
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 23:47:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3645E8BEF00
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 23:45:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FB4A1F258CA
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 21:47:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E148A1F2585B
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 21:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE4916C863;
-	Tue,  7 May 2024 21:47:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81CF97640E;
+	Tue,  7 May 2024 21:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jL8djN5v"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TicnrHpv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D4D15E7FD
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 21:47:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB241187348;
+	Tue,  7 May 2024 21:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715118456; cv=none; b=bi7rdFoVtYFprwU/HrM2XWMRGKU+kOou5fR7EG8d43XbVOpYwWKRsmjq5yDvR1mYm4r0Hxg0XB+aewRhh1wvsjHXRhadWiZKTzvpvC2jL4j47c23gF6kgghYeNaU4QXQS1PPanKJUBhdYJR2XqzzWzERqTngqxjJE4WcINsGKUQ=
+	t=1715118295; cv=none; b=FwnrQ/lyY37yXmm0CAIuVTUzdYw77O/md60vuKyxs0uQj6+nVuPAhQ01ayp2vRPLxEC4y2xczVGY8gSzZXuDg6SWgTAZs9a3hEsk9efaY9NvRDLF+Iz2p6WBhi6G1josj3sT12a2b1Wzvw+IGHiZrXkFKRq+ZeTwF87Xyf+cLE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715118456; c=relaxed/simple;
-	bh=rWVD3Les6HNzGCMpjrx8KhL3+oCBlnrsvxNQZUeaa0A=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=S5tmd9TKXMrhW43TxqU77ZX92xzrLDsvAzaTPn/TfPz/EMeR09yvUBL01JLyIoUtjgW3EYvFC6h/xfO9Ho0qdaMufoxNo8od2n0U5DS4VtA3XYWt1fBFJUHlC0qj+butdZYfDh5WZWmxEkp2MeDwUQytpB8FOuWszDtJeFKEF8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jL8djN5v; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6f446a1ec59so3345496b3a.1
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 14:47:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715118454; x=1715723254; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GxXvLzcq9DUcgwih3mSAQ78x/pV85qLBcUXkypaveog=;
-        b=jL8djN5vEO1m7TfEJ+L81YMFiHGDVolLVgM6fa5VYQ5mX/IYtVDh+74U6/qqObTmiJ
-         TGznpSJeelnL0XnJATpD9OKYwW4HcBEy1z6iLfyy4XigP7CDqBXeQVB4iZWUyVAaR8ul
-         HygKiUy+MquSUbKGVV0Yy3+/sjMqKsWKsORp27ZuE5ZT2uCMb7q0Ab+auS1b/Eo4KbxS
-         0VgZyg4Cu3vh+Nud0IkyWZ1h3I5EUMMpbE79VNLZV5bg86NyetkRNO2JGQsA3Mv7Q3CO
-         RQfRjJ43cqv26Y7CDw+l7cn6dUYEdkAnCOIHYaR9Ksq978wQ99DLauRRXD66BI8m90Nr
-         BFHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715118454; x=1715723254;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GxXvLzcq9DUcgwih3mSAQ78x/pV85qLBcUXkypaveog=;
-        b=fr0c1xaN9s+YOPALa9F93VCccB15WJan6TunrsripG0nknEQ+UmJ/kS47aWTWgHWZB
-         yRWye5wlB5ssKaPeDF2INQfxCLxIWZ/iuIYSRp/4Y8v3bUSLliAyphxznlvSZDLOIdoG
-         tnTQ6t5pyOie265LUpcF32Gx9JwbiHB043DrVET46uXcjkfzIihds8Ti4d0/8Xp1bf4Z
-         7/shoZ1GHSw13VfZUKMIWUcAm/XdookjftDUYHmT83pCcuFuKCtRt5p5OfHbHjuXcwWE
-         YzUrtZ2w3U38R4ocMr/fuYlkrxgEP8AjE9VlPGLRnZbUTh0rUUCdgmQMoYxJOCY15a2y
-         ftyA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJd+lE/rAm8hnNEkwj+W8lwOAMEBhLc2FAQ/1+NWKRD54fNMq+caEYJcA5wWpQV7l5UQlkcmxIdmYAMKD/SkpFVzNyCRTF
-X-Gm-Message-State: AOJu0Yw/JwwuwmVyrn8JQCJJu53/UcXAGhVOss3GQffre2fRvWmyIpXL
-	WmXQf/Vd75WRDvhgIwq5havbjJsCJjgoPVryLxFSFDjyP3gQdoOOoJEB7WlGXbRSi8DhRvKLUrc
-	jKQ==
-X-Google-Smtp-Source: AGHT+IGyIuHby3YDnVxOzNzbbaEdY9qKdq7MpmWxi3fRJ7Znvf9dmfYdSTbgOYiGfgZmNPwJBeWALvgDPEM=
-X-Received: from edliaw.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:305d])
- (user=edliaw job=sendgmr) by 2002:a05:6a00:1803:b0:6ec:f406:ab4b with SMTP id
- d2e1a72fcca58-6f49c30a0e9mr48385b3a.4.1715118454141; Tue, 07 May 2024
- 14:47:34 -0700 (PDT)
-Date: Tue,  7 May 2024 21:38:30 +0000
-In-Reply-To: <20240507214254.2787305-1-edliaw@google.com>
+	s=arc-20240116; t=1715118295; c=relaxed/simple;
+	bh=8Kks+YQ+RgJfm/5ALrDxQU4SyhuXGSCU5OOJP8icVW8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sMZrLouHaZPjKGtIoUBGanluPZlBnT3bjx4GKjzHHiXmENeLzPMl+A+Rzp+U23Duj7LACPJ+lkByrOqHjhB+Fhbhb2tkkOHI5xmTfkeOcjMljOIeyBO+b70KsKD30W3r6xa2HiePhUqXhoTq8rhMAgY8m3ert/YtSYia/TYGJiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TicnrHpv; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715118294; x=1746654294;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8Kks+YQ+RgJfm/5ALrDxQU4SyhuXGSCU5OOJP8icVW8=;
+  b=TicnrHpvrmxHMN3SBzU5VfR/yNG8SNAlkd90V3dwF3t1Kp0r0WkoFpdW
+   tA7/eZUFTOlqiq8eIvKc+SxwQASv6O7joPGG8qtiiB5l3dMcoGBmiwmAq
+   NExqkcaILMbeDQE7LlW6ahwN+LuMZQD9jvBeqlNeo8pE1FZltN79M647c
+   yU08MzMsoR3Ds4+9+0AntIL9HmaC23VePRvq3Kl+y71W6cWDw07A++H0R
+   ewedBZHPCgQ678ux7TA3jWgylPpbp1FiGOgARTMgz8wP/ATFJEPJxvCTU
+   YzavNXvZLrgtiH3NBIWRG+nSFgKcWaRr39S95R5KCb9wKCiHcK8c6Avh0
+   w==;
+X-CSE-ConnectionGUID: KptgGozJQQSyvXtFjhrIrg==
+X-CSE-MsgGUID: +XB4dEAxTFaQaDUDCt42qg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="21505746"
+X-IronPort-AV: E=Sophos;i="6.08,143,1712646000"; 
+   d="scan'208";a="21505746"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 14:44:53 -0700
+X-CSE-ConnectionGUID: CbGhnG5XQs2gLcCI/53hZw==
+X-CSE-MsgGUID: UNgLkOKIRK6YWhIxhGIM1w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,143,1712646000"; 
+   d="scan'208";a="33185958"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 07 May 2024 14:44:51 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s4ScC-0002fG-1m;
+	Tue, 07 May 2024 21:44:48 +0000
+Date: Wed, 8 May 2024 05:43:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Davide Caratti <dcaratti@redhat.com>, paul@paul-moore.com
+Cc: oe-kbuild-all@lists.linux.dev, casey@schaufler-ca.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, xmu@redhat.com
+Subject: Re: [PATCH net v3] netlabel: fix RCU annotation for IPv4 options on
+ socket creation
+Message-ID: <202405080517.oMJNehoP-lkp@intel.com>
+References: <ce1a2b59831d74cf8395501f1138923bb842dbce.1714992251.git.dcaratti@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240507214254.2787305-1-edliaw@google.com>
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240507214254.2787305-6-edliaw@google.com>
-Subject: [PATCH v2 5/5] selftests: Drop duplicate -D_GNU_SOURCE
-From: Edward Liaw <edliaw@google.com>
-To: shuah@kernel.org, Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
-	Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Nhat Pham <nphamcs@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Christian Brauner <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>, 
-	Kees Cook <keescook@chromium.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, 
-	Davidlohr Bueso <dave@stgolabs.net>, 
-	"=?UTF-8?q?Andr=C3=A9=20Almeida?=" <andrealmeid@igalia.com>, Jiri Kosina <jikos@kernel.org>, 
-	Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, 
-	Andy Lutomirski <luto@amacapital.net>, Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	David Hildenbrand <david@redhat.com>, "=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?=" <mic@digikod.net>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Seth Forshee <sforshee@kernel.org>, 
-	Bongsu Jeon <bongsu.jeon@samsung.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"=?UTF-8?q?Andreas=20F=C3=A4rber?=" <afaerber@suse.de>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
-	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Fenghua Yu <fenghua.yu@intel.com>, Reinette Chatre <reinette.chatre@intel.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Muhammad Usama Anjum <usama.anjum@collabora.com>, Edward Liaw <edliaw@google.com>
-Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kernel-team@android.com, linux-sound@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org, 
-	linux-input@vger.kernel.org, iommu@lists.linux.dev, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-actions@lists.infradead.org, mptcp@lists.linux.dev, 
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ce1a2b59831d74cf8395501f1138923bb842dbce.1714992251.git.dcaratti@redhat.com>
 
--D_GNU_SOURCE can be de-duplicated here, as it is added by
-KHDR_INCLUDES.
+Hi Davide,
 
-Signed-off-by: Edward Liaw <edliaw@google.com>
----
- tools/testing/selftests/futex/functional/Makefile | 2 +-
- tools/testing/selftests/iommu/Makefile            | 2 --
- tools/testing/selftests/net/tcp_ao/Makefile       | 2 +-
- tools/testing/selftests/resctrl/Makefile          | 2 +-
- 4 files changed, 3 insertions(+), 5 deletions(-)
+kernel test robot noticed the following build errors:
 
-diff --git a/tools/testing/selftests/futex/functional/Makefile b/tools/testing/selftests/futex/functional/Makefile
-index a392d0917b4e..f79f9bac7918 100644
---- a/tools/testing/selftests/futex/functional/Makefile
-+++ b/tools/testing/selftests/futex/functional/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- INCLUDES := -I../include -I../../ $(KHDR_INCLUDES)
--CFLAGS := $(CFLAGS) -g -O2 -Wall -D_GNU_SOURCE -pthread $(INCLUDES) $(KHDR_INCLUDES)
-+CFLAGS := $(CFLAGS) -g -O2 -Wall -pthread $(INCLUDES) $(KHDR_INCLUDES)
- LDLIBS := -lpthread -lrt
- 
- LOCAL_HDRS := \
-diff --git a/tools/testing/selftests/iommu/Makefile b/tools/testing/selftests/iommu/Makefile
-index 32c5fdfd0eef..fd6477911f24 100644
---- a/tools/testing/selftests/iommu/Makefile
-+++ b/tools/testing/selftests/iommu/Makefile
-@@ -2,8 +2,6 @@
- CFLAGS += -Wall -O2 -Wno-unused-function
- CFLAGS += $(KHDR_INCLUDES)
- 
--CFLAGS += -D_GNU_SOURCE
--
- TEST_GEN_PROGS :=
- TEST_GEN_PROGS += iommufd
- TEST_GEN_PROGS += iommufd_fail_nth
-diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-index 522d991e310e..c608b1ec02e6 100644
---- a/tools/testing/selftests/net/tcp_ao/Makefile
-+++ b/tools/testing/selftests/net/tcp_ao/Makefile
-@@ -26,7 +26,7 @@ LIB	:= $(LIBDIR)/libaotst.a
- LDLIBS	+= $(LIB) -pthread
- LIBDEPS	:= lib/aolib.h Makefile
- 
--CFLAGS	:= -Wall -O2 -g -D_GNU_SOURCE -fno-strict-aliasing
-+CFLAGS	:= -Wall -O2 -g -fno-strict-aliasing
- CFLAGS	+= $(KHDR_INCLUDES)
- CFLAGS	+= -iquote ./lib/ -I ../../../../include/
- 
-diff --git a/tools/testing/selftests/resctrl/Makefile b/tools/testing/selftests/resctrl/Makefile
-index 2deac2031de9..5073dbc96125 100644
---- a/tools/testing/selftests/resctrl/Makefile
-+++ b/tools/testing/selftests/resctrl/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- 
--CFLAGS = -g -Wall -O2 -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE
-+CFLAGS = -g -Wall -O2 -D_FORTIFY_SOURCE=2
- CFLAGS += $(KHDR_INCLUDES)
- 
- TEST_GEN_PROGS := resctrl_tests
+[auto build test ERROR on net/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Davide-Caratti/netlabel-fix-RCU-annotation-for-IPv4-options-on-socket-creation/20240506-184702
+base:   net/main
+patch link:    https://lore.kernel.org/r/ce1a2b59831d74cf8395501f1138923bb842dbce.1714992251.git.dcaratti%40redhat.com
+patch subject: [PATCH net v3] netlabel: fix RCU annotation for IPv4 options on socket creation
+config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20240508/202405080517.oMJNehoP-lkp@intel.com/config)
+compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240508/202405080517.oMJNehoP-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405080517.oMJNehoP-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   ld: vmlinux.o: in function `lockdep_sock_is_held':
+>> include/net/sock.h:1665:(.text+0xfe52da): undefined reference to `lockdep_is_held'
+>> ld: include/net/sock.h:1666:(.text+0xfe5306): undefined reference to `lockdep_is_held'
+
+
+vim +1665 include/net/sock.h
+
+ed07536ed67317 Peter Zijlstra       2006-12-06  1662  
+05b93801a23c21 Matthew Wilcox       2018-01-17  1663  static inline bool lockdep_sock_is_held(const struct sock *sk)
+1e1d04e678cf72 Hannes Frederic Sowa 2016-04-05  1664  {
+1e1d04e678cf72 Hannes Frederic Sowa 2016-04-05 @1665  	return lockdep_is_held(&sk->sk_lock) ||
+1e1d04e678cf72 Hannes Frederic Sowa 2016-04-05 @1666  	       lockdep_is_held(&sk->sk_lock.slock);
+1e1d04e678cf72 Hannes Frederic Sowa 2016-04-05  1667  }
+1e1d04e678cf72 Hannes Frederic Sowa 2016-04-05  1668  
+
 -- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
