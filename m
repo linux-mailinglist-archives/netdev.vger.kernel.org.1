@@ -1,58 +1,81 @@
-Return-Path: <netdev+bounces-93911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F0118BD911
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 03:39:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C57568BD917
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 03:40:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43BC41F22F21
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 01:39:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81D2428307F
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 01:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53E633FE4;
-	Tue,  7 May 2024 01:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02EB246A4;
+	Tue,  7 May 2024 01:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LSCcqLyL"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Xzm0fw1k"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D715F1366;
-	Tue,  7 May 2024 01:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624361FA5
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 01:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715045984; cv=none; b=ZE41oG8ejF+cRjhGplEq5CNgxfcWvu8CcW3bLOGELVVQpQ3Bt9197CCdSjGKiDTxKKlFGKnBBjgFBSWFDjW2yKAUP52BrgxmOWn8ohQ/+Ai0QLAvFsqct11ilr9fmWOOpiGMb0KUbAxvv0DxQob9ss7ONaKgKDYVHO5L2F5ENOc=
+	t=1715046006; cv=none; b=hVzhKGvYwSLaxG/J+wZ3HSQ0Jxpi8Soy9JVLHNTbaHw88KTKntMm6bFRF+VrtFJvFyJPxbmMJ5aqwu+XSrdlyvLmU8KS2FDAbQoUSy0u1+77i355D2LRqaXywEUNxKtNN8friCsqnZKmGXx8b0tvsuor3wencvpEN34C51/mH+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715045984; c=relaxed/simple;
-	bh=E7ARgkhEsohvSTW2NzXTQRNpgaQd8EYbT7I4/e0wuUM=;
+	s=arc-20240116; t=1715046006; c=relaxed/simple;
+	bh=XwFqs7H9duiL5Kq6JnyeSZY601RSrLaRvUN7CY94yI4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k2cvFpUEtkmgD+lFf1+3mUflam6OZI44Gc6TjQkncSUsye6menj3nOxCHw2mkthvlUm7V8/0ntVMViptjAWwPwK7Q57kePMLy8/0rQr4KBez7xaO+2ikcKyL83WB+1Jy59A+qVHgWU91m6mrMosqg/0h6Iak2qQH4/rzNiQ44IQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LSCcqLyL; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=FXNp/q3EFc3VE1kfKaNpKliwa/x0VAgfl7uuP2pqXyQ=; b=LSCcqLyL687THwltEsK2assb/C
-	3b7ONr5S/NsGuqh95g8ETyeP8w5OHcpqHaLc0f2gSm96GX23H4LOiSdNTsy6ncwZBxO9IgDWduXRi
-	lTK3xu1MszAdGGQ3vtJ9d79ef6EE0jwM9E5+NQvD9ImJeGApkoQnF+02/XeRajB/S1RA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s49nd-00EoM8-2p; Tue, 07 May 2024 03:39:21 +0200
-Date: Tue, 7 May 2024 03:39:21 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ricky Wu <en-wei.wu@canonical.com>
-Cc: jesse.brandeburg@intel.co, anthony.l.nguyen@intel.com,
-	intel-wired-lan@lists.osuosl.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	rickywu0421@gmail.com
-Subject: Re: [PATCH] e1000e: fix link fluctuations problem
-Message-ID: <f47e0bb6-fb3f-4d0e-923a-cdb5469b6cbe@lunn.ch>
-References: <20240502091215.13068-1-en-wei.wu@canonical.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kbjnp80TOP1sbAMr9gV5kHxYRzd4sZRANT93wprhyQwiqCXE/g89ESwRN4lf9UFJBpk9bYoepFV5+GtTkshJW7iIgMqWTu2unROq6gp51dPxXH0aTy9A+uYz+BzS9Ho8kaPY94rn+cqyHapY5x9XZsINQf45W/3XvYkO66Z+wg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Xzm0fw1k; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1ec41d82b8bso24113925ad.2
+        for <netdev@vger.kernel.org>; Mon, 06 May 2024 18:40:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1715046004; x=1715650804; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hzLw+wrhd4HeF6P/SeLSLWJ4Lt1ry+nUaNYpeb2dTV8=;
+        b=Xzm0fw1ky7ZhLQusgeOgaO19ghvAsmRF0HurEqVpb2Sadbia6uIETFg+tPKJlQFT/Y
+         S6x/E1ZvODDBM8dj8ivAOsam8y+QQVOV3tYAKnob9Tx9Dhg+Qp+Cqzj7jlk6EhDFXefY
+         yp4rR/e5SH8yS1arL5roVmj4TukI04yVEYs9s=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715046004; x=1715650804;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hzLw+wrhd4HeF6P/SeLSLWJ4Lt1ry+nUaNYpeb2dTV8=;
+        b=R0AY8eCfalX5cebwgm2A928UIUnzvemxHStduXvK6rfuXNdssIrDBVQGXwhhX3n0De
+         ZAQu8mqLBcMN34wB0vk3NMsWwLkKiRDuyyGJd8FOTvF4Iv6SOeQxaiLhO3nZhvlRyYdG
+         pT75KiOUFkhju29K4KdggsqXXmxpi49q7d/ZwdclzFB43dd36lkw7D4SKBEAQtS9bVdJ
+         bjqz5heaTzZEOFnYCeg2NplnlRHyKj05+wBb8tuSpseyBrnwCSYsVpJsu5EU5iFr84zO
+         cC7gKt15MV6/cAxCxL3+sTwXihuSW49V22/gsVhUoVwoXxy7qxdGdg8ceMM2EzuqHdkf
+         d3sw==
+X-Forwarded-Encrypted: i=1; AJvYcCVTY4nDOJZ86PRfqyScIjDtnT8KH1BFg133dFslq3PRSJKjJgncB2u9ocaHaBJSAIH96A0obR5w/Q5R1YBMgsyp07Cp58JA
+X-Gm-Message-State: AOJu0Yy0RmQ+rySLxjptEIz8N5SS39f7Faj9DUDwaW860/6p/jaG2vPb
+	82nDmqBvWufP+Os1y3rU0F59omc79C/RiPKkue9u1P9TRu5tNNMXBAopXLP3aIU=
+X-Google-Smtp-Source: AGHT+IE2hS3Ty1wgX0OolAQ+BEaLPzbJ71bQ/5H3QBdVZpMmvE3sG0x9J34Rt+wP+t9UBfHPmoBANA==
+X-Received: by 2002:a17:902:d3d3:b0:1ec:e3c2:790e with SMTP id w19-20020a170902d3d300b001ece3c2790emr12536876plb.19.1715046004243;
+        Mon, 06 May 2024 18:40:04 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id n10-20020a170902e54a00b001e29c4b7bd2sm8961427plf.240.2024.05.06.18.40.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 May 2024 18:40:03 -0700 (PDT)
+Date: Mon, 6 May 2024 18:40:00 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, nalramli@fastly.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH net-next v2] selftest: epoll_busy_poll: epoll busy poll
+ tests
+Message-ID: <ZjmGcPrxhm3mZnCS@LQ3V64L9R2>
+References: <20240506205326.70502-1-jdamato@fastly.com>
+ <20240506181254.09f10699@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,18 +84,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240502091215.13068-1-en-wei.wu@canonical.com>
+In-Reply-To: <20240506181254.09f10699@kernel.org>
 
-On Thu, May 02, 2024 at 05:12:15PM +0800, Ricky Wu wrote:
-> As described in https://bugzilla.kernel.org/show_bug.cgi?id=218642,
-> some e1000e NIC reports link up -> link down -> link up when hog-plugging
-> the Ethernet cable.
+On Mon, May 06, 2024 at 06:12:54PM -0700, Jakub Kicinski wrote:
+> On Mon,  6 May 2024 20:53:22 +0000 Joe Damato wrote:
+> > Add a simple test for the epoll busy poll ioctls, using the kernel
+> > selftest harness.
+> > 
+> > This test ensures that the ioctls have the expected return codes and
+> > that the kernel properly gets and sets epoll busy poll parameters.
+> > 
+> > The test can be expanded in the future to do real busy polling (provided
+> > another machine to act as the client is available).
 > 
-> The problem is because the unstable behavior of Link Status bit in
-> PHY Status Register of some e1000e NIC.
+> Hm, we get:
+> 
+> # timeout set to 3600
+> # selftests: net: epoll_busy_poll
+> # TAP version 13
+> # 1..5
+> # # Starting 5 tests from 2 test cases.
+> # #  RUN           invalid_fd.test_invalid_fd ...
+> # #            OK  invalid_fd.test_invalid_fd
+> # ok 1 invalid_fd.test_invalid_fd
+> # #  RUN           epoll_busy_poll.test_get_params ...
+> # #            OK  epoll_busy_poll.test_get_params
+> # ok 2 epoll_busy_poll.test_get_params
+> # #  RUN           epoll_busy_poll.test_set_invalid ...
+> # # epoll_busy_poll.c:204:test_set_invalid:Expected -1 (-1) == ret (0)
+> # # epoll_busy_poll.c:205:test_set_invalid:EPIOCSPARAMS should error busy_poll_budget > NAPI_POLL_WEIGHT
+> # # epoll_busy_poll.c:207:test_set_invalid:Expected EPERM (1) == errno (22)
+> # # epoll_busy_poll.c:208:test_set_invalid:EPIOCSPARAMS errno should be EPERM busy_poll_budget > NAPI_POLL_WEIGHT
+> # # test_set_invalid: Test failed
+> # #          FAIL  epoll_busy_poll.test_set_invalid
+> # not ok 3 epoll_busy_poll.test_set_invalid
+> # #  RUN           epoll_busy_poll.test_set_and_get_valid ...
+> # #            OK  epoll_busy_poll.test_set_and_get_valid
+> # ok 4 epoll_busy_poll.test_set_and_get_valid
+> # #  RUN           epoll_busy_poll.test_invalid_ioctl ...
+> # #            OK  epoll_busy_poll.test_invalid_ioctl
+> # ok 5 epoll_busy_poll.test_invalid_ioctl
+> 
+> https://netdev-3.bots.linux.dev/vmksft-net/results/584001/98-epoll-busy-poll/stdout
 
-Why PHY is this? It might be the PHY manufacture has an errata, since
-this is probably not the MAC causing the problem, but the PHY itself.
+Ah, sorry -- this is because I had assumed the test would run without
+CAP_NET_ADMIN, but since:
 
-	Andrew
+  epoll_busy_poll.c:204:test_set_invalid:Expected -1 (-1) == ret (0)
+
+succeeds (ret = 0), clearly I am mistaken. Sorry about that.
+
+I think I'll spin up a v3 and I'll add a test with and without
+CAP_NET_ADMIN to check both cases, which would probably be better anyway.
 
