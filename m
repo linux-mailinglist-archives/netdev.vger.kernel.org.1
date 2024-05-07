@@ -1,175 +1,185 @@
-Return-Path: <netdev+bounces-94265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73BDD8BEE63
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 22:52:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE89C8BEE6A
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 22:54:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96A541C22029
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 20:52:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 735E92841AF
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 20:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6759F57898;
-	Tue,  7 May 2024 20:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E555786E;
+	Tue,  7 May 2024 20:54:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hivFTRQ1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oFNEz7Ik"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBAE6187353;
-	Tue,  7 May 2024 20:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675A120315;
+	Tue,  7 May 2024 20:54:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715115124; cv=none; b=T71EJlxTQ32EICOI4wQPRMrjQaV8JZOxT6Ol9INPan+PESGewiarOrQUdC95Hdi6GzYcMTxUXD4g9m4e/hxeVPLacq9giI14L2ZWnlwI+o43nDx3OF5ckvhWakuZ5FUBI1rRv7d5ShadMFlVXMRs3M7xHI0xrAA8y+xPgeVKzEA=
+	t=1715115292; cv=none; b=t5fYkl17nmsqDYwx78p+bBV6VZZTsp9gTP2vwKdnghdhe2VlGr26uxhCmSEUJw3N2vxb1/0/HKw6Gsl86Xqwca97/r3OBdU72hCZI2wVC9Xa+cnUWaevLDEudk84YT2fTwLJ2OaAEOm1K7PkjYWj1ON2Ac8FeSwIRz2Tm4SmX48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715115124; c=relaxed/simple;
-	bh=b8UZ2RsJ1KvRwNE/4/qun7NqMNi9/Ak7SZwXxlqtD5E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J9pRjKyQiNn8dZmoasPGruBMpZlKQ5l9/Y9miIO3QCpTuF0v2y/N+VxxQrNi2OfX33dKUx1uSlyPEoreW1RUKTfBKtkJA3XI3JKhfMQRTpsOfeso6kc9E5zRI70XopSmQOn8tdAiqhqy8XoIUb06L4yY6S3rpWejjbETBsGIdRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hivFTRQ1; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-34f0e55787aso1973011f8f.2;
-        Tue, 07 May 2024 13:52:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715115120; x=1715719920; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qdcR2a16esVT3UB13Wto/4zRmwQIrll7yYTlz1PQXa8=;
-        b=hivFTRQ1huyE+NCd428B/jvRiaUVey7DtoY4duh1oTE/7nFH3Ke53YiZrFXCpeDLpo
-         xwzhgDoPhnxA5OkXtVqFRyIZ6IZPoFGuMI73TpMzHxHRpcUxdVkrsX2fhTO9TY9YHVeB
-         UI52nlJLt4vX5jCRL45dyHtyBaTkcidP3BKqYXcz4K+OTGK+VTRkpkAjRWihvJH7UdF7
-         YSEeIS9m7/YG+1m+RH25SywwaCNovK+51E8IMhr0C8K+wXs9H42dp+ruDDb2zlsssr4u
-         6OPBN2YR7Bf+Q83/cyS5qxO0u8gHMWdNE+7KN7blntCJ1nZ9iIfEtf4y+T7KYdzFcqYD
-         21tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715115120; x=1715719920;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qdcR2a16esVT3UB13Wto/4zRmwQIrll7yYTlz1PQXa8=;
-        b=J4beitXZdLy2O1OKoVaSZTWCadg+ncBVE4g0hIjbZjxDMP+jfEGGqL/oDHzCZC5AtA
-         5aNWWfARRs6Q8olWkh3WdhX9eRCHDDZvvtMwRSQjp4pY47Y24ox6yVjcSi3SFQB4Fe8X
-         ppOBXs2rGxl/w4QgNwACB6frtHWAqwWhMWUV6ds+R/OB5drohJ7RCrQ83B72/bZZk3Lv
-         4h/npxjwDT6zPNDHhCCMBFuSrGaWMxtMjhG5jkSfYLEK9As4tKkk+BZ1rlZRxZrv1LDn
-         HzeaSIF+w3ncufDcjP8HLs43hIqA2kS0rgaIsgEcNYWCp/ji/Gkb4anWqhhWl/6OzNMl
-         q0dw==
-X-Forwarded-Encrypted: i=1; AJvYcCWEAJjE1Igtb6yVqoA4DNawhh1E7OIMBldNEcaf7DF/oH4rY5lgA0NsdLBGkyEni29QbkF2kQ5NKugXT+palOJnB5n5hjCJNcleiLlVtWbl8zj/Yodh29+WzJ0zg9D9imlJkIBl7EIfJujAnFyUEgINS9ppNr+1qWk+UG8UkTb6MwsZlBO9ULB+UuTGqMUpliQpLkP2V/E8Md/l
-X-Gm-Message-State: AOJu0YwomNR/mgfvLvQ3pX3Ad/R2DyWhjhsqBZ9OdGmVu93jfIhZO8la
-	QEo6t7yPrYSV73rFwQsrnBUk6D4Dx7PSjCoEaJcI2dWgvIrKhfBMhd79WCZxM/rZLG6W0JO+6ZK
-	FQSG1mJErpf3JCkN9GY3EHtkECJM=
-X-Google-Smtp-Source: AGHT+IEupALi3YmwRAFNO89hfoLq5x2UZOxByq4dlLEg5tUq6l7C9/2mHmwsQr3MawIVxEWxb4cV0A1MmIur9qWOZgc=
-X-Received: by 2002:a5d:6e55:0:b0:34a:3f3d:bb14 with SMTP id
- ffacd0b85a97d-34fca242709mr600329f8f.27.1715115119939; Tue, 07 May 2024
- 13:51:59 -0700 (PDT)
+	s=arc-20240116; t=1715115292; c=relaxed/simple;
+	bh=ByjaozowwXMBmPG6teJv9IpV569M7F1fPCHE8e+B4o0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uXM32ULzpbOaLQTZG6floxGwlh6EjCjiirubt8E2Jl59OyMRf6yVR3L8BhzM9HQZsEDWtfkvUuIwt/fY14dPktEexHThM1LBxbawlU8K3HMW96O1qxwniMhe+1TseHp3wmve5voZrLQGoXjjgueoxm+Dz4fcM5c/BHFBnrUVmtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oFNEz7Ik; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715115290; x=1746651290;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ByjaozowwXMBmPG6teJv9IpV569M7F1fPCHE8e+B4o0=;
+  b=oFNEz7IkNj2GgvOXF2r6CAmWNiV+j6sDa+t9kKnDzsV5YecKdDhhLnwI
+   K7l1oXbCivtymBjo6f1UF032gqZlZ2SILa2YJc3KRzTuy+My7rZFdSBtC
+   mLua8B91K4R26m/dWSB4f3nJAkdDrICJ7fS6tBeqJBChESPAl8ED0Ut1P
+   iSH/MeKiQqmQvWXgH1z0fuVoLVNdMHk3vjaqpl1ykaAgRjFAlDiqxn44F
+   z6i+Lnk3I6QgIrLRPgk/eXRgVxAabbrILOLik2ecwxoPTnopec6jyreBC
+   pq/wCYCELTGLiH+4KUmF2yhLP29dcDeja/LdHxlqDgoyLNcqMwZRjW7Hx
+   g==;
+X-CSE-ConnectionGUID: 8Mg4w7WSRTiCB/9yfUidIA==
+X-CSE-MsgGUID: qvaYYkptSFqtgcd5jD8Vtw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="21547342"
+X-IronPort-AV: E=Sophos;i="6.08,143,1712646000"; 
+   d="scan'208";a="21547342"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 13:54:49 -0700
+X-CSE-ConnectionGUID: XdIgqTA6QnCcgd6HpXiE8Q==
+X-CSE-MsgGUID: bXqcioePQBKRkpCvFvxQiQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,143,1712646000"; 
+   d="scan'208";a="28615166"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa008.fm.intel.com with ESMTP; 07 May 2024 13:54:49 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
+	anthony.l.nguyen@intel.com,
+	richardcochran@gmail.com,
+	peterz@infradead.org,
+	linux-kernel@vger.kernel.org,
+	Arpana Arland <arpanax.arland@intel.com>
+Subject: [PATCH net-next] ice: add and use roundup_u64 instead of open coding equivalent
+Date: Tue,  7 May 2024 13:54:39 -0700
+Message-ID: <20240507205441.1657884-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240507-upstream-bpf-next-20240506-mptcp-subflow-test-v1-0-e2bcbdf49857@kernel.org>
- <20240507-upstream-bpf-next-20240506-mptcp-subflow-test-v1-2-e2bcbdf49857@kernel.org>
- <CAADnVQJ5-APFxMeGsUDSWBsiAbhJGivs=fBUapgYEFNHgnEVeA@mail.gmail.com> <d28dec16-9029-42f5-b979-a0f11656a991@kernel.org>
-In-Reply-To: <d28dec16-9029-42f5-b979-a0f11656a991@kernel.org>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 7 May 2024 13:51:48 -0700
-Message-ID: <CAADnVQJM73g9gTq3GxR-RMmpJPK3DGgzUTQiJXjz_B1G_4JAAw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 2/4] selftests/bpf: Add RUN_MPTCP_TEST macro
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: MPTCP Upstream <mptcp@lists.linux.dev>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Geliang Tang <tanggeliang@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 7, 2024 at 9:02=E2=80=AFAM Matthieu Baerts <matttbe@kernel.org>=
- wrote:
->
-> Hi Alexei,
->
-> Thank you for the review!
->
-> On 07/05/2024 16:44, Alexei Starovoitov wrote:
-> > On Tue, May 7, 2024 at 3:53=E2=80=AFAM Matthieu Baerts (NGI0)
-> > <matttbe@kernel.org> wrote:
-> >>
-> >> From: Geliang Tang <tanggeliang@kylinos.cn>
-> >>
-> >> Each MPTCP subtest tests test__start_subtest(suffix), then invokes
-> >> test_suffix(). It makes sense to add a new macro RUN_MPTCP_TEST to
-> >> simpolify the code.
-> >>
-> >> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> >> Reviewed-by: Mat Martineau <martineau@kernel.org>
-> >> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> >> ---
-> >>  tools/testing/selftests/bpf/prog_tests/mptcp.c | 12 ++++++++----
-> >>  1 file changed, 8 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/te=
-sting/selftests/bpf/prog_tests/mptcp.c
-> >> index baf976a7a1dd..9d1b255bb654 100644
-> >> --- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> >> +++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> >> @@ -347,10 +347,14 @@ static void test_mptcpify(void)
-> >>         close(cgroup_fd);
-> >>  }
-> >>
-> >> +#define RUN_MPTCP_TEST(suffix)                                 \
-> >> +do {                                                           \
-> >> +       if (test__start_subtest(#suffix))                       \
-> >> +               test_##suffix();                                \
-> >> +} while (0)
-> >
-> > Please no.
-> > Don't hide it behind macros.
->
-> I understand, I'm personally not a big fan of hiding code being a macro
-> too. This one saves only one line. Geliang added a few more tests in our
-> tree [1], for a total of 9, so that's only saving 9 lines.
->
-> Related to that, if you don't mind, Geliang also added another macro --
-> MPTCP_SCHED_TEST -- for tests that are currently only in our tree [2]
-> (not ready yet). We asked him to reduce the size of this macro to the
-> minimum. We accepted it because it removed quite a lot of similar code
-> with very small differences [3]. Do you think we should revert this
-> modification too?
+From: Jacob Keller <jacob.e.keller@intel.com>
 
-Yeah. Pls don't hide such things in macros.
-Refactor into helper function in normal C.
+In ice_ptp_cfg_clkout(), the ice driver needs to calculate the nearest next
+second of a current time value specified in nanoseconds. It implements this
+using div64_u64, because the time value is a u64. It could use div_u64
+since NSEC_PER_SEC is smaller than 32-bits.
 
-But, what do you mean "in your tree" ?
-That's your development tree and you plan to send all that
-properly as patches to bpf-next someday?
+Ideally this would be implemented directly with roundup(), but that can't
+work on all platforms due to a division which requires using the specific
+macros and functions due to platform restrictions, and to ensure that the
+most appropriate and fast instructions are used.
 
->
-> [1]
-> https://github.com/multipath-tcp/mptcp_net-next/blob/4369d9cbd752e166961a=
-c0db7f85886111606301/tools/testing/selftests/bpf/prog_tests/mptcp.c#L578-L5=
-95
->
-> [2]
-> https://github.com/multipath-tcp/mptcp_net-next/blob/4369d9cbd752e166961a=
-c0db7f85886111606301/tools/testing/selftests/bpf/prog_tests/mptcp.c#L559-L5=
-76
->
-> [3]
-> https://lore.kernel.org/mptcp/cover.1713321357.git.tanggeliang@kylinos.cn=
-/T/#m0b9c14f1cbae8653c6fd119f6b71d1797961d6ba
->
-> Cheers,
-> Matt
-> --
-> Sponsored by the NGI0 Core fund.
->
+The kernel doesn't currently provide any 64-bit equivalents for doing
+roundup. Attempting to use roundup() on a 32-bit platform will result in a
+link failure due to not having a direct 64-bit division.
+
+The closest equivalent for this is DIV64_U64_ROUND_UP, which does a
+division always rounding up. However, this only computes the division, and
+forces use of the div64_u64 in cases where the divisor is a 32bit value and
+could make use of div_u64.
+
+Introduce DIV_U64_ROUND_UP based on div_u64, and then use it to implement
+roundup_u64 which takes a u64 input value and a u32 rounding value.
+
+The name roundup_u64 matches the naming scheme of div_u64, and future
+patches could implement roundup64_u64 if they need to round by a multiple
+that is greater than 32-bits.
+
+Replace the logic in ice_ptp.c which does this equivalent with the newly
+added roundup_u64.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp.c |  3 +--
+ include/linux/math64.h                   | 29 ++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 0f17fc1181d2..a95af8d638a0 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -1714,8 +1714,7 @@ static int ice_ptp_cfg_clkout(struct ice_pf *pf, unsigned int chan,
+ 	 * maintaining phase
+ 	 */
+ 	if (start_time < current_time)
+-		start_time = div64_u64(current_time + NSEC_PER_SEC - 1,
+-				       NSEC_PER_SEC) * NSEC_PER_SEC + phase;
++		start_time = roundup_u64(current_time, NSEC_PER_SEC) + phase;
+ 
+ 	if (ice_is_e810(hw))
+ 		start_time -= E810_OUT_PROP_DELAY_NS;
+diff --git a/include/linux/math64.h b/include/linux/math64.h
+index bf74478926d4..553043ebf4cc 100644
+--- a/include/linux/math64.h
++++ b/include/linux/math64.h
+@@ -301,6 +301,19 @@ u64 mul_u64_u64_div_u64(u64 a, u64 mul, u64 div);
+ #define DIV64_U64_ROUND_UP(ll, d)	\
+ 	({ u64 _tmp = (d); div64_u64((ll) + _tmp - 1, _tmp); })
+ 
++/**
++ * DIV_U64_ROUND_UP - unsigned 64bit divide with 32bit divisor rounded up
++ * @ll: unsigned 64bit dividend
++ * @d: unsigned 32bit divisor
++ *
++ * Divide unsigned 64bit dividend by unsigned 32bit divisor
++ * and round up.
++ *
++ * Return: dividend / divisor rounded up
++ */
++#define DIV_U64_ROUND_UP(ll, d)		\
++	({ u32 _tmp = (d); div_u64((ll) + _tmp - 1, _tmp); })
++
+ /**
+  * DIV64_U64_ROUND_CLOSEST - unsigned 64bit divide with 64bit divisor rounded to nearest integer
+  * @dividend: unsigned 64bit dividend
+@@ -346,4 +359,20 @@ u64 mul_u64_u64_div_u64(u64 a, u64 mul, u64 div);
+ 		div_s64((__x - (__d / 2)), __d);	\
+ }							\
+ )
++
++/**
++ * roundup_u64 - Round up a 64bit value to the next specified 32bit multiple
++ * @x: the value to up
++ * @y: 32bit multiple to round up to
++ * @y: multiple to round up to
++ *
++ * Rounds @x to the next multiple of @y. For 32bit @x values, see roundup and
++ * the faster round_up() for powers of 2.
++ *
++ * Return: rounded up value
++ */
++static inline u64 roundup_u64(u64 x, u32 y)
++{
++	return DIV_U64_ROUND_UP(x, y) * y;
++}
+ #endif /* _LINUX_MATH64_H */
+-- 
+2.41.0
+
 
