@@ -1,94 +1,50 @@
-Return-Path: <netdev+bounces-93923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CAF48BD985
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 04:48:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47C858BD98B
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 04:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE4D61C21068
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 02:48:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 828D81C20F9D
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 02:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77BEC4C618;
-	Tue,  7 May 2024 02:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0003821101;
+	Tue,  7 May 2024 02:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CMibQX2X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aobyJvp9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8BB3D0AF;
-	Tue,  7 May 2024 02:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB3646A4
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 02:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715050086; cv=none; b=goNB127yTDQbCHPpjgzccFTb1GPSF19dXhYTEDGA1gyj4LS3oDZJTuwnNRVQLzyKaS/zgDRdA8YsoM5ZQ6xGQM7/j2FkWC52RiFCVVvDmITTzK85fxL3OC1I2H9dwSXvO1WRCM/PhuAVenW8s9GCioQ85QMDfsdT+r3H49Uf77E=
+	t=1715050226; cv=none; b=r9pJb3pajFazzg2Lw0a1EjtVcsML98g32rsvaBqRjTlfO+Yfz2+C4OE1u1KB8Xz0fL2rjPhx9VljhtswiTnUdSPN//oZ/++GOLSKc+zlZKlKd5GUaFZNvfwajYL6fNUrDmKVgLPR2bMiCnnSL9KZTeHHwwMZWst0Bpz0dWerDW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715050086; c=relaxed/simple;
-	bh=fPoxLXJ3y4JvA0eBPT3hLbERZiBjchIAQdBby/myRK4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Fuf8AHdwUZriMw+rMyFn0mXwy6764OHPz0I2XHTHtZz1y7byV7wepNgSDzspoqknG5WIn2AP8OoM2Oalx7+6uPP1pKxYq2dKzJrUGzcxQWcX4EKffBp7JFL9YEXFCa3pOODeYx8YiwGyXcyYz47LaZUspLZAa49kbbk56tx01PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CMibQX2X; arc=none smtp.client-ip=209.85.160.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-23d477a1a4fso1981399fac.3;
-        Mon, 06 May 2024 19:48:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715050084; x=1715654884; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B+2Yi0bAJKr/RmDXQertnEjM4vkBzvytl6JH2ermaTQ=;
-        b=CMibQX2XPZiifiivkDaPuvRldqwng7gnGLxitt1IN9O8hm7lNjJDBJNkXBK5x11bma
-         2ye76lE04AT+rG0plJQ0EecSRjqYxUtAxshEH4MCulU4wPL7eYCpxCG6QRiSohoffyqt
-         0LUtDpBoVyONTpWrrQnYqZFw01t4wP27fGKmPkREOQj7PV6Mrzovr72hkkUu4MuA6Kia
-         fqQT19ZR3U7LMt9KDiwoI4gIhUNu5N8Y267p2blCK6PZpgKB8ByjhvKVPRR90jb5dpx7
-         iytnxEtbc6pSHsqm+uCUWcY0bVOq7ielZQzWIBLHhTAtEsBP6ihf0Yf5qpYYyqjvfP9G
-         IfkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715050084; x=1715654884;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B+2Yi0bAJKr/RmDXQertnEjM4vkBzvytl6JH2ermaTQ=;
-        b=DFrO7TppBD1BYo6JAFr/1omUydGT2pGDbh5aza6D8xuma/JJWs6p16nIckkuXRjgcu
-         QGTGiGflharBTudkPPYo4aufodAHUxSF4mmg1qH89JIkKg6tIEnTwxt5J6YFwrD4m/kx
-         V8RHtmExZwRHI9D2IUdS3Xl5rAAK4N/OIr8GlEiJi9QfSmxnGJ/lFTEhsAurijUIXyy3
-         4C3S1ox533h3iE8u4Z9EAKLubAUUoyEKTsK90dAza08K0g6PHWJwynAmHwhfq/TgdhPQ
-         9/B0rorfbZIKqX+gZ4W9/n216Gc93mZ41ZKUIpyTUAdO/u1q3bxZydQQB4uSf2OLRwW+
-         62DA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTb/hn8K15qgH9EVNOJLPZfp1TOtlG0xZFcNb9/Y82BVv6myXts1v5Wpv9xWIfVp12qsPmt8+QBK3XeKjUnhKT40NTqQOyRiBMEnbc2eH4PJl3jaiPUCB5tga0DjlnDnWjbOrqkvDvrfVQuLJGvZf/O5fUEBB+vSBWQ7C4bWG3pnYsHgshEihZcMWG6QNyKTFMc+iV/cBu9MKAJmZO0zM=
-X-Gm-Message-State: AOJu0Yz9tV9SxG6/73aLABXj8MXzjctpBfD6qdFFooRxsaFnGTV3yMI/
-	5MdLsErh4158U1I9h3Bn5JTNNpDGdCxcgnAk9hjiuztze3uZbRXw
-X-Google-Smtp-Source: AGHT+IEJtWYKDRvNU/yVKOg4A3pz537ZV2ldoO1wACQTYe6gsoPCrXTTJ5sVgICq2SqIVXCsWUaWZg==
-X-Received: by 2002:a05:6871:7410:b0:23c:737f:5bcf with SMTP id nw16-20020a056871741000b0023c737f5bcfmr16880218oac.8.1715050084160;
-        Mon, 06 May 2024 19:48:04 -0700 (PDT)
-Received: from nukework.lan (c-98-197-58-203.hsd1.tx.comcast.net. [98.197.58.203])
-        by smtp.gmail.com with ESMTPSA id hg13-20020a056870790d00b002396fd308basm2333895oab.35.2024.05.06.19.48.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 May 2024 19:48:03 -0700 (PDT)
-From: Alexandru Gagniuc <mr.nuke.me@gmail.com>
-To: Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>,
-	linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Alexandru Gagniuc <mr.nuke.me@gmail.com>
-Subject: [PATCH v2 2/2] arm64: dts: qcom: ipq9574: add MDIO bus
-Date: Mon,  6 May 2024 21:47:58 -0500
-Message-Id: <20240507024758.2810514-2-mr.nuke.me@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240507024758.2810514-1-mr.nuke.me@gmail.com>
-References: <20240507024758.2810514-1-mr.nuke.me@gmail.com>
+	s=arc-20240116; t=1715050226; c=relaxed/simple;
+	bh=s+62aNLSXkNgkxlR2lRfNBxI8xrcPSPgM4YRPAgxLLA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Cc3J5F7OIWFqOBiFkj8DLQq3SLR/jfuzMi1obBxwCizj7TbbNVogzDBTT3LqQt3hK0qkj4yyy5FUhg0WEiruWB2qPyWkIz3/I/riY73qUy6PHrrGAEpWVytdXZS/YUVTNSxGFJL8oT7TSk2VYHzkFbYKZIyxQQAGl0C6zDOdXUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aobyJvp9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5C4D0C4AF18;
+	Tue,  7 May 2024 02:50:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715050226;
+	bh=s+62aNLSXkNgkxlR2lRfNBxI8xrcPSPgM4YRPAgxLLA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=aobyJvp9gw1wF+hm+9sM6ywZU6zTsqIqH+dh7xKcRnT/mnqAY7srvv5IIr4KZoUTI
+	 VPcutFNbHSNvCn/OR0h6llHMl+VRHSw1gwX0/xsoWa5VnFbspmjbQPHDo2yVxjz+Y4
+	 P6kIvWSdSFYCGHcmDYm3lTtkt+SZjeh7DVggGqlJ3JGAvTwmFTk+H6qbLjFnSW4LIF
+	 ls1+fb/4eg16rwuBzwyRk2ZRICH6BBOrJj6RrjcloOLhC64cjdwu/3mPzmmJHvdz3e
+	 9Y3Zvc7IzmuZjjlK7FRcKGURfiRjt3T3+tQcct3r326oLZVnGUonnpDHbbhjTntgTl
+	 a3N6sfX2uxyiw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4C3DAC43337;
+	Tue,  7 May 2024 02:50:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,40 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v1] netlink: specs: Add missing bridge linkinfo attrs
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171505022630.7000.13115007485294763859.git-patchwork-notify@kernel.org>
+Date: Tue, 07 May 2024 02:50:26 +0000
+References: <20240503164304.87427-1-donald.hunter@gmail.com>
+In-Reply-To: <20240503164304.87427-1-donald.hunter@gmail.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, jiri@resnulli.us,
+ jacob.e.keller@intel.com, jnixdorf-oss@avm.de, idosch@nvidia.com,
+ razor@blackwall.org, donald.hunter@redhat.com
 
-The IPQ95xx uses an IPQ4019 compatible MDIO controller that is already
-supported. Add a DT node to expose it.
+Hello:
 
-Signed-off-by: Alexandru Gagniuc <mr.nuke.me@gmail.com>
----
-changes since v1:
- - pad "reg" address to eight digits with leading zeroes
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
- arch/arm64/boot/dts/qcom/ipq9574.dtsi | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+On Fri,  3 May 2024 17:43:04 +0100 you wrote:
+> Attributes for FDB learned entries were added to the if_link netlink api
+> for bridge linkinfo but are missing from the rt_link.yaml spec. Add the
+> missing attributes to the spec.
+> 
+> Fixes: ddd1ad68826d ("net: bridge: Add netlink knobs for number / max learned FDB entries")
+> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+> 
+> [...]
 
-diff --git a/arch/arm64/boot/dts/qcom/ipq9574.dtsi b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
-index 7f2e5cbf3bbb..ded02bc39275 100644
---- a/arch/arm64/boot/dts/qcom/ipq9574.dtsi
-+++ b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
-@@ -232,6 +232,16 @@ rng: rng@e3000 {
- 			clock-names = "core";
- 		};
+Here is the summary with links:
+  - [net,v1] netlink: specs: Add missing bridge linkinfo attrs
+    https://git.kernel.org/netdev/net/c/9adcac650618
 
-+		mdio: mdio@90000 {
-+			compatible =  "qcom,ipq9574-mdio", "qcom,ipq4019-mdio";
-+			reg = <0x00090000 0x64>;
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			clocks = <&gcc GCC_MDIO_AHB_CLK>;
-+			clock-names = "gcc_mdio_ahb_clk";
-+			status = "disabled";
-+		};
-+
- 		qfprom: efuse@a4000 {
- 			compatible = "qcom,ipq9574-qfprom", "qcom,qfprom";
- 			reg = <0x000a4000 0x5a1>;
---
-2.40.1
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
