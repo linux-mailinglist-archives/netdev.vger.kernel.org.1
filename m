@@ -1,83 +1,103 @@
-Return-Path: <netdev+bounces-93929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC9338BD9C2
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 05:37:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 103888BD9BE
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 05:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 762371F2307F
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 03:37:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6A0B1F2320F
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 03:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1743A1C7;
-	Tue,  7 May 2024 03:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b="gh5OC/nW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18FE2A8DD;
+	Tue,  7 May 2024 03:33:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp65.iad3b.emailsrvr.com (smtp65.iad3b.emailsrvr.com [146.20.161.65])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB94E1EB5E
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 03:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=146.20.161.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78D14C94;
+	Tue,  7 May 2024 03:32:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715053023; cv=none; b=UaKQSIFc4RVADZaSm4Beh0zP7a63+ogoo8sBrS6Iuv2BLXH5Eo6sRYOLmpYM/KmJ7ek4MfbDVTbwHd2XxJ//ZAJgA5rwHCc41lNcWmDeDW8KZ2DCoc/3yDR5CEqEnlh715ZlK1tYf3hUwx976pun864HRem8TQXfSzCDblfVqW0=
+	t=1715052782; cv=none; b=UdXsZFb3e8dF/BrqTRQHpsc7mYXPVnjvwha9m7ZXC0HHUnpEdtGh0Qw7jPkR87hcY+WK0C1apNdx2CpJQ1QpcVRiZqpBxN3evFD/cGNUHBRt89n5p3I+/Fsg0FvFhYWn6vvosrn2sLtGarmp1A4vSjFUvPVaq7yUUq5MF53tyhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715053023; c=relaxed/simple;
-	bh=cWMEq59X7zXzL3nJa3BLDmbI7tPBBw3giwZaDz3gBLI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QVr6WziMHGfRyvilfQ1QrL4PsEPhFImB5uKo645NuwOE4saQX1XwW6Yss9xOUFadDTovqXvrC3SBLdFej7G69WuIxrnagLhn/XUVQjLZAnQdWfFos7T0ykFSKuIrN2ZYhX6jcx4UWYUXEZk1bPpCHspf1B2JUaQCztOiaiR5YFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com; spf=pass smtp.mailfrom=oddbit.com; dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b=gh5OC/nW; arc=none smtp.client-ip=146.20.161.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oddbit.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=oddbit.com;
-	s=20180920-g2b7aziw; t=1715051887;
-	bh=cWMEq59X7zXzL3nJa3BLDmbI7tPBBw3giwZaDz3gBLI=;
-	h=Date:From:To:Subject:From;
-	b=gh5OC/nWu2m+qCk6m0PPZVQuqzfvydgDIjESDhRMMppqckZ/n5+QjiJhRy4hCYjND
-	 59EjcycsEBuXz4t8EnBMrx/7wNVNtkJSZcs+vaPEmElxiYNIXw8Slbu5ct7020lsLA
-	 IchtCetQlquQGfB2uJiffbK2EpbEY9NblZGnzfX8=
-X-Auth-ID: lars@oddbit.com
-Received: by smtp17.relay.iad3b.emailsrvr.com (Authenticated sender: lars-AT-oddbit.com) with ESMTPSA id B39DCA02AA;
-	Mon,  6 May 2024 23:18:06 -0400 (EDT)
-Date: Mon, 6 May 2024 23:18:06 -0400
-From: Lars Kellogg-Stedman <lars@oddbit.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org, 
-	edumazet@google.com, davem@davemloft.net, jreuter@yaina.de
-Subject: Re: [PATCH net] ax25: Fix refcount leak issues of ax25_dev
-Message-ID: <eb5oil2exor2bq5n3pn62575phxjdex6wdjwwjxjd3pd4je55o@4k4iu2xobel5>
-References: <20240501060218.32898-1-duoming@zju.edu.cn>
- <my4l7ljo35dnwxl33maqhyvw7666dmuwtduwtyhnzdlb6bbf5m@5sbp4tvg246f>
- <78ae8aa0-eac5-4ade-8e85-0479a22e98a3@moroto.mountain>
- <ekgwuycs3hioz6vve57e6z7igovpls6s644rvdxpxqqr7v7is6@u5lqegkuwcex>
- <1e14f4f1-29dd-4fe5-8010-de7df0866e93@moroto.mountain>
- <movur4qy7wwavdyw2ugwfsz6kvshrqlvx32ym3fyx5gg66llge@citxuw5ztgwc>
+	s=arc-20240116; t=1715052782; c=relaxed/simple;
+	bh=7wd/yUfKcL6tjsmswtHH9lv5HGLnvEwVClY4hN6jGIs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=iU7Mw87T14BXVyCpL4zBzH6eCSFQ/Lql+BhoLepwTGbwwT4gybU1g3he8sOnAheE8E+VHMZOOd1L8r67r1j3ew+ruVjOfntVGrULUOAY5MXe1U7onwQPN8w5FYSncEwquadBBYKXDgOFrJdBkyLS9WeIRGcpJkBGXfwSv9NIdec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 77bd87380c2211ef9305a59a3cc225df-20240507
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.37,REQID:9ce386ab-0914-421d-8764-ed15d5d60748,IP:20,
+	URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACT
+	ION:release,TS:0
+X-CID-INFO: VERSION:1.1.37,REQID:9ce386ab-0914-421d-8764-ed15d5d60748,IP:20,UR
+	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:0
+X-CID-META: VersionHash:6f543d0,CLOUDID:953b18f2e0dff68bcc53e53b1d5fe9c7,BulkI
+	D:2405071132467M9YECP2,BulkQuantity:0,Recheck:0,SF:19|44|66|24|17|102,TC:n
+	il,Content:0,EDM:-3,IP:-2,URL:1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 1,UOG
+X-CID-BAS: 1,UOG,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,
+	TF_CID_SPAM_ULS
+X-UUID: 77bd87380c2211ef9305a59a3cc225df-20240507
+Received: from node2.com.cn [(39.156.73.10)] by mailgw.kylinos.cn
+	(envelope-from <luyun@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 764133066; Tue, 07 May 2024 11:32:44 +0800
+Received: from node2.com.cn (localhost [127.0.0.1])
+	by node2.com.cn (NSMail) with SMTP id A4719B8075B2;
+	Tue,  7 May 2024 11:32:44 +0800 (CST)
+X-ns-mid: postfix-6639A0DC-523906690
+Received: from localhost.localdomain (unknown [10.42.176.164])
+	by node2.com.cn (NSMail) with ESMTPA id DBB2FB8075B2;
+	Tue,  7 May 2024 03:32:42 +0000 (UTC)
+From: Yun Lu <luyun@kylinos.cn>
+To: hdanton@sina.com
+Cc: linux-kernel@vger.kernel.org,
+	syzbot+1acbadd9f48eeeacda29@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	vinicius.gomes@intel.com,
+	jhs@mojatatu.com,
+	netdev@vger.kernel.org
+Subject: Re: [syzbot] [kasan?] [mm?] INFO: rcu detected stall in __run_timer_base
+Date: Tue,  7 May 2024 11:32:42 +0800
+Message-Id: <20240507033242.1616594-1-luyun@kylinos.cn>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240414025336.2016-1-hdanton@sina.com>
+References: <20240414025336.2016-1-hdanton@sina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <movur4qy7wwavdyw2ugwfsz6kvshrqlvx32ym3fyx5gg66llge@citxuw5ztgwc>
-X-Classification-ID: 523c2de5-7003-4c0c-8800-1836014b2a10-1-1
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, May 04, 2024 at 06:16:14PM GMT, Lars Kellogg-Stedman wrote:
-> My original patch corrected this by adding the call to netdev_hold()
-> right next to the ax25_cb_add() in ax25_rcv(), which solves this
-> problem. If it seems weird to have this login in ax25_rcv, we could move
-> it to ax25_accept, right around line 1430 [3]; that would look
-> something like:
+Hello,
 
-The same patch applies cleanly against the Raspberry Pi 6.6.30 kernel,
-and clears up the frequeny crashes I was experiencing in that
-environment as well.
+Indeed, the taprio hrtimer does cause CPU stuck in certain specific scena=
+rios,
+and this patch indirectly confirms it.
 
--- 
-Lars Kellogg-Stedman <lars@oddbit.com> | larsks @ {irc,twitter,github}
-http://blog.oddbit.com/                | N1LKS
+However, it seems this patch isn't the final solution?=20
+
+On my testing machine, after starting Taprio hrtimer and then adjusting t=
+he
+system time backward, it can be observed that the taprio hrtimer indeed g=
+ets stuck
+in an infinite loop through tracing. And, the patch below can effectively=
+ resolve
+this issue, but it doesn't work for syzbot's tests.
+
+https://lore.kernel.org/all/20240506023617.1309937-1-luyun@kylinos.cn/
+
+Are there any better suggestions from others regarding the resolution of =
+this CPU stuck issue?
+
 
