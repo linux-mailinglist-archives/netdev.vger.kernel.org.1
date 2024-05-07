@@ -1,62 +1,58 @@
-Return-Path: <netdev+bounces-94100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F17A8BE1DD
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:18:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3A3F8BE1E7
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:21:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB6C31F25EF2
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:18:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63E811F25FB3
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37518156F45;
-	Tue,  7 May 2024 12:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="H+RObFUe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 061C3156F5D;
+	Tue,  7 May 2024 12:21:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546BD156F23;
-	Tue,  7 May 2024 12:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509CE156C6D;
+	Tue,  7 May 2024 12:21:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715084302; cv=none; b=G2wE5GD2/8PVnCy+qUrY2gn8dLGwor5PKvmSAeruGy0fdP8PZCQXeZQieFg8fDyHwv2V+iMlbS9iV6mbxjcjO4E9vX90dz3j1Thf21u3sZdoSSUSsFDW9yQD2kGcoB/Ujp/jHtTS4yzTG247/AlhkGLwLGiYFDbFIfsImAqn0M4=
+	t=1715084468; cv=none; b=QsrYbP1m+V7jNjO0/Iim7M6GVS4MD+MDy8SeugUW+/pMgeXI/6eCW1f/1nQHj9BQ/JNohchWtfgmxWX3DzZcC9BTiuUf6gvepVwcq/DvYe9RlCgI1SesbBXmn19avzlzO4Kqm3L5N+lGCm2n+eTJh0bRnxrnPtNU6b8lNvtdi0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715084302; c=relaxed/simple;
-	bh=XaLCNAECeluzjka4Oi85rIiDsTD/ZdajAgV3Z6+v+7k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KsjIcKB2mWGqYh/HY/jdHoEqpefn6MscHY/Lu/UBCLVIYro70vZnNp7+T1DuprfbvravDJpEcpfv3nbBI1cB44Ej6FO/jmizqGea8TUqKWvVwMTLBpRsp0IAL32GUFbkDp21VvTlNRPsN6IMfYxYtkkBryu34GDpS3JaPo0WWM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=H+RObFUe; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=sQM7rZP+pwd6y8h6SxqC2oyGkTbPvL7xGJBN4HpKr/I=; b=H+RObFUegfuZ2TdyPCJN3rgdVf
-	LUzOCqnzI7JHPLWff6XuRq2XbRFosmQyErR3l5CR9BWv4yBUbPYku0tQEO871ENmYWt4F51D+lkVW
-	DvXnuPEA9tNUByoG/kXU6mPav+iVuexgWqHtCt7e6C+AigcqHgbXrYBwhJC4tRTnWpCA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s4Jlr-00Eqp4-Ak; Tue, 07 May 2024 14:18:11 +0200
-Date: Tue, 7 May 2024 14:18:11 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1715084468; c=relaxed/simple;
+	bh=Y8fQUMzs7HZl5oQQnbJ+er0Rxfr51PVFMtxXioSay/U=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=uuEIM2NB/Y0apYmOcoWAkIdL99XZNax7FTNST+Tp6mvX09v79TZ0lDpIv81jO/pcm5y8SzksB87Tu809R+nYpGZDlDMNECsO1wFDppyQyNS33Ucpu0G2Sa66EchdVW46tTuLbvaU+gUabooQsZsrHHs5W+0mGA3rjKcf8pEmv9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1s4JoQ-0000000046z-17PQ;
+	Tue, 07 May 2024 12:20:50 +0000
+Date: Tue, 7 May 2024 13:20:43 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux@ew.tq-group.com
-Subject: Re: [PATCH net-next v2 2/2] net: phy: marvell: add support for
- MV88E6250 family internal PHYs
-Message-ID: <a46c1c48-653b-48b1-9a56-da2030545f81@lunn.ch>
-References: <24d7a2f39e0c4c94466e8ad43228fdd798053f3a.1714643285.git.matthias.schiffer@ew.tq-group.com>
- <0695f699cd942e6e06da9d30daeedfd47785bc01.1714643285.git.matthias.schiffer@ew.tq-group.com>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH v2] dt-bindings: net: mediatek: remove wrongly added clocks
+ and SerDes
+Message-ID: <1569290b21cc787a424469ed74456a7e976b102d.1715084326.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,27 +61,82 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0695f699cd942e6e06da9d30daeedfd47785bc01.1714643285.git.matthias.schiffer@ew.tq-group.com>
 
-On Thu, May 02, 2024 at 01:13:01PM +0200, Matthias Schiffer wrote:
-> The embedded PHYs of the 88E6250 family switches are very basic - they
-> do not even have an Extended Address / Page register.
-> 
-> This adds support for the PHYs to the driver to set up PHY interrupts
-> and retrieve error stats. To deal with PHYs without a page register,
-> "simple" variants of all stat handling functions are introduced.
-> 
-> The code should work with all 88E6250 family switches (6250/6220/6071/
-> 6070/6020). The PHY ID 0x01410db0 was read from a 88E6020, under the
-> assumption that all switches of this family use the same ID. The spec
-> only lists the prefix 0x01410c00 and leaves the last 10 bits as reserved,
-> but that seems too unspecific to be useful, as it would cover several
-> existing PHY IDs already supported by the driver; therefore, the ID read
-> from the actual hardware is used.
-> 
-> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Several clocks as well as both sgmiisys phandles were added by mistake
+to the Ethernet bindings for MT7988. Also, the total number of clocks
+didn't match with the actual number of items listed.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This happened because the vendor driver which served as a reference uses
+a high number of syscon phandles to access various parts of the SoC
+which wasn't acceptable upstream. Hence several parts which have never
+previously been supported (such SerDes PHY and USXGMII PCS) are going to
+be implemented by separate drivers. As a result the device tree will
+look much more sane.
 
-    Andrew
+Quickly align the bindings with the upcoming reality of the drivers
+actually adding support for the remaining Ethernet-related features of
+the MT7988 SoC.
+
+Fixes: c94a9aabec36 ("dt-bindings: net: mediatek,net: add mt7988-eth binding")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+v2: don't make changes to the order of clocks
+
+ .../devicetree/bindings/net/mediatek,net.yaml | 22 ++-----------------
+ 1 file changed, 2 insertions(+), 20 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+index e74502a0afe8..3202dc7967c5 100644
+--- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
++++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+@@ -337,8 +337,8 @@ allOf:
+           minItems: 4
+ 
+         clocks:
+-          minItems: 34
+-          maxItems: 34
++          minItems: 24
++          maxItems: 24
+ 
+         clock-names:
+           items:
+@@ -351,18 +351,6 @@ allOf:
+             - const: ethwarp_wocpu1
+             - const: ethwarp_wocpu0
+             - const: esw
+-            - const: netsys0
+-            - const: netsys1
+-            - const: sgmii_tx250m
+-            - const: sgmii_rx250m
+-            - const: sgmii2_tx250m
+-            - const: sgmii2_rx250m
+-            - const: top_usxgmii0_sel
+-            - const: top_usxgmii1_sel
+-            - const: top_sgm0_sel
+-            - const: top_sgm1_sel
+-            - const: top_xfi_phy0_xtal_sel
+-            - const: top_xfi_phy1_xtal_sel
+             - const: top_eth_gmii_sel
+             - const: top_eth_refck_50m_sel
+             - const: top_eth_sys_200m_sel
+@@ -375,16 +363,10 @@ allOf:
+             - const: top_netsys_sync_250m_sel
+             - const: top_netsys_ppefb_250m_sel
+             - const: top_netsys_warp_sel
+-            - const: wocpu1
+-            - const: wocpu0
+             - const: xgp1
+             - const: xgp2
+             - const: xgp3
+ 
+-        mediatek,sgmiisys:
+-          minItems: 2
+-          maxItems: 2
+-
+ patternProperties:
+   "^mac@[0-1]$":
+     type: object
+-- 
+2.45.0
+
 
