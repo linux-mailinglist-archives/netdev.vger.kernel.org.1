@@ -1,103 +1,124 @@
-Return-Path: <netdev+bounces-93939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8EE18BDADA
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 07:53:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F1F18BDAE2
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 07:55:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 056931C21976
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 05:53:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AB8E282581
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 05:55:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452C26D1C8;
-	Tue,  7 May 2024 05:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F3691854;
+	Tue,  7 May 2024 05:55:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mAitka9r"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtu5ljy1ljeznc42.icoremail.net (zg8tmtu5ljy1ljeznc42.icoremail.net [159.65.134.6])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688EE6BFA9;
-	Tue,  7 May 2024 05:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.65.134.6
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF356BFB8;
+	Tue,  7 May 2024 05:55:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715061196; cv=none; b=Kj6stmRptagxePBVAUA9Um5Sj6dt7BehIPL6qNG4BwD8Fz/OMGWuUWyUttFGlVd1ciRJhgIlES65v9lxUV8eFRyXYyEeH5edj83fG51CI1yOO7ON34QPy9nk9l4W1mGp5BQLjAAm3FoIotMv7zWwGT5r/ZXKbHfLZu9UMm+LGB8=
+	t=1715061309; cv=none; b=t2VJ+V4Kk5yhv7bjpo5MW8I8q69mRh1y/rNOg/VhBqlWjl2iRvF5twcRrti33GhRhULMZ+u7hQF7PebCGw0T81YQlv3N1WBr2VH3hbK7+r3WwQbbX5p3IOo9d92mLqchibymQXdoSxhqylL71BcQSEOuvmzDPaDHMvbG4ZIvfC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715061196; c=relaxed/simple;
-	bh=uY/f2XxADkXUxf5Kne/3qFuas5cvVQzyqm+DbipD+Vw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=tTztVvw4HoBEjcVzDxUGSUJAOHnRZC9y0+8VOdy2ZogJZUs2LnVA6DtMRvGLsdClyxSr6Rx4PYCp9Ckq0l3vTsVfNfMnBQ0ETkrfogCw1Bf72qKIggZ68Ia4OHDqC+YcglLDyOOGgLGtSHipj8jv8fblsYeJiGI2dIqOM/E+c7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=159.65.134.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from ubuntu.localdomain (unknown [221.192.179.90])
-	by mail-app2 (Coremail) with SMTP id by_KCgBH0Z+3wTlmoTRDAA--.41006S2;
-	Tue, 07 May 2024 13:52:58 +0800 (CST)
-From: Duoming Zhou <duoming@zju.edu.cn>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-hams@vger.kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	jreuter@yaina.de,
-	horms@kernel.org,
-	Markus.Elfring@web.de,
-	dan.carpenter@linaro.org,
-	lars@oddbit.com,
-	Duoming Zhou <duoming@zju.edu.cn>
-Subject: [PATCH net v4 4/4] ax25: Change kfree() in ax25_dev_free() to ax25_dev_put()
-Date: Tue,  7 May 2024 13:52:55 +0800
-Message-Id: <7fdad05adf75ab7e2f6aad4d4c596e0361ce55dd.1715059894.git.duoming@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1715059894.git.duoming@zju.edu.cn>
-References: <cover.1715059894.git.duoming@zju.edu.cn>
-X-CM-TRANSID:by_KCgBH0Z+3wTlmoTRDAA--.41006S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrZFy3Gr4DGFWrJw4kGFW3KFg_yoWfXFg_uF
-	ykCF4xWw1UJFyUCw1rCF4rJrW3Ww1Ygwn3JryfAFZ7t34jya4UJrWkWr1kXF1UWrW2krWS
-	qrn5ZrWfAr43tjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbTAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr1j
-	6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r126r1DMcIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwVW8WwCF04k20xvY0x0EwIxGrw
-	CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
-	14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
-	IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAv
-	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
-	v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUO3kuDUUUU
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwMOAWY4-AkEPQBDse
+	s=arc-20240116; t=1715061309; c=relaxed/simple;
+	bh=Pdne6XsnBJ3ITSgD5gyoB3HBz7+wRA143svwnH2aqpE=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=ZQ5YuTpJZ6y7QG4ijb0MrhhDRY9u0JQJfSnBQaNe6vUJ8CC1ONtDiAlW/edqI0llPpLFw9kwxalLOrZxBaRsQhaEXy1genJOs8O01N5R4nVpR5G1xJ0mYfo62lZqt4fVEKa2RepqbXtxdzXfFdCANJn5AWW6GirHSKxHmUNJQYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mAitka9r; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1715061298; h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
+	bh=ZEG518/BRX8gY2yhcbQUnSzkHiL/oK8UZA07FWoGJIw=;
+	b=mAitka9r1iDCfLCMusF/TcuTMVSGdl/f5YDEo592s4OBwiwxhupp5WYn/LPQvNXYMxxcIwhgJcWleCtnI/v5CXckR+99CcOM1svZjuodBSoI7bmqgFQ3HKOLi+o79Nri9rP3NMNPhz43So7lOk/e+IwWMooCfkek0NBia7bzghI=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R241e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0W6.3fpX_1715061296;
+Received: from 30.221.101.18(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0W6.3fpX_1715061296)
+          by smtp.aliyun-inc.com;
+          Tue, 07 May 2024 13:54:57 +0800
+Message-ID: <6d6e870a-3fbf-4802-9818-32ff46489448@linux.alibaba.com>
+Date: Tue, 7 May 2024 13:54:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: wenjia@linux.ibm.com, jaka@linux.ibm.com, kgraul@linux.ibm.com
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Subject: some questions about restrictions in SMC-R v2's implementation
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The object "ax25_dev" is managed by reference counting. Thus it should
-not be directly released by a kfree() call in ax25_dev_free(). Replace
-it with a ax25_dev_put() call instead.
+Hi, Wenjia and Jan,
 
-Fixes: d01ffb9eee4a ("ax25: add refcount in ax25_dev to avoid UAF bugs")
-Suggested-by: Dan Carpenter <dan.carpenter@linaro.org>
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
----
- net/ax25/ax25_dev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+When testing SMC-R v2, I found some scenarios where SMC-R v2 should be worked, but due to some restrictions in SMC-R v2's implementation,
+fallback happened. I want to know why these restrictions exist and what would happen if these restrictions were removed.
 
-diff --git a/net/ax25/ax25_dev.c b/net/ax25/ax25_dev.c
-index 05e556cdc2b..d4d29879df2 100644
---- a/net/ax25/ax25_dev.c
-+++ b/net/ax25/ax25_dev.c
-@@ -194,7 +194,7 @@ void __exit ax25_dev_free(void)
- 	list_for_each_entry_safe(s, n, &ax25_dev_list, list) {
- 		netdev_put(s->dev, &s->dev_tracker);
- 		list_del(&s->list);
--		kfree(s);
-+		ax25_dev_put(s)
- 	}
- 	spin_unlock_bh(&ax25_dev_lock);
- }
--- 
-2.17.1
+The first is in the function smc_ib_determine_gid_rcu, where restricts the subnet matching between smcrv2->saddr and the RDMA related netdev.
+codes here:
+static int smc_ib_determine_gid_rcu(...)
+{
+    ...
+        in_dev_for_each_ifa_rcu(ifa, in_dev) {
+            if (!inet_ifa_match(smcrv2->saddr, ifa))
+                continue;
+            subnet_match = true;
+            break;
+        }
+        if (!subnet_match)
+            goto out;
+    ...
+out:
+    return -ENODEV;
+}
+In my testing environment, either server or client, exists two netdevs, eth0 in netnamespace1 and eth0 in netnamespace2. For the sake of clarity
+in the following text, we will refer to eth0 in netnamespace1 as eth1, and eth0 in netnamespace2 as eth2. The eth1's ip is 192.168.0.3/32 and the
+eth2's ip is 192.168.0.4/24. The netmask of eth1 must be 32 due to some reasons. The eth1 is a RDMA related netdev, which means the adaptor of eth1
+has RDMA function. The eth2 has been associated to the eth1's RDMA device using smc_pnet. When testing connection in netnamespace2(using eth2 for
+SMC-R connection), we got fallback connection, rsn is 0x03010000, due to the above subnet matching restriction. But in this scenario, I think
+SMC-R should work.
+In my another testing environment, either server or client, exists two netdevs, eth0 in netnamespace1 and eth1 in netnamespace1. The eth0's ip is
+192.168.0.3/24 and the eth1's ip is 192.168.1.4/24. The eth0 is a RDMA related netdev, which means the adaptor of eth0 has RDMA function. The eth1 has
+been associated to the eth0's RDMA device using smc_pnet. When testing SMC-R connection through eth1, we got fallback connection, rsn is 0x03010000,
+due to the above subnet matching restriction. In my environment, eth0 and eth1 have the same network connectivity even though they have different
+subnet. I think SMC-R should work in this scenario.
 
+The other is in the function smc_connect_rdma_v2_prepare, where restricts the symmetric configuration of routing between client and server. codes here:
+static int smc_connect_rdma_v2_prepare(...)
+{
+    ...
+    if (fce->v2_direct) {
+        memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
+        ini->smcrv2.uses_gateway = false;
+    } else {
+        if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
+              smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
+              ini->smcrv2.nexthop_mac,
+              &ini->smcrv2.uses_gateway))
+            return SMC_CLC_DECL_NOROUTE;
+        if (!ini->smcrv2.uses_gateway) {
+            /* mismatch: peer claims indirect, but its direct */
+            return SMC_CLC_DECL_NOINDIRECT;
+        }
+    }
+    ...
+}
+In my testing environment, server's ip is 192.168.0.3/24, client's ip 192.168.0.4/24, regarding how many netdev in server or client. Server has special
+route setting due to some other reasons, which results in indirect route from 192.168.0.3/24 to 192.168.0.4/24. Thus, when CLC handshake, client will
+get fce->v2_direct==false, but client has no special routing setting and will find direct route from 192.168.0.4/24 to 192.168.0.3/24. Due to the above
+symmetric configuration of routing restriction, we got fallback connection, rsn is 0x030f0000. But I think SMC-R should work in this scenario.
+And more, why check the symmetric configuration of routing only when server is indirect route?
+
+Waiting for your reply.
+
+Thanks,
+Guangguan Wang
 
