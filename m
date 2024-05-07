@@ -1,245 +1,677 @@
-Return-Path: <netdev+bounces-94092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 932E58BE189
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:03:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D24E98BE1C8
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:14:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFE321C20C3F
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:03:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB101B24CB4
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:14:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CB0156F23;
-	Tue,  7 May 2024 12:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=solidrn.onmicrosoft.com header.i=@solidrn.onmicrosoft.com header.b="HM39CiBx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29CDB158D8C;
+	Tue,  7 May 2024 12:14:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2110.outbound.protection.outlook.com [40.107.7.110])
+Received: from smtp2-kfki.kfki.hu (smtp2-kfki.kfki.hu [148.6.0.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699D114E2EC;
-	Tue,  7 May 2024 12:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.7.110
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715083417; cv=fail; b=kV9lQzsssB+CDXYo0ZJS4Sc6yyrOwxj9uVsXLFfXjRqnYLfJMxD9bplbEEyY0EyYDwmO1vrnxUPNqtlbhh0DcPk3LsFZiLxKg4XQPvCuGe6fbkzBIMIYXN1QOrA9Keydl61rFOPy4h0ooe/JOm22SfTXdmnUyYQ/JdfkKXC0CEU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715083417; c=relaxed/simple;
-	bh=ji+1kg7U/D0we0wMhkTh7xTEN7As2jK5SiQ1eze7Gok=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=fxRsPnW+8P7EXMTUnPGZvrXCDB1txg4I7Hh0Xh9on9K1nygRkapjEYo2jtQFfGsRdx98iVOLTdlW1Pf7O7797KxgODkiKaMIHxQGfrj4AujPTYJ248xAu9B8lq3gcaBIsfl+EoMJRcUso6JlRqjR52vPMh9lwHBIXMIhtzGg4gs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=solid-run.com; spf=pass smtp.mailfrom=solid-run.com; dkim=pass (1024-bit key) header.d=solidrn.onmicrosoft.com header.i=@solidrn.onmicrosoft.com header.b=HM39CiBx; arc=fail smtp.client-ip=40.107.7.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=solid-run.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=solid-run.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Mnc+SSpR26dfjL/xdOU7VjmTFo/SH7LXlTZZdJqwLlcggklPPqJ1EEhT8jRWPY+Pcomyxvzj86X+KXTibprU+tnXDDOp7CdLUQKdVf/J48S/jfm0vHgykm8B+HaHHt3wWPGMhVLzs0IEoL1VgOeBpHzXt3gM2+FLmTtJ+RvpHT4pzsQwVc/hDQfC+eKpkdayJQrgYCTaIXlJ52viNN5lp7HRrBpWKHmIU71hJY+kVf+Lp5meHVBzKz0A44EzAX9mxPqg5BafzsDGm1jmi5RzDhpPB7rnBqq8u8U35QXxtjDDMqqOxiTuE7KM1vV1JSv3285v37B4FaXoHT0izPzINg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ji+1kg7U/D0we0wMhkTh7xTEN7As2jK5SiQ1eze7Gok=;
- b=bt38sRzKhb9F8ThLlU4W0sz01XUaD6DXxVyzzWPJq3+WogSMSGbtN4Gdk3QinsUPkXK4Jt/czzmRUxdBcPid/tW5igAYLdCYSWr9nAe4U1g1T6LM+gM3sZ3KKlyxIufBmV6pa8/iETKSOLUom7bYES5pvpoarS17FOS6mrPElwe8L10LTFQhm3fuoY+8DUswU9GbOmIoC5qObXhSVCywb4K5eYj93oK1lKj+q6S7+j1bFWzCeTxR6tGb7dGSNMpQy8x534BJYCE99QiRTZge2UHH+TQLzfdUBVlD4fs3HjjA5sGmtsBuCV94jqh8esWk6VEBu/37wCzE+p+Wpx40Uw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=solid-run.com; dmarc=pass action=none
- header.from=solid-run.com; dkim=pass header.d=solid-run.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=solidrn.onmicrosoft.com; s=selector1-solidrn-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ji+1kg7U/D0we0wMhkTh7xTEN7As2jK5SiQ1eze7Gok=;
- b=HM39CiBxLOSdnKbCPY4J5uTVTXmQvHEgXlCOXuBAefv1ybblCUODd9NcNdVwXTl/nJKzizAC7TcBYKSp/abDHuoMoHnJt2uHI5O5mcIp5GEM/l+DdJW0T28UnOBip7pl/FPJD7do5BVETBVGCDxmL6xo+DSZS8gjwQgoBfN7as4=
-Received: from AM9PR04MB7586.eurprd04.prod.outlook.com (2603:10a6:20b:2d5::17)
- by AM7PR04MB6774.eurprd04.prod.outlook.com (2603:10a6:20b:104::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.42; Tue, 7 May
- 2024 12:03:31 +0000
-Received: from AM9PR04MB7586.eurprd04.prod.outlook.com
- ([fe80::c04e:8a97:516c:5529]) by AM9PR04MB7586.eurprd04.prod.outlook.com
- ([fe80::c04e:8a97:516c:5529%7]) with mapi id 15.20.7544.041; Tue, 7 May 2024
- 12:03:31 +0000
-From: Josua Mayer <josua@solid-run.com>
-To: Florian Fainelli <f.fainelli@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Mor Nagli
-	<mor.nagli@solid-run.com>
-Subject: Re: [PATCH net-next v3] net: dsa: mv88e6xxx: control mdio bus-id
- truncation for long paths
-Thread-Topic: [PATCH net-next v3] net: dsa: mv88e6xxx: control mdio bus-id
- truncation for long paths
-Thread-Index: AQHantH8wZxLbGkA70ONa4AkREvmfLGJAo6AgAKs9YA=
-Date: Tue, 7 May 2024 12:03:31 +0000
-Message-ID: <c30a0242-9c68-4930-a752-80fb4ad499d9@solid-run.com>
-References:
- <20240505-mv88e6xxx-truncate-busid-v3-1-e70d6ec2f3db@solid-run.com>
- <A40C71BD-A733-43D2-A563-FEB1322ECB5C@gmail.com>
-In-Reply-To: <A40C71BD-A733-43D2-A563-FEB1322ECB5C@gmail.com>
-Accept-Language: de-DE, en-US
-Content-Language: de-DE
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=solid-run.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM9PR04MB7586:EE_|AM7PR04MB6774:EE_
-x-ms-office365-filtering-correlation-id: 4f212784-6e30-4f42-20b0-08dc6e8db6d9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|366007|376005|1800799015|38070700009;
-x-microsoft-antispam-message-info:
- =?utf-8?B?ZFF1S05RbExWYnF1RDlIMVVOVHhBeTJsUUE2cVZQaUtld0Ztd3BUcGVadDF5?=
- =?utf-8?B?L3g1RmI0UXJOaUhkUWxpNmFRVHo4aVRISzd6Ty8rOFJVdlNQTTFNYzVhNzIw?=
- =?utf-8?B?WUNCVDc4NzV6aWwrdUt1OFVnSHFjaHlGMytWa2lYU2RuUzV3enNBYjgwMHZt?=
- =?utf-8?B?VW5KMlM1ZDVwbXNtb3ZYbEk5bE9KQ3lGakFtSzhiRDNFbVBDdC9aS2haeUJE?=
- =?utf-8?B?S2ZVT0pENTJsZkxkVnNHT3JDaGxETzFCMm95a2lHWEpubmlWV1BYekVLOUFx?=
- =?utf-8?B?MU5lT25rd0lXWUpZTjc5dXpoS0srbkNFVmNlWXBUYzJxWnFmZ1gwa1RyY250?=
- =?utf-8?B?a0NqMlRGUEd1b3RKMVA3QnVOTmd0bHlIK1lFcmhLdFBrRGJZa2U5dEE0VXdC?=
- =?utf-8?B?SWFUQytFNkhsbjFuekg0T2NXcE1OV2MxY1duTGgwaXhRckpSczIrL21aZDAr?=
- =?utf-8?B?M3Q2NnFYbkc0TEplWmdmYW1DT21sbHJVYmIrcWJEM3psTkJMcEg3ZXBZZEdE?=
- =?utf-8?B?MEdVa1pYTDVtNnc2d243ZlVZRjhoUEVSRmY4Q3R1a2tvZGlZUCsxL1FFL1Rs?=
- =?utf-8?B?UGlDTVM2UURTallEaHIvMDBMSG0wcWxNazNIRktCSWJ6ak15TzQxSUdNLzFN?=
- =?utf-8?B?eU96b0R0dTRJQlFHeTRNeHZYM2JKUjJCOVdWZ291Yklqa2JnQnk4cnNpT3RY?=
- =?utf-8?B?eUVRWDk3UE5oL3huVjVTSUhOZ2hqWkxJejM3MXdvYVliOHhCZDRpY20yaWNl?=
- =?utf-8?B?cDNhZ1U5UHNndUhsMUkvUlNZMmJWNCtlaFp2MmNUOXZYWWRoWWYxQ3R6QWxk?=
- =?utf-8?B?ZVdVejhHUEVCYk5sMW5RZ29rbVIyQ01KaUlzSHBNOTZKNEFSeEc1ZWRRVHVv?=
- =?utf-8?B?ZG84Mm9DQ0VyRW5KT2FwYkc4dkovQnhVYm5LekNsd0FXMTR1eTJCQ0J5dHN2?=
- =?utf-8?B?U3ZUZ1lJemo4Q3E3N08vQjBnTGVZL3p1Vyt2UUprWkNIemR3ZFBabVFUR2NV?=
- =?utf-8?B?ZWNqQ1B0QU9sRDYrU05POVg5ejlqT01PMHZMWHhRcDcwUHRhNlNsamJGcTY5?=
- =?utf-8?B?ZjFoTnArZXl4OU5PL0FtUm9Wc2h6RnJVY1ZDdGs1TXI0NEFaYTc4Y29xbnhX?=
- =?utf-8?B?allTcUtjRTBKaWdvbnk4bWdOa01PRURJMm1XUUZTYW9wWU0xMHRNempMNk1R?=
- =?utf-8?B?U2xRQnNXWkxiVFNmZjRYUTdlZnNFSFpFZkN2VTl0azVyQnQxNmhsNUhWNDdG?=
- =?utf-8?B?OEhVTUJqZmlLencwRlh2eHArOVo1QllSOGlEVTF0WEcza3AvR3FlSm5kVHRn?=
- =?utf-8?B?enlSK2JqMkNUaGxITkJiV2dxZUZMQ3E5NDdZTVFqN1R6SUl5N0ZMT0pxTno4?=
- =?utf-8?B?V0FadVRITk55bHpQd2xjWXh2UG4xSTJva2Z1VExOSFcwQnkrQmxycWYrNW8z?=
- =?utf-8?B?ODFFOHROekpiSVoxRmtCZ05wVXV6R0U2SDBvK2lUZDEwMmVjQ3VYWTVlemNi?=
- =?utf-8?B?bGJCbWdraGcwRjBpczF4WDVFSjFuREh5VEZ3OTc1RjcxSDdSQUNlNko4Rzly?=
- =?utf-8?B?aEhabmVJVjJUTnpHQXNSUGZuUXd5ZFRJY3pUVjM1OGVrVnM2YkxLMjNZbXUx?=
- =?utf-8?B?QTZaQUdsNWlIYlZINnFydXFiajZWMm9FTkNsazdvSExEdUQ1RWRoY3VGc0VP?=
- =?utf-8?B?UFQ2SUFyNDk0LzRRUGFvKzBsdVZCeEFMVStlVXFwU2hGWmFONkVTYWFBamR6?=
- =?utf-8?B?enZTY2xoSFZTdlZkc1BSa0Z0VlVFaGFsVjYrU016V1U5eGhpcExOTkxpMFFC?=
- =?utf-8?B?OGVMcG5TTU9HZjZ5MVNTZz09?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB7586.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?b3pjTFE0aUlFdVAycjlpZXVFYU5LdXhYVy93Qms5VlloNmFtWWNpbjArV2g5?=
- =?utf-8?B?R3FtdW1RWnVIR2RDUlY3MzFTZEJmNTZvd3ZRSHRkYWxQYno5c0RpU2xoYi9R?=
- =?utf-8?B?V1NQbE1WQnFxaUJDSllUYUs5Skd5TG1EWXVXeUJXZktBV2JmMmRZUXBNRlVJ?=
- =?utf-8?B?bUhuZ0EwVEJZWUVBQmNDQmpqb1hyNGdjZ2VJK1FKZ3lGbjVhUkx5ZW1mWmdz?=
- =?utf-8?B?SSsxU2VkTk52aXE5TTA3MFN4Z2ZNVlNsYXdVbllxNUwwcDVWNUd1d2hjWlhh?=
- =?utf-8?B?Q2JsVFdtQUFVL0VxYWZQZEorTW1iWHlIdG9kc0EvdkdWWGgxYnVoVU5aVVZ6?=
- =?utf-8?B?ZHhqZWdHNUdoZkp4TzBhUlFTdXh3OHgzY1htL2ViWU11RG5CWTI0U0Q2eG41?=
- =?utf-8?B?TUpPR0JLMWJHeGMrZVBjUWpTOFM1Z1lhemhCNTE1NW9CUEhMQ0JPdkptS3c2?=
- =?utf-8?B?bGJINGFEeEZhd2gyZHI1eHNtUXlWRlZuUTRoMi9sdUhQKzFSY1lZOVRvRWZW?=
- =?utf-8?B?VkV0bXNvQ1F3dC9DSThXdmNVSFU2UEQ1WTVhcjUzb1ZzczRyVkVSRDFNSjFB?=
- =?utf-8?B?cFoxUFBRcjBLNVB4ZFJZeHNGdFFvbmwxYUY4c0Z3RkRJZ3o4WlBVUkY4cW9p?=
- =?utf-8?B?UFFXRytGS3h3emJPcGl3aC9SWkVMcm9RT3FkWWJOYTZnQ0YrRXpIM3BZL3V1?=
- =?utf-8?B?YVU5anNCLzhCdzFNenRPTVpjckFsRmpoNXVkWEprdmhsc1lSeUY2cmI1clMr?=
- =?utf-8?B?MkM2VXBvRE9PV2RqcEIzZDNzb0J5UEsyMldWdGF5UjEvTGZaRkNyS3VVOTZI?=
- =?utf-8?B?NlRJSnFVQUpFekhNU2tJK1BXek1LaGVCbUFma1Q4aG5HUzlXMnJic1Nlbmpy?=
- =?utf-8?B?TDFZVmFXT3pLM1pYeXBCbWxIQW8xZko0Z0wrVjErSGgwaUs4R0hLWE40bSt5?=
- =?utf-8?B?VVBlUDQzbC9jSXUwd0Z6L0dyWk82WkZ3WFNjMXk3d2pMK2Q2ME5MbCtwcUtO?=
- =?utf-8?B?YWtoaXZZRVdIdGZpSlFrQXdSdExsZTRBYjBBcGJmcXlFVWZIRUgwZFV3b2dB?=
- =?utf-8?B?NmhLQTNzSjlId0pmeUxSb1cyMUdleUFMUUVIME9KWFRHaTZHd0orMllQdHox?=
- =?utf-8?B?T3V3NW16a3o3ZjBJeHU5ZDdESGFXNlF6UDZscUN6TDNlMVNOeEppeU1VMEVi?=
- =?utf-8?B?NzI5SHJYWWlndHNxRjBSQmozVTNQNGViQzNLd1QrYUg3b0lJNlRyaTF5YlBB?=
- =?utf-8?B?ck1sMWFHdjc0aXZIRThXWkQxREdwWnNFRDd1SGkvZmpUY1AxRVpKbFB2R0pL?=
- =?utf-8?B?TEVTV2VCeVRMRkRtemVTMVpHRjlCUlZld0l2NW9LVUZOaitFQkNkWWczcXdQ?=
- =?utf-8?B?WXhwL2dEaTU1V2ZXUGRyYlMvVW82Wmk2WXV4bHI4S2VJY3kwR1ZtNXhkVGVy?=
- =?utf-8?B?TmZLczN5REdCUGRTdjAva2RwbjZKTmpOK2NodmlBdzdlTjVMU1NVaFh5eWtD?=
- =?utf-8?B?Q1phMHpPL0dWZkRuU1lFSjJIUG1yQ1FjZVhBRmdjaFVxK3p5VzVFS3pFMHE3?=
- =?utf-8?B?bmZibHEweFJrakY1N0RIUWdsWTFndlB1Y1g1K3ROVUVjcG9od1JGbjNtbjc0?=
- =?utf-8?B?cDN5RWZoaTBNeThvczUrWElsYkZ6eWgrMm5IZEpycjVuQnVyc1hpMkJFT3Rm?=
- =?utf-8?B?U2ppYysvYTU2K2RERjFjd01GbFZrVmZlOUs5RUtQdjB6QUhPbWVEMkc4Ymhm?=
- =?utf-8?B?Ylc5Y2xDanBJTzhTU3pGS3RQRDhkcXpFN2FSR01pamk3UUF5WVRlYXRBenhi?=
- =?utf-8?B?UzFPOEVaUEt3dkJXeDV1bWRBdGZtRUJYOTQxZjg3MTVMS08xWThITjgzNHpn?=
- =?utf-8?B?ajBsSWV1L2hGZ1kwdm9wYlB2N0tyNURIeFV4NmR0ZzhtdFFWZTRBOHNIS1dD?=
- =?utf-8?B?S3VjYzcxREQzQ0M5cHQzVW96TFppTktTSjN4UmVrdGlqbXhPckRDWDhjTzFz?=
- =?utf-8?B?dlkzOUxkZEcwOUNrdmxmc3JMTlFROElLdldIaWRONVorRHp4MXpScm0wM3hZ?=
- =?utf-8?B?RGRUWHFpbDIwYTF4UG0wZ2V3akFSSkRmK3VZTzVkM01CQ0Z4Z1piOWI0SGZ4?=
- =?utf-8?Q?eBk3lWbz6ugTSSAZ+4TTkbRn0?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E1CC0115994B08469CC872DA413A989B@eurprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF9B158A2C;
+	Tue,  7 May 2024 12:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715084062; cv=none; b=Mdug/6Vz+kxFWu4gm0UaiF0GGAL37sIyuW31hJCrGW4mKcHk739bycTvS1GLNENESRDMoQAN9syg6M7mrqx73zWJpZeXW0taBiPnwKXQsk7fVsWd4Zg2GXXYPDsi0c22LjfNZvdWYyUsWkJeE1mZJfr5JG00ItJq7hekTWwkelY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715084062; c=relaxed/simple;
+	bh=IS3bAIdEsmywWIbqW/1inVUCiV+s6SpsS10UL0PofJ4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Dk+JT/vkmd1nrr9SQRFjgytBkn0QK+7fs7e+QVni+ruianC3mLy5rXHQkJPvE+hF+lYSmnl3Ni97WJ35Yw5Az/ORk1+OMxNA1mMMn2nqx0/uJWQSqMICA0yIET5kEDJWSGVkBn1sC2/hZOmAVicvgdjTUXLb9rCyY3/M+QsUl+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=148.6.0.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost (localhost [127.0.0.1])
+	by smtp2.kfki.hu (Postfix) with ESMTP id BC5FBCC02C3;
+	Tue,  7 May 2024 14:05:22 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at smtp2.kfki.hu
+Received: from smtp2.kfki.hu ([127.0.0.1])
+	by localhost (smtp2.kfki.hu [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP; Tue,  7 May 2024 14:05:19 +0200 (CEST)
+Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 665A1CC0101;
+	Tue,  7 May 2024 14:05:19 +0200 (CEST)
+Received: by blackhole.kfki.hu (Postfix, from userid 1000)
+	id 5A24934316B; Tue,  7 May 2024 14:05:19 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by blackhole.kfki.hu (Postfix) with ESMTP id 57F2934316A;
+	Tue,  7 May 2024 14:05:19 +0200 (CEST)
+Date: Tue, 7 May 2024 14:05:19 +0200 (CEST)
+From: Jozsef Kadlecsik <kadlec@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org, 
+    ncardwell@google.com, edumazet@google.com, pablo@netfilter.org
+Subject: Re: [PATCH nf-next] selftests: netfilter: add packetdrill based
+ conntrack tests
+In-Reply-To: <20240507110218.4831-1-fw@strlen.de>
+Message-ID: <ad281865-47d3-cdfe-2a6f-b05b7a0ee88f@netfilter.org>
+References: <20240507110218.4831-1-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: solid-run.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB7586.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f212784-6e30-4f42-20b0-08dc6e8db6d9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2024 12:03:31.6705
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a4a8aaf3-fd27-4e27-add2-604707ce5b82
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cw/g0lgZxJ9X4+T+SioJt61RP0HbwYfhsiXkDuspEHKCmDRS4Gx8PrvXh6MfyMth5U8S577SJhzIQlfiS9/1og==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB6774
+Content-Type: text/plain; charset=US-ASCII
 
-QW0gMDUuMDUuMjQgdW0gMjE6MTEgc2NocmllYiBGbG9yaWFuIEZhaW5lbGxpOg0KPiBMZSA1IG1h
-aSAyMDI0IDAyOjUyOjQ1IEdNVC0wNzowMCwgSm9zdWEgTWF5ZXIgPGpvc3VhQHNvbGlkLXJ1bi5j
-b20+IGEgw6ljcml0wqA6DQo+PiBtdjg4ZTZ4eHggc3VwcG9ydHMgbXVsdGlwbGUgbWRpbyBidXNl
-cyBhcyBjaGlsZHJlbiwgZS5nLiB0byBtb2RlbCBib3RoDQo+PiBpbnRlcm5hbCBhbmQgZXh0ZXJu
-YWwgcGh5cy4gSWYgdGhlIGNoaWxkIGJ1c2VzIG1kaW8gaWRzIGFyZSB0cnVuY2F0ZWQsDQo+PiB0
-aGV5IG1pZ2h0IGNvbGxpZGUgd2l0aCBlYWNoIG90aGVyIGxlYWRpbmcgdG8gYW4gb2JzY3VyZSBl
-cnJvciBmcm9tDQo+PiBrb2JqZWN0X2FkZC4NCj4+DQo+PiBUaGUgbWF4aW11bSBsZW5ndGggb2Yg
-YnVzIGlkIGlzIGN1cnJlbnRseSBkZWZpbmVkIGFzIDYxDQo+PiAoTUlJX0JVU19JRF9TSVpFKS4g
-VHJ1bmNhdGlvbiBjYW4gb2NjdXIgb24gcGxhdGZvcm1zIHdpdGggbG9uZyBub2RlDQo+PiBuYW1l
-cyBhbmQgbXVsdGlwbGUgbGV2ZWxzIGJlZm9yZSB0aGUgcGFyZW50IGJ1cyBvbiB3aGljaCB0aGUg
-ZHNhIHN3aXRjaA0KPj4gaXRzZWxmIHNpdHMsIGUuZy4gQ045MTMwIFsxXS4NCj4+DQo+PiBDb21w
-YXJlIHRoZSByZXR1cm4gdmFsdWUgb2Ygc25wcmludGYgYWdhaW5zdCBtYXhpbXVtIGJ1cy1pZCBs
-ZW5ndGggdG8NCj4+IGRldGVjdCB0cnVuY2F0aW9uLiBJbiB0aGF0IGNhc2Ugd3JpdGUgYW4gaW5j
-cmVtZW50aW5nIG1hcmtlciB0byB0aGUgZW5kDQo+PiB0byBhdm9pZCBuYW1lIGNvbGxpc2lvbnMu
-DQo+PiBUaGlzIGNoYW5nZXMgdGhlIHByb2JsZW1hdGljIGJ1cy1pZHMgbWRpbyBhbmQgbWRpby1l
-eHRlcm5hbCBmcm9tIFsxXQ0KPj4gdG8gWzJdLg0KPj4NCj4+IFRydW5jYXRpb24gYXQgdGhlIGJl
-Z2lubmluZyB3YXMgY29uc2lkZXJlZCBhcyBhIHdvcmthcm91bmQsIGhvd2V2ZXIgdGhhdA0KPj4g
-aXMgc3RpbGwgc3ViamVjdCB0byBuYW1lIGNvbGxpc2lvbnMgaW4gc3lzZnMgd2hlcmUgb25seSB0
-aGUgZmlyc3QNCj4+IGNoYXJhY3RlcnMgZGlmZmVyLg0KPj4NCj4+IFsxXQ0KPj4gWyAgICA4LjMy
-NDYzMV0gbXY4OGU2MDg1IGYyMTJhMjAwLm1kaW8tbWlpOjA0OiBzd2l0Y2ggMHgxNzYwIGRldGVj
-dGVkOiBNYXJ2ZWxsIDg4RTYxNzYsIHJldmlzaW9uIDENCj4+IFsgICAgOC4zODk1MTZdIG12ODhl
-NjA4NSBmMjEyYTIwMC5tZGlvLW1paTowNDogVHJ1bmNhdGVkIGJ1cy1pZCBtYXkgY29sbGlkZS4N
-Cj4+IFsgICAgOC41OTIzNjddIG12ODhlNjA4NSBmMjEyYTIwMC5tZGlvLW1paTowNDogVHJ1bmNh
-dGVkIGJ1cy1pZCBtYXkgY29sbGlkZS4NCj4+IFsgICAgOC42MjM1OTNdIHN5c2ZzOiBjYW5ub3Qg
-Y3JlYXRlIGR1cGxpY2F0ZSBmaWxlbmFtZSAnL2RldmljZXMvcGxhdGZvcm0vY3AwL2NwMDpjb25m
-aWctc3BhY2VAZjIwMDAwMDAvZjIxMmEyMDAubWRpby9tZGlvX2J1cy9mMjEyYTIwMC5tZGlvLW1p
-aS9mMjEyYTIwMC5tZGlvLW1paTowNC9tZGlvX2J1cy8hY3AwIWNvbmZpZy1zcGFjZUBmMjAwMDAw
-MCFtZGlvQDEyYTIwMCFldGhlcm5ldC1zd2l0Y2hANCFtZGknDQo+PiBbICAgIDguNzg1NDgwXSBr
-b2JqZWN0OiBrb2JqZWN0X2FkZF9pbnRlcm5hbCBmYWlsZWQgZm9yICFjcDAhY29uZmlnLXNwYWNl
-QGYyMDAwMDAwIW1kaW9AMTJhMjAwIWV0aGVybmV0LXN3aXRjaEA0IW1kaSB3aXRoIC1FRVhJU1Qs
-IGRvbid0IHRyeSB0byByZWdpc3RlciB0aGluZ3Mgd2l0aCB0aGUgc2FtZSBuYW1lIGluIHRoZSBz
-YW1lIGRpcmVjdG9yeS4NCj4+IFsgICAgOC45MzY1MTRdIGxpYnBoeTogbWlpX2J1cyAvY3AwL2Nv
-bmZpZy1zcGFjZUBmMjAwMDAwMC9tZGlvQDEyYTIwMC9ldGhlcm5ldC1zd2l0Y2hANC9tZGkgZmFp
-bGVkIHRvIHJlZ2lzdGVyDQo+PiBbICAgIDguOTQ2MzAwXSBtZGlvX2J1cyAhY3AwIWNvbmZpZy1z
-cGFjZUBmMjAwMDAwMCFtZGlvQDEyYTIwMCFldGhlcm5ldC1zd2l0Y2hANCFtZGk6IF9fbWRpb2J1
-c19yZWdpc3RlcjogLTIyDQo+PiBbICAgIDguOTU2MDAzXSBtdjg4ZTYwODUgZjIxMmEyMDAubWRp
-by1taWk6MDQ6IENhbm5vdCByZWdpc3RlciBNRElPIGJ1cyAoLTIyKQ0KPj4gWyAgICA4Ljk2NTMy
-OV0gbXY4OGU2MDg1OiBwcm9iZSBvZiBmMjEyYTIwMC5tZGlvLW1paTowNCBmYWlsZWQgd2l0aCBl
-cnJvciAtMjINCj4+DQo+PiBbMl0NCj4+IC9kZXZpY2VzL3BsYXRmb3JtL2NwMC9jcDA6Y29uZmln
-LXNwYWNlQGYyMDAwMDAwL2YyMTJhMjAwLm1kaW8vbWRpb19idXMvZjIxMmEyMDAubWRpby1taWkv
-ZjIxMmEyMDAubWRpby1taWk6MDQvbWRpb19idXMvIWNwMCFjb25maWctc3BhY2VAZjIwMDAwMDAh
-bWRpb0AxMmEyMDAhZXRoZXJuZXQtc3dpdGNoLi4uIS0wDQo+PiAvZGV2aWNlcy9wbGF0Zm9ybS9j
-cDAvY3AwOmNvbmZpZy1zcGFjZUBmMjAwMDAwMC9mMjEyYTIwMC5tZGlvL21kaW9fYnVzL2YyMTJh
-MjAwLm1kaW8tbWlpL2YyMTJhMjAwLm1kaW8tbWlpOjA0L21kaW9fYnVzLyFjcDAhY29uZmlnLXNw
-YWNlQGYyMDAwMDAwIW1kaW9AMTJhMjAwIWV0aGVybmV0LXN3aXRjaC4uLiEtMQ0KPj4NCj4+IFNp
-Z25lZC1vZmYtYnk6IEpvc3VhIE1heWVyIDxqb3N1YUBzb2xpZC1ydW4uY29tPg0KPj4gLS0tDQo+
-IFRoZSBpZGVhIGFuZCBpbXBsZW1lbnRhdGlvbiBpcyByZWFzb25hYmxlIGJ1dCB0aGlzIGNvdWxk
-IGFmZmVjdCBvdGhlciBkcml2ZXJzIHRoYW4gbXY4OGU2eHh4LCB3aHkgbm90IG1vdmUgdGhhdCBs
-b2dpYyB0byBtZGlvYnVzX3JlZ2lzdGVyKCkgYW5kIHRyYWNraW5nIHRoZSB0cnVuY2F0aW9uIGlu
-ZGV4IGdsb2JhbGx5IHdpdGhpbiB0aGUgTURJTyBidXMgbGF5ZXI/DQpDb25jZXB0dWFsbHkgSSBh
-Z3JlZSwgaXQgd291bGQgYmUgbmljZSB0byBoYXZlIGEgY2VudHJhbGl6ZWQNCnNvbHV0aW9uIHRv
-IHRoaXMgcHJvYmxlbSwgaXQgcHJvYmFibHkgY2FuIG9jY3VyIGluIG11bHRpcGxlIHBsYWNlcy4N
-Cg0KTXkgcmVhc29uaW5nIGlzIHRoYXQgc29sdmluZyB0aGUgcHJvYmxlbSB3aXRoaW4gYSBzaW5n
-bGUgZHJpdmVyDQppcyBhIG11Y2ggc21hbGxlciB0YXNrLCBlc3BlY2lhbGx5IGZvciBzcG9yYWRp
-YyBjb250cmlidXRvcnMNCndobyBsYWNrIGEgZGVlcCB1bmRlcnN0YW5kaW5nIGZvciBob3cgYWxs
-IGxheWVycyBpbnRlcmFjdC4NCg0KUGVyaGFwcyBhZ3JlZWluZyBvbiBhIGdvb2Qgc29sdXRpb24g
-d2l0aGluIHRoaXMgZHJpdmVyDQpjYW4gaW5mb3JtIGEgbW9yZSBnZW5lcmFsIHNvbHV0aW9uIHRv
-IGJlIGFkZGVkIGxhdGVyLg0KDQo+IElmIHdlIHByZWZlciBhIGRyaXZlciBiYXNlZCBzb2x1dGlv
-biwgdGhlIG1paV9idXMgb2JqZWN0IGNvdWxkIGNhcnJ5IGEgdHJ1bmNhdGlvbiBmb3JtYXQsIGF0
-IHRoZSByaXNrIG9mIGNyZWF0aW5nIG1vcmUgdmFyaWF0aW9uIGJldHdlZW4gZHJpdmVycyBpbiBj
-YXNlIG9mIHRydW5jYXRpb24uIFdlIGNvdWxkIGFsc28gd2FpdCB1bnRpbCB3ZSBoYXZlIGFub3Ro
-ZXIgZHJpdmVyIHJlcXVpcmluZyBhIHNpbWlsYXIgc29sdXRpb24gYmVmb3JlIHByb21vdGluZyB0
-aGlzIHRvIGEgd2lkZXIgcmFuZ2UuDQoNCg0KYnINCkpvc3VhIE1heWVyDQoNCg==
+Hi Florian,
+
+On Tue, 7 May 2024, Florian Westphal wrote:
+
+> Add a new test script that uses packetdrill tool to exercise conntrack
+> state machine.
+
+This is really great!! It was missing to actually test and verify the
+conntrack state machine.
+
+Best regards,
+Jozsef
+ 
+> Needs ip/ip6tables and conntrack tool (to check if we have an entry in
+> the expected state).
+> 
+> Test cases added here cover following scenarios:
+> 1. already-acked (retransmitted) packets are not tagged as INVALID
+> 2. RST packet coming when conntrack is already closing (FIN/CLOSE_WAIT)
+>   transitions conntrack to CLOSE even if the RST is not an exact match
+> 3. RST packets with out-of-window sequence numbers are marked as INVALID
+> 4. SYN+Challenge ACK: check that challenge ack is allowed to pass
+> 5. Old SYN/ACK: check conntrack handles the case where SYN is answered
+>   with SYN/ACK for an old, previous connection attempt
+> 6. Check SYN reception while in ESTABLISHED state generates a challenge
+>    ack, RST response clears 'outdated' state + next SYN retransmit gets
+>    us into 'SYN_RECV' conntrack state.
+> 
+> Tests get run twice, once with ipv4 and once with ipv6.
+> 
+> Signed-off-by: Florian Westphal <fw@strlen.de>
+> ---
+>  .../testing/selftests/net/netfilter/Makefile  |   2 +
+>  tools/testing/selftests/net/netfilter/config  |   1 +
+>  .../net/netfilter/nf_conntrack_packetdrill.sh |  71 +++++++++++
+>  .../net/netfilter/packetdrill/common.sh       |  33 +++++
+>  .../packetdrill/conntrack_ack_loss_stall.pkt  | 118 ++++++++++++++++++
+>  .../packetdrill/conntrack_inexact_rst.pkt     |  62 +++++++++
+>  .../packetdrill/conntrack_rst_invalid.pkt     |  59 +++++++++
+>  .../conntrack_syn_challenge_ack.pkt           |  44 +++++++
+>  .../packetdrill/conntrack_synack_old.pkt      |  51 ++++++++
+>  .../packetdrill/conntrack_synack_reuse.pkt    |  34 +++++
+>  10 files changed, 475 insertions(+)
+>  create mode 100755 tools/testing/selftests/net/netfilter/nf_conntrack_packetdrill.sh
+>  create mode 100755 tools/testing/selftests/net/netfilter/packetdrill/common.sh
+>  create mode 100644 tools/testing/selftests/net/netfilter/packetdrill/conntrack_ack_loss_stall.pkt
+>  create mode 100644 tools/testing/selftests/net/netfilter/packetdrill/conntrack_inexact_rst.pkt
+>  create mode 100644 tools/testing/selftests/net/netfilter/packetdrill/conntrack_rst_invalid.pkt
+>  create mode 100644 tools/testing/selftests/net/netfilter/packetdrill/conntrack_syn_challenge_ack.pkt
+>  create mode 100644 tools/testing/selftests/net/netfilter/packetdrill/conntrack_synack_old.pkt
+>  create mode 100644 tools/testing/selftests/net/netfilter/packetdrill/conntrack_synack_reuse.pkt
+> 
+> diff --git a/tools/testing/selftests/net/netfilter/Makefile b/tools/testing/selftests/net/netfilter/Makefile
+> index e9a6c702b8c9..47945b2b3f92 100644
+> --- a/tools/testing/selftests/net/netfilter/Makefile
+> +++ b/tools/testing/selftests/net/netfilter/Makefile
+> @@ -13,6 +13,7 @@ TEST_PROGS += conntrack_tcp_unreplied.sh
+>  TEST_PROGS += conntrack_sctp_collision.sh
+>  TEST_PROGS += conntrack_vrf.sh
+>  TEST_PROGS += ipvs.sh
+> +TEST_PROGS += nf_conntrack_packetdrill.sh
+>  TEST_PROGS += nf_nat_edemux.sh
+>  TEST_PROGS += nft_audit.sh
+>  TEST_PROGS += nft_concat_range.sh
+> @@ -45,6 +46,7 @@ $(OUTPUT)/conntrack_dump_flush: CFLAGS += $(MNL_CFLAGS)
+>  $(OUTPUT)/conntrack_dump_flush: LDLIBS += $(MNL_LDLIBS)
+>  
+>  TEST_FILES := lib.sh
+> +TEST_FILES += packetdrill
+>  
+>  TEST_INCLUDES := \
+>  	../lib.sh
+> diff --git a/tools/testing/selftests/net/netfilter/config b/tools/testing/selftests/net/netfilter/config
+> index 5b5b764f6cd0..63ef80ef47a4 100644
+> --- a/tools/testing/selftests/net/netfilter/config
+> +++ b/tools/testing/selftests/net/netfilter/config
+> @@ -86,3 +86,4 @@ CONFIG_VLAN_8021Q=m
+>  CONFIG_XFRM_USER=m
+>  CONFIG_XFRM_STATISTICS=y
+>  CONFIG_NET_PKTGEN=m
+> +CONFIG_TUN=m
+> diff --git a/tools/testing/selftests/net/netfilter/nf_conntrack_packetdrill.sh b/tools/testing/selftests/net/netfilter/nf_conntrack_packetdrill.sh
+> new file mode 100755
+> index 000000000000..c6fdd2079f4d
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/netfilter/nf_conntrack_packetdrill.sh
+> @@ -0,0 +1,71 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +source lib.sh
+> +
+> +checktool "conntrack --version" "run test without conntrack"
+> +checktool "iptables --version" "run test without iptables"
+> +checktool "ip6tables --version" "run test without ip6tables"
+> +
+> +modprobe -q tun
+> +modprobe -q nf_conntrack
+> +# echo 1 > /proc/sys/net/netfilter/nf_log_all_netns
+> +
+> +PDRILL_TIMEOUT=10
+> +
+> +files="
+> +conntrack_ack_loss_stall.pkt
+> +conntrack_inexact_rst.pkt
+> +conntrack_syn_challenge_ack.pkt
+> +conntrack_synack_old.pkt
+> +conntrack_synack_reuse.pkt
+> +conntrack_rst_invalid.pkt
+> +"
+> +
+> +if ! packetdrill --dry_run --verbose "packetdrill/conntrack_ack_loss_stall.pkt";then
+> +	echo "SKIP: packetdrill not installed"
+> +	exit ${ksft_skip}
+> +fi
+> +
+> +ret=0
+> +
+> +run_packetdrill()
+> +{
+> +	filename="$1"
+> +	ipver="$2"
+> +	local mtu=1500
+> +
+> +	export NFCT_IP_VERSION="$ipver"
+> +
+> +	if [ "$ipver" = "ipv4" ];then
+> +		export xtables="iptables"
+> +	elif [ "$ipver" = "ipv6" ];then
+> +		export xtables="ip6tables"
+> +		mtu=1520
+> +	fi
+> +
+> +	timeout "$PDRILL_TIMEOUT" unshare -n packetdrill --ip_version="$ipver" --mtu=$mtu \
+> +		--tolerance_usecs=1000000 --non_fatal packet "$filename"
+> +}
+> +
+> +run_one_test_file()
+> +{
+> +	filename="$1"
+> +
+> +	for v in ipv4 ipv6;do
+> +		printf "%-50s(%s)%-20s" "$filename" "$v" ""
+> +		if run_packetdrill packetdrill/"$f" "$v";then
+> +			echo OK
+> +		else
+> +			echo FAIL
+> +			ret=1
+> +		fi
+> +	done
+> +}
+> +
+> +echo "Replaying packetdrill test cases:"
+> +for f in $files;do
+> +	run_one_test_file packetdrill/"$f"
+> +done
+> +
+> +exit $ret
+> diff --git a/tools/testing/selftests/net/netfilter/packetdrill/common.sh b/tools/testing/selftests/net/netfilter/packetdrill/common.sh
+> new file mode 100755
+> index 000000000000..ed36d535196d
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/netfilter/packetdrill/common.sh
+> @@ -0,0 +1,33 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +# for debugging set net.netfilter.nf_log_all_netns=1 in init_net
+> +# or do not use net namespaces.
+> +modprobe -q nf_conntrack
+> +sysctl -q net.netfilter.nf_conntrack_log_invalid=6
+> +
+> +# Flush old cached data (fastopen cookies).
+> +ip tcp_metrics flush all > /dev/null 2>&1
+> +
+> +# TCP min, default, and max receive and send buffer sizes.
+> +sysctl -q net.ipv4.tcp_rmem="4096 540000 $((15*1024*1024))"
+> +sysctl -q net.ipv4.tcp_wmem="4096 $((256*1024)) 4194304"
+> +
+> +# TCP congestion control.
+> +sysctl -q net.ipv4.tcp_congestion_control=cubic
+> +
+> +# TCP slow start after idle.
+> +sysctl -q net.ipv4.tcp_slow_start_after_idle=0
+> +
+> +# TCP Explicit Congestion Notification (ECN)
+> +sysctl -q net.ipv4.tcp_ecn=0
+> +
+> +sysctl -q net.ipv4.tcp_notsent_lowat=4294967295 > /dev/null 2>&1
+> +
+> +# Override the default qdisc on the tun device.
+> +# Many tests fail with timing errors if the default
+> +# is FQ and that paces their flows.
+> +tc qdisc add dev tun0 root pfifo
+> +
+> +# Enable conntrack
+> +$xtables -A INPUT -m conntrack --ctstate NEW -p tcp --syn
+> diff --git a/tools/testing/selftests/net/netfilter/packetdrill/conntrack_ack_loss_stall.pkt b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_ack_loss_stall.pkt
+> new file mode 100644
+> index 000000000000..d755bd64c54f
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_ack_loss_stall.pkt
+> @@ -0,0 +1,118 @@
+> +// check that already-acked (retransmitted) packet is let through rather
+> +// than tagged as INVALID.
+> +
+> +`packetdrill/common.sh`
+> +
+> +// should set -P DROP but it disconnects VM w.o. extra netns
+> ++0 `$xtables -A INPUT -m conntrack --ctstate INVALID -j DROP`
+> +
+> ++0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
+> ++0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
+> ++0 bind(3, ..., ...) = 0
+> ++0 listen(3, 10) = 0
+> +
+> ++0 < S 0:0(0) win 32792 <mss 1000>
+> ++0 > S. 0:0(0) ack 1 <mss 1460>
+> ++.01 < . 1:1(0) ack 1 win 65535
+> ++0 accept(3, ..., ...) = 4
+> +
+> ++0.0001 < P. 1:1461(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 1461 win 65535
+> ++0.0001 < P. 1461:2921(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 2921 win 65535
+> ++0.0001 < P. 2921:4381(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 4381 win 65535
+> ++0.0001 < P. 4381:5841(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 5841 win 65535
+> ++0.0001 < P. 5841:7301(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 7301 win 65535
+> ++0.0001 < P. 7301:8761(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 8761 win 65535
+> ++0.0001 < P. 8761:10221(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 10221 win 65535
+> ++0.0001 < P. 10221:11681(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 11681 win 65535
+> ++0.0001 < P. 11681:13141(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 13141 win 65535
+> ++0.0001 < P. 13141:14601(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 14601 win 65535
+> ++0.0001 < P. 14601:16061(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 16061 win 65535
+> ++0.0001 < P. 16061:17521(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 17521 win 65535
+> ++0.0001 < P. 17521:18981(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 18981 win 65535
+> ++0.0001 < P. 18981:20441(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 20441 win 65535
+> ++0.0001 < P. 20441:21901(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 21901 win 65535
+> ++0.0001 < P. 21901:23361(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 23361 win 65535
+> ++0.0001 < P. 23361:24821(1460) ack 1 win 257
+> +0.055 > . 1:1(0) ack 24821 win 65535
+> ++0.0001 < P. 24821:26281(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 26281 win 65535
+> ++0.0001 < P. 26281:27741(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 27741 win 65535
+> ++0.0001 < P. 27741:29201(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 29201 win 65535
+> ++0.0001 < P. 29201:30661(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 30661 win 65535
+> ++0.0001 < P. 30661:32121(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 32121 win 65535
+> ++0.0001 < P. 32121:33581(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 33581 win 65535
+> ++0.0001 < P. 33581:35041(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 35041 win 65535
+> ++0.0001 < P. 35041:36501(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 36501 win 65535
+> ++0.0001 < P. 36501:37961(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 37961 win 65535
+> ++0.0001 < P. 37961:39421(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 39421 win 65535
+> ++0.0001 < P. 39421:40881(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 40881 win 65535
+> ++0.0001 < P. 40881:42341(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 42341 win 65535
+> ++0.0001 < P. 42341:43801(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 43801 win 65535
+> ++0.0001 < P. 43801:45261(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 45261 win 65535
+> ++0.0001 < P. 45261:46721(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 46721 win 65535
+> ++0.0001 < P. 46721:48181(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 48181 win 65535
+> ++0.0001 < P. 48181:49641(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 49641 win 65535
+> ++0.0001 < P. 49641:51101(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 51101 win 65535
+> ++0.0001 < P. 51101:52561(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 52561 win 65535
+> ++0.0001 < P. 52561:54021(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 54021 win 65535
+> ++0.0001 < P. 54021:55481(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 55481 win 65535
+> ++0.0001 < P. 55481:56941(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 56941 win 65535
+> ++0.0001 < P. 56941:58401(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 58401 win 65535
+> ++0.0001 < P. 58401:59861(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 59861 win 65535
+> ++0.0001 < P. 59861:61321(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 61321 win 65535
+> ++0.0001 < P. 61321:62781(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 62781 win 65535
+> ++0.0001 < P. 62781:64241(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 64241 win 65535
+> ++0.0001 < P. 64241:65701(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 65701 win 65535
+> ++0.0001 < P. 65701:67161(1460) ack 1 win 257
+> ++.0 > . 1:1(0) ack 67161 win 65535
+> +
+> +// nf_ct_proto_6: SEQ is under the lower bound (already ACKed data retransmitted) IN=tun0 OUT= MAC= SRC=192.0.2.1 DST=192.168.24.72 LEN=1500 TOS=0x00 PREC=0x00 TTL=255 ID=0 PROTO=TCP SPT=34375 DPT=8080 SEQ=1 ACK=4162510439 WINDOW=257 RES=0x00 ACK PSH URGP=0
+> ++0.0001 < P. 1:1461(1460) ack 1 win 257
+> +
+> +// only sent if above packet isn't flagged as invalid
+> ++.0 > . 1:1(0) ack 67161 win 65535
+> +
+> ++0 `$xtables -D INPUT -m conntrack --ctstate INVALID -j DROP`
+> diff --git a/tools/testing/selftests/net/netfilter/packetdrill/conntrack_inexact_rst.pkt b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_inexact_rst.pkt
+> new file mode 100644
+> index 000000000000..dccdd4c009c6
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_inexact_rst.pkt
+> @@ -0,0 +1,62 @@
+> +// check RST packet that doesn't exactly match expected next sequence
+> +// number still transitions conntrack state to CLOSE iff its already in
+> +// FIN/CLOSE_WAIT.
+> +
+> +`packetdrill/common.sh`
+> +
+> +//  5.771921 server_ip > client_ip TLSv1.2 337 [Packet size limited during capture]
+> +//  5.771994 server_ip > client_ip TLSv1.2 337 [Packet size limited during capture]
+> +//  5.772212 client_ip > server_ip TCP 66 45020 > 443 [ACK] Seq=1905874048 Ack=781810658 Win=36352 Len=0 TSval=3317842872 TSecr=675936334
+> +//  5.787924 server_ip > client_ip TLSv1.2 1300 [Packet size limited during capture]
+> +//  5.788126 server_ip > client_ip TLSv1.2 90 Application Data
+> +//  5.788207 server_ip > client_ip TCP 66 443 > 45020 [FIN, ACK] Seq=781811916 Ack=1905874048 Win=31104 Len=0 TSval=675936350 TSecr=3317842872
+> +//  5.788447 client_ip > server_ip TLSv1.2 90 Application Data
+> +//  5.788479 client_ip > server_ip TCP 66 45020 > 443 [RST, ACK] Seq=1905874072 Ack=781811917 Win=39040 Len=0 TSval=3317842889 TSecr=675936350
+> +//  5.788581 server_ip > client_ip TCP 54 8443 > 45020 [RST] Seq=781811892 Win=0 Len=0
+> +
+> ++0 `iptables -A INPUT -p tcp -m conntrack --ctstate INVALID -j DROP`
+> ++0 `iptables -A OUTPUT -p tcp -m conntrack --ctstate INVALID -j DROP`
+> +
+> ++0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
+> ++0 fcntl(3, F_SETFL, O_RDWR|O_NONBLOCK) = 0
+> +
+> +0.1 connect(3, ..., ...) = -1 EINPROGRESS (Operation now in progress)
+> +
+> +0.1 > S 0:0(0) win 65535 <mss 1460,sackOK,TS val 1 ecr 0,nop,wscale 8>
+> +
+> ++0.1 < S. 1:1(0) ack 1 win 65535 <mss 1460>
+> +
+> ++0 > . 1:1(0) ack 1 win 65535
+> ++0 < . 1:1001(1000) ack 1 win 65535
+> ++0 < . 1001:2001(1000) ack 1 win 65535
+> ++0 < . 2001:3001(1000) ack 1 win 65535
+> +
+> ++0 > . 1:1(0) ack 1001 win 65535
+> ++0 > . 1:1(0) ack 2001 win 65535
+> ++0 > . 1:1(0) ack 3001 win 65535
+> +
+> ++0 write(3, ..., 1000) = 1000
+> +
+> ++0.0 > P. 1:1001(1000) ack 3001 win 65535
+> +
+> ++0.1 read(3, ..., 1000) = 1000
+> +
+> +// Conntrack should move to FIN_WAIT, then CLOSE_WAIT.
+> ++0 < F. 3001:3001(0) ack 1001 win 65535
+> ++0 >  . 1001:1001(0) ack 3002 win 65535
+> +
+> ++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null |grep -q CLOSE_WAIT`
+> +
+> ++1 close(3) = 0
+> +// RST: unread data. FIN was seen, hence ack + 1
+> ++0 > R. 1001:1001(0) ack 3002 win 65535
+> +// ... and then, CLOSE.
+> ++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null |grep -q CLOSE\ `
+> +
+> +// Spurious RST from peer -- no sk state.  Should NOT get
+> +// marked INVALID, because conntrack is already closing.
+> ++0.1 < R 2001:2001(0) win 0
+> +
+> +// No packets should have been marked INVALID
+> ++0 `iptables -v -S INPUT  | grep INVALID | grep -q -- "-c 0 0"`
+> ++0 `iptables -v -S OUTPUT | grep INVALID | grep -q -- "-c 0 0"`
+> diff --git a/tools/testing/selftests/net/netfilter/packetdrill/conntrack_rst_invalid.pkt b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_rst_invalid.pkt
+> new file mode 100644
+> index 000000000000..686f18a3d9ef
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_rst_invalid.pkt
+> @@ -0,0 +1,59 @@
+> +// check that out of window resets are marked as INVALID and conntrack remains
+> +// in ESTABLISHED state.
+> +
+> +`packetdrill/common.sh`
+> +
+> ++0 `$xtables -A INPUT -p tcp -m conntrack --ctstate INVALID -j DROP`
+> ++0 `$xtables -A OUTPUT -p tcp -m conntrack --ctstate INVALID -j DROP`
+> +
+> ++0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
+> ++0 fcntl(3, F_SETFL, O_RDWR|O_NONBLOCK) = 0
+> +
+> +0.1 connect(3, ..., ...) = -1 EINPROGRESS (Operation now in progress)
+> +
+> +0.1 > S 0:0(0) win 65535 <mss 1460,sackOK,TS val 1 ecr 0,nop,wscale 8>
+> +
+> ++0.1 < S. 1:1(0) ack 1 win 65535 <mss 1460>
+> +
+> ++0 > . 1:1(0) ack 1 win 65535
+> ++0 < . 1:1001(1000) ack 1 win 65535
+> ++0 < . 1001:2001(1000) ack 1 win 65535
+> ++0 < . 2001:3001(1000) ack 1 win 65535
+> +
+> ++0 > . 1:1(0) ack 1001 win 65535
+> ++0 > . 1:1(0) ack 2001 win 65535
+> ++0 > . 1:1(0) ack 3001 win 65535
+> +
+> ++0 write(3, ..., 1000) = 1000
+> +
+> +// out of window
+> ++0.0 < R	0:0(0)	win 0
+> ++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null |grep -q ESTABLISHED`
+> +
+> +// out of window
+> ++0.0 < R	1000000:1000000(0)	win 0
+> ++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null |grep -q ESTABLISHED`
+> +
+> +// in-window but not exact match
+> ++0.0 < R	42:42(0)	win 0
+> ++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null |grep -q ESTABLISHED`
+> +
+> ++0.0 > P. 1:1001(1000) ack 3001 win 65535
+> +
+> ++0.1 read(3, ..., 1000) = 1000
+> ++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null |grep -q ESTABLISHED`
+> +
+> ++0 < . 3001:3001(0) ack 1001 win 65535
+> +
+> ++0.0 < R. 3000:3000(0) ack 1001 win 0
+> ++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null |grep -q ESTABLISHED`
+> +
+> +// exact next sequence
+> ++0.0 < R. 3001:3001(0) ack 1001 win 0
+> +// Conntrack should move to CLOSE
+> +
+> +// Expect four invalid RSTs
+> ++0 `$xtables -v -S INPUT  | grep INVALID | grep -q -- "-c 4 "`
+> ++0 `$xtables -v -S OUTPUT | grep INVALID | grep -q -- "-c 0 0"`
+> +
+> ++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null |grep -q CLOSE\ `
+> diff --git a/tools/testing/selftests/net/netfilter/packetdrill/conntrack_syn_challenge_ack.pkt b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_syn_challenge_ack.pkt
+> new file mode 100644
+> index 000000000000..3442cd29bc93
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_syn_challenge_ack.pkt
+> @@ -0,0 +1,44 @@
+> +// Check connection re-use, i.e. peer that receives the SYN answers with
+> +// a challenge-ACK.
+> +// Check that conntrack lets all packets pass, including the challenge ack,
+> +// and that a new connection is established.
+> +
+> +`packetdrill/common.sh`
+> +
+> +// S  >
+> +//  . < (challnge-ack)
+> +// R. >
+> +// S  >
+> +// S. <
+> +// Expected outcome: established connection.
+> +
+> ++0 `$xtables -A INPUT -p tcp -m conntrack --ctstate INVALID -j DROP`
+> ++0 `$xtables -A OUTPUT -p tcp -m conntrack --ctstate INVALID -j DROP`
+> +
+> ++0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
+> ++0 fcntl(3, F_SETFL, O_RDWR|O_NONBLOCK) = 0
+> +
+> +0.1 connect(3, ..., ...) = -1 EINPROGRESS (Operation now in progress)
+> +0.1 > S 0:0(0) win 65535 <mss 1460,sackOK,TS val 1 ecr 0,nop,wscale 8>
+> +
+> +// Challenge ACK, old incarnation.
+> +0.1 < . 145824453:145824453(0) ack 643160523 win 240 <mss 1460,nop,nop,TS val 1 ecr 1,nop,wscale 0>
+> +
+> ++0.01 > R 643160523:643160523(0) win 0
+> +
+> ++0.01 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null | grep UNREPLIED | grep -q SYN_SENT`
+> +
+> +// Must go through.
+> ++0.01 > S 0:0(0) win 65535 <mss 1460,sackOK,TS val 1 ecr 0,nop,wscale 8>
+> +
+> +// correct synack
+> ++0.1 < S. 0:0(0) ack 1 win 250 <mss 1460,nop,nop,TS val 1 ecr 1,nop,wscale 0>
+> +
+> +// 3whs completes.
+> ++0.01 > . 1:1(0) ack 1 win 256 <nop,nop,TS val 1 ecr 1>
+> +
+> ++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null | grep ESTABLISHED | grep -q ASSURED`
+> +
+> +// No packets should have been marked INVALID
+> ++0 `$xtables -v -S INPUT  | grep INVALID | grep -q -- "-c 0 0"`
+> ++0 `$xtables -v -S OUTPUT | grep INVALID | grep -q -- "-c 0 0"`
+> diff --git a/tools/testing/selftests/net/netfilter/packetdrill/conntrack_synack_old.pkt b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_synack_old.pkt
+> new file mode 100644
+> index 000000000000..3047160c4bf3
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_synack_old.pkt
+> @@ -0,0 +1,51 @@
+> +// Check conntrack copes with syn/ack reply for a previous, old incarnation.
+> +
+> +// tcpdump with buggy sequence
+> +// 10.176.25.8.829 > 10.192.171.30.2049: Flags [S], seq 2375731741, win 29200, options [mss 1460,sackOK,TS val 2083107423 ecr 0,nop,wscale 7], length 0
+> +// OLD synack, for old/previous S
+> +// 10.192.171.30.2049 > 10.176.25.8.829: Flags [S.], seq 145824453, ack 643160523, win 65535, options [mss 8952,nop,wscale 5,TS val 3215437785 ecr 2082921663,nop,nop], length 0
+> +// This reset never makes it to the endpoint, elided in the packetdrill script
+> +// 10.192.171.30.2049 > 10.176.25.8.829: Flags [R.], seq 1, ack 1, win 65535, options [mss 8952,nop,wscale 5,TS val 3215443451 ecr 2082921663,nop,nop], length 0
+> +// Syn retransmit, no change
+> +// 10.176.25.8.829 > 10.192.171.30.2049: Flags [S], seq 2375731741, win 29200, options [mss 1460,sackOK,TS val 2083115583 ecr 0,nop,wscale 7], length 0
+> +// CORRECT synack, should be accepted, but conntrack classified this as INVALID:
+> +// SEQ is over the upper bound (over the window of the receiver) IN=tun0 OUT= MAC= SRC=192.0.2.1 DST=192.168.37.78 LEN=40 TOS=0x00 PREC=0x00 TTL=255 ID=0 PROTO=TCP SPT=8080 DPT=34500 SEQ=162602411 ACK=2124350315 ..
+> +// 10.192.171.30.2049 > 10.176.25.8.829: Flags [S.], seq 162602410, ack 2375731742, win 65535, options [mss 8952,nop,wscale 5,TS val 3215445754 ecr 2083115583,nop,nop], length 0
+> +
+> +`packetdrill/common.sh`
+> +
+> ++0 `$xtables -A INPUT -p tcp -m conntrack --ctstate INVALID -j DROP`
+> ++0 `$xtables -A OUTPUT -p tcp -m conntrack --ctstate INVALID -j DROP`
+> +
+> ++0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
+> ++0 fcntl(3, F_SETFL, O_RDWR|O_NONBLOCK) = 0
+> +
+> +0.1 connect(3, ..., ...) = -1 EINPROGRESS (Operation now in progress)
+> +0.1 > S 0:0(0) win 65535 <mss 1460,sackOK,TS val 1 ecr 0,nop,wscale 8>
+> +
+> +// bogus/outdated synack, invalid ack value
+> +0.1 < S. 145824453:145824453(0) ack 643160523 win 240 <mss 1440,nop,nop,TS val 1 ecr 1,nop,wscale 0>
+> +
+> +// syn retransmitted
+> +1.01 > S 0:0(0) win 65535 <mss 1460,sackOK,TS val 1015 ecr 0,nop,wscale 8>
+> ++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null | grep UNREPLIED | grep -q SYN_SENT`
+> +
+> +// correct synack
+> ++0 < S. 145758918:145758918(0) ack 1 win 250 <mss 1460,nop,nop,TS val 1 ecr 1,nop,wscale 0>
+> ++0 write(3, ..., 1) = 1
+> +
+> +// with buggy conntrack above packet is dropped, so SYN rtx is seen:
+> +// script packet:  1.054007 . 1:1(0) ack 16777958 win 256 <nop,nop,TS val 1033 ecr 1>
+> +// actual packet:  3.010000 S 0:0(0) win 65535 <mss 1460,sackOK,TS val 1015 ecr 0,nop,wscale 8>
+> ++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null | grep ESTABLISHED | grep -q ASSURED`
+> +
+> ++0 > P. 1:2(1) ack 4294901762 win 256 <nop,nop,TS val 1067 ecr 1>
+> +
+> ++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null | grep ASSURED | grep -q ESTABLISHED`
+> +
+> +// No packets should have been marked INVALID in OUTPUT direction, 1 in INPUT
+> ++0 `$xtables -v -S OUTPUT | grep INVALID | grep -q -- "-c 0 0"`
+> ++0 `$xtables -v -S INPUT  | grep INVALID | grep -q -- "-c 1 "`
+> +
+> ++0 `$xtables -D INPUT -p tcp -m conntrack --ctstate INVALID -j DROP`
+> ++0 `$xtables -D OUTPUT -p tcp -m conntrack --ctstate INVALID -j DROP`
+> diff --git a/tools/testing/selftests/net/netfilter/packetdrill/conntrack_synack_reuse.pkt b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_synack_reuse.pkt
+> new file mode 100644
+> index 000000000000..21e1bb6395e4
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_synack_reuse.pkt
+> @@ -0,0 +1,34 @@
+> +// Check reception of another SYN while we have an established conntrack state.
+> +// Challenge ACK is supposed to pass through, RST reply should clear conntrack
+> +// state and SYN retransmit should give us new 'SYN_RECV' connection state.
+> +
+> +`packetdrill/common.sh`
+> +
+> +// should show a match if bug is present:
+> ++0 `iptables -A INPUT -m conntrack --ctstate INVALID -p tcp --tcp-flags SYN,ACK SYN,ACK`
+> +
+> ++0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
+> ++0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
+> ++0 bind(3, ..., ...) = 0
+> ++0 listen(3, 10) = 0
+> +
+> ++0 < S 0:0(0) win 32792 <mss 1000,nop,wscale 7, TS val 1 ecr 0,nop,nop>
+> ++0 > S. 0:0(0) ack 1 <mss 1460,nop,nop,TS val 100 ecr 1,nop,wscale 8>
+> ++.01 < . 1:1(0) ack 1 win 257 <TS val 1 ecr 100,nop,nop>
+> ++0 accept(3, ..., ...) = 4
+> +
+> ++0 < P. 1:101(100) ack 1 win 257 <TS val 2 ecr 100,nop,nop>
+> ++.001 > . 1:1(0) ack 101 win 256 <nop,nop,TS val 110 ecr 2>
+> ++0 read(4, ..., 101) = 100
+> +
+> +1.0 < S 2000:2000(0) win 32792 <mss 1000,nop,wscale 7, TS val 233 ecr 0,nop,nop>
+> +// Won't expect this: challenge ack.
+> +
+> ++0 > . 1:1(0) ack 101 win 256 <nop,nop,TS val 112 ecr 2>
+> ++0 < R. 101:101(0) ack 1 win 257
+> ++0 close(4) = 0
+> +
+> +1.5 < S 2000:2000(0) win 32792 <mss 1000,nop,wscale 0, TS val 233 ecr 0,nop,nop>
+> +
+> ++0 `conntrack -L -p tcp --dport 8080 2>/dev/null | grep -q SYN_RECV`
+> ++0 `iptables -v -S INPUT | grep INVALID | grep -q -- "-c 0 0"`
+> -- 
+> 2.43.2
+> 
+> 
+> 
+
+-- 
+E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
+PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
+Address : Wigner Research Centre for Physics
+          H-1525 Budapest 114, POB. 49, Hungary
 
