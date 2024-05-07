@@ -1,57 +1,66 @@
-Return-Path: <netdev+bounces-94103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F188BE20B
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:26:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D285D8BE215
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:29:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6ECA6B27C92
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:26:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 100621C22CAA
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:29:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488EB158A38;
-	Tue,  7 May 2024 12:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95BB9158A31;
+	Tue,  7 May 2024 12:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YsqoD66p"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D4D156F29;
-	Tue,  7 May 2024 12:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1E12136E2D;
+	Tue,  7 May 2024 12:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715084759; cv=none; b=bP6tA2DF02IXQ2ZNNtqHUyTTRTqYK4k2eoXiA6UgM30BqiS/H41CshjoAbahOYjkM3qPIUbAxQovDPQluo8L7PeNu4cE6Q/vX185Zdy+8w+RO571A3jWoaSbxxnj4CrlzP9IJyYD2T8TINdEzFbhuL1chN2rH0MPTNMvnMw5eqc=
+	t=1715084970; cv=none; b=Bhrgvy8VNDinwhYJTH/Ebck+O9WPKFKTgFCk9pfYfmwUzHy9o6MhQ3tWDQisdfJP6j624N2HHqo0ds8RhY3hi4ZBNwwHhtvYFQLJEQh8kayR6V8JYiPASzW4nh3GZrkvlVUYantc8DuhEjlZOEd0LYK4vk6JGMyVInPrASTgpho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715084759; c=relaxed/simple;
-	bh=hfuT7WNUoZz0JVxXMhFVmQ3qWpZaycbTaEqiWpyZtnw=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G2CirK5ssppmlPqze9aROWAy2HKo5buwS8ZJVXhVqalJ71cty1Yi8qleMIL2Knfy3EWG5gsMyWmzxcW8lnD2noLBf5iGKJjOdj2h3wm+uXmX0CwAhEo/z0ZGHvvjETDQ3TE1Xyp3WIGm/fhWk5aiU0vckjQqF82HqViAPzR2LFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1s4JtI-0000000049d-2mRN;
-	Tue, 07 May 2024 12:25:52 +0000
-Date: Tue, 7 May 2024 13:25:46 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net v2 2/2] net: ethernet: mediatek: use ADMAv1 instead of
- ADMAv2.0 on MT7981 and MT7986
-Message-ID: <9a694114ffbbf5f03384b0cbf0c27b9528c94576.1715084578.git.daniel@makrotopia.org>
-References: <6747c038f4fc3b490e1b7a355cdaaf361e359def.1715084578.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1715084970; c=relaxed/simple;
+	bh=Ih+G/794+A8sluHrmrTfPtWPhvrNrNwwqD6ODTAobkQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dmREWM4YHeHNp4Tm5r5+0bitmTbfC3OCdASLe03Gaghzo+rRsjgXqOp4Fl1eFKBwtyCR1SrLZ1geSP0k9i3fIKHVIBvcpZOyDa5vdHtLb3LyjXqOzovm0O8pyinBytySoz9NjZAxpkEOe/jgvEi3yxzwORm5rr/ol21NQ7DjR4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YsqoD66p; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5V+1nFSAUkiuiW5zI+KiDr7XGM1wYhBwOjZiie4eCy4=; b=YsqoD66pR6k8Uver9MP2Vpm5EA
+	Q1gzlHM+IqOrnrZBXnp18aN58tO+r8SsxPBJTIWAAna58kgC0OLj29qbwvP4QNvDwrgXm3VJSS1p6
+	ySAN+0ihKOMD/LDg+QvguGfBx7S9TblyZnHzePTTu6NMNMRWcUscLEuQiuMC6Qot6rrQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s4Jwj-00Equp-Oa; Tue, 07 May 2024 14:29:25 +0200
+Date: Tue, 7 May 2024 14:29:25 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: En-Wei WU <en-wei.wu@canonical.com>
+Cc: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>,
+	Sasha Neftin <sasha.neftin@intel.com>, netdev@vger.kernel.org,
+	rickywu0421@gmail.com, linux-kernel@vger.kernel.org,
+	edumazet@google.com, intel-wired-lan@lists.osuosl.org,
+	kuba@kernel.org, anthony.l.nguyen@intel.com, pabeni@redhat.com,
+	davem@davemloft.net,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH v2 1/2] e1000e: let the sleep codes run
+ every time
+Message-ID: <010c2d24-201e-4aba-b4a1-d973545121a7@lunn.ch>
+References: <20240503101824.32717-1-en-wei.wu@canonical.com>
+ <7f533913-fba9-4a29-86a5-d3b32ac44632@intel.com>
+ <CAMqyJG1Fyt1pZJqEjQN_kqXwfJ+HnqvW1PnAOEEpzoS9f37KBg@mail.gmail.com>
+ <d2d9c0a8-6d4f-4aff-84f3-35fc2bff49b7@intel.com>
+ <CAMqyJG2S4yvO-UiCiWydO+9uzOWpeKR9tmMDWrw=m6O7pd3m0w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,132 +69,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6747c038f4fc3b490e1b7a355cdaaf361e359def.1715084578.git.daniel@makrotopia.org>
+In-Reply-To: <CAMqyJG2S4yvO-UiCiWydO+9uzOWpeKR9tmMDWrw=m6O7pd3m0w@mail.gmail.com>
 
-ADMAv2.0 is plagued by RX hangs which can't easily detected and happen upon
-receival of a corrupted Ethernet frame.
+> > (1) How serious this problem is. It is normal for link establishment to
+> > take a few seconds from plugging the cable (due to PHY
+> > auto-negotiation), and I can accept some link instability during that time.
+> Actually, the problem is not critical since the link will be up
+> permanently after the unstable up-down problem when hot-plugging. And
+> it has no functional impact on the system. But this problem can lead
+> to a failure in our script (for Canonical Certification), and it's not
+> tolerable.
 
-Use ADMAv1 instead which is also still present and usable, and doesn't
-suffer from that problem.
+Please could you describe your test. We should be sure you are fixing
+the right thing. Maybe the test is broken, not the driver...
 
-Fixes: 197c9e9b17b1 ("net: ethernet: mtk_eth_soc: introduce support for mt7986 chipset")
-Co-developed-by: Lorenzo Bianconi <lorenzo@kernel.org>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-v2: improve commit message
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 46 ++++++++++-----------
- 1 file changed, 23 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 3eefb735ce19..d7d73295f0dc 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -110,16 +110,16 @@ static const struct mtk_reg_map mt7986_reg_map = {
- 	.tx_irq_mask		= 0x461c,
- 	.tx_irq_status		= 0x4618,
- 	.pdma = {
--		.rx_ptr		= 0x6100,
--		.rx_cnt_cfg	= 0x6104,
--		.pcrx_ptr	= 0x6108,
--		.glo_cfg	= 0x6204,
--		.rst_idx	= 0x6208,
--		.delay_irq	= 0x620c,
--		.irq_status	= 0x6220,
--		.irq_mask	= 0x6228,
--		.adma_rx_dbg0	= 0x6238,
--		.int_grp	= 0x6250,
-+		.rx_ptr		= 0x4100,
-+		.rx_cnt_cfg	= 0x4104,
-+		.pcrx_ptr	= 0x4108,
-+		.glo_cfg	= 0x4204,
-+		.rst_idx	= 0x4208,
-+		.delay_irq	= 0x420c,
-+		.irq_status	= 0x4220,
-+		.irq_mask	= 0x4228,
-+		.adma_rx_dbg0	= 0x4238,
-+		.int_grp	= 0x4250,
- 	},
- 	.qdma = {
- 		.qtx_cfg	= 0x4400,
-@@ -1107,7 +1107,7 @@ static bool mtk_rx_get_desc(struct mtk_eth *eth, struct mtk_rx_dma_v2 *rxd,
- 	rxd->rxd1 = READ_ONCE(dma_rxd->rxd1);
- 	rxd->rxd3 = READ_ONCE(dma_rxd->rxd3);
- 	rxd->rxd4 = READ_ONCE(dma_rxd->rxd4);
--	if (mtk_is_netsys_v2_or_greater(eth)) {
-+	if (mtk_is_netsys_v3_or_greater(eth)) {
- 		rxd->rxd5 = READ_ONCE(dma_rxd->rxd5);
- 		rxd->rxd6 = READ_ONCE(dma_rxd->rxd6);
- 	}
-@@ -2028,7 +2028,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 			break;
- 
- 		/* find out which mac the packet come from. values start at 1 */
--		if (mtk_is_netsys_v2_or_greater(eth)) {
-+		if (mtk_is_netsys_v3_or_greater(eth)) {
- 			u32 val = RX_DMA_GET_SPORT_V2(trxd.rxd5);
- 
- 			switch (val) {
-@@ -2140,7 +2140,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 		skb->dev = netdev;
- 		bytes += skb->len;
- 
--		if (mtk_is_netsys_v2_or_greater(eth)) {
-+		if (mtk_is_netsys_v3_or_greater(eth)) {
- 			reason = FIELD_GET(MTK_RXD5_PPE_CPU_REASON, trxd.rxd5);
- 			hash = trxd.rxd5 & MTK_RXD5_FOE_ENTRY;
- 			if (hash != MTK_RXD5_FOE_ENTRY)
-@@ -2690,7 +2690,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 
- 		rxd->rxd3 = 0;
- 		rxd->rxd4 = 0;
--		if (mtk_is_netsys_v2_or_greater(eth)) {
-+		if (mtk_is_netsys_v3_or_greater(eth)) {
- 			rxd->rxd5 = 0;
- 			rxd->rxd6 = 0;
- 			rxd->rxd7 = 0;
-@@ -3893,7 +3893,7 @@ static int mtk_hw_init(struct mtk_eth *eth, bool reset)
- 	else
- 		mtk_hw_reset(eth);
- 
--	if (mtk_is_netsys_v2_or_greater(eth)) {
-+	if (mtk_is_netsys_v3_or_greater(eth)) {
- 		/* Set FE to PDMAv2 if necessary */
- 		val = mtk_r32(eth, MTK_FE_GLO_MISC);
- 		mtk_w32(eth,  val | BIT(4), MTK_FE_GLO_MISC);
-@@ -5169,11 +5169,11 @@ static const struct mtk_soc_data mt7981_data = {
- 		.dma_len_offset = 8,
- 	},
- 	.rx = {
--		.desc_size = sizeof(struct mtk_rx_dma_v2),
--		.irq_done_mask = MTK_RX_DONE_INT_V2,
-+		.desc_size = sizeof(struct mtk_rx_dma),
-+		.irq_done_mask = MTK_RX_DONE_INT,
- 		.dma_l4_valid = RX_DMA_L4_VALID_V2,
--		.dma_max_len = MTK_TX_DMA_BUF_LEN_V2,
--		.dma_len_offset = 8,
-+		.dma_max_len = MTK_TX_DMA_BUF_LEN,
-+		.dma_len_offset = 16,
- 	},
- };
- 
-@@ -5195,11 +5195,11 @@ static const struct mtk_soc_data mt7986_data = {
- 		.dma_len_offset = 8,
- 	},
- 	.rx = {
--		.desc_size = sizeof(struct mtk_rx_dma_v2),
--		.irq_done_mask = MTK_RX_DONE_INT_V2,
-+		.desc_size = sizeof(struct mtk_rx_dma),
-+		.irq_done_mask = MTK_RX_DONE_INT,
- 		.dma_l4_valid = RX_DMA_L4_VALID_V2,
--		.dma_max_len = MTK_TX_DMA_BUF_LEN_V2,
--		.dma_len_offset = 8,
-+		.dma_max_len = MTK_TX_DMA_BUF_LEN,
-+		.dma_len_offset = 16,
- 	},
- };
- 
--- 
-2.45.0
-
+    Andrew
 
