@@ -1,126 +1,291 @@
-Return-Path: <netdev+bounces-93977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B87F8BDCE9
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:06:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A10788BDCEE
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:08:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40D931F24E4F
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 08:06:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BCC52845C2
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 08:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920D513C825;
-	Tue,  7 May 2024 08:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5095513C8F7;
+	Tue,  7 May 2024 08:08:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="2h/stbQJ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SDqLOHt7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E267613B7AF
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 08:06:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD6A10E3
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 08:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715069204; cv=none; b=e4wPeqmqDHgrhJWT4UIuvCMjVl9xVuvXrW0uqXQ+qVYEWnkbYvZv5oa9KrZPrV/9v1lVT0ELYhz3sgThQZdeEwK8LFaOOqgkHsP8tScmNbiCnM+Ft1UoLUWMfH8Do2jhesEDLvoE5XV6Odl/f96UyxLxOrY+FEnSnrrBF7+jrHQ=
+	t=1715069303; cv=none; b=uW07Gk1MD6XEjDSQPtx7NUQd1VZtyeazHf24EJfcBg9NFrly8ZcE4+uAAdPelC28dt3Iy9dIyn5IrTimfsHdZ6z/6tD/yaR6hm2TXG53LECCJ/AhC8PCuL4QO19tz0LeKUxCnTHpURJ6OmAwEUNfUkQJJnD6fDS65zRuhncVZGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715069204; c=relaxed/simple;
-	bh=0pyedL1BVFoLLwp23WgMVifr+cMqistJ0hLnWEMvfh0=;
-	h=Message-ID:Date:MIME-Version:To:References:From:Subject:
-	 In-Reply-To:Content-Type; b=FfrbOZpqiK5SBAOUxKkVEoosZ1/mAaauLd9/qtICRKyUKyILil0YaIQ7huof/h2pGFezWGqD2u6eBMUwyTPvuuvN8P+TxfJLYr5R9qTdcHLHmgPPNVSfuDCHHBTLXxCyTRPzikMkCBVCr77b+8XQmMd7LauoVOhQEwl2ZO//yA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=2h/stbQJ; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from [IPV6:2a02:8010:6359:2:f8c1:ac3:4d22:e947] (unknown [IPv6:2a02:8010:6359:2:f8c1:ac3:4d22:e947])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id 8C6277D9CF;
-	Tue,  7 May 2024 09:06:35 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1715069195; bh=0pyedL1BVFoLLwp23WgMVifr+cMqistJ0hLnWEMvfh0=;
-	h=Message-ID:Date:MIME-Version:To:References:From:Subject:
-	 In-Reply-To:From;
-	z=Message-ID:=20<66998255-7078-8d4b-6efa-fa7b0751176e@katalix.com>|
-	 Date:=20Tue,=207=20May=202024=2009:06:35=20+0100|MIME-Version:=201
-	 .0|To:=20Samuel=20Thibault=20<samuel.thibault@ens-lyon.org>,=0D=0A
-	 =20Tom=20Parkin=20<tparkin@katalix.com>,=20Eric=20Dumazet=20<eduma
-	 zet@google.com>,=0D=0A=20Jakub=20Kicinski=20<kuba@kernel.org>,=20P
-	 aolo=20Abeni=20<pabeni@redhat.com>,=0D=0A=20netdev@vger.kernel.org
-	 |References:=20<20240502231418.2933925-1-samuel.thibault@ens-lyon.
-	 org>=0D=0A=20<ea4ddddc-719c-673e-7646-8f89cd341e7b@katalix.com>=0D
-	 =0A=20<20240506214424.4wddiwjdpdl2gf4w@begin>|From:=20James=20Chap
-	 man=20<jchapman@katalix.com>|Subject:=20Re:=20[PATCH]=20l2tp:=20Su
-	 pport=20several=20sockets=20with=20same=20IP/port=20quadruple|In-R
-	 eply-To:=20<20240506214424.4wddiwjdpdl2gf4w@begin>;
-	b=2h/stbQJ5Vq1gSbqddIXYxULpK9lXId0j2xezmcPUntG3GWCVP65zBVbf1fkXTyxP
-	 oBneUxJgavhyFfk2GE8VAkhvqNwJC0pyXrK6mbBTDvwcpHs3vjEVLni3F15kJxPW0D
-	 tPkhQupRUD1+DL7YM3sbvP2pJWJCZXGyefGuWwljAu9gyPg0wEoZCG4hTlYdBlPCMC
-	 Ai4R7iikTehVvNQfQA7YermJUapKWaS76b/k0Cy4ZRIO0QlsQuo82TzR3Rxyn1qjTN
-	 qQYW9EfEo9aI4lgOct4UDBcHOpzzKYaD6bCiTH+YfHMKuH27cObY4oi+MrJrd4XgtZ
-	 HvbcSvSUgiu0w==
-Message-ID: <66998255-7078-8d4b-6efa-fa7b0751176e@katalix.com>
-Date: Tue, 7 May 2024 09:06:35 +0100
+	s=arc-20240116; t=1715069303; c=relaxed/simple;
+	bh=Ddn1VNGItzdsWA45trh+gGxmlymXdQHn0cHiYXpmuHo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KTQv4+3nE9bU4OgmpS7JSEVvk+Ji1fBP/pG859n371X8DmA7CeEs1tStH43OIYHLYwXIkq+a1+AvCYaiyfptG2dmmqjCRai1vknBDCFNmgBUBmv33/Tpe9+BwBtYd2zBIKWapcqc2wnhC6G/YoEFoWy04VMAZwImUUO/4kyLn4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SDqLOHt7; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-34f0e55787aso1441988f8f.2
+        for <netdev@vger.kernel.org>; Tue, 07 May 2024 01:08:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1715069299; x=1715674099; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JwnUMMgXN/Wsuo8wQ8xw0lvYZHuA8pjKO6osAN4WAm0=;
+        b=SDqLOHt7dCI45kvQwLXxgzToIVid6VAE1pqeNt8x+7FGAlmmAWEaUzacNTopxvPAcY
+         h2dOhjsLRLmA6XhcFedZyojW6rrjUK+JJz2mk+3o79DAWqk7LoSloZIACUzCW90d1x+7
+         I74Bzl8ampQJPQJFQ1RIdp7bysYry8qBRLucsvQNNL5T3YBzHLOmm6MCOaSCI8+e7+C6
+         gQn0taRvk8JlPQUPrpuNSTkHB7bQ+VyegxvadaK44pS3shU5U9zEvztid6sHfipmLG/M
+         ooBFQqe+aejF6a70Vn59/ObFW/y72XwC3s4NRA5futZg9STSrOyKoLQeTr8o7oyZ4Ucp
+         ZpnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715069299; x=1715674099;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JwnUMMgXN/Wsuo8wQ8xw0lvYZHuA8pjKO6osAN4WAm0=;
+        b=GUKKQzZHF+oWKILApxMn1FupEGklgOGffoFIijR3832LEhFD/iK3siICzLLBqN+ddO
+         uxLNJdA0nOwwczXTrqCsOt1DB6Y/d5i/sUi8iQbBFgGM6l8MHNMl8m9+vYdPezxMA/gi
+         rGnhIgDuV/tKE4hs90VdNRxPfKSbxCBvt7VYsZtBjMZ/+2rWFHx9WUBegKgkD1xBEUdR
+         ynwQKLvkP3/ja0cVMcu8Tkyc1cRAH2/1S+532Dui2U3ivOsSyjfQbXza/N6ndKfs8lAG
+         PRSwLqD4MCBvvuAHC7kZxhjchKhkFJfBSPgDIF2VLtpXHkp5qeuBkM4PgnwngAdSbAa8
+         zAiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWgsjYb/TLeA5lL7oa6FpchQT1Otksmq8D2OAbQYGEVCyuItSULj6OcMd9MxZ2NaJ+W88AWtpGlC1fLtOPf8mCnFHMIoTc6
+X-Gm-Message-State: AOJu0YyTlDMzMbQuyazhWdRExgO9cfUHpaWsMvqmCSHgwczG3eszpj+w
+	F5RqufTU8oYz1bevTaYkxXGUIiu2N7L6t+YArIDdkZmVQDI2PzcijTA72ji1CW8=
+X-Google-Smtp-Source: AGHT+IHqmQLgl9Xz8cz4mPbBXMEtaAgjCTg++laQLsGNn99J2GLAx77yo3TSr95zHIwcTpNcgqKpPQ==
+X-Received: by 2002:adf:f606:0:b0:34d:414:5f99 with SMTP id t6-20020adff606000000b0034d04145f99mr7323220wrp.25.1715069298429;
+        Tue, 07 May 2024 01:08:18 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id e30-20020a5d595e000000b0034e8784473dsm9418578wri.41.2024.05.07.01.08.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 May 2024 01:08:18 -0700 (PDT)
+Date: Tue, 7 May 2024 11:08:14 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Lars Kellogg-Stedman <lars@oddbit.com>
+Cc: Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, jreuter@yaina.de
+Subject: Re: [PATCH net] ax25: Fix refcount leak issues of ax25_dev
+Message-ID: <79dc1067-76dc-43b2-9413-7754f96fe08e@moroto.mountain>
+References: <20240501060218.32898-1-duoming@zju.edu.cn>
+ <my4l7ljo35dnwxl33maqhyvw7666dmuwtduwtyhnzdlb6bbf5m@5sbp4tvg246f>
+ <78ae8aa0-eac5-4ade-8e85-0479a22e98a3@moroto.mountain>
+ <ekgwuycs3hioz6vve57e6z7igovpls6s644rvdxpxqqr7v7is6@u5lqegkuwcex>
+ <1e14f4f1-29dd-4fe5-8010-de7df0866e93@moroto.mountain>
+ <movur4qy7wwavdyw2ugwfsz6kvshrqlvx32ym3fyx5gg66llge@citxuw5ztgwc>
+ <eb5oil2exor2bq5n3pn62575phxjdex6wdjwwjxjd3pd4je55o@4k4iu2xobel5>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Tom Parkin <tparkin@katalix.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-References: <20240502231418.2933925-1-samuel.thibault@ens-lyon.org>
- <ea4ddddc-719c-673e-7646-8f89cd341e7b@katalix.com>
- <20240506214424.4wddiwjdpdl2gf4w@begin>
-Content-Language: en-US
-From: James Chapman <jchapman@katalix.com>
-Organization: Katalix Systems Ltd
-Subject: Re: [PATCH] l2tp: Support several sockets with same IP/port quadruple
-In-Reply-To: <20240506214424.4wddiwjdpdl2gf4w@begin>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eb5oil2exor2bq5n3pn62575phxjdex6wdjwwjxjd3pd4je55o@4k4iu2xobel5>
 
-Hi Samuel,
+On Mon, May 06, 2024 at 11:18:06PM -0400, Lars Kellogg-Stedman wrote:
+> On Sat, May 04, 2024 at 06:16:14PM GMT, Lars Kellogg-Stedman wrote:
+> > My original patch corrected this by adding the call to netdev_hold()
+> > right next to the ax25_cb_add() in ax25_rcv(), which solves this
+> > problem. If it seems weird to have this login in ax25_rcv, we could move
+> > it to ax25_accept, right around line 1430 [3]; that would look
+> > something like:
+> 
+> The same patch applies cleanly against the Raspberry Pi 6.6.30 kernel,
+> and clears up the frequeny crashes I was experiencing in that
+> environment as well.
 
-On 06/05/2024 22:44, Samuel Thibault wrote:
-> Hello,
->
-> James Chapman, le ven. 03 mai 2024 12:36:14 +0100, a ecrit:
->
->>> +			/* We are receiving trafic for another tunnel, probably
->>> +			 * because we have several tunnels between the same
->>> +			 * IP/port quadruple, look it up.
->>> +			 */
->>> +			struct l2tp_tunnel *alt_tunnel;
->>> +
->>> +			alt_tunnel = l2tp_tunnel_get(tunnel->l2tp_net, tunnel_id);
->> This misses a check that alt_tunnel's protocol version matches the header.
->> Move the existing header version check to after this fragment?
-> We need to check the version before getting the tunnel id, which we need
-> to look up the struct l2tp_tunnel :)
-I was referring to the following code fragment which is before your change:
+I have reviewed this code some more.  My theory is:
 
- >    version = hdrflags & L2TP_HDR_VER_MASK;
- >    if (version != tunnel->version) {
- >        pr_debug_ratelimited("%s: recv protocol version mismatch: got 
-%d expected %d\n",
- >                     tunnel->name, version, tunnel->version);
- >        goto invalid;
- >    }
+ax25_dev_device_up() <- sets refcount to 1
+ax25_dev_device_down() <- set refcount to 0 and frees it
 
-The tunnel->version check should now be done after the tunnel pointer is 
-possibly modified by your code.
+If the refcount is not 1 at ax25_dev_device_down() then something is
+screwed up.  So why do we even need more refcounting than that?  But
+apparently we do.  I don't really understand networking that well so
+maybe we can have lingering connections after the device is down.
 
-Also, if the tunnel pointer from sk_user_data isn't trusted due to 
-5-tuple aliasing, l2tp_udp_recv_core should compare with the local 
-'version' variable, not tunnel->version, when parsing the L2TP IDs e.g.:
+So the next rule is if we set ax25->ax25_dev from NULL to non-NULL then
+bump the refcount and decrement it if we set it back to NULL or we free
+ax25. Right now that's happening in ax25_bind() and ax25_release().  And
+also in ax25_kill_by_device() but not consistently.
 
- >    if (version == L2TP_HDR_VER_2) {
- >        /* If length is present, skip it */
+But it needs to happen *everywhere* we set ax25->ax25_dev and we need to
+decrement it when ax25 is freed in ax25_cb_put().  My patch is similar
+to yours in that every ax25_rcv() will now bump the reference through
+calling ax25_fillin_cb() or ax25_make_new().  The send path also bumps
+the reference.
 
-otherwise, L2TPv2 socket aliasing will still not work properly if one or 
-more L2TPv3 sockets also alias L2TPv2 sockets, even if there is no 
-L2TPv3 traffic.
+There are a few questions I don't know how to answer.  I added two
+-EBUSY paths to this patch.  I'm not sure if this is correct.
+Second, I don't understand the netdev_put(ax25_dev->dev, &s->dev_tracker);
+stuff.  Maybe that should be done in ax25_dev_hold/put().
 
+This patch might not work because of the netdev_hold/put() thing...
 
+I used the Smatch cross function database to show where ax25->ax25_dev
+is set to NULL/non-NULL.
+
+$ smdb.py where ax25_cb ax25_dev | grep -v "min-max"
+net/ax25/ax25_route.c          | ax25_rt_autobind               | (struct ax25_cb)->ax25_dev | 0-u64max
+net/ax25/af_ax25.c             | ax25_kill_by_device            | (struct ax25_cb)->ax25_dev | 0-u64max
+net/ax25/af_ax25.c             | ax25_fillin_cb                 | (struct ax25_cb)->ax25_dev | 0-u64max
+net/ax25/af_ax25.c             | ax25_setsockopt                | (struct ax25_cb)->ax25_dev | 0-u64max
+net/ax25/af_ax25.c             | ax25_make_new                  | (struct ax25_cb)->ax25_dev | 0-u64max
+net/ax25/af_ax25.c             | ax25_bind                      | (struct ax25_cb)->ax25_dev | 4096-ptr_max
+net/ax25/ax25_in.c             | ax25_rcv                       | (struct ax25_cb)->ax25_dev | 0-u64max
+net/ax25/ax25_out.c            | ax25_send_frame                | (struct ax25_cb)->ax25_dev | 0-u64max
+
+regards,
+dan carpenter
+
+diff --git a/include/net/ax25.h b/include/net/ax25.h
+index eb9cee8252c8..2cc94352b13d 100644
+--- a/include/net/ax25.h
++++ b/include/net/ax25.h
+@@ -275,25 +275,30 @@ static inline struct ax25_cb *sk_to_ax25(const struct sock *sk)
+ #define ax25_cb_hold(__ax25) \
+ 	refcount_inc(&((__ax25)->refcount))
+ 
+-static __inline__ void ax25_cb_put(ax25_cb *ax25)
++static inline ax25_dev *ax25_dev_hold(ax25_dev *ax25_dev)
+ {
+-	if (refcount_dec_and_test(&ax25->refcount)) {
+-		kfree(ax25->digipeat);
+-		kfree(ax25);
+-	}
++	if (ax25_dev)
++		refcount_inc(&ax25_dev->refcount);
++	return ax25_dev;
+ }
+ 
+-static inline void ax25_dev_hold(ax25_dev *ax25_dev)
++static inline void ax25_dev_put(ax25_dev *ax25_dev)
+ {
+-	refcount_inc(&ax25_dev->refcount);
++	if (ax25_dev && refcount_dec_and_test(&ax25_dev->refcount)) {
++		kfree(ax25_dev);
++	}
+ }
+ 
+-static inline void ax25_dev_put(ax25_dev *ax25_dev)
++static __inline__ void ax25_cb_put(ax25_cb *ax25)
+ {
+-	if (refcount_dec_and_test(&ax25_dev->refcount)) {
+-		kfree(ax25_dev);
++	if (refcount_dec_and_test(&ax25->refcount)) {
++		if (ax25->ax25_dev)
++			ax25_dev_put(ax25->ax25_dev);
++		kfree(ax25->digipeat);
++		kfree(ax25);
+ 	}
+ }
++
+ static inline __be16 ax25_type_trans(struct sk_buff *skb, struct net_device *dev)
+ {
+ 	skb->dev      = dev;
+diff --git a/net/ax25/af_ax25.c b/net/ax25/af_ax25.c
+index 9169efb2f43a..4d1ab296d52c 100644
+--- a/net/ax25/af_ax25.c
++++ b/net/ax25/af_ax25.c
+@@ -92,6 +92,7 @@ static void ax25_kill_by_device(struct net_device *dev)
+ 				spin_unlock_bh(&ax25_list_lock);
+ 				ax25_disconnect(s, ENETUNREACH);
+ 				s->ax25_dev = NULL;
++				ax25_dev_put(ax25_dev);
+ 				ax25_cb_del(s);
+ 				spin_lock_bh(&ax25_list_lock);
+ 				goto again;
+@@ -101,11 +102,8 @@ static void ax25_kill_by_device(struct net_device *dev)
+ 			lock_sock(sk);
+ 			ax25_disconnect(s, ENETUNREACH);
+ 			s->ax25_dev = NULL;
+-			if (sk->sk_socket) {
+-				netdev_put(ax25_dev->dev,
+-					   &s->dev_tracker);
+-				ax25_dev_put(ax25_dev);
+-			}
++			netdev_put(ax25_dev->dev, &s->dev_tracker);
++			ax25_dev_put(ax25_dev);
+ 			ax25_cb_del(s);
+ 			release_sock(sk);
+ 			spin_lock_bh(&ax25_list_lock);
+@@ -496,6 +494,7 @@ void ax25_fillin_cb(ax25_cb *ax25, ax25_dev *ax25_dev)
+ 	ax25->ax25_dev = ax25_dev;
+ 
+ 	if (ax25->ax25_dev != NULL) {
++		ax25_dev_hold(ax25->ax25_dev);
+ 		ax25_fillin_cb_from_dev(ax25, ax25_dev);
+ 		return;
+ 	}
+@@ -685,6 +684,11 @@ static int ax25_setsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 
++		if (ax25->ax25_dev) {
++			rtnl_unlock();
++			res = -EBUSY;
++			break;
++		}
+ 		ax25->ax25_dev = ax25_dev_ax25dev(dev);
+ 		if (!ax25->ax25_dev) {
+ 			rtnl_unlock();
+@@ -961,7 +965,7 @@ struct sock *ax25_make_new(struct sock *osk, struct ax25_dev *ax25_dev)
+ 	ax25->paclen  = oax25->paclen;
+ 	ax25->window  = oax25->window;
+ 
+-	ax25->ax25_dev    = ax25_dev;
++	ax25->ax25_dev    = ax25_dev_hold(ax25_dev);
+ 	ax25->source_addr = oax25->source_addr;
+ 
+ 	if (oax25->digipeat != NULL) {
+@@ -995,6 +999,11 @@ static int ax25_release(struct socket *sock)
+ 	sock_orphan(sk);
+ 	ax25 = sk_to_ax25(sk);
+ 	ax25_dev = ax25->ax25_dev;
++	/*
++	 * The ax25_destroy_socket() function decrements the reference but we
++	 * need to keep a reference until the end of the function.
++	 */
++	ax25_dev_hold(ax25_dev);
+ 
+ 	if (sk->sk_type == SOCK_SEQPACKET) {
+ 		switch (ax25->state) {
+@@ -1147,6 +1156,12 @@ static int ax25_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 
+ 	if (ax25_dev) {
+ 		ax25_fillin_cb(ax25, ax25_dev);
++		/*
++		 * both ax25_addr_ax25dev() and ax25_fillin_cb() take a
++		 * reference but we only want to take one reference so drop
++		 * the extra reference.
++		 */
++		ax25_dev_put(ax25_dev);
+ 		netdev_hold(ax25_dev->dev, &ax25->dev_tracker, GFP_ATOMIC);
+ 	}
+ 
+diff --git a/net/ax25/ax25_route.c b/net/ax25/ax25_route.c
+index b7c4d656a94b..d7f6d9f4f20c 100644
+--- a/net/ax25/ax25_route.c
++++ b/net/ax25/ax25_route.c
+@@ -406,6 +406,10 @@ int ax25_rt_autobind(ax25_cb *ax25, ax25_address *addr)
+ 		ax25_route_lock_unuse();
+ 		return -EHOSTUNREACH;
+ 	}
++	if (ax25->ax25_dev) {
++		err = -EBUSY;
++		goto put;
++	}
+ 	if ((ax25->ax25_dev = ax25_dev_ax25dev(ax25_rt->dev)) == NULL) {
+ 		err = -EHOSTUNREACH;
+ 		goto put;
 
