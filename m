@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-94287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7562B8BF013
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:58:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7094B8BF024
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:59:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F5AC281C1B
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 22:58:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23CE9285533
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 22:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4693C81749;
-	Tue,  7 May 2024 22:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7775E84FDA;
+	Tue,  7 May 2024 22:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TtMWdllR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i8VweOdq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184238248D;
-	Tue,  7 May 2024 22:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A58584FCD;
+	Tue,  7 May 2024 22:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715122656; cv=none; b=GgXF8nFnCUQYl7lFca6nMjnX2trNEsvH1tjZoN9+ra7S8u3nzg6NP4iRbJk3qhyC4IRLIlr62pKgEYbUfv69iIjfcYH+q2ouNqTCMgLRUJ5CU3Y+6wqdfC12zKWjFlBINqoa7anTeZJbjO44ZhjEiXDRNcD07+vkZlWj+UMkGc8=
+	t=1715122662; cv=none; b=J362hnBiwVYlJE9UmTHnkcTkLUFpVDcVeFvvEBbDUt0Qepgx8Stm9leWHoQG/IFuC/73Cpmg7mgXWWm1sfSVkCC5Li2ir40nxf9R9oRFoFnFgPDPw3dylWYZza3k9MIppkOm7LgxPQps1i531dPWbpOcnKgz/RQ7tYBUlbDOfFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715122656; c=relaxed/simple;
-	bh=MFDIxyrj2O52D2KjEO2iKcVJp7Hkty/SGnMIhwLGNMs=;
+	s=arc-20240116; t=1715122662; c=relaxed/simple;
+	bh=xhM6M7ZmmzFfW1OURG3AAZK8VgZOM7j7bDj45h/3j1Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JbgQeTMIlqbHVPcWOZyOsuq7CNy7zTgKFSEV/9nYktr3uR1kqjOJp5WTpUpvqiY5uPhrA0H++AxFPoroGYeT/2MqoWJL9Kv9o5GBE92Mv94XDJL5my34xdfpILzp4qMsZLcE7rwx+8RXI41dCRW/f0ctrwGlr1guSxaShfAuxZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TtMWdllR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48861C3277B;
-	Tue,  7 May 2024 22:57:34 +0000 (UTC)
+	 MIME-Version; b=rM09pKWQmwCUpgyHUSNgjE9KR2eDkkTCJoq90YIwyQLTKZUn6wgFZPbTE5NGcKcXD2id7MpmiAHSPpjb+1pxbJp5qa2y5TilLn+23PvscrjN3UdbK0dnVO1AgvrFK6bDpb0jLMEMezU3oCoXNcAV46Yeew3P86tD0PbXfYZ/AOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i8VweOdq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF972C3277B;
+	Tue,  7 May 2024 22:57:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715122655;
-	bh=MFDIxyrj2O52D2KjEO2iKcVJp7Hkty/SGnMIhwLGNMs=;
+	s=k20201202; t=1715122662;
+	bh=xhM6M7ZmmzFfW1OURG3AAZK8VgZOM7j7bDj45h/3j1Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TtMWdllRVfK7564Q1uGBh6O0Rb6Ed3ECho1nT3aGz6WB+7aAJimSRXUBEZ3fROX41
-	 HBAyanLwy93FOUAPsBVVBa3rsyuh8A5YSMMExiB2fp7XrMRmUFsR9znIIXtYfSW69j
-	 6FWBzrXK4TW3HS44lUtL08KBpddHofxR5rZ4X9eaaKa/L68w8G+E/6PUv6GqxYavpj
-	 8gE/DphpkTV4uR3r3gQUppoMgk1c5jZ4ekAOqICzW0jwdTuvVqaV7EUd02ajQqkLTJ
-	 NLyfoWphYEKjTPEObhC5WzRGh+TWcFEzjAdrfjcaquHCzvPZ4BgxG1kp4a5BL71wzF
-	 weGB2P6eMJDmg==
+	b=i8VweOdqfWVy8x8QmGpmlijlJbEBJXwYanvtYffyUfnbDvgOmiFD6u62EPcZd6RkH
+	 0Qo5EijPjHK1ALXuYGe+WDmXAic+WhZdmrd3sY290jpC1YG48NQ0nvWX2C+T1REQ9q
+	 4/vRq6FiKA4JTiSiYdpHUOGXxl+8oVHSLu50+T+STzq+J8qp/x8IWy8jE/qLGpxhgB
+	 BaElegBXiEeb1zt8Y8h3v8mB66rcQi43E4iStQmJhisafLO3YHVC1roKSTX5548q+G
+	 2kqZM8NMMObwoQpH2bn8cHeKNSXCBwTCF6Y4iCeCAFTqxZcp6AAsINzw910emwkmqC
+	 bWyGmuSwPDOgQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Igor Artemiev <Igor.A.Artemiev@mcst.ru>,
-	Johannes Berg <johannes.berg@intel.com>,
+Cc: Daniele Palmas <dnlplm@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
+	bjorn@mork.no,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 05/23] wifi: cfg80211: fix the order of arguments for trace events of the tx_rx_evt class
-Date: Tue,  7 May 2024 18:56:31 -0400
-Message-ID: <20240507225725.390306-5-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.8 08/23] net: usb: qmi_wwan: add Telit FN920C04 compositions
+Date: Tue,  7 May 2024 18:56:34 -0400
+Message-ID: <20240507225725.390306-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240507225725.390306-1-sashal@kernel.org>
 References: <20240507225725.390306-1-sashal@kernel.org>
@@ -71,47 +70,106 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.8.9
 Content-Transfer-Encoding: 8bit
 
-From: Igor Artemiev <Igor.A.Artemiev@mcst.ru>
+From: Daniele Palmas <dnlplm@gmail.com>
 
-[ Upstream commit 9ef369973cd2c97cce3388d2c0c7e3c056656e8a ]
+[ Upstream commit 0b8fe5bd73249dc20be2e88a12041f8920797b59 ]
 
-The declarations of the tx_rx_evt class and the rdev_set_antenna event
-use the wrong order of arguments in the TP_ARGS macro.
+Add the following Telit FN920C04 compositions:
 
-Fix the order of arguments in the TP_ARGS macro.
+0x10a0: rmnet + tty (AT/NMEA) + tty (AT) + tty (diag)
+T:  Bus=03 Lev=01 Prnt=03 Port=06 Cnt=01 Dev#=  5 Spd=480  MxCh= 0
+D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1bc7 ProdID=10a0 Rev=05.15
+S:  Manufacturer=Telit Cinterion
+S:  Product=FN920
+S:  SerialNumber=92c4c4d8
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=60 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+0x10a4: rmnet + tty (AT) + tty (AT) + tty (diag)
+T:  Bus=03 Lev=01 Prnt=03 Port=06 Cnt=01 Dev#=  8 Spd=480  MxCh= 0
+D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1bc7 ProdID=10a4 Rev=05.15
+S:  Manufacturer=Telit Cinterion
+S:  Product=FN920
+S:  SerialNumber=92c4c4d8
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 
-Signed-off-by: Igor Artemiev <Igor.A.Artemiev@mcst.ru>
-Link: https://msgid.link/20240405152431.270267-1-Igor.A.Artemiev@mcst.ru
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+0x10a9: rmnet + tty (AT) + tty (diag) + DPL (data packet logging) + adb
+T:  Bus=03 Lev=01 Prnt=03 Port=06 Cnt=01 Dev#=  9 Spd=480  MxCh= 0
+D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1bc7 ProdID=10a9 Rev=05.15
+S:  Manufacturer=Telit Cinterion
+S:  Product=FN920
+S:  SerialNumber=92c4c4d8
+C:  #Ifs= 5 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:  If#= 3 Alt= 0 #EPs= 1 Cls=ff(vend.) Sub=ff Prot=80 Driver=(none)
+E:  Ad=86(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:  If#= 4 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=(none)
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+
+Signed-off-by: Daniele Palmas <dnlplm@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/wireless/trace.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/usb/qmi_wwan.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/wireless/trace.h b/net/wireless/trace.h
-index 1f374c8a17a50..54303d6b7994e 100644
---- a/net/wireless/trace.h
-+++ b/net/wireless/trace.h
-@@ -1747,7 +1747,7 @@ TRACE_EVENT(rdev_return_void_tx_rx,
- 
- DECLARE_EVENT_CLASS(tx_rx_evt,
- 	TP_PROTO(struct wiphy *wiphy, u32 tx, u32 rx),
--	TP_ARGS(wiphy, rx, tx),
-+	TP_ARGS(wiphy, tx, rx),
- 	TP_STRUCT__entry(
- 		WIPHY_ENTRY
- 		__field(u32, tx)
-@@ -1764,7 +1764,7 @@ DECLARE_EVENT_CLASS(tx_rx_evt,
- 
- DEFINE_EVENT(tx_rx_evt, rdev_set_antenna,
- 	TP_PROTO(struct wiphy *wiphy, u32 tx, u32 rx),
--	TP_ARGS(wiphy, rx, tx)
-+	TP_ARGS(wiphy, tx, rx)
- );
- 
- DECLARE_EVENT_CLASS(wiphy_netdev_id_evt,
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index e2e181378f412..d1bd6b93a74e7 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -1368,6 +1368,9 @@ static const struct usb_device_id products[] = {
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1060, 2)},	/* Telit LN920 */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1070, 2)},	/* Telit FN990 */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1080, 2)}, /* Telit FE990 */
++	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a0, 0)}, /* Telit FN920C04 */
++	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a4, 0)}, /* Telit FN920C04 */
++	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a9, 0)}, /* Telit FN920C04 */
+ 	{QMI_FIXED_INTF(0x1bc7, 0x1100, 3)},	/* Telit ME910 */
+ 	{QMI_FIXED_INTF(0x1bc7, 0x1101, 3)},	/* Telit ME910 dual modem */
+ 	{QMI_FIXED_INTF(0x1bc7, 0x1200, 5)},	/* Telit LE920 */
 -- 
 2.43.0
 
