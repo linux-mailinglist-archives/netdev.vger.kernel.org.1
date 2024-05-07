@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-94043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD618BE011
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:47:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6632B8BE013
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EECA928BB3D
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:47:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 978AF1C23454
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83ECC15DBC1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8540015DBC3;
 	Tue,  7 May 2024 10:44:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="U32LXCVC"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="CYz80e0s"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6F1152E18;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E41154450;
 	Tue,  7 May 2024 10:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715078691; cv=none; b=qzb/bO2QJBCSK6W/xS42BetoKpPFH8kutJikHlzdHYBjLYQhwx7yTc+m7Q9x8FtwlEBU9Ovx8CoWZO5VmZ//xMhlh7cgIOXT+rp00VNq78cHZwvFMoTadainVzkxqqAeSMOGuL0tpzf+lirxlhQX20NaVNtdIW8eep4D+07m+c0=
+	t=1715078691; cv=none; b=PHurapU6Gqvz0warILPkP1G13Z5oNuXaEpN1uEM9DhE75nAV7MnV7Wxu+aNe8BK/llAF1VNGrkbBB5zh0NGAfIx4nptKhiG6WlyK2PwaFJJK+Y6gLaklob7vcFMF5QrqjSp8qzDc8e5AII5v57WUTgzE/T1xcb0sLwGWeg69jdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715078691; c=relaxed/simple;
-	bh=GSOXcR4bbFPjJZ3frmuY6IjJLkcw6hvn1PqSul/wOIw=;
+	bh=BXkqTGf4ljiO8BNjQTNrgJXmlT/C/AanHIXAnkbe1W4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HXzx3FEMLP91JffP6zlnuVhY7BRYdLEvOcxZ6YN9AXwZKDwJcGLMy0OIgJ1+tZoJ7DGTauwimCbdHruIEeSzP+9y0fR+S/rqn4f09FcrhemGjsjC+O4LNSQMVyW4uQt22uJZbZUNkzlQ2+uQP+jhYKSNz4Sf5QOBLkcsnR5H0P8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=U32LXCVC; arc=none smtp.client-ip=193.104.135.124
+	 MIME-Version:Content-Type; b=C3AcZ7wX6mE4YieKvThv77iXyE393aIjTQdN3WXohHMyoZl6og1vVz6JWnrU1SOUd5RA2xkBKgm5bTpkbOFgw3xdgwXbUnzph54c6GR+FjJsQ+DyKuFDer5nF1TwLXeDchTl0DWypGZRMtu4c/o1JuYyDTRxbotn/yCSSoR+nCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=CYz80e0s; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 33909600B7;
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 5B51B6016A;
 	Tue,  7 May 2024 10:44:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
 	s=202008; t=1715078675;
-	bh=GSOXcR4bbFPjJZ3frmuY6IjJLkcw6hvn1PqSul/wOIw=;
+	bh=BXkqTGf4ljiO8BNjQTNrgJXmlT/C/AanHIXAnkbe1W4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=U32LXCVCnDhD6Lcvjt/wky2/xmMGL8Wzq9LX6Lnn/BR8c+J87p6cAhRKO/IrxzUk3
-	 VGD8HcJ6q43QvVuVTikOUMaf6+8tBbQz5jcNtURUQ7wQajtfAn+9DfvB9gLpRMcxQQ
-	 hWwBjslbk8VUh3J0IUK1uIDhbpw8bqtKBkDM/iP46Z9j4VDuXP6xYrWHiiHLdpMPrX
-	 hb2MAYzBGatTLFnLuPuy4bxy2qajLAdhJVqJRQoOpO6KnVDlnoaNXj88E6Vs/YdmDs
-	 E0yrqw9QfYLC0+D49D2FWA0Hf57SRA+dmHeyVGLTi2A+dp/+uF8ukgffdJEsYAvR4h
-	 yR9+bO6hSGV6Q==
+	b=CYz80e0sPA5wEw5rSIQ7nlHRJyjF8l9bjP7kzn8ComkDvhgPbyNxJ3Nc0JvTJL40a
+	 XTKsttYh8NjiKa68lZ5+bcTDa5VLtpwkCJcn7+3/dUkfKeb6FCxx0xEuuMXj2MUP8Y
+	 q67RMDRdChhGKufsUkHWEs5dYmNVd8Sjv5B79oALukd9jyDrZtif9vPamoq+kIq7/a
+	 ii5LsFILTX9z5+pnXYjFnhFGw3X8Ub/TYuZPPXNFRF2F4YgukfTSt2Wh/Eyd0FLQ+q
+	 lfWBJ9f5Z2SohloS4a0zCpCDFj8rlRJVsMRAslmit2krLqiV/CzZmkuvrtsNDsJapK
+	 GUszAd9QAKuow==
 Received: by x201s (Postfix, from userid 1000)
-	id BA7B0203D5D; Tue, 07 May 2024 10:44:24 +0000 (UTC)
+	id E9930203F6E; Tue, 07 May 2024 10:44:24 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: netdev@vger.kernel.org
 Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
@@ -55,9 +55,9 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Manish Chopra <manishc@marvell.com>
-Subject: [PATCH net-next 12/14] net: qede: use faked extack in qede_flow_spec_to_rule()
-Date: Tue,  7 May 2024 10:44:13 +0000
-Message-ID: <20240507104421.1628139-13-ast@fiberby.net>
+Subject: [PATCH net-next 13/14] net: qede: propagate extack through qede_flow_spec_validate()
+Date: Tue,  7 May 2024 10:44:14 +0000
+Message-ID: <20240507104421.1628139-14-ast@fiberby.net>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240507104421.1628139-1-ast@fiberby.net>
 References: <20240507104421.1628139-1-ast@fiberby.net>
@@ -70,64 +70,53 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Since qede_parse_flow_attr() now does error reporting
-through extack, then give it a fake extack and extract the
-error message afterwards if one was set.
+Pass extack to qede_flow_spec_validate() when called in
+qede_flow_spec_to_rule().
 
-The extracted error message is then passed on through
-DP_NOTICE(), including messages that was earlier issued
-with DP_INFO().
+Pass extack to qede_parse_actions().
 
-This fake extack approach is already used by
-mlxsw_env_linecard_modules_power_mode_apply() in
-drivers/net/ethernet/mellanox/mlxsw/core_env.c
+Not converting qede_flow_spec_validate() to use extack for
+errors, as it's only called from qede_flow_spec_to_rule(),
+where extack is faked into a DP_NOTICE anyway, so opting to
+keep DP_VERBOSE/DP_NOTICE usage.
 
 Only compile tested.
 
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 ---
-
-Note:
-Even through _msg is marked in include/linux/netlink.h as
-"don't access directly, use NL_SET_ERR_MSG", then the comment
-above NL_SET_ERR_MSG, seams to indicate that it should be fine
-to access it directly if for reading, as is done other places.
-I could also add a NL_GET_ERR_MSG but I would rather not do that
-in this series.
-
- drivers/net/ethernet/qlogic/qede/qede_filter.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/qlogic/qede/qede_filter.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/qlogic/qede/qede_filter.c b/drivers/net/ethernet/qlogic/qede/qede_filter.c
-index 8734c864f324..3727ab5af088 100644
+index 3727ab5af088..7789a8b5b065 100644
 --- a/drivers/net/ethernet/qlogic/qede/qede_filter.c
 +++ b/drivers/net/ethernet/qlogic/qede/qede_filter.c
-@@ -1989,6 +1989,7 @@ static int qede_flow_spec_to_rule(struct qede_dev *edev,
+@@ -1952,6 +1952,7 @@ int qede_add_tc_flower_fltr(struct qede_dev *edev, __be16 proto,
+ static int qede_flow_spec_validate(struct qede_dev *edev,
+ 				   struct flow_action *flow_action,
+ 				   struct qede_arfs_tuple *t,
++				   struct netlink_ext_ack *extack,
+ 				   __u32 location)
  {
- 	struct ethtool_rx_flow_spec_input input = {};
- 	struct ethtool_rx_flow_rule *flow;
-+	struct netlink_ext_ack extack;
- 	__be16 proto;
  	int err;
+@@ -1976,7 +1977,7 @@ static int qede_flow_spec_validate(struct qede_dev *edev,
+ 		return -EINVAL;
+ 	}
  
-@@ -2016,7 +2017,7 @@ static int qede_flow_spec_to_rule(struct qede_dev *edev,
- 	if (IS_ERR(flow))
- 		return PTR_ERR(flow);
- 
--	err = qede_parse_flow_attr(NULL, proto, flow->rule, t);
-+	err = qede_parse_flow_attr(&extack, proto, flow->rule, t);
+-	err = qede_parse_actions(edev, flow_action, NULL);
++	err = qede_parse_actions(edev, flow_action, extack);
  	if (err)
- 		goto err_out;
+ 		return err;
  
-@@ -2024,6 +2025,8 @@ static int qede_flow_spec_to_rule(struct qede_dev *edev,
+@@ -2023,7 +2024,7 @@ static int qede_flow_spec_to_rule(struct qede_dev *edev,
+ 
+ 	/* Make sure location is valid and filter isn't already set */
  	err = qede_flow_spec_validate(edev, &flow->rule->action, t,
- 				      fs->location);
+-				      fs->location);
++				      &extack, fs->location);
  err_out:
-+	if (extack._msg)
-+		DP_NOTICE(edev, "%s\n", extack._msg);
- 	ethtool_rx_flow_rule_destroy(flow);
- 	return err;
- 
+ 	if (extack._msg)
+ 		DP_NOTICE(edev, "%s\n", extack._msg);
 -- 
 2.43.0
 
