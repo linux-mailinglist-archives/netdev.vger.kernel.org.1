@@ -1,127 +1,137 @@
-Return-Path: <netdev+bounces-94107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5AB78BE22A
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:32:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3B498BE249
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:36:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65FF41F21899
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:32:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F549289807
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:36:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BF8C14EC72;
-	Tue,  7 May 2024 12:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF74152E13;
+	Tue,  7 May 2024 12:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VdkNTI4T"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0skkp0I5";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/JjfpUyS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316AD8F6B;
-	Tue,  7 May 2024 12:32:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6C61DA3A;
+	Tue,  7 May 2024 12:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715085164; cv=none; b=WUj7rAXFR252tnOhimY+xfVIca/xj17uWwcyrYy+fzgBJFUalwzvO5v40H3ioiCt2tdv4YOqE1pf/enbNqYTZU6BvsKnlTqE58NZd/9WMeF2vyULXPCNhafCGLAkpwPbEfG0G3l1mq44NqcVGlrM7CFM+6KDB86Xu+OLF/Ynn5M=
+	t=1715085400; cv=none; b=O9UbCHMhltUXnJC2OcdDXELGa39cwmlM7ihrzF+kf43FZgjTeazt2GqkbTBoDnyC++7dgMvFJAkgwAf4zLlT8bxOo5RQgyMaB8FPTAKHzvjJsgki9t6LxnsOXtO1JdE+gfdta7c/1JuzXYbyTL6vVoBxB1vNO++eqnyeseBY8yQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715085164; c=relaxed/simple;
-	bh=/gUkLjOR4jSCzfgQ8uwQGC9Tyk0qbgfnT/0lr9ZVJOQ=;
+	s=arc-20240116; t=1715085400; c=relaxed/simple;
+	bh=9G2vBiJaAA3BQNwwiCWALPOb9+HbQdLD4X/2fudy6xY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bpWRtjVwtFfBFXCf/LNIqv+1q3ZsbgZaZiY6M7YSNTAEHjdUttXXSRlM5fg5X1XA4RUBfcqHDm5G6eYVcRHodiDqHGNISeXEqEuKEU0965joJjJ5IissKiHTcuT2OiD+Op6pYroLBnXowmOS3SfgvQfiknlxe/ag8LxSwJr144I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VdkNTI4T; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 447C1UU9015313;
-	Tue, 7 May 2024 12:32:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=VsUJTSdpnWOM0cDbhrM/hZOQ5xrPm9c9WsS553P/z/w=;
- b=VdkNTI4TvNiS/ClQQJlFKwqrM0Cser+ehQ5uLfyBzhB2/c0vQHwJtacd2vLRCKnav+bH
- nnLTsgNt06ySpcwn0AmlqHpm4iWV87OM3NovoDZphhFbIUT6fAGUzS30FemEVKYE8GaJ
- bRGdIqu19dHaH31diGU5+1rK4FYRMh5XA+F2lELm+V0sZcWPWG0mY4p+OgfKIlQNPFaQ
- wZAqxpkb2FTUsvGSlnRpGbYJ7aAVXFnSRcLEtm5x2kL00qkigYQKQnx6cVt1YU/dXZYD
- TchUzAOW2JemvxtVrzH09/loP9a+eD8hMNTFhERWros9j8dBEkKo67fZTrGrC1Csk0Xu Ig== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xyknd03f6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 May 2024 12:32:30 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 447CWTEw004456;
-	Tue, 7 May 2024 12:32:29 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xyknd03f3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 May 2024 12:32:29 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 447ANOgQ022508;
-	Tue, 7 May 2024 12:32:28 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xx1jkwre3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 May 2024 12:32:28 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 447CWNTs54985020
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 7 May 2024 12:32:25 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 410352004B;
-	Tue,  7 May 2024 12:32:23 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 502632004D;
-	Tue,  7 May 2024 12:32:22 +0000 (GMT)
-Received: from osiris (unknown [9.171.44.40])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue,  7 May 2024 12:32:22 +0000 (GMT)
-Date: Tue, 7 May 2024 14:32:20 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Thomas Huth <thuth@redhat.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>, netdev@vger.kernel.org,
-        llvm@lists.linux.dev, patches@lists.linux.dev,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>
-Subject: Re: [PATCH 0/6] s390: Unify IUCV device allocation
-Message-ID: <20240507123220.7301-A-hca@linux.ibm.com>
-References: <20240506194454.1160315-1-hca@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jUTFAluWgoWHLDbLRMP8El7h8dQYQqJaDzgGjC4HuURXAgEHN/AzbXxQAwlLqhLqVxlQEwKVRvdmcwyMHcbHcI0PSmxR9mUqwxnuIwknyVA7nxNKD0+Ut387l+zi8LW2qUPO4geXWDv6UMNBwQ771z78zKjOLGC2wuzUYGyKiQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0skkp0I5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/JjfpUyS; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 7 May 2024 14:36:36 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1715085397;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=abD/WEok7ruvAwEFcdpePsY8TlgCTElZkcX9i8JMXQc=;
+	b=0skkp0I5Wkrm16f4vCYvhDeUv4Xe3PXz+RhPhsojzPdEIO0NiyUDKt6ug+dBNqMYInzZP1
+	VeI8iSwX5Lyj9kwoUNCSclciGjCfQod+Bmkad4u5QFIx+jwC4dghdQ8PUpVEULXAHKnp0Y
+	kNGRyGfkQjIH48axOYQdikSVAMK9wepxbHz6LOmRn99fKS5OKMD2/CntrvctCKHZc+KayC
+	xXpUvIgSeh+6lqiRb6wNJBicC5X5sN8Tsr+dBwb63BakpsJSNuM3laxdao8djuRHrx+qMF
+	cq62Ae7kKN0Wo4x8L3D6EY66UzW6EBAWUOVE4nWNnT/QlOKgj6GGyUc/jiGFDw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1715085397;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=abD/WEok7ruvAwEFcdpePsY8TlgCTElZkcX9i8JMXQc=;
+	b=/JjfpUySMWS2t+Eo2IHC62Dpq6h8Q0dExEHVXU13h2qbsd59k6fSl9dOokezH4jZhi8G/q
+	oEqNaLi5OeIV4KCQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next 14/15] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+Message-ID: <20240507123636.cTnT7TvU@linutronix.de>
+References: <20240503182957.1042122-1-bigeasy@linutronix.de>
+ <20240503182957.1042122-15-bigeasy@linutronix.de>
+ <87y18mohhp.fsf@toke.dk>
+ <CAADnVQJkiwaYXUo+LyKoV96VFFCFL0VY5Jgpuv_0oypksrnciA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240506194454.1160315-1-hca@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: WKUqx34HX5S2SSp48t5luArWznjCnPse
-X-Proofpoint-GUID: 31WKNj7By9EH0_0BmBk-Q_I_6TUFYrCo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-07_06,2024-05-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=459 mlxscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0
- spamscore=0 impostorscore=0 clxscore=1015 bulkscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2405070086
+In-Reply-To: <CAADnVQJkiwaYXUo+LyKoV96VFFCFL0VY5Jgpuv_0oypksrnciA@mail.gmail.com>
 
-On Mon, May 06, 2024 at 09:44:48PM +0200, Heiko Carstens wrote:
-> Unify IUCV device allocation as suggested by Arnd Bergmann in order
-> to get rid of code duplication in various device drivers.
+On 2024-05-06 16:09:47 [-0700], Alexei Starovoitov wrote:
+> > > On PREEMPT_RT the pointer to bpf_net_context is saved task's
+> > > task_struct. On non-PREEMPT_RT builds the pointer saved in a per-CPU
+> > > variable (which is always NODE-local memory). Using always the
+> > > bpf_net_context approach has the advantage that there is almost zero
+> > > differences between PREEMPT_RT and non-PREEMPT_RT builds.
+> >
+> > Did you ever manage to get any performance data to see if this has an
+> > impact?
+> >
+> > [...]
+> >
+> > > +static inline struct bpf_net_context *bpf_net_ctx_get(void)
+> > > +{
+> > > +     struct bpf_net_context *bpf_net_ctx = this_cpu_read(bpf_net_context);
+> > > +
+> > > +     WARN_ON_ONCE(!bpf_net_ctx);
+> >
+> > If we have this WARN...
+> >
+> > > +static inline struct bpf_redirect_info *bpf_net_ctx_get_ri(void)
+> > > +{
+> > > +     struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
+> > > +
+> > > +     if (!bpf_net_ctx)
+> > > +             return NULL;
+> >
+> > ... do we really need all the NULL checks?
 > 
-> This also removes various warnings caused by
-> -Wcast-function-type-strict as reported by Nathan Lynch.
-                                             ^^^^^^^^^^^^
+> Indeed.
+> Let's drop all NULL checks, since they definitely add overhead.
+> I'd also remove ifdef CONFIG_PREEMPT_RT and converge on single implementation:
+> static inline struct bpf_net_context * bpf_net_ctx_get(void)
+> {
+>  return current->bpf_net_context;
+> }
 
-Ahem :)
+Okay, let me do that then.
 
-This should have been Nathan Chancellor, of course. Sorry for this!
+Sebastian
 
