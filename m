@@ -1,180 +1,81 @@
-Return-Path: <netdev+bounces-93899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 862F28BD8C1
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 02:54:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AE0E8BD8C8
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 03:06:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90B4BB24060
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 00:54:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A94471F237DF
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 01:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E0E15A4;
-	Tue,  7 May 2024 00:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394C719E;
+	Tue,  7 May 2024 01:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LkK5+wzm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VJkn1dEa"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F9410FA
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 00:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CAF138E
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 01:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715043263; cv=none; b=stJdOL2yfbyWzvKbRsiyZ1gPZc5MYGFihM/4UJSuGXTOaZ0zY9xkjI7VKR3lnNtQZShoP4gVhPkwuLz/2roQFTXbAtnLEIE/iq00rqvACwiIZxWUrqEexxBBOhapJrkTskMJrV1yGoSo3ZHz9TAOi27BSouHj/lLZm8bRreQ0Nw=
+	t=1715043994; cv=none; b=Ufr+dfzGTjt3yVjlJeZtiqpiLi47oG382As8VHVnhA/rWT4Uw81fVdbCezZ9yI22u0YeLLtF07m6xaE9zzWAUVAOP9KwvVc2xVsEvt998jWAw3FYiFvBXMv9YOs289auQnWs1oPFZsHwJCGVah9EiLb+Z9FuLWrBfll2cpOyDrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715043263; c=relaxed/simple;
-	bh=o8Bc5Ez/6YqYURlwwo5HZX/zfkTVwJuvYFnD3wNE9ys=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zkjb8g1hdoxnVYSrgs1WTnn9ICXieXFqHjb90b7fHASfr9a7hxhGmn9ex+WyPSBbExYftgW2Wi8KoxyIMPePny+xxEtXdSgzawxHIPc6PS42R68rs9uK1J55MIKwpABxWnwCHe8nbpy4b0OFlDmetFWq76qMGa/e4OSPCoG541w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LkK5+wzm; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a4957aaf-6b3f-45e8-8c18-a9f74213d0f3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1715043258;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EkN5x92xDG37kTOdUdSnJWPAN51eOIj86lnHKaDFNr0=;
-	b=LkK5+wzmXqo5sFsIhsMoTy0VapcDfqDuxZ3bfxSNryi85yj7zKlSdh+mFCFFcQCLYMRSJj
-	TcSTdH1wcZC4ssayEtP5BM1mvNQEMHg029Xyq2bFVaS8lOF544saj0ciaq1yvd1nR/v0JP
-	OZAckBjKAHxAuJT5NGL77nQS9sWwcN0=
-Date: Mon, 6 May 2024 17:54:13 -0700
+	s=arc-20240116; t=1715043994; c=relaxed/simple;
+	bh=BK4ZvQh84YwO18N6s1HcFmca6DjYoSth4mAw36dNcig=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=i0o1fYKy37+flrdJszWlcjNvNauZko5xvbqQX2z6B7dixmqqzcWkD82IHWyDvHPqVOZT1RERAoQbRNo2/1N235hrF4u4KGkKstXUHlIA276oXIwfhfwGd9XTMqMkzs/rBY8ACxwt+v3UopMavxQ7fW2xmIafeUhz8XhEguqnKAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VJkn1dEa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 431A3C116B1;
+	Tue,  7 May 2024 01:06:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715043993;
+	bh=BK4ZvQh84YwO18N6s1HcFmca6DjYoSth4mAw36dNcig=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VJkn1dEaQ++Qf9tlQz0xFS7Ib9oI0LF5jGv8/Tcc+IiOH4EsXV1FjVH4gCcd+RIns
+	 g0/E9ZYiuHDNXdH3iWvH358tr2uv4vs4rtJ34CwCB5zDSz8T0kv15fHC8kGV99jE/l
+	 SK9tGv5hNP9VCLtHiU8iMDJyErpJlKsvVEI1mrQnlH44CYCHKLdsXoTQLC2vlK53hn
+	 orxTjOyD0NndKTBcCYJqVdVEouGSboXXVEeqX61A+l0gOpYSzh1AZBYkYvF65xRUrB
+	 N9LTy1sbG6Qe6GjuI0pjA4xBF0NFsWxAYBRFxUqPaRYmJm4MCntzFyXWkdyQvTcPAF
+	 8F4H4+/jtCd/g==
+Date: Mon, 6 May 2024 18:06:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: Jacob Keller <jacob.e.keller@intel.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, Tariq
+ Toukan <tariqt@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Andrew
+ Gospodarek <andrew.gospodarek@broadcom.com>, "michael.chan@broadcom.com"
+ <michael.chan@broadcom.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Jiri Pirko <jiri@nvidia.com>, Alexander Duyck
+ <alexander.duyck@gmail.com>
+Subject: Re: Driver and H/W APIs Workshop at netdevconf
+Message-ID: <20240506180632.2bfdc996@kernel.org>
+In-Reply-To: <c4ae5f08-11f2-48f7-9c2a-496173f3373e@kernel.org>
+References: <c4ae5f08-11f2-48f7-9c2a-496173f3373e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH bpf-next v6 3/3] selftests/bpf: Handle forwarding of
- UDP CLOCK_TAI packets
-To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Andrew Halaney <ahalaney@redhat.com>,
- Martin KaFai Lau <martin.lau@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>,
- kernel@quicinc.com
-References: <20240504031331.2737365-1-quic_abchauha@quicinc.com>
- <20240504031331.2737365-4-quic_abchauha@quicinc.com>
- <663929b249143_516de2945@willemb.c.googlers.com.notmuch>
- <d613c5a6-5081-4760-8a86-db1107bdc207@quicinc.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <d613c5a6-5081-4760-8a86-db1107bdc207@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 5/6/24 1:50 PM, Abhishek Chauhan (ABC) wrote:
-> 
-> 
-> On 5/6/2024 12:04 PM, Willem de Bruijn wrote:
->> Abhishek Chauhan wrote:
->>> With changes in the design to forward CLOCK_TAI in the skbuff
->>> framework,  existing selftest framework needs modification
->>> to handle forwarding of UDP packets with CLOCK_TAI as clockid.
->>>
->>> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
->>> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
->>> ---
->>>   tools/include/uapi/linux/bpf.h                | 15 ++++---
->>>   .../selftests/bpf/prog_tests/ctx_rewrite.c    | 10 +++--
->>>   .../selftests/bpf/prog_tests/tc_redirect.c    |  3 --
->>>   .../selftests/bpf/progs/test_tc_dtime.c       | 39 +++++++++----------
->>>   4 files changed, 34 insertions(+), 33 deletions(-)
->>>
->>> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
->>> index 90706a47f6ff..25ea393cf084 100644
->>> --- a/tools/include/uapi/linux/bpf.h
->>> +++ b/tools/include/uapi/linux/bpf.h
->>> @@ -6207,12 +6207,17 @@ union {					\
->>>   	__u64 :64;			\
->>>   } __attribute__((aligned(8)))
->>>   
->>> +/* The enum used in skb->tstamp_type. It specifies the clock type
->>> + * of the time stored in the skb->tstamp.
->>> + */
->>>   enum {
->>> -	BPF_SKB_TSTAMP_UNSPEC,
->>> -	BPF_SKB_TSTAMP_DELIVERY_MONO,	/* tstamp has mono delivery time */
->>> -	/* For any BPF_SKB_TSTAMP_* that the bpf prog cannot handle,
->>> -	 * the bpf prog should handle it like BPF_SKB_TSTAMP_UNSPEC
->>> -	 * and try to deduce it by ingress, egress or skb->sk->sk_clockid.
->>> +	BPF_SKB_TSTAMP_UNSPEC = 0,		/* DEPRECATED */
->>> +	BPF_SKB_TSTAMP_DELIVERY_MONO = 1,	/* DEPRECATED */
->>> +	BPF_SKB_CLOCK_REALTIME = 0,
->>> +	BPF_SKB_CLOCK_MONOTONIC = 1,
->>> +	BPF_SKB_CLOCK_TAI = 2,
->>> +	/* For any future BPF_SKB_CLOCK_* that the bpf prog cannot handle,
->>> +	 * the bpf prog can try to deduce it by ingress/egress/skb->sk->sk_clockid.
->>>   	 */
->>>   };
->>>   
->>> diff --git a/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c b/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
->>> index 3b7c57fe55a5..71940f4ef0fb 100644
->>> --- a/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
->>> +++ b/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
->>> @@ -69,15 +69,17 @@ static struct test_case test_cases[] = {
->>>   	{
->>>   		N(SCHED_CLS, struct __sk_buff, tstamp),
->>>   		.read  = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
->>> -			 "w11 &= 3;"
->>> -			 "if w11 != 0x3 goto pc+2;"
->>> +			 "if w11 == 0x4 goto pc+1;"
->>> +			 "goto pc+4;"
->>> +			 "if w11 == 0x3 goto pc+1;"
->>> +			 "goto pc+2;"
->>
->> Not an expert on this code, and I see that the existing code already
->> has this below, but: isn't it odd and unnecessary to jump to an
->> unconditional jump statement?
->>
-> I am closely looking into your comment and i will evalute it(Martin can correct me
-> if the jumps are correct or not as i am new to BPF as well) but i found out that
-> JSET = "&" and not "==". So the above two ins has to change from -
+On Mon, 6 May 2024 13:59:31 -0600 David Ahern wrote:
+> Suggested topics based on recent netdev threads include
+> - devlink - extensions, shortcomings, ...
+> - extension to memory pools
+> - new APIs for managing queues
+> - challenges of netdev / IB co-existence (e.g., driven by AI workloads)
+> - fwctl - a proposal for direct firmware access
 
-Yes, this should be bitwise "&" instead of "==".
+Memory pools and queue API are more of stack features.
+Please leave them out of your fwctl session.
 
-The bpf CI did report this: 
-https://github.com/kernel-patches/bpf/actions/runs/8947652196/job/24579927178
-
-Please monitor the bpf CI test result.
-
-Do you have issue running the test locally?
-
-> 
-> "if w11 == 0x4 goto pc+1;" ==>(needs to be corrected to) "if w11 & 0x4 goto pc+1;"
->   "if w11 == 0x3 goto pc+1;" ==> (needs to be correct to) "if w11 & 0x3 goto pc+1;"
-> 
-> 
->>>   			 "$dst = 0;"
->>>   			 "goto pc+1;"
->>>   			 "$dst = *(u64 *)($ctx + sk_buff::tstamp);",
->>>   		.write = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
->>> -			 "if w11 & 0x2 goto pc+1;"
->>> +			 "if w11 & 0x4 goto pc+1;"
->>>   			 "goto pc+2;"
->>> -			 "w11 &= -2;"
->>> +			 "w11 &= -3;"
-> Martin,
-> Also i am not sure why the the dissembly complains because the value of SKB_TSTAMP_TYPE_MASK = 3 and we are
-> negating it ~3 = -3.
-> 
->    Can't match disassembly(left) with pattern(right):
->    r11 = *(u8 *)(r1 +129)  ;  r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset)
->    if w11 & 0x4 goto pc+1  ;  if w11 & 0x4 goto pc+1
->    goto pc+2               ;  goto pc+2
->    w11 &= -4               ;  w11 &= -3
-> 
->>>   			 "*(u8 *)($ctx + sk_buff::__mono_tc_offset) = r11;"
->>>   			 "*(u64 *)($ctx + sk_buff::tstamp) = $src;",
->>>   	},
-
+Aren't people who are actually working on those things submitting
+talks or hosting better scoped discussions? It appears you haven't 
+CCed any of them..
 
