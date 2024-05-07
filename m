@@ -1,108 +1,127 @@
-Return-Path: <netdev+bounces-93988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E69D08BDD79
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:51:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 785CC8BDD7F
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:52:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22D0B1C21B23
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 08:51:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33413282E36
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 08:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4757D14D430;
-	Tue,  7 May 2024 08:51:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="se2REd1I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F00414D447;
+	Tue,  7 May 2024 08:52:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.12])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF3E16D1A9;
-	Tue,  7 May 2024 08:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDB314D440
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 08:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715071861; cv=none; b=tRg11C+QKtcgSKNl4t84HgaafmdCk3KG1JlsCNSgl8kK9AJLaSPFBavMWs6jYeeBuQxK7RU7hOerc6ZgoCYq1a+Ch1RLZZopHRWVM0VujcI0zq0HAP0EU1Bgkd5DAI497fY8y6ewOjzOgrE1D63ZXZ4E0uhv4je6RW07tK8f6t0=
+	t=1715071936; cv=none; b=fGITqPxXFxg5Er6zfCbZg4fvK1kpFTf8fAORacJFUXP0Win5oqI7yppYAYzdbi3qzVEINsQoPFrerx3qIgp83MJXzw0JWrhKzaG4iftdg48hsdNJY/dOqei9ke8Dj1csLjMoZxxNTS/OgUP/ZOYLSyKcIBsICFnc1H/uxr7rX7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715071861; c=relaxed/simple;
-	bh=PdzkpfEmwxK/pzn735F8E3DY8ddcp/oOwhlxuPHUSGU=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=iDYFziTf7vIJsEpOg/uq2cVaNeljm4JuDEVH4TZi8FjO5W8WiZE64reA/ls0z7fymJnNNIAGfKS3HfRdyhvUtrpEhGehYJmk+v/3ea4Q0N9HpdyGOxUioXvNnB2CGP50el3zIogI/Ea8YriM6vDtzm0p2K4LTIqt3gGk1QlPZqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=se2REd1I; arc=none smtp.client-ip=212.227.17.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1715071728; x=1715676528; i=markus.elfring@web.de;
-	bh=PdzkpfEmwxK/pzn735F8E3DY8ddcp/oOwhlxuPHUSGU=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=se2REd1IuGnkcNo/dOgrzsZn3JdWJx5pwg5nFSsQ740oiJGSxzz4fmMDj+1ez3W2
-	 4sZz4cKlGlqOMyCaTRSNn0h0oM7uPp8BQgWiW1VJJPzVGta30XjjD8tKDX57D4pNd
-	 bhMEYlkWP3aLVlPnUztWF0LnnulTD8Fvq19wRTO5vFiVNXxMi48QYANCeBP7qH1xs
-	 CHWtzqStPEWnQaOOTRK7h6Trv+E55o49HjDnc31Cna5oRoUSn42fpXAHk25Mue2yX
-	 c3Oye5D2Ihap9uV9zKpIlrcTe+Ek72gPBqGsaVmb3ta+Hdo8TI0ibVzyXj09H8hlV
-	 qzoT+EXWniHy9yHfLQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N2BHw-1slSrG2FeI-0120rS; Tue, 07
- May 2024 10:48:48 +0200
-Message-ID: <09851d72-533f-4a30-99a0-09122af4f2e5@web.de>
-Date: Tue, 7 May 2024 10:48:35 +0200
+	s=arc-20240116; t=1715071936; c=relaxed/simple;
+	bh=PcC6gv/Xh6AX9bpLAJzrtC5YtnizlAobd29EGBRTI8Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=k35dlcErTi3mlEdknmTWvDVEEkH6abukLKfeSIy09W2y4mNWWcNoYcsarP5SYFlJvl5uqOGbOxsSxX3d16igND/ppBo/5gdUgufgFoRmqlNHv/SfXKAJzgEJPu7zyQC3Uqnk06b3qhdyKSwECLBkoaao7x/kyzzUnieMJjjA3TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-478-EKjwsSalOS-woX3gmevNcQ-1; Tue,
+ 07 May 2024 04:52:09 -0400
+X-MC-Unique: EKjwsSalOS-woX3gmevNcQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EA6DD3800BA4;
+	Tue,  7 May 2024 08:52:08 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 151DC40C6CB6;
+	Tue,  7 May 2024 08:52:06 +0000 (UTC)
+Date: Tue, 7 May 2024 10:52:05 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antony Antony <antony@phenome.org>
+Cc: Antony Antony <antony.antony@secunet.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Shuah Khan <shuah@kernel.org>, devel@linux-ipsec.org
+Subject: Re: [PATCH net-next v3 0/2] fix icmp error source address over xfrm
+ tunnel
+Message-ID: <ZjnrtWZeVgsHyNhm@hog>
+References: <cover.1714982035.git.antony.antony@secunet.com>
+ <ZjjczzsSz6wwUHd5@hog>
+ <Zjj94y2JW4uPg_Iz@Antony2201.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- =?UTF-8?Q?J=C3=B6rg_Reuter?= <jreuter@yaina.de>,
- Paolo Abeni <pabeni@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
- Lars Kellogg-Stedman <lars@oddbit.com>, Simon Horman <horms@kernel.org>
-References: <bd49e83817604e61a12c9bf688a0825f116e67c0.1715065005.git.duoming@zju.edu.cn>
-Subject: Re: [PATCH net v5 1/4] ax25: Use kernel universal linked list to
- implement ax25_dev_list
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <bd49e83817604e61a12c9bf688a0825f116e67c0.1715065005.git.duoming@zju.edu.cn>
+In-Reply-To: <Zjj94y2JW4uPg_Iz@Antony2201.local>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
 Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:hzN5HcI6Zd7BBby/m2pAitYCWjGmJIV6c8WrKJELNp0sDtOktQ6
- BmqEiFjllXfwBdtY2O4KR3r1u0HYhC29jJvEV8INkRPGFgTst/sZyO73Gwj6TnSdivTa8Ye
- ayV+YHAKp9Vi+cC8FEmj1LYoBsi5YmG9QJydZ6arUEsKPjvCDUs1wiZo8NsdBWfbdMTMxaW
- RPBt/SIVqjTHkUy2Ij7Kg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:OVReoEuT2vc=;p9gX44S8yh70XANrK4NitB+mWWW
- hjqS7EWo7E2zFVaw1G4zUE+brJJcTzdX9aII64hDbljmg+V8D0t7/Yi+PU8pkDLMYfEpBiRTF
- YOsOa2hnCcZQs1i/qpAfWJES9v16AJ1Nu+Q7+G8wEF7CXF+MMBNKRuy625IZpuNEJwbjfLzi8
- kvpdye6fJWoTz0iKaCAQSIOqb/yrOgTq9lkYvDohj11U1dEHR47OW0e9cnd0RMENeUjdxpRtK
- 1QNC8GE5ozaQnzgVhP/QvD7ag7dFMsq5EQT14UOU9ULLVAPurHO8ybXGc+eXgkrO+59JMWsbw
- IsC/PzYTxLc2nCGHoz+FyNoB12ewvofr3F0jCUYrsxwkOegKQXwoqvX1P/wvt782pCcABssMB
- GXQa74wJ8ghFzS9VYCRQI+rVoLKzpNBXFqvecCZY+vdO6K0bkKgOdGBWTQ/PcA5QJIcHTKzV0
- /jAYKozniLLB2RUOhxUFoeJzp07SlOlFGqC5YQiRcU+tT2BQwxCAghAvBs/tUo1WmXJ+R1KWK
- 6FxS4ypklCxAsXGreRL2TGnmfNvWEIb2Hf4oCawy89RAgyq2zmFbI0kEP7AqwtgJZGZBkUEID
- mKyTrt3tiutaalLdnv1xYpD1XpO7HJkBYdYBUDX/jW0as3oVF15Nk2TigmD8zCu9l4olBTA4L
- NM47Ou40UAE+47x3cJ3koujgzay+4gORZ5H7wZTHUzs1spFrHw+n7B5aa2PkvwV3R9XgNWCY9
- i4L1vKrHJ2nka/EMQxia/BXeNYScHEVGpXHWtreufzXIm3t9xuFsa6gBNRxnDiGV7RAOGhXBr
- al3FJ1aHsrydJ9d2a8zGFcQ08X2uxV25kRXmtolDXdN2c=
 
-> =E2=80=A6 that need to notice:
+2024-05-06, 17:57:23 +0200, Antony Antony wrote:
+> Hi Sabrina,
+>=20
+> On Mon, May 06, 2024 at 03:36:15PM +0200, Sabrina Dubroca via Devel wrote=
+:
+> > 2024-05-06, 09:58:26 +0200, Antony Antony wrote:
+> > > Hi,
+> > > This fix, originally intended for XFRM/IPsec, has been recommended by
+> > > Steffen Klassert to submit to the net tree.
+> > >=20
+> > > The patch addresses a minor issue related to the IPv4 source address =
+of
+> > > ICMP error messages, which originated from an old 2011 commit:
+> > >=20
+> > > 415b3334a21a ("icmp: Fix regression in nexthop resolution during repl=
+ies.")
+> > >=20
+> > > The omission of a "Fixes" tag  in the following commit is deliberate
+> > > to prevent potential test failures and subsequent regression issues
+> > > that may arise from backporting this patch all stable kerenels.
+> >=20
+> > What kind of regression do you expect? If there's a risk of
+>=20
+> For example, an old testing scripts with hardcoded source IP address assu=
+me
+> that the "Unreachable response" will have the previous behavior. Such=20
+> testing script may trigger regression when this patch is backported. =20
+> Consequently, there may be discussions on whether this patch has broken t=
+he=20
+> 10-year-old test scripts, which may be hard to fix.
 
-I suggest to improve such a wording.
+Ok, that seems like an acceptable level of "regression" to me. Thanks
+for explaining.
 
+> > regression, I'm not sure net-next is that much "better" than net or
+> > stable. If a user complains about the new behavior breaking their
+> > setup, my understanding is that you would likely have to revert the
+> > patch anyway, or at least add some way to toggle the behavior.
+>=20
+> My hope is that if this patch is applied to net-next without a "Fixes" ta=
+g,
+> users would fix their testing scripts properly.
 
-> [1] We should add a check to judge whether =E2=80=A6
+I don't think the lack of a fixes tag will make people fix broken test
+scripts, but maybe I'm too pessimistic.
 
-Are imperative wordings more desirable for improved change descriptions?
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv6.9-rc7#n94
+--=20
+Sabrina
 
-Regards,
-Markus
 
