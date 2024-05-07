@@ -1,105 +1,127 @@
-Return-Path: <netdev+bounces-94047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB9A8BE027
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:50:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE2838BE032
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:53:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C65FD1F2354C
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:50:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9992A28E175
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDBE614EC77;
-	Tue,  7 May 2024 10:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8151509A2;
+	Tue,  7 May 2024 10:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KH0y71ey"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lc2l0Tl5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C645F502B3;
-	Tue,  7 May 2024 10:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE3214EC77;
+	Tue,  7 May 2024 10:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715079027; cv=none; b=oeUYNIUh1KJaA7ivDI+gTYLRXHMHqmz8Z7c2LZeJlh/O+e7XplNgEO2tewm1eSAluhIyEHrYVXKXe/+aoBVzzg5sgkeqwdasTWuYWf8MQsXXWk0KXD/qPrBQRGDFcaaK5KjcjmycK/UsKZSQ0NDxbIPIjuUVByrmJdcc0j4+goU=
+	t=1715079220; cv=none; b=mJ32/EGIMXbIDcg8YjjGHQ6eO5cePja9B9ukxJxuLIOCmDQDeuHPnOvB/+7f07hi0gXA3dY9swAwlmfNyVD26dL2SrHeHaPFpnGShxng8TX260vt/As0JDAf6MrQ1+8I4is1ePA4GT6iXRYcCSsrkqOYXST0v5EQamqP8PrxVio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715079027; c=relaxed/simple;
-	bh=k7OVsW1CLhpS+Sgr4gaW6u0i/WxY3RLczvnY1bpnXJU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Cx5eRPTKO0zqr/jfVHBq5iZIXBfqlBMMiAGCjYGFuuDYg8aG+86m6JfAlmyIqwUbwlDVjLdX1x8nZ1w6x8QNkVQGxwr2G3DdDhyGsRquBzqRYvOQX5cB5JSBuFZ1TW0x9KdCj/nIkdswMUl2n2zHUL72GeShARMXhg6AzpUjIWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KH0y71ey; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5A333C3277B;
-	Tue,  7 May 2024 10:50:27 +0000 (UTC)
+	s=arc-20240116; t=1715079220; c=relaxed/simple;
+	bh=DDtXv196sRdXkSns3p8qkThzlerAR6hPwCoy0eKwf1o=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=L+0PUEARI8xpNcdaocdYNaQVsTlHM+2PJgq0rAT12KxlBHC7jOlhXi0R+M/Vp8x7dwHKLtOeeJ5CWUAhabY3NK1s54Qf6xPSEyve+N8/bO7hXTNO6d+MOZm3RP/82j3cfB3eT7bSOBF+hlwyNt3nTlzQTYLUa3mWWupTPLa5cqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lc2l0Tl5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4D4FC2BBFC;
+	Tue,  7 May 2024 10:53:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715079027;
-	bh=k7OVsW1CLhpS+Sgr4gaW6u0i/WxY3RLczvnY1bpnXJU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KH0y71eySxSSRI3mzAnyQ/eExmgX+b/8gskMdb8lLE81Xr0ltANmmilripIiFpvwf
-	 S5oOdFTRP+zp+vM+e12zZc34OCUg4Ns5oxufBmiB17745Dy3RFKrh3WER7bQmbRjWe
-	 hAYX06cHPCGTSwK67M3ZiJPZXzxAhV0D6NJseYhVLrDc9sP53MD1NeA8ZLy+fTufmP
-	 lnrq/ZlbalLSgvX4QsgCU7F4KS77V7R7fFEDnauSslGrtUpRjt6aNtK0vh4Qxji9V7
-	 u4n7WS8+yzNfuHIUFEMe5veuvH9csRYfitoDKFegbbiZNiy/48JmZdJyCtSRn7RV9j
-	 vmFcTX25kzB3g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4A519C43331;
-	Tue,  7 May 2024 10:50:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1715079220;
+	bh=DDtXv196sRdXkSns3p8qkThzlerAR6hPwCoy0eKwf1o=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Lc2l0Tl52xnX1scDwjpbITc4zdvgHvkTeYIdFY8HCHHaXfKCAHcg4kdXNxM3WSN0i
+	 gc31g0jkfUwF+lsF58lYqbdu1djXAcCiA7qHy/bWU/h6g3Hy6M6AzCS13SwZ//Y/aj
+	 0g8c8PtEgexm/tKf+GgQLsOZa6TtyMxFkBMzergRoOIOOlro/N4F2UhdguKZinWjXK
+	 5Z1PBDFGwfnzkiwg0gxwyjolJsY3VPJO7cG+aK/8fNRsaup09H7dxEfJFtlxmKQM44
+	 R6vdnkjPJHeIe8ErtXWD3o/PbMJOY0xyOC+XYDMagQDwQKYiQnHhPuwmPnlMtGTDBv
+	 t8Dl1jI5B8TEQ==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH bpf-next 0/4] selftests/bpf: new MPTCP subflow subtest &
+ improvements
+Date: Tue, 07 May 2024 12:53:30 +0200
+Message-Id: <20240507-upstream-bpf-next-20240506-mptcp-subflow-test-v1-0-e2bcbdf49857@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6 0/6] Remove RTNL lock protection of CVQ
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171507902730.3484.10843035496334670534.git-patchwork-notify@kernel.org>
-Date: Tue, 07 May 2024 10:50:27 +0000
-References: <20240503202445.1415560-1-danielj@nvidia.com>
-In-Reply-To: <20240503202445.1415560-1-danielj@nvidia.com>
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- jiri@nvidia.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACoIOmYC/z2NywrCMBAAf6Xs2YXYRw7+inhI2l0N2HTJbrVQ+
+ u8GQY/DwMwOSiWRwqXZodAraVpyhfOpgfER8p0wTZWhdW3vBudxFbVCYcYojJk2w7+axUZBXSM
+ /lzcaqSEHYu+HPnLooDalEKft+7vCrwC34/gA2ZwZXYkAAAA=
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Geliang Tang <tanggeliang@kylinos.cn>, 
+ Nicolas Rybowski <nicolas.rybowski@tessares.net>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1258; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=DDtXv196sRdXkSns3p8qkThzlerAR6hPwCoy0eKwf1o=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmOggtO/Cqc1Fa0yeK9U1dM6TuwUP3NS7h5UWQL
+ /9w5S4BGBmJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZjoILQAKCRD2t4JPQmmg
+ c+7sEACXzbvsXdwki+w0gLTftwninrBAg5VPvkKu6zYdk12OO4hptnDsYhF8lhAlVwlzAXQEhbm
+ bdzyKgf4F3DCDPTuQuDeG1mEquvx9K8DtVOKf2EsXrUZsRwnp0+Br5JPA6MEYDmRTOrKnBepLXx
+ ZXVQPLd1ISdFgHCyRjt2eb3OEBDp0O6lQxrxEZZwS3PKWtg/0H2/niKwKMKP8OZh7yFgnWGZDNi
+ kmTOZEaH9tIhMigeJUV5iVIhz+mXr1XHXTD2DPI8DMPPfMGodnhDBRrQwnl+syg5k2xITETu2yH
+ qPS9+3NZutNaLv7U+jfJCBlRykD8sv53Q93dieWRh6saG7CaRWHmFXTOyVlxFiMqHWZXWPwa4q9
+ kMexvQkimZHp0nzQ9TvPhIm51QyunMlHQg34KCaRHoCDgfGtocecAZ82PvhbSFbghUQne6xf595
+ 4ScH71GNWejxWdyUIgTELIdQxeXlTlloBk+bcmpPj/9bFCg3557fgmp0T3POXcnbPzdvNqVC7dK
+ TFkLAuLnNNYq1uclD7eia1Qfa33cANUX6kMM1wZrnfkfm196UJpKgVPt0Ak+84mm6sJYsJqZejU
+ OPoNpaxV6dJAjPXBWVAKdtK3Tg7qS52g+N/GipnXNOh0w8kbhSEk6C9976xRvtT4WAP7X5ydHqk
+ 0/134ECvKFsarpQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Hello:
+In this series from Geliang, modifying MPTCP BPF selftests, we have:
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+- SIGINT support
 
-On Fri, 3 May 2024 23:24:39 +0300 you wrote:
-> Currently the buffer used for control VQ commands is protected by the
-> RTNL lock. Previously this wasn't a major concern because the control VQ
-> was only used during device setup and user interaction. With the recent
-> addition of dynamic interrupt moderation the control VQ may be used
-> frequently during normal operation.
-> 
-> This series removes the RNTL lock dependency by introducing a mutex
-> to protect the control buffer and writing SGs to the control VQ.
-> 
-> [...]
+- A new macro to reduce duplicated code
 
-Here is the summary with links:
-  - [net-next,v6,1/6] virtio_net: Store RSS setting in virtnet_info
-    https://git.kernel.org/netdev/net-next/c/fce29030c565
-  - [net-next,v6,2/6] virtio_net: Remove command data from control_buf
-    https://git.kernel.org/netdev/net-next/c/ff7c7d9f5261
-  - [net-next,v6,3/6] virtio_net: Add a lock for the command VQ.
-    https://git.kernel.org/netdev/net-next/c/6f45ab3e0409
-  - [net-next,v6,4/6] virtio_net: Do DIM update for specified queue only
-    https://git.kernel.org/netdev/net-next/c/650d77c51e24
-  - [net-next,v6,5/6] virtio_net: Add a lock for per queue RX coalesce
-    https://git.kernel.org/netdev/net-next/c/4d4ac2ececd3
-  - [net-next,v6,6/6] virtio_net: Remove rtnl lock protection of command buffers
-    https://git.kernel.org/netdev/net-next/c/f8befdb21be0
+- A new MPTCP subflow BPF program setting socket options per subflow: it
+  looks better to have this old test program in the BPF selftests to
+  track regressions and to serve as example.
 
-You are awesome, thank you!
+  Note: Nicolas is no longer working for Tessares, but he did this work
+  while working for them, and his email address is no longer available.
+
+- A new MPTCP BPF subtest validating the new BPF program.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Geliang Tang (3):
+      selftests/bpf: Handle SIGINT when creating netns
+      selftests/bpf: Add RUN_MPTCP_TEST macro
+      selftests/bpf: Add mptcp subflow subtest
+
+Nicolas Rybowski (1):
+      selftests/bpf: Add mptcp subflow example
+
+ tools/testing/selftests/bpf/prog_tests/mptcp.c    | 127 +++++++++++++++++++++-
+ tools/testing/selftests/bpf/progs/mptcp_subflow.c |  70 ++++++++++++
+ 2 files changed, 193 insertions(+), 4 deletions(-)
+---
+base-commit: 329a6720a3ebbc041983b267981ab2cac102de93
+change-id: 20240506-upstream-bpf-next-20240506-mptcp-subflow-test-faef6654bfa3
+
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
