@@ -1,139 +1,163 @@
-Return-Path: <netdev+bounces-94004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EACEB8BDE35
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:29:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 514248BDE73
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:36:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BB0B1F23B30
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:29:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5A4F1F25C7B
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF4114D71E;
-	Tue,  7 May 2024 09:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FC214F9D6;
+	Tue,  7 May 2024 09:35:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cB06D8GB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qn9V5A0j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82F114D2B5;
-	Tue,  7 May 2024 09:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DE114E2F1;
+	Tue,  7 May 2024 09:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715074183; cv=none; b=raTnb57i0sQLdEx0xnNqxhKXmx0g3ZRc3+g1QafZwzIXHY3ji0wkdGYGgryWRuIOdba4lgcnQtfwvaMdFnJtEmjMvl1FX4pL5qYv3c4L1NZHQk8Fdzo5GBdMh8htddjMtzkbibz5yeBTx1/BH7V5DoBX4s+eZXqWuVfxn1Pm4eE=
+	t=1715074539; cv=none; b=iAUEYkj4r9Wdg/6whBMmefgoSDVttfoA5gfB/K/qH9mbxC76dVOWggg0cySJKR/GhBXDEiws/zYef37nujA/szWRSMilG3M/kaGRtj1ZiaXBboUnonT9Oq5a2jAgepIJdFdH+X27Hzi2Df1QCOZZG7uHK2/lyg8NxFPYdgixykU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715074183; c=relaxed/simple;
-	bh=+b0PqBmWiKM8fSbUCScwguB7ROVDToBniJB8hjgJhHs=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CxuoUjsRmiDLNfhaXeVWOur6JaFSFb/JEZCc5oV1RcdXf8aXGj/huLOs6JtuDQuYdboDIxSs/1E2RbBzAkn3r8DglSagLiBEwps9/P706xLtVtXiPaY0wwlB9/L+L/BKc1RKFSCYOokDjN6OcQVlEKS/19Bq9kCqpXzFLAeO+vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=cB06D8GB; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4478Qxlb005008;
-	Tue, 7 May 2024 02:29:23 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	date:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pfpt0220; bh=V3Tg6uTIXEi5tFnn8HB+4v
-	Z22SCVpPXl19hGHqdsyx8=; b=cB06D8GBOysMaiXZDzKxH7erL7QiJ8lT9f9qgO
-	52YSWme11bRV9si5kUz4YsPUdqA6X9H6bYlJE7joaZaw0QAlg0ZJrZAMU/FTqBmT
-	CEGWKWAjEQVR6bdy+9YShf4YwjJuv2HRlghNbmL7sJDxRKutNRkgopK9Ya9OCW3B
-	SP064sqRYQTGbh2jBp8OeLdHuZsHSsv9W8EDZ/SlmWoPnpSZvDUP4ErYmbf9n7cE
-	6Sl1nTVvKt36maWUVKHTRp/BzRabKqP2v3Ian/zBwjHJlNLZP7Y13CyiAkxl35zr
-	uPgw8TS0/0vGQWrhACI+gA6a/jVFx62d5DHXcBCHgl8c6/Sg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3xygt2r5aa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 May 2024 02:29:22 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 7 May 2024 02:29:21 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 7 May 2024 02:29:21 -0700
-Received: from maili.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id C08753F7067;
-	Tue,  7 May 2024 02:29:18 -0700 (PDT)
-Date: Tue, 7 May 2024 14:59:17 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Duoming Zhou <duoming@zju.edu.cn>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-hams@vger.kernel.org>, <pabeni@redhat.com>, <kuba@kernel.org>,
-        <edumazet@google.com>, <jreuter@yaina.de>, <dan.carpenter@linaro.org>
-Subject: Re: [PATCH net v5 1/4] ax25: Use kernel universal linked list to
- implement ax25_dev_list
-Message-ID: <20240507092917.GA1049473@maili.marvell.com>
-References: <cover.1715065005.git.duoming@zju.edu.cn>
- <bd49e83817604e61a12c9bf688a0825f116e67c0.1715065005.git.duoming@zju.edu.cn>
+	s=arc-20240116; t=1715074539; c=relaxed/simple;
+	bh=+/Wzimi9IDd0AOad7JCOBMX+aJPeFaceFPRoaZUd6JQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ZCWochjwwZwz9NztqWraIvMIuGg4l6idzMjg55a2fduCr/Z8Z1pg++R8NiPu+kSDJP5FZDpSJrB9qmijuq2h8K2u707NSmfl5RhXPjjFqoXgaz5XGzkaHAkgenyI97Jr3z8KKyk/vRrxCVFEA2qPRwpf5XnuCayIEZb7TqZ04Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qn9V5A0j; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2db101c11beso36565341fa.0;
+        Tue, 07 May 2024 02:35:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715074536; x=1715679336; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tHQ3wThlCa+tmPm7RaR+qFcrkGfD7gzEvoOA5PrmsZ8=;
+        b=Qn9V5A0jesQZGCTXuVJHyqNGw/91oEXDjIgBz/SvXiZ9YgEOFnZ3GLIgWUxQi7Mkgi
+         IdLpfkgpBsad/tqUYMYMscuLuqDTdvb7fdrjzWPazXJRw8/8nPYNrvq4GJKoHRzihu3p
+         6GT23cNQY1Qloec5lS22UXhNQmVsQK9OIAeaz63upP/VZZg4tDalQ7glnDbRvqTCRE19
+         LgNTPKaFuKycCmarguyQmGTyPMveC/07wz3cnsSV9wQ6qoxqgmO+I95gpdG+pnS3H/Ta
+         1UvVfnvx7a7iGATudsuL3BwehWn+Z5ZSKMm+3ERzR1rZkLWoYTeWfRr2mUGwCRRXTBv9
+         e4rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715074536; x=1715679336;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tHQ3wThlCa+tmPm7RaR+qFcrkGfD7gzEvoOA5PrmsZ8=;
+        b=CXjPGBIQoCbgcXn7xVJu/XpAvOaif58H4PK87Gi+TlMk+289DJ2m2H2T8PfzgQX/jf
+         MWoVyZVAozg4fQz4xO+HUf25/DnXY0nKqbu2SMCs3ehSnax+BU4kkiVeQZ9qe+lPo+8j
+         ZON+W9eNMSIf4lo2ZzU1fEMfc4j5sS0KT9pEnQOy9mGkFV3KzBvDi+7G4Cyjd8m/FV2M
+         QD7dE5nwM4AGlDdlX2KwSmkgtWFYM0HjqbqN+2jjGvFTI3hppykGFKjUZDNIcKpwyvii
+         +heNTR9DFhrOCb8KsZ+mnxAo8GemcAJc+LN0vbWlajIZKC1jKaOLxM2X9MPmWSZ2Tetd
+         njvg==
+X-Forwarded-Encrypted: i=1; AJvYcCX1J+RbDqD9+y0rw6COw06z8VEGi5ub7/EWn1T2VMLrTIvxOZNv7rUOmg4wRnynzazsr0KYF1gpcp6nrOKVq0xCtSNO6pHdnhH/QlECOwA57LgK/crFnk7OpFUgi49tTmGg+Dzp
+X-Gm-Message-State: AOJu0Yzth5zG1sWevcu579UGoEjy0q0draT/MwMZmMTrZRUU3gB6xS3W
+	GJIEflqCsXSViVMphY3hFMPV769ryHnG5LsqkegdcXH/mXFd3OFz
+X-Google-Smtp-Source: AGHT+IH3kyXVRJ4PLiuJO5l/3kxoCLnD2cm+0pheedS9Aj4zvXVnedQGHMETTqwaLGYpsfRGaYHCpA==
+X-Received: by 2002:a2e:9585:0:b0:2df:b800:5bff with SMTP id w5-20020a2e9585000000b002dfb8005bffmr8142337ljh.7.1715074536291;
+        Tue, 07 May 2024 02:35:36 -0700 (PDT)
+Received: from pc638.lan (host-185-121-47-193.sydskane.nu. [185.121.47.193])
+        by smtp.gmail.com with ESMTPSA id t18-20020a2e9d12000000b002e29c50c4dcsm1335473lji.27.2024.05.07.02.35.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 May 2024 02:35:35 -0700 (PDT)
+From: "Uladzislau Rezki (Sony)" <urezki@gmail.com>
+To: "Paul E . McKenney" <paulmck@kernel.org>
+Cc: RCU <rcu@vger.kernel.org>,
+	Neeraj upadhyay <Neeraj.Upadhyay@amd.com>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Hillf Danton <hdanton@sina.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Oleksiy Avramchenko <oleksiy.avramchenko@sony.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Yan Zhai <yan@cloudflare.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH 03/48] rcu: Add lockdep checks and kernel-doc header to rcu_softirq_qs()
+Date: Tue,  7 May 2024 11:34:45 +0200
+Message-Id: <20240507093530.3043-4-urezki@gmail.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240507093530.3043-1-urezki@gmail.com>
+References: <20240507093530.3043-1-urezki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <bd49e83817604e61a12c9bf688a0825f116e67c0.1715065005.git.duoming@zju.edu.cn>
-X-Proofpoint-ORIG-GUID: KfjDknZKjbqKtls64QpGuiYWmbBMGvzA
-X-Proofpoint-GUID: KfjDknZKjbqKtls64QpGuiYWmbBMGvzA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-07_03,2024-05-06_02,2023-05-22_02
+Content-Transfer-Encoding: 8bit
 
-On 2024-05-07 at 12:33:39, Duoming Zhou (duoming@zju.edu.cn) wrote:
-> The origin ax25_dev_list implements its own single linked list,
-> which is complicated and error-prone. For example, when deleting
-> the node of ax25_dev_list in ax25_dev_device_down(), we have to
-> operate on the head node and other nodes separately.
->
-> This patch uses kernel universal linked list to replace original
-> ax25_dev_list, which make the operation of ax25_dev_list easier.
-> There are two points that need to notice:
->
-> [1] We should add a check to judge whether the list is empty before
-> INIT_LIST_HEAD in ax25_dev_device_up(), otherwise it will empty the
-> list for each new ax25_dev added.
->
-> [2] We should do "dev->ax25_ptr = ax25_dev;" and "dev->ax25_ptr = NULL;"
-> while holding the spinlock, otherwise the ax25_dev_device_up() and
-> ax25_dev_device_down() could race, we're not guaranteed to find a match
-> ax25_dev in ax25_dev_device_down().
->
-> Suggested-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
-> -ax25_dev *ax25_dev_list;
-> +static struct list_head ax25_dev_list;
->  DEFINE_SPINLOCK(ax25_dev_lock);
->
->  ax25_dev *ax25_addr_ax25dev(ax25_address *addr)
-> @@ -34,7 +35,7 @@ ax25_dev *ax25_addr_ax25dev(ax25_address *addr)
->  	ax25_dev *ax25_dev, *res = NULL;
->
->  	spin_lock_bh(&ax25_dev_lock);
-> -	for (ax25_dev = ax25_dev_list; ax25_dev != NULL; ax25_dev = ax25_dev->next)
-> +	list_for_each_entry(ax25_dev, &ax25_dev_list, list)
->  		if (ax25cmp(addr, (const ax25_address *)ax25_dev->dev->dev_addr) == 0) {
->  			res = ax25_dev;
->  			ax25_dev_hold(ax25_dev);
-> @@ -52,6 +53,9 @@ void ax25_dev_device_up(struct net_device *dev)
->  {
->  	ax25_dev *ax25_dev;
->
-> +	/* Initialized the list for the first entry */
-> +	if (!ax25_dev_list.next)
-> +		INIT_LIST_HEAD(&ax25_dev_list);
-if you define ax25_dev_list using 'static LIST_HEAD(ax25_dev_list)', you need this conditional check and
-initialization ?
+From: "Paul E. McKenney" <paulmck@kernel.org>
 
->  	ax25_dev = kzalloc(sizeof(*ax25_dev), GFP_KERNEL);
->  	if (!ax25_dev) {
->  		printk(KERN_ERR "AX.25: ax25_dev_device_up - out of memory\n");
-> @@ -59,7 +63,6 @@ void ax25_dev_device_up(struct net_device *dev)
->  	}
->
->  	refcount_set(&ax25_dev->refcount, 1);
->
+There is some indications that rcu_softirq_qs() might be more generally
+used than anticipated.  This commit therefore adds some lockdep assertions
+and some cautionary tales in a new kernel-doc header.
+
+Link: https://lore.kernel.org/all/Zd4DXTyCf17lcTfq@debian.debian/
+
+Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Yan Zhai <yan@cloudflare.com>
+Cc: <netdev@vger.kernel.org>
+Signed-off-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
+---
+ kernel/rcu/tree.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
+index d9642dd06c25..2795a1457acf 100644
+--- a/kernel/rcu/tree.c
++++ b/kernel/rcu/tree.c
+@@ -240,8 +240,36 @@ static long rcu_get_n_cbs_cpu(int cpu)
+ 	return 0;
+ }
+ 
++/**
++ * rcu_softirq_qs - Provide a set of RCU quiescent states in softirq processing
++ *
++ * Mark a quiescent state for RCU, Tasks RCU, and Tasks Trace RCU.
++ * This is a special-purpose function to be used in the softirq
++ * infrastructure and perhaps the occasional long-running softirq
++ * handler.
++ *
++ * Note that from RCU's viewpoint, a call to rcu_softirq_qs() is
++ * equivalent to momentarily completely enabling preemption.  For
++ * example, given this code::
++ *
++ *	local_bh_disable();
++ *	do_something();
++ *	rcu_softirq_qs();  // A
++ *	do_something_else();
++ *	local_bh_enable();  // B
++ *
++ * A call to synchronize_rcu() that began concurrently with the
++ * call to do_something() would be guaranteed to wait only until
++ * execution reached statement A.  Without that rcu_softirq_qs(),
++ * that same synchronize_rcu() would instead be guaranteed to wait
++ * until execution reached statement B.
++ */
+ void rcu_softirq_qs(void)
+ {
++	RCU_LOCKDEP_WARN(lock_is_held(&rcu_bh_lock_map) ||
++			 lock_is_held(&rcu_lock_map) ||
++			 lock_is_held(&rcu_sched_lock_map),
++			 "Illegal rcu_softirq_qs() in RCU read-side critical section");
+ 	rcu_qs();
+ 	rcu_preempt_deferred_qs(current);
+ 	rcu_tasks_qs(current, false);
+-- 
+2.39.2
+
 
