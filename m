@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-94009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75E528BDEC6
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:48:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A6668BDEC7
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:48:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A73D71C22978
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:48:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C1A91C22B8B
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D9DF15350E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603E2153583;
 	Tue,  7 May 2024 09:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oedb7Fnv"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FTV37SJl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3926D14E2DA
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 09:40:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392C015253E;
+	Tue,  7 May 2024 09:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715074842; cv=none; b=fqnRwIATz3OON8BW9XMzHJhkrxKIUKOBZd9iKrVt5p0WPjtl8u9k10Jc/pYjwGA8oGCOwaeSlxdlLoqfy1yV0tlunEOGO4pvEXmnmaQW2xZ41Hh7W62HORLBF9kDYXHPn6Lol6EYD8jw5XS/TmFsVIxWt+5Bt2cQDjfsVrM73jg=
+	t=1715074842; cv=none; b=o9cSqbb7qhn57uZMkPBzUq378GcMgWmOZO3/v8QuuWepobU+GVsfk0oPb4QawAk2siaNPiX540SMIMgdLebEOzEqm9Zg5c0MrDQanC8r+cGKyAdOX87ovPnwMnAvR4k4KXEB7YJiPFTjVIrlN4y9kiem9YS2IzW78lxuyVgHyMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715074842; c=relaxed/simple;
-	bh=My6PzD7lp7WpGlcSquAFqoh0eASe6/Q/g2eMw2R99Mc=;
+	bh=XYhvyyqBPbCPPManGWzSD8bIWNDcaeNrlref3PG2kY0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DYlRgt4QVWppFO0SkeOa+coRFtiumQV01q8YAFzXBIVSMkQ3kMB/i0BnL1bq04nG8FTiakJ8+p43Yt0OR/cvoxb54csZAxlttwfl/xSSSY3cuJhYBaG+asNwiQXCqy2gSBMXpPPpq7yD8bs5OKhfDghTUgYhAMzb9oR/LrQU2wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oedb7Fnv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B9430C4AF66;
+	 In-Reply-To:To:Cc; b=X5Arqx75+srCWXLtaKrpfAz7Jrr1/RR6/baecYdtOHgCk9T6hqLOmqRoKQwA96sDEuMe/88MUHUWv2cKjTAmOkKS8+RJPq3+GbItN6hiaV/e47X4kTNukToDXRtGUN0nTVM6bB4W3dboKmNkrpKlet0evmg3hQFvp1jxv49rP6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FTV37SJl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C723CC4AF68;
 	Tue,  7 May 2024 09:40:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715074841;
-	bh=My6PzD7lp7WpGlcSquAFqoh0eASe6/Q/g2eMw2R99Mc=;
+	bh=XYhvyyqBPbCPPManGWzSD8bIWNDcaeNrlref3PG2kY0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Oedb7FnvVvlY1rP1Sj8CDFdSLWoOMJz/LCTyHSp318FryKDsHCuZa25VritEIqh/9
-	 h/ni0SeFchYq0AovInXMAQsd2j/7fIwenxfMvVBVTahgsanRNFUPXTih8Hi7WmFi0y
-	 YNx1cczyMRrfSkIumEpGmRmFww6kbr91RVINDWaY9iGwOdv8t9eYDZUYCGQYlPT5/s
-	 uljYRTtd74pKtrNlHhZmcptimab/4CySr8sTIXoUmFAlCFn+eBvCnEVIHzoUnKtE/7
-	 SFKcD8Np/S0QdIeq4cAAmn2WEN+NzNkJoXFcRzRK8gOxXqNfOrKYLy516+CGIHtOPv
-	 kZhmwMyCb7DkQ==
+	b=FTV37SJlOgl+6N1CNIdrbryReVPROt0XMJcJojUTOmJjEGL9WT8wrrxc07vwfnBac
+	 COG9xisdc2rBkShWxq2LMlyrZJnjpvbATDBknzCOSNk1T2soXuMSDpB4qYq0nPyElG
+	 9iJsQfEvXsQPtXWuZr1SKNsGxsGnsX7QmckHstUInp1hpKs3szqH9jI0hxspDq67QG
+	 O+SaaILdl9NhOWUZXEvuYG6YSl36a3jHd9ohdqvaw5HZMZxuTSrFQNv9QNm2eLlhAT
+	 3A4nXcSfFFSk4VS07D058WHV4mXImrEf2VS+hKs1MducGufgM/2VuuuEcFbgvIGNKM
+	 zUc8lNwjBhlfA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B0A6EC43331;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B9480C3276B;
 	Tue,  7 May 2024 09:40:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,57 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/8] rtnetlink: more rcu conversions for
- rtnl_fill_ifinfo()
+Subject: Re: [PATCH net-next v2] net: dsa: mt7530: detect PHY muxing when PHY
+ is defined on switch MDIO bus
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171507484172.24942.8367903904443484222.git-patchwork-notify@kernel.org>
+ <171507484175.24942.8565731423432452647.git-patchwork-notify@kernel.org>
 Date: Tue, 07 May 2024 09:40:41 +0000
-References: <20240503192059.3884225-1-edumazet@google.com>
-In-Reply-To: <20240503192059.3884225-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20240430-b4-for-netnext-mt7530-use-switch-mdio-bus-for-phy-muxing-v2-1-9104d886d0db@arinc9.com>
+In-Reply-To: <20240430-b4-for-netnext-mt7530-use-switch-mdio-bus-for-phy-muxing-v2-1-9104d886d0db@arinc9.com>
+To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
+	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
+Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
+ andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ bartel.eerdekens@constell8.be, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, arinc.unal@arinc9.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Fri,  3 May 2024 19:20:51 +0000 you wrote:
-> We want to no longer rely on RTNL for "ip link show" command.
+On Tue, 30 Apr 2024 08:01:33 +0300 you wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
-> This is a long road, this series takes care of some parts.
+> Currently, the MT7530 DSA subdriver configures the MT7530 switch to provide
+> direct access to switch PHYs, meaning, the switch PHYs listen on the MDIO
+> bus the switch listens on. The PHY muxing feature makes use of this.
 > 
-> Eric Dumazet (8):
->   rtnetlink: do not depend on RTNL for IFLA_QDISC output
->   rtnetlink: do not depend on RTNL for IFLA_IFNAME output
->   rtnetlink: do not depend on RTNL for IFLA_TXQLEN output
->   net: write once on dev->allmulti and dev->promiscuity
->   rtnetlink: do not depend on RTNL for many attributes
->   rtnetlink: do not depend on RTNL in rtnl_fill_proto_down()
->   rtnetlink: do not depend on RTNL in rtnl_xdp_prog_skb()
->   rtnetlink: allow rtnl_fill_link_netnsid() to run under RCU protection
+> This is problematic as the PHY may be attached before the switch is
+> initialised, in which case, the PHY will fail to be attached.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/8] rtnetlink: do not depend on RTNL for IFLA_QDISC output
-    https://git.kernel.org/netdev/net-next/c/698419ffb6fc
-  - [net-next,2/8] rtnetlink: do not depend on RTNL for IFLA_IFNAME output
-    https://git.kernel.org/netdev/net-next/c/8a5826813362
-  - [net-next,3/8] rtnetlink: do not depend on RTNL for IFLA_TXQLEN output
-    https://git.kernel.org/netdev/net-next/c/ad13b5b0d1f9
-  - [net-next,4/8] net: write once on dev->allmulti and dev->promiscuity
-    https://git.kernel.org/netdev/net-next/c/55a2c86c8db3
-  - [net-next,5/8] rtnetlink: do not depend on RTNL for many attributes
-    https://git.kernel.org/netdev/net-next/c/6747a5d4990b
-  - [net-next,6/8] rtnetlink: do not depend on RTNL in rtnl_fill_proto_down()
-    https://git.kernel.org/netdev/net-next/c/6890ab31d1a3
-  - [net-next,7/8] rtnetlink: do not depend on RTNL in rtnl_xdp_prog_skb()
-    https://git.kernel.org/netdev/net-next/c/979aad40da92
-  - [net-next,8/8] rtnetlink: allow rtnl_fill_link_netnsid() to run under RCU protection
-    https://git.kernel.org/netdev/net-next/c/9cf621bd5fcb
+  - [net-next,v2] net: dsa: mt7530: detect PHY muxing when PHY is defined on switch MDIO bus
+    https://git.kernel.org/netdev/net-next/c/d8dcf5bd6d0e
 
 You are awesome, thank you!
 -- 
