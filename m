@@ -1,168 +1,210 @@
-Return-Path: <netdev+bounces-94267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 875818BEE6D
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 22:55:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83CDD8BEE77
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 22:58:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA3A91C213E4
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 20:55:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2ECD1C23E63
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 20:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C79E73539;
-	Tue,  7 May 2024 20:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0AA57319;
+	Tue,  7 May 2024 20:58:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NvcrpBXx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0a2Wyvey"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD1E73527;
-	Tue,  7 May 2024 20:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13FF54BDE;
+	Tue,  7 May 2024 20:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715115298; cv=none; b=FS1Us84aUPVaV9ZsdOX19rCPutWBTPmR9jrsMJdrACar5FjbbFg4XDpdWHIDVrDynFgdLqTBzIK1BXGWC9olY1m6rRVyonthljyErThLWEqcRERGvPEnNlw2Fdc2zfYfGLTt0f1DmqpJeRbYWFFoG5ID81hLsqWn+8BDd01hGiY=
+	t=1715115483; cv=none; b=qD7cpD9ayXFYk4f6X5gdIDGIzlfEtkygJ8U4VttDazAV270FcOlUQoWGXzNdGwWdKvlm/B0hdCzIcFTqmsEv5BdrmBnlbDAdY51lDxN4RK8nHh7GgZPAP5M4Qu/OLxrki6daHL+AtsIxqu0XrzZRIg0kZO0XlML1bLN63L0xgKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715115298; c=relaxed/simple;
-	bh=cAKfbhhQ0Y5jBdfh2NiEcm1JrkpS5yL1MIDSPy8wRcI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fvXwGezSxMbNDkBmM7iPVJ9paFAVF10/hRoFUFJZf22XPn17HW4JPGyvMAlzivJ2WyuLUwEpsybXaSpdlKDaKK/WZyPTi7xtInbWwHim+rPVn2rbcpkKxlmPOUTTbGUpwGr30Ohnlo9R9+cA+hlevw9w/tb9bWRHluD9mV4Na88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NvcrpBXx; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-34c8592b8dbso2793905f8f.3;
-        Tue, 07 May 2024 13:54:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715115295; x=1715720095; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MRBMHAIqydmnvRNILnVciTFpbX1I1b05QddPgDfHrK8=;
-        b=NvcrpBXx/z67l/iM2dhY5h/7X2fP6Nd5SyCKxcOGHIKIbfkddyehJe+3d3scpp6MUH
-         HzkTmwDB4lKnJ4N3MyVTDzehJYKqVSjrZ3oQebZCk/nez/aErpopF9Deuiu7y2+/QcUs
-         bAF9ZmONhi3rTPncLg/paGID5wMwtkfHLdbgt8YdW0rzEGe3n0/k3McHoK9SW83SwqGE
-         Hswep864WJKd/9jDdG4KKlWxP+XfWIve8xDNtspe3AwvIcIvYP0dG/pm81HhcoZYwIx2
-         ja46Rp2rkIQY5aUYhhZM7tzDvlOgLU9uZMKIad40TNF7BUez4vf8pvYqN896Rv3sTtuE
-         KYeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715115295; x=1715720095;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MRBMHAIqydmnvRNILnVciTFpbX1I1b05QddPgDfHrK8=;
-        b=hhLhPzenCxA+ES2TzfmTH7BWiCgt/I+ulYq1A77bsQQLZ2wWtX+77FEQfsVo9F+P+P
-         5jfPFSGWdJI0IVXnDi3rXsYrwSQ0offNHWU2KVsp0Z+5lcgPrN5XOZ/Cg5NyhkIDoRc/
-         Qa+hiFH4qXGHaspDxkI2eBq0DEyBk37D2gJP3fitEUb5L0ljRFE8m+eOoreKkc6lEJ40
-         wV/zzLQXs4WaOg6x4qIszY5MPit/jMt/NckptZ1sW5B/TR9f2neC+jhWxt5GDF4MBZZm
-         Gj18bXGSyPdjlQa4HdON/JvWibjlG5mubj7khNvOF7/16xRuLuGJACTkerPzF2G9eAQP
-         J2vA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTKRiplFy6vzI3WuKAEs9/JInOBjI9JYuVs/kEVsuM4m6tVibijodieqpMe0D+EOkj2dwJQX1FyQaN8J3318mR0mY0zbCwXDXMjeaULWF0+xxG3jK6G9Zss1MmzTGHL0RX9MWLZxXqXgihhSPI7FwUzFUd41k22UbpFQCgWs+nIyw+PjJIiADGOhyUIU9g1JHAUxwrOGwOBLHO
-X-Gm-Message-State: AOJu0YxQL6fU7aOoUZSmIoCiI+mtfMDNc+P1cbZSMyH7QPpG0QN7qXFq
-	ebzcDYPxA8HF//BKauQjESAoclyq1eh+lTWPtWXvUYYThKUZXJjDo2v5BT9Xn/+ssZ2iKubH6D7
-	um8LsRdKV2e3Wlf+Xa7LJUeB+2/0=
-X-Google-Smtp-Source: AGHT+IE52tKX9im4lf8ezaDOOo3F3Pcz8ocEU7R0wHR1s8GzZ3ATxcqKKY3Q4tN3pKTGM3M7EeQ97g4fY8Ejam/i8No=
-X-Received: by 2002:adf:a492:0:b0:343:a368:f792 with SMTP id
- ffacd0b85a97d-34fca621315mr604788f8f.52.1715115294492; Tue, 07 May 2024
- 13:54:54 -0700 (PDT)
+	s=arc-20240116; t=1715115483; c=relaxed/simple;
+	bh=tHqx6j2RJAN0zoXfEpVpNWdAuCWsQBQlFivx6gEBV50=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PXU+4Z6IneaqEgRpLepvIPHi4MqOjAkdGLcvyCWz2EGrXBEEFQIeo1hSrec+P2mGsLXCrRAWawfxTcB308zNzofj0Yy+zdGfe0WzVVZICcXN2Z1CqQkMd+QR6DjmMuNRzD4EIyvF6/Vd3nVVW6jjtcxCbAdOZceWa3Xa4bWsbyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0a2Wyvey; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=KkxFR776rqvf78Kq5FtE9NX0Qwi+nHjJxAwCt3Qwpyo=; b=0a
+	2WyveyXsVnSgkTGqrrHD1gbw2Ft6P+Xy9iCRjo2nytup4Y0Gkd3Oly9DopM7Q/4+0lLi+ZgZ3T/Pq
+	CrAkb9ZZe2OQFolufG2KDRBrAAWxOOiPeHrlfJMx5d9hhhb6dYukkE+7Aqm2jQtzE+LnNmNpp+Aix
+	gqBSYNe6CH6c/8Y=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s4Rsh-00EtE4-OQ; Tue, 07 May 2024 22:57:47 +0200
+Date: Tue, 7 May 2024 22:57:47 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next,v2] net: ethernet: rtsn: Add support for Renesas
+ Ethernet-TSN
+Message-ID: <b51b7b2d-c6d0-49ef-8b84-b9ed8368c797@lunn.ch>
+References: <20240507201839.1763338-1-niklas.soderlund+renesas@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240507-upstream-bpf-next-20240506-mptcp-subflow-test-v1-0-e2bcbdf49857@kernel.org>
- <20240507-upstream-bpf-next-20240506-mptcp-subflow-test-v1-3-e2bcbdf49857@kernel.org>
- <CAADnVQ+ADQRrZmZ_M9LLGj9u_HOo7Aeup+kid62xZfLCvSxUOQ@mail.gmail.com> <843ea6eb-a28d-437c-9c98-0b8c8816c518@kernel.org>
-In-Reply-To: <843ea6eb-a28d-437c-9c98-0b8c8816c518@kernel.org>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 7 May 2024 13:54:43 -0700
-Message-ID: <CAADnVQLA+2uoJJAJNFoK-EnUjLAwxJjxOXAizLWhcx4mf+C2Vg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 3/4] selftests/bpf: Add mptcp subflow example
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: MPTCP Upstream <mptcp@lists.linux.dev>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Geliang Tang <tanggeliang@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240507201839.1763338-1-niklas.soderlund+renesas@ragnatech.se>
 
-On Tue, May 7, 2024 at 9:03=E2=80=AFAM Matthieu Baerts <matttbe@kernel.org>=
- wrote:
->
-> Hi Alexei,
->
-> Thank you for the review!
->
-> On 07/05/2024 16:49, Alexei Starovoitov wrote:
-> > On Tue, May 7, 2024 at 3:53=E2=80=AFAM Matthieu Baerts (NGI0)
-> > <matttbe@kernel.org> wrote:
-> >>
-> >> From: Nicolas Rybowski <nicolas.rybowski@tessares.net>
-> >>
-> >> Move Nicolas's patch into bpf selftests directory. This example added =
-a
-> >> test that was adding a different mark (SO_MARK) on each subflow, and
-> >> changing the TCP CC only on the first subflow.
-> >>
-> >> This example shows how it is possible to:
-> >>
-> >>     Identify the parent msk of an MPTCP subflow.
-> >>     Put different sockopt for each subflow of a same MPTCP connection.
-> >>
-> >> Here especially, we implemented two different behaviours:
-> >>
-> >>     A socket mark (SOL_SOCKET SO_MARK) is put on each subflow of a sam=
-e
-> >>     MPTCP connection. The order of creation of the current subflow def=
-ines
-> >>     its mark.
-> >
-> >> The TCP CC algorithm of the very first subflow of an MPTCP
-> >>     connection is set to "reno".
-> >
-> > why?
-> > What does it test?
-> > That bpf_setsockopt() can actually do it?
->
-> Correct.
->
-> Here is a bit of context: from the userspace, an application can do a
-> setsockopt() on an MPTCP socket, and typically the same value will be
-> set on all subflows (paths). If someone wants to have different values
-> per subflow, the recommanded way is to use BPF.
->
-> We can indeed restrict this test to changing the MARK only. I think the
-> CC has been modified just not to check one thing, but also to change
-> something at the TCP level, because it is managed differently on MPTCP
-> side -- but only when the userspace set something, or when new subflows
-> are created. The result of this operation is easy to check with 'ss',
-> and it was to show an exemple where this is set only on one subflow.
->
-> > But the next patch doesn't check that it's reno.
->
-> No, I think it is checked: 'reno' is not hardcoded, but 'skel->data->cc'
-> is used instead:
->
->   run_subflow(skel->data->cc);
->
-> > It looks to me that dropping this "set to reno" part
-> > won't change the purpose of the rest of selftest.
->
-> Yes, up to you. If you still think it is better without it, we can
-> remove the modification of the CC in patch 3/4, and the validation in
-> patch 4/4.
+> +RENESAS ETHERNET TSN DRIVER
+> +M:	Niklas Söderlund <niklas.soderlund@ragnatech.se>
+> +L:	netdev@vger.kernel.org
+> +L:	linux-renesas-soc@vger.kernel.org
+> +S:	Supported
+> +F:	Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
+> +F:	drivers/net/ethernet/renesas/rtsn.*
+> +
+>  RENESAS IDT821034 ASoC CODEC
+>  M:	Herve Codina <herve.codina@bootlin.com>
+>  L:	alsa-devel@alsa-project.org (moderated for non-subscribers)
+> diff --git a/drivers/net/ethernet/renesas/Kconfig b/drivers/net/ethernet/renesas/Kconfig
+> index b03fae7a0f72..ea4aca5f406f 100644
+> --- a/drivers/net/ethernet/renesas/Kconfig
+> +++ b/drivers/net/ethernet/renesas/Kconfig
+> @@ -58,4 +58,15 @@ config RENESAS_GEN4_PTP
+>  	help
+>  	  Renesas R-Car Gen4 gPTP device driver.
+>  
+> +config RTSN
+> +	tristate "Renesas Ethernet-TSN support"
+> +	depends on ARCH_RENESAS || COMPILE_TEST
+> +	depends on PTP_1588_CLOCK
+> +	select CRC32
+> +	select MII
 
-The concern with picking reno is extra deps to CI and every developer.
-Currently in selftests/bpf/config we do:
-CONFIG_TCP_CONG_DCTCP=3Dy
-CONFIG_TCP_CONG_BBR=3Dy
+That is an interesting one. What are you using from MII?
 
-I'd like to avoid adding reno there as well.
-Will bpf_setsockopt("dctcp") work?
+> +static int rtsn_request_irq(unsigned int irq, irq_handler_t handler,
+> +			    unsigned long flags, struct rtsn_private *priv,
+> +			    const char *ch)
+> +{
+> +	char *name;
+> +	int ret;
+> +
+> +	name = devm_kasprintf(&priv->pdev->dev, GFP_KERNEL, "%s:%s",
+> +			      priv->ndev->name, ch);
+> +	if (!name)
+> +		return -ENOMEM;
+> +
+> +	ret = request_irq(irq, handler, flags, name, priv);
+> +	if (ret) {
+> +		netdev_err(priv->ndev, "Cannot request IRQ %s\n", name);
+> +		free_irq(irq, priv);
+
+If requesting an IRQ fails, do you need to free it?
+
+> +static void rtsn_free_irqs(struct rtsn_private *priv)
+> +{
+> +	free_irq(priv->tx_data_irq, priv);
+> +	free_irq(priv->rx_data_irq, priv);
+> +}
+> +
+> +static int rtsn_request_irqs(struct rtsn_private *priv)
+> +{
+> +	int ret;
+> +
+> +	priv->rx_data_irq = platform_get_irq_byname(priv->pdev, "rx");
+> +	if (priv->rx_data_irq < 0)
+> +		return priv->rx_data_irq;
+> +
+> +	priv->tx_data_irq = platform_get_irq_byname(priv->pdev, "tx");
+> +	if (priv->tx_data_irq < 0)
+> +		return priv->tx_data_irq;
+> +
+> +	ret = rtsn_request_irq(priv->tx_data_irq, rtsn_irq, 0, priv, "tx");
+> +	if (ret)
+> +		goto error;
+> +
+> +	ret = rtsn_request_irq(priv->rx_data_irq, rtsn_irq, 0, priv, "rx");
+> +	if (ret)
+> +		goto error;
+> +
+> +	return 0;
+> +error:
+> +	rtsn_free_irqs(priv);
+
+This also looks to free IRQs which we potentially never requested.
+
+> +static void rtsn_set_delay_mode(struct rtsn_private *priv)
+> +{
+> +	struct device_node *np = priv->ndev->dev.parent->of_node;
+> +	u32 delay;
+> +	u32 val;
+> +
+> +	val = 0;
+> +
+> +	/* The MAC is capable of applying a delay on both Rx and Tx. Each
+> +	 * delay can either be on or off, there is no way to set its length.
+> +	 *
+> +	 * The exact delay applied depends on electric characteristics of the
+> +	 * board. The datasheet describes a typical Rx delay of 1800 ps and a
+> +	 * typical Tx delay of 2000 ps.
+> +	 *
+> +	 * There are boards where the RTSN device is used together with PHYs
+> +	 * who do not support a large enough internal delays to function. These
+> +	 * boards depends on the MAC applying these inexact delays.
+> +	 */
+> +
+> +	/* If the phy-mode is rgmii or rgmii-txid apply Rx delay on the MAC */
+> +	if (priv->iface == PHY_INTERFACE_MODE_RGMII ||
+> +	    priv->iface == PHY_INTERFACE_MODE_RGMII_TXID)
+> +		if (!of_property_read_u32(np, "rx-internal-delay-ps", &delay))
+> +			if (delay)
+> +				val |= GPOUT_RDM;
+> +
+> +	/* If the phy-mode is rgmii or rgmii-rxid apply Tx delay on the MAC */
+> +	if (priv->iface == PHY_INTERFACE_MODE_RGMII ||
+> +	    priv->iface == PHY_INTERFACE_MODE_RGMII_RXID)
+> +		if (!of_property_read_u32(np, "tx-internal-delay-ps", &delay))
+> +			if (delay)
+> +				val |= GPOUT_TDM;
+
+This looks wrong. You should be applying delays for rgmii-id and
+rgmii-rxid. Plain rgmii means no delays are required, because the
+board has extra long clock lines. Same for TX delays, only for
+rgmii-tx or rgmii-id.
+
+> +static int rtsn_phy_init(struct rtsn_private *priv)
+> +{
+> +	struct device_node *np = priv->ndev->dev.parent->of_node;
+> +	struct phy_device *phydev;
+> +	struct device_node *phy;
+> +
+> +	priv->link = 0;
+> +
+> +	phy = of_parse_phandle(np, "phy-handle", 0);
+> +	if (!phy)
+> +		return -ENOENT;
+> +
+> +	phydev = of_phy_connect(priv->ndev, phy, rtsn_adjust_link, 0,
+> +				priv->iface);
+
+This also looks wrong. Since you have applied the delays in the MAC,
+you need to mask the value passed to the PHY so it also does not apply
+delays.
+
+    Andrew
+
+---
+pw-bot: cr
 
