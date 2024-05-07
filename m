@@ -1,136 +1,192 @@
-Return-Path: <netdev+bounces-94212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2C2A8BE9EA
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:57:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22B878BE9F4
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 19:00:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7CD928C144
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:57:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A40BF1F21D36
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 17:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533485491A;
-	Tue,  7 May 2024 16:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 787FC44C6F;
+	Tue,  7 May 2024 17:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gJ7U3P7z"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="G5BU7uP+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC72951010
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 16:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9017B8F72
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 17:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715101032; cv=none; b=hfPXNytgS7CVK+se0vv2WOLkfSdYsoSXct8I+jRMfQ6WHFmd67XLjsPEUkPdKypkZLgRUngIeEoYx52AR9KHEDFMv6T8lCLfwltohNsRnZk0qeNM+8QlEFA1HO0hmN103u6yIPfrzbwg6P5yqL2XiyaSj/I4wzRdqNP6G+SPHW0=
+	t=1715101235; cv=none; b=OazYTK5RLYFNp+SixbBo26p7k02lVDcabCUp6vguHlAm6nC8Dc0K0KxcDt3ucwiQLQMpZNIfk3dbgLzzCuPGHFbPxKBCxvZWjxJ66g/4TT/h82cF8dKIJFPYNeTs99ozXdrwPoSxZJeV6a1rmSkpp6/wwW3BnZGp+gsPScYz/yU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715101032; c=relaxed/simple;
-	bh=AfjwtAP39slTw9D/sFg9CFQE5+RUn89+ulANIbcQzzM=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lROGQSqaj908WTgiiSgbuJxx16yhjPeekEODg17jQpAH8g2r4AD6rwDA5DuqJmcqLqprQrIwwGwrvBHiQrqyiJEHpOxzGe/wSy0vhd+DPj2Rd1eJeADZm0bi7JBjrjdOTGFmxPX3Xp1WlJOS3Swl0f9k8pew2uYPrGE6TgjVeyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=gJ7U3P7z; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7928ec5308cso315388785a.1
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 09:57:10 -0700 (PDT)
+	s=arc-20240116; t=1715101235; c=relaxed/simple;
+	bh=bd1WETvsO6CABJ7voIvj/JpiKukCC3goOgjQ9dlnzII=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NrYZrVdqa+en0JrvCaoCHvnzU7t7v796aHsv1Ct0iYsQigXx8gqqQnI1DQWl01zkKQI8bnGzaVt2X6sUmIpsvwZabdlUIZDPu/c/6rTrZjENJYWtuGOcikkqw15cVJC7LbYruE2QV98yTfHHCG+nf0XGNou8e/DTGhZn/Z5VjsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=G5BU7uP+; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1715101030; x=1715705830; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sZxb5h1bT1BCqcDGT4BId77aDMzJorIHfT9PA8+hbtU=;
-        b=gJ7U3P7ziVV3kmtmMFaQM9dR5I8IwpfSZBEDpVUoeDv/M5MAQxbaijWZYDEHb3o0a3
-         OSb4Dm6v7CVZu2z4t5PJesV8WU/UIQ8FqmiEPwLkRMEX7kaVGu1XJczCAU81j1huVH6E
-         SdVtkFyZ8OoesdL91zetH6Aiw83ZkFOX/7vRU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715101030; x=1715705830;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sZxb5h1bT1BCqcDGT4BId77aDMzJorIHfT9PA8+hbtU=;
-        b=q9zTUQyv2xpQDTQgTJ0Ir/w+zgjoZWsk7fkvcdQAqY9z3EDWrZnYoQ12jq0Yno3XvJ
-         o4rT1Eo5c0ACADB4VxDydhjK3nRFzcv1GbtvkHD4O1PDyIX/GuNMLTwn8NZc7IuKQyE1
-         qrQotiuBDVdIP6RoXH7U0radRatqmYcziSp1S+8PeYghCQ5tp1CRmNdLyDWTyIrEnJNG
-         3sRkUjd8Y06LGSPTxYAHJ1Y4xRHJo1RQgyGmVYyRhRA74mY0JA3DVa4eE95t8huXF89c
-         nZqR9LPUrAmJf/aUsbQ1E1+cFfJEAN2CCI5D3k5D73mmxh5PsclQXX0FKR7995A4mBk+
-         VUaw==
-X-Forwarded-Encrypted: i=1; AJvYcCVto2gBv+UvUtY4lBjtJWfAgKwlCwnMgvPKEbVWw9SAd/ZzS8c1Km9NX5u6La9/F0rt/1k7C3pCAiQ7AjAg9GOUpOD9CYbc
-X-Gm-Message-State: AOJu0YwtG94VzSfyCl3PIxvkeYRMDxmM60UzpmDzPSbOZz5s6xcHeSE7
-	JzxiANxWIcYRBhQVM1x29txhP4TveR992VNBabaVyn5DYRbFN8RdI0+VNOACEQ==
-X-Google-Smtp-Source: AGHT+IFOmr0eq/RLjFJ112y4htBTOBtdH3gY0yWqdaIiSvivvjiR7XfmN7nox9x3/iKMV3CfdfGENw==
-X-Received: by 2002:a05:620a:1728:b0:792:948c:318d with SMTP id af79cd13be357-792b2521a75mr70982885a.25.1715101029686;
-        Tue, 07 May 2024 09:57:09 -0700 (PDT)
-Received: from C02YVCJELVCG.dhcp.broadcom.net ([192.19.144.250])
-        by smtp.gmail.com with ESMTPSA id o17-20020a05620a229100b007929201d701sm2960029qkh.99.2024.05.07.09.57.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 09:57:08 -0700 (PDT)
-From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
-Date: Tue, 7 May 2024 12:56:55 -0400
-To: David Ahern <dsahern@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
-	Andrew Gospodarek <andrew.gospodarek@broadcom.com>,
-	"michael.chan@broadcom.com" <michael.chan@broadcom.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Jiri Pirko <jiri@nvidia.com>,
-	Alexander Duyck <alexander.duyck@gmail.com>
-Subject: Re: Driver and H/W APIs Workshop at netdevconf
-Message-ID: <ZjpdV2l7VckPz-jj@C02YVCJELVCG.dhcp.broadcom.net>
-References: <c4ae5f08-11f2-48f7-9c2a-496173f3373e@kernel.org>
- <20240506180632.2bfdc996@kernel.org>
- <1c36d251-0218-4e9d-b6e3-0d477a5e6a02@kernel.org>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1715101234; x=1746637234;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=iTJPLwcSvpddjq1vZWHCBlinu7Uj4V26SH4eg3ZZLp8=;
+  b=G5BU7uP+9QIqfkt7FDUDkjPPuaAU78XNOgLsmqJTmy3ipP2p6ia8Noy2
+   Y0WODEydc+6qql0G0ClNx9GH7I+GxOg+YuALrGDMJa1EAZwGRF5qzkeXG
+   9yR/oykC0VtjjPFtyGbiyS3nl1YmuQ+MJFxOWz9Jhu2r+91CQ0YTekXB3
+   E=;
+X-IronPort-AV: E=Sophos;i="6.08,142,1712620800"; 
+   d="scan'208";a="405360025"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 17:00:31 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:13892]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.2.103:2525] with esmtp (Farcaster)
+ id 2c5717e5-fa9b-46d9-9c3c-02218988cc8a; Tue, 7 May 2024 17:00:30 +0000 (UTC)
+X-Farcaster-Flow-ID: 2c5717e5-fa9b-46d9-9c3c-02218988cc8a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 7 May 2024 17:00:30 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.27) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 7 May 2024 17:00:27 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, Billy Jheng Bing-Jhong
+	<billy@starlabs.sg>
+Subject: [PATCH v1 net] af_unix: Update unix_sk(sk)->oob_skb under sk_receive_queue lock.
+Date: Tue, 7 May 2024 10:00:18 -0700
+Message-ID: <20240507170018.83385-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1c36d251-0218-4e9d-b6e3-0d477a5e6a02@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWA004.ant.amazon.com (10.13.139.93) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, May 06, 2024 at 08:05:36PM -0600, David Ahern wrote:
-> On 5/6/24 7:06 PM, Jakub Kicinski wrote:
-> > On Mon, 6 May 2024 13:59:31 -0600 David Ahern wrote:
-> >> Suggested topics based on recent netdev threads include
-> >> - devlink - extensions, shortcomings, ...
-> >> - extension to memory pools
-> >> - new APIs for managing queues
-> >> - challenges of netdev / IB co-existence (e.g., driven by AI workloads)
-> >> - fwctl - a proposal for direct firmware access
-> > 
-> > Memory pools and queue API are more of stack features.
-> 
-> That require driver support, no? e.g., There is no way that queue API is
-> going to work with the Enfabrica device without driver support.
+Billy Jheng Bing-Jhong reported a race between __unix_gc() and
+queue_oob().
 
-I defintely think that there should be a consumer of the queue API
-before it lands upstream, but if it cannot work without a
-driver/hardware support that seems a bit odd.
+__unix_gc() tries to garbage-collect close()d inflight sockets,
+and then if the socket has MSG_OOB in unix_sk(sk)->oob_skb, GC
+will drop the reference and set NULL to it locklessly.
 
-Maybe I've missed it on the list, but do you have something you can
-share about this proposed queue API?
+However, the peer socket still can send MSG_OOB message to the
+GC candidate and queue_oob() can update unix_sk(sk)->oob_skb
+concurrently, resulting in NULL pointer dereference. [0]
 
-> The point of the above is a list to motivate discussion based on recent
-> topics.
-> 
-> 
-> > Please leave them out of your fwctl session.
-> 
-> fwctl is a discussion item not tied to anything else; let's not conflat
-> topics here. That it is even on this list is because you brought netdev
-> into a discussion that is not netdev related. Given that, let's give it
-> proper daylight any topic deserves without undue bias and letting it
-> dominate the bigger picture.
-> 
-> > 
-> > Aren't people who are actually working on those things submitting
-> > talks or hosting better scoped discussions? It appears you haven't 
-> > CCed any of them..
-> 
-> I have no idea. I started with a list of well known driver contacts and
-> cc'ed netdev with an explicit statement that it is open to all.
+To avoid the race, let's update unix_sk(sk)->oob_skb under the
+sk_receive_queue's lock.
+
+Note that the same issue exists in the new GC, and the change
+in queue_oob() can be applied as is.
+
+[0]:
+BUG: kernel NULL pointer dereference, address: 0000000000000008
+#PF: supervisor write access in kernel mode
+#PF: error_code(0x0002) - not-present page
+PGD 8000000009f5e067 P4D 8000000009f5e067 PUD 9f5d067 PMD 0
+Oops: 0002 [#1] PREEMPT SMP PTI
+CPU: 3 PID: 50 Comm: kworker/3:1 Not tainted 6.9.0-rc5-00191-gd091e579b864 #110
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+Workqueue: events delayed_fput
+RIP: 0010:skb_dequeue (./include/linux/skbuff.h:2386 ./include/linux/skbuff.h:2402 net/core/skbuff.c:3847)
+Code: 39 e3 74 3e 8b 43 10 48 89 ef 83 e8 01 89 43 10 49 8b 44 24 08 49 c7 44 24 08 00 00 00 00 49 8b 14 24 49 c7 04 24 00 00 00 00 <48> 89 42 08 48 89 10 e8 e7 c5 42 00 4c 89 e0 5b 5d 41 5c c3 cc cc
+RSP: 0018:ffffc900001bfd48 EFLAGS: 00000002
+RAX: 0000000000000000 RBX: ffff8880088f5ae8 RCX: 00000000361289f9
+RDX: 0000000000000000 RSI: 0000000000000206 RDI: ffff8880088f5b00
+RBP: ffff8880088f5b00 R08: 0000000000080000 R09: 0000000000000001
+R10: 0000000000000003 R11: 0000000000000001 R12: ffff8880056b6a00
+R13: ffff8880088f5280 R14: 0000000000000001 R15: ffff8880088f5a80
+FS:  0000000000000000(0000) GS:ffff88807dd80000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000008 CR3: 0000000006314000 CR4: 00000000007506f0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ unix_release_sock (net/unix/af_unix.c:654)
+ unix_release (net/unix/af_unix.c:1050)
+ __sock_release (net/socket.c:660)
+ sock_close (net/socket.c:1423)
+ __fput (fs/file_table.c:423)
+ delayed_fput (fs/file_table.c:444 (discriminator 3))
+ process_one_work (kernel/workqueue.c:3259)
+ worker_thread (kernel/workqueue.c:3329 kernel/workqueue.c:3416)
+ kthread (kernel/kthread.c:388)
+ ret_from_fork (arch/x86/kernel/process.c:153)
+ ret_from_fork_asm (arch/x86/entry/entry_64.S:257)
+ </TASK>
+Modules linked in:
+CR2: 0000000000000008
+
+Fixes: 1279f9d9dec2 ("af_unix: Call kfree_skb() for dead unix_(sk)->oob_skb in GC.")
+Reported-by: Billy Jheng Bing-Jhong <billy@starlabs.sg>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ net/unix/af_unix.c | 11 +++++++++--
+ net/unix/garbage.c |  4 +++-
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 9a6ad5974dff..6ae0370f038f 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2217,13 +2217,20 @@ static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other
+ 	maybe_add_creds(skb, sock, other);
+ 	skb_get(skb);
+ 
++	scm_stat_add(other, skb);
++
++	/* oob_skb must be changed under sk_recv_queue's
++	 * lock to avoid the race with GC.
++	 */
++	spin_lock(&other->sk_receive_queue.lock);
+ 	if (ousk->oob_skb)
+ 		consume_skb(ousk->oob_skb);
+ 
+ 	WRITE_ONCE(ousk->oob_skb, skb);
+ 
+-	scm_stat_add(other, skb);
+-	skb_queue_tail(&other->sk_receive_queue, skb);
++	__skb_queue_tail(&other->sk_receive_queue, skb);
++	spin_unlock(&other->sk_receive_queue.lock);
++
+ 	sk_send_sigurg(other);
+ 	unix_state_unlock(other);
+ 	other->sk_data_ready(other);
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index 0104be9d4704..b87e48e2b51b 100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -342,10 +342,12 @@ static void __unix_gc(struct work_struct *work)
+ 		scan_children(&u->sk, inc_inflight, &hitlist);
+ 
+ #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
++		spin_lock(&u->sk.sk_receive_queue.lock);
+ 		if (u->oob_skb) {
+-			kfree_skb(u->oob_skb);
++			WARN_ON_ONCE(skb_unref(u->oob_skb));
+ 			u->oob_skb = NULL;
+ 		}
++		spin_unlock(&u->sk.sk_receive_queue.lock);
+ #endif
+ 	}
+ 
+-- 
+2.30.2
+
 
