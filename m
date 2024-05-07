@@ -1,93 +1,141 @@
-Return-Path: <netdev+bounces-94326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA888BF313
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:05:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4A0C8BF3B5
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:31:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4675B24E70
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:05:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 120911C213B5
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 921AF1327F9;
-	Tue,  7 May 2024 23:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4274621C178;
+	Tue,  7 May 2024 23:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7SekkNl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cBFM9spO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E71885C70
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 23:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1289621C171;
+	Tue,  7 May 2024 23:13:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715125230; cv=none; b=JDWtzlujKH0I6JbEuirMElyAlUQVzKQCg4uM/4zKCqMPy+vEi16jix3VYnbXWKVUoulbbcpl/c9UTif8nHVWLAAz/W9QPMzGNi4yEJLEWk+qsncLI4U/AHU1DoXLNu8KhGb8OwzMOztJt+5VUBkhWjVItD2/rxT1hP161xX5HBU=
+	t=1715123628; cv=none; b=RfkI8KMyWcZWUGNGYV5NTrJ6/rJrzRQ7UhywIOEs/qW9ibmwMyqJ51kk0ILShuqJSGgQEAhAqMjserVBkC6tU8H8G4QsRDkTf/4R0okdLwDg2gfwHx6f/VsVCUTpaZJS/YflWIkzBBDhzKCaM4hkqqQ++cFifwuNMB6bmU92qy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715125230; c=relaxed/simple;
-	bh=anQZsnoLQZx+H9iYdFe9qKQUJ3YMUkXTRd3HlYSQJqI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SPrHv3X8E2LBq4HUIToLzLQD0hLWdDq0mQXegJ/OsRFzw8L5L/G7V7njFlraS2KJcisDcxy/aNgzRyECu8phAkZx/g+NEi9E0oj/KzNsijo7wphb5QsI6d839Pj+Ez11dXQhIwmc4AEzIUWEE55hkd6yyVnqmTv24Z5MsLf1KR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g7SekkNl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 17DC2C4DDE0;
-	Tue,  7 May 2024 23:40:30 +0000 (UTC)
+	s=arc-20240116; t=1715123628; c=relaxed/simple;
+	bh=9MpYwDDygwbSAzolG9in6+os4KOgRZ056ZMi1p6g0lc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TGkc+jkBkfMWw9ABj/0QuIrj3FjrhGhw0QuHWFRWimpFsPKgGz8gcEnZ5OjwYaJbG2K8WahXR/hSm0snpbByyOAdjTfvqTIDiiUVU102DhsMyRmlx8Z8kSZ70ai8AGPFMtL9jIPzYSHR//FNCc8JOZGd5byVUk0uiFCA9gRy+S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cBFM9spO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 795DBC4AF17;
+	Tue,  7 May 2024 23:13:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715125230;
-	bh=anQZsnoLQZx+H9iYdFe9qKQUJ3YMUkXTRd3HlYSQJqI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=g7SekkNlyLRpC6QLpoo5Fvv1qSsEeXgl2hBCc9uM45V7Wc7+uvvAmrIEhsQiJ1SWD
-	 Q9vx5/jw46q85F2706Z9e7U/6NrThVgKumKkPD+Lg84NC+NQJ5FVJxBYDxMHHNO+VH
-	 FUKjC6twen3QwvEejpEA3eM3iSASyByEtmX7hXNijZZxpoLIuZLz/wqxZSs44kxYfM
-	 gTTuRnBLODUpvI8z1lr8rd/Ect7BG5beMuxlPI1wsrAzDVIESRhlUiwcg7dYFUlFxj
-	 o8uJGOhfU4IXwAfXVMyWY126hu7B+ADyyfizOzqvfkIjCVhFGJauKIp2aVAguR7INE
-	 zV98a+VZ8Qf7A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 012C8C43619;
-	Tue,  7 May 2024 23:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1715123627;
+	bh=9MpYwDDygwbSAzolG9in6+os4KOgRZ056ZMi1p6g0lc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=cBFM9spOuDlGYuN26dairuN8MgMHlCM9JukHLFMLGvbR1GsBJRTO88Kk6ZvIST2EA
+	 wr7zxsLjXa3/yGVOFIhFLMqq3mFUsgXCAqS+zEff/Z7jzvznyY66YvGeQyj9DT/9ts
+	 KlYj3KKjHregs774Oh4tTUvs1zaJHrhWo8fue/LL8H5j3xgxlPSO92H/9kNTUeaOvJ
+	 3eUmRSbbNmhs9yhmgjFyI5YCyE1UpvHcWRG/3p80p2KqnDtBOGUueL950PWIdGDKT+
+	 obRlMEK+4RyTyn54/PN73uxLpAYz4YZ++cge91mwPWqLRpASFiQRqvRIDDL5+FMjLM
+	 FpzrXjznyyNBQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Simon Horman <horms@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>,
+	manishc@marvell.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 08/15] net: qede: sanitize 'rc' in qede_add_tc_flower_fltr()
+Date: Tue,  7 May 2024 19:13:17 -0400
+Message-ID: <20240507231333.394765-8-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240507231333.394765-1-sashal@kernel.org>
+References: <20240507231333.394765-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 5.15.158
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: annotate writes on dev->mtu from
- ndo_change_mtu()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171512522999.22016.3007207524141493167.git-patchwork-notify@kernel.org>
-Date: Tue, 07 May 2024 23:40:29 +0000
-References: <20240506102812.3025432-1-edumazet@google.com>
-In-Reply-To: <20240506102812.3025432-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, horms@kernel.org
 
-Hello:
+From: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+[ Upstream commit e25714466abd9d96901b15efddf82c60a38abd86 ]
 
-On Mon,  6 May 2024 10:28:12 +0000 you wrote:
-> Simon reported that ndo_change_mtu() methods were never
-> updated to use WRITE_ONCE(dev->mtu, new_mtu) as hinted
-> in commit 501a90c94510 ("inet: protect against too small
-> mtu values.")
-> 
-> We read dev->mtu without holding RTNL in many places,
-> with READ_ONCE() annotations.
-> 
-> [...]
+Explicitly set 'rc' (return code), before jumping to the
+unlock and return path.
 
-Here is the summary with links:
-  - [net-next] net: annotate writes on dev->mtu from ndo_change_mtu()
-    https://git.kernel.org/netdev/net-next/c/1eb2cded45b3
+By not having any code depend on that 'rc' remains at
+it's initial value of -EINVAL, then we can re-use 'rc' for
+the return code of function calls in subsequent patches.
 
-You are awesome, thank you!
+Only compile tested.
+
+Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/qlogic/qede/qede_filter.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/qlogic/qede/qede_filter.c b/drivers/net/ethernet/qlogic/qede/qede_filter.c
+index 3010833ddde33..76aa5934e985b 100644
+--- a/drivers/net/ethernet/qlogic/qede/qede_filter.c
++++ b/drivers/net/ethernet/qlogic/qede/qede_filter.c
+@@ -1868,8 +1868,8 @@ int qede_add_tc_flower_fltr(struct qede_dev *edev, __be16 proto,
+ 			    struct flow_cls_offload *f)
+ {
+ 	struct qede_arfs_fltr_node *n;
+-	int min_hlen, rc = -EINVAL;
+ 	struct qede_arfs_tuple t;
++	int min_hlen, rc;
+ 
+ 	__qede_lock(edev);
+ 
+@@ -1879,8 +1879,10 @@ int qede_add_tc_flower_fltr(struct qede_dev *edev, __be16 proto,
+ 	}
+ 
+ 	/* parse flower attribute and prepare filter */
+-	if (qede_parse_flow_attr(edev, proto, f->rule, &t))
++	if (qede_parse_flow_attr(edev, proto, f->rule, &t)) {
++		rc = -EINVAL;
+ 		goto unlock;
++	}
+ 
+ 	/* Validate profile mode and number of filters */
+ 	if ((edev->arfs->filter_count && edev->arfs->mode != t.mode) ||
+@@ -1888,12 +1890,15 @@ int qede_add_tc_flower_fltr(struct qede_dev *edev, __be16 proto,
+ 		DP_NOTICE(edev,
+ 			  "Filter configuration invalidated, filter mode=0x%x, configured mode=0x%x, filter count=0x%x\n",
+ 			  t.mode, edev->arfs->mode, edev->arfs->filter_count);
++		rc = -EINVAL;
+ 		goto unlock;
+ 	}
+ 
+ 	/* parse tc actions and get the vf_id */
+-	if (qede_parse_actions(edev, &f->rule->action, f->common.extack))
++	if (qede_parse_actions(edev, &f->rule->action, f->common.extack)) {
++		rc = -EINVAL;
+ 		goto unlock;
++	}
+ 
+ 	if (qede_flow_find_fltr(edev, &t)) {
+ 		rc = -EEXIST;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
