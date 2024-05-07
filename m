@@ -1,98 +1,120 @@
-Return-Path: <netdev+bounces-93999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40EA28BDDF7
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:20:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A4FC8BDDD0
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:13:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 711341C21874
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:20:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C1B81F21B92
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D8714D6F9;
-	Tue,  7 May 2024 09:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F69514D6E7;
+	Tue,  7 May 2024 09:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="ArLEAsdz"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Lsypbf1j"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [217.72.192.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F9214D451;
-	Tue,  7 May 2024 09:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D844A14D451;
+	Tue,  7 May 2024 09:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715073616; cv=none; b=bYUaH3Sc6Jwk9kN+aOJ0RMoUChUu9ty24k4PDNr/bpWIv+PcfJOZODx+eG0O4Wj+/DfrDE51tV9a/0xgBYGh6iP8dI2kXbGBFHjX+tMxE9vWRLgnSv2UvAytapsulEBEIQ1YU2N/eC+hycXlpEPNWNF1xDeDKUVU9AHbgHmteYo=
+	t=1715073207; cv=none; b=DXdTfhVm7iy3T3Ofnv/fUuP3j9KT+ItNnrJYgy6zdl6u//7To8UI7ehSA9rVIYNhPsV9n4cx7IOOFaQstXc1FHc1RgTKh7IGmSg+9NmHjd64wghR5jKuGTiytIjEwIk2PwIJWjeWlb1g8Q5hp2gtVx6dB9HBjqtsUwagd6tGLqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715073616; c=relaxed/simple;
-	bh=sGf8/xmI8qDULHoJO68RRuCV/ofbkTSGYEIclQqzzuI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cags6hqHaeghlQcYlldB4CqFEBD2HmBvvkhg/kxwTBnjhpnNmNIxdMegEokgSXqRkGdxJW+RlLMhDw10w1YvtmXUjWISRQgItBXnGySOnHv4MFj7cDMljc1hirAT/7WfYp2SNJ1jo8RbH3nSxSP330rhuSEei0ik+eE9iu7LgoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=ArLEAsdz; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id A545488662;
-	Tue,  7 May 2024 11:12:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1715073140;
-	bh=gIiuGYeGovNn1vn+AbPqA/C3xilWFjjooh3cCUPXJPg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ArLEAsdz4l92leGhoyWDkV8sQUhnYA6o1EJlEc+Br8rlw2eUYYZMZgW4mqRKDmgjL
-	 tnyz4BaMDumIT1Ail6J+uruYZrQu8Q0zPp/cAbJH7DRcauhTJq3h0HNxUotlRh16YK
-	 UjNjF86KrS3u8F6oaviOfdUNyo43Ose8mw+U65qIvSTUtFtFZ4MWy6SHMLWIe1aTgN
-	 JS/dCdyB9QRlS23UJxlg4Obb3z1R1fjut4IjJXAuozq6lnheq7lM8kyWPmlQ+Aq+vk
-	 FCxNql/j7uLcY1IaUkgdF5gmpeRh7Xvt/5EfC/x/hkrT2z1dZwg9HWw40lyflk+fh0
-	 qAb65qHsZdeYg==
-From: Lukasz Majewski <lukma@denx.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [net-next PATCH] test: hsr: Call cleanup_all_ns when hsr_redbox.sh script exits
-Date: Tue,  7 May 2024 11:11:55 +0200
-Message-Id: <20240507091155.3504198-1-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1715073207; c=relaxed/simple;
+	bh=jciq9IMISLKFIamOPsw1NfQECykrFsPqx3KmjUlEdX4=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=NtUvr1vcSxFn65QHgHE30/myAVTL/RSVPyddIgcSuH4cHwTryQRJhdlNmzdScG/De4iA3kWURkWu+/8FAKfP5UGA8IKjYOFkrBB/mexVNHmLc6fnU3IOUm/70OEeqavSW0IZRkP4u2BJz+BuaDaDEJfF1LjMpcdFTYW2OLrQeRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Lsypbf1j; arc=none smtp.client-ip=217.72.192.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1715073171; x=1715677971; i=markus.elfring@web.de;
+	bh=+4X1Dq3PhXLw4Pod25FOL6S3U5Sov1WBLcQo1sxZYZM=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=Lsypbf1jmYJ/3dYyOzWO47ogXcomiyIbPSIKEpbKZYiagxlnvrpdl68by1wvJVii
+	 waG7/J617uSkY5teCsV7kXa9pO78yhKVxbi/eZtc6xPrh25yxtpSUWjFDji0DHDUT
+	 BJuCEy5TgCDqeA5n/iRvynZypoVTuFYWSVK3EtzGCtZyhtRarOhpW4UjWn4DOawj5
+	 Rut02WyximjkE478JJLLCneHAUXrksDQSKeUcNnkZe5kFSMGiIaF3jLqweW6AKoqm
+	 LvRAWU3LV1HJ2HGQZVGKE+A/qVoFWGCxO/yARzKcxhntrtT84aQWSTxAQ04CDNZhm
+	 IekJL4iVK2l6NGyeVA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MRW6Z-1sIDOI1r6L-00Mx00; Tue, 07
+ May 2024 11:12:51 +0200
+Message-ID: <4c09a28c-0336-4440-94c3-15337726ccd4@web.de>
+Date: Tue, 7 May 2024 11:12:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+User-Agent: Mozilla Thunderbird
+To: Dan Carpenter <dan.carpenter@linaro.org>,
+ Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ =?UTF-8?Q?J=C3=B6rg_Reuter?= <jreuter@yaina.de>,
+ Paolo Abeni <pabeni@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
+ Lars Kellogg-Stedman <lars@oddbit.com>, Simon Horman <horms@kernel.org>
+References: <86ae9712b610b3d41ce0ce3bbe268c68de6c5914.1715065005.git.duoming@zju.edu.cn>
+Subject: Re: [PATCH net v5 2/4] ax25: Fix reference count leak issues of
+ ax25_dev
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <86ae9712b610b3d41ce0ce3bbe268c68de6c5914.1715065005.git.duoming@zju.edu.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:9zLGST24T1eONVB08IqDf7NEIsQFZaKYLVN1oNvMm8kncuGCQ4c
+ sPcOAmZzlUSJ8facNH7xOCdJdGUtfYpDDvghr8bCFyVea7D+YwodAYGxwIBqj+sb8Me184W
+ LqBWpbf96Cja5WkbcbhQclv2y1Po3vNXDexdkxzh5g8seThJ4lXy90EgkoRrei+4PXe2Jzc
+ zt3SkmAnrRG6i7vKhk31A==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:f1IMFT+klaM=;mpsLtyLksxrhQFDRfTgUO5J77be
+ f3OnZ9iSLu6xSKD6KDE8ZtYJkLzlGdTQiE7n2eBXwUTxHrCMQUaXMi1VztIZvGZMtg/AZnhNR
+ 3AA+m4QgT4zAejN+f96U9vMLF5maGdP/1j1Hj0lbCYC9WQIw8tcfyCVQWGFVUhU+E3FT7WD4y
+ pAkFrN2TpxzLsNQxTLAMsp9Jq9ETpQM0I+QXDJYicf9mf2Dt0LM3ebq0n3cCcxUyucRrBKijt
+ 0ezMcE1SIyObBP9fTTOLMQeu2IFMmkfyexuz5ylhCS9zHAUIcqrb9WrSQ7PyG3MdDW/8BgQUe
+ yXsHm9few9pcUEf9o2JlUhkO+AlMiaBOjtXQS+zxrBERaa81fxzojcxCJnilhtmCC39GJw3p+
+ WjuvGzqJLVbyfgQBn0T2VBPBD/8VSnZWW3LWBObrlqyrwG7iVRYPcOLuh4k+yprqxL/0c61y3
+ kF3B5J7wF6F5VkD5wecJ+MnrFHKoFWjojDwToSIJYvS/6Knc3XUkeOUdDagY81MwQHS5fkzAt
+ T7OpWmyzcQo0KT2186DdHDDRA3cKiRiVHNA+pLGH7stilgIMOb8rV10Hf9jgNcO9YkiwbZZXm
+ fcwp7EtNxwNcb7VgjQYJOGhCD0EsETmSfXZC7S977H2zbbDWYZ9oulXl7DDWmUVPk+/dXiMhE
+ A3B9b9O+dvnMb/96iHXzdGC+QDGf7DsYj6ZUeZ/iNVARvv+SZwZz/nRtZqzZXpIt94fDh2RA8
+ K9BfgoWmMkyom9JF0P2MH9gT84zaSPcA4uWX3ZtkKLuEOzopxIm5VvcuI2JFP1kZbErJ+1RVp
+ FiWpyI3yBjaFyYkZBfd3dI4Q1oFVwpayIYQWhSZW+tqU4=
 
-Without this change the created netns instances are not cleared after
-this script execution. To fix this problem the cleanup_all_ns function
-from ../lib.sh is called.
+> The ax25_addr_ax25dev() and ax25_dev_device_down() exist a reference
+> count leak issue of the object "ax25_dev".
 
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
----
- tools/testing/selftests/net/hsr/hsr_redbox.sh | 2 ++
- 1 file changed, 2 insertions(+)
+Please improve this wording.
 
-diff --git a/tools/testing/selftests/net/hsr/hsr_redbox.sh b/tools/testing/selftests/net/hsr/hsr_redbox.sh
-index 52e0412c32e6..db69be95ecb3 100755
---- a/tools/testing/selftests/net/hsr/hsr_redbox.sh
-+++ b/tools/testing/selftests/net/hsr/hsr_redbox.sh
-@@ -86,6 +86,8 @@ setup_hsr_interfaces()
- check_prerequisites
- setup_ns ns1 ns2 ns3
- 
-+trap cleanup_all_ns EXIT
-+
- setup_hsr_interfaces 1
- do_complete_ping_test
- 
--- 
-2.20.1
+Suggestion:
+   Two function implementations contained programming mistakes.
+   Thus =E2=80=A6
 
+
+> Memory leak issue in ax25_addr_ax25dev():
+>
+> The reference count of the object "ax25_dev" can be increased multiple
+> times in ax25_addr_ax25dev(). This will cause a memory leak so far.
+=E2=80=A6
+
+* How do you think about to work with indentation in such a description
+  for item enumeration?
+
+* Would you like to add imperative wordings for improved changelogs?
+  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/=
+Documentation/process/submitting-patches.rst?h=3Dv6.9-rc7#n94
+
+Regards,
+Markus
 
