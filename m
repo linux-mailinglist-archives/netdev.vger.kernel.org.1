@@ -1,175 +1,138 @@
-Return-Path: <netdev+bounces-94131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F1728BE4AF
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 15:51:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE3358BE4B7
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 15:52:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D09571C21510
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 13:51:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 638E91F26859
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 13:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF39015F3F1;
-	Tue,  7 May 2024 13:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB0215E5DD;
+	Tue,  7 May 2024 13:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QmD0p47D"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD5015E21B;
-	Tue,  7 May 2024 13:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F09415E5D7
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 13:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715089799; cv=none; b=dosA5GEiGetw3Wq3sme8LZbW6rQzy1zXhtkesRaKOrEbRexyMnt3FK65kBT+rk+NZGFipRlmDUcdQi+tHCjbxNIhJKldEExorS4nQ18gXDmDFRtqPLUtf1jhi3r3fkmcj4OuaNtSqiDa57NyIDEKq++lFVAboL8F122uxd/7A9Y=
+	t=1715089856; cv=none; b=Q2/zHsxoLJSDLQ6UcOGh94o7onCsfm4mLZZ5lea2FJ7flkZOvxq3Y8ykntlQkF0TytbaL8yqGKcmbYXrKB+RolkKQUvaGhF7k2QSUhR+rnRRAdJGaBzkgcCDo6whz45WHKCSnv5e1jr3YhbVStx1EFYmRsoUYKEtjdHwwmvhvlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715089799; c=relaxed/simple;
-	bh=rTb+6h5WdLhI0PJ2MZa/eSn7YcfXrozUwQkanBndH2s=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EFU4a6yzw90+wIYJ43ngX0YcCAYcu6CY+h2RW4MzsHGF6/Eh5y8F2olTeaTvI6NNY5EPW9tbeKwr+XsrROHZZTZy0XWdV84Ylmx7LsSIv3y4IS0g69khZQxDrMCoWzk8c3e5NOnTdVPTMAVLC70bvdHTa41YacbjacOwL7sXR3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VYfkf2gbjzCrP3;
-	Tue,  7 May 2024 21:48:42 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0EBC71403D4;
-	Tue,  7 May 2024 21:49:53 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 7 May 2024 21:49:52 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <jiri@resnulli.us>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <chenhao418@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH V3 net 7/7] net: hns3: fix kernel crash when devlink reload during initialization
-Date: Tue, 7 May 2024 21:42:24 +0800
-Message-ID: <20240507134224.2646246-8-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240507134224.2646246-1-shaojijie@huawei.com>
-References: <20240507134224.2646246-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1715089856; c=relaxed/simple;
+	bh=TIJT24/Y/Kk/+RWnfVxsYYSG3i19tMA8dCXENC479kk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=AApEq/zgpLJZfQqRhysywEgB0c3EJQzY2M90tAXP64m9w+klz6ubxEwWoZVJLLCdrHVTiNqrm+NSVicUuv+wnWjfLMFZy7t3ixw5mhX80HQSz9rORU9FPEYw6wSCaVF38EfOJNVDJT3D3uScc/hpXOhmJkq1oIiCu2rBnyOXsC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QmD0p47D; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715089854;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xTODE9eHYN04ukhQbjsh3NfbLHwJO8ke2b2LYl5imOw=;
+	b=QmD0p47DDS36/tfeC5lWnhS7wPjlFyFUuQuyQ1PUICB+0jCs5kc2Ebd7/bxnWYz0VFU+W4
+	CJ37UVS/Ci04hPYRuogNRpXfQ9385roCkttFjGzylYiZFArnv1g6XT2s0ohFbb9jyng0hH
+	IYE14Semdk4ryGT7QMn8Ia+LOaAUoqg=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-29-lQuQbLMCOjWr7upeBSuyzA-1; Tue, 07 May 2024 09:50:52 -0400
+X-MC-Unique: lQuQbLMCOjWr7upeBSuyzA-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-51f22618c20so2518442e87.0
+        for <netdev@vger.kernel.org>; Tue, 07 May 2024 06:50:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715089851; x=1715694651;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xTODE9eHYN04ukhQbjsh3NfbLHwJO8ke2b2LYl5imOw=;
+        b=X7U65dP46PPC5oUpugRnsnR9eM5RfwyDXE5j37XVNk9xnUP8uzslB7eJaZ0JPygAt9
+         73sKBUzGSCjCrrwIZl5GeJcBK2mL3crJ62hakDDLMzL/5aXls0hu27xkGkkvjAusA3F7
+         vLmSoAkh/miRv16+3FizE1PjhYRildoyaO2WcgzQI3ofrTZkyPi5SlpHfam7Hhf1GnZ2
+         spQHz75Gldn5Dt49suN5TSC00C0JIXeAHt2kASsHw0AYRU+9SNEyDMWusI8kU8JE64rn
+         WURODNfX/V8gNztFisMgMbl2/yeaGFX3mqEkKuLxrf9+5DUb1SKWITcYSH0WfIsQT6+U
+         FnZg==
+X-Forwarded-Encrypted: i=1; AJvYcCVO78oJYzNP/k9zglI+uH2eN4p2pgopxmqsS2JZ7jKwJQrpXjOK+TBq1XyU2yVA4udK76jiovNNsa3v0qVxPtfDI7KVUNVm
+X-Gm-Message-State: AOJu0YyxC3ExktzT+Ss0EHOoeUPPHaXuXZwq7coCwnr1epcMqPf0ypho
+	wAu/E2afCCXF8nnlfS0pM1E6S5ilVqmP7ZPG96W0H4Z+lgMWTfeFmcAFIePZ756Z9bUVHylfaFN
+	E2K27JJsdl7zEgR/8t1b2E08D/99H7SXg3dv42aXpXZpx0r36G2fMxQ==
+X-Received: by 2002:a05:6512:1588:b0:518:b283:1078 with SMTP id bp8-20020a056512158800b00518b2831078mr14091449lfb.26.1715089851198;
+        Tue, 07 May 2024 06:50:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHv9UwS+EKurT0TjqicSwHazMqzSvX4nL5tG19yPraKVt7fxXPC1+UwQnvq4wdl4VKNZqfd2w==
+X-Received: by 2002:a05:6512:1588:b0:518:b283:1078 with SMTP id bp8-20020a056512158800b00518b2831078mr14091422lfb.26.1715089850709;
+        Tue, 07 May 2024 06:50:50 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id ek10-20020a056402370a00b00572033ec969sm6344723edb.60.2024.05.07.06.50.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 May 2024 06:50:50 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 6C3FE1275DC8; Tue, 07 May 2024 15:50:49 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Boqun Feng <boqun.feng@gmail.com>, Daniel Borkmann
+ <daniel@iogearbox.net>, Eric Dumazet <edumazet@google.com>, Frederic
+ Weisbecker <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Peter
+ Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard
+ Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Jiri Olsa <jolsa@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Yonghong Song
+ <yonghong.song@linux.dev>, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next 14/15] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+In-Reply-To: <20240507105731.bjCHl0YH@linutronix.de>
+References: <20240503182957.1042122-1-bigeasy@linutronix.de>
+ <20240503182957.1042122-15-bigeasy@linutronix.de> <87y18mohhp.fsf@toke.dk>
+ <20240507105731.bjCHl0YH@linutronix.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 07 May 2024 15:50:49 +0200
+Message-ID: <874jb9ohmu.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600007.china.huawei.com (7.193.23.208)
 
-From: Yonglong Liu <liuyonglong@huawei.com>
+Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
 
-The devlink reload process will access the hardware resources,
-but the register operation is done before the hardware is initialized.
-So, processing the devlink reload during initialization may lead to kernel
-crash.
+>> > +static inline struct bpf_redirect_info *bpf_net_ctx_get_ri(void)
+>> > +{
+>> > +	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
+>> > +
+>> > +	if (!bpf_net_ctx)
+>> > +		return NULL;
+>> 
+>> ... do we really need all the NULL checks?
+>> 
+>> (not just here, but in the code below as well).
+>> 
+>> I'm a little concerned that we are introducing a bunch of new branches
+>> in the XDP hot path. Which is also why I'm asking for benchmarks :)
+>
+> We could hide the WARN behind CONFIG_DEBUG_NET. The only purpose is to
+> see the backtrace where the context is missing. Having just an error
+> somewhere will make it difficult to track.
+>
+> The NULL check is to avoid a crash if the context is missing. You could
+> argue that this should be noticed in development and never hit
+> production. If so, then we get the backtrace from NULL-pointer
+> dereference and don't need the checks and WARN.
 
-This patch fixes this by registering the devlink after
-hardware initialization.
+Yup, this (relying on the NULL deref) SGTM :)
 
-Fixes: cd6242991d2e ("net: hns3: add support for registering devlink for VF")
-Fixes: 93305b77ffcb ("net: hns3: fix kernel crash when devlink reload during pf initialization")
-Signed-off-by: Yonglong Liu <liuyonglong@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 17 +++++------------
- .../hisilicon/hns3/hns3vf/hclgevf_main.c        | 10 ++++------
- 2 files changed, 9 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 0773124440e9..ce60332d83c3 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -11631,16 +11631,10 @@ static int hclge_init_ae_dev(struct hnae3_ae_dev *ae_dev)
- 	if (ret)
- 		goto out;
- 
--	ret = hclge_devlink_init(hdev);
--	if (ret)
--		goto err_pci_uninit;
--
--	devl_lock(hdev->devlink);
--
- 	/* Firmware command queue initialize */
- 	ret = hclge_comm_cmd_queue_init(hdev->pdev, &hdev->hw.hw);
- 	if (ret)
--		goto err_devlink_uninit;
-+		goto err_pci_uninit;
- 
- 	/* Firmware command initialize */
- 	ret = hclge_comm_cmd_init(hdev->ae_dev, &hdev->hw.hw, &hdev->fw_version,
-@@ -11808,6 +11802,10 @@ static int hclge_init_ae_dev(struct hnae3_ae_dev *ae_dev)
- 		dev_warn(&pdev->dev,
- 			 "failed to wake on lan init, ret = %d\n", ret);
- 
-+	ret = hclge_devlink_init(hdev);
-+	if (ret)
-+		goto err_ptp_uninit;
-+
- 	hclge_state_init(hdev);
- 	hdev->last_reset_time = jiffies;
- 
-@@ -11815,8 +11813,6 @@ static int hclge_init_ae_dev(struct hnae3_ae_dev *ae_dev)
- 		 HCLGE_DRIVER_NAME);
- 
- 	hclge_task_schedule(hdev, round_jiffies_relative(HZ));
--
--	devl_unlock(hdev->devlink);
- 	return 0;
- 
- err_ptp_uninit:
-@@ -11830,9 +11826,6 @@ static int hclge_init_ae_dev(struct hnae3_ae_dev *ae_dev)
- 	pci_free_irq_vectors(pdev);
- err_cmd_uninit:
- 	hclge_comm_cmd_uninit(hdev->ae_dev, &hdev->hw.hw);
--err_devlink_uninit:
--	devl_unlock(hdev->devlink);
--	hclge_devlink_uninit(hdev);
- err_pci_uninit:
- 	pcim_iounmap(pdev, hdev->hw.hw.io_base);
- 	pci_release_regions(pdev);
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-index 08db8e84be4e..43ee20eb03d1 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-@@ -2845,10 +2845,6 @@ static int hclgevf_init_hdev(struct hclgevf_dev *hdev)
- 	if (ret)
- 		return ret;
- 
--	ret = hclgevf_devlink_init(hdev);
--	if (ret)
--		goto err_devlink_init;
--
- 	ret = hclge_comm_cmd_queue_init(hdev->pdev, &hdev->hw.hw);
- 	if (ret)
- 		goto err_cmd_queue_init;
-@@ -2941,6 +2937,10 @@ static int hclgevf_init_hdev(struct hclgevf_dev *hdev)
- 
- 	hclgevf_init_rxd_adv_layout(hdev);
- 
-+	ret = hclgevf_devlink_init(hdev);
-+	if (ret)
-+		goto err_config;
-+
- 	set_bit(HCLGEVF_STATE_SERVICE_INITED, &hdev->state);
- 
- 	hdev->last_reset_time = jiffies;
-@@ -2960,8 +2960,6 @@ static int hclgevf_init_hdev(struct hclgevf_dev *hdev)
- err_cmd_init:
- 	hclge_comm_cmd_uninit(hdev->ae_dev, &hdev->hw.hw);
- err_cmd_queue_init:
--	hclgevf_devlink_uninit(hdev);
--err_devlink_init:
- 	hclgevf_pci_uninit(hdev);
- 	clear_bit(HCLGEVF_STATE_IRQ_INITED, &hdev->state);
- 	return ret;
--- 
-2.30.0
+-Toke
 
 
