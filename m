@@ -1,137 +1,111 @@
-Return-Path: <netdev+bounces-94070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D85C08BE116
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 13:39:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CED28BE147
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 13:43:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 937E5284FF9
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:39:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F668B26CCE
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39DF15252E;
-	Tue,  7 May 2024 11:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C02D15664F;
+	Tue,  7 May 2024 11:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K6QMOun+"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="YJqu5DHm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from nbd.name (nbd.name [46.4.11.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E36522E;
-	Tue,  7 May 2024 11:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359C715252F;
+	Tue,  7 May 2024 11:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715081971; cv=none; b=RXKPuG1qve3GlXBpbCmugbH+z6UN4uaAocsycXpPLitmXJYxE7bOluGh8EfeM1QV0iQlPOXSoaMwhBkUMI96R2QtOecGw4h7hbRT4/WWLAZdSSvX9zBE4XfB9RfAVjZwgoHvngky4Bbgjn/ETqFwvvFDJdIQKucgZQFp8OIu/dw=
+	t=1715082205; cv=none; b=LSG1rnuOHJWrkLzxEkBbeF6WTZXOKrIMvpWsOGygnGu5xviyWvZ/+En0sapc4HVviG5bjSEc0Pt7zB75IOCDzsFvaXMHTQEERRltvTq14iC0P/IJvrwCThQvs61RMBy4WW6OzoI5V3kdByKaAA5iyFf8MQmDufWZl/dHBgWBlDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715081971; c=relaxed/simple;
-	bh=QWRglvQC+Ilxa+wYRcwzz9FMw6bA6Z/0j3tXMZ1TDSM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Q/lGK1+F7KuF9P0ItlhC1NHUOOKwp1HJbiKGK8DiWgShRsIqPkD0lhtNs0wWXvmVLFV0B+QCm8Y9A+g4qMpc9C6+QYz/VTOr5s3fxxCNnz8J2YpRis4b1ZW7TbUehwAaflV/HAC0qJ/td7+ivTcZ5b8whz0xBUlMzaP8uIL7uTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K6QMOun+; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-43b06b803c4so20435271cf.1;
-        Tue, 07 May 2024 04:39:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715081969; x=1715686769; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bc2Fh6vr9HEHKy+AiZntTDAKa/QuaWvCqXRib6VLhHw=;
-        b=K6QMOun+SSSrGpJzlvMhU23ylUYSG2c0tdyw/O0E3Kwcya2bke5YQazo9EGKSmOe8j
-         6l70QSXWCivLUeeRZtzmpQApXuw9PCbc8HoR1bL8XVEl8Tav1qS78/cHBeUcJtShQ6j5
-         9HWBl82uUVuBU230UfAEZyHGSE25XPvh5P1/Ty0yk77D63VdsRxJpDOfpihnglLoMSsH
-         JRVPcyBg7XFxobjJZsyse55L5esqzJi+IV/tiHDeVCkuaSX9Gcgtx+e7vGT9XLgQ9icV
-         rnDzR9+QVRhf5oRkpgSoLdvoVB6Sh2fGeVwfRv8yElMaz0yUJobZQ1ABDroLFLaANv2p
-         RcYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715081969; x=1715686769;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bc2Fh6vr9HEHKy+AiZntTDAKa/QuaWvCqXRib6VLhHw=;
-        b=i/u69gyZXQuPwmyz/bGLAWutoshkQM7RvSReX6b8QuJJWQ6TqouAP7ue9klaGnco3w
-         JzG2yvAOYgk2JJeDhy+c4G5093TY3/gKGpLy1BgsybiGos6GN6ZX0pZ1aWFWbAOiSekF
-         IWKq9ABw4QyXDdcAingzkLFaBevVtgzutBsuwLTVtzqjwphhAq+kNZPEJuYCPGEgc6m2
-         pjIYBJQgtULobNAnmx37Oua6FW9gYQTwJ2PaRXO4t61QiJfMzLzddvtMGpB73HUL1tGV
-         eQU5BpotFBoCQx48dAiCEbeB6rF01nBXSZBwwhvVxC6b/hbn2wsgvt5tQFLIuPRvhnOJ
-         4+Dw==
-X-Forwarded-Encrypted: i=1; AJvYcCUG/KuANAgr7rQGxsMBF8MwLOmYbIT5GHjLAUJ7IaRx++jo19qC4X0JjNUaGV4nwtAQzr9HdkXeahGqUNSEICQqd08K6KzX+5f5xgW56DHrKcOdtfiuHpkxLX7VsQG+7C9CNQxLAVJTH/30DLJ5hc/7kEtIuvW50t4y
-X-Gm-Message-State: AOJu0YxTXs8lkR9Xwunj2eZRInZcsl82TYWBYw88NW24WGuQzjJEPdd9
-	pBuSRfy1W/nClOZfGhB8Eg9XQh+dpLtYu7P4ZW5EK3+hGxNDfxd2
-X-Google-Smtp-Source: AGHT+IEYa1mU6Tp3WBhIuUW/Dh9bS9a+VEaM8HEHI4XcFgssU84GL0HCwzAqkeL25nS4PeYPzFRieg==
-X-Received: by 2002:a05:622a:2989:b0:43a:dcd6:6507 with SMTP id hd9-20020a05622a298900b0043adcd66507mr17632581qtb.50.1715081969095;
-        Tue, 07 May 2024 04:39:29 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id er5-20020a05622a5e8500b0043cd93be06asm5598868qtb.62.2024.05.07.04.39.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 04:39:28 -0700 (PDT)
-Date: Tue, 07 May 2024 07:39:28 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>, 
- Abhishek Chauhan <quic_abchauha@quicinc.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Andrew Halaney <ahalaney@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Martin KaFai Lau <martin.lau@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- bpf <bpf@vger.kernel.org>, 
- kernel@quicinc.com
-Message-ID: <663a12f089b81_726ea29426@willemb.c.googlers.com.notmuch>
-In-Reply-To: <cab0c7ba-90bf-49e2-908d-ecd879160667@linux.dev>
-References: <20240504031331.2737365-1-quic_abchauha@quicinc.com>
- <20240504031331.2737365-3-quic_abchauha@quicinc.com>
- <cab0c7ba-90bf-49e2-908d-ecd879160667@linux.dev>
-Subject: Re: [RFC PATCH bpf-next v6 2/3] net: Add additional bit to support
- clockid_t timestamp type
+	s=arc-20240116; t=1715082205; c=relaxed/simple;
+	bh=n8U5Uc/ahU44+LRrdcNd3RNaR49dcnf3S9OFWjvtOoY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZvmFkey6dhQtoig3tcMZClxZkzA3NCmLuUGwqaTGZGqXPcU+azmwSltS0fEouf407SEYsjuZXzA6zcFP0LjgCuZcQkAtqPb8jilJxybkP40ryeM52iv0vlFksLN1fdvstw0Vo680kSXWqptkWjpDiIjwp1s5kNBT3TdY7J0nrpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=YJqu5DHm; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=n8U5Uc/ahU44+LRrdcNd3RNaR49dcnf3S9OFWjvtOoY=; b=YJqu5DHmoDQFv2SpdJ+AHK0JCa
+	PK6XiFL+xqIZ2xm8Om2sajRj6UVCtyD58LD0kqJfwX429IL8FIP2ysZFT9sMBXA+QNK37DiWyXDum
+	n9lfobOvUPZ5zQWt6i5Gx/fYcS9n64cIMBMCFFypzQC12ofAA3RaZACqsIRkrNshrQFI=;
+Received: from p54ae9c93.dip0.t-ipconnect.de ([84.174.156.147] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1s4JE0-00EKxy-1x;
+	Tue, 07 May 2024 13:43:12 +0200
+Message-ID: <4bcb2be8-d769-4972-be9b-c7798f50f207@nbd.name>
+Date: Tue, 7 May 2024 13:43:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXTERNAL] [PATCH net-next] net: add missing check for TCP
+ fraglist GRO
+To: Suman Ghosh <sumang@marvell.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20240507094114.67716-1-nbd@nbd.name>
+ <SJ0PR18MB521604310B1F7DC297C2870DDBE42@SJ0PR18MB5216.namprd18.prod.outlook.com>
+From: Felix Fietkau <nbd@nbd.name>
+Content-Language: en-US
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <SJ0PR18MB521604310B1F7DC297C2870DDBE42@SJ0PR18MB5216.namprd18.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Martin KaFai Lau wrote:
-> On 5/3/24 8:13 PM, Abhishek Chauhan wrote:
-> > diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-> > index fe86cadfa85b..c3d852eecb01 100644
-> > --- a/net/ipv4/ip_output.c
-> > +++ b/net/ipv4/ip_output.c
-> > @@ -1457,7 +1457,10 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
-> >   
-> >   	skb->priority = (cork->tos != -1) ? cork->priority: READ_ONCE(sk->sk_priority);
-> >   	skb->mark = cork->mark;
-> > -	skb->tstamp = cork->transmit_time;
-> > +	if (sk_is_tcp(sk))
-> 
-> This seems not catching all IPPROTO_TCP case. In particular, the percpu 
-> "ipv4_tcp_sk" is SOCK_RAW. sk_is_tcp() is checking SOCK_STREAM:
-> 
-> void __init tcp_v4_init(void)
-> {
-> 
-> 	/* ... */
-> 	res = inet_ctl_sock_create(&sk, PF_INET, SOCK_RAW,
-> 				   IPPROTO_TCP, &init_net);
-> 
-> 	/* ... */
-> }
-> 
-> "while :; do ./test_progs -t tc_redirect/tc_redirect_dtime || break; done" 
-> failed pretty often exactly in this case.
-> 
+On 07.05.24 13:33, Suman Ghosh wrote:
+>>----------------------------------------------------------------------
+>>It turns out that the existing checks do not guarantee that the skb can be
+>>pulled up to the GRO offset. When using the usb r8152 network driver with
+>>GRO fraglist, the BUG() in __skb_pull is often triggered.
+>>Fix the crash by adding the missing check.
+>>
+>>Fixes: 8d95dc474f85 ("net: add code for TCP fraglist GRO")
+> [Suman] Since this is a fix, this should be pushed to "net".
 
-Interesting. The TCP stack opens non TCP sockets.
+No, it is fixing a commit that was just pulled into -next.
 
-Initializing sk->sk_clockid for this socket should address that.
+- Felix
 
 
