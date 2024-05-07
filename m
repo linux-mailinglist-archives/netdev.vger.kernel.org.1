@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-94320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E9E38BF24C
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 01:46:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A33B8BF2A1
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 01:54:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C872A2845AD
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 23:46:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0692E284642
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 23:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBF519DF52;
-	Tue,  7 May 2024 23:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BCA219F0D2;
+	Tue,  7 May 2024 23:14:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qtu38uwE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bnlAlQ1V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D55199EAF;
-	Tue,  7 May 2024 23:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE0519F0CA;
+	Tue,  7 May 2024 23:14:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715123571; cv=none; b=NlhCRVdjyE4YldwptK19wSJriCl8WuIwetN34qA9+AuQ3GuKIExviPjldNOc0GzOdU97XxZNlULlOSaU+CkxR9v2gyVpZUUw+cUtO511aG46R0DpDx0ZDoGsKBKIng2X79Z7sKvcOXCBfSnI388VzhCm8ARZXqib3MCbBhTWGt0=
+	t=1715123656; cv=none; b=QZ2ogfIwAzwcreNt6KG9UwfHFFC+vDjv/oAxPocGvR0OxYyafstsQA/q4Sab+TQVOWxOT9dMUe3skMfLih0e5hUg/AZtGv2Kgfb/Zlz6pfnl4HwZuSiPzcRrdtIp3oLZcX1Dc7xYtsFI1Wz1VmAYokx2flr2qJ9TDgW1fhHR98k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715123571; c=relaxed/simple;
-	bh=9MpYwDDygwbSAzolG9in6+os4KOgRZ056ZMi1p6g0lc=;
+	s=arc-20240116; t=1715123656; c=relaxed/simple;
+	bh=Dxj5RRktJQRL9gOBT4vzGDQo76tsHd9nRkN7+UYgGiA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KwAlZ5E43mV04et4xO7r5UTgwWoQz1Jqxf8N6dlR4SUPqFvbdKJZebrFALlQt6czYI7XrUnPHtTupq0nEBzRc6G920CjeRkI+oyUymGqt6xi2V+aoK3ldqaHCWpdBWCzAWZ7djW2XKaXOiRZ2ETnA3uPqBXvefv2RIxcijFdm5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qtu38uwE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06EB7C4AF17;
-	Tue,  7 May 2024 23:12:49 +0000 (UTC)
+	 MIME-Version:Content-Type; b=B1i1GlCgL08327mJnbtWBZQEtLVg6PJAptHU9VuLKp3iCqtOeOoNJ5/LMLPksjJqlMypmR7BDo+271a/hmYYHMUDnH6O/vYhmekEsCigCx10jiphSyykZJvSN89WANeIbCQ3o85A8sCAMIff6/74ehFnDpw4KG6/HYZLeusVQAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bnlAlQ1V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8279C3277B;
+	Tue,  7 May 2024 23:14:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715123571;
-	bh=9MpYwDDygwbSAzolG9in6+os4KOgRZ056ZMi1p6g0lc=;
+	s=k20201202; t=1715123656;
+	bh=Dxj5RRktJQRL9gOBT4vzGDQo76tsHd9nRkN7+UYgGiA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qtu38uwEp8OpArSEDZh5e7IfQZXyJ8QkguCG5TewsoY4jx10FwPDrjvqU6PIyM5/W
-	 FORHVhwAh3B278Z/6vMdv9odkEpA0mpXp+o9WDxz8+NwY8O1j/tPI/NOZHCRLxtzrN
-	 U911HVNZUYbiyLGer206VUrvFV2uu7svmCB4f2eLGcYNlK16Gc23POxxi/MBVWE5yB
-	 OwwTd/egqoCuEOf7EZ7c0OuvVb+eXhLymE65G9hdbN/X/5lygx75xFb6Zb4O9nlkJj
-	 fy+H7QZBipslMozF+Xg+oeOQLQIFLorxEENQ7kaSVFcj2jWiv4xakcPFIGI4u1bz8e
-	 sOk/xNGs3Mtbg==
+	b=bnlAlQ1VxHPrG4ZfGSiatVuKi27tOX2oAtB3w7OL2g42IjvSx1g4y+GokpxWwLdCy
+	 oa6MwDcR848IB2il/Vnj9HWw6eLWoqxhmXxJpeQGaIVoYDfepaF/1DGsnWO++7lgal
+	 CB7avGG8ETxDxYr39A+f1DN85ZTsYzXEAozhIfZwPyaSpCEGooKDLK9R7AtCsBnadj
+	 Huj6e7G1MtP9f8lF0RFD5XGaNjKpc97kSQodTfvn/h3LnIpWwNSM9YFXiIWhBkel5w
+	 uS2AIGLU0DFiifWFS19qCh2MZ3OFVrdigxshG+TvwPSepw9ULVO3/BURGyJOZnti3c
+	 99Qlmoz4TTebA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -53,12 +53,12 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 11/25] net: qede: sanitize 'rc' in qede_add_tc_flower_fltr()
-Date: Tue,  7 May 2024 19:11:58 -0400
-Message-ID: <20240507231231.394219-11-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 5/9] net: qede: sanitize 'rc' in qede_add_tc_flower_fltr()
+Date: Tue,  7 May 2024 19:14:00 -0400
+Message-ID: <20240507231406.395123-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240507231231.394219-1-sashal@kernel.org>
-References: <20240507231231.394219-1-sashal@kernel.org>
+In-Reply-To: <20240507231406.395123-1-sashal@kernel.org>
+References: <20240507231406.395123-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,7 +68,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.90
+X-stable-base: Linux 5.10.216
 Content-Transfer-Encoding: 8bit
 
 From: Asbjørn Sloth Tønnesen <ast@fiberby.net>
@@ -93,10 +93,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/qlogic/qede/qede_filter.c b/drivers/net/ethernet/qlogic/qede/qede_filter.c
-index 3010833ddde33..76aa5934e985b 100644
+index a2e4dfb5cb44e..ba28381c26bbf 100644
 --- a/drivers/net/ethernet/qlogic/qede/qede_filter.c
 +++ b/drivers/net/ethernet/qlogic/qede/qede_filter.c
-@@ -1868,8 +1868,8 @@ int qede_add_tc_flower_fltr(struct qede_dev *edev, __be16 proto,
+@@ -1877,8 +1877,8 @@ int qede_add_tc_flower_fltr(struct qede_dev *edev, __be16 proto,
  			    struct flow_cls_offload *f)
  {
  	struct qede_arfs_fltr_node *n;
@@ -106,7 +106,7 @@ index 3010833ddde33..76aa5934e985b 100644
  
  	__qede_lock(edev);
  
-@@ -1879,8 +1879,10 @@ int qede_add_tc_flower_fltr(struct qede_dev *edev, __be16 proto,
+@@ -1888,8 +1888,10 @@ int qede_add_tc_flower_fltr(struct qede_dev *edev, __be16 proto,
  	}
  
  	/* parse flower attribute and prepare filter */
@@ -118,7 +118,7 @@ index 3010833ddde33..76aa5934e985b 100644
  
  	/* Validate profile mode and number of filters */
  	if ((edev->arfs->filter_count && edev->arfs->mode != t.mode) ||
-@@ -1888,12 +1890,15 @@ int qede_add_tc_flower_fltr(struct qede_dev *edev, __be16 proto,
+@@ -1897,12 +1899,15 @@ int qede_add_tc_flower_fltr(struct qede_dev *edev, __be16 proto,
  		DP_NOTICE(edev,
  			  "Filter configuration invalidated, filter mode=0x%x, configured mode=0x%x, filter count=0x%x\n",
  			  t.mode, edev->arfs->mode, edev->arfs->filter_count);
