@@ -1,185 +1,168 @@
-Return-Path: <netdev+bounces-94266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE89C8BEE6A
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 22:54:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 875818BEE6D
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 22:55:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 735E92841AF
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 20:54:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA3A91C213E4
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 20:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E555786E;
-	Tue,  7 May 2024 20:54:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C79E73539;
+	Tue,  7 May 2024 20:54:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oFNEz7Ik"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NvcrpBXx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675A120315;
-	Tue,  7 May 2024 20:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD1E73527;
+	Tue,  7 May 2024 20:54:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715115292; cv=none; b=t5fYkl17nmsqDYwx78p+bBV6VZZTsp9gTP2vwKdnghdhe2VlGr26uxhCmSEUJw3N2vxb1/0/HKw6Gsl86Xqwca97/r3OBdU72hCZI2wVC9Xa+cnUWaevLDEudk84YT2fTwLJ2OaAEOm1K7PkjYWj1ON2Ac8FeSwIRz2Tm4SmX48=
+	t=1715115298; cv=none; b=FS1Us84aUPVaV9ZsdOX19rCPutWBTPmR9jrsMJdrACar5FjbbFg4XDpdWHIDVrDynFgdLqTBzIK1BXGWC9olY1m6rRVyonthljyErThLWEqcRERGvPEnNlw2Fdc2zfYfGLTt0f1DmqpJeRbYWFFoG5ID81hLsqWn+8BDd01hGiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715115292; c=relaxed/simple;
-	bh=ByjaozowwXMBmPG6teJv9IpV569M7F1fPCHE8e+B4o0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uXM32ULzpbOaLQTZG6floxGwlh6EjCjiirubt8E2Jl59OyMRf6yVR3L8BhzM9HQZsEDWtfkvUuIwt/fY14dPktEexHThM1LBxbawlU8K3HMW96O1qxwniMhe+1TseHp3wmve5voZrLQGoXjjgueoxm+Dz4fcM5c/BHFBnrUVmtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oFNEz7Ik; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715115290; x=1746651290;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ByjaozowwXMBmPG6teJv9IpV569M7F1fPCHE8e+B4o0=;
-  b=oFNEz7IkNj2GgvOXF2r6CAmWNiV+j6sDa+t9kKnDzsV5YecKdDhhLnwI
-   K7l1oXbCivtymBjo6f1UF032gqZlZ2SILa2YJc3KRzTuy+My7rZFdSBtC
-   mLua8B91K4R26m/dWSB4f3nJAkdDrICJ7fS6tBeqJBChESPAl8ED0Ut1P
-   iSH/MeKiQqmQvWXgH1z0fuVoLVNdMHk3vjaqpl1ykaAgRjFAlDiqxn44F
-   z6i+Lnk3I6QgIrLRPgk/eXRgVxAabbrILOLik2ecwxoPTnopec6jyreBC
-   pq/wCYCELTGLiH+4KUmF2yhLP29dcDeja/LdHxlqDgoyLNcqMwZRjW7Hx
-   g==;
-X-CSE-ConnectionGUID: 8Mg4w7WSRTiCB/9yfUidIA==
-X-CSE-MsgGUID: qvaYYkptSFqtgcd5jD8Vtw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="21547342"
-X-IronPort-AV: E=Sophos;i="6.08,143,1712646000"; 
-   d="scan'208";a="21547342"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 13:54:49 -0700
-X-CSE-ConnectionGUID: XdIgqTA6QnCcgd6HpXiE8Q==
-X-CSE-MsgGUID: bXqcioePQBKRkpCvFvxQiQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,143,1712646000"; 
-   d="scan'208";a="28615166"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa008.fm.intel.com with ESMTP; 07 May 2024 13:54:49 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
-	anthony.l.nguyen@intel.com,
-	richardcochran@gmail.com,
-	peterz@infradead.org,
-	linux-kernel@vger.kernel.org,
-	Arpana Arland <arpanax.arland@intel.com>
-Subject: [PATCH net-next] ice: add and use roundup_u64 instead of open coding equivalent
-Date: Tue,  7 May 2024 13:54:39 -0700
-Message-ID: <20240507205441.1657884-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
+	s=arc-20240116; t=1715115298; c=relaxed/simple;
+	bh=cAKfbhhQ0Y5jBdfh2NiEcm1JrkpS5yL1MIDSPy8wRcI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fvXwGezSxMbNDkBmM7iPVJ9paFAVF10/hRoFUFJZf22XPn17HW4JPGyvMAlzivJ2WyuLUwEpsybXaSpdlKDaKK/WZyPTi7xtInbWwHim+rPVn2rbcpkKxlmPOUTTbGUpwGr30Ohnlo9R9+cA+hlevw9w/tb9bWRHluD9mV4Na88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NvcrpBXx; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-34c8592b8dbso2793905f8f.3;
+        Tue, 07 May 2024 13:54:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715115295; x=1715720095; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MRBMHAIqydmnvRNILnVciTFpbX1I1b05QddPgDfHrK8=;
+        b=NvcrpBXx/z67l/iM2dhY5h/7X2fP6Nd5SyCKxcOGHIKIbfkddyehJe+3d3scpp6MUH
+         HzkTmwDB4lKnJ4N3MyVTDzehJYKqVSjrZ3oQebZCk/nez/aErpopF9Deuiu7y2+/QcUs
+         bAF9ZmONhi3rTPncLg/paGID5wMwtkfHLdbgt8YdW0rzEGe3n0/k3McHoK9SW83SwqGE
+         Hswep864WJKd/9jDdG4KKlWxP+XfWIve8xDNtspe3AwvIcIvYP0dG/pm81HhcoZYwIx2
+         ja46Rp2rkIQY5aUYhhZM7tzDvlOgLU9uZMKIad40TNF7BUez4vf8pvYqN896Rv3sTtuE
+         KYeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715115295; x=1715720095;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MRBMHAIqydmnvRNILnVciTFpbX1I1b05QddPgDfHrK8=;
+        b=hhLhPzenCxA+ES2TzfmTH7BWiCgt/I+ulYq1A77bsQQLZ2wWtX+77FEQfsVo9F+P+P
+         5jfPFSGWdJI0IVXnDi3rXsYrwSQ0offNHWU2KVsp0Z+5lcgPrN5XOZ/Cg5NyhkIDoRc/
+         Qa+hiFH4qXGHaspDxkI2eBq0DEyBk37D2gJP3fitEUb5L0ljRFE8m+eOoreKkc6lEJ40
+         wV/zzLQXs4WaOg6x4qIszY5MPit/jMt/NckptZ1sW5B/TR9f2neC+jhWxt5GDF4MBZZm
+         Gj18bXGSyPdjlQa4HdON/JvWibjlG5mubj7khNvOF7/16xRuLuGJACTkerPzF2G9eAQP
+         J2vA==
+X-Forwarded-Encrypted: i=1; AJvYcCXTKRiplFy6vzI3WuKAEs9/JInOBjI9JYuVs/kEVsuM4m6tVibijodieqpMe0D+EOkj2dwJQX1FyQaN8J3318mR0mY0zbCwXDXMjeaULWF0+xxG3jK6G9Zss1MmzTGHL0RX9MWLZxXqXgihhSPI7FwUzFUd41k22UbpFQCgWs+nIyw+PjJIiADGOhyUIU9g1JHAUxwrOGwOBLHO
+X-Gm-Message-State: AOJu0YxQL6fU7aOoUZSmIoCiI+mtfMDNc+P1cbZSMyH7QPpG0QN7qXFq
+	ebzcDYPxA8HF//BKauQjESAoclyq1eh+lTWPtWXvUYYThKUZXJjDo2v5BT9Xn/+ssZ2iKubH6D7
+	um8LsRdKV2e3Wlf+Xa7LJUeB+2/0=
+X-Google-Smtp-Source: AGHT+IE52tKX9im4lf8ezaDOOo3F3Pcz8ocEU7R0wHR1s8GzZ3ATxcqKKY3Q4tN3pKTGM3M7EeQ97g4fY8Ejam/i8No=
+X-Received: by 2002:adf:a492:0:b0:343:a368:f792 with SMTP id
+ ffacd0b85a97d-34fca621315mr604788f8f.52.1715115294492; Tue, 07 May 2024
+ 13:54:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240507-upstream-bpf-next-20240506-mptcp-subflow-test-v1-0-e2bcbdf49857@kernel.org>
+ <20240507-upstream-bpf-next-20240506-mptcp-subflow-test-v1-3-e2bcbdf49857@kernel.org>
+ <CAADnVQ+ADQRrZmZ_M9LLGj9u_HOo7Aeup+kid62xZfLCvSxUOQ@mail.gmail.com> <843ea6eb-a28d-437c-9c98-0b8c8816c518@kernel.org>
+In-Reply-To: <843ea6eb-a28d-437c-9c98-0b8c8816c518@kernel.org>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 7 May 2024 13:54:43 -0700
+Message-ID: <CAADnVQLA+2uoJJAJNFoK-EnUjLAwxJjxOXAizLWhcx4mf+C2Vg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 3/4] selftests/bpf: Add mptcp subflow example
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: MPTCP Upstream <mptcp@lists.linux.dev>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Geliang Tang <tanggeliang@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+On Tue, May 7, 2024 at 9:03=E2=80=AFAM Matthieu Baerts <matttbe@kernel.org>=
+ wrote:
+>
+> Hi Alexei,
+>
+> Thank you for the review!
+>
+> On 07/05/2024 16:49, Alexei Starovoitov wrote:
+> > On Tue, May 7, 2024 at 3:53=E2=80=AFAM Matthieu Baerts (NGI0)
+> > <matttbe@kernel.org> wrote:
+> >>
+> >> From: Nicolas Rybowski <nicolas.rybowski@tessares.net>
+> >>
+> >> Move Nicolas's patch into bpf selftests directory. This example added =
+a
+> >> test that was adding a different mark (SO_MARK) on each subflow, and
+> >> changing the TCP CC only on the first subflow.
+> >>
+> >> This example shows how it is possible to:
+> >>
+> >>     Identify the parent msk of an MPTCP subflow.
+> >>     Put different sockopt for each subflow of a same MPTCP connection.
+> >>
+> >> Here especially, we implemented two different behaviours:
+> >>
+> >>     A socket mark (SOL_SOCKET SO_MARK) is put on each subflow of a sam=
+e
+> >>     MPTCP connection. The order of creation of the current subflow def=
+ines
+> >>     its mark.
+> >
+> >> The TCP CC algorithm of the very first subflow of an MPTCP
+> >>     connection is set to "reno".
+> >
+> > why?
+> > What does it test?
+> > That bpf_setsockopt() can actually do it?
+>
+> Correct.
+>
+> Here is a bit of context: from the userspace, an application can do a
+> setsockopt() on an MPTCP socket, and typically the same value will be
+> set on all subflows (paths). If someone wants to have different values
+> per subflow, the recommanded way is to use BPF.
+>
+> We can indeed restrict this test to changing the MARK only. I think the
+> CC has been modified just not to check one thing, but also to change
+> something at the TCP level, because it is managed differently on MPTCP
+> side -- but only when the userspace set something, or when new subflows
+> are created. The result of this operation is easy to check with 'ss',
+> and it was to show an exemple where this is set only on one subflow.
+>
+> > But the next patch doesn't check that it's reno.
+>
+> No, I think it is checked: 'reno' is not hardcoded, but 'skel->data->cc'
+> is used instead:
+>
+>   run_subflow(skel->data->cc);
+>
+> > It looks to me that dropping this "set to reno" part
+> > won't change the purpose of the rest of selftest.
+>
+> Yes, up to you. If you still think it is better without it, we can
+> remove the modification of the CC in patch 3/4, and the validation in
+> patch 4/4.
 
-In ice_ptp_cfg_clkout(), the ice driver needs to calculate the nearest next
-second of a current time value specified in nanoseconds. It implements this
-using div64_u64, because the time value is a u64. It could use div_u64
-since NSEC_PER_SEC is smaller than 32-bits.
+The concern with picking reno is extra deps to CI and every developer.
+Currently in selftests/bpf/config we do:
+CONFIG_TCP_CONG_DCTCP=3Dy
+CONFIG_TCP_CONG_BBR=3Dy
 
-Ideally this would be implemented directly with roundup(), but that can't
-work on all platforms due to a division which requires using the specific
-macros and functions due to platform restrictions, and to ensure that the
-most appropriate and fast instructions are used.
-
-The kernel doesn't currently provide any 64-bit equivalents for doing
-roundup. Attempting to use roundup() on a 32-bit platform will result in a
-link failure due to not having a direct 64-bit division.
-
-The closest equivalent for this is DIV64_U64_ROUND_UP, which does a
-division always rounding up. However, this only computes the division, and
-forces use of the div64_u64 in cases where the divisor is a 32bit value and
-could make use of div_u64.
-
-Introduce DIV_U64_ROUND_UP based on div_u64, and then use it to implement
-roundup_u64 which takes a u64 input value and a u32 rounding value.
-
-The name roundup_u64 matches the naming scheme of div_u64, and future
-patches could implement roundup64_u64 if they need to round by a multiple
-that is greater than 32-bits.
-
-Replace the logic in ice_ptp.c which does this equivalent with the newly
-added roundup_u64.
-
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp.c |  3 +--
- include/linux/math64.h                   | 29 ++++++++++++++++++++++++
- 2 files changed, 30 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 0f17fc1181d2..a95af8d638a0 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1714,8 +1714,7 @@ static int ice_ptp_cfg_clkout(struct ice_pf *pf, unsigned int chan,
- 	 * maintaining phase
- 	 */
- 	if (start_time < current_time)
--		start_time = div64_u64(current_time + NSEC_PER_SEC - 1,
--				       NSEC_PER_SEC) * NSEC_PER_SEC + phase;
-+		start_time = roundup_u64(current_time, NSEC_PER_SEC) + phase;
- 
- 	if (ice_is_e810(hw))
- 		start_time -= E810_OUT_PROP_DELAY_NS;
-diff --git a/include/linux/math64.h b/include/linux/math64.h
-index bf74478926d4..553043ebf4cc 100644
---- a/include/linux/math64.h
-+++ b/include/linux/math64.h
-@@ -301,6 +301,19 @@ u64 mul_u64_u64_div_u64(u64 a, u64 mul, u64 div);
- #define DIV64_U64_ROUND_UP(ll, d)	\
- 	({ u64 _tmp = (d); div64_u64((ll) + _tmp - 1, _tmp); })
- 
-+/**
-+ * DIV_U64_ROUND_UP - unsigned 64bit divide with 32bit divisor rounded up
-+ * @ll: unsigned 64bit dividend
-+ * @d: unsigned 32bit divisor
-+ *
-+ * Divide unsigned 64bit dividend by unsigned 32bit divisor
-+ * and round up.
-+ *
-+ * Return: dividend / divisor rounded up
-+ */
-+#define DIV_U64_ROUND_UP(ll, d)		\
-+	({ u32 _tmp = (d); div_u64((ll) + _tmp - 1, _tmp); })
-+
- /**
-  * DIV64_U64_ROUND_CLOSEST - unsigned 64bit divide with 64bit divisor rounded to nearest integer
-  * @dividend: unsigned 64bit dividend
-@@ -346,4 +359,20 @@ u64 mul_u64_u64_div_u64(u64 a, u64 mul, u64 div);
- 		div_s64((__x - (__d / 2)), __d);	\
- }							\
- )
-+
-+/**
-+ * roundup_u64 - Round up a 64bit value to the next specified 32bit multiple
-+ * @x: the value to up
-+ * @y: 32bit multiple to round up to
-+ * @y: multiple to round up to
-+ *
-+ * Rounds @x to the next multiple of @y. For 32bit @x values, see roundup and
-+ * the faster round_up() for powers of 2.
-+ *
-+ * Return: rounded up value
-+ */
-+static inline u64 roundup_u64(u64 x, u32 y)
-+{
-+	return DIV_U64_ROUND_UP(x, y) * y;
-+}
- #endif /* _LINUX_MATH64_H */
--- 
-2.41.0
-
+I'd like to avoid adding reno there as well.
+Will bpf_setsockopt("dctcp") work?
 
