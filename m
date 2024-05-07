@@ -1,125 +1,83 @@
-Return-Path: <netdev+bounces-94208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F5EC8BE9C3
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:52:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DA418BE9D2
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:55:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 676EF1C2213A
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:52:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEC921C20ECB
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49ABF200A9;
-	Tue,  7 May 2024 16:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD99200D3;
+	Tue,  7 May 2024 16:55:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="uuzIcpPP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qKB+rSWP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E6A548FE;
-	Tue,  7 May 2024 16:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D16747F
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 16:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715100761; cv=none; b=qVIBZ4jo0SQwkvuZKPDeWoBeqs3BDMZ6E+Gfb6PULvEp6GmqMu7ShQV265VTOhJ1iB08b/cQYNwoRJOZbrqu3TBSm8WdkRvXSXmGnyZNry4aLYLpYrOSwZVdhiF15Yy/sQKyZIdsoPnKjR69m+Gr+CAmWbASE3stn1HlajMf3B0=
+	t=1715100900; cv=none; b=H4J1QrbfJePj+HShayUeufD2cTuZWmh4iTBqXnm17JI0ntbbu4/hBK8ygtr3Xs4olyL/VxccKzQzcydKC+AS8XMSSgcWgEnD/+oapceZNBFsFWgCCnmXLSUqNCYq1fp/C5wi6gj77pJi9m0KYk859/VIbG83mGZvh+kkdJV5wPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715100761; c=relaxed/simple;
-	bh=S8A9zsnRsFYYjDKBdks2TE6fJGheoskRphy9HwhTQOg=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=DWgTItOxNNlx9eMDTJ67rMboS5Fh/ZUh8DGNxekvNuT+G0PmzIOaHUJbkVJZagL8j+GFDzu/9ecLb1utvoJ/+ob2RpbdW2VRrzmQVr8Kexu7VkUod74E4N3E7hXCsqXsxyHXGcZfqXS1OiYMgyyCuwGt4f5ZzEwXBxU/pZ5w4y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=uuzIcpPP; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1715100705; x=1715705505; i=markus.elfring@web.de;
-	bh=gPUDrs/Mk0znPw+v9wYlZjQS2DlLDMlwrHz+7dh3yU8=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=uuzIcpPPdkuzMaFIFNHuTDo3KPjg0p9VsEVyFkRO+CEp6qg9UXDwynzi1VvTmgZM
-	 lcC9U9SltotoIGrc7SQTze+ffZy635bKF8w+KXO71MNna2ENdenz7Fx+t8V1Z66fI
-	 8Qj8MZqRARZ7bYoWIEvgOMqfI18yzFMnC7wBvBO+lAa1dXkdlJqJC8YpFfkJToxWZ
-	 PRl94zQzihewm1PivvJjFbb61Vco5jLnRE5GgCjpBXmmwEANysBSxifxzU09dSh7q
-	 w5z+wBvalO4TnWG4+jwdzVTIRpdZJuOu7L8M2Y5VtkUpP7Ico5Vsmchuvx0oIXTxZ
-	 nG41BkKNSOoiNAVhkg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MQgl2-1sI3312TjC-00M7Wc; Tue, 07
- May 2024 18:51:45 +0200
-Message-ID: <73a1dc2e-cd7c-4fb0-a2cd-181155776490@web.de>
-Date: Tue, 7 May 2024 18:51:40 +0200
+	s=arc-20240116; t=1715100900; c=relaxed/simple;
+	bh=WYsK1PPnmWKmbI+8ac1JekRZ+CNaOmZOvOIEVEUw+wA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rY2ESJn8MmwN636Vj4Un6hGZ3Wjj16f7QBCTPGpF5mgaY0FpRZ91fUqyD+pWZZ/d75+VvT/FH5cDOhzs2HElpeJkKgFSkJHsadrgsJlrqYykCtNom5P8boFIM8irnOdtilT64GxTPQ5EIdMnPmrE3lml9PciazowjpTNsp0mue8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qKB+rSWP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA2A8C2BBFC;
+	Tue,  7 May 2024 16:54:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715100900;
+	bh=WYsK1PPnmWKmbI+8ac1JekRZ+CNaOmZOvOIEVEUw+wA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qKB+rSWPGqRIPGKMAcWDs3WlU7Lt102r3LCjdIf0VBIZxQQyxXJHEpZ/vN4mRCYGi
+	 20jGy2KQayHdBrlGBuHcRFnITQh2P4svI0vknHktvQuOlJ/HRVJtvP2IMsyo0tuK3k
+	 fK79lOdTe2qjlTq8QwQZr4UNEnjWOvHMOT/nJvJtgw7g343jrsOhqm66ZNKVZsRCzF
+	 xwVaaJKxdEi7ojshK0kX0k3XWgzljKoARo0HZqobmfNLZlBy5/ekK96QvZlgqavMeF
+	 KLp33xAXrViRX3OWmo6G9DgsYOgT6FKwCoT4GL4PBo+nOlUPSRXziWAvtBFW2GrNoq
+	 6c7583i3XKZCQ==
+Date: Tue, 7 May 2024 17:54:56 +0100
+From: Simon Horman <horms@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org
+Subject: Re: [PATCH 0/5] pull request (net-next): ipsec-next 2024-05-03
+Message-ID: <20240507165456.GH15955@kernel.org>
+References: <20240503082732.2835810-1-steffen.klassert@secunet.com>
+ <20240504143657.GA2279@kernel.org>
+ <Zjntq3jSFL2Uud9i@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Jijie Shao <shaojijie@huawei.com>, Peiyang Wang
- <wangpeiyang1@huawei.com>, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Jiri Pirko <jiri@resnulli.us>, Paolo Abeni <pabeni@redhat.com>,
- Salil Mehta <salil.mehta@huawei.com>, Simon Horman <horms@kernel.org>,
- Yisen Zhuang <yisen.zhuang@huawei.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Hao Chen <chenhao418@huawei.com>,
- Jie Wang <wangjie125@huawei.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Yonglong Liu <liuyonglong@huawei.com>
-References: <20240507134224.2646246-2-shaojijie@huawei.com>
-Subject: Re: [PATCH V3 net 1/7] net: hns3: using user configure after hardware
- reset
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240507134224.2646246-2-shaojijie@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:UAwRMbroh29s0Ez/VJv3gNYhlAe7D0+EmM7MDCRqf2rzqwcTcdd
- yO8GQFmHLsRZLGrEVaLJG4NDNHbqF0f+KVyxEWLRrVILkcZUMhFIuFHcZdzp4ywbrVA0iHG
- MqcaXAZwsCxH9ZYyUNq18EnRcDJ+Kq94k67l21FyxX7l4i1PFmfnLmbL+YDTnYEgfXAK1Hd
- nKN90sEHcYCYzDyIJhKSg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:d0Dcnv/9yPU=;PR+45TPLCU2DRnEStC3sDhDpyIP
- CuwRSfv2z1JUdNyItnEpGQXuUpll9EWP2BjNKPu0oba5Io0tDwfuJcoVHXJLJWu2TaUVWJoUp
- 5dDPiuzJ54TQVe1Z4qWyCjGK/lwnvq67Ru0UB4ldjAsdpafA3VJDKTjqJdxsiYKjOJVhaWdEd
- y/0w09TrkQzp0xMrx0bIVyCR3YkvgRMcdWqCpVh4UcpJmPFjTuIdQRtRtH5MzMAnpS0CGB9SX
- 0qJyT8Q6UIicIj7oJ24Who0vEp1Km+uX+kdPAbK0cUeCPnkp6SfJu6U4FUhdDXZuChFvwE7vx
- Amk+z3hUk/8NrorkRXuOuAW+ssQbyOb/dIOZDUdHKI1M6Y6rR+eVgCTxVrB6aQONihAMHwWL0
- nSbTrNx/5FtJ8MOYu1mySxzuT9FEXn02abK8+duWnv6Ra+v2hNm7OvSNizsKVbR00SWcgrJ98
- 4jG7U5Os0apeykSJYwpm9YOqW0hFDi66E9+pg2X4J9XsxY6+vhVfO8tODSwKYKP0s7rnsdKaK
- 7KFMC5C+A7Y+hKU/4BonV28/cNgvdsDmTXMKi9RwUO1ufve/HbiQ2JnoPfIoQ9zf5B2Kk/ZEI
- sdnoBkP7FA2uvIIjcvgJU9IC10+QAM9yN0paM12rdxGVQIqyXGHxGNE1SHejrCovpvW2jyO2l
- WqaKFZbeCWFuyDZ24r0VNGV0NogEL0GOSbFCqJxqJ/snQALk3rk5kId1Ns1BHNyDZ0oBuCssY
- mnbbzP9Yh8oqk7b7zHaAmhMjUQcl6WSrJt4ASENjFqv8Y6NtdhODfQv+JF3J2J9rOYHCRH8fs
- KQ9L0M0TKcNZUyqcnNVun+UZEZUxubACqGPpvppFL6G4Y=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zjntq3jSFL2Uud9i@gauss3.secunet.de>
 
-Can any wording adjustments be a bit nicer?
+On Tue, May 07, 2024 at 11:00:27AM +0200, Steffen Klassert wrote:
+> On Sat, May 04, 2024 at 03:36:57PM +0100, Simon Horman wrote:
+> > 
+> > Hi Steffen, all,
+> > 
+> > This comment is not strictly related to this pull request
+> > and certainly not intended to impede progress of it towards upstream.
+> > 
+> > However, while looking over it I noticed that Sparse flags a rather
+> > large number of warnings in xfrm code, mostly relating to __rcu annotations.
+> > I'm wondering if, at some point, these could be addressed somehow.
+> 
+> Yes, maybe just start to not introduce new ones and then fix
+> existing ones over time. I'll have a look on how I can integrate
+> Sparse checks in my workflow.
 
+Thanks Steffen,
 
-> When a reset occurring, it's supposed to recover user's configuration.
-
-An user configuration should be recovered after a reset occurred.
-
-
-=E2=80=A6
-> and will be scheduled updated. Consider the case that reset was happened
-
-and the schedule will be updated. Consider also the case that reset happen=
-ed
-
-
-=E2=80=A6
-> To avoid aboved situation, this patch introduced =E2=80=A6
-
-* Would you like to avoid another typo here?
-
-* How do you think about to use imperative wordings for improved change de=
-scriptions?
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/=
-Documentation/process/submitting-patches.rst?h=3Dv6.9-rc7#n94
-
-Regards,
-Markus
+That would be much appreciated.
 
