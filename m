@@ -1,94 +1,132 @@
-Return-Path: <netdev+bounces-93983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 565AC8BDD18
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:25:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 877E98BDD4A
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 10:41:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C0001F24019
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 08:25:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A99881C21898
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 08:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED1BD13C909;
-	Tue,  7 May 2024 08:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D583314D2B6;
+	Tue,  7 May 2024 08:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="uFrcjpQY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iQ9X2413"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FFD513C8FE;
-	Tue,  7 May 2024 08:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C4F13C9A6;
+	Tue,  7 May 2024 08:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715070313; cv=none; b=ufEQSr23KvLo1HJwx57O90S5hje+GqzXcn0JYndxqGYZ+Rwj2gI5d3t2yL/L5N97ec6YMrjjtKEt7E4LsRCR4xJ6HLzyTB16KemLZU8XKr3TjTmWNj0iAR/cjD226DLuPyakYeHspNzquwuOiOKSy+d0SAPQU3tZjsVqHBkCaug=
+	t=1715071286; cv=none; b=HhLLv+Qx/9OpWcAG6mzHtB6RGxM0jywVAENWimPOTP/8ik0Ta8T3pnkl74bvC0TMtEX47ZeBVWr499NfVZu8c0RPFJQRJXj2MePRjshVEHCwWUZfpTpVuerjEEbTsxtulhqGpU6kQnEBJciTiC4iOVM4zoC+uyNP6KYrx3TJwl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715070313; c=relaxed/simple;
-	bh=aO/h+F2//p2M80GykcrtBjuSGZbnrmUKjiredPkuMzg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gHapn0aaeds8r7TajkI0ta6tQJg8k7zPwd7CV7XBlysyVeaXLbiIa5xciKViLuug/M3OtnGyAT2deqRJMopxqXhiA4eOfYo6UOItTTM1j0vhdPX/ghTiouZfIEjlknk4suA9vo2ZSXM3ABekJsG2W6ZuJuxXLFP0+W0q+S0IyhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=uFrcjpQY; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=F5DZY8gU0+Joi+JnnaHOWLrQHFkVrDgQianYT2ENUU8=; b=uFrcjpQYVjV7Qo7+4gBRP9/uln
-	tRp2hHvTWZq3OjM10nvDmB0FX2qA23iNLxx/dk1VWPNglPXHV8ooivvU9olm9f1NzS79jp7x2Ql03
-	0cWYggr9wCynIE3GSjn54yklLtQuPJ1GGh20wwxoUikGR588wNN/JCG4i7hnIGQwJ2NFAZsZLeOk2
-	cZNFp8o9XxMkG0rJb/Oxpfw/vXVWT6DM7f22KLh/bMADx0SouTSAR6UsN+6GpcfacDtdko4NG17Jk
-	ZOKY8OGW+QFsVN7mJOIXUBUU3dKll5r76pbhrcy9epbFXWxq7NoGouX+wiwAPJRXcFcHirUa94cxw
-	umUkP4lA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50346)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1s4G8G-0003RS-0R;
-	Tue, 07 May 2024 09:25:04 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1s4G8F-0000BQ-M4; Tue, 07 May 2024 09:25:03 +0100
-Date: Tue, 7 May 2024 09:25:03 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, netdev@vger.kernel.org,
-	lxu@maxlinear.com, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next] net: phy: add wol config options in phy device
-Message-ID: <ZjnlX9/lm6OK39zl@shell.armlinux.org.uk>
-References: <20240430050635.46319-1-Raju.Lakkaraju@microchip.com>
- <7fe419b2-fc73-4584-ae12-e9e313d229c3@lunn.ch>
- <ZjSwXghk/lsT6Ndo@HYD-DK-UNGSW21.microchip.com>
- <4a565d54-f468-4e32-8a2c-102c1203f72c@lunn.ch>
+	s=arc-20240116; t=1715071286; c=relaxed/simple;
+	bh=A/2Xf3e32e9UcB7o3tAbPoI2bnWij43ER/ZIruQceYo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YcJ4N8cGWRmgYo8h0RXjiWXFpNHOLTP0C+LzBIJEWYHusZxQX6oiY1PBRB698T5rbmb3bU4GO20S2e/tGAOmb3jN0JbXHNW6NfKf0R0fKsRH+j1hoWbtf+WmndjITe/rNuf7WwuvqghLEXhd8ycnLU7NDU2ZhyGfHzuOXJ1AfFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iQ9X2413; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3631CC2BBFC;
+	Tue,  7 May 2024 08:41:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715071286;
+	bh=A/2Xf3e32e9UcB7o3tAbPoI2bnWij43ER/ZIruQceYo=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=iQ9X2413o12RNjv+LXmSF9xIWMTJLb+TyP6gNMFjhfDCeKmYP524WeQDYWjfwD6R6
+	 /2+vg2DR02wsPevCQ2p0RM5UBympySJaLd5+FDMTZEpECVqD27778YNd/nbQyRpQN5
+	 DC4bm890/NGAwq68cZrv6EFqQbsenJqCdlCnR3Jh7IvCvL+Lf1lx0z99VPMeCQZhsv
+	 g32RPxYkUS6fFdOImpvBCYAPD9bewsdKjqrJfnPjbIZ+ezsJejLPKtaLYgmDtiUhNW
+	 mgQTtjs1I7ejCaiXPAu/PWDD1UL7ILw9AEMem1DQHNh1isdg7ciiY7U0KeYbXtFcTH
+	 MlS5c2SQgBQcg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C95C10F1A;
+	Tue,  7 May 2024 08:41:26 +0000 (UTC)
+From: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kernel.org>
+Date: Tue, 07 May 2024 10:40:39 +0200
+Subject: [PATCH net-next] ax25: Remove superfuous "return" from
+ ax25_ds_set_timer
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4a565d54-f468-4e32-8a2c-102c1203f72c@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240507-jag-fix_void_ret_ax25-v1-1-507fb246f192@samsung.com>
+X-B4-Tracking: v=1; b=H4sIAAbpOWYC/x2MQQqAIBAAvxJ7bsEksfpKhIhutR0sVEKI/p50H
+ JiZBxJFpgRT80CkmxOfoULXNuB2GzZC9pVBCtkLJTQedsOVi7lP9iZSNrZIhU4PnVDe+VWPUNs
+ rUpX+7wyBMgYqGZb3/QAxNoBicQAAAA==
+To: Joerg Reuter <jreuter@yaina.de>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Joel Granados <j.granados@samsung.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1502;
+ i=j.granados@samsung.com; h=from:subject:message-id;
+ bh=dQzZAU/bAVlITUmjSe4Wlgex023rGgXtHdNKuKlNEBE=;
+ b=owJ4nAHtARL+kA0DAAoBupfNUreWQU8ByyZiAGY56TMcXuz2REsRh/+4pIWo6jsuY6Qwkwzip
+ jwFEVTLvwjGoIkBswQAAQoAHRYhBK5HCVcl5jElzssnkLqXzVK3lkFPBQJmOekzAAoJELqXzVK3
+ lkFPKhoL/25nUOLnvXhgHq5xRiJ8Ej/14vrShYBRPYQpM2FsDQdr+1aTDO+rbYrGsLncbC4tLCU
+ KHMrI7oDjS6Mdl59SH0avR8d2BpA0Z8xH4JeQe1ThRH9u2JGi5G1jL/ObpPV487YwB3lAeqPoZm
+ T7ONh3gyzKn7f0OvFk1Z+rM73hQvZchfXng4jFI0hVFIanhNZTUZhrrMh89B2HmcqersZgTdXmt
+ Bj1cQxX2wfu8+7JTyDkt2wWttN9XQV2mAp3tP+7tgiZrLkTCnHl8jsIkoE+8mP4wbbldcKRi/me
+ bUVv0+Itbzc7pxsVr2fmclidQzfUqNW2ULrPLL5ZnLisUnXtP7Q+5RGJuy+rxt5R1E7wDEYs9bT
+ L/tleobFn97hXmsR1uIonaxK1WtYvIr8E7oVFzV38Ltf13/Fx3jKuyZkN7joYi3pWh+NA4wSnAc
+ qwNtSPwC51O+p14SQP076eFhO7VMYIDnLRDD3gxuMHte8VnxVt5k1W2JwpSylYPYMHo9nEOMpT8
+ lw=
+X-Developer-Key: i=j.granados@samsung.com; a=openpgp;
+ fpr=F1F8E46D30F0F6C4A45FF4465895FAAC338C6E77
+X-Endpoint-Received: by B4 Relay for j.granados@samsung.com/default with
+ auth_id=70
+X-Original-From: Joel Granados <j.granados@samsung.com>
+Reply-To: j.granados@samsung.com
 
-On Mon, May 06, 2024 at 03:28:33AM +0200, Andrew Lunn wrote:
-> You should first answer Russell question. It could be a totally
-> different scheme might come of of the discussion with Russell.
+From: Joel Granados <j.granados@samsung.com>
 
-Yes please. We definitely need to get to the bottom of what is going
-on here _before_ we come up with a solution.
+Remove the explicit call to "return" in the void ax25_ds_set_timer
+function that was introduced in 78a7b5dbc060 ("ax.25: x.25: Remove the
+now superfluous sentinel elements from ctl_table array").
 
-If we don't understand the problem, whatever fix gets proposed is
-probably going to be nothing more than a bodge job - and then someone
-else is going to have a problem and propose another bodge job and so
-we'll end up with bodge job on top of more bodge jobs.
+Signed-off-by: Joel Granados <j.granados@samsung.com>
+---
+I did not include a "Fixes:" tag as this (IMO) should not be backported
+into a stable kernel. I'm assuming that net-next is going to be merged
+into mainline as is and therefore I linked to a specific commit ID (get
+back to me if I should do something different)
 
+This comes after a review from Dave Carpenter [1] to an already accepted
+patchset [2]
+
+[1] https://lore.kernel.org/all/20240501-jag-sysctl_remset_net-v6-8-370b702b6b4a@samsung.com
+[2] https://patchwork.kernel.org/project/netdevbpf/patch/20240501-jag-sysctl_remset_net-v6-1-370b702b6b4a@samsung.com/ 
+---
+ net/ax25/ax25_ds_timer.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/net/ax25/ax25_ds_timer.c b/net/ax25/ax25_ds_timer.c
+index c50a58d9e368..c4f8adbf8144 100644
+--- a/net/ax25/ax25_ds_timer.c
++++ b/net/ax25/ax25_ds_timer.c
+@@ -55,7 +55,6 @@ void ax25_ds_set_timer(ax25_dev *ax25_dev)
+ 	ax25_dev->dama.slave_timeout =
+ 		msecs_to_jiffies(ax25_dev->values[AX25_VALUES_DS_TIMEOUT]) / 10;
+ 	mod_timer(&ax25_dev->dama.slave_timer, jiffies + HZ);
+-	return;
+ }
+ 
+ /*
+
+---
+base-commit: 179a6f5df8dab7d027aa73a302d8506c6533e463
+change-id: 20240507-jag-fix_void_ret_ax25-c78105dcdf79
+
+Best regards,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Joel Granados <j.granados@samsung.com>
+
+
 
