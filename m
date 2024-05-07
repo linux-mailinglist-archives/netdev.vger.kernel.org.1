@@ -1,188 +1,193 @@
-Return-Path: <netdev+bounces-94234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4282B8BEAED
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 19:56:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B4D38BEAF6
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 19:57:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B09631F223FE
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 17:56:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 222A228268A
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 17:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E3E16D316;
-	Tue,  7 May 2024 17:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816B216C864;
+	Tue,  7 May 2024 17:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="lIpXG8KP"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="uFT5Pj6i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378601607A7
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 17:56:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA3C16C84E;
+	Tue,  7 May 2024 17:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715104609; cv=none; b=oyWLd5Mfi8WMuRt8ofQHKBwPP6s5x3+TefRMvSlh3vjRX4PH//j9VeRjFvIU0ezKfqTX2Bck/E/hmdRAWB+hrzA5dPn2Di0pJc3gXRyqdawxrj4c8E5qhpx2NOs6hWLI3ofdOFl0vUPopwKf4x7Tyd2UOBvEse7UbgzdfVRAu+4=
+	t=1715104630; cv=none; b=UupR/yITElx0z5pG/Jyi3VEzI1dxh3z4IllnvZ+1iVj1EUUJE8vhoDpgTxBp8jG+SBCMUKAy2yGe5d2H4H62TLQtiEZX3Di5/Q3wiX7TRmu5U0v9rxFIAI+ENPw6bd8EbQPUilm2d7nKZFmo10I541UcKTFAAJHAOjpwWKmUo+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715104609; c=relaxed/simple;
-	bh=2WVuSd42XVbejvGzvbE/XdmU6u71Lu82dpSc5WCFvqQ=;
+	s=arc-20240116; t=1715104630; c=relaxed/simple;
+	bh=r10QfMSDmh85E+Oesb+yGZtr7oLwmQ4ppUfBKTBED/o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mf4U0wlT1grSVjxZ14XkjaiLCMYCkSwjSIDGdXDwKR/1KNQ49jqlG0+Uh/xlTScVDRf40k6DRKSgY8OsGJ9bFUgogyXq8nIf4T3Ba6p8I7vZynzQnW5e+ryy2kF2VQyIDbF8iwlKdwg1EQtClr1ehXbTUOtWvOdSjDsa3FP9YD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=lIpXG8KP; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7928c351c6cso291914285a.3
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 10:56:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1715104606; x=1715709406; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wu9WbbBrtYOSeavstfMRlNJlMm/0/4MuzUdv+q+e+RU=;
-        b=lIpXG8KPmCMXpUh7JZ5V/2Srhwf1899y4M6b9Z4m2rUYLhAVXEKRAj2RbS/QyN5GNf
-         2R8Y4+kgBdJGnCvROMTlZNIII1WTss+Y5khV/PgrQo+7sFWO045oo8Cqya9djusUOWdw
-         LjZeH6XKCmyZLORSKOBUwlvwrfH4qmIGzYQkzC0FW+KOzcd1qDlIaV378bwVFn5loS4F
-         wqiIsJ0r9R80fgWfGYfaMSewGq3VGJUQqs2m7pEBn1QuVVPuWPc+JHx7ApEjyrIF6254
-         hWGm76/BZ+9Oo3kYlmqV0lfJs1bxJo0/Ebfpx75oRZa2ZnfSRTfebpn97TzpAwwECN+Z
-         +lTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715104606; x=1715709406;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wu9WbbBrtYOSeavstfMRlNJlMm/0/4MuzUdv+q+e+RU=;
-        b=miQ83QVCmlRLV43F2q5yQAlnMc6i9iRjJ/qhvgp6IisA1br1QGqy3asJYw9G9grSgT
-         Mo2S1evMtj/h+msX2Gw0sr/NtkRgnnTprYcuwdyz/v91Mcp6wLPyo8e5Jqckm90s8Q0v
-         2cXPFe7D2leTIEkunpNTc1N6CdzbyznTWBcHnyd9eH1wEJqF+lVmCCFNQQbCXRO8ZXvT
-         WG0qY7RHz2BvlMWE6nChcVxXaiIZg5i6E8Hii0z7JJSdtKyMv/IX7ro4HOqJWWGUlKqo
-         5C166CmitGYZQ21Ykf4yIw1TcEuNd5c3USkwC/r8dokRw4ZQJ9/U0VDtt83TUBhQ0ndM
-         av6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU005IDCGGR6jbIgVEeXW6uJlrrT6y6dGxGHBdXDf6VwSUqpKPXkekr4LJ1ttj43QyG6F8ujhg4H1m0HP6HLrln+cFVLdBi
-X-Gm-Message-State: AOJu0YzDVu945W2BQTMW3k4RelA42PWxSAsxViEksJfWBnmA60O48omP
-	irb5/ixSnm+lrL1Ld3o31O1xObRxifDwG6hkiyQWTQHoKzijsUCRbwjX4CXel08=
-X-Google-Smtp-Source: AGHT+IGCzj6XuEJPrKRVtB6HNDvjYgTlCCuf3Mc1RlNFJ90uDv9nZUQTLULizJXrrgrWoRFfeuAAuA==
-X-Received: by 2002:a05:620a:5a4b:b0:790:7345:2791 with SMTP id af79cd13be357-792b274eabbmr46464985a.56.1715104606118;
-        Tue, 07 May 2024 10:56:46 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id bm34-20020a05620a19a200b0078ec3aa9cc7sm5127446qkb.25.2024.05.07.10.56.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 10:56:45 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1s4P3U-00022m-Vn;
-	Tue, 07 May 2024 14:56:44 -0300
-Date: Tue, 7 May 2024 14:56:44 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Mina Almasry <almasrymina@google.com>,
-	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Matt Turner <mattst88@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Florian Westphal <fw@strlen.de>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
-	Arseniy Krasnov <avkrasnov@salutedevices.com>,
-	Aleksander Lobakin <aleksander.lobakin@intel.com>,
-	Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Richard Gobert <richardbgobert@gmail.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Abel Wu <wuyun.abel@bytedance.com>,
-	Breno Leitao <leitao@debian.org>, David Wei <dw@davidwei.uk>,
-	Shailend Chand <shailend@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Subject: Re: [RFC PATCH net-next v8 02/14] net: page_pool: create hooks for
- custom page providers
-Message-ID: <20240507175644.GJ4718@ziepe.ca>
-References: <20240403002053.2376017-3-almasrymina@google.com>
- <ZjH1QaSSQ98mw158@infradead.org>
- <CAHS8izM0=xc2UhUxhnF_BixuFs5VaDV9W1jbso1K+Rg=35NzeA@mail.gmail.com>
- <ZjjHUh1eINPg1wkn@infradead.org>
- <20b1c2d9-0b37-414c-b348-89684c0c0998@gmail.com>
- <20240507161857.GA4718@ziepe.ca>
- <ZjpVfPqGNfE5N4bl@infradead.org>
- <CAHS8izPH+sRLSiZ7vbrNtRdHrFEf8XQ61XAyHuxRSL9Jjy8YbQ@mail.gmail.com>
- <20240507164838.GG4718@ziepe.ca>
- <0d5da361-cc7b-46e9-a635-9a7a4c208444@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mf+XCbRhl93QHxqjX6hfdLOhpffJpaNlbAgjaxmEYe3z0sKIJrXt94V3/KyvoVPoiujoJGx+5oY+EE9G6xn1MrIlQspGyGIi0wa9+kMPYmrmjgyn18M3o1u1NoF4YrtJ30RjOnBY3L1lgyedbTU/ELSrpPLk2j0HjjMFjzm5pYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=uFT5Pj6i; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=aha/0e4Br4Rhm5frPp17CLqnlYgVg7Rrr8RUbo7VEZg=; b=uFT5Pj6itZA2g5wou/p8YZG8B9
+	ohZOhRHeF6Hwcv5kg+tSIXvUG3wXFVmFlTUnn1TQhc+CxNPoI+6GAe7F4NMHNj9mX/XsVWo4oCvIS
+	kgeOgZWEhjjPeLv178lWHwM+1cMx5bbdof2VyKoh75p0BpbAMTI2eTXezSRl1KrVz4LaZZnOKOeU/
+	2zbCf7lIwzGvob60u6zdxwT6GrgvGqgs9UxiR5j5zUI0PHFEttV8MIamG7Y0mveXwmMlerpzCRCqs
+	CDMUQHBwh2HqnXA25GoYj+JzQ4kFvBuK9rG78m6aAy5atEbAhuJTrV7UMdjTndV0iInBrzr0KZmJ/
+	Cd0QvUfw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54408)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1s4P3h-00046z-0B;
+	Tue, 07 May 2024 18:56:57 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1s4P3f-0000Vg-2V; Tue, 07 May 2024 18:56:55 +0100
+Date: Tue, 7 May 2024 18:56:54 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Ronnie.Kunin@microchip.com
+Cc: Raju.Lakkaraju@microchip.com, andrew@lunn.ch, netdev@vger.kernel.org,
+	lxu@maxlinear.com, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next] net: phy: add wol config options in phy device
+Message-ID: <ZjprZjKfewKRqRJL@shell.armlinux.org.uk>
+References: <20240430050635.46319-1-Raju.Lakkaraju@microchip.com>
+ <7fe419b2-fc73-4584-ae12-e9e313d229c3@lunn.ch>
+ <ZjO4VrYR+FCGMMSp@shell.armlinux.org.uk>
+ <ZjoAd2vsiqGhCVCv@HYD-DK-UNGSW21.microchip.com>
+ <ZjoWSJNS0BbeySuQ@shell.armlinux.org.uk>
+ <PH8PR11MB79658C7D202D67EEDDBD861495E42@PH8PR11MB7965.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <0d5da361-cc7b-46e9-a635-9a7a4c208444@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <PH8PR11MB79658C7D202D67EEDDBD861495E42@PH8PR11MB7965.namprd11.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, May 07, 2024 at 06:25:52PM +0100, Pavel Begunkov wrote:
-> On 5/7/24 17:48, Jason Gunthorpe wrote:
-> > On Tue, May 07, 2024 at 09:42:05AM -0700, Mina Almasry wrote:
-> > 
-> > > 1. Align with devmem TCP to use udmabuf for your io_uring memory. I
-> > > think in the past you said it's a uapi you don't link but in the face
-> > > of this pushback you may want to reconsider.
-> > 
-> > dmabuf does not force a uapi, you can acquire your pages however you
-> > want and wrap them up in a dmabuf. No uapi at all.
-> > 
-> > The point is that dmabuf already provides ops that do basically what
-> > is needed here. We don't need ops calling ops just because dmabuf's
-> > ops are not understsood or not perfect. Fixup dmabuf.
+On Tue, May 07, 2024 at 04:18:27PM +0000, Ronnie.Kunin@microchip.com wrote:
+> > So you want the MAC driver to access your new phydev->wolopts. What if there isn't a PHY, or the PHY
+> > is on a pluggable module (e.g. SFP.) No, you don't want to have phylib tracking this for the MAC. The
+> > MAC needs to track this itself if required.
 > 
-> Those ops, for example, are used to efficiently return used buffers
-> back to the kernel, which is uapi, I don't see how dmabuf can be
-> fixed up to cover it.
+> There is definite value to having the phy be able to effectively
+> communicate which specific wol events it currently has enabled so the
+> mac driver can make better decisions on what to enable or not in the
+> mac hardware (which of course will lead to more efficient power
+> management). While not really needed for the purpose of fixing this
+> driver's bugs, Raju's proposed addition of a wolopts tracking variable
+> to phydev was also providing a direct way to access that information.
+> In the current patch Raju is working on, the first call the lan743x
+> mac driver does in its set_wol() function is to call the phy's
+> set_wol() so that it gives the phy priority in wol handling. I guess
+> when you say that phylib does not need to track this by adding a
+> wolops member to the phydev structure, if we need that information
+> the alternative way is to just immediately call the phy's get_wol()
+> after set_wol() returns, correct ?
 
-Sure, but that doesn't mean you can't use dma buf for the other parts
-of the flow. The per-page lifetime is a different topic than the
-refcounting and access of the entire bulk of memory.
+Depends what the driver wants to do.
 
-Jason
+From the subset of drivers that implement WoL and use phylib:
+
+drivers/net/ethernet/socionext/sni_ave.c:
+	ave_init()
+	ave_suspend() - to save the wolopts from the PHY
+	ave_resume() - to restore them to the PHY - so presumably
+		working around a buggy PHY driver, but no idea which
+		PHY driver because although it uses DT, there's no way
+		to know from DT which PHYs get used on this platform.
+
+drivers/net/ethernet/ti/cpsw_ethtool.c:
+	does nothing more than forwarding the set_wol()/get_wol()
+	ethtool calls to phylib.
+
+drivers/net/ethernet/freescale/enetc/enetc_ethtool.c:
+	enetc_set_wol() merely sets the device for wakeup as appropriate
+	based on the wolopts after passing it to phylib.
+
+drivers/net/ethernet/microchip/lan743x_ethtool.c:
+	lan743x_ethtool_set_wol() tracks the wolopts *before* passing
+	to phylib, and enables the device for wakeup as appropriate.
+	The whole:
+	"return netdev->phydev ? phy_ethtool_set_wol(netdev->phydev, wol)
+                        : -ENETDOWN;"
+	thing at the end is buggy. You're updating the adapters state
+	and the device wakeup enable, _then_ checking whether we have a
+	phydev. If we don't have a phydev, you're then telling userspace
+	that the request to change the WoL settings failed but you've
+	already changed your configuration!
+
+	Moreover, looking at lan743x_ethtool_get_wol(), you set
+	WAKE_MAGIC | WAKE_PHY irrespective of what the PHY actually
+	supports. This makes a total nonsense of the purpose of the
+	supported flags here.
+
+	I guess the _reason_ you do this is because the PHY may not be
+	present (because you look it up in the .ndo_open() method) and
+	thus you're trying to work around that... but then set_wol()
+	fails in that instance. This all seems crazy.
+
+	Broadcom bcmgenet also connects to the PHY in .ndo_open() and
+	has sane semantics for .get_wol/.set_wol. I'd suggest having
+	a look at that driver...
+
+drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c:
+	bcmgenet_set_wol() saves the value of wolopts in its
+	private data structure and bcmgenet_wol_power_down_cfg()/
+	bcmgenet_wol_power_up_cfg() uses this to decide what to
+	power down/up.
+
+Now, let's look at what ethtool already does for us when attempting
+a set_wol() peration.
+
+1. It retrieves the current WoL configuration from the netdev into
+   'wol'.
+2. It modifies wol.wolopts according to the users request.
+3. It validates that the options set in wol.wolopts do _not_ include
+   anything that is not reported as supported (in other words, no
+   bits are set that aren't in wol.supported.)
+4. It deals with the WoL SecureOn™ password.
+5. It calls the netdev to set the new configuration.
+6. If successful, it updates the netdev's flag which indicates whether
+   WoL is currently enabled _in some form_ for this netdev.
+
+Ergo, network device drivers are *not* supposed to report modes in
+wol.supported that they do not support, and thus a network driver
+can be assured that wol.wolopts will not contain any modes that are
+not supported.
+
+Therefore, if a network device wishes to track which WoL modes are
+currently enabled, it can do this simply by:
+
+1. calling phy_ethtool_set_wol(), and if that call is successful, then
+2. save the value of wol.wolopts to its own private data structure to
+   determine what it needs to do at suspend/resume.
+
+This should be independent of which modes the PHY supports, because the
+etwork driver should be using phy_ethtool_get_wol() to retrieve the
+modes which the PHY supports, and then augmenting the wol.supported
+mask with whatever additional modes the network driver supports
+beyond that.
+
+So, there is no real need for a network driver to query phylib for the
+current configuration except possibly during probe or when connecting
+to its PHY.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
