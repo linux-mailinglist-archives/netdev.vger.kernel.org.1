@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-94319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B0908BF202
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 01:40:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E9E38BF24C
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 01:46:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D2E71C23602
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 23:40:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C872A2845AD
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 23:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9D414E2D0;
-	Tue,  7 May 2024 23:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBF519DF52;
+	Tue,  7 May 2024 23:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ALOE7BSB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qtu38uwE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A8314D2B4;
-	Tue,  7 May 2024 23:11:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D55199EAF;
+	Tue,  7 May 2024 23:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715123479; cv=none; b=GuRu5ZR55px00jk9j1OZVV30hiIrWBG4UGwniW0lttaHjWTbXz0WqgEi3PnRnMkE5/laCkVq5VrAgl3TUSESy8aMox7AkasL80MUbqeUbFhUlbW8HFCeDwQIbatH/fGIBG+ZpRvR6DsLVIDxuhsJFrEvLXe5fcXccTQfeyp+Hy8=
+	t=1715123571; cv=none; b=NlhCRVdjyE4YldwptK19wSJriCl8WuIwetN34qA9+AuQ3GuKIExviPjldNOc0GzOdU97XxZNlULlOSaU+CkxR9v2gyVpZUUw+cUtO511aG46R0DpDx0ZDoGsKBKIng2X79Z7sKvcOXCBfSnI388VzhCm8ARZXqib3MCbBhTWGt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715123479; c=relaxed/simple;
-	bh=P9+Xv74RFVSFodo/2jDBWm/cubv4cnUm6GU0sms+K4A=;
+	s=arc-20240116; t=1715123571; c=relaxed/simple;
+	bh=9MpYwDDygwbSAzolG9in6+os4KOgRZ056ZMi1p6g0lc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YW8GYkJfwdE+xNTJBcf3D2qg6O5Ca5ghPy5hOog5J0qWWduf70RxD7zXCFY523GyEU97T3WCbGo0aXr5YU2D5qDi4Vd+k4g3PJ05UPXhda0XrbqmRe9mmaVQxanDfi350eDD5bc1HGLkl6ulBkYKA/2nx3lArkIFSaTB1rrvUms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ALOE7BSB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 524D5C2BBFC;
-	Tue,  7 May 2024 23:11:17 +0000 (UTC)
+	 MIME-Version:Content-Type; b=KwAlZ5E43mV04et4xO7r5UTgwWoQz1Jqxf8N6dlR4SUPqFvbdKJZebrFALlQt6czYI7XrUnPHtTupq0nEBzRc6G920CjeRkI+oyUymGqt6xi2V+aoK3ldqaHCWpdBWCzAWZ7djW2XKaXOiRZ2ETnA3uPqBXvefv2RIxcijFdm5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qtu38uwE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06EB7C4AF17;
+	Tue,  7 May 2024 23:12:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715123478;
-	bh=P9+Xv74RFVSFodo/2jDBWm/cubv4cnUm6GU0sms+K4A=;
+	s=k20201202; t=1715123571;
+	bh=9MpYwDDygwbSAzolG9in6+os4KOgRZ056ZMi1p6g0lc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ALOE7BSBDL0X3wIPJqLiAQGTMav/0Y8vedhnAHw/pGm+tfE4e2NuNN7v2wlvW9ox7
-	 MssKT6kE0PyDqNrz2VfBkOtUL/iRZBn2TBHRTvPQlNwliZh6r70C6LHozpuLjNExa8
-	 exD+djQdluPiCIxlH145LoI/mGHVKH5BSY79hJCZVUCmWjSxOWIrkyoxe4pDDEpXG0
-	 2T1c7/KVIygmewX2tKPnTb0yX9BK3OzZHox/f37Z8yP20juC8YrfUNU50x9d1nTIdC
-	 lGFGKRRL47F4PnbxgroqsB/cDHV1wmFebQ/3iNzNCAT4uz5zf1XMmu5WQDEQiias6a
-	 P6xRQOFLoJ7JA==
+	b=qtu38uwEp8OpArSEDZh5e7IfQZXyJ8QkguCG5TewsoY4jx10FwPDrjvqU6PIyM5/W
+	 FORHVhwAh3B278Z/6vMdv9odkEpA0mpXp+o9WDxz8+NwY8O1j/tPI/NOZHCRLxtzrN
+	 U911HVNZUYbiyLGer206VUrvFV2uu7svmCB4f2eLGcYNlK16Gc23POxxi/MBVWE5yB
+	 OwwTd/egqoCuEOf7EZ7c0OuvVb+eXhLymE65G9hdbN/X/5lygx75xFb6Zb4O9nlkJj
+	 fy+H7QZBipslMozF+Xg+oeOQLQIFLorxEENQ7kaSVFcj2jWiv4xakcPFIGI4u1bz8e
+	 sOk/xNGs3Mtbg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -53,12 +53,12 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 23/43] net: qede: sanitize 'rc' in qede_add_tc_flower_fltr()
-Date: Tue,  7 May 2024 19:09:44 -0400
-Message-ID: <20240507231033.393285-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 11/25] net: qede: sanitize 'rc' in qede_add_tc_flower_fltr()
+Date: Tue,  7 May 2024 19:11:58 -0400
+Message-ID: <20240507231231.394219-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240507231033.393285-1-sashal@kernel.org>
-References: <20240507231033.393285-1-sashal@kernel.org>
+In-Reply-To: <20240507231231.394219-1-sashal@kernel.org>
+References: <20240507231231.394219-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,7 +68,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.30
+X-stable-base: Linux 6.1.90
 Content-Transfer-Encoding: 8bit
 
 From: Asbjørn Sloth Tønnesen <ast@fiberby.net>
@@ -93,7 +93,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/qlogic/qede/qede_filter.c b/drivers/net/ethernet/qlogic/qede/qede_filter.c
-index a5ac21a0ee33f..8ecdfa36a6854 100644
+index 3010833ddde33..76aa5934e985b 100644
 --- a/drivers/net/ethernet/qlogic/qede/qede_filter.c
 +++ b/drivers/net/ethernet/qlogic/qede/qede_filter.c
 @@ -1868,8 +1868,8 @@ int qede_add_tc_flower_fltr(struct qede_dev *edev, __be16 proto,
