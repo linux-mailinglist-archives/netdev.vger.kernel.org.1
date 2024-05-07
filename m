@@ -1,67 +1,63 @@
-Return-Path: <netdev+bounces-94290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 706718BF051
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 01:02:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F8578BF065
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 01:04:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C3C8283D80
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 23:02:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0ACB1C21FBD
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 23:04:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C8B08174F;
-	Tue,  7 May 2024 22:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D19981AA3;
+	Tue,  7 May 2024 22:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eT6bHF81"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qrqi1D3V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3497181AB2;
-	Tue,  7 May 2024 22:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30057EF1F;
+	Tue,  7 May 2024 22:59:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715122701; cv=none; b=NL9Xiehx9EwJ4E1rKGYF/4ScO3sb9hSJiic34NqQkIYpUhlhpkU6aC6fY+vtqMh2LM/b8MTowRGVzNf7+U6WW3LF8WPpt9KZ74EctHgLN5Hx2DKx2rsmY03r1rymqiMnc0YMP0uPHeRQRQURRuLRHeD6wZNRDgDnlyIn/w98ecc=
+	t=1715122753; cv=none; b=U7sl7JS6TR1QE1UGSg9DzNwfDF8/7AppxOmgLMlSSHSyGYfktYMKE5sjBYPyIUlm+YPR6hqPXfd2M/+M+J/EmUpUJaqe9wnX3MbUtXo+/dgeqHUQm7K0dFyyrcPhJRLr6AT8iexGQ6FhBzEAByy3oPTtIzcn/JjF11qBLDCvNpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715122701; c=relaxed/simple;
-	bh=d/Q00s+rDTzVJSbw78LlcHVSTaOdJicgjn0WFYA08qI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kFa++4WOpi+G8nUIISitMDYifsTvGa+Z8DJNKwg2CX5fzzIH/RuzgVo2c2CQKwKkYONmaqJ9C65qgqWH2/7TfieYer4/1x+rHKy39D+dndeK2DTSsPvhECnZsQWrhsvsmGwGKwNXSpKP360BSke1x7R6USYr78ubR2tXqVQGIRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eT6bHF81; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99D23C2BBFC;
-	Tue,  7 May 2024 22:58:19 +0000 (UTC)
+	s=arc-20240116; t=1715122753; c=relaxed/simple;
+	bh=/gwbIbp8a6r+iZdpA5zQG/OUP6iPP5MDBaszErJJRTc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sLcMq/okezmOzVHcedp67ze0SSMnivzbXVaKmmGeyGtZ2kwG/SeVTRFJyzD0vSgEa3I2teNdxc1oMN8EA74WCnc7Fj7ZFMloNUp5ssYqGW4DHcoik12qHTmw4rJpH5gPfS0Aefr5NRAK5fO5iWTDCJTqJ4qE5gt3C97Bibzord8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qrqi1D3V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70FFDC2BBFC;
+	Tue,  7 May 2024 22:59:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715122701;
-	bh=d/Q00s+rDTzVJSbw78LlcHVSTaOdJicgjn0WFYA08qI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eT6bHF81Kcmm/2vx7a+Ru0aP1glUGzrn3Q1EYRSioFwVZSdkb5e51mYTT2QIF3h7F
-	 nNr5rdXxqIYtqLgXG6Mxr6WsPaXXTCrPCXvnBP8xoC4sjSAEAT6Q7yx/vRelr5SaRn
-	 Q7Tde5I1qvO6ucZF1hMixRhZ6Qcdt4nOfZLTn2+k5PtRWus+9+s3Q3Nl4CjqMx9WcO
-	 9g5qX9Jled6Cn9RzoKwUhNEFlMpxUEHG6sm5Zfp6m5uOxdnCL56kMjaboFtQOy4X3S
-	 QHSFH8qL60sQcOmkMD+74W5ZvznWY9z5gk95urMtxxYKgPn0H8TLudIOS3DMAj2iE3
-	 o5otdKXUUASJw==
+	s=k20201202; t=1715122752;
+	bh=/gwbIbp8a6r+iZdpA5zQG/OUP6iPP5MDBaszErJJRTc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qrqi1D3VeFaMkwIAuHvC8P38YmjVDrtjFy66quQHTMIFEWZ1FuFs/t+cUyJl9zAV9
+	 WspF+Ou+C5rvbO57l0JwQEfe4AmxfE1F3CCfl9WAiOrGq8v+tdwVMOR+RFINBWa86u
+	 tk6qVFGtEJyipC8DmGfeSuZn3k1yyQ+k3QCxaRqdU+KIjACvaBlAbee+N7wAKxIifu
+	 nAwZHAxYdAPMNlwh0o2QBASNfMSYkjJiRCpJ21EO20n2SBOCBzjL66ta8tSRGEyyYg
+	 7+sJZQGpUoCkjsTAA3wsB4eSkge/PMiW4WBkPFrlIM8KhMWb/1gBVAyMQWzhB5ImCl
+	 dU3gTpc/u9uHQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Duanqiang Wen <duanqiangwen@net-swift.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Johannes Berg <johannes.berg@intel.com>,
+	syzbot+fdc5123366fb9c3fdc6d@syzkaller.appspotmail.com,
+	Dmitry Antipov <dmantipov@yandex.ru>,
 	Sasha Levin <sashal@kernel.org>,
-	jiawenwu@trustnetic.com,
-	mengyuanlou@net-swift.com,
+	johannes@sipsolutions.net,
 	davem@davemloft.net,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	maciej.fijalkowski@intel.com,
-	andrew@lunn.ch,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 16/23] Revert "net: txgbe: fix clk_name exceed MAX_DEV_ID limits"
-Date: Tue,  7 May 2024 18:56:42 -0400
-Message-ID: <20240507225725.390306-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 01/19] wifi: mac80211: don't use rate mask for scanning
+Date: Tue,  7 May 2024 18:58:23 -0400
+Message-ID: <20240507225910.390914-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240507225725.390306-1-sashal@kernel.org>
-References: <20240507225725.390306-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,40 +66,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.8.9
+X-stable-base: Linux 6.6.30
 Content-Transfer-Encoding: 8bit
 
-From: Duanqiang Wen <duanqiangwen@net-swift.com>
+From: Johannes Berg <johannes.berg@intel.com>
 
-[ Upstream commit edd2d250fb3bb5d70419ae82c1f9dbb9684dffd3 ]
+[ Upstream commit ab9177d83c040eba58387914077ebca56f14fae6 ]
 
-This reverts commit e30cef001da259e8df354b813015d0e5acc08740.
-commit 99f4570cfba1 ("clkdev: Update clkdev id usage to allow
-for longer names") can fix clk_name exceed MAX_DEV_ID limits,
-so this commit is meaningless.
+The rate mask is intended for use during operation, and
+can be set to only have masks for the currently active
+band. As such, it cannot be used for scanning which can
+be on other bands as well.
 
-Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Link: https://lore.kernel.org/r/20240422084109.3201-2-duanqiangwen@net-swift.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Simply ignore the rate masks during scanning to avoid
+warnings from incorrect settings.
+
+Reported-by: syzbot+fdc5123366fb9c3fdc6d@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=fdc5123366fb9c3fdc6d
+Co-developed-by: Dmitry Antipov <dmantipov@yandex.ru>
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Tested-by: Dmitry Antipov <dmantipov@yandex.ru>
+Link: https://msgid.link/20240326220854.9594cbb418ca.I7f86c0ba1f98cf7e27c2bacf6c2d417200ecea5c@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/mac80211.h |  3 +++
+ net/mac80211/rate.c    |  6 +++++-
+ net/mac80211/scan.c    |  1 +
+ net/mac80211/tx.c      | 13 +++++++++----
+ 4 files changed, 18 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index 29997e4b2d6ca..1b84d495d14e8 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -556,7 +556,7 @@ static int txgbe_clock_register(struct txgbe *txgbe)
- 	char clk_name[32];
- 	struct clk *clk;
+diff --git a/include/net/mac80211.h b/include/net/mac80211.h
+index 7c707358d15c8..a39bd4169f292 100644
+--- a/include/net/mac80211.h
++++ b/include/net/mac80211.h
+@@ -936,6 +936,8 @@ enum mac80211_tx_info_flags {
+  *	of their QoS TID or other priority field values.
+  * @IEEE80211_TX_CTRL_MCAST_MLO_FIRST_TX: first MLO TX, used mostly internally
+  *	for sequence number assignment
++ * @IEEE80211_TX_CTRL_SCAN_TX: Indicates that this frame is transmitted
++ *	due to scanning, not in normal operation on the interface.
+  * @IEEE80211_TX_CTRL_MLO_LINK: If not @IEEE80211_LINK_UNSPECIFIED, this
+  *	frame should be transmitted on the specific link. This really is
+  *	only relevant for frames that do not have data present, and is
+@@ -956,6 +958,7 @@ enum mac80211_tx_control_flags {
+ 	IEEE80211_TX_CTRL_NO_SEQNO		= BIT(7),
+ 	IEEE80211_TX_CTRL_DONT_REORDER		= BIT(8),
+ 	IEEE80211_TX_CTRL_MCAST_MLO_FIRST_TX	= BIT(9),
++	IEEE80211_TX_CTRL_SCAN_TX		= BIT(10),
+ 	IEEE80211_TX_CTRL_MLO_LINK		= 0xf0000000,
+ };
  
--	snprintf(clk_name, sizeof(clk_name), "i2c_dw.%d",
-+	snprintf(clk_name, sizeof(clk_name), "i2c_designware.%d",
- 		 pci_dev_id(pdev));
+diff --git a/net/mac80211/rate.c b/net/mac80211/rate.c
+index 9d33fd2377c88..a2bc9c5d92b8b 100644
+--- a/net/mac80211/rate.c
++++ b/net/mac80211/rate.c
+@@ -877,6 +877,7 @@ void ieee80211_get_tx_rates(struct ieee80211_vif *vif,
+ 	struct ieee80211_sub_if_data *sdata;
+ 	struct ieee80211_tx_info *info = IEEE80211_SKB_CB(skb);
+ 	struct ieee80211_supported_band *sband;
++	u32 mask = ~0;
  
- 	clk = clk_register_fixed_rate(NULL, clk_name, NULL, 0, 156250000);
+ 	rate_control_fill_sta_table(sta, info, dest, max_rates);
+ 
+@@ -889,9 +890,12 @@ void ieee80211_get_tx_rates(struct ieee80211_vif *vif,
+ 	if (ieee80211_is_tx_data(skb))
+ 		rate_control_apply_mask(sdata, sta, sband, dest, max_rates);
+ 
++	if (!(info->control.flags & IEEE80211_TX_CTRL_SCAN_TX))
++		mask = sdata->rc_rateidx_mask[info->band];
++
+ 	if (dest[0].idx < 0)
+ 		__rate_control_send_low(&sdata->local->hw, sband, sta, info,
+-					sdata->rc_rateidx_mask[info->band]);
++					mask);
+ 
+ 	if (sta)
+ 		rate_fixup_ratelist(vif, sband, info, dest, max_rates);
+diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
+index a52813f2b08cb..b68214f159838 100644
+--- a/net/mac80211/scan.c
++++ b/net/mac80211/scan.c
+@@ -636,6 +636,7 @@ static void ieee80211_send_scan_probe_req(struct ieee80211_sub_if_data *sdata,
+ 				cpu_to_le16(IEEE80211_SN_TO_SEQ(sn));
+ 		}
+ 		IEEE80211_SKB_CB(skb)->flags |= tx_flags;
++		IEEE80211_SKB_CB(skb)->control.flags |= IEEE80211_TX_CTRL_SCAN_TX;
+ 		ieee80211_tx_skb_tid_band(sdata, skb, 7, channel->band);
+ 	}
+ }
+diff --git a/net/mac80211/tx.c b/net/mac80211/tx.c
+index 5c6c5254d987f..46b02a6ae0a36 100644
+--- a/net/mac80211/tx.c
++++ b/net/mac80211/tx.c
+@@ -705,11 +705,16 @@ ieee80211_tx_h_rate_ctrl(struct ieee80211_tx_data *tx)
+ 	txrc.bss_conf = &tx->sdata->vif.bss_conf;
+ 	txrc.skb = tx->skb;
+ 	txrc.reported_rate.idx = -1;
+-	txrc.rate_idx_mask = tx->sdata->rc_rateidx_mask[info->band];
+ 
+-	if (tx->sdata->rc_has_mcs_mask[info->band])
+-		txrc.rate_idx_mcs_mask =
+-			tx->sdata->rc_rateidx_mcs_mask[info->band];
++	if (unlikely(info->control.flags & IEEE80211_TX_CTRL_SCAN_TX)) {
++		txrc.rate_idx_mask = ~0;
++	} else {
++		txrc.rate_idx_mask = tx->sdata->rc_rateidx_mask[info->band];
++
++		if (tx->sdata->rc_has_mcs_mask[info->band])
++			txrc.rate_idx_mcs_mask =
++				tx->sdata->rc_rateidx_mcs_mask[info->band];
++	}
+ 
+ 	txrc.bss = (tx->sdata->vif.type == NL80211_IFTYPE_AP ||
+ 		    tx->sdata->vif.type == NL80211_IFTYPE_MESH_POINT ||
 -- 
 2.43.0
 
