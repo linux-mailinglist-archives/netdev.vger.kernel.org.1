@@ -1,144 +1,159 @@
-Return-Path: <netdev+bounces-94088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BBF78BE167
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 13:51:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2EFA8BE16D
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 13:54:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 522AAB22949
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:51:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CEE4281688
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E62F156879;
-	Tue,  7 May 2024 11:51:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36AF1156885;
+	Tue,  7 May 2024 11:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aQEY++mB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="dhtHuXad"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D98152516;
-	Tue,  7 May 2024 11:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F59315216D;
+	Tue,  7 May 2024 11:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715082676; cv=none; b=Q2EqH38nJR2DOmKn7nTnPALKCpxYjpWMyTyMijkoY84BCQCO0g8fYHvfZj1pciD+YZC+OTgwRSHuyh2LLkq0eqy8rBdY0BamVX5krBhzxs2KE4R64qN2u1YYEdyLKVxHT5ADrYZHbJ1vOlPHI8Qi1N535Nn+DXUUpCXwwvEUFL4=
+	t=1715082837; cv=none; b=BdIsTOXcsxBdRHBLH9hLurDcELCpjH1krquIKSMAizC0J5N4uVUKbu5ZjEbKSwDPhUde/Qi/ywFpTY0Xk0xGCcEcNt7hLCFCHWiKSIdccfLRh0v97QjIFsGu4CAYP3YfkfzOVu540YxwbZ8YhB+kpusyu3NrU+8pohtZWjarzNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715082676; c=relaxed/simple;
-	bh=CGFh7Hfl/d5wAS1SYyKsQcFF/fGKTBBJq3hrEI/nR4o=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=HAqUFtqO6iWDi63RkQ956C3GnXIqrj/N2DlZi4plIjjX4NJD88HZQaWQHe38ldNUwqJX31RJcmsJj6Uu/28ltEovOku/L9+jAQcCbP4cHHXKC4cOJKVQfanBh47O2N3aaxedZR/SNEnA5HGtCgG67DnXoRhT8OKTXQ/pMM/EHBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aQEY++mB; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6a0406438b5so14461636d6.1;
-        Tue, 07 May 2024 04:51:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715082673; x=1715687473; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=716kUxhffnrYB5n58jkP05BrEcpnvwydyVRRLnVGoLY=;
-        b=aQEY++mBqyjfC26Xg5SLJ8kANL9lbLh2NS4trd8Zt73lr0KZF+xHc5T82pRI4PUj9b
-         /MFczmcv9sMTRntOtYyGA27kVlftIX3ddHuDKCCbEEiPfmGHyLywAKC9Lf9qOOkXo4zL
-         Kwet7aPackx6QvcXMpkC+j3JZ510ecF9kxcna5ZN1SewTlMJ4MgbSG8w1M2ewb2riG+P
-         1KExKMefkOusSU06r3HH1mY3RgZPqsYWEEjvb+F7a8cfiDwjl9cT7mMLWLlMlfjmOMkP
-         C9YJ4yeyFoZo+BCTN8MbsAxDQcxeQWCyV39lQPs7ztRSRObiv0RYCrb1KXmaPmhBYwXJ
-         wSHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715082673; x=1715687473;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=716kUxhffnrYB5n58jkP05BrEcpnvwydyVRRLnVGoLY=;
-        b=S8dx0Yu/Ur0ipRuZPogFXv2w5B9lbJcV7uYs/Dfc7Xbh3yQDEJeC6TudKjXmMOyx4F
-         p9ACM8c6aruRFn2aYxuJGJ8ZEc46cpAXyv8WHUefoX35igeOZOOmirjYWSPOOunVTyrA
-         9kZwbQR60Lb0y6FL8BxcUeFnBYFANX4nMNqHQN/mLBuZYmLSf/AwEso5PanUx2FHQqo9
-         J8TmMkxI4cGIitza9A9PPqpD+TFwu/oAsAJjx7G+e6tM4FCBrXPRCXDHeqjDKG5EK+r+
-         0lIT52QJQgJIeDboHuYSYMTTb6HVaEF2YAgWGchj0/5FKIP5ULKAsmtTIlI9fcx0qLF9
-         pXAg==
-X-Forwarded-Encrypted: i=1; AJvYcCXxHR8S2+v2tAALBZO8Dwg8VRzfLJl6amXZsoQjau1h6vML2wzamC9HNIJmq9V7BhuHpCgS2O/lJDm3oo0EtoIB9HHog3QP
-X-Gm-Message-State: AOJu0YxSs7F239PJkxyWWjtkeN3a37dghpULligVJJb+6BUsclMtrtmB
-	DtqKul4Gk2qBKvpf+01f9AG26Hk6FgBVpHMCd+DFHzWPnQUYBY6Q
-X-Google-Smtp-Source: AGHT+IFYOfDiGuprDTED3MyUDLFdpX4VMcTCMmBjOfUnKGh6TJSYm8JtrNUjCr8IExYaoybc/YIVXQ==
-X-Received: by 2002:a05:6214:d88:b0:6a0:91f0:ca4d with SMTP id e8-20020a0562140d8800b006a091f0ca4dmr15177913qve.22.1715082673549;
-        Tue, 07 May 2024 04:51:13 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id t3-20020a0cea23000000b006a100fa5fb2sm4617184qvp.77.2024.05.07.04.51.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 04:51:13 -0700 (PDT)
-Date: Tue, 07 May 2024 07:51:13 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Suman Ghosh <sumang@marvell.com>, 
- Felix Fietkau <nbd@nbd.name>, 
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemb@google.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-ID: <663a15b153de_726ea29475@willemb.c.googlers.com.notmuch>
-In-Reply-To: <SJ0PR18MB521604310B1F7DC297C2870DDBE42@SJ0PR18MB5216.namprd18.prod.outlook.com>
-References: <20240507094114.67716-1-nbd@nbd.name>
- <SJ0PR18MB521604310B1F7DC297C2870DDBE42@SJ0PR18MB5216.namprd18.prod.outlook.com>
-Subject: RE: [EXTERNAL] [PATCH net-next] net: add missing check for TCP
- fraglist GRO
+	s=arc-20240116; t=1715082837; c=relaxed/simple;
+	bh=XrhYbBixyQ93eYNpwcgImtQker1sbZGXhkuNQORBJ04=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GZeOG9H3lJUbHMrnCRUWn05O8WFkC72pQbGCi09Wk2llWIbSStIKUFH95rbphZgsni+t8VN7xtPs5jbnLkEiV3WrWO0y6r/90lzWifyEyggQbmHMwPmBo/erdQyoeWVMrul+pQ+loZ0wBRa1jdXA+S3ENpRX8Kb0Sh9cLp2GD9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=dhtHuXad; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=dP9BGOlS8Cdd3nKr9W+gvPxkG5zamPeQIojML0gQTqI=; b=dhtHuXad5DL3K8gxpt2hief4+B
+	1fYHo63VUV5viAAWvpYLYhSEkbprtYaib7Il5spzMt8WY8ciSnXbl93PQSC57GRPLj34dP+tFAd2D
+	rtjBE849KYEk351BCkjdppkC4fD018vEfkZYXr32MrdwlzP8y9HprH6Lc/00aLGBTXWPKQYSdKQwC
+	eKxk7alhYEaAeaAKAp4Spq54JDu1AQbGI979wfwt2QOQnLSzmxF/xvG47BEtWT9pNSwgfq9AcSaYm
+	ONjsuBF8eXqGfXsTJFPg+8VYfXgN9+GRCydUyblGimnSuxruOTfuZt0BMr8gqwdnoG5ofOqitm4SS
+	mZmC9xtw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58656)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1s4JOE-0003ep-0u;
+	Tue, 07 May 2024 12:53:46 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1s4JOC-0000JE-KO; Tue, 07 May 2024 12:53:44 +0100
+Date: Tue, 7 May 2024 12:53:44 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, lxu@maxlinear.com,
+	hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next] net: phy: add wol config options in phy device
+Message-ID: <ZjoWSJNS0BbeySuQ@shell.armlinux.org.uk>
+References: <20240430050635.46319-1-Raju.Lakkaraju@microchip.com>
+ <7fe419b2-fc73-4584-ae12-e9e313d229c3@lunn.ch>
+ <ZjO4VrYR+FCGMMSp@shell.armlinux.org.uk>
+ <ZjoAd2vsiqGhCVCv@HYD-DK-UNGSW21.microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjoAd2vsiqGhCVCv@HYD-DK-UNGSW21.microchip.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Suman Ghosh wrote:
-> >----------------------------------------------------------------------
-> >It turns out that the existing checks do not guarantee that the skb can be
-> >pulled up to the GRO offset. When using the usb r8152 network driver with
-> >GRO fraglist, the BUG() in __skb_pull is often triggered.
-> >Fix the crash by adding the missing check.
-> >
-> >Fixes: 8d95dc474f85 ("net: add code for TCP fraglist GRO")
+On Tue, May 07, 2024 at 03:50:39PM +0530, Raju Lakkaraju wrote:
+> Hi Russell King,
+> 
+> Sorry for late response
+> 
+> If we have phy's wolopts which holds the user configuration, Ethernet MAC
+> device can configure Power Manager's WOL registers whether handle only 
+> PHY interrupts or MAC's WOL functionality.
 
-> [Suman] Since this is a fix, this should be pushed to "net".
+That is the responsibility of the MAC driver to detect whether the MAC
+needs to be programmed for WoL, or whether the PHY is doing the wakeup.
+This doesn't need phylib to do any tracking.
 
-The referenced patch has only landed in net-next yet.
+> In existing code, we don't have any information about PHY's user configure
+> to configure the PM mode
 
-> >Signed-off-by: Felix Fietkau <nbd@nbd.name>
+So you want the MAC driver to access your new phydev->wolopts. What if
+there isn't a PHY, or the PHY is on a pluggable module (e.g. SFP.)
+No, you don't want to have phylib tracking this for the MAC. The MAC
+needs to track this itself if required.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+> The 05/02/2024 16:59, Russell King (Oracle) wrote:
+> > and why the PHY isn't retaining it.
+> 
+> mxl-gpy driver does not have soft_reset( ) function.
+> In resume sequence, mxl-gpy driver is clearing the WOL configuration and
+> interrupt i.e. gpy_config_init( ) and gpy_config_intr( )
 
-> >---
-> > net/ipv4/tcp_offload.c | 1 +
-> > 1 file changed, 1 insertion(+)
-> >
-> >diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c index
-> >c90704befd7b..a71d2e623f0c 100644
-> >--- a/net/ipv4/tcp_offload.c
-> >+++ b/net/ipv4/tcp_offload.c
-> >@@ -353,6 +353,7 @@ struct sk_buff *tcp_gro_receive(struct list_head *head,
-> >struct sk_buff *skb,
-> > 		flush |= (__force int)(flags ^ tcp_flag_word(th2));
-> > 		flush |= skb->ip_summed != p->ip_summed;
-> > 		flush |= skb->csum_level != p->csum_level;
-> >+		flush |= !pskb_may_pull(skb, skb_gro_offset(skb));
-> > 		flush |= NAPI_GRO_CB(p)->count >= 64;
+That sounds like the bug in this instance.
 
-The same check already exists in udp_gro_receive, which has for longer
-been calling skb_gro_receive_list:
+If a PHY driver has different behaviour from what's expected then it's
+buggy, and implementing workarounds in phylib rather than addressing
+the buggy driver is a no-no. Sorry.
 
-       if (!pskb_may_pull(skb, skb_gro_offset(skb))) {
-               NAPI_GRO_CB(skb)->flush = 1;
-               return NULL;
-       }
- 
-Alternatively it would make sense to deduplicate the check and move it
-to skb_gro_receive_list itself, before
+Why is mxl-gpy always masking and acknowledging interrupts in
+gpy_config_init()? This goes completely against what phylib expects.
+Interrupts are supposed to be managed by the config_intr() method,
+not the config_init() method.
 
-        skb_pull(skb, skb_gro_offset(skb));
+Moreover, if phydev->interrupts == PHY_INTERRUPT_ENABLED, then we
+expect interrupts to remain enabled, yet mxl-gpy *always* disables
+all interrupts in gpy_config_init() and then re-enables them in
+gpy_config_intr() leaving out the WoL interrupt.
 
+Given that gpy_config_intr() is called immediately after
+gpy_config_init() in phy_init_hw(), this is nonsense, and it is this
+nonsense that is at the root of the problem here. This is *not*
+expected PHY driver behaviour.
+
+See for example the at803x driver, specifically at803x_config_intr().
+When PHY_INTERRUPT_ENABLED, it doesn't clear the WoL interrupt (via
+the AT803X_INTR_ENABLE_WOL bit.)
+
+The dp83822 driver enables the WoL interrupt in dp83822_config_intr()
+if not in fibre mode and interupts are requested to be enabled.
+
+The dp83867 driver leaves the WoL interrupt untouched in
+dp83867_config_intr() if interrupts are requested to be enabled - if
+it was already enabled (via set_wol()) then that state is preserved
+if interrupts are being used. dp83869 is the same.
+
+motorcomm doesn't support interrupts, but does appear to use the
+interrupt pin for WoL, and doesn't touch the interrupt mask state in
+config_intr/config_init.
+
+mscc looks broken in a similar way to mxl-gpy - even worse, if
+userspace hammers on the set_wol() method, it'll read the interrupt
+status which appears to clear the status - possibly preventing real
+interrupts to be delivered. It also does the
+clear-MII_VSC85XX_INT_MASK-on-config_init() which will break WoL.
+
+
+So, in summary, please fix mxl-gpy.c not to clear the interrupt mask
+in the config_init() method. The contents of gpy_config_init() needs
+to move to gpy_config_intr(), and it needs not to mask the WoL
+interrupt if phydev->interrupts == PHY_INTERRUPT_ENABLED.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
