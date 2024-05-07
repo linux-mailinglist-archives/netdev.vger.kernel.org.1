@@ -1,232 +1,111 @@
-Return-Path: <netdev+bounces-94204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D55958BE998
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:47:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DC4E8BE9F0
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:59:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A52F28A6C8
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:47:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74934B2F981
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27785179972;
-	Tue,  7 May 2024 16:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28244200D2;
+	Tue,  7 May 2024 16:46:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fFMNv4LT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="La3wr7ds"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2BD16DECA
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 16:42:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DDA433D6
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 16:46:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715100142; cv=none; b=bEbf8I6fbdFMuhbmyDRJ911lI86qoatD1K74OXUjqnJxbZcnlTkFCm1gm4GrURlpM917QTL+1ixrx1JcrFFlh2SmKpyY1cWdp8ZIWPZOx1+swr2LypEoLzhzTTNhTSkReKs4b1pcbck1Jlcy4onKHxsLJdSzG/ARt4rGkkOxk4c=
+	t=1715100392; cv=none; b=caLGdwX0fvU3fxia2BltjaKRkEHJHqTw5AoCHPgtqLAcVvzDY4gh0WsVUj6k1nCHiBRc6gBEtjtFxd0di2SmN3N4FviOVWlWMj3W+noxicju7uy8xz/+GmuuvrA8cYjk7lAG1eqRjQ1clUa2NTrnk2nbT4Hxzp53pL2eRan7MEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715100142; c=relaxed/simple;
-	bh=4xUNxPDzztu8L8/w3Kr2Lgr1+A9SAEy6b6FHPJHwwv4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K3Mpbq12cMoIkTaZXqIDkhkBruJuxu/xh5VyB/JA+2r1EJQR7Pdpy2Co/Dc0ihLKNZ4nVUw0N07KfE1fyYpzh+NDTvdMxZG5UxJRNWphYRAFJm7sS+DdjmhfDXdxlS2aCB7tjKpTQAb9OKns14YMs7zp/oxiehRJvoFp5otUdsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fFMNv4LT; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a59a387fbc9so844359966b.1
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 09:42:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715100138; x=1715704938; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dI6bl9uqwH7zmPDcLL9svN5oVbQ7KUvxyIQRaOdtpl4=;
-        b=fFMNv4LTPJ31z4uW9YnTXqY/+P/Lu3XxPsX1vj/FcwrlahaksKtwSIJkvvDzcu2rIw
-         kUFK/asO0I1jpjKDr04+deUss1rHngscpNh095cNT9yAlUJGoBVdvFddfEUhojuVSLd8
-         Eto5no1o3YDn7s96fv4R3s6xbKb5Bsur/LC9clY8PjSwiL/9uzZj5LS5/oC+2OGW3A0+
-         vm7S0Y+TFMGs2VB53VFjDniE4wLpnem+YNJTJmc4qzG2ipR7VsHrwzdTNO1UY3pswfMu
-         NQONvfepGVrBaio6afuQzEqvzCXU8mh+EjojwyPooBi4z5e68SfByNYD/7cU59orv47R
-         zBcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715100138; x=1715704938;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dI6bl9uqwH7zmPDcLL9svN5oVbQ7KUvxyIQRaOdtpl4=;
-        b=GGmAAusfaS/Lj3sWJZrc6+jQPc3s/Y0BfQVpCY1HQ4UMi8KkL1c2CXP8e1ziEwcHMu
-         kdvdE1LiySLmyqxHcD8CeIj/ErCDEDugY4GrPMhIj9NnTJJaa7cdHsQjOrnmXNZrv6MD
-         U5x5BIvgCwt1ugoOh8vL0vde+aW/3FqO/IFETEJ2Hbue15sXxQULq6CU8vXbyMWgA5cq
-         IqD8TWR0CZ8aXPMWq8XjUxFTDDvqzQiwFX1CrSfqYDuxlMq6WIkPxPxffhNrgN6MstOA
-         PNQ8w7pqtc31wHEEWLKmlmu9Z79KEFz5trPjo/f+O83WsztRzyOt+4zHNEKYzECXs3aw
-         12Pw==
-X-Forwarded-Encrypted: i=1; AJvYcCU9NDmu5X1a+4wmuN4gHem6xTCR/4TR5VzDmE+/XvHVv7fsA/6IR93gO9IKtHwQteQqLbMfMJ4oMCLC454qu/rTmTJiHBn3
-X-Gm-Message-State: AOJu0Yw2stE5cON783O+qFbbsW8d4MbYWpr2PvHWF5LVHQqfXKfjmpoS
-	NsKAAyTtiVx0mA76w+/Dh0jU1QpITdGUecKONGQyPPg0ctT/iET9Y8q6RfCvqrg/rXOKefIWh/7
-	sPagBmKFJpIMK1A9LMGB3dGM3SrhxQv5syLUB
-X-Google-Smtp-Source: AGHT+IGXrfCrbPuBFYGXmT+FZdafT4oz7XFNMT8FfUWaWmudph1z0+uFgT86I0JhwB1+1uK0PlezLiQ7rsxPPg9MW2Q=
-X-Received: by 2002:a17:906:1d4b:b0:a59:c833:d275 with SMTP id
- a640c23a62f3a-a59fb94dbe4mr1458266b.30.1715100137853; Tue, 07 May 2024
- 09:42:17 -0700 (PDT)
+	s=arc-20240116; t=1715100392; c=relaxed/simple;
+	bh=zsEtDb8lT9Y0gqMHNYDGmJx3NOWbYASrrSVCB9e0m3s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HazhKmVkHatqu46CwATfpKh107z/PJApFNSxE2OcioWdP39sKBlzSC7KVeXfGSVqiflwdp4sC9ebXbwxMNvL38qMFUfi54S0hnMyZLIcm82mroeiDWPWVXEsZPkcZFOxDazkMJ3kSwnndGpmzgextM2eFnbP3aFreWKdm8gHCe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=La3wr7ds; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7981C2BBFC;
+	Tue,  7 May 2024 16:46:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715100391;
+	bh=zsEtDb8lT9Y0gqMHNYDGmJx3NOWbYASrrSVCB9e0m3s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=La3wr7dsm/IodnahoyrEho4/AVGn89z92nahZtPs8u2YKkNNyQW71yV5bbxhqh4b9
+	 F2AhCPLJGUKswknVs7fGE/dPa+ND9+Li5YUJ27ZxM3pirs787t9IdXTmvyXS0qjv5J
+	 6MIoDAI3h925VM3BCvQYOFSm/PEr9dPSxBeM0eW27zjXqhzLR+I1RxTZ7fuBa9C6sS
+	 KeIinM7cWrWgdOgrsRPVzUBqohPbFNvimOUGYeA6CV/OMU1H1GyYqsRd9hfUZ0m6CZ
+	 yHbKhHbxpmuM+FPye1SzE3UF3NSGXqHxDpn/6IDlwl01FQJ7nTe1RkIU9G8h9tfqHA
+	 Fq8lDp/ROFndA==
+Date: Tue, 7 May 2024 17:46:26 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Adrian Alvarado <adrian.alvarado@broadcom.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Shailend Chand <shailend@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [RFC PATCH net-next v2 3/9] netdev: add netdev_rx_queue_restart()
+Message-ID: <20240507164626.GF15955@kernel.org>
+References: <20240502045410.3524155-1-dw@davidwei.uk>
+ <20240502045410.3524155-4-dw@davidwei.uk>
+ <20240504122007.GG3167983@kernel.org>
+ <b1d37565-578b-455d-a73f-387d713a2893@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240403002053.2376017-1-almasrymina@google.com>
- <20240403002053.2376017-3-almasrymina@google.com> <ZjH1QaSSQ98mw158@infradead.org>
- <CAHS8izM0=xc2UhUxhnF_BixuFs5VaDV9W1jbso1K+Rg=35NzeA@mail.gmail.com>
- <ZjjHUh1eINPg1wkn@infradead.org> <20b1c2d9-0b37-414c-b348-89684c0c0998@gmail.com>
- <20240507161857.GA4718@ziepe.ca> <ZjpVfPqGNfE5N4bl@infradead.org>
-In-Reply-To: <ZjpVfPqGNfE5N4bl@infradead.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 7 May 2024 09:42:05 -0700
-Message-ID: <CAHS8izPH+sRLSiZ7vbrNtRdHrFEf8XQ61XAyHuxRSL9Jjy8YbQ@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v8 02/14] net: page_pool: create hooks for
- custom page providers
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org, 
-	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Amritha Nambiar <amritha.nambiar@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>, Kaiyuan Zhang <kaiyuanz@google.com>, 
-	Christian Brauner <brauner@kernel.org>, Simon Horman <horms@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Florian Westphal <fw@strlen.de>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>, 
-	Arseniy Krasnov <avkrasnov@salutedevices.com>, 
-	Aleksander Lobakin <aleksander.lobakin@intel.com>, Michael Lass <bevan@bi-co.net>, 
-	Jiri Pirko <jiri@resnulli.us>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Richard Gobert <richardbgobert@gmail.com>, 
-	Sridhar Samudrala <sridhar.samudrala@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Johannes Berg <johannes.berg@intel.com>, Abel Wu <wuyun.abel@bytedance.com>, 
-	Breno Leitao <leitao@debian.org>, David Wei <dw@davidwei.uk>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b1d37565-578b-455d-a73f-387d713a2893@davidwei.uk>
 
-On Tue, May 7, 2024 at 9:24=E2=80=AFAM Christoph Hellwig <hch@infradead.org=
-> wrote:
->
-> On Tue, May 07, 2024 at 01:18:57PM -0300, Jason Gunthorpe wrote:
-> > On Tue, May 07, 2024 at 05:05:12PM +0100, Pavel Begunkov wrote:
-> > > > even in tree if you give them enough rope, and they should not have
-> > > > that rope when the only sensible options are page/folio based kerne=
-l
-> > > > memory (incuding large/huge folios) and dmabuf.
-> > >
-> > > I believe there is at least one deep confusion here, considering you
-> > > previously mentioned Keith's pre-mapping patches. The "hooks" are not
-> > > that about in what format you pass memory, it's arguably the least
-> > > interesting part for page pool, more or less it'd circulate whatever
-> > > is given. It's more of how to have a better control over buffer lifet=
-ime
-> > > and implement a buffer pool passing data to users and empty buffers
-> > > back.
-> >
-> > Isn't that more or less exactly what dmabuf is? Why do you need
-> > another almost dma-buf thing for another project?
->
-> That's the exact point I've been making since the last round of
-> the series.  We don't need to reinvent dmabuf poorly in every
-> subsystem, but instead fix the odd parts in it and make it suitable
-> for everyone.
->
+On Sun, May 05, 2024 at 05:41:14PM -0700, David Wei wrote:
+> On 2024-05-04 05:20, Simon Horman wrote:
+> > On Wed, May 01, 2024 at 09:54:04PM -0700, David Wei wrote:
+> >> From: Mina Almasry <almasrymina@google.com>
+> >>
+> >> Add netdev_rx_queue_restart() function to netdev_rx_queue.h. This is
+> >> taken from Mina's work in [1] with a slight modification of taking
+> >> rtnl_lock() during the queue stop and start ops.
+> >>
+> >> For bnxt specifically, if the firmware doesn't support
+> >> BNXT_RST_RING_SP_EVENT, then ndo_queue_stop() returns -EOPNOTSUPP and
+> >> the whole restart fails. Unlike bnxt_rx_ring_reset(), there is no
+> >> attempt to reset the whole device.
+> >>
+> >> [1]: https://lore.kernel.org/linux-kernel/20240403002053.2376017-6-almasrymina@google.com/#t
+> >>
+> >> Signed-off-by: David Wei <dw@davidwei.uk>
+> > 
+> > nit: Mina's From line is above, but there is no corresponding Signed-off-by
+> >      line here.
+> 
+> This patch isn't a clean cherry pick, I pulled the core logic of
+> netdev_rx_queue_restart() from the middle of another patch. In these
+> cases should I be manually adding Signed-off-by tag?
 
+As you asked:
 
-FWIW the change Christoph is requesting is straight forward from my
-POV and doesn't really hurt the devmem use case. I'd basically remove
-the ops and add an if statement in the slow path where the ops are
-being used to alloc/free from dmabuf instead of alloc_pages().
-Something like (very rough, doesn't compile):
+I think if the patch is materially Mina's work - lets say more than 80% -
+then a From line and a Signed-off-by tag is appropriate. N.B. this
+implies Mina supplied a Signed-off-by tag at some point.
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 92be1aaf18ccc..2cc986455bce6 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -557,8 +557,8 @@ netmem_ref page_pool_alloc_netmem(struct page_pool
-*pool, gfp_t gfp)
-                return netmem;
+Otherwise I think it's fine to drop both the From line and Signed-off-by tag.
+And as a courtesy acknowledge Mina's work some other way.
 
-        /* Slow-path: cache empty, do real allocation */
--       if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_op=
-s)
--               netmem =3D pool->mp_ops->alloc_pages(pool, gfp);
-+       if (page_pool_is_dmabuf(pool))
-+               netmem =3D mp_dmabuf_devmem_alloc_pages():
-        else
-                netmem =3D __page_pool_alloc_pages_slow(pool, gfp);
-        return netmem;
+e.g. based on work by Mina Almasry <almasrymina@google.com>
 
+But perhaps it's as well to as Mina what he thinks :)
 
-The folks that will be negatively impacted by this are
-Jakub/Pavel/David. I think all were planning to extend the hooks for
-io_uring or other memory types.
-
-Pavel/David, AFAICT you have these options here (but maybe you can
-think of more):
-
-1. Align with devmem TCP to use udmabuf for your io_uring memory. I
-think in the past you said it's a uapi you don't link but in the face
-of this pushback you may want to reconsider.
-
-2. Follow the example of devmem TCP and add another if statement to
-alloc from io_uring, so something like:
-
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 92be1aaf18ccc..3545bb82c7d05 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -557,8 +557,10 @@ netmem_ref page_pool_alloc_netmem(struct
-page_pool *pool, gfp_t gfp)
-                return netmem;
-
-        /* Slow-path: cache empty, do real allocation */
--       if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_op=
-s)
--               netmem =3D pool->mp_ops->alloc_pages(pool, gfp);
-+       if (page_pool_is_dmabuf(pool))
-+               netmem =3D mp_dmabuf_devmem_alloc_pages():
-+       else if (page_pool_is_io_uring(pool))
-+               netmem =3D mp_io_uring_alloc_pages():
-        else
-                netmem =3D __page_pool_alloc_pages_slow(pool, gfp);
-        return netmem;
-
-Note that Christoph/Jason may not like you adding non-dmabuf io_uring
-backing memory in the first place, so there may be pushback against
-this approach.
-
-3. Pushback on the nack on this thread. It seems you're already
-discussing this. I'll see what happens.
-
-To be honest the GVE queue-API has just been merged I think, so I'm
-now unblocked on sending non-RFCs of this work and I'm hoping to send
-the next version soon. I may apply these changes on the next version
-for more discussion or leave as is and carry the nack until the
-conversation converges.
-
---=20
-Thanks,
-Mina
+...
 
