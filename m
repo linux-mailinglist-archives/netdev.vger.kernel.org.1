@@ -1,79 +1,133 @@
-Return-Path: <netdev+bounces-94139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 315008BE521
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:05:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 573808BE585
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0FFC289C01
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:05:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E127B2B464
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA2B15F320;
-	Tue,  7 May 2024 14:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01920161318;
+	Tue,  7 May 2024 14:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cRfNIVHb"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="Qxob4DHZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A65515EFD7;
-	Tue,  7 May 2024 14:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79183156C6B
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 14:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715090724; cv=none; b=AHrrlmNVmCqSjZEihPzypLnVfLI+c8hXuerTXUQT4yYeIl4ICiXDKNHQH2TfnNM5j24GcnHCAcxgfu3rWrc6zGZVlOr1B2Uq72HIglxyrfVsGtcKa+4npFsDus/MF7lL3qK6/Fpq0zLfb1KilPI9U9NhQRJ+y55HWoDoICKbyYU=
+	t=1715091016; cv=none; b=aibZi2OZn8r6Wq9R8nJ38sGi3DBm0lHXHR8OqCaSY/ADb8WqmS1Hukv0nm7Ry+2r027SREO2slsJ/D71vNiw5vsP+ILaYzAGTFbe7NFDC/bfJSIjKjLUeQSaKGm0a4DUegNyJhiHpOA3rxtNmObTB3EdL7HH6W8yDDhOz9Mqsck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715090724; c=relaxed/simple;
-	bh=Yvt9trn7k5sg0grmFzj/Z05xPhosOJKV+oMEXF2UGKg=;
+	s=arc-20240116; t=1715091016; c=relaxed/simple;
+	bh=Aw+k2LTWav+voxJYA+mYYDD9NA+sEEjl31+IivmaMYI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NoRTRzwmlW+17e3YPw/xB22OGu3s0P7x8B6ppXrgekpBhZm1QrYC4/RscWR/H/0hJo/pdn7ZpZeRwJQloCYoV5nqtwIGGpCcp/fgSzgEwNrmvvbdg0rC+EGNxSqgWCX9mQqMZxNN66plN+cKIH5mckgAcA+iTVUJFPjUQiBK8k4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cRfNIVHb; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+/2zFWULxAWvPzLT3urQNWLL10z8co/qMxogQ0U1TR0=; b=cRfNIVHbInwOfaoVrM/wwS4GHF
-	6zCSqzt9oKQ+zHZzagNSrZWDbKAwzFANpG6yjB5MKtqa+ayim3dr530/3vmqZFYZhYQlBx3P23HkH
-	cG2kejCgj4iAOH8V4gaZ2MncEd5U0PaGBPdxBowgbi5rnccc6WRNH8jPpwfI5vMRMj5w=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s4LRY-00ErbN-N6; Tue, 07 May 2024 16:05:20 +0200
-Date: Tue, 7 May 2024 16:05:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lh7h8+c7q5KHfnVcFoRE5UfWIJOtPE8aJnF14zLOrFHjUdmumpOJ6hA/TRWG1ATnQXpoQgthj9tsd9BChbGg07atgBmzV38lDn1SxeTXyuThDYk4cfYRO/tHfpDEs0MxPJbV076aV39x3VdgnJ9ndjey7iOgYqT4YL4ZPkoyOxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=Qxob4DHZ; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from localhost (unknown [IPv6:2a02:8012:909b:0:3397:4b77:9703:8b53])
+	(Authenticated sender: tom)
+	by mail.katalix.com (Postfix) with ESMTPSA id BC5CD7D8BA;
+	Tue,  7 May 2024 15:10:12 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1715091012; bh=Aw+k2LTWav+voxJYA+mYYDD9NA+sEEjl31+IivmaMYI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Disposition:In-Reply-To:From;
+	z=Date:=20Tue,=207=20May=202024=2015:10:12=20+0100|From:=20Tom=20Pa
+	 rkin=20<tparkin@katalix.com>|To:=20Jakub=20Kicinski=20<kuba@kernel
+	 .org>|Cc:=20netdev@vger.kernel.org|Subject:=20Re:=20[PATCH=20net-n
+	 ext]=20l2tp:=20fix=20ICMP=20error=20handling=20for=20UDP-encap=0D=
+	 0A=20sockets|Message-ID:=20<Zjo2RHSzCW2xGv7k@katalix.com>|Referenc
+	 es:=20<20240430140343.389543-1-tparkin@katalix.com>=0D=0A=20<20240
+	 503153214.3432d313@kernel.org>|MIME-Version:=201.0|Content-Disposi
+	 tion:=20inline|In-Reply-To:=20<20240503153214.3432d313@kernel.org>
+	 ;
+	b=Qxob4DHZiwlbUtvoXLuFklcMVfe9EoYRZH1UXZ9rTyC5D+TRyQN3dB8mxIcf7+QO7
+	 k2LU+YkXALtY7m1up3dyag9ws+3ZH+6BDkCwHLtyUi8sSIO2WhTphAHNJSIO9GL+xd
+	 2DUsEOcrnHjuOBeSjw2Da49gTeGlpW9C6Xcew5NZE06w6kMO/J62RMN7kJjsIBZCST
+	 JFrAlNQ07xQZreyf1WjnDI+YJG8u2RkGl9Beki4Hy23B2QWnW/DuHQpGSLiA4bOjfR
+	 cu0gP/2LduvHGvK/MIEEqqtiU36vCbOrCoI38UK6bBx7rPqccST9HJPuVj5JkeSzDk
+	 niSfat9PM6yYQ==
+Date: Tue, 7 May 2024 15:10:12 +0100
+From: Tom Parkin <tparkin@katalix.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: Re: [ANN] netdev call - May 7th
-Message-ID: <2730a628-88c8-4f46-a78d-03f96b3ec3e2@lunn.ch>
-References: <20240506075257.0ebd3785@kernel.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] l2tp: fix ICMP error handling for UDP-encap
+ sockets
+Message-ID: <Zjo2RHSzCW2xGv7k@katalix.com>
+References: <20240430140343.389543-1-tparkin@katalix.com>
+ <20240503153214.3432d313@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ZnqshFQ+uiXDkO8j"
+Content-Disposition: inline
+In-Reply-To: <20240503153214.3432d313@kernel.org>
+
+
+--ZnqshFQ+uiXDkO8j
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240506075257.0ebd3785@kernel.org>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 06, 2024 at 07:52:57AM -0700, Jakub Kicinski wrote:
-> Hi!
-> 
-> The bi-weekly call is scheduled for tomorrow at 8:30 am (PT) / 
-> 5:30 pm (~EU). Last call before the merge window. No agenda
-> items have been submitted so far.
-> 
-> See you at https://bbb.lwn.net/b/jak-wkr-seg-hjn
+Thanks Jakub,
 
-Maybe we can have a quick discussion and poll about:
+On  Fri, May 03, 2024 at 15:32:14 -0700, Jakub Kicinski wrote:
+> Seems like we should target it at net? Description indicates it's=20
+> a clear regression.
 
-https://patchwork.kernel.org/project/netdevbpf/patch/20240507090520.284821-1-wei.fang@nxp.com/
+Ack, I'll respin for net.
 
-Do we want patches like this? What do people think about guard() vs
-scoped_guard().
+> not: the !tunnel can't happen, right?
 
-	Andrew
+Your question makes me realise that l2tp_udp_encap_err_recv is being
+called in the same context as l2tp_udp_encap_recv, and so should be
+using rcu_dereference_sk_user_data to access the tunnel handle rather
+than l2tp_sk_to_tunnel.
+
+I'll fix that in the respin.
+
+However I note that l2tp_udp_encap_recv also checks for the tunnel
+handle being NULL :-|
+
+> nit: mismatch on the braces here, this would be more usual:
+>=20
+> +	if (ip_hdr(skb)->version =3D=3D IPVERSION) {
+> +		if (inet_test_bit(RECVERR, sk))
+> +			return ip_icmp_error(sk, skb, err, port, info, payload);
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +	} else {
+> +		if (inet6_test_bit(RECVERR6, sk))
+> +			return ipv6_icmp_error(sk, skb, err, port, info, payload);
+> +#endif
+> +	}
+>=20
+> +}
+
+Thanks, I will fix this.
+
+--ZnqshFQ+uiXDkO8j
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEsUkgyDzMwrj81nq0lIwGZQq6i9AFAmY6NkAACgkQlIwGZQq6
+i9Ccrgf9EJH+wRskXJDM1MJbW6raZYQZ7CSHsiKiXlNe0tiWTiE9E9+jqPUh8DEL
+KLGs5cFA27UFwArwguEjn+6WkTpGhTF6MwoC9fqCwLmPOpoHq6o0ONx0W1WPoVaP
+U0erYGHG1XchAM5kYV7Sx8+o2bcTnCILFtLgTu2hmSU5Vg4wriEt7twSMfF9Y/xL
+EozQmsOibZHMRliWCDXQ4OjYlzuvthoDgijduI0YIf8s3MeZkNtEI1sVxKPhQA1g
++6A288jVLh64i6YTFm1rlnLv6zPr/aI+qVPCdHcA9uy2+1jqir//kMJjZ3qLJReG
+CVEPhdcg6sVuJU8zpMXzYpdDNtTEeg==
+=lmIH
+-----END PGP SIGNATURE-----
+
+--ZnqshFQ+uiXDkO8j--
 
