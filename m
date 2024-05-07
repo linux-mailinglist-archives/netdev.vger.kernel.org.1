@@ -1,317 +1,153 @@
-Return-Path: <netdev+bounces-94176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 118308BE8A1
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:20:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D05FC8BE891
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:18:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71637B252F1
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:20:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 450051F27944
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:18:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D86116C699;
-	Tue,  7 May 2024 16:19:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2102D168AFD;
+	Tue,  7 May 2024 16:18:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="CqQlc0QR";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="K5LmxLBC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wVA9xhyb"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D684A168AF1;
-	Tue,  7 May 2024 16:19:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.154.123
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715098749; cv=fail; b=V1HFXNbrCDCye6HzcOfX7TEAr+4v6RG9U/9Jxy1gCf/1oGSo5B4P+JNs9e/mxD1gwC4zpuhFM3XZUDnMt5SPcd4l/XoU400lG9ejwcz1E6zWJnVDVPdoHdvBxD9PjyesZIm9wOZUrobPigMjAqjxHU+xhjimtFx3BE14uCuzXhk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715098749; c=relaxed/simple;
-	bh=prKQFYozuWwL5cVHuZlrfiJadSzmzHiK9glDEIcLsGc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=oBLCxKvdkq0iNB94Hd53yjc993pPSlVywdIgaasP3XxImOdGsfQNjXl6ypn21TPmJ+kgtOAmNaJ4ZjdUjfDii/Lzne/mk0eEKTUbW7PMo8wsIeB4QWCbfr4plaLaVt+6mx+deCHnmC8siOnLVCaKzjN7m7LNpj01bxdUyFgUEis=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=CqQlc0QR; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=K5LmxLBC; arc=fail smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1715098746; x=1746634746;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=prKQFYozuWwL5cVHuZlrfiJadSzmzHiK9glDEIcLsGc=;
-  b=CqQlc0QRO7nIkIsnMNDM7679NtfSL7G8HlFy7BS1yHnRS828qtHyx5N4
-   Cd4NMdeiH8js/c8lvVwFLvf/oP3WeHXxeL5wI+VWIrEbJCE/0ZV5ajOvZ
-   e4LmJnKt4ZkIFrdfXtUMX4gS0uQOHUPB9jCivFiKiPgzh5SWUqHvATUiN
-   DyKjobiD9iIGsms0aVOv/WS+E01SxemEhF1P33szZrs0DXRnr9k1ZEnzv
-   LPwmzs7JqiNxBEwHrtRLPKeRHma1W2/leBAnqkQmKwojvPL/Emkm0wZ7E
-   +virraCFn7sCpgZyj9lDZL5Znn09hM5XcO5BCzkdInlWacAg9pKa4MfCr
-   Q==;
-X-CSE-ConnectionGUID: iX7H8nhCSiiWw+rx9lVSkg==
-X-CSE-MsgGUID: 4/nfqMllTFycyzcV7OVkBA==
-X-IronPort-AV: E=Sophos;i="6.08,142,1712646000"; 
-   d="scan'208";a="191326679"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 May 2024 09:18:59 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 7 May 2024 09:18:30 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 7 May 2024 09:18:30 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a5SSUzfT5t1IRGNtDf2yJxM20KQM1tTE4uxXQOrXLifSbn+Wn2TmywaSOX5vueq2EL1CufW7g2JjBdPQxAA/EZ6Qc5N/pC74cwWt5ZURFlRSXsijxfgGTJEYkaqW2ASgw7APELrwAtNtw2gToslxUuRLInZUjC8bOw36LgaP7A2F7ZJ58/REHQ5qjOv0cEpu4v3HTfyvQnvY7u/iGXaE+7J5DqWrXMXvGWxwMd9bQqb9guuhyUbdQ70swurWey0FWnRy6GQbbp9RIW4hj86oU9+i5y9E7YXk1eHESXovgK8O62guYpe++mnW93Up8XGy6PurJUmcUVXI579bPrYhZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=prKQFYozuWwL5cVHuZlrfiJadSzmzHiK9glDEIcLsGc=;
- b=Bd70jW1GsplhGm51AHROo0OYEckJ2OeE1eNDyJ339Y7HMedUErpO/odT3qhh61Bo6dbJzGx7Mcbeeofnu3cDJECocHzQ9TjEZ3KR39IEFaahuk0XHDiWzAmnlMIZFZjb0xwfOk4kSiuWLM1Ktk9oN1C5IVj+9BRYLd+GZem3FSai08lvUHsBkDAfgsIgif2mCODt6Yd3L+DOWWQYocPCUeR+OH26p/2ITjcvGFuNBqhpknGG80PkcjlrDmkLHI3uFAIztoDPg8gdcDcpj0pPgeuHLWV/EyAuohhHnjSv4Js7/ZPGN9qD3VI0H73NwsEQ6FdUheiVgPTftHJf4h4EfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=prKQFYozuWwL5cVHuZlrfiJadSzmzHiK9glDEIcLsGc=;
- b=K5LmxLBC4Mkrso+0h6fk0Qmyj5Wt/hNoZTOt529sk4zqnl6x1MVs/Pd7JVDjhn4CW+Xbqo4JoZyDQi/8jDyMuS5bWkkBbHLgDT46o4+E34AipPtqd1HsIb8N9dOjboB5Egqw4zifNAl8AczyFSEaf6GPkgOC6+ZIAYqWDbueEo6hI1kibxhnuxi49JD6rgSBjUUATKJ0zO3rzCIdVVIyCrokCq04ODQmiiBSDpKgmn98M8AjaOB5YEmgQuhzghfZ0uyhZ3UgvMPRgcLRgp05UrJNcXGIB96hihLIzqk+cDfhZgbY69Ir33cBeJUkljbgVOIHwDqosH03EZHdsP7d1w==
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com (2603:10b6:510:25c::13)
- by MW5PR11MB5930.namprd11.prod.outlook.com (2603:10b6:303:1a1::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.43; Tue, 7 May
- 2024 16:18:27 +0000
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::ad6c:cf56:3c3d:4739]) by PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::ad6c:cf56:3c3d:4739%3]) with mapi id 15.20.7544.036; Tue, 7 May 2024
- 16:18:27 +0000
-From: <Ronnie.Kunin@microchip.com>
-To: <linux@armlinux.org.uk>, <Raju.Lakkaraju@microchip.com>
-CC: <andrew@lunn.ch>, <netdev@vger.kernel.org>, <lxu@maxlinear.com>,
-	<hkallweit1@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>
-Subject: RE: [PATCH net-next] net: phy: add wol config options in phy device
-Thread-Topic: [PATCH net-next] net: phy: add wol config options in phy device
-Thread-Index: AQHamryInbCB9BYIukGo4mVuOjWyY7GECwQAgAAS4wCAB30KgIAAGgIAgAA4RqA=
-Date: Tue, 7 May 2024 16:18:27 +0000
-Message-ID: <PH8PR11MB79658C7D202D67EEDDBD861495E42@PH8PR11MB7965.namprd11.prod.outlook.com>
-References: <20240430050635.46319-1-Raju.Lakkaraju@microchip.com>
- <7fe419b2-fc73-4584-ae12-e9e313d229c3@lunn.ch>
- <ZjO4VrYR+FCGMMSp@shell.armlinux.org.uk>
- <ZjoAd2vsiqGhCVCv@HYD-DK-UNGSW21.microchip.com>
- <ZjoWSJNS0BbeySuQ@shell.armlinux.org.uk>
-In-Reply-To: <ZjoWSJNS0BbeySuQ@shell.armlinux.org.uk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH8PR11MB7965:EE_|MW5PR11MB5930:EE_
-x-ms-office365-filtering-correlation-id: 3e496bec-c1ed-413b-a1fc-08dc6eb153d6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|7416005|1800799015|366007|376005|38070700009;
-x-microsoft-antispam-message-info: =?us-ascii?Q?VI5V/YCdv1KcbbASF5An+fIq2ZAOXbZ84VorKtq4vZjHzvl8L8HZ5chV4enC?=
- =?us-ascii?Q?aj20qrGKEKa44eUeNOB1YcOse0Mnxs9y5gGFCPhl6+1IDp27n+YrjEtu3940?=
- =?us-ascii?Q?1ylrq72PmIemNhmK+Uz5rP9z23rhrHqiflLpyNlLbqorSp9MMkRHuNDRAScg?=
- =?us-ascii?Q?1qfvATryI/Ng3GKTjsXaOAd1a9+EreeqLWXm52VDWueb4SADxTg00eO9ja/5?=
- =?us-ascii?Q?S1h+6O7VJq8r10jEdbmgvvD5w9X8U6OuFoE6RQbS+Q65cCdgxvjZJRU3wIZN?=
- =?us-ascii?Q?NKeXvQWq2pbn+2B7TjNX86TbAGWxIwZm1TVKq/0ugl5gq8F8l4aJfmWA2ogM?=
- =?us-ascii?Q?kzln4fvSil0/qboJWeR+x1ZJTkI3ObM5RRjNzLNCmPN0n5FDbomTxeWNiqKj?=
- =?us-ascii?Q?2exxgzpgpUIotm7+Snj1GtWlZjm+SMHr1hIetLUWr8drD3yIrJGMAylNCZaS?=
- =?us-ascii?Q?9TGk3TbMhWUMHdjC77VuHJJYFArwBYpjfNzZxSuozO6xIexuzctNTNN9eLcc?=
- =?us-ascii?Q?FRd0ZOg1q4Bk9Kfb4bLmcS2H2j2q5JcHBRzXwUxN9kqmX6nRoS/p56pC8AUh?=
- =?us-ascii?Q?LjMfPv/M0A/1YH2SVoKsSTR0Hdl4EhjPy9gitGNwgzTpWpf6QMgJx9TXlRan?=
- =?us-ascii?Q?NxcsoFhMkeF8pyqGFXrFLksyHa7Y0fKGzvVyuQWOymPJ6y9nqdfErRMWT0eo?=
- =?us-ascii?Q?Io/mZp2norE1oi8KpjSBF4PtCProWxBq+y+I+5UF5IkR7fjpuNNIaN/cMljo?=
- =?us-ascii?Q?ctOi16sLk4qT0CRkuqbm5aVUG29k2eUdmDaqk4qRlOw07gE7ChTA+nCFkBbQ?=
- =?us-ascii?Q?zlCBQzriqNAc0z67fwVLJUfjkGtL1H7vM5WFCfU6exRpvBFsFC64PLSox+MB?=
- =?us-ascii?Q?EmjfVeu5YMJd+6OSsog9Ve+KP6ydahCN8w4ACVLo3NUf6G4Xg7ZDQ2INJHWF?=
- =?us-ascii?Q?gI7DtpeaQrFm5/bjkD52eZQce6FSI4o+URUXER14Y1OJ+JB2r6UhSkKfmlJy?=
- =?us-ascii?Q?eElbh9nGEf3o0v+/SiPgZK2Rtwfy/1FIuQHW5UB7pBx15lFAzEBj+y8YTIuq?=
- =?us-ascii?Q?DaHDpZvbDuWPJSrZJFm0xuMOkY+S88Xz6BolPHfj6moXtU8ahC1Kgmxxi5pK?=
- =?us-ascii?Q?Gqq8CwgrTf8VFTp83ayTgtuHEvcG8234wz0s0zJXyVSvn1iH7PD3jNZh8auH?=
- =?us-ascii?Q?IapXteDvKmctlbtobihjpANFljKzCpSwjm6vXjX6vlvRQZVqr7OplgRJYCXz?=
- =?us-ascii?Q?hWPOoAJ1vuyTxDPWFh2UQEoTkcttiXthUMb24kzSiQ=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB7965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(366007)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?mRQSnSNmqUA6uMmyUFHidP9Fu4k5lD1EzT1qeN3CADk1NXdk3ql04fz4DfMd?=
- =?us-ascii?Q?u35YfJEoZf7D4oBLpSRT9xua/jQPjSDvJP4iW8xo1IgmI7xq1Kz51JFFTWlY?=
- =?us-ascii?Q?UiQDq8rrTZKDamVHe7Vi8iCXpkMQEZgYiG7su+W2qnQ9wqgUfEZwMlUvYKuz?=
- =?us-ascii?Q?MHLq9plaZm8OnH7ZcpY7O60NuDuLYT60mgvsNGU8FhCPYxjwctjHkGpl7RTB?=
- =?us-ascii?Q?dVU+rnzql7+nRkOXGzRZnUn81WqLTjhdDOdsZNKHvBg8xI+iipfiVfTGcnJC?=
- =?us-ascii?Q?Zs8cMYWdV7W2MOfP4m9NXdHnblIlz2qMVQrRTlCLKoC1eZ2Mrn7euS+pDvpf?=
- =?us-ascii?Q?CdW72krQLKi/ULk56gGgOykWYt7taCUGwAGgbwvxP4cvqiT8CgVMQNMrBzRA?=
- =?us-ascii?Q?y+KncnlLoWoMB0jGdCQxk4C7hOr+6ppNrLSc9VHNhyYQxlulOiMTaPsRQod5?=
- =?us-ascii?Q?fvt1OaH1AeQ/N2XWPSltubCHdfzbzX7cnN+INZJcU/ILDO06vb8DS1bUuDt0?=
- =?us-ascii?Q?rbkoE7pVVXDNL22vOJL7Lg/8W1nXEQksNrvrpDVa3nPQ3BGKXOBKiGdmvSPI?=
- =?us-ascii?Q?kZkoKiOV5+X+Y9NMIVpaOoIsDYr34nQr7++/hLIN/05UHRhl/24Mupx6MHW0?=
- =?us-ascii?Q?GJH0oiLnerBD2HgfPvZs2PxJ1CP2pgZZu1gwbNc93QHBIqcpuzAg+05uwY4H?=
- =?us-ascii?Q?8U9TIhiicoENNwsvUOyzIneLwTrSXnwD54bzJmrC4SbXYk4altgEJicxcyRM?=
- =?us-ascii?Q?AeJP6vaT0Z1NRfo2Fp5fc67UAu8qTOjuXFrZmgAY/8fdvm0V9N8yyTJjnY0K?=
- =?us-ascii?Q?/wq1XBfuszUNdiHtQlLGFZVnAAWxD0+y5e2XGTfUp5yJKE3Xl66znP2dfPni?=
- =?us-ascii?Q?LpoDYofrhIREy4wESpFjhV2A6GhspZTVca0sX6Ql4jInc8Ndj6/wGllb4W4S?=
- =?us-ascii?Q?x7Le11oMQ+3gjd9FOuBcxXff0MgpQagIYjBzneJ4cPwmAz0IukUnEIuLB5/l?=
- =?us-ascii?Q?/PgTEmk64XSaWrs1nOc08YdmKK/zpm1ygt6rcCUxdyYPXTxUdQhZZrSNEzf8?=
- =?us-ascii?Q?s18QIraMq/UEEoRxDIANeU+tMaGsVhfWIXAWl+eXsnNfHwN/8iuMgUDOaOd5?=
- =?us-ascii?Q?OvZfry2quPDzm58CXsLwnHoCYEtphFH6JQUsAQGddRWTRPmWGV/b+MPU9EnY?=
- =?us-ascii?Q?2Vo0TRz7zQTRuU5xoc6ZGZ8LVe4Cr/IWC9UQtCvwQa5DSpaatB3fcbIZRMUK?=
- =?us-ascii?Q?myAgC71uw5Ciqcd0gZa0y4GAt+bm17B5Tturo797wTGsNcKorjLOLdqGEF8x?=
- =?us-ascii?Q?3Pt4n3bKsaSFam9Fr9GuoGo9ENPXQcSWCxDI4gZQoj3T0g1vqxlGFdWMB6wV?=
- =?us-ascii?Q?KGmGGj0qodiPQ/U0oDqgz1GMIuYHrlzWaDTC20gATl0d/wNsfyB6UxjNKc2M?=
- =?us-ascii?Q?Mxktm6RRlTTPG4WusNBtxS+/2HbyXgF0cyMsTapFEKM8LcL8XNw9obVMi3JN?=
- =?us-ascii?Q?eQSQfw4Tr5UpN1nLrOXj0IYDJLt4qhkjlIp7XK9kVmKYl+kBhpfZLyRPIEnv?=
- =?us-ascii?Q?fVotytZUDfmb1isssHAel8ZLMI7WRgzC9fle4cAR?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95701156F57
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 16:18:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715098727; cv=none; b=QR2ttyZ0FxkNEA6X90xncNeuwNWe+XjZ435DaOXAlZEgnkRB8zBXt+FMTlNkulRVmEkfi6Nn/47hJpVrsiVnEM5ZYdR9LKOCrFeflQNhWht1XEq4nPhON7z268cM1mFH1QVzVaMMZHgAVcpiwf7Mcksf0pG8nEzM9XrECUFcgZc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715098727; c=relaxed/simple;
+	bh=6Q2n79LDESI6i50jya043KMGWqYlSeunvJeO52hlaVs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HUmF/jVPyZVjCggj/tTlmPZlDRjiEG8sf2kDWCwf4hhI1wMlxZj0SHOLLeRevVzg5kIRfPf8pM6j5EtfTEb+4dGHXDNUiMSN8xF/sAosrnuU2MPjULlrCkcONWBokFb4PLQsPY8iSdxuR7w4MSvhmxXdllilN6/m1SO+iuj/zys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wVA9xhyb; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-deb45f85880so5780068276.2
+        for <netdev@vger.kernel.org>; Tue, 07 May 2024 09:18:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715098724; x=1715703524; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VFlao/MnSxk7bNXmWRbxJxCzyyIwCv2wGgQAPF8miwQ=;
+        b=wVA9xhyb2Fj5LCSRXz2M6KfMxAr2SEZICIvVYhZwoGmJGNT2TtmCzt230Nua56/xn6
+         rObrI7j07wVxGR2YTMBvr4tIw/qfVzeAGW76p/YM6W13sOhIo5ZvS6Rbc4lt3rC8d+Cw
+         MZXB15Fo6+QrzGpr8inmt7h6EZ0/4mBzcMCnHv44j3o7Fy/jr/BQpDTDKM5BZcum3UB8
+         +FkFfnyTvXGoTLrQK0OlziTlriv2a24z9N9R2Gau/F8k1udKFGFysGu4PnOnHsz7eARN
+         tfsyw9bg67TgLRhJzjQ3uuVixp4dOPS9teeuF5/9HOH/eeafE7W/w7tX1QsUQxeJXXqr
+         mJdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715098724; x=1715703524;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VFlao/MnSxk7bNXmWRbxJxCzyyIwCv2wGgQAPF8miwQ=;
+        b=UhJMeXQtWdsHqlIccGj3DVpALuy7rGe+XgBquvjbqvo9+TBBfMk5o6b2cT6LrhjgTh
+         Z0gDUC5hfqM/AWorl3N9/NtPVfwOXrEKePgutRHB7+DbxXEn6wc3x46M4jKMgmDXlqQo
+         zU4OEkjXf1pl0VQLv6x97ybmqaId4rPlZ7WTyt6IwVB3k+2lKmt8J6Cwp0lvcbvflMQh
+         GAfYmcEn/gecZcWLYXTJaWYUKtHW52jOOTlRaZXE5Lr84IywSmHbehWD4biIykjg24sr
+         NpD6eYVtZXU1FJKO+g5rgOiwTKX+mm6I7ajAbS/Sj7oPE1TCubTGaX7WxMXTR4uvpaqc
+         sKUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWQ7D1megbZijGadHzeMLfAKp/qi3UosDqKClTdN3yShm7gjH3t7kusWoltfW4ZUv0JxkpNQ45u8aLG5ns3drfY4ILz4PI8
+X-Gm-Message-State: AOJu0YzR7xAzbuHeu0dDbUOUB4waGRIa/V1y28qo8Zt8jZzPFuUGsXXX
+	fBUNloA1b3faKSxZ/l65/edBvjBUvSGfCfj8B8DSGaSGap+0i0nDEOyCph413e6JMOlD8iubuIn
+	pdel3JGWOgg==
+X-Google-Smtp-Source: AGHT+IGscY0ckkMQW61yww8hFWgaHCMkxnMbys0mLFPWDpN/qan9h2112RZUqlKXMHpQbup813KFsJy9V4S3ZA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1509:b0:de5:78:34d2 with SMTP id
+ 3f1490d57ef6-debb9d0ac78mr7151276.6.1715098724654; Tue, 07 May 2024 09:18:44
+ -0700 (PDT)
+Date: Tue,  7 May 2024 16:18:42 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB7965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e496bec-c1ed-413b-a1fc-08dc6eb153d6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2024 16:18:27.4471
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: L0dC85wC34hEB5t4wnuvutbM13SmFfffAMrCckj47FCg1YbfQ4SLxURBrOiaM+I4JqZcWa7lUENRNFB0EhwsY8kZ4ksglwJeYYCNlYYcHvk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5930
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
+Message-ID: <20240507161842.773961-1-edumazet@google.com>
+Subject: [PATCH net] ipv6: prevent NULL dereference in ip6_output()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Russell,
-I do agree with most of what you posted below, including that the Maxlinear=
- gpy driver has a bug in the handling of interrupts which is the culprit, a=
-nd that it can be fixed within that driver itself without additions to phyl=
-ib.
+According to syzbot, there is a chance that ip6_dst_idev()
+returns NULL in ip6_output(). Most places in IPv6 stack
+deal with a NULL idev just fine, but not here.
 
-Additional comment / question below
+syzbot reported:
 
-Thanks,
-Ronnie
+general protection fault, probably for non-canonical address 0xdffffc00000000bc: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x00000000000005e0-0x00000000000005e7]
+CPU: 0 PID: 9775 Comm: syz-executor.4 Not tainted 6.9.0-rc5-syzkaller-00157-g6a30653b604a #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+ RIP: 0010:ip6_output+0x231/0x3f0 net/ipv6/ip6_output.c:237
+Code: 3c 1e 00 49 89 df 74 08 4c 89 ef e8 19 58 db f7 48 8b 44 24 20 49 89 45 00 49 89 c5 48 8d 9d e0 05 00 00 48 89 d8 48 c1 e8 03 <42> 0f b6 04 38 84 c0 4c 8b 74 24 28 0f 85 61 01 00 00 8b 1b 31 ff
+RSP: 0018:ffffc9000927f0d8 EFLAGS: 00010202
+RAX: 00000000000000bc RBX: 00000000000005e0 RCX: 0000000000040000
+RDX: ffffc900131f9000 RSI: 0000000000004f47 RDI: 0000000000004f48
+RBP: 0000000000000000 R08: ffffffff8a1f0b9a R09: 1ffffffff1f51fad
+R10: dffffc0000000000 R11: fffffbfff1f51fae R12: ffff8880293ec8c0
+R13: ffff88805d7fc000 R14: 1ffff1100527d91a R15: dffffc0000000000
+FS:  00007f135c6856c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000080 CR3: 0000000064096000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+  NF_HOOK include/linux/netfilter.h:314 [inline]
+  ip6_xmit+0xefe/0x17f0 net/ipv6/ip6_output.c:358
+  sctp_v6_xmit+0x9f2/0x13f0 net/sctp/ipv6.c:248
+  sctp_packet_transmit+0x26ad/0x2ca0 net/sctp/output.c:653
+  sctp_packet_singleton+0x22c/0x320 net/sctp/outqueue.c:783
+  sctp_outq_flush_ctrl net/sctp/outqueue.c:914 [inline]
+  sctp_outq_flush+0x6d5/0x3e20 net/sctp/outqueue.c:1212
+  sctp_side_effects net/sctp/sm_sideeffect.c:1198 [inline]
+  sctp_do_sm+0x59cc/0x60c0 net/sctp/sm_sideeffect.c:1169
+  sctp_primitive_ASSOCIATE+0x95/0xc0 net/sctp/primitive.c:73
+  __sctp_connect+0x9cd/0xe30 net/sctp/socket.c:1234
+  sctp_connect net/sctp/socket.c:4819 [inline]
+  sctp_inet_connect+0x149/0x1f0 net/sctp/socket.c:4834
+  __sys_connect_file net/socket.c:2048 [inline]
+  __sys_connect+0x2df/0x310 net/socket.c:2065
+  __do_sys_connect net/socket.c:2075 [inline]
+  __se_sys_connect net/socket.c:2072 [inline]
+  __x64_sys_connect+0x7a/0x90 net/socket.c:2072
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-> -----Original Message-----
-> From: Russell King <linux@armlinux.org.uk>
-> Sent: Tuesday, May 7, 2024 7:54 AM
-> To: Raju Lakkaraju - I30499 <Raju.Lakkaraju@microchip.com>
-> Cc: Andrew Lunn <andrew@lunn.ch>; netdev@vger.kernel.org; lxu@maxlinear.c=
-om;
-> hkallweit1@gmail.com; davem@davemloft.net; edumazet@google.com; kuba@kern=
-el.org;
-> pabeni@redhat.com; linux-kernel@vger.kernel.org; UNGLinuxDriver <UNGLinux=
-Driver@microchip.com>
-> Subject: Re: [PATCH net-next] net: phy: add wol config options in phy dev=
-ice
->=20
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> On Tue, May 07, 2024 at 03:50:39PM +0530, Raju Lakkaraju wrote:
-> > Hi Russell King,
-> >
-> > Sorry for late response
-> >
-> > If we have phy's wolopts which holds the user configuration, Ethernet
-> > MAC device can configure Power Manager's WOL registers whether handle
-> > only PHY interrupts or MAC's WOL functionality.
->=20
-> That is the responsibility of the MAC driver to detect whether the MAC ne=
-eds to be programmed for
-> WoL, or whether the PHY is doing the wakeup.
-> This doesn't need phylib to do any tracking.
->=20
-> > In existing code, we don't have any information about PHY's user
-> > configure to configure the PM mode
->=20
-> So you want the MAC driver to access your new phydev->wolopts. What if th=
-ere isn't a PHY, or the PHY
-> is on a pluggable module (e.g. SFP.) No, you don't want to have phylib tr=
-acking this for the MAC. The
-> MAC needs to track this itself if required.
->=20
+Fixes: 778d80be5269 ("ipv6: Add disable_ipv6 sysctl to disable IPv6 operaion on specific interface.")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv6/ip6_output.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-There is definite value to having the phy be able to effectively communicat=
-e which specific wol events it currently has enabled so the mac driver can =
-make better decisions on what to enable or not in the mac hardware (which o=
-f course will lead to more efficient power management). While not really ne=
-eded for the purpose of fixing this driver's bugs, Raju's proposed addition=
- of a wolopts tracking variable to phydev was also providing a direct way t=
-o access that information. In the current patch Raju is working on, the fir=
-st call the lan743x mac driver does in its set_wol() function is to call th=
-e phy's set_wol() so that it gives the phy priority in wol handling. I gues=
-s when you say that phylib does not need to track this by adding a wolops m=
-ember to the phydev structure, if we need that information the alternative =
-way is to just immediately call the phy's get_wol() after set_wol() returns=
-, correct ?
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index b9dd3a66e4236fbf67af75c5f98c921b38c18bf6..8f67a43843bbf856ac706fc7cbb28cc08ea0e6d0 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -234,7 +234,7 @@ int ip6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	skb->protocol = htons(ETH_P_IPV6);
+ 	skb->dev = dev;
+ 
+-	if (unlikely(READ_ONCE(idev->cnf.disable_ipv6))) {
++	if (unlikely(!idev || READ_ONCE(idev->cnf.disable_ipv6))) {
+ 		IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTDISCARDS);
+ 		kfree_skb_reason(skb, SKB_DROP_REASON_IPV6DISABLED);
+ 		return 0;
+-- 
+2.45.0.rc1.225.g2a3ae87e7f-goog
 
-> > The 05/02/2024 16:59, Russell King (Oracle) wrote:
-> > > and why the PHY isn't retaining it.
-> >
-> > mxl-gpy driver does not have soft_reset( ) function.
-> > In resume sequence, mxl-gpy driver is clearing the WOL configuration
-> > and interrupt i.e. gpy_config_init( ) and gpy_config_intr( )
->=20
-> That sounds like the bug in this instance.
->=20
-> If a PHY driver has different behaviour from what's expected then it's bu=
-ggy, and implementing
-> workarounds in phylib rather than addressing the buggy driver is a no-no.=
- Sorry.
->=20
-> Why is mxl-gpy always masking and acknowledging interrupts in gpy_config_=
-init()? This goes completely
-> against what phylib expects.
-> Interrupts are supposed to be managed by the config_intr() method, not th=
-e config_init() method.
->=20
-> Moreover, if phydev->interrupts =3D=3D PHY_INTERRUPT_ENABLED, then we exp=
-ect interrupts to remain
-> enabled, yet mxl-gpy *always* disables all interrupts in gpy_config_init(=
-) and then re-enables them in
-> gpy_config_intr() leaving out the WoL interrupt.
->=20
-> Given that gpy_config_intr() is called immediately after
-> gpy_config_init() in phy_init_hw(), this is nonsense, and it is this nons=
-ense that is at the root of the
-> problem here. This is *not* expected PHY driver behaviour.
->=20
-> See for example the at803x driver, specifically at803x_config_intr().
-> When PHY_INTERRUPT_ENABLED, it doesn't clear the WoL interrupt (via the
-> AT803X_INTR_ENABLE_WOL bit.)
->=20
-> The dp83822 driver enables the WoL interrupt in dp83822_config_intr() if =
-not in fibre mode and
-> interupts are requested to be enabled.
->=20
-> The dp83867 driver leaves the WoL interrupt untouched in
-> dp83867_config_intr() if interrupts are requested to be enabled - if it w=
-as already enabled (via
-> set_wol()) then that state is preserved if interrupts are being used. dp8=
-3869 is the same.
->=20
-> motorcomm doesn't support interrupts, but does appear to use the interrup=
-t pin for WoL, and doesn't
-> touch the interrupt mask state in config_intr/config_init.
->=20
-> mscc looks broken in a similar way to mxl-gpy - even worse, if userspace =
-hammers on the set_wol()
-> method, it'll read the interrupt status which appears to clear the status=
- - possibly preventing real
-> interrupts to be delivered. It also does the
-> clear-MII_VSC85XX_INT_MASK-on-config_init() which will break WoL.
->=20
->=20
-> So, in summary, please fix mxl-gpy.c not to clear the interrupt mask in t=
-he config_init() method. The
-> contents of gpy_config_init() needs to move to gpy_config_intr(), and it =
-needs not to mask the WoL
-> interrupt if phydev->interrupts =3D=3D PHY_INTERRUPT_ENABLED.
->=20
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
