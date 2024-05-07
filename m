@@ -1,210 +1,99 @@
-Return-Path: <netdev+bounces-93943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9848A8BDB28
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 08:10:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 520E18BDB48
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 08:21:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAAC61C21019
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 06:10:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B4091C2185D
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 06:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20986EB7A;
-	Tue,  7 May 2024 06:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I6Sgo6Oi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0A571B25;
+	Tue,  7 May 2024 06:21:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22516EB59
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 06:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+Received: from zg8tmtu5ljy1ljeznc42.icoremail.net (zg8tmtu5ljy1ljeznc42.icoremail.net [159.65.134.6])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 044226F514;
+	Tue,  7 May 2024 06:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.65.134.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715062228; cv=none; b=tRwVNcjLd5s4YsVrJobmoCkU+uW+Gyuzmy/Sq+yULaubcYnDvVyJvAS3s9zsWfq3IbOUZ7EhUZy1+ABq9MOEGcRBI2AqgaAimplfnrBvO+8aofIJcB8FqZANh8USCUmkIW7DrIO6c8+UyJ90g8x9ZS9B3paPrjtx61XRWDY2jAI=
+	t=1715062891; cv=none; b=kDoDNtmNKYkMQw43wdjkEW3x/kKcIFROmVtCsA9Sq86DggFOrfkE2tQdMmPOqfn0tKqa5WzDUq1xzTOvZII2g+lGxPbEFwuMbzcGJcLjJVyHkGtqqXQCIZ2vkC8hL9NGJsBRLlGVVjfDbyJW6EzQMl/1AUDJSCDIycYGTevMKfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715062228; c=relaxed/simple;
-	bh=NN37t59EsYaWpOfY6mIxVvawgYy1WxwgD7Dv5L4ULOg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oRnmWqa8w712XrxPMAwr60P4pIlHL6KbkJaUNPvHlvKyyHT1+2XypTtGBqmxEyHt7QsA9nJzlKPFO7KxM7hNXgYOW91mPOSlucOiAbwPd+/+siuifn92beHrf5DJ5+G5Oe2/E0O3tH3x+dDnPYlFK1E9alxQpUn8kHyhcZL8Gf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=I6Sgo6Oi; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a59a9d66a51so590896566b.2
-        for <netdev@vger.kernel.org>; Mon, 06 May 2024 23:10:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1715062225; x=1715667025; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=MXjJi9Id2sTcJOhILmN1ky4B/45ar4n3Y4h1sMFH2gA=;
-        b=I6Sgo6Oi0tI1e1OvwJe607Twd2qVWLBld45zSG6wvw6c8Ro0TNuC4Uem7+WlXULGo6
-         Wln68zxocPZ/PguVTjDF/SiFOMWvj2CRjNeBnDEOb0p945mIQEb96plHqtOFEW9ao6dV
-         Izp9Q6pZzlN7ON8AxXFIIBoxRJYkXYNHw7BXkk3B3dyiOg7Hx5aqNErff0JZGc1uQkEL
-         L22Q/7YLEQeT07q7yO3jv8kb9/dcGoU3+zoJOKlX9tfMY7t+DqU490UNSpPBJU/fcqnD
-         xks3V/30ZVtnHYOzKvJcvCzzy9D9B8zgt7EY8Ki2pe0TUmcuj1NU3ZDDwOPdx9qzG5re
-         zfiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715062225; x=1715667025;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MXjJi9Id2sTcJOhILmN1ky4B/45ar4n3Y4h1sMFH2gA=;
-        b=BGoTb03BSzrTAT4Glsbz2MtFoZoeSbUzwhrszeEk3cfwfA1BcMK6JStv62+nJkszOa
-         cpXDQVwhPMCgxgvm8mQ2HlPGJxeCEvFnVBbb1qiD+AzeGKGsrq4J8eSPresZo2I64Bvr
-         cx6QSyFSU6/XxBi4A+hamw+/V/6si2vV9BCsRW2e+XRH6VAPF7ck5zaztlXKC6H/pTXL
-         SK0Ttcg7WUbB5XTdNNsHSfFfHABWK7aYHeVlDrimUJGS//kFL58vBCyXRlwZOyHJhdQw
-         YMR+I0JKxsxtfZDZ2ryNANnJhBg0ADnazhPKSdFluT6Q+CoMEaCNFkmyWK2a2mEM0UqO
-         bqPg==
-X-Forwarded-Encrypted: i=1; AJvYcCWm05SHTJthWB/L7o8a7ArP29KCnYaqZBmZdiLn++he31NttvcxWQR1WlCIOLXAsl1Dy8w8UdTqbMhuYj9aNdM/fWyYnXKn
-X-Gm-Message-State: AOJu0Yzzruyy+hiHg7T9maJvA9sAPjq6a2dsddL9UtpazCLg3cK44ZEg
-	j5y3LvLlkpS2+3gM5TfnvOFOiz3l4LFlMRQdWOubGbDslhEWXfvxc+8nlcMGOt8=
-X-Google-Smtp-Source: AGHT+IFu8eR50FD/Gd28rJu3Vx/lNXa5WeyJ9YlaXosgaZ3mAvfhxHhCWRy7RjhvEshV0yDHDcXhhw==
-X-Received: by 2002:a50:bb0b:0:b0:56e:63d3:cb3e with SMTP id y11-20020a50bb0b000000b0056e63d3cb3emr7637147ede.41.1715062225320;
-        Mon, 06 May 2024 23:10:25 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.206.169])
-        by smtp.gmail.com with ESMTPSA id q11-20020a056402248b00b005726b83071esm6060147eda.4.2024.05.06.23.10.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 May 2024 23:10:24 -0700 (PDT)
-Message-ID: <d88e6d38-e7fd-4d06-8c54-e89948d568fd@linaro.org>
-Date: Tue, 7 May 2024 08:10:22 +0200
+	s=arc-20240116; t=1715062891; c=relaxed/simple;
+	bh=HF+Ofv68p/rKPCMK4bG+yOgon7sXYv8NhYt95aJ9Zug=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=MZ9MVGITxUlKXnUmL/rElOlmvm6gw/N5twgvsy3IgOWaxK2Mba5tKT7mSCn6kKSoB0vuHkl8EcUqDBjS99sGQ145+RZ56w1UdUhW96+qqieOfCJhfPf9YvQNDfPn0eKnDwyBClNdZDyDsxtR7Jga2hwNbYoKWOOy8WB/d4mNyUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=159.65.134.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from ubuntu.localdomain (unknown [221.192.179.90])
+	by mail-app4 (Coremail) with SMTP id cS_KCgC3Q7FVyDlmqYMzAA--.6564S2;
+	Tue, 07 May 2024 14:21:13 +0800 (CST)
+From: Duoming Zhou <duoming@zju.edu.cn>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-hams@vger.kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	jreuter@yaina.de,
+	horms@kernel.org,
+	Markus.Elfring@web.de,
+	dan.carpenter@linaro.org,
+	lars@oddbit.com,
+	Duoming Zhou <duoming@zju.edu.cn>
+Subject: [PATCH RESEND net v4 0/4] ax25: Fix issues of ax25_dev and net_device
+Date: Tue,  7 May 2024 14:21:08 +0800
+Message-Id: <cover.1715062582.git.duoming@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cS_KCgC3Q7FVyDlmqYMzAA--.6564S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Jr17CF4xCrWxAFyUArW8WFg_yoWfXFX_uF
+	ykAFWUZw18JFWDCa10ka1rXrZruF4jga1xXFyftFZ5Jry3Za4UJr4qgr4rXF18XFW7tr4k
+	t3Z5Gr1fAr17JjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUU1n8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_GcCE
+	3s1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
+	1lnx0E84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_GcCE3s0E84ACjcxK6xIIjxv20xvE14v2
+	6w1j6s0q6x02cVCv0xWlnx0E84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_GcCE3s0E84ACjc
+	xK6I8E87Iv67AKxVW0oVCq3VCjxxvEa2IrM2vj628EF7xvwVC0I7IYx2IY6xkF7I0E14v2
+	6rxl6s0q6x02cVCv0xWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I
+	8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCF
+	s4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFI
+	xGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK67AK6r47MxAI
+	w28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr
+	4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxG
+	rwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJw
+	CI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2
+	z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUUZYwUUUUUU==
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwMOAWY4-AkEPQBQsN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Aw: Re: [RFC v1 1/5] dt-bindings: leds: add led trigger netdev
-To: Frank Wunderlich <frank-w@public-files.de>
-Cc: Frank Wunderlich <linux@fw-web.de>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Eric Woudstra <ericwouds@gmail.com>, Tianling Shen <cnsztl@immortalwrt.org>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-leds@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240505164549.65644-1-linux@fw-web.de>
- <20240505164549.65644-2-linux@fw-web.de>
- <8e9fd4c9-f537-4413-b8c8-988b001b64c0@linaro.org>
- <trinity-c7cd6e30-cb34-4405-9527-6e183179c302-1715015402906@3c-app-gmx-bap23>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Language: en-US
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <trinity-c7cd6e30-cb34-4405-9527-6e183179c302-1715015402906@3c-app-gmx-bap23>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 06/05/2024 19:10, Frank Wunderlich wrote:
-> Hi
-> 
->> Gesendet: Montag, 06. Mai 2024 um 10:18 Uhr
->> Von: "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>
->> An: "Frank Wunderlich" <linux@fw-web.de>, "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>, "Conor Dooley" <conor+dt@kernel.org>, "Michael Turquette" <mturquette@baylibre.com>, "Stephen Boyd" <sboyd@kernel.org>, "Pavel Machek" <pavel@ucw.cz>, "Lee Jones" <lee@kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Matthias Brugger" <matthias.bgg@gmail.com>, "AngeloGioacchino Del Regno" <angelogioacchino.delregno@collabora.com>
->> Cc: "Frank Wunderlich" <frank-w@public-files.de>, "Eric Woudstra" <ericwouds@gmail.com>, "Tianling Shen" <cnsztl@immortalwrt.org>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, linux-leds@vger.kernel.org, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
->> Betreff: Re: [RFC v1 1/5] dt-bindings: leds: add led trigger netdev
->>
->> On 05/05/2024 18:45, Frank Wunderlich wrote:
->>> From: Frank Wunderlich <frank-w@public-files.de>
->>>
->>> Add led trigger implemented with config-symbol LEDS_TRIGGER_NETDEV to
->>> binding.
->>>
->>> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
->>> ---
->>>  Documentation/devicetree/bindings/leds/common.yaml | 2 ++
->>>  1 file changed, 2 insertions(+)
->>>
->>> diff --git a/Documentation/devicetree/bindings/leds/common.yaml b/Documentation/devicetree/bindings/leds/common.yaml
->>> index 8a3c2398b10c..bf9a101e4d42 100644
->>> --- a/Documentation/devicetree/bindings/leds/common.yaml
->>> +++ b/Documentation/devicetree/bindings/leds/common.yaml
->>> @@ -113,6 +113,8 @@ properties:
->>>              # LED indicates NAND memory activity (deprecated),
->>>              # in new implementations use "mtd"
->>>            - nand-disk
->>> +            # LED indicates network activity
->>> +          - netdev
->>
->> "dev" is redundant (there is no flash-dev or usb-host-dev). Two network
->> interfaces are already provided, so your commit msg must provide
->> rationale why this is not enough and why this is useful/needed.
-> 
-> i only see 1 network binding...and this is labeled/described with wlan and phy
-> 
->         # LED is triggered by WLAN activity
->       - pattern: "^phy[0-9]+tx$"
-> 
-> which second do you mean?
-> 
-> btw. usb + disk has 3 trigger and "netdev" is already used in some dts, so i thought adding the binding is a good idea
-> 
-> arch/arm/boot/dts/rockchip/rk3128-xpi-3128.dts:107:			 * linux,default-trigger = "netdev";
-> arch/arm/boot/dts/nxp/imx/imx53-m53menlo.dts:52:			linux,default-trigger = "netdev";
-> arch/arm/boot/dts/intel/ixp/intel-ixp42x-dlink-dsm-g600.dts:51:			linux,default-trigger = "netdev";
-> arch/arm/boot/dts/intel/ixp/intel-ixp42x-iomega-nas100d.dts:39:			linux,default-trigger = "netdev";
-> arch/arm/boot/dts/ti/omap/am5729-beagleboneai.dts:138:			linux,default-trigger = "netdev";
-> arch/arm/boot/dts/ti/omap/am335x-netcan-plus-1xx.dts:27:			linux,default-trigger = "netdev";
-> arch/mips/boot/dts/ralink/gardena_smart_gateway_mt7688.dts:107:			linux,default-trigger = "netdev";
-> arch/mips/boot/dts/ralink/gardena_smart_gateway_mt7688.dts:113:			linux,default-trigger = "netdev";
-> 
+The first patch uses kernel universal linked list to implement
+ax25_dev_list, which makes the operation of the list easier.
+The second and third patch fix reference count leak issues of
+the object "ax25_dev" and "net_device". The last patch uses
+ax25_dev_put() to replace kfree() in ax25_dev_free().
 
-Then please check previous discussions:
-https://lore.kernel.org/all/20230217230346.GA2217008-robh@kernel.org/
+You can see the former discussion in the following link:
+https://lore.kernel.org/netdev/20240501060218.32898-1-duoming@zju.edu.cn/
 
-Best regards,
-Krzysztof
+Duoming Zhou (4):
+  ax25: Use kernel universal linked list to implement ax25_dev_list
+  ax25: Fix reference count leak issues of ax25_dev
+  ax25: Fix reference count leak issues of net_device
+  ax25: Change kfree() in ax25_dev_free() to ax25_dev_put()
+
+ include/net/ax25.h  |  4 ++--
+ net/ax25/ax25_dev.c | 51 ++++++++++++++++-----------------------------
+ 2 files changed, 20 insertions(+), 35 deletions(-)
+
+-- 
+2.17.1
 
 
