@@ -1,91 +1,92 @@
-Return-Path: <netdev+bounces-93914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEFC78BD934
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 03:58:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0C818BD936
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 04:00:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72E07283821
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 01:58:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 948AB1F21CE6
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 02:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B063139F;
-	Tue,  7 May 2024 01:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F57D441D;
+	Tue,  7 May 2024 02:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n7WD8zIJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MDoYnyiP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7706B4A0A
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 01:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38DED1FA5
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 02:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715047119; cv=none; b=FpiOikJ0vCeRPRkcJE9SvshG9NiU2yAQf4sl/ZAhaAd91rjysctEW/roLHiAQnlxpa5PVU5FyURa0cQrueJ96tCNkHPKLNmVp1iD4jgBpUP36297TNAitHY9TBiZJs6C0AFoMzSwwQ1CQMjI5sgAgoeVvlaZkFBFcaCBay6oeas=
+	t=1715047232; cv=none; b=OLnxGT8P+ErQoFOIg2gkcJ37V9owH3FU1IsEEmlIwRC1PUxF5XBLPixuv5UADWxRhMzUimgoBojhCl9vhpUeuLakwVmc7KHYszkU6Xwh3AirT0JxjxCI61Yi0hFVXH9CEjIsbJV0R04hM7fFtjTaBfpsfZAxzdmxUdtGJ2khgUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715047119; c=relaxed/simple;
-	bh=Elngfwk+fsCDMlbluSYtBtSitWihDgt51DhjVItnnjI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VUMj86EIDlshVeeFHPRXD6OXGyI+AjZjBQ6CrJLoGY7CtFOI7rKuYOFuxfX+axOmUj5BvBQUxZ5N7FfMlMtbxxFk/szPVJ9baqe54dm/+H8wEUTZGtMWb+l/9MZ8lb5T7RFGZ8jDO9ASkt5JcplS0PpWhoSLlgGwU8JIgOeSNg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n7WD8zIJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCCFCC116B1;
-	Tue,  7 May 2024 01:58:38 +0000 (UTC)
+	s=arc-20240116; t=1715047232; c=relaxed/simple;
+	bh=TQ6O6ghgalslE1P7LHosilAfRO6nndY0Vg9GSPZml7g=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=uLHu7XncGCifBQyso+u8CrDCBs+Il0OC4xlKz/l0+r7mJFrTTtb5Wneibly5+NJQnLWc1O6qReCDgs1hkZybp8C4M5zdowLBo79UWlCX4H73Q39pV5HiCynTwsdwE8GiSabFqIvSirKKhzmwASKzJlrGSDwQhz+rI5c/yhB6UFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MDoYnyiP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 88DB3C3277B;
+	Tue,  7 May 2024 02:00:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715047119;
-	bh=Elngfwk+fsCDMlbluSYtBtSitWihDgt51DhjVItnnjI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=n7WD8zIJw4Z4m/wN1g0a7p8utSF+CUKYx/K0Qy7HOP1MSTtb93ubtgQ9uSwzynRdS
-	 dGJyP0m51373uiROVRqNQiWn0MSji7vKYzwBFQSArbRePveG7BZOF9Xcd/DbSX1e+q
-	 MZTUrUgcJnoqcdlu9YLM7i/2r7uDP8X6rzFA7IhY249u0zmhzh/nhQE7LGH6KenHEO
-	 bz7mgGCbFXoWben+Ggd0JUz8vWjcS8fEHCezA6Fm2nHL3pIKsuTLIndDygDrMVgcrC
-	 0LPon2TNdtRnIWEEqG4NZPrbUZ55D/wQR1DyUtlFvjF6zHSNtzb0rhd1AZNcuHlWCY
-	 CHkC7rMoRZqBg==
-Date: Mon, 6 May 2024 18:58:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, jiri@resnulli.us,
- horms@kernel.org
-Subject: Re: [PATCH net-next v4 4/6] net: tn40xx: add basic Rx handling
-Message-ID: <20240506185837.0f1db786@kernel.org>
-In-Reply-To: <20240501230552.53185-5-fujita.tomonori@gmail.com>
-References: <20240501230552.53185-1-fujita.tomonori@gmail.com>
-	<20240501230552.53185-5-fujita.tomonori@gmail.com>
+	s=k20201202; t=1715047231;
+	bh=TQ6O6ghgalslE1P7LHosilAfRO6nndY0Vg9GSPZml7g=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MDoYnyiPh5Gsm3/SEdok42VvEXRT1azgCjIGoWvFqpkGGnnpMRTtrmn3NagjfAJiK
+	 VZHJYARCTYpTIYniuHiiSjS5xnWIFbhQcAC1gVPF2SwghOt2kHIM0xDG2RoZ82qV3e
+	 Q/Se5QThy7sFxR3Bnqzm5MIJgHFa70d8Txn4utABwM4lamc0dt290RVn7JxOpQZgfO
+	 EPmWLg1aToFWMN+gDajsXJcuWhxZu8JXlxR83dGDJXNesxiGXMVJaMYOo+ddqCFbsU
+	 vIUXffOU8GqBLnJ66oInrrU9MdJ4tBFukV6MNYxeEG3T7YwdmRkzYF+rvH5YLvVp/a
+	 MLtWqNB2OqmxA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7716FC43333;
+	Tue,  7 May 2024 02:00:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] phonet: fix rtm_phonet_notify() skb allocation
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171504723148.13822.6899925292658413370.git-patchwork-notify@kernel.org>
+Date: Tue, 07 May 2024 02:00:31 +0000
+References: <20240502161700.1804476-1-edumazet@google.com>
+In-Reply-To: <20240502161700.1804476-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, courmisch@gmail.com
 
-On Thu,  2 May 2024 08:05:50 +0900 FUJITA Tomonori wrote:
-> @@ -745,6 +1248,21 @@ static irqreturn_t tn40_isr_napi(int irq, void *dev)
->  	return IRQ_HANDLED;
->  }
->  
-> +static int tn40_poll(struct napi_struct *napi, int budget)
-> +{
-> +	struct tn40_priv *priv = container_of(napi, struct tn40_priv, napi);
-> +	int work_done;
-> +
-> +	tn40_tx_cleanup(priv);
-> +
-> +	work_done = tn40_rx_receive(priv, &priv->rxd_fifo0, budget);
-> +	if (work_done < budget) {
-> +		napi_complete(napi);
+Hello:
 
-napi_complete_done() works better with busy polling and such 
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +		tn40_enable_interrupts(priv);
-> +	}
-> +	return work_done;
-> +}
-> +
+On Thu,  2 May 2024 16:17:00 +0000 you wrote:
+> fill_route() stores three components in the skb:
+> 
+> - struct rtmsg
+> - RTA_DST (u8)
+> - RTA_OIF (u32)
+> 
+> Therefore, rtm_phonet_notify() should use
+> 
+> [...]
 
-> +	netif_napi_del(&priv->napi);
-> +	napi_disable(&priv->napi);
+Here is the summary with links:
+  - [net] phonet: fix rtm_phonet_notify() skb allocation
+    https://git.kernel.org/netdev/net/c/d8cac8568618
 
-These two lines are likely in the wrong order
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
