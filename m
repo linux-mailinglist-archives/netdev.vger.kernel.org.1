@@ -1,110 +1,115 @@
-Return-Path: <netdev+bounces-94296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60D438BF08C
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 01:08:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A39F8BF0B0
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 01:09:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C930281506
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 23:08:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E7281F214E1
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 23:09:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0593A8528F;
-	Tue,  7 May 2024 23:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0648E136667;
+	Tue,  7 May 2024 23:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CVZqsKqV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AOmSgRzX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEDD27F7D9;
-	Tue,  7 May 2024 23:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B5D13664B
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 23:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715122801; cv=none; b=AgBP+5G/DzW+tVCHjoZOKbt7t+Ag1UNI5qgW/BdnBGmseRnFDomOxPsjPygcSmNHj2Abcsdi3LYQEAxhh09K0XsagB6RxW8zzuLi/V1mfF97REEMSvGo7F+EoCho8E3/SGJV/z/fAKvWrBE/D7MYJ3sbrtS4hXF0aT1GDB9kVDA=
+	t=1715122815; cv=none; b=YkM61FzFVYI5n4pq1VMdGAFPGFfeR8qQKIiwhkjn9sHOeN1oDC2o2AdYC2KkWEpHd2k1ClGUBZFajup+Y/n33r3gd8QP6FdcYwvppj+dNMrQz+WG2T+fsxygB6vnI9ECx/i50v7uDhprV/l9+rv1ORhdk9oZ02XTbYtfHlnQE1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715122801; c=relaxed/simple;
-	bh=HlhvlycC8BrhmgA7a7fniCtJoAtPnqD+b3bHZuUb0vY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dSK9uyypc1eyO9oCa6X2VENZsfGT3APh5czZz+o2kWsz2xczk/EcQQdezG86V9PtX5esISA+hpFtsGBO7ImM/wBGFO6L5DSgUPihUZ0KLEnZmEsEk6XLkfb1rYfkTXSuaIBMzhmfx+cl0hsJZr0N9yUgM3qofnXNQ6zf0jA8ADs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CVZqsKqV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2937C3277B;
-	Tue,  7 May 2024 22:59:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715122801;
-	bh=HlhvlycC8BrhmgA7a7fniCtJoAtPnqD+b3bHZuUb0vY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CVZqsKqV00Zdg1TPspNlrZBTHrKumTUPllp1bReyURfD/8ykPKXNeXiDpsvtVaS4/
-	 Xk4NDNhLQ3XtcHsz6dKnXjaK8BRztaEXQYmPQ81FHqw0qjZs8Fkyo4ROz5ximJZBSf
-	 /eqxxHH/dxcFU7p2oQeEyKG1bRapDWK2YK3vo/ulYxOacIqeFi7hRyRwUYVPQvusV8
-	 6XNfMgz0/xICMMIfASpoEfz77Masf5UNzhn5STPm623lC9MYrN033nfOxws+tYUyzp
-	 gMtYNv/cppzE0LilNhLaNmNEhOACMhp9BGLmR5xfJAcQOlGwfi5wncc3jdf6qeK3Nv
-	 cVnYFbyC1YYqA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Duanqiang Wen <duanqiangwen@net-swift.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	jiawenwu@trustnetic.com,
-	mengyuanlou@net-swift.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	maciej.fijalkowski@intel.com,
-	andrew@lunn.ch,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 14/19] Revert "net: txgbe: fix clk_name exceed MAX_DEV_ID limits"
-Date: Tue,  7 May 2024 18:58:36 -0400
-Message-ID: <20240507225910.390914-14-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240507225910.390914-1-sashal@kernel.org>
-References: <20240507225910.390914-1-sashal@kernel.org>
+	s=arc-20240116; t=1715122815; c=relaxed/simple;
+	bh=/GU79Kgff0skDDvMaY4WHPvnPx8SIQ17Sgl7wKmolF0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=G6qoJxkHbqQFsjtMApSIS8fsr/sim4SqddEbivjTvPZN2y7xEQbkVVmCsaIK6JuPa5CCDazdz9+w+xYQbs2Omcwz04zMqXLzkW20Y0czy9/DNnBsml1GOKXJyGuneI+gMaz6iD7jWLHAXCVAiCWG45DQeMfSHrTPcYhTyp7inXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AOmSgRzX; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61be3f082b0so64401657b3.1
+        for <netdev@vger.kernel.org>; Tue, 07 May 2024 16:00:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715122813; x=1715727613; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Sf3hv/X+FVx/KMJP0srRJep+yhny1t3ptyDpy1jPj74=;
+        b=AOmSgRzXXwfLLqiNCZkJp6O0EUuuF0oKiRgNjk0Ewotd46jSpvc7izMXfu9/hBBU0N
+         QWeCLgXqG80yikXuSRSfruaHy+59IgezRqhpoiVN8NzosIWPhQ2+DY9/wCaVjNM+ygoc
+         Nqd+gCtV5mfRrKzHh/blHRFQdmXMexlBmUfVZfjU2hpQIP22wFxdm2Xq/eT/KIxxyQVC
+         kbfhmVTYzeBCEqqLNZf/dck/hXE60ps0YY2n2cNTDxuc5nKAnk0jYEpMc3j6dy4AkTJ3
+         ZgbAWovBCdGOsL/AoVDn4wdmXplE4uRP9EvgS1gdMnqIIxo7mp0eL9dTe/v9S7qtbiQi
+         moqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715122813; x=1715727613;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Sf3hv/X+FVx/KMJP0srRJep+yhny1t3ptyDpy1jPj74=;
+        b=Pv0HLUwWYbFLcnGuP0pe5+wd6GFhWOqQvFPyuFUPzL+qLU7Oi52/XVhVgA93pheh8K
+         0pDJbWQRyR4qD85v1f5Xx1hLg1182JMBaCwWQJmTXlTPQoKgAEB7GxSnFEUEe8jSVVYG
+         bHABATSGkiazdfZghiJL8/YAKf4aMtaT5LrFEwYtZrwYuBlP+RpWYqt6TU6RVRkqzQm/
+         pEjsj6h6ZzAlgI+oZDVUAvPVq3GPtb2KnpUdjiawxMZVYpAVxbWn0bAFlpDAObRegeR7
+         L/2Xx/CIuHLGGlhrbXtiR2a2Ws/mzYilCDvNUjrShLeX/Id+vGjTELrnO1I43FxD/8oP
+         GCOw==
+X-Gm-Message-State: AOJu0YwQZITY+2GLTs5j7yRTGUBThW9V1e2/IKmZxhlvYlouk3o/EjjQ
+	dVwaQkAZJ2am+wSMwZzEi+5REcUqnvvHB0tTCF0hcq+Tz/MN+Jm3VaHeE/djTvpQXA0SBUTA9J9
+	6QsbTIIIcDEDfAQRzgXj1ETVBOpsXpKhIWIXx1EZzjqNzInf6cghpTvc6vVxJJLXH4PXupLJYUf
+	ITY5aky+F3+1AOIV3MDFAz+46OhOkCQQIOXZq4zAyLy47h/hT6
+X-Google-Smtp-Source: AGHT+IE9hOPN2lt7RSFJKIcZOyuNLU/r5OYWzliZ9pt3xeeJDz4hCT8iZ4E+txRGrb5DPst/gTSHqMgp3YtnFDE=
+X-Received: from ziwei-gti.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:9b0])
+ (user=ziweixiao job=sendgmr) by 2002:a25:8d03:0:b0:de1:d49:7ff6 with SMTP id
+ 3f1490d57ef6-debb9d3003cmr123671276.7.1715122812981; Tue, 07 May 2024
+ 16:00:12 -0700 (PDT)
+Date: Tue,  7 May 2024 22:59:40 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.30
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
+Message-ID: <20240507225945.1408516-1-ziweixiao@google.com>
+Subject: [PATCH net-next 0/5] gve: Add flow steering support
+From: Ziwei Xiao <ziweixiao@google.com>
+To: netdev@vger.kernel.org
+Cc: jeroendb@google.com, pkaligineedi@google.com, shailend@google.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	willemb@google.com, hramamurthy@google.com, rushilg@google.com, 
+	ziweixiao@google.com, jfraker@google.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Duanqiang Wen <duanqiangwen@net-swift.com>
+To support flow steering in GVE driver, there are two adminq changes
+need to be made in advance. The first one is adding adminq mutex lock,
+which is to allow the incoming flow steering operations to be able to
+temporarily drop the rtnl_lock to reduce the latency for registering
+flow rules among several NICs at the same time. The second one is to
+add the extended adminq command so that we can support larger adminq
+command such as configure_flow_rule command. The other three patches
+are needed for the actual flow steering feature support.
 
-[ Upstream commit edd2d250fb3bb5d70419ae82c1f9dbb9684dffd3 ]
+Jeroen de Borst (4):
+  gve: Add adminq extended command
+  gve: Add flow steering device option
+  gve: Add flow steering adminq commands
+  gve: Add flow steering ethtool support
 
-This reverts commit e30cef001da259e8df354b813015d0e5acc08740.
-commit 99f4570cfba1 ("clkdev: Update clkdev id usage to allow
-for longer names") can fix clk_name exceed MAX_DEV_ID limits,
-so this commit is meaningless.
+Ziwei Xiao (1):
+  gve: Add adminq mutex lock
 
-Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Link: https://lore.kernel.org/r/20240422084109.3201-2-duanqiangwen@net-swift.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/google/gve/Makefile      |   2 +-
+ drivers/net/ethernet/google/gve/gve.h         |  53 +++-
+ drivers/net/ethernet/google/gve/gve_adminq.c  | 228 +++++++++++++-
+ drivers/net/ethernet/google/gve/gve_adminq.h  |  98 ++++++
+ drivers/net/ethernet/google/gve/gve_ethtool.c |  91 +++++-
+ .../net/ethernet/google/gve/gve_flow_rule.c   | 296 ++++++++++++++++++
+ drivers/net/ethernet/google/gve/gve_main.c    |  86 ++++-
+ 7 files changed, 829 insertions(+), 25 deletions(-)
+ create mode 100644 drivers/net/ethernet/google/gve/gve_flow_rule.c
 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index e457ac9ae6d88..4159c84035fdc 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -551,7 +551,7 @@ static int txgbe_clock_register(struct txgbe *txgbe)
- 	char clk_name[32];
- 	struct clk *clk;
- 
--	snprintf(clk_name, sizeof(clk_name), "i2c_dw.%d",
-+	snprintf(clk_name, sizeof(clk_name), "i2c_designware.%d",
- 		 pci_dev_id(pdev));
- 
- 	clk = clk_register_fixed_rate(NULL, clk_name, NULL, 0, 156250000);
 -- 
-2.43.0
+2.45.0.rc1.225.g2a3ae87e7f-goog
 
 
