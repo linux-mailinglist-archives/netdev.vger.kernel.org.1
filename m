@@ -1,152 +1,91 @@
-Return-Path: <netdev+bounces-94099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 607778BE1DA
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:17:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F17A8BE1DD
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:18:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 649A8B22EC7
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:17:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB6C31F25EF2
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0445156F5D;
-	Tue,  7 May 2024 12:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37518156F45;
+	Tue,  7 May 2024 12:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Trch9/hC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="H+RObFUe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F7073530
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 12:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546BD156F23;
+	Tue,  7 May 2024 12:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715084271; cv=none; b=O1NUGchCE/qHJbD2CE0vgGEfvM6jvPz/ON8UVhIMbIH3af8b3jXeG0mdwc8BQ0vlR+Ud+ojWkiDMyzddoqXnk9vD6sPuT2Bgo/3RtMC6ly5oVlnpPmhNNhbhZ0vhUQJzt7QN3I2qRYqpmAQhBh2yX4XbL47JH2p17b5hGrmO6fk=
+	t=1715084302; cv=none; b=G2wE5GD2/8PVnCy+qUrY2gn8dLGwor5PKvmSAeruGy0fdP8PZCQXeZQieFg8fDyHwv2V+iMlbS9iV6mbxjcjO4E9vX90dz3j1Thf21u3sZdoSSUSsFDW9yQD2kGcoB/Ujp/jHtTS4yzTG247/AlhkGLwLGiYFDbFIfsImAqn0M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715084271; c=relaxed/simple;
-	bh=CFnhRfVVMb6W18q4kQBKyyaO05P1kJKdUisOQqI/Xc0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=h0q2vP244SKQY4lOG5ENb7V0+SAn+dLFvI7Dq8EyINEZKsJ9wcGs/sDZSeb0YkBn75rCP6HejWbSo9+M6fw3Ioa0iCr4cFsaaqYzMrJpEzcTAxRLdDsBi025wLu4gwFB23gq6tb5wAdAMbHw6ge71qvOLClI5ZMKp+L1ClTkre4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Trch9/hC; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61e0c296333so66154087b3.1
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 05:17:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715084269; x=1715689069; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SaKcvGzisgxVw+30ti0gDUw/ORGEq//I2ZgeYuQh9vk=;
-        b=Trch9/hC0+4Ht/TpxYLT2uN/TP3f1NMIR6vrdnzVfjGABdiVPg6ogk0uSOSR4ABRbD
-         GXgoUTy94GhkOyTYvRG6fjmKW717p5eux16S66H39S4cbhDOtr4MQP5SONlm4FdQ4hN+
-         9El6lLFadqDJMmZqp5NMlZ5sE1L6eokLynkKmtcXIB+eZntzB5pV1lXVdwMrou/cuShS
-         9D2wBcfa8OkzGc9mYLfgjLYzIcD6fK2iPNUxKCI3nVNM1TOyo0h/t1wbfEbnknRxliZA
-         qZzADDv0pWG87/OrOtpVpd8vEpQl5S59hUA6BBRZ6HA21EZCtjmsFiR4ShR2SLIDy8lz
-         4ZRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715084269; x=1715689069;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SaKcvGzisgxVw+30ti0gDUw/ORGEq//I2ZgeYuQh9vk=;
-        b=GlH9fYU+dyQDN2Fekwyvu0tBr/e+FO40QldWZwRoHPMVq2QldChWx/HlX8GLZpQ5Vi
-         lw39kjCf5gQKmXGyf5vmZSCffICqO0/OGRZgjJ3AftsX5fRC30GBmaGXS+IrzZo7SRZI
-         wN6313efvtfg5+PyodSUIvesnj1wpKecBFG7upWj/HzVVGmjFOo+znlY477WA9Opgn1h
-         1bPHWOC13/xSlCI3rnZ6garQI5tDjnSu/ywrMMTlP9EGGUCERF6o3V4YzVGHaM5k9YoX
-         VGUQhWTWDelfxeM86ao41Mme9UiT4krf4bKvLJJ79Sut5Pm/PsMUvul0vjJkNwgJXzgi
-         6zcQ==
-X-Gm-Message-State: AOJu0Yx3zuvS2eDUJU/QfFiEG4KLQI0jxd1lgRZyRi5OWJn5bj9AjbvE
-	b8zhGfByPjqMaxpKg9kw+pI6l2X4wn7yjM19ye7g+84NqN9Nlogae3l1Tp4FYovgeMSvjVMLKj6
-	4pSACAIlcsg==
-X-Google-Smtp-Source: AGHT+IFbAGnEohbfOzVTI7/wzXp/auUKxB7x5D7PFDuAzc70kQiYLe59z3NYj59Yupwe8zUSTqbzudQVR7sPEg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:910d:0:b0:611:5a9d:bb0e with SMTP id
- i13-20020a81910d000000b006115a9dbb0emr669325ywg.4.1715084269353; Tue, 07 May
- 2024 05:17:49 -0700 (PDT)
-Date: Tue,  7 May 2024 12:17:48 +0000
+	s=arc-20240116; t=1715084302; c=relaxed/simple;
+	bh=XaLCNAECeluzjka4Oi85rIiDsTD/ZdajAgV3Z6+v+7k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KsjIcKB2mWGqYh/HY/jdHoEqpefn6MscHY/Lu/UBCLVIYro70vZnNp7+T1DuprfbvravDJpEcpfv3nbBI1cB44Ej6FO/jmizqGea8TUqKWvVwMTLBpRsp0IAL32GUFbkDp21VvTlNRPsN6IMfYxYtkkBryu34GDpS3JaPo0WWM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=H+RObFUe; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=sQM7rZP+pwd6y8h6SxqC2oyGkTbPvL7xGJBN4HpKr/I=; b=H+RObFUegfuZ2TdyPCJN3rgdVf
+	LUzOCqnzI7JHPLWff6XuRq2XbRFosmQyErR3l5CR9BWv4yBUbPYku0tQEO871ENmYWt4F51D+lkVW
+	DvXnuPEA9tNUByoG/kXU6mPav+iVuexgWqHtCt7e6C+AigcqHgbXrYBwhJC4tRTnWpCA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s4Jlr-00Eqp4-Ak; Tue, 07 May 2024 14:18:11 +0200
+Date: Tue, 7 May 2024 14:18:11 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux@ew.tq-group.com
+Subject: Re: [PATCH net-next v2 2/2] net: phy: marvell: add support for
+ MV88E6250 family internal PHYs
+Message-ID: <a46c1c48-653b-48b1-9a56-da2030545f81@lunn.ch>
+References: <24d7a2f39e0c4c94466e8ad43228fdd798053f3a.1714643285.git.matthias.schiffer@ew.tq-group.com>
+ <0695f699cd942e6e06da9d30daeedfd47785bc01.1714643285.git.matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240507121748.416287-1-edumazet@google.com>
-Subject: [PATCH v2 net-next] phonet: no longer hold RTNL in route_dumpit()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Remi Denis-Courmont <courmisch@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0695f699cd942e6e06da9d30daeedfd47785bc01.1714643285.git.matthias.schiffer@ew.tq-group.com>
 
-route_dumpit() already relies on RCU, RTNL is not needed.
+On Thu, May 02, 2024 at 01:13:01PM +0200, Matthias Schiffer wrote:
+> The embedded PHYs of the 88E6250 family switches are very basic - they
+> do not even have an Extended Address / Page register.
+> 
+> This adds support for the PHYs to the driver to set up PHY interrupts
+> and retrieve error stats. To deal with PHYs without a page register,
+> "simple" variants of all stat handling functions are introduced.
+> 
+> The code should work with all 88E6250 family switches (6250/6220/6071/
+> 6070/6020). The PHY ID 0x01410db0 was read from a 88E6020, under the
+> assumption that all switches of this family use the same ID. The spec
+> only lists the prefix 0x01410c00 and leaves the last 10 bits as reserved,
+> but that seems too unspecific to be useful, as it would cover several
+> existing PHY IDs already supported by the driver; therefore, the ID read
+> from the actual hardware is used.
+> 
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
 
-Also change return value at the end of a dump.
-This allows NLMSG_DONE to be appended to the current
-skb at the end of a dump, saving a couple of recvmsg()
-system calls.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Remi Denis-Courmont <courmisch@gmail.com>
----
-v2: break;; -> break; (Jakub)
----
- net/phonet/pn_netlink.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
-
-diff --git a/net/phonet/pn_netlink.c b/net/phonet/pn_netlink.c
-index 59aebe29689077bfa77d37516aea4617fe3b8a50..92245fdfa846cb8b9747764a3330e17d8c6b1f16 100644
---- a/net/phonet/pn_netlink.c
-+++ b/net/phonet/pn_netlink.c
-@@ -178,7 +178,7 @@ static int fill_route(struct sk_buff *skb, struct net_device *dev, u8 dst,
- 	rtm->rtm_type = RTN_UNICAST;
- 	rtm->rtm_flags = 0;
- 	if (nla_put_u8(skb, RTA_DST, dst) ||
--	    nla_put_u32(skb, RTA_OIF, dev->ifindex))
-+	    nla_put_u32(skb, RTA_OIF, READ_ONCE(dev->ifindex)))
- 		goto nla_put_failure;
- 	nlmsg_end(skb, nlh);
- 	return 0;
-@@ -263,6 +263,7 @@ static int route_doit(struct sk_buff *skb, struct nlmsghdr *nlh,
- static int route_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- {
- 	struct net *net = sock_net(skb->sk);
-+	int err = 0;
- 	u8 addr;
- 
- 	rcu_read_lock();
-@@ -272,16 +273,16 @@ static int route_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 		if (!dev)
- 			continue;
- 
--		if (fill_route(skb, dev, addr << 2, NETLINK_CB(cb->skb).portid,
--			       cb->nlh->nlmsg_seq, RTM_NEWROUTE) < 0)
--			goto out;
-+		err = fill_route(skb, dev, addr << 2,
-+				 NETLINK_CB(cb->skb).portid,
-+				 cb->nlh->nlmsg_seq, RTM_NEWROUTE);
-+		if (err < 0)
-+			break;
- 	}
--
--out:
- 	rcu_read_unlock();
- 	cb->args[0] = addr;
- 
--	return skb->len;
-+	return err;
- }
- 
- int __init phonet_netlink_register(void)
-@@ -301,6 +302,6 @@ int __init phonet_netlink_register(void)
- 	rtnl_register_module(THIS_MODULE, PF_PHONET, RTM_DELROUTE,
- 			     route_doit, NULL, 0);
- 	rtnl_register_module(THIS_MODULE, PF_PHONET, RTM_GETROUTE,
--			     NULL, route_dumpit, 0);
-+			     NULL, route_dumpit, RTNL_FLAG_DUMP_UNLOCKED);
- 	return 0;
- }
--- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
-
+    Andrew
 
