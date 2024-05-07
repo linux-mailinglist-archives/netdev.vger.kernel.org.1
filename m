@@ -1,79 +1,83 @@
-Return-Path: <netdev+bounces-94109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D5D38BE258
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:40:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 276D98BE260
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:43:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53A0C1C239D7
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:40:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25B51B23A1C
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:43:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE21215D5A1;
-	Tue,  7 May 2024 12:40:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8CB715B12B;
+	Tue,  7 May 2024 12:43:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BBZ7dYSB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AgT2vZTb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com [209.85.221.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009F56CDB1;
-	Tue,  7 May 2024 12:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05337158A2D;
+	Tue,  7 May 2024 12:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715085615; cv=none; b=ep+ZaE8DmVlz8HlmVNVqc73KWqMR4ROtGcdFFP9LSHelVHAcSBfXABzk1r4UgFYOiqHQHQTPaVFJ3zxxWgGN3zohnxiFT3RjTKH/nJsBEwcwDCWNS06HxhaNFjj82zWyYxhqzMGCdX/Cg/3Xw7X4wohiHs4caucavl3VJT0muAM=
+	t=1715085782; cv=none; b=jjeOjkcDLumMY/tNO06GWDrujnvv6Cze4fwxF8QaRbdGTJ+oc0pBG+XicK0qsEbIViMGakPdxcpydo7/paljlcVoMEKiRgDwggAEuPbozK3Ys0oeifUFTzgT+qekWT2dKKWPYuwBv7B/ANkxIdFBXqcs+54Dh9tXKt3302knMwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715085615; c=relaxed/simple;
-	bh=m6vmFvUAC306G57ZtHT7Z0FTVplNYdcA1oCBDijt3C8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jcbRL6/UUony4ZJYD9wHsAer6UMH+sNF2okxiXDeHyMu2RXoXMBydodAWLFCvTuNV2RChaF9e/e1jf6QgmyBdZX1DGQ5AIwBdytTqQvEy65AvHEXzJU1DA6VtUiFSifoBxH8xgEKYgtT263r+IDoxrdAqxO4W5guHPSYGtybQoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BBZ7dYSB; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715085614; x=1746621614;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=m6vmFvUAC306G57ZtHT7Z0FTVplNYdcA1oCBDijt3C8=;
-  b=BBZ7dYSBYJK9cTxPtb/VS+zpaRlTm9EsRM8QTY/o4FIbC/W61tc/xwJg
-   CNfSbkqASVmJ/U5Npc9jyyDPc+stu5DXpArP2IkkyRTKAH+KFOymChExf
-   zZaSgb9INj1y5QMTjKRRX5h+pTZrxotqQCBBXon3oidKbYLf80UxH9bMJ
-   N62nG83T/Tka+35k6+0Y60HFJbfgBIxI9DicU/A6GTR5jlJjL6AT7B0Ff
-   Xn3REZEN5JWsXhQrsjEZg9LsRz6A66GLJ/wd+MQHEm2ib5wWOG9pAPXsE
-   /U05oj2INjX3J2IJfvTiUihu5i0Nx4lzRfd0RUyt6LReph9okZx2sEVVs
-   g==;
-X-CSE-ConnectionGUID: uiZ8wSb6SIiepOcMNr++tg==
-X-CSE-MsgGUID: rNufxRGWQtuCGXhTl4q8Ew==
-X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="11407721"
-X-IronPort-AV: E=Sophos;i="6.08,261,1712646000"; 
-   d="scan'208";a="11407721"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 05:40:13 -0700
-X-CSE-ConnectionGUID: 2o0ommHuSKCVMv3q6Pheag==
-X-CSE-MsgGUID: NWIEIjJ4SpmBbSVo3mJiNA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,261,1712646000"; 
-   d="scan'208";a="33020096"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa003.fm.intel.com with ESMTP; 07 May 2024 05:40:10 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Kees Cook <keescook@chromium.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	linux-hardening@vger.kernel.org,
+	s=arc-20240116; t=1715085782; c=relaxed/simple;
+	bh=pQ0VyLEWPbTzv8ueT/SYA25grM78ReWuMdOeMbNrUDg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qrKCUkKjAQWylYT75GwZyZEkw5J9d6b8NMP51bGz1+gPfaQKkKZIdnITI+b1EljUIzn0n0ONClJlL0AxdhL1QIntnU042YzNAsMG6wXu0UlC2rlfP9eYkVYngDUfle5Bh1UHa9zxjfBa+DLk+Ok7MHYE5Rr6i6uZrs7P3fV1rVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AgT2vZTb; arc=none smtp.client-ip=209.85.221.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f67.google.com with SMTP id ffacd0b85a97d-34d8f6cfe5bso2136927f8f.3;
+        Tue, 07 May 2024 05:43:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715085779; x=1715690579; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UeeAUA+M1CrSeGLqCio6FXkyYBfV90EEN3G250oeFOA=;
+        b=AgT2vZTb2uIjxuY7UvG1xtj1dcxwuDtSqq0xonzoR11Z7jelq6oe5iWv2yTyYqenrv
+         /kK2edpOwdLgT0ohHRLyQy2E4W0XJ5VJF1sluCFv4X60owkl5fgXOmc620TRLG/nhmw7
+         uHTajN7Hy7lqjxfMHDSQtEQoXLJnG3PHU+Na72rBgILztYd/VuO/x2YUtklk953E4ekX
+         yXbKq+sE0AvgnZWFdmN9oGZp/XkZwb3AK0R6ZqJy9fSEBG/5ug7itGqvSvN1su9JiyVm
+         +SWeopoir7y2xpIzCizi9dFCAq8jC3PXIJsSyvlLGeD2qm00TJxr9fKWghKuJX+vBQLn
+         oUBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715085779; x=1715690579;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UeeAUA+M1CrSeGLqCio6FXkyYBfV90EEN3G250oeFOA=;
+        b=wrzmaMKzS+jVbgNjnLkNq3/GqWHaXutd+eXeBGZ9Ti0vHmNcTjp90KwLQLsdnN+F69
+         7QrVGf+8TY5+ekcfT4gjdrqTnhaJb8dhv27OExPfLLwgdWLf6gT3K4RFQbe4hEjYBABc
+         gLIoWRIN3p/9ks95WjO2Dv+JAwHFQSjxh+mdeMAJn1ka2SxsiSUqTMbA2BCdvxGSB6yG
+         KMmQyXjknO5YYX+KGr5m/u9XnMDtM1K6ZAQoOHrtJuX4dhTmFPOkdjrVzPqQMH0XsY/h
+         dWD05NJlDVoHeiwhMw+j17O81rBBMcmPt8ZBkQRaU+L9Bs1jCcCLeuRIbDL/hdZikIlV
+         U1EA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+uE6uyYCUpk/8Ij6F5qHDWIbwbDF3FxFYstHGglacgRW8XEnURLjfOPPq0cpDf5QKLrxO8WLuNu3Hc7hp+QZCwH3Y3eCMqkTg6FMi+7w0Vpeo31sSDyoJuow2PS0V58XZIHP3
+X-Gm-Message-State: AOJu0Yy3SWnl5OmaxticlcFEW+9tEtAUe/Fj26FiHHg+3STrgV+huzYA
+	Q1seyyvJXU0OfW+VcKpaaNNwL8nc5Rh18TT8ZUfDFlS/47guSQW7
+X-Google-Smtp-Source: AGHT+IGCppBeEMOhD2xrR4PCOwGHoUpQx6Wz2LFnJVIyZ0e9u1sGi4E1te2Y5/irFZXNAMndMk5ROA==
+X-Received: by 2002:a5d:5242:0:b0:347:d352:d5c2 with SMTP id k2-20020a5d5242000000b00347d352d5c2mr9870799wrc.13.1715085779100;
+        Tue, 07 May 2024 05:42:59 -0700 (PDT)
+Received: from localhost ([45.130.85.2])
+        by smtp.gmail.com with ESMTPSA id b12-20020a5d4d8c000000b0034e65b8b43fsm10915955wru.8.2024.05.07.05.42.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 May 2024 05:42:58 -0700 (PDT)
+From: Leone Fernando <leone4fernando@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	willemb@google.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] netdevice: define and allocate &net_device _properly_
-Date: Tue,  7 May 2024 14:39:37 +0200
-Message-ID: <20240507123937.15364-1-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.45.0
+Cc: Leone Fernando <leone4fernando@gmail.com>
+Subject: [PATCH net-next v2 0/4] net: route: improve route hinting
+Date: Tue,  7 May 2024 14:42:25 +0200
+Message-Id: <20240507124229.446802-1-leone4fernando@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,167 +86,122 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In fact, this structure contains a flexible array at the end, but
-historically its size, alignment etc., is calculated manually.
-There are several instances of the structure embedded into other
-structures, but also there's ongoing effort to remove them and we
-could in the meantime declare &net_device properly.
-Declare the array explicitly, use struct_size() and store the array
-size inside the structure, so that __counted_by() can be applied.
-Don't use PTR_ALIGN(), as SLUB itself tries its best to ensure the
-allocated buffer is aligned to what the user expects.
-Also, change its alignment from %NETDEV_ALIGN to the cacheline size
-as per several suggestions on the netdev ML.
+In 2017, Paolo Abeni introduced the hinting mechanism [1] to the routing
+sub-system. The hinting optimization improves performance by reusing
+previously found dsts instead of looking them up for each skb.
 
-bloat-o-meter for vmlinux:
+This patch series introduces a generalized version of the hinting mechanism that
+can "remember" a larger number of dsts. This reduces the number of dst
+lookups for frequently encountered daddrs.
 
-free_netdev                                  445     440      -5
-netdev_freemem                                24       -     -24
-alloc_netdev_mqs                            1481    1450     -31
+Before diving into the code and the benchmarking results, it's important
+to address the deletion of the old route cache [2] and why
+this solution is different. The original cache was complicated,
+vulnerable to DOS attacks and had unstable performance.
 
-On x86_64 with several NICs of different vendors, I was never able to
-get a &net_device pointer not aligned to the cacheline size after the
-change.
+The new input dst_cache is much simpler thanks to its lazy approach,
+improving performance without the overhead of the removed cache
+implementation. Instead of using timers and GC, the deletion of invalid
+entries is performed lazily during their lookups.
+The dsts are stored in a simple, lightweight, static hash table. This
+keeps the lookup times fast yet stable, preventing DOS upon cache misses.
+The new input dst_cache implementation is built over the existing
+dst_cache code which supplies a fast lockless percpu behavior.
 
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/linux/netdevice.h | 12 +++++++-----
- net/core/dev.c            | 31 +++++++------------------------
- net/core/net-sysfs.c      |  2 +-
- 3 files changed, 15 insertions(+), 30 deletions(-)
+The measurement setup is comprised of 2 machines with mlx5 100Gbit NIC.
+I sent small UDP packets with 5000 daddrs (10x of cache size) from one
+machine to the other while also varying the saddr and the tos. I set
+an iptables rule to drop the packets after routing. the receiving
+machine's CPU (i9) was saturated. 
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index cf261fb89d73..171d70618a70 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2199,10 +2199,10 @@ struct net_device {
- 	unsigned short		neigh_priv_len;
- 	unsigned short          dev_id;
- 	unsigned short          dev_port;
--	unsigned short		padded;
-+	int			irq;
-+	u32			priv_len;
- 
- 	spinlock_t		addr_list_lock;
--	int			irq;
- 
- 	struct netdev_hw_addr_list	uc;
- 	struct netdev_hw_addr_list	mc;
-@@ -2403,7 +2403,10 @@ struct net_device {
- 	/** @page_pools: page pools created for this netdevice */
- 	struct hlist_head	page_pools;
- #endif
--};
-+
-+	u8			priv[] ____cacheline_aligned
-+				       __counted_by(priv_len);
-+} ____cacheline_aligned;
- #define to_net_dev(d) container_of(d, struct net_device, dev)
- 
- /*
-@@ -2593,7 +2596,7 @@ void dev_net_set(struct net_device *dev, struct net *net)
-  */
- static inline void *netdev_priv(const struct net_device *dev)
- {
--	return (char *)dev + ALIGN(sizeof(struct net_device), NETDEV_ALIGN);
-+	return (void *)dev->priv;
- }
- 
- /* Set the sysfs physical device reference for the network logical device
-@@ -3123,7 +3126,6 @@ static inline void unregister_netdevice(struct net_device *dev)
- 
- int netdev_refcnt_read(const struct net_device *dev);
- void free_netdev(struct net_device *dev);
--void netdev_freemem(struct net_device *dev);
- void init_dummy_netdev(struct net_device *dev);
- 
- struct net_device *netdev_get_xmit_slave(struct net_device *dev,
-diff --git a/net/core/dev.c b/net/core/dev.c
-index d6b24749eb2e..38c2e3c2df86 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -10889,13 +10889,6 @@ void netdev_sw_irq_coalesce_default_on(struct net_device *dev)
- }
- EXPORT_SYMBOL_GPL(netdev_sw_irq_coalesce_default_on);
- 
--void netdev_freemem(struct net_device *dev)
--{
--	char *addr = (char *)dev - dev->padded;
--
--	kvfree(addr);
--}
--
- /**
-  * alloc_netdev_mqs - allocate network device
-  * @sizeof_priv: size of private data to allocate space for
-@@ -10915,8 +10908,6 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- 		unsigned int txqs, unsigned int rxqs)
- {
- 	struct net_device *dev;
--	unsigned int alloc_size;
--	struct net_device *p;
- 
- 	BUG_ON(strlen(name) >= sizeof(dev->name));
- 
-@@ -10930,21 +10921,13 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- 		return NULL;
- 	}
- 
--	alloc_size = sizeof(struct net_device);
--	if (sizeof_priv) {
--		/* ensure 32-byte alignment of private area */
--		alloc_size = ALIGN(alloc_size, NETDEV_ALIGN);
--		alloc_size += sizeof_priv;
--	}
--	/* ensure 32-byte alignment of whole construct */
--	alloc_size += NETDEV_ALIGN - 1;
--
--	p = kvzalloc(alloc_size, GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
--	if (!p)
-+	sizeof_priv = ALIGN(sizeof_priv, SMP_CACHE_BYTES);
-+	dev = kvzalloc(struct_size(dev, priv, sizeof_priv),
-+		       GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
-+	if (!dev)
- 		return NULL;
- 
--	dev = PTR_ALIGN(p, NETDEV_ALIGN);
--	dev->padded = (char *)dev - (char *)p;
-+	dev->priv_len = sizeof_priv;
- 
- 	ref_tracker_dir_init(&dev->refcnt_tracker, 128, name);
- #ifdef CONFIG_PCPU_DEV_REFCNT
-@@ -11034,7 +11017,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- 	free_percpu(dev->pcpu_refcnt);
- free_dev:
- #endif
--	netdev_freemem(dev);
-+	kvfree(dev);
- 	return NULL;
- }
- EXPORT_SYMBOL(alloc_netdev_mqs);
-@@ -11090,7 +11073,7 @@ void free_netdev(struct net_device *dev)
- 	/*  Compatibility with error handling in drivers */
- 	if (dev->reg_state == NETREG_UNINITIALIZED ||
- 	    dev->reg_state == NETREG_DUMMY) {
--		netdev_freemem(dev);
-+		kvfree(dev);
- 		return;
- 	}
- 
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 4c27a360c294..0e2084ce7b75 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -2028,7 +2028,7 @@ static void netdev_release(struct device *d)
- 	 * device is dead and about to be freed.
- 	 */
- 	kfree(rcu_access_pointer(dev->ifalias));
--	netdev_freemem(dev);
-+	kvfree(dev);
- }
- 
- static const void *net_namespace(const struct device *d)
+Thanks a lot to David Ahern for all the help and guidance!
+
+I measured the rx PPS using ifpps and the per-queue PPS using ethtool -S.
+These are the results:
+
+Total PPS:
+mainline              patched                   delta
+  Kpps                  Kpps                      %
+  6903                  8105                    17.41
+
+Per-Queue PPS:
+Queue          mainline         patched
+  0             345775          411780
+  1             345252          414387
+  2             347724          407501
+  3             346232          413456
+  4             347271          412088
+  5             346808          400910
+  6             346243          406699
+  7             346484          409104
+  8             342731          404612
+  9             344068          407558
+  10            345832          409558
+  11            346296          409935
+  12            346900          399084
+  13            345980          404513
+  14            347244          405136
+  15            346801          408752
+  16            345984          410865
+  17            346632          405752
+  18            346064          407539
+  19            344861          408364
+ total          6921182         8157593
+
+I also verified that the number of packets caught by the iptables rule
+matches the measured PPS.
+
+TCP throughput was not affected by the patch, below is iperf3 output:
+       mainline                                     patched 
+15.4 GBytes 13.2 Gbits/sec                  15.5 GBytes 13.2 Gbits/sec
+
+[1] https://lore.kernel.org/netdev/cover.1574252982.git.pabeni@redhat.com/
+[2] https://lore.kernel.org/netdev/20120720.142502.1144557295933737451.davem@davemloft.net/
+
+v1->v2:
+- fix bitwise cast warning
+- improved measurements setup
+
+v1:
+- fix typo while allocating per-cpu cache
+- while using dst from the dst_cache set IPSKB_DOREDIRECT correctly
+- always compile dst_cache
+
+RFC-v2:
+- remove unnecessary macro
+- move inline to .h file
+
+RFC-v1: https://lore.kernel.org/netdev/d951b371-4138-4bda-a1c5-7606a28c81f0@gmail.com/
+RFC-v2: https://lore.kernel.org/netdev/3a17c86d-08a5-46d2-8622-abc13d4a411e@gmail.com/
+
+Leone Fernando (4):
+  net: route: expire rt if the dst it holds is expired
+  net: dst_cache: add input_dst_cache API
+  net: route: always compile dst_cache
+  net: route: replace route hints with input_dst_cache
+
+ drivers/net/Kconfig        |   1 -
+ include/net/dst_cache.h    |  68 +++++++++++++++++++
+ include/net/dst_metadata.h |   2 -
+ include/net/ip_tunnels.h   |   2 -
+ include/net/route.h        |   6 +-
+ net/Kconfig                |   4 --
+ net/core/Makefile          |   3 +-
+ net/core/dst.c             |   4 --
+ net/core/dst_cache.c       | 132 +++++++++++++++++++++++++++++++++++++
+ net/ipv4/Kconfig           |   1 -
+ net/ipv4/ip_input.c        |  58 ++++++++--------
+ net/ipv4/ip_tunnel_core.c  |   4 --
+ net/ipv4/route.c           |  75 +++++++++++++++------
+ net/ipv4/udp_tunnel_core.c |   4 --
+ net/ipv6/Kconfig           |   4 --
+ net/ipv6/ip6_udp_tunnel.c  |   4 --
+ net/netfilter/nft_tunnel.c |   2 -
+ net/openvswitch/Kconfig    |   1 -
+ net/sched/act_tunnel_key.c |   2 -
+ 19 files changed, 291 insertions(+), 86 deletions(-)
+
 -- 
-2.45.0
+2.34.1
 
 
