@@ -1,120 +1,200 @@
-Return-Path: <netdev+bounces-94244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBD8C8BEC18
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 21:00:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA1288BEC1D
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 21:01:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FDA8B244DF
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 19:00:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51FE51F23EEB
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 19:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050E416D9AF;
-	Tue,  7 May 2024 19:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD13F16D9B7;
+	Tue,  7 May 2024 19:01:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LA0YijEL"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="BUPpBvir"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D197916D9CA
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 19:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA2116D9A7;
+	Tue,  7 May 2024 19:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715108440; cv=none; b=DSN+mOiAPNMw1ohDvtsBnij8sLd4xwGNP4abRx+Jm3FoVrVoI8OcZB5gchTGMpGDGQ+HZ4v2U0rC/7/ApT8OFOAmhSJacDXsdvjh7ZB0m3hggs7CZ4j/81atmtxtkRGkOZFEFrzYFNR1RDbAlYEeKEzEri6K1oA2cU7nwFn7nZc=
+	t=1715108478; cv=none; b=PJro4YcPNXzD6jUurmyjruHo8vHqF01APRL0Bo45xCv7LNAMYTYgqB6vNQNckWOrnNNkS/ajPHcmgt+9YBop8Eujkyh60DA7szubqUyUUrNJfynblYS1XaAbUYqWFLfcyOPppyl7uz5ADuJZF2vJQRbYq/csSduLhJ2Udr+sj10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715108440; c=relaxed/simple;
-	bh=7s3oPGkGLzvOuGWVPAZcFf2NPdjW/ND+O4YOkgFBmXE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IdzXJv/Jd5OY3QXW18wvKT03IMxXqxJjib23PS3IxOmcHrtUvgXuR41Aew5axj77NiVmk5hmABQtU6ExR/bfWNi6Bcet4hoHS0pBVhMWjQl02eKooyKksryJE7dixbgpooP45KjB3lGAKKkW5tWpwR3FkWerc+ylqQj1l8pjA0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LA0YijEL; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2b4a7671abaso2371420a91.0
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 12:00:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715108431; x=1715713231; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=52/TiGb0pRp1cCi0WAvKTSl0Kx/3b9XgA1N/tzA4luI=;
-        b=LA0YijELBhtbFqj+kYPDc723zkxRrJQ3jYMZ0vaTfNAwYtW6HXeuX4RFhLCzYOpEkQ
-         785nJ1jvgpc+famATuw+rdHQIGH9byxrsSf1tZpq1u6G88HVqvyTuHbdjwXCOBGVru17
-         1T+bXwloEsbhpsaKeVAYI0tLCUxkhoQuwpgy6Ix0Xx5qvBQWh/AGzfnu1seyJkVcLHkT
-         sBV02UO974N1BVr/BqsESwQCLOizTJ/472GNVbbtQKbuuVnf0nRPmPZU7Kt+LhpNnpbz
-         i504WgCmYZeN4tpe4oKWCWqrgU4mLmaCXleke1TW9ydjdViNTC+x+uWmCJzBAa9rPngj
-         imrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715108431; x=1715713231;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=52/TiGb0pRp1cCi0WAvKTSl0Kx/3b9XgA1N/tzA4luI=;
-        b=qR111bTxCx+iajJdFke01jj8jXdhFvBDaz/Fd1gNHm2Rd5cvnJSE4KLRpzOjPL3MUL
-         hZwHE+5Fij2GpZ4ApzznpaNOZM6chNQcEeTqi3v+Y/4tMOADIjMHCokY9beINCr2KKnK
-         YZuAsjrqwesRidhvEf4p64I40e5s8w0sM5hPB+nygRRRKuxXJ5x+0YQS+Ra74MWw22xa
-         QxRAd1+XNMveZDf0Xgp3OL9QJ/O+Xa3OLfBJOKGlitLlEaYTPDr4WjPHzrqMZ26mGsd7
-         7FtCh980PJWExv08YCxwVy+opwr33sFYqcqb4aHIA0US80HD1e9jhQVnuay6r2QZp9DQ
-         8Mcg==
-X-Forwarded-Encrypted: i=1; AJvYcCV+BumznuznKRPAD5b3XsVXEuzek9OB2ef0ZTlsWHZP0POMzrBQfRYkWHMs6uVAxXpHor0iIsw1I5Imo1Oza3mPnBJ0tewT
-X-Gm-Message-State: AOJu0YyKSKgrzlTMVbAcrWnD92hE2NTiHunhyKKt3Zw/wOdQnZ2wkHWg
-	AuNoITk/jNY3asn9o1tGE/6oFPcgd/lla7hM1QWIvlfZ+lomCnC8601+S57q1/8e03+mmHOZxo9
-	k314oNIgGyUSq3DYU9Ywbsdz1WaxmoiPtpTgp
-X-Google-Smtp-Source: AGHT+IFdufqWMf0KRyS6ONQjfkqedO80otF+5gAkHmdq5Jd6uIJPgZyn9Nvw+Eax/axJml6eRyADco7/lvarEj7yCXU=
-X-Received: by 2002:a17:90b:4f46:b0:2a2:70f6:8f67 with SMTP id
- 98e67ed59e1d1-2b6169e318cmr418365a91.30.1715108430851; Tue, 07 May 2024
- 12:00:30 -0700 (PDT)
+	s=arc-20240116; t=1715108478; c=relaxed/simple;
+	bh=g1veQz9dJ3sVo0hMDOXcpFezi7Iobr9bX5G1zVUCr2s=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=imZZucoDpcIDsqWHkVP5dF96HrH27uz+tS1OaVRJbIYeGQcImUxCRnaYRz6Ex61kATBOiHHJi32rGTnJYPLODWol1o+tKASsIhLHfrCmJVXbCzQRxEGm7ZseFxBH4bts0ff93ARohdgn2iiseG5zPuztSrAlWCsH0Y2Cg0gVSgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=BUPpBvir; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from apais-vm1.0synte4vioeebbvidf5q0vz2ua.xx.internal.cloudapp.net (unknown [52.183.86.224])
+	by linux.microsoft.com (Postfix) with ESMTPSA id BFE4A20B2C82;
+	Tue,  7 May 2024 12:01:16 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BFE4A20B2C82
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1715108476;
+	bh=VWE6ZXP3AIBJkn4ZrcnxCPzQUxLvW0RGUuO+DHKq/oQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BUPpBvirSU0EX4pKl+Phr89hCZNIv0k0Az22vm7KuGi0USH0e7qWgzZ6Udw0XYCc1
+	 f8c0XlYsrfpY1Wu1Ayb0yKlIz14J+IO8Qd/dOrTV+O1rq/zlwl5rywcIUO15zHBLb9
+	 uqJP7Ip9O/vzxFMcysGpkWIAo+IBXQpmPcE44qGY=
+From: Allen Pais <apais@linux.microsoft.com>
+To: netdev@vger.kernel.org
+Cc: jes@trained-monkey.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kda@linux-powerpc.org,
+	cai.huoqing@linux.dev,
+	dougmill@linux.ibm.com,
+	npiggin@gmail.com,
+	christophe.leroy@csgroup.eu,
+	aneesh.kumar@kernel.org,
+	naveen.n.rao@linux.ibm.com,
+	nnac123@linux.ibm.com,
+	tlfalcon@linux.ibm.com,
+	cooldavid@cooldavid.org,
+	marcin.s.wojtas@gmail.com,
+	linux@armlinux.org.uk,
+	mlindner@marvell.com,
+	stephen@networkplumber.org,
+	nbd@nbd.name,
+	sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com,
+	lorenzo@kernel.org,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	borisp@nvidia.com,
+	bryan.whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	louis.peens@corigine.com,
+	richardcochran@gmail.com,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-acenic@sunsite.dk,
+	linux-arm-kernel@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-mediatek@lists.infradead.org,
+	oss-drivers@corigine.com,
+	linux-net-drivers@amd.com
+Subject: [PATCH 0/1] Convert tasklets to BH workqueues in ethernet drivers
+Date: Tue,  7 May 2024 19:01:10 +0000
+Message-Id: <20240507190111.16710-1-apais@linux.microsoft.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240503-gve-comma-v1-0-b50f965694ef@kernel.org>
-In-Reply-To: <20240503-gve-comma-v1-0-b50f965694ef@kernel.org>
-From: Shailend Chand <shailend@google.com>
-Date: Tue, 7 May 2024 12:00:19 -0700
-Message-ID: <CANLc=ata9H4ZTN92MhQ+P5bTBo9grE7sP1_JDk5MdzaCOhXOGQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/2] gve: Minor cleanups
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org, 
-	llvm@lists.linux.dev, linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 3, 2024 at 1:31=E2=80=AFPM Simon Horman <horms@kernel.org> wrot=
-e:
->
-> Hi,
->
-> This short patchset provides two minor cleanups for the gve driver.
->
-> These were found by tooling as mentioned in each patch,
-> and otherwise by inspection.
->
-> No change in run time behaviour is intended.
-> Each patch is compile tested only.
->
-> ---
-> Simon Horman (2):
->       gve: Avoid unnecessary use of comma operator
->       gve: Use ethtool_sprintf/puts() to fill stats strings
+This series focuses on converting the existing implementation of
+tasklets to bottom half (BH) workqueues across various Ethernet
+drivers under drivers/net/ethernet/*.
 
-Reviewed-by: Shailend Chand <shailend@google.com>
-Thanks!
+Impact:
+ The conversion is expected to maintain or improve the performance
+of the affected drivers. It also improves the maintainability and
+readability of the driver code.
 
->
->  drivers/net/ethernet/google/gve/gve_adminq.c  |  4 +--
->  drivers/net/ethernet/google/gve/gve_ethtool.c | 42 +++++++++++----------=
-------
->  2 files changed, 19 insertions(+), 27 deletions(-)
->
-> base-commit: 5829614a7b3b2cc9820efb2d29a205c00d748fcf
->
+Testing:
+ - Conducted standard network throughput and latency benchmarks
+   to ensure performance parity or improvement.
+ - Ran kernel regression tests to verify that changes do not introduce new issues.
+
+I appreciate your review and feedback on this patch series.
+And additional tested would be really helpful.
+
+Allen Pais (1):
+  [RFC] ethernet: Convert from tasklet to BH workqueue
+
+ drivers/infiniband/hw/mlx4/cq.c               |  2 +-
+ drivers/infiniband/hw/mlx5/cq.c               |  2 +-
+ drivers/net/ethernet/alteon/acenic.c          | 26 +++----
+ drivers/net/ethernet/alteon/acenic.h          |  7 +-
+ drivers/net/ethernet/amd/xgbe/xgbe-drv.c      | 30 ++++----
+ drivers/net/ethernet/amd/xgbe/xgbe-i2c.c      | 16 ++---
+ drivers/net/ethernet/amd/xgbe/xgbe-mdio.c     | 16 ++---
+ drivers/net/ethernet/amd/xgbe/xgbe-pci.c      |  4 +-
+ drivers/net/ethernet/amd/xgbe/xgbe.h          | 11 +--
+ drivers/net/ethernet/broadcom/cnic.c          | 19 ++---
+ drivers/net/ethernet/broadcom/cnic.h          |  2 +-
+ drivers/net/ethernet/cadence/macb.h           |  3 +-
+ drivers/net/ethernet/cadence/macb_main.c      | 10 +--
+ .../net/ethernet/cavium/liquidio/lio_core.c   |  4 +-
+ .../net/ethernet/cavium/liquidio/lio_main.c   | 25 +++----
+ .../ethernet/cavium/liquidio/lio_vf_main.c    | 10 +--
+ .../ethernet/cavium/liquidio/octeon_droq.c    |  4 +-
+ .../ethernet/cavium/liquidio/octeon_main.h    |  5 +-
+ .../net/ethernet/cavium/octeon/octeon_mgmt.c  | 12 ++--
+ drivers/net/ethernet/cavium/thunder/nic.h     |  5 +-
+ .../net/ethernet/cavium/thunder/nicvf_main.c  | 24 +++----
+ .../ethernet/cavium/thunder/nicvf_queues.c    |  5 +-
+ .../ethernet/cavium/thunder/nicvf_queues.h    |  3 +-
+ drivers/net/ethernet/chelsio/cxgb/sge.c       | 19 ++---
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4.h    |  9 +--
+ .../net/ethernet/chelsio/cxgb4/cxgb4_main.c   |  2 +-
+ .../ethernet/chelsio/cxgb4/cxgb4_tc_mqprio.c  |  4 +-
+ .../net/ethernet/chelsio/cxgb4/cxgb4_uld.c    |  2 +-
+ drivers/net/ethernet/chelsio/cxgb4/sge.c      | 41 +++++------
+ drivers/net/ethernet/chelsio/cxgb4vf/sge.c    |  6 +-
+ drivers/net/ethernet/dlink/sundance.c         | 41 +++++------
+ .../net/ethernet/huawei/hinic/hinic_hw_cmdq.c |  2 +-
+ .../net/ethernet/huawei/hinic/hinic_hw_eqs.c  | 17 +++--
+ .../net/ethernet/huawei/hinic/hinic_hw_eqs.h  |  2 +-
+ drivers/net/ethernet/ibm/ehea/ehea.h          |  3 +-
+ drivers/net/ethernet/ibm/ehea/ehea_main.c     | 14 ++--
+ drivers/net/ethernet/ibm/ibmvnic.c            | 24 +++----
+ drivers/net/ethernet/ibm/ibmvnic.h            |  2 +-
+ drivers/net/ethernet/jme.c                    | 72 +++++++++----------
+ drivers/net/ethernet/jme.h                    |  9 +--
+ .../net/ethernet/marvell/mvpp2/mvpp2_main.c   |  2 +-
+ drivers/net/ethernet/marvell/skge.c           | 12 ++--
+ drivers/net/ethernet/marvell/skge.h           |  3 +-
+ drivers/net/ethernet/mediatek/mtk_wed_wo.c    | 12 ++--
+ drivers/net/ethernet/mediatek/mtk_wed_wo.h    |  3 +-
+ drivers/net/ethernet/mellanox/mlx4/cq.c       | 42 +++++------
+ drivers/net/ethernet/mellanox/mlx4/eq.c       | 10 +--
+ drivers/net/ethernet/mellanox/mlx4/mlx4.h     | 11 +--
+ drivers/net/ethernet/mellanox/mlx5/core/cq.c  | 38 +++++-----
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c  | 12 ++--
+ .../ethernet/mellanox/mlx5/core/fpga/conn.c   | 15 ++--
+ .../ethernet/mellanox/mlx5/core/fpga/conn.h   |  3 +-
+ .../net/ethernet/mellanox/mlx5/core/lib/eq.h  | 11 +--
+ drivers/net/ethernet/mellanox/mlxsw/pci.c     | 29 ++++----
+ drivers/net/ethernet/micrel/ks8842.c          | 29 ++++----
+ drivers/net/ethernet/micrel/ksz884x.c         | 37 +++++-----
+ drivers/net/ethernet/microchip/lan743x_ptp.c  |  2 +-
+ drivers/net/ethernet/natsemi/ns83820.c        | 10 +--
+ drivers/net/ethernet/netronome/nfp/nfd3/dp.c  |  7 +-
+ .../net/ethernet/netronome/nfp/nfd3/nfd3.h    |  2 +-
+ drivers/net/ethernet/netronome/nfp/nfdk/dp.c  |  6 +-
+ .../net/ethernet/netronome/nfp/nfdk/nfdk.h    |  3 +-
+ drivers/net/ethernet/netronome/nfp/nfp_net.h  |  4 +-
+ .../ethernet/netronome/nfp/nfp_net_common.c   | 12 ++--
+ .../net/ethernet/netronome/nfp/nfp_net_dp.h   |  4 +-
+ drivers/net/ethernet/ni/nixge.c               | 19 ++---
+ drivers/net/ethernet/qlogic/qed/qed.h         |  2 +-
+ drivers/net/ethernet/qlogic/qed/qed_int.c     |  6 +-
+ drivers/net/ethernet/qlogic/qed/qed_int.h     |  4 +-
+ drivers/net/ethernet/qlogic/qed/qed_main.c    | 20 +++---
+ drivers/net/ethernet/sfc/falcon/farch.c       |  4 +-
+ drivers/net/ethernet/sfc/falcon/net_driver.h  |  2 +-
+ drivers/net/ethernet/sfc/falcon/selftest.c    |  2 +-
+ drivers/net/ethernet/sfc/net_driver.h         |  2 +-
+ drivers/net/ethernet/sfc/selftest.c           |  2 +-
+ drivers/net/ethernet/sfc/siena/farch.c        |  4 +-
+ drivers/net/ethernet/sfc/siena/net_driver.h   |  2 +-
+ drivers/net/ethernet/sfc/siena/selftest.c     |  2 +-
+ drivers/net/ethernet/silan/sc92031.c          | 47 ++++++------
+ drivers/net/ethernet/smsc/smc91x.c            | 16 ++---
+ drivers/net/ethernet/smsc/smc91x.h            |  3 +-
+ include/linux/mlx4/device.h                   |  2 +-
+ include/linux/mlx5/cq.h                       |  2 +-
+ 83 files changed, 501 insertions(+), 473 deletions(-)
+
+-- 
+2.17.1
+
 
