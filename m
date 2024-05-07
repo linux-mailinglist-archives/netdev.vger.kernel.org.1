@@ -1,152 +1,113 @@
-Return-Path: <netdev+bounces-94008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A28C8BDEC3
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:47:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75E528BDEC6
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:48:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9B5C284E80
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:47:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A73D71C22978
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6654615218E;
-	Tue,  7 May 2024 09:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D9DF15350E;
+	Tue,  7 May 2024 09:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GYUef3ec"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oedb7Fnv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303C4152184;
-	Tue,  7 May 2024 09:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3926D14E2DA
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 09:40:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715074805; cv=none; b=PFwqy3p+LjTUTaClx1lvnDUnEXiPr253vnEtwgiGjyxP86p7Ro2I6QCMCwqDoFOwsCXOwdM0vO/tmX4dFIb3mv/gd/kVGbtrIoadbq8ZpLX9nzcUcunHlevJTmdtHfAueP50WGmwKTyWaXPeaTKvsdYojzq8oHOvuoWwX4eIqtU=
+	t=1715074842; cv=none; b=fqnRwIATz3OON8BW9XMzHJhkrxKIUKOBZd9iKrVt5p0WPjtl8u9k10Jc/pYjwGA8oGCOwaeSlxdlLoqfy1yV0tlunEOGO4pvEXmnmaQW2xZ41Hh7W62HORLBF9kDYXHPn6Lol6EYD8jw5XS/TmFsVIxWt+5Bt2cQDjfsVrM73jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715074805; c=relaxed/simple;
-	bh=mHpsgJQH6Dc+37KdBggEY0UJx/gW/+EgPVSh+avscfU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U4Uw+Me+SLy/06+lP+3BiJ4Y0WMV+LmMPXK9QaVStNdFbVJNGbQ7/yuHZ5QaSGNWkYiofyXsZiecFqzVIzVOnz19jbOuFxUBsYarYsZ36u4ZHYGBYqa3xgl1qNCYGqVb2GhCERI8rhbJpy6agAqvz8uMbm+4Yqnyma5MY/dnmu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GYUef3ec; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4477xtwI024295;
-	Tue, 7 May 2024 09:39:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=1Hzs6jb+7+nNcGtUV/vlynnIqoPy7wF8kRwARHODZMM=;
- b=GYUef3ecBpfOVAkrajoj7aHiFo4M2kvxNVG5lXWjtQ7cZaVrCHwNLkkDkH6Ah+puVQo9
- X8z8euViOvxiysiz0ov9dwbyGT5TA7Myw97CbB/i8AbIZGZZG/LRwayIWiuRtMrLhBC0
- lfKGIK09LjHJ+AXAPuaHqBdon6CqIk7CSijzWkLE4RSsXCjGvSjG43YsIAZtJHWMV4MK
- ZA37p8VohR7eLZ6Z1V7tD1odoBe7dFCa0EKkIv5cjfUjy3Md1e3kb4o1ogetVejuKrQt
- 2BRkbfitqskgAmE0Kw2WjhRytCz284mrbrT1+XrEpore7c6rIb7NPoN9o5NWhxYv/iPy mA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xyg2y8a5y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 May 2024 09:39:55 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4479dt5D017163;
-	Tue, 7 May 2024 09:39:55 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xyg2y8a5v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 May 2024 09:39:55 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4476vGC9022515;
-	Tue, 7 May 2024 09:39:54 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xx1jkw11a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 May 2024 09:39:54 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4479dnsB25559694
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 7 May 2024 09:39:51 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 042D22004F;
-	Tue,  7 May 2024 09:39:49 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 94FE22004B;
-	Tue,  7 May 2024 09:39:48 +0000 (GMT)
-Received: from [9.152.224.141] (unknown [9.152.224.141])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  7 May 2024 09:39:48 +0000 (GMT)
-Message-ID: <a478920a-eda3-4667-ab82-383c64db15bf@linux.ibm.com>
-Date: Tue, 7 May 2024 11:39:48 +0200
+	s=arc-20240116; t=1715074842; c=relaxed/simple;
+	bh=My6PzD7lp7WpGlcSquAFqoh0eASe6/Q/g2eMw2R99Mc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DYlRgt4QVWppFO0SkeOa+coRFtiumQV01q8YAFzXBIVSMkQ3kMB/i0BnL1bq04nG8FTiakJ8+p43Yt0OR/cvoxb54csZAxlttwfl/xSSSY3cuJhYBaG+asNwiQXCqy2gSBMXpPPpq7yD8bs5OKhfDghTUgYhAMzb9oR/LrQU2wQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oedb7Fnv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B9430C4AF66;
+	Tue,  7 May 2024 09:40:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715074841;
+	bh=My6PzD7lp7WpGlcSquAFqoh0eASe6/Q/g2eMw2R99Mc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Oedb7FnvVvlY1rP1Sj8CDFdSLWoOMJz/LCTyHSp318FryKDsHCuZa25VritEIqh/9
+	 h/ni0SeFchYq0AovInXMAQsd2j/7fIwenxfMvVBVTahgsanRNFUPXTih8Hi7WmFi0y
+	 YNx1cczyMRrfSkIumEpGmRmFww6kbr91RVINDWaY9iGwOdv8t9eYDZUYCGQYlPT5/s
+	 uljYRTtd74pKtrNlHhZmcptimab/4CySr8sTIXoUmFAlCFn+eBvCnEVIHzoUnKtE/7
+	 SFKcD8Np/S0QdIeq4cAAmn2WEN+NzNkJoXFcRzRK8gOxXqNfOrKYLy516+CGIHtOPv
+	 kZhmwMyCb7DkQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B0A6EC43331;
+	Tue,  7 May 2024 09:40:41 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/6] s390: Unify IUCV device allocation
-Content-Language: en-US
-To: Heiko Carstens <hca@linux.ibm.com>, Nathan Chancellor
- <nathan@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, Thomas Huth <thuth@redhat.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jiri Slaby
- <jirislaby@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>, netdev@vger.kernel.org,
-        llvm@lists.linux.dev, patches@lists.linux.dev,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>
-References: <20240506194454.1160315-1-hca@linux.ibm.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20240506194454.1160315-1-hca@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wAeOck7hNshZ8btYkrbKOKmEFvJMeU2O
-X-Proofpoint-ORIG-GUID: PWwwpVme6PbjKWpr5QK3PjGUV4L3bJRh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-07_04,2024-05-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- spamscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0
- mlxlogscore=714 priorityscore=1501 clxscore=1011 mlxscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2405070064
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/8] rtnetlink: more rcu conversions for
+ rtnl_fill_ifinfo()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171507484172.24942.8367903904443484222.git-patchwork-notify@kernel.org>
+Date: Tue, 07 May 2024 09:40:41 +0000
+References: <20240503192059.3884225-1-edumazet@google.com>
+In-Reply-To: <20240503192059.3884225-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
+
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri,  3 May 2024 19:20:51 +0000 you wrote:
+> We want to no longer rely on RTNL for "ip link show" command.
+> 
+> This is a long road, this series takes care of some parts.
+> 
+> Eric Dumazet (8):
+>   rtnetlink: do not depend on RTNL for IFLA_QDISC output
+>   rtnetlink: do not depend on RTNL for IFLA_IFNAME output
+>   rtnetlink: do not depend on RTNL for IFLA_TXQLEN output
+>   net: write once on dev->allmulti and dev->promiscuity
+>   rtnetlink: do not depend on RTNL for many attributes
+>   rtnetlink: do not depend on RTNL in rtnl_fill_proto_down()
+>   rtnetlink: do not depend on RTNL in rtnl_xdp_prog_skb()
+>   rtnetlink: allow rtnl_fill_link_netnsid() to run under RCU protection
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/8] rtnetlink: do not depend on RTNL for IFLA_QDISC output
+    https://git.kernel.org/netdev/net-next/c/698419ffb6fc
+  - [net-next,2/8] rtnetlink: do not depend on RTNL for IFLA_IFNAME output
+    https://git.kernel.org/netdev/net-next/c/8a5826813362
+  - [net-next,3/8] rtnetlink: do not depend on RTNL for IFLA_TXQLEN output
+    https://git.kernel.org/netdev/net-next/c/ad13b5b0d1f9
+  - [net-next,4/8] net: write once on dev->allmulti and dev->promiscuity
+    https://git.kernel.org/netdev/net-next/c/55a2c86c8db3
+  - [net-next,5/8] rtnetlink: do not depend on RTNL for many attributes
+    https://git.kernel.org/netdev/net-next/c/6747a5d4990b
+  - [net-next,6/8] rtnetlink: do not depend on RTNL in rtnl_fill_proto_down()
+    https://git.kernel.org/netdev/net-next/c/6890ab31d1a3
+  - [net-next,7/8] rtnetlink: do not depend on RTNL in rtnl_xdp_prog_skb()
+    https://git.kernel.org/netdev/net-next/c/979aad40da92
+  - [net-next,8/8] rtnetlink: allow rtnl_fill_link_netnsid() to run under RCU protection
+    https://git.kernel.org/netdev/net-next/c/9cf621bd5fcb
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-On 06.05.24 21:44, Heiko Carstens wrote:
-> Unify IUCV device allocation as suggested by Arnd Bergmann in order
-> to get rid of code duplication in various device drivers.
-> 
-> This also removes various warnings caused by
-> -Wcast-function-type-strict as reported by Nathan Lynch.
-> 
-> Unless there are objections I think this whole series should go via
-> the s390 tree.
-> 
-> Heiko Carstens (6):
->   s390/iucv: Provide iucv_alloc_device() / iucv_release_device()
->   s390/vmlogrdr: Make use of iucv_alloc_device()
->   s390/netiucv: Make use of iucv_alloc_device()
->   s390/smsgiucv_app: Make use of iucv_alloc_device()
->   tty: hvc-iucv: Make use of iucv_alloc_device()
->   s390/iucv: Unexport iucv_root
-> 
->  drivers/s390/char/vmlogrdr.c    | 20 +++--------------
->  drivers/s390/net/netiucv.c      | 20 ++++-------------
->  drivers/s390/net/smsgiucv_app.c | 21 +++++-------------
->  drivers/tty/hvc/hvc_iucv.c      | 15 ++-----------
->  include/net/iucv/iucv.h         |  7 +++++-
->  net/iucv/iucv.c                 | 38 +++++++++++++++++++++++++++++++--
->  6 files changed, 56 insertions(+), 65 deletions(-)
-> 
-
-Thank you, Heiko.
-For the series:
-Acked-by: Alexandra Winter <wintera@linux.ibm.com>
 
