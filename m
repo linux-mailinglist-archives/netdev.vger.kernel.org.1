@@ -1,85 +1,76 @@
-Return-Path: <netdev+bounces-94335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 385238BF341
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:09:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 578D48BF32A
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:07:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E23B81F21850
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:09:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 106002884B7
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B75086AE3;
-	Tue,  7 May 2024 23:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3243413667B;
+	Tue,  7 May 2024 23:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b="czZj2bFr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="twWAl0F9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp95.ord1d.emailsrvr.com (smtp95.ord1d.emailsrvr.com [184.106.54.95])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC428662E
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 23:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=184.106.54.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB43136678
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 23:48:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715126207; cv=none; b=jFyzi8I/H2SInhfmzX5V6meP+J6Ifq4JTwQHtIsAO5JFKcak+6khqxh0Z+WU7SueCvzRwY50XZUyxFR/KTUzss39RiGdM0UnrubRxQcKooi3zffpArGUrpgVzicnFJGnmKZe/4Ay0/bwiz2di2ex8ALofaHX1QZKars2jdBdd7A=
+	t=1715125694; cv=none; b=M7XWouVlwSO6zk2QgXukZHVEv9VyIjYu1QoEsr44SVQVYE00TQqVwD+91Xi+SvsualUkjWVZTB4mQCCZfc/q016FdciKHhnA8uw68oWf1PZRsRyPFe0DpSUDvM9sYoNA8gyMfzY+1FppNZgAY2AfGQwFWfRD6Ukj46PandV2yfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715126207; c=relaxed/simple;
-	bh=/TOv6fP0vQebAxVEplVjdQOI2uzzY71yM9grBNcY6Zw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uOIUQlHWgA6U8JOZ0AHH8Lpn7vcHp2IQzpyLB0r44VgNGWorjrf5GgtXEh3e7KQEqV7GgvZAOSxHOCOJHS44Yp9Tw6wuiSTtb/HBkw4OA0qYh07O0TGg8oj0lE4E/e8y1hcecCW1bmoNqEf4AYRCBkKyob0FSaeRUMq6Pu1VGos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com; spf=pass smtp.mailfrom=oddbit.com; dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b=czZj2bFr; arc=none smtp.client-ip=184.106.54.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oddbit.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=oddbit.com;
-	s=20180920-g2b7aziw; t=1715125612;
-	bh=/TOv6fP0vQebAxVEplVjdQOI2uzzY71yM9grBNcY6Zw=;
-	h=Date:From:To:Subject:From;
-	b=czZj2bFrbwg8I9OB+pHUp343UlDFKC46ap8dR/xAGn1p+Bt65WKBMMTzsautPOHFk
-	 J19fxMTqeqj6IJlS/daQySD6lbc2hSAAjcmQcHuB146QbwpBuJc3VDRh88oN11dLia
-	 CWKVB/6mf1cbASHBLSrmGA6TMpJ5mAOFFouVrDKs=
-X-Auth-ID: lars@oddbit.com
-Received: by smtp12.relay.ord1d.emailsrvr.com (Authenticated sender: lars-AT-oddbit.com) with ESMTPSA id AD4E3E0099;
-	Tue,  7 May 2024 19:46:51 -0400 (EDT)
-Date: Tue, 7 May 2024 19:46:51 -0400
-From: Lars Kellogg-Stedman <lars@oddbit.com>
-To: Duoming Zhou <duoming@zju.edu.cn>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hams@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, 
-	jreuter@yaina.de, dan.carpenter@linaro.org
-Subject: Re: [PATCH net v5 1/4] ax25: Use kernel universal linked list to
- implement ax25_dev_list
-Message-ID: <z5l3dfardxqrwf2lzzpktuifqaxvv2clrgah5gnz4t6iphskeb@otrcl5cwyghx>
-References: <cover.1715065005.git.duoming@zju.edu.cn>
- <bd49e83817604e61a12c9bf688a0825f116e67c0.1715065005.git.duoming@zju.edu.cn>
- <sijkuyypbnelg3w2shbxm3y6zu3qhfurvpvkoij5eluolnqr5w@y5dq74ycxzkm>
+	s=arc-20240116; t=1715125694; c=relaxed/simple;
+	bh=7SAeFUNocfotopBOdnHpq4EmC3tZJy6HINGUamWhsII=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MTUpUjxyvP180Lqvaeq4ipibmBp5Ppa8/gBIMf3UWoRvMzfyJVFYN0JwbNZNBwLPewhF67sxW5t936N3HZUQXXpEsXaaE8rR7165YRpOddkEZp/FTSFi/eWC/T6XWnDb+Sz/FxrsoCQJRXVzgE/ew1cFBRP1qEVZZ5y3NBJJx/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=twWAl0F9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A74BC2BBFC;
+	Tue,  7 May 2024 23:48:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715125693;
+	bh=7SAeFUNocfotopBOdnHpq4EmC3tZJy6HINGUamWhsII=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=twWAl0F9s/Oz18EMRlXfY3BtVfBiHOSM+RiD82ggrMGa2m3hBqARCM6Ryd/rRmdRl
+	 6k2XLsHScy57jqKFDfoMsMOOikLrLsl8kbKZHc0RDk7FlXLyevk+VcsXdMVFG2bSY2
+	 AzzII8KXUpmF5eRdLRirmTd/6+642up4iuis/Vxo2zjbTTS408Ml2EBKD1Lgm9JPNY
+	 EtKZXoy1xTIyni7HkSJLN731Y1dsFHUsZuASQJdjLLfr+mIxXws8wZ5SayuT/Ufg7U
+	 ZWcAiJ06KZ03qIuF5d4A6/3jvizDN9Fz6LH4sFeBktmrzYrut9SHKfmGi66fG2KOhb
+	 JHBEU/eY0OPTg==
+Date: Tue, 7 May 2024 16:48:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo
+ Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Andrew Lunn
+ <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
+Subject: Re: [PATCH net-next v3 00/24] Introducing OpenVPN Data Channel
+ Offload
+Message-ID: <20240507164812.3ac8c7b5@kernel.org>
+In-Reply-To: <20240506011637.27272-1-antonio@openvpn.net>
+References: <20240506011637.27272-1-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <sijkuyypbnelg3w2shbxm3y6zu3qhfurvpvkoij5eluolnqr5w@y5dq74ycxzkm>
-X-Classification-ID: 0df3cc1c-0dba-498b-89fb-d2d91bbb82a1-1-1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 07, 2024 at 03:43:11PM GMT, Lars Kellogg-Stedman wrote:
-> On Tue, May 07, 2024 at 03:03:39PM GMT, Duoming Zhou wrote:
-> >  typedef struct ax25_dev {
-> > -	struct ax25_dev		*next;
-> > +	struct list_head	list;
-> 
-> Would it make sense to replace this with:
->
-> LIST_HEAD(ax25_dev_list);
+On Mon,  6 May 2024 03:16:13 +0200 Antonio Quartulli wrote:
+> I am finally back with version 3 of the ovpn patchset.
+> It took a while to address all comments I have received on v2, but I
+> am happy to say that I addressed 99% of the feedback I collected.
 
-Sorry, *this*:
+Nice, one more check / warning that pops up is missing kdoc.
+W=1 build only catches kdoc problems in C sources, for headers
+try running something like:
 
-> +static struct list_head ax25_dev_list;
-
-
+./scripts/kernel-doc -none -Wall $new_files
 -- 
-Lars Kellogg-Stedman <lars@oddbit.com> | larsks @ {irc,twitter,github}
-http://blog.oddbit.com/                | N1LKS
+pw-bot: cr
 
