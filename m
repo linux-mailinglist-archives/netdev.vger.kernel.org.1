@@ -1,61 +1,64 @@
-Return-Path: <netdev+bounces-94288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7094B8BF024
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:59:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4711C8BF04A
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 01:01:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23CE9285533
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 22:59:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A58E1C20A74
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 23:01:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7775E84FDA;
-	Tue,  7 May 2024 22:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A007180C1C;
+	Tue,  7 May 2024 22:58:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i8VweOdq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MW+b1Qcu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A58584FCD;
-	Tue,  7 May 2024 22:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71EC780026;
+	Tue,  7 May 2024 22:58:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715122662; cv=none; b=J362hnBiwVYlJE9UmTHnkcTkLUFpVDcVeFvvEBbDUt0Qepgx8Stm9leWHoQG/IFuC/73Cpmg7mgXWWm1sfSVkCC5Li2ir40nxf9R9oRFoFnFgPDPw3dylWYZza3k9MIppkOm7LgxPQps1i531dPWbpOcnKgz/RQ7tYBUlbDOfFk=
+	t=1715122695; cv=none; b=HYrWGX/C4EQ5AMo37U44EAcM8rYg6gksygiAUwbnTx7w/Xpj+MpRBWhgwWgAHg6iyksM2CI90nwVuLk+B2cV1z3b+o3/RYysaFqbeslPfsj9KdvvBYolTbKBg7YxuFfgfL7W/+QhKRLUWFH7B1tyTdfR66qW7Rg5wzfm//qNEJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715122662; c=relaxed/simple;
-	bh=xhM6M7ZmmzFfW1OURG3AAZK8VgZOM7j7bDj45h/3j1Q=;
+	s=arc-20240116; t=1715122695; c=relaxed/simple;
+	bh=Z+B83y+GREhQK4EQiOuqx47Q13BwPkKg4GAEVOkLClk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rM09pKWQmwCUpgyHUSNgjE9KR2eDkkTCJoq90YIwyQLTKZUn6wgFZPbTE5NGcKcXD2id7MpmiAHSPpjb+1pxbJp5qa2y5TilLn+23PvscrjN3UdbK0dnVO1AgvrFK6bDpb0jLMEMezU3oCoXNcAV46Yeew3P86tD0PbXfYZ/AOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i8VweOdq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF972C3277B;
-	Tue,  7 May 2024 22:57:40 +0000 (UTC)
+	 MIME-Version; b=F97KJhxlNZKWkNNFd8+bZ1zWJbKJq34M/wT6PQHzssft4d4LMm9ksbHFnexEtQeytWKl6pfj+bOLYF3hP7ckxa1iwFNbFN5y6iBtuNO2tjg/piNx7J+HryTKcJTKbEjNWgCpa5NtsuxUGcP+l12YlDdg//eE9X+Y/ZywOfo0QvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MW+b1Qcu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA747C2BBFC;
+	Tue,  7 May 2024 22:58:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715122662;
-	bh=xhM6M7ZmmzFfW1OURG3AAZK8VgZOM7j7bDj45h/3j1Q=;
+	s=k20201202; t=1715122695;
+	bh=Z+B83y+GREhQK4EQiOuqx47Q13BwPkKg4GAEVOkLClk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=i8VweOdqfWVy8x8QmGpmlijlJbEBJXwYanvtYffyUfnbDvgOmiFD6u62EPcZd6RkH
-	 0Qo5EijPjHK1ALXuYGe+WDmXAic+WhZdmrd3sY290jpC1YG48NQ0nvWX2C+T1REQ9q
-	 4/vRq6FiKA4JTiSiYdpHUOGXxl+8oVHSLu50+T+STzq+J8qp/x8IWy8jE/qLGpxhgB
-	 BaElegBXiEeb1zt8Y8h3v8mB66rcQi43E4iStQmJhisafLO3YHVC1roKSTX5548q+G
-	 2kqZM8NMMObwoQpH2bn8cHeKNSXCBwTCF6Y4iCeCAFTqxZcp6AAsINzw910emwkmqC
-	 bWyGmuSwPDOgQ==
+	b=MW+b1QcuEllnqWQrZfNYXza5jJWN7tK6oUF2L8GWBc8p2xq2FV8OqcQ3dm47wpV6Z
+	 kVZtd2MplyGjRXwDjG/4oaxTxFNfzmTH50bKTL8x6AELVxfGiwA1aDAQKqBwxW4jlk
+	 ozzLc83Q6JDOpdBx4CiEimk4TiMUapqFwBPnZADzEfENqmi0gfaZBE+BnZnBmo5TFa
+	 nSzweSS5CcUezGgLe0MkwiNv9VNncN1s85AIaSc02/zv62YId49NOyZLFPM+PkQq8n
+	 8hf9RXhvbOsr7UenPS6Zu+izTg3m+gjThTt/rBBIGo4nm/fUDJuAfc6/kI0f61lGPK
+	 0oU3dpPDZcXXA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Daniele Palmas <dnlplm@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Duanqiang Wen <duanqiangwen@net-swift.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	bjorn@mork.no,
+	jiawenwu@trustnetic.com,
+	mengyuanlou@net-swift.com,
+	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 08/23] net: usb: qmi_wwan: add Telit FN920C04 compositions
-Date: Tue,  7 May 2024 18:56:34 -0400
-Message-ID: <20240507225725.390306-8-sashal@kernel.org>
+	maciej.fijalkowski@intel.com,
+	andrew@lunn.ch,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.8 15/23] Revert "net: txgbe: fix i2c dev name cannot match clkdev"
+Date: Tue,  7 May 2024 18:56:41 -0400
+Message-ID: <20240507225725.390306-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240507225725.390306-1-sashal@kernel.org>
 References: <20240507225725.390306-1-sashal@kernel.org>
@@ -70,106 +73,56 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.8.9
 Content-Transfer-Encoding: 8bit
 
-From: Daniele Palmas <dnlplm@gmail.com>
+From: Duanqiang Wen <duanqiangwen@net-swift.com>
 
-[ Upstream commit 0b8fe5bd73249dc20be2e88a12041f8920797b59 ]
+[ Upstream commit 8d6bf83f6740ba52a59e25dad360e1e87ef47666 ]
 
-Add the following Telit FN920C04 compositions:
+This reverts commit c644920ce9220d83e070f575a4df711741c07f07.
+when register i2c dev, txgbe shorten "i2c_designware" to "i2c_dw",
+will cause this i2c dev can't match platfom driver i2c_designware_platform.
 
-0x10a0: rmnet + tty (AT/NMEA) + tty (AT) + tty (diag)
-T:  Bus=03 Lev=01 Prnt=03 Port=06 Cnt=01 Dev#=  5 Spd=480  MxCh= 0
-D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1bc7 ProdID=10a0 Rev=05.15
-S:  Manufacturer=Telit Cinterion
-S:  Product=FN920
-S:  SerialNumber=92c4c4d8
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
-I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=60 Driver=option
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-
-0x10a4: rmnet + tty (AT) + tty (AT) + tty (diag)
-T:  Bus=03 Lev=01 Prnt=03 Port=06 Cnt=01 Dev#=  8 Spd=480  MxCh= 0
-D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1bc7 ProdID=10a4 Rev=05.15
-S:  Manufacturer=Telit Cinterion
-S:  Product=FN920
-S:  SerialNumber=92c4c4d8
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
-I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-
-0x10a9: rmnet + tty (AT) + tty (diag) + DPL (data packet logging) + adb
-T:  Bus=03 Lev=01 Prnt=03 Port=06 Cnt=01 Dev#=  9 Spd=480  MxCh= 0
-D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1bc7 ProdID=10a9 Rev=05.15
-S:  Manufacturer=Telit Cinterion
-S:  Product=FN920
-S:  SerialNumber=92c4c4d8
-C:  #Ifs= 5 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
-I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 3 Alt= 0 #EPs= 1 Cls=ff(vend.) Sub=ff Prot=80 Driver=(none)
-E:  Ad=86(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 4 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=(none)
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-
-Signed-off-by: Daniele Palmas <dnlplm@gmail.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Link: https://lore.kernel.org/r/20240422084109.3201-1-duanqiangwen@net-swift.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/usb/qmi_wwan.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index e2e181378f412..d1bd6b93a74e7 100644
---- a/drivers/net/usb/qmi_wwan.c
-+++ b/drivers/net/usb/qmi_wwan.c
-@@ -1368,6 +1368,9 @@ static const struct usb_device_id products[] = {
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1060, 2)},	/* Telit LN920 */
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1070, 2)},	/* Telit FN990 */
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1080, 2)}, /* Telit FE990 */
-+	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a0, 0)}, /* Telit FN920C04 */
-+	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a4, 0)}, /* Telit FN920C04 */
-+	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a9, 0)}, /* Telit FN920C04 */
- 	{QMI_FIXED_INTF(0x1bc7, 0x1100, 3)},	/* Telit ME910 */
- 	{QMI_FIXED_INTF(0x1bc7, 0x1101, 3)},	/* Telit ME910 dual modem */
- 	{QMI_FIXED_INTF(0x1bc7, 0x1200, 5)},	/* Telit LE920 */
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index 8cddc9ddb3392..29997e4b2d6ca 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -20,8 +20,6 @@
+ #include "txgbe_phy.h"
+ #include "txgbe_hw.h"
+ 
+-#define TXGBE_I2C_CLK_DEV_NAME "i2c_dw"
+-
+ static int txgbe_swnodes_register(struct txgbe *txgbe)
+ {
+ 	struct txgbe_nodes *nodes = &txgbe->nodes;
+@@ -558,8 +556,8 @@ static int txgbe_clock_register(struct txgbe *txgbe)
+ 	char clk_name[32];
+ 	struct clk *clk;
+ 
+-	snprintf(clk_name, sizeof(clk_name), "%s.%d",
+-		 TXGBE_I2C_CLK_DEV_NAME, pci_dev_id(pdev));
++	snprintf(clk_name, sizeof(clk_name), "i2c_dw.%d",
++		 pci_dev_id(pdev));
+ 
+ 	clk = clk_register_fixed_rate(NULL, clk_name, NULL, 0, 156250000);
+ 	if (IS_ERR(clk))
+@@ -621,7 +619,7 @@ static int txgbe_i2c_register(struct txgbe *txgbe)
+ 
+ 	info.parent = &pdev->dev;
+ 	info.fwnode = software_node_fwnode(txgbe->nodes.group[SWNODE_I2C]);
+-	info.name = TXGBE_I2C_CLK_DEV_NAME;
++	info.name = "i2c_designware";
+ 	info.id = pci_dev_id(pdev);
+ 
+ 	info.res = &DEFINE_RES_IRQ(pdev->irq);
 -- 
 2.43.0
 
