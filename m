@@ -1,170 +1,274 @@
-Return-Path: <netdev+bounces-94172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E6118BE86B
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:12:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CAFF8BE8A0
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:20:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9088B1C23CBB
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:12:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04C8BB2497E
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:18:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B45C16C43E;
-	Tue,  7 May 2024 16:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9551A168AFD;
+	Tue,  7 May 2024 16:18:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gN1h2TZs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fUbo0p6S"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8662F16190C
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 16:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6131649C8;
+	Tue,  7 May 2024 16:18:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715098311; cv=none; b=TlRmFtjGKOQXR0e5cWUGvNppJcu02epW1BfSDDjE4SZJTzo4jsUDfI8g2RDE2LRB99hL1GW3IL0J+aiKcysDuz3YrqHtC+AGMXIjJyi8EH8R9gjLw53w/nX5A7gdSoYsZRnsfaabSrCRqS2I+odruXePhQZTABhuw7Bjgin2JD8=
+	t=1715098735; cv=none; b=acRQf9MB361SBs2pmiOTdxFExT1YnJXAozax1MYemHNddU3D5EhNIpYeJtzE4AnnPuVU8hboIk40UqHQFV3MPHfQ8slqd8Yr1qCvpsALIVx1a3bqVXs5B8haHsty3Tz4aIRegMIgK6387OGSAXZuemuRdUCOs0wqSOG1ZIJ1Scg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715098311; c=relaxed/simple;
-	bh=xZ/3iMxpgvRHaLXprhtJySa9RxrkSnDAdlIpmM84sMA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CFnttPSGhCOcu+aENYBvngg3qGyuI88+BpMlD2VYIg9wEN2cOoH5Vlgb9zxn0b6Gt5rpw6H9EhuKNrTZu1kmUSm/X9WwXk8yo4W9wvp99LfLyNcJfhG2+i4GGDgN7/J2rop16eRjmpI0o76Cz1prt7WgmQYyrb4vi0Ph/A3J9pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gN1h2TZs; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1715098735; c=relaxed/simple;
+	bh=CXkhrGmVovd2iD+gew7vIJBjDRjYbrAoBFBuatO/EcY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ZBuWQgXBcakoADWG+7HdZXfe7lXyI0JbmpFbSDZSw2gm/NUHHleH5+NsjWQyPcDmSM/VfrE4UHbMlLwOioL5t5bqGbUQ8E5h2dLh5LF9xqR9yOLdquMNZS2Qlos6L8YS73iXRl8J7Uiq96FoNbdgLt1QPfw2HGAap0djBjB9a4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fUbo0p6S; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-34db6a299b8so2159887f8f.3;
+        Tue, 07 May 2024 09:18:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1715098309; x=1746634309;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=FO8znyIcGRv6lOcPi45eg3Y8PiH/j3YzyVY3Fp2iPDE=;
-  b=gN1h2TZsBetwf+qff76wWN6baLiBe5DNn6ghFK+E9VGSzQpftA+A9/Pq
-   iczem9zSjFLMNMuLMNhpwMmUKWe/b1OaNcvHCJVm/vATkyDmzRaiXX4hI
-   J3rjBgXlJrkbyb5hDhJ+qiJq1JKRR0hUYEwzzHvv/xfXwhXwvh5wZeMRV
-   c=;
-X-IronPort-AV: E=Sophos;i="6.08,142,1712620800"; 
-   d="scan'208";a="87535354"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 16:11:47 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:39673]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.175:2525] with esmtp (Farcaster)
- id 1196193e-d129-457b-a062-a04113b8164a; Tue, 7 May 2024 16:11:47 +0000 (UTC)
-X-Farcaster-Flow-ID: 1196193e-d129-457b-a062-a04113b8164a
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 7 May 2024 16:11:46 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.27) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Tue, 7 May 2024 16:11:44 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pabeni@redhat.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v1 net-next 2/6] af_unix: Save the number of loops in inflight graph.
-Date: Tue, 7 May 2024 09:11:36 -0700
-Message-ID: <20240507161136.78482-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <37bb5b56bc27dbacfb48914f049efbb2bb8892f5.camel@redhat.com>
-References: <37bb5b56bc27dbacfb48914f049efbb2bb8892f5.camel@redhat.com>
+        d=gmail.com; s=20230601; t=1715098732; x=1715703532; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lZwcVSwzOm1/6zNDN7V+zmSg9uLJaNbCLAg7xyWPCgg=;
+        b=fUbo0p6SAYBXiJbbMee/iQBu5hDpznQgW1AkPNHPT6Kyc8uRE/Y9QjAI1dSTEkcGhM
+         cbTQh/1MXU48EYXshTQs+LcQlwxSGNofuv7bvjSfmgbzEHX9tJhXAvro1toQ8b6PV37L
+         NRxcow8Ge99KLk9TSJTnRno+mFQqSq7mwQRmB0jKToBbFqACoeyiKh+/BhanLeyBzeXt
+         hoTmAqQbn2mXLTiCo/W8Zqr7ZkQoOKkQix0nuVpjc4XfXsT5zQE+cbIsgO/XUJMGfAFm
+         ZdJErelqlfH8dsrVytGahjRdUriVe1M6DnDhnqkOLwhPfgtQVNMW6trJTqN9B5d9Vmi/
+         9fFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715098732; x=1715703532;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lZwcVSwzOm1/6zNDN7V+zmSg9uLJaNbCLAg7xyWPCgg=;
+        b=YWg6YjSyB+ni3X3BuNRYiyI0bIya1VC4JomuDxkFgMvQ1TfELHKLhHn4iErYdrkACj
+         v8aqyAIaL2hXteXqzmVTQT3nfeHdNHj4JPT6Y0env+tVH1+3MnSHRaxeCOaumBjD1QTH
+         FAlWRC+S47jxjybk+YUR9CMUewqI93Oh8wzqfJfQZL8uxj3oi2pQG3I7dBwsi9sZ+r+C
+         oCk5h8x/5EjOUNDw6fPd+LVbXDdMdlSJ8eLBV04lG01sasY83e5gMqYzxcG6yTnoOusX
+         xw7J3ozEBA2bjjnLbwl2C9T6ezj9QyLpH/9y7c5DLpf4c+Oj7DX7le3uI8Lswmc9Bh5Q
+         m9rw==
+X-Forwarded-Encrypted: i=1; AJvYcCXAY4G1CpMbgq7fSI4ehRuPU4yySy/9cP4yZuKHeOp7Ra5KjRulOo/1VccxqFvwhXKe7T6fz8aULS5l2mPyiRVgPjGiG4/mUEMqy7BMfxvnf0Wl2HindNIaa5BIX7tmA3QVIVv6YKlTN9+T2SJ9UbzixBAmMQ6FghzKo9sLru9pMrne3PwE
+X-Gm-Message-State: AOJu0YyFLDGcPAvNRVX1yJ0nfxR/0SrDpkWnFENkLqDJ5lbFV7A9yZEm
+	+cIO1HJsfswAoM8237WwVHlydi1Z128Nasa9oOVn5bjekMUB6gN6HeNd+g==
+X-Google-Smtp-Source: AGHT+IHx3+YiTxi1Fg/aMOoqKriaeDIKLF1dvzu0R4Y5PSwp5KwRB7ZCd9qeZFKdy4G+AcSQ1Nl9hw==
+X-Received: by 2002:adf:fecf:0:b0:34c:6629:9962 with SMTP id ffacd0b85a97d-34fca42eb2cmr201491f8f.30.1715098731713;
+        Tue, 07 May 2024 09:18:51 -0700 (PDT)
+Received: from debian ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id s3-20020adfe003000000b0034e8a10039esm10226719wrh.10.2024.05.07.09.18.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 May 2024 09:18:51 -0700 (PDT)
+Message-ID: <3514cd99-7bd2-49d9-a1b3-a26e727bcef8@gmail.com>
+Date: Tue, 7 May 2024 18:18:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Subject: Re: [PATCH net-next v8 2/3] net: gro: move L3 flush checks to
+ tcp_gro_receive and udp_gro_receive_segment
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
+ alobakin@pm.me, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ alexander.duyck@gmail.com
+References: <20240506093550.128210-1-richardbgobert@gmail.com>
+ <1ed21e6d-7cbc-43e3-8933-fc40562b70b2@gmail.com>
+ <6639114eab050_516de29444@willemb.c.googlers.com.notmuch>
+From: Richard Gobert <richardbgobert@gmail.com>
+In-Reply-To: <6639114eab050_516de29444@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Tue, 07 May 2024 15:54:33 +0200
-> On Fri, 2024-05-03 at 15:31 -0700, Kuniyuki Iwashima wrote:
-> > unix_walk_scc_fast() calls unix_scc_cyclic() for every SCC so that we
-> > can make unix_graph_maybe_cyclic false when all SCC are cleaned up.
-> > 
-> > If we count the number of loops in the graph during Tarjan's algorithm,
-> > we need not call unix_scc_cyclic() in unix_walk_scc_fast().
-> > 
-> > Instead, we can just decrement the number when calling unix_collect_skb()
-> > and update unix_graph_maybe_cyclic based on the count.
-> > 
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >  net/unix/garbage.c | 19 +++++++++++--------
-> >  1 file changed, 11 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-> > index 1f8b8cdfcdc8..7ffb80dd422c 100644
-> > --- a/net/unix/garbage.c
-> > +++ b/net/unix/garbage.c
-> > @@ -405,6 +405,7 @@ static bool unix_scc_cyclic(struct list_head *scc)
-> >  
-> >  static LIST_HEAD(unix_visited_vertices);
-> >  static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
-> > +static unsigned long unix_graph_circles;
-> >  
-> >  static void __unix_walk_scc(struct unix_vertex *vertex, unsigned long *last_index,
-> >  			    struct sk_buff_head *hitlist)
-> > @@ -494,8 +495,8 @@ static void __unix_walk_scc(struct unix_vertex *vertex, unsigned long *last_inde
-> >  
-> >  		if (scc_dead)
-> >  			unix_collect_skb(&scc, hitlist);
-> > -		else if (!unix_graph_maybe_cyclic)
-> > -			unix_graph_maybe_cyclic = unix_scc_cyclic(&scc);
-> > +		else if (unix_scc_cyclic(&scc))
-> > +			unix_graph_circles++;
-> >  
-> >  		list_del(&scc);
-> >  	}
-> > @@ -509,7 +510,7 @@ static void unix_walk_scc(struct sk_buff_head *hitlist)
-> >  {
-> >  	unsigned long last_index = UNIX_VERTEX_INDEX_START;
-> >  
-> > -	unix_graph_maybe_cyclic = false;
-> > +	unix_graph_circles = 0;
-> >  
-> >  	/* Visit every vertex exactly once.
-> >  	 * __unix_walk_scc() moves visited vertices to unix_visited_vertices.
-> > @@ -524,13 +525,12 @@ static void unix_walk_scc(struct sk_buff_head *hitlist)
-> >  	list_replace_init(&unix_visited_vertices, &unix_unvisited_vertices);
-> >  	swap(unix_vertex_unvisited_index, unix_vertex_grouped_index);
-> >  
-> > +	unix_graph_maybe_cyclic = !!unix_graph_circles;
-> >  	unix_graph_grouped = true;
-> >  }
-> >  
-> >  static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
-> >  {
-> > -	unix_graph_maybe_cyclic = false;
-> > -
-> >  	while (!list_empty(&unix_unvisited_vertices)) {
-> >  		struct unix_vertex *vertex;
-> >  		struct list_head scc;
-> > @@ -546,15 +546,18 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
-> >  				scc_dead = unix_vertex_dead(vertex);
-> >  		}
-> >  
-> > -		if (scc_dead)
-> > +		if (scc_dead) {
-> >  			unix_collect_skb(&scc, hitlist);
-> > -		else if (!unix_graph_maybe_cyclic)
-> > -			unix_graph_maybe_cyclic = unix_scc_cyclic(&scc);
-> > +			unix_graph_circles--;
+Willem de Bruijn wrote:
+> Richard Gobert wrote:
+>> {inet,ipv6}_gro_receive functions perform flush checks (ttl, flags,
+>> iph->id, ...) against all packets in a loop. These flush checks are used in
+>> all merging UDP and TCP flows.
+>>
+>> These checks need to be done only once and only against the found p skb,
+>> since they only affect flush and not same_flow.
+>>
+>> This patch leverages correct network header offsets from the cb for both
+>> outer and inner network headers - allowing these checks to be done only
+>> once, in tcp_gro_receive and udp_gro_receive_segment. As a result,
+>> NAPI_GRO_CB(p)->flush is not used at all. In addition, flush_id checks are
+>> more declarative and contained in inet_gro_flush, thus removing the need
+>> for flush_id in napi_gro_cb.
+>>
+>> This results in less parsing code for non-loop flush tests for TCP and UDP
+>> flows.
+>>
+>> To make sure results are not within noise range - I've made netfilter drop
+>> all TCP packets, and measured CPU performance in GRO (in this case GRO is
+>> responsible for about 50% of the CPU utilization).
+>>
+>> perf top while replaying 64 parallel IP/TCP streams merging in GRO:
+>> (gro_network_flush is compiled inline to tcp_gro_receive)
+>> net-next:
+>>         6.94% [kernel] [k] inet_gro_receive
+>>         3.02% [kernel] [k] tcp_gro_receive
+>>
+>> patch applied:
+>>         4.27% [kernel] [k] tcp_gro_receive
+>>         4.22% [kernel] [k] inet_gro_receive
+>>
+>> perf top while replaying 64 parallel IP/IP/TCP streams merging in GRO (same
+>> results for any encapsulation, in this case inet_gro_receive is top
+>> offender in net-next)
+>> net-next:
+>>         10.09% [kernel] [k] inet_gro_receive
+>>         2.08% [kernel] [k] tcp_gro_receive
+>>
+>> patch applied:
+>>         6.97% [kernel] [k] inet_gro_receive
+>>         3.68% [kernel] [k] tcp_gro_receive
 > 
-> Possibly WARN_ON_ONCE(unix_graph_circles < 0) ?
-
-Will add in v2.
-
+> Thanks for getting the additional numbers. The savings are not huge.
 > 
-> I find this patch a little scaring - meaning I can't understand it
-> fully,
-> I'm wondering if it would make any sense to postpone this patch
-> to the next cycle?
+> But +1 on the change also because it simplifies this non-obvious
+> logic. It makes sense to separate flow matching and flush logic.
+> 
+> Btw please include Alexander Duyck in the Cc: of this series. 
 
-It's fine by me to postpone patch 2 - 5, but it would be appreciated
-if patch 1 makes it to this cycle.
+Thanks, will do that when I re-post.
 
-Thanks!
+>> +static inline int inet_gro_flush(const struct iphdr *iph, const struct iphdr *iph2,
+>> +				 struct sk_buff *p, bool outer)
+>> +{
+>> +	const u32 id = ntohl(*(__be32 *)&iph->id);
+>> +	const u32 id2 = ntohl(*(__be32 *)&iph2->id);
+>> +	const u16 flush_id = (id >> 16) - (id2 >> 16);
+>> +	const u16 count = NAPI_GRO_CB(p)->count;
+>> +	const u32 df = id & IP_DF;
+>> +	u32 is_atomic;
+>> +	int flush;
+>> +
+>> +	/* All fields must match except length and checksum. */
+>> +	flush = (iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | (df ^ (id2 & IP_DF));
+>> +
+>> +	if (outer && df)
+>> +		return flush;
+> 
+> Does the fixed id logic apply equally to inner and outer IPv4?
+> 
+
+Fixed id logic is not applied equally to inner and outer IPv4. innermost
+IDs are checked, but outer IPv4 IDs are not checked at all if DF is set.
+This is the current logic in the code and this patch preserves it. To my
+understanding this is explained as intentional by the original commit author
+(20160407223218.11142.26592.stgit@ahduyck-xeon-server)
+
+Alexander - could you maybe elaborate further?
+
+>> +
+>> +	/* When we receive our second frame we can make a decision on if we
+>> +	 * continue this flow as an atomic flow with a fixed ID or if we use
+>> +	 * an incrementing ID.
+>> +	 */
+>> +	NAPI_GRO_CB(p)->is_atomic |= (count == 1 && df && flush_id == 0);
+>> +	is_atomic = (df && NAPI_GRO_CB(p)->is_atomic) - 1;
+>> +
+>> +	return flush | (flush_id ^ (count & is_atomic));
+> 
+> This is a good time to consider making this logical more obvious.
+> 
+> First off, the flush check can be part of the outer && df above, as
+> flush is not modified after.
+> 
+> Subjective, but I find the following more readable, and not worth
+> saving a few branches.
+> 
+>         if (count == 1 && df && !flush_id)
+>                 NAPI_GRO_CB(p)->is_atomic = true;
+> 
+> 	ip_fixedid_matches = NAPI_GRO_CB(p)->is_atomic ^ df;
+> 	ipid_offset_matches = ipid_offset - count;
+> 
+> 	return ip_fixedid_matches & ipid_offset_matches;
+> 
+> Have to be a bit careful about types. Have not checked that in detail.
+> 
+
+ip_fixedid_matches should also account for checking whether flush_id is 0
+or not, if we're going for readability I'd suggest checking "which check"
+should be done (fixedid or offset) and do only the appropriate one.
+
+	if (count == 1 && df && !ipid_offset)
+		NAPI_GRO_CB(p)->is_atomic = true;
+
+	if (NAPI_GRO_CB(p)->is_atomic && df)
+		return flush | ipid_offset;
+
+	return flush | (ipid_offset ^ count);
+
+> And while nitpicking:
+> ipid_offset may be a more descriptive variable name than flush_id, and
+> ip_fixedid  than is_atomic. If changing those does not result in a lot
+> of code churn.
+> 
+
+I also think is_atomic is not the best name, I'll change both names in the
+next patch.
+
+>> +}
+>> +
+>> +static inline int ipv6_gro_flush(const struct ipv6hdr *iph, const struct ipv6hdr *iph2)
+>> +{
+>> +	/* <Version:4><Traffic_Class:8><Flow_Label:20> */
+>> +	__be32 first_word = *(__be32 *)iph ^ *(__be32 *)iph2;
+>> +
+>> +	/* Flush if Traffic Class fields are different. */
+>> +	return !!((first_word & htonl(0x0FF00000)) |
+>> +		(__force __be32)(iph->hop_limit ^ iph2->hop_limit));
+>> +}
+>> +
+>> +static inline int gro_network_flush(const void *th, const void *th2, struct sk_buff *p, int off)
+>> +{
+>> +	const bool encap_mark = NAPI_GRO_CB(p)->encap_mark;
+> 
+> Is this correct when udp_gro_complete clears this for tunnels?
+> 
+
+gro_network_flush is called in receive flow, so udp_gro_complete cannot be
+called after gro_network_flush. I think the function name should be changed to
+gro_receive_network_flush.
+
+>> +	int flush = 0;
+>> +	int i;
+>> +
+>> +	for (i = 0; i <= encap_mark; i++) {
+>> +		const u16 diff = off - NAPI_GRO_CB(p)->network_offsets[i];
+>> +		const void *nh = th - diff;
+>> +		const void *nh2 = th2 - diff;
+>> +
+>> +		if (((struct iphdr *)nh)->version == 6)
+>> +			flush |= ipv6_gro_flush(nh, nh2);
+>> +		else
+>> +			flush |= inet_gro_flush(nh, nh2, p, i != encap_mark);
+>> +	}
+> 
+> Maybe slightly better for branch prediction, and more obvious, if
+> creating a helper function __gro_network_flush and calling
+> 
+>     __gro_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->network_offsets[0])
+>     if (NAPI_GRO_CB(p)->encap_mark)
+>             __gro_network_flush(th, th2, p, off - NAPI_GRO_CB(p)->network_offsets[1])
+> 
+>> +
+>> +	return flush;
+>> +}
+>> +
+>>  int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb);
+>>  
 
