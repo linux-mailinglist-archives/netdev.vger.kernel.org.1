@@ -1,129 +1,188 @@
-Return-Path: <netdev+bounces-94233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEED88BEADA
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 19:54:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4282B8BEAED
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 19:56:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72510282632
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 17:54:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B09631F223FE
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 17:56:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3F516C87D;
-	Tue,  7 May 2024 17:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E3E16D316;
+	Tue,  7 May 2024 17:56:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R5pdE+Oj"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="lIpXG8KP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4033F16C866
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 17:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378601607A7
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 17:56:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715104439; cv=none; b=ZQzuCbeKp7iaW6S+WuoFeCYKD7Ykh3QBc5xORxxihVXcJgGt2JpLvr4pJbpr+VqjCoypx5/jngwmTqTZLCTftGXrmrubr2baYmDzGBszWTFD0668Ft+crK1HIOUZUySaGSrin47OL6kC0x0Q7MJ/CCSLmJdZCoCSj07uwF9W1us=
+	t=1715104609; cv=none; b=oyWLd5Mfi8WMuRt8ofQHKBwPP6s5x3+TefRMvSlh3vjRX4PH//j9VeRjFvIU0ezKfqTX2Bck/E/hmdRAWB+hrzA5dPn2Di0pJc3gXRyqdawxrj4c8E5qhpx2NOs6hWLI3ofdOFl0vUPopwKf4x7Tyd2UOBvEse7UbgzdfVRAu+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715104439; c=relaxed/simple;
-	bh=f4jkcb6eCGK9z9a2d3qPQI3YlfWTfGaPefAR0W1j3LQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LPAgziLeve0cIUQDFmnIomgz4svcV3JP40FkEXZ5BW0Wz98c0Wse5WIbTFmLPpcOokNCI/9x7ID9y4lJN3z341YhKdb/e+BDraB1x24S92+v+X4+ZFWJhw7QO9bdkbxgIN3hYXLFnC7ICN/ZAUhDAbpqTHN+qnjVHAO8y0yvVw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R5pdE+Oj; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-418820e6effso12645e9.0
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 10:53:57 -0700 (PDT)
+	s=arc-20240116; t=1715104609; c=relaxed/simple;
+	bh=2WVuSd42XVbejvGzvbE/XdmU6u71Lu82dpSc5WCFvqQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mf4U0wlT1grSVjxZ14XkjaiLCMYCkSwjSIDGdXDwKR/1KNQ49jqlG0+Uh/xlTScVDRf40k6DRKSgY8OsGJ9bFUgogyXq8nIf4T3Ba6p8I7vZynzQnW5e+ryy2kF2VQyIDbF8iwlKdwg1EQtClr1ehXbTUOtWvOdSjDsa3FP9YD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=lIpXG8KP; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7928c351c6cso291914285a.3
+        for <netdev@vger.kernel.org>; Tue, 07 May 2024 10:56:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715104436; x=1715709236; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZZSBxoniVFCnSwsRyNGGB/5WVFKEVwOzPElRSvx/1EU=;
-        b=R5pdE+Ojdt2Cf5snoCts3zjuPF+NBboucpKaRWvWgyataQj2lyuCl8muFmDUew1dIJ
-         pDT0/AfQStpl9KL5fIHOuhGp/GFnj/lvtdIgkxXj0TeJyfYCJsmg5l0+Nx+iRcwvEK2K
-         +T6bgg/8EupoWfWeKz4F5PGwEWZJF4OgUdYAptkWRbt9z2bCz7HQwYNdNLQW+vO7DY7R
-         1Otjr7MtGzNjSh1KPtRe1WvnwHFWbbZhX/C+UnSGdcFMNNX1gox1bnmmu0UY9B8fWjhB
-         gN01Ma6l8bRH9yRsacL7Pq/XGNZPAciiYzX4QcNJNRYeOr5H6ak9cuiYu73daIk4JlMb
-         PXRg==
+        d=ziepe.ca; s=google; t=1715104606; x=1715709406; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wu9WbbBrtYOSeavstfMRlNJlMm/0/4MuzUdv+q+e+RU=;
+        b=lIpXG8KPmCMXpUh7JZ5V/2Srhwf1899y4M6b9Z4m2rUYLhAVXEKRAj2RbS/QyN5GNf
+         2R8Y4+kgBdJGnCvROMTlZNIII1WTss+Y5khV/PgrQo+7sFWO045oo8Cqya9djusUOWdw
+         LjZeH6XKCmyZLORSKOBUwlvwrfH4qmIGzYQkzC0FW+KOzcd1qDlIaV378bwVFn5loS4F
+         wqiIsJ0r9R80fgWfGYfaMSewGq3VGJUQqs2m7pEBn1QuVVPuWPc+JHx7ApEjyrIF6254
+         hWGm76/BZ+9Oo3kYlmqV0lfJs1bxJo0/Ebfpx75oRZa2ZnfSRTfebpn97TzpAwwECN+Z
+         +lTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715104436; x=1715709236;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZZSBxoniVFCnSwsRyNGGB/5WVFKEVwOzPElRSvx/1EU=;
-        b=CQY/JYqKGG/OdeoaHNO9EkJD4DrhOQ1YcZEQoNj+NDDWtvReh8YBxPmJxWnLGfo8+U
-         2ClBR8xQ2Ktz2tGGZI2RNnFxBWteLUa6bo4HLQl+IHMI0CcaN6nCnS8PRUuoKgkFQEO9
-         2SmPovFF1lglpeuTJXsMYH/dC7ZOO4D/k6VcIoIEQt3+b/7KboMlkB0kQklGKLjxgVzX
-         vtu0fn+I6GWlKf5ahtAWBaXgAVM7PHjGdn1m5jEj89EWX4CND/AyCDIQZwkEFZI0UWao
-         lNg3qCt2bXXWuM8RoL1eRRDkon5UBoDfDYCtNmUj8xVzewuyAJtXM5azreXKm1RMu3ph
-         v5Tg==
-X-Forwarded-Encrypted: i=1; AJvYcCUBqZzrdfcBR8C3unmiEG9HH7bKUjuMcMeV4MKFE1739x6rQd/TuLdoeegCOMSgW7ln4Ze8WI9DbC8vROFFGRRWwvfUQLz7
-X-Gm-Message-State: AOJu0YxVufpphIRu6SG6nPc7yH6ZUZIojbrUXKK9FkGLk1arQpW5xAMJ
-	uUBjmRTCSUx1atyN6v+1fkXi1a6ijTj83d0JnXb5mF88ByoigNlxQikPvkaBi3435/Ye4gev99i
-	fH0y1E5BkhsuX7kivf9RUJVK7AyckDXlSd7dl
-X-Google-Smtp-Source: AGHT+IGz1XnPd5AWeO8uJ/y11xaVSFsWnWF3iUnew2fdVCadE6k0qGy9DNTjKr8tWwxbE8CeHiLNiXoVqCbHcy7HxH0=
-X-Received: by 2002:a7b:c046:0:b0:419:b16:9c14 with SMTP id
- 5b1f17b1804b1-41f7a8634ffmr90295e9.1.1715104436438; Tue, 07 May 2024 10:53:56
- -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715104606; x=1715709406;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wu9WbbBrtYOSeavstfMRlNJlMm/0/4MuzUdv+q+e+RU=;
+        b=miQ83QVCmlRLV43F2q5yQAlnMc6i9iRjJ/qhvgp6IisA1br1QGqy3asJYw9G9grSgT
+         Mo2S1evMtj/h+msX2Gw0sr/NtkRgnnTprYcuwdyz/v91Mcp6wLPyo8e5Jqckm90s8Q0v
+         2cXPFe7D2leTIEkunpNTc1N6CdzbyznTWBcHnyd9eH1wEJqF+lVmCCFNQQbCXRO8ZXvT
+         WG0qY7RHz2BvlMWE6nChcVxXaiIZg5i6E8Hii0z7JJSdtKyMv/IX7ro4HOqJWWGUlKqo
+         5C166CmitGYZQ21Ykf4yIw1TcEuNd5c3USkwC/r8dokRw4ZQJ9/U0VDtt83TUBhQ0ndM
+         av6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU005IDCGGR6jbIgVEeXW6uJlrrT6y6dGxGHBdXDf6VwSUqpKPXkekr4LJ1ttj43QyG6F8ujhg4H1m0HP6HLrln+cFVLdBi
+X-Gm-Message-State: AOJu0YzDVu945W2BQTMW3k4RelA42PWxSAsxViEksJfWBnmA60O48omP
+	irb5/ixSnm+lrL1Ld3o31O1xObRxifDwG6hkiyQWTQHoKzijsUCRbwjX4CXel08=
+X-Google-Smtp-Source: AGHT+IGCzj6XuEJPrKRVtB6HNDvjYgTlCCuf3Mc1RlNFJ90uDv9nZUQTLULizJXrrgrWoRFfeuAAuA==
+X-Received: by 2002:a05:620a:5a4b:b0:790:7345:2791 with SMTP id af79cd13be357-792b274eabbmr46464985a.56.1715104606118;
+        Tue, 07 May 2024 10:56:46 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id bm34-20020a05620a19a200b0078ec3aa9cc7sm5127446qkb.25.2024.05.07.10.56.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 May 2024 10:56:45 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1s4P3U-00022m-Vn;
+	Tue, 07 May 2024 14:56:44 -0300
+Date: Tue, 7 May 2024 14:56:44 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Mina Almasry <almasrymina@google.com>,
+	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	Aleksander Lobakin <aleksander.lobakin@intel.com>,
+	Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Richard Gobert <richardbgobert@gmail.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Breno Leitao <leitao@debian.org>, David Wei <dw@davidwei.uk>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Subject: Re: [RFC PATCH net-next v8 02/14] net: page_pool: create hooks for
+ custom page providers
+Message-ID: <20240507175644.GJ4718@ziepe.ca>
+References: <20240403002053.2376017-3-almasrymina@google.com>
+ <ZjH1QaSSQ98mw158@infradead.org>
+ <CAHS8izM0=xc2UhUxhnF_BixuFs5VaDV9W1jbso1K+Rg=35NzeA@mail.gmail.com>
+ <ZjjHUh1eINPg1wkn@infradead.org>
+ <20b1c2d9-0b37-414c-b348-89684c0c0998@gmail.com>
+ <20240507161857.GA4718@ziepe.ca>
+ <ZjpVfPqGNfE5N4bl@infradead.org>
+ <CAHS8izPH+sRLSiZ7vbrNtRdHrFEf8XQ61XAyHuxRSL9Jjy8YbQ@mail.gmail.com>
+ <20240507164838.GG4718@ziepe.ca>
+ <0d5da361-cc7b-46e9-a635-9a7a4c208444@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240430235057.1351993-1-edliaw@google.com> <ZjGiGq-_kUVht63m@finisterre.sirena.org.uk>
- <be921714-b684-401e-a89a-8256df5fcb86@collabora.com>
-In-Reply-To: <be921714-b684-401e-a89a-8256df5fcb86@collabora.com>
-From: Edward Liaw <edliaw@google.com>
-Date: Tue, 7 May 2024 10:53:28 -0700
-Message-ID: <CAG4es9V1SYe-JA3xfkwqchZ37Oc3PY6O36hGcA26-JHZ2MmSCQ@mail.gmail.com>
-Subject: Re: [PATCH v1 00/10] Define _GNU_SOURCE for sources using
-To: Muhammad Usama Anjum <usama.anjum@collabora.com>
-Cc: Mark Brown <broonie@kernel.org>, shuah@kernel.org, Jaroslav Kysela <perex@perex.cz>, 
-	Takashi Iwai <tiwai@suse.com>, Jiri Kosina <jikos@kernel.org>, 
-	Benjamin Tissoires <bentiss@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Bongsu Jeon <bongsu.jeon@samsung.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kernel-team@android.com, linux-sound@vger.kernel.org, 
-	linux-input@vger.kernel.org, kvm@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0d5da361-cc7b-46e9-a635-9a7a4c208444@gmail.com>
 
-On Tue, Apr 30, 2024 at 10:41=E2=80=AFPM Muhammad Usama Anjum
-<usama.anjum@collabora.com> wrote:
->
-> Thanks for the fixes.
->
-> On 5/1/24 6:59 AM, Mark Brown wrote:
-> > On Tue, Apr 30, 2024 at 11:50:09PM +0000, Edward Liaw wrote:
-> >> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
-> >> asprintf into kselftest_harness.h, which is a GNU extension and needs
-> >> _GNU_SOURCE to either be defined prior to including headers or with th=
-e
-> >> -D_GNU_SOURCE flag passed to the compiler.
-> >
-> > This seems like something that should be handled centrally rather than
-> > having to go round and audit the users every time some update is made.
-> The easiest way I could think of is to add -D_GNU_SOURCE to KHDR_HEADERS
-> definition in tools/testing/selftests/Makefile. It wouldn't be obvious fr=
-om
-> KHDR_HEADERS name that there could be other flags in it as well though.
+On Tue, May 07, 2024 at 06:25:52PM +0100, Pavel Begunkov wrote:
+> On 5/7/24 17:48, Jason Gunthorpe wrote:
+> > On Tue, May 07, 2024 at 09:42:05AM -0700, Mina Almasry wrote:
+> > 
+> > > 1. Align with devmem TCP to use udmabuf for your io_uring memory. I
+> > > think in the past you said it's a uapi you don't link but in the face
+> > > of this pushback you may want to reconsider.
+> > 
+> > dmabuf does not force a uapi, you can acquire your pages however you
+> > want and wrap them up in a dmabuf. No uapi at all.
+> > 
+> > The point is that dmabuf already provides ops that do basically what
+> > is needed here. We don't need ops calling ops just because dmabuf's
+> > ops are not understsood or not perfect. Fixup dmabuf.
+> 
+> Those ops, for example, are used to efficiently return used buffers
+> back to the kernel, which is uapi, I don't see how dmabuf can be
+> fixed up to cover it.
 
-I'll try this approach and see.  It looks like there are also some
-Makefiles that don't currently include KHDR_INCLUDES.
+Sure, but that doesn't mean you can't use dma buf for the other parts
+of the flow. The per-page lifetime is a different topic than the
+refcounting and access of the entire bulk of memory.
 
-Also, this will cause _GNU_SOURCE redefined warnings wherever #define
-_GNU_SOURCE is present.  Should I also delete them or wrap them with
-#ifndef?
-
->
->
-> --
-> BR,
-> Muhammad Usama Anjum
+Jason
 
