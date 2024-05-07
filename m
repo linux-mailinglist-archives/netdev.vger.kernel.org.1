@@ -1,182 +1,232 @@
-Return-Path: <netdev+bounces-94203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66D078BE992
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:47:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D55958BE998
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:47:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E621C1F24ABB
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:47:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A52F28A6C8
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 16:47:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7621779BC;
-	Tue,  7 May 2024 16:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27785179972;
+	Tue,  7 May 2024 16:42:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p61l+Wbd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fFMNv4LT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EFB16D304
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 16:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2BD16DECA
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 16:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715100104; cv=none; b=eyMruAK8FXW3TGaePx2mnk6rz2rCjjI82xwxnvTSKABxRWdAui5m65tjx1aeiMmiaW+bL9AP94MZrJMurjy8ImQU6Hv/B/tDKFSRz4Vv/rk0cN7tk7LZTFU+/rbT750NJK3auq7WwPenDoJepD7kOr62aDKm2TcjzaSjDC6Zxwc=
+	t=1715100142; cv=none; b=bEbf8I6fbdFMuhbmyDRJ911lI86qoatD1K74OXUjqnJxbZcnlTkFCm1gm4GrURlpM917QTL+1ixrx1JcrFFlh2SmKpyY1cWdp8ZIWPZOx1+swr2LypEoLzhzTTNhTSkReKs4b1pcbck1Jlcy4onKHxsLJdSzG/ARt4rGkkOxk4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715100104; c=relaxed/simple;
-	bh=g9RdJJdQr5+ypb4bqHVtLuMWeVuxUx1tLhAm9Lz7Hsg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=l7RRrEm+dG85VBaO/AR2+hQZqjDFbNpGu6/p2yrenGoD6VNklYb1cyC+TPQpK+z/yq5/V8i5wlMQTc0lgWi/uB8ay89ghfhVXaLaVdctFi5a9ELFRnhaeEuqBX+JBbU8XPNNxmeJNTE7jKp50n/fdHElt5J7M0PU5fKjgqCeUWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p61l+Wbd; arc=none smtp.client-ip=209.85.128.202
+	s=arc-20240116; t=1715100142; c=relaxed/simple;
+	bh=4xUNxPDzztu8L8/w3Kr2Lgr1+A9SAEy6b6FHPJHwwv4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K3Mpbq12cMoIkTaZXqIDkhkBruJuxu/xh5VyB/JA+2r1EJQR7Pdpy2Co/Dc0ihLKNZ4nVUw0N07KfE1fyYpzh+NDTvdMxZG5UxJRNWphYRAFJm7sS+DdjmhfDXdxlS2aCB7tjKpTQAb9OKns14YMs7zp/oxiehRJvoFp5otUdsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fFMNv4LT; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61be452c62bso56637827b3.2
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 09:41:42 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a59a387fbc9so844359966b.1
+        for <netdev@vger.kernel.org>; Tue, 07 May 2024 09:42:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715100102; x=1715704902; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=V4JZlOG3KMdumm/hECnSPokzLRwFpE5xEeiTZ8xFU9s=;
-        b=p61l+WbdFJ7YyHfFPindJ7GbjXGCap9sTX5r5bKX1Mf2+3ZtqlgN/Q3RSNzJGovcSx
-         /g6ZHYcjHkRJiqb3Zel7+3k73qCkfIsvuBo4rPH/YcsB87bKDbCSgQqVRGL5v8+ryhLm
-         TANst38PyWWtaunFvPPcWqyNe3fmJhgbUp4vT09Hys2vjjf7OH6o2AnISX5/B4lCRq+x
-         P7qi8CX1/6B5sw/N3T/VD5g8n4KWYuqqGC9qbog0wIdcqxZLjtRUY83yGRV3p3ax53I1
-         dmSz3A6kdT5T9KC/u/3VM1Lw6YQ7RiHf7uhyapXI27HT6WlSGWEwzjSyBCR9eHkoQrQz
-         2iVQ==
+        d=google.com; s=20230601; t=1715100138; x=1715704938; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dI6bl9uqwH7zmPDcLL9svN5oVbQ7KUvxyIQRaOdtpl4=;
+        b=fFMNv4LTPJ31z4uW9YnTXqY/+P/Lu3XxPsX1vj/FcwrlahaksKtwSIJkvvDzcu2rIw
+         kUFK/asO0I1jpjKDr04+deUss1rHngscpNh095cNT9yAlUJGoBVdvFddfEUhojuVSLd8
+         Eto5no1o3YDn7s96fv4R3s6xbKb5Bsur/LC9clY8PjSwiL/9uzZj5LS5/oC+2OGW3A0+
+         vm7S0Y+TFMGs2VB53VFjDniE4wLpnem+YNJTJmc4qzG2ipR7VsHrwzdTNO1UY3pswfMu
+         NQONvfepGVrBaio6afuQzEqvzCXU8mh+EjojwyPooBi4z5e68SfByNYD/7cU59orv47R
+         zBcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715100102; x=1715704902;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=V4JZlOG3KMdumm/hECnSPokzLRwFpE5xEeiTZ8xFU9s=;
-        b=YMz3tPFfjtP+6YXbvGFwvhOOHshcaRSnwE3lqLy39sV9kd3lnmPBCkodgDxRnEe/hy
-         dt2HX7hmKKVoL4JtfmRYKVfkYibIimbuO32FEH5U5oZw4Wa9MHB3Ha+6cDmc3Jxju7ue
-         aeVxnudeOoa8te392RlWc9EyXmk2ysJVmBBkiJVZzCDygayFNFhR9T0VGr2kPmXRzxsz
-         mnvG3pgsq26jqVOFseaTiKZSflBV15CFcNyCaekyoHI/RR20kXiJ+ynS7KyrciU+vxuC
-         9I2442PmSoxDIlLx/a+MBXt7/YCsS3DsYop1wMbfKkDo0AZpLFzOFoz6gIf7sOwI3aIV
-         M0Uw==
-X-Forwarded-Encrypted: i=1; AJvYcCXSlN+UzdhHCgKlzO1Dq0nq2uGOOWjkCdCajMdpqKZai2Q/QUkaWQnnT3L0iUNEsE/1Y2mTr+i3C9bZsRQEJYlHLJM9x3KD
-X-Gm-Message-State: AOJu0YzYAlJiW18QTVz8vylVDFm8mwl9ButCuswBbcauIJi04u/e71Ma
-	wIyTMWFGEFqNcQ0Z+eWdeilNpMzbFwhIc82g5Wz91rlK29uPUMK2OFldC8Wx3DM2ON2Rf8te7v0
-	F6Kmj5gie2Q==
-X-Google-Smtp-Source: AGHT+IFE2uqLfM7shSgItIq5UFMNH0R8ihc9A1bjG32pBkSR8c827Qta2VLKJ4823FLk9POI6MY59vS1ZdlHPg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:100e:b0:de5:3003:4b64 with SMTP
- id 3f1490d57ef6-debb9cd89d9mr17225276.1.1715100102016; Tue, 07 May 2024
- 09:41:42 -0700 (PDT)
-Date: Tue,  7 May 2024 16:41:40 +0000
+        d=1e100.net; s=20230601; t=1715100138; x=1715704938;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dI6bl9uqwH7zmPDcLL9svN5oVbQ7KUvxyIQRaOdtpl4=;
+        b=GGmAAusfaS/Lj3sWJZrc6+jQPc3s/Y0BfQVpCY1HQ4UMi8KkL1c2CXP8e1ziEwcHMu
+         kdvdE1LiySLmyqxHcD8CeIj/ErCDEDugY4GrPMhIj9NnTJJaa7cdHsQjOrnmXNZrv6MD
+         U5x5BIvgCwt1ugoOh8vL0vde+aW/3FqO/IFETEJ2Hbue15sXxQULq6CU8vXbyMWgA5cq
+         IqD8TWR0CZ8aXPMWq8XjUxFTDDvqzQiwFX1CrSfqYDuxlMq6WIkPxPxffhNrgN6MstOA
+         PNQ8w7pqtc31wHEEWLKmlmu9Z79KEFz5trPjo/f+O83WsztRzyOt+4zHNEKYzECXs3aw
+         12Pw==
+X-Forwarded-Encrypted: i=1; AJvYcCU9NDmu5X1a+4wmuN4gHem6xTCR/4TR5VzDmE+/XvHVv7fsA/6IR93gO9IKtHwQteQqLbMfMJ4oMCLC454qu/rTmTJiHBn3
+X-Gm-Message-State: AOJu0Yw2stE5cON783O+qFbbsW8d4MbYWpr2PvHWF5LVHQqfXKfjmpoS
+	NsKAAyTtiVx0mA76w+/Dh0jU1QpITdGUecKONGQyPPg0ctT/iET9Y8q6RfCvqrg/rXOKefIWh/7
+	sPagBmKFJpIMK1A9LMGB3dGM3SrhxQv5syLUB
+X-Google-Smtp-Source: AGHT+IGXrfCrbPuBFYGXmT+FZdafT4oz7XFNMT8FfUWaWmudph1z0+uFgT86I0JhwB1+1uK0PlezLiQ7rsxPPg9MW2Q=
+X-Received: by 2002:a17:906:1d4b:b0:a59:c833:d275 with SMTP id
+ a640c23a62f3a-a59fb94dbe4mr1458266b.30.1715100137853; Tue, 07 May 2024
+ 09:42:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240507164140.940547-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: get rid of twsk_unique()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <20240403002053.2376017-1-almasrymina@google.com>
+ <20240403002053.2376017-3-almasrymina@google.com> <ZjH1QaSSQ98mw158@infradead.org>
+ <CAHS8izM0=xc2UhUxhnF_BixuFs5VaDV9W1jbso1K+Rg=35NzeA@mail.gmail.com>
+ <ZjjHUh1eINPg1wkn@infradead.org> <20b1c2d9-0b37-414c-b348-89684c0c0998@gmail.com>
+ <20240507161857.GA4718@ziepe.ca> <ZjpVfPqGNfE5N4bl@infradead.org>
+In-Reply-To: <ZjpVfPqGNfE5N4bl@infradead.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 7 May 2024 09:42:05 -0700
+Message-ID: <CAHS8izPH+sRLSiZ7vbrNtRdHrFEf8XQ61XAyHuxRSL9Jjy8YbQ@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v8 02/14] net: page_pool: create hooks for
+ custom page providers
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Amritha Nambiar <amritha.nambiar@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>, Kaiyuan Zhang <kaiyuanz@google.com>, 
+	Christian Brauner <brauner@kernel.org>, Simon Horman <horms@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Florian Westphal <fw@strlen.de>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, 
+	Aleksander Lobakin <aleksander.lobakin@intel.com>, Michael Lass <bevan@bi-co.net>, 
+	Jiri Pirko <jiri@resnulli.us>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Richard Gobert <richardbgobert@gmail.com>, 
+	Sridhar Samudrala <sridhar.samudrala@intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Johannes Berg <johannes.berg@intel.com>, Abel Wu <wuyun.abel@bytedance.com>, 
+	Breno Leitao <leitao@debian.org>, David Wei <dw@davidwei.uk>, Shailend Chand <shailend@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-DCCP is going away soon, and had no twsk_unique() method.
+On Tue, May 7, 2024 at 9:24=E2=80=AFAM Christoph Hellwig <hch@infradead.org=
+> wrote:
+>
+> On Tue, May 07, 2024 at 01:18:57PM -0300, Jason Gunthorpe wrote:
+> > On Tue, May 07, 2024 at 05:05:12PM +0100, Pavel Begunkov wrote:
+> > > > even in tree if you give them enough rope, and they should not have
+> > > > that rope when the only sensible options are page/folio based kerne=
+l
+> > > > memory (incuding large/huge folios) and dmabuf.
+> > >
+> > > I believe there is at least one deep confusion here, considering you
+> > > previously mentioned Keith's pre-mapping patches. The "hooks" are not
+> > > that about in what format you pass memory, it's arguably the least
+> > > interesting part for page pool, more or less it'd circulate whatever
+> > > is given. It's more of how to have a better control over buffer lifet=
+ime
+> > > and implement a buffer pool passing data to users and empty buffers
+> > > back.
+> >
+> > Isn't that more or less exactly what dmabuf is? Why do you need
+> > another almost dma-buf thing for another project?
+>
+> That's the exact point I've been making since the last round of
+> the series.  We don't need to reinvent dmabuf poorly in every
+> subsystem, but instead fix the odd parts in it and make it suitable
+> for everyone.
+>
 
-We can directly call tcp_twsk_unique() for TCP sockets.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/timewait_sock.h | 9 ---------
- net/ipv4/inet_hashtables.c  | 3 ++-
- net/ipv4/tcp_ipv4.c         | 1 -
- net/ipv6/inet6_hashtables.c | 4 +++-
- net/ipv6/tcp_ipv6.c         | 1 -
- 5 files changed, 5 insertions(+), 13 deletions(-)
+FWIW the change Christoph is requesting is straight forward from my
+POV and doesn't really hurt the devmem use case. I'd basically remove
+the ops and add an if statement in the slow path where the ops are
+being used to alloc/free from dmabuf instead of alloc_pages().
+Something like (very rough, doesn't compile):
 
-diff --git a/include/net/timewait_sock.h b/include/net/timewait_sock.h
-index 74d2b463cc95e61baced94ff3e6aea3913b506ee..62b3e9f2aed404ba818f4b57d7f2d3acb8ef73f2 100644
---- a/include/net/timewait_sock.h
-+++ b/include/net/timewait_sock.h
-@@ -15,18 +15,9 @@ struct timewait_sock_ops {
- 	struct kmem_cache	*twsk_slab;
- 	char		*twsk_slab_name;
- 	unsigned int	twsk_obj_size;
--	int		(*twsk_unique)(struct sock *sk,
--				       struct sock *sktw, void *twp);
- 	void		(*twsk_destructor)(struct sock *sk);
- };
- 
--static inline int twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
--{
--	if (sk->sk_prot->twsk_prot->twsk_unique != NULL)
--		return sk->sk_prot->twsk_prot->twsk_unique(sk, sktw, twp);
--	return 0;
--}
--
- static inline void twsk_destructor(struct sock *sk)
- {
- 	if (sk->sk_prot->twsk_prot->twsk_destructor != NULL)
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index cf88eca5f1b40563e177c6d84dd59416c62c30e5..48d0d494185b19a5e7282ffb6b33051604c28c9f 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -565,7 +565,8 @@ static int __inet_check_established(struct inet_timewait_death_row *death_row,
- 		if (likely(inet_match(net, sk2, acookie, ports, dif, sdif))) {
- 			if (sk2->sk_state == TCP_TIME_WAIT) {
- 				tw = inet_twsk(sk2);
--				if (twsk_unique(sk, sk2, twp))
-+				if (sk->sk_protocol == IPPROTO_TCP &&
-+				    tcp_twsk_unique(sk, sk2, twp))
- 					break;
- 			}
- 			goto not_unique;
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 0427deca3e0eb9239558aa124a41a1525df62a04..be0f64fec6840cee3d1734b932ba7c8b1e9bfad2 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -2431,7 +2431,6 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 
- static struct timewait_sock_ops tcp_timewait_sock_ops = {
- 	.twsk_obj_size	= sizeof(struct tcp_timewait_sock),
--	.twsk_unique	= tcp_twsk_unique,
- 	.twsk_destructor= tcp_twsk_destructor,
- };
- 
-diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
-index 2e81383b663b71b95719a295fd9629f1193e4225..6db71bb1cd300a9a3d91a8d771db4521978bc5d6 100644
---- a/net/ipv6/inet6_hashtables.c
-+++ b/net/ipv6/inet6_hashtables.c
-@@ -21,6 +21,7 @@
- #include <net/secure_seq.h>
- #include <net/ip.h>
- #include <net/sock_reuseport.h>
-+#include <net/tcp.h>
- 
- u32 inet6_ehashfn(const struct net *net,
- 		  const struct in6_addr *laddr, const u16 lport,
-@@ -289,7 +290,8 @@ static int __inet6_check_established(struct inet_timewait_death_row *death_row,
- 				       dif, sdif))) {
- 			if (sk2->sk_state == TCP_TIME_WAIT) {
- 				tw = inet_twsk(sk2);
--				if (twsk_unique(sk, sk2, twp))
-+				if (sk->sk_protocol == IPPROTO_TCP &&
-+				    tcp_twsk_unique(sk, sk2, twp))
- 					break;
- 			}
- 			goto not_unique;
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 37201c4fb3931d1eb93fcd6868de7167977bf0a1..7f6693e794bd011371a8a794f703192f400546e5 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -2049,7 +2049,6 @@ void tcp_v6_early_demux(struct sk_buff *skb)
- 
- static struct timewait_sock_ops tcp6_timewait_sock_ops = {
- 	.twsk_obj_size	= sizeof(struct tcp6_timewait_sock),
--	.twsk_unique	= tcp_twsk_unique,
- 	.twsk_destructor = tcp_twsk_destructor,
- };
- 
--- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 92be1aaf18ccc..2cc986455bce6 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -557,8 +557,8 @@ netmem_ref page_pool_alloc_netmem(struct page_pool
+*pool, gfp_t gfp)
+                return netmem;
 
+        /* Slow-path: cache empty, do real allocation */
+-       if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_op=
+s)
+-               netmem =3D pool->mp_ops->alloc_pages(pool, gfp);
++       if (page_pool_is_dmabuf(pool))
++               netmem =3D mp_dmabuf_devmem_alloc_pages():
+        else
+                netmem =3D __page_pool_alloc_pages_slow(pool, gfp);
+        return netmem;
+
+
+The folks that will be negatively impacted by this are
+Jakub/Pavel/David. I think all were planning to extend the hooks for
+io_uring or other memory types.
+
+Pavel/David, AFAICT you have these options here (but maybe you can
+think of more):
+
+1. Align with devmem TCP to use udmabuf for your io_uring memory. I
+think in the past you said it's a uapi you don't link but in the face
+of this pushback you may want to reconsider.
+
+2. Follow the example of devmem TCP and add another if statement to
+alloc from io_uring, so something like:
+
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 92be1aaf18ccc..3545bb82c7d05 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -557,8 +557,10 @@ netmem_ref page_pool_alloc_netmem(struct
+page_pool *pool, gfp_t gfp)
+                return netmem;
+
+        /* Slow-path: cache empty, do real allocation */
+-       if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_op=
+s)
+-               netmem =3D pool->mp_ops->alloc_pages(pool, gfp);
++       if (page_pool_is_dmabuf(pool))
++               netmem =3D mp_dmabuf_devmem_alloc_pages():
++       else if (page_pool_is_io_uring(pool))
++               netmem =3D mp_io_uring_alloc_pages():
+        else
+                netmem =3D __page_pool_alloc_pages_slow(pool, gfp);
+        return netmem;
+
+Note that Christoph/Jason may not like you adding non-dmabuf io_uring
+backing memory in the first place, so there may be pushback against
+this approach.
+
+3. Pushback on the nack on this thread. It seems you're already
+discussing this. I'll see what happens.
+
+To be honest the GVE queue-API has just been merged I think, so I'm
+now unblocked on sending non-RFCs of this work and I'm hoping to send
+the next version soon. I may apply these changes on the next version
+for more discussion or leave as is and carry the nack until the
+conversation converges.
+
+--=20
+Thanks,
+Mina
 
