@@ -1,126 +1,131 @@
-Return-Path: <netdev+bounces-94239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A978BEB68
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 20:18:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9A578BEB79
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 20:24:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6DB21C204FA
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:18:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EB3EB21F05
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 18:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4460216D30B;
-	Tue,  7 May 2024 18:18:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F8016D326;
+	Tue,  7 May 2024 18:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U3CODpBV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3asohX/a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78B516C870
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 18:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6483316D319
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 18:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715105893; cv=none; b=T8a0PpW8RHmyMCszi+oO/mh/qZDiKpj8fWPtyRG9PLse5JXSdQJhnCMWGhw+VYBMLQKDXUOsYQCpY0iNZNRLF2PKPQNv5/OXCMGn/vnsLaWGNsBRTWoXt0t/Hs3jlWJOZ1JHiX3fqp/VD7e2B3F8nSVMwSbvrF95Fj4MpYsV6bo=
+	t=1715106132; cv=none; b=usvkvV/eh0MfToB3eEcjRov6/TUUoJPeEcWLlOMidC9Mcfm5DdYOdwU5cld5Uohv/+7wH8Wrd3K84Z5oSTxOGC/m/4xelhfv9eC+jafuWMVhltLoL7u7rovf/9WDFcV9kP0f5iK7rrPf2az630t89awb3Wx48/89Ps9lZ/1DuNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715105893; c=relaxed/simple;
-	bh=UAD+USFELbp8ul+Ht1vR+uQKssV6QsZHA8kGTKhPpFo=;
+	s=arc-20240116; t=1715106132; c=relaxed/simple;
+	bh=WGrDCpLhmXG0OzKkWQlmblE8Fu1o4nkE0xfNOfdBRP0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OSv5LHfady7H95I8Y1YD+PF4DK8eFAf3ynGe0OpuWtcJuxnwx1xi07cVaspJkGaxtby/3hFw3IphPsz35GoVx0V2jVLun5EFvVZzF5tHL+TGKKez/W+jhBB498i4IhPIgWrptfd42BPuOwHDrX5N4fMpSkpRz5Fp6QhvSqyxjYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U3CODpBV; arc=none smtp.client-ip=209.85.208.43
+	 To:Cc:Content-Type; b=qOyJ4gSwMzCsR51lC1ofsRL46vhT6Nek/pbwLCjpHlpJSYADhO9VLkBQExNLKkylBI+5vmvz+N0RdXLADa0RNZxLlCfKbZTHD6oGqDJxwWsWSdp3MbJ1Zxjh8Dttm5LpvH5Rij9dkyKaG3Wi79TfiIByWe2sP0yr95iaYBjeYHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3asohX/a; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-573137ba8d7so57841a12.0
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 11:18:11 -0700 (PDT)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso1353a12.1
+        for <netdev@vger.kernel.org>; Tue, 07 May 2024 11:22:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715105890; x=1715710690; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1715106130; x=1715710930; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UAD+USFELbp8ul+Ht1vR+uQKssV6QsZHA8kGTKhPpFo=;
-        b=U3CODpBVVdEQM0EAdEYEa7byTsenAMsvGQMNgMWE5smpjOLVtYB7FOstpRx80vjsAY
-         saM58lFf9Xm6wAa2sL6CM8nBwxh42jCyH7bHKDc5Pnlc9RSFvAOVxqeDfVJnHNcxcsE6
-         O3qGoQ1zGTTQK6EZz/Y0TM1yE8mkJMa2AybNRLyWh3M5LUghD0TZfeg7zkvvQeTXsfqA
-         lCooYpPMVGx7KBQNpDtiLxm0Jw9H34RKHpxYE6OD5OO56LHBr7LWk3Owr5RfcdW/Y5Yb
-         gFGVUb7F+NrLVwPMCdW5Mjx9WO05VwZbKcsoUupLTew++baREvTBJqhlDhQ7gGZdSYq7
-         I8Gw==
+        bh=+wLflVW04KtJjzrqEX38+Aa3dYvsqD/1sar1AfKslmU=;
+        b=3asohX/a0thUx9BdUrMrwqOlVpupyx8q+uiV3ouw6117tGqRUyQ6DAxVAZUj2A/TaG
+         cnlJdVpMn816RRAvIQIPe6dw4ASO0sD5lzzWIQ2rwmnLsDC1xVNNPgUgBtzHa7L3X8fo
+         uxq4gJJe25yEAtOUgTeps5dBXC+bCk/SQtXnWGYuJkXSQS6GOogzIOr6zkdZLjuBE9/t
+         780z+x6aMSoqqE6i4sB/e17biCnPlgFNH5Zx6AnRum9MvR8/HEaMUAJgmd9CV63Y4BRt
+         AtyZxAKQi9hL4lrsFAmXVTbDUN8XmxqAs8jISldmI+wv1s5k22EYIMNa+4okIPbwYzOm
+         ZYIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715105890; x=1715710690;
+        d=1e100.net; s=20230601; t=1715106130; x=1715710930;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UAD+USFELbp8ul+Ht1vR+uQKssV6QsZHA8kGTKhPpFo=;
-        b=faQSN2FjOpvW4X5g90CRKOFznPwAtnY8nNpWCh1p2e0YbaJyZZyxbVa0D9jTqZqSuJ
-         jnr8p1jk4hXP40m+EPy4cZdbqJtqXTTEwQ1WSCkB1I/lQ4ZyX01iRUMVLR1H9elboRh5
-         /p99fkrFGgZaj8wDmmEExFkWB0a3oG/dsVlTs5NgtVcisy+hm+H6VKZ16rqErF8gt3oY
-         a+GUE93m4hbOarnoq60Vxb0n5Zu7eyG3khJ5TGCh/Hh2KFDbhlvqBeGGALPuiARL+gSv
-         IcZAgr2hG8unxNa40m40+0BGhUJIWca+K5JhCXRFRkkFZ/zUzDGrJwgJ50I0BVh4IW8e
-         g7lQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWVC4eP7XjPKdB9/Q8OxuYEzmoXYD3reBrxKFIF3NIf6rpTWpSJ42453/Maej81cHoQZ5dWTYqUFmmNrqRqKrVNV/TFpowR
-X-Gm-Message-State: AOJu0YzzKS3FnloQ9faTWqXgh7wuP6+LAo1SjwTE2H80Mt7GSkuS3g0U
-	mBFAMG4fE40/lwDxISC5W6qvWREPu+5BZpcsVCp/b+aM3DzGPTwC4ZpYnu6VUqmNGXZIzQp3eOa
-	+0dZ2Tm9ZbP6K8EFY3uyExX+K3NVxfskGhXfu
-X-Google-Smtp-Source: AGHT+IEyJbNJ212YZFLiysY7ZB2yvq8Sb/inANzZg6JwVfC2GCwQMNxHohhpneOcMG4HvnvOTiZXlyhBK91mXHpHyjI=
-X-Received: by 2002:a17:906:a453:b0:a59:b87d:f81d with SMTP id
- a640c23a62f3a-a59fa8899a8mr46327566b.10.1715105889736; Tue, 07 May 2024
- 11:18:09 -0700 (PDT)
+        bh=+wLflVW04KtJjzrqEX38+Aa3dYvsqD/1sar1AfKslmU=;
+        b=jAcNgXCXDx20SyGUfUTqLNtd3ikCsFGkN3B2QGhAtYDN4AtoXQlG1oKqbvV5szH/5E
+         Eeqt3CX0NwoU9BlFMpVTo06tYZmPKbBWd41aPK6VZrVvz0Bgmiafkx7JUFMddpn3A37Q
+         LFNptoao8L8nlOQdwdY8C9kv+JB5t3ZaxI4N3LIKYZnCTfZUUSnGaBQYHjmSmUVuKXlq
+         DkfItbt4rp2CXFpOKvtDZYljl0Ws2X6yKWi5ojJAJglJ0RnHTID8IdL56hyXettzLkFN
+         t2pj9T4lKEmqCNt7t/h+IpGtPrN0/xovO2MXI4TnLp+TJnLmqk+YMBL1+RsRQIInjuB6
+         cdhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWtOrRZwGeYZuU0TUV/QuVcdEZKbAkQgcjqsm+jNnaze3nL5NxPE9Zs1Tgeq8+Ivd1x9nk/psb1WIcinTHsATLVEn/dBZBR
+X-Gm-Message-State: AOJu0YyT6OVXnFFfSb5jRjjxmBoCfma8C3MBXjzl3X4uRbukoCDr9Lu9
+	im3unKxpafHI4qLvIT/lU6aa/GtqtUc/grphhlJ71MRAVlS7Q1ZkUN2IdX11V8nKEuuOZ3Y4OxV
+	HslcBQsTW8FPi79m3p6QDCOd0cQfro1URDcan
+X-Google-Smtp-Source: AGHT+IEAUzK+Q2fl59QehpxISiQK+7GwZsujcGUtEEc473hSQ+Nch2fZVwYDMTDd1EXoTB5TtIifc+BmsIe9TrH0kP4=
+X-Received: by 2002:aa7:c988:0:b0:572:a23b:1d81 with SMTP id
+ 4fb4d7f45d1cf-5731ffc8a3amr12072a12.5.1715106129590; Tue, 07 May 2024
+ 11:22:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <c4ae5f08-11f2-48f7-9c2a-496173f3373e@kernel.org> <20240506180632.2bfdc996@kernel.org>
-In-Reply-To: <20240506180632.2bfdc996@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 7 May 2024 11:17:57 -0700
-Message-ID: <CAHS8izPu9nJu-ogEZ9pJw8RzH7sxsMT9pC25widSoEQVK_d9qw@mail.gmail.com>
-Subject: Re: Driver and H/W APIs Workshop at netdevconf
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Ahern <dsahern@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Tariq Toukan <tariqt@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	Andrew Gospodarek <andrew.gospodarek@broadcom.com>, 
-	"michael.chan@broadcom.com" <michael.chan@broadcom.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jiri Pirko <jiri@nvidia.com>, 
-	Alexander Duyck <alexander.duyck@gmail.com>, Willem de Bruijn <willemb@google.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
-	Shailend Chand <shailend@google.com>
+References: <20240507123937.15364-1-aleksander.lobakin@intel.com>
+In-Reply-To: <20240507123937.15364-1-aleksander.lobakin@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 7 May 2024 20:21:58 +0200
+Message-ID: <CANn89iLANEp-tjkKSawPTmH8DxaSQZ_OoJaAYHjLPkmwGEJ6nw@mail.gmail.com>
+Subject: Re: [PATCH net-next] netdevice: define and allocate &net_device _properly_
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Kees Cook <keescook@chromium.org>, 
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Simon Horman <horms@kernel.org>, 
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, linux-hardening@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 6, 2024 at 6:06=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+On Tue, May 7, 2024 at 2:40=E2=80=AFPM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
 >
-> On Mon, 6 May 2024 13:59:31 -0600 David Ahern wrote:
-> > Suggested topics based on recent netdev threads include
-> > - devlink - extensions, shortcomings, ...
-> > - extension to memory pools
-> > - new APIs for managing queues
-> > - challenges of netdev / IB co-existence (e.g., driven by AI workloads)
-> > - fwctl - a proposal for direct firmware access
+> In fact, this structure contains a flexible array at the end, but
+> historically its size, alignment etc., is calculated manually.
+> There are several instances of the structure embedded into other
+> structures, but also there's ongoing effort to remove them and we
+> could in the meantime declare &net_device properly.
+> Declare the array explicitly, use struct_size() and store the array
+> size inside the structure, so that __counted_by() can be applied.
+> Don't use PTR_ALIGN(), as SLUB itself tries its best to ensure the
+> allocated buffer is aligned to what the user expects.
+> Also, change its alignment from %NETDEV_ALIGN to the cacheline size
+> as per several suggestions on the netdev ML.
 >
-> Memory pools and queue API are more of stack features.
-> Please leave them out of your fwctl session.
+> bloat-o-meter for vmlinux:
 >
-> Aren't people who are actually working on those things submitting
-> talks or hosting better scoped discussions? It appears you haven't
-> CCed any of them..
+> free_netdev                                  445     440      -5
+> netdev_freemem                                24       -     -24
+> alloc_netdev_mqs                            1481    1450     -31
 >
+> On x86_64 with several NICs of different vendors, I was never able to
+> get a &net_device pointer not aligned to the cacheline size after the
+> change.
+>
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
 
-Me/Willem/Pavel/David/Shailend (I know, list is long xD), submitted a
-Devem TCP + Io_uring joint talk. We don't know if we'll get accepted.
-So far we plan to cover netmem + memory pools out of that list. We
-didn't plan to cover queue-API yet because we didn't have it accepted
-at talk submission time, but we just got it accepted so I was gonna
-reach out anyway to see if folks would be OK to have it in our talk.
+...
 
-Any objection to having queue-API discussed as part of our talk? Or
-add some of us to yours? I'm fine with whatever. Just thought it fits
-well as part of this Devmem TCP + io_uring talk.
+> -       p =3D kvzalloc(alloc_size, GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFA=
+IL);
+> -       if (!p)
+> +       sizeof_priv =3D ALIGN(sizeof_priv, SMP_CACHE_BYTES);
 
---=20
-Thanks,
-Mina
+If we have a __counted_by(priv_len), why do you ALIGN(sizeof_priv,
+SMP_CACHE_BYTES) ?
+
+If a driver pretends its private part is 4 bytes, we should get a
+warning if 20 bytes are used instead.
+
+You added two ____cacheline_aligned already in net_device already.
 
