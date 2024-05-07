@@ -1,89 +1,116 @@
-Return-Path: <netdev+bounces-94252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 736C28BEC7C
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 21:21:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 461878BEC8C
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 21:23:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 044A728A185
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 19:21:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7782B1C2463A
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 19:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C74816D9B4;
-	Tue,  7 May 2024 19:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9B616DEA4;
+	Tue,  7 May 2024 19:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jmvBoEdZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DGHZcDwQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DFF6CDC2
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 19:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B61A16D9B4;
+	Tue,  7 May 2024 19:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715109711; cv=none; b=X0wVmD+JLzOcI/nP/jsmj+1DEyzsaBuNgLA4La7KMRINz2sN5cm/2T/88nxNNyqIcqRaxqBn+YLtYSe3n8thoiyfCdbA69034hdLjEmQdTpz4GLozp42rZAiIlUs9Qhd0Izk16QwI2W1HSluWRii9NoLCFueaylS9rInnxKd0tk=
+	t=1715109806; cv=none; b=UbMhINtZeOIPeMBj+dRR6x+Lorv9Uzt5COuqdAXZ1l1I7zODPSNnk94e7EG/xXGef6hHXHaL/iFWLrYS9OkykYYrWZ0CYjf9HvE07KP/Az6+h4aiotLp00SnpvL2UfHLluT/njnIpSmhuJBguF5tprg6/rh5peBvuXpe6+h0ciY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715109711; c=relaxed/simple;
-	bh=QzWD6Sclv+mVopwstfR1LKukKHl969UIt0guEcvc6XA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QAu/gPp3N+M3tVHd2Egwdtb9+NwMW7aKCAf+ElI9Vgtng9QkF0Ije79TH6I++jTqV+qZU7NTvH2EQgviMYGaE2zZiZpcFXopApMSdZAdPVSXN77k95rxlOQ7MYrOJnW+WSvbGGDmefHubNqZ5MDaFd/RHq1J/rkx2azFu+Mc4hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jmvBoEdZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCB40C2BBFC;
-	Tue,  7 May 2024 19:21:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715109710;
-	bh=QzWD6Sclv+mVopwstfR1LKukKHl969UIt0guEcvc6XA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jmvBoEdZZG/7CwyIbbdFtL92Mx5ej2vbm+e3KOVdho5H2WSqyHNXEEw+ucCHfqnf9
-	 d5Wgnv2kqsF0ParhtgXVw431M5FMy8jGiCnEw2Ddx0I2o6bl2DL5qn+Imz+/S4csgA
-	 tceIL55uX6pfmdYpz4A3WZ/7Af9xgXjZTXu/X5MSaiMXhDMOdn0i17AQn5I57+DFuB
-	 jVWYms2IicTe+7mrdxDciMMcAjoS0kcnLCVocVUv/pNFp3C74HEXMxd5x3vMlQgFrx
-	 lR/GtTejKnodxvh2tSkAIeeIVJk4xwl8rjoKmm7FMQQefVtiyxPDCyWRYVYeC19g8F
-	 3A/MzZ3I86XJg==
-Date: Tue, 7 May 2024 12:21:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: David Ahern <dsahern@kernel.org>, Jacob Keller
- <jacob.e.keller@intel.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, Tariq
- Toukan <tariqt@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Andrew
- Gospodarek <andrew.gospodarek@broadcom.com>, "michael.chan@broadcom.com"
- <michael.chan@broadcom.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, Jiri Pirko <jiri@nvidia.com>, Alexander Duyck
- <alexander.duyck@gmail.com>, Willem de Bruijn <willemb@google.com>, Pavel
- Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Shailend
- Chand <shailend@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>
-Subject: Re: Driver and H/W APIs Workshop at netdevconf
-Message-ID: <20240507122148.1aba2359@kernel.org>
-In-Reply-To: <CAHS8izPu9nJu-ogEZ9pJw8RzH7sxsMT9pC25widSoEQVK_d9qw@mail.gmail.com>
-References: <c4ae5f08-11f2-48f7-9c2a-496173f3373e@kernel.org>
-	<20240506180632.2bfdc996@kernel.org>
-	<CAHS8izPu9nJu-ogEZ9pJw8RzH7sxsMT9pC25widSoEQVK_d9qw@mail.gmail.com>
+	s=arc-20240116; t=1715109806; c=relaxed/simple;
+	bh=N9VAa7hmB0B7LwXNGLbiRpxaywLSphhnsGPBx+mqXyo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XuQBZHyw9LQgUv2Gj7Wlic0RggOXdnPtr+yRpHdxKaf9aAh7Fsv5BzCchjzM9X24hXQQfgEd7gLuP64jcS9/j34iITy9NBH3mnMRXL2UuQ+sLJU28Hcn2gqVJ4Nt5XlupShO9j4JQ/tFpLIuXGrglQTBOzeDzFjwDdcB4BZeZkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DGHZcDwQ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=1Rlt99zmcVILKclqpbjv2utXWPqAc4TJPPlL31nMJt8=; b=DGHZcDwQt05/ofsRmHCXxB7F7p
+	4+19AHlf/kB9ynBunr+XzmEvyFe6jOB5Bi4Rg6t+TMauL7eOeAIVct20JsAWJK4OCulTHdC9kwooI
+	piaA8++amm65GJTBciceqX7s9AIYLi/5LAzyO1mzBOTXaqL3R65vQlUcICSp/KtxsspkpnGaEw/jv
+	BFFDRAv6XEpLYVjeNMGIqqF6+U84USuu86U1FYPS/48Wb2aAdf83MBClnEzbI40mPdQEnJjsMlRxA
+	jA2Mxibyz2aoHWw87X0TBKAU7uJ6LRcRJ4xY4XkjrvGCwdIf2txmwWpBcVfF0tuTv/Uq/WjjhOrdl
+	Mj+cEspQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36042)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1s4QP6-0004C4-0A;
+	Tue, 07 May 2024 20:23:08 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1s4QOw-0000ZA-Of; Tue, 07 May 2024 20:22:58 +0100
+Date: Tue, 7 May 2024 20:22:58 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Allen Pais <apais@linux.microsoft.com>
+Cc: netdev@vger.kernel.org, jes@trained-monkey.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	kda@linux-powerpc.org, cai.huoqing@linux.dev,
+	dougmill@linux.ibm.com, npiggin@gmail.com,
+	christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org,
+	naveen.n.rao@linux.ibm.com, nnac123@linux.ibm.com,
+	tlfalcon@linux.ibm.com, cooldavid@cooldavid.org,
+	marcin.s.wojtas@gmail.com, mlindner@marvell.com,
+	stephen@networkplumber.org, nbd@nbd.name, sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com, lorenzo@kernel.org,
+	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+	borisp@nvidia.com, bryan.whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com, louis.peens@corigine.com,
+	richardcochran@gmail.com, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-acenic@sunsite.dk,
+	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+	linux-mediatek@lists.infradead.org, oss-drivers@corigine.com,
+	linux-net-drivers@amd.com
+Subject: Re: [PATCH 1/1] [RFC] ethernet: Convert from tasklet to BH workqueue
+Message-ID: <Zjp/kgBE2ddjV044@shell.armlinux.org.uk>
+References: <20240507190111.16710-1-apais@linux.microsoft.com>
+ <20240507190111.16710-2-apais@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240507190111.16710-2-apais@linux.microsoft.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, 7 May 2024 11:17:57 -0700 Mina Almasry wrote:
-> Me/Willem/Pavel/David/Shailend (I know, list is long xD), submitted a
-> Devem TCP + Io_uring joint talk. We don't know if we'll get accepted.
-> So far we plan to cover netmem + memory pools out of that list. We
-> didn't plan to cover queue-API yet because we didn't have it accepted
-> at talk submission time, but we just got it accepted so I was gonna
-> reach out anyway to see if folks would be OK to have it in our talk.
+On Tue, May 07, 2024 at 07:01:11PM +0000, Allen Pais wrote:
+> The only generic interface to execute asynchronously in the BH context is
+> tasklet; however, it's marked deprecated and has some design flaws. To
+> replace tasklets, BH workqueue support was recently added. A BH workqueue
+> behaves similarly to regular workqueues except that the queued work items
+> are executed in the BH context.
 > 
-> Any objection to having queue-API discussed as part of our talk? Or
-> add some of us to yours? I'm fine with whatever. Just thought it fits
-> well as part of this Devmem TCP + io_uring talk.
+> This patch converts drivers/ethernet/* from tasklet to BH workqueue.
 
-I wonder if Amritha submitted something.
+I doubt you're going to get many comments on this patch, being so large
+and spread across all drivers. I'm not going to bother trying to edit
+this down to something more sensible, I'll just plonk my comment here.
 
-Otherwise it makes sense to cover as part of your session.
-Or - if you're submitting a new session, pop my name on the list 
-as well, if you don't mind.
+For the mvpp2 driver, you're only updating a comment - and looking at
+it, the comment no longer reflects the code. It doesn't make use of
+tasklets at all. That makes the comment wrong whether or not it's
+updated. So I suggest rather than doing a search and replace for
+"tasklet" to "BH blahblah" (sorry, I don't remember what you replaced
+it with) just get rid of that bit of the comment.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
