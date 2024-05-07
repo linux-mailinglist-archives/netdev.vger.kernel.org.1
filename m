@@ -1,84 +1,70 @@
-Return-Path: <netdev+bounces-93909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AF6E8BD8F5
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 03:33:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF54A8BD90B
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 03:38:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B30FCB2151B
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 01:33:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E39AB20A8C
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 01:38:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E3F1C3D;
-	Tue,  7 May 2024 01:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DFCD1FA5;
+	Tue,  7 May 2024 01:38:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nzViaw57"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rx+ywEF+"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F7D139F;
-	Tue,  7 May 2024 01:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486FA139F
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 01:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715045597; cv=none; b=sTYwZ1M/kwtIIsiKvcfRDdXcBN+g/cUTeuASwty0CRhBYq4KHmjM2bGLS8meBiBP9vc0aADBTooVVBhpnS9sQHSyOS+uB0+noFT4FL//evdeEU5k5PJt+/udoHAJoZ8AtCQMTBlfGbMUIbNxzgS8oOg6Uzu3qrmpaeVeCLzEc7M=
+	t=1715045907; cv=none; b=OTqFyQa7Cp/SmUK8+rGbhds2xpPa3tgyFYH1rtdvN+l9t1FAj6a5F8MFEwjdtH3LY6LH35mmDuOBHQrsM8vbD5m6iAG49kHbSQAxYkV/QspORcBQqPwOEUocSyfniySZS48YbQSNHXkocfnys2++cq185KFImJiA79ijFV1z70k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715045597; c=relaxed/simple;
-	bh=qPRJnYhfG3ihAcwLFlEiL3vMYD133/E5GbZFFwNXRHY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FSzgc8oQfSU1mTeJIe3xWf7Yxr1m+MZNVjo4CLy7M88mWu9jitWPcoZt6SqM0gZbyFyGN8cjwbY8ur8KjdbrnJAeUuSrT+26+ezEoqkks+E/t+uzHAiZEIecW/jG5nK1qir0EVKRp1BmEKX3Jid9ymkol5YPRvKgTej57K+AK3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nzViaw57; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=w7qpPlO1ia49EiV1A7IncpyuhlxwrR2pVKc054DktVE=; b=nzViaw57oJ4jG5xzUHra90T2OI
-	qHIwcqcuZxUMtuM6QPghR6oGcnkw4kSFk6mBS548GtN8g2jMxAEulIvaDSVrbDNnzkMjp5E9cRlv/
-	4YEp/uPp3UbV+S+SoXj+9cEUI0S3hmPOzYwe6ZOTBLB03PMnTHPEphnD5Um0Lg8U0uII=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s49hV-00EoJm-1l; Tue, 07 May 2024 03:33:01 +0200
-Date: Tue, 7 May 2024 03:33:01 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rengarajan S <rengarajan.s@microchip.com>
-Cc: bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, richardcochran@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v1] net: microchip: lan743x: Reduce PTP timeout
- on HW failure
-Message-ID: <01145749-30a7-47a3-a5e6-03f4d0ee1264@lunn.ch>
-References: <20240502050300.38689-1-rengarajan.s@microchip.com>
+	s=arc-20240116; t=1715045907; c=relaxed/simple;
+	bh=3UVvf9/MD2DAo4mb8+aMVIRmwQ9YeNRpK/hCEcC33BI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Lakxan8YTjy9I1V8fbrGh2tn+CvDLBmYNsL0Tp6jZmKXJiNRJREEyPeEU+GsvJFBInSWl677GpkPWDXvckTSpeqC5sPs4fQDmwjpwxaXe4qfQb5Xtu26zOVvrKx5jLBdmXGChYmjZDo2liTZ4bSvCMbXV+HfmHYhDaxHyCnVcFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rx+ywEF+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBF14C3277B;
+	Tue,  7 May 2024 01:38:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715045907;
+	bh=3UVvf9/MD2DAo4mb8+aMVIRmwQ9YeNRpK/hCEcC33BI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rx+ywEF+J5iOOxP5iV/SWaxjj7Y4ZlCXBS+86eQ7qkZu/m4O5FNxD7w0yJWqcbsXu
+	 2T4LfEb5YxGN+jrcYYe808oAXcoqmVTnwPtF56/jvmaqMBPCf3y+PVSDIXVyDNbysu
+	 lJ7ncNpSDfSRRBgV6J/iaXB05+NqWLSZJOIcJq+uDTSY/r6v4IJIlHaWt8S0Me2Cha
+	 xDQMoG4MKQLhekI1MePeerfkdtBW1eQXNUZ08wDFDHqSvCe7b4XKnoKoG3DQM7t6cM
+	 xktu85VTS3dhCle5PkZVEbwihxu+0l5SiJSZzJk4Rw8+kr1KO5GqhfPfjSECzZWeMu
+	 XePznq/+2z/ZA==
+Date: Mon, 6 May 2024 18:38:25 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, jiri@resnulli.us,
+ horms@kernel.org
+Subject: Re: [PATCH net-next v4 1/6] net: tn40xx: add pci driver for Tehuti
+ Networks TN40xx chips
+Message-ID: <20240506183825.116df362@kernel.org>
+In-Reply-To: <20240501230552.53185-2-fujita.tomonori@gmail.com>
+References: <20240501230552.53185-1-fujita.tomonori@gmail.com>
+	<20240501230552.53185-2-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240502050300.38689-1-rengarajan.s@microchip.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 02, 2024 at 10:33:00AM +0530, Rengarajan S wrote:
-> The PTP_CMD_CTL is a self clearing register which controls the PTP clock
-> values. In the current implementation driver waits for a duration of 20
-> sec in case of HW failure to clear the PTP_CMD_CTL register bit. This
-> timeout of 20 sec is very long to recognize a HW failure, as it is
-> typically cleared in one clock(<16ns). Hence reducing the timeout to 1 sec
-> would be sufficient to conclude if there is any HW failure observed. The
-> usleep_range will sleep somewhere between 1 msec to 20 msec for each
-> iteration. By setting the PTP_CMD_CTL_TIMEOUT_CNT to 50 the max timeout
-> is extended to 1 sec.
+On Thu,  2 May 2024 08:05:47 +0900 FUJITA Tomonori wrote:
+> +	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
+> +		ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
 
-This patch has already been merged, so this is just for my
-curiosity. The hardware is dead. Does it really matter if we wait 1s
-or 20 seconds. It is still dead? This is a void function. Other than
-reporting that the hardware is dead, nothing is done. So this change
-seems pointless?
-
-	Andrew
+This fallback is unnecessary, please see commit f0ed939b6a or one of
+many similar removals..
 
