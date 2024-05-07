@@ -1,180 +1,244 @@
-Return-Path: <netdev+bounces-94226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C4F8BEA7F
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 19:25:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13DD78BEA87
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 19:26:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F4C81F25A00
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 17:25:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF1FF285624
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 17:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894BA16C6A0;
-	Tue,  7 May 2024 17:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D00116C6BF;
+	Tue,  7 May 2024 17:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jNrab5FI"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ISo1SuM4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D722810E6;
-	Tue,  7 May 2024 17:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D2A10E6
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 17:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715102749; cv=none; b=Ld70IFOKKs7l9nV790HoykyeKVr7QCyvG/hRbtfFkardIeD1FCh5vyRpTu489vqTsv1HjZ7/ciCVuyyoZvENyMZDIQClI94iCBXaEvyOvoanGfZxL9drVtPIc5QmRC17XpxAB9uUqoBRN3p9t4y3TRq8dy9n33fTnKr1HFcIRG0=
+	t=1715102781; cv=none; b=aGZL8n0HkJLh//j0Lp56LBUZIEcB2l0N5Z2azySlukXU3/v788xkk2FzXp/j9EbpcdCrpNGwottqnqxVLbHk/BhkjI5RHmqfmO4wgqHcZjMoO9yR/Oq6vOJRyN2JVxmgn9RJYHuiHnuPmypaf4vtTZl0+FqEmeAGb7e2O+ToxY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715102749; c=relaxed/simple;
-	bh=bTTBFm34vqlakeJr0m54mbETfTUQX1eA6jXf1Rs5dOA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DZyHYQ8KR8h1ii7y/8iv3pP9qSxmOty9Qh+/MmUOnJGreBZDygyk5Zqq3kAbjBbtSj1i1qB5Is9504qTVJhFhPzWZGzxkkvl+UXP4j2bfxDiSi2tvDlvuYM96uVV6m+1AOErXqXBfesJSSKyFLBXatLaPTIOg7yrTgWjDA128D4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jNrab5FI; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-41b2119da94so21972415e9.0;
-        Tue, 07 May 2024 10:25:47 -0700 (PDT)
+	s=arc-20240116; t=1715102781; c=relaxed/simple;
+	bh=sQgUUJgt0Y6RT1b0gl/uw6obu0IWR4GBTYpk2ajvyHA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Zradq+rkp5f/PdJuAIk+qRJmhahdp8jm+0pCV8tO2ytTQF820JCXuApAL9QodCXxzV2Jt/cysIcFDPq3w/WVhi4XCr61WWoACWrwq6M5Iq3LIYLKQOgu5gZHn4vDf+WDI8GXv6wWYm8Kh8XuX/RdtPkUxPZrBmeL8p4Cx05W51g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ISo1SuM4; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715102746; x=1715707546; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hH2gwlX9CIjp5iuBC0nf4yhM48L0bVqOBBwTo5W8RyY=;
-        b=jNrab5FIB2NnWnx4xgeTfTxwuvHlTuY3o63Nq/HzBsUb1b4ZN2+tE5ykrBLzUvNN8N
-         LK8i+RgZpcUoyBx2wKixVkVq4IVh1V4fjaKrHUNyIi1EiP5cdYmXYpeXtnOGwLTYdPhz
-         lJUuClphvrY6vmm0IqLgVV9KfoMA6ICMMB0yLMWiR/pOxJI+EfzQCetg5arxiBsjcC/o
-         1L/PDBQhGABrFM+bviZJ1R8xuuHD9REtmQrpnOxwkXP8LQL/+V7IqMCxO1mzEx2A8Vx1
-         sjg0OT+WygO5C3bPzU1YRZsC40QkmIt4fx+lyUkCnfLmZPrtwKhnvEP8ix7DLO2p+0F9
-         4CSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715102746; x=1715707546;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hH2gwlX9CIjp5iuBC0nf4yhM48L0bVqOBBwTo5W8RyY=;
-        b=xRaRsmAatWXjHYI7G/qsaORGiiz7aoofOsU++QEUuh5qYVr1fHmv4tof9cGvHOd1N/
-         pjdIAdAiXvQxYkJU50IkRusgdXSZeTynwHpZFxIBo9M6V/yeFyltqmPz1URR+3Ljddx/
-         jOJS9V2MZDmHncWWRusR9z2eFGYEIN4GVPiCeLpfYUrncsJ3NbA50upA7tZEkPXr5ZpW
-         cb44Ez3dzL9dvhMGobzIohgZukCkRuig5x9JEiXPapv9E0myoDDvlGnG25lAp3rVuEAK
-         0pY4vtx8VlRrU4H4uvzCQ086EbZTEGtWc+GeW5nFoeGqcAAJSvqYsgnVEq4ahgQp9wGa
-         GxNw==
-X-Forwarded-Encrypted: i=1; AJvYcCU2H2UqPyoMOPHuTKRTCeIFjZsZ02c7DI1b86RrQ4Su/H/a1QdMXJZFK3dPW34SkDsjxYuuegttAR02O+HM7SoOcZi1e5hzLl9RzV8yDDIbR4A04hK26X26++NtzULgRvPEKCkU6vfJz7csZwFMMTDq0PEbSJvoxF24AADgNm4uBI3f107HKa8tLnm2VnuMdqTrL3KBA+l4k8KPkHuXhysGn1zsuaKpQ4SXNiAUaSK+qKejo9iT0W83w6Kup7ctRFlEOun6yl072/i0i0FPoBVEBJDdtR0Pgd9hDB2SzKO70cirhgH6Am0osm8XPJSnRSTDCOGmDVqE4h5iWRq54saYkL4OIFuW4HnymVytma/mZZw/mMz99DsrhijgISgT9TB5pVqiSOKuea+QYjyZfN29x8OnLYyWHW54axsdxOl9XO87BqLHrpp5qLoB6u0qedyScZFmPtvH9Uz33XnEgHTpLyV+dGcLkMsViEKcJYIqByx8RkPCWRVL0N51izOniOKYIeFlVg==
-X-Gm-Message-State: AOJu0YxZklsIKNn9nb42QlEnLg4q/dJoYC/3T8qGHBJt/ph0e1Y5awfp
-	Hj9XEsJcvBp2U+yevY7KRBmQjUzYmov6ENqf6QXeNRBf2gzg0UP7
-X-Google-Smtp-Source: AGHT+IF8VqTV1BUapN1EV+Wyp48hykZoX+S626zj6EDdX9l6sa2/8vTRY34QFeCfF+VTNplXaFTyXQ==
-X-Received: by 2002:a05:600c:46ce:b0:41b:e609:bc97 with SMTP id 5b1f17b1804b1-41f71cc1512mr3537475e9.2.1715102746162;
-        Tue, 07 May 2024 10:25:46 -0700 (PDT)
-Received: from [192.168.42.69] ([85.255.235.91])
-        by smtp.gmail.com with ESMTPSA id f20-20020a05600c4e9400b0041b5500e438sm20349790wmq.23.2024.05.07.10.25.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 May 2024 10:25:45 -0700 (PDT)
-Message-ID: <0d5da361-cc7b-46e9-a635-9a7a4c208444@gmail.com>
-Date: Tue, 7 May 2024 18:25:52 +0100
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1715102779; x=1746638779;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=zQ4Wnfkdb/aNYYPr80kKJyvMfGQwPgIA6rv3rEO+YZc=;
+  b=ISo1SuM4OgbscwW9QP3syyOH4p+IOYcZc27xfBCkcvA7of0gvd4ZqkCd
+   CGvFzvqb1IGJVjnJ8VfZwe4M0U38EJkOFi5szUT29+vQTD0RGR3L+btu6
+   oIO9uF1O4UPivDNPVshgwIWJq2SqfCmttB39Um2+apR1S/08Sm6Uii6TF
+   E=;
+X-IronPort-AV: E=Sophos;i="6.08,142,1712620800"; 
+   d="scan'208";a="87650302"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 17:26:17 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:62056]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.46.21:2525] with esmtp (Farcaster)
+ id b0833592-a2b4-4be1-9194-26134e1b50db; Tue, 7 May 2024 17:26:16 +0000 (UTC)
+X-Farcaster-Flow-ID: b0833592-a2b4-4be1-9194-26134e1b50db
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 7 May 2024 17:26:16 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.27) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 7 May 2024 17:26:14 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <mhal@rbox.co>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] af_unix: Fix garbage collector racing against send() MSG_OOB
+Date: Tue, 7 May 2024 10:26:06 -0700
+Message-ID: <20240507172606.85532-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240507163653.1131444-1-mhal@rbox.co>
+References: <20240507163653.1131444-1-mhal@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v8 02/14] net: page_pool: create hooks for
- custom page providers
-To: Jason Gunthorpe <jgg@ziepe.ca>, Mina Almasry <almasrymina@google.com>
-Cc: Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Amritha Nambiar <amritha.nambiar@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Alexander Mikhalitsyn <alexander@mihalicyn.com>,
- Kaiyuan Zhang <kaiyuanz@google.com>, Christian Brauner <brauner@kernel.org>,
- Simon Horman <horms@kernel.org>, David Howells <dhowells@redhat.com>,
- Florian Westphal <fw@strlen.de>, Yunsheng Lin <linyunsheng@huawei.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
- Arseniy Krasnov <avkrasnov@salutedevices.com>,
- Aleksander Lobakin <aleksander.lobakin@intel.com>,
- Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Richard Gobert <richardbgobert@gmail.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Johannes Berg <johannes.berg@intel.com>, Abel Wu <wuyun.abel@bytedance.com>,
- Breno Leitao <leitao@debian.org>, David Wei <dw@davidwei.uk>,
- Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-References: <20240403002053.2376017-1-almasrymina@google.com>
- <20240403002053.2376017-3-almasrymina@google.com>
- <ZjH1QaSSQ98mw158@infradead.org>
- <CAHS8izM0=xc2UhUxhnF_BixuFs5VaDV9W1jbso1K+Rg=35NzeA@mail.gmail.com>
- <ZjjHUh1eINPg1wkn@infradead.org>
- <20b1c2d9-0b37-414c-b348-89684c0c0998@gmail.com>
- <20240507161857.GA4718@ziepe.ca> <ZjpVfPqGNfE5N4bl@infradead.org>
- <CAHS8izPH+sRLSiZ7vbrNtRdHrFEf8XQ61XAyHuxRSL9Jjy8YbQ@mail.gmail.com>
- <20240507164838.GG4718@ziepe.ca>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20240507164838.GG4718@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWC004.ant.amazon.com (10.13.139.229) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 5/7/24 17:48, Jason Gunthorpe wrote:
-> On Tue, May 07, 2024 at 09:42:05AM -0700, Mina Almasry wrote:
+From: Michal Luczaj <mhal@rbox.co>
+Date: Tue,  7 May 2024 18:29:33 +0200
+> Garbage collector takes care to explicitly drop oob_skb references before
+> purging the hit list. However, it does not account for a race: another
+> oob_skb might get assigned through in-flight socket's peer.
 > 
->> 1. Align with devmem TCP to use udmabuf for your io_uring memory. I
->> think in the past you said it's a uapi you don't link but in the face
->> of this pushback you may want to reconsider.
+> a/A and b/B are peers; A and B have been close()d and form an (OOB)
+> in-flight cycle:
 > 
-> dmabuf does not force a uapi, you can acquire your pages however you
-> want and wrap them up in a dmabuf. No uapi at all.
+>         a -- A <-> B -- b
 > 
-> The point is that dmabuf already provides ops that do basically what
-> is needed here. We don't need ops calling ops just because dmabuf's
-> ops are not understsood or not perfect. Fixup dmabuf.
+> When A's and B's queues are about to be collected, their peers are still
+> reachable. User can send another OOB packet:
+> 
+> queue_oob                       unix_gc
+> ---------                       -------
+> 
+> unix_state_lock(u)
+> if (u->oob_sbk)
+>   consume_skb(u->oob_skb)
+>   // oob_skb refcnt == 1
+> 				skb_queue_splice(u->queue, hitlist)
+> 				if (u->oob_skb) {
+> 				  kfree_skb(u->oob_skb)
+> 				  // oob_skb refcnt == 0, but in hitlist (!)
+> 				  u->oob_skb = NULL
+> 				}
+> u->oob_skb = skb
+> skb_queue(u->queue, skb)
+> unix_state_unlock(u)
+> 
+> Tell GC to remove oob_skb under unix_state_lock().
+> 
+> Fixes: 4090fa373f0e ("af_unix: Replace garbage collection algorithm.")
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
+> [   10.959053] refcount_t: underflow; use-after-free.
+> [   10.959072] WARNING: CPU: 0 PID: 711 at lib/refcount.c:28 refcount_warn_saturate+0xba/0x110
+> [   10.959077] Modules linked in: 9p netfs kvm_intel kvm 9pnet_virtio 9pnet i2c_piix4 zram crct10dif_pclmul crc32_pclmul crc32c_intel virtio_blk ghash_clmulni_intel serio_raw fuse qemu_fw_cfg virtio_console
+> [   10.959092] CPU: 0 PID: 711 Comm: kworker/0:3 Not tainted 6.9.0-rc6nokasan+ #7
+> [   10.959094] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
+> [   10.959095] Workqueue: events delayed_fput
+> [   10.959098] RIP: 0010:refcount_warn_saturate+0xba/0x110
+> [   10.959100] Code: 01 01 e8 79 d7 86 ff 0f 0b c3 cc cc cc cc 80 3d a7 e1 cd 01 00 75 85 48 c7 c7 d0 c0 a2 82 c6 05 97 e1 cd 01 01 e8 56 d7 86 ff <0f> 0b c3 cc cc cc cc 80 3d 85 e1 cd 01 00 0f 85 5e ff ff ff 48 c7
+> [   10.959102] RSP: 0018:ffffc90000477ce8 EFLAGS: 00010296
+> [   10.959104] RAX: 0000000000000026 RBX: ffff88812d102440 RCX: 0000000000000000
+> [   10.959105] RDX: 0000000000000002 RSI: 0000000000000027 RDI: 00000000ffffffff
+> [   10.959106] RBP: 0000000000000300 R08: 0000000000000000 R09: 0000000000000003
+> [   10.959107] R10: ffffc90000477ba0 R11: ffffffff833591e8 R12: ffff88812d1026dc
+> [   10.959108] R13: ffff88812d102c68 R14: 0000000000000001 R15: ffff88812d102ac0
+> [   10.959109] FS:  0000000000000000(0000) GS:ffff88842fa00000(0000) knlGS:0000000000000000
+> [   10.959110] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   10.959111] CR2: 00007f158e949900 CR3: 0000000003238000 CR4: 0000000000750ef0
+> [   10.959114] PKRU: 55555554
+> [   10.959115] Call Trace:
+> [   10.959116]  <TASK>
+> [   10.959118]  ? __warn+0x88/0x180
+> [   10.959121]  ? refcount_warn_saturate+0xba/0x110
+> [   10.959123]  ? report_bug+0x18d/0x1c0
+> [   10.959128]  ? handle_bug+0x3c/0x80
+> [   10.959130]  ? exc_invalid_op+0x13/0x60
+> [   10.959132]  ? asm_exc_invalid_op+0x16/0x20
+> [   10.959137]  ? refcount_warn_saturate+0xba/0x110
+> [   10.959139]  ? refcount_warn_saturate+0xba/0x110
+> [   10.959141]  sock_wfree+0xcf/0x300
+> [   10.959144]  unix_destruct_scm+0x77/0x90
+> [   10.959147]  skb_release_head_state+0x20/0x60
+> [   10.959149]  kfree_skb_reason+0x53/0x1e0
+> [   10.959152]  unix_release_sock+0x255/0x560
+> [   10.959155]  unix_release+0x2e/0x40
+> [   10.959156]  __sock_release+0x3a/0xc0
+> [   10.959159]  sock_close+0x14/0x20
+> [   10.959161]  __fput+0x9a/0x2d0
+> [   10.959163]  delayed_fput+0x1f/0x30
+> [   10.959165]  process_one_work+0x217/0x700
+> [   10.959167]  ? move_linked_works+0x70/0xa0
+> [   10.959170]  worker_thread+0x1ca/0x3b0
+> [   10.959173]  ? __pfx_worker_thread+0x10/0x10
+> [   10.959175]  kthread+0xdd/0x110
+> [   10.959176]  ? __pfx_kthread+0x10/0x10
+> [   10.959178]  ret_from_fork+0x2d/0x50
+> [   10.959181]  ? __pfx_kthread+0x10/0x10
+> [   10.959182]  ret_from_fork_asm+0x1a/0x30
+> [   10.959187]  </TASK>
+> [   10.959188] irq event stamp: 47083
+> [   10.959189] hardirqs last  enabled at (47089): [<ffffffff811c5a5d>] console_unlock+0xfd/0x130
+> [   10.959192] hardirqs last disabled at (47094): [<ffffffff811c5a42>] console_unlock+0xe2/0x130
+> [   10.959193] softirqs last  enabled at (46644): [<ffffffff81f1ed8f>] unix_release_sock+0x12f/0x560
+> [   10.959194] softirqs last disabled at (46642): [<ffffffff81f1ed6b>] unix_release_sock+0x10b/0x560
+> 
+>  include/net/af_unix.h |  1 +
+>  net/unix/garbage.c    | 10 ++++++----
+>  2 files changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+> index b6eedf7650da..6791c660b5ca 100644
+> --- a/include/net/af_unix.h
+> +++ b/include/net/af_unix.h
+> @@ -103,6 +103,7 @@ enum unix_socket_lock_class {
+>  	U_LOCK_GC_LISTENER, /* used for listening socket while determining gc
+>  			     * candidates to close a small race window.
+>  			     */
+> +	U_LOCK_GC_OOB, /* freeing oob_skb during GC. */
+>  };
+>  
+>  static inline void unix_state_lock_nested(struct sock *sk,
+> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> index d76450133e4f..f2098653aef8 100644
+> --- a/net/unix/garbage.c
+> +++ b/net/unix/garbage.c
+> @@ -357,11 +357,10 @@ static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist
+>  		u = edge->predecessor;
+>  		queue = &u->sk.sk_receive_queue;
+>  
+> -		spin_lock(&queue->lock);
+> -
+>  		if (u->sk.sk_state == TCP_LISTEN) {
+>  			struct sk_buff *skb;
+>  
+> +			spin_lock(&queue->lock);
+>  			skb_queue_walk(queue, skb) {
+>  				struct sk_buff_head *embryo_queue = &skb->sk->sk_receive_queue;
+>  
+> @@ -370,18 +369,21 @@ static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist
+>  				skb_queue_splice_init(embryo_queue, hitlist);
+>  				spin_unlock(&embryo_queue->lock);
+>  			}
+> +			spin_unlock(&queue->lock);
+>  		} else {
+> +			spin_lock(&queue->lock);
+>  			skb_queue_splice_init(queue, hitlist);
+> +			spin_unlock(&queue->lock);
+>  
+>  #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
+> +			unix_state_lock_nested(&u->sk, U_LOCK_GC_OOB);
 
-Those ops, for example, are used to efficiently return used buffers
-back to the kernel, which is uapi, I don't see how dmabuf can be
-fixed up to cover it.
+I've just noticed you posted a similar patch to the same issue :)
+https://lore.kernel.org/netdev/20240507170018.83385-1-kuniyu@amazon.com/
 
-> If io_uring wants to take its existing memory pre-registration it can
-> wrap that in a dmbauf, and somehow pass it to the netstack. Userspace
-> doesn't need to know a dmabuf is being used in the background.
+But we cannot acquire unix_state_lock() here for receiver sockets
+(listener is ok) because unix_(add|remove|update)_edges() takes
+unix_state_lock() first and then unix_gc_lock.
 
-io_uring's pre-registered memory is just pages, but even that is
-going to be replaced with just a normal user buffer pointer.
-Regardless, io_uring can wrap pages into a dmabuf, but it's not
-a direct replacement for the ops, it'd mandate uapi change in a not
-desirable way.
+So, we need to avoid the race by updating oob_skb under recvq lock
+in queue_oob().
 
--- 
-Pavel Begunkov
+Thanks!
+
+
+>  			if (u->oob_skb) {
+>  				kfree_skb(u->oob_skb);
+>  				u->oob_skb = NULL;
+>  			}
+> +			unix_state_unlock(&u->sk);
+>  #endif
+>  		}
+> -
+> -		spin_unlock(&queue->lock);
+>  	}
+>  }
+>  
+> -- 
+> 2.45.0
 
