@@ -1,231 +1,85 @@
-Return-Path: <netdev+bounces-94328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 621ED8BF31C
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:05:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 385238BF341
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:09:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC300B2633A
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:05:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E23B81F21850
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:09:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF2C133425;
-	Tue,  7 May 2024 23:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B75086AE3;
+	Tue,  7 May 2024 23:56:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WH1d1Zrd"
+	dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b="czZj2bFr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp95.ord1d.emailsrvr.com (smtp95.ord1d.emailsrvr.com [184.106.54.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C242B13329C;
-	Tue,  7 May 2024 23:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC428662E
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 23:56:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=184.106.54.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715125274; cv=none; b=OkB35gfkdzPhtxtDSZ4xgBJaX+HxhZRSo/vGhdQEEV5SQ3ksd4gKg110XV6oqNBBnWG8KIrg6i0gwC28u81zkEaeCKv2aG1aTHFRZ4SGQJc6xiwi22vHHkA0ro4iKNjdg8lGoLJOKgqC9G9mHqwnUFwN3gpTLAqnx0RSIXLU52w=
+	t=1715126207; cv=none; b=jFyzi8I/H2SInhfmzX5V6meP+J6Ifq4JTwQHtIsAO5JFKcak+6khqxh0Z+WU7SueCvzRwY50XZUyxFR/KTUzss39RiGdM0UnrubRxQcKooi3zffpArGUrpgVzicnFJGnmKZe/4Ay0/bwiz2di2ex8ALofaHX1QZKars2jdBdd7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715125274; c=relaxed/simple;
-	bh=ODKOUMcSjW/vZC3ltI6tPmb1ZIxhx2e2qI8/N+kVOFM=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=t6CwqmleLwgGY8hf61vJqTDLDLKUtwOl7IzBSRD290G2mMXBMDMCx2LipMBcNV+MIlJJGXlHmZeFSZuCnSIP01uaA+ypqj6ovQ9E8BObn5JsrlczQyJPZMNFW+hJSgwjhYqdHmj6d7yuiJRfiFhF3lDHotmh5ouLRqgfEu8Km9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WH1d1Zrd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D7C2C2BBFC;
-	Tue,  7 May 2024 23:41:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715125273;
-	bh=ODKOUMcSjW/vZC3ltI6tPmb1ZIxhx2e2qI8/N+kVOFM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WH1d1ZrdOijFn1cT49Jm2ZUSrhswkNac03IVHqq7Eohwb66eyC/upbIRg5OmSQrS5
-	 590jVcfK2eY7mGIT+Mu2vfZ+2kgvT+bvvG+nO0mpjkaiB/hzuVoCqKdsgEfcB6GUI1
-	 tZHVMdm8HMaoJWCDDdSEsUeSS2shrn9LwS64jApcEtp551mG5S0J2RXLfrbG59V5J/
-	 HlHuUhoLZsEzbSOo52SetyHK+GisTyafXt2qQ3WQN6uI/FPqAL3Mvb4Ag0onvgsMRn
-	 PVoqChvTS3nyekeTg4nrB1W8PoOH/gLtrOXEqRETwcHpFeC7NS6eZgZtaW77r3KgQl
-	 SXWjnlSGSut3Q==
-Date: Wed, 8 May 2024 08:41:02 +0900
-From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-To: Mike Rapoport <rppt@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
- Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, "David S. Miller"
- <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>, Donald Dutile
- <ddutile@redhat.com>, Eric Chanudet <echanude@redhat.com>, Heiko Carstens
- <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>, Huacai Chen
- <chenhuacai@kernel.org>, Kent Overstreet <kent.overstreet@linux.dev>, Liviu
- Dudau <liviu@dudau.co.uk>, Luis Chamberlain <mcgrof@kernel.org>, Mark
- Rutland <mark.rutland@arm.com>, Masami Hiramatsu <mhiramat@kernel.org>,
- Michael Ellerman <mpe@ellerman.id.au>, Nadav Amit <nadav.amit@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Peter Zijlstra <peterz@infradead.org>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>, Rick
- Edgecombe <rick.p.edgecombe@intel.com>, Russell King
- <linux@armlinux.org.uk>, Sam Ravnborg <sam@ravnborg.org>, Song Liu
- <song@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, Thomas
- Bogendoerfer <tsbogend@alpha.franken.de>, Thomas Gleixner
- <tglx@linutronix.de>, Will Deacon <will@kernel.org>, bpf@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mips@vger.kernel.org, linux-mm@kvack.org,
- linux-modules@vger.kernel.org, linux-parisc@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- loongarch@lists.linux.dev, netdev@vger.kernel.org,
- sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH RESEND v8 05/16] module: make module_memory_{alloc,free}
- more self-contained
-Message-Id: <20240508084102.9e9b18a9b111d427e7cc9c94@kernel.org>
-In-Reply-To: <20240505160628.2323363-6-rppt@kernel.org>
-References: <20240505160628.2323363-1-rppt@kernel.org>
-	<20240505160628.2323363-6-rppt@kernel.org>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1715126207; c=relaxed/simple;
+	bh=/TOv6fP0vQebAxVEplVjdQOI2uzzY71yM9grBNcY6Zw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uOIUQlHWgA6U8JOZ0AHH8Lpn7vcHp2IQzpyLB0r44VgNGWorjrf5GgtXEh3e7KQEqV7GgvZAOSxHOCOJHS44Yp9Tw6wuiSTtb/HBkw4OA0qYh07O0TGg8oj0lE4E/e8y1hcecCW1bmoNqEf4AYRCBkKyob0FSaeRUMq6Pu1VGos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com; spf=pass smtp.mailfrom=oddbit.com; dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b=czZj2bFr; arc=none smtp.client-ip=184.106.54.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oddbit.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=oddbit.com;
+	s=20180920-g2b7aziw; t=1715125612;
+	bh=/TOv6fP0vQebAxVEplVjdQOI2uzzY71yM9grBNcY6Zw=;
+	h=Date:From:To:Subject:From;
+	b=czZj2bFrbwg8I9OB+pHUp343UlDFKC46ap8dR/xAGn1p+Bt65WKBMMTzsautPOHFk
+	 J19fxMTqeqj6IJlS/daQySD6lbc2hSAAjcmQcHuB146QbwpBuJc3VDRh88oN11dLia
+	 CWKVB/6mf1cbASHBLSrmGA6TMpJ5mAOFFouVrDKs=
+X-Auth-ID: lars@oddbit.com
+Received: by smtp12.relay.ord1d.emailsrvr.com (Authenticated sender: lars-AT-oddbit.com) with ESMTPSA id AD4E3E0099;
+	Tue,  7 May 2024 19:46:51 -0400 (EDT)
+Date: Tue, 7 May 2024 19:46:51 -0400
+From: Lars Kellogg-Stedman <lars@oddbit.com>
+To: Duoming Zhou <duoming@zju.edu.cn>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hams@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, 
+	jreuter@yaina.de, dan.carpenter@linaro.org
+Subject: Re: [PATCH net v5 1/4] ax25: Use kernel universal linked list to
+ implement ax25_dev_list
+Message-ID: <z5l3dfardxqrwf2lzzpktuifqaxvv2clrgah5gnz4t6iphskeb@otrcl5cwyghx>
+References: <cover.1715065005.git.duoming@zju.edu.cn>
+ <bd49e83817604e61a12c9bf688a0825f116e67c0.1715065005.git.duoming@zju.edu.cn>
+ <sijkuyypbnelg3w2shbxm3y6zu3qhfurvpvkoij5eluolnqr5w@y5dq74ycxzkm>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <sijkuyypbnelg3w2shbxm3y6zu3qhfurvpvkoij5eluolnqr5w@y5dq74ycxzkm>
+X-Classification-ID: 0df3cc1c-0dba-498b-89fb-d2d91bbb82a1-1-1
 
-On Sun,  5 May 2024 19:06:17 +0300
-Mike Rapoport <rppt@kernel.org> wrote:
-
-> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+On Tue, May 07, 2024 at 03:43:11PM GMT, Lars Kellogg-Stedman wrote:
+> On Tue, May 07, 2024 at 03:03:39PM GMT, Duoming Zhou wrote:
+> >  typedef struct ax25_dev {
+> > -	struct ax25_dev		*next;
+> > +	struct list_head	list;
 > 
-> Move the logic related to the memory allocation and freeing into
-> module_memory_alloc() and module_memory_free().
-> 
+> Would it make sense to replace this with:
+>
+> LIST_HEAD(ax25_dev_list);
 
-Looks good to me.
+Sorry, *this*:
 
-Reviewed-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-
-Thanks,
-
-> Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> ---
->  kernel/module/main.c | 64 +++++++++++++++++++++++++++-----------------
->  1 file changed, 39 insertions(+), 25 deletions(-)
-> 
-> diff --git a/kernel/module/main.c b/kernel/module/main.c
-> index e1e8a7a9d6c1..5b82b069e0d3 100644
-> --- a/kernel/module/main.c
-> +++ b/kernel/module/main.c
-> @@ -1203,15 +1203,44 @@ static bool mod_mem_use_vmalloc(enum mod_mem_type type)
->  		mod_mem_type_is_core_data(type);
->  }
->  
-> -static void *module_memory_alloc(unsigned int size, enum mod_mem_type type)
-> +static int module_memory_alloc(struct module *mod, enum mod_mem_type type)
->  {
-> +	unsigned int size = PAGE_ALIGN(mod->mem[type].size);
-> +	void *ptr;
-> +
-> +	mod->mem[type].size = size;
-> +
->  	if (mod_mem_use_vmalloc(type))
-> -		return vzalloc(size);
-> -	return module_alloc(size);
-> +		ptr = vmalloc(size);
-> +	else
-> +		ptr = module_alloc(size);
-> +
-> +	if (!ptr)
-> +		return -ENOMEM;
-> +
-> +	/*
-> +	 * The pointer to these blocks of memory are stored on the module
-> +	 * structure and we keep that around so long as the module is
-> +	 * around. We only free that memory when we unload the module.
-> +	 * Just mark them as not being a leak then. The .init* ELF
-> +	 * sections *do* get freed after boot so we *could* treat them
-> +	 * slightly differently with kmemleak_ignore() and only grey
-> +	 * them out as they work as typical memory allocations which
-> +	 * *do* eventually get freed, but let's just keep things simple
-> +	 * and avoid *any* false positives.
-> +	 */
-> +	kmemleak_not_leak(ptr);
-> +
-> +	memset(ptr, 0, size);
-> +	mod->mem[type].base = ptr;
-> +
-> +	return 0;
->  }
->  
-> -static void module_memory_free(void *ptr, enum mod_mem_type type)
-> +static void module_memory_free(struct module *mod, enum mod_mem_type type)
->  {
-> +	void *ptr = mod->mem[type].base;
-> +
->  	if (mod_mem_use_vmalloc(type))
->  		vfree(ptr);
->  	else
-> @@ -1229,12 +1258,12 @@ static void free_mod_mem(struct module *mod)
->  		/* Free lock-classes; relies on the preceding sync_rcu(). */
->  		lockdep_free_key_range(mod_mem->base, mod_mem->size);
->  		if (mod_mem->size)
-> -			module_memory_free(mod_mem->base, type);
-> +			module_memory_free(mod, type);
->  	}
->  
->  	/* MOD_DATA hosts mod, so free it at last */
->  	lockdep_free_key_range(mod->mem[MOD_DATA].base, mod->mem[MOD_DATA].size);
-> -	module_memory_free(mod->mem[MOD_DATA].base, MOD_DATA);
-> +	module_memory_free(mod, MOD_DATA);
->  }
->  
->  /* Free a module, remove from lists, etc. */
-> @@ -2225,7 +2254,6 @@ static int find_module_sections(struct module *mod, struct load_info *info)
->  static int move_module(struct module *mod, struct load_info *info)
->  {
->  	int i;
-> -	void *ptr;
->  	enum mod_mem_type t = 0;
->  	int ret = -ENOMEM;
->  
-> @@ -2234,26 +2262,12 @@ static int move_module(struct module *mod, struct load_info *info)
->  			mod->mem[type].base = NULL;
->  			continue;
->  		}
-> -		mod->mem[type].size = PAGE_ALIGN(mod->mem[type].size);
-> -		ptr = module_memory_alloc(mod->mem[type].size, type);
-> -		/*
-> -                 * The pointer to these blocks of memory are stored on the module
-> -                 * structure and we keep that around so long as the module is
-> -                 * around. We only free that memory when we unload the module.
-> -                 * Just mark them as not being a leak then. The .init* ELF
-> -                 * sections *do* get freed after boot so we *could* treat them
-> -                 * slightly differently with kmemleak_ignore() and only grey
-> -                 * them out as they work as typical memory allocations which
-> -                 * *do* eventually get freed, but let's just keep things simple
-> -                 * and avoid *any* false positives.
-> -		 */
-> -		kmemleak_not_leak(ptr);
-> -		if (!ptr) {
-> +
-> +		ret = module_memory_alloc(mod, type);
-> +		if (ret) {
->  			t = type;
->  			goto out_enomem;
->  		}
-> -		memset(ptr, 0, mod->mem[type].size);
-> -		mod->mem[type].base = ptr;
->  	}
->  
->  	/* Transfer each section which specifies SHF_ALLOC */
-> @@ -2296,7 +2310,7 @@ static int move_module(struct module *mod, struct load_info *info)
->  	return 0;
->  out_enomem:
->  	for (t--; t >= 0; t--)
-> -		module_memory_free(mod->mem[t].base, t);
-> +		module_memory_free(mod, t);
->  	return ret;
->  }
->  
-> -- 
-> 2.43.0
-> 
+> +static struct list_head ax25_dev_list;
 
 
 -- 
-Masami Hiramatsu (Google) <mhiramat@kernel.org>
+Lars Kellogg-Stedman <lars@oddbit.com> | larsks @ {irc,twitter,github}
+http://blog.oddbit.com/                | N1LKS
 
