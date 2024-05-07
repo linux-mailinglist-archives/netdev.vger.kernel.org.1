@@ -1,283 +1,81 @@
-Return-Path: <netdev+bounces-93906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7995A8BD8E4
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 03:23:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E178BD8E6
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 03:25:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E85E285D00
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 01:23:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84DD91F22E79
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 01:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3955B1862;
-	Tue,  7 May 2024 01:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5D41877;
+	Tue,  7 May 2024 01:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hvyyywHK"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B707D1854;
-	Tue,  7 May 2024 01:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445C41C32
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 01:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715045024; cv=none; b=ZGf+jBbv29GODwNnjyYlzJC+QrmC5VRGLvOdQLwvi/b770CoEtBwJ9mqhcJnP/xGnyiV4FY347pTgxIX05F1Ycd3DDkfdqe2i7UVQwM7IP1nW1C7keOb/G9vUsXlFZFejE1Cf0+u7icgAWdsbWD7q7zlATnqBbwUS+zKcqCgB+M=
+	t=1715045122; cv=none; b=eqhcAI/ug4z3qdDgU6v8/m40YtuFywV4DIHj2GBUaM/VGIE39o+NLspe9+/Q9cgArCE9JvB03cyt9v3+O5LOQXtUHRHgN3VTLj8eeVCjPwHPkmKTPr5BjfGFs1qc0S2esg80G+b2p8Oy0YxTL9GAIpqYZueu41rp7SeN21mAlwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715045024; c=relaxed/simple;
-	bh=BBeUUcnKdqwjJNM/9HXrPaPwjiMKRmPvEMOkdsxKDio=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Qy3rCOytn4hbq19G8ji59vHOXCX3kgmv6z/Vw1QN9/8iQFS6He6+L7rckVI3VdhnP04sLW6EMHQxbBpIaoH90x3voxjU3TMqVwgjrpsHQN7Q0DsMhWk0HHRBvf4RbZ6cAGpgmgBZDaVAuSxxK+QQo5hTnDtYUz7LNy2LZ3FwUWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VYL9c0GMHzcdjj;
-	Tue,  7 May 2024 09:22:28 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7D26D180073;
-	Tue,  7 May 2024 09:23:38 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 7 May 2024 09:23:37 +0800
-Message-ID: <b10f0074-4003-2862-78ff-9b5dfcdc8566@huawei.com>
-Date: Tue, 7 May 2024 09:23:37 +0800
+	s=arc-20240116; t=1715045122; c=relaxed/simple;
+	bh=7YFcdiu50ARa+ziyjuHJexuRD3reVsdYnRta0qhWDQU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z0rVtgO/Q3sKciv2Xvi+lh3ymUWf+a8I/41k++tN5/fIW2RLO8CMm/5Q9yipL54BEGrOqLGE2bVOwHkjiIPpHmNMBYUkmAIAhM0xh/wMdf8aLtw9akDLe6TH9TTWfkX+Wb6u6vSb1IvFY8YgL5p72oEYHbO/0Po8GA0NuivBvs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hvyyywHK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A9EBC116B1;
+	Tue,  7 May 2024 01:25:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715045121;
+	bh=7YFcdiu50ARa+ziyjuHJexuRD3reVsdYnRta0qhWDQU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hvyyywHKK70823qoUaH8czo07qYGtjEniWUNDbFUoVwkY4/Fp0T2jbBTLUAImdsAU
+	 Bduh/tQ/j/6YHUMc4nMjDVTPtlMMGxpxNC22bUYn7rnu/OgqBvRkwO9ury06kSCc/v
+	 ufREZmVK1t+GoqGPJEw6COcGWu10ENDNWTotNgtxoXGailK5CyOz4UspYlHzKERlwD
+	 om0hj/qnC5TVNLjKM7cWZ5crgBZqdNsgsXLSW8TmGN9tXnHMEoD6QsNTOpyGUL33sU
+	 VXexquUgkf+3o3rX6YsghD3GzI11XZ8mUbPU4Ca/Ns5c5YDVeXXz5EThRewaiCe6nJ
+	 yyPBvxm9GRrHw==
+Date: Mon, 6 May 2024 18:25:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shailend Chand <shailend@google.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, almasrymina@google.com,
+ edumazet@google.com, hramamurthy@google.com, jeroendb@google.com,
+ pabeni@redhat.com, pkaligineedi@google.com, rushilg@google.com,
+ willemb@google.com, ziweixiao@google.com
+Subject: Re: [PATCH net-next v2 00/10] gve: Implement queue api
+Message-ID: <20240506182520.67044aa7@kernel.org>
+In-Reply-To: <CANLc=avO2Xmkjh=VsvCkN=jUEOpSFN-74MkbtByicsRs+GANNQ@mail.gmail.com>
+References: <20240501232549.1327174-1-shailend@google.com>
+	<171491642897.19257.15217395970936349981.git-patchwork-notify@kernel.org>
+	<CANLc=autjsuVO3NLhfL6wBg3SH8u9SsWQGUn=oSHHVjhdnn38w@mail.gmail.com>
+	<CANLc=avO2Xmkjh=VsvCkN=jUEOpSFN-74MkbtByicsRs+GANNQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [question] when bonding with CX5 network card that support ROCE
-To: Zhu Yanjun <zyjzyj2000@gmail.com>, <saeedm@nvidia.com>,
-	<tariqt@nvidia.com>, <borisp@nvidia.com>, <shayd@nvidia.com>,
-	<msanalla@nvidia.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	<weizhang@nvidia.com>, <kliteyn@nvidia.com>, <erezsh@nvidia.com>,
-	<igozlan@nvidia.com>
-CC: netdev <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>
-References: <756aaf3c-5a15-8d18-89d4-ea7380cf845d@huawei.com>
- <7b0e61e1-8d50-4431-bd0a-6398c618a609@linux.dev>
- <bb68fc32-9c6c-ceda-a961-f4fde72ce64d@huawei.com>
- <6a285586-0a11-43be-a07a-5ba0b92d0ee6@gmail.com>
- <d345b292-e5a1-a428-f5e1-74a6c0c390d9@huawei.com>
- <f49c80dc-6138-4073-b873-97f729817790@linux.dev>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <f49c80dc-6138-4073-b873-97f729817790@linux.dev>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Mon, 6 May 2024 11:07:52 -0700 Shailend Chand wrote:
+> > The last patch of this patchset did not get applied:
+> > https://patchwork.kernel.org/project/netdevbpf/patch/20240430231420.699177-11-shailend@google.com/,
+> > not sure why there is a "no matching commit" message.  
+> 
+> This is the v2 patch that did not get applied
+> https://patchwork.kernel.org/project/netdevbpf/patch/20240501232549.1327174-11-shailend@google.com/.
+> The subjects of the cover letter and this patch both are the same,
+> differing only in their number prefix, maybe that could be triggering
+> some issue.
 
-
-On 2024/5/6 20:27, Zhu Yanjun wrote:
-> On 06.05.24 13:33, shaozhengchao wrote:
->>
->> Hi Yanjun:
->>    Thank you for your reply. Are there any other restrictions on using
->> ROCE on the CX5?
-> 
-> https://docs.nvidia.com/networking/display/mlnxofedv571020
-> 
-> The above link can answer all your questions ^_^
-> 
-> Enjoy it.
-> 
-> Zhu Yanjun
-> 
-Thank you.
-
-Zhengchao Shao
->>
->> Zhengchao Shao
->>
->> On 2024/5/6 18:58, Zhu Yanjun wrote:
->>>
->>> On 06.05.24 12:45, shaozhengchao wrote:
->>>> Hi yanjun:
->>>>   The following is the command output after the cat /proc/net/bonding
->>>> /bond0 command is run:
->>>
->>> If I remember it correctly, it seems that it is a rdma LAG and 
->>> bonding problem.
->>>
->>> Not sure if it is a known problem or not. Please contact your local 
->>> support.
->>>
->>> Zhu Yanjun
->>>
->>>> [root@localhost ~]# cat /proc/net/bonding/bond0
->>>> Ethernet Channel Bonding Driver: v5.10.0+
->>>>
->>>> Bonding Mode: IEEE 802.3ad Dynamic link aggregation
->>>> Transmit Hash Policy: layer2 (0)
->>>> MII Status: up
->>>> MII Polling Interval (ms): 100
->>>> Up Delay (ms): 0
->>>> Down Delay (ms): 0
->>>> Peer Notification Delay (ms): 0
->>>>
->>>> 802.3ad info
->>>> LACP rate: slow
->>>> Min links: 0
->>>> Aggregator selection policy (ad_select): stable
->>>> System priority: 65535
->>>> System MAC address: f4:1d:6b:6f:3b:97
->>>> Active Aggregator Info:
->>>>         Aggregator ID: 2
->>>>         Number of ports: 1
->>>>         Actor Key: 23
->>>>         Partner Key: 1
->>>>         Partner Mac Address: 00:00:00:00:00:00
->>>>
->>>> Slave Interface: enp145s0f0
->>>> MII Status: up
->>>> Speed: 40000 Mbps
->>>> Duplex: full
->>>> Link Failure Count: 1
->>>> Permanent HW addr: f4:1d:6b:6f:3b:97
->>>> Slave queue ID: 0
->>>> Aggregator ID: 1
->>>> Actor Churn State: churned
->>>> Partner Churn State: churned
->>>> Actor Churned Count: 1
->>>> Partner Churned Count: 2
->>>> details actor lacp pdu:
->>>>     system priority: 65535
->>>>     system mac address: f4:1d:6b:6f:3b:97
->>>>     port key: 23
->>>>     port priority: 255
->>>>     port number: 1
->>>>     port state: 69
->>>> details partner lacp pdu:
->>>>     system priority: 65535
->>>>     system mac address: 00:00:00:00:00:00
->>>>     oper key: 1
->>>>     port priority: 255
->>>>     port number: 1
->>>>     port state: 1
->>>>
->>>> Slave Interface: enp145s0f1
->>>> MII Status: up
->>>> Speed: 40000 Mbps
->>>> Duplex: full
->>>> Link Failure Count: 0
->>>> Permanent HW addr: f4:1d:6b:6f:3b:98
->>>> Slave queue ID: 0
->>>> Aggregator ID: 2
->>>> Actor Churn State: none
->>>> Partner Churn State: churned
->>>> Actor Churned Count: 0
->>>> Partner Churned Count: 1
->>>> details actor lacp pdu:
->>>>     system priority: 65535
->>>>     system mac address: f4:1d:6b:6f:3b:97
->>>>     port key: 23
->>>>     port priority: 255
->>>>     port number: 2
->>>>     port state: 77
->>>> details partner lacp pdu:
->>>>     system priority: 65535
->>>>     system mac address: 00:00:00:00:00:00
->>>>     oper key: 1
->>>>     port priority: 255
->>>>     port number: 1
->>>>     port state: 1
->>>>
->>>> Thank you
->>>> Zhengchao Shao
->>>>
->>>>
->>>> On 2024/5/6 16:26, Zhu Yanjun wrote:
->>>>> On 06.05.24 06:46, shaozhengchao wrote:
->>>>>>
->>>>>> When using the 5.10 kernel, I can find two IB devices using the 
->>>>>> ibv_devinfo command.
->>>>>> ----------------------------------
->>>>>> [root@localhost ~]# lspci
->>>>>> 91:00.0 Ethernet controller: Mellanox Technologies MT27800 Family 
->>>>>> [ConnectX-5]
->>>>>> 91:00.1 Ethernet controller: Mellanox Technologies MT27800 Family
->>>>>> ----------------------------------
->>>>>> [root@localhost ~]# ibv_devinfo
->>>>>> hca_id: mlx5_0
->>>>>>          transport:                      InfiniBand (0)
->>>>>>          fw_ver:                         16.31.1014
->>>>>>          node_guid:                      f41d:6b03:006f:4743
->>>>>>          sys_image_guid:                 f41d:6b03:006f:4743
->>>>>>          vendor_id:                      0x02c9
->>>>>>          vendor_part_id:                 4119
->>>>>>          hw_ver:                         0x0
->>>>>>          board_id:                       HUA0000000004
->>>>>>          phys_port_cnt:                  1
->>>>>>                  port:   1
->>>>>>                          state:                  PORT_ACTIVE (4)
->>>>>>                          max_mtu:                4096 (5)
->>>>>>                          active_mtu:             1024 (3)
->>>>>>                          sm_lid:                 0
->>>>>>                          port_lid:               0
->>>>>>                          port_lmc:               0x00
->>>>>>                          link_layer:             Ethernet
->>>>>>
->>>>>> hca_id: mlx5_1
->>>>>>          transport:                      InfiniBand (0)
->>>>>>          fw_ver:                         16.31.1014
->>>>>>          node_guid:                      f41d:6b03:006f:4744
->>>>>>          sys_image_guid:                 f41d:6b03:006f:4743
->>>>>>          vendor_id:                      0x02c9
->>>>>>          vendor_part_id:                 4119
->>>>>>          hw_ver:                         0x0
->>>>>>          board_id:                       HUA0000000004
->>>>>>          phys_port_cnt:                  1
->>>>>>                  port:   1
->>>>>>                          state:                  PORT_ACTIVE (4)
->>>>>>                          max_mtu:                4096 (5)
->>>>>>                          active_mtu:             1024 (3)
->>>>>>                          sm_lid:                 0
->>>>>>                          port_lid:               0
->>>>>>                          port_lmc:               0x00
->>>>>>                          link_layer:             Ethernet
->>>>>> ----------------------------------
->>>>>> But after the two network ports are bonded, only one IB device is
->>>>>> available, and only PF0 can be used.
->>>>>> [root@localhost shaozhengchao]# ibv_devinfo
->>>>>> hca_id: mlx5_bond_0
->>>>>>          transport:                      InfiniBand (0)
->>>>>>          fw_ver:                         16.31.1014
->>>>>>          node_guid:                      f41d:6b03:006f:4743
->>>>>>          sys_image_guid:                 f41d:6b03:006f:4743
->>>>>>          vendor_id:                      0x02c9
->>>>>>          vendor_part_id:                 4119
->>>>>>          hw_ver:                         0x0
->>>>>>          board_id:                       HUA0000000004
->>>>>>          phys_port_cnt:                  1
->>>>>>                  port:   1
->>>>>>                          state:                  PORT_ACTIVE (4)
->>>>>>                          max_mtu:                4096 (5)
->>>>>>                          active_mtu:             1024 (3)
->>>>>>                          sm_lid:                 0
->>>>>>                          port_lid:               0
->>>>>>                          port_lmc:               0x00
->>>>>>                          link_layer:             Ethernet
->>>>>>
->>>>>> The current Linux mainline driver is the same.
->>>>>>
->>>>>> I found the comment ("If bonded, we do not add an IB device for 
->>>>>> PF1.")
->>>>>> in the mlx5_lag_intf_add function of the 5.10 branch driver code.
->>>>>
->>>>> Not sure if rdma lag is enabled for this or not. /proc/net/bonding 
->>>>> will provide more more details normally.
->>>>>
->>>>> Zhu Yanjun
->>>>>
->>>>>> This indicates that wthe the same NIC is used, only PF0 support 
->>>>>> bonding?
->>>>>> Are there any other constraints, when enable bonding with CX5?
->>>>>>
->>>>>> Thank you
->>>>>> Zhengchao Shao
->>>>>
-> 
+The space characters in Mina's review tag are funny looking, maybe that
+was the cause. In any case, applied now, will push once build finishes.
+Thanks!
 
