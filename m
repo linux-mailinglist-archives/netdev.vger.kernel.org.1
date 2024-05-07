@@ -1,206 +1,94 @@
-Return-Path: <netdev+bounces-94325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBEA98BF2FA
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:03:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 650DE8BF311
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:05:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49D1E1F22A5D
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:03:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F1FF28598B
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634D2130ADF;
-	Tue,  7 May 2024 23:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 979AD1327FE;
+	Tue,  7 May 2024 23:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="kLgbb4QD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="khlssk/S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B0C85930
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 23:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E73B86128;
+	Tue,  7 May 2024 23:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715124771; cv=none; b=syQ0+LuKcGj+I46BcxjJLzGU0TVdHGeG3RCXuQEV3sYDpR0+i9iXafxUEYxufXALbp57CrnMmg0HKOgD8/8PETtOVwTgD68awGJ3uuTrrmeUXfN55Jctyu9Jo3u05ZddR+KSWIn8BGdohGLGPtIpUGhsUqqUH5ZoxFu6NbMV/KI=
+	t=1715125230; cv=none; b=KKz/Vy3+Y1h2V8o8+JLZxwNCxDaGLedngO4seWCaCAMFnqx9TbhjzpJ3ViJtIR00TyF0hUiLzZfeAcuiI67WCUbAwPvo7BOxGa5zKPWcyUgP1TO7BIJx173JSjbzwz+G7L1Dskpl0fzKvWkoJtZSKd1lh13dtWxF3Ldyn6HYkro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715124771; c=relaxed/simple;
-	bh=S2uBTZg89QC23t/2WuaFpXUGHgJQVwlXA9YYtSljwBo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hDgAiIGFvpP24WSOrkLnvDSjmkIhz1jrsSpQXwJ9GwAr+0EG8mneV1pzVZdtT52iPsJsWAzeAUeWT0+UUlUJD54aeJx1eOJlUEqCCgsyob6zQEylK4kYgDEUAOzqQ1rQ4YfiAkHsFVW2FIZgNQ/glrk2NQFE/6sdnLFjerJPanc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=kLgbb4QD; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-43ad4097aefso11677631cf.2
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 16:32:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1715124768; x=1715729568; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cP7hm5cgGIFObZwmlEXmT4H6ZLJ5hLejs2qh73QUpsY=;
-        b=kLgbb4QDiYjjhbVyqnASJTqYVBMpFZOu0trzJrO++O0tgH216w9YbqRM7XZIqXipzP
-         DU7LaKiHJo+E9DfRMOf3yG/lgGvIKPfZegBXl5VnL64GTcnVXxbA2wVHsGQ+Grsyo0fc
-         eSCOy1wI0RHUjdPVCTMH8wp2yDyyMFvV/XUHhkbTPNutQ72aqilYR3nVWDQQVwt5D1z2
-         CKQtLDYFc1SFzbSLM1F6oA/FT669ybhGR9UhqpSu7S/9p/Y0yeuCrv1BtOQGkQuoiPKM
-         IRDQC38DkPdYqATOLE4nt7CYXbckLb/80m/t3XhzxmOZ+VOgARatj3XQtpjCKsgKUATY
-         kZXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715124768; x=1715729568;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cP7hm5cgGIFObZwmlEXmT4H6ZLJ5hLejs2qh73QUpsY=;
-        b=kWhWIIzN5T12WyEUPqWFUZNVla2HFBSCnwUxt87mXwcLkBsqEl3+Z0UEZa0a/rV3A6
-         OQdysDxf5gldPnOgbgJQBp48/THzSEky78bE/zk0ckvuh39gA5WB9vnOe5uAl37EwD6O
-         CPecNLYEyJGGHgItvm8ynZtYlyObwt7rVaxmtiJangw45wtVZxcj1QrKUZQL2WnKCH7k
-         sQO69U/pcsc1PYyNYmWD/Gw3VQkl/DGaIK3f5mmPKwCzU2Xwms+qW+AYf16guRbPPgga
-         e9NxiKPfIcBsAMEpF877+6Gh/Z30UlQf48N06KbV65uKipo4sZWVPZuTEGZT/MmA0jzr
-         MOmA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIdUm3fIR0BFdrH/CnB43oH/dZSSVoo8RPCNsdhcHIs7LOfpq4tUx6Eh7IX8qOxLJ+myN6AvNz4/oDWXZTuB1JJtgO9FhH
-X-Gm-Message-State: AOJu0YzrqDqWMS6rYcufY2tDcvZyTGFQ+jgXmVVeRGorHOhYMw6YCWYm
-	Fsc0JFvJVr/vLrcMsZ6fVJ7xRrxhTleSB7xwyKlPmdK+0i0hNUVtzz3Hemr+abk=
-X-Google-Smtp-Source: AGHT+IHk+yKjIhj9AR797n1JaOj9Z/2rWjQRz+xGELrz6+y3H07eSktk/E/cHfzwS8PtlVFgYI8C4w==
-X-Received: by 2002:a05:622a:60c:b0:434:b593:2d25 with SMTP id d75a77b69052e-43dbf0b35e3mr10728951cf.66.1715124768502;
-        Tue, 07 May 2024 16:32:48 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id fb20-20020a05622a481400b00434efa0feaasm6953842qtb.1.2024.05.07.16.32.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 16:32:48 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1s4UIh-0003NT-Cq;
-	Tue, 07 May 2024 20:32:47 -0300
-Date: Tue, 7 May 2024 20:32:47 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Mina Almasry <almasrymina@google.com>,
-	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Matt Turner <mattst88@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Florian Westphal <fw@strlen.de>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
-	Arseniy Krasnov <avkrasnov@salutedevices.com>,
-	Aleksander Lobakin <aleksander.lobakin@intel.com>,
-	Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Richard Gobert <richardbgobert@gmail.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Abel Wu <wuyun.abel@bytedance.com>,
-	Breno Leitao <leitao@debian.org>, David Wei <dw@davidwei.uk>,
-	Shailend Chand <shailend@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Subject: Re: [RFC PATCH net-next v8 02/14] net: page_pool: create hooks for
- custom page providers
-Message-ID: <20240507233247.GK4718@ziepe.ca>
-References: <CAHS8izM0=xc2UhUxhnF_BixuFs5VaDV9W1jbso1K+Rg=35NzeA@mail.gmail.com>
- <ZjjHUh1eINPg1wkn@infradead.org>
- <20b1c2d9-0b37-414c-b348-89684c0c0998@gmail.com>
- <20240507161857.GA4718@ziepe.ca>
- <ZjpVfPqGNfE5N4bl@infradead.org>
- <CAHS8izPH+sRLSiZ7vbrNtRdHrFEf8XQ61XAyHuxRSL9Jjy8YbQ@mail.gmail.com>
- <20240507164838.GG4718@ziepe.ca>
- <0d5da361-cc7b-46e9-a635-9a7a4c208444@gmail.com>
- <20240507175644.GJ4718@ziepe.ca>
- <6a50d01a-b5b9-4699-9d58-94e5f8f81c13@gmail.com>
+	s=arc-20240116; t=1715125230; c=relaxed/simple;
+	bh=C7NSF3vJhM4BSvLjhB7M0TbuLFQ4Crn+An+CD8TYils=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=drZ+VZ20unmd6Xq5oHApWWlsv/kXjIxBz+wl5co9DLcVMQustYrs7q4hrqyTdBl/fPOnNbfqfbA6qTOoAmsWersBowhORaJnamhvNtzWnkz9pogEoqDd21UEfHvfSKMVOdmYTxDoeSmW09RvX8h9+N8qjQpo24bkBlqEdDOax78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=khlssk/S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0F635C4AF63;
+	Tue,  7 May 2024 23:40:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715125230;
+	bh=C7NSF3vJhM4BSvLjhB7M0TbuLFQ4Crn+An+CD8TYils=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=khlssk/SpyYlEs8LkVpq0Z5t6Tdqi+g3kxCMkKq2MpWdF9DngeQcYnMAx52Q69Oqz
+	 3r/oTmctYWIapJuVcVy9/kf3snuZp2u48/t9/MQ4g+I9Ydx+QMTZFdfQUi4CQSxoYs
+	 Ooh7ckXPP88M56dXmYvJNqffr5lLryrA/pVybuQWZaeDM2OIZolV96YjWHxIK38VBh
+	 PudfJ0wObEDQUW5YN2Iy9drzZvYWDZTao16Pz7l7KT/wCKE9OfQkg1LHlXGiTQcbO3
+	 iDFcKV85P+kjzag42WK5UytNqbmcNHn8/v8W5ZL+DuGep5o827WsURFYm8Odu7lilZ
+	 XRqxKrif3Cjuw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EBD59C43330;
+	Tue,  7 May 2024 23:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6a50d01a-b5b9-4699-9d58-94e5f8f81c13@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] selftests: netfilter: conntrack_tcp_unreplied.sh:
+ wait for initial connection attempt
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171512522996.22016.2718919156181526257.git-patchwork-notify@kernel.org>
+Date: Tue, 07 May 2024 23:40:29 +0000
+References: <20240506114320.12178-1-fw@strlen.de>
+In-Reply-To: <20240506114320.12178-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org
 
-On Tue, May 07, 2024 at 08:35:37PM +0100, Pavel Begunkov wrote:
-> On 5/7/24 18:56, Jason Gunthorpe wrote:
-> > On Tue, May 07, 2024 at 06:25:52PM +0100, Pavel Begunkov wrote:
-> > > On 5/7/24 17:48, Jason Gunthorpe wrote:
-> > > > On Tue, May 07, 2024 at 09:42:05AM -0700, Mina Almasry wrote:
-> > > > 
-> > > > > 1. Align with devmem TCP to use udmabuf for your io_uring memory. I
-> > > > > think in the past you said it's a uapi you don't link but in the face
-> > > > > of this pushback you may want to reconsider.
-> > > > 
-> > > > dmabuf does not force a uapi, you can acquire your pages however you
-> > > > want and wrap them up in a dmabuf. No uapi at all.
-> > > > 
-> > > > The point is that dmabuf already provides ops that do basically what
-> > > > is needed here. We don't need ops calling ops just because dmabuf's
-> > > > ops are not understsood or not perfect. Fixup dmabuf.
-> > > 
-> > > Those ops, for example, are used to efficiently return used buffers
-> > > back to the kernel, which is uapi, I don't see how dmabuf can be
-> > > fixed up to cover it.
-> > 
-> > Sure, but that doesn't mean you can't use dma buf for the other parts
-> > of the flow. The per-page lifetime is a different topic than the
-> > refcounting and access of the entire bulk of memory.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  6 May 2024 13:43:16 +0200 you wrote:
+> Netdev CI reports occasional failures with this test
+> ("ERROR: ns2-dX6bUE did not pick up tcp connection from peer").
 > 
-> Ok, so if we're leaving uapi (and ops) and keep per page/sub-buffer as
-> is, the rest is resolving uptr -> pages, and passing it to page pool in
-> a convenient to page pool format (net_iov).
+> Add explicit busywait call until the initial connection attempt shows
+> up in conntrack rather than a one-shot 'must exist' check.
+> 
+> Signed-off-by: Florian Westphal <fw@strlen.de>
+> 
+> [...]
 
-I'm not going to pretend to know about page pool details, but dmabuf
-is the way to get the bulk of pages into a pool within the net stack's
-allocator and keep that bulk properly refcounted while.
+Here is the summary with links:
+  - [net-next] selftests: netfilter: conntrack_tcp_unreplied.sh: wait for initial connection attempt
+    https://git.kernel.org/netdev/net-next/c/76508154d7da
 
-An object like dmabuf is needed for the general case because there are
-not going to be per-page references or otherwise available.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-What you seem to want is to alter how the actual allocation flow works
-from that bulk of memory and delay the free. It seems like a different
-topic to me, and honestly hacking into the allocator free function
-seems a bit weird..
 
-Jason
 
