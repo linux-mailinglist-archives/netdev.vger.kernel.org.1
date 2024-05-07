@@ -1,139 +1,109 @@
-Return-Path: <netdev+bounces-93969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 037308BDC61
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:26:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 361B58BDC6F
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:31:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 844541F21DC2
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 07:26:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E50D9283480
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 07:31:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE88D13B28D;
-	Tue,  7 May 2024 07:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E72313BC30;
+	Tue,  7 May 2024 07:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J1sQt8m2"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="lYOeEOuq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout.web.de (mout.web.de [212.227.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3714D13BAE8
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 07:26:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191EC13C3C0;
+	Tue,  7 May 2024 07:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715066794; cv=none; b=UlFXjRd5SZQmuy/3yPT2WE4Nf7eVo2TYsjq0QD2kMKcrQXfrJNmIxh+OzbRgdGDCwNA4mwxvbrTngWEHRHdm0JexBBzzvdhrU/Ce+4NmZ8XC82eUOE7TYneEUaMSGwBoPVt7nq8o2VlCOd7eL9FiUGENKOpPRTlcT7yKq/6OdLs=
+	t=1715067066; cv=none; b=qCr4k7CWcP+xLByBEXAzjLoQfL7Fwg7xnJ//2+JJSjZtl8yYOC2rFZljWpCxiXVXAZXY43K698kctTA4gYu5/3H5xd4lalgoyZ7X1IviajFf96Hp/LOLObm7gfJAJGb9ElXySkaVZ/dEx0EaGmUDgrqRAfdlE5YEkY9R8rD/sJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715066794; c=relaxed/simple;
-	bh=7MpXiMgQGHLmxQ0OdtXnlBwuru1G5DYxHpA08m6Etus=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jUtzaG41l0C3KPf8zvuK6gYuc8JY4hUeyvU09rFnJPkODww8M+4oMDfdB3L+z8DZ4OBMjeQMiz6+8kX2nFeCbc98dsjvStSB0Ki0X6FeGercUIActc6k9zjbo6sTQ9DUIOs4WCts6SiGz96tNoaijPyyVcrUpM3Gjyvf/eI7hT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J1sQt8m2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715066792;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Sfy45R6lsrRAD/roDDebjpPvuoKjWVqjyuul7mT10uI=;
-	b=J1sQt8m2t+9XQTltPY9wY+D62YgygEJrzkDtmEfu9nkoKIDIwGmBbW4tUVBGrR+sUjAz6a
-	1KNszhwtAcRaBgygkbRxorkbYy0Qy6OLRcQbGTfyPwwCKHOIInYXmg2Ta5hOQkHVl6JAGS
-	ZGTOMQyw/UK37b8EYJcJcuDn2Sya/0g=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-658-zH6zOZgzNjujKePu13WOjw-1; Tue, 07 May 2024 03:26:30 -0400
-X-MC-Unique: zH6zOZgzNjujKePu13WOjw-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2e1cb7b0816so3506471fa.0
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 00:26:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715066788; x=1715671588;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Sfy45R6lsrRAD/roDDebjpPvuoKjWVqjyuul7mT10uI=;
-        b=uQN0V6NnE9UuNUoEh1RC1z9cs8PtfVJKOs1cDQXFcadj0CM4F6GTFdrG6LWydQfgtk
-         xZj25WJjjhsH40C/mblevmhWUo2ZXb4pu8WzFXD4SgLBgLCkha+Qiv9KrK6YIPlKUfB9
-         OJ0EY8ShiaIhkQe8fteA2xL+a7a1u/fCbappGTXbacPVGxuZJjQqZ4sgc4DBGb/q3SqF
-         g4Nd1ksD9kJ+K3UgBuF3lcDVs7IJ/eP14S6lxbYHsjCeQZVyiXbFMKee14Aaw0Uj8+gx
-         sKV0QgsEEV0fCCRlaFKAON0KhiqsQ5PMlEQLspZPPC7u6LAAYDKcwY4YP5kWR4BYPXyu
-         AUFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUqf24BgNn0QQz43VKVOZ0nWXin7xHePpHk1reZB/TWSOm9+x1zgRVyb+mHfEpSAbbJHnFewngeD2R1tVie5kok/TxIjnRn
-X-Gm-Message-State: AOJu0YzJ62sq1qjEBUPNU94bx8f5ks/SwHgwOQevKP85l2wKTAF/P2WS
-	TlAce2y0VzZ5BPE/aXKhG+4aOCRTvZQkSltIZovmUpCWq+HGJShrRwb03KImEHqR+gixhULPOQx
-	/UzLUeun+p1ZDegDr1PfzQdrKh33nWBOf6OVuMzkBhIATVEq03RNmkQ==
-X-Received: by 2002:a2e:3c0c:0:b0:2e2:177c:5f6 with SMTP id j12-20020a2e3c0c000000b002e2177c05f6mr7654399lja.0.1715066788578;
-        Tue, 07 May 2024 00:26:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGd7MvIU86f0xnKGs3qNXdmJyKYKW8CPvoXT0BGxokQYzfy0jqdHpJPZlR/EW/P+Itfg/iXGQ==
-X-Received: by 2002:a2e:3c0c:0:b0:2e2:177c:5f6 with SMTP id j12-20020a2e3c0c000000b002e2177c05f6mr7654382lja.0.1715066788131;
-        Tue, 07 May 2024 00:26:28 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b09b:b810::f71])
-        by smtp.gmail.com with ESMTPSA id r9-20020a05600c35c900b0041bf5b9fb93sm18692524wmq.5.2024.05.07.00.26.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 00:26:27 -0700 (PDT)
-Message-ID: <03c25d8e994e4388cb8bfd726ba738eea3c4dcdf.camel@redhat.com>
-Subject: Re: [PATCH RFC net-next] net: cache the __dev_alloc_name()
-From: Paolo Abeni <pabeni@redhat.com>
-To: William Tu <witu@nvidia.com>, netdev@vger.kernel.org
-Cc: jiri@nvidia.com, bodong@nvidia.com, kuba@kernel.org
-Date: Tue, 07 May 2024 09:26:26 +0200
-In-Reply-To: <20240506203207.1307971-1-witu@nvidia.com>
-References: <20240506203207.1307971-1-witu@nvidia.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1715067066; c=relaxed/simple;
+	bh=hmx5YlR28Y43Dsm7EnmMfOwh+GjWWW2rcpB2wdOLYhk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=puezjBwNTlY2sjrwJuDJoYqaeDMh41icbzcInsUtbYfbH4K78ccKVmUdB/kjUM29mXBtol0h+5en1gXZUI+AXOtYbAyL5cauOOusuu2n1Kitdjs9A+zHXE3YblHSi32mmFk8Zn9Ia06bIXJ8NchLA0Z98yCz+lc1BeSaixIqioY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=lYOeEOuq; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1715067033; x=1715671833; i=markus.elfring@web.de;
+	bh=hmx5YlR28Y43Dsm7EnmMfOwh+GjWWW2rcpB2wdOLYhk=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=lYOeEOuqbEZHSXsC7xePzvU9QstYMyAtkmTziCxXiidg31b9ORH1/jvwG6+P4tBj
+	 roIu74BgeEmZH/vDZYYzGCS5UruDBaa/81KairCv99Q0BwtFvnBghxuXjpHp7KJsC
+	 LZhIgGRvuDd7GfKz0VFAZzVwagj6K6Pmek5Gj+F7P4B+dQDXRWfAf3ImsPDIxXQNc
+	 /dg2C9TzAtHf5dMmuXhH/vuHps4jW76u+366/QogDHyRRkQq821Sy55TYAoVFc2kb
+	 gN8Mvd191sguM5aM+T4ybjZAAgdlMSDOIMkJyBfu8qWsgQ3r8i2JeiuFnFiOQ9dkK
+	 +8WmeN2mUnvQSfOumA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1Mvbn2-1swUYw47eQ-00sfkN; Tue, 07
+ May 2024 09:30:33 +0200
+Message-ID: <0334480f-1545-455b-8d5f-0f7a804ad186@web.de>
+Date: Tue, 7 May 2024 09:30:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND net v4 0/4] ax25: Fix issues of ax25_dev and
+ net_device
+To: Dan Carpenter <dan.carpenter@linaro.org>,
+ Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ =?UTF-8?Q?J=C3=B6rg_Reuter?= <jreuter@yaina.de>,
+ Paolo Abeni <pabeni@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
+ Lars Kellogg-Stedman <lars@oddbit.com>, Simon Horman <horms@kernel.org>
+References: <cover.1715062582.git.duoming@zju.edu.cn>
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <cover.1715062582.git.duoming@zju.edu.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:59Z3T0+7kOChULTDQq4WStFF3BTShvGpkWwNkdTCMr5X15GDbxu
+ ib+CHx8O1VWr2jeEJLfM+hzOGlAqEaPDPrj1MwWjepqz8b/L/m9bvr5qugaSW4unlxtm3ED
+ fgKfCK1dUJQAWAB5QFFbKtryNQY4kvpS6rt0+edi/B1Z47yjiKfWpy9fBuuo7PmBGfYQitQ
+ Xco3djPc3qP3jUB8PCshw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:wp9FOU4EY3o=;NUy1Sm4Obbq0MFx+2V62dk+SmSO
+ 77SLi7jq+MGe0NyZez6HwAu91ZMO5pCRPDQ9b1zerBacTKalB7xVLJiWIYhh6gKo930q3KiQm
+ 9dgCDFOYV7+wTfFyHk/kXykJdFutHZb/kkHtd2ZhrIxYYLtuTStSswIyA7mzhvh0VPl/mozJ6
+ kmdmOD/u48hLUZVCoZx1ro4MOlTZa5vbjr033WC57xqLXZGVu6FLINCrOeP8VP7iquY2ugNyR
+ l1ezYtOcgc/ToQhto3CkQJJuplW93ZqCIb+kvTU95t32bxrKZ4co+h//e4f4Goeiyd8TIl0Vw
+ qPHKqtO1EVUdGpsEw8zLBUP2psL/nleMD0gqh19ovNgzitdd28xfxtKYuqWcd9L6lb9cX9/Bv
+ qbJPjmoFv9SjI6mn04BLqB1uBFtJxgSFCtBmodKpZEiGq44d9W3qqjyX9MqiLGOzorbtq7icU
+ XYF9L+R+vyX0zV0QVNZOBgCy5Tk/smrVjYn5qOdbq34u1Qcy8H3vRZw96vV3g0I1oigLq25Ca
+ M6/voT+WhDmCLX969DTVfoSHwwijzOblZfBAPMpKfn2BZq7kI1S8uHKuhyg1Ymoy9U2jusALr
+ gkVEwHiMvRi0U2+XHDgF9Hj8okhwcGwxwSDXgaojuDEIdMApWLj5n8FsKb3s11wgsWalkyYan
+ vDLNzCUfxk6bOOtTgdXeHQDDKXnsm9Go3fdH7Vq0T6PC+w2L8t2DGF4vBiAofFamHibfRK+t/
+ x9QTScrciTcG4yNyzBgvlmy2LXkPPw1IEr9OIA0FST5+rFtCAW5xi+nAR1Ijqnb15GhI2RxzV
+ SzaXqeAvAnSslm8afsPy6lSNY2NX4AAm0FjdDCIExmJk0=
 
-On Mon, 2024-05-06 at 20:32 +0000, William Tu wrote:
-> When a system has around 1000 netdevs, adding the 1001st device becomes
-> very slow. The devlink command to create an SF
->   $ devlink port add pci/0000:03:00.0 flavour pcisf \
->     pfnum 0 sfnum 1001
-> takes around 5 seconds, and Linux perf and flamegraph show 19% of time
-> spent on __dev_alloc_name() [1].
->=20
-> The reason is that devlink first requests for next available "eth%d".
-> And __dev_alloc_name will scan all existing netdev to match on "ethN",
-> set N to a 'inuse' bitmap, and find/return next available number,
-> in our case eth0.
->=20
-> And later on based on udev rule, we renamed it from eth0 to
-> "en3f0pf0sf1001" and with altname below
->   14: en3f0pf0sf1001: <BROADCAST,MULTICAST,UP,LOWER_UP> ...
->       altname enp3s0f0npf0sf1001
->=20
-> So eth0 is actually never being used, but as we have 1k "en3f0pf0sfN"
-> devices + 1k altnames, the __dev_alloc_name spends lots of time goint
-> through all existing netdev and try to build the 'inuse' bitmap of
-> pattern 'eth%d'. And the bitmap barely has any bit set, and it rescanes
-> every time.
->=20
-> I want to see if it makes sense to save/cache the result, or is there
-> any way to not go through the 'eth%d' pattern search. The RFC patch
-> adds name_pat (name pattern) hlist and saves the 'inuse' bitmap. It saves
-> pattens, ex: "eth%d", "veth%d", with the bitmap, and lookup before
-> scanning all existing netdevs.
+=E2=80=A6
+> You can see the former discussion in the following link:
+> https://lore.kernel.org/netdev/20240501060218.32898-1-duoming@zju.edu.cn=
+/
+=E2=80=A6
 
-An alternative heuristic that should be cheap and possibly reasonable
-could be optimistically check for=C2=A0<name>0..<name><very small int>
-availability, possibly restricting such attempt at scenarios where the
-total number of hashed netdevice names is somewhat high.
+Does this change approach represent another subsequent patch version
+instead of a =E2=80=9CRESEND=E2=80=9D?
 
-WDYT?
+How do you think about to improve patch changelogs accordingly?
 
-Cheers,
-
-Paolo
-
+Regards,
+Markus
 
