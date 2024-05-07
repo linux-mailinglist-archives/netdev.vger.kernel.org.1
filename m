@@ -1,95 +1,73 @@
-Return-Path: <netdev+bounces-93919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB53F8BD94D
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 04:10:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C9388BD94E
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 04:11:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 709CDB20AD7
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 02:10:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D2A91C20DCB
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 02:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600964A12;
-	Tue,  7 May 2024 02:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDBE04A20;
+	Tue,  7 May 2024 02:11:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gsg0e2Fb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DZ2keh2p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385C646A4
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 02:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97D14A12
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 02:11:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715047827; cv=none; b=ooB+FLphhBEdwU/HLT77taMNUVXfpFSU4X/Lyh6U4c3E369sYnR7dWYGHP4+o5vN85e8+2AohLkzX1+NRehPA3lLdSuSULBro84ncw964m11KLyCJbwmpEPim3dtArri5kQQhJ+o20635uAxrWLOdOqRKnk2M0Vbz91n5PnZbF0=
+	t=1715047884; cv=none; b=Eemtazfhwbo59FN5+SjRyv3wQSNMKuJE+v+1DAQaqGkvjFmzTVP0RA2L26TzKIaxAsrJLt0K98ZDuKOMTZNOWcRo8yag5EbkngwfteQpS0bqw/+8d7tSt6D3sC3EPPsFyMQ+Nji5X3Cgmbar3KW47gGYkqCobgG0Xk6MUJ04ISg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715047827; c=relaxed/simple;
-	bh=CPansORL4SJWZJ4Cph/x8l1HtMNIZCH012uf2pAypXM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lvYWxmsB04rbGa8JhY0NfS273DQTKw9DSUzKSjdftMDXKKqfg2IrBuF9xMd7M+0TZeXrtfktZUfGe/n8S5+D4IRUhoTIBAMsvlEBr4IcBTvoqZgaLUXVCuvI3BRtA0xgAopCgHHlpIhCe/KGa5xIf7qRsLxIv3ytKVXGgnpv7SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gsg0e2Fb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9F3AFC3277B;
-	Tue,  7 May 2024 02:10:26 +0000 (UTC)
+	s=arc-20240116; t=1715047884; c=relaxed/simple;
+	bh=VklxtigMVpLy/wemkOY5pVV1pqBo7jD/1AV/9pQ8rNE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N17JEwiK/ZA2bgjyebxtRQm2dawpNmKF3QcU35fLC3Rew02Y0b3kqmzKRunW/iz1yZaZOkmEw+yfYox3C0fiNckezS+AEydjNKRvE0HXMss1ghV8UGE1M1bq2Gox0N+W/UE+n76uQvmkT1hDNlukUHl8SwU4lA6TXbz3Enmapx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DZ2keh2p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12F22C116B1;
+	Tue,  7 May 2024 02:11:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715047826;
-	bh=CPansORL4SJWZJ4Cph/x8l1HtMNIZCH012uf2pAypXM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Gsg0e2FbutADlWkkEIua7+n4k4FBbfBang/LbOeR4wE3b5fk0/1BaR06snsnW8yEr
-	 uf3m2brBg07z4w8x4Qtd4A614fxTcDKu6A0QoreuRZyU1yX2fwIaPUxAfS1bZnlvue
-	 w8R04rn7oSklFSHUaiiJBq8MeX07D2HjH4rDP/nzjgcrBWUzcr0VCLpiMSlOc+9Qtu
-	 MuLk0BBJp+kN7W7cyDIPC9ML9icHc+0HY4PLclXDYTRex7XxyIUshzDG6k8E+xRyr5
-	 +Fkt2Bdcm+Bh1zcThriTf4zJDFdPyt3rEEShP0rDr6ZWPHREFhEDfn9HOAA3tYcuig
-	 upmZkocJiu5LA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8BE19C43337;
-	Tue,  7 May 2024 02:10:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1715047884;
+	bh=VklxtigMVpLy/wemkOY5pVV1pqBo7jD/1AV/9pQ8rNE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DZ2keh2pHyywGrIxKKlPA4gG+XO1uaEcQlQ+wq5NSRqO43VfcZjh4NKl380INIhAj
+	 GHPwjXaIN2Et+FMlaymD64ZuTlp9md9dmBoENq4Y3fAdRW/pwvZVNXAIeKX8t6QTQ0
+	 qtLQ77liwcazQPlng1EYXLqtjGYl8jbul6uPwQJZj+3cvWA42313igzudIj8bmt8xs
+	 DymRhfwLwW5gSeqWvBv8AC9Klpnqn+NFaXCLaSpcp3DNitDjAFj6m6IfF3jwyn/LwP
+	 3Ge8TDcDbomAne+762Jr/poFNev8ck9R7dMsefYV7n/V7mCWQ/xgTjGUsVTiXCi4Qx
+	 /eD/DnS5CZvzA==
+Date: Mon, 6 May 2024 19:11:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v4 0/2] netdevsim: add NAPI support
+Message-ID: <20240506191123.5dfc549f@kernel.org>
+In-Reply-To: <20240502163928.2478033-1-dw@davidwei.uk>
+References: <20240502163928.2478033-1-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] octeontx2-pf: Treat truncation of IRQ name as
- an error
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171504782656.18663.926414916456400043.git-patchwork-notify@kernel.org>
-Date: Tue, 07 May 2024 02:10:26 +0000
-References: <20240503-octeon2-pf-irq_name-truncation-v2-1-91099177b942@kernel.org>
-In-Reply-To: <20240503-octeon2-pf-irq_name-truncation-v2-1-91099177b942@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, sgoutham@marvell.com, gakula@marvell.com,
- sbhatta@marvell.com, hkelam@marvell.com, dan.carpenter@linaro.org,
- netdev@vger.kernel.org, andrew@lunn.ch
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 03 May 2024 12:11:58 +0100 you wrote:
-> According to GCC, the constriction of irq_name in otx2_open()
-> may, theoretically, be truncated.
+On Thu,  2 May 2024 09:39:26 -0700 David Wei wrote:
+> Add NAPI support to netdevsim and register its Rx queues with NAPI
+> instances. Then add a selftest using the new netdev Python selftest
+> infra to exercise the existing Netdev Netlink API, specifically the
+> queue-get API.
 > 
-> This patch takes the approach of treating such a situation as an error
-> which it detects by making use of the return value of snprintf, which is
-> the total number of bytes, excluding the trailing '\0', that would have
-> been written.
-> 
-> [...]
+> This expands test coverage and further fleshes out netdevsim as a test
+> device. It's still my goal to make it useful for testing things like
+> flow steering and ZC Rx.
 
-Here is the summary with links:
-  - [net-next,v2] octeontx2-pf: Treat truncation of IRQ name as an error
-    https://git.kernel.org/netdev/net-next/c/6bee69422590
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Looks good but doesn't apply, could you respin?
 
