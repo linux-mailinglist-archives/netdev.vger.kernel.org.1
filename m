@@ -1,141 +1,152 @@
-Return-Path: <netdev+bounces-94098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D8DB8BE1CF
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:15:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 607778BE1DA
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 14:17:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 327831F25B6B
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:15:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 649A8B22EC7
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 12:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10240156F48;
-	Tue,  7 May 2024 12:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0445156F5D;
+	Tue,  7 May 2024 12:17:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="QY69fWhW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Trch9/hC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F7F156F37
-	for <netdev@vger.kernel.org>; Tue,  7 May 2024 12:15:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F7073530
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 12:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715084149; cv=none; b=ob1lV0nFZqpQVJJV5D4SOi6QA0GMr3xcpZnkmxjhNf8sQdJePI0gFDRlIozE3V9JwNFIoYf0sHyKHZWV9KQuR1sGq/jiOq5XoBzN/EYZLtekWj9nTD3TFrbMb3x8obq6Ez0Ku3/YCSK8e99F/gDVxfSz5BFs+D/1ESc3L9T5Sao=
+	t=1715084271; cv=none; b=O1NUGchCE/qHJbD2CE0vgGEfvM6jvPz/ON8UVhIMbIH3af8b3jXeG0mdwc8BQ0vlR+Ud+ojWkiDMyzddoqXnk9vD6sPuT2Bgo/3RtMC6ly5oVlnpPmhNNhbhZ0vhUQJzt7QN3I2qRYqpmAQhBh2yX4XbL47JH2p17b5hGrmO6fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715084149; c=relaxed/simple;
-	bh=dWYuhSmaw6zHw/xPyvKvmeoz7fmgJSbAFIN1ULigx1k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bnDscfUXQHUXEkkjVdU6DqKovHYo1Rs+Rpzhm75BUHHmI0pYD8kqdDsC3mGEx68OlQCJuW5fvTiOtihmZ8VlCKwc0mNlGtCdQc4SFUzhCy1YoujXRtvDpw5xW05Yf4hQd0V7Mn7UhV2Kvf27WXZfUEvl4ndRR7pmnfEZiJ10cIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=QY69fWhW; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a59a5f81af4so789314066b.3
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 05:15:47 -0700 (PDT)
+	s=arc-20240116; t=1715084271; c=relaxed/simple;
+	bh=CFnhRfVVMb6W18q4kQBKyyaO05P1kJKdUisOQqI/Xc0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=h0q2vP244SKQY4lOG5ENb7V0+SAn+dLFvI7Dq8EyINEZKsJ9wcGs/sDZSeb0YkBn75rCP6HejWbSo9+M6fw3Ioa0iCr4cFsaaqYzMrJpEzcTAxRLdDsBi025wLu4gwFB23gq6tb5wAdAMbHw6ge71qvOLClI5ZMKp+L1ClTkre4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Trch9/hC; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61e0c296333so66154087b3.1
+        for <netdev@vger.kernel.org>; Tue, 07 May 2024 05:17:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1715084146; x=1715688946; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IUKfXenJAG2N5WSgqguRSHR3qBfgjkNSXZ2oXGFiItU=;
-        b=QY69fWhWTMO3yG0urr8Aozglu4L7uxGOzS5TmFk/WK6iITOQanhnK1ahmYOtxnzzG8
-         JYb7EDzzh0gkeDc0+BzFaf60CCXOb+IoQ7FIX6VHymQDUsxolg3vXsoOaBwUOTRSn5wP
-         UjxzfaNKs4pJEDAavj89x+VfKE+yP4d2nMEHroOv4WkTGrgbQB2O6afZIK8bgmTcBBgH
-         3CrZrXQYTmZvLbuz18E7KTud7+k5ytqi8GYCIbzPLOTtcif7gA8FoUbwHrofMBPsrs5j
-         EJETQYi9jnHMbau0E0aH1lM9xPaBMa3Y3CaKHDB9WrTLz5o1eHR1pE9kruO79+zjKqpc
-         KNKQ==
+        d=google.com; s=20230601; t=1715084269; x=1715689069; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SaKcvGzisgxVw+30ti0gDUw/ORGEq//I2ZgeYuQh9vk=;
+        b=Trch9/hC0+4Ht/TpxYLT2uN/TP3f1NMIR6vrdnzVfjGABdiVPg6ogk0uSOSR4ABRbD
+         GXgoUTy94GhkOyTYvRG6fjmKW717p5eux16S66H39S4cbhDOtr4MQP5SONlm4FdQ4hN+
+         9El6lLFadqDJMmZqp5NMlZ5sE1L6eokLynkKmtcXIB+eZntzB5pV1lXVdwMrou/cuShS
+         9D2wBcfa8OkzGc9mYLfgjLYzIcD6fK2iPNUxKCI3nVNM1TOyo0h/t1wbfEbnknRxliZA
+         qZzADDv0pWG87/OrOtpVpd8vEpQl5S59hUA6BBRZ6HA21EZCtjmsFiR4ShR2SLIDy8lz
+         4ZRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715084146; x=1715688946;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IUKfXenJAG2N5WSgqguRSHR3qBfgjkNSXZ2oXGFiItU=;
-        b=Rzo1A+5+TbbzEOQSJDmUjP3T1OCKP6fo62zlJF2HLi+DYnA27aUNj3KCxmRnn6TZrX
-         rLsgobDVZEUQAZWpsHfsOWoWYAeVuBlCtZRjc3cDwANomyZDNzBVNhx9vvcowKiqW+jx
-         qn6pzP6P+q0bf0Y4O6KCllny0cmnfO5U3BJoHEPz/5rN/JJxaWNF1lKFR9xkeHb1yWZB
-         kxDeSZ6Aq3eYIeRdYtb4kQ5Ge+I4VKuGS5v4cYD1Ai2045Ia+gDY0NFJ6QMfrCl00qx/
-         nM7i9Y2q33vX/0qK4MT3s58gfjeUJyjoRk41bLPku1BCWz9XlzZ8nL2QJkRw632mU/Xn
-         HSNA==
-X-Forwarded-Encrypted: i=1; AJvYcCXx8+u0OOjX669cv4kYIBjhntm98NPfm2hv/JN1eKQYpNfq2A7sQ2aOutNgyZj5ZcMDzWRUAFS9cnP1u080b/J/vJM8KazR
-X-Gm-Message-State: AOJu0YxKfnhB9JZk9lIFyVzkVlh6jny8JcIzKPFlX8sGdsQ/RQ3C+5cg
-	Bi1F8TVsLaKrnTe32TXsZkpYnucp1FBJ2ne5h1RQ+0kWySlq3Jh3F23nIIu1rjI=
-X-Google-Smtp-Source: AGHT+IG9cak2fCNRkjLA6nMOklMc3wR0gPeYdLkCkvN53U7wFdtqN+DcTu8b6RKxXiaT5kYD3tNeag==
-X-Received: by 2002:a50:d4d3:0:b0:570:cd6:8ef with SMTP id e19-20020a50d4d3000000b005700cd608efmr9909187edj.29.1715084145631;
-        Tue, 07 May 2024 05:15:45 -0700 (PDT)
-Received: from [192.168.51.243] ([78.128.78.220])
-        by smtp.gmail.com with ESMTPSA id j8-20020a50ed08000000b0056e718795f8sm6289854eds.36.2024.05.07.05.15.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 May 2024 05:15:45 -0700 (PDT)
-Message-ID: <9a1825ff-3a55-4c2a-86bc-0709d4ff8153@blackwall.org>
-Date: Tue, 7 May 2024 15:15:43 +0300
+        d=1e100.net; s=20230601; t=1715084269; x=1715689069;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SaKcvGzisgxVw+30ti0gDUw/ORGEq//I2ZgeYuQh9vk=;
+        b=GlH9fYU+dyQDN2Fekwyvu0tBr/e+FO40QldWZwRoHPMVq2QldChWx/HlX8GLZpQ5Vi
+         lw39kjCf5gQKmXGyf5vmZSCffICqO0/OGRZgjJ3AftsX5fRC30GBmaGXS+IrzZo7SRZI
+         wN6313efvtfg5+PyodSUIvesnj1wpKecBFG7upWj/HzVVGmjFOo+znlY477WA9Opgn1h
+         1bPHWOC13/xSlCI3rnZ6garQI5tDjnSu/ywrMMTlP9EGGUCERF6o3V4YzVGHaM5k9YoX
+         VGUQhWTWDelfxeM86ao41Mme9UiT4krf4bKvLJJ79Sut5Pm/PsMUvul0vjJkNwgJXzgi
+         6zcQ==
+X-Gm-Message-State: AOJu0Yx3zuvS2eDUJU/QfFiEG4KLQI0jxd1lgRZyRi5OWJn5bj9AjbvE
+	b8zhGfByPjqMaxpKg9kw+pI6l2X4wn7yjM19ye7g+84NqN9Nlogae3l1Tp4FYovgeMSvjVMLKj6
+	4pSACAIlcsg==
+X-Google-Smtp-Source: AGHT+IFbAGnEohbfOzVTI7/wzXp/auUKxB7x5D7PFDuAzc70kQiYLe59z3NYj59Yupwe8zUSTqbzudQVR7sPEg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a81:910d:0:b0:611:5a9d:bb0e with SMTP id
+ i13-20020a81910d000000b006115a9dbb0emr669325ywg.4.1715084269353; Tue, 07 May
+ 2024 05:17:49 -0700 (PDT)
+Date: Tue,  7 May 2024 12:17:48 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bridge: fix corrupted ethernet header on
- multicast-to-unicast
-To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org,
- Roopa Prabhu <roopa@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: bridge@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20240505184239.15002-1-nbd@nbd.name>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240505184239.15002-1-nbd@nbd.name>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
+Message-ID: <20240507121748.416287-1-edumazet@google.com>
+Subject: [PATCH v2 net-next] phonet: no longer hold RTNL in route_dumpit()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Remi Denis-Courmont <courmisch@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 05/05/2024 21:42, Felix Fietkau wrote:
-> The change from skb_copy to pskb_copy unfortunately changed the data
-> copying to omit the ethernet header, since it was pulled before reaching
-> this point. Fix this by calling __skb_push/pull around pskb_copy.
-> 
-> Fixes: 59c878cbcdd8 ("net: bridge: fix multicast-to-unicast with fraglist GSO")
-> Signed-off-by: Felix Fietkau <nbd@nbd.name>
-> ---
->   net/bridge/br_forward.c | 9 +++++++--
->   1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bridge/br_forward.c b/net/bridge/br_forward.c
-> index d7c35f55bd69..d97064d460dc 100644
-> --- a/net/bridge/br_forward.c
-> +++ b/net/bridge/br_forward.c
-> @@ -258,6 +258,7 @@ static void maybe_deliver_addr(struct net_bridge_port *p, struct sk_buff *skb,
->   {
->   	struct net_device *dev = BR_INPUT_SKB_CB(skb)->brdev;
->   	const unsigned char *src = eth_hdr(skb)->h_source;
-> +	struct sk_buff *nskb;
->   
->   	if (!should_deliver(p, skb))
->   		return;
-> @@ -266,12 +267,16 @@ static void maybe_deliver_addr(struct net_bridge_port *p, struct sk_buff *skb,
->   	if (skb->dev == p->dev && ether_addr_equal(src, addr))
->   		return;
->   
-> -	skb = pskb_copy(skb, GFP_ATOMIC);
-> -	if (!skb) {
-> +	__skb_push(skb, ETH_HLEN);
-> +	nskb = pskb_copy(skb, GFP_ATOMIC);
-> +	__skb_pull(skb, ETH_HLEN);
-> +	if (!nskb) {
->   		DEV_STATS_INC(dev, tx_dropped);
->   		return;
->   	}
->   
-> +	skb = nskb;
-> +	__skb_pull(skb, ETH_HLEN);
->   	if (!is_broadcast_ether_addr(addr))
->   		memcpy(eth_hdr(skb)->h_dest, addr, ETH_ALEN);
->   
+route_dumpit() already relies on RCU, RTNL is not needed.
 
-This dance is getting ugly, but better to have it correct.
-It'd be nice if you could add a selftest that exercises it.
+Also change return value at the end of a dump.
+This allows NLMSG_DONE to be appended to the current
+skb at the end of a dump, saving a couple of recvmsg()
+system calls.
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Remi Denis-Courmont <courmisch@gmail.com>
+---
+v2: break;; -> break; (Jakub)
+---
+ net/phonet/pn_netlink.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/net/phonet/pn_netlink.c b/net/phonet/pn_netlink.c
+index 59aebe29689077bfa77d37516aea4617fe3b8a50..92245fdfa846cb8b9747764a3330e17d8c6b1f16 100644
+--- a/net/phonet/pn_netlink.c
++++ b/net/phonet/pn_netlink.c
+@@ -178,7 +178,7 @@ static int fill_route(struct sk_buff *skb, struct net_device *dev, u8 dst,
+ 	rtm->rtm_type = RTN_UNICAST;
+ 	rtm->rtm_flags = 0;
+ 	if (nla_put_u8(skb, RTA_DST, dst) ||
+-	    nla_put_u32(skb, RTA_OIF, dev->ifindex))
++	    nla_put_u32(skb, RTA_OIF, READ_ONCE(dev->ifindex)))
+ 		goto nla_put_failure;
+ 	nlmsg_end(skb, nlh);
+ 	return 0;
+@@ -263,6 +263,7 @@ static int route_doit(struct sk_buff *skb, struct nlmsghdr *nlh,
+ static int route_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ {
+ 	struct net *net = sock_net(skb->sk);
++	int err = 0;
+ 	u8 addr;
+ 
+ 	rcu_read_lock();
+@@ -272,16 +273,16 @@ static int route_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 		if (!dev)
+ 			continue;
+ 
+-		if (fill_route(skb, dev, addr << 2, NETLINK_CB(cb->skb).portid,
+-			       cb->nlh->nlmsg_seq, RTM_NEWROUTE) < 0)
+-			goto out;
++		err = fill_route(skb, dev, addr << 2,
++				 NETLINK_CB(cb->skb).portid,
++				 cb->nlh->nlmsg_seq, RTM_NEWROUTE);
++		if (err < 0)
++			break;
+ 	}
+-
+-out:
+ 	rcu_read_unlock();
+ 	cb->args[0] = addr;
+ 
+-	return skb->len;
++	return err;
+ }
+ 
+ int __init phonet_netlink_register(void)
+@@ -301,6 +302,6 @@ int __init phonet_netlink_register(void)
+ 	rtnl_register_module(THIS_MODULE, PF_PHONET, RTM_DELROUTE,
+ 			     route_doit, NULL, 0);
+ 	rtnl_register_module(THIS_MODULE, PF_PHONET, RTM_GETROUTE,
+-			     NULL, route_dumpit, 0);
++			     NULL, route_dumpit, RTNL_FLAG_DUMP_UNLOCKED);
+ 	return 0;
+ }
+-- 
+2.45.0.rc1.225.g2a3ae87e7f-goog
 
 
