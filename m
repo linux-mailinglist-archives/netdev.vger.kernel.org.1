@@ -1,181 +1,178 @@
-Return-Path: <netdev+bounces-94055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 887468BE0BC
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 13:12:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 258368BE0C2
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 13:14:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E6331F21B27
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:12:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90D6E1F21BB9
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038BC1514E1;
-	Tue,  7 May 2024 11:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB381514E6;
+	Tue,  7 May 2024 11:14:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="EZOphe+l"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="qc5stMZB";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="frcr+dyD"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wfhigh5-smtp.messagingengine.com (wfhigh5-smtp.messagingengine.com [64.147.123.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8E11514DE;
-	Tue,  7 May 2024 11:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5453113CFAD;
+	Tue,  7 May 2024 11:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715080355; cv=none; b=uaWpyOj7N7Y73w1FVucYUEMmF3liyAesnc5j1qvPmnUf5obhR8td+seWfLM2eYJ5tEYEiOiobkzq1g2MF1xeiqqwZ8lSH0IRWeuDM4mSyiCvCjOiDUjH1Wirp4mWLz+3ICwFeh6OmqQE5YVwzuOtNNghlgOLXMLBNOOd6uLHDEc=
+	t=1715080478; cv=none; b=i6tEvNMMBQbE4DQaQQxDBJ0h7z+ux0TKG8uirZ8V4+xJFI82fJr21i5+OIok2DMJgqLvKCtN9TbaZ1jiacUs5RTwSb6NxDcCpdpjaMP9DDYNusAiGXjPR45SPHQY8jNqF/nr2XiewJcObEcRfULF0m4IMbKc+3GyKTLC3xLv9fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715080355; c=relaxed/simple;
-	bh=zSxCKA0DoPcq5N5f7sSYXUx1jwib2HFJ6z5toCJG9ic=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RE4nz6P4HF2ZlxY6r7FNjuaHNzruHIXP11NROK8Czh+RyCyoJfGsxrpT1cRTAPYLUoFp8lhzH3SYzUEEdJlIh+at34OyUylHYyNZ8E7AJZ8hgFJR/un1H0B2pysXz3VosooYWSIeb0LnS3OZtd5gnJvCdGsxH+bFIFOvINRkzBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=EZOphe+l; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 7A0F88872F;
-	Tue,  7 May 2024 13:12:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1715080352;
-	bh=jN+EFedDRgb8BUKslcDfIzWNN0Nyjd/TLRJiDObOb4A=;
-	h=From:To:Cc:Subject:Date:From;
-	b=EZOphe+lgfXkwuYNX/4PmH1PHKP+QI9UBTFYz3eq2wd7wZiKfVnBH+3F+z2/NZWNU
-	 YidvliZOBZWxITzzJ/Y7SQTv1/nE2TCdmdvaxn9WdcyPV+73gq5jjh/yZoyReEcg82
-	 FrZGUEwy457kIu6e5KedOwMRREPVTlZCXro++H+tosO6PgbEMPLYEGOiQgM6YLiic7
-	 NAspXfMR2TZ0GdkmdlzUpCpLWVORm1Y14isoZuvvYFbuX0IBBRUcfUTuVirwcDHnkX
-	 ovDMIJHco8RWvKJcjyecAiQhSpvenl1fDT+EZjJiPptNGl/A6C/G8MPAtAhbg0QIkM
-	 AUhfterVL1Ipg==
-From: Lukasz Majewski <lukma@denx.de>
-To: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
+	s=arc-20240116; t=1715080478; c=relaxed/simple;
+	bh=eAy/F0pITkePjQeYgsqDSQBbp0ZeZXuxZitQrYHQ57w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pGERphaIqnDNhd3Xehg1IDljmN7JiZln9dxzZwj4ayP+0X5Qo1Y1I9KIN8F0f5VmNg3COW4F0vsZImXqJ688N0silGFxe4pvdS74SbkjWx34OufbFEvILUcQGnrYsyVfG3IAmqVh5qSoAJVMEy+JQ6dgUl6oxM6cJHn2TIsXj10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=qc5stMZB; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=frcr+dyD; arc=none smtp.client-ip=64.147.123.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailfhigh.west.internal (Postfix) with ESMTP id B84F118000EE;
+	Tue,  7 May 2024 07:14:32 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Tue, 07 May 2024 07:14:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1715080472;
+	 x=1715166872; bh=ExdImNTrAEE8eTDqnYwHtkEqkw0iJOiQ4VkzpdMSP2A=; b=
+	qc5stMZBQQQ9AXZvT5YVSoCgE9Madu8qHb4r/hB0jP77htm7GAvkgyG5+ZLCjqCD
+	vKFRaHcbMPbdT6KoXuXGAIxMaAPLVWtd9pU6AXsWhEq1KZ6vJN5uMyOsaDKaLvz1
+	FuG0zqowpkn97e6WoOvYuK4yoKMZHFXDQZyW4DSSyXeJaVs48xi4X45mmrLqg2Rp
+	s2qYZLngzaT+Zf/7NVYjCqcJnEoxMlh5+LUGUPBX5tniFf6wFgUMQHnOz/gqqbIZ
+	JPFMMnMLTcBIIHUq1ZjXgjF4xTt5NKJRZppAHmpQbit7/1p3/ylsgMakEE63+a05
+	EDAsI8Dkr4/d8pn0ZoHRzg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1715080472; x=
+	1715166872; bh=ExdImNTrAEE8eTDqnYwHtkEqkw0iJOiQ4VkzpdMSP2A=; b=f
+	rcr+dyD0So2kJHCM3SMwIFb1yFgQysWCjgngCotwcXDv5G6ivAIq6ZROeNRTNaN0
+	KYZ5eKBAUY8VfwaA/LwwPe0MPMuqxp0je888XSTccpLHruZzu/85YI+Wbc7bLZZT
+	G8P2c93eF6swocJijEPRXXYV//TP4qf1fyTFNnq219nZ3pk5IV2cvnLlwRlKVsHh
+	wwg/S9ao2Akn1s/3enIEwIL7KPd68Ustko7mPwrSRby8mrEU+r+2ZKrDANwJpIoO
+	pSprHVe6iehZD4tAtDMlGwFXnHMHNXBe3/0+Q2T9MuYQE5NGf5bSzc9ruiY0AZ3E
+	odKY+1k0tanU6AXLHcLuw==
+X-ME-Sender: <xms:Fw06Zkt6kLIUSOvcmbJBWzT-nldLHJ55RI3zA1gBKeNrSSmIpx7m5g>
+    <xme:Fw06ZheQfeT4leIPK-49oZqd-p93kU-CMmvEyV0fCVwhe5LuNpYBUf0Nh0R75w4zk
+    JYUJNTPIOySdit2C6k>
+X-ME-Received: <xmr:Fw06Zvxbf9faTdeog_YazCxuF2DKnA5VAKpJsb3Qjtu0C4r_Mk1zK6GVeYsO1AjR79rkYwyRcHzovtW-1j4XwyTmqJq2cRQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvddvkedgfeehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
+    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
+    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeefhfellefh
+    ffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvdelieenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggv
+    rhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
+X-ME-Proxy: <xmx:Fw06ZnP-EceyYX6WN4Vh9xTJczdG2Bc2B26BA83M-YlozPhMqF7UmA>
+    <xmx:Fw06Zk9tjHWDSNp4jdKqnJDfXDJOjyqdr8PNF4GvBYAzqOF5Ukn4wQ>
+    <xmx:Fw06ZvUguv4y11ypG2z_HwfjJICF0GmybTzIacfmhHsQdnkZCieHlA>
+    <xmx:Fw06Zte3VfkWNrOiG7DnIaPOWQ9mnddEHhZCvlT_Lc8vrOw88te5CA>
+    <xmx:GA06ZoQ77RtQIA6pXDT1DGvVKznI8q1Mpy4qccMKG5YxxrvqtrqOkG-J>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 7 May 2024 07:14:31 -0400 (EDT)
+Date: Tue, 7 May 2024 13:14:28 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Ravi Gunasekaran <r-gunasekaran@ti.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
-	Murali Karicheri <m-karicheri2@ti.com>,
-	Arvid Brodin <Arvid.Brodin@xdin.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	Casper Andersson <casper.casan@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [net PATCH v2] hsr: Simplify code for announcing HSR nodes timer setup
-Date: Tue,  7 May 2024 13:12:14 +0200
-Message-Id: <20240507111214.3519800-1-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas
+ Ethernet-TSN
+Message-ID: <20240507111428.GJ720810@ragnatech.se>
+References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
+ <5fd25c58-b421-4ec0-8b4f-24f86f054a44@lunn.ch>
+ <20240503102006.GI3927860@ragnatech.se>
+ <e3ce12b0-fb5d-49d7-a529-9ea7392b80ca@lunn.ch>
+ <20240503133033.GJ3927860@ragnatech.se>
+ <d5f6f31a-6ecc-48a9-a2ca-9d22fc6acb21@lunn.ch>
+ <20240506140533.GD720810@ragnatech.se>
+ <0b686943-51de-49c9-afef-04db18b8fdbc@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+In-Reply-To: <0b686943-51de-49c9-afef-04db18b8fdbc@lunn.ch>
 
-Up till now the code to start HSR announce timer, which triggers sending
-supervisory frames, was assuming that hsr_netdev_notify() would be called
-at least twice for hsrX interface. This was required to have different
-values for old and current values of network device's operstate.
+On 2024-05-06 21:53:58 +0200, Andrew Lunn wrote:
+> On Mon, May 06, 2024 at 04:05:33PM +0200, Niklas Söderlund wrote:
+> > Hi Andrew,
+> > 
+> > Thanks for this explanation, it helps understand what's going on.
+> > 
+> > On 2024-05-06 03:51:45 +0200, Andrew Lunn wrote:
+> > 
+> > > What PHY is this? Does it have C22 registers? Can it be identified via
+> > > C22 registers 2 and 3?
+> > 
+> > The PHY in question is mv88q2110 (drivers/net/phy/marvell-88q2xxx.c), 
+> > unfortunately I do not have a datasheet for it so I can't tell you much 
+> > about it.
+> 
+> The mv88q2110 declares itself as 0x002b0b20.
+> 
+> > 
+> > <snip>
+> > 
+> > > 
+> > > So i would drop the compatible. See if C22 is sufficient to get the
+> > > correct driver loaded.
+> > 
+> > - Remove C45 compatible; Remove C45 read/write in driver
+> > 
+> >   The PHY is identified as "Generic PHY", and the correct PHY driver is 
+> >   not used. I can't test more than that as the generic PHY driver do not 
+> >   implement some quirks I need to get the link up.
+> 
+> What ID does it return in registers 2 and 3? Anything like 0x002b0b20?
+> If there is some usable value there, we can probably extend the driver
+> to accept that ID as well.
+> 
+> Another option it to use a compatible conforming to:
+> 
+>       - pattern: "^ethernet-phy-id[a-f0-9]{4}\\.[a-f0-9]{4}$"
+> 
+> ethernet-phy-id002b.0b20
+> 
+> That will bypass reading ID registers for the ID, and just use the ID
+> in the compatible. However, it would be better to read them from the
+> PHY.
 
-This is problematic for a case where hsrX interface is already in the
-operational state when hsr_netdev_notify() is called, so timer is not
-configured to trigger and as a result the hsrX is not sending supervisory
-frames to HSR ring.
+Thanks for these hints. Using a compatible to indicate which PHY to use 
+allows the RTSN driver to not implement C45 read/write functions and 
+still operate.
 
-This error has been discovered when hsr_ping.sh script was run. To be
-more specific - for the hsr1 and hsr2 the hsr_netdev_notify() was
-called at least twice with different IF_OPER_{LOWERDOWN|DOWN|UP} states
-assigned in hsr_check_carrier_and_operstate(hsr). As a result there was
-no issue with sending supervisory frames.
-However, with hsr3, the notify function was called only once with
-operstate set to IF_OPER_UP and timer responsible for triggering
-supervisory frames was not fired.
+I will look into if I can extend the PHY driver with identification from 
+register 2 and 3, but that will be a separate work item.
 
-The solution is to use netif_oper_up() and netif_running() helper
-functions to assess if network hsrX device is up.
-Only then, when the timer is not already pending, it is started.
-Otherwise it is deactivated.
+Unrelated note: I use the ID 0x002b0980 instead of 0x002b0b20 as I have 
+a 88Q2110 and not a 88Q2220 PHY, but both are handled by the same PHY
+driver.
 
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> 
+> 	Andrew
+> 
+> 
 
-Fixes: f421436a591d ("net/hsr: Add support for the High-availability Seamless Redundancy protocol (HSRv0)")
----
-Changes for v2:
-
-- Add extra condition to check if the hsr network device is running
-  (not only up).
-
-- Only start announce timer when it is not pending (to avoid period
-  shortening/violation)
----
- net/hsr/hsr_device.c | 27 ++++++++++++---------------
- 1 file changed, 12 insertions(+), 15 deletions(-)
-
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index e9d45133d641..5afc450d0855 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -61,39 +61,36 @@ static bool hsr_check_carrier(struct hsr_port *master)
- 	return false;
- }
- 
--static void hsr_check_announce(struct net_device *hsr_dev,
--			       unsigned char old_operstate)
-+static void hsr_check_announce(struct net_device *hsr_dev)
- {
- 	struct hsr_priv *hsr;
- 
- 	hsr = netdev_priv(hsr_dev);
--
--	if (READ_ONCE(hsr_dev->operstate) == IF_OPER_UP && old_operstate != IF_OPER_UP) {
--		/* Went up */
--		hsr->announce_count = 0;
--		mod_timer(&hsr->announce_timer,
--			  jiffies + msecs_to_jiffies(HSR_ANNOUNCE_INTERVAL));
-+	if (netif_running(hsr_dev) && netif_oper_up(hsr_dev)) {
-+		/* Enable announce timer and start sending supervisory frames */
-+		if (!timer_pending(&hsr->announce_timer)) {
-+			hsr->announce_count = 0;
-+			mod_timer(&hsr->announce_timer, jiffies +
-+				  msecs_to_jiffies(HSR_ANNOUNCE_INTERVAL));
-+		}
-+	} else {
-+		/* Deactivate the announce timer  */
-+		timer_delete(&hsr->announce_timer);
- 	}
--
--	if (READ_ONCE(hsr_dev->operstate) != IF_OPER_UP && old_operstate == IF_OPER_UP)
--		/* Went down */
--		del_timer(&hsr->announce_timer);
- }
- 
- void hsr_check_carrier_and_operstate(struct hsr_priv *hsr)
- {
- 	struct hsr_port *master;
--	unsigned char old_operstate;
- 	bool has_carrier;
- 
- 	master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
- 	/* netif_stacked_transfer_operstate() cannot be used here since
- 	 * it doesn't set IF_OPER_LOWERLAYERDOWN (?)
- 	 */
--	old_operstate = READ_ONCE(master->dev->operstate);
- 	has_carrier = hsr_check_carrier(master);
- 	hsr_set_operstate(master, has_carrier);
--	hsr_check_announce(master->dev, old_operstate);
-+	hsr_check_announce(master->dev);
- }
- 
- int hsr_get_max_mtu(struct hsr_priv *hsr)
 -- 
-2.20.1
-
+Kind Regards,
+Niklas Söderlund
 
