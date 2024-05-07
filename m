@@ -1,104 +1,122 @@
-Return-Path: <netdev+bounces-94002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AB598BDE1B
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:25:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FFB38BDE27
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:26:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14B012844D7
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:25:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A02701F2124A
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:26:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D14714D714;
-	Tue,  7 May 2024 09:25:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C018B14D716;
+	Tue,  7 May 2024 09:26:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="M3/FZZjA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FmON90Og"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [217.72.192.78])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF43014D710;
-	Tue,  7 May 2024 09:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2040314D705
+	for <netdev@vger.kernel.org>; Tue,  7 May 2024 09:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715073947; cv=none; b=UGkr8mPKTUAchFre+SRNpv89OiOW2RmZGRMVoSOAKVXm4TG86MFX25cEp5VasXbr0EP6AJ0kHHo8/AhmKiYadczidSjhdXDoInReuueRV4SoZNC62gJYomaa+KpJIO8q9YLrBFsD1zPa9sX+nMXnk1crLkvDd3iviCAt+OhIc64=
+	t=1715073977; cv=none; b=rnmtY44KjZudpQSle6Gyau8sDfxyuIaNp3EOVxNkDRpZJO/pKmmFTPOiHCEn4Lkisb5qlc7QtF+J3/CroUR5qUvKWc+CYkOLOhDa6VPgqWvA9MReOMmqjdM2SIrwe7fcC9dTm/fokkxHwvEMZJWcSWlpqzwxsmMNf7eYunEqJ0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715073947; c=relaxed/simple;
-	bh=vSeJbkIMICdQAl1glvGGycQMjGSoLDGjVinLmisZB9E=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=uL1x0krhba5dkZPs6rUUdqMKnyaYv5rX82F8IB94HLItnnNbKo0ZPOChbs3tmwGICb7R8hulcuu6YhHA+RJAcKJr8eNcNKEu82EvxHKfxqj+BzgSixYadZGFqhAYcozFLHmrXjQWoufbR/x17by/w0XADJy1ivjSI8fzxHdXAMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=M3/FZZjA; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1715073921; x=1715678721; i=markus.elfring@web.de;
-	bh=vSeJbkIMICdQAl1glvGGycQMjGSoLDGjVinLmisZB9E=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=M3/FZZjAx73zkY/yPxjQ895+NCl082NCcX+avLWlv4RPMPPr3zFj2b/rBn77/fq2
-	 bt/ZOQA6mtSqI/75X2NTMQL5fY5cXUF9R9JRjWu/7HzY1vbihXk5bVozMdAo1rCQ8
-	 d/3RMEZ6nxAZO9N0oIu8xHZoNctp3+vZ7vC1Rh0C1PFD7dUflREpU71haCw7lwr7A
-	 C4wjHmyX0G1sSJ4muY0aKVRtqrMcoxpuT2VAXQcdY0rHFx+1tffBYqjK8NHdA/SKI
-	 z/tAsgocwli91S8vA7hfx2ecJEePnC6A/tkQA+44nmvitUIrXxwv9qMsPhpq1rUR2
-	 NjEgKH3FnyHkGcoiNw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MVaYw-1sE4jU3sAu-00R14J; Tue, 07
- May 2024 11:25:20 +0200
-Message-ID: <7cc71e11-a484-4b5d-a3dd-a8b84c432977@web.de>
-Date: Tue, 7 May 2024 11:25:19 +0200
+	s=arc-20240116; t=1715073977; c=relaxed/simple;
+	bh=kBYE1Jc9EL+Lvp6dzrDvSFBT6lJSp+HFOny/0PXqM80=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=TvkGwyI/bJ8jPoeICb1Yyhvxh1W+nmstrhrN+XK6sVc+JahASPny4k/ZoWpW8tt7PmCJXTF/QSdom5jsu1BvBFAUuo+iafGPjZMBWEZmE47FbkolaYIe1z38JUjcH04yR/5FvaondRXFtg73ZNMFNJ1ZZcSHN0ePAz2/KnKyYZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FmON90Og; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715073975;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=kBYE1Jc9EL+Lvp6dzrDvSFBT6lJSp+HFOny/0PXqM80=;
+	b=FmON90OgjgPkUHnqGBQAFnPFqbiIM+/tO5H9KKJrx5zSHkAi0kCwxWoKOVqt9Ie+yU7HoY
+	1f6PdRb3PW7vHp4nTur+pLeX36BaSglRd0NDy2JF3+Jj1EaHCIVJ8GTDUCRm8m6ow1/XRQ
+	WR2oyV5k0B4NRS5rLKXMyiBat3D5ius=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-104-YDrtVfrkPiOPiH1YW2kAjA-1; Tue, 07 May 2024 05:26:13 -0400
+X-MC-Unique: YDrtVfrkPiOPiH1YW2kAjA-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-34ef7d11a78so252073f8f.3
+        for <netdev@vger.kernel.org>; Tue, 07 May 2024 02:26:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715073972; x=1715678772;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kBYE1Jc9EL+Lvp6dzrDvSFBT6lJSp+HFOny/0PXqM80=;
+        b=E1wuj3m9GvCbNAelQGtNik2M3ac2hlxRmNxAgQbWqlTA/O4zsWAZ0jbv+Se3XcWVTh
+         4oQRB4RJ+YP1pJY8z6VOxV6jFZDvqFjJ6yxsx5bR431yD7SvLpVH5O9zBYkbAzM+K6yM
+         F7Tkxn16cIrr9IczVUgItszkqzdAuCcjVTj1abGXcT8qIAUFhVwPwDMbpG9MttZFPUXo
+         yycikpOm1O8tho4TRpx4IRNMnodcrD7dtQ1F487lxC4sNvxxbes/q37ySwqcP/Pb2VAd
+         7z2SV9pIHSlQYmEl6uz8El5Mvo0JtqtWxaW6MDGB8lqvaESmMd1xHd1NdcVqpJ8cIW6K
+         fM9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWA7cm4bTle95vVyIHE+BcMU+TgsSNgs4TqtSz/Hsuo5wMCXQsIWBaSYDiqSMWnvTdtpkRgdNXc91fmlkWjDZkUM3a9s8S6
+X-Gm-Message-State: AOJu0YzoEXXqhz4ZAbpfSyTYHi8NprzeMNJPRZnbt9NCts17yQmThKQh
+	EQKx02rDnkh5FjCRBDfOK4Mft5zSQ4kXMbEa4lCZADHzzUSRNEVP41+PFjI6dAjklbPScKSnxhJ
+	YoftffK8KIguqzRIDtltcRYVuhDRkALukOgo9a1f+mdFqAmb3CxCoJA==
+X-Received: by 2002:a05:6000:1e85:b0:34d:707c:9222 with SMTP id dd5-20020a0560001e8500b0034d707c9222mr8067094wrb.2.1715073972545;
+        Tue, 07 May 2024 02:26:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFmWF4Zlvsdk9zMF6bVCUbpJSefWMonUomkf4F3VkdPenUbVTYlJVMQlDaWGFJLz+S8dJzOHQ==
+X-Received: by 2002:a05:6000:1e85:b0:34d:707c:9222 with SMTP id dd5-20020a0560001e8500b0034d707c9222mr8067079wrb.2.1715073972154;
+        Tue, 07 May 2024 02:26:12 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b09b:b810::f71])
+        by smtp.gmail.com with ESMTPSA id n13-20020a5d420d000000b00346f9071405sm12539067wrq.21.2024.05.07.02.26.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 May 2024 02:26:11 -0700 (PDT)
+Message-ID: <89e0117a970a56bc2de521bbc6f13dfe03b33373.camel@redhat.com>
+Subject: Re: [PATCH net-next 3/8] rtnetlink: do not depend on RTNL for
+ IFLA_TXQLEN output
+From: Paolo Abeni <pabeni@redhat.com>
+To: Simon Horman <horms@kernel.org>, Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>,  netdev@vger.kernel.org, eric.dumazet@gmail.com
+Date: Tue, 07 May 2024 11:26:10 +0200
+In-Reply-To: <20240505144334.GA67882@kernel.org>
+References: <20240503192059.3884225-1-edumazet@google.com>
+	 <20240503192059.3884225-4-edumazet@google.com>
+	 <20240505144334.GA67882@kernel.org>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
+ 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
+ iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
+ sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- =?UTF-8?Q?J=C3=B6rg_Reuter?= <jreuter@yaina.de>,
- Paolo Abeni <pabeni@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
- Lars Kellogg-Stedman <lars@oddbit.com>, Simon Horman <horms@kernel.org>
-References: <c1d18fcf1bf6ef65264ba992172ea1636dbf5431.1715065005.git.duoming@zju.edu.cn>
-Subject: Re: [PATCH net v5 3/4] ax25: Fix reference count leak issues of
- net_device
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <c1d18fcf1bf6ef65264ba992172ea1636dbf5431.1715065005.git.duoming@zju.edu.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:EvViN+aWJfnlUWfbeSptumUZpkz1hRT43xIcsGsraksgWefTirR
- 1qhK4MRgc6ZmxsGzPD4Kxmz1RgK6xJ9Lay8ipCqBOJ/HzA1bVM55Kg9KZ29XWLGLuSm42pW
- nafRPfJ0gP14LS47ZFxpi7/RLesqJids2+znTW22wdERYorMcE2ZgpGLLr4wRcp9LQtUl+L
- MvVAUC58/XASnG4lwQLhg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:eHzY7tsbTC0=;ywjjrQhRZCbWvmysFOg+GM/ODeM
- axDWGTwsrSWSa6g0to3P4Sd145vXKDvthSeHbEYYiPxrcCB8T8ekS5Cec7ozHldHxdr6i1hFr
- +Ap4XGpvoUMoSKRvZITfRkDwwtnHECHtVpvq5gt1/B/KGEQYureNKFTEL8FjWVvuhnYbWO86D
- NcTnSvA4MrnZlMAVR3DHioe9j2qJRIDumDx5c/Br7xMGSVqj3gFjuj/CfcIcn1Y9aD9vk29Db
- eoqIa5LaUF2AXQHhVsQ152LK06I9f6MLqtobA8yvZejIdueySMpgUbclxuzdnaeJXZVjPiXLK
- 483s5sw7EzxaRVqqHv9tyNCSZ3llJZHLLeT0VtBl+FjCHUiqWxm0Uga4ll/oWH7jUgn4NxSYc
- UNHN1twdljMIlcwn4jL14PpT6LQUU+sXO0TYs2y4sa0y3ebBxEW09EFdPjRTRQoWR9taw/I/k
- pRqDfHvdCZ9WKXwn+VXQHZhWSzNpvjYHKg55TutNb/M9mCL+eZfWL2W+B/uQLj6U3yMjkV9yC
- UnzrsAm8p3ENr/gpnCXXv31MPhTa1thk5p0jijg0ByYsO7ljzCoW7rT3F8ROISJe8l7vKcmwa
- O6Clu0bDjYOJOnpV9S/P9Zu9CX1EXIe6NZnm76zXquIB0l8ZZHH8jQ/hLYNW04Ydvmvx17Mr0
- v+CHwtuqLX1VlNDz35QrYeN0EzIrTyYyGq8+1HltAWU0bRveCArvOZW9LOv3fooFggEepnCcQ
- mhJjWAJuHBIlbOsEOIIMwWnsFRJqfUYo5JoBu2ig2B5bMEef+hcwy6pKZHih5lgGy0qZXLf44
- E+g4KnD6P3QxCLWZ70fY22VLdUQRuNnPqtFzArg6uES1s=
 
-> The ax25_dev_device_down() exists reference count leak issues of
-> the object "net_device". When the ax25 device is shutting down.
+On Sun, 2024-05-05 at 15:43 +0100, Simon Horman wrote:
+> On Fri, May 03, 2024 at 07:20:54PM +0000, Eric Dumazet wrote:
+> > rtnl_fill_ifinfo() can read dev->tx_queue_len locklessly,
+> > granted we add corresponding READ_ONCE()/WRITE_ONCE() annotations.
+> >=20
+> > Add missing READ_ONCE(dev->tx_queue_len) in teql_enqueue()
+>=20
+> Hi Eric,
+>=20
+> I am wondering if READ_ONCE(caifd->netdev->tx_queue_len)
+> is also missing from net/caif/caif_dev.c:transmit().
 
-* Please improve this wording for the final commit.
+I agree such read is outside the rtnl lock and could use a READ_ONCE
+annotation. I think it's better to handle that as an eventual follow-up
+instead of blocking this series.
 
-* Do you refer to a single issue here?
+Thanks,
 
-Regards,
-Markus
+Paolo
+
 
