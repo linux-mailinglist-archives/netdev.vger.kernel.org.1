@@ -1,109 +1,98 @@
-Return-Path: <netdev+bounces-93994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-93999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AB908BDDC7
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:09:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40EA28BDDF7
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 11:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEF4F281C5D
-	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:09:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 711341C21874
+	for <lists+netdev@lfdr.de>; Tue,  7 May 2024 09:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 701CF14D6E6;
-	Tue,  7 May 2024 09:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D8714D6F9;
+	Tue,  7 May 2024 09:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="ArLEAsdz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF976BFC0;
-	Tue,  7 May 2024 09:09:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F9214D451;
+	Tue,  7 May 2024 09:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715072963; cv=none; b=XfaNe3/xzzr7IZMRqK/2TDGgB3QlwewDolSed2LD52hVvfUNuvHs1lhjZf8yVd73/FgQsy/6SnXn2ndKzugOIn1OEhphLYzXD84VOD3t8athG7ZEsmw89sJ+JwChzh9zEoPPuivH5+DVtwCVAgkVsWicUc7p81x30q7BnZDXrkM=
+	t=1715073616; cv=none; b=bYUaH3Sc6Jwk9kN+aOJ0RMoUChUu9ty24k4PDNr/bpWIv+PcfJOZODx+eG0O4Wj+/DfrDE51tV9a/0xgBYGh6iP8dI2kXbGBFHjX+tMxE9vWRLgnSv2UvAytapsulEBEIQ1YU2N/eC+hycXlpEPNWNF1xDeDKUVU9AHbgHmteYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715072963; c=relaxed/simple;
-	bh=0L9VIcNji6Ae28xW1QP08XAInwJIp5n5Epon4SaYRxY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qHdLsDAQX5qqqZ1Q9Vi7HK4pwR8YN6+9VXEz70dZ2bJVluZSHEzg4NucqLPFF4LLDDVJV8iVHaoXjAGZi+JcMBIslNfWzEf81wDvdUP4xYftC2Re999HLACjA2UM5nJ3gKOdAODyiKPfbowgC3n5iIiLMImshzHHNa9gBa+jjVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49A7BC2BBFC;
-	Tue,  7 May 2024 09:09:20 +0000 (UTC)
-Date: Tue, 7 May 2024 05:09:17 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: <xu.xin16@zte.com.cn>
-Cc: <kuba@kernel.org>, <horms@kernel.org>, <davem@davemloft.net>,
- <mhiramat@kernel.org>, <dsahern@kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <yang.yang29@zte.com.cn>, <he.peilin@zte.com.cn>,
- <liu.chun2@zte.com.cn>, <jiang.xuexin@zte.com.cn>,
- <zhang.yunkai@zte.com.cn>, <kerneljasonxing@gmail.com>,
- <fan.yu9@zte.com.cn>, <qiu.yutan@zte.com.cn>, <ran.xiaokai@zte.com.cn>,
- <zhang.run@zte.com.cn>, <wang.haoyi@zte.com.cn>, <si.hao@zte.com.cn>,
- <lu.zhongjun@zte.com.cn>
-Subject: Re: [PATCH net-next v9] net/ipv4: add tracepoint for icmp_send
-Message-ID: <20240507050917.238a0891@rorschach.local.home>
-In-Reply-To: <202405071541038433DpxXxFl-a_4XcQGTy_BU@zte.com.cn>
-References: <202405071541038433DpxXxFl-a_4XcQGTy_BU@zte.com.cn>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1715073616; c=relaxed/simple;
+	bh=sGf8/xmI8qDULHoJO68RRuCV/ofbkTSGYEIclQqzzuI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cags6hqHaeghlQcYlldB4CqFEBD2HmBvvkhg/kxwTBnjhpnNmNIxdMegEokgSXqRkGdxJW+RlLMhDw10w1YvtmXUjWISRQgItBXnGySOnHv4MFj7cDMljc1hirAT/7WfYp2SNJ1jo8RbH3nSxSP330rhuSEei0ik+eE9iu7LgoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=ArLEAsdz; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id A545488662;
+	Tue,  7 May 2024 11:12:19 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1715073140;
+	bh=gIiuGYeGovNn1vn+AbPqA/C3xilWFjjooh3cCUPXJPg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ArLEAsdz4l92leGhoyWDkV8sQUhnYA6o1EJlEc+Br8rlw2eUYYZMZgW4mqRKDmgjL
+	 tnyz4BaMDumIT1Ail6J+uruYZrQu8Q0zPp/cAbJH7DRcauhTJq3h0HNxUotlRh16YK
+	 UjNjF86KrS3u8F6oaviOfdUNyo43Ose8mw+U65qIvSTUtFtFZ4MWy6SHMLWIe1aTgN
+	 JS/dCdyB9QRlS23UJxlg4Obb3z1R1fjut4IjJXAuozq6lnheq7lM8kyWPmlQ+Aq+vk
+	 FCxNql/j7uLcY1IaUkgdF5gmpeRh7Xvt/5EfC/x/hkrT2z1dZwg9HWw40lyflk+fh0
+	 qAb65qHsZdeYg==
+From: Lukasz Majewski <lukma@denx.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [net-next PATCH] test: hsr: Call cleanup_all_ns when hsr_redbox.sh script exits
+Date: Tue,  7 May 2024 11:11:55 +0200
+Message-Id: <20240507091155.3504198-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Tue, 7 May 2024 15:41:03 +0800 (CST)
-<xu.xin16@zte.com.cn> wrote:
+Without this change the created netns instances are not cleared after
+this script execution. To fix this problem the cleanup_all_ns function
+from ../lib.sh is called.
 
-> From: Peilin He <he.peilin@zte.com.cn>
->=20
-> Introduce a tracepoint for icmp_send, which can help users to get more
-> detail information conveniently when icmp abnormal events happen.
->=20
-> 1. Giving an usecase example:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> When an application experiences packet loss due to an unreachable UDP
-> destination port, the kernel will send an exception message through the
-> icmp_send function. By adding a trace point for icmp_send, developers or
-> system administrators can obtain detailed information about the UDP
-> packet loss, including the type, code, source address, destination addres=
-s,
-> source port, and destination port. This facilitates the trouble-shooting
-> of UDP packet loss issues especially for those network-service
-> applications.
->=20
-> 2. Operation Instructions:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-> Switch to the tracing directory.
->         cd /sys/kernel/tracing
-> Filter for destination port unreachable.
->         echo "type=3D=3D3 && code=3D=3D3" > events/icmp/icmp_send/filter
-> Enable trace event.
->         echo 1 > events/icmp/icmp_send/enable
->=20
-> 3. Result View:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->  udp_client_erro-11370   [002] ...s.12   124.728002:
->  icmp_send: icmp_send: type=3D3, code=3D3.
->  From 127.0.0.1:41895 to 127.0.0.1:6666 ulen=3D23
->  skbaddr=3D00000000589b167a
->=20
-> Signed-off-by: Peilin He <he.peilin@zte.com.cn>
-> Signed-off-by: xu xin <xu.xin16@zte.com.cn>
-> Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
-> Cc: Yang Yang <yang.yang29@zte.com.cn>
-> Cc: Liu Chun <liu.chun2@zte.com.cn>
-> Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
-> ---
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
+---
+ tools/testing/selftests/net/hsr/hsr_redbox.sh | 2 ++
+ 1 file changed, 2 insertions(+)
 
-=46rom just a tracing point of view:
+diff --git a/tools/testing/selftests/net/hsr/hsr_redbox.sh b/tools/testing/selftests/net/hsr/hsr_redbox.sh
+index 52e0412c32e6..db69be95ecb3 100755
+--- a/tools/testing/selftests/net/hsr/hsr_redbox.sh
++++ b/tools/testing/selftests/net/hsr/hsr_redbox.sh
+@@ -86,6 +86,8 @@ setup_hsr_interfaces()
+ check_prerequisites
+ setup_ns ns1 ns2 ns3
+ 
++trap cleanup_all_ns EXIT
++
+ setup_hsr_interfaces 1
+ do_complete_ping_test
+ 
+-- 
+2.20.1
 
-Reviewed-by: Steven Rostedt (Google) <rostedt@goodmis.org>
-
--- Steve
 
