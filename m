@@ -1,83 +1,79 @@
-Return-Path: <netdev+bounces-94608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAAEE8BFFD6
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 16:23:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49AE68BFFDB
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 16:25:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 549EE1F223EA
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 14:23:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBFC828486B
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 14:25:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C34385279;
-	Wed,  8 May 2024 14:23:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EEE785626;
+	Wed,  8 May 2024 14:25:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="foVciofR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T9z0Xtzh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160CE54FA3
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 14:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963C78563D;
+	Wed,  8 May 2024 14:25:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715178215; cv=none; b=kgEG3kJmTr/zWAmwwjWFuy6aJXkyGYq0zLonoAk1A/aVxhoJA4kdHjp3g27ink+1to4PXO1jxBROoAo2XcwC8a3sNJSzFcqpsIY7QRqe4GyfizrgRQ1Er246PGvRGyMKCG1b6fYK9P84LGdWhtJZBOuGqgImA3vf3Bf2QXXyat8=
+	t=1715178308; cv=none; b=U5HcZ+nwfFyODU/1ldNcZpbbwQpc071KxHINqxtlqj9SRLjU7uaR2zkpBdo8m1gNbERR1+oj/K1KIbh58gyasD+CXD1/QF/a51BNI/l/ABPyRMO2weSmmJDhKcnDH3I6aDHyHM29wMX1hvAjHhArhzuyOVQ47tfZfyzPkoDpfoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715178215; c=relaxed/simple;
-	bh=8fH6jRdDmbAnB9N28iTR7F5I1XJIrOvaMZXp3yLpkDI=;
+	s=arc-20240116; t=1715178308; c=relaxed/simple;
+	bh=Q8EdklBvi0mIChkWeowYvf8T5q15r9lrjv+MIn+aa8A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vq8dyAi4mKXWtp7iiC8c+9ACegyvUu7tTawVdayJW7UyXus+F7kCJu2Q5cdRWIhdQDNAIm9nIe/kXWkbh7yOfNX8NqYXBE3glwhCigLeoZPZttk91bnfQfcU/U3xjqgwp0gLJ08DCn6neMSkD1JKu6L/s46pBQcLv3Loy4yEow8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=foVciofR; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6ed9fc77bbfso3329412b3a.1
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 07:23:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715178213; x=1715783013; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yWFDb/XC5HCMPYI0Z8fskivsrqr1wR3MQAkFu/Af6yE=;
-        b=foVciofRW7DRjbC/BSkG9dV7FNXAzgMYWS1BsMaBAl9SIL7+aWBEsh/9zfxSnxcXhL
-         nClIJnrR9Fa8rDTAbAqk2OwTjEEnJ5wS1gL1hh3cJPJvtthIIxiEy9gWb7JTkz/gNilI
-         gqCEJm33xTQL2zir71JX+ISDtohJU+g8gEuYQxju//ChaFVEVdM3JW3tkeIgOqg2edpA
-         ZnlbY6ZLb95BvrK5nQA8fAgeQfKlrCCr9crKz+0daoPb7qXyvdcGyjxLvMFeCbhxLL/6
-         jBRWjrQ7bnystCFYsAQSXVhjfWLJDS+V8MDy0t7WZrt4ZPsBRuc+Fk4S0SWXJkpm2HRp
-         Ajaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715178213; x=1715783013;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yWFDb/XC5HCMPYI0Z8fskivsrqr1wR3MQAkFu/Af6yE=;
-        b=Bl4XHTTrmGwEu81ck+qP7cUryITpEMz6fsucAADgvNTcyWWvig3ULSoSBFYefDJiyh
-         b2BUwVBeig1GJEg1JtmY9DKCX7S9M5yde3w+6Exzx+e1Hc42CmD/qGIxhvIqSfrQ8As+
-         XNCc7IrleerxMyTzS1R6Pony07+UPlotZe2QyYgkg/zl+ibSes1aRYhAic19dpVecE5e
-         0JN2hOy/wDF1GoCNiXbjmg08fjrIQKZF9HQaH58AAKF0TRhUpysiOlb3jJqQuVSeFbwN
-         Hk/L6LD7tB29nUA/t1ssQHFcv+S8MpZODPNRzBDY/CNh99rjuyNjm0uzYBNeVb9CWgWQ
-         snGg==
-X-Gm-Message-State: AOJu0YwZULZTr4Frd8yT2o6EBYWf+CUsiRyLhsyL2u1wGgMaYrpywyQg
-	5ccPMqh12O5icsYNJA8OhNJIK1HpwTOiKsRAO/nu+gdFORyXxzEX
-X-Google-Smtp-Source: AGHT+IHAPmTfJDMlM8sVXwx0ivcH90uQ9i9aIyXyCPz0EQ7bDzwCfk1kONesK1XvFOXFIw0rrh8gCQ==
-X-Received: by 2002:a05:6a20:9c8d:b0:1af:a35b:a34f with SMTP id adf61e73a8af0-1afc8d4e5a3mr3300831637.25.1715178213035;
-        Wed, 08 May 2024 07:23:33 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d13-20020aa7868d000000b006f49c07f9dasm1684351pfo.21.2024.05.08.07.23.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 07:23:32 -0700 (PDT)
-Date: Wed, 8 May 2024 22:23:28 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vasiliy Kovalev <kovalev@altlinux.org>,
-	Guillaume Nault <gnault@redhat.com>
-Subject: Re: [PATCHv2 net] ipv6: sr: fix invalid unregister error path
-Message-ID: <ZjuK4AT-B_NQmFkb@Laptop-X1>
-References: <20240508025502.3928296-1-liuhangbin@gmail.com>
- <ZjtG3iQywq2xll6H@hog>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FDIbMmWg6jnmIp48eRKyzxPBHGFJRFXYdvHzu1HkHhWWTmMAGobgkBQvdr4L35e2meA9FO2vtUj9+n2T63570IfEPzJSHlWeXYXXtjcjB3pNN2x0X3SdaGeKnI06mM5U+uc9k+E4Xq/09igzVZGV4BvEE7z1qEeQZRBXcJGMOCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T9z0Xtzh; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715178307; x=1746714307;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Q8EdklBvi0mIChkWeowYvf8T5q15r9lrjv+MIn+aa8A=;
+  b=T9z0XtzhoBVtTcJMYAbXL/ZZj4kcom3p1RnC1JU6y315BBN/kbd/2b7h
+   QAYxGn2rJ29BZvB9n3G+g+DqyhYAE9FqIlcvM8k5lphxEqJVKQvViY8Yp
+   UpXKnPZ0RDrFO55RXlFD//DSrrRS/osWJBYDnkxKB55sXHsqtN/PNzfHH
+   prZBo4+SF3crUkp8j6C3Fcz4O+YVRokhV7Nnhtf5hZlvFL8o/QnN3wV2H
+   okqMaKmQCce8hX/r48lPWLgPhpbx6dTWCOsSCrJpUSqTR4hTNXigJw252
+   cNo9oo8Kxv3fJin3fVMmKzAqweC5kvPoJNayaD7X7WkrVaUJ+MjF8h1Vo
+   Q==;
+X-CSE-ConnectionGUID: em56PmwQRS61XQzFIPOk8w==
+X-CSE-MsgGUID: A/StZNDHT2qAuXjQdNLAWQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11067"; a="13989191"
+X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
+   d="scan'208";a="13989191"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 07:25:06 -0700
+X-CSE-ConnectionGUID: Or+Y93ZeT4CuhZFdQnXcew==
+X-CSE-MsgGUID: JdmqQmIHSvyVq4Yik03rsw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
+   d="scan'208";a="60070546"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 08 May 2024 07:25:02 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s4iE8-0003ck-0U;
+	Wed, 08 May 2024 14:25:00 +0000
+Date: Wed, 8 May 2024 22:24:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ziwei Xiao <ziweixiao@google.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, jeroendb@google.com,
+	pkaligineedi@google.com, shailend@google.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	willemb@google.com, hramamurthy@google.com, rushilg@google.com,
+	ziweixiao@google.com, jfraker@google.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 4/5] gve: Add flow steering adminq commands
+Message-ID: <202405082251.rL1Lk120-lkp@intel.com>
+References: <20240507225945.1408516-5-ziweixiao@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,66 +82,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZjtG3iQywq2xll6H@hog>
+In-Reply-To: <20240507225945.1408516-5-ziweixiao@google.com>
 
-On Wed, May 08, 2024 at 11:33:18AM +0200, Sabrina Dubroca wrote:
-> > ---
-> > v2: define label out_unregister_genl in CONFIG_IPV6_SEG6_LWTUNNEL(Sabrina Dubroca)
-> > ---
-> >  net/ipv6/seg6.c | 5 +++--
-> >  1 file changed, 3 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/net/ipv6/seg6.c b/net/ipv6/seg6.c
-> > index 35508abd76f4..6a80d93399ce 100644
-> > --- a/net/ipv6/seg6.c
-> > +++ b/net/ipv6/seg6.c
-> > @@ -551,8 +551,8 @@ int __init seg6_init(void)
-> >  #endif
-> >  #ifdef CONFIG_IPV6_SEG6_LWTUNNEL
-> >  out_unregister_genl:
-> > -	genl_unregister_family(&seg6_genl_family);
-> >  #endif
-> > +	genl_unregister_family(&seg6_genl_family);
-> 
-> Sorry, I didn't notice when you answered my comment yesterday, but
-> this will create unreachable code after return when
-> CONFIG_IPV6_SEG6_LWTUNNEL=n and CONFIG_IPV6_SEG6_HMAC=n:
+Hi Ziwei,
 
-Oh.. Didn't notice this...
+kernel test robot noticed the following build warnings:
 
-> 
-> out:
-> 	return err;
-> 	genl_unregister_family(&seg6_genl_family);
-> out_unregister_pernet:
-> 	unregister_pernet_subsys(&ip6_segments_ops);
-> 	goto out;
-> 
-> 
-> (stragely, gcc doesn't complain about it, I thought it would)
+[auto build test WARNING on net-next/main]
 
-Yes, I also complied the patch with not complain, so I just posted it.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ziwei-Xiao/gve-Add-adminq-mutex-lock/20240508-071419
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240507225945.1408516-5-ziweixiao%40google.com
+patch subject: [PATCH net-next 4/5] gve: Add flow steering adminq commands
+config: arm-allyesconfig (https://download.01.org/0day-ci/archive/20240508/202405082251.rL1Lk120-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240508/202405082251.rL1Lk120-lkp@intel.com/reproduce)
 
-> 
-> 
-> The only solution I can think of if we want to avoid it is ugly:
-> 
->  #ifdef CONFIG_IPV6_SEG6_LWTUNNEL
->  out_unregister_genl:
->  #endif
-> +#if IS_ENABLED(CONFIG_IPV6_SEG6_LWTUNNEL) || IS_ENABLED(CONFIG_IPV6_SEG6_HMAC)
->  	genl_unregister_family(&seg6_genl_family);
-> +#endif
->  out_unregister_pernet:
->  	unregister_pernet_subsys(&ip6_segments_ops);
->  	goto out;
-> 
-> (on top of v2)
-> 
-> For all other cases your patch looks correct.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405082251.rL1Lk120-lkp@intel.com/
 
-Thanks, I will check if there are any other workaround. If not, I will do
-like what you said.
+All warnings (new ones prefixed by >>):
 
-Hangbin
+   drivers/net/ethernet/google/gve/gve_adminq.c: In function 'gve_adminq_process_flow_rules_query':
+>> drivers/net/ethernet/google/gve/gve_adminq.c:1259:15: warning: variable 'descriptor_end' set but not used [-Wunused-but-set-variable]
+    1259 |         void *descriptor_end, *rule_info;
+         |               ^~~~~~~~~~~~~~
+
+
+vim +/descriptor_end +1259 drivers/net/ethernet/google/gve/gve_adminq.c
+
+  1248	
+  1249	/* In the dma memory that the driver allocated for the device to query the flow rules, the device
+  1250	 * will first write it with a struct of gve_query_flow_rules_descriptor. Next to it, the device
+  1251	 * will write an array of rules or rule ids with the count that specified in the descriptor.
+  1252	 * For GVE_FLOW_RULE_QUERY_STATS, the device will only write the descriptor.
+  1253	 */
+  1254	static int gve_adminq_process_flow_rules_query(struct gve_priv *priv, u16 query_opcode,
+  1255						       struct gve_query_flow_rules_descriptor *descriptor)
+  1256	{
+  1257		struct gve_flow_rules_cache *flow_rules_cache = &priv->flow_rules_cache;
+  1258		u32 num_queried_rules, total_memory_len, rule_info_len;
+> 1259		void *descriptor_end, *rule_info;
+  1260	
+  1261		total_memory_len = be32_to_cpu(descriptor->total_length);
+  1262		if (total_memory_len > GVE_ADMINQ_BUFFER_SIZE) {
+  1263			dev_err(&priv->dev->dev, "flow rules query is out of memory.\n");
+  1264			return -ENOMEM;
+  1265		}
+  1266	
+  1267		num_queried_rules = be32_to_cpu(descriptor->num_queried_rules);
+  1268		descriptor_end = (void *)descriptor + total_memory_len;
+  1269		rule_info = (void *)(descriptor + 1);
+  1270	
+  1271		switch (query_opcode) {
+  1272		case GVE_FLOW_RULE_QUERY_RULES:
+  1273			rule_info_len = num_queried_rules * sizeof(*flow_rules_cache->rules_cache);
+  1274	
+  1275			memcpy(flow_rules_cache->rules_cache, rule_info, rule_info_len);
+  1276			flow_rules_cache->rules_cache_num = num_queried_rules;
+  1277			break;
+  1278		case GVE_FLOW_RULE_QUERY_IDS:
+  1279			rule_info_len = num_queried_rules * sizeof(*flow_rules_cache->rule_ids_cache);
+  1280	
+  1281			memcpy(flow_rules_cache->rule_ids_cache, rule_info, rule_info_len);
+  1282			flow_rules_cache->rule_ids_cache_num = num_queried_rules;
+  1283			break;
+  1284		case GVE_FLOW_RULE_QUERY_STATS:
+  1285			priv->num_flow_rules = be32_to_cpu(descriptor->num_flow_rules);
+  1286			priv->max_flow_rules = be32_to_cpu(descriptor->max_flow_rules);
+  1287			return 0;
+  1288		default:
+  1289			return -EINVAL;
+  1290		}
+  1291	
+  1292		return  0;
+  1293	}
+  1294	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
