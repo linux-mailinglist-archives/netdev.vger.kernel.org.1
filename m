@@ -1,110 +1,104 @@
-Return-Path: <netdev+bounces-94534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62DE18BFC8D
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:45:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 86FE18BFCB0
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:53:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E5C2287745
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 11:45:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B7F1285F6E
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 11:53:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9475F7E105;
-	Wed,  8 May 2024 11:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF85D82876;
+	Wed,  8 May 2024 11:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d2DkkJds"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="LxTz7Km0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E48881AD0;
-	Wed,  8 May 2024 11:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CDF823D1
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 11:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715168726; cv=none; b=MXzaw++NvXtDKz//J5U6qdxu/ldh9OsjQ0hI4PPIuQo1Lb7iFQVc84Lmw8aOXvA0o0riFWmJHBarHzrMuS+DErgYPDIAiqIY5eDjjuQXcowKPCs+eOO5YwNWWCxZ60X/mpGD44DjxYoNixXcFrAKKNDg1DOh4Iylmn0DNVlC4vM=
+	t=1715169207; cv=none; b=mTn+VI6BJBbilo30sF1FqE+6nXP49EiktE9+al8knYtMgoajSjCvYdfWm67w4IQ2CLdNwoQG4fA1niW1jWv9DibntIq6icJIVHPcEuuXXrmV0XB809E/O97NNT2uHsYtcml8TCl5lzjLImf7P3I93Jtfqsk6gquQY4pZgVlYvL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715168726; c=relaxed/simple;
-	bh=ysQMPzsDmdSKglgataWxi6Vk6YGZw5N5O//e4R4eqdg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h31LE0W5myDk31eLoZ5Ntx2iCc/T8kwULMPHSD1fDDs7yIdr5Ya4ixgTmFm5HyP7ZoYACCRbQ+j9IL5wGLyfq2N6LJU6gxVKWwYlNHh1pYBZguFmzZz5CrN4ulVCXZdADMR8LO5qrlUMOTKgTRd3sUcfAPPjS16lDfqjMdDk53U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d2DkkJds; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715168725; x=1746704725;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ysQMPzsDmdSKglgataWxi6Vk6YGZw5N5O//e4R4eqdg=;
-  b=d2DkkJdsdllueGRiR1xNHD2oWYmAgKowBaSWfZ8lF9R/cMyV15d2nOPj
-   mcX/r7PQ+nwOh5vAsJ1Q4JD0+cqfgjqmPdyhtVAj4ayh3LxN9aEF7s7qw
-   f3osq33a1gz1QcHewI4Yz6A5J2rEMlan88JP6C5PlWsuMbyHHHMRj5qUy
-   9laamy2wPGJQW/Zm6jNJAr7NipWNkmmY3Eaz86NvXLXsBkAqs8QosxMTS
-   IflEhgXVXjn2vlEbDrxRn/WO5yKzffiJsf5TDJ+6zlhOaLjFxOElnmMR7
-   Jo0Ml6Nwio9bkyzx/H4/PvcVxug8VbmZHXnSQfBCAnz8N8fGUlCUheLw9
-   A==;
-X-CSE-ConnectionGUID: LGvDU9NdRByURblp/td/sA==
-X-CSE-MsgGUID: 7JXF34PQSgGSVAr66k8Rvw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="11234275"
-X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
-   d="scan'208";a="11234275"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 04:45:25 -0700
-X-CSE-ConnectionGUID: IHQsn8PmQdWC0SWNtEbnJg==
-X-CSE-MsgGUID: NDgYrUWXQdykbmw35d1DeA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
-   d="scan'208";a="33697538"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa004.jf.intel.com with ESMTP; 08 May 2024 04:45:22 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 892E611F; Wed, 08 May 2024 14:45:21 +0300 (EEST)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH net-next v1 1/1] net: ethernet: adi: adin1110: Replace linux/gpio.h by proper one
-Date: Wed,  8 May 2024 14:45:19 +0300
-Message-ID: <20240508114519.972082-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1336.g36b5255a03ac
+	s=arc-20240116; t=1715169207; c=relaxed/simple;
+	bh=3vlV/UT8Lz7AZ0zWr7NTiNZWlDGBoZmP3MuofEiQPCI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GH8QdeVYgEIDjdr05/56CGEdBLPbEo1Ve+qhzvKavJth2P4keGvWNCgrtqZHu7xM/OeR1bFTiwF4NMjKEhlDRjMZyScAi09HpIh+/5wUKZhH1fbMOSYBMntS0pBfasAfqFR5H8E/ZMDCjmX4+jLhc7YSiW0jE74BB2nvewHa0PQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=LxTz7Km0; arc=none smtp.client-ip=185.125.188.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from [192.168.0.106] (unknown [114.249.184.67])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 650764211B;
+	Wed,  8 May 2024 11:53:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1715169195;
+	bh=kHXiE4/6/Qns30RL6w55nzWStI9TW1oLIKxwXtctZhA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type;
+	b=LxTz7Km0+6VK7u8Fgn0fh009jO7b0dUH6hNmG+kXRF2AQ5aNFzaTubJQvNoCjnFLT
+	 rZJuWOQjuGoUkfko7VB80tBERGi9Lo2pCB0wiZY7gaNGeAvVOKMyKo1L5uHhF2kg3j
+	 Qh+mBL5phJ7eZEX/C/eZ9kx0nko7sOPqNBrnLPd2PNseW/1UtC4Zas/ZNLj5vWmePC
+	 INCG6+48g4VDiffenD34VjGZZV0+nZ2VvqELdBEwiZ3vaxjHsJMvBqafBUvI8U1f+T
+	 S/uWA8ILM1umkvTOMWummxSqEzh22ZACSEWXswvUOlAoeCTqqtABKLOn/msQmtG2nW
+	 1EEqoh5ljPVRw==
+Message-ID: <71001a25-34f1-48ea-b35b-049ee35335c1@canonical.com>
+Date: Wed, 8 May 2024 19:53:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] e1000e: move force SMBUS near the end of enable_ulp
+ function
+To: Jakub Kicinski <kuba@kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ netdev@vger.kernel.org, sasha.neftin@intel.com, dima.ruinskiy@intel.com,
+ Vitaly Lifshits <vitaly.lifshits@intel.com>,
+ Naama Meir <naamax.meir@linux.intel.com>
+References: <20240506172217.948756-1-anthony.l.nguyen@intel.com>
+ <20240507192112.3c3ee4f2@kernel.org>
+Content-Language: en-US
+From: Hui Wang <hui.wang@canonical.com>
+In-Reply-To: <20240507192112.3c3ee4f2@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-linux/gpio.h is deprecated and subject to remove.
-The driver doesn't use it directly, replace it
-with what is really being used.
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/ethernet/adi/adin1110.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 5/8/24 10:21, Jakub Kicinski wrote:
+> On Mon,  6 May 2024 10:22:16 -0700 Tony Nguyen wrote:
+>> The commit 861e8086029e ("e1000e: move force SMBUS from enable ulp
+>> function to avoid PHY loss issue") introduces a regression on
+>> CH_MTP_I219_LM18 (PCIID: 0x8086550A). Without this commit, the
+> Referring to the quoted commit as "this commit" is pretty confusing.
+>
+Will change it in the v2.
+>> ethernet works well after suspend and resume, but after applying the
+>> commit, the ethernet couldn't work anymore after the resume and the
+>> dmesg shows that the NIC Link changes to 10Mbps (1000Mbps originally):
+>> [   43.305084] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Up 10 Mbps Full Duplex, Flow Control: Rx/Tx
+>>   release:
+>> +	/* Switching PHY interface always returns MDI error
+>> +	 * so disable retry mechanism to avoid wasting time
+>> +	 */
+>> +	e1000e_disable_phy_retry(hw);
+>> +
+>> +	/* Force SMBus mode in PHY */
+>> +	ret_val = e1000_read_phy_reg_hv_locked(hw, CV_SMB_CTRL, &phy_reg);
+>> +	if (ret_val)
+>> +		goto release;
+> Looks like an infinite loop waiting to happen.
 
-diff --git a/drivers/net/ethernet/adi/adin1110.c b/drivers/net/ethernet/adi/adin1110.c
-index 8b4ef5121308..0713f1e2c7f3 100644
---- a/drivers/net/ethernet/adi/adin1110.c
-+++ b/drivers/net/ethernet/adi/adin1110.c
-@@ -11,10 +11,10 @@
- #include <linux/crc8.h>
- #include <linux/etherdevice.h>
- #include <linux/ethtool.h>
-+#include <linux/gpio/consumer.h>
- #include <linux/if_bridge.h>
- #include <linux/interrupt.h>
- #include <linux/iopoll.h>
--#include <linux/gpio.h>
- #include <linux/kernel.h>
- #include <linux/mii.h>
- #include <linux/module.h>
--- 
-2.43.0.rc1.1336.g36b5255a03ac
+Correct, will fix it in the v2.
+
+Thanks.
 
 
