@@ -1,177 +1,165 @@
-Return-Path: <netdev+bounces-94699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297108C0410
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 20:03:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF6638C0422
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 20:09:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D487E28ABC1
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 18:03:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64C251F24623
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 18:09:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9502012E1E3;
-	Wed,  8 May 2024 18:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD3F12B14B;
+	Wed,  8 May 2024 18:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DUGEar/2"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="ioXHAmxZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4330B12BF04
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 18:03:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA878128829
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 18:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715191421; cv=none; b=cXy9vXdU6Ax4WnpaWlznpK+C0+o4C6DiAro288MRFAtG37gb4j+HIGBJeWzYk1zlfv2c2Gnal7U18qgF0thRAQN959X0HkYIr5qZjOqMFKCIeYokK5t6s/4wFam/btLvJd5Ly1EW0uh+VNMp4KEjEn3e9jIL4CE14wgulEAURR8=
+	t=1715191752; cv=none; b=aQbDMq+/x9KmthJKYlYqnIQ6GieTJLZMxXFL+JAYlWbgqkkhCe5N4orvSsCeDxMNTQg2GYCpsY1or712IFLujP+bbgyH4GUbEO7Wiv/7jCty/VCuPURRJ+NKnp5Gnw6Dfocn9kl3xCW39l/Gq7RDBFaNOMUHRLYKCvlLKT1B9tU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715191421; c=relaxed/simple;
-	bh=QnIGcOGbV4cqrx4Nx/huveAV3Zfk93aDR5GKJzn4mog=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KmCKqt78tvFD/eQgKE+Ql+GV+fGXYC9jXvzh6T7rDJD7LczEeqmYzn/Zissx9Pet7LfA2NK44FXtLQwClHJqXj0R5AMqRNg/Ivz/rcna0jTppeAJHcFUJpbL+ya1PGYRtMvkRdHVe1mWaxUmeDJAMV2wbz882gp+QZ6gLrNDYQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DUGEar/2; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-572a1b3d6baso1742a12.1
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 11:03:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715191416; x=1715796216; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NKy0w8SAVZYo27FpU6ZBovVv7b8KWTwyUtyfvoxHua4=;
-        b=DUGEar/2Azn7Sk1QTNCuUDEulN/0fZl9vXB5hOQzu0/nOgrwg4fZf52/mToQDVM8qK
-         jiUsdPGqqUwvZzc5u0l9202dIYL0q+IMe7xxZmBhlXB3J5eRzxWX0fftblZOgWkxI+we
-         9XD++0LEzvNluWOsumBz40KWlPtxbPjPC1kf6Ok4aTOZesZCMqDyE4i2PbM2TmRkV77y
-         fnpSfFLerzM3rn5+E4gNgR7DEPJhXlLQCIGbBmOfFDZ+yXafG5xPNT3IZJeGT7IZdJGj
-         zytDYAaO/LVJKWnOCxxOJKkQXzbNcmOYPnzY1vzpXmWU5IB7rQ0/IA1p+LCrYBo48PLP
-         biFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715191416; x=1715796216;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NKy0w8SAVZYo27FpU6ZBovVv7b8KWTwyUtyfvoxHua4=;
-        b=OZ835IYwC5ChQfBFNXyiRia0X8nADsTIFLE3+sqnklSbZdac7/lGRBhrAJbgJRrUvU
-         ltG/3wmFFyMOtLDFRcYsbx1oOmJiUoxkCHXLz1LczoIomMzIkGUVGEgj1KX7xy25JPFr
-         HaYdwQAK/LHgybHnIDPUTb2bofi2CEciysEukHjj3PvbQ1VC9ru+w4H3W/dKiFmfXZxy
-         zKyr8UhzjkGjAx5WA7cJJoiV42zR4d0ALjFsQiL7p0200QcoWwAq3Xjeu9F7+7eKKFJr
-         89PcXcCbuNLuL1uSDIg/xRIgJjHdEW3W72ubNwKRKL9eg5n+KVOAFMBP+RwfeDXPRY+4
-         PJUg==
-X-Forwarded-Encrypted: i=1; AJvYcCWO6XNo/NqIccGJx355ESf5AifIGki+bJ0QJt3cH1PoqAOrrLr1MDuaBBjAQnvwbQNX3Rwr5eemFnoV1yKhznvcHox49/io
-X-Gm-Message-State: AOJu0Yxec0e2VgqRvSrVMRjWA8S8raPCMtFp/l80+jmDzOv94oHbL8gz
-	J7mLhIcrhrVAhsBZjOSxb7RV9q7Ue0Ea6PvIVM6XDLNFKbMLD47bi6qSw0qtISyY/FNi4MIDJj6
-	7o7fz71ynue1c0IpiI3qrMPqsu9DCY9qlxlds
-X-Google-Smtp-Source: AGHT+IFdyxKHKBA5RxjNJeg0nvw+PuOv0TpVA43qYYBbq4FC0UUJLuiCzYnH7rV9IAgiFwYJSHM5Q/yPLhYa7GrUbHY=
-X-Received: by 2002:a05:6402:1763:b0:572:554b:ec66 with SMTP id
- 4fb4d7f45d1cf-57334b922acmr1088a12.3.1715191416289; Wed, 08 May 2024 11:03:36
- -0700 (PDT)
+	s=arc-20240116; t=1715191752; c=relaxed/simple;
+	bh=5jB0MReNBDrITSrke0WnnIS1jVzv7MmrH8FRbjijGik=;
+	h=Message-ID:Date:MIME-Version:From:To:Subject:Cc:Content-Type; b=f2F5UWO9V2Azl0/8hzUdAMQqScRmwU8dv4Ls2spFe6mD5fATlV3lNyTUGvIMHdrKAoIMvWe/Zy7QuxOxC0aLTmEsGN8aSN5orgx2tb37ky2B/bSQeOTgjYkiFv98PddAxinWwXu+m+7xI+3/7mkUMW5txnXdBUurPobH7PRfGQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=ioXHAmxZ; arc=none smtp.client-ip=212.227.15.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1715191739; x=1715796539; i=hfdevel@gmx.net;
+	bh=5jB0MReNBDrITSrke0WnnIS1jVzv7MmrH8FRbjijGik=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:From:To:Subject:
+	 Cc:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=ioXHAmxZb0SLoge5nt4q6i3h6dhbCLqSzgiRF1Ki1I7uaI82bvdBOSqz8W7p7pUN
+	 YqDe9oeLNGTFgwRalvbcaaWtSVxNSe1lzeFmhNtwloaGRyXE6U+ZM36bPGmux1Z1m
+	 pas9IeTpa8er6Ux1uBG055oStt7USRAKyYQde2lSP49vxrYWKH5LHfMsnAt4xZE5f
+	 YFInFodsN8DUcWwk0tPRMo/77JT72Tm1gEeRV5yzhrNDD37hW5VPBxubxNnhsETqt
+	 qvzakVcR+iMgMA+p3hZ7UeNj2SX5DzRoYvMOQ5bGe6a/Ga14Sdc0EEd0rZ/7K8CZN
+	 LxvjxNR6gHdcI1ZHeQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MLQxN-1sLbmi0hu7-00IX3R; Wed, 08
+ May 2024 20:08:59 +0200
+Message-ID: <1f28bc3c-3489-4fc7-b5de-20824631e5df@gmx.net>
+Date: Wed, 8 May 2024 20:08:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240507214254.2787305-1-edliaw@google.com> <ZjuA3aY_iHkjP7bQ@google.com>
-In-Reply-To: <ZjuA3aY_iHkjP7bQ@google.com>
-From: Edward Liaw <edliaw@google.com>
-Date: Wed, 8 May 2024 11:03:07 -0700
-Message-ID: <CAG4es9V1578h2EgpztcoEv3CPGftbgA+HNfhgaPxBqOxP6-CrQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
-To: Sean Christopherson <seanjc@google.com>
-Cc: shuah@kernel.org, Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
-	Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Nhat Pham <nphamcs@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Christian Brauner <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>, 
-	Kees Cook <keescook@chromium.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, 
-	Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>, 
-	Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>, 
-	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	David Hildenbrand <david@redhat.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Seth Forshee <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	=?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Fenghua Yu <fenghua.yu@intel.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Muhammad Usama Anjum <usama.anjum@collabora.com>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kernel-team@android.com, 
-	linux-sound@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mm@kvack.org, linux-input@vger.kernel.org, iommu@lists.linux.dev, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-actions@lists.infradead.org, mptcp@lists.linux.dev, 
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Hans-Frieder Vogt <hfdevel@gmx.net>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Subject: Re: [PATCH net-next v5 5/6] net: tn40xx: add mdio bus support
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, horms@kernel.org,
+ kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:9wbZONoYNuw9Vy1PuV1whGUVS5OsRcpxQtgOeFx9BjKmMhbO4/Q
+ zTnEubR4tbwUFLWgfCKwMngOaE0czWNuz7WeGMMkICz6pcj+Pi7eZsEVwmFxPucSP+ePppv
+ TJpM8nDuBNwW3jjpsUONVNAfxayrJVzZzo819gvRneoatd/nWmzWUHNqwTOcJm132xX2NQ4
+ VORygeKttu6kUPSE3bBEA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:i2HirBnq3as=;Gwn4e7JiWPJwJqSi67Q6e+A5RA7
+ mfqQdH2uoImRtnCpt78pCDGKxX8ODHsSSbuTB3iMc7H5b0peVA2w8DDP9f2MOLh6Cf0Veq1n9
+ 1af305s6XLtqNC+ehBH8h00XY40qyzFnxlFDLOjM1Jm0t05ZOpjF95eRVVmaKZiqDSm+XCVe6
+ YbWxLaBxeBU8XJcgRcd3e/wy+ORnlQMR7AE/DpkT0/8LOhfqJPCym27/y1O97INbDp4Ghloy0
+ HITna2PyzVssz/JHOCbBpE4h3TkJBSeznf3vi2ifR0VJuTPcmSRLyAbfai+/3Q41KNpJZJAoa
+ yRkvw9UR7UctPzLXWlixGvF345Sukk1CV5Y8jeL5QtMz/B6jZrvQPULj6LRFs4Ncxxqq+m6kg
+ c/SiRvGw3rjJMbyZh6ZgzyASwBgCj/1PTHIyYNYzThpagKY/yGdesfpCDat/UXJp8qPuut9Rh
+ lANgwKWKn7caUv5bli0u/YLV2OrDYnhkYYUFcVb2CoBLTI+F2T/khsNTt29sITL1iJPvyluQu
+ h3H9Tg20AhjwpVLZW6Jz8GrVRL/TQ6MuFOhFSx2CiKVpOmlbNBjfw2iD2+q6KHF1jb8NNlLkw
+ Q/TCSgOKnbk8v7mEavCHNMx2veNJRg3j2h1biYXlNmXhKgnOxZN5VdbL9vOVZDAn8VblNZd4V
+ 91IutSvM6GghcLUjtt5x5cATSkB4YF40OsNbAJ2J72VAIN4S75c3LHNU9vIiENkKHldJJ30fZ
+ 75FcsQDb8+bVXfqiSS289tFUFA+q8zu/wUtolAaD1evP2Nl/LlQIuCmhhez/e9qkZ9y/7D49p
+ fPTa1lPtXWBUdUuuFBGUIe0pWLW31UVBweZiU1D0gSeLI=
 
-On Wed, May 8, 2024 at 6:47=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Tue, May 07, 2024, Edward Liaw wrote:
-> > 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
-> > asprintf into kselftest_harness.h, which is a GNU extension and needs
-> > _GNU_SOURCE to either be defined prior to including headers or with the
-> > -D_GNU_SOURCE flag passed to the compiler.
-> >
-> > v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-ed=
-liaw@google.com/
-> > v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
-> > location.  Remove #define _GNU_SOURCE from source code to resolve
-> > redefinition warnings.
-> >
-> > Edward Liaw (5):
-> >   selftests: Compile kselftest headers with -D_GNU_SOURCE
-> >   selftests/sgx: Include KHDR_INCLUDES in Makefile
-> >   selftests: Include KHDR_INCLUDES in Makefile
-> >   selftests: Drop define _GNU_SOURCE
-> >   selftests: Drop duplicate -D_GNU_SOURCE
->
-> Can you rebase this on top of linux-next?  I have a conflicting fix[*] fo=
-r the
-> KVM selftests queued for 6.10, and I would prefer not to drop that commit=
- at
-> this stage as it would require a rebase of a pile of other commits.
+ > +static int tn40_mdio_read(struct tn40_priv *priv, int port, int device=
+,
+ > +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0 u16 re=
+gnum)
+ > +{
+ > +=C2=A0=C2=A0=C2=A0 void __iomem *regs =3D priv->regs;
+ > +=C2=A0=C2=A0=C2=A0 u32 tmp_reg, i;
+ > +
+ > +=C2=A0=C2=A0=C2=A0 /* wait until MDIO is not busy */
+ > +=C2=A0=C2=A0=C2=A0 if (tn40_mdio_get(priv, NULL))
+ > +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return -EIO;
+ > +
+ > +=C2=A0=C2=A0=C2=A0 i =3D ((device & 0x1F) | ((port & 0x1F) << 5));
 
-Ok, I'll do that.
+instead of using numbers for the masks, you may use here the constants
+defined in uapi/linux/mdio.h, to make the code more understandable
 
->
-> And I doubt KVM is the only subsystem that has a targeted fix for the _GN=
-U_SOURCE
-> mess.
->
-> If we want/need to get a fix into 6.9, then IMO we should just revert 809=
-216233555
-> ("selftests/harness: remove use of LINE_MAX"), as that came in quite late=
- in the
-> 6.9 cycle, and I don't think it's feasible to be 100% confident that glob=
-ally
-> defining _GNU_SOURCE works for all selftests, i.e. we really should have =
-a full
-> cycle for folks to test.
+i =3D (device & MDIO_PHY_ID_DEVAD) | ((port << 5) & MDIO_PHY_ID_PRTAD);
 
-That sounds reasonable to me.  In this thread Tao suggested reverting
-back to 809216233555 and using a fixed value in place of LINE_MAX to
-fix 38c957f07038
-https://lore.kernel.org/linux-kselftest/20240508070003.2acdf9b4@kernel.org/
+ > +=C2=A0=C2=A0=C2=A0 writel(i, regs + TN40_REG_MDIO_CMD);
+ > +=C2=A0=C2=A0=C2=A0 writel((u32)regnum, regs + TN40_REG_MDIO_ADDR);
+ > +=C2=A0=C2=A0=C2=A0 if (tn40_mdio_get(priv, NULL))
+ > +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return -EIO;
+ > +
+ > +=C2=A0=C2=A0=C2=A0 writel(((1 << 15) | i), regs + TN40_REG_MDIO_CMD);
 
->
-> [*] https://github.com/kvm-x86/linux/commit/730cfa45b5f4
+similarly here:
+
+writel((MDIO_PHY_ID_C45 | i), regs + TN40_REG_MDIO_CMD);
+
+ > +=C2=A0=C2=A0=C2=A0 /* read CMD_STAT until not busy */
+ > +=C2=A0=C2=A0=C2=A0 if (tn40_mdio_get(priv, NULL))
+ > +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return -EIO;
+ > +
+ > +=C2=A0=C2=A0=C2=A0 tmp_reg =3D readl(regs + TN40_REG_MDIO_DATA);
+ > +=C2=A0=C2=A0=C2=A0 return lower_16_bits(tmp_reg);
+ > +}
+ > +
+ > +static int tn40_mdio_write(struct tn40_priv *priv, int port, int devic=
+e,
+ > +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0 =
+u16 regnum, u16 data)
+ > +{
+ > +=C2=A0=C2=A0=C2=A0 void __iomem *regs =3D priv->regs;
+ > +=C2=A0=C2=A0=C2=A0 u32 tmp_reg =3D 0;
+ > +=C2=A0=C2=A0=C2=A0 int ret;
+ > +
+ > +=C2=A0=C2=A0=C2=A0 /* wait until MDIO is not busy */
+ > +=C2=A0=C2=A0=C2=A0 if (tn40_mdio_get(priv, NULL))
+ > +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return -EIO;
+ > +=C2=A0=C2=A0=C2=A0 writel(((device & 0x1F) | ((port & 0x1F) << 5)),
+
+and also here, similarly:
+
+writel((device & MDIO_PHY_ID_DEVAD) | ((port << 5) & MDIO_PHY_ID_PRTAD),
+
+ > +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 regs + TN40_RE=
+G_MDIO_CMD);
+ > +=C2=A0=C2=A0=C2=A0 writel((u32)regnum, regs + TN40_REG_MDIO_ADDR);
+ > +=C2=A0=C2=A0=C2=A0 if (tn40_mdio_get(priv, NULL))
+ > +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return -EIO;
+ > +=C2=A0=C2=A0=C2=A0 writel((u32)data, regs + TN40_REG_MDIO_DATA);
+ > +=C2=A0=C2=A0=C2=A0 /* read CMD_STAT until not busy */
+ > +=C2=A0=C2=A0=C2=A0 ret =3D tn40_mdio_get(priv, &tmp_reg);
+ > +=C2=A0=C2=A0=C2=A0 if (ret)
+ > +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return -EIO;
+ > +
+ > +=C2=A0=C2=A0=C2=A0 if (TN40_GET_MDIO_RD_ERR(tmp_reg)) {
+ > +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 dev_err(&priv->pdev->dev, "MDIO =
+error after write command\n");
+ > +=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return -EIO;
+ > +=C2=A0=C2=A0=C2=A0 }
+ > +=C2=A0=C2=A0=C2=A0 return 0;
+ > +}
+
+=2D-
+Cheers,
+Hans
+
 
