@@ -1,75 +1,82 @@
-Return-Path: <netdev+bounces-94722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF32C8C061C
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 23:14:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B9D4B8C0632
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 23:23:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10EA7B20B9F
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 21:14:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CC74B23941
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 21:23:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF81131BC7;
-	Wed,  8 May 2024 21:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4EB131E2D;
+	Wed,  8 May 2024 21:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MlTPmpmn"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="psPKObxQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2040.outbound.protection.outlook.com [40.107.92.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DF4131758
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 21:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715202887; cv=none; b=tAfEZJSgvIQOMsVAdsXom7zN1ug12rszsteLwihg9nLANemXHiZTcANOqLJqcQf+BakuiTpQx8KKEsF8LJ5I6FsgoI3Y7G5C+zbepcD9TSapFJFQEB2oF0ETpLSVOfnOJsHz4OmleP6yDvSfjqNtyK/JkEblmF/dbyxAN/jbhWU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715202887; c=relaxed/simple;
-	bh=Lf9g3o9EzpktHFLwDQSctB738MtuHmSNqMhBu+cHiD8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VYiJTbS4oQ3UKlcfh2efl7esKNc6nEHj9LN1edIrvQdF9FvPFsP43mHD0YnAyCBENNuN0IeZAtSe8RBNOusbz9ZJ3vEotLL9a42QmxAiZCyp9zXXq1N8wXUpUJrCl1kKSPQOZr0aoZgqpk5cyIaU2ZfDXGqnuYYttAsudF5bOvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MlTPmpmn; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a59a934ad50so40507166b.1
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 14:14:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715202882; x=1715807682; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=bmn3LDGEv7yBVyKJ57Vpc85f+djVKRPjl//XxlxliC8=;
-        b=MlTPmpmnFz9l0FUrvaaoQFJJCKMLJ2cjrRzHJn2U+84e00tZDxSWl6cKQrkMrkqhI7
-         Gtmd90iTz17X9+SU1ecMYxkv7cHkmRY+5+F3Cr4VpDBz9Y3GJ4lIBBwnBdSfVNnPCq8O
-         yMO+bceAV4f5f7EOkDKqo3p56m3Mk2Q/4Adfv1RxI2e4GjW+5AG8PedK/zrRL77/tAfZ
-         sTZ8W8CdZWA+gFE0fZONtzvyOWNiICRjFUCEhaHi2tl+tyIkUrQ8gOvsuAc0kC6Ho1Cu
-         U9eeYsnS8zz9j6g7f5A53hBdWhw34/8EqY3aYK9llPFd8Byu5LjhHtN/ual7tTLMn7NH
-         Kq3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715202882; x=1715807682;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bmn3LDGEv7yBVyKJ57Vpc85f+djVKRPjl//XxlxliC8=;
-        b=d+mVego+6Myx/Mm8UZ37sUDkBGpKutCXEK/W+Y3DdTisjP1DFUFM2WSsN4idW3fRKb
-         cMgfPjMsnOzGknRX28IJU+cHlh07jI+ybJoUm8HzUpTvXhlNW+8Vlyy3FwaSYfprbhXW
-         W3ji/EBzqEacyTkec8M/+eo+i/QX0u5Iq/wO1pAnVtcIq0oHHo1VJzod3r43A7Hu1F7p
-         Ow5XXfxeFMgHHMjr011qj/2Rv5NwbzzpK7tgwlqn9s5XW8wk6EivwO0c5aUNFsFBPSav
-         PyFX08FgemgGTnWlbnOxlY75y5EG476MwFqK5k6Lc2U0hQHTx7N7DE1kdnlm/liC+wfr
-         +BiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUkd9Nho5tyCf7i9mIPRcUb5Qr5ebJNRKE/q7irZoKt2RmVklvN6aAS5YhHsPbMr7of7x01iYVER+tLlUdMHlZOvGktrr9W
-X-Gm-Message-State: AOJu0YwN/BsZpAuYtOvPpHk4s3fw8s/gX7PcPg1mD1TWmvS82fsd4hYa
-	4jq1CL8ejvc/zfSz8WmEkzHjNDlLW6y+WWEDQZg/RRmxJMFUx+mM/JoS5g==
-X-Google-Smtp-Source: AGHT+IG+ijx3NzvNetRTEO9tmCBiN8kHaQAF3hdpGi43va9QqSvpfuAToJp1d5ApEH1xhlM8OBk8Eg==
-X-Received: by 2002:a05:6402:5173:b0:573:1ee9:bf21 with SMTP id 4fb4d7f45d1cf-5731eea2f5dmr2478575a12.36.1715202881686;
-        Wed, 08 May 2024 14:14:41 -0700 (PDT)
-Received: from ?IPV6:2a01:c23:c5ec:1600:b431:d45e:ca48:8fa1? (dynamic-2a01-0c23-c5ec-1600-b431-d45e-ca48-8fa1.c23.pool.telefonica.de. [2a01:c23:c5ec:1600:b431:d45e:ca48:8fa1])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5733bebc318sm2512a12.37.2024.05.08.14.14.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 May 2024 14:14:40 -0700 (PDT)
-Message-ID: <f4197a6d-d829-4adf-8666-1390f2355540@gmail.com>
-Date: Wed, 8 May 2024 23:14:40 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B0C12BF23;
+	Wed,  8 May 2024 21:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715203419; cv=fail; b=Q0Ofb2k8JiQ5BlNGGpxtnn0oZtLXj3nxKxfcDm5FeaiNJ8bDfsPSnsJCx6L5PRHXqX/JtKJ3OjlTB3MztznmUlmnmGlLLfE0tl/WDkUnuDUYswzcBdFm3fEnCvDpVM6e1P2BPVkZEbKhFwrBXxxPtWjOZL8edxNaEZHRwsVdUvg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715203419; c=relaxed/simple;
+	bh=1Q8o/yPbXZ1c1kX6urJFvrXbJw0nYGkYCIRTOwENeMg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=jInmQvwphZa7V1AVIUnDrjJusjBv/0enqGr9JddSleoRDhfic11B03tlwvGgYXI+0Af1qL8NFd+iBtU8dCik6Ooiq+FrvTs6FYD9PkjyjwFv7cajUoedXMw1RtWz/4oKkI2bjiVKxgrn8I7pMeUhXBeeJru+hGV2KS5n2DAJS3E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=psPKObxQ; arc=fail smtp.client-ip=40.107.92.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ANe4hHjJ/53dF/sABv6nNxv4gMj3H7J7I9387QmpliI7VZKZUeYmkX9G9zxSm1rmYwkq4i8pTrPYkVtY2q0uXFXARNao1/CrOzPMUlQu5Wr1hcxXzTyYpXwCtJdyLDqLGjOSCt1Wn4GoQ3NYN5JvELGSVn8aCmI7jsZPqT+NYtGlqLMwYAwxCZxfgg0/BEk/zr2f8jg4rWWX3V93YqoT9wsZl2An/mUB6lU765BQaFGqQcclslsb50k+j3JX7Kibk7E636nZGLvvaxDzUWwKjGOUbwx8WhdqegyR+ivlMTqMG+F7jxXEsgmBdeUJvhJEJHHxFr5MSB2CypU+Ej3EuA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6cuVI8nLklnsaIy8DNNA4KfuSqGhFVXCYf9GP8tFTcg=;
+ b=ZykZd2OmIIQxN91XQWfwxbcyPocqgaEN9xa4/CLDq36ReDFbIRgjE01DdnVtYnVY9VISYBJpgzf52Q5H93zQDCBx8NBqxj0qEN9w8UKKCahkgl2mTYf3aMJoM8bN9NpBg1lfSPbOfKm8KUrIdx5bolVi8Na/MYeVeik8Z77QUN8iA53XaS6G9ZhrqrHNbWwsEAMp9gX6Z/cHgl2LqxMAms6F7MMzt5YHl/P24Ubd4/sS7JHsi/u6fAxDmta4cIYY26IWM1SS3tpfn3LXrXJDO7+gZnt3l4tKZlWdSe9B7b3iSvi5UAVP2oD26y0o/+pF0/IxQD0XMS4LfXTcRhekQQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6cuVI8nLklnsaIy8DNNA4KfuSqGhFVXCYf9GP8tFTcg=;
+ b=psPKObxQgEi38/D3LYE2hRQ/gIgJEz0RWCwQeUZY2ulUrztApivMnF3HXW+iLMqdL0TnPPXs9jo7WY+UifIZbzHJNy2E0pN6u89Z+plRAnNhtSyYV1NbEoVHlf+3Xwarq4YNE4Zpg2lXI1xEgron8fcFhNB3Hcxy7XyDnftrO2Wb3J39X6O4kbJ0DWnhjdvR90egkvKMJ4Nb9mG2zUpe9Qh08H6hQwyFh5FGFtlj/IN2f8/TkqK7wZWwi1O9H8AiHmWkVMTGIIo9Znt++NYGyOnCuzilPSmxjYATCtfpQfZs9O4VBsOv+Oh7358ONSWJY5XN+QkwAuSfXBUJn1i7HA==
+Received: from MN2PR04CA0017.namprd04.prod.outlook.com (2603:10b6:208:d4::30)
+ by LV2PR12MB6015.namprd12.prod.outlook.com (2603:10b6:408:14f::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.46; Wed, 8 May
+ 2024 21:23:33 +0000
+Received: from BL6PEPF0001AB56.namprd02.prod.outlook.com
+ (2603:10b6:208:d4:cafe::d0) by MN2PR04CA0017.outlook.office365.com
+ (2603:10b6:208:d4::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.45 via Frontend
+ Transport; Wed, 8 May 2024 21:23:33 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL6PEPF0001AB56.mail.protection.outlook.com (10.167.241.8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7544.18 via Frontend Transport; Wed, 8 May 2024 21:23:33 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 8 May 2024
+ 14:23:20 -0700
+Received: from [10.110.48.28] (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 8 May 2024
+ 14:23:17 -0700
+Message-ID: <ac8c217e-4109-4ca7-a7dd-fc4fc8b0a4de@nvidia.com>
+Date: Wed, 8 May 2024 14:23:13 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,536 +84,228 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: r8169: transmit queue timeouts and IRQ masking
-To: Ken Milmore <ken.milmore@gmail.com>, netdev@vger.kernel.org
-Cc: nic_swsd@realtek.com
-References: <ad6a0c52-4dcb-444e-88cd-a6c490a817fe@gmail.com>
+Subject: Re: [PATCH v2 1/5] selftests: Compile kselftest headers with
+ -D_GNU_SOURCE
+To: Edward Liaw <edliaw@google.com>, <shuah@kernel.org>, Mark Brown
+	<broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
+	<tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
+	<will@kernel.org>, Nhat Pham <nphamcs@gmail.com>, Johannes Weiner
+	<hannes@cmpxchg.org>, Christian Brauner <brauner@kernel.org>, Eric Biederman
+	<ebiederm@xmission.com>, Kees Cook <keescook@chromium.org>, OGAWA Hirofumi
+	<hirofumi@mail.parknet.co.jp>, Thomas Gleixner <tglx@linutronix.de>, "Ingo
+ Molnar" <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Darren
+ Hart <dvhart@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>,
+	=?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>, Jiri Kosina
+	<jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe
+	<jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski
+	<luto@amacapital.net>, Will Drewry <wad@chromium.org>, Marc Zyngier
+	<maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, James Morse
+	<james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+	<yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, "Sean
+ Christopherson" <seanjc@google.com>, Anup Patel <anup@brainfault.org>, "Atish
+ Patra" <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank
+	<frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, "David
+ Hildenbrand" <david@redhat.com>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
+	<mic@digikod.net>, Paul Moore <paul@paul-moore.com>, James Morris
+	<jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Seth Forshee <sforshee@kernel.org>, Bongsu Jeon
+	<bongsu.jeon@samsung.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Steffen Klassert <steffen.klassert@secunet.com>,
+	"Herbert Xu" <herbert@gondor.apana.org.au>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
+	<afaerber@suse.de>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, Fenghua Yu <fenghua.yu@intel.com>,
+	Reinette Chatre <reinette.chatre@intel.com>, Mathieu Desnoyers
+	<mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>, Alexandre Belloni
+	<alexandre.belloni@bootlin.com>, Jarkko Sakkinen <jarkko@kernel.org>, "Dave
+ Hansen" <dave.hansen@linux.intel.com>, Muhammad Usama Anjum
+	<usama.anjum@collabora.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<kernel-team@android.com>, <linux-sound@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mm@kvack.org>,
+	<linux-input@vger.kernel.org>, <iommu@lists.linux.dev>,
+	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+	<linux-security-module@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-actions@lists.infradead.org>,
+	<mptcp@lists.linux.dev>, <linux-rtc@vger.kernel.org>,
+	<linux-sgx@vger.kernel.org>, <bpf@vger.kernel.org>, kernel test robot
+	<oliver.sang@intel.com>
+References: <20240507214254.2787305-1-edliaw@google.com>
+ <20240507214254.2787305-2-edliaw@google.com>
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <ad6a0c52-4dcb-444e-88cd-a6c490a817fe@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+From: John Hubbard <jhubbard@nvidia.com>
+In-Reply-To: <20240507214254.2787305-2-edliaw@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB56:EE_|LV2PR12MB6015:EE_
+X-MS-Office365-Filtering-Correlation-Id: 583a5497-99b4-4096-1a3a-08dc6fa51d96
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|376005|36860700004|1800799015|7416005|82310400017|921011;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bytMZXpSOXR2cmtpOXRCU1BHMnpWaEdjcW1lVUFXOHFMUU15NHN4UUs1NXd1?=
+ =?utf-8?B?eXcrWitXam1XZ1N2cW11bzB3eWdNQWdOUEg4Uk5xa0VHQmtLSWRHbms1anBh?=
+ =?utf-8?B?QUJ6SkFFN1N4Y0xrTHlzWU4xbkNCUWtNeGZZU1MybVZwZUlQam9nLzV4VFQ4?=
+ =?utf-8?B?L2dSakFnTHJ0aWw0MU5QUm8vaW8xejNHQjBUTzFBcmdlNWZ4ZlI2WXl2alVZ?=
+ =?utf-8?B?bVp5ZVhiaG52eUZKNTc2dnRjWHFzR1REejY3SmFsMXVNelNqMHhkbkhTQmdN?=
+ =?utf-8?B?UkNRLzc3NVIzNUk4enZTQ3ljUzFJbUQrUGoxQVZYa1dMNE5ORjVrZXBhQkdy?=
+ =?utf-8?B?T29WNTYzd0gvUEQxak1FMWZDMG9Jem9EQ0dRQy9aOG1WVFhNMFIvOFhVMlNO?=
+ =?utf-8?B?QmI2K0xzVWVrSnlxQmFFa3ZKN3RVOC9ySEdKSWptUjFQYmZDZ2FtMWFTVDNZ?=
+ =?utf-8?B?ckZBVVdWQ1lRQ0xYbTgrOVBoUEVUdlhzMjU0Rk1KV0lmRUdZci9aaHRnMWl5?=
+ =?utf-8?B?MUJmMTRNQkZ5cXZ4RytNWWtGUm9aWVJValZZVldhY1pEaWRLS0tIT0o0RG1W?=
+ =?utf-8?B?RW5XVUdYUTJDQW1kT2hFUHo4VmJ3dHBZNkNVeTdoSFhGLzFBQ3ZlbXNrVk9p?=
+ =?utf-8?B?NUVyUmtyeEJRVVhNYmt0ZzBZVjYva2Nocll2VHYvSXNLYXFjSG9BY2Q4YmZh?=
+ =?utf-8?B?UzNQRDNvbzlhWWZpSlZZbWF4eDM2YkdCbXRmbzMwL20vWFF6aGlpam1nVG95?=
+ =?utf-8?B?WW4wNWFDN2JreFhRdGFLNVd6QVNxNXZLL0dndnNkNnRmNGRCSTNVMmJxVVV5?=
+ =?utf-8?B?NDYzZXR1T3hFVVIzRm1sdWVBdkg4L2FacERMeldockd2RDJlVUdPOEJTL0FE?=
+ =?utf-8?B?VWM3UnBmODdlS01XZFNTZDg5Wk5IcDRxTkRNV0ZQVHppY0NyK1RwTnR5bmFU?=
+ =?utf-8?B?YTQ0R3BzVXZ1Sk9Rc2t0NWwvYjhnZEpHSGZmSjRSMzUxQ2NaUHdReXFxbC9Q?=
+ =?utf-8?B?Ym5IRlg1S01senRWNjJXMUlTS0F5bnhDS2dHUEw4amNDcnpodDdLRDZHWGc0?=
+ =?utf-8?B?Yi9sSXNMTDFRV2I2UFg3dmk2YXMxdGxoTGdwYzZ3YVAwTnRHb1dmRkZmUzU2?=
+ =?utf-8?B?cU9DdHA3T2lBVm5DU0xsZ0wvTnFVdmtDaWIyd1NVWDRMdlM2Nko4Mmcvb3RZ?=
+ =?utf-8?B?RkdSZHhjVjVpaVhZekxhaXoyREJRUXZzVm1zY1VqWjNxT215ZmdURnRna3ZF?=
+ =?utf-8?B?MG9icHJraWdtZmlKM043WmY1YmtxcHBIRnRNeDA4aVFMaXErc2svSFpHbmll?=
+ =?utf-8?B?RW1KTzFzVkM1YVdkRnNQQUgwbkNlVVJKWjVKUXBOWTZkSHVqWXN3RW9SNVFr?=
+ =?utf-8?B?U25vYTVsSzF0bDNwQXdSdnpnZjRWTFp0TURCeHE5d2JRajB2NXVaaC9EMkwv?=
+ =?utf-8?B?Q2VnYTZ0eDZ1dUhVRVVUZzBIMzd3YStxQ3cydVNSRUIycUsxKzRyRjQrSjdS?=
+ =?utf-8?B?RWEvaUxtdG1rTDNianVBUld2TGExa3NBZ0dKRWhHWGhkR2c2R1VlV0xtc3dZ?=
+ =?utf-8?B?dVU5RzdFOWplSnpXSStPMDZMcCtxSnBEZTlnZ0pPN29MRElZVjUwUFBVdVEw?=
+ =?utf-8?B?YnN2M3c5Qk9SNlVZRXQrN0VKOWF3ajdGYmNEclB3ZkpJdll2MFY5ZHNwTGdJ?=
+ =?utf-8?B?RHFrTFdudjdDNWx4Smk4c0Exb2hMaFl1UjRIZGlCbnVOOHB3eXdlM2w2eEtl?=
+ =?utf-8?B?T0hpS2Jqd0xzTFduTG12RXplMFpBVmhWTFpRSFZQNnNxdUNBZXdZQ2VXdysx?=
+ =?utf-8?B?OFhLSkc2RlBsMEJpaGw4Q1pHcm5zVlg4ejVOT2hhTUpxenl0YjBOaFNDZU1t?=
+ =?utf-8?Q?kcyOIn2L58iU1?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(36860700004)(1800799015)(7416005)(82310400017)(921011);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2024 21:23:33.4556
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 583a5497-99b4-4096-1a3a-08dc6fa51d96
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB56.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB6015
 
-On 06.05.2024 23:28, Ken Milmore wrote:
-> I have a motherboard with an integrated RTL8125B network adapter, and I=
- have found a way to predictably cause TX queue timeouts with the r8169 d=
-river.
->=20
-> Briefly, if rtl8169_poll() ever gets called with interrupts unmasked on=
- the device, then it seems to be possible to get it stuck in a non-interr=
-upting state.
-> It appears disaster can be averted in this case by making sure device i=
-nterrupts are always masked when inside rtl8169_poll()! For which see bel=
-ow...
->=20
-> The preconditions I found for causing a timeout are:
-> - Set gro_flush_timeout to a NON-ZERO value
-> - Set napi_defer_hard_irqs to ZERO
-> - Put some heavy bidirectional load on the interface (I find iperf3 to =
-another host does the job nicely: 1Gbps is enough).
->=20
-> e.g.
-> # echo 20000 > /sys/class/net/eth0/gro_flush_timeout
-> # echo 0 > /sys/class/net/eth0/napi_defer_hard_irqs
-> # iperf3 --bidir -c hostname
->=20
+On 5/7/24 2:38 PM, Edward Liaw wrote:
+> Add the -D_GNU_SOURCE flag to KHDR_INCLUDES so that it is defined in a
+> central location.
+> 
+> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> asprintf into kselftest_harness.h, which is a GNU extension and needs
+> _GNU_SOURCE to either be defined prior to including headers or with the
+> -D_GNU_SOURCE flag passed to the compiler.
+> 
+> Fixes: 809216233555 ("selftests/harness: remove use of LINE_MAX")
+> Reported-by: kernel test robot <oliver.sang@intel.com>
+> Closes: https://lore.kernel.org/oe-lkp/202404301040.3bea5782-oliver.sang@intel.com
+> Signed-off-by: Edward Liaw <edliaw@google.com>
+> ---
+>   tools/testing/selftests/Makefile            | 4 ++--
+>   tools/testing/selftests/kselftest_harness.h | 2 +-
+>   tools/testing/selftests/lib.mk              | 2 +-
+>   3 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+> index e1504833654d..ed012a7f0786 100644
+> --- a/tools/testing/selftests/Makefile
+> +++ b/tools/testing/selftests/Makefile
+> @@ -161,11 +161,11 @@ ifneq ($(KBUILD_OUTPUT),)
+>     # $(realpath ...) resolves symlinks
+>     abs_objtree := $(realpath $(abs_objtree))
+>     BUILD := $(abs_objtree)/kselftest
+> -  KHDR_INCLUDES := -isystem ${abs_objtree}/usr/include
+> +  KHDR_INCLUDES := -D_GNU_SOURCE -isystem ${abs_objtree}/usr/include
+>   else
+>     BUILD := $(CURDIR)
+>     abs_srctree := $(shell cd $(top_srcdir) && pwd)
+> -  KHDR_INCLUDES := -isystem ${abs_srctree}/usr/include
+> +  KHDR_INCLUDES := -D_GNU_SOURCE -isystem ${abs_srctree}/usr/include
+>     DEFAULT_INSTALL_HDR_PATH := 1
+>   endif
 
-Thanks for the interesting report and the thorough analysis.
-I could reproduce the issue on RTL8168h. It didn't even take heavy
-bidirectional load, iperf3 -R -c hostname was enough in my case.
+Just a small copy-paste duplication request: can we maybe do it this
+way, instead, to remove the duplication? It's small *so far*, but
+still. :)
 
-> The bitrate falls off to zero almost immediately, whereafter the interf=
-ace just stops working:
->=20
-> [ ID][Role] Interval           Transfer     Bitrate         Retr  Cwnd
-> [  5][TX-C]   0.00-1.00   sec  1010 KBytes  8.26 Mbits/sec    1   1.39 =
-KBytes      =20
-> [  7][RX-C]   0.00-1.00   sec   421 KBytes  3.45 Mbits/sec             =
-    =20
-> [  5][TX-C]   1.00-2.00   sec  0.00 Bytes  0.00 bits/sec    0   1.39 KB=
-ytes      =20
-> [  7][RX-C]   1.00-2.00   sec  0.00 Bytes  0.00 bits/sec               =
-  =20
-> [  5][TX-C]   2.00-3.00   sec  0.00 Bytes  0.00 bits/sec    0   1.39 KB=
-ytes      =20
->=20
-> On recent(ish) kernels I see the "ASPM disabled on Tx timeout" message =
-as it tries to recover, then after some delay, the familiar "transmit que=
-ue 0 timed out" warning usually occurs.
->=20
->=20
-> [  149.473134] ------------[ cut here ]------------
-> [  149.473155] NETDEV WATCHDOG: eth0 (r8169): transmit queue 0 timed ou=
-t 6812 ms
-> [  149.473188] WARNING: CPU: 18 PID: 0 at net/sched/sch_generic.c:525 d=
-ev_watchdog+0x235/0x240
-> [  149.473206] Modules linked in: nft_chain_nat nf_nat bridge stp llc q=
-rtr sunrpc binfmt_misc ip6t_REJECT nf_reject_ipv6 joydev ipt_REJECT nf_re=
-ject_ipv4 xt_tcpudp xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ip=
-v4 nft_compat nf_tables libcrc32c nfnetlink hid_generic nls_ascii nls_cp4=
-37 usbhid vfat hid fat amdgpu intel_rapl_msr snd_sof_pci_intel_tgl intel_=
-rapl_common snd_sof_intel_hda_common soundwire_intel soundwire_generic_al=
-location intel_uncore_frequency intel_uncore_frequency_common snd_sof_int=
-el_hda_mlink soundwire_cadence snd_sof_intel_hda snd_sof_pci x86_pkg_temp=
-_thermal intel_powerclamp snd_sof_xtensa_dsp iwlmvm snd_sof coretemp kvm_=
-intel snd_sof_utils snd_hda_codec_realtek snd_soc_hdac_hda mac80211 kvm s=
-nd_hda_ext_core snd_hda_codec_generic snd_soc_acpi_intel_match snd_soc_ac=
-pi ledtrig_audio snd_soc_core irqbypass snd_compress libarc4 drm_exec snd=
-_pcm_dmaengine snd_hda_codec_hdmi ghash_clmulni_intel amdxcp soundwire_bu=
-s drm_buddy sha512_ssse3 gpu_sched sha256_ssse3 snd_hda_intel sha1_ssse3
-> [  149.473574]  drm_suballoc_helper snd_intel_dspcfg iwlwifi snd_intel_=
-sdw_acpi drm_display_helper snd_hda_codec cec aesni_intel snd_hda_core cr=
-ypto_simd cryptd rc_core snd_hwdep mei_pxp mei_hdcp snd_pcm rapl drm_ttm_=
-helper pmt_telemetry iTCO_wdt cfg80211 ttm pmt_class snd_timer intel_pmc_=
-bxt evdev intel_cstate drm_kms_helper wmi_bmof mxm_wmi snd iTCO_vendor_su=
-pport mei_me intel_uncore i2c_algo_bit ee1004 pcspkr watchdog mei soundco=
-re rfkill intel_vsec serial_multi_instantiate intel_pmc_core acpi_pad acp=
-i_tad button drm nct6683 parport_pc ppdev lp parport loop efi_pstore conf=
-igfs efivarfs ip_tables x_tables autofs4 ext4 crc16 mbcache jbd2 crc32c_g=
-eneric dm_mod nvme ahci nvme_core xhci_pci libahci t10_pi xhci_hcd r8169 =
-libata realtek crc64_rocksoft mdio_devres crc64 usbcore scsi_mod crc_t10d=
-if i2c_i801 crct10dif_generic libphy crc32_pclmul crct10dif_pclmul crc32c=
-_intel i2c_smbus video scsi_common usb_common crct10dif_common fan wmi pi=
-nctrl_alderlake
-> [  149.474122] CPU: 18 PID: 0 Comm: swapper/18 Not tainted 6.6.13+bpo-a=
-md64 #1  Debian 6.6.13-1~bpo12+1
-> [  149.474134] Hardware name: Micro-Star International Co., Ltd. MS-7D4=
-3/PRO B660M-A WIFI DDR4 (MS-7D43), BIOS 1.E0 09/14/2023
-> [  149.474141] RIP: 0010:dev_watchdog+0x235/0x240
-> [  149.474154] Code: ff ff ff 48 89 df c6 05 6c 2a 40 01 01 e8 e3 37 fa=
- ff 45 89 f8 44 89 f1 48 89 de 48 89 c2 48 c7 c7 60 5f f2 9f e8 0b e3 6a =
-ff <0f> 0b e9 2a ff ff ff 0f 1f 40 00 90 90 90 90 90 90 90 90 90 90 90
-> [  149.474163] RSP: 0018:ffffa4c3c0444e78 EFLAGS: 00010286
-> [  149.474176] RAX: 0000000000000000 RBX: ffff93d94b354000 RCX: 0000000=
-00000083f
-> [  149.474185] RDX: 0000000000000000 RSI: 00000000000000f6 RDI: 0000000=
-00000083f
-> [  149.474192] RBP: ffff93d94b3544c8 R08: 0000000000000000 R09: ffffa4c=
-3c0444d00
-> [  149.474199] R10: 0000000000000003 R11: ffff93e0bf780228 R12: ffff93d=
-94b346a00
-> [  149.474207] R13: ffff93d94b35441c R14: 0000000000000000 R15: 0000000=
-000001a9c
-> [  149.474215] FS:  0000000000000000(0000) GS:ffff93e09f680000(0000) kn=
-lGS:0000000000000000
-> [  149.474225] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  149.474232] CR2: 00007f616800a008 CR3: 0000000136820000 CR4: 0000000=
-000f50ee0
-> [  149.474240] PKRU: 55555554
-> [  149.474247] Call Trace:
-> [  149.474254]  <IRQ>
-> [  149.474261]  ? dev_watchdog+0x235/0x240
-> [  149.474271]  ? __warn+0x81/0x130
-> [  149.474289]  ? dev_watchdog+0x235/0x240
-> [  149.474298]  ? report_bug+0x171/0x1a0
-> [  149.474314]  ? handle_bug+0x41/0x70
-> [  149.474326]  ? exc_invalid_op+0x17/0x70
-> [  149.474338]  ? asm_exc_invalid_op+0x1a/0x20
-> [  149.474353]  ? dev_watchdog+0x235/0x240
-> [  149.474363]  ? dev_watchdog+0x235/0x240
-> [  149.474372]  ? __pfx_dev_watchdog+0x10/0x10
-> [  149.474381]  call_timer_fn+0x24/0x130
-> [  149.474396]  ? __pfx_dev_watchdog+0x10/0x10
-> [  149.474404]  __run_timers+0x222/0x2c0
-> [  149.474420]  run_timer_softirq+0x1d/0x40
-> [  149.474433]  __do_softirq+0xc7/0x2ae
-> [  149.474444]  __irq_exit_rcu+0x96/0xb0
-> [  149.474459]  sysvec_apic_timer_interrupt+0x72/0x90
-> [  149.474469]  </IRQ>
-> [  149.474473]  <TASK>
-> [  149.474479]  asm_sysvec_apic_timer_interrupt+0x1a/0x20
-> [  149.474492] RIP: 0010:cpuidle_enter_state+0xcc/0x440
-> [  149.474504] Code: fa b6 53 ff e8 35 f4 ff ff 8b 53 04 49 89 c5 0f 1f=
- 44 00 00 31 ff e8 43 c4 52 ff 45 84 ff 0f 85 57 02 00 00 fb 0f 1f 44 00 =
-00 <45> 85 f6 0f 88 85 01 00 00 49 63 d6 48 8d 04 52 48 8d 04 82 49 8d
-> [  149.474514] RSP: 0018:ffffa4c3c022be90 EFLAGS: 00000246
-> [  149.474524] RAX: ffff93e09f6b3440 RBX: ffffc4c3bfcb2140 RCX: 0000000=
-00000001f
-> [  149.474529] RDX: 0000000000000012 RSI: 000000003c9b26c9 RDI: 0000000=
-000000000
-> [  149.474536] RBP: 0000000000000004 R08: 0000000000000000 R09: 0000000=
-000000500
-> [  149.474542] R10: 0000000000000007 R11: ffff93e09f6b1fe4 R12: fffffff=
-fa079a500
-> [  149.474548] R13: 00000022cd4ab97d R14: 0000000000000004 R15: 0000000=
-000000000
-> [  149.474560]  cpuidle_enter+0x2d/0x40
-> [  149.474571]  do_idle+0x20d/0x270
-> [  149.474585]  cpu_startup_entry+0x2a/0x30
-> [  149.474598]  start_secondary+0x11e/0x140
-> [  149.474613]  secondary_startup_64_no_verify+0x18f/0x19b
-> [  149.474630]  </TASK>
-> [  149.474635] ---[ end trace 0000000000000000 ]---
->=20
->=20
-> Here's a dump of the registers (MAC Address redacted).
-> It seems to be stuck on TxDescUnavail | RxOverflow | TxOK | RxOk, and i=
-nterrupts are unmasked.
->=20
-> # ethtool -d eth0
-> Unknown RealTek chip (TxConfig: 0x67100f00)
-> Offset		Values
-> ------		------
-> 0x0000:		XXXXXXXXXXXXXXXXX fe 09 40 00 00 00 80 00 01 00=20
-> 0x0010:		00 00 57 ff 00 00 00 00 0a 00 00 00 00 00 00 00=20
-> 0x0020:		00 10 7d ff 00 00 00 00 19 1e 9f b4 79 a5 3f 3b=20
-> 0x0030:		00 00 00 00 00 00 00 0c 3f 00 00 00 95 00 00 00=20
-> 0x0040:		00 0f 10 67 0e 0f c2 40 00 00 00 00 00 00 00 00=20
-> 0x0050:		11 00 cf bc 60 11 03 01 00 00 00 00 00 00 00 00=20
-> 0x0060:		00 00 00 00 00 00 00 00 00 00 02 00 f3 00 80 f0=20
-> 0x0070:		00 00 00 00 00 00 00 00 07 00 00 00 00 00 b3 e9=20
-> 0x0080:		62 60 02 00 00 02 20 00 00 00 00 00 00 00 00 00=20
-> 0x0090:		00 00 00 00 60 00 20 02 62 64 00 00 00 00 00 00=20
-> 0x00a0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=20
-> 0x00b0:		1f 00 00 00 80 00 00 00 ec 10 1a d2 01 00 01 00=20
-> 0x00c0:		00 00 00 00 00 00 00 00 00 00 00 00 12 00 00 00=20
-> 0x00d0:		21 00 04 12 00 00 01 00 00 00 00 40 ff ff ff ff=20
-> 0x00e0:		20 20 03 01 00 00 91 fe 00 00 00 00 ff 02 00 00=20
-> 0x00f0:		3f 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00=20
->=20
->=20
-> I tried instrumenting the code a bit and found that rtl8169_poll() bein=
-g called with interrupts unmasked seems to be a precursor to the problem =
-occuring.
-> The *only* time this usually happens is when a GRO timer has been set b=
-ut napi_defer_hard_irqs is off.
-> Now that the defaults are gro_flush_timeout=3D20000, napi_defer_hard_ir=
-qs=3D1, this probably doesn't happen very often for most people.
-> I guess it will happen with busy polling, but I haven't tested that yet=
-=2E
->=20
->=20
-> diff --git linux-source-6.6~/drivers/net/ethernet/realtek/r8169_main.c =
-linux-source-6.6/drivers/net/ethernet/realtek/r8169_main.c
-> index 81fd31f..927786f 100644
-> --- linux-source-6.6~/drivers/net/ethernet/realtek/r8169_main.c
-> +++ linux-source-6.6/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -4601,6 +4601,8 @@ static int rtl8169_poll(struct napi_struct *napi,=
- int budget)
->         struct net_device *dev =3D tp->dev;
->         int work_done;
-> =20
-> +       WARN_ONCE(RTL_R32(tp, IntrMask_8125) !=3D 0, "rtl8169_poll: IRQ=
-s enabled!");
-> +
->         rtl_tx(dev, tp, budget);
-> =20
->         work_done =3D rtl_rx(dev, tp, budget);
->=20
-> [ 5055.978473] ------------[ cut here ]------------
-> [ 5055.978503] rtl8169_poll: IRQs enabled!
-> [ 5055.978527] WARNING: CPU: 15 PID: 0 at /home/ken/work/r8169/linux-so=
-urce-6.6/drivers/net/ethernet/realtek/r8169_main.c:4604 rtl8169_poll+0x4e=
-5/0x520 [r8169]
-> [ 5055.978568] Modules linked in: r8169(OE) realtek mdio_devres libphy =
-nft_chain_nat nf_nat bridge stp llc ip6t_REJECT nf_reject_ipv6 qrtr ipt_R=
-EJECT nf_reject_ipv4 xt_tcpudp xt_conntrack nf_conntrack nf_defrag_ipv6 n=
-f_defrag_ipv4 sunrpc nft_compat nf_tables libcrc32c nfnetlink binfmt_misc=
- joydev nls_ascii nls_cp437 vfat fat hid_generic usbhid hid amdgpu intel_=
-rapl_msr intel_rapl_common intel_uncore_frequency snd_sof_pci_intel_tgl i=
-ntel_uncore_frequency_common snd_sof_intel_hda_common x86_pkg_temp_therma=
-l soundwire_intel intel_powerclamp soundwire_generic_allocation snd_sof_i=
-ntel_hda_mlink coretemp iwlmvm soundwire_cadence kvm_intel snd_sof_intel_=
-hda snd_sof_pci snd_sof_xtensa_dsp snd_sof kvm mac80211 snd_sof_utils snd=
-_soc_hdac_hda snd_hda_ext_core irqbypass snd_soc_acpi_intel_match snd_soc=
-_acpi libarc4 snd_hda_codec_realtek ghash_clmulni_intel snd_soc_core sha5=
-12_ssse3 snd_hda_codec_generic drm_exec sha256_ssse3 amdxcp sha1_ssse3 le=
-dtrig_audio drm_buddy iwlwifi gpu_sched snd_compress snd_hda_codec_hdmi s=
-nd_pcm_dmaengine
-> [ 5055.979159]  drm_suballoc_helper soundwire_bus drm_display_helper ae=
-sni_intel snd_hda_intel cec crypto_simd cryptd snd_intel_dspcfg rc_core s=
-nd_intel_sdw_acpi rapl snd_hda_codec mei_hdcp drm_ttm_helper mei_pxp pmt_=
-telemetry intel_cstate cfg80211 evdev pmt_class snd_hda_core ttm snd_hwde=
-p mei_me snd_pcm drm_kms_helper iTCO_wdt wmi_bmof intel_pmc_bxt snd_timer=
- intel_uncore snd iTCO_vendor_support i2c_algo_bit mei ee1004 mxm_wmi wat=
-chdog pcspkr soundcore rfkill intel_vsec serial_multi_instantiate intel_p=
-mc_core acpi_tad acpi_pad button drm nct6683 parport_pc ppdev lp parport =
-loop configfs efi_pstore efivarfs ip_tables x_tables autofs4 ext4 crc16 m=
-bcache jbd2 crc32c_generic dm_mod nvme ahci nvme_core libahci xhci_pci t1=
-0_pi libata xhci_hcd crc64_rocksoft crc64 usbcore scsi_mod crc_t10dif i2c=
-_i801 crc32_pclmul crct10dif_generic crct10dif_pclmul crc32c_intel i2c_sm=
-bus video scsi_common usb_common fan crct10dif_common wmi pinctrl_alderla=
-ke [last unloaded: r8169(OE)]
-> [ 5055.979787] CPU: 15 PID: 0 Comm: swapper/15 Tainted: G        W  OE =
-     6.6.13+bpo-amd64 #1  Debian 6.6.13-1~bpo12+1
-> [ 5055.979797] Hardware name: Micro-Star International Co., Ltd. MS-7D4=
-3/PRO B660M-A WIFI DDR4 (MS-7D43), BIOS 1.E0 09/14/2023
-> [ 5055.979803] RIP: 0010:rtl8169_poll+0x4e5/0x520 [r8169]
-> [ 5055.979829] Code: 19 00 00 76 40 89 50 38 eb 98 80 3d 24 e2 00 00 00=
- 0f 85 66 fb ff ff 48 c7 c7 7a d0 8d c0 c6 05 10 e2 00 00 01 e8 ab f6 fe =
-f4 <0f> 0b e9 4c fb ff ff ba 40 00 00 00 88 50 38 e9 a5 fc ff ff 31 c0
-> [ 5055.979836] RSP: 0018:ffffad4340618e88 EFLAGS: 00010286
-> [ 5055.979846] RAX: 0000000000000000 RBX: ffff8f799b16c9e0 RCX: 0000000=
-00000083f
-> [ 5055.979853] RDX: 0000000000000000 RSI: 00000000000000f6 RDI: 0000000=
-00000083f
-> [ 5055.979859] RBP: ffff8f799b16c9e0 R08: 0000000000000000 R09: ffffad4=
-340618d10
-> [ 5055.979864] R10: 0000000000000003 R11: ffff8f80ff780228 R12: ffff8f7=
-99b16c000
-> [ 5055.979871] R13: 0000000000000040 R14: ffff8f799b16c9c0 R15: ffff8f7=
-99b16c9e0
-> [ 5055.979877] FS:  0000000000000000(0000) GS:ffff8f80df5c0000(0000) kn=
-lGS:0000000000000000
-> [ 5055.979884] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 5055.979890] CR2: 00007f0062503000 CR3: 00000004afc20000 CR4: 0000000=
-000f50ee0
-> [ 5055.979897] PKRU: 55555554
-> [ 5055.979903] Call Trace:
-> [ 5055.979911]  <IRQ>
-> [ 5055.979916]  ? rtl8169_poll+0x4e5/0x520 [r8169]
-> [ 5055.979940]  ? __warn+0x81/0x130
-> [ 5055.979955]  ? rtl8169_poll+0x4e5/0x520 [r8169]
-> [ 5055.979978]  ? report_bug+0x171/0x1a0
-> [ 5055.979992]  ? handle_bug+0x41/0x70
-> [ 5055.980004]  ? exc_invalid_op+0x17/0x70
-> [ 5055.980014]  ? asm_exc_invalid_op+0x1a/0x20
-> [ 5055.980026]  ? rtl8169_poll+0x4e5/0x520 [r8169]
-> [ 5055.980048]  ? rtl8169_poll+0x4e5/0x520 [r8169]
-> [ 5055.980070]  ? ktime_get+0x3c/0xa0
-> [ 5055.980079]  ? sched_clock+0x10/0x30
-> [ 5055.980090]  __napi_poll+0x28/0x1b0
-> [ 5055.980104]  net_rx_action+0x2a4/0x380
-> [ 5055.980116]  __do_softirq+0xc7/0x2ae
-> [ 5055.980126]  __irq_exit_rcu+0x96/0xb0
-> [ 5055.980139]  sysvec_apic_timer_interrupt+0x72/0x90
-> [ 5055.980148]  </IRQ>
-> [ 5055.980152]  <TASK>
-> [ 5055.980156]  asm_sysvec_apic_timer_interrupt+0x1a/0x20
-> [ 5055.980167] RIP: 0010:cpuidle_enter_state+0xcc/0x440
-> [ 5055.980179] Code: fa b6 53 ff e8 35 f4 ff ff 8b 53 04 49 89 c5 0f 1f=
- 44 00 00 31 ff e8 43 c4 52 ff 45 84 ff 0f 85 57 02 00 00 fb 0f 1f 44 00 =
-00 <45> 85 f6 0f 88 85 01 00 00 49 63 d6 48 8d 04 52 48 8d 04 82 49 8d
-> [ 5055.980187] RSP: 0018:ffffad4340213e90 EFLAGS: 00000246
-> [ 5055.980197] RAX: ffff8f80df5f3440 RBX: ffffcd433fbf2140 RCX: 0000000=
-00000001f
-> [ 5055.980203] RDX: 000000000000000f RSI: 000000003c9b26c9 RDI: 0000000=
-000000000
-> [ 5055.980208] RBP: 0000000000000004 R08: 0000000000000000 R09: 0000000=
-000000012
-> [ 5055.980214] R10: 0000000000000008 R11: ffff8f80df5f1fe4 R12: fffffff=
-fb759a500
-> [ 5055.980219] R13: 000004992fcca629 R14: 0000000000000004 R15: 0000000=
-000000000
-> [ 5055.980229]  cpuidle_enter+0x2d/0x40
-> [ 5055.980238]  do_idle+0x20d/0x270
-> [ 5055.980253]  cpu_startup_entry+0x2a/0x30
-> [ 5055.980265]  start_secondary+0x11e/0x140
-> [ 5055.980279]  secondary_startup_64_no_verify+0x18f/0x19b
-> [ 5055.980294]  </TASK>
-> [ 5055.980298] ---[ end trace 0000000000000000 ]---
->=20
->=20
-> So to make the problem go away, I found that putting an unconditional c=
-all to rtl_irq_disable() up front in rtl8169_poll() is sufficient.
-> This seems a shame, since in almost every case, interrupts are already =
-off at this point so it is an unnecessary write to the card.
->=20
-> I assume it is rtl8169_interrupt() clearing the interrupt status regist=
-er while something inside rtl8169_interrupt() is going on that causes the=
- problem, so this needs to be avoided.
-> I tried moving the interrupt masking around inside rtl_tx() and rtl_rx(=
-) to see if I could work out which specific place is vulnerable to the ra=
-ce, but it was inconclusive.
->=20
-In general there's nothing wrong with having interrupts enabled.
-Disabling them is just an optimization. Seems like this scenario
-triggers some silicon bug.
-
->=20
-> The cheap hack below seems like a more performant solution than masking=
- interrupts unconditionally in the poll function:
-> If a hardware interrupt comes in and NAPI_STATE_SCHED is set, we assume=
- we're either in the poll function already or it will be called again soo=
-n, so we can safely disable interrupts.
-> It has worked perfectly for me so far, although it doesn't prevent the =
-poll function from *ever* getting called with interrupts on. I suspect it=
- will come apart with busy polling or the like.
->=20
-> No doubt some sort of semaphore between the interrupt handler and poll =
-function will be needed to decide who gets to disable interrupts.
-> It would be great if NAPI had a "begin polling" upcall or something...
->=20
->=20
-> diff --git linux-source-6.6~/drivers/net/ethernet/realtek/r8169_main.c =
-linux-source-6.6/drivers/net/ethernet/realtek/r8169_main.c
-> index 81fd31f..60cf4f6 100644
-> --- linux-source-6.6~/drivers/net/ethernet/realtek/r8169_main.c
-> +++ linux-source-6.6/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -4521,6 +4521,11 @@ release_descriptor:
->         return count;
->  }
-> =20
-> +static inline bool napi_is_scheduled(struct napi_struct *n)
-> +{
-> +       return test_bit(NAPI_STATE_SCHED, &n->state);
-> +}
-> +
->  static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
->  {
->         struct rtl8169_private *tp =3D dev_instance;
-> @@ -4546,7 +4551,8 @@ static irqreturn_t rtl8169_interrupt(int irq, voi=
-d *dev_instance)
->         if (napi_schedule_prep(&tp->napi)) {
->                 rtl_irq_disable(tp);
->                 __napi_schedule(&tp->napi);
-> -       }
-> +       } else if (napi_is_scheduled(&tp->napi))
-> +               rtl_irq_disable(tp);
-
-Re-reading &tp->napi may be racy, and I think the code delivers
-a wrong result if NAPI_STATE_SCHEDand NAPI_STATE_DISABLE
-both are set.
-
->  out:
->         rtl_ack_events(tp, status);
-
-The following uses a modified version of napi_schedule_prep()
-to avoid re-reading the napi state.
-We would have to see whether this extension to the net core is
-acceptable, as r8169 would be the only user for now.
-For testing it's one patch, for submitting it would need to be
-splitted.
-
----
- drivers/net/ethernet/realtek/r8169_main.c |  6 ++++--
- include/linux/netdevice.h                 |  7 ++++++-
- net/core/dev.c                            | 12 ++++++------
- 3 files changed, 16 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethe=
-rnet/realtek/r8169_main.c
-index eb329f0ab..94b97a16d 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -4639,6 +4639,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void =
-*dev_instance)
- {
- 	struct rtl8169_private *tp =3D dev_instance;
- 	u32 status =3D rtl_get_events(tp);
-+	int ret;
-=20
- 	if ((status & 0xffff) =3D=3D 0xffff || !(status & tp->irq_mask))
- 		return IRQ_NONE;
-@@ -4657,10 +4658,11 @@ static irqreturn_t rtl8169_interrupt(int irq, voi=
-d *dev_instance)
- 		rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
- 	}
-=20
--	if (napi_schedule_prep(&tp->napi)) {
-+	ret =3D __napi_schedule_prep(&tp->napi);
-+	if (ret >=3D 0)
- 		rtl_irq_disable(tp);
-+	if (ret > 0)
- 		__napi_schedule(&tp->napi);
--	}
- out:
- 	rtl_ack_events(tp, status);
-=20
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 42b9e6dc6..3df560264 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -498,7 +498,12 @@ static inline bool napi_is_scheduled(struct napi_str=
-uct *n)
- 	return test_bit(NAPI_STATE_SCHED, &n->state);
- }
-=20
--bool napi_schedule_prep(struct napi_struct *n);
-+int __napi_schedule_prep(struct napi_struct *n);
+diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+index e1504833654d..13a5b11db59a 100644
+--- a/tools/testing/selftests/Makefile
++++ b/tools/testing/selftests/Makefile
+@@ -152,6 +152,8 @@ ifeq ("$(origin O)", "command line")
+    KBUILD_OUTPUT := $(O)
+  endif
+  
++KHDR_INCLUDES := -D_GNU_SOURCE
 +
-+static inline bool napi_schedule_prep(struct napi_struct *n)
-+{
-+	return __napi_schedule_prep(n) > 0;
-+}
-=20
- /**
-  *	napi_schedule - schedule NAPI poll
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 4bf081c5a..126eab121 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6102,21 +6102,21 @@ void __napi_schedule(struct napi_struct *n)
- EXPORT_SYMBOL(__napi_schedule);
-=20
- /**
-- *	napi_schedule_prep - check if napi can be scheduled
-+ *	__napi_schedule_prep - check if napi can be scheduled
-  *	@n: napi context
-  *
-  * Test if NAPI routine is already running, and if not mark
-  * it as running.  This is used as a condition variable to
-- * insure only one NAPI poll instance runs.  We also make
-- * sure there is no pending NAPI disable.
-+ * insure only one NAPI poll instance runs. Return -1 if
-+ * there is a pending NAPI disable.
-  */
--bool napi_schedule_prep(struct napi_struct *n)
-+int __napi_schedule_prep(struct napi_struct *n)
- {
- 	unsigned long new, val =3D READ_ONCE(n->state);
-=20
- 	do {
- 		if (unlikely(val & NAPIF_STATE_DISABLE))
--			return false;
-+			return -1;
- 		new =3D val | NAPIF_STATE_SCHED;
-=20
- 		/* Sets STATE_MISSED bit if STATE_SCHED was already set
-@@ -6131,7 +6131,7 @@ bool napi_schedule_prep(struct napi_struct *n)
-=20
- 	return !(val & NAPIF_STATE_SCHED);
- }
--EXPORT_SYMBOL(napi_schedule_prep);
-+EXPORT_SYMBOL(__napi_schedule_prep);
-=20
- /**
-  * __napi_schedule_irqoff - schedule for receive
---=20
-2.45.0
+  ifneq ($(KBUILD_OUTPUT),)
+    # Make's built-in functions such as $(abspath ...), $(realpath ...) cannot
+    # expand a shell special character '~'. We use a somewhat tedious way here.
+@@ -161,11 +163,11 @@ ifneq ($(KBUILD_OUTPUT),)
+    # $(realpath ...) resolves symlinks
+    abs_objtree := $(realpath $(abs_objtree))
+    BUILD := $(abs_objtree)/kselftest
+-  KHDR_INCLUDES := -isystem ${abs_objtree}/usr/include
++  KHDR_INCLUDES += -isystem ${abs_objtree}/usr/include
+  else
+    BUILD := $(CURDIR)
+    abs_srctree := $(shell cd $(top_srcdir) && pwd)
+-  KHDR_INCLUDES := -isystem ${abs_srctree}/usr/include
++  KHDR_INCLUDES += -isystem ${abs_srctree}/usr/include
+    DEFAULT_INSTALL_HDR_PATH := 1
+  endif
 
+
+>   
+> diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
+> index d98702b6955d..b2a1b6343896 100644
+> --- a/tools/testing/selftests/kselftest_harness.h
+> +++ b/tools/testing/selftests/kselftest_harness.h
+> @@ -51,7 +51,7 @@
+>   #define __KSELFTEST_HARNESS_H
+>   
+>   #ifndef _GNU_SOURCE
+> -#define _GNU_SOURCE
+> +static_assert(0, "kselftest harness requires _GNU_SOURCE to be defined");
+>   #endif
+>   #include <asm/types.h>
+>   #include <ctype.h>
+> diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
+> index da2cade3bab0..2503dc732b4d 100644
+> --- a/tools/testing/selftests/lib.mk
+> +++ b/tools/testing/selftests/lib.mk
+> @@ -45,7 +45,7 @@ selfdir = $(realpath $(dir $(filter %/lib.mk,$(MAKEFILE_LIST))))
+>   top_srcdir = $(selfdir)/../../..
+>   
+>   ifeq ($(KHDR_INCLUDES),)
+> -KHDR_INCLUDES := -isystem $(top_srcdir)/usr/include
+> +KHDR_INCLUDES := -D_GNU_SOURCE -isystem $(top_srcdir)/usr/include
+>   endif
+>   
+>   # The following are built by lib.mk common compile rules.
+
+The rest looks good. And whether you accept my recommendation above,
+or not, either way this patch looks good, so please feel free to add:
+
+Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
 
 
