@@ -1,114 +1,283 @@
-Return-Path: <netdev+bounces-94419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1B3F8BF6CA
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:12:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 949738BF6D6
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:17:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A761E1F22232
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:12:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17C2F1F21025
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EBFF2561D;
-	Wed,  8 May 2024 07:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B41B2940C;
+	Wed,  8 May 2024 07:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xYSdhQsQ"
+	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="MroJbJ8q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F73D24B21
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 07:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F2B282D6
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 07:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715152322; cv=none; b=g2ifsZYCxQnlEHQ5yj7wSH9znBHgUn4kXszutVmQ503V0Jssl6+BI1Xt3lEDKNVESTnuoUprvbSleSckCnFCVs9ahaXYbMQa52tNASUm3zypISh+K7ORx2Bc83RTTDKpxIxHVMiXL5qm76ff2hLb55GZmRSk2KFuZVIGYPz42RA=
+	t=1715152614; cv=none; b=MX9XiH8pMN8yIguSz1Q1SprH3R5vX7lksc7scuvRE1LQ9ViBBqxZJFTHwAR1Ait5j1hTtXsENwhfwb8H1MihQ+bIBlQ8A0JrcA0/Sa+LHytlrOhlMLhR5aoNjIPhLAxKE7YEgE85nGyPxMhffsaoIutVsHK+0z4OCM19/j69SjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715152322; c=relaxed/simple;
-	bh=EECYBmeowsEM9QAMxkOX5cI6KMRFf+aN6TKibBIl5e0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A5agpWe5i38zGCIP1lbAxyve/m1Xe8XjLs2JPnzUdL5zOJmD4eikDVW1fEGS16024YgXBqTjhTRgeYD6RS5spYUuL8Ww3YHS2y/qR8lIPiNMPqq0jSYE2e2hsm530Gz1KA4rcaHs6j8RYWlIJunvmnGZA4hj9Kz2WPASZRZ8MB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xYSdhQsQ; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-572a1b3d6baso6644a12.1
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 00:12:00 -0700 (PDT)
+	s=arc-20240116; t=1715152614; c=relaxed/simple;
+	bh=f0m34QhDPAosJyYZmjdMVXrVYo1qtPAsG7RWUe2/wXY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WZTyjjOjDsHH4kS7PPHzIxIEUc6zP4OoDE6eHoStilGPnNOBwNbyVrw++Nera5AKil3yQa2DAy717bBHFrPcnwvo4s2xnn33IyhmYP/9X7+8LnPSVxlDHe+pBQO6ShBtmJXFtpm9KykNw/VhE73o0ZzIc4+9RxAyxEU3KbBghEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=MroJbJ8q; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a59cac06ec3so80475166b.0
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 00:16:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715152319; x=1715757119; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cFLnG0J+oQmKDBlznHjvioaqBMv9WOmRiyhgyzt7qjo=;
-        b=xYSdhQsQYkJjTU+tgGkRL+iXgE66ekH5ij7bmgSaDs+/bGgbzqMvXg/rywuWDY3e6e
-         P9Z5ASpPSCWTfREoMSfBqvvZUSoiV8MVeEFFlqzrkglpK4dyREaz328HHa3GQWF4WoJS
-         B+HE7HOdxtfCs1s+UimsvDu7ojj/ySjTA4eRvqIFGdjq5LPjzovS3QeSz9UXiaCpynmF
-         YLtDJJUTO5TNAZgnFFKxfvCd6glvHqd40H/xvUBDA0BHdI6msGrRaWzIzfYMWHvyKhl7
-         ET5qpatpx311bgi2gNP/0qXrNsVAhtycCDGQJT2q6iBdItrLF9xWZKLcO2iAfj67ViRA
-         YqVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715152319; x=1715757119;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=ffwll.ch; s=google; t=1715152610; x=1715757410; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cFLnG0J+oQmKDBlznHjvioaqBMv9WOmRiyhgyzt7qjo=;
-        b=J3bm79NOlBs5OqcnTtT0VpzqwyTAk9H/G9+6RzKhXzmbOYxs1UjKLhLsw2paCyT6vL
-         J7FQ7VS3Go8O0IekTWT93Zy0NPeEmcJc1bVNE+OXSEbTvCF661ifhUCjZWjeXCnISN0i
-         0P+AOtrf1MWadrOF8BOyrEZNOVpRSm3NLfPpk7G0ZYdTsCIxvYxgHiNf3tLoRopwhZiw
-         qAuBS0qAxmaAPMJ8Yx+wZ99HXMfre5slAk3GutY40ZzxkVnoPdpO+b7D7OcIQpyTP6U5
-         5M6ZUVw6TNcwWEwqbH+/D/bcbOn1gYhB2JwUK/0c/cMfDX0xzO7KTo3SbVyGpJySRY0K
-         GZCw==
-X-Forwarded-Encrypted: i=1; AJvYcCUOKxrQ8AJbDxTn88pJqaClCYim0xT0eV/x7wWaQ7C4GxK8lAzMiwI8LZYY3HyfLPR8QKyId10O7FaZ/49t1UKbhoGdD913
-X-Gm-Message-State: AOJu0YxKRq/64BEQyPS5z79XhxUF+BMqRxkFCvRoPlizsy8pB4RgcNLr
-	U6QviuETAlc/2JfIST4g/YNMxAcQRkFPs4QmPdeMVRe5u5ZbghVYKA7gzy3OUNX/jn1feBQATUv
-	0f//9mo2oCIk2D0XNePkORXBMwRCee3119I/A
-X-Google-Smtp-Source: AGHT+IGKV7NntvnZda0g7YDQmt1Qa4mft2JhpTkWD4H+su1I/KgJp1e9S4NzCDRnvXRjYxfMB4RL0SfLCVgVr0lTrlU=
-X-Received: by 2002:a05:6402:348b:b0:572:554b:ec66 with SMTP id
- 4fb4d7f45d1cf-57321028182mr90182a12.3.1715152318344; Wed, 08 May 2024
- 00:11:58 -0700 (PDT)
+        bh=CeBqT9Zed0z1jUGrfvGp1XN4J6QgdBnyIkuy1n0h3cY=;
+        b=MroJbJ8qrt1lWtQl9CkIOA2S2/0/Rhz+N8DSshEjcDJkwLiOBB10BYEH8HBRVgEogf
+         aproeU1tIF8tqQahdssZIDdOG5v17aE1qXU1Efu55FGbbP739+/7KY5q49fLqgFTZdy9
+         E3mqH2mJI76tWpPg8ek0CnV201zdpFmeUQeyQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715152610; x=1715757410;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CeBqT9Zed0z1jUGrfvGp1XN4J6QgdBnyIkuy1n0h3cY=;
+        b=fkYC7NBEm4h/zOQf2jpQ8IhVIgJEjHAihWd1p3B4roUosA4+OT5zPL8bZ7AgWrPnwY
+         W/eErOrORjmTuT25lf0UhQtnju0GtT7Jd1pLbQfoQ8hy7eAJbApI1PpYf/gScKmHyOna
+         rbdOKR0bQ7ofZvSL+2HALr5YVmIyGg9MkdOl64xes7c03jgqEu6DhwwRt5fpn+J1b232
+         UeMS+2mvnW91BBaW9xX16Ra0ZohBkPXMD75rqsQnDnxYptMJAxpPv4Y7eLH43YrH/5nj
+         51l0p/xjMkMZKlQc6tcXCtGwpMDHX4sKftFFGMDCUgu+rKxYWLIKHMzK3DV1viAuT92D
+         vQ5w==
+X-Forwarded-Encrypted: i=1; AJvYcCUfNkcojpBqrfoc+Bw6IHIy79lDvtine/dutYRQ8Imlvkbvc6K4NxR5EAAXz0+yuXpZqrreYAQH7aKHNzdMfA8wxs1F20a6
+X-Gm-Message-State: AOJu0YymXyyvP6rf9hB8NMNzjRNiHZSKGTBXHRERo7W3Rmf3xYsPi6Gq
+	IOKLkxVn6eiaQ3RmLdf+QRFdcy27q4t2NNScpBMCBkLcGQE8ZR4s5uGOi9+2iDo=
+X-Google-Smtp-Source: AGHT+IHGhXCUeVIYLmH7Uo4M9BmI6iPWf/Ls31PQQRWTBdNBS6P3e6HNMCsyKMnZNizlrV6npyfCDA==
+X-Received: by 2002:a05:6402:378a:b0:572:d841:1189 with SMTP id 4fb4d7f45d1cf-5731da624efmr899529a12.3.1715152610093;
+        Wed, 08 May 2024 00:16:50 -0700 (PDT)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id n18-20020a05640205d200b00572f0438b02sm4124571edx.6.2024.05.08.00.16.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 May 2024 00:16:49 -0700 (PDT)
+Date: Wed, 8 May 2024 09:16:46 +0200
+From: Daniel Vetter <daniel@ffwll.ch>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Pavel Begunkov <asml.silence@gmail.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	Aleksander Lobakin <aleksander.lobakin@intel.com>,
+	Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Richard Gobert <richardbgobert@gmail.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Breno Leitao <leitao@debian.org>, David Wei <dw@davidwei.uk>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Subject: Re: [RFC PATCH net-next v8 02/14] net: page_pool: create hooks for
+ custom page providers
+Message-ID: <Zjsm3vO6rIY_sw5A@phenom.ffwll.local>
+Mail-Followup-To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	Aleksander Lobakin <aleksander.lobakin@intel.com>,
+	Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Richard Gobert <richardbgobert@gmail.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Breno Leitao <leitao@debian.org>, David Wei <dw@davidwei.uk>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>
+References: <ZjjHUh1eINPg1wkn@infradead.org>
+ <20b1c2d9-0b37-414c-b348-89684c0c0998@gmail.com>
+ <20240507161857.GA4718@ziepe.ca>
+ <ZjpVfPqGNfE5N4bl@infradead.org>
+ <CAHS8izPH+sRLSiZ7vbrNtRdHrFEf8XQ61XAyHuxRSL9Jjy8YbQ@mail.gmail.com>
+ <20240507164838.GG4718@ziepe.ca>
+ <0d5da361-cc7b-46e9-a635-9a7a4c208444@gmail.com>
+ <20240507175644.GJ4718@ziepe.ca>
+ <6a50d01a-b5b9-4699-9d58-94e5f8f81c13@gmail.com>
+ <20240507233247.GK4718@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240506142835.3665037-1-edumazet@google.com> <20240507174151.477792ac@kernel.org>
-In-Reply-To: <20240507174151.477792ac@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 8 May 2024 09:11:44 +0200
-Message-ID: <CANn89iKG4XE448P-AjQKkoK9kJkdBCXMP244biHbcrSA_zDmKQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: usb: smsc95xx: stop lying about skb->truesize
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Steve Glendinning <steve.glendinning@shawell.net>, 
-	UNGLinuxDriver@microchip.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240507233247.GK4718@ziepe.ca>
+X-Operating-System: Linux phenom 6.6.15-amd64 
 
-On Wed, May 8, 2024 at 2:41=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Mon,  6 May 2024 14:28:35 +0000 Eric Dumazet wrote:
-> > -                     ax_skb->len =3D size;
-> > -                     ax_skb->data =3D packet;
-> > -                     skb_set_tail_pointer(ax_skb, size);
-> > +                     skb_put(ax_skb, size - 4);
-> > +                     memcpy(ax_skb->data, packet, size - 4);
-> >
-> >                       if (dev->net->features & NETIF_F_RXCSUM)
-> >                               smsc95xx_rx_csum_offload(ax_skb);
-> > -                     skb_trim(ax_skb, ax_skb->len - 4); /* remove fcs =
-*/
-> > -                     ax_skb->truesize =3D size + sizeof(struct sk_buff=
-);
->
-> I think this one's off:
->
-> static void smsc95xx_rx_csum_offload(struct sk_buff *skb)
-> {
->      skb->csum =3D *(u16 *)(skb_tail_pointer(skb) - 2);
->      skb->ip_summed =3D CHECKSUM_COMPLETE;
->      skb_trim(skb, skb->len - 2);
-> }
+On Tue, May 07, 2024 at 08:32:47PM -0300, Jason Gunthorpe wrote:
+> On Tue, May 07, 2024 at 08:35:37PM +0100, Pavel Begunkov wrote:
+> > On 5/7/24 18:56, Jason Gunthorpe wrote:
+> > > On Tue, May 07, 2024 at 06:25:52PM +0100, Pavel Begunkov wrote:
+> > > > On 5/7/24 17:48, Jason Gunthorpe wrote:
+> > > > > On Tue, May 07, 2024 at 09:42:05AM -0700, Mina Almasry wrote:
+> > > > > 
+> > > > > > 1. Align with devmem TCP to use udmabuf for your io_uring memory. I
+> > > > > > think in the past you said it's a uapi you don't link but in the face
+> > > > > > of this pushback you may want to reconsider.
+> > > > > 
+> > > > > dmabuf does not force a uapi, you can acquire your pages however you
+> > > > > want and wrap them up in a dmabuf. No uapi at all.
+> > > > > 
+> > > > > The point is that dmabuf already provides ops that do basically what
+> > > > > is needed here. We don't need ops calling ops just because dmabuf's
+> > > > > ops are not understsood or not perfect. Fixup dmabuf.
+> > > > 
+> > > > Those ops, for example, are used to efficiently return used buffers
+> > > > back to the kernel, which is uapi, I don't see how dmabuf can be
+> > > > fixed up to cover it.
+> > > 
+> > > Sure, but that doesn't mean you can't use dma buf for the other parts
+> > > of the flow. The per-page lifetime is a different topic than the
+> > > refcounting and access of the entire bulk of memory.
+> > 
+> > Ok, so if we're leaving uapi (and ops) and keep per page/sub-buffer as
+> > is, the rest is resolving uptr -> pages, and passing it to page pool in
+> > a convenient to page pool format (net_iov).
+> 
+> I'm not going to pretend to know about page pool details, but dmabuf
+> is the way to get the bulk of pages into a pool within the net stack's
+> allocator and keep that bulk properly refcounted while.
+> 
+> An object like dmabuf is needed for the general case because there are
+> not going to be per-page references or otherwise available.
+> 
+> What you seem to want is to alter how the actual allocation flow works
+> from that bulk of memory and delay the free. It seems like a different
+> topic to me, and honestly hacking into the allocator free function
+> seems a bit weird..
 
-Good catch, I will revise this patch accordingly, thanks !
+Also I don't see how it's an argument against dma-buf as the interface for
+all these, because e.g. ttm internally does have a page pool because
+depending upon allocator, that's indeed beneficial. Other drm drivers have
+more buffer-based concepts for opportunistically memory around, usually
+by marking buffers that are just kept as cache as purgeable (which is a
+concept that goes all the way to opengl/vulkan).
+
+But these are all internals of the dma-buf exporter, the dma-buf api users
+don't ever need to care.
+-Sima
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
 
