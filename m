@@ -1,63 +1,59 @@
-Return-Path: <netdev+bounces-94597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4D428BFF56
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:48:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3B5F8BFF76
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:51:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85FF71F29FE6
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:48:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF2691C23461
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E2037D075;
-	Wed,  8 May 2024 13:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C731F84FB8;
+	Wed,  8 May 2024 13:49:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eV9g7Oo6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q2KoI68r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7329E79B9D;
-	Wed,  8 May 2024 13:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A2885281
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 13:49:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715176088; cv=none; b=LFztigO5Y96c0z+gqw9Wn0E6WhvCGhX0f6b8+u3vd2uhbiDQW+VXl7fdHGTrwR3OKXFRYpEE+Ux9Xr0XnTkMFh6ZFXnzajLLgoKEZumgRCG1tktIuho+3zBHNOHpe4MkZISCI7F8AUPMCHsz+nILpW2nFRMRyJUnvRglxJwR4XM=
+	t=1715176163; cv=none; b=dIiGqytGkhlidgsK2pLO4bORieZMV5QENhmacc/ccDx3Mu49mOGfAPvqZ2aSOzJcNpPS0Owvt9pQVJVcE2ow9jEX3Nh0ynsgMr+z2yj3GzNuTNQYD3JqnOIfKBWpi5WKCokJG/uEixJVRieD1LRRW83aE0/lddiLFyzohDImdc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715176088; c=relaxed/simple;
-	bh=xgHln/S0N3xK3r9g48jliwLklyosUPHMKzEFivOOsFM=;
+	s=arc-20240116; t=1715176163; c=relaxed/simple;
+	bh=ha24tXh+FlN2ZY/wMaMW9zpguQyt/JjmW9Q1piyIZrs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fowvA4/OWGfwU85JbxX8SiCUKvdZXyUzUp+qW+t//u0b7v0yRzDXNTcd+0tM5LGjUFwLeL8MzrGj4M0JBDJwvGxJ3mSyuhEqBZGTBEBjAIQcipG+mbEAj+d3+jR0eIrZeucMM6cIubCLdkrpm+q3EBbAc2Ka5YljYgLkF0ZwqI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eV9g7Oo6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D59BCC113CC;
-	Wed,  8 May 2024 13:48:07 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mDF39pO9cjN4hapqlJMMi4pabydHP8WnZ0eLks4AkB2hDwUcFHXGNWyWGu5VtXVytsDxDEdXluOV7ysNVJCweE3SA6vhIh0XUVhMq4SnzA3OJuBhpNPUstcK7DmMtdV33q8tgLWAO9YTyhnM4W01jgZWmoQdVWfYHSOyGlVyfUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q2KoI68r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3525C113CC;
+	Wed,  8 May 2024 13:49:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715176088;
-	bh=xgHln/S0N3xK3r9g48jliwLklyosUPHMKzEFivOOsFM=;
+	s=k20201202; t=1715176163;
+	bh=ha24tXh+FlN2ZY/wMaMW9zpguQyt/JjmW9Q1piyIZrs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eV9g7Oo6aO4YBPs5bYhHrXa84k6uIdcZjdL8HHkIG2T0iag+LPv9vxwLxZMKZmRQp
-	 TFYUVEMfmpe4sfsA52OayAmHd9ftUj/zYyCXQZ+EtFP4OSeLSOXoJsNhFkcFw4jZ6a
-	 TJEgGmhfdwafv0hg9VVkVik3buLHJFnpfrzR62LiwujKAdTEgmaIjAxRmb2xkMUrfo
-	 FdxvUdp24w/XgV+KfZRWEmee9ZuwAXAjUCGT+O7kF9WBilofRH7n6tkapwqlq7xf2e
-	 +qFLNcA3XlVlovFYwxr9FWjzTdNOKLiGHUsCa+CM/m0bsHVYFFvfYp2FaocBRb53Bx
-	 xb5Ye07+8rGGw==
-Date: Wed, 8 May 2024 06:48:06 -0700
+	b=q2KoI68r+hjDmAXjs544ebWuCgh04mi2IWm2LUWGgjgbC1EQ+LkP+VfENZPQFgiBD
+	 a52sS9ZjwVzd0S5FYD1LrrXcTZRspqUXPhxatRV4k/CSuaid+IDvM21HrvtvkGe5Ni
+	 Zh7zMRkz8WQZCAdlaE7zWH0NRL4TNXtzmYu1tHf/qB76PBzhbYKNKqV0Q6y1l6Mpmj
+	 3KbE2RO13uftb1mADGfb3mv5Kahb6yU6ghVkYkL6OYRlrfrJW/GUqerMjEOR2sXV9F
+	 8+F7BctK2zl+71hHEp93Ily6n0RcNWynNKgavBy0MJ01nfyLzYpDgqyL2lwXO/sBSn
+	 jt8aPZreWiJwQ==
+Date: Wed, 8 May 2024 06:49:22 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Erhard Furtner <erhard_f@mailbox.org>
-Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org
-Subject: Re: WARNING: CPU: 1 PID: 1 at net/core/netpoll.c:370
- netpoll_send_skb+0x1fc/0x20c at boot when netconsole is enabled (kernel
- v6.9-rc5, v6.8.7, sungem, PowerMac G4 DP)
-Message-ID: <20240508064806.10b95d29@kernel.org>
-In-Reply-To: <20240508105505.098efd6c@yea>
-References: <20240428125306.2c3080ef@legion>
-	<20240429183630.399859e2@kernel.org>
-	<20240505232713.46c03b30@yea>
-	<20240506072645.448bc49f@kernel.org>
-	<20240507024258.07980f55@yea>
-	<20240506181020.292b25f0@kernel.org>
-	<20240508105505.098efd6c@yea>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, jiri@resnulli.us,
+ horms@kernel.org
+Subject: Re: [PATCH net-next v4 1/6] net: tn40xx: add pci driver for Tehuti
+ Networks TN40xx chips
+Message-ID: <20240508064922.77e4a69a@kernel.org>
+In-Reply-To: <20240508.163618.289658716761599768.fujita.tomonori@gmail.com>
+References: <20240501230552.53185-1-fujita.tomonori@gmail.com>
+	<20240501230552.53185-2-fujita.tomonori@gmail.com>
+	<20240506183825.116df362@kernel.org>
+	<20240508.163618.289658716761599768.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,46 +63,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 8 May 2024 10:55:05 +0200 Erhard Furtner wrote:
-> I could do that with the explanation you stated. But should any
-> further questions arise in this process I would also lack the
-> technical background to deal with them. ;)
+On Wed, 08 May 2024 16:36:18 +0900 (JST) FUJITA Tomonori wrote:
+> > On Thu,  2 May 2024 08:05:47 +0900 FUJITA Tomonori wrote:  
+> >> +	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
+> >> +		ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));  
+> > 
+> > This fallback is unnecessary, please see commit f0ed939b6a or one of
+> > many similar removals..  
+> 
+> I see, fixed.
+> 
+> It might not be necessary to check the returned value here? I keep the
+> checking alone like the majority of drivers though.
 
-Alright, submitted :)
-
-> I also noticed a similar #ifdef CONFIG_NET_POLL_CONTROLLER logic shows up in
-> many network drivers, e.g. net/ethernet/realtek/8139too.c:
-> 
-> #ifdef CONFIG_NET_POLL_CONTROLLER
-> static void rtl8139_poll_controller(struct net_device *dev);
-> #endif
-> [...]
-> #ifdef CONFIG_NET_POLL_CONTROLLER
-> /*
->  * Polling receive - used by netconsole and other diagnostic tools
->  * to allow network i/o with interrupts disabled.
->  */
-> static void rtl8139_poll_controller(struct net_device *dev)
-> {
->         struct rtl8139_private *tp = netdev_priv(dev);
->        	const int irq = tp->pci_dev->irq;
-> 
->        	disable_irq_nosync(irq);
->        	rtl8139_interrupt(irq, dev);
->        	enable_irq(irq);
-> }
-> #endif
-> [...]
-> #ifdef CONFIG_NET_POLL_CONTROLLER
->        	.ndo_poll_controller    = rtl8139_poll_controller,
-> #endif
-> 
-> 
-> Should it be removed here too? This would be more cards I can test.
-> So far I only see this on my G4 and I think something similar on an
-> old Pentium4 box I no longer have. 
-
-That one looks legit. Note the _nosync() which solves the immediate
-IRQ masking / deadlock issue. And the rtl8139_interrupt() function
-actually does the packet cleanup in case of 8139too.
+Right, keep the error check. It's just that the failure, if it happens,
+will not be related to the length of the mask. So "fallback" to 32b if
+64b fails is unnecessary.
 
