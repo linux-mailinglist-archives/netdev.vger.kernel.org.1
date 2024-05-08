@@ -1,80 +1,83 @@
-Return-Path: <netdev+bounces-94602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 941758BFFA3
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 16:00:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC0398BFFA7
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 16:00:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C55CE1C2287A
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 14:00:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26AAF1C20968
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 14:00:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C4884E07;
-	Wed,  8 May 2024 14:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936AD85281;
+	Wed,  8 May 2024 14:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J5pvVf/2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="f8hLebpi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E7A26291;
-	Wed,  8 May 2024 14:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D993784E07;
+	Wed,  8 May 2024 14:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715176805; cv=none; b=Q1/cXvUO4pj6bO5+raO+7cLnBM6QXKX5biRwPNIdG+Wyw5koY9OEZQaQrHNXe4PetXl+Wi/Utvd9JOiVYxBNH/dOuE0z9QhawKVRrFlRFPbZRkhW1psassveNKT0G+CRQwvzY0Gi6TbZtx4SY1f4P1y8O74Xp37xmKmm9VXJCZs=
+	t=1715176836; cv=none; b=sNK0lzkd9yohdjBniv+m5Ay8CkLKnsxP3ZD7fwllgzWnby+ZUuToRkIVUo71hRumsU3ezG/B2z7lR/aOmu6UEI30nmDF0I0IMvDItRPpAAHagxmCOMDnu0OL2aEuRtQx9RraKVSeTQEQPJFJJpazf6fAoT8EpznfwZATYxw6Rfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715176805; c=relaxed/simple;
-	bh=k4/XzfxHm2HAV59nufUVMe2H7Iyjec3oXI258oBkEsA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TTK9uIqpYv6cvn67BefLvSY8aIe6YF8tEkEx03fydCJqyhws2gV2ksjfmVTBFueLJdqY7S4DSN683WCWnKDGMskg4gkCQAvs+5M7NZiedCnZQTMYDaVB7Aa9btKfGG9T21tb7NcGVYidP2Cf5Ls/TTc4ai7uM/iYZKwSmRPzgaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J5pvVf/2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECCF9C113CC;
-	Wed,  8 May 2024 14:00:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715176804;
-	bh=k4/XzfxHm2HAV59nufUVMe2H7Iyjec3oXI258oBkEsA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=J5pvVf/2/25oH20Wp+8UM3NI9VvyFNF9xzxQzAYiZ7bhv7EqRNqPZj/ahCuz0r6oq
-	 mx6ia0xOCwyBONjFaGGjG/x9Yn/ixG23LVGcNfskpCzzJruetudJJ2UWSSW7jDPM2m
-	 ljsmjZRCgB0F3+xHeXWGeMMWC3gHTMqD4cy002k0tgHnzfzmpUSJJvBPG3sKJFm4a3
-	 mBylBci6We7oEM4mErgeSeeMAZ6Vuq6Zhoa6rym9918JFCNd1kedKuFewztKSoMf0p
-	 seVAZdMSzj+6LPs4J30quX1XI3M9f9F+3J7tcXnYgxGawaaRGj/nDqz5/OLo77KiAc
-	 Y3QGK9FaXVxww==
-Date: Wed, 8 May 2024 07:00:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tao Su <tao1.su@linux.intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-sound@vger.kernel.org, kvm@vger.kernel.org, netdev@vger.kernel.org,
- linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, edliaw@google.com,
- ivan.orlov0322@gmail.com, broonie@kernel.org, perex@perex.cz,
- tiwai@suse.com, shuah@kernel.org, seanjc@google.com, pbonzini@redhat.com,
- bongsu.jeon@samsung.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, alexandre.belloni@bootlin.com, jarkko@kernel.org,
- dave.hansen@linux.intel.com
-Subject: Re: [PATCH] selftests: Add _GNU_SOURCE definition when including
- kselftest_harness.h
-Message-ID: <20240508070003.2acdf9b4@kernel.org>
-In-Reply-To: <ZjrpieLKXFhklVwR@linux.bj.intel.com>
-References: <20240507063534.4191447-1-tao1.su@linux.intel.com>
-	<20240507100651.8faca09c7af34de28f830f03@linux-foundation.org>
-	<ZjrpieLKXFhklVwR@linux.bj.intel.com>
+	s=arc-20240116; t=1715176836; c=relaxed/simple;
+	bh=M246gDOkovbm/rkXwU30GInsRjJOrUJiuDqcK41t7+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AKcCvJQ8rMII68lkbl8JWOslEAtmpZdmSHGvl4lHcRUAHeNFEvVaUP2Fg2wipYZze0nfwiVQu089/N5Zf2gyo4tn1dSd0mOtlDXJGjRg+KkBsqzIslv7rKs2TOF+Wv0qYsVXHquobpomlKhO3J/anV2fiXX6aPNzdQNIdWAgwmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=f8hLebpi; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Icw/BGT9ZDB2Cz2BCCx7FOpnFmNDQ/zQWyh8Zb0/jE0=; b=f8hLebpifdmAiisHsPNBZVxWJj
+	XQFlvIGwHc3emlNArqdHFyVheeoW2/e4RE9Lfj67oEqLWwKnVrl7D2nk+DYoIP9bDiDT3p9tL+XDn
+	GHnXjlUQu5dl4jGPtdP+yLtO1rm317tu9X+xmP7HCyOL9uiaEUhWsd/NWgqYDmAzC23c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s4hqH-00ExVO-Vk; Wed, 08 May 2024 16:00:21 +0200
+Date: Wed, 8 May 2024 16:00:21 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next,v2] net: ethernet: rtsn: Add support for Renesas
+ Ethernet-TSN
+Message-ID: <51b6a4f8-ef48-400f-acb6-fd20e661802d@lunn.ch>
+References: <20240507201839.1763338-1-niklas.soderlund+renesas@ragnatech.se>
+ <4970fd77-504c-4fb3-9c47-e4185d03e74a@lunn.ch>
+ <20240508105831.GB1385281@ragnatech.se>
+ <ba35173c-eaba-4f13-a2ed-011f6f7a48d1@lunn.ch>
+ <20240508125557.GG1385281@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240508125557.GG1385281@ragnatech.se>
 
-On Wed, 8 May 2024 10:55:05 +0800 Tao Su wrote:
-> Back to commit 38c957f07038, I don't see any advantage in using LINE_MAX.
-> Can we use a fixed value instead of LINE_MAX? E.g., 1024, 2048. Then we
-> just need to revert commit 809216233555.
+> I agree it's odd and I will try to find out.
+> 
+> If I remove all pm_ calls and the include of pm_runtime.h register reads 
+> from the device do no longer works, so operating the device fails. Even 
+> if I dig out the root cause for this, is there any harm in keeping the 
+> pm_ operations in the initial entablement?
 
-SGTM, FWIW. The print is printing a test summary line, printing more
-than 1k seems rather unreasonable. Other facilities, like TH_LOG(),
-should be used for displaying longer info.
+It suggests something is broken. Do we want to merge broken code?
+
+Once we understand the root cause maybe then we can decide it is O.K.
+
+     Andrew
 
