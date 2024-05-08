@@ -1,167 +1,108 @@
-Return-Path: <netdev+bounces-94459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D87518BF88E
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 10:32:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46DAF8BF88F
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 10:33:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07AE51C23035
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 08:32:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01DE928682D
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 08:33:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E127535D1;
-	Wed,  8 May 2024 08:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353775026D;
+	Wed,  8 May 2024 08:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J/PLj6bV"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="aaXBsLvx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511C95338F;
-	Wed,  8 May 2024 08:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF2B47A7D;
+	Wed,  8 May 2024 08:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715157152; cv=none; b=eX98XKmSJoLGEvXvpAFDh1yVIvPcCYYmGobqc05ag7T+9L+0Oe8nHuQVBssf5MvPoF5n9UY3DiucJReZ7MkB2Q7yz+Hz8ZMP7pNUnm00eC9aAapHyqt2UodpNPCZjVF24GwCfoLsL9Bja0jQWPcfp5ZDWxLk4riBvmNtIgeCBEc=
+	t=1715157169; cv=none; b=FIngEPfuuG2W4Jipq9b9rh8DVkidczSOazS6cbiUcoCDZD0vWAYcYBm5ONt16QX4bkm7TXIwKLmHvnPLf3H6/a8iVmFaXLHnHyo6wdU/spXlhIeqfgxGrCqUjdq9DvBQ/4vziEgwwA6PoQ35ZZQydpsok557W2CLS0dL9khMAYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715157152; c=relaxed/simple;
-	bh=DqcOk4T4gJZ0/xWAo81NsY8g+OvkcV1E42NwKE8Z8Bc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=a2nA7ENuM3aWkl3EWXMFVaj2UIDGVNaVR2HnUpi1VbG9ymasDLkMGQYpaOADqPk8kO3N3wvh+fDUkRAuxZSauBcLlrEIdcDfpnBG4HoB/RF4Rzh411f1nToh6UD57x9pg1pT2CwHTREpObwfIAxOch/Nvhwj45hTX+HmhVlMuZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J/PLj6bV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC2B4C4AF66;
-	Wed,  8 May 2024 08:32:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715157151;
-	bh=DqcOk4T4gJZ0/xWAo81NsY8g+OvkcV1E42NwKE8Z8Bc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=J/PLj6bVUDhWgnFyIlijornibU5SPrNBSyCHikPctQQEY1lEgAgMxBsERxkgtQAGl
-	 DOwGX4K7PPc9afntxd4CJdsWCbOVINHxKVgX0pEoZM2FSIWLK6kz/TzPlZ+xRnGOo9
-	 jVCBD8jJsDmxKQQNxKaiOzkBZ/f3y2CRttxJ4cXzYCn6lHd0+ual6ENy2iMGcG8Ogx
-	 ig2xICE2m9PJJmCm77wmCsvZpWO1Q7jecpLY6enzzOqofyVdQGRgj59ZEI07CqIJ47
-	 m8e8JwVdDxp5NHdNoRqxUyzq5zkHUoekMyzaJgszhcwe7zIpYb6omADJbZxlultLuB
-	 2umwEYOlh+2Kg==
-From: Simon Horman <horms@kernel.org>
-Date: Wed, 08 May 2024 09:32:20 +0100
-Subject: [PATCH net-next v2 2/2] gve: Use ethtool_sprintf/puts() to fill
- stats strings
+	s=arc-20240116; t=1715157169; c=relaxed/simple;
+	bh=X1F71bqUTtnwDXgkh1tSC4NNTNLQREiEi0F6wYWTtJU=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=u0jOswOWfNV/nH4+quRtj/ieBLQLPjAD8gFwzRSRcYf0d0ehyHD9WR9GFTVwezLihtRNN8Apd5v6e7+Qlmcwz1dUyz0TSnpF01xYN2dg1yRGPEIF24g0qZEU4brotbS2/y9U6UMJIPjms+2mtcNd2aNepauPEGFwmmloFpokaWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=aaXBsLvx; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1715157143; x=1715761943; i=markus.elfring@web.de;
+	bh=oZq37vWiGR286Tk/fZJLDQiM5qL995HLhi4rMYm4rMI=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=aaXBsLvx+tLaMWB8G5Z2hqM4X8WdzCPD27gxIR8yiW1636fa18jeF0RbebkVhi49
+	 0i/YYyP4zL0pVHs1o3mPISDbhH+wJEANiQX2sfGqTFtaD+yAszC2lRqUK+tp7n2to
+	 M5EF5cDaYzTsa9B14SeTbbhr8uvRnVJFxzHrlxVPH2eX4EObBT4MoqrmZ29Ww0VyB
+	 HusPK6krbWuYXslsTqXg+5UhXuX6Xu4hOfVuBD6ffT7Xb21bePsxQwSFwmkndWQGJ
+	 djR4i0Q9rwArLc9+mfhgpH4zancmdpnHDiIkN9qLtktskXtHVjpc+oIxbnlofnIIf
+	 bW+41b6IM8eg2R3+MQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1N1d7s-1skaH046f2-011vUc; Wed, 08
+ May 2024 10:32:23 +0200
+Message-ID: <f9c7f7ba-fa82-422a-be3c-fd5c50a63bfb@web.de>
+Date: Wed, 8 May 2024 10:32:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240508-gve-comma-v2-2-1ac919225f13@kernel.org>
-References: <20240508-gve-comma-v2-0-1ac919225f13@kernel.org>
-In-Reply-To: <20240508-gve-comma-v2-0-1ac919225f13@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Jeroen de Borst <jeroendb@google.com>, 
- Praveen Kaligineedi <pkaligineedi@google.com>, 
- Shailend Chand <shailend@google.com>, Nathan Chancellor <nathan@kernel.org>, 
- Nick Desaulniers <ndesaulniers@google.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- Larysa Zaremba <larysa.zaremba@intel.com>, 
- Dan Carpenter <dan.carpenter@linaro.org>, Kees Cook <keescook@chromium.org>, 
- netdev@vger.kernel.org, llvm@lists.linux.dev, 
- linux-hardening@vger.kernel.org
-X-Mailer: b4 0.12.3
+User-Agent: Mozilla Thunderbird
+To: Hariprasad Kelam <hkelam@marvell.com>, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Geethasowjanya Akula <gakula@marvell.com>, Jakub Kicinski <kuba@kernel.org>,
+ Naveen Mamindlapalli <naveenm@marvell.com>, Paolo Abeni <pabeni@redhat.com>,
+ Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+ Sunil Goutham <sgoutham@marvell.com>
+References: <20240508070935.11501-1-hkelam@marvell.com>
+Subject: Re: [net-next Patch] octeontx2-pf: Reuse Transmit queue/Send queue
+ index of HTB class
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240508070935.11501-1-hkelam@marvell.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:hb9y0tp9rjg17HHnW1+x8wRVtZ65ElgYZSlLkpFxUps330sVZvJ
+ oQQUmV7oa5j/CpWReGwkMfFVmSDe0WO9RyEscWdTYJIQZ/a8Qni4JBFnjkLBF1g0lHzfZ5w
+ 5baPMh5R4DhKW1KKQp1TRbZh/szGxeMDY3y57WxMOMwqCSGibuuYzmOwyEAFJNeHWHmgRWU
+ gMGN+aKYzBeCnykATsc/A==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:6fQw/0olnSU=;t43d8NKPSWZy3gPseridGy4BOx+
+ c9LmDvQWnotDKUktUXgnnji0TL2usg1Jxp2JGoCi1zi3KMm5hkGOYa2kfIpWc0aosKO3+/F2z
+ Xj8PFHa6QH1hoyCSNLXJ0KwWCQigIQJ/gs43gszCNnSQUpypDkaBmSSehNHz6PDiJzsT6IG24
+ RBSQFdJ3KbCdoGRBRnBIWFzbFZJpN+gMn6SElOWTN50T4l/4LkOI2mNBTmZKpWTcLjTd7eqTz
+ WRP1Bw3QrdA/xezGhSAfmv8HPOGZv+IL7qjhBlrydomx89B2xCB11dQQsq1ON1NL26+PwGEB/
+ jyr7fHasG0pNfmMQTK7QU/qcw/WEUlN42Ir/SeqEhgGDTR0pThMR9Tlfp3yTl0x7cqXpCFF9v
+ PdPGkvf0c3CmygNYFHZbTUJ/CZ4FP30SBF/Dubr9cW+JehRTTIyN9pl0dOUS04yloPybQCL8n
+ zB8DGGIVAqFGOmx0fIVjxSyR7qoVDfcjU//WP2shKaM2qfFdeu/vNIPD15iqq/9Y2whYJqz8d
+ MrjA8VEZtRAX2Vf0DoHbhgg4rOFBJ/GWfcAc5rtqDlGc5nMxnRiJUpPaUFdJbV8zy+nGk9YBI
+ IpPG26aM22OC63TkwNdohl1G3TSYHi9+BEc0pGzRdZoogAKNLu8DNIn8T4I2IavWefgVNZ0Co
+ ip4F6xjpqkpFam3gX9zjJZh4V5vVM332IH8nTj+CMMoqXrQT6/BwE+4Hsh+vF59gL5mfVIQ69
+ tItgNqa4bo+bKBjWInhhFlDMY7oWZwcy0o0GmuQs3Q6lNiDQL5oQfAN9ywpjC0UGXR0jetbfl
+ 5x/calVUK4JwWpi18nVUF6T4o7sSOc5pmAT090LsbRqWk=
 
-Make use of standard helpers to simplify filling in stats strings.
+=E2=80=A6
+> This patch solves the problem by assigning deleted class transmit
+> queue/send queue to active class.
 
-The first two ethtool_puts() changes address the following fortification
-warnings flagged by W=1 builds with clang-18. (The last ethtool_puts
-change does not because the warning relates to writing beyond the first
-element of an array, and gve_gstrings_priv_flags only has one element.)
+* How do you think about to add the tag =E2=80=9CFixes=E2=80=9D?
 
-.../fortify-string.h:562:4: warning: call to '__read_overflow2_field' declared with 'warning' attribute: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Wattribute-warning]
-  562 |                         __read_overflow2_field(q_size_field, size);
-      |                         ^
-.../fortify-string.h:562:4: warning: call to '__read_overflow2_field' declared with 'warning' attribute: detected read beyond size of field (2nd parameter); maybe use struct_group()? [-Wattribute-warning]
+* Would you like to use imperative wordings for an improved change descrip=
+tion?
+  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/=
+Documentation/process/submitting-patches.rst?h=3Dv6.9-rc7#n94
 
-Likewise, the same changes resolve the same problems flagged by Smatch.
-
-.../gve_ethtool.c:100 gve_get_strings() error: __builtin_memcpy() '*gve_gstrings_main_stats' too small (32 vs 576)
-.../gve_ethtool.c:120 gve_get_strings() error: __builtin_memcpy() '*gve_gstrings_adminq_stats' too small (32 vs 512)
-
-Compile tested only.
-
-Reviewed-by: Shailend Chand <shailend@google.com>
-Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/google/gve/gve_ethtool.c | 42 +++++++++++----------------
- 1 file changed, 17 insertions(+), 25 deletions(-)
-
-diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-index 156b7e128b53..fe1741d482b4 100644
---- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-+++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-@@ -90,42 +90,34 @@ static const char gve_gstrings_priv_flags[][ETH_GSTRING_LEN] = {
- static void gve_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
- {
- 	struct gve_priv *priv = netdev_priv(netdev);
--	char *s = (char *)data;
-+	u8 *s = (char *)data;
- 	int num_tx_queues;
- 	int i, j;
- 
- 	num_tx_queues = gve_num_tx_queues(priv);
- 	switch (stringset) {
- 	case ETH_SS_STATS:
--		memcpy(s, *gve_gstrings_main_stats,
--		       sizeof(gve_gstrings_main_stats));
--		s += sizeof(gve_gstrings_main_stats);
--
--		for (i = 0; i < priv->rx_cfg.num_queues; i++) {
--			for (j = 0; j < NUM_GVE_RX_CNTS; j++) {
--				snprintf(s, ETH_GSTRING_LEN,
--					 gve_gstrings_rx_stats[j], i);
--				s += ETH_GSTRING_LEN;
--			}
--		}
-+		for (i = 0; i < ARRAY_SIZE(gve_gstrings_main_stats); i++)
-+			ethtool_puts(&s, gve_gstrings_main_stats[i]);
- 
--		for (i = 0; i < num_tx_queues; i++) {
--			for (j = 0; j < NUM_GVE_TX_CNTS; j++) {
--				snprintf(s, ETH_GSTRING_LEN,
--					 gve_gstrings_tx_stats[j], i);
--				s += ETH_GSTRING_LEN;
--			}
--		}
-+		for (i = 0; i < priv->rx_cfg.num_queues; i++)
-+			for (j = 0; j < NUM_GVE_RX_CNTS; j++)
-+				ethtool_sprintf(&s, gve_gstrings_rx_stats[j],
-+						i);
-+
-+		for (i = 0; i < num_tx_queues; i++)
-+			for (j = 0; j < NUM_GVE_TX_CNTS; j++)
-+				ethtool_sprintf(&s, gve_gstrings_tx_stats[j],
-+						i);
-+
-+		for (i = 0; i < ARRAY_SIZE(gve_gstrings_adminq_stats); i++)
-+			ethtool_puts(&s, gve_gstrings_adminq_stats[i]);
- 
--		memcpy(s, *gve_gstrings_adminq_stats,
--		       sizeof(gve_gstrings_adminq_stats));
--		s += sizeof(gve_gstrings_adminq_stats);
- 		break;
- 
- 	case ETH_SS_PRIV_FLAGS:
--		memcpy(s, *gve_gstrings_priv_flags,
--		       sizeof(gve_gstrings_priv_flags));
--		s += sizeof(gve_gstrings_priv_flags);
-+		for (i = 0; i < ARRAY_SIZE(gve_gstrings_priv_flags); i++)
-+			ethtool_puts(&s, gve_gstrings_priv_flags[i]);
- 		break;
- 
- 	default:
-
--- 
-2.43.0
-
+Regards,
+Markus
 
