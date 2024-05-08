@@ -1,104 +1,80 @@
-Return-Path: <netdev+bounces-94536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86FE18BFCB0
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:53:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0B8F8BFCBE
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:57:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B7F1285F6E
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 11:53:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7B621F234B2
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 11:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF85D82876;
-	Wed,  8 May 2024 11:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA50582D64;
+	Wed,  8 May 2024 11:57:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="LxTz7Km0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZU+PreJh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CDF823D1
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 11:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD5782C6B;
+	Wed,  8 May 2024 11:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715169207; cv=none; b=mTn+VI6BJBbilo30sF1FqE+6nXP49EiktE9+al8knYtMgoajSjCvYdfWm67w4IQ2CLdNwoQG4fA1niW1jWv9DibntIq6icJIVHPcEuuXXrmV0XB809E/O97NNT2uHsYtcml8TCl5lzjLImf7P3I93Jtfqsk6gquQY4pZgVlYvL8=
+	t=1715169444; cv=none; b=T93QnjhErfIRx5EkVlszBqwUdgXp6Tzdz2LjMmV5o0fxq1/aMCRNww/94FYzhaS82VHZxi4jrU4c4UnN5n+XFdXwPIT6fgt6SQwvted84uHqDwSG2qgc7vAgs6R/7F1H2AXGtDyuZbfDmJd2Jixk4Sl9bwFbfGSGGdBStQ1eaMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715169207; c=relaxed/simple;
-	bh=3vlV/UT8Lz7AZ0zWr7NTiNZWlDGBoZmP3MuofEiQPCI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GH8QdeVYgEIDjdr05/56CGEdBLPbEo1Ve+qhzvKavJth2P4keGvWNCgrtqZHu7xM/OeR1bFTiwF4NMjKEhlDRjMZyScAi09HpIh+/5wUKZhH1fbMOSYBMntS0pBfasAfqFR5H8E/ZMDCjmX4+jLhc7YSiW0jE74BB2nvewHa0PQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=LxTz7Km0; arc=none smtp.client-ip=185.125.188.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from [192.168.0.106] (unknown [114.249.184.67])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 650764211B;
-	Wed,  8 May 2024 11:53:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1715169195;
-	bh=kHXiE4/6/Qns30RL6w55nzWStI9TW1oLIKxwXtctZhA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type;
-	b=LxTz7Km0+6VK7u8Fgn0fh009jO7b0dUH6hNmG+kXRF2AQ5aNFzaTubJQvNoCjnFLT
-	 rZJuWOQjuGoUkfko7VB80tBERGi9Lo2pCB0wiZY7gaNGeAvVOKMyKo1L5uHhF2kg3j
-	 Qh+mBL5phJ7eZEX/C/eZ9kx0nko7sOPqNBrnLPd2PNseW/1UtC4Zas/ZNLj5vWmePC
-	 INCG6+48g4VDiffenD34VjGZZV0+nZ2VvqELdBEwiZ3vaxjHsJMvBqafBUvI8U1f+T
-	 S/uWA8ILM1umkvTOMWummxSqEzh22ZACSEWXswvUOlAoeCTqqtABKLOn/msQmtG2nW
-	 1EEqoh5ljPVRw==
-Message-ID: <71001a25-34f1-48ea-b35b-049ee35335c1@canonical.com>
-Date: Wed, 8 May 2024 19:53:04 +0800
+	s=arc-20240116; t=1715169444; c=relaxed/simple;
+	bh=wju6TxifXsmZBEaNzAa18t9xsnqPTcke0EvxvyMxRaM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aYGts/PmODkhCRXRsTD0vV+fcJ0rV54GFIvB1Eai5ECzFqgAe0frHQ05trLptgdQ6dKgThkuhSEXLCUEKtRcrf6jxcUyBwzl1sCWNIXo+yAocJ+7kx+v1YUl3eZF2K5EjVSg4V00aaiwvJ7sxMSnuat3Xa21rA8vRpJxXVnjhMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZU+PreJh; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=p1A5eM6N5zPKftIsP9j+hrNy6HacLDaOY385DjZnn30=; b=ZU+PreJh/Ev3vXlm69jYeUEIlO
+	laDXs5H0nhmdLvZ8pDPG7pyjp3shNWg/o5FtGBeyx7ztUy5oPOE+bW8y6vU/3PHtQWtix+SF5P3li
+	1P4FCoi7iSpYeUpTfaG8oCRn3Opc1qkG1Iyh6BLmUKxAiMypK7z9gOFplfnk5JTHxK3Y=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s4fv6-00Ewfk-VE; Wed, 08 May 2024 13:57:12 +0200
+Date: Wed, 8 May 2024 13:57:12 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rengarajan.S@microchip.com
+Cc: Bryan.Whitehead@microchip.com, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com, edumazet@google.com,
+	UNGLinuxDriver@microchip.com, kuba@kernel.org
+Subject: Re: [PATCH net-next v1] net: microchip: lan743x: Reduce PTP timeout
+ on HW failure
+Message-ID: <9cc733b9-005d-4587-bc08-971f39334663@lunn.ch>
+References: <20240502050300.38689-1-rengarajan.s@microchip.com>
+ <01145749-30a7-47a3-a5e6-03f4d0ee1264@lunn.ch>
+ <5ee0e9beb684dcf0b19b5c0698deea033cfff588.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] e1000e: move force SMBUS near the end of enable_ulp
- function
-To: Jakub Kicinski <kuba@kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- netdev@vger.kernel.org, sasha.neftin@intel.com, dima.ruinskiy@intel.com,
- Vitaly Lifshits <vitaly.lifshits@intel.com>,
- Naama Meir <naamax.meir@linux.intel.com>
-References: <20240506172217.948756-1-anthony.l.nguyen@intel.com>
- <20240507192112.3c3ee4f2@kernel.org>
-Content-Language: en-US
-From: Hui Wang <hui.wang@canonical.com>
-In-Reply-To: <20240507192112.3c3ee4f2@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5ee0e9beb684dcf0b19b5c0698deea033cfff588.camel@microchip.com>
 
+> Hi Andrew, based on the customer experience they felt that there might
+> be cases where the 20-sec delay can cause the issue(reporting the HW to
+> be dead). For boards with defects/failure on few occasions it was found
+> that resetting the chip can lead to successful resolution; however,
+> since we need to wait for 20 sec for chip reset, we found that reducing
+> the timeout to 1 sec would be optimal.
 
-On 5/8/24 10:21, Jakub Kicinski wrote:
-> On Mon,  6 May 2024 10:22:16 -0700 Tony Nguyen wrote:
->> The commit 861e8086029e ("e1000e: move force SMBUS from enable ulp
->> function to avoid PHY loss issue") introduces a regression on
->> CH_MTP_I219_LM18 (PCIID: 0x8086550A). Without this commit, the
-> Referring to the quoted commit as "this commit" is pretty confusing.
->
-Will change it in the v2.
->> ethernet works well after suspend and resume, but after applying the
->> commit, the ethernet couldn't work anymore after the resume and the
->> dmesg shows that the NIC Link changes to 10Mbps (1000Mbps originally):
->> [   43.305084] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Up 10 Mbps Full Duplex, Flow Control: Rx/Tx
->>   release:
->> +	/* Switching PHY interface always returns MDI error
->> +	 * so disable retry mechanism to avoid wasting time
->> +	 */
->> +	e1000e_disable_phy_retry(hw);
->> +
->> +	/* Force SMBus mode in PHY */
->> +	ret_val = e1000_read_phy_reg_hv_locked(hw, CV_SMB_CTRL, &phy_reg);
->> +	if (ret_val)
->> +		goto release;
-> Looks like an infinite loop waiting to happen.
+O.K. This should of been part of the commit message, since with this
+comment the change becomes meaningful. Please try to ensure the commit
+message explains "Why?"
 
-Correct, will fix it in the v2.
-
-Thanks.
-
+	Andrew
 
