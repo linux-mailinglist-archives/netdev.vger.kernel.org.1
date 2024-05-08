@@ -1,93 +1,97 @@
-Return-Path: <netdev+bounces-94346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1C2A8BF3D4
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:50:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D51F8BF3D7
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:52:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 607561F23A4D
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:50:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D8091F2132E
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:52:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAF4438F;
-	Wed,  8 May 2024 00:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cryy5ikM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9F4399;
+	Wed,  8 May 2024 00:51:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 969AB622
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 00:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDC579CC;
+	Wed,  8 May 2024 00:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715129429; cv=none; b=KC0F04pVFEtL2EZinCR8J3l0rkWMU2p9hIwnSc+oIMBsOjw5vdrNmlOZUy8fnwlO3V48RsaQrTdageJnmbMgmkC8QaZ/yaNoQ4uO6qiubiFIzbGuD3vbR44aYJkwyUq9XifuJSba1qexdiFh5moMmWZEfszRz8Ka9YXKL4S0B9I=
+	t=1715129518; cv=none; b=ZggUn+vszKgUBXREuOanhuMk/BVBpB24pK1gIFqVzdFl2gWklzKxclYSArFB5gX39+9dFrsySVjdIpopiX1jzSNSQaBOaM+ykSl0c95WV2zNwYq0jTaj9hZ3lsuorNH71wYuvkFzAOKinZWPqZEBsOboO3ewJLa+7/MqVPyc1E0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715129429; c=relaxed/simple;
-	bh=OZPDe84Q+9JZxtvV9AQ2Ixd9PO6E9WbI7KANR2DoEGo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rIaNE7T03fkDi8S2/dcTEFErdof5HXbruSXDS8TMLDSvgRDAyWyuKJPMSKpGV2W/h3KKPtJG69StPZ234zzvqnEckUnivm81QmT66QVouJqGJSEXEV/dX4c59CzXZhTEqafOJDUcmBaqmAbwwEjop+QJk4mRaazVl3MxU5HkgLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cryy5ikM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1832AC3277B;
-	Wed,  8 May 2024 00:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715129429;
-	bh=OZPDe84Q+9JZxtvV9AQ2Ixd9PO6E9WbI7KANR2DoEGo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cryy5ikMdUNaLLPe8flWIt1LcRPzBNGdmwuyUsfbS8VvXmyPU925pv3xE5+gqXqSi
-	 jPok81UUArSaxrFiuAQ9wE043N7a/mMTcLYXlRLaFXFR1rYqqi6cINnXDLmJPQSJ+d
-	 eDskYjCoY8qcrioVmz+SVCTRIoqaqGjNiiNtbl+Up5xaRZkqWF4lJwv1Pl8y46Ce8D
-	 xo+k50QfAzLl/3vLSVwgYGFqrwiVUMOigWHfT44eQC13Ik1lXG/hjc+9ACVzgujuSs
-	 tukHdIY5HEebNJJUlOevbkeomcWSeITt7RMmD3sWEr6lU17SAzbGmmqXoXfUBvmswR
-	 F0+1ouG67HAhA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0230BC43614;
-	Wed,  8 May 2024 00:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1715129518; c=relaxed/simple;
+	bh=bDx4HxaCRI3tx13XsK0SdihIQe6rQ1h74yQ6qmRAqzg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=CzkYK2C9O2Zf6UIRTAWq8c+gYooAK5kHRrSt/F+iJ49xNSHgPbtb5Ze1uKPY9xA+cmWQ6EoapZk2fGQztdPyDY5TKbvr3y3oMNFL7ZUdcKJkHWXMdqmo3QV/hsZEqqvAC9stqxa23lpwZVpgUtb+wjZZHz0vdZ9wZ++6Wf7zZBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1s4VX9-000000007ms-0HBx;
+	Wed, 08 May 2024 00:51:47 +0000
+Date: Wed, 8 May 2024 01:51:39 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	SkyLake Huang <skylake.huang@mediatek.com>,
+	Eric Woudstra <ericwouds@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: John Crispin <john@phrozen.org>
+Subject: [PATCH net] net: phy: air_en8811h: reset netdev rules when LED is
+ set manually
+Message-ID: <9be9a00adfac8118b6d685e71696f83187308c66.1715125851.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] usb: aqc111: stop lying about skb->truesize
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171512942900.28907.2087875185752822551.git-patchwork-notify@kernel.org>
-Date: Wed, 08 May 2024 00:50:29 +0000
-References: <20240506135546.3641185-1-edumazet@google.com>
-In-Reply-To: <20240506135546.3641185-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hello:
+Setting LED_OFF via the brightness_set should deactivate hw control,
+so make sure netdev trigger rules also get cleared in that case.
+This matches the behaviour when using the 'netdev' trigger without
+any hardware offloading and fixes unwanted memory of the default
+netdev trigger rules when another trigger (or no trigger) had been
+selected meanwhile.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Fixes: 71e79430117d ("net: phy: air_en8811h: Add the Airoha EN8811H PHY driver")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+This is basically a stop-gap measure until unified LED handling has
+been implemented accross all MediaTek and Airoha PHYs.
+See also
+https://patchwork.kernel.org/project/netdevbpf/patch/20240425023325.15586-3-SkyLake.Huang@mediatek.com/
 
-On Mon,  6 May 2024 13:55:46 +0000 you wrote:
-> Some usb drivers try to set small skb->truesize and break
-> core networking stacks.
-> 
-> I replace one skb_clone() by an allocation of a fresh
-> and small skb, to get minimally sized skbs, like we did
-> in commit 1e2c61172342 ("net: cdc_ncm: reduce skb truesize
-> in rx path") and 4ce62d5b2f7a ("net: usb: ax88179_178a:
-> stop lying about skb->truesize")
-> 
-> [...]
+ drivers/net/phy/air_en8811h.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Here is the summary with links:
-  - [net-next] usb: aqc111: stop lying about skb->truesize
-    https://git.kernel.org/netdev/net-next/c/9aad6e45c4e7
-
-You are awesome, thank you!
+diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
+index 4c9a1c9c805e..3cdc8c6b30b6 100644
+--- a/drivers/net/phy/air_en8811h.c
++++ b/drivers/net/phy/air_en8811h.c
+@@ -544,6 +544,10 @@ static int air_hw_led_on_set(struct phy_device *phydev, u8 index, bool on)
+ 
+ 	changed |= (priv->led[index].rules != 0);
+ 
++	/* clear netdev trigger rules in case LED_OFF has been set */
++	if (!on)
++		priv->led[index].rules = 0;
++
+ 	if (changed)
+ 		return phy_modify_mmd(phydev, MDIO_MMD_VEND2,
+ 				      AIR_PHY_LED_ON(index),
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.45.0
 
 
