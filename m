@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-94571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6BEB8BFE8E
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:20:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66CD58BFE8F
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:20:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9348B288FB9
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:20:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D5CF1F26967
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A401F75803;
-	Wed,  8 May 2024 13:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A6878C85;
+	Wed,  8 May 2024 13:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TPTTvU3s"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XkEPPNN2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B2A73191
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 13:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5A379945
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 13:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715174362; cv=none; b=jGy0QJEQyWfM90WaIwZBghKIZL9eTx0jRdTG1HzxhHIwz4fXW5tEarKbY1ewOLCk1Ff/fhTGnxjCw6iDzGZoGg1edNb8fRWoh7q9xRtQiV2BASg/7OJGg06wdWJDGPoPgANwJA18TaFmo46TsDcXIogQpYU/eJwZXJW/hYBlqxY=
+	t=1715174385; cv=none; b=GHJlSuIR4egzdCgSVD0wGgO2MYlSbTOsLYSe/GFe92fRnno/Fs7q2GEW1YrPQ2w+guvpnKRuak4+5+TvwGOCun9b2TYD005FZcgHwvdhtUqFift4bTlPO5fR2sej/E0TQwEJLDo3/eXgDP/D66RkW3XrNuuLbDdzWmvr3E42LXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715174362; c=relaxed/simple;
-	bh=sFzPIT5Te1nb8NBbWpkxIkGDjBIjnZtkvfkI0vbFXfA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QJ+LEVTAGXn0KprFxa9KT8aqiX4meCJPmiaKUKrUxnhSo83JGb7PtdBhCeiNT/6BGurLVgJKvTweIuK1eHdz3p+d/aIQfa2X8IT0DJHNgkPGMfsgUlbzVCBrOQP5jsFUAYkkzCmGY3O7nl1tTjoOGNdtrSNZ1+FrAake6GG7QfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TPTTvU3s; arc=none smtp.client-ip=91.218.175.171
+	s=arc-20240116; t=1715174385; c=relaxed/simple;
+	bh=ocluJHKG5H67LGLj+kkg7g2CrvBwTZcXIsaY6UFAY0o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PYJIi279I5p82vDq/Um7YdNiKsXVCKqsRk/u2ZYJI4vy/AHjSOjTFZvvGg2dnFSMOwS8U0Er6e/z6EIwwcNKJEXIplS4ExBtJyOPRr9XDudg1aSjFkxmmYq0Op4RLflylBWQ1JO7De8Valn4yMhciVqZeLqECb9XSpkryh6+/iU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XkEPPNN2; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1715174357;
+	t=1715174381;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=a7PN3JQ4K/DvJRnlFHoORql2tVkuV7mrhZmcPwMwWoY=;
-	b=TPTTvU3s1SYWMOeKi3A9oFy4vPfN5w7108g2iPx1iuvN4rnC0ByATQqnIzsegeKk9zmJid
-	p6RUCa7MFiTb81i/lnxM/9K6p1fqHH5DVuJVMsnIYumkN08q3Uo1nDw7VPRv6W/NEChTAq
-	KqjK/oBuS2+YGOpnYDitf04YGQHfqxU=
+	bh=lBzxJEZkTr2twh/tIhpqNl8YWzKURmo6vkMsWYPZA7g=;
+	b=XkEPPNN2Wjdaq3EekZyraMVtoJcWyNHvm2asikrJt2OgdY0GUiqx+O3aLsObD6yoF7Ytlz
+	wBhOAaZ8caeqRiWnotoSHVK/oueumUZfPot5qUh1J84d/G0VIDORV9esIvty/7wakcRkhK
+	cMeXXZUfpQSqN5qQdIAZDLZ78aQHp0Q=
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Jonathan Lemon <jonathan.lemon@gmail.com>
 Cc: Richard Cochran <richardcochran@gmail.com>,
 	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	netdev@vger.kernel.org
-Subject: [PATCH net] ptp: ocp: fix DPLL functions
-Date: Wed,  8 May 2024 13:21:11 +0000
-Message-ID: <20240508132111.11545-1-vadim.fedorenko@linux.dev>
+Subject: [PATCH net] ptp: ocp: adjust serial port symlink creation
+Date: Wed,  8 May 2024 13:21:44 +0000
+Message-ID: <20240508132144.11560-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,46 +58,90 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-In ptp_ocp driver pin actions assume sma_nr starts with 1, but for DPLL
-subsystem callback 0-based index was used. Fix it providing proper index.
+The commit b286f4e87e32 ("serial: core: Move tty and serdev to be children
+of serial core port device") changed the hierarchy of serial port devices
+and device_find_child_by_name cannot find ttyS* devices because they are
+no longer directly attached. Add some logic to restore symlinks creation
+to the driver for OCP TimeCard.
 
-Fixes: 09eeb3aecc6c ("ptp_ocp: implement DPLL ops")
+Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
 Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
- drivers/ptp/ptp_ocp.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/ptp/ptp_ocp.c | 30 +++++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-index 6506cfb89aa9..ee2ced88ab34 100644
+index ee2ced88ab34..50b7cb9db3be 100644
 --- a/drivers/ptp/ptp_ocp.c
 +++ b/drivers/ptp/ptp_ocp.c
-@@ -4562,7 +4562,7 @@ static int ptp_ocp_dpll_direction_set(const struct dpll_pin *pin,
- 		return -EOPNOTSUPP;
- 	mode = direction == DPLL_PIN_DIRECTION_INPUT ?
- 			    SMA_MODE_IN : SMA_MODE_OUT;
--	return ptp_ocp_sma_store_val(bp, 0, mode, sma_nr);
-+	return ptp_ocp_sma_store_val(bp, 0, mode, sma_nr + 1);
+@@ -25,6 +25,8 @@
+ #include <linux/crc16.h>
+ #include <linux/dpll.h>
+ 
++#include "../tty/serial/8250/8250.h"
++
+ #define PCI_VENDOR_ID_FACEBOOK			0x1d9b
+ #define PCI_DEVICE_ID_FACEBOOK_TIMECARD		0x0400
+ 
+@@ -4330,11 +4332,9 @@ ptp_ocp_symlink(struct ptp_ocp *bp, struct device *child, const char *link)
  }
  
- static int ptp_ocp_dpll_frequency_set(const struct dpll_pin *pin,
-@@ -4583,7 +4583,7 @@ static int ptp_ocp_dpll_frequency_set(const struct dpll_pin *pin,
- 	tbl = bp->sma_op->tbl[sma->mode];
- 	for (i = 0; tbl[i].name; i++)
- 		if (tbl[i].frequency == frequency)
--			return ptp_ocp_sma_store_val(bp, i, sma->mode, sma_nr);
-+			return ptp_ocp_sma_store_val(bp, i, sma->mode, sma_nr + 1);
- 	return -EINVAL;
- }
+ static void
+-ptp_ocp_link_child(struct ptp_ocp *bp, const char *name, const char *link)
++ptp_ocp_link_child(struct ptp_ocp *bp, struct device *dev, const char *name, const char *link)
+ {
+-	struct device *dev, *child;
+-
+-	dev = &bp->pdev->dev;
++	struct device *child;
  
-@@ -4600,7 +4600,7 @@ static int ptp_ocp_dpll_frequency_get(const struct dpll_pin *pin,
- 	u32 val;
- 	int i;
+ 	child = device_find_child_by_name(dev, name);
+ 	if (!child) {
+@@ -4349,27 +4349,39 @@ ptp_ocp_link_child(struct ptp_ocp *bp, const char *name, const char *link)
+ static int
+ ptp_ocp_complete(struct ptp_ocp *bp)
+ {
++	struct device *dev, *port_dev;
++	struct uart_8250_port *port;
+ 	struct pps_device *pps;
+ 	char buf[32];
  
--	val = bp->sma_op->get(bp, sma_nr);
-+	val = bp->sma_op->get(bp, sma_nr + 1);
- 	tbl = bp->sma_op->tbl[sma->mode];
- 	for (i = 0; tbl[i].name; i++)
- 		if (val == tbl[i].value) {
++	dev = &bp->pdev->dev;
++
+ 	if (bp->gnss_port.line != -1) {
++		port = serial8250_get_port(bp->gnss_port.line);
++		port_dev = (struct device *)port->port.port_dev;
+ 		sprintf(buf, "ttyS%d", bp->gnss_port.line);
+-		ptp_ocp_link_child(bp, buf, "ttyGNSS");
++		ptp_ocp_link_child(bp, port_dev, buf, "ttyGNSS");
+ 	}
+ 	if (bp->gnss2_port.line != -1) {
++		port = serial8250_get_port(bp->gnss2_port.line);
++		port_dev = (struct device *)port->port.port_dev;
+ 		sprintf(buf, "ttyS%d", bp->gnss2_port.line);
+-		ptp_ocp_link_child(bp, buf, "ttyGNSS2");
++		ptp_ocp_link_child(bp, port_dev, buf, "ttyGNSS2");
+ 	}
+ 	if (bp->mac_port.line != -1) {
++		port = serial8250_get_port(bp->mac_port.line);
++		port_dev = (struct device *)port->port.port_dev;
+ 		sprintf(buf, "ttyS%d", bp->mac_port.line);
+-		ptp_ocp_link_child(bp, buf, "ttyMAC");
++		ptp_ocp_link_child(bp, port_dev, buf, "ttyMAC");
+ 	}
+ 	if (bp->nmea_port.line != -1) {
++		port = serial8250_get_port(bp->nmea_port.line);
++		port_dev = (struct device *)port->port.port_dev;
+ 		sprintf(buf, "ttyS%d", bp->nmea_port.line);
+-		ptp_ocp_link_child(bp, buf, "ttyNMEA");
++		ptp_ocp_link_child(bp, port_dev, buf, "ttyNMEA");
+ 	}
+ 	sprintf(buf, "ptp%d", ptp_clock_index(bp->ptp));
+-	ptp_ocp_link_child(bp, buf, "ptp");
++	ptp_ocp_link_child(bp, dev, buf, "ptp");
+ 
+ 	pps = pps_lookup_dev(bp->ptp);
+ 	if (pps)
 -- 
 2.43.0
 
