@@ -1,62 +1,56 @@
-Return-Path: <netdev+bounces-94713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 387178C051C
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 21:33:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D818C054A
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 21:55:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64D8F1C21009
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 19:33:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 799EC1F22665
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 19:55:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D16130AE7;
-	Wed,  8 May 2024 19:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF91130A64;
+	Wed,  8 May 2024 19:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="UQa1tWWS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cGMGbJ3a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22F412B156
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 19:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56B338DF2
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 19:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715196794; cv=none; b=MzcInmEIzpnjnlC7Uo3Zbtn49RuhEzp1Z9dispe1F4D5EOvfPX3TN5TNMSREtnGehFOYmBKXXVewWrlB5UydO7g8zQwIClbAQEbMApzXlABU1bJ0pxCMaCL1bLbLH24gTmS5mPWCs5+URf3hPAYL+rAfoDH/Akrpbq91g3/sJoA=
+	t=1715198136; cv=none; b=ugoamCaAOZ364JtRG77G3vaV2TyqepgqaRmqY5iBKqG6Ka1Aa8n9kXm/wkmv7fvyuRsGCNB/7hGc8WV9eahjEGjcjoN5qg/3igNUKdlWMZmLaFyuRTIZYZb3HTm2SgRh1r+YYlWorOu7r3rH1b+mJDia2yw81eAFMBx2s+B0I8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715196794; c=relaxed/simple;
-	bh=BqASjYSExQ+D7Yd+cxznVTfXPxXorUXWvTG6AeWlH3c=;
+	s=arc-20240116; t=1715198136; c=relaxed/simple;
+	bh=HqpGS+JOndachOGlFftx2AIMZIuv9uWeH/DA9u9Y/bo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qVSUiD5lylCUasMYuNVL7OY0jfwdvBZEWt6sQQ5T6GGCOuCu85XYb7gHoOAcnsBKnhhidCg4Vq3TDeqn88vjN18SxUd7ZZ4e2zQ1L2M7Bz1L+BxjHXzDtrQSq1B801TnjhOaohwmAtMGdIrXiLSY36nzq9WWWgWNnmeGNPDSwuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=UQa1tWWS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6D5DC113CC;
-	Wed,  8 May 2024 19:33:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1715196794;
-	bh=BqASjYSExQ+D7Yd+cxznVTfXPxXorUXWvTG6AeWlH3c=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=F/lAXAnfxeq7DRAMRqSHBSiypIc1v+YR5JfL6S/qOUcGs09YdS4lhs4qCF+A6MCuMCPr0EDSutJ2QLSX1bKQS6hK64LOl53maEB0qzV2/hKavKI5+4jgSI5NWex62YyVRaYU4UuR8pp+88Erm+OQaXus5GXBR97kOTG2LzcJkgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cGMGbJ3a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9B34C113CC;
+	Wed,  8 May 2024 19:55:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715198136;
+	bh=HqpGS+JOndachOGlFftx2AIMZIuv9uWeH/DA9u9Y/bo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UQa1tWWSpnsQOi3dp5NKMdGe3cMEdHHphY+y/2nUymWnqqf/e8+UIEkdtLg5yPur6
-	 0W4BBrcZkwt1SgmHsROH0hNeDsAJ+7hNCBDtKfr7OUUBtL1AeockbogA93jl4TBVpT
-	 fIT8X+LXl2gz0CttL5Ciwzs3L6an8JFQKIIgmAmE=
-Date: Wed, 8 May 2024 20:33:10 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Andrew Cooper <andrew.cooper3@citrix.com>
-Cc: cve@kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>,
-	netdev@vger.kernel.org,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, wei.liu@kernel.org,
-	paul@xen.org, Jakub Kicinski <kuba@kernel.org>, kirjanov@gmail.com,
-	dkirjanov@suse.de, kernel-team@cloudflare.com,
-	security@xenproject.org, xen-devel@lists.xenproject.org,
-	George Dunlap <dunlapg@umich.edu>
-Subject: Re: [PATCH net] xen-netfront: Add missing skb_mark_for_recycle
-Message-ID: <2024050802-playful-brick-0c67@gregkh>
-References: <171154167446.2671062.9127105384591237363.stgit@firesoul>
- <CALUcmU=xOR1j9Asdv0Ny7x=o4Ckz80mDjbuEnJC0Z_Aepu0Zzw@mail.gmail.com>
- <CALUcmUkvpnq+CKSCn=cuAfxXOGU22fkBx4QD4u2nZYGM16DD6A@mail.gmail.com>
- <CALUcmUn0__izGAS-8gDL2h2Ceg9mdkFnLmdOgvAfO7sqxXK1-Q@mail.gmail.com>
- <CAFLBxZaLKGgrZRUDMQ+kCAYKD7ypzsjO55mWvkZHtMTBxdw51A@mail.gmail.com>
- <2024042544-jockstrap-cycle-ed93@gregkh>
- <9a2018c6-4efb-4bfe-b90f-531a072f0ef8@citrix.com>
+	b=cGMGbJ3a7KYbRO3B4DJTfpChzOfeNGlsnJPCj141pQJujoFFsQBXmgBeVeXohaDfO
+	 LIpQtaxkqF/7ZYQECW8az7n60doEv7xWTDrFab8uYp6P/hrIDkyMjfC7T0NGzXmiMR
+	 rOZOOFHqqcsMOWXS6TeDuIRjtxgMgT23TvM57u1rHESH4Fosrm86kpr5vX5xYrMMob
+	 XTDwfRDV7xO9U2eZfpmwtEmKK1Xk/r4e5M7J2PoyTtcuhPc9WRrfGW1KjoQvIPqGS2
+	 tUTRDru8vGiBGPJ5/yyhhaa98TB3wm4IsVyd9fQ+iIFfCVDSIIAjm46hUSrHfz0A+C
+	 VI1AfNXzEy3dw==
+Date: Wed, 8 May 2024 20:55:32 +0100
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next] net: annotate data-races around dev->if_port
+Message-ID: <20240508195532.GI1736038@kernel.org>
+References: <20240507184144.1230469-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,21 +59,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9a2018c6-4efb-4bfe-b90f-531a072f0ef8@citrix.com>
+In-Reply-To: <20240507184144.1230469-1-edumazet@google.com>
 
-On Tue, May 07, 2024 at 02:57:08PM +0100, Andrew Cooper wrote:
-> Hello,
+On Tue, May 07, 2024 at 06:41:44PM +0000, Eric Dumazet wrote:
+> Various ndo_set_config() methods can change dev->if_port
 > 
-> Please could we request a CVE for "xen-netfront: Add missing
-> skb_mark_for_recycle" which is 037965402a010898d34f4e35327d22c0a95cd51f
-> in Linus' tree.
+> dev->if_port is going to be read locklessly from
+> rtnl_fill_link_ifmap().
 > 
-> This is a kernel memory leak trigger-able from unprivileged userspace.
+> Add corresponding WRITE_ONCE() on writer sides.
 > 
-> I can't see any evidence of this fix having been assigned a CVE thus far
-> on the linux-cve-annouce mailing list.
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-CVE-2024-27393 is now created for this, thanks.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-greg k-h
 
