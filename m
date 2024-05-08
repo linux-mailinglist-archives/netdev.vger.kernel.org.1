@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-94340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 538308BF3AF
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:30:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6988B8BF3AC
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0912D1F21474
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:30:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02BED1F22684
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4BD1849;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE6D263E;
 	Wed,  8 May 2024 00:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rM9mUW+u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TSHNcXaA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93F9622;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85E1938F;
 	Wed,  8 May 2024 00:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715128232; cv=none; b=kBNRd/OScJ/L8r9wZZluE6Hyaok7Z1rir5Ww7YA5sD59YNYMVJmvaxk/pKzHzAjnnbtWla6rBvrKt+ZgFKo85MMqO7T2StyZHcl5Zg+feEt/UuVA1iwSK84QZEchSMu/W/BDN310srzpcMqiAwRfBuOAMlGGQrPBzlgqn52yrWQ=
+	t=1715128232; cv=none; b=km6isFrY/wYrtJ+XOZwCmBufx54S38A92mXGFM29KQBijhNoYe7G2LTvEppfJe0ydP1ZQ+yUS+mX/5hhcppXsG/ApDZEQvco6dR/1/p0RJCMItGC7RWDUOfq1XZR917c8j1S872S2+Mw9NmxFC3IhqslBSD8ZyAC8z2bQYnwFHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715128232; c=relaxed/simple;
-	bh=q6V7n72TWE+LkN6Z1iKMOe3Tu61qwITDsaurNXpNThY=;
+	bh=k8BXEudDpHpt0/brJcoInDKI3eTW/lQczY+pbYkA2zk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ly+qbBqnIcyYitWriKMHJsAF2FGkVqlac1LTeQC+HCzOAs42oTb0Ddst5dKl0sZVD7+oy7zOcKHIEi9ciXXI8CZFg28LZR30Lp158zTQY24JIa3ipV6TfwJJDLxIbfwDMUeW/EHf56Hs70KS4C/GoSYB9ZZaHJDszCaHsJCYxtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rM9mUW+u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6AC5EC4DDE8;
+	 In-Reply-To:To:Cc; b=pr0reizOqhoA9cRbpZQKX/jf3Yy9Jq070C2FNCcxCZewE5eA3jIHmhK/bmuN0oMl5DXevAgcie1AKwXnHTpQSi6mtYfXESsmQ2kZPj3wzVI5lfc60SScIFkEP5zwgEeGP1LAJRYzb4kwMt8fKvhi1gnu1H4t1biWqY7UyLUjFZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TSHNcXaA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2CBF9C4DDE2;
 	Wed,  8 May 2024 00:30:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715128232;
-	bh=q6V7n72TWE+LkN6Z1iKMOe3Tu61qwITDsaurNXpNThY=;
+	bh=k8BXEudDpHpt0/brJcoInDKI3eTW/lQczY+pbYkA2zk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rM9mUW+uCyW/C+l7YZqn2HJubeCXW8XJmWc36duoSk4aNSt4fb+TgZo+IFraMBQyV
-	 5CLIy5/rXtuwfysu/bH/gx6VUJDSQQgUCvsdLVT7OJG/PEh2Yx7ON75232pD0dvkCL
-	 4F/SCRISml0gDFmwiYxcIuyoWK8EBPxxu/9S0syUbg/lXhfdDWoEewDm/yabYjZT9B
-	 Ly9Lc7rnecRfMOrk8HaHDiXU8wL3qjin2WsqBeZ9vcclI9gosbYKA0uEBWgMIskUOE
-	 mKUnBumVr+Fb/o2f1PIKLaS0LZMrVOl1kmIWeZvgH25pEI4RDf6ooUBA1w9dqZt6cV
-	 ewnrn40mzMLRQ==
+	b=TSHNcXaACur+/GZluQlXnpU37/1vNA02m//LEL3qN6PZwVJ+G6qHAOvVzI+QnkSu0
+	 O6CVpM3CjqCug/QPjwLHx270KlootJ5FaX79HisWEeDjyh5CVESORjdI9gnrbl4ipv
+	 5BDs5+3OFpphJNOm3Ce0geLeL4hweXCkbDDbNcCHp/Jt2lwO78HiXcX7sKRhc/OXrH
+	 PBkTVj9xN/4d8uTmltaOUakjQbe/ir1Dr18xk03gSD79dkCCRlTbfWwXZ+V66reLSz
+	 hRKKQPCzpw7HhF/Jdcdi4K/fR6LdSWnPyV9xjwI8OX7PoD85A05iYOZ2uPVv9yi56m
+	 5282eDtZID+rg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5D90AC43614;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 20C0EC43617;
 	Wed,  8 May 2024 00:30:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,45 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] selftests/net: fix uninitialized variables
+Subject: Re: [PATCH net] mptcp: only allow set existing scheduler for
+ net.mptcp.scheduler
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171512823237.17947.6042274954836297174.git-patchwork-notify@kernel.org>
+ <171512823213.17947.12733712609638814177.git-patchwork-notify@kernel.org>
 Date: Wed, 08 May 2024 00:30:32 +0000
-References: <20240506190204.28497-1-jhubbard@nvidia.com>
-In-Reply-To: <20240506190204.28497-1-jhubbard@nvidia.com>
-To: John Hubbard <jhubbard@nvidia.com>
-Cc: shuah@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, steffen.klassert@secunet.com,
- herbert@gondor.apana.org.au, afaerber@suse.de,
- manivannan.sadhasivam@linaro.org, matttbe@kernel.org, martineau@kernel.org,
- geliang@kernel.org, pshelar@ovn.org, willemdebruijn.kernel@gmail.com,
- alexander@mihalicyn.com, zhujun2@cmss.chinamobile.com, petrm@nvidia.com,
- idosch@nvidia.com, liuhangbin@gmail.com, razor@blackwall.org,
- bpoirier@nvidia.com, bigeasy@linutronix.de, 0x7f454c46@gmail.com,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
- dev@openvswitch.org, kernel@valentinobst.de, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+References: <20240506-upstream-net-20240506-mptcp-sched-exist-v1-1-2ed1529e521e@kernel.org>
+In-Reply-To: <20240506-upstream-net-20240506-mptcp-sched-exist-v1-1-2ed1529e521e@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ gregory.detal@gmail.com, stable@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  6 May 2024 12:02:04 -0700 you wrote:
-> When building with clang, via:
+On Mon, 06 May 2024 17:35:28 +0200 you wrote:
+> From: Gregory Detal <gregory.detal@gmail.com>
 > 
->     make LLVM=1 -C tools/testing/selftest
+> The current behavior is to accept any strings as inputs, this results in
+> an inconsistent result where an unexisting scheduler can be set:
 > 
-> ...clang warns about three variables that are not initialized in all
-> cases:
+>   # sysctl -w net.mptcp.scheduler=notdefault
+>   net.mptcp.scheduler = notdefault
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] selftests/net: fix uninitialized variables
-    https://git.kernel.org/netdev/net-next/c/eb709b5f6536
+  - [net] mptcp: only allow set existing scheduler for net.mptcp.scheduler
+    https://git.kernel.org/netdev/net/c/6963c508fd7a
 
 You are awesome, thank you!
 -- 
