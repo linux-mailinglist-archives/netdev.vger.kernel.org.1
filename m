@@ -1,61 +1,52 @@
-Return-Path: <netdev+bounces-94587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FA0F8BFEEF
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:39:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 041AA8BFEEA
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:38:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA4ED2833F2
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:39:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7282E1F23C20
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:38:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771B91272BF;
-	Wed,  8 May 2024 13:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B242D86259;
+	Wed,  8 May 2024 13:37:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C9A86AE2;
-	Wed,  8 May 2024 13:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12EC8614D;
+	Wed,  8 May 2024 13:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715175425; cv=none; b=DjfWDw07fFDW6b2UN+ebp14h7yO08rDyGTKP+7dgpQsPZ5lrxzuxLs/apxMGUFM/KY5jxC/h5OARZlPr4wqXhroEb7QfHJE0uccc8nDNXLzRBMmiwkToB4v7oJseBLGux+m5mlAz+IItBo1gplNNcDf+N/rnv5+ZaALlUI9B8yg=
+	t=1715175421; cv=none; b=us4AWQS7eKC/cSneOHgcq3j/iWgA2Em+hbJJQa/SsGcAgQTkCd3j4L/8rDgoY+HdAWIvYlNc0vvHszNgtkiLMmRbGnCN5xxUZI7vbVphLDrUOtgi8k3cI0qj//7eW7d68sDiQgkjIgCb+1ExsDqYfhKYm7JAFvkyX6zN689+dig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715175425; c=relaxed/simple;
-	bh=aUMv2EyZWKJgCD0BZ6yrbkGsvXQDS9HIZgEmv9GZke0=;
+	s=arc-20240116; t=1715175421; c=relaxed/simple;
+	bh=t8kYAIW2U8ao1A2w0BdbR0I96PSYyvvBz8AT9+ffVW8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FtXOzXZe9xbVKI3Z4ppNAIuEXPEbLVMifLx5NuCMojsoQwFSRMvdgerKbR/VFoHOIHW2jDy3R/8bLWBP86idQz71nFISExgjuh4nFnPlK9YyRKIR06nCmc3/58SnAV+qC1tsPIVh/zUiVZWjaUJMMb1LEELSVD+5rf1oM2IoEew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	 MIME-Version:Content-Type; b=aj1CPETO7YA5m6GHnTrXQrj3O6erUAk8cST48YtGdJtdr0Z8hs7LWbtHyIzt16cRmBFKDI7u7QLtrt4q1Ph8hQcd36djksZB+Q4roSIsBJnTBKczoG8fQ/pCDAR0Ay8i2+EYoSPV5e33tyFGFsARjKmarLt7lbcKdYuJzMMTOJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VZGLd3YXtztTBx;
-	Wed,  8 May 2024 21:33:29 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VZGLn55CNz1RBtL;
+	Wed,  8 May 2024 21:33:37 +0800 (CST)
 Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id B419C1800B8;
-	Wed,  8 May 2024 21:36:55 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id A857D18007E;
+	Wed,  8 May 2024 21:36:57 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 8 May 2024 21:36:55 +0800
+ 15.1.2507.35; Wed, 8 May 2024 21:36:57 +0800
 From: Yunsheng Lin <linyunsheng@huawei.com>
 To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
-	<edumazet@google.com>, David Howells <dhowells@redhat.com>, Marc Dionne
-	<marc.dionne@auristor.com>, Trond Myklebust
-	<trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, Chuck
- Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
-	<neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-afs@lists.infradead.org>, <linux-nfs@vger.kernel.org>
-Subject: [PATCH net-next v3 07/13] mm: page_frag: avoid caller accessing 'page_frag_cache' directly
-Date: Wed, 8 May 2024 21:34:02 +0800
-Message-ID: <20240508133408.54708-8-linyunsheng@huawei.com>
+	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>, Andrew
+ Morton <akpm@linux-foundation.org>, <linux-mm@kvack.org>
+Subject: [PATCH net-next v3 08/13] mm: page_frag: reuse existing space for 'size' and 'pfmemalloc'
+Date: Wed, 8 May 2024 21:34:03 +0800
+Message-ID: <20240508133408.54708-9-linyunsheng@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20240508133408.54708-1-linyunsheng@huawei.com>
 References: <20240508133408.54708-1-linyunsheng@huawei.com>
@@ -70,149 +61,285 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  dggpemm500005.china.huawei.com (7.185.36.74)
 
-Use appropriate frag_page API instead of caller accessing
-'page_frag_cache' directly.
+Currently there is one 'struct page_frag' for every 'struct
+sock' and 'struct task_struct', we are about to replace the
+'struct page_frag' with 'struct page_frag_cache' for them.
+Before begin the replacing, we need to ensure the size of
+'struct page_frag_cache' is not bigger than the size of
+'struct page_frag', as there may be tens of thousands of
+'struct sock' and 'struct task_struct' instances in the
+system.
+
+By or'ing the page order & pfmemalloc with lower bits of
+'va' instead of using 'u16' or 'u32' for page size and 'u8'
+for pfmemalloc, we are able to avoid 3 or 5 bytes space waste.
+And page address & pfmemalloc & order is unchanged for the
+same page in the same 'page_frag_cache' instance, it makes
+sense to fit them together.
+
+Also, it is better to replace 'offset' with 'remaining', which
+is the remaining size for the cache in a 'page_frag_cache'
+instance, we are able to do a single 'fragsz > remaining'
+checking for the case of cache being enough, which should be the
+fast path if we ensure size is zoro when 'va' == NULL by
+memset'ing 'struct page_frag_cache' in page_frag_cache_init()
+and page_frag_cache_drain().
+
+After this patch, the size of 'struct page_frag_cache' should be
+the same as the size of 'struct page_frag'.
 
 CC: Alexander Duyck <alexander.duyck@gmail.com>
 Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
 ---
- drivers/vhost/net.c             |  2 +-
- include/linux/page_frag_cache.h | 10 ++++++++++
- mm/page_frag_test.c             |  2 +-
- net/core/skbuff.c               |  6 +++---
- net/rxrpc/conn_object.c         |  4 +---
- net/rxrpc/local_object.c        |  4 +---
- net/sunrpc/svcsock.c            |  6 ++----
- 7 files changed, 19 insertions(+), 15 deletions(-)
+ include/linux/page_frag_cache.h | 62 +++++++++++++++++----
+ mm/page_frag_cache.c            | 98 ++++++++++++++++++++-------------
+ 2 files changed, 111 insertions(+), 49 deletions(-)
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 6691fac01e0d..b2737dc0dc50 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1325,7 +1325,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 			vqs[VHOST_NET_VQ_RX]);
- 
- 	f->private_data = n;
--	n->pf_cache.va = NULL;
-+	page_frag_cache_init(&n->pf_cache);
- 
- 	return 0;
- }
 diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
-index a5747cf7a3a1..024ff73a7ea4 100644
+index 024ff73a7ea4..88e91ee57b91 100644
 --- a/include/linux/page_frag_cache.h
 +++ b/include/linux/page_frag_cache.h
-@@ -23,6 +23,16 @@ struct page_frag_cache {
- 	bool pfmemalloc;
+@@ -8,29 +8,67 @@
+ #define PAGE_FRAG_CACHE_MAX_SIZE	__ALIGN_MASK(32768, ~PAGE_MASK)
+ #define PAGE_FRAG_CACHE_MAX_ORDER	get_order(PAGE_FRAG_CACHE_MAX_SIZE)
+ 
++/*
++ * struct encoded_va - a nonexistent type marking this pointer
++ *
++ * An 'encoded_va' pointer is a pointer to a aligned virtual address, which is
++ * at least aligned to PAGE_SIZE, that means there are at least 12 lower bits
++ * space available for other purposes.
++ *
++ * Currently we use the lower 8 bits and bit 9 for the order and PFMEMALLOC
++ * flag of the page this 'va' is corresponding to.
++ *
++ * Use the supplied helper functions to endcode/decode the pointer and bits.
++ */
++struct encoded_va;
++
++#define PAGE_FRAG_CACHE_ORDER_MASK		GENMASK(7, 0)
++#define PAGE_FRAG_CACHE_PFMEMALLOC_BIT		BIT(8)
++#define PAGE_FRAG_CACHE_PFMEMALLOC_SHIFT	8
++
++static inline struct encoded_va *encode_aligned_va(void *va,
++						   unsigned int order,
++						   bool pfmemalloc)
++{
++	return (struct encoded_va *)((unsigned long)va | order |
++			pfmemalloc << PAGE_FRAG_CACHE_PFMEMALLOC_SHIFT);
++}
++
++static inline unsigned long encoded_page_order(struct encoded_va *encoded_va)
++{
++	return PAGE_FRAG_CACHE_ORDER_MASK & (unsigned long)encoded_va;
++}
++
++static inline bool encoded_page_pfmemalloc(struct encoded_va *encoded_va)
++{
++	return PAGE_FRAG_CACHE_PFMEMALLOC_BIT & (unsigned long)encoded_va;
++}
++
++static inline void *encoded_page_address(struct encoded_va *encoded_va)
++{
++	return (void *)((unsigned long)encoded_va & PAGE_MASK);
++}
++
+ struct page_frag_cache {
+-	void *va;
+-#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+-	__u16 offset;
+-	__u16 size;
++	struct encoded_va *encoded_va;
++
++#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <= 32)
++	u16 pagecnt_bias;
++	u16 remaining;
+ #else
+-	__u32 offset;
++	u32 pagecnt_bias;
++	u32 remaining;
+ #endif
+-	/* we maintain a pagecount bias, so that we dont dirty cache line
+-	 * containing page->_refcount every time we allocate a fragment.
+-	 */
+-	unsigned int		pagecnt_bias;
+-	bool pfmemalloc;
  };
  
-+static inline void page_frag_cache_init(struct page_frag_cache *nc)
-+{
-+	nc->va = NULL;
-+}
-+
-+static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
-+{
-+	return !!nc->pfmemalloc;
-+}
-+
- void page_frag_cache_drain(struct page_frag_cache *nc);
- void __page_frag_cache_drain(struct page *page, unsigned int count);
- void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
-diff --git a/mm/page_frag_test.c b/mm/page_frag_test.c
-index 92eb288aab75..8a974d0588bf 100644
---- a/mm/page_frag_test.c
-+++ b/mm/page_frag_test.c
-@@ -329,7 +329,7 @@ static int __init page_frag_test_init(void)
- 	u64 duration;
- 	int ret;
- 
--	test_frag.va = NULL;
-+	page_frag_cache_init(&test_frag);
- 	atomic_set(&nthreads, 2);
- 	init_completion(&wait);
- 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index dca4e7445348..caee22db1cc7 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -741,12 +741,12 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
- 	if (in_hardirq() || irqs_disabled()) {
- 		nc = this_cpu_ptr(&netdev_alloc_cache);
- 		data = page_frag_alloc_va(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 	} else {
- 		local_bh_disable();
- 		nc = this_cpu_ptr(&napi_alloc_cache.page);
- 		data = page_frag_alloc_va(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 		local_bh_enable();
- 	}
- 
-@@ -834,7 +834,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 		len = SKB_HEAD_ALIGN(len);
- 
- 		data = page_frag_alloc_va(&nc->page, len, gfp_mask);
--		pfmemalloc = nc->page.pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
- 	}
- 
- 	if (unlikely(!data))
-diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
-index 1539d315afe7..694c4df7a1a3 100644
---- a/net/rxrpc/conn_object.c
-+++ b/net/rxrpc/conn_object.c
-@@ -337,9 +337,7 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
- 	 */
- 	rxrpc_purge_queue(&conn->rx_queue);
- 
--	if (conn->tx_data_alloc.va)
--		__page_frag_cache_drain(virt_to_page(conn->tx_data_alloc.va),
--					conn->tx_data_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&conn->tx_data_alloc);
- 	call_rcu(&conn->rcu, rxrpc_rcu_free_connection);
- }
- 
-diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index 504453c688d7..a8cffe47cf01 100644
---- a/net/rxrpc/local_object.c
-+++ b/net/rxrpc/local_object.c
-@@ -452,9 +452,7 @@ void rxrpc_destroy_local(struct rxrpc_local *local)
- #endif
- 	rxrpc_purge_queue(&local->rx_queue);
- 	rxrpc_purge_client_connections(local);
--	if (local->tx_alloc.va)
--		__page_frag_cache_drain(virt_to_page(local->tx_alloc.va),
--					local->tx_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&local->tx_alloc);
- }
- 
- /*
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 42d20412c1c3..4b1e87187614 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1609,7 +1609,6 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
- static void svc_sock_free(struct svc_xprt *xprt)
+ static inline void page_frag_cache_init(struct page_frag_cache *nc)
  {
- 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
--	struct page_frag_cache *pfc = &svsk->sk_frag_cache;
- 	struct socket *sock = svsk->sk_sock;
- 
- 	trace_svcsock_free(svsk, sock);
-@@ -1619,8 +1618,7 @@ static void svc_sock_free(struct svc_xprt *xprt)
- 		sockfd_put(sock);
- 	else
- 		sock_release(sock);
--	if (pfc->va)
--		__page_frag_cache_drain(virt_to_head_page(pfc->va),
--					pfc->pagecnt_bias);
-+
-+	page_frag_cache_drain(&svsk->sk_frag_cache);
- 	kfree(svsk);
+-	nc->va = NULL;
++	memset(nc, 0, sizeof(*nc));
  }
+ 
+ static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
+ {
+-	return !!nc->pfmemalloc;
++	return encoded_page_pfmemalloc(nc->encoded_va);
+ }
+ 
+ void page_frag_cache_drain(struct page_frag_cache *nc);
+diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+index c0ecfa733727..4542d72e7b01 100644
+--- a/mm/page_frag_cache.c
++++ b/mm/page_frag_cache.c
+@@ -22,6 +22,7 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
+ 					     gfp_t gfp_mask)
+ {
+ 	struct page *page = NULL;
++	unsigned int size, order;
+ 	gfp_t gfp = gfp_mask;
+ 
+ #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+@@ -32,23 +33,41 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
+ 		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+ 	page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
+ 				PAGE_FRAG_CACHE_MAX_ORDER);
+-	nc->size = page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
+ #endif
+-	if (unlikely(!page))
++	if (unlikely(!page)) {
+ 		page = alloc_pages_node(NUMA_NO_NODE, gfp, 0);
++		if (unlikely(!page))
++			goto alloc_failed;
++
++		size = PAGE_SIZE;
++		order = 0;
++	} else {
++		size = PAGE_FRAG_CACHE_MAX_SIZE;
++		order = PAGE_FRAG_CACHE_MAX_ORDER;
++	}
+ 
+-	nc->va = page ? page_address(page) : NULL;
++	nc->encoded_va = encode_aligned_va(page_address(page), order,
++					   page_is_pfmemalloc(page));
++	nc->remaining = size;
++	page_ref_add(page, PAGE_FRAG_CACHE_MAX_SIZE);
++	nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE + 1;
+ 
+ 	return page;
++
++alloc_failed:
++	nc->encoded_va = NULL;
++	nc->remaining = 0;
++	return NULL;
+ }
+ 
+ void page_frag_cache_drain(struct page_frag_cache *nc)
+ {
+-	if (!nc->va)
++	if (!nc->encoded_va)
+ 		return;
+ 
+-	__page_frag_cache_drain(virt_to_head_page(nc->va), nc->pagecnt_bias);
+-	nc->va = NULL;
++	__page_frag_cache_drain(virt_to_head_page(nc->encoded_va),
++				nc->pagecnt_bias);
++	memset(nc, 0, sizeof(*nc));
+ }
+ EXPORT_SYMBOL(page_frag_cache_drain);
+ 
+@@ -65,35 +84,32 @@ void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+ 				 unsigned int fragsz, gfp_t gfp_mask,
+ 				 unsigned int align_mask)
+ {
+-	unsigned int size, offset;
++	unsigned int remaining, page_size;
++	struct encoded_va *encoded_va;
++#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
++	unsigned long page_order;
++#endif
+ 	struct page *page;
+ 
+-	if (unlikely(!nc->va)) {
+-refill:
+-		page = __page_frag_cache_refill(nc, gfp_mask);
+-		if (!page)
+-			return NULL;
+-
+-		/* Even if we own the page, we do not use atomic_set().
+-		 * This would break get_page_unless_zero() users.
+-		 */
+-		page_ref_add(page, PAGE_FRAG_CACHE_MAX_SIZE);
+-
+-		/* reset page count bias and offset to start of new frag */
+-		nc->pfmemalloc = page_is_pfmemalloc(page);
+-		nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE + 1;
+-		nc->offset = 0;
+-	}
+-
++alloc_fragment:
++	remaining = nc->remaining & align_mask;
++	encoded_va = nc->encoded_va;
+ #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+-	/* if size can vary use size else just use PAGE_SIZE */
+-	size = nc->size;
++	page_order = encoded_page_order(encoded_va);
++	page_size = PAGE_SIZE << page_order;
+ #else
+-	size = PAGE_SIZE;
++	page_size = PAGE_SIZE;
+ #endif
+ 
+-	offset = __ALIGN_KERNEL_MASK(nc->offset, ~align_mask);
+-	if (unlikely(offset + fragsz > size)) {
++	if (unlikely(fragsz > remaining)) {
++		if (unlikely(!encoded_va)) {
++			page = __page_frag_cache_refill(nc, gfp_mask);
++			if (page)
++				goto alloc_fragment;
++
++			return NULL;
++		}
++
+ 		/* fragsz is not supposed to be bigger than PAGE_SIZE as we are
+ 		 * allowing order 3 page allocation to fail easily under low
+ 		 * memory condition.
+@@ -101,14 +117,22 @@ void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+ 		if (WARN_ON_ONCE(fragsz > PAGE_SIZE))
+ 			return NULL;
+ 
+-		page = virt_to_page(nc->va);
++		page = virt_to_page(encoded_va);
++		if (!page_ref_sub_and_test(page, nc->pagecnt_bias)) {
++			page = __page_frag_cache_refill(nc, gfp_mask);
++			if (page)
++				goto alloc_fragment;
+ 
+-		if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
+-			goto refill;
++			return NULL;
++		}
+ 
+-		if (unlikely(nc->pfmemalloc)) {
++		if (unlikely(encoded_page_pfmemalloc(encoded_va))) {
+ 			free_unref_page(page, compound_order(page));
+-			goto refill;
++			page = __page_frag_cache_refill(nc,  gfp_mask);
++			if (page)
++				goto alloc_fragment;
++
++			return NULL;
+ 		}
+ 
+ 		/* OK, page count is 0, we can safely set it */
+@@ -116,13 +140,13 @@ void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+ 
+ 		/* reset page count bias and offset to start of new frag */
+ 		nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE + 1;
+-		offset = 0;
++		remaining = page_size;
+ 	}
+ 
++	nc->remaining = remaining - fragsz;
+ 	nc->pagecnt_bias--;
+-	nc->offset = offset + fragsz;
+ 
+-	return nc->va + offset;
++	return encoded_page_address(encoded_va) + (page_size - remaining);
+ }
+ EXPORT_SYMBOL(__page_frag_alloc_va_align);
+ 
 -- 
 2.33.0
 
