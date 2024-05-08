@@ -1,218 +1,142 @@
-Return-Path: <netdev+bounces-94424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C973D8BF712
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:30:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA0608BF71A
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:34:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C24EB22239
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:30:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 594B1B207C4
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E90374C1;
-	Wed,  8 May 2024 07:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63382BB03;
+	Wed,  8 May 2024 07:34:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=innosonix.de header.i=@innosonix.de header.b="CncpDfTr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bH0BIpcQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A6228DC0
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 07:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67FA22301;
+	Wed,  8 May 2024 07:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715153428; cv=none; b=pqzFllnRYw8kBSguPGz4aMSL34XwjLqKhlBiT0dNL997iOtJZr1CcIpqK9HPBJbUy8XO7fwkG1M4EkNmPPs6bwk8dSjchYR7XrQrxLVicmWaus7YttC9Ar4xBtTLPp8Xz4cs0jLwGDbSwcfbBxwlf+f6kQ0DdL8E6/lcZS2+DT0=
+	t=1715153685; cv=none; b=F1JOFnA5AXQh1wBG4Tm+uC5GTgc5MdDQZZVocBYz1N1P7ba7Y//uD6/jwvInSDSQSXB/016uOCDD356VBBtVHK/VfRhqcKuAI0HMayGt9rrVABOI8Qx+2uOuQk677VvoK/Myxkl7Yq3wB5mpjSVYlasyuBp1HbhLhPlOB/U2BGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715153428; c=relaxed/simple;
-	bh=HkLTXlvLqPcM1G9r5TuQ/k6k+kIB8Kh6veaRJgAeLuE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NVpNMljSz1lZ00jDPb+/kXxdsakKTt09JyjnJOlFHMkMrvYo0sh4JhK4zfWC8oGZLSRI9YcWIP2usdsK5ym1Ur4deNn/goQGlq3I1xbAXem79WaSySotIdoilukRyAOGDe4y0FB7o+MmvAuzIbhOFiUNL+MMaKKCnsGmKHJC0mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=innosonix.de; spf=pass smtp.mailfrom=innosonix.de; dkim=pass (2048-bit key) header.d=innosonix.de header.i=@innosonix.de header.b=CncpDfTr; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=innosonix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=innosonix.de
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a599b74fd49so100123366b.2
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 00:30:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=innosonix.de; s=google; t=1715153425; x=1715758225; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5VYVvd11hV7rJunixQLWGyRIvzoAkWZceNjuLWyDIro=;
-        b=CncpDfTrHUfZw6dPg0Q43fIfcyNbLPSpT0yl+p/WWlFiSrNf/ue+abrPSlPlJUrzNg
-         bQc7RkPFAkE9tOGs2mi8fRYcCFsVZ/tLKRtMQGu/dk4h9gjbeEY6jDyQcq5C5bHiDay6
-         CU4AAqg0fy9XUy6T1gvhkG0zaVapZU5ITd2nTLiiyngmPxRnfCX8KzCtBZ0L6BqAa8DB
-         2qShFxanfwqwn72fVGyFlmO79FLkXGqUhrCls3/59cK1D9tzU3RFcV+cMBJYYLFC0bqQ
-         AHoak4ESm1XkK5e/4bY7Jott7Dpx+zRxMJApnioSE/uB2WJeyt691VE4wgz4KfLnn+Z2
-         QCBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715153425; x=1715758225;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5VYVvd11hV7rJunixQLWGyRIvzoAkWZceNjuLWyDIro=;
-        b=GuXPiq9vX/SGaBkuZBfcg7/Al6gBYxfNI9QY5sU9uvNuB2Xs89wHmKksZo2KJvr3yX
-         8uWgP9x0tinuoKfgUhX9HXzerZboK2JRlM7KR1cuSN7Mcy41SphvRDMQVZbv/7sEzFYy
-         kfPxvGaipgolHIvagIBUKMwf4fv1DsSNSyQS5WzQHrPjVSnozAR/TJx4aTw97On/dzRM
-         Zmi8Xy1GoVMUimvEQDz/Jok+qe8XGe2/Fm6VFws8D4xFRICB0skmy1QkqhISayGYXXSJ
-         LmvCdcaTpYkOwLU2zvbhjes12Ge+CuHJXio0Qt2ElB2B5juH5iL7m9XCR5oq76drqEBK
-         M/SA==
-X-Forwarded-Encrypted: i=1; AJvYcCUYapVqdkocOGtx6Hdd4u1G2QOGis6DrZczYJr3dsob1YvN7BEsDFpK+ZGF79qsDRCsEQItKyzc3I9ubYSkCTW2K4/Fn234
-X-Gm-Message-State: AOJu0Yw2tIatnbGZIPDnUmxWqxbWP+wA5HvO4kqflAqpT5E28GPx/VNR
-	9Pshv4U+fABotT6O7NN21Lm0jEmXrATjsrPdLMzwZUQok3d7V/IA7s1hOcwqJS6P/X9LrmmuxhI
-	eWrIMqt4sI6j9MMImWW9LGw3ZVfXn/RzuS8bm6zEWBncwn9A=
-X-Google-Smtp-Source: AGHT+IESY233JbBjfnq6GMLDZnMM4NG31o9T4zlVFMeCCFSjl3lZjwhguOSXqQjmzu92DOiPMrJUMA==
-X-Received: by 2002:a17:906:df14:b0:a59:bce9:8454 with SMTP id a640c23a62f3a-a59fb94f6d3mr109682366b.1.1715153425329;
-        Wed, 08 May 2024 00:30:25 -0700 (PDT)
-Received: from localhost.localdomain ([24.134.20.169])
-        by smtp.gmail.com with ESMTPSA id d12-20020a17090648cc00b00a59a874136fsm5212358ejt.214.2024.05.08.00.30.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 00:30:24 -0700 (PDT)
-From: =?UTF-8?q?Steffen=20B=C3=A4tz?= <steffen@innosonix.de>
-To: 
-Cc: =?UTF-8?q?Steffen=20B=C3=A4tz?= <steffen@innosonix.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Fabio Estevam <festevam@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net 2/2] net: dsa: mv88e6xxx: read cmode on mv88e6320/21 serdes only ports
-Date: Wed,  8 May 2024 09:29:44 +0200
-Message-Id: <20240508072944.54880-3-steffen@innosonix.de>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240508072944.54880-1-steffen@innosonix.de>
-References: <20240508072944.54880-1-steffen@innosonix.de>
+	s=arc-20240116; t=1715153685; c=relaxed/simple;
+	bh=lAlbifORId4Iqe5Et4Xx4lAvJBrGMg1upJ1kuvRnFog=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=R4lfFVo6X2nONCPr1pYzmcxIpJYVGcQB0fxFD4WatdgRXa0H90brk1nV2tlQveXu7K0QgX4E20+hhSeXblTnOSDVkjHvdx2rHSKA94cxAWYgprTpINMQ5GYAwOJ0qIOC/We+U5nzX9Oj+LzmW0EjeYR3AZU6QnAmZFqdRlujdZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bH0BIpcQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F19B3C113CC;
+	Wed,  8 May 2024 07:34:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715153685;
+	bh=lAlbifORId4Iqe5Et4Xx4lAvJBrGMg1upJ1kuvRnFog=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=bH0BIpcQ1Qx5tXc90kqXcjBLjM3aDHGeOF4O3gcjEXcYyKQH1p9QFHJo2andx6Euj
+	 Suhgrg5xWomacSm2dNFYfCs3i0ZTz4hr4H6A0n/sfJy2XPaGBGkoLky8KwXWPaCUaw
+	 lPXXJ4hhkhWJbGgArkjdyDb7rRuXPYVFd0VDEU2D1N93/D1eG2dRmyjbtefsfDTjTs
+	 ktwE+YYvUxaEMtcpmBgc6sThtiW5zX2FnZITt2whmRSVaTTfYAA7SsrLe74DT3GPSp
+	 69mPVHZoqEK0X27Zoao6u+E3EweIqNULayDUS/2D9pwAVxrQy6WyOddgNmQl9Uyh6N
+	 r2JBAA2LfLzLA==
+Message-ID: <e96bfb0a-fa1d-423e-925d-32f4e1e00421@kernel.org>
+Date: Wed, 8 May 2024 09:34:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] dt-bindings: net: mediatek: remove wrongly added
+ clocks and SerDes
+To: Daniel Golle <daniel@makrotopia.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <1569290b21cc787a424469ed74456a7e976b102d.1715084326.git.daniel@makrotopia.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <1569290b21cc787a424469ed74456a7e976b102d.1715084326.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On the mv88e6320 and 6321 switch family, port 0/1 are serdes only ports.
-Modified the mv88e6352_get_port4_serdes_cmode function to pass a port
-number since the register set of the 6352 is equal on the 6320/21.
+On 07/05/2024 14:20, Daniel Golle wrote:
+> Several clocks as well as both sgmiisys phandles were added by mistake
+> to the Ethernet bindings for MT7988. Also, the total number of clocks
+> didn't match with the actual number of items listed.
+> 
+> This happened because the vendor driver which served as a reference uses
+> a high number of syscon phandles to access various parts of the SoC
+> which wasn't acceptable upstream. Hence several parts which have never
+> previously been supported (such SerDes PHY and USXGMII PCS) are going to
+> be implemented by separate drivers. As a result the device tree will
+> look much more sane.
+> 
+> Quickly align the bindings with the upcoming reality of the drivers
+> actually adding support for the remaining Ethernet-related features of
+> the MT7988 SoC.
+> 
+> Fixes: c94a9aabec36 ("dt-bindings: net: mediatek,net: add mt7988-eth binding")
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+> v2: don't make changes to the order of clocks
 
-Signed-off-by: Steffen B=C3=A4tz <steffen@innosonix.de>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Fabio Estevam <festevam@gmail.com>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Changes since v1:
-- Collected Reviewed-by tags from Andrew and Fabio
----
- drivers/net/dsa/mv88e6xxx/chip.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/c=
-hip.c
-index bd58190853c7..6780e8c36b1f 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -637,12 +637,12 @@ static void mv88e6351_phylink_get_caps(struct mv88e6x=
-xx_chip *chip, int port,
- 				   MAC_1000FD;
- }
-=20
--static int mv88e6352_get_port4_serdes_cmode(struct mv88e6xxx_chip *chip)
-+static int mv88e63xx_get_port_serdes_cmode(struct mv88e6xxx_chip *chip, in=
-t port)
- {
- 	u16 reg, val;
- 	int err;
-=20
--	err =3D mv88e6xxx_port_read(chip, 4, MV88E6XXX_PORT_STS, &reg);
-+	err =3D mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_STS, &reg);
- 	if (err)
- 		return err;
-=20
-@@ -651,16 +651,16 @@ static int mv88e6352_get_port4_serdes_cmode(struct mv=
-88e6xxx_chip *chip)
- 		return 0xf;
-=20
- 	val =3D reg & ~MV88E6XXX_PORT_STS_PHY_DETECT;
--	err =3D mv88e6xxx_port_write(chip, 4, MV88E6XXX_PORT_STS, val);
-+	err =3D mv88e6xxx_port_write(chip, port, MV88E6XXX_PORT_STS, val);
- 	if (err)
- 		return err;
-=20
--	err =3D mv88e6xxx_port_read(chip, 4, MV88E6XXX_PORT_STS, &val);
-+	err =3D mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_STS, &val);
- 	if (err)
- 		return err;
-=20
- 	/* Restore PHY_DETECT value */
--	err =3D mv88e6xxx_port_write(chip, 4, MV88E6XXX_PORT_STS, reg);
-+	err =3D mv88e6xxx_port_write(chip, port, MV88E6XXX_PORT_STS, reg);
- 	if (err)
- 		return err;
-=20
-@@ -688,7 +688,7 @@ static void mv88e6352_phylink_get_caps(struct mv88e6xxx=
-_chip *chip, int port,
- 		if (err <=3D 0)
- 			return;
-=20
--		cmode =3D mv88e6352_get_port4_serdes_cmode(chip);
-+		cmode =3D mv88e63xx_get_port_serdes_cmode(chip, port);
- 		if (cmode < 0)
- 			dev_err(chip->dev, "p%d: failed to read serdes cmode\n",
- 				port);
-@@ -701,12 +701,23 @@ static void mv88e632x_phylink_get_caps(struct mv88e6x=
-xx_chip *chip, int port,
- 				       struct phylink_config *config)
- {
- 	unsigned long *supported =3D config->supported_interfaces;
-+	int cmode;
-=20
- 	/* Translate the default cmode */
- 	mv88e6xxx_translate_cmode(chip->ports[port].cmode, supported);
-=20
- 	config->mac_capabilities =3D MAC_SYM_PAUSE | MAC_10 | MAC_100 |
- 				   MAC_1000FD;
-+
-+	/* Port 0/1 are serdes only ports */
-+	if (port =3D=3D 0 || port =3D=3D 1) {
-+		cmode =3D mv88e63xx_get_port_serdes_cmode(chip, port);
-+		if (cmode < 0)
-+			dev_err(chip->dev, "p%d: failed to read serdes cmode\n",
-+				port);
-+		else
-+			mv88e6xxx_translate_cmode(cmode, supported);
-+	}
- }
-=20
- static void mv88e6341_phylink_get_caps(struct mv88e6xxx_chip *chip, int po=
-rt,
---=20
-2.34.1
-
-
---=20
-
-
-*innosonix GmbH*
-Hauptstr. 35
-96482 Ahorn
-central: +49 9561 7459980
-www.innosonix.de <http://www.innosonix.de>
-
-innosonix GmbH
-Gesch=C3=A4ftsf=C3=BChrer:=20
-Markus B=C3=A4tz, Steffen B=C3=A4tz
-USt.-IdNr / VAT-Nr.: DE266020313
-EORI-Nr.:=20
-DE240121536680271
-HRB 5192 Coburg
-WEEE-Reg.-Nr. DE88021242
-
---=20
+Best regards,
+Krzysztof
 
 
