@@ -1,262 +1,106 @@
-Return-Path: <netdev+bounces-94573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 906758BFEA5
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:23:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 388C58BFEA9
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:23:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3360B231C5
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:23:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8E1928A720
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:23:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF4873175;
-	Wed,  8 May 2024 13:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20AE78C97;
+	Wed,  8 May 2024 13:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DY0RyZJn"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="vobyrqzP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E2F54FA3;
-	Wed,  8 May 2024 13:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACDD78C85;
+	Wed,  8 May 2024 13:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715174609; cv=none; b=Aa1UZuwSPAryDKbdt/6MbaIsJ7bjZENv6we4LzxkDtd02sxgN1pe81+TVTKNDNAok4lbpC/RErZX+zPFT9WYsuLDuqGZInwRA+qbw6mViapRHI1LNYBvve7cgjyDAV40y8CYXupToZVZwEPHxtATHPdiXT5ltsZvhQ8xmXes2Zk=
+	t=1715174623; cv=none; b=lNkMfFn9/X3xwFUeNwgzKwfGXxpy619AuFKK7ZAGY6oxRFRt+P6h6gHXR7YbgmsZZ0vlhm5m7cTUjRVeu/O/4qtdbiLjAZLi6o94eAIuljyKk+XUqEewHpdOdDp9pMVmjk59WVGE8Vq3X/zuZTc9kFqVMV14Ru+YtxzQxfnBw80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715174609; c=relaxed/simple;
-	bh=UZTuM19sfO6IyeO00FqUVca6+KRZ5NfpcA4zNw9xJg4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hj+ZT/5RxmWI11mS6cYv4k7DQTQ3xQNDc4k4uHSySA5EhYTV1Qfzok/i5WRfGkiPyjdHXXHIvK1q4V0ZZyIJvPKjogpwbVeIJXf4KmbCaltmY7T+8sF4a9jFJ+gVqobbiD0snkwI3XbldZgPJmCHVdpTKVbQuvLpUFOmBaPp/lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DY0RyZJn; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715174607; x=1746710607;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=UZTuM19sfO6IyeO00FqUVca6+KRZ5NfpcA4zNw9xJg4=;
-  b=DY0RyZJnXz/lLirAH6aw7Afo2Z7z6B4H1D5WoeXfwCsLNl9Jxx+d2nhx
-   q9eLpQes5M+kxT+jA+7cTTK2N+WpcUbIoGgnHkj6wqUAFZSaQiSajG2Mi
-   cPuh/Q2AqUBA10P9irov9s02kPujaDNF8F1ihFsey+w93HI6rXAXCPoSh
-   K8j3EtrUfCMcoDaC543XmSowYkcFB17Avb/1KOXvtKr+YrMV2Mnnr7KyW
-   0QEbVScfXzz0tnekPVx/ZEa4xAAUZcAvR+ry6P6O6uq6cyfttvZe/SIP7
-   9KiF+nvyeVhAEP5+WsFwDi81hBWAOCzqZVAnDk9hGAFUbZSEVvUUYnHdu
-   A==;
-X-CSE-ConnectionGUID: c/wFF05ER26kZLNTpi5g1A==
-X-CSE-MsgGUID: eBH0pV/wSvq7lEhY/AdFUw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="36414233"
-X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
-   d="scan'208";a="36414233"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 06:23:27 -0700
-X-CSE-ConnectionGUID: nl17En8nSgWa4E/1HF/puA==
-X-CSE-MsgGUID: OrWG+csSRCip2uAzwaFf3w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
-   d="scan'208";a="33358923"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa005.fm.intel.com with ESMTP; 08 May 2024 06:23:22 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 5917011F; Wed, 08 May 2024 16:23:21 +0300 (EEST)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>
-Subject: [PATCH net-next v1 1/1] net: intel: Use *-y instead of *-objs in Makefile
-Date: Wed,  8 May 2024 16:23:15 +0300
-Message-ID: <20240508132315.1121086-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1336.g36b5255a03ac
+	s=arc-20240116; t=1715174623; c=relaxed/simple;
+	bh=nIua7Nli79Cy4ClZ3sm15/ruW09uct03XQCexKb3oa8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=QrjiuFLFyMiLB7Xiof8RPDYoZ7+LKRJv9CPukPQoSHBb3Q/joh5Q85Hlqyf/AtlhhyuLjRDk5yLxuy+9HqDiNgblvyn+vyc8MZJkkp8Vsl5wLrh5JWhspy9SiRYzlQG6W7fVTdjSZd9vPeDTv3Fkn4QuNBIddlRc+KQneR3C1tM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=vobyrqzP; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1715174599; x=1715779399; i=markus.elfring@web.de;
+	bh=nIua7Nli79Cy4ClZ3sm15/ruW09uct03XQCexKb3oa8=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=vobyrqzPFQj1QXKmExAgMKdsgPHytnwtgj7+tst8ZcjpJPoL2aRaCRnLcsuFzeSx
+	 ztdu0gKAtXt6+jqfwHOxHGLfDWzJkN86BwETLeHb1mukl0HWj59VOSJ2KSGVgUL9b
+	 SxT5XbXJ/Cq/ziDk5dJn8FM3Q1iq7r9CUbGQ4KN+a3g92U4QCOR42jJNXzyLhuKO6
+	 A5X7A+8+y3hgiNB4sp6sf3k4+Qs1AfMYf5saPXaM2CjpJh+9PuDgqo7DlbwjwfZB1
+	 r78PFrSAgS2gmDIQ9KQBLKMlmXT+T+xr+RWfHZdhw+6JLl4JrUb7WrnYmpPDmj7iD
+	 PxM5rJLQiJrXttv5Vg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1M5j1q-1rxWX70Qyg-00GVD4; Wed, 08
+ May 2024 15:23:19 +0200
+Message-ID: <334f5ae7-17cb-4c67-81d2-ffbfa3812ee9@web.de>
+Date: Wed, 8 May 2024 15:23:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: Jeroen de Borst <jeroendb@google.com>, Ziwei Xiao <ziweixiao@google.com>,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, John Fraker <jfraker@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Shailend Chand <shailend@google.com>,
+ rushilg@google.com
+References: <20240507225945.1408516-5-ziweixiao@google.com>
+Subject: Re: [PATCH net-next 4/5] gve: Add flow steering adminq commands
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240507225945.1408516-5-ziweixiao@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:N7BodfaSkicQ4rqScWElvnOEDSWQXr8ncFDCNFCGpJhmX95GA1X
+ eyAMB/ukemGRTPwUy2qVBviXG30agC3aDpqpxKAl9tmkNmYPYm4rMtu2WRsvuVDQcYdCgpS
+ zvdacP3xDzr8CPgb/Ri5GmYt3sIRzNwQuK2gUi3IrTxpIItlBM9fYN5eWBhpz731YdG+lpA
+ q7ZKMW2Q20FqRjISiVN1A==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:7r+EZz22b5I=;CmayfH5iTD6B3vfq0Nfup+A/8CW
+ PC73mycydm3uzYJ0eYoPc/6cuXSDpCpt9CSYsss5OeF3M9TUroNh4OGx3l4AKg3eV+d59ezU+
+ bL2HsQMy9nY1cP8T4bE+oS8mqJhCuG94HFG5TKfXw6/TanWu+vKGEGYI4GR7Q71EFGD7w0mhh
+ jon6Hnd9YaL0PVoKPLZfSS/CJg+k1wgS3K3k3m7FTWOMg1J8nMJprLMd7ZUaRAYy+51HF+1ut
+ Cis0+R6+p+J3iua69qIJCf/WbCzvlsAD7cdpLEMfHQyQRMOamH/pDNaSJXYldgT890qDaJ9uu
+ DaiB7XVHPoASq2bGV6sZz1s0C8T3/1t4LXQd8F3a4jKhuIamdFFnQQnkJRIb29KQeIJ+H7HjJ
+ Edq/RE2cANUKbLNLbC15yECUobJQo4PqLZcahNMxAfYtpzlnQG3E9dpRQKjXhv++9evplVy2z
+ mPagn46k01eOO+dNOcjmCip7oXZjuvfEo2naWHsZr+RpUstF/uzSC07seCXBnKh5gZfuqwERu
+ f3/MRxTil1vCffl0r4kUoG4W5B37dTZw85iURkO827y2H9BSDTUM/Op5ZTbS4X2WlXxB6DyPZ
+ ut++1ThMNg9Vd1COb7nu4/OW2X3wrVFi2Fl7kVD1ywZMH6LxwJa8ZaGmRtr/bgFq3hFU7e5tI
+ h/Qli76HQlsD98nPznq4gMPW07x1ijSl6VpfPhvfGC0I2/sq/ay+VAt9/l2l0bRfHYHvjkeAO
+ +xr9+dRANwcP7RbggJA9JJ7SPBEdFgCKYrhgG5AoAP4j5SC0lPEWlc/HGPCVgkCZ3eIED9EdS
+ UU5TtlsGefBS/u+uWClKk+2Bwh4HRskJhLAxvbnNAiCtE=
 
-*-objs suffix is reserved rather for (user-space) host programs while
-usually *-y suffix is used for kernel drivers (although *-objs works
-for that purpose for now).
+> Adding new adminq commands for the driver to configure and query flow
+> rules that are stored in the device. =E2=80=A6
 
-Let's correct the old usages of *-objs in Makefiles.
+Will corresponding imperative wordings be desirable for an improved change=
+ description?
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?h=3Dv6.9-rc7#n94
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/ethernet/intel/e1000/Makefile   | 2 +-
- drivers/net/ethernet/intel/e1000e/Makefile  | 7 +++----
- drivers/net/ethernet/intel/i40e/Makefile    | 2 +-
- drivers/net/ethernet/intel/iavf/Makefile    | 5 ++---
- drivers/net/ethernet/intel/igb/Makefile     | 6 +++---
- drivers/net/ethernet/intel/igbvf/Makefile   | 6 +-----
- drivers/net/ethernet/intel/igc/Makefile     | 4 ++--
- drivers/net/ethernet/intel/ixgbe/Makefile   | 8 ++++----
- drivers/net/ethernet/intel/ixgbevf/Makefile | 6 +-----
- drivers/net/ethernet/intel/libeth/Makefile  | 2 +-
- drivers/net/ethernet/intel/libie/Makefile   | 2 +-
- 11 files changed, 20 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/e1000/Makefile b/drivers/net/ethernet/intel/e1000/Makefile
-index 314c52d44b7c..79491dec47e1 100644
---- a/drivers/net/ethernet/intel/e1000/Makefile
-+++ b/drivers/net/ethernet/intel/e1000/Makefile
-@@ -7,4 +7,4 @@
- 
- obj-$(CONFIG_E1000) += e1000.o
- 
--e1000-objs := e1000_main.o e1000_hw.o e1000_ethtool.o e1000_param.o
-+e1000-y := e1000_main.o e1000_hw.o e1000_ethtool.o e1000_param.o
-diff --git a/drivers/net/ethernet/intel/e1000e/Makefile b/drivers/net/ethernet/intel/e1000e/Makefile
-index 0baa15503c38..18f22b6374d5 100644
---- a/drivers/net/ethernet/intel/e1000e/Makefile
-+++ b/drivers/net/ethernet/intel/e1000e/Makefile
-@@ -10,7 +10,6 @@ subdir-ccflags-y += -I$(src)
- 
- obj-$(CONFIG_E1000E) += e1000e.o
- 
--e1000e-objs := 82571.o ich8lan.o 80003es2lan.o \
--	       mac.o manage.o nvm.o phy.o \
--	       param.o ethtool.o netdev.o ptp.o
--
-+e1000e-y := 82571.o ich8lan.o 80003es2lan.o \
-+	    mac.o manage.o nvm.o phy.o \
-+	    param.o ethtool.o netdev.o ptp.o
-diff --git a/drivers/net/ethernet/intel/i40e/Makefile b/drivers/net/ethernet/intel/i40e/Makefile
-index cad93f323bd5..9faa4339a76c 100644
---- a/drivers/net/ethernet/intel/i40e/Makefile
-+++ b/drivers/net/ethernet/intel/i40e/Makefile
-@@ -10,7 +10,7 @@ subdir-ccflags-y += -I$(src)
- 
- obj-$(CONFIG_I40E) += i40e.o
- 
--i40e-objs := i40e_main.o \
-+i40e-y := i40e_main.o \
- 	i40e_ethtool.o	\
- 	i40e_adminq.o	\
- 	i40e_common.o	\
-diff --git a/drivers/net/ethernet/intel/iavf/Makefile b/drivers/net/ethernet/intel/iavf/Makefile
-index 2d154a4e2fd7..356ac9faa5bf 100644
---- a/drivers/net/ethernet/intel/iavf/Makefile
-+++ b/drivers/net/ethernet/intel/iavf/Makefile
-@@ -11,6 +11,5 @@ subdir-ccflags-y += -I$(src)
- 
- obj-$(CONFIG_IAVF) += iavf.o
- 
--iavf-objs := iavf_main.o iavf_ethtool.o iavf_virtchnl.o iavf_fdir.o \
--	     iavf_adv_rss.o \
--	     iavf_txrx.o iavf_common.o iavf_adminq.o
-+iavf-y := iavf_main.o iavf_ethtool.o iavf_virtchnl.o iavf_fdir.o \
-+	  iavf_adv_rss.o iavf_txrx.o iavf_common.o iavf_adminq.o
-diff --git a/drivers/net/ethernet/intel/igb/Makefile b/drivers/net/ethernet/intel/igb/Makefile
-index 394c1e0656b9..463c0d26b9d4 100644
---- a/drivers/net/ethernet/intel/igb/Makefile
-+++ b/drivers/net/ethernet/intel/igb/Makefile
-@@ -6,6 +6,6 @@
- 
- obj-$(CONFIG_IGB) += igb.o
- 
--igb-objs := igb_main.o igb_ethtool.o e1000_82575.o \
--	    e1000_mac.o e1000_nvm.o e1000_phy.o e1000_mbx.o \
--	    e1000_i210.o igb_ptp.o igb_hwmon.o
-+igb-y := igb_main.o igb_ethtool.o e1000_82575.o \
-+	 e1000_mac.o e1000_nvm.o e1000_phy.o e1000_mbx.o \
-+	 e1000_i210.o igb_ptp.o igb_hwmon.o
-diff --git a/drivers/net/ethernet/intel/igbvf/Makefile b/drivers/net/ethernet/intel/igbvf/Makefile
-index afd3e36eae75..902711d5e691 100644
---- a/drivers/net/ethernet/intel/igbvf/Makefile
-+++ b/drivers/net/ethernet/intel/igbvf/Makefile
-@@ -6,8 +6,4 @@
- 
- obj-$(CONFIG_IGBVF) += igbvf.o
- 
--igbvf-objs := vf.o \
--              mbx.o \
--              ethtool.o \
--              netdev.o
--
-+igbvf-y := vf.o mbx.o ethtool.o netdev.o
-diff --git a/drivers/net/ethernet/intel/igc/Makefile b/drivers/net/ethernet/intel/igc/Makefile
-index ebffd3054285..a64c734740f6 100644
---- a/drivers/net/ethernet/intel/igc/Makefile
-+++ b/drivers/net/ethernet/intel/igc/Makefile
-@@ -8,5 +8,5 @@
- obj-$(CONFIG_IGC) += igc.o
- igc-$(CONFIG_IGC_LEDS) += igc_leds.o
- 
--igc-objs := igc_main.o igc_mac.o igc_i225.o igc_base.o igc_nvm.o igc_phy.o \
--igc_diag.o igc_ethtool.o igc_ptp.o igc_dump.o igc_tsn.o igc_xdp.o
-+igc-y := igc_main.o igc_mac.o igc_i225.o igc_base.o igc_nvm.o igc_phy.o \
-+	 igc_diag.o igc_ethtool.o igc_ptp.o igc_dump.o igc_tsn.o igc_xdp.o
-diff --git a/drivers/net/ethernet/intel/ixgbe/Makefile b/drivers/net/ethernet/intel/ixgbe/Makefile
-index 4fb0d9e3f2da..965e5ce1b326 100644
---- a/drivers/net/ethernet/intel/ixgbe/Makefile
-+++ b/drivers/net/ethernet/intel/ixgbe/Makefile
-@@ -6,10 +6,10 @@
- 
- obj-$(CONFIG_IXGBE) += ixgbe.o
- 
--ixgbe-objs := ixgbe_main.o ixgbe_common.o ixgbe_ethtool.o \
--              ixgbe_82599.o ixgbe_82598.o ixgbe_phy.o ixgbe_sriov.o \
--              ixgbe_mbx.o ixgbe_x540.o ixgbe_x550.o ixgbe_lib.o ixgbe_ptp.o \
--              ixgbe_xsk.o
-+ixgbe-y := ixgbe_main.o ixgbe_common.o ixgbe_ethtool.o \
-+           ixgbe_82599.o ixgbe_82598.o ixgbe_phy.o ixgbe_sriov.o \
-+           ixgbe_mbx.o ixgbe_x540.o ixgbe_x550.o ixgbe_lib.o ixgbe_ptp.o \
-+           ixgbe_xsk.o
- 
- ixgbe-$(CONFIG_IXGBE_DCB) +=  ixgbe_dcb.o ixgbe_dcb_82598.o \
-                               ixgbe_dcb_82599.o ixgbe_dcb_nl.o
-diff --git a/drivers/net/ethernet/intel/ixgbevf/Makefile b/drivers/net/ethernet/intel/ixgbevf/Makefile
-index 186a4bb24fde..01d3e892f3fa 100644
---- a/drivers/net/ethernet/intel/ixgbevf/Makefile
-+++ b/drivers/net/ethernet/intel/ixgbevf/Makefile
-@@ -6,9 +6,5 @@
- 
- obj-$(CONFIG_IXGBEVF) += ixgbevf.o
- 
--ixgbevf-objs := vf.o \
--                mbx.o \
--                ethtool.o \
--                ixgbevf_main.o
-+ixgbevf-y := vf.o mbx.o ethtool.o ixgbevf_main.o
- ixgbevf-$(CONFIG_IXGBEVF_IPSEC) += ipsec.o
--
-diff --git a/drivers/net/ethernet/intel/libeth/Makefile b/drivers/net/ethernet/intel/libeth/Makefile
-index cb99203d1dd2..52492b081132 100644
---- a/drivers/net/ethernet/intel/libeth/Makefile
-+++ b/drivers/net/ethernet/intel/libeth/Makefile
-@@ -3,4 +3,4 @@
- 
- obj-$(CONFIG_LIBETH)		+= libeth.o
- 
--libeth-objs			+= rx.o
-+libeth-y			:= rx.o
-diff --git a/drivers/net/ethernet/intel/libie/Makefile b/drivers/net/ethernet/intel/libie/Makefile
-index bf42c5aeeedd..ffd27fab916a 100644
---- a/drivers/net/ethernet/intel/libie/Makefile
-+++ b/drivers/net/ethernet/intel/libie/Makefile
-@@ -3,4 +3,4 @@
- 
- obj-$(CONFIG_LIBIE)	+= libie.o
- 
--libie-objs		+= rx.o
-+libie-y			:= rx.o
--- 
-2.43.0.rc1.1336.g36b5255a03ac
-
+Regards,
+Markus
 
