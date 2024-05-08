@@ -1,145 +1,236 @@
-Return-Path: <netdev+bounces-94417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D0E78BF6B4
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:01:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58AD28BF6C2
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:09:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFD041F23303
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:01:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C77B1C20C0F
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:09:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4CD3225D9;
-	Wed,  8 May 2024 07:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD12522EF8;
+	Wed,  8 May 2024 07:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7KFktG7"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ZAyKmc+N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24DC17BCD;
-	Wed,  8 May 2024 07:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2C115E86;
+	Wed,  8 May 2024 07:09:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715151671; cv=none; b=NGP7GGX4Za/rP/hSUl2sFocF4tVZymgiBu2FXgdrNKrgMVR0zz6cWPHoqOLF6RkdQ7w29wgQplygoVCIahL4FGkelPc8aFW2iKhSqC3tKysc4gMJ0izpnLW7EONWuCf1b3EY6z2xzgoPun6SJ+JgbylsHUq3ceU9JNmDPDpkytc=
+	t=1715152190; cv=none; b=WiPtpVHcLKxpjLUm5N2hFGuF1TqUk+FUKWTNqRxt1raiPpX0MOj6Rm2FB/QToqPvvebS8KuAlGRKtnEYdOEkbA0xkNwQWH6LmxaXu/YUhqoZVUpns3H/Sq37v8yKoA4jVE+zQ8y1AuNrpf7QHKM/2dX3nI5SUdMTMKX4Qbt7ltA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715151671; c=relaxed/simple;
-	bh=bDBwycGaC/PlY0kR4qyYfRKjMFSOWty57OMtRsUEpP8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oGEuxs7nqT61n8VK7QQiw+8KVJsz0v7m3+eGZAxXsdBHTOZ3R/bPHggxBKF35Y6mrI+JoCZZ6bJCUWv3D4cHKENFQyfj+Daat3QiocMFNJ0NRT5hiHqfxxZmk1rmcGdy4LE4jwixAzESwQKkES8HASofDCO23h7Dm2Ks7xULGeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7KFktG7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38EB3C113CC;
-	Wed,  8 May 2024 07:01:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715151671;
-	bh=bDBwycGaC/PlY0kR4qyYfRKjMFSOWty57OMtRsUEpP8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=S7KFktG7znFadJ4uNm2bTFIfNIScmGeiSnyIyvZDI/8Id/p5jxBojGxgs8cgYUhCN
-	 w08m9AsqumuxKG0SMzAZr0PO150nTx+jHvuHLvXMTxS1T1RWfGfin8Tgu8CdU+zU8m
-	 wuVeQyo51t0z3LVVtDQEljxMNZNrvDVgEktP7tcj0FZ8pK5xuxoFnayJj4XZX+uiiC
-	 VfQ4ujJxnEtDPzgyn19dyJQ/iv5BxIipo9cas6xv9GdbjPnhY1cHbrAp1lWgVL829a
-	 oruudRpalSliEaSZIDgCUSSxA7Gx3D2VG84IEpKpanD1SaesXUzien4o0cMDYAV3Sr
-	 hVnYyPUkb1dAg==
-Message-ID: <a0a89cd8-9604-4a75-a358-2974a0f70e54@kernel.org>
-Date: Wed, 8 May 2024 09:01:03 +0200
+	s=arc-20240116; t=1715152190; c=relaxed/simple;
+	bh=4I3/b/RWdKDsqAWaFoI38koUjVEP35TxOAyx2gUrEbA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IZbYw2IYFJiYiGxlFBe8q75d+kG0k+dO65FaW2raoR24bEk4kks70FBMOXHjtGGVztHw+sArfLT3RhIrF/8vQ84XBxzjhLtm1Yln6yeoz/nOubi1uuOteOaOpVZJ3TU3suQ/X2r+OJWOp0iWP0Q1dwyniTQVlWbmKf/lmYMLrD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ZAyKmc+N; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4485RT5r001818;
+	Wed, 8 May 2024 00:09:42 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=Z43sw7wJKj+AEUjOjRBr3+5NfAhSnoJw42gJbDaeRzs=; b=ZAy
+	Kmc+NQhqIRY3EuATqwa85y7ArWFLigIe6uTlxolCC4/JHrL6ZyTsLHOfSd0oLNsw
+	HoPvR5ybQo5rmuh0emLABqCsaNoqWixVh7zZ+G+63bvCc5ZQnv/Q9c9yWM2hVpzy
+	Zo84rnm/3dffBCVfxTlyQEjerQiAP3gHFNjYW4I0dBIOczH6u9RbdmdjlFZwEvU9
+	Z7xB1wRpetLvOaqmK9LngumPZ7Ocdo3dJkelvnbLZmi3tmh3crmOmae30o8d5L0c
+	sQJ9CNQTDfiiqTBESkDdnMvzzUx0jScNGsEpcvnKfImCwwXtfzqDJy0MA0KULwDy
+	ohBNCWgsn5jes1f6w5Q==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3xysfmjabg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 May 2024 00:09:40 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 8 May 2024 00:09:39 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 8 May 2024 00:09:39 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 8378D5B6942;
+	Wed,  8 May 2024 00:09:36 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+        <davem@davemloft.net>, <sbhatta@marvell.com>, <gakula@marvell.com>,
+        <sgoutham@marvell.com>, <naveenm@marvell.com>
+Subject: [net-next Patch] octeontx2-pf: Reuse Transmit queue/Send queue index of HTB class
+Date: Wed, 8 May 2024 12:39:35 +0530
+Message-ID: <20240508070935.11501-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] dt-bindings: net: qcom: ethernet: Allow
- dma-coherent
-To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Andrew Halaney <ahalaney@redhat.com>, Vinod Koul <vkoul@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc: kernel@quicinc.com, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240507-mark_ethernet_devices_dma_coherent-v3-0-dbe70d0fa971@quicinc.com>
- <20240507-mark_ethernet_devices_dma_coherent-v3-2-dbe70d0fa971@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240507-mark_ethernet_devices_dma_coherent-v3-2-dbe70d0fa971@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-GUID: Ao6lBRG0M2fGNjaTUJZ7AYl2fbuGofun
+X-Proofpoint-ORIG-GUID: Ao6lBRG0M2fGNjaTUJZ7AYl2fbuGofun
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-08_02,2024-05-08_01,2023-05-22_02
 
-On 08/05/2024 03:31, Sagar Cheluvegowda wrote:
-> On SA8775P, Ethernet DMA controller is coherent with the CPU.
-> allow specifying that.
-> 
-> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-> ---
->  Documentation/devicetree/bindings/net/qcom,ethqos.yaml | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-> index 69a337c7e345..44028987ef92 100644
-> --- a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-> +++ b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-> @@ -66,6 +66,8 @@ properties:
->    phy-names:
->      const: serdes
->  
-> +  dma-coherent: true
+Real number of Transmit queues are incremented when user enables HTB
+class and vice versa. Depending on SKB priority driver returns transmit
+queue (Txq). Transmit queues and Send queues are one-to-one mapped.
 
-Do not add properties to the end of the list. That's downstream
-practice... Keep it next to iommus, for example.
+In few scenarios, Driver is returning transmit queue value which is
+greater than real number of transmit queue and Stack detects this as
+error and overwrites transmit queue value.
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+For example
+user has added two classes and real number of queues are incremented
+accordingly
+- tc class add dev eth1 parent 1: classid 1:1 htb
+      rate 100Mbit ceil 100Mbit prio 1 quantum 1024
+- tc class add dev eth1 parent 1: classid 1:2 htb
+      rate 100Mbit ceil 200Mbit prio 7 quantum 1024
 
-Best regards,
-Krzysztof
+now if user deletes the class with id 1:1, driver decrements the real
+number of queues
+- tc class del dev eth1 classid 1:1
+
+But for the class with id 1:2, driver is returning transmit queue
+value which is higher than real number of transmit queue leading
+to below error
+
+eth1 selects TX queue x, but real number of TX queues is x
+
+This patch solves the problem by assigning deleted class transmit
+queue/send queue to active class.
+
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+---
+ .../net/ethernet/marvell/octeontx2/nic/qos.c  | 80 ++++++++++++++++++-
+ 1 file changed, 79 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
+index 1723e9912ae0..070711df612e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
+@@ -545,6 +545,20 @@ otx2_qos_sw_create_leaf_node(struct otx2_nic *pfvf,
+ 	return node;
+ }
+ 
++static struct otx2_qos_node
++*otx2_sw_node_find_by_qid(struct otx2_nic *pfvf, u16 qid)
++{
++	struct otx2_qos_node *node = NULL;
++	int bkt;
++
++	hash_for_each(pfvf->qos.qos_hlist, bkt, node, hlist) {
++		if (node->qid == qid)
++			break;
++	}
++
++	return node;
++}
++
+ static struct otx2_qos_node *
+ otx2_sw_node_find(struct otx2_nic *pfvf, u32 classid)
+ {
+@@ -917,6 +931,7 @@ static void otx2_qos_enadis_sq(struct otx2_nic *pfvf,
+ 		otx2_qos_disable_sq(pfvf, qid);
+ 
+ 	pfvf->qos.qid_to_sqmap[qid] = node->schq;
++	otx2_qos_txschq_config(pfvf, node);
+ 	otx2_qos_enable_sq(pfvf, qid);
+ }
+ 
+@@ -1475,13 +1490,45 @@ static int otx2_qos_leaf_to_inner(struct otx2_nic *pfvf, u16 classid,
+ 	return ret;
+ }
+ 
++static int otx2_qos_cur_leaf_nodes(struct otx2_nic *pfvf)
++{
++	int last = find_last_bit(pfvf->qos.qos_sq_bmap, pfvf->hw.tc_tx_queues);
++
++	return last ==  pfvf->hw.tc_tx_queues ? 0 : last + 1;
++}
++
++static void otx2_reset_qdisc(struct net_device *dev, u16 qid)
++{
++	struct netdev_queue *dev_queue = netdev_get_tx_queue(dev, qid);
++	struct Qdisc *qdisc = rtnl_dereference(dev_queue->qdisc_sleeping);
++
++	if (!qdisc)
++		return;
++
++	spin_lock_bh(qdisc_lock(qdisc));
++	qdisc_reset(qdisc);
++	spin_unlock_bh(qdisc_lock(qdisc));
++}
++
++static void otx2_cfg_smq(struct otx2_nic *pfvf, struct otx2_qos_node *node,
++			 int qid)
++{
++	struct otx2_qos_node *tmp;
++
++	list_for_each_entry(tmp, &node->child_schq_list, list)
++		if (tmp->level == NIX_TXSCH_LVL_MDQ) {
++			otx2_qos_txschq_config(pfvf, tmp);
++			pfvf->qos.qid_to_sqmap[qid] = tmp->schq;
++		}
++}
++
+ static int otx2_qos_leaf_del(struct otx2_nic *pfvf, u16 *classid,
+ 			     struct netlink_ext_ack *extack)
+ {
+ 	struct otx2_qos_node *node, *parent;
+ 	int dwrr_del_node = false;
++	u16 qid, moved_qid;
+ 	u64 prio;
+-	u16 qid;
+ 
+ 	netdev_dbg(pfvf->netdev, "TC_HTB_LEAF_DEL classid %04x\n", *classid);
+ 
+@@ -1517,6 +1564,37 @@ static int otx2_qos_leaf_del(struct otx2_nic *pfvf, u16 *classid,
+ 	if (!parent->child_static_cnt)
+ 		parent->max_static_prio = 0;
+ 
++	moved_qid = otx2_qos_cur_leaf_nodes(pfvf);
++
++	/* last node just deleted */
++	if (moved_qid == 0 || moved_qid == qid)
++		return 0;
++
++	moved_qid--;
++
++	node = otx2_sw_node_find_by_qid(pfvf, moved_qid);
++	if (!node)
++		return 0;
++
++	/* stop traffic to the old queue and disable
++	 * SQ associated with it
++	 */
++	node->qid =  OTX2_QOS_QID_INNER;
++	__clear_bit(moved_qid, pfvf->qos.qos_sq_bmap);
++	otx2_qos_disable_sq(pfvf, moved_qid);
++
++	otx2_reset_qdisc(pfvf->netdev, pfvf->hw.tx_queues + moved_qid);
++
++	/* enable SQ associated with qid and
++	 * update the node
++	 */
++	otx2_cfg_smq(pfvf, node, qid);
++
++	otx2_qos_enable_sq(pfvf, qid);
++	__set_bit(qid, pfvf->qos.qos_sq_bmap);
++	node->qid = qid;
++
++	*classid = node->classid;
+ 	return 0;
+ }
+ 
+-- 
+2.17.1
 
 
