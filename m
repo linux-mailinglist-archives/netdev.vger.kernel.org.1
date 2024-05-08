@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-94372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C649D8BF48F
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 04:31:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DF4F8BF492
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 04:33:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D1D8282152
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:31:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C469B206B9
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF8D111BB;
-	Wed,  8 May 2024 02:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2292CBA38;
+	Wed,  8 May 2024 02:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h9kBTwr8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EvZd+vbW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D34111A3
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 02:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F237D33F6
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 02:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715135473; cv=none; b=ADipx1MzGWeFRP5pE2L3nXQktUgQ1Yh/kkrxIwoxYeYnxyIuDc4rD/9y1gybpzQWGiXF4aoIIhGrLfBGzw8pKl/cA4tzD77JKeV8L9KQR0HlJXnbhyfB9sxeKX8zajWSxIm/Aga/8AS1TaELJmvTuVuRgWCxLFJXPZnVe9NPD0U=
+	t=1715135585; cv=none; b=c9sYbP12COXI6LHnrvK/IWA2J488Rb3PAyiDFDTep55MQcJEjsksvrDkBODICdC/axyJqQs902IR425nmaQi/hYSCrwzQ6nes+t+SxUKAmmuEVLV/juxP4DfuBqOupvQ+U4tQmyXHupJrBfosWGkTwTnw/D90zyj/8LVwJLQiQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715135473; c=relaxed/simple;
-	bh=PzUN7as8hvaHEfJH3w49ourLnthqU87g9wzN7k+jD9c=;
+	s=arc-20240116; t=1715135585; c=relaxed/simple;
+	bh=DhzteD6OrtchTzfy93rr/r+V1QQyXfFHK1YsLCVgM9o=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L9yTDxswd0yLEhYAu4Ka2IIC6zMlWBV/UYHFuh17WL2ROi9JUAV1rPcSr0jWdz0nDIzeR9xnWOAut0BuPtBeEdrCkeGLTtCmnwBeC6QEDNQUCfIPLrM6M76F4rkWkMTPn4SAVw+qjhDRWD++6IA+UKEBQ0z2/sz+B1Wjs9/G/8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h9kBTwr8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A5BAC2BBFC;
-	Wed,  8 May 2024 02:31:12 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qHYPCCXCiIuwxeX5BFsADePfII33hoSxh8EHdPl6Pq6Q4TM5+Dzht/Tk9Gv8LcxqfLlIJuqlDH91YBD6v4fkXs1xUJ87c9LTXBk26m528iM5ANzrlx+RoY58o/VLeOw/fBmoeS0CLPNm+kLH4X+KtswJ080TNU4oUynRfMgYq/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EvZd+vbW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E18CC2BBFC;
+	Wed,  8 May 2024 02:33:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715135473;
-	bh=PzUN7as8hvaHEfJH3w49ourLnthqU87g9wzN7k+jD9c=;
+	s=k20201202; t=1715135584;
+	bh=DhzteD6OrtchTzfy93rr/r+V1QQyXfFHK1YsLCVgM9o=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h9kBTwr8rgIj/vSgOUbJOP2430siw/Zm8fKsIMd7vYz6vPgiMYyL7eLqHEWmnnIQq
-	 IyqwDZxMaQcjvPtjHaCqhX2ro7CKcu8xsG1hiKNDWHsu0/35v6C/ErIKmcl7FQ+kFR
-	 +ZzXJcsGCJ8W62JmwSzQyB7PqlpYLWeTvebccPtbyVyl0E1WBhDlkEr1AvcOxwwRCT
-	 5VO5RVpBZf6d5lvIyXYVzlU166ZNFdS3QfJ4iwqigMeFzuAfpkIgqR8DqtG6ByxvIN
-	 7C8kte2WocxgYKzucIMM55u/3b9AQlhgevrSue8k0Xb1Rk899aMUiO08mw8CZjy18d
-	 U28af+Pv1ZHmw==
-Date: Tue, 7 May 2024 19:31:11 -0700
+	b=EvZd+vbW2ZU2UArZMQp2vzWTKgxCSULOtPxJRdUHI7sN3qlQElWfvNSjalHGEwAJx
+	 FN7yjktsHK2rXM5hE/DP/8UzA7eVfcQaY/PIf9yKkjJepH3RabEm+KkdNI6Va/gO/t
+	 g4KconPNKwUBMy7T7NSqHohAGa9zbFThCa4LwC1Egee2DgPRHt96+oXx919dvwwANQ
+	 Z5ed3gYW0q0H6nQtpziaiJWY7SWinD4jHmyvmCdcuvcZjMXZXDE5+n/UWTiMJcncNL
+	 8Xr4KYozGXbOPvB9Bh+5P2iFr8ihKpwY321OrDQ6uGHlhCHGHw5j2bfiJxRrGXq7pz
+	 QjN5gwedoXqBQ==
+Date: Tue, 7 May 2024 19:33:02 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: <darinzon@amazon.com>
 Cc: David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>,
@@ -55,12 +55,12 @@ Cc: David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>,
  <ndagan@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Itzko, Shahar"
  <itzko@amazon.com>, "Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky,
  Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>
-Subject: Re: [PATCH v1 net-next 6/6] net: ena: Add a field for no interrupt
- moderation update action
-Message-ID: <20240507193111.5d24343c@kernel.org>
-In-Reply-To: <20240506070453.17054-7-darinzon@amazon.com>
+Subject: Re: [PATCH v1 net-next 3/6] net: ena: Add validation for completion
+ descriptors consistency
+Message-ID: <20240507193302.440feb6e@kernel.org>
+In-Reply-To: <20240506070453.17054-4-darinzon@amazon.com>
 References: <20240506070453.17054-1-darinzon@amazon.com>
-	<20240506070453.17054-7-darinzon@amazon.com>
+	<20240506070453.17054-4-darinzon@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,13 +70,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 6 May 2024 07:04:53 +0000 darinzon@amazon.com wrote:
-> +	for (i = 0; i < adapter->num_io_queues; i++) {
-> +		adapter->rx_ring[i].interrupt_interval_changed =
+On Mon, 6 May 2024 07:04:50 +0000 darinzon@amazon.com wrote:
+> +		if (unlikely((status & ENA_ETH_IO_RX_CDESC_BASE_FIRST_MASK) >>
+> +		    ENA_ETH_IO_RX_CDESC_BASE_FIRST_SHIFT && count != 0)) {
+> +			struct ena_com_dev *dev = ena_com_io_cq_to_ena_dev(io_cq);
+> +
+> +			netdev_err(dev->net_device,
+> +				   "First bit is on in descriptor #%d on q_id: %d, req_id: %u\n",
+> +				   count, io_cq->qid, cdesc->req_id);
+> +			return -EFAULT;
 
-Shouldn't this be |= ?
+This is really asking to be a devlink health reporter.
+You can dump the information to the user and get the event counter 
+for free.
 
-> +			adapter->rx_ring[i].interrupt_interval != val;
-> +		adapter->rx_ring[i].interrupt_interval = val;
-> +	}
+But if you don't want to use that - please at least rate limit the
+message.
 
