@@ -1,245 +1,178 @@
-Return-Path: <netdev+bounces-94539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE8DB8BFCD7
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 14:06:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E85198BFCDD
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 14:06:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4BEF284CE4
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 12:06:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B404B24CB1
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 12:06:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B3983A0E;
-	Wed,  8 May 2024 12:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B4E83CCF;
+	Wed,  8 May 2024 12:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h6b9ritU"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="U8pSDJv8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2CD45024;
-	Wed,  8 May 2024 12:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F46583A12
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 12:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715169959; cv=none; b=UtoNHioxFfQko1t0MIcVidCXcjiEhUHdML+01Kpthl0xgVEZam7NhFZowgFh1d5PsLkHS1UF8DWwuLzx/odHiypwhKXF2dp68GnakVp2NJZPIrDNQxcWSz6WNoQ4V9hr1Ybr92+Rxo8Tx+Q1i7AXQZfsdlg3X+th3omSH9o7lic=
+	t=1715169985; cv=none; b=lzJC6jIBIBQ1YYUlNsYJYatRH4PHWjgU96SZr1QvHktUL11h+gN1i/iUS4ESzAAaWaKZVfvez3R3KelZF6JjsPZAabZ86h/y+FFOQf/j7NwzrQoYNMM2amgwJQaZ7ioPsU7pjcwlKXG/D8uCpjCKB5drJxcus41fAwKVQGNJSsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715169959; c=relaxed/simple;
-	bh=Nyz1qBX4AhSejr40aGAqB++CiOKmtDB7Y/C9c18/WZ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n2og/Fi8kG6iXrU125n9a9LtvM09cyg4znz2MZLBfigUG+Ecwd0uny+kCXcw/97MtdD44/07etLiPq3zQStfHq9rpD7gEjYzTiPrViSs/XRIOYpldnQe7WyWwvkSQDSU6AMZpaKghclu7FoZ5ZcUP4DcpSlpnHpohY48H2OvyAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h6b9ritU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E81CBC113CC;
-	Wed,  8 May 2024 12:05:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715169958;
-	bh=Nyz1qBX4AhSejr40aGAqB++CiOKmtDB7Y/C9c18/WZ8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=h6b9ritU4vQNxnTR7eE3vrl7XyG3xhiGCQ3mm6aJQRCCFjPFC/Q1hWuJjhy4l+Qax
-	 oR324+ZD/1B55q8u12dgWy3sRKPw84A6m5/lJMNbU/ZfkzUlIfv9F6M4Qsr74SZluv
-	 Ri6pDOnK4BWwAhDMhF58vTUbpuAZdeUXISMowuweeAt6zvNRRwALQPzA5fLGJ57Wbp
-	 2OEXRdD82ue1m5gsxJCTrctUxqpi5AwOZDXrAU1DFHkyJAlciUx03FDgas2YXkWL4U
-	 Ezxdp3UnYRZZhJByl5oD0Rz2BdBs3ecBvSz1FhVaxAQRSNofS2jvXx6H85WK8jvqHo
-	 58Yjy/AMTsjFA==
-Date: Wed, 8 May 2024 21:05:55 +0900
-From: Mark Brown <broonie@kernel.org>
-To: Edward Liaw <edliaw@google.com>
-Cc: shuah@kernel.org, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Darren Hart <dvhart@infradead.org>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	=?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@igalia.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Seth Forshee <sforshee@kernel.org>,
-	Bongsu Jeon <bongsu.jeon@samsung.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Fenghua Yu <fenghua.yu@intel.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kernel-team@android.com, linux-sound@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-	linux-input@vger.kernel.org, iommu@lists.linux.dev,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-security-module@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org,
-	bpf@vger.kernel.org, kernel test robot <oliver.sang@intel.com>
-Subject: Re: [PATCH v2 1/5] selftests: Compile kselftest headers with
- -D_GNU_SOURCE
-Message-ID: <Zjtqo6EFyGmSeREQ@finisterre.sirena.org.uk>
-Mail-Followup-To: Edward Liaw <edliaw@google.com>, shuah@kernel.org,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Darren Hart <dvhart@infradead.org>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	=?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@igalia.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Seth Forshee <sforshee@kernel.org>,
-	Bongsu Jeon <bongsu.jeon@samsung.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Fenghua Yu <fenghua.yu@intel.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kernel-team@android.com, linux-sound@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-	linux-input@vger.kernel.org, iommu@lists.linux.dev,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-security-module@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org,
-	bpf@vger.kernel.org, kernel test robot <oliver.sang@intel.com>
-References: <20240507214254.2787305-1-edliaw@google.com>
- <20240507214254.2787305-2-edliaw@google.com>
+	s=arc-20240116; t=1715169985; c=relaxed/simple;
+	bh=u68YNwcuyN1Xx3DofuEVXBZn1CkHAmqSQV8d6wAiC1c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kW3KjJ3qkER5xZyyPku3/dAcauexc55EfzZHOtVvMQ8ZSZSF1eZ0TJvpcgEykzcd+UTfDMWywnX0Q4po3BBULqxBLYy1E/xa/kpGvzKsYg76IxBytLxo5FO74im3m3do4pTS7n8VceqwoOiffGdmxZ1oU4DmILHIyIJFEOQlrls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=U8pSDJv8; arc=none smtp.client-ip=185.125.188.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from hwang4-ThinkPad-T14s-Gen-2a.conference (unknown [114.249.184.67])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id 788F93F6CC;
+	Wed,  8 May 2024 12:06:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1715169976;
+	bh=dK4QW0JXh/HALH9tt2xBOqDUcgd53vJGCuGFFNdKyHA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+	b=U8pSDJv88W2aOh6d8eDNUVyv+fA3Ye70nfu/1RfewvGmlq6sJtvInmsVmhCuYh7Dg
+	 O+0qokeJXHFqB7YDIfONIQZZg/rWM9deZpL1JNaAUaJMF8WxPLO6vLbRBV8FAi2srx
+	 LO0wiOpCg9Q6aajAogpEKw5+xT5nhzYb/9rmOfL7wk4jKdqeSInEVwm5FMqIDj5L13
+	 fmME4HGXE18REEBjg0VgvixlWskWhU1T/2nZPktIimHaWCAzbPPVo2d1yHnzqOPy5f
+	 y8dIs9CssX503OoMlQ2vPNwoUmgzMjLf//l85TxOaEAXBtjuJHF7ucclpLWTvvheo5
+	 OX8+/SASLG5uw==
+From: Hui Wang <hui.wang@canonical.com>
+To: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	anthony.l.nguyen@intel.com,
+	vitaly.lifshits@intel.com,
+	dima.ruinskiy@intel.com,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	sasha.neftin@intel.com,
+	naamax.meir@linux.intel.com
+Cc: hui.wang@canonical.com
+Subject: [PATCH v2] e1000e: move force SMBUS near the end of enable_ulp function
+Date: Wed,  8 May 2024 20:06:04 +0800
+Message-Id: <20240508120604.233166-1-hui.wang@canonical.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fwllAq8yEacRp/F5"
-Content-Disposition: inline
-In-Reply-To: <20240507214254.2787305-2-edliaw@google.com>
-X-Cookie: Accuracy, n.:
+Content-Transfer-Encoding: 8bit
 
+The commit 861e8086029e ("e1000e: move force SMBUS from enable ulp
+function to avoid PHY loss issue") introduces a regression on
+CH_MTP_I219_LM18 (PCIID: 0x8086550A). Without the referred commit, the
+ethernet works well after suspend and resume, but after applying the
+commit, the ethernet couldn't work anymore after the resume and the
+dmesg shows that the NIC Link changes to 10Mbps (1000Mbps originally):
+[   43.305084] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Up 10 Mbps Full Duplex, Flow Control: Rx/Tx
 
---fwllAq8yEacRp/F5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Without the commit, the force SMBUS code will not be executed if
+"return 0" or "goto out" is executed in the enable_ulp(), and in my
+case, the "goto out" is executed since FWSM_FW_VALID is set. But after
+applying the commit, the force SMBUS code will be ran unconditionally.
 
-On Tue, May 07, 2024 at 09:38:26PM +0000, Edward Liaw wrote:
-> Add the -D_GNU_SOURCE flag to KHDR_INCLUDES so that it is defined in a
-> central location.
->=20
-> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
-> asprintf into kselftest_harness.h, which is a GNU extension and needs
-> _GNU_SOURCE to either be defined prior to including headers or with the
-> -D_GNU_SOURCE flag passed to the compiler.
+Here move the force SMBUS code back to enable_ulp() and put it
+immediate ahead of hw->phy.ops.release(hw), this could allow the
+longest settling time as possible for interface in this function and
+doesn't change the original code logic.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+Fixes: 861e8086029e ("e1000e: move force SMBUS from enable ulp function to avoid PHY loss issue")
+Signed-off-by: Hui Wang <hui.wang@canonical.com>
+Acked-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+In the v2:
+ Change "this commit" to "the referred commit" in the commit header
+ Fix a potential infinite loop if ret_val is not zero
+ 
+ drivers/net/ethernet/intel/e1000e/ich8lan.c | 22 +++++++++++++++++++++
+ drivers/net/ethernet/intel/e1000e/netdev.c  | 18 -----------------
+ 2 files changed, 22 insertions(+), 18 deletions(-)
 
-This does mean we define _GNU_SOURCE for nolibc (and I guess any other
-libc people use like bionic) but hopefully nobody's using the same
-define with a different meaning so should be fine.
+diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+index f9e94be36e97..2e98a2a0bead 100644
+--- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
++++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+@@ -1225,6 +1225,28 @@ s32 e1000_enable_ulp_lpt_lp(struct e1000_hw *hw, bool to_sx)
+ 	}
+ 
+ release:
++	/* Switching PHY interface always returns MDI error
++	 * so disable retry mechanism to avoid wasting time
++	 */
++	e1000e_disable_phy_retry(hw);
++
++	/* Force SMBus mode in PHY */
++	ret_val = e1000_read_phy_reg_hv_locked(hw, CV_SMB_CTRL, &phy_reg);
++	if (ret_val) {
++		e1000e_enable_phy_retry(hw);
++		hw->phy.ops.release(hw);
++		goto out;
++	}
++	phy_reg |= CV_SMB_CTRL_FORCE_SMBUS;
++	e1000_write_phy_reg_hv_locked(hw, CV_SMB_CTRL, phy_reg);
++
++	e1000e_enable_phy_retry(hw);
++
++	/* Force SMBus mode in MAC */
++	mac_reg = er32(CTRL_EXT);
++	mac_reg |= E1000_CTRL_EXT_FORCE_SMBUS;
++	ew32(CTRL_EXT, mac_reg);
++
+ 	hw->phy.ops.release(hw);
+ out:
+ 	if (ret_val)
+diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+index 3692fce20195..cc8c531ec3df 100644
+--- a/drivers/net/ethernet/intel/e1000e/netdev.c
++++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+@@ -6623,7 +6623,6 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
+ 	struct e1000_hw *hw = &adapter->hw;
+ 	u32 ctrl, ctrl_ext, rctl, status, wufc;
+ 	int retval = 0;
+-	u16 smb_ctrl;
+ 
+ 	/* Runtime suspend should only enable wakeup for link changes */
+ 	if (runtime)
+@@ -6697,23 +6696,6 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
+ 			if (retval)
+ 				return retval;
+ 		}
+-
+-		/* Force SMBUS to allow WOL */
+-		/* Switching PHY interface always returns MDI error
+-		 * so disable retry mechanism to avoid wasting time
+-		 */
+-		e1000e_disable_phy_retry(hw);
+-
+-		e1e_rphy(hw, CV_SMB_CTRL, &smb_ctrl);
+-		smb_ctrl |= CV_SMB_CTRL_FORCE_SMBUS;
+-		e1e_wphy(hw, CV_SMB_CTRL, smb_ctrl);
+-
+-		e1000e_enable_phy_retry(hw);
+-
+-		/* Force SMBus mode in MAC */
+-		ctrl_ext = er32(CTRL_EXT);
+-		ctrl_ext |= E1000_CTRL_EXT_FORCE_SMBUS;
+-		ew32(CTRL_EXT, ctrl_ext);
+ 	}
+ 
+ 	/* Ensure that the appropriate bits are set in LPI_CTRL
+-- 
+2.34.1
 
---fwllAq8yEacRp/F5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmY7aqIACgkQJNaLcl1U
-h9DCxAf+M+eUS9Sr8Cy7bCTOxGv4sZGiJ7AeEEoR5TzBm5SOC6mKe/M0t4SexFRB
-5nAjL3TO9i8cfMtUMh6LMvciaa5sGVNRFhpTIgljvO7ND7Dv+WKpJyiicl/1DYIK
-DEdpua8OQJ4bz9PQwOZO1kgQzC003JRxY0Gbz9kk8ie58HVAodSSWi7kgNsMc/0t
-mKOumN6X7MhAoslboc7h3A6xymN8AHvHeNga3yP+1E84M8mjiR91sc3btIn4Wa/w
-6LIqTSCun/wuxeQnkz0Rlk1LdA1F0KQPzQAriWxju8K9dqc3prqYkWuDtRVYN+Li
-LJAemrTmdlcOF/7uoi1Z7s4wZajT2A==
-=IlWr
------END PGP SIGNATURE-----
-
---fwllAq8yEacRp/F5--
 
