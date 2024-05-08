@@ -1,154 +1,143 @@
-Return-Path: <netdev+bounces-94466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADEED8BF8EE
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 10:41:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8C138BF904
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 10:48:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69D44286F1F
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 08:41:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A416B28136B
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 08:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EFBD54756;
-	Wed,  8 May 2024 08:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576FF535D0;
+	Wed,  8 May 2024 08:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="droVsfqg"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="E/Lq6AFw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3710D54668;
-	Wed,  8 May 2024 08:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51E79476;
+	Wed,  8 May 2024 08:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715157635; cv=none; b=skeMp75ECAedMIX4oTGTETslgbe+q7OyTDYNlSYjSDhB+fUacn2zPxulMAnjvbs+CjsXZmCYiIpxyrCRjgeFNKsIvZ8+tkRCUM5nqaJFxvVME6WKI2FJb+0lM/bk/6pOUjKws8BC8bu8YN9ZJAlG3bVu2yTHo5rCUhKK/qmlLbI=
+	t=1715158115; cv=none; b=Qx6+w5CTsvOg1izSWmQ3HHGVSv4KbTcvwGpbr6ShN5U87TgSUBo18NEw2QFyJjup0243njBky+H3b13F7jdASjZ7Nw/I5ZhjA01MCCE090AuNghY80EHrKcfByLSC+NYG3CSegcgRKH0ICQoSiqA+Wz5+lk0ud1DJ5Roc7JGLNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715157635; c=relaxed/simple;
-	bh=7AkH+Cd52kKIzQ6Z1eGmeRFbIVVvMbs2fVbYsa8ENKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kdeyJ0zzk7Cm+gAZiyGR0zcIyNROET+/6cvJsp7Sxlh0xtJ3RlxHcmMZwSaPyH+GSxQpSDcQ+VcOxqC0bkctc64npQKAAK6wZIUOFJBbmG6IsPQKlXUl0qcw19/DznLc6rmCtWPoRLts8VGvqf2RDx8G5cTh6HoWBvUh1hp/uwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=droVsfqg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BFB9C113CC;
-	Wed,  8 May 2024 08:40:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715157634;
-	bh=7AkH+Cd52kKIzQ6Z1eGmeRFbIVVvMbs2fVbYsa8ENKE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=droVsfqgQLlY5fn/Vt+M7KFqUK8CKoh3x8pk8O7hiSlH+LLrXoFhbLEOMEBzKSfSJ
-	 RW6Cg0/CXmktZnLv3xWhN3fVBJ0GHSvvmlpJtWA4H2GeFzyd2TaMmkvhYFs6I7gRyC
-	 rjRpZlaVpVWqP/mO7ty8Zv6GgLrUaL4BPgSJbagucUx/5FjvFx00pisN6wobVbxP4L
-	 xBYbs419tu86cidfsKDlkkKF8MPP2vnQ4TW1PnqoHoULcIxlZvJD6OfosCATT8B4Sn
-	 xIe/XRy67//r1SbHqzYJ4KU3oHgU43lmMWtZsMNJAFLJm9QtU5T7btGJRzcIr/3rAF
-	 7w7ZC+2BqY0LA==
-Date: Wed, 8 May 2024 09:40:30 +0100
-From: Simon Horman <horms@kernel.org>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: "kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	Ping-Ke Shih <pkshih@realtek.com>,
-	Larry Chiu <larry.chiu@realtek.com>
-Subject: Re: [PATCH net-next v17 12/13] realtek: Update the Makefile and
- Kconfig in the realtek folder
-Message-ID: <20240508084030.GP15955@kernel.org>
-References: <20240502091847.65181-1-justinlai0215@realtek.com>
- <20240502091847.65181-13-justinlai0215@realtek.com>
- <20240503083534.GL2821784@kernel.org>
- <1470b2c0983442fcb5078ca510aade35@realtek.com>
+	s=arc-20240116; t=1715158115; c=relaxed/simple;
+	bh=KFMj3U7Obl/qOELPmA1G8lQsydYqYK1yXc1XYG2gwpM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=qkQokaU8CnyNK/h7wI4593BfmvCuxUZGFVrfK3r6iyqUs3vtN6bVCW75pD1lFWyCAYXVSs3+Ouj9ShShBFSKaxBXvx4HuASpsgbv1VpwLuBsFGHsACAcvyTd3ce5WFN0EofuoBhAPoEnvigNUYgmv88S51H9hQLx/SPPTz18M1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=E/Lq6AFw; arc=none smtp.client-ip=213.160.72.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
+	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:Reply-To:From:Subject:Message-ID:Sender:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=/zOyVvtd4hHv6CKYy7zMjS3W53YqU2ozpdmDgVx4s6Y=; b=E/Lq6AFw4vjvpx20b7f7bacPYa
+	Q7jIGpOHSFZqz28PYM10ruDXqZ4t9fmlDxsNpFFNw0FTwKB0MWw64tCk8Y7pnfQ0NZM+vbQz80l6c
+	9IFVivOdwvcWD11NfMIrwMrTJmgBLkmu9OZTuBH4mLMGC8rd/me/MyZlHbM34U0nOT/4=;
+Received: from 127.0.0.1
+	by fritzc.com with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim latest)
+	(envelope-from <christoph.fritz@hexdev.de>)
+	id 1s4cyO-001hNS-1B;
+	Wed, 08 May 2024 10:48:24 +0200
+Message-ID: <663ea6b946a1a18637a1eae9bd8abe43607d9619.camel@hexdev.de>
+Subject: Re: [PATCH v3 03/11] tty: serdev: Add flag buffer aware
+ receive_buf_fp()
+From: Christoph Fritz <christoph.fritz@hexdev.de>
+Reply-To: christoph.fritz@hexdev.de
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Jiri Slaby <jirislaby@kernel.org>, Oliver Hartkopp
+ <socketcan@hartkopp.net>,  Marc Kleine-Budde <mkl@pengutronix.de>, Vincent
+ Mailhol <mailhol.vincent@wanadoo.fr>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor Dooley
+ <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires
+ <bentiss@kernel.org>,  Sebastian Reichel <sre@kernel.org>, Linus Walleij
+ <linus.walleij@linaro.org>, Andreas Lauser
+ <andreas.lauser@mercedes-benz.com>, Jonathan Corbet <corbet@lwn.net>, Pavel
+ Pisa <pisa@cmp.felk.cvut.cz>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org,  devicetree@vger.kernel.org,
+ linux-input@vger.kernel.org,  linux-serial@vger.kernel.org
+Date: Wed, 08 May 2024 10:48:23 +0200
+In-Reply-To: <2024050410-gigolo-giddily-97b6@gregkh>
+References: <20240502182804.145926-1-christoph.fritz@hexdev.de>
+	 <20240502182804.145926-4-christoph.fritz@hexdev.de>
+	 <2024050410-gigolo-giddily-97b6@gregkh>
+Organization: hexDEV GmbH
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1470b2c0983442fcb5078ca510aade35@realtek.com>
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 07, 2024 at 09:44:14AM +0000, Justin Lai wrote:
-> > On Thu, May 02, 2024 at 05:18:46PM +0800, Justin Lai wrote:
-> > > 1. Add the RTASE entry in the Kconfig.
-> > > 2. Add the CONFIG_RTASE entry in the Makefile.
-> > >
-> > > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
-> > > ---
-> > >  drivers/net/ethernet/realtek/Kconfig  | 17 +++++++++++++++++
-> > > drivers/net/ethernet/realtek/Makefile |  1 +
-> > >  2 files changed, 18 insertions(+)
-> > >
-> > > diff --git a/drivers/net/ethernet/realtek/Kconfig
-> > > b/drivers/net/ethernet/realtek/Kconfig
-> > > index 93d9df55b361..57ef924deebd 100644
-> > > --- a/drivers/net/ethernet/realtek/Kconfig
-> > > +++ b/drivers/net/ethernet/realtek/Kconfig
-> > > @@ -113,4 +113,21 @@ config R8169
-> > >         To compile this driver as a module, choose M here: the module
-> > >         will be called r8169.  This is recommended.
-> > >
-> > > +config RTASE
-> > > +     tristate "Realtek Automotive Switch
-> > 9054/9068/9072/9075/9068/9071 PCIe Interface support"
-> > > +     depends on PCI
-> > > +     select CRC32
+On Sat, 2024-05-04 at 18:00 +0200, Greg Kroah-Hartman wrote:
+> On Thu, May 02, 2024 at 08:27:56PM +0200, Christoph Fritz wrote:
+> > This patch introduces an additional receive buffer callback variation
+> > besides the already existing receive_buf(). This new callback function
+> > also passes the flag buffer (TTY_NORMAL, TTY_BREAK, and friends).
 > > 
-> > Hi Justin,
+> > If defined, this function gets prioritized and called instead of the
+> > standard receive_buf().
 > > 
-> > I believe that you also need:
-> > 
-> >         select PAGE_POOL
-> > 
-> > As the driver uses page_pool_alloc_pages()
-> > 
-> > FWIIW, I observed this when using a config based on make tinyconfig with PCI
-> > and NET enabled, all WiFi drivers disabled, and only and only this Ethernet
-> > driver enabled.
-> > 
-> > > +     help
-> > > +       Say Y here if you have a Realtek Ethernet adapter belonging to
-> > > +       the following families:
-> > > +       RTL9054 5GBit Ethernet
-> > > +       RTL9068 5GBit Ethernet
-> > > +       RTL9072 5GBit Ethernet
-> > > +       RTL9075 5GBit Ethernet
-> > > +       RTL9068 5GBit Ethernet
-> > > +       RTL9071 5GBit Ethernet
-> > > +
-> > > +       To compile this driver as a module, choose M here: the module
-> > > +       will be called rtase. This is recommended.
-> > 
-> > The advice above to chose Y and M seem to conflict.
-> > Perhaps this can be edited somehow.
-> > 
+> > An alternative approach could have been to enhance the receive_buf()
+> > function and update all drivers that use it.
 > 
-> Hi Simon,
-> I would like to ask if it would be clearer if I changed it to the following?
+> Please, let's do that instead of adding random letters at the end of a
+> function pointer :)
+
+:) sure
+
 > 
-> config RTASE
-> 	tristate "Realtek Automotive Switch 9054/9068/9072/9075/9068/9071 PCIe Interface support"
-> 	depends on PCI
-> 	select CRC32
-> 	select PAGE_POOL
-> 	help
-> 	  Say Y here and it will be compiled and linked with the kernel
-> 	  if you have a Realtek Ethernet adapter belonging to the
-> 	  following families:
-> 	  RTL9054 5GBit Ethernet
-> 	  RTL9068 5GBit Ethernet
-> 	  RTL9072 5GBit Ethernet
-> 	  RTL9075 5GBit Ethernet
-> 	  RTL9068 5GBit Ethernet
-> 	  RTL9071 5GBit Ethernet
->  
-> 	  To compile this driver as a module, choose M here: the module
-> 	  will be called rtase. This is recommended.
+> > Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+> > ---
+> >  drivers/tty/serdev/serdev-ttyport.c |  2 +-
+> >  include/linux/serdev.h              | 17 ++++++++++++++---
+> >  2 files changed, 15 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
+> > index 3d7ae7fa50186..bb47691afdb21 100644
+> > --- a/drivers/tty/serdev/serdev-ttyport.c
+> > +++ b/drivers/tty/serdev/serdev-ttyport.c
+> > @@ -32,7 +32,7 @@ static size_t ttyport_receive_buf(struct tty_port *port, const u8 *cp,
+> >  	if (!test_bit(SERPORT_ACTIVE, &serport->flags))
+> >  		return 0;
+> >  
+> > -	ret = serdev_controller_receive_buf(ctrl, cp, count);
+> > +	ret = serdev_controller_receive_buf(ctrl, cp, fp, count);
+> >  
+> >  	dev_WARN_ONCE(&ctrl->dev, ret > count,
+> >  				"receive_buf returns %zu (count = %zu)\n",
+> > diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+> > index ff78efc1f60df..c6ef5a8988e07 100644
+> > --- a/include/linux/serdev.h
+> > +++ b/include/linux/serdev.h
+> > @@ -23,11 +23,17 @@ struct serdev_device;
+> >   * struct serdev_device_ops - Callback operations for a serdev device
+> >   * @receive_buf:	Function called with data received from device;
+> >   *			returns number of bytes accepted; may sleep.
+> > + * @receive_buf_fp:	Function called with data and flag buffer received
+> > + *			from device; If defined, this function gets called
+> > + *			instead of @receive_buf;
+> > + *			returns number of bytes accepted; may sleep.
+> 
+> I don't remember waht "fp" means here, and you don't document it, so
+> let's just have one recieve_buf() callback please.
 
-Thanks Justin,
+OK, that is a great opportunity for me to use Coccinelle. In the
+upcoming revision v4 I'll add the "flag buffer pointer" treewide, then
+named "flags".
 
-Yes, I think that addresses my concern.
+thanks
+  -- Christoph
 
