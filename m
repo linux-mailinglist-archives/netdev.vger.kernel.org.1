@@ -1,121 +1,122 @@
-Return-Path: <netdev+bounces-94498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B05688BFB2A
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 12:41:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FCD48BFB2D
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 12:42:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F3A0B21322
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 10:41:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5549B21EF4
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 10:42:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C2980C16;
-	Wed,  8 May 2024 10:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2D9A81726;
+	Wed,  8 May 2024 10:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="gzcay2bz"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z3FgsNNT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDD48061B;
-	Wed,  8 May 2024 10:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2E881721
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 10:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715164904; cv=none; b=NpLpJUVhXjvSKfOK7bc+3QHic0027xghbrRYjINGAWm0k5z1IoA6b0SUQ63uKop+YSJXi+x3EcpVjjhhcsbNlNQqFMii9z0iqrW2+18lTyby+fO4/tfYZBTZG14rTkU+erXElqvwOMgaCEBuK1/ASl3xBoXPoZMg3gDodlycdR0=
+	t=1715164930; cv=none; b=ZV5D1E6eOaIgXq8N6U7kgKjSTXBVrrMz0E2AZoAKVQbRRdvWvKS9Ge8fI/ND1GyMK5I0veyk8sneE7JSxyhnbwwl8AdbUgpIpLfajt29lQFOMysgpZQ251w1RLeZl2b83C8sQw/kHZRUGn+UDonRmUomt0MZJeKbl5cmVgvP4mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715164904; c=relaxed/simple;
-	bh=ftk3LXm1KKRXyvUxh2iDxkdzjCVpvWqkwpfBuiUcmSo=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=RDm03PXYpB9TaItGBv0QQqNtY3OL3P3qjJ1iLEXqEVN0jpurdPxDDUimaqYFl/UjPT/CL8Ktx7EljdTrsd0tEcqilR+JA0GN2sRvq2uhxgEBsPXS6cck1KYcp8er0FsifCNUmWUjlatDc6xctaEgevkgXfCSpDY/6XM6A08CV1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=gzcay2bz; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 05876600A2;
-	Wed,  8 May 2024 10:41:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1715164897;
-	bh=ftk3LXm1KKRXyvUxh2iDxkdzjCVpvWqkwpfBuiUcmSo=;
-	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
-	b=gzcay2bzt3xz45WH2jyYMewfkSg1ICtKOW2N9S0+WfOikt+lrsXUROaKfCSuaRi6z
-	 N0oGA8qEXfWeB8Ay7BS+CCtZU4WJeijpR87ZrTCEsRZT3RZ52e4k6aInJrRTiX5Egz
-	 CyrNwC14kz6sN5oJfcYzN6eJzh3qc15xYJ4X+KNI0gT0vSZfaCzkUj7DFUdIUGBaCr
-	 imigTrRd+/bKI4/ad+EVToUhBmi/bY7eHrXeEvj4ffiYlL3LdrLBEbyPKbkqczAV3Z
-	 Hxnf7K5wGLtVd/78jSqhCxFKHha6KYNYBeeq35QqY24nRP+d6zXYs6K4fpiIbpllew
-	 vohFQ7bp8Ve1Q==
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id A2456201852;
-	Wed, 08 May 2024 10:41:27 +0000 (UTC)
-Message-ID: <f54e0ffb-4087-4e83-9953-122fc19f488b@fiberby.net>
-Date: Wed, 8 May 2024 10:41:27 +0000
+	s=arc-20240116; t=1715164930; c=relaxed/simple;
+	bh=msFOWMMZAv+nOcQqKV5mzuGZJ+dqXm8YAjq5UYtYae0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qns9jUInvIOhbRaonPahKN9YVT7eF2qFu8vXPD6BSfw8or6Yu9zsZlrDHPFJ3tMgvsmVwEUdJB6R/5UhynWLffBHpLb+C6t86GjT6HuQZ7XK1bJ/KXQX++ALZqvq+PO5cDtvNru2VMBC+FJwNpHD3zLAefwyVfz63o166BBKgMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Z3FgsNNT; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-61ab6faf179so43673707b3.1
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 03:42:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1715164928; x=1715769728; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SCNZSYQEn9C0yYifJvIKeqaC0I3ddBBIVvQAOJJfdew=;
+        b=Z3FgsNNTxk1w3eCb/U+dIqo+fSnddur6Kj3Hjwm6PWw6J43QdXoqeyT9WmkuZsv2Fn
+         r0CglCSOtTjn42IStELQLTUfutMDTHCLcjU7Xv9xg0rZExtbqIQLsgy+7rKvINYWrjr3
+         mpdFacD3PlzYQKEt0u4BXc6JzQs8LEQjpOU0pyERqcnGVQJqam7XE69WSpuRL07S+eMF
+         8UOwMlMZPVNNO0MtG3MSzXrNLqYVpOcQ9By2Rf+4C9CaYhcWQ1vYd5xPF98wCF6TtCM5
+         QhLhFYECHfF6Cpj66Bvzue9MmTZucTPd1gd8CXiZSy7hhEj2vRMqYGZQ71X1My/ETTNL
+         JGRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715164928; x=1715769728;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SCNZSYQEn9C0yYifJvIKeqaC0I3ddBBIVvQAOJJfdew=;
+        b=Q0UjX816pz4DhfJ+3wf+A+G7xSLk9dio6ZefKofti8X5ppQSPF8PCrz9OlX9mOYuKf
+         J/c6TdGqW1ETbp9xLXNCsiPKpYBletOIrfdRjCO8BzqFmAes22MYyzGy5lSMMvSmGWRK
+         lmhkDWT6jEQm07Vo30f5bIp80oi5winlLuN32taeg73zClJlseOhMcs3CZ/nzckcyARM
+         Ef7CrO+00DWzTx+Hk2k5pAiAzwlWLQyVTnTRPR++VE3wlXYra4f7DM+KdW/H+NWT48Xc
+         hef5Nwf0mUIlovBSKv97axoPCgs504cxqyauiyIMKVoNfgACyoAWbLMsV8kIexWhaSu5
+         YQYA==
+X-Forwarded-Encrypted: i=1; AJvYcCWe1L14mKFQBpvuv7lBW02LdQ+WPhIB+KBahvSXa2NUzRoUI6G11zX1slnzFdBJMpcAKK14uGoGn+xb+vDRYCqwIGPvhW1E
+X-Gm-Message-State: AOJu0YzWdLnC79NcLHhB0p/Flpklw2AmhcX/cKCZb5NK5ZBVDV9nEeas
+	xEoSZ5cHmb2r4ssvM7LHh/aDjSpssweFLQUSmG3T6wsWM9dlM8eBST4cB7SLOBXCGG4DW6G+2nn
+	xDgPcZ9vNcaLf0jwbgo+5O2TPEarxCSEnicuMDQ==
+X-Google-Smtp-Source: AGHT+IG/YkpxJFnMtp9np4dGXgtlpi8FQCo5Um1fohI6F0WuAx9qFoD5jZyRnJpee9YYAVFVuPsAG5b/WQKuWWsqGYM=
+X-Received: by 2002:a81:844c:0:b0:61a:db67:b84f with SMTP id
+ 00721157ae682-62085da981emr27885857b3.27.1715164928430; Wed, 08 May 2024
+ 03:42:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-Subject: Re: [PATCH net-next 01/14] net: qede: use extack in
- qede_flow_parse_ports()
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Manish Chopra <manishc@marvell.com>,
- netdev@vger.kernel.org
-References: <20240507104421.1628139-1-ast@fiberby.net>
- <20240507104421.1628139-2-ast@fiberby.net>
- <e3993bb2-3aac-4b07-8f8a-e537fa902af4@intel.com>
-Content-Language: en-US
-In-Reply-To: <e3993bb2-3aac-4b07-8f8a-e537fa902af4@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <CAMSo37UN11V8UeDM4cyD+iXyRR1Us53a00e34wTy+zP6vx935A@mail.gmail.com>
+ <20240508075658.7164-1-jtornosm@redhat.com>
+In-Reply-To: <20240508075658.7164-1-jtornosm@redhat.com>
+From: Yongqin Liu <yongqin.liu@linaro.org>
+Date: Wed, 8 May 2024 18:41:57 +0800
+Message-ID: <CAMSo37XddAvE199QpA_WR5uwQUjzemF8GxqoWfETUNtFw6iCrg@mail.gmail.com>
+Subject: Re: [PATCH v2] net: usb: ax88179_178a: avoid writing the mac address
+ before first reading
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: amit.pundir@linaro.org, davem@davemloft.net, edumazet@google.com, 
+	inventor500@vivaldi.net, jarkko.palviainen@gmail.com, jstultz@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org, 
+	sumit.semwal@linaro.org, vadim.fedorenko@linux.dev, vmartensson@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Przemek,
+Hi, Jose
 
-Thank you for the review!
+On Wed, 8 May 2024 at 15:57, Jose Ignacio Tornos Martinez
+<jtornosm@redhat.com> wrote:
+>
+> Hello Yongqin,
+>
+> Sorry for the inconveniences.
+>
+> I don't have the db845c, could you provide information about the type of
+> device and protocol used?
 
-On 5/8/24 10:07 AM, Przemek Kitszel wrote:
-> On 5/7/24 12:44, Asbjørn Sloth Tønnesen wrote:
->> Convert qede_flow_parse_ports to use extack,
->> and drop the edev argument.
->>
->> Convert DP_NOTICE call to use NL_SET_ERR_MSG_MOD instead.
->>
->> In calls to qede_flow_parse_ports(), use NULL as extack
->> for now, until a subsequent patch makes extack available.
->>
->> Only compile tested.
->>
->> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
->> ---
->>   drivers/net/ethernet/qlogic/qede/qede_filter.c | 9 +++++----
->>   1 file changed, 5 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/qlogic/qede/qede_filter.c b/drivers/net/ethernet/qlogic/qede/qede_filter.c
->> index ded48523c383..3995baa2daa6 100644
->> --- a/drivers/net/ethernet/qlogic/qede/qede_filter.c
->> +++ b/drivers/net/ethernet/qlogic/qede/qede_filter.c
->> @@ -1700,7 +1700,7 @@ static int qede_parse_actions(struct qede_dev *edev,
->>   }
->>   static int
->> -qede_flow_parse_ports(struct qede_dev *edev, struct flow_rule *rule,
->> +qede_flow_parse_ports(struct netlink_ext_ack *extack, struct flow_rule *rule,
->>                 struct qede_arfs_tuple *t)
-> 
-> there are ~40 cases in drivers/net/ethernet that have an extack param as
-> not the last one, and over 1250 that have an extack as the last param.
-> My grepping was very naive, and counted both forward declarations and
-> implementations, but it's clear what is the preference.
-> 
-> Could you please convert the series to be that way?
+The db845c uses an RJ45 as the physical interface.
+It has the translation from PCIe0 to USB and USB to Gigabit Ethernet controller.
 
-Sure, will do that in v2.
+For details, maybe you could check the hardware details from the documents here:
+    https://www.96boards.org/documentation/consumer/dragonboard/dragonboard845c/hardware-docs/
+
+> Related driver logs would be very helpful for this.
+
+Here is the log from the serial console side:
+    https://gist.github.com/liuyq/809247d8a12aa1d9e03058e8371a4d44
+
+Please let me know if I could try and provide more information for the
+investigation.
 
 -- 
-Best regards
-Asbjørn Sloth Tønnesen
-Network Engineer
-Fiberby - AS42541
+Best Regards,
+Yongqin Liu
+---------------------------------------------------------------
+#mailing list
+linaro-android@lists.linaro.org
+http://lists.linaro.org/mailman/listinfo/linaro-android
 
