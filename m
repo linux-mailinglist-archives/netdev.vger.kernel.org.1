@@ -1,181 +1,112 @@
-Return-Path: <netdev+bounces-94568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD6088BFE05
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:08:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0628A8BFE09
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:10:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83BCF28355F
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:08:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5495285BE6
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:10:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A69586A343;
-	Wed,  8 May 2024 13:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B8076A347;
+	Wed,  8 May 2024 13:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jfcCtNYT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RxSJb7Sp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD77B26AFF;
-	Wed,  8 May 2024 13:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5614256454;
+	Wed,  8 May 2024 13:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715173712; cv=none; b=WMOx/B+9yYpTMQV8PcmMrnBNOFarUHMbOJuM2+BNPSbL8zWKPISdBmcyQA2lSYEHEc3Qz4aPWLqaDh8Dpvs1KoSaIw8WNxMm3a0SI24DN5Z8mdTP2xpKj92pPJrSlYYfspFIJ+7f4WDLK1yWY7oaWE3HSc+bcUk0m9LHz50lMV4=
+	t=1715173801; cv=none; b=DGbv3BriERxDFsSnR/ybIiMZbSkKcg5XigHr/65CHzSKYupmKzZ3syG+z7y9kuCUoS8FYD3nPEKETv52bJvT2FCHENOBI0FJ6Hk6AaYQjKTwKmjBzEsh8kgwsNupzQpyIRz69pimxkeS0eSK+V0zBGFDadIfyYYCvS0fvyNLykk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715173712; c=relaxed/simple;
-	bh=Nhek7t2kXbSnyS4ynbhye8pjdTcB5x58ll+RArMjhG4=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=IqOYgm185x3drXKw42ZvrL//8m89SGId8XBqkSkbRFX8lyr+8zNDJRZHJpP+Q081FITzBE0/86KC7456THMakYoawf4TmZIAA+fkjk4eUwrndL2kUlcxj+WEufLlKpg0MqEJuKzZv5LTjuSI4IfjYfp128tzg5M23Kq3q62TplQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jfcCtNYT; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715173711; x=1746709711;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version:content-id;
-  bh=Nhek7t2kXbSnyS4ynbhye8pjdTcB5x58ll+RArMjhG4=;
-  b=jfcCtNYTHirOcv6y7VMtVHK9Zbk6Qo6r/cIpzvvYi6mbfw5G/uZOminI
-   UzJbnvTJa331N0/AsnXDBRiKcsiN1fozENd7elmIlPiMopy6ihkvK/09S
-   DewJFIlM5P0MfWtzbyhvD4EeJ7mHt24/QjIhoc/+iTdR63TUvgzNx1UVj
-   ExaIvxb15RedOpuSuey2R7HKG3wzeaH8wCEeGRGPBKqNbMjHTf17HDsIV
-   5KvSTE2NNOnC6Nx15+r2yXfzj1tfnc3L2fUkg/VXtN+8MhIwlk0fu/GFr
-   EQ7/7wjrL3OoYpsp+r/eWnIHhOvmpmVqUb/h3iAVKiqtHPTlCU4CVho40
-   A==;
-X-CSE-ConnectionGUID: 6LniEL/vR6q3cpvYYkh/FA==
-X-CSE-MsgGUID: hgUNPgKbTzSodfZyjqDoCQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="14837324"
-X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
-   d="scan'208";a="14837324"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 06:08:28 -0700
-X-CSE-ConnectionGUID: gag7DJvuRZGkzb+94mIYag==
-X-CSE-MsgGUID: unnb3CkzTJ23HcfMHdTsww==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
-   d="scan'208";a="28858984"
-Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.247.80])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 06:08:21 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Wed, 8 May 2024 16:08:15 +0300 (EEST)
-To: Christoph Fritz <christoph.fritz@hexdev.de>
-cc: Oliver Hartkopp <socketcan@hartkopp.net>, 
-    Marc Kleine-Budde <mkl@pengutronix.de>, Jiri Slaby <jirislaby@kernel.org>, 
-    Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-    "David S . Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-    Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-    Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
-    Benjamin Tissoires <bentiss@kernel.org>, 
-    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-    Sebastian Reichel <sre@kernel.org>, 
-    Linus Walleij <linus.walleij@linaro.org>, 
-    Andreas Lauser <andreas.lauser@mercedes-benz.com>, 
-    Jonathan Corbet <corbet@lwn.net>, Pavel Pisa <pisa@cmp.felk.cvut.cz>, 
-    linux-can@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
-    devicetree@vger.kernel.org, linux-input@vger.kernel.org, 
-    linux-serial <linux-serial@vger.kernel.org>
-Subject: Re: [PATCH v3 01/11] can: Add LIN bus as CAN abstraction
-In-Reply-To: <e0f3d0716ed2f4281561f08bbcd3050dddcf1831.camel@hexdev.de>
-Message-ID: <4e8a50a0-f938-8aaf-fe4b-d18765407d4d@linux.intel.com>
-References: <20240502182804.145926-1-christoph.fritz@hexdev.de>  <20240502182804.145926-2-christoph.fritz@hexdev.de>  <61adf428-2205-1563-d0b6-fa843e08559d@linux.intel.com> <e0f3d0716ed2f4281561f08bbcd3050dddcf1831.camel@hexdev.de>
+	s=arc-20240116; t=1715173801; c=relaxed/simple;
+	bh=9nupFW/QjOyvBp4lXy18CeJ4uCNVsZ8k/Rv/E8n9eP4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sLchTOUjkA8pxQM0wncQbkGfWfAivfs0mitZdYjoCfrtUpDB2n+W8Er4YFupGaGXo8XEmJMgWqTHvDlUahGN/cfkmdirU887rNJNCgwtZxytE+ATR/lsBlgqLYbu+hya2Ui7KyE1xtjIZdx/DFWRWZ4GgGjjqTg84J0StU1boXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=RxSJb7Sp; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=rlmkt8g9gLz2FbVYrvJA9JT7otm1jUX7lKLhqslbHGI=; b=RxSJb7Sp74qndsfLvvKEIOPdMa
+	KiM42boTGqab+gwvAILrvWeEgwiUvELAV9UohU9tBo+KLYB9Bi/BfXaH8X2T/DtUVugFGs6dDb0RK
+	ENFqOb70DXPSiab+XKPwcLEP+OOr1zUF1h0/Fu3qoY6iaCXOeDx7LlBR/adnjPC/eB+6OqqTM7Az5
+	gIrFB7py2+qzhy/7DTOthu2CnbU69O3Vk3XCFvxD6BK65qPLiGGKemYc34cRtBSWKiRZAelFFn/Lm
+	zEJ7yxsL1sWRX0JI6WxfgLPVSQUEnDn4wpPGxGlpPaz4+qIQ5f5539AOQn5V0PqO3xzJadUtFB3Mu
+	xWRQjYCA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39206)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1s4h39-0005FO-0X;
+	Wed, 08 May 2024 14:09:35 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1s4h34-0001OL-HC; Wed, 08 May 2024 14:09:30 +0100
+Date: Wed, 8 May 2024 14:09:30 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+	Sky Huang <SkyLake.Huang@mediatek.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Qingfang Deng <dqfext@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Steven Liu <Steven.Liu@mediatek.com>
+Subject: Re: [PATCH 2/3] net: phy: mediatek: Add mtk phy lib for token ring
+ access & LED/other manipulations
+Message-ID: <Zjt5iobHklvrVgtB@shell.armlinux.org.uk>
+References: <20240425023325.15586-1-SkyLake.Huang@mediatek.com>
+ <20240425023325.15586-3-SkyLake.Huang@mediatek.com>
+ <Zjo9SZiGKDUf2Kwx@makrotopia.org>
+ <a005409e-255e-4633-a58c-6c29e6708b34@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="8323328-1801532953-1715173426=:3164"
-Content-ID: <48adb666-4c9a-aa9a-24fb-3a1d33c5cc32@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a005409e-255e-4633-a58c-6c29e6708b34@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Wed, May 08, 2024 at 02:25:56PM +0200, Andrew Lunn wrote:
+> On Tue, May 07, 2024 at 03:40:09PM +0100, Daniel Golle wrote:
+> > Could you create this helper library in a way that it would be useful
+> > also for the otherwise identical LED controller of the Airoha EN8811H,
+> > ie. supporting both variants with LED_ON_LINK2500 at BIT(7) as well as
+> > BIT(8) would be worth it imho as all the rest could be shared.
+> 
+> Please trim the email when replying to just what is relevant. If i
+> need to page down lots of time to find a comment it is possible i will
+> skip write passed a comment...
 
---8323328-1801532953-1715173426=:3164
-Content-Type: text/plain; CHARSET=ISO-8859-15
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Content-ID: <109eb976-de37-c302-06dc-7d4f63b0cbac@linux.intel.com>
++1. There are _too_ _many_ people on netdev who just don't bother to do
+this, and it's getting to the point where if people can't be bothered
+to make it easier for me to engage with them, I'm just not going to be
+bothered engaging with them. People need to realise that this is a two-
+way thing, and stop making reviewers have extra work trying to find
+their one or two line comment buried in a few hundred lines of irrevant
+content. I might just send a reply, top posting, stating I can't be
+bothered to read their email.
 
-On Wed, 8 May 2024, Christoph Fritz wrote:
-
-> On Mon, 2024-05-06 at 19:24 +0300, Ilpo J=E4rvinen wrote:
-> > On Thu, 2 May 2024, Christoph Fritz wrote:
-> >=20
-> > > This patch adds a LIN (local interconnect network) bus abstraction on
-> > > top of CAN.  It is a glue driver adapting CAN on one side while offer=
-ing
-> > > LIN abstraction on the other side. So that upcoming LIN device driver=
-s
-> > > can make use of it.
-
-> > > +static int lin_create_sysfs_id_files(struct net_device *ndev)
-> > > +{
-> > > +=09struct lin_device *ldev =3D netdev_priv(ndev);
-> > > +=09struct kobj_attribute *attr;
-> > > +=09int ret;
-> > > +
-> > > +=09for (int id =3D 0; id < LIN_NUM_IDS; id++) {
-> > > +=09=09ldev->sysfs_entries[id].ldev =3D ldev;
-> > > +=09=09attr =3D &ldev->sysfs_entries[id].attr;
-> > > +=09=09attr->attr.name =3D kasprintf(GFP_KERNEL, "%02x", id);
-> > > +=09=09if (!attr->attr.name)
-> > > +=09=09=09return -ENOMEM;
-> > > +=09=09attr->attr.mode =3D 0644;
-> > > +=09=09attr->show =3D lin_identifier_show;
-> > > +=09=09attr->store =3D lin_identifier_store;
-> > > +
-> > > +=09=09sysfs_attr_init(&attr->attr);
-> > > +=09=09ret =3D sysfs_create_file(ldev->lin_ids_kobj, &attr->attr);
-> > > +=09=09if (ret) {
-> > > +=09=09=09kfree(attr->attr.name);
-> > > +=09=09=09return -ENOMEM;
-> > > +=09=09}
-> > > +=09}
-> > > +
-> > > +=09return 0;
-> > > +}
-> >=20
-> > Can you use .dev_groups instead ?
->=20
-> I'm not sure where to attach this in this glue code here. Should I do a
-> class_register() and add the .dev_groups there?
-
-I guess struct class would be correct direction but I'm not sure if it's=20
-viable in this case. It would avoid the need for custom sysfs setup code
-if it's workable.
-
-> > FWIW, this function doesn't do rollback when error occurs.
->=20
-> OK, this issue can be fixed in revision v4.
->=20
-> ...
-
-> > > diff --git a/include/uapi/linux/can/netlink.h b/include/uapi/linux/ca=
-n/netlink.h
-> > > index 02ec32d694742..51b0e2a7624e4 100644
-> > > --- a/include/uapi/linux/can/netlink.h
-> > > +++ b/include/uapi/linux/can/netlink.h
-> > > @@ -103,6 +103,7 @@ struct can_ctrlmode {
-> > >  #define CAN_CTRLMODE_CC_LEN8_DLC=090x100=09/* Classic CAN DLC option=
- */
-> > >  #define CAN_CTRLMODE_TDC_AUTO=09=090x200=09/* CAN transiver automati=
-cally calculates TDCV */
-> > >  #define CAN_CTRLMODE_TDC_MANUAL=09=090x400=09/* TDCV is manually set=
- up by user */
-> >=20
-> > BIT(x) is these days available also for uapi I think.
-> >=20
-> > > +#define CAN_CTRLMODE_LIN=09=090x800=09/* LIN bus mode */
->=20
-> So, should I use just BIT(11) for the new define, or should I also
-> refactor the whole list while at it?
-
-Either is fine for me.
-
---=20
- i.
---8323328-1801532953-1715173426=:3164--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
