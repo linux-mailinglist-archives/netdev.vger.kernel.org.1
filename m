@@ -1,89 +1,142 @@
-Return-Path: <netdev+bounces-94469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B09398BF910
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 10:53:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 620F48BF931
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 11:01:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1FC61C208CB
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 08:53:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 011351F2382A
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D527535D5;
-	Wed,  8 May 2024 08:53:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F201E71742;
+	Wed,  8 May 2024 09:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rsqk/DHR"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="DURQmnno"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A6246453;
-	Wed,  8 May 2024 08:53:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23172537F2;
+	Wed,  8 May 2024 09:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715158393; cv=none; b=K+zU6OBW7v0NwPufjk02u4cUhY2bmZueDQJ8/SDA+qeX3PlEXUolghIdYFC9nd3Rckepk/TVYXjQXhqsMr/8Ub2Q4GmpVIbIePKIVIEQ/ZKc6Q/J9vwwsjg+AS2uD86dwWmRYf7dJU6aHzdi66QmMCRnT5s4TaLlCiGEfAfBYIU=
+	t=1715158908; cv=none; b=eXfcuGQf6BIy1k1QcZ+3ccddVu26qtNmbdtriXZApQf+2qKDytVER5yv+s45ZSA90O3RRB07eUB1zY6XbDZmqvSf6TTem7B2h0OSSDRpzBOPkmQXDC2A8QidRXO64wldxev3P9bogR2eulHnUAyJ/rcpmTx+gGsDaXG5XL+zDE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715158393; c=relaxed/simple;
-	bh=W9i+0UwSIxGffCty/8mZuU1UQUdF5pVE6vy46XAO7Ro=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uy8ScbICKCiNAezcPlJV3kmVUSc6m17PpRJbJ+i8PbIC8POIg/vV0pAQMhOqzma151I9tV7n42E+ygze6c/ZugKcpThZdmhqZ6nHVC5WTcgPidCQc9nwI9YyAim/OEeg5BJor+ZNuEmvUL3KUkDZuakJAC1ff7NCOdCNHgfaOoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rsqk/DHR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFECDC4AF17;
-	Wed,  8 May 2024 08:53:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715158393;
-	bh=W9i+0UwSIxGffCty/8mZuU1UQUdF5pVE6vy46XAO7Ro=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rsqk/DHRbmtn3hbdlXfqnusf9dj7a1WlTNJ/QFiBnEEpV00n8B5IxxSRf1/DqX3UA
-	 ljpNm8TpcZFIkfTbtZuPNbVPgsqyUBhYtQNoLkRknk2V2eu+E/sCHlbNzp0AqJ9YKV
-	 dDEmOfX9vwV+skVj9bjTOlV4d8LnqI50CKj4HPvn9UfXxDhoGZeaW4HoNJWNT/pPu7
-	 WfJFkAEHWXLeNtGqBIxoIdtxvzCshq6v0lQTPNHodyHePhgkyVzPmnOVfSfSe5f6qa
-	 B8QzL7Wo8SU6C7OQdtbFTBetsC++F/fZ/UFi9/3giy279ZLhcpaEwmUSsZWXo5WP0R
-	 ts/am9tW7tmIA==
-Date: Wed, 8 May 2024 09:53:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	virtualization@lists.linux.dev, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 0/7] virtnet_net: prepare for af-xdp
-Message-ID: <20240508085308.GA1736038@kernel.org>
-References: <20240508080514.99458-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1715158908; c=relaxed/simple;
+	bh=wAUIHDwJWti/Qtu1rVeMco4tYKMnZhzWFK1YVr5s2h4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fLld4yBq+cu3dmlwC0dyHjaBIPTHff8Cg3qx/n1Bjyc7Jb5sH1TtzA/0Uc5mVgtXxWczZwzptyPkY3dcI+PWE9DG6cBRZPpLt83rwv2crFyJjY/f6J2KaO54kYZKiV8f7oHbwCjPwFNwR7ttiI6px4Y+p0BjAXeU7iqOx7gOfp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=DURQmnno; arc=none smtp.client-ip=80.241.56.161
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4VZ89X13K6z9sRx;
+	Wed,  8 May 2024 10:55:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1715158512;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LgTa174CN4twtJVuodBezk0b2vWnBKWssMs5UWGeMhE=;
+	b=DURQmnnoX8sm4mSH2+Wiww+tChze7TvUiyZS+n2y2rVSOBoJXb5ppk/y7HqkmmEuUINXx7
+	EyqnuylnRlAwf77RwpnGTSJILDfxnX1FUVI8ZrehNhEtcaTHHZTy6M+wNwOVOUPO2RbMaM
+	UeHRH9PSgD31eUfIWwtRjUC/3qvwxu3Wd5ImjKpbczOWgcSw868cjExUJn6axBs7pLtUSf
+	nI2PknUfuA92H5l8KI5gdBfriQCCrsWW+pFz+l1KMguYCBTTE+ZgV/G68jGwXcFJCrtmdz
+	PGmwcn2syJUh1ivzuEfbD8bo8CB4EguP0f8b+x1MoMyYrt0ovmllRs6JmNQdLA==
+Date: Wed, 8 May 2024 10:55:05 +0200
+From: Erhard Furtner <erhard_f@mailbox.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: WARNING: CPU: 1 PID: 1 at net/core/netpoll.c:370
+ netpoll_send_skb+0x1fc/0x20c at boot when netconsole is enabled (kernel
+ v6.9-rc5, v6.8.7, sungem, PowerMac G4 DP)
+Message-ID: <20240508105505.098efd6c@yea>
+In-Reply-To: <20240506181020.292b25f0@kernel.org>
+References: <20240428125306.2c3080ef@legion>
+	<20240429183630.399859e2@kernel.org>
+	<20240505232713.46c03b30@yea>
+	<20240506072645.448bc49f@kernel.org>
+	<20240507024258.07980f55@yea>
+	<20240506181020.292b25f0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240508080514.99458-1-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-MBO-RS-META: oi1ksroanrx3buqynk4yf9m64a7ii418
+X-MBO-RS-ID: 34bc1399a180a3c52e3
 
-On Wed, May 08, 2024 at 04:05:07PM +0800, Xuan Zhuo wrote:
-> This patch set prepares for supporting af-xdp zerocopy.
-> There is no feature change in this patch set.
-> I just want to reduce the patch num of the final patch set,
-> so I split the patch set.
+On Mon, 6 May 2024 18:10:20 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
+
+> Excellent! Do you want to submit that as an official patch?
+> The explanation is that we can't call disable_irq() from atomic
+> context (which which netpoll runs). But the callback is no longer
+> necessary as we can depend on NAPI to do the polling these days.
+
+I could do that with the explanation you stated. But should any further questions arise in this process I would also lack the technical background to deal with them. ;)
+
+I also noticed a similar #ifdef CONFIG_NET_POLL_CONTROLLER logic shows up in
+many network drivers, e.g. net/ethernet/realtek/8139too.c:
+
+#ifdef CONFIG_NET_POLL_CONTROLLER
+static void rtl8139_poll_controller(struct net_device *dev);
+#endif
+[...]
+#ifdef CONFIG_NET_POLL_CONTROLLER
+/*
+ * Polling receive - used by netconsole and other diagnostic tools
+ * to allow network i/o with interrupts disabled.
+ */
+static void rtl8139_poll_controller(struct net_device *dev)
+{
+        struct rtl8139_private *tp = netdev_priv(dev);
+       	const int irq = tp->pci_dev->irq;
+
+       	disable_irq_nosync(irq);
+       	rtl8139_interrupt(irq, dev);
+       	enable_irq(irq);
+}
+#endif
+[...]
+#ifdef CONFIG_NET_POLL_CONTROLLER
+       	.ndo_poll_controller    = rtl8139_poll_controller,
+#endif
+
+
+Should it be removed here too? This would be more cards I can test. So far I only see this on my G4 and I think something similar on an old Pentium4 box I no longer have. 
+ 
+> > What I still get with 'modprobe -v dev_addr_lists_test', even with gem_poll_controller() removed is:
+> > 
+> > [...]
+> > KTAP version 1
+> > 1..1
+> >     KTAP version 1
+> >     # Subtest: dev-addr-list-test
+> >     # module: dev_addr_lists_test
+> >     1..6
+> > 
+> > ====================================
+> > WARNING: kunit_try_catch/1770 still has locks held!
+> > 6.9.0-rc6-PMacG4-dirty #5 Tainted: G        W        N
+> > ------------------------------------
+> > 1 lock held by kunit_try_catch/1770:
+> >  #0: c0dbfce4 (rtnl_mutex){....}-{3:3}, at: dev_addr_test_init+0xbc/0xc8 [dev_addr_lists_test]  
 > 
-> #1-#3 add independent directory for virtio-net
-> #4-#7 do some refactor, the sub-functions will be used by the subsequent commits
+> I think that's fixed in net-next.
 
-Hi Xuan Zhuo,
+Ah, good to hear!
 
-This patch is targeted at net-next,
-but unfortunately it does not apply to current net-next.
-Please rebase and repost taking care to observe the 24h rule.
-
-Link: https://docs.kernel.org/process/maintainer-netdev.html
-
--- 
-pw-bot: changes-requested
+Regards,
+Erhard F.
 
