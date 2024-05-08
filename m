@@ -1,93 +1,401 @@
-Return-Path: <netdev+bounces-94492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C96BA8BFB19
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 12:39:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93A748BFB24
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 12:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6ACC51F22FA6
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 10:39:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18BE21F23320
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 10:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2369A7C08F;
-	Wed,  8 May 2024 10:39:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254FC81725;
+	Wed,  8 May 2024 10:39:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HRkEitQ4"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="vhHECUvW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-bc09.mail.infomaniak.ch (smtp-bc09.mail.infomaniak.ch [45.157.188.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895692836D
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 10:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AB58120F
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 10:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715164750; cv=none; b=a/IqTMJW4A9kiOlb69EclUDI9GL2s27dUCdYr1/BTQcK+BY8LM4XwJyl+2zFbmqXn7yd0O/cFsiuupCrNsO56u011JYwvb+eqCLd1S9Idkg4dk0CoHkw6al2FL5iaH1TaawK/Agme+OgTvlLDGKKEYld1DniJAJoUK6G0EkY9YU=
+	t=1715164770; cv=none; b=X3vFJvyzNm3wfAkaE8eFuhyNPefQmqi1V9zKDuk55kLqu13BB5slUmWN6BWBcJ4wAwjiE+wTJDiwKIKm63p8OL4pw+Ixg2KxikOxX4wiJfA/0aQuP3vXKbURM1sEG78TjXvLIZHywtDWi/PKI7ZaPzDrm8xJfJBdj0Gvl0Fwh+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715164750; c=relaxed/simple;
-	bh=YXNybCmdD0cX90rP7knyBn3ABtTb/ix7lSNzwC7WBXQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hZSIFOWpBPJtk33+62GO6+AholFt+4ddY6m5hxotUUBDxiEbe09AufGkFjzqjnPbDbpoRbwIcBU3U1UmG0M7puTjzJAvLRgzXpo/8AKo9CseV9SQA1b4cwVRn2z27wOwrXHonIs6O8ul5z+vp+RJirrWjPcekm4/AJ6Ejiwv2gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HRkEitQ4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715164747;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=rljQqv49klU+q6EQwFWdfti7B1JNGp/+41eQrpaWnqQ=;
-	b=HRkEitQ4lQIYC5Cq88StgBDpdB2cJqSIPxRRkzmZPfD9XAmCHciqT6tRublA4fO/YgMKlB
-	itiSu7GYqeK4OhZ4O4vRlR1XVddgv5LGuAwRhcNoMPyhoJF5vVZn2ByvOQOiQzVp1WLPs8
-	HkvO1FAOn7EK47/8d6xSKyBmh5W85pU=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-561-ycAsKtVSOKO8zYkMXE5fCA-1; Wed,
- 08 May 2024 06:39:04 -0400
-X-MC-Unique: ycAsKtVSOKO8zYkMXE5fCA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D52A93800094;
-	Wed,  8 May 2024 10:39:03 +0000 (UTC)
-Received: from renaissance-vector.redhat.com (unknown [10.39.192.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B23AC2022F10;
-	Wed,  8 May 2024 10:39:02 +0000 (UTC)
-From: Andrea Claudi <aclaudi@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	David Ahern <dsahern@gmail.com>
-Subject: [PATCH iproute2] man: fix typo in tc-mirred man page
-Date: Wed,  8 May 2024 12:38:52 +0200
-Message-ID: <83c969899db103576310bf3837595ab32984c8b4.1715164702.git.aclaudi@redhat.com>
+	s=arc-20240116; t=1715164770; c=relaxed/simple;
+	bh=lSJXVR5Br9K8S0SHmR21C5ZC8aKk/4QjhdL4XnVcQJc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c9wGlBXaTub1aD78y5UTpI/rZadoE/981tZP4JX18QWSvH/vIPnCNLB72+aVDnKqMn3cj/cJGDt9VinlEnCWy1wE3JxgxNKEEykekR3TcuPnowHMgnPq6nCfuRNpg87doPvoPKLzuagzpXaPyxwU0tBzXBzctSlY79u8+l5sOS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=vhHECUvW; arc=none smtp.client-ip=45.157.188.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VZBTc4zrnzLCp;
+	Wed,  8 May 2024 12:39:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1715164756;
+	bh=lSJXVR5Br9K8S0SHmR21C5ZC8aKk/4QjhdL4XnVcQJc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vhHECUvWwkjaWzZQKTGHrRbbVWIX7CYliG0amjiDJmvWswCVPLsTz0hAm3pGnGDqG
+	 DhSg0Yoz5N6334UsYUJuqE78fKbhMdR5ijg2SZF+fqoTw6DESH1CDyU7XC4VVdQAW7
+	 +KZ0WeoDTZQxoC4qh9KW9B8RWHnnrok+0P3fJTWQ=
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4VZBTb4ZG0zPqK;
+	Wed,  8 May 2024 12:39:15 +0200 (CEST)
+Date: Wed, 8 May 2024 12:38:58 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
+Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
+	willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, linux-security-module@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Subject: Re: [RFC PATCH v1 03/10] selftests/landlock: Create 'create' test
+Message-ID: <20240508.Kiqueira8The@digikod.net>
+References: <20240408093927.1759381-1-ivanov.mikhail1@huawei-partners.com>
+ <20240408093927.1759381-4-ivanov.mikhail1@huawei-partners.com>
+ <ZhPsWKSRrqDiulrg@google.com>
+ <9a8b71c6-f72c-7ec0-adee-5828dc41cf44@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+In-Reply-To: <9a8b71c6-f72c-7ec0-adee-5828dc41cf44@huawei-partners.com>
+X-Infomaniak-Routing: alpha
 
-Signed-off-by: Andrea Claudi <aclaudi@redhat.com>
----
- man/man8/tc-mirred.8 | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Apr 11, 2024 at 06:58:34PM +0300, Ivanov Mikhail wrote:
+> 
+> 4/8/2024 4:08 PM, Günther Noack wrote:
+> > Hello!
+> > 
+> > I am very happy to see this patch set, this is a very valuable feature, IMHO! :)
+> > 
+> > Regarding the subject of this patch:
+> > 
+> >    [RFC PATCH v1 03/10] selftests/landlock: Create 'create' test
+> >                                                     ^^^^^^
+> > 
+> > This was probably meant to say "socket"?
+> 
+> I wanted each such patch to have the name of the test that this patch
+> adds (without specifying the fixture, since this is not necessary
+> information, which only complicates the name). I think
+> 
+>     [RFC PATCH v1 03/10] selftests/landlock: Add 'create' test
+>                                              ~~~
+> renaming should be fine.
 
-diff --git a/man/man8/tc-mirred.8 b/man/man8/tc-mirred.8
-index 46d894ce..6959e3e6 100644
---- a/man/man8/tc-mirred.8
-+++ b/man/man8/tc-mirred.8
-@@ -37,7 +37,7 @@ receives. Mirroring is what is sometimes referred to as Switch Port Analyzer
- (SPAN) and is commonly used to analyze and/or debug flows.
- When mirroring to a tc block, the packet will be mirrored to all the ports in
- the block with exception of the port where the packet ingressed, if that port is
--part of the tc block. Redirecting is simillar to mirroring except that the
-+part of the tc block. Redirecting is similar to mirroring except that the
- behaviour is to mirror to the first N - 1 ports in the block and redirect to the
- last one (note that the port in which the packet arrived is not going to be
- mirrored or redirected to).
--- 
-2.45.0
 
+Maybe something like this?
+"selftests/landlock: Add protocol.create to socket tests"
+
+
+> 
+> > 
+> > (In my mind, it is a good call to put the test in a separate file -
+> > the existing test files have grown too large already.)
+> > 
+> > 
+> > On Mon, Apr 08, 2024 at 05:39:20PM +0800, Ivanov Mikhail wrote:
+> > > Initiate socket_test.c selftests. Add protocol fixture for tests
+> > > with changeable domain/type values. Only most common variants of
+> > > protocols (like ipv4-tcp,ipv6-udp, unix) were added.
+> > > Add simple socket access right checking test.
+> > > 
+> > > Signed-off-by: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
+> > > Reviewed-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> > > ---
+> > >   .../testing/selftests/landlock/socket_test.c  | 197 ++++++++++++++++++
+> > >   1 file changed, 197 insertions(+)
+> > >   create mode 100644 tools/testing/selftests/landlock/socket_test.c
+> > > 
+> > > diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testing/selftests/landlock/socket_test.c
+> > > new file mode 100644
+> > > index 000000000..525f4f7df
+> > > --- /dev/null
+> > > +++ b/tools/testing/selftests/landlock/socket_test.c
+> > > @@ -0,0 +1,197 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +/*
+> > > + * Landlock tests - Socket
+> > > + *
+> > > + * Copyright © 2024 Huawei Tech. Co., Ltd.
+> > > + */
+> > > +
+> > > +#define _GNU_SOURCE
+> > > +
+> > > +#include <errno.h>
+> > > +#include <linux/landlock.h>
+> > > +#include <sched.h>
+> > > +#include <string.h>
+> > > +#include <sys/prctl.h>
+> > > +#include <sys/socket.h>
+> > > +
+> > > +#include "common.h"
+> > > +
+> > > +/* clang-format off */
+> > > +
+> > > +#define ACCESS_LAST LANDLOCK_ACCESS_SOCKET_CREATE
+> > > +
+> > > +#define ACCESS_ALL ( \
+> > > +	LANDLOCK_ACCESS_SOCKET_CREATE)
+> > > +
+> > > +/* clang-format on */
+> > > +
+> > > +struct protocol_variant {
+> > > +	int domain;
+> > > +	int type;
+> > > +};
+> > > +
+> > > +struct service_fixture {
+> > > +	struct protocol_variant protocol;
+> > > +};
+> > > +
+> > > +static void setup_namespace(struct __test_metadata *const _metadata)
+> > > +{
+> > > +	set_cap(_metadata, CAP_SYS_ADMIN);
+> > > +	ASSERT_EQ(0, unshare(CLONE_NEWNET));
+> > > +	clear_cap(_metadata, CAP_SYS_ADMIN);
+> > > +}
+> > > +
+> > > +static int socket_variant(const struct service_fixture *const srv)
+> > > +{
+> > > +	int ret;
+> > > +
+> > > +	ret = socket(srv->protocol.domain, srv->protocol.type | SOCK_CLOEXEC,
+> > > +			 0);
+> > > +	if (ret < 0)
+> > > +		return -errno;
+> > > +	return ret;
+> > > +}
+> > 
+> > This helper is mostly concerned with mapping the error code.
+> > 
+> > In the fs_test.c, we have dealt with such use cases with helpers like
+> > test_open_rel() and test_open().  These helpers attempt to open the file, take
+> > the same arguments as open(2), but instead of returning the opened fd, they only
+> > return 0 or errno.  Do you think this would be an option here?
+> > 
+> > Then you could write your tests as
+> > 
+> >    ASSERT_EQ(EACCES, test_socket(p->domain, p->type, 0));
+> > 
+> > and the test would (a) more obviously map to socket(2), and (b) keep relevant
+> > information like the expected error code at the top level of the test.
+> > 
+> 
+> I thought that `socket_variant()` would be suitable for future tests
+> where sockets can be used after creation (e.g. for sending FDs). But
+> until then, it's really better to replace it with what you suggested.
+
+You can move common code/helpers from net_test.c to common.h (with a
+dedicated patch) to avoid duplicating code.
+
+> 
+> > > +
+> > > +FIXTURE(protocol)
+> > > +{
+> > > +	struct service_fixture srv0;
+> > > +};
+> > > +
+> > > +FIXTURE_VARIANT(protocol)
+> > > +{
+> > > +	const struct protocol_variant protocol;
+> > > +};
+> > > +
+> > > +FIXTURE_SETUP(protocol)
+> > > +{
+> > > +	disable_caps(_metadata);
+> > > +	self->srv0.protocol = variant->protocol;
+> > > +	setup_namespace(_metadata);
+> > > +};
+> > > +
+> > > +FIXTURE_TEARDOWN(protocol)
+> > > +{
+> > > +}
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, unspec) {
+> > > +	/* clang-format on */
+> > > +	.protocol = {
+> > > +		.domain = AF_UNSPEC,
+> > > +		.type = SOCK_STREAM,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, unix_stream) {
+> > > +	/* clang-format on */
+> > > +	.protocol = {
+> > > +		.domain = AF_UNIX,
+> > > +		.type = SOCK_STREAM,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, unix_dgram) {
+> > > +	/* clang-format on */
+> > > +	.protocol = {
+> > > +		.domain = AF_UNIX,
+> > > +		.type = SOCK_DGRAM,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, ipv4_tcp) {
+> > > +	/* clang-format on */
+> > > +	.protocol = {
+> > > +		.domain = AF_INET,
+> > > +		.type = SOCK_STREAM,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, ipv4_udp) {
+> > > +	/* clang-format on */
+> > > +	.protocol = {
+> > > +		.domain = AF_INET,
+> > > +		.type = SOCK_DGRAM,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, ipv6_tcp) {
+> > > +	/* clang-format on */
+> > > +	.protocol = {
+> > > +		.domain = AF_INET6,
+> > > +		.type = SOCK_STREAM,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, ipv6_udp) {
+> > > +	/* clang-format on */
+> > > +	.protocol = {
+> > > +		.domain = AF_INET6,
+> > > +		.type = SOCK_DGRAM,
+> > > +	},
+> > > +};
+> > > +
+> > > +static void test_socket_create(struct __test_metadata *const _metadata,
+> > > +				  const struct service_fixture *const srv,
+> > > +				  const bool deny_create)
+> > > +{
+> > > +	int fd;
+> > > +
+> > > +	fd = socket_variant(srv);
+> > > +	if (srv->protocol.domain == AF_UNSPEC) {
+> > > +		EXPECT_EQ(fd, -EAFNOSUPPORT);
+> > > +	} else if (deny_create) {
+> > > +		EXPECT_EQ(fd, -EACCES);
+
+The deny_create argument/check should not be in this helper but in the
+caller.
+
+> > > +	} else {
+> > > +		EXPECT_LE(0, fd)
+
+This should be an ASSERT because the following code using fd would make
+no sense if executed.
+
+> > > +		{
+> > > +			TH_LOG("Failed to create socket: %s", strerror(errno));
+> > > +		}
+> > > +		EXPECT_EQ(0, close(fd));
+> > > +	}
+> > > +}
+> > 
+> > This is slightly too much logic in a test helper, for my taste,
+> > and the meaning of the true/false argument in the main test below
+> > is not very obvious.
+> > 
+> > Extending the idea from above, if test_socket() was simpler, would it
+> > be possible to turn these fixtures into something shorter like this:
+> > 
+> >    ASSERT_EQ(EAFNOSUPPORT, test_socket(AF_UNSPEC, SOCK_STREAM, 0));
+> >    ASSERT_EQ(EACCES, test_socket(AF_UNIX, SOCK_STREAM, 0));
+> >    ASSERT_EQ(EACCES, test_socket(AF_UNIX, SOCK_DGRAM, 0));
+> >    ASSERT_EQ(EACCES, test_socket(AF_INET, SOCK_STREAM, 0));
+> >    // etc.
+
+I'd prefer that too.
+
+> > 
+> > Would that make the tests easier to write, to list out the table of
+> > expected values aspect like that, rather than in a fixture?
+> > 
+> > 
+> 
+> Initially, I conceived this function as an entity that allows to
+> separate the logic associated with the tested methods or usecases from
+> the logic of configuring the state of the Landlock ruleset in the
+> sandbox.
+> 
+> But at the moment, `test_socket_create()` is obviously a wrapper over
+> socket(2). So for now it's worth removing unnecessary logic.
+> 
+> But i don't think it's worth removing the fixtures here:
+> 
+>   * in my opinion, the design of the fixtures is quite convenient.
+>     It allows you to separate the definition of the object under test
+>     from the test case. E.g. test protocol.create checks the ability of
+>     Landlock to restrict the creation of a socket of a certain type,
+>     rather than the ability to restrict creation of UNIX, TCP, UDP...
+>     sockets
+
+I'm not sure to understand, but we need to have positive and negative
+tests, potentially in separate TEST_F().
+
+> 
+>   * with adding more tests, it may be necessary to check all protocols
+>     in each of them
+> 
+> AF_UNSPEC should be removed from fixture variant to separate test,
+> though.
+
+Or you can add a new field to mark it as such.
+
+A test should check that AF_UNSPEC cannot be restricted though.
+
+> 
+> > > +
+> > > +TEST_F(protocol, create)
+> > > +{
+> > > +	const struct landlock_ruleset_attr ruleset_attr = {
+> > > +		.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
+> > > +	};
+> > > +	const struct landlock_socket_attr create_socket_attr = {
+> > > +		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+> > > +		.domain = self->srv0.protocol.domain,
+> > > +		.type = self->srv0.protocol.type,
+> > > +	};
+> > > +
+> > > +	int ruleset_fd;
+> > > +
+> > > +	/* Allowed create */
+> > > +	ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+> > > +							sizeof(ruleset_attr), 0);
+> > > +	ASSERT_LE(0, ruleset_fd);
+> > > +
+> > > +	ASSERT_EQ(0,
+> > > +			landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
+> > > +					&create_socket_attr, 0));
+> > 
+> > The indentation looks wrong?  We run clang-format on Landlock files.
+> > 
+> >    clang-format -i security/landlock/*.[ch] \
+> >    	include/uapi/linux/landlock.h \
+> >    	tools/testing/selftests/landlock/*.[ch]
+> > 
+> 
+> Thanks! I'll fix indentation in the patch.
+
+Please fix formatting in all patches.
+
+You should have enough for a second patch series. :)
 
