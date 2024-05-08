@@ -1,188 +1,168 @@
-Return-Path: <netdev+bounces-94665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 865448C01BA
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 18:13:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44B0F8C01C8
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 18:16:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A991C1C21C32
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 16:13:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB91E1F23420
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 16:16:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79D4312A169;
-	Wed,  8 May 2024 16:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA791292E9;
+	Wed,  8 May 2024 16:16:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TAvZlWEK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mb+hdOq5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A348184A38;
-	Wed,  8 May 2024 16:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3571DFD8;
+	Wed,  8 May 2024 16:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715184820; cv=none; b=iOBI6jT+0x7qgRqlefPWItZGAzdQMoDV5wHts1Jhq/CM32ChJpVNnr9FAlYci4NgHtPOJ3Huuguf+sy6UzN7zjz+vzpsIaKe9n99nsm1m98F9mj8yHW/EPtNORcExh81+18U7PCJONb3fCFyycxEif606OR//2zg8i0Oq/7d9f8=
+	t=1715184994; cv=none; b=LgEzfyuMbS6nlMV/o0J/yUg3632Gz24Mxj9ISCU7uq9eBMdAb9gnTf0HKIhHpWmR0MPzcyNnGh4LVUO6fHXcBSQGNCKf86gCuQ12h+/KH+UTdQB8/UFcDsO3m2HA5UMhSWOc3L2SmgxIOM78DwgflqbP+M3HKNb943BxrhMOv6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715184820; c=relaxed/simple;
-	bh=KTTPfU3G93nUaSQQ03SoA08BLzmCwzGHhrMxQMHXbrw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LgKElpLYBQhs0SGUE+TA72SzgMC+9b3QdVzi/LdMjdf1kRmrQ0nvRlCQcLDXgEJpYyKrnUio0uwmOrD+CUUxdSG/2Tujg4uunpXZET60e93ipH7ttL6DXYIrCm1qkIeiNGaO03FhJAm9YU5YafEwOIbrvuAh4go7KU315zLmkyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TAvZlWEK; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-520f9d559f6so3322217e87.3;
-        Wed, 08 May 2024 09:13:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715184817; x=1715789617; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8f/oNkLNRVDgyHz7SZX/CbDK9NIee4eeJWH9FsmJVO4=;
-        b=TAvZlWEKkXb77emTrSTwOzBRHL8ug8NMAuDKE6BOic+fg2A7sA90de4JHF7Wau2xW5
-         fecK+x6qcOchdMWceLOVCNtBN29n9EbLiF/VWB34UYv6uvvLtKjIh1rqTFNtKJ7/krIS
-         OySf2q0HOyl5vWpjxzO1Kl3kfiRxEC+TBDnnaTDgiasl3rQkCCWzVb6KbtNa+U1XbbCL
-         HEw0epDxohvWiPfAsCRtRxMpzgdkyLs+2OwCfwAO9dtE/FZKYU98hKP2pbxk4nCoRm1e
-         QbNM36jsnDINHtE5tHuYRuBaLZQic0qSEvHy7zReKTHmNjOI03FvxeOJM0XHjvoTGZC6
-         Us/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715184817; x=1715789617;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8f/oNkLNRVDgyHz7SZX/CbDK9NIee4eeJWH9FsmJVO4=;
-        b=aoKtCQ1fZ40sBjZa/Tldul+O4hQjk9kqh76dKiHfAdvc0m/f73cEcMpIUnaLMRieOL
-         vgwJKV8vLou8Xy3RKLXOUXgm9y1hKbtLJDaQiH/6RYZXs+B2EAgIesaIzeQXBdIIyXV7
-         bgCcZ97KLpUOLBXYlQYSH0GywipVxD0StrUWqu+d90RUKzLDpKSW5kQuBkW5hzGqLAHA
-         BUPvSAY+zY9nkW8HJ5mAFvMkH0x4PSVmdinpMSNKZLrAYtCohxXnsD66wBN/Hod5i5/I
-         gVi2+H78MyVTHkomrYwufOaVtezIh/99zBAER8eQKoanCfEm7ntbYocYrIiO4IPP0m6B
-         WFxA==
-X-Forwarded-Encrypted: i=1; AJvYcCWib0r6e0Dq+xKF4iG8tjOM3ZoRl+qq4gosrqYCe6sarAjMbxGO7kDsTu13VRqaFxQBjsqR2INTArIjEKC/ferF9JfLX5ykGmfYtEfc2oEPBgY/FMG+DKPxEF4+mrEFkzm5lbP6li7VpMY3f+xEb9vwaZlMfrOccBYBPe8R8BLQpEfSL/ODPomo4ZemdQTwzXdpER4g5icdcrh+GrIMbiKRatm1vUXfC/BA+xLO6sD1AxS0TuXj0uUmi/k4Yhx0jNmqewFlTKWrS4l9bzzqWJ7CC2T/yzXpzfYSz7JWoNb9vvWNucV3YNgwMqgFkbOJSAIGi8nzATxwXXdozLXW1xGTlWMoAcONLGoJi9Ws1co7lmPBTh37DbQQ/YXdlfQ/E8U0/k9HatLt323fcx024x0ggRMghnNp/cKi25AY6t+eeieaqpAOVBmYRoJo3MNQI4Eo+C+Cg+1osmHiOLQfTm/fCaaLQzgwplxfIyQFst4xoHGXglC+byKSvoNQIAISHMw4WLrdlA==
-X-Gm-Message-State: AOJu0YxeYZoGNExeJ5GWhVwEPF8RcOKIHyh0kb4oynuO3PQ+1iBopLv7
-	f5FPJwETVM65Q/ruWjfHV8Yu/kAfrdWcGPs76i+FoyKHmQgop5LDe3ikSxVK
-X-Google-Smtp-Source: AGHT+IGOsGKTobWTIXaEhASc0QNiWa87Ncv1n8+a1K7thxeRTWIrU67BwG7R0FIWXrNbhbARcUS18g==
-X-Received: by 2002:a05:6512:3da6:b0:51b:f78d:c189 with SMTP id 2adb3069b0e04-5217c3707fdmr2707077e87.14.1715184816352;
-        Wed, 08 May 2024 09:13:36 -0700 (PDT)
-Received: from [192.168.42.40] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id my37-20020a1709065a6500b00a59ae892a68sm5208655ejc.167.2024.05.08.09.13.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 May 2024 09:13:35 -0700 (PDT)
-Message-ID: <710dfcb5-8489-446d-a230-0e01828dfc58@gmail.com>
-Date: Wed, 8 May 2024 17:13:43 +0100
+	s=arc-20240116; t=1715184994; c=relaxed/simple;
+	bh=7uXx6swrCcj63Q1Kq5orROu6Yte2GQluX/afoi/VjlM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pUUO66ArORYCZGqZyczkJnh88MSPhFXobdc3P2RMHOkpwH7FGXyWi3MPc3pH/SPUlgziLxNbqm9wl4Pl3y8lXJFN3JaUQGt6LfrhV50e4c8M0v4ULNZg2UBHUuhUrSXtY0JZysKDSciuwq93Tpm+sgxa+G/rzDBICSWQeq5tyYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mb+hdOq5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B670CC113CC;
+	Wed,  8 May 2024 16:16:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715184993;
+	bh=7uXx6swrCcj63Q1Kq5orROu6Yte2GQluX/afoi/VjlM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mb+hdOq53qmHC0tsnwHZjWvs0XBJkKZMEiwnPjJ2mn32qKcZZw4pY0Mo55+FJrmcS
+	 /XCsoVhGSe7MSvmWWAwogYlSP3eqAlzXIz9RSwbgfLmeNG7CLVhSPmpXxCzieRVYuZ
+	 cOufbq3pU4xhAFLiBblQ/ahAAQ693QQWfoRODWX7xcxLCInUUXMjUdvHgoz9yw0RMM
+	 RLtGgoM9mPdmuvYQoPD2BTDowiNH94T95q73biOqRbfHENAbkQ//ZjHtcbEpdr+UQd
+	 Vu7kDL3ejYOds/rA8GqKWvTaQTr4SnyOOM0fSjQODFHTymGa9w14L3TTHDG08v3EJe
+	 yoCD9p5pfLmbg==
+Date: Wed, 8 May 2024 17:16:25 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Christoph Fritz <christoph.fritz@hexdev.de>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Sebastian Reichel <sre@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Andreas Lauser <andreas.lauser@mercedes-benz.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Pavel Pisa <pisa@cmp.felk.cvut.cz>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-input@vger.kernel.org, linux-serial@vger.kernel.org
+Subject: Re: [PATCH v3 06/11] dt-bindings: net/can: Add serial (serdev) LIN
+ adapter
+Message-ID: <20240508-headwear-monorail-a425ac6fe8a8@spud>
+References: <20240502182804.145926-1-christoph.fritz@hexdev.de>
+ <20240502182804.145926-7-christoph.fritz@hexdev.de>
+ <20240503-fading-extruding-2105bbd8b479@spud>
+ <a5b894f8dc2ab0cf087a5b4972d7f752e6c17c16.camel@hexdev.de>
+ <20240506-jaws-cheesy-bf94885651c1@spud>
+ <f1173a7c-f18b-47cc-8873-30347489d1be@kernel.org>
+ <b716f34ce54dfed2595690d37c121d242a18ff64.camel@hexdev.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v8 02/14] net: page_pool: create hooks for
- custom page providers
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Mina Almasry <almasrymina@google.com>,
- Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Amritha Nambiar <amritha.nambiar@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Alexander Mikhalitsyn <alexander@mihalicyn.com>,
- Kaiyuan Zhang <kaiyuanz@google.com>, Christian Brauner <brauner@kernel.org>,
- Simon Horman <horms@kernel.org>, David Howells <dhowells@redhat.com>,
- Florian Westphal <fw@strlen.de>, Yunsheng Lin <linyunsheng@huawei.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
- Arseniy Krasnov <avkrasnov@salutedevices.com>,
- Aleksander Lobakin <aleksander.lobakin@intel.com>,
- Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Richard Gobert <richardbgobert@gmail.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Johannes Berg <johannes.berg@intel.com>, Abel Wu <wuyun.abel@bytedance.com>,
- Breno Leitao <leitao@debian.org>, David Wei <dw@davidwei.uk>,
- Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-References: <ZjpVfPqGNfE5N4bl@infradead.org>
- <CAHS8izPH+sRLSiZ7vbrNtRdHrFEf8XQ61XAyHuxRSL9Jjy8YbQ@mail.gmail.com>
- <20240507164838.GG4718@ziepe.ca>
- <0d5da361-cc7b-46e9-a635-9a7a4c208444@gmail.com>
- <20240507175644.GJ4718@ziepe.ca>
- <6a50d01a-b5b9-4699-9d58-94e5f8f81c13@gmail.com>
- <20240507233247.GK4718@ziepe.ca>
- <54830914-1ec9-4312-96ad-423ac0aeb233@gmail.com>
- <20240508142530.GR4718@ziepe.ca>
- <6f69694b-4281-45a6-92aa-d9d72b918df2@gmail.com>
- <20240508155813.GS4718@ziepe.ca>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20240508155813.GS4718@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="tlupBOI+4XnNwj6+"
+Content-Disposition: inline
+In-Reply-To: <b716f34ce54dfed2595690d37c121d242a18ff64.camel@hexdev.de>
 
-On 5/8/24 16:58, Jason Gunthorpe wrote:
-> On Wed, May 08, 2024 at 04:44:32PM +0100, Pavel Begunkov wrote:
-> 
->>> like a weird and indirect way to get there. Why can't io_uring just be
->>> the entity that does the final free and not mess with the logic
->>> allocator?
->>
->> Then the user has to do a syscall (e.g. via io_uring) to return pages,
->> and there we'd need to care how to put the pages efficiently, i.e.
->> hitting the page pool's fast path, e.g. by hoping napi is scheduled and
->> scheduled for the CPU we're running on, or maybe transferring the pages
->> to the right CPU first.
->>
->> Compare it with userspace putting pages into a ring, and the allocator
->> taking from there when needed without any extra synchronisation and
->> hassle just because it's a sole consumer.
-> 
-> Wow, that sounds a bit terrifying for security, but I guess I can see
-> your point.
 
-Mind elaborating about security? "No synchronisation" is for grabbing
-from the ring, it's napi exclusive, but it does refcounting to make sure
-there are no previous net users left and the userspace doesn't try
-anything funny like returning a page twice. And it's not even a page
-but rather a separately refcounted buffer represented by an offset
-from the userspace POV. It doesn't even have to be page sized, hw
-benefits from smaller chunks.
+--tlupBOI+4XnNwj6+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> You are replacing the whole allocator logic if you are effectively
-> putting the free list in userspace memory.
-> 
-> Jason
+On Wed, May 08, 2024 at 01:34:34PM +0200, Christoph Fritz wrote:
+> On Mon, 2024-05-06 at 20:50 +0200, Krzysztof Kozlowski wrote:
+> > On 06/05/2024 18:16, Conor Dooley wrote:
+> > > > > > +maintainers:
+> > > > > > +  - Christoph Fritz <christoph.fritz@hexdev.de>
+> > > > > > +
+> > > > > > +properties:
+> > > > > > +  compatible:
+> > > > > > +    const: hexdev,lin-serdev
+> > > > >=20
+> > > > > Maybe I've just missed something on earlier versions that I didn't
+> > > > > read, but the name of the device on the website you link is "hexL=
+IN",
+> > > > > so why is "lin-serdev" used here instead?
+> > > >=20
+> > > > The USB one is called hexLIN and has it's own HID driver.
+> > > >=20
+> > > > This serial LIN adapter doesn't really have a product name. Current=
+ly
+> > > > on our website it's generically called 'UART LIN Adapter'.
+> > > >=20
+> > > > This LIN adapter is basically just a LIN transceiver and very gener=
+ic,
+> > > > so that one could solder it to any single-board computer with an ua=
+rt.
+> > > >=20
+> > > > I think 'lin-serdev' for LIN and serial device fits great, also ser=
+dev
+> > > > is the name of the used kernel infrastructure (besides the LIN glue
+> > > > driver).
+> > > >=20
+> > > > If you still don't like it, I'm open to other names. What about
+> > > > "hexlin-uart" or "linser"?
+> > >
+> > > I dunno, I don't really care about it being called "hexlin,lin-serdev=
+",
+> > > all that much, I just found it confusing that the link in the descrip=
+tion
+> > > sent me to the ""Hello World" in LIN" section of your site. If it had
+> > > dropped me off at the "UART LIN adapter" section things woud've been =
+less
+> > > confusing.
+>=20
+> Hi Conor and Krzysztof,
+>=20
+> I guess this is a chromium oddity, because browsing to
+>=20
+>  https://hexdev.de/hexlin#hexLINSER
+>=20
+> brings the user to another headline ("hexLIN" not "hexLINSER") as long
+> as headline "hexLINSER" can be also displayed.
+>=20
+> When using firefox, the top headline is hexLINSER as expected (at least
+> I do).
 
--- 
-Pavel Begunkov
+
+Yeah, I think its actually chrome that I saw it originally, but that's
+probably irrelevant. After your re-org, in Chrome, if the window is small
+enough, I still only see the "3 Open Source Tool: hexLIN" stuff, but
+that's not an issue with the binding itself, so I won't hold things up
+on that basis.
+
+--tlupBOI+4XnNwj6+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZjulWQAKCRB4tDGHoIJi
+0tMQAP9fMElMFGNJxdwBsOADn6kLSS6YLWaEOU+ouw82kF76MAEAptNwatRO9P4z
+xo6AX9qqibZldOB8BhC2XkjXXCc6BAo=
+=k3yE
+-----END PGP SIGNATURE-----
+
+--tlupBOI+4XnNwj6+--
 
