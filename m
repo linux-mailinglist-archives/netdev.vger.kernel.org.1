@@ -1,76 +1,140 @@
-Return-Path: <netdev+bounces-94714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3D818C054A
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 21:55:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 976FE8C0571
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 22:17:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 799EC1F22665
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 19:55:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C85461C20F1F
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 20:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF91130A64;
-	Wed,  8 May 2024 19:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4447813118B;
+	Wed,  8 May 2024 20:17:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cGMGbJ3a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OSZyA/tB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56B338DF2
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 19:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1116E131183;
+	Wed,  8 May 2024 20:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715198136; cv=none; b=ugoamCaAOZ364JtRG77G3vaV2TyqepgqaRmqY5iBKqG6Ka1Aa8n9kXm/wkmv7fvyuRsGCNB/7hGc8WV9eahjEGjcjoN5qg/3igNUKdlWMZmLaFyuRTIZYZb3HTm2SgRh1r+YYlWorOu7r3rH1b+mJDia2yw81eAFMBx2s+B0I8c=
+	t=1715199425; cv=none; b=aLbd8WPsstjTjZGQ/GUSLvw3uSkyI4LVRn6RzDXzmliLGEHFvyAq0hLk79gx6U/CVlKjqKTO5OOKMJGw5Wcjt98sSVzG5Q0OHqQA9dvzZzLCZ6tgNp6vk+wBRWt5hQodhCw7TOqa/nM8El+QfIRi05x1DYBQ4dukOfTHjyd68sA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715198136; c=relaxed/simple;
-	bh=HqpGS+JOndachOGlFftx2AIMZIuv9uWeH/DA9u9Y/bo=;
+	s=arc-20240116; t=1715199425; c=relaxed/simple;
+	bh=AeePNuL7SFwUOG4gPSg8rwAm8IPCSABF4FYA1EDT90I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F/lAXAnfxeq7DRAMRqSHBSiypIc1v+YR5JfL6S/qOUcGs09YdS4lhs4qCF+A6MCuMCPr0EDSutJ2QLSX1bKQS6hK64LOl53maEB0qzV2/hKavKI5+4jgSI5NWex62YyVRaYU4UuR8pp+88Erm+OQaXus5GXBR97kOTG2LzcJkgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cGMGbJ3a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9B34C113CC;
-	Wed,  8 May 2024 19:55:34 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=bVrTaJ82txG5Q7Jv5Zyw3s7BVZlRFhvMLQ3RcCuGwPFkOUaxtGGQW498PvPOl5oGxoZaBBIGHOaS+avYEGRRUBIDWrRNxSMyBgzBKPbkjI6aDWx/Nlr9JUh7Rk5wOmZpP7BQp7pPELf3Y33l7Iu2IL8vQKo8Fq7IyXjSqpN204w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OSZyA/tB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13308C113CC;
+	Wed,  8 May 2024 20:16:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715198136;
-	bh=HqpGS+JOndachOGlFftx2AIMZIuv9uWeH/DA9u9Y/bo=;
+	s=k20201202; t=1715199424;
+	bh=AeePNuL7SFwUOG4gPSg8rwAm8IPCSABF4FYA1EDT90I=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cGMGbJ3a7KYbRO3B4DJTfpChzOfeNGlsnJPCj141pQJujoFFsQBXmgBeVeXohaDfO
-	 LIpQtaxkqF/7ZYQECW8az7n60doEv7xWTDrFab8uYp6P/hrIDkyMjfC7T0NGzXmiMR
-	 rOZOOFHqqcsMOWXS6TeDuIRjtxgMgT23TvM57u1rHESH4Fosrm86kpr5vX5xYrMMob
-	 XTDwfRDV7xO9U2eZfpmwtEmKK1Xk/r4e5M7J2PoyTtcuhPc9WRrfGW1KjoQvIPqGS2
-	 tUTRDru8vGiBGPJ5/yyhhaa98TB3wm4IsVyd9fQ+iIFfCVDSIIAjm46hUSrHfz0A+C
-	 VI1AfNXzEy3dw==
-Date: Wed, 8 May 2024 20:55:32 +0100
+	b=OSZyA/tB5lOjpS4LC/9SY0EU+oSR2ADLqzy+2Oxxm/z6SO+lSeYqArptx9zIchIXk
+	 UiNicWJF1t0rqW+/75aVsY9qju7Ua4/12VQZiJiUlaEiH4nP7dtm6m8nHPMJVkL/e7
+	 dT4l7ucoWkMp4DEZQmkg02x4F/I3bajuOdqHxt96PxG7vcQGPSxmIVSWWk4UWM2Npy
+	 5j8C7jHMtngGG50t8cy9/OfatYDYYOm8fCYKK5P4uKlv6Q2FcvJcfql94ojXTASiir
+	 Unt1u5D51eAHSMTj76PGlYkMWXCG+OJIRRO2EgobbMJJ0WcJKSBDeElVhnooiXnVGX
+	 evN2ku1af2CsA==
+Date: Wed, 8 May 2024 21:16:54 +0100
 From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] net: annotate data-races around dev->if_port
-Message-ID: <20240508195532.GI1736038@kernel.org>
-References: <20240507184144.1230469-1-edumazet@google.com>
+To: Allen <allen.lkml@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Allen Pais <apais@linux.microsoft.com>, netdev@vger.kernel.org,
+	jes@trained-monkey.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, kda@linux-powerpc.org,
+	cai.huoqing@linux.dev, dougmill@linux.ibm.com, npiggin@gmail.com,
+	christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org,
+	naveen.n.rao@linux.ibm.com, nnac123@linux.ibm.com,
+	tlfalcon@linux.ibm.com, cooldavid@cooldavid.org,
+	marcin.s.wojtas@gmail.com, mlindner@marvell.com,
+	stephen@networkplumber.org, nbd@nbd.name, sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com, lorenzo@kernel.org,
+	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+	borisp@nvidia.com, bryan.whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com, louis.peens@corigine.com,
+	richardcochran@gmail.com, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-acenic@sunsite.dk,
+	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+	linux-mediatek@lists.infradead.org, oss-drivers@corigine.com,
+	linux-net-drivers@amd.com
+Subject: Re: [PATCH 1/1] [RFC] ethernet: Convert from tasklet to BH workqueue
+Message-ID: <20240508201654.GA2248333@kernel.org>
+References: <20240507190111.16710-1-apais@linux.microsoft.com>
+ <20240507190111.16710-2-apais@linux.microsoft.com>
+ <Zjp/kgBE2ddjV044@shell.armlinux.org.uk>
+ <CAOMdWSKfkT4K9MAOn-rL44pycHPhVDj4CtiYkru5y_s0S-sPeQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240507184144.1230469-1-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOMdWSKfkT4K9MAOn-rL44pycHPhVDj4CtiYkru5y_s0S-sPeQ@mail.gmail.com>
 
-On Tue, May 07, 2024 at 06:41:44PM +0000, Eric Dumazet wrote:
-> Various ndo_set_config() methods can change dev->if_port
+On Tue, May 07, 2024 at 12:27:10PM -0700, Allen wrote:
+> On Tue, May 7, 2024 at 12:23 PM Russell King (Oracle)
+> <linux@armlinux.org.uk> wrote:
+> >
+> > On Tue, May 07, 2024 at 07:01:11PM +0000, Allen Pais wrote:
+> > > The only generic interface to execute asynchronously in the BH context is
+> > > tasklet; however, it's marked deprecated and has some design flaws. To
+> > > replace tasklets, BH workqueue support was recently added. A BH workqueue
+> > > behaves similarly to regular workqueues except that the queued work items
+> > > are executed in the BH context.
+> > >
+> > > This patch converts drivers/ethernet/* from tasklet to BH workqueue.
+> >
+> > I doubt you're going to get many comments on this patch, being so large
+> > and spread across all drivers. I'm not going to bother trying to edit
+> > this down to something more sensible, I'll just plonk my comment here.
+> >
+> > For the mvpp2 driver, you're only updating a comment - and looking at
+> > it, the comment no longer reflects the code. It doesn't make use of
+> > tasklets at all. That makes the comment wrong whether or not it's
+> > updated. So I suggest rather than doing a search and replace for
+> > "tasklet" to "BH blahblah" (sorry, I don't remember what you replaced
+> > it with) just get rid of that bit of the comment.
+> >
 > 
-> dev->if_port is going to be read locklessly from
-> rtnl_fill_link_ifmap().
+>  Thank you Russell.
 > 
-> Add corresponding WRITE_ONCE() on writer sides.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+>  I will get rid of the comment. If it helps, I can create a patch for each
+> driver. We did that in the past, with this series, I thought it would be
+> easier to apply one patch.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Hi Allen and Russell,
 
+My 2c worth:
+
+* In general non bug-fix patches for networking code should be targeted at
+  net-next. This means that they should include net-next in the subject,
+  and be based on that tree.
+
+  Subject: [PATCH net-next] ...
+
+* This series does not appear to apply to net-next
+
+* This series appears to depend on code which is not present in net-next.
+  f.e. disable_work_sync
+
+* The Infiniband patches should probably be submitted separately
+  to the relevant maintainers
+
+* As this patch seems to involve many non-trivial changes
+  it seems to me that it would be best to break it up somehow.
+  To allow proper review.
+
+* Patch-sets for net-next should be limited to 15 patches,
+  so perhaps multiple sequential batches would be a way forwards.
+
+Link: https://docs.kernel.org/process/maintainer-netdev.html
 
