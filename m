@@ -1,133 +1,149 @@
-Return-Path: <netdev+bounces-94421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74808BF6FD
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:26:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBEFA8BF70E
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A9F52854E0
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:26:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B0011C22822
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C6C22EF5;
-	Wed,  8 May 2024 07:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8F32941F;
+	Wed,  8 May 2024 07:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GoVjLqwI"
+	dkim=pass (2048-bit key) header.d=innosonix.de header.i=@innosonix.de header.b="Z1BXXkUv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D912D1BC40
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 07:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31A91773D
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 07:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715153186; cv=none; b=QYwgqPWVaRd8be9881E94aeevcbZkEQFctg84eZtNYmX2HAv61ZMqphbNbJ5kG0eZa6VD9Hc+g/LB1uRZhSmkS/JHXD2cVV/y+Ow8B3joMzGX3PGNjoYVYd9aGknWMvOTZ4V5JPJzk3MDGBczQHreKBi2oSQr16nHt9wCAquUuE=
+	t=1715153426; cv=none; b=gBAoDnA6ssH3xb0jE1g/c3LQgetuxqngMdMLHuNjACBtUb6WIT1hIxJM/KiFVT5Xxq8hGT4ku+PP8nLX0KDAuyhb55E/utGwEyR2v559tMGRU5V6R4DBo8O5wN0moKaFqOnZ6Lk5sdi3da8PQZjMtxW1d2HiCqiopTKMPNpzxaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715153186; c=relaxed/simple;
-	bh=nzHkHgB1kFFJ9xGqdQDFZ6L2FZdG9X2ezr1nxT4iXYs=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=u6pbJjOxGEFScDkb5w8TP8qv4GEAfP38HzO8KZslHE1q5Fs+H+XH8nQUSBe6N8u7uRU8HPv/QSvDmbeanXodQxLyuISARbhT7wMt0OjfgIR+nHUVoklXRgF3eQ7b43wfG6R1CWZEz4ZveyqjhRLTzXqR2gzQxWDteANr+UUnZl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GoVjLqwI; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2abae23d682so1105648a91.3
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 00:26:24 -0700 (PDT)
+	s=arc-20240116; t=1715153426; c=relaxed/simple;
+	bh=8MJVYb7cJIk6fOdvOULsJh7hLK4SkwmGIcOvMtTljuc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Ya26Iiuoc0rrA5kxGPrn4olTfDEVrrVwkvMeEIbl9FmUPHYT8ZGvxt0xemdtmuaY2Jwq95fy9pCf3OItG81NdyECsYVj3EjJhjB+YEHHTK5tBtUh6nloWxAIBUaca/1opAYDhzpqwqPvu4QWBItGg3dyQoFi6FY5bwSQJAaaVxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=innosonix.de; spf=pass smtp.mailfrom=innosonix.de; dkim=pass (2048-bit key) header.d=innosonix.de header.i=@innosonix.de header.b=Z1BXXkUv; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=innosonix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=innosonix.de
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a597394af62so75135966b.3
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 00:30:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715153184; x=1715757984; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=25F96gIo6jtVmRUaicY9ktJ04Hwv3tFkp4G88NiIyFQ=;
-        b=GoVjLqwIKOLWnN7z5vLL6qKCOgmvzw1og7Tc15WoPa+gUTvuS2Hk11qAv1EAsqIok4
-         yflSZX9qre0TI2x9IXSJpewheEVcjBS2TIkQItgyUa0Pp0u6cXYrlfFmGP2gx2AeeXhK
-         4mZcwaJgpthA5pBvVhe+d3/0uSh85qiHS4yAjdrw99+56LuCMnWvzN6Q3RzNiaGJvzvF
-         GqXhLLc4xXqelxcoCHa7SecXn7TlG3bPS5+zahOZjuaZt4blUDty/623WHoA3wlEvIg6
-         8azV2YDZQJWPhQHFIHNdwW2hMSgxi4x7qwcHxl6va3ErrzNrubMJ5VzhaYvBb+ThWeXn
-         oEXQ==
+        d=innosonix.de; s=google; t=1715153422; x=1715758222; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hJcjnRKy8xP2WS7UzmCHQ2sD43j2O7hA2lQCM9IkQBo=;
+        b=Z1BXXkUvu5PLsFBqkwLeTZH29CS6RU9Hq2zWqpGQ7sqf5tpQzINqWvFi30gKGmqbSE
+         WKlgLXK749euD6CooDXeFgVVfJD+oBtM5tV8Hg+smng+e4DE0pbCKqDyDNVuGx5Zq+cL
+         wIVcqKuizeFifculSSpvs81komCqfrrpDsqmoFahyCdc0zx737JODVEM3G+u1v2C/rqZ
+         7ISxyRxrMgaadjTSHuL1SYNrIl18bL03yqAOT/WDhquHZM9Z5xZz+9aXPEw7ld5epTJ/
+         GwI9mLEmOXPGKpoO6Fuv+1GNmpxMFuGza7ZgcNxlfRg2NrMNSFDn1n+zkiD4xvWuK/Dx
+         u+LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715153184; x=1715757984;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=25F96gIo6jtVmRUaicY9ktJ04Hwv3tFkp4G88NiIyFQ=;
-        b=aVbraK71yRM8zrBdTeEhdM6c8RPOe9kyue2WDam4uvvMEvXdJgXvANtptCBl5paOaQ
-         /eEF8kA7C285l0HnBjP+svQj/1uCzDmcVVNL3hd+eRVbhqWphjNfPdRqdEozk3g11toW
-         lMqWnu8BH1A28CCx8qTZ5Ne9Vz2+Vy1JNJtfPE8ztZNQZ702y30txXa+/wW7mPsAS4UN
-         QJy6kKLz0W8iXBssFGSx4XmBzklc3TXGykIa1g154G8ltZyqFQVBHTXsU5ZLK10W3uD1
-         PrzJ9sx/XO/7OM3Kts/7uS/maW8cP9GazElLZrq7X7kjlYYq4y/NCWqcCg8KcbICjrXA
-         TyvA==
-X-Forwarded-Encrypted: i=1; AJvYcCVnB649VSAj0fCCIyeWDD35yJMgMjtoSwHz1t4qiYfzgR8AydfzxCp/B3YDqlyzUTDkp4T6GECZoOeFJ3ZCkcwuUGlF2LoK
-X-Gm-Message-State: AOJu0YwSA+hP0QZdnk9zQORIl9WVi3OyIOQ1c3uMAZzB8J3orcLX981P
-	NCwHYrpoI4fLM5uOYWU6+Zk4HUXOr7nI5AQcThmDkNWePvRN1cPWTHUiApmy
-X-Google-Smtp-Source: AGHT+IEiL/YCUMDEtbiRdCE4NRWn9r1RZzo2HbYgLM23tV/Zo9b2jxNy4dlnBzoJP5JpgtR/zGSpeQ==
-X-Received: by 2002:a17:90b:3002:b0:2b2:b080:dd35 with SMTP id 98e67ed59e1d1-2b615af6e05mr1756381a91.0.1715153183933;
-        Wed, 08 May 2024 00:26:23 -0700 (PDT)
-Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b628ea6a13sm739325a91.57.2024.05.08.00.26.21
+        d=1e100.net; s=20230601; t=1715153422; x=1715758222;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hJcjnRKy8xP2WS7UzmCHQ2sD43j2O7hA2lQCM9IkQBo=;
+        b=G6EDUgelomdHgXR4/JA2UD+0hXli7GMu7kbeoA/urqHEta749rMGFayBnIVPNG3YQi
+         aBZdVCn0jOI9cbZwMKfSBHrAHGTN+nO+GmPCaVKmNYf9Ucnuy3MmKR2MpbQhBOwsPtpg
+         I59Mmnqrsce04S3Ycwg02GCMtrYYRol/Sj1pgXGW0ELBNLQynshAfr16P+XhoU46PItj
+         s31wwJuHGGJgAEZH687vy0cgGNJIJLGk9VZ780dE+78PS5JUMBIAYN9GEpT3CPttxqyB
+         +Yex3glZC8BOsx8gYZqKIlGe5RC/ad1UqSErQcVpMDmE7NoqSB9AHe3tarMDSBa3WS0U
+         I64g==
+X-Forwarded-Encrypted: i=1; AJvYcCXNkuXwfITsp8od/VR4RoU6Kb0D9uvC/EE4novrzOIYWAY8nzLMSAtOJxfOUFDmmwTtywxfMNALIs2bEQzsCVyAlNXTN8Hi
+X-Gm-Message-State: AOJu0Yzm9wHYnTkdEUVhOVzKn4yQUjgZUHaKeRlXQFAgCI6UB/vmrxdu
+	C7HTGnUGPGRcxz9kRDENlQP+ZE71JLzMXVyGYKHykahfnVwmlFQH8I+jWemn/3vaPVW+cg2MOUM
+	TqjcP4J/cQw5iCmEKNOHcYncb8oOQvATF5VSplKExMUSfib8=
+X-Google-Smtp-Source: AGHT+IFXj5UdMjbqmKhl8pzs3m0JQY8AH+iKILd952YFuuAHyUqyc9kG4749y/FdV1LXFvh2+oMtUA==
+X-Received: by 2002:a17:907:b9d0:b0:a59:cb29:3fa7 with SMTP id a640c23a62f3a-a59fb91fa86mr98634666b.1.1715153421963;
+        Wed, 08 May 2024 00:30:21 -0700 (PDT)
+Received: from localhost.localdomain ([24.134.20.169])
+        by smtp.gmail.com with ESMTPSA id d12-20020a17090648cc00b00a59a874136fsm5212358ejt.214.2024.05.08.00.30.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 00:26:23 -0700 (PDT)
-Date: Wed, 08 May 2024 16:26:18 +0900 (JST)
-Message-Id: <20240508.162618.236220769643680941.fujita.tomonori@gmail.com>
-To: pabeni@redhat.com
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
- kuba@kernel.org, jiri@resnulli.us, horms@kernel.org
-Subject: Re: [PATCH net-next v4 4/6] net: tn40xx: add basic Rx handling
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <bde7b5c39b19cbc6e32a92b94e731d26a8d47922.camel@redhat.com>
-References: <20240501230552.53185-1-fujita.tomonori@gmail.com>
-	<20240501230552.53185-5-fujita.tomonori@gmail.com>
-	<bde7b5c39b19cbc6e32a92b94e731d26a8d47922.camel@redhat.com>
+        Wed, 08 May 2024 00:30:21 -0700 (PDT)
+From: =?UTF-8?q?Steffen=20B=C3=A4tz?= <steffen@innosonix.de>
+To: 
+Cc: =?UTF-8?q?Steffen=20B=C3=A4tz?= <steffen@innosonix.de>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 net 0/2] net: dsa: mv88e6xxx: fix marvell 6320/21 switch probing
+Date: Wed,  8 May 2024 09:29:42 +0200
+Message-Id: <20240508072944.54880-1-steffen@innosonix.de>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+As of commit de5c9bf40c45 ("net: phylink: require supported_interfaces to
+be filled")
+Marvell 88e6320/21 switches fail to be probed:
 
-Thanks for reviewing the patch!
+...
+mv88e6085 30be0000.ethernet-1:00: phylink: error: empty supported_interface=
+s
+error creating PHYLINK: -22
+...
 
-On Mon, 06 May 2024 11:20:55 +0200
-Paolo Abeni <pabeni@redhat.com> wrote:
+The problem stems from the use of mv88e6185_phylink_get_caps() to get
+the device capabilities.=20
+Since there are serdes only ports 0/1 included, create a new dedicated=20
+phylink_get_caps for the 6320 and 6321 to properly support their=20
+set of capabilities.
 
-> 
-> On Thu, 2024-05-02 at 08:05 +0900, FUJITA Tomonori wrote:
->> +static struct tn40_rx_page *tn40_rx_page_alloc(struct tn40_priv *priv)
->> +{
->> +	struct tn40_rx_page *rx_page = &priv->rx_page_table.rx_pages;
->> +	int page_size = priv->rx_page_table.page_size;
->> +	struct page *page;
->> +	gfp_t gfp_mask;
->> +	dma_addr_t dma;
->> +
->> +	gfp_mask = GFP_ATOMIC | __GFP_NOWARN;
->> +	if (page_size > PAGE_SIZE)
->> +		gfp_mask |= __GFP_COMP;
->> +
->> +	page = alloc_pages(gfp_mask, get_order(page_size));
->> +	if (likely(page)) {
-> 
-> Note that this allocation schema can be problematic when the NIC will
-> receive traffic from many different streams/connection: a single packet
-> can keep a full order 4 page in use leading to overall memory usage
-> much greater the what truesize will report.
-> 
-> See commit 3226b158e67c. Here the under-estimation could fair worse.
-> 
-> Drivers usually use order-0 or order-1 pages.
+Fixes: de5c9bf40c45 ("net: phylink: require supported_interfaces to be fill=
+ed")
 
-Understood. I fixed the driver to use only order-0 or order-1 pages.
+Steffen B=C3=A4tz (2):
+  net: dsa: mv88e6xxx: add phylink_get_caps for the mv88e6320/21 family
+  net: dsa: mv88e6xxx: read cmode on mv88e6320/21 serdes only ports
 
-> [...]
->> +static void tn40_recycle_skb(struct tn40_priv *priv, struct tn40_rxd_desc *rxdd)
->> +{
-> 
-> Minor nit: the function name is confusing, at it does recycle in
-> internal buffer, not a skbuff.
+ drivers/net/dsa/mv88e6xxx/chip.c | 39 +++++++++++++++++++++++++-------
+ 1 file changed, 31 insertions(+), 8 deletions(-)
 
-Sure, I'll go with recycle_rx_buffer instead.
+Changes since v1:
+- Removed unused variables.
+- Collected Reviewed-by tags from Andrew and Fabio
+--=20
+2.34.1
+
+
+--=20
+
+
+*innosonix GmbH*
+Hauptstr. 35
+96482 Ahorn
+central: +49 9561 7459980
+www.innosonix.de <http://www.innosonix.de>
+
+innosonix GmbH
+Gesch=C3=A4ftsf=C3=BChrer:=20
+Markus B=C3=A4tz, Steffen B=C3=A4tz
+USt.-IdNr / VAT-Nr.: DE266020313
+EORI-Nr.:=20
+DE240121536680271
+HRB 5192 Coburg
+WEEE-Reg.-Nr. DE88021242
+
+--=20
+
 
