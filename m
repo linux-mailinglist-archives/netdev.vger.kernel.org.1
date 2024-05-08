@@ -1,133 +1,197 @@
-Return-Path: <netdev+bounces-94434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6316E8BF77F
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:48:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D52F8BF78A
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:49:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0186C1F213A2
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:48:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C4FB1C2107E
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:49:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7F32E852;
-	Wed,  8 May 2024 07:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 135423B798;
+	Wed,  8 May 2024 07:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VNfUc2mD"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="MbV/DHwt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691572BB09
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 07:44:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C3B2C85F;
+	Wed,  8 May 2024 07:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715154243; cv=none; b=BmHQsO3+6O6h3+07EB41Tz5p1KSvmT28uFRb2GSrAiNUrzn/1yxlCFoBK79dzhvcPp/2kPFgD8GZJt1x3OoUk/57Prxv9KLCPbPso9ahLGvXg3f1DflQnOOf0W2AGqkzeeCZWCyEFgQsR16mMON2w0li3CjXBt7q929W7EOLH9o=
+	t=1715154553; cv=none; b=J31IriaSeFLm5YglO/En/6o/Kg7umjTRc7M3sqoqT95r70J36X44spsu8teu+k0qVbQBRdcZgIrMExhJojM8SL4YR9MlfWgTSxcFGBcYxJZHZ5oHje/stggxeh/htEqJNjouBgWMDxUgSceNafHrmoERaELAXA4mahx2QjLFX1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715154243; c=relaxed/simple;
-	bh=aroAKGfbT/S9HJvxnanc2k9LUOaJMxnCzC7Fvgc4BI8=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=ZBRb2jNCPkpohDftzoetbxNWgTeWzcrEE+lEgeaSrr/sNYzLPfBTkrNDUwF2Fb56g8BhNuzhMx6XWaVaEvdTYdXOk2pXb7EGzMiBMzO1MB32Yn63SLrc7QRarABSe0Qc50FfMVOilQI5ynxxq2RcAkZzCDUu7PejFZ013/y5EmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VNfUc2mD; arc=none smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5acf5723325so1041999eaf.0
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 00:44:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715154241; x=1715759041; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7CxMouQzaROWJ/PtIXTCtUayc+4cz5SGh9UM4LtWya0=;
-        b=VNfUc2mDvcCzLqyHyQX5WmV0uM6mm2G57eVMPNWyGz0us4QxvqbHOvsAco7yH+CVnE
-         ADKmtZADzEUfv3+JItPBvGLuYcaFwL3mHq7c5FySCYKp1KutFSlRd6Oem1GI8tELV09p
-         BE8vfEO3BcpolPcYBYCe72hpgVYzOkIZn/UMa4oyki/SjNvCquyX3VXg34KORrtzw5dS
-         +Rv7eQrZo6uGWRcdTpj1ubHvFyRdkoYXObnh+t0i/hkArzsRumArA1pbjAn7Mdndgq5N
-         SjLpmBQYBhuPSg+LtGDef7j/58DKdyYfpKOjsBBNp9S9pQAKYnNeBosxT4LlBqELK4GH
-         QIrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715154241; x=1715759041;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7CxMouQzaROWJ/PtIXTCtUayc+4cz5SGh9UM4LtWya0=;
-        b=PSJFgH2Kno9FCbEZWSugzdxnIIfOtvVEpocp+2t8h+wKqIlPe0j5h3wQPloQprPmII
-         ElZFc6E9F1LqnrgfPCNFqDIoYsXgwwcpHrhnKLZNDdYW714snqybeto+zVdVBz0uj+0H
-         Sl1LS8YDu0dY5/P4nz/cfXXpQja87xop7f5ze+oPOumeMOw8vvXs52vJ7muqh5MNV+zl
-         jpKWU4aD9z2evN9om9paJQnXsZw9Oj/x6+VJwesFK70O49MbrDYvVb/82ytvM6CV6PlG
-         k1+lgOHr3nsWs4/B49V9308yYo8sOi8rQ7Xj9vCdWfvTZBR+x0+GjL5WPFjuG1o1Uih+
-         X4gA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLaMqwmLyAX2oIvbd7oDy4gfCyX7V5t3G56bk7t+hIjxTGexBRb0XEhbN6PpGEXbPLbwqvXJqPO7beLlS1UvJx1NNRMkp8
-X-Gm-Message-State: AOJu0YwW/U3FcCSaE9jSw3tI0CrhKSrxONaL9Yvx+YToEg9f3AiPrFj7
-	lbzfQh9Sm+3myzGDeuckwUHrxoonq9osrOhSyMNvh3kzebC9Q01g
-X-Google-Smtp-Source: AGHT+IESmg0VOmleIreUH9OwFvIeDr/prdY/UAgsaJII3RSILEm4ugPoi0jmZGuOaqO35/vms5zRPQ==
-X-Received: by 2002:a05:6358:5289:b0:192:89b7:b4b5 with SMTP id e5c5f4694b2df-192d397385bmr205892855d.3.1715154241212;
-        Wed, 08 May 2024 00:44:01 -0700 (PDT)
-Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id c192-20020a6335c9000000b0061c416c93e4sm9523369pga.61.2024.05.08.00.43.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 00:44:00 -0700 (PDT)
-Date: Wed, 08 May 2024 16:43:56 +0900 (JST)
-Message-Id: <20240508.164356.95077580739186400.fujita.tomonori@gmail.com>
-To: kuba@kernel.org
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
- jiri@resnulli.us, horms@kernel.org
-Subject: Re: [PATCH net-next v4 4/6] net: tn40xx: add basic Rx handling
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <20240506185837.0f1db786@kernel.org>
-References: <20240501230552.53185-1-fujita.tomonori@gmail.com>
-	<20240501230552.53185-5-fujita.tomonori@gmail.com>
-	<20240506185837.0f1db786@kernel.org>
+	s=arc-20240116; t=1715154553; c=relaxed/simple;
+	bh=MofcZIwCP6uQfQVp6EE9HurxL3czn6diXGm18p/OF50=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=QP8r7FGCEIG9RIPEHrCJr201UpOq8fxdk2dGIGtH485FSZl0SCLcbFaQsRohnC5mV9vR2V+jJTIMKpfb4h9Jv8+Z4lR+4Ho9xY5yp8IEbhuQi1OZpX5aaJnvhz+jvpc1dwlZrJM7qKEpQjKP4MX2Nc7TE8804Qx1YrSNGjMmO1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=MbV/DHwt; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1715154544;
+	bh=MofcZIwCP6uQfQVp6EE9HurxL3czn6diXGm18p/OF50=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=MbV/DHwtYAujOpXoDCW0s0KB5riHG/p4OMQuvDB00Pz7/gzHkZrQVMbWFe8RMvmKa
+	 E7/eZm+J0KkW6WdglkC3NhaZhrrqLwrLM/rN6pAvFjHBThsazg6zRLYCYBJKWtjUwR
+	 eLafdjBQjRl8tFVMXaPf7ETS5Spz1U0TN2/pXHhbkRMUKnerr3EUzBLw1LELesDSjx
+	 ww1UwcyShSZE5MdiI2h1EXPosoRI0u6sJbDL1yLfBCglfBakx0ihDdtGsu1uPdwGRy
+	 epZ0TaGCSSjrbxIQaccEYwAzomyOHcnd+TiIXNmGJ4FavJjakZ9om8hZy1/HJ08OvK
+	 /vO//iWp1Vbsw==
+Received: from [10.193.1.1] (broslavsky.collaboradmins.com [68.183.210.73])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: usama.anjum)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id C668C378107C;
+	Wed,  8 May 2024 07:48:36 +0000 (UTC)
+Message-ID: <546aaaa7-d796-46af-8805-1612759aaaa5@collabora.com>
+Date: Wed, 8 May 2024 12:48:57 +0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-team@android.com, linux-sound@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+ linux-input@vger.kernel.org, iommu@lists.linux.dev, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
+ linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org,
+ kernel test robot <oliver.sang@intel.com>
+Subject: Re: [PATCH v2 1/5] selftests: Compile kselftest headers with
+ -D_GNU_SOURCE
+To: Edward Liaw <edliaw@google.com>, shuah@kernel.org,
+ Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
+ Johannes Weiner <hannes@cmpxchg.org>, Christian Brauner
+ <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>,
+ Kees Cook <keescook@chromium.org>,
+ OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>,
+ Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?=
+ <andrealmeid@igalia.com>, Jiri Kosina <jikos@kernel.org>,
+ Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>,
+ Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>,
+ Atish Patra <atishp@atishpatra.org>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
+ <mic@digikod.net>, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Seth Forshee
+ <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
+ <afaerber@suse.de>, Manivannan Sadhasivam
+ <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Fenghua Yu <fenghua.yu@intel.com>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>
+References: <20240507214254.2787305-1-edliaw@google.com>
+ <20240507214254.2787305-2-edliaw@google.com>
+Content-Language: en-US
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <20240507214254.2787305-2-edliaw@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi,
+Thanks for patches
 
-On Mon, 6 May 2024 18:58:37 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
-
-> On Thu,  2 May 2024 08:05:50 +0900 FUJITA Tomonori wrote:
->> @@ -745,6 +1248,21 @@ static irqreturn_t tn40_isr_napi(int irq, void *dev)
->>  	return IRQ_HANDLED;
->>  }
->>  
->> +static int tn40_poll(struct napi_struct *napi, int budget)
->> +{
->> +	struct tn40_priv *priv = container_of(napi, struct tn40_priv, napi);
->> +	int work_done;
->> +
->> +	tn40_tx_cleanup(priv);
->> +
->> +	work_done = tn40_rx_receive(priv, &priv->rxd_fifo0, budget);
->> +	if (work_done < budget) {
->> +		napi_complete(napi);
+On 5/8/24 2:38 AM, Edward Liaw wrote:
+> Add the -D_GNU_SOURCE flag to KHDR_INCLUDES so that it is defined in a
+> central location.
 > 
-> napi_complete_done() works better with busy polling and such 
-
-Understood, fixed.
-
-I also fixed the function to handle the cases where budget is zero.
-
-
->> +		tn40_enable_interrupts(priv);
->> +	}
->> +	return work_done;
->> +}
->> +
+> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> asprintf into kselftest_harness.h, which is a GNU extension and needs
+> _GNU_SOURCE to either be defined prior to including headers or with the
+> -D_GNU_SOURCE flag passed to the compiler.
 > 
->> +	netif_napi_del(&priv->napi);
->> +	napi_disable(&priv->napi);
+> Fixes: 809216233555 ("selftests/harness: remove use of LINE_MAX")
+> Reported-by: kernel test robot <oliver.sang@intel.com>
+> Closes: https://lore.kernel.org/oe-lkp/202404301040.3bea5782-oliver.sang@intel.com
+> Signed-off-by: Edward Liaw <edliaw@google.com>
+Reviewed-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+
+> ---
+>  tools/testing/selftests/Makefile            | 4 ++--
+>  tools/testing/selftests/kselftest_harness.h | 2 +-
+>  tools/testing/selftests/lib.mk              | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
 > 
-> These two lines are likely in the wrong order
+> diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+> index e1504833654d..ed012a7f0786 100644
+> --- a/tools/testing/selftests/Makefile
+> +++ b/tools/testing/selftests/Makefile
+> @@ -161,11 +161,11 @@ ifneq ($(KBUILD_OUTPUT),)
+>    # $(realpath ...) resolves symlinks
+>    abs_objtree := $(realpath $(abs_objtree))
+>    BUILD := $(abs_objtree)/kselftest
+> -  KHDR_INCLUDES := -isystem ${abs_objtree}/usr/include
+> +  KHDR_INCLUDES := -D_GNU_SOURCE -isystem ${abs_objtree}/usr/include
+>  else
+>    BUILD := $(CURDIR)
+>    abs_srctree := $(shell cd $(top_srcdir) && pwd)
+> -  KHDR_INCLUDES := -isystem ${abs_srctree}/usr/include
+> +  KHDR_INCLUDES := -D_GNU_SOURCE -isystem ${abs_srctree}/usr/include
+>    DEFAULT_INSTALL_HDR_PATH := 1
+>  endif
+>  
+> diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
+> index d98702b6955d..b2a1b6343896 100644
+> --- a/tools/testing/selftests/kselftest_harness.h
+> +++ b/tools/testing/selftests/kselftest_harness.h
+> @@ -51,7 +51,7 @@
+>  #define __KSELFTEST_HARNESS_H
+>  
+>  #ifndef _GNU_SOURCE
+> -#define _GNU_SOURCE
+> +static_assert(0, "kselftest harness requires _GNU_SOURCE to be defined");
+>  #endif
+>  #include <asm/types.h>
+>  #include <ctype.h>
+> diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
+> index da2cade3bab0..2503dc732b4d 100644
+> --- a/tools/testing/selftests/lib.mk
+> +++ b/tools/testing/selftests/lib.mk
+> @@ -45,7 +45,7 @@ selfdir = $(realpath $(dir $(filter %/lib.mk,$(MAKEFILE_LIST))))
+>  top_srcdir = $(selfdir)/../../..
+>  
+>  ifeq ($(KHDR_INCLUDES),)
+> -KHDR_INCLUDES := -isystem $(top_srcdir)/usr/include
+> +KHDR_INCLUDES := -D_GNU_SOURCE -isystem $(top_srcdir)/usr/include
+>  endif
+>  
+>  # The following are built by lib.mk common compile rules.
 
-Ah, fixed.
-
-
-Thanks a lot!
+-- 
+BR,
+Muhammad Usama Anjum
 
