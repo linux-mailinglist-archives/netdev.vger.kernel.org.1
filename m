@@ -1,121 +1,151 @@
-Return-Path: <netdev+bounces-94607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 616F88BFFBD
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 16:09:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAAEE8BFFD6
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 16:23:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 279A4282042
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 14:09:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 549EE1F223EA
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 14:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4668985281;
-	Wed,  8 May 2024 14:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C34385279;
+	Wed,  8 May 2024 14:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="mIeKFqpB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="foVciofR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE1B5228;
-	Wed,  8 May 2024 14:09:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160CE54FA3
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 14:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715177369; cv=none; b=pU5aEclfeBPxGTKR/acDwNSdhz7WDdAboKz9wSUneD6z/TO360uMPYe93QR9g5nEFW/UHRcbCsv1MdtdZLnBxUhCirElfBIKo9TDpqsTwIY0ocDqtwBswRlsp2JhAcJn4zNyr2wjJsw8cEkGer3INcMYPClYZJw/7Cynj4BGsc8=
+	t=1715178215; cv=none; b=kgEG3kJmTr/zWAmwwjWFuy6aJXkyGYq0zLonoAk1A/aVxhoJA4kdHjp3g27ink+1to4PXO1jxBROoAo2XcwC8a3sNJSzFcqpsIY7QRqe4GyfizrgRQ1Er246PGvRGyMKCG1b6fYK9P84LGdWhtJZBOuGqgImA3vf3Bf2QXXyat8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715177369; c=relaxed/simple;
-	bh=fzgy4+mHXCfyJ5AoicOHwibfr+aeCNSgI8of7qlT1Ww=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=Ng1xxEEusGPLDj2XDUZSo+4PQi07b8VJKxvXuXpXTcm8HmvzUIhw+txGrw+aqGZya9QNpsp4bemmKyd5aoVOAOPr8o6XIhPssAoaeBBywgz9M9UPzYyvmldaHsDjU+ewX7eA9Pg3iiOjArtOxmVZ0bDiN03M4ikA6fu3PL3xEb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=mIeKFqpB; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1715177342; x=1715782142; i=markus.elfring@web.de;
-	bh=Ci8HjQX8tPorewOGkgAMjFb6w69V1gUEGyVbNhMY+G8=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=mIeKFqpB9OvrKQ6L34lq2gak9fr5qc1aYD9MuZFHrCYfG4PbW+eaKWX7CBeOzdEe
-	 e1xxubPCFrWfUo5qEWaz5ukZ3njIp+QrOrBBsJVVjEpqUPcl3ldtgbtjA6DoYwCKm
-	 NiqbsHPYMf0V2TL71V2wgY6V4khDBLE2EjmUwN3aRSt2dLaWrTvYzdqfvOubUJFCV
-	 6yr8g25YMeKjOz9S2YDbQf2JzLjkoxhqOQLNmMzTvE/C6ABEu9aDJc8PdXa32hvvk
-	 oQ0dBQeeda66bgzcK5aGZDTsRZAEGsFAabbazKrK00Idi46Oa7cuPUE2F+y3DqcIH
-	 NSNcjHWiwobFUICfog==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MD5nx-1rvfQ70jE9-001vPi; Wed, 08
- May 2024 16:09:02 +0200
-Message-ID: <3e10ff86-902d-45ed-8671-6544ac4b3930@web.de>
-Date: Wed, 8 May 2024 16:09:00 +0200
+	s=arc-20240116; t=1715178215; c=relaxed/simple;
+	bh=8fH6jRdDmbAnB9N28iTR7F5I1XJIrOvaMZXp3yLpkDI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vq8dyAi4mKXWtp7iiC8c+9ACegyvUu7tTawVdayJW7UyXus+F7kCJu2Q5cdRWIhdQDNAIm9nIe/kXWkbh7yOfNX8NqYXBE3glwhCigLeoZPZttk91bnfQfcU/U3xjqgwp0gLJ08DCn6neMSkD1JKu6L/s46pBQcLv3Loy4yEow8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=foVciofR; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6ed9fc77bbfso3329412b3a.1
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 07:23:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715178213; x=1715783013; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yWFDb/XC5HCMPYI0Z8fskivsrqr1wR3MQAkFu/Af6yE=;
+        b=foVciofRW7DRjbC/BSkG9dV7FNXAzgMYWS1BsMaBAl9SIL7+aWBEsh/9zfxSnxcXhL
+         nClIJnrR9Fa8rDTAbAqk2OwTjEEnJ5wS1gL1hh3cJPJvtthIIxiEy9gWb7JTkz/gNilI
+         gqCEJm33xTQL2zir71JX+ISDtohJU+g8gEuYQxju//ChaFVEVdM3JW3tkeIgOqg2edpA
+         ZnlbY6ZLb95BvrK5nQA8fAgeQfKlrCCr9crKz+0daoPb7qXyvdcGyjxLvMFeCbhxLL/6
+         jBRWjrQ7bnystCFYsAQSXVhjfWLJDS+V8MDy0t7WZrt4ZPsBRuc+Fk4S0SWXJkpm2HRp
+         Ajaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715178213; x=1715783013;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yWFDb/XC5HCMPYI0Z8fskivsrqr1wR3MQAkFu/Af6yE=;
+        b=Bl4XHTTrmGwEu81ck+qP7cUryITpEMz6fsucAADgvNTcyWWvig3ULSoSBFYefDJiyh
+         b2BUwVBeig1GJEg1JtmY9DKCX7S9M5yde3w+6Exzx+e1Hc42CmD/qGIxhvIqSfrQ8As+
+         XNCc7IrleerxMyTzS1R6Pony07+UPlotZe2QyYgkg/zl+ibSes1aRYhAic19dpVecE5e
+         0JN2hOy/wDF1GoCNiXbjmg08fjrIQKZF9HQaH58AAKF0TRhUpysiOlb3jJqQuVSeFbwN
+         Hk/L6LD7tB29nUA/t1ssQHFcv+S8MpZODPNRzBDY/CNh99rjuyNjm0uzYBNeVb9CWgWQ
+         snGg==
+X-Gm-Message-State: AOJu0YwZULZTr4Frd8yT2o6EBYWf+CUsiRyLhsyL2u1wGgMaYrpywyQg
+	5ccPMqh12O5icsYNJA8OhNJIK1HpwTOiKsRAO/nu+gdFORyXxzEX
+X-Google-Smtp-Source: AGHT+IHAPmTfJDMlM8sVXwx0ivcH90uQ9i9aIyXyCPz0EQ7bDzwCfk1kONesK1XvFOXFIw0rrh8gCQ==
+X-Received: by 2002:a05:6a20:9c8d:b0:1af:a35b:a34f with SMTP id adf61e73a8af0-1afc8d4e5a3mr3300831637.25.1715178213035;
+        Wed, 08 May 2024 07:23:33 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d13-20020aa7868d000000b006f49c07f9dasm1684351pfo.21.2024.05.08.07.23.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 May 2024 07:23:32 -0700 (PDT)
+Date: Wed, 8 May 2024 22:23:28 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vasiliy Kovalev <kovalev@altlinux.org>,
+	Guillaume Nault <gnault@redhat.com>
+Subject: Re: [PATCHv2 net] ipv6: sr: fix invalid unregister error path
+Message-ID: <ZjuK4AT-B_NQmFkb@Laptop-X1>
+References: <20240508025502.3928296-1-liuhangbin@gmail.com>
+ <ZjtG3iQywq2xll6H@hog>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Jeroen de Borst <jeroendb@google.com>, Ziwei Xiao <ziweixiao@google.com>,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, John Fraker <jfraker@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Shailend Chand <shailend@google.com>, rushilg@google.com
-References: <20240507225945.1408516-6-ziweixiao@google.com>
-Subject: Re: [PATCH net-next 5/5] gve: Add flow steering ethtool support
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240507225945.1408516-6-ziweixiao@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:K4H+6zwfaC+6QAg16E2784YO4mIc0G2T9mui64mzKlR5zfH5yzA
- 8qc/hLuQqUwRCNv5bxB4odN7DfmMAtVDuieZKYMcqYjXlbIsovXbSlBSYmWHX70uKihg4Us
- EjVSUaMIrPyE3OkGOW5kg9VmFGkR1rDJcLzLpbEvFPGAoWT7+ukvyuHN+E65A5WllIDKILp
- xHdaz1KZ7xT6zewdHpQ+w==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:37HGseiCCJg=;Bo90SZctH6Pl03ncbBVsfMAV1TL
- xCSXsrtfkfVPuudD6KhmGQGRFt84YDQHeoLhxC0r7UqZdEauv57IzzcxAwa3CFjXvYv2Xlc3q
- /j6nK1BYRbzIILfaUSaTbFgF/YvjEgy3PEkIXfXea5atvoaTCwzfKESJdzSUB3M6x2Ki/I5Ev
- 6hxeEsRfY/eaJbzgnaZ1pvjVnNmbCF+eryh3mMNd6wnMGpLZK1fl8JG33dez4NnZV8sLMOODa
- BrbwlTw5vlwVoLiQF13v8a1wWiZCR5QndoqzdKD2fh3afkNyb3xF7RZ+gkIEMETVprJTqUR2H
- g80V8oPO5uIDKIN04d1StpO8safJjD4T9+kkJwOmXr4TcfIefhHr7dSFA4I3csCVug4ZZHcSF
- Ka9dChBRLffkYdnQOMrgn27L3favwBGyWQiqsuOTwFS4of/tq9zd9fC8x76DGrfQcnqAr9bPz
- i1S2pP3J3EdxPJ4SEVFnUyt2uQY7kX/md7nHIeKBZk8UIQFu0YCJtXjHXP00FxyZ6HTRthvf9
- roL/h09cG5v1RH0io7CefP+nEugOUOnRqT92aaylI4l0ooZl9k+i4kKRHzT0FXA7FiYp/IM6p
- LuZoiK0VZbaNU3OBGSyfIutiQ74lYuvnTe0xSVI6HCB71WECE1TssdvVDu2clWb0KNi3Ft03b
- 9QKu3k2TXnLjasZLZokB55HaDFMqp0g4hykoQx9scDB3RxRukwtSeIeqsB6+Ml8e0R7nUQzs5
- 1o5xWj6KeIDRw7KBVBW0FEU9oJjsx0T58zjxSquuhmzV768jcWW8t+66OmUgDSSNoUWVQIJ0q
- qroxQRLRYfj4UFHDCB+FMTYSiCt7s+v4vmu0XXDrai8C4=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjtG3iQywq2xll6H@hog>
 
-=E2=80=A6
-> +++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-=E2=80=A6
-> +static int gve_get_rxnfc(struct net_device *netdev, struct ethtool_rxnf=
-c *cmd, u32 *rule_locs)
-> +{
-> +	struct gve_priv *priv =3D netdev_priv(netdev);
-> +	int err =3D 0;
-> +
-> +	dev_hold(netdev);
-> +	rtnl_unlock();
-=E2=80=A6
-> +out:
-> +	rtnl_lock();
-> +	dev_put(netdev);
-> +	return err;
-> +}
-=E2=80=A6
+On Wed, May 08, 2024 at 11:33:18AM +0200, Sabrina Dubroca wrote:
+> > ---
+> > v2: define label out_unregister_genl in CONFIG_IPV6_SEG6_LWTUNNEL(Sabrina Dubroca)
+> > ---
+> >  net/ipv6/seg6.c | 5 +++--
+> >  1 file changed, 3 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/ipv6/seg6.c b/net/ipv6/seg6.c
+> > index 35508abd76f4..6a80d93399ce 100644
+> > --- a/net/ipv6/seg6.c
+> > +++ b/net/ipv6/seg6.c
+> > @@ -551,8 +551,8 @@ int __init seg6_init(void)
+> >  #endif
+> >  #ifdef CONFIG_IPV6_SEG6_LWTUNNEL
+> >  out_unregister_genl:
+> > -	genl_unregister_family(&seg6_genl_family);
+> >  #endif
+> > +	genl_unregister_family(&seg6_genl_family);
+> 
+> Sorry, I didn't notice when you answered my comment yesterday, but
+> this will create unreachable code after return when
+> CONFIG_IPV6_SEG6_LWTUNNEL=n and CONFIG_IPV6_SEG6_HMAC=n:
 
-How do you think about to increase the application of scope-based resource=
- management
-at such source code places?
+Oh.. Didn't notice this...
 
-Regards,
-Markus
+> 
+> out:
+> 	return err;
+> 	genl_unregister_family(&seg6_genl_family);
+> out_unregister_pernet:
+> 	unregister_pernet_subsys(&ip6_segments_ops);
+> 	goto out;
+> 
+> 
+> (stragely, gcc doesn't complain about it, I thought it would)
+
+Yes, I also complied the patch with not complain, so I just posted it.
+
+> 
+> 
+> The only solution I can think of if we want to avoid it is ugly:
+> 
+>  #ifdef CONFIG_IPV6_SEG6_LWTUNNEL
+>  out_unregister_genl:
+>  #endif
+> +#if IS_ENABLED(CONFIG_IPV6_SEG6_LWTUNNEL) || IS_ENABLED(CONFIG_IPV6_SEG6_HMAC)
+>  	genl_unregister_family(&seg6_genl_family);
+> +#endif
+>  out_unregister_pernet:
+>  	unregister_pernet_subsys(&ip6_segments_ops);
+>  	goto out;
+> 
+> (on top of v2)
+> 
+> For all other cases your patch looks correct.
+
+Thanks, I will check if there are any other workaround. If not, I will do
+like what you said.
+
+Hangbin
 
