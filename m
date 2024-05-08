@@ -1,110 +1,115 @@
-Return-Path: <netdev+bounces-94615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 876308C000A
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 16:33:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14B368C0005
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 16:33:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8FDA1C22A60
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 14:33:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A9A81F254C0
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 14:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 623DB2575A;
-	Wed,  8 May 2024 14:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3419686250;
+	Wed,  8 May 2024 14:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="feHQf1Ub"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jyrWLuyS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0CF77624
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 14:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899CA6A8A6;
+	Wed,  8 May 2024 14:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715178774; cv=none; b=Pr4I2UuZXM8cXFwbaafnr6hXKzyKidPC3DZwKYos/UlIoKH9UoQ8a4RZ1m+g01q8djWEgzCuSzlBUPKUuBuIp4NvGC7G/yM4yZUWzX2croXbuyR/+sWzb6e/+NgVr5SrPv9D0qji4WG9jjtGV/KYmmz6Ofkj/8H45v7E+72NM1g=
+	t=1715178773; cv=none; b=nQD/JbvfLRs0H6W18R6q8K/nnpWqDfoqkWc/2kCj2unjYgN7atz76teVcr9l24Xy37SSgK/Lyy4Zt2LifuSqPyy7/UJUREN+aYWwF1RfW1IHt0rwgwpNcQJ7HRtcC9XrAD7+iBr9c3oCnTW04vsJXHMHj1XV6hkR3VProzJavOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715178774; c=relaxed/simple;
-	bh=Rvt0FRjOjq3HFrcM20zZK769YoV1zESrYxd4VRtvDV8=;
+	s=arc-20240116; t=1715178773; c=relaxed/simple;
+	bh=HVuSNV30ElxcT1+wSpbmK0uLVc4u+3qE7HNXqWCBkzE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t9TXRg/HeIS0Mkb3QbQwLPqEwq4iQdFp+DpR+vwE7GpKUZBdpTp3PJ0Dj+3lJTn+opiLPMst+nMCREGU86vdLqE7QXJelPJWA2qeg4GhvcdZB1gJ6wBCuVMXnFsxtpfW2xoixvEq87qvItup2EcnGxJt9jKyN7nqvQi3fqEfdnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=feHQf1Ub; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-572a1b3d6baso12699a12.1
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 07:32:52 -0700 (PDT)
+	 To:Cc:Content-Type; b=J+zI+FONMuxB1y2bN2+OCLI087zFW8yT7UOxK2+UUH5VBXlpWfBMpib4yY5dgeal7ZsMqwOBC56kDA+OCNl+aoSDChNStU4wEb/ZAhjDBCmKZwCU+Jw1258CLiHmii9xLPWelU5yLmxKQ8SaFyMoMldrzAL9aMOmHlaAdbYL03M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jyrWLuyS; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-34e7a35d5d4so3343275f8f.2;
+        Wed, 08 May 2024 07:32:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715178771; x=1715783571; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1715178770; x=1715783570; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XkLfY1ciSibBPQau9xDq8UKiI6bkAs9KYMM1v/xxO6M=;
-        b=feHQf1UbrerkFlb24QbefPCxlWi3E7sXVoi0qE1NZX5Gn4i7ugDZYLFCpoSF2vUHVR
-         KtSrZ7MfCQR2AIZ4d6REQdiIf/PSrPzlInbmxHvgYtp57wl7dah6WUvdiB5KR4s6qWQu
-         9KesP01pQFndHY4kLDZOGgMR0fWEUp709xRAi540IWN7mDec6UEmxq/m6C1mkSGUfqTz
-         ZLVYfDHhVF9CF+VKXvDtcwHjBgWzVZrNF6wM0MUO1mC+Afah5rUeVg7vcRFL5yxCQtGP
-         /CCBjB0uBsZ5L1zHWHAzkgL2n/jUptyIn8/5RaqzhDl94phrUxYS+31sITpaOPFF4gdl
-         +cHg==
+        bh=HVuSNV30ElxcT1+wSpbmK0uLVc4u+3qE7HNXqWCBkzE=;
+        b=jyrWLuyS+0Uh2cVas1SRi3AehA+KS6zKFIJh17vFLQ9i8Vvg7r2fRuhS6p7k/Zqo6W
+         1PsvwQi+EpiXM6t0s+blUU93OAFyGIdo8EuiBHYD4R+VC0bBjlELHV7vLn2H5ccYB/gL
+         aRZps0b8RNWmPmxYjtWef0CZGMuNCWwqxUcqqXSTS1mQdxJ67YY0kDVv1jF8/sGWquPi
+         y29CWpOjaDFOUSoqYo/urHlMwUV+jSkt7PZWHwSkYvx2rAWK25VZ1pQ5//BERTj0SY2X
+         zlBTsiyHWcTi6GUoC1mjJ4xIX8+lM8NiYXcSSiHkDaI/dZl1J/8MFvbwjqkhTLw8C45H
+         xX9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715178771; x=1715783571;
+        d=1e100.net; s=20230601; t=1715178770; x=1715783570;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XkLfY1ciSibBPQau9xDq8UKiI6bkAs9KYMM1v/xxO6M=;
-        b=aWzan3ZBslTWMDA4dNrZGMBK1FoiDdxvOWZKp8coPOm0EaHdXkLkQNXF43lowtjeBL
-         MKD1MGPbcb7+aQXOaepEtzm7uqNgPpiYIVNvTVjJmBUo6lwT4/CzfSuKg79u5G17ckn7
-         QZ+mHaBHwA6/ye5tYN6y86s1swdxYhxz+e19+iTtFJZ9YDMndeJeJKU1kEXs5QYdHwzN
-         5YuMEQX7vd38vTrhlDsKwNYC2tkRfLpu6hIV0x/DwkNewfpxiIXiN0IbXkO8cHeRixvk
-         GQRi0bOqFR+68UeFqf4MrFOO/7gaWpt9FMbaE4Kux7pqd6cG8R7CbFAjzAruIcL8fXGV
-         ci+g==
-X-Forwarded-Encrypted: i=1; AJvYcCWIRIQPp4r7aiafixVh8eES8mWPWOlcsD8XRijNFQ/iuXy9AfvEKpXYrTBsePCCwgzEjYsewWoyCGUjKrNY2hd2EqtYmwaP
-X-Gm-Message-State: AOJu0YzFh8iqoAK/qS+XRcBE8z4bKeWCUjWLmJHXCSU5TPFCLvuNw1tO
-	V75OVZUT99xF3bre215/5nryrKYW96bF68yxDNvhyf/JZ03ofX0XhFRFNPhLQCm3OcdNNqrqTpU
-	pzfTR0FrNTBLRdTDlNLSxGEAmV2KZ4qesdcsg
-X-Google-Smtp-Source: AGHT+IHzV+id9T78pX9Ouwc2CFvxOONuapL13pSZ6l/CsxGEPFjPJFpqYhX71qCnYEu1hxXfTZ2Nl1WZaw8YQgiIhBE=
-X-Received: by 2002:a05:6402:3099:b0:572:a154:7081 with SMTP id
- 4fb4d7f45d1cf-5731fea28c4mr215902a12.4.1715178770611; Wed, 08 May 2024
- 07:32:50 -0700 (PDT)
+        bh=HVuSNV30ElxcT1+wSpbmK0uLVc4u+3qE7HNXqWCBkzE=;
+        b=sCLvNUCpN7VdyZw/sQVcWIXtVmNnoosRPZ6auNO4HXR53+LE7SiDJODnysdxZRzlQ8
+         KTilEgk9A54UqqcD00hy/h/lE6VbywY67qHkKuH5jd1z7/fkNaqBKMLSAhGqn7L4TeeX
+         xeHrz+SdJJOJ8LaiE06UMEzsRpgPGj3f0PD1C5eoL+fWeKj7wxZY+WJaaccFOA78z7e3
+         PH3D7+iO9MTOon4s37W0qx00NNZ1QfUZxGwpXvKrXihiYTsevuj5BpAEJuHTSMeT9N3n
+         oD6sQuNW5L4nJGeIWjpeC2s3oD/mDCBOrOXN3IUYJWNok7wFGN/0d8U2Yr+IMmBMDssN
+         +C2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWlsSw+p1PTW7NhnqpZh+cQfxzY87vOadsOF2p3pbt2l60zFbctMiFS4tKRmBAvEkLdUUDsQ6XnD/BGBGa8LM+IYCyzJCujdRLoJd1yntTQehmGEqnTBA6Rcw9uxrh2d/X4ViF9NfnqcGMGqBJsGckelbGQvyZwNk5tBZlEMr27qLW9qWSdyaz3BxPNBXVVPdaZHkAGcY8a1YPt
+X-Gm-Message-State: AOJu0YwaPemS8nWJmH0SBHAIa6+YD74nEbPyLyfmNRWkMpR+YxcZpLEg
+	ge07bpDtO82uVe9CDZvcjPSHkkCHcmnCScLtsecxgT6ISz1FRZxXcpY2x2z9qlJif92yLMSMPw7
+	InMxqFaCx+3ZufpsB0qqIIAUeDSA=
+X-Google-Smtp-Source: AGHT+IGIQzT0RrKC7x0GqEWEZhRSqTUdJnPjGul2tjjJI1pgCNj6AAR9flqehUHmkOSFJCiYE/2NxHIW09V4wGkEHx0=
+X-Received: by 2002:adf:b1d1:0:b0:34e:21cd:dbed with SMTP id
+ ffacd0b85a97d-34fca14b28fmr2461061f8f.14.1715178769627; Wed, 08 May 2024
+ 07:32:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240508134504.3560956-1-kuba@kernel.org>
-In-Reply-To: <20240508134504.3560956-1-kuba@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 8 May 2024 16:32:36 +0200
-Message-ID: <CANn89iKpZ79f7nP5HtBfmN_m_KyO0MZ5m2Z53RNtQ5Q=e3WC4w@mail.gmail.com>
-Subject: Re: [PATCH net] eth: sungem: remove .ndo_poll_controller to avoid deadlocks
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
-	Erhard Furtner <erhard_f@mailbox.org>, robh@kernel.org, elder@kernel.org, wei.fang@nxp.com, 
-	bhupesh.sharma@linaro.org, benh@kernel.crashing.org
+References: <20240507-upstream-bpf-next-20240506-mptcp-subflow-test-v1-0-e2bcbdf49857@kernel.org>
+ <20240507-upstream-bpf-next-20240506-mptcp-subflow-test-v1-3-e2bcbdf49857@kernel.org>
+ <CAADnVQ+ADQRrZmZ_M9LLGj9u_HOo7Aeup+kid62xZfLCvSxUOQ@mail.gmail.com>
+ <843ea6eb-a28d-437c-9c98-0b8c8816c518@kernel.org> <CAADnVQLA+2uoJJAJNFoK-EnUjLAwxJjxOXAizLWhcx4mf+C2Vg@mail.gmail.com>
+ <42d0718f-296d-48ca-a21a-b4708e9bd6e9@kernel.org>
+In-Reply-To: <42d0718f-296d-48ca-a21a-b4708e9bd6e9@kernel.org>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 8 May 2024 07:32:38 -0700
+Message-ID: <CAADnVQL4z=LcJW7iD246Tc+TB-Ast-eYHA9DaN9q6dgQ_Z97Wg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 3/4] selftests/bpf: Add mptcp subflow example
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: MPTCP Upstream <mptcp@lists.linux.dev>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Geliang Tang <tanggeliang@kylinos.cn>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 8, 2024 at 3:45=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+On Wed, May 8, 2024 at 12:36=E2=80=AFAM Matthieu Baerts <matttbe@kernel.org=
+> wrote:
 >
-> Erhard reports netpoll warnings from sungem:
+> >
+> > The concern with picking reno is extra deps to CI and every developer.
+> > Currently in selftests/bpf/config we do:
+> > CONFIG_TCP_CONG_DCTCP=3Dy
+> > CONFIG_TCP_CONG_BBR=3Dy
+> >
+> > I'd like to avoid adding reno there as well.
+> > Will bpf_setsockopt("dctcp") work?
 >
->   netpoll_send_skb_on_dev(): eth0 enabled interrupts in poll (gem_start_x=
-mit+0x0/0x398)
->   WARNING: CPU: 1 PID: 1 at net/core/netpoll.c:370 netpoll_send_skb+0x1fc=
-/0x20c
->
-> gem_poll_controller() disables interrupts, which may sleep.
-> We can't sleep in netpoll, it has interrupts disabled completely.
-> Strangely, gem_poll_controller() doesn't even poll the completions,
-> and instead acts as if an interrupt has fired so it just schedules
-> NAPI and exits. None of this has been necessary for years, since
-> netpoll invokes NAPI directly.
->
-> Fixes: fe09bb619096 ("sungem: Spring cleaning and GRO support")
-> Reported-and-tested-by: Erhard Furtner <erhard_f@mailbox.org>
-> Link: https://lore.kernel.org/all/20240428125306.2c3080ef@legion
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> We picked Reno because this is an inlined kernel module that is always
+> built: there is no kernel config to set, no extra deps. Also, it is
+> usually not used as default, mostly used as fallback, so the
+> verification should not be an issue.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Ahh. didn't realize that it's builtin. Then sure. keep it as reno.
 
