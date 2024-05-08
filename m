@@ -1,100 +1,187 @@
-Return-Path: <netdev+bounces-94663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0259E8C019A
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 17:59:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB16C8C0195
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 17:58:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 980311F2400E
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:59:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A36D628B7F1
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:58:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDE81128805;
-	Wed,  8 May 2024 15:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E20112A17B;
+	Wed,  8 May 2024 15:58:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="G6sb7fiK"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="KUiojH4L"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B0B8663E;
-	Wed,  8 May 2024 15:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C77C12881C
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 15:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715183968; cv=none; b=hUbI37MP0JFJNBxqFWXNRx8OyPgDUGyVLK86fXzjk3rweYtYonoGZE7AjNZMbLSqrMgjigwa3BEwAFyafzQKrQtNAS0WkJ64UhTcD3xYmJbuLfzMruVwpe+tsGmbywNy72C1VItrR/sttmyQNL/2gQE0rkd9jvQD/hZV2qqyHhM=
+	t=1715183899; cv=none; b=lmeXfa5QDTxyzrTOAnpYe5m5WKMAdNNA+/hez74eGRXkNaM5JBLw/qJh/98RMCyAqM+2jv/DkPq99cAPbDZOiVf6djNA1/1mSqkc0iWuqLJQcPOrjuyryqDxsFK4QpYL0ogjGo7N3dmMsZtXQc+zsjZx4o7qDsWb6f+SO2tVvIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715183968; c=relaxed/simple;
-	bh=Vr4ak7PpgyRFjcXcRl+OWn3i7tJscUswaAZxWq/gJMg=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=aX77JCim5VYWW19SDOFZXILJbFkHzwwB8wpzxlvbN2iIYhwUP2s6UxBxDVWzx5bXY28JfXAIBeiUKPoGr93+7hSGusahzJBOGS7V4bkNtue2MmCdIbhZerLBZ8ia3eykCE7O8Hb2bFGYJ9egkieqEFyW2n8RuXifm5tKZ9EyM44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=G6sb7fiK; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1715183958; h=Message-ID:Subject:Date:From:To;
-	bh=bDQQx0bxj6KLo4YVZhxf/+u13Y8cYMKCpaQfBhfDF0c=;
-	b=G6sb7fiKZiWijlHWXN72XbwKaOdBofXjwf6XeUGhD7We/aT0sR7IvMIy9G6xO6e8O3RrrSiludu5oJzvY85iKqWRjFzcQRyv2GAqurRfUdXPRVPEwk2lWldhVJeTYJsXvHg6AacAXVFtQET/UdqMnYbY9xFMXWJDI7IjE04gAAY=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045046011;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=24;SR=0;TI=SMTPD_---0W64.QmE_1715183954;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W64.QmE_1715183954)
-          by smtp.aliyun-inc.com;
-          Wed, 08 May 2024 23:59:16 +0800
-Message-ID: <1715183609.0604343-3-hengqi@linux.alibaba.com>
-Subject: Re: [PATCH net-next v12 0/4] ethtool: provide the dim profile fine-tuning channel
-Date: Wed, 8 May 2024 23:53:29 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>,
- Paolo  Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>,
- Jason Wang <jasowang@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Brett  Creeley <bcreeley@amd.com>,
- Ratheesh Kannoth <rkannoth@marvell.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Tal Gilboa <talgi@nvidia.com>,
- Jonathan  Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Paul  Greenwalt <paul.greenwalt@intel.com>,
- Ahmed Zaki <ahmed.zaki@intel.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>,
- justinstitt@google.com,
- Simon Horman <horms@kernel.org>,
- virtualization@lists.linux.dev
-References: <20240504064447.129622-1-hengqi@linux.alibaba.com>
- <1715134355.2261543-3-hengqi@linux.alibaba.com>
- <20240507194707.7c868654@kernel.org>
-In-Reply-To: <20240507194707.7c868654@kernel.org>
+	s=arc-20240116; t=1715183899; c=relaxed/simple;
+	bh=8Q0d5ghL7esSJXn5530BhC5obw3iPkePfl6coMCDXmA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hK3d8YLCUDc2SZU8l/fdMf7XlAdoaqgsR63y538H5P0e3iVjDii+KmSdZLx7WJDSqgf8/WTyenyaBPz04EDrvn6SOIA1WlEaWNCzJ75/R6uzBDGXODx4p6LhfCNHYVPxzSBnqwkEXrat/WJDTtq/1VRZtFIidoaJw1kI05Smj7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=KUiojH4L; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7928ec5308cso97826685a.1
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 08:58:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1715183896; x=1715788696; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fqoHV1aKLMbHVQjAORL2ZSoTVMVXNqsiEWwcIT2cGHs=;
+        b=KUiojH4LesQeeoO6quuwR7nVjh0RP2E6XcLvhsjVb4t5nlyf0ETS8m29ozIxD60OV0
+         raxqXEVFi4A0cm5S6doHh9fCFJB2LZkXOCOZqdd0MWi1bG2I9fn6VQAc7aX9V9HyFjfm
+         jkY4Voiau7v13ScYtwzTUFfWP1Z05UYDYHO8fLz8y5hI8Pz/5gVJMTNdgL7N+rkGVquI
+         8DtYHnsIzd6IbHy0zAMZOMfF497TOkBvb4SM9uYKX7ms7wlWy879pnjeNolmq7Pyuv72
+         ZlBEbrpqQhGGoUE8PIRfUuYPaEO8bg4Z/SiZRZ42jHR18qASdlV7o8rIEDN7Ufp8U7PI
+         TgOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715183896; x=1715788696;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fqoHV1aKLMbHVQjAORL2ZSoTVMVXNqsiEWwcIT2cGHs=;
+        b=Q+Wv/9jbuqKt6g+RQRmbc4rR3RZ6Cu3GC4JZm4uiAzXpHO1G/t7WNFf8QkUZAO0LMC
+         RgnhxoSCrJka+0v1+zD25/sFUS+3yv4R61MORTyq717rXL+MbIfqMCdgc4nDSEQKbzyp
+         L3i+D9uQS9l3cL73lwgzvm95SroRsGsXyK7hDBGUXQm65VtBewVsG3HLYg1s6Ej4mU5v
+         iJmHF4O1FxaA1Dbrx8Vbsn+OxvJDn4G7HtIJQaSJuY8H7HkPRGEC+3VLregdKsn3GXxU
+         tXWlKxGFVsuvwm99Au2rfqRoB9qPrUWumxUh0KoEfw2Q+ZVLDQmaWfKqdH4rgI3iZWbE
+         54tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVrc9Eb7cnot3DQrrpNtmVzLKBVGW3uejvzvu4QixNZfjfRUfu6KQdfTr1TthfYROQ351CnJ8Z/5VTHSf3RCLB9a/KFqw2A
+X-Gm-Message-State: AOJu0YwtUWdhwhXey90wA7AizJCRJaMFVFUeOHpBCYQZQUYqqWDZsbGs
+	1os+PYPiaLyTO1ect9OKtDV+4S+epHx3UkclyLui2pf5L9r2RVgHL0XgdnyRa+8=
+X-Google-Smtp-Source: AGHT+IHoJL5JboSaZtdo3JuvhTrGDECSyt70uMsqmpWZo0ihNDCQjPgANHuq7+Znj7wAL/DbLTGC4Q==
+X-Received: by 2002:ad4:5f85:0:b0:6a0:a4db:b297 with SMTP id 6a1803df08f44-6a15cc4e35amr1166676d6.23.1715183894191;
+        Wed, 08 May 2024 08:58:14 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id pm21-20020ad446d5000000b006a0d057073bsm5684884qvb.58.2024.05.08.08.58.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 May 2024 08:58:13 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1s4jgL-001JCw-43;
+	Wed, 08 May 2024 12:58:13 -0300
+Date: Wed, 8 May 2024 12:58:13 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Mina Almasry <almasrymina@google.com>,
+	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	Aleksander Lobakin <aleksander.lobakin@intel.com>,
+	Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Richard Gobert <richardbgobert@gmail.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Breno Leitao <leitao@debian.org>, David Wei <dw@davidwei.uk>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Subject: Re: [RFC PATCH net-next v8 02/14] net: page_pool: create hooks for
+ custom page providers
+Message-ID: <20240508155813.GS4718@ziepe.ca>
+References: <ZjpVfPqGNfE5N4bl@infradead.org>
+ <CAHS8izPH+sRLSiZ7vbrNtRdHrFEf8XQ61XAyHuxRSL9Jjy8YbQ@mail.gmail.com>
+ <20240507164838.GG4718@ziepe.ca>
+ <0d5da361-cc7b-46e9-a635-9a7a4c208444@gmail.com>
+ <20240507175644.GJ4718@ziepe.ca>
+ <6a50d01a-b5b9-4699-9d58-94e5f8f81c13@gmail.com>
+ <20240507233247.GK4718@ziepe.ca>
+ <54830914-1ec9-4312-96ad-423ac0aeb233@gmail.com>
+ <20240508142530.GR4718@ziepe.ca>
+ <6f69694b-4281-45a6-92aa-d9d72b918df2@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6f69694b-4281-45a6-92aa-d9d72b918df2@gmail.com>
 
-On Tue, 7 May 2024 19:47:07 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
-> On Wed, 8 May 2024 10:12:35 +0800 Heng Qi wrote:
-> > I would like to confirm if there are still comments on the current version,
-> > since the current series and the just merged "Remove RTNL lock protection of
-> > CVQ" conflict with a line of code with the fourth patch, if I can collect
-> > other comments or ack/review tags, then release the new version seems better.
+On Wed, May 08, 2024 at 04:44:32PM +0100, Pavel Begunkov wrote:
+
+> > like a weird and indirect way to get there. Why can't io_uring just be
+> > the entity that does the final free and not mess with the logic
+> > allocator?
 > 
-> Looking now!
+> Then the user has to do a syscall (e.g. via io_uring) to return pages,
+> and there we'd need to care how to put the pages efficiently, i.e.
+> hitting the page pool's fast path, e.g. by hoping napi is scheduled and
+> scheduled for the CPU we're running on, or maybe transferring the pages
+> to the right CPU first.
 > 
-> Please note that I merged a patch today which makes DIMLIB a tri-state
-> config, meaning it can be a module now. So please double check that
-> didn't break things, especially referring to dim symbols from the core
-> code.
+> Compare it with userspace putting pages into a ring, and the allocator
+> taking from there when needed without any extra synchronisation and
+> hassle just because it's a sole consumer.
 
+Wow, that sounds a bit terrifying for security, but I guess I can see
+your point.
 
-The transition from bool-state to tri-state has no impact on this series,
-since functions in the DIM library used by external modules require
-EXPORT_SYMBOL in both conditions.
+You are replacing the whole allocator logic if you are effectively
+putting the free list in userspace memory.
 
-Thanks.
+Jason
 
