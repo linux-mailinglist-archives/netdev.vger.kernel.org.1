@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-94598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3B5F8BFF76
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:51:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C1C68BFF8B
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF2691C23461
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:51:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E428E1F2168B
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C731F84FB8;
-	Wed,  8 May 2024 13:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE51D47A5C;
+	Wed,  8 May 2024 13:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q2KoI68r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VosKMvN9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A2885281
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 13:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842867C09F;
+	Wed,  8 May 2024 13:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715176163; cv=none; b=dIiGqytGkhlidgsK2pLO4bORieZMV5QENhmacc/ccDx3Mu49mOGfAPvqZ2aSOzJcNpPS0Owvt9pQVJVcE2ow9jEX3Nh0ynsgMr+z2yj3GzNuTNQYD3JqnOIfKBWpi5WKCokJG/uEixJVRieD1LRRW83aE0/lddiLFyzohDImdc8=
+	t=1715176478; cv=none; b=dSJCfyC6zrmgej5PqRAenjJwyqDnvp5JCxMbPFBYaFrk5o9oFkEjFP9pCpKGoxuL+tQXwmCF9hgENEc0R0b4jvKQVVBVWHxVhKriNO9sFyMp0sw0c405SLDehltHXp118RkL03DIWQFdoUKFv78uigCfXdXRQILeS9KuJ0Ts6Ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715176163; c=relaxed/simple;
-	bh=ha24tXh+FlN2ZY/wMaMW9zpguQyt/JjmW9Q1piyIZrs=;
+	s=arc-20240116; t=1715176478; c=relaxed/simple;
+	bh=BVindEG8kkeqoVqnzxdnmSHNneCwyXWBRBgbxPuLyZE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mDF39pO9cjN4hapqlJMMi4pabydHP8WnZ0eLks4AkB2hDwUcFHXGNWyWGu5VtXVytsDxDEdXluOV7ysNVJCweE3SA6vhIh0XUVhMq4SnzA3OJuBhpNPUstcK7DmMtdV33q8tgLWAO9YTyhnM4W01jgZWmoQdVWfYHSOyGlVyfUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q2KoI68r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3525C113CC;
-	Wed,  8 May 2024 13:49:22 +0000 (UTC)
+	 MIME-Version:Content-Type; b=pJw5zzgm6mB915dElQysjWF2b/tFtvOtREHYOaNpw6E8UcdC2LzvpbooaPYjRZLetD7TGaRpKnahSB4fD9OBDMvEKx48ILOAi5Qut59xeOuuUW2GNvLhcWu0d6BjDzwLxRaO0K1Nr/VCSLaTfCA0BqHVEjBTOlS8aFMkuqN4G2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VosKMvN9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABCD9C113CC;
+	Wed,  8 May 2024 13:54:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715176163;
-	bh=ha24tXh+FlN2ZY/wMaMW9zpguQyt/JjmW9Q1piyIZrs=;
+	s=k20201202; t=1715176478;
+	bh=BVindEG8kkeqoVqnzxdnmSHNneCwyXWBRBgbxPuLyZE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q2KoI68r+hjDmAXjs544ebWuCgh04mi2IWm2LUWGgjgbC1EQ+LkP+VfENZPQFgiBD
-	 a52sS9ZjwVzd0S5FYD1LrrXcTZRspqUXPhxatRV4k/CSuaid+IDvM21HrvtvkGe5Ni
-	 Zh7zMRkz8WQZCAdlaE7zWH0NRL4TNXtzmYu1tHf/qB76PBzhbYKNKqV0Q6y1l6Mpmj
-	 3KbE2RO13uftb1mADGfb3mv5Kahb6yU6ghVkYkL6OYRlrfrJW/GUqerMjEOR2sXV9F
-	 8+F7BctK2zl+71hHEp93Ily6n0RcNWynNKgavBy0MJ01nfyLzYpDgqyL2lwXO/sBSn
-	 jt8aPZreWiJwQ==
-Date: Wed, 8 May 2024 06:49:22 -0700
+	b=VosKMvN9G5m8W0xR/dY2Gmlj5VGjqY2IJpa1UAltsiCKSIfnNhSnQlxS4heE1btT9
+	 ECCB9NJ5OGV8kY9EOjGeyQmbAPFrHnGMaf+3en7krFHyItjn1QucO9T3LYAv2npdHa
+	 gx8ecsojvu4ZTqgx4JU2MInj469Xy0kQMEcz6Vdy6XGimiLMrtcY+CXzqUDVlkkoi6
+	 gjAGLUW7tcSeMUCd1sI1ijvM3g7p14HQtG1oL/liW9paqkTrkKysH2ReCV6H/HzOAP
+	 wPS4Pppx0tf9B6pPz6x6n/NGo991sHLWAzV2Ns+bC5if/EwzAcbmAhC2f/xje7vGg+
+	 BqILBev026bOA==
+Date: Wed, 8 May 2024 06:54:36 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, jiri@resnulli.us,
- horms@kernel.org
-Subject: Re: [PATCH net-next v4 1/6] net: tn40xx: add pci driver for Tehuti
- Networks TN40xx chips
-Message-ID: <20240508064922.77e4a69a@kernel.org>
-In-Reply-To: <20240508.163618.289658716761599768.fujita.tomonori@gmail.com>
-References: <20240501230552.53185-1-fujita.tomonori@gmail.com>
-	<20240501230552.53185-2-fujita.tomonori@gmail.com>
-	<20240506183825.116df362@kernel.org>
-	<20240508.163618.289658716761599768.fujita.tomonori@gmail.com>
+To: Jeffrey Altman <jaltman@auristor.com>, David Howells
+ <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 0/5] rxrpc: Miscellaneous fixes
+Message-ID: <20240508065436.2f0c07e9@kernel.org>
+In-Reply-To: <955B77FD-C0C2-479E-9D85-D2F62E3DA48C@auristor.com>
+References: <20240503150749.1001323-1-dhowells@redhat.com>
+	<20240507194447.20bcfb60@kernel.org>
+	<955B77FD-C0C2-479E-9D85-D2F62E3DA48C@auristor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,20 +64,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 08 May 2024 16:36:18 +0900 (JST) FUJITA Tomonori wrote:
-> > On Thu,  2 May 2024 08:05:47 +0900 FUJITA Tomonori wrote:  
-> >> +	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
-> >> +		ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));  
-> > 
-> > This fallback is unnecessary, please see commit f0ed939b6a or one of
-> > many similar removals..  
+On Wed, 8 May 2024 01:57:43 -0600 Jeffrey Altman wrote:
+> > Looks like these got marked as Rejected in patchwork.
+> > I think either because lore is confused and attaches an exchange with
+> > DaveM from 2022 to them (?) or because I mentioned to DaveM that I'm
+> > not sure these are fixes. So let me ask - on a scale of 1 to 10, how
+> > convinced are you that these should go to Linus this week rather than
+> > being categorized as general improvements and go during the merge
+> > window (without the Fixes tags)?  
 > 
-> I see, fixed.
+> Jakub,
 > 
-> It might not be necessary to check the returned value here? I keep the
-> checking alone like the majority of drivers though.
+> In my opinion, the first two patches in the series I believe are important to back port to the stable branches.
+> 
+> Reviewed-by: Jeffrey Altman <jaltman@auristor.com <mailto:jaltman@auristor.com>>
 
-Right, keep the error check. It's just that the failure, if it happens,
-will not be related to the length of the mask. So "fallback" to 32b if
-64b fails is unnecessary.
+Are they regressions? Seems possible from the Fixes tag but unclear
+from the text of the commit messages.
+
+In any case, taking the first two may be a reasonable compromise.
+Does it sounds good to you, David?
 
