@@ -1,89 +1,87 @@
-Return-Path: <netdev+bounces-94648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DB938C00B3
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 17:12:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FA678C00CA
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 17:20:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 229441F273BA
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:12:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58DAC285901
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87441126F1D;
-	Wed,  8 May 2024 15:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D6A126F09;
+	Wed,  8 May 2024 15:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TyK/6sxK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hv7rDTLH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C4DC126F07;
-	Wed,  8 May 2024 15:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544A61A2C05;
+	Wed,  8 May 2024 15:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715181110; cv=none; b=KawXHMuz+VSDjzOaW1IXj5mZi6j2xDsYx+S7Jjjfq270lur4v2vUa4x+XMU4GMGF0E+QjYfLM90xHqEmBzCBuN9Xwi3R7tJM2Eu+B8bmZc4J8S7fEc9qGmPIw+yHm9629vinwrtk8HY3d617Ee1D1L1htiVwDMudxJqFduykfmE=
+	t=1715181602; cv=none; b=WEF2vigJkz4MawjidLzcHttVEovk7+UrGA5lKvzPahbHk8u750A7r8OwaTkZinY/Co/efPG7HU3PLSNstAJm+pMmOo73Ebp3W2ZA5TFbdcW4lSnr1AGddOFE3UOYV3tRoEkrQBOFmD1ipYx9rEhYCv9FpO3yCt4uraJyOKK3eKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715181110; c=relaxed/simple;
-	bh=vikwuTwMkABdES9wzg7+bp3LS1APlhsRz9rgvZ9XVt0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N5CBshEVq3CumAhlIf0uMstKNq21Rck2JeP241tQbfEm/M32AwG0lOD5UZrq1YI/Z/65bhtqu2IMMBH+6iu1dVMU3DDdOnoR3yuW9H1ihDF9ewwhQ4x2HMCv1vdQriEtEXUblr2wirEJmohsdmcA1QLL2j9xZgY15mG0PZPp80w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TyK/6sxK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55DA4C2BD10;
-	Wed,  8 May 2024 15:11:48 +0000 (UTC)
+	s=arc-20240116; t=1715181602; c=relaxed/simple;
+	bh=kPkA9p7uZs1VyeX10od+xbCvAiD3OqwenuDPcZ6dfeg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HsQznUK9oXayVkN5zvaOSwbyJB4mjUDc8etVZ06pYghPl845I9pmxkPLsST1QPE3TIYrAYW7cr2CvoQgRqwlVOGH6xSlWM/eI223NaPFHgpC86euAwvDfhF4BvYDrG5J7oNVlifK0gWWQgb7aVf575xM+pjbKi9SZnhnk5zQwcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hv7rDTLH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5115BC113CC;
+	Wed,  8 May 2024 15:20:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715181109;
-	bh=vikwuTwMkABdES9wzg7+bp3LS1APlhsRz9rgvZ9XVt0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TyK/6sxK5ZGUQqv0U91OuTojVQ4jqgAwXQLfi20bKBNBNBnsfqp7sU2GT1PTQFU0o
-	 0OgCBSGbvRfZkT6KcIJdWyDdxWM9eJxmTuN6Tz9JeK4YHnc/e7Z6mQ9i5ll5uMxtCr
-	 W1XM0f6tchzFPrnxAJQzx4qG5fovQD2PhGsqzKWB/c5ZnuMJ6MbordKrRQglmJSnAb
-	 3VvqZ+Pq7fJ3uuVsY+mN+kdKyytNNtbZnpj/H/NI6Xji6mMaxdtUJb/Dl5bsLEUS0u
-	 3j0kbZRrTUBpVIxhMzmyvS7hj5j1EnB11y8gJRjTKvyClwHr2xm9QkfcFd3DENaeWt
-	 kuGHSQt6WLuWQ==
-Date: Wed, 8 May 2024 16:11:45 +0100
-From: Simon Horman <horms@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Kalle Valo <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	ath12k@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH wireless-next v2] wifi: ath12k: allocate dummy net_device
- dynamically
-Message-ID: <20240508151145.GG1736038@kernel.org>
-References: <20240508095410.1923198-1-leitao@debian.org>
+	s=k20201202; t=1715181601;
+	bh=kPkA9p7uZs1VyeX10od+xbCvAiD3OqwenuDPcZ6dfeg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Hv7rDTLHrcFLeA+kc75PxtnGB+/1C149EkYbwJoC6QJhT2kY77UTruqDPYDhniKNh
+	 AC2jmRlQ6a3WcJwql/Kwa7dnFN1TTtRaswNL8MYpxuidODebY1Ej6YtZatbyRKXKIr
+	 sDC4BEmeTWWRC7oHCKj2XjJ2juIKuCqrX8GQZ4NGM+M5y6YFLG1HI5qvlcZKmowTeC
+	 r/IG77OY9dZ2TdsFK0mWqHwIPFIlho6w8WpFcFcIdiOlv3dLMndAigICQlU8WiRqF5
+	 X7nwlzMrlJcKp3YuQhJtOAE5sQdl9qsPWc3ICse+xXNaddUUpsqfQzM/BOE3W1t4sx
+	 EOjxhIZ+cK1iA==
+Date: Wed, 8 May 2024 08:20:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason
+ Wang <jasowang@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev,
+ bpf@vger.kernel.org
+Subject: Re: [PATCH net-next 0/7] virtnet_net: prepare for af-xdp
+Message-ID: <20240508082000.4938fb56@kernel.org>
+In-Reply-To: <20240508085308.GA1736038@kernel.org>
+References: <20240508080514.99458-1-xuanzhuo@linux.alibaba.com>
+	<20240508085308.GA1736038@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240508095410.1923198-1-leitao@debian.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 08, 2024 at 02:54:09AM -0700, Breno Leitao wrote:
-> Embedding net_device into structures prohibits the usage of flexible
-> arrays in the net_device structure. For more details, see the discussion
-> at [1].
+On Wed, 8 May 2024 09:53:08 +0100 Simon Horman wrote:
+> On Wed, May 08, 2024 at 04:05:07PM +0800, Xuan Zhuo wrote:
+> > This patch set prepares for supporting af-xdp zerocopy.
+> > There is no feature change in this patch set.
+> > I just want to reduce the patch num of the final patch set,
+> > so I split the patch set.
+> > 
+> > #1-#3 add independent directory for virtio-net
+> > #4-#7 do some refactor, the sub-functions will be used by the subsequent commits  
 > 
-> Un-embed the net_device from struct ath12k_ext_irq_grp by converting it
-> into a pointer. Then use the leverage alloc_netdev_dummy() to allocate
-> the net_device object at ath12k_pci_ext_irq_config().
+> Hi Xuan Zhuo,
 > 
-> The free of the device occurs at ath12k_pci_free_ext_irq().
-> 
-> [1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
-> Changelog:
->  v2:
-> 	* Free all the allocated dummy devices if one of them fails to
-> 	  be allocated (in ath12k_pci_ext_irq_config()), as
-> 	  pointed by by Simon Horman.
+> This patch is targeted at net-next,
+> but unfortunately it does not apply to current net-next.
+> Please rebase and repost taking care to observe the 24h rule.
 
-Thanks for the update.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+Also - is this going to conflict with your premapped DMA work in the
+vhost tree? If it does - just wait, please, the merge window is in 
+a week..
 
