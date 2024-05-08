@@ -1,156 +1,222 @@
-Return-Path: <netdev+bounces-94439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98B7F8BF7C4
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:52:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D62E8BF7C5
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:52:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F80AB23953
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:52:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB3D11F20F13
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:52:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2283EA96;
-	Wed,  8 May 2024 07:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034973AC08;
+	Wed,  8 May 2024 07:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B8ddtPt5"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="ddf6FNF2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7572C68F
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 07:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37802C6B2
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 07:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715154723; cv=none; b=FVNO7NuzP96WDTl6aD2W1TMJ+TJB5K7SBASKV2U1Shv0x+4hhiVhrE3w3HBc0dH+NEKgABRC1BXVhZ/LllMayHtUe5wkU+IX7qFFczfG38CywNz586l+kKsQ2tfYNAsCYZ0eJIgaUkhcDQUNmsVH63Rg4QJ1j15lwyS/qCgyD3o=
+	t=1715154749; cv=none; b=YX+9AWZf94MalgS0OpaAKFywhpWViuLNDrx8FfoiejdfOgz1wi47XHEPluOiN64YHfvR0Gm/8//+S1ZggOpxadqVd2r1adCKIrmTFrkY2XrIjn9GvLBlyFt08aKCZq9yRnVJv2kaSK0VDkVZfw4VXMlmeM3xRCIwhBJt/NC/edg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715154723; c=relaxed/simple;
-	bh=SkGUXLxhIZf/WEa7vtmtaJlINHyA97xY8A9l482JZ0k=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Q7HpEy3TPG0CkwilWJHXWMG+LI7Zt39egwiijYTsO5wbFDgHRhOYkMUBIkaCKfhL/f2AyB1QdJ/HtJjA30c86Vo0M4flQ0Gl26+g2XEgwSVMbPB5AiB8LbnGd+hVavgnXjXdcJebwIYD1jgrgyPTZIvoOd8lKyKxUwwyPOoFzXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B8ddtPt5; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de54be7066bso7491195276.0
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 00:52:01 -0700 (PDT)
+	s=arc-20240116; t=1715154749; c=relaxed/simple;
+	bh=B4K0UXAMt/4BMSWk205ywb3OdnMecNmmYkz6QuNJXuM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GLfnL4C/x2ufUIAaWq58rh+uADY8+2OhhMg0LJ6VqvgypNVVgH3XlaHCHg9+LoLkXQydZ/zCUM4uWYRQY6azqQ0eUS7n7z++6Nd4a85Bd6Gz9A+yVLbt4ZmQvXpirptKNvd24b9CX3+IbCkhm9+F4xz20/x98Ijp0VUN1XIrizQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=ddf6FNF2; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a59a934ad50so931109166b.1
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 00:52:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715154721; x=1715759521; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=TUySFJvY1/u3z2nLmEOERnnBTopYnCa7abTKtIfq/nw=;
-        b=B8ddtPt5lljiIQ/I5bh/5I3TUOcRgkJ8bSEGeCFTnHUrm1x5JNP9oaFv4sxyQiQive
-         BXvH5Yj+WHJAbQp5w5C2X403RqcYfmTmG9Q0Uo4D0ZHSQ/7NYcQTwoObdsof7gWgu760
-         QHRSzlhIHukDo/AaFcXuAU2+S3UZx5y/RW+lCrF/V1nTDJWAj3Dqo624O4g2DWLGdsyq
-         pAWOAJkjcOGLzfhUqSvyKu2fSabEGlejUfOfeUOlrk7bOTx5dBt9xvIwmpVPAiYQGDz/
-         piw8tOek+kGBfF+KQQDqx3btWGPReEO62bG8nopaQ72sRjHTOGykKzhj19sFjfL7AGTi
-         uF8Q==
+        d=openvpn.net; s=google; t=1715154746; x=1715759546; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ToC+ccNVImre8PquDiUFTtuakUAIwW0nehY1L9IOo/o=;
+        b=ddf6FNF2Xam1K7LwdXeJ0UQH/5l7mqSOkWiPrAALNp4srxJRDBw/pFvds8OOD3b3/f
+         pZJDOQLvNwg/nQJ2Jkptr7qDlZLTdmlP7POvMI4xW5ruV9x6Ob0UUEjrR7SP2aWuMMvV
+         /oi2YfjZWQ9cn6TzK7VAFQqD6CkzofozOXTJ5niQPnDVVusCT0RErXaLvRtjKgvJe7XA
+         9C2sM3gum/BQTmMk/atI/NUuwrMtdVC5l/+/LioLgxUxW/VhZI0O7hHdYW0iBh3YdjxJ
+         1VQHChpbbI14RjWW8eBZ7Vpaywj4XLGfMeQCRlfJY1oDntR7+rJXBF631cPfF0Fg+DHy
+         QlQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715154721; x=1715759521;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TUySFJvY1/u3z2nLmEOERnnBTopYnCa7abTKtIfq/nw=;
-        b=JCM/LN+zF+mYTutT5A3+l2m1q7UDLc1OCSi7Pa67ROAVSsBcXSAEPJ1xy4rJ4jqoZ5
-         eNIVDSTNOXqNKCseyco6gxAXEhBV8elXqc08VjBzgPpJhKdmhEflCEftkEr5TJ+YH2Jd
-         jHdEri+vDb8cEd6jWmSjvR0xE+He7OoX/igzAjyzA4w9dQLlJjPx8/Tb88E7PXJk6/Bx
-         CVxSNfjGZvvkm6J2hoWLs7YzZBqOXoH4xytMU8qdkHUV9f4YYw0rKzYRx58tvWPmN9vE
-         bsLeB/3sxL9A27meRixCgYK/ngrlTG6cI52+BK6Y8LW/3huxq3IiYLr3enwHbYQPKE2k
-         xZmQ==
-X-Gm-Message-State: AOJu0Yx3d3Qyf0f6J56F0JnZqt4qvVtXeUsch+6Ky7S6akKdiSsuVKP+
-	vGm6Ki7ANeAF2CDNDM9Oug8BfE1/WlvaFK4pljAHbuCEghcI6x3wfAI2TTLqoeBHeb6F+RhDYjK
-	Pdv3tE8BC/w==
-X-Google-Smtp-Source: AGHT+IHM/gERUjVl8iHzu7aDroMyxOk/Uqa5MWgUA9t/vLi5iEKLxPXSV6grb0tZcgM4Jz8J0Mjn6tMU5ZKWDA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1027:b0:de5:a7a4:ebd6 with SMTP
- id 3f1490d57ef6-debb9de88fdmr571213276.12.1715154720817; Wed, 08 May 2024
- 00:52:00 -0700 (PDT)
-Date: Wed,  8 May 2024 07:51:59 +0000
+        d=1e100.net; s=20230601; t=1715154746; x=1715759546;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ToC+ccNVImre8PquDiUFTtuakUAIwW0nehY1L9IOo/o=;
+        b=JPUmvw4QKbpcmXfBRz2bW5nyxkqgnBzL4/SQKne+qPknpfDONCigJpz4fGOXQBqBhj
+         vQkhRm0OoV1r+z99XxPglarKs/p/BB/sBAu5LO1D3nBoSme1ilWOOPe7OC7SmSOJbGPw
+         Z51n9ebMJky3ZsiEb3sOdmIyTTV4Rh2sy4qUA+mLU3kNOixqt6EdwHzgMWWsXzKyrxSD
+         HkiKc5+XlGMMOqY5AL7WGSwjJKWDIknpx/g9N1NR8ZgBcU+DtxZVEbFns/64jCNEEqbE
+         0YrvjK+ASoZ5RfNTbAKe2NeAOKENTKt0ETDQfJ4AfndGlSnQgOOpdZ+1GrKi/Q+FwPma
+         +akQ==
+X-Gm-Message-State: AOJu0Yz4XRlz3V3N+msZoY0RGPWHI0VB8PxO1YiMbmQy9x1kUUggIkRj
+	LHwaPNNsCjfkhA5oXCtkBlOIdkUVVnhcejHbW8L/Y6JnjHU4POAv6nJdU0vQt8M=
+X-Google-Smtp-Source: AGHT+IF49vF2awiSavxSivUCk6tM0jdF3UWvtO7S82F6udy6i8r1C2lyajRvgbKprGD6VMZlw0Ey0g==
+X-Received: by 2002:a17:906:b7d6:b0:a59:fca5:ccaa with SMTP id a640c23a62f3a-a59fca5ce2amr96279366b.13.1715154745923;
+        Wed, 08 May 2024 00:52:25 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:0:9ca5:af56:50eb:bcf3? ([2001:67c:2fbc:0:9ca5:af56:50eb:bcf3])
+        by smtp.gmail.com with ESMTPSA id ze16-20020a170906ef9000b00a59b9b1abdfsm4455701ejb.185.2024.05.08.00.52.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 May 2024 00:52:25 -0700 (PDT)
+Message-ID: <6e7b19fd-c8da-439d-9b9d-4dd3b6a5567d@openvpn.net>
+Date: Wed, 8 May 2024 09:53:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240508075159.1646031-1-edumazet@google.com>
-Subject: [PATCH v2 net-next] net: usb: smsc95xx: stop lying about skb->truesize
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Steve Glendinning <steve.glendinning@shawell.net>, 
-	UNGLinuxDriver@microchip.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 04/24] ovpn: add basic interface
+ creation/destruction/management routines
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
+References: <20240506011637.27272-1-antonio@openvpn.net>
+ <20240506011637.27272-5-antonio@openvpn.net>
+ <20240507171835.1e92cffa@kernel.org>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <20240507171835.1e92cffa@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Some usb drivers try to set small skb->truesize and break
-core networking stacks.
+On 08/05/2024 02:18, Jakub Kicinski wrote:
+> On Mon,  6 May 2024 03:16:17 +0200 Antonio Quartulli wrote:
+> 
+>> diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
+>> index ad3813419c33..338e99dfe886 100644
+>> --- a/drivers/net/ovpn/io.c
+>> +++ b/drivers/net/ovpn/io.c
+>> @@ -11,6 +11,26 @@
+>>   #include <linux/skbuff.h>
+>>   
+>>   #include "io.h"
+>> +#include "ovpnstruct.h"
+>> +#include "netlink.h"
+>> +
+>> +int ovpn_struct_init(struct net_device *dev)
+>> +{
+>> +	struct ovpn_struct *ovpn = netdev_priv(dev);
+>> +	int err;
+>> +
+>> +	ovpn->dev = dev;
+>> +
+>> +	err = ovpn_nl_init(ovpn);
+>> +	if (err < 0)
+>> +		return err;
+>> +
+>> +	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+> 
+> Set pcpu_stat_type, core will allocate for you
 
-In this patch, I removed one of the skb->truesize override.
+ok
 
-I also replaced one skb_clone() by an allocation of a fresh
-and small skb, to get minimally sized skbs, like we did
-in commit 1e2c61172342 ("net: cdc_ncm: reduce skb truesize
-in rx path") and 4ce62d5b2f7a ("net: usb: ax88179_178a:
-stop lying about skb->truesize")
+> 
+>> +	if (!dev->tstats)
+>> +		return -ENOMEM;
+>> +
+>> +	return 0;
+>> +}
+> 
+>> +/**
+>> + * ovpn_struct_init - Initialize the netdevice private area
+>> + * @dev: the device to initialize
+>> + *
+>> + * Return: 0 on success or a negative error code otherwise
+>> + */
+>> +int ovpn_struct_init(struct net_device *dev);
+> 
+> Weak preference for kdoc to go with the implementation, not declaration.
 
-v2: leave the skb_trim() game because smsc95xx_rx_csum_offload()
-    needs the csum part. (Jakub)
-    While we are it, use get_unaligned() in smsc95xx_rx_csum_offload().
+oh ok - this wasn't clear.
+Will move the kdoc next to the implementation.
 
-Fixes: 2f7ca802bdae ("net: Add SMSC LAN9500 USB2.0 10/100 ethernet adapter driver")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Steve Glendinning <steve.glendinning@shawell.net>
-Cc: UNGLinuxDriver@microchip.com
----
- drivers/net/usb/smsc95xx.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+> 
+>> +static const struct net_device_ops ovpn_netdev_ops = {
+>> +	.ndo_open		= ovpn_net_open,
+>> +	.ndo_stop		= ovpn_net_stop,
+>> +	.ndo_start_xmit		= ovpn_net_xmit,
+>> +	.ndo_get_stats64        = dev_get_tstats64,
+> 
+> Core should count pcpu stats automatically
 
-diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
-index 2fa46baa589e5e87e12e145fe46268bdaf9fc219..0311328797c345bfa9a117596c268757808828d1 100644
---- a/drivers/net/usb/smsc95xx.c
-+++ b/drivers/net/usb/smsc95xx.c
-@@ -1810,9 +1810,11 @@ static int smsc95xx_reset_resume(struct usb_interface *intf)
- 
- static void smsc95xx_rx_csum_offload(struct sk_buff *skb)
- {
--	skb->csum = *(u16 *)(skb_tail_pointer(skb) - 2);
-+	u16 *csum_ptr = (u16 *)(skb_tail_pointer(skb) - 2);
-+
-+	skb->csum = get_unaligned(csum_ptr);
- 	skb->ip_summed = CHECKSUM_COMPLETE;
--	skb_trim(skb, skb->len - 2);
-+	skb_trim(skb, skb->len - 2); /* remove csum */
- }
- 
- static int smsc95xx_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
-@@ -1870,25 +1872,22 @@ static int smsc95xx_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
- 				if (dev->net->features & NETIF_F_RXCSUM)
- 					smsc95xx_rx_csum_offload(skb);
- 				skb_trim(skb, skb->len - 4); /* remove fcs */
--				skb->truesize = size + sizeof(struct sk_buff);
- 
- 				return 1;
- 			}
- 
--			ax_skb = skb_clone(skb, GFP_ATOMIC);
-+			ax_skb = netdev_alloc_skb_ip_align(dev->net, size);
- 			if (unlikely(!ax_skb)) {
- 				netdev_warn(dev->net, "Error allocating skb\n");
- 				return 0;
- 			}
- 
--			ax_skb->len = size;
--			ax_skb->data = packet;
--			skb_set_tail_pointer(ax_skb, size);
-+			skb_put(ax_skb, size);
-+			memcpy(ax_skb->data, packet, size);
- 
- 			if (dev->net->features & NETIF_F_RXCSUM)
- 				smsc95xx_rx_csum_offload(ax_skb);
- 			skb_trim(ax_skb, ax_skb->len - 4); /* remove fcs */
--			ax_skb->truesize = size + sizeof(struct sk_buff);
- 
- 			usbnet_skb_return(dev, ax_skb);
- 		}
+Thanks for pointing this out.
+I see dev_get_stats() takes care of all this for us.
+
+> 
+>> +};
+>> +
+>>   bool ovpn_dev_is_valid(const struct net_device *dev)
+>>   {
+>>   	return dev->netdev_ops->ndo_start_xmit == ovpn_net_xmit;
+>>   }
+> 
+>> +	list_add(&ovpn->dev_list, &dev_list);
+>> +	rtnl_unlock();
+>> +
+>> +	/* turn carrier explicitly off after registration, this way state is
+>> +	 * clearly defined
+>> +	 */
+>> +	netif_carrier_off(dev);
+> 
+> carrier off inside the locked section, user can call open
+> immediately after unlock
+
+ok, will move it up.
+
+
 -- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
-
+Antonio Quartulli
+OpenVPN Inc.
 
