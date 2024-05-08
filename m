@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-94519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88DBF8BFC0B
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:30:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EE768BFC10
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:30:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA3CA1C21455
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 11:30:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC4DA282643
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 11:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9CA824AE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230318286F;
 	Wed,  8 May 2024 11:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AEKPGAi+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RFbOiohp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA62C8248D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA6928248E;
 	Wed,  8 May 2024 11:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715167829; cv=none; b=suzjQ9BJbOEv720fkTWsngB7fgXCKOZSA+mrRIzhkuiC6qr6daAcaW06Y47j+qANeKADFhihIuUU+UPxD4eNWT7Fy03O8pkIhEf47YJrmQ2ZEVj2VDN2e9k/Ia88+i1AN6TI2k0xQnTo6o2+ywxWeYuFM/7QGe2k+aE9k+VNtpk=
+	t=1715167829; cv=none; b=LGPjmHh5bENFHPvb6iQ7zYehG1T69mV/pwHRVPh2Voq/JZtP4Ulyo5RvBBfXc9YPqLBbzWnsPH7wui6vTFSD/UcWZ/O2s6bV59qiG9O9y1REJnodBIscBNpvas4Q9zR5Z1y6lj5MKlwdlswIwGp1vU7vS+8cMtNEWMqaJsoEdSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715167829; c=relaxed/simple;
-	bh=axHrUToPoL787w2hxsBZe3Z6MmWMNp4EPGZTDCBJPl4=;
+	bh=ZWwvIlpDfXjQiHlFpfVwvKlXouqi+uWHU0X/OwSj8eA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MDm117fZKH6hjqxzJvhG+WkMz9/BCsWSiqyUgzDF9RAhNlyppfOxobhH1MBmG26JQMsADw7rsQOakqYMxdfZD3Ko5s1YrG/ErMxDFcvhAcuW4b924S3MrZ5OKOD/9L86OwWfmr1MQv5MDk+Dtg9M//d9FTWfsqKgSFhlVyEuubQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AEKPGAi+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ADF13C4AF18;
+	 In-Reply-To:To:Cc; b=jIjcAldLNF+XiIEmbYYF+NfjoDjJS33K41/umrIBzCvxo2FpbqujvRWkoWOrPkfAL36I8Z1DpxJV6Vdmd1BfUBhitz9FS7lNWzsjyRoxPAKWhAvK0q1nZNeLtG/SgXIyMIP3DQemDGd9nSwhZ2X11Fdo4JIIe0PU1yCmB11pa8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RFbOiohp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A6D14C4DDE1;
 	Wed,  8 May 2024 11:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715167828;
-	bh=axHrUToPoL787w2hxsBZe3Z6MmWMNp4EPGZTDCBJPl4=;
+	bh=ZWwvIlpDfXjQiHlFpfVwvKlXouqi+uWHU0X/OwSj8eA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AEKPGAi+YpkuKFQljES739yUDjh3q9jmTkCisXmC+T0r4YCapun/EatCG8NSYuJTX
-	 FLvyPzR5FVlZGN9ncgnkS++gXNsoJHdhrsEG2oknpvg3btc3xK+P42RudyqZJtSMsU
-	 FKPVP7+pVesAR9K+QsqIGaCAICE1QrHa9CJcAGx+vDUjw0YmReDA1Rvvk4C/xAhruz
-	 OUvcjruGXohs/alDi9iFTdvvRAu3rEr67224uMT+qoD2kzQeXidqG/HT4VKFR0NuaC
-	 gu4dcaZEg3FGa8di+US6Jv40PeW81VTXkQfxQDsqIbcIh6HiGWI4PTGCpOahgCmjBN
-	 2vrVqhw0htlVA==
+	b=RFbOiohp7ndeulJ/85d8ir4PvJ2UFBFYNR1PwRR1ORHWpSuE9NqZdLrsYfb1LatKh
+	 ssBELM9UwJo8hXN+Y34a5N8+NzFfp/S1mbDLle2EOk43LioXFNa8Kce8oWPoQmRDrg
+	 us4iF+YiAmGBLkMvQIN+CDvDWLRJijazf0Zz57OeE83zIKWpsUISIKD6rb1zrE0J2R
+	 eHr0/94245mqt3WGyhDBLTrhxBVgM7zBR5yPgb3w9+utbKHr+gmiiULg5j3aHP8/Xg
+	 F3fGZNaYZKa4Z3RLSJ7/wl042pY8+EptX2D9CbBqAFYKy2kbT4Dd+Wf9jYptv+WtI6
+	 HXHwnmCVm70Gg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9E997C54BB1;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 964ADC3275C;
 	Wed,  8 May 2024 11:30:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,37 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next PATCH] test: hsr: Call cleanup_all_ns when hsr_redbox.sh
- script exits
+Subject: Re: [PATCH v4 1/2] ipvs: add READ_ONCE barrier for
+ ipvs->sysctl_amemthresh
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171516782864.10113.4815978135761063766.git-patchwork-notify@kernel.org>
+ <171516782861.10113.14484359490290066834.git-patchwork-notify@kernel.org>
 Date: Wed, 08 May 2024 11:30:28 +0000
-References: <20240507091155.3504198-1-lukma@denx.de>
-In-Reply-To: <20240507091155.3504198-1-lukma@denx.de>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240506141444.145946-1-aleksandr.mikhalitsyn@canonical.com>
+In-Reply-To: <20240506141444.145946-1-aleksandr.mikhalitsyn@canonical.com>
+To: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Cc: horms@verge.net.au, netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, linux-kernel@vger.kernel.org, ja@ssi.bg,
+ pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Tue,  7 May 2024 11:11:55 +0200 you wrote:
-> Without this change the created netns instances are not cleared after
-> this script execution. To fix this problem the cleanup_all_ns function
-> from ../lib.sh is called.
+On Mon,  6 May 2024 16:14:43 +0200 you wrote:
+> Cc: Julian Anastasov <ja@ssi.bg>
+> Cc: Simon Horman <horms@verge.net.au>
+> Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+> Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+> Cc: Florian Westphal <fw@strlen.de>
+> Suggested-by: Julian Anastasov <ja@ssi.bg>
+> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 > 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> ---
->  tools/testing/selftests/net/hsr/hsr_redbox.sh | 2 ++
->  1 file changed, 2 insertions(+)
+> [...]
 
 Here is the summary with links:
-  - [net-next] test: hsr: Call cleanup_all_ns when hsr_redbox.sh script exits
-    https://git.kernel.org/netdev/net-next/c/252aa6d53931
+  - [v4,1/2] ipvs: add READ_ONCE barrier for ipvs->sysctl_amemthresh
+    https://git.kernel.org/netdev/net-next/c/643bb5dbaef7
+  - [v4,2/2] ipvs: allow some sysctls in non-init user namespaces
+    https://git.kernel.org/netdev/net-next/c/2b696a2a101d
 
 You are awesome, thank you!
 -- 
