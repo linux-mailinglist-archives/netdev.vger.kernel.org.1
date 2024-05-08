@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-94341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB728BF3B3
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:31:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DAB58BF3BD
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:35:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0A2BB22328
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:31:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D4ED1C2341B
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C12C621;
-	Wed,  8 May 2024 00:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F5A1A2C1D;
+	Wed,  8 May 2024 00:34:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j35DM3+W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hZxfO6uu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7625138B;
-	Wed,  8 May 2024 00:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF53C7490;
+	Wed,  8 May 2024 00:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715128249; cv=none; b=INTYY/MgtpIDeidn5zJkr95loxPGUPeBGdJbEPXXSHDGz7pks5eeYH+MvqPYunB8ZpCEjb4jtQt22dvpNhFls9E6ZUvrsBhTi1d3vdXcVuAuCSakwXCNbp9vn/lhQ3Io1TVQhzIxAVvJgAK1Rt0lW/bU21mfyJaSccLxtXX8rA0=
+	t=1715128488; cv=none; b=JuBDqhimWQdQlESGnPs46GJs/23TLfcuTveess0+l8rQGgwe6oGaa26srL/7sMKla4e3gGucXoYzqTsSUsHWKOwF4hGVm2naBGdCzYs7rxuPEv0CsBMiUh3N/sDABmXf2w2u+eIYMiDuCpkJ46eTKwfkxUSEVQ01tMlR4xTlpk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715128249; c=relaxed/simple;
-	bh=E+MEqaMI2H1mlAS0yyvf/LG3IxZ91Jzmyg/2JNYYdyk=;
+	s=arc-20240116; t=1715128488; c=relaxed/simple;
+	bh=KMjZdINE6p4LPP83BwN/kf1WG3JBITPmf6n2KYAIkwU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JA3SwSuLsofCXhwInfC+op10jrM3hp7LMOIVIcrZa9of9iZXGCueQ2EcEAReMAekG2q8Q190FVOSeriaP3oJ5iu1bB+8IQf+NV81bDfOJvOnVxwqdbag7BqNYtPib9kYRbX+RgtXCrdPtk+d7Sfs0vD0gRrFEWE0LYC8mhgmTIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j35DM3+W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CA4CC2BBFC;
-	Wed,  8 May 2024 00:30:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=NBmIMB8/cOimdoWa4trE5r79vPnDrxV65p2wgcC2ABPlbCGoP/nG121OW2LgC18IoGXRWcMjC/UcwqMw/JdgJdFmmpbMLsNXWw79XTXoXZCVbgu5zCc0OMPU2lg+jes04coP/Sb16l/fYK4pdWTvYMI5aB78B21jZ5LRbLdd8+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hZxfO6uu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5563C4AF63;
+	Wed,  8 May 2024 00:34:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715128249;
-	bh=E+MEqaMI2H1mlAS0yyvf/LG3IxZ91Jzmyg/2JNYYdyk=;
+	s=k20201202; t=1715128488;
+	bh=KMjZdINE6p4LPP83BwN/kf1WG3JBITPmf6n2KYAIkwU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j35DM3+WvzaZPDJkrsXvUIYUHjeRcoNpWkUrxKt2msJMe64NGTAW0XXPUOdEKjBEH
-	 UoWz9Gme/0BeVU2zCRPmoPOptV5EXwFZswU+wIMHM5BsSJR1yOKwidXubyrCxUGDOD
-	 pJs4PvyDmXARw7hUgxObI8NbRih/gjgFJYLxJg18UL5GjXNh4MCe+Ya6yTsLweGXbd
-	 2ZViQpXoCLaisTgpExfTwCFLosFF5BVtCSzetJ60k/9WsCzyK5BndjWrQEvEvKkSwk
-	 jh/p7eXchQ772iwCnua2fL0HwlE+PxyL89qMzYaLyV8EQ+OmkCE+zBQAxqGL6Ti7Ln
-	 zis/oVjGQpNwA==
-Date: Tue, 7 May 2024 17:30:47 -0700
+	b=hZxfO6uuR0sJsZ4maM3E83w8LHyCysvPwHU9Kwn/G06Zbv4L2e/hFTq9GUS5Ai1SV
+	 dS2srV0P/M8Wy15kUE5x+9yxIpbJJF9kzZBsOxYvlNG+SPDOb5Te1nRAP26K19I+z1
+	 Egars8UnKppMv4utEWCCS29OKItnDCev17XefLnfZorFryFeFWCrUNtdVCrTR/1OT0
+	 oVq7c/WDtgjsh5sNvDOq/ZIKGWHLgyysT64CGBp1cgL9Ij5Y1z05BX2QU17eSJ3XlA
+	 TweCwTcn3bxY24+CITarXvlNVsUhsNTPQo/nnVFfhXRmOB6I8jJVH4L/31eSJGwo8Q
+	 AwqETHFwAltDQ==
+Date: Tue, 7 May 2024 17:34:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- rajesh.sivaramasubramaniom@oracle.com, rama.nichanamatlu@oracle.com,
- manjunath.b.patil@oracle.com
-Subject: Re: [PATCH v2] net/sched: adjust device watchdog timer to detect
- stopped queue at right time
-Message-ID: <20240507173047.47586a14@kernel.org>
-In-Reply-To: <20240506135944.7753-1-praveen.kannoju@oracle.com>
-References: <20240506135944.7753-1-praveen.kannoju@oracle.com>
+To: Richard Gobert <richardbgobert@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ willemdebruijn.kernel@gmail.com, dsahern@kernel.org,
+ alexander.duyck@gmail.com, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v9 0/3] net: gro: remove network_header use,
+ move p->{flush/flush_id} calculations to L4
+Message-ID: <20240507173447.015a03a5@kernel.org>
+In-Reply-To: <20240507162349.130277-1-richardbgobert@gmail.com>
+References: <20240507162349.130277-1-richardbgobert@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,14 +62,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-LGTM! 
+On Tue,  7 May 2024 18:23:45 +0200 Richard Gobert wrote:
+> The cb fields network_offset and inner_network_offset are used instead of
+> skb->network_header throughout GRO.
+> 
+> These fields are then leveraged in the next commit to remove flush_id state
+> from napi_gro_cb, and stateful code in {ipv6,inet}_gro_receive which may be
+> unnecessarily complicated due to encapsulation support in GRO. These fields
+> are checked in L4 instead.
+> 
+> 3rd patch adds tests for different flush_id flows in GRO.
 
-One nit..
-
-On Mon,  6 May 2024 19:29:44 +0530 Praveen Kumar Kannoju wrote:
-> +				if (time_after(jiffies, (trans_start + dev->watchdog_timeo))) {
-                                                        ^                                 ^
-
-Would you mind dropping these brackets while you're touching this line?
-They are unnecessary.
+Doesn't apply to either tree, please rebase.
+-- 
+pw-bot: cr
 
