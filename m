@@ -1,392 +1,198 @@
-Return-Path: <netdev+bounces-94735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87E628C078C
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 01:10:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CDBF8C07A3
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 01:24:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D72F4B21228
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 23:10:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62E9FB21640
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 23:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C815151C5B;
-	Wed,  8 May 2024 23:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EBD1332A7;
+	Wed,  8 May 2024 23:24:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Iwxf4bkt"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="IF/p+zAw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3A23B298
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 23:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98EB078C72
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 23:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715209831; cv=none; b=RXkgUOIVu43muejYYA5h0JEWFaGlk963ryDyjvs6vbWo5OURzihF53bCpflQQxdkamNtt/LNJB/08bMRRE+Jl0diWO6mbB/Okd+GpMYSWE9ZPaSMepih5V+YTFsBVozNdEqDLMSFqqaF6tUawbs4Q2ZM6LLDWqvyOuAIaR7FWqg=
+	t=1715210656; cv=none; b=ZwRGPRgNwVxYhr0bcXfxf5sTOfUuKquM95HfYYeW2HOAIM43DJpv6JeeQT5TNIcRLEzdGImk4wd17YZauyNKezYU1EgMRJo3Tz4nlScdQSKILFa1N5cXlnDO5gok8WcX8uPFX8iKamAuhOc+VdWKcmPJCLl02gtPQ0XM5lnzOVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715209831; c=relaxed/simple;
-	bh=GLERfbMnsmuFAuMuxywN9iF9fGY0EwPrTh8sSjCh724=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZaMoAsy0x8VBGsw+z8ZQmsxkcwOJwG5aA4yWBhevYmMvOty3aLO/l0O9j4E+S9w3adzOUqJmvEvDg2pyMFvLFNI+mUkFQPBd0bUuh39LU2fGmzhQ51iFUxfV/icqcf9WrSrXbKjIb6J7CuB+FMYV2oRoeLPfsBpJ5DkXukA6z1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Iwxf4bkt; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-36c0d2b0fdeso282595ab.1
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 16:10:28 -0700 (PDT)
+	s=arc-20240116; t=1715210656; c=relaxed/simple;
+	bh=m/nCFqHe0a+bSNrZTvPd++SPHNeMCq8hpEDrrkoK4xM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TSEbU+XUIv5VKRcvWHrDPYciVcOLKlhBgzMmzYlCMxUrxtNe84uwqIf0szSN53O4/bXtlc6mEURvfKwFL2acr1xLs+Sy5xGl8Zsn1mJNxvP892UP+VyhWnkvuTt9Z5ZhMN8Rl8AM/ZGysjvILIZXqo3GyA65cKd7M2sARRKqAlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=IF/p+zAw; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2b5388087f9so264160a91.0
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 16:24:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1715209828; x=1715814628; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xLnlpoMndJv6kXCz+FbZOexc9v1XQ4k/KtWuckbio3c=;
-        b=Iwxf4bktbwUVJx1SVqOyYZgiC3xjRaHoWQbFDzoFSVtJcrruuQ175G6cdb+cZHYURL
-         0/47qBcikRMUvFGRmRJVnDC6TSRjbuyQSTPQBGyq2fp0XIM1NNgiWnKU9TcLiYXVcO1s
-         +2dDcJAiDScGDIug8CCQdqyC+mkoZkE3IxZqc=
+        d=fastly.com; s=google; t=1715210652; x=1715815452; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=u+AO/FgdbXB/WPpRvASJSNtkz6kd+Jn2U53cQAsPW9M=;
+        b=IF/p+zAwHPkMRzw1HTFZX6gOBmC0zTnpqZe3u4v0ryFb19omSxjusTy+aS6ZNqhToM
+         aYNp0oXxJdcOItHtqIO/pky28HtV7NOaNiAK1LTq5F2sjDxQ8Rbq9rZ2V7Hj6CDa/+zA
+         b4ioCBQkS7GZ2CrdvKXX+AF+vHItG+uPj1qEM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715209828; x=1715814628;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xLnlpoMndJv6kXCz+FbZOexc9v1XQ4k/KtWuckbio3c=;
-        b=XmxtZxFMwDr0uVOZUuLI87joyY3qYV7DZM3fmermak9/wOtquYzEkN0jaK9pQ+fhK8
-         GvdOS1mBYsnfj+FnTYoxN37dWsIvh9XcvKfqVEWEj2po49sRe5R4lGV4TqPHBbPQ5Fdg
-         Fk/WDFg7xttxxOcCWGIyAfrV/MjKaLopPW9kI7ST3q7PqoKnDK2EpoKfjBjE1+WUoj9W
-         v4xCwpwE7VdftsSZ6zGJy5p4yxR71mP6+rK40a9hze0bbuL2evvZCW0X3+gMJiOgmMBE
-         HMILB5P2r1kbU5EtuQtBoZb/5GoTGbA5+mUtuNIRMp8DhMxCSKKPTICwbkTpr93FxzH9
-         XEsg==
-X-Forwarded-Encrypted: i=1; AJvYcCVb1QXV9Hsrl7UZIMcX2rG0dJvKFKGOfuttsRVtVt87XKv2bfEzwkTbIRkwyPWRbWGvNUIgOR+AKYiWSC34LE8aBo3Eypcp
-X-Gm-Message-State: AOJu0YzMYtygWJYx/1BFJJvlXnVcl9s+phm6en7qDSWslM9gnBuO+JU5
-	OrpRfNBJrVLEL1FZNtzXY7rxKGKToECOIXXcfAb7kK0MACnlTRufXrsaMGUoxr0=
-X-Google-Smtp-Source: AGHT+IGjHhKKM24ZUFIVswkuYx3QwGN8iZAP+skToQSUH9ATxlCCLFZFt3zeJLulXQKSKo0MDx46iA==
-X-Received: by 2002:a05:6e02:2193:b0:369:f53b:6c2 with SMTP id e9e14a558f8ab-36caecc858bmr42995245ab.1.1715209827936;
-        Wed, 08 May 2024 16:10:27 -0700 (PDT)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-36cb9e08d92sm170485ab.54.2024.05.08.16.10.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 May 2024 16:10:27 -0700 (PDT)
-Message-ID: <f4e45604-86b0-4be6-9bea-36edf301df33@linuxfoundation.org>
-Date: Wed, 8 May 2024 17:10:24 -0600
+        d=1e100.net; s=20230601; t=1715210652; x=1715815452;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u+AO/FgdbXB/WPpRvASJSNtkz6kd+Jn2U53cQAsPW9M=;
+        b=NEC50qIbG/pIcxndFAAbZhroTV/dNncJjl+HxqUwN/2JSyuZVXrWn+P/uPFggjTE2u
+         wiwcZuozJB9GD0Bap2PyXiIDmcMFDYNP34aZjzIzhlokZsNwWfyT8AS/R3zIUDvkoL4w
+         gYzoaBxe24P0YEXYln8xCjcNzdbXyR/vt+wByClRdC8eoTjmWCKausQHr1EQYlVfYxre
+         2Kh+v4GFOzz+dLPCOv/1sa9eyTQRp61D4NUjH62n4M0of6unbw6RcNtOG53/5C8z1V66
+         Dscgevcq5W3e6POJJlcc9JPp6zzgHECZG+twhoy1VzphvRUfbg9GUfYkTEWDX2nL4hkw
+         1a6A==
+X-Forwarded-Encrypted: i=1; AJvYcCUICyCcPUCUfEBgUVC+aqetrLGUWcWlQnpGDQqgxcimBf3fp25QvWAwZfaUjieo+bWgjK+UBsokM5FR2AiT37f1J9p5BEsx
+X-Gm-Message-State: AOJu0Yy1M65us5/K1Uc6JyUGnnI78WHESKgLI5AO68zklLP9myM5IybU
+	IBGozVrD3rnGKFmUPr/AifT45GPqtLMkxVkNd+mVlVoFkBjRuyjtru2IV6vXxNU=
+X-Google-Smtp-Source: AGHT+IH/X19jWdrcIa2RfuVEDUbUdZo5O//bofdSllbZHHS/yCmARd5qOQe8x9IzsnVULm5gwIrQxw==
+X-Received: by 2002:a17:90a:1c8f:b0:2b2:a607:ea4a with SMTP id 98e67ed59e1d1-2b616be46bdmr3944849a91.44.1715210651863;
+        Wed, 08 May 2024 16:24:11 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b62863a1d4sm2024316a91.8.2024.05.08.16.24.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 May 2024 16:24:11 -0700 (PDT)
+Date: Wed, 8 May 2024 16:24:08 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	saeedm@nvidia.com, gal@nvidia.com, nalramli@fastly.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
+Message-ID: <ZjwJmKa6orPm9NHF@LQ3V64L9R2>
+References: <20240503022549.49852-1-jdamato@fastly.com>
+ <c3f4f1a4-303d-4d57-ae83-ed52e5a08f69@linux.dev>
+ <ZjUwT_1SA9tF952c@LQ3V64L9R2>
+ <20240503145808.4872fbb2@kernel.org>
+ <ZjV5BG8JFGRBoKaz@LQ3V64L9R2>
+ <20240503173429.10402325@kernel.org>
+ <ZjkbpLRyZ9h0U01_@LQ3V64L9R2>
+ <8678e62c-f33b-469c-ac6c-68a060273754@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
-To: Edward Liaw <edliaw@google.com>, shuah@kernel.org,
- Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
- Johannes Weiner <hannes@cmpxchg.org>, Christian Brauner
- <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>,
- Kees Cook <keescook@chromium.org>,
- OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>,
- Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?=
- <andrealmeid@igalia.com>, Jiri Kosina <jikos@kernel.org>,
- Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>,
- Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
- <mic@digikod.net>, Paul Moore <paul@paul-moore.com>,
- James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
- Andrew Morton <akpm@linux-foundation.org>, Seth Forshee
- <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
- <afaerber@suse.de>, Manivannan Sadhasivam
- <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>,
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Fenghua Yu <fenghua.yu@intel.com>,
- Reinette Chatre <reinette.chatre@intel.com>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "Paul E. McKenney" <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Jarkko Sakkinen <jarkko@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Muhammad Usama Anjum <usama.anjum@collabora.com>
-Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kernel-team@android.com, linux-sound@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
- linux-input@vger.kernel.org, iommu@lists.linux.dev, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
- linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
- linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>
-References: <20240507214254.2787305-1-edliaw@google.com>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20240507214254.2787305-1-edliaw@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8678e62c-f33b-469c-ac6c-68a060273754@gmail.com>
 
-On 5/7/24 15:38, Edward Liaw wrote:
-> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
-> asprintf into kselftest_harness.h, which is a GNU extension and needs
-> _GNU_SOURCE to either be defined prior to including headers or with the
-> -D_GNU_SOURCE flag passed to the compiler.
-> 
-> v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-edliaw@google.com/
-> v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
-> location.  Remove #define _GNU_SOURCE from source code to resolve
-> redefinition warnings.
-> 
-> Edward Liaw (5):
->    selftests: Compile kselftest headers with -D_GNU_SOURCE
->    selftests/sgx: Include KHDR_INCLUDES in Makefile
-
-I appled patches 1/5 and 2.5 - The rest need to be split up.
-
->    selftests: Include KHDR_INCLUDES in Makefile
->    selftests: Drop define _GNU_SOURCE
->    selftests: Drop duplicate -D_GNU_SOURCE
-> 
-
-Please split these patches pwe test directory. Otherwise it will
-cause merge conflicts which can be hard to resolve.
-
->   tools/testing/selftests/Makefile                              | 4 ++--
->   tools/testing/selftests/alsa/Makefile                         | 2 +-
->   tools/testing/selftests/arm64/signal/Makefile                 | 2 +-
->   tools/testing/selftests/cachestat/test_cachestat.c            | 2 --
->   tools/testing/selftests/capabilities/test_execve.c            | 2 --
->   tools/testing/selftests/clone3/clone3.c                       | 2 --
->   .../testing/selftests/clone3/clone3_cap_checkpoint_restore.c  | 2 --
->   tools/testing/selftests/clone3/clone3_clear_sighand.c         | 2 --
->   tools/testing/selftests/clone3/clone3_selftests.h             | 1 -
->   tools/testing/selftests/clone3/clone3_set_tid.c               | 2 --
->   tools/testing/selftests/core/close_range_test.c               | 2 --
->   tools/testing/selftests/drivers/dma-buf/udmabuf.c             | 1 -
->   tools/testing/selftests/exec/Makefile                         | 2 +-
->   tools/testing/selftests/fchmodat2/fchmodat2_test.c            | 2 --
->   tools/testing/selftests/filesystems/binderfs/binderfs_test.c  | 2 --
->   tools/testing/selftests/filesystems/devpts_pts.c              | 1 -
->   tools/testing/selftests/filesystems/dnotify_test.c            | 1 -
->   tools/testing/selftests/filesystems/epoll/epoll_wakeup_test.c | 2 --
->   tools/testing/selftests/filesystems/eventfd/eventfd_test.c    | 2 --
->   tools/testing/selftests/filesystems/fat/rename_exchange.c     | 2 --
->   tools/testing/selftests/filesystems/overlayfs/Makefile        | 2 +-
->   tools/testing/selftests/filesystems/overlayfs/dev_in_maps.c   | 2 --
->   .../testing/selftests/filesystems/statmount/statmount_test.c  | 3 ---
->   tools/testing/selftests/futex/functional/Makefile             | 2 +-
->   tools/testing/selftests/futex/functional/futex_requeue_pi.c   | 3 ---
->   tools/testing/selftests/hid/Makefile                          | 2 +-
->   tools/testing/selftests/iommu/Makefile                        | 2 --
->   tools/testing/selftests/ipc/msgque.c                          | 1 -
->   tools/testing/selftests/kcmp/kcmp_test.c                      | 2 --
->   tools/testing/selftests/kselftest_harness.h                   | 2 +-
->   tools/testing/selftests/kvm/aarch64/arch_timer.c              | 2 --
->   tools/testing/selftests/kvm/aarch64/page_fault_test.c         | 1 -
->   tools/testing/selftests/kvm/aarch64/psci_test.c               | 3 ---
->   tools/testing/selftests/kvm/aarch64/vgic_init.c               | 1 -
->   tools/testing/selftests/kvm/arch_timer.c                      | 3 ---
->   tools/testing/selftests/kvm/demand_paging_test.c              | 3 ---
->   tools/testing/selftests/kvm/dirty_log_test.c                  | 3 ---
->   tools/testing/selftests/kvm/guest_memfd_test.c                | 2 --
->   tools/testing/selftests/kvm/hardware_disable_test.c           | 3 ---
->   tools/testing/selftests/kvm/include/userfaultfd_util.h        | 3 ---
->   tools/testing/selftests/kvm/kvm_binary_stats_test.c           | 2 --
->   tools/testing/selftests/kvm/kvm_create_max_vcpus.c            | 2 --
->   tools/testing/selftests/kvm/kvm_page_table_test.c             | 3 ---
->   tools/testing/selftests/kvm/lib/assert.c                      | 3 ---
->   tools/testing/selftests/kvm/lib/kvm_util.c                    | 2 --
->   tools/testing/selftests/kvm/lib/memstress.c                   | 2 --
->   tools/testing/selftests/kvm/lib/test_util.c                   | 2 --
->   tools/testing/selftests/kvm/lib/userfaultfd_util.c            | 3 ---
->   tools/testing/selftests/kvm/lib/x86_64/sev.c                  | 1 -
->   tools/testing/selftests/kvm/max_guest_memory_test.c           | 2 --
->   .../testing/selftests/kvm/memslot_modification_stress_test.c  | 3 ---
->   tools/testing/selftests/kvm/riscv/arch_timer.c                | 3 ---
->   tools/testing/selftests/kvm/rseq_test.c                       | 1 -
->   tools/testing/selftests/kvm/s390x/cmma_test.c                 | 2 --
->   tools/testing/selftests/kvm/s390x/sync_regs_test.c            | 2 --
->   tools/testing/selftests/kvm/set_memory_region_test.c          | 1 -
->   tools/testing/selftests/kvm/steal_time.c                      | 1 -
->   tools/testing/selftests/kvm/x86_64/amx_test.c                 | 2 --
->   .../selftests/kvm/x86_64/exit_on_emulation_failure_test.c     | 3 ---
->   tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c            | 2 --
->   tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c             | 2 --
->   tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c             | 1 -
->   tools/testing/selftests/kvm/x86_64/hyperv_ipi.c               | 2 --
->   tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c          | 1 -
->   tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c         | 2 --
->   tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c   | 2 --
->   tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c       | 3 ---
->   tools/testing/selftests/kvm/x86_64/platform_info_test.c       | 2 --
->   tools/testing/selftests/kvm/x86_64/pmu_counters_test.c        | 2 --
->   tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c    | 3 ---
->   .../selftests/kvm/x86_64/private_mem_conversions_test.c       | 1 -
->   tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c          | 1 -
->   tools/testing/selftests/kvm/x86_64/set_sregs_test.c           | 1 -
->   .../selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c  | 3 ---
->   tools/testing/selftests/kvm/x86_64/smm_test.c                 | 1 -
->   tools/testing/selftests/kvm/x86_64/state_test.c               | 1 -
->   tools/testing/selftests/kvm/x86_64/sync_regs_test.c           | 2 --
->   tools/testing/selftests/kvm/x86_64/ucna_injection_test.c      | 2 --
->   tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c  | 2 --
->   tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c       | 3 ---
->   tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c        | 1 -
->   .../testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c  | 1 -
->   tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c           | 2 --
->   tools/testing/selftests/kvm/x86_64/xapic_state_test.c         | 1 -
->   tools/testing/selftests/kvm/x86_64/xss_msr_test.c             | 2 --
->   tools/testing/selftests/landlock/base_test.c                  | 2 --
->   tools/testing/selftests/landlock/fs_test.c                    | 2 --
->   tools/testing/selftests/landlock/net_test.c                   | 2 --
->   tools/testing/selftests/landlock/ptrace_test.c                | 2 --
->   tools/testing/selftests/lib.mk                                | 2 +-
->   tools/testing/selftests/lsm/common.c                          | 2 --
->   tools/testing/selftests/lsm/lsm_get_self_attr_test.c          | 2 --
->   tools/testing/selftests/lsm/lsm_list_modules_test.c           | 2 --
->   tools/testing/selftests/lsm/lsm_set_self_attr_test.c          | 2 --
->   tools/testing/selftests/membarrier/membarrier_test_impl.h     | 1 -
->   .../selftests/membarrier/membarrier_test_multi_thread.c       | 1 -
->   .../selftests/membarrier/membarrier_test_single_thread.c      | 1 -
->   tools/testing/selftests/memfd/common.c                        | 1 -
->   tools/testing/selftests/memfd/fuse_test.c                     | 2 --
->   tools/testing/selftests/memfd/memfd_test.c                    | 1 -
->   tools/testing/selftests/mm/cow.c                              | 1 -
->   tools/testing/selftests/mm/gup_longterm.c                     | 1 -
->   tools/testing/selftests/mm/hugepage-mmap.c                    | 1 -
->   tools/testing/selftests/mm/hugepage-mremap.c                  | 2 --
->   tools/testing/selftests/mm/hugetlb-madvise.c                  | 2 --
->   tools/testing/selftests/mm/hugetlb-read-hwpoison.c            | 2 --
->   tools/testing/selftests/mm/khugepaged.c                       | 1 -
->   tools/testing/selftests/mm/ksm_functional_tests.c             | 1 -
->   tools/testing/selftests/mm/madv_populate.c                    | 1 -
->   tools/testing/selftests/mm/map_populate.c                     | 2 --
->   tools/testing/selftests/mm/mdwe_test.c                        | 1 -
->   tools/testing/selftests/mm/memfd_secret.c                     | 2 --
->   tools/testing/selftests/mm/mlock2-tests.c                     | 1 -
->   tools/testing/selftests/mm/mrelease_test.c                    | 1 -
->   tools/testing/selftests/mm/mremap_dontunmap.c                 | 1 -
->   tools/testing/selftests/mm/mremap_test.c                      | 2 --
->   tools/testing/selftests/mm/pagemap_ioctl.c                    | 1 -
->   tools/testing/selftests/mm/pkey-helpers.h                     | 1 -
->   tools/testing/selftests/mm/protection_keys.c                  | 1 -
->   tools/testing/selftests/mm/split_huge_page_test.c             | 2 --
->   tools/testing/selftests/mm/thuge-gen.c                        | 2 --
->   tools/testing/selftests/mm/uffd-common.h                      | 1 -
->   tools/testing/selftests/mount_setattr/mount_setattr_test.c    | 1 -
->   .../move_mount_set_group/move_mount_set_group_test.c          | 1 -
->   tools/testing/selftests/nci/Makefile                          | 2 +-
->   tools/testing/selftests/net/af_unix/diag_uid.c                | 2 --
->   tools/testing/selftests/net/af_unix/scm_pidfd.c               | 1 -
->   tools/testing/selftests/net/af_unix/unix_connect.c            | 2 --
->   tools/testing/selftests/net/csum.c                            | 3 ---
->   tools/testing/selftests/net/gro.c                             | 3 ---
->   tools/testing/selftests/net/ip_defrag.c                       | 3 ---
->   tools/testing/selftests/net/ipsec.c                           | 3 ---
->   tools/testing/selftests/net/ipv6_flowlabel.c                  | 3 ---
->   tools/testing/selftests/net/ipv6_flowlabel_mgr.c              | 3 ---
->   tools/testing/selftests/net/mptcp/mptcp_connect.c             | 3 ---
->   tools/testing/selftests/net/mptcp/mptcp_inq.c                 | 3 ---
->   tools/testing/selftests/net/mptcp/mptcp_sockopt.c             | 3 ---
->   tools/testing/selftests/net/msg_zerocopy.c                    | 3 ---
->   tools/testing/selftests/net/nettest.c                         | 2 --
->   tools/testing/selftests/net/psock_fanout.c                    | 3 ---
->   tools/testing/selftests/net/psock_snd.c                       | 3 ---
->   tools/testing/selftests/net/reuseport_addr_any.c              | 3 ---
->   tools/testing/selftests/net/reuseport_bpf_cpu.c               | 3 ---
->   tools/testing/selftests/net/reuseport_bpf_numa.c              | 3 ---
->   tools/testing/selftests/net/reuseport_dualstack.c             | 3 ---
->   tools/testing/selftests/net/so_incoming_cpu.c                 | 1 -
->   tools/testing/selftests/net/so_netns_cookie.c                 | 1 -
->   tools/testing/selftests/net/so_txtime.c                       | 3 ---
->   tools/testing/selftests/net/tap.c                             | 3 ---
->   tools/testing/selftests/net/tcp_ao/Makefile                   | 2 +-
->   tools/testing/selftests/net/tcp_fastopen_backup_key.c         | 1 -
->   tools/testing/selftests/net/tcp_inq.c                         | 2 --
->   tools/testing/selftests/net/tcp_mmap.c                        | 1 -
->   tools/testing/selftests/net/tls.c                             | 3 ---
->   tools/testing/selftests/net/toeplitz.c                        | 3 ---
->   tools/testing/selftests/net/tun.c                             | 3 ---
->   tools/testing/selftests/net/txring_overwrite.c                | 3 ---
->   tools/testing/selftests/net/txtimestamp.c                     | 3 ---
->   tools/testing/selftests/net/udpgso.c                          | 3 ---
->   tools/testing/selftests/net/udpgso_bench_rx.c                 | 3 ---
->   tools/testing/selftests/net/udpgso_bench_tx.c                 | 3 ---
->   tools/testing/selftests/perf_events/remove_on_exec.c          | 2 --
->   tools/testing/selftests/perf_events/sigtrap_threads.c         | 2 --
->   tools/testing/selftests/pid_namespace/regression_enomem.c     | 1 -
->   tools/testing/selftests/pidfd/pidfd.h                         | 1 -
->   tools/testing/selftests/pidfd/pidfd_fdinfo_test.c             | 2 --
->   tools/testing/selftests/pidfd/pidfd_getfd_test.c              | 2 --
->   tools/testing/selftests/pidfd/pidfd_open_test.c               | 2 --
->   tools/testing/selftests/pidfd/pidfd_poll_test.c               | 2 --
->   tools/testing/selftests/pidfd/pidfd_setns_test.c              | 2 --
->   tools/testing/selftests/pidfd/pidfd_test.c                    | 2 --
->   tools/testing/selftests/pidfd/pidfd_wait.c                    | 2 --
->   tools/testing/selftests/prctl/Makefile                        | 2 ++
->   tools/testing/selftests/proc/Makefile                         | 2 +-
->   tools/testing/selftests/ptrace/get_set_sud.c                  | 1 -
->   tools/testing/selftests/ptrace/peeksiginfo.c                  | 1 -
->   tools/testing/selftests/resctrl/Makefile                      | 2 +-
->   tools/testing/selftests/riscv/mm/Makefile                     | 2 +-
->   tools/testing/selftests/rseq/basic_percpu_ops_test.c          | 1 -
->   tools/testing/selftests/rseq/basic_test.c                     | 2 --
->   tools/testing/selftests/rseq/param_test.c                     | 1 -
->   tools/testing/selftests/rseq/rseq.c                           | 2 --
->   tools/testing/selftests/rtc/Makefile                          | 2 +-
->   tools/testing/selftests/seccomp/seccomp_benchmark.c           | 1 -
->   tools/testing/selftests/seccomp/seccomp_bpf.c                 | 2 --
->   tools/testing/selftests/sgx/Makefile                          | 2 +-
->   tools/testing/selftests/sgx/sigstruct.c                       | 1 -
->   tools/testing/selftests/tmpfs/Makefile                        | 2 +-
->   tools/testing/selftests/user_events/abi_test.c                | 2 --
->   tools/testing/selftests/x86/amx.c                             | 2 --
->   tools/testing/selftests/x86/check_initial_reg_state.c         | 3 ---
->   tools/testing/selftests/x86/corrupt_xstate_header.c           | 3 ---
->   tools/testing/selftests/x86/entry_from_vm86.c                 | 3 ---
->   tools/testing/selftests/x86/fsgsbase.c                        | 2 --
->   tools/testing/selftests/x86/fsgsbase_restore.c                | 2 --
->   tools/testing/selftests/x86/ioperm.c                          | 2 --
->   tools/testing/selftests/x86/iopl.c                            | 2 --
->   tools/testing/selftests/x86/lam.c                             | 1 -
->   tools/testing/selftests/x86/ldt_gdt.c                         | 2 --
->   tools/testing/selftests/x86/mov_ss_trap.c                     | 2 --
->   tools/testing/selftests/x86/nx_stack.c                        | 2 --
->   tools/testing/selftests/x86/ptrace_syscall.c                  | 2 --
->   tools/testing/selftests/x86/sigaltstack.c                     | 2 --
->   tools/testing/selftests/x86/sigreturn.c                       | 3 ---
->   tools/testing/selftests/x86/single_step_syscall.c             | 3 ---
->   tools/testing/selftests/x86/syscall_arg_fault.c               | 3 ---
->   tools/testing/selftests/x86/syscall_numbering.c               | 3 ---
->   tools/testing/selftests/x86/sysret_rip.c                      | 3 ---
->   tools/testing/selftests/x86/sysret_ss_attrs.c                 | 3 ---
->   tools/testing/selftests/x86/test_FCMOV.c                      | 4 ----
->   tools/testing/selftests/x86/test_FCOMI.c                      | 4 ----
->   tools/testing/selftests/x86/test_FISTTP.c                     | 4 ----
->   tools/testing/selftests/x86/test_mremap_vdso.c                | 1 -
->   tools/testing/selftests/x86/test_shadow_stack.c               | 3 ---
->   tools/testing/selftests/x86/test_syscall_vdso.c               | 4 ----
->   tools/testing/selftests/x86/test_vsyscall.c                   | 3 ---
->   tools/testing/selftests/x86/unwind_vdso.c                     | 3 ---
->   tools/testing/selftests/x86/vdso_restorer.c                   | 3 ---
->   218 files changed, 20 insertions(+), 426 deletions(-)
-> 
-> --
-> 2.45.0.rc1.225.g2a3ae87e7f-goog
+On Thu, May 09, 2024 at 12:40:01AM +0300, Tariq Toukan wrote:
 > 
 > 
+> On 06/05/2024 21:04, Joe Damato wrote:
+> > On Fri, May 03, 2024 at 05:34:29PM -0700, Jakub Kicinski wrote:
+> > > On Fri, 3 May 2024 16:53:40 -0700 Joe Damato wrote:
+> > > > > diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+> > > > > index c7ac4539eafc..f5d9f3ad5b66 100644
+> > > > > --- a/include/net/netdev_queues.h
+> > > > > +++ b/include/net/netdev_queues.h
+> > > > > @@ -59,6 +59,8 @@ struct netdev_queue_stats_tx {
+> > > > >    * statistics will not generally add up to the total number of events for
+> > > > >    * the device. The @get_base_stats callback allows filling in the delta
+> > > > >    * between events for currently live queues and overall device history.
+> > > > > + * @get_base_stats can also be used to report any miscellaneous packets
+> > > > > + * transferred outside of the main set of queues used by the networking stack.
+> > > > >    * When the statistics for the entire device are queried, first @get_base_stats
+> > > > >    * is issued to collect the delta, and then a series of per-queue callbacks.
+> > > > >    * Only statistics which are set in @get_base_stats will be reported
+> > > > > 
+> > > > > 
+> > > > > SG?
+> > > > 
+> > > > I think that sounds good and makes sense, yea. By that definition, then I
+> > > > should leave the PTP stats as shown above. If you agree, I'll add that
+> > > > to the v2.
+> > > 
+> > > Yup, agreed.
+> > > 
+> > > > I feel like I should probably wait before sending a v2 with PTP included in
+> > > > get_base_stats to see if the Mellanox folks have any hints about why rtnl
+> > > > != queue stats on mlx5?
+> > > > 
+> > > > What do you think?
+> > > 
+> > > Very odd, the code doesn't appear to be doing any magic :S Did you try
+> > > to print what the delta in values is? Does bringing the interface up and
+> > > down affect the size of it?
+> > 
+> > I booted the kernel which includes PTP stats in the base stats as you've
+> > suggested (as shown in the diff in this thread) and I've brought the
+> > interface down and back up:
+> > 
+> > $ sudo ip link set dev eth0 down
+> > $ sudo ip link set dev eth0 up
+> > 
+> > Re ran the test script, which includes some mild debugging print out I
+> > added to show the delta for rx-packets (but I think all stats are off):
+> > 
+> >    # Exception| Exception: Qstats are lower, fetched later
+> > 
+> > key: rx-packets rstat: 1192281902 qstat: 1186755777
+> > key: rx-packets rstat: 1192281902 qstat: 1186755781
+> > 
+> > So qstat is lower by (1192281902 - 1186755781) = 5,526,121
+> > 
+> > Not really sure why, but I'll take another look at the code this morning to
+> > see if I can figure out what's going on.
+> > 
+> > I'm clearly doing something wrong or misunderstanding something about the
+> > accounting that will seem extremely obvious in retrospect.
+> 
+> Hi Joe,
+> 
+> Thanks for your patch.
+> Apologies for the late response. I was on PTO for some time.
 
-thanks,
--- Shuah
+No worries, I hope you enjoyed your PTO. I appreciate your response, time,
+and energy.
+
+> From first look the patch looks okay. The overall approach seems correct.
+
+Sounds good to me!
+ 
+> The off-channels queues (like PTP) do not exist in default. So they are out
+> of the game unless you explicitly enables them.
+
+I did not enable them, but if you saw the thread, it sounds like Jakub's
+preference is that in the v2 I include the PTP stats in get_base_stats.
+
+Are you OK with that?
+Are there other queue stats I should include as well?
+
+> A possible reason for this difference is the queues included in the sum.
+> Our stats are persistent across configuration changes, so they doesn't reset
+> when number of channels changes for example.
+> 
+> We keep stats entries for al ring indices that ever existed. Our driver
+> loops and sums up the stats for all of them, while the stack loops only up
+> to the current netdev->real_num_rx_queues.
+> 
+> Can this explain the diff here?
+
+Yes, that was it. Sorry I didn't realize this case. My lab machine runs a
+script to adjust the queue count shortly after booting.
+
+I disabled that and re-ran:
+
+  NETIF=eth0 tools/testing/selftests/drivers/net/stats.py
+
+and all tests pass.
 
