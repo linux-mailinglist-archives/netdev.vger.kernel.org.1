@@ -1,113 +1,149 @@
-Return-Path: <netdev+bounces-94430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C3838BF733
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:39:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7987D8BF73B
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:41:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C01A1F22873
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:39:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FCB91F2158C
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334B72C856;
-	Wed,  8 May 2024 07:39:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A982C85F;
+	Wed,  8 May 2024 07:41:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1nuvvsDk";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VhcHvm6K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RaiOBOFF"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5A73A1DA;
-	Wed,  8 May 2024 07:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF192C197;
+	Wed,  8 May 2024 07:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715153942; cv=none; b=qSJ9hzS/inqPb9UlrM7genso6Th88gUw0TB5n5OWcdsOCEgJ3zZgKy44CqgyKhBfrtcXz6NDsBJgnC8BZjCgXPWOHTTma/rUFAKfS8dt7zPscr2+T0ur4yHXosPTU2HZrshXB8ljIZXiSYwRWxZ8Q5vYQDI79Vd3ofUaymDkq30=
+	t=1715154087; cv=none; b=noZe6u3J67DZU8gZWmmaqYTM0i/ke40XydovrbFGROB6xc+ZRPvuAmEtiR9huaBiJk/fZhhGP3ALT6hoiLZDaULlRMUrROnVewdxW8751I9QD891bRlOXgSw1/mQRyDmAmxzE3oUgqNrNio4v9t9msRspUMThsJAKRs0OaYyq/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715153942; c=relaxed/simple;
-	bh=GRBM6Q9ulEa6b1C1AIlEe8Wdt4+S7xROw+0i92+JaGM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Vl2oIYOqyOkitW77ksIncoyWS3WdSqPuvnWaTgkGHmYgFKNyjqGKE8rB0z05nOpE2SOvzKqYi5uwUohh3wM5duRx8irqZOsI3mfzRYGi5zy0uFtGW//D7zEsFFUgK+WXC7dGsncrbZiKGy7fxj0JXMqu63aMEkDZhUEl+9Crtrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1nuvvsDk; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VhcHvm6K; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1715153938;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H6hqXb9MCRTxs635sBkjBFmdNV/lsU4W+VAlI6NfWPc=;
-	b=1nuvvsDkJk308I59qyuDDAY7raMXe58IJXHnvzks1l63fWs+dsBnkjDhXWyX+RkV5iwtA8
-	T3RA3EpWWIdkiKp1cax73+1KK2ox+7wLrbrvMIvRG2TELc+w2JbgQjKEZq+5ZfvRrJD/8F
-	F8jpJogjcxUpCQMQFrJMErIyKbaTyAenawxMeeWOe14p9gCqzdgaEKrp44L/1IWM1lalyL
-	yw6OMkBZatjNT8rJ8aNZ4It2sMoGGoLVipfSUaTMOZCrVC869f7TDfA9R9MnAokrpPpt/B
-	OJYBR/wOvl0N9uAd1+YZM4U0seXYiQfQ+tYgjvnzs9psZGw2RDjWoVeZPgz0Xw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1715153938;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H6hqXb9MCRTxs635sBkjBFmdNV/lsU4W+VAlI6NfWPc=;
-	b=VhcHvm6KLaVB6rBreMYUoEE64Vi598JqUzdOvrN74UVu4Cjh8nJs+xoFXBzFMTwf1LmnpH
-	S/C3f/eYNLCT5VAA==
-To: Richard Cochran <richardcochran@gmail.com>, Mahesh Bandewar
- <maheshb@google.com>
-Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Arnd
- Bergmann <arnd@arndb.de>, Sagi Maimon <maimon.sagi@gmail.com>, Jonathan
- Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>, Mahesh Bandewar
- <mahesh@bandewar.net>
-Subject: Re: [PATCHv4 net-next] ptp/ioctl: support MONOTONIC_RAW timestamps
- for PTP_SYS_OFFSET_EXTENDED
-In-Reply-To: <ZjsDJ-adNCBQIbG1@hoboy.vegasvil.org>
-References: <20240502211047.2240237-1-maheshb@google.com>
- <ZjsDJ-adNCBQIbG1@hoboy.vegasvil.org>
-Date: Wed, 08 May 2024 09:38:58 +0200
-Message-ID: <87cypwpxbh.ffs@tglx>
+	s=arc-20240116; t=1715154087; c=relaxed/simple;
+	bh=hpUE2jTXU0F1c21XagX7+x/2j0uwkL8RIi4dEVUUWjw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s82dtUhe2NIOqUuhxZibXLh/yAX9r7oSdksR6Xx8hKU/J2Qkh0VVXHPXjeV1Puvy7d+JJ9P/7i/yeqAPqsdEblQZv9+bVUvj2KPgaiWmOYvFs74amS7rSQChpno6B0a4pm3H5WCYcrDNWn9xIyXCKpfP7zcQlrGjGG9ba12MGGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RaiOBOFF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19113C113CC;
+	Wed,  8 May 2024 07:41:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715154086;
+	bh=hpUE2jTXU0F1c21XagX7+x/2j0uwkL8RIi4dEVUUWjw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RaiOBOFFPbftdumizgVPQf/0/TNG2AthXwiYZS0H7klZ0CrHAPbEyAtFp0plfzZ2n
+	 zNcat72gsbL81UQ47BFr5XAi0HisnZnSZPri4yZ9fJjmI9cX7ELnUzftzjNTM4JRAQ
+	 Zdp5Xg4T8SDR0i4xT5iPa1emBQ/KcTyLJnhKmPoOFHLSA0eB7OqGm14iqoqDswL4Ay
+	 lhICi1SMAk0BbGBxEeZM91uYn/KFBNWp2Ed1Grq51nn5heACqUsWvVVMOVKcTkRFKz
+	 NaQ7ZNCXaNiWPJYegu+eSPBF0o6IFwkTnDN9iAAu4aRVKtZzoVymZL/6n8ymjVYKfP
+	 jLu7ixfPNG5ww==
+Date: Wed, 8 May 2024 08:39:52 +0100
+From: Simon Horman <horms@kernel.org>
+To: Kamil =?utf-8?B?SG9yw6Fr?= - 2N <kamilh@axis.com>
+Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+	andrew@lunn.ch, hkallweit1@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] net: phy: bcm-phy-lib: Implement BroadR-Reach
+ link modes
+Message-ID: <20240508073952.GL15955@kernel.org>
+References: <20240506144015.2409715-1-kamilh@axis.com>
+ <20240506144015.2409715-4-kamilh@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240506144015.2409715-4-kamilh@axis.com>
 
-On Tue, May 07 2024 at 21:44, Richard Cochran wrote:
-> On Thu, May 02, 2024 at 02:10:47PM -0700, Mahesh Bandewar wrote:
->> +/*
->> + * ptp_sys_offset_extended - data structure for IOCTL operation
->> + *			     PTP_SYS_OFFSET_EXTENDED
->> + *
->> + * @n_samples:	Desired number of measurements.
->> + * @clockid:	clockid of a clock-base used for pre/post timestamps.
->> + * @rsv:	Reserved for future use.
->> + * @ts:		Array of samples in the form [pre-TS, PHC, post-TS]. The
->> + *		kernel provides @n_samples.
->> + *
->> + * History:
->> + * v1: Initial implementation.
->> + *
->> + * v2: Use the first word of the reserved-field for @clockid. That's
->> + *     backward compatible since v1 expects all three reserved words
->> + *     (@rsv[3]) to be 0 while the clockid (first word in v2) for
->> + *     CLOCK_REALTIME is '0'.
->
-> This is not really appropriate for a source code comment.  The
-> un-merged patch series iterations are preserved at lore.kernel in case
-> someone needs that.
->
-> The "backward compatible" information really wants to be in the commit
-> message.
+On Mon, May 06, 2024 at 04:40:15PM +0200, Kamil Horák - 2N wrote:
+> Implement single-pair BroadR-Reach modes on bcm5481x PHY by Broadcom.
+> Create set of functions alternative to IEEE 802.3 to handle configuration
+> of these modes on compatible Broadcom PHYs.
+> 
+> Signed-off-by: Kamil Horák - 2N <kamilh@axis.com>
 
-I agree that it wants to be in the commit message, but having the
-version information in the kernel-doc which describes the UAPI is
-sensible and useful. That's where I'd look first and asking a user to
-dig up this information on lore is not really helpful.
+Hi Kamil,
 
-Thanks,
+Some minor feedback from my side.
 
-        tglx
+...
+
+> diff --git a/drivers/net/phy/bcm-phy-lib.c b/drivers/net/phy/bcm-phy-lib.c
+
+...
+
+> +/**
+> + * bcm_linkmode_adv_to_mii_adv_t
+> + * @advertising: the linkmode advertisement settings
+> + *
+> + * A small helper function that translates linkmode advertisement
+> + * settings to phy autonegotiation advertisements for the
+> + * MII_BCM54XX_LREANAA register.
+
+Please consider including a Return: section in the Kernel doc.
+
+Flagged by ./scripts/kernel-doc -Wall -none
+
+> + */
+> +static inline u32 bcm_linkmode_adv_to_mii_adv_t(unsigned long *advertising)
+
+...
+
+> diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
+
+...
+
+> +static int bcm_read_master_slave(struct phy_device *phydev)
+> +{
+> +	int cfg, state;
+> +	int val;
+> +
+> +	/* In BroadR-Reach mode we are always capable of master-slave
+> +	 *  and there is no preferred master or slave configuration
+> +	 */
+> +	phydev->master_slave_get = MASTER_SLAVE_CFG_UNKNOWN;
+> +	phydev->master_slave_state = MASTER_SLAVE_STATE_UNKNOWN;
+> +
+> +	val = phy_read(phydev, MII_BCM54XX_LRECR);
+> +	if (val < 0)
+> +		return val;
+> +
+> +	if ((val & LRECR_LDSEN) == 0) {
+> +		if (val & LRECR_MASTER)
+> +			cfg = MASTER_SLAVE_CFG_MASTER_FORCE;
+> +		else
+> +			cfg = MASTER_SLAVE_CFG_SLAVE_FORCE;
+> +	}
+> +
+> +	val = phy_read(phydev, MII_BCM54XX_LRELDSE);
+> +	if (val < 0)
+> +		return val;
+> +
+> +	if (val & LDSE_MASTER)
+> +		state = MASTER_SLAVE_STATE_MASTER;
+> +	else
+> +		state = MASTER_SLAVE_STATE_SLAVE;
+> +
+> +	phydev->master_slave_get = cfg;
+
+Perhaps it is not possible, but it appears that if the
+((val & LRECR_LDSEN) == 0) condition above is not met then
+cfg is used uninitialised here.
+
+Flagged by Smatch.
+
+> +	phydev->master_slave_state = state;
+> +
+> +	return 0;
+> +}
+
+...
 
