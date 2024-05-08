@@ -1,131 +1,84 @@
-Return-Path: <netdev+bounces-94688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC75C8C0335
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 19:34:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D048C033F
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 19:36:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5CEC1C217FF
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 17:34:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB2AF1F20CD4
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 17:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC9012D754;
-	Wed,  8 May 2024 17:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E98127B5D;
+	Wed,  8 May 2024 17:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IESRWX5V"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2QUxa6go"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E2212C469
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 17:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FD8E57F;
+	Wed,  8 May 2024 17:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715189636; cv=none; b=Ij3sWRJ8I1ttaHjgMBlfgkeTYkMpTQ8dw/NcWAhKOro73OTX31qoSPqvAL+26DMELut9YxidKdgWdRLE42g5s+Lt97kVsDCuBDSkZqgmSG+mXg9Z9plyXdphsizDm0SQAhYTY12ehmyLQfS+XVJKh4xesg6y63UlWW5PZ4sLLL8=
+	t=1715189791; cv=none; b=VXym42hgxWsFHsZ45CWS8ASaDA6ingDD3pVKM8ei5gsP6wkxKZG1IjH4nZo5ymZnfO8m2L0T769EUGaNEG9sWPYOq52bTYESHUc/xi8MjAmD4bHm43y6ybuiBJNG8K0jLOhJoTCWo4iacFdSYjEeEnr6dQE3aPL4gRhY3OBbnZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715189636; c=relaxed/simple;
-	bh=S5kAvu7vvLLNh2OrPSKBV1yzdQzL7XdknFdkUe9c6Oc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EkCFVtxigwn7tzMGkNvYXTwp0gXdaxeiL3FjM7Zp+JGtUIt48pLpv9F3gUF1faTfocv0jn7yjF3Ml9PFKGJB8TcXWerwZJqu7xxgLw4TG9ssHCU80puw9Ukly9+iiLd88essm4FM/mNNA8fyveE8UFgSao1+K599YYmTuqSG3UU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IESRWX5V; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715189635; x=1746725635;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=S5kAvu7vvLLNh2OrPSKBV1yzdQzL7XdknFdkUe9c6Oc=;
-  b=IESRWX5VZuanFw2ifUFgxOBcSKfAk4yAN33IiAz6U1fSHrEvnLLaA6uW
-   gZ6RK36vWZiHAWDPUTJFkA8vttL/6cVfeAGvKBBj2rsK92YcEboscZgq2
-   eL5h4bOPmV6XtgLxB4vwxLV+YarHnP01bsp/hVL2FlDp1pAGpfAlA+sjE
-   7ernqU4mydlLF8/kDGOf47sZfFHgaZJz8WgSnCj9nnL279GR+kD9CeXuc
-   rLaA051d4W6tVODVGtxcdHRhfvlRl18b3M0RsvsU8yvVyCqFJ6dtA+cm/
-   7uIBK1Va0Rryvbr/+QZXOnOdoMyHgVNvLCRb0jham8yi6zWFYjDhCa06V
-   Q==;
-X-CSE-ConnectionGUID: TNSNYiJNRE2Lb7x0KBYZgw==
-X-CSE-MsgGUID: b7aN4xgPSM6P9EteyzsXog==
-X-IronPort-AV: E=McAfee;i="6600,9927,11067"; a="10938980"
-X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
-   d="scan'208";a="10938980"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 10:33:52 -0700
-X-CSE-ConnectionGUID: FohlTwPFR5OsuEqxfPJgWg==
-X-CSE-MsgGUID: IsVsMyQ6RAmlL3JniZBw8Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
-   d="scan'208";a="28843725"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa010.jf.intel.com with ESMTP; 08 May 2024 10:33:51 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	anthony.l.nguyen@intel.com,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Sasha Neftin <sasha.neftin@intel.com>
-Subject: [PATCH net-next 7/7] net: e1000e & ixgbe: Remove PCI_HEADER_TYPE_MFD duplicates
-Date: Wed,  8 May 2024 10:33:39 -0700
-Message-ID: <20240508173342.2760994-8-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240508173342.2760994-1-anthony.l.nguyen@intel.com>
-References: <20240508173342.2760994-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1715189791; c=relaxed/simple;
+	bh=WvGRDpFnU7bdvexiQnVTby+Q8hc/HiA1N+1bPXgNymI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bu36QB4TNbQ4opj4AXLDDsCY7/PdI+HNIwuPuQj7XuTHryB1eSF7arMXk1xV1q/DCpCHDFTlbUHQG5Z1pssDo3CmGTWdF5AbA1kNZJ5LFKrDSW54btOFqGHhRWokD8c3QEOYESIyxrjVK+FMgpDIewd8uZJQlsD2QLo6gW3oxug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2QUxa6go; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IJWHD6fJD+RTBbtpWt6pxNfFmH4N0xHA3T0EGF6awZY=; b=2QUxa6goXrmd7mthrh8ujrZ590
+	+3ABIjgJ/XwGcyAuqlsvFjwD7XKCu2xvBKAFb/JJQnYFqiyXaj6I/Y7pVCMqtPJ89ojccc3lbS3ep
+	J2L2+9mcoOn120iQVHIrHPA6PICHVYsDVIL+Q01EVP5CVarRztYx2Qr6+FQDbr5eDwI0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s4lDF-00Eyhb-Qb; Wed, 08 May 2024 19:36:17 +0200
+Date: Wed, 8 May 2024 19:36:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next,v2] net: ethernet: rtsn: Add support for Renesas
+ Ethernet-TSN
+Message-ID: <c4c84b76-ac3b-4f5f-ae4e-4712dede8dc2@lunn.ch>
+References: <20240507201839.1763338-1-niklas.soderlund+renesas@ragnatech.se>
+ <4970fd77-504c-4fb3-9c47-e4185d03e74a@lunn.ch>
+ <20240508105831.GB1385281@ragnatech.se>
+ <ba35173c-eaba-4f13-a2ed-011f6f7a48d1@lunn.ch>
+ <20240508125557.GG1385281@ragnatech.se>
+ <51b6a4f8-ef48-400f-acb6-fd20e661802d@lunn.ch>
+ <20240508151043.GH1385281@ragnatech.se>
+ <CAMuHMdWQNQWtofKqAcdWurk5eV+gKaG3b-pWNd+Fjpg89BLkWA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdWQNQWtofKqAcdWurk5eV+gKaG3b-pWNd+Fjpg89BLkWA@mail.gmail.com>
 
-From: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+> While explicit clock management works, please use pm_runtime_*()
+> instead, as the device is part of a Clock Domain.  Also, the TSN
+> block may be reused on a different SoC, where it is part of a real
+> power domain, and manual clock management won't be sufficient.
 
-PCI_HEADER_TYPE_MULTIFUNC is define by e1000e and ixgbe and both are
-unused. There is already PCI_HEADER_TYPE_MFD in pci_regs.h anyway which
-should be used instead so remove the duplicated defines of it.
+Please document this in the commit message. It was not obvious to me
+at least that pm_runtime without callbacks can effect clocks.
 
-Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Acked-by: Sasha Neftin <sasha.neftin@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/e1000e/defines.h   | 2 --
- drivers/net/ethernet/intel/ixgbe/ixgbe_type.h | 1 -
- 2 files changed, 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
-index 23a58cada43a..5e2cfa73f889 100644
---- a/drivers/net/ethernet/intel/e1000e/defines.h
-+++ b/drivers/net/ethernet/intel/e1000e/defines.h
-@@ -679,8 +679,6 @@
- /* PCI/PCI-X/PCI-EX Config space */
- #define PCI_HEADER_TYPE_REGISTER     0x0E
- 
--#define PCI_HEADER_TYPE_MULTIFUNC    0x80
--
- #define PHY_REVISION_MASK      0xFFFFFFF0
- #define MAX_PHY_REG_ADDRESS    0x1F  /* 5 bit address bus (0-0x1F) */
- #define MAX_PHY_MULTI_PAGE_REG 0xF
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-index ed440dd0c4f9..897fe357b65b 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-@@ -2179,7 +2179,6 @@ enum {
- #define IXGBE_PCI_LINK_SPEED_5000 0x2
- #define IXGBE_PCI_LINK_SPEED_8000 0x3
- #define IXGBE_PCI_HEADER_TYPE_REGISTER  0x0E
--#define IXGBE_PCI_HEADER_TYPE_MULTIFUNC 0x80
- #define IXGBE_PCI_DEVICE_CONTROL2_16ms  0x0005
- 
- #define IXGBE_PCIDEVCTRL2_TIMEO_MASK	0xf
--- 
-2.41.0
-
+   Andrew
 
