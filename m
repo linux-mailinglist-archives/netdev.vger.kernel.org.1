@@ -1,236 +1,114 @@
-Return-Path: <netdev+bounces-94418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58AD28BF6C2
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:09:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1B3F8BF6CA
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:12:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C77B1C20C0F
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:09:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A761E1F22232
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD12522EF8;
-	Wed,  8 May 2024 07:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EBFF2561D;
+	Wed,  8 May 2024 07:12:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ZAyKmc+N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xYSdhQsQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2C115E86;
-	Wed,  8 May 2024 07:09:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F73D24B21
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 07:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715152190; cv=none; b=WiPtpVHcLKxpjLUm5N2hFGuF1TqUk+FUKWTNqRxt1raiPpX0MOj6Rm2FB/QToqPvvebS8KuAlGRKtnEYdOEkbA0xkNwQWH6LmxaXu/YUhqoZVUpns3H/Sq37v8yKoA4jVE+zQ8y1AuNrpf7QHKM/2dX3nI5SUdMTMKX4Qbt7ltA=
+	t=1715152322; cv=none; b=g2ifsZYCxQnlEHQ5yj7wSH9znBHgUn4kXszutVmQ503V0Jssl6+BI1Xt3lEDKNVESTnuoUprvbSleSckCnFCVs9ahaXYbMQa52tNASUm3zypISh+K7ORx2Bc83RTTDKpxIxHVMiXL5qm76ff2hLb55GZmRSk2KFuZVIGYPz42RA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715152190; c=relaxed/simple;
-	bh=4I3/b/RWdKDsqAWaFoI38koUjVEP35TxOAyx2gUrEbA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IZbYw2IYFJiYiGxlFBe8q75d+kG0k+dO65FaW2raoR24bEk4kks70FBMOXHjtGGVztHw+sArfLT3RhIrF/8vQ84XBxzjhLtm1Yln6yeoz/nOubi1uuOteOaOpVZJ3TU3suQ/X2r+OJWOp0iWP0Q1dwyniTQVlWbmKf/lmYMLrD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ZAyKmc+N; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4485RT5r001818;
-	Wed, 8 May 2024 00:09:42 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	pfpt0220; bh=Z43sw7wJKj+AEUjOjRBr3+5NfAhSnoJw42gJbDaeRzs=; b=ZAy
-	Kmc+NQhqIRY3EuATqwa85y7ArWFLigIe6uTlxolCC4/JHrL6ZyTsLHOfSd0oLNsw
-	HoPvR5ybQo5rmuh0emLABqCsaNoqWixVh7zZ+G+63bvCc5ZQnv/Q9c9yWM2hVpzy
-	Zo84rnm/3dffBCVfxTlyQEjerQiAP3gHFNjYW4I0dBIOczH6u9RbdmdjlFZwEvU9
-	Z7xB1wRpetLvOaqmK9LngumPZ7Ocdo3dJkelvnbLZmi3tmh3crmOmae30o8d5L0c
-	sQJ9CNQTDfiiqTBESkDdnMvzzUx0jScNGsEpcvnKfImCwwXtfzqDJy0MA0KULwDy
-	ohBNCWgsn5jes1f6w5Q==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3xysfmjabg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 May 2024 00:09:40 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 8 May 2024 00:09:39 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 8 May 2024 00:09:39 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 8378D5B6942;
-	Wed,  8 May 2024 00:09:36 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-        <davem@davemloft.net>, <sbhatta@marvell.com>, <gakula@marvell.com>,
-        <sgoutham@marvell.com>, <naveenm@marvell.com>
-Subject: [net-next Patch] octeontx2-pf: Reuse Transmit queue/Send queue index of HTB class
-Date: Wed, 8 May 2024 12:39:35 +0530
-Message-ID: <20240508070935.11501-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1715152322; c=relaxed/simple;
+	bh=EECYBmeowsEM9QAMxkOX5cI6KMRFf+aN6TKibBIl5e0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A5agpWe5i38zGCIP1lbAxyve/m1Xe8XjLs2JPnzUdL5zOJmD4eikDVW1fEGS16024YgXBqTjhTRgeYD6RS5spYUuL8Ww3YHS2y/qR8lIPiNMPqq0jSYE2e2hsm530Gz1KA4rcaHs6j8RYWlIJunvmnGZA4hj9Kz2WPASZRZ8MB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xYSdhQsQ; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-572a1b3d6baso6644a12.1
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 00:12:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715152319; x=1715757119; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cFLnG0J+oQmKDBlznHjvioaqBMv9WOmRiyhgyzt7qjo=;
+        b=xYSdhQsQYkJjTU+tgGkRL+iXgE66ekH5ij7bmgSaDs+/bGgbzqMvXg/rywuWDY3e6e
+         P9Z5ASpPSCWTfREoMSfBqvvZUSoiV8MVeEFFlqzrkglpK4dyREaz328HHa3GQWF4WoJS
+         B+HE7HOdxtfCs1s+UimsvDu7ojj/ySjTA4eRvqIFGdjq5LPjzovS3QeSz9UXiaCpynmF
+         YLtDJJUTO5TNAZgnFFKxfvCd6glvHqd40H/xvUBDA0BHdI6msGrRaWzIzfYMWHvyKhl7
+         ET5qpatpx311bgi2gNP/0qXrNsVAhtycCDGQJT2q6iBdItrLF9xWZKLcO2iAfj67ViRA
+         YqVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715152319; x=1715757119;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cFLnG0J+oQmKDBlznHjvioaqBMv9WOmRiyhgyzt7qjo=;
+        b=J3bm79NOlBs5OqcnTtT0VpzqwyTAk9H/G9+6RzKhXzmbOYxs1UjKLhLsw2paCyT6vL
+         J7FQ7VS3Go8O0IekTWT93Zy0NPeEmcJc1bVNE+OXSEbTvCF661ifhUCjZWjeXCnISN0i
+         0P+AOtrf1MWadrOF8BOyrEZNOVpRSm3NLfPpk7G0ZYdTsCIxvYxgHiNf3tLoRopwhZiw
+         qAuBS0qAxmaAPMJ8Yx+wZ99HXMfre5slAk3GutY40ZzxkVnoPdpO+b7D7OcIQpyTP6U5
+         5M6ZUVw6TNcwWEwqbH+/D/bcbOn1gYhB2JwUK/0c/cMfDX0xzO7KTo3SbVyGpJySRY0K
+         GZCw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOKxrQ8AJbDxTn88pJqaClCYim0xT0eV/x7wWaQ7C4GxK8lAzMiwI8LZYY3HyfLPR8QKyId10O7FaZ/49t1UKbhoGdD913
+X-Gm-Message-State: AOJu0YxKRq/64BEQyPS5z79XhxUF+BMqRxkFCvRoPlizsy8pB4RgcNLr
+	U6QviuETAlc/2JfIST4g/YNMxAcQRkFPs4QmPdeMVRe5u5ZbghVYKA7gzy3OUNX/jn1feBQATUv
+	0f//9mo2oCIk2D0XNePkORXBMwRCee3119I/A
+X-Google-Smtp-Source: AGHT+IGKV7NntvnZda0g7YDQmt1Qa4mft2JhpTkWD4H+su1I/KgJp1e9S4NzCDRnvXRjYxfMB4RL0SfLCVgVr0lTrlU=
+X-Received: by 2002:a05:6402:348b:b0:572:554b:ec66 with SMTP id
+ 4fb4d7f45d1cf-57321028182mr90182a12.3.1715152318344; Wed, 08 May 2024
+ 00:11:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: Ao6lBRG0M2fGNjaTUJZ7AYl2fbuGofun
-X-Proofpoint-ORIG-GUID: Ao6lBRG0M2fGNjaTUJZ7AYl2fbuGofun
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-08_02,2024-05-08_01,2023-05-22_02
+References: <20240506142835.3665037-1-edumazet@google.com> <20240507174151.477792ac@kernel.org>
+In-Reply-To: <20240507174151.477792ac@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 8 May 2024 09:11:44 +0200
+Message-ID: <CANn89iKG4XE448P-AjQKkoK9kJkdBCXMP244biHbcrSA_zDmKQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: usb: smsc95xx: stop lying about skb->truesize
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Steve Glendinning <steve.glendinning@shawell.net>, 
+	UNGLinuxDriver@microchip.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Real number of Transmit queues are incremented when user enables HTB
-class and vice versa. Depending on SKB priority driver returns transmit
-queue (Txq). Transmit queues and Send queues are one-to-one mapped.
+On Wed, May 8, 2024 at 2:41=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Mon,  6 May 2024 14:28:35 +0000 Eric Dumazet wrote:
+> > -                     ax_skb->len =3D size;
+> > -                     ax_skb->data =3D packet;
+> > -                     skb_set_tail_pointer(ax_skb, size);
+> > +                     skb_put(ax_skb, size - 4);
+> > +                     memcpy(ax_skb->data, packet, size - 4);
+> >
+> >                       if (dev->net->features & NETIF_F_RXCSUM)
+> >                               smsc95xx_rx_csum_offload(ax_skb);
+> > -                     skb_trim(ax_skb, ax_skb->len - 4); /* remove fcs =
+*/
+> > -                     ax_skb->truesize =3D size + sizeof(struct sk_buff=
+);
+>
+> I think this one's off:
+>
+> static void smsc95xx_rx_csum_offload(struct sk_buff *skb)
+> {
+>      skb->csum =3D *(u16 *)(skb_tail_pointer(skb) - 2);
+>      skb->ip_summed =3D CHECKSUM_COMPLETE;
+>      skb_trim(skb, skb->len - 2);
+> }
 
-In few scenarios, Driver is returning transmit queue value which is
-greater than real number of transmit queue and Stack detects this as
-error and overwrites transmit queue value.
-
-For example
-user has added two classes and real number of queues are incremented
-accordingly
-- tc class add dev eth1 parent 1: classid 1:1 htb
-      rate 100Mbit ceil 100Mbit prio 1 quantum 1024
-- tc class add dev eth1 parent 1: classid 1:2 htb
-      rate 100Mbit ceil 200Mbit prio 7 quantum 1024
-
-now if user deletes the class with id 1:1, driver decrements the real
-number of queues
-- tc class del dev eth1 classid 1:1
-
-But for the class with id 1:2, driver is returning transmit queue
-value which is higher than real number of transmit queue leading
-to below error
-
-eth1 selects TX queue x, but real number of TX queues is x
-
-This patch solves the problem by assigning deleted class transmit
-queue/send queue to active class.
-
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
----
- .../net/ethernet/marvell/octeontx2/nic/qos.c  | 80 ++++++++++++++++++-
- 1 file changed, 79 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-index 1723e9912ae0..070711df612e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-@@ -545,6 +545,20 @@ otx2_qos_sw_create_leaf_node(struct otx2_nic *pfvf,
- 	return node;
- }
- 
-+static struct otx2_qos_node
-+*otx2_sw_node_find_by_qid(struct otx2_nic *pfvf, u16 qid)
-+{
-+	struct otx2_qos_node *node = NULL;
-+	int bkt;
-+
-+	hash_for_each(pfvf->qos.qos_hlist, bkt, node, hlist) {
-+		if (node->qid == qid)
-+			break;
-+	}
-+
-+	return node;
-+}
-+
- static struct otx2_qos_node *
- otx2_sw_node_find(struct otx2_nic *pfvf, u32 classid)
- {
-@@ -917,6 +931,7 @@ static void otx2_qos_enadis_sq(struct otx2_nic *pfvf,
- 		otx2_qos_disable_sq(pfvf, qid);
- 
- 	pfvf->qos.qid_to_sqmap[qid] = node->schq;
-+	otx2_qos_txschq_config(pfvf, node);
- 	otx2_qos_enable_sq(pfvf, qid);
- }
- 
-@@ -1475,13 +1490,45 @@ static int otx2_qos_leaf_to_inner(struct otx2_nic *pfvf, u16 classid,
- 	return ret;
- }
- 
-+static int otx2_qos_cur_leaf_nodes(struct otx2_nic *pfvf)
-+{
-+	int last = find_last_bit(pfvf->qos.qos_sq_bmap, pfvf->hw.tc_tx_queues);
-+
-+	return last ==  pfvf->hw.tc_tx_queues ? 0 : last + 1;
-+}
-+
-+static void otx2_reset_qdisc(struct net_device *dev, u16 qid)
-+{
-+	struct netdev_queue *dev_queue = netdev_get_tx_queue(dev, qid);
-+	struct Qdisc *qdisc = rtnl_dereference(dev_queue->qdisc_sleeping);
-+
-+	if (!qdisc)
-+		return;
-+
-+	spin_lock_bh(qdisc_lock(qdisc));
-+	qdisc_reset(qdisc);
-+	spin_unlock_bh(qdisc_lock(qdisc));
-+}
-+
-+static void otx2_cfg_smq(struct otx2_nic *pfvf, struct otx2_qos_node *node,
-+			 int qid)
-+{
-+	struct otx2_qos_node *tmp;
-+
-+	list_for_each_entry(tmp, &node->child_schq_list, list)
-+		if (tmp->level == NIX_TXSCH_LVL_MDQ) {
-+			otx2_qos_txschq_config(pfvf, tmp);
-+			pfvf->qos.qid_to_sqmap[qid] = tmp->schq;
-+		}
-+}
-+
- static int otx2_qos_leaf_del(struct otx2_nic *pfvf, u16 *classid,
- 			     struct netlink_ext_ack *extack)
- {
- 	struct otx2_qos_node *node, *parent;
- 	int dwrr_del_node = false;
-+	u16 qid, moved_qid;
- 	u64 prio;
--	u16 qid;
- 
- 	netdev_dbg(pfvf->netdev, "TC_HTB_LEAF_DEL classid %04x\n", *classid);
- 
-@@ -1517,6 +1564,37 @@ static int otx2_qos_leaf_del(struct otx2_nic *pfvf, u16 *classid,
- 	if (!parent->child_static_cnt)
- 		parent->max_static_prio = 0;
- 
-+	moved_qid = otx2_qos_cur_leaf_nodes(pfvf);
-+
-+	/* last node just deleted */
-+	if (moved_qid == 0 || moved_qid == qid)
-+		return 0;
-+
-+	moved_qid--;
-+
-+	node = otx2_sw_node_find_by_qid(pfvf, moved_qid);
-+	if (!node)
-+		return 0;
-+
-+	/* stop traffic to the old queue and disable
-+	 * SQ associated with it
-+	 */
-+	node->qid =  OTX2_QOS_QID_INNER;
-+	__clear_bit(moved_qid, pfvf->qos.qos_sq_bmap);
-+	otx2_qos_disable_sq(pfvf, moved_qid);
-+
-+	otx2_reset_qdisc(pfvf->netdev, pfvf->hw.tx_queues + moved_qid);
-+
-+	/* enable SQ associated with qid and
-+	 * update the node
-+	 */
-+	otx2_cfg_smq(pfvf, node, qid);
-+
-+	otx2_qos_enable_sq(pfvf, qid);
-+	__set_bit(qid, pfvf->qos.qos_sq_bmap);
-+	node->qid = qid;
-+
-+	*classid = node->classid;
- 	return 0;
- }
- 
--- 
-2.17.1
-
+Good catch, I will revise this patch accordingly, thanks !
 
