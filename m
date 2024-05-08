@@ -1,176 +1,169 @@
-Return-Path: <netdev+bounces-94508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10BF48BFB94
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:07:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DEBF8BFB9F
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:14:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB8DC281333
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 11:07:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 993B4B20FC5
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 11:14:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F938172A;
-	Wed,  8 May 2024 11:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F8C8004D;
+	Wed,  8 May 2024 11:14:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="CqBJr5bt";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Yqj/OSOe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="td2zStV3"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout8-smtp.messagingengine.com (fout8-smtp.messagingengine.com [103.168.172.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BFD26AFF;
-	Wed,  8 May 2024 11:07:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D3D763EC
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 11:14:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715166454; cv=none; b=qKG/VVySNisH8D19b5+xLxMSKEOcoUHS8IBxUR1O3MsaHyXMQ/DO4vysNzfnWOzKwQ03wF2fjgJCBTEAPK9BoAZwiorYic6mxaTJj65uYU9Jenk5H9WHUDefj8QOLKgLFklOr0ZXMfv7Qpe9HbJHe+m2vJRgGXjCAK8Bk/NH5vg=
+	t=1715166841; cv=none; b=GeD/l/ocwaqAICR9j0HLNTtmHfve80XX6thRBqk+PS7IfnDv+K8AmRLUYslRCYB3DzFbVoRIwzhh4muzv9jgUVOrkf7Mj4sUNBKl7eq0cjpiMxA8NazQlGl7gI8iGqHa3dKxl46eY7fnwJTM273BtkxDbsddNx+lJRJKx69gyjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715166454; c=relaxed/simple;
-	bh=urGOUdc300vFQCsbB/6SAMCUJIQfOPUkv5UkGgygMYk=;
+	s=arc-20240116; t=1715166841; c=relaxed/simple;
+	bh=fRybOXPi73Hy2AP9E3imJlVNfSIwXRbcfgmZ4cXCbWA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iVHDNCKGL9PlbRiTPoX6OvZSYpqyHRADe+mp99E6/nktnhfQKUqeW9XwoqHxSr7P/orrR28dBk0X2ayKeqLLvf7h83Nu5YFgS+PesY2sBem4y52w3NF0hHWZ1vcZlO+bBU5+pgf3dIJ5If+I47e6TOxfNfaam9P65EeWePHGbiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=CqBJr5bt; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Yqj/OSOe; arc=none smtp.client-ip=103.168.172.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfout.nyi.internal (Postfix) with ESMTP id 6A5111380FD1;
-	Wed,  8 May 2024 07:07:32 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Wed, 08 May 2024 07:07:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1715166452;
-	 x=1715252852; bh=oOES+7d96Ln9+kYMYVV5bxS6uek4cldZUnA+nP+0Tu0=; b=
-	CqBJr5btfsoKDjK4fvbKYKfFJuYof/MhyIlA01f0e7Imh97xqu/OJP7HRiLUaFIY
-	rwKhBU6p6LmzMYxb6O2+aHd6yEToHDy+mQQrUKP8o8SuvLmWGe+HmfeWF8mJehGE
-	YC2L7NzGrl8L4ZvVFnkSFArrUEPJIoAn3DTOptXID2/wW3wM2FVvUFLiRBgHSLJt
-	vtFlJQCEgRE0K3IRVHy+lNf74wViNAoCi5gJraZHv8RVfF7DFJXGaFCgRxgePtwT
-	+brf5QEpY8bqq/0Advm9EKsPjF9r7n4dmVItglc4s5oOpcA/YjJdSmgzOcninPcE
-	bdNVCuwJolBqZYQE8JjYiw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1715166452; x=
-	1715252852; bh=oOES+7d96Ln9+kYMYVV5bxS6uek4cldZUnA+nP+0Tu0=; b=Y
-	qj/OSOey3GfcVE/chbZFTNWVyaMisMlJoIa+8NUlp6D+AqGCONrbbF5h1QBEz61l
-	A7cJXD3G7ywU0K0Wb/L3N3h9zDmaLiIYLfgKsNAf00bMVo+1yeZfA9BSEqZF+N0v
-	qgoqWjL9JY+tAvVkWGH++3zD7EAqnsFhaItzXuuNjNWFlYvQYPuCfu/uw6LwrOdQ
-	Dhs2rCuXFDo8IwQp9/O3a9Fi27BABHVB4B5hKNcfI6UYeDxTmgvc2DtGSHiuRWmp
-	xctIP5UTluPHgm4az7kJVjsyZY3BWXqCtWXu3QZG1NEEWpxzunwd3fVcdLRR7Wez
-	+rx7El3lMlutlYzntY/kw==
-X-ME-Sender: <xms:81w7Zol1F6pavAQ3AMGQSsLX193J9JDk8N8kxlQf6bfD1XCZFgPWIA>
-    <xme:81w7Zn092O-qqYQPYiyTtfkiOrv1D0rRXpqNYuYwNiycBtvoyX0EiifMLhZhUpnWU
-    -FmTlGxdVSWEj8shHc>
-X-ME-Received: <xmr:81w7ZmrU7HLBuIslYcRc6eyJn7PD8wvLoV9ZHaXO7qEawD7pgf6AC1qZsw9oj28rFg5Qshz0xRtnc4vdVIKwU7KOdApV8Vg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvdeftddgfeehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
-    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
-    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeefhfellefh
-    ffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvdelieenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggv
-    rhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
-X-ME-Proxy: <xmx:81w7ZkkZSbgONk4ES1JQIkZ8QM_bmvi_LTnGmZzM1bmVOOJFz9YM1Q>
-    <xmx:81w7Zm0eZ_2bURimizNobvgSUPYUYpZgj0mqAyrlM3PHgEJnrDCSIQ>
-    <xmx:81w7Zrt-oJ2WgqGO3ryWDSisUeyHGjDW6tspW7k9-uZpKiK5aVcDqQ>
-    <xmx:81w7ZiWJM8AJyz6CayT_RHtd58d2Fe0FPXH39q2NifxheEXyo7GZEw>
-    <xmx:9Fw7ZnKrgT_ekiUxntjj0OAD-1yQSgAkb1strJ6KsNYW1jemxcVhrXWU>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 8 May 2024 07:07:31 -0400 (EDT)
-Date: Wed, 8 May 2024 13:07:29 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next,v2] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <20240508110729.GD1385281@ragnatech.se>
-References: <20240507201839.1763338-1-niklas.soderlund+renesas@ragnatech.se>
- <b51b7b2d-c6d0-49ef-8b84-b9ed8368c797@lunn.ch>
- <20240507215017.GA1385281@ragnatech.se>
- <2cd13d49-6b9f-4ce8-ba4e-ca02b4568842@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=R1RW9Wo7RMIECMDFILIluAh9TqA29+P3lSf5nV0h4F6fQMBDddPfsXzNqx6iHV1yypkfudZj7uUPMTqzH+g8OKUDARCytDwe6zJn86HE7OUVmKG1JtVwX/1FjRyfjQFEyX5nZcW5uDVxI3gU7tIweyXSpHfDzHcmMknPqPHE6DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=td2zStV3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77978C113CC;
+	Wed,  8 May 2024 11:13:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715166841;
+	bh=fRybOXPi73Hy2AP9E3imJlVNfSIwXRbcfgmZ4cXCbWA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=td2zStV3eIjywWL6/8TtBhPz4LpqRG3y6Kfwr9rVBmdQas6Dh+5WXCoNojiUo9SsE
+	 k4M08cU78yHHs43/mMaWNA/slhimSalcnu4YSNNFvOvMYWWnF+D/wmTJEyy7pshnwO
+	 DFar6DVqLtvxfIG1Ie59eW5+WGFaDsqmECKehH144z8P97rN1gasOde38zBKSBbmvl
+	 VcTbyjjMhFrV3bZW1PV8pH6bvlXrDGHtzRaLg5AkGRGV57zQEQtIyF95820V7hGIME
+	 iAb2gEcMuU7fMOdv1tjgZybaOKJfF+2Np9Bwl/S1r6bzo+PrJm08LFVDbV7pOAbyZf
+	 lVJ+n9gV1bxGQ==
+Date: Wed, 8 May 2024 13:13:52 +0200
+From: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH net-next v2 2/2] net: dsa: update the unicast MAC address
+ when changing conduit
+Message-ID: <20240508111328.ya4ydnmd6w764q5k@kandell>
+References: <20240502122922.28139-1-kabel@kernel.org>
+ <20240502122922.28139-1-kabel@kernel.org>
+ <20240502122922.28139-3-kabel@kernel.org>
+ <20240502122922.28139-3-kabel@kernel.org>
+ <20240507201827.47suw4fwcjrbungy@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2cd13d49-6b9f-4ce8-ba4e-ca02b4568842@lunn.ch>
+In-Reply-To: <20240507201827.47suw4fwcjrbungy@skbuf>
 
-On 2024-05-08 02:35:27 +0200, Andrew Lunn wrote:
-> > > This looks wrong. You should be applying delays for rgmii-id and
-> > > rgmii-rxid. Plain rgmii means no delays are required, because the
-> > > board has extra long clock lines. Same for TX delays, only for
-> > > rgmii-tx or rgmii-id.
-> > 
-> > This confuses me a bit, from the bindings in ethernet-controller.yaml I 
-> > get this the other way around,
-> > 
-> >       # RX and TX delays are added by the MAC when required
-> >       - rgmii
-> > 
-> >       # RGMII with internal RX and TX delays provided by the PHY,
-> >       # the MAC should not add the RX or TX delays in this case
-> >       - rgmii-id
-> > 
-> >       # RGMII with internal RX delay provided by the PHY, the MAC
-> >       # should not add an RX delay in this case
-> >       - rgmii-rxid
-> > 
-> >       # RGMII with internal TX delay provided by the PHY, the MAC
-> >       # should not add an TX delay in this case
-> >       - rgmii-txid
-> > 
-> > The way I understand it is that if if the phy-mode is 'rgmii' the MAC 
-> > shall apply delays if requested and only if the phy-mode is 'rgmii-id' 
-> > shall the MAC completely ignore the delays and let the PHY handle it.
+On Tue, May 07, 2024 at 11:18:27PM +0300, Vladimir Oltean wrote:
+> Hi Marek,
 > 
-> It is confusing, and made worse by you doing different to normal and
-> implementing it in the MAC, not the PHY.
+> On Thu, May 02, 2024 at 02:29:22PM +0200, Marek Behún wrote:
+> > When changing DSA user interface conduit while the user interface is up,
+> > DSA exhibits different behavior in comparison to when the interface is
+> > down. This different behavior concers the primary unicast MAC address
 > 
-> 1% of boards use extra long clock lines, so don't need additional
-> delays. They use 'rgmii'. There is at least one board i know of which
-> has one extra long clock line, and one normal length clock line. That
-> board uses 'rgmii-txid', or 'rgmii-rxid', i don't remember which. The
-> other 98% of boards should be using 'rgmii-id', indicating something
-> needs to insert delays.  Of those 98%, the vast majority pass phy-mode
-> straight to the PHY, and the PHY added delays in both the Rx and Tx
-> clock. If the MAC decides to add the delays, and it is 'rgmii-id', it
-> should enable delays for both clock lines, and pass 'rgmii' to the
-> PHY. In the unlikely event somebody builds one of those 2% boards
-> using the MAC, you need to enable just Rx delays, or just Tx delays,
-> or maybe no delay at all, because of extra long clock lines. But you
-> should still be passing 'rgmii' to the PHY.
+> nitpick: concerns
+> 
+> > stored in the port standalone FDB and in the conduit device UC database.
+> > 
+> > If we put a switch port down while changing the conduit with
+> >   ip link set sw0p0 down
+> >   ip link set sw0p0 type dsa conduit conduit1
+> >   ip link set sw0p0 up
+> > we delete the address in dsa_user_close() and install the (possibly
+> > different) address in dsa_user_open().
+> > 
+> > But when changing the conduit on the fly, the old address is not
+> > deleted and the new one is not installed.
+> > 
+> > Since we explicitly want to support live-changing the conduit, uninstall
+> > the old address before calling dsa_port_assign_conduit() and install the
+> > (possibly different) new address after the call.
+> > 
+> > Because conduit change might also trigger address change (the user
+> > interface is supposed to inherit the conudit interface MAC address if no
+> 
+> nitpick: conduit
+> 
+> > address is defined in hardware (dp->mac is a zero address)), move the
+> > eth_hw_addr_inherit() call from dsa_user_change_conduit() to
+> > dsa_port_change_conduit(), just before installing the new address.
+> > 
+> > Fixes: 95f510d0b792 ("net: dsa: allow the DSA master to be seen and changed through rtnetlink")
+> > Signed-off-by: Marek Behún <kabel@kernel.org>
+> > ---
+> 
+> Sorry for the delay. I've tested this change and basically, while there
+> is clearly a bug, that bug produces no adverse effects / cannot be
+> reproduced with felix (the only mainline driver with the feature to
+> change conduits). So it could be sent to 'net-next' rather that 'net' on
+> that very ground, if there is no other separate reason for this to go to
+> stable kernels anyway, I guess.
 
-Thanks for your patience and this explanation, I understand now.
+I did send this to net-next. The question is whether I should keep the
+Fixes tag.
 
-> 
-> > Just so I understand correctly, if the phy-mode is A I should pass B to 
-> > of_phy_connect() if I apply the delays in the MAC.
-> > 
-> > A               B
-> > rgmii           rgmii-id
-> > rgmii-id        rgmii
-> > rgmii-rxid      rgmii-txid
-> > rgmii-txid      rgmii-rxid
-> 
-> Nope. Since the MAC is doing the delay, you always pass rgmii to the
-> PHY. A determines what, if any, delays the MAC adds.
-> 
->      Andrew
+Marek
 
--- 
-Kind Regards,
-Niklas SÃ¶derlund
+> There are 2 reasons why with felix the bug does not manifest itself.
+> 
+> First is because both the 'ocelot' and the alternate 'ocelot-8021q'
+> tagging protocols have the 'promisc_on_conduit = true' flag. So the
+> unicast address doesn't have to be in the conduit's RX filter - neither
+> the old or the new conduit.
+> 
+> Second, dsa_user_host_uc_install() theoretically leaves behind host FDB
+> entries installed towards the wrong (old) CPU port. But in felix_fdb_add(),
+> we treat any FDB entry requested towards any CPU port as if it was a
+> multicast FDB entry programmed towards _all_ CPU ports. For that reason,
+> it is installed towards the port mask of the PGID_CPU port group ID:
+> 
+> 	if (dsa_port_is_cpu(dp))
+> 		port = PGID_CPU;
+> 
+> It would be great if this clarification would be made in the commit
+> message, to give the right impression to backporters seeking a correct
+> bug impact assessment.
+> 
+> BTW, I'm curious how this is going to be handled with Marvell. Basically
+> if all switch Ethernet interfaces have the same MAC address X which
+> _isn't_ inherited from their respective conduit (so it is preserved when
+> changing conduit), and you have a split conduit configuration like this:
+> - half the user ports are under eth0
+> - half the user ports are under eth1
+> 
+> then you have a situation where MAC address X needs to be programmed as
+> a host FDB entry both towards the CPU port next to eth0, and towards
+> that next to eth1.
+> 
+> There isn't any specific "core awareness" in DSA about the way in which
+> host FDB entries towards multiple CPU ports are handled in the Felix case.
+> So the core ends up having a not very good idea of what's happening
+> behind the scenes, and basically requests a migration from the old CPU
+> port to the new one, when in reality none takes place. I'm wondering how
+> things are handled in your new code; maybe we need to adapt the core
+> logic if there is a second implementation that's similar to felix in
+> this regard. Basically I'm saying that dsa_user_host_uc_install() may
+> not need to call dsa_port_standalone_host_fdb_add() when changing
+> conduit, if we had dedicated DSA API for .host_fdb_add() rather than
+> .port_fdb_add(port == CPU port).
+> 
+> Anyway, I was able to coerce the code (with extra patches) into validating
+> that your patch works on a driver that hypothetically does things a bit
+> differently than felix. So, with the commit message reorganized:
+> 
+> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+> Tested-by: Vladimir Oltean <olteanv@gmail.com>
 
