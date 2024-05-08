@@ -1,143 +1,152 @@
-Return-Path: <netdev+bounces-94404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89DD18BF592
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:34:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 808618BF59B
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:42:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B702A1C23057
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 05:34:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DF251F23B46
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 05:42:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E545017559;
-	Wed,  8 May 2024 05:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CDD7175BF;
+	Wed,  8 May 2024 05:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="j88ccihM"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KcIa/Bhi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E169171B0
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 05:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CB61A2C15
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 05:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715146459; cv=none; b=JGR+O/nRzLA5fViLB000R3kz9sXt9HW4VffFBapmAGidsdSkJOoQnx+EI8Z/nFodUjiKFUJa9FuuJ60yfIS1zk9e+iDoP8IGD2xQnp0+5LMmzyduTmoNM4wyblf3inX8iuTg2qnQoQu/U+BjLSC9/E6nl1gh9GcnE/0VYrjzoas=
+	t=1715146970; cv=none; b=e+zoZK5bIHafazJUj374xy0Pc9N2JtaHktMhqQ2ITbxrM893ZP0mnwwUjlC2VBgd2nUFkGRPY+PelHuJ6kYuleaK5W4T+WT+U+ONviEWMD7r1W1sU6bqUmmZ61nQ24ujOY1QcGj6DTppPzYdf+wfklqzvZyLHwNJjZCv08zh5oM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715146459; c=relaxed/simple;
-	bh=Mgc4qvmHI5USLX4TSJDzE/lN4QyO/e2B1pGdj7DbaaU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rMkKgvMXRbBPR8V08vZ2ccGVi6I2x9L0s9BICLYobhqq+nXqFKT6xE2YeUbA9V2eocQcO89QaKZYCmUHVDuFdAj3TTZk+hj0dgrgQCNeC6CH6nrAOIr7dP3MDqd3LY7jNhaGJFlh3jICKq8pTDimHLoEHVM5CVhuAUuL9Pl926A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=j88ccihM; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so2966095a12.1
-        for <netdev@vger.kernel.org>; Tue, 07 May 2024 22:34:18 -0700 (PDT)
+	s=arc-20240116; t=1715146970; c=relaxed/simple;
+	bh=Dm8oAyDId/BGzFguq4WTwi8cfuw6NO7IL3CwBWqI+YI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tFo5CDmDFlK7Ivhd5spME3sVFsN0tAsMn78KGO+CtzAZzRrtvjylXMkaLDK0f3HkJPDwNGScfBKfkLjWuHhsF2HshRUfEXXuV40SdyIcv8Bw0uEm83n928ED5HZW/8/cjrgP+ddy9vL8QETIfeUKvvWcf9Cse0E90CsdnevWuk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KcIa/Bhi; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-6153d85053aso29054997b3.0
+        for <netdev@vger.kernel.org>; Tue, 07 May 2024 22:42:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1715146458; x=1715751258; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fXT/Ht6B5HpOzfTzjvvlcw2AzVRmZ1Sdv0MVJNtZ0AM=;
-        b=j88ccihMcOAO/pW9IWO2VnDt8+i5GMktEE2DgjBrQFnnrmjmMfvToiDkXjfg18HqDM
-         Chwj0dVx7JIfRhdvhiwLGn1C+XKiEpGqNYG5g9QyQPijPaO+hoXZC+h9Fix0qQqNOroI
-         cr+/SAg52MxCeLuavjetnd+EFdtB7riq6XcuA+lXOhkk9O4Kdrp3Op6SvzFQndVU1wYB
-         g2uydNYRPyXIAIZ1v5Z5YNVTn4OdCZQ1XrCVZ3La0r+uZrqFDsHYe4TzerfuH0S7UQz4
-         ASWLpDq+tXV25IEKlpMbBGNd5MeDFEer52xwNmdAXp4Mq2F5GHT6uXO6U/ZCydnOuGH5
-         6Vng==
+        d=linaro.org; s=google; t=1715146968; x=1715751768; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8is/8kMXXquytRmRTTojazPRXnlwoDhApNzUo9b3+OQ=;
+        b=KcIa/BhiRW5xS3AQueE75g59SNsIUK7uFzmASvX+e254/TVlCrWRvk69o5U56MBJVJ
+         +6xNpGUi81LEsfeMlpf6hPyxUdTvREE/rIno9US2AeUv9/8rmuCvX8qkUtO/S4P8x9A7
+         gNql39MBxjLtQik8dAb4RLs/g8TlxD2m+dPOYdISqkTDJKRFqa+foXMAvQz00Bh58S6/
+         LHt55T6ueY+mS8FEKFflcKay5dgT8SAdfyf0xb9P5MfFn4/7Zh96p49GdgRLyEj69xui
+         BSmXw9E1iueHRuA82pmMB9+39RgIgqlXs/LhwyNLzhxGWgRGtzBOCF67qE5Z49dGQA17
+         TOmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715146458; x=1715751258;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fXT/Ht6B5HpOzfTzjvvlcw2AzVRmZ1Sdv0MVJNtZ0AM=;
-        b=RYoLUGXRSO23Cq86F+h+PD176gAP/tKAz7n5KXaSM4UxAtPEn/9oFtdEL5/Jzq5917
-         ESYtr6rsMNWMZQWxpcei0huPqJcFos5AmdWNzbXE8XRJ1wQWtLHVNEX3eVSujKG+eWI8
-         KHQgXIyb2pbmURHHjnzRvUQtfk4Jyxv8cdflLKuNEZHOVqeIYhzlTu06fVHUKIfKuR0x
-         blfa9U2cZVjSd9epYlHLlU2Xd+dtxtE2XZrF37rvf3FR0lk1DVw+YSW1gf9OhRqSR+bC
-         M4bTBuzpDj4F80AlXbvwembPFnisbP5kWBDxvu12uuiMHwV+r4M0WmM0c+lCwptk+BcT
-         V6/w==
-X-Forwarded-Encrypted: i=1; AJvYcCUXMRwtThguvT3lD6ORjEn/ctsImR/STWoueF5XtJLHA6Q5+RcNOouzpTxNIS5mmLhWFdCK4qSsh4oHAU1M+F/8RuCqx1L/
-X-Gm-Message-State: AOJu0YxpWEkYqC3LszLMT+Js8WS1jabcdUqj3ckmAKwyMrcVFxkgboQF
-	hQ0unIoZc4M2TU1nszNtKFujNZPjtBRAMpdOleirHIP8hGBzWkSYh2eDqCZ0iB8=
-X-Google-Smtp-Source: AGHT+IE6nF92f8yMJvw4QXM30dHJBCHwIsLxQLj62XpbEJNdClKoMiShhkTXCvn5sfSkppH7D38bPg==
-X-Received: by 2002:a05:6a21:880a:b0:1af:9e3c:63c0 with SMTP id adf61e73a8af0-1afc8dbe1cbmr1900935637.59.1715146457800;
-        Tue, 07 May 2024 22:34:17 -0700 (PDT)
-Received: from [192.168.1.15] (174-21-160-85.tukw.qwest.net. [174.21.160.85])
-        by smtp.gmail.com with ESMTPSA id z8-20020a170903018800b001e4464902bcsm10911053plg.60.2024.05.07.22.34.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 May 2024 22:34:17 -0700 (PDT)
-Message-ID: <64a7690e-50a1-4b3b-9b9b-5c2efa552806@davidwei.uk>
-Date: Tue, 7 May 2024 22:34:16 -0700
+        d=1e100.net; s=20230601; t=1715146968; x=1715751768;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8is/8kMXXquytRmRTTojazPRXnlwoDhApNzUo9b3+OQ=;
+        b=NcykH6FZ/xPPowAnCl8EbaQqRGDbxwIoFU/Rzlpt5SZiUZAgHub23gIYq1xeLmhyGx
+         4CCj+KDtHgh1SJd1G0kGxNRVAOBbAe2VckKcwaibWKZzWpXGef2fztF2FZpKfQl27sQx
+         N9Ot3eUskjPkyA+jyEWQz3oPrdE+7W+vKaLTsecwt+Ywb7RCRb+/uHSt29l8mb0ZIGHn
+         YUs/cTmRZIW8LBYY6W4jkGGq3wPbwEccv0qaga2M5gUpISdso7F+bxZKuPoKTF6foqpL
+         1r3OL0THbq2lQo2SmoZWsbZOHJsQj9qRiJzSB22YmvN9Ehg+cZUx3fu9cDpJLe7XiEIl
+         E7fQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWcy+ZMu5MCYeA3vSMJhEFqk84oO/dPFQAHZ0CqzomeRWLeENa7ubH4XlKBEvNSWdPb8rsqiI2wQ3ApHTnag97YkYxlcay9
+X-Gm-Message-State: AOJu0YzzyVsCW5DSGtj/P31TXPFaDMqhvLJod/DBPU3KWJ3op9GFBkE2
+	/+jcCK5vDvzojY6Kt/6hY//ICWKdsxS5saNLHR+J9CGcIBb/FrxsL5eYY68ZQ6+l3buAjBYip6Y
+	UdXR4VLICkajBEFeQsp09zZzHtc4ro5JYB7grng==
+X-Google-Smtp-Source: AGHT+IG24D1NQIZ27R3N3aZ27xeVwEEsTRm5xCfdyZ/r6uMBhrpmntSpIHxXqQrXwipOem08bGFWGZKtDUaSlW68z1M=
+X-Received: by 2002:a81:7182:0:b0:61b:3356:a679 with SMTP id
+ 00721157ae682-62085a6fd15mr20951377b3.17.1715146967118; Tue, 07 May 2024
+ 22:42:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/5] gve: Add adminq extended command
-Content-Language: en-GB
-To: Ziwei Xiao <ziweixiao@google.com>, netdev@vger.kernel.org
-Cc: jeroendb@google.com, pkaligineedi@google.com, shailend@google.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, willemb@google.com, hramamurthy@google.com,
- rushilg@google.com, jfraker@google.com, linux-kernel@vger.kernel.org
-References: <20240507225945.1408516-1-ziweixiao@google.com>
- <20240507225945.1408516-4-ziweixiao@google.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20240507225945.1408516-4-ziweixiao@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240430082717.65f26140@kernel.org> <20240430160057.557295-1-jtornosm@redhat.com>
+In-Reply-To: <20240430160057.557295-1-jtornosm@redhat.com>
+From: Yongqin Liu <yongqin.liu@linaro.org>
+Date: Wed, 8 May 2024 13:42:36 +0800
+Message-ID: <CAMSo37UN11V8UeDM4cyD+iXyRR1Us53a00e34wTy+zP6vx935A@mail.gmail.com>
+Subject: Re: [PATCH v2] net: usb: ax88179_178a: avoid writing the mac address
+ before first reading
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
+	inventor500@vivaldi.net, jarkko.palviainen@gmail.com, 
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org, 
+	vadim.fedorenko@linux.dev, Sumit Semwal <sumit.semwal@linaro.org>, 
+	John Stultz <jstultz@google.com>, Viktor Martensson <vmartensson@google.com>, 
+	Amit Pundir <amit.pundir@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2024-05-07 15:59, Ziwei Xiao wrote:
-> From: Jeroen de Borst <jeroendb@google.com>
-> 
-> Add a new device option to signal to the driver that the device supports
-> flow steering. This device option also carries the maximum number of
-> flow steering rules that the device can store.
+Hi, Jose
 
-Other than superficial style choices, looks good.
+On Wed, 1 May 2024 at 00:01, Jose Ignacio Tornos Martinez
+<jtornosm@redhat.com> wrote:
+>
+> > v6.8.8 has 56f78615b already. We need another patch, Jose?
+>
+> Hello Jakub,
+>
+> I will try to analyze it during the next week (I will be out until then).
+>
 
-> 
-> Signed-off-by: Jeroen de Borst <jeroendb@google.com>
-> Co-developed-by: Ziwei Xiao <ziweixiao@google.com>
-> Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
-> Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
-> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> ---
->  drivers/net/ethernet/google/gve/gve.h        |  2 +
->  drivers/net/ethernet/google/gve/gve_adminq.c | 42 ++++++++++++++++++--
->  drivers/net/ethernet/google/gve/gve_adminq.h | 11 +++++
->  3 files changed, 51 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-> index ca7fce17f2c0..58213c15e084 100644
-> --- a/drivers/net/ethernet/google/gve/gve.h
-> +++ b/drivers/net/ethernet/google/gve/gve.h
-> @@ -786,6 +786,8 @@ struct gve_priv {
->  
->  	u16 header_buf_size; /* device configured, header-split supported if non-zero */
->  	bool header_split_enabled; /* True if the header split is enabled by the user */
-> +
-> +	u32 max_flow_rules;
+Not sure if you have checked it already, this commit causes an issue for the
+db845c + ACK android15-6.6[1] + AOSP main Android configuration, the
+ethernet does not work,
+there is no ip address assigned, like:
+    db845c:/ # ifconfig eth0
+    eth0      Link encap:Ethernet  HWaddr 02:00:89:7a:fb:61  Driver ax88179_178a
+              UP BROADCAST MULTICAST  MTU:1500  Metric:1
+              RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+              TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+              collisions:0 txqueuelen:1000
+              RX bytes:0 TX bytes:0
 
-nit: this struct is lovingly documented, could we continue by adding a
-one liner here maybe about how it's device configured?
+    db845c:/ #
+if I have this change reverted, then it will work again:
+    db845c:/ # ifconfig eth0
+    eth0      Link encap:Ethernet  HWaddr 02:00:89:7a:fb:61  Driver ax88179_178a
+              inet addr:192.168.1.10  Bcast:192.168.1.255  Mask:255.255.255.0
+              inet6 addr: 240e:305:2c88:4700:4b6d:926d:1592:fc5e/64
+Scope: Global
+              inet6 addr: 240e:305:2c88:4700:edc9:86ec:7c5e:b028/64
+Scope: Global
+              inet6 addr: fe80::32ce:8a2e:269d:e53f/64 Scope: Link
+              UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+              RX packets:966 errors:0 dropped:33 overruns:0 frame:0
+              TX packets:475 errors:0 dropped:0 overruns:0 carrier:0
+              collisions:0 txqueuelen:1000
+              RX bytes:51193 TX bytes:39472
 
->  };
->  
->  enum gve_service_task_flags_bit {
-> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-> index 514641b3ccc7..85d0d742ad21 100644
-> --- a/drivers/net/ethernet/google/gve/gve_adminq.c
-> +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-> @@ -44,6 +44,7 @@ void gve_parse_device_option(struct gve_priv *priv,
->  			     struct gve_device_option_jumbo_frames **dev_op_jumbo_frames,
->  			     struct gve_device_option_dqo_qpl **dev_op_dqo_qpl,
->  			     struct gve_device_option_buffer_sizes **dev_op_buffer_sizes,
-> +			     struct gve_device_option_flow_steering **dev_op_flow_steering,
+    db845c:/ #
 
-nit: getting unwieldy here, is it time to pack into a struct?
+One thing to be noted here is that, during the boot, the MAC address
+will be reassigned
+to make sure each board has its own unique MAC address with the
+following commands:
+    /vendor/bin/ifconfig eth0 down
+    /vendor/bin/ifconfig eth0 hw ether "${ETHADDR}"
+    /vendor/bin/ifconfig eth0 up
+
+
+Could you please help have a check and fix or give some suggestions on
+this issue?
+
+[1]: https://android.googlesource.com/kernel/common/+/refs/heads/android15-6.6
+-- 
+Best Regards,
+Yongqin Liu
+---------------------------------------------------------------
+#mailing list
+linaro-android@lists.linaro.org
+http://lists.linaro.org/mailman/listinfo/linaro-android
 
