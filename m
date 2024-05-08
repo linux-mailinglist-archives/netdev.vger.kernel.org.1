@@ -1,185 +1,181 @@
-Return-Path: <netdev+bounces-94485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16FAD8BF9D9
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 11:54:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1FBE8BF9E0
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 11:56:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4556B1C21D3B
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:54:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A93FB20A4D
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C4875809;
-	Wed,  8 May 2024 09:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC512768E1;
+	Wed,  8 May 2024 09:56:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jd3/3MUB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080ED54679;
-	Wed,  8 May 2024 09:54:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12629BA27;
+	Wed,  8 May 2024 09:56:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715162076; cv=none; b=hbkiy7mhRIlKA9t5amG8Tt00jVGjdVAdxnIzuXUuP2ISx85j9atNDRB153iwQdIUA9dxZQQu2HsixLYxkCDUvNaxGWYJMHqQnalpjuNXHarq91y89GpmsPiXmgKEX7wLhvJGF6VzibalrYQ4aOcxQxLidFp+amjAUUQhfb8WpvY=
+	t=1715162176; cv=none; b=Pz6i54+NKCI9IfuUjRPWphLtuUl0O8BK/yIX9UNm41i9A8APNL7lgIeVc06zMoI6giWzRolKS+cUiEyVKGz6O97cWUUEN6t1MHxS1iREQlT8BiebhmGe0RgVJMZJfJQDHffgprOd1oxQIGAuM+oRcEpq9WPMboADkKmIr2qOEF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715162076; c=relaxed/simple;
-	bh=FfA5dF31garZW/tk3DQl+spTHY7RrowSCt5gDZ9Om5k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EL3URdUFxNswfWu89eqgUIrgtfQ/sJ6hROy9rHX5NYs3BShUlm6JeUzTEPWLbbemddnMzGsyJcgM4DwAotsg0V07awZEfniFke+DkzHomIm2EzzcbDHelPnrVD2KMJ93ARL4yIvL8RZU9cgCb8ByllPQgl5Zf9UwsYIbzIURu0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1715162176; c=relaxed/simple;
+	bh=L58OHrtgnGvD6BMHNnxub1BnLgpGqwKlRG8lHbKfkmg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GC8pjJpz1PRBh5kMy6oFDC1bNd9VX4jf4l6oDfs77hFPJjDHY9Gv6mw9RIcPFAwhx1eD6ZLqM1kvywsd2pSc1Jc4Gk/voQFxd+FCZVfNx/orSWfQbeOSe+rHFnjUzD5ctmIoxTdOWB+uPpjCURj4sWGZCFo6h2+gWkmoo/exiqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jd3/3MUB; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-51f3761c96aso5359673e87.3;
-        Wed, 08 May 2024 02:54:34 -0700 (PDT)
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-51f71e4970bso4934972e87.2;
+        Wed, 08 May 2024 02:56:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715162173; x=1715766973; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=io8fmhR7P9iwCv/52XS5SThweh8W+4/Do9egkjm9CcM=;
+        b=Jd3/3MUBTiSrw/xZ5I3Q4pNQBXsBYWyDUVofdyQ9yeEPFWuPpNjYV1NxSwb+WMstj7
+         8chDKeCC3Zh7cxgO4CU2BW68SGm7R7nfpGfDovlhH5jmpBL02Y6J2fq1rzi/XQiOG2Mj
+         UKRu/fal++BMgtrH/TkGsblpCE7VGRKa5Be0GWI6vKQjZ1gIhvN5NN9kMei6Z8jrPT+q
+         Jmble/hOmxwlVMZnAKp3MxPb7aJ8uKnNtum0CjfP7Pjly9u9UhY7Q3yF/79AQpG2Zf3+
+         jcikFhLP2kE2Yam9zDlFFUen9cr9w2MGRYRcbBDMFTw+OcYiKzsT2RjMMCtufc2MgrI5
+         5qng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715162073; x=1715766873;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sD2/6sPlr7JEw5uhBN364YYJFLTnmVMqOaL4BzfWeD8=;
-        b=JK9dtjL3KcLGjrM7+kmQQsDY0Y5AqzmConde9oSepmQmv7OIfQymaJjU+w/+DUJa+v
-         Z5hghzEAynwFe1JwOL/AHM9ObQDy7TFA1W/nOUPf4UK6+BfIfRb8DsjZu3NqUNTDOb49
-         JC7R0Gf/Tg2ggCWgFBTO4Pl0//WFlxiiuhyYxs71tDYhZZsWFFZ36MD3hHXnrIJSn9pq
-         7oxrWUt86U63tv+YLjwfOc640O4umls3wXNIHGxOk2i0dnjHfoq94zk5VrYjBAhnawsh
-         kzMQUNVn5a/9ofUMsObz2uh7zRAelLAYlDwrwyFgtY4zCI1OGQXqpovH5mID27mlpTXm
-         yRgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWaVnDQcksz/jsxekU//CEQIjcPRMYzjSX4DPSmHhWS9NjEtnX92F+JvAGCk+bTPFPdOm000lC6pm9wCh984+xGwsQxIFsSigPKIFdD/LUqlxMKwtIlYOgYi0lZAPysEHNEtYlVELVL7yUah44=
-X-Gm-Message-State: AOJu0YywGncSVmDtpr54G2+potKreOQsD2wQQa8aMZ8KRG2H4T2sLXBh
-	yv0j3HRGEbJnYZfyD2XB/DAFuhl6Z02Mf8jAnnbBynvcpRM+NsvTmMgtPg==
-X-Google-Smtp-Source: AGHT+IHmCf5LAkl84GP171Zeb9C+hU+YlcxP1NLnZdtmzr65qLJvoOCAVJfs5QJwFe5Cm/IGPVi37w==
-X-Received: by 2002:ac2:5929:0:b0:51d:a1ab:98bc with SMTP id 2adb3069b0e04-5217c3733cfmr1876163e87.2.1715162072909;
-        Wed, 08 May 2024 02:54:32 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-119.fbsv.net. [2a03:2880:30ff:77::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d19-20020a17090648d300b00a5a06effd3fsm379569ejt.221.2024.05.08.02.54.32
+        d=1e100.net; s=20230601; t=1715162173; x=1715766973;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=io8fmhR7P9iwCv/52XS5SThweh8W+4/Do9egkjm9CcM=;
+        b=tW0DWys1Ie2mgXDdv8oV9o1iDhE0Cbc6DvOc8DanDyZQ5BV+jo70OJbPg6l+WIotBN
+         YVV+BaHEpCxO6q/Wp4CJYs+1B7pB8DUac20augfRNZOP/HRX913BGUDdypOS9JhO37ZD
+         q6AcC6Dd3/qplK2nkQIXrhtn7kOAlewK9Klsp1iEpQDPUySYsXLix1/RkQpS5tFVuz7e
+         NMWrR2+qpQaubTrqYyJdPMBeX42ZxxkaDlpoSmwQUqs6fWgh4uW6o35jjCOswcMCk3NC
+         MKU8cNfcGw8g3YtsbKdbJ+5ds2pln6pxt9WHDD08SudKkv+NnlqDmW05GH3zORYd31Im
+         dAVg==
+X-Forwarded-Encrypted: i=1; AJvYcCWQqPGyyUf1wZrESi+/OWVpNTZhruI6DcoK8YFcnuztT/r9lNOYsJoaG+p+oeyekMuqXvdegUu0ovhUoaK88LKwxPwwz/b/E09xeY0mx+nWdSJjy5cNC2tHvq+D+B1woSDLzXyV
+X-Gm-Message-State: AOJu0YxZIqonjy2o2qj4L4XGcFrHTyOpHM59AFFfvKHAsQjAd124n7HF
+	QlJH5/beFPIkF41GV96fLdJUMBzGO1APq+dQmb9C/gnIDIqE5dbk
+X-Google-Smtp-Source: AGHT+IFSg3ipoB9x/q9K5s3nqoZPNbvUw9v4r5YNPaHHmzhGDbABkPL44NPpL7eQYgs74L94b0SGPg==
+X-Received: by 2002:a05:6512:3157:b0:518:eef0:45c0 with SMTP id 2adb3069b0e04-5217cc520d0mr1791398e87.48.1715162172805;
+        Wed, 08 May 2024 02:56:12 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id o3-20020ac24943000000b0051e12a2c07bsm2475872lfi.20.2024.05.08.02.56.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 02:54:32 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: horms@kernel.org,
-	Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <jjohnson@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org (open list:NETWORKING DRIVERS (WIRELESS)),
-	ath12k@lists.infradead.org (open list:QUALCOMM ATH12K WIRELESS DRIVER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH wireless-next v2] wifi: ath12k: allocate dummy net_device dynamically
-Date: Wed,  8 May 2024 02:54:09 -0700
-Message-ID: <20240508095410.1923198-1-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
+        Wed, 08 May 2024 02:56:12 -0700 (PDT)
+Date: Wed, 8 May 2024 12:56:09 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Xiaolei Wang <xiaolei.wang@windriver.com>
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mcoquelin.stm32@gmail.com, richardcochran@gmail.com, bartosz.golaszewski@linaro.org, 
+	horms@kernel.org, ahalaney@redhat.com, rohan.g.thomas@intel.com, 
+	j.zink@pengutronix.de, rmk+kernel@armlinux.org.uk, leong.ching.swee@intel.com, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] net: stmmac: move the lock to struct
+ plat_stmmacenet_data
+Message-ID: <dvtilkr2ho5yy56fii6voglgu3tnopmoy556vrdo4evlynet5g@lnrlv73a27hm>
+References: <20240508045257.2470698-1-xiaolei.wang@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240508045257.2470698-1-xiaolei.wang@windriver.com>
 
-Embedding net_device into structures prohibits the usage of flexible
-arrays in the net_device structure. For more details, see the discussion
-at [1].
+On Wed, May 08, 2024 at 12:52:57PM +0800, Xiaolei Wang wrote:
+> Reinitialize the whole est structure would also reset the mutex lock
+> which is embedded in the est structure, and then trigger the following
+> warning. To address this, move the lock to struct plat_stmmacenet_data.
+> We also need to require the mutex lock when doing this initialization.
+> 
+> DEBUG_LOCKS_WARN_ON(lock->magic != lock)
+> WARNING: CPU: 3 PID: 505 at kernel/locking/mutex.c:587 __mutex_lock+0xd84/0x1068
+>  Modules linked in:
+>  CPU: 3 PID: 505 Comm: tc Not tainted 6.9.0-rc6-00053-g0106679839f7-dirty #29
+>  Hardware name: NXP i.MX8MPlus EVK board (DT)
+>  pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+>  pc : __mutex_lock+0xd84/0x1068
+>  lr : __mutex_lock+0xd84/0x1068
+>  sp : ffffffc0864e3570
+>  x29: ffffffc0864e3570 x28: ffffffc0817bdc78 x27: 0000000000000003
+>  x26: ffffff80c54f1808 x25: ffffff80c9164080 x24: ffffffc080d723ac
+>  x23: 0000000000000000 x22: 0000000000000002 x21: 0000000000000000
+>  x20: 0000000000000000 x19: ffffffc083bc3000 x18: ffffffffffffffff
+>  x17: ffffffc08117b080 x16: 0000000000000002 x15: ffffff80d2d40000
+>  x14: 00000000000002da x13: ffffff80d2d404b8 x12: ffffffc082b5a5c8
+>  x11: ffffffc082bca680 x10: ffffffc082bb2640 x9 : ffffffc082bb2698
+>  x8 : 0000000000017fe8 x7 : c0000000ffffefff x6 : 0000000000000001
+>  x5 : ffffff8178fe0d48 x4 : 0000000000000000 x3 : 0000000000000027
+>  x2 : ffffff8178fe0d50 x1 : 0000000000000000 x0 : 0000000000000000
+>  Call trace:
+>   __mutex_lock+0xd84/0x1068
+>   mutex_lock_nested+0x28/0x34
+>   tc_setup_taprio+0x118/0x68c
+>   stmmac_setup_tc+0x50/0xf0
+>   taprio_change+0x868/0xc9c
+> 
+> Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
+> ---
+> v1 -> v2:
+>  - move the lock to struct plat_stmmacenet_data
+> v2 -> v3:
+>  - Add require the mutex lock for reinitialization
+> 
+>  .../net/ethernet/stmicro/stmmac/stmmac_ptp.c   |  8 ++++----
+>  .../net/ethernet/stmicro/stmmac/stmmac_tc.c    | 18 ++++++++++--------
+>  include/linux/stmmac.h                         |  2 +-
+>  3 files changed, 15 insertions(+), 13 deletions(-)
+> 
+> [...]
+>
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index dfa1828cd756..316ff7eb8b33 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -117,7 +117,6 @@ struct stmmac_axi {
+>  
+>  #define EST_GCL		1024
+>  struct stmmac_est {
+> -	struct mutex lock;
+>  	int enable;
+>  	u32 btr_reserve[2];
+>  	u32 btr_offset[2];
+> @@ -246,6 +245,7 @@ struct plat_stmmacenet_data {
+>  	struct fwnode_handle *port_node;
+>  	struct device_node *mdio_node;
+>  	struct stmmac_dma_cfg *dma_cfg;
+> +	struct mutex lock;
+>  	struct stmmac_est *est;
+>  	struct stmmac_fpe_cfg *fpe_cfg;
+>  	struct stmmac_safety_feature_cfg *safety_feat_cfg;
 
-Un-embed the net_device from struct ath12k_ext_irq_grp by converting it
-into a pointer. Then use the leverage alloc_netdev_dummy() to allocate
-the net_device object at ath12k_pci_ext_irq_config().
+Seeing you are going to move things around I suggest to move the
+entire stmmac_est instance out of the plat_stmmacenet_data structure
+and place it in the stmmac_priv instead. Why? Because the EST configs
+don't look as the platform config, but EST is enabled in runtime with
+the settings retrieved for the TC TAPRIO feature also in runtime. So
+it's better to have the EST-data preserved in the driver private date
+instead of the platform data storage. You could move the structure
+there and place the lock aside of it. Field name like "est_lock" might
+be most suitable to be looking unified with the "ptp_lock" or
+"aux_ts_lock".
 
-The free of the device occurs at ath12k_pci_free_ext_irq().
+* The same, but with no lock-related thing should be done for the
+* stmmac_safety_feature_cfg structure,
+but it's unrelated to the subject...
 
-[1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
+-Serge(y)
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-Changelog:
- v2:
-	* Free all the allocated dummy devices if one of them fails to
-	  be allocated (in ath12k_pci_ext_irq_config()), as
-	  pointed by by Simon Horman.
----
- drivers/net/wireless/ath/ath12k/core.h |  2 +-
- drivers/net/wireless/ath/ath12k/pci.c  | 27 +++++++++++++++++++++-----
- 2 files changed, 23 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/wireless/ath/ath12k/core.h b/drivers/net/wireless/ath/ath12k/core.h
-index 47dde4401210..6671219c3567 100644
---- a/drivers/net/wireless/ath/ath12k/core.h
-+++ b/drivers/net/wireless/ath/ath12k/core.h
-@@ -146,7 +146,7 @@ struct ath12k_ext_irq_grp {
- 	u32 grp_id;
- 	u64 timestamp;
- 	struct napi_struct napi;
--	struct net_device napi_ndev;
-+	struct net_device *napi_ndev;
- };
- 
- struct ath12k_smbios_bdf {
-diff --git a/drivers/net/wireless/ath/ath12k/pci.c b/drivers/net/wireless/ath/ath12k/pci.c
-index 16af046c33d9..ac75e8e3916b 100644
---- a/drivers/net/wireless/ath/ath12k/pci.c
-+++ b/drivers/net/wireless/ath/ath12k/pci.c
-@@ -350,6 +350,7 @@ static void ath12k_pci_free_ext_irq(struct ath12k_base *ab)
- 			free_irq(ab->irq_num[irq_grp->irqs[j]], irq_grp);
- 
- 		netif_napi_del(&irq_grp->napi);
-+		free_netdev(irq_grp->napi_ndev);
- 	}
- }
- 
-@@ -560,8 +561,9 @@ static irqreturn_t ath12k_pci_ext_interrupt_handler(int irq, void *arg)
- static int ath12k_pci_ext_irq_config(struct ath12k_base *ab)
- {
- 	struct ath12k_pci *ab_pci = ath12k_pci_priv(ab);
--	int i, j, ret, num_vectors = 0;
-+	int i, j, n, ret, num_vectors = 0;
- 	u32 user_base_data = 0, base_vector = 0, base_idx;
-+	struct ath12k_ext_irq_grp *irq_grp;
- 
- 	base_idx = ATH12K_PCI_IRQ_CE0_OFFSET + CE_COUNT_MAX;
- 	ret = ath12k_pci_get_user_msi_assignment(ab, "DP",
-@@ -572,13 +574,18 @@ static int ath12k_pci_ext_irq_config(struct ath12k_base *ab)
- 		return ret;
- 
- 	for (i = 0; i < ATH12K_EXT_IRQ_GRP_NUM_MAX; i++) {
--		struct ath12k_ext_irq_grp *irq_grp = &ab->ext_irq_grp[i];
-+		irq_grp = &ab->ext_irq_grp[i];
- 		u32 num_irq = 0;
- 
- 		irq_grp->ab = ab;
- 		irq_grp->grp_id = i;
--		init_dummy_netdev(&irq_grp->napi_ndev);
--		netif_napi_add(&irq_grp->napi_ndev, &irq_grp->napi,
-+		irq_grp->napi_ndev = alloc_netdev_dummy(0);
-+		if (!irq_grp->napi_ndev) {
-+			ret = -ENOMEM;
-+			goto fail_allocate;
-+		}
-+
-+		netif_napi_add(irq_grp->napi_ndev, &irq_grp->napi,
- 			       ath12k_pci_ext_grp_napi_poll);
- 
- 		if (ab->hw_params->ring_mask->tx[i] ||
-@@ -611,13 +618,23 @@ static int ath12k_pci_ext_irq_config(struct ath12k_base *ab)
- 			if (ret) {
- 				ath12k_err(ab, "failed request irq %d: %d\n",
- 					   vector, ret);
--				return ret;
-+				goto fail_request;
- 			}
- 		}
- 		ath12k_pci_ext_grp_disable(irq_grp);
- 	}
- 
- 	return 0;
-+
-+fail_request:
-+	/* i ->napi_ndev was properly allocated. Free it also */
-+	i += 1;
-+fail_allocate:
-+	for (n = 0; n < i; n++) {
-+		irq_grp = &ab->ext_irq_grp[n];
-+		free_netdev(irq_grp->napi_ndev);
-+	}
-+	return ret;
- }
- 
- static int ath12k_pci_set_irq_affinity_hint(struct ath12k_pci *ab_pci,
--- 
-2.43.0
-
+> -- 
+> 2.25.1
+> 
+> 
 
