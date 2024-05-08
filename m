@@ -1,93 +1,209 @@
-Return-Path: <netdev+bounces-94461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69BE08BF8A6
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 10:36:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BAE28BF8D6
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 10:40:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 236D0285CD8
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 08:36:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B320C285FD9
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 08:40:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D6B2E417;
-	Wed,  8 May 2024 08:36:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB39768EF;
+	Wed,  8 May 2024 08:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OYMulct1"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="TI8Ilyfb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21F528FF;
-	Wed,  8 May 2024 08:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8BA854794;
+	Wed,  8 May 2024 08:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715157408; cv=none; b=BAE++hD+5bBFM/n/VI2lEHE09BH5rJTSpSrJnm8uPz9beRK9VhuV9rwwLVGHIly3NcCS+aCB5ZtRF0LZ5zASiA9nFZJcpadBtVlx6tYO3cVZqzvu+pLCU5EIiz47TNS1lOWV+G2XDHXAADkHAQIQ8AQPcV2Tw4Q/otlUJ5XHM4E=
+	t=1715157482; cv=none; b=K98gpUJx8Zlzj4FGeaKD32iYQ50v+ijk3wuP7vYnoq1pVH6Myab0ArP9aX2uSz0egBC498Cyi3yoZYtTkRcUt4WBmyP2EQfL1XdHvERB4A9x3MYBCFaw/KZHTQwnGuFGkD6Sqb3AQb6HEcb7OEHhLmxjCKeEdaGoEj5OMzudKIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715157408; c=relaxed/simple;
-	bh=Yt5LjAYmCH2zW6V6lFvCUyRwoou5rXH6aioGietuBfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MM9sW2Eceas69W9e6YmfaSypkDzmEhjlzE3Ccu53sNEKOkHMBffmJUu5QG1s/aQhYTCl4aCUdzzrtNNTdCTktlZdtYwU2IocrETJC1+PhJeuzcT2VuayOdAp6xcw/3GedgDxdWaMXRGqAKO4OCXNcy4DEZnDZooZWp4kls5Is+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OYMulct1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E05EC113CC;
-	Wed,  8 May 2024 08:36:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715157408;
-	bh=Yt5LjAYmCH2zW6V6lFvCUyRwoou5rXH6aioGietuBfQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OYMulct1JFmm6SkV4txli38l3rSTtGc9dsso3RxQgTY7lyFMTn22SUOhR/2ZAWjHL
-	 G6HxuCBbq4SOV62ahDrvpdHs54zUffQDB3KGxz/CE7BNboK0DAb9qzFXxohl5EQ2S+
-	 GnbD7lQ9DScs0svtiYJUyqdODzGpHxsqGDwQIHmroO1LYX0gLhQrsIr8TAjjKGU1cq
-	 HdTUNLiNc7WwdsONLdDfDUfYFqtDOIRk1tSj4c9KkoIFjkQOC5plqXfJV5sm8Zf9kC
-	 WuZ2W6BdzBDadrmQswl3bXegCCR+Lx2tE9vKSBFYtH/XNscvaLXdOZlYOQt4DgFmAg
-	 4gMq7SzN+tkvw==
-Date: Wed, 8 May 2024 09:36:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: "kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	Ping-Ke Shih <pkshih@realtek.com>,
-	Larry Chiu <larry.chiu@realtek.com>
-Subject: Re: [PATCH net-next v17 02/13] rtase: Implement the .ndo_open
- function
-Message-ID: <20240508083643.GN15955@kernel.org>
-References: <20240502091847.65181-1-justinlai0215@realtek.com>
- <20240502091847.65181-3-justinlai0215@realtek.com>
- <20240503085257.GM2821784@kernel.org>
- <745b2ee9e81f4904920e0e4fe6e4df89@realtek.com>
+	s=arc-20240116; t=1715157482; c=relaxed/simple;
+	bh=Ymt6mozaZpmsZUFJR/IHGnlk0I5feZGcwlYIOyneKek=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=jGR+SDXGlom9b8or42nv+gxXD6TIUYY6d899D3+6NYG/5iiY9Mdt75A/BHad7B71n7kN9PqOrDkDOZQThxdOFMqEPWzjNRIylOqwdMIdWH5IN4Q+MXf0sWOys75CDVOoGWa4/sdUWc1kekO1U3UsECVbJ7WY8vezs9qVoB3pKGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=TI8Ilyfb; arc=none smtp.client-ip=213.160.72.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
+	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:Reply-To:From:Subject:Message-ID:Sender:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=/cwWJ2hMCsxHa5oCqbo42OeplSDlKH5HJFgON70WHio=; b=TI8Ilyfby4KeVuwyRX1MiCEsjZ
+	gm+QHj0oxkL/6FiMJTs/z/VC+0bOPbtwYXMDKUJjgkTQmUU0PGY4BQ7u0XiwKzCxheL4pO5AAQV0P
+	O6R7iVA7HrAyfvEUdMQZ4nknb2bmdyd6s1Rj9hesRknNtKiIsb2ThZXdHPHdNkJE4H/8=;
+Received: from 127.0.0.1
+	by fritzc.com with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim latest)
+	(envelope-from <christoph.fritz@hexdev.de>)
+	id 1s4cns-001hLj-2m;
+	Wed, 08 May 2024 10:37:33 +0200
+Message-ID: <42012e066d3da1ac89b00b793283d03874cd0776.camel@hexdev.de>
+Subject: Re: [PATCH v2 01/12] can: Add LIN bus as CAN abstraction
+From: Christoph Fritz <christoph.fritz@hexdev.de>
+Reply-To: christoph.fritz@hexdev.de
+To: Simon Horman <horms@kernel.org>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde
+ <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David
+ S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Rob
+ Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
+ Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, Benjamin
+ Tissoires <bentiss@kernel.org>,  Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, Sebastian
+ Reichel <sre@kernel.org>,  Linus Walleij <linus.walleij@linaro.org>,
+ Andreas Lauser <andreas.lauser@mercedes-benz.com>, Jonathan Corbet
+ <corbet@lwn.net>, Pavel Pisa <pisa@cmp.felk.cvut.cz>,
+ linux-can@vger.kernel.org,  netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-input@vger.kernel.org, 
+ linux-serial@vger.kernel.org
+Date: Wed, 08 May 2024 10:37:31 +0200
+In-Reply-To: <20240504124904.GJ3167983@kernel.org>
+References: <20240502075534.882628-1-christoph.fritz@hexdev.de>
+	 <20240502075534.882628-2-christoph.fritz@hexdev.de>
+	 <20240504124904.GJ3167983@kernel.org>
+Organization: hexDEV GmbH
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <745b2ee9e81f4904920e0e4fe6e4df89@realtek.com>
+Content-Transfer-Encoding: 7bit
 
-On Mon, May 06, 2024 at 02:45:11AM +0000, Justin Lai wrote:
-
-...
-
-> > > +
-> > > +             /* request other interrupts to handle multiqueue */
-> > > +             for (i = 1; i < tp->int_nums; i++) {
-> > > +                     ivec = &tp->int_vector[i];
-> > > +                     snprintf(ivec->name, sizeof(ivec->name),
-> > > + "%s_int%i", tp->dev->name, i);
+On Sat, 2024-05-04 at 13:49 +0100, Simon Horman wrote:
+> On Thu, May 02, 2024 at 09:55:23AM +0200, Christoph Fritz wrote:
+> > This patch adds a LIN (local interconnect network) bus abstraction on
+> > top of CAN.  It is a glue driver adapting CAN on one side while offering
+> > LIN abstraction on the other side. So that upcoming LIN device drivers
+> > can make use of it.
 > > 
-> > nit: This line could trivially be split into two lines,
-> >      each less than 80 columns wide.
-> > 
-> I will check if there are other similar issues and make corrections.
+> > Tested-by: Andreas Lauser <andreas.lauser@mercedes-benz.com>
+> > Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+> 
+> ...
+> 
+> > diff --git a/drivers/net/can/lin.c b/drivers/net/can/lin.c
+> 
+> ...
+> 
+> > +struct lin_device *register_lin(struct device *dev,
+> > +				const struct lin_device_ops *ldops)
+> > +{
+> > +	struct net_device *ndev;
+> > +	struct lin_device *ldev;
+> > +	int ret;
+> > +
+> > +	if (!ldops || !ldops->ldo_tx || !ldops->update_bitrate  ||
+> > +	    !ldops->ldo_open || !ldops->ldo_stop) {
+> > +		netdev_err(ndev, "missing mandatory lin_device_ops\n");
+> 
+> Hi Christoph,
 
-Thanks.
+Hi Simon
 
-FWIIW, checkpatch.pl --max-line-length=80 can be helpful here.
+> The line above uses ndev, but ndev is not initialised
+> until a few lines further down.
+> 
+> Flagged by Smatch.
+
+Despite netdev_err() checks validity of ndev, I agree with Smatch: In
+upcoming v4 I'll use dev_err() here instead.
+
+> > +		return ERR_PTR(-EINVAL);
+> > +	}
+> > +
+> > +	ndev = alloc_candev(sizeof(struct lin_device), 1);
+> > +	if (!ndev)
+> > +		return ERR_PTR(-ENOMEM);
+> > +
+> > +	ldev = netdev_priv(ndev);
+> > +
+> > +	ldev->ldev_ops = ldops;
+> > +	ndev->netdev_ops = &lin_netdev_ops;
+> > +	ndev->flags |= IFF_ECHO;
+> > +	ndev->mtu = CANFD_MTU;
+> > +	ldev->can.bittiming.bitrate = LIN_DEFAULT_BAUDRATE;
+> > +	ldev->can.ctrlmode = CAN_CTRLMODE_LIN;
+> > +	ldev->can.ctrlmode_supported = 0;
+> > +	ldev->can.bitrate_const = lin_bitrate;
+> > +	ldev->can.bitrate_const_cnt = ARRAY_SIZE(lin_bitrate);
+> > +	ldev->can.do_set_bittiming = lin_set_bittiming;
+> > +	ldev->ndev = ndev;
+> > +	ldev->dev = dev;
+> > +
+> > +	SET_NETDEV_DEV(ndev, dev);
+> > +
+> > +	ret = lin_set_bittiming(ndev);
+> > +	if (ret) {
+> > +		netdev_err(ndev, "set bittiming failed\n");
+> > +		goto exit_candev;
+> > +	}
+> > +
+> > +	ret = register_candev(ndev);
+> > +	if (ret)
+> > +		goto exit_candev;
+> > +
+> > +	ldev->lin_ids_kobj = kobject_create_and_add("lin_ids", &ndev->dev.kobj);
+> > +	if (!ldev->lin_ids_kobj) {
+> > +		netdev_err(ndev, "Failed to create sysfs directory\n");
+> > +		ret = -ENOMEM;
+> > +		goto exit_unreg;
+> > +	}
+> > +
+> > +	ret = lin_create_sysfs_id_files(ndev);
+> > +	if (ret) {
+> > +		netdev_err(ndev, "Failed to create sysfs entry: %d\n", ret);
+> > +		goto exit_kobj_put;
+> > +	}
+> > +
+> > +	/* Using workqueue as tx over USB/SPI/... may sleep */
+> > +	ldev->wq = alloc_workqueue(dev_name(dev), WQ_FREEZABLE | WQ_MEM_RECLAIM,
+> > +				   0);
+> > +	if (!ldev->wq)
+> > +		goto exit_rm_files;
+> 
+> The goto above will result in: return ERR_PTR(ret)
+> But ret is 0 here. Should it be set to a negative error value?
+> 
+> Also flagged by Smatch.
+
+OK, will get an
+
+ret = -ENOMEM;
+
+> 
+> > +
+> > +	INIT_WORK(&ldev->tx_work, lin_tx_work_handler);
+> > +
+> > +	netdev_info(ndev, "LIN initialized.\n");
+> > +
+> > +	return ldev;
+> > +
+> > +exit_rm_files:
+> > +	lin_remove_sysfs_id_files(ndev);
+> > +exit_kobj_put:
+> > +	kobject_put(ldev->lin_ids_kobj);
+> > +exit_unreg:
+> > +	unregister_candev(ndev);
+> > +exit_candev:
+> > +	free_candev(ndev);
+> > +	return ERR_PTR(ret);
+> > +}
+> > +EXPORT_SYMBOL_GPL(register_lin);
+> 
+> ...
+
+Thanks
+  -- Christoph
 
