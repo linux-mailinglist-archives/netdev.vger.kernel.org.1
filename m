@@ -1,121 +1,153 @@
-Return-Path: <netdev+bounces-94595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74D2E8BFF45
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:47:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B084D8BFF4C
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 15:48:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A69FE1C22121
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:47:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D36EC1C2130D
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 13:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E4F85264;
-	Wed,  8 May 2024 13:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B768C8526C;
+	Wed,  8 May 2024 13:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aCT7PrIt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bPR2FNMY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7384183A18
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 13:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4639C84E0D
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 13:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715175996; cv=none; b=afulsFXLeCB4ahQgPKNTqTCTQBiKBI8E5c3U1wrd0U47H+SCvgswYrlzlACNB01/2TwpTF39xzkjX8OoJQ/uGt5GRw8FeqS9jXyomQxXikpCy57qDLBMprGBx93s4JXv4wtCfotieHdrse8S/cF/nTRTfY06JVQOp+oyPrSLcoM=
+	t=1715176027; cv=none; b=D2F+oyO8MIanh5tFdbMd7Udec5kXbWAqIh+fa+1pVbFavzmPUoSCIm4ChOWPq/lh3Uq48VuZUWLb99MG4ptkoB7sgcwsq6sTvp6EKdAxzkZaVAm7bLsv1a/W05VX0/FAIM4BTTYm+vaxC0CZaeQJje97DgRfrU8BKnosddfBMwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715175996; c=relaxed/simple;
-	bh=GdixQsgXvC6tXH8Ww9zrCzm6z3xMTX7yN34V5Eukft0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=abmJyPHhDpoFH3MJ51OMn4LlbjCkwLtfaf/CdwemFQrTvvYayqb+O0G9pEfF0UCUTAUvIF7PMkLDiY0RO+jqj5TZDv8LDNiK4TTEc8KlQjagn08wjgvfsLA98YGgv3tDulLFUo8Iiy3cFo6fWuMd6VQH8ZM9aBHHxwKtKgMlVzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aCT7PrIt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7647DC113CC;
-	Wed,  8 May 2024 13:46:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715175996;
-	bh=GdixQsgXvC6tXH8Ww9zrCzm6z3xMTX7yN34V5Eukft0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aCT7PrItNGdOtULlPqF/Ai9WyjvuHJafdOVxGm6edf6ZkZKQFYkC9wWMaEWBIAKG1
-	 9zpzYrUBtODocSAdR2KMBBGhMmShz8i0hvww8BMYqUsWBOS5xL6uIJIS7MHO8IF2pi
-	 1p9jFETanG7vXm6wNS8tzRQyHMMf1nAK14mXVXs2x5Lcj5/d0Ni5yVjzLzy5UGGC0i
-	 theifWkUsTiGFbrlDzZe9ksP84zh1b3/ZhwgSqx3Lve65vb/rhofji/geUGyNjJGpK
-	 Y+6Ia5RX6/WaeSUcOkWoE4K1JViSE691AgJyLDSixDAU5el5ap6wH272eUWuZVW8j+
-	 b0TPdO9dtEuGA==
-Date: Wed, 8 May 2024 14:46:32 +0100
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net] ipv6: fib6_rules: avoid possible NULL dereference in
- fib6_rule_action()
-Message-ID: <20240508134632.GF1736038@kernel.org>
-References: <20240507163145.835254-1-edumazet@google.com>
+	s=arc-20240116; t=1715176027; c=relaxed/simple;
+	bh=u6EyzHXd27fFGrN9Et656hCo/08PPyT+hT+CjlkxkTU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ilLRk3tfjWXSZ785bdz7ERh0jzlT32LyB3dEWbS5a5NG/D7UmJMyufz4ZlCm9CZDsgbdYTaXE+Xc1J6xeRbkfFTo6oEQ6F2IJ7YyYCF76NpK6On75+k4W7ahv+iiew2RsLKiMFXdKt4nfAs3zAkQfNbDzKlpYQs/g50tY8gdbVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bPR2FNMY; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2b2738ce656so3654193a91.0
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 06:47:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715176025; x=1715780825; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Cy96MEbs4JLv+XlnJDrNT2CJ2qEQRDaH5Qu53Pf8ZU=;
+        b=bPR2FNMYRrL08LQZsHzX4L6KUGDoby1D7kq9CdVilnTl6CW9lrBNQYoFJsegU0aGHp
+         4Rvak8c4UmtoXc6S3fFjOZBo01YZflQzqFYbXxLIMfFX6eOvhYD8CtmBrq+Mb4rYJAd4
+         2TsYLBRRZ5lpklLD11TRJUBP059D2HhrmxyI4sMyN7bd6vthUJHtxs4RdEeGguR3wo9D
+         30qJITdawJLGFg0swiui7xrCU72XGr5q34hiCJUVBCjHrubNk4EFfWZpBaPVUzsm1Ifx
+         +T4FgDSpNbi6t6XMJh7DSzyQHM216u9cGZYXYgPB8SaOhyO6WycTJJETY3cK0TX2A9N0
+         gIog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715176025; x=1715780825;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Cy96MEbs4JLv+XlnJDrNT2CJ2qEQRDaH5Qu53Pf8ZU=;
+        b=bZTu8i091NKmkSBGlkGVIIm6gy/lNU7xZRwdK1kr/wjJXeM4q7nor/HRfmzEoNiTj2
+         A2mvI4v1JoVmEeRPoSQBVzhaBP/jQ4nteAiTNuELEsHchv4oRCTXw7RpyhyX8wK2XKDQ
+         DSynXIsfyqWVxVoOIhoM7q8HtPCX7t3wcheAUqdW3zo3MLmbs7qYVXdxlmpViNHiFJbb
+         XS1FdzTJrMQcv4nFGu+IY57dWomo3022wkeOk1ovY4EA1PM7M/BKHK1Vk91K400LbkJr
+         mmVEXkAfcUuEN+nvwa53a2S2pN6FDcijHyVQKBcAp6o6bYkL5XQfJU34Sn9q7LMLxZOi
+         lvzA==
+X-Forwarded-Encrypted: i=1; AJvYcCUAAKlFA1gakudb/XHbzapM1CUglaTOYyAbwOMYFQocQ2Rrcy9XjstAdbXppRJda9G5I6NpS9HiG6RhQmepkLBeEHzgPhbb
+X-Gm-Message-State: AOJu0YwhlrF8SOHRePPZtUV61sxTaGMTttg3JAwIQIaXld1XwYlDWL0x
+	EI2++RjNGGv3+mbtXDEoqiYptBdd6EJMSDTcc3mlIx5OIb2MeruRxZVjeC40a8QpmfSt9eGcdOv
+	FcQ==
+X-Google-Smtp-Source: AGHT+IGkEzt3rrLCYEAc2MIkDJ4rSudkNPJV/ZI7YDr6FjDNwR59XbPWzyPuXmQfxq7n/1Jp45z9S3futCA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:128d:b0:2b4:32ae:483e with SMTP id
+ 98e67ed59e1d1-2b61638c780mr8658a91.2.1715176024465; Wed, 08 May 2024 06:47:04
+ -0700 (PDT)
+Date: Wed, 8 May 2024 06:47:03 -0700
+In-Reply-To: <20240507214254.2787305-1-edliaw@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240507163145.835254-1-edumazet@google.com>
+Mime-Version: 1.0
+References: <20240507214254.2787305-1-edliaw@google.com>
+Message-ID: <ZjuA3aY_iHkjP7bQ@google.com>
+Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
+From: Sean Christopherson <seanjc@google.com>
+To: Edward Liaw <edliaw@google.com>
+Cc: shuah@kernel.org, Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
+	Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Nhat Pham <nphamcs@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Christian Brauner <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>, 
+	Kees Cook <keescook@chromium.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, 
+	Davidlohr Bueso <dave@stgolabs.net>, "=?utf-8?B?QW5kcsOp?= Almeida" <andrealmeid@igalia.com>, 
+	Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>, 
+	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	David Hildenbrand <david@redhat.com>, "=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Seth Forshee <sforshee@kernel.org>, 
+	Bongsu Jeon <bongsu.jeon@samsung.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"Andreas =?utf-8?Q?F=C3=A4rber?=" <afaerber@suse.de>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Fenghua Yu <fenghua.yu@intel.com>, Reinette Chatre <reinette.chatre@intel.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kernel-team@android.com, 
+	linux-sound@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mm@kvack.org, linux-input@vger.kernel.org, iommu@lists.linux.dev, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-actions@lists.infradead.org, mptcp@lists.linux.dev, 
+	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, May 07, 2024 at 04:31:45PM +0000, Eric Dumazet wrote:
-> syzbot is able to trigger the following crash [1],
-> caused by unsafe ip6_dst_idev() use.
+On Tue, May 07, 2024, Edward Liaw wrote:
+> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> asprintf into kselftest_harness.h, which is a GNU extension and needs
+> _GNU_SOURCE to either be defined prior to including headers or with the
+> -D_GNU_SOURCE flag passed to the compiler.
 > 
-> Indeed ip6_dst_idev() can return NULL, and must always be checked.
+> v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-edliaw@google.com/
+> v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
+> location.  Remove #define _GNU_SOURCE from source code to resolve
+> redefinition warnings.
 > 
-> [1]
-> 
-> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
-> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-> CPU: 0 PID: 31648 Comm: syz-executor.0 Not tainted 6.9.0-rc4-next-20240417-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
->  RIP: 0010:__fib6_rule_action net/ipv6/fib6_rules.c:237 [inline]
->  RIP: 0010:fib6_rule_action+0x241/0x7b0 net/ipv6/fib6_rules.c:267
-> Code: 02 00 00 49 8d 9f d8 00 00 00 48 89 d8 48 c1 e8 03 42 80 3c 20 00 74 08 48 89 df e8 f9 32 bf f7 48 8b 1b 48 89 d8 48 c1 e8 03 <42> 80 3c 20 00 74 08 48 89 df e8 e0 32 bf f7 4c 8b 03 48 89 ef 4c
-> RSP: 0018:ffffc9000fc1f2f0 EFLAGS: 00010246
-> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 1a772f98c8186700
-> RDX: 0000000000000003 RSI: ffffffff8bcac4e0 RDI: ffffffff8c1f9760
-> RBP: ffff8880673fb980 R08: ffffffff8fac15ef R09: 1ffffffff1f582bd
-> R10: dffffc0000000000 R11: fffffbfff1f582be R12: dffffc0000000000
-> R13: 0000000000000080 R14: ffff888076509000 R15: ffff88807a029a00
-> FS:  00007f55e82ca6c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000001b31d23000 CR3: 0000000022b66000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->   fib_rules_lookup+0x62c/0xdb0 net/core/fib_rules.c:317
->   fib6_rule_lookup+0x1fd/0x790 net/ipv6/fib6_rules.c:108
->   ip6_route_output_flags_noref net/ipv6/route.c:2637 [inline]
->   ip6_route_output_flags+0x38e/0x610 net/ipv6/route.c:2649
->   ip6_route_output include/net/ip6_route.h:93 [inline]
->   ip6_dst_lookup_tail+0x189/0x11a0 net/ipv6/ip6_output.c:1120
->   ip6_dst_lookup_flow+0xb9/0x180 net/ipv6/ip6_output.c:1250
->   sctp_v6_get_dst+0x792/0x1e20 net/sctp/ipv6.c:326
->   sctp_transport_route+0x12c/0x2e0 net/sctp/transport.c:455
->   sctp_assoc_add_peer+0x614/0x15c0 net/sctp/associola.c:662
->   sctp_connect_new_asoc+0x31d/0x6c0 net/sctp/socket.c:1099
->   __sctp_connect+0x66d/0xe30 net/sctp/socket.c:1197
->   sctp_connect net/sctp/socket.c:4819 [inline]
->   sctp_inet_connect+0x149/0x1f0 net/sctp/socket.c:4834
->   __sys_connect_file net/socket.c:2048 [inline]
->   __sys_connect+0x2df/0x310 net/socket.c:2065
->   __do_sys_connect net/socket.c:2075 [inline]
->   __se_sys_connect net/socket.c:2072 [inline]
->   __x64_sys_connect+0x7a/0x90 net/socket.c:2072
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Fixes: 5e5f3f0f8013 ("[IPV6] ADDRCONF: Convert ipv6_get_saddr() to ipv6_dev_get_saddr().")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Edward Liaw (5):
+>   selftests: Compile kselftest headers with -D_GNU_SOURCE
+>   selftests/sgx: Include KHDR_INCLUDES in Makefile
+>   selftests: Include KHDR_INCLUDES in Makefile
+>   selftests: Drop define _GNU_SOURCE
+>   selftests: Drop duplicate -D_GNU_SOURCE
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Can you rebase this on top of linux-next?  I have a conflicting fix[*] for the
+KVM selftests queued for 6.10, and I would prefer not to drop that commit at
+this stage as it would require a rebase of a pile of other commits.
 
+And I doubt KVM is the only subsystem that has a targeted fix for the _GNU_SOURCE
+mess.
+
+If we want/need to get a fix into 6.9, then IMO we should just revert 809216233555
+("selftests/harness: remove use of LINE_MAX"), as that came in quite late in the
+6.9 cycle, and I don't think it's feasible to be 100% confident that globally
+defining _GNU_SOURCE works for all selftests, i.e. we really should have a full
+cycle for folks to test.
+
+[*] https://github.com/kvm-x86/linux/commit/730cfa45b5f4
 
