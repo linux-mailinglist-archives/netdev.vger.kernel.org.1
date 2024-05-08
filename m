@@ -1,251 +1,248 @@
-Return-Path: <netdev+bounces-94626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D7EE8C0037
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 16:39:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4E1C8C0039
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 16:39:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00939B20C0E
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 14:39:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C50561C20B24
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 14:39:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD3E84A23;
-	Wed,  8 May 2024 14:38:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C398563C;
+	Wed,  8 May 2024 14:39:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYf7XwnI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bWuVIJNs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0350077624
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 14:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715179139; cv=none; b=cShu0utGb+Wja2t9q0B0/+BvYdR9u0Ut5j8ZRURzUwYWrKRZpv4uNsF8DXdpeTS4WGP1h7gH1ZVFAF1YHh6pGYkE9XAm2lCXooCMK5v+fF+mrWB5r57B2XM/PXr4wnYUXyCa0pk3891cCMEz95IIkkiCv1e5NmVSZbjd/yzMZvQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715179139; c=relaxed/simple;
-	bh=vK2+ORZcFIFmbd5FcENZ1RSHVRnFdp/zpiWJuRzGdlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JHbMkzEwzZa0I4+6FU7qktg/MCGoKYZLcNBRzsm2RZfY9w2/J8lfyI9idL5ewCcgNfEm1GY/eIu52+yxntK/FQrS4kHcQBqZAoVFIqiGwBQk/+p9TUVqlOSMGlZVRTDSxqBAPvUEXPU28IrXbZitW2k2N3Qt8OhTfpukqY7C2Y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GYf7XwnI; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2e1fa824504so64544081fa.0
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 07:38:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715179136; x=1715783936; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Q11mZhBQ5RCgyYqvf0ZT/Zqv/lkMsD/ZITIy8YN6jWA=;
-        b=GYf7XwnI/pABKW8d8ad209OPtUaUSBu8VFgK52mdZFIF7HOvCgs/KGkMHdI2GJt76I
-         9gqGiLEKv6c2zrhMz9lyMHVWu2rdrXfhNJXzVH3dz//+lhw/xYR3oCHwA7OuffEYhx3g
-         owY5SpvEtB5Of6kt/FPjAzomooCxWZ+DRv5yhK0DJsMP1Fsw7qb8hxzXUpcBZeYRV3bn
-         E0+4CL0qxJR5ajH5baHJaX8+zhZnkhvNlPtTIKTCESOjjEgrNRVXkQip4hZ4siCG6fbf
-         NAWDxGVzox12O/inclY2b3yxX09RynkfKdQXsZLsUM93eXvJ1Wr41P1ygpSTgrz9uLH+
-         Ur3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715179136; x=1715783936;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q11mZhBQ5RCgyYqvf0ZT/Zqv/lkMsD/ZITIy8YN6jWA=;
-        b=wu3hks3X62kVcE15EaAoHN/oFqGqeqAJXzNFL2/Veo+4EOwmf5twMajEf6SU5qTN3e
-         l6wvgMZlRmwvNQ8K6jbuFSt0dTxbx423SeKQuvpDxUWaWimAaQAPLKzYhOVW/W/hJAfw
-         JTPq3uK1kTbqibN2nzMocBVZ0YDATWP+pJUR10gzBxIM2n6bSeFTETCtWBG8+dUhoXwx
-         3p84Bwsss+1E09+UQkY3kDfbF7KMTqR+u7CdPbaqZMfBHv02FOhwSRrTnSx0DzwdwvQa
-         tCFoPKhHutFLEJ9YvIE0PjdR7plNUgLR9nxKOnKQkVMGF1fnWBBtpxdT8RQpF0YHN+i5
-         jMrw==
-X-Forwarded-Encrypted: i=1; AJvYcCV//7AxnhHxQTBFV7MlKWjKuEe+JYD3edV/xdeca8akLQGMEj4KOAD3Yxk17IEHYZq6MZz8ZfG4eA0BoOa4XmxDAMs6OLD0
-X-Gm-Message-State: AOJu0Yz4O/MQwjK4tKfXdD9QaHBVXJZEWZ5BRg4E1Tv3ssNI+2J0FLfP
-	eLizWcsBfsTIPVYfhwlqukworBzENQh0DG4XrOIyqyFclXtPlgrC
-X-Google-Smtp-Source: AGHT+IFOhe5QF0yVSgeXHEwAsukGTr3pHaBUSDLhkIdstfu3cOrTtbtfbXVHDwyFM6iGFW+7xgzNqQ==
-X-Received: by 2002:a2e:9906:0:b0:2db:77c7:c4aa with SMTP id 38308e7fff4ca-2e4476ad0e7mr15946551fa.41.1715179135787;
-        Wed, 08 May 2024 07:38:55 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id u19-20020a2e9f13000000b002dd847e16b5sm2430123ljk.70.2024.05.08.07.38.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 07:38:55 -0700 (PDT)
-Date: Wed, 8 May 2024 17:38:52 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-Subject: Re: [PATCH net-next v12 13/15] net: stmmac: dwmac-loongson: Add
- Loongson GNET support
-Message-ID: <pdyqoki5qw4zabz3uv5ff2e2o43htcr6xame652zmbqh23tjji@lt5gmp6m3lkm>
-References: <cover.1714046812.git.siyanteng@loongson.cn>
- <c97cb15ab77fb9dfdd281640f48dcfc08c6988c0.1714046812.git.siyanteng@loongson.cn>
- <jkjgjraqvih4zu7wvqykerq5wisgkhqf2n2pouha7qhfoeif7v@tkwyx53dfrdw>
- <150b03ff-70b5-488a-b5e6-5f74b6398b20@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3FA7EF06;
+	Wed,  8 May 2024 14:39:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715179192; cv=fail; b=TsA0zrvlJcVv2AmMxBLSYZEGePxIERYXa7cAJ6ruhJsDtbgj96EGVYv3i4puM2w4ASS0ts7MbHjfAmcWqrjCi+1PZ9iFFwIScW+CmSlt8GYAYuLb4vMEFlZA+EgwkNlgQf9N3vMano4cmJ6XGUaXFbzcZJvJlSPH8T6y/+x3vyo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715179192; c=relaxed/simple;
+	bh=MwOqXxMJqPcVTfjdg5wjbvT5KNENXzBH9F1z33cp5BY=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=MhoVV2jPcf7MHLP5t69V169uzVJIKWE7g7pHUf7ErNVksUs8YA7WjpGn95PGyOYiySJui13gzP81BNZk6FW4bp+mrf3GWexvd6rAFDjlcfekkOMWFqjIie6In5/qY0IEjfoNfdPYvU10rcIvkiEniXLX1OpFvEfRUQRQyDqdbN4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bWuVIJNs; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715179191; x=1746715191;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=MwOqXxMJqPcVTfjdg5wjbvT5KNENXzBH9F1z33cp5BY=;
+  b=bWuVIJNsLbdxAAEpA9tZEQyL5nEdrd4MfkZ4nmhYyDUFqWWaEtsX+uJg
+   /ZfIyBDwSRxp1vIGV2wILeMz+Yy05CnZkFtewKHarlks/6IEL9S773HyQ
+   W9RBpOgCX3gfFk4MN4k8U89g5hyBrOlPTdZNNIeKUFEs04Jw1FZ7qB0mT
+   ek998rYTVcgAAHFfc4z+bFoLrbkmOo8fOL5Ufup7bfK43pJy6q0K0F7lX
+   l3ZyeD9RY02/hGOP5DHAtMmr7XL3IetS+3l8H6wkrr/mh3dZGHqeFjiYi
+   S6di92saazn/NVa0c1hnJeSdyvhq1yFKaLL0mJrJmDQbMm/v9tHCwHUej
+   Q==;
+X-CSE-ConnectionGUID: ETR4QGvxS+OAvVyGEB9bLA==
+X-CSE-MsgGUID: vsyDB5byToGskmGsmH9skQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11067"; a="36423228"
+X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
+   d="scan'208";a="36423228"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 07:39:50 -0700
+X-CSE-ConnectionGUID: M47Pbhm+SXK6a2H9waqmTQ==
+X-CSE-MsgGUID: SqiIU76mTV2LsqPGwNdecA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
+   d="scan'208";a="33741244"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 May 2024 07:39:49 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 8 May 2024 07:39:49 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 8 May 2024 07:39:49 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 8 May 2024 07:39:49 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 8 May 2024 07:39:48 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=K8BAhdGpQll+HaeC+Zy9gkGtqUe/GXwdbSKSt6CqPenMcyQWacQPYIfmR24mtGOw5gaTcEs3swWWqawxnm7p/fsHyLDcvQpjNt+Q3b+KQkNlU91r6+/IvhPaZpbL0wimSpftfYYISdJoobbCtG4RmSjOkW2nb8Ru8gQPMAdbsk9qlWAzwkDBSzxGINI90FejNMjtJK7OANn6gZj1JkrWG4jnNgkqeZagq590Nmt8oXCp8qcmQlRfbkf5Y/xI8XXBRxevVY5fRj4cX5hyJmHCAUX1VichumHOh3gyP5yK485qszm4nLVeHDQPHtNsqg2kuPPewS1/3j6UoijKgxf6lQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2V/9IK5GgLteBC47L6JFSG0XwCnStgIyfTF00RoKNBM=;
+ b=gKF3qXGdtRrO+LKIQDmpuvlxIJPWiHji9g7Hx4lHFNtAk8VbikJ76gx/prXpAXn+7BtNrdqFl9t+LJtkkqy7T8ivspddw6bdMrtrd/hitYskJVLODQ1up35DbIT2MMk5tksbAP6Iwg/A159AHObBUStlEsJyt6iiKkQZdR0WESVBsHs/kaptnZPIdUcc985DkMH2206hECadaUBAqdEKyDOcMWsOvdzRJzIUS2iOwrJpfKG3gCLWGhzZapWq5isnm5FD+fvNHO/jyTro8zYRgkGEjbyzlI2YPk5MMO051qVpdHABsxdQfI9ddGEvsA17FVw2qU17ebnY2ueWg41P4w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by LV8PR11MB8485.namprd11.prod.outlook.com (2603:10b6:408:1e6::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.46; Wed, 8 May
+ 2024 14:39:47 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.7544.041; Wed, 8 May 2024
+ 14:39:46 +0000
+Message-ID: <5ab7ae5c-79d2-494e-8986-d18d4a8e74bb@intel.com>
+Date: Wed, 8 May 2024 16:39:21 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 1/1] net: intel: Use *-y instead of *-objs in
+ Makefile
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+CC: Jacob Keller <jacob.e.keller@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>, Jesse Brandeburg
+	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Richard
+ Cochran" <richardcochran@gmail.com>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer
+	<hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>
+References: <20240508132315.1121086-1-andriy.shevchenko@linux.intel.com>
+ <6ac025de-9264-4510-ba7f-f9a56c564a80@intel.com>
+ <ZjuLW8jA3MuT0oih@smile.fi.intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <ZjuLW8jA3MuT0oih@smile.fi.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA1P291CA0010.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:19::10) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <150b03ff-70b5-488a-b5e6-5f74b6398b20@loongson.cn>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|LV8PR11MB8485:EE_
+X-MS-Office365-Filtering-Correlation-Id: 45cfc678-3f0d-4bac-c668-08dc6f6cb513
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|376005|7416005|1800799015;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?R28zMUtrdlBPcVZjdTkrTjhKS05KNzZMN0lkTm9tNmt1eFNQbnZSVHpSNXNM?=
+ =?utf-8?B?UWlYaFFQZG8xSzB1OVFGdEpsZWhnbXRPWld0SGdYWXRoRkJONklUSmMxazAv?=
+ =?utf-8?B?Y2s1YUtCRCt0b1VrZk44UWVBMWNiZTEwTU5KdTdSeDVrYTZLT3VZTDNPQVAw?=
+ =?utf-8?B?SSs1dHlKT21hMFBVYURncTY4RUR2aDJFbnhZdVk0YWNSL3VEbWdhRVdVVWJi?=
+ =?utf-8?B?RWFDQTZSZWF6Ujl4ckljOVNEQmdQVlNrK2RSTXgyZVc5dWZybE1QVXhMYVVo?=
+ =?utf-8?B?UG5pWmthZFhwTmdZTXhPRVB5eDdKc2RHYkllRjlOUldiUStNWVBwcHRsd0Fz?=
+ =?utf-8?B?bEFBYVA4V2Zickc2UGh0aVllVytDazRyR2xpRGZ6cWtzenRHaHVUNDlzdnlo?=
+ =?utf-8?B?YndiNG53Zmk3Ri80SDJYWHFhNW9xMHFvdnoxNmJGTGxIOEk2VnphdlM3K3kx?=
+ =?utf-8?B?MHh6eFdlTGpQdnR4NXdEUWJ0b05vSVJLYVpVV0JDNnJKUGNHZEtqU1lWdzVM?=
+ =?utf-8?B?bTR1WFJNTFA5eVF5RXVRblE3ZGxjRndZbFQ4MXA1WStia2MvTWt3RnRuTmZI?=
+ =?utf-8?B?OVpUVzhHeFRHc01Lc1pReEtHK1JMQkQ3ZXVaZEE3bEk1S1N3VFVCZVBaUWdJ?=
+ =?utf-8?B?ZkhVd0FIUE9TeTdKZEo1a3kwRzdjdUYwYlcwNmtTOEhRNThyWnhSZE5UR3Ez?=
+ =?utf-8?B?OExlSXU2dkZWYWoyM01uVTFqb2NGVytrR2RnRzJjMEhkRS96eWFsdzhld1Bn?=
+ =?utf-8?B?TGQ3NERSVk5KMkc3WHBHaGF3QmtjQS9oNW1HaDNaM2xjaFZGY1ZpRTN5YlpO?=
+ =?utf-8?B?NFpCMnVmRTFWMnBrSG9vNUNUUXF4bVRZcnRTYXNpUngwUWFRL3JsSlFaZm94?=
+ =?utf-8?B?YW10bDdKZlIyRTNNQXZlRndIK1o0aGV2ZVBWQTdkKzRVVW5jdnJTbUI1WE9a?=
+ =?utf-8?B?Y1k2VytTM2hlR2J2Vk9vWVJxUDdJcHhsdzdKV2pHdWs2UWM0Ukg2RXh0bzI4?=
+ =?utf-8?B?UXFmeUlteEdPcm9UbUZMRE1HeEpjbXd4Q1lvR3VuZTFOblpObno3UTBHQzBl?=
+ =?utf-8?B?Z1AvZU9lUDgyck1nR1hQZXBGQmRrME1nZXJaK3ZkWWZoZThhVjFFMm9ZYkZH?=
+ =?utf-8?B?Q1hkZjhwc0QyWW5ZSEF5L04ycGZPZ0Zmd2F2UFAyT3dnemhSZStYUXZOTEVJ?=
+ =?utf-8?B?c3BRbVQ3ZDlzemxmNzdPbkN6WFY4TTVaWFNFOE90aUN5ZlJQNGI5QWNCVG92?=
+ =?utf-8?B?NzMwd2E5UU95N1J2RGM3eE9uUThDTjRubmZiamhVbExUTlBjdlExR1U2WXhl?=
+ =?utf-8?B?aFBOT2k0MmpscHFQU0RNS0IxNXFkelN2TU5HZmVSakg1S3BVWXJ0aGExaWZY?=
+ =?utf-8?B?M2doSWJqZ1dwL20yYnZsRFNTVHdzdExlM3hybVREVlJDMGV1L290UUdmN1hi?=
+ =?utf-8?B?NVJnQkV0UWwyN1c1dHF3b0tqTlFWVFFDcXd0ZHhGME9KZEEyQXhqNStKcERP?=
+ =?utf-8?B?TUFPbVVHYVZZVEQ5VzdJMzh4c2RTcTRkOHpTbU9yY2VlOWtTaVhhVmY4RzYv?=
+ =?utf-8?B?Y1c1WGdZajBtRnhtZGVnT3VERllTSU9jTDhBOTdHTFJ5S0pxaEVQcy9vdTIw?=
+ =?utf-8?B?N0lVd3o4S0dIanZXbURaUlpWd1RhQWM5MmRLU2xZbGIwakJqR09xUmJRYmcw?=
+ =?utf-8?B?ZnJoV3ZRellHYlhmY3JqeHg4MThVZkdrNHJZM0JSdlpIcWZSSUlQUVNRPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(7416005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZEZsQ2xPRGlwM2lTbGM1SVZ2REJTdHBFMDZPRk5wbVB3VGMwbzlTV0tZU1dL?=
+ =?utf-8?B?QUk0Mi9Nemd1SHpCb0JtVGJxR2cyZjNFdytFRmVmTmtncnlhTUZZQnA1dDVD?=
+ =?utf-8?B?SHE5L0tDN0llTHE1NXJIZW5ocEdod2lMZE9IS1BlL0xwS1Bmc29KTXc4eUJW?=
+ =?utf-8?B?cGhQV0w1NjA3VkRkRHBQTFA3Y282ZnR3L1lrYURWMjBZTElDcmRnUXpUNVBS?=
+ =?utf-8?B?R0x4T0tzUm1CdmsxNlNScndRNDJTVGZkNFY3b0dhRUNOS2dqV1FLNXZhWk1E?=
+ =?utf-8?B?YWZ3M3Nsd2Z5aUpnK1NUNU9URjZmTXYrelM2eG1YMWdnKytOWklBSmVaSUJK?=
+ =?utf-8?B?cktFZDIzU3U4b3cxVXZwTHNqekEwRVlOSG1LMU9mMVNqVkFib0FrODNEZXow?=
+ =?utf-8?B?aE1WY0ZZRURvcnNyMXorYUdEbVdhZUFtOFc2TjF4UThUenRZVVdWWnluRkJl?=
+ =?utf-8?B?TU9DWVYrVzU5UC9oU3JsVktwMG1DU0luM2xjaW1QNWl0dWFnWWQxYmZqVXFs?=
+ =?utf-8?B?WEIrSHg5dHgxK1p5R1g2V1dZOFVSL0Q0Q1k4ODdUZGN0bWpaS3BrOVhrSnNG?=
+ =?utf-8?B?SEt0dXFTbTFIK1o5NW9qdW90dlN2NFJHQWlUSG5TRElLZm1ZOVhaYUl1Z25F?=
+ =?utf-8?B?SXVGU05PRjJxc1oyZS9GVkRhU0Nzc3hkaEE3am90bVVCeXpzY0JYR1FVd3ha?=
+ =?utf-8?B?b1VVcmRwRVZGQithT3NwKzJTV2Q0VDJBanRwVEk1K0lMQlpaSm5pc05VaVJ3?=
+ =?utf-8?B?bThkbExXVFFrc3loRzBScUVQSE9IYlF2T01ncHA4VGo3L0dZTzJoZmJUUEky?=
+ =?utf-8?B?YVJyT3V1U0hqNkJkR0lTVnlFa3J5L3Rob2ZYakorRkxJWjUrVkJINmNWQSto?=
+ =?utf-8?B?WFFLd1ZNUFF6RU41emVIdUdSZFEwcVMzR1Y4RDNvMWRMSCtjR3hERkJCOTBp?=
+ =?utf-8?B?MWNPOHhLK1gzdmk2MXBCaFE1NTh0Y2NrblljNE9RamdhWEFOakprSmVCbk1t?=
+ =?utf-8?B?NlBkcUg0UE1DeUZEWE9zdkRUd3lEaDNnWTJ6RUdadlRQQ0F2dDUxN20vdXdn?=
+ =?utf-8?B?ZWFOL0pwQUZxdWZoWmFqSlVaOGVlK1l4SWtjbnl3VURHZmFPZWdFb0RHR0tM?=
+ =?utf-8?B?Z2xScDlkNVd0aFRzRklDZmprUkNqUEg2cjRKSTlzMWVKalFZZjl2WFp6QURE?=
+ =?utf-8?B?ZXlIM2hnQ0VkQWk1emRGajV1S0tZSjJpL1p4a0cvQ3k3Wmw3eFB6d29iWXhX?=
+ =?utf-8?B?Y3Q1bmNpR3BKY0lTWnRkeUNrRERjWHkxTmc1N0ZyRStybFNOZzk2TWpQU3Jl?=
+ =?utf-8?B?VGJocThwYVFYTlQzMVhPR0kxZVlyZHljQVJSOCtSK3BnSWtwR1RyeUFwcXVE?=
+ =?utf-8?B?UU9XQTVHZmFhbERESVpzeUlRbE11SHFuUVdqWHJHaW5GSmZrb0UyUVpmRlB1?=
+ =?utf-8?B?Rmx1YmcwYlhwK0VJSlRBMSsxMXBCalEzbnJPUmsyVDBMd1BSSWg4TlJYUWRi?=
+ =?utf-8?B?amlFZzNGNFJ4b2hGTVRtWDVFRTcyc0lkayt4MFZQbTJ2UTcyOFo3VXhlN2Vi?=
+ =?utf-8?B?OThIYTl3MmV1NjVZQzlQL1phTUxFR1FmMWV4RitmRU5DL2pGMExULzBTeGVP?=
+ =?utf-8?B?RHBTWExSVEtOOUxISkdZWmR4NTFLQnQ4S0U4ZjlGTFNIVWk1aUhaWDQ1eEUz?=
+ =?utf-8?B?SWhHdzRncDgvdzJGQjUrNW1mZGlkeGFxcXNock13czk0NG1TTUZNZmV2cVY5?=
+ =?utf-8?B?bFZFK2t5ckZINTNOeHhwblVVbnhIZHdGV0dQODJOaXJ5Yzk3NG1TdlZ0bDJX?=
+ =?utf-8?B?NUNhM2xjQzM3RzByNlNMR3ZIMnR1UkljemJ6SWxFT3c5TDVtQWxqTFpEckdK?=
+ =?utf-8?B?VElyQjNWdHU5Nng3NURnL1htMzRpcXIwVkhxNTZ4bmNWdzMyRTlwTmM5bXRZ?=
+ =?utf-8?B?V2ZaRk9oSDhwOC9EVDdjRzl3bkpjYld1ZVAwTjdvVklXV3lQQlNEbE1kb011?=
+ =?utf-8?B?TzhrR1FFUG1HTTZsRlMrUVhQV2l3YlZpOU51Z2JGcnhkRkhxTnZsTWdGNkJu?=
+ =?utf-8?B?UTFudEsvK2xHRG14SjhhTGdrY3kvN3h2Tll3K0FlTWxMQnQzQTJMSWZtTGFV?=
+ =?utf-8?B?S2FBNFBnTXdwM0I4dDdtTXU3ZHVMMUNUekpqWFRDRjA0MU55MUpOOEhqT0xD?=
+ =?utf-8?B?WUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45cfc678-3f0d-4bac-c668-08dc6f6cb513
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2024 14:39:46.8017
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nMSAp2aqQnDqRMtb6Y85+dUIJCwUjLa0MsVMUtOWyouzSSpmsMbEwmxQL4jy22rH5fSTLr53qCWu3uOXc/IqZaR2PVbjhAVrhTrPlngLPsw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8485
+X-OriginatorOrg: intel.com
 
-On Tue, May 07, 2024 at 09:35:24PM +0800, Yanteng Si wrote:
-> Hi Serge,
-> 
-> 在 2024/5/6 18:39, Serge Semin 写道:
-> > On Thu, Apr 25, 2024 at 09:11:36PM +0800, Yanteng Si wrote:
-> > > ...
-> > > +static int loongson_dwmac_config_msi(struct pci_dev *pdev,
-> > > +				     struct plat_stmmacenet_data *plat,
-> > > +				     struct stmmac_resources *res,
-> > > +				     struct device_node *np)
-> > > +{
-> > > +	int i, ret, vecs;
-> > > +
-> > > +	vecs = roundup_pow_of_two(CHANNEL_NUM * 2 + 1);
-> > > +	ret = pci_alloc_irq_vectors(pdev, vecs, vecs, PCI_IRQ_MSI);
-> > > +	if (ret < 0) {
-> > > +		dev_info(&pdev->dev,
-> > > +			 "MSI enable failed, Fallback to legacy interrupt\n");
-> > > +		return loongson_dwmac_config_legacy(pdev, plat, res, np);
-> > > +	}
-> > > +
-> > > +	res->irq = pci_irq_vector(pdev, 0);
-> > > +	res->wol_irq = 0;
-> > > +
-> > > +	/* INT NAME | MAC | CH7 rx | CH7 tx | ... | CH0 rx | CH0 tx |
-> > > +	 * --------- ----- -------- --------  ...  -------- --------
-> > > +	 * IRQ NUM  |  0  |   1    |   2    | ... |   15   |   16   |
-> > > +	 */
-> > > +	for (i = 0; i < CHANNEL_NUM; i++) {
-> > > +		res->rx_irq[CHANNEL_NUM - 1 - i] =
-> > > +			pci_irq_vector(pdev, 1 + i * 2);
-> > > +		res->tx_irq[CHANNEL_NUM - 1 - i] =
-> > > +			pci_irq_vector(pdev, 2 + i * 2);
-> > > +	}
-> > > +
-> > > +	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > ...
-> > >   static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> > >   {
-> > >   	struct plat_stmmacenet_data *plat;
-> > >   	int ret, i, bus_id, phy_mode;
-> > >   	struct stmmac_pci_info *info;
-> > >   	struct stmmac_resources res;
-> > > +	struct loongson_data *ld;
-> > >   	struct device_node *np;
-> > >   	np = dev_of_node(&pdev->dev);
-> > > @@ -122,10 +460,12 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
-> > >   		return -ENOMEM;
-> > >   	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
-> > > -	if (!plat->dma_cfg) {
-> > > -		ret = -ENOMEM;
-> > > -		goto err_put_node;
-> > > -	}
-> > > +	if (!plat->dma_cfg)
-> > > +		return -ENOMEM;
-> > > +
-> > > +	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
-> > > +	if (!ld)
-> > > +		return -ENOMEM;
-> > >   	/* Enable pci device */
-> > >   	ret = pci_enable_device(pdev);
-> > > @@ -171,14 +511,34 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
-> > >   		plat->phy_interface = phy_mode;
-> > >   	}
-> > > -	pci_enable_msi(pdev);
-> > > +	plat->bsp_priv = ld;
-> > > +	plat->setup = loongson_dwmac_setup;
-> > > +	ld->dev = &pdev->dev;
-> > > +
-> > >   	memset(&res, 0, sizeof(res));
-> > >   	res.addr = pcim_iomap_table(pdev)[0];
-> > > +	ld->gmac_verion = readl(res.addr + GMAC_VERSION) & 0xff;
-> > > +
-> > > +	switch (ld->gmac_verion) {
-> > > +	case LOONGSON_DWMAC_CORE_1_00:
-> > > +		plat->rx_queues_to_use = CHANNEL_NUM;
-> > > +		plat->tx_queues_to_use = CHANNEL_NUM;
-> > > +
-> > > +		/* Only channel 0 supports checksum,
-> > > +		 * so turn off checksum to enable multiple channels.
-> > > +		 */
-> > > +		for (i = 1; i < CHANNEL_NUM; i++)
-> > > +			plat->tx_queues_cfg[i].coe_unsupported = 1;
-> > > -	plat->tx_queues_to_use = 1;
-> > > -	plat->rx_queues_to_use = 1;
-> > > +		ret = loongson_dwmac_config_msi(pdev, plat, &res, np);
-> > > +		break;
-> > > +	default:	/* 0x35 device and 0x37 device. */
-> > > +		plat->tx_queues_to_use = 1;
-> > > +		plat->rx_queues_to_use = 1;
-> > > -	ret = loongson_dwmac_config_legacy(pdev, plat, &res, np);
-> > > +		ret = loongson_dwmac_config_legacy(pdev, plat, &res, np);
-> > > +		break;
-> > > +	}
-> > Let's now talk about this change.
-> > 
-> > First of all, one more time. You can't miss the return value check
-> > because if any of the IRQ config method fails then the driver won't
-> > work! The first change that introduces the problem is in the patch
-> > [PATCH net-next v12 11/15] net: stmmac: dwmac-loongson: Add loongson_dwmac_config_legacy
-> OK!
-> > 
-> > Second, as I already mentioned in another message sent to this patch
-> > you are missing the PCI MSI IRQs freeing in the cleanup-on-error path
-> > and in the device/driver remove() function. It's definitely wrong.
-> You are right! I will do it.
-> > Thirdly, you said that the node-pointer is now optional and introduced
-> > the patch
-> > [PATCH net-next v12 10/15] net: stmmac: dwmac-loongson: Add full PCI support
-> > If so and the DT-based setting up isn't mandatory then I would
-> > suggest to proceed with the entire so called legacy setups only if the
-> > node-pointer has been found, otherwise the pure PCI-based setup would
-> > be performed. So the patches 10-13 (in your v12 order) would look
-> 
-> In this case, MSI will not be enabled when the node-pointer is found.
-> 
-> .
-> 
-> 
-> In fact, a large fraction of 2k devices are DT-based, of course, many are
-> PCI-based.
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Date: Wed, 8 May 2024 17:25:31 +0300
 
-Then please summarise which devices need the DT-node pointer which
-don't? And most importantly if they do why do they need the DT-node?
-
-AFAICS currently both LS2K1000 and LS7A1000 GMACs require the DT-node
-to get the MAC and LPI IRQ signals. AFAICS from your series LS7A2000
-GNET is also DT-based for the same reason. But the LS2K2000 GNET case
-is different. You say that some of the platforms have the respective
-DT-node some don't, but at the same time you submitting this patch
-which permits the MSI IRQs only for the LS7A2000 GNET. It looks
-contradicting. Does it mean that the GNET devices may generate the
-IRQs via both legacy (an IRQ signal directly connected to the system
-GIC) and the PCI MSI ways?
-
-Let's get the question to the more generic level. Are the Loongson
-GNET and GMAC controllers able to generate the IRQs via both ways:
-physical IRQ signal and PCI MSI?
-
-Please don't consider this as a vastly meticulous review. I am just
-trying to figure out how to make things less complicated and fix the
-driver to permitting only the cases which are actually possible.
-
--Serge(y)
-
+> On Wed, May 08, 2024 at 03:35:26PM +0200, Alexander Lobakin wrote:
+>>> *-objs suffix is reserved rather for (user-space) host programs while
+>>> usually *-y suffix is used for kernel drivers (although *-objs works
+>>> for that purpose for now).
+>>>
+>>> Let's correct the old usages of *-objs in Makefiles.
+>>
+>> Wait, I was sure I've seen somewhere that -objs is more new and
+>> preferred over -y. 
 > 
+> Then you are mistaken.
 > 
-> Thanks,
+>> See recent dimlib comment where Florian changed -y to
+>> -objs for example.
 > 
-> Yanteng
+> So does he :-)
 > 
+>> Any documentation reference that -objs is for userspace and we should
+>> clearly use -y?
 > 
+> Sure. Luckily it's documented in Documentation/kbuild/makefiles.rst
+> "Composite Host Programs" (mind the meaning of the word "host"!).
+
+Oh okay, I see. `-objs` is indeed only mentioned in the host chapter.
+
+Thanks! Good to know.
+
+Thanks,
+Olek
 
