@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-94423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52C8F8BF710
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:30:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C973D8BF712
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 09:30:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 768071C227AA
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:30:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C24EB22239
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83C0B2C197;
-	Wed,  8 May 2024 07:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E90374C1;
+	Wed,  8 May 2024 07:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=innosonix.de header.i=@innosonix.de header.b="L3YDX+aD"
+	dkim=pass (2048-bit key) header.d=innosonix.de header.i=@innosonix.de header.b="CncpDfTr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3DA2837E
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 07:30:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A6228DC0
+	for <netdev@vger.kernel.org>; Wed,  8 May 2024 07:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715153427; cv=none; b=HVIKO+XOlsQ72YzhiCgc4O7OY20IFMloJxzPqIawTLsKy6HqM+2yVVmxT+ZnhVhM+yHJs6B990nd75YY8n7ZtW2oJ+9uK847ljqMd2qG5WUnQ5vfMOrCHXSCLZidLRDDhxCL790TWvG4ml9XqGKJDDdDMldi0livJTxRPp88aVw=
+	t=1715153428; cv=none; b=pqzFllnRYw8kBSguPGz4aMSL34XwjLqKhlBiT0dNL997iOtJZr1CcIpqK9HPBJbUy8XO7fwkG1M4EkNmPPs6bwk8dSjchYR7XrQrxLVicmWaus7YttC9Ar4xBtTLPp8Xz4cs0jLwGDbSwcfbBxwlf+f6kQ0DdL8E6/lcZS2+DT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715153427; c=relaxed/simple;
-	bh=ryub+2DBPj8dygA3ixSZEPzzf62nwP7aubV60BBTVrc=;
+	s=arc-20240116; t=1715153428; c=relaxed/simple;
+	bh=HkLTXlvLqPcM1G9r5TuQ/k6k+kIB8Kh6veaRJgAeLuE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D64YUO90HGIaed59pj9LUfe5PbWKvt4QHvaosWVeCzSNWJzI1jJryuQ5lYpX0rM9yWYx8TK+htquQxHT+g6dsgZl3i2/f+QrdO29WqfYCOCJjNmivcYMSy9O6UiYUFGr1nYS02DXHvT41H2vNdSWh8T2w7s01nD4bJjJEsDAqHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=innosonix.de; spf=pass smtp.mailfrom=innosonix.de; dkim=pass (2048-bit key) header.d=innosonix.de header.i=@innosonix.de header.b=L3YDX+aD; arc=none smtp.client-ip=209.85.218.42
+	 MIME-Version:Content-Type; b=NVpNMljSz1lZ00jDPb+/kXxdsakKTt09JyjnJOlFHMkMrvYo0sh4JhK4zfWC8oGZLSRI9YcWIP2usdsK5ym1Ur4deNn/goQGlq3I1xbAXem79WaSySotIdoilukRyAOGDe4y0FB7o+MmvAuzIbhOFiUNL+MMaKKCnsGmKHJC0mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=innosonix.de; spf=pass smtp.mailfrom=innosonix.de; dkim=pass (2048-bit key) header.d=innosonix.de header.i=@innosonix.de header.b=CncpDfTr; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=innosonix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=innosonix.de
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a59ad24baa2so133429466b.1
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 00:30:25 -0700 (PDT)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a599b74fd49so100123366b.2
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 00:30:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=innosonix.de; s=google; t=1715153424; x=1715758224; darn=vger.kernel.org;
+        d=innosonix.de; s=google; t=1715153425; x=1715758225; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=754+1zrqtoCOba8ne7LLZxtOMyJ9BY4rqXthCHDzDCA=;
-        b=L3YDX+aDDb+yf+dwS95FbJ+vti8GeqhVrdhJmZHNMwjrG6tc7PAchgn2er8TKgRwhP
-         HSEvUlBwn2L3k6sT97ohMXmske9KfxlLn4eQH2FZSYrmVC+QjHTc/z+IP02vDUdXYmnO
-         OPkxxHalLCiC1cTuhlC46hZ4CPaBwQLgd0nj/1LNlRx4Y2abRPCtYnPIVxU5dL5ErQI6
-         8/jaeeVxFMm/p9i7DRa0uwpJhZNOadWXSVEQFimMWgASqHBtT3UqZKHfZ45KSWzPeSVx
-         oqquJItfWJmeXlna0nR/Q2WdIHaQJaXlC1kj1UEhRcyOs2M2HbR7AbYUDeAAovoCD3SG
-         ZD6A==
+        bh=5VYVvd11hV7rJunixQLWGyRIvzoAkWZceNjuLWyDIro=;
+        b=CncpDfTrHUfZw6dPg0Q43fIfcyNbLPSpT0yl+p/WWlFiSrNf/ue+abrPSlPlJUrzNg
+         bQc7RkPFAkE9tOGs2mi8fRYcCFsVZ/tLKRtMQGu/dk4h9gjbeEY6jDyQcq5C5bHiDay6
+         CU4AAqg0fy9XUy6T1gvhkG0zaVapZU5ITd2nTLiiyngmPxRnfCX8KzCtBZ0L6BqAa8DB
+         2qShFxanfwqwn72fVGyFlmO79FLkXGqUhrCls3/59cK1D9tzU3RFcV+cMBJYYLFC0bqQ
+         AHoak4ESm1XkK5e/4bY7Jott7Dpx+zRxMJApnioSE/uB2WJeyt691VE4wgz4KfLnn+Z2
+         QCBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715153424; x=1715758224;
+        d=1e100.net; s=20230601; t=1715153425; x=1715758225;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=754+1zrqtoCOba8ne7LLZxtOMyJ9BY4rqXthCHDzDCA=;
-        b=PlIc8PwuET+5BTGlT8HyVlod/XxiKcl61+Z9Iy2i0u1CBbLs/qeg6NqdLESVSIKs4p
-         +p2krgnFKEmWnPMPe9RLfG69Ee9hKxv+DQaM4Kx3p3iwZmE/EAc5Fdi0U1TaSpho/59J
-         c3qOxl3D7mNmSf6TwQ1GC+AEaj7Uw6GVlSWWhMhZwG1pPsTiEB3aMUXjDz5P3qPeY6uu
-         OIWeOEmpkuJwLQ1fFI0WYQRmqu0Nbs6tdDw1hajxACldP9c9Cu1xme7G4iZx2a0A+EB1
-         JcBLLT+cZAKKKgoka+obsdUdvZ6FLBd+2GI7ispmG2UZvQ3GA4J4EJOpB5UBHaan/1gz
-         UwCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVMmqbRVN443VWfoCo5U2U2cVyEAB3WhR/Kd8U8egm8LOO24a6yRpKguIXUBkRxkeSOqXhzlyIY8jP6nCFlO5MGsPlRsviR
-X-Gm-Message-State: AOJu0Yy3eHUHJQipaGKz+6R0ia8ETV1Rae6kB9dnhe3piPV+uxGGKMMn
-	fpilF6zUQ9qcqLn0ob1OpJETWjntK5JB2Yes828RitbatrMYAdyTrxiNyqw6onAD7XPdA/1XCST
-	GoCVAo3B1ypQIlq4e1WuBAuTwYjI8BtT4kgsSNgwVGmYroy4=
-X-Google-Smtp-Source: AGHT+IFJl0Hd+7ds8Gsfg4fK6Yko9ghN0efVIKYWnlVqJ4Ohl30Swm4Unehgo2M448T11Ubrq1tenA==
-X-Received: by 2002:a17:907:9545:b0:a59:da00:5acf with SMTP id a640c23a62f3a-a59fb942291mr83147266b.2.1715153423661;
-        Wed, 08 May 2024 00:30:23 -0700 (PDT)
+        bh=5VYVvd11hV7rJunixQLWGyRIvzoAkWZceNjuLWyDIro=;
+        b=GuXPiq9vX/SGaBkuZBfcg7/Al6gBYxfNI9QY5sU9uvNuB2Xs89wHmKksZo2KJvr3yX
+         8uWgP9x0tinuoKfgUhX9HXzerZboK2JRlM7KR1cuSN7Mcy41SphvRDMQVZbv/7sEzFYy
+         kfPxvGaipgolHIvagIBUKMwf4fv1DsSNSyQS5WzQHrPjVSnozAR/TJx4aTw97On/dzRM
+         Zmi8Xy1GoVMUimvEQDz/Jok+qe8XGe2/Fm6VFws8D4xFRICB0skmy1QkqhISayGYXXSJ
+         LmvCdcaTpYkOwLU2zvbhjes12Ge+CuHJXio0Qt2ElB2B5juH5iL7m9XCR5oq76drqEBK
+         M/SA==
+X-Forwarded-Encrypted: i=1; AJvYcCUYapVqdkocOGtx6Hdd4u1G2QOGis6DrZczYJr3dsob1YvN7BEsDFpK+ZGF79qsDRCsEQItKyzc3I9ubYSkCTW2K4/Fn234
+X-Gm-Message-State: AOJu0Yw2tIatnbGZIPDnUmxWqxbWP+wA5HvO4kqflAqpT5E28GPx/VNR
+	9Pshv4U+fABotT6O7NN21Lm0jEmXrATjsrPdLMzwZUQok3d7V/IA7s1hOcwqJS6P/X9LrmmuxhI
+	eWrIMqt4sI6j9MMImWW9LGw3ZVfXn/RzuS8bm6zEWBncwn9A=
+X-Google-Smtp-Source: AGHT+IESY233JbBjfnq6GMLDZnMM4NG31o9T4zlVFMeCCFSjl3lZjwhguOSXqQjmzu92DOiPMrJUMA==
+X-Received: by 2002:a17:906:df14:b0:a59:bce9:8454 with SMTP id a640c23a62f3a-a59fb94f6d3mr109682366b.1.1715153425329;
+        Wed, 08 May 2024 00:30:25 -0700 (PDT)
 Received: from localhost.localdomain ([24.134.20.169])
-        by smtp.gmail.com with ESMTPSA id d12-20020a17090648cc00b00a59a874136fsm5212358ejt.214.2024.05.08.00.30.22
+        by smtp.gmail.com with ESMTPSA id d12-20020a17090648cc00b00a59a874136fsm5212358ejt.214.2024.05.08.00.30.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 00:30:23 -0700 (PDT)
+        Wed, 08 May 2024 00:30:24 -0700 (PDT)
 From: =?UTF-8?q?Steffen=20B=C3=A4tz?= <steffen@innosonix.de>
 To: 
 Cc: =?UTF-8?q?Steffen=20B=C3=A4tz?= <steffen@innosonix.de>,
@@ -83,9 +83,9 @@ Cc: =?UTF-8?q?Steffen=20B=C3=A4tz?= <steffen@innosonix.de>,
 	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net 1/2] net: dsa: mv88e6xxx: add phylink_get_caps for the mv88e6320/21 family
-Date: Wed,  8 May 2024 09:29:43 +0200
-Message-Id: <20240508072944.54880-2-steffen@innosonix.de>
+Subject: [PATCH v2 net 2/2] net: dsa: mv88e6xxx: read cmode on mv88e6320/21 serdes only ports
+Date: Wed,  8 May 2024 09:29:44 +0200
+Message-Id: <20240508072944.54880-3-steffen@innosonix.de>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240508072944.54880-1-steffen@innosonix.de>
 References: <20240508072944.54880-1-steffen@innosonix.de>
@@ -98,81 +98,99 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-As of commit de5c9bf40c45 ("net: phylink: require supported_interfaces to
-be filled")
-Marvell 88e6320/21 switches fail to be probed:
-
-...
-mv88e6085 30be0000.ethernet-1:00: phylink: error: empty supported_interface=
-s
-error creating PHYLINK: -22
-...
-
-The problem stems from the use of mv88e6185_phylink_get_caps() to get
-the device capabilities.=20
-Since there are serdes only ports 0/1 included, create a new dedicated=20
-phylink_get_caps for the 6320 and 6321 to properly support their=20
-set of capabilities.
-
-Fixes: de5c9bf40c45 ("net: phylink: require supported_interfaces to be fill=
-ed")
+On the mv88e6320 and 6321 switch family, port 0/1 are serdes only ports.
+Modified the mv88e6352_get_port4_serdes_cmode function to pass a port
+number since the register set of the 6352 is equal on the 6320/21.
 
 Signed-off-by: Steffen B=C3=A4tz <steffen@innosonix.de>
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Reviewed-by: Fabio Estevam <festevam@gmail.com>
 
 Changes since v1:
-- Removed unused variables.
 - Collected Reviewed-by tags from Andrew and Fabio
 ---
- drivers/net/dsa/mv88e6xxx/chip.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ drivers/net/dsa/mv88e6xxx/chip.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/c=
 hip.c
-index 32416d8802ca..bd58190853c7 100644
+index bd58190853c7..6780e8c36b1f 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.c
 +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -697,6 +697,18 @@ static void mv88e6352_phylink_get_caps(struct mv88e6xx=
-x_chip *chip, int port,
- 	}
+@@ -637,12 +637,12 @@ static void mv88e6351_phylink_get_caps(struct mv88e6x=
+xx_chip *chip, int port,
+ 				   MAC_1000FD;
  }
 =20
-+static void mv88e632x_phylink_get_caps(struct mv88e6xxx_chip *chip, int po=
-rt,
-+				       struct phylink_config *config)
-+{
-+	unsigned long *supported =3D config->supported_interfaces;
-+
-+	/* Translate the default cmode */
-+	mv88e6xxx_translate_cmode(chip->ports[port].cmode, supported);
-+
-+	config->mac_capabilities =3D MAC_SYM_PAUSE | MAC_10 | MAC_100 |
-+				   MAC_1000FD;
-+}
-+
- static void mv88e6341_phylink_get_caps(struct mv88e6xxx_chip *chip, int po=
-rt,
+-static int mv88e6352_get_port4_serdes_cmode(struct mv88e6xxx_chip *chip)
++static int mv88e63xx_get_port_serdes_cmode(struct mv88e6xxx_chip *chip, in=
+t port)
+ {
+ 	u16 reg, val;
+ 	int err;
+=20
+-	err =3D mv88e6xxx_port_read(chip, 4, MV88E6XXX_PORT_STS, &reg);
++	err =3D mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_STS, &reg);
+ 	if (err)
+ 		return err;
+=20
+@@ -651,16 +651,16 @@ static int mv88e6352_get_port4_serdes_cmode(struct mv=
+88e6xxx_chip *chip)
+ 		return 0xf;
+=20
+ 	val =3D reg & ~MV88E6XXX_PORT_STS_PHY_DETECT;
+-	err =3D mv88e6xxx_port_write(chip, 4, MV88E6XXX_PORT_STS, val);
++	err =3D mv88e6xxx_port_write(chip, port, MV88E6XXX_PORT_STS, val);
+ 	if (err)
+ 		return err;
+=20
+-	err =3D mv88e6xxx_port_read(chip, 4, MV88E6XXX_PORT_STS, &val);
++	err =3D mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_STS, &val);
+ 	if (err)
+ 		return err;
+=20
+ 	/* Restore PHY_DETECT value */
+-	err =3D mv88e6xxx_port_write(chip, 4, MV88E6XXX_PORT_STS, reg);
++	err =3D mv88e6xxx_port_write(chip, port, MV88E6XXX_PORT_STS, reg);
+ 	if (err)
+ 		return err;
+=20
+@@ -688,7 +688,7 @@ static void mv88e6352_phylink_get_caps(struct mv88e6xxx=
+_chip *chip, int port,
+ 		if (err <=3D 0)
+ 			return;
+=20
+-		cmode =3D mv88e6352_get_port4_serdes_cmode(chip);
++		cmode =3D mv88e63xx_get_port_serdes_cmode(chip, port);
+ 		if (cmode < 0)
+ 			dev_err(chip->dev, "p%d: failed to read serdes cmode\n",
+ 				port);
+@@ -701,12 +701,23 @@ static void mv88e632x_phylink_get_caps(struct mv88e6x=
+xx_chip *chip, int port,
  				       struct phylink_config *config)
  {
-@@ -5090,7 +5102,7 @@ static const struct mv88e6xxx_ops mv88e6320_ops =3D {
- 	.gpio_ops =3D &mv88e6352_gpio_ops,
- 	.avb_ops =3D &mv88e6352_avb_ops,
- 	.ptp_ops =3D &mv88e6352_ptp_ops,
--	.phylink_get_caps =3D mv88e6185_phylink_get_caps,
-+	.phylink_get_caps =3D mv88e632x_phylink_get_caps,
- };
+ 	unsigned long *supported =3D config->supported_interfaces;
++	int cmode;
 =20
- static const struct mv88e6xxx_ops mv88e6321_ops =3D {
-@@ -5136,7 +5148,7 @@ static const struct mv88e6xxx_ops mv88e6321_ops =3D {
- 	.gpio_ops =3D &mv88e6352_gpio_ops,
- 	.avb_ops =3D &mv88e6352_avb_ops,
- 	.ptp_ops =3D &mv88e6352_ptp_ops,
--	.phylink_get_caps =3D mv88e6185_phylink_get_caps,
-+	.phylink_get_caps =3D mv88e632x_phylink_get_caps,
- };
+ 	/* Translate the default cmode */
+ 	mv88e6xxx_translate_cmode(chip->ports[port].cmode, supported);
 =20
- static const struct mv88e6xxx_ops mv88e6341_ops =3D {
+ 	config->mac_capabilities =3D MAC_SYM_PAUSE | MAC_10 | MAC_100 |
+ 				   MAC_1000FD;
++
++	/* Port 0/1 are serdes only ports */
++	if (port =3D=3D 0 || port =3D=3D 1) {
++		cmode =3D mv88e63xx_get_port_serdes_cmode(chip, port);
++		if (cmode < 0)
++			dev_err(chip->dev, "p%d: failed to read serdes cmode\n",
++				port);
++		else
++			mv88e6xxx_translate_cmode(cmode, supported);
++	}
+ }
+=20
+ static void mv88e6341_phylink_get_caps(struct mv88e6xxx_chip *chip, int po=
+rt,
 --=20
 2.34.1
 
