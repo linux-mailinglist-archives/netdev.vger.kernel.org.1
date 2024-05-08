@@ -1,250 +1,142 @@
-Return-Path: <netdev+bounces-94396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A76368BF542
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 06:31:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79BFC8BF549
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 06:44:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B7B01F26383
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 04:31:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6896B22AA6
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 04:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0436175AD;
-	Wed,  8 May 2024 04:31:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACA6C147;
+	Wed,  8 May 2024 04:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=faucet.nz header.i=@faucet.nz header.b="gGLDUaxV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y22blxSF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12A117557
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 04:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7DC364;
+	Wed,  8 May 2024 04:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715142712; cv=none; b=bEmmMXLCi2lq4E9R09XxJmGog9u6dMAiHMO+m4kfhuQi0tTC1DQ94ikCJ1naLunbplBiI5BYgBV4fBkW91yAdK+2QH7X1BXQU/XksW7XaY+kRDK0UZn4r0z3ex8kcz4/+yF75Zipek8ZHqhSYL26zCHNbpJL2RfezQFpptuhIPo=
+	t=1715143469; cv=none; b=C1ySx84fjrKJZ7UwbzpbdlLBG4/aHVef72HYL1rxMUAFsDfse4BNQgUd9LvRQIX/2LWNyGuqFS9ykLBY7Ak56puxRkUVCrbmrXvP3HfzoZppbm4KxjZKeX00gsIG8Abmv7Hyk+l/WicT4srb0dNfZcm+5WSGVBZdR53w370Rh38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715142712; c=relaxed/simple;
-	bh=TcKipYSQ7HxK9DGEAnXO7v/KoZRGOrh+vyY6CyEwTRc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I5WBPwC3JJyTzd87KdX0hj5VftnVk46U91x2o7rOl1+KPNY7IJefiHdHwq4v82gI3OyZhQooi6dER8FbSenMuT3dzrXrNAzgWm4l2/yYsuROjg1K8L4/nuEXAW+9HJ6JXs9h6osMxMDuk7c21VsEvXE2gGRpyRuVqf4a+nxbzQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=faucet.nz; spf=pass smtp.mailfrom=fe-bounces.faucet.nz; dkim=pass (1024-bit key) header.d=faucet.nz header.i=@faucet.nz header.b=gGLDUaxV; arc=none smtp.client-ip=149.28.215.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=faucet.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.faucet.nz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=faucet.nz;
- h=Content-Transfer-Encoding: MIME-Version: Message-Id: Date: Subject: Cc:
- To: From; q=dns/txt; s=fe-4ed8c67516; t=1715142676;
- bh=n5msmILHpinJBimNBcmxIbuUacgT3LzKm/AdQAyT72k=;
- b=gGLDUaxVaCUnDnk77pQcj79FyUzehnBvbAMW+33c/g1kufy446NJ32uO2JI+beqp3y7SRBekZ
- euRkjVSWJuyPjEUq0/znpkcZXEMCi6qS3ECwvQtMELlsgL5/t/nK9oraO+Anm4eisdrMTQj24au
- eta07vcCZlV4xw0rThhq73k=
-From: Brad Cowie <brad@faucet.nz>
-To: bpf@vger.kernel.org, martin.lau@linux.dev
-Cc: lorenzo@kernel.org, memxor@gmail.com, pablo@netfilter.org,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, song@kernel.org,
- john.fastabend@gmail.com, sdf@google.com, jolsa@kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, Brad Cowie <brad@faucet.nz>
-Subject: [PATCH bpf-next v3 1/2] net: netfilter: Make ct zone opts configurable for bpf ct helpers
-Date: Wed,  8 May 2024 16:30:32 +1200
-Message-Id: <20240508043033.52311-1-brad@faucet.nz>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1715143469; c=relaxed/simple;
+	bh=iOUJ8kYbuUYawD/L951m0iz1DP0bS5YCnIXkJbzD++8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vFk1R+26v1m9Yp7fOZczXQ9IJiRM3noKBuLDDQCJ9wAm5/kfFAAi6CR0A3PoBQRa0VyqersZwtlZ90Zg0ttD1IpQv0NMPYpybhCs4B14B4lLSsX+ilk9s+Iq/OOn+ibn7w5/ne44uwL+EuRY5waiXNdRBTai6uQmc06SyH/xsyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y22blxSF; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-deb6495a8c5so13404276.2;
+        Tue, 07 May 2024 21:44:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715143466; x=1715748266; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=W7zDgjfQ9ejdYEtQFd2CZ42/9Zvjl6dq+wJeEOP1/pM=;
+        b=Y22blxSFxRQDlL/3Dx6eV7P0WHgvem1AoS++pZIK0kwSeNtaAwQ4OD3JiGytrPzVJd
+         EmT4yyTYitdxx3GjKaEzyaO1iQb4JBF0gBCQjtkTckGkiXI0pX3tcusuRgPG5rpqoS57
+         eBRA97SaqNfLewXM/2JtupHJmofCNJlGRSy0R0E88vCQ84NoRr07CPPQXAxJ1eQowLvF
+         oRJ5VO9tg3HflyNA4Ff1vw/UmnNrHsxU/kaou6JTw8AQYYxUTg/LW1HWo8arnr0Jph1c
+         xSVz+NLKa8ujIst47Eyyu6tp0GRWasBQqiZXlQ1CtRqD0cruh05yq0KmOVOeyW0GGksW
+         dMuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715143466; x=1715748266;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W7zDgjfQ9ejdYEtQFd2CZ42/9Zvjl6dq+wJeEOP1/pM=;
+        b=ac2fRKE9ntTq312PnjHE93b+z0VIsbGOB9c3PpdXpNdTY5ckAmofdGru6QQmvsSdFm
+         Hp9j3bsxhSWX6RbLw23jdLHUZZ6jlMMMqSlKUhTsYEGhZy6fwgo2+NM0TF25mz+KJi9s
+         anlADvkWa/NzvhwRbY0fAQosTLIWxmutgJD/IBafsGwZ1wFcY/VS4xKQTzcOFa99C76z
+         JWOI5iIBGi6H2ljhgrUlvUZLM5+tk128FxLJYDatI7MbaHqnVLbhse4mVwkiK4eWi2jm
+         VeSkB+GnR/MA3mv9ehA+ER/TKabEEHbm81Owja500L1dsDUk2xBVk1De29C5ftQPr4AK
+         zv4g==
+X-Forwarded-Encrypted: i=1; AJvYcCWk60XQcq/gotC23L8+ZLYMxJ/zXkbnrFa2QS3znyiCMikgSZRUyymClRujFrOPMAQ0taeKm9XMaSuMSg/yxTdHO3z870tMZs/63Tul
+X-Gm-Message-State: AOJu0Yzz9kqkgTP3dqPOBPlalYny3Zgvy/t35MEGjMV8/WLkG/7etcbB
+	5RAu22BlygBbz+/e+sa0ySsNl+Cca5SWPZMN93JzhO81sCfWDzm8mSbEAg==
+X-Google-Smtp-Source: AGHT+IGE4AcWoLxQ3WsFkXQSbENWAJJpe8pMCBqlSyO6HdO1/kFk8awXmWPH4G/IX0ptaHx9IOD9MQ==
+X-Received: by 2002:a25:5855:0:b0:de4:5c38:40b8 with SMTP id 3f1490d57ef6-debb9e5b635mr1313776276.6.1715143466411;
+        Tue, 07 May 2024 21:44:26 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id b3-20020a5b0083000000b00de763b8a696sm2936160ybp.20.2024.05.07.21.44.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 May 2024 21:44:25 -0700 (PDT)
+Date: Tue, 7 May 2024 21:44:23 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Mahesh Bandewar <maheshb@google.com>
+Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>, Arnd Bergmann <arnd@arndb.de>,
+	Sagi Maimon <maimon.sagi@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>,
+	Mahesh Bandewar <mahesh@bandewar.net>
+Subject: Re: [PATCHv4 net-next] ptp/ioctl: support MONOTONIC_RAW timestamps
+ for PTP_SYS_OFFSET_EXTENDED
+Message-ID: <ZjsDJ-adNCBQIbG1@hoboy.vegasvil.org>
+References: <20240502211047.2240237-1-maheshb@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Report-Abuse-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-ForwardEmail-Version: 0.4.40
-X-ForwardEmail-Sender: rfc822; brad@faucet.nz, smtp.forwardemail.net,
- 149.28.215.223
-X-ForwardEmail-ID: 663b000c72b4a4e913ba5536
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240502211047.2240237-1-maheshb@google.com>
 
-Add ct zone id and direction to bpf_ct_opts so that arbitrary ct zones
-can be used for xdp/tc bpf ct helper functions bpf_{xdp,skb}_ct_alloc
-and bpf_{xdp,skb}_ct_lookup.
+On Thu, May 02, 2024 at 02:10:47PM -0700, Mahesh Bandewar wrote:
 
-Signed-off-by: Brad Cowie <brad@faucet.nz>
----
-v2 -> v3:
-  - Remove whitespace changes
-  - Add reserved padding options
-  - If ct_zone_id is set when opts__sz isn't 16 return -EINVAL
-  - Remove ct_zone_flags, not used by nf_conntrack_alloc
-    or nf_conntrack_find_get
-  - Update comments to reflect opts__sz can be 16 or 12
+> @@ -457,14 +459,34 @@ static inline ktime_t ptp_convert_timestamp(const ktime_t *hwtstamp,
+>  
+>  static inline void ptp_read_system_prets(struct ptp_system_timestamp *sts)
+>  {
+> -	if (sts)
+> -		ktime_get_real_ts64(&sts->pre_ts);
+> +	if (sts) {
+> +		switch (sts->clockid) {
+> +		case CLOCK_REALTIME:
+> +			ktime_get_real_ts64(&sts->pre_ts);
+> +			break;
+> +		case CLOCK_MONOTONIC_RAW:
+> +			ktime_get_raw_ts64(&sts->pre_ts);
+> +			break;
 
-v1 -> v2:
-  - Make ct zone flags/dir configurable
----
- net/netfilter/nf_conntrack_bpf.c | 68 ++++++++++++++++++++++++++------
- 1 file changed, 55 insertions(+), 13 deletions(-)
+Why not add CLOCK_MONOTONIC as well?
+That would be useful in many cases.
 
-diff --git a/net/netfilter/nf_conntrack_bpf.c b/net/netfilter/nf_conntrack_bpf.c
-index d2492d050fe6..4a136fc3a9c0 100644
---- a/net/netfilter/nf_conntrack_bpf.c
-+++ b/net/netfilter/nf_conntrack_bpf.c
-@@ -32,7 +32,9 @@
-  *		   -EINVAL - Passed NULL for bpf_tuple pointer
-  *		   -EINVAL - opts->reserved is not 0
-  *		   -EINVAL - netns_id is less than -1
-- *		   -EINVAL - opts__sz isn't NF_BPF_CT_OPTS_SZ (12)
-+ *		   -EINVAL - opts__sz isn't NF_BPF_CT_OPTS_SZ (16) or 12
-+ *		   -EINVAL - opts->ct_zone_id set when
-+			     opts__sz isn't NF_BPF_CT_OPTS_SZ (16)
-  *		   -EPROTO - l4proto isn't one of IPPROTO_TCP or IPPROTO_UDP
-  *		   -ENONET - No network namespace found for netns_id
-  *		   -ENOENT - Conntrack lookup could not find entry for tuple
-@@ -42,6 +44,8 @@
-  *		 Values:
-  *		   IPPROTO_TCP, IPPROTO_UDP
-  * @dir:       - connection tracking tuple direction.
-+ * @ct_zone_id - connection tracking zone id.
-+ * @ct_zone_dir - connection tracking zone direction.
-  * @reserved   - Reserved member, will be reused for more options in future
-  *		 Values:
-  *		   0
-@@ -51,11 +55,13 @@ struct bpf_ct_opts {
- 	s32 error;
- 	u8 l4proto;
- 	u8 dir;
--	u8 reserved[2];
-+	u16 ct_zone_id;
-+	u8 ct_zone_dir;
-+	u8 reserved[3];
- };
- 
- enum {
--	NF_BPF_CT_OPTS_SZ = 12,
-+	NF_BPF_CT_OPTS_SZ = 16,
- };
- 
- static int bpf_nf_ct_tuple_parse(struct bpf_sock_tuple *bpf_tuple,
-@@ -104,12 +110,21 @@ __bpf_nf_ct_alloc_entry(struct net *net, struct bpf_sock_tuple *bpf_tuple,
- 			u32 timeout)
- {
- 	struct nf_conntrack_tuple otuple, rtuple;
-+	struct nf_conntrack_zone ct_zone;
- 	struct nf_conn *ct;
- 	int err;
- 
--	if (!opts || !bpf_tuple || opts->reserved[0] || opts->reserved[1] ||
--	    opts_len != NF_BPF_CT_OPTS_SZ)
-+	if (!opts || !bpf_tuple)
- 		return ERR_PTR(-EINVAL);
-+	if (!(opts_len == NF_BPF_CT_OPTS_SZ || opts_len == 12))
-+		return ERR_PTR(-EINVAL);
-+	if (opts_len == NF_BPF_CT_OPTS_SZ) {
-+		if (opts->reserved[0] || opts->reserved[1] || opts->reserved[2])
-+			return ERR_PTR(-EINVAL);
-+	} else {
-+		if (opts->ct_zone_id)
-+			return ERR_PTR(-EINVAL);
-+	}
- 
- 	if (unlikely(opts->netns_id < BPF_F_CURRENT_NETNS))
- 		return ERR_PTR(-EINVAL);
-@@ -130,7 +145,16 @@ __bpf_nf_ct_alloc_entry(struct net *net, struct bpf_sock_tuple *bpf_tuple,
- 			return ERR_PTR(-ENONET);
- 	}
- 
--	ct = nf_conntrack_alloc(net, &nf_ct_zone_dflt, &otuple, &rtuple,
-+	if (opts_len == NF_BPF_CT_OPTS_SZ) {
-+		if (opts->ct_zone_dir == 0)
-+			opts->ct_zone_dir = NF_CT_DEFAULT_ZONE_DIR;
-+		nf_ct_zone_init(&ct_zone,
-+				opts->ct_zone_id, opts->ct_zone_dir, 0);
-+	} else {
-+		ct_zone = nf_ct_zone_dflt;
-+	}
-+
-+	ct = nf_conntrack_alloc(net, &ct_zone, &otuple, &rtuple,
- 				GFP_ATOMIC);
- 	if (IS_ERR(ct))
- 		goto out;
-@@ -152,12 +176,21 @@ static struct nf_conn *__bpf_nf_ct_lookup(struct net *net,
- {
- 	struct nf_conntrack_tuple_hash *hash;
- 	struct nf_conntrack_tuple tuple;
-+	struct nf_conntrack_zone ct_zone;
- 	struct nf_conn *ct;
- 	int err;
- 
--	if (!opts || !bpf_tuple || opts->reserved[0] || opts->reserved[1] ||
--	    opts_len != NF_BPF_CT_OPTS_SZ)
-+	if (!opts || !bpf_tuple)
- 		return ERR_PTR(-EINVAL);
-+	if (!(opts_len == NF_BPF_CT_OPTS_SZ || opts_len == 12))
-+		return ERR_PTR(-EINVAL);
-+	if (opts_len == NF_BPF_CT_OPTS_SZ) {
-+		if (opts->reserved[0] || opts->reserved[1] || opts->reserved[2])
-+			return ERR_PTR(-EINVAL);
-+	} else {
-+		if (opts->ct_zone_id)
-+			return ERR_PTR(-EINVAL);
-+	}
- 	if (unlikely(opts->l4proto != IPPROTO_TCP && opts->l4proto != IPPROTO_UDP))
- 		return ERR_PTR(-EPROTO);
- 	if (unlikely(opts->netns_id < BPF_F_CURRENT_NETNS))
-@@ -174,7 +207,16 @@ static struct nf_conn *__bpf_nf_ct_lookup(struct net *net,
- 			return ERR_PTR(-ENONET);
- 	}
- 
--	hash = nf_conntrack_find_get(net, &nf_ct_zone_dflt, &tuple);
-+	if (opts_len == NF_BPF_CT_OPTS_SZ) {
-+		if (opts->ct_zone_dir == 0)
-+			opts->ct_zone_dir = NF_CT_DEFAULT_ZONE_DIR;
-+		nf_ct_zone_init(&ct_zone,
-+				opts->ct_zone_id, opts->ct_zone_dir, 0);
-+	} else {
-+		ct_zone = nf_ct_zone_dflt;
-+	}
-+
-+	hash = nf_conntrack_find_get(net, &ct_zone, &tuple);
- 	if (opts->netns_id >= 0)
- 		put_net(net);
- 	if (!hash)
-@@ -245,7 +287,7 @@ __bpf_kfunc_start_defs();
-  * @opts	- Additional options for allocation (documented above)
-  *		    Cannot be NULL
-  * @opts__sz	- Length of the bpf_ct_opts structure
-- *		    Must be NF_BPF_CT_OPTS_SZ (12)
-+ *		    Must be NF_BPF_CT_OPTS_SZ (16) or 12
-  */
- __bpf_kfunc struct nf_conn___init *
- bpf_xdp_ct_alloc(struct xdp_md *xdp_ctx, struct bpf_sock_tuple *bpf_tuple,
-@@ -279,7 +321,7 @@ bpf_xdp_ct_alloc(struct xdp_md *xdp_ctx, struct bpf_sock_tuple *bpf_tuple,
-  * @opts	- Additional options for lookup (documented above)
-  *		    Cannot be NULL
-  * @opts__sz	- Length of the bpf_ct_opts structure
-- *		    Must be NF_BPF_CT_OPTS_SZ (12)
-+ *		    Must be NF_BPF_CT_OPTS_SZ (16) or 12
-  */
- __bpf_kfunc struct nf_conn *
- bpf_xdp_ct_lookup(struct xdp_md *xdp_ctx, struct bpf_sock_tuple *bpf_tuple,
-@@ -312,7 +354,7 @@ bpf_xdp_ct_lookup(struct xdp_md *xdp_ctx, struct bpf_sock_tuple *bpf_tuple,
-  * @opts	- Additional options for allocation (documented above)
-  *		    Cannot be NULL
-  * @opts__sz	- Length of the bpf_ct_opts structure
-- *		    Must be NF_BPF_CT_OPTS_SZ (12)
-+ *		    Must be NF_BPF_CT_OPTS_SZ (16) or 12
-  */
- __bpf_kfunc struct nf_conn___init *
- bpf_skb_ct_alloc(struct __sk_buff *skb_ctx, struct bpf_sock_tuple *bpf_tuple,
-@@ -347,7 +389,7 @@ bpf_skb_ct_alloc(struct __sk_buff *skb_ctx, struct bpf_sock_tuple *bpf_tuple,
-  * @opts	- Additional options for lookup (documented above)
-  *		    Cannot be NULL
-  * @opts__sz	- Length of the bpf_ct_opts structure
-- *		    Must be NF_BPF_CT_OPTS_SZ (12)
-+ *		    Must be NF_BPF_CT_OPTS_SZ (16) or 12
-  */
- __bpf_kfunc struct nf_conn *
- bpf_skb_ct_lookup(struct __sk_buff *skb_ctx, struct bpf_sock_tuple *bpf_tuple,
--- 
-2.34.1
+> +/*
+> + * ptp_sys_offset_extended - data structure for IOCTL operation
+> + *			     PTP_SYS_OFFSET_EXTENDED
+> + *
+> + * @n_samples:	Desired number of measurements.
+> + * @clockid:	clockid of a clock-base used for pre/post timestamps.
+> + * @rsv:	Reserved for future use.
+> + * @ts:		Array of samples in the form [pre-TS, PHC, post-TS]. The
+> + *		kernel provides @n_samples.
+> + *
+> + * History:
+> + * v1: Initial implementation.
+> + *
+> + * v2: Use the first word of the reserved-field for @clockid. That's
+> + *     backward compatible since v1 expects all three reserved words
+> + *     (@rsv[3]) to be 0 while the clockid (first word in v2) for
+> + *     CLOCK_REALTIME is '0'.
+
+This is not really appropriate for a source code comment.  The
+un-merged patch series iterations are preserved at lore.kernel in case
+someone needs that.
+
+The "backward compatible" information really wants to be in the commit
+message.
+
+Thanks,
+Richard
 
 
