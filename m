@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-94406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 174948BF5AE
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:45:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAE818BF5B1
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 07:45:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B1902866A8
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 05:45:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61CD5282E44
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 05:45:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B70917BAE;
-	Wed,  8 May 2024 05:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6BB1863C;
+	Wed,  8 May 2024 05:44:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TYjlY4pO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EzaVhwjd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC3B3A1C5;
-	Wed,  8 May 2024 05:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114D923772;
+	Wed,  8 May 2024 05:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715147027; cv=none; b=f9vVAaAi+DxgXJjkL/nHlylnUeZh4dOsydUbotU08IuKtv8nGuYQ4TZRrkhFU3s71vN6Eg8Gw8IB3TrNojixhczXVt3MNffiqi0M/Eami6r++eIams9HVhO48Rui2J95i1yAhNQN0kYzZZk99BopfLZjxjz7JYozd2Pc+vh58Nc=
+	t=1715147065; cv=none; b=DvLnlp+IFJwSiLeb3q0HREG5XkJIBx+6a7KbH23lQv83lwOl+dUYfEprnmAcODbs09+p8sRYEnMe/H8CaiAtSy9LKciQ3I2+VoHwaT7p9VdX+X+y9i1P4SOi8Ng5ml9WHp/Z1kzfjV+q39DP99qJb3+++15lpeHHNcF2dmrLFpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715147027; c=relaxed/simple;
-	bh=QmJ8E0GR6HVfUQpKE6Djv4TCZt/N05vFu7w3L88Kops=;
+	s=arc-20240116; t=1715147065; c=relaxed/simple;
+	bh=g0QKnentJGiost6G7V+VKDbo7VqtLa6zkLDH8d+Xvl4=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=HpDeJRcmNQWh2zxP/0YpMZRL23exI4YhaWmQ8KcS5GzKkQtnzQYB8QLSgMngdgz+5TNOTCtKhmyiEcwUlzwo07gKPT5SF453upg5NywAflp6RuPOKrYqZbx7BHIYr//DGQaZCUMRg0mFs7RK53aQxURdoNgBc9HMkwdvfVYHjmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TYjlY4pO; arc=none smtp.client-ip=209.85.218.45
+	 In-Reply-To:Content-Type; b=a9NHp4sTTFrJhDjU4eEEHVoNJ8w1QA0IG1e/oU9iUxaOXB9WQzt8kbvV09rg59nz1fDWXlHI/e3WhwvOYqYXXhOOD37vaG/sAn74KQFPM+5CRNH/fYNAO+Ci9653Jm2mYEY9qqz6p7CAGQxV9aBMRtsPIpdK2c67p8jUu9AUp3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EzaVhwjd; arc=none smtp.client-ip=209.85.218.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a59cdf7cd78so770512666b.0;
-        Tue, 07 May 2024 22:43:44 -0700 (PDT)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a59ce1e8609so83518366b.0;
+        Tue, 07 May 2024 22:44:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715147023; x=1715751823; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1715147062; x=1715751862; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:subject:from:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=fiWPwYiB92tF4WQY1BN+lNYYVhCz5it+Y7g3x7gUTT0=;
-        b=TYjlY4pONJqa80oqoPdS63GBp66B120OM9srMfPV/WtZVBwrq8JsFTFZJhbNrXUbdr
-         mQpELRqMDk6W93+B5ba8WtkUuP2P1SJiMvDhQQzMN6hXgV4FnGxttmUhmwbOmGaxLExE
-         Y5keUNEN6urYG/uNpY5QX2pndwQTHSaz5lZaQ6s+XARnOxJYLLOtAJjXADs0c0NZkqJ2
-         TYEXzfhAqZSRGln6yuaI5KxhAuhjuQrkuyRu5bRfkMVqUtKTKWzBAS9APURsSrJ03q0+
-         3Q8CHDyDk2ksElSDXlCCraygi5nPDokqvuq+E6NLVlilwJsDU5XRw9zmv8ZXVLzQMcTQ
-         OrGw==
+        bh=tWp+2HJ0ZBVj/8UDTxv5UJsC8X6e/fyQU24aWtEM2tI=;
+        b=EzaVhwjdM9SXp1uqkYrThf6JSmTZloGBA20qYw+tujNQZWA0nJBpCX1SFzjMwfgqLG
+         /6uDqRKdUxA9fsMz04udnxhSLF4gyIiUFO4Dg6PAV3O/VnI1jZ5qHXTSowDejFMn0WSA
+         /QXxn2yG7KHDA9ydmFy6oQJGa6kaUobKXcLG8so8PxhKJIkHjZ00GSIjRJBFAgathnTE
+         DqvS5prBbBo+fo0rP3h3A3ttAKX5a8VYB7B3GcLxprRD5JAsjwWPx3QeBBx6pPbdldMz
+         5bRXys8UhTw6FfzlvTw4qkO9aHQjsivMCsC8jozAsvDa1yBye6xwDD4wOb+NTpRBC0rO
+         36VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715147023; x=1715751823;
+        d=1e100.net; s=20230601; t=1715147062; x=1715751862;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:subject:from:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fiWPwYiB92tF4WQY1BN+lNYYVhCz5it+Y7g3x7gUTT0=;
-        b=nGpae4fhzV0/hEHXif/mKsq2arFhAol2kxy+P/ifRYoOENGr0gQxHiaTS+QTMnwgWN
-         gEajZfeqWzUW1Kl3SVJzqJWZe20m0KpTR8cGZ9F86HuEgGnJds9s99o28MhsvN0SQy8v
-         QH+arfnubX1Cmew77LgWk6U1WZPDO1LiF0bu5D6EF5of/M/xNUwTbxirl9qDxP2I7mh2
-         XLcf0PlRGnTfkVqbjmer5jsTRmx3EOFc09rGk0nZZeAZjQjUv0iqAylC1zBCeXXM67K7
-         o7pymgqklfSI3ZD1LJ4bYLbvv4WXsMD6JfXJrIL4MG3MvlQbmz1D0MAii2nQhygWSEvL
-         72cQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV6BTS+JmTcxTS9vBX/V+J08qQj71ZX/l44dstmQGUDGiXcBUlKSXx6PSeQ9kIN7rced/nnUE+AcEvc+XWjzsBGFFMzm8ldJfYr7F1E
-X-Gm-Message-State: AOJu0YwJHvDZYV5sqFUlDWMzd45IZiPPcwIZrOWpYaCOEAPqt89rwIjv
-	Z1UFX7Unj4d++lVdjP6wJ5/bG2r90sKaBVowhI2H2NuOgmGPZwA0
-X-Google-Smtp-Source: AGHT+IF7cIGyFtpEAXYC1YmQO4hzObfVUwPA74DS0TjxiqRtmI/DEc970iSlvGionU5zELgJQe6lFA==
-X-Received: by 2002:a50:bb41:0:b0:572:719f:b44f with SMTP id 4fb4d7f45d1cf-5731d9ce2a9mr1060568a12.9.1715147023013;
-        Tue, 07 May 2024 22:43:43 -0700 (PDT)
+        bh=tWp+2HJ0ZBVj/8UDTxv5UJsC8X6e/fyQU24aWtEM2tI=;
+        b=Yi4RzIF2rImULAUIC+Ca75GHQd3w3VDKvmnMITI8i8qaLqlwvPQsgL2lCuazei0+by
+         i+CRmw95sxeViLWPx4YunZ7hS0wBT+WOmR+IYrNmaAy0pWBV9aS376Ooz90tCSXRXjX5
+         k4PZaN7ucxj6qsJxXnuKUXlx8OizAonmAKQFhMZhTqfFQfT0pmLYVwaKIISQ11vp6Sl9
+         ybgClmSlNqgHg4Rv1L43WXPMVoj6ugPDclTEVdfqbsvCWOCdDM7vFwXr7PeIS+964sW8
+         5g08fP5wAiI3PGdZYPGefERH6OP8LJbQVreR+xY111GIF3z0++43SoFJb263ysV8payk
+         euLg==
+X-Forwarded-Encrypted: i=1; AJvYcCWNBhXktsFWMI9g4neMafxAayUoMA694GlwqmGCmDR9KDw+hgWSIvC+Oc97P3UtbU7eVfCbFk7izoh9OlxbZPChmIly3qNzi3qcvbRr
+X-Gm-Message-State: AOJu0YzfLi8uOkUsGTiH6BxaQnNaBeMA0Za3GjmEuJZO7aAILcau3eeD
+	wAO1VHqrfLPbpwb0bL1cgxXxF8R8etLjmdlNP9NG6lVcpP9Cfo1R
+X-Google-Smtp-Source: AGHT+IHMH+dhBxg0aaWFyBp9dd8DZ05OWVV+ablPEEa9JqZx+ELP1XPZZCU+orednsvLOXZfo3Yxqw==
+X-Received: by 2002:a17:906:4a8a:b0:a51:8672:66e4 with SMTP id a640c23a62f3a-a59e4cf82c9mr379969566b.22.1715147062065;
+        Tue, 07 May 2024 22:44:22 -0700 (PDT)
 Received: from ?IPV6:2a01:c23:c5ec:1600:f15f:edb4:9cd5:3c38? (dynamic-2a01-0c23-c5ec-1600-f15f-edb4-9cd5-3c38.c23.pool.telefonica.de. [2a01:c23:c5ec:1600:f15f:edb4:9cd5:3c38])
-        by smtp.googlemail.com with ESMTPSA id p9-20020a056402500900b005727b2ae25csm7176205eda.14.2024.05.07.22.43.41
+        by smtp.googlemail.com with ESMTPSA id j8-20020a50ed08000000b0056e718795f8sm7168133eds.36.2024.05.07.22.44.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 May 2024 22:43:42 -0700 (PDT)
-Message-ID: <b1ef50ce-40e5-453a-a78a-55e373ad36db@gmail.com>
-Date: Wed, 8 May 2024 07:43:43 +0200
+        Tue, 07 May 2024 22:44:21 -0700 (PDT)
+Message-ID: <6cedd632-d555-4c17-81cb-984af73f2c08@gmail.com>
+Date: Wed, 8 May 2024 07:44:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,8 +78,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next 1/2] net: phy: phy_link_topology: Pass netdevice
- to phy_link_topo helpers
+Subject: Re: [PATCH net-next 2/2] net: phy: phy_link_topology: Lazy-initialize
+ the link topology
 To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
@@ -98,7 +98,7 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
  Nathan Chancellor <nathan@kernel.org>, Antoine Tenart <atenart@kernel.org>
 References: <20240507102822.2023826-1-maxime.chevallier@bootlin.com>
- <20240507102822.2023826-2-maxime.chevallier@bootlin.com>
+ <20240507102822.2023826-3-maxime.chevallier@bootlin.com>
 Content-Language: en-US
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
@@ -143,207 +143,259 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <20240507102822.2023826-2-maxime.chevallier@bootlin.com>
+In-Reply-To: <20240507102822.2023826-3-maxime.chevallier@bootlin.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 07.05.2024 12:28, Maxime Chevallier wrote:
-> The phy link topology's main goal is to better track which PHYs are
-> connected to a given netdevice. Make so that the helpers take the
-> netdevice as a parameter directly.
+> Having the net_device's init path for the link_topology depend on
+> IS_REACHABLE(PHYLIB)-protected helpers triggers errors when modules are being
+> built with phylib as a module as-well, as they expect netdev->link_topo
+> to be initialized.
 > 
-The commit message should explain what the issue is that you're fixing,
-and how this patch fixes it.
-
+> Move the link_topo initialization at the first PHY insertion, which will
+> both improve the memory usage, and make the behaviour more predicatble
+> and robust.
+> 
 > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 > Fixes: 6916e461e793 ("net: phy: Introduce ethernet link topology representation")
 > Closes: https://lore.kernel.org/netdev/2e11b89d-100f-49e7-9c9a-834cc0b82f97@gmail.com/
 > Closes: https://lore.kernel.org/netdev/20240409201553.GA4124869@dev-arch.thelio-3990X/
 > ---
->  drivers/net/phy/phy_device.c        | 25 ++++++++-----------------
->  drivers/net/phy/phy_link_topology.c | 13 ++++++++++---
->  include/linux/phy_link_topology.h   | 21 +++++++++++++--------
->  net/ethtool/netlink.c               |  2 +-
->  4 files changed, 32 insertions(+), 29 deletions(-)
+>  drivers/net/phy/phy_link_topology.c    | 31 ++++++---------------
+>  include/linux/netdevice.h              |  2 ++
+>  include/linux/phy_link_topology.h      | 23 ++++++++--------
+>  include/linux/phy_link_topology_core.h | 23 +++-------------
+>  net/core/dev.c                         | 38 ++++++++++++++++++++++----
+>  5 files changed, 58 insertions(+), 59 deletions(-)
 > 
-> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> index 616bd7ba46cb..111434201545 100644
-> --- a/drivers/net/phy/phy_device.c
-> +++ b/drivers/net/phy/phy_device.c
-> @@ -277,14 +277,6 @@ static void phy_mdio_device_remove(struct mdio_device *mdiodev)
->  
->  static struct phy_driver genphy_driver;
->  
-> -static struct phy_link_topology *phy_get_link_topology(struct phy_device *phydev)
-> -{
-> -	if (phydev->attached_dev)
-> -		return phydev->attached_dev->link_topo;
-> -
-> -	return NULL;
-> -}
-> -
->  static LIST_HEAD(phy_fixup_list);
->  static DEFINE_MUTEX(phy_fixup_lock);
->  
-> @@ -1389,10 +1381,10 @@ static DEVICE_ATTR_RO(phy_standalone);
->  int phy_sfp_connect_phy(void *upstream, struct phy_device *phy)
->  {
->  	struct phy_device *phydev = upstream;
-> -	struct phy_link_topology *topo = phy_get_link_topology(phydev);
-> +	struct net_device *dev = phydev->attached_dev;
->  
-> -	if (topo)
-> -		return phy_link_topo_add_phy(topo, phy, PHY_UPSTREAM_PHY, phydev);
-> +	if (dev)
-> +		return phy_link_topo_add_phy(dev, phy, PHY_UPSTREAM_PHY, phydev);
->  
->  	return 0;
->  }
-> @@ -1411,10 +1403,10 @@ EXPORT_SYMBOL(phy_sfp_connect_phy);
->  void phy_sfp_disconnect_phy(void *upstream, struct phy_device *phy)
->  {
->  	struct phy_device *phydev = upstream;
-> -	struct phy_link_topology *topo = phy_get_link_topology(phydev);
-> +	struct net_device *dev = phydev->attached_dev;
->  
-> -	if (topo)
-> -		phy_link_topo_del_phy(topo, phy);
-> +	if (dev)
-> +		phy_link_topo_del_phy(dev, phy);
->  }
->  EXPORT_SYMBOL(phy_sfp_disconnect_phy);
->  
-> @@ -1561,8 +1553,7 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
->  		if (phydev->sfp_bus_attached)
->  			dev->sfp_bus = phydev->sfp_bus;
->  
-> -		err = phy_link_topo_add_phy(dev->link_topo, phydev,
-> -					    PHY_UPSTREAM_MAC, dev);
-> +		err = phy_link_topo_add_phy(dev, phydev, PHY_UPSTREAM_MAC, dev);
->  		if (err)
->  			goto error;
->  	}
-> @@ -1992,7 +1983,7 @@ void phy_detach(struct phy_device *phydev)
->  	if (dev) {
->  		phydev->attached_dev->phydev = NULL;
->  		phydev->attached_dev = NULL;
-> -		phy_link_topo_del_phy(dev->link_topo, phydev);
-> +		phy_link_topo_del_phy(dev, phydev);
->  	}
->  	phydev->phylink = NULL;
->  
 > diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
-> index 985941c5c558..0e36bd7c15dc 100644
+> index 0e36bd7c15dc..b1aba9313e73 100644
 > --- a/drivers/net/phy/phy_link_topology.c
 > +++ b/drivers/net/phy/phy_link_topology.c
-> @@ -35,10 +35,11 @@ void phy_link_topo_destroy(struct phy_link_topology *topo)
->  	kfree(topo);
->  }
+> @@ -12,29 +12,6 @@
+>  #include <linux/rtnetlink.h>
+>  #include <linux/xarray.h>
 >  
-> -int phy_link_topo_add_phy(struct phy_link_topology *topo,
-> +int phy_link_topo_add_phy(struct net_device *dev,
+> -struct phy_link_topology *phy_link_topo_create(struct net_device *dev)
+> -{
+> -	struct phy_link_topology *topo;
+> -
+> -	topo = kzalloc(sizeof(*topo), GFP_KERNEL);
+> -	if (!topo)
+> -		return ERR_PTR(-ENOMEM);
+> -
+> -	xa_init_flags(&topo->phys, XA_FLAGS_ALLOC1);
+> -	topo->next_phy_index = 1;
+> -
+> -	return topo;
+> -}
+> -
+> -void phy_link_topo_destroy(struct phy_link_topology *topo)
+> -{
+> -	if (!topo)
+> -		return;
+> -
+> -	xa_destroy(&topo->phys);
+> -	kfree(topo);
+> -}
+> -
+>  int phy_link_topo_add_phy(struct net_device *dev,
 >  			  struct phy_device *phy,
 >  			  enum phy_upstream upt, void *upstream)
->  {
-> +	struct phy_link_topology *topo = dev->link_topo;
+> @@ -43,6 +20,14 @@ int phy_link_topo_add_phy(struct net_device *dev,
 >  	struct phy_device_node *pdn;
 >  	int ret;
 >  
-> @@ -90,10 +91,16 @@ int phy_link_topo_add_phy(struct phy_link_topology *topo,
->  }
->  EXPORT_SYMBOL_GPL(phy_link_topo_add_phy);
+> +	if (!topo) {
+> +		ret = netdev_alloc_phy_link_topology(dev);
+
+This function is implemented in net core, but used only here.
+So move the implementation here?
+
+> +		if (ret)
+> +			return ret;
+> +
+> +		topo = dev->link_topo;
+> +	}
+> +
+>  	pdn = kzalloc(sizeof(*pdn), GFP_KERNEL);
+>  	if (!pdn)
+>  		return -ENOMEM;
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index cf261fb89d73..25a0a77cfadc 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -4569,6 +4569,8 @@ void __hw_addr_unsync_dev(struct netdev_hw_addr_list *list,
+>  					const unsigned char *));
+>  void __hw_addr_init(struct netdev_hw_addr_list *list);
 >  
-> -void phy_link_topo_del_phy(struct phy_link_topology *topo,
-> +void phy_link_topo_del_phy(struct net_device *dev,
->  			   struct phy_device *phy)
+> +int netdev_alloc_phy_link_topology(struct net_device *dev);
+> +
+>  /* Functions used for device addresses handling */
+>  void dev_addr_mod(struct net_device *dev, unsigned int offset,
+>  		  const void *addr, size_t len);
+> diff --git a/include/linux/phy_link_topology.h b/include/linux/phy_link_topology.h
+> index 166a01710aa2..3501f9a9e932 100644
+> --- a/include/linux/phy_link_topology.h
+> +++ b/include/linux/phy_link_topology.h
+> @@ -32,10 +32,12 @@ struct phy_device_node {
+>  	struct phy_device *phy;
+>  };
+>  
+> -struct phy_link_topology {
+> -	struct xarray phys;
+> -	u32 next_phy_index;
+> -};
+> +#if IS_ENABLED(CONFIG_PHYLIB)
+> +int phy_link_topo_add_phy(struct net_device *dev,
+> +			  struct phy_device *phy,
+> +			  enum phy_upstream upt, void *upstream);
+> +
+> +void phy_link_topo_del_phy(struct net_device *dev, struct phy_device *phy);
+>  
+>  static inline struct phy_device
+>  *phy_link_topo_get_phy(struct net_device *dev, u32 phyindex)
+> @@ -53,13 +55,6 @@ static inline struct phy_device
+>  	return NULL;
+>  }
+>  
+> -#if IS_REACHABLE(CONFIG_PHYLIB)
+> -int phy_link_topo_add_phy(struct net_device *dev,
+> -			  struct phy_device *phy,
+> -			  enum phy_upstream upt, void *upstream);
+> -
+> -void phy_link_topo_del_phy(struct net_device *dev, struct phy_device *phy);
+> -
+>  #else
+>  static inline int phy_link_topo_add_phy(struct net_device *dev,
+>  					struct phy_device *phy,
+> @@ -72,6 +67,12 @@ static inline void phy_link_topo_del_phy(struct net_device *dev,
+>  					 struct phy_device *phy)
 >  {
-> -	struct phy_device_node *pdn = xa_erase(&topo->phys, phy->phyindex);
+>  }
+> +
+> +static inline struct phy_device *
+> +phy_link_topo_get_phy(struct net_device *dev, u32 phyindex)
+> +{
+> +	return NULL;
+> +}
+>  #endif
+>  
+>  #endif /* __PHY_LINK_TOPOLOGY_H */
+> diff --git a/include/linux/phy_link_topology_core.h b/include/linux/phy_link_topology_core.h
+> index 0a6479055745..f9c0520806fb 100644
+> --- a/include/linux/phy_link_topology_core.h
+> +++ b/include/linux/phy_link_topology_core.h
+> @@ -2,24 +2,9 @@
+>  #ifndef __PHY_LINK_TOPOLOGY_CORE_H
+>  #define __PHY_LINK_TOPOLOGY_CORE_H
+>  
+> -struct phy_link_topology;
+> -
+> -#if IS_REACHABLE(CONFIG_PHYLIB)
+> -
+> -struct phy_link_topology *phy_link_topo_create(struct net_device *dev);
+> -void phy_link_topo_destroy(struct phy_link_topology *topo);
+> -
+> -#else
+> -
+> -static inline struct phy_link_topology *phy_link_topo_create(struct net_device *dev)
+> -{
+> -	return NULL;
+> -}
+> -
+> -static inline void phy_link_topo_destroy(struct phy_link_topology *topo)
+> -{
+> -}
+> -
+> -#endif
+> +struct phy_link_topology {
+> +	struct xarray phys;
+> +	u32 next_phy_index;
+> +};
+>  
+This is all which is left in this header. As this header is public anyway,
+better move this definition to phy_link_topology.h?
+
+>  #endif /* __PHY_LINK_TOPOLOGY_CORE_H */
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index d2ce91a334c1..1b4ffc273a04 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -10256,6 +10256,35 @@ static void netdev_do_free_pcpu_stats(struct net_device *dev)
+>  	}
+>  }
+>  
+> +int netdev_alloc_phy_link_topology(struct net_device *dev)
+> +{
+> +	struct phy_link_topology *topo;
+> +
+> +	topo = kzalloc(sizeof(*topo), GFP_KERNEL);
+> +	if (!topo)
+> +		return -ENOMEM;
+> +
+> +	xa_init_flags(&topo->phys, XA_FLAGS_ALLOC1);
+> +	topo->next_phy_index = 1;
+> +
+> +	dev->link_topo = topo;
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(netdev_alloc_phy_link_topology);
+> +
+> +static void netdev_free_phy_link_topology(struct net_device *dev)
+> +{
 > +	struct phy_link_topology *topo = dev->link_topo;
-> +	struct phy_device_node *pdn;
 > +
 > +	if (!topo)
 > +		return;
 > +
-> +	pdn = xa_erase(&topo->phys, phy->phyindex);
->  
->  	/* We delete the PHY from the topology, however we don't re-set the
->  	 * phy->phyindex field. If the PHY isn't gone, we can re-assign it the
-> diff --git a/include/linux/phy_link_topology.h b/include/linux/phy_link_topology.h
-> index 6b79feb607e7..166a01710aa2 100644
-> --- a/include/linux/phy_link_topology.h
-> +++ b/include/linux/phy_link_topology.h
-> @@ -12,11 +12,11 @@
->  #define __PHY_LINK_TOPOLOGY_H
->  
->  #include <linux/ethtool.h>
-> +#include <linux/netdevice.h>
->  #include <linux/phy_link_topology_core.h>
->  
->  struct xarray;
->  struct phy_device;
-> -struct net_device;
->  struct sfp_bus;
->  
->  struct phy_device_node {
-> @@ -37,11 +37,16 @@ struct phy_link_topology {
->  	u32 next_phy_index;
->  };
->  
-> -static inline struct phy_device *
-> -phy_link_topo_get_phy(struct phy_link_topology *topo, u32 phyindex)
-> +static inline struct phy_device
-> +*phy_link_topo_get_phy(struct net_device *dev, u32 phyindex)
->  {
-> -	struct phy_device_node *pdn = xa_load(&topo->phys, phyindex);
-> +	struct phy_link_topology *topo = dev->link_topo;
-> +	struct phy_device_node *pdn;
->  
-> +	if (!topo)
-> +		return NULL;
+> +	xa_destroy(&topo->phys);
+> +	kfree(topo);
+> +	dev->link_topo = NULL;
+
+Give the compiler a chance to remove this function if
+CONFIG_PHYLIB isn't enabled.
+
+if (IS_ENABLED(CONFIG_PHYLIB) && topo) {
+	xa_destroy(&topo->phys);
+	kfree(topo);
+	dev->link_topo = NULL;
+}
+
+> +}
 > +
-> +	pdn = xa_load(&topo->phys, phyindex);
->  	if (pdn)
->  		return pdn->phy;
+>  /**
+>   * register_netdevice() - register a network device
+>   * @dev: device to register
+> @@ -10998,11 +11027,6 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+>  #ifdef CONFIG_NET_SCHED
+>  	hash_init(dev->qdisc_hash);
+>  #endif
+> -	dev->link_topo = phy_link_topo_create(dev);
+> -	if (IS_ERR(dev->link_topo)) {
+> -		dev->link_topo = NULL;
+> -		goto free_all;
+> -	}
 >  
-> @@ -49,21 +54,21 @@ phy_link_topo_get_phy(struct phy_link_topology *topo, u32 phyindex)
->  }
+>  	dev->priv_flags = IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM;
+>  	setup(dev);
+> @@ -11092,7 +11116,9 @@ void free_netdev(struct net_device *dev)
+>  	free_percpu(dev->xdp_bulkq);
+>  	dev->xdp_bulkq = NULL;
 >  
->  #if IS_REACHABLE(CONFIG_PHYLIB)
-> -int phy_link_topo_add_phy(struct phy_link_topology *topo,
-> +int phy_link_topo_add_phy(struct net_device *dev,
->  			  struct phy_device *phy,
->  			  enum phy_upstream upt, void *upstream);
+> -	phy_link_topo_destroy(dev->link_topo);
+> +#if IS_ENABLED(CONFIG_PHYLIB)
+> +	netdev_free_phy_link_topology(dev);
+> +#endif
 >  
-> -void phy_link_topo_del_phy(struct phy_link_topology *lt, struct phy_device *phy);
-> +void phy_link_topo_del_phy(struct net_device *dev, struct phy_device *phy);
->  
->  #else
-> -static inline int phy_link_topo_add_phy(struct phy_link_topology *topo,
-> +static inline int phy_link_topo_add_phy(struct net_device *dev,
->  					struct phy_device *phy,
->  					enum phy_upstream upt, void *upstream)
->  {
->  	return 0;
->  }
->  
-> -static inline void phy_link_topo_del_phy(struct phy_link_topology *topo,
-> +static inline void phy_link_topo_del_phy(struct net_device *dev,
->  					 struct phy_device *phy)
->  {
->  }
-> diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-> index 563e94e0cbd8..f5b4adf324bc 100644
-> --- a/net/ethtool/netlink.c
-> +++ b/net/ethtool/netlink.c
-> @@ -170,7 +170,7 @@ int ethnl_parse_header_dev_get(struct ethnl_req_info *req_info,
->  			struct nlattr *phy_id;
->  
->  			phy_id = tb[ETHTOOL_A_HEADER_PHY_INDEX];
-> -			phydev = phy_link_topo_get_phy(dev->link_topo,
-> +			phydev = phy_link_topo_get_phy(dev,
->  						       nla_get_u32(phy_id));
->  			if (!phydev) {
->  				NL_SET_BAD_ATTR(extack, phy_id);
+Then the conditional compiling can be removed here.
+
+>  	/*  Compatibility with error handling in drivers */
+>  	if (dev->reg_state == NETREG_UNINITIALIZED ||
+
+
 
 
 
