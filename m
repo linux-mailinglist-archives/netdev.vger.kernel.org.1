@@ -1,54 +1,59 @@
-Return-Path: <netdev+bounces-94348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D51F8BF3D7
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:52:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A107A8BF3D9
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 02:52:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D8091F2132E
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:52:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2F4D1C23639
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 00:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9F4399;
-	Wed,  8 May 2024 00:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1DE399;
+	Wed,  8 May 2024 00:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hoCn9aqo"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDC579CC;
-	Wed,  8 May 2024 00:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2368621;
+	Wed,  8 May 2024 00:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715129518; cv=none; b=ZggUn+vszKgUBXREuOanhuMk/BVBpB24pK1gIFqVzdFl2gWklzKxclYSArFB5gX39+9dFrsySVjdIpopiX1jzSNSQaBOaM+ykSl0c95WV2zNwYq0jTaj9hZ3lsuorNH71wYuvkFzAOKinZWPqZEBsOboO3ewJLa+7/MqVPyc1E0=
+	t=1715129551; cv=none; b=jg1YnfVyars937N2tWbicZFkL8w3Y2TJ2L366IGq+ioxD0KLtzzoVfm88Vh0y+lI5jM9S/05GBtCDn4zpUTNy/QYlpJ5OpLETBcbAizpv9GTUlAC8GeyWqcVGUFhdupfUNNC+NKQ5rJsLwuqMTftBTgXs/mMFCrOweMnRIFtZLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715129518; c=relaxed/simple;
-	bh=bDx4HxaCRI3tx13XsK0SdihIQe6rQ1h74yQ6qmRAqzg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=CzkYK2C9O2Zf6UIRTAWq8c+gYooAK5kHRrSt/F+iJ49xNSHgPbtb5Ze1uKPY9xA+cmWQ6EoapZk2fGQztdPyDY5TKbvr3y3oMNFL7ZUdcKJkHWXMdqmo3QV/hsZEqqvAC9stqxa23lpwZVpgUtb+wjZZHz0vdZ9wZ++6Wf7zZBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1s4VX9-000000007ms-0HBx;
-	Wed, 08 May 2024 00:51:47 +0000
-Date: Wed, 8 May 2024 01:51:39 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	s=arc-20240116; t=1715129551; c=relaxed/simple;
+	bh=sB4/qry+pSodw3Z8qdjDOAT+IY/uNcQ8+nikFMiTH/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kYPGznwtGKuoBHgZE3QA0srSZI4kUwRkxzJjmW6Ul5olw2r8a9VjUI3/F4vizvxmg6Tu2SmyWL7gjeVNtO0HoKChD2n83DCSpjRmKrV1ZcwfqbstdwJrTa8AxfV99W/Lx+7Kk2/FUEYqjqCr5/GjVYQtd6tDHMElf9S1FTCJYWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hoCn9aqo; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=RnwzN1zFiKJ6Mo+l9B22ekjNNfXtVqYT9pVfZnBjIcw=; b=hoCn9aqoXBt+6g6FY71YGYuK7V
+	ZF1F6NsbzCvsj3Ai7iLJ2T3BkulFkuatwlcdn0w7Bhc66ofNIFVsTMyvAwoas69IUXuJSa5ZOfoSC
+	Y0VtFYC6HX+H8p9jfLZi4nxeZqC3F6kRPTyBtXdvNYIhFbQQkSsHa8OOXA2KAWhnknck=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s4VXf-00Eu4O-0V; Wed, 08 May 2024 02:52:19 +0200
+Date: Wed, 8 May 2024 02:52:18 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	SkyLake Huang <skylake.huang@mediatek.com>,
-	Eric Woudstra <ericwouds@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: John Crispin <john@phrozen.org>
-Subject: [PATCH net] net: phy: air_en8811h: reset netdev rules when LED is
- set manually
-Message-ID: <9be9a00adfac8118b6d685e71696f83187308c66.1715125851.git.daniel@makrotopia.org>
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next,v2] net: ethernet: rtsn: Add support for Renesas
+ Ethernet-TSN
+Message-ID: <25f23887-061f-4ce6-a424-e5bf269cf8b5@lunn.ch>
+References: <20240507201839.1763338-1-niklas.soderlund+renesas@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,41 +62,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240507201839.1763338-1-niklas.soderlund+renesas@ragnatech.se>
 
-Setting LED_OFF via the brightness_set should deactivate hw control,
-so make sure netdev trigger rules also get cleared in that case.
-This matches the behaviour when using the 'netdev' trigger without
-any hardware offloading and fixes unwanted memory of the default
-netdev trigger rules when another trigger (or no trigger) had been
-selected meanwhile.
+> +static int rtsn_probe(struct platform_device *pdev)
+> +{
+> +	struct rtsn_private *priv;
+> +	struct net_device *ndev;
+> +	struct resource *res;
+> +	int ret;
+> +
+> +	ndev = alloc_etherdev_mqs(sizeof(struct rtsn_private), TX_NUM_CHAINS,
 
-Fixes: 71e79430117d ("net: phy: air_en8811h: Add the Airoha EN8811H PHY driver")
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-This is basically a stop-gap measure until unified LED handling has
-been implemented accross all MediaTek and Airoha PHYs.
-See also
-https://patchwork.kernel.org/project/netdevbpf/patch/20240425023325.15586-3-SkyLake.Huang@mediatek.com/
+...
 
- drivers/net/phy/air_en8811h.c | 4 ++++
- 1 file changed, 4 insertions(+)
+> +	ether_setup(ndev);
 
-diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
-index 4c9a1c9c805e..3cdc8c6b30b6 100644
---- a/drivers/net/phy/air_en8811h.c
-+++ b/drivers/net/phy/air_en8811h.c
-@@ -544,6 +544,10 @@ static int air_hw_led_on_set(struct phy_device *phydev, u8 index, bool on)
- 
- 	changed |= (priv->led[index].rules != 0);
- 
-+	/* clear netdev trigger rules in case LED_OFF has been set */
-+	if (!on)
-+		priv->led[index].rules = 0;
-+
- 	if (changed)
- 		return phy_modify_mmd(phydev, MDIO_MMD_VEND2,
- 				      AIR_PHY_LED_ON(index),
--- 
-2.45.0
+struct net_device *alloc_etherdev_mqs(int sizeof_priv, unsigned int txqs,
+				      unsigned int rxqs)
+{
+	return alloc_netdev_mqs(sizeof_priv, "eth%d", NET_NAME_ENUM,
+				ether_setup, txqs, rxqs);
+}
 
+Notice the ether_setup here? I think you end up calling it twice.
+
+       Andrew
 
