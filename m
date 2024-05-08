@@ -1,154 +1,130 @@
-Return-Path: <netdev+bounces-94692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C679C8C039B
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 19:47:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 567A78C03E6
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 19:56:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8244628183C
-	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 17:47:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CA4A1F24365
+	for <lists+netdev@lfdr.de>; Wed,  8 May 2024 17:56:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C03012CD8E;
-	Wed,  8 May 2024 17:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8826912BE9E;
+	Wed,  8 May 2024 17:56:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="ZzdB3Jth"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OCQvLHFd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F374712FF65
-	for <netdev@vger.kernel.org>; Wed,  8 May 2024 17:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D749220309;
+	Wed,  8 May 2024 17:56:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715190379; cv=none; b=kZKzujkOwibRoo0LmpNg9Df9BYB8AGtgmaNhwI7dTuiZh3esxTAF8xGWdHX/4clcB27yJSjPTmX8gDAKoVZBDZ5S2bPNY+9QYlRRIiiiA4Fnq91mb9arvtCERHXn0xzRdwAd9rXoz2gBHj9u4EB49xSuMj/+G/8gJHfA9P3rwQU=
+	t=1715191011; cv=none; b=s4t5WgtalFnO1+C9YGGQ4b+6BF3uWclt3YdgHWHAIFXjcV73zYEP7PsKedQSrYbUKDAPvaGeMzPA4lOr/Kkdc6UhXEKciHKg2DiMBRqTMCkzqKyj17T4bHDIrOk7Noe/6JJ2MSfe90eiYmnznHnyRpNUeslmDAoLKS340SOEc+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715190379; c=relaxed/simple;
-	bh=slbEVuIv2JdVCq4rv5/u/gs9BnJNjVm0YjN9IYaxYBw=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=IsBrPFECaQVa/g2FkGLd99Vl/WexaL1dgqZu4+nsFrDc1djCw9I+BqR3qH0gSCuAkFvJ6J2Bve6CXvVW5gHygRWyPKzVNm/VBJRNULIx6LPHQsIOallGvJK6xG23OVS5VMahdFTc4+6t9OjKzJ2/nRZx+GbEYPI1y3gYl6CYofA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=ZzdB3Jth; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1715190367; x=1715795167; i=hfdevel@gmx.net;
-	bh=slbEVuIv2JdVCq4rv5/u/gs9BnJNjVm0YjN9IYaxYBw=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:From:Subject:To:
-	 Cc:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=ZzdB3JthORQ1LYXORNXt91lAzhP/l87M7vw85iVsp6gtAhmP95rq4BoDUrImW9kB
-	 3ISYrXlJHnY322JYzarntaE74QGxj9jqTbfUT7O7X+AMAi1p1drEg7xw5IXhRWooy
-	 +n3ImSeB5OPaDBFa439+lEJxQAea1fVoWmYpFuY+D7mI8Gtg9kR8s5vs5PrLIbyco
-	 1IxUQ3NfJIIceZ7d7aVSpYA5gKSQj3qpRkXbnNvALQe/PEYWytWweAWSz4PiHb5Sc
-	 lTtVdUgbuT9YaQYctUnS4PV+T3/4e0Pu8OU4YngUy8rjXYvzVrBDcuFBHwwUcP+N/
-	 oFjuXSB3bSkF77t+2A==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MNswE-1sFnxn1xUm-00N6Tr; Wed, 08
- May 2024 19:46:07 +0200
-Message-ID: <bde062c3-a487-4c57-b864-dc7835573553@gmx.net>
-Date: Wed, 8 May 2024 19:46:05 +0200
+	s=arc-20240116; t=1715191011; c=relaxed/simple;
+	bh=8GWvJFhjz+4IneZTgTdmlJNfYB6EqWQuwqKdICsfABI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PRp7lrfTfPTXHPK2EqxQx1k02d52d7O2ZAK3sbJcDPmGlk771uuYfEJiTxMCrkpMpiZbHZsr6ropSuw3C7kaPQoNAZZA9usvQTkVSwwvDNiixPiB2ljkbOQqRoQUEyDRbZzY6YhPSIdL/Hah3I0ltU/HI8y50s5mwnQ5CvMw46E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OCQvLHFd; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715191011; x=1746727011;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8GWvJFhjz+4IneZTgTdmlJNfYB6EqWQuwqKdICsfABI=;
+  b=OCQvLHFdf8KJYg1Bbl3/bh2T8bDu7CCYnw2axSlSYem3xbU8+F4lv0R9
+   KShUb66NB9eYFTI1jKAWdpyB910dmDff1sMoCC+MSIMOvnjcjt8QmHoQs
+   HE4EhsvaZthmkXt17dq6+qWTbmR97n/lr7wSbL8FsKGHlCn30O+yx97sJ
+   jPuEyQmtKeQkebyoCFIr3tLKCRZCOsChxkiXOSqr/CYYrtDaoeYtJf1N3
+   7NIousA3nbLUj4dNphL184G7YeeRnoyK1j9zfZwkrWKCG66pboPO/cbtF
+   0ZoXzXq170eMZKoTTY4EgZWo4Yt8JSRuahQpoR3Si+Qg8yxb8C6BAZiM4
+   g==;
+X-CSE-ConnectionGUID: TdDvloZsSOecmPwVCltgyQ==
+X-CSE-MsgGUID: 9K51f540ShSGdMWZvmMf+g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11067"; a="14866370"
+X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
+   d="scan'208";a="14866370"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 10:56:50 -0700
+X-CSE-ConnectionGUID: zxobd8YET5uEesz/RMcfsg==
+X-CSE-MsgGUID: mnsBKCwgQry3x8FmPaCH5Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,145,1712646000"; 
+   d="scan'208";a="33661787"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 10:56:45 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1s4lWz-00000005Wxk-3Bor;
+	Wed, 08 May 2024 20:56:41 +0300
+Date: Wed, 8 May 2024 20:56:41 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: kernel test robot <lkp@intel.com>
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	oe-kbuild-all@lists.linux.dev,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Subject: Re: [PATCH net-next v1 1/1] net: intel: Use *-y instead of *-objs in
+ Makefile
+Message-ID: <Zju82TRJ8EwJh8is@smile.fi.intel.com>
+References: <20240508132315.1121086-1-andriy.shevchenko@linux.intel.com>
+ <202405090110.rS1cBZES-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Hans-Frieder Vogt <hfdevel@gmx.net>
-Subject: Re: [PATCH net-next v5 3/6] net: tn40xx: add basic Tx handling
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, horms@kernel.org,
- kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:7+cC00REFgetfhYXp/ZqPtffm/BO0rD1su4aj67huc8omgZ7Trz
- 8M2uIhwWK6M0fMNb1sRSo9iK1oPw5P2PZadaqXk3NRWrEZ7VldJRvKGxwyKy49g3GhrDXM5
- d+9Cv1s4BIyKTLbHx+Ih8nVb82I1V1fRfe4mfs+LpkbZCd6MUJT/JBUEVmPxUoQyjqQvyky
- 51JvsvVBHpgE1qAdrfPug==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:XzYwm1980u8=;KOC3B5P74gQU+ldCTQAQPBW9gCa
- G/Homey4k58O1MAETmVX73UQo/DVkCwcJVdfa6lXXkHAJtHf34e8ZisDwDJCdzdbays2kjVQ2
- QxE9IPo8+yyScP5t/YiyEPdLNUg5/pokm2EranLvNBaF7RUkQBaF8Jr7YEfAeqhM13tNs6OHv
- upPGf5fCmVR3FM5CsCdPOVQm6uLWP+pU0PuVKwd+ej1oaggB8ZrwXyBtXaB6eJHqPXVjvzyvo
- 39nGCJ7fKCu4/iSFOI1jdInwVBMBtBFbMbrQHOATZD6f+cqCtPL6oQYOTXc5cetNHfhCrnA82
- L2qIc6h0iulNTrwiWIlaHWdaMmxYUtWytVjxeVBz1Tv999omA+xHS+80OAb7c6/B0nrSFi/sd
- 40XGD8yagjBpQwxni0upbkUYafwA1R6Zxn9Q7WfetkpnY+649+COB9GrdVwFylhPhXA2f8s9b
- SdoLDdiQD8wK+uqnTFrJMkVGIS7UKqfGG/huztuoUTbSFrW9AKhqWy4jKRsmQzJG5ir6jTIPd
- vo4LIttBQJ2eUerEudhkBsp9pgVeSu/+KckN4GkWclwgRLVN0nIRKN9RihXomu0WxgKy+9CIu
- 0fXgDnH8J04zEBTXayMiFJTpNBRZHgg4TwnBrxiUrpWvV7HMoP8X7NYnOjV6l5TzAm/pkaYOG
- S4rP0RtZEmjThy+EXRyexPO83AzfX43tR5SUJbByGXplGZk8Gmz53Dur0BcaWc9YlYUmn8WU9
- L46a9g03O+gEtU875CDadLs6lv4bUPcB0u7xI9Tn+JbbVythADo7vFdaKqaUsBXsU+SfN7Qh+
- 3SSUeKD50PNgEWmRx+1lTTIDUQ97RdL4hYYhKwXcO/XIs=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202405090110.rS1cBZES-lkp@intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
- > This patch adds device specific structures to initialize the hardware
- > with basic Tx handling. The original driver loads the embedded
- > firmware in the header file. This driver is implemented to use the
- > firmware APIs.
- >
- > The Tx logic uses three major data structures; two ring buffers with
- > NIC and one database. One ring buffer is used to send information
- > about packets to be sent for NIC. The other is used to get information
- > from NIC about packet that are sent. The database is used to keep the
- > information about DMA mapping. After a packet is sent, the db is used
- > to free the resource used for the packet.
- >
- > Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
- > ---
- >=C2=A0 drivers/net/ethernet/tehuti/Kconfig |=C2=A0=C2=A0=C2=A0 1 +
- >=C2=A0 drivers/net/ethernet/tehuti/tn40.c=C2=A0 | 1260 +++++++++++++++++=
-++++++++++
- >=C2=A0 drivers/net/ethernet/tehuti/tn40.h=C2=A0 |=C2=A0 167 ++++
- >=C2=A0 3 files changed, 1428 insertions(+)
- >
- > diff --git a/drivers/net/ethernet/tehuti/Kconfig
-b/drivers/net/ethernet/tehuti/Kconfig
- > index 849e3b4a71c1..4198fd59e42e 100644
- > --- a/drivers/net/ethernet/tehuti/Kconfig
- > +++ b/drivers/net/ethernet/tehuti/Kconfig
- > @@ -26,6 +26,7 @@ config TEHUTI
- >=C2=A0 config TEHUTI_TN40
- > =C2=A0=C2=A0=C2=A0=C2=A0 tristate "Tehuti Networks TN40xx 10G Ethernet =
-adapters"
- > =C2=A0=C2=A0=C2=A0=C2=A0 depends on PCI
- > +=C2=A0=C2=A0=C2=A0 select FW_LOADER
- > =C2=A0=C2=A0=C2=A0=C2=A0 help
- > =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0 This driver supports 10G Ethernet adapt=
-ers using Tehuti Networks
- > =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0 TN40xx chips. Currently, adapters with =
-Applied Micro Circuits
- > diff --git a/drivers/net/ethernet/tehuti/tn40.c
-b/drivers/net/ethernet/tehuti/tn40.c
- > index 6ec436120d18..6c6163bad2c2 100644
- > --- a/drivers/net/ethernet/tehuti/tn40.c
- > +++ b/drivers/net/ethernet/tehuti/tn40.c
- > @@ -1,14 +1,1186 @@
- >=C2=A0 // SPDX-License-Identifier: GPL-2.0+
- >=C2=A0 /* Copyright (c) Tehuti Networks Ltd. */
- >
- > +#include <linux/bitfield.h>
- > +#include <linux/ethtool.h>
- > +#include <linux/firmware.h>
- > +#include <linux/if_vlan.h>
- > +#include <linux/netdevice.h>
- >=C2=A0 #include <linux/pci.h>
- >
- >=C2=A0 #include "tn40.h"
- >
- > +#define TN40_SHORT_PACKET_SIZE 60
- > +#define TN40_FIRMWARE_NAME "tn40xx-14.fw"
+On Thu, May 09, 2024 at 01:28:19AM +0800, kernel test robot wrote:
+> Hi Andy,
+> 
+> kernel test robot noticed the following build errors:
+> 
+> [auto build test ERROR on net-next/main]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Andy-Shevchenko/net-intel-Use-y-instead-of-objs-in-Makefile/20240508-212446
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/20240508132315.1121086-1-andriy.shevchenko%40linux.intel.com
+> patch subject: [PATCH net-next v1 1/1] net: intel: Use *-y instead of *-objs in Makefile
+> config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20240509/202405090110.rS1cBZES-lkp@intel.com/config)
+> compiler: loongarch64-linux-gcc (GCC) 13.2.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240509/202405090110.rS1cBZES-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202405090110.rS1cBZES-lkp@intel.com/
+> 
+> All errors (new ones prefixed by >>, old ones prefixed by <<):
 
-why is here a new firmware name defined?
-The TN4010 uses the identical firmware as the tehuti ethernet driver. I
-suggest therefore to define instead, in order to avoid storing the same
-firmware twice:
+> >> ERROR: modpost: "igc_led_free" [drivers/net/ethernet/intel/igc/igc.ko] undefined!
+> >> ERROR: modpost: "igc_led_setup" [drivers/net/ethernet/intel/igc/igc.ko] undefined!
 
-#define TN40_FIRMWARE_NAME "tehuti/bdx.bin"
+Sure, misplaced line. I'll fix this in the next version.
 
-=2D-
-Best regards,
+-- 
+With Best Regards,
+Andy Shevchenko
 
-Hans
+
 
