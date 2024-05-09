@@ -1,96 +1,92 @@
-Return-Path: <netdev+bounces-94886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DA6D8C0EDE
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 13:32:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2AA38C0ED7
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 13:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFE311F211CD
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:32:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FDC0283293
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77181311B9;
-	Thu,  9 May 2024 11:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D341311AC;
+	Thu,  9 May 2024 11:31:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="K3aUJsAz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i99lmOdj"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2069.outbound.protection.outlook.com [40.107.236.69])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A2013172B
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 11:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715254305; cv=fail; b=I8VqotijBBQmFHHA2gpL69sbsHkVLyvsBw7ywKKOU0m0cf03jbxTpAqrdxS4LOwKW02maR3k04Vn5nzM107Jjqb0/Ysd3Yj+G7ijS9nFDPTgO9x/Ei0vfqkUfl6RnWGZuEd0UhicTwPzuREZxSJ5yeSAZJwTzaAgwcg5GZBlLUE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715254305; c=relaxed/simple;
-	bh=pWyA5CbvPcePRn9+zxkQI1drOT28RCuJIhFNVK2C+nw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nAGQVrjuPLQTQxqIFwx4Kv0wJCc/nPQjItY50AzFz0By6QGczJq2SqiZ0B3LFDGCKQHX1mQqrvXHxPKrmGMl6CKWZOZvIgN/Yts7KSdzKKmfYTkISzjA40vsxymeRz3UKHeCDk2zkkfYkqQsIvCJd39Nx+3g5rXS+Ky0oIdsHW0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=K3aUJsAz; arc=fail smtp.client-ip=40.107.236.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mFsMO0axPf75wUfIQXxZsruIFbhL7oGV9EVsvBh/Y5Yddx2tTN6sX4gJ7jkCvfWzyzgBZL5XqWm6ckP4+XtcruJmAIp0S2Wy5rmES+P7iNwQJU4o9TwK7HJDWHFBc0HvsJ1YtKdwJ1HZHP9v6Vlgj4p+ETXMufbWxTenMUn7VqoFbtVr1m54NMJFAAsszPUd4Wxcqmsg8CW9608QzJFbDCbxmH6PvwZcyvQqCFMGtt7Uarf4w1JREdhXQPpudgmQ3FTifubJLUljtK1828sS3NRoe20KVRSLNKMtAnYrOyW1RroSB5/nP1ZRyY9x/jX5mRD0k1tOlietwDBIXBGKvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wXOfpUYR1958LdBCQxjl+tZsSDx6KPiY8X4QwpE5umY=;
- b=Y0pxzYMobFzUJM2Ahwk853HIA91OP1btNokgJwzpm2gs8Be18MRWf/gUGtM8ynmgCNy7Ns9YSxA8qDZOLvzaYhYkt3qQmu4XWbbLuUtFw/1ph3m04qihwbo+eMYsBifeocT0IXiZayX1FuWmgCrgGm+jjOKbynowFMNEYptsYUYeElEohBs6qhpCPOVbDHYatQoXgGjgGJlm1ty+tXQBjPfD24KpouzA11j18oOxeZKuvTQGSIttg5MR9CcVrNihLlQ6wTLms8NmgpNzmpvrf/E3YAWYlyrVdawIafKKAwAn+X0W2ISkmQLO+xpBfkGfOTtCyDUETc4s8iWf2KjPQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wXOfpUYR1958LdBCQxjl+tZsSDx6KPiY8X4QwpE5umY=;
- b=K3aUJsAzJrXBigEJetUEZzk7SzKMesAgQewbzA4YTADt4GR3gYX+9ZpndzGSOok0KBLPpjyfVVFwSf3xTtV2CrAcOUDt1vmvK7uf6IreLCN+xw2Uh7vbN92rUPK1MbSRBHlLPW4GB74QIPbjuD1n2EcQ4tF0I5C6ws14uDXXlWZSo5sj9PScN8QtJFIEJkXkRud1Yz6gQUlojNMucsv9MWwHkDBfqtWuksbDRLSfvAhe56gOuWtan5+D8aHu414/SqyiVL/wgVQlXKKsWVDnb0BvTHufWgEz8H4Gqf+sIqHON9d39TXrvk/UdiuRhgoNopEam3G+2y4iTYWm+tLaJQ==
-Received: from SN1PR12CA0046.namprd12.prod.outlook.com (2603:10b6:802:20::17)
- by DM4PR12MB5722.namprd12.prod.outlook.com (2603:10b6:8:5d::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.43; Thu, 9 May
- 2024 11:31:40 +0000
-Received: from SA2PEPF00003AE9.namprd02.prod.outlook.com
- (2603:10b6:802:20:cafe::30) by SN1PR12CA0046.outlook.office365.com
- (2603:10b6:802:20::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.48 via Frontend
- Transport; Thu, 9 May 2024 11:31:40 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SA2PEPF00003AE9.mail.protection.outlook.com (10.167.248.9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7544.18 via Frontend Transport; Thu, 9 May 2024 11:31:40 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 9 May 2024
- 04:31:22 -0700
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 9 May 2024
- 04:31:21 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
- with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Thu, 9 May
- 2024 04:31:18 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Akiva Goldberger
-	<agoldberger@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Tariq Toukan
-	<tariqt@nvidia.com>
-Subject: [PATCH net 5/5] net/mlx5: Discard command completions in internal error
-Date: Thu, 9 May 2024 14:29:51 +0300
-Message-ID: <20240509112951.590184-6-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4223F131192
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 11:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715254280; cv=none; b=o6sLJqKwXOHMp9S4arCOloaaN4EjPk0KDqEZXDeELcEHtzOu9wQxeAX+Yp19JO7/Y6nTI1lPAon0dttvKpe9wPmVSJ/MpVvTSqTyTHxtgEKkEJdJ0QDCvW4yfQ8aXO2jjWwPc57YtoHU1XYDkdI8MZ0CNozneXI5EFgI2K+AlHg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715254280; c=relaxed/simple;
+	bh=KbSJqTXIym8X1LZZSbDqHy2oc5PTnuYaFn9rlqkiybc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I0xeDQ622c1nVXH+ckxaOut2Jfrm1ilzWBlQxz8oI1F571LWijL8GweEUgWpujnvjsitEbnkBA357BYCu0UCPGyYlTqwLGRxKAkrpK1oWKbJO6BP7sZBsvBcILi1VKXe0T4MA9doQ+stu87pEcRK2ISKktXsKoi+qoiwU/8yXYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i99lmOdj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715254278;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kZ1oYNvf/jlHzYagQ7dAZFEVJALyTuqemntwu0w6jKw=;
+	b=i99lmOdjJt6OZpMXl+4iv18Pf9vJ671+RVgOwXt3a3m143Lf0ABqRYkxbRWM0dAUuLcjou
+	fY882dj8rD9BORJXNLHkYB82b8UxZL3ZXuWz56HwdmPQF0rrl9bgBxKMOuKDhu1b4+rAMy
+	fIsQkUr/hmsGidkH14Ni5JCHbifrD5Q=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-131-NtgFnCvUNzaltDQOkpbEfA-1; Thu, 09 May 2024 07:31:16 -0400
+X-MC-Unique: NtgFnCvUNzaltDQOkpbEfA-1
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6efef492e79so861421b3a.1
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 04:31:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715254274; x=1715859074;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kZ1oYNvf/jlHzYagQ7dAZFEVJALyTuqemntwu0w6jKw=;
+        b=it/E5wET3iExINMpUSXnyCNJOA+qiYAj4QMRAR+Ca+RpOoVckg2CGUY6W62htVlhU2
+         i0y1a2Xipr/wh7AuANrEypYx8wiVNpdYoGWETjB1x2elYdd0SoZoeFA2Y+3AAN8z237/
+         YHNIv7F71ISYR2v3wHP+2n71cHBBO+J/uXkKDNuN2kXC/AQVQKgCyQBqE8DP4xWdI9Wv
+         3g9NpxM8UeoNXCfmNLVtWxi/kY4/jenQFufYJJ/hWlShjscAQAon6N049jMzM7Hgkim3
+         sMajCLfhU3PxUO7wBOnO4CB6jBOoRg8x5BCIAhlIpb0mEAcwG5xNe8lNxIoaKI7WL+TQ
+         xPMw==
+X-Forwarded-Encrypted: i=1; AJvYcCXEELV8U+S9xM1NRk25hZIOTPzoMEOcdwCiy+xQAJYJ9cPtZozi8qpifwyDOBICOmAEPJJD0lAS4DLGK0v+47zWmHiA+upl
+X-Gm-Message-State: AOJu0Ywh/aIms2dt+mPuhtqzcUS9pTkcjGOmEv3IypobMDkDagZGVNuG
+	8z/mc1Mf5c08pJ9j25W/PZcN9wWdjkOw/8y//PssE6Hyy1JvsKbBSqo7Fzm0dhn6jwhLI+SqLYM
+	JaJR1oO0u7BvdvEeyCrPbAQtcRzxyI4KNAu0Hzd9o1k3Id7s+dj4Fx8HbGBjtG5Z6
+X-Received: by 2002:a05:6a20:9494:b0:1af:c0f9:b155 with SMTP id adf61e73a8af0-1afc8d8eb58mr5402212637.38.1715254274439;
+        Thu, 09 May 2024 04:31:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEznRBomI8zqavjnHRv+qhrEvXhhgPA38IG4MHjby0WMFKowdUH6+SUrWT3PbTYHv67iCKEGw==
+X-Received: by 2002:a05:6a20:9494:b0:1af:c0f9:b155 with SMTP id adf61e73a8af0-1afc8d8eb58mr5402187637.38.1715254274006;
+        Thu, 09 May 2024 04:31:14 -0700 (PDT)
+Received: from zeus.elecom ([240b:10:83a2:bd00:6e35:f2f5:2e21:ae3a])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c2567ccsm12023495ad.301.2024.05.09.04.31.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 May 2024 04:31:13 -0700 (PDT)
+From: Ryosuke Yasuoka <ryasuoka@redhat.com>
+To: krzk@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: Ryosuke Yasuoka <ryasuoka@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syoshida@redhat.com,
+	syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail.com
+Subject: [PATCH net v4] nfc: nci: Fix uninit-value in nci_rx_work
+Date: Thu,  9 May 2024 20:30:33 +0900
+Message-ID: <20240509113036.362290-1-ryasuoka@redhat.com>
 X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240509112951.590184-1-tariqt@nvidia.com>
-References: <20240509112951.590184-1-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,118 +94,115 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003AE9:EE_|DM4PR12MB5722:EE_
-X-MS-Office365-Filtering-Correlation-Id: e4cea40d-4427-4c44-735b-08dc701b9859
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|82310400017|1800799015|36860700004|376005;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?FTyr6h63GhqyVQl7w7rekGrz7QCtf8a3yYjLpoGbUsZHtUX9L8De2VmcLRJF?=
- =?us-ascii?Q?ILcnOw/awJ0BOCUy4K5N8+PV1lq4uIQmxz1cvvRS3d17SRcDa/6ze55WFeSt?=
- =?us-ascii?Q?aXilu+vVUxC94AOXeAgf3pTJBTNqDMrj+AcMYcEJcTwXQEQqVmLDDugj9dY0?=
- =?us-ascii?Q?saask5tnSlWgDO3+esmVT+/Z5obLBRv10CbptVqcMm9XU/RsylisV2XzcHaC?=
- =?us-ascii?Q?M6tmtHLWWs0pDIGRql0vgYsdKCGiwQjuIvF4FHFk9jlFuh2NMdiLWezcGYzX?=
- =?us-ascii?Q?VqEstA2Sob2ymfTbBkMPOVrqRynk0LRMtAu1TeYfc/xu3rkO8mt8PwUV6Shr?=
- =?us-ascii?Q?VZkzZ3oSbzfS+qgOnwFZ7RrnGVqqDdO7thOZxgEq6hrbMhXKhG1lkF/BWiPt?=
- =?us-ascii?Q?8J0RnN6yyiioZ3HESxR40Y6p3DCKyiJf7Ya8kP7394JHxbCFE6OXwO7o1Bgc?=
- =?us-ascii?Q?hzQQ2VI5y6xcKG6Ia6WHLPHpDdiJFyDCU7vHnpU1aMcNKS/H2Zqdf9hlQ+US?=
- =?us-ascii?Q?a5kqvHm1m32Yx0nSi/eFp4V7fQ299kf1OW8TI/9px+IV5TQaEKNyMo/lmQGU?=
- =?us-ascii?Q?Cfwapd2NSzMq9RBPxzj13EEGwVLQnr4GKcuywfmRbYDV0rIkU35Qh89w4hQK?=
- =?us-ascii?Q?0XsSaUTAGdKJrLyBVluUPMiNw2uyrYrClgB6nZRvpz2p6IqrTc80LGjmT1Ag?=
- =?us-ascii?Q?HQf2dyrpc7Tz6FWB38eLZ3/c3Zwz8EqucCkeBJZG3/zITUyWKoBDxxOBwHYg?=
- =?us-ascii?Q?1ieypHqhHYlHjKXHX76GDEMug2IgyY8wi2+oEq9XVmIQeXC0MMlTbb4Eh5z3?=
- =?us-ascii?Q?xRYG75bIIB5vBCatO4mdWXRVBFhQTcNNrG7k1QYbYlUFSDW6v0EYqCGYBbji?=
- =?us-ascii?Q?6Ew8QP/cXp/2L7Zr2aFtk0qB+72e0aId1iWZm26iv6ta7DC3PsLU4wvx0zax?=
- =?us-ascii?Q?p8qbtSfZe7eupT80F8gz8z9VNI1j+MDuZ18aWThTd5elWZq8qJqyWONFDh2m?=
- =?us-ascii?Q?eZ9pgsb55WfyDP0Az4sA4IHHAiIMARGTXS6yYZymqho/27KlE4Vv8fwVRECv?=
- =?us-ascii?Q?3rgYncsk9KsH68m0TJlChU+zqIkQVitD21tJm/dAjzCRMsZsjkDugHkN4xQP?=
- =?us-ascii?Q?/8KUm93nSB9U1ZL8lt1JE6AJVjpQVTQwt6quFv3GU64yLFlrstgcl1bxYq5m?=
- =?us-ascii?Q?3JV2nDLU9RjNIOH13S3ovTKQvLwiVYkm8DJkHQCSWGVddEJpbTkbsKPAIqyp?=
- =?us-ascii?Q?+x+yvyOZbpIp+ssPNRCrl/P6XjL66TNOoPVorajwzw5QKNoWtw3O0D281HFy?=
- =?us-ascii?Q?VbpDXpY46hcyh9tp4JDO+jB01h8gwInX3Cvp+7vH77CKkA+EY0++dep/AR4U?=
- =?us-ascii?Q?cgUszvfktgWFLWo1MY03rqUqGFBE?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(82310400017)(1800799015)(36860700004)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2024 11:31:40.0788
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4cea40d-4427-4c44-735b-08dc701b9859
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003AE9.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5722
 
-From: Akiva Goldberger <agoldberger@nvidia.com>
+syzbot reported the following uninit-value access issue [1]
 
-Fix use after free when FW completion arrives while device is in
-internal error state. Avoid calling completion handler in this case,
-since the device will flush the command interface and trigger all
-completions manually.
+nci_rx_work() parses received packet from ndev->rx_q. It should be
+validated header size, payload size and total packet size before
+processing the packet. If an invalid packet is detected, it should be
+silently discarded.
 
-Kernel log:
-------------[ cut here ]------------
-refcount_t: underflow; use-after-free.
-...
-RIP: 0010:refcount_warn_saturate+0xd8/0xe0
-...
-Call Trace:
-<IRQ>
-? __warn+0x79/0x120
-? refcount_warn_saturate+0xd8/0xe0
-? report_bug+0x17c/0x190
-? handle_bug+0x3c/0x60
-? exc_invalid_op+0x14/0x70
-? asm_exc_invalid_op+0x16/0x20
-? refcount_warn_saturate+0xd8/0xe0
-cmd_ent_put+0x13b/0x160 [mlx5_core]
-mlx5_cmd_comp_handler+0x5f9/0x670 [mlx5_core]
-cmd_comp_notifier+0x1f/0x30 [mlx5_core]
-notifier_call_chain+0x35/0xb0
-atomic_notifier_call_chain+0x16/0x20
-mlx5_eq_async_int+0xf6/0x290 [mlx5_core]
-notifier_call_chain+0x35/0xb0
-atomic_notifier_call_chain+0x16/0x20
-irq_int_handler+0x19/0x30 [mlx5_core]
-__handle_irq_event_percpu+0x4b/0x160
-handle_irq_event+0x2e/0x80
-handle_edge_irq+0x98/0x230
-__common_interrupt+0x3b/0xa0
-common_interrupt+0x7b/0xa0
-</IRQ>
-<TASK>
-asm_common_interrupt+0x22/0x40
-
-Fixes: 51d138c2610a ("net/mlx5: Fix health error state handling")
-Signed-off-by: Akiva Goldberger <agoldberger@nvidia.com>
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Fixes: d24b03535e5e ("nfc: nci: Fix uninit-value in nci_dev_up and nci_ntf_packet")
+Reported-and-tested-by: syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=d7b4dc6cd50410152534 [1]
+Signed-off-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 3 +++
- 1 file changed, 3 insertions(+)
+v4
+- v3 patch uses goto statement and it makes codes complicated. So this
+  patch simply calls kfree_skb inside loop and remove goto statement.
+- [2] inserted kcov_remote_stop() to fix kcov check. However, as we
+  discuss about my v3 patch [3], it should not exit the for statement
+  and should continue processing subsequent packets. This patch removes
+  them and simply insert continue statement.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-index 511e7fee39ac..20768ef2e9d2 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-@@ -1634,6 +1634,9 @@ static int cmd_comp_notifier(struct notifier_block *nb,
- 	dev = container_of(cmd, struct mlx5_core_dev, cmd);
- 	eqe = data;
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=19e35f24750d
+
+v3
+https://lore.kernel.org/netdev/20240502082323.250739-1-ryasuoka@redhat.com/T/
+- As Simon pointed out, the valid packets will reach invalid_pkt_free
+and kfree_skb(skb) after being handled correctly in switch statement.
+It can lead to double free issues, which is not intended. So this patch
+uses "continue" instead of "break" in switch statement.
+
+- In the current implementation, once zero payload size is detected, the
+for statement exits. It should continue processing subsequent packets. 
+So this patch just frees skb in invalid_pkt_free when the invalid 
+packets are detected. [3]
+
+v2
+https://lore.kernel.org/lkml/20240428134525.GW516117@kernel.org/T/
+
+- The v1 patch only checked whether skb->len is zero. This patch also
+  checks header size, payload size and total packet size.
+
+
+v1
+https://lore.kernel.org/linux-kernel/CANn89iJrQevxPFLCj2P=U+XSisYD0jqrUQpa=zWMXTjj5+RriA@mail.gmail.com/T/
+
+ net/nfc/nci/core.c | 30 ++++++++++++++++++++++++------
+ 1 file changed, 24 insertions(+), 6 deletions(-)
+
+diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
+index b133dc55304c..0aaff30cb68f 100644
+--- a/net/nfc/nci/core.c
++++ b/net/nfc/nci/core.c
+@@ -1463,6 +1463,16 @@ int nci_core_ntf_packet(struct nci_dev *ndev, __u16 opcode,
+ 				 ndev->ops->n_core_ops);
+ }
  
-+	if (dev->state == MLX5_DEVICE_STATE_INTERNAL_ERROR)
-+		return NOTIFY_DONE;
++static bool nci_valid_size(struct sk_buff *skb, unsigned int header_size)
++{
++	if (skb->len < header_size ||
++	    !nci_plen(skb->data) ||
++	    skb->len < header_size + nci_plen(skb->data)) {
++		return false;
++	}
++	return true;
++}
 +
- 	mlx5_cmd_comp_handler(dev, be32_to_cpu(eqe->data.cmd.vector), false);
+ /* ---- NCI TX Data worker thread ---- */
  
- 	return NOTIFY_OK;
+ static void nci_tx_work(struct work_struct *work)
+@@ -1516,24 +1526,32 @@ static void nci_rx_work(struct work_struct *work)
+ 		nfc_send_to_raw_sock(ndev->nfc_dev, skb,
+ 				     RAW_PAYLOAD_NCI, NFC_DIRECTION_RX);
+ 
+-		if (!nci_plen(skb->data)) {
++		if (!skb->len) {
+ 			kfree_skb(skb);
+-			kcov_remote_stop();
+-			break;
++			continue;
+ 		}
+ 
+ 		/* Process frame */
+ 		switch (nci_mt(skb->data)) {
+ 		case NCI_MT_RSP_PKT:
+-			nci_rsp_packet(ndev, skb);
++			if (nci_valid_size(skb, NCI_CTRL_HDR_SIZE))
++				nci_rsp_packet(ndev, skb);
++			else
++				kfree_skb(skb);
+ 			break;
+ 
+ 		case NCI_MT_NTF_PKT:
+-			nci_ntf_packet(ndev, skb);
++			if (nci_valid_size(skb, NCI_CTRL_HDR_SIZE))
++				nci_ntf_packet(ndev, skb);
++			else
++				kfree_skb(skb);
+ 			break;
+ 
+ 		case NCI_MT_DATA_PKT:
+-			nci_rx_data_packet(ndev, skb);
++			if (nci_valid_size(skb, NCI_DATA_HDR_SIZE))
++				nci_rx_data_packet(ndev, skb);
++			else
++				kfree_skb(skb);
+ 			break;
+ 
+ 		default:
 -- 
-2.31.1
+2.44.0
 
 
