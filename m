@@ -1,359 +1,269 @@
-Return-Path: <netdev+bounces-94866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC2288C0E44
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 12:36:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7323F8C0DFA
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 12:09:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83D97283BD6
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:36:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84E911C2110B
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEED912E1E3;
-	Thu,  9 May 2024 10:36:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ch6m/viA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E836514AD14;
+	Thu,  9 May 2024 10:09:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41DB5339A
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 10:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8EF14A4FF
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 10:09:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715251014; cv=none; b=cvLJp9fPMHQH5fKwXDr4xPVQzUG8pwvCkwjMB/faeNfBN66hSVAMKeFw8iT79RjaOia38mup7pSKsilvY4aL6J9OYJuRRwMqbq4hC6AIyGGy01o4QD8eHSpCo44L0C3Vbp/anijX28FiDbmyx12wSq62LRtpZqZFWT5B4YPqSjc=
+	t=1715249357; cv=none; b=uG+tSGOEcZiJ/w4VLOrooon7ZMh4Oy9PIFKD7IaXUMr9CBtS0lYR9CXw9miBbLNBfRRj5QNS8mdhxSwu6uaJZvBFOYeBjwTEECh70C/BaibOBM7+22KTqtJl5z2VP18nZnw16HbPYE4YJYc42OJhHGeYi2Czr1Z2REpoVjGx4S0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715251014; c=relaxed/simple;
-	bh=HBDZwzRGeQnsIpiARlnK4c9lly2wfAMLwYCqSmUF43o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SECBy0qmpN0WxKfY7cBVg7Jn8djqpnxsPVqonqeRtmSpua0IScopvympjhs+LnxgrFdoPZSr9ia67zOv1mVOw+p2VNrS2IxrOfrt0C0lI/MR3rbhj1nb/p73ipQnvai9Io8eF9I5VpcOWd/+tBKqpjCUSGi6vZ1e/9O3WJp7Crc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ch6m/viA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715251010;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jLIz1Jbxti8NJft3YZRGOY+N8ghcPjRasffwEVjRfb4=;
-	b=ch6m/viAuFdOU+l2JC5dp5HAND8SczHUHpYWL8wTP6RLH0lUk32R3Gi7NuiPzFFblWvoAd
-	wLG3mTlB6HdS1P8WchgMyrqmqO5OPGvF+WPeBoEtuTOjqKZ3JVmzjTwzEvoSxnWXviIjhQ
-	O/bjnhuLJ4i/Q3xLoHpVO/TSVzwltG8=
+	s=arc-20240116; t=1715249357; c=relaxed/simple;
+	bh=Szz2WxrTEgN97//PYlaMdCl+ZNNQuRaW2dNxA8/Zgv8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=O/5gwcOHSnuyAHSaRy3TDPYsJ/ZbGeDiRfd5dUbbvayWewbaUUTX1M+FXpsh0cni22MMOGxHok/UFQZeYi/Ok2BTaUS7Emrkwofrb7o0ivETZ+VZWnRJkF3yw6hK5KP8kDop/5VWJJh0Y3MS9KhgQZUYcyt+CbDLIbe/ae1NJ9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-574-As0XE-8nN32WyKnX_e-r1Q-1; Thu, 09 May 2024 06:36:47 -0400
-X-MC-Unique: As0XE-8nN32WyKnX_e-r1Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-241-sELZQplUOXCA3OaNWreScw-1; Thu, 09 May 2024 06:09:02 -0400
+X-MC-Unique: sELZQplUOXCA3OaNWreScw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0345881227E;
-	Thu,  9 May 2024 10:36:47 +0000 (UTC)
-Received: from dcaratti.users.ipa.redhat.com (unknown [10.45.225.109])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CDB7E1C008B9;
-	Thu,  9 May 2024 10:36:44 +0000 (UTC)
-From: Davide Caratti <dcaratti@redhat.com>
-To: netdev@vger.kernel.org
-Cc: casey@schaufler-ca.com,
-	davem@davemloft.net,
-	dcaratti@redhat.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-security-module@vger.kernel.org,
-	pabeni@redhat.com,
-	paul@paul-moore.com,
-	xmu@redhat.com
-Subject: [PATCH net v4] netlabel: fix RCU annotation for IPv4 options on socket creation
-Date: Thu,  9 May 2024 12:07:05 +0200
-Message-ID: <262f71a207e8cedd388bd89d17ef16155eb2acee.1715248275.git.dcaratti@redhat.com>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 68C38185A783;
+	Thu,  9 May 2024 10:09:02 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 34A6F5ADC42;
+	Thu,  9 May 2024 10:09:01 +0000 (UTC)
+Date: Thu, 9 May 2024 12:09:00 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
+Subject: Re: [PATCH net-next v3 04/24] ovpn: add basic interface
+ creation/destruction/management routines
+Message-ID: <ZjygvCgXFfrA4GRN@hog>
+References: <20240506011637.27272-1-antonio@openvpn.net>
+ <20240506011637.27272-5-antonio@openvpn.net>
+ <ZjuRqyZB0kMINqme@hog>
+ <b6a6c29b-ad78-4d6f-be1a-93615f27c956@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+In-Reply-To: <b6a6c29b-ad78-4d6f-be1a-93615f27c956@openvpn.net>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Xiumei reports the following splat when netlabel and TCP socket are used:
+2024-05-09, 10:25:44 +0200, Antonio Quartulli wrote:
+> On 08/05/2024 16:52, Sabrina Dubroca wrote:
+> > 2024-05-06, 03:16:17 +0200, Antonio Quartulli wrote:
+> > > diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+> > > index 33c0b004ce16..584cd7286aff 100644
+> > > --- a/drivers/net/ovpn/main.c
+> > > +++ b/drivers/net/ovpn/main.c
+> > [...]
+> > > +static void ovpn_struct_free(struct net_device *net)
+> > > +{
+> > > +=09struct ovpn_struct *ovpn =3D netdev_priv(net);
+> > > +
+> > > +=09rtnl_lock();
+> >=20
+> >   ->priv_destructor can run from register_netdevice (already under
+> > RTNL), this doesn't look right.
+> >=20
+> > > +=09list_del(&ovpn->dev_list);
+> >=20
+> > And if this gets called from register_netdevice, the list_add from
+> > ovpn_iface_create hasn't run yet, so this will probably do strange
+> > things?
+>=20
+> Argh, again I haven't considered a failure in register_netdevice and you =
+are
+> indeed right.
+>=20
+> Maybe it is better to call list_del() in the netdev notifier, upon
+> NETDEV_UNREGISTER event?
 
- =============================
- WARNING: suspicious RCU usage
- 6.9.0-rc2+ #637 Not tainted
- -----------------------------
- net/ipv4/cipso_ipv4.c:1880 suspicious rcu_dereference_protected() usage!
+I'd like to avoid splitting the clean up code over so maybe different
+functions and called through different means. Keep it simple.
 
- other info that might help us debug this:
+AFAICT the only reason you need this list is to delete your devices on
+netns exit, so if we can get rid of that the list can go away.
 
- rcu_scheduler_active = 2, debug_locks = 1
- 1 lock held by ncat/23333:
-  #0: ffffffff906030c0 (rcu_read_lock){....}-{1:2}, at: netlbl_sock_setattr+0x25/0x1b0
 
- stack backtrace:
- CPU: 11 PID: 23333 Comm: ncat Kdump: loaded Not tainted 6.9.0-rc2+ #637
- Hardware name: Supermicro SYS-6027R-72RF/X9DRH-7TF/7F/iTF/iF, BIOS 3.0  07/26/2013
- Call Trace:
-  <TASK>
-  dump_stack_lvl+0xa9/0xc0
-  lockdep_rcu_suspicious+0x117/0x190
-  cipso_v4_sock_setattr+0x1ab/0x1b0
-  netlbl_sock_setattr+0x13e/0x1b0
-  selinux_netlbl_socket_post_create+0x3f/0x80
-  selinux_socket_post_create+0x1a0/0x460
-  security_socket_post_create+0x42/0x60
-  __sock_create+0x342/0x3a0
-  __sys_socket_create.part.22+0x42/0x70
-  __sys_socket+0x37/0xb0
-  __x64_sys_socket+0x16/0x20
-  do_syscall_64+0x96/0x180
-  ? do_user_addr_fault+0x68d/0xa30
-  ? exc_page_fault+0x171/0x280
-  ? asm_exc_page_fault+0x22/0x30
-  entry_SYSCALL_64_after_hwframe+0x71/0x79
- RIP: 0033:0x7fbc0ca3fc1b
- Code: 73 01 c3 48 8b 0d 05 f2 1b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 29 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d d5 f1 1b 00 f7 d8 64 89 01 48
- RSP: 002b:00007fff18635208 EFLAGS: 00000246 ORIG_RAX: 0000000000000029
- RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007fbc0ca3fc1b
- RDX: 0000000000000006 RSI: 0000000000000001 RDI: 0000000000000002
- RBP: 000055d24f80f8a0 R08: 0000000000000003 R09: 0000000000000001
+> > > +static int ovpn_net_open(struct net_device *dev)
+> > > +{
+> > > +=09struct in_device *dev_v4 =3D __in_dev_get_rtnl(dev);
+> > > +
+> > > +=09if (dev_v4) {
+> > > +=09=09/* disable redirects as Linux gets confused by ovpn handling
+> > > +=09=09 * same-LAN routing
+> > > +=09=09 */
+> > > +=09=09IN_DEV_CONF_SET(dev_v4, SEND_REDIRECTS, false);
+> > > +=09=09IPV4_DEVCONF_ALL(dev_net(dev), SEND_REDIRECTS) =3D false;
+> >=20
+> > Jakub, are you ok with that? This feels a bit weird to have in the
+> > middle of a driver.
+>=20
+> Let me share what the problem is (copied from the email I sent to Andrew
+> Lunn as he was also curious about this):
+>=20
+> The reason for requiring this setting lies in the OpenVPN server acting a=
+s
+> relay point (star topology) for hosts in the same subnet.
+>=20
+> Example: given the a.b.c.0/24 IP network, you have .2 that in order to ta=
+lk
+> to .3 must have its traffic relayed by .1 (the server).
+>=20
+> When the kernel (at .1) sees this traffic it will send the ICMP redirects=
+,
+> because it believes that .2 should directly talk to .3 without passing
+> through .1.
 
-R10: 0000000000020000 R11: 0000000000000246 R12: 000055d24f80f8a0
- R13: 0000000000000000 R14: 000055d24f80fb88 R15: 0000000000000000
-  </TASK>
+So only the server would need to stop sending them, not the client?
+(or the client would need to ignore them)
+But the kernel has no way of knowing if an ovpn device is on a client
+or a server?
 
-The current implementation of cipso_v4_sock_setattr() replaces IP options
-under the assumption that the caller holds the socket lock; however, such
-assumption is not true, nor needed, in selinux_socket_post_create() hook.
+> Of course it makes sense in a normal network with a classic broadcast
+> domain, but this is not the case in a VPN implemented as a star topology.
+>=20
+> Does it make sense?
 
-Let all callers of cipso_v4_sock_setattr() specify the "socket lock held"
-condition, except selinux_socket_post_create() _ where such condition can
-safely be set as true even without holding the socket lock.
+It looks like the problem is that ovpn links are point-to-point
+(instead of a broadcast LAN kind of link where redirects would make
+sense), and the kernel doesn't handle it that way.
 
-v4:
- - fix build when CONFIG_LOCKDEP is unset (thanks kernel test robot)
+> The only way I see to fix this globally is to have an extra flag in the
+> netdevice signaling this peculiarity and thus disabling ICMP redirects
+> automatically.
+>=20
+> Note: wireguard has those lines too, as it probably needs to address the
+> same scenario.
 
-v3:
- - rename variable to 'sk_locked' (thanks Paul Moore)
- - keep rcu_replace_pointer() open-coded and re-add NULL check of 'old',
-   these two changes will be posted in another patch (thanks Paul Moore)
+I've noticed a lot of similarities in some bits I've looked at, and I
+hate that this is turning into another pile of duplicate code like
+vxlan/geneve, bond/team, etc :(
 
-v2:
- - pass lockdep_sock_is_held() through a boolean variable in the stack
-   (thanks Eric Dumazet, Paul Moore, Casey Schaufler)
- - use rcu_replace_pointer() instead of rcu_dereference_protected() +
-   rcu_assign_pointer()
- - remove NULL check of 'old' before kfree_rcu()
 
-Fixes: f6d8bd051c39 ("inet: add RCU protection to inet->opt")
-Reported-by: Xiumei Mu <xmu@redhat.com>
-Acked-by: Paul Moore <paul@paul-moore.com>
-Signed-off-by: Davide Caratti <dcaratti@redhat.com>
----
- include/net/cipso_ipv4.h     |  6 ++++--
- include/net/netlabel.h       | 12 ++++++++++--
- net/ipv4/cipso_ipv4.c        |  7 ++++---
- net/netlabel/netlabel_kapi.c | 26 +++++++++++++++++++++++---
- security/selinux/netlabel.c  |  5 ++++-
- security/smack/smack_lsm.c   |  3 ++-
- 6 files changed, 47 insertions(+), 12 deletions(-)
+> > [...]
+> > > +void ovpn_iface_destruct(struct ovpn_struct *ovpn)
+> > > +{
+> > > +=09ASSERT_RTNL();
+> > > +
+> > > +=09netif_carrier_off(ovpn->dev);
+> > > +
+> > > +=09ovpn->registered =3D false;
+> > > +
+> > > +=09unregister_netdevice(ovpn->dev);
+> > > +=09synchronize_net();
+> >=20
+> > If this gets called from the loop in ovpn_netns_pre_exit, one
+> > synchronize_net per ovpn device would seem quite expensive.
+>=20
+> As per your other comment, maybe I should just remove the synchronize_net=
+()
+> entirely since it'll be the core to take care of inflight packets?
 
-diff --git a/include/net/cipso_ipv4.h b/include/net/cipso_ipv4.h
-index 53dd7d988a2d..c9111bb2f59b 100644
---- a/include/net/cipso_ipv4.h
-+++ b/include/net/cipso_ipv4.h
-@@ -183,7 +183,8 @@ int cipso_v4_getattr(const unsigned char *cipso,
- 		     struct netlbl_lsm_secattr *secattr);
- int cipso_v4_sock_setattr(struct sock *sk,
- 			  const struct cipso_v4_doi *doi_def,
--			  const struct netlbl_lsm_secattr *secattr);
-+			  const struct netlbl_lsm_secattr *secattr,
-+			  bool sk_locked);
- void cipso_v4_sock_delattr(struct sock *sk);
- int cipso_v4_sock_getattr(struct sock *sk, struct netlbl_lsm_secattr *secattr);
- int cipso_v4_req_setattr(struct request_sock *req,
-@@ -214,7 +215,8 @@ static inline int cipso_v4_getattr(const unsigned char *cipso,
- 
- static inline int cipso_v4_sock_setattr(struct sock *sk,
- 				      const struct cipso_v4_doi *doi_def,
--				      const struct netlbl_lsm_secattr *secattr)
-+				      const struct netlbl_lsm_secattr *secattr,
-+				      bool sk_locked)
- {
- 	return -ENOSYS;
- }
-diff --git a/include/net/netlabel.h b/include/net/netlabel.h
-index f3ab0b8a4b18..2133ad723fc1 100644
---- a/include/net/netlabel.h
-+++ b/include/net/netlabel.h
-@@ -470,7 +470,8 @@ void netlbl_bitmap_setbit(unsigned char *bitmap, u32 bit, u8 state);
- int netlbl_enabled(void);
- int netlbl_sock_setattr(struct sock *sk,
- 			u16 family,
--			const struct netlbl_lsm_secattr *secattr);
-+			const struct netlbl_lsm_secattr *secattr,
-+			bool sk_locked);
- void netlbl_sock_delattr(struct sock *sk);
- int netlbl_sock_getattr(struct sock *sk,
- 			struct netlbl_lsm_secattr *secattr);
-@@ -487,6 +488,7 @@ int netlbl_skbuff_getattr(const struct sk_buff *skb,
- 			  u16 family,
- 			  struct netlbl_lsm_secattr *secattr);
- void netlbl_skbuff_err(struct sk_buff *skb, u16 family, int error, int gateway);
-+bool netlbl_sk_lock_check(struct sock *sk);
- 
- /*
-  * LSM label mapping cache operations
-@@ -614,7 +616,8 @@ static inline int netlbl_enabled(void)
- }
- static inline int netlbl_sock_setattr(struct sock *sk,
- 				      u16 family,
--				      const struct netlbl_lsm_secattr *secattr)
-+				      const struct netlbl_lsm_secattr *secattr,
-+				      bool sk_locked)
- {
- 	return -ENOSYS;
- }
-@@ -673,6 +676,11 @@ static inline struct audit_buffer *netlbl_audit_start(int type,
- {
- 	return NULL;
- }
-+
-+static inline bool netlbl_sk_lock_check(struct sock *sk)
-+{
-+	return true;
-+}
- #endif /* CONFIG_NETLABEL */
- 
- const struct netlbl_calipso_ops *
-diff --git a/net/ipv4/cipso_ipv4.c b/net/ipv4/cipso_ipv4.c
-index 8b17d83e5fde..dd6d46015058 100644
---- a/net/ipv4/cipso_ipv4.c
-+++ b/net/ipv4/cipso_ipv4.c
-@@ -1815,6 +1815,7 @@ static int cipso_v4_genopt(unsigned char *buf, u32 buf_len,
-  * @sk: the socket
-  * @doi_def: the CIPSO DOI to use
-  * @secattr: the specific security attributes of the socket
-+ * @sk_locked: true if caller holds the socket lock
-  *
-  * Description:
-  * Set the CIPSO option on the given socket using the DOI definition and
-@@ -1826,7 +1827,8 @@ static int cipso_v4_genopt(unsigned char *buf, u32 buf_len,
-  */
- int cipso_v4_sock_setattr(struct sock *sk,
- 			  const struct cipso_v4_doi *doi_def,
--			  const struct netlbl_lsm_secattr *secattr)
-+			  const struct netlbl_lsm_secattr *secattr,
-+			  bool sk_locked)
- {
- 	int ret_val = -EPERM;
- 	unsigned char *buf = NULL;
-@@ -1876,8 +1878,7 @@ int cipso_v4_sock_setattr(struct sock *sk,
- 
- 	sk_inet = inet_sk(sk);
- 
--	old = rcu_dereference_protected(sk_inet->inet_opt,
--					lockdep_sock_is_held(sk));
-+	old = rcu_dereference_protected(sk_inet->inet_opt, sk_locked);
- 	if (inet_test_bit(IS_ICSK, sk)) {
- 		sk_conn = inet_csk(sk);
- 		if (old)
-diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
-index 1ba4f58e1d35..371158b22ec6 100644
---- a/net/netlabel/netlabel_kapi.c
-+++ b/net/netlabel/netlabel_kapi.c
-@@ -965,6 +965,7 @@ int netlbl_enabled(void)
-  * @sk: the socket to label
-  * @family: protocol family
-  * @secattr: the security attributes
-+ * @sk_locked: true if caller holds the socket lock
-  *
-  * Description:
-  * Attach the correct label to the given socket using the security attributes
-@@ -977,7 +978,8 @@ int netlbl_enabled(void)
-  */
- int netlbl_sock_setattr(struct sock *sk,
- 			u16 family,
--			const struct netlbl_lsm_secattr *secattr)
-+			const struct netlbl_lsm_secattr *secattr,
-+			bool sk_locked)
- {
- 	int ret_val;
- 	struct netlbl_dom_map *dom_entry;
-@@ -997,7 +999,7 @@ int netlbl_sock_setattr(struct sock *sk,
- 		case NETLBL_NLTYPE_CIPSOV4:
- 			ret_val = cipso_v4_sock_setattr(sk,
- 							dom_entry->def.cipso,
--							secattr);
-+							secattr, sk_locked);
- 			break;
- 		case NETLBL_NLTYPE_UNLABELED:
- 			ret_val = 0;
-@@ -1090,6 +1092,23 @@ int netlbl_sock_getattr(struct sock *sk,
- 	return ret_val;
- }
- 
-+/**
-+ * netlbl_sk_lock_check - Check if the socket lock has been acquired.
-+ * @sk: the socket to check
-+ *
-+ * Description: check if @sk is locked. Returns true if socket @sk is locked
-+ * or if lock debugging is disabled at runtime or compile-time
-+ *
-+ */
-+bool netlbl_sk_lock_check(struct sock *sk)
-+{
-+#ifdef CONFIG_LOCKDEP
-+	if (debug_locks)
-+		return lockdep_sock_is_held(sk);
-+#endif
-+	return true;
-+}
-+
- /**
-  * netlbl_conn_setattr - Label a connected socket using the correct protocol
-  * @sk: the socket to label
-@@ -1126,7 +1145,8 @@ int netlbl_conn_setattr(struct sock *sk,
- 		switch (entry->type) {
- 		case NETLBL_NLTYPE_CIPSOV4:
- 			ret_val = cipso_v4_sock_setattr(sk,
--							entry->cipso, secattr);
-+							entry->cipso, secattr,
-+							netlbl_sk_lock_check(sk));
- 			break;
- 		case NETLBL_NLTYPE_UNLABELED:
- 			/* just delete the protocols we support for right now
-diff --git a/security/selinux/netlabel.c b/security/selinux/netlabel.c
-index 8f182800e412..55885634e880 100644
---- a/security/selinux/netlabel.c
-+++ b/security/selinux/netlabel.c
-@@ -402,7 +402,10 @@ int selinux_netlbl_socket_post_create(struct sock *sk, u16 family)
- 	secattr = selinux_netlbl_sock_genattr(sk);
- 	if (secattr == NULL)
- 		return -ENOMEM;
--	rc = netlbl_sock_setattr(sk, family, secattr);
-+	/* On socket creation, replacement of IP options is safe even if
-+	 * the caller does not hold the socket lock.
-+	 */
-+	rc = netlbl_sock_setattr(sk, family, secattr, true);
- 	switch (rc) {
- 	case 0:
- 		sksec->nlbl_state = NLBL_LABELED;
-diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
-index 146667937811..efeac8365ad0 100644
---- a/security/smack/smack_lsm.c
-+++ b/security/smack/smack_lsm.c
-@@ -2565,7 +2565,8 @@ static int smack_netlbl_add(struct sock *sk)
- 	local_bh_disable();
- 	bh_lock_sock_nested(sk);
- 
--	rc = netlbl_sock_setattr(sk, sk->sk_family, &skp->smk_netlabel);
-+	rc = netlbl_sock_setattr(sk, sk->sk_family, &skp->smk_netlabel,
-+				 netlbl_sk_lock_check(sk));
- 	switch (rc) {
- 	case 0:
- 		ssp->smk_state = SMK_NETLBL_LABELED;
--- 
-2.44.0
+There's a synchronize_net in unregister_netdevice_many_notify, so I'd
+say you can get rid of it here.
+
+
+> > >   static int ovpn_netdev_notifier_call(struct notifier_block *nb,
+> > >   =09=09=09=09     unsigned long state, void *ptr)
+> > >   {
+> > >   =09struct net_device *dev =3D netdev_notifier_info_to_dev(ptr);
+> > > +=09struct ovpn_struct *ovpn;
+> > >   =09if (!ovpn_dev_is_valid(dev))
+> > >   =09=09return NOTIFY_DONE;
+> > > +=09ovpn =3D netdev_priv(dev);
+> > > +
+> > >   =09switch (state) {
+> > >   =09case NETDEV_REGISTER:
+> > > -=09=09/* add device to internal list for later destruction upon
+> > > -=09=09 * unregistration
+> > > -=09=09 */
+> > > +=09=09ovpn->registered =3D true;
+> > >   =09=09break;
+> > >   =09case NETDEV_UNREGISTER:
+> > > +=09=09/* twiddle thumbs on netns device moves */
+> > > +=09=09if (dev->reg_state !=3D NETREG_UNREGISTERING)
+> > > +=09=09=09break;
+> > > +
+> > >   =09=09/* can be delivered multiple times, so check registered flag,
+> > >   =09=09 * then destroy the interface
+> > >   =09=09 */
+> > > +=09=09if (!ovpn->registered)
+> > > +=09=09=09return NOTIFY_DONE;
+> > > +
+> > > +=09=09ovpn_iface_destruct(ovpn);
+> >=20
+> > Maybe I'm misunderstanding this code. Why do you want to manually
+> > destroy a device that is already going away?
+>=20
+> We need to perform some internal cleanup (i.e. release all peers).
+> I don't see how this can happen automatically, no?
+
+That's what ->priv_destructor does, and it will be called ultimately
+by the unregister_netdevice call you have in ovpn_iface_destruct (in
+netdev_run_todo). Anyway, this UNREGISTER event is probably generated
+by unregister_netdevice_many_notify (basically a previous
+unregister_netdevice() call), so I don't know why you want to call
+unregister_netdevice again on the same device.
+
+
+> > > @@ -62,6 +210,24 @@ static struct notifier_block ovpn_netdev_notifier=
+ =3D {
+> > >   =09.notifier_call =3D ovpn_netdev_notifier_call,
+> > >   };
+> > > +static void ovpn_netns_pre_exit(struct net *net)
+> > > +{
+> > > +=09struct ovpn_struct *ovpn;
+> > > +
+> > > +=09rtnl_lock();
+> > > +=09list_for_each_entry(ovpn, &dev_list, dev_list) {
+> > > +=09=09if (dev_net(ovpn->dev) !=3D net)
+> > > +=09=09=09continue;
+> > > +
+> > > +=09=09ovpn_iface_destruct(ovpn);
+> >=20
+> > Is this needed? On netns destruction all devices within the ns will be
+> > destroyed by the networking core.
+>=20
+> Before implementing ovpn_netns_pre_exit() this way, upon namespace deleti=
+on
+> the ovpn interface was being moved to the global namespace.
+
+Crap it's only the devices with ->rtnl_link_ops that get killed by the
+core. Because you create your devices via genl (which I'm not a fan
+of, even if it's a bit nicer for userspace having a single netlink api
+to deal with), default_device_exit_batch/default_device_exit_net think
+ovpn devices are real NICs and move them back to init_net instead of
+destroying them.
+
+Maybe we can extend the condition in default_device_exit_net with a
+new flag so that ovpn devices get destroyed by the core, even without
+rtnl_link_ops?
+
+--=20
+Sabrina
 
 
