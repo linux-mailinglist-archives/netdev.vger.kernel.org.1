@@ -1,159 +1,118 @@
-Return-Path: <netdev+bounces-95030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D91F78C144B
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 19:47:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CD928C145E
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 19:51:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B8E3B22D0B
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 17:47:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 599D31C21DF6
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 17:51:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B5676F1D;
-	Thu,  9 May 2024 17:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A540770FE;
+	Thu,  9 May 2024 17:51:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="rO5DX1yh"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K80TwnDD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07458FBFD
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 17:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7899C7711E
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 17:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715276819; cv=none; b=MNSlykDwr2fFlmqEp+0zn8CKSCbChSK0VeqL8ErdCo2BF7tB5bNhw0cc9FhuqW5lDgbcKrO23g2ejonTDQTYF4TrJ0o9kRA9eDX23Ws5eDCCM2J0nju+oU35IGYYgvmJnN2vjmQ3L6+C1shAaj1QYdp9ZLmsNpAgdkxcjfy3C40=
+	t=1715277060; cv=none; b=Ez8kWnr6DmQ7VBcnnHtdnSh0RPzmTPi+sL0QYiYkfJY2JM+O9M6ugc0lJ8zu1JjSZ7+MwVkWzoDZcUOTfJHnAhrCOWwhvhet1Rejnl5MyifixykWF554GKOyyyjZmaTqeZj9QGmPoIKfaBkW1aczkSBI+4Ki0gPQrnRzrTL/yD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715276819; c=relaxed/simple;
-	bh=gJ68XP9RLJtQXdROFvBjcsoAUV8wtAuSKfD1zG78Lvg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=htd0xLgQNesIxR8Nb0X1PRREYHlWe6RusaDTI7kxQxsEdIqLXFh+mICFk7nk1qkGEhuXnFsEaiHdm0fZQhtDLp3IWAq0RG4KWJfQTFWNYQN7Kbu2JfrA8p7ioqXfHkdkLGIwafioqaW3UD5e+CdqjMj3IM87KX5+TLPUfKZQoWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=rO5DX1yh; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-53fa455cd94so892406a12.2
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 10:46:57 -0700 (PDT)
+	s=arc-20240116; t=1715277060; c=relaxed/simple;
+	bh=kNoTpj4oZDgdt4XFfpDAb2yvaTodna80/e7sziSUPPs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ff4yKNdSdn3wrGIlnQOGYsoFcSEOimFpUvC01AxU493BUe1g/Fq/G2jPOgZulap8TX8Hec3bni7RzAJL0M71MtOVuFM7OCgzSsbCRyFPNi3bz+coYGvbzU3ogx+v7ctvpBcitnyk/0RKAb7CPX8YEDgIrZ03foS0LMR1ILZ+xww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=K80TwnDD; arc=none smtp.client-ip=209.85.219.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-de61424f478so1170508276.0
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 10:50:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1715276817; x=1715881617; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0gjM2LdJtSH/C4elUqmT8FA1WeyKpXQeqAMznEHvXNI=;
-        b=rO5DX1yhm4Msl6Ogp8zDeNPOODJ4eM074i+ecFj6dZ+tf3U8Gjyn4uY1r0YAmOyt1j
-         xrdKxqCUGhWN6A87lGzfDCxAR+T7cOHW62KaMxqcCceGwE8os5HCzkyT6ZRK2Ri1ou+i
-         QeyGeIJvki0LUF7te081BG3LBnV2FXSb/Ek561dvBUkn8MMO697/o4duman95YZRKxIH
-         AvWUEWTDLZfbgyMzdtO/TdF/cWKBHEHhletfMTEbtmvLcw63sc5Ca7evmW4V1p6p8CKL
-         rUlpjK3fRC6RgCH7fYvKbALGEYlnrbnFMkRoV827cId1URSsr3Duns5xYmkeID7d0QYD
-         CSUw==
+        d=linaro.org; s=google; t=1715277057; x=1715881857; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e6zRb5sNwk+KFH9dVAQ+NdMpZwMFMJ2qYTJfcaSsvKc=;
+        b=K80TwnDDGieRXWraDDw54Xmsttee+7JPU1kIyV4ztr5WBzdG016xWb1s+a+maFUbgp
+         9K1VGp6ganRjfEqxb6UQMK213dkvc3IMpuMzePpHh+yCXeDVh+2c2Z3zKPL52oMme3he
+         4tK4dHUczUfxPQlzJVL807Aj5UOh4BXnexsbJsR/kQBt+nsAhbvgo9QLVESTgOjtnZIm
+         X9LWgLuuhDN84MfWGmO5HVNw4O+LBiodXF4V9TUv4+/9UKZUNYOZYvn2RIvUzqMx5/sy
+         ZyS3DTf09bjH01l7K8h9DpC25oO6MxnjowwuM01glDnuuPMmpY5xTJyGAfLsH0gQbJCA
+         HuJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715276817; x=1715881617;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0gjM2LdJtSH/C4elUqmT8FA1WeyKpXQeqAMznEHvXNI=;
-        b=GdyJ6gctiSSh/a5aY6W29mluQunWVEZsVTs/aCtY6g8cXzZi9PHquePWesp3SR/vTt
-         3T/HzEJbt6skM6MJMgMOACr8LQZAZPGcYN3/YwK/ESY72r0K32nRfbX8uKBTv3q5LzYa
-         NXbCnQ3Xo52aZqBxYZEzq+YGIWlEVV0FpYfFUdxq/ZRYENB7ytf+HYVa3wnrvgTiKDGE
-         /xZq2ZZm5hEy01JYbVefCsTutbEXhhMLdXvWv6M/XhsqC1p6Yp4bRKOKPU+dKqOGE8k3
-         aTxxfrcn10Ula+vx+OIpt+2PJEsvzEzJnGf72srN1NJ5umNT4aXgfC0RoRURTXHHep+F
-         xHUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXm2Vaze2ttERkUsHxN9LcQl4PrZhjVg8W3rc0Lfznos5CPYxzgpuNBjxugU0zLAKN2GQBSXGBHHjM+MJy9mTjYXAJ9PiQn
-X-Gm-Message-State: AOJu0YyCAo2UvxArnd7aZUBf7oXdhJKlWt++f0P0xnsMQ4vUZT8gR67Z
-	XuziDFy8jgNP+tq9WtQIx74HWyuZDyZ/qnzweGhxoWTolP6vEZrW66vtVIsIxNo=
-X-Google-Smtp-Source: AGHT+IHYrINHCKLkmYBXOVWfHmC+FOaP22v9Do63Vd0ALuhzlZv64zUR1Quo7gu06s98dQpTEj6zcg==
-X-Received: by 2002:a17:90a:b101:b0:2a2:7edd:19b7 with SMTP id 98e67ed59e1d1-2b6cc7805e1mr165346a91.27.1715276817092;
-        Thu, 09 May 2024 10:46:57 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::5:c55])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b628849965sm3621991a91.15.2024.05.09.10.46.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 May 2024 10:46:56 -0700 (PDT)
-Message-ID: <246d09a5-e3f2-425a-be68-8abbe3c98eb3@davidwei.uk>
-Date: Thu, 9 May 2024 10:46:54 -0700
+        d=1e100.net; s=20230601; t=1715277057; x=1715881857;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e6zRb5sNwk+KFH9dVAQ+NdMpZwMFMJ2qYTJfcaSsvKc=;
+        b=BB7srN3URzHnIvzAlvXfUgLxUqjMh8DSBiOIvliwRS/sLnpaZnA2hJBblUTi0xSXIC
+         IXwbVYsWJRg2QyE6hpZz8bq/IAbXLaVAi912nytaq+LRuSKIcMJSqTdEYbJJ1nZdUbP5
+         4qTyPl4y7JD/Mq39en0UwMo84vWtKKpB1ZJszDscC6+nxbdrFWq/ECwegb5h67Q4Nk+h
+         3vlQDZAwlcLYsnQOwToonKqgFgcYNDAFcCSy9hzCSqBvZNWvJ27k9ajME8XFDYHtPl8e
+         ZGPr7wp5+RQib2XRDsDxH2/zNxeYeP08UVLXUpZdCjZTp26iWE7P6TNiBnNPzzbQYVne
+         rmJA==
+X-Forwarded-Encrypted: i=1; AJvYcCWhHTH3BR3HJggwMZ13A2woUlJN1USu15mzK9KF6XvKG6MPniLRQNPxm3f4J4/y0j4c9zj7sh7GEAcnWzJuTZG+N44bC+IX
+X-Gm-Message-State: AOJu0Yz0T/w9K33I5UUodIbVOxctKU222CuSaYIH+6l6MQvz4ugz/hZk
+	xfX2N+iphD2r/joRUhcUnRfIbt2jQl3gN++u4AHOct385L71xz/HgVMy3S3Zk4kcXTiBsBxmtw6
+	AaCPMb39ckdn+UMIjJjHC6jbkjrZv96eENXUcKCeP4zT/zHDk3yE=
+X-Google-Smtp-Source: AGHT+IFyUPdT/SN1s7lwcLhlDt/Dw64AWw5sRppACAlFRsmsBPK6GHYzG26Xa0BZfbovBx326mQw9rWd2yszux2TE+0=
+X-Received: by 2002:a25:d6c3:0:b0:dc6:e4f8:7e22 with SMTP id
+ 3f1490d57ef6-dee4f396411mr218322276.62.1715277057500; Thu, 09 May 2024
+ 10:50:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 10/10] gve: Implement queue api
-Content-Language: en-GB
-To: Mina Almasry <almasrymina@google.com>
-Cc: Shailend Chand <shailend@google.com>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, hramamurthy@google.com,
- jeroendb@google.com, kuba@kernel.org, pabeni@redhat.com,
- pkaligineedi@google.com, rushilg@google.com, willemb@google.com,
- ziweixiao@google.com
-References: <20240501232549.1327174-1-shailend@google.com>
- <20240501232549.1327174-11-shailend@google.com>
- <43d7196e-e2f5-4568-b88b-c66e51218b2b@davidwei.uk>
- <CAHS8izOYj-_KKgpPm7Tn3SkcqAjkU1b4h9nkRpPj+wMyQ23JqA@mail.gmail.com>
- <320a7d5f-f932-467b-a874-dbd2d8319b9f@davidwei.uk>
- <CAHS8izO4EjXB4U=oq0zFTdJRnqXPzRJLo9fVqtSHPAFnKoU9aQ@mail.gmail.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <CAHS8izO4EjXB4U=oq0zFTdJRnqXPzRJLo9fVqtSHPAFnKoU9aQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240509-gemini-ethernet-fix-tso-v1-0-10cd07b54d1c@linaro.org>
+ <20240509-gemini-ethernet-fix-tso-v1-1-10cd07b54d1c@linaro.org>
+ <CANn89iKgi6yEEenSy1M-PVRYWz=Ri9UorV7irCywOZ8xTbNk_A@mail.gmail.com>
+ <CACRpkdYyyQ_=2FmEe7FjDT-2BrhO5GezdXk35werHwBNA=uO=Q@mail.gmail.com>
+ <CANn89i+JphFK4TCVjXxbxCicJwrxFC=+ngjnheZWK3KvCJ4Ocg@mail.gmail.com>
+ <CANn89i+neubYmpc5VNamXoSjWkw+7-wQ6S-Q5jQjqWtEhiwgfg@mail.gmail.com> <CANn89iL1GK3cqY=bowYu0idtJ3o3FMJh5hkLAY9Lt4RE+Q560Q@mail.gmail.com>
+In-Reply-To: <CANn89iL1GK3cqY=bowYu0idtJ3o3FMJh5hkLAY9Lt4RE+Q560Q@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 9 May 2024 19:50:46 +0200
+Message-ID: <CACRpkdbannQiJwBZtx-_qkgG7vOFv47bqC-oMiTGqXwWsymPvA@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net: ethernet: cortina: Restore TSO support
+To: Eric Dumazet <edumazet@google.com>
+Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-05-08 10:09, Mina Almasry wrote:
-> On Tue, May 7, 2024 at 2:06 PM David Wei <dw@davidwei.uk> wrote:
->>
->> On 2024-05-06 11:47, Mina Almasry wrote:
->>> On Mon, May 6, 2024 at 11:09 AM David Wei <dw@davidwei.uk> wrote:
->>>>
->>>> On 2024-05-01 16:25, Shailend Chand wrote:
->>>>> The new netdev queue api is implemented for gve.
->>>>>
->>>>> Tested-by: Mina Almasry <almasrymina@google.com>
->>>>> Reviewed-by:  Mina Almasry <almasrymina@google.com>
->>>>> Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
->>>>> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
->>>>> Signed-off-by: Shailend Chand <shailend@google.com>
->>>>> ---
->>>>>  drivers/net/ethernet/google/gve/gve.h        |   6 +
->>>>>  drivers/net/ethernet/google/gve/gve_dqo.h    |   6 +
->>>>>  drivers/net/ethernet/google/gve/gve_main.c   | 177 +++++++++++++++++--
->>>>>  drivers/net/ethernet/google/gve/gve_rx.c     |  12 +-
->>>>>  drivers/net/ethernet/google/gve/gve_rx_dqo.c |  12 +-
->>>>>  5 files changed, 189 insertions(+), 24 deletions(-)
->>>>>
->>>>
->>>> [...]
->>>>
->>>>> +static const struct netdev_queue_mgmt_ops gve_queue_mgmt_ops = {
->>>>> +     .ndo_queue_mem_size     =       sizeof(struct gve_rx_ring),
->>>>> +     .ndo_queue_mem_alloc    =       gve_rx_queue_mem_alloc,
->>>>> +     .ndo_queue_mem_free     =       gve_rx_queue_mem_free,
->>>>> +     .ndo_queue_start        =       gve_rx_queue_start,
->>>>> +     .ndo_queue_stop         =       gve_rx_queue_stop,
->>>>> +};
->>>>
->>>> Shailend, Mina, do you have code that calls the ndos somewhere?
->>>
->>> I plan to rebase the devmem TCP series on top of these ndos and submit
->>> that, likely sometime this week. The ndos should be used from an
->>> updated version of [RFC,net-next,v8,04/14] netdev: support binding
->>> dma-buf to netdevice
->>
->> Now that queue API ndos have merged, could you please send this as a
->> separate series and put it somewhere where it can be re-used e.g.
->> netdev_rx_queue.c?
->>
-> 
-> Definitely happy to put it in a generic place like netdev_rx_queue.c
-> like you did, but slight pushback to putting it into its own series.
-> With the ndos merged finally, I can take our devmem TCP series out of
-> RFC and I am eager to do so. Making it dependent on a change that is
-> in another series means it must remain RFC.
-> 
-> What I can do here is put this change into its own patch in the devmem
-> TCP series. Once that is reviewed the maintainers may apply that patch
-> out of the series. I can also put it in its own series and keep devmem
-> TCP in RFC for now if you insist :D
+On Thu, May 9, 2024 at 5:10=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
 
-No, that's fine. Please put it at the front of the series once you're
-ready. I'll cherrypick it into our series.
+> > +       if (mss >=3D ETH_FRAME_LEN) {
+>
+> Also this last check makes little sense, because normal MTU/MSS would
+> trigger this condition.
+>
+> Forcing software checksumming would make TSO useless.
+>
+> I suspect this code is there because of the old buggy TSO
+> implementation of this driver.
 
-> 
-> 
+I think you're right, when the packets are "pure" TCP let's say.
+The TSO should just split those.
+
+I think the check is needed for e.g. UDP with large payload
+(such as ping -s 9000....) or those custom packets with funny extra bytes
+and ethertype that the DSA switch uses. We determined that the HW
+IP checksummer actually get hiccups when the frame is larger than
+1518 bytes  so that is why this bypass path is needed.
+
+I think I will try to make one "clean path" for just pure TCP and no
+funky business, and an exceptional path for any other package.
+
+Yours,
+Linus Walleij
 
