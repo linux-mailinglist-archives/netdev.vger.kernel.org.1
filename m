@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-95131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 956958C1769
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 22:28:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB2898C177E
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 22:29:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E227286790
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:28:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA7DB1C22072
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A38880631;
-	Thu,  9 May 2024 20:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E5083A0E;
+	Thu,  9 May 2024 20:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zX+KV5aA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fBVLEic+"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405D380043;
-	Thu,  9 May 2024 20:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1721292C9;
+	Thu,  9 May 2024 20:25:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715285843; cv=none; b=Tk4mGnTjrbeh8qvmyffjzQ7jwwRTDywDmXOi1p+8FckUBZTMiG6kE2W6We/Gk1mDdxiFjEFZTEYek92s0CJ7X1GLQjg1WGr2t9vhm8ugW+ksoRKdteLBjxchMus4tO3RinumiKiDFbc92pHxEPAJLzYuRMQ0VeeNbbEnJno+834=
+	t=1715286342; cv=none; b=CFLhcWOr/LTun8zdE880hmffjX76pxSBQcWg7SwoWptldfAvXR/MJ7KNkiwTmwu/CdrM5L+0LFsd+k4ibRLDWbKkdwDKW6fqQ8TJda7Iv3NQ4sxgNf2KBwSe11vwVZBeUF/WlUjPnyF6SmLQTQrpdg/qSDRPd9WSEhoCjBoUk8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715285843; c=relaxed/simple;
-	bh=lICYDaRSn8HsmeXAurxSzsp+d+rM5QiHyZnsXPzU7TM=;
+	s=arc-20240116; t=1715286342; c=relaxed/simple;
+	bh=q66twQ3ZQmwtVpgyjIoW4gH5J6u56rokCV4I/WTlC5c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=esmp/TfaDpoE2reeQ8svcNTcSDQhSm/uv7SSc8N+JDxzqNKgPAIjBtyFamcHhGA3k/KyWNSVKIlsEhblIMcv+9zksBhJhd2xN+lNqsRIuRU5biM7TxwxXPLSS7LOeaV37vY8j0H4y1k/D+rYy+fsCoBNWI18C65f3Q7EcpQex7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zX+KV5aA; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=mXpdwdqLSIFA2yalIIeTCDOzl3dWHeG6QYmgIGfQgJ0xxdjUkTwlH5mh2kqSxLaH3mSWa0hZY87Mg9yHMgV3/jk5PzMviU8qwCrjfM7jVHqj1WzQtl/4UjLblVcevIjvQhi54Gg4NNzGiVvLSrmgoK8E5LlzXjA4wF/kRpR7k4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fBVLEic+; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,30 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=2Ct/oG04cz4M7nY829u2Qio1z6a5TPRCIdyjKCqCtGg=; b=zX+KV5aAAuuYlSsD4j+xGKxI28
-	oF0zirnqHjWj16/AD3Vti5CjmatTU9V4UD60sQq2VOrTUQzEuXR2j2XM+e9zwjJlrV9AHTM5errXT
-	nHEbTs5DN4clan/cfjriWrxGljuiFMl7gcoMIFZm9iyz8+sPYfkBPLu7NaSv9qHxGpzo=;
+	bh=Jnctv+naZw8viulJjjf7C4sXmPGQ+5Xig0IuuCkqOcE=; b=fBVLEic+AzSZjKrQP3uozvo3XB
+	IqYVXmNydqYmDm8nY5Ht/2GJvNZQKsAPx4JbFcXdIojYV14pNU/ngQP3GblPknnPNJyuSBZluTRNJ
+	mswfgBveCRi2ZiJgAQHEf+TK7I7UAwZeEawd0mTblGRzvnRQf3f8E8Nv1KbMdSpW0mQQ=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1s5ACH-00F4pk-L3; Thu, 09 May 2024 22:16:57 +0200
-Date: Thu, 9 May 2024 22:16:57 +0200
+	id 1s5AKV-00F4w0-5f; Thu, 09 May 2024 22:25:27 +0200
+Date: Thu, 9 May 2024 22:25:27 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
+To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Breno Leitao <leitao@debian.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH net-next v3] net: Add sysfs atttribute for max_mtu
-Message-ID: <6203153e-780c-4570-9c4e-a053cfbc3290@lunn.ch>
-References: <1715245883-3467-1-git-send-email-shradhagupta@linux.microsoft.com>
- <20240509094225.GA1078660@maili.marvell.com>
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next,v4] net: ethernet: rtsn: Add support for Renesas
+ Ethernet-TSN
+Message-ID: <0d7b04a6-9f5b-41c7-bd52-890521019f8d@lunn.ch>
+References: <20240509095217.3274671-1-niklas.soderlund+renesas@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,44 +62,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240509094225.GA1078660@maili.marvell.com>
+In-Reply-To: <20240509095217.3274671-1-niklas.soderlund+renesas@ragnatech.se>
 
-On Thu, May 09, 2024 at 03:12:25PM +0530, Ratheesh Kannoth wrote:
-> On 2024-05-09 at 14:41:23, Shradha Gupta (shradhagupta@linux.microsoft.com) wrote:
-> > For drivers like MANA, max_mtu value is populated with the value of
-> > maximum MTU that the underlying hardware can support.
-> IIUC, this reads dev->mtu.
+> +static void rtsn_set_delay_mode(struct rtsn_private *priv)
+> +{
+> +	struct device_node *np = priv->ndev->dev.parent->of_node;
+> +	u32 delay;
+> +	u32 val;
+> +
+> +	val = 0;
+> +
+> +	/* The MAC is capable of applying a delay on both Rx and Tx. Each
+> +	 * delay can either be on or off, there is no way to set its length.
+> +	 *
+> +	 * The exact delay applied depends on electric characteristics of the
+> +	 * board. The datasheet describes a typical Rx delay of 1800 ps and a
+> +	 * typical Tx delay of 2000 ps.
+> +	 *
+> +	 * There are boards where the RTSN device is used together with PHYs
+> +	 * who do not support a large enough internal delays to function. These
+> +	 * boards depends on the MAC applying these inexact delays.
+> +	 */
+> +
+> +	/* If the phy-mode is rgmii or rgmii-rxid apply Rx delay on the MAC */
+> +	if (priv->iface == PHY_INTERFACE_MODE_RGMII_ID ||
+> +	    priv->iface == PHY_INTERFACE_MODE_RGMII_RXID)
+> +		if (!of_property_read_u32(np, "rx-internal-delay-ps", &delay))
+> +			if (delay)
+> +				val |= GPOUT_RDM;
+> +
+> +	/* If the phy-mode is rgmii or rgmii-txid apply Tx delay on the MAC */
+> +	if (priv->iface == PHY_INTERFACE_MODE_RGMII_ID ||
+> +	    priv->iface == PHY_INTERFACE_MODE_RGMII_TXID)
+> +		if (!of_property_read_u32(np, "tx-internal-delay-ps", &delay))
+> +			if (delay)
+> +				val |= GPOUT_TDM;
 
-I think you are misunderstanding the code.
+Much better, but still not correct. rx-internal-delay-ps and
+tx-internal-delay-ps is meant for fine tuning the delays, generally in
+steps of a few 10ps. It is applied unconditionally, since it is just a
+fine tune.
 
-> > +NETDEVICE_SHOW_RO(max_mtu, fmt_dec);
+You hardware does not support fine tuning, just 1800/2000ps. So it
+makes no sense to use these DT properties. Just enable GPOUT_RDM or
+GPOUT_TDM as appropriate for PHY_INTERFACE_MODE_*.
 
-/* generate a show function for simple field */
-#define NETDEVICE_SHOW(field, format_string)				\
-static ssize_t format_##field(const struct net_device *dev, char *buf)	\
-{									\
-	return sysfs_emit(buf, format_string, dev->field);		\
-}									\
-static ssize_t field##_show(struct device *dev,				\
-			    struct device_attribute *attr, char *buf)	\
-{									\
-	return netdev_show(dev, attr, buf, format_##field);		\
-}									\
+    Andrew
 
-#define NETDEVICE_SHOW_RO(field, format_string)				\
-NETDEVICE_SHOW(field, format_string);					\
-static DEVICE_ATTR_RO(field)
-
-So field is max_mtu, so that dev->field gets expanded to dev->max_mtu.
-
-> you can read the same using ifconfig
-
-We stopped using ifconfig years ago. You actually mean "ip link show"
-
-> or any thing that uses SIOCGIFMTU. why do you need to add a new sysfs ?
-
-SIOCGIFMTU is still implemented, but obsolete, replaced by netlink, as
-Eric pointed out.
-
-	Andrew
+---
+pw-bot: cr
 
