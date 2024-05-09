@@ -1,125 +1,104 @@
-Return-Path: <netdev+bounces-94849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7370B8C0DB1
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:43:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D09F8C0DC8
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:51:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 135F01F2166E
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 09:43:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C82502844D9
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 09:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676E414A632;
-	Thu,  9 May 2024 09:42:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA16114A635;
+	Thu,  9 May 2024 09:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VdfY67cz"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZOwSOcGj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53AA14A62D;
-	Thu,  9 May 2024 09:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F94101E3
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 09:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715247776; cv=none; b=BxtWsndYSSd+v/KMx1P9xdLQkRVrpqScasf6nJo2f/8AVT5vUFFE4JzyUVeuECUglNP+wxHk0sJhfhJEwTViH6/p3ZbKpOcUH51k3G76HEMRV+PcO8sLzfnQsCXMVFqHDmFiRt0/Dt9xyqMVClD29HeSYJdqtTHiTNKakXZxNbc=
+	t=1715248278; cv=none; b=TPugDmxsygfADpb48H6Cz9u23fvmGe7WUnWb9K8Ds5w2G1Zgc/qeJ+gTx6SBvRBv8bctzKwhwh+jbGf5mnsfAaUPbInnK7T9rVYYgfHGEa1LCscYX0dL+5IN7e5j8zCNKvLg7Xb8slioewKjoTa3D84TmkJNMI7+bPWZbFUaTCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715247776; c=relaxed/simple;
-	bh=f0SYpwdoemCf5nkip/wAI+bWzfh+oJZhvTL4/f8DXiw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jrEUHqq7vkZ7Er2Mknf6RPxHJMdzUioOj4VH8wJACcDSOCGvEfFXcXFrYQkazJ9s4DZ93Ob7th5ZCotVAN2Xj09v8TuauzGydcta42O3RH/mKxsTYup95r3Xl1bAWj+h4s3UoiJQJoCKTx4SeiDL+/deLmdjtDGRKs6Fxq6SggQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=VdfY67cz; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4494fPwe022106;
-	Thu, 9 May 2024 02:42:32 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	date:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pfpt0220; bh=I1JDod1XMZqhnsd6n1qqwr
-	NRTv97wHEp+l3xJ/+Dleg=; b=VdfY67czD6obZFxytoVJ7BblmzVbWEgkqI0E1L
-	urd1+GSFN3WZBqyY9oMppkj7rUiuEQUNK/mmaB+22jGO3j6WEnrlSAHxCiOu5vRR
-	sfJEglSt5dalXftKJcO82psuJpbWHkwzPp2UOwwOFLC8rAMIyVQb9YMXtPSwqcgT
-	1ka9/UJ5c6vE63BPZ9Q9RdOJptU21hlr00zMwMyZB1vsj9O/NclbReYz0ng82HiG
-	qL+ckX70nOyYq6N9MVmJXY0Cm0heEEOqk9wAJ5kSmkma3IXxBkgVF+AwdNMdVDWc
-	DU9AjRlbH6oMI1aqBWwePLCC55MLhLYA+asOxadueNrb6hHQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3y0qpbsf0s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 May 2024 02:42:31 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 9 May 2024 02:42:30 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 9 May 2024 02:42:30 -0700
-Received: from maili.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 6E4E53F7063;
-	Thu,  9 May 2024 02:42:26 -0700 (PDT)
-Date: Thu, 9 May 2024 15:12:25 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-CC: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>,
-        Jonathan Corbet
-	<corbet@lwn.net>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Randy Dunlap
-	<rdunlap@infradead.org>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Breno
- Leitao <leitao@debian.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH net-next v3] net: Add sysfs atttribute for max_mtu
-Message-ID: <20240509094225.GA1078660@maili.marvell.com>
-References: <1715245883-3467-1-git-send-email-shradhagupta@linux.microsoft.com>
+	s=arc-20240116; t=1715248278; c=relaxed/simple;
+	bh=HwgomhHyoNxuk/P65VSTDTjX/OrvIegbXeCP/nu/Ctc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BS8RG+U0rCM+xR7uMF/7oiXNi86SQSFBRQ0gPlfHtb///2xxz8p0IOzD//b/dr0VwufkX1X5ZgF7bOCXwvH1qMhOz0jjS7zS5FJwRiBF1xBvZiqxqGc5PBpiXJpUP7Qg2IOTq5fqMu+ej6ZCgzV91+VJHCpxg7qSlJKzvFJRZfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZOwSOcGj; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a59a609dd3fso119529466b.0
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 02:51:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1715248275; x=1715853075; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ywofGwMYBfFis2HqHr7Nt/RPy6KpRr5SHOYvXemXtAo=;
+        b=ZOwSOcGj4JIbIOGXQDyrlG+5ad/7F/QGjZWnX2Ce/hNQXQ8evrRX3vMsgW8WTmXM0I
+         BHro7w51Yvc2lbosn7HD67TQiOcFxmgz24cKbASFC43IFk1uTUdGUz8ppk4i5qTfxGIP
+         wpc1GRaA7bFZInVM7mh1RFQudSlWfbqKSOoiyRoPwXF6IThHjL0TeNz1WYJqnEV72Ka5
+         DLxYLEeEwY1XDXjn2UmPfrdMXZREJgoc0NLH8XX8x9q3mgMwxPwrBdfb4XGM5aEcwsAk
+         9UxP+E6lUZ98pc0L7cA23Y4BGHnEwKY+YDyXmdyBGsqsnqhD4qG3UY/bnUjWuvYjwJFN
+         encA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715248275; x=1715853075;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ywofGwMYBfFis2HqHr7Nt/RPy6KpRr5SHOYvXemXtAo=;
+        b=qH2DLljkW0oS+/zdtfr1sp2wgR0tsItMClQdcFnBWqnTmseYOR8N4bTbi8tV3xxL3Z
+         bZbv1nK+I4eqlxorj0oltCaPcad9esxmMzBhnkznWdtULv4q+UedZM2i8ykqw+wRX5qs
+         kNzmBk98pEAI7VP6WvCnr4yjMACAtUoo/Embp53h+6rGVX4zmQsHc344V9aBRCiaPhDb
+         UXmtOEXwIBmZpObtSWqVo/AyxyWTAAeg/TaQAW0C+c7K65CurBhsg/qy37bugciKO/bK
+         XI2YahxEGVANXagoCURPA8MUzpbDphIPq6pMNqoxaJ75OG30Omwtah3dnpSIdiWlm3lo
+         HFEQ==
+X-Gm-Message-State: AOJu0YwaGXIV7qq0xr0SLt2eSgu1rPQNaSrC4MytmCNIcLBjeeHhOz30
+	3K2yuNlq63hmoCzOOrpcPh9NIuNLrrfja90timSvcTX7FbVExuL5k7n71ioC35U=
+X-Google-Smtp-Source: AGHT+IEbUB7ITQG3LQnrbSjNOLWt/PQE4woZqsi3of9uczOVr5D+X401PanfnzNzZ1RqHahUg5vDHQ==
+X-Received: by 2002:a17:907:2d09:b0:a55:5520:f43f with SMTP id a640c23a62f3a-a5a115ef93dmr223975366b.10.1715248275395;
+        Thu, 09 May 2024 02:51:15 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a179c7fe5sm55191466b.114.2024.05.09.02.51.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 May 2024 02:51:15 -0700 (PDT)
+Date: Thu, 9 May 2024 12:51:10 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Duoming Zhou <duoming@zju.edu.cn>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hams@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, jreuter@yaina.de, rkannoth@marvell.com,
+	davem@davemloft.net, lars@oddbit.com
+Subject: Re: [PATCH net v7 0/3] ax25: Fix issues of ax25_dev and net_device
+Message-ID: <e00b89a7-3c1f-4830-9ef9-3230c3648092@moroto.mountain>
+References: <cover.1715247018.git.duoming@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1715245883-3467-1-git-send-email-shradhagupta@linux.microsoft.com>
-X-Proofpoint-GUID: 42nSExTnEKBldjj6ItdnZ2N6vzg4Kipz
-X-Proofpoint-ORIG-GUID: 42nSExTnEKBldjj6ItdnZ2N6vzg4Kipz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-09_05,2024-05-08_01,2023-05-22_02
+In-Reply-To: <cover.1715247018.git.duoming@zju.edu.cn>
 
-On 2024-05-09 at 14:41:23, Shradha Gupta (shradhagupta@linux.microsoft.com) wrote:
-> For drivers like MANA, max_mtu value is populated with the value of
-> maximum MTU that the underlying hardware can support.
-IIUC, this reads dev->mtu. you can read the same using ifconfig, or any thing that uses
-SIOCGIFMTU. why do you need to add a new sysfs ?
+On Thu, May 09, 2024 at 05:35:59PM +0800, Duoming Zhou wrote:
+> The first patch uses kernel universal linked list to implement
+> ax25_dev_list, which makes the operation of the list easier.
+> The second and third patch fix reference count leak issues of
+> the object "ax25_dev" and "net_device".
+> 
+> Duoming Zhou (3):
+>   ax25: Use kernel universal linked list to implement ax25_dev_list
+>   ax25: Fix reference count leak issues of ax25_dev
+>   ax25: Fix reference count leak issue of net_device
 
-> Exposing this attribute as sysfs param, would be helpful in debugging
-> and customization of config issues with such drivers.
->
-> --- a/net/core/net-sysfs.c
-> +++ b/net/core/net-sysfs.c
-> @@ -114,6 +114,7 @@ NETDEVICE_SHOW_RO(addr_len, fmt_dec);
->  NETDEVICE_SHOW_RO(ifindex, fmt_dec);
->  NETDEVICE_SHOW_RO(type, fmt_dec);
->  NETDEVICE_SHOW_RO(link_mode, fmt_dec);
-> +NETDEVICE_SHOW_RO(max_mtu, fmt_dec);
->
->  static ssize_t iflink_show(struct device *dev, struct device_attribute *attr,
->  			   char *buf)
-> @@ -660,6 +661,7 @@ static struct attribute *net_class_attrs[] __ro_after_init = {
->  	&dev_attr_ifalias.attr,
->  	&dev_attr_carrier.attr,
->  	&dev_attr_mtu.attr,
-> +	&dev_attr_max_mtu.attr,
->  	&dev_attr_flags.attr,
->  	&dev_attr_tx_queue_len.attr,
->  	&dev_attr_gro_flush_timeout.attr,
-> --
-> 2.34.1
->
+Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
+
+regards,
+dan carpenter
+
 
