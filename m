@@ -1,103 +1,180 @@
-Return-Path: <netdev+bounces-94868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20DEE8C0E91
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 12:53:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BCEB8C0E9C
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 12:59:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 456761C20938
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:53:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AB421C20A97
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5DB812FB38;
-	Thu,  9 May 2024 10:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9929612EBC8;
+	Thu,  9 May 2024 10:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="UTy4D9Ck"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fwZ+LDTh"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D3E12F37C;
-	Thu,  9 May 2024 10:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5DF3715E
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 10:59:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715251985; cv=none; b=QDPe2NL4kOZsCdYHiJXAj9J97Sb9OTyg7SNLjgQBjsoyaXCsmModUwwDpIhH+UyqyV1+W3qW4K+aHouDUVIKxmf5oIzG5k6lR2cQnRTk7a0bRWxxKh7giwwJM+0P5XZOHAZ9UuCS4L6s3u4xG1x8RA1gwjjGaiXUCcWPXLdykVA=
+	t=1715252353; cv=none; b=iKKLwoNmZUiqGfdSmGnXmg1Ymt4DKALqabo6lOzSZjclSfkKxY9C8Pc+0dhlkPmFgTU20WipGL6+oRCK2ioWv9Pive6qQoRNcUOmLOwCDv+2nYrmNijzB2nayrImxKlWsgV0reYoHWD3dTbbTKlDfskStD1mJgDgJarDBEXHAA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715251985; c=relaxed/simple;
-	bh=TkwNWDqoHA+H+7j4DdwcM/R93W1nTiD50C2NF+X+k2c=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=NrLIcjmkUXuP6v0TsTKx0l4PJeZDdPawm/SNIrmUQtRnr8oWonZLTMPI0saDk42Nh+la3H/phAT06tLsYp6D6/Vq1ujrvAGczJV1Y9GfDBUxNHQLvl5txw3A8283qSwluKvsG5KLOWrYuQ5SSnQVO63TUBOlFTQ43137jQIeG+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=UTy4D9Ck; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=e7z0v/MhjoIRCMcX4IPYi9XvMRKn+UlhFSRYOf0bl00=;
-	t=1715251983; x=1716461583; b=UTy4D9CklN7Fl5pTZwiHsuxnMuRHtTU6HiEDg2yl+RtXZ7B
-	2qGmVGdf/YwsdZXsRdvGM2TulwtO2PGwqFxcNdyRGf6vwSFibSpn3m/gCeU+yOkDOuUGhATYUxtXX
-	4pCdmknlm7hfYA2fZ2mCB3iKTRqvF5mie7DvxDjdQJ2rpXGCBqrj+PeY/tRG9SCk2oWbHLvCHoJ5Z
-	fAJimjXteve3s+7qhed1VqFzkWK4bfbpNpYKOXZmn8zLh9PVbEjuG3o/bNtbTNKv4E9aJXU38HCNW
-	Q+MB8DLuBpiw5ObKHBgs0/5R3ROYVWSPzh7bib5NglDT3+aNLJyTQ+vBwqncMWxg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1s51OT-0000000D1B1-2HJC;
-	Thu, 09 May 2024 12:52:57 +0200
-Message-ID: <161df39ee89ae640828d3226a8de3d60f786ddd7.camel@sipsolutions.net>
-Subject: Re: Fwd: UBSAN: array-index-out-of-bounds in net/wireless/nl80211.c
- and net/mac80211/scan.c
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jannik =?ISO-8859-1?Q?Gl=FCckert?= <jannik.glueckert@gmail.com>
-Cc: Bagas Sanjaya <bagasdotme@gmail.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Networking <netdev@vger.kernel.org>, 
- Linux Wireless <linux-wireless@vger.kernel.org>, Jouni Malinen
- <jouni.malinen@atheros.com>, "John W. Linville" <linville@tuxdriver.com>,
- Kalle Valo <kvalo@kernel.org>, Emmanuel Grumbach
- <emmanuel.grumbach@intel.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>,  Sam James <sam@gentoo.org>
-Date: Thu, 09 May 2024 12:52:56 +0200
-In-Reply-To: <CAFqe=z+bnNayKaxEnEFar28Q__yZ9Byaxe3YwtMaBEsASG2VwA@mail.gmail.com>
-References: <ZjwTyGqcey0HXxTT@archie.me>
-	 <12b6ac611c1a44b4eadbb1316636b7268ab66a50.camel@sipsolutions.net>
-	 <CAFqe=z+bnNayKaxEnEFar28Q__yZ9Byaxe3YwtMaBEsASG2VwA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1715252353; c=relaxed/simple;
+	bh=e8J1VXsTVLSJrNx/Z3WlGMkS2jcS3LF/98JSDjL+u8M=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=DO4Ew2fzrc1jp/G3CFu7u405CgyD9/XR3f+XsJPelyLBAI47FlzSZtJgcSX6BRFBqhQIGkRsQeCdHTKU+THloIayqCI6jgjQA1tA57+FCR7Udx5QCM61Xh1czOcAWm4w6OyIiUgtZlgsHcRXxITNsoL9aPdWNAuh+poQrx2RRNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fwZ+LDTh; arc=none smtp.client-ip=209.85.210.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-6ebddef73b5so100314a34.3
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 03:59:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715252351; x=1715857151; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/IkOAXUx3tHgZcUiJ6wigE1dqY+HU5i/i31Ie65t5Yc=;
+        b=fwZ+LDThblbHge6ws9p8B5P+9nHQfsBrUhOkEuO3FWfrN5vrN7m6zr+sMlicqDax+D
+         gZaR/2vdj2aF66IfLoZ87aFSajNqiey4Y4GJ8J94TGl5ghpk04PaVNCFDbEkjyMByd5z
+         ZWF/LrOShKpBAn5gGrizdUIiIFqPWr9Mz6OPwUXQcBIatmtMBDNPFKt1pexHq1LZZxHR
+         cuMIF8iNkZUCqoI6gZ5gJ/cuz2T+g7Ri/8JnMedRE00p2mlSxZi4hroweJMjQ1uc7cwE
+         8ylDGnJrKKpD8GCH9o2PXeL8xebERpTDZZUmmRqhTX46tTPhU/NtE1/fYQQemHZwcIDF
+         DMeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715252351; x=1715857151;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/IkOAXUx3tHgZcUiJ6wigE1dqY+HU5i/i31Ie65t5Yc=;
+        b=VeEFMwmfrxLGOgWK4LUPOkMRKIGJuplRQ3vrbXY0YXpQMbIhlMLsBd0se5j5wqOvLx
+         Y+9YC9Zc5LTp0q1qGIs0anXMjig6r77fsUFJosnpajPFaZtqyT1dr4GtAXIFxPLnGzYU
+         8EznkkaZpUgcTpN+OprUZ46c8Io6drPZ9ENywscP4vCQAeV830RMyB8TVQdImOPFB245
+         dr+EM3lBuHb8idXdk81HmgAAHyewwgcPMVOtw9j4t5oRDhGxivxeRFQtRnNA69bG6jkE
+         A7Dt0zpM3gcN5A3RVkMd0DUU76KWGmIseW0M+qU8Xumc1HiBer6Y/n5HvrpjThPmKNTR
+         1CUw==
+X-Forwarded-Encrypted: i=1; AJvYcCXqxdFaO6UUNPihkLiogpFzBgb2TWCFl3S5Ip3CbSnjUPWPJ/eTTfjj/72EPB2i9NsHaq4HKpNQ51bNSFvLJkWeBxCH4Zkh
+X-Gm-Message-State: AOJu0YzMaBOFDNhzMKENbKaHkzpclzKU+M8CbHl4G8vQ5TBBOXdGcaRi
+	fO5f9NenN4dqA/k0DNhCz4EoWlIKmvafysxqR3Kggw8ih14GzfX+
+X-Google-Smtp-Source: AGHT+IFGjU0KaUu6yzBpDlEPhdjZfCUvxVQawDIqzdFW6TDxb78qyrpfYeq3MH6u7iRbqXkr3HcNmQ==
+X-Received: by 2002:a05:6359:4c21:b0:191:f9d:3468 with SMTP id e5c5f4694b2df-192d1b33d94mr547325155d.0.1715252351026;
+        Thu, 09 May 2024 03:59:11 -0700 (PDT)
+Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6340b767ae3sm1054654a12.31.2024.05.09.03.59.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 May 2024 03:59:10 -0700 (PDT)
+Date: Thu, 09 May 2024 19:59:06 +0900 (JST)
+Message-Id: <20240509.195906.2304840489846825725.fujita.tomonori@gmail.com>
+To: hfdevel@gmx.net
+Cc: andrew@lunn.ch, fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ horms@kernel.org, kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com
+Subject: Re: [PATCH net-next v5 5/6] net: tn40xx: add mdio bus support
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <6388dcc8-2152-45bd-8e0f-2fb558c6fce9@gmx.net>
+References: <12394ae6-6a2d-4575-9ba1-1b39ca983264@lunn.ch>
+	<71d4a673-73b6-4ebe-a669-de3ae6c9af5f@gmx.net>
+	<6388dcc8-2152-45bd-8e0f-2fb558c6fce9@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2024-05-09 at 12:49 +0200, Jannik Gl=C3=BCckert wrote:
->=20
-> > (Seriously. If you're running with bleeding edge toolchains that pretty
-> > much nobody has yet, send patches.)
->=20
-> I'm not sure what to make of this - this bug has been around ever
-> since the code was added, modern toolchains just happen to be one way
-> to expose it.
+Hi,
 
-No, that's incorrect. This is perfectly valid code:
+On Thu, 9 May 2024 11:52:46 +0200
+Hans-Frieder Vogt <hfdevel@gmx.net> wrote:
 
- struct x {
-   int n;
-   int a[] /* __counted_by(n) */;
- };
+> A small addition here:
+> digging through an old Tehuti linux river for the TN30xx (revision
+> 7.33.5.1) I found revealing comments:
+> in bdx_mdio_read:
+> =A0=A0=A0=A0=A0=A0=A0 /* Write read command */
+> =A0=A0=A0=A0=A0=A0=A0 writel(MDIO_CMD_STAT_VAL(1, device, port), regs=
+ +
+> regMDIO_CMD_STAT);
+> in bdx_mdio_write:
+> =A0=A0=A0=A0=A0=A0=A0 /* Write write command */
+> =A0=A0=A0=A0=A0=A0=A0 writel(MDIO_CMD_STAT_VAL(0, device, port), regs=
+ +
+> regMDIO_CMD_STAT);
+> =
 
- x =3D alloc(sizeof(*x) + sizeof(int) * 2);
- x->a[0] =3D 10;
- x->a[1] =3D 20;
- x->n =3D 2;
+> The CMD register has a different layout in the TN40xx, but the logic
+> is
+> similar.
+> Therefore, I conclude now that the value (1 << 15)=A0 is in fact a re=
+ad
+> flag. Maybe it could be defined like:
+> =
 
-However, the uncommenting of the __counted_by() annotation will lead to
-a complaint.
+> #define TN40_MDIO_READ=A0=A0=A0 BIT(15)
 
-johannes
+Thanks a lot!
+
+So worth adding MDIO_CMD_STAT_VAL macro and TN40_MDIO_CMD_READ
+definition?
+
+
+diff --git a/drivers/net/ethernet/tehuti/tn40_mdio.c b/drivers/net/ethe=
+rnet/tehuti/tn40_mdio.c
+index 64ef7f40f25d..d2e4b4d5ee9a 100644
+--- a/drivers/net/ethernet/tehuti/tn40_mdio.c
++++ b/drivers/net/ethernet/tehuti/tn40_mdio.c
+@@ -7,6 +7,10 @@
+ =
+
+ #include "tn40.h"
+ =
+
++#define TN40_MDIO_CMD_STAT_VAL(device, port) \
++	(((device) & MDIO_PHY_ID_DEVAD) | (((port) << 5) & MDIO_PHY_ID_PRTAD)=
+)
++#define TN40_MDIO_CMD_READ BIT(15)
++
+ static void tn40_mdio_set_speed(struct tn40_priv *priv, u32 speed)
+ {
+ 	void __iomem *regs =3D priv->regs;
+@@ -48,13 +52,13 @@ static int tn40_mdio_read(struct tn40_priv *priv, i=
+nt port, int device,
+ 	if (tn40_mdio_get(priv, NULL))
+ 		return -EIO;
+ =
+
+-	i =3D ((device & 0x1F) | ((port & 0x1F) << 5));
++	i =3D TN40_MDIO_CMD_STAT_VAL(device, port);
+ 	writel(i, regs + TN40_REG_MDIO_CMD);
+ 	writel((u32)regnum, regs + TN40_REG_MDIO_ADDR);
+ 	if (tn40_mdio_get(priv, NULL))
+ 		return -EIO;
+ =
+
+-	writel(((1 << 15) | i), regs + TN40_REG_MDIO_CMD);
++	writel(TN40_MDIO_CMD_READ | i, regs + TN40_REG_MDIO_CMD);
+ 	/* read CMD_STAT until not busy */
+ 	if (tn40_mdio_get(priv, NULL))
+ 		return -EIO;
+@@ -73,8 +77,7 @@ static int tn40_mdio_write(struct tn40_priv *priv, in=
+t port, int device,
+ 	/* wait until MDIO is not busy */
+ 	if (tn40_mdio_get(priv, NULL))
+ 		return -EIO;
+-	writel(((device & 0x1F) | ((port & 0x1F) << 5)),
+-	       regs + TN40_REG_MDIO_CMD);
++	writel(TN40_MDIO_CMD_STAT_VAL(device, port), regs + TN40_REG_MDIO_CMD=
+);
+ 	writel((u32)regnum, regs + TN40_REG_MDIO_ADDR);
+ 	if (tn40_mdio_get(priv, NULL))
+ 		return -EIO;
+-- =
+
+2.34.1
+
 
