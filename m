@@ -1,115 +1,137 @@
-Return-Path: <netdev+bounces-94846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 467698C0D9C
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:38:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 382978C0DA6
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:42:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAA8A1F21522
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 09:38:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E762D283658
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 09:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C087314B062;
-	Thu,  9 May 2024 09:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1506014A618;
+	Thu,  9 May 2024 09:42:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E87814AD32;
-	Thu,  9 May 2024 09:37:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E1F14A61E;
+	Thu,  9 May 2024 09:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715247440; cv=none; b=hn3RvibM/86OUcQ6QBtFkNKrZfBrhZCeSXGO9Z/5O1lqo9oV9QyX98zxRPd2ER+3UJMZWfsB+hLfO4Gq8keWa9ho5UyGaGFQmHDfCpnk4ou1ekpmcUi0E8lZnX8MMiBr7jc1Q+7pw/nWKDdeXlqxXSLRlupTp6GNas8OBp6B0kc=
+	t=1715247723; cv=none; b=YkED3UoH9Crv4WtJrfsrBwk8Nss8a1O/A7pgOvs8DJ331EFnyhsSx3MzVKMiUfXIqVZoSP2eFiNcnQLqZjGhBG4H3InVGvTZnrtrz5i1wGpviYuHsUUnOsj/ZuY04wTtQ80EnZzXjARmbLRCwBIsZ1z/Nk8BVV6pZpf7MEkwaUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715247440; c=relaxed/simple;
-	bh=ySeQnilNVeiocf2Y9Gj1+QOw9K8QIdvsO5VKfq/TB2o=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=XSjGaguG6BuPZLOuu2cw6KWfXYrwot8yrwTYNFrLheofMta98VawZPAqUY31YP0HPQEMAaptffye24EW8Z5CWnVgyzp0C1i0Yk1PLXJuuhFo8CfiyOGpT4wLGsmAmQUt2q48I7k8DCx1mZO5W/81rX2WYB747qXahwaHPR8OR1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=162.243.161.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from ubuntu.localdomain (unknown [221.192.180.131])
-	by mail-app4 (Coremail) with SMTP id cS_KCgBH97U_mTxm18NPAA--.29040S2;
-	Thu, 09 May 2024 17:37:06 +0800 (CST)
-From: Duoming Zhou <duoming@zju.edu.cn>
+	s=arc-20240116; t=1715247723; c=relaxed/simple;
+	bh=TNe1rMP+ypl47hsJ4a40gMpHW3BIzrJt/nOYekkuWXQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZbaP81L7NX8TeHKyUXEWE3drm0JUy6b8W1JxQ/ftYB0gZuwHFrAYJS1wSjYuVxHH90shx9iHmJIwHT0rYDLCdCjDX+LfQDPVYWDsL3ITkE3WmF49sfVBqsjrN+3v9PeT4m6774jX8vS8PtUxb3AWZwyuiqU3f7Izx+iwQuv6x/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7FE32FF804;
+	Thu,  9 May 2024 09:41:55 +0000 (UTC)
+From: Ilya Maximets <i.maximets@ovn.org>
 To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-hams@vger.kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	jreuter@yaina.de,
-	dan.carpenter@linaro.org,
-	rkannoth@marvell.com,
-	davem@davemloft.net,
-	lars@oddbit.com,
-	Duoming Zhou <duoming@zju.edu.cn>
-Subject: [PATCH net v7 3/3] ax25: Fix reference count leak issue of net_device
-Date: Thu,  9 May 2024 17:37:02 +0800
-Message-Id: <7ce3b23a40d9084657ba1125432f0ecc380cbc80.1715247018.git.duoming@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1715247018.git.duoming@zju.edu.cn>
-References: <cover.1715247018.git.duoming@zju.edu.cn>
-X-CM-TRANSID:cS_KCgBH97U_mTxm18NPAA--.29040S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJryktF15Gr15ur4UAF43Wrg_yoW8JFy5pF
-	W2gFyfArZ7Jr1DJr4DWr97Wr10vryDu3yrCw45u3WSk3s5XasxJryrKrWUXry7KrWfXF18
-	u347Wrn8uF1kZaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9K14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
-	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_GFWl42xK82IYc2Ij64vIr4
-	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
-	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
-	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
-	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
-	v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU073vUUUUU
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwIQAWY7nwoPXwAkss
+Cc: Pravin B Shelar <pshelar@ovn.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Joe Stringer <joe@ovn.org>,
+	Jarno Rajahalme <jarno@ovn.org>,
+	dev@openvswitch.org,
+	linux-kernel@vger.kernel.org,
+	Ilya Maximets <i.maximets@ovn.org>,
+	Antonin Bas <antonin.bas@broadcom.com>
+Subject: [PATCH net] net: openvswitch: fix overwriting ct original tuple for ICMPv6
+Date: Thu,  9 May 2024 11:38:05 +0200
+Message-ID: <20240509094228.1035477-1-i.maximets@ovn.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: i.maximets@ovn.org
 
-There is a reference count leak issue of the object "net_device" in
-ax25_dev_device_down(). When the ax25 device is shutting down, the
-ax25_dev_device_down() drops the reference count of net_device one
-or zero times depending on if we goto unlock_put or not, which will
-cause memory leak.
+OVS_PACKET_CMD_EXECUTE has 3 main attributes:
+ - OVS_PACKET_ATTR_KEY - Packet metadata in a netlink format.
+ - OVS_PACKET_ATTR_PACKET - Binary packet content.
+ - OVS_PACKET_ATTR_ACTIONS - Actions to execute on the packet.
 
-In order to solve the above issue, decrease the reference count of
-net_device after dev->ax25_ptr is set to null.
+OVS_PACKET_ATTR_KEY is parsed first to populate sw_flow_key structure
+with the metadata like conntrack state, input port, recirculation id,
+etc.  Then the packet itself gets parsed to populate the rest of the
+keys from the packet headers.
 
-Fixes: d01ffb9eee4a ("ax25: add refcount in ax25_dev to avoid UAF bugs")
-Suggested-by: Dan Carpenter <dan.carpenter@linaro.org>
-Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+Whenever the packet parsing code starts parsing the ICMPv6 header, it
+first zeroes out fields in the key corresponding to Neighbor Discovery
+information even if it is not an ND packet.
+
+It is an 'ipv6.nd' field.  However, the 'ipv6' is a union that shares
+the space between 'nd' and 'ct_orig' that holds the original tuple
+conntrack metadata parsed from the OVS_PACKET_ATTR_KEY.
+
+ND packets should not normally have conntrack state, so it's fine to
+share the space, but normal ICMPv6 Echo packets or maybe other types of
+ICMPv6 can have the state attached and it should not be overwritten.
+
+The issue results in all but the last 4 bytes of the destination
+address being wiped from the original conntrack tuple leading to
+incorrect packet matching and potentially executing wrong actions
+in case this packet recirculates within the datapath or goes back
+to userspace.
+
+ND fields should not be accessed in non-ND packets, so not clearing
+them should be fine.  Executing memset() only for actual ND packets to
+avoid the issue.
+
+Initializing the whole thing before parsing is needed because ND packet
+may not contain all the options.
+
+The issue only affects the OVS_PACKET_CMD_EXECUTE path and doesn't
+affect packets entering OVS datapath from network interfaces, because
+in this case CT metadata is populated from skb after the packet is
+already parsed.
+
+Fixes: 9dd7f8907c37 ("openvswitch: Add original direction conntrack tuple to sw_flow_key.")
+Reported-by: Antonin Bas <antonin.bas@broadcom.com>
+Closes: https://github.com/openvswitch/ovs-issues/issues/327
+Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
 ---
- net/ax25/ax25_dev.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/net/ax25/ax25_dev.c b/net/ax25/ax25_dev.c
-index 52ccc37d568..c9d55b99a7a 100644
---- a/net/ax25/ax25_dev.c
-+++ b/net/ax25/ax25_dev.c
-@@ -118,15 +118,10 @@ void ax25_dev_device_down(struct net_device *dev)
- 	list_for_each_entry(s, &ax25_dev_list, list) {
- 		if (s == ax25_dev) {
- 			list_del(&s->list);
--			goto unlock_put;
-+			break;
- 		}
- 	}
--	dev->ax25_ptr = NULL;
--	spin_unlock_bh(&ax25_dev_lock);
--	ax25_dev_put(ax25_dev);
--	return;
+Note: I'm working on a selftest for this issue, but it requires some
+ground work first to add support for OVS_PACKET_CMD_EXECUTE into
+opnevswitch selftests as well as parsing of ct tuples.  So it is going
+to be a separate patch set.
+
+ net/openvswitch/flow.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/openvswitch/flow.c b/net/openvswitch/flow.c
+index 33b21a0c0548..8a848ce72e29 100644
+--- a/net/openvswitch/flow.c
++++ b/net/openvswitch/flow.c
+@@ -561,7 +561,6 @@ static int parse_icmpv6(struct sk_buff *skb, struct sw_flow_key *key,
+ 	 */
+ 	key->tp.src = htons(icmp->icmp6_type);
+ 	key->tp.dst = htons(icmp->icmp6_code);
+-	memset(&key->ipv6.nd, 0, sizeof(key->ipv6.nd));
  
--unlock_put:
- 	dev->ax25_ptr = NULL;
- 	spin_unlock_bh(&ax25_dev_lock);
- 	netdev_put(dev, &ax25_dev->dev_tracker);
+ 	if (icmp->icmp6_code == 0 &&
+ 	    (icmp->icmp6_type == NDISC_NEIGHBOUR_SOLICITATION ||
+@@ -570,6 +569,8 @@ static int parse_icmpv6(struct sk_buff *skb, struct sw_flow_key *key,
+ 		struct nd_msg *nd;
+ 		int offset;
+ 
++		memset(&key->ipv6.nd, 0, sizeof(key->ipv6.nd));
++
+ 		/* In order to process neighbor discovery options, we need the
+ 		 * entire packet.
+ 		 */
 -- 
-2.17.1
+2.44.0
 
 
