@@ -1,163 +1,147 @@
-Return-Path: <netdev+bounces-95158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DEA68C1876
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 23:35:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B19018C1891
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 23:42:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8B57286218
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 21:35:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CE261F21CFA
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 21:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A51128373;
-	Thu,  9 May 2024 21:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F058185653;
+	Thu,  9 May 2024 21:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bCO5rgmD"
+	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="eTVqphzn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2B182871;
-	Thu,  9 May 2024 21:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D08180055
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 21:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715290527; cv=none; b=hsztUcPB1SpqxyMwb3QosdfqJdtsjxJPYPrSUfd2smi6jCCA5ioy2yoB8B07Hc9VCoskEZykdyUI3KLifzv+bJy6uHeeO3oxLihAtIFV+KvcEOFJzOaPwPYB/0sIqvM6OvS0jo9n69mT6b4ivZ2KqjACxTcORv8/KEaZR/9WCb8=
+	t=1715290932; cv=none; b=pkGU5PHnWeRdqUesBDRECnM+AlwLWuSVtLXv2uF8AcZFHW0FDwN1JCzipnPCGB1csILNOJZAp7PttXzcj0ZEbX+otwbSIOpNcea+ipmTqMZeT2Eo0jJPL9lcTDrm89fmINgNd+AU8yzhiYp1lFesNLhULbhEDM6dNdGekw8gQR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715290527; c=relaxed/simple;
-	bh=UwbCOJ+2ltILz7mmNFABnaGxjulRAwqZ+Yv5Bs9oBTo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SSnqpyvI4P61TSKUKefTYoaYdnrb/m+xhQvs706iy6N1Xp02TougufaiNtfw5ajXl2wpEN8n4CJ6zA418z4HAYvg9spIV8+SuhS6quzVrx22NaL5GDMBtdtIjI02p+uOSQfvn5jTXmR9HSa2ZWWChuJb+kMzy5A0vXftXaqkI/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bCO5rgmD; arc=none smtp.client-ip=209.85.222.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-7f82c932858so440804241.0;
-        Thu, 09 May 2024 14:35:25 -0700 (PDT)
+	s=arc-20240116; t=1715290932; c=relaxed/simple;
+	bh=wP+7wj0GQxTLjS1RBn+5MHXwXji8frVrT0a+yqSGftI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QMLAnmV93+eixKUFmkSZccI6yF1ymzfbEOA3EEdT7+Ack13KoYvZf/J43XS8J4z/xsr679t98CKG6U0Zc56VLh5V9Q8GLOL/gRHu62Gu5x1eI4aa8UGdCLLC/abCCnsDkQ/pHcVWz0Ex8r+cgkEeP2lHm0wl+dCtBRhQd6OVUWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=eTVqphzn; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a59cdd185b9so441481866b.1
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 14:42:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715290524; x=1715895324; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Yo3NJl/+D3HjDzk2u86J+UDtYtrXvOHQjT1qCvhfSw=;
-        b=bCO5rgmDjNmNHOd4rdDidebbEu/czR20bYwycwbsINCPco/LrDrifnvwC2fF8mKE50
-         W5O9GLpC4UCSnHW7JlmMxcYuMF6loqvf7JuNSuXEmhCISPy3v9ge6LMiaf/IIcOxVllU
-         FwDNFaYSMAlLTmrCM2zvwpQMJWmWNR+f93WJ5Kh3Cv2EW6hn4FclNpb3lBwm8YJiCM4c
-         6G+VfcNhanfiUx1L6IPIysJW+pyrHoGaQBdjUUtkj+tygrOUrrs9pnA7N1yaxkKe5CfI
-         yFMOISiNxnShdBV4J3KYTePCaJaBfBZqSVObOPk7k3nyP/Mjbd9gbaSbnUYXOXEX4qP7
-         1pLA==
+        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1715290929; x=1715895729; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mWiEw6OZOjWrMlF7JIfpMQ4VjNqi64jS5UnPYz95OZ8=;
+        b=eTVqphznEInDiS0VczP2VH9UF64/BJfL7J8XhAWxO57KqR8nM9Y+bdEcdMyBeRLpGO
+         FqEih12Qf+pWy1tJ2TEspOFyl9IxqiNMAFJzzLNsNizHu4HFP9edfEJH1+1/RrYTe2al
+         HGveGpWjcynEkH5L1g2f71izsxYZPr/dSUcxfmiTma3KYoaZqKmxyNeh926LdoF3xVoD
+         nFTI124ZrMkDlYKeq1MMFQK8bw1ihoIbXkdCd3xQw9GPp2UoVapytDiYmFCe+dTetnF8
+         JAbu9x4GGg4+cLPMWElH6S1V/ob93h1wuOwzdyTq4PDR7ZGKg7yMvgdnCZY9PB42FWPJ
+         KXvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715290524; x=1715895324;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1Yo3NJl/+D3HjDzk2u86J+UDtYtrXvOHQjT1qCvhfSw=;
-        b=ce736AjipCnN6DYMHYEG+7ExThvf+HH8z1Hiv8C6Wlhc2aWK5zrqhkZj98xaPTR6UQ
-         Ih4POQsEhwICU1Xl3xBquzNXml2COxKNROEaDOnh5tqcDDKG/Li3Cxlw7mPzN8Va9xQf
-         4cZVttYTjx/gVEuh7UosnI/1fa2jRJg52OKebyZ1PYtx+oJacG1QqbbfCEcpsKg7ttlT
-         iik9NInEUmJNYG84CZOl/T3V6cHcKpH89CnO3pqTLEAH7IGKYr3CdvGDXG+c8oGDlafb
-         VbAIutaZ/xZSxAdQFEhN0Nx+Pvvv6GP7DwIH0+smcwn1Cgs/kIyTwQ+SrCwLE06HHMeE
-         +yZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWRSYV9CFgnv+fZ19PJaXvjpxeS2bx36TjEc/VUxF+0eA3mufo6xizqP935TWlGs3HmpQEHMFUSotdv3hLQpT2uEMC0ykDiuFTOcnG79YyTg9s/DgZdfmyzmzsFkV8ho8+MpGa/sWjQRRLvwFB28QCTgc4ec2cRc5NBiL5+PFOtYQ==
-X-Gm-Message-State: AOJu0Yx//rQckLpLUTgbqBrozL5CeWbidPqcrWikv5QBGeRDtI8hQ5Wi
-	aEhrnv3lRTcaEP1VnRZgS8UWBnKDsHO97P/5J4A6FIL6DfhvH4tDGOiqA95W5gKy3/l2ZnHFVQz
-	/1t3mLBJ4HOcGj3mclQKh9hIYF2k=
-X-Google-Smtp-Source: AGHT+IEDcACUSM80VSR45ArKgZiWP4c9kqdCth3bLU1kbXd1shP57oMwEOz/0YVPrQ6VzKWJJJR4QpRgtprtu6Wem7s=
-X-Received: by 2002:a05:6102:3ece:b0:47e:5c2e:5695 with SMTP id
- ada2fe7eead31-48077e45cc6mr1030292137.23.1715290523779; Thu, 09 May 2024
- 14:35:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715290929; x=1715895729;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mWiEw6OZOjWrMlF7JIfpMQ4VjNqi64jS5UnPYz95OZ8=;
+        b=cC2pSzziXcLdgLnWR9SfAC/SwjnibN1JRX19ZaUFzDKp0PmIkeSaD/zU6F6iQYjc4T
+         jVtI435qkk9ym8d5ipnoZOfB7wh2KsTCg2583WL9zcFSGfbQk5/rvW4ZYmdBx4UhmWpK
+         fihozyJaqHBJi6RLPFqJ6jpMw8qP9nrTNsGQsvcl3+13m92HC2kfxKaTZzlPWgrYZ+6s
+         9yubm7JQr4/e4Y78L0x/BzsJ7FRexLpt0wOZ3LFvqmTtk9TUznZGQhTW/6aR7QzxTkSS
+         RemOhQn4iOCP1U6d111zxFuWk+g7aTAE1jVtpmcTZwijMlqvNGwpG3FYE3NaBzJbjojb
+         aTaw==
+X-Forwarded-Encrypted: i=1; AJvYcCWQpeazaktByawNnjgYj0O187SUhYTXPkR8tCw6OdBbDEKKLiwbq7xxriwEwuxnWx4nS9ukngFD4lIpp3REmoFaeNtQGPyU
+X-Gm-Message-State: AOJu0Ywn+jF5DsNWNaqG2YKZ7QgwdqMdRmzzq/tuxnJwodkkIo97dVFL
+	VWhfWzYDm/73/8eWpSbPD/yDaw+rvCS6wzm6Y+l2C7cq5xkvuRywI2TkVKoYak0=
+X-Google-Smtp-Source: AGHT+IGTpPDGkQCDLZt6tcLLMFMDJc5KKSgY3+50vm30L4sanYzfyVqp2bPZ6X5+JuA63Tj/y5DeVA==
+X-Received: by 2002:a17:906:5613:b0:a59:ccc3:544 with SMTP id a640c23a62f3a-a5a1155b4f4mr356392966b.2.1715290929531;
+        Thu, 09 May 2024 14:42:09 -0700 (PDT)
+Received: from fedora.fritz.box (aftr-62-216-208-100.dynamic.mnet-online.de. [62.216.208.100])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a17b01598sm116496666b.178.2024.05.09.14.42.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 May 2024 14:42:09 -0700 (PDT)
+From: Thorsten Blum <thorsten.blum@toblux.com>
+To: arnd@arndb.de
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	gerg@linux-m68k.org,
+	glaubitz@physik.fu-berlin.de,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	nico@fluxnic.net,
+	pabeni@redhat.com,
+	thorsten.blum@toblux.com,
+	andrew@lunn.ch
+Subject: [PATCH v2] net: smc91x: Fix m68k kernel compilation for ColdFire CPU
+Date: Thu,  9 May 2024 23:37:45 +0200
+Message-ID: <20240509213743.175221-3-thorsten.blum@toblux.com>
+X-Mailer: git-send-email 2.45.0
+In-Reply-To: <2ef3df08-ffc7-4925-82bf-0813c8b0b439@app.fastmail.com>
+References: <2ef3df08-ffc7-4925-82bf-0813c8b0b439@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240507190111.16710-1-apais@linux.microsoft.com>
- <20240507190111.16710-2-apais@linux.microsoft.com> <Zjp/kgBE2ddjV044@shell.armlinux.org.uk>
- <CAOMdWSKfkT4K9MAOn-rL44pycHPhVDj4CtiYkru5y_s0S-sPeQ@mail.gmail.com> <20240508201654.GA2248333@kernel.org>
-In-Reply-To: <20240508201654.GA2248333@kernel.org>
-From: Allen <allen.lkml@gmail.com>
-Date: Thu, 9 May 2024 14:35:12 -0700
-Message-ID: <CAOMdWSJ2vV5gYpEQUCpAco3W9ZKKmmj1LXGzk7kTbAaBmsQknQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] [RFC] ethernet: Convert from tasklet to BH workqueue
-To: Simon Horman <horms@kernel.org>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Allen Pais <apais@linux.microsoft.com>, 
-	netdev@vger.kernel.org, jes@trained-monkey.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	kda@linux-powerpc.org, cai.huoqing@linux.dev, dougmill@linux.ibm.com, 
-	npiggin@gmail.com, christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org, 
-	naveen.n.rao@linux.ibm.com, nnac123@linux.ibm.com, tlfalcon@linux.ibm.com, 
-	cooldavid@cooldavid.org, marcin.s.wojtas@gmail.com, mlindner@marvell.com, 
-	stephen@networkplumber.org, nbd@nbd.name, sean.wang@mediatek.com, 
-	Mark-MC.Lee@mediatek.com, lorenzo@kernel.org, matthias.bgg@gmail.com, 
-	angelogioacchino.delregno@collabora.com, borisp@nvidia.com, 
-	bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com, 
-	louis.peens@corigine.com, richardcochran@gmail.com, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-acenic@sunsite.dk, linux-arm-kernel@lists.infradead.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-mediatek@lists.infradead.org, 
-	oss-drivers@corigine.com, linux-net-drivers@amd.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-> > > On Tue, May 07, 2024 at 07:01:11PM +0000, Allen Pais wrote:
-> > > > The only generic interface to execute asynchronously in the BH context is
-> > > > tasklet; however, it's marked deprecated and has some design flaws. To
-> > > > replace tasklets, BH workqueue support was recently added. A BH workqueue
-> > > > behaves similarly to regular workqueues except that the queued work items
-> > > > are executed in the BH context.
-> > > >
-> > > > This patch converts drivers/ethernet/* from tasklet to BH workqueue.
-> > >
-> > > I doubt you're going to get many comments on this patch, being so large
-> > > and spread across all drivers. I'm not going to bother trying to edit
-> > > this down to something more sensible, I'll just plonk my comment here.
-> > >
-> > > For the mvpp2 driver, you're only updating a comment - and looking at
-> > > it, the comment no longer reflects the code. It doesn't make use of
-> > > tasklets at all. That makes the comment wrong whether or not it's
-> > > updated. So I suggest rather than doing a search and replace for
-> > > "tasklet" to "BH blahblah" (sorry, I don't remember what you replaced
-> > > it with) just get rid of that bit of the comment.
-> > >
-> >
-> >  Thank you Russell.
-> >
-> >  I will get rid of the comment. If it helps, I can create a patch for each
-> > driver. We did that in the past, with this series, I thought it would be
-> > easier to apply one patch.
->
-> Hi Allen and Russell,
->
-> My 2c worth:
->
-> * In general non bug-fix patches for networking code should be targeted at
->   net-next. This means that they should include net-next in the subject,
->   and be based on that tree.
->
->   Subject: [PATCH net-next] ...
->
-> * This series does not appear to apply to net-next
->
-> * This series appears to depend on code which is not present in net-next.
->   f.e. disable_work_sync
->
-> * The Infiniband patches should probably be submitted separately
->   to the relevant maintainers
->
-> * As this patch seems to involve many non-trivial changes
->   it seems to me that it would be best to break it up somehow.
->   To allow proper review.
->
-> * Patch-sets for net-next should be limited to 15 patches,
->   so perhaps multiple sequential batches would be a way forwards.
->
-> Link: https://docs.kernel.org/process/maintainer-netdev.html
+Compiling the m68k kernel with support for the ColdFire CPU family fails
+with the following error:
 
- Thank you very much for taking the time to write back.
-Since the patches that are necessary for this series are not in
-net-next, I could not target net-next.
+In file included from drivers/net/ethernet/smsc/smc91x.c:80:
+drivers/net/ethernet/smsc/smc91x.c: In function ‘smc_reset’:
+drivers/net/ethernet/smsc/smc91x.h:160:40: error: implicit declaration of function ‘_swapw’; did you mean ‘swap’? [-Werror=implicit-function-declaration]
+  160 | #define SMC_outw(lp, v, a, r)   writew(_swapw(v), (a) + (r))
+      |                                        ^~~~~~
+drivers/net/ethernet/smsc/smc91x.h:904:25: note: in expansion of macro ‘SMC_outw’
+  904 |                         SMC_outw(lp, x, ioaddr, BANK_SELECT);           \
+      |                         ^~~~~~~~
+drivers/net/ethernet/smsc/smc91x.c:250:9: note: in expansion of macro ‘SMC_SELECT_BANK’
+  250 |         SMC_SELECT_BANK(lp, 2);
+      |         ^~~~~~~~~~~~~~~
+cc1: some warnings being treated as errors
 
- I will wait for the patches to land in net-next, and the v2 will
-be broken into multiple smaller sets(per driver).
+The function _swapw() was removed in commit d97cf70af097 ("m68k: use
+asm-generic/io.h for non-MMU io access functions"), but is still used in
+drivers/net/ethernet/smsc/smc91x.h.
 
-Thanks.
- Allen
+Use ioread16be() and iowrite16be() to resolve the error.
+
+Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
+---
+Changes in v2:
+- Use ioread16be() and iowrite16be() directly instead of re-adding
+  _swapw() as suggested by Arnd Bergmann and Andrew Lunn
+---
+ drivers/net/ethernet/smsc/smc91x.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/smsc/smc91x.h b/drivers/net/ethernet/smsc/smc91x.h
+index 46eee747c699..45ef5ac0788a 100644
+--- a/drivers/net/ethernet/smsc/smc91x.h
++++ b/drivers/net/ethernet/smsc/smc91x.h
+@@ -156,8 +156,8 @@ static inline void mcf_outsw(void *a, unsigned char *p, int l)
+ 		writew(*wp++, a);
+ }
+ 
+-#define SMC_inw(a, r)		_swapw(readw((a) + (r)))
+-#define SMC_outw(lp, v, a, r)	writew(_swapw(v), (a) + (r))
++#define SMC_inw(a, r)		ioread16be((a) + (r))
++#define SMC_outw(lp, v, a, r)	iowrite16be(v, (a) + (r))
+ #define SMC_insw(a, r, p, l)	mcf_insw(a + r, p, l)
+ #define SMC_outsw(a, r, p, l)	mcf_outsw(a + r, p, l)
+ 
+-- 
+2.45.0
+
 
