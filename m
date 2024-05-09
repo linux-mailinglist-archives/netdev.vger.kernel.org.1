@@ -1,136 +1,160 @@
-Return-Path: <netdev+bounces-94805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B4E68C0B46
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:01:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7C38C0B54
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:14:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B722283650
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:01:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFB7E1F2346C
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:14:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B3651494BD;
-	Thu,  9 May 2024 06:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F901149C55;
+	Thu,  9 May 2024 06:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EY/Sw4rk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WEm/VoPd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109691494B8
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 06:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9D81494D4
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 06:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715234478; cv=none; b=N6BJnhwj+Xi5b3lLk9vBFJ7N4akKHxxnRF//0m9ECT7bNyYeMogzglnj6t/Mq6n8yK8Ieg35M8ijAiDjsKnb67fT76MwHwL0xpPTloS0yLbRi1q/MRedztL/ni5vUiNSiYfa82n+c8mjpH/hsSLN/z34IfQx/xL6nQJuXLnSW6w=
+	t=1715235263; cv=none; b=QS+Ey/GtVYQJaq1h4XIee8HWxCflugkHvS34wDgIAzvV7aVKik7YnC7+K6OrttKCZr6koGsXYFXiv4pg11aL8VBW3NDhg9gkrCxo9sPm5DqIawkauyG5Z7nj0GdRpExs1+DCJ3TRZnF4M8CP6OXOtEPvtI4OdMay9gs3d9HvRfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715234478; c=relaxed/simple;
-	bh=S/MVZRULVDyrUtXP/nK9eDK3Jsi7ratojp8mojszynM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sX2bH6hKKsLVW21YUYAr6oLrLmWr4bsSUpOYlUlErxBQcoMXQ4sBXuUgD7ejq5mdN8wdZNHw2oMnAvzb4GRdbMxP9WLSBN2xGAK/+zoWk181NUPWvSt18YJmZdLDJsGixAE6cUlmZdxLI9zh3BqCDTma71UJAgcfelnsoIXlHto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EY/Sw4rk; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715234476; x=1746770476;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=S/MVZRULVDyrUtXP/nK9eDK3Jsi7ratojp8mojszynM=;
-  b=EY/Sw4rkebEj/sgnRIiHkjXTnZsDsuk5t+7IhuU5hdQhkA0nuokxEqOG
-   SWnhw/bN2xrnuey92eSM23H5bazj6Vp9RkxgIUE2clvqsuyzFFJ01gzp+
-   3rtxvwpCXk/ta8jiBmZJfPqTnDwuRoDacjti4tfyaQPHUGoELY+EYOfUw
-   EfCyfGQRvJRqAxmZelHEI7TF6eh7LDvVDOP/W+aL2Engh2525szQfHzf0
-   Svnhd4q/AnDEJxgHGi5N0eZAtg5aIWZVwTLfMg7FVx3+/oDVR4z0CeuU5
-   aAUX8MWNLOJGvWKkUGTEP0UFTIq+uVCfjP8nprK4VDxAfE1LiXcXmH8kd
-   A==;
-X-CSE-ConnectionGUID: AO3WkSLCSF6LYyxuMDg8mA==
-X-CSE-MsgGUID: xcygRezOSVa5/mUpfUTe4w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11067"; a="22537627"
-X-IronPort-AV: E=Sophos;i="6.08,147,1712646000"; 
-   d="scan'208";a="22537627"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 23:01:07 -0700
-X-CSE-ConnectionGUID: mu4NNIakSeCSwqzvSQ/Dyw==
-X-CSE-MsgGUID: mhd8fBbrRF+nHHsS/1XTdQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,147,1712646000"; 
-   d="scan'208";a="33607618"
-Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 08 May 2024 23:01:02 -0700
-Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s4wpw-0004Vg-1B;
-	Thu, 09 May 2024 06:01:00 +0000
-Date: Thu, 9 May 2024 14:00:26 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>,
-	Steve Glendinning <steve.glendinning@shawell.net>,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH v2 net-next] net: usb: smsc95xx: stop lying about
- skb->truesize
-Message-ID: <202405091310.KvncIecx-lkp@intel.com>
-References: <20240508075159.1646031-1-edumazet@google.com>
+	s=arc-20240116; t=1715235263; c=relaxed/simple;
+	bh=EL59YAvQ+NejbE+MgsQ0pGcYE6qA6HsEuHDusaEk0N4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g80+BH94R5mKdOLBVH5hhHhMrWybYyKKti6DonXp06A3y+9/2pvraPmxyuADvmsOX2FKmmso2WF9T7+o6qntwzMxTpNf/8BXJJs39YHu2q+FiLfIQiYJLegkpX+1LMnD9uNLYcBTEtsjgEanFxsQ6veIc+0xSxjJEDKx14tT290=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WEm/VoPd; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-572f6c56cdaso10549a12.0
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 23:14:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715235259; x=1715840059; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=72bWBwjQodIuSi8MsUtQvKNvKwdUWjXGREUei480Xwo=;
+        b=WEm/VoPdoWkj0T759QWiuYvMX4pHXbQGtGV6B8BdS6/Cq0VFDkresAaaMIYb++Xv07
+         NGG+jf4a1dEnvAy0YaC/s7lcBHZYg4XfdFyn0UE/NSSxuV4NI+ONOzRkSN7wuCtF7G6m
+         GTOO87BGuQVGfzWL5T65/lgJj6fjNzyMISuP7RyGnMi7ZT8v5eJ20/bJPOff/6tMEzYf
+         htFF4m10x/m7ACoxg+H+qSKb1axBk/xf7pNTnIFlBhJxau06TJtioZB85NLY3yGUoNGf
+         qsBS4tNQxQMxJEtkUampvrB3zly877wqooUCzxdQkmiqESGQ2AKpeP3mEO/CMSG07Le0
+         wmxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715235259; x=1715840059;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=72bWBwjQodIuSi8MsUtQvKNvKwdUWjXGREUei480Xwo=;
+        b=Lj8tbNC/A2PrXak1lzkJVstSGGrvttufE5IGdCW8N3Rm4wURz4C5T1HQMyAzInLfvm
+         2ACbZBLJLhvvxe/78/2Ccg1Wo5mBkvAAtrLKq/Wq7N23OviGAWS8xOuyiUMnPpu8VnmT
+         p+na+gDZD7GT8eKLxXNLiXaD5qxqi4BOoA4hPwh0q+4B/3i2jtLBQQ56jAbfhIQtyQiM
+         E4hRqtQzcZqP2y2kjJDUI67+g5BLec3gattOR7LqRrLISpR0abFc6uQN5vo7FpSDIfGl
+         2FHqHfugM3xZ6ZHvtdD+fZF5VbCcewgwnGRszAeZ52i2Snklfm/drdeQoFHGCKSwtrt1
+         DCzw==
+X-Forwarded-Encrypted: i=1; AJvYcCXPqOoHmEfxBeEWoq3+hp8jJJagNDWigMPVqtPcAyQSPB2Pzy+Uk/WOXz09tdAKed9tuBHi3vHWrsL+wlL0BHb31ZSJA84e
+X-Gm-Message-State: AOJu0Ywtj5LCAF5djEr1Mhlb2kgOMKEExrXbJ1v7VLCRGQE80tGiXbkb
+	ViJnnGxE7/o/axzTSzwtojIltyz3ENFHa+ciEWd3Ikr7fQ1RaFg5rVFjFgyP/fA63TsghgZjvRB
+	uxA9LB4pmXIB6/Tmz3TkOOZ8rRvJo9Qwq6Ox/
+X-Google-Smtp-Source: AGHT+IHsPAG0LEeM4cJXnAxgH06RrdZlxemOxK5bdPXtb66jyshH3jVsPNC7i5pX8kAB1x6smMgaq3eKTmHMEonCtFw=
+X-Received: by 2002:a05:6402:5206:b0:572:a23b:1d81 with SMTP id
+ 4fb4d7f45d1cf-5733b9d3b3emr79412a12.5.1715235258767; Wed, 08 May 2024
+ 23:14:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240508075159.1646031-1-edumazet@google.com>
+References: <20240507214254.2787305-1-edliaw@google.com> <f4e45604-86b0-4be6-9bea-36edf301df33@linuxfoundation.org>
+In-Reply-To: <f4e45604-86b0-4be6-9bea-36edf301df33@linuxfoundation.org>
+From: Edward Liaw <edliaw@google.com>
+Date: Wed, 8 May 2024 23:13:51 -0700
+Message-ID: <CAG4es9XE2D94BNboRSf607NbJVW7OW4xkVq4jZ8pDZ_AZsb3nQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
+To: Shuah Khan <skhan@linuxfoundation.org>
+Cc: shuah@kernel.org, Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
+	Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Nhat Pham <nphamcs@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Christian Brauner <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>, 
+	Kees Cook <keescook@chromium.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, 
+	Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>, 
+	Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>, 
+	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Seth Forshee <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	=?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Fenghua Yu <fenghua.yu@intel.com>, 
+	Reinette Chatre <reinette.chatre@intel.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kernel-team@android.com, 
+	linux-sound@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mm@kvack.org, linux-input@vger.kernel.org, iommu@lists.linux.dev, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-actions@lists.infradead.org, mptcp@lists.linux.dev, 
+	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Eric,
+On Wed, May 8, 2024 at 4:10=E2=80=AFPM Shuah Khan <skhan@linuxfoundation.or=
+g> wrote:
+>
+> On 5/7/24 15:38, Edward Liaw wrote:
+> > 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> > asprintf into kselftest_harness.h, which is a GNU extension and needs
+> > _GNU_SOURCE to either be defined prior to including headers or with the
+> > -D_GNU_SOURCE flag passed to the compiler.
+> >
+> > v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-ed=
+liaw@google.com/
+> > v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
+> > location.  Remove #define _GNU_SOURCE from source code to resolve
+> > redefinition warnings.
+> >
+> > Edward Liaw (5):
+> >    selftests: Compile kselftest headers with -D_GNU_SOURCE
+> >    selftests/sgx: Include KHDR_INCLUDES in Makefile
+>
+> I appled patches 1/5 and 2.5 - The rest need to be split up.
+>
+> >    selftests: Include KHDR_INCLUDES in Makefile
+> >    selftests: Drop define _GNU_SOURCE
+> >    selftests: Drop duplicate -D_GNU_SOURCE
+> >
+>
+> Please split these patches pwe test directory. Otherwise it will
+> cause merge conflicts which can be hard to resolve.
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-usb-smsc95xx-stop-lying-about-skb-truesize/20240508-155316
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240508075159.1646031-1-edumazet%40google.com
-patch subject: [PATCH v2 net-next] net: usb: smsc95xx: stop lying about skb->truesize
-config: arc-randconfig-r132-20240509 (https://download.01.org/0day-ci/archive/20240509/202405091310.KvncIecx-lkp@intel.com/config)
-compiler: arceb-elf-gcc (GCC) 13.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20240509/202405091310.KvncIecx-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405091310.KvncIecx-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/net/usb/smsc95xx.c:1815:19: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __wsum [usertype] csum @@     got unsigned short x @@
-   drivers/net/usb/smsc95xx.c:1815:19: sparse:     expected restricted __wsum [usertype] csum
-   drivers/net/usb/smsc95xx.c:1815:19: sparse:     got unsigned short x
-   drivers/net/usb/smsc95xx.c: note: in included file (through include/net/checksum.h, include/linux/skbuff.h, include/net/net_namespace.h, ...):
-   arch/arc/include/asm/checksum.h:27:26: sparse: sparse: restricted __wsum degrades to integer
-   arch/arc/include/asm/checksum.h:27:36: sparse: sparse: restricted __wsum degrades to integer
-   arch/arc/include/asm/checksum.h:29:11: sparse: sparse: bad assignment (-=) to restricted __wsum
-   arch/arc/include/asm/checksum.h:30:16: sparse: sparse: restricted __wsum degrades to integer
-   arch/arc/include/asm/checksum.h:30:18: sparse: sparse: incorrect type in return expression (different base types) @@     expected restricted __sum16 @@     got unsigned int @@
-   arch/arc/include/asm/checksum.h:30:18: sparse:     expected restricted __sum16
-   arch/arc/include/asm/checksum.h:30:18: sparse:     got unsigned int
-
-vim +1815 drivers/net/usb/smsc95xx.c
-
-  1810	
-  1811	static void smsc95xx_rx_csum_offload(struct sk_buff *skb)
-  1812	{
-  1813		u16 *csum_ptr = (u16 *)(skb_tail_pointer(skb) - 2);
-  1814	
-> 1815		skb->csum = get_unaligned(csum_ptr);
-  1816		skb->ip_summed = CHECKSUM_COMPLETE;
-  1817		skb_trim(skb, skb->len - 2); /* remove csum */
-  1818	}
-  1819	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Hi Shuah,
+Sean asked that I rebase the patches on linux-next, and I will need to
+remove additional _GNU_SOURCE defines.  Should I send an unsplit v3 to
+be reviewed, then split it afterwards?  I'm concerned that it will be
+difficult to review with ~70 patches once split.
 
