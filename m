@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-94762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DAC58C0980
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:00:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB6F58C0981
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:00:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 839BF1C21051
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 02:00:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 805A42832E1
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 02:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C6913C8FF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C98DA13C90F;
 	Thu,  9 May 2024 02:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TdZc4rLz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E9dwTcno"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A189113C80E
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 02:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A183F13C683;
+	Thu,  9 May 2024 02:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715220029; cv=none; b=XxD+VQVvNoSKUdiPgpjH+ba+Z+LFGnnDrmILLODlWte1j4Etn7/lzFozO56/S03CITCxU7vxGLSrVfY+gL8qXgtDt0ZaKEBa/hNz7Zc26EXXqeHHq5t3mzlzlNMTyGPAOlbEdtozPW2bZHTRoajG87nKHiN1yIEwblTeudnP6VM=
+	t=1715220029; cv=none; b=QdQmQZnwBj0T2tjlbYD3bRs8ycjojcxaPr1TUlO8dav2OoVtUc8yI26de+xXWbtrxfj4y8q5TzV68PU2f+XYxJ67gapC1m/xENORyMEYhjajresaMCj5GzEs5MncqFbs6e9yWdaZsrlOkemhlnIaqVllLj/9OlFNVvWupF0SgOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715220029; c=relaxed/simple;
-	bh=nEaHl6oze0uAUcggo3IjhlcbwOlHmIhSSOBSwbz/3TU=;
+	bh=4FAUsU5mVbqb7YAyLX76pu1HOYCKM/90jyHr1I3lBOY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PaaPFi6LnyWJ93EU1h7WHBZnF+/IkDpMAbA2bLkPjBqWgMufWD7+EhQVDbN7A/hHgvQAQKLL89QZS34bk1Bayudw5MAs61LBKrt045cxAlHiLJ8TenM+4X/rl4dqyYNd6a6jeDvSzmqGxbP9skSiyAVAtZAInuLEsIkRb+kt+PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TdZc4rLz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 34765C2BD10;
+	 In-Reply-To:To:Cc; b=M/upj7oeLhXRO81giEKnk8yuLz/t9DE2wjKG3Twd13QlzoOr8ebOA1HRdyMzv8D/zsdsUvMW8zspabbJG+BU0fHpELUjRRzDfak4LZiPtUn+Z7lavvNe+iCsotpiub1NnYuzaI9xkAPMsW9VmiSU+OKEX4/6gft0Yy8QXFTSccI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E9dwTcno; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 38E40C32783;
 	Thu,  9 May 2024 02:00:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715220029;
-	bh=nEaHl6oze0uAUcggo3IjhlcbwOlHmIhSSOBSwbz/3TU=;
+	bh=4FAUsU5mVbqb7YAyLX76pu1HOYCKM/90jyHr1I3lBOY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TdZc4rLznHCfCPKeW2lNCQXXqiTONy/4bmjm4dXaKk5KFosm6i5Q2LoLBjzCws5Ra
-	 wzFoxdA3vzngBqsImtxKAeMR1pOBroBni5P+iKfryNrsd3OE5e8MTgg7V15wRQBuku
-	 TK65jfDr0sycfm2T0vUudoar0pobVrpZOYLJyg83MkGKi0tM6O7ljXJSV98sIfx314
-	 yQPr6TFguPAq61ebzXoWSjyD0uBjJwMAuhxMZ10L/KasZRqB2AD1mz+xTuWdpW4LAo
-	 dG9lbyT0hcPNoBPND1ejVSaA8nFiBvYGQ4qpCAcUe0M4FjA/RK8F+3tWMM7OYnRtxF
-	 VRuYfnEFO11Xg==
+	b=E9dwTcnoBoWs1VjrsjgnLBl+iq8wZFwWptcmNAbutBxpV/+KMNwJHr4AV/AhFpISn
+	 fbkA9l4GhK3fcdSzXQ3I6ahkmJcbRhCgflbj4pXlHx9+JHNNqPC8qa8EQ/g7Sq1lrh
+	 uD/znpGGv6GCPMHNvBAWUdNdLYdjtutztfTtZ8Czm9hO6WxXHwlq7qLvaTWMxMMHmV
+	 Ct2Vq3KsH0aeLil75MRX5tmwhX4cqQM33R0JF8irSUAVXTnNfLi0dxl6IEYCGj1Ieh
+	 aUYhUbKXC89nNvjwtkfpsZ9aLxlvKqNug7CLTyohZCVr4nK9ckzOAsH8gUxYirLbHO
+	 oA9YelZJZRkQQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 17560C43330;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 21C16C43614;
 	Thu,  9 May 2024 02:00:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ipv6: fib6_rules: avoid possible NULL dereference in
- fib6_rule_action()
+Subject: Re: [net PATCH v2] hsr: Simplify code for announcing HSR nodes timer
+ setup
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171522002909.32544.13436478403974145062.git-patchwork-notify@kernel.org>
+ <171522002913.32544.11720704507207514169.git-patchwork-notify@kernel.org>
 Date: Thu, 09 May 2024 02:00:29 +0000
-References: <20240507163145.835254-1-edumazet@google.com>
-In-Reply-To: <20240507163145.835254-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20240507111214.3519800-1-lukma@denx.de>
+In-Reply-To: <20240507111214.3519800-1-lukma@denx.de>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ edumazet@google.com, olteanv@gmail.com, davem@davemloft.net,
+ o.rempel@pengutronix.de, Tristram.Ha@microchip.com, bigeasy@linutronix.de,
+ r-gunasekaran@ti.com, horms@kernel.org, n.zhandarovich@fintech.ru,
+ m-karicheri2@ti.com, Arvid.Brodin@xdin.com, dan.carpenter@linaro.org,
+ ricardo@marliere.net, casper.casan@gmail.com, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  7 May 2024 16:31:45 +0000 you wrote:
-> syzbot is able to trigger the following crash [1],
-> caused by unsafe ip6_dst_idev() use.
+On Tue,  7 May 2024 13:12:14 +0200 you wrote:
+> Up till now the code to start HSR announce timer, which triggers sending
+> supervisory frames, was assuming that hsr_netdev_notify() would be called
+> at least twice for hsrX interface. This was required to have different
+> values for old and current values of network device's operstate.
 > 
-> Indeed ip6_dst_idev() can return NULL, and must always be checked.
-> 
-> [1]
+> This is problematic for a case where hsrX interface is already in the
+> operational state when hsr_netdev_notify() is called, so timer is not
+> configured to trigger and as a result the hsrX is not sending supervisory
+> frames to HSR ring.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] ipv6: fib6_rules: avoid possible NULL dereference in fib6_rule_action()
-    https://git.kernel.org/netdev/net/c/d101291b2681
+  - [net,v2] hsr: Simplify code for announcing HSR nodes timer setup
+    https://git.kernel.org/netdev/net/c/4893b8b3ef8d
 
 You are awesome, thank you!
 -- 
