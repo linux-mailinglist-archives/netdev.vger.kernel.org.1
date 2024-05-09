@@ -1,130 +1,110 @@
-Return-Path: <netdev+bounces-95005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A248C137D
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 19:07:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC4928C1388
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 19:09:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8D76282917
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 17:07:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51004B2080B
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 17:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F03910979;
-	Thu,  9 May 2024 17:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B118C8FF;
+	Thu,  9 May 2024 17:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="rte+Mh4X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HX1F+zCx"
 X-Original-To: netdev@vger.kernel.org
-Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCF0BE66;
-	Thu,  9 May 2024 17:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6173B6AD7;
+	Thu,  9 May 2024 17:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715274440; cv=none; b=gFDM4YsU3hDel4ygQZ263gkd6aBklAjYIeQrySKOpscBoK6yDRBOtb8dWTtnDUMOKocZy1v8w7rIfr1b0abugUCVkC76FrEHsOTIVEKQW4lmiuCEUJB90Su0BQfvHnvMXHa01ietDjfnvApXVXmlXHcFNTL2mJ7TGYaHGZfH92M=
+	t=1715274568; cv=none; b=TLcaT3Nj5rhIWi8Iv+FZSVD6JUEncABHNAigv62Yz1smqlua3cghzsJTahmVNOcGq8cWZje5/2Lp9Zhx2k3KXJRWIr5VKs1waS1m042lJlnoKZz3pX+f/5ZqxBMNzPCa3L+wpVe1T9F41Y29Jrxf5nHEZksLCspfD7cy9IQlhLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715274440; c=relaxed/simple;
-	bh=k0gFByMqGHNy3MKYMJRe8RyZTM90AqHah86h/xiMaKg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iBR00Wm8usbGmJKe+jYZ4pMoXxTlOoJPS9V7FKRQWAYKaStvr39MJ8kIosSjz/YM8715vIiE7VD7c1zbC0XWT17qCDgx4Hr4GfNA/+BWFRr/0pih1amPbrajFyM0Cwq5bZTNxuU59PLGUHrYAgXCCiBCjDwpy3ej91oLLDg1GYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=rte+Mh4X; arc=none smtp.client-ip=213.160.72.247
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
-	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:Reply-To:From:Subject:Message-ID:Sender:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=sUztFsMyGZd9hnT+rv/hD8QxRQK2xhAXzjM5dYq9Q+4=; b=rte+Mh4XhnNANibuwvObP/HxSR
-	zcjPGtpOuRBhhT/2Uw/tTbuOXfCv0fqBnSnk/J27+VhBLaJywQpr73Yyq7beKucMFEaa+cUx4yHx/
-	bBDhuHObt28XGDW36OtkSNKTnM2MVEdUik4BbyqN5WqfmqcKT4Lde+FGg7f/HvAhd+qU=;
-Received: from 127.0.0.1
-	by fritzc.com with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim latest)
-	(envelope-from <christoph.fritz@hexdev.de>)
-	id 1s57EX-001jcC-1A;
-	Thu, 09 May 2024 19:07:05 +0200
-Message-ID: <a447d09485adf8103b7bb738caff79136dc7bf1b.camel@hexdev.de>
-Subject: Re: [PATCH v3 09/11] can: lin: Handle rx offload config frames
-From: Christoph Fritz <christoph.fritz@hexdev.de>
-Reply-To: christoph.fritz@hexdev.de
-To: Ilpo =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: Jiri Slaby <jirislaby@kernel.org>, Oliver Hartkopp
- <socketcan@hartkopp.net>,  Marc Kleine-Budde <mkl@pengutronix.de>, Vincent
- Mailhol <mailhol.vincent@wanadoo.fr>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor Dooley
- <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires
- <bentiss@kernel.org>,  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Sebastian Reichel <sre@kernel.org>, Linus Walleij
- <linus.walleij@linaro.org>, Andreas Lauser
- <andreas.lauser@mercedes-benz.com>,  Jonathan Corbet <corbet@lwn.net>,
- Pavel Pisa <pisa@cmp.felk.cvut.cz>, linux-can@vger.kernel.org,  Netdev
- <netdev@vger.kernel.org>, devicetree@vger.kernel.org,
- linux-input@vger.kernel.org,  linux-serial <linux-serial@vger.kernel.org>
-Date: Thu, 09 May 2024 19:07:04 +0200
-In-Reply-To: <9cf35451-9d03-e487-c06b-580208ac3a3d@linux.intel.com>
-References: <20240502182804.145926-1-christoph.fritz@hexdev.de>
-	 <20240502182804.145926-10-christoph.fritz@hexdev.de>
-	 <9cf35451-9d03-e487-c06b-580208ac3a3d@linux.intel.com>
-Organization: hexDEV GmbH
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1715274568; c=relaxed/simple;
+	bh=+wFFlTnc55xfpgjhlPdcqsCb7nESgiO72PfzTtTnZX0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BN41I+mrU9MYnNMSDlTGXWcXuk18ZP2H/hHIITCd13yCdC2Wpot03cEWiIm+NNG7x/PYfWTcURYuMku0OYbDs/1BoUNPtzZhX4UZBPbEAc3g6lRJxw/eiGZ/WrLvjXcIYPLJIohLBAI3dh1lw6cbos0D2NJLmOto6wHNBm/HW+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HX1F+zCx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68B45C116B1;
+	Thu,  9 May 2024 17:09:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715274567;
+	bh=+wFFlTnc55xfpgjhlPdcqsCb7nESgiO72PfzTtTnZX0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HX1F+zCxhba2xkkS+/jxIRRSMCzSSUwEJxHOGHh7Yk+LVsZqozmdJHCZjYvt56RC8
+	 AzEqRzXcpUMp2enG4vEFF6oZ79h54xD22MHdOUwQHHx4Sthb65ym8ollnjiPEccj0D
+	 UP496q/8KBg0TlBI72oGGAQV+Plim21lrfBxA/mCDkyWneGKtb5Qx4gey64lFVRKHw
+	 thc6gPwlrMC04+y7f+4+SM93YrIVW/ngC9E3FZvzDwWs8rVuKpSLxUb3uUwhZlc8JK
+	 cqoAIFpWcw1IzEoUztJl5Ux1l6O+cze5uLsuI/Dph8BLDu4XkDzHT3d4aBj5oSFcEd
+	 yu2Iuw8r5OiWA==
+Date: Thu, 9 May 2024 18:09:21 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Frank Wunderlich <linux@fw-web.de>
+Cc: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+	Lee Jones <lee@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Tianling Shen <cnsztl@immortalwrt.org>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+	linux-leds@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH v2 1/2] dt-bindings: arm64: dts: mediatek: add BananaPi
+ R3 Mini
+Message-ID: <20240509-velcro-march-6878a4ee1f73@spud>
+References: <20240509152157.10162-1-linux@fw-web.de>
+ <20240509152157.10162-2-linux@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="1UDgLFyYubxOZ98P"
+Content-Disposition: inline
+In-Reply-To: <20240509152157.10162-2-linux@fw-web.de>
 
-On Mon, 2024-05-06 at 20:11 +0300, Ilpo Järvinen wrote:
-> On Thu, 2 May 2024, Christoph Fritz wrote:
-> 
-> > The CAN Broadcast Manager now has the capability to dispatch CANFD
-> > frames marked with the id LINBUS_RXOFFLOAD_ID. This patch introduces
-> > functionality to interpret these specific frames, enabling the
-> > configuration of RX offloading within the LIN driver.
-> > 
-> > Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
-> > ---
-> >  drivers/net/can/lin.c | 29 +++++++++++++++++++++++++++++
-> >  1 file changed, 29 insertions(+)
-> > 
-> > diff --git a/drivers/net/can/lin.c b/drivers/net/can/lin.c
-> > index 95906003666fb..ee2ebea2c865f 100644
-> > --- a/drivers/net/can/lin.c
-> > +++ b/drivers/net/can/lin.c
-> > @@ -194,6 +194,27 @@ static void lin_remove_sysfs_id_files(struct net_device *ndev)
-> >  	}
-> >  }
-> >  
-> > +static int lin_setup_rxoffload(struct lin_device *ldev,
-> > +			       struct canfd_frame *cfd)
-> > +{
-> > +	struct lin_responder_answer answ;
-> > +
-> > +	if (!(cfd->flags & CANFD_FDF))
-> > +		return -EMSGSIZE;
-> 
-> This seems a bit odd error code.
 
-OK, will be changed in v4 to more common -EINVAL.
+--1UDgLFyYubxOZ98P
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> > +	BUILD_BUG_ON(sizeof(struct lin_responder_answer) > sizeof(cfd->data));
-> > +	memcpy(&answ, cfd->data, sizeof(struct lin_responder_answer));
-> 
-> 2x sizeof(answ)
+On Thu, May 09, 2024 at 05:21:56PM +0200, Frank Wunderlich wrote:
+> From: Frank Wunderlich <frank-w@public-files.de>
+>=20
+> Add MT7988A based BananaPi R3 Mini.
+>=20
+> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
 
-OK
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-...
+Cheers,
+Conor.
 
-thanks
-  -- Christoph
+--1UDgLFyYubxOZ98P
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZj0DQQAKCRB4tDGHoIJi
+0luUAP0frxkua/Bw7NrNmTdtW5/WNrwwxuYa9/Wu69VhqSV8VQEAhbmO5/rayKXx
+LwEsbLqjtjgZ+ORX0KXmqU1etJV7pAk=
+=t38o
+-----END PGP SIGNATURE-----
+
+--1UDgLFyYubxOZ98P--
 
