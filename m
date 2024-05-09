@@ -1,184 +1,183 @@
-Return-Path: <netdev+bounces-94951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19D4D8C1157
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 16:37:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 863DF8C115C
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 16:38:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 208EBB22FCE
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 14:37:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D12928615D
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 14:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932B7133423;
-	Thu,  9 May 2024 14:37:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698D631A66;
+	Thu,  9 May 2024 14:38:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="NTo7eWSD"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FACGXN/A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E4F3D963
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 14:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9744A15AF1
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 14:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715265430; cv=none; b=pKP8XrvJc4NRsHeJrBJE61DEj4ro1xwEAgD7Qp+iIzEGVlSDBG9R1LiEOeszSNVbCrbB7wxUgpSakYO1NA32K+52ju9o7Pzj+zuR8OCQBoAFG1UsFp0QdcurG4BbTDlOmR3qW+cDG86/IbsZj4+IcVTbWGnEUuWCapH8mBqZG9k=
+	t=1715265525; cv=none; b=lZwrSnvkEc53f6y69yo1RuJcPip9fU91FK4jp+5Z0JUDLR169F6s2tde7Q84PUhtip9yXIIgbWL/n+V7awTzH+OkxhFpYvXFdVVIWM53PORpHj4QmJkuvfwu/0kE2J1Uqwk5QKv6mpKUlWa1g0d+afU0r51O5Qepw7nmJiZnn+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715265430; c=relaxed/simple;
-	bh=rX2HhaPr9XjslEz/iELt3o8cY4WdThK1YOL4qhZC7cc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QRAGVXflKo23MXxrT4s0g3rvzk1B1ammXFbwKKf24iKk4djWFb6RQ1RkQm/Hx5xZBCJxiWP5FsBA8xm5FjX43UgC0pcHjJO076wXtGmH7j46arixvQsVKe7FK9HFVd4GPvJeE5Hs7BYwmn0zY5m1Cfa93OjR1mfby0lemdt0JOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=NTo7eWSD; arc=none smtp.client-ip=209.85.166.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7d9ef422859so8308539f.0
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 07:37:07 -0700 (PDT)
+	s=arc-20240116; t=1715265525; c=relaxed/simple;
+	bh=PPPjdYb41uc7xIn+uvpRXVu5uZppou/3XJNhZ0cnn6I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ctWCg0GXdN7Xyn5ML+oG88tuFQBFlk+zeZZQBHQLL7vLwI9H6vS7wb++zoFBh9F7nSqRbN4iELnBxJV8KnUG22oIgnQJPfLRwbYe1/bCRnpaLuvjMVvNCohfwt4XqFFgIobE4sPt2vF3KtAIwCvqpHKj1iMaFktO9/degNSIq/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FACGXN/A; arc=none smtp.client-ip=209.85.219.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-de45385a1b4so849106276.3
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 07:38:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1715265427; x=1715870227; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qhunxhR/OF2icvm3HmEsNbbwCxzb74IsXbKxDT8qkPs=;
-        b=NTo7eWSDMbAgSOT7CINCmQClTKuqqKFXzf8sF9h8V2D/TL6uzIk6kNIRhOOZdzEMTW
-         mJ9+zmh148SCPZPrjx1yCxIGvBo6MHnlbazDh1HqKyqkHbDHYDUog3Z/huvB7M1KruTH
-         G4D/ZyTmCb4BjkMlKuDOLN5gYiVRGa28cjD1M=
+        d=linaro.org; s=google; t=1715265522; x=1715870322; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w2hqaVPgf9CmbqrYSPiHKb8A/h9/MLbbdKnirUGyoOI=;
+        b=FACGXN/A9kKILgtOSayxwkeNPk5LvMdGTG6QyPdT0D7X6zfls64xPhntkcphb49fhS
+         9btf6y5ZdwqRUvi/QOwZay56W7iDgHBRqIrRKchv5x5drMPHtnyJsNqDgl5geryBhU66
+         GsfFiHoyb6ZeyX6XRHuf7CCVWFIrlj1sqwm9V+RLApgvqmqeItWelzWIIcX+xBZBruTh
+         4Vwjv6YeiZAMA1lLQ135DYtststhtyalg1BRQ+mNEMxaWsuOVJB9rNuY5h8K5FgnNr8k
+         EddylJDZN3kqILyLvU+lnZD711tXdGr3oLpzozF2+b5VXwjJscyQI+/JBma1qeiKbTxH
+         /YgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715265427; x=1715870227;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qhunxhR/OF2icvm3HmEsNbbwCxzb74IsXbKxDT8qkPs=;
-        b=cNmMULm0uKeQ9JMwIaoaqGUXQqckub8JYyEs8LsU0aj0oH0w8TOgcUyRD1KMsvt0pD
-         VIL2tsJDGjtyl8iPhd68gCZVnPy5sACiwXZcMcND/T6GC9ilkN/I7x2LGpNyNJP5JzxF
-         PZUIYBOpbxAN1K7C3DMwbk2RbJzaP7Vm5N3KPcF7E7MNz2czlwwUZTd9+tSYYPjGDuMF
-         l6yI52w1hYn9QBQa9fB9hAizrT6phsqDylv0WJHcGrsNdeBLWERuufgP9xDcZSjJzi7B
-         79eUp0jd2pC91PvGTDlAyPQIQs7UtID1l41TzepUtHs8lhbKWqwdFLojQ+sWXraeTKB7
-         FXmg==
-X-Forwarded-Encrypted: i=1; AJvYcCWiukpe+NTpRKuL3HXUrozSkBIrQ8V0sH+gtLelwCzdoYO4tmWjhuQvtgCp5mQyCZWr1lYzt/QCoAnYF2KU7A9D8kjx6mJw
-X-Gm-Message-State: AOJu0YwpSwTUPjHlxXgDCGa86h0W1tL+jBO7tRhZTdTul67cTA34Dhgy
-	49m1T3Bc8E7+sKHzP331FaOEqhaZ0NV8fqo9wjAYXZUUyWZuS/MPSrfxSQAKJlA=
-X-Google-Smtp-Source: AGHT+IFLPV3hTUAqtiZSXFMZ3nZtJrVA8/PdzJcN3v/yjJF832scb22cGE7mYooNXziODVFLnPMOaA==
-X-Received: by 2002:a6b:e618:0:b0:7e1:86e1:cd46 with SMTP id ca18e2360f4ac-7e18fd9a35cmr655432839f.2.1715265426750;
-        Thu, 09 May 2024 07:37:06 -0700 (PDT)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4893703c0c8sm386684173.48.2024.05.09.07.37.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 May 2024 07:37:06 -0700 (PDT)
-Message-ID: <946ae22f-a4af-448a-92e1-60afb6ed9261@linuxfoundation.org>
-Date: Thu, 9 May 2024 08:37:03 -0600
+        d=1e100.net; s=20230601; t=1715265522; x=1715870322;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w2hqaVPgf9CmbqrYSPiHKb8A/h9/MLbbdKnirUGyoOI=;
+        b=tQ/kwgR2te6U9YiBvEgYX5BV0WGsEE5KzV8+CHC2TZcUdqIkaAvfzIKRQrPSX1y287
+         gWU4TarDyVXajsWov2tod/KDCvC6cQbzoZoR7zT0n8Rw8U7cNjAnSOG/IgaoI4YLrFHx
+         kpVY+QmNcEWNiXkjFjp1mm82e/ilbinCXx9udJMVsdHiMCJhyHsODhDXiAFSPNAK1Qfm
+         PS6sV9QElcz6OZ2EyQfla9ycpDbMyNc1dGqjE73iC4sSmYPMeq871G1KXaVYwNds7H9j
+         Oujf50EGU67ltWN7RtHLVwg5vq9xfeWBDqp4Kvcktog1G5P85gdeoBQ0DRrslNOpeVm8
+         bPgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWLQEVUquuFy/95iTABvJg0fl38G+knVxvvGDfeVSDLWRxsVkX3JLD+ACYFdWS4zXUPMgo1Ej3jK/Z8xY7Etv6ivbAoDT9F
+X-Gm-Message-State: AOJu0YwbQzIyJc9AghYLE/BHLfjfr7ZqRdRh8rWOp0t13W0fZMLRon+W
+	yf+UBxPu/GFSay0ekQhkMi2taheTgcpuLeMIgzpcNSRfNxkuErmfkD/dwude/buerRtnmv1E/o5
+	+qumQijSIuCOvYsg2vsHaInQbNJvfML/onabhdg==
+X-Google-Smtp-Source: AGHT+IEVnx7xug/dgb3VQgdriK0DzwoDdocU7f75Tv5ChH35g2t7VKHbquf2sXhm8yO4/ru5Dl/qsG5ab9YbksTc6EM=
+X-Received: by 2002:a25:a283:0:b0:de5:4ba0:5b61 with SMTP id
+ 3f1490d57ef6-debb9d6fd17mr5772893276.3.1715265522504; Thu, 09 May 2024
+ 07:38:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
-To: Edward Liaw <edliaw@google.com>
-Cc: shuah@kernel.org, Mark Brown <broonie@kernel.org>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Nhat Pham <nphamcs@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>,
- Christian Brauner <brauner@kernel.org>,
- Eric Biederman <ebiederm@xmission.com>, Kees Cook <keescook@chromium.org>,
- OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>,
- Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?=
- <andrealmeid@igalia.com>, Jiri Kosina <jikos@kernel.org>,
- Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>,
- Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
- <mic@digikod.net>, Paul Moore <paul@paul-moore.com>,
- James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
- Andrew Morton <akpm@linux-foundation.org>, Seth Forshee
- <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
- <afaerber@suse.de>, Manivannan Sadhasivam
- <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>,
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Fenghua Yu <fenghua.yu@intel.com>,
- Reinette Chatre <reinette.chatre@intel.com>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "Paul E. McKenney" <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Jarkko Sakkinen <jarkko@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Muhammad Usama Anjum <usama.anjum@collabora.com>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kernel-team@android.com, linux-sound@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
- linux-input@vger.kernel.org, iommu@lists.linux.dev, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
- linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
- linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>
-References: <20240507214254.2787305-1-edliaw@google.com>
- <f4e45604-86b0-4be6-9bea-36edf301df33@linuxfoundation.org>
- <CAG4es9XE2D94BNboRSf607NbJVW7OW4xkVq4jZ8pDZ_AZsb3nQ@mail.gmail.com>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <CAG4es9XE2D94BNboRSf607NbJVW7OW4xkVq4jZ8pDZ_AZsb3nQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240509-gemini-ethernet-fix-tso-v1-0-10cd07b54d1c@linaro.org>
+ <20240509-gemini-ethernet-fix-tso-v1-1-10cd07b54d1c@linaro.org> <CANn89iKgi6yEEenSy1M-PVRYWz=Ri9UorV7irCywOZ8xTbNk_A@mail.gmail.com>
+In-Reply-To: <CANn89iKgi6yEEenSy1M-PVRYWz=Ri9UorV7irCywOZ8xTbNk_A@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 9 May 2024 16:38:30 +0200
+Message-ID: <CACRpkdYyyQ_=2FmEe7FjDT-2BrhO5GezdXk35werHwBNA=uO=Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net: ethernet: cortina: Restore TSO support
+To: Eric Dumazet <edumazet@google.com>
+Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/9/24 00:13, Edward Liaw wrote:
-> On Wed, May 8, 2024 at 4:10 PM Shuah Khan <skhan@linuxfoundation.org> wrote:
->>
->> On 5/7/24 15:38, Edward Liaw wrote:
->>> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
->>> asprintf into kselftest_harness.h, which is a GNU extension and needs
->>> _GNU_SOURCE to either be defined prior to including headers or with the
->>> -D_GNU_SOURCE flag passed to the compiler.
->>>
->>> v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-edliaw@google.com/
->>> v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
->>> location.  Remove #define _GNU_SOURCE from source code to resolve
->>> redefinition warnings.
->>>
->>> Edward Liaw (5):
->>>     selftests: Compile kselftest headers with -D_GNU_SOURCE
->>>     selftests/sgx: Include KHDR_INCLUDES in Makefile
->>
->> I appled patches 1/5 and 2.5 - The rest need to be split up.
->>
->>>     selftests: Include KHDR_INCLUDES in Makefile
->>>     selftests: Drop define _GNU_SOURCE
->>>     selftests: Drop duplicate -D_GNU_SOURCE
->>>
->>
->> Please split these patches pwe test directory. Otherwise it will
->> cause merge conflicts which can be hard to resolve.
-> 
-> Hi Shuah,
-> Sean asked that I rebase the patches on linux-next, and I will need to
-> remove additional _GNU_SOURCE defines.  Should I send an unsplit v3 to
-> be reviewed, then split it afterwards?  I'm concerned that it will be
-> difficult to review with ~70 patches once split.
+On Thu, May 9, 2024 at 10:21=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+> On Thu, May 9, 2024 at 9:48=E2=80=AFAM Linus Walleij <linus.walleij@linar=
+o.org> wrote:
+> >
+> > An earlier commit deleted the TSO support in the Cortina Gemini
+> > driver because the driver was confusing gso_size and MTU,
+> > probably because what the Linux kernel calls "gso_size" was
+> > called "MTU" in the datasheet.
+> >
+> > Restore the functionality properly reading the gso_size from
+> > the skbuff.
+> >
+> > Tested with iperf3, running a server on a different machine
+> > and client on the device with the cortina gemini ethernet:
+> >
+> > Connecting to host 192.168.1.2, port 5201
+> > 60008000.ethernet-port eth0: segment offloading mss =3D 05a8 len=3D1c8a
+> > 60008000.ethernet-port eth0: segment offloading mss =3D 05a8 len=3D1c8a
+> > 60008000.ethernet-port eth0: segment offloading mss =3D 05a8 len=3D27da
+> > 60008000.ethernet-port eth0: segment offloading mss =3D 05a8 len=3D0b92
+> > 60008000.ethernet-port eth0: segment offloading mss =3D 05a8 len=3D2bda
+> > (...)
+> >
+> > It also performs well: ~268 MBit/s.
+>
+> This does not look very good to me ?
 
-Please send them split - it will be easier to review and apply. You
-might as well wait until the merge window is done. I don't think
-anybody would have time to review now since merge window starts
-next week.
+Oh it's pretty typical. This is an ARMv4 router from 2007, end-of-lifed
+in 2015, and it is not meant to be stressed by the software like
+this, the idea is that packets get routed by the DSA switch
+(RTL8366RB).
 
+> What number do you have when/if TSO is turned off ?
 
-thanks,
--- Shuah
+Around 187 MBit/s.
+
+> > +       /* Translate to link layer size */
+> > +       mss +=3D ETH_HLEN;
+> > +       if (skb->protocol =3D=3D htons(ETH_P_8021Q))
+> > +               mss +=3D VLAN_HLEN;
+>
+> Are you sure this is needed at all ?
+> Why not include IP and TCP header sizes as well, if the datasheet
+> mentions 'link layer size' ?
+
+Actually that code is just reusing the mss variable for
+skb->len in the case where TSO is not used, so I'll try to
+be more elaborate in the code :/
+
+I guess I actually need to account for it if ->gso_size expand
+to the MTU of the interface if I bump it up. But I don't
+know if the the TSO code actually does this or if it is
+more conservative?
+
+> To double check, please disable GRO on the receive side and verify the
+> packet sizes with tcpdump.
+>
+> Typically, for MTU=3D1500, IPv4, and TCP timestamp enabled,
+> skb_shinfo(skb)->gso_size is 1448
+>
+> (Because 20 (ipv4 header) + 32 (tcp header with TS option) + 1448 =3D 150=
+0)
+
+I disabled all segment offloading on the receiving side:
+ethtool -K enp2s0 gro off gso off tso off
+
+The iperf3 -c generates segmens like in the commit message:
+gemini-ethernet-port 60008000.ethernet-port eth0: segment offloading
+mss =3D 05a8 len=3D2bda
+gemini-ethernet-port 60008000.ethernet-port eth0: segment offloading
+mss =3D 05a8 len=3D27da
+gemini-ethernet-port 60008000.ethernet-port eth0: segment offloading
+mss =3D 05a8 len=3D0b92
+
+And 05a8 is 1448 so it is expected.
+
+tcpdump -e -X enp2s0 gives this on a single segment in a segmented
+iperf3 -c transfer:
+
+16:24:09.182095 14:d6:4d:a8:3c:4f (oui Unknown) > fc:34:97:01:a0:c6
+(oui Unknown), ethertype IPv4 (0x0800), length 1448: OpenWrt.lan.56624
+> Fecusia.targus-getdata1: Flags [.], seq 18664:20046, ack 1, win
+4198, options [nop,nop,TS val 2770370491 ecr 3490176978], length 1382
+    0x0000:  4500 059a 8ff6 4000 4006 218d c0a8 0188  E.....@.@.!.....
+    0x0010:  c0a8 0102 dd30 1451 a701 4f9d e809 8788  .....0.Q..O.....
+    0x0020:  8010 1066 0b60 0000 0101 080a a520 7fbb  ...f.`..........
+(...)
+    0x0580:  de60 2081 5678 4f8b 31b1 6f85 87fe ae63  .`..VxO.1.o....c
+    0x0590:  e2ca 8281 fa72 16aa 52e2                 .....r..R.
+
+As can be seen in the header, it is indeed 1448 bytes when arriving
+as well, so it seems to work!
+
+Yours,
+Linus Walleij
 
