@@ -1,140 +1,125 @@
-Return-Path: <netdev+bounces-94848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8227E8C0DA8
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:42:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7370B8C0DB1
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:43:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37F3A28389B
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 09:42:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 135F01F2166E
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 09:43:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C8F14A62D;
-	Thu,  9 May 2024 09:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676E414A632;
+	Thu,  9 May 2024 09:42:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g/f/Bj14"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VdfY67cz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A6F14A607;
-	Thu,  9 May 2024 09:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53AA14A62D;
+	Thu,  9 May 2024 09:42:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715247737; cv=none; b=FRlxHUV7Vg5fdbr6UMUUuWI5SLH/0f9g12P7HPFu3RMIJZPk0R6ocQN6kHgLWT0G6AuwlCUuxvcWSaHx7ROQDH/3rEev5zylOMFKNx+9vnahSk0ZRJcdGPJUuESB7VFIfMaVUQe1Wgb1x9mvBQCbV906Y3gcZix1KR02ikc8R3g=
+	t=1715247776; cv=none; b=BxtWsndYSSd+v/KMx1P9xdLQkRVrpqScasf6nJo2f/8AVT5vUFFE4JzyUVeuECUglNP+wxHk0sJhfhJEwTViH6/p3ZbKpOcUH51k3G76HEMRV+PcO8sLzfnQsCXMVFqHDmFiRt0/Dt9xyqMVClD29HeSYJdqtTHiTNKakXZxNbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715247737; c=relaxed/simple;
-	bh=vbUuMsQkpj5urNgjzxVGrL4w3lmYyfQUVbCuhNO8W8s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p2eZgKAuGFl8z0cfPJcBZxUoJ8e3vqAwsL8BHy+BDa/ns8ckl8ewJQtUOI9945cK1hyaIhTtTtT3MqAY057BBSWUEo0VinTaL5U6hInCpJjoz6t9JAleNXAIR4/EZcCubJQstJ3diDWD+Wx2oxIz0tIRn1qYRM5mmKyLbDl5pFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g/f/Bj14; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-41adf155cffso5187905e9.2;
-        Thu, 09 May 2024 02:42:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715247734; x=1715852534; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z06VK901YT4AA0mu0lKiHWnHF+lrDbqE9NkpBOX5zS0=;
-        b=g/f/Bj14qKl7veT8RA0Gwp4h3ex/SaY4sebWVwjUWmH+MU0mOjb7fNHJBCLvpW/CS0
-         +pBB+5lbIZ6w8e6M23pgTc3cKxx8WpZnLY+nd3+3ct13jTEjAEsp8/BOXrXXmvF0+1gb
-         p4EcxtwCKB3NCVLYAFLR/TqKhWkpRvhN/xULEGK58eNPD1/ckNXpp6L1EQ9am0sykFQk
-         9utkymvNQyJNKv7+r5xtkIrkuqf/HOBxHh/z3sPfcylHUEzJ9+8FpYeiWNqk7MPRRcWC
-         BrKDlwZwWrDNrZAgSw4lqB/d/GkbB6VJD5PmlVdR7i6012xoNZ/2q7RAgUC5pGUzb18z
-         5dVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715247734; x=1715852534;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z06VK901YT4AA0mu0lKiHWnHF+lrDbqE9NkpBOX5zS0=;
-        b=NUXKWVL5cIGisaBcvYPQv2mZni+x8l45nKH59YDh+U8WdnvdIZ2PcDDx4Qe00KHvYD
-         4Nu2jMLxj2WusJh6XmOGz5xnVKD0lE4d7TNXR6yDfr4sz9bwwh8N/sH/4s+WwIwn7yuB
-         pXS863AAMi2EKERxnXyU5RJWpQFF5DN0rRI1LnEH0kE+u/1AjgFt4CR4daDLvIGny29x
-         eIBeYN/6hE5j0YactTerj0evIpa+e3RsLPiH7R3AqUJm8E4vEJZ3y34Bvq1SIrDmcgMJ
-         EEEl+T6ZmBjuRGELBNyOphKQ/WAmsruY0UYJFHE6axK5eYtur4suHPuV70qVO2D81wgY
-         xBVA==
-X-Forwarded-Encrypted: i=1; AJvYcCUqnMDWfUxDH9BPQnBUsMRZ0VpfZ3KApV5I70qaxWKN6dfBmL5COhzt6FN+PNJCBFItq9OBXs9+mGaE8yfirsX5N8U5T4kwIZbO6096WOvlSH668lpaYyTRb7Vg+yaxnvSXaGfq1u41e1YlgVpDmKd4fkgzA1ybv08gQrRLNdL30w==
-X-Gm-Message-State: AOJu0YzmV42zMQKubAPsAfJkWmt2movN/wayjYpfCbPf4yf3e1raj2LV
-	t8xlXHukV+WD1f/u5KUFiqZCMFvPGqY6YTON8DPNoZN7C6URja+z
-X-Google-Smtp-Source: AGHT+IE54IK54ssMqput+/vf82wzC7v7aJy4IidT5pFMs/25AkJ6OlBZMh8Gl07P8/wcI7CPoGq3vw==
-X-Received: by 2002:a05:600c:1c12:b0:41b:f359:2b53 with SMTP id 5b1f17b1804b1-41f723a2496mr43829985e9.37.1715247733672;
-        Thu, 09 May 2024 02:42:13 -0700 (PDT)
-Received: from [172.27.51.192] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccce25d5sm19179325e9.14.2024.05.09.02.42.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 May 2024 02:42:13 -0700 (PDT)
-Message-ID: <05317efb-14e9-433b-b0b6-657a98500efd@gmail.com>
-Date: Thu, 9 May 2024 12:42:11 +0300
+	s=arc-20240116; t=1715247776; c=relaxed/simple;
+	bh=f0SYpwdoemCf5nkip/wAI+bWzfh+oJZhvTL4/f8DXiw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jrEUHqq7vkZ7Er2Mknf6RPxHJMdzUioOj4VH8wJACcDSOCGvEfFXcXFrYQkazJ9s4DZ93Ob7th5ZCotVAN2Xj09v8TuauzGydcta42O3RH/mKxsTYup95r3Xl1bAWj+h4s3UoiJQJoCKTx4SeiDL+/deLmdjtDGRKs6Fxq6SggQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=VdfY67cz; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4494fPwe022106;
+	Thu, 9 May 2024 02:42:32 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	date:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=pfpt0220; bh=I1JDod1XMZqhnsd6n1qqwr
+	NRTv97wHEp+l3xJ/+Dleg=; b=VdfY67czD6obZFxytoVJ7BblmzVbWEgkqI0E1L
+	urd1+GSFN3WZBqyY9oMppkj7rUiuEQUNK/mmaB+22jGO3j6WEnrlSAHxCiOu5vRR
+	sfJEglSt5dalXftKJcO82psuJpbWHkwzPp2UOwwOFLC8rAMIyVQb9YMXtPSwqcgT
+	1ka9/UJ5c6vE63BPZ9Q9RdOJptU21hlr00zMwMyZB1vsj9O/NclbReYz0ng82HiG
+	qL+ckX70nOyYq6N9MVmJXY0Cm0heEEOqk9wAJ5kSmkma3IXxBkgVF+AwdNMdVDWc
+	DU9AjRlbH6oMI1aqBWwePLCC55MLhLYA+asOxadueNrb6hHQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3y0qpbsf0s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 May 2024 02:42:31 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 9 May 2024 02:42:30 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 9 May 2024 02:42:30 -0700
+Received: from maili.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 6E4E53F7063;
+	Thu,  9 May 2024 02:42:26 -0700 (PDT)
+Date: Thu, 9 May 2024 15:12:25 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+CC: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>,
+        Jonathan Corbet
+	<corbet@lwn.net>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Randy Dunlap
+	<rdunlap@infradead.org>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Breno
+ Leitao <leitao@debian.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH net-next v3] net: Add sysfs atttribute for max_mtu
+Message-ID: <20240509094225.GA1078660@maili.marvell.com>
+References: <1715245883-3467-1-git-send-email-shradhagupta@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
-To: Joe Damato <jdamato@fastly.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Zhu Yanjun <zyjzyj2000@gmail.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, saeedm@nvidia.com,
- gal@nvidia.com, nalramli@fastly.com, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Leon Romanovsky <leon@kernel.org>,
- "open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Tariq Toukan <tariqt@nvidia.com>
-References: <20240503022549.49852-1-jdamato@fastly.com>
- <c3f4f1a4-303d-4d57-ae83-ed52e5a08f69@linux.dev>
- <ZjUwT_1SA9tF952c@LQ3V64L9R2> <20240503145808.4872fbb2@kernel.org>
- <ZjV5BG8JFGRBoKaz@LQ3V64L9R2> <20240503173429.10402325@kernel.org>
- <ZjkbpLRyZ9h0U01_@LQ3V64L9R2>
- <8678e62c-f33b-469c-ac6c-68a060273754@gmail.com>
- <ZjwJmKa6orPm9NHF@LQ3V64L9R2>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <ZjwJmKa6orPm9NHF@LQ3V64L9R2>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1715245883-3467-1-git-send-email-shradhagupta@linux.microsoft.com>
+X-Proofpoint-GUID: 42nSExTnEKBldjj6ItdnZ2N6vzg4Kipz
+X-Proofpoint-ORIG-GUID: 42nSExTnEKBldjj6ItdnZ2N6vzg4Kipz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-09_05,2024-05-08_01,2023-05-22_02
 
-..
+On 2024-05-09 at 14:41:23, Shradha Gupta (shradhagupta@linux.microsoft.com) wrote:
+> For drivers like MANA, max_mtu value is populated with the value of
+> maximum MTU that the underlying hardware can support.
+IIUC, this reads dev->mtu. you can read the same using ifconfig, or any thing that uses
+SIOCGIFMTU. why do you need to add a new sysfs ?
 
->> The off-channels queues (like PTP) do not exist in default. So they are out
->> of the game unless you explicitly enables them.
-> 
-> I did not enable them, but if you saw the thread, it sounds like Jakub's
-> preference is that in the v2 I include the PTP stats in get_base_stats.
-> 
-> Are you OK with that?
-
-Sounds good.
-
-> Are there other queue stats I should include as well?
-> 
-
-The QOS/HTB queues.
-See mlx5e_stats_grp_sw_update_stats_qos.
-
->> A possible reason for this difference is the queues included in the sum.
->> Our stats are persistent across configuration changes, so they doesn't reset
->> when number of channels changes for example.
->>
->> We keep stats entries for al ring indices that ever existed. Our driver
->> loops and sums up the stats for all of them, while the stack loops only up
->> to the current netdev->real_num_rx_queues.
->>
->> Can this explain the diff here?
-> 
-> Yes, that was it. Sorry I didn't realize this case. My lab machine runs a
-> script to adjust the queue count shortly after booting.
-> 
-> I disabled that and re-ran:
-> 
->    NETIF=eth0 tools/testing/selftests/drivers/net/stats.py
-> 
-> and all tests pass.
-> 
-
-Great!
+> Exposing this attribute as sysfs param, would be helpful in debugging
+> and customization of config issues with such drivers.
+>
+> --- a/net/core/net-sysfs.c
+> +++ b/net/core/net-sysfs.c
+> @@ -114,6 +114,7 @@ NETDEVICE_SHOW_RO(addr_len, fmt_dec);
+>  NETDEVICE_SHOW_RO(ifindex, fmt_dec);
+>  NETDEVICE_SHOW_RO(type, fmt_dec);
+>  NETDEVICE_SHOW_RO(link_mode, fmt_dec);
+> +NETDEVICE_SHOW_RO(max_mtu, fmt_dec);
+>
+>  static ssize_t iflink_show(struct device *dev, struct device_attribute *attr,
+>  			   char *buf)
+> @@ -660,6 +661,7 @@ static struct attribute *net_class_attrs[] __ro_after_init = {
+>  	&dev_attr_ifalias.attr,
+>  	&dev_attr_carrier.attr,
+>  	&dev_attr_mtu.attr,
+> +	&dev_attr_max_mtu.attr,
+>  	&dev_attr_flags.attr,
+>  	&dev_attr_tx_queue_len.attr,
+>  	&dev_attr_gro_flush_timeout.attr,
+> --
+> 2.34.1
+>
 
