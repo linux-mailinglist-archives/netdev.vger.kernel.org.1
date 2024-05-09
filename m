@@ -1,97 +1,103 @@
-Return-Path: <netdev+bounces-94778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28BF28C09FF
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 05:11:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE2678C0A02
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 05:13:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9C6D1F2216D
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 03:11:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF5C01C214F3
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 03:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B2D12BEA4;
-	Thu,  9 May 2024 03:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3625313C3F9;
+	Thu,  9 May 2024 03:13:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="O87Cd2ap"
 X-Original-To: netdev@vger.kernel.org
-Received: from bg5.exmail.qq.com (bg5.exmail.qq.com [43.155.80.173])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC326D517
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 03:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.155.80.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700CDD517;
+	Thu,  9 May 2024 03:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715224282; cv=none; b=PUtYDI1CGqrKOw8a42J+Jbzfo89T+CkmNKggf5eF+mSanbUSmFhsQ6exvZu7Z6qx7/tQbqJCUU8W0/BKT1pwBVMDE+psD/MCEHJc/P/vc9+pP/tYad6eDCo2zxbED5cEE8ycXu/6pgM6xtdrOEurj8/kum9SQztpzSPw8XIFXMQ=
+	t=1715224392; cv=none; b=ogwcolegQLjz487lBT0n4RuL7wxEzwsGN3QtYxbSQjoittF5mofn4cUxGzEP1H8Ib4CVC1cUTJOQiVsDdh4+M+8BauHuNZMoq8ywIZGVkV14iltaS7SIdoT/L3ECordqc8qSgN0PLcfkUtQHj7AEY8dMVLIu3+ocFkJHXYOWvfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715224282; c=relaxed/simple;
-	bh=H8MQ9Mah0/xDsu2ucPyYx6dqcLcNSYA4l5IWtkDVZKU=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=C+XocXRZCXSxLDUd/EVza2OEuA9rmrG4jwjR6r27B/pbIUPjGlEZ/MhFpCjpOjDbYbrSQ+8Iqy8Yw8GaXVzPbOttLLcj0MVwPdXmhXdwHewaLFHfzvYOoob/sFv+WsUwjK3dNgbhfPTBnh7DFVlo2GhWQ0kPE4RUTQCtjiJjXqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=43.155.80.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas12t1715224127t058t23064
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [183.129.236.74])
-X-QQ-SSF:00400000000000F0FUF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 7894192083632368795
-To: "'Simon Horman'" <horms@kernel.org>
-Cc: <davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<rmk+kernel@armlinux.org.uk>,
-	<andrew@lunn.ch>,
-	<netdev@vger.kernel.org>,
-	<mengyuanlou@net-swift.com>,
-	<duanqiangwen@net-swift.com>
-References: <20240429102519.25096-1-jiawenwu@trustnetic.com> <20240429102519.25096-5-jiawenwu@trustnetic.com> <20240502092526.GD2821784@kernel.org>
-In-Reply-To: <20240502092526.GD2821784@kernel.org>
-Subject: RE: [PATCH net v2 4/4] net: txgbe: fix to control VLAN strip
-Date: Thu, 9 May 2024 11:08:46 +0800
-Message-ID: <00a301daa1be$34d98620$9e8c9260$@trustnetic.com>
+	s=arc-20240116; t=1715224392; c=relaxed/simple;
+	bh=7aBwxO2CipScIGLBEjHWmQgZZx67CZNWp8onHyyobcM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p0zij9PbNsygCYCFZoQZKbYCGZ1bmlyoxbl4+G1rYS4kPBASp6gorTdIVpuxUrG0F6jl6eEhJ0d53cayCy2LGthUTaRCNTzfckdP+LuIS0c7n2jjfl8DwakSZjIWDoLIIiOgvSX8gSLlqwhdsdtACVlrdv85zQe/pd33dLLE7oI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=O87Cd2ap; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 448NOrbp003000;
+	Wed, 8 May 2024 20:12:59 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	date:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=pfpt0220; bh=NIN1SoqsKzzoR1CfLY8RZC
+	nwsAX8ymAGByQHK0QnZHA=; b=O87Cd2apgUI/luHEUjpzz7eLB5961pH5ddIQbP
+	vqQBGLla7b9C9Qh/7jeNVyWaURNz3Um5Egq3Id852F4gZkUDHor3JNQdBfa6dOT+
+	Q4HeaAOeiaxRtd4cKgYVP16kJxBSj5ZgfeKCvI89a7pQKgWxEVtN8MugAVvp/piB
+	RugysNPV7IIFR3tOURe2EGzIBiarQxPCvUuXvZEVhqZOvC3EqxRAY2IrbzZdGwFm
+	h/QDvopSvXLgIsG383jjOpbr/gwq/yBDf2+qtk/ZYMZNWoyWeEFxMHQo3liPZHAk
+	mCrHDyyhj4bm2WldGGKUAKRSHmxSBXgU1HFlY0U/ARvqoHbA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3y0b2d321n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 May 2024 20:12:58 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 8 May 2024 20:12:58 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 8 May 2024 20:12:58 -0700
+Received: from maili.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id EC58F5B6D03;
+	Wed,  8 May 2024 20:12:54 -0700 (PDT)
+Date: Thu, 9 May 2024 08:42:53 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Duoming Zhou <duoming@zju.edu.cn>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-hams@vger.kernel.org>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <edumazet@google.com>, <davem@davemloft.net>, <jreuter@yaina.de>,
+        <dan.carpenter@linaro.org>
+Subject: Re: [PATCH net v6 1/3] ax25: Use kernel universal linked list to
+ implement ax25_dev_list
+Message-ID: <20240509031253.GA1077013@maili.marvell.com>
+References: <cover.1715219007.git.duoming@zju.edu.cn>
+ <d52c1f4dbd6e09769007233aa343010e98c85f0d.1715219007.git.duoming@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQKMAc/6KzgCZu6RyYLqheGkGVll8gG5kjUzARbteTiwFO7YYA==
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <d52c1f4dbd6e09769007233aa343010e98c85f0d.1715219007.git.duoming@zju.edu.cn>
+X-Proofpoint-GUID: l2QN4S6jGK8w_e9CzPGmE2I-1-2mgNaB
+X-Proofpoint-ORIG-GUID: l2QN4S6jGK8w_e9CzPGmE2I-1-2mgNaB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-08_10,2024-05-08_01,2023-05-22_02
 
-> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> > index aefd78455468..ed6a168ff136 100644
-> > --- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> > @@ -2692,9 +2692,9 @@ int wx_set_features(struct net_device *netdev, netdev_features_t features)
-> >
-> >  	netdev->features = features;
-> >
-> > -	if (changed &
-> > -	    (NETIF_F_HW_VLAN_CTAG_RX |
-> > -	     NETIF_F_HW_VLAN_STAG_RX))
-> > +	if (wx->mac.type == wx_mac_sp && changed & NETIF_F_HW_VLAN_CTAG_RX)
-> > +		wx->do_reset(netdev);
-> > +	else if (changed & (NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_CTAG_FILTER))
-> >  		wx_set_rx_mode(netdev);
-> >
-> >  	return 0;
-> 
-> Hi Jiawen Wu,
-> 
-> NETIF_F_HW_VLAN_CTAG_RX appears in both the "if" and "if else" condition.
-> Should "if else" be changed to "if" ?
+On 2024-05-09 at 07:26:12, Duoming Zhou (duoming@zju.edu.cn) wrote:
+>  		if (ax25cmp(addr, (const ax25_address *)ax25_dev->dev->dev_addr) == 0) {
+>  			res = ax25_dev;
+>  			ax25_dev_hold(ax25_dev);
+> @@ -52,6 +53,9 @@ void ax25_dev_device_up(struct net_device *dev)
+>  {
+>  	ax25_dev *ax25_dev;
+>
+> +	/* Initialized the list for the first entry */
+> +	if (!ax25_dev_list.next)
+will there be any case where this condition is true ? LIST_HEAD() or list_del() will never
+make this condition true.
 
-There are 4 cases where wx_set_rx_mode() is called, CTAG_RX and CTAG_FILTER
-combined with wx_mac_sp and wx_mac_em. But only one special case that
-changing CTAG_RX requires wx_mac_sp device to do reset, and wx_set_rx_mode()
-also will be called during the reset process. So I think "if else" is more appropriate
-here.
-
-
+> +		INIT_LIST_HEAD(&ax25_dev_list);
+>  	ax25_dev = kzalloc(sizeof(*ax25_dev), GFP_KERNEL);
+>
 
