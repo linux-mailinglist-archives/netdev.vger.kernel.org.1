@@ -1,172 +1,87 @@
-Return-Path: <netdev+bounces-94755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E1ED8C0962
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 03:54:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 378B58C096C
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 03:56:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC1E8B216D0
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 01:54:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 689341C21355
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 01:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B24913D514;
-	Thu,  9 May 2024 01:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="GpYwT3ly"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D818313C830;
+	Thu,  9 May 2024 01:56:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C347413D280;
-	Thu,  9 May 2024 01:53:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+Received: from zg8tmja5ljk3lje4ms43mwaa.icoremail.net (zg8tmja5ljk3lje4ms43mwaa.icoremail.net [209.97.181.73])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D3B13C8E9;
+	Thu,  9 May 2024 01:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.181.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715219603; cv=none; b=a2K3b9DcAHaM5+lAo6VhbwNV6JpQajzG4Lex2WGhYr0UDBYxY3GWO5Fs4sEEwyFUqLYCiW5Rgnk9lSQJvNMMkIg3BUmXt/29QzBzxPV6ZZ6iFmHZA33bxQpx5/YwJiCi/PcX3aGnHwmnxVKjtDP34Bik96EzD1G5r+Or80iDG+A=
+	t=1715219778; cv=none; b=hCrWZTyn2ZSR7jLlCqeUy3pCoqghV7JOgQiRQ+GBClAQIYwzikXn2fvsitpopSQPXIIHZVCnaBtdOkBzk14qEuptjegMufTKAX1DvcdkfD4q5KWpw/0a4FSEsQh0ZPZsD3hr6YvkkswwdjyOcHeuE0FY1lFhbbKOAUHYHryk7Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715219603; c=relaxed/simple;
-	bh=nhF5Rqpf1Sh/E7F/InVEqc1GzOa/hK+3b/qJDEK0PdM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Cloz6ZkoIM4JUlK658Q7vWDyU4iwHXIOcs1MNFg1RdcB0wCgSO0zSuyuq96egOw2J1bHuqelmdWhWAHeMh1o6w5HpW6SbYC76jn1WaXfW383/LaHb5zJNLhIeaIaHTdtxAduR2lLyt1wyr8yN2a+ujm2J0cPkeZdUrT+RR03YUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=GpYwT3ly; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1715219592;
-	bh=WpdW4zqAGBKvnQv0jKzuhtnmm8jG3qKhG4SNIVAsBt4=;
-	h=Date:From:To:Cc:Subject:From;
-	b=GpYwT3lyREGArozTLTrWqQSSnAQQMhHVI6/9zkqD5S4MCB/UDXvcKRxBFKdNiSXtR
-	 YWOYU3nPg+rtTWsOsXILkTBQQeIXLm9h7IfpwEdu8PI0Gq7B/xdmu7D9GpkCyJdrCa
-	 tQjFoJ6KJTKcpupzgeSvRj44xrjTLbsCer/CzLXi4DqZpmpdTfqZYeBEJD758ZXazc
-	 WnXoXJ5OV34fXQ8w1iyxodyyZA8VV2n8UJui4E9GB9cPh+KKBZ5GSZVfvmrQMTWlEj
-	 ZKtTrYPYLY311CcTvOD/v8LZMgDGNt7VW7EohpCmIXjqBMq9W1OokHmBKkJtK5gp60
-	 WFaQbHKq6Bzuw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VZZm72g4Nz4x30;
-	Thu,  9 May 2024 11:53:10 +1000 (AEST)
-Date: Thu, 9 May 2024 11:53:07 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Networking <netdev@vger.kernel.org>, Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net-next tree with the dma-mapping
- tree
-Message-ID: <20240509115307.71ae8787@canb.auug.org.au>
+	s=arc-20240116; t=1715219778; c=relaxed/simple;
+	bh=D0lEga4NzrSPnmmB5RQnDioLVs1XusUapUufvpV91n4=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=He+tFHV2rhYNt0SO6PE0mskhcKxBx5SIBYnJLgvYeYUQYpeaRdT5EC5bD9aaVNxh+vnj2uo8kJ/F/6hEWdTOjMQftISOKkYRdDLFQ+5ogaHrmK56/5hMirhOztJaF0IkCpduaLEMixeRzY8S8WekhfXwV4UJbuFd3suPqyIisqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=209.97.181.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from ubuntu.localdomain (unknown [221.192.180.131])
+	by mail-app4 (Coremail) with SMTP id cS_KCgC3Q7EuLTxmaElMAA--.47540S2;
+	Thu, 09 May 2024 09:56:01 +0800 (CST)
+From: Duoming Zhou <duoming@zju.edu.cn>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-hams@vger.kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	jreuter@yaina.de,
+	dan.carpenter@linaro.org,
+	Duoming Zhou <duoming@zju.edu.cn>
+Subject: [PATCH net v6 0/3] ax25: Fix issues of ax25_dev and net_device
+Date: Thu,  9 May 2024 09:55:56 +0800
+Message-Id: <cover.1715219007.git.duoming@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cS_KCgC3Q7EuLTxmaElMAA--.47540S2
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYW7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVWxJr0_GcWl84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2js
+	IEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE
+	5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeV
+	CFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l
+	FIxGxcIEc7CjxVA2Y2ka0xkIwI1lc2xSY4AK67AK6w4l42xK82IYc2Ij64vIr41l4c8EcI
+	0Ec7CjxVAaw2AFwI0_Jw0_GFyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
+	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
+	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
+	6r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
+	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUFVyIUUUU
+	U
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwIQAWY7nwoGrwAGs3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/NuBy9ZQeB44PQ22KF2SbEhf";
- protocol="application/pgp-signature"; micalg=pgp-sha256
 
---Sig_/NuBy9ZQeB44PQ22KF2SbEhf
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The first patch uses kernel universal linked list to implement
+ax25_dev_list, which makes the operation of the list easier.
+The second and third patch fix reference count leak issues of
+the object "ax25_dev" and "net_device".
 
-Hi all,
+Duoming Zhou (3):
+  ax25: Use kernel universal linked list to implement ax25_dev_list
+  ax25: Fix reference count leak issues of ax25_dev
+  ax25: Fix reference count leak issues of net_device
 
-Today's linux-next merge of the net-next tree got a conflict in:
+ include/net/ax25.h  |  3 +--
+ net/ax25/ax25_dev.c | 50 ++++++++++++++++-----------------------------
+ 2 files changed, 19 insertions(+), 34 deletions(-)
 
-  net/core/page_pool.c
+-- 
+2.17.1
 
-between commit:
-
-  4321de4497b2 ("page_pool: check for DMA sync shortcut earlier")
-
-from the dma-mapping tree and commit:
-
-  ef9226cd56b7 ("page_pool: constify some read-only function arguments")
-
-from the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc net/core/page_pool.c
-index 4f9d1bd7f4d1,8bcc7014a61a..000000000000
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@@ -398,26 -384,16 +399,26 @@@ static struct page *__page_pool_get_cac
-  	return page;
-  }
- =20
- -static void page_pool_dma_sync_for_device(const struct page_pool *pool,
- -					  const struct page *page,
- -					  unsigned int dma_sync_size)
- +static void __page_pool_dma_sync_for_device(const struct page_pool *pool,
-- 					    struct page *page,
-++					    const struct page *page,
- +					    u32 dma_sync_size)
-  {
- +#if defined(CONFIG_HAS_DMA) && defined(CONFIG_DMA_NEED_SYNC)
-  	dma_addr_t dma_addr =3D page_pool_get_dma_addr(page);
- =20
-  	dma_sync_size =3D min(dma_sync_size, pool->p.max_len);
- -	dma_sync_single_range_for_device(pool->p.dev, dma_addr,
- -					 pool->p.offset, dma_sync_size,
- -					 pool->p.dma_dir);
- +	__dma_sync_single_for_device(pool->p.dev, dma_addr + pool->p.offset,
- +				     dma_sync_size, pool->p.dma_dir);
- +#endif
- +}
- +
- +static __always_inline void
- +page_pool_dma_sync_for_device(const struct page_pool *pool,
-- 			      struct page *page,
-++			      const struct page *page,
- +			      u32 dma_sync_size)
- +{
- +	if (pool->dma_sync && dma_dev_need_sync(pool->p.dev))
- +		__page_pool_dma_sync_for_device(pool, page, dma_sync_size);
-  }
- =20
-  static bool page_pool_dma_map(struct page_pool *pool, struct page *page)
-@@@ -708,10 -688,11 +710,9 @@@ __page_pool_put_page(struct page_pool *
-  	if (likely(__page_pool_page_can_be_recycled(page))) {
-  		/* Read barrier done in page_ref_count / READ_ONCE */
- =20
- -		if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
- -			page_pool_dma_sync_for_device(pool, page,
- -						      dma_sync_size);
- +		page_pool_dma_sync_for_device(pool, page, dma_sync_size);
- =20
-- 		if (allow_direct && in_softirq() &&
-- 		    page_pool_recycle_in_cache(page, pool))
-+ 		if (allow_direct && page_pool_recycle_in_cache(page, pool))
-  			return NULL;
- =20
-  		/* Page found as candidate for recycling */
-
---Sig_/NuBy9ZQeB44PQ22KF2SbEhf
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmY8LIMACgkQAVBC80lX
-0GyoaQf/ezrpddH1WzyhXEMQYeGAg/CF1ZTKsowhF5XlCdn+JLEPJdmubXK/zClx
-+CwSlhUDqXIENzGzmQtGFmZQ2lTCKcfrREz+0LPCbrLVm3w2mvuFpzXv2ywncPz+
-isqeCsKePHKAYo7n25wM28Swzgm/nzyXMGLpkdlUCCGOpfa4iG7EtDkuffqnkG1P
-o1DsjAWiWSnDnm/1Ug5WEV8zO+V6YWDr683LKbuPH49o+52FisC89Zs+ezMFN3wT
-hp8EHfIIVTk2enZK2ZWko3mDbr5Zwlpf85VWoeGA4rIblxIWaC8zHlS56VReI8Re
-l6oXl3MZkt6OUWjwwGP6Hy/7Orw/AQ==
-=oTxH
------END PGP SIGNATURE-----
-
---Sig_/NuBy9ZQeB44PQ22KF2SbEhf--
 
