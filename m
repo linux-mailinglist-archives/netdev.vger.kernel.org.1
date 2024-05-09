@@ -1,146 +1,144 @@
-Return-Path: <netdev+bounces-94852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82F598C0DD0
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:53:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3E998C0DE5
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:59:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 327F228481D
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 09:53:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FF6E283ACE
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 09:59:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A066B14AD14;
-	Thu,  9 May 2024 09:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="OYvu2Ya8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92BA14AD26;
+	Thu,  9 May 2024 09:59:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E1314A638
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 09:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A95F14AD1A;
+	Thu,  9 May 2024 09:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715248379; cv=none; b=BmWIFeCGDftCeFCQ1nHlMWvhMtupjrnEhxzLdu+wk8BBNMkbOOtWrB3tAaiaRPWMs2az3lupHAttDE8fVOpbJkIYNIolNBht7tcn1PPzYUz3WTt5dw4rXyVjxUEMlrqFaNgGdbPp0kNj5tRYY41p2L2peSAiHYOktCZP5llqlUo=
+	t=1715248774; cv=none; b=kLPMb/V+EMG+3KEavF+f8NgvHQ6hw4l9W6NuRm7s8xSCb4valSUDV/JGDyUU1wiKCWDBFCEWqNZaDjegG7X7ZuuI0Um4OGafPJQCxA2A4h/J6eb6ahtVqlgrZnwjdqbdYo+iQ1FcGo2ZdtuieCh7kSpHbc3mrnU5fSvffTKtexs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715248379; c=relaxed/simple;
-	bh=BPiNM3gYqrPLiegyXLabr7dBcPmIHHf8dlo7Qk1EMu0=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=YLixs5UAaOTF8arBPE8vTDXscngfDL6U3FZmHQbWDkF8WPN7vv85gWmTS3ownKfPHLm9ffQl1rp5blSvA7V6iul85O9YDbCmTcYzoStJbNamkQcP5s9gOcSHagCsYrSnJBpGJBvW8IfVIeC1vkutEc+ICwgCNIPxNK0htbmpbIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=OYvu2Ya8; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1715248367; x=1715853167; i=hfdevel@gmx.net;
-	bh=BPiNM3gYqrPLiegyXLabr7dBcPmIHHf8dlo7Qk1EMu0=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:From:To:
-	 Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=OYvu2Ya8JIHkEiPV6FhHi+K3IfCHTdF1qFE1n44QdMiQ3xtKxJ8XYQg+GfehENkd
-	 VPNw9EYruyopcd/03SbIhIbgSb5QsGYC7ph/GYdzQN0At9u51HMbw1EPBgM5YhOap
-	 qFQFlrfXEyv6kYcDWOtRdyv9iw8Jx6E6lQeJtm7wcXOj619Z1RVa1l5p40bFJ1k8a
-	 WoTCYOjuGPPuV2992K+dLC4uS9BVdBZ+1XArVHb7CTKzyYFs5P1WDFkU4QOl0IIqB
-	 0jaF0/LQaFjCIFfohZ7LjCDRljb5FUYYO+nZQFUALUofH7o5fdd6VrWPILWLsecXl
-	 YV/VpxiCgx4Lw/1zpA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1M2f5Z-1s2WPZ3WAx-0048p8; Thu, 09
- May 2024 11:52:46 +0200
-Message-ID: <6388dcc8-2152-45bd-8e0f-2fb558c6fce9@gmx.net>
-Date: Thu, 9 May 2024 11:52:46 +0200
+	s=arc-20240116; t=1715248774; c=relaxed/simple;
+	bh=dtQ5WtrGDhIWgT1qeZF8014MTF0JeO8/hPqjUWcHDGY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DHd44pzcD+A+i5/wl2GdIW/Z1RMA0wAhi38l8AvfKC65aOIuDNQaU/xV3ifyGD37rgEXV4eSnK6CLVPp79m+Qnmis0O/SqbC5abtbeBs32wsqZiGddoOWiIWyznwYJ831R+lrqpreKCzg0HiWvoNGutFoZWvzniXUU1zuRqvwZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4499x4Jd91475338, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 4499x4Jd91475338
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 9 May 2024 17:59:04 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 9 May 2024 17:59:04 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 9 May 2024 17:59:04 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Thu, 9 May 2024 17:59:04 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "andrew@lunn.ch" <andrew@lunn.ch>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org" <horms@kernel.org>,
+        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v18 02/13] rtase: Implement the .ndo_open function
+Thread-Topic: [PATCH net-next v18 02/13] rtase: Implement the .ndo_open
+ function
+Thread-Index: AQHaoUT5RWh4TO7cuUeh1vkT8i8o3LGN87+AgACfZICAAApUsIAADPfg
+Date: Thu, 9 May 2024 09:59:04 +0000
+Message-ID: <feeecf2edbe54d999b09068718e9c8b5@realtek.com>
+References: <20240508123945.201524-1-justinlai0215@realtek.com>
+ <20240508123945.201524-3-justinlai0215@realtek.com>
+ <20240509065747.GB1077013@maili.marvell.com>
+ <9267c5002e444000bb21e8eef4d4dc07@realtek.com>
+ <MWHPR1801MB19187C10FEBB29BDACE499B1D3E62@MWHPR1801MB1918.namprd18.prod.outlook.com>
+In-Reply-To: <MWHPR1801MB19187C10FEBB29BDACE499B1D3E62@MWHPR1801MB1918.namprd18.prod.outlook.com>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 5/6] net: tn40xx: add mdio bus support
-From: Hans-Frieder Vogt <hfdevel@gmx.net>
-To: Andrew Lunn <andrew@lunn.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org, kuba@kernel.org,
- jiri@resnulli.us, pabeni@redhat.com
-References: <1f28bc3c-3489-4fc7-b5de-20824631e5df@gmx.net>
- <12394ae6-6a2d-4575-9ba1-1b39ca983264@lunn.ch>
- <71d4a673-73b6-4ebe-a669-de3ae6c9af5f@gmx.net>
-Content-Language: en-US
-In-Reply-To: <71d4a673-73b6-4ebe-a669-de3ae6c9af5f@gmx.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:HpmZrhPT0KAISimDwgkfyAOFMa+Cb5MHTsac1pnPpQK/XDktIy9
- +R0iiXx+LW+ZAAQkjZzcgXFEdNxMQg5sfSYp0ww5TYJfvwRnsHHLjG4tXTWjMj9iRzGnOG7
- GqgUidoqKLXTu1tLEGezsGMip5pIAsiV4ZbXyNkrGS+OxEx631loKCKCVDwDNFy39yKYCnT
- xzEDwYvPjrSXgtlLK4anA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:gRXp8N4FzSg=;3f1hoVHA1PnZxf5sfAn4vPEn5MZ
- /ods3eR6vly1aPkGg4n9j3gka3HLGaKJRuqYCORvQOr46ZcBaFhsjPMgG0IjU6ia2TfnJVfni
- xh9DA51538JNCoSm6x2HAERK1UjsIIsEguBYLN3w6rkSbOJpCYgVb4fhh9T03NHoFk/YfMDDt
- lxR1xliwJlucSO0NaN9cdPK7sn06RYFme/Xp6EGCpNaFS6DqaFv8uxGrS2Ho/nO0Xy0gzUMUt
- Wl9ZhmdH5gLqvIdnzWQCLPyZ1A/M8AakP7nc1mrB+8m6UOD1V7dUOCcCOD7myWfRbsIpoq+hm
- /eT2zdI6s9pJQHrxbjA0oZMT7BLEiJpF0PT0ILnqvB7yRdlydBQto9fYhV7SfEosUDzmBmpPa
- BKZtGgmUeOT1cD4bdmqEnMt2P1E4t3pdQRFls1GnfDZns9jfWf2RNq6RSOdXZlciJgPz9NzuR
- G1reiL1xlT9m3G0JHSQu9tUZqXfWQlcklldKImulXsIjwmO9uPiu2XenVYJp7qCYobXYvD2oG
- pIc+T5XtfiVNbsiFxm40qIZn5chWP0DT/GyzFwsd71PD5bj/81KaOQpeJ66tWhTcB69T5u+u5
- tkVEXymX+7W1OrmwQYP0pb56L0TqLGb+qHOlfJuZ/R6gPBerJD6XerS6nPGtpu/nRmyVXeClH
- kpz0UqS021MSKq20HNG7XjrEq9Gpx+q3/42R+zxsbZtTkjSmeDWSQnVWEBXfZqVgFovecZFe/
- Nsxplme4f94N17QcvAi57O4XXULSCr2z+2vawC9fkmkuVfO40D6Y4rqAlZgprs9ngglPCmFr0
- wzAnSmxxNf+G7QbkC/OXwIBwChQkD/xQB7nGZuikN+tcs=
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On 08.05.2024 21.30, Hans-Frieder Vogt wrote:
+>=20
+> > From: Justin Lai <justinlai0215@realtek.com>
+> > Sent: Thursday, May 9, 2024 2:29 PM
+> > > > +
+> > > > +     /* rx and tx descriptors needs 256 bytes alignment.
+> > > > +      * dma_alloc_coherent provides more.
+> > > > +      */
+> > > > +     for (i =3D 0; i < tp->func_tx_queue_num; i++) {
+> > > > +             tp->tx_ring[i].desc =3D
+> > > > +                             dma_alloc_coherent(&pdev->dev,
+> > > > +
+> > > RTASE_TX_RING_DESC_SIZE,
+> > > > +
+> > > &tp->tx_ring[i].phy_addr,
+> > > > +
+> GFP_KERNEL);
+> > > > +             if (!tp->tx_ring[i].desc)
+> > > You have handled errors gracefully very where else. why not here ?
+> >
+> > I would like to ask you, are you referring to other places where there
+> > are error description messages, but not here?
+> other functions, you are freeing allocated resources in case of failure, =
+but here,
+> you are returning error directly.
+>=20
+After returning the error, I will do the corresponding error handling in rt=
+ase_open.
+.
+>=20
+> > > Did you mark the skb for recycle ? Hmm ... did i miss to find the cod=
+e ?
+> > >
+> > We have done this part when using the skb and before finally releasing
+> > the skb resource. Do you think it would be better to do this part of
+> > the process when allocating the skb?
+> i think, you added skb_for_recycle() in the following patch. Sorry I miss=
+ed it .
+> ignore my comment.
+>=20
 
-> On 08.05.2024 20.25, Andrew Lunn wrote:
->>>> +=C2=A0=C2=A0=C2=A0 writel(((1 << 15) | i), regs + TN40_REG_MDIO_CMD)=
-;
->>> similarly here:
->>>
->>> writel((MDIO_PHY_ID_C45 | i), regs + TN40_REG_MDIO_CMD);
->> This one i don't agree with. It happens to work, but there is no
->> reason to think the hardware has been designed around how Linux
->> combines the different parts of a C45 address into one word, using the
->> top bit to indicate it is actually a C45 address, not a C22.
->>
->> I would much prefer a TN40_ define is added for this bit.
-> OK, yes, very valid point.
+OK, thank you for your feedback.
 
-A small addition here:
-digging through an old Tehuti linux river for the TN30xx (revision
-7.33.5.1) I found revealing comments:
-in bdx_mdio_read:
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Write read command */
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 writel(MDIO_CMD_STAT_VAL(1, de=
-vice, port), regs +
-regMDIO_CMD_STAT);
-in bdx_mdio_write:
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Write write command */
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 writel(MDIO_CMD_STAT_VAL(0, de=
-vice, port), regs +
-regMDIO_CMD_STAT);
+> >
+> > > > +
+> > > > +err_free_all_allocated_irq:
+> > > You are allocating from i =3D 1, but freeing from j =3D 0;
+> >
+> > Hi Ratheesh,
+> > I have done request_irq() once before the for loop, so there should be
+> > no problem starting free from j=3D0 here.
+> Thanks for pointing out.
 
-The CMD register has a different layout in the TN40xx, but the logic is
-similar.
-Therefore, I conclude now that the value (1 << 15)=C2=A0 is in fact a read
-flag. Maybe it could be defined like:
+Thank you also for your review.
 
-#define TN40_MDIO_READ=C2=A0=C2=A0=C2=A0 BIT(15)
-
->>
->>>> +=C2=A0=C2=A0=C2=A0 writel(((device & 0x1F) | ((port & 0x1F) << 5)),
->>> and also here, similarly:
->>>
->>> writel((device & MDIO_PHY_ID_DEVAD) | ((port << 5) &
->>> MDIO_PHY_ID_PRTAD),
->> Similarly here, this happens to work, but that is just because the
->> hardware matches a software construct Linux uses. It would be better
->> to add TN40_ macros to describe the hardware.
-> agreed, I assume I just interpreted too much into the constants.
->>
->> =C2=A0=C2=A0=C2=A0 Andrew
->
-> Thanks!
-> Hans
->
-Thanks for challenging my initial assumptions,
-Hans
 
