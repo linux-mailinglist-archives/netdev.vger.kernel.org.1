@@ -1,157 +1,200 @@
-Return-Path: <netdev+bounces-94825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 190E98C0CA3
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:33:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 636A98C0CAC
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:38:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38B9A1C20869
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:33:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80F851C20C59
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60083433A4;
-	Thu,  9 May 2024 08:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD53127B56;
+	Thu,  9 May 2024 08:38:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bL8BUGNr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XRSfnqHJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B0938D
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 08:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EA7DDD9;
+	Thu,  9 May 2024 08:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715243598; cv=none; b=CuT6VsrlLCgubfKgTDmqy504la3EQqVEFBNVl95jibWn3jcDITiIFRL2zNmX9H1SXxOTui58AiaIjy6kZaagTeQKusSVkPneHZazryKI0HguDZ4Zvs0pOTk7HaYdp6Xqw9gpGiYQBReVo8Yssi/dSxXPxB9jWZRqJsYO9urlaWs=
+	t=1715243905; cv=none; b=f6AXevLTJ+GlbpVaPzLXlP4S+cj+uKpiwK9skO6JKGgG1UvCqf2f36i63IfQGxKTXYGr2PHMaCXUXOOw9ieXvi63qrctXV71rqMr5eQbv5O0D8UyzYBti6KApF5AtoIMh++0DxLvdKjT6tTceec8VVDSxlRNWPLDz7FOfYsdVEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715243598; c=relaxed/simple;
-	bh=DK0VIC7vlrqZuUsGXQl+yOHrnrpxXYu3PFZB/+p4UFU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BwD5L/hfuSU+B2rlfYf/UOSC31bB+Byt0f1dH4POpGQfT3dhD3Z2b3IrGLqhTTyXngLACZ/Nq/fKLM4hKYBuGuVwg/Fb3JnmPh7cQT2oVlZJKx4r8W0CQ+8HwH+BnxUdkguEYzxH8HFLWOgTg8HTNHLTzFxIXIlcKOxzz31MheU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bL8BUGNr; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61e0949fc17so9895457b3.0
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 01:33:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715243595; x=1715848395; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=06L/hAgFiE3Gl637uFdUd28QJ6MyrGIQDMBI+Gqf1Wc=;
-        b=bL8BUGNrtVIl0FnK7vwmqfMHx3PIhLElpUIG631w25p1c4koSlYFFvYxmZnPB7IVSj
-         VDnv/EYAI8h/WEtZmCR5ZtpaIM3B65l67lrvfWD/9YBDarJQX73chKn712bA5ZQctrJR
-         RHrpSY+QCdv0s5Cil7XsPJKR7+su/tK4Fvb0ZYX1omgmm2gmNbusSPkVc++iF8irpfJU
-         ZktnXcROaTkoLpybPp+3dNx50VjQTDolgRh7EgBRCjRceJVWrcG+sUSaQH1i6ba/bJcd
-         h6X5zWqHNEAJOsVcRsVu3PpHg/IE67kYL8vtT/RoeIu1CtpZ4eI1/a1xNqyV+m2hbmLN
-         DvFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715243595; x=1715848395;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=06L/hAgFiE3Gl637uFdUd28QJ6MyrGIQDMBI+Gqf1Wc=;
-        b=xFCLZpR18WGKlyJDhuCRXViK3UmYLWX0WgS1NZ1OlWxwTuyNtxoEKq9o8Ji1+wVFA6
-         wzwNgKJvqOq46GwEgRtaREAsejnZjqTVxZ9zt3fi6DLeppg2U1i+WDhok8Z4DlnV41SQ
-         7NtTgqZQByQ3J75NfmaWqqvQX/gnayjDoMGnQitdwCykbwSjmz2/eBWkjm+N7fZuOoBD
-         ll3gTd1Hy4/dlKp6Gc8WLS3Lpd0Iu7Zz0m74pWd40WZpn/cVfN/zkw6Qo3GZKMknXYZB
-         BwU6/BzlJwIbrwlnxRX2rziE5CkyiAcNqTLTiYNOmCh59pD+3VuZ7Gm2Nu0zLhpJuQ70
-         RKJQ==
-X-Gm-Message-State: AOJu0Yz/2d5v68i0MJAIS+8nSVYCSebgyn0WC4nBTwqCGr9wuBFHSG5g
-	uZ6yqAfoHgqoXijiIb4maxPsnoqp4lmfe36FbdPdHEsthfu+gi/HZF75ZdoAdU0CxZNuhMaVz/j
-	3FCBWQdcUvw==
-X-Google-Smtp-Source: AGHT+IE/sZHcTiO4o2MQH6MqBb1XW9RRhW2cp99mXMsGtsawTrl6jzi1kZ471iRrNc3zou2zIAGid5mugy0pZg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:48d7:0:b0:61a:dcd0:5a61 with SMTP id
- 00721157ae682-62085b20e6bmr10591487b3.7.1715243595178; Thu, 09 May 2024
- 01:33:15 -0700 (PDT)
-Date: Thu,  9 May 2024 08:33:13 +0000
+	s=arc-20240116; t=1715243905; c=relaxed/simple;
+	bh=zsovbGoq8RZauFYPDoccHy6UgagSseoBYUdNySN/XtQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TQEacZVpjG/NtH73ZAg35T5aNYjdWbWq6tiab7GmH9MDOrQDZIDyCgXgjRW18K1JUYk2LeeQ2upXN41Jb5wL9OUgTfaxNyyX3Cbl3MAMLrK0Hu2s+/rE+3AyJUy+TnhnDy1lNBX4o8gwScDF/abk2WoFdFpKTxOOtqS+vrQdL7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XRSfnqHJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1616C116B1;
+	Thu,  9 May 2024 08:38:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715243905;
+	bh=zsovbGoq8RZauFYPDoccHy6UgagSseoBYUdNySN/XtQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XRSfnqHJbO9qTED8QloMU6C8EPGxwiSaxCnP8F2m6fhUAOA3WFBqDMMngD7Q5Py00
+	 d0lE86n4mxYdtbqY2simyyUfQ94f35NNP+d2AG/YMQobyyPToIBKrX1LsLaMF7Xif+
+	 uYC0+56a179PA8Oe6z0z/WJnj5AbEp/kMF3CRqK0DJtKHfn7z2GKgSWVjy6z1T3gru
+	 Tk2bTXDMpOCwg521HFF9JproQ3IXeMKDwivLFyDwmVRENCxHM3bS36dLC5+BwarwPy
+	 akJzOf5jvIHyUeHrpRBxwKm9FywTC7QCpispk5lZhoemGBMukyrfDg+pCysIRhuFLD
+	 ua6O6paBOkMKg==
+Date: Thu, 9 May 2024 09:38:19 +0100
+From: Simon Horman <horms@kernel.org>
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: net: avoid waiting for server in amt.sh
+ forever when it fails.
+Message-ID: <20240509083819.GJ1736038@kernel.org>
+References: <20240508040643.229383-1-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240509083313.2113832-1-edumazet@google.com>
-Subject: [PATCH v3 net-next] net: usb: smsc95xx: stop lying about skb->truesize
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Steve Glendinning <steve.glendinning@shawell.net>, 
-	UNGLinuxDriver@microchip.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240508040643.229383-1-ap420073@gmail.com>
 
-Some usb drivers try to set small skb->truesize and break
-core networking stacks.
+On Wed, May 08, 2024 at 04:06:43AM +0000, Taehee Yoo wrote:
+> In the forwarding testcase, it opens a server and a client with the nc.
+> The server receives the correct message from NC, it prints OK.
+> The server prints FAIL if it receives the wrong message from the client.
+> 
+> But If the server can't receive any message, it will not close so
+> the amt.sh waits forever.
+> There are several reasons.
+> 1. crash of smcrouted.
+> 2. Send a message from the client to the server before the server is up.
+> 
+> To avoid this problem, the server waits only for 10 seconds.
+> The client sends messages for 10 seconds.
+> If the server is successfully closed, it kills the client.
+> 
+> Fixes: c08e8baea78e ("selftests: add amt interface selftest script")
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> ---
+>  tools/testing/selftests/net/amt.sh | 63 +++++++++++++++++++-----------
+>  1 file changed, 40 insertions(+), 23 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftests/net/amt.sh
+> index 75528788cb95..16641d3dccce 100755
+> --- a/tools/testing/selftests/net/amt.sh
+> +++ b/tools/testing/selftests/net/amt.sh
+> @@ -77,6 +77,7 @@ readonly LISTENER=$(mktemp -u listener-XXXXXXXX)
+>  readonly GATEWAY=$(mktemp -u gateway-XXXXXXXX)
+>  readonly RELAY=$(mktemp -u relay-XXXXXXXX)
+>  readonly SOURCE=$(mktemp -u source-XXXXXXXX)
+> +readonly RESULT=$(mktemp -p /tmp amt-XXXXXXXX)
+>  ERR=4
+>  err=0
+>  
+> @@ -85,6 +86,10 @@ exit_cleanup()
+>  	for ns in "$@"; do
+>  		ip netns delete "${ns}" 2>/dev/null || true
+>  	done
+> +	rm $RESULT
+> +	smcpid=$(< $SMCROUTEDIR/amt.pid)
+> +	kill $smcpid
+> +	rm -rf $SMCROUTEDIR
 
-In this patch, I removed one of the skb->truesize override.
+Hi Taehee Yoo,
 
-I also replaced one skb_clone() by an allocation of a fresh
-and small skb, to get minimally sized skbs, like we did
-in commit 1e2c61172342 ("net: cdc_ncm: reduce skb truesize
-in rx path") and 4ce62d5b2f7a ("net: usb: ax88179_178a:
-stop lying about skb->truesize")
+I think this cleanup may be executed before SMCROUTEDIR exists.
 
-v3: also fix a sparse error ( https://lore.kernel.org/oe-kbuild-all/202405091310.KvncIecx-lkp@intel.com/ )
-v2: leave the skb_trim() game because smsc95xx_rx_csum_offload()
-    needs the csum part. (Jakub)
-    While we are it, use get_unaligned() in smsc95xx_rx_csum_offload().
+For consistency with other temp files, perhaps
+perpahps it is best to move the creation of SMCROUTEDIR up
+to where RESULT is instantiated above.
 
-Fixes: 2f7ca802bdae ("net: Add SMSC LAN9500 USB2.0 10/100 ethernet adapter driver")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Steve Glendinning <steve.glendinning@shawell.net>
-Cc: UNGLinuxDriver@microchip.com
----
- drivers/net/usb/smsc95xx.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+And perhaps the pid handling can be made conditional on the
+existence of $SMCROUTEDIR/amt.pid
 
-diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
-index 2fa46baa589e5e87e12e145fe46268bdaf9fc219..cbea246664795f27618908838b37384e8f3b67d0 100644
---- a/drivers/net/usb/smsc95xx.c
-+++ b/drivers/net/usb/smsc95xx.c
-@@ -1810,9 +1810,11 @@ static int smsc95xx_reset_resume(struct usb_interface *intf)
- 
- static void smsc95xx_rx_csum_offload(struct sk_buff *skb)
- {
--	skb->csum = *(u16 *)(skb_tail_pointer(skb) - 2);
-+	u16 *csum_ptr = (u16 *)(skb_tail_pointer(skb) - 2);
-+
-+	skb->csum = (__force __wsum)get_unaligned(csum_ptr);
- 	skb->ip_summed = CHECKSUM_COMPLETE;
--	skb_trim(skb, skb->len - 2);
-+	skb_trim(skb, skb->len - 2); /* remove csum */
- }
- 
- static int smsc95xx_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
-@@ -1870,25 +1872,22 @@ static int smsc95xx_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
- 				if (dev->net->features & NETIF_F_RXCSUM)
- 					smsc95xx_rx_csum_offload(skb);
- 				skb_trim(skb, skb->len - 4); /* remove fcs */
--				skb->truesize = size + sizeof(struct sk_buff);
- 
- 				return 1;
- 			}
- 
--			ax_skb = skb_clone(skb, GFP_ATOMIC);
-+			ax_skb = netdev_alloc_skb_ip_align(dev->net, size);
- 			if (unlikely(!ax_skb)) {
- 				netdev_warn(dev->net, "Error allocating skb\n");
- 				return 0;
- 			}
- 
--			ax_skb->len = size;
--			ax_skb->data = packet;
--			skb_set_tail_pointer(ax_skb, size);
-+			skb_put(ax_skb, size);
-+			memcpy(ax_skb->data, packet, size);
- 
- 			if (dev->net->features & NETIF_F_RXCSUM)
- 				smsc95xx_rx_csum_offload(ax_skb);
- 			skb_trim(ax_skb, ax_skb->len - 4); /* remove fcs */
--			ax_skb->truesize = size + sizeof(struct sk_buff);
- 
- 			usbnet_skb_return(dev, ax_skb);
- 		}
+	if [ -f "$SMCROUTEDIR/amt.pid" ]; then
+		...
+	fi
+
+>  
+>  	exit $ERR
+>  }
+> @@ -167,7 +172,9 @@ setup_iptables()
+>  
+>  setup_mcast_routing()
+>  {
+> -	ip netns exec "${RELAY}" smcrouted
+> +	SMCROUTEDIR="$(mktemp -d)"
+> +
+> +	ip netns exec "${RELAY}" smcrouted -P $SMCROUTEDIR/amt.pid
+>  	ip netns exec "${RELAY}" smcroutectl a relay_src \
+>  		172.17.0.2 239.0.0.1 amtr
+>  	ip netns exec "${RELAY}" smcroutectl a relay_src \
+> @@ -210,40 +217,52 @@ check_features()
+>  
+>  test_ipv4_forward()
+>  {
+> -	RESULT4=$(ip netns exec "${LISTENER}" nc -w 1 -l -u 239.0.0.1 4000)
+> +	echo "" > $RESULT
+> +	bash -c "$(ip netns exec "${LISTENER}" \
+> +		timeout 10s nc -w 1 -l -u 239.0.0.1 4000 > $RESULT)"
+
+Hi,
+
+It's unclear to me what the purpose of the bash -c "$(...)" construction is
+here. Can the same be achieved using simply:
+
+	ip netns exec "${LISTENER}" \
+		timeout 10s nc -w 1 -l -u 239.0.0.1 4000 > $RESULT
+
+Also, not strictly related to this patch, it seems a little odd here, and
+elsewhere, to call bash in a /bin/sh script.
+
+> +	RESULT4=$(< $RESULT)
+>  	if [ "$RESULT4" == "172.17.0.2" ]; then
+>  		printf "TEST: %-60s  [ OK ]\n" "IPv4 amt multicast forwarding"
+> -		exit 0
+>  	else
+>  		printf "TEST: %-60s  [FAIL]\n" "IPv4 amt multicast forwarding"
+> -		exit 1
+>  	fi
+> +
+>  }
+
+...
+
+>  send_mcast4()
+>  {
+>  	sleep 2
+> -	ip netns exec "${SOURCE}" bash -c \
+> -		'echo 172.17.0.2 | nc -w 1 -u 239.0.0.1 4000' &
+> +	for n in {0..10}; do
+> +		ip netns exec "${SOURCE}" bash -c \
+> +			'echo 172.17.0.2 | nc -w 1 -u 239.0.0.1 4000'
+> +		sleep 1
+> +	done
+> +
+>  }
+>  
+>  send_mcast6()
+>  {
+>  	sleep 2
+> -	ip netns exec "${SOURCE}" bash -c \
+> -		'echo 2001:db8:3::2 | nc -w 1 -u ff0e::5:6 6000' &
+> +	for n in {0..10}; do
+> +		ip netns exec "${SOURCE}" bash -c \
+> +			'echo 2001:db8:3::2 | nc -w 1 -u ff0e::5:6 6000'
+> +		sleep 1
+> +	done
+> +
+>  }
+>  
+>  check_features
+
+...
+
 -- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
-
+pw-bot: under-review
 
