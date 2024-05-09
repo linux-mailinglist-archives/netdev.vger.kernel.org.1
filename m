@@ -1,160 +1,134 @@
-Return-Path: <netdev+bounces-94806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D7C38C0B54
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:14:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 096A88C0B83
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFB7E1F2346C
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:14:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2FBA1F237BC
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F901149C55;
-	Thu,  9 May 2024 06:14:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD246FCB;
+	Thu,  9 May 2024 06:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WEm/VoPd"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="KKH2leG1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9D81494D4
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 06:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006B1653
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 06:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715235263; cv=none; b=QS+Ey/GtVYQJaq1h4XIee8HWxCflugkHvS34wDgIAzvV7aVKik7YnC7+K6OrttKCZr6koGsXYFXiv4pg11aL8VBW3NDhg9gkrCxo9sPm5DqIawkauyG5Z7nj0GdRpExs1+DCJ3TRZnF4M8CP6OXOtEPvtI4OdMay9gs3d9HvRfY=
+	t=1715236224; cv=none; b=nq95XE39Wi1N262t9ulF2pNOrRFIunyWuaSf/sfang48bMdA2ibG/8aL1TFBwlRTHEvOSyMx+e4aaWxP1+vZuMPfLOBGooTxUIOOq6NgCgH5uHmp3lsABN+UxgOXckxHVosOMcXAUnB/YDJeTmp24UFDzeIHKW+/DZ++Zfr0S/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715235263; c=relaxed/simple;
-	bh=EL59YAvQ+NejbE+MgsQ0pGcYE6qA6HsEuHDusaEk0N4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g80+BH94R5mKdOLBVH5hhHhMrWybYyKKti6DonXp06A3y+9/2pvraPmxyuADvmsOX2FKmmso2WF9T7+o6qntwzMxTpNf/8BXJJs39YHu2q+FiLfIQiYJLegkpX+1LMnD9uNLYcBTEtsjgEanFxsQ6veIc+0xSxjJEDKx14tT290=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WEm/VoPd; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-572f6c56cdaso10549a12.0
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 23:14:20 -0700 (PDT)
+	s=arc-20240116; t=1715236224; c=relaxed/simple;
+	bh=n0yLBLsCcWZoXT34oLNGOKh5OKX0+BXthBYvmA190hI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EaPoCFLVWRweTQrbHW4kY/GnoP+GIei5ZCCnDHgEQ9TmBPsFeupP8C6HY3A4yIQVdeZhm668ntzw9AHF6QfGknG9xpIrGUy/4cYsn9TlpH31XdbFnwWondn6R6hCMU6gjBJhmz4sDgZE38ychvkw/pI1L8U9x2isEDrLw+6KGTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=KKH2leG1; arc=none smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6f0307322d5so301386a34.0
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 23:30:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715235259; x=1715840059; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=72bWBwjQodIuSi8MsUtQvKNvKwdUWjXGREUei480Xwo=;
-        b=WEm/VoPdoWkj0T759QWiuYvMX4pHXbQGtGV6B8BdS6/Cq0VFDkresAaaMIYb++Xv07
-         NGG+jf4a1dEnvAy0YaC/s7lcBHZYg4XfdFyn0UE/NSSxuV4NI+ONOzRkSN7wuCtF7G6m
-         GTOO87BGuQVGfzWL5T65/lgJj6fjNzyMISuP7RyGnMi7ZT8v5eJ20/bJPOff/6tMEzYf
-         htFF4m10x/m7ACoxg+H+qSKb1axBk/xf7pNTnIFlBhJxau06TJtioZB85NLY3yGUoNGf
-         qsBS4tNQxQMxJEtkUampvrB3zly877wqooUCzxdQkmiqESGQ2AKpeP3mEO/CMSG07Le0
-         wmxw==
+        d=fastly.com; s=google; t=1715236222; x=1715841022; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3qoYQ9U2MlC2IsyOoGY5lXnwSMtPZXtV4EZE56MKyN8=;
+        b=KKH2leG1H5mAm1P/La2bBB872AjGrZ/gxtz0Rd3W3tUxRz5vU3LV++FX/CDputlPQe
+         YPCltQRmlNaEBkGl/12VcgxEGfvA/NHPw5FnNKfVyiRMb3wfPZH/Yu3BDqOVMB02Krco
+         NMZvr5HhAzoFQU9ENuxvq3lYX/hEOiEvfBP9c=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715235259; x=1715840059;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=72bWBwjQodIuSi8MsUtQvKNvKwdUWjXGREUei480Xwo=;
-        b=Lj8tbNC/A2PrXak1lzkJVstSGGrvttufE5IGdCW8N3Rm4wURz4C5T1HQMyAzInLfvm
-         2ACbZBLJLhvvxe/78/2Ccg1Wo5mBkvAAtrLKq/Wq7N23OviGAWS8xOuyiUMnPpu8VnmT
-         p+na+gDZD7GT8eKLxXNLiXaD5qxqi4BOoA4hPwh0q+4B/3i2jtLBQQ56jAbfhIQtyQiM
-         E4hRqtQzcZqP2y2kjJDUI67+g5BLec3gattOR7LqRrLISpR0abFc6uQN5vo7FpSDIfGl
-         2FHqHfugM3xZ6ZHvtdD+fZF5VbCcewgwnGRszAeZ52i2Snklfm/drdeQoFHGCKSwtrt1
-         DCzw==
-X-Forwarded-Encrypted: i=1; AJvYcCXPqOoHmEfxBeEWoq3+hp8jJJagNDWigMPVqtPcAyQSPB2Pzy+Uk/WOXz09tdAKed9tuBHi3vHWrsL+wlL0BHb31ZSJA84e
-X-Gm-Message-State: AOJu0Ywtj5LCAF5djEr1Mhlb2kgOMKEExrXbJ1v7VLCRGQE80tGiXbkb
-	ViJnnGxE7/o/axzTSzwtojIltyz3ENFHa+ciEWd3Ikr7fQ1RaFg5rVFjFgyP/fA63TsghgZjvRB
-	uxA9LB4pmXIB6/Tmz3TkOOZ8rRvJo9Qwq6Ox/
-X-Google-Smtp-Source: AGHT+IHsPAG0LEeM4cJXnAxgH06RrdZlxemOxK5bdPXtb66jyshH3jVsPNC7i5pX8kAB1x6smMgaq3eKTmHMEonCtFw=
-X-Received: by 2002:a05:6402:5206:b0:572:a23b:1d81 with SMTP id
- 4fb4d7f45d1cf-5733b9d3b3emr79412a12.5.1715235258767; Wed, 08 May 2024
- 23:14:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715236222; x=1715841022;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3qoYQ9U2MlC2IsyOoGY5lXnwSMtPZXtV4EZE56MKyN8=;
+        b=gqPin51zPikTWH92BnhqDoNtYPSIT8YrekKaUb6028vYYwXjGWI+05EVDfTFvUjh3B
+         XsC73+lJn0mHem1APHcjQgHKsbJo1CVwbRVEZi8iK0RU1kC/TYNgPejkhqC9XRynTd9l
+         OCrkMZzfFjZ9jDmJv8RslOQ5/OOymlXJAfUDgOW7makifMrGYV35VwxUwraKHRteIfUT
+         rpiKxmSfdzL521R9dyX3IyH76i2G09RgRHQ8RM20XqJlNr6ZswMl9W5SSMrshBu5ANja
+         z25JKVI4kRarsQFKU6oSz2YqOjeBbf6kRUmgyYlqOmgQGRZrvpaSRsqIBt1GN7B5E4NG
+         j34g==
+X-Forwarded-Encrypted: i=1; AJvYcCWpEp0ciuWfel4C5hslYAYYra/7wPpb5DhV6LkO5Jj3btA9LEVQf45gCOoeSCHCHY48Zq1fSb05bb7hQIxVHW3othZMm1af
+X-Gm-Message-State: AOJu0YyDex3PuKru/FEsG9s2hStIqjArYvqT5nDcyrC2tSXGFxAYHpvU
+	NN7gOzzQh+axK/qAzQeuAfanlM8fjFb+cS/Q3KDvDh50wwvNPmE5C+GjYptG2Xo=
+X-Google-Smtp-Source: AGHT+IFDgooGY0GwBc2iJimptTybd/gNtDtCFUTE5EpIKrrUwbabTOKQRU++5xWg2GQ02FIt7hW1VA==
+X-Received: by 2002:a05:6358:890:b0:186:2ac7:316c with SMTP id e5c5f4694b2df-192d35776c9mr580862955d.20.1715236222043;
+        Wed, 08 May 2024 23:30:22 -0700 (PDT)
+Received: from ubuntu (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-634119041b2sm484067a12.94.2024.05.08.23.30.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 May 2024 23:30:21 -0700 (PDT)
+Date: Thu, 9 May 2024 06:30:18 +0000
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <ttoukan.linux@gmail.com>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, saeedm@nvidia.com, gal@nvidia.com,
+	nalramli@fastly.com, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
+Message-ID: <ZjxtejIZmJCwLgKC@ubuntu>
+References: <ZjUwT_1SA9tF952c@LQ3V64L9R2>
+ <20240503145808.4872fbb2@kernel.org>
+ <ZjV5BG8JFGRBoKaz@LQ3V64L9R2>
+ <20240503173429.10402325@kernel.org>
+ <ZjkbpLRyZ9h0U01_@LQ3V64L9R2>
+ <8678e62c-f33b-469c-ac6c-68a060273754@gmail.com>
+ <ZjwJmKa6orPm9NHF@LQ3V64L9R2>
+ <20240508175638.7b391b7b@kernel.org>
+ <ZjwtoH1K1o0F5k+N@ubuntu>
+ <20240508190839.16ec4003@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240507214254.2787305-1-edliaw@google.com> <f4e45604-86b0-4be6-9bea-36edf301df33@linuxfoundation.org>
-In-Reply-To: <f4e45604-86b0-4be6-9bea-36edf301df33@linuxfoundation.org>
-From: Edward Liaw <edliaw@google.com>
-Date: Wed, 8 May 2024 23:13:51 -0700
-Message-ID: <CAG4es9XE2D94BNboRSf607NbJVW7OW4xkVq4jZ8pDZ_AZsb3nQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
-To: Shuah Khan <skhan@linuxfoundation.org>
-Cc: shuah@kernel.org, Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
-	Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Nhat Pham <nphamcs@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Christian Brauner <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>, 
-	Kees Cook <keescook@chromium.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, 
-	Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>, 
-	Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>, 
-	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Seth Forshee <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	=?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Fenghua Yu <fenghua.yu@intel.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Muhammad Usama Anjum <usama.anjum@collabora.com>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kernel-team@android.com, 
-	linux-sound@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mm@kvack.org, linux-input@vger.kernel.org, iommu@lists.linux.dev, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-actions@lists.infradead.org, mptcp@lists.linux.dev, 
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240508190839.16ec4003@kernel.org>
 
-On Wed, May 8, 2024 at 4:10=E2=80=AFPM Shuah Khan <skhan@linuxfoundation.or=
-g> wrote:
->
-> On 5/7/24 15:38, Edward Liaw wrote:
-> > 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
-> > asprintf into kselftest_harness.h, which is a GNU extension and needs
-> > _GNU_SOURCE to either be defined prior to including headers or with the
-> > -D_GNU_SOURCE flag passed to the compiler.
-> >
-> > v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-ed=
-liaw@google.com/
-> > v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
-> > location.  Remove #define _GNU_SOURCE from source code to resolve
-> > redefinition warnings.
-> >
-> > Edward Liaw (5):
-> >    selftests: Compile kselftest headers with -D_GNU_SOURCE
-> >    selftests/sgx: Include KHDR_INCLUDES in Makefile
->
-> I appled patches 1/5 and 2.5 - The rest need to be split up.
->
-> >    selftests: Include KHDR_INCLUDES in Makefile
-> >    selftests: Drop define _GNU_SOURCE
-> >    selftests: Drop duplicate -D_GNU_SOURCE
-> >
->
-> Please split these patches pwe test directory. Otherwise it will
-> cause merge conflicts which can be hard to resolve.
+On Wed, May 08, 2024 at 07:08:39PM -0700, Jakub Kicinski wrote:
+> On Thu, 9 May 2024 01:57:52 +0000 Joe Damato wrote:
+> > If I'm following that right and understanding mlx5 (two things I am
+> > unlikely to do simultaneously), that sounds to me like:
+> > 
+> > - mlx5e_get_queue_stats_rx and mlx5e_get_queue_stats_tx check if i <
+> >   priv->channels.params.num_channels (instead of priv->stats_nch),
+> 
+> Yes, tho, not sure whether the "if i < ...num_channels" is even
+> necessary, as core already checks against real_num_rx_queues.
+> 
+> >   and when
+> >   summing mlx5e_sq_stats in the latter function, it's up to
+> >   priv->channels.params.mqprio.num_tc instead of priv->max_opened_tc.
+> > 
+> > - mlx5e_get_base_stats accumulates and outputs stats for everything from
+> >   priv->channels.params.num_channels to priv->stats_nch, and
+> 
+> I'm not sure num_channels gets set to 0 when device is down so possibly
+> from "0 if down else ...num_channels" to stats_nch.
 
-Hi Shuah,
-Sean asked that I rebase the patches on linux-next, and I will need to
-remove additional _GNU_SOURCE defines.  Should I send an unsplit v3 to
-be reviewed, then split it afterwards?  I'm concerned that it will be
-difficult to review with ~70 patches once split.
+Yea, you were right:
+
+  if (priv->channels.num == 0)
+          i = 0;
+  else
+          i = priv->channels.params.num_channels;
+  
+  for (; i < priv->stats_nch; i++) {
+
+Seems to be working now when I adjust the queue count and the test is
+passing as I adjust the queue count up or down. Cool.
+
+Adding TCs to the NIC triggers the test to fail, so there's still some bug
+in how I'm accumulating stats from the hw TCs.
 
