@@ -1,240 +1,128 @@
-Return-Path: <netdev+bounces-95169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CADAD8C19B7
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 01:03:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46B868C19C2
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 01:06:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED9231C23119
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 23:03:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC7A81F23FBC
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 23:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38B612D760;
-	Thu,  9 May 2024 23:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4174D12D758;
+	Thu,  9 May 2024 23:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UMigAKh9"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="rtGMrxWN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92411292E6;
-	Thu,  9 May 2024 23:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715295815; cv=fail; b=RzpMmDHNWEVuIbmVYY0EW/uw6+W9o8rQAF2uWvlwJPX78Hg/W1a/A65OSyfQKwaTxAIR9hsp0RLZsA0CIXyS4VzbyZatnwan5WrN4GfcljhSfUJw+sbv4AAqDYowqT2wJ2eVzEaAhxLwwmt5yTO7zl5SX6n12YzZSG0j2pb72ZI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715295815; c=relaxed/simple;
-	bh=OPWU5+ix3aqGPvoCdrj9AWV5ve05Hc09CyLmUz2F+Ws=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=kRniI5+VQh1pRIGkYlpBOgVtzwW1r2j5KehUvyUgrbq9LStpfhEmRFLNmJHYNO+er+bTIBUMrD7xR5egpRJksyPOjEXobvuihx+RRH1wCfiU3Pv5/LPGVOvufKnVfHKB+XPp9ZcB1SwQODwn5Klv3thPA74zJPhgiob3OTZbT+c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UMigAKh9; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715295814; x=1746831814;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=OPWU5+ix3aqGPvoCdrj9AWV5ve05Hc09CyLmUz2F+Ws=;
-  b=UMigAKh9G8HzJMCaYkhuJj00Hfox8/HrUhWid3ClxEdOV48aW/RAJP/w
-   o9lapb/2S6Pj1KCivcfanmvH9bohmfWVOr3sCW9C6PplG7u2+1jG59i2Q
-   3p6HxqkHxnoXfevSUjlepekE7tFFUa3Q4997nY/WHe69vAj7vkDr4Hh/2
-   w1/rLO/8BEhVjNGqWS47LRhBdXMgpsYoMqyKx26cfOUZ93u06L58XZaBt
-   8EbaqZX+HIpRoHFSLdkmpFPfR83UICYs/3ghVNbqd7Es8N7xyY7JHXRVC
-   MWAdndVHXzqKRscg0ukzTrzm272QdHfP2XAhxn48pBsIANKotvZwIyMyJ
-   w==;
-X-CSE-ConnectionGUID: +hYPlPslSVSLQCtiKiU6QQ==
-X-CSE-MsgGUID: dHExVIHQTLezdUw2WutmYw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="11412680"
-X-IronPort-AV: E=Sophos;i="6.08,149,1712646000"; 
-   d="scan'208";a="11412680"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2024 16:03:33 -0700
-X-CSE-ConnectionGUID: 39k5i6SJSW2XgS4JKO+4kg==
-X-CSE-MsgGUID: Qt15jePoSVqrbmgFp0g3ZA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,149,1712646000"; 
-   d="scan'208";a="29445675"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 May 2024 16:03:32 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 9 May 2024 16:03:32 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 9 May 2024 16:03:31 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 9 May 2024 16:03:31 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 9 May 2024 16:03:31 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QLXd68NPVr+dZrzTPCGJ6y8XOBODorhNKLis+JDVZU+HiGo17+OEgmOS1SixR1fKMiLOdsUvUZaUlubznwg4bhrzQQw2bTmtPvoUK49tU/aj638Opx8sQsghSra43cKs+g67njk/eT9x12uExUoWPoExNRCjA1mfQ7IwGZEhvYMjvIn0H/XuEN+1T8rMtKAVaFQi8G2jtkhZq0TlM4CzFmkav6ZxcaVP4JaBCD7kkTQQlE0D3nxLTOPa3egvBQdBhNIqAXYXJhBT26pzFVuKyIdtntUu9IQaIiXc/MOKIs3V2kS3ZlyTuanIHqGCMH8o6MMsmahfZYLrl/xg+EpeZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OPWU5+ix3aqGPvoCdrj9AWV5ve05Hc09CyLmUz2F+Ws=;
- b=NisPNsE2KYsMULXN/qo1kj4QsDgB+G5qtpqCNNefO2wACAo3bEPhntoHJuQ6PAqGt3a/BWwSarcOR9aejv16ICCGdQO+919tZuuOUn0yxmKAtCjVqckrxYkEGYb3ZaZtRlA6KTecuD7kr7qNXCEDJ4KxG+lqC2Z+FUToJuzSVIQ7d681dn+Dus0i/SgLVwZx6AZTTamTRowJdj413l4qVlD5XzNAgaAYTdRlbYj3WK5bZYc+9yI04NemFzGfoYq8o1Ry6PlCRIJwsIN79ufCZSqv2lhu5fPD9vjJp7htLXzDzjXBN9O4QcYoMn2W3GtxpdhwN7oZm6TVIncPSuJOHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MW4PR11MB5911.namprd11.prod.outlook.com (2603:10b6:303:16b::16)
- by DM6PR11MB4706.namprd11.prod.outlook.com (2603:10b6:5:2a5::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.47; Thu, 9 May
- 2024 23:03:27 +0000
-Received: from MW4PR11MB5911.namprd11.prod.outlook.com
- ([fe80::6446:3cb8:5fd5:c636]) by MW4PR11MB5911.namprd11.prod.outlook.com
- ([fe80::6446:3cb8:5fd5:c636%7]) with mapi id 15.20.7544.046; Thu, 9 May 2024
- 23:03:27 +0000
-From: "Singh, Krishneil K" <krishneil.k.singh@intel.com>
-To: Simon Horman <horms@kernel.org>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>
-CC: "Drewek, Wojciech" <wojciech.drewek@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, "Kubiak,
- Michal" <michal.kubiak@intel.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, NEX SW NCIS OSDT ITP Upstreaming
-	<nex.sw.ncis.osdt.itp.upstreaming@intel.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>
-Subject: RE: [Intel-wired-lan] [PATCH iwl] idpf: don't enable NAPI and
- interrupts prior to allocating Rx buffers
-Thread-Topic: [Intel-wired-lan] [PATCH iwl] idpf: don't enable NAPI and
- interrupts prior to allocating Rx buffers
-Thread-Index: AQHal+hNhMcZHvVF2kSeEm3ZM1H/ILF/OdQAgBBgYsA=
-Date: Thu, 9 May 2024 23:03:27 +0000
-Message-ID: <MW4PR11MB591159578D0D2AFDB0CB8917BAE62@MW4PR11MB5911.namprd11.prod.outlook.com>
-References: <20240426144408.1353962-1-aleksander.lobakin@intel.com>
- <20240429125742.GX516117@kernel.org>
-In-Reply-To: <20240429125742.GX516117@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW4PR11MB5911:EE_|DM6PR11MB4706:EE_
-x-ms-office365-filtering-correlation-id: e71a554c-7041-4592-eabe-08dc707c3cd2
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|366007|376005|1800799015|38070700009;
-x-microsoft-antispam-message-info: =?us-ascii?Q?x+RQEVjloA+Qz3DmY5hQE6H18zIwAk8Zb5koILhsoiQJGsRep4jr8NWahQY5?=
- =?us-ascii?Q?nQqvwhs+F3Bg/jveufuyA9naaNTq6Pq+FVeBwelofBChGtQ+uZ5j4qzRmhiR?=
- =?us-ascii?Q?5Tm127FkcznQZIhPa2kRDpd/vJPH32477ECEMRYQVb96tjKG2W8soVHlPEYe?=
- =?us-ascii?Q?zomU5QfV4UK+STRJgSCs709jiIwS0i7z5TwRoCiNdFamAx9upzeIaQAnEyR4?=
- =?us-ascii?Q?48+mytxyC5GpQ3/u8VuYX/8Jii7M6riW/Ee/ILxrh7DhGQMWDIQnwC2YeAcK?=
- =?us-ascii?Q?XTwPubpSNyZXQI/t0mjKAG+XWtK3LUMePF/puWUuRkuLTjKC36E9DDq/y+Gw?=
- =?us-ascii?Q?dC8kjAn3Ik6ChhNWEvh1aelgp/NDhBDxhabslNhFFWT5kZ3hagDQDdmnxoEQ?=
- =?us-ascii?Q?oLgnx9en89oHI0p/AINjd+NfmU8hSUmBErmo47rzIWb6hTVoXUEslNlC1vip?=
- =?us-ascii?Q?3Pc1xDUrk92nSy/LPCp22s+Fmj89qY5cxwj3YcERUawp4qbOTWsN1M8XQMWj?=
- =?us-ascii?Q?u1KnAXNfCd8yRG1OxVwCDMCHEihnev8Rquhqde38ugpqwmEb5GyaD7fprZ93?=
- =?us-ascii?Q?wfAYspwmvNl76SCwI5W6gtsrR33HiMqz5asrGQSifPDOIwQtr02YkkU7RZlz?=
- =?us-ascii?Q?ulW5OCzbMVBqHrFz0FTkxB90OVHLRzIJhN1rvZy/YXD3N9jnMYmf813TwFfl?=
- =?us-ascii?Q?YkWF0x7guhcMkzLybjPQWhdkV8o7Wy8s7a/zRp3NF/nVAj6RktOBObcLUY8m?=
- =?us-ascii?Q?WZKCxt/zicnPvxUKIGQeEk7NMNi5jyUQTVPsEpD/aNj2tCCgq/Shg0U/RLe/?=
- =?us-ascii?Q?qb4wfsit+tiDt16n022PHDq+K5V/sZK9eXZkzG9mI5mOIi/OaBh1kAXwQOe8?=
- =?us-ascii?Q?AaqlXycWOHOMG+vHwa0Lpk2+PQNYWdvsND1iPL93yjY11dfpsjj9l4D3N8qx?=
- =?us-ascii?Q?Vy+c5Y0N1Wzl/+IEB8Yj0Gi8x3/QUcr71TnQfRMJkRJh5lRMENZDNSprNVhe?=
- =?us-ascii?Q?KNSfUuWQuisbcS44qg96WYyG64nKQYZLe2WXly2NRytcLRw4oqRxu0KAhT79?=
- =?us-ascii?Q?WRRw9W0+Tul5/7Q+fH+YP5Yx8/SArhrFG2KkwLCQMPY8mpAizWuLV+fkXfRs?=
- =?us-ascii?Q?6Pk/BZW/tqlmzhc/O3aUpa4gL3wWqw1cJ8u+SHmXec4D+J/8K5L/h1Iwjdnn?=
- =?us-ascii?Q?lzFBLvYuQKH9oh4JyKLb8HcTzilQX4AexX9zXly6EtA5PdisQzCdJcbp6kkx?=
- =?us-ascii?Q?Wf5fS9P1NFBrPKpYFyIM79TbS48gzQDc8eZCXmDCPAd45MeQrUTCI04R+6KT?=
- =?us-ascii?Q?uZUvD6FQSyYo2yWgpqb2/qfnjrua7dItHgd9eECTdPcpPg=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5911.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?RBxKIZyKYZgj7WBYb6gR1F97sYK6B5Gmd6FzgCFlxnah8rykhfAO34uZoRpG?=
- =?us-ascii?Q?RntwQXR9mSNzaaxYenICAlvjf3Ysi8+3t5Q4lLvKvFvVYU5UnbrFBVTFeGGq?=
- =?us-ascii?Q?2Y+ede1wBy2Wr+x2UR2OFXS9F/tn8tPWtOB21diAOiu9OP+nmoWlfloT0P6N?=
- =?us-ascii?Q?V712fL7j32t8hkRcTjPR/6K+OJNXhVx9nibLlprCafgqF5fGfrJOrKs1IBOR?=
- =?us-ascii?Q?pmnmhoDyb3tqwROwfVvrKfMq+fw5uM4sXO/XTrO77kYY0yVSdgt5OLqsro8a?=
- =?us-ascii?Q?WkI+PEfLOWTe2H3aN7t35pbJ1c5D1vyo71COTgZ72m+QUifSuNnxWdaduxuz?=
- =?us-ascii?Q?0jW0BlKfK0vPDinikRFVvYV/04vLYGY8Zzw9fe2sIZPbftfuBRHktqUgFvUB?=
- =?us-ascii?Q?RbHfWApePUW6Y3Ag24kYo4x1VoKDWwACcz0s9ybL2pxHLhZV2T+z1r1oo0SO?=
- =?us-ascii?Q?Wvzyev1xq5v7rD2F64ph30n99Gbxv7MTVW3VP7kNKnYCZfEJWrNux/h6Ygf9?=
- =?us-ascii?Q?jQjOxjgK8mHbF7nqwCz37aqX28e3sqgDLpYfraswQfg5jRMYpE4VV6mEp9rG?=
- =?us-ascii?Q?rNWt6zokRR3fsFwC3+E0EzHAzwwQC/xeVxX4PVQjkEchVN4e/Ua4Q+TqBgVR?=
- =?us-ascii?Q?r7czvHCKfDPBnbfUsKD3cOBS4jQbSeERN57/hI+trXjx9Q24FDvGpacDDQ5l?=
- =?us-ascii?Q?EnheDLku1gPpcI6aHucKKwB7hiHO1VJaeRiFjpkkTISIL4a7nk4OJLOjHXjr?=
- =?us-ascii?Q?dMfnW7kuOF+9FQDdNM3bd8D1HMPAZDyjqirbVAlPQKDC+GO6yIqBj0ucrNnq?=
- =?us-ascii?Q?vTOU+nohse/uZIQ1z75GXq3a6qPAZPBu2RMg9ytJcFEwO8FukbqXDT4Qa8UF?=
- =?us-ascii?Q?iZq5ZuCY+iMajz9My47l01NNB4PGbqzYF3ghY/J9Jejp/k9NDnwmST1jUN6Q?=
- =?us-ascii?Q?SqHNm8BcpKJrEeae147LOOW3zigpKjhiX0UAcgII4QDUq/fWASKCs47i4p+p?=
- =?us-ascii?Q?FFebsmnDTlFEAvMpG84+h1/BsWpgMhs/EkYLJ46gU71XrUqzKxQqcLZ9uluN?=
- =?us-ascii?Q?uwmEQ9HgDR+lxGN3jkaoE1b9sO9MIaWYleXTnEtm0RjDNBSmxMc0BS9Vokna?=
- =?us-ascii?Q?bDTL7ddUtuiUtpkVjCgQmq/vCJ0m16/95d4zUVOyW5AK3B7y5fkp9jTXrEJw?=
- =?us-ascii?Q?ij1ToOMqBzGloV2bdSCK6AyO+9WrVkjy2o7vPxBTGwUF6ASgb83fXu7W8ZmZ?=
- =?us-ascii?Q?7jIPv2lkxJwb6zuRMXB0AwBDHgEYQbW7LmIQu5iIWTkzKbhdp7ADJaUT4uX/?=
- =?us-ascii?Q?jfTXJFTk5ETvJWDAJ5U72/elTyWunGe1b6QmYK++d2Mn2PUWO1CLhqLcIuuW?=
- =?us-ascii?Q?YOaeCCeqNY9a3Dqukri6eZDj4UY+Y+rClOuwnNiRimFo3bzBMI/kb2uRUL3g?=
- =?us-ascii?Q?8gtS5bUBt7KuKV+x7zWgxx37WjSVAN9nx6D6ZMz/rqCViR6t/E07h8IIDj3y?=
- =?us-ascii?Q?hl15jvcjOR6/00YknKbja2fpBEOKrGzE9p4tFsPGbwoRXw2ZA2Qd34MxJi7Q?=
- =?us-ascii?Q?NhJGiB/VMfE+5q8vZRBPEvKgyrj2thkIOHxyBG9Znc5m+hSJSCjf6GYAAfo1?=
- =?us-ascii?Q?Cg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE3C86245
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 23:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715296002; cv=none; b=trhFrEZ0pXaTDQw8zYqid/JxIt/3lOpow1ZOI0kIJPy9V2BdtN0ZHU27+fiV8gldRakM2MwPVHBXoOhavecNYib2ppOXbIpdjpfLbz4SvGclSAsetZ+GKGjMcKAMhfoHE5BT5l1k0BiN+VNbwPOLCA2LpDY7brKDoP4DZUDvE5c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715296002; c=relaxed/simple;
+	bh=Ng18fVP8U39tP/Yi0NGN1v5+V+jbpidoZX+xxyxIFck=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Po7Haq5Xc88b4zf9aIEJCTeq9DEIUGnWLuO41bdbfaMf+TBAukSOnFw4QgW49B4DNLsE1rhf8brzRhBDmoT1NxshBL5YwoSxCIMy2mIORMgdkJiDlH2N+Yt4WTWZMtNF8wPFUpgZ3jzsQb8X3mT5iNFjt4CeWbU2oIE6v43alOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=rtGMrxWN; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5ca29c131ebso1028548a12.0
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 16:06:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1715296000; x=1715900800; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FrQui9B6BoEIY/rh+mexhaF7aELyfYWuHXoeSmqlVL0=;
+        b=rtGMrxWNHvsrkMZKxcoyo6lwbgezQ83jdWTAEPN9zbjUSXotTl9RE2f6Fs3xdTVffl
+         4uAWy+bwDKNqRWpz/eMnxUU3Bf7dopkdxgMffIbQzOWLqRfdlTk+trm0Qp4r+nNoVist
+         KdaJUO5LS0ctg48P6RS9t3n1y2TEnO1nDikuw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715296000; x=1715900800;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FrQui9B6BoEIY/rh+mexhaF7aELyfYWuHXoeSmqlVL0=;
+        b=HjxxVbywGdWbwCNJOXTOL2onaMKIkZ9iazbVt5kKy1z74Zp7Oqw/rEnA9OHznhMHQ8
+         m3iJYnEdUMFcolykHx4HATY35mWWPLp7PbYpaFwaVZxwnHpTzLhxGe0I2d+98NMsOb2u
+         dziTwTFKNCytMEUEv5trh05HJ8FEDuVuxVn3173I3DEr2sKL8tzWNKa7LW4WDQFnh895
+         yY6HXs/Ey8aWwWWlPa67IfojIp47SSkAEily3lBeIBl/owM6VPSyqeOGyR/ulYMUeZh5
+         9i1kwLqOpfp4FhwR/rBpTcy0jxEeYjl5EVAh+D6MdKjeg4s7ZZ8bVFg9xupMhOqMpeWV
+         8xnA==
+X-Forwarded-Encrypted: i=1; AJvYcCXj9np4ZFBtSZrfd/wWbIWnwrAERhCwq89gXtEUv8FhInjAmNS5o54AMxsC0sETmQJYWqh3oDYEC394vob5XCHnUO+JALZB
+X-Gm-Message-State: AOJu0YxdbLVBb01O4i3Vprh/OFdnGrQuQ16KpiEBLfDJmaKUA3GZtg0R
+	q8UdX1pOaWAGurlDGLLrDe8hbjdvwOy+e7iuQaVCdIEVx06/NyetidX9ASPlf7M=
+X-Google-Smtp-Source: AGHT+IGc/iwlNZZmQjVUxnvbLuwphUnwPD4l0hWq3QPzh+j7dh2oKcWhg374+QqVtMcUzqahlUUnGg==
+X-Received: by 2002:a17:90a:8a96:b0:2b2:c6f8:70b0 with SMTP id 98e67ed59e1d1-2b6cc357aefmr1012739a91.11.1715296000115;
+        Thu, 09 May 2024 16:06:40 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b695f8d058sm1186647a91.2.2024.05.09.16.06.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 May 2024 16:06:39 -0700 (PDT)
+Date: Thu, 9 May 2024 16:06:36 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	saeedm@nvidia.com, gal@nvidia.com, nalramli@fastly.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
+Message-ID: <Zj1W_JH-k3skeHPj@LQ3V64L9R2>
+References: <20240503022549.49852-1-jdamato@fastly.com>
+ <c3f4f1a4-303d-4d57-ae83-ed52e5a08f69@linux.dev>
+ <ZjUwT_1SA9tF952c@LQ3V64L9R2>
+ <20240503145808.4872fbb2@kernel.org>
+ <ZjV5BG8JFGRBoKaz@LQ3V64L9R2>
+ <20240503173429.10402325@kernel.org>
+ <ZjkbpLRyZ9h0U01_@LQ3V64L9R2>
+ <8678e62c-f33b-469c-ac6c-68a060273754@gmail.com>
+ <ZjwJmKa6orPm9NHF@LQ3V64L9R2>
+ <05317efb-14e9-433b-b0b6-657a98500efd@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5911.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e71a554c-7041-4592-eabe-08dc707c3cd2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 May 2024 23:03:27.8081
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: axHfGpAbhsNdUoElfTahel5KHJBbmL5yKqK+enKq9VF2aDxT/Sm7LiXgi1FtjlnQf/q6StpFLzMRgUFlVdl0v3jhMGZAJVNYfl5vUhAv/N8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4706
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <05317efb-14e9-433b-b0b6-657a98500efd@gmail.com>
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Simon Horman
-> Sent: Monday, April 29, 2024 5:58 AM
-> To: Lobakin, Aleksander <aleksander.lobakin@intel.com>
-> Cc: Drewek, Wojciech <wojciech.drewek@intel.com>;
-> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Eric Dumazet
-> <edumazet@google.com>; Kubiak, Michal <michal.kubiak@intel.com>; intel-
-> wired-lan@lists.osuosl.org; NEX SW NCIS OSDT ITP Upstreaming
-> <nex.sw.ncis.osdt.itp.upstreaming@intel.com>; Jakub Kicinski
-> <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; David S. Miller
-> <davem@davemloft.net>
-> Subject: Re: [Intel-wired-lan] [PATCH iwl] idpf: don't enable NAPI and
-> interrupts prior to allocating Rx buffers
->=20
-> On Fri, Apr 26, 2024 at 04:44:08PM +0200, Alexander Lobakin wrote:
-> > Currently, idpf enables NAPI and interrupts prior to allocating Rx
-> > buffers.
-> > This may lead to frame loss (there are no buffers to place incoming
-> > frames) and even crashes on quick ifup-ifdown. Interrupts must be
-> > enabled only after all the resources are here and available.
-> > Split interrupt init into two phases: initialization and enabling,
-> > and perform the second only after the queues are fully initialized.
-> > Note that we can't just move interrupt initialization down the init
-> > process, as the queues must have correct a ::q_vector pointer set
-> > and NAPI already added in order to allocate buffers correctly.
-> > Also, during the deinit process, disable HW interrupts first and
-> > only then disable NAPI. Otherwise, there can be a HW event leading
-> > to napi_schedule(), but the NAPI will already be unavailable.
-> >
-> > Fixes: d4d558718266 ("idpf: initialize interrupts and enable vport")
-> > Reported-by: Michal Kubiak <michal.kubiak@intel.com>
-> > Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> > Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
->=20
-> Reviewed-by: Simon Horman <horms@kernel.org>
+On Thu, May 09, 2024 at 12:42:11PM +0300, Tariq Toukan wrote:
+> ..
+> 
+> > > The off-channels queues (like PTP) do not exist in default. So they are out
+> > > of the game unless you explicitly enables them.
+> > 
+> > I did not enable them, but if you saw the thread, it sounds like Jakub's
+> > preference is that in the v2 I include the PTP stats in get_base_stats.
+> > 
+> > Are you OK with that?
+> 
+> Sounds good.
+> 
+> > Are there other queue stats I should include as well?
+> > 
+> 
+> The QOS/HTB queues.
+> See mlx5e_stats_grp_sw_update_stats_qos.
 
-Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
+Sure, thanks, I can take a look. I think maybe an issue might be that if
+I include QOS/HTB queues then tools/testing/selftests/drivers/net/stats.py
+will start to fail.
+
+I could be mistaken, but it seems that QOS/HTB are not included in the rtnl
+stats, is that right?
+
+If the goal is for queue stats to match rtnl then maybe I should leave
+QOS/HTB out and they can be added to both RTNL and queue stats together at
+a later time.
 
