@@ -1,145 +1,136 @@
-Return-Path: <netdev+bounces-94800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 798038C0AF8
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 07:34:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B4E68C0B46
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:01:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25FF41F22B6A
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 05:34:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B722283650
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F6D149C63;
-	Thu,  9 May 2024 05:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B3651494BD;
+	Thu,  9 May 2024 06:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EY/Sw4rk"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA181494B0
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 05:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109691494B8
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 06:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715232824; cv=none; b=lLBdsrH6Kk7344MY+GDn3sQJdmiHNYZVHk9JEIVHYxnAdYYC9J33ZlsSdLkv+4DT0mVMKaDkPy0DUxULm8kird/Y1Qlo8+zkD1jYDcCvPXpHpo9nkuTAJPS/AdWV037WbcBVeI3OmEVzP6/236uDgxbCjCfvyLtm2gjvH8e0JZ4=
+	t=1715234478; cv=none; b=N6BJnhwj+Xi5b3lLk9vBFJ7N4akKHxxnRF//0m9ECT7bNyYeMogzglnj6t/Mq6n8yK8Ieg35M8ijAiDjsKnb67fT76MwHwL0xpPTloS0yLbRi1q/MRedztL/ni5vUiNSiYfa82n+c8mjpH/hsSLN/z34IfQx/xL6nQJuXLnSW6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715232824; c=relaxed/simple;
-	bh=9TgtwrptwMcS3xm6QIxccK+KaGlkKIOHI+/pkhA276s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Mr8o43S0jt9dcOOPaAqPmngmOJzTSxgnryYRnPB2eb/c8eBxrj4d4W1K9g8cfPPTKOFu0KnnfqAkbvzpLtS/I+Vok5Fqll2tJNlcGIPWVD0hpocI50NsfcWbnx4rnQKpIV2uBwjoFwxtmZUCkfFNTT8zBdLyb1qgDtNQzZpi1Mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1s4wPR-0006ks-81; Thu, 09 May 2024 07:33:37 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1s4wPP-000P92-Va; Thu, 09 May 2024 07:33:35 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1s4wPP-000XZZ-2v;
-	Thu, 09 May 2024 07:33:35 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	=?UTF-8?q?S=C3=B8ren=20Andersen?= <san@skov.dk>
-Subject: [PATCH net-next v2 3/3] net: dsa: microchip: dcb: set default apptrust to PCP only
-Date: Thu,  9 May 2024 07:33:35 +0200
-Message-Id: <20240509053335.129002-4-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240509053335.129002-1-o.rempel@pengutronix.de>
-References: <20240509053335.129002-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1715234478; c=relaxed/simple;
+	bh=S/MVZRULVDyrUtXP/nK9eDK3Jsi7ratojp8mojszynM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sX2bH6hKKsLVW21YUYAr6oLrLmWr4bsSUpOYlUlErxBQcoMXQ4sBXuUgD7ejq5mdN8wdZNHw2oMnAvzb4GRdbMxP9WLSBN2xGAK/+zoWk181NUPWvSt18YJmZdLDJsGixAE6cUlmZdxLI9zh3BqCDTma71UJAgcfelnsoIXlHto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EY/Sw4rk; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715234476; x=1746770476;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=S/MVZRULVDyrUtXP/nK9eDK3Jsi7ratojp8mojszynM=;
+  b=EY/Sw4rkebEj/sgnRIiHkjXTnZsDsuk5t+7IhuU5hdQhkA0nuokxEqOG
+   SWnhw/bN2xrnuey92eSM23H5bazj6Vp9RkxgIUE2clvqsuyzFFJ01gzp+
+   3rtxvwpCXk/ta8jiBmZJfPqTnDwuRoDacjti4tfyaQPHUGoELY+EYOfUw
+   EfCyfGQRvJRqAxmZelHEI7TF6eh7LDvVDOP/W+aL2Engh2525szQfHzf0
+   Svnhd4q/AnDEJxgHGi5N0eZAtg5aIWZVwTLfMg7FVx3+/oDVR4z0CeuU5
+   aAUX8MWNLOJGvWKkUGTEP0UFTIq+uVCfjP8nprK4VDxAfE1LiXcXmH8kd
+   A==;
+X-CSE-ConnectionGUID: AO3WkSLCSF6LYyxuMDg8mA==
+X-CSE-MsgGUID: xcygRezOSVa5/mUpfUTe4w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11067"; a="22537627"
+X-IronPort-AV: E=Sophos;i="6.08,147,1712646000"; 
+   d="scan'208";a="22537627"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 23:01:07 -0700
+X-CSE-ConnectionGUID: mu4NNIakSeCSwqzvSQ/Dyw==
+X-CSE-MsgGUID: mhd8fBbrRF+nHHsS/1XTdQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,147,1712646000"; 
+   d="scan'208";a="33607618"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 08 May 2024 23:01:02 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s4wpw-0004Vg-1B;
+	Thu, 09 May 2024 06:01:00 +0000
+Date: Thu, 9 May 2024 14:00:26 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>,
+	Steve Glendinning <steve.glendinning@shawell.net>,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH v2 net-next] net: usb: smsc95xx: stop lying about
+ skb->truesize
+Message-ID: <202405091310.KvncIecx-lkp@intel.com>
+References: <20240508075159.1646031-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240508075159.1646031-1-edumazet@google.com>
 
-Before DCB support, the KSZ driver had only PCP as source of packet
-priority values. To avoid regressions, make PCP only as default value.
-User will need enable DSCP support manually.
+Hi Eric,
 
-This patch do not affect other KSZ8 related quirks. User will still be
-warned by setting not support configurations for the port 2.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/dsa/microchip/ksz_dcb.c | 21 +++------------------
- 1 file changed, 3 insertions(+), 18 deletions(-)
+[auto build test WARNING on net-next/main]
 
-diff --git a/drivers/net/dsa/microchip/ksz_dcb.c b/drivers/net/dsa/microchip/ksz_dcb.c
-index 07f6742df41bd..dfe2c48e1066a 100644
---- a/drivers/net/dsa/microchip/ksz_dcb.c
-+++ b/drivers/net/dsa/microchip/ksz_dcb.c
-@@ -82,10 +82,6 @@ static const u8 ksz_supported_apptrust[] = {
- 	IEEE_8021QAZ_APP_SEL_DSCP,
- };
- 
--static const u8 ksz8_port2_supported_apptrust[] = {
--	DCB_APP_SEL_PCP,
--};
--
- static const char * const ksz_supported_apptrust_variants[] = {
- 	"empty", "dscp", "pcp", "dscp pcp"
- };
-@@ -771,9 +767,8 @@ int ksz_port_get_apptrust(struct dsa_switch *ds, int port, u8 *sel, int *nsel)
-  */
- int ksz_dcb_init_port(struct ksz_device *dev, int port)
- {
--	const u8 *sel;
-+	const u8 ksz_default_apptrust[] = { DCB_APP_SEL_PCP };
- 	int ret, ipm;
--	int sel_len;
- 
- 	if (is_ksz8(dev)) {
- 		ipm = ieee8021q_tt_to_tc(IEEE8021Q_TT_BE,
-@@ -789,18 +784,8 @@ int ksz_dcb_init_port(struct ksz_device *dev, int port)
- 	if (ret)
- 		return ret;
- 
--	if (ksz_is_ksz88x3(dev) && port == KSZ_PORT_2) {
--		/* KSZ88x3 devices do not support DSCP classification on
--		 * "Port 2.
--		 */
--		sel = ksz8_port2_supported_apptrust;
--		sel_len = ARRAY_SIZE(ksz8_port2_supported_apptrust);
--	} else {
--		sel = ksz_supported_apptrust;
--		sel_len = ARRAY_SIZE(ksz_supported_apptrust);
--	}
--
--	return ksz_port_set_apptrust(dev->ds, port, sel, sel_len);
-+	return ksz_port_set_apptrust(dev->ds, port, ksz_default_apptrust,
-+				     ARRAY_SIZE(ksz_default_apptrust));
- }
- 
- /**
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-usb-smsc95xx-stop-lying-about-skb-truesize/20240508-155316
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240508075159.1646031-1-edumazet%40google.com
+patch subject: [PATCH v2 net-next] net: usb: smsc95xx: stop lying about skb->truesize
+config: arc-randconfig-r132-20240509 (https://download.01.org/0day-ci/archive/20240509/202405091310.KvncIecx-lkp@intel.com/config)
+compiler: arceb-elf-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20240509/202405091310.KvncIecx-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405091310.KvncIecx-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/usb/smsc95xx.c:1815:19: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __wsum [usertype] csum @@     got unsigned short x @@
+   drivers/net/usb/smsc95xx.c:1815:19: sparse:     expected restricted __wsum [usertype] csum
+   drivers/net/usb/smsc95xx.c:1815:19: sparse:     got unsigned short x
+   drivers/net/usb/smsc95xx.c: note: in included file (through include/net/checksum.h, include/linux/skbuff.h, include/net/net_namespace.h, ...):
+   arch/arc/include/asm/checksum.h:27:26: sparse: sparse: restricted __wsum degrades to integer
+   arch/arc/include/asm/checksum.h:27:36: sparse: sparse: restricted __wsum degrades to integer
+   arch/arc/include/asm/checksum.h:29:11: sparse: sparse: bad assignment (-=) to restricted __wsum
+   arch/arc/include/asm/checksum.h:30:16: sparse: sparse: restricted __wsum degrades to integer
+   arch/arc/include/asm/checksum.h:30:18: sparse: sparse: incorrect type in return expression (different base types) @@     expected restricted __sum16 @@     got unsigned int @@
+   arch/arc/include/asm/checksum.h:30:18: sparse:     expected restricted __sum16
+   arch/arc/include/asm/checksum.h:30:18: sparse:     got unsigned int
+
+vim +1815 drivers/net/usb/smsc95xx.c
+
+  1810	
+  1811	static void smsc95xx_rx_csum_offload(struct sk_buff *skb)
+  1812	{
+  1813		u16 *csum_ptr = (u16 *)(skb_tail_pointer(skb) - 2);
+  1814	
+> 1815		skb->csum = get_unaligned(csum_ptr);
+  1816		skb->ip_summed = CHECKSUM_COMPLETE;
+  1817		skb_trim(skb, skb->len - 2); /* remove csum */
+  1818	}
+  1819	
+
 -- 
-2.39.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
