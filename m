@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-94822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20F448C0C80
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:24:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CABC8C0C91
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:29:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 449ED1C20A44
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:24:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D0C91C20A24
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD23113B5A9;
-	Thu,  9 May 2024 08:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43EEC14A081;
+	Thu,  9 May 2024 08:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="ZywfUE0j"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="fV1F62OE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB1FD528
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 08:24:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DCF149DEB
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 08:29:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715243074; cv=none; b=g+G7TQjVqrgjSjsFolPytMP7xrftG0jEgUQYsQB1k8SatUO8jPPDk5K1jExmoNxWHJ5qbjwQMZV9r4alMBGn8ctwD/GpyLDJ42s/Uj9wGiNVhPpEenymbFdcfOEoiQUscEQ/EtZIWzDLmMJ3XVT0k1p0oobo1fVt7K/NFi1lwg8=
+	t=1715243379; cv=none; b=edKzDNu1gaDQAPGztVVYPJSAGTBB06xkt0GWNzF2Qq63HSslVo8v4YSOnwK/dtFijDtFqtFHrmV8mTnhWfTpT+cYK9JuycSDjXPC+KOSjuU/rBOG+Lv5MCZ3K8fDQO4O3q/plecBWDWUAddUdRTsZuDvY24NiP7gFQkDYXSPDlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715243074; c=relaxed/simple;
-	bh=zmVx3rNKuLnJ2Wlwq8EcKeHd5L/7YRHK+ReT9/TwfuE=;
+	s=arc-20240116; t=1715243379; c=relaxed/simple;
+	bh=zkq4ruaaBI1AkUYT0ApAFfUAHFHrNu3wfkgQJ1nIms4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W1kItg5BMwGkRNaVOxVWxaJBcfkQ9OR3YZdTDKwCujOVH3TdvNipUlULsair7Bz/HGjhTB4joQfMCCD5H1k5oXyGf3gfwDDc5cPUSmi5wDfhqO4wDqM3go+Pt703Y86QontVhB7rpVGFRSR8dP6W+1LKKDGy2Myes5ZiHKrHHKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=ZywfUE0j; arc=none smtp.client-ip=209.85.221.46
+	 In-Reply-To:Content-Type; b=l7kwXhZHyR8kwMJWXgNkX3/pvXoxCosnycG3gRb7mFZx0dHn5CffPB4rpM+ktQnSrODnJSUa4WwjznLU05fTNngKGTZ0v5nTYGOK2OOOKctY3gc5vvpYhLqRkRpGcy0Bwye9VgGbVXn7zGuoJ3zXTRlmNVtze6uRpAGn9vX30f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=fV1F62OE; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-349545c3eb8so324800f8f.2
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 01:24:31 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-346359c8785so433165f8f.0
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 01:29:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1715243070; x=1715847870; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1715243375; x=1715848175; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=R5ypNlPhNqmmdIPprtNarw6csoNiCVV8u16iqX+HW5Y=;
-        b=ZywfUE0jamj/dTOCUiX7OWA8HomhvlBBXbbufj9DYlSKoYGCNxYZ4OQgcldj4/1V/S
-         Of+Bhd7Nq/5EpfTgsCeWn7mIE9wMD6WajiPCAzkshbTkC+e2jfu8Ie5DHArPUtO2aPCv
-         m0ijE2EhnUxNp5RQASfQgk0rEv2ihBYBuHm+cYe+CYRx431CYCB2lhGdqukvH4fCHLPz
-         JNTVfHxtzKmdl9kuuJ/VSF0ZUCCO8Dnf6nW/5Lrj4em9c7RXKZsB37kdGfmaHKlcDDla
-         Z+BaEkLsHK/MTcttUtyVTwXGld/3+XeppuUwSAdYKf8tqc+k+bxcTKH0rDoeGgXMK+lN
-         Eu+Q==
+        bh=ap5et3rfjZAPPI6jdU2zvUzFqtxJdAXJo60vGkUc804=;
+        b=fV1F62OE9S9Kvq0bNy858mf8MyJw45ZfVKsKLjqNq0nVBzCran/IMn2d5ql4kByv1I
+         fwD7eAyKEnhf5L8P7VW6kiPB8RewNtjcIcbSiM0p50vOhDxk+tqjq6/oDbsCKp6QlG4o
+         2h5eYusbj6yQ1QzP9/WCy0KEDpcl7p/vVK64ynXHfPtQkp4OgHgSOa2t+377MFwrcqJa
+         LVZ/4LY1o9TXPeBBz8BuHuragT7ZrxcAYXcWOrYPnNBX7zAcL6dzq5te1YKHHL9TBmQg
+         X/kjKySAk6L4xPINxS6//3h7NZrvbDhgTC/rHHRw9odSpVRHbyzGz7w0v3DBK24l91nl
+         DqFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715243070; x=1715847870;
+        d=1e100.net; s=20230601; t=1715243375; x=1715848175;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R5ypNlPhNqmmdIPprtNarw6csoNiCVV8u16iqX+HW5Y=;
-        b=s2Ay/KeS6/3UhKui3Dbp3759uEpzh4iaw8Zcv8mY5nH3b602lfeJGkco0NJAOKQ7X4
-         kq2RxM7GhLFEkrUKdeltTcfJK5hfd0a0hQkzxg+qvzcpF1WSSBq6Jy8elkgGvU2cflUp
-         wOXdWM1HY2kIod6UE1DzGYh0h10m1WrLBKtQIFbPkqt5UeCsQvE7pe58jl7uQizr2e8j
-         X112uDFrnGNnKRKtxbbqq+r3q7WsshtyrNg1OHcehft4/KwsH/jUIzcCiQVSZGrn1x0T
-         yInxLUFMVNGpN+hhprxbb7QQIYjNy6UEJ9b/QgA7hpOyfqXe7wwjR95FaRgCwcnXBoyb
-         1DTw==
-X-Gm-Message-State: AOJu0Yyaf2DQlzxFXqv4vj/y6zDHXS8ie3uh/AhJ8c2r6HqrpwpFI+94
-	qiezQciMJiln6RbZommsJF866ceCcfATHRqIPY4TD3QRs2Fw5DZ2hBLrNCadp+lq1l2Dk7xJ7Qc
-	u
-X-Google-Smtp-Source: AGHT+IE/DlaSIUPKp85cyGvZT0OFokF2QGP0tuZEXUHsoKDTEzNm8hJ3pdT4uoreLk6Kub8JYi8r1Q==
-X-Received: by 2002:adf:e484:0:b0:33e:800d:e87a with SMTP id ffacd0b85a97d-34fcafcdb91mr4371658f8f.34.1715243069529;
-        Thu, 09 May 2024 01:24:29 -0700 (PDT)
+        bh=ap5et3rfjZAPPI6jdU2zvUzFqtxJdAXJo60vGkUc804=;
+        b=kKeUjKlbaJ/Q/DjPgpgsfucYpcm2UWz8Vom9xV3PTmW5UYt2feqMVwwhzVSPcNIxa2
+         /XhacVqhCAxFVFieF+hXInFT4igL9N3iIZaPVi9gRvnJGC6eHc/W06LQOttPFwypltck
+         lMt24rRKJwchYzyE/5EdB2q3Jk/4fTCaE8llWzopnz/quyFW7939bgX6TQRftrzqiwcS
+         Q0Y5WqvV2KTHAX6/20/FayNPXPFM2l2FZSpGV4cT+JHGnaLdA71OB9VyS2OKmvDWULqs
+         VwIQcQpZjNEOuvkI9kInfyhl34b+2/0WJpbAlqnpXYDLOQh9HqYjDBnnIzOhSyikybgn
+         JBnQ==
+X-Gm-Message-State: AOJu0Yy6CX+rPUkIIL2LjVZ7DodvY8p0XqjVvjr+TbAlwTMiQOIUY1PC
+	wC7psUc4pN1S5LmRqZ7aIARW5Ky4IONcZBvW3yh/0Xd/dKB9vHJfBm9lrJSEumikG52/Vt0FCbs
+	2
+X-Google-Smtp-Source: AGHT+IHol/FHAvT0PKf0FqIiYLjDGi9Ezkseav9fmCA4VXY+VH7nVYvTkbnj1BT/nms/Z4XFEIj7cA==
+X-Received: by 2002:adf:f946:0:b0:34e:e770:9a11 with SMTP id ffacd0b85a97d-34fcb3a9282mr3001691f8f.55.1715243375428;
+        Thu, 09 May 2024 01:29:35 -0700 (PDT)
 Received: from ?IPV6:2001:67c:2fbc:0:6fcd:499b:c37e:9a0? ([2001:67c:2fbc:0:6fcd:499b:c37e:9a0])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502baacff4sm1040852f8f.79.2024.05.09.01.24.27
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502baad04dsm1045533f8f.81.2024.05.09.01.29.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 May 2024 01:24:28 -0700 (PDT)
-Message-ID: <b6a6c29b-ad78-4d6f-be1a-93615f27c956@openvpn.net>
-Date: Thu, 9 May 2024 10:25:44 +0200
+        Thu, 09 May 2024 01:29:34 -0700 (PDT)
+Message-ID: <6cd53c57-0ec6-46e1-bfb3-e2ca02215a37@openvpn.net>
+Date: Thu, 9 May 2024 10:30:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,15 +77,17 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 04/24] ovpn: add basic interface
- creation/destruction/management routines
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
- Esben Haabendal <esben@geanix.com>
+Subject: Re: [PATCH net-next v3 05/24] ovpn: implement interface
+ creation/destruction via netlink
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
 References: <20240506011637.27272-1-antonio@openvpn.net>
- <20240506011637.27272-5-antonio@openvpn.net> <ZjuRqyZB0kMINqme@hog>
+ <20240506011637.27272-6-antonio@openvpn.net>
+ <20240507172122.544dd68e@kernel.org>
+ <3b9f43da-0269-4eba-a3c4-dcb635c0de75@openvpn.net>
+ <20240508180946.47e6610a@kernel.org>
 Content-Language: en-US
 From: Antonio Quartulli <antonio@openvpn.net>
 Autocrypt: addr=antonio@openvpn.net; keydata=
@@ -128,211 +130,77 @@ Autocrypt: addr=antonio@openvpn.net; keydata=
  ify06RjcfKmutBiS7jNrNWDK7nOpAP4zMYxYTD9DP03i1MqmJjR9hD+RhBiB63Rsh/UqZ8iN
  VL3XJZMQ2E9SfVWyWYLTfb0Q8c4zhhtKwyOr6wvpEpkCH6uevqKx4YC5
 Organization: OpenVPN Inc.
-In-Reply-To: <ZjuRqyZB0kMINqme@hog>
+In-Reply-To: <20240508180946.47e6610a@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 08/05/2024 16:52, Sabrina Dubroca wrote:
-> 2024-05-06, 03:16:17 +0200, Antonio Quartulli wrote:
->> diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
->> index ad3813419c33..338e99dfe886 100644
->> --- a/drivers/net/ovpn/io.c
->> +++ b/drivers/net/ovpn/io.c
->> @@ -11,6 +11,26 @@
->>   #include <linux/skbuff.h>
->>   
->>   #include "io.h"
->> +#include "ovpnstruct.h"
->> +#include "netlink.h"
->> +
->> +int ovpn_struct_init(struct net_device *dev)
+On 09/05/2024 03:09, Jakub Kicinski wrote:
+> On Wed, 8 May 2024 11:49:07 +0200 Antonio Quartulli wrote:
+>>>> +		netdev_err(dev, "%s: cannot add ifname to reply\n", __func__);
+>>>
+>>> Probably not worth it, can't happen given the message size
+>>
+>> Personally I still prefer to check the return value of functions that
+>> may fail, because somebody may break the assumption (i.e. message large
+>> enough by design) without realizing that this call was relying on that.
+>>
+>> If you want, I could still add a comment saying that we don't expect
+>> this to happen.
 > 
-> nit: Should this be in main.c? It's only used there, and I think it
-> would make more sense to drop it next to ovpn_struct_free.
+> In a few other places we put a WARN_ON_ONCE() on messages size errors.
+> That way syzbot usually catches the miscalculation rather quickly.
+> But no strong objections if you prefer the print.
 
-yeah, it makes sense. will move it.
+I am fine as long as we have some check.
+If WARN_ON_ONCE() helps syzbot, then I'll go with it.
 
+>    
+>>>> +		genlmsg_cancel(msg, hdr);
+>>>> +		nlmsg_free(msg);
+>>>> +		return -EMSGSIZE;
+>>>> +	}
+>>>> +
+>>>> +	genlmsg_end(msg, hdr);
+>>>> +
+>>>> +	return genlmsg_reply(msg, info);
+>>>>    }
+>>>>    
+>>>>    int ovpn_nl_del_iface_doit(struct sk_buff *skb, struct genl_info *info)
+>>>>    {
+>>>> -	return -ENOTSUPP;
+>>>> +	struct ovpn_struct *ovpn = info->user_ptr[0];
+>>>> +
+>>>> +	rtnl_lock();
+>>>> +	ovpn_iface_destruct(ovpn);
+>>>> +	dev_put(ovpn->dev);
+>>>> +	rtnl_unlock();
+>>>> +
+>>>> +	synchronize_net();
+>>>
+>>> Why? 🤔️
+>>
+>>
+>> hmm I was under the impression that we should always call this function
+>> when destroying an interface to make sure that packets that already
+>> entered the network stack can be properly processed before the interface
+>> is gone for good.
+>>
+>> Maybe this is not the right place? Any hint?
 > 
->> +{
->> +	struct ovpn_struct *ovpn = netdev_priv(dev);
->> +	int err;
->> +
-> 
-> [...]
->> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
->> index 33c0b004ce16..584cd7286aff 100644
->> --- a/drivers/net/ovpn/main.c
->> +++ b/drivers/net/ovpn/main.c
-> [...]
->> +static void ovpn_struct_free(struct net_device *net)
->> +{
->> +	struct ovpn_struct *ovpn = netdev_priv(net);
->> +
->> +	rtnl_lock();
-> 
->   ->priv_destructor can run from register_netdevice (already under
-> RTNL), this doesn't look right.
-> 
->> +	list_del(&ovpn->dev_list);
-> 
-> And if this gets called from register_netdevice, the list_add from
-> ovpn_iface_create hasn't run yet, so this will probably do strange
-> things?
+> The unregistration of the netdevice should take care of syncing packets
+> in flight, AFAIU.
 
-Argh, again I haven't considered a failure in register_netdevice and you 
-are indeed right.
+I have another call to synchronize_net() in ovpn_iface_destruct() after 
+calling unregister_netdevice().
 
-Maybe it is better to call list_del() in the netdev notifier, upon 
-NETDEV_UNREGISTER event?
+Sabrina was actually questioning that call too.
 
+First of all I now realize that we are calling it twice, but from what I 
+am understanding, I think we can just ditch any invocation and let core 
+do the right thing.
 
-> 
->> +	rtnl_unlock();
->> +
->> +	free_percpu(net->tstats);
->> +}
->> +
->> +static int ovpn_net_open(struct net_device *dev)
->> +{
->> +	struct in_device *dev_v4 = __in_dev_get_rtnl(dev);
->> +
->> +	if (dev_v4) {
->> +		/* disable redirects as Linux gets confused by ovpn handling
->> +		 * same-LAN routing
->> +		 */
->> +		IN_DEV_CONF_SET(dev_v4, SEND_REDIRECTS, false);
->> +		IPV4_DEVCONF_ALL(dev_net(dev), SEND_REDIRECTS) = false;
-> 
-> Jakub, are you ok with that? This feels a bit weird to have in the
-> middle of a driver.
+I'll remove it and do some tests.
 
-Let me share what the problem is (copied from the email I sent to Andrew 
-Lunn as he was also curious about this):
-
-The reason for requiring this setting lies in the OpenVPN server acting 
-as relay point (star topology) for hosts in the same subnet.
-
-Example: given the a.b.c.0/24 IP network, you have .2 that in order to 
-talk to .3 must have its traffic relayed by .1 (the server).
-
-When the kernel (at .1) sees this traffic it will send the ICMP 
-redirects, because it believes that .2 should directly talk to .3 
-without passing through .1.
-
-Of course it makes sense in a normal network with a classic broadcast 
-domain, but this is not the case in a VPN implemented as a star topology.
-
-Does it make sense?
-
-The only way I see to fix this globally is to have an extra flag in the 
-netdevice signaling this peculiarity and thus disabling ICMP redirects 
-automatically.
-
-Note: wireguard has those lines too, as it probably needs to address the 
-same scenario.
-
-
-> 
->> +	}
->> +
->> +	netif_tx_start_all_queues(dev);
->> +	return 0;
->> +}
-> 
-> [...]
->> +void ovpn_iface_destruct(struct ovpn_struct *ovpn)
->> +{
->> +	ASSERT_RTNL();
->> +
->> +	netif_carrier_off(ovpn->dev);
->> +
->> +	ovpn->registered = false;
->> +
->> +	unregister_netdevice(ovpn->dev);
->> +	synchronize_net();
-> 
-> If this gets called from the loop in ovpn_netns_pre_exit, one
-> synchronize_net per ovpn device would seem quite expensive.
-
-As per your other comment, maybe I should just remove the 
-synchronize_net() entirely since it'll be the core to take care of 
-inflight packets?
-
-> 
->> +}
->> +
->>   static int ovpn_netdev_notifier_call(struct notifier_block *nb,
->>   				     unsigned long state, void *ptr)
->>   {
->>   	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
->> +	struct ovpn_struct *ovpn;
->>   
->>   	if (!ovpn_dev_is_valid(dev))
->>   		return NOTIFY_DONE;
->>   
->> +	ovpn = netdev_priv(dev);
->> +
->>   	switch (state) {
->>   	case NETDEV_REGISTER:
->> -		/* add device to internal list for later destruction upon
->> -		 * unregistration
->> -		 */
->> +		ovpn->registered = true;
->>   		break;
->>   	case NETDEV_UNREGISTER:
->> +		/* twiddle thumbs on netns device moves */
->> +		if (dev->reg_state != NETREG_UNREGISTERING)
->> +			break;
->> +
->>   		/* can be delivered multiple times, so check registered flag,
->>   		 * then destroy the interface
->>   		 */
->> +		if (!ovpn->registered)
->> +			return NOTIFY_DONE;
->> +
->> +		ovpn_iface_destruct(ovpn);
-> 
-> Maybe I'm misunderstanding this code. Why do you want to manually
-> destroy a device that is already going away?
-
-We need to perform some internal cleanup (i.e. release all peers).
-I don't see how this can happen automatically, no?
-
-> 
->>   		break;
->>   	case NETDEV_POST_INIT:
->>   	case NETDEV_GOING_DOWN:
->>   	case NETDEV_DOWN:
->>   	case NETDEV_UP:
->>   	case NETDEV_PRE_UP:
->> +		break;
->>   	default:
->>   		return NOTIFY_DONE;
->>   	}
->> @@ -62,6 +210,24 @@ static struct notifier_block ovpn_netdev_notifier = {
->>   	.notifier_call = ovpn_netdev_notifier_call,
->>   };
->>   
->> +static void ovpn_netns_pre_exit(struct net *net)
->> +{
->> +	struct ovpn_struct *ovpn;
->> +
->> +	rtnl_lock();
->> +	list_for_each_entry(ovpn, &dev_list, dev_list) {
->> +		if (dev_net(ovpn->dev) != net)
->> +			continue;
->> +
->> +		ovpn_iface_destruct(ovpn);
-> 
-> Is this needed? On netns destruction all devices within the ns will be
-> destroyed by the networking core.
-
-Before implementing ovpn_netns_pre_exit() this way, upon namespace 
-deletion the ovpn interface was being moved to the global namespace.
-
-Hence I decided to manually take care of its destruction.
-
-Isn't this expected?
 
 -- 
 Antonio Quartulli
