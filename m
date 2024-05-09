@@ -1,171 +1,184 @@
-Return-Path: <netdev+bounces-95042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C3568C14C6
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:31:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FC148C14D2
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:37:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2BAE28202E
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 18:31:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92AB81F21C76
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 18:37:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE4269D29;
-	Thu,  9 May 2024 18:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254B4770FC;
+	Thu,  9 May 2024 18:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="spFPN9Zz"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aq0m6g1O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2083.outbound.protection.outlook.com [40.107.92.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26447E112;
-	Thu,  9 May 2024 18:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715279508; cv=none; b=dt7+fajGKWRisHMYxtHbhg3uDMIY5ZDjzybmAxV9uv2Fec8NfRfZaWeeJmvRAWB9Dv6e7jnWJiNwa/WWpTdC+Ph66pvCg1es+Ggr6F7TtuCihLczKquEf4eMTBl+930kAdSEh87wyL0RpujzSdXGg9zprhG6EClzPnSAR1FjE64=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715279508; c=relaxed/simple;
-	bh=EW2HneRYvnYjamI9I95OmhMCaCA7WANES7Q2uzbWvKs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p5IG35miH4aL2eGqk6vSNG/85873lGmyYf9nnpfiiqknshe3sWu3ljoDzRP4sE7A7WIjl3WkMI5b/92hMYU6r0NXV9y7FzIGhBCfQ896vWwB9ZykmuS4Mv8PccU6r9VfTJ6kkkYMW5Kq2/kvWJXKSlUzVYfIRhioiFZfgU3DoOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=spFPN9Zz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6278CC116B1;
-	Thu,  9 May 2024 18:31:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715279508;
-	bh=EW2HneRYvnYjamI9I95OmhMCaCA7WANES7Q2uzbWvKs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=spFPN9Zz/J4ZBr0EV6hWgtopFbXtBdd4UmS5ifVTpe132J8fQmCGTlBWqV99fm4ju
-	 2jNW9DaIGEiZM81Is3h2sBICV/xMl60piGjnZhB8BeCqG9pNwNW2VG2mFtZB52rhbf
-	 ao7W/AdGRffBhbfnp0tcIuTJM4J/6xtDLTZqB4Mm3tlZ2bron4p0jf+2sg1ExdXXqf
-	 dCFBhUmBti4QI3nyHAt0BYQr880GSazfhdWMC1hf01w4QM/5b0vSafnAUrNQJ0t4CN
-	 r61CWgx+AF8Gg2Vk1m7dLE8gRvgvjySHC+XOlDQJJxHHbgBeh5JVqU0Pvm8QlJbkIW
-	 LfoKHgs2+AV+g==
-Message-ID: <daf7ed61-e09b-439b-9cdd-b6d9aa003e27@kernel.org>
-Date: Thu, 9 May 2024 20:31:40 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467F038DE4
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 18:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.83
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715279835; cv=fail; b=tWV989MKF4iAe1S2Zep5pWZVo88tYDj5RWojYwqqFvtgNp1ZmyqBgwmWKZ3Y3zh8vXLqXx13M8nFDNtc2EDpzEVsuLwXHGOCEG6t56DGwBDZY7/njBoWupQCpfFVEW13ZBKCpFq02RljbSJYslTlUQvbeE/h1tEIyvPMfXCuiMY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715279835; c=relaxed/simple;
+	bh=fGjoCbXZkYDOkUHQIOEyChjg5bDzK28VoUgvyPdc130=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QXUoVRsPDvo6FkvOaQHNNd0a2qCxfP2e7f6ZRVUe3WRzTp/oFaR2+OqRAiUK+72Xe/D/mTI4LTNaVD5IfAoWlva2P/6plPRFIk8ZBWl5D3WYVCMLm19d5OKO3NWdoXPVH2Tx+Kfumm0NsctAtjLdhrMuxhk4jkMB9f+l3kx6Rho=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aq0m6g1O; arc=fail smtp.client-ip=40.107.92.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RmGObHECdErSwdHbXttGKxzJNYxCgV6zygVTgnmUd6xE+ys+kQmsfxuMiLWWQIdggvIZ0F4+quQhkwmszCWzrOayIT7cmJeivnsqkmNId6cfeZ8zJpjuZBs2XMEhMVzXwXCLoeekXBaQMnWB2QVQTUwmITRT4+WYbvARv40K0ilwn7WfPIRRIbJTYXf0P7L0Rtq+6Qp5Ph/fKGMtPNgi+r9vURQczAdsglDpPVAUF1dxlnPRDIjggWYF0FAksOy7MawZqMkHATTAuAdaQmP58zFrNbQrndxrjmWelbkrStBQjZmHA1Ns4zmLqNw3B9G6Nps68tlmjyUOUIi65HPW0Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KEVdWgbC8fUXHE0TXaGdTSk61o6omhb2dkdOblXSL70=;
+ b=jOKRwzlazE6hldKT38GfOXGGts1xXNhNM3N8YnsCtY/BHsPdRM9jX3kaXYl8OYIsWKUsvtsZSmohvaXnyXuvt/E0YEtf8BU46TdpaXmnsHB7fvRX9ZCsRvU+Z+TBR4RI/pa7L+4SqX/RVXmiksgdUWVoQkF2Z7uZmih2TmQkT2f7eyWRvMEgGoYI7zaYUdu18rP9FoJ500pgNTVUxP2CydTR+HkkcDGWI8xOsO9+eMjp3JpguSxVd/7vl73AWpOQOSJinbTpVAHs2bTPy6Dg0Lg8Qnrcgl2aA+IK+Dal1GMpojoUpuXc/+yfs/50YgfYDt+9Tq7nSJ9hv0kbhj2pnQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KEVdWgbC8fUXHE0TXaGdTSk61o6omhb2dkdOblXSL70=;
+ b=aq0m6g1OKwFHDkDNWY8DuwY8oxhUAKs3fwHSYRA0bs1Fw/WJ5hC3BaofYnyATtanZVkmwTDjUgepT0vkD9tWWb2Ob0c55Y1Mh3CUXd/L/ER/zH+kGIGuM1YtmnV1WUgybxp13y3NqiEYlD62iA4IAksvVsMjAMmxjCFyfUWb3AyIc/nv9oQ7pXgR40ceylwqpkDC43aV0dH33Eir/mGCXxPKEi046+lVJnGRuhMaEWOf7CPTCXhOtt2d7gyo9wVqdxGxTLpZ3CqHy+RGgq1pDuTigHRR3TTCPXiUnBi1uMUQwXKoNRQLckBlhrC+oEoQvOq0ldhHyXRidTtnM7zKug==
+Received: from BY3PR04CA0009.namprd04.prod.outlook.com (2603:10b6:a03:217::14)
+ by PH8PR12MB6769.namprd12.prod.outlook.com (2603:10b6:510:1c4::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.48; Thu, 9 May
+ 2024 18:37:09 +0000
+Received: from CO1PEPF000042A9.namprd03.prod.outlook.com
+ (2603:10b6:a03:217:cafe::d7) by BY3PR04CA0009.outlook.office365.com
+ (2603:10b6:a03:217::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.46 via Frontend
+ Transport; Thu, 9 May 2024 18:37:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000042A9.mail.protection.outlook.com (10.167.243.38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7544.18 via Frontend Transport; Thu, 9 May 2024 18:37:09 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 9 May 2024
+ 11:36:40 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 9 May 2024
+ 11:36:40 -0700
+Received: from vdi.nvidia.com (10.127.8.13) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Thu, 9 May
+ 2024 11:36:39 -0700
+From: Daniel Jurgens <danielj@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
+	<virtualization@lists.linux.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<jiri@nvidia.com>, <axboe@kernel.dk>, Daniel Jurgens <danielj@nvidia.com>
+Subject: [PATCH] virtio_net: Fix memory leak in virtnet_rx_mod_work
+Date: Thu, 9 May 2024 13:36:34 -0500
+Message-ID: <20240509183634.143273-1-danielj@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH bpf-next v2 2/2] selftests/bpf: Add mptcp subflow subtest
-Content-Language: en-GB
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Geliang Tang <tanggeliang@kylinos.cn>
-References: <20240509-upstream-bpf-next-20240506-mptcp-subflow-test-v2-0-4048c2948665@kernel.org>
- <20240509-upstream-bpf-next-20240506-mptcp-subflow-test-v2-2-4048c2948665@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240509-upstream-bpf-next-20240506-mptcp-subflow-test-v2-2-4048c2948665@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042A9:EE_|PH8PR12MB6769:EE_
+X-MS-Office365-Filtering-Correlation-Id: 99262414-282d-46f8-fd89-08dc70570905
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|82310400017|1800799015|7416005|376005|36860700004;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?k21dj2n9dBfl6cjqG0QVyh+4oIt7r8Te25woA1CirEiL9VNECpcbWRgqqJrd?=
+ =?us-ascii?Q?SlZ849VlTUjLN7wXUWKo7+NY5xwxZXYWjPBT36kBMsLHLB12G1eYTcOMDeUS?=
+ =?us-ascii?Q?mP/mzAUgcoxP8/J50H0X4vidB2pENCx/C6GETB2sCTz2rEAO57mJysLl37JC?=
+ =?us-ascii?Q?BWEd5fMuwcRLG6ljd8sYcUrOEqxDfyT/W1M9NbTsXaq0tqSyDvvBraRq9gxV?=
+ =?us-ascii?Q?uOn63A+9kQ2JgEwdACxxMZPT1A1OUFLTw2aBHtBppSC6FkcmmQ9A2iN/StsR?=
+ =?us-ascii?Q?6GtKnI5MA1hb7L9X8hkhHHY7799VBC9cE36lrhvtaXg9W1bW2GqBq58pmwon?=
+ =?us-ascii?Q?30iPiPvQBz+6GWPcYK5Qrms3k8FRoiINxCihumGDOFmpxFy9Tyt3q+OvbEhY?=
+ =?us-ascii?Q?T4CdWh0fCOxVfk/id7o1vrhEst57LxohmdEGyP8us83j96qIIILX5b4hqSBB?=
+ =?us-ascii?Q?oKl9N2JQFADia9Z0PsDZLPIXFgTP0LaQaZvGFwGd26Qed4fGLakRkvw62pQz?=
+ =?us-ascii?Q?oa+7sv5lnkNho+aRUe2EqE+U/NZYGaplvVbnMHRB7QX/ftE1BGLR5zZQH9dS?=
+ =?us-ascii?Q?hJmZwwTfJPK8LYyNROYSMHNHIfQYaXhI2p9i8aXSvLgVcSud6W5iIZ5W+4pk?=
+ =?us-ascii?Q?Z3nHpHkhBC8ZJ2g1BmmLY2yi061HMENPDW3WQvpc3uNlMoC6Vc3oorXr/rOl?=
+ =?us-ascii?Q?QrDPbYkxETZ8GuOY0aVsPvs84f/LzKS2F1ZnpPRsZyKVLQr1T3B0/IFLtCqP?=
+ =?us-ascii?Q?6QZ9sPelvRRmz5KhFvbNpuHlqXhgs+srzsDBvbaAAkgBLqGkj3uFpZw+IPiD?=
+ =?us-ascii?Q?JSsPyP9aWMH/VA0h1LZbhzX51cDru2BDh1ssiU/iM991XkI/EZCSi5R/evR3?=
+ =?us-ascii?Q?YzMVdWtQxTtMn4+xseD5FFi9IWqF9cYy5Nqv1NEEd2R0tIrNalmBZGB/t6A4?=
+ =?us-ascii?Q?6Ubqo4wWxMQV+T8WderKESCF1spD+UtD/Ivc/uc6S5pQQH7zgd+LMFA/7HJ7?=
+ =?us-ascii?Q?DG5y8hJk9TpAN9itZUSpCSMx+hT6Sqm+JCzuXnxqzTOtXp+Jrl/KWhUNX1b4?=
+ =?us-ascii?Q?hjNmTwFOpWMVRTtqlHNTsUY3WuJgZ94gZoMXegt7qcGIDSyFYTyjlDEOWERq?=
+ =?us-ascii?Q?V3XnYSL/AXzrItDBDS09tFjc0emek9kk0+FEChxzwOk1yfCiHDoinDT8hROn?=
+ =?us-ascii?Q?xL4Cj4rLKY0p/EfEeiWXFX/W7ASQUXU+1HKeCIsb5v2gSaKETO9rYHEWWwKR?=
+ =?us-ascii?Q?NUHclSgcrQq+qqGJlar9wLroROiTo4l8f5lmEBjtd88XQ5RFCCSbTcnEREEI?=
+ =?us-ascii?Q?GxyZRD0jdSprDBZzt8B+nOuISqYqykHUzqhYBD5t4/KMRrAXMOiLZUPONiVe?=
+ =?us-ascii?Q?FsDPr+TPzP9uhceqOQwStQyM/ku6?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400017)(1800799015)(7416005)(376005)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2024 18:37:09.4058
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99262414-282d-46f8-fd89-08dc70570905
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000042A9.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6769
 
-Hello,
+The pointer delcaration was missing the __free(kfree).
 
-On 09/05/2024 17:49, Matthieu Baerts (NGI0) wrote:
-> From: Geliang Tang <tanggeliang@kylinos.cn>
-> 
-> This patch adds a subtest named test_subflow to load and verify the newly
-> added mptcp subflow example in test_mptcp. Add a helper endpoint_init()
-> to add a new subflow endpoint. Add another helper ss_search() to verify the
-> fwmark and congestion values set by mptcp_subflow prog using setsockopts.
-> 
-> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/76
-> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> Reviewed-by: Mat Martineau <martineau@kernel.org>
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
->  tools/testing/selftests/bpf/prog_tests/mptcp.c | 109 +++++++++++++++++++++++++
->  1 file changed, 109 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> index 274d2e033e39..6039b0ff3801 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
+Fixes: ff7c7d9f5261 ("virtio_net: Remove command data from control_buf")
+Reported-by: Jens Axboe <axboe@kernel.dk>
+Closes: https://lore.kernel.org/netdev/0674ca1b-020f-4f93-94d0-104964566e3f@kernel.dk/
+Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+---
+ drivers/net/virtio_net.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-(...)
-
-> @@ -340,10 +344,115 @@ static void test_mptcpify(void)
->  	close(cgroup_fd);
->  }
->  
-> +static int endpoint_init(char *flags)
-> +{
-> +	SYS(fail, "ip -net %s link add veth1 type veth peer name veth2", NS_TEST);
-> +	SYS(fail, "ip -net %s addr add %s/24 dev veth1", NS_TEST, ADDR_1);
-> +	SYS(fail, "ip -net %s link set dev veth1 up", NS_TEST);
-> +	SYS(fail, "ip -net %s addr add %s/24 dev veth2", NS_TEST, ADDR_2);
-> +	SYS(fail, "ip -net %s link set dev veth2 up", NS_TEST);
-> +	SYS(fail, "ip -net %s mptcp endpoint add %s %s", NS_TEST, ADDR_2, flags);
-
-I just noticed that this command is failing on the BPF CI:
-
-  https://github.com/kernel-patches/bpf/actions/runs/9020020315?pr=7009
-
-Is it possible that an old version of IPRoute2 is installed?
-'ip mptcp' is supported since v5.8.0 (from 2020).
-
-It looks like Ubuntu Focal 20.04 is being used, which has the v5.5.0. Do
-we then need to find another way to set the MPTCP endpoints?
-
-Cheers,
-Matt
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index df6121c38a1b..42da535913ed 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -2884,7 +2884,6 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+ 
+ static int virtnet_close(struct net_device *dev)
+ {
+-	u8 *promisc_allmulti  __free(kfree) = NULL;
+ 	struct virtnet_info *vi = netdev_priv(dev);
+ 	int i;
+ 
+@@ -2905,11 +2904,11 @@ static void virtnet_rx_mode_work(struct work_struct *work)
+ {
+ 	struct virtnet_info *vi =
+ 		container_of(work, struct virtnet_info, rx_mode_work);
++	u8 *promisc_allmulti  __free(kfree) = NULL;
+ 	struct net_device *dev = vi->dev;
+ 	struct scatterlist sg[2];
+ 	struct virtio_net_ctrl_mac *mac_data;
+ 	struct netdev_hw_addr *ha;
+-	u8 *promisc_allmulti;
+ 	int uc_count;
+ 	int mc_count;
+ 	void *buf;
 -- 
-Sponsored by the NGI0 Core fund.
+2.45.0
 
 
