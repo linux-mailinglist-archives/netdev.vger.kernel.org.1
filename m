@@ -1,90 +1,80 @@
-Return-Path: <netdev+bounces-94773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00B668C09B5
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:20:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4230E8C09E3
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:43:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31B121C2101E
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 02:20:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72C511C209D1
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 02:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F9B13C9D7;
-	Thu,  9 May 2024 02:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DSAw5lqJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4724313A414;
+	Thu,  9 May 2024 02:43:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.124.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B89513C9C8;
-	Thu,  9 May 2024 02:20:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB4213AD0E
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 02:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.124.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715221247; cv=none; b=tq/vye/lO/rdGYrxtneikSYeSZsy1aMeDSBApSaz3936faWT3ZiD63VKatmWDVVolNUETazZinK4pwIU7DPhh/8Xk0V9B4PnXEVwdAtMGCOK4/BS2DyH0TeeWzqdQkHk7hekWRfrsBD4rMgwQCoMnr/Rq7UobVIPl9LHs0zAWQk=
+	t=1715222601; cv=none; b=l/Gry/ZH4TonrdVCTq5Wdv+5UMN5P2BAuW/DuCnOLYukB8L8xyTGZpDDRNABYcpeZOXtZn0z9lQAvHDaheVIjNnYgzjJ+lRgB6i4X2etLnByONJJnMXdkPAqjdy6sYkWmy9DQTD7hQKPdNQc+n7qc+yzkWmx5gKywqVw1xmWb+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715221247; c=relaxed/simple;
-	bh=A5R9N6suF2say+DC+2OqoLEof2TmNGWj0P0OCAE1IA4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HAbwL4eCCc+Ca8svIqYcyXNfdMm5xP9j4naM4n6q2LlQX2rEihvHSZ7XduI5Olspf3WqJqQNJ7iAccqEJ7qychMSnz/sAqopFuvq3RfZxHqD18ttTtMOGZ+XKuCYNhkgcizWCcyliXdVnh27V1vYiB03QNXuZXr19KPz9w5wqaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DSAw5lqJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 88E6DC2BD11;
-	Thu,  9 May 2024 02:20:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715221246;
-	bh=A5R9N6suF2say+DC+2OqoLEof2TmNGWj0P0OCAE1IA4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DSAw5lqJcHKTEvDpjH2wSxDU/8MXELnzBcwyOP1fwgtX1AmaTfh7m4utdBebGicZ3
-	 DxgX5GsLMkjU0cfM8Bzyx0U/rYeMHxUcH/Yw6YUcD7g24PsOK1osw9j4JUj45wlA6q
-	 rdqqAFdy1hT5+JQ4dG5KQudyFL6fnoypk+3LEhO0g8pPhchSTXMMBlsUwwLLyyvaYx
-	 dTScO2+nGzMTU5G0tqPNOuCb71NErmuAFvqf32Nc88WFjKbNhchR4m+JYhXn9GbGj1
-	 qKPCiaQF9YI1qJUGdFtdmOQrLRCXLfVrx6L6tV3dEpCgCqisE7ZKFlb2RagxJztsyZ
-	 RxMJzFEWt1m9Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 73991C43331;
-	Thu,  9 May 2024 02:20:46 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1715222601; c=relaxed/simple;
+	bh=kIZLAlOJZG1H04luQj/Aon1q5SGKrKDL095iTKMpL+E=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=qvhTBo318mbp+hu4+x+S4opt14wEgRQvHsqpFwak/NzgtytdKS+kOrt9QP7+C0THFEYb6zp7wbU8VDx1KnlvPg9f4wJDOgHfsQInArqmCtoV3QWJjSjOabqv+kSu04e0KrGhpiZlMQGwpgM/9Wpx74l7lV0DnChWIo2HOcwhI9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=114.132.124.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas5t1715222363t207t37108
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [183.129.236.74])
+X-QQ-SSF:00400000000000F0FUF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 852496616481411263
+To: "'Jakub Kicinski'" <kuba@kernel.org>
+Cc: <davem@davemloft.net>,
+	<edumazet@google.com>,
+	<pabeni@redhat.com>,
+	<rmk+kernel@armlinux.org.uk>,
+	<andrew@lunn.ch>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<duanqiangwen@net-swift.com>
+References: <20240429102519.25096-1-jiawenwu@trustnetic.com>	<20240429102519.25096-2-jiawenwu@trustnetic.com> <20240430185951.5005ff96@kernel.org>
+In-Reply-To: <20240430185951.5005ff96@kernel.org>
+Subject: RE: [PATCH net v2 1/4] net: wangxun: fix the incorrect display of queue number in statistics
+Date: Thu, 9 May 2024 10:39:22 +0800
+Message-ID: <009c01daa1ba$1986bae0$4c9430a0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: wireless-next-2024-05-08
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171522124646.11537.1340312844004646287.git-patchwork-notify@kernel.org>
-Date: Thu, 09 May 2024 02:20:46 +0000
-References: <20240508120726.85A10C113CC@smtp.kernel.org>
-In-Reply-To: <20240508120726.85A10C113CC@smtp.kernel.org>
-To: Kalle Valo <kvalo@kernel.org>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Content-Type: text/plain;
+	charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQKMAc/6KzgCZu6RyYLqheGkGVll8gKXsrC2AVA+vb6wCXQ3IA==
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Hello:
-
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed,  8 May 2024 12:07:26 +0000 (UTC) you wrote:
-> Hi,
+On Wed, May 1, 2024 10:00 AM, Jakub Kicinski wrote:
+> On Mon, 29 Apr 2024 18:25:16 +0800 Jiawen Wu wrote:
+> > When using ethtool -S to print hardware statistics, the number of
+> > Rx/Tx queues printed is greater than the number of queues actually
+> > used.
 > 
-> here's a pull request to net-next tree, more info below. Please let me know if
-> there are any problems.
-> 
-> Kalle
-> 
-> [...]
+> The ethtool API fetches the number of stats and the values in an
+> unsafe, non-atomic way. If someone increases the number of queues
+> while someone else is fetching the stats the memory of the latter
+> process will get corrupted. The code is correct as is.
 
-Here is the summary with links:
-  - pull-request: wireless-next-2024-05-08
-    https://git.kernel.org/netdev/net-next/c/83127ecada25
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+So should we keep the old code, showing stats with fixed maximum
+number of queues?
 
 
