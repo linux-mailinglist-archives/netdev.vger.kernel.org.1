@@ -1,104 +1,117 @@
-Return-Path: <netdev+bounces-94929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEEF18C106B
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 15:32:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D15D8C106D
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 15:33:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CC0C1F224A8
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 13:32:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E5441C20BDB
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 13:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 231D21527BB;
-	Thu,  9 May 2024 13:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="12O7hd2z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF5115279B;
+	Thu,  9 May 2024 13:33:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 770EF15253E
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 13:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC2F14A62A
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 13:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715261524; cv=none; b=CaMvpIAeJDLz0YONOCi7+/dfgtJ3VC9qXY+I8PBZ3jECU5n66TXNISrZkRD5cPZWrJBxtAuMbmw6kEpP01ZDIu4ozOg2EJ51EmBPt7pBZAq2whgvjQJhsCxe99dUlP3LuEmxq/bjnGRepR5z+yo0kVoCZpeQbbDCxOrZOr/xLr4=
+	t=1715261587; cv=none; b=KHoxTJ9uJcwZdAwDq65iyrMFC+eLhytI6zsnZLjKOKjP868C8xAT8kbQjVUKDxmRRbgnoL37pOS79zBCTEg/T517dyRPlK152MP9T83WjiQ7juhEWzVW7NJN1msjBsLoRJNNjLqJjo08lAX+vaIMk1IOVvpTkcghtwlt1fPyqCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715261524; c=relaxed/simple;
-	bh=UGtd25PtHEIWxCFYY/R1k/CiR1C5wx6tTMdVM+SZH6g=;
+	s=arc-20240116; t=1715261587; c=relaxed/simple;
+	bh=t27OOztjwI27LyDpR52PwYOrlrbv9JGIoAkEKg1BCkI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FNpV+GbT7zS4cgK4W50PiJOqSzWbBu1PLwh2D15k/VCuvegEYtKs/qG0BF1cCv8iWsU2PKpcjD2cS1oniDNy3kC+p/Ar5CPKLJzklthGK7i5Npsv9uChhsM7gHrzKHQefaoV9r4iXP0DHU9WgpyiQerD2AxMy0Kqx/a8RPy0Ho8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=12O7hd2z; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41ba1ba55ffso4975395e9.1
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 06:32:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715261521; x=1715866321; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=70d8HmBhBsVnOVGM9dBLiSdBfBSq7HfimZSV/5XPOsY=;
-        b=12O7hd2zCN8U3YDiF/NiZW21UN6bBtIjcCDbBir7gFNoMfGlmrh0rOeEsrArZAE+T0
-         Ek31ConGocLhr6Nlzm7PKoF6JAA3ElYB7t51hHmgqKH5ETeDfSfpSEmz5z+f3ATeWe2H
-         QqKywAdHKDsH20cQkALBUm5FNHVovCZYxFCJfeSqcWg059ZYeww8ZjjYHKU+PPNfuEJt
-         da3p7z59RB8gyCTAEQA7u2+u+Ll1DbwUiT/hhyKqQCuOEC8ahrbR4P9Myw6hPMarh5fi
-         sm2Ve1fpqUVfu70yRVIp9BCQnUeRbuq65OHAhkHQ2r5/eVssu3vOl3Uy1ZqMXhO9CM7e
-         oL5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715261521; x=1715866321;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=70d8HmBhBsVnOVGM9dBLiSdBfBSq7HfimZSV/5XPOsY=;
-        b=br12/8BUJzwnn6/f81eGL8axUbYjINHWT7do6zg4b1PraVXNUpfoF49DnVBVxEGOlK
-         +FG4PIqmqnYk0QNTkyJPzeH/FzxxlkIV64hpqT1eHbXocGdg09I9w1ZnxpkWbekf8nad
-         /fYf/KDutkoSebNofaB3RSQuBIHqngKPwVNbGT8XVLrZF5mL0r9qZZwAi/ZCBOz1x++h
-         9O45b5VzG41a9nQp9dJaMbdhU/vKvUvUmO3Q6lO1XfhScrL72no5g40+/ebZfE/aRcVf
-         SgYX5/hjZAtLdTBZgiaSA/z48GLEkBJoicL/SCQrrEFD76AjG+OLMm3yiMunN05s9x7t
-         CgYw==
-X-Gm-Message-State: AOJu0YzYrJBWuj47C9wytF69n/5WBOUNfJ6eXvquEcWWGNbazG+k/NPg
-	1gcUAPFzyeV84uS8uSVgEficRqFJQ1L+NcxHL5Gctqyu/29RhyfxFtooO0H1evc=
-X-Google-Smtp-Source: AGHT+IF5XnRKnh+zxxiQWj046SakVClKzAm5n/VwxuaCxO5rFmV2zyz0T1mPR2yDxRk1wD0FiW+FfQ==
-X-Received: by 2002:a05:600c:1d05:b0:418:d3f4:677b with SMTP id 5b1f17b1804b1-41fbce7ddc9mr23119235e9.17.1715261520556;
-        Thu, 09 May 2024 06:32:00 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccce9426sm26020195e9.25.2024.05.09.06.31.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 06:32:00 -0700 (PDT)
-Date: Thu, 9 May 2024 15:31:56 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com
-Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
-Message-ID: <ZjzQTFq5lJIoeSqM@nanopsycho.orion>
-References: <20240509114615.317450-1-jiri@resnulli.us>
- <20240509084050-mutt-send-email-mst@kernel.org>
+	 In-Reply-To:Content-Type:Content-Disposition; b=c7Lk7OW23fgz5AYrW5svO6dKdGUyuLs6M63LOj0Io4FEpCNhLu4VqMlOCvYVa3TiOnueZLy8b2lcXLyNXRrnPhpOFq2auZ319s/+5fY/E8yu06kWOPwHmu44FwnCp6l8gaKh00RBnLvtuQAxlIc3n+2/ZrJm2ZvSlLfAeXU6PSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-290-JZZP_wTcP5ivedMqqU7guw-1; Thu, 09 May 2024 09:32:53 -0400
+X-MC-Unique: JZZP_wTcP5ivedMqqU7guw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 952BC805912;
+	Thu,  9 May 2024 13:32:52 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E60B40004D;
+	Thu,  9 May 2024 13:32:51 +0000 (UTC)
+Date: Thu, 9 May 2024 15:32:50 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
+Subject: Re: [PATCH net-next v3 08/24] ovpn: introduce the ovpn_socket object
+Message-ID: <ZjzQgog9NfFiR6CP@hog>
+References: <20240506011637.27272-1-antonio@openvpn.net>
+ <20240506011637.27272-9-antonio@openvpn.net>
+ <ZjuyIOK6BY3r9YCI@hog>
+ <53dc5388-630f-47e1-a6c1-6c3bb91ee2ac@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <53dc5388-630f-47e1-a6c1-6c3bb91ee2ac@openvpn.net>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
-In-Reply-To: <20240509084050-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: quoted-printable
 
-Thu, May 09, 2024 at 02:41:39PM CEST, mst@redhat.com wrote:
->On Thu, May 09, 2024 at 01:46:15PM +0200, Jiri Pirko wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> Add support for Byte Queue Limits (BQL).
->> 
->> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->
->Can we get more detail on the benefits you observe etc?
->Thanks!
+2024-05-08, 22:38:58 +0200, Antonio Quartulli wrote:
+> On 08/05/2024 19:10, Sabrina Dubroca wrote:
+> > 2024-05-06, 03:16:21 +0200, Antonio Quartulli wrote:
+> > > diff --git a/drivers/net/ovpn/socket.c b/drivers/net/ovpn/socket.c
+> > > new file mode 100644
+> > > index 000000000000..a4a4d69162f0
+> > > --- /dev/null
+> > > +++ b/drivers/net/ovpn/socket.c
+> > [...]
+> > > +
+> > > +/* Finalize release of socket, called after RCU grace period */
+> >=20
+> > kref_put seems to call ovpn_socket_release_kref without waiting, and
+> > then that calls ovpn_socket_detach immediately as well. Am I missing
+> > something?
+>=20
+> hmm what do we need to wait for exactly? (Maybe I am missing something)
+> The ovpn_socket will survive a bit longer thanks to kfree_rcu.
 
-More info about the BQL in general is here:
-https://lwn.net/Articles/469652/
+The way I read this comment, it says that ovpn_socket_detach will be
+called after one RCU grace period, but I don't see where that grace
+period would come from.
+
+    ovpn_socket_put -> kref_put(release=3Dovpn_socket_release_kref) ->
+      ovpn_socket_release_kref -> ovpn_socket_detach
+
+No grace period here.
+
+Or am I misinterpreting the comment? There will be a grace period
+caused by kfree_rcu before the ovpn_socket is actually freed, is that
+what the comment means?
+
+> > > +static void ovpn_socket_detach(struct socket *sock)
+> > > +{
+> > > +=09if (!sock)
+> > > +=09=09return;
+> > > +
+> > > +=09sockfd_put(sock);
+> > > +}
+> >=20
+
+--=20
+Sabrina
 
 
