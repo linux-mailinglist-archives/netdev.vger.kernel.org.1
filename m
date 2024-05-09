@@ -1,202 +1,166 @@
-Return-Path: <netdev+bounces-94791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 268388C0A9C
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:48:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06398C0AA9
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:50:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9236F282140
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:48:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 451111F22955
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36781494AB;
-	Thu,  9 May 2024 04:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B97149009;
+	Thu,  9 May 2024 04:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="PIQhdSB+"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="d9k3Xohb"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA3710E5;
-	Thu,  9 May 2024 04:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E902747D;
+	Thu,  9 May 2024 04:49:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715230084; cv=none; b=HIFyww88Vy3DSQa4W7PmYbojSASef6t1I0Lqi4YnsL/EkhcyMkkFnv3KnMj4YDOY7UqCFef4Am1V2S4u9SOG1N4C+Tc8+l61hx8AafwkxVfcOZg8yserqbNoJtHkyCXe7LtMQdPHSo+wHeQtomYEnF2acTcoj1964fciAMzctrg=
+	t=1715230195; cv=none; b=BCjXOxe0Oa9542fw/UqQXY4T5vcOs8zMxCx7ihNJu1oKiYO/d3Eh929W80bhDyr3DpbfLfuzr0zmYwwE9pI+E/g2eRC55q6a9SOAlpFVblFM+MuKjehqJPB6G8NtbUIxpEgVfiDcXzsZAMgNyQ4n9UKB5Z3UEquJx/YJMp49ERc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715230084; c=relaxed/simple;
-	bh=0sXKEUPKYsOEEH4LhVpmVlkzLaZgJQCzrryLkUE7ROc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=a/BBk4ccPeITqkpdW9KcKVS16N93tABohHQ+8JKgXsuaa+QMN3C1LKzy41nGvQw9RI7bzg/tygfgzWe8/sjaV4Tr4yhADyuhotNbncN1WlUz/pmmbPOetnDOHzTsaF2OM2o7JMKJg6nTl89UDTNoynixWNeZkORQspYuQoRr2KQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=PIQhdSB+; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1715230077; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=FktZGS1PcidKzZWp/FV98QcsANXTXQ1UQ5n4c9mukPI=;
-	b=PIQhdSB+yr/HWqGlfljMsScPKnasGQQOv8f/SjCUfpJ5O5yMydr02qkKjbsMsgIoMXe/BtPIJKDIqW5ZCrxYYgyXuo1QAHPcZXGFbLFBXxIm0NHGbX6l93ATIHe/KgoE+7eyvzlyy/+GPfBUXlNz7d9/OucV1WKTs0I2FDz0shk=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045046011;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=24;SR=0;TI=SMTPD_---0W65dDll_1715230074;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W65dDll_1715230074)
-          by smtp.aliyun-inc.com;
-          Thu, 09 May 2024 12:47:55 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: netdev@vger.kernel.org,
-	virtualization@lists.linux.dev
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1715230195; c=relaxed/simple;
+	bh=+AiojDAJmMoCc0Wxxh5jISkjo5+IH8X8Y3hjru7idxw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gd3tEsR/YQv0byIK1xjrl8o5hHsNLMKfXXH2YrBPy+qRa3XHUzeq41uD/hGk9158kxvmhCMG8KcXCYFXTNlXVTOP2Wtw56iRtrxB49RwlFBFP+KGePBvwY9IrDGeqT/tLf/oSBQJ/pYPuAj3ZSgeLMiGhvl2GtDB0nWb5/WBe8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=d9k3Xohb; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=x3Xxg6i0FLAN0umHIWCwG93UHt8NFMOuUk41qzLUqYk=; b=d9k3XohbzRhXOoELgdBEeA6f1S
+	3oOjwUmoqaRaQC0CvfU6k+88iGiYqGevi4D0Mjv1XT/tJ31yElVIPjyooqUNsndaV6nr1hGD5KD6Y
+	hpVyEo5ud1SsOU0IbJ/27faXATUncL94DVq2aq/GP8tX02rBz5V+LazPctxgZmjT4XiNg5CteZelR
+	F250+x02riIYTRrco+NPB3RdRCFIh0LOb6pIdqAbmqXgrCWDOGcloO9JUAvrLzhBGKhu3BAgULPxQ
+	P+NUz6+r5CHQPlzEem7mdtAOYVy13sfKqnZcHBQZehzZ76EOcgOw/zp4uB68EXKz4VKifIE4VqybV
+	dq8ZPucQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s4vit-00000000LYS-0m4f;
+	Thu, 09 May 2024 04:49:39 +0000
+Date: Wed, 8 May 2024 21:49:39 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Brett Creeley <bcreeley@amd.com>,
-	Ratheesh Kannoth <rkannoth@marvell.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Tal Gilboa <talgi@nvidia.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Paul Greenwalt <paul.greenwalt@intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	justinstitt@google.com,
-	donald.hunter@gmail.com
-Subject: [PATCH net-next v13 4/4] virtio-net: support dim profile fine-tuning
-Date: Thu,  9 May 2024 12:47:47 +0800
-Message-Id: <20240509044747.101237-5-hengqi@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20240509044747.101237-1-hengqi@linux.alibaba.com>
-References: <20240509044747.101237-1-hengqi@linux.alibaba.com>
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
+	Arseniy Krasnov <avkrasnov@salutedevices.com>,
+	Aleksander Lobakin <aleksander.lobakin@intel.com>,
+	Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Richard Gobert <richardbgobert@gmail.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Breno Leitao <leitao@debian.org>, David Wei <dw@davidwei.uk>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Subject: Re: [RFC PATCH net-next v8 02/14] net: page_pool: create hooks for
+ custom page providers
+Message-ID: <ZjxV4yEYXRGElrsA@infradead.org>
+References: <CAHS8izPH+sRLSiZ7vbrNtRdHrFEf8XQ61XAyHuxRSL9Jjy8YbQ@mail.gmail.com>
+ <20240507164838.GG4718@ziepe.ca>
+ <0d5da361-cc7b-46e9-a635-9a7a4c208444@gmail.com>
+ <20240507175644.GJ4718@ziepe.ca>
+ <6a50d01a-b5b9-4699-9d58-94e5f8f81c13@gmail.com>
+ <20240507233247.GK4718@ziepe.ca>
+ <Zjsm3vO6rIY_sw5A@phenom.ffwll.local>
+ <1e2823db-504b-4829-856f-3f45a45ccada@gmail.com>
+ <ZjufddNVJs5Csaix@infradead.org>
+ <8ced4c49-d153-40fb-9e62-0a5784cfa864@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8ced4c49-d153-40fb-9e62-0a5784cfa864@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Virtio-net has different types of back-end device implementations.
-In order to effectively optimize the dim library's gains for different
-device implementations, let's use the new interface params to
-initialize and query dim results from a customized profile list.
+On Wed, May 08, 2024 at 06:02:14PM +0100, Pavel Begunkov wrote:
+> Well, the example fell flat, but you don't use dmabuf when there are
+> no upsides from using it. For instance, when you already have pinned
+> pages, you're going to use pages, and there are no other refcounting
+> concerns.
 
-Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
----
- drivers/net/virtio_net.c | 47 ++++++++++++++++++++++++++++++++++------
- 1 file changed, 40 insertions(+), 7 deletions(-)
+Sure.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 218a446c4c27..9e0624ae962d 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2447,7 +2447,7 @@ static int virtnet_open(struct net_device *dev)
- 
- 	for (i--; i >= 0; i--) {
- 		virtnet_disable_queue_pair(vi, i);
--		cancel_work_sync(&vi->rq[i].dim.work);
-+		net_dim_work_cancel(&vi->rq[i].dim);
- 	}
- 
- 	return err;
-@@ -2613,7 +2613,7 @@ static int virtnet_rx_resize(struct virtnet_info *vi,
- 
- 	if (running) {
- 		napi_disable(&rq->napi);
--		cancel_work_sync(&rq->dim.work);
-+		net_dim_work_cancel(&rq->dim);
- 	}
- 
- 	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_unmap_free_buf);
-@@ -2873,7 +2873,7 @@ static int virtnet_close(struct net_device *dev)
- 
- 	for (i = 0; i < vi->max_queue_pairs; i++) {
- 		virtnet_disable_queue_pair(vi, i);
--		cancel_work_sync(&vi->rq[i].dim.work);
-+		net_dim_work_cancel(&vi->rq[i].dim);
- 	}
- 
- 	return 0;
-@@ -4403,7 +4403,7 @@ static void virtnet_rx_dim_work(struct work_struct *work)
- 	if (!rq->dim_enabled)
- 		goto out;
- 
--	update_moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
-+	update_moder = net_dim_get_rx_irq_moder(dev, dim);
- 	if (update_moder.usec != rq->intr_coal.max_usecs ||
- 	    update_moder.pkts != rq->intr_coal.max_packets) {
- 		err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, qnum,
-@@ -5101,6 +5101,36 @@ static void virtnet_tx_timeout(struct net_device *dev, unsigned int txqueue)
- 		   jiffies_to_usecs(jiffies - READ_ONCE(txq->trans_start)));
- }
- 
-+static int virtnet_init_irq_moder(struct virtnet_info *vi)
-+{
-+	u8 profile_flags = 0, coal_flags = 0;
-+	int ret, i;
-+
-+	profile_flags |= DIM_PROFILE_RX;
-+	coal_flags |= DIM_COALESCE_USEC | DIM_COALESCE_PKTS;
-+	ret = net_dim_init_irq_moder(vi->dev, profile_flags, coal_flags,
-+				     DIM_CQ_PERIOD_MODE_START_FROM_EQE,
-+				     0, virtnet_rx_dim_work, NULL);
-+
-+	if (ret)
-+		return ret;
-+
-+	for (i = 0; i < vi->max_queue_pairs; i++)
-+		net_dim_setting(vi->dev, &vi->rq[i].dim, false);
-+
-+	return 0;
-+}
-+
-+static void virtnet_free_irq_moder(struct virtnet_info *vi)
-+{
-+	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-+		return;
-+
-+	rtnl_lock();
-+	net_dim_free_irq_moder(vi->dev);
-+	rtnl_unlock();
-+}
-+
- static const struct net_device_ops virtnet_netdev = {
- 	.ndo_open            = virtnet_open,
- 	.ndo_stop   	     = virtnet_close,
-@@ -5380,9 +5410,6 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
- 					 virtnet_poll_tx,
- 					 napi_tx ? napi_weight : 0);
- 
--		INIT_WORK(&vi->rq[i].dim.work, virtnet_rx_dim_work);
--		vi->rq[i].dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
--
- 		sg_init_table(vi->rq[i].sg, ARRAY_SIZE(vi->rq[i].sg));
- 		ewma_pkt_len_init(&vi->rq[i].mrg_avg_pkt_len);
- 		sg_init_table(vi->sq[i].sg, ARRAY_SIZE(vi->sq[i].sg));
-@@ -5803,6 +5830,10 @@ static int virtnet_probe(struct virtio_device *vdev)
- 		for (i = 0; i < vi->max_queue_pairs; i++)
- 			if (vi->sq[i].napi.weight)
- 				vi->sq[i].intr_coal.max_packets = 1;
-+
-+		err = virtnet_init_irq_moder(vi);
-+		if (err)
-+			goto free;
- 	}
- 
- #ifdef CONFIG_SYSFS
-@@ -5954,6 +5985,8 @@ static void virtnet_remove(struct virtio_device *vdev)
- 	disable_rx_mode_work(vi);
- 	flush_work(&vi->rx_mode_work);
- 
-+	virtnet_free_irq_moder(vi);
-+
- 	unregister_netdev(vi->dev);
- 
- 	net_failover_destroy(vi->failover);
--- 
-2.32.0.3.g01195cf9f
+> Unless there is an advantage of dmabufs over FOLL_LONGTERM
+> that I don't know about when used with normal user pages.
+
+The advantages of using a dma-buf over FOLL_LONGTERM are:
+
+ a) you pre-dma map, which is a significant performance advantage for
+    IOMMU-based setups
+ b) you support any dma-buf exported and not just user memory.  This
+    is primarily important for PCIe P2P, but there might be other
+    useful exporters as well
+
+> > wish io_uring would have just implemented them from the start instead of
+> > the current fixed buffers that are not quite as useful by not
+> > pre-mapping DMA and not supporting P2P.
+> 
+> fdget(dmabuf) would be horrible, I assume that's not the suggestion.
+
+I'm not even sure what you mean with that.
 
 
