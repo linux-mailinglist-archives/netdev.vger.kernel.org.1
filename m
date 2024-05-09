@@ -1,87 +1,62 @@
-Return-Path: <netdev+bounces-95141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FD238C17F1
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 22:51:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 225C88C1800
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 22:58:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C35421C21D26
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:51:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1464283830
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:58:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B9A86258;
-	Thu,  9 May 2024 20:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="jXh2kqeU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851DE84FB1;
+	Thu,  9 May 2024 20:58:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sonata.ens-lyon.org (domu-toccata.ens-lyon.fr [140.77.166.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96EAC85620
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 20:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85F384DEE;
+	Thu,  9 May 2024 20:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.77.166.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715287871; cv=none; b=gRJM2FAdmU5zlAsLqX7n9nsi0/LVgR5aXU5un1HU7i/5rsDdOkCntrGMmzEII1BTPzTSXHZfPYMbPbLguGDYoo6+ZnfFajPmBomrldtgYKzcvHYupbTD7CzH9Jx4oGKY4YVAl3kJUEURKPlRO9vy88ZyJVSWdldsIlzIuigMicA=
+	t=1715288305; cv=none; b=YS4b8fSUtBSUGmQdgtLUlLpjpVgAlfC63I0aoZnrW8m8gKzY7XB8cM1nU+IBFtUEfEPNyWmOozo384UDJyrHWkbT9mOf5Tb5LcEV+LXJ1Z7rcKaKFYp2Z6NNPq7DicM9LplcqLj0aZoIHIRByn5ZI0POay6kp1eQCT+bZ5DFcOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715287871; c=relaxed/simple;
-	bh=jh0q0ulQ5LcPy3XQUg0Ue3n4pGfewvXGaX+N3ICGH+Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TIUlCYBTIPTgNleRdGU4QhQDfidnfNN+E5H21vYl+09KqrB3AtE0UANLLurUmezuWiGL4/0ZV8QF9EAcJysCCOV+RtgttJ2GIYvVnQVsAfLgZiFz0doil/tH5UNZPoiP7gGrltfA7SnH0cWX7ZvTRRxcWf+jlQDIG8Gr6thMInI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=jXh2kqeU; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1ec69e3dbcfso10708685ad.0
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 13:51:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1715287869; x=1715892669; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=No8/jmvB2lIMy6tK61c0Wm+y+Z2VaVEhQDXdDb8ENDg=;
-        b=jXh2kqeUaVQ0nhfXGHTIL23aws5KMCR8Yscd7r1sehBwfSwQRHDjCnXqcnG0IRr0oH
-         3a+hKH2nHUvzXiXJA9/y/H35CGqSW2LAh6Wx5h13meATPrwl3nalSImdxrrhXHWILNuv
-         4JPlAyjSq+MMJEmRPYcZXa80RgNMRcWQWZ1i8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715287869; x=1715892669;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=No8/jmvB2lIMy6tK61c0Wm+y+Z2VaVEhQDXdDb8ENDg=;
-        b=VaZCNJvRWBT2YqlJDOoQYTht097FqnsCuEhCKKt3TdG5It2is1FvpSME5TSgqh7Ilj
-         eX4ZNoIQ5Pvz6He69A+50ID+U3kJzzq6tEi9n4Do+dhniAuZl2BuY5FQXjFXVqphR+xN
-         +wSeTPlD+J0b/PaiDzvCgwIncVDHOeLUIzoh5JAsGWPNm2XKKEnQvJJlqqLc1HBPT65R
-         lRBfqN7ym55P7OfTffYK4ufokPQhUMd9FBrAnPMGBLlS7JqxBjODEkDSNTUQAgta6fVm
-         uSogrZpYpzmg0lGy0Gu1Ed+opCNsbpWzbLuRt0cMgM3tajlTw0UzbWLKTJ6OeUIvKlyq
-         OpKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVPHOI8DX3LFmWHrtgo8bGa2MlZJoKXDBHKrBbKU1yZ6dKcbbChIJW6Y36bNbMfFPT+Mok1dfcPS8QX9HhSvATuKFCciIaX
-X-Gm-Message-State: AOJu0Yxnwi6e/VW4He4EmffnK2JqNsykhaWlHJcwvtq2pZkpKXLNBCLI
-	v/C30QXl4ZRGwjFeQ9kA5Lbw1DS+6XXxiNwLbUMoiUzsELDl/JrK145YzJgBaHI=
-X-Google-Smtp-Source: AGHT+IFdJzoOlK3+2PZn0yWAVQ5SUDkUUcQQGgjCs9iyqPeiJ5XXgMJqnpVya2oFF/6RdwbW0XGY1w==
-X-Received: by 2002:a17:902:f812:b0:1eb:1474:5ef5 with SMTP id d9443c01a7336-1ef43d2ea72mr6154495ad.33.1715287868873;
-        Thu, 09 May 2024 13:51:08 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0badb959sm18677365ad.85.2024.05.09.13.51.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 13:51:08 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
+	s=arc-20240116; t=1715288305; c=relaxed/simple;
+	bh=C67xdYWkBGECbhZb4PGQ2m356x1NuCq2vdcx75RdNeQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l5NHHXX+WsDoTo339JkTDyFMSxC1U9z2BhLRq4bD65B9YKZbhLXPzAnAhGnUzmQa5yRxjd3aMRm9IRTPziBFIGm+aWZNbG3sg4XUu/p8QS5cDrXxnIkA9kwWUsMec00r/lME1hKyN5f47J+VsMCsUdj/JDk97sXwKsRG23VnFgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org; spf=pass smtp.mailfrom=bounce.ens-lyon.org; arc=none smtp.client-ip=140.77.166.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.ens-lyon.org
+Received: from localhost (localhost [127.0.0.1])
+	by sonata.ens-lyon.org (Postfix) with ESMTP id D8533A0336;
+	Thu,  9 May 2024 22:58:15 +0200 (CEST)
+Received: from sonata.ens-lyon.org ([127.0.0.1])
+	by localhost (sonata.ens-lyon.org [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id xslR1qoH_xYw; Thu,  9 May 2024 22:58:15 +0200 (CEST)
+Received: from begin (aamiens-653-1-111-57.w83-192.abo.wanadoo.fr [83.192.234.57])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by sonata.ens-lyon.org (Postfix) with ESMTPSA id AB897A0332;
+	Thu,  9 May 2024 22:58:15 +0200 (CEST)
+Received: from samy by begin with local (Exim 4.97)
+	(envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1s5AqF-0000000H31a-0DdT;
+	Thu, 09 May 2024 22:58:15 +0200
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
 To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: mkarsten@uwaterloo.ca,
-	nalramli@fastly.com,
-	Joe Damato <jdamato@fastly.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	tparkin@katalix.com,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	linux-rdma@vger.kernel.org (open list:MELLANOX MLX4 core VPI driver)
-Subject: [PATCH net-next v4 3/3] net/mlx4: support per-queue statistics via netlink
-Date: Thu,  9 May 2024 20:50:56 +0000
-Message-Id: <20240509205057.246191-4-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240509205057.246191-1-jdamato@fastly.com>
-References: <20240509205057.246191-1-jdamato@fastly.com>
+	James Chapman <jchapman@katalix.com>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	netdev@vger.kernel.org
+Subject: [PATCH] l2tp: Support different protocol versions with same IP/port quadruple
+Date: Thu,  9 May 2024 22:58:12 +0200
+Message-ID: <20240509205812.4063198-1-samuel.thibault@ens-lyon.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,113 +65,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Make mlx4 compatible with the newly added netlink queue stats API.
+628bc3e5a1be ("l2tp: Support several sockets with same IP/port quadruple")
+added support for several L2TPv2 tunnels using the same IP/port quadruple,
+but if an L2TPv3 socket exists it could eat all the trafic. We thus have to
+first use the version from the packet to get the proper tunnel, and only
+then check that the version matches.
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
-Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- .../net/ethernet/mellanox/mlx4/en_netdev.c    | 73 +++++++++++++++++++
- 1 file changed, 73 insertions(+)
+ net/l2tp/l2tp_core.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_netdev.c b/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
-index 4c089cfa027a..fd79e957b5d8 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
-@@ -43,6 +43,7 @@
- #include <net/vxlan.h>
- #include <net/devlink.h>
- #include <net/rps.h>
-+#include <net/netdev_queues.h>
+diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+index 2ab45e3f48bf..7d519a46a844 100644
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -820,13 +820,8 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
+ 	/* Get L2TP header flags */
+ 	hdrflags = ntohs(*(__be16 *)ptr);
  
- #include <linux/mlx4/driver.h>
- #include <linux/mlx4/device.h>
-@@ -3099,6 +3100,77 @@ void mlx4_en_set_stats_bitmap(struct mlx4_dev *dev,
- 	last_i += NUM_PHY_STATS;
- }
+-	/* Check protocol version */
++	/* Get protocol version */
+ 	version = hdrflags & L2TP_HDR_VER_MASK;
+-	if (version != tunnel->version) {
+-		pr_debug_ratelimited("%s: recv protocol version mismatch: got %d expected %d\n",
+-				     tunnel->name, version, tunnel->version);
+-		goto invalid;
+-	}
  
-+static void mlx4_get_queue_stats_rx(struct net_device *dev, int i,
-+				    struct netdev_queue_stats_rx *stats)
-+{
-+	struct mlx4_en_priv *priv = netdev_priv(dev);
-+	const struct mlx4_en_rx_ring *ring;
-+
-+	spin_lock_bh(&priv->stats_lock);
-+
-+	if (!priv->port_up || mlx4_is_master(priv->mdev->dev))
-+		goto out_unlock;
-+
-+	ring = priv->rx_ring[i];
-+	stats->packets = READ_ONCE(ring->packets);
-+	stats->bytes   = READ_ONCE(ring->bytes);
-+	stats->alloc_fail = READ_ONCE(ring->alloc_fail);
-+
-+out_unlock:
-+	spin_unlock_bh(&priv->stats_lock);
-+}
-+
-+static void mlx4_get_queue_stats_tx(struct net_device *dev, int i,
-+				    struct netdev_queue_stats_tx *stats)
-+{
-+	struct mlx4_en_priv *priv = netdev_priv(dev);
-+	const struct mlx4_en_tx_ring *ring;
-+
-+	spin_lock_bh(&priv->stats_lock);
-+
-+	if (!priv->port_up || mlx4_is_master(priv->mdev->dev))
-+		goto out_unlock;
-+
-+	ring = priv->tx_ring[TX][i];
-+	stats->packets = READ_ONCE(ring->packets);
-+	stats->bytes   = READ_ONCE(ring->bytes);
-+
-+out_unlock:
-+	spin_unlock_bh(&priv->stats_lock);
-+}
-+
-+static void mlx4_get_base_stats(struct net_device *dev,
-+				struct netdev_queue_stats_rx *rx,
-+				struct netdev_queue_stats_tx *tx)
-+{
-+	struct mlx4_en_priv *priv = netdev_priv(dev);
-+
-+	spin_lock_bh(&priv->stats_lock);
-+
-+	if (!priv->port_up || mlx4_is_master(priv->mdev->dev))
-+		goto out_unlock;
-+
-+	if (priv->rx_ring_num) {
-+		rx->packets = 0;
-+		rx->bytes = 0;
-+		rx->alloc_fail = 0;
+ 	/* Get length of L2TP packet */
+ 	length = skb->len;
+@@ -838,7 +833,7 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
+ 	/* Skip flags */
+ 	ptr += 2;
+ 
+-	if (tunnel->version == L2TP_HDR_VER_2) {
++	if (version == L2TP_HDR_VER_2) {
+ 		/* If length is present, skip it */
+ 		if (hdrflags & L2TP_HDRFLAG_L)
+ 			ptr += 2;
+@@ -855,7 +850,7 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
+ 			struct l2tp_tunnel *alt_tunnel;
+ 
+ 			alt_tunnel = l2tp_tunnel_get(tunnel->l2tp_net, tunnel_id);
+-			if (!alt_tunnel || alt_tunnel->version != L2TP_HDR_VER_2)
++			if (!alt_tunnel)
+ 				goto pass;
+ 			tunnel = alt_tunnel;
+ 		}
+@@ -869,6 +864,13 @@ static int l2tp_udp_recv_core(struct l2tp_tunnel *tunnel, struct sk_buff *skb)
+ 		ptr += 4;
+ 	}
+ 
++	/* Check protocol version */
++	if (version != tunnel->version) {
++		pr_debug_ratelimited("%s: recv protocol version mismatch: got %d expected %d\n",
++				     tunnel->name, version, tunnel->version);
++		goto invalid;
 +	}
 +
-+	if (priv->tx_ring_num[TX]) {
-+		tx->packets = 0;
-+		tx->bytes = 0;
-+	}
-+
-+out_unlock:
-+	spin_unlock_bh(&priv->stats_lock);
-+}
-+
-+static const struct netdev_stat_ops mlx4_stat_ops = {
-+	.get_queue_stats_rx     = mlx4_get_queue_stats_rx,
-+	.get_queue_stats_tx     = mlx4_get_queue_stats_tx,
-+	.get_base_stats         = mlx4_get_base_stats,
-+};
-+
- int mlx4_en_init_netdev(struct mlx4_en_dev *mdev, int port,
- 			struct mlx4_en_port_profile *prof)
- {
-@@ -3262,6 +3334,7 @@ int mlx4_en_init_netdev(struct mlx4_en_dev *mdev, int port,
- 	netif_set_real_num_tx_queues(dev, priv->tx_ring_num[TX]);
- 	netif_set_real_num_rx_queues(dev, priv->rx_ring_num);
- 
-+	dev->stat_ops = &mlx4_stat_ops;
- 	dev->ethtool_ops = &mlx4_en_ethtool_ops;
- 
- 	/*
+ 	/* Find the session context */
+ 	session = l2tp_tunnel_get_session(tunnel, session_id);
+ 	if (!session || !session->recv_skb) {
 -- 
-2.25.1
+2.43.0
 
 
