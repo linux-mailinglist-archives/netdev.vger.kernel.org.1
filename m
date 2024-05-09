@@ -1,156 +1,115 @@
-Return-Path: <netdev+bounces-95133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F39F8C1791
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 22:31:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F01468C17A8
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 22:37:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FF0D1C22027
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:31:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C9591C21DD5
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED0312BB13;
-	Thu,  9 May 2024 20:31:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10CFF7CF16;
+	Thu,  9 May 2024 20:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fIhFWTXo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vBndXtjF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC47C29AF;
-	Thu,  9 May 2024 20:31:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE0D4C618;
+	Thu,  9 May 2024 20:37:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715286683; cv=none; b=MxfK+HHZExRviTnS776143pl/fQuXzpFfRB1DTbA1SnNXBNI9mn3aQfIbPI4IYSNB9w4rw9xzaZCjRkKctJQRKpuDsP2/rTijmU2FMkcjfSoU7KxqLUC0JyP+dS9y1uHQebOTsXazlE87ZWmzPE0ZfMM6Emass15cQhWO0J2hgE=
+	t=1715287032; cv=none; b=BlNAaMDx0ORVOr+50Bxa3YKMkqYvPlHUb62yKDbDf8gJUbsKUqbHCS1jhRfvydme8dujdJ51hMgiwvxfz8rX/O/ZsoyWOiKbaEwpQJ3Id15b7t25xfYv4ZL7j7AKv9FR+Lm57Grzrx6YvLG4voIzcaKLL9Dej2Ux8/prHlAPtiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715286683; c=relaxed/simple;
-	bh=3hRwl2K12SkRKNM78wLsl/4te3kJ4BT9nZoF6sCbxbA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Y6ORVS9/MHH8gFbRDYwZJhLkNKqr4JFJxkH3AUoj/kOCYYaeKjIfN4DoLs0hiYYB0PB6o8mTYUvLL4WU5l/kc4AFBDplL53pYWIbh7vOyD1Qfrs0/9Jgyk7g0RaRAs3k2tTyroZFVLLfc1v7dFAPKndPczpRGUSojeAyZTH37mA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fIhFWTXo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BEF6C116B1;
-	Thu,  9 May 2024 20:31:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715286683;
-	bh=3hRwl2K12SkRKNM78wLsl/4te3kJ4BT9nZoF6sCbxbA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fIhFWTXoUfrZEXYXnNpjyqAaUa4FKNKp1liB8UAZMze9KVv4hdAFmJylc4iA2ekx7
-	 0fhwWAgIWjmCNyvHeQ0baHNbtDX7ycaHfa2SXUNVmD1OT3lznGSH7W9ZOMYVq8XzPS
-	 XNdetjkAICbPLl6ZcBlFpBrF6uOo19eNlFEH04hmul98ViHyviLWxshHNPkuB4YW8R
-	 j/XqzRH4eUz9DNnhN6j1c2zTJ4wOzQvR5+5d/39yVSA5AWK7LBuN0WnPSyQoM+Na7F
-	 +byhIpw32XvdJTGUefGzhSRK/x2pK5XgOnr0McvVxwaDjfNk0mDdQZSj4xrD1fIuDV
-	 XVepSil5D0/gg==
-From: SeongJae Park <sj@kernel.org>
-To: Edward Liaw <edliaw@google.com>
-Cc: SeongJae Park <sj@kernel.org>,
-	shuah@kernel.org,
-	"=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?=" <mic@digikod.net>,
-	"=?UTF-8?q?G=C3=BCnther=20Noack?=" <gnoack@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
+	s=arc-20240116; t=1715287032; c=relaxed/simple;
+	bh=x7LhucK821k3vSDngfFbnMiXnOtN4rPhBuqtaKRTceA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tbPH7pOY0F6ynYZFbEfzCBWlbM0JuhY9M3e6iLi99FGDeM1/FQodEY5f0eKWbgU8Tj/PFzrZk0dzVRApnrY4Z4AK6YbJN+0q3CZcOL38XDw4pat2wrJrGVRbC7upNh7gOTyZXiqszggZdm7m0LRp66w+n9A9lFuCCUNM8D6lUWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vBndXtjF; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=Ts0hQ/+xW7g60neUMYTCGyqDcd3REU5NHScQ5L3JXqY=; b=vB
+	ndXtjFxiQyjGyXFPOPqJvLSuYj1dZgBZBtGlR0d534n0nhdN/FqezzvTA6FSRMOSooXTH6Mw2mv+F
+	krBi5WwH8hWLFR/pPsDeq6MRSc/Z3lUJhDrf8OTVPellNItjSPBqaRgngM4K6lIldyp2KxQdeufcG
+	ImLBwCUicnKLxqU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s5AVd-00F4zH-4P; Thu, 09 May 2024 22:36:57 +0200
+Date: Thu, 9 May 2024 22:36:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Thorsten Blum <thorsten.blum@toblux.com>
+Cc: Nicolas Pitre <nico@fluxnic.net>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kernel-team@android.com,
-	linux-security-module@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	bpf@vger.kernel.org,
-	damon@lists.linux.dev,
-	linux-mm@kvack.org,
-	mathieu.desnoyers@efficios.com
-Subject: Re: [PATCH v3 13/68] selftests/damon: Drop define _GNU_SOURCE
-Date: Thu,  9 May 2024 13:31:13 -0700
-Message-Id: <20240509203113.63537-1-sj@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240509200022.253089-14-edliaw@google.com>
-References: 
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	Arnd Bergmann <arnd@arndb.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: smc91x: Fix m68k kernel compilation for ColdFire CPU
+Message-ID: <98259c2f-b44a-467e-8854-48641984e468@lunn.ch>
+References: <20240509121713.190076-2-thorsten.blum@toblux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240509121713.190076-2-thorsten.blum@toblux.com>
 
-Hi Edward,
-
-On Thu,  9 May 2024 19:58:05 +0000 Edward Liaw <edliaw@google.com> wrote:
-
-> _GNU_SOURCE is provided by lib.mk, so it should be dropped to prevent
-> redefinition warnings.
+On Thu, May 09, 2024 at 02:17:14PM +0200, Thorsten Blum wrote:
+> Compiling the m68k kernel with support for the ColdFire CPU family fails
+> with the following error:
 > 
-> Fixes: 809216233555 ("selftests/harness: remove use of LINE_MAX")
-
-I show Mathieu's comment on this[1].  I have no strong opinion on this, but if
-you conclude to remove or change this line, please apply same change to this
-patch.
-
-[1] https://lore.kernel.org/638a7831-493c-4917-9b22-5aa663e9ee84@efficios.com
-
-> Signed-off-by: Edward Liaw <edliaw@google.com>
-
-I also added trivial comments that coming from my personal and humble
-preferrence below.  Other than the above and the below comments,
-
-Reviewed-by: SeongJae Park <sj@kernel.org>
-
-> ---
->  tools/testing/selftests/damon/debugfs_target_ids_pid_leak.c    | 3 ---
->  .../damon/debugfs_target_ids_read_before_terminate_race.c      | 2 --
->  2 files changed, 5 deletions(-)
+> In file included from drivers/net/ethernet/smsc/smc91x.c:80:
+> drivers/net/ethernet/smsc/smc91x.c: In function ‘smc_reset’:
+> drivers/net/ethernet/smsc/smc91x.h:160:40: error: implicit declaration of function ‘_swapw’; did you mean ‘swap’? [-Werror=implicit-function-declaration]
+>   160 | #define SMC_outw(lp, v, a, r)   writew(_swapw(v), (a) + (r))
+>       |                                        ^~~~~~
+> drivers/net/ethernet/smsc/smc91x.h:904:25: note: in expansion of macro ‘SMC_outw’
+>   904 |                         SMC_outw(lp, x, ioaddr, BANK_SELECT);           \
+>       |                         ^~~~~~~~
+> drivers/net/ethernet/smsc/smc91x.c:250:9: note: in expansion of macro ‘SMC_SELECT_BANK’
+>   250 |         SMC_SELECT_BANK(lp, 2);
+>       |         ^~~~~~~~~~~~~~~
+> cc1: some warnings being treated as errors
 > 
-> diff --git a/tools/testing/selftests/damon/debugfs_target_ids_pid_leak.c b/tools/testing/selftests/damon/debugfs_target_ids_pid_leak.c
-> index 0cc2eef7d142..7a17a03d555c 100644
-> --- a/tools/testing/selftests/damon/debugfs_target_ids_pid_leak.c
-> +++ b/tools/testing/selftests/damon/debugfs_target_ids_pid_leak.c
-> @@ -2,9 +2,6 @@
->  /*
->   * Author: SeongJae Park <sj@kernel.org>
->   */
-> -
-> -#define _GNU_SOURCE
-> -
->  #include <fcntl.h>
+> The function _swapw() was removed in commit d97cf70af097 ("m68k: use
+> asm-generic/io.h for non-MMU io access functions"), but is still used in
+> drivers/net/ethernet/smsc/smc91x.h.
+> 
+> Re-adding the previously deleted _swapw() function resolves the error.
 
-I'd prefer having one empty line between the comment and includes.
+This seems like the wrong fix.
 
->  #include <stdbool.h>
->  #include <stdint.h>
-> diff --git a/tools/testing/selftests/damon/debugfs_target_ids_read_before_terminate_race.c b/tools/testing/selftests/damon/debugfs_target_ids_read_before_terminate_race.c
-> index b06f52a8ce2d..4aeac55ac93e 100644
-> --- a/tools/testing/selftests/damon/debugfs_target_ids_read_before_terminate_race.c
-> +++ b/tools/testing/selftests/damon/debugfs_target_ids_read_before_terminate_race.c
-> @@ -2,8 +2,6 @@
->  /*
->   * Author: SeongJae Park <sj@kernel.org>
->   */
-> -#define _GNU_SOURCE
-> -
->  #include <fcntl.h>
+commit d97cf70af09721ef416c61faa44543e3b84c9a55
+Author: Greg Ungerer <gerg@linux-m68k.org>
+Date:   Fri Mar 23 23:39:10 2018 +1000
 
-Ditto.
+    m68k: use asm-generic/io.h for non-MMU io access functions
+    
+    There is nothing really special about the non-MMU m68k IO access functions.
+    So we can easily switch to using the asm-generic/io.h functions.
 
-And I realize I also forgot adding one empty line before the above #define
-line.  That's why I'm saying this is just a trivial comment :)
+So it rather than put something back which there is an aim to remove,
+please find the generic replacement. This _swapw() swaps a 16 bit
+word. The generic for that is swab16().
 
->  #include <stdbool.h>
->  #include <stdint.h>
-> -- 
-> 2.45.0.118.g7fe29c98d7-goog
+I'm also surprised it took 6 years to find this. Has something else
+changed recently?
 
+    Andrew
 
-Thanks,
-SJ
+---
+pw-bot: cr
 
