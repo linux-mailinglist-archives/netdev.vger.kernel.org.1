@@ -1,59 +1,68 @@
-Return-Path: <netdev+bounces-94744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E9FC8C08AD
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 02:53:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 299888C08B0
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 02:56:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC6DFB20A09
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 00:53:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D69CA281806
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 00:56:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABEB10A1D;
-	Thu,  9 May 2024 00:53:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9C183D3A0;
+	Thu,  9 May 2024 00:56:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A+7o5coP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BQuOSUjU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A20DDA5
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 00:53:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9896199B9;
+	Thu,  9 May 2024 00:56:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715216009; cv=none; b=fm+ASfkyIMYOoZZWQvr9JRakIGK0/VvGB9Y0/n/U8/5Jmk8VW253n1h/+NuxbLdtGkOw7fyWzZOICEJsOXIWqGe+KPtD4AqWn1mijUWwVSUhfHaPyLy+geO5Hbrn3M7pQU2v5hEA5xhAEKwNQ4EqGqKzOGC6cob14LPBrYX97mo=
+	t=1715216199; cv=none; b=O19QzWgbkGx8j+obPx3Z1C6QwXpj3w+Cyt+HPTLLrKxiUQ35y92aWe4rlGyMFIZHZ3Df127FFpje7JLGLcO+43dAbc+Pqvgpm3YFxh2NbaXjz0hT3CnV9eXZM8yhQ6tzQOZpeddTBRXPj5VC3tzKDiDum30/TpmZ9NMx5/EnTWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715216009; c=relaxed/simple;
-	bh=U1BqdA3luMmbNZuY/avlaEcBNytu9kf/26cH5StYa/U=;
+	s=arc-20240116; t=1715216199; c=relaxed/simple;
+	bh=Rw11crbnuQ6fU3EEzrTuH2bfFNBuwuRmqc1xYSAsUAg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GQ72qlsclqyRCYzAQhnAEqIFop8GqhOlSI117GTZ3+5GjPd/zGaImHKi2JcrFcfygB5Ih9No/qNpsi7CvQVAXLxDDz05405FQ97xvRgLFoQrP8zffhZqnGm/hFUR6l2tQbTxKWvgpCKI4Gl4oSf22zdxxPqeCd+k59xS1fcwFMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A+7o5coP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CDC7C113CC;
-	Thu,  9 May 2024 00:53:28 +0000 (UTC)
+	 MIME-Version:Content-Type; b=W4y8jLN+zrKbH450+R/avG+gfXicYUES6ExriLbfc6p7Vh16RTYyk26iiIcUpItRkGhjY/+4NBrnCrbRTUVXdoYdwcjv5QO9+9GgwcE6cBAhtOTP1fVuWWiwtjBjlMb86+k3wONfOyhdZaUosn40bRQ5FHD7svL09IQ+aqvK/2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BQuOSUjU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21C3AC113CC;
+	Thu,  9 May 2024 00:56:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715216008;
-	bh=U1BqdA3luMmbNZuY/avlaEcBNytu9kf/26cH5StYa/U=;
+	s=k20201202; t=1715216199;
+	bh=Rw11crbnuQ6fU3EEzrTuH2bfFNBuwuRmqc1xYSAsUAg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=A+7o5coPp7uOntMgJMi3YxlKEF1FxXbbYMfmTIL7g6Y+GRgtcgTJ95uMt+lrerHVJ
-	 dMdI2dmCIsMCJHytcLoui3nnL77ZNFInUIAOdv9gCAt/9TCetnqtLMSjH0P3i/NBrA
-	 6g6BYr5PsCqcvKtehqRXlo9N3FYfnZ2gG8R0OCZ43hZrASxBP4UQFnQvvdjr3rYmX4
-	 AA0evsb6t7xJ09cpfQLvQr7KmLtA27IwgVDAqISwxP1wPr/yTpTUV8AIhzwPdfpA9W
-	 XCSFd7SMq6+TVFBbMi7Ym+qEovr9Ke7E6Q3Z1miBv6LE6dyeDIqO6h1hEknSxMDADE
-	 bv3baFT1zgTMw==
-Date: Wed, 8 May 2024 17:53:27 -0700
+	b=BQuOSUjUgz03tQE/6+Ukix4akBBd1J0kU7yO4iOr20hDZv7f+8kAkVhH0OxkGWgD9
+	 zjJhpWgwk9exov4OC8uwQS6UijUWPRpknDLuh/PtSlxjyIlgyov78ZAzIUEyL2F5iW
+	 jhFe6F05mDiIURchpmP0IXFFjgCOuhA5ITiz5TVlb3P86qZ9bU5SY1AT0J+ne1w6/m
+	 Q7q4ftB4jAbkQ3o2SA45gJMEXOv8w6gBv5yyjQmcDNG3P73re5V0tM4c39yLjvrspX
+	 RZx39sXMwKkvrR7GcPnieE5P3BOZE4Os08aS7ivCMsZvaQrQKNYSIJ/XCKPGu2nJHI
+	 lrDrAxiGxDHXg==
+Date: Wed, 8 May 2024 17:56:38 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo
- Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Andrew Lunn
- <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
-Subject: Re: [PATCH net-next v3 00/24] Introducing OpenVPN Data Channel
- Offload
-Message-ID: <20240508175327.31bf47a3@kernel.org>
-In-Reply-To: <239cdb0d-507f-4cf0-87a1-69ca6429d254@openvpn.net>
-References: <20240506011637.27272-1-antonio@openvpn.net>
-	<20240507164812.3ac8c7b5@kernel.org>
-	<239cdb0d-507f-4cf0-87a1-69ca6429d254@openvpn.net>
+To: Joe Damato <jdamato@fastly.com>
+Cc: Tariq Toukan <ttoukan.linux@gmail.com>, Zhu Yanjun
+ <zyjzyj2000@gmail.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, saeedm@nvidia.com, gal@nvidia.com,
+ nalramli@fastly.com, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Leon Romanovsky <leon@kernel.org>, "open
+ list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
+Message-ID: <20240508175638.7b391b7b@kernel.org>
+In-Reply-To: <ZjwJmKa6orPm9NHF@LQ3V64L9R2>
+References: <20240503022549.49852-1-jdamato@fastly.com>
+	<c3f4f1a4-303d-4d57-ae83-ed52e5a08f69@linux.dev>
+	<ZjUwT_1SA9tF952c@LQ3V64L9R2>
+	<20240503145808.4872fbb2@kernel.org>
+	<ZjV5BG8JFGRBoKaz@LQ3V64L9R2>
+	<20240503173429.10402325@kernel.org>
+	<ZjkbpLRyZ9h0U01_@LQ3V64L9R2>
+	<8678e62c-f33b-469c-ac6c-68a060273754@gmail.com>
+	<ZjwJmKa6orPm9NHF@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,26 +72,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 8 May 2024 11:56:45 +0200 Antonio Quartulli wrote:
-> I see there is one warning to fix due to a typ0 (eventS_wq vs event_wq), 
-> but I also get more warnings like this:
+On Wed, 8 May 2024 16:24:08 -0700 Joe Damato wrote:
+> > A possible reason for this difference is the queues included in the sum.
+> > Our stats are persistent across configuration changes, so they doesn't reset
+> > when number of channels changes for example.
+> > 
+> > We keep stats entries for al ring indices that ever existed. Our driver
+> > loops and sums up the stats for all of them, while the stack loops only up
+> > to the current netdev->real_num_rx_queues.
+> > 
+> > Can this explain the diff here?  
 > 
-> drivers/net/ovpn/peer.h:119: warning: Function parameter or struct 
-> member 'vpn_addrs' not described in 'ovpn_peer'
+> Yes, that was it. Sorry I didn't realize this case. My lab machine runs a
+> script to adjust the queue count shortly after booting.
 > 
-> However vpn_addrs is an anonymous struct within struct ovpn_peer.
-> I have already documented all its members using the form:
+> I disabled that and re-ran:
 > 
-> @vpn_addrs.ipv4
-> @vpn_addrs.ipv6
+>   NETIF=eth0 tools/testing/selftests/drivers/net/stats.py
 > 
-> Am I expected to document the vpn_addrs as well?
-> Or is this a false positive?
+> and all tests pass.
 
-I think we need to trust the script on what's expected. 
-The expectations around documenting anonymous structs may have 
-changed recently, I remember fixing this in my code, too.
-
-BTW make sure you use -Wall, people started sending trivial
-patches to fix those :S Would be best not to add new ones.
+Stating the obvious, perhaps, but in this case we should add the stats
+from inactive queues to the base (which when the NIC is down means all
+queues).
 
