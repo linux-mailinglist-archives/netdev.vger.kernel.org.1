@@ -1,139 +1,103 @@
-Return-Path: <netdev+bounces-94760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89E968C0979
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 03:58:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D5D78C098C
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:01:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3F261F22290
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 01:58:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45A22283345
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 02:01:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E41B13C838;
-	Thu,  9 May 2024 01:57:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36EB13CAB7;
+	Thu,  9 May 2024 02:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Sks9IBPE"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="x0fHOcq7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07FEE2C87C
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 01:57:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2252313CA84;
+	Thu,  9 May 2024 02:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715219878; cv=none; b=CQ1GXeNOWw91RCYr77vrH0JyGE9TwF4VYxX5h2r/Ry86HQtm8ZGu/51frHkLMFhpckyhgqiCXwUltWyOw8dGkHgqtUJti5Tll/Z8NiyGOG9RUr6RksTDfUD86QMp93lxNOTVu0v3HZ+5eagg7XMwhpaQbfnny7RYXU8HbbIVOCU=
+	t=1715220082; cv=none; b=i6SDJnrqXrsLzsgpPiON35hRCEGjJW3EYlYNUz05/BmTp06CwARDYow0QgpdGQda7tMN9K8jHq0klQ9aMdVECddwlMMfcRb1h0sfuWbXGbW49KkOXFKSuG1dVYHHPweLGwv/RDT6P+TRXCHEPYVcw6HwEuoDKK1dGLwi+Y3Br1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715219878; c=relaxed/simple;
-	bh=wFHg8u5STogFH/ZoekFKe0WoCicext3N7WZORQvrdDs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iPBITJI1VBFEsPLD+uhSzfHySHG1V3H4W3U/jUK9r4h3lbZ74KlLy5MzgPs4+9BB0tf0Y6/dob4/lKJjgGst6RFzfO4MjW+tBzy4wVxKnYKyhrcrqcYRWnXEQAurnScu44/ScHfU+yy2wQlOE4bBY4PdUuhYgzkudcihd/KtoFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Sks9IBPE; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1e4c4fb6af3so2523815ad.0
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 18:57:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1715219876; x=1715824676; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ol07fMm5kmX25Akoa7gDRlXSp7tunorw05f28am+peY=;
-        b=Sks9IBPESymzhpDHLQJlvEDOTLqR7Sh2SV1zfmi50CgRi8JlmGGlInrsBkbzmWyH9p
-         FBOAR9th0E7/yR9V8naV4BOE01GY0GaFneWkzu+GoX8ltYJ5420vWQ37QfywGOyeKX6B
-         QixmprdDDYlnLmotSR3jWskXsiC8iw7E8cqvU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715219876; x=1715824676;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ol07fMm5kmX25Akoa7gDRlXSp7tunorw05f28am+peY=;
-        b=NOQjCqDBcCE5HZHq+fp8Henv9QEylsvSbG6GWH9ErDYNEhEjQQqk8nq3TrPj3E4uOO
-         rS4+kKz2a2dWIioHYdrOkokEIim5/TCtlhIZzbsoKWJLrou8W01jNTCFCc4I+2hey6k/
-         Jc88rn/Ep9pD0vhmrF3dcXfqcAePHDSSZBW0900Th7vJA+QYpxXyC58EdvGTQiC7heoh
-         a+lAvwe4XiQQdcIXOaxIRWtu83tUry3GvjVqRIvuoTBfqWDZ7KBMH/nm70LmSj1piE+O
-         1D8XUUZ6CkBhpKxRqgSsTnvnF/1NHEIcRkKwMuuTYjLyOvRk8iY4DOtmcfg/wJWsxE6v
-         uVOg==
-X-Forwarded-Encrypted: i=1; AJvYcCVkGb6qIFQFJ+mCV9aZmeFd38Gs/fF0SRLkXL0VL1gYmMY+pPZQD6RGrRaofc+DbSYIXYxRF93VuEJNijMST8jq+RHdt9Oh
-X-Gm-Message-State: AOJu0Yy8sk1WYW+MX3ByntIwS3F8w8ncn+wr7fgeDm0ZqfzuJEBAzIAy
-	ynPVzv16gXLcJ7I7DQM09pxe8CI4VOutx1mFsSVF3WyZSjh0Ilw/vRt6OI/L2ZI=
-X-Google-Smtp-Source: AGHT+IFcnjp+pOOLih/Zt/FMX+mO9oZUF+Nach2AjPkraWqiLTStw3+LaLB8b60ReaVNPU/YqG+Tww==
-X-Received: by 2002:a17:902:cecc:b0:1e5:1041:7ed4 with SMTP id d9443c01a7336-1eefa12f408mr21848865ad.14.1715219876348;
-        Wed, 08 May 2024 18:57:56 -0700 (PDT)
-Received: from ubuntu (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c25651dsm2083085ad.298.2024.05.08.18.57.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 18:57:55 -0700 (PDT)
-Date: Thu, 9 May 2024 01:57:52 +0000
-From: Joe Damato <jdamato@fastly.com>
+	s=arc-20240116; t=1715220082; c=relaxed/simple;
+	bh=Htat2MyTse7a++9pWJqbBAP7hMj1nNpg55KHQ5NcWBM=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=o0lKW3vZ2q6hs5h6HMxJyQfeW+Wf3nRxu5ij5ABq16E4vtmYw/VnQsE3vz3fzEmUY+1nmnAsAfbt77hKdk76/LzTl288X13SxULu0Hqy3HoEN/rHgbXmwHepneWhRxWi5uPzt75OshYetpiQ2HRoelveWIFrUjz9//taaK7/QWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=x0fHOcq7; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1715220070; h=Message-ID:Subject:Date:From:To;
+	bh=cQQB8y7lyMs6fyaeOrFr4e4tsBpA8NP9fB/55KyIbmA=;
+	b=x0fHOcq7OuXr0jHj7EWurbzBYzPATTvLNjJvNR/5OQHIdyTD9HtT3t+rvUfQFuJ/4ZF95gL5nXhkW8rG4Eb1C/+qUDbFgMQQYhe7vz6aJXDDjMvfVHRIOpqL1w1gYavKhB0+XV+JEXCP7kRGzVS04AqnK7u/tveNNLJSOjOL/i4=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R461e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W650tlQ_1715220068;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W650tlQ_1715220068)
+          by smtp.aliyun-inc.com;
+          Thu, 09 May 2024 10:01:09 +0800
+Message-ID: <1715219893.9627535-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next 0/7] virtnet_net: prepare for af-xdp
+Date: Thu, 9 May 2024 09:58:13 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Tariq Toukan <ttoukan.linux@gmail.com>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, saeedm@nvidia.com, gal@nvidia.com,
-	nalramli@fastly.com, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
-Message-ID: <ZjwtoH1K1o0F5k+N@ubuntu>
-References: <20240503022549.49852-1-jdamato@fastly.com>
- <c3f4f1a4-303d-4d57-ae83-ed52e5a08f69@linux.dev>
- <ZjUwT_1SA9tF952c@LQ3V64L9R2>
- <20240503145808.4872fbb2@kernel.org>
- <ZjV5BG8JFGRBoKaz@LQ3V64L9R2>
- <20240503173429.10402325@kernel.org>
- <ZjkbpLRyZ9h0U01_@LQ3V64L9R2>
- <8678e62c-f33b-469c-ac6c-68a060273754@gmail.com>
- <ZjwJmKa6orPm9NHF@LQ3V64L9R2>
- <20240508175638.7b391b7b@kernel.org>
+Cc: Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org,
+ "David S.  Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Paolo  Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason  Wang <jasowang@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel  Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux.dev,
+ bpf@vger.kernel.org
+References: <20240508080514.99458-1-xuanzhuo@linux.alibaba.com>
+ <20240508085308.GA1736038@kernel.org>
+ <20240508082000.4938fb56@kernel.org>
+In-Reply-To: <20240508082000.4938fb56@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240508175638.7b391b7b@kernel.org>
 
-On Wed, May 08, 2024 at 05:56:38PM -0700, Jakub Kicinski wrote:
-> On Wed, 8 May 2024 16:24:08 -0700 Joe Damato wrote:
-> > > A possible reason for this difference is the queues included in the sum.
-> > > Our stats are persistent across configuration changes, so they doesn't reset
-> > > when number of channels changes for example.
-> > > 
-> > > We keep stats entries for al ring indices that ever existed. Our driver
-> > > loops and sums up the stats for all of them, while the stack loops only up
-> > > to the current netdev->real_num_rx_queues.
-> > > 
-> > > Can this explain the diff here?  
-> > 
-> > Yes, that was it. Sorry I didn't realize this case. My lab machine runs a
-> > script to adjust the queue count shortly after booting.
-> > 
-> > I disabled that and re-ran:
-> > 
-> >   NETIF=eth0 tools/testing/selftests/drivers/net/stats.py
-> > 
-> > and all tests pass.
-> 
-> Stating the obvious, perhaps, but in this case we should add the stats
-> from inactive queues to the base (which when the NIC is down means all
-> queues).
+On Wed, 8 May 2024 08:20:00 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
+> On Wed, 8 May 2024 09:53:08 +0100 Simon Horman wrote:
+> > On Wed, May 08, 2024 at 04:05:07PM +0800, Xuan Zhuo wrote:
+> > > This patch set prepares for supporting af-xdp zerocopy.
+> > > There is no feature change in this patch set.
+> > > I just want to reduce the patch num of the final patch set,
+> > > so I split the patch set.
+> > >
+> > > #1-#3 add independent directory for virtio-net
+> > > #4-#7 do some refactor, the sub-functions will be used by the subsequent commits
+> >
+> > Hi Xuan Zhuo,
+> >
+> > This patch is targeted at net-next,
+> > but unfortunately it does not apply to current net-next.
+> > Please rebase and repost taking care to observe the 24h rule.
+>
+> Also - is this going to conflict with your premapped DMA work in the
+> vhost tree? If it does - just wait, please, the merge window is in
+> a week..
 
-If I'm following that right and understanding mlx5 (two things I am
-unlikely to do simultaneously), that sounds to me like:
+NO.
 
-- mlx5e_get_queue_stats_rx and mlx5e_get_queue_stats_tx check if i <
-  priv->channels.params.num_channels (instead of priv->stats_nch), and when
-  summing mlx5e_sq_stats in the latter function, it's up to
-  priv->channels.params.mqprio.num_tc instead of priv->max_opened_tc.
+This is on the top of
 
-- mlx5e_get_base_stats accumulates and outputs stats for everything from
-  priv->channels.params.num_channels to priv->stats_nch, and
-  priv->channels.params.mqprio.num_tc to priv->max_opened_tc... which
-  should cover the inactive queues, I think.
+	http://lore.kernel.org/all/20240508063718.69806-1-xuanzhuo@linux.alibaba.com
 
-Just writing that all out to avoid hacking up the wrong thing for the v2
-and to reduce overall noise on the list :)
+That is targeted to net-next.
+
+I will wait until it is merged to repost.
+
+Thanks.
+
 
