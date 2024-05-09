@@ -1,166 +1,266 @@
-Return-Path: <netdev+bounces-94792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F06398C0AA9
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:50:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22DDF8C0AAD
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:50:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 451111F22955
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:50:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A37FF1F230E4
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:50:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B97149009;
-	Thu,  9 May 2024 04:49:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C7E149003;
+	Thu,  9 May 2024 04:50:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="d9k3Xohb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NvxKDsfN"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E902747D;
-	Thu,  9 May 2024 04:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0EBF148858;
+	Thu,  9 May 2024 04:50:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715230195; cv=none; b=BCjXOxe0Oa9542fw/UqQXY4T5vcOs8zMxCx7ihNJu1oKiYO/d3Eh929W80bhDyr3DpbfLfuzr0zmYwwE9pI+E/g2eRC55q6a9SOAlpFVblFM+MuKjehqJPB6G8NtbUIxpEgVfiDcXzsZAMgNyQ4n9UKB5Z3UEquJx/YJMp49ERc=
+	t=1715230245; cv=none; b=MtnzE7pt6ah2haATxJa7bjhmLBazxUHepsEXTOPKvze7Q2oIpsWMyz3c17T68Hw/8FHbRFCFRGad20BWUN94lZjkoCtes0AdbAzF5dTABoch5m216qigAfA5TkEMumBnzTrbNNZNP+UQMCvh8/AhuJUMqUlkALKeQwV7gGxUfWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715230195; c=relaxed/simple;
-	bh=+AiojDAJmMoCc0Wxxh5jISkjo5+IH8X8Y3hjru7idxw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gd3tEsR/YQv0byIK1xjrl8o5hHsNLMKfXXH2YrBPy+qRa3XHUzeq41uD/hGk9158kxvmhCMG8KcXCYFXTNlXVTOP2Wtw56iRtrxB49RwlFBFP+KGePBvwY9IrDGeqT/tLf/oSBQJ/pYPuAj3ZSgeLMiGhvl2GtDB0nWb5/WBe8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=d9k3Xohb; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=x3Xxg6i0FLAN0umHIWCwG93UHt8NFMOuUk41qzLUqYk=; b=d9k3XohbzRhXOoELgdBEeA6f1S
-	3oOjwUmoqaRaQC0CvfU6k+88iGiYqGevi4D0Mjv1XT/tJ31yElVIPjyooqUNsndaV6nr1hGD5KD6Y
-	hpVyEo5ud1SsOU0IbJ/27faXATUncL94DVq2aq/GP8tX02rBz5V+LazPctxgZmjT4XiNg5CteZelR
-	F250+x02riIYTRrco+NPB3RdRCFIh0LOb6pIdqAbmqXgrCWDOGcloO9JUAvrLzhBGKhu3BAgULPxQ
-	P+NUz6+r5CHQPlzEem7mdtAOYVy13sfKqnZcHBQZehzZ76EOcgOw/zp4uB68EXKz4VKifIE4VqybV
-	dq8ZPucQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s4vit-00000000LYS-0m4f;
-	Thu, 09 May 2024 04:49:39 +0000
-Date: Wed, 8 May 2024 21:49:39 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Matt Turner <mattst88@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Florian Westphal <fw@strlen.de>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Jens Axboe <axboe@kernel.dk>,
-	Arseniy Krasnov <avkrasnov@salutedevices.com>,
-	Aleksander Lobakin <aleksander.lobakin@intel.com>,
-	Michael Lass <bevan@bi-co.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Richard Gobert <richardbgobert@gmail.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Abel Wu <wuyun.abel@bytedance.com>,
-	Breno Leitao <leitao@debian.org>, David Wei <dw@davidwei.uk>,
-	Shailend Chand <shailend@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Subject: Re: [RFC PATCH net-next v8 02/14] net: page_pool: create hooks for
- custom page providers
-Message-ID: <ZjxV4yEYXRGElrsA@infradead.org>
-References: <CAHS8izPH+sRLSiZ7vbrNtRdHrFEf8XQ61XAyHuxRSL9Jjy8YbQ@mail.gmail.com>
- <20240507164838.GG4718@ziepe.ca>
- <0d5da361-cc7b-46e9-a635-9a7a4c208444@gmail.com>
- <20240507175644.GJ4718@ziepe.ca>
- <6a50d01a-b5b9-4699-9d58-94e5f8f81c13@gmail.com>
- <20240507233247.GK4718@ziepe.ca>
- <Zjsm3vO6rIY_sw5A@phenom.ffwll.local>
- <1e2823db-504b-4829-856f-3f45a45ccada@gmail.com>
- <ZjufddNVJs5Csaix@infradead.org>
- <8ced4c49-d153-40fb-9e62-0a5784cfa864@gmail.com>
+	s=arc-20240116; t=1715230245; c=relaxed/simple;
+	bh=wFESnTy0F2sgYYS9+vYDpTJInEkSFXUMZ76AJIzXpvY=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=GQ4s6TDILWv2QJlrdKU4gZnDyntPa0KY28otlI8xBS2RCYTsVjhIEsA0exm0qr/oLLh7gLL9wmK8EMSWaHedirj02RrJgG2tSB0fMIRtXWCaEubOG/tM11G9PfWOju3KNSB3+6w+LvXf/1yCVCBT/9n4JBrF7G3FK3SqU2fVz1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NvxKDsfN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B4A7C116B1;
+	Thu,  9 May 2024 04:50:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715230245;
+	bh=wFESnTy0F2sgYYS9+vYDpTJInEkSFXUMZ76AJIzXpvY=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=NvxKDsfN6UImjQWlzi7xAxnJQIZpvXG1BWLQ66KpVcU9fYTfdB84eob+wsavsVwa+
+	 mF1ANfm6ObO7OdPopGGCc6dLAEhVkzmy8M56l6QtjD8RBgCTX8ohO7htkQD5bVQUsF
+	 qmWjx6J5rUXdRmK06+lsKB1XSXjjdIHwsiFYfzEGjOhos1TH0wqjqKAwYA5B1ZJvPU
+	 6PqImjBBNUzlKmWN+vQF+Vox5PEf1Hx1amtJxz8a8IWiIMwtLA5nH3HQp6/9gR7Z15
+	 EUz8W/2WN8d0jueRfdBn299hPu2aL7ZjJxSARsavTRdDgjdg4YKs6NyfZTFW+NGrFe
+	 ZmYrcvccwtbJg==
+From: Kalle Valo <kvalo@kernel.org>
+To: Ansuel Smith <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  linux-kernel@vger.kernel.org,
+  ath10k@lists.infradead.org,  linux-wireless@vger.kernel.org,
+  netdev@vger.kernel.org,  Sebastian Gottschall <s.gottschall@dd-wrt.com>,
+  Steve deRosier <derosier@cal-sierra.com>,  Stefan Lippers-Hollmann
+ <s.l-h@gmx.de>
+Subject: Re: [PATCH v14] ath10k: add LED and GPIO controlling support for
+ various chipsets
+References: <20230611080505.17393-1-ansuelsmth@gmail.com>
+	<878rcjbaqs.fsf@kernel.org>
+	<648cdebb.5d0a0220.be7f8.a096@mx.google.com>
+	<648ded2a.df0a0220.b78de.4603@mx.google.com>
+	<CA+_ehUzzVq_sVTgVCM+r=oLp=GNn-6nJRBG=bndJjrRDhCodaw@mail.gmail.com>
+Date: Thu, 09 May 2024 07:50:40 +0300
+In-Reply-To: <CA+_ehUzzVq_sVTgVCM+r=oLp=GNn-6nJRBG=bndJjrRDhCodaw@mail.gmail.com>
+	(Ansuel Smith's message of "Mon, 21 Aug 2023 12:46:00 +0200")
+Message-ID: <87v83nlhb3.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8ced4c49-d153-40fb-9e62-0a5784cfa864@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
 
-On Wed, May 08, 2024 at 06:02:14PM +0100, Pavel Begunkov wrote:
-> Well, the example fell flat, but you don't use dmabuf when there are
-> no upsides from using it. For instance, when you already have pinned
-> pages, you're going to use pages, and there are no other refcounting
-> concerns.
+Ansuel Smith <ansuelsmth@gmail.com> writes:
 
-Sure.
+> Il giorno sab 17 giu 2023 alle ore 19:28 Christian Marangi
+> <ansuelsmth@gmail.com> ha scritto:
+>
+>>
+>> On Fri, Jun 16, 2023 at 01:35:04PM +0200, Christian Marangi wrote:
+>> > On Fri, Jun 16, 2023 at 08:03:23PM +0300, Kalle Valo wrote:
+>> > > Christian Marangi <ansuelsmth@gmail.com> writes:
+>> > >
+>> > > > From: Sebastian Gottschall <s.gottschall@dd-wrt.com>
+>> > > >
+>> > > > Adds LED and GPIO Control support for 988x, 9887, 9888, 99x0, 9984
+>> > > > based chipsets with on chipset connected led's using WMI Firmware API.
+>> > > > The LED device will get available named as "ath10k-phyX" at sysfs and
+>> > > > can be controlled with various triggers.
+>> > > > Adds also debugfs interface for gpio control.
+>> > > >
+>> > > > Signed-off-by: Sebastian Gottschall <s.gottschall@dd-wrt.com>
+>> > > > Reviewed-by: Steve deRosier <derosier@cal-sierra.com>
+>> > > > [kvalo: major reorg and cleanup]
+>> > > > Signed-off-by: Kalle Valo <kvalo@codeaurora.org>
+>> > > > [ansuel: rebase and small cleanup]
+>> > > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+>> > > > Tested-by: Stefan Lippers-Hollmann <s.l-h@gmx.de>
+>> > > > ---
+>> > > >
+>> > > > Hi,
+>> > > > this is a very old patch from 2018 that somehow was talked till 2020
+>> > > > with Kavlo asked to rebase and resubmit and nobody did.
+>> > > > So here we are in 2023 with me trying to finally have this upstream.
+>> > > >
+>> > > > A summarize of the situation.
+>> > > > - The patch is from years in OpenWRT. Used by anything that has ath10k
+>> > > >   card and a LED connected.
+>> > > > - This patch is also used by the fw variant from Candela Tech with no
+>> > > >   problem reported.
+>> > > > - It was pointed out that this caused some problem with ipq4019 SoC
+>> > > >   but the problem was actually caused by a different bug related to
+>> > > >   interrupts.
+>> > > >
+>> > > > I honestly hope we can have this feature merged since it's really
+>> > > > funny to have something that was so near merge and jet still not
+>> > > > present and with devices not supporting this simple but useful
+>> > > > feature.
+>> > >
+>> > > Indeed, we should finally get this in. Thanks for working on it.
+>> > >
+>> > > I did some minor changes to the patch, they are in my pending branch:
+>> > >
+>> > > https://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git/commit/?h=pending&id=686464864538158f22842dc49eddea6fa50e59c1
+>> > >
+>> > > My comments below, please review my changes. No need to resend because
+>> > > of these.
+>> > >
+>> >
+>> > Hi,
+>> > very happy this is going further.
+>> >
+>> > > > --- a/drivers/net/wireless/ath/ath10k/Kconfig
+>> > > > +++ b/drivers/net/wireless/ath/ath10k/Kconfig
+>> > > > @@ -67,6 +67,23 @@ config ATH10K_DEBUGFS
+>> > > >
+>> > > >     If unsure, say Y to make it easier to debug problems.
+>> > > >
+>> > > > +config ATH10K_LEDS
+>> > > > + bool "Atheros ath10k LED support"
+>> > > > + depends on ATH10K
+>> > > > + select MAC80211_LEDS
+>> > > > + select LEDS_CLASS
+>> > > > + select NEW_LEDS
+>> > > > + default y
+>> > > > + help
+>> > > > +   This option enables LEDs support for chipset LED pins.
+>> > > > +   Each pin is connected via GPIO and can be controlled using
+>> > > > +   WMI Firmware API.
+>> > > > +
+>> > > > +   The LED device will get available named as "ath10k-phyX" at sysfs and
+>> > > > +           can be controlled with various triggers.
+>> > > > +
+>> > > > +   Say Y, if you have LED pins connected to the ath10k wireless card.
+>> > >
+>> > > I'm not sure anymore if we should ask anything from the user, better to
+>> > > enable automatically if LED support is enabled in the kernel. So I
+>> > > simplified this to:
+>> > >
+>> > > config ATH10K_LEDS
+>> > >     bool
+>> > >     depends on ATH10K
+>> > >     depends on LEDS_CLASS=y || LEDS_CLASS=MAC80211
+>> > >     default y
+>> > >
+>> > > This follows what mt76 does:
+>> > >
+>> > > config MT76_LEDS
+>> > >     bool
+>> > >     depends on MT76_CORE
+>> > >     depends on LEDS_CLASS=y || MT76_CORE=LEDS_CLASS
+>> > >     default y
+>> > >
+>> >
+>> > I remember there was the same discussion in a previous series. OK for me
+>> > for making this by default, only concern is any buildbot error (if any)
+>> >
+>> > Anyway OK for the change.
+>> >
+>> > > > @@ -65,6 +66,7 @@ static const struct ath10k_hw_params
+>> > > > ath10k_hw_params_list[] = {
+>> > > >           .dev_id = QCA988X_2_0_DEVICE_ID,
+>> > > >           .bus = ATH10K_BUS_PCI,
+>> > > >           .name = "qca988x hw2.0",
+>> > > > +         .led_pin = 1,
+>> > > >           .patch_load_addr = QCA988X_HW_2_0_PATCH_LOAD_ADDR,
+>> > > >           .uart_pin = 7,
+>> > > >           .cc_wraparound_type = ATH10K_HW_CC_WRAP_SHIFTED_ALL,
+>> > >
+>> > > I prefer following the field order from struct ath10k_hw_params
+>> > > declaration and also setting fields explicitly to zero (even though
+>> > > there are gaps still) so I changed that for every entry.
+>> > >
+>> >
+>> > Thanks for the change, np for me.
+>> >
+>> > > > +int ath10k_leds_register(struct ath10k *ar)
+>> > > > +{
+>> > > > + int ret;
+>> > > > +
+>> > > > + if (ar->hw_params.led_pin == 0)
+>> > > > +         /* leds not supported */
+>> > > > +         return 0;
+>> > > > +
+>> > > > + snprintf(ar->leds.label, sizeof(ar->leds.label), "ath10k-%s",
+>> > > > +          wiphy_name(ar->hw->wiphy));
+>> > > > + ar->leds.wifi_led.active_low = 1;
+>> > > > + ar->leds.wifi_led.gpio = ar->hw_params.led_pin;
+>> > > > + ar->leds.wifi_led.name = ar->leds.label;
+>> > > > + ar->leds.wifi_led.default_state = LEDS_GPIO_DEFSTATE_KEEP;
+>> > > > +
+>> > > > + ar->leds.cdev.name = ar->leds.label;
+>> > > > + ar->leds.cdev.brightness_set_blocking = ath10k_leds_set_brightness_blocking;
+>> > > > +
+>> > > > + /* FIXME: this assignment doesn't make sense as it's NULL, remove it? */
+>> > > > + ar->leds.cdev.default_trigger = ar->leds.wifi_led.default_trigger;
+>> > >
+>> > > But what to do with this FIXME?
+>> > >
+>> >
+>> > It was pushed by you in v13.
+>> >
+>> > I could be wrong but your idea was to prepare for future support of
+>> > other patch that would set the default_trigger to the mac80211 tpt.
+>> >
+>> > We might got both confused by default_trigger and default_state.
+>> > default_trigger is actually never set and is NULL (actually it's 0)
+>> >
+>> > We have other 2 patch that adds tpt rates for the mac80211 LED trigger
+>> > and set this trigger as the default one but honestly I would chose a
+>> > different implementation than hardcoding everything.
+>> >
+>> > If it's ok for you, I would drop the comment and the default_trigger and
+>> > I will send a follow-up patch to this adding DT support by using
+>> > led_classdev_register_ext and defining init_data.
+>> > (and this indirectly would permit better LED naming and defining of
+>> > default-trigger in DT)
+>> >
+>> > Also ideally I will also send a patch for default_state following
+>> > standard LED implementation. (to set default_state in DT)
+>> >
+>> > I would prefer this approach as the LED patch already took way too much
+>> > time and I think it's better to merge this initial version and then
+>> > improve it.
+>>
+>> If you want to check out I attached the 2 patch (one dt-bindings and the
+>> one for the code) that I will submit when this will be merged (the
+>> change is with the assumption that the FIXME line is dropped)
+>>
+>> Tested and works correctly with my use case of wifi card attached with
+>> pcie. This implementation permits to declare the default trigger in DT
+>> instead of hardcoding.
+>>
+>
+> Any news with this? Did I notice the LEDs patch are still in pending...
 
-> Unless there is an advantage of dmabufs over FOLL_LONGTERM
-> that I don't know about when used with normal user pages.
+Sorry for the delay but finally I looked at this again. I decided to
+just remove the fixme and otherwise it looks good for me. Please check
+my changes:
 
-The advantages of using a dma-buf over FOLL_LONGTERM are:
+https://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git/commit/?h=pending&id=688130a66ed49f20ca0ce02c3987f6a474f7c93a
 
- a) you pre-dma map, which is a significant performance advantage for
-    IOMMU-based setups
- b) you support any dma-buf exported and not just user memory.  This
-    is primarily important for PCIe P2P, but there might be other
-    useful exporters as well
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
 
-> > wish io_uring would have just implemented them from the start instead of
-> > the current fixed buffers that are not quite as useful by not
-> > pre-mapping DMA and not supporting P2P.
-> 
-> fdget(dmabuf) would be horrible, I assume that's not the suggestion.
-
-I'm not even sure what you mean with that.
-
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
