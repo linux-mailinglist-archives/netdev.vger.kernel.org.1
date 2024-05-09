@@ -1,114 +1,156 @@
-Return-Path: <netdev+bounces-95132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB2898C177E
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 22:29:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F39F8C1791
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 22:31:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA7DB1C22072
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:29:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FF0D1C22027
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E5083A0E;
-	Thu,  9 May 2024 20:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED0312BB13;
+	Thu,  9 May 2024 20:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fBVLEic+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fIhFWTXo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1721292C9;
-	Thu,  9 May 2024 20:25:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC47C29AF;
+	Thu,  9 May 2024 20:31:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715286342; cv=none; b=CFLhcWOr/LTun8zdE880hmffjX76pxSBQcWg7SwoWptldfAvXR/MJ7KNkiwTmwu/CdrM5L+0LFsd+k4ibRLDWbKkdwDKW6fqQ8TJda7Iv3NQ4sxgNf2KBwSe11vwVZBeUF/WlUjPnyF6SmLQTQrpdg/qSDRPd9WSEhoCjBoUk8Y=
+	t=1715286683; cv=none; b=MxfK+HHZExRviTnS776143pl/fQuXzpFfRB1DTbA1SnNXBNI9mn3aQfIbPI4IYSNB9w4rw9xzaZCjRkKctJQRKpuDsP2/rTijmU2FMkcjfSoU7KxqLUC0JyP+dS9y1uHQebOTsXazlE87ZWmzPE0ZfMM6Emass15cQhWO0J2hgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715286342; c=relaxed/simple;
-	bh=q66twQ3ZQmwtVpgyjIoW4gH5J6u56rokCV4I/WTlC5c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mXpdwdqLSIFA2yalIIeTCDOzl3dWHeG6QYmgIGfQgJ0xxdjUkTwlH5mh2kqSxLaH3mSWa0hZY87Mg9yHMgV3/jk5PzMviU8qwCrjfM7jVHqj1WzQtl/4UjLblVcevIjvQhi54Gg4NNzGiVvLSrmgoK8E5LlzXjA4wF/kRpR7k4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fBVLEic+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Jnctv+naZw8viulJjjf7C4sXmPGQ+5Xig0IuuCkqOcE=; b=fBVLEic+AzSZjKrQP3uozvo3XB
-	IqYVXmNydqYmDm8nY5Ht/2GJvNZQKsAPx4JbFcXdIojYV14pNU/ngQP3GblPknnPNJyuSBZluTRNJ
-	mswfgBveCRi2ZiJgAQHEf+TK7I7UAwZeEawd0mTblGRzvnRQf3f8E8Nv1KbMdSpW0mQQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s5AKV-00F4w0-5f; Thu, 09 May 2024 22:25:27 +0200
-Date: Thu, 9 May 2024 22:25:27 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	s=arc-20240116; t=1715286683; c=relaxed/simple;
+	bh=3hRwl2K12SkRKNM78wLsl/4te3kJ4BT9nZoF6sCbxbA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Y6ORVS9/MHH8gFbRDYwZJhLkNKqr4JFJxkH3AUoj/kOCYYaeKjIfN4DoLs0hiYYB0PB6o8mTYUvLL4WU5l/kc4AFBDplL53pYWIbh7vOyD1Qfrs0/9Jgyk7g0RaRAs3k2tTyroZFVLLfc1v7dFAPKndPczpRGUSojeAyZTH37mA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fIhFWTXo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BEF6C116B1;
+	Thu,  9 May 2024 20:31:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715286683;
+	bh=3hRwl2K12SkRKNM78wLsl/4te3kJ4BT9nZoF6sCbxbA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=fIhFWTXoUfrZEXYXnNpjyqAaUa4FKNKp1liB8UAZMze9KVv4hdAFmJylc4iA2ekx7
+	 0fhwWAgIWjmCNyvHeQ0baHNbtDX7ycaHfa2SXUNVmD1OT3lznGSH7W9ZOMYVq8XzPS
+	 XNdetjkAICbPLl6ZcBlFpBrF6uOo19eNlFEH04hmul98ViHyviLWxshHNPkuB4YW8R
+	 j/XqzRH4eUz9DNnhN6j1c2zTJ4wOzQvR5+5d/39yVSA5AWK7LBuN0WnPSyQoM+Na7F
+	 +byhIpw32XvdJTGUefGzhSRK/x2pK5XgOnr0McvVxwaDjfNk0mDdQZSj4xrD1fIuDV
+	 XVepSil5D0/gg==
+From: SeongJae Park <sj@kernel.org>
+To: Edward Liaw <edliaw@google.com>
+Cc: SeongJae Park <sj@kernel.org>,
+	shuah@kernel.org,
+	"=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?=" <mic@digikod.net>,
+	"=?UTF-8?q?G=C3=BCnther=20Noack?=" <gnoack@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next,v4] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <0d7b04a6-9f5b-41c7-bd52-890521019f8d@lunn.ch>
-References: <20240509095217.3274671-1-niklas.soderlund+renesas@ragnatech.se>
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Muhammad Usama Anjum <usama.anjum@collabora.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	kernel-team@android.com,
+	linux-security-module@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	bpf@vger.kernel.org,
+	damon@lists.linux.dev,
+	linux-mm@kvack.org,
+	mathieu.desnoyers@efficios.com
+Subject: Re: [PATCH v3 13/68] selftests/damon: Drop define _GNU_SOURCE
+Date: Thu,  9 May 2024 13:31:13 -0700
+Message-Id: <20240509203113.63537-1-sj@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240509200022.253089-14-edliaw@google.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240509095217.3274671-1-niklas.soderlund+renesas@ragnatech.se>
+Content-Transfer-Encoding: 8bit
 
-> +static void rtsn_set_delay_mode(struct rtsn_private *priv)
-> +{
-> +	struct device_node *np = priv->ndev->dev.parent->of_node;
-> +	u32 delay;
-> +	u32 val;
-> +
-> +	val = 0;
-> +
-> +	/* The MAC is capable of applying a delay on both Rx and Tx. Each
-> +	 * delay can either be on or off, there is no way to set its length.
-> +	 *
-> +	 * The exact delay applied depends on electric characteristics of the
-> +	 * board. The datasheet describes a typical Rx delay of 1800 ps and a
-> +	 * typical Tx delay of 2000 ps.
-> +	 *
-> +	 * There are boards where the RTSN device is used together with PHYs
-> +	 * who do not support a large enough internal delays to function. These
-> +	 * boards depends on the MAC applying these inexact delays.
-> +	 */
-> +
-> +	/* If the phy-mode is rgmii or rgmii-rxid apply Rx delay on the MAC */
-> +	if (priv->iface == PHY_INTERFACE_MODE_RGMII_ID ||
-> +	    priv->iface == PHY_INTERFACE_MODE_RGMII_RXID)
-> +		if (!of_property_read_u32(np, "rx-internal-delay-ps", &delay))
-> +			if (delay)
-> +				val |= GPOUT_RDM;
-> +
-> +	/* If the phy-mode is rgmii or rgmii-txid apply Tx delay on the MAC */
-> +	if (priv->iface == PHY_INTERFACE_MODE_RGMII_ID ||
-> +	    priv->iface == PHY_INTERFACE_MODE_RGMII_TXID)
-> +		if (!of_property_read_u32(np, "tx-internal-delay-ps", &delay))
-> +			if (delay)
-> +				val |= GPOUT_TDM;
+Hi Edward,
 
-Much better, but still not correct. rx-internal-delay-ps and
-tx-internal-delay-ps is meant for fine tuning the delays, generally in
-steps of a few 10ps. It is applied unconditionally, since it is just a
-fine tune.
+On Thu,  9 May 2024 19:58:05 +0000 Edward Liaw <edliaw@google.com> wrote:
 
-You hardware does not support fine tuning, just 1800/2000ps. So it
-makes no sense to use these DT properties. Just enable GPOUT_RDM or
-GPOUT_TDM as appropriate for PHY_INTERFACE_MODE_*.
+> _GNU_SOURCE is provided by lib.mk, so it should be dropped to prevent
+> redefinition warnings.
+> 
+> Fixes: 809216233555 ("selftests/harness: remove use of LINE_MAX")
 
-    Andrew
+I show Mathieu's comment on this[1].  I have no strong opinion on this, but if
+you conclude to remove or change this line, please apply same change to this
+patch.
 
----
-pw-bot: cr
+[1] https://lore.kernel.org/638a7831-493c-4917-9b22-5aa663e9ee84@efficios.com
+
+> Signed-off-by: Edward Liaw <edliaw@google.com>
+
+I also added trivial comments that coming from my personal and humble
+preferrence below.  Other than the above and the below comments,
+
+Reviewed-by: SeongJae Park <sj@kernel.org>
+
+> ---
+>  tools/testing/selftests/damon/debugfs_target_ids_pid_leak.c    | 3 ---
+>  .../damon/debugfs_target_ids_read_before_terminate_race.c      | 2 --
+>  2 files changed, 5 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/damon/debugfs_target_ids_pid_leak.c b/tools/testing/selftests/damon/debugfs_target_ids_pid_leak.c
+> index 0cc2eef7d142..7a17a03d555c 100644
+> --- a/tools/testing/selftests/damon/debugfs_target_ids_pid_leak.c
+> +++ b/tools/testing/selftests/damon/debugfs_target_ids_pid_leak.c
+> @@ -2,9 +2,6 @@
+>  /*
+>   * Author: SeongJae Park <sj@kernel.org>
+>   */
+> -
+> -#define _GNU_SOURCE
+> -
+>  #include <fcntl.h>
+
+I'd prefer having one empty line between the comment and includes.
+
+>  #include <stdbool.h>
+>  #include <stdint.h>
+> diff --git a/tools/testing/selftests/damon/debugfs_target_ids_read_before_terminate_race.c b/tools/testing/selftests/damon/debugfs_target_ids_read_before_terminate_race.c
+> index b06f52a8ce2d..4aeac55ac93e 100644
+> --- a/tools/testing/selftests/damon/debugfs_target_ids_read_before_terminate_race.c
+> +++ b/tools/testing/selftests/damon/debugfs_target_ids_read_before_terminate_race.c
+> @@ -2,8 +2,6 @@
+>  /*
+>   * Author: SeongJae Park <sj@kernel.org>
+>   */
+> -#define _GNU_SOURCE
+> -
+>  #include <fcntl.h>
+
+Ditto.
+
+And I realize I also forgot adding one empty line before the above #define
+line.  That's why I'm saying this is just a trivial comment :)
+
+>  #include <stdbool.h>
+>  #include <stdint.h>
+> -- 
+> 2.45.0.118.g7fe29c98d7-goog
+
+
+Thanks,
+SJ
 
