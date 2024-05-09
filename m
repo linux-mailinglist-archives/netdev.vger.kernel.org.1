@@ -1,95 +1,108 @@
-Return-Path: <netdev+bounces-95057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29B908C158C
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 21:40:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECEDB8C159D
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 21:47:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2848C1C21B5E
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 19:40:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A9F81C21239
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 19:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6B37F7D3;
-	Thu,  9 May 2024 19:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438627FBAE;
+	Thu,  9 May 2024 19:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+JaM5eI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zDthsi/u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415B1C2ED;
-	Thu,  9 May 2024 19:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9132E80639
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 19:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715283628; cv=none; b=gyjI/yTAcY51ZleRallq9F6HyovocZAZIC89iDNkahMNMRM07F00O0gpyLrl6rSdUd7Pd550jcWADWC4jXU48VS99twVDk7skzqHfK7NmV9X0mpWJz14Y2ymcVtZaZ7AhkZT79gs7XY8RdM54F9XO86m85v4r76Jlnd+HAp6P5M=
+	t=1715284031; cv=none; b=aS4xwjx3lDgmjjoLzVynd3JkoJeBpuijC7a72nDrQxpP9KjqtY3NEQNnIyFuHriQpR4s8QI9hi6choa2LJ3A1vIYIbp7dCU/bEO3WAuqi2xIifPIRe6I57Huk9tcCp+3dhSqhkvFEJRddPSgKBfpba5IWIM8eCXwBepi6jyXGmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715283628; c=relaxed/simple;
-	bh=Syz/ozW0y/v/oKXIKjLMnVSPKSibcKLyKO5odXaFv5c=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UECFDFQC/UoWPEIpZVoFevSrBnTvRoSLgQBzwulnMgE7lqjg0n23e+JUP3crlihz1TKjmcy6+b5MgZjLKXf5Sbv2jI7LBcBtEVErVFMHBngzSMeT0NDOAolDhD9IEYZmX9jRrANuODHlujJQ/BV+Y6xti77HLPDXK7u0O4octpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O+JaM5eI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BD569C2BD11;
-	Thu,  9 May 2024 19:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715283627;
-	bh=Syz/ozW0y/v/oKXIKjLMnVSPKSibcKLyKO5odXaFv5c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=O+JaM5eIlVp2yLYxugQQqCoG8H6myYok97rVKYOsGBk1GBfEzKPtt+Ex7Pxh8AvN2
-	 7iEdZ7gMbZNCu9mt/xMocuWKpTwU692ccszj+SHp0cydXNWCE2p9DMdMn0Ctr4Y0zM
-	 LbceWKzYIBUUFxjcDugUXd2v8omx1ZGoMzEGcqKi3+Ootg/A3SDQdvd/imB6tqJdnv
-	 UHqa9x/gMsXZ7mvSKDj6RSpZftD0jcRw4+Ti30k5G/N92vfNKjwSaB7M/EH1k+iA3U
-	 s3Zi3YG6afo8C7s6+DmTHv72leE0bCLeAX8c3SNk/+S69hbjluRrXqced11UPbABoX
-	 Rg4lpbn4kExXg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AC707E7C0E0;
-	Thu,  9 May 2024 19:40:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1715284031; c=relaxed/simple;
+	bh=ZiH1zPLlQKa/SRZ6lleNveigp7s/byE/uEd8dR3ontI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nB/kN7nDAdz7r5ZbAEINJ6GBe15pC0TsTZqvKFE7A93sRxdQKB0l8Zs8EGF2XIOIpng5xTOgsIRh6F6JTsmv9kxzReEVKyY+aMHUCvemcsEiyn3EV8K9n6enj/NuqYCdUEfjj0zrbN/LasmASN9LJhlhbTXkzrYZNUWmxHQiR9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zDthsi/u; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-572f6c56cdaso4162a12.0
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 12:47:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715284028; x=1715888828; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZiH1zPLlQKa/SRZ6lleNveigp7s/byE/uEd8dR3ontI=;
+        b=zDthsi/uFefA3vU0zxVyd5oD3GKW6tIz5q8mQOFUIpQdKMOB5Pcu0Gra4nQhXPkbfp
+         /ei+P+KKk2LKTC19suROWTPO9XPgrHDMV1XYgjFgNXKYm3MTnS0G3E+gXQAEtHK+SyBL
+         J37l3WgYwKpXqcYQOJr2SUc/zgPP+K4WNljPGf9AdXYhwm6sQFPDRJf3Oxa0hFrnHPrR
+         dl1JyQRjzTIbcNb7+SLMfZwVJm1ZDytTF+iPtSxYBJXov9WZsaenclUD8S04AkEsifK3
+         +prBETPCmvQDf9g6afiY5DJuO1xK+lAnPmQ/FdFORIyfuoNFfiElEkAuIg2InBcVXr5G
+         cA4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715284028; x=1715888828;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZiH1zPLlQKa/SRZ6lleNveigp7s/byE/uEd8dR3ontI=;
+        b=bLicvfnoPcLFZFh7nV21kviXp39Beo/1C2QbScuxx0CPLqldAYV+S+YTIA2ZgXhh3g
+         D9t13mA9oIdIv/nnH22VLLkPoaFVTYJjxoL3kHMucabQEZEQ1Km830KVCatQUGTbIxF7
+         r+yii8sVvJh8ADfCjREbbEsDdwnZecNDXjs+ZOEBNwGFS4H9iqzXOelVgZbuJh3N4In3
+         5RbB2WSJvISiRW7C4lBt3n0LOrbj6sjLWGQiAW5mHlKnpDqGnHqXBKDtE5FzsEB6VcGY
+         dAfblSnkGPveyco9S8W3HylGW4pi+5xQkkjDCc5dW+E4sLy1/XS0ks1aT9xLcoyveaGa
+         MM4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWbCrkLvIEJBmPCqXg14iDucPVCDHMovLMrZeVxwUYA+TqqopQpCoXwhPJFNXUP5GGWT2BVf8308BsD2LOHcMDzJoCrsvoV
+X-Gm-Message-State: AOJu0YxjPv3te37DErlvWMmwdFo7p8t4q8Kv03o5SJaIEVSlwm2oj2yx
+	4F0ibXOUKkvGT1q+E42MKIzdB7UD8BRa99r5q0cvufErC/W+n3JAY8Zokc7RA22LRYFWTTuI1Zs
+	2QqX/itLaiqEWmM/uoEwgIL1PFzDsZGz56wqW
+X-Google-Smtp-Source: AGHT+IEZCDgbWkHGbZwcPCGwWduTsdt6r5RS+/glnkO4xpsrY20S5rSV2bbITuAGJGCPUGiYgD9i4gF1ZL/L0ggFKWU=
+X-Received: by 2002:a05:6402:2267:b0:572:57d8:4516 with SMTP id
+ 4fb4d7f45d1cf-5734f603ae7mr39067a12.2.1715284027577; Thu, 09 May 2024
+ 12:47:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH REPOST net-next v3] selftest: epoll_busy_poll: epoll busy poll
- tests
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171528362770.20134.14528995105510778643.git-patchwork-notify@kernel.org>
-Date: Thu, 09 May 2024 19:40:27 +0000
-References: <20240508184008.48264-1-jdamato@fastly.com>
-In-Reply-To: <20240508184008.48264-1-jdamato@fastly.com>
-To: Joe Damato <jdamato@fastly.com>
-Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, nalramli@fastly.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org
+References: <20240509044323.247606-1-yf768672249@gmail.com>
+ <DS0PR10MB6056248B2DFFC393E31B4A1B8FE62@DS0PR10MB6056.namprd10.prod.outlook.com>
+ <9aafe0de-7e46-4255-915e-2cf2969377d0@davidwei.uk>
+In-Reply-To: <9aafe0de-7e46-4255-915e-2cf2969377d0@davidwei.uk>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 9 May 2024 21:46:54 +0200
+Message-ID: <CANn89iLfj3fPmCC+3-ZfAAvCMVh=E3j3xTAu6At2wdK2MK0-=A@mail.gmail.com>
+Subject: Re: [External] : [PATCH 1/2] tcp: fix get_tcp4_sock() output error info
+To: David Wei <dw@davidwei.uk>
+Cc: Mohith Kumar Thummaluru <mohith.k.kumar.thummaluru@oracle.com>, Yuan Fang <yf768672249@gmail.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed,  8 May 2024 18:40:04 +0000 you wrote:
-> Add a simple test for the epoll busy poll ioctls, using the kernel
-> selftest harness.
-> 
-> This test ensures that the ioctls have the expected return codes and
-> that the kernel properly gets and sets epoll busy poll parameters.
-> 
-> The test can be expanded in the future to do real busy polling (provided
-> another machine to act as the client is available).
-> 
-> [...]
-
-Here is the summary with links:
-  - [REPOST,net-next,v3] selftest: epoll_busy_poll: epoll busy poll tests
-    https://git.kernel.org/netdev/net-next/c/60e0f986e89f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+On Thu, May 9, 2024 at 8:09=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+>
+> On 2024-05-09 10:29, Mohith Kumar Thummaluru wrote:
+> > Good catch! Thanks for this fix.
+>
+> If this is a fix, can you please add a Fixes tag? And in general some
+> surrounding context in a cover letter? Thanks.
 
 
+I do not think it is a fix, and I am not sure we want this patch anyway.
+
+/proc interface is legacy, we do not change it.
+
+Please use TCP_INFO or inet_diag, because
+commit 5ee3afba88f5 "[TCP]: Return useful listenq info in tcp_info and
+INET_DIAG_INFO."
+took care of this in 2007.
+
+Already in 2007 we were considering /proc/net/tcp as a legacy.
 
