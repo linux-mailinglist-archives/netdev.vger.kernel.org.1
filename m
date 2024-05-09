@@ -1,160 +1,128 @@
-Return-Path: <netdev+bounces-94776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CD1F8C09E5
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:48:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B24F8C09EB
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:54:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2086B283B83
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 02:48:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BD681F22557
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 02:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73AC13BC13;
-	Thu,  9 May 2024 02:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4AC13BC1D;
+	Thu,  9 May 2024 02:54:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TcRoAy5a"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MQ0Hz/ai"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EDA413A87A
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 02:48:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2E885950
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 02:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715222922; cv=none; b=aKgiFcB+x48J2miuSutRyWrhnR3ZvtCes9j4/I/4ZLXiQ0W8CPwsUSyihP3rR67+crrZwZZjDksLVN1krLVLbGKkf+klQ0Xa3HeRJ5eyAZU2E/gwCT4vzXWwjIChx/y2xMB4hO6tOVlFjOny60fSGUZ16d2bffGRfWH70xo4xmw=
+	t=1715223268; cv=none; b=Ll/2050Ng7UYA0OTyARk9iGfOx4ks3uLK/to/sld/Pynkx3zM6tsx3UmwgIBRcj0oI2RH/1Rmi/SFROdVOPD2aT8/eTbvvvjFURkiDDx/7xkbxy70NI6tP0p9BIK61YERduOo9ri2uwbeuzMqxsRq6xdssOPIysGwTEwSPVTVt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715222922; c=relaxed/simple;
-	bh=wQkXTf5xKOi/jkQqHQ2AkEYJzxMOlLiqa4piZ7/Gmgs=;
+	s=arc-20240116; t=1715223268; c=relaxed/simple;
+	bh=px95XfgVdNLSqB1NEtbMqouLoL3ZUqGEDf4VJRKlrNg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mNdo6kMlmiuKOtinD+t2jBo/qzt0hps3fSLgiD2dd7QRY+7dV5VB+xN+jHicO2FC+r/BpPOOFzfJD43dAzT1wBveRYOTDGt3KA7nUSN/cbSkzziX2Pe9uASNPaQp14ySsodMW55Ey9qNi3AALWgZKJnYaZ6Zw4ELW+z+fN64YrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TcRoAy5a; arc=none smtp.client-ip=209.85.222.49
+	 To:Cc:Content-Type; b=f0zmhP5q48dy8hi6mg8lKvryinThK05ziNxx3C98oNM9DRJYWVBfDbuaL0D2MPMpLprMLfVe2JbEYmKW146Pxp7vAp4dQBqbQZJDk0uv2RQP/AvWHZXJjSQQY/t5n9ceYuDEFsITIhMDqtf/2fcbgLeeKpY6Lil3/BARB/b7UMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MQ0Hz/ai; arc=none smtp.client-ip=209.85.219.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-7f7809ae952so111019241.0
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 19:48:41 -0700 (PDT)
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-69b47833dc5so2012406d6.0
+        for <netdev@vger.kernel.org>; Wed, 08 May 2024 19:54:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715222920; x=1715827720; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1715223266; x=1715828066; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8t5MjaAMAXet3sIw/oEjf3p3suprAqTqym8YuM7ds4g=;
-        b=TcRoAy5aqnI587XnOMn5ebUnicnkw7crwSX07/GOUk0GtH5SvTYF9P967pqaePynoE
-         AFPK66gy439+gLl1qKNB/HMhq4j0mzFU6EENi6crc8yPziKd8z+t9ERJYVJyF6ahcOJP
-         7YegStGQo8+eI17SlqpPHSktNXIrc/bnzsdBBObgbKMAYOtFCA862/3WN4kOkS3ZML+M
-         LG52WDZ/Egv1dk7U+yqtYTzbirWSapSaY21wSk8j4EndGwoc7bhTvWoSHSVSuF/MjMkt
-         VcyyEomnOl1exDFGrI5z3n9l/TxsvzZfh1/1YHMKlKMcCGksLJ0GmivSzG8wN2qRmL9U
-         vK5A==
+        bh=0n5lXWwCrkNw+mZGyoG+6UZQXx93pGBCtpjOq+keWdY=;
+        b=MQ0Hz/aiIh3fGCWR/x2rtu7OJ2Z/DMj2FMHIFrYvJ5Bs4yX2efgDcF/C76eEVc1UAi
+         9Gvn8e6sFMX8M1A1GlkEyqzHTiaTKjQ82bpEIhU/BBKHoYgvX9JxJVyJaQCb6qEpvTA6
+         kc6+eEjibGwZv9RHGIZXlJI5Bo3ILQWjnjuPfRlctMxnjN8N6R+81B+Q8ZOWO8R3tcYH
+         vfEIE3A4eMQxGFzY+Pl1IwQ4+2VC5HLYAdwbQgNbvw2OxkGXEMJnWQVBWcR3z4VWg7gK
+         Ds3dR34aK6Z7a8WGKs1BOiO+RxQtLVvi/1IUhVZLKCzp2yby5o12SCa0Q3jC+Y2aKnBD
+         4fRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715222920; x=1715827720;
+        d=1e100.net; s=20230601; t=1715223266; x=1715828066;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8t5MjaAMAXet3sIw/oEjf3p3suprAqTqym8YuM7ds4g=;
-        b=wKCh+aIKMrbynq+2S18G4jQC+QL0cHQZ1Ntw58WH75FAcnNSQ9563MSAX1RBLK7jSo
-         tsLlCgWVbbPxx+KEoIu9i9yiPt0hLOhzEFdRfoB8hCBLM0Q5agdOTmFaONZVTojAAZHO
-         KP2DPSMm6/dwbFHc+FRBIuZn3f9qek/TIKo9Gp6WzU2/beCm76ENZsqDWTP8q7ARNfCq
-         qKw1sDTEPGho8qvuLkxwryKw4lJaxliow9HX7hudrAD92rG/zGADf9dPuSoQp4RvR987
-         tXsr9C1EUWncyWeHKYAxv8mf5WUbhXEJBwb6l1MQ4IH4NuBZ8NIMfhjBgvlJzoRKl5/f
-         EUPA==
-X-Gm-Message-State: AOJu0YymZjxtf4G2TPu1XdgqwAIv+/mFEjNzl3mtUZeVe9IrHB9BtV4P
-	zydQX1z1UlLZ4gLqxRi6TCXtd2rtWe4CLlhnFvk51dgno32XMQqO26Lr5gLzKuICVAP3GEoVVls
-	2rmyEH6ZBS0MSGFJVq8bHglHdzton91BkmGXB
-X-Google-Smtp-Source: AGHT+IGwP7bmrs8c6H2dNlHWYWMc4pvUuN7R8ssTqnmr7Fu6RYzEU/zJq2dOHJYvSw7IotqU7XqRa2ac2bYn+xiOn/I=
-X-Received: by 2002:a67:f448:0:b0:47e:f147:ca71 with SMTP id
- ada2fe7eead31-47f3c2eaa12mr4070131137.19.1715222920018; Wed, 08 May 2024
- 19:48:40 -0700 (PDT)
+        bh=0n5lXWwCrkNw+mZGyoG+6UZQXx93pGBCtpjOq+keWdY=;
+        b=Ul6cVdJn8e2fh6tzzXRbQ1TsZNYF5zFVn1PKY5mhctiPwQMooudqODXWGrILunVzz8
+         3UcoeayW35pzC+CFarR8FmklrkhdKbddLHuBzTLNhb7gg+AkmjA64i50WhxaNp4V9lPV
+         /3SaMySnt0eCpUNLaYMBLiI0gfOm+WGbwkoepLnBrjNk0fRJXsvolOGGgY5OqlWLxOaF
+         dpE2RimX1i6muLEa5XjSHLxuE3WfInq+GYLDvywCb6Q92sGWKlKMpkH/kuWxUulmbQDm
+         EetVfRz6ulZ1hzCSGFXljOJfDb5d9UxczgKIEM/7v94Lfz6w06/+/md3LrINqyUKThBe
+         QLrg==
+X-Gm-Message-State: AOJu0YwStjXBm5qBokyedqyd2d7r1HkxFN+vywwFv+3Q6xzU5ycYSyYr
+	C/72/SZUNwZXufLzuQB0685XPuimQx2yPWZoUPEzDlVGwiv3gNFMYngZFhc/YJhdl4KbfVKV7iG
+	rQLzERqZAJFrMZo3P1eiQOib6wKGxFhUCgpEt
+X-Google-Smtp-Source: AGHT+IEDRHFaM7QiNDpvS1RM9lXUOxibfeTGoCbE7y0wlHy7q9FA+3L3PbX3ukTv0VKfULn8aem19wicPLE3Tz00mfQ=
+X-Received: by 2002:a05:6214:d66:b0:6a0:c914:2a07 with SMTP id
+ 6a1803df08f44-6a151436c43mr57067126d6.4.1715223265690; Wed, 08 May 2024
+ 19:54:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240502211047.2240237-1-maheshb@google.com> <ZjsDJ-adNCBQIbG1@hoboy.vegasvil.org>
-In-Reply-To: <ZjsDJ-adNCBQIbG1@hoboy.vegasvil.org>
+References: <20240502211047.2240237-1-maheshb@google.com> <87fruspxgt.ffs@tglx>
+In-Reply-To: <87fruspxgt.ffs@tglx>
 From: =?UTF-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?= <maheshb@google.com>
-Date: Wed, 8 May 2024 19:48:12 -0700
-Message-ID: <CAF2d9jgzsOMQcOv=bhFqWuo2+8wjsEmwmcwnMrVy6gKLXohHMw@mail.gmail.com>
+Date: Wed, 8 May 2024 19:53:58 -0700
+Message-ID: <CAF2d9jigGhpSAj2hnUG2QSvYeSzTvD1FUf7tT8BW1NU8EouyOA@mail.gmail.com>
 Subject: Re: [PATCHv4 net-next] ptp/ioctl: support MONOTONIC_RAW timestamps
  for PTP_SYS_OFFSET_EXTENDED
-To: Richard Cochran <richardcochran@gmail.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Yuliang Li <yuliangli@google.com>, 
+	Don Hatchett <hatch@google.com>
 Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, 
 	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Arnd Bergmann <arnd@arndb.de>, Sagi Maimon <maimon.sagi@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Sagi Maimon <maimon.sagi@gmail.com>, Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>, 
 	Mahesh Bandewar <mahesh@bandewar.net>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 7, 2024 at 9:44=E2=80=AFPM Richard Cochran <richardcochran@gmai=
-l.com> wrote:
+On Wed, May 8, 2024 at 12:35=E2=80=AFAM Thomas Gleixner <tglx@linutronix.de=
+> wrote:
 >
-> On Thu, May 02, 2024 at 02:10:47PM -0700, Mahesh Bandewar wrote:
->
-> > @@ -457,14 +459,34 @@ static inline ktime_t ptp_convert_timestamp(const=
- ktime_t *hwtstamp,
+> On Thu, May 02 2024 at 14:10, Mahesh Bandewar wrote:
+> > The ability to read the PHC (Physical Hardware Clock) alongside
+> > multiple system clocks is currently dependent on the specific
+> > hardware architecture. This limitation restricts the use of
+> > PTP_SYS_OFFSET_PRECISE to certain hardware configurations.
 > >
-> >  static inline void ptp_read_system_prets(struct ptp_system_timestamp *=
-sts)
-> >  {
-> > -     if (sts)
-> > -             ktime_get_real_ts64(&sts->pre_ts);
-> > +     if (sts) {
-> > +             switch (sts->clockid) {
-> > +             case CLOCK_REALTIME:
-> > +                     ktime_get_real_ts64(&sts->pre_ts);
-> > +                     break;
-> > +             case CLOCK_MONOTONIC_RAW:
-> > +                     ktime_get_raw_ts64(&sts->pre_ts);
-> > +                     break;
+> > The generic soultion which would work across all architectures
+> > is to read the PHC along with the latency to perform PHC-read as
+> > offered by PTP_SYS_OFFSET_EXTENDED which provides pre and post
+> > timestamps.  However, these timestamps are currently limited
+> > to the CLOCK_REALTIME timebase. Since CLOCK_REALTIME is affected
+> > by NTP (or similar time synchronization services), it can
+> > experience significant jumps forward or backward. This hinders
+> > the precise latency measurements that PTP_SYS_OFFSET_EXTENDED
+> > is designed to provide.
 >
-> Why not add CLOCK_MONOTONIC as well?
-> That would be useful in many cases.
+> This is really a handwavy argument.
 >
-In fact my original implementation had it but my use case is really
-CLOCK_MONOTONIC_RAW, however, the general opinion on the thread was to
-implement what is needed now and if someone needs (CLOCK_MONOTONIC),
-it can be added at that time. So I removed it.
-
-> > +/*
-> > + * ptp_sys_offset_extended - data structure for IOCTL operation
-> > + *                        PTP_SYS_OFFSET_EXTENDED
-> > + *
-> > + * @n_samples:       Desired number of measurements.
-> > + * @clockid: clockid of a clock-base used for pre/post timestamps.
-> > + * @rsv:     Reserved for future use.
-> > + * @ts:              Array of samples in the form [pre-TS, PHC, post-T=
-S]. The
-> > + *           kernel provides @n_samples.
-> > + *
-> > + * History:
-> > + * v1: Initial implementation.
-> > + *
-> > + * v2: Use the first word of the reserved-field for @clockid. That's
-> > + *     backward compatible since v1 expects all three reserved words
-> > + *     (@rsv[3]) to be 0 while the clockid (first word in v2) for
-> > + *     CLOCK_REALTIME is '0'.
+> Fact is that the time jumps of CLOCK_REALTIME caused by NTP (etc) are
+> rare and significant enough to be easily filtered out. That's why this
+> interface allows you to retrieve more than one sample.
 >
-> This is not really appropriate for a source code comment.  The
-> un-merged patch series iterations are preserved at lore.kernel in case
-> someone needs that.
+> Can you please explain which problem you are actually trying to solve?
 >
-This was added in rev3
-(Also this is the API version-history which intends to track how the
-fields have changed / morphed and not to be confused with the patch
-versions)
-
-> The "backward compatible" information really wants to be in the commit
-> message.
+> It can't be PTP system time synchronization as that obviously requires
+> CLOCK_REALTIME.
 >
-I have the last paragraph in the commit log about compatibility.
-
-
-Thanks for the comments,
---mahesh..
+Let me add a couple of folks from the clock team. @Yuliang Li  @Don Hatchet=
+t
+I'm just a nomad-kernel-net guy trying to fill-in gaps :(
 
 > Thanks,
-> Richard
 >
+>         tglx
 
