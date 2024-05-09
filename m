@@ -1,133 +1,132 @@
-Return-Path: <netdev+bounces-94797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449ED8C0AE0
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 07:15:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B3DD8C0AFD
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 07:35:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C81281F24052
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 05:15:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CA821C22247
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 05:35:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3BE11494A3;
-	Thu,  9 May 2024 05:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0404E14A08F;
+	Thu,  9 May 2024 05:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eBHsIzGp"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC7313BC3C
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 05:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C17C14A084;
+	Thu,  9 May 2024 05:33:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715231736; cv=none; b=EDgmXoBH91r3mvyOA1RDFVouwyQQJ9HczSujM+N+yd3qHaiE6HqRHoO0Dmh598JOQnu6pR+ylgqK/Gj9YDMj7pcCcHT6gCOGbmd6uhSgGUSjba0XWpGrpzWZllHhUVJpITjp+XFGwCRKVEcUkfO+l7uagrX+JyaEheaeU/E9S10=
+	t=1715232829; cv=none; b=ZMwXn/Dy9jagzuEurPCqnvbiOlL1WJj6wEDWIzSaouMC5tsAJ2GtWWnc21uECPFOZmqNKNyxXEuyGeHRMS1c4S9v0Bd5vyGLq1qCESHALs/trMd5zsI9P2SIGf0jkF0K/4bf39op1DDpg4Ua3gS5UTPEJoBITBqNLAcTZQD3loI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715231736; c=relaxed/simple;
-	bh=cIDQZAOFPzs20dF1EbvJv64A34Ri3yMsRyyX/TylLmk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WqgwvmTZ7UpL8PJEmMnXxh62pWVGrqjGEaKAprkxFUCF2VtrUkmyiS9DH0qCpTMOgOUo5c45MbrjCMbgzjW1LpHZ9PqlKH0y+BqOKjqT5TLIwgRHNTBlvhAagx8RoGCnUS/VSn25f+q+nxgCdrkRph/jqVul5awldjqM6m7Nr68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1s4w7o-0004Iw-3N; Thu, 09 May 2024 07:15:24 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1s4w7l-000P7C-Tw; Thu, 09 May 2024 07:15:21 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1s4w7l-002KX4-2a;
-	Thu, 09 May 2024 07:15:21 +0200
-Date: Thu, 9 May 2024 07:15:21 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Arun.Ramadoss@microchip.com
-Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
-	Woojung.Huh@microchip.com, pabeni@redhat.com, edumazet@google.com,
-	f.fainelli@gmail.com, kuba@kernel.org, kernel@pengutronix.de,
-	dsahern@kernel.org, san@skov.dk, willemb@google.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	horms@kernel.org, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v1 3/3] net: dsa: microchip: dcb: set default
- apptrust to PCP only
-Message-ID: <Zjxb6a_MaSxjTQxU@pengutronix.de>
-References: <20240508103902.4134098-1-o.rempel@pengutronix.de>
- <20240508103902.4134098-4-o.rempel@pengutronix.de>
- <d4f7d3be15d46b07d7139ee4d453d7366d7aedc3.camel@microchip.com>
+	s=arc-20240116; t=1715232829; c=relaxed/simple;
+	bh=3Ex41zxZJpQFqhcvv30eVA/Rdlt84AztCsldCSW3S3I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=dzuTx9LiMvVxe4YOhR7UZIU3EIGQako/aVTiyUpFZJv3TNr4dE452wRHTbnG30AlP+0guxTM8MwCBO25ql2t2FAsvADDaqjj9fNQ29C1309z/ke9VKACyCszQ0LtJIHJyPJOzriDMQEWpaM+n2AK1ytzsuDtBBiwpMrw0zsmVtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eBHsIzGp; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715232828; x=1746768828;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3Ex41zxZJpQFqhcvv30eVA/Rdlt84AztCsldCSW3S3I=;
+  b=eBHsIzGpKNzKzVY0K0haB6R9KzR2tsNUXkzct5Gfp5x0GWP+vaGOfjap
+   r4X8Ck2q1jSq3uDD7Q0oqGfM+sX4+lQjtIG/oFZCkrBfeQCex+55bkhFp
+   YSpMEGcFhzgEsrYI5DJPqwJNu5+6/r8vUo0OX5NJNKObgVug/MaViv9wH
+   FU/BK8xu/36H00lzmirjXblGTQw46H7C/6hiviw2App8oSauMYnZTFYCF
+   Jc/gfm7VDVAmztTgfuHussJCvzimmC7amEOhMcEB39egER82TuJ+uzFg8
+   zZlkSKvGhPGwHdo/VHZ2qxlzfoE9GsEpE0nB8YPGFxjwCByGCwPR86tzz
+   Q==;
+X-CSE-ConnectionGUID: ebsSsMhtQn685BEadfVuMg==
+X-CSE-MsgGUID: VN13pNzFRceOlZCPJx3hZg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11067"; a="11286345"
+X-IronPort-AV: E=Sophos;i="6.08,146,1712646000"; 
+   d="scan'208";a="11286345"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 22:33:48 -0700
+X-CSE-ConnectionGUID: bFeud+yySzylKh5uE2BOpQ==
+X-CSE-MsgGUID: ajvf2dKpQh6BItEGgn+qsg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,146,1712646000"; 
+   d="scan'208";a="66558870"
+Received: from unknown (HELO st-server.bj.intel.com) ([10.240.193.102])
+  by orviesa001.jf.intel.com with ESMTP; 08 May 2024 22:33:42 -0700
+From: Tao Su <tao1.su@linux.intel.com>
+To: linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	kvm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-rtc@vger.kernel.org,
+	linux-sgx@vger.kernel.org
+Cc: akpm@linux-foundation.org,
+	edliaw@google.com,
+	ivan.orlov0322@gmail.com,
+	broonie@kernel.org,
+	perex@perex.cz,
+	tiwai@suse.com,
+	shuah@kernel.org,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	bongsu.jeon@samsung.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	alexandre.belloni@bootlin.com,
+	jarkko@kernel.org,
+	dave.hansen@linux.intel.com,
+	tao1.su@linux.intel.com
+Subject: [PATCH v2 0/2] Selftests: Fix compilation warnings due to missing _GNU_SOURCE definition
+Date: Thu,  9 May 2024 13:31:11 +0800
+Message-Id: <20240509053113.43462-1-tao1.su@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d4f7d3be15d46b07d7139ee4d453d7366d7aedc3.camel@microchip.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Arun,
+Since kselftest_harness.h introduces asprintf()[1], many selftests have
+compilation warnings or errors due to missing _GNU_SOURCE definitions.
 
-On Wed, May 08, 2024 at 03:11:24PM +0000, Arun.Ramadoss@microchip.com wrote:
-> Hi Oleksij,
-> 
-> On Wed, 2024-05-08 at 12:39 +0200, Oleksij Rempel wrote:
-> > EXTERNAL EMAIL: Do not click links or open attachments unless you
-> > know the content is safe
-> > 
-> > 
-> > -static const u8 ksz8_port2_supported_apptrust[] = {
-> > -       DCB_APP_SEL_PCP,
-> > -};
-> > -
-> >  static const char * const ksz_supported_apptrust_variants[] = {
-> >         "empty", "dscp", "pcp", "dscp pcp"
-> >  };
-> > @@ -771,9 +767,8 @@ int ksz_port_get_apptrust(struct dsa_switch *ds,
-> > int port, u8 *sel, int *nsel)
-> >   */
-> >  int ksz_dcb_init_port(struct ksz_device *dev, int port)
-> >  {
-> > -       const u8 *sel;
-> > +       const u8 ksz_default_apptrust[] = { DCB_APP_SEL_PCP };
-> >         int ret, ipm;
-> > -       int sel_len;
-> > 
-> >         if (is_ksz8(dev)) {
-> >                 ipm = ieee8021q_tt_to_tc(IEEE8021Q_TT_BE,
-> > @@ -789,18 +784,8 @@ int ksz_dcb_init_port(struct ksz_device *dev,
-> > int port)
-> >         if (ret)
-> >                 return ret;
-> > 
-> > -       if (ksz_is_ksz88x3(dev) && port == KSZ_PORT_2) {
-> > -               /* KSZ88x3 devices do not support DSCP classification
-> > on
-> > -                * "Port 2.
-> > -                */
-> > -               sel = ksz8_port2_supported_apptrust;
-> > -               sel_len = ARRAY_SIZE(ksz8_port2_supported_apptrust);
-> 
-> If we remove this, How the user application knows about the DSCP
-> resistriction of KSZ8 port 2. Is it implemented in other functions?
+The issue stems from a lack of a LINE_MAX definition in Android (see
+commit 38c957f07038), which is the reason why asprintf() was introduced.
+We tried adding _GNU_SOURCE definitions to more selftests to fix, but
+asprintf() may continue to cause problems, and since it is quite late in
+the 6.9 cycle, we would like to revert 809216233555 first to provide
+testing for forks[2].
 
-Yes, it is implemented in
-ksz_port_set_apptrust()->ksz88x3_port_apptrust_quirk(). This patch
-affects only default configuration.
+[1] https://lore.kernel.org/all/20240411231954.62156-1-edliaw@google.com
+[2] https://lore.kernel.org/linux-kselftest/ZjuA3aY_iHkjP7bQ@google.com
 
+v1 -> v2:
+- Stop defining _GNU_SOURCE in related selftests
+- Revert commit 809216233555
+- Use 1024 in place of LINE_MAX to fix 38c957f07038
+
+v1: https://lore.kernel.org/all/20240507063534.4191447-1-tao1.su@linux.intel.com/
+
+Tao Su (2):
+  Revert "selftests/harness: remove use of LINE_MAX"
+  selftests/harness: Use 1024 in place of LINE_MAX
+
+ tools/testing/selftests/kselftest_harness.h | 11 +++--------
+ tools/testing/selftests/mm/mdwe_test.c      |  1 -
+ 2 files changed, 3 insertions(+), 9 deletions(-)
+
+
+base-commit: 45db3ab70092637967967bfd8e6144017638563c
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.34.1
+
 
