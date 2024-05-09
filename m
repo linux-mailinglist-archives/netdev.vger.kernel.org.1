@@ -1,336 +1,639 @@
-Return-Path: <netdev+bounces-94740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B4838C0871
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 02:29:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 305BA8C0893
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 02:45:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18B791F226FF
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 00:29:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A2CAB21E75
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 00:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142D1DDA5;
-	Thu,  9 May 2024 00:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04A33398E;
+	Thu,  9 May 2024 00:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M1rhmnQ5"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U0t0scC6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B352DCA6F
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 00:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E3310A1F;
+	Thu,  9 May 2024 00:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715214580; cv=none; b=mG0K/nBtHyGM815EezN5WL2Cu+BrOYcZMlohS9FY+DQDRy8urpXntKjhKkFHGncIwM1L8CxVy57hQYdh25JcUykpbTGrdSAUbMoaswBLb2GJudcqwKTMXQMl2xxY8o6u4UX6GbyfjSyjwBsYV2ncqlgXkylBaSUtJV/GkNV0oYw=
+	t=1715215503; cv=none; b=vEgIwTag0eEjQD9uX2smw72NckdefHI623t01TgyT6dXXa/Faxty2vxS++DQWsKU/8jFCrht7TXrvXZZTF27+6zPbiXG/SjxW/Mdp5PaGchyGfAyfToqGPYMxtNG9Tzq60E1ZntTb8ucS3Boz74atq0hfKCPG3g4IpryzLMRau8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715214580; c=relaxed/simple;
-	bh=YFEOyn8HhTR+KZ3cmP9SJDzMJP8/0gmTLnbxrYrAyiM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fTbXZPiS3WcXqKXfEea0zzSiV87/HY+IaFRsdnXbw3rPqVT0X8rOnrSM4DodfGFEXAhpx52uYxfTA+z2XfXRr/wr5s0Q4d2lrXoO1WGHPlVJfje3aWJxgHT5TsPP0LZzLEuhGFN+sTCpc70YHV02n1Frx/LiFdkrlKyQsTI3rug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M1rhmnQ5; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-572aad902baso6280a12.0
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 17:29:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715214575; x=1715819375; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/ze6we/9zl1hwpr5TTVXS+9EQi+iUJaNZFz5eMfIu64=;
-        b=M1rhmnQ5tPiYNgd3tYVN99l88xQJCR8QJ093SQ2ZdqpvlnparBv0W5R3gw0uiZoJIW
-         OpS/QL8eJjBFSCFRg+WtS4Mr4e8sgr3XF6Fj9sM8TRcogvaHaHeSvC8uTmpzeIK7nx/P
-         U7MG5p/lfaoyftQszloEFVlHKD53T+lSbG8Rm2k1ovzoPmXkANijqZHgFbeGAIK7Icii
-         K6YOYusn0GcPwD+KKY5aBL+oPTwXT5B1TJ5xzq3oXzHkMgTwfKWDpnhK1YYst/teky9P
-         eEY/jKzRKxHTRMapxx/C+MzpnWsiVAkjn6zSY9i9NeLPbdp5Hr1PIkGY86y0jHRXFr+5
-         Pg8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715214575; x=1715819375;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/ze6we/9zl1hwpr5TTVXS+9EQi+iUJaNZFz5eMfIu64=;
-        b=PJvMgkSPz7b1pUjdbx6AAPfQnFapG+PwmpHljSf3rHQ+3pOc73IbebLH5JSu3AFL3T
-         BGekNZhQlV1KKQjk/r+1AnI48c1z+gdL75K6vkX+jZMmZADyaePo6ZKHTNV1gg6mluSr
-         uXRBUPdqRJWBPdBt6JTtRFgqF0VHyzXb6kYiRmxSBnKuEc53+atnPBX2mMv2Q6fzXH9o
-         t8ylQDmovkLG75vCHelR2v7gVaWhqJtjgq+pijplntYWVXO7gZIr61CNInD2C8rCJ5pA
-         WXY4xM1ljuIxZW4qbRa/Jcl6h4Gg+TTLincA7MmAWpynUjVo/bnoPqUXwERhuYd9zjdI
-         1kZA==
-X-Forwarded-Encrypted: i=1; AJvYcCUuk8hNhQSNlBpQJj6Z5l3DgbPz0j8GTBvqZvxv2P0iXto+0fii3Nev6PnmuX63/zASwVd7jOFFwBfK7G60NlUnpOCjlE5B
-X-Gm-Message-State: AOJu0YybutTe6ZGEbnEj7o0vq/VLdNC3ifmB/aSOwKjhqHNUu4leEDwz
-	offMLAoRj9HGopowA/S4/z83ycZrz2K+CCBNRoT9GRUNABRbp2k39S6RaxrMRQnM+Hnq5ywp2+m
-	RlYXKYTM9aAmw3kPs69ZygxmKQEEICDbCF5j5
-X-Google-Smtp-Source: AGHT+IEpRBxjqO7YXZEC9B8FKVtXSFN03eOTZMizwoUq2jNrJCvIwReN+ats511GKy8ts5rRqhmgn49fpwdVOB7Y6R8=
-X-Received: by 2002:a05:6402:742:b0:572:a154:7081 with SMTP id
- 4fb4d7f45d1cf-5733434b416mr85834a12.4.1715214574664; Wed, 08 May 2024
- 17:29:34 -0700 (PDT)
+	s=arc-20240116; t=1715215503; c=relaxed/simple;
+	bh=WVHtNljGpj4u18niXFyP3IP1K5P1hjMmkE4XUd2J5+4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nxKkroX1tuPZKrisqmUdXtjV0koh8oscdSnh2UHZAleJQ9c03NisSCj1tY1K4LvAH0fh3c4Mv6zOuMBNrYu09bo2s/vKa0heIBXUp6NacH13WMbDmL9GKcDRLN3CLmamUGJad1CnwRATozsnBsqMH1+FJuOxGohJeWWmJIBwZ5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=U0t0scC6; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=p4w5MoMB38DN/Tg8kqUxVog4ZJJdmPG/YvyxaE2aVjE=; b=U0t0scC6BqoggumMzzzpHfKbAC
+	l5flUebn83u9hy3Shi9Zqbfw6GKJcYJHRPpvAcmvz2ylLgsYeaiE9++trYywOSQtiDpbRcCdmSfSD
+	kuNRn2zV9xQdJtgIMK8Uf6Tgahd2Pvesnubpx9s27aygt14bWnKnr2Mw5f9XRIk6oLa+XA2DoO1t0
+	LkNNsOK8dJFe5zdE8QcB/z9o4t9gXeCQ5WSTPbVRmuX39RFNttxi1eOrLc/YcaFg77Mqhme53y9zI
+	9q0GUTsoEhGA/e7WhM3YqLKN70q/Gaz7wY/aYogTDOvbZI1W7fidgvDSGlCYk7A7ySDbk5HmM8k7+
+	o15H3z5A==;
+Received: from [50.53.4.147] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s4rtz-0000000HQZY-1MJO;
+	Thu, 09 May 2024 00:44:51 +0000
+Message-ID: <0ac5219b-b756-4a8d-ba31-21601eb1e7f4@infradead.org>
+Date: Wed, 8 May 2024 17:44:50 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240507214254.2787305-1-edliaw@google.com> <20240507214254.2787305-4-edliaw@google.com>
- <ec8ab737-a841-4cd5-8ec1-e0a777744262@nvidia.com>
-In-Reply-To: <ec8ab737-a841-4cd5-8ec1-e0a777744262@nvidia.com>
-From: Edward Liaw <edliaw@google.com>
-Date: Wed, 8 May 2024 17:29:07 -0700
-Message-ID: <CAG4es9XPLhHhH-Hfm3_m5zLLtiB1zme8pAazMhErMpHqJcAMmw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/5] selftests: Include KHDR_INCLUDES in Makefile
-To: John Hubbard <jhubbard@nvidia.com>
-Cc: shuah@kernel.org, Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
-	Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Nhat Pham <nphamcs@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Christian Brauner <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>, 
-	Kees Cook <keescook@chromium.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, 
-	Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>, 
-	Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>, 
-	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Seth Forshee <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	=?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Fenghua Yu <fenghua.yu@intel.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Muhammad Usama Anjum <usama.anjum@collabora.com>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kernel-team@android.com, 
-	linux-sound@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mm@kvack.org, linux-input@vger.kernel.org, iommu@lists.linux.dev, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-actions@lists.infradead.org, mptcp@lists.linux.dev, 
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 12/13] mm: page_frag: update documentation for
+ page_frag
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Alexander Duyck <alexander.duyck@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Andrew Morton <akpm@linux-foundation.org>,
+ linux-mm@kvack.org, linux-doc@vger.kernel.org
+References: <20240508133408.54708-1-linyunsheng@huawei.com>
+ <20240508133408.54708-13-linyunsheng@huawei.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20240508133408.54708-13-linyunsheng@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 8, 2024 at 2:41=E2=80=AFPM John Hubbard <jhubbard@nvidia.com> w=
-rote:
->
-> On 5/7/24 2:38 PM, Edward Liaw wrote:
-> > Add KHDR_INCLUDES to CFLAGS to pull in the kselftest harness
-> > dependencies (-D_GNU_SOURCE).
-> >
-> > Fixes: 809216233555 ("selftests/harness: remove use of LINE_MAX")
-> > Signed-off-by: Edward Liaw <edliaw@google.com>
-> > ---
-> >   tools/testing/selftests/alsa/Makefile                  | 2 +-
-> >   tools/testing/selftests/arm64/signal/Makefile          | 2 +-
-> >   tools/testing/selftests/exec/Makefile                  | 2 +-
-> >   tools/testing/selftests/filesystems/overlayfs/Makefile | 2 +-
-> >   tools/testing/selftests/hid/Makefile                   | 2 +-
-> >   tools/testing/selftests/nci/Makefile                   | 2 +-
-> >   tools/testing/selftests/prctl/Makefile                 | 2 ++
-> >   tools/testing/selftests/proc/Makefile                  | 2 +-
-> >   tools/testing/selftests/riscv/mm/Makefile              | 2 +-
-> >   tools/testing/selftests/rtc/Makefile                   | 2 +-
-> >   tools/testing/selftests/tmpfs/Makefile                 | 2 +-
-> >   11 files changed, 12 insertions(+), 10 deletions(-)
->
-> Hi Edward,
->
-> Seeing as how these all include lib.mk, and all use CFLAGS, is there
-> any reason not to simply fix this in lib.mk instead? Like this:
->
-> diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib=
-.mk
-> index 7fa4a96e26ed..df72610e0d2b 100644
-> --- a/tools/testing/selftests/lib.mk
-> +++ b/tools/testing/selftests/lib.mk
-> @@ -170,6 +170,8 @@ clean: $(if $(TEST_GEN_MODS_DIR),clean_mods_dir)
->   CFLAGS +=3D $(USERCFLAGS)
->   LDFLAGS +=3D $(USERLDFLAGS)
->
-> +CFLAGS +=3D $(KHDR_INCLUDES)
+
+
+On 5/8/24 6:34 AM, Yunsheng Lin wrote:
+> Update documentation about design, implementation and API usages
+> for page_frag.
+> 
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>  Documentation/mm/page_frags.rst | 156 +++++++++++++++++++++++++++++++-
+>  include/linux/page_frag_cache.h |  96 ++++++++++++++++++++
+>  mm/page_frag_cache.c            |  65 ++++++++++++-
+>  3 files changed, 314 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/mm/page_frags.rst b/Documentation/mm/page_frags.rst
+> index 503ca6cdb804..9c25c0fd81f0 100644
+> --- a/Documentation/mm/page_frags.rst
+> +++ b/Documentation/mm/page_frags.rst
+> @@ -1,3 +1,5 @@
+> +.. SPDX-License-Identifier: GPL-2.0
 > +
->   # When make O=3D with kselftest target from main level
->   # the following aren't defined.
->   #
->
+>  ==============
+>  Page fragments
+>  ==============
+> @@ -40,4 +42,156 @@ page via a single call.  The advantage to doing this is that it allows for
+>  cleaning up the multiple references that were added to a page in order to
+>  avoid calling get_page per allocation.
+>  
+> -Alexander Duyck, Nov 29, 2016.
+> +
+> +Architecture overview
+> +=====================
+> +
+> +.. code-block:: none
+> +
+> +                +----------------------+
+> +                | page_frag API caller |
+> +                +----------------------+
+> +                            ^
+> +                            |
+> +                            |
+> +                            |
+> +                            v
+> +    +------------------------------------------------+
+> +    |             request page fragment              |
+> +    +------------------------------------------------+
+> +        ^                      ^                   ^
+> +        |                      | Cache not enough  |
+> +        | Cache empty          v                   |
+> +        |             +-----------------+          |
+> +        |             | drain old cache |          |
+> +        |             +-----------------+          |
+> +        |                      ^                   |
+> +        |                      |                   |
+> +        v                      v                   |
+> +    +----------------------------------+           |
+> +    |  refill cache with order 3 page  |           |
+> +    +----------------------------------+           |
+> +     ^                  ^                          |
+> +     |                  |                          |
+> +     |                  | Refill failed            |
+> +     |                  |                          | Cache is enough
+> +     |                  |                          |
+> +     |                  v                          |
+> +     |    +----------------------------------+     |
+> +     |    |  refill cache with order 0 page  |     |
+> +     |    +----------------------------------+     |
+> +     |                       ^                     |
+> +     | Refill succeed        |                     |
+> +     |                       | Refill succeed      |
+> +     |                       |                     |
+> +     v                       v                     v
+> +    +------------------------------------------------+
+> +    |         allocate fragment from cache           |
+> +    +------------------------------------------------+
+> +
+> +API interface
+> +=============
+> +As the design and implementation of page_frag API implies, the allocation side
+> +does not allow concurrent calling. Instead it is assumed that the caller must
+> +ensure there is not concurrent alloc calling to the same page_frag_cache
+> +instance by using its own lock or rely on some lockless guarantee like NAPI
+> +softirq.
+> +
+> +Depending on different aligning requirement, the page_frag API caller may call
+> +page_frag_alloc*_align*() to ensure the returned virtual address or offset of
+> +the page is aligned according to the 'align/alignment' parameter. Note the size
+> +of the allocated fragment is not aligned, the caller need to provide a aligned
 
-Or how about just adding -D_GNU_SOURCE to CFLAGS then?
+                                                        needs to provide an aligned
+
+> +fragsz if there is a alignment requirement for the size of the fragment.
+
+                      an alignment
+
+> +
+> +Depending on different use cases, callers expecting to deal with va, page or
+> +both va and page for them may call page_frag_alloc_va*, page_frag_alloc_pg*,
+> +or page_frag_alloc* API accordingly.
+> +
+> +There is also a use case that need minimum memory in order for forward
+
+                                 needs
+
+> +progressing, but more performant if more memory is available. Using
+
+   progress,
+
+> +page_frag_alloc_prepare() and page_frag_alloc_commit() related API, the caller
+> +requests the minimum memory it need and the prepare API will return the maximum
+
+                                  needs
+
+> +size of the fragment returned, the caller needs to either call the commit API to
+
+                        returned. The caller
+
+> +report how much memory it actually uses, or not do so if deciding to not use any
+> +memory.
+> +
+> +.. kernel-doc:: include/linux/page_frag_cache.h
+> +   :identifiers: page_frag_cache_init page_frag_cache_is_pfmemalloc
+> +                 page_frag_cache_page_offset page_frag_alloc_va
+> +                 page_frag_alloc_va_align page_frag_alloc_va_prepare_align
+> +                 page_frag_alloc_probe page_frag_alloc_commit
+> +                 page_frag_alloc_commit_noref
+> +
+> +.. kernel-doc:: mm/page_frag_cache.c
+> +   :identifiers: __page_frag_alloc_va_align page_frag_alloc_va_prepare
+> +		 page_frag_alloc_pg_prepare page_frag_alloc_prepare
+> +		 page_frag_cache_drain page_frag_free_va
+> +
+> +Coding examples
+> +===============
+> +
+> +Init & Drain API
+> +----------------
+> +
+> +.. code-block:: c
+> +
+> +   page_frag_cache_init(pfrag);
+> +   ...
+> +   page_frag_cache_drain(pfrag);
+> +
+> +
+> +Alloc & Free API
+> +----------------
+> +
+> +.. code-block:: c
+> +
+> +    void *va;
+> +
+> +    va = page_frag_alloc_va_align(pfrag, size, gfp, align);
+> +    if (!va)
+> +        goto do_error;
+> +
+> +    err = do_something(va, size);
+> +    if (err) {
+> +        page_frag_free_va(va);
+> +        goto do_error;
+> +    }
+> +
+> +Prepare & Commit API
+> +--------------------
+> +
+> +.. code-block:: c
+> +
+> +    unsigned int offset, size;
+> +    bool merge = true;
+> +    struct page *page;
+> +    void *va;
+> +
+> +    size = 32U;
+> +    page = page_frag_alloc_prepare(pfrag, &offset, &size, &va);
+> +    if (!page)
+> +        goto wait_for_space;
+> +
+> +    copy = min_t(int, copy, size);
+
+declare copy?
+
+> +    if (!skb_can_coalesce(skb, i, page, offset)) {
+> +        if (i >= max_skb_frags)
+> +            goto new_segment;
+> +
+> +        merge = false;
+> +    }
+> +
+> +    copy = mem_schedule(copy);
+> +    if (!copy)
+> +        goto wait_for_space;
+> +
+> +    err = copy_from_iter_full_nocache(va, copy, iter);
+> +    if (err)
+> +        goto do_error;
+> +
+> +    if (merge) {
+> +        skb_frag_size_add(&skb_shinfo(skb)->frags[i - 1], copy);
+> +        page_frag_alloc_commit_noref(pfrag, offset, copy);
+> +    } else {
+> +        skb_fill_page_desc(skb, i, page, offset, copy);
+> +        page_frag_alloc_commit(pfrag, offset, copy);
+> +    }
+> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
+> index 30893638155b..8925397262a1 100644
+> --- a/include/linux/page_frag_cache.h
+> +++ b/include/linux/page_frag_cache.h
+> @@ -61,11 +61,28 @@ struct page_frag_cache {
+>  #endif
+>  };
+>  
+> +/**
+> + * page_frag_cache_init() - Init page_frag cache.
+> + * @nc: page_frag cache from which to init
+> + *
+> + * Inline helper to init the page_frag cache.
+> + */
+>  static inline void page_frag_cache_init(struct page_frag_cache *nc)
+>  {
+>  	memset(nc, 0, sizeof(*nc));
+>  }
+>  
+> +/**
+> + * page_frag_cache_is_pfmemalloc() - Check for pfmemalloc.
+> + * @nc: page_frag cache from which to check
+> + *
+> + * Used to check if the current page in page_frag cache is pfmemalloc'ed.
+> + * It has the same calling context expection as the alloc API.
+> + *
+> + * Return:
+> + * Return true if the current page in page_frag cache is pfmemalloc'ed,
+
+Drop the (second) word "Return"...
+
+> + * otherwise return false.
+> + */
+>  static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
+>  {
+>  	return encoded_page_pfmemalloc(nc->encoded_va);
+> @@ -92,6 +109,19 @@ void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+>  				 unsigned int fragsz, gfp_t gfp_mask,
+>  				 unsigned int align_mask);
+>  
+> +/**
+> + * page_frag_alloc_va_align() - Alloc a page fragment with aligning requirement.
+> + * @nc: page_frag cache from which to allocate
+> + * @fragsz: the requested fragment size
+> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
+
+                                                      needs
+
+> + * @align: the requested aligning requirement for 'va'
+
+                 or                                  @va
+
+> + *
+> + * WARN_ON_ONCE() checking for 'align' before allocing a page fragment from
+> + * page_frag cache with aligning requirement for 'va'.
+
+                    or                              @va.
+
+> + *
+> + * Return:
+> + * Return va of the page fragment, otherwise return NULL.
+
+Drop the second "Return".
+
+> + */
+>  static inline void *page_frag_alloc_va_align(struct page_frag_cache *nc,
+>  					     unsigned int fragsz,
+>  					     gfp_t gfp_mask, unsigned int align)
+> @@ -100,11 +130,32 @@ static inline void *page_frag_alloc_va_align(struct page_frag_cache *nc,
+>  	return __page_frag_alloc_va_align(nc, fragsz, gfp_mask, -align);
+>  }
+>  
+> +/**
+> + * page_frag_cache_page_offset() - Return the current page fragment's offset.
+> + * @nc: page_frag cache from which to check
+> + *
+> + * The API is only used in net/sched/em_meta.c for historical reason, do not use
+
+                                                                 reasons; do not use
+
+> + * it for new caller unless there is a strong reason.
+
+                 callers
+
+> + *
+> + * Return:
+> + * Return the offset of the current page fragment in the page_frag cache.
+
+Drop second "Return".
+
+> + */
+>  static inline unsigned int page_frag_cache_page_offset(const struct page_frag_cache *nc)
+>  {
+>  	return __page_frag_cache_page_offset(nc->encoded_va, nc->remaining);
+>  }
+>  
+> +/**
+> + * page_frag_alloc_va() - Alloc a page fragment.
+> + * @nc: page_frag cache from which to allocate
+> + * @fragsz: the requested fragment size
+> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
+
+                                                      needs
+
+> + *
+> + * Get a page fragment from page_frag cache.
+> + *
+> + * Return:
+> + * Return va of the page fragment, otherwise return NULL.
+
+Drop second "Return".
+
+> + */
+>  static inline void *page_frag_alloc_va(struct page_frag_cache *nc,
+>  				       unsigned int fragsz, gfp_t gfp_mask)
+>  {
+> @@ -114,6 +165,21 @@ static inline void *page_frag_alloc_va(struct page_frag_cache *nc,
+>  void *page_frag_alloc_va_prepare(struct page_frag_cache *nc, unsigned int *fragsz,
+>  				 gfp_t gfp);
+>  
+> +/**
+> + * page_frag_alloc_va_prepare_align() - Prepare allocing a page fragment with
+> + * aligning requirement.
+> + * @nc: page_frag cache from which to prepare
+> + * @fragsz: in as the requested size, out as the available size
+> + * @gfp: the allocation gfp to use when cache need to be refilled
+
+                                                 needs
+
+> + * @align: the requested aligning requirement for 'va'
+
+                                       or            @va
+
+> + *
+> + * WARN_ON_ONCE() checking for 'align' before preparing an aligned page fragment
+> + * with minimum size of ‘fragsz’, 'fragsz' is also used to report the maximum
+
+                           'fragsz'. 'fragsz' is
+(don't use fancy single quote marks above)
+
+> + * size of the page fragment the caller can use.
+> + *
+> + * Return:
+> + * Return va of the page fragment, otherwise return NULL.
+
+Drop second "Return".
+
+> + */
+>  static inline void *page_frag_alloc_va_prepare_align(struct page_frag_cache *nc,
+>  						     unsigned int *fragsz,
+>  						     gfp_t gfp,
+> @@ -148,6 +214,19 @@ static inline struct encoded_va *__page_frag_alloc_probe(struct page_frag_cache
+>  	return encoded_va;
+>  }
+>  
+> +/**
+> + * page_frag_alloc_probe - Probe the avaiable page fragment.
+
+                                        available
+
+> + * @nc: page_frag cache from which to probe
+> + * @offset: out as the offset of the page fragment
+> + * @fragsz: in as the requested size, out as the available size
+> + * @va: out as the virtual address of the returned page fragment
+> + *
+> + * Probe the current available memory to caller without doing cache refilling.
+> + * If the cache is empty, return NULL.
+> + *
+> + * Return:
+> + * Return the page fragment, otherwise return NULL.
+
+Drop the second "Return".
+
+> + */
+>  #define page_frag_alloc_probe(nc, offset, fragsz, va)			\
+>  ({									\
+>  	struct encoded_va *__encoded_va;				\
+> @@ -162,6 +241,13 @@ static inline struct encoded_va *__page_frag_alloc_probe(struct page_frag_cache
+>  	__page;								\
+>  })
+>  
+> +/**
+> + * page_frag_alloc_commit - Commit allocing a page fragment.
+> + * @nc: page_frag cache from which to commit
+> + * @fragsz: size of the page fragment has been used
+> + *
+> + * Commit the alloc preparing by passing the actual used size.
+> + */
+>  static inline void page_frag_alloc_commit(struct page_frag_cache *nc,
+>  					  unsigned int fragsz)
+>  {
+> @@ -170,6 +256,16 @@ static inline void page_frag_alloc_commit(struct page_frag_cache *nc,
+>  	nc->remaining -= fragsz;
+>  }
+>  
+> +/**
+> + * page_frag_alloc_commit_noref - Commit allocing a page fragment without taking
+> + * page refcount.
+> + * @nc: page_frag cache from which to commit
+> + * @fragsz: size of the page fragment has been used
+> + *
+> + * Commit the alloc preparing by passing the actual used size, but not taking
+> + * page refcount. Mostly used for fragmemt coaleasing case when the current
+
+                                     fragment coalescing
+
+> + * fragmemt can share the same refcount with previous fragmemt.
+
+      fragment                                           fragment.
+
+> + */
+>  static inline void page_frag_alloc_commit_noref(struct page_frag_cache *nc,
+>  						unsigned int fragsz)
+>  {
+> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+> index eb8bf59b26bb..85e23d5cbdcc 100644
+> --- a/mm/page_frag_cache.c
+> +++ b/mm/page_frag_cache.c
+> @@ -89,6 +89,18 @@ static struct page *page_frag_cache_refill(struct page_frag_cache *nc,
+>  	return __page_frag_cache_refill(nc, gfp_mask);
+>  }
+>  
+> +/**
+> + * page_frag_alloc_va_prepare() - Prepare allocing a page fragment.
+> + * @nc: page_frag cache from which to prepare
+> + * @fragsz: in as the requested size, out as the available size
+> + * @gfp: the allocation gfp to use when cache need to be refilled
+
+                                                 needs
+
+> + *
+> + * Prepare a page fragment with minimum size of ‘fragsz’, 'fragsz' is also used
+
+                                                   'fragsz'. 'fragsz'
+(don't use fancy single quote marks)
+
+> + * to report the maximum size of the page fragment the caller can use.
+> + *
+> + * Return:
+> + * Return va of the page fragment, otherwise return NULL.
+
+Drop second "Return".
+
+> + */
+>  void *page_frag_alloc_va_prepare(struct page_frag_cache *nc,
+>  				 unsigned int *fragsz, gfp_t gfp)
+>  {
+> @@ -111,6 +123,19 @@ void *page_frag_alloc_va_prepare(struct page_frag_cache *nc,
+>  }
+>  EXPORT_SYMBOL(page_frag_alloc_va_prepare);
+>  
+> +/**
+> + * page_frag_alloc_pg_prepare - Prepare allocing a page fragment.
+> + * @nc: page_frag cache from which to prepare
+> + * @offset: out as the offset of the page fragment
+> + * @fragsz: in as the requested size, out as the available size
+> + * @gfp: the allocation gfp to use when cache need to be refilled
+> + *
+> + * Prepare a page fragment with minimum size of ‘fragsz’, 'fragsz' is also used
+
+                                                   'fragsz'. 'fragsz'
+(don't use fancy single quote marks)
+
+> + * to report the maximum size of the page fragment the caller can use.
+> + *
+> + * Return:
+> + * Return the page fragment, otherwise return NULL.
+
+Drop second "Return".
+
+> + */
+>  struct page *page_frag_alloc_pg_prepare(struct page_frag_cache *nc,
+>  					unsigned int *offset,
+>  					unsigned int *fragsz, gfp_t gfp)
+> @@ -141,6 +166,21 @@ struct page *page_frag_alloc_pg_prepare(struct page_frag_cache *nc,
+>  }
+>  EXPORT_SYMBOL(page_frag_alloc_pg_prepare);
+>  
+> +/**
+> + * page_frag_alloc_prepare - Prepare allocing a page fragment.
+> + * @nc: page_frag cache from which to prepare
+> + * @offset: out as the offset of the page fragment
+> + * @fragsz: in as the requested size, out as the available size
+> + * @va: out as the virtual address of the returned page fragment
+> + * @gfp: the allocation gfp to use when cache need to be refilled
+> + *
+> + * Prepare a page fragment with minimum size of ‘fragsz’, 'fragsz' is also used
+
+                                                   'fragsz'. 'fragsz'
+(don't use fancy single quote marks)
+
+You could also (in several places) refer to the variables as
+                                                    @fragsz. @fragsz
+
+> + * to report the maximum size of the page fragment. Return both 'page' and 'va'
+> + * of the fragment to the caller.
+> + *
+> + * Return:
+> + * Return the page fragment, otherwise return NULL.
+
+Drop second "Return". But the paragraph above says that both @page and @va
+are returned. How is that done?
+
+> + */
+>  struct page *page_frag_alloc_prepare(struct page_frag_cache *nc,
+>  				     unsigned int *offset,
+>  				     unsigned int *fragsz,
+> @@ -173,6 +213,10 @@ struct page *page_frag_alloc_prepare(struct page_frag_cache *nc,
+>  }
+>  EXPORT_SYMBOL(page_frag_alloc_prepare);
+>  
+> +/**
+> + * page_frag_cache_drain - Drain the current page from page_frag cache.
+> + * @nc: page_frag cache from which to drain
+> + */
+>  void page_frag_cache_drain(struct page_frag_cache *nc)
+>  {
+>  	if (!nc->encoded_va)
+> @@ -193,6 +237,19 @@ void __page_frag_cache_drain(struct page *page, unsigned int count)
+>  }
+>  EXPORT_SYMBOL(__page_frag_cache_drain);
+>  
+> +/**
+> + * __page_frag_alloc_va_align() - Alloc a page fragment with aligning
+> + * requirement.
+> + * @nc: page_frag cache from which to allocate
+> + * @fragsz: the requested fragment size
+> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
+> + * @align_mask: the requested aligning requirement for the 'va'
+> + *
+> + * Get a page fragment from page_frag cache with aligning requirement.
+> + *
+> + * Return:
+> + * Return va of the page fragment, otherwise return NULL.
+
+Drop the second "Return".
+
+> + */
+>  void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+>  				 unsigned int fragsz, gfp_t gfp_mask,
+>  				 unsigned int align_mask)
+> @@ -263,8 +320,12 @@ void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+>  }
+>  EXPORT_SYMBOL(__page_frag_alloc_va_align);
+>  
+> -/*
+> - * Frees a page fragment allocated out of either a compound or order 0 page.
+> +/**
+> + * page_frag_free_va - Free a page fragment.
+> + * @addr: va of page fragment to be freed
+> + *
+> + * Free a page fragment allocated out of either a compound or order 0 page by
+> + * virtual address.
+>   */
+>  void page_frag_free_va(void *addr)
+>  {
 
 
-
->
-> thanks,
-> --
-> John Hubbard
-> NVIDIA
->
-> >
-> > diff --git a/tools/testing/selftests/alsa/Makefile b/tools/testing/self=
-tests/alsa/Makefile
-> > index 5af9ba8a4645..9a0ef194522c 100644
-> > --- a/tools/testing/selftests/alsa/Makefile
-> > +++ b/tools/testing/selftests/alsa/Makefile
-> > @@ -6,7 +6,7 @@ LDLIBS +=3D $(shell pkg-config --libs alsa)
-> >   ifeq ($(LDLIBS),)
-> >   LDLIBS +=3D -lasound
-> >   endif
-> > -CFLAGS +=3D -L$(OUTPUT) -Wl,-rpath=3D./
-> > +CFLAGS +=3D $(KHDR_INCLUDES) -L$(OUTPUT) -Wl,-rpath=3D./
-> >
-> >   LDLIBS+=3D-lpthread
-> >
-> > diff --git a/tools/testing/selftests/arm64/signal/Makefile b/tools/test=
-ing/selftests/arm64/signal/Makefile
-> > index 8f5febaf1a9a..ae682ade615d 100644
-> > --- a/tools/testing/selftests/arm64/signal/Makefile
-> > +++ b/tools/testing/selftests/arm64/signal/Makefile
-> > @@ -2,7 +2,7 @@
-> >   # Copyright (C) 2019 ARM Limited
-> >
-> >   # Additional include paths needed by kselftest.h and local headers
-> > -CFLAGS +=3D -D_GNU_SOURCE -std=3Dgnu99 -I.
-> > +CFLAGS +=3D $(KHDR_INCLUDES) -std=3Dgnu99 -I.
-> >
-> >   SRCS :=3D $(filter-out testcases/testcases.c,$(wildcard testcases/*.c=
-))
-> >   PROGS :=3D $(patsubst %.c,%,$(SRCS))
-> > diff --git a/tools/testing/selftests/exec/Makefile b/tools/testing/self=
-tests/exec/Makefile
-> > index fb4472ddffd8..15e78ec7c55e 100644
-> > --- a/tools/testing/selftests/exec/Makefile
-> > +++ b/tools/testing/selftests/exec/Makefile
-> > @@ -1,7 +1,7 @@
-> >   # SPDX-License-Identifier: GPL-2.0
-> >   CFLAGS =3D -Wall
-> >   CFLAGS +=3D -Wno-nonnull
-> > -CFLAGS +=3D -D_GNU_SOURCE
-> > +CFLAGS +=3D $(KHDR_INCLUDES)
-> >
-> >   TEST_PROGS :=3D binfmt_script.py
-> >   TEST_GEN_PROGS :=3D execveat load_address_4096 load_address_2097152 l=
-oad_address_16777216 non-regular
-> > diff --git a/tools/testing/selftests/filesystems/overlayfs/Makefile b/t=
-ools/testing/selftests/filesystems/overlayfs/Makefile
-> > index 56b2b48a765b..6c29c963c7a8 100644
-> > --- a/tools/testing/selftests/filesystems/overlayfs/Makefile
-> > +++ b/tools/testing/selftests/filesystems/overlayfs/Makefile
-> > @@ -2,6 +2,6 @@
-> >
-> >   TEST_GEN_PROGS :=3D dev_in_maps
-> >
-> > -CFLAGS :=3D -Wall -Werror
-> > +CFLAGS :=3D -Wall -Werror $(KHDR_INCLUDES)
-> >
-> >   include ../../lib.mk
-> > diff --git a/tools/testing/selftests/hid/Makefile b/tools/testing/selft=
-ests/hid/Makefile
-> > index 2b5ea18bde38..0661b34488ef 100644
-> > --- a/tools/testing/selftests/hid/Makefile
-> > +++ b/tools/testing/selftests/hid/Makefile
-> > @@ -21,7 +21,7 @@ CXX ?=3D $(CROSS_COMPILE)g++
-> >
-> >   HOSTPKG_CONFIG :=3D pkg-config
-> >
-> > -CFLAGS +=3D -g -O0 -rdynamic -Wall -Werror -I$(OUTPUT)
-> > +CFLAGS +=3D -g -O0 -rdynamic -Wall -Werror $(KHDR_INCLUDES) -I$(OUTPUT=
-)
-> >   CFLAGS +=3D -I$(OUTPUT)/tools/include
-> >
-> >   LDLIBS +=3D -lelf -lz -lrt -lpthread
-> > diff --git a/tools/testing/selftests/nci/Makefile b/tools/testing/selft=
-ests/nci/Makefile
-> > index 47669a1d6a59..bbc5b8ec3b17 100644
-> > --- a/tools/testing/selftests/nci/Makefile
-> > +++ b/tools/testing/selftests/nci/Makefile
-> > @@ -1,5 +1,5 @@
-> >   # SPDX-License-Identifier: GPL-2.0
-> > -CFLAGS +=3D -Wl,-no-as-needed -Wall
-> > +CFLAGS +=3D -Wl,-no-as-needed -Wall $(KHDR_INCLUDES)
-> >   LDFLAGS +=3D -lpthread
-> >
-> >   TEST_GEN_PROGS :=3D nci_dev
-> > diff --git a/tools/testing/selftests/prctl/Makefile b/tools/testing/sel=
-ftests/prctl/Makefile
-> > index 01dc90fbb509..1a0aefec9d6f 100644
-> > --- a/tools/testing/selftests/prctl/Makefile
-> > +++ b/tools/testing/selftests/prctl/Makefile
-> > @@ -6,6 +6,8 @@ ARCH ?=3D $(shell echo $(uname_M) | sed -e s/i.86/x86/ =
--e s/x86_64/x86/)
-> >   ifeq ($(ARCH),x86)
-> >   TEST_PROGS :=3D disable-tsc-ctxt-sw-stress-test disable-tsc-on-off-st=
-ress-test \
-> >               disable-tsc-test set-anon-vma-name-test set-process-name
-> > +
-> > +CFLAGS +=3D $(KHDR_INCLUDES)
-> >   all: $(TEST_PROGS)
-> >
-> >   include ../lib.mk
-> > diff --git a/tools/testing/selftests/proc/Makefile b/tools/testing/self=
-tests/proc/Makefile
-> > index cd95369254c0..9596014c10a0 100644
-> > --- a/tools/testing/selftests/proc/Makefile
-> > +++ b/tools/testing/selftests/proc/Makefile
-> > @@ -1,6 +1,6 @@
-> >   # SPDX-License-Identifier: GPL-2.0-only
-> >   CFLAGS +=3D -Wall -O2 -Wno-unused-function
-> > -CFLAGS +=3D -D_GNU_SOURCE
-> > +CFLAGS +=3D $(KHDR_INCLUDES)
-> >   LDFLAGS +=3D -pthread
-> >
-> >   TEST_GEN_PROGS :=3D
-> > diff --git a/tools/testing/selftests/riscv/mm/Makefile b/tools/testing/=
-selftests/riscv/mm/Makefile
-> > index c333263f2b27..715a21241113 100644
-> > --- a/tools/testing/selftests/riscv/mm/Makefile
-> > +++ b/tools/testing/selftests/riscv/mm/Makefile
-> > @@ -3,7 +3,7 @@
-> >   # Originally tools/testing/arm64/abi/Makefile
-> >
-> >   # Additional include paths needed by kselftest.h and local headers
-> > -CFLAGS +=3D -D_GNU_SOURCE -std=3Dgnu99 -I.
-> > +CFLAGS +=3D $(KHDR_INCLUDES) -std=3Dgnu99 -I.
-> >
-> >   TEST_GEN_FILES :=3D mmap_default mmap_bottomup
-> >
-> > diff --git a/tools/testing/selftests/rtc/Makefile b/tools/testing/selft=
-ests/rtc/Makefile
-> > index 55198ecc04db..654f9d58da3c 100644
-> > --- a/tools/testing/selftests/rtc/Makefile
-> > +++ b/tools/testing/selftests/rtc/Makefile
-> > @@ -1,5 +1,5 @@
-> >   # SPDX-License-Identifier: GPL-2.0
-> > -CFLAGS +=3D -O3 -Wl,-no-as-needed -Wall
-> > +CFLAGS +=3D -O3 -Wl,-no-as-needed -Wall $(KHDR_INCLUDES)
-> >   LDLIBS +=3D -lrt -lpthread -lm
-> >
-> >   TEST_GEN_PROGS =3D rtctest
-> > diff --git a/tools/testing/selftests/tmpfs/Makefile b/tools/testing/sel=
-ftests/tmpfs/Makefile
-> > index aa11ccc92e5b..bcdc1bb6d2e6 100644
-> > --- a/tools/testing/selftests/tmpfs/Makefile
-> > +++ b/tools/testing/selftests/tmpfs/Makefile
-> > @@ -1,6 +1,6 @@
-> >   # SPDX-License-Identifier: GPL-2.0-only
-> >   CFLAGS +=3D -Wall -O2
-> > -CFLAGS +=3D -D_GNU_SOURCE
-> > +CFLAGS +=3D $(KHDR_INCLUDES)
-> >
-> >   TEST_GEN_PROGS :=3D
-> >   TEST_GEN_PROGS +=3D bug-link-o-tmpfile
->
->
+thanks.
+-- 
+#Randy
+https://people.kernel.org/tglx/notes-about-netiquette
+https://subspace.kernel.org/etiquette.html
 
