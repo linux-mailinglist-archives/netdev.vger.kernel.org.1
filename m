@@ -1,215 +1,217 @@
-Return-Path: <netdev+bounces-95054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBB438C1539
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 21:13:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32FBB8C1555
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 21:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6939C1F22B61
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 19:13:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFC48283179
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 19:18:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75EB37F484;
-	Thu,  9 May 2024 19:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED20A81ACB;
+	Thu,  9 May 2024 19:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="HhPg85s/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="k83wz7aa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62DC653
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 19:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64987F49A
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 19:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715282031; cv=none; b=MsihbmJ6YwLwhVrRNcrVwyTC4m9tgS6qxNf8E+V3KEdsykr9WitvmggPfrfcFkjmkSZNX+nDb1eJK8ZnrX9H/wN4LVMfsXyl4NtDBGwA1GENoIDIEB3nRaeG8ecjlXdK69fp9INlACCRmF4z+w26dL3XnyExKdlRYSF8euTl0G4=
+	t=1715282273; cv=none; b=X71HpdYFwTdF1KIzwkAbeG9zotxtXr0421WYmGgHqiRg0HXxh6XUvsIULr/cCWRcOsnWZa+ED2dRorrM09+MI527GC7Z1WWRWm9Z0MBei0Ngw/Oq4QyVVU9Zfo0S5hiaYYURfJ2gHeWLb9682g4reYcU+p4EeQnIGRPFBftC0U0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715282031; c=relaxed/simple;
-	bh=1G0QDR8JUJFyxaGNVbL1UI3DtGhHUGbyrMYHlnXXzhc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b7cBFcv7gt0S+AZiVGAqDXCn0kW70DQ4uKqDCxj9HwKsQaeCdQ7K2WnuOsnTYhF8rULqaAvURBO0Vy0JjVwXbYkSalKiYDsQkvNqPAW7V/GQrpoxDc2xL5ks1kPVO16cLR0I8Fq2MnkABektFHxVYgiwlaRfLJasKPcl1j7a3hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=HhPg85s/; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-620390308e5so11074787b3.3
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 12:13:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1715282027; x=1715886827; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P5+CpfPTydUeT3vKTfUos21UxKzlhAl+5pqEA8g6EMk=;
-        b=HhPg85s/v6Htcvh2B2b1drMbpAeC4qjPAA6iOVP+p25cuKi5Ty4uiBb2rzA4ONOb4A
-         dRMdG71gWQek6x0b9arUEuiUAakh2nfTV+YPcbhd6DGk8kDi73XEnzrAIkGyxHPnHztT
-         1wyXrHNmXDWOyYwfLU1/g+5EEhNkPZYM7ssrC7O7tk2sZpQuSvwCzH030tL61Fgu3zdh
-         BiwXGTq6CUYu4IE51Sp4g/UUYAyGOzia1JACLf82EkmrJRi3/MnskyEE9XLe0TArZRDH
-         WnuXHHzGLjAP91P5dtNTo+P0bhIIi1LGmSnGxr2pMm6cizkkPd8H7pF4cnw7jgS4lUud
-         Dumg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715282027; x=1715886827;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P5+CpfPTydUeT3vKTfUos21UxKzlhAl+5pqEA8g6EMk=;
-        b=rciUxetVfMmpVcTtVnkeeul+j1SX7+yS91dqa+90o9p+yCisRsCXoHEKmhQBFXpfWU
-         f27aJJ8MSseauZJgbN24IjBbpbVOsFUUlMmZeNG62mX1lHhi6jaOtwKXJWjIqOxYSvzk
-         P+NHksXgH8sJJn+CQGiH4vAN770GaGySjHoxRQLUjXkNCxPBzLXNxnzhks2vF/UBTMPz
-         XQtB5euvsFaO48r/OaH7Wu2MpwanZ2cg530axYC6D+TPk15dYBVMkodyVokvggE9FAeb
-         AROzXMj566Zktbl2Ix+iuiuHsPmokHPObeG4pwtoO7OGjwDuNmlo+RqFqrXJX06nHEst
-         m4HQ==
-X-Gm-Message-State: AOJu0YzJHRCns/ucmfW12GeAqt6UvYHTAVpaoerKD3PIoYD1TG6C3HMS
-	EhY6me0e6jKUWUNa4ZOLMPH314KMOqpD97f7oe+R6hEW9U+gk3OOW9Wb+nhwZy2dfnsKz+20mNN
-	fI//jtJhRh0nVcCyBdXy0mNS/PJTfLspR/QZkJVfTM6H/OSk=
-X-Google-Smtp-Source: AGHT+IHUWBa+ghPEnr1ieJmvlpKHqw0gEV0F6yX4442fyzIAt9aMggaDcKmU/XZYYhXknN1mpz1tA24TgG24v/jaGhg=
-X-Received: by 2002:a05:690c:b1b:b0:61b:e62e:8fad with SMTP id
- 00721157ae682-622affb59b1mr5628747b3.21.1715282027468; Thu, 09 May 2024
- 12:13:47 -0700 (PDT)
+	s=arc-20240116; t=1715282273; c=relaxed/simple;
+	bh=T036fifrIA1AksrNL7AFJX0e/GPtXPfszP11ZVgPMCM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kazKWjeQnKbvTr/q+u1JPGZMMfcb+adNzv8a/EVbFx/5EJSN2mA/7WWlOyVzjCk35a/4K3dLU+ienDHT0H+YVgv5+mKIjr3mHMnu+YOnV8PrKHlPmR1Rqo2mKFefqv9FyvVikszB7oxVvtQcCbMn5pV26gS56PB8vjsPmtzGYI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=k83wz7aa; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c929dced-e70e-4f49-b812-026b2677bfd9@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1715282268;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KOgzY1WJHW9FwJa+ECKBwfARITf81KjLffAQbrFvkAo=;
+	b=k83wz7aalbejSVXWLHFcLxiKRzT5kSW7NA+WKJgvBtn/C0vIRknQrGxh0peZ867AQccx0/
+	nR/vlBtTtlKgscE9YlpFjWU+jX5QgqrVZ+jSo6aKjstFTWCX8uQX1vZSMUDlUMAwIIEtTW
+	QfHyoynhNjpEEnM2hdGGKz5VjPMlOXE=
+Date: Thu, 9 May 2024 12:17:40 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <262f71a207e8cedd388bd89d17ef16155eb2acee.1715248275.git.dcaratti@redhat.com>
-In-Reply-To: <262f71a207e8cedd388bd89d17ef16155eb2acee.1715248275.git.dcaratti@redhat.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 9 May 2024 15:13:36 -0400
-Message-ID: <CAHC9VhQEa+6BQs-9jT4JR64nDGio8FbAG5smPaq8E3gi=H1SLg@mail.gmail.com>
-Subject: Re: [PATCH net v4] netlabel: fix RCU annotation for IPv4 options on
- socket creation
-To: Davide Caratti <dcaratti@redhat.com>
-Cc: netdev@vger.kernel.org, casey@schaufler-ca.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, linux-security-module@vger.kernel.org, 
-	pabeni@redhat.com, xmu@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [RFC PATCH bpf-next v7 3/3] selftests/bpf: Handle forwarding of
+ UDP CLOCK_TAI packets
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Martin KaFai Lau <martin.lau@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>,
+ kernel@quicinc.com
+References: <20240508215842.2449798-1-quic_abchauha@quicinc.com>
+ <20240508215842.2449798-4-quic_abchauha@quicinc.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240508215842.2449798-4-quic_abchauha@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, May 9, 2024 at 6:36=E2=80=AFAM Davide Caratti <dcaratti@redhat.com>=
- wrote:
->
-> Xiumei reports the following splat when netlabel and TCP socket are used:
->
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
->  WARNING: suspicious RCU usage
->  6.9.0-rc2+ #637 Not tainted
->  -----------------------------
->  net/ipv4/cipso_ipv4.c:1880 suspicious rcu_dereference_protected() usage!
->
->  other info that might help us debug this:
->
->  rcu_scheduler_active =3D 2, debug_locks =3D 1
->  1 lock held by ncat/23333:
->   #0: ffffffff906030c0 (rcu_read_lock){....}-{1:2}, at: netlbl_sock_setat=
-tr+0x25/0x1b0
->
->  stack backtrace:
->  CPU: 11 PID: 23333 Comm: ncat Kdump: loaded Not tainted 6.9.0-rc2+ #637
->  Hardware name: Supermicro SYS-6027R-72RF/X9DRH-7TF/7F/iTF/iF, BIOS 3.0  =
-07/26/2013
->  Call Trace:
->   <TASK>
->   dump_stack_lvl+0xa9/0xc0
->   lockdep_rcu_suspicious+0x117/0x190
->   cipso_v4_sock_setattr+0x1ab/0x1b0
->   netlbl_sock_setattr+0x13e/0x1b0
->   selinux_netlbl_socket_post_create+0x3f/0x80
->   selinux_socket_post_create+0x1a0/0x460
->   security_socket_post_create+0x42/0x60
->   __sock_create+0x342/0x3a0
->   __sys_socket_create.part.22+0x42/0x70
->   __sys_socket+0x37/0xb0
->   __x64_sys_socket+0x16/0x20
->   do_syscall_64+0x96/0x180
->   ? do_user_addr_fault+0x68d/0xa30
->   ? exc_page_fault+0x171/0x280
->   ? asm_exc_page_fault+0x22/0x30
->   entry_SYSCALL_64_after_hwframe+0x71/0x79
->  RIP: 0033:0x7fbc0ca3fc1b
->  Code: 73 01 c3 48 8b 0d 05 f2 1b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e =
-0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 29 00 00 00 0f 05 <48> 3d 01 f0 f=
-f ff 73 01 c3 48 8b 0d d5 f1 1b 00 f7 d8 64 89 01 48
->  RSP: 002b:00007fff18635208 EFLAGS: 00000246 ORIG_RAX: 0000000000000029
->  RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007fbc0ca3fc1b
->  RDX: 0000000000000006 RSI: 0000000000000001 RDI: 0000000000000002
->  RBP: 000055d24f80f8a0 R08: 0000000000000003 R09: 0000000000000001
->
-> R10: 0000000000020000 R11: 0000000000000246 R12: 000055d24f80f8a0
->  R13: 0000000000000000 R14: 000055d24f80fb88 R15: 0000000000000000
->   </TASK>
->
-> The current implementation of cipso_v4_sock_setattr() replaces IP options
-> under the assumption that the caller holds the socket lock; however, such
-> assumption is not true, nor needed, in selinux_socket_post_create() hook.
->
-> Let all callers of cipso_v4_sock_setattr() specify the "socket lock held"
-> condition, except selinux_socket_post_create() _ where such condition can
-> safely be set as true even without holding the socket lock.
->
-> v4:
->  - fix build when CONFIG_LOCKDEP is unset (thanks kernel test robot)
->
-> v3:
->  - rename variable to 'sk_locked' (thanks Paul Moore)
->  - keep rcu_replace_pointer() open-coded and re-add NULL check of 'old',
->    these two changes will be posted in another patch (thanks Paul Moore)
->
-> v2:
->  - pass lockdep_sock_is_held() through a boolean variable in the stack
->    (thanks Eric Dumazet, Paul Moore, Casey Schaufler)
->  - use rcu_replace_pointer() instead of rcu_dereference_protected() +
->    rcu_assign_pointer()
->  - remove NULL check of 'old' before kfree_rcu()
->
-> Fixes: f6d8bd051c39 ("inet: add RCU protection to inet->opt")
-> Reported-by: Xiumei Mu <xmu@redhat.com>
-> Acked-by: Paul Moore <paul@paul-moore.com>
-> Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+On 5/8/24 2:58 PM, Abhishek Chauhan wrote:
+> With changes in the design to forward CLOCK_TAI in the skbuff
+> framework,  existing selftest framework needs modification
+> to handle forwarding of UDP packets with CLOCK_TAI as clockid.
+
+The set lgtm. I have a few final nits on the test.
+
+> 
+> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
+> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
 > ---
->  include/net/cipso_ipv4.h     |  6 ++++--
->  include/net/netlabel.h       | 12 ++++++++++--
->  net/ipv4/cipso_ipv4.c        |  7 ++++---
->  net/netlabel/netlabel_kapi.c | 26 +++++++++++++++++++++++---
->  security/selinux/netlabel.c  |  5 ++++-
->  security/smack/smack_lsm.c   |  3 ++-
->  6 files changed, 47 insertions(+), 12 deletions(-)
+> Changes since v7
+> - Fixed  issues in the ctx_rewrite.c
+>    with respect to dissembly in both
+>    .read and .write
+> 
+> Changes since v6
+> - Moved all the selftest to another patch
+> 
+> Changes since v1 - v5
+> - Patch was not present
+> 
+>   tools/include/uapi/linux/bpf.h                | 15 ++++---
+>   .../selftests/bpf/prog_tests/ctx_rewrite.c    | 10 +++--
+>   .../selftests/bpf/prog_tests/tc_redirect.c    |  3 --
+>   .../selftests/bpf/progs/test_tc_dtime.c       | 39 +++++++++----------
+>   4 files changed, 34 insertions(+), 33 deletions(-)
+> 
+> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+> index 90706a47f6ff..25ea393cf084 100644
+> --- a/tools/include/uapi/linux/bpf.h
+> +++ b/tools/include/uapi/linux/bpf.h
 
-...
+nit. Please move this bpf.h sync changes to patch 2 where the uapi changes happen.
 
-> +/**
-> + * netlbl_sk_lock_check - Check if the socket lock has been acquired.
-> + * @sk: the socket to check
-> + *
-> + * Description: check if @sk is locked. Returns true if socket @sk is lo=
-cked
-> + * or if lock debugging is disabled at runtime or compile-time
-> + *
+> @@ -6207,12 +6207,17 @@ union {					\
+>   	__u64 :64;			\
+>   } __attribute__((aligned(8)))
+>   
+> +/* The enum used in skb->tstamp_type. It specifies the clock type
+> + * of the time stored in the skb->tstamp.
 > + */
-> +bool netlbl_sk_lock_check(struct sock *sk)
-> +{
-> +#ifdef CONFIG_LOCKDEP
-> +       if (debug_locks)
-> +               return lockdep_sock_is_held(sk);
-> +#endif
-> +       return true;
-> +}
+>   enum {
+> -	BPF_SKB_TSTAMP_UNSPEC,
+> -	BPF_SKB_TSTAMP_DELIVERY_MONO,	/* tstamp has mono delivery time */
+> -	/* For any BPF_SKB_TSTAMP_* that the bpf prog cannot handle,
+> -	 * the bpf prog should handle it like BPF_SKB_TSTAMP_UNSPEC
+> -	 * and try to deduce it by ingress, egress or skb->sk->sk_clockid.
+> +	BPF_SKB_TSTAMP_UNSPEC = 0,		/* DEPRECATED */
+> +	BPF_SKB_TSTAMP_DELIVERY_MONO = 1,	/* DEPRECATED */
+> +	BPF_SKB_CLOCK_REALTIME = 0,
+> +	BPF_SKB_CLOCK_MONOTONIC = 1,
+> +	BPF_SKB_CLOCK_TAI = 2,
+> +	/* For any future BPF_SKB_CLOCK_* that the bpf prog cannot handle,
+> +	 * the bpf prog can try to deduce it by ingress/egress/skb->sk->sk_clockid.
+>   	 */
+>   };
+>   
+> diff --git a/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c b/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
+> index 3b7c57fe55a5..08b6391f2f56 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
+> @@ -69,15 +69,17 @@ static struct test_case test_cases[] = {
+>   	{
+>   		N(SCHED_CLS, struct __sk_buff, tstamp),
+>   		.read  = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
+> -			 "w11 &= 3;"
+> -			 "if w11 != 0x3 goto pc+2;"
+> +			 "if w11 & 0x4 goto pc+1;"
+> +			 "goto pc+4;"
+> +			 "if w11 & 0x3 goto pc+1;"
+> +			 "goto pc+2;"
+>   			 "$dst = 0;"
+>   			 "goto pc+1;"
+>   			 "$dst = *(u64 *)($ctx + sk_buff::tstamp);",
+>   		.write = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
+> -			 "if w11 & 0x2 goto pc+1;"
+> +			 "if w11 & 0x4 goto pc+1;"
+>   			 "goto pc+2;"
+> -			 "w11 &= -2;"
+> +			 "w11 &= -4;"
+>   			 "*(u8 *)($ctx + sk_buff::__mono_tc_offset) = r11;"
+>   			 "*(u64 *)($ctx + sk_buff::tstamp) = $src;",
+>   	},
+> diff --git a/tools/testing/selftests/bpf/prog_tests/tc_redirect.c b/tools/testing/selftests/bpf/prog_tests/tc_redirect.c
+> index b1073d36d77a..327d51f59142 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/tc_redirect.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/tc_redirect.c
+> @@ -890,9 +890,6 @@ static void test_udp_dtime(struct test_tc_dtime *skel, int family, bool bpf_fwd)
+>   
+>   	ASSERT_EQ(dtimes[INGRESS_FWDNS_P100], 0,
+>   		  dtime_cnt_str(t, INGRESS_FWDNS_P100));
+> -	/* non mono delivery time is not forwarded */
+> -	ASSERT_EQ(dtimes[INGRESS_FWDNS_P101], 0,
+> -		  dtime_cnt_str(t, INGRESS_FWDNS_P101));
+>   	for (i = EGRESS_FWDNS_P100; i < SET_DTIME; i++)
+>   		ASSERT_GT(dtimes[i], 0, dtime_cnt_str(t, i));
+>   
+> diff --git a/tools/testing/selftests/bpf/progs/test_tc_dtime.c b/tools/testing/selftests/bpf/progs/test_tc_dtime.c
+> index 74ec09f040b7..21f5be202e4b 100644
+> --- a/tools/testing/selftests/bpf/progs/test_tc_dtime.c
+> +++ b/tools/testing/selftests/bpf/progs/test_tc_dtime.c
+> @@ -222,13 +222,19 @@ int egress_host(struct __sk_buff *skb)
+>   		return TC_ACT_OK;
+>   
+>   	if (skb_proto(skb_type) == IPPROTO_TCP) {
+> -		if (skb->tstamp_type == BPF_SKB_TSTAMP_DELIVERY_MONO &&
+> +		if (skb->tstamp_type == BPF_SKB_CLOCK_MONOTONIC &&
+> +		    skb->tstamp)
+> +			inc_dtimes(EGRESS_ENDHOST);
+> +		else
+> +			inc_errs(EGRESS_ENDHOST);
+> +	} else if (skb_proto(skb_type) == IPPROTO_UDP) {
+> +		if (skb->tstamp_type == BPF_SKB_CLOCK_TAI &&
+>   		    skb->tstamp)
+>   			inc_dtimes(EGRESS_ENDHOST);
+>   		else
+>   			inc_errs(EGRESS_ENDHOST);
+>   	} else {
+> -		if (skb->tstamp_type == BPF_SKB_TSTAMP_UNSPEC &&
+> +		if (skb->tstamp_type == BPF_SKB_CLOCK_REALTIME &&
+>   		    skb->tstamp)
 
-It might be cleaner to do this:
+Since the UDP+TAI can be handled properly in the above "else if" case now, I 
+would like to further tighten the bolt on detecting the non-zero REALTIME 
+skb->tstamp here since it should not happen at egress. Something like:
 
-#ifdef CONFIG_LOCKDEP
-bool netlbl_sk_lock_check(sk)
-{
-  if (debug_locks)
-    return lockdep_sock_is_held(sk);
-  return true;
-}
-#else
-bool netlbl_sk_lock_check(sk)
-{
-  return true;
-}
-#endif
+	} else {
+		if (skb->tstamp_type == BPF_SKB_CLOCK_REALTIME &&
+		    skb->tstamp)
+			inc_errs(EGRESS_ENDHOST);
+	}
 
---=20
-paul-moore.com
+I ran the test (w or w/o the above inc_errs changes) in a loop and it 
+consistently passes now.
+
+Other than the above small nits, in the next re-spin, please remove the RFC tag 
+and you can carry my reviewed-by to all 3 patches. Thanks.
+
+Reviewed-by: Martin KaFai Lau <martin.lau@kernel.org>
+
+>   			inc_dtimes(EGRESS_ENDHOST);
+>   		else
+
 
