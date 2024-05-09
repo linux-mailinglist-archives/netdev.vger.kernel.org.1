@@ -1,55 +1,74 @@
-Return-Path: <netdev+bounces-94860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFC888C0E02
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 12:11:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E3CB8C0E0D
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 12:16:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3678AB22851
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:11:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39635283099
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FFDD14B083;
-	Thu,  9 May 2024 10:11:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECBD814B07E;
+	Thu,  9 May 2024 10:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="0Hzv31iA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RxmUVVIu"
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC5714B07D;
-	Thu,  9 May 2024 10:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42818D528;
+	Thu,  9 May 2024 10:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715249465; cv=none; b=ks5+jhFV9jWBJFlrot0XGLag1vQPzVgLErqiZMVj1h2jY9aylCIzm4weqhVgw4um6F2avhbR6ek8ruX29YY1REcpe1jIHfVuStosUzU7DsyQQB14FcUg6G5sbpGLvgxJhQN1q1BKFk+prYYk5sCFd8gn7oxs6Hdvl/5K7jVgUlM=
+	t=1715249780; cv=none; b=sO+R/vu5cKbSivdboQifYV4BBMLj+38bdsFJS7ba5CslO2oXhNj9UDziUiYKqFBPGW7bd06Urui1e0tB8qmwWlKywCApuLFDIPDEyv4o0kMsoQl/snbpnpUkArGmTmSMSYqU7mmZtEloZOHKgee+Fs4DFxUE2lNcDrgUsrkPgCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715249465; c=relaxed/simple;
-	bh=2LnYN9nc3SQsqAASkrGVaJVc2LgnjoBJzHW2Q9QiI6Q=;
+	s=arc-20240116; t=1715249780; c=relaxed/simple;
+	bh=881zudWU6qfyucZG14Pc4Iu4wKaVIbgiMZki3Pu9CRM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p7MLPnHHqUBbix3C2WSUaHuLR/Wh6U0/mm/dcURSRy96qlF9bmozDnjsW65gyTRAhDHWKcRNbqjEoyh7YU6pDyCDyaiwhAr3kqd2dXXp1/uynuxbEpFmXcffLdKElpLY8ViyCrL0j1GHwWca6Lk/IRHe+CLr0QCzWY+EleT53r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=0Hzv31iA; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1715249461;
-	bh=2LnYN9nc3SQsqAASkrGVaJVc2LgnjoBJzHW2Q9QiI6Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=0Hzv31iAsIm4B1HeTQAjmmQCSI3i7Ksjvh28OlgI0QFbqUVIBBggMoVuDGJoM2xzR
-	 NRQF7Opxi8NtCObvbptm0TeTTCo5k7Br/nCEc8PmhaSOBwxL9MYvOxU4Df28dAJe8D
-	 JidG8I/KjROo53PimQ71rzlTgYjHTsddh1uXyD1kT6rWty2Zw6conx5jodeW/0+5Ux
-	 8RnDQloSkFHNRuNYp2FF5Q+uoKmfVREVGm0Cbwj/X5eC4w/AYcodYw9Tp0nKVBGSs7
-	 RFPZPfb6E8TWevSntJJGzeyIOVfwHTdZ6wGLOYWGo7GGHmqqRuL6tNudvc70fKqfWK
-	 AFt6QgH5hAqGQ==
-Received: from [100.113.186.2] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 58C7B3780627;
-	Thu,  9 May 2024 10:11:00 +0000 (UTC)
-Message-ID: <a9980df7-7d65-4818-8dd3-b056ba5ac566@collabora.com>
-Date: Thu, 9 May 2024 12:10:59 +0200
+	 In-Reply-To:Content-Type; b=T1jQmk+HMsAFO93ZUwGsSQtYIcoUDvsiQ6wiCByHrYeOOP5lHhXGLf6+f/lGN2U3FPf0S4MaxVI2xrJamUJXvopjdOcV+eK+tpouJT2O2OF5OzSo8AmBIlkhky1/PikGWrG0O2RThKw6dke8YbhK4HorufZ9Erb++y5Y/tnVfuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RxmUVVIu; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a5a1054cf61so161414266b.1;
+        Thu, 09 May 2024 03:16:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715249777; x=1715854577; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5I6sdfeuhGDQZEJYpwbwlRvLcoIJyVZFCXAeHmKIg6Q=;
+        b=RxmUVVIuw8gB2wvTb3DD7gEcMwpzhLX7cpI6vBeP+GPp+yuboH2udiL1Ah5eWtADDm
+         O9BS1TxqoZWxU3SlqTVy/b4w/ftsbrjvprB5c+eem4bgdqQtM6tmrPcUHWiPrWxdfpeI
+         gWSA3ywx4PNJo1o3o6UXyajQK5LC9fxDAzAWEqteJw35o97SDRvKTGnZfWeflSoy6exq
+         X9V3ZA1gxHMqpfE8ur6SJz/u9zAB/oHuLIBzqD4fySw0z8YQOlQxZVplTeKUmq+/8hb3
+         TZmY7abJYNsTfEusTr9gibifJM6TlApTwdjRYwkkrnEaRxmWhuMRlNbNwZg7bSpbckHZ
+         VYpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715249777; x=1715854577;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5I6sdfeuhGDQZEJYpwbwlRvLcoIJyVZFCXAeHmKIg6Q=;
+        b=t9xfnpW5xSvor6OhbPLQvsqm0BrVG/urVttWKJkEM+iI6i4wtMCao3zNFRkeD7CiRi
+         iX4LXAaxCZ5xwaWNOO7XXeVai8jWWgLbI0OZqR7x6HGNdQUvL3TM9cchvxPd+0puhKtH
+         un6qgxH/FC+lmHXgW6w+I3M89BqbNSx4PPhpHniC6Ig9izHa3m87Y5JW95lTGCDAvaTQ
+         3Adoz2IYQLTR3YrgkdYRGU6rS60oedtLIVFN9uYQ35I+hF+xHOk8ykfr0c8axyqYW0F/
+         9UtF5nLbM4+l1tkscr5yHABFxBf6oac7Ohz23Tuul3az5+tzIcdKLPqDfIedV9KkJ3M/
+         24hw==
+X-Forwarded-Encrypted: i=1; AJvYcCUr3NOs21By4VhoNADb+6X/GYHdiAHfFI6GIaNGkBEF+LQZPzmui2agj22YGqhXc34EzYDqbbqLPWjALMw0idfcqERPiVYA5eVEZyN7BGXNAMa2QJQ8kh7rnfmh/eNh41U3Wav13BH+sWP4Em7y1IPSxFgsfLlMedlM66ezTwX9LA==
+X-Gm-Message-State: AOJu0YwQSaef48JVuutKv06rqVXlvxftonviyuThMkBrQIP/BLsQ+n1u
+	QjUEbBq0XG8ges/xn3g+w+BxmVi+YKqYmQq7lBPnxfefOoyfPryil5vdHg==
+X-Google-Smtp-Source: AGHT+IFKm8dFeKHTx6sWWFxm9MrFf3naXL6aZ59huxIUKNrPdiep+ncOyjwbUnW526jrZm80z8G/xg==
+X-Received: by 2002:a50:8d17:0:b0:571:bed1:3a36 with SMTP id 4fb4d7f45d1cf-5731da9adbdmr4789496a12.38.1715249777220;
+        Thu, 09 May 2024 03:16:17 -0700 (PDT)
+Received: from [172.27.51.192] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5733bed2059sm543028a12.56.2024.05.09.03.16.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 May 2024 03:16:16 -0700 (PDT)
+Message-ID: <32495a72-4d41-4b72-84e7-0d86badfd316@gmail.com>
+Date: Thu, 9 May 2024 13:16:15 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,179 +76,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Aw: Re: [RFC v1 5/5] arm64: dts: mediatek: Add mt7986 based
- Bananapi R3 Mini
-To: Frank Wunderlich <frank-w@public-files.de>
-Cc: Frank Wunderlich <linux@fw-web.de>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- Eric Woudstra <ericwouds@gmail.com>, Tianling Shen <cnsztl@immortalwrt.org>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-leds@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, Tianling Shen <cnsztl@gmail.com>
-References: <20240505164549.65644-1-linux@fw-web.de>
- <20240505164549.65644-6-linux@fw-web.de>
- <a4099612-a4ae-4211-9674-c7053d2a995a@collabora.com>
- <3E013BA7-0264-4AC3-B677-BDD16B1F8D90@public-files.de>
- <a18a10e5-42e1-4302-b9f3-43c6174e2cf9@collabora.com>
- <trinity-2158d675-7049-4432-b925-6ace44401aa0-1715192732273@3c-app-gmx-bs02>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
+To: Joe Damato <jdamato@fastly.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <ttoukan.linux@gmail.com>, Zhu Yanjun
+ <zyjzyj2000@gmail.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, saeedm@nvidia.com, gal@nvidia.com,
+ nalramli@fastly.com, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Leon Romanovsky <leon@kernel.org>,
+ "open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Tariq Toukan <tariqt@nvidia.com>
+References: <ZjUwT_1SA9tF952c@LQ3V64L9R2> <20240503145808.4872fbb2@kernel.org>
+ <ZjV5BG8JFGRBoKaz@LQ3V64L9R2> <20240503173429.10402325@kernel.org>
+ <ZjkbpLRyZ9h0U01_@LQ3V64L9R2>
+ <8678e62c-f33b-469c-ac6c-68a060273754@gmail.com>
+ <ZjwJmKa6orPm9NHF@LQ3V64L9R2> <20240508175638.7b391b7b@kernel.org>
+ <ZjwtoH1K1o0F5k+N@ubuntu> <20240508190839.16ec4003@kernel.org>
+ <ZjxtejIZmJCwLgKC@ubuntu>
 Content-Language: en-US
-In-Reply-To: <trinity-2158d675-7049-4432-b925-6ace44401aa0-1715192732273@3c-app-gmx-bs02>
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <ZjxtejIZmJCwLgKC@ubuntu>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Il 08/05/24 20:25, Frank Wunderlich ha scritto:
-> Hi
-> 
->> Gesendet: Dienstag, 07. Mai 2024 um 15:35 Uhr
->> Von: "AngeloGioacchino Del Regno" <angelogioacchino.delregno@collabora.com>
+
+
+On 09/05/2024 9:30, Joe Damato wrote:
+> On Wed, May 08, 2024 at 07:08:39PM -0700, Jakub Kicinski wrote:
+>> On Thu, 9 May 2024 01:57:52 +0000 Joe Damato wrote:
+>>> If I'm following that right and understanding mlx5 (two things I am
+>>> unlikely to do simultaneously), that sounds to me like:
+>>>
+>>> - mlx5e_get_queue_stats_rx and mlx5e_get_queue_stats_tx check if i <
+>>>    priv->channels.params.num_channels (instead of priv->stats_nch),
 >>
->> Il 06/05/24 18:00, Frank Wunderlich ha scritto:
-> 
->>>>> +	fan: pwm-fan {
->>>>> +		compatible = "pwm-fan";
->>>>> +		#cooling-cells = <2>;
->>>>> +		/* cooling level (0, 1, 2) - pwm inverted */
->>>>> +		cooling-levels = <255 96 0>;
->>>>
->>>> Did you try to actually invert the PWM?
->>>>
->>>> Look for PWM_POLARITY_INVERTED ;-)
->>>
->>> Mtk pwm driver does not support it
->>>
->>> https://elixir.bootlin.com/linux/latest/source/drivers/pwm/pwm-mediatek.c#L211
->>>
+>> Yes, tho, not sure whether the "if i < ...num_channels" is even
+>> necessary, as core already checks against real_num_rx_queues.
 >>
->> You're right, sorry - I confused the general purpose PWM controller with the
->> rather specific DISP_PWM controller (which does support polarity inversion).
->>
->> It's good - but I'd appreciate if you can please add a comment stating that
->> the PWM values are inverted in SW because the controller does *not* support
->> polarity inversion... so that next time someone looks at this will immediately
->> understand what's going on and why :-)
-> 
-> so i would change comment like this:
-> 
-> 		/* cooling level (0, 1, 2)
-> 		 * signal is inverted on board
-> 		 * mtk pwm driver does not support
-> 		 * PWM_POLARITY_INVERTED */
-> 
-
-There you go:
-
-/*
-  * The signal is inverted on this board and the general purpose
-  * PWM HW IP in this SoC does not support polarity inversion.
-  */
-/* Cooling level < 0  1  2> */
-cooling-levels = <255 96 0>;
-
-
-
->>>>> +		pwms = <&pwm 0 10000>;
->>>>> +		status = "okay";
->>>>> +	};
->>>>> +
->>>>> +	phy14: ethernet-phy@14 {
-> ...
->>>>> +		interrupts-extended = <&pio 48 IRQ_TYPE_EDGE_FALLING>;
->>>>> +		reset-gpios = <&pio 49 GPIO_ACTIVE_LOW>;
->>>>> +		reset-assert-us = <10000>;
->>>>> +		reset-deassert-us = <20000>;
->>>>> +		phy-mode = "2500base-x";
->>>>> +		full-duplex;
->>>>> +		pause;
->>>>> +		airoha,pnswap-rx;
->>>>> +
->>>>> +		leds {
->>>>> +			#address-cells = <1>;
->>>>> +			#size-cells = <0>;
->>>>> +
->>>>> +			led@0 { /* en8811_a_gpio5 */
->>>>> +				reg = <0>;
->>>>> +				color = <LED_COLOR_ID_YELLOW>;
->>>>> +				function = LED_FUNCTION_LAN;
->>>>> +				function-enumerator = <1>;
->>>>
->>>> Why aren't you simply using a label?
+>>>    and when
+>>>    summing mlx5e_sq_stats in the latter function, it's up to
+>>>    priv->channels.params.mqprio.num_tc instead of priv->max_opened_tc.
 >>>
->>> You mean the comment? I can add it of course like for regulators.
->>>
+>>> - mlx5e_get_base_stats accumulates and outputs stats for everything from
+>>>    priv->channels.params.num_channels to priv->stats_nch, and
 >>
->> I mean in place of the function-enumerator... that's practically used to
->> distinguish between instances, it's not too common to see it, and usually
->> "label" replaces exactly that - just that, instead of a different number,
->> it gets a different name with no (usually) meaningless numbers :-)
+>> I'm not sure num_channels gets set to 0 when device is down so possibly
+>> from "0 if down else ...num_channels" to stats_nch.
 > 
-> as far as i understand using label also makes "function" property useless, after discussing
-> this with eric i would drop both on all 4 places by labels like these:
+> Yea, you were right:
 > 
-> label = "yellow-lan";
-> label = "green-lan";
-> ...
+>    if (priv->channels.num == 0)
+>            i = 0;
+>    else
+>            i = priv->channels.params.num_channels;
+>    
+>    for (; i < priv->stats_nch; i++) {
 > 
-> not sure if we should drop color property too...
+> Seems to be working now when I adjust the queue count and the test is
+> passing as I adjust the queue count up or down. Cool.
 > 
 
-I'm looking at the leds binding (leds/common.yaml) right now.
+I agree that get_base should include all inactive queues stats.
+But it's not straight forward to implement.
 
-My suggestion of using 'label' was actually wrong - and your devicetree was
-actually right!!! (apart from the default-trigger that may not work)
+A few guiding points:
 
-Infact, the documentation says, in brief:
+Use mlx5e_get_dcb_num_tc(params) for current num_tc.
 
-- function-enumerator is ignored if label is present
-- function doesn't say that gets ignored
-- color doesn't say that gets ignored
-- label says:
-   - If not present -> get string from node name
-   - function-enumerator ignored
-   - This property is deprecated
+txq_ix (within the real_num_tx_queues) is calculated by c->ix + tc * 
+params->num_channels.
 
-...but the 'label' binding does not say 'deprecated: true', which is something
-that must be fixed!
+The txqsq stats struct is chosen by channel_stats[c->ix]->sq[tc].
 
+It means, in the base stats you should include SQ stats for:
+1. all SQs of non-active channels, i.e. ch in [params.num_channels, 
+priv->stats_nch), tc in [0, priv->max_opened_tc).
+2. all SQs of non-active TCs in active channels [0, 
+params.num_channels), tc in [mlx5e_get_dcb_num_tc(params), 
+priv->max_opened_tc).
 
-So, I'm sorry for the confusion, the noise and the useless loss of time around
-this - you can keep the LED nodes as they are, and that's a lesson for the future
-me reviewing another node like this one.
+Now I actually see that the patch has issues in mlx5e_get_queue_stats_tx.
+You should not loop over all TCs of channel index i.
+You must do a reverse mapping from "i" to the pair/tuple [ch_ix, tc], 
+and then access a single TXQ stats by priv->channel_stats[ch_ix].sq[tc].
 
-P.S.: This shouldn't have been a RFC, as the patches are more than RFC quality!!!
-
-Cheers,
-Angelo
-
->>>>> +				default-state = "keep";
->>>>> +				linux,default-trigger = "netdev";
->>>>> +			};
->>>>> +			led@1 { /* en8811_a_gpio4 */
->>>>> +				reg = <1>;
->>>>> +				color = <LED_COLOR_ID_GREEN>;
->>>>> +				function = LED_FUNCTION_LAN;
->>>>> +				function-enumerator = <2>;
->>>>> +				default-state = "keep";
->>>>> +				linux,default-trigger = "netdev";
->>>>> +			};
->>>>> +		};
->>>>> +	};
->>>>> +
->>>>> +	phy15: ethernet-phy@15 {
->>>>> +		reg = <15>;
->>>>
->>>> Same here.
->>>>
->>>> Cheers,
->>>> Angelo
-> 
-> regards Frank
-
+> Adding TCs to the NIC triggers the test to fail, so there's still some bug
+> in how I'm accumulating stats from the hw TCs.
 
