@@ -1,167 +1,189 @@
-Return-Path: <netdev+bounces-95025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14C078C142D
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 19:39:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 857048C1432
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 19:40:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF3012824A3
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 17:39:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8D511C21D2D
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 17:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5867C5491B;
-	Thu,  9 May 2024 17:39:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C06255E40;
+	Thu,  9 May 2024 17:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TMo6Oi0+"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="Ig2l67xS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B448B5477C
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 17:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E65D56B67
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 17:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715276389; cv=none; b=ZoNB+Netwr85TYokBnVHLEWJGEUlM4sqkA1PuDza/XkgoNa5oVlgzTMvRe4bWnXFCZITP+uf5yPaLQ9kuuosYWFhbI91Nlsc1mqBZxc8CT1+FJ8z0UD2M9loFf/xM7EN8rnQtv/T1SK0Q6GZylX4EUUYFuDvwdG+LQrWxErRYYw=
+	t=1715276419; cv=none; b=Kj2H48wk9B2CG3k+HqXma77TfqwpNtEJHMP96ps98op9gML2H+3jLJJgNsCsDYb+JZCUXOiw+P83S/rUwFPTRrL2YP9yZ9lBrce8H1hB0eNxYku+a1SYbGtprvqEbEz2gp0rwtvsMMBphauqjC52vJyTQ7tq0icue+WWuh88i2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715276389; c=relaxed/simple;
-	bh=uaNuxkbzdgHihbQ6NpVrvKhs9dxn4ioblyHHcHj3RQ8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Q8hXiAMGoB08f5yLDr/AQOjyegNgaa95RXicHMUf84eO94oc2XGSh/2xbz0OE84l+EJ//9/nV61uEzfO+fc4+oWWJhHEQukB+1hiwVlJf/RnwplT0gSp138P8UcuwM1YiLiC8kZ3VAIMecoQhyLXAzzw26psHQKoYhcOAkqb7CU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TMo6Oi0+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715276386;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=vo2RN8rDO3gH+oTYUY95UXyQf/SX3wrcQE13vlpNQus=;
-	b=TMo6Oi0+r6Fld+hbEaqi0vauS4LPDijxeQuh5Bz4p5TrySxjY9JZ0mcxr9omJhUTFG9FMh
-	6T8my5omBtlaiCxBqGn4WMohjMPiexmc+90T4W3cX1raBWkZTk5rEDW2D1xzFARLw510x6
-	2hZ6aHBmWlVnLpy4NII/VLqvG57UANE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-333-l6rUML3iMpWfDmpAh0gZsw-1; Thu, 09 May 2024 13:39:43 -0400
-X-MC-Unique: l6rUML3iMpWfDmpAh0gZsw-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-34d7ce41d7bso165340f8f.1
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 10:39:42 -0700 (PDT)
+	s=arc-20240116; t=1715276419; c=relaxed/simple;
+	bh=+JJ3OgJl4Lh3xvKOAMjBnHajAacDL9RZkh7lLjWbwrI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t82byU5k0SHm30BrzchZvcZYxyZG2Dz2B0t+lp27nVHMaqJ67LlLhI3/JvjvqHZa5oMbM3jILE9s+zujD4U7Xn2IsLNoBDLoEN5K5DEa0mNToevwu1Q46aAmULoKZx0hZtRjNH+vZvIySV+DvptyBfwA9T73KBN5a3Xr4OCJykc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=Ig2l67xS; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id B06353FB75
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 17:40:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1715276415;
+	bh=ainzmkdiFZatTBBNnswuHUf0cvHV/VEu7RERUQouf94=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=Ig2l67xSccdbNwpLvNgrcRvD18UzVb8iUO9nOXi2imeXtTKAU7iJEwrwBWb4isPQ7
+	 BEwz2NaJ0UKx3JpaGeBvQ+tTwt+V2Y4igGplO5YOhqjA1OX9jSLbjPUxGVLSGaa9zj
+	 L3E6hJKGKXBMMGwF57lTy8hkgwqE+WQU3JtipHPYAeu0AEGXD1Ba+bWwgCizG+MxK3
+	 ZL+ZQcPSZ1Od2y53lJGbZ5byXra8r8j0/P29/30gFs0XZihEWTZYPu9IBvQl4akm5Q
+	 gOjxzFlDKuW0AOQGjUJWobQJiLbCugB0u58roMUz5rqxDWARz3zkytkHQgCSbwLsDF
+	 0smyerdBWMCIg==
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-34dc66313b3so779366f8f.2
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 10:40:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715276380; x=1715881180;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vo2RN8rDO3gH+oTYUY95UXyQf/SX3wrcQE13vlpNQus=;
-        b=eeEesO1Xv2jl6ikQm4iB1H/NgMC/Xt88S+a8jARjOP5zGCsLMpHQhorf0ntu8l3emo
-         3n/6IfgN/TVcpzvFdLR3TOQimia91lkti7SjTGy8FceNXEn/cMzlCBnE+7gApRKOKS9R
-         1JX6vH9XaJinDfToLnn40rGSEhwoVAS7GHIlooS1BKcVA3JTcDNIGtUeeucw8GsgO5G4
-         Mpkch23B5An6h+Dz0l6KCtC30+1BtIpPqpMNdWsFKnx6aU8oP/NjUqaoTqHp4B2C9hRx
-         LpctzVUzZhSU5KdsmSBKBMhDaEIBpCt1LpR0abbqNO5/hOjXQJEYo5WIQ5TESQlau2j6
-         pfcA==
-X-Gm-Message-State: AOJu0Yy7ZR8BkVsLOtkaMKTMmsuKahzOHbdSMT/xmJOfUxFKpSwjW3F2
-	lHQTDTMLulQVz8O6I0HfX/2NePZTtH58d0az/9G1cj0g+kLJqhvhGn/yy0Y30DPhmX+yMXtOLaz
-	nL3q5Suv5PXFmQlYSIM3QPM+TPoY+8RTAWmfRSREcF9x3Ymc1DywwAQ==
-X-Received: by 2002:adf:c049:0:b0:350:4c83:d654 with SMTP id ffacd0b85a97d-3504c83d800mr73851f8f.1.1715276379775;
-        Thu, 09 May 2024 10:39:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFVTFwvk2oj4zaevdbFu34SDlX5q0ayYND1P8eJw88PQSBx20uDhCN4uS+pbrZw72ty2wCi6Q==
-X-Received: by 2002:adf:c049:0:b0:350:4c83:d654 with SMTP id ffacd0b85a97d-3504c83d800mr73841f8f.1.1715276379369;
-        Thu, 09 May 2024 10:39:39 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3344:1b68:1b10::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b8a781asm2260415f8f.60.2024.05.09.10.39.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 10:39:38 -0700 (PDT)
-Message-ID: <0bf4989c10917b2351636a2f19794e47f3d336e9.camel@redhat.com>
-Subject: Re: [PATCH net] selftests: net: move amt to socat for better
- compatibility
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, shuah@kernel.org, 
-	ap420073@gmail.com, linux-kselftest@vger.kernel.org
-Date: Thu, 09 May 2024 19:39:36 +0200
-In-Reply-To: <20240509161952.3940476-1-kuba@kernel.org>
-References: <20240509161952.3940476-1-kuba@kernel.org>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        d=1e100.net; s=20230601; t=1715276414; x=1715881214;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ainzmkdiFZatTBBNnswuHUf0cvHV/VEu7RERUQouf94=;
+        b=CjMfYV/4VAzVKJps06ql/3HOc27chTZBw0e5JeAu8+HCgkI0m9+Gv9uUbZ2h4dr8mb
+         zEQBpv1McGz9UH3ZgyCQzt/O8C5DS0ImNE9FhHcmr+SbqD15DSjQI4V0AjkROvkK7xKu
+         qUHPsQhIUqTilFQiMP+OgZSJK0hKtAzrkiWQTgGPn3GRZDqyLsp8ZFW0tNQDSChT8gLY
+         58ueM4aC6lHPnRdD2tQStulI/Ct0LH7XSmwSUSyC+6uGIM0BhdgQuu7/unhEUb/aMR8B
+         /Lblx9K+7XBfezhJd3+n49hp1+IhdnYp2owNpTAv19X4HhcvGHS9Xjl7vg56C5U3ZPeq
+         2m0A==
+X-Forwarded-Encrypted: i=1; AJvYcCUCzaaXBXrrpSa0R6VxLOvcgVYm7rZ2RSDguXauUxbSM3zng7hsQ1mI3h2q1J7oZxock6V3mrQkw+jdu5pLwBiI7SE6f3fb
+X-Gm-Message-State: AOJu0YybYHWtlY+2Rd1BulLoP7Mpa1ZxSg/u8xNSktpK7jrF4m13T9YW
+	NAqIEcM1Sm+NjdOny6dGjpz4uosPW5erqVvWkptaYjQyCCPjCQiOzEnDF/nTenBxWv629VqNpDZ
+	+guPdpqO5gTefM1q6tgJOG787MevesyKqHDmVRBgwgrdwLom2jShnBy/QlOxTv5uCrF8wVrexQc
+	41XH1Nx1TBChu4rGAc8opuHZFxWjQgeG3icYUrsg13QT3H
+X-Received: by 2002:a5d:45d1:0:b0:349:ffed:792d with SMTP id ffacd0b85a97d-3504a7372a1mr278056f8f.30.1715276414424;
+        Thu, 09 May 2024 10:40:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGadpoJUBLPLrGbKTI6NrhfHgQFMupVGgJHWXb6ctPt9UXT1JRQDQhiYxpWoe+IrnBQi24ZmA5VglKX5yH9fA4=
+X-Received: by 2002:a5d:45d1:0:b0:349:ffed:792d with SMTP id
+ ffacd0b85a97d-3504a7372a1mr278029f8f.30.1715276414106; Thu, 09 May 2024
+ 10:40:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240503101836.32755-1-en-wei.wu@canonical.com>
+ <83a2c15e-12ef-4a33-a1f1-8801acb78724@lunn.ch> <514e990b-50c6-419b-96f2-09c3d04a2fda@intel.com>
+ <334396b5-0acc-43f7-b046-30bcdab1b6fb@intel.com> <cc58ecfc-53f1-4154-bc38-e73964a59e16@lunn.ch>
+In-Reply-To: <cc58ecfc-53f1-4154-bc38-e73964a59e16@lunn.ch>
+From: En-Wei WU <en-wei.wu@canonical.com>
+Date: Thu, 9 May 2024 19:40:02 +0200
+Message-ID: <CAMqyJG2Xnn7VtT1CrCXK7ojuUmP+ig8uwB30uK3nprPo5hLiUQ@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH v2 2/2] e1000e: fix link fluctuations problem
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>, Sasha Neftin <sasha.neftin@intel.com>, 
+	netdev@vger.kernel.org, rickywu0421@gmail.com, linux-kernel@vger.kernel.org, 
+	edumazet@google.com, intel-wired-lan@lists.osuosl.org, kuba@kernel.org, 
+	anthony.l.nguyen@intel.com, pabeni@redhat.com, davem@davemloft.net, 
+	"Lifshits, Vitaly" <vitaly.lifshits@intel.com>, "naamax.meir" <naamax.meir@linux.intel.com>, 
+	"Avivi, Amir" <amir.avivi@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 2024-05-09 at 09:19 -0700, Jakub Kicinski wrote:
-> The test seems to expect that nc will exit after the first
-> received message. This is not the case with Ncat 7.94.
-> There are multiple versions of nc out there, switch
-> to socat for better compatibility.
->=20
-> Tell socat to exit after 128 bytes and pad the message.
->=20
-> Since the test sets -e make sure we don't set exit code
-> (|| true) and print the pass / fail rather then silently
-> moving over the test and just setting non-zero exit code
-> with no output indicating what failed.
->=20
-> Fixes: c08e8baea78e ("selftests: add amt interface selftest script")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: shuah@kernel.org
-> CC: ap420073@gmail.com
-> CC: linux-kselftest@vger.kernel.org
-> ---
->  tools/testing/selftests/net/amt.sh | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->=20
-> diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftests=
-/net/amt.sh
-> index 75528788cb95..5175a42cbe8a 100755
-> --- a/tools/testing/selftests/net/amt.sh
-> +++ b/tools/testing/selftests/net/amt.sh
-> @@ -210,8 +210,8 @@ check_features()
-> =20
->  test_ipv4_forward()
->  {
-> -	RESULT4=3D$(ip netns exec "${LISTENER}" nc -w 1 -l -u 239.0.0.1 4000)
-> -	if [ "$RESULT4" =3D=3D "172.17.0.2" ]; then
-> +	RESULT4=3D$(ip netns exec "${LISTENER}" timeout 15 socat - UDP4-LISTEN:=
-4000,readbytes=3D128 || true)
-> +	if echo "$RESULT4" | grep -q "172.17.0.2"; then
->  		printf "TEST: %-60s  [ OK ]\n" "IPv4 amt multicast forwarding"
->  		exit 0
->  	else
-> @@ -222,8 +222,8 @@ test_ipv4_forward()
-> =20
->  test_ipv6_forward()
->  {
-> -	RESULT6=3D$(ip netns exec "${LISTENER}" nc -w 1 -l -u ff0e::5:6 6000)
-> -	if [ "$RESULT6" =3D=3D "2001:db8:3::2" ]; then
-> +	RESULT6=3D$(ip netns exec "${LISTENER}" timeout 15 socat - UDP6-LISTEN:=
-6000,readbytes=3D128 || true)
-> +	if echo "$RESULT6" | grep -q "2001:db8:3::2"; then
+> En-Wei, My recommendation is not to accept these patches. If you think
+> there is a HW/PHY problem - open a ticket on Intel PAE.
 
-The patch LGTM:
+> I concur. I am wary of changing the behavior of some driver
+> fundamentals, to satisfy a particular validation/certification flow, if
+> there is no real functionality problem. It can open a big Pandora box.
+OK. Thanks for your help. I think we can end this patchset now.
 
-Acked-by: Paolo Abeni<pabeni@redhat.com>
+> It is normally a little over 1 second. I
+> forget the exact number. But is the PHY being polled once a second,
+> rather than being interrupt driven?
+If I read the code correctly, the PHY is polled every 2 seconds by the
+e1000e watchdog. But if an interrupt occurs and it's a
+link-status-change interrupt, the watchdog will be called immediately
+and the PHY is polled.
 
-As a minor note, shell variable expansion should already trim all the
-trailing/leading spaces from the socat command output, so it should not
-be necessary replace the string comparison with the grep command:
+> What does it think the I219-LM is advertising? Is it advertising 1000BaseT_Half?
+> But why would auto-neg resolve to that if 1000BaseT_Full is available?
+I'm also interested in it. I'll do some checking later to see what's
+advertising by us and the link partner.
 
-	RESULT6=3D$(ip netns exec "${LISTENER}" timeout 15 socat - UDP6-LISTEN:600=
-0,readbytes=3D128 || true)
-	if [ "$RESULT6" =3D=3D "2001:db8:3::2" ]; then
+> Agreed. Root cause this, which looks like a real problem, rather than
+> apply a band-aid for a test system.
+OK. I think there is a clue which is related to auto-negotiation. I'll
+work on it later.
 
-Should work
+Thank all of you for your help, I really appreciate it.
 
-Cheers,
-
-Paolo
-
+On Thu, 9 May 2024 at 15:46, Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Thu, May 09, 2024 at 12:13:27PM +0300, Ruinskiy, Dima wrote:
+> > On 08/05/2024 8:05, Sasha Neftin wrote:
+> > > On 07/05/2024 15:31, Andrew Lunn wrote:
+> > > > On Fri, May 03, 2024 at 06:18:36PM +0800, Ricky Wu wrote:
+> > > > > As described in https://bugzilla.kernel.org/show_bug.cgi?id=218642,
+> > > > > Intel I219-LM reports link up -> link down -> link up after hot-plugging
+> > > > > the Ethernet cable.
+> > > >
+> > > > Please could you quote some parts of 802.3 which state this is a
+> > > > problem. How is this breaking the standard.
+> > > >
+> > > >     Andrew
+> > >
+> > > In I219-* parts used LSI PHY. This PHY is compliant with the 802.3 IEEE
+> > > standard if I recall correctly. Auto-negotiation and link establishment
+> > > are processed following the IEEE standard and could vary from platform
+> > > to platform but are not violent to the IEEE standard.
+> > >
+> > > En-Wei, My recommendation is not to accept these patches. If you think
+> > > there is a HW/PHY problem - open a ticket on Intel PAE.
+> > >
+> > > Sasha
+> >
+> > I concur. I am wary of changing the behavior of some driver fundamentals, to
+> > satisfy a particular validation/certification flow, if there is no real
+> > functionality problem. It can open a big Pandora box.
+> >
+> > Checking the Bugzilla report again, I am not sure we understand the issue
+> > fully:
+> >
+> > [  143.141006] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Up 1000 Mbps Half
+> > Duplex, Flow Control: None
+> > [  143.144878] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Down
+> > [  146.838980] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Up 1000 Mbps Full
+> > Duplex, Flow Control: None
+> >
+> > This looks like a very quick link "flap", following by proper link
+> > establishment ~3.7 seconds later. These ~3.7 seconds are in line of what
+> > link auto-negotiation would take (auto-negotiation is the default mode for
+> > this driver).
+>
+> That actually seems slow. It is normally a little over 1 second. I
+> forget the exact number. But is the PHY being polled once a second,
+> rather than being interrupt driven?
+>
+> > The first print (1000 Mbps Half Duplex) actually makes no
+> > sense - it cannot be real link status since 1000/Half is not a supported
+> > speed.
+>
+> It would be interesting to see what the link partner sees. What does
+> it think the I219-LM is advertising? Is it advertising 1000BaseT_Half?
+> But why would auto-neg resolve to that if 1000BaseT_Full is available?
+>
+> > So it seems to me that actually the first "link up" is an
+> > incorrect/incomplete/premature reading, not the "link down".
+>
+> Agreed. Root cause this, which looks like a real problem, rather than
+> apply a band-aid for a test system.
+>
+>       Andrew
 
