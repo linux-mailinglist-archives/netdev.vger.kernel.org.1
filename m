@@ -1,168 +1,217 @@
-Return-Path: <netdev+bounces-94812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58E418C0C13
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 09:45:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39E608C0C17
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 09:46:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9A1AB225BE
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 07:45:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDB011F224C3
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 07:46:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44188148307;
-	Thu,  9 May 2024 07:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FB214830B;
+	Thu,  9 May 2024 07:46:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cpor8yFW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PiUm/3BK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621B1624
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 07:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6861B14884B
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 07:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715240708; cv=none; b=Mv+1uhp39m2D7PCsbGPs3DfqJlMhFOwi1z5L4Qd+5NIYZzgw2BQeuIAdjayecj5srLKIOJq9a1BYY22l+8Pm254BeAFLqyFyp/NMresieowqyC74rpV93yziLw2EmJfyJ8l7JbgIM6+VM/6JDGjUi0hlfuPT6DdSnJ8bDNjaaX8=
+	t=1715240806; cv=none; b=ZqDIOe7R/urnq00ZkaOfiqokZtdE8/srl2qW0B25gHFG1NB73TcPdB+6FLJT1QrdRAr0pS3HFPBdcUjHIc9hBqT5AWCGuGnyh0+Fz+RcW+Uqip+Eobg/zdBNkhuYfHt3P6HOIyavAl/fHwPLYpNoRFG9Bwj2i58dD3oEtQjXHf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715240708; c=relaxed/simple;
-	bh=uqSFUt+6hbQp7AmSUqu4k6Ig0CACIiBo5+SXZJf395Y=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=h5Zi3WqWk8ApeAYeQkTcISx/Sfr0IpnG3FvFyeeXOzeGHD9sGiJRrfbV87DkBUD/eRKiPl5oURwnu7ETPeWFrPV7NvtXHOaELoKqHG4XoVEwA7+O/j+ohdYyDCDH8HtX8JBMndMNFWFF9GPNGMORpt1NK1XWwuUXDeGCAkPLlTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Cpor8yFW; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a599af16934so132962966b.1
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 00:45:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1715240704; x=1715845504; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5y+uXmNpnj2RaNWPj3qJCxN72WzccnwLe4mZM9KaQP4=;
-        b=Cpor8yFWxoww24sem1pSa6MeoVj5ObDMXKojslcYo/4Gtrx0UKdXMOpz9Hz2Nb+sO1
-         Gqgc0NR6FbmS51ShWU/pNNe6YclB+5HxkoYyf2t/srIgSqi73PA3LZFgY1Qh0ypSAPUE
-         lELG/86ivRIYQGo/gz6at/8l4sUbVBuVVKDd6wIi9b+zb8WCvy2/5+xploJkkmEm1wrA
-         GuLV/Iben33GVSnkxSXEMZdEg/R4VDSg5E0w56a2DGyDRTrk+6sqNxNVX8ZzaBQ9vUQN
-         IZIH4Dn0mqcAdFBTjMyfgI3kdIK9V2YxSk3qKNOu1LT4B4g9QgwXwIe8kiU0uyEzHSuM
-         N09w==
+	s=arc-20240116; t=1715240806; c=relaxed/simple;
+	bh=HhgVgwFAw125HsYffBUcKULiQ/FHN6+J5MSrsuq4w2Q=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=pZiWx7BniLAKLBTbTm6kLMyTMniv0nxRDpyw+qeTV7wXvTHVxSKmTrkjX0KP0ccjom8cnzuAXXuM3lrIN5mzUI88wjKkBUlqVcieFvMSp03nw5i7kkrKxfxxnJEA/Arq1aRdiXmrlp5hQf9+wDvAKFVptlrAe022B2CgC67MxxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PiUm/3BK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715240803;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=6xdzoSLaBkieVNky7RVFLQHac2yeEC0n7m3n+rfK3Rc=;
+	b=PiUm/3BKdF7d2IuF6/PIhi+ikFgTDCvM0xTu3n/j1gjRQhOZGtj9edlxz8GHMZSRPOd2iB
+	mz1S19pC8FmL5cazkIuyztrW9XcWNyR79fz760z0EGKCIIU6aMA5p/lsgZpiGMmvxHJvBA
+	NKHb3w8bX0DlAzyNBBZFWjeCvFeGoS8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-271-Je0oWLAePneKq9UPVDFDyA-1; Thu, 09 May 2024 03:46:38 -0400
+X-MC-Unique: Je0oWLAePneKq9UPVDFDyA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-34db05be56dso80846f8f.0
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 00:46:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715240704; x=1715845504;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5y+uXmNpnj2RaNWPj3qJCxN72WzccnwLe4mZM9KaQP4=;
-        b=LW5kHaUVqCIdvD3COSzBqchyzr+yk/GBdmVR3LtIvgk8NV7r/sF5C1vmh9xODMdjBL
-         OMosF01V5B5C2d5VOGi7qy6yKK22597Va26kYvza432ngfICLaLor/mXhFaehll9l/NB
-         o3q8nxuNjyx1vpTMwDq/btBkd1GU4uCbYnJ1TlKjxU1ByXrgf5Z0CdHpFfpcy2Icpz9v
-         /ZD4sSdHZIdkYMaLjxTYiXOEW40hP/TZ1LrrTC5ldf1of7xU67c9olzk8keK+kmvF2FJ
-         0I+ZcIp4I0iqEKpr66QR3BT4kbCejAXxn/StmLElRrqaL1Rdh56T9HiDnU9tOmCKyMns
-         +Dsg==
-X-Gm-Message-State: AOJu0YzsxZ0zSELCX1WoBIgAz5tYlmYtejsbzNUIwvBgpdZtuBDBaRGc
-	6bJBd7uoAnXZmLzaofArHQ8b8X88PexSXnMjAQEClwj24SAKsHvAKHhEgCuIGwY=
-X-Google-Smtp-Source: AGHT+IHkxv73L0WnVY6pllsaFfzFkhW688GQPZ4oxPVl/JII/T+P+dihkb6kL9L805SfRzC7qVPiQQ==
-X-Received: by 2002:a17:906:f917:b0:a59:b02a:90e7 with SMTP id a640c23a62f3a-a59fb9f0eeemr316243166b.64.1715240704533;
-        Thu, 09 May 2024 00:45:04 -0700 (PDT)
-Received: from [192.168.1.140] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a17b0172fsm45002466b.183.2024.05.09.00.45.03
+        d=1e100.net; s=20230601; t=1715240797; x=1715845597;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6xdzoSLaBkieVNky7RVFLQHac2yeEC0n7m3n+rfK3Rc=;
+        b=uYkY1OhbW4Yre6TVJ97h9RTpM58VFx7jg9oZ/DPm9eVfCpJoR2M/C69iddEuU3dgDw
+         TZr6Y9XzIzA98psT2NFEXhCwJTXZKvQBDagg3ncE2XMh6mzHtGiAGLs2vf3dfVk4JAid
+         HyOhI9uBCi4YuuOSoyargZuZPGVf1yy2uoXr8kFumJMGnkX2asFmPdtAM3zvn96LocXi
+         y8w7cyNyxHSpUjIZcwFBTNvPUC3SP3Ag6MPj6jm2b7Tu7u6Lxwi0bkA7wLRcFZWZT8KL
+         6T9cI747bov0wSrnaljqL/uAUWu81Z1voVO8VpoJtTydmMaXyeoDdhoGd4hhTUWnQMVW
+         IQMw==
+X-Forwarded-Encrypted: i=1; AJvYcCU6TFqYJPPpchv/KBLVnmsHERbe86WB4sYdOVirNnD/vpMh5v432JMUwh763TqWRsuHjH6zgmlcpaMlF8ZLavUGHcLYglaY
+X-Gm-Message-State: AOJu0YzEiAAUbPSSGIltm7vSjtsjLnecY5gzU89Nnm/7Hnh+7VF75TL2
+	hZ1xZmvMQev/UcTdFrpvTNV0MpkHXVYcaEY1BEqQUlTMCeHIeXDvBhIHNnqFwfgslxKdlDKs37H
+	Dxu8n1j8juTy4hf8Iiqq1L5BUHF2RWcPyUzS3NeJn+aAanKiEV1cIPg==
+X-Received: by 2002:a05:600c:1c0a:b0:418:9941:ca28 with SMTP id 5b1f17b1804b1-41f719d62b4mr34878325e9.2.1715240797647;
+        Thu, 09 May 2024 00:46:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEmSvzdCw9iXsAde+CQex6xKhWRl8ljB1dEZSk63p1UnNhtNjgqw+WKSP/6N6GSQe3WVMFozA==
+X-Received: by 2002:a05:600c:1c0a:b0:418:9941:ca28 with SMTP id 5b1f17b1804b1-41f719d62b4mr34878105e9.2.1715240797172;
+        Thu, 09 May 2024 00:46:37 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:1b68:1b10:ff61:41fd:2ae4:da3a])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502bbbc082sm944823f8f.107.2024.05.09.00.46.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 00:45:04 -0700 (PDT)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 09 May 2024 09:44:54 +0200
-Subject: [PATCH net] net: ethernet: cortina: Locking fixes
+        Thu, 09 May 2024 00:46:36 -0700 (PDT)
+Message-ID: <6891de8fbc542340d157634ff1fe6701443995a5.camel@redhat.com>
+Subject: Re: [PATCH RFC net-next] net: cache the __dev_alloc_name()
+From: Paolo Abeni <pabeni@redhat.com>
+To: William Tu <witu@nvidia.com>, netdev@vger.kernel.org
+Cc: jiri@nvidia.com, bodong@nvidia.com, kuba@kernel.org
+Date: Thu, 09 May 2024 09:46:35 +0200
+In-Reply-To: <103033d0-f6e2-49ee-a8e2-ba23c6e9a6a1@nvidia.com>
+References: <20240506203207.1307971-1-witu@nvidia.com>
+	 <03c25d8e994e4388cb8bfd726ba738eea3c4dcdf.camel@redhat.com>
+	 <103033d0-f6e2-49ee-a8e2-ba23c6e9a6a1@nvidia.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240509-gemini-ethernet-locking-v1-1-afd00a528b95@linaro.org>
-X-B4-Tracking: v=1; b=H4sIAPV+PGYC/x2MwQqDMBAFf0X27MIqkaK/UjzY+IxL7SpJkIL47
- w09DszMRQlRkWioLoo4NeluBZq6Ir9OFsA6F6ZWWied9BzwUVNGXhENmbfdv9UCP3zjXyIOs+u
- p1EfEot//+UlFpPG+f/NEJoNuAAAA
-To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- =?utf-8?q?Micha=C5=82_Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>
-Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
-X-Mailer: b4 0.13.0
 
-This fixes a probably long standing problem in the Cortina
-Gemini ethernet driver: there are some paths in the code
-where the IRQ registers are written without taking the proper
-locks.
+On Tue, 2024-05-07 at 11:55 -0700, William Tu wrote:
+>=20
+> On 5/7/24 12:26 AM, Paolo Abeni wrote:
+> > External email: Use caution opening links or attachments
+> >=20
+> >=20
+> > On Mon, 2024-05-06 at 20:32 +0000, William Tu wrote:
+> > > When a system has around 1000 netdevs, adding the 1001st device becom=
+es
+> > > very slow. The devlink command to create an SF
+> > >    $ devlink port add pci/0000:03:00.0 flavour pcisf \
+> > >      pfnum 0 sfnum 1001
+> > > takes around 5 seconds, and Linux perf and flamegraph show 19% of tim=
+e
+> > > spent on __dev_alloc_name() [1].
+> > >=20
+> > > The reason is that devlink first requests for next available "eth%d".
+> > > And __dev_alloc_name will scan all existing netdev to match on "ethN"=
+,
+> > > set N to a 'inuse' bitmap, and find/return next available number,
+> > > in our case eth0.
+> > >=20
+> > > And later on based on udev rule, we renamed it from eth0 to
+> > > "en3f0pf0sf1001" and with altname below
+> > >    14: en3f0pf0sf1001: <BROADCAST,MULTICAST,UP,LOWER_UP> ...
+> > >        altname enp3s0f0npf0sf1001
+> > >=20
+> > > So eth0 is actually never being used, but as we have 1k "en3f0pf0sfN"
+> > > devices + 1k altnames, the __dev_alloc_name spends lots of time goint
+> > > through all existing netdev and try to build the 'inuse' bitmap of
+> > > pattern 'eth%d'. And the bitmap barely has any bit set, and it rescan=
+es
+> > > every time.
+> > >=20
+> > > I want to see if it makes sense to save/cache the result, or is there
+> > > any way to not go through the 'eth%d' pattern search. The RFC patch
+> > > adds name_pat (name pattern) hlist and saves the 'inuse' bitmap. It s=
+aves
+> > > pattens, ex: "eth%d", "veth%d", with the bitmap, and lookup before
+> > > scanning all existing netdevs.
+> > An alternative heuristic that should be cheap and possibly reasonable
+> > could be optimistically check for <name>0..<name><very small int>
+> > availability, possibly restricting such attempt at scenarios where the
+> > total number of hashed netdevice names is somewhat high.
+> >=20
+> > WDYT?
+> >=20
+> > Cheers,
+> >=20
+> > Paolo
+> Hi Paolo,
+>=20
+> Thanks for your suggestion!
+> I'm not clear with that idea.
+>=20
+> The current code has to do a full scan of all netdevs in a list, and the=
+=20
+> name list is not sorted / ordered. So to get to know, ex: eth0 .. eth10,=
+=20
+> we still need to do a full scan, find netdev with prefix "eth", and get=
+=20
+> net available bit 11 (10+1).
+> And in another use case where users doesn't install UDEV rule to rename,=
+=20
+> the system can actually create eth998, eth999, eth1000....
+>=20
+> What if we create prefix map (maybe using xarray)
+> idx=C2=A0=C2=A0 entry=3D(prefix, bitmap)
+> --------------------
+> 0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 eth, 1111000000...
+> 1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 veth, 1000000...
+> 2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 can, 11100000...
+> 3=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 firewire, 00000...
+>=20
+> but then we need to unset the bit when device is removed.
+> William
 
-Fixes: 4d5ae32f5e1e ("net: ethernet: Add a driver for Gemini gigabit ethernet")
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Sorry for the late reply. I mean something alike the following
+(completely untested!!!):
 ---
- drivers/net/ethernet/cortina/gemini.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
-index 705c3eb19cd3..d1fbadbf86d4 100644
---- a/drivers/net/ethernet/cortina/gemini.c
-+++ b/drivers/net/ethernet/cortina/gemini.c
-@@ -1107,10 +1107,13 @@ static void gmac_tx_irq_enable(struct net_device *netdev,
- {
- 	struct gemini_ethernet_port *port = netdev_priv(netdev);
- 	struct gemini_ethernet *geth = port->geth;
-+	unsigned long flags;
- 	u32 val, mask;
- 
- 	netdev_dbg(netdev, "%s device %d\n", __func__, netdev->dev_id);
- 
-+	spin_lock_irqsave(&geth->irq_lock, flags);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index d2ce91a334c1..0d428825f88a 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1109,6 +1109,12 @@ static int __dev_alloc_name(struct net *net, const c=
+har *name, char *res)
+ 	if (!p || p[1] !=3D 'd' || strchr(p + 2, '%'))
+ 		return -EINVAL;
+=20
++	for (i =3D 0; i < 4; ++i) {
++		snprintf(buf, IFNAMSIZ, name, i);
++		if (!__dev_get_by_name(net, buf))
++			goto found;
++	}
 +
- 	mask = GMAC0_IRQ0_TXQ0_INTS << (6 * netdev->dev_id + txq);
- 
- 	if (en)
-@@ -1119,6 +1122,8 @@ static void gmac_tx_irq_enable(struct net_device *netdev,
- 	val = readl(geth->base + GLOBAL_INTERRUPT_ENABLE_0_REG);
- 	val = en ? val | mask : val & ~mask;
- 	writel(val, geth->base + GLOBAL_INTERRUPT_ENABLE_0_REG);
-+
-+	spin_unlock_irqrestore(&geth->irq_lock, flags);
- }
- 
- static void gmac_tx_irq(struct net_device *netdev, unsigned int txq_num)
-@@ -1415,15 +1420,19 @@ static unsigned int gmac_rx(struct net_device *netdev, unsigned int budget)
- 	union gmac_rxdesc_3 word3;
- 	struct page *page = NULL;
- 	unsigned int page_offs;
-+	unsigned long flags;
- 	unsigned short r, w;
- 	union dma_rwptr rw;
- 	dma_addr_t mapping;
- 	int frag_nr = 0;
- 
-+	spin_lock_irqsave(&geth->irq_lock, flags);
- 	rw.bits32 = readl(ptr_reg);
- 	/* Reset interrupt as all packages until here are taken into account */
- 	writel(DEFAULT_Q0_INT_BIT << netdev->dev_id,
- 	       geth->base + GLOBAL_INTERRUPT_STATUS_1_REG);
-+	spin_unlock_irqrestore(&geth->irq_lock, flags);
-+
- 	r = rw.bits.rptr;
- 	w = rw.bits.wptr;
- 
-@@ -1726,10 +1735,9 @@ static irqreturn_t gmac_irq(int irq, void *data)
- 		gmac_update_hw_stats(netdev);
- 
- 	if (val & (GMAC0_RX_OVERRUN_INT_BIT << (netdev->dev_id * 8))) {
-+		spin_lock(&geth->irq_lock);
- 		writel(GMAC0_RXDERR_INT_BIT << (netdev->dev_id * 8),
- 		       geth->base + GLOBAL_INTERRUPT_STATUS_4_REG);
--
--		spin_lock(&geth->irq_lock);
- 		u64_stats_update_begin(&port->ir_stats_syncp);
- 		++port->stats.rx_fifo_errors;
- 		u64_stats_update_end(&port->ir_stats_syncp);
+ 	/* Use one page as a bit array of possible slots */
+ 	inuse =3D bitmap_zalloc(max_netdevices, GFP_ATOMIC);
+ 	if (!inuse)
+@@ -1144,6 +1150,7 @@ static int __dev_alloc_name(struct net *net, const ch=
+ar *name, char *res)
+ 	if (i =3D=3D max_netdevices)
+ 		return -ENFILE;
+=20
++found:
+ 	/* 'res' and 'name' could overlap, use 'buf' as an intermediate buffer */
+ 	strscpy(buf, name, IFNAMSIZ);
+ 	snprintf(res, IFNAMSIZ, buf, i);
 
 ---
-base-commit: 4cece764965020c22cff7665b18a012006359095
-change-id: 20240509-gemini-ethernet-locking-7c1cb004ed49
+plus eventually some additional check to use such heuristic only if the
+total number of devices	is significantly high. That would need some
+additional book-keeping, not added here.
 
-Best regards,
--- 
-Linus Walleij <linus.walleij@linaro.org>
+Cheers,
+
+Paolo
 
 
