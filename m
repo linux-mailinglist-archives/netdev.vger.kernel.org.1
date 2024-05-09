@@ -1,142 +1,110 @@
-Return-Path: <netdev+bounces-95037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 300008C1483
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:09:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E3568C1486
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:10:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 339D21C21F29
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 18:09:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B577AB2131F
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 18:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3863D770F2;
-	Thu,  9 May 2024 18:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BBC071742;
+	Thu,  9 May 2024 18:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pcWbs/r1"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="K1Nw+mtv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2FB4A21;
-	Thu,  9 May 2024 18:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F4A10979
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 18:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715278185; cv=none; b=jqjUccbNx8kjy3idHsiIIaTnUNUHOb1GxXiTqu0PBAq7W8j/qU6szcj8ZlysYSzP+R2QbgHcDX2YNT8WyE4XPgsCeIHGudHIhRvJSglADpdpr87v+DKaTaM6uekf9UIFxPA3dH7mdERpe1QnNBKcCV7TijUkmw91+9OOdpUML38=
+	t=1715278198; cv=none; b=NdKaayHBCmH89Vt+DfbgfSPFzNwLqImY2CosyY35+NSgmGEhq9m8V2TxkPvq3lqJOkfBVXVuctyj0Jf6JzD9nYEQlr3FLbXDwISEcrCtxDxq52edmQeAps2GVM1ibKiZyiQxKUSq2AmLKeWRi77YbkwXIIh4FgD57C1wsnNcAVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715278185; c=relaxed/simple;
-	bh=jwv2fzzjt0cfgGB3Brq3DaNH87PYRXNR2e6rGYGOafE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y82mLFY9ueoQfAwtLzvVH2zRHyVkivHPSbOCvb6AQUI1nBLoR6eBW5/wl20MZuxjA0SnHo92wzCfmjjQfL1szgPRdO4jp4thyC6Iuf8P065nFWOmf1leO9J87wd8Bm7M35y1yWj0fS09lo+ovsgLSwmgoRAL2Ha4B0zpOtgqT2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pcWbs/r1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68B79C116B1;
-	Thu,  9 May 2024 18:09:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715278184;
-	bh=jwv2fzzjt0cfgGB3Brq3DaNH87PYRXNR2e6rGYGOafE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pcWbs/r1G654QjExkZzDw+Ye8SGuO5KNSoJXgb3ZcHmQu3x4E4I2S1EyboJZJ69Pm
-	 mQGtOZps9Mk4n5oD3NC0m6qaZEA2R4B3yV8ziliaYQKJuVPbeega5VLoJMM7bdEW8w
-	 QsO0dRoyLJXReH4e+Gr2o/o8rwX7eRPfNmNxtDhq2odx+5HXePP3adhAZMwihdufgm
-	 TJYZN9r45oB8RBk9LJ07YyNdaLx0jXiIe+uuIlXoZ3rnG7UWq+TcvufvwhgqAcdXUj
-	 IWIJQk7xiKk8ZMCAMycm8EUrbMdGg/3MJ+w5ZJHt/4Fmr2dZhqKHu/Lwo0Trc23XnT
-	 53sTqY3R2bs6Q==
-Date: Thu, 9 May 2024 19:09:37 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Christoph Fritz <christoph.fritz@hexdev.de>
-Cc: Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Jiri Slaby <jirislaby@kernel.org>, Simon Horman <horms@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Sebastian Reichel <sre@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Andreas Lauser <andreas.lauser@mercedes-benz.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Pavel Pisa <pisa@cmp.felk.cvut.cz>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-serial@vger.kernel.org
-Subject: Re: [PATCH v4 06/11] dt-bindings: net/can: Add serial LIN adapter
- hexLINSER
-Message-ID: <20240509-kindred-cauterize-ced967ec9d73@spud>
-References: <20240509171736.2048414-1-christoph.fritz@hexdev.de>
- <20240509171736.2048414-7-christoph.fritz@hexdev.de>
+	s=arc-20240116; t=1715278198; c=relaxed/simple;
+	bh=mVAlrsqmGe3vk35le2tnYkIvTR7PVyC+QldNcM5L7OA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eEjsvrQ7Sw8q1EKaBqsn3HUudvdpH6UECShSRe1D1nccYMi32ygJQTD7b09L0IyWiGmnSsyGgw/10w+x9bzIYQ1wRmLID94gdLrhFfr/IW3+vplmag90CrMpObY+BpFLzNW7vInOFWWfPzaEDIA9X4EJvAGGzFYBMbmPGtizMtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=K1Nw+mtv; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6f44ed6e82fso1072665b3a.3
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 11:09:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1715278196; x=1715882996; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cAFQ1pXnscaNYourVZhjgkuHX4JeH6ZyCE9xtGGuVew=;
+        b=K1Nw+mtvhTt9hUg4iHOEr7RFWGifly79q7A3HkYygXKeVu9k3fE8YAi/hCiE9PmveY
+         KZ0giZ77yVXLyqw7+wK9cgXxtcRuzA4I6pyns6cl71hpxPYpPfcPbw4jcK3Ez0LcOYSg
+         1+3wdmCdyjFHrrLXJlhyn6dyJ9fvccSH2BXHYe+j+cXyId9QInTn3euYLK8yOKt1JDho
+         Le7Xkxgk0BT7pO7/zukIAJscipk/ARc2Vnkh4WIR6eNjhqOEd/awQCwYehoZJfWrcJGa
+         /YHLgrzRSjuT3Wp6lS11XpdSmd66jiPi8lWIiG4+HjRku5smupmP3XEd3jy9Zfnk1Hbg
+         QqgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715278196; x=1715882996;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cAFQ1pXnscaNYourVZhjgkuHX4JeH6ZyCE9xtGGuVew=;
+        b=MRY+fkCtPRaJu3YH/nwXir7jYVrlYxcrWJo6AY7Dl4wblj9ykzAssoZJRHIxkD5MII
+         591rAeHCmOxto6yhw/sCPl3AkgBPtJQlrIdvCBacgBDn8SnyaorrBGmrePQf+twbZVgE
+         Y+GTSz99vtEFXvux9P/2pvzldGdHGrq93yjBWwB18igdhuUEI/ItDR+Tpn/BwfqOP1Rr
+         WsNZ6YP0Ppv3Tdr56LhnT4avzLftGXqQpDmobSF5TanEFk9K77PuLFSs4TFMPJraaBBA
+         bcuqo65TLy1lNM0on4IouCXywiQkWKKRfcxbAtLbcIJIX96XY7lCT/YX5oBHTPhRhkeA
+         2e5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUxQutxEj2BkNumkTi23FWDQlGJpPy1eeMbZBLrusgeaG/rMr9w5QCZaJvUTAujUvjnVJRgvvjO+2U8iFmg8AevNzZ93OxZ
+X-Gm-Message-State: AOJu0Yzjn95bO6qzKQax9TiQPjsMVkUu9wXzh+OBLztGIACOq52dtBMZ
+	kMeKF9hTd7XgLs+Rl0B/VVyIYh+LoPcN2E5TwzGrTrnz8HtbYPokCQ5v40FsPCQ=
+X-Google-Smtp-Source: AGHT+IFxmYJaEZMycBwCktGS2JRoQMzjPs2ACXgv7iXVhtolq9hdV25hRc+e4jTDZ9ebNKJLLNmWig==
+X-Received: by 2002:a05:6a20:565b:b0:1af:d44c:cfc3 with SMTP id adf61e73a8af0-1afde104374mr528069637.32.1715278196152;
+        Thu, 09 May 2024 11:09:56 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::5:c55])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-634024a3eb4sm1651671a12.0.2024.05.09.11.09.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 May 2024 11:09:55 -0700 (PDT)
+Message-ID: <9aafe0de-7e46-4255-915e-2cf2969377d0@davidwei.uk>
+Date: Thu, 9 May 2024 11:09:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="36g1c/htqkz0JRR5"
-Content-Disposition: inline
-In-Reply-To: <20240509171736.2048414-7-christoph.fritz@hexdev.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [External] : [PATCH 1/2] tcp: fix get_tcp4_sock() output error
+ info
+Content-Language: en-GB
+To: Mohith Kumar Thummaluru <mohith.k.kumar.thummaluru@oracle.com>,
+ Yuan Fang <yf768672249@gmail.com>, "edumazet@google.com"
+ <edumazet@google.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20240509044323.247606-1-yf768672249@gmail.com>
+ <DS0PR10MB6056248B2DFFC393E31B4A1B8FE62@DS0PR10MB6056.namprd10.prod.outlook.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <DS0PR10MB6056248B2DFFC393E31B4A1B8FE62@DS0PR10MB6056.namprd10.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 2024-05-09 10:29, Mohith Kumar Thummaluru wrote:
+> Good catch! Thanks for this fix. 
 
---36g1c/htqkz0JRR5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+If this is a fix, can you please add a Fixes tag? And in general some
+surrounding context in a cover letter? Thanks.
 
-On Thu, May 09, 2024 at 07:17:31PM +0200, Christoph Fritz wrote:
-> Add dt-bindings for hexDEV hexLINSER serial LIN adapters. These adapters
-> are basically just LIN transceivers that are mostly hard-wired to serial
-> devices.
->=20
-> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
-> ---
->  .../bindings/net/can/hexdev,hex-linser.yaml   | 32 +++++++++++++++++++
->  1 file changed, 32 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/can/hexdev,hex-=
-linser.yaml
->=20
-> diff --git a/Documentation/devicetree/bindings/net/can/hexdev,hex-linser.=
-yaml b/Documentation/devicetree/bindings/net/can/hexdev,hex-linser.yaml
-> new file mode 100644
-> index 0000000000000..42dce3348f73c
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/can/hexdev,hex-linser.yaml
-> @@ -0,0 +1,32 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/can/hexdev,hex-linser.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: hexDEV hexLINSER serial LIN adapter
-> +
-> +description:
-> +  LIN transceiver, mostly hard-wired to a serial device, used for commun=
-ication
-> +  on a LIN bus.
-> +  For more details on the adapter, visit <https://hexdev.de/hexlin#hexLI=
-NSER>.
-
-I figured I should check in firefox this time, link works fine :)
-
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-
-Cheers,
-Conor.
-
---36g1c/htqkz0JRR5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZj0RYQAKCRB4tDGHoIJi
-0rn9AP9GeUrrcK2lOZklZKtI73PoesLELNp3iickgJOn7nnz3gEA2+jfFsbOdudy
-aNhI8GeBNvUtapOXQ7u6wpXTXsMdLgQ=
-=CoEI
------END PGP SIGNATURE-----
-
---36g1c/htqkz0JRR5--
+> 
+> LGTM.
+> 
+> Reviewed-by : Mohith Kumar Thummaluru <mohith.k.kumar.thummaluru@oracle.com>
+> Tested-by: Mohith Kumar Thummaluru <mohith.k.kumar.thummaluru@oracle.com>
+> 
+> Regards,
+> Mohith
+> 
 
