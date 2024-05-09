@@ -1,241 +1,189 @@
-Return-Path: <netdev+bounces-94974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC9DD8C123F
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 17:50:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD268C126A
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 18:06:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 653FC283355
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 15:50:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 502AB2826B0
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 16:06:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82709170828;
-	Thu,  9 May 2024 15:49:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FD216F287;
+	Thu,  9 May 2024 16:06:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGZLxob+"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JD+PZ1mm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9263BBE3;
-	Thu,  9 May 2024 15:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271C7383BD
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 16:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715269790; cv=none; b=MNDoYEvoXTyG5icETN50RpjBQZNi/aKE4C7AeNQ+NlySDiRiJqBdw3Umj03+L58qkxzFZbho+5m8GoaX2rlnPeYwXUmX4T0fuVPQ5z41+Cb/XFm+bj1AuJUYCYYyDaWjt6jCU1uAPXSNiGaRkinsgK0ijAEJMhYgdVxaSVSXuvg=
+	t=1715270812; cv=none; b=PUuqR09B4zWQLUQi7VEhs+ZV6oy8zifqp9FxPaDsUE2hQ4nNF8qKEEc3ywv+a0ira50iwkLmAPVoaQrtk/VByR5ACWRyRRd6qFz6tXmtR8AodIz5eo82MGQtQKW0T86gr+FxFZsIQrAHZk2tZ2Yea/UCfiVyZqjo7+P6aXq9zO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715269790; c=relaxed/simple;
-	bh=fwWU1y6Fq/raMfRnXEAPArvOPb7WTnJwfEnbbmHKMMo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WUoNPF55jlTkfpO0bGIAEyuH/GPBZ9x7MWGNiR4D4/E5wjBZEXcKBE2IzXOFv/nk6Q/vmETvTps/gG782/kND38JdzyCWRRL/UDMrQsWfr4ds+iolOEvBxSH7JGPX83WVCD7MkwpIRx5j59oxZ845Z+n0D3yjn6xHfsXHNo+2co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DGZLxob+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ECA9C4AF08;
-	Thu,  9 May 2024 15:49:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715269789;
-	bh=fwWU1y6Fq/raMfRnXEAPArvOPb7WTnJwfEnbbmHKMMo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=DGZLxob+DWdDmZ5oINztgCw1wZDvVf7ay3e08FbmMxGfabdWnVGjsr/lJ9KG426S7
-	 wg+KfoQ4Z/+iqifBNK0JoLlorU5KZOd3cpJyuJVz74UrafrYr4I65+pD0cQYVZaeGN
-	 dWUhGRz4ZOMRspdGYR/iXnafviYJTUSE51AkUCP4oV7LN0cEyfT1xD2eYIlSxtaSPE
-	 twYlWky0+v6Cg/yahrotiJx2RSOlKVpc+6atB1XCKhquNQ4eRPcrof1fNTrg+eVBzH
-	 PTdK7gKRXAde0AD9m4KlGAJYY3iiMpxmiBgvltsSKaRQR+AlaWDbopABONHHbgJgHY
-	 fNvr8wHGfrJbg==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Thu, 09 May 2024 17:49:12 +0200
-Subject: [PATCH bpf-next v2 2/2] selftests/bpf: Add mptcp subflow subtest
+	s=arc-20240116; t=1715270812; c=relaxed/simple;
+	bh=z/qUOO5YeD5BSjZFI+ma6jMU8ud4L0lr7+Z5cFwkn44=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iNrEFm+tzzKcCR00/PgV0zWoL7ZfcX4/LnVb6CYcoB5Jfu0OwfsKrFWYxCkBPCO6ZoEgV3iR56Opy/s8gmLZig+/gzEehSjmFtZKPVZUaj3V1+BB5zhjS3U8KwOp/5DNHt5jrqe12vtElfab77YwiZnhq5hE047muIQd9RKtIzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=JD+PZ1mm; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a59ab4f60a6so251296866b.0
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 09:06:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1715270809; x=1715875609; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GB/4Z+YptE0jg+l1zDNEeImadVyevI/WgrfpA5GHblw=;
+        b=JD+PZ1mmJT37MNwAq7YfVPqpTQTvD7OZ4mg2pvMmnJtWemjIwYvBRT7ELuFwCiTKEw
+         uYyU4H9sgzpOH+j/KQnJPqiAhEw8F6tmZpNQWTVAJareafkalg2qxTiqu6UJbvkBF3ZS
+         JPUJT64GR2zVoX/9PSE3UGKF1xhrjYbYS0hZI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715270809; x=1715875609;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GB/4Z+YptE0jg+l1zDNEeImadVyevI/WgrfpA5GHblw=;
+        b=KBjmNhe3PGFPAc8+R3PUyFCgXc4nXkN0rl8KcKktHhq+NwVP0s0ZTfE+HYy9eAQhSg
+         GRZbdDnCadmSJhyxtVhlGW2FXFfvs85SXR5f8S9HTZ240rQJ6naIybQzbJ0kEUh6FMHb
+         6OR7tHH9seuvw9Hi8r9pzF5EBduUn+zKLwsvR3lpZ8NPQ3AEbJzhpU+p7jZU7mVbdxGl
+         D7ARvMrbmDdYTsBMLKANetLdsuk6PHDVRBL9a4utoodvvdWDPS+owwEe852XDROQk6yk
+         mXKnILIHVHeiuG75YxfcBVW2AvDwOkZc2M33Z3hMS6OlwXurjmR6GO2YPOm4JxcH+e4k
+         Lr4w==
+X-Forwarded-Encrypted: i=1; AJvYcCVHD1Ce1HIECQB+Cj6Ah59MKMFynjed+oXiZ54mW+t23MVcKny2RhnCZ/ozX9dA5637bUxpB1CnCVE2712NnY2z/fcsU5cG
+X-Gm-Message-State: AOJu0YyTFmlCyfdi9LEBHsejb4sGj+7kjzOIXc+HcdtkEVJFuXu4EJIs
+	DOBof7xvVpsoAGx4vL51DP4/mRgcuq1xshwWupqfHE8PZYn/dQlxXkjyiUkHftZsOg1GVys593l
+	87dkT5sZEgYdBO1JBGzN87Z9oZuLl+N7CTc7kaQRPuksNAJ0=
+X-Google-Smtp-Source: AGHT+IEwVOfalPtqjyFiHyVoblIKM86Zc2S6ZY01DkP9N9v2Vf/Gx6NU1WqpvCZImy9rYmrU7whMTlmd5DG28Tey7vE=
+X-Received: by 2002:a50:f60d:0:b0:572:7c13:c7d8 with SMTP id
+ 4fb4d7f45d1cf-5734d6effa0mr89584a12.34.1715270808467; Thu, 09 May 2024
+ 09:06:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240509-upstream-bpf-next-20240506-mptcp-subflow-test-v2-2-4048c2948665@kernel.org>
-References: <20240509-upstream-bpf-next-20240506-mptcp-subflow-test-v2-0-4048c2948665@kernel.org>
-In-Reply-To: <20240509-upstream-bpf-next-20240506-mptcp-subflow-test-v2-0-4048c2948665@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
- Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Geliang Tang <tanggeliang@kylinos.cn>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4451; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=LJOvAclIqDeTdcev8kuUSRjihzhLlQDft5mKWsBKgVA=;
- b=kA0DAAgB9reCT0JpoHMByyZiAGY88I6gJC+qoBHY0rayM2/i1+mgE4r9HTrzf1Byy6x2nsshU
- 4kCMwQAAQgAHRYhBOjLhfdodwV6bif3eva3gk9CaaBzBQJmPPCOAAoJEPa3gk9CaaBz13YP/RDY
- XXwOC+86HWPGvJ10RvVL4e/1himpNFmzBbou2tqHBkr19qD0Ji2xmqnnI4LsY+QLsxhBEcM+8BZ
- ATdMxxXkhvTHKcyKOaqnpY0mNvZd/4ByQYia0Ykh2nDzsVwRXV3S3z4QEPpG1Qq/3OLBSrd/YJX
- bHU0hGII1occkeYG0LOZU/I0I00Yb5PjqswKtce49ruVgFfpIr+HmVGyvY70dwGY8Q8gMHoWhGq
- Sx1oilBRsglXGT7llNl/YZQ8advZdFmvjRkgyZYaah+2ESHHeXksAFTTlSkaaDFdESc+0iKaxcp
- hUc5buOlJidc0cq6lahyh82cnpNGtEYWd/QvvWe3u50/yFGKSojgP4NQbuWVUVVe7KXIr1WhNDH
- R0hT5CssUmARyzdtDO3Wzq2fbYagkCjPyk59eyCb5pVgWavOfXHCEOGrPdz13+XEObun2h1XZ/W
- 3Gw0halfqVsMr+MgL1l/HoTqDz/6wVIf+y6UX386ooBx3xCYt9OScNCYoE+zfOemsc1QPBbc3wj
- hSq+44GN/deXfASymVFiAGxLea0fRceRmWotMTM8/FfIDGflHcnqyjSh4tjMTB45hnnicDgucLw
- ayVYb6vXpR/sxXTdWQE94pDgUUmYnwEKsOP5fAj0x+2m+m9/qEtDYCaqGk8QTza1ytt9TRPEGAg
- Wo0/h
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+References: <20240509151833.12579-1-vadim.fedorenko@linux.dev>
+In-Reply-To: <20240509151833.12579-1-vadim.fedorenko@linux.dev>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Thu, 9 May 2024 09:06:36 -0700
+Message-ID: <CACKFLikp26CsUcv2-cf9DkBgNAbMxoiw32cQ63FQi8T1TB1XVA@mail.gmail.com>
+Subject: Re: [PATCH net] bnxt_en: silence clang build warning
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000004f72010618079bf5"
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+--0000000000004f72010618079bf5
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This patch adds a subtest named test_subflow to load and verify the newly
-added mptcp subflow example in test_mptcp. Add a helper endpoint_init()
-to add a new subflow endpoint. Add another helper ss_search() to verify the
-fwmark and congestion values set by mptcp_subflow prog using setsockopts.
+On Thu, May 9, 2024 at 8:16=E2=80=AFAM Vadim Fedorenko
+<vadim.fedorenko@linux.dev> wrote:
+>
+> Clang build brings a warning:
+>
+>     ../drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:133:12: warning:
+>     comparison of distinct pointer types ('typeof (tmo_us) *' (aka 'unsig=
+ned
+>     int *') and 'typeof (65535) *' (aka 'int *'))
+>     [-Wcompare-distinct-pointer-types]
+>       133 |                 tmo_us =3D min(tmo_us, BNXT_PTP_QTS_MAX_TMO_U=
+S);
+>           |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> Fix it by specifying proper type for BNXT_PTP_QTS_MAX_TMO_US.
+>
+> Fixes: 7de3c2218eed ("bnxt_en: Add a timeout parameter to bnxt_hwrm_port_=
+ts_query()")
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/76
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/bpf/prog_tests/mptcp.c | 109 +++++++++++++++++++++++++
- 1 file changed, 109 insertions(+)
+Thanks.
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-index 274d2e033e39..6039b0ff3801 100644
---- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-+++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-@@ -9,8 +9,12 @@
- #include "network_helpers.h"
- #include "mptcp_sock.skel.h"
- #include "mptcpify.skel.h"
-+#include "mptcp_subflow.skel.h"
- 
- #define NS_TEST "mptcp_ns"
-+#define ADDR_1	"10.0.1.1"
-+#define ADDR_2	"10.0.1.2"
-+#define PORT_1	10001
- 
- #ifndef IPPROTO_MPTCP
- #define IPPROTO_MPTCP 262
-@@ -340,10 +344,115 @@ static void test_mptcpify(void)
- 	close(cgroup_fd);
- }
- 
-+static int endpoint_init(char *flags)
-+{
-+	SYS(fail, "ip -net %s link add veth1 type veth peer name veth2", NS_TEST);
-+	SYS(fail, "ip -net %s addr add %s/24 dev veth1", NS_TEST, ADDR_1);
-+	SYS(fail, "ip -net %s link set dev veth1 up", NS_TEST);
-+	SYS(fail, "ip -net %s addr add %s/24 dev veth2", NS_TEST, ADDR_2);
-+	SYS(fail, "ip -net %s link set dev veth2 up", NS_TEST);
-+	SYS(fail, "ip -net %s mptcp endpoint add %s %s", NS_TEST, ADDR_2, flags);
-+
-+	return 0;
-+fail:
-+	return -1;
-+}
-+
-+static int _ss_search(char *src, char *dst, char *port, char *keyword)
-+{
-+	char cmd[128];
-+	int n;
-+
-+	n = snprintf(cmd, sizeof(cmd),
-+		     "ip netns exec %s ss -Menita src %s dst %s %s %d | grep -q '%s'",
-+		     NS_TEST, src, dst, port, PORT_1, keyword);
-+	if (n < 0 || n >= sizeof(cmd))
-+		return -1;
-+
-+	return system(cmd);
-+}
-+
-+static int ss_search(char *src, char *keyword)
-+{
-+	return _ss_search(src, ADDR_1, "dport", keyword);
-+}
-+
-+static void run_subflow(char *new)
-+{
-+	int server_fd, client_fd, err;
-+	char cc[TCP_CA_NAME_MAX];
-+	socklen_t len = sizeof(cc);
-+
-+	server_fd = start_mptcp_server(AF_INET, ADDR_1, PORT_1, 0);
-+	if (!ASSERT_GE(server_fd, 0, "start_mptcp_server"))
-+		return;
-+
-+	client_fd = connect_to_fd(server_fd, 0);
-+	if (!ASSERT_GE(client_fd, 0, "connect to fd"))
-+		goto fail;
-+
-+	err = getsockopt(server_fd, SOL_TCP, TCP_CONGESTION, cc, &len);
-+	if (!ASSERT_OK(err, "getsockopt(srv_fd, TCP_CONGESTION)"))
-+		goto fail;
-+
-+	send_byte(client_fd);
-+
-+	ASSERT_OK(ss_search(ADDR_1, "fwmark:0x1"), "ss_search fwmark:0x1");
-+	ASSERT_OK(ss_search(ADDR_2, "fwmark:0x2"), "ss_search fwmark:0x2");
-+	ASSERT_OK(ss_search(ADDR_1, new), "ss_search new cc");
-+	ASSERT_OK(ss_search(ADDR_2, cc), "ss_search default cc");
-+
-+	close(client_fd);
-+fail:
-+	close(server_fd);
-+}
-+
-+static void test_subflow(void)
-+{
-+	int cgroup_fd, prog_fd, err;
-+	struct mptcp_subflow *skel;
-+	struct nstoken *nstoken;
-+
-+	cgroup_fd = test__join_cgroup("/mptcp_subflow");
-+	if (!ASSERT_GE(cgroup_fd, 0, "join_cgroup: mptcp_subflow"))
-+		return;
-+
-+	skel = mptcp_subflow__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel_open_load: mptcp_subflow"))
-+		goto close_cgroup;
-+
-+	err = mptcp_subflow__attach(skel);
-+	if (!ASSERT_OK(err, "skel_attach: mptcp_subflow"))
-+		goto skel_destroy;
-+
-+	prog_fd = bpf_program__fd(skel->progs.mptcp_subflow);
-+	err = bpf_prog_attach(prog_fd, cgroup_fd, BPF_CGROUP_SOCK_OPS, 0);
-+	if (!ASSERT_OK(err, "prog_attach"))
-+		goto skel_destroy;
-+
-+	nstoken = create_netns();
-+	if (!ASSERT_OK_PTR(nstoken, "create_netns: mptcp_subflow"))
-+		goto skel_destroy;
-+
-+	if (!ASSERT_OK(endpoint_init("subflow"), "endpoint_init"))
-+		goto close_netns;
-+
-+	run_subflow(skel->data->cc);
-+
-+close_netns:
-+	cleanup_netns(nstoken);
-+skel_destroy:
-+	mptcp_subflow__destroy(skel);
-+close_cgroup:
-+	close(cgroup_fd);
-+}
-+
- void test_mptcp(void)
- {
- 	if (test__start_subtest("base"))
- 		test_base();
- 	if (test__start_subtest("mptcpify"))
- 		test_mptcpify();
-+	if (test__start_subtest("subflow"))
-+		test_subflow();
- }
+--0000000000004f72010618079bf5
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
--- 
-2.43.0
-
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIP4Hbn/kn2dvLbEteINTDLB+qHDnYTlZ
+lC9fWhATGj3kMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDUw
+OTE2MDY0OVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQB6X7oyfVVm/V+a5rjlBL54H/QDY0rhaDi+lJJCsjJmH4khf9K+
+aV8VNjtfvWLjUTMNBDB+Ta7+OOcHE8jfScV/PAcWQcKvq2Oua93pIjDZBXKjEugAeLSqVitiVHvd
+ZV6i9tV9Y+xsDgT25P1cQNYQyA7TSoFXs2yq1eGerJoZumlG+zXpGHcMKiOcCuV9XGLOBlBai8Ma
+cfdRwy5wiN0UPSdbr/7x3FmY1RzdB0D4kI/J0OBO9VeFJc6ApQbBJr4SgsVwinoi+b2VVSgi8c5B
+MjYDUXDigRdAEXEvEkbhxqAzcvHr8TGp6YGhEiGPeTrSBdVpo2FVnkKnSLYpRtTy
+--0000000000004f72010618079bf5--
 
