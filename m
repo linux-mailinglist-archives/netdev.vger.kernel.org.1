@@ -1,216 +1,202 @@
-Return-Path: <netdev+bounces-94955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AAFC8C117C
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 16:47:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8523D8C117F
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 16:49:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E3751C21E65
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 14:47:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1E671C208CF
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 14:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A426612E1F6;
-	Thu,  9 May 2024 14:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301C43AC2B;
+	Thu,  9 May 2024 14:49:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P0lEfVc/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eFf8zukh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3641A291;
-	Thu,  9 May 2024 14:47:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B891A291
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 14:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715266022; cv=none; b=gQlvuQGf4MtndP7j5d7v+ELT4B/d8YGxv8uK2by/avkkqGG0+G8YD1l9fL149kFAu/PAx3pBJVcAJbbRrtpzs0q+1PIxYrrsPh+FTh1KnYwRilYPX7SX74IpBYxZuKBO5tx68uVVlIoyCSsYrUwJ0vFwey7ktMGCkKGJJitdJ3Q=
+	t=1715266188; cv=none; b=QYhM//CMHvd2l0C/TLK7cd/glRbNObQLLhdXAoit3FDjyshgIes8z9QaFcfhd8DhiPgzq2kIypo4HKaqYFs5H/xumgagrlfIg6DMaQgZrRECBtteS1ociy6zMJ1qZda5niHWMOrrofl7JpEwWbMvcJTAMHy9yJijNLFKmoTb2Pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715266022; c=relaxed/simple;
-	bh=44nu8TQxim7F3121JfCwQxg3SRkVOTAgI+q5yLgxXI8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rcAzPGLKLtB3ogsUbKpT/Ow82wHgtF2urIXwNbv/hSrbZ+xxOOuQA4xcwMsrH0ch3yI2fvvjfW2Es9Wwip9Pgj8wKjWaq4HX0mSfdjGY9NexIbGrMaSJvTAa9KJgGnOCp8NTvv4PdThOw+0RmsX7T/vvEXTfu15+w1N7/fLs/QM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P0lEfVc/; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715266021; x=1746802021;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=44nu8TQxim7F3121JfCwQxg3SRkVOTAgI+q5yLgxXI8=;
-  b=P0lEfVc/s//qXkMO627xZy+p0BBx7WJJJ0g4j6v0EFv3W2VbF6eHhIqx
-   xqf4bVWpl2+dQGB9kzC8of36SZ3ocUOcgrkqs78j/q0d8euETfOJYKBh0
-   1XiVEgnxyoKmM5BB/x+37ZQh+PqRGPrWie5WGK//2hq6PrRNYLr18HZ0d
-   AyCCEcYG8NxqyChLZrNMQal3svf63oZ04gYHfo6F4XafrJ5yobh+RLf5f
-   A7DMdf3NzJmKlJaAOqWkO64qC8SCEXs/RalcWxjvUrTwEJfyO4qum/3zC
-   cxqi3Zr/WIY/QyAKiaLwHlCIX+CXgHLv3MSO4QuuI3AplMmU4aUzMDpb2
-   A==;
-X-CSE-ConnectionGUID: CbB/oyKlTlq2wMwVOZKbKQ==
-X-CSE-MsgGUID: js4hFtT2R7um2Kt/2su+7A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11067"; a="11052035"
-X-IronPort-AV: E=Sophos;i="6.08,148,1712646000"; 
-   d="scan'208";a="11052035"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2024 07:47:00 -0700
-X-CSE-ConnectionGUID: tiVKl2c0RcGZ8zyTSJAfAw==
-X-CSE-MsgGUID: WSHUraYDR+CfMCbB9uynSw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,148,1712646000"; 
-   d="scan'208";a="34119686"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa004.jf.intel.com with ESMTP; 09 May 2024 07:46:56 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Steven Price <steven.price@arm.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] dma: fix DMA sync for drivers not calling dma_set_mask*()
-Date: Thu,  9 May 2024 16:46:16 +0200
-Message-ID: <20240509144616.938519-1-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.45.0
+	s=arc-20240116; t=1715266188; c=relaxed/simple;
+	bh=WQEXcfTY50KR4jNxT0kstC2ZQMe6GUcPl3mXTMvdVks=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N4D6lN9XAgcBYhUJ8TS+8XlOARSddVhreiSKhsJYD/P4SH68atKW01zxkvVUKC72iV2qXcx1vv8Hpx4joo4SRfXEd92CUJgluEPQzdOWIluQ0G8ceQkjZ2ctfkgUZoC6aYMNybZlSaSKRhvLC8DWpGvxza92o18/6EOJJ+MYtLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eFf8zukh; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-572f6c56cdaso17643a12.0
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 07:49:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715266184; x=1715870984; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dXmNcVc3OL5b8qlh51akDuOijw6KmJMEpIHgtYE7qgc=;
+        b=eFf8zukhjjV8tGJHCjSSHo7qd1sw5OYKRSzuNYO1IuwpHzr88CMV0hVPJ5mnugYD+C
+         mw/fU+0mZhqm31mk7fcoceVgoiL2tBKlfkQ9PO45swYME6Em6wjuDaxuKD/L8vte5w9D
+         +W8c9JgxziMPKMLE+7EsmRtC1jZ9HxMYGm/GKGXY38dRrbJqkRVfkACQIikOr0j6VYXB
+         uH2KJN66JHaRcYPb1EgUL9H54nHD/4WaRTIuJx4E3pMm99Hxndqr0I/V3+ux4Xl0RenF
+         880nfLos8NeAUkNseEtvna25YKB5xBCVhdunsbaCEwl3TDW6+PqXOc5TFsK3bRjh+xD8
+         MPIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715266184; x=1715870984;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dXmNcVc3OL5b8qlh51akDuOijw6KmJMEpIHgtYE7qgc=;
+        b=VUcUmp2BNe2nUn9U2ekusprqJDBuMDBzscqSGbl40uKTw2cp2VZJf/1jG6RlOhGdqQ
+         58C4FpeDruRFpNggD3QOt5RNRmNgPwEfDYqE6aki8fUw7vYaFjYND/ysqvlPX3luE6Ou
+         ngzm/ub90he+F89GcKQBePWLH5lKzUygeo77SuBelUPxWxxxtI9iOYneX/IUN80A43bu
+         i28wm2uMAlo6GsoEPDSh8L9YoQYeQs7TEnWEiI7Km+VK+y3Nuj9OwwjZ+ZT8mSEvrHai
+         0OuGbIJlebi0RH1MK7NhaxeEJc0rueHRykNEnf1vB7L5NOhzn920GCARAs7aeCXwq5XS
+         xNGA==
+X-Forwarded-Encrypted: i=1; AJvYcCUb3hfhG9mtQjaI5cAqFDm0dIVedLkmbDzb3pQfgJt0FASQ705URLmRdct1H335VI3t+rgPmVZ60kkKVb4a8VTwoCbSdymY
+X-Gm-Message-State: AOJu0YzO2ZjP8SNJGjp+fe2qlVwv8suNe+ls6kfbRukIcY1A/w7vPbpF
+	pWvxN/rfGaH3ug8t/Lwup7XJRtINqidRN/dsmF6mhwys25aq57kvqJUYmXSPUn4lGilq5yjIXok
+	em0V8IstuGJbvQ7G6bQngsMIf2VB2XTS8Aiyg
+X-Google-Smtp-Source: AGHT+IHpgmi+JfcaEEiOj6RfPhdxMYW2Sm/QS6Q8XvqZTKfvSH800aRiu7iKUXWfcHd3uashCFWiB6o9aHdEiPjDAn4=
+X-Received: by 2002:aa7:d704:0:b0:572:57d8:4516 with SMTP id
+ 4fb4d7f45d1cf-5733415ad8cmr187759a12.2.1715266184217; Thu, 09 May 2024
+ 07:49:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240509-gemini-ethernet-fix-tso-v1-0-10cd07b54d1c@linaro.org>
+ <20240509-gemini-ethernet-fix-tso-v1-1-10cd07b54d1c@linaro.org>
+ <CANn89iKgi6yEEenSy1M-PVRYWz=Ri9UorV7irCywOZ8xTbNk_A@mail.gmail.com> <CACRpkdYyyQ_=2FmEe7FjDT-2BrhO5GezdXk35werHwBNA=uO=Q@mail.gmail.com>
+In-Reply-To: <CACRpkdYyyQ_=2FmEe7FjDT-2BrhO5GezdXk35werHwBNA=uO=Q@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 9 May 2024 16:49:30 +0200
+Message-ID: <CANn89i+JphFK4TCVjXxbxCicJwrxFC=+ngjnheZWK3KvCJ4Ocg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net: ethernet: cortina: Restore TSO support
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There are several reports that the DMA sync shortcut broke non-coherent
-devices.
-dev->dma_need_sync is false after the &device allocation and if a driver
-didn't call dma_set_mask*(), it will still be false even if the device
-is not DMA-coherent and thus needs synchronizing. Due to historical
-reasons, there's still a lot of drivers not calling it.
-Invert the boolean, so that the sync will be performed by default and
-the shortcut will be enabled only when calling dma_set_mask*().
+On Thu, May 9, 2024 at 4:38=E2=80=AFPM Linus Walleij <linus.walleij@linaro.=
+org> wrote:
+>
+> On Thu, May 9, 2024 at 10:21=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> > On Thu, May 9, 2024 at 9:48=E2=80=AFAM Linus Walleij <linus.walleij@lin=
+aro.org> wrote:
+> > >
+> > > An earlier commit deleted the TSO support in the Cortina Gemini
+> > > driver because the driver was confusing gso_size and MTU,
+> > > probably because what the Linux kernel calls "gso_size" was
+> > > called "MTU" in the datasheet.
+> > >
+> > > Restore the functionality properly reading the gso_size from
+> > > the skbuff.
+> > >
+> > > Tested with iperf3, running a server on a different machine
+> > > and client on the device with the cortina gemini ethernet:
+> > >
+> > > Connecting to host 192.168.1.2, port 5201
+> > > 60008000.ethernet-port eth0: segment offloading mss =3D 05a8 len=3D1c=
+8a
+> > > 60008000.ethernet-port eth0: segment offloading mss =3D 05a8 len=3D1c=
+8a
+> > > 60008000.ethernet-port eth0: segment offloading mss =3D 05a8 len=3D27=
+da
+> > > 60008000.ethernet-port eth0: segment offloading mss =3D 05a8 len=3D0b=
+92
+> > > 60008000.ethernet-port eth0: segment offloading mss =3D 05a8 len=3D2b=
+da
+> > > (...)
+> > >
+> > > It also performs well: ~268 MBit/s.
+> >
+> > This does not look very good to me ?
+>
+> Oh it's pretty typical. This is an ARMv4 router from 2007, end-of-lifed
+> in 2015, and it is not meant to be stressed by the software like
+> this, the idea is that packets get routed by the DSA switch
+> (RTL8366RB).
+>
+> > What number do you have when/if TSO is turned off ?
+>
+> Around 187 MBit/s.
+>
+> > > +       /* Translate to link layer size */
+> > > +       mss +=3D ETH_HLEN;
+> > > +       if (skb->protocol =3D=3D htons(ETH_P_8021Q))
+> > > +               mss +=3D VLAN_HLEN;
+> >
+> > Are you sure this is needed at all ?
+> > Why not include IP and TCP header sizes as well, if the datasheet
+> > mentions 'link layer size' ?
+>
+> Actually that code is just reusing the mss variable for
+> skb->len in the case where TSO is not used, so I'll try to
+> be more elaborate in the code :/
+>
+> I guess I actually need to account for it if ->gso_size expand
+> to the MTU of the interface if I bump it up. But I don't
+> know if the the TSO code actually does this or if it is
+> more conservative?
+>
+> > To double check, please disable GRO on the receive side and verify the
+> > packet sizes with tcpdump.
+> >
+> > Typically, for MTU=3D1500, IPv4, and TCP timestamp enabled,
+> > skb_shinfo(skb)->gso_size is 1448
+> >
+> > (Because 20 (ipv4 header) + 32 (tcp header with TS option) + 1448 =3D 1=
+500)
+>
+> I disabled all segment offloading on the receiving side:
+> ethtool -K enp2s0 gro off gso off tso off
 
-Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-Closes: https://lore.kernel.org/lkml/46160534-5003-4809-a408-6b3a3f4921e9@samsung.com
-Reported-by: Steven Price <steven.price@arm.com>
-Closes: https://lore.kernel.org/lkml/010686f5-3049-46a1-8230-7752a1b433ff@arm.com
-Fixes: 32ba8b823252 ("dma: avoid redundant calls for sync operations")
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/linux/device.h      |  4 ++--
- include/linux/dma-map-ops.h |  4 ++--
- include/linux/dma-mapping.h |  2 +-
- kernel/dma/mapping.c        | 10 +++++-----
- kernel/dma/swiotlb.c        |  2 +-
- 5 files changed, 11 insertions(+), 11 deletions(-)
+>
+> The iperf3 -c generates segmens like in the commit message:
+> gemini-ethernet-port 60008000.ethernet-port eth0: segment offloading
+> mss =3D 05a8 len=3D2bda
+> gemini-ethernet-port 60008000.ethernet-port eth0: segment offloading
+> mss =3D 05a8 len=3D27da
+> gemini-ethernet-port 60008000.ethernet-port eth0: segment offloading
+> mss =3D 05a8 len=3D0b92
+>
+> And 05a8 is 1448 so it is expected.
+>
+> tcpdump -e -X enp2s0 gives this on a single segment in a segmented
+> iperf3 -c transfer:
+>
+> 16:24:09.182095 14:d6:4d:a8:3c:4f (oui Unknown) > fc:34:97:01:a0:c6
+> (oui Unknown), ethertype IPv4 (0x0800), length 1448: OpenWrt.lan.56624
+> > Fecusia.targus-getdata1: Flags [.], seq 18664:20046, ack 1, win
+> 4198, options [nop,nop,TS val 2770370491 ecr 3490176978], length 1382
+>     0x0000:  4500 059a 8ff6 4000 4006 218d c0a8 0188  E.....@.@.!.....
+>     0x0010:  c0a8 0102 dd30 1451 a701 4f9d e809 8788  .....0.Q..O.....
+>     0x0020:  8010 1066 0b60 0000 0101 080a a520 7fbb  ...f.`..........
+> (...)
+>     0x0580:  de60 2081 5678 4f8b 31b1 6f85 87fe ae63  .`..VxO.1.o....c
+>     0x0590:  e2ca 8281 fa72 16aa 52e2                 .....r..R.
+>
+> As can be seen in the header, it is indeed 1448 bytes when arriving
+> as well, so it seems to work!
 
-diff --git a/include/linux/device.h b/include/linux/device.h
-index ed95b829f05b..d4b50accff26 100644
---- a/include/linux/device.h
-+++ b/include/linux/device.h
-@@ -691,7 +691,7 @@ struct device_physical_location {
-  *		and optionall (if the coherent mask is large enough) also
-  *		for dma allocations.  This flag is managed by the dma ops
-  *		instance from ->dma_supported.
-- * @dma_need_sync: The device needs performing DMA sync operations.
-+ * @dma_skip_sync: DMA sync operations can be skipped for coherent buffers.
-  *
-  * At the lowest level, every device in a Linux system is represented by an
-  * instance of struct device. The device structure contains the information
-@@ -805,7 +805,7 @@ struct device {
- 	bool			dma_ops_bypass : 1;
- #endif
- #ifdef CONFIG_DMA_NEED_SYNC
--	bool			dma_need_sync:1;
-+	bool			dma_skip_sync:1;
- #endif
- };
- 
-diff --git a/include/linux/dma-map-ops.h b/include/linux/dma-map-ops.h
-index 4893cb89cb52..5217b922d29f 100644
---- a/include/linux/dma-map-ops.h
-+++ b/include/linux/dma-map-ops.h
-@@ -280,8 +280,8 @@ static inline void dma_reset_need_sync(struct device *dev)
- {
- #ifdef CONFIG_DMA_NEED_SYNC
- 	/* Reset it only once so that the function can be called on hotpath */
--	if (unlikely(!dev->dma_need_sync))
--		dev->dma_need_sync = true;
-+	if (unlikely(dev->dma_skip_sync))
-+		dev->dma_skip_sync = false;
- #endif
- }
- 
-diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-index eb4e15893b6c..f693aafe221f 100644
---- a/include/linux/dma-mapping.h
-+++ b/include/linux/dma-mapping.h
-@@ -295,7 +295,7 @@ bool __dma_need_sync(struct device *dev, dma_addr_t dma_addr);
- static inline bool dma_dev_need_sync(const struct device *dev)
- {
- 	/* Always call DMA sync operations when debugging is enabled */
--	return dev->dma_need_sync || IS_ENABLED(CONFIG_DMA_API_DEBUG);
-+	return !dev->dma_skip_sync || IS_ENABLED(CONFIG_DMA_API_DEBUG);
- }
- 
- static inline void dma_sync_single_for_cpu(struct device *dev, dma_addr_t addr,
-diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
-index 3524bc92c37f..3f77c3f8d16d 100644
---- a/kernel/dma/mapping.c
-+++ b/kernel/dma/mapping.c
-@@ -392,7 +392,7 @@ bool __dma_need_sync(struct device *dev, dma_addr_t dma_addr)
- 
- 	if (dma_map_direct(dev, ops))
- 		/*
--		 * dma_need_sync could've been reset on first SWIOTLB buffer
-+		 * dma_skip_sync could've been reset on first SWIOTLB buffer
- 		 * mapping, but @dma_addr is not necessary an SWIOTLB buffer.
- 		 * In this case, fall back to more granular check.
- 		 */
-@@ -407,20 +407,20 @@ static void dma_setup_need_sync(struct device *dev)
- 
- 	if (dma_map_direct(dev, ops) || (ops->flags & DMA_F_CAN_SKIP_SYNC))
- 		/*
--		 * dma_need_sync will be reset to %true on first SWIOTLB buffer
-+		 * dma_skip_sync will be reset to %false on first SWIOTLB buffer
- 		 * mapping, if any. During the device initialization, it's
- 		 * enough to check only for the DMA coherence.
- 		 */
--		dev->dma_need_sync = !dev_is_dma_coherent(dev);
-+		dev->dma_skip_sync = dev_is_dma_coherent(dev);
- 	else if (!ops->sync_single_for_device && !ops->sync_single_for_cpu &&
- 		 !ops->sync_sg_for_device && !ops->sync_sg_for_cpu)
- 		/*
- 		 * Synchronization is not possible when none of DMA sync ops
- 		 * is set.
- 		 */
--		dev->dma_need_sync = false;
-+		dev->dma_skip_sync = true;
- 	else
--		dev->dma_need_sync = true;
-+		dev->dma_skip_sync = false;
- }
- #else /* !CONFIG_DMA_NEED_SYNC */
- static inline void dma_setup_need_sync(struct device *dev) { }
-diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
-index ae3e593eaadb..068134697cf1 100644
---- a/kernel/dma/swiotlb.c
-+++ b/kernel/dma/swiotlb.c
-@@ -1409,7 +1409,7 @@ phys_addr_t swiotlb_tbl_map_single(struct device *dev, phys_addr_t orig_addr,
- 	}
- 
- 	/*
--	 * If dma_need_sync wasn't set, reset it on first SWIOTLB buffer
-+	 * If dma_skip_sync was set, reset it on first SWIOTLB buffer
- 	 * mapping to always sync SWIOTLB buffers.
- 	 */
- 	dma_reset_need_sync(dev);
--- 
-2.45.0
+Not really.
 
+Try to disable TSO, and look at the resulting incoming packets, how
+they are different.
+
+If skb_shinfo(skb)->gso_size is 1448, you should receive something like
+
+seq 18664:20112 .... length 1448  (this is the payload len at this stage)
+
+If you receive instead ".... length 1382" this means you gave to the
+NIC a 'link layer MSS' too small by 66 bytes.
 
