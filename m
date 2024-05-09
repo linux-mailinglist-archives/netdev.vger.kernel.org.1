@@ -1,135 +1,180 @@
-Return-Path: <netdev+bounces-95129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B73E38C174A
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 22:27:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D2758C1763
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 22:27:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4C621C2082F
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:27:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE38E1C20915
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 20:27:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4043811E6;
-	Thu,  9 May 2024 20:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C6B86240;
+	Thu,  9 May 2024 20:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="12ubbAa0"
+	dkim=pass (2048-bit key) header.d=efficios.com header.i=@efficios.com header.b="HPZWOmhn"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpout.efficios.com (smtpout.efficios.com [167.114.26.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9081784E0B
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 20:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4F580BE5;
+	Thu,  9 May 2024 20:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.114.26.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715285337; cv=none; b=jjDEmCpwZrRmdLIhwFs85V7qK1dfeZDlVHDLJK59wDrThwH3NwShEcED5hFNJotx9/wVL7jbi8BRL9Fss2CksCFUCrBqU5WtrVXXRRHWCJe6uehAx2N7hwTM1Gd370zaUs4GmSaQ/COKWU2hxfNjQ66tNNUH4Abyo6EJAx1ofgE=
+	t=1715285773; cv=none; b=nwncLGbTUR9isNlfkxTEv/YqXC46G+RejkoV+juMAHKJzOhJcWDQpnMJhW7SDxFsb2dneYUJIDfk/WqB0y5vuVsx+Q/x5/qlbDA9FJVOWILCW9wBAxf52T5IvO0tzs1UMWPgz0u4Y0oB1BTW8G7xhUFdu0ha/U0W/pR3t/bYtJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715285337; c=relaxed/simple;
-	bh=aOSszBxpeDyjnZDXGr3iYypcM5hKAr5soH2k6BaDM7k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EAbAO+aUzcr2SN9lnDAEpNO/PnSEJEmzAc9ELQ+29x76/uxCH1x0Z+Su2SnRk1J1xDO3k90nQVO6CRsJbJgjU/xynZzpJF+UReMIi82QMMhbac70FhbwQkPx5JPxgaYd+n3rmGP2ZV4h3FlcAr0LJ09JHO+m64o2zH/PW1tDxt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=12ubbAa0; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Z0LTjuvyo0fpGXlo2vdqreZA9HtIJ4VTaNFqkzC2bG8=; b=12ubbAa0Wy8E7ZuXt81/Sx19J9
-	rvw7hpnAoIxfbv/VoAQMxFyOQlPTzP0ZuYz7dUX4GanEmAaD8mr4IyhR4Pk57101tvwqWz97YlfHy
-	gtW96wtfrSGuy0/YCnvqpYx5ZGKhZB03v3EfnbhKF9dTzfTXaRPYv6KXtG8oYihDWgAU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s5A4L-00F4ju-EH; Thu, 09 May 2024 22:08:45 +0200
-Date: Thu, 9 May 2024 22:08:45 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: ethernet: cortina: Implement
- .set_pauseparam()
-Message-ID: <55d915d2-28f0-4ed3-8f60-b43e7f4469ac@lunn.ch>
-References: <20240509-gemini-ethernet-fix-tso-v1-0-10cd07b54d1c@linaro.org>
- <20240509-gemini-ethernet-fix-tso-v1-2-10cd07b54d1c@linaro.org>
+	s=arc-20240116; t=1715285773; c=relaxed/simple;
+	bh=cMWw8x/P40/KMWgVweNbntQjYA+K9n2XKgcRYU9QC9I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RWj7pCbiJUYOoNITLg2fMvzibWkoG5woXPyoKyZ3FDQs3ED0W7yHe8FzClP3TJTL8Ft4SjxLzJMcbaZfN8CbmxM47sRBdjF+slL2QBRCWFtTpPmpnmvL5GIU6enZ98pvfds0yFpulvt6Zb/MV5kIJgrWbkayjnvSwEqejzhcek4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=efficios.com; spf=pass smtp.mailfrom=efficios.com; dkim=pass (2048-bit key) header.d=efficios.com header.i=@efficios.com header.b=HPZWOmhn; arc=none smtp.client-ip=167.114.26.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=efficios.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=efficios.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=efficios.com;
+	s=smtpout1; t=1715285763;
+	bh=cMWw8x/P40/KMWgVweNbntQjYA+K9n2XKgcRYU9QC9I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=HPZWOmhnoRkqipHqnwg6g545VwMlsV8zx/BSHSoFPE4eWw/mPW4cf0jmeu422Z636
+	 jLntHYOgVNutEjpLrWE9rP1+MPli0NS8sJtlLTVtYguaOTUm+CI3HmXiFtMYktT8Ql
+	 FX7RzuXYLAAEEvihpE/pWrH7pdCmnGMkPWZh//qC1SMDLhRv9YnaftIhQfQitZZkKa
+	 RamXBJLbx3DsqqXTvrWF2nqFsEHQH+JMe/Okl/wi7F4CIjX7ap+LzVAwX78Jj8CHfN
+	 IFkpFCckFqnrzKm/TaiKH4FX05dPGhNGc4WCKG05ghyQKfvelcPFGNsUruPcwx/gTc
+	 /zFV5k2dA0e8g==
+Received: from [172.16.0.134] (192-222-143-198.qc.cable.ebox.net [192.222.143.198])
+	by smtpout.efficios.com (Postfix) with ESMTPSA id 4Vb3Df5nW8zyZy;
+	Thu,  9 May 2024 16:16:02 -0400 (EDT)
+Message-ID: <638a7831-493c-4917-9b22-5aa663e9ee84@efficios.com>
+Date: Thu, 9 May 2024 16:16:20 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240509-gemini-ethernet-fix-tso-v1-2-10cd07b54d1c@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 54/68] selftests/rseq: Drop define _GNU_SOURCE
+To: Edward Liaw <edliaw@google.com>, shuah@kernel.org,
+ =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+ =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
+ Christian Brauner <brauner@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Peter Zijlstra <peterz@infradead.org>, "Paul E. McKenney"
+ <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Muhammad Usama Anjum <usama.anjum@collabora.com>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-team@android.com, linux-security-module@vger.kernel.org,
+ netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+ bpf@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>
+References: <20240509200022.253089-1-edliaw@google.com>
+ <20240509200022.253089-55-edliaw@google.com>
+From: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Content-Language: en-US
+In-Reply-To: <20240509200022.253089-55-edliaw@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 09, 2024 at 09:48:38AM +0200, Linus Walleij wrote:
-> The Cortina Gemini ethernet can very well set up TX or RX
-> pausing, so add this functionality to the driver in a
-> .set_pauseparam() callback.
+On 2024-05-09 15:58, Edward Liaw wrote:
+> _GNU_SOURCE is provided by lib.mk, so it should be dropped to prevent
+> redefinition warnings.
 > 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> Fixes: 809216233555 ("selftests/harness: remove use of LINE_MAX")
+
+The patch per se looks fine, except for the "Fixes" tag.
+
+Commit 809216233555 introduces use of asprintf in kselftest_harness.h
+which is used by (all ?) selftests, including the rseq ones. However,
+the rseq selftests each have the #define _GNU_SOURCE, which would have
+been OK without those further changes.
+
+So this patch is more about consolidating where the _GNU_SOURCE is
+defined, which is OK with me, but not so much about "fixing" an
+issue with commit 809216233555.
+
+A "Fix" is something to be backported to stable kernels, and I
+don't think this patch reaches that threshold.
+
+If anything, this patch removes a warning that gets added by
+https://lore.kernel.org/lkml/20240509200022.253089-1-edliaw@google.com/T/#mf8438d03de6e2b613da4f86d4f60c5fe1c5f8483
+within the same series.
+
+Arguably, each #define _GNU_SOURCE could have been first protected
+by a #ifndef guard to eliminate this transient warning, and there
+would be nothing to "fix" in this consolidation series.
+
+Thoughts ?
+
+Thanks,
+
+Mathieu
+
+> Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+> Reviewed-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+> Signed-off-by: Edward Liaw <edliaw@google.com>
 > ---
->  drivers/net/ethernet/cortina/gemini.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
+>   tools/testing/selftests/rseq/basic_percpu_ops_test.c | 1 -
+>   tools/testing/selftests/rseq/basic_test.c            | 2 --
+>   tools/testing/selftests/rseq/param_test.c            | 1 -
+>   tools/testing/selftests/rseq/rseq.c                  | 2 --
+>   4 files changed, 6 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
-> index 599de7914122..c732e985055f 100644
-> --- a/drivers/net/ethernet/cortina/gemini.c
-> +++ b/drivers/net/ethernet/cortina/gemini.c
-> @@ -2138,6 +2138,28 @@ static void gmac_get_pauseparam(struct net_device *netdev,
->  	pparam->autoneg = true;
->  }
->  
-> +static int gmac_set_pauseparam(struct net_device *netdev,
-> +				struct ethtool_pauseparam *pparam)
-> +{
-> +	struct gemini_ethernet_port *port = netdev_priv(netdev);
-> +	union gmac_config0 config0;
-> +
-> +	config0.bits32 = readl(port->gmac_base + GMAC_CONFIG0);
-> +
-> +	if (pparam->rx_pause)
-> +		config0.bits.rx_fc_en = 1;
-> +	if (pparam->tx_pause)
-> +		config0.bits.tx_fc_en = 1;
-> +	/* We only support autonegotiation */
-> +	if (!pparam->autoneg)
-> +		return -EINVAL;
-> +
-> +	writel(config0.bits32, port->gmac_base + GMAC_CONFIG0);
+> diff --git a/tools/testing/selftests/rseq/basic_percpu_ops_test.c b/tools/testing/selftests/rseq/basic_percpu_ops_test.c
+> index 2348d2c20d0a..5961c24ee1ae 100644
+> --- a/tools/testing/selftests/rseq/basic_percpu_ops_test.c
+> +++ b/tools/testing/selftests/rseq/basic_percpu_ops_test.c
+> @@ -1,5 +1,4 @@
+>   // SPDX-License-Identifier: LGPL-2.1
+> -#define _GNU_SOURCE
+>   #include <assert.h>
+>   #include <pthread.h>
+>   #include <sched.h>
+> diff --git a/tools/testing/selftests/rseq/basic_test.c b/tools/testing/selftests/rseq/basic_test.c
+> index 295eea16466f..1fed749b4bd7 100644
+> --- a/tools/testing/selftests/rseq/basic_test.c
+> +++ b/tools/testing/selftests/rseq/basic_test.c
+> @@ -2,8 +2,6 @@
+>   /*
+>    * Basic test coverage for critical regions and rseq_current_cpu().
+>    */
+> -
+> -#define _GNU_SOURCE
+>   #include <assert.h>
+>   #include <sched.h>
+>   #include <signal.h>
+> diff --git a/tools/testing/selftests/rseq/param_test.c b/tools/testing/selftests/rseq/param_test.c
+> index 2f37961240ca..48a55d94eb72 100644
+> --- a/tools/testing/selftests/rseq/param_test.c
+> +++ b/tools/testing/selftests/rseq/param_test.c
+> @@ -1,5 +1,4 @@
+>   // SPDX-License-Identifier: LGPL-2.1
+> -#define _GNU_SOURCE
+>   #include <assert.h>
+>   #include <linux/membarrier.h>
+>   #include <pthread.h>
+> diff --git a/tools/testing/selftests/rseq/rseq.c b/tools/testing/selftests/rseq/rseq.c
+> index 96e812bdf8a4..88602889414c 100644
+> --- a/tools/testing/selftests/rseq/rseq.c
+> +++ b/tools/testing/selftests/rseq/rseq.c
+> @@ -14,8 +14,6 @@
+>    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+>    * Lesser General Public License for more details.
+>    */
+> -
+> -#define _GNU_SOURCE
+>   #include <errno.h>
+>   #include <sched.h>
+>   #include <stdio.h>
 
-Everybody gets pause wrong. You even say it yourself:
+-- 
+Mathieu Desnoyers
+EfficiOS Inc.
+https://www.efficios.com
 
-> +	/* We only support autonegotiation */
-
-After connecting to the PHY, you need to call
-phy_support_asym_pause(), to let phylib know the MAC support
-asymmetric pause. The PHY will then advertise this to the link peer.
-Gemini does seem to be doing that already.
-
-When auto-neg is complete, it calls the adjust link callback. Ideally
-you then want to call phy_get_pause() which gives you the results of
-the negotiation, and so how to configure the MAC. gmac_speed_set()
-kind of does this, but it directly reads PHY registers, rather than
-asking phylib. It would be nice to update this code.
-
-This ethtool call allows you to change what the device advertises to
-the link partner. You should pass this onto phylib using
-phy_set_asym_pause(). If something has changed, phylib will kick off a
-new auto-neg, and then call the adjust link callback so you can
-configure the hardware with the new negotiation results. It is
-unlikely that gmac_set_pauseparam() needs to change the hardware
-configuration when pparam->autoneg is true.
-
-If pparam->autoneg is false, that means we are not using auto-neg for
-pause, and then you can directly program the MAC hardware. But it does
-not look like you intend to support this, which is fine.
-
-    Andrew
-
----
-pw-bot: cr
 
