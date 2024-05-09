@@ -1,232 +1,299 @@
-Return-Path: <netdev+bounces-94890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D52858C0EFC
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 13:46:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 584268C0F08
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 13:54:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ACAE282864
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:46:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D958E1F218F4
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F76613173B;
-	Thu,  9 May 2024 11:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED29148303;
+	Thu,  9 May 2024 11:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="R1MjwJKz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ws4GgjsY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C4E131188
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 11:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B36C12FB3F
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 11:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715255183; cv=none; b=uVxRJhRL9J6mou+mRd2PdRStY4q1ZR2x42WYRDdVxZ98RsOH8FH8OV/9oWl6GP64shs4c7+XQlVwd+ugHcvVQUw8eTxITTfJ1eRO15LPf06T8GODGp80KVVUOtt4T7sue/C/NuD+PE9IRdsn9yifYOxChgUPFhBfcZNlX7ngPUI=
+	t=1715255670; cv=none; b=X8WiJtxMcgU6YhnjCv0msLK11SemuHDfkrPLWQfsmg04WnxNGCjH3d5RXQ4PyDF3m+uGJl+Mp37LsbEDttL1mTng6HR855HaL+QTQQUwwqPnLLwai9nXbdzBzRjvfsc+S6gjRD5fY1Du+LGfRKLCqkIpccQ0vvNFub/a299NPPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715255183; c=relaxed/simple;
-	bh=41q6w+iDpR6FRQh1gTwi9bkZIR6ZbLJ/nt7XJX4mSGw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Amg3cGk0coL9FekC/RgIITrI1+l81U34WMSJK5NVwd7rFLHbIPsxU08Cwy4Tu4Bs2/0kgElpzFQv1Cc5pTFvoTkWlFQjP4YioomLxei3UcDA4PLjB7bUoJRabY1a+AcLuBVJfNt7yC7Ea3VJa3tWZSUlG0BzJbhMC0Ed9EbT0Ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=R1MjwJKz; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a5a1192c664so206083366b.2
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 04:46:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715255180; x=1715859980; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=33S2PQDlGKSgHvCStcnq/stwheT+yk8+mj4rEWpjP9k=;
-        b=R1MjwJKz+Pv5bsApz1fcHejQX2byfyK5TX80WTXCav7wvFoP9dGWV9VDA+WY2Nwpac
-         vS67gfa+8yE9qO0dW1Ew83/4BEVZ4FG8Qp5mjJ6w2Mra91XSKCIRpgkK//LW2YOmOO9+
-         e3G5oDs6YWSlG6pf0kqeq14hIv/8Bjh6bBcdOS5jIWy6fBmu00So0y+M5PxZwZrY17Pe
-         DJ6RhiOyeJ9XVpYGPNEZ0yiWfmdAUZURvERfCBCMjvyjv9KURZQOiIQqIdD4Z0x0Siin
-         QCwF2z95FRJZdaWkCvIel+0kdhr7yiabyf0yr+AT3juUPKWm+Y/vC9gsRrNrfGo4HopG
-         6/AQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715255180; x=1715859980;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=33S2PQDlGKSgHvCStcnq/stwheT+yk8+mj4rEWpjP9k=;
-        b=QOA6pvDV5dN17gxSvtNZQTGSsNYDn+aSduZbJqMKl7u+P5CrhSJWd/mkBbEUz22+T+
-         /BhiGUu9h9biMX8aZpDBgvLfGFJ4ZlzyOhZme8khqItbjqZKU1mbw0O97cQ/V+VufPI4
-         stxBKOBQnR9l6YuKozP5n9hyW0YvSMB26TRK5xgB6fQD/TDSM4YDqdBsTyNMalC3YArp
-         gyyLdHCq13x5hCYbZaAW7Pux/1m8Z6SdNUzuDCZtDM/VST8W18yvBd3ja1G8/TwG247q
-         bt/Smhzr7/dZ7mT2l5OZg/0fHxJRoS29zy702B/BJMLHxM7KAOoB8pF83oiPMyR3c+uc
-         xiVA==
-X-Gm-Message-State: AOJu0YwZWSKqNx9H69QbJ+RW7C1tpZiLCOZJRr3O7qWBx0L+I7cTM3Qz
-	O9UoOgR54FBkE0gkWZgThVLi/xpxmHRHiJGmo9zWFDfKHfHvklUGXiUCFSak+1RimWNnMhn7tT6
-	x
-X-Google-Smtp-Source: AGHT+IE0bfVMxDyCH257TbVVCB/lGvx9ql36mre7hQWTqweS/pleK3AQjjwbgp0zDSE1Qv6l61MkDQ==
-X-Received: by 2002:a17:906:f9c8:b0:a59:cdf4:f948 with SMTP id a640c23a62f3a-a59fb9dac78mr418908266b.65.1715255179576;
-        Thu, 09 May 2024 04:46:19 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a17b01724sm64615566b.162.2024.05.09.04.46.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 04:46:18 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	virtualization@lists.linux.dev,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com
-Subject: [patch net-next] virtio_net: add support for Byte Queue Limits
-Date: Thu,  9 May 2024 13:46:15 +0200
-Message-ID: <20240509114615.317450-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1715255670; c=relaxed/simple;
+	bh=vfzbXmrl/AwHVMDZUI8PRatAwjjoI5XimVa1uLdey4s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qk6Cs3b0IBB7VZ+c3SDF2QW/HGtOfXMkVZwAXDftilO8yX7MQAtzkiaU3zA+T8A/+cRR6TByipLjymtbiTcRVYwZ59aYJN4Km02W8++UKNpQvXY57HbPhcszrmtkA+wUd0sMNYeKtkRTdKxqbwYCleAxwAJWZDDA2IcV8N9hTGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ws4GgjsY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715255667;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Y3JZ5LkzbJDwZzWqwn1ukS8ZJVZyGGaxdZIhbOgoOzQ=;
+	b=Ws4GgjsYINDiqHEA3uXV+QxqPZfg+EWMCzYmIxgrVtx+1rQjfyJmfk+fS4SPCO38ysZzg1
+	k39lROnNKyFpF/VnRGv10QOztn+GoYISDk3KHNMt9pgYmwM2Smrmni4EPW1AefPI1bTW38
+	H+2J5OsVnJgw2eJRDKlEA6L7yrMazfY=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-206-Nd94kMKCP5WJOtrd0EZe4Q-1; Thu,
+ 09 May 2024 07:54:25 -0400
+X-MC-Unique: Nd94kMKCP5WJOtrd0EZe4Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3F8601C3F0FB;
+	Thu,  9 May 2024 11:54:25 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.225.82])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0670136EC;
+	Thu,  9 May 2024 11:54:23 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.9-rc8
+Date: Thu,  9 May 2024 13:54:11 +0200
+Message-ID: <20240509115411.30032-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-From: Jiri Pirko <jiri@nvidia.com>
+Hi Linus!
 
-Add support for Byte Queue Limits (BQL).
+The following changes since commit 545c494465d24b10a4370545ba213c0916f70b95:
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- drivers/net/virtio_net.c | 33 ++++++++++++++++++++-------------
- 1 file changed, 20 insertions(+), 13 deletions(-)
+  Merge tag 'net-6.9-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-05-02 08:51:47 -0700)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 218a446c4c27..c53d6dc6d332 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -84,7 +84,9 @@ struct virtnet_stat_desc {
- 
- struct virtnet_sq_free_stats {
- 	u64 packets;
-+	u64 xdp_packets;
- 	u64 bytes;
-+	u64 xdp_bytes;
- };
- 
- struct virtnet_sq_stats {
-@@ -512,19 +514,19 @@ static void __free_old_xmit(struct send_queue *sq, bool in_napi,
- 	void *ptr;
- 
- 	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
--		++stats->packets;
--
- 		if (!is_xdp_frame(ptr)) {
- 			struct sk_buff *skb = ptr;
- 
- 			pr_debug("Sent skb %p\n", skb);
- 
-+			stats->packets++;
- 			stats->bytes += skb->len;
- 			napi_consume_skb(skb, in_napi);
- 		} else {
- 			struct xdp_frame *frame = ptr_to_xdp(ptr);
- 
--			stats->bytes += xdp_get_frame_len(frame);
-+			stats->xdp_packets++;
-+			stats->xdp_bytes += xdp_get_frame_len(frame);
- 			xdp_return_frame(frame);
- 		}
- 	}
-@@ -965,7 +967,8 @@ static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
- 	virtnet_rq_free_buf(vi, rq, buf);
- }
- 
--static void free_old_xmit(struct send_queue *sq, bool in_napi)
-+static void free_old_xmit(struct send_queue *sq, struct netdev_queue *txq,
-+			  bool in_napi)
- {
- 	struct virtnet_sq_free_stats stats = {0};
- 
-@@ -974,9 +977,11 @@ static void free_old_xmit(struct send_queue *sq, bool in_napi)
- 	/* Avoid overhead when no packets have been processed
- 	 * happens when called speculatively from start_xmit.
- 	 */
--	if (!stats.packets)
-+	if (!stats.packets && !stats.xdp_packets)
- 		return;
- 
-+	netdev_tx_completed_queue(txq, stats.packets, stats.bytes);
-+
- 	u64_stats_update_begin(&sq->stats.syncp);
- 	u64_stats_add(&sq->stats.bytes, stats.bytes);
- 	u64_stats_add(&sq->stats.packets, stats.packets);
-@@ -1013,13 +1018,15 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
- 	 * early means 16 slots are typically wasted.
- 	 */
- 	if (sq->vq->num_free < 2+MAX_SKB_FRAGS) {
--		netif_stop_subqueue(dev, qnum);
-+		struct netdev_queue *txq = netdev_get_tx_queue(dev, qnum);
-+
-+		netif_tx_stop_queue(txq);
- 		if (use_napi) {
- 			if (unlikely(!virtqueue_enable_cb_delayed(sq->vq)))
- 				virtqueue_napi_schedule(&sq->napi, sq->vq);
- 		} else if (unlikely(!virtqueue_enable_cb_delayed(sq->vq))) {
- 			/* More just got used, free them then recheck. */
--			free_old_xmit(sq, false);
-+			free_old_xmit(sq, txq, false);
- 			if (sq->vq->num_free >= 2+MAX_SKB_FRAGS) {
- 				netif_start_subqueue(dev, qnum);
- 				virtqueue_disable_cb(sq->vq);
-@@ -2319,7 +2326,7 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
- 
- 		do {
- 			virtqueue_disable_cb(sq->vq);
--			free_old_xmit(sq, true);
-+			free_old_xmit(sq, txq, true);
- 		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
- 
- 		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
-@@ -2471,7 +2478,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
- 	txq = netdev_get_tx_queue(vi->dev, index);
- 	__netif_tx_lock(txq, raw_smp_processor_id());
- 	virtqueue_disable_cb(sq->vq);
--	free_old_xmit(sq, true);
-+	free_old_xmit(sq, txq, true);
- 
- 	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
- 		netif_tx_wake_queue(txq);
-@@ -2553,7 +2560,7 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	struct send_queue *sq = &vi->sq[qnum];
- 	int err;
- 	struct netdev_queue *txq = netdev_get_tx_queue(dev, qnum);
--	bool kick = !netdev_xmit_more();
-+	bool xmit_more = netdev_xmit_more();
- 	bool use_napi = sq->napi.weight;
- 
- 	/* Free up any pending old buffers before queueing new ones. */
-@@ -2561,9 +2568,9 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		if (use_napi)
- 			virtqueue_disable_cb(sq->vq);
- 
--		free_old_xmit(sq, false);
-+		free_old_xmit(sq, txq, false);
- 
--	} while (use_napi && kick &&
-+	} while (use_napi && !xmit_more &&
- 	       unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
- 
- 	/* timestamp packet in software */
-@@ -2592,7 +2599,7 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	check_sq_full_and_disable(vi, dev, sq);
- 
--	if (kick || netif_xmit_stopped(txq)) {
-+	if (__netdev_tx_sent_queue(txq, skb->len, xmit_more)) {
- 		if (virtqueue_kick_prepare(sq->vq) && virtqueue_notify(sq->vq)) {
- 			u64_stats_update_begin(&sq->stats.syncp);
- 			u64_stats_inc(&sq->stats.kicks);
--- 
-2.44.0
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.9-rc8
+
+for you to fetch changes up to 6e7ffa180a532b6fe2e22aa6182e02ce988a43aa:
+
+  net: dsa: mv88e6xxx: read cmode on mv88e6320/21 serdes only ports (2024-05-09 11:48:20 +0200)
+
+----------------------------------------------------------------
+Including fixes from bluetooth and IPsec.
+
+The bridge patch is actually a follow-up to a recent fix in the same
+area. We have a pending v6.8 AF_UNIX regression; it should be solved
+soon, but not in time for this PR.
+
+Current release - regressions:
+
+ - eth: ks8851: Queue RX packets in IRQ handler instead of disabling BHs
+
+ - net: bridge: fix corrupted ethernet header on multicast-to-unicast
+
+Current release - new code bugs:
+
+ - xfrm: fix possible bad pointer derferencing in error path
+
+Previous releases - regressionis:
+
+ - core: fix out-of-bounds access in ops_init
+
+ - ipv6:
+   - fix potential uninit-value access in __ip6_make_skb()
+   - fib6_rules: avoid possible NULL dereference in fib6_rule_action()
+
+ - tcp: use refcount_inc_not_zero() in tcp_twsk_unique().
+
+ - rtnetlink: correct nested IFLA_VF_VLAN_LIST attribute validation
+
+ - rxrpc: fix congestion control algorithm
+
+ - bluetooth:
+   - l2cap: fix slab-use-after-free in l2cap_connect()
+   - msft: fix slab-use-after-free in msft_do_close()
+
+ - eth: hns3: fix kernel crash when devlink reload during initialization
+
+ - eth: dsa: mv88e6xxx: add phylink_get_caps for the mv88e6320/21 family
+
+Previous releases - always broken:
+
+ - xfrm: preserve vlan tags for transport mode software GRO
+
+ - tcp: defer shutdown(SEND_SHUTDOWN) for TCP_SYN_RECV sockets
+
+ - eth: hns3: keep using user config after hardware reset
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Antony Antony (2):
+      xfrm: fix possible derferencing in error path
+      xfrm: Correct spelling mistake in xfrm.h comment
+
+Chen-Yu Tsai (1):
+      arm64: dts: mediatek: mt8183-pico6: Fix bluetooth node
+
+Daniel Golle (1):
+      dt-bindings: net: mediatek: remove wrongly added clocks and SerDes
+
+David Howells (2):
+      rxrpc: Fix congestion control algorithm
+      rxrpc: Only transmit one ACK per jumbo packet received
+
+Donald Hunter (1):
+      netlink: specs: Add missing bridge linkinfo attrs
+
+Duoming Zhou (2):
+      Bluetooth: Fix use-after-free bugs caused by sco_sock_timeout
+      Bluetooth: l2cap: fix null-ptr-deref in l2cap_chan_timeout
+
+Eric Dumazet (4):
+      tcp: defer shutdown(SEND_SHUTDOWN) for TCP_SYN_RECV sockets
+      phonet: fix rtm_phonet_notify() skb allocation
+      ipv6: fib6_rules: avoid possible NULL dereference in fib6_rule_action()
+      ipv6: prevent NULL dereference in ip6_output()
+
+Felix Fietkau (1):
+      net: bridge: fix corrupted ethernet header on multicast-to-unicast
+
+Gregor Herburger (1):
+      net: phy: marvell-88q2xxx: add support for Rev B1 and B2
+
+Gregory Detal (1):
+      mptcp: only allow set existing scheduler for net.mptcp.scheduler
+
+Ido Schimmel (1):
+      selftests: test_bridge_neigh_suppress.sh: Fix failures due to duplicate MAC
+
+Jakub Kicinski (3):
+      Merge tag 'for-net-2024-05-03' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
+      Merge tag 'ipsec-2024-05-02' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec
+      Merge branch 'rxrpc-miscellaneous-fixes'
+
+Jian Shen (1):
+      net: hns3: direct return when receive a unknown mailbox message
+
+Johan Hovold (7):
+      Bluetooth: qca: fix wcn3991 device address check
+      Bluetooth: qca: add missing firmware sanity checks
+      Bluetooth: qca: fix NVM configuration parsing
+      Bluetooth: qca: generalise device address check
+      Bluetooth: qca: fix info leak when fetching fw build id
+      Bluetooth: qca: fix info leak when fetching board id
+      Bluetooth: qca: fix firmware check error path
+
+Kuniyuki Iwashima (1):
+      tcp: Use refcount_inc_not_zero() in tcp_twsk_unique().
+
+Lukasz Majewski (1):
+      hsr: Simplify code for announcing HSR nodes timer setup
+
+Marek Vasut (1):
+      net: ks8851: Queue RX packets in IRQ handler instead of disabling BHs
+
+Paolo Abeni (1):
+      Merge branch 'there-are-some-bugfix-for-the-hns3-ethernet-driver'
+
+Paul Davey (1):
+      xfrm: Preserve vlan tags for transport mode software GRO
+
+Peiyang Wang (4):
+      net: hns3: using user configure after hardware reset
+      net: hns3: change type of numa_node_mask as nodemask_t
+      net: hns3: release PTP resources if pf initialization failed
+      net: hns3: use appropriate barrier function after setting a bit value
+
+Potnuri Bharat Teja (1):
+      MAINTAINERS: update cxgb4 and cxgb3 network drivers maintainer
+
+Roded Zats (1):
+      rtnetlink: Correct nested IFLA_VF_VLAN_LIST attribute validation
+
+Shigeru Yoshida (1):
+      ipv6: Fix potential uninit-value access in __ip6_make_skb()
+
+Steffen Bätz (2):
+      net: dsa: mv88e6xxx: add phylink_get_caps for the mv88e6320/21 family
+      net: dsa: mv88e6xxx: read cmode on mv88e6320/21 serdes only ports
+
+Sungwoo Kim (3):
+      Bluetooth: L2CAP: Fix slab-use-after-free in l2cap_connect()
+      Bluetooth: msft: fix slab-use-after-free in msft_do_close()
+      Bluetooth: HCI: Fix potential null-ptr-deref
+
+Tetsuo Handa (1):
+      nfc: nci: Fix kcov check in nci_rx_work()
+
+Thadeu Lima de Souza Cascardo (1):
+      net: fix out-of-bounds access in ops_init
+
+Vincent Duvert (1):
+      appletalk: Improve handling of broadcast packets
+
+Wen Gu (1):
+      net/smc: fix neighbour and rtable leak in smc_ib_find_route()
+
+Yonglong Liu (2):
+      net: hns3: fix port vlan filter not disabled issue
+      net: hns3: fix kernel crash when devlink reload during initialization
+
+ .../devicetree/bindings/net/mediatek,net.yaml      |  22 +---
+ Documentation/netlink/specs/rt_link.yaml           |   6 ++
+ MAINTAINERS                                        |   6 +-
+ .../dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts    |   3 +-
+ drivers/bluetooth/btqca.c                          | 110 +++++++++++++++----
+ drivers/bluetooth/btqca.h                          |   3 +-
+ drivers/net/dsa/mv88e6xxx/chip.c                   |  39 +++++--
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h        |   2 +-
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    |  52 ++++-----
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.h    |   5 +-
+ .../net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c |   7 +-
+ .../ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c  |  20 ++--
+ .../ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h  |   2 +-
+ drivers/net/ethernet/micrel/ks8851_common.c        |  16 +--
+ drivers/net/phy/marvell-88q2xxx.c                  | 119 ++++++++++++++++++---
+ include/linux/skbuff.h                             |  15 +++
+ include/net/xfrm.h                                 |   3 +
+ include/uapi/linux/xfrm.h                          |   2 +-
+ net/appletalk/ddp.c                                |  19 +++-
+ net/bluetooth/hci_core.c                           |   3 +-
+ net/bluetooth/hci_event.c                          |   2 +
+ net/bluetooth/l2cap_core.c                         |  24 +++--
+ net/bluetooth/msft.c                               |   2 +-
+ net/bluetooth/msft.h                               |   4 +-
+ net/bluetooth/sco.c                                |   4 +
+ net/bridge/br_forward.c                            |   9 +-
+ net/core/net_namespace.c                           |  13 ++-
+ net/core/rtnetlink.c                               |   2 +-
+ net/hsr/hsr_device.c                               |  27 +++--
+ net/ipv4/tcp.c                                     |   4 +-
+ net/ipv4/tcp_input.c                               |   2 +
+ net/ipv4/tcp_ipv4.c                                |   8 +-
+ net/ipv4/tcp_output.c                              |   4 +-
+ net/ipv4/xfrm4_input.c                             |   6 +-
+ net/ipv6/fib6_rules.c                              |   6 +-
+ net/ipv6/ip6_output.c                              |   4 +-
+ net/ipv6/xfrm6_input.c                             |   6 +-
+ net/mptcp/ctrl.c                                   |  39 ++++++-
+ net/nfc/nci/core.c                                 |   1 +
+ net/phonet/pn_netlink.c                            |   2 +-
+ net/rxrpc/ar-internal.h                            |   2 +-
+ net/rxrpc/call_object.c                            |   7 +-
+ net/rxrpc/input.c                                  |  49 ++++++---
+ net/smc/smc_ib.c                                   |  19 ++--
+ net/xfrm/xfrm_input.c                              |   8 ++
+ net/xfrm/xfrm_policy.c                             |   2 +
+ .../selftests/net/test_bridge_neigh_suppress.sh    |  14 +--
+ 47 files changed, 519 insertions(+), 205 deletions(-)
 
 
