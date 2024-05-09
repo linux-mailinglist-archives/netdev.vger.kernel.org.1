@@ -1,235 +1,133 @@
-Return-Path: <netdev+bounces-94796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA7168C0ADB
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 07:15:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 449ED8C0AE0
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 07:15:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 070711C228C6
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 05:15:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C81281F24052
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 05:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698F11494BE;
-	Thu,  9 May 2024 05:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BQoywBiy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3BE11494A3;
+	Thu,  9 May 2024 05:15:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F165712BEA4;
-	Thu,  9 May 2024 05:15:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC7313BC3C
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 05:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715231702; cv=none; b=M20wBKv1KmPMI2YetKIHte8XdX1oOsLDwQcAV4/kVjGbt7LgdtZpiYBivxWYM6Mb/cUJEvRi0aY2UUtfDo2etnGZruROxlcL8+l6he8JsrW81V+/STuGay6UFLmYnCDKJuS3ShDNYpnJYmF1wltJI8B7rSDqcZTIoFR/Xw8dj5I=
+	t=1715231736; cv=none; b=EDgmXoBH91r3mvyOA1RDFVouwyQQJ9HczSujM+N+yd3qHaiE6HqRHoO0Dmh598JOQnu6pR+ylgqK/Gj9YDMj7pcCcHT6gCOGbmd6uhSgGUSjba0XWpGrpzWZllHhUVJpITjp+XFGwCRKVEcUkfO+l7uagrX+JyaEheaeU/E9S10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715231702; c=relaxed/simple;
-	bh=dgBpxGC9J1WlBSk7j6Dg82LPiieH8ot79JOBQEcnXq0=;
+	s=arc-20240116; t=1715231736; c=relaxed/simple;
+	bh=cIDQZAOFPzs20dF1EbvJv64A34Ri3yMsRyyX/TylLmk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n2X0yRfuJgzYC4GSubvuUR/5Mc+Bz/XX8LWsy43oCV78USf9Uh4j92xsVivWX0kqhbj4GJ/BO21C19tiXwk2NykWKbDTZrv1yhi9vB7FfA1jx8/s+s8AyWaOhf/UcAKOxIkaE8Aj7rR2p4Ycj47Tv1oXF0eztuzz2OEIiDcDgZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BQoywBiy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF8AFC116B1;
-	Thu,  9 May 2024 05:15:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715231701;
-	bh=dgBpxGC9J1WlBSk7j6Dg82LPiieH8ot79JOBQEcnXq0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BQoywBiy+PCheZmKhnImt/9BOTJD7sOxdMdOTlOLCfvXUKjgZOA92aRVR4OmcoxF9
-	 PTbOPGZF15CWvHBVuEwGeUtVVWmwiTb6FfsEOgf/6RkiKxAdRchyA72tARTMQHHS56
-	 7stGdQt7WDteZaEvMke5xN3k6+K3rexu/sDXquvtBr5Y2djj6r0Ay4Odn4nRO45Keu
-	 8+zyLIWzfYoyoPvE3xWjoC9Knv0/BRtHDQXiZtyiizSj8iI/Tmkzv636dmxJZptUSp
-	 6/rG79xlRkSsK2N27OtXiWF1LNTVKFxU0CRMDW0fjxV0VUp1GCtX3Br/Lr+jHOaIOv
-	 Lun/NWWKy0C5Q==
-Date: Thu, 9 May 2024 07:14:58 +0200
-From: Mark Brown <broonie@kernel.org>
-To: Edward Liaw <edliaw@google.com>
-Cc: shuah@kernel.org, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Darren Hart <dvhart@infradead.org>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	=?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@igalia.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Seth Forshee <sforshee@kernel.org>,
-	Bongsu Jeon <bongsu.jeon@samsung.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Fenghua Yu <fenghua.yu@intel.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kernel-team@android.com, linux-sound@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-	linux-input@vger.kernel.org, iommu@lists.linux.dev,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-security-module@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH v2 3/5] selftests: Include KHDR_INCLUDES in Makefile
-Message-ID: <Zjxb0k--qUyZKSg6@finisterre.sirena.org.uk>
-Mail-Followup-To: Edward Liaw <edliaw@google.com>, shuah@kernel.org,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Darren Hart <dvhart@infradead.org>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	=?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@igalia.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Seth Forshee <sforshee@kernel.org>,
-	Bongsu Jeon <bongsu.jeon@samsung.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Fenghua Yu <fenghua.yu@intel.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kernel-team@android.com, linux-sound@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-	linux-input@vger.kernel.org, iommu@lists.linux.dev,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-security-module@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org,
-	bpf@vger.kernel.org
-References: <20240507214254.2787305-1-edliaw@google.com>
- <20240507214254.2787305-4-edliaw@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WqgwvmTZ7UpL8PJEmMnXxh62pWVGrqjGEaKAprkxFUCF2VtrUkmyiS9DH0qCpTMOgOUo5c45MbrjCMbgzjW1LpHZ9PqlKH0y+BqOKjqT5TLIwgRHNTBlvhAagx8RoGCnUS/VSn25f+q+nxgCdrkRph/jqVul5awldjqM6m7Nr68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1s4w7o-0004Iw-3N; Thu, 09 May 2024 07:15:24 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1s4w7l-000P7C-Tw; Thu, 09 May 2024 07:15:21 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1s4w7l-002KX4-2a;
+	Thu, 09 May 2024 07:15:21 +0200
+Date: Thu, 9 May 2024 07:15:21 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Arun.Ramadoss@microchip.com
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+	Woojung.Huh@microchip.com, pabeni@redhat.com, edumazet@google.com,
+	f.fainelli@gmail.com, kuba@kernel.org, kernel@pengutronix.de,
+	dsahern@kernel.org, san@skov.dk, willemb@google.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	horms@kernel.org, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v1 3/3] net: dsa: microchip: dcb: set default
+ apptrust to PCP only
+Message-ID: <Zjxb6a_MaSxjTQxU@pengutronix.de>
+References: <20240508103902.4134098-1-o.rempel@pengutronix.de>
+ <20240508103902.4134098-4-o.rempel@pengutronix.de>
+ <d4f7d3be15d46b07d7139ee4d453d7366d7aedc3.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="8TMyWXG1VGLOfNzK"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240507214254.2787305-4-edliaw@google.com>
-X-Cookie: Sorry.  Nice try.
+In-Reply-To: <d4f7d3be15d46b07d7139ee4d453d7366d7aedc3.camel@microchip.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+Hi Arun,
 
---8TMyWXG1VGLOfNzK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Wed, May 08, 2024 at 03:11:24PM +0000, Arun.Ramadoss@microchip.com wrote:
+> Hi Oleksij,
+> 
+> On Wed, 2024-05-08 at 12:39 +0200, Oleksij Rempel wrote:
+> > EXTERNAL EMAIL: Do not click links or open attachments unless you
+> > know the content is safe
+> > 
+> > 
+> > -static const u8 ksz8_port2_supported_apptrust[] = {
+> > -       DCB_APP_SEL_PCP,
+> > -};
+> > -
+> >  static const char * const ksz_supported_apptrust_variants[] = {
+> >         "empty", "dscp", "pcp", "dscp pcp"
+> >  };
+> > @@ -771,9 +767,8 @@ int ksz_port_get_apptrust(struct dsa_switch *ds,
+> > int port, u8 *sel, int *nsel)
+> >   */
+> >  int ksz_dcb_init_port(struct ksz_device *dev, int port)
+> >  {
+> > -       const u8 *sel;
+> > +       const u8 ksz_default_apptrust[] = { DCB_APP_SEL_PCP };
+> >         int ret, ipm;
+> > -       int sel_len;
+> > 
+> >         if (is_ksz8(dev)) {
+> >                 ipm = ieee8021q_tt_to_tc(IEEE8021Q_TT_BE,
+> > @@ -789,18 +784,8 @@ int ksz_dcb_init_port(struct ksz_device *dev,
+> > int port)
+> >         if (ret)
+> >                 return ret;
+> > 
+> > -       if (ksz_is_ksz88x3(dev) && port == KSZ_PORT_2) {
+> > -               /* KSZ88x3 devices do not support DSCP classification
+> > on
+> > -                * "Port 2.
+> > -                */
+> > -               sel = ksz8_port2_supported_apptrust;
+> > -               sel_len = ARRAY_SIZE(ksz8_port2_supported_apptrust);
+> 
+> If we remove this, How the user application knows about the DSCP
+> resistriction of KSZ8 port 2. Is it implemented in other functions?
 
-On Tue, May 07, 2024 at 09:38:28PM +0000, Edward Liaw wrote:
+Yes, it is implemented in
+ksz_port_set_apptrust()->ksz88x3_port_apptrust_quirk(). This patch
+affects only default configuration.
 
->  tools/testing/selftests/arm64/signal/Makefile          | 2 +-
-
-This is not really using any of the kselftest framework at all to build
-so I'm not sure the change makes sense for it.  OTOH it does no harm...
-
---8TMyWXG1VGLOfNzK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmY8W9EACgkQJNaLcl1U
-h9Aa4gf9HY7hIlNAryB75Fb1YdATwSHy7EQyKfWsSaobZtWWwgFh6CF0C6J7Wa0o
-UmFwVoKos72xm0UCKTtuBAxkIxhk1wupw0K6u0fVcraHpDV579RI/BAsIc1cFgf8
-cGvyEy3VRgjGDKorUJnMg9WU7qNTIfRovXGmXewa1WJHz1OFk+ETMSbXQ3rmKPlF
-2epuBPaw7gBN4W1nb9nGpZkG+Ub2hUJTN7nBB0IJ5GD+mrREYXyxAHiEk9AWR1Bb
-nD5tNG9ZWepZSGtR11j3jdPc2XVNksMJyMCuqG4tmIZbjuaS7mu9vvxBoSDxqD9j
-uK6Nqwb0FziTG9MkhW8EMgjvhlCGnA==
-=L/hl
------END PGP SIGNATURE-----
-
---8TMyWXG1VGLOfNzK--
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
