@@ -1,91 +1,137 @@
-Return-Path: <netdev+bounces-94752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9771B8C093A
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 03:40:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2E0F8C094A
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 03:50:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FB0C2825A3
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 01:40:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DA9C282869
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 01:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13ACD2C184;
-	Thu,  9 May 2024 01:40:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8A9D13C80F;
+	Thu,  9 May 2024 01:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cM4aPhl7"
 X-Original-To: netdev@vger.kernel.org
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A06510979;
-	Thu,  9 May 2024 01:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF07313C806
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 01:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715218838; cv=none; b=QM+LeTde4rUpvNAawTioelN7Xuc4W7AR/GWSg+gvBnr2fgdau02QBeOJm0NYqbkAYwyKSIji953dluHAiPZ4CD6i+pyANik0NZuytA8XCuff7WZBt/IDF+e+bsjmKfllUzZ8yEKVN63ochzV2qgOciSmIY0VOJzTFughnRhvmYU=
+	t=1715219427; cv=none; b=SZTeVz+vNEC4UFEGL1IJM71Y5I4b7YL2MFsBjofUgZqUCA/psrBEUJU0B26tUMJhopcP4JKAobvGH2oIgS7FDkDl8kUXz5+3XN9FSF6iC0yUtNthmrJ9beoTCGgKXmAXwDmHAEHwGzPv4SilGRctjfHsL4SeoIG4m3x4jyaoDYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715218838; c=relaxed/simple;
-	bh=vypeUuzuRONIjZ7ZibBQrbY2ZXTNxfDGI+HhUXXdBN4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=NiIafw/TTINftVGfcWSDAd8ZC6P71+g8P+ETiBWkLtUPswzy8IuaZYtP4ldHe0HMcnGD3lbBZH4oADWKHm+bXNhvRRGfOS858ms23C2sDQcU02UUJtXxhItoAcWznQUeO0aCBAra7nbPy1wGt3EdbPoKwVWJNl7V3ZxF4DQIAww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=129.150.39.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from duoming$zju.edu.cn ( [221.192.180.131] ) by
- ajax-webmail-mail-app4 (Coremail) ; Thu, 9 May 2024 09:40:02 +0800
- (GMT+08:00)
-Date: Thu, 9 May 2024 09:40:02 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: duoming@zju.edu.cn
-To: "Dan Carpenter" <dan.carpenter@linaro.org>
-Cc: "Lars Kellogg-Stedman" <lars@oddbit.com>, linux-hams@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, jreuter@yaina.de
-Subject: Re: [PATCH net] ax25: Fix refcount leak issues of ax25_dev
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT5 build
- 20231205(37e20f0e) Copyright (c) 2002-2024 www.mailtech.cn zju.edu.cn
-In-Reply-To: <79dc1067-76dc-43b2-9413-7754f96fe08e@moroto.mountain>
-References: <20240501060218.32898-1-duoming@zju.edu.cn>
- <my4l7ljo35dnwxl33maqhyvw7666dmuwtduwtyhnzdlb6bbf5m@5sbp4tvg246f>
- <78ae8aa0-eac5-4ade-8e85-0479a22e98a3@moroto.mountain>
- <ekgwuycs3hioz6vve57e6z7igovpls6s644rvdxpxqqr7v7is6@u5lqegkuwcex>
- <1e14f4f1-29dd-4fe5-8010-de7df0866e93@moroto.mountain>
- <movur4qy7wwavdyw2ugwfsz6kvshrqlvx32ym3fyx5gg66llge@citxuw5ztgwc>
- <eb5oil2exor2bq5n3pn62575phxjdex6wdjwwjxjd3pd4je55o@4k4iu2xobel5>
- <79dc1067-76dc-43b2-9413-7754f96fe08e@moroto.mountain>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1715219427; c=relaxed/simple;
+	bh=se/WhrfDnCxp3AU0EPe3h6M+4rQK0WtnHxXbRCiX+C4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TsBpEv+nUB5/wFjSAUAIKmWRmRg+EOQPHolYkzXC3Ujei/pYQ9bqGU0+T8vhGRFrrOXQhLtbNqRccS3CYJcQ+s5bOKn3vHsAvVD5bR4+VcRti+d8v5dgjADwxbrzp2LxhHIf9qwoa2NBb1cUZkbon+yKQKQYGrjGAjN7vmoCpEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cM4aPhl7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 46D22C2BD10;
+	Thu,  9 May 2024 01:50:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715219427;
+	bh=se/WhrfDnCxp3AU0EPe3h6M+4rQK0WtnHxXbRCiX+C4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cM4aPhl7HQ+Y0iQb+VL5BFDjxom+vKWExi6rpx5XIdOjL/CV8mc72DGD103UO91ZM
+	 LTUzu8eHot6E+JKaJXk565vUQcKTN20VS+Gf8NnNNy9ayB35c8h4YO7HKA3Z60edQC
+	 AD9OusKNxcLwBq293QftZ/o0uEN0p6oGVnO95VmWJcnRlxPKfpaCFiUS9Rhh+leqkn
+	 0O53rihQYLobEF10S478Xzp8iAUTyhpujINvdiB/fs9esIcPnLj7ZjRiqvQvodbzCN
+	 dlxNFgYZK81S/S1KPJqeN+US1w6ovPWLqOAVsocJI8o3Z5EcjUtsQcytGjym9RLh6N
+	 f/rHPlUKscZ3A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3781FC43332;
+	Thu,  9 May 2024 01:50:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <5a4e0ffa.6776.18f5b01e5e0.Coremail.duoming@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgDHVLJyKTxmyi1MAA--.5246W
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwIQAWY7nwoGrwABsw
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW7Jw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v1] netlink/specs: Add VF attributes to rt_link spec
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171521942722.27440.17140123550559529904.git-patchwork-notify@kernel.org>
+Date: Thu, 09 May 2024 01:50:27 +0000
+References: <20240507103603.23017-1-donald.hunter@gmail.com>
+In-Reply-To: <20240507103603.23017-1-donald.hunter@gmail.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, jiri@resnulli.us,
+ jacob.e.keller@intel.com, liuhangbin@gmail.com, donald.hunter@redhat.com
 
-T24gVHVlLCA3IE1heSAyMDI0IDExOjA4OjE0ICswMzAwIERhbiBDYXJwZW50ZXIgd3JvdGU6Cj4g
-ZGlmZiAtLWdpdCBhL25ldC9heDI1L2FmX2F4MjUuYyBiL25ldC9heDI1L2FmX2F4MjUuYwo+IGlu
-ZGV4IDkxNjllZmIyZjQzYS4uNGQxYWIyOTZkNTJjIDEwMDY0NAo+IC0tLSBhL25ldC9heDI1L2Fm
-X2F4MjUuYwo+ICsrKyBiL25ldC9heDI1L2FmX2F4MjUuYwo+IEBAIC05Miw2ICs5Miw3IEBAIHN0
-YXRpYyB2b2lkIGF4MjVfa2lsbF9ieV9kZXZpY2Uoc3RydWN0IG5ldF9kZXZpY2UgKmRldikKPiAg
-CQkJCXNwaW5fdW5sb2NrX2JoKCZheDI1X2xpc3RfbG9jayk7Cj4gIAkJCQlheDI1X2Rpc2Nvbm5l
-Y3QocywgRU5FVFVOUkVBQ0gpOwo+ICAJCQkJcy0+YXgyNV9kZXYgPSBOVUxMOwo+ICsJCQkJYXgy
-NV9kZXZfcHV0KGF4MjVfZGV2KTsKPiAgCQkJCWF4MjVfY2JfZGVsKHMpOwo+ICAJCQkJc3Bpbl9s
-b2NrX2JoKCZheDI1X2xpc3RfbG9jayk7Cj4gIAkJCQlnb3RvIGFnYWluOwo+IEBAIC0xMDEsMTEg
-KzEwMiw4IEBAIHN0YXRpYyB2b2lkIGF4MjVfa2lsbF9ieV9kZXZpY2Uoc3RydWN0IG5ldF9kZXZp
-Y2UgKmRldikKPiAgCQkJbG9ja19zb2NrKHNrKTsKPiAgCQkJYXgyNV9kaXNjb25uZWN0KHMsIEVO
-RVRVTlJFQUNIKTsKPiAgCQkJcy0+YXgyNV9kZXYgPSBOVUxMOwo+IC0JCQlpZiAoc2stPnNrX3Nv
-Y2tldCkgewo+IC0JCQkJbmV0ZGV2X3B1dChheDI1X2Rldi0+ZGV2LAo+IC0JCQkJCSAgICZzLT5k
-ZXZfdHJhY2tlcik7Cj4gLQkJCQlheDI1X2Rldl9wdXQoYXgyNV9kZXYpOwo+IC0JCQl9Cj4gKwkJ
-CW5ldGRldl9wdXQoYXgyNV9kZXYtPmRldiwgJnMtPmRldl90cmFja2VyKTsKPiArCQkJYXgyNV9k
-ZXZfcHV0KGF4MjVfZGV2KTsKCldlIHNob3VsZCBub3QgZGVjcmVhc2UgdGhlIHJlZmNvdW50IHdp
-dGhvdXQgY2hlY2tpbmcgImlmIChzay0+c2tfc29ja2V0KSIsIGJlY2F1c2UgCnRoZXJlIGlzIGEg
-cmFjZSBjb25kaXRpb24gYmV0d2VlbiBheDI1X2tpbGxfYnlfZGV2aWNlKCkgYW5kIGF4MjVfcmVs
-ZWFzZSgpLCBpZiB3ZQpkZWNyZWFzZSB0aGUgcmVmY291bnQgaW4gYXgyNV9yZWxlYXNlKCksIHdl
-IHNob3VsZCBub3QgZGVjcmVhc2UgaXQgaGVyZSwgb3RoZXJ3aXNlIAp0aGUgcmVmY291bnQgdW5k
-ZXJmbG93IHdpbGwgaGFwcGVuLgoKQmVzdCByZWdhcmRzLApEdW9taW5nIFpob3UKCgo=
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue,  7 May 2024 11:36:03 +0100 you wrote:
+> Add support for retrieving VFs as part of link info. For example:
+> 
+> ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/rt_link.yaml \
+>   --do getlink --json '{"ifi-index": 38, "ext-mask": ["vf", "skip-stats"]}'
+> {'address': 'b6:75:91:f2:64:65',
+>  [snip]
+>  'vfinfo-list': {'info': [{'broadcast': b'\xff\xff\xff\xff\xff\xff\x00\x00'
+>                                         b'\x00\x00\x00\x00\x00\x00\x00\x00'
+>                                         b'\x00\x00\x00\x00\x00\x00\x00\x00'
+>                                         b'\x00\x00\x00\x00\x00\x00\x00\x00',
+>                            'link-state': {'link-state': 'auto', 'vf': 0},
+>                            'mac': {'mac': b'\x00\x00\x00\x00\x00\x00\x00\x00'
+>                                           b'\x00\x00\x00\x00\x00\x00\x00\x00'
+>                                           b'\x00\x00\x00\x00\x00\x00\x00\x00'
+>                                           b'\x00\x00\x00\x00\x00\x00\x00\x00',
+>                                    'vf': 0},
+>                            'rate': {'max-tx-rate': 0,
+>                                     'min-tx-rate': 0,
+>                                     'vf': 0},
+>                            'rss-query-en': {'setting': 0, 'vf': 0},
+>                            'spoofchk': {'setting': 0, 'vf': 0},
+>                            'trust': {'setting': 0, 'vf': 0},
+>                            'tx-rate': {'rate': 0, 'vf': 0},
+>                            'vlan': {'qos': 0, 'vf': 0, 'vlan': 0},
+>                            'vlan-list': {'info': [{'qos': 0,
+>                                                    'vf': 0,
+>                                                    'vlan': 0,
+>                                                    'vlan-proto': 0}]}},
+>                           {'broadcast': b'\xff\xff\xff\xff\xff\xff\x00\x00'
+>                                         b'\x00\x00\x00\x00\x00\x00\x00\x00'
+>                                         b'\x00\x00\x00\x00\x00\x00\x00\x00'
+>                                         b'\x00\x00\x00\x00\x00\x00\x00\x00',
+>                            'link-state': {'link-state': 'auto', 'vf': 1},
+>                            'mac': {'mac': b'\x00\x00\x00\x00\x00\x00\x00\x00'
+>                                           b'\x00\x00\x00\x00\x00\x00\x00\x00'
+>                                           b'\x00\x00\x00\x00\x00\x00\x00\x00'
+>                                           b'\x00\x00\x00\x00\x00\x00\x00\x00',
+>                                    'vf': 1},
+>                            'rate': {'max-tx-rate': 0,
+>                                     'min-tx-rate': 0,
+>                                     'vf': 1},
+>                            'rss-query-en': {'setting': 0, 'vf': 1},
+>                            'spoofchk': {'setting': 0, 'vf': 1},
+>                            'trust': {'setting': 0, 'vf': 1},
+>                            'tx-rate': {'rate': 0, 'vf': 1},
+>                            'vlan': {'qos': 0, 'vf': 1, 'vlan': 0},
+>                            'vlan-list': {'info': [{'qos': 0,
+>                                                    'vf': 1,
+>                                                    'vlan': 0,
+>                                                    'vlan-proto': 0}]}}]},
+>  'xdp': {'attached': 0}}
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v1] netlink/specs: Add VF attributes to rt_link spec
+    https://git.kernel.org/netdev/net-next/c/e497c3228a4e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
