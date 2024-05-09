@@ -1,120 +1,138 @@
-Return-Path: <netdev+bounces-95156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E68388C185B
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 23:27:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07CC68C1867
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 23:33:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82F0EB20D07
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 21:27:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2E3E28335D
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 21:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B78785C65;
-	Thu,  9 May 2024 21:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C89EF128370;
+	Thu,  9 May 2024 21:33:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="SvQCTsBu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ija/fl61"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FCE85264
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 21:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF4786247
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 21:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715290021; cv=none; b=qXYcP100QmBTFl2Rp9kSBWddMcZy1ZmiQmq2SkY0Xzr1agZnsCflfDdzgEgP2LRVi4DAh3FjblwOmGC7/LV6k8Cul5EnnSMwgzENggB8G74Aw328Vum/GVD7aihNMoI5BFScxhPAoQgdHpwlGEAul63MDS35sCsMpsZ7pQ7+Bi8=
+	t=1715290428; cv=none; b=rtHyAQ2Rn9BEoLNrgXCoG4rSh1HUNYylcjI2QfS1Xkh1O/bID9uE8K3u6IlaR15ecEpb+uxnioL//th5X6u5oTjGhw+zMabZMM2IJbQqxj5wFKW4zoxyzQ5sW2D4t+ahd9s5EpCXnZp13RXPw1l80MYlZXk0IAqEJMocg95WLnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715290021; c=relaxed/simple;
-	bh=sh2RVcH3kYXx3pxWSDGSev2r56o7qSVgAC52eozUMkE=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=qhzSzOaI7ne1XWA3i8xd/fOz3VO1ebXSXAssduKLGdMo0YX5yAUHaYSESalmUP7ikp2x2CIycQv57qis5NFQ6INZGuN7h1ZLy3tNwtmk7S1wvwFjKvhKe9SVUVPlfRIuUCKsUv2tfk4ZZs0wF0v99FMUlqhIE2X0G9o0uksCaQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=SvQCTsBu; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a59a387fbc9so350522166b.1
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 14:27:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1715290019; x=1715894819; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uJpnYp9Gok3jjEaTByhEx/g2RIutD08xBpO53TQkyBA=;
-        b=SvQCTsBuu9qYbfTyxs3r99RzaTnjBQyOb9AbGUAGwSU6PvO6IKULoplLnnYOcEi4lm
-         7uve9FtRUWnD1D/OoxXL54vWkU6gxdW5fRILK+MpXDhrDyh+kXK49S4Goc+QhBoOP/vO
-         ViFCamhIdClhN0tuwRO3TqThqoRY0wLj6CJ/otNCKPuCNCVvnBH644uxNGk1rBRvVc3u
-         0uXFgip7VOU2jdyZqCNBdY9eVd4LcwkAx3y/s1mzCI61nb2gAjuXWvcejeeoOCvJ0d5y
-         TUGh6b1cLBP7AC8mVdpEuXjadJtHMShTNzt5sFB+xqP+958DDHuNl/3JGFMDdYfLWyKJ
-         LgRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715290019; x=1715894819;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uJpnYp9Gok3jjEaTByhEx/g2RIutD08xBpO53TQkyBA=;
-        b=DuemjAK+QUCILIjdUkvpWwFhWDt5iCbS5um6O5cI81HbGdFAZ3cLluFuiO1PKnVgm9
-         jsNGP7TucrHJVknAcwYA4Xm9PE6M0lk+POhVoFEanVkV/LWx+8p0vgSx/UcuKNMyr0Xf
-         2rmsaMNeaqMCiQw7lyYk1ME3GkKXetSd8Ab5zFzrbGnnsHR4NOAbD+O1KnEGcTIuyUj0
-         kp5lG1TvU5pYeJqj56PSfMYrYAKmB/pADmCKMpgEjVf7rUEBf/VLV5BYTdQWVts7+TlY
-         8QxUt3I7zz7AQogW65zqL3eeJ0qBLPChEXMAVZ8PEDHwfnTNJ6LOmWWMZ9m1kAx4EYs2
-         4wMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXpo+tfhwTDo8bRhElMhPTNeTzmqZh4/rARWiOJTmXPi3RUtLVTW98qi4XIRMyn8P8Smzb7HJ3Rz5uCVy3374toDd1ZTgok
-X-Gm-Message-State: AOJu0Yx9tbGaJErPhH7YGahPDSxzTlMWiODIYDOPAwUtIgIVG413BbzI
-	i4t2KSX+a596djEsq1ZNHzQ5eVnH/my7js4Fyhjpcv05ZVU083tpEPqZX2GIwnz2DzwlUfLcAEv
-	aBT4=
-X-Google-Smtp-Source: AGHT+IFtYo+0Pn0orW7bPoagGtyFqlCu8vgHBbRxWWEscfR2+qoH0iwqBQyJ2OIx7eQMwYd7E6Jpcg==
-X-Received: by 2002:a50:bac4:0:b0:572:9f40:514d with SMTP id 4fb4d7f45d1cf-5734d67aadbmr523850a12.29.1715290018651;
-        Thu, 09 May 2024 14:26:58 -0700 (PDT)
-Received: from smtpclient.apple ([2001:a61:aa3:5c01:9c2d:df77:ab3f:a592])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5733c2c7dd9sm1065430a12.69.2024.05.09.14.26.57
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 09 May 2024 14:26:58 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1715290428; c=relaxed/simple;
+	bh=7Qd7kioQIn6Ug3QVYIeKDHVOfBDjLq7+QwL5mOTHriA=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=nCRx21Ht1fdVJgpoH2omfJko6LctDbZiuoBbdDZelgOndS5PnYrVDAI75BJVHHCfyi8r3pKVD5DqI4x7MBwTKUTDTWErkTjmCowkpoKkKCZdVJfsnVGlLAhUoc/m4E/RWvM0sEOCD1Z40TONT0/clDv30Fyehr21wFSoP/jlqHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ija/fl61; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715290426;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IcaQVOny0rQHUK0pL7eF7lEuZY7XrpmUt/qtfJiKS4s=;
+	b=Ija/fl61EQLZSiq338Weocqjqz0pwGyeBRbAufp0RDa27x7SqISjBA8S1oa5DClQ3PSGrQ
+	3idD7y33wuqm531tQFQ1jOsmG/NdYXHvgsMU3oiFy9yoHujUCMqREidwenzb5NIxZSG95I
+	HIVkbvA9qd52fjz/JmKfpYjL5qLX8t8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-84-SXXJHLiOO2OSZBwSwPH1GA-1; Thu, 09 May 2024 17:33:43 -0400
+X-MC-Unique: SXXJHLiOO2OSZBwSwPH1GA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 046A38030A4;
+	Thu,  9 May 2024 21:33:42 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.34])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 12FA0116F842;
+	Thu,  9 May 2024 21:33:37 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <Zj0ErxVBE3DYT2Ea@gpd>
+References: <Zj0ErxVBE3DYT2Ea@gpd> <20231221132400.1601991-1-dhowells@redhat.com> <20231221132400.1601991-41-dhowells@redhat.com>
+To: Andrea Righi <andrea.righi@canonical.com>
+Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org, Latchesar Ionkov <lucho@ionkov.net>,
+    Christian Schoenebeck <linux_oss@crudebyte.com>
+Subject: Re: [PATCH v5 40/40] 9p: Use netfslib read/write_iter
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.500.171.1.1\))
-Subject: Re: [PATCH] net: smc91x: Fix m68k kernel compilation for ColdFire CPU
-From: Thorsten Blum <thorsten.blum@toblux.com>
-In-Reply-To: <98259c2f-b44a-467e-8854-48641984e468@lunn.ch>
-Date: Thu, 9 May 2024 23:26:46 +0200
-Cc: Nicolas Pitre <nico@fluxnic.net>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
- Arnd Bergmann <arnd@arndb.de>,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1567251.1715290417.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <FF387A27-547C-448A-AF52-8E170C05C094@toblux.com>
-References: <20240509121713.190076-2-thorsten.blum@toblux.com>
- <98259c2f-b44a-467e-8854-48641984e468@lunn.ch>
-To: Andrew Lunn <andrew@lunn.ch>
-X-Mailer: Apple Mail (2.3774.500.171.1.1)
+Date: Thu, 09 May 2024 22:33:37 +0100
+Message-ID: <1567252.1715290417@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On 9. May 2024, at 22:36, Andrew Lunn <andrew@lunn.ch> wrote:
-> This seems like the wrong fix.
->=20
-> commit d97cf70af09721ef416c61faa44543e3b84c9a55
-> Author: Greg Ungerer <gerg@linux-m68k.org>
-> Date:   Fri Mar 23 23:39:10 2018 +1000
->=20
->    m68k: use asm-generic/io.h for non-MMU io access functions
->=20
->    There is nothing really special about the non-MMU m68k IO access =
-functions.
->    So we can easily switch to using the asm-generic/io.h functions.
->=20
-> So it rather than put something back which there is an aim to remove,
-> please find the generic replacement. This _swapw() swaps a 16 bit
-> word. The generic for that is swab16().
+Andrea Righi <andrea.righi@canonical.com> wrote:
 
-Thanks. I will use ioread16be() and iowrite16be() as suggested by Arnd
-instead and submit a v2 shortly.
+> On Thu, Dec 21, 2023 at 01:23:35PM +0000, David Howells wrote:
+> > Use netfslib's read and write iteration helpers, allowing netfslib to =
+take
+> > over the management of the page cache for 9p files and to manage local=
+ disk
+> > caching.  In particular, this eliminates write_begin, write_end, write=
+page
+> > and all mentions of struct page and struct folio from 9p.
+> > =
 
-Thorsten=
+> > Note that netfslib now offers the possibility of write-through caching=
+ if
+> > that is desirable for 9p: just set the NETFS_ICTX_WRITETHROUGH flag in
+> > v9inode->netfs.flags in v9fs_set_netfs_context().
+> > =
+
+> > Note also this is untested as I can't get ganesha.nfsd to correctly pa=
+rse
+> > the config to turn on 9p support.
+> =
+
+> It looks like this patch has introduced a regression with autopkgtest,
+> see: https://bugs.launchpad.net/bugs/2056461
+> =
+
+> I haven't looked at the details yet, I just did some bisecting and
+> apparently reverting this one seems to fix the problem.
+> =
+
+> Let me know if you want me to test something in particular or if you
+> already have a potential fix. Otherwise I'll take a look.
+
+Do you have a reproducer?
+
+I'll be at LSF next week, so if I can't fix it tomorrow, I won't be able t=
+o
+poke at it until after that.
+
+David
+
 
