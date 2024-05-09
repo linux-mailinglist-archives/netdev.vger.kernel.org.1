@@ -1,98 +1,172 @@
-Return-Path: <netdev+bounces-94754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 662498C094C
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 03:50:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E1ED8C0962
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 03:54:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05CE71F221E7
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 01:50:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC1E8B216D0
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 01:54:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091B913C825;
-	Thu,  9 May 2024 01:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B24913D514;
+	Thu,  9 May 2024 01:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0LSJbbQ"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="GpYwT3ly"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD70113B5B3;
-	Thu,  9 May 2024 01:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C347413D280;
+	Thu,  9 May 2024 01:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715219427; cv=none; b=HdmT2YDMc1+mBkdj5MCzdmYHRc9sYyU2oLqtH3dDq7KDStGdBj8vj9iI5k+VwLWUAV46oIUCTNIrHYUN2yV86OBZoW93k1xcqnO1sHA6qoafrUaQuiGPhk9zDPT6RhrAHAqBwZLwzHDKeIEKRZDvXxsQ6OCANjsKsOuuit9c5Q4=
+	t=1715219603; cv=none; b=a2K3b9DcAHaM5+lAo6VhbwNV6JpQajzG4Lex2WGhYr0UDBYxY3GWO5Fs4sEEwyFUqLYCiW5Rgnk9lSQJvNMMkIg3BUmXt/29QzBzxPV6ZZ6iFmHZA33bxQpx5/YwJiCi/PcX3aGnHwmnxVKjtDP34Bik96EzD1G5r+Or80iDG+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715219427; c=relaxed/simple;
-	bh=TjFtPczTySps3gtYiaLaMfzP0mzVJYqLHUsJpNxYMLg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Vt6NTQo0QhCJX9mMS7LE774sXugI4EWIylBTOiOeXO07s3FI8IZgkbi7tB56XQinuImOkfYj0D9Sk1hRq7h5Aloc23MfVEdGG6bmwLH7jTVJX10Tw6G4+5/TGJA6ouB6PScZhDBaz5IxT764gUjvS92ungIRycuS5O5xzMvHxHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d0LSJbbQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 52B09C3277B;
-	Thu,  9 May 2024 01:50:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715219427;
-	bh=TjFtPczTySps3gtYiaLaMfzP0mzVJYqLHUsJpNxYMLg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=d0LSJbbQHDxyrM0TgTU4yAMD3lPyubH2P8+gvVy/YZtmEKiUyVA6c2cR3wkJJD5PH
-	 +9N1wwzr7GxlBbRdDnpRqCYFT0t/gt/NdBMU70VpyQUC9WIdoAL7/3+BzsRglHYMb/
-	 YURTen9dfj7Gxs+uVbi6Y3EOcvhrS0Yk0Z3loASbJFrtKEVP9BrWz4zZbJVTr2dtpE
-	 DGPUsy6i5tOVw7Gf8ZeDX1IfKddHVv4Jr2zRqvcHWGzJljHuld0ys7g1LjwOY0IlKD
-	 bfIDssEo1r6lW9JPo+VsxhfB0JhomkPTv7L6jfQbc/rvgJl9kxFVQEDZ3VgV5DtotZ
-	 o5qQyK0nXiRwg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 406EAC43331;
-	Thu,  9 May 2024 01:50:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1715219603; c=relaxed/simple;
+	bh=nhF5Rqpf1Sh/E7F/InVEqc1GzOa/hK+3b/qJDEK0PdM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Cloz6ZkoIM4JUlK658Q7vWDyU4iwHXIOcs1MNFg1RdcB0wCgSO0zSuyuq96egOw2J1bHuqelmdWhWAHeMh1o6w5HpW6SbYC76jn1WaXfW383/LaHb5zJNLhIeaIaHTdtxAduR2lLyt1wyr8yN2a+ujm2J0cPkeZdUrT+RR03YUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=GpYwT3ly; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1715219592;
+	bh=WpdW4zqAGBKvnQv0jKzuhtnmm8jG3qKhG4SNIVAsBt4=;
+	h=Date:From:To:Cc:Subject:From;
+	b=GpYwT3lyREGArozTLTrWqQSSnAQQMhHVI6/9zkqD5S4MCB/UDXvcKRxBFKdNiSXtR
+	 YWOYU3nPg+rtTWsOsXILkTBQQeIXLm9h7IfpwEdu8PI0Gq7B/xdmu7D9GpkCyJdrCa
+	 tQjFoJ6KJTKcpupzgeSvRj44xrjTLbsCer/CzLXi4DqZpmpdTfqZYeBEJD758ZXazc
+	 WnXoXJ5OV34fXQ8w1iyxodyyZA8VV2n8UJui4E9GB9cPh+KKBZ5GSZVfvmrQMTWlEj
+	 ZKtTrYPYLY311CcTvOD/v8LZMgDGNt7VW7EohpCmIXjqBMq9W1OokHmBKkJtK5gp60
+	 WFaQbHKq6Bzuw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VZZm72g4Nz4x30;
+	Thu,  9 May 2024 11:53:10 +1000 (AEST)
+Date: Thu, 9 May 2024 11:53:07 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Christoph Hellwig <hch@lst.de>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Networking <netdev@vger.kernel.org>, Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the net-next tree with the dma-mapping
+ tree
+Message-ID: <20240509115307.71ae8787@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: ipq4019-mdio: add IPQ9574 compatible
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171521942726.27440.15024502968877873009.git-patchwork-notify@kernel.org>
-Date: Thu, 09 May 2024 01:50:27 +0000
-References: <20240507024758.2810514-1-mr.nuke.me@gmail.com>
-In-Reply-To: <20240507024758.2810514-1-mr.nuke.me@gmail.com>
-To: Alexandru Gagniuc <mr.nuke.me@gmail.com>
-Cc: andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, robert.marko@sartura.hr,
- linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- conor.dooley@microchip.com
+Content-Type: multipart/signed; boundary="Sig_/NuBy9ZQeB44PQ22KF2SbEhf";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hello:
+--Sig_/NuBy9ZQeB44PQ22KF2SbEhf
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Hi all,
 
-On Mon,  6 May 2024 21:47:57 -0500 you wrote:
-> Add a compatible property specific to IPQ9574. This should be used
-> along with the IPQ4019 compatible. This second compatible serves the
-> same purpose as the ipq{5,6,8} compatibles. This is to indicate that
-> the clocks properties are required.
-> 
-> Signed-off-by: Alexandru Gagniuc <mr.nuke.me@gmail.com>
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> 
-> [...]
+Today's linux-next merge of the net-next tree got a conflict in:
 
-Here is the summary with links:
-  - [v2,1/2] dt-bindings: net: ipq4019-mdio: add IPQ9574 compatible
-    https://git.kernel.org/netdev/net-next/c/3a2a192b0ef1
-  - [v2,2/2] arm64: dts: qcom: ipq9574: add MDIO bus
-    (no matching commit)
+  net/core/page_pool.c
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+between commit:
 
+  4321de4497b2 ("page_pool: check for DMA sync shortcut earlier")
 
+from the dma-mapping tree and commit:
+
+  ef9226cd56b7 ("page_pool: constify some read-only function arguments")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc net/core/page_pool.c
+index 4f9d1bd7f4d1,8bcc7014a61a..000000000000
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@@ -398,26 -384,16 +399,26 @@@ static struct page *__page_pool_get_cac
+  	return page;
+  }
+ =20
+ -static void page_pool_dma_sync_for_device(const struct page_pool *pool,
+ -					  const struct page *page,
+ -					  unsigned int dma_sync_size)
+ +static void __page_pool_dma_sync_for_device(const struct page_pool *pool,
+- 					    struct page *page,
+++					    const struct page *page,
+ +					    u32 dma_sync_size)
+  {
+ +#if defined(CONFIG_HAS_DMA) && defined(CONFIG_DMA_NEED_SYNC)
+  	dma_addr_t dma_addr =3D page_pool_get_dma_addr(page);
+ =20
+  	dma_sync_size =3D min(dma_sync_size, pool->p.max_len);
+ -	dma_sync_single_range_for_device(pool->p.dev, dma_addr,
+ -					 pool->p.offset, dma_sync_size,
+ -					 pool->p.dma_dir);
+ +	__dma_sync_single_for_device(pool->p.dev, dma_addr + pool->p.offset,
+ +				     dma_sync_size, pool->p.dma_dir);
+ +#endif
+ +}
+ +
+ +static __always_inline void
+ +page_pool_dma_sync_for_device(const struct page_pool *pool,
+- 			      struct page *page,
+++			      const struct page *page,
+ +			      u32 dma_sync_size)
+ +{
+ +	if (pool->dma_sync && dma_dev_need_sync(pool->p.dev))
+ +		__page_pool_dma_sync_for_device(pool, page, dma_sync_size);
+  }
+ =20
+  static bool page_pool_dma_map(struct page_pool *pool, struct page *page)
+@@@ -708,10 -688,11 +710,9 @@@ __page_pool_put_page(struct page_pool *
+  	if (likely(__page_pool_page_can_be_recycled(page))) {
+  		/* Read barrier done in page_ref_count / READ_ONCE */
+ =20
+ -		if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
+ -			page_pool_dma_sync_for_device(pool, page,
+ -						      dma_sync_size);
+ +		page_pool_dma_sync_for_device(pool, page, dma_sync_size);
+ =20
+- 		if (allow_direct && in_softirq() &&
+- 		    page_pool_recycle_in_cache(page, pool))
++ 		if (allow_direct && page_pool_recycle_in_cache(page, pool))
+  			return NULL;
+ =20
+  		/* Page found as candidate for recycling */
+
+--Sig_/NuBy9ZQeB44PQ22KF2SbEhf
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmY8LIMACgkQAVBC80lX
+0GyoaQf/ezrpddH1WzyhXEMQYeGAg/CF1ZTKsowhF5XlCdn+JLEPJdmubXK/zClx
++CwSlhUDqXIENzGzmQtGFmZQ2lTCKcfrREz+0LPCbrLVm3w2mvuFpzXv2ywncPz+
+isqeCsKePHKAYo7n25wM28Swzgm/nzyXMGLpkdlUCCGOpfa4iG7EtDkuffqnkG1P
+o1DsjAWiWSnDnm/1Ug5WEV8zO+V6YWDr683LKbuPH49o+52FisC89Zs+ezMFN3wT
+hp8EHfIIVTk2enZK2ZWko3mDbr5Zwlpf85VWoeGA4rIblxIWaC8zHlS56VReI8Re
+l6oXl3MZkt6OUWjwwGP6Hy/7Orw/AQ==
+=oTxH
+-----END PGP SIGNATURE-----
+
+--Sig_/NuBy9ZQeB44PQ22KF2SbEhf--
 
