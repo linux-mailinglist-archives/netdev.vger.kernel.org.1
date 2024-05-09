@@ -1,642 +1,100 @@
-Return-Path: <netdev+bounces-94978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A289F8C1298
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 18:16:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B2028C129C
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 18:17:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04B55B21582
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 16:16:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B68CD281A76
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 16:17:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B430716F84B;
-	Thu,  9 May 2024 16:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D78B16F83F;
+	Thu,  9 May 2024 16:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2l7afX+z"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AC3E16F832;
-	Thu,  9 May 2024 16:16:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210F216F84B
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 16:17:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715271399; cv=none; b=H26ZT6TodjEI6xIwQsqjfOoJLAgvTZziE7db3yUJT+Y0tGlC+God9IuGfLsjkwjp/MPBAElH3emc6YACLCFHBBm1iGb4QzdFso9jxq9DFEnVivO1nM4juee+LkwHJ+ywUGa7t3e/GJnMmDPM3nx6v+DPB1Kx65FO8NNqwRohZi0=
+	t=1715271435; cv=none; b=qK7xOsAnfA9OjpJL/rGXAZ07haPh43pJ2VQMPsMpPQn0ImGtJutZCMmVHGJ0/+giIE9BgRhUGScCHTE1uAS3BFPXga2JHNTGQarpBx7jqlKnPPVXkXDv45N3FdvhqE1BBsAwD3OTnbYqg6JUgDJinh12lGUWxU18Js5N2u+Y8zE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715271399; c=relaxed/simple;
-	bh=QvxJGTGS4mwLgnS0xtMjkHGpoJAiZv1+KvY8N7BDM7I=;
+	s=arc-20240116; t=1715271435; c=relaxed/simple;
+	bh=sYL+tm5cKkY8dZSO20Vahj+h/Jf7ruvKKYNgnnb1SIg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PJZzeHOCzPY8cutfgzwPDHzW2FmfVEhBe8C54mz8S59i+HwFz1LROcTIeb27yf47jljGB9Q70yuLnth+Vo1UHnKS9lTyZ+D3s07zZj/xkAsvp8NTUPkw8bKKq22MrwjmjMktpy0wqZLeZQexOu/ymACh5Bs4lvwFLY6Qxog4Kys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1s56RK-000000008Vk-1VOx;
-	Thu, 09 May 2024 16:16:14 +0000
-Date: Thu, 9 May 2024 17:16:09 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Frank Wunderlich <linux@fw-web.de>
-Cc: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-	Lee Jones <lee@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	devicetree@vger.kernel.org, Tianling Shen <cnsztl@immortalwrt.org>,
-	netdev@vger.kernel.org, Tianling Shen <cnsztl@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	Eric Woudstra <ericwouds@gmail.com>, linux-clk@vger.kernel.org,
-	linux-leds@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] arm64: dts: mediatek: Add  mt7986 based Bananapi
- R3 Mini
-Message-ID: <Zjz2yeUFdoVmBXIc@makrotopia.org>
-References: <20240509152157.10162-1-linux@fw-web.de>
- <20240509152157.10162-3-linux@fw-web.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z66FYpvaMYJ2qVRwWIcKreU9KotmkZ9/zyre9diCkXDvtEDJmk5/qK3ysgfaqkwZG36PZNpU6l5KVoVPJ4EFIj/oXN5WVkKo9FBRUpKUuMvgwl+hcaMqG4OZVcY8795I4Df6MsKu6btZRKH+BzNV1bNI+bOYz+wn0BFHY4i8+94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2l7afX+z; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=fSGYK3Osj+/uFmjgHX8YsyvjdvHRLEUz/pi2ug1calU=; b=2l7afX+zfWPH65o0aDKnBuDR2E
+	iuJfL5rjaLIKL0ltGKY/FO9tbFhLaxJbeHxZCSadJh6X+yWMfc9u6AQh+MgWDl4nnvxtPxQbE0uDr
+	UmlzkVSthIHTIvBhQ8uPblBxlxeO+WmqnsA+dD9XZ5IvdOY26T0xFHo5sOmf3/JM1FvQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s56SC-00F3iQ-Lr; Thu, 09 May 2024 18:17:08 +0200
+Date: Thu, 9 May 2024 18:17:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [RFC PATCH] net: introduce HW Rate Limiting Driver API
+Message-ID: <a0ada382-105a-4994-ad0f-1a485cef12c4@lunn.ch>
+References: <3d1e2d945904a0fb55258559eb7322d7e11066b6.1715199358.git.pabeni@redhat.com>
+ <f6d15624-cd25-4484-9a25-86f08b5efd51@lunn.ch>
+ <e2cbbbc416700486e0b4dd5bc9d80374b53aaf79.camel@redhat.com>
+ <9dd818dc-1fef-4633-b388-6ce7272f9cb4@lunn.ch>
+ <f7fa91a89f16e45de56c1aa8d2c533c6f94648ba.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240509152157.10162-3-linux@fw-web.de>
+In-Reply-To: <f7fa91a89f16e45de56c1aa8d2c533c6f94648ba.camel@redhat.com>
 
-On Thu, May 09, 2024 at 05:21:57PM +0200, Frank Wunderlich wrote:
-> From: Frank Wunderlich <frank-w@public-files.de>
+> > Now the question is, how do i get between these two states? It is not
+> > possible to mix WRR and strict priority. Any kAPI which only modifies
+> > one queue at once will go straight into an invalid state, and the
+> > driver will need to return -EOPNOTSUPP. So it seems like there needs
+> > to be an atomic set N queue configuration at once, so i can cleanly go
+> > from strict priority across 8 queues to WRR across 8 queues. Is that
+> > foreseen?
 > 
-> Add devicetree for Bananapi R3 Mini SBC.
-> 
-> Key features:
-> - MediaTek MT7986A(Filogic 830) Quad core ARM Cortex A53
-> - Wifi 6 2.4G/5G（MT7976C）
-                  ^^       ^^
-Those are full-width unicode parentheses.
-Consider using normal 7-bit ASCII parentheses instead to keep the
-commit message readable also on non-unicode terminals.
+> You could delete all the WRR shapers and then create/add SP based ones.
 
-  Unicode    vs    ASCII
-  （ 0xff08  vs    ( 0x28
-  ） 0xff09  vs    ) 0x29
+But that does not match the hardware. I cannot delete the hardware. It
+will either do strict priority or WRR. If i delete the software
+representation of the shaper, the hardware shaper will keep on doing
+what it was doing. So i don't see this as a good model. I think the
+driver will create shapers to represent the hardware, and you are not
+allowed to delete them or add more of them, because that is what the
+hardware is. All you can do is configure the shapers that exist.
 
+> The 'create' op is just an abstraction to tell the NIC to switch from
+> the default configuration to the specified one.
 
-> - 2G DDR RAM
-> - 8G eMMC flash
-> - 128MB Nand flash
-> - 2x 2.5GbE network port
-> - 1x M.2 Key B USB interface
-> - 1x M.2 KEY M PCIe interface
-> - 1x USB2.0 interface
-> 
-> source: https://wiki.banana-pi.org/Banana_Pi_BPI-R3_Mini
-> 
-> Co-developed-by: Eric Woudstra <ericwouds@gmail.com>
-> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-> Co-developed-by: Tianling Shen <cnsztl@gmail.com>
-> Signed-off-by: Tianling Shen <cnsztl@gmail.com>
-> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+Well, the hardware default is i think WRR for the queues, and line
+rate. That will be what the software representation of the shapers
+will be set to when the driver probes and creates the shapers
+representors.
 
-Reviewed-by: Daniel Golle <daniel@makrotopia.org>
-
-> ---
-> v2:
-> - add missing node for nand
-> - add some information about the board in description
-> 
-> change dts based on review from angelo+krzysztof
-> 
-> - drop fan status
-> - rename phy14 to phy0 and phy15 to phy1
-> - drop default-trigger from phys and so also the binding-patch
-> - use regulator names based on regexp regulator-[0-9]+v[0-9]+
-> - add comment for pwm
-> ---
->  arch/arm64/boot/dts/mediatek/Makefile         |   1 +
->  .../mediatek/mt7986a-bananapi-bpi-r3-mini.dts | 493 ++++++++++++++++++
->  2 files changed, 494 insertions(+)
->  create mode 100644 arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts
-> 
-> diff --git a/arch/arm64/boot/dts/mediatek/Makefile b/arch/arm64/boot/dts/mediatek/Makefile
-> index 37b4ca3a87c9..1763b001ab06 100644
-> --- a/arch/arm64/boot/dts/mediatek/Makefile
-> +++ b/arch/arm64/boot/dts/mediatek/Makefile
-> @@ -11,6 +11,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += mt7622-bananapi-bpi-r64.dtb
->  dtb-$(CONFIG_ARCH_MEDIATEK) += mt7981b-xiaomi-ax3000t.dtb
->  dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-acelink-ew-7886cax.dtb
->  dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3.dtb
-> +dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3-mini.dtb
->  dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3-emmc.dtbo
->  dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3-nand.dtbo
->  dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3-nor.dtbo
-> diff --git a/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts b/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts
-> new file mode 100644
-> index 000000000000..e2a2fea7adf0
-> --- /dev/null
-> +++ b/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts
-> @@ -0,0 +1,493 @@
-> +// SPDX-License-Identifier: (GPL-2.0 OR MIT)
-> +/*
-> + * Copyright (C) 2021 MediaTek Inc.
-> + * Authors: Frank Wunderlich <frank-w@public-files.de>
-> + *          Eric Woudstra <ericwouds@gmail.com>
-> + *          Tianling Shen <cnsztl@immortalwrt.org>
-> + */
-> +
-> +/dts-v1/;
-> +
-> +#include <dt-bindings/gpio/gpio.h>
-> +#include <dt-bindings/input/input.h>
-> +#include <dt-bindings/leds/common.h>
-> +#include <dt-bindings/pinctrl/mt65xx.h>
-> +
-> +#include "mt7986a.dtsi"
-> +
-> +/ {
-> +	model = "Bananapi BPI-R3 Mini";
-> +	chassis-type = "embedded";
-> +	compatible = "bananapi,bpi-r3mini", "mediatek,mt7986a";
-> +
-> +	aliases {
-> +		serial0 = &uart0;
-> +		ethernet0 = &gmac0;
-> +		ethernet1 = &gmac1;
-> +	};
-> +
-> +	chosen {
-> +		stdout-path = "serial0:115200n8";
-> +	};
-> +
-> +	dcin: regulator-12v {
-> +		compatible = "regulator-fixed";
-> +		regulator-name = "12vd";
-> +		regulator-min-microvolt = <12000000>;
-> +		regulator-max-microvolt = <12000000>;
-> +		regulator-boot-on;
-> +		regulator-always-on;
-> +	};
-> +
-> +	fan: pwm-fan {
-> +		compatible = "pwm-fan";
-> +		#cooling-cells = <2>;
-> +		/*
-> +		 * The signal is inverted on this board and the PWM driver
-> +		 * does not support polarity inversion.
-> +		 */
-> +		/* cooling level (0, 1, 2) */
-> +		cooling-levels = <255 96 0>;
-> +		pwms = <&pwm 0 10000>;
-> +	};
-> +
-> +	reg_1p8v: regulator-1v8 {
-> +		compatible = "regulator-fixed";
-> +		regulator-name = "1.8vd";
-> +		regulator-min-microvolt = <1800000>;
-> +		regulator-max-microvolt = <1800000>;
-> +		regulator-boot-on;
-> +		regulator-always-on;
-> +		vin-supply = <&dcin>;
-> +	};
-> +
-> +	reg_3p3v: regulator-3v3 {
-> +		compatible = "regulator-fixed";
-> +		regulator-name = "3.3vd";
-> +		regulator-min-microvolt = <3300000>;
-> +		regulator-max-microvolt = <3300000>;
-> +		regulator-boot-on;
-> +		regulator-always-on;
-> +		vin-supply = <&dcin>;
-> +	};
-> +
-> +	usb_vbus: regulator-5v {
-> +		compatible = "regulator-fixed";
-> +		regulator-name = "usb_vbus";
-> +		regulator-min-microvolt = <5000000>;
-> +		regulator-max-microvolt = <5000000>;
-> +		gpios = <&pio 20 GPIO_ACTIVE_LOW>;
-> +		regulator-boot-on;
-> +	};
-> +
-> +	en8811_a: regulator-phy1 {
-> +		compatible = "regulator-fixed";
-> +		regulator-name = "phy1";
-> +		regulator-min-microvolt = <3300000>;
-> +		regulator-max-microvolt = <3300000>;
-> +		gpio = <&pio 16 GPIO_ACTIVE_LOW>;
-> +		regulator-always-on;
-> +	};
-> +
-> +	en8811_b: regulator-phy2 {
-> +		compatible = "regulator-fixed";
-> +		regulator-name = "phy2";
-> +		regulator-min-microvolt = <3300000>;
-> +		regulator-max-microvolt = <3300000>;
-> +		gpio = <&pio 17 GPIO_ACTIVE_LOW>;
-> +		regulator-always-on;
-> +	};
-> +
-> +	leds {
-> +		compatible = "gpio-leds";
-> +
-> +		green_led: led-0 {
-> +			color = <LED_COLOR_ID_GREEN>;
-> +			function = LED_FUNCTION_POWER;
-> +			gpios = <&pio 19 GPIO_ACTIVE_HIGH>;
-> +			default-state = "on";
-> +		};
-> +	};
-> +
-> +	gpio-keys {
-> +		compatible = "gpio-keys";
-> +
-> +		reset-key {
-> +			label = "reset";
-> +			linux,code = <KEY_RESTART>;
-> +			gpios = <&pio 7 GPIO_ACTIVE_LOW>;
-> +		};
-> +	};
-> +
-> +};
-> +
-> +&cpu_thermal {
-> +	cooling-maps {
-> +		map0 {
-> +			/* active: set fan to cooling level 2 */
-> +			cooling-device = <&fan 2 2>;
-> +			trip = <&cpu_trip_active_high>;
-> +		};
-> +
-> +		map1 {
-> +			/* active: set fan to cooling level 1 */
-> +			cooling-device = <&fan 1 1>;
-> +			trip = <&cpu_trip_active_med>;
-> +		};
-> +
-> +		map2 {
-> +			/* active: set fan to cooling level 0 */
-> +			cooling-device = <&fan 0 0>;
-> +			trip = <&cpu_trip_active_low>;
-> +		};
-> +	};
-> +};
-> +
-> +&crypto {
-> +	status = "okay";
-> +};
-> +
-> +&eth {
-> +	status = "okay";
-> +
-> +	gmac0: mac@0 {
-> +		compatible = "mediatek,eth-mac";
-> +		reg = <0>;
-> +		phy-mode = "2500base-x";
-> +		phy-handle = <&phy0>;
-> +	};
-> +
-> +	gmac1: mac@1 {
-> +		compatible = "mediatek,eth-mac";
-> +		reg = <1>;
-> +		phy-mode = "2500base-x";
-> +		phy-handle = <&phy1>;
-> +	};
-> +
-> +	mdio: mdio-bus {
-> +		#address-cells = <1>;
-> +		#size-cells = <0>;
-> +	};
-> +};
-> +
-> +&mmc0 {
-> +	pinctrl-names = "default", "state_uhs";
-> +	pinctrl-0 = <&mmc0_pins_default>;
-> +	pinctrl-1 = <&mmc0_pins_uhs>;
-> +	vmmc-supply = <&reg_3p3v>;
-> +	vqmmc-supply = <&reg_1p8v>;
-> +};
-> +
-> +
-> +&i2c0 {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&i2c_pins>;
-> +	status = "okay";
-> +
-> +	/* MAC Address EEPROM */
-> +	eeprom@50 {
-> +		compatible = "atmel,24c02";
-> +		reg = <0x50>;
-> +
-> +		address-width = <8>;
-> +		pagesize = <8>;
-> +		size = <256>;
-> +	};
-> +};
-> +
-> +&mdio {
-> +	phy0: ethernet-phy@14 {
-> +		reg = <14>;
-> +		interrupts-extended = <&pio 48 IRQ_TYPE_EDGE_FALLING>;
-> +		reset-gpios = <&pio 49 GPIO_ACTIVE_LOW>;
-> +		reset-assert-us = <10000>;
-> +		reset-deassert-us = <20000>;
-> +		phy-mode = "2500base-x";
-> +		full-duplex;
-> +		pause;
-> +		airoha,pnswap-rx;
-> +
-> +		leds {
-> +			#address-cells = <1>;
-> +			#size-cells = <0>;
-> +
-> +			led@0 { /* en8811_a_gpio5 */
-> +				reg = <0>;
-> +				color = <LED_COLOR_ID_YELLOW>;
-> +				function = LED_FUNCTION_LAN;
-> +				function-enumerator = <1>;
-> +				default-state = "keep";
-> +			};
-> +			led@1 { /* en8811_a_gpio4 */
-> +				reg = <1>;
-> +				color = <LED_COLOR_ID_GREEN>;
-> +				function = LED_FUNCTION_LAN;
-> +				function-enumerator = <2>;
-> +				default-state = "keep";
-> +			};
-> +		};
-> +	};
-> +
-> +	phy1: ethernet-phy@15 {
-> +		reg = <15>;
-> +		interrupts-extended = <&pio 46 IRQ_TYPE_EDGE_FALLING>;
-> +		reset-gpios = <&pio 47 GPIO_ACTIVE_LOW>;
-> +		reset-assert-us = <10000>;
-> +		reset-deassert-us = <20000>;
-> +		phy-mode = "2500base-x";
-> +		full-duplex;
-> +		pause;
-> +		airoha,pnswap-rx;
-> +
-> +		leds {
-> +			#address-cells = <1>;
-> +			#size-cells = <0>;
-> +
-> +			led@0 { /* en8811_b_gpio5 */
-> +				reg = <0>;
-> +				color = <LED_COLOR_ID_YELLOW>;
-> +				function = LED_FUNCTION_WAN;
-> +				function-enumerator = <1>;
-> +				default-state = "keep";
-> +			};
-> +			led@1 { /* en8811_b_gpio4 */
-> +				reg = <1>;
-> +				color = <LED_COLOR_ID_GREEN>;
-> +				function = LED_FUNCTION_WAN;
-> +				function-enumerator = <2>;
-> +				default-state = "keep";
-> +			};
-> +		};
-> +	};
-> +};
-> +
-> +&pcie {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&pcie_pins>;
-> +	status = "okay";
-> +};
-> +
-> +&pcie_phy {
-> +	status = "okay";
-> +};
-> +
-> +&pio {
-> +	i2c_pins: i2c-pins {
-> +		mux {
-> +			function = "i2c";
-> +			groups = "i2c";
-> +		};
-> +	};
-> +
-> +	mmc0_pins_default: mmc0-pins {
-> +		mux {
-> +			function = "emmc";
-> +			groups = "emmc_51";
-> +		};
-> +		conf-cmd-dat {
-> +			pins = "EMMC_DATA_0", "EMMC_DATA_1", "EMMC_DATA_2",
-> +			       "EMMC_DATA_3", "EMMC_DATA_4", "EMMC_DATA_5",
-> +			       "EMMC_DATA_6", "EMMC_DATA_7", "EMMC_CMD";
-> +			input-enable;
-> +			drive-strength = <4>;
-> +			bias-pull-up = <MTK_PUPD_SET_R1R0_01>; /* pull-up 10K */
-> +		};
-> +		conf-clk {
-> +			pins = "EMMC_CK";
-> +			drive-strength = <6>;
-> +			bias-pull-down = <MTK_PUPD_SET_R1R0_10>; /* pull-down 50K */
-> +		};
-> +		conf-ds {
-> +			pins = "EMMC_DSL";
-> +			bias-pull-down = <MTK_PUPD_SET_R1R0_10>; /* pull-down 50K */
-> +		};
-> +		conf-rst {
-> +			pins = "EMMC_RSTB";
-> +			drive-strength = <4>;
-> +			bias-pull-up = <MTK_PUPD_SET_R1R0_01>; /* pull-up 10K */
-> +		};
-> +	};
-> +
-> +	mmc0_pins_uhs: mmc0-uhs-pins {
-> +		mux {
-> +			function = "emmc";
-> +			groups = "emmc_51";
-> +		};
-> +		conf-cmd-dat {
-> +			pins = "EMMC_DATA_0", "EMMC_DATA_1", "EMMC_DATA_2",
-> +			       "EMMC_DATA_3", "EMMC_DATA_4", "EMMC_DATA_5",
-> +			       "EMMC_DATA_6", "EMMC_DATA_7", "EMMC_CMD";
-> +			input-enable;
-> +			drive-strength = <4>;
-> +			bias-pull-up = <MTK_PUPD_SET_R1R0_01>; /* pull-up 10K */
-> +		};
-> +		conf-clk {
-> +			pins = "EMMC_CK";
-> +			drive-strength = <6>;
-> +			bias-pull-down = <MTK_PUPD_SET_R1R0_10>; /* pull-down 50K */
-> +		};
-> +		conf-ds {
-> +			pins = "EMMC_DSL";
-> +			bias-pull-down = <MTK_PUPD_SET_R1R0_10>; /* pull-down 50K */
-> +		};
-> +		conf-rst {
-> +			pins = "EMMC_RSTB";
-> +			drive-strength = <4>;
-> +			bias-pull-up = <MTK_PUPD_SET_R1R0_01>; /* pull-up 10K */
-> +		};
-> +	};
-> +
-> +	pcie_pins: pcie-pins {
-> +		mux {
-> +			function = "pcie";
-> +			groups = "pcie_clk", "pcie_wake", "pcie_pereset";
-> +		};
-> +	};
-> +
-> +	pwm_pins: pwm-pins {
-> +		mux {
-> +			function = "pwm";
-> +			groups = "pwm0";
-> +		};
-> +	};
-> +
-> +	spi_flash_pins: spi-flash-pins {
-> +		mux {
-> +			function = "spi";
-> +			groups = "spi0", "spi0_wp_hold";
-> +		};
-> +	};
-> +
-> +	usb_ngff_pins: usb-ngff-pins {
-> +		ngff-gnss-off-conf {
-> +			pins = "GPIO_6";
-> +			drive-strength = <8>;
-> +			mediatek,pull-up-adv = <1>;
-> +		};
-> +		ngff-pe-rst-conf {
-> +			pins = "GPIO_7";
-> +			drive-strength = <8>;
-> +			mediatek,pull-up-adv = <1>;
-> +		};
-> +		ngff-wwan-off-conf {
-> +			pins = "GPIO_8";
-> +			drive-strength = <8>;
-> +			mediatek,pull-up-adv = <1>;
-> +		};
-> +		ngff-pwr-off-conf {
-> +			pins = "GPIO_9";
-> +			drive-strength = <8>;
-> +			mediatek,pull-up-adv = <1>;
-> +		};
-> +		ngff-rst-conf {
-> +			pins = "GPIO_10";
-> +			drive-strength = <8>;
-> +			mediatek,pull-up-adv = <1>;
-> +		};
-> +		ngff-coex-conf {
-> +			pins = "SPI1_CS";
-> +			drive-strength = <8>;
-> +			mediatek,pull-up-adv = <1>;
-> +		};
-> +	};
-> +
-> +	wf_2g_5g_pins: wf-2g-5g-pins {
-> +		mux {
-> +			function = "wifi";
-> +			groups = "wf_2g", "wf_5g";
-> +		};
-> +		conf {
-> +			pins = "WF0_HB1", "WF0_HB2", "WF0_HB3", "WF0_HB4",
-> +			       "WF0_HB0", "WF0_HB0_B", "WF0_HB5", "WF0_HB6",
-> +			       "WF0_HB7", "WF0_HB8", "WF0_HB9", "WF0_HB10",
-> +			       "WF0_TOP_CLK", "WF0_TOP_DATA", "WF1_HB1",
-> +			       "WF1_HB2", "WF1_HB3", "WF1_HB4", "WF1_HB0",
-> +			       "WF1_HB5", "WF1_HB6", "WF1_HB7", "WF1_HB8",
-> +			       "WF1_TOP_CLK", "WF1_TOP_DATA";
-> +			drive-strength = <4>;
-> +		};
-> +	};
-> +
-> +	wf_dbdc_pins: wf-dbdc-pins {
-> +		mux {
-> +			function = "wifi";
-> +			groups = "wf_dbdc";
-> +		};
-> +		conf {
-> +			pins = "WF0_HB1", "WF0_HB2", "WF0_HB3", "WF0_HB4",
-> +			       "WF0_HB0", "WF0_HB0_B", "WF0_HB5", "WF0_HB6",
-> +			       "WF0_HB7", "WF0_HB8", "WF0_HB9", "WF0_HB10",
-> +			       "WF0_TOP_CLK", "WF0_TOP_DATA", "WF1_HB1",
-> +			       "WF1_HB2", "WF1_HB3", "WF1_HB4", "WF1_HB0",
-> +			       "WF1_HB5", "WF1_HB6", "WF1_HB7", "WF1_HB8",
-> +			       "WF1_TOP_CLK", "WF1_TOP_DATA";
-> +			drive-strength = <4>;
-> +		};
-> +	};
-> +
-> +	wf_led_pins: wf-led-pins {
-> +		mux {
-> +			function = "led";
-> +			groups = "wifi_led";
-> +		};
-> +	};
-> +};
-> +
-> +&pwm {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&pwm_pins>;
-> +	status = "okay";
-> +};
-> +
-> +&spi0 {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&spi_flash_pins>;
-> +	status = "okay";
-> +
-> +	flash@0 {
-> +		compatible = "spi-nand";
-> +		#address-cells = <1>;
-> +		#size-cells = <1>;
-> +		reg = <0>;
-> +
-> +		spi-max-frequency = <20000000>;
-> +		spi-tx-bus-width = <4>;
-> +		spi-rx-bus-width = <4>;
-> +	};
-> +};
-> +
-> +&ssusb {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&usb_ngff_pins>;
-> +	vusb33-supply = <&reg_3p3v>;
-> +	vbus-supply = <&usb_vbus>;
-> +	status = "okay";
-> +};
-> +
-> +&trng {
-> +	status = "okay";
-> +};
-> +
-> +&uart0 {
-> +	status = "okay";
-> +};
-> +
-> +&usb_phy {
-> +	status = "okay";
-> +};
-> +
-> +&watchdog {
-> +	status = "okay";
-> +};
-> +
-> +&wifi {
-> +	status = "okay";
-> +	pinctrl-names = "default", "dbdc";
-> +	pinctrl-0 = <&wf_2g_5g_pins>, <&wf_led_pins>;
-> +	pinctrl-1 = <&wf_dbdc_pins>, <&wf_led_pins>;
-> +
-> +	led {
-> +		led-active-low;
-> +	};
-> +};
-> +
-> -- 
-> 2.34.1
-> 
-> 
+	Andrew
 
