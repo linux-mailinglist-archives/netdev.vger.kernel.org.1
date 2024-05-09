@@ -1,645 +1,266 @@
-Return-Path: <netdev+bounces-94969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E21D8C11EA
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 17:22:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CE558C11F9
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 17:27:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E24841F213A3
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 15:22:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 727001F22007
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 15:27:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F32E916EC01;
-	Thu,  9 May 2024 15:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F9516F297;
+	Thu,  9 May 2024 15:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="Qvj+NSbY"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="b8QfaBGy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout4.routing.net (mxout4.routing.net [134.0.28.9])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8378A16F823;
-	Thu,  9 May 2024 15:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D17516F287
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 15:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715268138; cv=none; b=ig6AbiKC1/Bmr6YY9S7toUo/q9g4MfKhjK93PEIc7cqntCXUZ5iIZkVtA1O9umADTnevHZonBX+2PZVoBk6V7UIb/oOB/szwEKLVkiOQgvTr8NF/rRFKRUa7gBu3AeueFcZJKT1bkRGjWN2KC/SGj+R+HIE9lpJ/n87ZSOtxtJk=
+	t=1715268458; cv=none; b=P1PxVME8y7pw3OmrpGJ/r9+hGa8oEtjdMlIYd77+qAr/jsD93MFkg+FsgYultyryX9pGWDnm/HA/FdmRi+EqCrX3pmXPWAuqabAi2zS9iatyB+zbZjwJip7OQ/Dqywe86pILBIJWJzpZ5g8e0t7JLkuv6aRUOdTgIttB5s5yGo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715268138; c=relaxed/simple;
-	bh=g27TH0GfwlXlPIR4iWQEmDfVasbH2Cyw1Js+fUjLFUg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=clgKmF4CQ/OyRWoMF0/RGnN6Oy6jlwYdrPJuMdtWb0MPGNr8D4Xdjifng0CEUjzpCIr2qr1DD5DqzssT2RAxomw9ms7gjUHpWwaOfjKCXUQPR/tplb7aSvDx9pJ4V80KJ0GngtdRZ1Xrf/B9otbUbs2Q+aGcB0lL8CVm0w/6Fq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=Qvj+NSbY; arc=none smtp.client-ip=134.0.28.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbox3.masterlogin.de (unknown [192.168.10.78])
-	by mxout4.routing.net (Postfix) with ESMTP id 2A134100D7C;
-	Thu,  9 May 2024 15:22:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1715268128;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KSApDUWx3Ivo0aH4pfh174rewacA6nt9Ad68I5vywH0=;
-	b=Qvj+NSbYm57YM2N37NaH2wCl1ncUtwYtnjecppIcwvLvA406zo0kdwgRPgz57e+OTh5wvx
-	mTr18q5S1iFyIRIORukbwaQ4IL5cXnQC5mySJ459WnHgnLhqgGUnFFQiTGaloWudlZKJgg
-	gE2Bsm/+YubngVS46ZZ0NgneSbLviL4=
-Received: from frank-G5.. (fttx-pool-217.61.150.116.bambit.de [217.61.150.116])
-	by mxbox3.masterlogin.de (Postfix) with ESMTPSA id 28FCF36025A;
-	Thu,  9 May 2024 15:22:07 +0000 (UTC)
-From: Frank Wunderlich <linux@fw-web.de>
-To: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>,
-	Lee Jones <lee@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	Eric Woudstra <ericwouds@gmail.com>,
-	Tianling Shen <cnsztl@immortalwrt.org>,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-clk@vger.kernel.org,
-	linux-leds@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Tianling Shen <cnsztl@gmail.com>
-Subject: [PATCH v2 2/2] arm64: dts: mediatek: Add  mt7986 based Bananapi R3 Mini
-Date: Thu,  9 May 2024 17:21:57 +0200
-Message-Id: <20240509152157.10162-3-linux@fw-web.de>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240509152157.10162-1-linux@fw-web.de>
-References: <20240509152157.10162-1-linux@fw-web.de>
+	s=arc-20240116; t=1715268458; c=relaxed/simple;
+	bh=D+gVTItRtfglcVRMVjWLYiTUP3h7feBGYvgzlXWh3Qs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=ETmFp+SoBsOFb14OdwMJq39HXxJEGDjrAj7TSautbbRsG6dnKuLL3j6hd3Oegiwnli820VzdscLmr4TUx+Imj6TQOLvmd+VWZ5ObwRQjmU2Csk3VZbZGlya/FKnmP6Z40LVrLoePnkbG9o0c5SfOO573vkM5jfBfjh4EeeYNYAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=b8QfaBGy; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240509152733euoutp01f0b528de8e54af17940f11c7b83b03a9~N25IK44OT1509215092euoutp01q
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 15:27:33 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240509152733euoutp01f0b528de8e54af17940f11c7b83b03a9~N25IK44OT1509215092euoutp01q
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1715268453;
+	bh=iKzan+AtH1MLoCj0BGLCQVFuAFEDByvOY6m2IAn5u1E=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=b8QfaBGyodS0ZrDbPtPVb6Z8aQXNK8nRVGyTx8DYfWp1V6XDjVV6NOnZ50bq51ZLB
+	 Tvj25fhF/bEO+63/SAL6bTNTwpk8gKXJie9D5t0F1qH4DM9bgwXbIYUNEbwHnTawOy
+	 poKtORPufvrAK7wcExjJBJ0RRzVAsM6P6/H2ZYao=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+	20240509152733eucas1p21b928a4d596f3cc47a1ffbb0d0b0a66a~N25H6UKAt0901309013eucas1p2K;
+	Thu,  9 May 2024 15:27:33 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges3new.samsung.com (EUCPMTA) with SMTP id 15.C9.09620.46BEC366; Thu,  9
+	May 2024 16:27:32 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20240509152732eucas1p1b71b1a26a0ad22e4b312fc67d31ce565~N25HdLGmP1519015190eucas1p11;
+	Thu,  9 May 2024 15:27:32 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240509152732eusmtrp21f58eaa0be099ccb174a9941fecd3be0~N25HchPCn3217432174eusmtrp2p;
+	Thu,  9 May 2024 15:27:32 +0000 (GMT)
+X-AuditID: cbfec7f5-d31ff70000002594-4b-663ceb64d8ec
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+	eusmgms2.samsung.com (EUCPMTA) with SMTP id F5.9E.09010.46BEC366; Thu,  9
+	May 2024 16:27:32 +0100 (BST)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240509152731eusmtip1743dcfe9fff0115332f0217b51336b15~N25GgQt502500825008eusmtip1x;
+	Thu,  9 May 2024 15:27:31 +0000 (GMT)
+Message-ID: <34f29631-af45-462a-a168-e9f4bb4451cf@samsung.com>
+Date: Thu, 9 May 2024 17:27:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Mail-ID: 7414568c-cc8c-488f-a1d6-9e11e8596d71
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dma: fix DMA sync for drivers not calling
+ dma_set_mask*()
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, Christoph Hellwig
+	<hch@lst.de>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Steven Price <steven.price@arm.com>, Robin Murphy <robin.murphy@arm.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, "Rafael J.
+ Wysocki" <rafael@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Language: en-US
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <20240509144616.938519-1-aleksander.lobakin@intel.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrPKsWRmVeSWpSXmKPExsWy7djPc7opr23SDB5vtbG4+Hkhq8XnI8fZ
+	LJ4ee8RusXL1USaLX18sLDpnb2C3uLCtj9Xi8q45bBYrDp1gtzi2QMxixu2lzBZzv0xltjj4
+	4QmrReOR92wWLXdMHfg9nhycx+SxZt4aRo8Fm0o9Fu95yeSxaVUnm8eLzTMZPXbfbGDz+LxJ
+	LoAjissmJTUnsyy1SN8ugStj1fbrzAXrdCpWbXjM2sB4VbmLkZNDQsBE4sbX8yxdjFwcQgIr
+	GCUez5rDBuF8YZTYsncrK0iVkMBnRol1fR4wHSemn4XqWM4osWLvHlYI5yOjxO4JN9m7GDk4
+	eAXsJL7vAmtgEVCR2LXjCyOIzSsgKHFy5hMWEFtUQF7i/q0Z7CC2sECAxORf98CWiQiESTw6
+	2gNWzyywn1ni/XMtCFtc4taT+UwgNpuAoUTX2y42EJtTwFliTutKJogaeYntb+cwQxy6nlNi
+	+m8WCNtFYtKz3UwQtrDEq+Nb2CFsGYn/O0FmcgHZ7YwSC37fh3ImMEo0PL/FCFFlLXHn3C82
+	kMeYBTQl1u/Shwg7Svy4dIMJJCwhwCdx460gxA18EpO2TWeGCPNKdLQJQVSrScw6vg5u7cEL
+	l5gnMCrNQgqVWUi+nIXkm1kIexcwsqxiFE8tLc5NTy02zkst1ytOzC0uzUvXS87P3cQITHOn
+	/x3/uoNxxauPeocYmTgYDzFKcDArifBW1VinCfGmJFZWpRblxxeV5qQWH2KU5mBREudVTZFP
+	FRJITyxJzU5NLUgtgskycXBKNTDpzjL8s9wzN3ZtaHJTui+Pqcfsc/Gd8/Zvf3RPMpZDu+Fx
+	waKLi4w/x8pmieYuXJV85aU5n4Of8BnFO590VbnFUtUu1TkFaAucPHbgoLKsi8yR08VCHTt9
+	N13SbVXezBERVB2eXdZ1sVxS5r+Kf+fq+wnyXpMKHMtPXmk0cGmNM2t1f/CqZdV1o0/771hl
+	xT5+wBPJtmXx5SMBv77PVZ30JfDOSXPDr9daDh2TylXtmrt108ufbBdO9om2bAwuTtu2IY59
+	+wbdFY/Zp7SXbdX723xNXkrG3UWV3+uEDLvImsv7Xd+J6XWtMzaQ/vo94E7XsZmp+4WmXmVp
+	r/I1L70nN+XSZuH3rBfFM6MqPyuxFGckGmoxFxUnAgBs8uMZ4gMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrCIsWRmVeSWpSXmKPExsVy+t/xu7opr23SDD5OVrS4+Hkhq8XnI8fZ
+	LJ4ee8RusXL1USaLX18sLDpnb2C3uLCtj9Xi8q45bBYrDp1gtzi2QMxixu2lzBZzv0xltjj4
+	4QmrReOR92wWLXdMHfg9nhycx+SxZt4aRo8Fm0o9Fu95yeSxaVUnm8eLzTMZPXbfbGDz+LxJ
+	LoAjSs+mKL+0JFUhI7+4xFYp2tDCSM/Q0kLPyMRSz9DYPNbKyFRJ384mJTUnsyy1SN8uQS9j
+	1fbrzAXrdCpWbXjM2sB4VbmLkZNDQsBE4sT0syxdjFwcQgJLGSWuretih0jISJyc1sAKYQtL
+	/LnWxQZR9J5Ron/rRaYuRg4OXgE7ie+7PEBqWARUJHbt+MIIYvMKCEqcnPmEBcQWFZCXuH9r
+	BthMYQE/iWVzLzKD2CICYRINPStYQWYyCxxklri+azPUFdMYJQ4veM4GUsUsIC5x68l8JhCb
+	TcBQouttF1icU8BZYk7rSiaIGjOJrq1djBC2vMT2t3OYJzAKzUJyyCwko2YhaZmFpGUBI8sq
+	RpHU0uLc9NxiI73ixNzi0rx0veT83E2MwOjeduznlh2MK1991DvEyMTBeIhRgoNZSYS3qsY6
+	TYg3JbGyKrUoP76oNCe1+BCjKTA0JjJLiSbnA9NLXkm8oZmBqaGJmaWBqaWZsZI4r2dBR6KQ
+	QHpiSWp2ampBahFMHxMHp1QDk+WpyLf3Eg+unjIl7m1ApUYBz4LzN79PMe+4cZr55w0986Z7
+	9jOKEvtE9PmWSl5tvjjhjxvXm6DX11gyLcOsZjzaNGeOK/O7ot3PFogonDkgtI5ZcDk33zaL
+	S2tvNJd12143bWnSk/vmIdTLVlGmc6s28LNr9urtK476tk6Re1KlVLXH7mZM+yWLV2rfd7Sx
+	uHEe1l/yXj1jlp/x+S8Tj2WF+RZuWWxYaMK8ukqWZZmit/wN5fr53Fe/GLU5rv35xL/Hovuk
+	TUrB84j0Yq57ZbJRnUli77dv3vNn7qrmkJTNEg7/5t37GB/+5t3t1cwfOu34P/1Kr3l3+PWG
+	pHvZ6l8W5oR+De9ondytx+Q9W4mlOCPRUIu5qDgRACyAurJ3AwAA
+X-CMS-MailID: 20240509152732eucas1p1b71b1a26a0ad22e4b312fc67d31ce565
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20240509144704eucas1p2fe6bfb07a9b39f548e7db0f24e47eb0a
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20240509144704eucas1p2fe6bfb07a9b39f548e7db0f24e47eb0a
+References: <CGME20240509144704eucas1p2fe6bfb07a9b39f548e7db0f24e47eb0a@eucas1p2.samsung.com>
+	<20240509144616.938519-1-aleksander.lobakin@intel.com>
 
-From: Frank Wunderlich <frank-w@public-files.de>
+On 09.05.2024 16:46, Alexander Lobakin wrote:
+> There are several reports that the DMA sync shortcut broke non-coherent
+> devices.
+> dev->dma_need_sync is false after the &device allocation and if a driver
+> didn't call dma_set_mask*(), it will still be false even if the device
+> is not DMA-coherent and thus needs synchronizing. Due to historical
+> reasons, there's still a lot of drivers not calling it.
+> Invert the boolean, so that the sync will be performed by default and
+> the shortcut will be enabled only when calling dma_set_mask*().
+>
+> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> Closes: https://lore.kernel.org/lkml/46160534-5003-4809-a408-6b3a3f4921e9@samsung.com
+> Reported-by: Steven Price <steven.price@arm.com>
+> Closes: https://lore.kernel.org/lkml/010686f5-3049-46a1-8230-7752a1b433ff@arm.com
+> Fixes: 32ba8b823252 ("dma: avoid redundant calls for sync operations")
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
+> ---
+>   include/linux/device.h      |  4 ++--
+>   include/linux/dma-map-ops.h |  4 ++--
+>   include/linux/dma-mapping.h |  2 +-
+>   kernel/dma/mapping.c        | 10 +++++-----
+>   kernel/dma/swiotlb.c        |  2 +-
+>   5 files changed, 11 insertions(+), 11 deletions(-)
+>
+> diff --git a/include/linux/device.h b/include/linux/device.h
+> index ed95b829f05b..d4b50accff26 100644
+> --- a/include/linux/device.h
+> +++ b/include/linux/device.h
+> @@ -691,7 +691,7 @@ struct device_physical_location {
+>    *		and optionall (if the coherent mask is large enough) also
+>    *		for dma allocations.  This flag is managed by the dma ops
+>    *		instance from ->dma_supported.
+> - * @dma_need_sync: The device needs performing DMA sync operations.
+> + * @dma_skip_sync: DMA sync operations can be skipped for coherent buffers.
+>    *
+>    * At the lowest level, every device in a Linux system is represented by an
+>    * instance of struct device. The device structure contains the information
+> @@ -805,7 +805,7 @@ struct device {
+>   	bool			dma_ops_bypass : 1;
+>   #endif
+>   #ifdef CONFIG_DMA_NEED_SYNC
+> -	bool			dma_need_sync:1;
+> +	bool			dma_skip_sync:1;
+>   #endif
+>   };
+>   
+> diff --git a/include/linux/dma-map-ops.h b/include/linux/dma-map-ops.h
+> index 4893cb89cb52..5217b922d29f 100644
+> --- a/include/linux/dma-map-ops.h
+> +++ b/include/linux/dma-map-ops.h
+> @@ -280,8 +280,8 @@ static inline void dma_reset_need_sync(struct device *dev)
+>   {
+>   #ifdef CONFIG_DMA_NEED_SYNC
+>   	/* Reset it only once so that the function can be called on hotpath */
+> -	if (unlikely(!dev->dma_need_sync))
+> -		dev->dma_need_sync = true;
+> +	if (unlikely(dev->dma_skip_sync))
+> +		dev->dma_skip_sync = false;
+>   #endif
+>   }
+>   
+> diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
+> index eb4e15893b6c..f693aafe221f 100644
+> --- a/include/linux/dma-mapping.h
+> +++ b/include/linux/dma-mapping.h
+> @@ -295,7 +295,7 @@ bool __dma_need_sync(struct device *dev, dma_addr_t dma_addr);
+>   static inline bool dma_dev_need_sync(const struct device *dev)
+>   {
+>   	/* Always call DMA sync operations when debugging is enabled */
+> -	return dev->dma_need_sync || IS_ENABLED(CONFIG_DMA_API_DEBUG);
+> +	return !dev->dma_skip_sync || IS_ENABLED(CONFIG_DMA_API_DEBUG);
+>   }
+>   
+>   static inline void dma_sync_single_for_cpu(struct device *dev, dma_addr_t addr,
+> diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
+> index 3524bc92c37f..3f77c3f8d16d 100644
+> --- a/kernel/dma/mapping.c
+> +++ b/kernel/dma/mapping.c
+> @@ -392,7 +392,7 @@ bool __dma_need_sync(struct device *dev, dma_addr_t dma_addr)
+>   
+>   	if (dma_map_direct(dev, ops))
+>   		/*
+> -		 * dma_need_sync could've been reset on first SWIOTLB buffer
+> +		 * dma_skip_sync could've been reset on first SWIOTLB buffer
+>   		 * mapping, but @dma_addr is not necessary an SWIOTLB buffer.
+>   		 * In this case, fall back to more granular check.
+>   		 */
+> @@ -407,20 +407,20 @@ static void dma_setup_need_sync(struct device *dev)
+>   
+>   	if (dma_map_direct(dev, ops) || (ops->flags & DMA_F_CAN_SKIP_SYNC))
+>   		/*
+> -		 * dma_need_sync will be reset to %true on first SWIOTLB buffer
+> +		 * dma_skip_sync will be reset to %false on first SWIOTLB buffer
+>   		 * mapping, if any. During the device initialization, it's
+>   		 * enough to check only for the DMA coherence.
+>   		 */
+> -		dev->dma_need_sync = !dev_is_dma_coherent(dev);
+> +		dev->dma_skip_sync = dev_is_dma_coherent(dev);
+>   	else if (!ops->sync_single_for_device && !ops->sync_single_for_cpu &&
+>   		 !ops->sync_sg_for_device && !ops->sync_sg_for_cpu)
+>   		/*
+>   		 * Synchronization is not possible when none of DMA sync ops
+>   		 * is set.
+>   		 */
+> -		dev->dma_need_sync = false;
+> +		dev->dma_skip_sync = true;
+>   	else
+> -		dev->dma_need_sync = true;
+> +		dev->dma_skip_sync = false;
+>   }
+>   #else /* !CONFIG_DMA_NEED_SYNC */
+>   static inline void dma_setup_need_sync(struct device *dev) { }
+> diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
+> index ae3e593eaadb..068134697cf1 100644
+> --- a/kernel/dma/swiotlb.c
+> +++ b/kernel/dma/swiotlb.c
+> @@ -1409,7 +1409,7 @@ phys_addr_t swiotlb_tbl_map_single(struct device *dev, phys_addr_t orig_addr,
+>   	}
+>   
+>   	/*
+> -	 * If dma_need_sync wasn't set, reset it on first SWIOTLB buffer
+> +	 * If dma_skip_sync was set, reset it on first SWIOTLB buffer
+>   	 * mapping to always sync SWIOTLB buffers.
+>   	 */
+>   	dma_reset_need_sync(dev);
 
-Add devicetree for Bananapi R3 Mini SBC.
-
-Key features:
-- MediaTek MT7986A(Filogic 830) Quad core ARM Cortex A53
-- Wifi 6 2.4G/5G（MT7976C）
-- 2G DDR RAM
-- 8G eMMC flash
-- 128MB Nand flash
-- 2x 2.5GbE network port
-- 1x M.2 Key B USB interface
-- 1x M.2 KEY M PCIe interface
-- 1x USB2.0 interface
-
-source: https://wiki.banana-pi.org/Banana_Pi_BPI-R3_Mini
-
-Co-developed-by: Eric Woudstra <ericwouds@gmail.com>
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-Co-developed-by: Tianling Shen <cnsztl@gmail.com>
-Signed-off-by: Tianling Shen <cnsztl@gmail.com>
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
----
-v2:
-- add missing node for nand
-- add some information about the board in description
-
-change dts based on review from angelo+krzysztof
-
-- drop fan status
-- rename phy14 to phy0 and phy15 to phy1
-- drop default-trigger from phys and so also the binding-patch
-- use regulator names based on regexp regulator-[0-9]+v[0-9]+
-- add comment for pwm
----
- arch/arm64/boot/dts/mediatek/Makefile         |   1 +
- .../mediatek/mt7986a-bananapi-bpi-r3-mini.dts | 493 ++++++++++++++++++
- 2 files changed, 494 insertions(+)
- create mode 100644 arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts
-
-diff --git a/arch/arm64/boot/dts/mediatek/Makefile b/arch/arm64/boot/dts/mediatek/Makefile
-index 37b4ca3a87c9..1763b001ab06 100644
---- a/arch/arm64/boot/dts/mediatek/Makefile
-+++ b/arch/arm64/boot/dts/mediatek/Makefile
-@@ -11,6 +11,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += mt7622-bananapi-bpi-r64.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7981b-xiaomi-ax3000t.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-acelink-ew-7886cax.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3.dtb
-+dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3-mini.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3-emmc.dtbo
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3-nand.dtbo
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3-nor.dtbo
-diff --git a/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts b/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts
-new file mode 100644
-index 000000000000..e2a2fea7adf0
---- /dev/null
-+++ b/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts
-@@ -0,0 +1,493 @@
-+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
-+/*
-+ * Copyright (C) 2021 MediaTek Inc.
-+ * Authors: Frank Wunderlich <frank-w@public-files.de>
-+ *          Eric Woudstra <ericwouds@gmail.com>
-+ *          Tianling Shen <cnsztl@immortalwrt.org>
-+ */
-+
-+/dts-v1/;
-+
-+#include <dt-bindings/gpio/gpio.h>
-+#include <dt-bindings/input/input.h>
-+#include <dt-bindings/leds/common.h>
-+#include <dt-bindings/pinctrl/mt65xx.h>
-+
-+#include "mt7986a.dtsi"
-+
-+/ {
-+	model = "Bananapi BPI-R3 Mini";
-+	chassis-type = "embedded";
-+	compatible = "bananapi,bpi-r3mini", "mediatek,mt7986a";
-+
-+	aliases {
-+		serial0 = &uart0;
-+		ethernet0 = &gmac0;
-+		ethernet1 = &gmac1;
-+	};
-+
-+	chosen {
-+		stdout-path = "serial0:115200n8";
-+	};
-+
-+	dcin: regulator-12v {
-+		compatible = "regulator-fixed";
-+		regulator-name = "12vd";
-+		regulator-min-microvolt = <12000000>;
-+		regulator-max-microvolt = <12000000>;
-+		regulator-boot-on;
-+		regulator-always-on;
-+	};
-+
-+	fan: pwm-fan {
-+		compatible = "pwm-fan";
-+		#cooling-cells = <2>;
-+		/*
-+		 * The signal is inverted on this board and the PWM driver
-+		 * does not support polarity inversion.
-+		 */
-+		/* cooling level (0, 1, 2) */
-+		cooling-levels = <255 96 0>;
-+		pwms = <&pwm 0 10000>;
-+	};
-+
-+	reg_1p8v: regulator-1v8 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "1.8vd";
-+		regulator-min-microvolt = <1800000>;
-+		regulator-max-microvolt = <1800000>;
-+		regulator-boot-on;
-+		regulator-always-on;
-+		vin-supply = <&dcin>;
-+	};
-+
-+	reg_3p3v: regulator-3v3 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "3.3vd";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		regulator-boot-on;
-+		regulator-always-on;
-+		vin-supply = <&dcin>;
-+	};
-+
-+	usb_vbus: regulator-5v {
-+		compatible = "regulator-fixed";
-+		regulator-name = "usb_vbus";
-+		regulator-min-microvolt = <5000000>;
-+		regulator-max-microvolt = <5000000>;
-+		gpios = <&pio 20 GPIO_ACTIVE_LOW>;
-+		regulator-boot-on;
-+	};
-+
-+	en8811_a: regulator-phy1 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "phy1";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		gpio = <&pio 16 GPIO_ACTIVE_LOW>;
-+		regulator-always-on;
-+	};
-+
-+	en8811_b: regulator-phy2 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "phy2";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		gpio = <&pio 17 GPIO_ACTIVE_LOW>;
-+		regulator-always-on;
-+	};
-+
-+	leds {
-+		compatible = "gpio-leds";
-+
-+		green_led: led-0 {
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_POWER;
-+			gpios = <&pio 19 GPIO_ACTIVE_HIGH>;
-+			default-state = "on";
-+		};
-+	};
-+
-+	gpio-keys {
-+		compatible = "gpio-keys";
-+
-+		reset-key {
-+			label = "reset";
-+			linux,code = <KEY_RESTART>;
-+			gpios = <&pio 7 GPIO_ACTIVE_LOW>;
-+		};
-+	};
-+
-+};
-+
-+&cpu_thermal {
-+	cooling-maps {
-+		map0 {
-+			/* active: set fan to cooling level 2 */
-+			cooling-device = <&fan 2 2>;
-+			trip = <&cpu_trip_active_high>;
-+		};
-+
-+		map1 {
-+			/* active: set fan to cooling level 1 */
-+			cooling-device = <&fan 1 1>;
-+			trip = <&cpu_trip_active_med>;
-+		};
-+
-+		map2 {
-+			/* active: set fan to cooling level 0 */
-+			cooling-device = <&fan 0 0>;
-+			trip = <&cpu_trip_active_low>;
-+		};
-+	};
-+};
-+
-+&crypto {
-+	status = "okay";
-+};
-+
-+&eth {
-+	status = "okay";
-+
-+	gmac0: mac@0 {
-+		compatible = "mediatek,eth-mac";
-+		reg = <0>;
-+		phy-mode = "2500base-x";
-+		phy-handle = <&phy0>;
-+	};
-+
-+	gmac1: mac@1 {
-+		compatible = "mediatek,eth-mac";
-+		reg = <1>;
-+		phy-mode = "2500base-x";
-+		phy-handle = <&phy1>;
-+	};
-+
-+	mdio: mdio-bus {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+	};
-+};
-+
-+&mmc0 {
-+	pinctrl-names = "default", "state_uhs";
-+	pinctrl-0 = <&mmc0_pins_default>;
-+	pinctrl-1 = <&mmc0_pins_uhs>;
-+	vmmc-supply = <&reg_3p3v>;
-+	vqmmc-supply = <&reg_1p8v>;
-+};
-+
-+
-+&i2c0 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&i2c_pins>;
-+	status = "okay";
-+
-+	/* MAC Address EEPROM */
-+	eeprom@50 {
-+		compatible = "atmel,24c02";
-+		reg = <0x50>;
-+
-+		address-width = <8>;
-+		pagesize = <8>;
-+		size = <256>;
-+	};
-+};
-+
-+&mdio {
-+	phy0: ethernet-phy@14 {
-+		reg = <14>;
-+		interrupts-extended = <&pio 48 IRQ_TYPE_EDGE_FALLING>;
-+		reset-gpios = <&pio 49 GPIO_ACTIVE_LOW>;
-+		reset-assert-us = <10000>;
-+		reset-deassert-us = <20000>;
-+		phy-mode = "2500base-x";
-+		full-duplex;
-+		pause;
-+		airoha,pnswap-rx;
-+
-+		leds {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+
-+			led@0 { /* en8811_a_gpio5 */
-+				reg = <0>;
-+				color = <LED_COLOR_ID_YELLOW>;
-+				function = LED_FUNCTION_LAN;
-+				function-enumerator = <1>;
-+				default-state = "keep";
-+			};
-+			led@1 { /* en8811_a_gpio4 */
-+				reg = <1>;
-+				color = <LED_COLOR_ID_GREEN>;
-+				function = LED_FUNCTION_LAN;
-+				function-enumerator = <2>;
-+				default-state = "keep";
-+			};
-+		};
-+	};
-+
-+	phy1: ethernet-phy@15 {
-+		reg = <15>;
-+		interrupts-extended = <&pio 46 IRQ_TYPE_EDGE_FALLING>;
-+		reset-gpios = <&pio 47 GPIO_ACTIVE_LOW>;
-+		reset-assert-us = <10000>;
-+		reset-deassert-us = <20000>;
-+		phy-mode = "2500base-x";
-+		full-duplex;
-+		pause;
-+		airoha,pnswap-rx;
-+
-+		leds {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+
-+			led@0 { /* en8811_b_gpio5 */
-+				reg = <0>;
-+				color = <LED_COLOR_ID_YELLOW>;
-+				function = LED_FUNCTION_WAN;
-+				function-enumerator = <1>;
-+				default-state = "keep";
-+			};
-+			led@1 { /* en8811_b_gpio4 */
-+				reg = <1>;
-+				color = <LED_COLOR_ID_GREEN>;
-+				function = LED_FUNCTION_WAN;
-+				function-enumerator = <2>;
-+				default-state = "keep";
-+			};
-+		};
-+	};
-+};
-+
-+&pcie {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pcie_pins>;
-+	status = "okay";
-+};
-+
-+&pcie_phy {
-+	status = "okay";
-+};
-+
-+&pio {
-+	i2c_pins: i2c-pins {
-+		mux {
-+			function = "i2c";
-+			groups = "i2c";
-+		};
-+	};
-+
-+	mmc0_pins_default: mmc0-pins {
-+		mux {
-+			function = "emmc";
-+			groups = "emmc_51";
-+		};
-+		conf-cmd-dat {
-+			pins = "EMMC_DATA_0", "EMMC_DATA_1", "EMMC_DATA_2",
-+			       "EMMC_DATA_3", "EMMC_DATA_4", "EMMC_DATA_5",
-+			       "EMMC_DATA_6", "EMMC_DATA_7", "EMMC_CMD";
-+			input-enable;
-+			drive-strength = <4>;
-+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>; /* pull-up 10K */
-+		};
-+		conf-clk {
-+			pins = "EMMC_CK";
-+			drive-strength = <6>;
-+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>; /* pull-down 50K */
-+		};
-+		conf-ds {
-+			pins = "EMMC_DSL";
-+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>; /* pull-down 50K */
-+		};
-+		conf-rst {
-+			pins = "EMMC_RSTB";
-+			drive-strength = <4>;
-+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>; /* pull-up 10K */
-+		};
-+	};
-+
-+	mmc0_pins_uhs: mmc0-uhs-pins {
-+		mux {
-+			function = "emmc";
-+			groups = "emmc_51";
-+		};
-+		conf-cmd-dat {
-+			pins = "EMMC_DATA_0", "EMMC_DATA_1", "EMMC_DATA_2",
-+			       "EMMC_DATA_3", "EMMC_DATA_4", "EMMC_DATA_5",
-+			       "EMMC_DATA_6", "EMMC_DATA_7", "EMMC_CMD";
-+			input-enable;
-+			drive-strength = <4>;
-+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>; /* pull-up 10K */
-+		};
-+		conf-clk {
-+			pins = "EMMC_CK";
-+			drive-strength = <6>;
-+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>; /* pull-down 50K */
-+		};
-+		conf-ds {
-+			pins = "EMMC_DSL";
-+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>; /* pull-down 50K */
-+		};
-+		conf-rst {
-+			pins = "EMMC_RSTB";
-+			drive-strength = <4>;
-+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>; /* pull-up 10K */
-+		};
-+	};
-+
-+	pcie_pins: pcie-pins {
-+		mux {
-+			function = "pcie";
-+			groups = "pcie_clk", "pcie_wake", "pcie_pereset";
-+		};
-+	};
-+
-+	pwm_pins: pwm-pins {
-+		mux {
-+			function = "pwm";
-+			groups = "pwm0";
-+		};
-+	};
-+
-+	spi_flash_pins: spi-flash-pins {
-+		mux {
-+			function = "spi";
-+			groups = "spi0", "spi0_wp_hold";
-+		};
-+	};
-+
-+	usb_ngff_pins: usb-ngff-pins {
-+		ngff-gnss-off-conf {
-+			pins = "GPIO_6";
-+			drive-strength = <8>;
-+			mediatek,pull-up-adv = <1>;
-+		};
-+		ngff-pe-rst-conf {
-+			pins = "GPIO_7";
-+			drive-strength = <8>;
-+			mediatek,pull-up-adv = <1>;
-+		};
-+		ngff-wwan-off-conf {
-+			pins = "GPIO_8";
-+			drive-strength = <8>;
-+			mediatek,pull-up-adv = <1>;
-+		};
-+		ngff-pwr-off-conf {
-+			pins = "GPIO_9";
-+			drive-strength = <8>;
-+			mediatek,pull-up-adv = <1>;
-+		};
-+		ngff-rst-conf {
-+			pins = "GPIO_10";
-+			drive-strength = <8>;
-+			mediatek,pull-up-adv = <1>;
-+		};
-+		ngff-coex-conf {
-+			pins = "SPI1_CS";
-+			drive-strength = <8>;
-+			mediatek,pull-up-adv = <1>;
-+		};
-+	};
-+
-+	wf_2g_5g_pins: wf-2g-5g-pins {
-+		mux {
-+			function = "wifi";
-+			groups = "wf_2g", "wf_5g";
-+		};
-+		conf {
-+			pins = "WF0_HB1", "WF0_HB2", "WF0_HB3", "WF0_HB4",
-+			       "WF0_HB0", "WF0_HB0_B", "WF0_HB5", "WF0_HB6",
-+			       "WF0_HB7", "WF0_HB8", "WF0_HB9", "WF0_HB10",
-+			       "WF0_TOP_CLK", "WF0_TOP_DATA", "WF1_HB1",
-+			       "WF1_HB2", "WF1_HB3", "WF1_HB4", "WF1_HB0",
-+			       "WF1_HB5", "WF1_HB6", "WF1_HB7", "WF1_HB8",
-+			       "WF1_TOP_CLK", "WF1_TOP_DATA";
-+			drive-strength = <4>;
-+		};
-+	};
-+
-+	wf_dbdc_pins: wf-dbdc-pins {
-+		mux {
-+			function = "wifi";
-+			groups = "wf_dbdc";
-+		};
-+		conf {
-+			pins = "WF0_HB1", "WF0_HB2", "WF0_HB3", "WF0_HB4",
-+			       "WF0_HB0", "WF0_HB0_B", "WF0_HB5", "WF0_HB6",
-+			       "WF0_HB7", "WF0_HB8", "WF0_HB9", "WF0_HB10",
-+			       "WF0_TOP_CLK", "WF0_TOP_DATA", "WF1_HB1",
-+			       "WF1_HB2", "WF1_HB3", "WF1_HB4", "WF1_HB0",
-+			       "WF1_HB5", "WF1_HB6", "WF1_HB7", "WF1_HB8",
-+			       "WF1_TOP_CLK", "WF1_TOP_DATA";
-+			drive-strength = <4>;
-+		};
-+	};
-+
-+	wf_led_pins: wf-led-pins {
-+		mux {
-+			function = "led";
-+			groups = "wifi_led";
-+		};
-+	};
-+};
-+
-+&pwm {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pwm_pins>;
-+	status = "okay";
-+};
-+
-+&spi0 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&spi_flash_pins>;
-+	status = "okay";
-+
-+	flash@0 {
-+		compatible = "spi-nand";
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+		reg = <0>;
-+
-+		spi-max-frequency = <20000000>;
-+		spi-tx-bus-width = <4>;
-+		spi-rx-bus-width = <4>;
-+	};
-+};
-+
-+&ssusb {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&usb_ngff_pins>;
-+	vusb33-supply = <&reg_3p3v>;
-+	vbus-supply = <&usb_vbus>;
-+	status = "okay";
-+};
-+
-+&trng {
-+	status = "okay";
-+};
-+
-+&uart0 {
-+	status = "okay";
-+};
-+
-+&usb_phy {
-+	status = "okay";
-+};
-+
-+&watchdog {
-+	status = "okay";
-+};
-+
-+&wifi {
-+	status = "okay";
-+	pinctrl-names = "default", "dbdc";
-+	pinctrl-0 = <&wf_2g_5g_pins>, <&wf_led_pins>;
-+	pinctrl-1 = <&wf_dbdc_pins>, <&wf_led_pins>;
-+
-+	led {
-+		led-active-low;
-+	};
-+};
-+
+Best regards
 -- 
-2.34.1
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
 
 
