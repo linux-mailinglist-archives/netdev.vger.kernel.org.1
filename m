@@ -1,134 +1,117 @@
-Return-Path: <netdev+bounces-94807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 096A88C0B83
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:30:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D30A88C0BAF
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:50:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2FBA1F237BC
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:30:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E23B28487A
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD246FCB;
-	Thu,  9 May 2024 06:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A19E13B2BC;
+	Thu,  9 May 2024 06:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="KKH2leG1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zez3NFdM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006B1653
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 06:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9379BDDD9;
+	Thu,  9 May 2024 06:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715236224; cv=none; b=nq95XE39Wi1N262t9ulF2pNOrRFIunyWuaSf/sfang48bMdA2ibG/8aL1TFBwlRTHEvOSyMx+e4aaWxP1+vZuMPfLOBGooTxUIOOq6NgCgH5uHmp3lsABN+UxgOXckxHVosOMcXAUnB/YDJeTmp24UFDzeIHKW+/DZ++Zfr0S/E=
+	t=1715237428; cv=none; b=FrDZyYu7YvPUIPfozpePZQV0yrJ0qzHic1WF9irAG9NzLtdTjyAUo/n7Q8QhEWB1h1uDHmu0XPvwlcXpO+suDvDsTwM/rWHQtOeVcE9zmQdCHH0gjYi4/WnmLP1zGZUYToIyKliYHc1K/+U2CF0F3lrETr4frTY1c1ggF7Bf1Mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715236224; c=relaxed/simple;
-	bh=n0yLBLsCcWZoXT34oLNGOKh5OKX0+BXthBYvmA190hI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EaPoCFLVWRweTQrbHW4kY/GnoP+GIei5ZCCnDHgEQ9TmBPsFeupP8C6HY3A4yIQVdeZhm668ntzw9AHF6QfGknG9xpIrGUy/4cYsn9TlpH31XdbFnwWondn6R6hCMU6gjBJhmz4sDgZE38ychvkw/pI1L8U9x2isEDrLw+6KGTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=KKH2leG1; arc=none smtp.client-ip=209.85.210.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6f0307322d5so301386a34.0
-        for <netdev@vger.kernel.org>; Wed, 08 May 2024 23:30:22 -0700 (PDT)
+	s=arc-20240116; t=1715237428; c=relaxed/simple;
+	bh=RSeqe6ed4ewdO4stMEjsqV83ww4odGvJX+LQ9kccDDw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Nq5/uhK6jJ8zpow/53Lyj/0bQmBbXJCSXcG7vcSRQ7xZNfMsifxedsXSqQSEkt+CVUitWij3iI/FsUR1WI3u04TOz6nDkDfETzDHko3E+q2rMbjlJzGULLJit1yEVDWLRmi8YehmVPJ+gh/tEQUDJ+VNR2UvQcWi1OaosRghgiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zez3NFdM; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2e4b90b03a9so6674971fa.1;
+        Wed, 08 May 2024 23:50:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1715236222; x=1715841022; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3qoYQ9U2MlC2IsyOoGY5lXnwSMtPZXtV4EZE56MKyN8=;
-        b=KKH2leG1H5mAm1P/La2bBB872AjGrZ/gxtz0Rd3W3tUxRz5vU3LV++FX/CDputlPQe
-         YPCltQRmlNaEBkGl/12VcgxEGfvA/NHPw5FnNKfVyiRMb3wfPZH/Yu3BDqOVMB02Krco
-         NMZvr5HhAzoFQU9ENuxvq3lYX/hEOiEvfBP9c=
+        d=gmail.com; s=20230601; t=1715237425; x=1715842225; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2UOhhsJgb99pm27SXHK1pVf/ykOOg5LTm9pRGDO0Fjs=;
+        b=Zez3NFdMeQnGYCiu7MmJe5nvUMEpBYbwDLmI/ZdVXg2qrU+MbE9/7u2BPsam9iPzB0
+         kD/GdYtPlX1Jyy5rMA7ez0Bm3BFclvBm3/LEGSkpcIbtTilFfgXD3wz9pqMba273qCcS
+         fHqtOC8RpJpOMhTiOM02vIMseqf4smHY6CWT8/Be4OoMWqRkgarc0yOvtcwrgud6pkzr
+         /WXQU91iYi9IKcd2L4ATJTPLkhAc7AcTuEYCsR1c16vqqX17T7CGSVlyuvD5AfQnmnC2
+         YpBOJHAfMN/w3Ms5tfvAKKNENqhZ+dU29dl1hLdwM3AtI8P8sggwQD0f39pH9FZlZaBa
+         03dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715236222; x=1715841022;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3qoYQ9U2MlC2IsyOoGY5lXnwSMtPZXtV4EZE56MKyN8=;
-        b=gqPin51zPikTWH92BnhqDoNtYPSIT8YrekKaUb6028vYYwXjGWI+05EVDfTFvUjh3B
-         XsC73+lJn0mHem1APHcjQgHKsbJo1CVwbRVEZi8iK0RU1kC/TYNgPejkhqC9XRynTd9l
-         OCrkMZzfFjZ9jDmJv8RslOQ5/OOymlXJAfUDgOW7makifMrGYV35VwxUwraKHRteIfUT
-         rpiKxmSfdzL521R9dyX3IyH76i2G09RgRHQ8RM20XqJlNr6ZswMl9W5SSMrshBu5ANja
-         z25JKVI4kRarsQFKU6oSz2YqOjeBbf6kRUmgyYlqOmgQGRZrvpaSRsqIBt1GN7B5E4NG
-         j34g==
-X-Forwarded-Encrypted: i=1; AJvYcCWpEp0ciuWfel4C5hslYAYYra/7wPpb5DhV6LkO5Jj3btA9LEVQf45gCOoeSCHCHY48Zq1fSb05bb7hQIxVHW3othZMm1af
-X-Gm-Message-State: AOJu0YyDex3PuKru/FEsG9s2hStIqjArYvqT5nDcyrC2tSXGFxAYHpvU
-	NN7gOzzQh+axK/qAzQeuAfanlM8fjFb+cS/Q3KDvDh50wwvNPmE5C+GjYptG2Xo=
-X-Google-Smtp-Source: AGHT+IFDgooGY0GwBc2iJimptTybd/gNtDtCFUTE5EpIKrrUwbabTOKQRU++5xWg2GQ02FIt7hW1VA==
-X-Received: by 2002:a05:6358:890:b0:186:2ac7:316c with SMTP id e5c5f4694b2df-192d35776c9mr580862955d.20.1715236222043;
-        Wed, 08 May 2024 23:30:22 -0700 (PDT)
-Received: from ubuntu (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-634119041b2sm484067a12.94.2024.05.08.23.30.20
+        d=1e100.net; s=20230601; t=1715237425; x=1715842225;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2UOhhsJgb99pm27SXHK1pVf/ykOOg5LTm9pRGDO0Fjs=;
+        b=SPbGLQQ4l6fT5is9jtKcVwXdkWVu6cpz3iqO9+izVYRFsx+s1agge0ldT6dC4SoJ+U
+         y6sahXsQxOn+ClmfPJo3i3YDSSlXJm8gBvcu1urkPh/fZEROmNX22Kcucj+9qpnc1/yg
+         qxTJHn+hnbggCyNx8YYY6PteA97HTtEiyVDZSF3voztakY2zBiOlZXr/xoOBvKs6J6Uv
+         Phmrem8iY3lxQwEQniCVmImIOm+E2/Ilo5uGkrp/4P59aFm6051nyOgkFXIj/QqODQj3
+         1f7USZBnh94bGTuAk7CbECz6ZsqA/JmMm0BRI/pOYSXWUZbos01BmwcynC3Yx2m5LrMl
+         am5A==
+X-Forwarded-Encrypted: i=1; AJvYcCWMq3YRte85F4Smc8eWU+uQIRZGBjdnfNFe/S1NVJ+5n0PtcRsbHlYmNegbTJmgmBmGxwiBC7/2dl8s8drYCdiH0nYMl0FmeXMMOQJJLoB5JyrZYwd8H7K6LzEGAU0tFgk3keUT
+X-Gm-Message-State: AOJu0YxiWMyJUAcWRFR9rrscM4/XrMqpDvFGxC37np7I0a5YSCwfl+iv
+	MroaIu+Md0NvI4oKfAIzsD4xhX7W1HANSeQDr4oxb0QOAOjgQP//
+X-Google-Smtp-Source: AGHT+IFdtu14ZmyI84Ks3pnhLvcdac1FmVj0U13JvxDP7AMPhUTOAmsM9uMthlsZwwvco4EdRUWDNQ==
+X-Received: by 2002:a05:651c:b29:b0:2e2:db99:c35e with SMTP id 38308e7fff4ca-2e44738a829mr35982021fa.12.1715237424463;
+        Wed, 08 May 2024 23:50:24 -0700 (PDT)
+Received: from localhost (craw-09-b2-v4wan-169726-cust2117.vm24.cable.virginm.net. [92.238.24.70])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fa9dbab53sm31431165e9.13.2024.05.08.23.50.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 23:30:21 -0700 (PDT)
-Date: Thu, 9 May 2024 06:30:18 +0000
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Tariq Toukan <ttoukan.linux@gmail.com>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, saeedm@nvidia.com, gal@nvidia.com,
-	nalramli@fastly.com, "David S. Miller" <davem@davemloft.net>,
+        Wed, 08 May 2024 23:50:23 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
-Message-ID: <ZjxtejIZmJCwLgKC@ubuntu>
-References: <ZjUwT_1SA9tF952c@LQ3V64L9R2>
- <20240503145808.4872fbb2@kernel.org>
- <ZjV5BG8JFGRBoKaz@LQ3V64L9R2>
- <20240503173429.10402325@kernel.org>
- <ZjkbpLRyZ9h0U01_@LQ3V64L9R2>
- <8678e62c-f33b-469c-ac6c-68a060273754@gmail.com>
- <ZjwJmKa6orPm9NHF@LQ3V64L9R2>
- <20240508175638.7b391b7b@kernel.org>
- <ZjwtoH1K1o0F5k+N@ubuntu>
- <20240508190839.16ec4003@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] net: dsa: microchip: Fix spellig mistake "configur" -> "configure"
+Date: Thu,  9 May 2024 07:50:23 +0100
+Message-Id: <20240509065023.3033397-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240508190839.16ec4003@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 08, 2024 at 07:08:39PM -0700, Jakub Kicinski wrote:
-> On Thu, 9 May 2024 01:57:52 +0000 Joe Damato wrote:
-> > If I'm following that right and understanding mlx5 (two things I am
-> > unlikely to do simultaneously), that sounds to me like:
-> > 
-> > - mlx5e_get_queue_stats_rx and mlx5e_get_queue_stats_tx check if i <
-> >   priv->channels.params.num_channels (instead of priv->stats_nch),
-> 
-> Yes, tho, not sure whether the "if i < ...num_channels" is even
-> necessary, as core already checks against real_num_rx_queues.
-> 
-> >   and when
-> >   summing mlx5e_sq_stats in the latter function, it's up to
-> >   priv->channels.params.mqprio.num_tc instead of priv->max_opened_tc.
-> > 
-> > - mlx5e_get_base_stats accumulates and outputs stats for everything from
-> >   priv->channels.params.num_channels to priv->stats_nch, and
-> 
-> I'm not sure num_channels gets set to 0 when device is down so possibly
-> from "0 if down else ...num_channels" to stats_nch.
+There is a spelling mistake in a dev_err message. Fix it.
 
-Yea, you were right:
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ drivers/net/dsa/microchip/ksz_dcb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  if (priv->channels.num == 0)
-          i = 0;
-  else
-          i = priv->channels.params.num_channels;
-  
-  for (; i < priv->stats_nch; i++) {
+diff --git a/drivers/net/dsa/microchip/ksz_dcb.c b/drivers/net/dsa/microchip/ksz_dcb.c
+index 5e520c02afd7..484945a9c5fb 100644
+--- a/drivers/net/dsa/microchip/ksz_dcb.c
++++ b/drivers/net/dsa/microchip/ksz_dcb.c
+@@ -220,7 +220,7 @@ static int ksz88x3_port_set_default_prio_quirks(struct ksz_device *dev, int port
+ 			return ret;
+ 
+ 		if (!(port2_data & KSZ8_PORT_802_1P_ENABLE)) {
+-			dev_err(dev->dev, "Not possible to configur port priority on Port 1 if PCP apptrust on Port 2 is disabled\n");
++			dev_err(dev->dev, "Not possible to configure port priority on Port 1 if PCP apptrust on Port 2 is disabled\n");
+ 			return -EINVAL;
+ 		}
+ 	}
+-- 
+2.39.2
 
-Seems to be working now when I adjust the queue count and the test is
-passing as I adjust the queue count up or down. Cool.
-
-Adding TCs to the NIC triggers the test to fail, so there's still some bug
-in how I'm accumulating stats from the hw TCs.
 
