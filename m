@@ -1,278 +1,215 @@
-Return-Path: <netdev+bounces-95053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B2208C1533
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 21:09:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBB438C1539
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 21:13:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BCF4CB222CD
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 19:09:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6939C1F22B61
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 19:13:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24BFE7F492;
-	Thu,  9 May 2024 19:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75EB37F484;
+	Thu,  9 May 2024 19:13:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="epkngSnw"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="HhPg85s/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FB87F7D1;
-	Thu,  9 May 2024 19:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62DC653
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 19:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715281785; cv=none; b=uioPXA+Yodprpu6qgpoKyXXv6Yb37pbSZBGFhRtEGQYuRi0BP7Nddi+2GjSbgnULwVvNuZXWXV5nG2xlciFbz7SsfMQJSG9FepH2jWJyD58rMyoNR0DA5fdmcGRbAJUWmftkSQ/9aRRaskemiq87XvsZaNQFgRaX9Xysg/7c0aE=
+	t=1715282031; cv=none; b=MsihbmJ6YwLwhVrRNcrVwyTC4m9tgS6qxNf8E+V3KEdsykr9WitvmggPfrfcFkjmkSZNX+nDb1eJK8ZnrX9H/wN4LVMfsXyl4NtDBGwA1GENoIDIEB3nRaeG8ecjlXdK69fp9INlACCRmF4z+w26dL3XnyExKdlRYSF8euTl0G4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715281785; c=relaxed/simple;
-	bh=Je2CopuisTQSqTRX+CMQd6WrKvalUE1cl0xUVrV4L50=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AR3MniwtCN8l0Z55yiqgVKkEdZ+vzoF18l6dl0nZL/Fog/Rq33e/JUPRwgzx+u3c7vxLlNuZzfP7CwMxJ/NlHWCzzXB6ut3FiYCL/OEc7ql+vuO9zJKl/bDDjjO4g+vaYkz9SKBkBDej2xQ2/yoHeLw5nf3g3VoxD7P6foxiXRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=epkngSnw; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-34ddc9fe4a1so778337f8f.0;
-        Thu, 09 May 2024 12:09:42 -0700 (PDT)
+	s=arc-20240116; t=1715282031; c=relaxed/simple;
+	bh=1G0QDR8JUJFyxaGNVbL1UI3DtGhHUGbyrMYHlnXXzhc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b7cBFcv7gt0S+AZiVGAqDXCn0kW70DQ4uKqDCxj9HwKsQaeCdQ7K2WnuOsnTYhF8rULqaAvURBO0Vy0JjVwXbYkSalKiYDsQkvNqPAW7V/GQrpoxDc2xL5ks1kPVO16cLR0I8Fq2MnkABektFHxVYgiwlaRfLJasKPcl1j7a3hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=HhPg85s/; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-620390308e5so11074787b3.3
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 12:13:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715281781; x=1715886581; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=paul-moore.com; s=google; t=1715282027; x=1715886827; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3CSbzIHGbUZ218pL4yd7rG60VIXMZlWnpY2Qh8ih8nw=;
-        b=epkngSnwF0h+iOqsgdCG4Di9lFPeAj2JLO5ZD97jby7HjVBAgBTBlcFRyV7+7yK7gq
-         tVo+ziwjpx3Y1yq3L19nveC0wj2Ndxm792nWJblG7lqS5sZwim/iwSL7RHRhBQODPWvu
-         Yh0sE/7b5VpCYz52cddL/pZS0FBXJjM52BTAfHEMAdUewrUsGiDPXntYWmCz/RUb6kKj
-         zvlvRjAr6tiddef86GsSGhdxQQY1xuwooAgP2kGTavhSY9WDj8i6iv5dgqffu7mTU+HC
-         pKrfaQEPalJr/dP7LLoPgmCvGf7+J8b+FZVEy/JnrZvSfxDE+j30y/zqE4SJRWcsbR2B
-         oyug==
+        bh=P5+CpfPTydUeT3vKTfUos21UxKzlhAl+5pqEA8g6EMk=;
+        b=HhPg85s/v6Htcvh2B2b1drMbpAeC4qjPAA6iOVP+p25cuKi5Ty4uiBb2rzA4ONOb4A
+         dRMdG71gWQek6x0b9arUEuiUAakh2nfTV+YPcbhd6DGk8kDi73XEnzrAIkGyxHPnHztT
+         1wyXrHNmXDWOyYwfLU1/g+5EEhNkPZYM7ssrC7O7tk2sZpQuSvwCzH030tL61Fgu3zdh
+         BiwXGTq6CUYu4IE51Sp4g/UUYAyGOzia1JACLf82EkmrJRi3/MnskyEE9XLe0TArZRDH
+         WnuXHHzGLjAP91P5dtNTo+P0bhIIi1LGmSnGxr2pMm6cizkkPd8H7pF4cnw7jgS4lUud
+         Dumg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715281781; x=1715886581;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1715282027; x=1715886827;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3CSbzIHGbUZ218pL4yd7rG60VIXMZlWnpY2Qh8ih8nw=;
-        b=derbDo1tBiJuAsbzzrp8aiwE9kK0zj1OMpN1nafnFHQ26eDjtCNGg1Ly3w0w0kIV0d
-         He15RJOrxbMxw7mKetpSBW87EEFC7lsYUQW7DUurkyw2I3D+V7hXnmiG3NXAmAyn1DUR
-         IKu2seVESSjsWVgd2EgWLpFrolLJKKBBTwDfP3y+obuJh8JJHp7uiMD+jnCv9mntt1ZI
-         UBcpA5NuXUMmv+xOpb3FpyRSJXzPLw0lNcfGn2J7DJ5X6hbEKKLOg/eBGIQ9UZjOg5h0
-         Ni3Zw+zGFrXDsMhQL31iM8CzMw39AD6SSBRCb6BpI+1KKXZIbBk5SWlloZe6zL4oJ1Fa
-         S73Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVZeSZX5yuIF/3SFpX/XTooKiVglDoIG4BCgP3lj53pXRLoPHHyBOrYiuAiiU1jhe+QQwww/1cksDkl1hNpb9K50pCouPqzb08NzbfqOZ7ADwuSAE4tXWShuj9UoHJoIEqwPyPb36vLDtzdpE2liz4RTGs88JyBsyQed5WGt1e0QSQcxDQc
-X-Gm-Message-State: AOJu0YxbMKtavakio7BEKPtWkht8qrm4nrPbdS28px/gzm2WuU+QQTD0
-	s6ji0hQZsBQ3lWimBQCdZPW9QZKxJenjxqg8FRuDPPmq2/YG8Hl8
-X-Google-Smtp-Source: AGHT+IG5prNPg2rPvVejn53N8fhi120sz/Ilh9Fs/V3adRIhICtygStfMc9Tdnf7wKHeG3l19/wJ2A==
-X-Received: by 2002:adf:ff8a:0:b0:34a:687a:8f66 with SMTP id ffacd0b85a97d-3504a954dd1mr310915f8f.45.1715281781298;
-        Thu, 09 May 2024 12:09:41 -0700 (PDT)
-Received: from localhost ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502baad08asm2435998f8f.76.2024.05.09.12.09.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 12:09:41 -0700 (PDT)
-From: Richard Gobert <richardbgobert@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	willemdebruijn.kernel@gmail.com,
-	dsahern@kernel.org,
-	alexander.duyck@gmail.com,
-	shuah@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: Richard Gobert <richardbgobert@gmail.com>
-Subject: [PATCH net-next v10 3/3] selftests/net: add flush id selftests
-Date: Thu,  9 May 2024 21:08:19 +0200
-Message-Id: <20240509190819.2985-4-richardbgobert@gmail.com>
-In-Reply-To: <20240509190819.2985-1-richardbgobert@gmail.com>
-References: <20240509190819.2985-1-richardbgobert@gmail.com>
+        bh=P5+CpfPTydUeT3vKTfUos21UxKzlhAl+5pqEA8g6EMk=;
+        b=rciUxetVfMmpVcTtVnkeeul+j1SX7+yS91dqa+90o9p+yCisRsCXoHEKmhQBFXpfWU
+         f27aJJ8MSseauZJgbN24IjBbpbVOsFUUlMmZeNG62mX1lHhi6jaOtwKXJWjIqOxYSvzk
+         P+NHksXgH8sJJn+CQGiH4vAN770GaGySjHoxRQLUjXkNCxPBzLXNxnzhks2vF/UBTMPz
+         XQtB5euvsFaO48r/OaH7Wu2MpwanZ2cg530axYC6D+TPk15dYBVMkodyVokvggE9FAeb
+         AROzXMj566Zktbl2Ix+iuiuHsPmokHPObeG4pwtoO7OGjwDuNmlo+RqFqrXJX06nHEst
+         m4HQ==
+X-Gm-Message-State: AOJu0YzJHRCns/ucmfW12GeAqt6UvYHTAVpaoerKD3PIoYD1TG6C3HMS
+	EhY6me0e6jKUWUNa4ZOLMPH314KMOqpD97f7oe+R6hEW9U+gk3OOW9Wb+nhwZy2dfnsKz+20mNN
+	fI//jtJhRh0nVcCyBdXy0mNS/PJTfLspR/QZkJVfTM6H/OSk=
+X-Google-Smtp-Source: AGHT+IHUWBa+ghPEnr1ieJmvlpKHqw0gEV0F6yX4442fyzIAt9aMggaDcKmU/XZYYhXknN1mpz1tA24TgG24v/jaGhg=
+X-Received: by 2002:a05:690c:b1b:b0:61b:e62e:8fad with SMTP id
+ 00721157ae682-622affb59b1mr5628747b3.21.1715282027468; Thu, 09 May 2024
+ 12:13:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <262f71a207e8cedd388bd89d17ef16155eb2acee.1715248275.git.dcaratti@redhat.com>
+In-Reply-To: <262f71a207e8cedd388bd89d17ef16155eb2acee.1715248275.git.dcaratti@redhat.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Thu, 9 May 2024 15:13:36 -0400
+Message-ID: <CAHC9VhQEa+6BQs-9jT4JR64nDGio8FbAG5smPaq8E3gi=H1SLg@mail.gmail.com>
+Subject: Re: [PATCH net v4] netlabel: fix RCU annotation for IPv4 options on
+ socket creation
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: netdev@vger.kernel.org, casey@schaufler-ca.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, linux-security-module@vger.kernel.org, 
+	pabeni@redhat.com, xmu@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Added flush id selftests to test different cases where DF flag is set or
-unset and id value changes in the following packets. All cases where the
-packets should coalesce or should not coalesce are tested.
+On Thu, May 9, 2024 at 6:36=E2=80=AFAM Davide Caratti <dcaratti@redhat.com>=
+ wrote:
+>
+> Xiumei reports the following splat when netlabel and TCP socket are used:
+>
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+>  WARNING: suspicious RCU usage
+>  6.9.0-rc2+ #637 Not tainted
+>  -----------------------------
+>  net/ipv4/cipso_ipv4.c:1880 suspicious rcu_dereference_protected() usage!
+>
+>  other info that might help us debug this:
+>
+>  rcu_scheduler_active =3D 2, debug_locks =3D 1
+>  1 lock held by ncat/23333:
+>   #0: ffffffff906030c0 (rcu_read_lock){....}-{1:2}, at: netlbl_sock_setat=
+tr+0x25/0x1b0
+>
+>  stack backtrace:
+>  CPU: 11 PID: 23333 Comm: ncat Kdump: loaded Not tainted 6.9.0-rc2+ #637
+>  Hardware name: Supermicro SYS-6027R-72RF/X9DRH-7TF/7F/iTF/iF, BIOS 3.0  =
+07/26/2013
+>  Call Trace:
+>   <TASK>
+>   dump_stack_lvl+0xa9/0xc0
+>   lockdep_rcu_suspicious+0x117/0x190
+>   cipso_v4_sock_setattr+0x1ab/0x1b0
+>   netlbl_sock_setattr+0x13e/0x1b0
+>   selinux_netlbl_socket_post_create+0x3f/0x80
+>   selinux_socket_post_create+0x1a0/0x460
+>   security_socket_post_create+0x42/0x60
+>   __sock_create+0x342/0x3a0
+>   __sys_socket_create.part.22+0x42/0x70
+>   __sys_socket+0x37/0xb0
+>   __x64_sys_socket+0x16/0x20
+>   do_syscall_64+0x96/0x180
+>   ? do_user_addr_fault+0x68d/0xa30
+>   ? exc_page_fault+0x171/0x280
+>   ? asm_exc_page_fault+0x22/0x30
+>   entry_SYSCALL_64_after_hwframe+0x71/0x79
+>  RIP: 0033:0x7fbc0ca3fc1b
+>  Code: 73 01 c3 48 8b 0d 05 f2 1b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e =
+0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 29 00 00 00 0f 05 <48> 3d 01 f0 f=
+f ff 73 01 c3 48 8b 0d d5 f1 1b 00 f7 d8 64 89 01 48
+>  RSP: 002b:00007fff18635208 EFLAGS: 00000246 ORIG_RAX: 0000000000000029
+>  RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007fbc0ca3fc1b
+>  RDX: 0000000000000006 RSI: 0000000000000001 RDI: 0000000000000002
+>  RBP: 000055d24f80f8a0 R08: 0000000000000003 R09: 0000000000000001
+>
+> R10: 0000000000020000 R11: 0000000000000246 R12: 000055d24f80f8a0
+>  R13: 0000000000000000 R14: 000055d24f80fb88 R15: 0000000000000000
+>   </TASK>
+>
+> The current implementation of cipso_v4_sock_setattr() replaces IP options
+> under the assumption that the caller holds the socket lock; however, such
+> assumption is not true, nor needed, in selinux_socket_post_create() hook.
+>
+> Let all callers of cipso_v4_sock_setattr() specify the "socket lock held"
+> condition, except selinux_socket_post_create() _ where such condition can
+> safely be set as true even without holding the socket lock.
+>
+> v4:
+>  - fix build when CONFIG_LOCKDEP is unset (thanks kernel test robot)
+>
+> v3:
+>  - rename variable to 'sk_locked' (thanks Paul Moore)
+>  - keep rcu_replace_pointer() open-coded and re-add NULL check of 'old',
+>    these two changes will be posted in another patch (thanks Paul Moore)
+>
+> v2:
+>  - pass lockdep_sock_is_held() through a boolean variable in the stack
+>    (thanks Eric Dumazet, Paul Moore, Casey Schaufler)
+>  - use rcu_replace_pointer() instead of rcu_dereference_protected() +
+>    rcu_assign_pointer()
+>  - remove NULL check of 'old' before kfree_rcu()
+>
+> Fixes: f6d8bd051c39 ("inet: add RCU protection to inet->opt")
+> Reported-by: Xiumei Mu <xmu@redhat.com>
+> Acked-by: Paul Moore <paul@paul-moore.com>
+> Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+> ---
+>  include/net/cipso_ipv4.h     |  6 ++++--
+>  include/net/netlabel.h       | 12 ++++++++++--
+>  net/ipv4/cipso_ipv4.c        |  7 ++++---
+>  net/netlabel/netlabel_kapi.c | 26 +++++++++++++++++++++++---
+>  security/selinux/netlabel.c  |  5 ++++-
+>  security/smack/smack_lsm.c   |  3 ++-
+>  6 files changed, 47 insertions(+), 12 deletions(-)
 
-Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
----
- tools/testing/selftests/net/gro.c | 138 ++++++++++++++++++++++++++++++
- 1 file changed, 138 insertions(+)
+...
 
-diff --git a/tools/testing/selftests/net/gro.c b/tools/testing/selftests/net/gro.c
-index 6038b96ecee8..b2184847e388 100644
---- a/tools/testing/selftests/net/gro.c
-+++ b/tools/testing/selftests/net/gro.c
-@@ -93,6 +93,7 @@ static bool tx_socket = true;
- static int tcp_offset = -1;
- static int total_hdr_len = -1;
- static int ethhdr_proto = -1;
-+static const int num_flush_id_cases = 6;
- 
- static void vlog(const char *fmt, ...)
- {
-@@ -620,6 +621,113 @@ static void add_ipv6_exthdr(void *buf, void *optpkt, __u8 exthdr_type, char *ext
- 	iph->payload_len = htons(ntohs(iph->payload_len) + MIN_EXTHDR_SIZE);
- }
- 
-+static void fix_ip4_checksum(struct iphdr *iph)
-+{
-+	iph->check = 0;
-+	iph->check = checksum_fold(iph, sizeof(struct iphdr), 0);
-+}
-+
-+static void send_flush_id_case(int fd, struct sockaddr_ll *daddr, int tcase)
-+{
-+	static char buf1[MAX_HDR_LEN + PAYLOAD_LEN];
-+	static char buf2[MAX_HDR_LEN + PAYLOAD_LEN];
-+	static char buf3[MAX_HDR_LEN + PAYLOAD_LEN];
-+	bool send_three = false;
-+	struct iphdr *iph1;
-+	struct iphdr *iph2;
-+	struct iphdr *iph3;
-+
-+	iph1 = (struct iphdr *)(buf1 + ETH_HLEN);
-+	iph2 = (struct iphdr *)(buf2 + ETH_HLEN);
-+	iph3 = (struct iphdr *)(buf3 + ETH_HLEN);
-+
-+	create_packet(buf1, 0, 0, PAYLOAD_LEN, 0);
-+	create_packet(buf2, PAYLOAD_LEN, 0, PAYLOAD_LEN, 0);
-+	create_packet(buf3, PAYLOAD_LEN * 2, 0, PAYLOAD_LEN, 0);
-+
-+	switch (tcase) {
-+	case 0: /* DF=1, Incrementing - should coalesce */
-+		iph1->frag_off |= htons(IP_DF);
-+		iph1->id = htons(8);
-+
-+		iph2->frag_off |= htons(IP_DF);
-+		iph2->id = htons(9);
-+		break;
-+
-+	case 1: /* DF=1, Fixed - should coalesce */
-+		iph1->frag_off |= htons(IP_DF);
-+		iph1->id = htons(8);
-+
-+		iph2->frag_off |= htons(IP_DF);
-+		iph2->id = htons(8);
-+		break;
-+
-+	case 2: /* DF=0, Incrementing - should coalesce */
-+		iph1->frag_off &= ~htons(IP_DF);
-+		iph1->id = htons(8);
-+
-+		iph2->frag_off &= ~htons(IP_DF);
-+		iph2->id = htons(9);
-+		break;
-+
-+	case 3: /* DF=0, Fixed - should not coalesce */
-+		iph1->frag_off &= ~htons(IP_DF);
-+		iph1->id = htons(8);
-+
-+		iph2->frag_off &= ~htons(IP_DF);
-+		iph2->id = htons(8);
-+		break;
-+
-+	case 4: /* DF=1, two packets incrementing, and one fixed - should
-+		 * coalesce only the first two packets
-+		 */
-+		iph1->frag_off |= htons(IP_DF);
-+		iph1->id = htons(8);
-+
-+		iph2->frag_off |= htons(IP_DF);
-+		iph2->id = htons(9);
-+
-+		iph3->frag_off |= htons(IP_DF);
-+		iph3->id = htons(9);
-+		send_three = true;
-+		break;
-+
-+	case 5: /* DF=1, two packets fixed, and one incrementing - should
-+		 * coalesce only the first two packets
-+		 */
-+		iph1->frag_off |= htons(IP_DF);
-+		iph1->id = htons(8);
-+
-+		iph2->frag_off |= htons(IP_DF);
-+		iph2->id = htons(8);
-+
-+		iph3->frag_off |= htons(IP_DF);
-+		iph3->id = htons(9);
-+		send_three = true;
-+		break;
-+	}
-+
-+	fix_ip4_checksum(iph1);
-+	fix_ip4_checksum(iph2);
-+	write_packet(fd, buf1, total_hdr_len + PAYLOAD_LEN, daddr);
-+	write_packet(fd, buf2, total_hdr_len + PAYLOAD_LEN, daddr);
-+
-+	if (send_three) {
-+		fix_ip4_checksum(iph3);
-+		write_packet(fd, buf3, total_hdr_len + PAYLOAD_LEN, daddr);
-+	}
-+}
-+
-+static void test_flush_id(int fd, struct sockaddr_ll *daddr, char *fin_pkt)
-+{
-+	for (int i = 0; i < num_flush_id_cases; i++) {
-+		sleep(1);
-+		send_flush_id_case(fd, daddr, i);
-+		sleep(1);
-+		write_packet(fd, fin_pkt, total_hdr_len, daddr);
-+	}
-+}
-+
- static void send_ipv6_exthdr(int fd, struct sockaddr_ll *daddr, char *ext_data1, char *ext_data2)
- {
- 	static char buf[MAX_HDR_LEN + PAYLOAD_LEN];
-@@ -938,6 +1046,8 @@ static void gro_sender(void)
- 			send_fragment4(txfd, &daddr);
- 			sleep(1);
- 			write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
-+
-+			test_flush_id(txfd, &daddr, fin_pkt);
- 		} else if (proto == PF_INET6) {
- 			sleep(1);
- 			send_fragment6(txfd, &daddr);
-@@ -1064,6 +1174,34 @@ static void gro_receiver(void)
- 
- 			printf("fragmented ip4 doesn't coalesce: ");
- 			check_recv_pkts(rxfd, correct_payload, 2);
-+
-+			/* is_atomic checks */
-+			printf("DF=1, Incrementing - should coalesce: ");
-+			correct_payload[0] = PAYLOAD_LEN * 2;
-+			check_recv_pkts(rxfd, correct_payload, 1);
-+
-+			printf("DF=1, Fixed - should coalesce: ");
-+			correct_payload[0] = PAYLOAD_LEN * 2;
-+			check_recv_pkts(rxfd, correct_payload, 1);
-+
-+			printf("DF=0, Incrementing - should coalesce: ");
-+			correct_payload[0] = PAYLOAD_LEN * 2;
-+			check_recv_pkts(rxfd, correct_payload, 1);
-+
-+			printf("DF=0, Fixed - should not coalesce: ");
-+			correct_payload[0] = PAYLOAD_LEN;
-+			correct_payload[1] = PAYLOAD_LEN;
-+			check_recv_pkts(rxfd, correct_payload, 2);
-+
-+			printf("DF=1, 2 Incrementing and one fixed - should coalesce only first 2 packets: ");
-+			correct_payload[0] = PAYLOAD_LEN * 2;
-+			correct_payload[1] = PAYLOAD_LEN;
-+			check_recv_pkts(rxfd, correct_payload, 2);
-+
-+			printf("DF=1, 2 Fixed and one incrementing - should coalesce only first 2 packets: ");
-+			correct_payload[0] = PAYLOAD_LEN * 2;
-+			correct_payload[1] = PAYLOAD_LEN;
-+			check_recv_pkts(rxfd, correct_payload, 2);
- 		} else if (proto == PF_INET6) {
- 			/* GRO doesn't check for ipv6 hop limit when flushing.
- 			 * Hence no corresponding test to the ipv4 case.
--- 
-2.36.1
+> +/**
+> + * netlbl_sk_lock_check - Check if the socket lock has been acquired.
+> + * @sk: the socket to check
+> + *
+> + * Description: check if @sk is locked. Returns true if socket @sk is lo=
+cked
+> + * or if lock debugging is disabled at runtime or compile-time
+> + *
+> + */
+> +bool netlbl_sk_lock_check(struct sock *sk)
+> +{
+> +#ifdef CONFIG_LOCKDEP
+> +       if (debug_locks)
+> +               return lockdep_sock_is_held(sk);
+> +#endif
+> +       return true;
+> +}
 
+It might be cleaner to do this:
+
+#ifdef CONFIG_LOCKDEP
+bool netlbl_sk_lock_check(sk)
+{
+  if (debug_locks)
+    return lockdep_sock_is_held(sk);
+  return true;
+}
+#else
+bool netlbl_sk_lock_check(sk)
+{
+  return true;
+}
+#endif
+
+--=20
+paul-moore.com
 
