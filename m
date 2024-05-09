@@ -1,284 +1,549 @@
-Return-Path: <netdev+bounces-94999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A206A8C1345
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 18:54:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED6828C134B
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 18:58:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4AF51C20AD6
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 16:54:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A374E281FC1
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 16:58:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A848F7A;
-	Thu,  9 May 2024 16:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314288F44;
+	Thu,  9 May 2024 16:58:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="itWjunuv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8C46FB0
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 16:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009426FB0;
+	Thu,  9 May 2024 16:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715273664; cv=none; b=PIS141tVXexc2oxG5WGb++pmaEQpQVX0IggJ7nTOge8KLazBUWjGIofixvn9+Ylqy9Ko7x2tI82P2y3nMiCC4yI2JJzZVM2hdnREXdh/XnM1Ne7XEebPtxwffOm+gZCWY00IPsg/e7qnkpteAEfqwhPBHqcIzGGNqdO33iixrRs=
+	t=1715273890; cv=none; b=grZkM31Uvc7HQOQcMiNiieZSvrLSeWI1SvwKEXtqfUu1RcbxbkkcESndgjijEExg49dEvf3/TRhNCjrjINt0HZgiS72HaqmCiuLBBA4jHjZQ0fhWQXjAB1hes4W71OHHDUf4PvuDrk3WV6GowTNqxz4tp0/zvua3Muu1MrIffK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715273664; c=relaxed/simple;
-	bh=jRFBtIxI7p41PalXC/FldCWeMtTS5vkp+wgCQ8PDF3w=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=et4seUH0whkkuUK4g77I0Atq82LGIU6X1iSCZjNTF5QNRP/FWgrx9Q8RKat04+TVPgR+Rc/b2gW17XmN7VAg4Uw2OgP5IG3ep7NsuGhOIjmR3nWElif7blBYK1nLroEGHqmRRvSfRFpYA18r+nqUuQ/V18o3u3zoWPfWGfdxb1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-7ddf08e17e4so86690239f.0
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 09:54:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715273662; x=1715878462;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AOw5MqGpBrLpd0h3l7Dpkao88gTm4e5Gux9aso7oDEg=;
-        b=WtqbgNnY2rnJffYZ0COZlwISe1eQOoJrvHhn7o85l+ATYTdSxVRfAG8ICYZa111sK8
-         fPn/JkRfKgC8SeBl6txaFGC3OaoFeOAprvZmesV2wKNwjOO8Y5iZZQ9H8iJs1EhZLNXP
-         C8r749nBYuBuTSDo0Bn3oFFgGLdiZIYEARpHr1c8aSJTnL2wvLwR/LtmY75qbvS0oC6N
-         WHGwSgxCGKtHjBBTPF/MkiQrN4Lf1cptN9IQ74zPUnMMk4QgKoDkV/ZrJ9i8KNTSxKIt
-         hibb8Mb2cKI0uHJMjAQBHZIAgTqwl8fDnlnJkHRbZuCj9b0DavcUdHUNEzop7ON6w4s3
-         J7MQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV+ARntfmPv+cHEwi/ldzRJdOPDnTJWK9yHfabOi8KbO1VPCaKqDkxROoreZfcUblPMNbS9gC/ytlBrVNdLu5FIWjA0dyeI
-X-Gm-Message-State: AOJu0Yyu0Qw6TzYgUaS/VEao9HSYi6xtlqno+bKq1SBFeWz1EMh6Re/c
-	y+16gNM5Pkwr/1EjQB5/bsY/UFyaB9aE8nQ6W33ags0fzl5CldtcJptLpUEPiM1zc+1lVTe2x5H
-	JE7qKAJ7m3kq89EOI2Gq3j0BDiZIDr/0Y+TFW6qH43QYqmfm3z7Haruc=
-X-Google-Smtp-Source: AGHT+IH9kPxUtSsZvDI6Vhhr/vuJLi/aZxSb2xniCmpohNijvH8as43eAvI/ffq3bj9qUamE4ZW+rA374GgBSmeN+LYG6zTYTAQ6
+	s=arc-20240116; t=1715273890; c=relaxed/simple;
+	bh=Rv252xbtK7kqw+580zaOJQJK+pd6z69TPTUWEDC6nyM=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=ZyLgzhiGbU2LzUmVuo66PtpCAs8BVkY0uyetWzuG/7Ga8F6dI2J6zApFgvDi1kTXJAegAzUk73I2QREDoqnxlbhBSvbqcukPJ/iNlb4WjjtjMHfbcqf94AhEQ8cm9xAkJVQVmeFF549Be4bY+Stb8IxHC3bgHt8t4kQgPuLfPgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=itWjunuv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 634FEC116B1;
+	Thu,  9 May 2024 16:58:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715273889;
+	bh=Rv252xbtK7kqw+580zaOJQJK+pd6z69TPTUWEDC6nyM=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+	b=itWjunuvy+dTZ+EsBfr1IqpAG1KcaAzX0rJXlkbUu9lRhUc+WvAlHORJtkkUPZ3jZ
+	 S90VqQzlFYWiHkGkTDZvWrIwBsV9FTIVSgOYiFs8spI+0WGrbGoCNm6R9xLwDloGqX
+	 SPS97+jnlPPw/eJ8jSUdXZxd5vNU+dnYJEQQWWyl2Bj3hl6KVAm/zqt9y7X2Pa4TIK
+	 n64Vp5ws8SuWMDxoJpRo5G06pmzCeP7QotCHNxAFHmpMwO6E+VnZuFVqtxgnzcW7W6
+	 FAAgWwwAorCP5U+5fdHhVmJzMVA3q8btwmLZEE/TkhfCfIcSGqxmPJWqxwgtOuP95D
+	 s80BrgVZnDjSw==
+Date: Thu, 9 May 2024 09:58:08 -0700 (PDT)
+From: Mat Martineau <martineau@kernel.org>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    Alexander Duyck <alexander.duyck@gmail.com>, 
+    Jonathan Corbet <corbet@lwn.net>, 
+    Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, 
+    linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v3 12/13] mm: page_frag: update documentation
+ for page_frag
+In-Reply-To: <20240508133408.54708-13-linyunsheng@huawei.com>
+Message-ID: <2dc46fd0-fe7a-436a-5238-ff6b3f69e1a8@kernel.org>
+References: <20240508133408.54708-1-linyunsheng@huawei.com> <20240508133408.54708-13-linyunsheng@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:13d0:b0:487:591e:6e04 with SMTP id
- 8926c6da1cb9f-48955bde8ebmr14344173.3.1715273661779; Thu, 09 May 2024
- 09:54:21 -0700 (PDT)
-Date: Thu, 09 May 2024 09:54:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004da3b0061808451e@google.com>
-Subject: [syzbot] [net?] possible deadlock in team_device_event (3)
-From: syzbot <syzbot+b668da2bc4cb9670bf58@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jiri@resnulli.us, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8; format=flowed
 
-Hello,
+On Wed, 8 May 2024, Yunsheng Lin wrote:
 
-syzbot found the following issue on:
+> Update documentation about design, implementation and API usages
+> for page_frag.
+>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+> Documentation/mm/page_frags.rst | 156 +++++++++++++++++++++++++++++++-
+> include/linux/page_frag_cache.h |  96 ++++++++++++++++++++
+> mm/page_frag_cache.c            |  65 ++++++++++++-
+> 3 files changed, 314 insertions(+), 3 deletions(-)
+>
+> diff --git a/Documentation/mm/page_frags.rst b/Documentation/mm/page_frags.rst
+> index 503ca6cdb804..9c25c0fd81f0 100644
+> --- a/Documentation/mm/page_frags.rst
+> +++ b/Documentation/mm/page_frags.rst
+> @@ -1,3 +1,5 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> ==============
+> Page fragments
+> ==============
+> @@ -40,4 +42,156 @@ page via a single call.  The advantage to doing this is that it allows for
+> cleaning up the multiple references that were added to a page in order to
+> avoid calling get_page per allocation.
+>
+> -Alexander Duyck, Nov 29, 2016.
+> +
+> +Architecture overview
+> +=====================
+> +
+> +.. code-block:: none
+> +
+> +                +----------------------+
+> +                | page_frag API caller |
+> +                +----------------------+
+> +                            ^
+> +                            |
+> +                            |
+> +                            |
+> +                            v
+> +    +------------------------------------------------+
+> +    |             request page fragment              |
+> +    +------------------------------------------------+
+> +        ^                      ^                   ^
+> +        |                      | Cache not enough  |
+> +        | Cache empty          v                   |
+> +        |             +-----------------+          |
+> +        |             | drain old cache |          |
+> +        |             +-----------------+          |
+> +        |                      ^                   |
+> +        |                      |                   |
+> +        v                      v                   |
+> +    +----------------------------------+           |
+> +    |  refill cache with order 3 page  |           |
+> +    +----------------------------------+           |
+> +     ^                  ^                          |
+> +     |                  |                          |
+> +     |                  | Refill failed            |
+> +     |                  |                          | Cache is enough
+> +     |                  |                          |
+> +     |                  v                          |
+> +     |    +----------------------------------+     |
+> +     |    |  refill cache with order 0 page  |     |
+> +     |    +----------------------------------+     |
+> +     |                       ^                     |
+> +     | Refill succeed        |                     |
+> +     |                       | Refill succeed      |
+> +     |                       |                     |
+> +     v                       v                     v
+> +    +------------------------------------------------+
+> +    |         allocate fragment from cache           |
+> +    +------------------------------------------------+
+> +
+> +API interface
+> +=============
+> +As the design and implementation of page_frag API implies, the allocation side
+> +does not allow concurrent calling. Instead it is assumed that the caller must
+> +ensure there is not concurrent alloc calling to the same page_frag_cache
+> +instance by using its own lock or rely on some lockless guarantee like NAPI
+> +softirq.
+> +
+> +Depending on different aligning requirement, the page_frag API caller may call
+> +page_frag_alloc*_align*() to ensure the returned virtual address or offset of
+> +the page is aligned according to the 'align/alignment' parameter. Note the size
+> +of the allocated fragment is not aligned, the caller need to provide a aligned
+> +fragsz if there is a alignment requirement for the size of the fragment.
+> +
+> +Depending on different use cases, callers expecting to deal with va, page or
+> +both va and page for them may call page_frag_alloc_va*, page_frag_alloc_pg*,
+> +or page_frag_alloc* API accordingly.
+> +
+> +There is also a use case that need minimum memory in order for forward
+> +progressing, but more performant if more memory is available. Using
+> +page_frag_alloc_prepare() and page_frag_alloc_commit() related API, the caller
+> +requests the minimum memory it need and the prepare API will return the maximum
+> +size of the fragment returned, the caller needs to either call the commit API to
+> +report how much memory it actually uses, or not do so if deciding to not use any
+> +memory.
+> +
+> +.. kernel-doc:: include/linux/page_frag_cache.h
+> +   :identifiers: page_frag_cache_init page_frag_cache_is_pfmemalloc
+> +                 page_frag_cache_page_offset page_frag_alloc_va
+> +                 page_frag_alloc_va_align page_frag_alloc_va_prepare_align
+> +                 page_frag_alloc_probe page_frag_alloc_commit
+> +                 page_frag_alloc_commit_noref
+> +
+> +.. kernel-doc:: mm/page_frag_cache.c
+> +   :identifiers: __page_frag_alloc_va_align page_frag_alloc_va_prepare
+> +		 page_frag_alloc_pg_prepare page_frag_alloc_prepare
+> +		 page_frag_cache_drain page_frag_free_va
+> +
+> +Coding examples
+> +===============
+> +
+> +Init & Drain API
+> +----------------
+> +
+> +.. code-block:: c
+> +
+> +   page_frag_cache_init(pfrag);
+> +   ...
+> +   page_frag_cache_drain(pfrag);
+> +
+> +
+> +Alloc & Free API
+> +----------------
+> +
+> +.. code-block:: c
+> +
+> +    void *va;
+> +
+> +    va = page_frag_alloc_va_align(pfrag, size, gfp, align);
+> +    if (!va)
+> +        goto do_error;
+> +
+> +    err = do_something(va, size);
+> +    if (err) {
+> +        page_frag_free_va(va);
+> +        goto do_error;
+> +    }
+> +
+> +Prepare & Commit API
+> +--------------------
+> +
+> +.. code-block:: c
+> +
+> +    unsigned int offset, size;
+> +    bool merge = true;
+> +    struct page *page;
+> +    void *va;
+> +
+> +    size = 32U;
+> +    page = page_frag_alloc_prepare(pfrag, &offset, &size, &va);
+> +    if (!page)
+> +        goto wait_for_space;
+> +
+> +    copy = min_t(int, copy, size);
+> +    if (!skb_can_coalesce(skb, i, page, offset)) {
+> +        if (i >= max_skb_frags)
+> +            goto new_segment;
+> +
+> +        merge = false;
+> +    }
+> +
+> +    copy = mem_schedule(copy);
+> +    if (!copy)
+> +        goto wait_for_space;
+> +
+> +    err = copy_from_iter_full_nocache(va, copy, iter);
+> +    if (err)
+> +        goto do_error;
+> +
+> +    if (merge) {
+> +        skb_frag_size_add(&skb_shinfo(skb)->frags[i - 1], copy);
+> +        page_frag_alloc_commit_noref(pfrag, offset, copy);
+> +    } else {
+> +        skb_fill_page_desc(skb, i, page, offset, copy);
+> +        page_frag_alloc_commit(pfrag, offset, copy);
+> +    }
+> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
+> index 30893638155b..8925397262a1 100644
+> --- a/include/linux/page_frag_cache.h
+> +++ b/include/linux/page_frag_cache.h
+> @@ -61,11 +61,28 @@ struct page_frag_cache {
+> #endif
+> };
+>
+> +/**
+> + * page_frag_cache_init() - Init page_frag cache.
+> + * @nc: page_frag cache from which to init
+> + *
+> + * Inline helper to init the page_frag cache.
+> + */
+> static inline void page_frag_cache_init(struct page_frag_cache *nc)
+> {
+> 	memset(nc, 0, sizeof(*nc));
+> }
+>
+> +/**
+> + * page_frag_cache_is_pfmemalloc() - Check for pfmemalloc.
+> + * @nc: page_frag cache from which to check
+> + *
+> + * Used to check if the current page in page_frag cache is pfmemalloc'ed.
+> + * It has the same calling context expection as the alloc API.
+> + *
+> + * Return:
+> + * Return true if the current page in page_frag cache is pfmemalloc'ed,
+> + * otherwise return false.
+> + */
+> static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
+> {
+> 	return encoded_page_pfmemalloc(nc->encoded_va);
+> @@ -92,6 +109,19 @@ void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+> 				 unsigned int fragsz, gfp_t gfp_mask,
+> 				 unsigned int align_mask);
+>
+> +/**
+> + * page_frag_alloc_va_align() - Alloc a page fragment with aligning requirement.
+> + * @nc: page_frag cache from which to allocate
+> + * @fragsz: the requested fragment size
+> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
+> + * @align: the requested aligning requirement for 'va'
+> + *
+> + * WARN_ON_ONCE() checking for 'align' before allocing a page fragment from
+> + * page_frag cache with aligning requirement for 'va'.
+> + *
+> + * Return:
+> + * Return va of the page fragment, otherwise return NULL.
+> + */
+> static inline void *page_frag_alloc_va_align(struct page_frag_cache *nc,
+> 					     unsigned int fragsz,
+> 					     gfp_t gfp_mask, unsigned int align)
+> @@ -100,11 +130,32 @@ static inline void *page_frag_alloc_va_align(struct page_frag_cache *nc,
+> 	return __page_frag_alloc_va_align(nc, fragsz, gfp_mask, -align);
+> }
+>
+> +/**
+> + * page_frag_cache_page_offset() - Return the current page fragment's offset.
+> + * @nc: page_frag cache from which to check
+> + *
+> + * The API is only used in net/sched/em_meta.c for historical reason, do not use
+> + * it for new caller unless there is a strong reason.
+> + *
+> + * Return:
+> + * Return the offset of the current page fragment in the page_frag cache.
+> + */
+> static inline unsigned int page_frag_cache_page_offset(const struct page_frag_cache *nc)
+> {
+> 	return __page_frag_cache_page_offset(nc->encoded_va, nc->remaining);
+> }
+>
+> +/**
+> + * page_frag_alloc_va() - Alloc a page fragment.
+> + * @nc: page_frag cache from which to allocate
+> + * @fragsz: the requested fragment size
+> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
+> + *
+> + * Get a page fragment from page_frag cache.
+> + *
+> + * Return:
+> + * Return va of the page fragment, otherwise return NULL.
+> + */
+> static inline void *page_frag_alloc_va(struct page_frag_cache *nc,
+> 				       unsigned int fragsz, gfp_t gfp_mask)
+> {
+> @@ -114,6 +165,21 @@ static inline void *page_frag_alloc_va(struct page_frag_cache *nc,
+> void *page_frag_alloc_va_prepare(struct page_frag_cache *nc, unsigned int *fragsz,
+> 				 gfp_t gfp);
+>
+> +/**
+> + * page_frag_alloc_va_prepare_align() - Prepare allocing a page fragment with
+> + * aligning requirement.
+> + * @nc: page_frag cache from which to prepare
+> + * @fragsz: in as the requested size, out as the available size
+> + * @gfp: the allocation gfp to use when cache need to be refilled
+> + * @align: the requested aligning requirement for 'va'
+> + *
+> + * WARN_ON_ONCE() checking for 'align' before preparing an aligned page fragment
+> + * with minimum size of ???fragsz???, 'fragsz' is also used to report the maximum
+> + * size of the page fragment the caller can use.
+> + *
+> + * Return:
+> + * Return va of the page fragment, otherwise return NULL.
+> + */
+> static inline void *page_frag_alloc_va_prepare_align(struct page_frag_cache *nc,
+> 						     unsigned int *fragsz,
+> 						     gfp_t gfp,
+> @@ -148,6 +214,19 @@ static inline struct encoded_va *__page_frag_alloc_probe(struct page_frag_cache
+> 	return encoded_va;
+> }
+>
+> +/**
+> + * page_frag_alloc_probe - Probe the avaiable page fragment.
+> + * @nc: page_frag cache from which to probe
+> + * @offset: out as the offset of the page fragment
+> + * @fragsz: in as the requested size, out as the available size
 
-HEAD commit:    7367539ad4b0 Merge tag 'cxl-fixes-6.9-rc7' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17c0a004980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3310e643b6ef5d69
-dashboard link: https://syzkaller.appspot.com/bug?extid=b668da2bc4cb9670bf58
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Hi Yunsheng -
 
-Unfortunately, I don't have any reproducer for this issue yet.
+fragsz is never used as an input in this function. I think it would be 
+good to make the code consistent with this documentation by checking that 
+*fragsz <= (nc)->remaining
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8b1efa4e7ecb/disk-7367539a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ba7142036852/vmlinux-7367539a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/17af3ae89832/bzImage-7367539a.xz
+> + * @va: out as the virtual address of the returned page fragment
+> + *
+> + * Probe the current available memory to caller without doing cache refilling.
+> + * If the cache is empty, return NULL.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b668da2bc4cb9670bf58@syzkaller.appspotmail.com
+Instead of this line, is it more accurate to say "if no space is available 
+in the page_frag cache, return NULL" ?
 
-mac80211_hwsim hwsim28 wlan0 (unregistering): left allmulticast mode
-======================================================
-WARNING: possible circular locking dependency detected
-6.9.0-rc6-syzkaller-00234-g7367539ad4b0 #0 Not tainted
-------------------------------------------------------
-kworker/u8:9/5208 is trying to acquire lock:
-ffff88806325cd20 (team->team_lock_key#12){+.+.}-{3:3}, at: team_port_change_check drivers/net/team/team.c:2995 [inline]
-ffff88806325cd20 (team->team_lock_key#12){+.+.}-{3:3}, at: team_device_event+0x11d/0x770 drivers/net/team/team.c:3021
+I also suggest adding some documentation here like:
 
-but task is already holding lock:
-ffff888051578768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: wiphy_lock include/net/cfg80211.h:5953 [inline]
-ffff888051578768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: ieee80211_remove_interfaces+0xfe/0x760 net/mac80211/iface.c:2277
+"If the requested space is available, up to fragsz bytes may be added to 
+the fragment using page_frag_alloc_commit()".
 
-which lock already depends on the new lock.
+> + *
+> + * Return:
+> + * Return the page fragment, otherwise return NULL.
+> + */
+> #define page_frag_alloc_probe(nc, offset, fragsz, va)			\
+> ({									\
+> 	struct encoded_va *__encoded_va;				\
+> @@ -162,6 +241,13 @@ static inline struct encoded_va *__page_frag_alloc_probe(struct page_frag_cache
+> 	__page;								\
+> })
+>
+> +/**
+> + * page_frag_alloc_commit - Commit allocing a page fragment.
+> + * @nc: page_frag cache from which to commit
+> + * @fragsz: size of the page fragment has been used
+> + *
+> + * Commit the alloc preparing by passing the actual used size.
 
+Rephrasing suggestion:
 
-the existing dependency chain (in reverse order) is:
-
--> #1 (&rdev->wiphy.mtx){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
-       wiphy_lock include/net/cfg80211.h:5953 [inline]
-       cfg80211_netdev_notifier_call+0x367/0x1110 net/wireless/core.c:1524
-       notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
-       call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1950
-       call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
-       call_netdevice_notifiers net/core/dev.c:2002 [inline]
-       dev_open net/core/dev.c:1471 [inline]
-       dev_open+0x144/0x160 net/core/dev.c:1459
-       team_port_add drivers/net/team/team.c:1214 [inline]
-       team_add_slave+0xadc/0x2110 drivers/net/team/team.c:1974
-       do_set_master+0x1bc/0x230 net/core/rtnetlink.c:2685
-       do_setlink+0xcaf/0x3ff0 net/core/rtnetlink.c:2891
-       __rtnl_newlink+0xc35/0x1960 net/core/rtnetlink.c:3680
-       rtnl_newlink+0x67/0xa0 net/core/rtnetlink.c:3727
-       rtnetlink_rcv_msg+0x3c7/0xe60 net/core/rtnetlink.c:6595
-       netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2559
-       netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
-       netlink_unicast+0x542/0x820 net/netlink/af_netlink.c:1361
-       netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1905
-       sock_sendmsg_nosec net/socket.c:730 [inline]
-       __sock_sendmsg net/socket.c:745 [inline]
-       ____sys_sendmsg+0xab5/0xc90 net/socket.c:2584
-       ___sys_sendmsg+0x135/0x1e0 net/socket.c:2638
-       __sys_sendmsg+0x117/0x1f0 net/socket.c:2667
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (team->team_lock_key#12){+.+.}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain kernel/locking/lockdep.c:3869 [inline]
-       __lock_acquire+0x2478/0x3b30 kernel/locking/lockdep.c:5137
-       lock_acquire kernel/locking/lockdep.c:5754 [inline]
-       lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
-       team_port_change_check drivers/net/team/team.c:2995 [inline]
-       team_device_event+0x11d/0x770 drivers/net/team/team.c:3021
-       notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
-       call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1950
-       call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
-       call_netdevice_notifiers net/core/dev.c:2002 [inline]
-       dev_close_many+0x333/0x6a0 net/core/dev.c:1543
-       unregister_netdevice_many_notify+0x46d/0x19f0 net/core/dev.c:11080
-       macvlan_device_event+0x4ed/0x880 drivers/net/macvlan.c:1828
-       notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
-       call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1950
-       call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
-       call_netdevice_notifiers net/core/dev.c:2002 [inline]
-       unregister_netdevice_many_notify+0x8a1/0x19f0 net/core/dev.c:11105
-       unregister_netdevice_many net/core/dev.c:11163 [inline]
-       unregister_netdevice_queue+0x307/0x3f0 net/core/dev.c:11042
-       unregister_netdevice include/linux/netdevice.h:3115 [inline]
-       _cfg80211_unregister_wdev+0x624/0x7f0 net/wireless/core.c:1206
-       ieee80211_remove_interfaces+0x36d/0x760 net/mac80211/iface.c:2302
-       ieee80211_unregister_hw+0x55/0x3a0 net/mac80211/main.c:1652
-       mac80211_hwsim_del_radio drivers/net/wireless/virtual/mac80211_hwsim.c:5560 [inline]
-       hwsim_exit_net+0x3ad/0x7d0 drivers/net/wireless/virtual/mac80211_hwsim.c:6437
-       ops_exit_list+0xb0/0x180 net/core/net_namespace.c:170
-       cleanup_net+0x5b7/0xbf0 net/core/net_namespace.c:637
-       process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3267
-       process_scheduled_works kernel/workqueue.c:3348 [inline]
-       worker_thread+0x6c8/0xf70 kernel/workqueue.c:3429
-       kthread+0x2c1/0x3a0 kernel/kthread.c:388
-       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&rdev->wiphy.mtx);
-                               lock(team->team_lock_key#12);
-                               lock(&rdev->wiphy.mtx);
-  lock(team->team_lock_key#12);
-
- *** DEADLOCK ***
-
-5 locks held by kworker/u8:9/5208:
- #0: ffff888015ecb148 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work+0x1296/0x1ac0 kernel/workqueue.c:3242
- #1: ffffc90003e5fd80 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work+0x906/0x1ac0 kernel/workqueue.c:3243
- #2: ffffffff8f2ec950 (pernet_ops_rwsem){++++}-{3:3}, at: cleanup_net+0xbb/0xbf0 net/core/net_namespace.c:591
- #3: ffffffff8f301748 (rtnl_mutex){+.+.}-{3:3}, at: ieee80211_unregister_hw+0x4d/0x3a0 net/mac80211/main.c:1645
- #4: ffff888051578768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: wiphy_lock include/net/cfg80211.h:5953 [inline]
- #4: ffff888051578768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: ieee80211_remove_interfaces+0xfe/0x760 net/mac80211/iface.c:2277
-
-stack backtrace:
-CPU: 1 PID: 5208 Comm: kworker/u8:9 Not tainted 6.9.0-rc6-syzkaller-00234-g7367539ad4b0 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Workqueue: netns cleanup_net
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
- check_noncircular+0x31a/0x400 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain kernel/locking/lockdep.c:3869 [inline]
- __lock_acquire+0x2478/0x3b30 kernel/locking/lockdep.c:5137
- lock_acquire kernel/locking/lockdep.c:5754 [inline]
- lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
- __mutex_lock_common kernel/locking/mutex.c:608 [inline]
- __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
- team_port_change_check drivers/net/team/team.c:2995 [inline]
- team_device_event+0x11d/0x770 drivers/net/team/team.c:3021
- notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
- call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1950
- call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
- call_netdevice_notifiers net/core/dev.c:2002 [inline]
- dev_close_many+0x333/0x6a0 net/core/dev.c:1543
- unregister_netdevice_many_notify+0x46d/0x19f0 net/core/dev.c:11080
- macvlan_device_event+0x4ed/0x880 drivers/net/macvlan.c:1828
- notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
- call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1950
- call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
- call_netdevice_notifiers net/core/dev.c:2002 [inline]
- unregister_netdevice_many_notify+0x8a1/0x19f0 net/core/dev.c:11105
- unregister_netdevice_many net/core/dev.c:11163 [inline]
- unregister_netdevice_queue+0x307/0x3f0 net/core/dev.c:11042
- unregister_netdevice include/linux/netdevice.h:3115 [inline]
- _cfg80211_unregister_wdev+0x624/0x7f0 net/wireless/core.c:1206
- ieee80211_remove_interfaces+0x36d/0x760 net/mac80211/iface.c:2302
- ieee80211_unregister_hw+0x55/0x3a0 net/mac80211/main.c:1652
- mac80211_hwsim_del_radio drivers/net/wireless/virtual/mac80211_hwsim.c:5560 [inline]
- hwsim_exit_net+0x3ad/0x7d0 drivers/net/wireless/virtual/mac80211_hwsim.c:6437
- ops_exit_list+0xb0/0x180 net/core/net_namespace.c:170
- cleanup_net+0x5b7/0xbf0 net/core/net_namespace.c:637
- process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3267
- process_scheduled_works kernel/workqueue.c:3348 [inline]
- worker_thread+0x6c8/0xf70 kernel/workqueue.c:3429
- kthread+0x2c1/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-team0: Port device macvlan2 removed
-hsr_slave_0: left promiscuous mode
-hsr_slave_1: left promiscuous mode
-batman_adv: batadv0: Interface deactivated: batadv_slave_0
-batman_adv: batadv0: Removing interface: batadv_slave_0
-batman_adv: batadv0: Interface deactivated: batadv_slave_1
-batman_adv: batadv0: Removing interface: batadv_slave_1
-veth1_macvtap: left promiscuous mode
-veth0_macvtap: left promiscuous mode
-veth1_vlan: left promiscuous mode
-veth0_vlan: left promiscuous mode
-team0 (unregistering): Port device virt_wifi0 removed
-team0 (unregistering): Port device team_slave_1 removed
-team0 (unregistering): Port device team_slave_0 removed
+"Commit the actual used size for the allocation that was either prepared 
+or probed"
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Thanks,
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Mat
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> + */
+> static inline void page_frag_alloc_commit(struct page_frag_cache *nc,
+> 					  unsigned int fragsz)
+> {
+> @@ -170,6 +256,16 @@ static inline void page_frag_alloc_commit(struct page_frag_cache *nc,
+> 	nc->remaining -= fragsz;
+> }
+>
+> +/**
+> + * page_frag_alloc_commit_noref - Commit allocing a page fragment without taking
+> + * page refcount.
+> + * @nc: page_frag cache from which to commit
+> + * @fragsz: size of the page fragment has been used
+> + *
+> + * Commit the alloc preparing by passing the actual used size, but not taking
+> + * page refcount. Mostly used for fragmemt coaleasing case when the current
+> + * fragmemt can share the same refcount with previous fragmemt.
+> + */
+> static inline void page_frag_alloc_commit_noref(struct page_frag_cache *nc,
+> 						unsigned int fragsz)
+> {
+> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+> index eb8bf59b26bb..85e23d5cbdcc 100644
+> --- a/mm/page_frag_cache.c
+> +++ b/mm/page_frag_cache.c
+> @@ -89,6 +89,18 @@ static struct page *page_frag_cache_refill(struct page_frag_cache *nc,
+> 	return __page_frag_cache_refill(nc, gfp_mask);
+> }
+>
+> +/**
+> + * page_frag_alloc_va_prepare() - Prepare allocing a page fragment.
+> + * @nc: page_frag cache from which to prepare
+> + * @fragsz: in as the requested size, out as the available size
+> + * @gfp: the allocation gfp to use when cache need to be refilled
+> + *
+> + * Prepare a page fragment with minimum size of ???fragsz???, 'fragsz' is also used
+> + * to report the maximum size of the page fragment the caller can use.
+> + *
+> + * Return:
+> + * Return va of the page fragment, otherwise return NULL.
+> + */
+> void *page_frag_alloc_va_prepare(struct page_frag_cache *nc,
+> 				 unsigned int *fragsz, gfp_t gfp)
+> {
+> @@ -111,6 +123,19 @@ void *page_frag_alloc_va_prepare(struct page_frag_cache *nc,
+> }
+> EXPORT_SYMBOL(page_frag_alloc_va_prepare);
+>
+> +/**
+> + * page_frag_alloc_pg_prepare - Prepare allocing a page fragment.
+> + * @nc: page_frag cache from which to prepare
+> + * @offset: out as the offset of the page fragment
+> + * @fragsz: in as the requested size, out as the available size
+> + * @gfp: the allocation gfp to use when cache need to be refilled
+> + *
+> + * Prepare a page fragment with minimum size of ???fragsz???, 'fragsz' is also used
+> + * to report the maximum size of the page fragment the caller can use.
+> + *
+> + * Return:
+> + * Return the page fragment, otherwise return NULL.
+> + */
+> struct page *page_frag_alloc_pg_prepare(struct page_frag_cache *nc,
+> 					unsigned int *offset,
+> 					unsigned int *fragsz, gfp_t gfp)
+> @@ -141,6 +166,21 @@ struct page *page_frag_alloc_pg_prepare(struct page_frag_cache *nc,
+> }
+> EXPORT_SYMBOL(page_frag_alloc_pg_prepare);
+>
+> +/**
+> + * page_frag_alloc_prepare - Prepare allocing a page fragment.
+> + * @nc: page_frag cache from which to prepare
+> + * @offset: out as the offset of the page fragment
+> + * @fragsz: in as the requested size, out as the available size
+> + * @va: out as the virtual address of the returned page fragment
+> + * @gfp: the allocation gfp to use when cache need to be refilled
+> + *
+> + * Prepare a page fragment with minimum size of ???fragsz???, 'fragsz' is also used
+> + * to report the maximum size of the page fragment. Return both 'page' and 'va'
+> + * of the fragment to the caller.
+> + *
+> + * Return:
+> + * Return the page fragment, otherwise return NULL.
+> + */
+> struct page *page_frag_alloc_prepare(struct page_frag_cache *nc,
+> 				     unsigned int *offset,
+> 				     unsigned int *fragsz,
+> @@ -173,6 +213,10 @@ struct page *page_frag_alloc_prepare(struct page_frag_cache *nc,
+> }
+> EXPORT_SYMBOL(page_frag_alloc_prepare);
+>
+> +/**
+> + * page_frag_cache_drain - Drain the current page from page_frag cache.
+> + * @nc: page_frag cache from which to drain
+> + */
+> void page_frag_cache_drain(struct page_frag_cache *nc)
+> {
+> 	if (!nc->encoded_va)
+> @@ -193,6 +237,19 @@ void __page_frag_cache_drain(struct page *page, unsigned int count)
+> }
+> EXPORT_SYMBOL(__page_frag_cache_drain);
+>
+> +/**
+> + * __page_frag_alloc_va_align() - Alloc a page fragment with aligning
+> + * requirement.
+> + * @nc: page_frag cache from which to allocate
+> + * @fragsz: the requested fragment size
+> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
+> + * @align_mask: the requested aligning requirement for the 'va'
+> + *
+> + * Get a page fragment from page_frag cache with aligning requirement.
+> + *
+> + * Return:
+> + * Return va of the page fragment, otherwise return NULL.
+> + */
+> void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+> 				 unsigned int fragsz, gfp_t gfp_mask,
+> 				 unsigned int align_mask)
+> @@ -263,8 +320,12 @@ void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+> }
+> EXPORT_SYMBOL(__page_frag_alloc_va_align);
+>
+> -/*
+> - * Frees a page fragment allocated out of either a compound or order 0 page.
+> +/**
+> + * page_frag_free_va - Free a page fragment.
+> + * @addr: va of page fragment to be freed
+> + *
+> + * Free a page fragment allocated out of either a compound or order 0 page by
+> + * virtual address.
+>  */
+> void page_frag_free_va(void *addr)
+> {
+> -- 
+> 2.33.0
+>
+>
+>
 
