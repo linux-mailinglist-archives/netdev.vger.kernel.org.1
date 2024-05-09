@@ -1,543 +1,237 @@
-Return-Path: <netdev+bounces-94809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DF028C0BD0
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:58:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04B328C0BD4
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:59:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA0091F2202A
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:58:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27B6E1C20F4E
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649AF13AA5A;
-	Thu,  9 May 2024 06:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7098413C830;
+	Thu,  9 May 2024 06:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JFZXg6Ho"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="qLm4lh5J";
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="RWoCmAWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83446127E3D;
-	Thu,  9 May 2024 06:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715237890; cv=none; b=keFHfFxB9J2lnB0JMcthcGtt/4QkiubA5hf4mxbgRdwED8yJe7XNidB1+lLPyKXSRXukhLcpHzUuwuy6HLpDbfyK6VAFYafcGG55MM6CWaAEf6H8U4hfKMgofrF3wHrlN5mBniMrKG+LquXMeE7lj8YunydQ/ssSIMLrQqusuvw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715237890; c=relaxed/simple;
-	bh=6qA/k8Uo+9wS2YxLrs1J1zfN53pquTtnPDBJRCf6WQc=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PobyvlHoPDb+eQxU49kCe9JooQkoaNWdQ6ewcHE4IdwbhVOc4DKOAMMqcl6vOlYt3GkBin1azGsf6YG1o80vxcgV4vD8HTR+TQqHb5sd7vppPaItXNQ+x8Kn8MkOG7YtjUoOW67KWjPnhilU7se/y/kbOHGAR8YovMCAek9KP3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=JFZXg6Ho; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4494fVAo022119;
-	Wed, 8 May 2024 23:57:53 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	date:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pfpt0220; bh=j+XlDjlIwADvxa08WJazpB
-	QTiknsZgHnrYnq+EmH9nA=; b=JFZXg6Ho9t6VjRahQqAtXNlUbfuDFYYr5dgYRn
-	HmWLHjGnrDGplC+mpwyHb4PooD9cbR6k5IHbjt/JM9uSvlHioDCzNVbIAuO7E4p2
-	z1Tb9wKbpuotXZhfgMyTdJyKj+3gmrmwaBMUx4tloNRww+LnYxghiBM+b9zQvk7F
-	V+NxQTx/tLLsvMglq6lXBTwJRm6acLI2jd2KNMc08PJuL0+g+EN8WpOHH4rAACGI
-	PGWF3UvTRmu2R/KXALCya/ksKz+9yIklMcQ5TldfBRutgJWZMSIdigy0FZjB0Syb
-	8YRxQFSqtpwtAXQM7VYlFJQHFShaMSGcTO9km02YgBaWcR4A==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3y0qpbrkyh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 May 2024 23:57:53 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 8 May 2024 23:57:52 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 8 May 2024 23:57:52 -0700
-Received: from maili.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id AEE913F7063;
-	Wed,  8 May 2024 23:57:48 -0700 (PDT)
-Date: Thu, 9 May 2024 12:27:47 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Justin Lai <justinlai0215@realtek.com>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <andrew@lunn.ch>, <jiri@resnulli.us>,
-        <horms@kernel.org>, <pkshih@realtek.com>, <larry.chiu@realtek.com>
-Subject: Re: [PATCH net-next v18 02/13] rtase: Implement the .ndo_open
- function
-Message-ID: <20240509065747.GB1077013@maili.marvell.com>
-References: <20240508123945.201524-1-justinlai0215@realtek.com>
- <20240508123945.201524-3-justinlai0215@realtek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F53637;
+	Thu,  9 May 2024 06:59:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715237954; cv=fail; b=rb+JRwwJR4fosEb7rjOWMzydh5dnceNerl47dVPolKRgxstcyZvVC0qhKolUg6+oMXcldzfhakh4g/vj8s6SdHtYwVZ1EAsPIVbfN+xgX3joTqonVgabCdh6SH3La7PdvFxoL64wA7xYUkQ8l5BN4q14i7I9nBedn9+y8nfvNHE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715237954; c=relaxed/simple;
+	bh=/J3YqBiAfxGjPSa2HOMfGv0vGJuLnpGdDIXOdtL3+1s=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=e/0aEpGe6UJu8Eokw+aiQJCydkENlwzr1jfassgtiVg8KGNkXDh1c4ZjYT3DfxJhar+por+X2qGnIStPqoQ8gwTuuoaYP6ZVgqiXv4ZAK/h9GLBEF4w80QhfPEZiEkLwPW2CKyElLzBCvndzFpbNmfGWR1VyzzfpgbmUyPEI3hU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=qLm4lh5J; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=RWoCmAWG; arc=fail smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1715237952; x=1746773952;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=/J3YqBiAfxGjPSa2HOMfGv0vGJuLnpGdDIXOdtL3+1s=;
+  b=qLm4lh5Jb2Ow1Uw45QhJb6/9FpqHfN5fH+SToHgkrFpxcHm3Fi/cCbrF
+   jRAyKqYAWPoY7huVnMG8ZXYPzCaRoGDDNbaKz7LgcPRM1hOVkE+Mfes6a
+   QzRYHBWW4Cd9RPcXk0Urdn3s78zMv4irqY6EhkVRItfwqngTQh1GFw3nP
+   2F+8qLe/R6pcPv8Vy4mtyU3Fa4fteJm70KOTuartpJ3xmz6Bh6bnAESjk
+   z6qxNaCTz0YItD7OlyT2GwBWgJEKIbA5FXesPJTKnN61diLUhQUk8hyOb
+   FzbS+uSenRlyLMh7xqDZX/HZpOdndCnasC8qmnTv834TXWT2OnB85r/rx
+   w==;
+X-CSE-ConnectionGUID: GNRYmCwMS4CgryDxK7uw2A==
+X-CSE-MsgGUID: 0zaFJhDWT3+Ro1W3vTEymg==
+X-IronPort-AV: E=Sophos;i="6.08,147,1712646000"; 
+   d="scan'208";a="24281477"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 May 2024 23:59:11 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 8 May 2024 23:59:08 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (10.10.215.250)
+ by email.microchip.com (10.10.87.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 8 May 2024 23:59:07 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XxqTx9PARRmpg5SiegZTn+szta+auvBpEc2ExPIZLmiO8RN8HZXa7knk79txTad5JZS9pPsDdEPZGJ+HFqF/N10+2AySh2ZGyIvMYcJBBrD9FjAWGhx379CGOAtB9yDGYczB0PAPrkwvqSeTiYhQVoMOlY+J/jLNaJ1pdA0P1LpgXIbKbq1C90A8zZdW348jcC2b/evJSq7Tp6Nay7pftTCgSbdTkAGDkt4iT9uZ0WsxHBJYQMU7zF42H1vA84RHMIouXa6PuJk8+PVJf4V8VHahWKQXXCyVnJE4Kyso0VZPd5tH8tiplaA9J3CQozZYSyx/+93dtRkrLDr2WgxYXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/J3YqBiAfxGjPSa2HOMfGv0vGJuLnpGdDIXOdtL3+1s=;
+ b=KEI9MtUq8WODcXxEYYNHfhn57FVqRKJFUYE+bx21brWwroXLXYbS3XIBkqm7kqgwfhHJHeXrmNaYnyEPc26adTKPQGvHrB+oOabD9jRr4qarJVqgsxR69UpwHJ7drAnZAw1mePTppDRfq+FV27cURXFtlZFQ4vi06hvu4TF8HflS+rq8jkz34gNpqVQhoRXz4Ue09IUIAD29NvLZ+2yHSYxcTvYH7txnLDb/ynmPtiXBY70Sv1lZyNa0eEmM9OncVwEQbO/MDn3dRYKK8i+0BhpR4rMig4lFjKYeh/hEk/ktdL6oRpBc3ZqlmNEHEINc5H8rmHAMM04qNlLpvCPjcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/J3YqBiAfxGjPSa2HOMfGv0vGJuLnpGdDIXOdtL3+1s=;
+ b=RWoCmAWGb64jbJGtAkhfQqN0Bcyze0fqYxpJJwaYfbgzQxysV02aIrLTPEQH1B2rLFo6N8Ok8bCCVGJKShNYYGPQ85Epyy4+n1PjnXwLsotY3nacwiqWT3N6Qr5GScRlVF/JTPmQtdt1cU2lCow9GC0DkCZYw0xp8UJWKG03wRY4/KHfyBMdsyCSuGlEv5Q96Gg5g9ocgQD1Ix6ESF92Oy3Wgdfo924Ay3oBQAeqmAa0e/PMufiUZH6kxY6rnifXKHcWiHqCCFMg2iM4rLT5HigOuHr6HY8yIJcdjCPeemx0Z1kGdgFdEbpxmkyGOQXsoaZ5awhjC4uCfu1SOrzr+Q==
+Received: from DS0PR11MB7481.namprd11.prod.outlook.com (2603:10b6:8:14b::16)
+ by SJ0PR11MB5865.namprd11.prod.outlook.com (2603:10b6:a03:428::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.47; Thu, 9 May
+ 2024 06:59:04 +0000
+Received: from DS0PR11MB7481.namprd11.prod.outlook.com
+ ([fe80::3a8a:2d38:64c0:cc4f]) by DS0PR11MB7481.namprd11.prod.outlook.com
+ ([fe80::3a8a:2d38:64c0:cc4f%5]) with mapi id 15.20.7544.041; Thu, 9 May 2024
+ 06:59:03 +0000
+From: <Rengarajan.S@microchip.com>
+To: <horms@kernel.org>
+CC: <linux-usb@vger.kernel.org>, <davem@davemloft.net>,
+	<Woojung.Huh@microchip.com>, <linux-kernel@vger.kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<UNGLinuxDriver@microchip.com>, <kuba@kernel.org>
+Subject: Re: [PATCH net-next v1] lan78xx: Enable 125 MHz CLK and Auto Speed
+ configuration for LAN7801 if NO EEPROM is detected
+Thread-Topic: [PATCH net-next v1] lan78xx: Enable 125 MHz CLK and Auto Speed
+ configuration for LAN7801 if NO EEPROM is detected
+Thread-Index: AQHanE0W355Z0SUftkipxbImkHa6jrGGx1uAgAe9mIA=
+Date: Thu, 9 May 2024 06:59:03 +0000
+Message-ID: <d5727bf3d176e3d71abeba7f7c3aa86cf96262cc.camel@microchip.com>
+References: <20240502045503.36298-1-rengarajan.s@microchip.com>
+	 <20240504084931.GA3167983@kernel.org>
+In-Reply-To: <20240504084931.GA3167983@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7481:EE_|SJ0PR11MB5865:EE_
+x-ms-office365-filtering-correlation-id: 3fa80f32-ccd8-4788-2fc8-08dc6ff5830c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|376005|1800799015|366007|38070700009;
+x-microsoft-antispam-message-info: =?utf-8?B?VW10K0JCbk1kM0lEWnpSTlQ1djZwenliVkhnRzVyNEhCYzA3aW00UUdVVVUr?=
+ =?utf-8?B?S3VUUGpRaVJCSTRNZ0tQR1lTR2xVNDNhdWozZ0JicldCYUtDQkoycEVWVXd4?=
+ =?utf-8?B?R2RWUTlnM1Y2WFlDRi9JV0M0M3lqSXlac01zZ2REdFI0U3ZoMjNESnAzd0xn?=
+ =?utf-8?B?ZVlRT1VlYzZPYWk3b08yN1F1dWY3MmNPR2habHY5TTdSMjdtc0JiLzg0bmxF?=
+ =?utf-8?B?NTkyeFhQY3NoQUd0YTRNWEMxSWJoVWZWdlE2cmszZ2gxSHNROTVDN29keWNh?=
+ =?utf-8?B?NnpTVThFb2h1cHZsUWtpcWNvN0NyQkdOOEgvM2F1OXFkRVN1a2JYM3A5QWcx?=
+ =?utf-8?B?bGNxaWVQQXRwSmVublZtbTF5RHNheHNUa3BkV1RiTS94cU9YT3J3eHVuN1Mw?=
+ =?utf-8?B?MDYvY0Z5WGMzcVpmNTVqaE9CUmdLWENJa0NxYWNOSUpJajlOczZ4eEtUN3dy?=
+ =?utf-8?B?OVhKaTdFeWx2N1J4U1BOQ2tNYUJydkxXcUFQVjV5K012S0hWS1l1bUpIVTBW?=
+ =?utf-8?B?M0c4SmNvdEZNWVNLS083cERwcWRzWERTek5ERlFtMms3aEI2ejZZR2dmaE1K?=
+ =?utf-8?B?UzJQUnlBaUl0aVhlSEtEZ1BFbHcxNlNDbmhpUU5FdndLbnBGbzVMcDVDVmNs?=
+ =?utf-8?B?U2FFRDN5bnAwV2JmY0RRSnBZSEtwcTd4Y1N6ZGhmaU5HRmVZRzF1QUNUSFEz?=
+ =?utf-8?B?NUdrb21yN3ZYQzlYbjFCZWgydEEvbHRiUFd2RzhWaEYvVmtKQmdkcUJWd0Fz?=
+ =?utf-8?B?dVFsSHFLbnZpeEpxaGZTeHpqSE91T0grMjI0d2ZUclBkcDRVME5aaUtHZEJm?=
+ =?utf-8?B?SWkyVkl1bVJrM2lKS0dQaGZHQWl0UitrOEtKVXliZEFvejRYSXR3VWptZkQv?=
+ =?utf-8?B?VHVpbnp4L2dMUFMwckRPUmdYY25sdEdFMisycVMwQnRHYTNqUWpiMjVQSVZz?=
+ =?utf-8?B?ak5PV2Z1L1dGd3RzY3JZSE96OGtMNVBRMitjMTdKMnRIZHlGcnNta0VzTVBQ?=
+ =?utf-8?B?V2RvVFV0Zm1FMklxc1BrZ3JTdmJ0Y1ZaaExkUTNHeitDRXd5N013VDIrcVhi?=
+ =?utf-8?B?WW43YW83djdOSmt2RmZYejNOWG1JUGdMZUFhNXdjZUJqT3c0eEQ2ZGZpNVls?=
+ =?utf-8?B?emNQRFZ3UHpvQUQ2KzJTYnVOZWNadG1IU3BxaEZxODF4MXBWS1loNFlibUYw?=
+ =?utf-8?B?QzJYdXFMT2d5Zk9SMENLUlVETmcyc3JUSkQ3bmVtT0t2c1BycnMxSnRnNjIz?=
+ =?utf-8?B?RDlCYVdXZUtQOThIeXFIOXluaDVXVXhvVmlTYUFydTF0bFdlOEZ6MUZ4Y0dW?=
+ =?utf-8?B?WnczVFp2aXphZ3V5cVN4bjFnVFpqc0ovYVVDbEJ3YnNJc2VxMHhmaWViMk9L?=
+ =?utf-8?B?eXM5OUovK3VGMmt3Mnlldnpua2dienFqdmc5WGZoWTBwUDViVGhkN3Y1WXdh?=
+ =?utf-8?B?bmJiZSsyQ1RTd0pXQVp4WEgxNllJQU4rRkJUaWxTK05SZ3hncE5JMFBsZmF4?=
+ =?utf-8?B?bG81Yi9RVWErSTVDZ1A1L1RvQlJCMjVjTU9hQzVJdXRLM2hPeS9rZzRhVHJy?=
+ =?utf-8?B?RnVPMnQxVlZFY0tCUUZ6NnF5aDl2ODRBeWNXRHBkSjhaNmljdHUzdVBtcXdm?=
+ =?utf-8?B?UWdwMXdmS3BLeFU4YmZDUU5EOEkxUzZvTmM1L1VrM2xiS2hLTHo3MEM4UW5a?=
+ =?utf-8?B?dG5KTmhia0JxZm5LbTJmUHJXaXZTN1llMHBDZTRnNzFxaFFSN2VwVW5NRitB?=
+ =?utf-8?B?VlZkWmRJNzZ2aHhWdnYvSEFPOVBycEFYWTZLdDcrT0d1ZUJMdHpRYlp1SzR4?=
+ =?utf-8?B?MXVnQjhScllnTEJaZ0ZIQT09?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7481.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WXVFbmNhRjNoRkNMazMvV2lqeEk4MHFrS242bVJJYUllODZVWXVLcnVrUk5H?=
+ =?utf-8?B?U1k3VldJaW5BcWxOZzROMXhXQlU5SkVzV1NKRFRLK1lPYTR5UHVOT1BiaSs5?=
+ =?utf-8?B?WmJFVzBQVG16M2l6cFZpR0c4eTdzNGdGNmNNbnZOSm5CWkU0aVBRb1J6SFBu?=
+ =?utf-8?B?TTluekdqVEV0Nm1GdEQyOWJvc1FQa2xhRzZkRDJ5ZkpIOFZOWlFTeWk0ZjVH?=
+ =?utf-8?B?NHNvWkFxTVIraUJVZDZrZUZ3TE1yWlpCc3JweUlNWXowWGNuZDAyZlhVYU0v?=
+ =?utf-8?B?blF0aTZaQXp1bCszc01DdS8ybTEvM3d0NkFHc213VWJkcEthSVhtK3VBK3VD?=
+ =?utf-8?B?L21wQUE2cHFveXQ4aC84c21oZDRPeVN2WWk3QW1iRUw2UUM1anVrR2QyL3Jk?=
+ =?utf-8?B?T29RVlJETlJKWW4rRThzcHljanRTdXk2NHJNeE5rQzFMcUdwaXVGanB4Y2Fp?=
+ =?utf-8?B?U09qS1V0aHBSVFRZTFpZQk5XUlVHT3BGVlZvQ1gzNDc0T2drSkFOTjBSNStw?=
+ =?utf-8?B?dG5CTVplR2ZtcjFhaERTdWNzeFR5QUcrSXN6RTNCNGxLcFkwNTR0eHJVaW1E?=
+ =?utf-8?B?ekEyTXdtSjQ2ck00dTlzdkRNdWRxbGx2QWswdWFRM05aQTZTSUhnOWJYQ0RB?=
+ =?utf-8?B?Y2QvRVdFTVp6ZUZXYzJ0WlpLVmVPRGd2RWFFblNCS1ZsSy9hUFZhSnpFUFBu?=
+ =?utf-8?B?NmNzWmVqV2xUTGRIV2U3K2g3V0tlaEg0RytEZUdROHVXSUc4aVkxL0tPQ1ZS?=
+ =?utf-8?B?V0dRQlJScjBzbzM5c2RSRk5BSDA0aFVCeVVpaUNGME44dXROdUJVcEJ5N1Nl?=
+ =?utf-8?B?bzNSM2U1WDZGYTgvTHZZY2tDdUhPVW84b05UR0NDeUlGVVp5VmJuNTFIRDdU?=
+ =?utf-8?B?MUpQMXRyNktCSUJVTWhEQW9ORHlKMXZuVVdrMFJvZGltVzFBeW1IemZESWVp?=
+ =?utf-8?B?emRGUm5hcnJZc1l0SFpxZEFhM05DelBDWkNyNkJWZ211MEdCazVDeTFYUExP?=
+ =?utf-8?B?OWQ2RVNwdlVpRWxTTXhEMkpTTk9hYlBneEgyZHcwbE5QSDZ3WUZJT21SRGU4?=
+ =?utf-8?B?OFJSYXk0WHV4UU5VelRnMG11Rndkb29FcHZJdGMwRG5haXU2Q0h0SUlxZ1Bv?=
+ =?utf-8?B?Sk4vbmVhSnZnRVVyTnJ2M296a0I3WGwveUNwN2w2ZVV0MUJ4TnZmUWFwa2o5?=
+ =?utf-8?B?Sk9lcjRmNDNqRGc0azBVT1VmSmVaTlNJa2RtM090YitDV3BKMW55dDhPQlVT?=
+ =?utf-8?B?YlhqNjlhNDNGbkxyZmRCSmFNRmltNnZxbjRrQ1lTWXhJd1pOMnhxS2V2blM2?=
+ =?utf-8?B?UFBuOTNQdkJVbEFFTUY4OTNGZnNhM3UrYlpkaU04TGNYcGRFbXluTHpLejZT?=
+ =?utf-8?B?OVdGWDRDSTl1NVFNYXVjY2tYMTk2aFhUU25nTEE5Ym5maCt5Y1hWTm02Tnk0?=
+ =?utf-8?B?bXBNWDYyaldTdXVDUkd1L2poUFBQL1E3Z1BEQk1NaUZVQTZrYWMySkd5L3Nh?=
+ =?utf-8?B?Qnd0Vi9jaTRUalhLbGo1bEdJc29IYVBsNGtIeVhRYVBiZ040ZzZtOVl4bC9X?=
+ =?utf-8?B?SkVZeWZPcSt3eFFGVkJ1YTIxTnRKbHk2WVJkQnU0YU9WU0phY0ZCQncwNlNv?=
+ =?utf-8?B?N0Q2Q3pMYzN4QUlISzRPVUFsYzFSTG9qZkNLNDh5V1JnQm5WSlNNTCtOb2JO?=
+ =?utf-8?B?YzBXU0t4Z1FZUE5DcHFUdFEzd2ZEbGRsbkUyendQTkd6TGtvWlo2YSs1U1pK?=
+ =?utf-8?B?Qk1hQVNCaDBIUm1yeEN3czZTYjgxNWZqbTV0K1BlTHYwclp0SWhnQndyRkR4?=
+ =?utf-8?B?RkxIT3dWY1NZODlSNWF0b21yUTZGUVBBUHN5ZzMrUmZ0eVZ4OG5UNmVJZkkr?=
+ =?utf-8?B?STZKQzZTaExDbTcwYmVPNC80MHhMQTlXZFp1cmJJcDFkc2tjbHlaeDNNaUt0?=
+ =?utf-8?B?Z1hzWlhxcGViUlZsUXNNR1JCcll0SXFJMnM2bW5KUTMwVDR3TVlZTGp6emp2?=
+ =?utf-8?B?dWF2S1hPVUZXRFNzLytSNU96cCtCd2s1NU1DS2I5a2NBOWFWVWd1OWlFTlRJ?=
+ =?utf-8?B?cXNXc1hodE1nYUJPTlZMbm5pdzRuNDRiT0gwVTNtZnZpTkNIaXdqbThua1I4?=
+ =?utf-8?B?dXlsOXpFVzNkeThYSmVZd1hxa1QvWW5tUXpkSGQvN1Z4Wk9yMGxlUUQ3b2Vz?=
+ =?utf-8?B?K0E9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A02E314CC4E4014481DDDD30960F12C9@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240508123945.201524-3-justinlai0215@realtek.com>
-X-Proofpoint-GUID: ZdnxY70ey0FCmF_2Jms_wBjMLWCJplN0
-X-Proofpoint-ORIG-GUID: ZdnxY70ey0FCmF_2Jms_wBjMLWCJplN0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-09_02,2024-05-08_01,2023-05-22_02
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7481.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3fa80f32-ccd8-4788-2fc8-08dc6ff5830c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 May 2024 06:59:03.5513
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: S/pyyqjWNeNSIq24lDQZf7Upnt1WC7ZO0hDFLeRplGHgcMqk6x8Pb+e1j11sI/HquBaMbQFVnxVxpISeP9r99jL3LRv4Tx1n7ZfSJHr5HPg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5865
 
-On 2024-05-08 at 18:09:34, Justin Lai (justinlai0215@realtek.com) wrote:
->
-> +static int rtase_alloc_desc(struct rtase_private *tp)
-> +{
-> +	struct pci_dev *pdev = tp->pdev;
-> +	u32 i;
-> +
-> +	/* rx and tx descriptors needs 256 bytes alignment.
-> +	 * dma_alloc_coherent provides more.
-> +	 */
-> +	for (i = 0; i < tp->func_tx_queue_num; i++) {
-> +		tp->tx_ring[i].desc =
-> +				dma_alloc_coherent(&pdev->dev,
-> +						   RTASE_TX_RING_DESC_SIZE,
-> +						   &tp->tx_ring[i].phy_addr,
-> +						   GFP_KERNEL);
-> +		if (!tp->tx_ring[i].desc)
-You have handled errors gracefully very where else. why not here ?
-> +			return -ENOMEM;
-> +	}
-> +
-> +	for (i = 0; i < tp->func_rx_queue_num; i++) {
-> +		tp->rx_ring[i].desc =
-> +				dma_alloc_coherent(&pdev->dev,
-> +						   RTASE_RX_RING_DESC_SIZE,
-> +						   &tp->rx_ring[i].phy_addr,
-> +						   GFP_KERNEL);
-> +		if (!tp->rx_ring[i].desc)
-> +			return -ENOMEM;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void rtase_free_desc(struct rtase_private *tp)
-> +{
-> +	struct pci_dev *pdev = tp->pdev;
-> +	u32 i;
-> +
-> +	for (i = 0; i < tp->func_tx_queue_num; i++) {
-> +		if (!tp->tx_ring[i].desc)
-> +			continue;
-> +
-> +		dma_free_coherent(&pdev->dev, RTASE_TX_RING_DESC_SIZE,
-> +				  tp->tx_ring[i].desc,
-> +				  tp->tx_ring[i].phy_addr);
-> +		tp->tx_ring[i].desc = NULL;
-> +	}
-> +
-> +	for (i = 0; i < tp->func_rx_queue_num; i++) {
-> +		if (!tp->rx_ring[i].desc)
-> +			continue;
-> +
-> +		dma_free_coherent(&pdev->dev, RTASE_RX_RING_DESC_SIZE,
-> +				  tp->rx_ring[i].desc,
-> +				  tp->rx_ring[i].phy_addr);
-> +		tp->rx_ring[i].desc = NULL;
-> +	}
-> +}
-> +
-> +static void rtase_mark_to_asic(union rtase_rx_desc *desc, u32 rx_buf_sz)
-> +{
-> +	u32 eor = le32_to_cpu(desc->desc_cmd.opts1) & RTASE_RING_END;
-> +
-> +	desc->desc_status.opts2 = 0;
-desc->desc_cmd.addr to be written before desc->desc_status.opts2 ? Just a question
-whether below dma_wmb() suffice for both ?
-> +	/* force memory writes to complete before releasing descriptor */
-> +	dma_wmb();
-> +	WRITE_ONCE(desc->desc_cmd.opts1,
-> +		   cpu_to_le32(RTASE_DESC_OWN | eor | rx_buf_sz));
-> +}
-> +
-> +static void rtase_tx_desc_init(struct rtase_private *tp, u16 idx)
-> +{
-> +	struct rtase_ring *ring = &tp->tx_ring[idx];
-> +	struct rtase_tx_desc *desc;
-> +	u32 i;
-> +
-> +	memset(ring->desc, 0x0, RTASE_TX_RING_DESC_SIZE);
-> +	memset(ring->skbuff, 0x0, sizeof(ring->skbuff));
-> +	ring->cur_idx = 0;
-> +	ring->dirty_idx = 0;
-> +	ring->index = idx;
-> +
-> +	for (i = 0; i < RTASE_NUM_DESC; i++) {
-> +		ring->mis.len[i] = 0;
-> +		if ((RTASE_NUM_DESC - 1) == i) {
-> +			desc = ring->desc + sizeof(struct rtase_tx_desc) * i;
-> +			desc->opts1 = cpu_to_le32(RTASE_RING_END);
-> +		}
-> +	}
-> +
-> +	ring->ring_handler = tx_handler;
-> +	if (idx < 4) {
-> +		ring->ivec = &tp->int_vector[idx];
-> +		list_add_tail(&ring->ring_entry,
-> +			      &tp->int_vector[idx].ring_list);
-> +	} else {
-> +		ring->ivec = &tp->int_vector[0];
-> +		list_add_tail(&ring->ring_entry, &tp->int_vector[0].ring_list);
-> +	}
-> +}
-> +
-> +static void rtase_map_to_asic(union rtase_rx_desc *desc, dma_addr_t mapping,
-> +			      u32 rx_buf_sz)
-> +{
-> +	desc->desc_cmd.addr = cpu_to_le64(mapping);
-> +	/* make sure the physical address has been updated */
-> +	wmb();
-why not dma_wmb();
-> +	rtase_mark_to_asic(desc, rx_buf_sz);
-> +}
-> +
-> +static void rtase_make_unusable_by_asic(union rtase_rx_desc *desc)
-> +{
-> +	desc->desc_cmd.addr = cpu_to_le64(RTK_MAGIC_NUMBER);
-> +	desc->desc_cmd.opts1 &= ~cpu_to_le32(RTASE_DESC_OWN | RSVD_MASK);
-> +}
-> +
-> +static int rtase_alloc_rx_skb(const struct rtase_ring *ring,
-> +			      struct sk_buff **p_sk_buff,
-> +			      union rtase_rx_desc *desc,
-> +			      dma_addr_t *rx_phy_addr, u8 in_intr)
-> +{
-> +	struct rtase_int_vector *ivec = ring->ivec;
-> +	const struct rtase_private *tp = ivec->tp;
-> +	struct sk_buff *skb = NULL;
-> +	dma_addr_t mapping;
-> +	struct page *page;
-> +	void *buf_addr;
-> +	int ret = 0;
-> +
-> +	page = page_pool_dev_alloc_pages(tp->page_pool);
-> +	if (!page) {
-> +		netdev_err(tp->dev, "failed to alloc page\n");
-> +		goto err_out;
-> +	}
-> +
-> +	buf_addr = page_address(page);
-> +	mapping = page_pool_get_dma_addr(page);
-> +
-> +	skb = build_skb(buf_addr, PAGE_SIZE);
-> +	if (!skb) {
-> +		page_pool_put_full_page(tp->page_pool, page, true);
-> +		netdev_err(tp->dev, "failed to build skb\n");
-> +		goto err_out;
-> +	}
-Did you mark the skb for recycle ? Hmm ... did i miss to find the code ?
-
-> +
-> +	*p_sk_buff = skb;
-> +	*rx_phy_addr = mapping;
-> +	rtase_map_to_asic(desc, mapping, tp->rx_buf_sz);
-> +
-> +	return ret;
-> +
-> +err_out:
-> +	if (skb)
-> +		dev_kfree_skb(skb);
-> +
-> +	ret = -ENOMEM;
-> +	rtase_make_unusable_by_asic(desc);
-> +
-> +	return ret;
-> +}
-> +
-> +static u32 rtase_rx_ring_fill(struct rtase_ring *ring, u32 ring_start,
-> +			      u32 ring_end, u8 in_intr)
-> +{
-> +	union rtase_rx_desc *desc_base = ring->desc;
-> +	u32 cur;
-> +
-> +	for (cur = ring_start; ring_end - cur > 0; cur++) {
-> +		u32 i = cur % RTASE_NUM_DESC;
-> +		union rtase_rx_desc *desc = desc_base + i;
-> +		int ret;
-> +
-> +		if (ring->skbuff[i])
-> +			continue;
-> +
-> +		ret = rtase_alloc_rx_skb(ring, &ring->skbuff[i], desc,
-> +					 &ring->mis.data_phy_addr[i],
-> +					 in_intr);
-> +		if (ret)
-> +			break;
-> +	}
-> +
-> +	return cur - ring_start;
-> +}
-> +
-> +static void rtase_mark_as_last_descriptor(union rtase_rx_desc *desc)
-> +{
-> +	desc->desc_cmd.opts1 |= cpu_to_le32(RTASE_RING_END);
-> +}
-> +
-> +static void rtase_rx_ring_clear(struct rtase_ring *ring)
-> +{
-> +	union rtase_rx_desc *desc;
-> +	u32 i;
-> +
-> +	for (i = 0; i < RTASE_NUM_DESC; i++) {
-> +		desc = ring->desc + sizeof(union rtase_rx_desc) * i;
-> +
-> +		if (!ring->skbuff[i])
-> +			continue;
-> +
-> +		skb_mark_for_recycle(ring->skbuff[i]);
-> +
-> +		dev_kfree_skb(ring->skbuff[i]);
-> +
-> +		ring->skbuff[i] = NULL;
-> +
-> +		rtase_make_unusable_by_asic(desc);
-> +	}
-> +}
-> +
-> +static void rtase_rx_desc_init(struct rtase_private *tp, u16 idx)
-> +{
-> +	struct rtase_ring *ring = &tp->rx_ring[idx];
-> +	u16 i;
-> +
-> +	memset(ring->desc, 0x0, RTASE_RX_RING_DESC_SIZE);
-> +	memset(ring->skbuff, 0x0, sizeof(ring->skbuff));
-> +	ring->cur_idx = 0;
-> +	ring->dirty_idx = 0;
-> +	ring->index = idx;
-> +
-> +	for (i = 0; i < RTASE_NUM_DESC; i++)
-> +		ring->mis.data_phy_addr[i] = 0;
-> +
-> +	ring->ring_handler = rx_handler;
-> +	ring->ivec = &tp->int_vector[idx];
-> +	list_add_tail(&ring->ring_entry, &tp->int_vector[idx].ring_list);
-> +}
-> +
-> +static void rtase_rx_clear(struct rtase_private *tp)
-> +{
-> +	u32 i;
-> +
-> +	for (i = 0; i < tp->func_rx_queue_num; i++)
-> +		rtase_rx_ring_clear(&tp->rx_ring[i]);
-> +
-> +	page_pool_destroy(tp->page_pool);
-> +	tp->page_pool = NULL;
-> +}
-> +
-> +static int rtase_init_ring(const struct net_device *dev)
-> +{
-> +	struct rtase_private *tp = netdev_priv(dev);
-> +	struct page_pool_params pp_params = { 0 };
-> +	struct page_pool *page_pool;
-> +	u32 num;
-> +	u16 i;
-> +
-> +	pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
-> +	pp_params.order = 0;
-> +	pp_params.pool_size = RTASE_NUM_DESC * tp->func_rx_queue_num;
-> +	pp_params.nid = dev_to_node(&tp->pdev->dev);
-> +	pp_params.dev = &tp->pdev->dev;
-> +	pp_params.dma_dir = DMA_FROM_DEVICE;
-> +	pp_params.max_len = PAGE_SIZE;
-> +	pp_params.offset = 0;
-> +
-> +	page_pool = page_pool_create(&pp_params);
-> +	if (IS_ERR(page_pool)) {
-> +		netdev_err(tp->dev, "failed to create page pool\n");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	tp->page_pool = page_pool;
-> +
-> +	for (i = 0; i < tp->func_tx_queue_num; i++)
-> +		rtase_tx_desc_init(tp, i);
-> +
-> +	for (i = 0; i < tp->func_rx_queue_num; i++) {
-> +		rtase_rx_desc_init(tp, i);
-> +		num = rtase_rx_ring_fill(&tp->rx_ring[i], 0,
-> +					 RTASE_NUM_DESC, 0);
-> +		if (num != RTASE_NUM_DESC)
-> +			goto err_out;
-> +
-> +		rtase_mark_as_last_descriptor(tp->rx_ring[i].desc +
-> +					      sizeof(union rtase_rx_desc) *
-> +					      (RTASE_NUM_DESC - 1));
-> +	}
-> +
-> +	return 0;
-> +
-> +err_out:
-> +	rtase_rx_clear(tp);
-> +	return -ENOMEM;
-> +}
-> +
->  static void rtase_tally_counter_clear(const struct rtase_private *tp)
->  {
->  	u32 cmd = lower_32_bits(tp->tally_paddr);
-> @@ -138,6 +424,130 @@ static void rtase_tally_counter_clear(const struct rtase_private *tp)
->  	rtase_w32(tp, RTASE_DTCCR0, cmd | RTASE_COUNTER_RESET);
->  }
->
-> +static void rtase_nic_enable(const struct net_device *dev)
-> +{
-> +	const struct rtase_private *tp = netdev_priv(dev);
-> +	u16 rcr = rtase_r16(tp, RTASE_RX_CONFIG_1);
-> +	u8 val;
-> +
-> +	rtase_w16(tp, RTASE_RX_CONFIG_1, rcr & ~RTASE_PCIE_RELOAD_EN);
-> +	rtase_w16(tp, RTASE_RX_CONFIG_1, rcr | RTASE_PCIE_RELOAD_EN);
-> +
-> +	val = rtase_r8(tp, RTASE_CHIP_CMD);
-> +	rtase_w8(tp, RTASE_CHIP_CMD, val | RTASE_TE | RTASE_RE);
-> +
-> +	val = rtase_r8(tp, RTASE_MISC);
-> +	rtase_w8(tp, RTASE_MISC, val & ~RTASE_RX_DV_GATE_EN);
-> +}
-> +
-> +static void rtase_enable_hw_interrupt(const struct rtase_private *tp)
-> +{
-> +	const struct rtase_int_vector *ivec = &tp->int_vector[0];
-> +	u32 i;
-> +
-> +	rtase_w32(tp, ivec->imr_addr, ivec->imr);
-> +
-> +	for (i = 1; i < tp->int_nums; i++) {
-> +		ivec = &tp->int_vector[i];
-> +		rtase_w16(tp, ivec->imr_addr, ivec->imr);
-> +	}
-> +}
-> +
-> +static void rtase_hw_start(const struct net_device *dev)
-> +{
-> +	const struct rtase_private *tp = netdev_priv(dev);
-> +
-> +	rtase_nic_enable(dev);
-> +	rtase_enable_hw_interrupt(tp);
-> +}
-> +
-> +static int rtase_open(struct net_device *dev)
-> +{
-> +	struct rtase_private *tp = netdev_priv(dev);
-> +	const struct pci_dev *pdev = tp->pdev;
-> +	struct rtase_int_vector *ivec;
-> +	u16 i = 0, j;
-> +	int ret;
-> +
-> +	ivec = &tp->int_vector[0];
-> +	tp->rx_buf_sz = RTASE_RX_BUF_SIZE;
-> +
-> +	ret = rtase_alloc_desc(tp);
-> +	if (ret)
-> +		goto err_free_all_allocated_mem;
-> +
-> +	ret = rtase_init_ring(dev);
-> +	if (ret)
-> +		goto err_free_all_allocated_mem;
-> +
-> +	rtase_hw_config(dev);
-> +
-> +	if (tp->sw_flag & RTASE_SWF_MSIX_ENABLED) {
-> +		ret = request_irq(ivec->irq, rtase_interrupt, 0,
-> +				  dev->name, ivec);
-> +		if (ret)
-> +			goto err_free_all_allocated_irq;
-> +
-> +		/* request other interrupts to handle multiqueue */
-> +		for (i = 1; i < tp->int_nums; i++) {
-> +			ivec = &tp->int_vector[i];
-> +			snprintf(ivec->name, sizeof(ivec->name), "%s_int%i",
-> +				 tp->dev->name, i);
-> +			ret = request_irq(ivec->irq, rtase_q_interrupt, 0,
-> +					  ivec->name, ivec);
-> +			if (ret)
-> +				goto err_free_all_allocated_irq;
-> +		}
-> +	} else {
-> +		ret = request_irq(pdev->irq, rtase_interrupt, 0, dev->name,
-> +				  ivec);
-> +		if (ret)
-> +			goto err_free_all_allocated_mem;
-> +	}
-> +
-> +	rtase_hw_start(dev);
-> +
-> +	for (i = 0; i < tp->int_nums; i++) {
-> +		ivec = &tp->int_vector[i];
-> +		napi_enable(&ivec->napi);
-> +	}
-> +
-> +	netif_carrier_on(dev);
-> +	netif_wake_queue(dev);
-> +
-> +	return 0;
-> +
-> +err_free_all_allocated_irq:
-You are allocating from i = 1, but freeing from j = 0;
-> +	for (j = 0; j < i; j++)
-> +		free_irq(tp->int_vector[j].irq, &tp->int_vector[j]);
-> +
-> +err_free_all_allocated_mem:
-> +	rtase_free_desc(tp);
-> +
-> +	return ret;
-> +}
-> +
-> +static int rtase_close(struct net_device *dev)
-> +{
-> +	struct rtase_private *tp = netdev_priv(dev);
-> +	const struct pci_dev *pdev = tp->pdev;
-> +	u32 i;
-> +
-> +	rtase_down(dev);
-> +
-> +	if (tp->sw_flag & RTASE_SWF_MSIX_ENABLED) {
-> +		for (i = 0; i < tp->int_nums; i++)
-> +			free_irq(tp->int_vector[i].irq, &tp->int_vector[i]);
-> +
-> +	} else {
-> +		free_irq(pdev->irq, &tp->int_vector[0]);
-> +	}
-> +
-> +	rtase_free_desc(tp);
-> +
-> +	return 0;
-> +}
-> +
->  static void rtase_enable_eem_write(const struct rtase_private *tp)
->  {
->  	u8 val;
-> @@ -170,6 +580,11 @@ static void rtase_rar_set(const struct rtase_private *tp, const u8 *addr)
->  	rtase_w16(tp, RTASE_LBK_CTRL, RTASE_LBK_ATLD | RTASE_LBK_CLR);
->  }
->
-> +static const struct net_device_ops rtase_netdev_ops = {
-> +	.ndo_open = rtase_open,
-> +	.ndo_stop = rtase_close,
-> +};
-> +
->  static void rtase_get_mac_address(struct net_device *dev)
->  {
->  	struct rtase_private *tp = netdev_priv(dev);
-> @@ -190,6 +605,11 @@ static void rtase_get_mac_address(struct net_device *dev)
->  	rtase_rar_set(tp, dev->dev_addr);
->  }
->
-> +static void rtase_init_netdev_ops(struct net_device *dev)
-> +{
-> +	dev->netdev_ops = &rtase_netdev_ops;
-> +}
-> +
->  static void rtase_reset_interrupt(struct pci_dev *pdev,
->  				  const struct rtase_private *tp)
->  {
-> --
-> 2.34.1
->
+SGkgU2ltb24sDQoNCkFwb2xvZ2llcyBmb3IgdGhlIGRlbGF5IGluIHJlc3BvbnNlLiBUaGFua3Mg
+Zm9yIHJldmlld2luZyB0aGUgcGF0Y2guDQpQbGVhc2UgZmluZCBteSBjb21tZW50cyBpbmxpbmUu
+DQoNCk9uIFNhdCwgMjAyNC0wNS0wNCBhdCAwOTo0OSArMDEwMCwgU2ltb24gSG9ybWFuIHdyb3Rl
+Og0KPiBFWFRFUk5BTCBFTUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVu
+dHMgdW5sZXNzIHlvdQ0KPiBrbm93IHRoZSBjb250ZW50IGlzIHNhZmUNCj4gDQo+IE9uIFRodSwg
+TWF5IDAyLCAyMDI0IGF0IDEwOjI1OjAzQU0gKzA1MzAsIFJlbmdhcmFqYW4gUyB3cm90ZToNCj4g
+PiBUaGUgMTI1TUh6IGFuZCAyNU1IeiBjbG9jayBjb25maWd1cmF0aW9ucyBhcmUgZG9uZSBpbiB0
+aGUNCj4gPiBpbml0aWFsaXphdGlvbg0KPiA+IHJlZ2FyZGxlc3Mgb2YgRUVQUk9NICgxMjVNSHog
+aXMgbmVlZGVkIGZvciBSR01JSSAxMDAwTWJwcw0KPiA+IG9wZXJhdGlvbikuIEFmdGVyDQo+ID4g
+YSBsaXRlIHJlc2V0IChsYW43OHh4X3Jlc2V0KSwgdGhlc2UgY29udGVudHMgZ28gYmFjayB0bw0K
+PiA+IGRlZmF1bHRzKGFsbCAwLCBzbw0KPiA+IG5vIDEyNU1IeiBvciAyNU1IeiBjbG9jayBhbmQg
+bm8gQVNEL0FERCkuIEFsc28sIGFmdGVyIHRoZSBsaXRlDQo+ID4gcmVzZXQsIHRoZQ0KPiA+IExB
+Tjc4MDAgZW5hYmxlcyB0aGUgQVNEL0FERCBpbiB0aGUgYWJzZW5jZSBvZiBFRVBST00uIFRoZXJl
+IGlzIG5vDQo+ID4gc3VjaA0KPiA+IGNoZWNrIGZvciBMQU43ODAxLg0KPiA+IA0KPiA+IFNpZ25l
+ZC1vZmYtYnk6IFJlbmdhcmFqYW4gUyA8cmVuZ2FyYWphbi5zQG1pY3JvY2hpcC5jb20+DQo+IA0K
+PiBIaSBSZW5nYXJhamFuLA0KPiANCj4gVGhpcyBwYXRjaCBzZWVtcyBhZGRyZXNzIHR3byBpc3N1
+ZXMuDQo+IFNvIEkgdGhpbmsgaXQgd291bGQgYmUgYmVzdCB0byBzcGxpdCBpdCBpbnRvIHR3byBw
+YXRjaGVzLg0KDQpTdXJlLiBXaWxsIHNwbGl0IHRoZSBwYXRjaCBpbnRvIHR3byBhbmQgd2lsbCBz
+dWJtaXQgdGhlIHVwZGF0ZWQgcGF0Y2gNCmluIHRoZSBuZXh0IHJldmlzaW9uIHNob3J0bHksDQoN
+Cj4gDQo+IEFsc28sIGFyZSB0aGVzZSBwcm9ibGVtcyBidWdzIC0gZG8gdGhleSBoYXZlIGFkdmVy
+c2UgZWZmZWN0IHZpc2libGUNCj4gYnkNCj4gdXNlcnM/IElmIHNvIHBlcmhhcHMgdGhleSBzaG91
+bGQgYmUgdGFyZ2V0ZWQgYXQgJ25ldCcgcmF0aGVyIHRoYW4NCj4gJ25ldC1uZXh0JywgYW5kIGFu
+IGFwcHJvcHJpYXRlIEZpeGVzIHRhZyBzaG91bGQgYXBwZWFyIGp1c3QgYWJvdmUNCj4gdGhlIFNp
+Z25lZC1vZmYtYnkgbGluZSAobm8gYmxhbmsgbGluZSBpbiBiZXR3ZWVuKS4NCg0KVGhlIGNoYW5n
+ZXMgbGlzdGVkIGluIHRoZSBwYXRjaCBhcmUgZmVhdHVyZSBhZGRpdGlvbnMgd2hlcmUgd2UgZ2l2
+ZSBhbg0Kb3B0aW9uIG9mIGNvbmZpZ3VyaW5nIHRoZSBjbG9jayBhbmQgc3BlZWQgaW4gdGhlIGFi
+c2VuY2Ugb2YgdGhlIEVFUFJPTS4NClRoZSBjdXJyZW50IGNvZGUgZG9lcyBub3QgaGF2ZSBhbnkg
+YnVncyByZWxhdGVkIHRvIHRoaXMuIFNpbmNlLCB0aGVzZQ0KYXJlIHRoZSBhZGRpdGlvbmFsIGZl
+YXR1cmVzL3JlcXVpcmVtZW50cywgd2UgYXJlIHRhcmdldGluZyBhdCAnbmV0LQ0KbmV4dCcgcmF0
+aGVyIHRoYW4gJ25ldCcuDQoNCj4gDQo+IC4uLg0KPiANCj4gLS0NCj4gcHctYm90OiB1bmRlci1y
+ZXZpZXcNCg0K
 
