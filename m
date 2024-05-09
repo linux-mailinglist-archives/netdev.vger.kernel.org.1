@@ -1,84 +1,73 @@
-Return-Path: <netdev+bounces-94786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05A418C0A8A
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:44:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D804C8C0A91
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 06:48:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36B651C210EE
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:44:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 766DC1F22526
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 04:48:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184931494AB;
-	Thu,  9 May 2024 04:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB84A13BC3C;
+	Thu,  9 May 2024 04:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/oM8gK5"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="EtdeSNEc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D1C10E5;
-	Thu,  9 May 2024 04:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC38D2747D;
+	Thu,  9 May 2024 04:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715229819; cv=none; b=mr8+sczOCrdXBCqdpWieRUwEB95foMZLTkRxpHQc+Ar0ZzItkSf37AeGmjsGs2WfmdxC1Ek1U9W6xbDpz9A1+Uj1nbajCsGfXT9gFe5Cvmpm4DCgeRRQib0ZjgsB0s/HzCKFBJehs+mIiRGVhAU/5PFXkyPFI9n+UFK+eVdrfIw=
+	t=1715230075; cv=none; b=Sm8TkQhfR91Mq7vIoF2vcbwy3vZ9RrlsMEJZSS8p7rbopxqOOs0N0cKW53QfkBdh6XjKh5jZQ/am6zkLEJkKewmDzsPqjMz06LTf6ZE8cBEYvbQxEEU8nL+IeIzHIhYzjwIsHSVmqqjaO9fDnVrxkWqnBykTlvLttHBAaIK2JEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715229819; c=relaxed/simple;
-	bh=wC8ROQGMCBiyRkgcqeR1VWvYtgaUZqSR/VXIfZ3SVZI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cVyASkgKg3CuCCQLdjzS81lErW2Ui49JPMerZ0f2FLHZIVxOqzZ+eoh9SERVWj7x/uNVOVz+sxTmOsAmx4TEmYK5ckGJ8Vrv7dRkvUuF5zZkRaAHvuK7lxDtluJ6vefwxQ2e1CCD4+rq2KZa/pPmwgvsup+8b35pLF2m3YRC2AM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U/oM8gK5; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1edf506b216so3070335ad.2;
-        Wed, 08 May 2024 21:43:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715229817; x=1715834617; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RAVsowuKL8PpxwI/qtET9GJ7xFpj2lJ5HF1nhUYlHaY=;
-        b=U/oM8gK5HkUr96YdtUNs6WL4FTDYAFE8HDYcnCDLQzfviPNKKoRra5OdW6uyCxXWQM
-         pFstItpRfyI7mg4ERkHEXEZioVPDq4oj/HmvazZOYnZd+M9gzpnf9ReDhvvqYgG1b79P
-         M9C0sa//IoZtID69f27ixbq7aCQ+pKlQXJwqineSaeP20rB0ypXW6wB0jCJVnJmxrsaC
-         TBJ63lgtBvi0gtL+qtsXC51q7KtOI/VTRfQelAtZ3SWHzG5N2yImILb+UxJfsVKf7cE7
-         K4yluMWxLkhb0i7XYcfgPXcmy7mVHkHLi0Bh/BJeRGm3UmJTLhn04ETAyTiNxr/1Ht0G
-         0+mA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715229817; x=1715834617;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RAVsowuKL8PpxwI/qtET9GJ7xFpj2lJ5HF1nhUYlHaY=;
-        b=KtHs+qHgcclHntvGAhbckfsRfGNfeK7maL9CgjP06pmS9XBaH/0Qoj7ZVmvEaUdQyC
-         6bO7GfR6l9t6qph4Hf8uI3lzs8M8nS2nQ9a+BsQSBtyeYBNoRfuaTQh6frxcsfLXHYhY
-         1VuMZLLYKjgYRfB2mUxXHb+XdbJcw09FfNLFi978DZMlR4HwzZzF0sD7q06jGZAn3Uug
-         oGNKhZVH3bgfB/abqCYoEYoaaiKSe+4weHzIy8XD1bNMT6WcBU230iwxfdPVhVMlu/Ix
-         aqmUB0DU2eaiDnrvYooSFUAmbutvWHzmCkzieRFpTDz75R913GNteHIWCgWwCyEsY7+W
-         jgRA==
-X-Forwarded-Encrypted: i=1; AJvYcCWEW/T5T6eSBk3jHdA0cBiaa25xVUAT/iP958atK4vT9yHq9xy3qo7kA1eZZFGl4/zUDa/wPoZyIj8pIR63jKfTt7Sjt9arAQ5MnLYiAaz299i0EByYDoOXH55Nj88TyxmI9Hpg
-X-Gm-Message-State: AOJu0Ywi+/zyNezi8/XdOE5OpnkAY8PG17colc5ov27eRC0lWcMWnmGC
-	8UnkHCiMKpEIFOREzunJcF83OxAdu3s8chPockDuYeKUflq2gHpP
-X-Google-Smtp-Source: AGHT+IHjG84ykjAvUA3ORCTHT7UNqgZtDs11HRYoPIcMLVKsLvcqOsgyCDbW78ExK3X0UkfTlpXPcQ==
-X-Received: by 2002:a17:902:edc5:b0:1e4:60d4:916b with SMTP id d9443c01a7336-1eeb0aa49acmr38936125ad.64.1715229816966;
-        Wed, 08 May 2024 21:43:36 -0700 (PDT)
-Received: from localhost ([117.32.216.71])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c13699dsm4066405ad.239.2024.05.08.21.43.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 21:43:36 -0700 (PDT)
-From: Yuan Fang <yf768672249@gmail.com>
-To: edumazet@google.com
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yuan Fang <yf768672249@gmail.com>
-Subject: [PATCH 2/2] tcp/ipv6: fix get_tcp6_sock() output error info
-Date: Thu,  9 May 2024 12:43:23 +0800
-Message-ID: <20240509044323.247606-2-yf768672249@gmail.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240509044323.247606-1-yf768672249@gmail.com>
-References: <20240509044323.247606-1-yf768672249@gmail.com>
+	s=arc-20240116; t=1715230075; c=relaxed/simple;
+	bh=yn6z4Xu9XJe8+P4siS+L9oLNEb1Nb0vrz6xd5dESRII=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YQztXGN1x6e/c0d6xJn50NHx/lg+oeJRhT+btf24pvPbDJW7Rgu5NCf7E8DGlU27pdYVih4Jiu4YRteAghzIIVtk2hW/bFOg8cLH7qJUj/rPRxXS4ywVPqtHJWAjZW94sjroS6z+hrhiCslveGbEqKHEQ2HNnPnoeZwloVwCAiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=EtdeSNEc; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1715230070; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=biTs5kQqplTbXx0OlRbtoUu3wlnUGsDxGs20ybVbVGY=;
+	b=EtdeSNEco2rwksBTwYNIFcyzNZj/VfN4PPTM2dWvWXcYu8fphMWoWVDx7KxJx9Tw00SV0CXUk63S42CuvLZKV9O/bNZP6Q/Ke25R5DErqIRqnlcZbWlGC1t2qq6ElJ9bxkJpFJyiBLnRJ83cdDzIQHooM0IeiDfBxfiROJOR8OA=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045075189;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=24;SR=0;TI=SMTPD_---0W65g812_1715230067;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W65g812_1715230067)
+          by smtp.aliyun-inc.com;
+          Thu, 09 May 2024 12:47:48 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: netdev@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Brett Creeley <bcreeley@amd.com>,
+	Ratheesh Kannoth <rkannoth@marvell.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Tal Gilboa <talgi@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Paul Greenwalt <paul.greenwalt@intel.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	justinstitt@google.com,
+	donald.hunter@gmail.com
+Subject: [PATCH net-next v13 0/4] ethtool: provide the dim profile fine-tuning channel
+Date: Thu,  9 May 2024 12:47:43 +0800
+Message-Id: <20240509044747.101237-1-hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,57 +76,87 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Using the netstat command, the Send-Q is always 0 in TCP_LISTEN.
-Modify tx_queue to the value of sk->sk_max_ack_backlog.
+The NetDIM library provides excellent acceleration for many modern
+network cards. However, the default profiles of DIM limits its maximum
+capabilities for different NICs, so providing a way which the NIC can
+be custom configured is necessary.
 
-Signed-off-by: Yuan Fang <yf768672249@gmail.com>
----
- net/ipv6/tcp_ipv6.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Currently, the way is based on the commonly used "ethtool -C".
 
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 3f4cba49e9ee..07ea1be13151 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -2177,7 +2177,7 @@ static void get_tcp6_sock(struct seq_file *seq, struct sock *sp, int i)
- 	const struct tcp_sock *tp = tcp_sk(sp);
- 	const struct inet_connection_sock *icsk = inet_csk(sp);
- 	const struct fastopen_queue *fastopenq = &icsk->icsk_accept_queue.fastopenq;
--	int rx_queue;
-+	int rx_queue, tx_queue;
- 	int state;
- 
- 	dest  = &sp->sk_v6_daddr;
-@@ -2202,14 +2202,17 @@ static void get_tcp6_sock(struct seq_file *seq, struct sock *sp, int i)
- 	}
- 
- 	state = inet_sk_state_load(sp);
--	if (state == TCP_LISTEN)
-+	if (state == TCP_LISTEN) {
- 		rx_queue = READ_ONCE(sp->sk_ack_backlog);
--	else
-+		tx_queue = READ_ONCE(sp->sk_max_ack_backlog);
-+	} else {
- 		/* Because we don't lock the socket,
- 		 * we might find a transient negative value.
- 		 */
- 		rx_queue = max_t(int, READ_ONCE(tp->rcv_nxt) -
- 				      READ_ONCE(tp->copied_seq), 0);
-+		tx_queue = READ_ONCE(tp->write_seq) - tp->snd_una;
-+	}
- 
- 	seq_printf(seq,
- 		   "%4d: %08X%08X%08X%08X:%04X %08X%08X%08X%08X:%04X "
-@@ -2220,7 +2223,7 @@ static void get_tcp6_sock(struct seq_file *seq, struct sock *sp, int i)
- 		   dest->s6_addr32[0], dest->s6_addr32[1],
- 		   dest->s6_addr32[2], dest->s6_addr32[3], destp,
- 		   state,
--		   READ_ONCE(tp->write_seq) - tp->snd_una,
-+		   tx_queue,
- 		   rx_queue,
- 		   timer_active,
- 		   jiffies_delta_to_clock_t(timer_expires - jiffies),
+Please review, thank you very much!
+
+Changelog
+=====
+v12->v13:
+  - Rebase net-next to fix the one-line conflict.
+  - Update tiny comments.
+  - Config ETHTOOL_NETLINK to select DIMLIB.
+
+v11->v12:
+  - Remove the use of IS_ENABLED(DIMLIB).
+  - Update Simon's htmldoc hint.
+
+v10->v11:
+  - Fix and clean up some issues from Kuba, thanks.
+  - Rebase net-next/main
+
+v9->v10:
+  - Collect dim related flags/mode/work into one place.
+  - Use rx_profile + tx_profile instead of four profiles.
+  - Add several helps.
+  - Update commit logs.
+
+v8->v9:
+  - Fix the compilation error of conflicting names of rx_profile in
+    dim.h and ice driver: in dim.h, rx_profile is replaced with
+    dim_rx_profile. So does tx_profile.
+
+v7->v8:
+  - Use kmemdup() instead of kzalloc()/memcpy() in dev_dim_profile_init().
+
+v6->v7:
+  - A new wrapper struct pointer is used in struct net_device.
+  - Add IS_ENABLED(CONFIG_DIMLIB) to avoid compiler warnings.
+  - Profile fields changed from u16 to u32.
+
+v5->v6:
+  - Place the profile in netdevice to bypass the driver.
+    The interaction code of ethtool <-> kernel has not changed at all,
+    only the interaction part of kernel <-> driver has changed.
+
+v4->v5:
+  - Update some snippets from Kuba.
+
+v3->v4:
+  - Some tiny updates and patch 1 only add a new comment.
+
+v2->v3:
+  - Break up the attributes to avoid the use of raw c structs.
+  - Use per-device profile instead of global profile in the driver.
+
+v1->v2:
+  - Use ethtool tool instead of net-sysfs.
+
+Heng Qi (4):
+  linux/dim: move useful macros to .h file
+  ethtool: provide customized dim profile management
+  dim: add new interfaces for initialization and getting results
+  virtio-net: support dim profile fine-tuning
+
+ Documentation/netlink/specs/ethtool.yaml     |  31 +++
+ Documentation/networking/ethtool-netlink.rst |   4 +
+ Documentation/networking/net_dim.rst         |  42 +++
+ drivers/net/virtio_net.c                     |  47 +++-
+ include/linux/dim.h                          | 113 ++++++++
+ include/linux/ethtool.h                      |   4 +-
+ include/linux/netdevice.h                    |   3 +
+ include/uapi/linux/ethtool_netlink.h         |  22 ++
+ lib/dim/net_dim.c                            | 144 +++++++++-
+ net/Kconfig                                  |   1 +
+ net/ethtool/coalesce.c                       | 263 ++++++++++++++++++-
+ 11 files changed, 658 insertions(+), 16 deletions(-)
+
 -- 
-2.45.0
+2.32.0.3.g01195cf9f
 
 
