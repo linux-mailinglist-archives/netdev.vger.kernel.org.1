@@ -1,299 +1,359 @@
-Return-Path: <netdev+bounces-94857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9231B8C0DF5
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 12:05:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC2288C0E44
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 12:36:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE5BF1C21808
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:05:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83D97283BD6
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47AA14AD26;
-	Thu,  9 May 2024 10:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEED912E1E3;
+	Thu,  9 May 2024 10:36:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X6gVxXAC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ch6m/viA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A328114A4FF;
-	Thu,  9 May 2024 10:04:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41DB5339A
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 10:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715249099; cv=none; b=BWgE2ujv32Gm4fT/93xXbHBhPwuO5bNFekVJXVDIpwotOAj17p1zXbbfhRg2l392/xyLrASFMVNnuuGvaBNnZmVU3syf7FYB/pcFMpJAv4Q09IeExvSeFQz0buqjPspVpKLd8LHRrUJlh94XgZ8Qa8B5U2sistyg7BuHvJRV5v0=
+	t=1715251014; cv=none; b=cvLJp9fPMHQH5fKwXDr4xPVQzUG8pwvCkwjMB/faeNfBN66hSVAMKeFw8iT79RjaOia38mup7pSKsilvY4aL6J9OYJuRRwMqbq4hC6AIyGGy01o4QD8eHSpCo44L0C3Vbp/anijX28FiDbmyx12wSq62LRtpZqZFWT5B4YPqSjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715249099; c=relaxed/simple;
-	bh=IfMoDQWY48qsrBKQhlHUTl/fNsBkkkR7LISA/6xuS9Y=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p3s4uEgaDW1YWhuJ/PSeoHkAN0MV4B7C7bgiQW3KxZw/FLe6IRTx2wBZQhkQ6hUOCm77TY4Q53oliRc38yd37UgmdHlH/o8MCa5jou/KIV1Y/Pn29jbrGemVoLlPIxyJNkkRNpmDpfjQ912b/tUO7bBr/TFYKnIUoffhXBKn0cU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X6gVxXAC; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-41fc2f7fbb5so3479025e9.1;
-        Thu, 09 May 2024 03:04:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715249096; x=1715853896; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=G8bJUHKzT4cckh7Csum6u92RyLMuy6+Rog15X/qkuuw=;
-        b=X6gVxXACmXmIGNA5MU0Qjgto5bPsC7uaHpIVufD6aLoSsAvitJO1ANgiEx5YgwE3BO
-         ghTLEin1Q7L46wYeX9igkgajuNbgEhpufCSw6FapKiz0uSXjleIO34+X5W6xQzJTfL02
-         2Gw43uK5J9PkT1d7m8f4/OCV/xomxLAhmTqWPf7GHN14xtLCsI1HiaNUegU7a5nkw1+Z
-         aGM8xDIjlU1W77bzAi6p3sps3tDbKKxoM2RzAxXChRkTPRiw9lkM9uQ+p7tBOUhHX/z8
-         PNTfEXkP0E3TknQeUrT2BgrnCQNT7xxIUoergiTIFJer/qiw6MqlR2e/pNGk340uca9t
-         RgvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715249096; x=1715853896;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G8bJUHKzT4cckh7Csum6u92RyLMuy6+Rog15X/qkuuw=;
-        b=Jo7zOpe6uKrBl+/JQosN/TVfMFUdXFMlpc34JodmrTWrGVKbBHc86+JILOICBZbFm0
-         TToHn5iGGdMJHycA8pjeYRK9xWgVLr3TqbQXcF1D7Mm1IW8d5X3R4gBfNwRAQb9cYLSy
-         zOHUWAOZsDYXs+YmOo5FrqmzW7gMp5NAhnhIXATaNiWpIhI9+QuNd436bpXw33pchyDF
-         1UF55ZfzVSnoX5tQHXTYp9meXIm1XTG871eXXW2B9QhhUI0M9OCzhWVdykfFnonQCNIr
-         7S8DPsUgnh3BoKbDOmsrRKJz6hoMkm+Oy6EN8msgWZpVOXHAsmZfS3xzyEFqHDnqGJTP
-         NqiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXACXNvnX0NXY0s4qNs5puWYsR91kkdlSiQ0UczpTy6d18OLargj0skwW0IuWBxxV5iy1MFG6fouAMxqkAb1X40VCVAN0u1OEL+M5q8iNA6XMHo5RCZZ8TC7d3PSpQ6sVJXnU9Yq+c5QlIQ+/nzR/VTpzbs0BKLjjtFDIzGIXIjgmcztvc=
-X-Gm-Message-State: AOJu0Yzxw+v72XAYkmK2mXM3ULkN6vRI/LMud8iDYT6saQqxIJI6XpcL
-	0TWdJ/eOHAe5fGRyfe1fT4wAZd9Abm6W0wMnOSBXiF7JiCtI3k7L
-X-Google-Smtp-Source: AGHT+IFubYDzH/R/sEBcBaXb48wBShYfqFDm0AmdYNsLwjhe/Po/fGXZsk9mxd+Mubhfnib/ltG3/A==
-X-Received: by 2002:a05:600c:3103:b0:41b:f43b:e263 with SMTP id 5b1f17b1804b1-41fbc12bdcbmr18994445e9.0.1715249095619;
-        Thu, 09 May 2024 03:04:55 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccfe100csm20295685e9.40.2024.05.09.03.04.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 03:04:55 -0700 (PDT)
-Message-ID: <663c9fc7.050a0220.5fb3a.4e87@mx.google.com>
-X-Google-Original-Message-ID: <ZjyfxNXUfButVfN7@Ansuel-XPS.>
-Date: Thu, 9 May 2024 12:04:52 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Kalle Valo <kvalo@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, ath10k@lists.infradead.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	Sebastian Gottschall <s.gottschall@dd-wrt.com>,
-	Steve deRosier <derosier@cal-sierra.com>,
-	Stefan Lippers-Hollmann <s.l-h@gmx.de>
-Subject: Re: [PATCH v14] ath10k: add LED and GPIO controlling support for
- various chipsets
-References: <20230611080505.17393-1-ansuelsmth@gmail.com>
- <878rcjbaqs.fsf@kernel.org>
- <648cdebb.5d0a0220.be7f8.a096@mx.google.com>
- <648ded2a.df0a0220.b78de.4603@mx.google.com>
- <CA+_ehUzzVq_sVTgVCM+r=oLp=GNn-6nJRBG=bndJjrRDhCodaw@mail.gmail.com>
- <87v83nlhb3.fsf@kernel.org>
+	s=arc-20240116; t=1715251014; c=relaxed/simple;
+	bh=HBDZwzRGeQnsIpiARlnK4c9lly2wfAMLwYCqSmUF43o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SECBy0qmpN0WxKfY7cBVg7Jn8djqpnxsPVqonqeRtmSpua0IScopvympjhs+LnxgrFdoPZSr9ia67zOv1mVOw+p2VNrS2IxrOfrt0C0lI/MR3rbhj1nb/p73ipQnvai9Io8eF9I5VpcOWd/+tBKqpjCUSGi6vZ1e/9O3WJp7Crc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ch6m/viA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715251010;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=jLIz1Jbxti8NJft3YZRGOY+N8ghcPjRasffwEVjRfb4=;
+	b=ch6m/viAuFdOU+l2JC5dp5HAND8SczHUHpYWL8wTP6RLH0lUk32R3Gi7NuiPzFFblWvoAd
+	wLG3mTlB6HdS1P8WchgMyrqmqO5OPGvF+WPeBoEtuTOjqKZ3JVmzjTwzEvoSxnWXviIjhQ
+	O/bjnhuLJ4i/Q3xLoHpVO/TSVzwltG8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-574-As0XE-8nN32WyKnX_e-r1Q-1; Thu, 09 May 2024 06:36:47 -0400
+X-MC-Unique: As0XE-8nN32WyKnX_e-r1Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0345881227E;
+	Thu,  9 May 2024 10:36:47 +0000 (UTC)
+Received: from dcaratti.users.ipa.redhat.com (unknown [10.45.225.109])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CDB7E1C008B9;
+	Thu,  9 May 2024 10:36:44 +0000 (UTC)
+From: Davide Caratti <dcaratti@redhat.com>
+To: netdev@vger.kernel.org
+Cc: casey@schaufler-ca.com,
+	davem@davemloft.net,
+	dcaratti@redhat.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-security-module@vger.kernel.org,
+	pabeni@redhat.com,
+	paul@paul-moore.com,
+	xmu@redhat.com
+Subject: [PATCH net v4] netlabel: fix RCU annotation for IPv4 options on socket creation
+Date: Thu,  9 May 2024 12:07:05 +0200
+Message-ID: <262f71a207e8cedd388bd89d17ef16155eb2acee.1715248275.git.dcaratti@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87v83nlhb3.fsf@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-On Thu, May 09, 2024 at 07:50:40AM +0300, Kalle Valo wrote:
-> Ansuel Smith <ansuelsmth@gmail.com> writes:
-> 
-> > Il giorno sab 17 giu 2023 alle ore 19:28 Christian Marangi
-> > <ansuelsmth@gmail.com> ha scritto:
-> >
-> >>
-> >> On Fri, Jun 16, 2023 at 01:35:04PM +0200, Christian Marangi wrote:
-> >> > On Fri, Jun 16, 2023 at 08:03:23PM +0300, Kalle Valo wrote:
-> >> > > Christian Marangi <ansuelsmth@gmail.com> writes:
-> >> > >
-> >> > > > From: Sebastian Gottschall <s.gottschall@dd-wrt.com>
-> >> > > >
-> >> > > > Adds LED and GPIO Control support for 988x, 9887, 9888, 99x0, 9984
-> >> > > > based chipsets with on chipset connected led's using WMI Firmware API.
-> >> > > > The LED device will get available named as "ath10k-phyX" at sysfs and
-> >> > > > can be controlled with various triggers.
-> >> > > > Adds also debugfs interface for gpio control.
-> >> > > >
-> >> > > > Signed-off-by: Sebastian Gottschall <s.gottschall@dd-wrt.com>
-> >> > > > Reviewed-by: Steve deRosier <derosier@cal-sierra.com>
-> >> > > > [kvalo: major reorg and cleanup]
-> >> > > > Signed-off-by: Kalle Valo <kvalo@codeaurora.org>
-> >> > > > [ansuel: rebase and small cleanup]
-> >> > > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> >> > > > Tested-by: Stefan Lippers-Hollmann <s.l-h@gmx.de>
-> >> > > > ---
-> >> > > >
-> >> > > > Hi,
-> >> > > > this is a very old patch from 2018 that somehow was talked till 2020
-> >> > > > with Kavlo asked to rebase and resubmit and nobody did.
-> >> > > > So here we are in 2023 with me trying to finally have this upstream.
-> >> > > >
-> >> > > > A summarize of the situation.
-> >> > > > - The patch is from years in OpenWRT. Used by anything that has ath10k
-> >> > > >   card and a LED connected.
-> >> > > > - This patch is also used by the fw variant from Candela Tech with no
-> >> > > >   problem reported.
-> >> > > > - It was pointed out that this caused some problem with ipq4019 SoC
-> >> > > >   but the problem was actually caused by a different bug related to
-> >> > > >   interrupts.
-> >> > > >
-> >> > > > I honestly hope we can have this feature merged since it's really
-> >> > > > funny to have something that was so near merge and jet still not
-> >> > > > present and with devices not supporting this simple but useful
-> >> > > > feature.
-> >> > >
-> >> > > Indeed, we should finally get this in. Thanks for working on it.
-> >> > >
-> >> > > I did some minor changes to the patch, they are in my pending branch:
-> >> > >
-> >> > > https://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git/commit/?h=pending&id=686464864538158f22842dc49eddea6fa50e59c1
-> >> > >
-> >> > > My comments below, please review my changes. No need to resend because
-> >> > > of these.
-> >> > >
-> >> >
-> >> > Hi,
-> >> > very happy this is going further.
-> >> >
-> >> > > > --- a/drivers/net/wireless/ath/ath10k/Kconfig
-> >> > > > +++ b/drivers/net/wireless/ath/ath10k/Kconfig
-> >> > > > @@ -67,6 +67,23 @@ config ATH10K_DEBUGFS
-> >> > > >
-> >> > > >     If unsure, say Y to make it easier to debug problems.
-> >> > > >
-> >> > > > +config ATH10K_LEDS
-> >> > > > + bool "Atheros ath10k LED support"
-> >> > > > + depends on ATH10K
-> >> > > > + select MAC80211_LEDS
-> >> > > > + select LEDS_CLASS
-> >> > > > + select NEW_LEDS
-> >> > > > + default y
-> >> > > > + help
-> >> > > > +   This option enables LEDs support for chipset LED pins.
-> >> > > > +   Each pin is connected via GPIO and can be controlled using
-> >> > > > +   WMI Firmware API.
-> >> > > > +
-> >> > > > +   The LED device will get available named as "ath10k-phyX" at sysfs and
-> >> > > > +           can be controlled with various triggers.
-> >> > > > +
-> >> > > > +   Say Y, if you have LED pins connected to the ath10k wireless card.
-> >> > >
-> >> > > I'm not sure anymore if we should ask anything from the user, better to
-> >> > > enable automatically if LED support is enabled in the kernel. So I
-> >> > > simplified this to:
-> >> > >
-> >> > > config ATH10K_LEDS
-> >> > >     bool
-> >> > >     depends on ATH10K
-> >> > >     depends on LEDS_CLASS=y || LEDS_CLASS=MAC80211
-> >> > >     default y
-> >> > >
-> >> > > This follows what mt76 does:
-> >> > >
-> >> > > config MT76_LEDS
-> >> > >     bool
-> >> > >     depends on MT76_CORE
-> >> > >     depends on LEDS_CLASS=y || MT76_CORE=LEDS_CLASS
-> >> > >     default y
-> >> > >
-> >> >
-> >> > I remember there was the same discussion in a previous series. OK for me
-> >> > for making this by default, only concern is any buildbot error (if any)
-> >> >
-> >> > Anyway OK for the change.
-> >> >
-> >> > > > @@ -65,6 +66,7 @@ static const struct ath10k_hw_params
-> >> > > > ath10k_hw_params_list[] = {
-> >> > > >           .dev_id = QCA988X_2_0_DEVICE_ID,
-> >> > > >           .bus = ATH10K_BUS_PCI,
-> >> > > >           .name = "qca988x hw2.0",
-> >> > > > +         .led_pin = 1,
-> >> > > >           .patch_load_addr = QCA988X_HW_2_0_PATCH_LOAD_ADDR,
-> >> > > >           .uart_pin = 7,
-> >> > > >           .cc_wraparound_type = ATH10K_HW_CC_WRAP_SHIFTED_ALL,
-> >> > >
-> >> > > I prefer following the field order from struct ath10k_hw_params
-> >> > > declaration and also setting fields explicitly to zero (even though
-> >> > > there are gaps still) so I changed that for every entry.
-> >> > >
-> >> >
-> >> > Thanks for the change, np for me.
-> >> >
-> >> > > > +int ath10k_leds_register(struct ath10k *ar)
-> >> > > > +{
-> >> > > > + int ret;
-> >> > > > +
-> >> > > > + if (ar->hw_params.led_pin == 0)
-> >> > > > +         /* leds not supported */
-> >> > > > +         return 0;
-> >> > > > +
-> >> > > > + snprintf(ar->leds.label, sizeof(ar->leds.label), "ath10k-%s",
-> >> > > > +          wiphy_name(ar->hw->wiphy));
-> >> > > > + ar->leds.wifi_led.active_low = 1;
-> >> > > > + ar->leds.wifi_led.gpio = ar->hw_params.led_pin;
-> >> > > > + ar->leds.wifi_led.name = ar->leds.label;
-> >> > > > + ar->leds.wifi_led.default_state = LEDS_GPIO_DEFSTATE_KEEP;
-> >> > > > +
-> >> > > > + ar->leds.cdev.name = ar->leds.label;
-> >> > > > + ar->leds.cdev.brightness_set_blocking = ath10k_leds_set_brightness_blocking;
-> >> > > > +
-> >> > > > + /* FIXME: this assignment doesn't make sense as it's NULL, remove it? */
-> >> > > > + ar->leds.cdev.default_trigger = ar->leds.wifi_led.default_trigger;
-> >> > >
-> >> > > But what to do with this FIXME?
-> >> > >
-> >> >
-> >> > It was pushed by you in v13.
-> >> >
-> >> > I could be wrong but your idea was to prepare for future support of
-> >> > other patch that would set the default_trigger to the mac80211 tpt.
-> >> >
-> >> > We might got both confused by default_trigger and default_state.
-> >> > default_trigger is actually never set and is NULL (actually it's 0)
-> >> >
-> >> > We have other 2 patch that adds tpt rates for the mac80211 LED trigger
-> >> > and set this trigger as the default one but honestly I would chose a
-> >> > different implementation than hardcoding everything.
-> >> >
-> >> > If it's ok for you, I would drop the comment and the default_trigger and
-> >> > I will send a follow-up patch to this adding DT support by using
-> >> > led_classdev_register_ext and defining init_data.
-> >> > (and this indirectly would permit better LED naming and defining of
-> >> > default-trigger in DT)
-> >> >
-> >> > Also ideally I will also send a patch for default_state following
-> >> > standard LED implementation. (to set default_state in DT)
-> >> >
-> >> > I would prefer this approach as the LED patch already took way too much
-> >> > time and I think it's better to merge this initial version and then
-> >> > improve it.
-> >>
-> >> If you want to check out I attached the 2 patch (one dt-bindings and the
-> >> one for the code) that I will submit when this will be merged (the
-> >> change is with the assumption that the FIXME line is dropped)
-> >>
-> >> Tested and works correctly with my use case of wifi card attached with
-> >> pcie. This implementation permits to declare the default trigger in DT
-> >> instead of hardcoding.
-> >>
-> >
-> > Any news with this? Did I notice the LEDs patch are still in pending...
-> 
-> Sorry for the delay but finally I looked at this again. I decided to
-> just remove the fixme and otherwise it looks good for me. Please check
-> my changes:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git/commit/?h=pending&id=688130a66ed49f20ca0ce02c3987f6a474f7c93a
->
+Xiumei reports the following splat when netlabel and TCP socket are used:
 
-All ok for me, Just I notice the ATH10K_LEDS is not exposed anymore? Is
-that intended?
+ =============================
+ WARNING: suspicious RCU usage
+ 6.9.0-rc2+ #637 Not tainted
+ -----------------------------
+ net/ipv4/cipso_ipv4.c:1880 suspicious rcu_dereference_protected() usage!
 
-Aside from this very happy that we are finally finishing with this long
-lasting feature!
+ other info that might help us debug this:
 
+ rcu_scheduler_active = 2, debug_locks = 1
+ 1 lock held by ncat/23333:
+  #0: ffffffff906030c0 (rcu_read_lock){....}-{1:2}, at: netlbl_sock_setattr+0x25/0x1b0
+
+ stack backtrace:
+ CPU: 11 PID: 23333 Comm: ncat Kdump: loaded Not tainted 6.9.0-rc2+ #637
+ Hardware name: Supermicro SYS-6027R-72RF/X9DRH-7TF/7F/iTF/iF, BIOS 3.0  07/26/2013
+ Call Trace:
+  <TASK>
+  dump_stack_lvl+0xa9/0xc0
+  lockdep_rcu_suspicious+0x117/0x190
+  cipso_v4_sock_setattr+0x1ab/0x1b0
+  netlbl_sock_setattr+0x13e/0x1b0
+  selinux_netlbl_socket_post_create+0x3f/0x80
+  selinux_socket_post_create+0x1a0/0x460
+  security_socket_post_create+0x42/0x60
+  __sock_create+0x342/0x3a0
+  __sys_socket_create.part.22+0x42/0x70
+  __sys_socket+0x37/0xb0
+  __x64_sys_socket+0x16/0x20
+  do_syscall_64+0x96/0x180
+  ? do_user_addr_fault+0x68d/0xa30
+  ? exc_page_fault+0x171/0x280
+  ? asm_exc_page_fault+0x22/0x30
+  entry_SYSCALL_64_after_hwframe+0x71/0x79
+ RIP: 0033:0x7fbc0ca3fc1b
+ Code: 73 01 c3 48 8b 0d 05 f2 1b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 29 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d d5 f1 1b 00 f7 d8 64 89 01 48
+ RSP: 002b:00007fff18635208 EFLAGS: 00000246 ORIG_RAX: 0000000000000029
+ RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007fbc0ca3fc1b
+ RDX: 0000000000000006 RSI: 0000000000000001 RDI: 0000000000000002
+ RBP: 000055d24f80f8a0 R08: 0000000000000003 R09: 0000000000000001
+
+R10: 0000000000020000 R11: 0000000000000246 R12: 000055d24f80f8a0
+ R13: 0000000000000000 R14: 000055d24f80fb88 R15: 0000000000000000
+  </TASK>
+
+The current implementation of cipso_v4_sock_setattr() replaces IP options
+under the assumption that the caller holds the socket lock; however, such
+assumption is not true, nor needed, in selinux_socket_post_create() hook.
+
+Let all callers of cipso_v4_sock_setattr() specify the "socket lock held"
+condition, except selinux_socket_post_create() _ where such condition can
+safely be set as true even without holding the socket lock.
+
+v4:
+ - fix build when CONFIG_LOCKDEP is unset (thanks kernel test robot)
+
+v3:
+ - rename variable to 'sk_locked' (thanks Paul Moore)
+ - keep rcu_replace_pointer() open-coded and re-add NULL check of 'old',
+   these two changes will be posted in another patch (thanks Paul Moore)
+
+v2:
+ - pass lockdep_sock_is_held() through a boolean variable in the stack
+   (thanks Eric Dumazet, Paul Moore, Casey Schaufler)
+ - use rcu_replace_pointer() instead of rcu_dereference_protected() +
+   rcu_assign_pointer()
+ - remove NULL check of 'old' before kfree_rcu()
+
+Fixes: f6d8bd051c39 ("inet: add RCU protection to inet->opt")
+Reported-by: Xiumei Mu <xmu@redhat.com>
+Acked-by: Paul Moore <paul@paul-moore.com>
+Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+---
+ include/net/cipso_ipv4.h     |  6 ++++--
+ include/net/netlabel.h       | 12 ++++++++++--
+ net/ipv4/cipso_ipv4.c        |  7 ++++---
+ net/netlabel/netlabel_kapi.c | 26 +++++++++++++++++++++++---
+ security/selinux/netlabel.c  |  5 ++++-
+ security/smack/smack_lsm.c   |  3 ++-
+ 6 files changed, 47 insertions(+), 12 deletions(-)
+
+diff --git a/include/net/cipso_ipv4.h b/include/net/cipso_ipv4.h
+index 53dd7d988a2d..c9111bb2f59b 100644
+--- a/include/net/cipso_ipv4.h
++++ b/include/net/cipso_ipv4.h
+@@ -183,7 +183,8 @@ int cipso_v4_getattr(const unsigned char *cipso,
+ 		     struct netlbl_lsm_secattr *secattr);
+ int cipso_v4_sock_setattr(struct sock *sk,
+ 			  const struct cipso_v4_doi *doi_def,
+-			  const struct netlbl_lsm_secattr *secattr);
++			  const struct netlbl_lsm_secattr *secattr,
++			  bool sk_locked);
+ void cipso_v4_sock_delattr(struct sock *sk);
+ int cipso_v4_sock_getattr(struct sock *sk, struct netlbl_lsm_secattr *secattr);
+ int cipso_v4_req_setattr(struct request_sock *req,
+@@ -214,7 +215,8 @@ static inline int cipso_v4_getattr(const unsigned char *cipso,
+ 
+ static inline int cipso_v4_sock_setattr(struct sock *sk,
+ 				      const struct cipso_v4_doi *doi_def,
+-				      const struct netlbl_lsm_secattr *secattr)
++				      const struct netlbl_lsm_secattr *secattr,
++				      bool sk_locked)
+ {
+ 	return -ENOSYS;
+ }
+diff --git a/include/net/netlabel.h b/include/net/netlabel.h
+index f3ab0b8a4b18..2133ad723fc1 100644
+--- a/include/net/netlabel.h
++++ b/include/net/netlabel.h
+@@ -470,7 +470,8 @@ void netlbl_bitmap_setbit(unsigned char *bitmap, u32 bit, u8 state);
+ int netlbl_enabled(void);
+ int netlbl_sock_setattr(struct sock *sk,
+ 			u16 family,
+-			const struct netlbl_lsm_secattr *secattr);
++			const struct netlbl_lsm_secattr *secattr,
++			bool sk_locked);
+ void netlbl_sock_delattr(struct sock *sk);
+ int netlbl_sock_getattr(struct sock *sk,
+ 			struct netlbl_lsm_secattr *secattr);
+@@ -487,6 +488,7 @@ int netlbl_skbuff_getattr(const struct sk_buff *skb,
+ 			  u16 family,
+ 			  struct netlbl_lsm_secattr *secattr);
+ void netlbl_skbuff_err(struct sk_buff *skb, u16 family, int error, int gateway);
++bool netlbl_sk_lock_check(struct sock *sk);
+ 
+ /*
+  * LSM label mapping cache operations
+@@ -614,7 +616,8 @@ static inline int netlbl_enabled(void)
+ }
+ static inline int netlbl_sock_setattr(struct sock *sk,
+ 				      u16 family,
+-				      const struct netlbl_lsm_secattr *secattr)
++				      const struct netlbl_lsm_secattr *secattr,
++				      bool sk_locked)
+ {
+ 	return -ENOSYS;
+ }
+@@ -673,6 +676,11 @@ static inline struct audit_buffer *netlbl_audit_start(int type,
+ {
+ 	return NULL;
+ }
++
++static inline bool netlbl_sk_lock_check(struct sock *sk)
++{
++	return true;
++}
+ #endif /* CONFIG_NETLABEL */
+ 
+ const struct netlbl_calipso_ops *
+diff --git a/net/ipv4/cipso_ipv4.c b/net/ipv4/cipso_ipv4.c
+index 8b17d83e5fde..dd6d46015058 100644
+--- a/net/ipv4/cipso_ipv4.c
++++ b/net/ipv4/cipso_ipv4.c
+@@ -1815,6 +1815,7 @@ static int cipso_v4_genopt(unsigned char *buf, u32 buf_len,
+  * @sk: the socket
+  * @doi_def: the CIPSO DOI to use
+  * @secattr: the specific security attributes of the socket
++ * @sk_locked: true if caller holds the socket lock
+  *
+  * Description:
+  * Set the CIPSO option on the given socket using the DOI definition and
+@@ -1826,7 +1827,8 @@ static int cipso_v4_genopt(unsigned char *buf, u32 buf_len,
+  */
+ int cipso_v4_sock_setattr(struct sock *sk,
+ 			  const struct cipso_v4_doi *doi_def,
+-			  const struct netlbl_lsm_secattr *secattr)
++			  const struct netlbl_lsm_secattr *secattr,
++			  bool sk_locked)
+ {
+ 	int ret_val = -EPERM;
+ 	unsigned char *buf = NULL;
+@@ -1876,8 +1878,7 @@ int cipso_v4_sock_setattr(struct sock *sk,
+ 
+ 	sk_inet = inet_sk(sk);
+ 
+-	old = rcu_dereference_protected(sk_inet->inet_opt,
+-					lockdep_sock_is_held(sk));
++	old = rcu_dereference_protected(sk_inet->inet_opt, sk_locked);
+ 	if (inet_test_bit(IS_ICSK, sk)) {
+ 		sk_conn = inet_csk(sk);
+ 		if (old)
+diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
+index 1ba4f58e1d35..371158b22ec6 100644
+--- a/net/netlabel/netlabel_kapi.c
++++ b/net/netlabel/netlabel_kapi.c
+@@ -965,6 +965,7 @@ int netlbl_enabled(void)
+  * @sk: the socket to label
+  * @family: protocol family
+  * @secattr: the security attributes
++ * @sk_locked: true if caller holds the socket lock
+  *
+  * Description:
+  * Attach the correct label to the given socket using the security attributes
+@@ -977,7 +978,8 @@ int netlbl_enabled(void)
+  */
+ int netlbl_sock_setattr(struct sock *sk,
+ 			u16 family,
+-			const struct netlbl_lsm_secattr *secattr)
++			const struct netlbl_lsm_secattr *secattr,
++			bool sk_locked)
+ {
+ 	int ret_val;
+ 	struct netlbl_dom_map *dom_entry;
+@@ -997,7 +999,7 @@ int netlbl_sock_setattr(struct sock *sk,
+ 		case NETLBL_NLTYPE_CIPSOV4:
+ 			ret_val = cipso_v4_sock_setattr(sk,
+ 							dom_entry->def.cipso,
+-							secattr);
++							secattr, sk_locked);
+ 			break;
+ 		case NETLBL_NLTYPE_UNLABELED:
+ 			ret_val = 0;
+@@ -1090,6 +1092,23 @@ int netlbl_sock_getattr(struct sock *sk,
+ 	return ret_val;
+ }
+ 
++/**
++ * netlbl_sk_lock_check - Check if the socket lock has been acquired.
++ * @sk: the socket to check
++ *
++ * Description: check if @sk is locked. Returns true if socket @sk is locked
++ * or if lock debugging is disabled at runtime or compile-time
++ *
++ */
++bool netlbl_sk_lock_check(struct sock *sk)
++{
++#ifdef CONFIG_LOCKDEP
++	if (debug_locks)
++		return lockdep_sock_is_held(sk);
++#endif
++	return true;
++}
++
+ /**
+  * netlbl_conn_setattr - Label a connected socket using the correct protocol
+  * @sk: the socket to label
+@@ -1126,7 +1145,8 @@ int netlbl_conn_setattr(struct sock *sk,
+ 		switch (entry->type) {
+ 		case NETLBL_NLTYPE_CIPSOV4:
+ 			ret_val = cipso_v4_sock_setattr(sk,
+-							entry->cipso, secattr);
++							entry->cipso, secattr,
++							netlbl_sk_lock_check(sk));
+ 			break;
+ 		case NETLBL_NLTYPE_UNLABELED:
+ 			/* just delete the protocols we support for right now
+diff --git a/security/selinux/netlabel.c b/security/selinux/netlabel.c
+index 8f182800e412..55885634e880 100644
+--- a/security/selinux/netlabel.c
++++ b/security/selinux/netlabel.c
+@@ -402,7 +402,10 @@ int selinux_netlbl_socket_post_create(struct sock *sk, u16 family)
+ 	secattr = selinux_netlbl_sock_genattr(sk);
+ 	if (secattr == NULL)
+ 		return -ENOMEM;
+-	rc = netlbl_sock_setattr(sk, family, secattr);
++	/* On socket creation, replacement of IP options is safe even if
++	 * the caller does not hold the socket lock.
++	 */
++	rc = netlbl_sock_setattr(sk, family, secattr, true);
+ 	switch (rc) {
+ 	case 0:
+ 		sksec->nlbl_state = NLBL_LABELED;
+diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
+index 146667937811..efeac8365ad0 100644
+--- a/security/smack/smack_lsm.c
++++ b/security/smack/smack_lsm.c
+@@ -2565,7 +2565,8 @@ static int smack_netlbl_add(struct sock *sk)
+ 	local_bh_disable();
+ 	bh_lock_sock_nested(sk);
+ 
+-	rc = netlbl_sock_setattr(sk, sk->sk_family, &skp->smk_netlabel);
++	rc = netlbl_sock_setattr(sk, sk->sk_family, &skp->smk_netlabel,
++				 netlbl_sk_lock_check(sk));
+ 	switch (rc) {
+ 	case 0:
+ 		ssp->smk_state = SMK_NETLBL_LABELED;
 -- 
-	Ansuel
+2.44.0
+
 
