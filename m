@@ -1,129 +1,104 @@
-Return-Path: <netdev+bounces-94928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D46B18C105F
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 15:30:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEEF18C106B
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 15:32:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C2CEB2115F
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 13:30:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CC0C1F224A8
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 13:32:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D8A31514F4;
-	Thu,  9 May 2024 13:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 231D21527BB;
+	Thu,  9 May 2024 13:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lFF3xVA2"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="12O7hd2z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3A21272A8;
-	Thu,  9 May 2024 13:30:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 770EF15253E
+	for <netdev@vger.kernel.org>; Thu,  9 May 2024 13:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715261403; cv=none; b=nii++1oYT75O58Y2+aj/4Bg1gL5Z/WYZSyPQCFjiE7yWpd+kFawgomTfZyX9uwp7Zi31nNOSUNwttEHtaHyTDdjWz4LVcf92fp6YTWyKi4piqPaTuQCj6NuVMRK+zDvUHEnCMLFd/sKVwjAf9aYNOq9canaDIhXUHREcICG8EAU=
+	t=1715261524; cv=none; b=CaMvpIAeJDLz0YONOCi7+/dfgtJ3VC9qXY+I8PBZ3jECU5n66TXNISrZkRD5cPZWrJBxtAuMbmw6kEpP01ZDIu4ozOg2EJ51EmBPt7pBZAq2whgvjQJhsCxe99dUlP3LuEmxq/bjnGRepR5z+yo0kVoCZpeQbbDCxOrZOr/xLr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715261403; c=relaxed/simple;
-	bh=Vqluo3CoEl0yjpeMMYMVlJn59yph0GEYTkGYgj/VXAg=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ljnyKYGtfyMefbFVKlhzPCgOh/ss/Ort9GSz8JDICS0AjPxRg6jhvJADt9v5t+CmHmJSQAcb2XV760JzJhS65KYW0BOOgARAsznVCYcrJId3Wo32SbUmGvq0pgBDrSFBqBP6lmlKxASZjrW9MiCAdy1TOlp/IaLR2HK9Aa47Hrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lFF3xVA2; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-792b8d989e4so60969885a.2;
-        Thu, 09 May 2024 06:30:01 -0700 (PDT)
+	s=arc-20240116; t=1715261524; c=relaxed/simple;
+	bh=UGtd25PtHEIWxCFYY/R1k/CiR1C5wx6tTMdVM+SZH6g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FNpV+GbT7zS4cgK4W50PiJOqSzWbBu1PLwh2D15k/VCuvegEYtKs/qG0BF1cCv8iWsU2PKpcjD2cS1oniDNy3kC+p/Ar5CPKLJzklthGK7i5Npsv9uChhsM7gHrzKHQefaoV9r4iXP0DHU9WgpyiQerD2AxMy0Kqx/a8RPy0Ho8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=12O7hd2z; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41ba1ba55ffso4975395e9.1
+        for <netdev@vger.kernel.org>; Thu, 09 May 2024 06:32:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715261401; x=1715866201; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ELRiPzSaiwBksf6U0zKzkjH8xyzzGxI12XOql1C3goM=;
-        b=lFF3xVA2EWnoha8f6ODTFylP6Bu4MiUDRGAeAXLl1zMoZBtRybFaylKVaijy5j8IQt
-         vxaZi/X8How+W8wANNqXM8/x+5n1mCnXCYl5O65+IHlyOX9Bfd5RFA4xR5DTH4mN8oND
-         hIZwyE43T7aBBldCckGUXOXCJfBbP/rFC+jbcv2W2q9IqlNgBQoqrmeggEDotsF69pDa
-         T6Xts02cz5YAXlD9cPoR6dWRgiyAjue63LmA5nnYhL2Fx3oSB1k5ZN1BFEFyraXLNwbA
-         AcNSrz7WIk2D3ftnem9PyjnSZaM9t5RZeBWBN7im45I9jYjFaFjomrWpyxR9E5oMB3wF
-         y9lg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715261521; x=1715866321; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=70d8HmBhBsVnOVGM9dBLiSdBfBSq7HfimZSV/5XPOsY=;
+        b=12O7hd2zCN8U3YDiF/NiZW21UN6bBtIjcCDbBir7gFNoMfGlmrh0rOeEsrArZAE+T0
+         Ek31ConGocLhr6Nlzm7PKoF6JAA3ElYB7t51hHmgqKH5ETeDfSfpSEmz5z+f3ATeWe2H
+         QqKywAdHKDsH20cQkALBUm5FNHVovCZYxFCJfeSqcWg059ZYeww8ZjjYHKU+PPNfuEJt
+         da3p7z59RB8gyCTAEQA7u2+u+Ll1DbwUiT/hhyKqQCuOEC8ahrbR4P9Myw6hPMarh5fi
+         sm2Ve1fpqUVfu70yRVIp9BCQnUeRbuq65OHAhkHQ2r5/eVssu3vOl3Uy1ZqMXhO9CM7e
+         oL5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715261401; x=1715866201;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ELRiPzSaiwBksf6U0zKzkjH8xyzzGxI12XOql1C3goM=;
-        b=uaU2fzndbg8KTmwaCPNNZQI4CO0wsRMSCOt7CIDkRMZePr0W63gpQ0up5IF0QON9ne
-         GMTgZnlzQY2JzFYoRHo4RNJbuNtkVCdgeJzyB3xIeDDLnrJOPyAYeNjHHWOmZz+Yjnxj
-         xoCTsOBzx8Dpp1A86Qbhhq5guRSsdZ1Aob9da6pPcHTDaFoorH8u/rfOb9jWtYJ5Pnf1
-         kvxyT6hepNEc7BH49wVpRD8Pep/hVCcIZu+sieUPgbn4SRBgrjJAA7G/Tkroy3kRchxh
-         127OucoTxjoUnN+6O6oSaGiVswHpVUH6HFnmbh28K72YmatCjzLndhAWiQu+mvyzuW8r
-         LvzA==
-X-Forwarded-Encrypted: i=1; AJvYcCVeHjTE16+nWVqWbcfzWW4x4FpZLZFRZHxXOh8Lwmqf7wkbGXNrcsZF20Wei1HDYNuVcC1GRxvlCOIoVtjW7+00ChXg7B2L727U2cq1dEoR1JBr4rtPO86VAq7xMsBEdMthorGNTzAqXNR/XP6s6jzeJ26AzhJvWtIA
-X-Gm-Message-State: AOJu0Yww180FRwGfCiCooNj3zPTZWhshgtC+gZDtq1X8zNO554qhbhNO
-	ih7rx1Um9CQbkvyhzYBuAc8yPIIWElf/jhoFYsGiTBlSrh19gDfE
-X-Google-Smtp-Source: AGHT+IGR8QNz4Hr5GnYcPQ/hhmSvnn69uxTLGwX8KFiGnexA4jkVhDNdTatkSydDCIFPLPZqVBRsyg==
-X-Received: by 2002:a05:6214:2581:b0:6a1:4580:9555 with SMTP id 6a1803df08f44-6a1514374bemr63898186d6.16.1715261400783;
-        Thu, 09 May 2024 06:30:00 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f1d7040sm6828186d6.107.2024.05.09.06.29.59
+        d=1e100.net; s=20230601; t=1715261521; x=1715866321;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=70d8HmBhBsVnOVGM9dBLiSdBfBSq7HfimZSV/5XPOsY=;
+        b=br12/8BUJzwnn6/f81eGL8axUbYjINHWT7do6zg4b1PraVXNUpfoF49DnVBVxEGOlK
+         +FG4PIqmqnYk0QNTkyJPzeH/FzxxlkIV64hpqT1eHbXocGdg09I9w1ZnxpkWbekf8nad
+         /fYf/KDutkoSebNofaB3RSQuBIHqngKPwVNbGT8XVLrZF5mL0r9qZZwAi/ZCBOz1x++h
+         9O45b5VzG41a9nQp9dJaMbdhU/vKvUvUmO3Q6lO1XfhScrL72no5g40+/ebZfE/aRcVf
+         SgYX5/hjZAtLdTBZgiaSA/z48GLEkBJoicL/SCQrrEFD76AjG+OLMm3yiMunN05s9x7t
+         CgYw==
+X-Gm-Message-State: AOJu0YzYrJBWuj47C9wytF69n/5WBOUNfJ6eXvquEcWWGNbazG+k/NPg
+	1gcUAPFzyeV84uS8uSVgEficRqFJQ1L+NcxHL5Gctqyu/29RhyfxFtooO0H1evc=
+X-Google-Smtp-Source: AGHT+IF5XnRKnh+zxxiQWj046SakVClKzAm5n/VwxuaCxO5rFmV2zyz0T1mPR2yDxRk1wD0FiW+FfQ==
+X-Received: by 2002:a05:600c:1d05:b0:418:d3f4:677b with SMTP id 5b1f17b1804b1-41fbce7ddc9mr23119235e9.17.1715261520556;
+        Thu, 09 May 2024 06:32:00 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccce9426sm26020195e9.25.2024.05.09.06.31.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 06:30:00 -0700 (PDT)
-Date: Thu, 09 May 2024 09:29:59 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Andrew Halaney <ahalaney@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Martin KaFai Lau <martin.lau@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- bpf <bpf@vger.kernel.org>
-Cc: kernel@quicinc.com
-Message-ID: <663ccfd7bc17d_12691429452@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240508215842.2449798-2-quic_abchauha@quicinc.com>
-References: <20240508215842.2449798-1-quic_abchauha@quicinc.com>
- <20240508215842.2449798-2-quic_abchauha@quicinc.com>
-Subject: Re: [RFC PATCH bpf-next v7 1/3] net: Rename mono_delivery_time to
- tstamp_type for scalabilty
+        Thu, 09 May 2024 06:32:00 -0700 (PDT)
+Date: Thu, 9 May 2024 15:31:56 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com
+Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
+Message-ID: <ZjzQTFq5lJIoeSqM@nanopsycho.orion>
+References: <20240509114615.317450-1-jiri@resnulli.us>
+ <20240509084050-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240509084050-mutt-send-email-mst@kernel.org>
 
-Abhishek Chauhan wrote:
-> mono_delivery_time was added to check if skb->tstamp has delivery
-> time in mono clock base (i.e. EDT) otherwise skb->tstamp has
-> timestamp in ingress and delivery_time at egress.
-> 
-> Renaming the bitfield from mono_delivery_time to tstamp_type is for
-> extensibilty for other timestamps such as userspace timestamp
-> (i.e. SO_TXTIME) set via sock opts.
-> 
-> As we are renaming the mono_delivery_time to tstamp_type, it makes
-> sense to start assigning tstamp_type based on enum defined
-> in this commit.
-> 
-> Earlier we used bool arg flag to check if the tstamp is mono in
-> function skb_set_delivery_time, Now the signature of the functions
-> accepts tstamp_type to distinguish between mono and real time.
-> 
-> Also skb_set_delivery_type_by_clockid is a new function which accepts
-> clockid to determine the tstamp_type.
-> 
-> In future tstamp_type:1 can be extended to support userspace timestamp
-> by increasing the bitfield.
-> 
-> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
-> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+Thu, May 09, 2024 at 02:41:39PM CEST, mst@redhat.com wrote:
+>On Thu, May 09, 2024 at 01:46:15PM +0200, Jiri Pirko wrote:
+>> From: Jiri Pirko <jiri@nvidia.com>
+>> 
+>> Add support for Byte Queue Limits (BQL).
+>> 
+>> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>
+>Can we get more detail on the benefits you observe etc?
+>Thanks!
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+More info about the BQL in general is here:
+https://lwn.net/Articles/469652/
+
 
