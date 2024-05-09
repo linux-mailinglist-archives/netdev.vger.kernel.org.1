@@ -1,144 +1,92 @@
-Return-Path: <netdev+bounces-94854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3E998C0DE5
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 11:59:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 660358C0DEC
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 12:01:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FF6E283ACE
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 09:59:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCAA2B20B17
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92BA14AD26;
-	Thu,  9 May 2024 09:59:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE5F14AD1B;
+	Thu,  9 May 2024 10:01:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A95F14AD1A;
-	Thu,  9 May 2024 09:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CF714A600;
+	Thu,  9 May 2024 10:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715248774; cv=none; b=kLPMb/V+EMG+3KEavF+f8NgvHQ6hw4l9W6NuRm7s8xSCb4valSUDV/JGDyUU1wiKCWDBFCEWqNZaDjegG7X7ZuuI0Um4OGafPJQCxA2A4h/J6eb6ahtVqlgrZnwjdqbdYo+iQ1FcGo2ZdtuieCh7kSpHbc3mrnU5fSvffTKtexs=
+	t=1715248866; cv=none; b=Te9K6JV4zg9Jm33/6clEBGeVUF3GVQ5r9A3OlIkYeIir9F1wjbHvsnG6S1eKsUemQJ2Yw9XzNLmMPAZNtfMn+4zofuG7QVE++4f8ANuT4gN2849ADuL65d9VnckydSPAIKNRcEc0crWM9SApXo2JNSzD8nfS8E5tOu6XRyddenM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715248774; c=relaxed/simple;
-	bh=dtQ5WtrGDhIWgT1qeZF8014MTF0JeO8/hPqjUWcHDGY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DHd44pzcD+A+i5/wl2GdIW/Z1RMA0wAhi38l8AvfKC65aOIuDNQaU/xV3ifyGD37rgEXV4eSnK6CLVPp79m+Qnmis0O/SqbC5abtbeBs32wsqZiGddoOWiIWyznwYJ831R+lrqpreKCzg0HiWvoNGutFoZWvzniXUU1zuRqvwZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4499x4Jd91475338, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 4499x4Jd91475338
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 9 May 2024 17:59:04 +0800
-Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 9 May 2024 17:59:04 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 9 May 2024 17:59:04 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
- RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
- 15.01.2507.035; Thu, 9 May 2024 17:59:04 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "andrew@lunn.ch" <andrew@lunn.ch>,
-        "jiri@resnulli.us" <jiri@resnulli.us>,
-        "horms@kernel.org" <horms@kernel.org>,
-        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v18 02/13] rtase: Implement the .ndo_open function
-Thread-Topic: [PATCH net-next v18 02/13] rtase: Implement the .ndo_open
- function
-Thread-Index: AQHaoUT5RWh4TO7cuUeh1vkT8i8o3LGN87+AgACfZICAAApUsIAADPfg
-Date: Thu, 9 May 2024 09:59:04 +0000
-Message-ID: <feeecf2edbe54d999b09068718e9c8b5@realtek.com>
-References: <20240508123945.201524-1-justinlai0215@realtek.com>
- <20240508123945.201524-3-justinlai0215@realtek.com>
- <20240509065747.GB1077013@maili.marvell.com>
- <9267c5002e444000bb21e8eef4d4dc07@realtek.com>
- <MWHPR1801MB19187C10FEBB29BDACE499B1D3E62@MWHPR1801MB1918.namprd18.prod.outlook.com>
-In-Reply-To: <MWHPR1801MB19187C10FEBB29BDACE499B1D3E62@MWHPR1801MB1918.namprd18.prod.outlook.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1715248866; c=relaxed/simple;
+	bh=08JimUmQRxTjn4B+q3auuFtqKI5+6brRqqK5PHYKf7Y=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=NpRz1NssUTt4kKFOzBfhaZLb88NioEfz163TTRNWNal+8LMLxT3r5SGHbq6uxV+u+dKmeZfHt1Jg0a9vgZV1uP1ghAdeAO4wn14Bipg4TX1OMufteZ3ks1HHLgQoSJu8i8x896CZyBN77JW70jYJIqkOJsijTxzI8BBnRY11zh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1s50a2-000000006oK-40ff;
+	Thu, 09 May 2024 10:00:51 +0000
+Date: Thu, 9 May 2024 11:00:42 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Woudstra <ericwouds@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] net: phy: air_en8811h: reset netdev rules when
+ LED is set manually
+Message-ID: <5ed8ea615890a91fa4df59a7ae8311bbdf63cdcf.1715248281.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
->=20
-> > From: Justin Lai <justinlai0215@realtek.com>
-> > Sent: Thursday, May 9, 2024 2:29 PM
-> > > > +
-> > > > +     /* rx and tx descriptors needs 256 bytes alignment.
-> > > > +      * dma_alloc_coherent provides more.
-> > > > +      */
-> > > > +     for (i =3D 0; i < tp->func_tx_queue_num; i++) {
-> > > > +             tp->tx_ring[i].desc =3D
-> > > > +                             dma_alloc_coherent(&pdev->dev,
-> > > > +
-> > > RTASE_TX_RING_DESC_SIZE,
-> > > > +
-> > > &tp->tx_ring[i].phy_addr,
-> > > > +
-> GFP_KERNEL);
-> > > > +             if (!tp->tx_ring[i].desc)
-> > > You have handled errors gracefully very where else. why not here ?
-> >
-> > I would like to ask you, are you referring to other places where there
-> > are error description messages, but not here?
-> other functions, you are freeing allocated resources in case of failure, =
-but here,
-> you are returning error directly.
->=20
-After returning the error, I will do the corresponding error handling in rt=
-ase_open.
-.
->=20
-> > > Did you mark the skb for recycle ? Hmm ... did i miss to find the cod=
-e ?
-> > >
-> > We have done this part when using the skb and before finally releasing
-> > the skb resource. Do you think it would be better to do this part of
-> > the process when allocating the skb?
-> i think, you added skb_for_recycle() in the following patch. Sorry I miss=
-ed it .
-> ignore my comment.
->=20
+Setting LED_OFF via brightness_set should deactivate hw control, so make
+sure netdev trigger rules also get cleared in that case.
+This fixes unwanted restoration of the default netdev trigger rules and
+matches the behaviour when using the 'netdev' trigger without any
+hardware offloading.
 
-OK, thank you for your feedback.
+Fixes: 71e79430117d ("net: phy: air_en8811h: Add the Airoha EN8811H PHY driver")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+v2: send to net-next instead of net tree because driver is present only
+    in net-next tree. Improve commit description while at it.
 
-> >
-> > > > +
-> > > > +err_free_all_allocated_irq:
-> > > You are allocating from i =3D 1, but freeing from j =3D 0;
-> >
-> > Hi Ratheesh,
-> > I have done request_irq() once before the for loop, so there should be
-> > no problem starting free from j=3D0 here.
-> Thanks for pointing out.
+ drivers/net/phy/air_en8811h.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Thank you also for your review.
+diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
+index 4c9a1c9c805e..3cdc8c6b30b6 100644
+--- a/drivers/net/phy/air_en8811h.c
++++ b/drivers/net/phy/air_en8811h.c
+@@ -544,6 +544,10 @@ static int air_hw_led_on_set(struct phy_device *phydev, u8 index, bool on)
+ 
+ 	changed |= (priv->led[index].rules != 0);
+ 
++	/* clear netdev trigger rules in case LED_OFF has been set */
++	if (!on)
++		priv->led[index].rules = 0;
++
+ 	if (changed)
+ 		return phy_modify_mmd(phydev, MDIO_MMD_VEND2,
+ 				      AIR_PHY_LED_ON(index),
+-- 
+2.45.0
 
 
