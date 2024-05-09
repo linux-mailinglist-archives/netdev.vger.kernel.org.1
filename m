@@ -1,237 +1,355 @@
-Return-Path: <netdev+bounces-94829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-94830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 663938C0CF0
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:57:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 387058C0CF8
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 10:59:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBCBD1F22420
-	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:57:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 644BD1C20F16
+	for <lists+netdev@lfdr.de>; Thu,  9 May 2024 08:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B3514A085;
-	Thu,  9 May 2024 08:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED92C14A0A3;
+	Thu,  9 May 2024 08:59:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9931127E1F
-	for <netdev@vger.kernel.org>; Thu,  9 May 2024 08:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31412149C6C;
+	Thu,  9 May 2024 08:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715245073; cv=none; b=GEokoLy3H130gBlHPlt6NBZH+ESg9G8YaDZSET5SyszTq30wZ1ME+7H8WXdGzB20FNIMVD3J9lJn9wHck6Szv0UjPgnKojYXRxtewmhwD3VEOGa+kjhbZAQuF4zWwQbt9NTrOj38phfb4IVpVlvJtKp8sRPUPO1QklaJvlcnNUQ=
+	t=1715245153; cv=none; b=PDzDOm4mzJ7Ej5PtIveBC6dcTc4cctA5T0nyVlN/1AsZHWVCwj6tucouvFPBBIMzsMPyK751hNshCQy/Jcob+PLJFZU3rdBo4ILKW/3B+EMFR5dRuhZeb4KHoVZtvjkeojINBGKRGnFwV/91msbo/eGYAhGUGZN/0Mn8rDXIKdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715245073; c=relaxed/simple;
-	bh=D2iDzNdeQWHB0QtXMopxQRRdVMqhh5gKID1na6iNNFw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=teLHNM8KuFA/+5MjofzskLEoRz1UKzIVk7y9QueoXd9Ej+9xQ/3KkV3bavY0siMvcpWvKsz/49ogp4T3nFt564895NoogdfTORUONnrfHeHcqCP5KyynpjVOcv6W+rHCyzZHYe4+jUWZh/FdsqyWVqAcLK65H6P0Nk0PHyGKnHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.112.218])
-	by gateway (Coremail) with SMTP id _____8Cxg+oMkDxmyegJAA--.13698S3;
-	Thu, 09 May 2024 16:57:48 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.112.218])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxjlcIkDxmR+0WAA--.38711S3;
-	Thu, 09 May 2024 16:57:45 +0800 (CST)
-Message-ID: <7b56eabc-53e1-4fbe-bf92-81bb1c91ddfc@loongson.cn>
-Date: Thu, 9 May 2024 16:57:44 +0800
+	s=arc-20240116; t=1715245153; c=relaxed/simple;
+	bh=koXkkXyo2fXKNsIgVU44WH/LgBvHigRvyRRFKn2RO50=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=hJOIgogxdo0FqaP7LILKsPJIUEjPPmmdaOTB2a0KpgBmkbffypc3whxIwHARDZB4OOMaLI/RwR8pJpR7dbUM78tCqyu3zPRDZInQWiFF0j9EdkL33LuNqIhJNkRUQjpeGB6mn+o4aaLUgonjUlc2uz3D7Y/Ojf61oILIwjcrPyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4498wcfA71418763, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 4498wcfA71418763
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 9 May 2024 16:58:38 +0800
+Received: from RTEXMBS02.realtek.com.tw (172.21.6.95) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 9 May 2024 16:58:38 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS02.realtek.com.tw (172.21.6.95) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 9 May 2024 16:58:37 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Thu, 9 May 2024 16:58:37 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "andrew@lunn.ch" <andrew@lunn.ch>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org" <horms@kernel.org>,
+        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v18 02/13] rtase: Implement the .ndo_open function
+Thread-Topic: [PATCH net-next v18 02/13] rtase: Implement the .ndo_open
+ function
+Thread-Index: AQHaoUT5RWh4TO7cuUeh1vkT8i8o3LGN87+AgACfZIA=
+Date: Thu, 9 May 2024 08:58:37 +0000
+Message-ID: <9267c5002e444000bb21e8eef4d4dc07@realtek.com>
+References: <20240508123945.201524-1-justinlai0215@realtek.com>
+ <20240508123945.201524-3-justinlai0215@realtek.com>
+ <20240509065747.GB1077013@maili.marvell.com>
+In-Reply-To: <20240509065747.GB1077013@maili.marvell.com>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS02.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 13/15] net: stmmac: dwmac-loongson: Add
- Loongson GNET support
-To: Serge Semin <fancer.lancer@gmail.com>, Huacai Chen <chenhuacai@kernel.org>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- linux@armlinux.org.uk, guyinggang@loongson.cn, netdev@vger.kernel.org,
- chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-References: <cover.1714046812.git.siyanteng@loongson.cn>
- <c97cb15ab77fb9dfdd281640f48dcfc08c6988c0.1714046812.git.siyanteng@loongson.cn>
- <jkjgjraqvih4zu7wvqykerq5wisgkhqf2n2pouha7qhfoeif7v@tkwyx53dfrdw>
- <150b03ff-70b5-488a-b5e6-5f74b6398b20@loongson.cn>
- <pdyqoki5qw4zabz3uv5ff2e2o43htcr6xame652zmbqh23tjji@lt5gmp6m3lkm>
- <CAAhV-H7Dz0CVysUVVVe4Y8qGxpmwJ0i6y2wKnATzNS=5DR_vZg@mail.gmail.com>
- <tbjruh7sx7zovj4ypvfmer3tkgp63zrwhsaxj6hpcfc7ljaqes@zyd3acrqchik>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <tbjruh7sx7zovj4ypvfmer3tkgp63zrwhsaxj6hpcfc7ljaqes@zyd3acrqchik>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxjlcIkDxmR+0WAA--.38711S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3GrWfJw45GFykAF47uFWkKrX_yoWxJry3pr
-	WfCFW7KrW5Jry3GF1qvw4jqrnIyrWUtr48Xr15tw18Cw1qyr17tFy8J3yjkr97CrWDCF1U
-	ZF4UtF47uF98JFgCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
-	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU4SoGDUUUU
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-Hi Serge
+>=20
+> On 2024-05-08 at 18:09:34, Justin Lai (justinlai0215@realtek.com) wrote:
+> >
+> > +static int rtase_alloc_desc(struct rtase_private *tp) {
+> > +     struct pci_dev *pdev =3D tp->pdev;
+> > +     u32 i;
+> > +
+> > +     /* rx and tx descriptors needs 256 bytes alignment.
+> > +      * dma_alloc_coherent provides more.
+> > +      */
+> > +     for (i =3D 0; i < tp->func_tx_queue_num; i++) {
+> > +             tp->tx_ring[i].desc =3D
+> > +                             dma_alloc_coherent(&pdev->dev,
+> > +
+> RTASE_TX_RING_DESC_SIZE,
+> > +
+> &tp->tx_ring[i].phy_addr,
+> > +                                                GFP_KERNEL);
+> > +             if (!tp->tx_ring[i].desc)
+> You have handled errors gracefully very where else. why not here ?
 
-在 2024/5/8 23:10, Serge Semin 写道:
-> On Wed, May 08, 2024 at 10:58:16PM +0800, Huacai Chen wrote:
->> Hi, Serge,
->>
->> On Wed, May 8, 2024 at 10:38 PM Serge Semin<fancer.lancer@gmail.com>  wrote:
->>> On Tue, May 07, 2024 at 09:35:24PM +0800, Yanteng Si wrote:
->>>> Hi Serge,
->>>>
->>>> 在 2024/5/6 18:39, Serge Semin 写道:
->>>>> On Thu, Apr 25, 2024 at 09:11:36PM +0800, Yanteng Si wrote:
->>>>>> ...
->>>>>> +static int loongson_dwmac_config_msi(struct pci_dev *pdev,
->>>>>> +                              struct plat_stmmacenet_data *plat,
->>>>>> +                              struct stmmac_resources *res,
->>>>>> +                              struct device_node *np)
->>>>>> +{
->>>>>> + int i, ret, vecs;
->>>>>> +
->>>>>> + vecs = roundup_pow_of_two(CHANNEL_NUM * 2 + 1);
->>>>>> + ret = pci_alloc_irq_vectors(pdev, vecs, vecs, PCI_IRQ_MSI);
->>>>>> + if (ret < 0) {
->>>>>> +         dev_info(&pdev->dev,
->>>>>> +                  "MSI enable failed, Fallback to legacy interrupt\n");
->>>>>> +         return loongson_dwmac_config_legacy(pdev, plat, res, np);
->>>>>> + }
->>>>>> +
->>>>>> + res->irq = pci_irq_vector(pdev, 0);
->>>>>> + res->wol_irq = 0;
->>>>>> +
->>>>>> + /* INT NAME | MAC | CH7 rx | CH7 tx | ... | CH0 rx | CH0 tx |
->>>>>> +  * --------- ----- -------- --------  ...  -------- --------
->>>>>> +  * IRQ NUM  |  0  |   1    |   2    | ... |   15   |   16   |
->>>>>> +  */
->>>>>> + for (i = 0; i < CHANNEL_NUM; i++) {
->>>>>> +         res->rx_irq[CHANNEL_NUM - 1 - i] =
->>>>>> +                 pci_irq_vector(pdev, 1 + i * 2);
->>>>>> +         res->tx_irq[CHANNEL_NUM - 1 - i] =
->>>>>> +                 pci_irq_vector(pdev, 2 + i * 2);
->>>>>> + }
->>>>>> +
->>>>>> + plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
->>>>>> +
->>>>>> + return 0;
->>>>>> +}
->>>>>> +
->>>>>> ...
->>>>>>    static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->>>>>>    {
->>>>>>            struct plat_stmmacenet_data *plat;
->>>>>>            int ret, i, bus_id, phy_mode;
->>>>>>            struct stmmac_pci_info *info;
->>>>>>            struct stmmac_resources res;
->>>>>> + struct loongson_data *ld;
->>>>>>            struct device_node *np;
->>>>>>            np = dev_of_node(&pdev->dev);
->>>>>> @@ -122,10 +460,12 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->>>>>>                    return -ENOMEM;
->>>>>>            plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
->>>>>> - if (!plat->dma_cfg) {
->>>>>> -         ret = -ENOMEM;
->>>>>> -         goto err_put_node;
->>>>>> - }
->>>>>> + if (!plat->dma_cfg)
->>>>>> +         return -ENOMEM;
->>>>>> +
->>>>>> + ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
->>>>>> + if (!ld)
->>>>>> +         return -ENOMEM;
->>>>>>            /* Enable pci device */
->>>>>>            ret = pci_enable_device(pdev);
->>>>>> @@ -171,14 +511,34 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->>>>>>                    plat->phy_interface = phy_mode;
->>>>>>            }
->>>>>> - pci_enable_msi(pdev);
->>>>>> + plat->bsp_priv = ld;
->>>>>> + plat->setup = loongson_dwmac_setup;
->>>>>> + ld->dev = &pdev->dev;
->>>>>> +
->>>>>>            memset(&res, 0, sizeof(res));
->>>>>>            res.addr = pcim_iomap_table(pdev)[0];
->>>>>> + ld->gmac_verion = readl(res.addr + GMAC_VERSION) & 0xff;
->>>>>> +
->>>>>> + switch (ld->gmac_verion) {
->>>>>> + case LOONGSON_DWMAC_CORE_1_00:
->>>>>> +         plat->rx_queues_to_use = CHANNEL_NUM;
->>>>>> +         plat->tx_queues_to_use = CHANNEL_NUM;
->>>>>> +
->>>>>> +         /* Only channel 0 supports checksum,
->>>>>> +          * so turn off checksum to enable multiple channels.
->>>>>> +          */
->>>>>> +         for (i = 1; i < CHANNEL_NUM; i++)
->>>>>> +                 plat->tx_queues_cfg[i].coe_unsupported = 1;
->>>>>> - plat->tx_queues_to_use = 1;
->>>>>> - plat->rx_queues_to_use = 1;
->>>>>> +         ret = loongson_dwmac_config_msi(pdev, plat, &res, np);
->>>>>> +         break;
->>>>>> + default:        /* 0x35 device and 0x37 device. */
->>>>>> +         plat->tx_queues_to_use = 1;
->>>>>> +         plat->rx_queues_to_use = 1;
->>>>>> - ret = loongson_dwmac_config_legacy(pdev, plat, &res, np);
->>>>>> +         ret = loongson_dwmac_config_legacy(pdev, plat, &res, np);
->>>>>> +         break;
->>>>>> + }
->>>>> Let's now talk about this change.
->>>>>
->>>>> First of all, one more time. You can't miss the return value check
->>>>> because if any of the IRQ config method fails then the driver won't
->>>>> work! The first change that introduces the problem is in the patch
->>>>> [PATCH net-next v12 11/15] net: stmmac: dwmac-loongson: Add loongson_dwmac_config_legacy
->>>> OK!
->>>>> Second, as I already mentioned in another message sent to this patch
->>>>> you are missing the PCI MSI IRQs freeing in the cleanup-on-error path
->>>>> and in the device/driver remove() function. It's definitely wrong.
->>>> You are right! I will do it.
->>>>> Thirdly, you said that the node-pointer is now optional and introduced
->>>>> the patch
->>>>> [PATCH net-next v12 10/15] net: stmmac: dwmac-loongson: Add full PCI support
->>>>> If so and the DT-based setting up isn't mandatory then I would
->>>>> suggest to proceed with the entire so called legacy setups only if the
->>>>> node-pointer has been found, otherwise the pure PCI-based setup would
->>>>> be performed. So the patches 10-13 (in your v12 order) would look
->>>> In this case, MSI will not be enabled when the node-pointer is found.
->>>>
->>>> .
->>>>
->>>>
->>>> In fact, a large fraction of 2k devices are DT-based, of course, many are
->>>> PCI-based.
->>> Then please summarise which devices need the DT-node pointer which
->>> don't? And most importantly if they do why do they need the DT-node?
->> Whether we need DT-nodes doesn't depend on device type, but depends on
->> the BIOS type. When we boot with UEFI+ACPI, we don't need DT-node,
->> when we boot with PMON+FDT, we need DT-node. Loongson machines may
->> have either BIOS types.
-> Thanks for the answer. Just to fully clarify. Does it mean that all
-> Loongson Ethernet controllers (Loongson GNET and GMAC) are able to
-> deliver both PCI MSI IRQs and direct GIC IRQs (so called legacy)?
+I would like to ask you, are you referring to other places where there are
+error description messages, but not here?
 
-No, only devices that support multiple channels can deliver both PCI MSI 
-IRQs
+> > +                     return -ENOMEM;
+> > +     }
+> > +
+> > +     for (i =3D 0; i < tp->func_rx_queue_num; i++) {
+> > +             tp->rx_ring[i].desc =3D
+> > +                             dma_alloc_coherent(&pdev->dev,
+> > +
+> RTASE_RX_RING_DESC_SIZE,
+> > +
+> &tp->rx_ring[i].phy_addr,
+> > +                                                GFP_KERNEL);
+> > +             if (!tp->rx_ring[i].desc)
+> > +                     return -ENOMEM;
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static void rtase_free_desc(struct rtase_private *tp) {
+> > +     struct pci_dev *pdev =3D tp->pdev;
+> > +     u32 i;
+> > +
+> > +     for (i =3D 0; i < tp->func_tx_queue_num; i++) {
+> > +             if (!tp->tx_ring[i].desc)
+> > +                     continue;
+> > +
+> > +             dma_free_coherent(&pdev->dev,
+> RTASE_TX_RING_DESC_SIZE,
+> > +                               tp->tx_ring[i].desc,
+> > +                               tp->tx_ring[i].phy_addr);
+> > +             tp->tx_ring[i].desc =3D NULL;
+> > +     }
+> > +
+> > +     for (i =3D 0; i < tp->func_rx_queue_num; i++) {
+> > +             if (!tp->rx_ring[i].desc)
+> > +                     continue;
+> > +
+> > +             dma_free_coherent(&pdev->dev,
+> RTASE_RX_RING_DESC_SIZE,
+> > +                               tp->rx_ring[i].desc,
+> > +                               tp->rx_ring[i].phy_addr);
+> > +             tp->rx_ring[i].desc =3D NULL;
+> > +     }
+> > +}
+> > +
+> > +static void rtase_mark_to_asic(union rtase_rx_desc *desc, u32
+> > +rx_buf_sz) {
+> > +     u32 eor =3D le32_to_cpu(desc->desc_cmd.opts1) & RTASE_RING_END;
+> > +
+> > +     desc->desc_status.opts2 =3D 0;
+> desc->desc_cmd.addr to be written before desc->desc_status.opts2 ? Just
+> desc->a question
+> whether below dma_wmb() suffice for both ?
 
-and direct GIC IRQs, other devices can only deliver GIC IRQs.
+Thank you for your suggestion, this seems feasible,
+I will modify it again.
 
-Furthermore, multiple channel features are bundled with MSI. If we want to
+> > +     /* force memory writes to complete before releasing descriptor */
+> > +     dma_wmb();
+> > +     WRITE_ONCE(desc->desc_cmd.opts1,
+> > +                cpu_to_le32(RTASE_DESC_OWN | eor | rx_buf_sz)); }
+> > +
+> > +static void rtase_tx_desc_init(struct rtase_private *tp, u16 idx) {
+> > +     struct rtase_ring *ring =3D &tp->tx_ring[idx];
+> > +     struct rtase_tx_desc *desc;
+> > +     u32 i;
+> > +
+> > +     memset(ring->desc, 0x0, RTASE_TX_RING_DESC_SIZE);
+> > +     memset(ring->skbuff, 0x0, sizeof(ring->skbuff));
+> > +     ring->cur_idx =3D 0;
+> > +     ring->dirty_idx =3D 0;
+> > +     ring->index =3D idx;
+> > +
+> > +     for (i =3D 0; i < RTASE_NUM_DESC; i++) {
+> > +             ring->mis.len[i] =3D 0;
+> > +             if ((RTASE_NUM_DESC - 1) =3D=3D i) {
+> > +                     desc =3D ring->desc + sizeof(struct rtase_tx_desc=
+) *
+> i;
+> > +                     desc->opts1 =3D cpu_to_le32(RTASE_RING_END);
+> > +             }
+> > +     }
+> > +
+> > +     ring->ring_handler =3D tx_handler;
+> > +     if (idx < 4) {
+> > +             ring->ivec =3D &tp->int_vector[idx];
+> > +             list_add_tail(&ring->ring_entry,
+> > +                           &tp->int_vector[idx].ring_list);
+> > +     } else {
+> > +             ring->ivec =3D &tp->int_vector[0];
+> > +             list_add_tail(&ring->ring_entry,
+> &tp->int_vector[0].ring_list);
+> > +     }
+> > +}
+> > +
+> > +static void rtase_map_to_asic(union rtase_rx_desc *desc, dma_addr_t
+> mapping,
+> > +                           u32 rx_buf_sz) {
+> > +     desc->desc_cmd.addr =3D cpu_to_le64(mapping);
+> > +     /* make sure the physical address has been updated */
+> > +     wmb();
+> why not dma_wmb();
 
-enable multiple channels, we must enable MSI.
+dma_wmb() is already done in rtase_mark_to_asic(), so I will remove wmb().
 
-Thanks,
+> > +     rtase_mark_to_asic(desc, rx_buf_sz); }
+> > +
+> > +static void rtase_make_unusable_by_asic(union rtase_rx_desc *desc) {
+> > +     desc->desc_cmd.addr =3D cpu_to_le64(RTK_MAGIC_NUMBER);
+> > +     desc->desc_cmd.opts1 &=3D ~cpu_to_le32(RTASE_DESC_OWN |
+> > +RSVD_MASK); }
+> > +
+> > +static int rtase_alloc_rx_skb(const struct rtase_ring *ring,
+> > +                           struct sk_buff **p_sk_buff,
+> > +                           union rtase_rx_desc *desc,
+> > +                           dma_addr_t *rx_phy_addr, u8 in_intr) {
+> > +     struct rtase_int_vector *ivec =3D ring->ivec;
+> > +     const struct rtase_private *tp =3D ivec->tp;
+> > +     struct sk_buff *skb =3D NULL;
+> > +     dma_addr_t mapping;
+> > +     struct page *page;
+> > +     void *buf_addr;
+> > +     int ret =3D 0;
+> > +
+> > +     page =3D page_pool_dev_alloc_pages(tp->page_pool);
+> > +     if (!page) {
+> > +             netdev_err(tp->dev, "failed to alloc page\n");
+> > +             goto err_out;
+> > +     }
+> > +
+> > +     buf_addr =3D page_address(page);
+> > +     mapping =3D page_pool_get_dma_addr(page);
+> > +
+> > +     skb =3D build_skb(buf_addr, PAGE_SIZE);
+> > +     if (!skb) {
+> > +             page_pool_put_full_page(tp->page_pool, page, true);
+> > +             netdev_err(tp->dev, "failed to build skb\n");
+> > +             goto err_out;
+> > +     }
+> Did you mark the skb for recycle ? Hmm ... did i miss to find the code ?
+>=20
+We have done this part when using the skb and before finally releasing
+the skb resource. Do you think it would be better to do this part of the
+process when allocating the skb?
 
-Yanteng
+> > +
+> > +     *p_sk_buff =3D skb;
+> > +     *rx_phy_addr =3D mapping;
+> > +     rtase_map_to_asic(desc, mapping, tp->rx_buf_sz);
+> > +
+> > +     return ret;
+> > +
+> > +err_out:
+> > +     if (skb)
+> > +             dev_kfree_skb(skb);
+> > +
+> > +     ret =3D -ENOMEM;
+> > +     rtase_make_unusable_by_asic(desc);
+> > +
+> > +     return ret;
+> > +}
+> > +
+> > +
+> > +
+> > +static int rtase_open(struct net_device *dev) {
+> > +     struct rtase_private *tp =3D netdev_priv(dev);
+> > +     const struct pci_dev *pdev =3D tp->pdev;
+> > +     struct rtase_int_vector *ivec;
+> > +     u16 i =3D 0, j;
+> > +     int ret;
+> > +
+> > +     ivec =3D &tp->int_vector[0];
+> > +     tp->rx_buf_sz =3D RTASE_RX_BUF_SIZE;
+> > +
+> > +     ret =3D rtase_alloc_desc(tp);
+> > +     if (ret)
+> > +             goto err_free_all_allocated_mem;
+> > +
+> > +     ret =3D rtase_init_ring(dev);
+> > +     if (ret)
+> > +             goto err_free_all_allocated_mem;
+> > +
+> > +     rtase_hw_config(dev);
+> > +
+> > +     if (tp->sw_flag & RTASE_SWF_MSIX_ENABLED) {
+> > +             ret =3D request_irq(ivec->irq, rtase_interrupt, 0,
+> > +                               dev->name, ivec);
+> > +             if (ret)
+> > +                     goto err_free_all_allocated_irq;
+> > +
+> > +             /* request other interrupts to handle multiqueue */
+> > +             for (i =3D 1; i < tp->int_nums; i++) {
+> > +                     ivec =3D &tp->int_vector[i];
+> > +                     snprintf(ivec->name, sizeof(ivec->name),
+> "%s_int%i",
+> > +                              tp->dev->name, i);
+> > +                     ret =3D request_irq(ivec->irq, rtase_q_interrupt,=
+ 0,
+> > +                                       ivec->name, ivec);
+> > +                     if (ret)
+> > +                             goto err_free_all_allocated_irq;
+> > +             }
+> > +     } else {
+> > +             ret =3D request_irq(pdev->irq, rtase_interrupt, 0, dev->n=
+ame,
+> > +                               ivec);
+> > +             if (ret)
+> > +                     goto err_free_all_allocated_mem;
+> > +     }
+> > +
+> > +     rtase_hw_start(dev);
+> > +
+> > +     for (i =3D 0; i < tp->int_nums; i++) {
+> > +             ivec =3D &tp->int_vector[i];
+> > +             napi_enable(&ivec->napi);
+> > +     }
+> > +
+> > +     netif_carrier_on(dev);
+> > +     netif_wake_queue(dev);
+> > +
+> > +     return 0;
+> > +
+> > +err_free_all_allocated_irq:
+> You are allocating from i =3D 1, but freeing from j =3D 0;
 
+Hi Ratheesh,
+I have done request_irq() once before the for loop,
+so there should be no problem starting free from j=3D0 here.
+
+> > +     for (j =3D 0; j < i; j++)
+> > +             free_irq(tp->int_vector[j].irq, &tp->int_vector[j]);
+> > +
+> > +err_free_all_allocated_mem:
+> > +     rtase_free_desc(tp);
+> > +
+> > +     return ret;
+> > +}
+> > +
+> >
 
