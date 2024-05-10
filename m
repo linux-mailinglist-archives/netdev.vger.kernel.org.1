@@ -1,97 +1,153 @@
-Return-Path: <netdev+bounces-95400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 896358C22A9
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:03:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E1208C22A7
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9D8D1C20D3A
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:03:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6793C1C20AB7
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:02:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6778A16C6A9;
-	Fri, 10 May 2024 11:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F15C16C844;
+	Fri, 10 May 2024 11:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pjPn21al"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AWNDpV7u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4248F16ABC3
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 11:02:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD8F16ABC3
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 11:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715338978; cv=none; b=j8kb6Yu0fz762A0g7MSVwsdFC0rDvVnctbwshMeJS+9EMArzukFvHywZux1xqD88BsIp1kFc8PISiQ9G1Pyw+Vq+tl4zkajuBv8ZKnX5qmZLfs/XbY0sKig/meMRyn9Q3iC9FHWfbvfLu6j8Lz6CTlBQTs2/A++O6mnWb/uyh90=
+	t=1715338950; cv=none; b=EGS8+ePV8abFuTk++igDzVNhIaM96LwTsf+7c/jCuxQeT6I9cziBp2AeUGQGV1DMTFhFD2ZlNq3vZGyIF3xJpdLVLx7T/vqr2rXaXFoOVv90vvi1Wej7uy53W46PHcGbmgjUXM0mVx7HdfS4nYbgzLUbRQNhattMm7RNL5pW0wU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715338978; c=relaxed/simple;
-	bh=7ci1fi03lER3M3a1LyWlHm8KKCSQMYM3V05XcAPPy1A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fVyrFRghEyN+z5zNCYjWSxGIKRzsSFu/zOwJBRIme7DmUBw4UtHMytGHzmnsgqBBmo1ouUepWwXjxsCFFjGP22MYD+rNxtIb5dtYVirbtGqgv9iO25ijKmAkWY9WEjJI+FHLZaBecRWw/Qk8OKMSfPGZZg7D1/2CYZxUp3Sbqa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pjPn21al; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7E49C2BD11;
-	Fri, 10 May 2024 11:02:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715338977;
-	bh=7ci1fi03lER3M3a1LyWlHm8KKCSQMYM3V05XcAPPy1A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pjPn21aloWccCKcZ/MWF7bTwo0cjFhTBSQAy3TjoKNpuB2a5UhmyWSGj+zKgc4ldd
-	 zCgdRikeXXCDgJ6Ww4oj+G132XJ1StDsbebiHCBA1+ThiK5Q7V5I9SYnzb7ahnYktl
-	 yIOSdyMZqZGQaF4r9ZEd9aNdrSDPJ1QScmR1w5Ky3x/ccIduN2s8lqJXLcuSrTzt2N
-	 HFFCPi0OJwHIgsPXAiWjehvHtme03XAtr4rkp3E++72jzi13XpMfsOLospcQL9keHX
-	 FDMnkE7VWzCUA+EjLMqT0MdkToincCpfBLaHjrcipKFV31I8usAdEFRFgaKCk4WxYR
-	 0yNn0pRhgRs4w==
-Date: Fri, 10 May 2024 12:02:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Hui Wang <hui.wang@canonical.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	kuba@kernel.org, anthony.l.nguyen@intel.com,
-	vitaly.lifshits@intel.com, dima.ruinskiy@intel.com,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	sasha.neftin@intel.com, naamax.meir@linux.intel.com
-Subject: Re: [PATCH v2] e1000e: move force SMBUS near the end of enable_ulp
- function
-Message-ID: <20240510110251.GB2347895@kernel.org>
-References: <20240508120604.233166-1-hui.wang@canonical.com>
+	s=arc-20240116; t=1715338950; c=relaxed/simple;
+	bh=dUBrlzpR4IR+l7Ds9JK558DMuZcqv5kbZtHSgEgFyf0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HnyAjJ7MbctF8L8dWnCet1clmFJcSmJVL9mOtiu2Lw5H2lzqzGikVorlniYqN+VSTJ+FN88dj81wpHuvafGqWODQi+rhV4p6mEZIi9j2fHhpDFEOOol3bYnF5r6vz37HtLfGvDLLRTyD5tfAOBzJoL2rPfuRhKnFSfZLj3/TqXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AWNDpV7u; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1715338946;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=OFi2O84ZjGzksvFyL3NIFcB+aK/jsbmnLmBT3YBCaAk=;
+	b=AWNDpV7uTIIXRzzM91qkJ0TeQUeE5mDbcuP5z8TqZYrDUjl0k4z4OVEDx8o3gw7JU6F1na
+	m4DgwJ0h6Q0n9OMad+A/n/3K3ph4tWxF9j7mNZ8cRtTHQEsi0CtJzGA0OD/T9Tgs2h7o+P
+	Gh5ajN2j11yVoDb+QaxcAwKTEfNrWo0=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>
+Cc: linux-serial@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 net] ptp: ocp: adjust serial port symlink creation
+Date: Fri, 10 May 2024 11:04:05 +0000
+Message-ID: <20240510110405.15115-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240508120604.233166-1-hui.wang@canonical.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, May 08, 2024 at 08:06:04PM +0800, Hui Wang wrote:
-> The commit 861e8086029e ("e1000e: move force SMBUS from enable ulp
-> function to avoid PHY loss issue") introduces a regression on
-> CH_MTP_I219_LM18 (PCIID: 0x8086550A). Without the referred commit, the
-> ethernet works well after suspend and resume, but after applying the
-> commit, the ethernet couldn't work anymore after the resume and the
-> dmesg shows that the NIC Link changes to 10Mbps (1000Mbps originally):
-> [   43.305084] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Up 10 Mbps Full Duplex, Flow Control: Rx/Tx
-> 
-> Without the commit, the force SMBUS code will not be executed if
-> "return 0" or "goto out" is executed in the enable_ulp(), and in my
-> case, the "goto out" is executed since FWSM_FW_VALID is set. But after
-> applying the commit, the force SMBUS code will be ran unconditionally.
-> 
-> Here move the force SMBUS code back to enable_ulp() and put it
-> immediate ahead of hw->phy.ops.release(hw), this could allow the
-> longest settling time as possible for interface in this function and
-> doesn't change the original code logic.
-> 
-> Fixes: 861e8086029e ("e1000e: move force SMBUS from enable ulp function to avoid PHY loss issue")
-> Signed-off-by: Hui Wang <hui.wang@canonical.com>
-> Acked-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-> Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-> ---
-> In the v2:
->  Change "this commit" to "the referred commit" in the commit header
->  Fix a potential infinite loop if ret_val is not zero
+The commit b286f4e87e32 ("serial: core: Move tty and serdev to be children
+of serial core port device") changed the hierarchy of serial port devices
+and device_find_child_by_name cannot find ttyS* devices because they are
+no longer directly attached. Add some logic to restore symlinks creation
+to the driver for OCP TimeCard.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
+Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+---
+v2:
+ add serial/8250 maintainers
+---
+ drivers/ptp/ptp_ocp.c | 30 +++++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+index ee2ced88ab34..50b7cb9db3be 100644
+--- a/drivers/ptp/ptp_ocp.c
++++ b/drivers/ptp/ptp_ocp.c
+@@ -25,6 +25,8 @@
+ #include <linux/crc16.h>
+ #include <linux/dpll.h>
+ 
++#include "../tty/serial/8250/8250.h"
++
+ #define PCI_VENDOR_ID_FACEBOOK			0x1d9b
+ #define PCI_DEVICE_ID_FACEBOOK_TIMECARD		0x0400
+ 
+@@ -4330,11 +4332,9 @@ ptp_ocp_symlink(struct ptp_ocp *bp, struct device *child, const char *link)
+ }
+ 
+ static void
+-ptp_ocp_link_child(struct ptp_ocp *bp, const char *name, const char *link)
++ptp_ocp_link_child(struct ptp_ocp *bp, struct device *dev, const char *name, const char *link)
+ {
+-	struct device *dev, *child;
+-
+-	dev = &bp->pdev->dev;
++	struct device *child;
+ 
+ 	child = device_find_child_by_name(dev, name);
+ 	if (!child) {
+@@ -4349,27 +4349,39 @@ ptp_ocp_link_child(struct ptp_ocp *bp, const char *name, const char *link)
+ static int
+ ptp_ocp_complete(struct ptp_ocp *bp)
+ {
++	struct device *dev, *port_dev;
++	struct uart_8250_port *port;
+ 	struct pps_device *pps;
+ 	char buf[32];
+ 
++	dev = &bp->pdev->dev;
++
+ 	if (bp->gnss_port.line != -1) {
++		port = serial8250_get_port(bp->gnss_port.line);
++		port_dev = (struct device *)port->port.port_dev;
+ 		sprintf(buf, "ttyS%d", bp->gnss_port.line);
+-		ptp_ocp_link_child(bp, buf, "ttyGNSS");
++		ptp_ocp_link_child(bp, port_dev, buf, "ttyGNSS");
+ 	}
+ 	if (bp->gnss2_port.line != -1) {
++		port = serial8250_get_port(bp->gnss2_port.line);
++		port_dev = (struct device *)port->port.port_dev;
+ 		sprintf(buf, "ttyS%d", bp->gnss2_port.line);
+-		ptp_ocp_link_child(bp, buf, "ttyGNSS2");
++		ptp_ocp_link_child(bp, port_dev, buf, "ttyGNSS2");
+ 	}
+ 	if (bp->mac_port.line != -1) {
++		port = serial8250_get_port(bp->mac_port.line);
++		port_dev = (struct device *)port->port.port_dev;
+ 		sprintf(buf, "ttyS%d", bp->mac_port.line);
+-		ptp_ocp_link_child(bp, buf, "ttyMAC");
++		ptp_ocp_link_child(bp, port_dev, buf, "ttyMAC");
+ 	}
+ 	if (bp->nmea_port.line != -1) {
++		port = serial8250_get_port(bp->nmea_port.line);
++		port_dev = (struct device *)port->port.port_dev;
+ 		sprintf(buf, "ttyS%d", bp->nmea_port.line);
+-		ptp_ocp_link_child(bp, buf, "ttyNMEA");
++		ptp_ocp_link_child(bp, port_dev, buf, "ttyNMEA");
+ 	}
+ 	sprintf(buf, "ptp%d", ptp_clock_index(bp->ptp));
+-	ptp_ocp_link_child(bp, buf, "ptp");
++	ptp_ocp_link_child(bp, dev, buf, "ptp");
+ 
+ 	pps = pps_lookup_dev(bp->ptp);
+ 	if (pps)
+-- 
+2.43.0
 
 
