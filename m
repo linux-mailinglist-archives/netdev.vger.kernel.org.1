@@ -1,228 +1,130 @@
-Return-Path: <netdev+bounces-95390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DC328C2240
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:36:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9611E8C2247
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:37:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E82DD283818
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:36:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C76521C20C8A
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4F014F9E6;
-	Fri, 10 May 2024 10:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62EAB13D27C;
+	Fri, 10 May 2024 10:37:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I/sCuI9s"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="FNhyV3qg"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B048B1292F2
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 10:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AF1364
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 10:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715337410; cv=none; b=F7YE9k4NefOot3Bw8keGTuNq9dxFxPUcr0Um6R8CChF00DbzcY/trJg3p3Zf7VXAUAPHnuzqNJihwKf5/IIdRD73jAsFR3uXwP+wM59Oloh1DiCa9KjYb696PUxsiYZJDXtVNA5IU3RtwVRmXjWUqA0MXHmTb9eVL73Rf6hjeq8=
+	t=1715337442; cv=none; b=VfZXtdk63Ry8mevWheeIgCC2kjRTdJX/agcaOPDyxSMpE1AE41yv0wC+Q724T7VUfvzVV6LT+V1caepBtqn6AKI5o2zSfvHaxU7jFn7XJqVYTQfH2/ziELk+JKfYwRwEKYwm84t7UtU5FnhXy1NjzExRrpN2Wi7AjbOfBtmYhBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715337410; c=relaxed/simple;
-	bh=b885mkoaowBayYp5fXXjWypVmC7CJmpFTZem7E8ZEVU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M5IKLM/FaPFFqT+n9aDcvNk+3k5CUaYi5zqwynHKsuSgrBcfZeOKxUCO3bg04AgqyZYdiBGpBUDsIXQ+VeTAY+r+gafD+QgPTXr9gsN3o1+6nO2wNzmngKXlB1vY02KgBegxB3KGJ+anLivLCkUQFO2m0xwRfYBq3r6H88f6Aa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I/sCuI9s; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <4c6a8b86-6544-4c99-a0f2-030e2ec4e98f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1715337405;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CQwv+B8JLCi8Nn/Gx8F39vcswEdPMaokUDHh8iKT79Y=;
-	b=I/sCuI9sQDx4Co7JyiG2pdbHMCMyGy4yI7TvmiREuzpzE7qoGCge3LFgO9BnTOnSTUZ+kJ
-	ZSbYWyCnSjOd5Yj1aNceTWE1y4k00r+xEoYT5oZk//coZ3Rh2B8lcLLYx6UuEt61JMH0B2
-	/07Wp///4OoECJ+hdsXPZo98NqjAh5I=
-Date: Fri, 10 May 2024 11:35:35 +0100
+	s=arc-20240116; t=1715337442; c=relaxed/simple;
+	bh=nXgflE5B95vd9pNg+4/If8fnc0fknILcfN5X2631qLI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oigiMYYMJVhCh0xX7QpXP1bAsYT0gw5uyW2k24gKyBXOB34UL3IPrrSiyIyq1TO8CpstxNqwqzNi/kFXUX2X/p7w5IIqGG2yaDq401Ky/H6PfKVsp1TB0kDkW9AdqzX4in6DrX5HCHdFvvqec75GrPQ+8DBpOP8mX7hxptpUjX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=FNhyV3qg; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2e5218112a6so7716841fa.2
+        for <netdev@vger.kernel.org>; Fri, 10 May 2024 03:37:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715337439; x=1715942239; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2wD5INpBrnsarO0AiJUhZuKf0j4l0d3r9JcWEyVVrlA=;
+        b=FNhyV3qgWaIbd2vD34Xf6P+R40I2q9bvutuvXWrl1ZHpWi1A+thM7OZ8MCmHTytrFo
+         OE8rNwFZexDkfBnqPdSg4Tv9vlI8iu+8lzW/TJpeBji0QRV99cIIBwFEEevCQztdZhfI
+         1ioIOKkos35AKHWVGJ7k8GD5YLBoj2P14ABZG+YcLbrrq448f32UZWXgQfDqWA2MEjDm
+         RGdWSdmAYvHlTfXg/xm2Ypi53AhIu2Lm3Yq9jaapVBMpu/Bqo0o8WBC96R6Tz6V4yUFc
+         xJBTO3RdmmOmvzgSjW87eUpOBbejzXTl9r0KLlfeE2qzreEnVIf4LOOGpyFAwl0ZWnP3
+         BsqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715337439; x=1715942239;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2wD5INpBrnsarO0AiJUhZuKf0j4l0d3r9JcWEyVVrlA=;
+        b=dRw7VwleePyze3ilU4UdB02GABMa8b69v37TFx0BaINLqR/MtUWNi7w+NgK5txsWJm
+         n2ppgcloGliYZQKaY/6vA1r81hbXU2C1Ru3khni+rz+/ccFwOXnpFhFPSgt+parOoZ2S
+         cKVHWUIcSQw8pkfXdmuAbancBxyF4qVeDAZOWZG2OE2MNhxxRF82DQjUqsKNdvyO0wG5
+         vEQbpIjLMoAgF4sDsspgMB42h0m9Tahrm/UNpMa8Anwpt4FsQ+dYKVARhQXyhhShbj/u
+         ROMPOkI+ZNXdSyq4hO0fiMNebwABPZZFxRJOdqApw91CD6Et2+EGMku4KrOM/LLiYA2r
+         5j+g==
+X-Gm-Message-State: AOJu0YwWwdO4I/ZTB7QgwIaQVqLxafwM5XuKzk8jakFv/HnI7VXuaH70
+	hY8++KxiCesbbAakUb4YeIfovImeQBWLyGHA1myTkbx44r5JFTDyxch0rIZIzSM=
+X-Google-Smtp-Source: AGHT+IGk6Tu9ZaxL6acgoYnm6At4B4bc73fVWAaY3JZYI+o01Kpih02yFjeVK4Va11FoA+V+WYLocQ==
+X-Received: by 2002:a05:651c:50c:b0:2e0:ffea:4298 with SMTP id 38308e7fff4ca-2e52039c0c8mr17507961fa.34.1715337438710;
+        Fri, 10 May 2024 03:37:18 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41f88208886sm94053465e9.45.2024.05.10.03.37.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 May 2024 03:37:18 -0700 (PDT)
+Date: Fri, 10 May 2024 12:37:15 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com
+Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
+Message-ID: <Zj3425_gSqHByw-R@nanopsycho.orion>
+References: <20240509114615.317450-1-jiri@resnulli.us>
+ <20240509084050-mutt-send-email-mst@kernel.org>
+ <ZjzQTFq5lJIoeSqM@nanopsycho.orion>
+ <20240509102643-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH V1 8/9] bnxt_en: Add TPH support in BNXT driver
-Content-Language: en-US
-To: Ajit Khaparde <ajit.khaparde@broadcom.com>
-Cc: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, bhelgaas@google.com, corbet@lwn.net,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
- michael.chan@broadcom.com, manoj.panicker2@amd.com, Eric.VanTassell@amd.com
-References: <20240509162741.1937586-1-wei.huang2@amd.com>
- <20240509162741.1937586-9-wei.huang2@amd.com>
- <868a4758-2873-4ede-83e5-65f42cb12b81@linux.dev>
- <CACZ4nhuBMOX8s1ODcJOvvCKp-VsOPHShEUHAsPvB75Yv2823qA@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <CACZ4nhuBMOX8s1ODcJOvvCKp-VsOPHShEUHAsPvB75Yv2823qA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240509102643-mutt-send-email-mst@kernel.org>
 
-On 10.05.2024 04:55, Ajit Khaparde wrote:
-> On Thu, May 9, 2024 at 2:50 PM Vadim Fedorenko
-> <vadim.fedorenko@linux.dev> wrote:
->>
->> On 09/05/2024 17:27, Wei Huang wrote:
->>> From: Manoj Panicker <manoj.panicker2@amd.com>
->>>
->>> As a usage example, this patch implements TPH support in Broadcom BNXT
->>> device driver by invoking pcie_tph_set_st() function when interrupt
->>> affinity is changed.
->>>
->>> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
->>> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
->>> Reviewed-by: Wei Huang <wei.huang2@amd.com>
->>> Signed-off-by: Manoj Panicker <manoj.panicker2@amd.com>
->>> ---
->>>    drivers/net/ethernet/broadcom/bnxt/bnxt.c | 51 +++++++++++++++++++++++
->>>    drivers/net/ethernet/broadcom/bnxt/bnxt.h |  4 ++
->>>    2 files changed, 55 insertions(+)
->>>
->>> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->>> index 2c2ee79c4d77..be9c17566fb4 100644
->>> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->>> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->>> @@ -55,6 +55,7 @@
->>>    #include <net/page_pool/helpers.h>
->>>    #include <linux/align.h>
->>>    #include <net/netdev_queues.h>
->>> +#include <linux/pci-tph.h>
->>>
->>>    #include "bnxt_hsi.h"
->>>    #include "bnxt.h"
->>> @@ -10491,6 +10492,7 @@ static void bnxt_free_irq(struct bnxt *bp)
->>>                                free_cpumask_var(irq->cpu_mask);
->>>                                irq->have_cpumask = 0;
->>>                        }
->>> +                     irq_set_affinity_notifier(irq->vector, NULL);
->>>                        free_irq(irq->vector, bp->bnapi[i]);
->>>                }
->>>
->>> @@ -10498,6 +10500,45 @@ static void bnxt_free_irq(struct bnxt *bp)
->>>        }
->>>    }
->>>
->>> +static void bnxt_rtnl_lock_sp(struct bnxt *bp);
->>> +static void bnxt_rtnl_unlock_sp(struct bnxt *bp);
->>> +static void bnxt_irq_affinity_notify(struct irq_affinity_notify *notify,
->>> +                                  const cpumask_t *mask)
->>> +{
->>> +     struct bnxt_irq *irq;
->>> +
->>> +     irq = container_of(notify, struct bnxt_irq, affinity_notify);
->>> +     cpumask_copy(irq->cpu_mask, mask);
->>> +
->>> +     if (!pcie_tph_set_st(irq->bp->pdev, irq->msix_nr,
->>> +                          cpumask_first(irq->cpu_mask),
->>> +                          TPH_MEM_TYPE_VM, PCI_TPH_REQ_TPH_ONLY))
->>> +             pr_err("error in configuring steering tag\n");
->>> +
->>> +     if (netif_running(irq->bp->dev)) {
->>> +             rtnl_lock();
->>> +             bnxt_close_nic(irq->bp, false, false);
->>> +             bnxt_open_nic(irq->bp, false, false);
->>> +             rtnl_unlock();
->>> +     }
->>
->> Is it really needed? It will cause link flap and pause in the traffic
->> service for the device. Why the device needs full restart in this case?
-> 
-> In that sequence only the rings are recreated for the hardware to sync
-> up the tags.
-> 
-> Actually its not a full restart. There is no link reinit or other
-> heavy lifting in this sequence.
-> The pause in traffic may be momentary. Do IRQ/CPU affinities change frequently?
-> Probably not?
+Thu, May 09, 2024 at 04:28:12PM CEST, mst@redhat.com wrote:
+>On Thu, May 09, 2024 at 03:31:56PM +0200, Jiri Pirko wrote:
+>> Thu, May 09, 2024 at 02:41:39PM CEST, mst@redhat.com wrote:
+>> >On Thu, May 09, 2024 at 01:46:15PM +0200, Jiri Pirko wrote:
+>> >> From: Jiri Pirko <jiri@nvidia.com>
+>> >> 
+>> >> Add support for Byte Queue Limits (BQL).
+>> >> 
+>> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>> >
+>> >Can we get more detail on the benefits you observe etc?
+>> >Thanks!
+>> 
+>> More info about the BQL in general is here:
+>> https://lwn.net/Articles/469652/
+>
+>I know about BQL in general. We discussed BQL for virtio in the past
+>mostly I got the feedback from net core maintainers that it likely won't
+>benefit virtio.
 
- From what I can see in bnxt_en, proper validation of link_re_init parameter is
-not (yet?) implemented, __bnxt_open_nic will unconditionally call 
-netif_carrier_off() which will be treated as loss of carrier with counters
-increment and proper events posted. Changes to CPU affinities were 
-non-distruptive before the patch, but now it may break user-space assumptions.
+Do you have some link to that, or is it this thread:
+https://lore.kernel.org/netdev/21384cb5-99a6-7431-1039-b356521e1bc3@redhat.com/
 
-Does FW need full rings re-init to update target value, which is one u32 write?
-It looks like overkill TBH.
+I don't see why virtio should be any different from other
+drivers/devices that benefit from bql. HOL blocking is the same here are
+everywhere.
 
-And yes, affinities can be change on fly according to the changes of the
-workload on the host.
+>
+>So I'm asking, what kind of benefit do you observe?
 
->>
->>
->>> +}
->>> +
->>> +static void bnxt_irq_affinity_release(struct kref __always_unused *ref)
->>> +{
->>> +}
->>> +
->>> +static inline void __bnxt_register_notify_irqchanges(struct bnxt_irq *irq)
->>
->> No inlines in .c files, please. Let compiler decide what to inline.
->>
->>> +{
->>> +     struct irq_affinity_notify *notify;
->>> +
->>> +     notify = &irq->affinity_notify;
->>> +     notify->irq = irq->vector;
->>> +     notify->notify = bnxt_irq_affinity_notify;
->>> +     notify->release = bnxt_irq_affinity_release;
->>> +
->>> +     irq_set_affinity_notifier(irq->vector, notify);
->>> +}
->>> +
->>>    static int bnxt_request_irq(struct bnxt *bp)
->>>    {
->>>        int i, j, rc = 0;
->>> @@ -10543,6 +10584,7 @@ static int bnxt_request_irq(struct bnxt *bp)
->>>                        int numa_node = dev_to_node(&bp->pdev->dev);
->>>
->>>                        irq->have_cpumask = 1;
->>> +                     irq->msix_nr = map_idx;
->>>                        cpumask_set_cpu(cpumask_local_spread(i, numa_node),
->>>                                        irq->cpu_mask);
->>>                        rc = irq_set_affinity_hint(irq->vector, irq->cpu_mask);
->>> @@ -10552,6 +10594,15 @@ static int bnxt_request_irq(struct bnxt *bp)
->>>                                            irq->vector);
->>>                                break;
->>>                        }
->>> +
->>> +                     if (!pcie_tph_set_st(bp->pdev, i,
->>> +                                          cpumask_first(irq->cpu_mask),
->>> +                                          TPH_MEM_TYPE_VM, PCI_TPH_REQ_TPH_ONLY)) {
->>> +                             netdev_err(bp->dev, "error in setting steering tag\n");
->>> +                     } else {
->>> +                             irq->bp = bp;
->>> +                             __bnxt_register_notify_irqchanges(irq);
->>> +                     }
->>>                }
->>>        }
->>>        return rc;
->>> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
->>> index dd849e715c9b..0d3442590bb4 100644
->>> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
->>> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
->>> @@ -1195,6 +1195,10 @@ struct bnxt_irq {
->>>        u8              have_cpumask:1;
->>>        char            name[IFNAMSIZ + 2];
->>>        cpumask_var_t   cpu_mask;
->>> +
->>> +     int             msix_nr;
->>> +     struct bnxt     *bp;
->>> +     struct irq_affinity_notify affinity_notify;
->>>    };
->>>
->>>    #define HWRM_RING_ALLOC_TX  0x1
->>
+I don't have measurements at hand, will attach them to v2.
 
+Thanks!
+
+>
+>-- 
+>MST
+>
 
