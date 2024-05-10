@@ -1,127 +1,151 @@
-Return-Path: <netdev+bounces-95387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 640008C2220
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:30:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5863E8C2222
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:31:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1892D1F21262
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:30:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDD4E1F217F6
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:31:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E43130E39;
-	Fri, 10 May 2024 10:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 472A67EEF8;
+	Fri, 10 May 2024 10:30:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F90554677;
-	Fri, 10 May 2024 10:30:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3976C2233B
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 10:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715337027; cv=none; b=LIfM1u4qCrqanODVD+AcSj7V2M5nmJKEpEqqdu87t554QVhb2aUElPNF87gI62xTMDXrN/El3GZ4ZULTxXun9OHYEq7ovF4OES/cNnk64eK5ddteUoK6Je2oBKQ6KJyWxvkxu3/njsYNY7ElxUMiNuNMOys6t+laXxiYr4pCTjs=
+	t=1715337054; cv=none; b=VAkNKx8mpyuiC0E57bM8OH3E1ryDdV8BePub/Gwo5jiXQRW3F/ZG4qGSD9GlrMHXI7bjnNpNaXrwcaXOCXH/kryKHiCESu0T8hmFdjw/ANM0Qkt0bOP9UMO4Q1Qa546k3hiIhY+w37MSzH+SvkKocXyr5YJYFyMoAH+Siwzm2O4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715337027; c=relaxed/simple;
-	bh=xFhHz1KjXpz9Rv+VlQW1WOjFDZBJOu2NMH+tMzfpL+4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KJTojW/J3gS02x9qGaG1fQ5iZI59cOjjgrDfnUGtUnbDP668sAdPyNmySQOJlE90jSEePLF03v1tg8+q3aVZfEUb2LdO+Msqld4KdJ2+gk+ogxML/I5FqR1d4R14IXObfevUgcVBk2/GdAiPytAxRN8AQfoHWq0OvcGv+toly3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-51ffff16400so3074791e87.2;
-        Fri, 10 May 2024 03:30:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715337024; x=1715941824;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Cpd+1uI5omhYD2wj/HwWULTJmMXVCOfVodGWbcrp/kg=;
-        b=ffY8t9h77KCvFn0aFPMxBFuTKRcGmVhz+S9BoRI2FQy6poISe/uqYfzr8IbGdKaeF1
-         jYeU/0/o/FTQ4IQEfKdIvDDgCH2qWat4VgHvmkYQspCOT4ns1O4pyfslWVTxJLSvOqcJ
-         WaJ4IdfN1uzrWCs21uLQZKAhCXPXlh9A34QMR75go1XpM+LZUbFvA6Mjx5CxSmy+wIJd
-         DSxAtNNbaBwPJD5aN/Jycr6Jijo6v9qvOUt4g0kkvoXIq9SAYDimw6H8fMByYF9BdxOv
-         czs20VcqINOVNmshqWbaxKMwG7qtfLYJ8ywMgWMSg7QdQ2R6nQuk6gg+2ix4mHpnhRBv
-         9suQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWnKsUhiELTnOrWWiNrssDqMrntk6M5Zh2b2RbTIJVJf/iYWiCfxqDKbu7tauzsVjR9YWBJew8sEXs3SO8qvH0utaglNdAbudpfG1mzGgw6x07ApaSqAPBEkm+cyd1jY06muDub
-X-Gm-Message-State: AOJu0YwNo4WGqjnYkF6dlF3/lt6JQ2i99E0lvTGnfe29FOGQhwIGn41g
-	P900ztK/B4i+d5EG9ErnxScSXFvL76OALEMHiAXSk3Re1b9OkFeK
-X-Google-Smtp-Source: AGHT+IF6SR57niQ6ZbUxHCPC3Q5Me6vEJFxgwq2p7jJwy9dYqNyIRsUhZIkZH4fkpsOv97w7jk84lQ==
-X-Received: by 2002:a19:c207:0:b0:51a:f11c:81db with SMTP id 2adb3069b0e04-5220fe794b0mr1561407e87.30.1715337023305;
-        Fri, 10 May 2024 03:30:23 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-003.fbsv.net. [2a03:2880:30ff:3::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a17894eb1sm168791566b.77.2024.05.10.03.30.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 03:30:22 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: thepacketgeek@gmail.com,
-	Aijay Adams <aijay@meta.com>,
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] netconsole: Do not shutdown dynamic configuration if cmdline is invalid
-Date: Fri, 10 May 2024 03:30:05 -0700
-Message-ID: <20240510103005.3001545-1-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1715337054; c=relaxed/simple;
+	bh=Qtu8qyzGZ60/dE9N/8kVfBI9gCFDdX4n+RccsWMkZaE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=pinTr+Jg761NBaZyJABypNnHq1sxRwK0oaCAtP7fs1Tw0Cg4B+T1gCsdsPvtOaF+Nj9zr/Ix/DBTN9GKtnjFBtafcBkZekfzhvZDRHaD+TgXWjod8x8lsgQqSQSYXpMcFcuwjbNT3iVxyQG+2zWcm3pzCiwTL2jPTIucbGVVCgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-647-7jvuyYW8NgiiLcaMDYelbg-1; Fri,
+ 10 May 2024 06:30:41 -0400
+X-MC-Unique: 7jvuyYW8NgiiLcaMDYelbg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7FD6C29AA39D;
+	Fri, 10 May 2024 10:30:40 +0000 (UTC)
+Received: from hog (unknown [10.39.193.137])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0CF57205588E;
+	Fri, 10 May 2024 10:30:38 +0000 (UTC)
+Date: Fri, 10 May 2024 12:30:37 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
+Subject: Re: [PATCH net-next v3 07/24] ovpn: introduce the ovpn_peer object
+Message-ID: <Zj33TTI5081ejbfs@hog>
+References: <20240506011637.27272-1-antonio@openvpn.net>
+ <20240506011637.27272-8-antonio@openvpn.net>
+ <ZjujHw6eglLEIbxA@hog>
+ <60cae774-b60b-4a4b-8645-91eb6f186032@openvpn.net>
+ <ZjzJ5Hm8hHnE7LR9@hog>
+ <7254c556-8fe9-484c-9dc8-f55c30b11776@openvpn.net>
+ <ZjzbDpEW5iVqW8oA@hog>
+ <04558c43-6b7d-4076-a6eb-d60222a292fc@openvpn.net>
+ <786914f6-325c-4452-8d71-292ffb59a298@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <786914f6-325c-4452-8d71-292ffb59a298@openvpn.net>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-If a user provides an invalid netconsole configuration during boot time
-(e.g., specifying an invalid ethX interface), netconsole will be
-entirely disabled. Consequently, the user won't be able to create new
-entries in /sys/kernel/config/netconsole/ as that directory does not
-exist.
+2024-05-09, 16:53:42 +0200, Antonio Quartulli wrote:
+>=20
+>=20
+> On 09/05/2024 16:36, Antonio Quartulli wrote:
+> > On 09/05/2024 16:17, Sabrina Dubroca wrote:
+> > > 2024-05-09, 15:44:26 +0200, Antonio Quartulli wrote:
+> > > > On 09/05/2024 15:04, Sabrina Dubroca wrote:
+> > > > > > > > +void ovpn_peer_release(struct ovpn_peer *peer)
+> > > > > > > > +{
+> > > > > > > > +=C2=A0=C2=A0=C2=A0 call_rcu(&peer->rcu, ovpn_peer_release_=
+rcu);
+> > > > > > > > +}
+> > > > > > > > +
+> > > > > > > > +/**
+> > > > > > > > + * ovpn_peer_delete_work - work scheduled to
+> > > > > > > > release peer in process context
+> > > > > > > > + * @work: the work object
+> > > > > > > > + */
+> > > > > > > > +static void ovpn_peer_delete_work(struct work_struct *work=
+)
+> > > > > > > > +{
+> > > > > > > > +=C2=A0=C2=A0=C2=A0 struct ovpn_peer *peer =3D container_of=
+(work, struct ovpn_peer,
+> > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 delete_work);
+> > > > > > > > +=C2=A0=C2=A0=C2=A0 ovpn_peer_release(peer);
+> > > > > > >=20
+> > > > > > > Does call_rcu really need to run in process context?
+> > > > > >=20
+> > > > > > Reason for switching to process context is that we have to invo=
+ke
+> > > > > > ovpn_nl_notify_del_peer (that sends a netlink event to
+> > > > > > userspace) and the
+> > > > > > latter requires a reference to the peer.
+> > > > >=20
+> > > > > I'm confused. When you say "requires a reference to the peer", do=
+ you
+> > > > > mean accessing fields of the peer object? I don't see why this
+> > > > > requires ovpn_nl_notify_del_peer to to run from process context.
+> > > >=20
+> > > > ovpn_nl_notify_del_peer sends a netlink message to userspace and
+> > > > I was under
+> > > > the impression that it may block/sleep, no?
+> > > > For this reason I assumed it must be executed in process context.
+> > >=20
+> > > With s/GFP_KERNEL/GFP_ATOMIC/, it should be ok to run from whatever
+> > > context. Firing up a workqueue just to send a 100B netlink message
+> > > seems a bit overkill.
+> >=20
+> > Oh ok, I thought the send could be a problem too.
+> >=20
+> > Will test with GFP_ATOMIC then. Thanks for the hint.
+>=20
+> I am back and unfortunately we also have (added by a later patch):
+>=20
+>  294         napi_disable(&peer->napi);
+>  295         netif_napi_del(&peer->napi);
 
-Apart from misconfiguration, another issue arises when ethX is loaded as
-a module and the netconsole= line in the command line points to ethX,
-resulting in an obvious failure. This renders netconsole unusable, as
-/sys/kernel/config/netconsole/ will never appear. This is more annoying
-since users reconfigure (or just toggle) the configuratin later (see
-commit 5fbd6cdbe304b ("netconsole: Attach cmdline target to dynamic
-target"))
+Do you need the napi instance to be per peer, or can it be per
+netdevice? If it's per netdevice you can clean it up in
+->priv_destructor.
 
-Create /sys/kernel/config/netconsole/ even if the command line arguments
-are invalid, so, users can create dynamic entries in netconsole.
+> that need to be executed in process context.
+> So it seems I must fire up the worker anyway..
 
-Reported-by: Aijay Adams <aijay@meta.com>
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/netconsole.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+I hope with can simplify all that logic. There's some complexity
+that's unavoidable in this kind of driver, but maybe not as much as
+you've got here.
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index d7070dd4fe73..e69bc88c22a0 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -122,6 +122,11 @@ struct netconsole_target {
- 	struct netpoll		np;
- };
- 
-+static inline bool dynamic_netconsole_enabled(void)
-+{
-+	return IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC);
-+}
-+
- #ifdef	CONFIG_NETCONSOLE_DYNAMIC
- 
- static struct configfs_subsystem netconsole_subsys;
-@@ -1262,6 +1267,8 @@ static int __init init_netconsole(void)
- 		while ((target_config = strsep(&input, ";"))) {
- 			nt = alloc_param_target(target_config, count);
- 			if (IS_ERR(nt)) {
-+				if (dynamic_netconsole_enabled())
-+					continue;
- 				err = PTR_ERR(nt);
- 				goto fail;
- 			}
--- 
-2.43.0
+--=20
+Sabrina
 
 
