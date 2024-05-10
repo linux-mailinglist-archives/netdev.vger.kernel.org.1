@@ -1,217 +1,241 @@
-Return-Path: <netdev+bounces-95503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44FB98C2701
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 16:37:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1125A8C2708
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 16:39:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6863E1C21FA1
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:37:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 344221C20A81
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CD7170895;
-	Fri, 10 May 2024 14:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 278B01708A9;
+	Fri, 10 May 2024 14:39:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="ZYCSRI7v"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SvXgBHQj"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AF412C526;
-	Fri, 10 May 2024 14:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C78914B08C;
+	Fri, 10 May 2024 14:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715351856; cv=none; b=MUzpAFqgd+R7Msxwr+wW2thWyF47Fg6F61Hb+pNZbVctxG7Vt54t47vwbbv1DSZ/GA63ghQfclGOMEdXESTYlcitgcr9J3KOIn5qrm3EyS3PFuHsqNdv6swn6q0AgBug9MT6SY0v9S8S+00QVPH7qgBH6D4tWTOluAdwSG6XRlA=
+	t=1715351969; cv=none; b=TWjeIPYKDWrDPN3SC+MhbQS7FV99CPwfB3CM7yVq0F3PvVno0PgGecHZFuU2go7WXYXXsw9IiHVNjbwKzfPeB18qLQ2x3N22daO6HsxcUfuzCwXuq9RE5M3g+3iva3Q+PLiLLU9khkLPUxZ9CrB7oOfYbLoDu1EVvRaWh+LgejE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715351856; c=relaxed/simple;
-	bh=Rs8unjHuGUxifVY/9+LC+KIT6hLlUWyGTvZnyD5tKSI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ioGODtkzXU5uiO9h5ZkU8Nx66tIUQQivomZ0aC2dszG/XYW2laIUhFSJl3HdMdiWbWihR3ehC7J64DsjbECaX8pnuyCCw2U2n1qiz6yVr7OWbFyNZYDiFyKBTAYsIkOGQgulnGvcvc8oy4dFbNjOsbX79Vln4m5PYRl7JKe2tbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=ZYCSRI7v; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 36EF688122;
-	Fri, 10 May 2024 16:37:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1715351846;
-	bh=jOpOKeXB26MZGG5tc6iWhny1B4Ybi73lxsddx0Swstw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ZYCSRI7vYaB9EJXXMJidQqjnmSwNoVkIWGX4FrOSw/9Re8XKPS0fZTBUMumBo/BdT
-	 JRGLaqKHk30YJZBbsU1veZ4D7yeJwn4AGPqLSlADSbKED+7L765V7aoaMP//g5dkmw
-	 UhavJevqRi+k4JszuQEWCS5oPf8IuxJhVgnQvmzc27QrmKdJCOHil92PqC0pd48hnL
-	 acAagRV3kTW1V7vL86Fh30wRxcjO0/eyr7myB4EjBye5MEafwP7dqQXcqNxGy1bMqj
-	 RyQx7GJOmlU8RsYhQGnj3lL1a4YwxHwLCM99zPGFYA/9BZth6FoRMOjCp/5bqM+5LZ
-	 pdIXc9cMimREA==
-From: Lukasz Majewski <lukma@denx.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Casper Andersson <casper.casan@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [net-next PATCH] test: hsr: Extend the hsr_redbox.sh to have more SAN devices connected
-Date: Fri, 10 May 2024 16:37:10 +0200
-Message-Id: <20240510143710.3916631-1-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1715351969; c=relaxed/simple;
+	bh=1mZQpCNgLHeL3u0oeK2XgbI336g5gF4n4i2zz/VMjDM=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=OLE8PG9JQDp1PtCNlVC31oFKvsdP4KQFk6nmFHzTHWx3stVOvessrHl9J3y9ZgOBm0rsYUSc7u9WE7BzEqKS8iv1Qnwj4qGDJriUDG0SewbqYmEBml5Lf9FLnH7ZRJXWMI1N2nCNV59TbLApbeVt83fIgwFE5HHOBcCrqHw7PtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SvXgBHQj; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715351967; x=1746887967;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=1mZQpCNgLHeL3u0oeK2XgbI336g5gF4n4i2zz/VMjDM=;
+  b=SvXgBHQjNX2wMKP4lWONzlnSFTJLCH/2xHX8FqcTNZAT2bMcq57W5RJO
+   Pc3O6bsEelc00UYinwyX0VwvRCdOG5mTCoNy5QlC3Hdq8zjHm7NhcXPFi
+   i8VL7mcYLT3bEPxAVSnFDtS+Vn2mSKRo63NZSj+qtYtbzVvFD+Fd0IMLb
+   Ch7TqGyrVAA3Cx9TWgdyKfRBDiNbhvixFswQ7yKwHCt37AEJgGa8uoWxZ
+   ag7xehK04+b1oavmd7My5IQOlcQYRBGrgTJ81JmkSlSGxknw2s6QIzeq3
+   6FIVVYftIBGdriv2M/beQw88fGYPXxQXcM2KRMVPHqtbRi5Tk5MisojRH
+   Q==;
+X-CSE-ConnectionGUID: VH9LRxpWTqmMk5oEfLJ9fA==
+X-CSE-MsgGUID: 10qs1WjSSCSOscoBysG28w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="22006598"
+X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
+   d="scan'208";a="22006598"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 07:39:26 -0700
+X-CSE-ConnectionGUID: VVDy6M/OSrqsiWz0tSC0nA==
+X-CSE-MsgGUID: uxmhq12gTaSaAmPHBnqdFA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
+   d="scan'208";a="30018377"
+Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.247.85])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 07:39:19 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Fri, 10 May 2024 17:39:14 +0300 (EEST)
+To: Christoph Fritz <christoph.fritz@hexdev.de>
+cc: Jiri Slaby <jirislaby@kernel.org>, Simon Horman <horms@kernel.org>, 
+    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+    Marc Kleine-Budde <mkl@pengutronix.de>, 
+    Oliver Hartkopp <socketcan@hartkopp.net>, 
+    Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+    "David S . Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+    Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+    Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
+    Benjamin Tissoires <bentiss@kernel.org>, 
+    Sebastian Reichel <sre@kernel.org>, 
+    Linus Walleij <linus.walleij@linaro.org>, 
+    Andreas Lauser <andreas.lauser@mercedes-benz.com>, 
+    Jonathan Corbet <corbet@lwn.net>, Pavel Pisa <pisa@cmp.felk.cvut.cz>, 
+    linux-can@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
+    devicetree@vger.kernel.org, linux-input@vger.kernel.org, 
+    linux-serial <linux-serial@vger.kernel.org>
+Subject: Re: [PATCH v4 10/11] can: lin: Support setting LIN mode
+In-Reply-To: <20240509171736.2048414-11-christoph.fritz@hexdev.de>
+Message-ID: <b796b3ac-df5e-e39a-7ae2-db7b7829abaa@linux.intel.com>
+References: <20240509171736.2048414-1-christoph.fritz@hexdev.de> <20240509171736.2048414-11-christoph.fritz@hexdev.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=US-ASCII
 
-After this change the single SAN device (ns3eth1) is now replaced with
-two SAN devices - respectively ns4eth1 and ns5eth1.
+On Thu, 9 May 2024, Christoph Fritz wrote:
 
-It is possible to extend this script to have more SAN devices connected
-by adding them to ns3br1 bridge.
+> A LIN node can work as commander or responder, so introduce a new
+> control mode (CAN_CTRLMODE_LIN_COMMANDER) for configuration.
+> 
+> This enables e.g. the userland tool ip from iproute2 to turn on
+> commander mode when the device is being brought up.
+> 
+> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+> ---
+>  drivers/net/can/lin.c            | 40 +++++++++++++++++++++++++++++++-
+>  include/net/lin.h                |  7 ++++++
+>  include/uapi/linux/can/netlink.h |  1 +
+>  3 files changed, 47 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/can/lin.c b/drivers/net/can/lin.c
+> index f77abd7d7d21c..03ddf5d5a31b8 100644
+> --- a/drivers/net/can/lin.c
+> +++ b/drivers/net/can/lin.c
+> @@ -262,11 +262,40 @@ static netdev_tx_t lin_start_xmit(struct sk_buff *skb,
+>  	return NETDEV_TX_OK;
+>  }
+>  
+> +static int lin_update_mode(struct net_device *ndev)
+> +{
+> +	struct lin_device *ldev = netdev_priv(ndev);
+> +	u32 ctrlmode = ldev->can.ctrlmode;
+> +	enum lin_mode lm;
+> +	int ret = 0;
+> +
+> +	lm = (ctrlmode & CAN_CTRLMODE_LIN_COMMANDER) ? LINBUS_COMMANDER :
+> +						       LINBUS_RESPONDER;
+> +	if (ldev->lmode != lm) {
+> +		if (!ldev->ldev_ops->update_lin_mode) {
+> +			netdev_err(ndev, "setting lin mode unsupported\n");
 
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
----
- tools/testing/selftests/net/hsr/hsr_redbox.sh | 71 +++++++++++++------
- 1 file changed, 49 insertions(+), 22 deletions(-)
+In user visible messages, it would be best to use the expected 
+capitalization, which I suppose is LIN given you use capitals in the 
+commit message yourself?
 
-diff --git a/tools/testing/selftests/net/hsr/hsr_redbox.sh b/tools/testing/selftests/net/hsr/hsr_redbox.sh
-index db69be95ecb3..1f36785347c0 100755
---- a/tools/testing/selftests/net/hsr/hsr_redbox.sh
-+++ b/tools/testing/selftests/net/hsr/hsr_redbox.sh
-@@ -8,12 +8,19 @@ source ./hsr_common.sh
- do_complete_ping_test()
- {
- 	echo "INFO: Initial validation ping (HSR-SAN/RedBox)."
--	# Each node has to be able each one.
-+	# Each node has to be able to reach each one.
- 	do_ping "${ns1}" 100.64.0.2
- 	do_ping "${ns2}" 100.64.0.1
--	# Ping from SAN to hsr1 (via hsr2)
-+	# Ping between SANs (test bridge)
-+	do_ping "${ns4}" 100.64.0.51
-+	do_ping "${ns5}" 100.64.0.41
-+	# Ping from SANs to hsr1 (via hsr2) (and opposite)
- 	do_ping "${ns3}" 100.64.0.1
- 	do_ping "${ns1}" 100.64.0.3
-+	do_ping "${ns1}" 100.64.0.41
-+	do_ping "${ns4}" 100.64.0.1
-+	do_ping "${ns1}" 100.64.0.51
-+	do_ping "${ns5}" 100.64.0.1
- 	stop_if_error "Initial validation failed."
- 
- 	# Wait for MGNT HSR frames being received and nodes being
-@@ -23,8 +30,12 @@ do_complete_ping_test()
- 	echo "INFO: Longer ping test (HSR-SAN/RedBox)."
- 	# Ping from SAN to hsr1 (via hsr2)
- 	do_ping_long "${ns3}" 100.64.0.1
--	# Ping from hsr1 (via hsr2) to SAN
-+	# Ping from hsr1 (via hsr2) to SANs (and opposite)
- 	do_ping_long "${ns1}" 100.64.0.3
-+	do_ping_long "${ns1}" 100.64.0.41
-+	do_ping_long "${ns4}" 100.64.0.1
-+	do_ping_long "${ns1}" 100.64.0.51
-+	do_ping_long "${ns5}" 100.64.0.1
- 	stop_if_error "Longer ping test failed."
- 
- 	echo "INFO: All good."
-@@ -35,22 +46,26 @@ setup_hsr_interfaces()
- 	local HSRv="$1"
- 
- 	echo "INFO: preparing interfaces for HSRv${HSRv} (HSR-SAN/RedBox)."
--
--#       |NS1                     |
--#       |                        |
--#       |    /-- hsr1 --\        |
--#       | ns1eth1     ns1eth2    |
--#       |------------------------|
--#            |            |
--#            |            |
--#            |            |
--#       |------------------------|        |-----------|
--#       | ns2eth1     ns2eth2    |        |           |
--#       |    \-- hsr2 --/        |        |           |
--#       |            \           |        |           |
--#       |             ns2eth3    |--------| ns3eth1   |
--#       |             (interlink)|        |           |
--#       |NS2 (RedBOX)            |        |NS3 (SAN)  |
-+#
-+# IPv4 addresses (100.64.X.Y/24), and [X.Y] is presented on below diagram:
-+#
-+#
-+# |NS1                     |               |NS4                |
-+# |       [0.1]            |               |                   |
-+# |    /-- hsr1 --\        |               |    [0.41]         |
-+# | ns1eth1     ns1eth2    |               |    ns4eth1 (SAN)  |
-+# |------------------------|               |-------------------|
-+#      |            |                                |
-+#      |            |                                |
-+#      |            |                                |
-+# |------------------------|   |-------------------------------|
-+# | ns2eth1     ns2eth2    |   |                  ns3eth2      |
-+# |    \-- hsr2 --/        |   |                 /             |
-+# |      [0.2] \           |   |                /              |  |------------|
-+# |             ns2eth3    |---| ns3eth1 -- ns3br1 -- ns3eth3--|--| ns5eth1    |
-+# |             (interlink)|   | [0.3]      [0.11]             |  | [0.51]     |
-+# |NS2 (RedBOX)            |   |NS3 (BR)                       |  | NS5 (SAN)  |
-+#
- #
- 	# Check if iproute2 supports adding interlink port to hsrX device
- 	ip link help hsr | grep -q INTERLINK
-@@ -59,7 +74,9 @@ setup_hsr_interfaces()
- 	# Create interfaces for name spaces
- 	ip link add ns1eth1 netns "${ns1}" type veth peer name ns2eth1 netns "${ns2}"
- 	ip link add ns1eth2 netns "${ns1}" type veth peer name ns2eth2 netns "${ns2}"
--	ip link add ns3eth1 netns "${ns3}" type veth peer name ns2eth3 netns "${ns2}"
-+	ip link add ns2eth3 netns "${ns2}" type veth peer name ns3eth1 netns "${ns3}"
-+	ip link add ns3eth2 netns "${ns3}" type veth peer name ns4eth1 netns "${ns4}"
-+	ip link add ns3eth3 netns "${ns3}" type veth peer name ns5eth1 netns "${ns5}"
- 
- 	sleep 1
- 
-@@ -70,21 +87,31 @@ setup_hsr_interfaces()
- 	ip -n "${ns2}" link set ns2eth2 up
- 	ip -n "${ns2}" link set ns2eth3 up
- 
--	ip -n "${ns3}" link set ns3eth1 up
-+	ip -n "${ns3}" link add name ns3br1 type bridge
-+	ip -n "${ns3}" link set ns3br1 up
-+	ip -n "${ns3}" link set ns3eth1 master ns3br1 up
-+	ip -n "${ns3}" link set ns3eth2 master ns3br1 up
-+	ip -n "${ns3}" link set ns3eth3 master ns3br1 up
-+
-+	ip -n "${ns4}" link set ns4eth1 up
-+	ip -n "${ns5}" link set ns5eth1 up
- 
- 	ip -net "${ns1}" link add name hsr1 type hsr slave1 ns1eth1 slave2 ns1eth2 supervision 45 version ${HSRv} proto 0
- 	ip -net "${ns2}" link add name hsr2 type hsr slave1 ns2eth1 slave2 ns2eth2 interlink ns2eth3 supervision 45 version ${HSRv} proto 0
- 
- 	ip -n "${ns1}" addr add 100.64.0.1/24 dev hsr1
- 	ip -n "${ns2}" addr add 100.64.0.2/24 dev hsr2
-+	ip -n "${ns3}" addr add 100.64.0.11/24 dev ns3br1
- 	ip -n "${ns3}" addr add 100.64.0.3/24 dev ns3eth1
-+	ip -n "${ns4}" addr add 100.64.0.41/24 dev ns4eth1
-+	ip -n "${ns5}" addr add 100.64.0.51/24 dev ns5eth1
- 
- 	ip -n "${ns1}" link set hsr1 up
- 	ip -n "${ns2}" link set hsr2 up
- }
- 
- check_prerequisites
--setup_ns ns1 ns2 ns3
-+setup_ns ns1 ns2 ns3 ns4 ns5
- 
- trap cleanup_all_ns EXIT
- 
+> +			return -EINVAL;
+> +		}
+> +		ret = ldev->ldev_ops->update_lin_mode(ldev, lm);
+> +		if (ret) {
+> +			netdev_err(ndev, "Failed to set lin mode: %d\n", ret);
+
+Ditto.
+
+There might be other cases in any of the patches, please check.
+
+> +			return ret;
+> +		}
+> +		ldev->lmode = lm;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>  static int lin_open(struct net_device *ndev)
+>  {
+>  	struct lin_device *ldev = netdev_priv(ndev);
+>  	int ret;
+>  
+> +	ret = lin_update_mode(ndev);
+> +	if (ret)
+> +		return ret;
+> +
+>  	ldev->tx_busy = false;
+>  
+>  	ret = open_candev(ndev);
+> @@ -443,7 +472,7 @@ struct lin_device *register_lin(struct device *dev,
+>  	ndev->sysfs_groups[0] = &lin_sysfs_group;
+>  	ldev->can.bittiming.bitrate = LIN_DEFAULT_BAUDRATE;
+>  	ldev->can.ctrlmode = CAN_CTRLMODE_LIN;
+> -	ldev->can.ctrlmode_supported = 0;
+> +	ldev->can.ctrlmode_supported = CAN_CTRLMODE_LIN_COMMANDER;
+>  	ldev->can.bitrate_const = lin_bitrate;
+>  	ldev->can.bitrate_const_cnt = ARRAY_SIZE(lin_bitrate);
+>  	ldev->can.do_set_bittiming = lin_set_bittiming;
+> @@ -458,6 +487,15 @@ struct lin_device *register_lin(struct device *dev,
+>  		goto exit_candev;
+>  	}
+>  
+> +	ldev->lmode = LINBUS_RESPONDER;
+> +	if (ldev->ldev_ops->update_lin_mode) {
+> +		ret = ldev->ldev_ops->update_lin_mode(ldev, ldev->lmode);
+> +		if (ret) {
+> +			netdev_err(ndev, "updating lin mode failed\n");
+
+Ditto.
+
+> +			goto exit_candev;
+> +		}
+> +	}
+> +
+>  	ret = register_candev(ndev);
+>  	if (ret)
+>  		goto exit_candev;
+> diff --git a/include/net/lin.h b/include/net/lin.h
+> index 31bb0feefd188..63ac870a0ab6f 100644
+> --- a/include/net/lin.h
+> +++ b/include/net/lin.h
+> @@ -36,6 +36,11 @@ struct lin_attr {
+>  	struct lin_device *ldev;
+>  };
+>  
+> +enum lin_mode {
+> +	LINBUS_RESPONDER = 0,
+> +	LINBUS_COMMANDER,
+> +};
+> +
+>  struct lin_device {
+>  	struct can_priv can;  /* must be the first member */
+>  	struct net_device *ndev;
+> @@ -45,6 +50,7 @@ struct lin_device {
+>  	struct work_struct tx_work;
+>  	bool tx_busy;
+>  	struct sk_buff *tx_skb;
+> +	enum lin_mode lmode;
+>  };
+>  
+>  enum lin_checksum_mode {
+> @@ -71,6 +77,7 @@ struct lin_device_ops {
+>  	int (*ldo_open)(struct lin_device *ldev);
+>  	int (*ldo_stop)(struct lin_device *ldev);
+>  	int (*ldo_tx)(struct lin_device *ldev, const struct lin_frame *frame);
+> +	int (*update_lin_mode)(struct lin_device *ldev, enum lin_mode lm);
+>  	int (*update_bitrate)(struct lin_device *ldev, u16 bitrate);
+>  	int (*update_responder_answer)(struct lin_device *ldev,
+>  				       const struct lin_responder_answer *answ);
+> diff --git a/include/uapi/linux/can/netlink.h b/include/uapi/linux/can/netlink.h
+> index a37f56d86c5f2..cc390f6444d59 100644
+> --- a/include/uapi/linux/can/netlink.h
+> +++ b/include/uapi/linux/can/netlink.h
+> @@ -104,6 +104,7 @@ struct can_ctrlmode {
+>  #define CAN_CTRLMODE_TDC_AUTO		0x200	/* CAN transiver automatically calculates TDCV */
+>  #define CAN_CTRLMODE_TDC_MANUAL		0x400	/* TDCV is manually set up by user */
+>  #define CAN_CTRLMODE_LIN		BIT(11)	/* LIN bus mode */
+> +#define CAN_CTRLMODE_LIN_COMMANDER	BIT(12)	/* LIN bus specific commander mode */
+>  
+>  /*
+>   * CAN device statistics
+> 
+
 -- 
-2.20.1
+ i.
 
 
