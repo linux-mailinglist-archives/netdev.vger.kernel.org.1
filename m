@@ -1,120 +1,137 @@
-Return-Path: <netdev+bounces-95498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 062D48C26D2
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 16:28:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 861888C26DB
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 16:28:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A3C5B22DD3
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:28:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4196728584D
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD8A170820;
-	Fri, 10 May 2024 14:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5EC6168AFC;
+	Fri, 10 May 2024 14:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f5/qGu4S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fhtXu+R5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF8714B08C;
-	Fri, 10 May 2024 14:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E9D14B08C
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 14:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715351286; cv=none; b=p4MmoLjnXFG5feiCcBlZPUjYcY4j4OGcAEzK7gDWEsskv+lJpSypSmMyQjQXoc8r6oJRc7+e/DvbsXSwpnG0ic8Vm90t82J+0Qsu13yy0Jx0UeeQsFb8Ynhb/7C55U+/BOT+rDIcKtP82fJaoTCsBrbamNSyajtsa4ApSFeNDYI=
+	t=1715351320; cv=none; b=Yl+k+CF50QEIH4noYkCiA0aPU8NrygG9u8CWVw+e0/z0qbqvpVJ/taq0ef9b+vXyfLsKk9+QlgpS0M/bO6lUoJnZPKb/i/GQmFPT+ia/nJfwa8uHddiIly4T/WkN/wQ/Azx4y2Ro6ZZ4v7GO/yaJSM42vSCaJxwzRiEt7k5hV2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715351286; c=relaxed/simple;
-	bh=kz2991U92lAyIp31g+FlBWFiotk7FNz3VZrEBJoZ0qw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C1M2TvrmCzO5Jx9qcsmLxpe/QkcRkR8GfrX7W6oGiKf3tub7m0UFht6h9rDBl5XWpAW/KKYEMOvs80tXwZQrJv0VLDlhH3Rya+orpv2z7Kkyh7sXj6nEj3pLjp6PPOW0SBrLX037T809ay9aoQgvgcSEvzQILThep6mkQsx7rz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f5/qGu4S; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715351285; x=1746887285;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kz2991U92lAyIp31g+FlBWFiotk7FNz3VZrEBJoZ0qw=;
-  b=f5/qGu4SOegdF3tV4GDCqoDMA5A80t7wq/e9VwcKWcwcTGPwIfnHvzWL
-   UJc792Y/jGVyq3G1ICQ6O9T3tyskM7n2bXT3o3F2StxhrcOAevYY0Vj44
-   rcnO3mPZwhV7b3ehf8g8mUAXz+9RrnvHXemfJ73BmRUT8Hw7NDye+Fdd2
-   S9ZIngBTJsidgaS0USe28ConIL74sMe0FRExOwYbE6xqKBhH0ytF6eDM2
-   a0rMi2Xbe8oRTvUGZLUD8gLUl3MCsnIJkz3pHOXFLOe7jQs6baASXnHwC
-   0aL+t2NF/iDn5H/m9QpiJf/aTaIIaPXpKh2LsPwJQkRWukS2H04E/RIgk
-   g==;
-X-CSE-ConnectionGUID: YQDjtZIKR0KADxFttf2G7Q==
-X-CSE-MsgGUID: fA+uijg/TdymXqi10xw/nw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="11460536"
-X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
-   d="scan'208";a="11460536"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 07:28:04 -0700
-X-CSE-ConnectionGUID: RfUGcRtZRjGlOkFb8E3Fkg==
-X-CSE-MsgGUID: haEr3iRVQ/+b1G/BD2RmpQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
-   d="scan'208";a="29577789"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 07:27:59 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1s5RE3-000000067xv-15tJ;
-	Fri, 10 May 2024 17:27:55 +0300
-Date: Fri, 10 May 2024 17:27:55 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: "D, Lakshmi Sowjanya" <lakshmi.sowjanya.d@intel.com>
-Cc: "tglx@linutronix.de" <tglx@linutronix.de>,
-	"jstultz@google.com" <jstultz@google.com>,
-	"giometti@enneenne.com" <giometti@enneenne.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"x86@kernel.org" <x86@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Dong, Eddie" <eddie.dong@intel.com>,
-	"Hall, Christopher S" <christopher.s.hall@intel.com>,
-	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
-	"joabreu@synopsys.com" <joabreu@synopsys.com>,
-	"mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
-	"perex@perex.cz" <perex@perex.cz>,
-	"linux-sound@vger.kernel.org" <linux-sound@vger.kernel.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"peter.hilber@opensynergy.com" <peter.hilber@opensynergy.com>,
-	"N, Pandith" <pandith.n@intel.com>,
-	"Mohan, Subramanian" <subramanian.mohan@intel.com>,
-	"T R, Thejesh Reddy" <thejesh.reddy.t.r@intel.com>
-Subject: Re: [PATCH v7 10/12] pps: generators: Add PPS Generator TIO Driver
-Message-ID: <Zj4u64qC4d2FXSQW@smile.fi.intel.com>
-References: <20240430085225.18086-1-lakshmi.sowjanya.d@intel.com>
- <20240430085225.18086-11-lakshmi.sowjanya.d@intel.com>
- <ZjD3ztepVkb5RlVE@smile.fi.intel.com>
- <CY8PR11MB7364F43C08D75878205599A5C4E62@CY8PR11MB7364.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1715351320; c=relaxed/simple;
+	bh=p3y9hJQ+HVpr/uRhiT4scof+qEdN76syc6+Nm3GvjhM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SG98HB35ymH3KbRzR9laZsOidxdUuGulacy8xmI71RSAn97KpJg6qMo2Z2G21O2NXU67MJUKHtZPy4bQt4/XOI/pwlN19dIdPQLTzE4GtvA77wEC3lJctsE3Of1oJF376pcvuZu3qJxKxTjsbbZoB6DAPo6M3lcm92JVyWENBec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fhtXu+R5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79B54C113CC;
+	Fri, 10 May 2024 14:28:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715351320;
+	bh=p3y9hJQ+HVpr/uRhiT4scof+qEdN76syc6+Nm3GvjhM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fhtXu+R58jnr6bxABBmf1zQScKJn7nYihVziVpswQfUR8lVaUMJWjBQB2pGWCXPNF
+	 cbluTtKzBkiPiPgOmEiJQg6/MAh1AzVmiGGLuU7fWAI+vtwTmZQiOdhPCiLhvJb/HC
+	 p03Ymid5YmdLASmIcF8t6fEaQ15uk3Hjk5+A573gQ5elUAgJWq3yD5t4rN8F71cg3m
+	 CK+bfJAmgkvz9cqLqx4KV5e0/7bAmzdKjnuqk46B1QranBhep/j0r3ClnWpEinGGEa
+	 HwlszsfNa7tnTuANGGW0FiOLvbvoj8NubOwPBslp3ZxUHPcnlzZhf4+XLCBAhSxzyy
+	 bP2n/WL/i7p7g==
+Message-ID: <11ff9d2b-6c3e-4ee5-81c0-d36de2308dbd@kernel.org>
+Date: Fri, 10 May 2024 16:28:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CY8PR11MB7364F43C08D75878205599A5C4E62@CY8PR11MB7364.namprd11.prod.outlook.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [TEST] Flake report
+Content-Language: en-GB
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>,
+ Simon Horman <horms@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>,
+ Jaehee Park <jhpark1013@gmail.com>, Petr Machata <petrm@nvidia.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
+ Davide Caratti <dcaratti@redhat.com>
+References: <20240509160958.2987ef50@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240509160958.2987ef50@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 09, 2024 at 04:38:49AM +0000, D, Lakshmi Sowjanya wrote:
+Hi Jakub,
 
-> Will update as suggested.
+Thank you for this reminder!
 
-Just a side note: Since the series most likely missed v6.10, don't forget to
-bump dates and versions in ABI documentation in the next version.
+On 10/05/2024 01:09, Jakub Kicinski wrote:
 
+(...)
+
+> mptcp
+> -----
+> To: Matthieu Baerts <matttbe@kernel.org>
+> 
+> simult-flows-sh is still quite flaky :(
+
+Yes, we need to find a solution for that. It is not as unstable on our
+side [1]. We will look at that next week. If we cannot find a solution
+quickly, we will skip the flaky subtests to stop the noise while
+continuing to investigate.
+
+[1] https://ci-results.mptcp.dev/flakes.html
+
+Cheers,
+Matt
 -- 
-With Best Regards,
-Andy Shevchenko
-
+Sponsored by the NGI0 Core fund.
 
 
