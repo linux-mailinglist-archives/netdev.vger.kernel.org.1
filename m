@@ -1,189 +1,160 @@
-Return-Path: <netdev+bounces-95304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D14858C1D6C
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 06:27:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F7298C1D7F
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 06:50:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83C08284693
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 04:27:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD4D11F23207
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 04:50:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F0214A084;
-	Fri, 10 May 2024 04:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9F614A08E;
+	Fri, 10 May 2024 04:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="D5JlEHsH"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WXcxe161"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2182149C79
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 04:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D287E12DD88;
+	Fri, 10 May 2024 04:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715315237; cv=none; b=l9pQ9iTJDYBgoO8+I7lvuuTXLKq/5lmU7PmS5u1YxnK9ob/41F63LckTAE49MgdYhzgKtW1ZNnQCc8aCV6rxtjjYjYa0ZzJt7y6phiEm8sFdAFqU/YbcBp9CrJH+3JA3RGiLEgf5oyGs4Nf9igL9ZyuQKKHvWvjbbZEyPPcxn5g=
+	t=1715316609; cv=none; b=N4A/yqqv2uMN6CSMLMOYDJqZvrvwjB3BEalCNHQ8nDpvnYQiqAsOdG8xXTYUXl3UGtfI/pnAYwStEXTvMHOUaIoDZ6c566t4wjU5mNJHUEdZiztqt8/1GN4otGNeFe3BonQm2WGg+kuGbYtW1/ThrrNPvel7QxsilY2L5ownPsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715315237; c=relaxed/simple;
-	bh=14nSWpNeh0d7rXYDykeBcTJq2Hy8sObAceg8DfUEvNU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TA+A+qgnBqAUQtozrC4Vk334Yt6lDqCnm5Mqk/SWtw4BtM/68eOqiRsGrS6tX0gJ+U123Br2tfmtHldddzFNLk4hlyT9mM4WqX5WtjFkBwSWK50Axil7uBqMlRKT4W0Bcqe7vgJ2K7/y7YQleGjsyyFybZ1WcV0xhtN3mXY6k2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=D5JlEHsH; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1eb24e3a2d9so14258725ad.1
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 21:27:15 -0700 (PDT)
+	s=arc-20240116; t=1715316609; c=relaxed/simple;
+	bh=Ojbxz06eYniGbmSWyknhMjXnkbDq+DPs55HNM0uCzNA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gBtTwrNuQ3BUulzk3lz7HdGs/hqCmvwve731ch91oFKgVDOYhZWDwSIvCcEmCk85uwGPcm1IXIM/tyCMtKz9wiHf+4svpFGGcMi/dfjRtFyOh8xy0NN6enqnuP2LiK5Et66Z6rTvnC9S2H0L1hlBaj27F90P0lZHvHm40h1j7q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=WXcxe161; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1715315235; x=1715920035; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JO706E9CS5Et8zewEmeRZI9gpEtF+EgDmsWANk00whE=;
-        b=D5JlEHsH8qYYy1Wi//0FTaTRc5BvOeijmbHWET5z0nV9I/uqls4/JnThzl+zXDDJef
-         RBDyeCcJBkvHuww+NPi3tntLec/J2wnoG97Degzol7LiCd7D9C9sBXF0uAWbYV7K5b9F
-         5L5PFdoJPHhMJSylqVo4JXVv2NeL+T6rkgP5E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715315235; x=1715920035;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JO706E9CS5Et8zewEmeRZI9gpEtF+EgDmsWANk00whE=;
-        b=GyxS54I9enOuppUJ/7firFHHl22GmXtXieZFGb9Jh2w1NJjPyrXNqA5q1JEqX5epM/
-         Dx5y90mRDzrYLGlGhNJdJOni7+wfp1KB4G+4T7u+5n3o9E+EjnYqI1NfcyDPNVtAIH+S
-         w/LWhlNPVhWkiwnJKAMqI0CAimsLNtD4Bu+XVPyzJ6vzJveqn7S5zaRgDsYHAZrFM0hX
-         GAQL3+lv01IOc/2AM9+CcC6dW03uZFQYr6qi54mavmEkO7W4+0Ytrq39Y6qk0aGBVHiu
-         AQg0MTlvor81+/mGGPXvaQ1irAmJqznJnuRaZu1KO31UqODc/9MVPIp/FaV5tG7vVuph
-         HMHg==
-X-Forwarded-Encrypted: i=1; AJvYcCU1Xk4JJo8/J63rijEhCd4mfEAaxP97mG3pqE+0cigdcS9gT0rqtPhWKAHfIjoeahCGc6/7GfIwiMQx+k6V/56I6zfqCijF
-X-Gm-Message-State: AOJu0YwYb6iE/LHglDUm3pDppTBHv7kmPaeLTzBXhEiOjzTp719yCVKr
-	I+3NUmiRaHyMlBychFzjPKUjktsxT7CDl15DWMLGXTldlLMX0DohqQzV8jn/6VA=
-X-Google-Smtp-Source: AGHT+IGpQAmfRjfA2BEioKWQ7Pne3T/JJXafarTVBkxYhZOG8AnFDxWJ9uvzwShO4ilaXkKzhcMhJA==
-X-Received: by 2002:a17:902:e883:b0:1eb:d79a:c111 with SMTP id d9443c01a7336-1ef43c095b1mr22932935ad.4.1715315235174;
-        Thu, 09 May 2024 21:27:15 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bad6176sm22571335ad.76.2024.05.09.21.27.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 21:27:14 -0700 (PDT)
-Date: Thu, 9 May 2024 21:27:11 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Zhu Yanjun <zyjzyj2000@gmail.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	saeedm@nvidia.com, gal@nvidia.com, nalramli@fastly.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net-next 0/1] mlx5: Add netdev-genl queue stats
-Message-ID: <Zj2iHwEO4NLvCT06@LQ3V64L9R2>
-References: <20240503173429.10402325@kernel.org>
- <ZjkbpLRyZ9h0U01_@LQ3V64L9R2>
- <8678e62c-f33b-469c-ac6c-68a060273754@gmail.com>
- <ZjwJmKa6orPm9NHF@LQ3V64L9R2>
- <20240508175638.7b391b7b@kernel.org>
- <ZjwtoH1K1o0F5k+N@ubuntu>
- <20240508190839.16ec4003@kernel.org>
- <ZjxtejIZmJCwLgKC@ubuntu>
- <32495a72-4d41-4b72-84e7-0d86badfd316@gmail.com>
- <Zj1qxgElgHhtxj4h@LQ3V64L9R2>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1715316608; x=1746852608;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=5bl0Zifhqq7E3SoEKYbnz8ntYa90jVZRoq1CV9kYkGQ=;
+  b=WXcxe1613DL0S0dOLHM0bGjFyXt73PzCBvTso9U9+QSEJT8F+LJ21UmL
+   MEHiYv4FsugpiBnpasaQ+XVYSEjNKmYeaZFHGKBT74tDSzNDvBnujRkml
+   dr2Lw4gS1s5DglYH86aVSna5bSOJL7juzkhGSWdZ+hYT3UiHGW3H20Vd5
+   g=;
+X-IronPort-AV: E=Sophos;i="6.08,150,1712620800"; 
+   d="scan'208";a="657824590"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 04:50:05 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:1742]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.40:2525] with esmtp (Farcaster)
+ id 2c3c20f3-af69-4b47-b2fb-8052ca477e74; Fri, 10 May 2024 04:50:04 +0000 (UTC)
+X-Farcaster-Flow-ID: 2c3c20f3-af69-4b47-b2fb-8052ca477e74
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 10 May 2024 04:50:03 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.119.0.5) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 10 May 2024 04:49:59 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <leitao@debian.org>
+CC: <alexander@mihalicyn.com>, <daan.j.demeyer@gmail.com>,
+	<davem@davemloft.net>, <dhowells@redhat.com>, <edumazet@google.com>,
+	<horms@kernel.org>, <john.fastabend@gmail.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <paulmck@kernel.org>
+Subject: Re: [PATCH net v2] af_unix: Fix data races in unix_release_sock/unix_stream_sendmsg
+Date: Fri, 10 May 2024 13:49:48 +0900
+Message-ID: <20240510044948.26074-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240509081459.2807828-1-leitao@debian.org>
+References: <20240509081459.2807828-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zj1qxgElgHhtxj4h@LQ3V64L9R2>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWA002.ant.amazon.com (10.13.139.113) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, May 09, 2024 at 05:31:06PM -0700, Joe Damato wrote:
-> On Thu, May 09, 2024 at 01:16:15PM +0300, Tariq Toukan wrote:
-> > 
-> > 
-> > On 09/05/2024 9:30, Joe Damato wrote:
-> > > On Wed, May 08, 2024 at 07:08:39PM -0700, Jakub Kicinski wrote:
-> > > > On Thu, 9 May 2024 01:57:52 +0000 Joe Damato wrote:
-> > > > > If I'm following that right and understanding mlx5 (two things I am
-> > > > > unlikely to do simultaneously), that sounds to me like:
-> > > > > 
-> > > > > - mlx5e_get_queue_stats_rx and mlx5e_get_queue_stats_tx check if i <
-> > > > >    priv->channels.params.num_channels (instead of priv->stats_nch),
-> > > > 
-> > > > Yes, tho, not sure whether the "if i < ...num_channels" is even
-> > > > necessary, as core already checks against real_num_rx_queues.
-> > > > 
-> > > > >    and when
-> > > > >    summing mlx5e_sq_stats in the latter function, it's up to
-> > > > >    priv->channels.params.mqprio.num_tc instead of priv->max_opened_tc.
-> > > > > 
-> > > > > - mlx5e_get_base_stats accumulates and outputs stats for everything from
-> > > > >    priv->channels.params.num_channels to priv->stats_nch, and
-> > > > 
-> > > > I'm not sure num_channels gets set to 0 when device is down so possibly
-> > > > from "0 if down else ...num_channels" to stats_nch.
-> > > 
-> > > Yea, you were right:
-> > > 
-> > >    if (priv->channels.num == 0)
-> > >            i = 0;
-> > >    else
-> > >            i = priv->channels.params.num_channels;
-> > >    for (; i < priv->stats_nch; i++) {
-> > > 
-> > > Seems to be working now when I adjust the queue count and the test is
-> > > passing as I adjust the queue count up or down. Cool.
-> > > 
-> > 
-> > I agree that get_base should include all inactive queues stats.
-> > But it's not straight forward to implement.
-> > 
-> > A few guiding points:
-> > 
-> > Use mlx5e_get_dcb_num_tc(params) for current num_tc.
-> > 
-> > txq_ix (within the real_num_tx_queues) is calculated by c->ix + tc *
-> > params->num_channels.
-> > 
-> > The txqsq stats struct is chosen by channel_stats[c->ix]->sq[tc].
-> > 
-> > It means, in the base stats you should include SQ stats for:
-> > 1. all SQs of non-active channels, i.e. ch in [params.num_channels,
-> > priv->stats_nch), tc in [0, priv->max_opened_tc).
-> > 2. all SQs of non-active TCs in active channels [0, params.num_channels), tc
-> > in [mlx5e_get_dcb_num_tc(params), priv->max_opened_tc).
-> > 
-> > Now I actually see that the patch has issues in mlx5e_get_queue_stats_tx.
-> > You should not loop over all TCs of channel index i.
-> > You must do a reverse mapping from "i" to the pair/tuple [ch_ix, tc], and
-> > then access a single TXQ stats by priv->channel_stats[ch_ix].sq[tc].
+From: Breno Leitao <leitao@debian.org>
+Date: Thu,  9 May 2024 01:14:46 -0700
+> A data-race condition has been identified in af_unix. In one data path,
+> the write function unix_release_sock() atomically writes to
+> sk->sk_shutdown using WRITE_ONCE. However, on the reader side,
+> unix_stream_sendmsg() does not read it atomically. Consequently, this
+> issue is causing the following KCSAN splat to occur:
 > 
-> It looks like txq2sq probably will help with this?
+> 	BUG: KCSAN: data-race in unix_release_sock / unix_stream_sendmsg
 > 
-> Something like:
+> 	write (marked) to 0xffff88867256ddbb of 1 bytes by task 7270 on cpu 28:
+> 	unix_release_sock (net/unix/af_unix.c:640)
+> 	unix_release (net/unix/af_unix.c:1050)
+> 	sock_close (net/socket.c:659 net/socket.c:1421)
+> 	__fput (fs/file_table.c:422)
+> 	__fput_sync (fs/file_table.c:508)
+> 	__se_sys_close (fs/open.c:1559 fs/open.c:1541)
+> 	__x64_sys_close (fs/open.c:1541)
+> 	x64_sys_call (arch/x86/entry/syscall_64.c:33)
+> 	do_syscall_64 (arch/x86/entry/common.c:?)
+> 	entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
 > 
-> for (j = 0; j < mlx5e_get_dcb_num_tc(); j++) {
->   sq = priv->txq2sq[j];
->   if (sq->ch_ix == i) {
->     /* this sq->stats is what I need */
->   }
-> }
+> 	read to 0xffff88867256ddbb of 1 bytes by task 989 on cpu 14:
+> 	unix_stream_sendmsg (net/unix/af_unix.c:2273)
+> 	__sock_sendmsg (net/socket.c:730 net/socket.c:745)
+> 	____sys_sendmsg (net/socket.c:2584)
+> 	__sys_sendmmsg (net/socket.c:2638 net/socket.c:2724)
+> 	__x64_sys_sendmmsg (net/socket.c:2753 net/socket.c:2750 net/socket.c:2750)
+> 	x64_sys_call (arch/x86/entry/syscall_64.c:33)
+> 	do_syscall_64 (arch/x86/entry/common.c:?)
+> 	entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
 > 
-> Is that right?
+> 	value changed: 0x01 -> 0x03
+> 
+> The line numbers are related to commit dd5a440a31fa ("Linux 6.9-rc7").
+> 
+> Commit e1d09c2c2f57 ("af_unix: Fix data races around sk->sk_shutdown.")
+> addressed a comparable issue in the past regarding sk->sk_shutdown.
+> However, it overlooked resolving this particular data path.
+> This patch only offending unix_stream_sendmsg() function, since the
+> other reads seem to be protected by unix_state_lock() as discussed in
+> Link: https://lore.kernel.org/all/20240508173324.53565-1-kuniyu@amazon.com/
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-This was incorrect, but I think I got it in the v2 I just sent out. When
-you have the time, please take a look at that version.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Thanks for the guidance, it was very helpful.
- 
-> Not sure if I'm missing something obvious here, sorry, I've been puzzling
-> over the mlx5 source for a bit.
+Thanks!
+
+> ---
+> Changelog:
 > 
-> BTW: kind of related but in mlx5e_alloc_txqsq the int tc param is unused (I
-> think). It might be helpful to struct mlx5e_txqsq to have a tc field and
-> then in mlx5e_alloc_txqsq:
+> v2:
+> 	* Only fix the usecase reported by KCSAN
+> 	* Targeting net instead of net-next
+> ---
+>  net/unix/af_unix.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
->   sq->tc = tc;
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index dc1651541723..fa906ec5e657 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -2224,7 +2224,7 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+>  			goto out_err;
+>  	}
+>  
+> -	if (sk->sk_shutdown & SEND_SHUTDOWN)
+> +	if (READ_ONCE(sk->sk_shutdown) & SEND_SHUTDOWN)
+>  		goto pipe_err;
+>  
+>  	while (sent < len) {
+> -- 
+> 2.43.0
 > 
-> Not sure if that'd be helpful in general, but I could send that as a
-> separate patch.
 
