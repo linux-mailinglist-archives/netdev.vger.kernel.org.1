@@ -1,134 +1,197 @@
-Return-Path: <netdev+bounces-95602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 888BA8C2C76
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 00:09:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA1A28C2C82
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 00:16:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44CA9284285
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 22:09:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 697E61F218FB
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 22:16:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAAC913D295;
-	Fri, 10 May 2024 22:09:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1920213CFA4;
+	Fri, 10 May 2024 22:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gDDyRqxc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ca4vn291"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3622513D275
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 22:09:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77BE13D249;
+	Fri, 10 May 2024 22:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715378942; cv=none; b=Pi/pSzVm2RBN3TkQFPgzK/DJI68t/GGP8BLT8351GcvsCSqz79KklGlwn+YLmJa8yG4YafGSShiD2K9UHytIjtr+oOlG9Jbjr+tHuGzuxA9VHt6Fvm4m4dnhw2bSU/Mw+EIerYDbcHK+NHYtR/uelA5RUbhfmB3+0+lZl9pnN9I=
+	t=1715379411; cv=none; b=GZUxiDYzuOBsgwtzz0Ql1cBs94sqkWIfrTE4nSWicejKEl7aWKbLBLzka6YSZ7NF99unYEEUFo8R15ZubiS7jBxglAXST7gosSSORAcXxDbhZ86VkVuVwzKbIXcDjORCYDUXmz5iU9igACnqmq42Qjyiw11AfqcBcBZWKuTm+NA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715378942; c=relaxed/simple;
-	bh=hK1AwCcD4OmTuWhTNoyavke80bEp/QmDUm1yjQRGk/4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YBi0p2JZ8au9PPp31MQ7khJYHpfEiMapvfjkjURXG0KpcXYqwxO6hMv1u1C3s8QdrOmPkWpC2DAxyNIi+hFFJXn8qd5ilaptyAkPM4OSlup43iHrmys375KLwanQxb2EoN01cx5zoOOP3FnzCQxUxOq+ZtUhLVQQwR2AFqUepLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gDDyRqxc; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-51f12ccff5eso3427890e87.1
-        for <netdev@vger.kernel.org>; Fri, 10 May 2024 15:09:01 -0700 (PDT)
+	s=arc-20240116; t=1715379411; c=relaxed/simple;
+	bh=5OfmgoAYcfgbRVZam+epYxmJECo8KxPiHXd4rLSQ43k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HEaHCr99Xn8wiAfaBR1o8DlhALlDIYiIc4vvjvU2JyMkGAbBwXdB/sv1el+5U3Zr/yzRhjxWGEsXkv/Omd8fXrORI3AC/KBVnqHj3n1qXlWurYG1LOMdJeF2hAmNnLL8FrRZedN8M7bf76NJzQ9iIyi0T3h5Bzjp/lkfd1Xd3XI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ca4vn291; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-de5b1e6beceso2975367276.0;
+        Fri, 10 May 2024 15:16:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1715378939; x=1715983739; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eqHQx/qPXsoWvKvCs+iR2iSoM0kbh7ImNwOPcq13Hhs=;
-        b=gDDyRqxc47OybD/9Cd8gfbWnNvFzG/vQ4DUCTVaFlWj4EAmN0THsgCwHCepy4s6LFj
-         DiIEOUv7j5ISq/jxmx8HE/3PQfWi+knjpolNXgKBCDv/hQpzGU8H12JiJzphPm9VN1/T
-         SbOVIyjGYlYl2egqgrWgUDAfs6WRNmyZpLvBNYl+oIt+xH/jAfShufoTh70MDBmhQd+3
-         hC1P2/Lylbt65f5SQ4Xh4ws83KxSsrjT0UE5Djbuvhpo5QjyYR7cpOVchQ2XhHs96N7S
-         nIw4mrV0ChnmduJC+K04mnCJ33zMW7e/2T5ct8oxGQXqDVNvHUUded9RSL272lTHJcar
-         m0BA==
+        d=gmail.com; s=20230601; t=1715379403; x=1715984203; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vgEWVwj9CTy6eW4Gl2DhjkJwIccLS9CHbLse7CH8+Zo=;
+        b=Ca4vn291yoaDLv87+QAVyLjisMVzPi/0ALYHU44FzJiPyr8UjnITuS8jfBCsk8/PpZ
+         CWASNkZX3UlKxKGsxeSJbH2p4SDt8PwuvAtVVfGmCnyIzOQAW84P6K1dGxlYqf1z1GMU
+         SOu21Cg0C/DaKR12Cm3Cen8+/Pp8GqP+FtNhvaZc8uHI8S5AmiSTarp8hIY/7jL6Q/FI
+         FDMWvtH8qNChCAtVTYj4ZmoHdfftO7K8zW/Qcb/g8ylKfLniYbC140qCZjKcTvDQ2W80
+         ze7TLd7p1+JoTn26DIWBe81rwiR02Nxuchm2mMVnf2/1xaFooHXRKKf+e2nQhBxbPzWL
+         imlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715378939; x=1715983739;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1715379403; x=1715984203;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eqHQx/qPXsoWvKvCs+iR2iSoM0kbh7ImNwOPcq13Hhs=;
-        b=U4yjoDI4rnirJeFHctHyxN9OMvEBJ3MWznyIsxgpA65HYCcDud1MuwSmgIgkPXevZf
-         70phC5BYL94CuIwOMwt1nqlQ2J1lQHNhnt5BVzf0fMe6QsdcvJkFce3qhsJRN3dNTN1i
-         ZtvDhLrepk4mx7FuEA5dIEAmdE2xn69egRxtBwtYkVtfSomQ+vCzS1tR+60ugv2gJC6O
-         8Oa0ZAtickpOxKFCM6kJXgFktYjud5t0gNLY9BUgA3jAG2HjCsGR+dycjJpNnQ5Xo5xV
-         o0fPJu2TykEE+lh8s6fL1ErFvgazeWFfc0u/7y0vp6zsQAk3wSAUFps1FkWzFFzeqd20
-         xmkQ==
-X-Gm-Message-State: AOJu0Yx/XXTkVBP82LazfDG8Dywjj/nF2bCnW3ihttrrQsoevp1FvQa5
-	C0u3yGdBy+/6bYfdPYRR/loWAjyqYkgE6R2Tx6Q0goCj/HcUNDC7rf2kVhIbtWY=
-X-Google-Smtp-Source: AGHT+IG9etHAzRkra2Pva4AqH5dC9t3zCo3LQlQjK11jutNSxDdpm+VlkAopy+jbZCKqeOE6gCyhAA==
-X-Received: by 2002:ac2:4c2f:0:b0:518:96b5:f2c5 with SMTP id 2adb3069b0e04-5221057923bmr2490205e87.46.1715378939428;
-        Fri, 10 May 2024 15:08:59 -0700 (PDT)
-Received: from [192.168.1.140] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a1781ce3fsm228219866b.4.2024.05.10.15.08.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 15:08:59 -0700 (PDT)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sat, 11 May 2024 00:08:43 +0200
-Subject: [PATCH net-next v2 5/5] net: ethernet: cortina: Implement
- .set_pauseparam()
+        bh=vgEWVwj9CTy6eW4Gl2DhjkJwIccLS9CHbLse7CH8+Zo=;
+        b=P9hfUZ492ZsITdhZEcQj82h+aTzkPUG0Eoq3vTGrXBqcMmnSoMYl586olxvtDdOlP+
+         T++SrQuaUs9sraZHAVHEcjz+u2Rf6g8ORFCIZQP/+ADgHCvgE2CsqxowW2LDgwb4jW3x
+         Tkf18ZdALOwb9ZGeLS5Se6qzFSTY8JonAqBGYez7xnk5R06+eMjZG2IYgB9hBeBrchPT
+         H5SKfJxJADDk+kIzRym0uZyG/kaQH39eC8SCpot6UXh4dVRVlAYfiE16WD0jBTVLBtYN
+         lLrkjtzeoylp5YWL+731Vxl1WwCauXuG5Qx3lNWh9WEU6eZRmT216aFb2lmzzH0SUUpq
+         m+rg==
+X-Forwarded-Encrypted: i=1; AJvYcCUByKPgH4Me8UfiGuW6gy8IFtRUh5P7OLkjpNvE2UdKm/Yq2Qy5j4UsZ5VubgxuaDgngLEZ8uT7gaaVr2CoAVKx8p/i
+X-Gm-Message-State: AOJu0YyMLU/2YDzg1eq+dHDZfkkT1VUJwU9LQOWuTAp8lx0QMblWDlpD
+	8zy3GVjF7uqnAac19Q2aG4IIB5d+wtX5VL8xnE94QM7cbNBz+druKXeom/gjsgPYYazZvbTAKJW
+	w40wDhuu51nFyd4ioa/FHd29I8DE=
+X-Google-Smtp-Source: AGHT+IFPstVJ9zjwRj0J3D+5ZU5oYSqAiysZbBcR98SC5jP45p7avlBHDk9SXoG1rntWZTSN2yZFxZj/VxRFE1iyoGU=
+X-Received: by 2002:a25:ab48:0:b0:dc2:5553:ca12 with SMTP id
+ 3f1490d57ef6-dee4f32be93mr4118871276.14.1715379403488; Fri, 10 May 2024
+ 15:16:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240511-gemini-ethernet-fix-tso-v2-5-2ed841574624@linaro.org>
-References: <20240511-gemini-ethernet-fix-tso-v2-0-2ed841574624@linaro.org>
-In-Reply-To: <20240511-gemini-ethernet-fix-tso-v2-0-2ed841574624@linaro.org>
-To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
-X-Mailer: b4 0.13.0
+References: <20240510192412.3297104-1-amery.hung@bytedance.com>
+ <20240510192412.3297104-3-amery.hung@bytedance.com> <b2486867-0fee-4972-ad71-7b54e8a5d2b6@gmail.com>
+In-Reply-To: <b2486867-0fee-4972-ad71-7b54e8a5d2b6@gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Fri, 10 May 2024 15:16:32 -0700
+Message-ID: <CAMB2axN3XwSmvk2eC9OnaUk5QvXS6sLVv148NrepkbtjCixVwg@mail.gmail.com>
+Subject: Re: [RFC PATCH v8 02/20] selftests/bpf: Test referenced kptr
+ arguments of struct_ops programs
+To: Kui-Feng Lee <sinquersw@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@kernel.org, 
+	toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com, 
+	xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The Cortina Gemini ethernet can very well set up TX or RX
-pausing, so add this functionality to the driver in a
-.set_pauseparam() callback.
-
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/net/ethernet/cortina/gemini.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
-index d3134db032a2..137242a4977c 100644
---- a/drivers/net/ethernet/cortina/gemini.c
-+++ b/drivers/net/ethernet/cortina/gemini.c
-@@ -2145,6 +2145,17 @@ static void gmac_get_pauseparam(struct net_device *netdev,
- 	pparam->autoneg = true;
- }
- 
-+static int gmac_set_pauseparam(struct net_device *netdev,
-+			       struct ethtool_pauseparam *pparam)
-+{
-+	struct phy_device *phydev = netdev->phydev;
+On Fri, May 10, 2024 at 2:33=E2=80=AFPM Kui-Feng Lee <sinquersw@gmail.com> =
+wrote:
+>
+>
+>
+> On 5/10/24 12:23, Amery Hung wrote:
+> > A reference is automatically acquired for a referenced kptr argument
+> > annotated via the stub function with "__ref_acquired" in a struct_ops
+> > program. It must be released and cannot be acquired more than once.
+> >
+> > The test first checks whether a reference to the correct type is acquir=
+ed
+> > in "ref_acquire". Then, we check if the verifier correctly rejects the
+> > program that fails to release the reference (i.e., reference leak) in
+> > "ref_acquire_ref_leak". Finally, we check if the reference can be only
+> > acquired once through the argument in "ref_acquire_dup_ref".
+> >
+> > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> > ---
+> >   .../selftests/bpf/bpf_testmod/bpf_testmod.c   |  7 +++
+> >   .../selftests/bpf/bpf_testmod/bpf_testmod.h   |  2 +
+> >   .../prog_tests/test_struct_ops_ref_acquire.c  | 58 ++++++++++++++++++=
 +
-+	gmac_set_flow_control(netdev, pparam->tx_pause, pparam->rx_pause);
-+	phy_set_asym_pause(phydev, pparam->rx_pause, pparam->tx_pause);
-+
-+	return 0;
-+}
-+
- static void gmac_get_ringparam(struct net_device *netdev,
- 			       struct ethtool_ringparam *rp,
- 			       struct kernel_ethtool_ringparam *kernel_rp,
-@@ -2265,6 +2276,7 @@ static const struct ethtool_ops gmac_351x_ethtool_ops = {
- 	.set_link_ksettings = gmac_set_ksettings,
- 	.nway_reset	= gmac_nway_reset,
- 	.get_pauseparam	= gmac_get_pauseparam,
-+	.set_pauseparam = gmac_set_pauseparam,
- 	.get_ringparam	= gmac_get_ringparam,
- 	.set_ringparam	= gmac_set_ringparam,
- 	.get_coalesce	= gmac_get_coalesce,
+> >   .../bpf/progs/struct_ops_ref_acquire.c        | 27 +++++++++
+> >   .../progs/struct_ops_ref_acquire_dup_ref.c    | 24 ++++++++
+> >   .../progs/struct_ops_ref_acquire_ref_leak.c   | 19 ++++++
+> >   6 files changed, 137 insertions(+)
+> >   create mode 100644 tools/testing/selftests/bpf/prog_tests/test_struct=
+_ops_ref_acquire.c
+> >   create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_ref_a=
+cquire.c
+> >   create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_ref_a=
+cquire_dup_ref.c
+> >   create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_ref_a=
+cquire_ref_leak.c
+> >
+> >
+>   ... skipped ...
+> > +
+> > diff --git a/tools/testing/selftests/bpf/progs/struct_ops_ref_acquire.c=
+ b/tools/testing/selftests/bpf/progs/struct_ops_ref_acquire.c
+> > new file mode 100644
+> > index 000000000000..bae342db0fdb
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/bpf/progs/struct_ops_ref_acquire.c
+> > @@ -0,0 +1,27 @@
+> > +#include <vmlinux.h>
+> > +#include <bpf/bpf_tracing.h>
+> > +#include "../bpf_testmod/bpf_testmod.h"
+> > +
+> > +char _license[] SEC("license") =3D "GPL";
+> > +
+> > +void bpf_task_release(struct task_struct *p) __ksym;
+> > +
+> > +/* This is a test BPF program that uses struct_ops to access a referen=
+ced
+> > + * kptr argument. This is a test for the verifier to ensure that it re=
+congnizes
+> > + * the task as a referenced object (i.e., ref_obj_id > 0).
+> > + */
+> > +SEC("struct_ops/test_ref_acquire")
+> > +int BPF_PROG(test_ref_acquire, int dummy,
+> > +          struct task_struct *task)
+> > +{
+> > +     bpf_task_release(task);
+>
+> This looks weird for me.
+>
+> According to what you mentioned in the patch 1, the purpose is to
+> prevent acquiring multiple references from happening. So, is it possible
+> to return NULL from the acquire function if having returned a reference
+> before?
 
--- 
-2.45.0
+The purpose of req_acquired is to allow acquiring a referenced kptr in
+struct_ops argument just once. Whether multiple references can be
+acquired/duplicated later I think could be orthogonal.
 
+In bpf qdisc, we ensure unique reference of skb through ref_acquired and
+the fact that there is no bpf_ref_count in sk_buff (so that users cannot
+use bpf_ref_acquire()).
+
+In this case, it is true that programs like below will be able to get
+multiple references to task (Is this the scenario you have in mind?).
+Thus, if the users want to enforce the unique reference semantic, they
+need to make bpf_task_acquire() unavailable as well.
+
+SEC("struct_ops/test_ref_acquire")
+int BPF_PROG(test_ref_acquire, int dummy,
+             struct task_struct *task)
+{
+        struct task_struct task2;
+        task2 =3D bpf_task_acquire(task);
+        bpf_task_release(task);
+        if (task2)
+            bpf_task_release(task2);
+        return 0;
+}
+
+
+>
+>
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +
+> ... skipped ...
 
