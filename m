@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-95455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D23E88C24C9
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:26:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61AB28C24CC
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:27:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72BD81F218DD
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:26:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 155822815ED
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:27:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB6915491;
-	Fri, 10 May 2024 12:26:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC7D487BC;
+	Fri, 10 May 2024 12:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BOhntd2n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RlLCLxC7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F0D134BD
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 12:26:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86906182BB
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 12:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715343984; cv=none; b=KVmX6C9im9IdtYqgquu7jycwK2OskXe/znux+LTa6aKSjJVezbsBEeBKLGE55W0FlLSiuaeIBbCSooAenkIAtKJft5bUfvl8oB6gFI/0EUes43arYjV4wFcACAx9U9svD/F4/xUmUBbg5+G2sX1dLQCD44dVT5RkLS77k7P0XWU=
+	t=1715344041; cv=none; b=bu8OGAXYVPYF/c/qipSPiS70V+KgoXhx1DvFax5sJ1DgYF+Wu/sJiPWCQlwdsUXUskRMPMlmWALlt+CMuKsurEksmJ3osSnQJ/om1RwFAoQisjQ/pSwaL7tmYoy011a3MZm11/rqLHd+ikMR7hMGut/B83HcD+5eEfa+0mlpUqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715343984; c=relaxed/simple;
-	bh=Hnq+191h8FhyyUIpxrV6q5jxz+UIi9bgn2as7lK3+F0=;
+	s=arc-20240116; t=1715344041; c=relaxed/simple;
+	bh=3QOPJukGU6uFHgR5tNYJ36zcuIs6vwSXJ/cY9HhVQL4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tZ234pdH/WnQuCAol/59miwnadysj0VitMp55rD0AlhnY9Zi+eqJD5wrpW6R6UvywmYhAzVQCqYrvSavjRCrNYn8c2HRgqp2e311NDcsWB/DlH+17oyIA4KfQTPvxa3SqY4STjYBQ9yCnFwPDssC54T6IFQx2Pi6QmDV9ae0L54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BOhntd2n; arc=none smtp.client-ip=192.198.163.7
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZsCWGqmgMKHNXOCaZoCEzLmo0ooQMRpWcgMB+GH7FmGj/Vk6NCGbneN8x9+/5CjO1bw72zCTpISXORcG6/AReukCMQOL0o4jHnUUzhGzkXIBkmKvtgx11bM21CBIj9J73EhnMRPZOyx+g3oWJW+pJNAPh6iGwpGlTCPWDUQ989w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RlLCLxC7; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715343983; x=1746879983;
+  t=1715344040; x=1746880040;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=Hnq+191h8FhyyUIpxrV6q5jxz+UIi9bgn2as7lK3+F0=;
-  b=BOhntd2n6qkgR4kXmEMmflr+kZhoAYI0FWeXMN6TPSKyy28OjHa15Tov
-   UoQM2+hidtaEY9IS5D/aHUiXjQle+4fgGHIROcR7ZKOc5nEuhclNsrS7Q
-   9lgkUT5lcbvWyfh0uikN7axPdGoQpLTe1nN6Tiie3Pg5fftnMd+GzHbT9
-   hsJQKabgnlti1JcenlClV2Qs2D7OdLNIFOuKLp+BXTGao/a6VtNRPCCML
-   6VQ2NdlZ/my9L2kzdGFrogTziFhWRRN/y4K0SLKYU/wjfB7Mp2FFYmeKP
-   lM68L/W5dNAnx7KaGeW+/9rlTgAHkB4p1OToUsD6vLMDbe93mLkCj7xwo
-   w==;
-X-CSE-ConnectionGUID: 7SY7FtVCS4uW49X1LY4qWw==
-X-CSE-MsgGUID: h5twnn3tQ0mpOxFizKhJgw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="36701486"
+  bh=3QOPJukGU6uFHgR5tNYJ36zcuIs6vwSXJ/cY9HhVQL4=;
+  b=RlLCLxC7+VhlCcpitcuUpXWqEpS/3QXw1ffir7kpW7aOyRLl7OWGueyq
+   ZhOLZDFv5CPA8h8ZKi5AZIjDfvuJ2XDoU8kfBUmWUiLSlEqunV3rDtvZY
+   43Xlp+ZQMon4lIRTga21+ksup63i0eTTkHpZ6ddbCdJwpqAEL5gpwm3bB
+   03mpzJOFBbIr1NAwUoUI10HJc1bYd8R9Xg+Sb+M27D5MUJhtY/7+XOCTW
+   d0sbaI8S4sV8jy0pIYaMazBHLBdRrRT/EnjMkcLDdzH2KWGb4H+yj+KFe
+   11cZqJrjPAMKCk9177dTYQEKXZUAioI0ITtFpHeiZd/RfcmjEYS7qUSy0
+   A==;
+X-CSE-ConnectionGUID: hwWcWncoT3O0i0hoyuwYIQ==
+X-CSE-MsgGUID: mrN7m4rOSR6lFdnj/LOWOw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="11448561"
 X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
-   d="scan'208";a="36701486"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 05:26:22 -0700
-X-CSE-ConnectionGUID: 4Zyxxi2eSjmg5/RJNmA1EA==
-X-CSE-MsgGUID: wTAdXrR5RYiLfbXSmP8ISQ==
+   d="scan'208";a="11448561"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 05:27:19 -0700
+X-CSE-ConnectionGUID: j3N3MwOeReK7huCho3WGBg==
+X-CSE-MsgGUID: pOF2BCpvRButj3Hp/or91g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
-   d="scan'208";a="29988170"
+   d="scan'208";a="29618221"
 Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 05:26:19 -0700
-Date: Fri, 10 May 2024 14:25:47 +0200
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 05:27:16 -0700
+Date: Fri, 10 May 2024 14:26:44 +0200
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 To: Jiri Pirko <jiri@resnulli.us>
 Cc: shayd@nvidia.com, maciej.fijalkowski@intel.com,
@@ -67,14 +67,13 @@ Cc: shayd@nvidia.com, maciej.fijalkowski@intel.com,
 	intel-wired-lan@lists.osuosl.org, pio.raczynski@gmail.com,
 	sridhar.samudrala@intel.com, jacob.e.keller@intel.com,
 	wojciech.drewek@intel.com, przemyslaw.kitszel@intel.com
-Subject: Re: [Intel-wired-lan] [iwl-next v1 08/14] ice: create port
- representor for SF
-Message-ID: <Zj4SS6hPPDEhvBCX@mev-dev>
+Subject: Re: [Intel-wired-lan] [iwl-next v1 00/14] ice: support devlink
+ subfunction
+Message-ID: <Zj4ShOiyrGQK8J6p@mev-dev>
 References: <20240507114516.9765-1-michal.swiatkowski@linux.intel.com>
- <20240507114516.9765-9-michal.swiatkowski@linux.intel.com>
- <ZjywddcaIae0W_w3@nanopsycho.orion>
- <Zj3NQw1BxqtOS9VG@mev-dev>
- <Zj4AAFwZudmyOWTm@nanopsycho.orion>
+ <ZjyxBcVZNbWioRP0@nanopsycho.orion>
+ <Zj3LwDMbktRXk0QX@mev-dev>
+ <Zj4AYN4uDtL51G1P@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,59 +82,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zj4AAFwZudmyOWTm@nanopsycho.orion>
+In-Reply-To: <Zj4AYN4uDtL51G1P@nanopsycho.orion>
 
-On Fri, May 10, 2024 at 01:07:44PM +0200, Jiri Pirko wrote:
-> Fri, May 10, 2024 at 09:31:15AM CEST, michal.swiatkowski@linux.intel.com wrote:
-> >On Thu, May 09, 2024 at 01:16:05PM +0200, Jiri Pirko wrote:
-> >> Tue, May 07, 2024 at 01:45:09PM CEST, michal.swiatkowski@linux.intel.com wrote:
-> >> >Store subfunction and VF pointer in port representor structure as an
-> >> >union. Add port representor type to distinguish between each of them.
+On Fri, May 10, 2024 at 01:09:20PM +0200, Jiri Pirko wrote:
+> Fri, May 10, 2024 at 09:24:48AM CEST, michal.swiatkowski@linux.intel.com wrote:
+> >On Thu, May 09, 2024 at 01:18:29PM +0200, Jiri Pirko wrote:
+> >> Tue, May 07, 2024 at 01:45:01PM CEST, michal.swiatkowski@linux.intel.com wrote:
+> >> >Hi,
 > >> >
-> >> >Keep the same flow of port representor creation, but instead of general
-> >> >attach function create helpers for VF and subfunction attach function.
+> >> >Currently ice driver does not allow creating more than one networking
+> >> >device per physical function. The only way to have more hardware backed
+> >> >netdev is to use SR-IOV.
 > >> >
-> >> >Type of port representor can be also known based on VSI type, but it
-> >> >is more clean to have it directly saved in port representor structure.
+> >> >Following patchset adds support for devlink port API. For each new
+> >> >pcisf type port, driver allocates new VSI, configures all resources
+> >> >needed, including dynamically MSIX vectors, program rules and registers
+> >> >new netdev.
 > >> >
-> >> >Create port representor when subfunction port is created.
+> >> >This series supports only one Tx/Rx queue pair per subfunction.
 > >> >
-> >> >Add devlink lock for whole VF port representor creation and destruction.
-> >> >It is done to be symmetric with what happens in case of SF port
-> >> >representor. SF port representor is always added or removed with devlink
-> >> >lock taken. Doing the same with VF port representor simplify logic.
+> >> >Example commands:
+> >> >devlink port add pci/0000:31:00.1 flavour pcisf pfnum 1 sfnum 1000
+> >> >devlink port function set pci/0000:31:00.1/1 hw_addr 00:00:00:00:03:14
+> >> >devlink port function set pci/0000:31:00.1/1 state active
+> >> >devlink port function del pci/0000:31:00.1/1
 > >> >
-> >> >Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> >> >Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> >> >---
-> >> > .../ethernet/intel/ice/devlink/devlink_port.c |   6 +-
-> >> > .../ethernet/intel/ice/devlink/devlink_port.h |   1 +
-> >> > drivers/net/ethernet/intel/ice/ice_eswitch.c  |  85 +++++++++---
-> >> > drivers/net/ethernet/intel/ice/ice_eswitch.h  |  22 +++-
-> >> > drivers/net/ethernet/intel/ice/ice_repr.c     | 124 +++++++++++-------
-> >> > drivers/net/ethernet/intel/ice/ice_repr.h     |  21 ++-
-> >> > drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +-
-> >> > drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   4 +-
-> >> > 8 files changed, 187 insertions(+), 80 deletions(-)
+> >> >Make the port representor and eswitch code generic to support
+> >> >subfunction representor type.
+> >> >
+> >> >VSI configuration is slightly different between VF and SF. It needs to
+> >> >be reflected in the code.
+> >> >
+> >> >Most recent previous patchset (not containing port representor for SF
+> >> >support). [1]
+> >> >
+> >> >[1] https://lore.kernel.org/netdev/20240417142028.2171-1-michal.swiatkowski@linux.intel.com/
+> >> >
 > >> 
-> >> This calls for a split to at least 2 patches. One patch to prepare and
-> >> one to add the SF support?
+> >> 
+> >> I don't understand howcome the patchset is v1, yet there are patches
+> >> that came through multiple iterations alread. Changelog is missing
+> >> completely :/
+> >> 
 > >
-> >Is 187 insertions and 80 deletions too many for one patch? Or the
-> >problem is with number of files changed?
+> >What is wrong here? There is a link to previous patchset with whole
+> >changlog and links to previous ones. I didn't add changlog here as it is
+> >new patchset (partialy the same as from [1], because of that I added a
+> >link). I can add the changlog from [1] if you want, but for me it can be
+> >missleading.
 > 
-> The patch is hard to follow, that's the problem.
+> It's always good to see what you changed if you send modified patches.
+> That's all.
 > 
 
-Ok, I will do my best to make it easier to read in next version.
+I will paste previous changelog in next version so.
 
 > 
 > >
-> >I don't see what here can be moved to preparation part as most changes
-> >depends on each other. Do you want me to have one patch with unused
-> >functions that are adding/removing SF repr and another with calling
-> >them?
-> >
-> >Thanks,
-> >Michal
+> >> 
+> >> >Michal Swiatkowski (7):
+> >> >  ice: treat subfunction VSI the same as PF VSI
+> >> >  ice: create port representor for SF
+> >> >  ice: don't set target VSI for subfunction
+> >> >  ice: check if SF is ready in ethtool ops
+> >> >  ice: netdevice ops for SF representor
+> >> >  ice: support subfunction devlink Tx topology
+> >> >  ice: basic support for VLAN in subfunctions
+> >> >
+> >> >Piotr Raczynski (7):
+> >> >  ice: add new VSI type for subfunctions
+> >> >  ice: export ice ndo_ops functions
+> >> >  ice: add basic devlink subfunctions support
+> >> >  ice: allocate devlink for subfunction
+> >> >  ice: base subfunction aux driver
+> >> >  ice: implement netdev for subfunction
+> >> >  ice: allow to activate and deactivate subfunction
+> >> >
+> >> > drivers/net/ethernet/intel/ice/Makefile       |   2 +
+> >> > .../net/ethernet/intel/ice/devlink/devlink.c  |  48 ++
+> >> > .../net/ethernet/intel/ice/devlink/devlink.h  |   1 +
+> >> > .../ethernet/intel/ice/devlink/devlink_port.c | 516 ++++++++++++++++++
+> >> > .../ethernet/intel/ice/devlink/devlink_port.h |  43 ++
+> >> > drivers/net/ethernet/intel/ice/ice.h          |  19 +-
+> >> > drivers/net/ethernet/intel/ice/ice_base.c     |   5 +-
+> >> > drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   1 +
+> >> > drivers/net/ethernet/intel/ice/ice_eswitch.c  |  85 ++-
+> >> > drivers/net/ethernet/intel/ice/ice_eswitch.h  |  22 +-
+> >> > drivers/net/ethernet/intel/ice/ice_ethtool.c  |   7 +-
+> >> > drivers/net/ethernet/intel/ice/ice_lib.c      |  52 +-
+> >> > drivers/net/ethernet/intel/ice/ice_lib.h      |   3 +
+> >> > drivers/net/ethernet/intel/ice/ice_main.c     |  66 ++-
+> >> > drivers/net/ethernet/intel/ice/ice_repr.c     | 195 +++++--
+> >> > drivers/net/ethernet/intel/ice/ice_repr.h     |  22 +-
+> >> > drivers/net/ethernet/intel/ice/ice_sf_eth.c   | 329 +++++++++++
+> >> > drivers/net/ethernet/intel/ice/ice_sf_eth.h   |  33 ++
+> >> > .../ethernet/intel/ice/ice_sf_vsi_vlan_ops.c  |  21 +
+> >> > .../ethernet/intel/ice/ice_sf_vsi_vlan_ops.h  |  13 +
+> >> > drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +-
+> >> > drivers/net/ethernet/intel/ice/ice_txrx.c     |   2 +-
+> >> > drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+> >> > drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   4 +-
+> >> > .../net/ethernet/intel/ice/ice_vsi_vlan_ops.c |   4 +
+> >> > drivers/net/ethernet/intel/ice/ice_xsk.c      |   2 +-
+> >> > 26 files changed, 1362 insertions(+), 138 deletions(-)
+> >> > create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.c
+> >> > create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
+> >> > create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_vsi_vlan_ops.c
+> >> > create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_vsi_vlan_ops.h
+> >> >
+> >> >-- 
+> >> >2.42.0
+> >> >
+> >> >
 
