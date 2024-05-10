@@ -1,239 +1,187 @@
-Return-Path: <netdev+bounces-95372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76EEA8C2129
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:39:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A1238C212B
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:40:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10AC028154F
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 09:39:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D6851C20FD3
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 09:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D552161330;
-	Fri, 10 May 2024 09:39:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA75160877;
+	Fri, 10 May 2024 09:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="FYvNigRk"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lXls/VCL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A7F79945
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 09:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96C315B108;
+	Fri, 10 May 2024 09:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715333965; cv=none; b=iWi4zu/DYfhsQMDkgGo1/VnJF5mBBx9UEtIbRMwF6X/4pYdxd7jkbj36PI2Fau7GScFZgMtOeKwIS/lKkqw6O3tOhgxHrhZJnR8E5PT6v5vNxMXaO5UEi4OpRlizi7l9R6gz39fzri/nlQuHO0lAvyQamtFJE/XnW/N7iqoH5Pw=
+	t=1715334034; cv=none; b=Kk414OE++VZGJ9TMiN4Tj6F2PF1prBKzA1JmNPWQy0FcSshe3g8cSNZIJNUdEEE+NAuqnndPmGD2G+9zc1aNITzgq1p9wgi2dnQ6LNpuJg4S28ok/f5uuR1V3lWOK/8OMUb8NjuOJ13y7+tL98EH5GIdGEUg+OQYGlhlYm4NnRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715333965; c=relaxed/simple;
-	bh=aUC9WY9L673XexnT/sMq0U/3yMHh03s1b+2kjzlvG2k=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l1H1FX+XQ0Mn6rIXh4PzUuZZ1kuCi6GPpA0xjys65pe6+jIV5DzDOHysTDeA6ZXBMAsJblkjdEX/8KsENZFBPmHpLYUhPU2Wquoqt4plOIWdqZtwCi3fWSnMlXF7uVlC80ksVNB7N0598I+KIk2xxdhD012Cx4axJQGHpDyExIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=FYvNigRk; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1715333965; x=1746869965;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=DCmyurp3HT6tozvqW7aDfi87dDIz82X35+QOhDRnaHs=;
-  b=FYvNigRkouzrajXu7AOEGSsn3nAkRQJdaEfiQwGkvyuxT4wQ4K5NSCQv
-   UMR0J/Ybrk2hFhV36BwQxCckNCEaVLVcYRk76fkdnK/Wk6jSk1rC0fJsH
-   c9Hnvt0PHdBBuXAbfenmHP+zLcqKvyUPlfRXMkiFP+3lAnJpmyHBOSKEm
-   w=;
-X-IronPort-AV: E=Sophos;i="6.08,150,1712620800"; 
-   d="scan'208";a="653343152"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 09:39:22 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:32365]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.186:2525] with esmtp (Farcaster)
- id 98de88ca-c8e7-445c-b16f-9e6f7edce709; Fri, 10 May 2024 09:39:20 +0000 (UTC)
-X-Farcaster-Flow-ID: 98de88ca-c8e7-445c-b16f-9e6f7edce709
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 10 May 2024 09:39:20 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.9.22) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 10 May 2024 09:39:16 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, Billy Jheng Bing-Jhong
-	<billy@starlabs.sg>
-Subject: [PATCH v2 net] af_unix: Update unix_sk(sk)->oob_skb under sk_receive_queue lock.
-Date: Fri, 10 May 2024 18:39:05 +0900
-Message-ID: <20240510093905.25510-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1715334034; c=relaxed/simple;
+	bh=VdsdasOmPy4sPsIFhfaAnrSDTw/u9uq15u29olSiUdY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UXm6Y9MFSafRlVN6tgzGr52cuLcFanD6gKnj7P9k5JYbWDX0Tl2zyzoUQgbGsQnailiLBG2vHwYp86pvEj+Z6TD7ofI/391DMLfGpKGSpJLRN8Fiv0obnFbtMrNtYliTwn7kR7D5tyCv9ELFMEZEZmX3y+VY3OWuyKRcy2o65OE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lXls/VCL; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44A9LYuv015356;
+	Fri, 10 May 2024 09:40:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=lP6Gw9j5kJ8uGDKLhQswgwChAG7hxrrVGV2JYtdxmP0=;
+ b=lXls/VCLGGnP0NhzCz1maWjVNqsqrM3qgWzcIFYljN7N3vFRXCkSEzff73kETXY0OD15
+ tt8MRzsTsJs/3A9+183Gyw7GQGmCkzOh6W6dXxFooyrSp4STmoHX1DTJzqhdAWfvY0gc
+ TSsafghSRNH8ec37yT4dKgIVDgrsRGeEQ9MDBto5cIxuSWCHkT+RsMeMRHPKBWGiaVsU
+ 2S27Db2INQZPGMFpv2EEuPSUaeXoLEJglJ10pfxZ9HKjTSKYMS1B9QWvCjV8tru9Oz0n
+ i0EZox21mCQqUMRjBsVQUqMicJFjOlfBqQo9YaiJIyltp+1yipg9/JbiO10uXsajLZbb yQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y1gabr5ak-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 May 2024 09:40:30 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44A9eTT5014625;
+	Fri, 10 May 2024 09:40:29 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y1gabr5ag-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 May 2024 09:40:29 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44A7i6VH009327;
+	Fri, 10 May 2024 09:40:29 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xyshv0e5w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 May 2024 09:40:29 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44A9eQsj48693862
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 10 May 2024 09:40:28 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6322F5805D;
+	Fri, 10 May 2024 09:40:26 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3E15D58057;
+	Fri, 10 May 2024 09:40:25 +0000 (GMT)
+Received: from [9.171.7.235] (unknown [9.171.7.235])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 10 May 2024 09:40:25 +0000 (GMT)
+Message-ID: <ba4c7916-d6c4-44b6-a649-1e17c65e87f9@linux.ibm.com>
+Date: Fri, 10 May 2024 11:40:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: some questions about restrictions in SMC-R v2's implementation
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, jaka@linux.ibm.com,
+        kgraul@linux.ibm.com
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <6d6e870a-3fbf-4802-9818-32ff46489448@linux.alibaba.com>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <6d6e870a-3fbf-4802-9818-32ff46489448@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7n470_4bm7F81DT2l4dNXbQU2Cra1jiY
+X-Proofpoint-ORIG-GUID: L6oY6bi9De9H696zDVCLbvuXILwf6ANJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-10_06,2024-05-10_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
+ adultscore=0 mlxlogscore=999 suspectscore=0 phishscore=0 mlxscore=0
+ spamscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2405100069
 
-Billy Jheng Bing-Jhong reported a race between __unix_gc() and
-queue_oob().
 
-__unix_gc() tries to garbage-collect close()d inflight sockets,
-and then if the socket has MSG_OOB in unix_sk(sk)->oob_skb, GC
-will drop the reference and set NULL to it locklessly.
 
-However, the peer socket still can send MSG_OOB message and
-queue_oob() can update unix_sk(sk)->oob_skb concurrently, leading
-NULL pointer dereference. [0]
+On 07.05.24 07:54, Guangguan Wang wrote:
+> Hi, Wenjia and Jan,
+> 
+> When testing SMC-R v2, I found some scenarios where SMC-R v2 should be worked, but due to some restrictions in SMC-R v2's implementation,
+> fallback happened. I want to know why these restrictions exist and what would happen if these restrictions were removed.
+> 
+> The first is in the function smc_ib_determine_gid_rcu, where restricts the subnet matching between smcrv2->saddr and the RDMA related netdev.
+> codes here:
+> static int smc_ib_determine_gid_rcu(...)
+> {
+>      ...
+>          in_dev_for_each_ifa_rcu(ifa, in_dev) {
+>              if (!inet_ifa_match(smcrv2->saddr, ifa))
+>                  continue;
+>              subnet_match = true;
+>              break;
+>          }
+>          if (!subnet_match)
+>              goto out;
+>      ...
+> out:
+>      return -ENODEV;
+> }
+> In my testing environment, either server or client, exists two netdevs, eth0 in netnamespace1 and eth0 in netnamespace2. For the sake of clarity
+> in the following text, we will refer to eth0 in netnamespace1 as eth1, and eth0 in netnamespace2 as eth2. The eth1's ip is 192.168.0.3/32 and the
+> eth2's ip is 192.168.0.4/24. The netmask of eth1 must be 32 due to some reasons. The eth1 is a RDMA related netdev, which means the adaptor of eth1
+> has RDMA function. The eth2 has been associated to the eth1's RDMA device using smc_pnet. When testing connection in netnamespace2(using eth2 for
+> SMC-R connection), we got fallback connection, rsn is 0x03010000, due to the above subnet matching restriction. But in this scenario, I think
+> SMC-R should work.
+> In my another testing environment, either server or client, exists two netdevs, eth0 in netnamespace1 and eth1 in netnamespace1. The eth0's ip is
+> 192.168.0.3/24 and the eth1's ip is 192.168.1.4/24. The eth0 is a RDMA related netdev, which means the adaptor of eth0 has RDMA function. The eth1 has
+> been associated to the eth0's RDMA device using smc_pnet. When testing SMC-R connection through eth1, we got fallback connection, rsn is 0x03010000,
+> due to the above subnet matching restriction. In my environment, eth0 and eth1 have the same network connectivity even though they have different
+> subnet. I think SMC-R should work in this scenario.
+> 
+> The other is in the function smc_connect_rdma_v2_prepare, where restricts the symmetric configuration of routing between client and server. codes here:
+> static int smc_connect_rdma_v2_prepare(...)
+> {
+>      ...
+>      if (fce->v2_direct) {
+>          memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
+>          ini->smcrv2.uses_gateway = false;
+>      } else {
+>          if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
+>                smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
+>                ini->smcrv2.nexthop_mac,
+>                &ini->smcrv2.uses_gateway))
+>              return SMC_CLC_DECL_NOROUTE;
+>          if (!ini->smcrv2.uses_gateway) {
+>              /* mismatch: peer claims indirect, but its direct */
+>              return SMC_CLC_DECL_NOINDIRECT;
+>          }
+>      }
+>      ...
+> }
+> In my testing environment, server's ip is 192.168.0.3/24, client's ip 192.168.0.4/24, regarding how many netdev in server or client. Server has special
+> route setting due to some other reasons, which results in indirect route from 192.168.0.3/24 to 192.168.0.4/24. Thus, when CLC handshake, client will
+> get fce->v2_direct==false, but client has no special routing setting and will find direct route from 192.168.0.4/24 to 192.168.0.3/24. Due to the above
+> symmetric configuration of routing restriction, we got fallback connection, rsn is 0x030f0000. But I think SMC-R should work in this scenario.
+> And more, why check the symmetric configuration of routing only when server is indirect route?
+> 
+> Waiting for your reply.
+> 
+> Thanks,
+> Guangguan Wang
+> 
+Hi Guangguan,
 
-To fix the issue, let's update unix_sk(sk)->oob_skb under the
-sk_receive_queue's lock and take it everywhere we touch oob_skb.
+Thank you for the questions. We also asked ourselves the same questions 
+a while ago, and also did some research on it. Unfortunately, it was not 
+yet done and I had to delay it because of my vacation last month. Now 
+it's time to pick it up again ;) I'll come back to you as soon as I can 
+give a very certain answer.
 
-Note that the same issue exists in the new GC, and the change
-in queue_oob() can be applied as is.
-
-[0]:
-BUG: kernel NULL pointer dereference, address: 0000000000000008
-#PF: supervisor write access in kernel mode
-#PF: error_code(0x0002) - not-present page
-PGD 8000000009f5e067 P4D 8000000009f5e067 PUD 9f5d067 PMD 0
-Oops: 0002 [#1] PREEMPT SMP PTI
-CPU: 3 PID: 50 Comm: kworker/3:1 Not tainted 6.9.0-rc5-00191-gd091e579b864 #110
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-Workqueue: events delayed_fput
-RIP: 0010:skb_dequeue (./include/linux/skbuff.h:2386 ./include/linux/skbuff.h:2402 net/core/skbuff.c:3847)
-Code: 39 e3 74 3e 8b 43 10 48 89 ef 83 e8 01 89 43 10 49 8b 44 24 08 49 c7 44 24 08 00 00 00 00 49 8b 14 24 49 c7 04 24 00 00 00 00 <48> 89 42 08 48 89 10 e8 e7 c5 42 00 4c 89 e0 5b 5d 41 5c c3 cc cc
-RSP: 0018:ffffc900001bfd48 EFLAGS: 00000002
-RAX: 0000000000000000 RBX: ffff8880088f5ae8 RCX: 00000000361289f9
-RDX: 0000000000000000 RSI: 0000000000000206 RDI: ffff8880088f5b00
-RBP: ffff8880088f5b00 R08: 0000000000080000 R09: 0000000000000001
-R10: 0000000000000003 R11: 0000000000000001 R12: ffff8880056b6a00
-R13: ffff8880088f5280 R14: 0000000000000001 R15: ffff8880088f5a80
-FS:  0000000000000000(0000) GS:ffff88807dd80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000008 CR3: 0000000006314000 CR4: 00000000007506f0
-PKRU: 55555554
-Call Trace:
- <TASK>
- unix_release_sock (net/unix/af_unix.c:654)
- unix_release (net/unix/af_unix.c:1050)
- __sock_release (net/socket.c:660)
- sock_close (net/socket.c:1423)
- __fput (fs/file_table.c:423)
- delayed_fput (fs/file_table.c:444 (discriminator 3))
- process_one_work (kernel/workqueue.c:3259)
- worker_thread (kernel/workqueue.c:3329 kernel/workqueue.c:3416)
- kthread (kernel/kthread.c:388)
- ret_from_fork (arch/x86/kernel/process.c:153)
- ret_from_fork_asm (arch/x86/entry/entry_64.S:257)
- </TASK>
-Modules linked in:
-CR2: 0000000000000008
-
-Fixes: 1279f9d9dec2 ("af_unix: Call kfree_skb() for dead unix_(sk)->oob_skb in GC.")
-Reported-by: Billy Jheng Bing-Jhong <billy@starlabs.sg>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
-v2:
-  * Add recvq locking everywhere we touch oob_skb (Paolo)
-
-v1: https://lore.kernel.org/netdev/20240507170018.83385-1-kuniyu@amazon.com/
----
- net/unix/af_unix.c | 18 ++++++++++++++----
- net/unix/garbage.c |  4 +++-
- 2 files changed, 17 insertions(+), 5 deletions(-)
-
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 9a6ad5974dff..c555464cf1fb 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2217,13 +2217,15 @@ static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other
- 	maybe_add_creds(skb, sock, other);
- 	skb_get(skb);
- 
-+	scm_stat_add(other, skb);
-+
-+	spin_lock(&other->sk_receive_queue.lock);
- 	if (ousk->oob_skb)
- 		consume_skb(ousk->oob_skb);
--
- 	WRITE_ONCE(ousk->oob_skb, skb);
-+	__skb_queue_tail(&other->sk_receive_queue, skb);
-+	spin_unlock(&other->sk_receive_queue.lock);
- 
--	scm_stat_add(other, skb);
--	skb_queue_tail(&other->sk_receive_queue, skb);
- 	sk_send_sigurg(other);
- 	unix_state_unlock(other);
- 	other->sk_data_ready(other);
-@@ -2614,8 +2616,10 @@ static int unix_stream_recv_urg(struct unix_stream_read_state *state)
- 
- 	mutex_lock(&u->iolock);
- 	unix_state_lock(sk);
-+	spin_lock(&sk->sk_receive_queue.lock);
- 
- 	if (sock_flag(sk, SOCK_URGINLINE) || !u->oob_skb) {
-+		spin_unlock(&sk->sk_receive_queue.lock);
- 		unix_state_unlock(sk);
- 		mutex_unlock(&u->iolock);
- 		return -EINVAL;
-@@ -2627,6 +2631,8 @@ static int unix_stream_recv_urg(struct unix_stream_read_state *state)
- 		WRITE_ONCE(u->oob_skb, NULL);
- 	else
- 		skb_get(oob_skb);
-+
-+	spin_unlock(&sk->sk_receive_queue.lock);
- 	unix_state_unlock(sk);
- 
- 	chunk = state->recv_actor(oob_skb, 0, chunk, state);
-@@ -2655,6 +2661,8 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
- 		consume_skb(skb);
- 		skb = NULL;
- 	} else {
-+		spin_lock(&sk->sk_receive_queue.lock);
-+
- 		if (skb == u->oob_skb) {
- 			if (copied) {
- 				skb = NULL;
-@@ -2666,13 +2674,15 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
- 			} else if (flags & MSG_PEEK) {
- 				skb = NULL;
- 			} else {
--				skb_unlink(skb, &sk->sk_receive_queue);
-+				__skb_unlink(skb, &sk->sk_receive_queue);
- 				WRITE_ONCE(u->oob_skb, NULL);
- 				if (!WARN_ON_ONCE(skb_unref(skb)))
- 					kfree_skb(skb);
- 				skb = skb_peek(&sk->sk_receive_queue);
- 			}
- 		}
-+
-+		spin_unlock(&sk->sk_receive_queue.lock);
- 	}
- 	return skb;
- }
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index 0104be9d4704..b87e48e2b51b 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -342,10 +342,12 @@ static void __unix_gc(struct work_struct *work)
- 		scan_children(&u->sk, inc_inflight, &hitlist);
- 
- #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-+		spin_lock(&u->sk.sk_receive_queue.lock);
- 		if (u->oob_skb) {
--			kfree_skb(u->oob_skb);
-+			WARN_ON_ONCE(skb_unref(u->oob_skb));
- 			u->oob_skb = NULL;
- 		}
-+		spin_unlock(&u->sk.sk_receive_queue.lock);
- #endif
- 	}
- 
--- 
-2.30.2
-
+Thanks,
+Wenjia
 
