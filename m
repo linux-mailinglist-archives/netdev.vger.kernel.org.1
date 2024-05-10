@@ -1,61 +1,59 @@
-Return-Path: <netdev+bounces-95396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D33E18C2297
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:55:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48AA78C229E
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E3752814CB
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:55:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F29F91F21991
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6840C16C443;
-	Fri, 10 May 2024 10:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3889116ABC3;
+	Fri, 10 May 2024 10:58:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="iAhuMrqN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hbCNeM4P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27375168AF4;
-	Fri, 10 May 2024 10:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1227A135A63;
+	Fri, 10 May 2024 10:58:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715338539; cv=none; b=IPduIAFRpJLngrPDfbbclm2WgmXD0oLrsLrUbO5VL1MaqbPbbav+xy+XVQ1DiXInVvK18qSGY1L+K7X9sw4jYXrQ1s6lR1U52hoJwgtriLygoHz2L0GWU1+p9NH4FXEdu6UOoYPKD7y0EcrqUfpddhrYs+tanK6hyg4szp+DhNc=
+	t=1715338706; cv=none; b=Bpwqr9s7WPLyO9mTUAPlTf+0A7/U+qrayAzEnypD3+gE4aNEIJS79LFvvX5biS8QoY9G6v0b9Tb4MhRbk+S0lD5YfKlchF/GkhAYxStYHrJtHFO2rXibR69T+wjpWpXJ8SoOHe38Z5EKdnsHOmnKzi460SKQXVAnJhNJELIxacY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715338539; c=relaxed/simple;
-	bh=3RLAuGF0/SkubgGqr81HXENZp8CeEDdU7Is1crZ3K9E=;
+	s=arc-20240116; t=1715338706; c=relaxed/simple;
+	bh=WGtE5WWpk/C1iE7KEMLqGKCNQCr1YROMZTc7+mCeVPA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HEYURWeGJ/q41JwWF69GncWy9YqroUh2C5JX7n6LXCMhFNtVnuy3lRlGf6Er30AJrEaAGXeydd34z+NvG4MkoujJjqIJCz02WQS9kcz4gPsed6x0Y3fdM7ti2qyZ7km2sAqUTYgLKblZN1R7es0eeHOFmyyA46IvYjmcpJLuzuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=iAhuMrqN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F142DC2BD11;
-	Fri, 10 May 2024 10:55:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1715338538;
-	bh=3RLAuGF0/SkubgGqr81HXENZp8CeEDdU7Is1crZ3K9E=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=kVnIQIWdH3hKhhkbjVbwb6yP1AYqZpGer+Kt611HD15MKrODKv9cO8ibrOR4QSp1aQPmnuUXsXV4IyrHRHhMb8VjR/HFcCkQ7lwMilm5HBEfihWuxHqRaZHf9n0WxW4UVg4jAw4Uvo8VHhaGi5fjLe97HHmgA218HjdGGVNRmig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hbCNeM4P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DB0BC113CC;
+	Fri, 10 May 2024 10:58:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715338705;
+	bh=WGtE5WWpk/C1iE7KEMLqGKCNQCr1YROMZTc7+mCeVPA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iAhuMrqNrc8yn5jVWXFn7GPRrBN8y7V/vwv8h2mY/wXj3euox2C4isv05myPDDV5q
-	 og6nQb+CIEuHNLZLFoOgncqL6lIaUSLtTevSdZ7+KO8wvZ2wdD7IN8NUOA7KtaBwLS
-	 8+DDn5ftDCGo4fdlbW6fUVVzV52a7V9c5MUrFX7I=
-Date: Fri, 10 May 2024 11:55:30 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: Nathan Chancellor <nathan@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Thomas Huth <thuth@redhat.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>, netdev@vger.kernel.org,
-	llvm@lists.linux.dev, patches@lists.linux.dev,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>
-Subject: Re: [PATCH 5/6] tty: hvc-iucv: Make use of iucv_alloc_device()
-Message-ID: <2024051023-tapeless-hardener-593d@gregkh>
-References: <20240506194454.1160315-1-hca@linux.ibm.com>
- <20240506194454.1160315-6-hca@linux.ibm.com>
+	b=hbCNeM4PSvPZ6TgJXun9VcmgdjTHxN2RNJ2s0SVwbgFfgEr9+dI3NksT3zI3e7Unx
+	 OpkLXUeiUUMt60VM47bjs558cCbfK5398Ugd9nqQ23r8lE8f0quNB7wBpDMoLTgd+X
+	 c9BZP98PE/15bZpKII9pShH2eZkLpoB0a9BFIY9ShG0A88hrcT0gTlFAhdjZ9Y0xgR
+	 2G9Oq0ADFV9YKPhgUqTftCrA8Z3cptqIgmkT3tQ9+DZJNOlpc53Ld0YVENfPf8ZZdn
+	 1HDANm8yy463kXg6e+RKXbLhEy+cmT1RioXrzwTtQxsl6VeFtIpQZFbcIIlNbR/zjB
+	 MELTHDwNHCzmQ==
+Date: Fri, 10 May 2024 11:58:20 +0100
+From: Simon Horman <horms@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ciprian Regus <ciprian.regus@analog.com>,
+	Yang Yingliang <yangyingliang@huawei.com>
+Subject: Re: [PATCH net-next v1 1/1] net: ethernet: adi: adin1110: Replace
+ linux/gpio.h by proper one
+Message-ID: <20240510105820.GA2347895@kernel.org>
+References: <20240508114519.972082-1-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,15 +62,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240506194454.1160315-6-hca@linux.ibm.com>
+In-Reply-To: <20240508114519.972082-1-andriy.shevchenko@linux.intel.com>
 
-On Mon, May 06, 2024 at 09:44:53PM +0200, Heiko Carstens wrote:
-> Make use of iucv_alloc_device() to get rid of quite some code.
++ Ciprian Regus and Yang Yingliang (via get_maintainer.pl)
+
+On Wed, May 08, 2024 at 02:45:19PM +0300, Andy Shevchenko wrote:
+> linux/gpio.h is deprecated and subject to remove.
+> The driver doesn't use it directly, replace it
+> with what is really being used.
 > 
-> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
-> ---
->  drivers/tty/hvc/hvc_iucv.c | 15 ++-------------
->  1 file changed, 2 insertions(+), 13 deletions(-)
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+> ---
+>  drivers/net/ethernet/adi/adin1110.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/adi/adin1110.c b/drivers/net/ethernet/adi/adin1110.c
+> index 8b4ef5121308..0713f1e2c7f3 100644
+> --- a/drivers/net/ethernet/adi/adin1110.c
+> +++ b/drivers/net/ethernet/adi/adin1110.c
+> @@ -11,10 +11,10 @@
+>  #include <linux/crc8.h>
+>  #include <linux/etherdevice.h>
+>  #include <linux/ethtool.h>
+> +#include <linux/gpio/consumer.h>
+>  #include <linux/if_bridge.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/iopoll.h>
+> -#include <linux/gpio.h>
+>  #include <linux/kernel.h>
+>  #include <linux/mii.h>
+>  #include <linux/module.h>
+> -- 
+> 2.43.0.rc1.1336.g36b5255a03ac
+> 
+> 
 
