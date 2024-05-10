@@ -1,172 +1,101 @@
-Return-Path: <netdev+bounces-95319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 366268C1DE8
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 08:09:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D37D8C1DF8
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 08:20:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70DAA1C20EA2
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 06:09:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 585361C209B3
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 06:20:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600341527B2;
-	Fri, 10 May 2024 06:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AfjL2PUF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445A51527BE;
+	Fri, 10 May 2024 06:20:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.65.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27E7128816;
-	Fri, 10 May 2024 06:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3823F1494DE
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 06:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.65.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715321378; cv=none; b=PQj8c9QAO7ddCHXc53EDJFLel48/kLhpIyCJdmwOKE7ElH84WrWnRM4rMn1s2RincI9UGiONqOrCv0J4ixom2EbYrASv8RQU8WZp57jZ4o3R0GMfk3QtQOc7g0AuFPB1CWjAzzQfq7GA1NfdCYMkjXPHvopaU5mcLrBVO8ML0lY=
+	t=1715322001; cv=none; b=EeB3Gmupzny9xD4ij6/yxTIrhlihpf2dizKvq/szqiBTKZEHXt/zkt6A+VKa8tptQmz2jmQgCzXcSsqAUrY1qj7dV9qmhv5o+nrg7LupMyW8CnHi8xjg9O80Ck5t8HjyWI4Cu2BUVTJgNPLpT1Sk9TgAlw2+vJ17yVOklzhDanc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715321378; c=relaxed/simple;
-	bh=X2n280+mXsA89/FtAepb7uflU5AriFITfm3j9x0rLRA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aV06sc7TVxLEYXr3d0LmDy2iYe2cwXHov2jIU5xIROuZdzDf34zz93Oqmp1wtaC/KUlN4/cFvCADjBqIFnuTEITs0ZiUZ0cr+jR/kBmhyCxsT1pTH3uCDwfzGyClhkcKHT/dLlrlDAN02xytLYXyOMReM7qZh0IMxeUoZSl4yQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AfjL2PUF; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2e09138a2b1so18605541fa.3;
-        Thu, 09 May 2024 23:09:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715321375; x=1715926175; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y6Yn4wNa98dW6VI6SqDEcxq/HOv22hewhypus1USGwM=;
-        b=AfjL2PUFnQCNAlskM0oZfyRDlS61vmJz5NT9KdRnXsiA0ek/wNBwExIDUjw/ARERLN
-         ut1SOMmkBA27IxrSxbpaOPFrdpEfSTHeSl43VS3OvYr6iAhNtZLCjgFFuVmyhEpbjav7
-         6+4VeiuK5wEMSr9ter25Xk4+/Fk/zpNsUOV7dWy/CDbg2ewcqKS7zUvNLrzCU3kiAcFQ
-         4fz0n7yhGcNOrxp53RbKPwnFcWzItkWh5OBg0WmeLVhUTbaNqcHN5hsOhf1Ds+MotuNu
-         Nw1rcGsEYE56a3Nc3NWd35H6BMWqwRE/sM5Kxj9+KJuaLU+oA9E7mWR89xvN5nKQuPIm
-         S34Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715321375; x=1715926175;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y6Yn4wNa98dW6VI6SqDEcxq/HOv22hewhypus1USGwM=;
-        b=mpC6dEUH+v1Z/S7+1TUl7nx/cSBqL7k/0Ggclrbrug62S+WznqoclRQlm3AKm9hnI5
-         GjOsAFg9mBM+PfyA07qFEsuUXrnv0vMEXGS/J9NGpFVI7WMcXu62zejxmVmsfPKbANTr
-         IxUgD5OLfrXx9js8Vh2mxtlSXQEQd/wnDjwR8t7PRqW9U5AeTVgPk1HjrBpyHa9Nz+Xu
-         uQZvRxe9ygmDkO/qQ8lFN0M7/MHJi79ytENQbPnaT8uK0xhix/r3CZfxte31LVmNTzwP
-         cSGXZQiHEW7GW8VNvJ0zQyr3PsBybgsBsrM9+9HGQEgY351cAqMf2JwbutORSihwRI2w
-         7tNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0/SDhD2ofGc/N1wqC4uLXh7Ue1pVFkl2COgALWFb/CR3ap9hhgedP1eefl53RCbklt35IKeUT9QS0hk3Q+CCD9kqsDmxzgR5idtlt4UGx1pOBjQe1IVfGAB/4f7YA6BG1KfLvmVjH
-X-Gm-Message-State: AOJu0YzY+0MrWowchW2tAdjer9gG/E3HVW5YBPCY4VORV32jwck0dkuQ
-	IwT6G9/V+qamQx32qkppCaxjFb3gV2JsSqLHEXB9GpkzpZS688PMAB+gGCmUwr4cfnTD7m1Zwu1
-	pLNOMm00EJYgCmb0Z0Q4SMI+X4M4=
-X-Google-Smtp-Source: AGHT+IGtZRZ5lZkbKfGtptUShvonm0UqQ0HKCNe+xz6gkIbRPLcwR7OXEkKd/JP0v+EBQUYbRwjzB+EU7UPlVd25o2Y=
-X-Received: by 2002:a2e:81d6:0:b0:2e4:45a6:cdcf with SMTP id
- 38308e7fff4ca-2e5205ec95bmr9748531fa.43.1715321374588; Thu, 09 May 2024
- 23:09:34 -0700 (PDT)
+	s=arc-20240116; t=1715322001; c=relaxed/simple;
+	bh=HmaUrs11k3LumKWmjlitvpT07wfIBTCqRqIRRTgnBKA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Rr4T/vWQ9RE6qx+FBtqwCrKhyX70YTJk8QqYhReGFoLdVyorRJz1YoeWRgblQ47RHa4+rrOoMJx3XBkWCysFlDTW+SXpskBWbRG6/qApHdoLSXz9XprV1c8B8Fl5LsS8QkpqPIiG34RBPeNSGwkIrKrboS+CwUb5LbJghZ7wnjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=114.132.65.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: bizesmtp88t1715321884tamjqn62
+X-QQ-Originating-IP: hyH+TIcbeogxTH2zIIF0f2zKzC2oyMeKRoZUCAoVxZ4=
+Received: from lap-jiawenwu.trustnetic.com ( [183.129.236.74])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 10 May 2024 14:18:02 +0800 (CST)
+X-QQ-SSF: 01400000000000L0Z000000A0000000
+X-QQ-FEAT: mVJZl7SIEgj+j+i5M12A4DFp/czP2RLVXY9KPD6ltPcupW0uQph18k/v2l8Ss
+	MTdz+4e1/J/R30N/MyzqHc0TchnXFUBUOEDofar9Vu6HI1yi6dkdsM/CEeqQ3JIFXjM1+K8
+	Y9kIamo+AeXxU//p0meUD3+JQUIabwfZsC+8EBYI5zfSx+5y5o9hGY/Kqtyhr6FzLrq85Dh
+	7k4dECL6slsdc8iP/iI3RXnmIAt03vi7wQ+eF1gJ49zYU8O2cqyfCcYqWYV6rVsF6s+TcKW
+	0M++4CjrBjnfHrjHy637zzNbb/gy1DSlNRidChYwHQoOvHQk3DpiLYkMhAuoLjUxQmRJ1vC
+	Zf8XEcG8wwchn6NOqa16qwy/XKDKOCHa8SJG5scgHif5sbThRs0uKAMppQyIg==
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 7159787598339307279
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	horms@kernel.org,
+	andrew@lunn.ch,
+	netdev@vger.kernel.org
+Cc: mengyuanlou@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net v3 0/3] Wangxun fixes
+Date: Fri, 10 May 2024 14:17:48 +0800
+Message-Id: <20240510061751.2240-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240509161952.3940476-1-kuba@kernel.org>
-In-Reply-To: <20240509161952.3940476-1-kuba@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Fri, 10 May 2024 15:09:23 +0900
-Message-ID: <CAMArcTVfJZH+u1XT4pTxiLftX=ndRoQceaSLg1SvDOr85R1D3Q@mail.gmail.com>
-Subject: Re: [PATCH net] selftests: net: move amt to socat for better compatibility
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-On Fri, May 10, 2024 at 1:19=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
+Fixed some bugs when using ethtool to operate network devices.
 
-Hi Jakub,
-Thanks a lot for this work!
+v2 -> v3:
+- Drop the first patch.
 
-> The test seems to expect that nc will exit after the first
-> received message. This is not the case with Ncat 7.94.
-> There are multiple versions of nc out there, switch
-> to socat for better compatibility.
->
-> Tell socat to exit after 128 bytes and pad the message.
->
-> Since the test sets -e make sure we don't set exit code
-> (|| true) and print the pass / fail rather then silently
-> moving over the test and just setting non-zero exit code
-> with no output indicating what failed.
->
-> Fixes: c08e8baea78e ("selftests: add amt interface selftest script")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: shuah@kernel.org
-> CC: ap420073@gmail.com
-> CC: linux-kselftest@vger.kernel.org
-> ---
->  tools/testing/selftests/net/amt.sh | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftests=
-/net/amt.sh
-> index 75528788cb95..5175a42cbe8a 100755
-> --- a/tools/testing/selftests/net/amt.sh
-> +++ b/tools/testing/selftests/net/amt.sh
-> @@ -210,8 +210,8 @@ check_features()
->
->  test_ipv4_forward()
->  {
-> -       RESULT4=3D$(ip netns exec "${LISTENER}" nc -w 1 -l -u 239.0.0.1 4=
-000)
-> -       if [ "$RESULT4" =3D=3D "172.17.0.2" ]; then
-> +       RESULT4=3D$(ip netns exec "${LISTENER}" timeout 15 socat - UDP4-L=
-ISTEN:4000,readbytes=3D128 || true)
-> +       if echo "$RESULT4" | grep -q "172.17.0.2"; then
->                 printf "TEST: %-60s  [ OK ]\n" "IPv4 amt multicast forwar=
-ding"
->                 exit 0
->         else
-> @@ -222,8 +222,8 @@ test_ipv4_forward()
->
->  test_ipv6_forward()
->  {
-> -       RESULT6=3D$(ip netns exec "${LISTENER}" nc -w 1 -l -u ff0e::5:6 6=
-000)
-> -       if [ "$RESULT6" =3D=3D "2001:db8:3::2" ]; then
-> +       RESULT6=3D$(ip netns exec "${LISTENER}" timeout 15 socat - UDP6-L=
-ISTEN:6000,readbytes=3D128 || true)
-> +       if echo "$RESULT6" | grep -q "2001:db8:3::2"; then
->                 printf "TEST: %-60s  [ OK ]\n" "IPv6 amt multicast forwar=
-ding"
->                 exit 0
->         else
-> @@ -236,14 +236,14 @@ send_mcast4()
->  {
->         sleep 2
->         ip netns exec "${SOURCE}" bash -c \
-> -               'echo 172.17.0.2 | nc -w 1 -u 239.0.0.1 4000' &
-> +               'printf "%s %128s" 172.17.0.2 | nc -w 1 -u 239.0.0.1 4000=
-' &
->  }
->
->  send_mcast6()
->  {
->         sleep 2
->         ip netns exec "${SOURCE}" bash -c \
-> -               'echo 2001:db8:3::2 | nc -w 1 -u ff0e::5:6 6000' &
-> +               'printf "%s %128s" 2001:db8:3::2 | nc -w 1 -u ff0e::5:6 6=
-000' &
->  }
->
->  check_features
-> --
-> 2.45.0
->
+v1 -> v2:
+- Factor out the same code.
+- Remove statistics printing with more than 64 queues.
+- Detail the commit logs to describe issues.
+- Remove reset flag check in wx_update_stats().
+- Change to set VLAN CTAG and STAG to be consistent.
 
-Tested-by: Taehee Yoo <ap420073@gmail.com>
+Jiawen Wu (3):
+  net: wangxun: fix to change Rx features
+  net: wangxun: match VLAN CTAG and STAG features
+  net: txgbe: fix to control VLAN strip
+
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  2 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 56 +++++++++++++++++--
+ drivers/net/ethernet/wangxun/libwx/wx_lib.h   |  2 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  | 22 ++++++++
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  | 18 ++++--
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  1 +
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    | 18 ++++--
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 31 ++++++++++
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  1 +
+ 9 files changed, 137 insertions(+), 14 deletions(-)
+
+-- 
+2.27.0
+
 
