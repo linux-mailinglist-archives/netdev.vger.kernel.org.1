@@ -1,187 +1,168 @@
-Return-Path: <netdev+bounces-95373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A1238C212B
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:40:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2C9B8C2143
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:48:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D6851C20FD3
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 09:40:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BB981C20AF3
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 09:48:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA75160877;
-	Fri, 10 May 2024 09:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lXls/VCL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9CEF1635BC;
+	Fri, 10 May 2024 09:48:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96C315B108;
-	Fri, 10 May 2024 09:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1AC80BF8;
+	Fri, 10 May 2024 09:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715334034; cv=none; b=Kk414OE++VZGJ9TMiN4Tj6F2PF1prBKzA1JmNPWQy0FcSshe3g8cSNZIJNUdEEE+NAuqnndPmGD2G+9zc1aNITzgq1p9wgi2dnQ6LNpuJg4S28ok/f5uuR1V3lWOK/8OMUb8NjuOJ13y7+tL98EH5GIdGEUg+OQYGlhlYm4NnRM=
+	t=1715334529; cv=none; b=FhvmMITKov2jrjlRSli1rl1LIcsVFVi25AlHv28laklhxcC093q9kVwcgx2jxERlrqXoGWRLKYEy0EVChKlg9BHISVl8ITYJAAANHHEffKMwUBSZVBqOWG/LgcHampdq1o6DlJ5K7cb8FA7n/wDPyGHjAYXrjMvjfcXj2S5ysiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715334034; c=relaxed/simple;
-	bh=VdsdasOmPy4sPsIFhfaAnrSDTw/u9uq15u29olSiUdY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UXm6Y9MFSafRlVN6tgzGr52cuLcFanD6gKnj7P9k5JYbWDX0Tl2zyzoUQgbGsQnailiLBG2vHwYp86pvEj+Z6TD7ofI/391DMLfGpKGSpJLRN8Fiv0obnFbtMrNtYliTwn7kR7D5tyCv9ELFMEZEZmX3y+VY3OWuyKRcy2o65OE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lXls/VCL; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44A9LYuv015356;
-	Fri, 10 May 2024 09:40:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=lP6Gw9j5kJ8uGDKLhQswgwChAG7hxrrVGV2JYtdxmP0=;
- b=lXls/VCLGGnP0NhzCz1maWjVNqsqrM3qgWzcIFYljN7N3vFRXCkSEzff73kETXY0OD15
- tt8MRzsTsJs/3A9+183Gyw7GQGmCkzOh6W6dXxFooyrSp4STmoHX1DTJzqhdAWfvY0gc
- TSsafghSRNH8ec37yT4dKgIVDgrsRGeEQ9MDBto5cIxuSWCHkT+RsMeMRHPKBWGiaVsU
- 2S27Db2INQZPGMFpv2EEuPSUaeXoLEJglJ10pfxZ9HKjTSKYMS1B9QWvCjV8tru9Oz0n
- i0EZox21mCQqUMRjBsVQUqMicJFjOlfBqQo9YaiJIyltp+1yipg9/JbiO10uXsajLZbb yQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y1gabr5ak-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 May 2024 09:40:30 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44A9eTT5014625;
-	Fri, 10 May 2024 09:40:29 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y1gabr5ag-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 May 2024 09:40:29 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44A7i6VH009327;
-	Fri, 10 May 2024 09:40:29 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xyshv0e5w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 May 2024 09:40:29 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44A9eQsj48693862
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 May 2024 09:40:28 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6322F5805D;
-	Fri, 10 May 2024 09:40:26 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3E15D58057;
-	Fri, 10 May 2024 09:40:25 +0000 (GMT)
-Received: from [9.171.7.235] (unknown [9.171.7.235])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 10 May 2024 09:40:25 +0000 (GMT)
-Message-ID: <ba4c7916-d6c4-44b6-a649-1e17c65e87f9@linux.ibm.com>
-Date: Fri, 10 May 2024 11:40:24 +0200
+	s=arc-20240116; t=1715334529; c=relaxed/simple;
+	bh=Xil9cHz9oqs+92T/ENlvQu/A3K8EA3wr2TLDeo2amOE=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=rBQULUQdGitjZo/z+zbzokbmI18ISI/qy2fzm4Ds9j1hDtXNGhkOtsFkytFyNzlN9VKdBzZlYcaKrSqiMlm0wvqWzn+ibMUsEVTABVbGVUzPdGUl+N6ISz0uCFC9lusfIsiaoVoGJiEZBAQb8JSxw/vkcCrMcoADm3240tfmGhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VbP9s42bYzfbh9;
+	Fri, 10 May 2024 17:44:49 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 445551400E3;
+	Fri, 10 May 2024 17:48:43 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 10 May
+ 2024 17:48:43 +0800
+Subject: Re: [PATCH net-next v3 12/13] mm: page_frag: update documentation for
+ page_frag
+To: Randy Dunlap <rdunlap@infradead.org>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
+	<alexander.duyck@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
+	<akpm@linux-foundation.org>, <linux-mm@kvack.org>,
+	<linux-doc@vger.kernel.org>
+References: <20240508133408.54708-1-linyunsheng@huawei.com>
+ <20240508133408.54708-13-linyunsheng@huawei.com>
+ <0ac5219b-b756-4a8d-ba31-21601eb1e7f4@infradead.org>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <28447d18-dc61-3652-f572-617e718c8bd5@huawei.com>
+Date: Fri, 10 May 2024 17:48:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: some questions about restrictions in SMC-R v2's implementation
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, jaka@linux.ibm.com,
-        kgraul@linux.ibm.com
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <6d6e870a-3fbf-4802-9818-32ff46489448@linux.alibaba.com>
+In-Reply-To: <0ac5219b-b756-4a8d-ba31-21601eb1e7f4@infradead.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <6d6e870a-3fbf-4802-9818-32ff46489448@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7n470_4bm7F81DT2l4dNXbQU2Cra1jiY
-X-Proofpoint-ORIG-GUID: L6oY6bi9De9H696zDVCLbvuXILwf6ANJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-10_06,2024-05-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
- adultscore=0 mlxlogscore=999 suspectscore=0 phishscore=0 mlxscore=0
- spamscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2405100069
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
+On 2024/5/9 8:44, Randy Dunlap wrote:
+> 
+> 
+> On 5/8/24 6:34 AM, Yunsheng Lin wrote:
+>> Update documentation about design, implementation and API usages
+>> for page_frag.
+>>
+>> CC: Alexander Duyck <alexander.duyck@gmail.com>
+>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>> ---
+>>  Documentation/mm/page_frags.rst | 156 +++++++++++++++++++++++++++++++-
+>>  include/linux/page_frag_cache.h |  96 ++++++++++++++++++++
+>>  mm/page_frag_cache.c            |  65 ++++++++++++-
+>>  3 files changed, 314 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/Documentation/mm/page_frags.rst b/Documentation/mm/page_frags.rst
+>> index 503ca6cdb804..9c25c0fd81f0 100644
+>> --- a/Documentation/mm/page_frags.rst
+>> +++ b/Documentation/mm/page_frags.rst
+>> @@ -1,3 +1,5 @@
+>> +.. SPDX-License-Identifier: GPL-2.0
+>> +
+>>  ==============
+>>  Page fragments
+>>  ==============
+>> @@ -40,4 +42,156 @@ page via a single call.  The advantage to doing this is that it allows for
+>>  cleaning up the multiple references that were added to a page in order to
+>>  avoid calling get_page per allocation.
+>>  
+>> -Alexander Duyck, Nov 29, 2016.
+>> +
+>> +Architecture overview
+>> +=====================
+>> +
+>> +.. code-block:: none
+>> +
+>> +                +----------------------+
+>> +                | page_frag API caller |
+>> +                +----------------------+
+>> +                            ^
+>> +                            |
+>> +                            |
+>> +                            |
+>> +                            v
+>> +    +------------------------------------------------+
+>> +    |             request page fragment              |
+>> +    +------------------------------------------------+
+>> +        ^                      ^                   ^
+>> +        |                      | Cache not enough  |
+>> +        | Cache empty          v                   |
+>> +        |             +-----------------+          |
+>> +        |             | drain old cache |          |
+>> +        |             +-----------------+          |
+>> +        |                      ^                   |
+>> +        |                      |                   |
+>> +        v                      v                   |
+>> +    +----------------------------------+           |
+>> +    |  refill cache with order 3 page  |           |
+>> +    +----------------------------------+           |
+>> +     ^                  ^                          |
+>> +     |                  |                          |
+>> +     |                  | Refill failed            |
+>> +     |                  |                          | Cache is enough
+>> +     |                  |                          |
+>> +     |                  v                          |
+>> +     |    +----------------------------------+     |
+>> +     |    |  refill cache with order 0 page  |     |
+>> +     |    +----------------------------------+     |
+>> +     |                       ^                     |
+>> +     | Refill succeed        |                     |
+>> +     |                       | Refill succeed      |
+>> +     |                       |                     |
+>> +     v                       v                     v
+>> +    +------------------------------------------------+
+>> +    |         allocate fragment from cache           |
+>> +    +------------------------------------------------+
+>> +
+>> +API interface
+>> +=============
+>> +As the design and implementation of page_frag API implies, the allocation side
+>> +does not allow concurrent calling. Instead it is assumed that the caller must
+>> +ensure there is not concurrent alloc calling to the same page_frag_cache
+>> +instance by using its own lock or rely on some lockless guarantee like NAPI
+>> +softirq.
+>> +
+>> +Depending on different aligning requirement, the page_frag API caller may call
+>> +page_frag_alloc*_align*() to ensure the returned virtual address or offset of
+>> +the page is aligned according to the 'align/alignment' parameter. Note the size
+>> +of the allocated fragment is not aligned, the caller need to provide a aligned
+> 
+>                                                         needs to provide an aligned
+> 
+>> +fragsz if there is a alignment requirement for the size of the fragment.
+> 
+>                       an alignment
 
-
-On 07.05.24 07:54, Guangguan Wang wrote:
-> Hi, Wenjia and Jan,
-> 
-> When testing SMC-R v2, I found some scenarios where SMC-R v2 should be worked, but due to some restrictions in SMC-R v2's implementation,
-> fallback happened. I want to know why these restrictions exist and what would happen if these restrictions were removed.
-> 
-> The first is in the function smc_ib_determine_gid_rcu, where restricts the subnet matching between smcrv2->saddr and the RDMA related netdev.
-> codes here:
-> static int smc_ib_determine_gid_rcu(...)
-> {
->      ...
->          in_dev_for_each_ifa_rcu(ifa, in_dev) {
->              if (!inet_ifa_match(smcrv2->saddr, ifa))
->                  continue;
->              subnet_match = true;
->              break;
->          }
->          if (!subnet_match)
->              goto out;
->      ...
-> out:
->      return -ENODEV;
-> }
-> In my testing environment, either server or client, exists two netdevs, eth0 in netnamespace1 and eth0 in netnamespace2. For the sake of clarity
-> in the following text, we will refer to eth0 in netnamespace1 as eth1, and eth0 in netnamespace2 as eth2. The eth1's ip is 192.168.0.3/32 and the
-> eth2's ip is 192.168.0.4/24. The netmask of eth1 must be 32 due to some reasons. The eth1 is a RDMA related netdev, which means the adaptor of eth1
-> has RDMA function. The eth2 has been associated to the eth1's RDMA device using smc_pnet. When testing connection in netnamespace2(using eth2 for
-> SMC-R connection), we got fallback connection, rsn is 0x03010000, due to the above subnet matching restriction. But in this scenario, I think
-> SMC-R should work.
-> In my another testing environment, either server or client, exists two netdevs, eth0 in netnamespace1 and eth1 in netnamespace1. The eth0's ip is
-> 192.168.0.3/24 and the eth1's ip is 192.168.1.4/24. The eth0 is a RDMA related netdev, which means the adaptor of eth0 has RDMA function. The eth1 has
-> been associated to the eth0's RDMA device using smc_pnet. When testing SMC-R connection through eth1, we got fallback connection, rsn is 0x03010000,
-> due to the above subnet matching restriction. In my environment, eth0 and eth1 have the same network connectivity even though they have different
-> subnet. I think SMC-R should work in this scenario.
-> 
-> The other is in the function smc_connect_rdma_v2_prepare, where restricts the symmetric configuration of routing between client and server. codes here:
-> static int smc_connect_rdma_v2_prepare(...)
-> {
->      ...
->      if (fce->v2_direct) {
->          memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
->          ini->smcrv2.uses_gateway = false;
->      } else {
->          if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
->                smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
->                ini->smcrv2.nexthop_mac,
->                &ini->smcrv2.uses_gateway))
->              return SMC_CLC_DECL_NOROUTE;
->          if (!ini->smcrv2.uses_gateway) {
->              /* mismatch: peer claims indirect, but its direct */
->              return SMC_CLC_DECL_NOINDIRECT;
->          }
->      }
->      ...
-> }
-> In my testing environment, server's ip is 192.168.0.3/24, client's ip 192.168.0.4/24, regarding how many netdev in server or client. Server has special
-> route setting due to some other reasons, which results in indirect route from 192.168.0.3/24 to 192.168.0.4/24. Thus, when CLC handshake, client will
-> get fce->v2_direct==false, but client has no special routing setting and will find direct route from 192.168.0.4/24 to 192.168.0.3/24. Due to the above
-> symmetric configuration of routing restriction, we got fallback connection, rsn is 0x030f0000. But I think SMC-R should work in this scenario.
-> And more, why check the symmetric configuration of routing only when server is indirect route?
-> 
-> Waiting for your reply.
-> 
-> Thanks,
-> Guangguan Wang
-> 
-Hi Guangguan,
-
-Thank you for the questions. We also asked ourselves the same questions 
-a while ago, and also did some research on it. Unfortunately, it was not 
-yet done and I had to delay it because of my vacation last month. Now 
-it's time to pick it up again ;) I'll come back to you as soon as I can 
-give a very certain answer.
-
-Thanks,
-Wenjia
+Will update them accordingly, thanks for the review.
 
