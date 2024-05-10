@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-95415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 441158C22FF
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:20:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E736D8C2301
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 673B01C212F3
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:20:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23C991C20F72
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F232F1708A0;
-	Fri, 10 May 2024 11:19:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D247F17107F;
+	Fri, 10 May 2024 11:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ARIWUGbW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZ33SQKl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53EA17089A;
-	Fri, 10 May 2024 11:19:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A487F16EC18;
+	Fri, 10 May 2024 11:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715339949; cv=none; b=nXsRAFP5/hmMmSlAzF51DvGBgq1H7X1X2NSUquYCHipNPUyZ+BkN8qQwKwAqvhj3FA/EMGG5t2GsUfepxPGoRVj04UJqDDhMtWoSvG+NIoLP5dSNSM4RrkRqUEIkupoZJs8LZBjhPrz1plpP42VpeXPf0fhvlP7y7ZymrtUr+Js=
+	t=1715339952; cv=none; b=QlFor8sQDrVCXK3pYd/z8FglNUZZQcUlJIdZGbomYF38OLC9i2FDrJgb+G1ZaK7iE7gN5aWnSKQx9XJyGgAXbZ6ZWAnukbxJsgygnq7CbNlulxVgqjXUMGr7KucJsURTNom25WIlcme53+NlblnXlHYoURO0Oy5NzMqo12TkuZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715339949; c=relaxed/simple;
-	bh=xbCxQm7NYK+1wRRkdU1YZqrQE67obVDoGOLdbAX28Bo=;
+	s=arc-20240116; t=1715339952; c=relaxed/simple;
+	bh=g9/Ts3HF1r1iy03o7GZp55OQrzTi5Lbtpm9Z2O40MPo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=AnqAexhRUcz/j0asQ5UxmdO6oTQFhV6MDVcY3So+02ADWQh6C+sJV6SJkxqaaWsrPN+Lj+vrWxXYe5sk933mwRy+2FiYobY8+DNEYHLmUhnQxLEqvImg0Pv+hodmIE/5wZLLCh5gcBldhe/I2ISQiwh04TP9P+ZNvMjVS5aiOuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ARIWUGbW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DF1FC2BD11;
-	Fri, 10 May 2024 11:19:07 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=OtCDafUEYwVAsE9KKUI006kMUPA9pw8L6V/0RWJncVLmpkrBKL9yacOG+yqCWZ9Vx/2ECCDidUCWMgq+PYe4bXhvJ60rjWPd7XViUkUIwWYZNixmSUfDWD+p8IJsSk0UJ17C7V1et+P0NGf58NLoxWTMWlN8SBojV4jue1+xZYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZ33SQKl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1F6AC32781;
+	Fri, 10 May 2024 11:19:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715339949;
-	bh=xbCxQm7NYK+1wRRkdU1YZqrQE67obVDoGOLdbAX28Bo=;
+	s=k20201202; t=1715339952;
+	bh=g9/Ts3HF1r1iy03o7GZp55OQrzTi5Lbtpm9Z2O40MPo=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ARIWUGbWqjKWCzXGTQUsQW2kEIY4+1FUaei1Ipim4kPSjhDdPLzYJttG293hD5XUV
-	 cIKGsTfW7rKLfeuGOudfHCPdb1VKXPSHBbUD3PZraHS5zpFhbgQ44LALBsHgpFROWU
-	 qZRNffnB9x5n18eYNYUQAf+X4dAd2XKgFYB5jYW6Y+OaMekwLZTcVWN56m4f2V0sjV
-	 9spu5B272P33AsuXF0VEpOIph2Z3/XLaqAR8FumVd/5+NcBF0UwoLS1bG1qD2M4q49
-	 1XSeDb0fXUrjRcVXSQexJyxrr0KtgFP5D0N4nJ1DMQQkaf8hcOZgW2IurT70hESj8l
-	 VxEVwp5RsISOg==
+	b=EZ33SQKl6dO4lEs6fb7iiaz/O9behXw9uxJnd/Z4FSo7rxX0Gp0TYgyc9HrLD6/7G
+	 zp2TfgdWpo5FtBENqnYp6Z253uQ5MNdvKSdKUyHIJ85zhb6pbdnnVAK1q27X2tUznZ
+	 wxs2Y77mdrtldgycA3ecAg5k8DzDDImEYYcvd9skhHTzvASpuSbnWEmcxzgQjjgZtw
+	 WOerD8yEPZsQrfNN44+y0GDY06Uw/abVHy65ByUfjaPaelbtX1+ElKExb3hYqr9mma
+	 2bpwFzWDNthjnqTM/EY6isKKM6XoV0XLyE4soNVLYnh69IDn2XAOM/9nEMuPhhy4Yi
+	 H9C3z4b1ENiBA==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 10 May 2024 13:18:35 +0200
-Subject: [PATCH net-next 5/8] mptcp: prefer strscpy over strcpy
+Date: Fri, 10 May 2024 13:18:36 +0200
+Subject: [PATCH net-next 6/8] mptcp: remove unnecessary else statements
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240510-upstream-net-next-20240509-misc-improvements-v1-5-4f25579e62ba@kernel.org>
+Message-Id: <20240510-upstream-net-next-20240509-misc-improvements-v1-6-4f25579e62ba@kernel.org>
 References: <20240510-upstream-net-next-20240509-misc-improvements-v1-0-4f25579e62ba@kernel.org>
 In-Reply-To: <20240510-upstream-net-next-20240509-misc-improvements-v1-0-4f25579e62ba@kernel.org>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
@@ -62,93 +62,91 @@ To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2664; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=xbCxQm7NYK+1wRRkdU1YZqrQE67obVDoGOLdbAX28Bo=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmPgKcc2r9q5h7H1i/aLEx24OsCJy2Wa1zE3IeU
- fhSct5FzEqJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZj4CnAAKCRD2t4JPQmmg
- c7sPD/4hpkNHeOFB5lQSXgVrUQw2P3twOxcElic9JWU8YWa9taxfoCiyiX3HrgtDf3Q0o4F2lxb
- OE0UvdLcJ19w/JiBe/zpYPP99i/zsPCjdHSxhABcFC8RNOdm+cQY6AM1EBf7p/dkXc4M0YQrZzv
- m+mmh/T+Th/8Mz/ZFIL5wRRVB7SQZ+MiSAapKVOEFb+v698ho2LMFYoR1hLi0jp58zYoxCEJNIU
- JU+eiW9rJitvYfjeUv2XZ8fwfLc2IogattzWZLl600PdCxMpRhPz8VddaCjF5stqLxwD+F88rRJ
- obyAMIgvRW8CGxdl2TYFjKBLPMrO8OUvKeUfyo01jJJ4iGRfcnKMRrGZM2QB0XUxkfqY4Zsu8HT
- 39myYfpwbsLdhYe2VbLl+YmVm5NIgY4PgISPPGfzgvvMW3SQWO5CGNVx5Qzz3qS3ibxWdlhaJAv
- LCbHfX60lhnoojQKcNQsmOQmFcEJ8q4eQTu6JgkBwUOhJf4N9nlFDWs9AY/dXmMx39H8IA1evUB
- 0ljpYDgA4cqnWQKMsQixTFMaTjN1m/cIftewQFybJRlhy/FmHx9zo5ggXSdscU34a1updoTfRRi
- k9Gfc1A9pYCGMHEGArpZxmCK09fTgtm9ckdWfwZ48IGheFtTgIxeRX3l6EJ30TCSzFXdVIQHv3w
- XGyRvEbbr1I0UaQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2132; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=g9/Ts3HF1r1iy03o7GZp55OQrzTi5Lbtpm9Z2O40MPo=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmPgKc1QcUYvndAnUHnijSXy1AReoYUZFJh7zL7
+ cPPQACSYUuJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZj4CnAAKCRD2t4JPQmmg
+ czGoEAC3r8/aL+IMbek1lKsHeROt/gjlk3DFA3X53eSEsJNgKdA3tgXY2KippKQf7yOq106iXas
+ WE0j6JyTXyKUtYxiWDkQfmzm4PDjazz1Tb3EDANRklWYcvsy/1ky8nfDgIQ6dG/+ijta49QkyF2
+ lNpP8UP9YZwGsMdUUlCQHamw7I81WUfWKYuGkiZuxWcAjdkV/9uG95OllFS70T10BdJjWibfSAP
+ di8MHq/Ac5MxkABxmGWdlQ+JFM5VbOI9sJHbfwI0S3vEyrps8gvQaLzBQ0kVpiwIBvZM3vRmI5B
+ DNQXoBi4csk4umXWC0ZoUMZ1y0sCbPCpc9cyrPw6XgcZExIXDpta6u84muR2ChA+EqJqYwkwRGQ
+ OLs86zrz47yqSdNQelbx7eDo3FzTtNtBUQeMSwkzs9wMQA1qHRHgGVZ64FRzuGrrWwOQ/55HPk9
+ 1+nTi1PLbZ8hCtoboYNBNk0lnN8LtTmMdEXeeUnZr55A4ZXOS2wC6M269RlNtETM54SxAwIpN3v
+ X5wr+KWco/xxDgVW+rJw4ONMNOgf2C/LZi0zAxZukZ/KNEVTW1zksaBa2XQgFPzLPzc9FAOlLzT
+ ZfMYFvT2u9U2yE3gGJUtwunro7ODYodNIx7foNNmgkgLrduMz3GKcQzUqylty+L940CzV9cUL5d
+ VpveFJz48U78SAQ==
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-strcpy() performs no bounds checking on the destination buffer. This
-could result in linear overflows beyond the end of the buffer, leading
-to all kinds of misbehaviors. The safe replacement is strscpy() [1].
-
-This is in preparation of a possible future step where all strcpy() uses
-will be removed in favour of strscpy() [2].
+The 'else' statements are not needed here, because their previous 'if'
+block ends with a 'return'.
 
 This fixes CheckPatch warnings:
 
-  WARNING: Prefer strscpy over strcpy
+  WARNING: else is not generally useful after a break or return
 
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strcpy [1]
-Link: https://github.com/KSPP/linux/issues/88 [2]
 Reviewed-by: Geliang Tang <geliang@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- net/mptcp/ctrl.c     | 2 +-
- net/mptcp/protocol.c | 5 +++--
- net/mptcp/sockopt.c  | 2 +-
- 3 files changed, 5 insertions(+), 4 deletions(-)
+ net/mptcp/subflow.c | 32 +++++++++++++++++---------------
+ 1 file changed, 17 insertions(+), 15 deletions(-)
 
-diff --git a/net/mptcp/ctrl.c b/net/mptcp/ctrl.c
-index 542555ba474c..98b1dd498ff6 100644
---- a/net/mptcp/ctrl.c
-+++ b/net/mptcp/ctrl.c
-@@ -92,7 +92,7 @@ static void mptcp_pernet_set_defaults(struct mptcp_pernet *pernet)
- 	pernet->allow_join_initial_addr_port = 1;
- 	pernet->stale_loss_cnt = 4;
- 	pernet->pm_type = MPTCP_PM_TYPE_KERNEL;
--	strcpy(pernet->scheduler, "default");
-+	strscpy(pernet->scheduler, "default", sizeof(pernet->scheduler));
- }
- 
- #ifdef CONFIG_SYSCTL
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index bb8f96f2b86f..a42494d3a71b 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -2814,7 +2814,8 @@ static void mptcp_ca_reset(struct sock *sk)
- 	struct inet_connection_sock *icsk = inet_csk(sk);
- 
- 	tcp_assign_congestion_control(sk);
--	strcpy(mptcp_sk(sk)->ca_name, icsk->icsk_ca_ops->name);
-+	strscpy(mptcp_sk(sk)->ca_name, icsk->icsk_ca_ops->name,
-+		sizeof(mptcp_sk(sk)->ca_name));
- 
- 	/* no need to keep a reference to the ops, the name will suffice */
- 	tcp_cleanup_congestion_control(sk);
-@@ -4169,7 +4170,7 @@ int __init mptcp_proto_v6_init(void)
- 	int err;
- 
- 	mptcp_v6_prot = mptcp_prot;
--	strcpy(mptcp_v6_prot.name, "MPTCPv6");
-+	strscpy(mptcp_v6_prot.name, "MPTCPv6", sizeof(mptcp_v6_prot.name));
- 	mptcp_v6_prot.slab = NULL;
- 	mptcp_v6_prot.obj_size = sizeof(struct mptcp6_sock);
- 	mptcp_v6_prot.ipv6_pinfo_offset = offsetof(struct mptcp6_sock, np);
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index cc9ecccf219d..0f6ef494525f 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -616,7 +616,7 @@ static int mptcp_setsockopt_sol_tcp_congestion(struct mptcp_sock *msk, sockptr_t
+diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+index c1d13e555d10..612c38570a64 100644
+--- a/net/mptcp/subflow.c
++++ b/net/mptcp/subflow.c
+@@ -1119,6 +1119,8 @@ static enum mapping_status get_mapping_status(struct sock *ssk,
  	}
  
- 	if (ret == 0)
--		strcpy(msk->ca_name, name);
-+		strscpy(msk->ca_name, name, sizeof(msk->ca_name));
+ 	if (mpext->data_fin == 1) {
++		u64 data_fin_seq;
++
+ 		if (data_len == 1) {
+ 			bool updated = mptcp_update_rcv_data_fin(msk, mpext->data_seq,
+ 								 mpext->dsn64);
+@@ -1131,26 +1133,26 @@ static enum mapping_status get_mapping_status(struct sock *ssk,
+ 				 */
+ 				skb_ext_del(skb, SKB_EXT_MPTCP);
+ 				return MAPPING_OK;
+-			} else {
+-				if (updated)
+-					mptcp_schedule_work((struct sock *)msk);
+-
+-				return MAPPING_DATA_FIN;
+ 			}
+-		} else {
+-			u64 data_fin_seq = mpext->data_seq + data_len - 1;
  
- 	release_sock(sk);
- 	return ret;
+-			/* If mpext->data_seq is a 32-bit value, data_fin_seq
+-			 * must also be limited to 32 bits.
+-			 */
+-			if (!mpext->dsn64)
+-				data_fin_seq &= GENMASK_ULL(31, 0);
++			if (updated)
++				mptcp_schedule_work((struct sock *)msk);
+ 
+-			mptcp_update_rcv_data_fin(msk, data_fin_seq, mpext->dsn64);
+-			pr_debug("DATA_FIN with mapping seq=%llu dsn64=%d",
+-				 data_fin_seq, mpext->dsn64);
++			return MAPPING_DATA_FIN;
+ 		}
+ 
++		data_fin_seq = mpext->data_seq + data_len - 1;
++
++		/* If mpext->data_seq is a 32-bit value, data_fin_seq must also
++		 * be limited to 32 bits.
++		 */
++		if (!mpext->dsn64)
++			data_fin_seq &= GENMASK_ULL(31, 0);
++
++		mptcp_update_rcv_data_fin(msk, data_fin_seq, mpext->dsn64);
++		pr_debug("DATA_FIN with mapping seq=%llu dsn64=%d",
++			 data_fin_seq, mpext->dsn64);
++
+ 		/* Adjust for DATA_FIN using 1 byte of sequence space */
+ 		data_len--;
+ 	}
 
 -- 
 2.43.0
