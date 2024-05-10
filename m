@@ -1,313 +1,253 @@
-Return-Path: <netdev+bounces-95367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A30F8C2016
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:53:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F428C203C
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A888AB20FF7
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 08:53:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A77EA282A23
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 09:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1373515F3F4;
-	Fri, 10 May 2024 08:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1FC1607BC;
+	Fri, 10 May 2024 09:09:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=dd-wrt.com header.i=@dd-wrt.com header.b="sNnoAgxC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="feZmusuX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.as201155.net (mail.as201155.net [185.84.6.188])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32EC015E800
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 08:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.84.6.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFC914901F
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 09:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715331220; cv=none; b=IUz/vaA55R8pmryRIemOmXGEUecJoV33u4giTy0EzS6vkq4Ozj8ZhUhiSTwSCCGTTgBzPb+s/WvEYqBctAiTwsWb2QBxe5FIZVt9UIdjPGzKaN3sfgk4Tw+haUZPI3NTRtnXPuy7xPLmAbCms4d1h78P20GPtaM+DdHgbDim3+I=
+	t=1715332142; cv=none; b=QDzRqU0Pnsf44lO1IyEDftutPb182KK2Ez6cjSGPZd447ppRAkwpB4Alc+3p4N9YPO99ilof41jfgUHH4JCPMH/i4hQvxMpy7jBBoLhKtxo3OZU88tEF71w4ItrKKrUXQPq7cVmNprhpXxwj9/s2W6th81aUchiPpC724r6DxdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715331220; c=relaxed/simple;
-	bh=8kMvzTWQsyHILcUOzdfNUPWiJJKGl3cncGowDiDKyo8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bluSoxR3PLeRN0qgBof5AbC18HzNZ6DP9Njdk2sP+CbHtl2ecRWLW+Rf67Q2tJStWjxWqLmEXBqYGCe9b/K4uYnqzaw/SKlF3rddhnMJBZyNfLQvz13U5ZedoZr9kSysukBr0PYPQB2RpTKnoCiCTrQVYbX9/2eDiWbOs5axc70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dd-wrt.com; spf=pass smtp.mailfrom=dd-wrt.com; dkim=pass (1024-bit key) header.d=dd-wrt.com header.i=@dd-wrt.com header.b=sNnoAgxC; arc=none smtp.client-ip=185.84.6.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dd-wrt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dd-wrt.com
-Received: from smtps.newmedia-net.de ([2a05:a1c0:0:de::167]:35894 helo=webmail.newmedia-net.de)
-	by mail.as201155.net with esmtps  (TLS1) tls TLS_RSA_WITH_AES_256_CBC_SHA
-	(Exim 4.97.1)
-	(envelope-from <s.gottschall@dd-wrt.com>)
-	id 1s5M0T-0000000010E-1SBk;
-	Fri, 10 May 2024 10:53:33 +0200
-X-SASI-Hits: CTE_7BIT 0.000000, DKIM_ALIGNS 0.000000, DKIM_SIGNATURE 0.000000,
-	ECARD_WORD 0.000000, HTML_00_01 0.050000, HTML_00_10 0.050000,
-	IN_REP_TO 0.000000, LEGITIMATE_SIGNS 0.000000,
-	MSGID_SAMEAS_FROM_HEX_844412 0.100000, MSG_THREAD 0.000000,
-	MULTIPLE_RCPTS 0.100000, MULTIPLE_REAL_RCPTS 0.000000,
-	NO_FUR_HEADER 0.000000, OUTBOUND 0.000000, OUTBOUND_SOPHOS 0.000000,
-	REFERENCES 0.000000, SENDER_NO_AUTH 0.000000, SUSP_DH_NEG 0.000000,
-	URI_WITH_PATH_ONLY 0.000000, __ANY_URI 0.000000, __BODY_NO_MAILTO 0.000000,
-	__BOUNCE_CHALLENGE_SUBJ 0.000000, __BOUNCE_NDR_SUBJ_EXEMPT 0.000000,
-	__BULK_NEGATE 0.000000, __CC_NAME 0.000000, __CC_NAME_DIFF_FROM_ACC 0.000000,
-	__CC_REAL_NAMES 0.000000, __CP_URI_IN_BODY 0.000000, __CT 0.000000,
-	__CTE 0.000000, __CT_TEXT_PLAIN 0.000000, __DKIM_ALIGNS_1 0.000000,
-	__DKIM_ALIGNS_2 0.000000, __DQ_NEG_DOMAIN 0.000000, __DQ_NEG_HEUR 0.000000,
-	__DQ_NEG_IP 0.000000, __FORWARDED_MSG 0.000000,
-	__FRAUD_BODY_WEBMAIL 0.000000, __FRAUD_WEBMAIL 0.000000,
-	__FUR_RDNS_SOPHOS 0.000000, __HAS_CC_HDR 0.000000, __HAS_FROM 0.000000,
-	__HAS_MSGID 0.000000, __HAS_REFERENCES 0.000000, __HTTPS_URI 0.000000,
-	__INVOICE_MULTILINGUAL 0.000000, __IN_REP_TO 0.000000, __MAIL_CHAIN 0.000000,
-	__MAIL_CHAIN_OLD 0.000000, __MIME_BOUND_CHARSET 0.000000,
-	__MIME_TEXT_ONLY 0.000000, __MIME_TEXT_P 0.000000, __MIME_TEXT_P1 0.000000,
-	__MIME_VERSION 0.000000, __MOZILLA_USER_AGENT 0.000000,
-	__MSGID_HEX_844412 0.000000, __MULTIPLE_RCPTS_CC_X2 0.000000,
-	__MULTIPLE_RCPTS_TO_X2 0.000000, __MULTIPLE_URI_TEXT 0.000000,
-	__NO_HTML_TAG_RAW 0.000000, __OUTBOUND_SOPHOS_FUR 0.000000,
-	__OUTBOUND_SOPHOS_FUR_IP 0.000000, __OUTBOUND_SOPHOS_FUR_RDNS 0.000000,
-	__PHISH_PHRASE10_D 0.000000, __PHISH_SPEAR_SUBJ_TEAM 0.000000,
-	__RCVD_PASS 0.000000, __REFERENCES 0.000000, __SANE_MSGID 0.000000,
-	__SCAN_D_NEG 0.000000, __SCAN_D_NEG2 0.000000, __SCAN_D_NEG_HEUR 0.000000,
-	__SCAN_D_NEG_HEUR2 0.000000, __SUBJ_ALPHA_END 0.000000,
-	__SUBJ_ALPHA_NEGATE 0.000000, __SUBJ_REPLY 0.000000,
-	__TO_MALFORMED_2 0.000000, __TO_NAME 0.000000,
-	__TO_NAME_DIFF_FROM_ACC 0.000000, __TO_REAL_NAMES 0.000000,
-	__URI_IN_BODY 0.000000, __URI_MAILTO 0.000000, __URI_NOT_IMG 0.000000,
-	__URI_NO_WWW 0.000000, __URI_NS 0.000000, __URI_WITH_PATH 0.000000,
-	__USER_AGENT 0.000000, __X_MAILSCANNER 0.000000
-X-SASI-Probability: 8%
-X-SASI-RCODE: 200
-X-SASI-Version: Antispam-Engine: 5.1.4, AntispamData: 2024.5.10.82716
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=dd-wrt.com; s=mikd;
-	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID; bh=+D0lJ6XGvB7RcRH/OwONvFz4A82ou2NnW/z7IzLDnFQ=;
-	b=sNnoAgxClLp/fkgfhDTVqufBvQ0NJOtEXvL9p03lZeTBFEVUcqONW/W81dZyoR6H4yns3IJ6hCcWK2CP7UQj7tMlV4SUwx91cmsIvuVYsdwCmoeP374mj57+5oHkosYOPmeT6OWvmCb/BIjcVdJAsnzQvTHfUlZutvElQden8GY=;
-Message-ID: <81137bf1-09a3-42ca-a9d6-fefeba693c05@dd-wrt.com>
-Date: Fri, 10 May 2024 10:53:07 +0200
+	s=arc-20240116; t=1715332142; c=relaxed/simple;
+	bh=I04nZi4eDHjXV0NwFmOXhSYav1tj+JZIjFxquAOBChw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hZCF9hnHQbgJzoz3vLXTcSlRT47kp+RD+oW1g7+VT0uYkhCGAOVN1k4BJKDE4Dv9fMLIgr8Mti/hzmkH5rLhkOYSMOWeDCBS5LO1tJ4YTncRr3q7bhD/T8KOtx2dIL6Pkln6B6CbJ71ghTTv/y5tlo3R73BVMcMG6PZvXGzasFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=feZmusuX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715332140;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=G0EvWCNfwA9x7KaIVr6ruCAINAZy8qYnlw/yafFrBXk=;
+	b=feZmusuXSbP8fNYHtROeiOWKUXDCgTLGQkRnG+QTeqNbVVfQ5MtUBf3Gufvgfo8+gUjriH
+	lXFJtzHvhjKzHpVQPe1nNcbbd2+AwhXPFv4YEumVxgwQvgMfz1aos0OVU9htI4Pe9e1s9D
+	XTYBueMoY2TiUiPMu9E29mguyXZpYtA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-117-P6WCIJl4MZWzY1hAMHkBrA-1; Fri, 10 May 2024 05:08:54 -0400
+X-MC-Unique: P6WCIJl4MZWzY1hAMHkBrA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3EBE7800206;
+	Fri, 10 May 2024 09:08:54 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.192.109])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0A6A9200A612;
+	Fri, 10 May 2024 09:08:51 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
+	stable@vger.kernel.org,
+	Isaac Ganoung <inventor500@vivaldi.net>,
+	Yongqin Liu <yongqin.liu@linaro.org>
+Subject: [PATCH] net: usb: ax88179_178a: fix link status when link is set to down/up
+Date: Fri, 10 May 2024 11:08:28 +0200
+Message-ID: <20240510090846.328201-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v14] ath10k: add LED and GPIO controlling support for
- various chipsets
-To: Christian Marangi <ansuelsmth@gmail.com>, Kalle Valo <kvalo@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
- ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, Steve deRosier <derosier@cal-sierra.com>,
- Stefan Lippers-Hollmann <s.l-h@gmx.de>
-References: <20230611080505.17393-1-ansuelsmth@gmail.com>
- <878rcjbaqs.fsf@kernel.org> <648cdebb.5d0a0220.be7f8.a096@mx.google.com>
- <648ded2a.df0a0220.b78de.4603@mx.google.com>
- <CA+_ehUzzVq_sVTgVCM+r=oLp=GNn-6nJRBG=bndJjrRDhCodaw@mail.gmail.com>
- <87v83nlhb3.fsf@kernel.org> <663c9fc7.050a0220.5fb3a.4e87@mx.google.com>
-From: Sebastian Gottschall <s.gottschall@dd-wrt.com>
-In-Reply-To: <663c9fc7.050a0220.5fb3a.4e87@mx.google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass (webmail.newmedia-net.de: localhost is always allowed.) client-ip=127.0.0.1; envelope-from=s.gottschall@dd-wrt.com; helo=webmail.newmedia-net.de;
-X-SA-Exim-Connect-IP: 127.0.0.1
-X-SA-Exim-Mail-From: s.gottschall@dd-wrt.com
-X-SA-Exim-Scanned: No (on webmail.newmedia-net.de); SAEximRunCond expanded to false
-X-NMN-MailScanner-Information: Please contact the ISP for more information
-X-NMN-MailScanner-ID: 1s5M08-000Cnb-2J
-X-NMN-MailScanner: Found to be clean
-X-NMN-MailScanner-From: s.gottschall@dd-wrt.com
-X-Received:  from localhost.localdomain ([127.0.0.1] helo=webmail.newmedia-net.de)
-	by webmail.newmedia-net.de with esmtp (Exim 4.72)
-	(envelope-from <s.gottschall@dd-wrt.com>)
-	id 1s5M08-000Cnb-2J; Fri, 10 May 2024 10:53:12 +0200
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
+The idea was to keep only one reset at initialization stage in order to
+reduce the total delay, or the reset from usbnet_probe or the reset from
+usbnet_open.
 
-Am 09.05.2024 um 12:04 schrieb Christian Marangi:
-> On Thu, May 09, 2024 at 07:50:40AM +0300, Kalle Valo wrote:
->> Ansuel Smith <ansuelsmth@gmail.com> writes:
->>
->>> Il giorno sab 17 giu 2023 alle ore 19:28 Christian Marangi
->>> <ansuelsmth@gmail.com> ha scritto:
->>>
->>>> On Fri, Jun 16, 2023 at 01:35:04PM +0200, Christian Marangi wrote:
->>>>> On Fri, Jun 16, 2023 at 08:03:23PM +0300, Kalle Valo wrote:
->>>>>> Christian Marangi <ansuelsmth@gmail.com> writes:
->>>>>>
->>>>>>> From: Sebastian Gottschall <s.gottschall@dd-wrt.com>
->>>>>>>
->>>>>>> Adds LED and GPIO Control support for 988x, 9887, 9888, 99x0, 9984
->>>>>>> based chipsets with on chipset connected led's using WMI Firmware API.
->>>>>>> The LED device will get available named as "ath10k-phyX" at sysfs and
->>>>>>> can be controlled with various triggers.
->>>>>>> Adds also debugfs interface for gpio control.
->>>>>>>
->>>>>>> Signed-off-by: Sebastian Gottschall <s.gottschall@dd-wrt.com>
->>>>>>> Reviewed-by: Steve deRosier <derosier@cal-sierra.com>
->>>>>>> [kvalo: major reorg and cleanup]
->>>>>>> Signed-off-by: Kalle Valo <kvalo@codeaurora.org>
->>>>>>> [ansuel: rebase and small cleanup]
->>>>>>> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
->>>>>>> Tested-by: Stefan Lippers-Hollmann <s.l-h@gmx.de>
->>>>>>> ---
->>>>>>>
->>>>>>> Hi,
->>>>>>> this is a very old patch from 2018 that somehow was talked till 2020
->>>>>>> with Kavlo asked to rebase and resubmit and nobody did.
->>>>>>> So here we are in 2023 with me trying to finally have this upstream.
->>>>>>>
->>>>>>> A summarize of the situation.
->>>>>>> - The patch is from years in OpenWRT. Used by anything that has ath10k
->>>>>>>    card and a LED connected.
->>>>>>> - This patch is also used by the fw variant from Candela Tech with no
->>>>>>>    problem reported.
->>>>>>> - It was pointed out that this caused some problem with ipq4019 SoC
->>>>>>>    but the problem was actually caused by a different bug related to
->>>>>>>    interrupts.
->>>>>>>
->>>>>>> I honestly hope we can have this feature merged since it's really
->>>>>>> funny to have something that was so near merge and jet still not
->>>>>>> present and with devices not supporting this simple but useful
->>>>>>> feature.
->>>>>> Indeed, we should finally get this in. Thanks for working on it.
->>>>>>
->>>>>> I did some minor changes to the patch, they are in my pending branch:
->>>>>>
->>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git/commit/?h=pending&id=686464864538158f22842dc49eddea6fa50e59c1
->>>>>>
->>>>>> My comments below, please review my changes. No need to resend because
->>>>>> of these.
->>>>>>
->>>>> Hi,
->>>>> very happy this is going further.
->>>>>
->>>>>>> --- a/drivers/net/wireless/ath/ath10k/Kconfig
->>>>>>> +++ b/drivers/net/wireless/ath/ath10k/Kconfig
->>>>>>> @@ -67,6 +67,23 @@ config ATH10K_DEBUGFS
->>>>>>>
->>>>>>>      If unsure, say Y to make it easier to debug problems.
->>>>>>>
->>>>>>> +config ATH10K_LEDS
->>>>>>> + bool "Atheros ath10k LED support"
->>>>>>> + depends on ATH10K
->>>>>>> + select MAC80211_LEDS
->>>>>>> + select LEDS_CLASS
->>>>>>> + select NEW_LEDS
->>>>>>> + default y
->>>>>>> + help
->>>>>>> +   This option enables LEDs support for chipset LED pins.
->>>>>>> +   Each pin is connected via GPIO and can be controlled using
->>>>>>> +   WMI Firmware API.
->>>>>>> +
->>>>>>> +   The LED device will get available named as "ath10k-phyX" at sysfs and
->>>>>>> +           can be controlled with various triggers.
->>>>>>> +
->>>>>>> +   Say Y, if you have LED pins connected to the ath10k wireless card.
->>>>>> I'm not sure anymore if we should ask anything from the user, better to
->>>>>> enable automatically if LED support is enabled in the kernel. So I
->>>>>> simplified this to:
->>>>>>
->>>>>> config ATH10K_LEDS
->>>>>>      bool
->>>>>>      depends on ATH10K
->>>>>>      depends on LEDS_CLASS=y || LEDS_CLASS=MAC80211
->>>>>>      default y
->>>>>>
->>>>>> This follows what mt76 does:
->>>>>>
->>>>>> config MT76_LEDS
->>>>>>      bool
->>>>>>      depends on MT76_CORE
->>>>>>      depends on LEDS_CLASS=y || MT76_CORE=LEDS_CLASS
->>>>>>      default y
->>>>>>
->>>>> I remember there was the same discussion in a previous series. OK for me
->>>>> for making this by default, only concern is any buildbot error (if any)
->>>>>
->>>>> Anyway OK for the change.
->>>>>
->>>>>>> @@ -65,6 +66,7 @@ static const struct ath10k_hw_params
->>>>>>> ath10k_hw_params_list[] = {
->>>>>>>            .dev_id = QCA988X_2_0_DEVICE_ID,
->>>>>>>            .bus = ATH10K_BUS_PCI,
->>>>>>>            .name = "qca988x hw2.0",
->>>>>>> +         .led_pin = 1,
->>>>>>>            .patch_load_addr = QCA988X_HW_2_0_PATCH_LOAD_ADDR,
->>>>>>>            .uart_pin = 7,
->>>>>>>            .cc_wraparound_type = ATH10K_HW_CC_WRAP_SHIFTED_ALL,
->>>>>> I prefer following the field order from struct ath10k_hw_params
->>>>>> declaration and also setting fields explicitly to zero (even though
->>>>>> there are gaps still) so I changed that for every entry.
->>>>>>
->>>>> Thanks for the change, np for me.
->>>>>
->>>>>>> +int ath10k_leds_register(struct ath10k *ar)
->>>>>>> +{
->>>>>>> + int ret;
->>>>>>> +
->>>>>>> + if (ar->hw_params.led_pin == 0)
->>>>>>> +         /* leds not supported */
->>>>>>> +         return 0;
->>>>>>> +
->>>>>>> + snprintf(ar->leds.label, sizeof(ar->leds.label), "ath10k-%s",
->>>>>>> +          wiphy_name(ar->hw->wiphy));
->>>>>>> + ar->leds.wifi_led.active_low = 1;
->>>>>>> + ar->leds.wifi_led.gpio = ar->hw_params.led_pin;
->>>>>>> + ar->leds.wifi_led.name = ar->leds.label;
->>>>>>> + ar->leds.wifi_led.default_state = LEDS_GPIO_DEFSTATE_KEEP;
->>>>>>> +
->>>>>>> + ar->leds.cdev.name = ar->leds.label;
->>>>>>> + ar->leds.cdev.brightness_set_blocking = ath10k_leds_set_brightness_blocking;
->>>>>>> +
->>>>>>> + /* FIXME: this assignment doesn't make sense as it's NULL, remove it? */
->>>>>>> + ar->leds.cdev.default_trigger = ar->leds.wifi_led.default_trigger;
->>>>>> But what to do with this FIXME?
->>>>>>
->>>>> It was pushed by you in v13.
->>>>>
->>>>> I could be wrong but your idea was to prepare for future support of
->>>>> other patch that would set the default_trigger to the mac80211 tpt.
->>>>>
->>>>> We might got both confused by default_trigger and default_state.
->>>>> default_trigger is actually never set and is NULL (actually it's 0)
->>>>>
->>>>> We have other 2 patch that adds tpt rates for the mac80211 LED trigger
->>>>> and set this trigger as the default one but honestly I would chose a
->>>>> different implementation than hardcoding everything.
->>>>>
->>>>> If it's ok for you, I would drop the comment and the default_trigger and
->>>>> I will send a follow-up patch to this adding DT support by using
->>>>> led_classdev_register_ext and defining init_data.
->>>>> (and this indirectly would permit better LED naming and defining of
->>>>> default-trigger in DT)
->>>>>
->>>>> Also ideally I will also send a patch for default_state following
->>>>> standard LED implementation. (to set default_state in DT)
->>>>>
->>>>> I would prefer this approach as the LED patch already took way too much
->>>>> time and I think it's better to merge this initial version and then
->>>>> improve it.
->>>> If you want to check out I attached the 2 patch (one dt-bindings and the
->>>> one for the code) that I will submit when this will be merged (the
->>>> change is with the assumption that the FIXME line is dropped)
->>>>
->>>> Tested and works correctly with my use case of wifi card attached with
->>>> pcie. This implementation permits to declare the default trigger in DT
->>>> instead of hardcoding.
->>>>
->>> Any news with this? Did I notice the LEDs patch are still in pending...
->> Sorry for the delay but finally I looked at this again. I decided to
->> just remove the fixme and otherwise it looks good for me. Please check
->> my changes:
->>
->> https://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git/commit/?h=pending&id=688130a66ed49f20ca0ce02c3987f6a474f7c93a
->>
-> All ok for me, Just I notice the ATH10K_LEDS is not exposed anymore? Is
-> that intended?
->
-> Aside from this very happy that we are finally finishing with this long
-> lasting feature!
+I have seen that restarting from usbnet_probe is necessary to avoid doing
+too complex things. But when the link is set to down/up (for example to
+configure a different mac address) the link is not correctly recovered
+unless a reset is commanded from usbnet_open.
 
-since ATH10K_LEDS is no exposed option anymore. how is this feature 
-enabled then? Its not selected by any dependency
+So, detect the initialization stage (first call) to not reset from
+usbnet_open after the reset from usbnet_probe and after this stage, always
+reset from usbnet_open too (when the link needs to be rechecked).
 
-Sebastian
+Apply to all the possible devices, the behavior now is going to be the same.
 
->
+cc: stable@vger.kernel.org # 6.6+
+Fixes: 56f78615bcb1 ("net: usb: ax88179_178a: avoid writing the mac address before first reading")
+Reported-by: Isaac Ganoung <inventor500@vivaldi.net>
+Reported-by: Yongqin Liu <yongqin.liu@linaro.org>
+Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+---
+ drivers/net/usb/ax88179_178a.c | 37 ++++++++++++++++++++++++----------
+ 1 file changed, 26 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
+index 377be0d9ef14..a0edb410f746 100644
+--- a/drivers/net/usb/ax88179_178a.c
++++ b/drivers/net/usb/ax88179_178a.c
+@@ -174,6 +174,7 @@ struct ax88179_data {
+ 	u32 wol_supported;
+ 	u32 wolopts;
+ 	u8 disconnecting;
++	u8 initialized;
+ };
+ 
+ struct ax88179_int_data {
+@@ -1672,6 +1673,18 @@ static int ax88179_reset(struct usbnet *dev)
+ 	return 0;
+ }
+ 
++static int ax88179_net_reset(struct usbnet *dev)
++{
++	struct ax88179_data *ax179_data = dev->driver_priv;
++
++	if (ax179_data->initialized)
++		ax88179_reset(dev);
++	else
++		ax179_data->initialized = 1;
++
++	return 0;
++}
++
+ static int ax88179_stop(struct usbnet *dev)
+ {
+ 	u16 tmp16;
+@@ -1691,6 +1704,7 @@ static const struct driver_info ax88179_info = {
+ 	.unbind = ax88179_unbind,
+ 	.status = ax88179_status,
+ 	.link_reset = ax88179_link_reset,
++	.reset = ax88179_net_reset,
+ 	.stop = ax88179_stop,
+ 	.flags = FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+@@ -1703,6 +1717,7 @@ static const struct driver_info ax88178a_info = {
+ 	.unbind = ax88179_unbind,
+ 	.status = ax88179_status,
+ 	.link_reset = ax88179_link_reset,
++	.reset = ax88179_net_reset,
+ 	.stop = ax88179_stop,
+ 	.flags = FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+@@ -1715,7 +1730,7 @@ static const struct driver_info cypress_GX3_info = {
+ 	.unbind = ax88179_unbind,
+ 	.status = ax88179_status,
+ 	.link_reset = ax88179_link_reset,
+-	.reset = ax88179_reset,
++	.reset = ax88179_net_reset,
+ 	.stop = ax88179_stop,
+ 	.flags = FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+@@ -1728,7 +1743,7 @@ static const struct driver_info dlink_dub1312_info = {
+ 	.unbind = ax88179_unbind,
+ 	.status = ax88179_status,
+ 	.link_reset = ax88179_link_reset,
+-	.reset = ax88179_reset,
++	.reset = ax88179_net_reset,
+ 	.stop = ax88179_stop,
+ 	.flags = FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+@@ -1741,7 +1756,7 @@ static const struct driver_info sitecom_info = {
+ 	.unbind = ax88179_unbind,
+ 	.status = ax88179_status,
+ 	.link_reset = ax88179_link_reset,
+-	.reset = ax88179_reset,
++	.reset = ax88179_net_reset,
+ 	.stop = ax88179_stop,
+ 	.flags = FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+@@ -1754,7 +1769,7 @@ static const struct driver_info samsung_info = {
+ 	.unbind = ax88179_unbind,
+ 	.status = ax88179_status,
+ 	.link_reset = ax88179_link_reset,
+-	.reset = ax88179_reset,
++	.reset = ax88179_net_reset,
+ 	.stop = ax88179_stop,
+ 	.flags = FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+@@ -1767,7 +1782,7 @@ static const struct driver_info lenovo_info = {
+ 	.unbind = ax88179_unbind,
+ 	.status = ax88179_status,
+ 	.link_reset = ax88179_link_reset,
+-	.reset = ax88179_reset,
++	.reset = ax88179_net_reset,
+ 	.stop = ax88179_stop,
+ 	.flags = FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+@@ -1780,7 +1795,7 @@ static const struct driver_info belkin_info = {
+ 	.unbind = ax88179_unbind,
+ 	.status = ax88179_status,
+ 	.link_reset = ax88179_link_reset,
+-	.reset	= ax88179_reset,
++	.reset	= ax88179_net_reset,
+ 	.stop	= ax88179_stop,
+ 	.flags	= FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+@@ -1793,7 +1808,7 @@ static const struct driver_info toshiba_info = {
+ 	.unbind = ax88179_unbind,
+ 	.status = ax88179_status,
+ 	.link_reset = ax88179_link_reset,
+-	.reset	= ax88179_reset,
++	.reset	= ax88179_net_reset,
+ 	.stop = ax88179_stop,
+ 	.flags	= FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+@@ -1806,7 +1821,7 @@ static const struct driver_info mct_info = {
+ 	.unbind	= ax88179_unbind,
+ 	.status	= ax88179_status,
+ 	.link_reset = ax88179_link_reset,
+-	.reset	= ax88179_reset,
++	.reset	= ax88179_net_reset,
+ 	.stop	= ax88179_stop,
+ 	.flags	= FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+@@ -1819,7 +1834,7 @@ static const struct driver_info at_umc2000_info = {
+ 	.unbind = ax88179_unbind,
+ 	.status = ax88179_status,
+ 	.link_reset = ax88179_link_reset,
+-	.reset  = ax88179_reset,
++	.reset  = ax88179_net_reset,
+ 	.stop   = ax88179_stop,
+ 	.flags  = FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+@@ -1832,7 +1847,7 @@ static const struct driver_info at_umc200_info = {
+ 	.unbind = ax88179_unbind,
+ 	.status = ax88179_status,
+ 	.link_reset = ax88179_link_reset,
+-	.reset  = ax88179_reset,
++	.reset  = ax88179_net_reset,
+ 	.stop   = ax88179_stop,
+ 	.flags  = FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+@@ -1845,7 +1860,7 @@ static const struct driver_info at_umc2000sp_info = {
+ 	.unbind = ax88179_unbind,
+ 	.status = ax88179_status,
+ 	.link_reset = ax88179_link_reset,
+-	.reset  = ax88179_reset,
++	.reset  = ax88179_net_reset,
+ 	.stop   = ax88179_stop,
+ 	.flags  = FLAG_ETHER | FLAG_FRAMING_AX,
+ 	.rx_fixup = ax88179_rx_fixup,
+-- 
+2.44.0
+
 
