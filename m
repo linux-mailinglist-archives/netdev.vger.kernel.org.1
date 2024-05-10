@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-95410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03AD08C22F5
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:19:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 221E78C22F7
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:19:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 328451C2100E
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:19:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D28C4282908
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F9616D4D6;
-	Fri, 10 May 2024 11:18:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E41016F0E5;
+	Fri, 10 May 2024 11:18:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VOVv8Xv6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pwy4GnLC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001031649CF;
-	Fri, 10 May 2024 11:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D483B16F0DA;
+	Fri, 10 May 2024 11:18:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715339936; cv=none; b=XRW76Vp07F4spGbhb/6IkFlmvDVl4KfJ4iYXfzHabRxfo5x09T/rKGjz83i70X6e53kc+OiT+HGtm5iOSnRChpFjU6edeMZwu4ONXrI35UxqYq6tSF9XLHxU+2xo3Aje6058Mob6UllH/SUQEZA7TMBvB0tHqgdFXBUlq9hEM6Y=
+	t=1715339938; cv=none; b=pFPPc1yy4xueEZFDDQ2DXP0Lk2Mk+9YcHzSG89BQRqLb9NH6UbqdUx/0uT/Vh8+Xi44Xu4n4dhQawe7xdUQHzV3MOqQ9Hc1j3Spf/y7sit+kGfW9PqrBvOAwOyw5SsOAROHSScaE5wAgTrR4Bbn1fdLwTaWGFWQBUmhpBcoheLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715339936; c=relaxed/simple;
-	bh=ToKtFZmWWfuV2kB4dgliCIRKJEwH1p0nGQ2UWd5XBY8=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=rdPd6Cc18nRFprjjFjGSX+z1X8AtedVA2uGzdryjMzV0ci4xIlygu2xHaRj9X4acE6JdStxY4YnVn6gBGZMc5x7IzgsD5/+Uww/WkCEjHgpUC9rsNe1ZHrfCAoQR2oSWFGGZwzWBu8A2SIuhxmqFUVI33pxy0TI6q7O6VqGqjMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VOVv8Xv6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ED82C32781;
-	Fri, 10 May 2024 11:18:52 +0000 (UTC)
+	s=arc-20240116; t=1715339938; c=relaxed/simple;
+	bh=e72oNWyYzu0S4cUwcbJkoVMrT7hFjweEktpyclaET6I=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=rHsY9kcGUD3SrKibe20AfFdITxxKfnul1qykkeXGtiLA1TpZFVC8Bqpv/qPruoLE+YIfFt7Va9+x8k8SIJj12ixspNFxc9ecXG8ah9YEvmAGtt5hnBIwbElkCBC091fvJbcAbkZQIbkk+EuVcW8A8+w7n3UeRlKN3OY7RTMDITI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pwy4GnLC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12729C113CC;
+	Fri, 10 May 2024 11:18:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715339935;
-	bh=ToKtFZmWWfuV2kB4dgliCIRKJEwH1p0nGQ2UWd5XBY8=;
-	h=From:Subject:Date:To:Cc:From;
-	b=VOVv8Xv6x4AizlMth+HSrzcMq+nwcXrZFNHpXjfzCiasb3vPhHH/jpYqQjOB1semh
-	 4bCf4cTeLY2LbOPNq0pW9gIvJ1JVpOidMwqmkBgG5JYCAp4w4jrBFDJVzPSxyOyZrl
-	 a6yTdv/1RKJ+9sH+i+ZyKd8+VlegT6eVSiQYfsgOZ8qmwTu2ZeUDYk8JaZXJIh+uj7
-	 aKwWnVQcPUsJEVObmnC1AYpGo+N8l1ZRfoc5YjqHgJmCLTl71oz86jKTqC91SpAk9q
-	 5zhnb6Tkov1GflbscAlRs1ZjxU+QKxWU7DgsLSAeJoiw3qjnc3XFrls4YMdpcUmPVy
-	 0tHmU8REydFpQ==
+	s=k20201202; t=1715339938;
+	bh=e72oNWyYzu0S4cUwcbJkoVMrT7hFjweEktpyclaET6I=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=Pwy4GnLC0r5k93j8vZc6EL/Ule56xU/cdUIsmZtzRraInzpI150pNndl0L4n9+Xf0
+	 SbPADg/GPvU9MbRhelCo2yTjNJJd38P+eWSKMd70iOw72ilNA6a/ya/Bp0oAz2qoRf
+	 N1hVRUc2zTdfFM8jjmBc+sW9Wg3GIJVuog/ORsOvQC/NCnnvbYj4OHyBmM36kSjNFb
+	 O8KoMSWJKH8DaxiyqzHYZquPqcrLhgWlROGv5dRH5+Ywy3oClvPj2CCWb0uBTi56iG
+	 PCmb9RK+o/F8Pnmfwu9YIf3OnmakWsbTIRG9SRXxjvqQnPpsoGAXZEXg6is5ogoGkq
+	 n0xlsO3Mo5frg==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Subject: [PATCH net-next 0/8] mptcp: small improvements, fix and clean-ups
-Date: Fri, 10 May 2024 13:18:30 +0200
-Message-Id: <20240510-upstream-net-next-20240509-misc-improvements-v1-0-4f25579e62ba@kernel.org>
+Date: Fri, 10 May 2024 13:18:31 +0200
+Subject: [PATCH net-next 1/8] mptcp: SO_KEEPALIVE: fix getsockopt support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,88 +52,72 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAIYCPmYC/z2NQQqDMBBFryKz7kA0UbRXKV1YO+osEsNMFEG8e
- 4NQF3/x+PDeAUrCpPAsDhDaWHkJGcpHAcPch4mQv5mhMpUztelwjZqEeo+BUt6e8L4864Dsoyw
- beQpJsXUf69qutM1oISuj0Mj7lXvBXwDv8/wB5SXhP4gAAAA=
+Message-Id: <20240510-upstream-net-next-20240509-misc-improvements-v1-1-4f25579e62ba@kernel.org>
+References: <20240510-upstream-net-next-20240509-misc-improvements-v1-0-4f25579e62ba@kernel.org>
+In-Reply-To: <20240510-upstream-net-next-20240509-misc-improvements-v1-0-4f25579e62ba@kernel.org>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
  Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, Florian Westphal <fw@strlen.de>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Gregory Detal <gregory.detal@gmail.com>
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2272; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=ToKtFZmWWfuV2kB4dgliCIRKJEwH1p0nGQ2UWd5XBY8=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmPgKb40RMvXAQbuIZdUe5MCpWgEaHtuMhc+kNi
- 27sWrPX59+JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZj4CmwAKCRD2t4JPQmmg
- c39eD/wIOKzgRhEkfB7BQnj6iiGzb250Jqy05mJkKTGrj8M2azzTr8ImQ7eER8FRAWn9dgWRRhO
- TmLr6iQvrUdiSwgg3sq5NY9Nn2jP8ORJJ/xMYxv1Ji1yh4dA7KS8kKa9NCJUwGTiKkYnrzmiP5y
- XM9Bx3lvDYVoUQX9fl6dq7OhNeRgxhT+7nsODS8T/VfKp4Pi4ai5zyXKmTdyi5SvZJINRpfhO98
- ycd2PoYXlvtR8JpsgjzMly7/TVuBM1vVhj3aELddw077gphEEBDn/jZge+DcvAydMotQXx+IHAb
- PzGJ9zG3cLb1D9DJbOskmScdGRSk8ucGSnsf4lb643z1A91L3OIYz04fecqTe28gA/axaezpNYu
- ZGeJkTXGUdBHg06W6pKra/An/t7le3/cr5XUM4N6h8+iXV8+mQf0rI1sgPJ/sQ/lOuit8yMzBVk
- LTBxx5ttHS99Ic5dYChE2q4g5Pgjy8BIHs3IC76CPZ4gU/01UfHcJsicSRNzfQwoMGSbRvauhJ8
- VkUCmWws7CH29ucp5TZUhazB2CskDzW+kqpTXw072TIhPI6vnK6LNvACSCX0XbsZddK7ITqn6w/
- Q0YiUQxWnNFJj6vXmfw3zIrEdC+E3VZh7PPKUgY7nxB9pDckYxSA0U7FElIoX0q1Bw4Bkx+ujsn
- biqrIU2MldtIX0g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1498; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=e72oNWyYzu0S4cUwcbJkoVMrT7hFjweEktpyclaET6I=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmPgKcli09G1VxtjxaHvlHQu1/+J+WFb8w/44+s
+ UZ6ZsWjT9WJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZj4CnAAKCRD2t4JPQmmg
+ c3rUEACh1Bs3IPBnK6zn8d3s27ZT8sreHxXUt+ZCmGxBhEcxASY6vCXT02Pn/kccYEgE1Bb3esa
+ 9fDnx8Yj4QhM7AEks4QJQOU3pV8b//X1HrfNlFRdWlRO5zvCcxzM+cE9xAQw2b0Mdf+2aT36cg9
+ x6eGDWVaYSEQyWvUUlhPitSbX5E++Qsx+mtPkHEeTXUwDVQQwQ2y4pZMX5Q9W/p16fJ/oS7ZO8A
+ S1gyK1Gl1DZYJ8tXzWw7BSm51Xa5XvZuNKfeXZg6EdUWps9j+LmP7iTueDL5Ef8pq9t0p0fsSYS
+ g6ZDvUHhjgMEtIVqHv6JqmZxnW9FyGeYsMHtB2V78NmYkQZFbQR2TlO4UejugheE/jzwKAaLwpk
+ XSIvrDzfLSGKmythuSmw8IPu6Zt7fhlMnv1KS2RrntH9ILnDywCxN++UlLMqK+76+zsKmHKKPaf
+ W4cq+onNNG2ouTSJQSfxx7Z663nZYbp7mXCh7rVNEvFU/2CFzXBkZDl1ggoDmwyNiDjge9WHD5Y
+ BtL37jEtkHtXshZgcUzFF4N5TN9ryxwRk8pggJj/OFpfkQ37j/cs3hTpc41n0jj7ALyhquh/OOp
+ 2vqhyYbOz8U6X365izSKma4KsRP7rv3eP9g2QBHR182ueQgQ4EBxlnVhCQRcD13Wi/w3YN+A9P3
+ Gxii9efmB/ubzHQ==
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-This series contain mostly unrelated patches:
+SO_KEEPALIVE support has to be set on each subflow: on each TCP socket,
+where sk_prot->keepalive is defined. Technically, nothing has to be done
+on the MPTCP socket. That's why mptcp_sol_socket_sync_intval() was
+called instead of mptcp_sol_socket_intval().
 
-- The two first patches can be seen as "fixes". They are part of this
-  series for -next because it looks like the last batch of fixes for
-  v6.9 has already been sent. These fixes are not urgent, so they can
-  wait if an unlikely v6.9-rc8 is published. About the two patches:
-    - Patch 1 fixes getsockopt(SO_KEEPALIVE) support on MPTCP sockets
-    - Patch 2 makes sure the full TCP keep-alive feature is supported,
-      not just SO_KEEPALIVE.
+Except that when nothing is done on the MPTCP socket, the
+getsockopt(SO_KEEPALIVE), handled in net/core/sock.c:sk_getsockopt(),
+will not know if SO_KEEPALIVE has been set on the different subflows or
+not.
 
-- Patch 3 is a small optimisation when getsockopt(MPTCP_INFO) is used
-  without buffer, just to check if MPTCP is still being used: no
-  fallback to TCP.
+The fix is simple: simply call mptcp_sol_socket_intval() which will end
+up calling net/core/sock.c:sk_setsockopt() where the SOCK_KEEPOPEN flag
+will be set, the one used in sk_getsockopt().
 
-- Patch 4 adds net.mptcp.available_schedulers sysctl knob to list packet
-  schedulers, similar to net.ipv4.tcp_available_congestion_control.
+So now, getsockopt(SO_KEEPALIVE) on an MPTCP socket will return the same
+value as the one previously set with setsockopt(SO_KEEPALIVE).
 
-- Patch 5 and 6 fix CheckPatch warnings: "prefer strscpy over strcpy"
-  and "else is not generally useful after a break or return".
-
-- Patch 7 and 8 remove and add header includes to avoid unused ones, and
-  add missing ones to be self-contained.
-
+Fixes: 1b3e7ede1365 ("mptcp: setsockopt: handle SO_KEEPALIVE and SO_PRIORITY")
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
-Gregory Detal (1):
-      mptcp: add net.mptcp.available_schedulers
+ net/mptcp/sockopt.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Matthieu Baerts (NGI0) (7):
-      mptcp: SO_KEEPALIVE: fix getsockopt support
-      mptcp: fix full TCP keep-alive support
-      mptcp: sockopt: info: stop early if no buffer
-      mptcp: prefer strscpy over strcpy
-      mptcp: remove unnecessary else statements
-      mptcp: move mptcp_pm_gen.h's include
-      mptcp: include inet_common in mib.h
+diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+index 1fea43f5b6f3..69fc584fc57e 100644
+--- a/net/mptcp/sockopt.c
++++ b/net/mptcp/sockopt.c
+@@ -181,8 +181,6 @@ static int mptcp_setsockopt_sol_socket_int(struct mptcp_sock *msk, int optname,
+ 
+ 	switch (optname) {
+ 	case SO_KEEPALIVE:
+-		mptcp_sol_socket_sync_intval(msk, optname, val);
+-		return 0;
+ 	case SO_DEBUG:
+ 	case SO_MARK:
+ 	case SO_PRIORITY:
 
- include/net/mptcp.h      |  3 +++
- net/mptcp/ctrl.c         | 29 +++++++++++++++++++--
- net/mptcp/mib.h          |  2 ++
- net/mptcp/pm_netlink.c   |  1 +
- net/mptcp/pm_userspace.c |  1 +
- net/mptcp/protocol.c     |  5 ++--
- net/mptcp/protocol.h     |  6 +++--
- net/mptcp/sched.c        | 22 ++++++++++++++++
- net/mptcp/sockopt.c      | 66 +++++++++++++++++++++++++++++++++++++++++++++---
- net/mptcp/subflow.c      | 32 ++++++++++++-----------
- 10 files changed, 143 insertions(+), 24 deletions(-)
----
-base-commit: 383eed2de529287337d9153a5084d4291a7c69f2
-change-id: 20240509-upstream-net-next-20240509-misc-improvements-84b3489136f3
-
-Best regards,
 -- 
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
+2.43.0
 
 
