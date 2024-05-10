@@ -1,165 +1,110 @@
-Return-Path: <netdev+bounces-95253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A30128C1BDF
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 02:58:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 074AD8C1BF7
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 03:19:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40B66B21DEB
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 00:58:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 783FA2825A3
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 01:19:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA66137932;
-	Fri, 10 May 2024 00:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 886F513AA59;
+	Fri, 10 May 2024 01:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNCIvRRK"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="dmooV9W0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA43137925;
-	Fri, 10 May 2024 00:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3F213A89A
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 01:19:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715302701; cv=none; b=gJew4+5I4dVstGeic7kZtp8yUaaTykjCydYjlIJZyrL4u+97yZ+gsn6TRG7MMpHRdQMCX9pvwlvMW1SJuUhQMbYRYCyoO6qglEtD17MBEg8MW+zDXFV6FADkJwucjOV+4IktuColCsT8MToSL79ObzSsTCgHDQcJzxLqhFuZsgM=
+	t=1715303965; cv=none; b=XfGvG86KVfjkWO6hrPW5jc76AXd2OfQ/ahAs5lWf54WFAs8l7lZnco0PtaTzQY9VtEeKA3X8N0ZGCKRUFrdphxXgXcQpB2Ks8h7CLViZ6x1QIPDqhSAijUwcpd8tzMW7+RvhkB2Fb9cZm/lMM1gXxy+BcfSmahh8ZfYk/u/Z3uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715302701; c=relaxed/simple;
-	bh=7T+Yp+4uFqfXgd2aYFPdSwfxDXWerTLDOmWnFl37rEk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nfGZnTO94MAPTxyYFd+lrW1QtGr737U98KhUN3+M/8CjtCaD4HLvNd56Vcppf3tC1YCscebcN88Yovr7VXMvVrtiPaxlRnNUvuvCxTp+jS3ZmrmWOypK13nQQViPv3k+LZg22BPISUfxoyahNDtriy74C66ZcT11RedZ4CYGGhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNCIvRRK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F354BC3277B;
-	Fri, 10 May 2024 00:58:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715302701;
-	bh=7T+Yp+4uFqfXgd2aYFPdSwfxDXWerTLDOmWnFl37rEk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SNCIvRRKRnr2QVi+J6iFi80IkYQbGPLFHfRupzW1Ni7ToTB+wZ6w8oiua5rDl1L6O
-	 zTEaEanhfDlUBg3jEJqZWpTM3Lhv4EdmBBAMIuiyloCKMyiLc3tGPOowlfYGKsA+FL
-	 0IhqW2zPB9hPg8SYLFipxX3rrLInqb1pxS6+xCArDStLn0+nzLGkR2doe3XjEYdWMe
-	 pWsgOBdJo+V0TzPGFu6mjurqUUlPEPxv+32nbVDIaigbRBSAaFAPyDuuSnffJdaDSL
-	 RLVUMgeGuaPQJ2Hv4yxWrQGjtTepy063HVn9RYlWD/k0a3lfyB+VFGgZ0HLYA6deD+
-	 4wWWiKcz51UUw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next 2/2] selftests: net: increase the delay for relative cmsg_time.sh test
-Date: Thu,  9 May 2024 17:57:05 -0700
-Message-ID: <20240510005705.43069-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240510005705.43069-1-kuba@kernel.org>
-References: <20240510005705.43069-1-kuba@kernel.org>
+	s=arc-20240116; t=1715303965; c=relaxed/simple;
+	bh=OES0ocJOGOCNOUpdz2lxGQKJI6TmFx00t08hjU1Cp9Q=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=Uko7Q3ng7SHuWc9IQeZjV9jXz8ynhmLfBlc8f4ZX6+l0YLrd/jEBw0ZCtbpGAAvPZIXHU54zFVb3r7EEwTPMwya/tzSP4A44u2DUM/YU53jP7UnscfuYcl4RjuYZYzdEc3eUl1pFR3HWOLtZCGAAfVk+76GK+WLsyol0M2ZEYaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=dmooV9W0; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1715303959; h=Message-ID:Subject:Date:From:To;
+	bh=6tUqBykojlPtOa+QazN2Fepll1KlXCkQkFGlBoxMAGY=;
+	b=dmooV9W0d2ng1bkafpVVWg2Mjmni//ivoSKlPqEegIRtrm2y5sV+H3p6yGt42KiYYtKvvBx3tH4eEWwv3DQHvryawPrOGbJhtIyCacsaG65OOSo5PvF0vqjA6rFLsibBp5mJxqNMPNDJuYd36zg5eayYj9Hu2x6BLO4CjzUwWMA=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067109;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W68Tgkt_1715303957;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W68Tgkt_1715303957)
+          by smtp.aliyun-inc.com;
+          Fri, 10 May 2024 09:19:18 +0800
+Message-ID: <1715303950.5769324-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH] virtio_net: Fix memory leak in virtnet_rx_mod_work
+Date: Fri, 10 May 2024 09:19:10 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: <mst@redhat.com>,
+ <jasowang@redhat.com>,
+ <xuanzhuo@linux.alibaba.com>,
+ <virtualization@lists.linux.dev>,
+ <davem@davemloft.net>,
+ <edumazet@google.com>,
+ <kuba@kernel.org>,
+ <pabeni@redhat.com>,
+ <jiri@nvidia.com>,
+ <axboe@kernel.dk>,
+ Daniel Jurgens <danielj@nvidia.com>,
+ <netdev@vger.kernel.org>
+References: <20240509183634.143273-1-danielj@nvidia.com>
+In-Reply-To: <20240509183634.143273-1-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Slow machines can delay scheduling of the packets for milliseconds.
-Increase the delay to 8ms if KSFT_MACHINE_SLOW. Try to limit the
-variability by moving setsockopts earlier (before we read time).
+On Thu, 9 May 2024 13:36:34 -0500, Daniel Jurgens <danielj@nvidia.com> wrote:
+> The pointer delcaration was missing the __free(kfree).
+>
+> Fixes: ff7c7d9f5261 ("virtio_net: Remove command data from control_buf")
+> Reported-by: Jens Axboe <axboe@kernel.dk>
+> Closes: https://lore.kernel.org/netdev/0674ca1b-020f-4f93-94d0-104964566e3f@kernel.dk/
+> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
 
-This fixes the "TXTIME rel" failures on debug kernels, like:
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
-  Case ICMPv4  - TXTIME rel returned '', expected 'OK'
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/net/cmsg_sender.c | 32 +++++++++++++----------
- tools/testing/selftests/net/cmsg_time.sh  |  7 +++--
- 2 files changed, 23 insertions(+), 16 deletions(-)
-
-diff --git a/tools/testing/selftests/net/cmsg_sender.c b/tools/testing/selftests/net/cmsg_sender.c
-index f25268504937..b2df05ef71cb 100644
---- a/tools/testing/selftests/net/cmsg_sender.c
-+++ b/tools/testing/selftests/net/cmsg_sender.c
-@@ -260,15 +260,8 @@ cs_write_cmsg(int fd, struct msghdr *msg, char *cbuf, size_t cbuf_sz)
- 			  SOL_IPV6, IPV6_HOPLIMIT, &opt.v6.hlimit);
- 
- 	if (opt.txtime.ena) {
--		struct sock_txtime so_txtime = {
--			.clockid = CLOCK_MONOTONIC,
--		};
- 		__u64 txtime;
- 
--		if (setsockopt(fd, SOL_SOCKET, SO_TXTIME,
--			       &so_txtime, sizeof(so_txtime)))
--			error(ERN_SOCKOPT, errno, "setsockopt TXTIME");
--
- 		txtime = time_start_mono.tv_sec * (1000ULL * 1000 * 1000) +
- 			 time_start_mono.tv_nsec +
- 			 opt.txtime.delay * 1000;
-@@ -284,13 +277,6 @@ cs_write_cmsg(int fd, struct msghdr *msg, char *cbuf, size_t cbuf_sz)
- 		memcpy(CMSG_DATA(cmsg), &txtime, sizeof(txtime));
- 	}
- 	if (opt.ts.ena) {
--		__u32 val = SOF_TIMESTAMPING_SOFTWARE |
--			    SOF_TIMESTAMPING_OPT_TSONLY;
--
--		if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING,
--			       &val, sizeof(val)))
--			error(ERN_SOCKOPT, errno, "setsockopt TIMESTAMPING");
--
- 		cmsg = (struct cmsghdr *)(cbuf + cmsg_len);
- 		cmsg_len += CMSG_SPACE(sizeof(__u32));
- 		if (cbuf_sz < cmsg_len)
-@@ -426,6 +412,24 @@ static void ca_set_sockopts(int fd)
- 	    setsockopt(fd, SOL_SOCKET, SO_PRIORITY,
- 		       &opt.sockopt.priority, sizeof(opt.sockopt.priority)))
- 		error(ERN_SOCKOPT, errno, "setsockopt SO_PRIORITY");
-+
-+	if (opt.txtime.ena) {
-+		struct sock_txtime so_txtime = {
-+			.clockid = CLOCK_MONOTONIC,
-+		};
-+
-+		if (setsockopt(fd, SOL_SOCKET, SO_TXTIME,
-+			       &so_txtime, sizeof(so_txtime)))
-+			error(ERN_SOCKOPT, errno, "setsockopt TXTIME");
-+	}
-+	if (opt.ts.ena) {
-+		__u32 val = SOF_TIMESTAMPING_SOFTWARE |
-+			SOF_TIMESTAMPING_OPT_TSONLY;
-+
-+		if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING,
-+			       &val, sizeof(val)))
-+			error(ERN_SOCKOPT, errno, "setsockopt TIMESTAMPING");
-+	}
- }
- 
- int main(int argc, char *argv[])
-diff --git a/tools/testing/selftests/net/cmsg_time.sh b/tools/testing/selftests/net/cmsg_time.sh
-index af85267ad1e3..1d7e756644bc 100755
---- a/tools/testing/selftests/net/cmsg_time.sh
-+++ b/tools/testing/selftests/net/cmsg_time.sh
-@@ -66,10 +66,13 @@ for i in "-4 $TGT4" "-6 $TGT6"; do
- 		 awk '/SND/ { if ($3 > 1000) print "OK"; }')
- 	check_result $? "$ts" "OK" "$prot - TXTIME abs"
- 
--	ts=$(ip netns exec $NS ./cmsg_sender -p $p $i 1234 -t -d 1000 |
-+	[ "$KSFT_MACHINE_SLOW" = yes ] && delay=8000 || delay=1000
-+
-+	ts=$(ip netns exec $NS ./cmsg_sender -p $p $i 1234 -t -d $delay |
- 		 awk '/SND/ {snd=$3}
- 		      /SCHED/ {sch=$3}
--		      END { if (snd - sch > 500) print "OK"; }')
-+		      END { if (snd - sch > '$((delay/2))') print "OK";
-+			    else print snd, "-", sch, "<", '$((delay/2))'; }')
- 	check_result $? "$ts" "OK" "$prot - TXTIME rel"
-     done
- done
--- 
-2.45.0
-
+> ---
+>  drivers/net/virtio_net.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index df6121c38a1b..42da535913ed 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2884,7 +2884,6 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+>
+>  static int virtnet_close(struct net_device *dev)
+>  {
+> -	u8 *promisc_allmulti  __free(kfree) = NULL;
+>  	struct virtnet_info *vi = netdev_priv(dev);
+>  	int i;
+>
+> @@ -2905,11 +2904,11 @@ static void virtnet_rx_mode_work(struct work_struct *work)
+>  {
+>  	struct virtnet_info *vi =
+>  		container_of(work, struct virtnet_info, rx_mode_work);
+> +	u8 *promisc_allmulti  __free(kfree) = NULL;
+>  	struct net_device *dev = vi->dev;
+>  	struct scatterlist sg[2];
+>  	struct virtio_net_ctrl_mac *mac_data;
+>  	struct netdev_hw_addr *ha;
+> -	u8 *promisc_allmulti;
+>  	int uc_count;
+>  	int mc_count;
+>  	void *buf;
+> --
+> 2.45.0
+>
 
