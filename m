@@ -1,136 +1,100 @@
-Return-Path: <netdev+bounces-95312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 583858C1DB1
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 07:26:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A39768C1DC7
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 07:40:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B5BAB20D82
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 05:26:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36904B221F7
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 05:40:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425E815E81D;
-	Fri, 10 May 2024 05:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VNyDCe8M"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3181168AE2;
+	Fri, 10 May 2024 05:38:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840D31527AA;
-	Fri, 10 May 2024 05:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40E815E5C9
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 05:38:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715318757; cv=none; b=Gjg8n/zTLLGIUcs3MZIy/7OkpHyCNoe/UoItoNpa1RWe5VGzpaFpd8BoHvUfENRMzDDTKdAfbZAJF8LbJi0PqgDukuJ3ERLiLkvw4uP/GKcstl4xYmRt6yVnJ28IQVS7ww5ZAjjnJliLrjbxMeAYR8ZGAS49sU7B55RCSMeCKbc=
+	t=1715319521; cv=none; b=h8umkH+XoyrQ//XoW1yluKNN6jlvONMTjOHtFyDIk3IOD8rEe8VuRubl+pmdWDXvYtQCSPAWf0nS2zVYEFQ+MHuQ81sV+9MF1MyMQzhoUR+81DFDiBjLhu/CN+80b260OOV0C9MpvVwqB00RuyPTGkonslaf/xQnZmRQIcAUiEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715318757; c=relaxed/simple;
-	bh=FkGLtnlZ8fZVob3oYQ/PzCDEhIp08hyLY4qDOsXcQKI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tv3uFQ1KkwZe5jkDhGeVBcEkfQX8P4YIxNPCcoZ9g/xEpU7i7zx7wBavtifBo6Xe/B6ICLeZfgfk4kVGSpbyovU2qKvu4lJ4wLNvPe2itkTiSgMMgiuopqQ+zps1o3Bb4sRRD4z+6IkaJD/59X7LiVcZ+MouKX3zA82xyBvGJ2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VNyDCe8M; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715318755; x=1746854755;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=FkGLtnlZ8fZVob3oYQ/PzCDEhIp08hyLY4qDOsXcQKI=;
-  b=VNyDCe8M13HL3tGr8BrTLRTMZUlF1qKpwyrDRsw2YK8F2CNE6/CkJzZR
-   fE7lx12Erbyg1QnlHs2Y24d4ZaoRPTICHVeEn7jrNFhRFqAwXfCWjx4fW
-   1nQ10QtLIqodAEhI+VZ6IE9MFkCPQsfxhJgQz0eGGLSuqoY66c6owcZce
-   h8ueINClmEHjv6Fdd2WWWeqLCoZyDbe/JsFLkced4xPB+AaiMIABdSgu7
-   M546Y8XaI8BcP0zysxGYAbv1YlzzI9iVEXg+V+eEn/2IW/SrvmO7nt2iS
-   u3vwPhUxgfu+Oj5Xt77iC2f7mmMMJsrrlGbIhP7mlS6t9uGfqdWp1F8r/
-   Q==;
-X-CSE-ConnectionGUID: w4RWOogKSy2ttL6nEuYLLw==
-X-CSE-MsgGUID: ibc02tQPQ+WM5JORLjCwXQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="15089629"
-X-IronPort-AV: E=Sophos;i="6.08,150,1712646000"; 
-   d="scan'208";a="15089629"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2024 22:25:54 -0700
-X-CSE-ConnectionGUID: 7XnWVU9sTXid/yjQ40wPAQ==
-X-CSE-MsgGUID: mLOqxVP1SeScPTOAxiYdZw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,150,1712646000"; 
-   d="scan'208";a="34151806"
-Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 09 May 2024 22:25:48 -0700
-Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s5IlN-0005lZ-0v;
-	Fri, 10 May 2024 05:25:45 +0000
-Date: Fri, 10 May 2024 13:24:50 +0800
-From: kernel test robot <lkp@intel.com>
-To: Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
-	mingo@redhat.com, tglx@linutronix.de
-Cc: oe-kbuild-all@lists.linux.dev, x86@kernel.org, netdev@vger.kernel.org,
-	richardcochran@gmail.com, linux-input@vger.kernel.org,
-	dmitry.torokhov@gmail.com, zackr@vmware.com,
-	linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
-	timothym@vmware.com, akaher@vmware.com,
-	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
-	tzimmermann@suse.de, mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com, horms@kernel.org,
-	kirill.shutemov@linux.intel.com,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Nadav Amit <nadav.amit@gmail.com>, Jeff Sipek <jsipek@vmware.com>
-Subject: Re: [PATCH v9 3/8] x86/vmware: Introduce VMware hypercall API
-Message-ID: <202405101333.vdlWwpgr-lkp@intel.com>
-References: <20240506215305.30756-4-alexey.makhalov@broadcom.com>
+	s=arc-20240116; t=1715319521; c=relaxed/simple;
+	bh=GSpMQSri9vV2W/mPCjfVGmKY0KvOr6Roho9vskVmg4I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BKVpsAgdOMjjvxguboRsjmvQfCOMlOgDX2okyhyunDnICaFWyQeLOVYzhE95WV07xhbbmNqLO7aTuuiOAKOnKP9gs4QLHMusVDpJ1duZRUUO/jkP19faCS39QHQFcr7KYFlryPoAi4kLzvEd6oxqN5/dEDQMJFfObUezCPt6XHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1s5Ixk-0006RX-4d; Fri, 10 May 2024 07:38:32 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1s5Ixh-000a4C-D4; Fri, 10 May 2024 07:38:29 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1s5Ixh-00A7bx-15;
+	Fri, 10 May 2024 07:38:29 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	David Ahern <dsahern@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	=?UTF-8?q?S=C3=B8ren=20Andersen?= <san@skov.dk>
+Subject: [PATCH net-next v3 0/3] net: dsa: microchip: DCB fixes 
+Date: Fri, 10 May 2024 07:38:25 +0200
+Message-Id: <20240510053828.2412516-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240506215305.30756-4-alexey.makhalov@broadcom.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi Alexey,
+This patch series address recommendation to rename IPV to IPM to avoid
+confusion with IPV name used in 802.1Qci PSFP. And restores default "PCP
+only" configuration as source of priorities to avoid possible
+regressions. 
 
-kernel test robot noticed the following build errors:
+change logs are in separate patches.
 
-[auto build test ERROR on drm-misc/drm-misc-next]
-[also build test ERROR on dtor-input/next dtor-input/for-linus linus/master v6.9-rc7 next-20240509]
-[cannot apply to tip/x86/vmware]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Oleksij Rempel (3):
+  net: dsa: microchip: dcb: rename IPV to IPM
+  net: dsa: microchip: dcb: add comments for DSCP related functions
+  net: dsa: microchip: dcb: set default apptrust to PCP only
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Alexey-Makhalov/x86-vmware-Move-common-macros-to-vmware-h/20240507-055606
-base:   git://anongit.freedesktop.org/drm/drm-misc drm-misc-next
-patch link:    https://lore.kernel.org/r/20240506215305.30756-4-alexey.makhalov%40broadcom.com
-patch subject: [PATCH v9 3/8] x86/vmware: Introduce VMware hypercall API
-config: x86_64-buildonly-randconfig-003-20240510 (https://download.01.org/0day-ci/archive/20240510/202405101333.vdlWwpgr-lkp@intel.com/config)
-compiler: gcc-11 (Ubuntu 11.4.0-4ubuntu1) 11.4.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240510/202405101333.vdlWwpgr-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405101333.vdlWwpgr-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   ld: drivers/gpu/drm/vmwgfx/vmwgfx_msg.o: in function `vmw_close_channel':
->> vmwgfx_msg.c:(.text+0xaf): undefined reference to `vmware_hypercall_mode'
-   ld: drivers/gpu/drm/vmwgfx/vmwgfx_msg.o: in function `vmw_port_hb_in':
-   vmwgfx_msg.c:(.text+0x2c4): undefined reference to `vmware_hypercall_mode'
-   ld: drivers/gpu/drm/vmwgfx/vmwgfx_msg.o: in function `vmw_port_hb_out':
-   vmwgfx_msg.c:(.text+0x604): undefined reference to `vmware_hypercall_mode'
-   ld: drivers/gpu/drm/vmwgfx/vmwgfx_msg.o: in function `vmw_send_msg':
-   vmwgfx_msg.c:(.text+0x8b0): undefined reference to `vmware_hypercall_mode'
-   ld: drivers/gpu/drm/vmwgfx/vmwgfx_msg.o: in function `vmw_open_channel.constprop.0':
-   vmwgfx_msg.c:(.text+0x9e8): undefined reference to `vmware_hypercall_mode'
-   ld: drivers/gpu/drm/vmwgfx/vmwgfx_msg.o:vmwgfx_msg.c:(.text+0xc3c): more undefined references to `vmware_hypercall_mode' follow
+ drivers/net/dsa/microchip/ksz_common.c |  46 +++++------
+ drivers/net/dsa/microchip/ksz_common.h |   2 +-
+ drivers/net/dsa/microchip/ksz_dcb.c    | 106 ++++++++++++++-----------
+ 3 files changed, 85 insertions(+), 69 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.39.2
+
 
