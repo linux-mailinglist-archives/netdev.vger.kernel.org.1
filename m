@@ -1,157 +1,82 @@
-Return-Path: <netdev+bounces-95279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E30128C1CDE
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 05:16:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 572EB8C1CE2
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 05:16:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98A001F21DC0
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 03:16:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CFC81C20DDF
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 03:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF39D148851;
-	Fri, 10 May 2024 03:16:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59692148FE1;
+	Fri, 10 May 2024 03:16:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hFPzsuPb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="REVzbOSZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A92033CD1;
-	Fri, 10 May 2024 03:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D845490E;
+	Fri, 10 May 2024 03:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715310965; cv=none; b=rhBjW/8UOcaQ5nF5/y4dfIpwmJ1QNHugvlrCnd4E9Hm1U7kqEFR/2xAQIKXWKaunWWdX732nHGnWggbFz+stq0yYhXAzlHhcYCDteNNHeB2UEPqaELVW0uUR66+CMxtCfOcSCOa3k8c+7wVYcJ2ETZyICRIdG4+KrM7UwT3cuZ8=
+	t=1715310974; cv=none; b=Kc5hbsk+RnCXd67+5OMqWtv43WgqATWfa/FctjcilX4+cvzgb9UISht1F/huWblyXAmo2RQgeDGO8lXwMT5gKrRxApMCVeOkYOEswVc97BeQWysqjGWbCagat2qVsl011shgYeqCPn7Z71xoDXEnS2ZK2fFXv3EJtuIq9uV6Jgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715310965; c=relaxed/simple;
-	bh=EZCtcC832okbCoOmAXdjjo9bFvPzED2Zv15Z4Du/YSA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mMbSy3w/9+Gja3e5jhHE7+CG9owZ6bFWx5/XfWLZYYuH28Z1QAn79dTHVoL1Nsm4/WBHp+sEnmEMcgJClaHpITdhCCs1hzKYjgGuVWGb7n1UE80z0FAf4HqE9tOVoeggHJVNwiQkurbw2KyesPVzuYbT+i17cZRnw4fMC2ANxes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hFPzsuPb; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-61bbb208ea5so1270473a12.0;
-        Thu, 09 May 2024 20:16:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715310963; x=1715915763; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+eCEQn7dgWiTVUcqJQl6AoPw5dlj4qntOgHjUfcOjVw=;
-        b=hFPzsuPbCP7Ms5+cuEXJtEktBjuYDxTdI7FHxXAtWQ0yo1Ps2zWrPCKWM/UE1kPlYZ
-         Xwj88pLuj7Nw2xJ9f4EUkM0rDxkJTITCNZBfLfrRE7MRBSuAXHGGFnKx8nqjF2FPrIGv
-         RWfwXxyoLeaBlZqsWVbivEJsqYN+AIjPYbAVa4pFH7m8LXZSfa/LO/ulkKIF+R3wYVmy
-         VVCsgct2fg7dIc4RtKJzvzvxONeTSaxCYFQaQn0U36Wu5t2fDHiVmG/d/qA9T/XN4Iy9
-         F/Z5nEYUulks0rjyPg77mdTPy1uQYZw+IBXZtDvbVv4MlItW6bpho4mwcHZC33hNsAKX
-         dBHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715310963; x=1715915763;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+eCEQn7dgWiTVUcqJQl6AoPw5dlj4qntOgHjUfcOjVw=;
-        b=GOsRd8xGmKathDnY76TzLPgvLUIj2vk0ZP97h9WGVkV0uWNwz+uThliVEE0jWlHf4K
-         7G4i8t6kuxM3scQH7Y4qMePTkH5gaB7Q5JVbKAz/YezOxUNLOugjgUNdLE6pPF1t00f2
-         6TqL78bKsMemNJmH3B/LSpUrmBBaBQd7fX+4+8xI/Syx62T5skAEpX5Pxpz3Ry80Vabl
-         zNvTfpGCI448afTSXpOkUZPAzwFec1h/WHa2nlXzgEpu5hBhJRoCCOTE5V0MB28jPXvL
-         XPgx9DnafOXURedekifFrNtqUg3Isg1xL/9qKkgp2Jz/mRG3IBDp8Crn5LEMd6sog1kt
-         JVkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVaWAGSt3mkow4JDWxMPPAuJoDaa0qfCWEWquZ0IIS06fZvH695PL3AG+kpaIorbXQmuQWo/a9/DtloQp6Dru5g8ZzzRH+BSZEX2q6dM2PI5XA8kE44k6MolfPRoWm8gE3VrpyoQuCL
-X-Gm-Message-State: AOJu0YxoEynlMflQBANOHm/pH1PckKcm1LynMwKKnNhcrmTX+SMtrSAw
-	Yza42pt33L0gY3wtPyJFKA0QjaULW76LhlqSTJrvfL6t2CGaaMVsScWEifpB
-X-Google-Smtp-Source: AGHT+IE7+Jpi8WD1iSlMGbKoqJjapAG+wbrWmiPigh+jFHBDu8OlAErlx2ysDCFwYE2buJg9MKnrYg==
-X-Received: by 2002:a17:90b:4f81:b0:2a0:3a16:7489 with SMTP id 98e67ed59e1d1-2b6ccfed28bmr1219313a91.44.1715310963377;
-        Thu, 09 May 2024 20:16:03 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b671056629sm2223503a91.7.2024.05.09.20.16.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 20:16:02 -0700 (PDT)
-Date: Fri, 10 May 2024 11:15:58 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, vladimir.oltean@nxp.com, shuah@kernel.org,
-	petrm@nvidia.com, bpoirier@nvidia.com,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next] selftests: net: local_termination: annotate the
- expected failures
-Message-ID: <Zj2RbpO6tu7Sq8za@Laptop-X1>
-References: <20240509235553.5740-1-kuba@kernel.org>
+	s=arc-20240116; t=1715310974; c=relaxed/simple;
+	bh=PytcuTsukT994oYXjr1HyDGo4xfMA1yb3JvQ6Ozqpgo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XBYdzXerp1a6DCbS5jwcQtuIf8xlTKY/KssswHxZg0J0sjpfb3pnP9KC6QOJel8YZ9ky+fMcg6Ok1+H4DOua5/F7MLr/jMBCzjnwdTSuO5PBOPerbgNuNN/sIs5OlvvR89aXrRWGQrQSeO00xCZWJ2HJEyEeLSK1pVNmXk6ZXHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=REVzbOSZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFAD0C116B1;
+	Fri, 10 May 2024 03:16:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715310973;
+	bh=PytcuTsukT994oYXjr1HyDGo4xfMA1yb3JvQ6Ozqpgo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=REVzbOSZzKaiStzn9IuNaLnNHmDhtLkhb1jbOPPqxd1KRnh9C2STYomtY4Hw7DwI0
+	 OwkxU8qCaAgKvGTBjm5tMQ/v5ANBf78n7FzA2o57Z7zG6jFOptQYmkJd7veBHIfMUo
+	 QtYiOTTbGQb3NAqH6gn9yE6XAphHbdfmrB35XoO3RcQBNSYwtDOF7LozvnpevmXxUu
+	 vJ8G60zechptAbwfl758Cl7YRBAk+zk4+GWhXKTdb5EI5NVdv3X2aYodVQWVcnWYAi
+	 qddA+g1p9JuD2art0a4ySlvIg8O5kjzveWXm7GxDiIA3Jj9rt0dJG8kRRh+x/+qBnY
+	 5EreW0Tlm0vgA==
+Date: Thu, 9 May 2024 20:16:11 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ziwei Xiao <ziweixiao@google.com>
+Cc: Markus Elfring <Markus.Elfring@web.de>, Jeroen de Borst
+ <jeroendb@google.com>, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, Harshitha Ramamurthy
+ <hramamurthy@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, LKML <linux-kernel@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, John Fraker <jfraker@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Shailend Chand
+ <shailend@google.com>, rushilg@google.com
+Subject: Re: [PATCH net-next 5/5] gve: Add flow steering ethtool support
+Message-ID: <20240509201611.053027de@kernel.org>
+In-Reply-To: <CAG-FcCNGsP3FnB6HzrcQxX4kKEHzimYaQnFcBK63z_kFTEQKgw@mail.gmail.com>
+References: <20240507225945.1408516-6-ziweixiao@google.com>
+	<3e10ff86-902d-45ed-8671-6544ac4b3930@web.de>
+	<CAG-FcCNGsP3FnB6HzrcQxX4kKEHzimYaQnFcBK63z_kFTEQKgw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240509235553.5740-1-kuba@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
+On Thu, 9 May 2024 17:19:00 -0700 Ziwei Xiao wrote:
+> > How do you think about to increase the application of scope-based resource management
+> > at such source code places?
+> >  
+> Is the suggestion to combine dev_hold(netdev) together with
+> rtnl_unlock()? If so, I think there might be different usages for
+> using rtnl_unlock. For example, some drivers will call rtnl_unlock
+> after dev_close(netdev). Please correct me if I'm wrong. Thank you!
 
-On Thu, May 09, 2024 at 04:55:53PM -0700, Jakub Kicinski wrote:
-> Vladimir said when adding this test:
-> 
->   The bridge driver fares particularly badly [...] mainly because
->   it does not implement IFF_UNICAST_FLT.
-> 
-> See commit 90b9566aa5cd ("selftests: forwarding: add a test for
-> local_termination.sh").
-> 
-> We don't want to hide the known gaps, but having a test which
-> always fails prevents us from catching regressions. Report
-> the cases we know may fail as XFAIL.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: vladimir.oltean@nxp.com
-> CC: shuah@kernel.org
-> CC: petrm@nvidia.com
-> CC: liuhangbin@gmail.com
-> CC: bpoirier@nvidia.com
-> CC: linux-kselftest@vger.kernel.org
-> ---
->  tools/testing/selftests/net/forwarding/lib.sh |  9 ++++++++
->  .../net/forwarding/local_termination.sh       | 21 ++++++++++++++-----
->  2 files changed, 25 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> index 3353a1745946..4fe28ab5d8b9 100644
-> --- a/tools/testing/selftests/net/forwarding/lib.sh
-> +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> @@ -605,6 +605,15 @@ log_test_xfail()
->  	RET=$ksft_xfail retmsg= log_test "$@"
->  }
->  
-> +log_test_xfail()
-> +{
-> +	local test_name=$1
-> +	local opt_str=$2
-> +
-> +	printf "TEST: %-60s  [XFAIL]\n" "$test_name $opt_str"
-> +	return 0
-> +}
-> +
-
-I may missed something, I saw there is already a log_test_xfail() in lib.sh
-
-log_test_skip()
-{
-        RET=$ksft_skip retmsg= log_test "$@"
-}
-
-log_test_xfail()
-{
-        RET=$ksft_xfail retmsg= log_test "$@"
-}
-
-log_info()
-{
-...
-}
-
-Added by a923af1ceee7 ("selftests: forwarding: Convert log_test() to recognize RET values")
-
-Thanks
-Hangbin
+We are rather cautious about adoption of the scope-based resource
+management in networking. Don't let Markus lead you astray.
 
