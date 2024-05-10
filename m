@@ -1,131 +1,151 @@
-Return-Path: <netdev+bounces-95407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62B8E8C22E2
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:12:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF5F38C22E4
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:12:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D107C1F230E9
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:12:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 712B8B2143B
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:12:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5A116DED7;
-	Fri, 10 May 2024 11:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFDDF16E898;
+	Fri, 10 May 2024 11:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RUeBlgBQ"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="z3k5TqiZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A2D16D326
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 11:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F02F16D326
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 11:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715339474; cv=none; b=G1N5wzeqj+iwxDsZYkbKnKdA/2cUIEbyHfJK3W4YfNqGNYZAwfdUe/xAYFqAri018UB96FbFxaFJXaec7BiTTHf0ZawouhCoSyPZXAgWhkdiA463+K/iguQisUzvJdCjxgYwRoKhgwdA5L1Zfxc4FhhTXoD2U1KDTEcM/IktkFE=
+	t=1715339517; cv=none; b=OZU4FCu/tfcDJ29uiW0Ts1UrenBC1r781G98VuirIVzV6fDP2Vs/hWLJXVirRgiPSYa/7jzO5caiszmjfhGViYSQ1zPuSaEpdrQdExP8XHDGrPr6dZ2ZdIub5Ms9pegFPwPwU6tsbH7gLhbC8RwxCWQtW5yCeVGKcJ4b2sqmg3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715339474; c=relaxed/simple;
-	bh=mWhegVltV13dpJK6/P17kRU2b6WzSY1iwJzdoZv5Wt4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=r1WzYVwOLjyoFQ03jF0KgnTj/8xwmsIFtaNciTUG0BcjwpxIWm10Jzbb2JYmdOVoPZwj7uRCD34WLTJhVBa75/g5RTGX/I0pi9+moSfegsMFMsnjL8uPy6ICyKVtEwL5q/HH3ms8RWdXH0GxCTRNkc36PO8jBBxoeW9qXXuh4UQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RUeBlgBQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715339471;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=91sOE+bK42zmtXNZ/WoNezaGVg+1uvC26YMVuzi57gA=;
-	b=RUeBlgBQHSQXPtycGHYVqa/XyxkQi6h0P6K8l8G+W+PJiuk5Mgzh/4jq6sm8o0GFaaZMgX
-	JsdG6koIwxg9tk358YTsPHrMmZYb+buwTvZVYK8mU7BW9m64D9wphgGhQ14hfoYf/YliXy
-	/21RZ/gETzHJJ2Ry5FWEgX+5FuZVJHg=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-494-Cu3faxM2PyOMZJFZ89oM8g-1; Fri, 10 May 2024 07:11:10 -0400
-X-MC-Unique: Cu3faxM2PyOMZJFZ89oM8g-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2e43f513563so2985121fa.3
-        for <netdev@vger.kernel.org>; Fri, 10 May 2024 04:11:10 -0700 (PDT)
+	s=arc-20240116; t=1715339517; c=relaxed/simple;
+	bh=yeo8sd8RFZdJ862z4TQug4Oieue2ymTOsLQYxEAdY08=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rw7ljsT04RLQa22ODpzFQmo1+jhQf6J2uz3floC42V54tIPNzLiZyY4Tp2OR3ACZUaseG5CznpyU92nNos6ENvqHDjbJAu2Emoy9mWsS/yKKqqAeCe9y/S8AzCX+1GmQZuQYj16r2YwT1O0sSOYQ4acVOUccxAuTWnAlw+DIrY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=z3k5TqiZ; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-792bd1f5b28so160802285a.2
+        for <netdev@vger.kernel.org>; Fri, 10 May 2024 04:11:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715339515; x=1715944315; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fzDowZL4O8ZaZ5oGwMtdLpyR1SKzWoUyd2n/48q61cY=;
+        b=z3k5TqiZ0miLDhmtzMG6nni1qUmWge9059HmubHklBY5Wxeg8TC9dps77C7kgj4V44
+         ntYDclKXCAQYU6YB+LuqWFtdLFoXkvzgnU29Fq4rudFjd45PRcKbUiNq0fIStUVOFtB+
+         W1Qb8zufO6BJcSJmeOce8PKubKe5hLNM148vxJBGUWyw2GLK9/cvDgAoY5mkpurMn+hS
+         OaSezFfaKwJ8RhYhfi8JPqHADeHl3MfJch9gk0RDWkW6iATV64EXh1vR4aeQzRBnNlpX
+         vA1wMvkO/SsEcYw4pCkZB3GlqbcxNlDY7h5DukoNjYgNuHn9GRDeuvNFHz1i4ERnqKTE
+         ZA9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715339469; x=1715944269;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=91sOE+bK42zmtXNZ/WoNezaGVg+1uvC26YMVuzi57gA=;
-        b=mTPmPD1pUkcltHENmaRKT0QoAbf37DqI0Agn/P2R+TiXGRydVh6/QCfU+BBy+M1BpA
-         qTtoYc6wJh4nEJH96wV4XUtYuysNYsTt4dhueoPOx3WUHDXqJcNifUKEbspMfDKwrsMD
-         zO/ZZzXGHrl4ONMgbUeRv99K4DIkz/hmH5vVaRc59IO6G+0SqOHAxKTRG2l+1mH/NZdu
-         IESTDHr+iI5uyc6IC2Vp1z+v1abKXi1T5cryONYNMBzBTsvEejU+9wx2z77BL7sKkIIY
-         gJ2XNANa0b+iCpHFxjHzjGzv4z51WZsSVmSFH8fSN0CEt5RIIMhyPSR5XJ4upFmh+RXo
-         Imvw==
-X-Forwarded-Encrypted: i=1; AJvYcCXSnXAyL8HL5IYX1yxYtcbCI8Eb6SudpQtlXkrl8GLl4xpQpU5fDF6VzJTz3nQkfGNHpYsEoCklifeXJCiwAnYhyyHU5ahP
-X-Gm-Message-State: AOJu0Yyg32jIYi/HvP9ig+/opHXUWrcKu+DxWHZA8GJRN9I4r9Dv4Hef
-	NvSWjqVWuQRVwFc5VU4FFT5c4La4mh8vGbXH192Bi1Xb8kieygBXGx9d2WcGyzrwK0ITaHrxGSU
-	D2ZBjWpoi2cWZXL//UFxbeBKUes+RS7KVadBbu6ZR/LMWTKMNsdx4pXEVSp1o8A==
-X-Received: by 2002:a2e:9604:0:b0:2e4:4532:3c7 with SMTP id 38308e7fff4ca-2e5204c71bamr14309251fa.4.1715339468893;
-        Fri, 10 May 2024 04:11:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGPGaaiVW0aD/XiguTEkwPCgJWDIWtSkF5T1Mf47gVf/FfvuIhk++yu4ncxkDvDA7S6JzLLXQ==
-X-Received: by 2002:a2e:9604:0:b0:2e4:4532:3c7 with SMTP id 38308e7fff4ca-2e5204c71bamr14309141fa.4.1715339468410;
-        Fri, 10 May 2024 04:11:08 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3344:1b68:1b10::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502bbc56d1sm4276762f8f.116.2024.05.10.04.11.07
+        d=1e100.net; s=20230601; t=1715339515; x=1715944315;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fzDowZL4O8ZaZ5oGwMtdLpyR1SKzWoUyd2n/48q61cY=;
+        b=Zi35CHarXbvuHIPOkv5Xmu0Ui+yuG+PdPkttUNDvO1rh1wTjAm4oiaFCc2a7yASbdz
+         OksLtv/RZrhMxwv4Qss+QcjCBEJJ2FregFjltjvlpKgoO50INVGASUf5TKImogm2CnpZ
+         0m/ogB3Yi47yiMDaPksyCMmefbYWK9DWPFPxuVbabsAtDGKIISuw5zriSLmaIoBWZz/z
+         LQ8+0XbpDMJS/AKyBlLExyORfSV/4yT0vDsAR3LTF4WPS5iVgwGyUoKIsmhxcXfELU+K
+         NCp9iupfE6y5NrwgQ3OZ/mRqi21xMVpgTxOmRTYH7S3ZP7FOMMSteNNoMowisOaXz2k/
+         h3Ng==
+X-Gm-Message-State: AOJu0YwcsCxwxZOg3UBUfMXpAVtuh3YrNyMDbZ/LVK8/CUO8eET9SdCA
+	+/4hIP63t+oBuDehdxi0o9hyYh+WwMRKfHl8Z8489owcr7+Qx2auvPbVw7vMNM0=
+X-Google-Smtp-Source: AGHT+IHnhjG58jX47vVHtIqP3sRxriUOfdxV+WZjAFYtYRcjCXfosuwppdjvkX6oUiw2FmBIAynX9g==
+X-Received: by 2002:a05:620a:1003:b0:792:91ce:9b07 with SMTP id af79cd13be357-792c760083cmr219679285a.71.1715339514921;
+        Fri, 10 May 2024 04:11:54 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-792bf310713sm168643085a.109.2024.05.10.04.11.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 04:11:07 -0700 (PDT)
-Message-ID: <54a73bb8163716f724af91de3ed8b2bd59aa5d39.camel@redhat.com>
-Subject: Re: [PATCH v2 net] af_unix: Update unix_sk(sk)->oob_skb under
- sk_receive_queue lock.
-From: Paolo Abeni <pabeni@redhat.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: billy@starlabs.sg, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org,  kuni1840@gmail.com, netdev@vger.kernel.org
-Date: Fri, 10 May 2024 13:11:06 +0200
-In-Reply-To: <20240510105400.32158-1-kuniyu@amazon.com>
-References: <6dfcdb8b562c567995ae9786ab399a1f3a24c62a.camel@redhat.com>
-	 <20240510105400.32158-1-kuniyu@amazon.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        Fri, 10 May 2024 04:11:53 -0700 (PDT)
+Date: Fri, 10 May 2024 13:11:49 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com
+Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
+Message-ID: <Zj4A9XY7z-TzEpdz@nanopsycho.orion>
+References: <20240509114615.317450-1-jiri@resnulli.us>
+ <20240509084050-mutt-send-email-mst@kernel.org>
+ <ZjzQTFq5lJIoeSqM@nanopsycho.orion>
+ <20240509102643-mutt-send-email-mst@kernel.org>
+ <Zj3425_gSqHByw-R@nanopsycho.orion>
+ <20240510065121-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240510065121-mutt-send-email-mst@kernel.org>
 
-On Fri, 2024-05-10 at 19:54 +0900, Kuniyuki Iwashima wrote:
-> From: Paolo Abeni <pabeni@redhat.com>
-> Date: Fri, 10 May 2024 12:44:58 +0200
-> > On Fri, 2024-05-10 at 18:39 +0900, Kuniyuki Iwashima wrote:
-> > > diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-> > > index 0104be9d4704..b87e48e2b51b 100644
-> > > --- a/net/unix/garbage.c
-> > > +++ b/net/unix/garbage.c
-> > > @@ -342,10 +342,12 @@ static void __unix_gc(struct work_struct *work)
-> > >  		scan_children(&u->sk, inc_inflight, &hitlist);
-> > > =20
-> > >  #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-> > > +		spin_lock(&u->sk.sk_receive_queue.lock);
-> > >  		if (u->oob_skb) {
-> > > -			kfree_skb(u->oob_skb);
-> > > +			WARN_ON_ONCE(skb_unref(u->oob_skb));
-> >=20
-> > Sorry for not asking this first, but it's not clear to me why the above
-> > change (just the 'WARN_ON_ONCE' introduction) is needed and if it's
-> > related to the addressed issue???
->=20
-> I think I added it to make it clear that here we don't actually free skb
-> and consistent with manage_oob().
->=20
-> But I don't have strong preference as it will be removed soon.
+Fri, May 10, 2024 at 12:52:52PM CEST, mst@redhat.com wrote:
+>On Fri, May 10, 2024 at 12:37:15PM +0200, Jiri Pirko wrote:
+>> Thu, May 09, 2024 at 04:28:12PM CEST, mst@redhat.com wrote:
+>> >On Thu, May 09, 2024 at 03:31:56PM +0200, Jiri Pirko wrote:
+>> >> Thu, May 09, 2024 at 02:41:39PM CEST, mst@redhat.com wrote:
+>> >> >On Thu, May 09, 2024 at 01:46:15PM +0200, Jiri Pirko wrote:
+>> >> >> From: Jiri Pirko <jiri@nvidia.com>
+>> >> >> 
+>> >> >> Add support for Byte Queue Limits (BQL).
+>> >> >> 
+>> >> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>> >> >
+>> >> >Can we get more detail on the benefits you observe etc?
+>> >> >Thanks!
+>> >> 
+>> >> More info about the BQL in general is here:
+>> >> https://lwn.net/Articles/469652/
+>> >
+>> >I know about BQL in general. We discussed BQL for virtio in the past
+>> >mostly I got the feedback from net core maintainers that it likely won't
+>> >benefit virtio.
+>> 
+>> Do you have some link to that, or is it this thread:
+>> https://lore.kernel.org/netdev/21384cb5-99a6-7431-1039-b356521e1bc3@redhat.com/
+>
+>
+>A quick search on lore turned up this, for example:
+>https://lore.kernel.org/all/a11eee78-b2a1-3dbc-4821-b5f4bfaae819@gmail.com/
 
-Ok, thanks for the explanation. I'm fine with the above.
+Says:
+"Note that NIC with many TX queues make BQL almost useless, only adding extra
+ overhead."
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+But virtio can have one tx queue, I guess that could be quite common
+configuration in lot of deployments.
 
+
+>
+>
+>
+>
+>> I don't see why virtio should be any different from other
+>> drivers/devices that benefit from bql. HOL blocking is the same here are
+>> everywhere.
+>> 
+>> >
+>> >So I'm asking, what kind of benefit do you observe?
+>> 
+>> I don't have measurements at hand, will attach them to v2.
+>> 
+>> Thanks!
+>> 
+>> >
+>> >-- 
+>> >MST
+>> >
+>
 
