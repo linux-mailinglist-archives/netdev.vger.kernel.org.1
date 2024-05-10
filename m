@@ -1,140 +1,221 @@
-Return-Path: <netdev+bounces-95326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF968C1E50
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 08:46:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 410A48C1E65
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 08:50:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D2871C21D80
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 06:46:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA7D8283C19
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 06:50:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB6A13BAC2;
-	Fri, 10 May 2024 06:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539741487F7;
+	Fri, 10 May 2024 06:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="W2fa3IWe"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="iZXNPv6z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902021DA53;
-	Fri, 10 May 2024 06:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCF41361
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 06:50:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715323554; cv=none; b=CUOaxauZsQ8XCKamIFSCwe4cQcE1w6lx1C/63Mqu8pOX+9T9Fuan0NalLbySE4jm7D1gnOGlKCXEN+tnr58/hZRxBYA9XybrTXT9ODwG5prL62CwYck/F0n5XX2BctgC3J/5Br4+Ek4ZteWDN+Jxa6u8NpM6ut010rNYUpPEroY=
+	t=1715323814; cv=none; b=u0OMHjqPTzjyvwL58ku2QQjXirPsCurZraEX/xd90mYwZDfLpBsn1RGa5SuCYCaFj3pxS6z28i7bwikR7CJT9GEVFuv0t6e04ZLLdtXWmZEjllf93D/H4rDSJ6yE0ykDoaO1FQ1nvjkJpzlbSxwy0+JE257ftg5C0qPXKjlViaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715323554; c=relaxed/simple;
-	bh=E37wzb7Oc2j7nExYXW6yhBwO5jY3WIFEbE3c2OVZvbk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dg/MlMmOmjSR6IBAbIVZb5GF8kpxaFXpqaDgd8zu/Xh9VF29mZmEpSfc26GEtKwCimUiLOoT+WphCaZnR9H5YZhFx3GaAWB8bpj0UonqH7TckLoCd8mmiryp1W5lhsFf7GTh8+38OoTuSMFxU186hby4ZtopYlKEUT4ffk7nA98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=W2fa3IWe; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1715323521; x=1715928321; i=markus.elfring@web.de;
-	bh=2A9f1JkH3YiV7UuUkIXTZjRmYrYTSco0Pa5dRp+sG9w=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=W2fa3IWelkldCoyYVac8jhdTQPoIpq5RyMpf7AmrMh0lGs152MKOxPFk0GfWZYNC
-	 40+5U8UukREBA7F/bQFtp80hrjQIV+9p+xKaw941I4jyl2/fvlyFiEJW/PrdJKFBH
-	 BZA3aKEZNlvLhAzeFMiPwaOxmbzpJHIwy7mPoGP/GVjIS1MzecN6rR/nptywII34y
-	 3udC+ndwZoeqpr4ZA1qd6sTC1OHUoan8tOWFa+B/3vFR9990XbtdY20BK0v4wEgiH
-	 J5l/BENfusb9noy9AKkxoDJjr9JhfYTZueIm2d8KyI1DvkoxBSA3Zw18inr5G0HUB
-	 IEcVLnAr5LXGTQtPDw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MLzmv-1sMZuK2WFl-00SQIJ; Fri, 10
- May 2024 08:45:21 +0200
-Message-ID: <a9868190-676e-40a4-93de-2a6f9978e89f@web.de>
-Date: Fri, 10 May 2024 08:45:20 +0200
+	s=arc-20240116; t=1715323814; c=relaxed/simple;
+	bh=at2lnNgiXNrdTa5JV/yNDZYavo9jvs+VSjr7gNOeMQ8=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=i9pD1b67ChxK/iZA26P5UIMh/LMxtIbsT2wDbGDllD446khGwNZElv1IxIawDirIfL+DXIEQhfxScHHO+cEpaaHJqHskQFDcxXhjO0GBSZiGiwNArJnoY93iIQCoX0z4ynyQJbS7L6Snh59goI5+zgCVvPMF+iurnkvvMM1ibT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=iZXNPv6z; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1715323803; h=Message-ID:Subject:Date:From:To;
+	bh=rV8GXyrJ07GSYwwl1SJfRsZvo+s7i6qK5asbBHBEaKM=;
+	b=iZXNPv6z1LPEYuza8niG9XxC+Iuu0gSgmZX065Rt9izdZWiCFQKCsyeEhasYyChQPPGEt1MmFuGZjKmWQJCm9SdP1bUGtiPPQQEGJ/kMMnObSh+5NBLdTPOw9VYXpYGzPVzFmqCViHvhL3hyrix7r5BowvGunW9uyfdMRcc/xk8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067112;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0W69bk6G_1715323801;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W69bk6G_1715323801)
+          by smtp.aliyun-inc.com;
+          Fri, 10 May 2024 14:50:02 +0800
+Message-ID: <1715323692.749715-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: RE: [PATCH net-next 2/2] virtio_net: Add TX stopped and wake counters
+Date: Fri, 10 May 2024 14:48:12 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Dan Jurgens <danielj@nvidia.com>
+Cc: "mst@redhat.com" <mst@redhat.com>,
+ "jasowang@redhat.com" <jasowang@redhat.com>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>,
+ "pabeni@redhat.com" <pabeni@redhat.com>,
+ Jiri Pirko <jiri@nvidia.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20240509163216.108665-1-danielj@nvidia.com>
+ <20240509163216.108665-3-danielj@nvidia.com>
+ <1715304096.399735-3-xuanzhuo@linux.alibaba.com>
+ <CH0PR12MB858086B1DEB3F5D4015D937EC9E72@CH0PR12MB8580.namprd12.prod.outlook.com>
+In-Reply-To: <CH0PR12MB858086B1DEB3F5D4015D937EC9E72@CH0PR12MB8580.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/5] gve: Add flow steering ethtool support
-To: Ziwei Xiao <ziweixiao@google.com>, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org
-Cc: Jeroen de Borst <jeroendb@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, LKML <linux-kernel@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, John Fraker <jfraker@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Shailend Chand <shailend@google.com>, rushilg@google.com
-References: <20240507225945.1408516-6-ziweixiao@google.com>
- <3e10ff86-902d-45ed-8671-6544ac4b3930@web.de>
- <CAG-FcCNGsP3FnB6HzrcQxX4kKEHzimYaQnFcBK63z_kFTEQKgw@mail.gmail.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <CAG-FcCNGsP3FnB6HzrcQxX4kKEHzimYaQnFcBK63z_kFTEQKgw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:z0bArOj9RiMuvpRRNSk/7wZyQWP+/BZSS8rcUExDu3P8IiiepMZ
- sNHr8k0qejvxDaR+QQ+mOpNkfcBBNF7DbkDp2Eo+p7QGIZR5Hitd1SFfyCyh7IOJlCg9jtx
- kabwG6cXZ5EMoyGaYSEEr9jcdWkQNRMbzww5l8ocF9MIrOFG4uZ54HExna7TJ/KD8YuX8Kr
- I+Dn3EH32ILdzS3YayQAA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:mp12yI6FNfE=;p95rRIu2sD/CMUq04nJNzMAK26N
- TBmPoBNnUhwG3Ac5LBBYZXTYlWklwKVrKaZpwbtasJr5XsGh8yntbIMZBzUxhPX92NEdJFcLT
- 5V/o36egFnJ49qpY2PB8k/NeFr7s9QPMyaO5XZNiO3DJB/4nPEDI6evCyii8LEfViDsY4xaJL
- E7rxsGh1eOsy3efRIR05YvZkDkflm7u59go4ivYGWn9i2JmvyVfhfdkMJgNBgUVTvCXVjHAvH
- pB9jxeslFNKzPRSm0rvqJFAMMd0j3zmY3g4c66DfpO6X5okFAHP/asgMJvL1GCGWoA3nLtFiF
- 8GsEiyuTd4NKPjedaVNtWfLYnxAgKTxgfaMZhw8RjdT9e6IrVDuRMkm/cMXZFYQ2FC07YI1IJ
- AmKx7UsPOHhNam4ujOwuXHmBDnN1ZGZP8InYlUCY0Nrg23dM4Phfkkpavhnbe/G87kiZP8WnT
- ZH0rMSnHNMqV48ZMZKFJbOpOslJ5gz/9nlpL1LTPSO/chRFK37hN9z1blVz6MHduuJBeEgdfp
- 6v1yjlfNy6QZCTihTp3VfSnSyD1RfxubTsZtQxClarYR1/yuaQfhMmmjadvMkC/zKJN6OEj93
- 6YTPcl1s3hkh49xhpBQvnPjXUiE2Fm44o+43Rv23Y2cGTM1Fo40vrsVsfBb7AwzYHIJyvwHOo
- EPh2LHzCe/4iVLD+KMXTIHNEQTVZvH06QRcZ/1+3g84NipVke0vgDozt8NLWvK8dASqxAxlNN
- OCccPaEs2fzmd8ATREuHKEPVgbWdKLuh/8IggtgXeVyk+XTowUkd+Ty6AgqbEJAxU4x0EbX/+
- 1I6awWZyXAnEJ6wkUa4eOtjgVx3zhYMRHSPuj5S2BOz3A=
 
->> =E2=80=A6
->>> +++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
->> =E2=80=A6
->>> +static int gve_get_rxnfc(struct net_device *netdev, struct ethtool_rx=
-nfc *cmd, u32 *rule_locs)
->>> +{
->>> +     struct gve_priv *priv =3D netdev_priv(netdev);
->>> +     int err =3D 0;
->>> +
->>> +     dev_hold(netdev);
->>> +     rtnl_unlock();
->> =E2=80=A6
->>> +out:
->>> +     rtnl_lock();
->>> +     dev_put(netdev);
->>> +     return err;
->>> +}
->> =E2=80=A6
->>
->> How do you think about to increase the application of scope-based resou=
-rce management
->> at such source code places?
->>
-> Is the suggestion to combine dev_hold(netdev) together with
-> rtnl_unlock()? If so, I think there might be different usages for
-> using rtnl_unlock. For example, some drivers will call rtnl_unlock
-> after dev_close(netdev). Please correct me if I'm wrong.
+On Fri, 10 May 2024 03:35:51 +0000, Dan Jurgens <danielj@nvidia.com> wrote:
+> > From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > Sent: Thursday, May 9, 2024 8:22 PM
+> > To: Dan Jurgens <danielj@nvidia.com>
+> > Cc: mst@redhat.com; jasowang@redhat.com; xuanzhuo@linux.alibaba.com;
+> > virtualization@lists.linux.dev; davem@davemloft.net;
+> > edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; Jiri Pirko
+> > <jiri@nvidia.com>; Dan Jurgens <danielj@nvidia.com>;
+> > netdev@vger.kernel.org
+> > Subject: Re: [PATCH net-next 2/2] virtio_net: Add TX stopped and wake
+> > counters
+> >
+> > On Thu, 9 May 2024 11:32:16 -0500, Daniel Jurgens <danielj@nvidia.com>
+> > wrote:
+> > > Add a tx queue stop and wake counters, they are useful for debugging.
+> > >
+> > > $ ./tools/net/ynl/cli.py --spec netlink/specs/netdev.yaml \ --dump
+> > > qstats-get --json '{"scope": "queue"}'
+> > > ...
+> > >  {'ifindex': 13,
+> > >   'queue-id': 0,
+> > >   'queue-type': 'tx',
+> > >   'tx-bytes': 14756682850,
+> > >   'tx-packets': 226465,
+> > >   'tx-stop': 113208,
+> > >   'tx-wake': 113208},
+> > >  {'ifindex': 13,
+> > >   'queue-id': 1,
+> > >   'queue-type': 'tx',
+> > >   'tx-bytes': 18167675008,
+> > >   'tx-packets': 278660,
+> > >   'tx-stop': 8632,
+> > >   'tx-wake': 8632}]
+> > >
+> > > Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+> > > Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> > > ---
+> > >  drivers/net/virtio_net.c | 28 ++++++++++++++++++++++++++--
+> > >  1 file changed, 26 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c index
+> > > 218a446c4c27..df6121c38a1b 100644
+> > > --- a/drivers/net/virtio_net.c
+> > > +++ b/drivers/net/virtio_net.c
+> > > @@ -95,6 +95,8 @@ struct virtnet_sq_stats {
+> > >  	u64_stats_t xdp_tx_drops;
+> > >  	u64_stats_t kicks;
+> > >  	u64_stats_t tx_timeouts;
+> > > +	u64_stats_t stop;
+> > > +	u64_stats_t wake;
+> > >  };
+> > >
+> > >  struct virtnet_rq_stats {
+> > > @@ -145,6 +147,8 @@ static const struct virtnet_stat_desc
+> > > virtnet_rq_stats_desc[] = {  static const struct virtnet_stat_desc
+> > virtnet_sq_stats_desc_qstat[] = {
+> > >  	VIRTNET_SQ_STAT_QSTAT("packets", packets),
+> > >  	VIRTNET_SQ_STAT_QSTAT("bytes",   bytes),
+> > > +	VIRTNET_SQ_STAT_QSTAT("stop",	 stop),
+> > > +	VIRTNET_SQ_STAT_QSTAT("wake",	 wake),
+> > >  };
+> > >
+> > >  static const struct virtnet_stat_desc virtnet_rq_stats_desc_qstat[] =
+> > > { @@ -1014,6 +1018,9 @@ static void check_sq_full_and_disable(struct
+> > virtnet_info *vi,
+> > >  	 */
+> > >  	if (sq->vq->num_free < 2+MAX_SKB_FRAGS) {
+> > >  		netif_stop_subqueue(dev, qnum);
+> > > +		u64_stats_update_begin(&sq->stats.syncp);
+> > > +		u64_stats_inc(&sq->stats.stop);
+> > > +		u64_stats_update_end(&sq->stats.syncp);
+> >
+> > How about introduce two helpers to wrap
+> > netif_tx_queue_stopped and netif_start_subqueue?
+> >
+> > >  		if (use_napi) {
+> > >  			if (unlikely(!virtqueue_enable_cb_delayed(sq->vq)))
+> > >  				virtqueue_napi_schedule(&sq->napi, sq-
+> > >vq); @@ -1022,6 +1029,9 @@
+> > > static void check_sq_full_and_disable(struct virtnet_info *vi,
+> > >  			free_old_xmit(sq, false);
+> > >  			if (sq->vq->num_free >= 2+MAX_SKB_FRAGS) {
+> > >  				netif_start_subqueue(dev, qnum);
+> > > +				u64_stats_update_begin(&sq->stats.syncp);
+> > > +				u64_stats_inc(&sq->stats.wake);
+> > > +				u64_stats_update_end(&sq->stats.syncp);
+> >
+> > If we start the queue immediately, should we update the counter?
+>
+> I intentionally only counted the wakes on restarts after stopping the queue.
+> I don't think counting the initial wake adds any value since it always happens.
 
-How much collateral evolution did you notice according to information from
-an article like =E2=80=9CScope-based resource management for the kernel=E2=
-=80=9D
-by Jonathan Corbet (from 2023-06-15)?
-https://lwn.net/Articles/934679/
+Here, we start the queue immediately after the queue is stopped.
+So for the upper layer, the queue "has not" changed the status,
+I think we do not need to update the wake counter.
 
-Would you become interested to extend the usage of resource guards accordi=
-ngly?
-https://elixir.bootlin.com/linux/v6.9-rc7/source/include/linux/cleanup.h#L=
-124
+Thanks.
 
-Regards,
-Markus
+
+>
+> >
+> > Thanks.
+> >
+> > >  				virtqueue_disable_cb(sq->vq);
+> > >  			}
+> > >  		}
+> > > @@ -2322,8 +2332,14 @@ static void virtnet_poll_cleantx(struct
+> > receive_queue *rq)
+> > >  			free_old_xmit(sq, true);
+> > >  		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+> > >
+> > > -		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
+> > > +		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
+> > > +			if (netif_tx_queue_stopped(txq)) {
+> > > +				u64_stats_update_begin(&sq->stats.syncp);
+> > > +				u64_stats_inc(&sq->stats.wake);
+> > > +				u64_stats_update_end(&sq->stats.syncp);
+> > > +			}
+> > >  			netif_tx_wake_queue(txq);
+> > > +		}
+> > >
+> > >  		__netif_tx_unlock(txq);
+> > >  	}
+> > > @@ -2473,8 +2489,14 @@ static int virtnet_poll_tx(struct napi_struct
+> > *napi, int budget)
+> > >  	virtqueue_disable_cb(sq->vq);
+> > >  	free_old_xmit(sq, true);
+> > >
+> > > -	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
+> > > +	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
+> > > +		if (netif_tx_queue_stopped(txq)) {
+> > > +			u64_stats_update_begin(&sq->stats.syncp);
+> > > +			u64_stats_inc(&sq->stats.wake);
+> > > +			u64_stats_update_end(&sq->stats.syncp);
+> > > +		}
+> > >  		netif_tx_wake_queue(txq);
+> > > +	}
+> > >
+> > >  	opaque = virtqueue_enable_cb_prepare(sq->vq);
+> > >
+> > > @@ -4790,6 +4812,8 @@ static void virtnet_get_base_stats(struct
+> > > net_device *dev,
+> > >
+> > >  	tx->bytes = 0;
+> > >  	tx->packets = 0;
+> > > +	tx->stop = 0;
+> > > +	tx->wake = 0;
+> > >
+> > >  	if (vi->device_stats_cap & VIRTIO_NET_STATS_TYPE_TX_BASIC) {
+> > >  		tx->hw_drops = 0;
+> > > --
+> > > 2.44.0
+> > >
+>
 
