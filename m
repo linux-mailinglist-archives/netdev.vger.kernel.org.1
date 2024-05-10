@@ -1,123 +1,112 @@
-Return-Path: <netdev+bounces-95296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C1DD8C1D4F
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 06:07:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C6918C1D53
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 06:12:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 450EF1C21C01
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 04:07:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD660B21711
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 04:12:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87E23149C51;
-	Fri, 10 May 2024 04:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB00149DEB;
+	Fri, 10 May 2024 04:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ipqmAhVm"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Twk10rZX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F5C142E66;
-	Fri, 10 May 2024 04:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4712013B5A1;
+	Fri, 10 May 2024 04:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715314026; cv=none; b=KxnTMNcwNrvktjkYBh1N5TWNJV7nRH68o0gQNZzK84W/MTlwK2PPlEG0J4aroOHK8ycUAOXdZYdrJOtCAQQO9kbMNig3HPGE9vFvmGrItgiOTVV75wNQVOtdoTckilBwvfFZ9UoSqnnVDeOJu3Sw9+DtW43nKxuXMKNGAM+/B/E=
+	t=1715314350; cv=none; b=chC0CvnA2Sv60MK/iinOiY1OZmsLVmmHNJdTkh8Zj3DVpdDA/RF1GmhMSbqx1MKLNFZxfY05wkNABqFSQtfGVhLeZvdu4BFnxuCqI4IMubZuJ1j9WVAHJdkD+Pkt0H6yRHOMdy73rPFc3MIzFD+A+9k+aAr2C69lYnb3LkasW90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715314026; c=relaxed/simple;
-	bh=0q8yaNH1A/SfdimQk6S6iL+CGfUXVf8m1RNrCjILjxQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ebg6DMD/MqNPvdv7g2lnrS0kSaigp6cU1FSxsAsk8n0eQWnsvFkd0dcnQPscvSBFv6vpDvTv4Tv0sCu2QlvQ7ohmKWPkNQeNCmmlMCtu7RtLbYpNVVCPREHM68G/4iPLoF4aYw2jV8xs9C+W/in+zj8pmkYeRRnUAKyIi8Kde4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ipqmAhVm; arc=none smtp.client-ip=209.85.161.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5b27cc76e9aso194686eaf.2;
-        Thu, 09 May 2024 21:07:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715314024; x=1715918824; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zQ7ZoNviSnHC/g2meGJKV3qnWk+1KxyO8OjUrJK9GVc=;
-        b=ipqmAhVmbrPFnxJJm/bqqq7M+D5qeS7HY2LvzWX0vVC7/AcKU+BemGyZCtRDWGMxAm
-         PzS718Pq06Xw8+vGc3rLaDlac8H/hlbnbH3hh5Tx+YH5dmQ4ZVzDvc4kcjbuloAYM+gS
-         vyalme9bb4raZ9/BEg/NH4RTL8aDyOP2QlfZ8gXoaY4D7MOzFbi+9fp5KO0LbtjJ3nGQ
-         gA14efgtNChoO/cx9RFEMuc2q/f0LU7wXmlMoDdVsr5cIq+6LZgNs1MdgoWmFrwovXye
-         HICd8D0mVg+P+FjYa4E96FsWqD8shExeIJalXoA56hujEJqfU8xPANuGqyxFZdpVMypl
-         tEzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715314024; x=1715918824;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zQ7ZoNviSnHC/g2meGJKV3qnWk+1KxyO8OjUrJK9GVc=;
-        b=fNutedZuGIaod1V79xYzj8Dj9N1/VQEpyr362prZptVr9hGL0gb2Yq0i5buXG5WW0U
-         Gkh1ZG/Ptw4zjMukMfb3TcRFKKOOXQEu5Dd45BQF0mcFlFA1jSxDQwh/4GkhhrtrTiPQ
-         RawgDph2cIOEafhOmSY/U1Y8FPVk8GHb3P0Dj4cSCOl0S66aWdZxjreQko3TVGBeLORE
-         q0GJvHnbVcMaSWFf5XUpV+pDxT5kDVOFO2EU9u2UgmFwuUnv7IrEwrEzAe1Uacufrzkc
-         DAgPcl282GqfxB2IwdA1Km0JlAKUvjyfTk43B/KKt86NEWGwmeBL1rM65QRD6oSP8Yip
-         BYcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW99NS1Vj3uwBkFmJK+LLDnC6D8r3NgSrT0K2oIHaseMhlJsVVhDfI8pBOShNIYzSyYk5voEBZDl6cxkCdSYu3URem9ITn3mrmD9h7cULFbqIKzN0RU2dpCeDZ2qJIvXnDciEME
-X-Gm-Message-State: AOJu0YwYt/sTTsH9jhKmANTutxzy/xDaaFZfijA1pqx35v6NlKSEOr9Y
-	QRJHJgFJliXe0GPTbAQpEPClbK3ZKQqo2o2nj1o+PoVinTYE2gn1e/M40w==
-X-Google-Smtp-Source: AGHT+IHof3l3bj/wMmMu4y7yYHakp8mH1JiJTRdJUXrQe4JohJLQ7OjjKxvFtg6N4Otn3+YSejVRUA==
-X-Received: by 2002:a05:6870:cb94:b0:239:6927:6826 with SMTP id 586e51a60fabf-241721ade50mr2031899fac.0.1715314024076;
-        Thu, 09 May 2024 21:07:04 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2412a679cfasm627099fac.26.2024.05.09.21.07.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 21:07:03 -0700 (PDT)
-Date: Thu, 9 May 2024 21:07:00 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Mahesh Bandewar <maheshb@google.com>, Netdev <netdev@vger.kernel.org>,
-	Linux <linux-kernel@vger.kernel.org>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>, Sagi Maimon <maimon.sagi@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>,
-	Mahesh Bandewar <mahesh@bandewar.net>
-Subject: Re: [PATCHv4 net-next] ptp/ioctl: support MONOTONIC_RAW timestamps
- for PTP_SYS_OFFSET_EXTENDED
-Message-ID: <Zj2dZJAfOdag-M1H@hoboy.vegasvil.org>
-References: <20240502211047.2240237-1-maheshb@google.com>
- <ZjsDJ-adNCBQIbG1@hoboy.vegasvil.org>
- <87cypwpxbh.ffs@tglx>
+	s=arc-20240116; t=1715314350; c=relaxed/simple;
+	bh=/LbHYtzPH3iw3XGWOvqHbL99O9TWUBZA8MGRm/DAL2Q=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=MK42QLSyyku6EDSBnJu4cNbm/6J8EG1dfcYqiESRAaposBSf0AIXxKbwe0hM+ffRPsiEnLWyylOgMwV7/aFqd6dNnsHLLu62y/j5U3A5asne16AApjLK53IWvqFQ673ayeHR+Qk2TnUZXyCN+IkiNVxRvj26avPJaEe181YTxCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Twk10rZX; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1715314339; h=From:To:Subject:Date:Message-Id;
+	bh=UWrstFGN85/5yWEaFNa4Yc+QlD7Y5sQgJNMRahvXNMM=;
+	b=Twk10rZXAkUUK7r23jk0jD1qldKj07pLwDY9vp3k3LvO8/2c3RXuDhsYiRiJ43p95IK6+MUF77m7inEzA9y+ZzORvpyZZAyNFyVzLNfVtjKWLU1VkInG2DCRZwzRxGlli7Rd4B7q/fg3IeamvGtpa1GG/tmTAyGVgAR6v9Y3Tx8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R611e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W68pi1J_1715314333;
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W68pi1J_1715314333)
+          by smtp.aliyun-inc.com;
+          Fri, 10 May 2024 12:12:18 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	wintera@linux.ibm.com,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	tonylu@linux.alibaba.com,
+	pabeni@redhat.com,
+	edumazet@google.com
+Subject: [PATCH net-next 0/2] Introduce IPPROTO_SMC
+Date: Fri, 10 May 2024 12:12:11 +0800
+Message-Id: <1715314333-107290-1-git-send-email-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87cypwpxbh.ffs@tglx>
 
-Thomas,
+From: "D. Wythe" <alibuda@linux.alibaba.com>
 
-On Wed, May 08, 2024 at 09:38:58AM +0200, Thomas Gleixner wrote:
-> On Tue, May 07 2024 at 21:44, Richard Cochran wrote:
-> > On Thu, May 02, 2024 at 02:10:47PM -0700, Mahesh Bandewar wrote:
-> >> + * History:
-> >> + * v1: Initial implementation.
-> >> + *
-> >> + * v2: Use the first word of the reserved-field for @clockid. That's
-> >> + *     backward compatible since v1 expects all three reserved words
-> >> + *     (@rsv[3]) to be 0 while the clockid (first word in v2) for
-> >> + *     CLOCK_REALTIME is '0'.
+This patch allows to create smc socket via AF_INET,
+similar to the following code,
 
-...
+/* create v4 smc sock */
+v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
 
-> I agree that it wants to be in the commit message, but having the
-> version information in the kernel-doc which describes the UAPI is
-> sensible and useful. That's where I'd look first and asking a user to
-> dig up this information on lore is not really helpful.
+/* create v6 smc sock */
+v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
 
-But writing "v1, v2" doesn't make sense for this code.  There never
-was a "v1" for this ioctl.  At the very least, the change should be
-identified by kernel version (or git SHA).
+There are several reasons why we believe it is appropriate here:
 
-Thanks,
-Richard
+1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
+address. There is no AF_SMC address at all.
+
+2. Create smc socket in the AF_INET(6) path, which allows us to reuse
+the infrastructure of AF_INET(6) path, such as common ebpf hooks.
+Otherwise, smc have to implement it again in AF_SMC path. Such as:
+  1. Replace IPPROTO_TCP with IPPROTO_SMC in the socket() syscall
+     initiated by the user, without the use of LD-PRELOAD.
+  2. Select whether immediate fallback is required based on peer's port/ip
+     before connect().
+
+A very significant result is that we can now use eBPF to implement smc_run
+instead of LD_PRELOAD, who is completely ineffective in scenarios of static
+linking.
+
+Another potential value is that we are attempting to optimize the performance of
+fallback socks, where merging socks is an important part, and it relies on the
+creation of SMC sockets under the AF_INET path. (More information :
+https://lore.kernel.org/netdev/1699442703-25015-1-git-send-email-alibuda@linux.alibaba.com/T/)
+
+D. Wythe (2):
+  net/smc: refatoring initialization of smc sock
+  net/smc: Introduce IPPROTO_SMC
+
+ include/uapi/linux/in.h |   2 +
+ net/smc/af_smc.c        | 222 +++++++++++++++++++++++++++++++++++++++---------
+ net/smc/inet_smc.h      |  32 +++++++
+ 3 files changed, 214 insertions(+), 42 deletions(-)
+ create mode 100644 net/smc/inet_smc.h
+
+-- 
+1.8.3.1
 
 
