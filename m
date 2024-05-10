@@ -1,184 +1,165 @@
-Return-Path: <netdev+bounces-95385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA72F8C21CE
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:14:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E37C8C21FE
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:23:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43D9C1F21B11
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:14:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 012DDB20BB3
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:23:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB444165FD8;
-	Fri, 10 May 2024 10:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72191165FDB;
+	Fri, 10 May 2024 10:23:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RCWRYoNy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB6A165FCB
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 10:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93136130E39;
+	Fri, 10 May 2024 10:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715336037; cv=none; b=OIhKo8voUEOOGZ7mV0m7GPPomED/GxJZMrYewA2wikyLW5zQXY3N7yjRYTOD5pFy/Dgw3Reo4hu5mDe5+jIwcvD2bAh6qFOtl3Icj9Iz/s3f3DbrCBCKn62HfEPp90G16VYpR1LC76lYKld7+T0V/bjZMjQhDc3KzOJLfn7rpEs=
+	t=1715336583; cv=none; b=G+v5aowAMSngyu4OIfraVF26aSqy8titwf3EUn59dOLXMf09Qk/vcKD8M+cRqTFepMaD+ucI/rgPKJw1OOiB+48XNLrFI3OZ0XNA4Vjvlx79ODH4dlP+ApvckHo6uZpfHw5Xh3Td1H8khMIqE8R2CBM037V+q2VoKDs+EWjVCA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715336037; c=relaxed/simple;
-	bh=05WBO0dHpHCs3B2si0lnWUO4hKXI7L3zIv/qUk1JrrQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bBqKKQv22BGtbKHoybzVQm01bPyCF/JTe2mdSGNxqFY7g9NGU+ADsIZl56NVL7fpHPNaMHAmtUEXZ8oPnnLvyGO1CDwtY5Ulglch61GTs6itSLkKNNh4UGV9MoQRfgcjnY1eiseNaZUXI/OrxZ0Ro4S7n+7p5327PIE6FZZF1Ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.112.218])
-	by gateway (Coremail) with SMTP id _____8CxCupW8z1mUIgKAA--.14859S3;
-	Fri, 10 May 2024 18:13:42 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.112.218])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxKORU8z1mO5oYAA--.45943S3;
-	Fri, 10 May 2024 18:13:41 +0800 (CST)
-Message-ID: <33ee7998-df36-492c-9507-a08c3a6dad9b@loongson.cn>
-Date: Fri, 10 May 2024 18:13:40 +0800
+	s=arc-20240116; t=1715336583; c=relaxed/simple;
+	bh=oJTSAfBvuIycIoXTlRrSClNVDYbN32w4IpQTqf56fco=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=F3SJGPfa5g1/KMO1okXOjCKZb9an+iNcrKoZUuqBcBt5RUd/2x1JrgUxpojuuV133xB8tAkAZj6tJkRORucYdn1/2QwXS41SglgtXYmjyjFwVRWt7k6R8lZfDGLxIwbErVj/AG2XqkvHmPT9SLI/VfmOcYZjLjDvs2aIk224RVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RCWRYoNy; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44A9Cqx8022386;
+	Fri, 10 May 2024 10:22:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=MG5ZYsRiODRe4ubGtFf8H3gDEjjOmPzap7ojKtBzCzc=;
+ b=RCWRYoNyivhryOSfXnxpR0dknta7AKjeVlGRD8GqnqHGNishCuQLYpUeRbBx8i7w59Iw
+ SbikzDl+fPAPXkCbc9qpsxTaPOyDYAVHpeAQ3GeUbQ03vd9XDI8ypHUi4Qa4OSqk5YLw
+ gJ6qV5siXlAk8EO1GDnHFlOv3kLtMFwthDhjN8qbDKrC/aqnpNm1q81tQc70yxLF4Hzy
+ H/SCdH8RhsNRv4qVcTgKkpWIULZSwT+Ep2SzgKy6D8QMpbZ/XAT0mFkvI9n0EYfhCXz5
+ A+YQUjxYQo266+vj6Fs3f0YPkkOKG0MLq2PJeKeHR5ZQSttOI/cW4ZlviHstCWnVacTV /A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y1grdr50k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 May 2024 10:22:54 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44AAMrmK029219;
+	Fri, 10 May 2024 10:22:53 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y1grdr50f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 May 2024 10:22:53 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44A7Ower017582;
+	Fri, 10 May 2024 10:22:52 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xysht8kw0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 May 2024 10:22:52 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44AAMmIq45482446
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 10 May 2024 10:22:51 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D7C1458059;
+	Fri, 10 May 2024 10:22:48 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A0CDA58057;
+	Fri, 10 May 2024 10:22:46 +0000 (GMT)
+Received: from [9.171.7.235] (unknown [9.171.7.235])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 10 May 2024 10:22:46 +0000 (GMT)
+Message-ID: <310155d9-591a-428f-ad81-d317615faa90@linux.ibm.com>
+Date: Fri, 10 May 2024 12:22:45 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/2] Introduce IPPROTO_SMC
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+        jaka@linux.ibm.com, wintera@linux.ibm.com, guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+        tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+References: <1715314333-107290-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <1715314333-107290-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: l2kbX6APCCV0-1pkzDdruf7P-z99Nzgf
+X-Proofpoint-GUID: K9ygItOsGcJw_nv5XM2sXt1N1yDIsgTG
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 02/15] net: stmmac: Add multi-channel support
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-References: <cover.1714046812.git.siyanteng@loongson.cn>
- <5409facf916c0123e39a913c8342cc0ce8ed93db.1714046812.git.siyanteng@loongson.cn>
- <zbs5vkzyuoyte5mr2pprf7xxahhuxlinvxe24h4oc6jeshwii5@ivqr45z27ef4>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <zbs5vkzyuoyte5mr2pprf7xxahhuxlinvxe24h4oc6jeshwii5@ivqr45z27ef4>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxKORU8z1mO5oYAA--.45943S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxWF1xWF1rWw1UKFyfXFy3WrX_yoWrZFWDpF
-	WkA3yvqF95JF1Sy3WkJw4kXFyrtr15tw1UZrs5Ga429a1qgr90qr4Ygayjga4UuF4xAr42
-	qr4Utr1Dur1DAFgCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
-	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU4SoGDUUUU
-
-Hi Serge
-
-在 2024/5/3 06:02, Serge Semin 写道:
-> On Thu, Apr 25, 2024 at 09:01:55PM +0800, Yanteng Si wrote:
->> DW GMAC v3.x multi-channels feature is implemented as multiple
->> sets of the same CSRs. Here is only preliminary support, it will
->> be useful for the driver further evolution and for the users
->> having multi-channel DWGMAC v3.x devices.
-> Why do you call it "preliminary"? AFAICS it's a fully functional
-> support with no restrictions. Am I wrong?
->
-> I would reformulate the commit message as:
->
-> "DW GMAC v3.73 can be equipped with the Audio Video (AV) feature which
-> enables transmission of time-sensitive traffic over bridged local area
-> networks (DWC Ethernet QoS Product). In that case there can be up to two
-> additional DMA-channels available with no Tx COE support (unless there is
-> vendor-specific IP-core alterations). Each channel is implemented as a
-> separate Control and Status register (CSR) for managing the transmit and
-> receive functions, descriptor handling, and interrupt handling.
->
-> Add the multi-channels DW GMAC controllers support just by making sure the
-> already implemented DMA-configs are performed on the per-channel basis.
->
-> Note the only currently known instance of the multi-channel DW GMAC
-> IP-core is the LS2K2000 GNET controller, which has been released with the
-> vendor-specific feature extension of having eight DMA-channels. The device
-> support will be added in one of the following up commits."
-OK.
->
->
->> @@ -153,7 +155,7 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
->>   					    void __iomem *ioaddr, int mode,
->>   					    u32 channel, int fifosz, u8 qmode)
->>   {
->> -	u32 csr6 = readl(ioaddr + DMA_CONTROL);
->> +	u32 csr6 = readl(ioaddr + DMA_CHAN_CONTROL(channel));
->>   
->>   	if (mode == SF_DMA_MODE) {
->>   		pr_debug("GMAC: enable RX store and forward mode\n");
->> @@ -175,14 +177,14 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
->>   	/* Configure flow control based on rx fifo size */
->>   	csr6 = dwmac1000_configure_fc(csr6, fifosz);
->>   
->> -	writel(csr6, ioaddr + DMA_CONTROL);
->> +	writel(csr6, ioaddr + DMA_CHAN_CONTROL(channel));
->>   }
->>   
->>   static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
->>   					    void __iomem *ioaddr, int mode,
->>   					    u32 channel, int fifosz, u8 qmode)
->>   {
->> -	u32 csr6 = readl(ioaddr + DMA_CONTROL);
->> +	u32 csr6 = readl(ioaddr + DMA_CHAN_CONTROL(channel));
->>   
->>   	if (mode == SF_DMA_MODE) {
->>   		pr_debug("GMAC: enable TX store and forward mode\n");
->> @@ -209,7 +211,7 @@ static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
->>   			csr6 |= DMA_CONTROL_TTC_256;
->>   	}
->>   
->> -	writel(csr6, ioaddr + DMA_CONTROL);
->> +	writel(csr6, ioaddr + DMA_CHAN_CONTROL(channel));
->>   }
->>   
-> Just figured out that besides of the channel-related changes you also need
-> to have the stmmac_dma_operation_mode() method fixed. So one wouldn't
-> redistribute the detected Tx/Rx FIFO between the channels. Each DW GMAC
-> channel has separate FIFO of the same size. The databook explicitly says
-> about that:
->
-> "The Tx FIFO size of all selected Transmit channels is always same.
-> Similarly, the Rx FIFO size of all selected Receive channels is same.
-> These channels cannot be of different sizes."
->
-Should I do this, right?
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c 
-b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 33d04243b4d8..9d4148daee68 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -2371,8 +2371,13 @@ static void stmmac_dma_operation_mode(struct 
-stmmac_priv *priv)
-                 txfifosz = priv->dma_cap.tx_fifo_size;
-
-         /* Adjust for real per queue fifo size */
--       rxfifosz /= rx_channels_count;
--       txfifosz /= tx_channels_count;
-+       if ((priv->synopsys_id != DWMAC_CORE_3_40) ||
-+           (priv->synopsys_id != DWMAC_CORE_3_50) ||
-+           (priv->synopsys_id != DWMAC_CORE_3_70)) {
-+               rxfifosz /= rx_channels_count;
-+               txfifosz /= tx_channels_count;
-+       }
-+
-
-         if (priv->plat->force_thresh_dma_mode) {
-                 txmode = tc;
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-10_06,2024-05-10_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 spamscore=0
+ malwarescore=0 bulkscore=0 priorityscore=1501 phishscore=0 adultscore=0
+ mlxscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2405100073
 
 
-Thanks,
 
-Yanteng
+On 10.05.24 06:12, D. Wythe wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+> 
+> This patch allows to create smc socket via AF_INET,
+> similar to the following code,
+> 
+> /* create v4 smc sock */
+> v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
+> 
+> /* create v6 smc sock */
+> v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
+> 
+> There are several reasons why we believe it is appropriate here:
+> 
+> 1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
+> address. There is no AF_SMC address at all.
+> 
+> 2. Create smc socket in the AF_INET(6) path, which allows us to reuse
+> the infrastructure of AF_INET(6) path, such as common ebpf hooks.
+> Otherwise, smc have to implement it again in AF_SMC path. Such as:
+>    1. Replace IPPROTO_TCP with IPPROTO_SMC in the socket() syscall
+>       initiated by the user, without the use of LD-PRELOAD.
+>    2. Select whether immediate fallback is required based on peer's port/ip
+>       before connect().
+> 
+> A very significant result is that we can now use eBPF to implement smc_run
+> instead of LD_PRELOAD, who is completely ineffective in scenarios of static
+> linking.
+> 
 
+> Another potential value is that we are attempting to optimize the performance of
+> fallback socks, where merging socks is an important part, and it relies on the
+> creation of SMC sockets under the AF_INET path. (More information :
+> https://lore.kernel.org/netdev/1699442703-25015-1-git-send-email-alibuda@linux.alibaba.com/T/)
+> 
+> D. Wythe (2):
+>    net/smc: refatoring initialization of smc sock
+>    net/smc: Introduce IPPROTO_SMC
+> 
+>   include/uapi/linux/in.h |   2 +
+>   net/smc/af_smc.c        | 222 +++++++++++++++++++++++++++++++++++++++---------
+>   net/smc/inet_smc.h      |  32 +++++++
+>   3 files changed, 214 insertions(+), 42 deletions(-)
+>   create mode 100644 net/smc/inet_smc.h
+> 
+Replacing the preload library is indeed a good reason for this method. 
+And that could be a new era for smc. However, there are still some 
+details we need to take care of. Thus, I'd like to ask for more time to 
+review and test these patches.
+
+Thank you,
+Wenjia
 
