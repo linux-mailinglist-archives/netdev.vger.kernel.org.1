@@ -1,137 +1,554 @@
-Return-Path: <netdev+bounces-95499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 861888C26DB
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 16:28:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84DBB8C26E6
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 16:32:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4196728584D
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:28:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC495B22E66
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5EC6168AFC;
-	Fri, 10 May 2024 14:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4B312D219;
+	Fri, 10 May 2024 14:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fhtXu+R5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V5covMGx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E9D14B08C
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 14:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A07338D;
+	Fri, 10 May 2024 14:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715351320; cv=none; b=Yl+k+CF50QEIH4noYkCiA0aPU8NrygG9u8CWVw+e0/z0qbqvpVJ/taq0ef9b+vXyfLsKk9+QlgpS0M/bO6lUoJnZPKb/i/GQmFPT+ia/nJfwa8uHddiIly4T/WkN/wQ/Azx4y2Ro6ZZ4v7GO/yaJSM42vSCaJxwzRiEt7k5hV2Q=
+	t=1715351563; cv=none; b=bLFJUyah/SBEHJJamHXNpiD1BfF8q02pwqtiAp65f29/wOwnroVJnPME1WAB4kNflH0jzuD4+AkYHCEeKyBCv5OD4ATpUPBv7fDDsCy54l/zMVP0hKWYIFw+iN1eJf2Pu1MW41ySvkSuvUaJybadte6/ON2ZE1dLvrGO9Cz5muU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715351320; c=relaxed/simple;
-	bh=p3y9hJQ+HVpr/uRhiT4scof+qEdN76syc6+Nm3GvjhM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SG98HB35ymH3KbRzR9laZsOidxdUuGulacy8xmI71RSAn97KpJg6qMo2Z2G21O2NXU67MJUKHtZPy4bQt4/XOI/pwlN19dIdPQLTzE4GtvA77wEC3lJctsE3Of1oJF376pcvuZu3qJxKxTjsbbZoB6DAPo6M3lcm92JVyWENBec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fhtXu+R5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79B54C113CC;
-	Fri, 10 May 2024 14:28:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715351320;
-	bh=p3y9hJQ+HVpr/uRhiT4scof+qEdN76syc6+Nm3GvjhM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fhtXu+R58jnr6bxABBmf1zQScKJn7nYihVziVpswQfUR8lVaUMJWjBQB2pGWCXPNF
-	 cbluTtKzBkiPiPgOmEiJQg6/MAh1AzVmiGGLuU7fWAI+vtwTmZQiOdhPCiLhvJb/HC
-	 p03Ymid5YmdLASmIcF8t6fEaQ15uk3Hjk5+A573gQ5elUAgJWq3yD5t4rN8F71cg3m
-	 CK+bfJAmgkvz9cqLqx4KV5e0/7bAmzdKjnuqk46B1QranBhep/j0r3ClnWpEinGGEa
-	 HwlszsfNa7tnTuANGGW0FiOLvbvoj8NubOwPBslp3ZxUHPcnlzZhf4+XLCBAhSxzyy
-	 bP2n/WL/i7p7g==
-Message-ID: <11ff9d2b-6c3e-4ee5-81c0-d36de2308dbd@kernel.org>
-Date: Fri, 10 May 2024 16:28:29 +0200
+	s=arc-20240116; t=1715351563; c=relaxed/simple;
+	bh=OyQx8duQm9hg8aX7eKlNxWpT4KFgG8uAqjkUxkYAf9g=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=R32iZWR3tP4aRJ2JU+xnKgGeheLnOdG9Nz7110DIbz7UfuAu2mfxFd6PZ/U2TZNiHmoJ9WmZrR4YoyY+dpOaMtrXNqwyzETTGnHUvx1G88Si0DNW3EN76F3VkscVMgfm0u3nDdjRuTf/d0F3CAX5E8ew139gNxCM0k4D4HvHwpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V5covMGx; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715351562; x=1746887562;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=OyQx8duQm9hg8aX7eKlNxWpT4KFgG8uAqjkUxkYAf9g=;
+  b=V5covMGxSjPhAUcJhe6X8/WN2Mad0IhsqjZLIjDg9HyI3+NT62HTWxeB
+   BhvLMFdSoS62QDGWUtk6N9il7yvh+roSYZ0o4rYdjCjtuxJ7680XhdOlW
+   Gtp6+ItdM1vyfX/xKul6MFE4cfOviDnRbHmdonrlsljf3fv6aSmI2ITda
+   s09BvnOZzIXYZOTfxlp5iGY5AfmoIUK5sRGSIdeAjXpTYNepNY8NqxfWO
+   heyODlNvreDkP+VAObyEGKVnY2YA49xF90RwZ2HSYXIIQCnf48n0PJW+4
+   XgkDTTqVjpG8tPRYGk5cpdS15lFEzrqlMTKsUOI3nNh+9ukb1umYn+IzP
+   Q==;
+X-CSE-ConnectionGUID: VWvbVRpqQoulJZBr5ua9EA==
+X-CSE-MsgGUID: uFKQnzfDReGeP88hyP81Vg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="33846247"
+X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
+   d="scan'208";a="33846247"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 07:32:41 -0700
+X-CSE-ConnectionGUID: viL66+41TVSr/Em7zPTpyw==
+X-CSE-MsgGUID: V6HV30O6Q7iaUG8D2/Vx0Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
+   d="scan'208";a="60803332"
+Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.247.85])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 07:32:33 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Fri, 10 May 2024 17:32:28 +0300 (EEST)
+To: Christoph Fritz <christoph.fritz@hexdev.de>
+cc: Jiri Slaby <jirislaby@kernel.org>, Simon Horman <horms@kernel.org>, 
+    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+    Marc Kleine-Budde <mkl@pengutronix.de>, 
+    Oliver Hartkopp <socketcan@hartkopp.net>, 
+    Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+    "David S . Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+    Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+    Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
+    Benjamin Tissoires <bentiss@kernel.org>, 
+    Sebastian Reichel <sre@kernel.org>, 
+    Linus Walleij <linus.walleij@linaro.org>, 
+    Andreas Lauser <andreas.lauser@mercedes-benz.com>, 
+    Jonathan Corbet <corbet@lwn.net>, Pavel Pisa <pisa@cmp.felk.cvut.cz>, 
+    linux-can@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
+    devicetree@vger.kernel.org, linux-input@vger.kernel.org, 
+    linux-serial <linux-serial@vger.kernel.org>
+Subject: Re: [PATCH v4 07/11] can: Add support for hexDEV serial LIN adapter
+ hexLINSER
+In-Reply-To: <20240509171736.2048414-8-christoph.fritz@hexdev.de>
+Message-ID: <d0884a05-7f38-7026-4f3b-fd50d9133a26@linux.intel.com>
+References: <20240509171736.2048414-1-christoph.fritz@hexdev.de> <20240509171736.2048414-8-christoph.fritz@hexdev.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [TEST] Flake report
-Content-Language: en-GB
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>,
- Simon Horman <horms@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>,
- Jaehee Park <jhpark1013@gmail.com>, Petr Machata <petrm@nvidia.com>,
- Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
- Davide Caratti <dcaratti@redhat.com>
-References: <20240509160958.2987ef50@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240509160958.2987ef50@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 
-Hi Jakub,
+On Thu, 9 May 2024, Christoph Fritz wrote:
 
-Thank you for this reminder!
-
-On 10/05/2024 01:09, Jakub Kicinski wrote:
-
-(...)
-
-> mptcp
-> -----
-> To: Matthieu Baerts <matttbe@kernel.org>
+> Introduce support for the hexDEV serial LIN adapter hexLINSER. These
+> devices are equipped with LIN transceivers and are mostly hard-wired to
+> serial devices.
 > 
-> simult-flows-sh is still quite flaky :(
+> This device driver uses CAN_LIN on one side and the serial device bus
+> (serdev) interface on the other.
+> 
+> For more details on the adapter, visit: https://hexdev.de/hexlin#hexLINSER
+> 
+> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+> ---
+>  drivers/net/can/Kconfig      |  15 ++
+>  drivers/net/can/Makefile     |   1 +
+>  drivers/net/can/hex-linser.c | 505 +++++++++++++++++++++++++++++++++++
+>  3 files changed, 521 insertions(+)
+>  create mode 100644 drivers/net/can/hex-linser.c
+> 
+> diff --git a/drivers/net/can/Kconfig b/drivers/net/can/Kconfig
+> index 0934bbf8d03b2..141972d6bbf1e 100644
+> --- a/drivers/net/can/Kconfig
+> +++ b/drivers/net/can/Kconfig
+> @@ -181,6 +181,21 @@ config CAN_LIN
+>  
+>  	  Actual device drivers need to be enabled too.
+>  
+> +config CAN_LIN_HEXLINSER
+> +	tristate "hexDEV hexLINSER serial LIN Adaptors"
+> +	depends on CAN_LIN && SERIAL_DEV_BUS && OF
+> +	help
+> +	  LIN support for serial devices equipped with LIN transceivers.
+> +	  This device driver is using CAN_LIN for a userland connection on
+> +	  one side and the kernel its serial device bus (serdev) interface
+> +	  on the other side.
+> +
+> +	  If you have a hexLINSER tty adapter, say Y here and see
+> +	  <https://hexdev.de/hexlin#hexLINSER>.
+> +
+> +	  This driver can also be built as a module. If so, the module will be
+> +	  called hex-linser.ko.
+> +
+>  config CAN_SLCAN
+>  	tristate "Serial / USB serial CAN Adaptors (slcan)"
+>  	depends on TTY
+> diff --git a/drivers/net/can/Makefile b/drivers/net/can/Makefile
+> index 0093ee9219ca8..9fdad4a0fd12a 100644
+> --- a/drivers/net/can/Makefile
+> +++ b/drivers/net/can/Makefile
+> @@ -26,6 +26,7 @@ obj-$(CONFIG_CAN_IFI_CANFD)	+= ifi_canfd/
+>  obj-$(CONFIG_CAN_JANZ_ICAN3)	+= janz-ican3.o
+>  obj-$(CONFIG_CAN_KVASER_PCIEFD)	+= kvaser_pciefd.o
+>  obj-$(CONFIG_CAN_LIN)		+= lin.o
+> +obj-$(CONFIG_CAN_LIN_HEXLINSER)	+= hex-linser.o
+>  obj-$(CONFIG_CAN_MSCAN)		+= mscan/
+>  obj-$(CONFIG_CAN_M_CAN)		+= m_can/
+>  obj-$(CONFIG_CAN_PEAK_PCIEFD)	+= peak_canfd/
+> diff --git a/drivers/net/can/hex-linser.c b/drivers/net/can/hex-linser.c
+> new file mode 100644
+> index 0000000000000..9c2d11d2ed0c0
+> --- /dev/null
+> +++ b/drivers/net/can/hex-linser.c
+> @@ -0,0 +1,505 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+> +/* Copyright (C) 2024 hexDEV GmbH - https://hexdev.de */
+> +
+> +#include <linux/delay.h>
+> +#include <linux/init.h>
+> +#include <linux/kfifo.h>
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/serdev.h>
+> +#include <linux/slab.h>
+> +#include <linux/tty.h>
+> +#include <net/lin.h>
+> +
+> +#define LINSER_SAMPLES_PER_CHAR		10
+> +#define LINSER_TX_BUFFER_SIZE		11
+> +#define LINSER_RX_FIFO_SIZE		256
+> +#define LINSER_PARSE_BUFFER		24
+> +
+> +struct linser_rx {
+> +	u8 data;
+> +	u8 flag;
+> +};
+> +
+> +enum linser_rx_status {
+> +	NEED_MORE = -1,
+> +	MODE_OK = 0,
+> +	NEED_FORCE,
+> +};
+> +
+> +struct linser_priv {
+> +	struct lin_device *lin_dev;
+> +	struct serdev_device *serdev;
+> +	DECLARE_KFIFO_PTR(rx_fifo, struct linser_rx);
+> +	struct delayed_work rx_work;
+> +	unsigned long break_usleep_min;
+> +	unsigned long break_usleep_max;
+> +	unsigned long post_break_usleep_min;
+> +	unsigned long post_break_usleep_max;
+> +	unsigned long force_timeout_jfs;
+> +	struct lin_responder_answer respond_answ[LIN_NUM_IDS];
+> +	struct mutex resp_lock; /* protects respond_answ */
+> +	bool is_stopped;
+> +};
+> +
+> +static int linser_open(struct lin_device *ldev)
+> +{
+> +	struct serdev_device *serdev = to_serdev_device(ldev->dev);
+> +	struct linser_priv *priv = serdev_device_get_drvdata(serdev);
+> +	int ret;
+> +
+> +	if (priv->is_stopped) {
+> +		ret = serdev_device_open(serdev);
+> +		if (ret) {
+> +			dev_err(&serdev->dev, "Unable to open device\n");
+> +			return ret;
+> +		}
+> +
+> +		serdev_device_set_flow_control(serdev, false);
+> +		serdev_device_set_break_detection(serdev, true);
+> +
+> +		priv->is_stopped = false;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int linser_stop(struct lin_device *ldev)
+> +{
+> +	struct serdev_device *serdev = to_serdev_device(ldev->dev);
+> +	struct linser_priv *priv = serdev_device_get_drvdata(serdev);
+> +
+> +	if (priv->is_stopped)
+> +		return 0;
+> +
+> +	serdev_device_close(serdev);
+> +	priv->is_stopped = true;
+> +
+> +	return 0;
+> +}
+> +
+> +static int linser_send_break(struct linser_priv *priv)
+> +{
+> +	struct serdev_device *serdev = priv->serdev;
+> +	int ret;
+> +
+> +	ret = serdev_device_break_ctl(serdev, -1);
+> +	if (ret)
+> +		return ret;
+> +
+> +	usleep_range(priv->break_usleep_min, priv->break_usleep_max);
+> +
+> +	ret = serdev_device_break_ctl(serdev, 0);
+> +	if (ret)
+> +		return ret;
+> +
+> +	usleep_range(priv->post_break_usleep_min, priv->post_break_usleep_max);
+> +
+> +	return 0;
+> +}
+> +
+> +static int linser_ldo_tx(struct lin_device *ldev, const struct lin_frame *lf)
+> +{
+> +	struct serdev_device *serdev = to_serdev_device(ldev->dev);
+> +	struct linser_priv *priv = serdev_device_get_drvdata(serdev);
+> +	u8 pid = LIN_FORM_PID(lf->lin_id);
+> +	u8 buf[LINSER_TX_BUFFER_SIZE];
+> +	ssize_t written_len, total_len;
+> +	u8 checksum;
+> +	int ret;
+> +
+> +	if (lf->len + 3 > LINSER_TX_BUFFER_SIZE) {
+> +		dev_err(&serdev->dev, "Frame length %u exceeds buffer size\n", lf->len);
+> +		return -EINVAL;
+> +	}
+> +
+> +	buf[0] = LIN_SYNC_BYTE;
+> +	buf[1] = pid;
+> +	total_len = 2;
+> +
+> +	if (lf->len) {
+> +		memcpy(&buf[2], lf->data, lf->len);
+> +		checksum = lin_get_checksum(pid, lf->len, lf->data,
+> +					    lf->checksum_mode);
+> +		buf[lf->len + 2] = checksum;
+> +		total_len += lf->len + 1;
+> +	}
+> +
+> +	ret = linser_send_break(priv);
+> +	if (ret)
+> +		return ret;
+> +
+> +	written_len = serdev_device_write(serdev, buf, total_len, 0);
+> +	if (written_len < total_len)
+> +		return written_len < 0 ? (int)written_len : -EIO;
+> +
+> +	dev_dbg(&serdev->dev, "sent out: %*ph\n", (int)total_len, buf);
+> +
+> +	serdev_device_wait_until_sent(serdev, 0);
+> +
+> +	return 0;
+> +}
+> +
+> +static int linser_derive_timings(struct linser_priv *priv, u16 bitrate)
+> +{
+> +	unsigned long break_baud = (bitrate * 2) / 3;
+> +	struct serdev_device *serdev = priv->serdev;
+> +	unsigned long timeout_us;
+> +
+> +	if (bitrate < LIN_MIN_BAUDRATE || bitrate > LIN_MAX_BAUDRATE) {
+> +		dev_err(&serdev->dev, "Bitrate %u out of bounds (%u to %u)\n",
+> +			bitrate, LIN_MIN_BAUDRATE, LIN_MAX_BAUDRATE);
+> +		return -EINVAL;
+> +	}
+> +
+> +	priv->break_usleep_min = (USEC_PER_SEC * LINSER_SAMPLES_PER_CHAR) /
+> +				 break_baud;
+> +	priv->break_usleep_max = priv->break_usleep_min + 50;
+> +	priv->post_break_usleep_min = USEC_PER_SEC / break_baud;
+> +	priv->post_break_usleep_max = priv->post_break_usleep_min + 30;
+> +
+> +	timeout_us = DIV_ROUND_CLOSEST(USEC_PER_SEC * 256, bitrate);
+> +	priv->force_timeout_jfs = usecs_to_jiffies(timeout_us);
+> +
+> +	return 0;
+> +}
+> +
+> +static int linser_update_bitrate(struct lin_device *ldev, u16 bitrate)
+> +{
+> +	struct serdev_device *serdev = to_serdev_device(ldev->dev);
+> +	struct linser_priv *priv = serdev_device_get_drvdata(serdev);
+> +	unsigned int speed;
+> +	int ret;
+> +
+> +	ret = linser_open(ldev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	speed = serdev_device_set_baudrate(serdev, bitrate);
+> +	if (!bitrate || speed != bitrate)
+> +		return -EINVAL;
+> +
+> +	ret = linser_derive_timings(priv, bitrate);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+> +static int linser_get_responder_answer(struct lin_device *ldev, u8 id,
+> +				       struct lin_responder_answer *answ)
+> +{
+> +	struct serdev_device *serdev = to_serdev_device(ldev->dev);
+> +	struct linser_priv *priv = serdev_device_get_drvdata(serdev);
+> +	struct lin_responder_answer *r = &priv->respond_answ[id];
+> +
+> +	if (!answ)
+> +		return -EINVAL;
+> +
+> +	guard(mutex)(&priv->resp_lock);
+> +	memcpy(answ, r, sizeof(*answ));
+> +
+> +	return 0;
+> +}
+> +
+> +static int linser_update_resp_answer(struct lin_device *ldev,
+> +				     const struct lin_responder_answer *answ)
+> +{
+> +	struct serdev_device *serdev = to_serdev_device(ldev->dev);
+> +	struct linser_priv *priv = serdev_device_get_drvdata(serdev);
+> +	struct lin_responder_answer *r = &priv->respond_answ[answ->lf.lin_id];
+> +
+> +	if (!answ)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&priv->resp_lock);
+> +	memcpy(r, answ, sizeof(*answ));
+> +	r->lf.checksum = lin_get_checksum(LIN_FORM_PID(answ->lf.lin_id),
+> +					  answ->lf.len,
+> +					  answ->lf.data,
+> +					  answ->lf.checksum_mode);
 
-Yes, we need to find a solution for that. It is not as unstable on our
-side [1]. We will look at that next week. If we cannot find a solution
-quickly, we will skip the flaky subtests to stop the noise while
-continuing to investigate.
+Can this checksum occur outside of lock using the copy in r?
 
-[1] https://ci-results.mptcp.dev/flakes.html
+In anycase, use guard() (or scoped_guard() if the checksum can happen 
+outside of the lock.)
 
-Cheers,
-Matt
+> +	mutex_unlock(&priv->resp_lock);
+> +
+> +	return 0;
+> +}
+> +
+> +static struct lin_device_ops linser_lindev_ops = {
+> +	.ldo_open = linser_open,
+> +	.ldo_stop = linser_stop,
+> +	.ldo_tx = linser_ldo_tx,
+> +	.update_bitrate = linser_update_bitrate,
+> +	.get_responder_answer = linser_get_responder_answer,
+> +	.update_responder_answer = linser_update_resp_answer,
+> +};
+> +
+> +static bool linser_tx_frame_as_responder(struct linser_priv *priv, u8 id)
+> +{
+> +	struct lin_responder_answer *answ = &priv->respond_answ[id];
+> +	struct serdev_device *serdev = priv->serdev;
+> +	u8 buf[LINSER_TX_BUFFER_SIZE];
+> +	u8 checksum, count, n;
+> +	ssize_t write_len;
+> +
+> +	scoped_guard(mutex, &priv->resp_lock) {
+> +		if (!answ->is_active)
+> +			return false;
+> +
+> +		if (answ->is_event_frame) {
+> +			struct lin_responder_answer *e_answ;
+> +
+> +			e_answ = &priv->respond_answ[answ->event_associated_id];
+> +			n = min(e_answ->lf.len, LIN_MAX_DLEN);
+> +
+> +			if (memcmp(answ->lf.data, e_answ->lf.data, n) == 0)
+> +				return false;
+> +
+> +			memcpy(answ->lf.data, e_answ->lf.data, n);
+> +			checksum = lin_get_checksum(LIN_FORM_PID(answ->lf.lin_id),
+> +						    n, e_answ->lf.data,
+> +						    answ->lf.checksum_mode);
+> +			answ = e_answ;
+> +		} else {
+> +			checksum = answ->lf.checksum;
+> +		}
+> +
+> +		count = min(answ->lf.len, LIN_MAX_DLEN);
+> +		memcpy(&buf[0], answ->lf.data, count);
+> +		buf[count] = checksum;
+> +	}
+> +
+> +	write_len = serdev_device_write(serdev, buf, count + 1, 0);
+> +	if (write_len < count + 1)
+> +		return false;
+> +
+> +	serdev_device_wait_until_sent(serdev, 0);
+> +
+> +	return true;
+> +}
+> +
+> +static void linser_pop_fifo(struct linser_priv *priv, size_t n)
+> +{
+> +	for (size_t i = 0; i < n; i++)
+> +		kfifo_skip(&priv->rx_fifo);
+> +}
+> +
+> +static int linser_fill_frame(struct linser_priv *priv, struct lin_frame *lf)
+> +{
+> +	struct serdev_device *serdev = priv->serdev;
+> +	struct linser_rx buf[LINSER_PARSE_BUFFER];
+> +	unsigned int count, i, brk = 0;
+> +
+> +	count = kfifo_out_peek(&priv->rx_fifo, buf, LINSER_PARSE_BUFFER);
+> +
+> +	memset(lf, 0, sizeof(*lf));
+> +
+> +	for (i = 0; i < count; i++) {
+> +		dev_dbg(&serdev->dev, "buf[%d]: data=%02x, flag=%02x\n",
+> +			i, buf[i].data, buf[i].flag);
+> +	}
+> +
+> +	if (count < 3)
+> +		return NEED_MORE;
+> +
+> +	if (buf[0].flag != TTY_BREAK || buf[1].data != LIN_SYNC_BYTE) {
+> +		linser_pop_fifo(priv, 1); /* pop incorrect start */
+> +		return NEED_MORE;
+> +	} else if (!LIN_CHECK_PID(buf[2].data)) {
+> +		linser_pop_fifo(priv, 3); /* pop incorrect header */
+> +		return NEED_MORE;
+> +	}
+> +
+> +	lf->lin_id = LIN_GET_ID(buf[2].data);
+> +
+> +	/* from here on we do have a correct LIN header */
+> +
+> +	if (count == 3)
+> +		return linser_tx_frame_as_responder(priv, lf->lin_id) ?
+> +		       NEED_MORE : NEED_FORCE;
+> +
+> +	for (i = 3; i < count && i < LINSER_PARSE_BUFFER && i < 12; i++) {
+> +		if (buf[i].flag == TTY_BREAK) {
+> +			brk = i;
+> +			break;
+> +		}
+> +		lf->len++;
+> +	}
+> +	if (lf->len)
+> +		lf->len -= 1; /* account for checksum */
+> +
+> +	if (brk == 3)
+> +		return MODE_OK;
+> +
+> +	if (brk == 4) {
+> +		/* suppress wrong answer data-byte in between PID and break
+> +		 * because checksum is missing
+> +		 */
+> +		return MODE_OK;
+> +	}
+> +
+> +	for (i = 0; i < lf->len; i++)
+> +		lf->data[i] = buf[3 + i].data;
+> +	lf->checksum = buf[2 + lf->len + 1].data;
+> +	mutex_lock(&priv->resp_lock);
+> +	lf->checksum_mode = priv->respond_answ[lf->lin_id].lf.checksum_mode;
+> +	mutex_unlock(&priv->resp_lock);
+> +
+> +	dev_dbg(&serdev->dev, "brk:%i, len:%u, data:%*ph, checksum:%x (%s)\n",
+> +		brk, lf->len, lf->len, lf->data, lf->checksum,
+> +		lf->checksum_mode ? "enhanced" : "classic");
+> +
+> +	if (brk > 4)
+> +		return MODE_OK;	/* frame in between two breaks: so complete */
+> +
+> +	if (lf->len == 8)
+> +		return MODE_OK;
+> +
+> +	return NEED_FORCE;
+> +}
+> +
+> +static int linser_process_frame(struct linser_priv *priv, bool force)
+> +{
+> +	struct serdev_device *serdev = priv->serdev;
+> +	struct lin_frame lf;
+> +	size_t bytes_to_pop;
+> +	int ret = NEED_MORE;
+> +
+> +	while (kfifo_len(&priv->rx_fifo) >= LIN_HEADER_SIZE) {
+> +		ret = linser_fill_frame(priv, &lf);
+> +
+> +		if (!(ret == MODE_OK || (ret == NEED_FORCE && force)))
+> +			return ret;
+> +
+> +		dev_dbg(&serdev->dev, "lin_rx: %s\n", force ?
+> +			"force" : "normal");
+
+Put to one line.
+
+> +		lin_rx(priv->lin_dev, &lf);
+> +		bytes_to_pop = LIN_HEADER_SIZE + lf.len + (lf.len ? 1 : 0);
+> +		linser_pop_fifo(priv, bytes_to_pop);
+> +		force = false;
+> +		ret = MODE_OK;
+> +	}
+> +
+> +	return ret;
+> +}
+
+
 -- 
-Sponsored by the NGI0 Core fund.
+ i.
 
 
