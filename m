@@ -1,77 +1,114 @@
-Return-Path: <netdev+bounces-95478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8260E8C25FD
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 15:46:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5E968C260E
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 15:51:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E55AC281D4C
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:46:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D6CD1F22A65
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E9B12C48A;
-	Fri, 10 May 2024 13:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71CEB12C7E8;
+	Fri, 10 May 2024 13:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BdWzzwDT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OI2Z35V+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E3B12C47D
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 13:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413FA12BF39;
+	Fri, 10 May 2024 13:50:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715348809; cv=none; b=ilnXjwBop4DJmNyWxFfJLBXoCEv0Kc/qXn4sbP9m754asHuP5422UmTdsreWe1cCjpEwzy5rAuejL/B8o4MYZ04CG1KLRvj+ocNd6b+ObcePLQiMWS38ToDIElsoRVbOaDkFkyWN5MDyqWjunKCwDkMKAa11smIaJhxBd952mac=
+	t=1715349057; cv=none; b=rro70WPxsL7XHT+rKRLHE2jRqeuZgrdOUkCQoCMSFRxA4C08bUQy/OxEcoAuuAJbYmNpj2fNIjUkWTIdjXQxNs0TN0plHcLUIMR9eRXM7yduKeIcmUVg6f39KX+3e9K6OHzYpC/BqGKhTNjIwRaXKYQ9oroLnPvbfY+7DBLtik8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715348809; c=relaxed/simple;
-	bh=rMhyTvsntGHE7xEXc213w1XVsY/vxCLYN+8TmVMqBxo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VGHzMd3HcQCFEBPGJj/2SEpjd3PTgXNWrxY1U9Y8HT4Dbjisjdn/6eZ0XoGAtPEmsJ+je0puYwgur0zvWyds1FTts+nFKZUPsynYr81uCW94AX32bedKJgKwX8fc5zfck3frxPOQ8MZ6Xnn+XnCUfsuXYDp19Q0m9fzSwN74hvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BdWzzwDT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDAAFC113CC;
-	Fri, 10 May 2024 13:46:46 +0000 (UTC)
+	s=arc-20240116; t=1715349057; c=relaxed/simple;
+	bh=1o5pwPx9wrewqRpso30hR7MfPzjEudJwCui/sX1m3SY=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=MTOjQDoDdllmFL3JwA7Z61KRLVXzwjUnAus8ivv33j09RRhrpiBzheXjqWDpvea3tCX9jvoAulvBpSHmOrmVYurolX3kdd/GswN9u4/wxXRZG25RxSmovqR1sYuUtQVQ1jt5YpuyvGLXpazQmgghyIKAgAe2Jzwf8kYrK3zF7Jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OI2Z35V+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 328D6C113CC;
+	Fri, 10 May 2024 13:50:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715348809;
-	bh=rMhyTvsntGHE7xEXc213w1XVsY/vxCLYN+8TmVMqBxo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BdWzzwDTexUOtitt034e3yhGNxK++NrIa2I7p63jlsMoCU0upVZxotwBLc8fuJwpi
-	 LfUbeKcOnq7gvSp4zz171+Nk0SlCHUqZ2douaTTKsmDTKKV3CJktV5m5ViALs4Z6hU
-	 StZyLbPDamqhMzzyPH1G7qnZEO/FRs78YlygmA+jyldbokbRsEyIvX3gmQgyxCdW2C
-	 1SewIADzFnyjHH7bVMc2kl175zsZrQY9S1veoerd3IJHsuFEnalHMW65HxWpUX5SRG
-	 1Lz/geu3L9pcM/M6W43sxf6aGZXRZdebCJGIj4XQk/nB6PLMCtKVNSp/9+kGhT7y+s
-	 OxwLCkLhjgDSg==
-Date: Fri, 10 May 2024 14:46:44 +0100
-From: Simon Horman <horms@kernel.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	=?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: ethernet: cortina: Locking fixes
-Message-ID: <20240510134644.GB2347895@kernel.org>
-References: <20240509-gemini-ethernet-locking-v1-1-afd00a528b95@linaro.org>
+	s=k20201202; t=1715349056;
+	bh=1o5pwPx9wrewqRpso30hR7MfPzjEudJwCui/sX1m3SY=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=OI2Z35V+XCNTV1UDJaNCiVB+oz/Nl7JOH5NMPltS4N0lFk7kFn/c5zRHQoSC8Z4qh
+	 Zu+Yv2b93c6mXPMeMfjo7x32z2RaCH15eSpxMemdO2p7aMrEDR97wk+XMNttsAO0yI
+	 WyqixIrBrcZINuOTeoNdr9tF3VCGLbB6YJuaU7L3MdRPtrlvDAoKaEYgRDb/HZSKfZ
+	 GQYvhnj+/iFIsHrO3VoRRY3n5rXt+KEb+h+d2FClI+qu/PvYV0Br8eB+zmYKJ3bfm5
+	 3dRNQ6E267bfPRfncksQ92R+Wck/iBwS/8eCtGQbVati6pDgYrhyd/bQ7uV6nBQtu5
+	 JkgqRABfTlhBQ==
+From: Kalle Valo <kvalo@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  linux-kernel@vger.kernel.org,
+  ath10k@lists.infradead.org,  linux-wireless@vger.kernel.org,
+  netdev@vger.kernel.org,  Sebastian Gottschall <s.gottschall@dd-wrt.com>,
+  Steve deRosier <derosier@cal-sierra.com>,  Stefan Lippers-Hollmann
+ <s.l-h@gmx.de>
+Subject: Re: [PATCH v14] ath10k: add LED and GPIO controlling support for
+ various chipsets
+References: <20230611080505.17393-1-ansuelsmth@gmail.com>
+	<878rcjbaqs.fsf@kernel.org>
+	<648cdebb.5d0a0220.be7f8.a096@mx.google.com>
+	<648ded2a.df0a0220.b78de.4603@mx.google.com>
+	<CA+_ehUzzVq_sVTgVCM+r=oLp=GNn-6nJRBG=bndJjrRDhCodaw@mail.gmail.com>
+	<87v83nlhb3.fsf@kernel.org>
+	<663c9fc7.050a0220.5fb3a.4e87@mx.google.com>
+Date: Fri, 10 May 2024 16:50:52 +0300
+In-Reply-To: <663c9fc7.050a0220.5fb3a.4e87@mx.google.com> (Christian Marangi's
+	message of "Thu, 9 May 2024 12:04:52 +0200")
+Message-ID: <87a5kxlqrn.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240509-gemini-ethernet-locking-v1-1-afd00a528b95@linaro.org>
+Content-Type: text/plain
 
-On Thu, May 09, 2024 at 09:44:54AM +0200, Linus Walleij wrote:
-> This fixes a probably long standing problem in the Cortina
-> Gemini ethernet driver: there are some paths in the code
-> where the IRQ registers are written without taking the proper
-> locks.
-> 
-> Fixes: 4d5ae32f5e1e ("net: ethernet: Add a driver for Gemini gigabit ethernet")
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Christian Marangi <ansuelsmth@gmail.com> writes:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+>> 
+>> Sorry for the delay but finally I looked at this again. I decided to
+>> just remove the fixme and otherwise it looks good for me. Please check
+>> my changes:
+>> 
+>> https://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git/commit/?h=pending&id=688130a66ed49f20ca0ce02c3987f6a474f7c93a
+>>
+>
+> All ok for me, Just I notice the ATH10K_LEDS is not exposed anymore? Is
+> that intended?
 
+Yes. It follows the same idea as other wireless drivers do, for example iwlwifi:
+
+config IWLWIFI_LEDS
+	bool
+	depends on LEDS_CLASS=y || LEDS_CLASS=MAC80211
+	depends on IWLMVM || IWLDVM
+	select LEDS_TRIGGERS
+	select MAC80211_LEDS
+	default y
+
+So what this patch now does:
+
+config ATH10K_LEDS
+	bool
+	depends on ATH10K
+	depends on LEDS_CLASS=y || LEDS_CLASS=MAC80211
+	default y
+
+The idea being that if LEDS_CLASS is enabled then ATH10K_LEDS is
+automatically enabled. But please let us know if something is wrong
+here.
+
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
