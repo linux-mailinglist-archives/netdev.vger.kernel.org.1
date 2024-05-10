@@ -1,254 +1,228 @@
-Return-Path: <netdev+bounces-95389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B2CE8C223A
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:35:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DC328C2240
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:36:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBCE61F2202B
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:35:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E82DD283818
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A359B85959;
-	Fri, 10 May 2024 10:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4F014F9E6;
+	Fri, 10 May 2024 10:36:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="H4JDKQFk"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I/sCuI9s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68578364
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 10:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B048B1292F2
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 10:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715337310; cv=none; b=hUqb2jcLOuzvxlgQuckB+EmNXztfaE9qaTuk/35xDCqKCX4SLo9CZH8C8NbfR6QrWxxI3BaAiA388XEAQ2a9eX6bsWIYcj9dsh9NmLxhfmcGiR7isX89cY6wsHRUEx0i/0AaE5IgmlOAAQEP2hUgzonbrDDRcTbtYNv8GfEIaIc=
+	t=1715337410; cv=none; b=F7YE9k4NefOot3Bw8keGTuNq9dxFxPUcr0Um6R8CChF00DbzcY/trJg3p3Zf7VXAUAPHnuzqNJihwKf5/IIdRD73jAsFR3uXwP+wM59Oloh1DiCa9KjYb696PUxsiYZJDXtVNA5IU3RtwVRmXjWUqA0MXHmTb9eVL73Rf6hjeq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715337310; c=relaxed/simple;
-	bh=o6JFuHgOdAawciqY4EZmbjA2eVPuOWiIZa3N6EQKGwE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W4FopBvJmecZZFCbOk2sSEcyqHMAvXn+Oqcnzcjd/X/UKJ6BXvo8MLgo+YV+nP7egFhLrCJ4GlnS+ynruVaKfZ+9apw1IuDjF6+MgmD1r7DmF1Cj8PFWopZwpaPET/C1YjrDeziRFUhqJB1z2KJFUdIu06rLd+zPp00OSo9yIs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=H4JDKQFk; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-51f60817e34so2248252e87.2
-        for <netdev@vger.kernel.org>; Fri, 10 May 2024 03:35:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715337306; x=1715942106; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7WF6NXAmShEkLi88sqZOX0cWWafeX5tooo7v0pkI1FQ=;
-        b=H4JDKQFkV5R/iflwk21sABiFBEvO6Vwp6woIfQkHjMMWz9VUNfB4xZyGCEeYSSYIRH
-         skyYW+sBnZnc7U1CgOMT3SFw12piTnFDTcPYDoPTZd1fA/dnj56BP/MRCR3Vzo6T5QDo
-         6po9L7OjpYdK+dkPqaJxe5sFM8VivLTtg+NzLHb9Jwc9Hsx9Me2rL8cLfgBzj5nRiVhs
-         UOIE5HuG0dvQ8ukrDBS/w74eGQIRR+x1SDkd27m8rLzrvXj4hsmCWK3yvfBxdDbJLUe5
-         LniiPbYkKAADNzFtjAMMppDL+iRxfMcb8jySQifUgAuOV1em9VkjRXSvi5APf+R3GOM2
-         wS+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715337306; x=1715942106;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7WF6NXAmShEkLi88sqZOX0cWWafeX5tooo7v0pkI1FQ=;
-        b=vRMneDCMyufyHydDLNfYMkbUg8TWjEscaVZsSQ3ccYKTbrWYbU2aiPENLWr0mPrB7j
-         EhQHecK5f/JXKRlVgOeBUr+ivROK27V4ySFkPvx3xo6v1EBUQxGXI+5nFymZBfwbIaRn
-         CAS9HAWYT63Hq5krVz91S6uTkVzHbtgIYqoLoTrqiB/3QnT26s6OSjhpaOVvHhb8f8qO
-         zQ3Fu6/KMHXLVy6+kXAdr0WhlhA3crz+CryEn+iwZL4cRiU9KZnQcm4iyYOOcMYmA5Yl
-         eSF8pK3bd+ijaKJsOn3I2MscZm3CSCHdw+AdX5CopLrDzzpKCmk6CompdMOrEGWvJYQf
-         6Z3A==
-X-Forwarded-Encrypted: i=1; AJvYcCXU6wyyuKhqy0o4GNIhGvEf94D2I3FqO9lCM2Pe7FaBC1ZYDP2GS3q+2qXNJs4lfkoJIlGzr0m8a35NPCFAqCm4qlDtZPrc
-X-Gm-Message-State: AOJu0YyNsxvBHfqJ85po9rB6GuT6rqM/+52ywi3G9Lv6FuK5/PRR+2wm
-	aGK4Anftp4pzTI6yfSYaRJUfHjn9nZc+ZewBCS6vZHjwctdqcBEKJDIlBFcpsG0=
-X-Google-Smtp-Source: AGHT+IEZdzOLT/qB1CrK1qM4rWDfvvPv8AKWCB3xY0cjp0hEZAQTWGTr+MhRIYstBgqcwctvkewJFw==
-X-Received: by 2002:a05:6512:33ce:b0:513:edf4:6f20 with SMTP id 2adb3069b0e04-5220fe79457mr1602566e87.54.1715337306127;
-        Fri, 10 May 2024 03:35:06 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b79bc99sm4190142f8f.11.2024.05.10.03.35.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 03:35:05 -0700 (PDT)
-Date: Fri, 10 May 2024 12:35:02 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, mst@redhat.com, jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, netdev@vger.kernel.org
-Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
-Message-ID: <Zj34VgY5yT7259iT@nanopsycho.orion>
-References: <20240509114615.317450-1-jiri@resnulli.us>
- <1715325076.4219763-2-hengqi@linux.alibaba.com>
+	s=arc-20240116; t=1715337410; c=relaxed/simple;
+	bh=b885mkoaowBayYp5fXXjWypVmC7CJmpFTZem7E8ZEVU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M5IKLM/FaPFFqT+n9aDcvNk+3k5CUaYi5zqwynHKsuSgrBcfZeOKxUCO3bg04AgqyZYdiBGpBUDsIXQ+VeTAY+r+gafD+QgPTXr9gsN3o1+6nO2wNzmngKXlB1vY02KgBegxB3KGJ+anLivLCkUQFO2m0xwRfYBq3r6H88f6Aa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I/sCuI9s; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <4c6a8b86-6544-4c99-a0f2-030e2ec4e98f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1715337405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CQwv+B8JLCi8Nn/Gx8F39vcswEdPMaokUDHh8iKT79Y=;
+	b=I/sCuI9sQDx4Co7JyiG2pdbHMCMyGy4yI7TvmiREuzpzE7qoGCge3LFgO9BnTOnSTUZ+kJ
+	ZSbYWyCnSjOd5Yj1aNceTWE1y4k00r+xEoYT5oZk//coZ3Rh2B8lcLLYx6UuEt61JMH0B2
+	/07Wp///4OoECJ+hdsXPZo98NqjAh5I=
+Date: Fri, 10 May 2024 11:35:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1715325076.4219763-2-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH V1 8/9] bnxt_en: Add TPH support in BNXT driver
+Content-Language: en-US
+To: Ajit Khaparde <ajit.khaparde@broadcom.com>
+Cc: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org, bhelgaas@google.com, corbet@lwn.net,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
+ michael.chan@broadcom.com, manoj.panicker2@amd.com, Eric.VanTassell@amd.com
+References: <20240509162741.1937586-1-wei.huang2@amd.com>
+ <20240509162741.1937586-9-wei.huang2@amd.com>
+ <868a4758-2873-4ede-83e5-65f42cb12b81@linux.dev>
+ <CACZ4nhuBMOX8s1ODcJOvvCKp-VsOPHShEUHAsPvB75Yv2823qA@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CACZ4nhuBMOX8s1ODcJOvvCKp-VsOPHShEUHAsPvB75Yv2823qA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Fri, May 10, 2024 at 09:11:16AM CEST, hengqi@linux.alibaba.com wrote:
->On Thu,  9 May 2024 13:46:15 +0200, Jiri Pirko <jiri@resnulli.us> wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> Add support for Byte Queue Limits (BQL).
->
->Historically both Jason and Michael have attempted to support BQL
->for virtio-net, for example:
->
->https://lore.kernel.org/netdev/21384cb5-99a6-7431-1039-b356521e1bc3@redhat.com/
->
->These discussions focus primarily on:
->
->1. BQL is based on napi tx. Therefore, the transfer of statistical information
->needs to rely on the judgment of use_napi. When the napi mode is switched to
->orphan, some statistical information will be lost, resulting in temporary
->inaccuracy in BQL.
->
->2. If tx dim is supported, orphan mode may be removed and tx irq will be more
->reasonable. This provides good support for BQL.
+On 10.05.2024 04:55, Ajit Khaparde wrote:
+> On Thu, May 9, 2024 at 2:50 PM Vadim Fedorenko
+> <vadim.fedorenko@linux.dev> wrote:
+>>
+>> On 09/05/2024 17:27, Wei Huang wrote:
+>>> From: Manoj Panicker <manoj.panicker2@amd.com>
+>>>
+>>> As a usage example, this patch implements TPH support in Broadcom BNXT
+>>> device driver by invoking pcie_tph_set_st() function when interrupt
+>>> affinity is changed.
+>>>
+>>> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+>>> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+>>> Reviewed-by: Wei Huang <wei.huang2@amd.com>
+>>> Signed-off-by: Manoj Panicker <manoj.panicker2@amd.com>
+>>> ---
+>>>    drivers/net/ethernet/broadcom/bnxt/bnxt.c | 51 +++++++++++++++++++++++
+>>>    drivers/net/ethernet/broadcom/bnxt/bnxt.h |  4 ++
+>>>    2 files changed, 55 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>>> index 2c2ee79c4d77..be9c17566fb4 100644
+>>> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>>> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>>> @@ -55,6 +55,7 @@
+>>>    #include <net/page_pool/helpers.h>
+>>>    #include <linux/align.h>
+>>>    #include <net/netdev_queues.h>
+>>> +#include <linux/pci-tph.h>
+>>>
+>>>    #include "bnxt_hsi.h"
+>>>    #include "bnxt.h"
+>>> @@ -10491,6 +10492,7 @@ static void bnxt_free_irq(struct bnxt *bp)
+>>>                                free_cpumask_var(irq->cpu_mask);
+>>>                                irq->have_cpumask = 0;
+>>>                        }
+>>> +                     irq_set_affinity_notifier(irq->vector, NULL);
+>>>                        free_irq(irq->vector, bp->bnapi[i]);
+>>>                }
+>>>
+>>> @@ -10498,6 +10500,45 @@ static void bnxt_free_irq(struct bnxt *bp)
+>>>        }
+>>>    }
+>>>
+>>> +static void bnxt_rtnl_lock_sp(struct bnxt *bp);
+>>> +static void bnxt_rtnl_unlock_sp(struct bnxt *bp);
+>>> +static void bnxt_irq_affinity_notify(struct irq_affinity_notify *notify,
+>>> +                                  const cpumask_t *mask)
+>>> +{
+>>> +     struct bnxt_irq *irq;
+>>> +
+>>> +     irq = container_of(notify, struct bnxt_irq, affinity_notify);
+>>> +     cpumask_copy(irq->cpu_mask, mask);
+>>> +
+>>> +     if (!pcie_tph_set_st(irq->bp->pdev, irq->msix_nr,
+>>> +                          cpumask_first(irq->cpu_mask),
+>>> +                          TPH_MEM_TYPE_VM, PCI_TPH_REQ_TPH_ONLY))
+>>> +             pr_err("error in configuring steering tag\n");
+>>> +
+>>> +     if (netif_running(irq->bp->dev)) {
+>>> +             rtnl_lock();
+>>> +             bnxt_close_nic(irq->bp, false, false);
+>>> +             bnxt_open_nic(irq->bp, false, false);
+>>> +             rtnl_unlock();
+>>> +     }
+>>
+>> Is it really needed? It will cause link flap and pause in the traffic
+>> service for the device. Why the device needs full restart in this case?
+> 
+> In that sequence only the rings are recreated for the hardware to sync
+> up the tags.
+> 
+> Actually its not a full restart. There is no link reinit or other
+> heavy lifting in this sequence.
+> The pause in traffic may be momentary. Do IRQ/CPU affinities change frequently?
+> Probably not?
 
-Thanks for the pointers, will check that out.
+ From what I can see in bnxt_en, proper validation of link_re_init parameter is
+not (yet?) implemented, __bnxt_open_nic will unconditionally call 
+netif_carrier_off() which will be treated as loss of carrier with counters
+increment and proper events posted. Changes to CPU affinities were 
+non-distruptive before the patch, but now it may break user-space assumptions.
 
+Does FW need full rings re-init to update target value, which is one u32 write?
+It looks like overkill TBH.
 
->
->Thanks.
->
->> 
->> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->> ---
->>  drivers/net/virtio_net.c | 33 ++++++++++++++++++++-------------
->>  1 file changed, 20 insertions(+), 13 deletions(-)
->> 
->> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> index 218a446c4c27..c53d6dc6d332 100644
->> --- a/drivers/net/virtio_net.c
->> +++ b/drivers/net/virtio_net.c
->> @@ -84,7 +84,9 @@ struct virtnet_stat_desc {
->>  
->>  struct virtnet_sq_free_stats {
->>  	u64 packets;
->> +	u64 xdp_packets;
->>  	u64 bytes;
->> +	u64 xdp_bytes;
->>  };
->>  
->>  struct virtnet_sq_stats {
->> @@ -512,19 +514,19 @@ static void __free_old_xmit(struct send_queue *sq, bool in_napi,
->>  	void *ptr;
->>  
->>  	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
->> -		++stats->packets;
->> -
->>  		if (!is_xdp_frame(ptr)) {
->>  			struct sk_buff *skb = ptr;
->>  
->>  			pr_debug("Sent skb %p\n", skb);
->>  
->> +			stats->packets++;
->>  			stats->bytes += skb->len;
->>  			napi_consume_skb(skb, in_napi);
->>  		} else {
->>  			struct xdp_frame *frame = ptr_to_xdp(ptr);
->>  
->> -			stats->bytes += xdp_get_frame_len(frame);
->> +			stats->xdp_packets++;
->> +			stats->xdp_bytes += xdp_get_frame_len(frame);
->>  			xdp_return_frame(frame);
->>  		}
->>  	}
->> @@ -965,7 +967,8 @@ static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
->>  	virtnet_rq_free_buf(vi, rq, buf);
->>  }
->>  
->> -static void free_old_xmit(struct send_queue *sq, bool in_napi)
->> +static void free_old_xmit(struct send_queue *sq, struct netdev_queue *txq,
->> +			  bool in_napi)
->>  {
->>  	struct virtnet_sq_free_stats stats = {0};
->>  
->> @@ -974,9 +977,11 @@ static void free_old_xmit(struct send_queue *sq, bool in_napi)
->>  	/* Avoid overhead when no packets have been processed
->>  	 * happens when called speculatively from start_xmit.
->>  	 */
->> -	if (!stats.packets)
->> +	if (!stats.packets && !stats.xdp_packets)
->>  		return;
->>  
->> +	netdev_tx_completed_queue(txq, stats.packets, stats.bytes);
->> +
->>  	u64_stats_update_begin(&sq->stats.syncp);
->>  	u64_stats_add(&sq->stats.bytes, stats.bytes);
->>  	u64_stats_add(&sq->stats.packets, stats.packets);
->> @@ -1013,13 +1018,15 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
->>  	 * early means 16 slots are typically wasted.
->>  	 */
->>  	if (sq->vq->num_free < 2+MAX_SKB_FRAGS) {
->> -		netif_stop_subqueue(dev, qnum);
->> +		struct netdev_queue *txq = netdev_get_tx_queue(dev, qnum);
->> +
->> +		netif_tx_stop_queue(txq);
->>  		if (use_napi) {
->>  			if (unlikely(!virtqueue_enable_cb_delayed(sq->vq)))
->>  				virtqueue_napi_schedule(&sq->napi, sq->vq);
->>  		} else if (unlikely(!virtqueue_enable_cb_delayed(sq->vq))) {
->>  			/* More just got used, free them then recheck. */
->> -			free_old_xmit(sq, false);
->> +			free_old_xmit(sq, txq, false);
->>  			if (sq->vq->num_free >= 2+MAX_SKB_FRAGS) {
->>  				netif_start_subqueue(dev, qnum);
->>  				virtqueue_disable_cb(sq->vq);
->> @@ -2319,7 +2326,7 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
->>  
->>  		do {
->>  			virtqueue_disable_cb(sq->vq);
->> -			free_old_xmit(sq, true);
->> +			free_old_xmit(sq, txq, true);
->>  		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
->>  
->>  		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
->> @@ -2471,7 +2478,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
->>  	txq = netdev_get_tx_queue(vi->dev, index);
->>  	__netif_tx_lock(txq, raw_smp_processor_id());
->>  	virtqueue_disable_cb(sq->vq);
->> -	free_old_xmit(sq, true);
->> +	free_old_xmit(sq, txq, true);
->>  
->>  	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
->>  		netif_tx_wake_queue(txq);
->> @@ -2553,7 +2560,7 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
->>  	struct send_queue *sq = &vi->sq[qnum];
->>  	int err;
->>  	struct netdev_queue *txq = netdev_get_tx_queue(dev, qnum);
->> -	bool kick = !netdev_xmit_more();
->> +	bool xmit_more = netdev_xmit_more();
->>  	bool use_napi = sq->napi.weight;
->>  
->>  	/* Free up any pending old buffers before queueing new ones. */
->> @@ -2561,9 +2568,9 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
->>  		if (use_napi)
->>  			virtqueue_disable_cb(sq->vq);
->>  
->> -		free_old_xmit(sq, false);
->> +		free_old_xmit(sq, txq, false);
->>  
->> -	} while (use_napi && kick &&
->> +	} while (use_napi && !xmit_more &&
->>  	       unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
->>  
->>  	/* timestamp packet in software */
->> @@ -2592,7 +2599,7 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
->>  
->>  	check_sq_full_and_disable(vi, dev, sq);
->>  
->> -	if (kick || netif_xmit_stopped(txq)) {
->> +	if (__netdev_tx_sent_queue(txq, skb->len, xmit_more)) {
->>  		if (virtqueue_kick_prepare(sq->vq) && virtqueue_notify(sq->vq)) {
->>  			u64_stats_update_begin(&sq->stats.syncp);
->>  			u64_stats_inc(&sq->stats.kicks);
->> -- 
->> 2.44.0
->> 
->> 
+And yes, affinities can be change on fly according to the changes of the
+workload on the host.
+
+>>
+>>
+>>> +}
+>>> +
+>>> +static void bnxt_irq_affinity_release(struct kref __always_unused *ref)
+>>> +{
+>>> +}
+>>> +
+>>> +static inline void __bnxt_register_notify_irqchanges(struct bnxt_irq *irq)
+>>
+>> No inlines in .c files, please. Let compiler decide what to inline.
+>>
+>>> +{
+>>> +     struct irq_affinity_notify *notify;
+>>> +
+>>> +     notify = &irq->affinity_notify;
+>>> +     notify->irq = irq->vector;
+>>> +     notify->notify = bnxt_irq_affinity_notify;
+>>> +     notify->release = bnxt_irq_affinity_release;
+>>> +
+>>> +     irq_set_affinity_notifier(irq->vector, notify);
+>>> +}
+>>> +
+>>>    static int bnxt_request_irq(struct bnxt *bp)
+>>>    {
+>>>        int i, j, rc = 0;
+>>> @@ -10543,6 +10584,7 @@ static int bnxt_request_irq(struct bnxt *bp)
+>>>                        int numa_node = dev_to_node(&bp->pdev->dev);
+>>>
+>>>                        irq->have_cpumask = 1;
+>>> +                     irq->msix_nr = map_idx;
+>>>                        cpumask_set_cpu(cpumask_local_spread(i, numa_node),
+>>>                                        irq->cpu_mask);
+>>>                        rc = irq_set_affinity_hint(irq->vector, irq->cpu_mask);
+>>> @@ -10552,6 +10594,15 @@ static int bnxt_request_irq(struct bnxt *bp)
+>>>                                            irq->vector);
+>>>                                break;
+>>>                        }
+>>> +
+>>> +                     if (!pcie_tph_set_st(bp->pdev, i,
+>>> +                                          cpumask_first(irq->cpu_mask),
+>>> +                                          TPH_MEM_TYPE_VM, PCI_TPH_REQ_TPH_ONLY)) {
+>>> +                             netdev_err(bp->dev, "error in setting steering tag\n");
+>>> +                     } else {
+>>> +                             irq->bp = bp;
+>>> +                             __bnxt_register_notify_irqchanges(irq);
+>>> +                     }
+>>>                }
+>>>        }
+>>>        return rc;
+>>> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+>>> index dd849e715c9b..0d3442590bb4 100644
+>>> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+>>> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+>>> @@ -1195,6 +1195,10 @@ struct bnxt_irq {
+>>>        u8              have_cpumask:1;
+>>>        char            name[IFNAMSIZ + 2];
+>>>        cpumask_var_t   cpu_mask;
+>>> +
+>>> +     int             msix_nr;
+>>> +     struct bnxt     *bp;
+>>> +     struct irq_affinity_notify affinity_notify;
+>>>    };
+>>>
+>>>    #define HWRM_RING_ALLOC_TX  0x1
+>>
+
 
