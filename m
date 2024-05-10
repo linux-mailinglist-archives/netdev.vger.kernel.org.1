@@ -1,50 +1,51 @@
-Return-Path: <netdev+bounces-95225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E23038C1B40
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 02:27:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 323B18C1BA3
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 02:35:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F06D1C20C42
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 00:27:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA47C284CDB
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 00:35:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD2913C3F4;
-	Fri, 10 May 2024 00:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2C544436C;
+	Fri, 10 May 2024 00:13:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KjySGI9x"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="mDwECrOZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.209])
+Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9BC13BAE2
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 00:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9B244C76
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 00:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715299886; cv=none; b=Oipmwpc12eyyMd5ywbpfTeGXea+hIgnGKLx6pU5pirbiS7M3P1s+LWz4g1qK448HmXfrYz03cOlyMwMPk5iVKH2UgtoZjpEqqeYYTtrTWHL5S7DRCjoZvw4cJpzcY26ZCOGTft2AWs/+xnbL3KHP3KPd5wZma0jW4z8ceX1KH68=
+	t=1715300006; cv=none; b=uRIkOi59rPWE1D6Nq6oynL4nzw/yT/QnE8rKthUr6ho5cXSZGHuDzCD9FMd32X/NnLRNbe0FJod22alRLpCoipdntWwYNWRvxrIQqhZLb9/xcnBrmxMLPtkzCy68mV1gg039WgiaXKwnVEgKgpWqdtvG2kQt2y0IXVQhnIXCBck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715299886; c=relaxed/simple;
-	bh=chyNa1uFVKbt4AA8a+7DGkvXTJ2CYHEPezpwZXD45PI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=urEm/3AfPbJqDpz82F14QMagIUDM5UnAmcTWMPjbSe+EQtwO4P9s9cSiuAC54GayuKQiMzW9iiAx6hv1uIxlgBXKz9jNGIJ6y1NWzAd6gfR1WlhiTas7NOF9DfL0WhZN85cJyz+gi/OU3i8M8mgmGUjJ2PKpjghva8i8h2QQk1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KjySGI9x; arc=none smtp.client-ip=192.19.144.209
+	s=arc-20240116; t=1715300006; c=relaxed/simple;
+	bh=s9CQjtPp1wHfwXMpCWMDDerkBZMNAsSPxnhRgahcXSk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=BsLSMsUMDPd1NhqjmKJ7YlHXd2LDSnGkBhE19Q2a0eVUDmvVP/yxkWRV9mKsaBc0z79jovom9BGp0aVU2iwMi5z9OkY4JsReIzG6p4HG7N/wLbq5id1ZGMGlaBKypL2hQjBwe8+8YJFdKqqBowcSr8ZMQ4Cg4XVtSHMzjRxItXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=mDwECrOZ; arc=none smtp.client-ip=192.19.144.205
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 7C6A3C0000D8;
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 91967C0000E3;
 	Thu,  9 May 2024 17:03:34 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 7C6A3C0000D8
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 91967C0000E3
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
 	s=dkimrelay; t=1715299414;
-	bh=chyNa1uFVKbt4AA8a+7DGkvXTJ2CYHEPezpwZXD45PI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=KjySGI9xgTSc7tTopZcE/1Hx42LyXxmJrNgW1vPis3ukLhPEf6mSyHzL0QaiYadtA
-	 nxEppxLPMY/6VKGvf9tzBan2JpFxEo1AbFUWm01mQZrlx/7TnIdq+4xO8Zjiikkzcx
-	 vsOaW5YBFYllCsciAHzoiboUdfC1BaV7Py3rf8NE=
+	bh=s9CQjtPp1wHfwXMpCWMDDerkBZMNAsSPxnhRgahcXSk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mDwECrOZMbt1ARtkiEj5zNTJ/p04LzO4+V5pjiGczlOu2Y1JPRA/SPdMKh0gHo/MC
+	 C2+RuaAzz/TLk7yAFoWWv8QEPWjup2gn1AH0YWbaViXQy5zqQbzzkPD+DouY2+MO9S
+	 lkmYYDSKBoB0J3et4JfLUmjQD8tvsk8edtVkYZOQ=
 Received: from lvnvdd6494.lvn.broadcom.net (lvnvdd6494.lvn.broadcom.net [10.36.237.243])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 99D2D18041CAC4;
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id A9C8318041CAC7;
 	Thu,  9 May 2024 17:03:32 -0700 (PDT)
 From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
 To: netdev@vger.kernel.org
@@ -54,10 +55,12 @@ Cc: jitendra.vegiraju@broadcom.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	bcm-kernel-feedback-list@broadcom.com
-Subject: [PATCH, net-next, 0/2] net: stmmac: support for BCM8958x SoC
-Date: Thu,  9 May 2024 17:03:29 -0700
-Message-Id: <20240510000331.154486-1-jitendra.vegiraju@broadcom.com>
+Subject: [PATCH, net-next, 2/2] net: stmmac: PCI driver for BCM8958X SoC
+Date: Thu,  9 May 2024 17:03:31 -0700
+Message-Id: <20240510000331.154486-3-jitendra.vegiraju@broadcom.com>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20240510000331.154486-1-jitendra.vegiraju@broadcom.com>
+References: <20240510000331.154486-1-jitendra.vegiraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,26 +69,734 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patchseries adds PCI driver support for Broadcom BCM8958x SoC devices.
-BCM8958x core functionality is similar to existing dwxgmac2 implementation.
-However, there are minor conflicting differences in dma operations.
+Broadcom BCM8958X SoCs use Synopsys XGMAC design, which is similar to
+dwxgmac2 core implementation in stmmac driver. The existing dwxgmac2 dma
+operation functions have some conflicting differences with BCM8958X.
+This glue driver attempts to reuse dwxgmac2 implementation wherever
+possible, adding alternative implementations where necessary.
 
-This driver will utilize dwxgmac2 core functions as much possible and
-implement alternative functions wherever functionality differs.
-
-Jitendra Vegiraju (2):
-  Export dma_ops for reuse in glue drivers.
-  PCI driver for BCM8958X SoC
-
+Signed-off-by: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+---
  MAINTAINERS                                   |   7 +
  drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
  drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
  .../net/ethernet/stmicro/stmmac/dwmac-brcm.c  | 657 ++++++++++++++++++
- .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  62 ++
- .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 149 ++--
- 6 files changed, 826 insertions(+), 61 deletions(-)
+ 4 files changed, 676 insertions(+)
  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.c
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 294e472d7de8..8bf9df7028d6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4115,6 +4115,13 @@ N:	brcmstb
+ N:	bcm7038
+ N:	bcm7120
+ 
++BROADCOM BCM8958X ETHERNET DRIVER
++M:	Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
++R:	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
++L:	netdev@vger.kernel.org
++S:	Maintained
++F:	drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.c
++
+ BROADCOM BCMBCA ARM ARCHITECTURE
+ M:	William Zhang <william.zhang@broadcom.com>
+ M:	Anand Gore <anand.gore@broadcom.com>
+diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+index 4ec61f1ee71a..6c06149712c8 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
++++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+@@ -286,6 +286,17 @@ config DWMAC_LOONGSON
+ 	  This selects the LOONGSON PCI bus support for the stmmac driver,
+ 	  Support for ethernet controller on Loongson-2K1000 SoC and LS7A1000 bridge.
+ 
++config DWMAC_BRCM
++	tristate "Broadcom XGMAC support"
++	depends on STMMAC_ETH && PCI
++	depends on COMMON_CLK
++	help
++	  Support for ethernet controllers on Broadcom BCM8958x SoCs
++
++	  This selects Broadcom XGMAC specific PCI bus support for the
++	  stmmac driver. This driver provides the glue layer on top of the
++	  stmmac driver required for the Broadcom BCM8958x SoC devices.
++
+ config STMMAC_PCI
+ 	tristate "STMMAC PCI bus support"
+ 	depends on STMMAC_ETH && PCI
+diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
+index 26cad4344701..1cd0f508bafb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/Makefile
++++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
+@@ -40,4 +40,5 @@ dwmac-altr-socfpga-objs := dwmac-socfpga.o
+ obj-$(CONFIG_STMMAC_PCI)	+= stmmac-pci.o
+ obj-$(CONFIG_DWMAC_INTEL)	+= dwmac-intel.o
+ obj-$(CONFIG_DWMAC_LOONGSON)	+= dwmac-loongson.o
++obj-$(CONFIG_DWMAC_BRCM)	+= dwmac-brcm.o
+ stmmac-pci-objs:= stmmac_pci.o
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.c
+new file mode 100644
+index 000000000000..86125f59a8ff
+--- /dev/null
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.c
+@@ -0,0 +1,657 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (c) 2024 Broadcom Corporation
++ * This file contains the functions to handle the Broadcom XGMAC PCI driver.
++ *
++ */
++
++#include <linux/clk-provider.h>
++#include <linux/dmi.h>
++#include <linux/pci.h>
++#include <linux/phy.h>
++#include <linux/phy_fixed.h>
++
++#include "stmmac.h"
++#include "dwxgmac2.h"
++
++#define PCI_DEVICE_ID_BROADCOM_BCM8958X		0xa00d
++#define BRCM_MAX_MTU				1500
++#define READ_POLL_DELAY_US			100
++#define READ_POLL_TIMEOUT_US			10000
++#define DWMAC_125MHZ				125000000
++#define DWMAC_250MHZ				250000000
++
++/* TX and RX Queue couts */
++#define BRCM_TX_Q_COUNT				4
++#define BRCM_RX_Q_COUNT				1
++
++/* PDMA Channel counts */
++#define PDMA_TX_CH_COUNT			8
++#define PDMA_RX_CH_COUNT			10
++
++/* PDMA register type */
++#define PDMA_CH_TX_EXT_CFGR			0
++#define PDMA_CH_RX_EXT_CFGR			1
++#define PDMA_CH_TX_DBG_STSR			2
++#define PDMA_CH_RX_DBG_STSR			3
++
++/* VDMA register type */
++#define VDMA_CH_TX_DESC_CTRLR			4
++#define VDMA_CH_RX_DESC_CTRLR			5
++
++/* VDMA channel count */
++#define VDMA_TOTAL_CH_COUNT			32
++
++#define DMA_CH_IND_CTRLR			0x3080
++#define DMA_CH_IND_DATAR			0x3084
++
++#define BRCM_XGMAC_RX_CFG			0x2000
++#define BRCM_XGMAC_RXQ_CTRL1_CFG		0x8000
++
++#define BRCM_XGMAC_DMA_TX_SIZE			4096
++#define BRCM_XGMAC_DMA_RX_SIZE			4096
++#define BRCM_XGMAC_BAR0_MASK			BIT(0)
++
++#define BRCM_XGMAC_IOMEM_MISC_REG_OFFSET	0x0
++#define BRCM_XGMAC_IOMEM_MBOX_REG_OFFSET	0x1000
++#define BRCM_XGMAC_IOMEM_CFG_REG_OFFSET		0x3000
++
++#define XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_LOW	0x940
++#define XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_LO_VALUE	0x00000001
++#define XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_HIGH	0x944
++#define XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_HI_VALUE	0x88000000
++
++#define XGMAC_PCIE_MISC_MII_CTRL			0x4
++#define XGMAC_PCIE_MISC_MII_CTRL_VALUE			0x7
++#define XGMAC_PCIE_MISC_PCIESS_CTRL			0x8
++#define XGMAC_PCIE_MISC_PCIESS_CTRL_VALUE		0x200
++#define XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_LO		0x90
++#define XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_LO_VALUE	0x00000001
++#define XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_HI		0x94
++#define XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_HI_VALUE	0x88000000
++#define XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST0	0x700
++#define XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST0_VALUE	1
++#define XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST1	0x704
++#define XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST1_VALUE	1
++#define XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST_DBELL	0x728
++#define XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST_DBELL_VALUE	1
++#define XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_SBD_ALL		0x740
++#define XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_SBD_ALL_VALUE	0
++
++#define DMA_CH_IND_CTRLR_MSEL_OFF		24
++#define DMA_CH_IND_CTRLR_MSEL_MASK		GENMASK(27, 24)
++#define DMA_CH_IND_CTRLR_AOFF_OFF		8
++#define DMA_CH_IND_CTRLR_AOFF_MASK		GENMASK(14, 8)
++#define DMA_CH_IND_CTRLR_AUTO_OFF		4
++#define DMA_CH_IND_CTRLR_AUTO_MASK		GENMASK(5, 4)
++#define DMA_CH_IND_CTRLR_CT_OFF			1
++#define DMA_CH_IND_CTRLR_CT_MASK		BIT(1)
++#define DMA_CH_IND_CTRLR_OB_OFF			0
++#define DMA_CH_IND_CTRLR_OB_MASK		BIT(0)
++
++/* DMA Descriptor configuration */
++#define BRCM_PDMA_DESC_CTRL_CFG_VALUE		0x1B
++
++#define XGMAC_PCIE_MISC_FUNC_RESOURCES_PF0	0x804
++
++/* MSIX Vector map register starting offsets */
++#define XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_RX0_PF0	0x840
++#define XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_TX0_PF0	0x890
++#define BRCM_MAX_DMA_CHANNEL_PAIRS		4
++
++#define BRCM_XGMAC_MSI_MAC_VECTOR		0
++#define BRCM_XGMAC_MSI_RX_VECTOR_START		9
++#define BRCM_XGMAC_MSI_TX_VECTOR_START		10
++
++static int num_instances;
++
++struct brcm_priv_data {
++	struct phy_device *phy_dev;
++	void __iomem *mbox_regs;    /* MBOX */
++	void __iomem *misc_regs;    /* MISC_cfg */
++	u16	dev_id;
++	u16	phy_addr;
++};
++
++static struct fixed_phy_status dwxgmac_brcm_fixed_phy_status = {
++	.link	= 1,
++	.speed	= SPEED_1000,
++	.duplex	= DUPLEX_FULL,
++};
++
++struct dwxgmac_brcm_pci_info {
++	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
++};
++
++static inline void misc_iowrite(struct brcm_priv_data *brcm_priv,
++				u32 reg, u32 val)
++{
++	iowrite32(val, brcm_priv->misc_regs + reg);
++}
++
++static void dwxgmac_brcm_pdma_set(void __iomem *ioaddr, u32 type, u32 chan,
++				  u32 val)
++{
++	u32 var = 0;
++
++	var |= FIELD_PREP(DMA_CH_IND_CTRLR_MSEL_MASK, type);
++	var |= FIELD_PREP(DMA_CH_IND_CTRLR_AOFF_MASK, chan);
++	var |= FIELD_PREP(DMA_CH_IND_CTRLR_CT_MASK, 0);
++	var |= FIELD_PREP(DMA_CH_IND_CTRLR_OB_MASK, 1);
++
++	if (!FIELD_GET(DMA_CH_IND_CTRLR_OB_MASK,
++		       readl(ioaddr + DMA_CH_IND_CTRLR))) {
++		writel(0x0, (ioaddr + DMA_CH_IND_CTRLR));
++		writel(val, (ioaddr + DMA_CH_IND_DATAR));
++	}
++
++	writel(var, (ioaddr + DMA_CH_IND_CTRLR));
++	readl_poll_timeout(ioaddr + DMA_CH_IND_CTRLR, var,
++			   !(var & XGMAC_OB), READ_POLL_TIMEOUT_US,
++			   READ_POLL_TIMEOUT_US);
++}
++
++static void dwxgmac_brcm_dma_init(void __iomem *ioaddr,
++				  struct stmmac_dma_cfg *dma_cfg, int atds)
++{
++	u32 val = dma_cfg->pbl << 24;
++	u32 i;
++
++	if (dma_cfg->pblx8)
++		val |= (1 << 19);
++
++	dwxgmac2_dma_init(ioaddr, dma_cfg, atds);
++
++	for (i = 0; i < PDMA_TX_CH_COUNT; i++)
++		dwxgmac_brcm_pdma_set(ioaddr, PDMA_CH_TX_EXT_CFGR, i, val);
++
++	for (i = 0; i < PDMA_RX_CH_COUNT; i++)
++		dwxgmac_brcm_pdma_set(ioaddr, PDMA_CH_RX_EXT_CFGR, i, val);
++
++	for (i = 0; i < VDMA_TOTAL_CH_COUNT; i++) {
++		dwxgmac_brcm_pdma_set(ioaddr, VDMA_CH_TX_DESC_CTRLR, i,
++				      BRCM_PDMA_DESC_CTRL_CFG_VALUE);
++		dwxgmac_brcm_pdma_set(ioaddr, VDMA_CH_RX_DESC_CTRLR, i,
++				      BRCM_PDMA_DESC_CTRL_CFG_VALUE);
++	}
++}
++
++static void dwxgmac_brcm_dma_init_tx_chan(struct stmmac_priv *priv,
++					  void __iomem *ioaddr,
++					  struct stmmac_dma_cfg *dma_cfg,
++					  dma_addr_t phy, u32 chan)
++{
++	u32 value;
++
++	value = readl(ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
++	value &= ~XGMAC_TxPBL;
++	value &= ~GENMASK(6, 4);
++	writel(value, ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
++
++	writel(upper_32_bits(phy), ioaddr + XGMAC_DMA_CH_TxDESC_HADDR(chan));
++	writel(lower_32_bits(phy), ioaddr + XGMAC_DMA_CH_TxDESC_LADDR(chan));
++}
++
++static void dwxgmac_brcm_dma_init_rx_chan(struct stmmac_priv *priv,
++					  void __iomem *ioaddr,
++					  struct stmmac_dma_cfg *dma_cfg,
++					  dma_addr_t phy, u32 chan)
++{
++	u32 value;
++
++	value = readl(ioaddr + XGMAC_DMA_CH_RX_CONTROL(chan));
++	value &= ~XGMAC_RxPBL;
++	writel(value, ioaddr + XGMAC_DMA_CH_RX_CONTROL(chan));
++
++	writel(upper_32_bits(phy), ioaddr + XGMAC_DMA_CH_RxDESC_HADDR(chan));
++	writel(lower_32_bits(phy), ioaddr + XGMAC_DMA_CH_RxDESC_LADDR(chan));
++}
++
++const struct stmmac_dma_ops dwxgmac_brcm_dma_ops = {
++	.reset = dwxgmac2_dma_reset,
++	.init = dwxgmac_brcm_dma_init,
++	.init_chan = dwxgmac2_dma_init_chan,
++	.init_rx_chan = dwxgmac_brcm_dma_init_rx_chan,
++	.init_tx_chan = dwxgmac_brcm_dma_init_tx_chan,
++	.axi = dwxgmac2_dma_axi,
++	.dump_regs = dwxgmac2_dma_dump_regs,
++	.dma_rx_mode = dwxgmac2_dma_rx_mode,
++	.dma_tx_mode = dwxgmac2_dma_tx_mode,
++	.enable_dma_irq = dwxgmac2_enable_dma_irq,
++	.disable_dma_irq = dwxgmac2_disable_dma_irq,
++	.start_tx = dwxgmac2_dma_start_tx,
++	.stop_tx = dwxgmac2_dma_stop_tx,
++	.start_rx = dwxgmac2_dma_start_rx,
++	.stop_rx = dwxgmac2_dma_stop_rx,
++	.dma_interrupt = dwxgmac2_dma_interrupt,
++	.get_hw_feature = dwxgmac2_get_hw_feature,
++	.rx_watchdog = dwxgmac2_rx_watchdog,
++	.set_rx_ring_len = dwxgmac2_set_rx_ring_len,
++	.set_tx_ring_len = dwxgmac2_set_tx_ring_len,
++	.set_rx_tail_ptr = dwxgmac2_set_rx_tail_ptr,
++	.set_tx_tail_ptr = dwxgmac2_set_tx_tail_ptr,
++	.enable_tso = dwxgmac2_enable_tso,
++	.qmode = dwxgmac2_qmode,
++	.set_bfsize = dwxgmac2_set_bfsize,
++	.enable_sph = dwxgmac2_enable_sph,
++	.enable_tbs = dwxgmac2_enable_tbs,
++};
++
++static void dwxgmac_brcm_fix_speed(void *priv, unsigned int speed,
++				   unsigned int mode)
++{
++}
++
++static struct mac_device_info *dwxgmac_brcm_setup(void *ppriv)
++{
++	struct mac_device_info *mac;
++	struct stmmac_priv *priv = ppriv;
++
++	mac = devm_kzalloc(priv->device, sizeof(*mac), GFP_KERNEL);
++	if (!mac)
++		return NULL;
++
++	mac->dma = &dwxgmac_brcm_dma_ops;
++
++	priv->dma_conf.dma_tx_size = BRCM_XGMAC_DMA_TX_SIZE;
++	priv->dma_conf.dma_rx_size = BRCM_XGMAC_DMA_RX_SIZE;
++	priv->plat->rss_en = 1;
++	mac->pcsr = priv->ioaddr;
++	priv->dev->priv_flags |= IFF_UNICAST_FLT;
++	mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
++	mac->unicast_filter_entries = priv->plat->unicast_filter_entries;
++	mac->mcast_bits_log2 = 0;
++
++	if (mac->multicast_filter_bins)
++		mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
++
++	mac->link.duplex = 0;
++	mac->link.xgmii.speed10000 = XGMAC_CONFIG_SS_10000;
++	mac->link.speed_mask = XGMAC_CONFIG_SS_MASK;
++	return mac;
++}
++
++static void dwxgmac_brcm_common_default_data(struct plat_stmmacenet_data *plat)
++{
++	int i;
++
++	plat->has_xgmac = 1;
++	plat->force_sf_dma_mode = 1;
++	plat->mac_port_sel_speed = SPEED_10000;
++	plat->clk_ptp_rate = DWMAC_125MHZ;
++	plat->clk_ref_rate = DWMAC_250MHZ;
++	plat->setup = dwxgmac_brcm_setup;
++	plat->tx_coe = 1;
++	plat->rx_coe = 1;
++	plat->max_speed = SPEED_10000;
++	plat->fix_mac_speed = dwxgmac_brcm_fix_speed;
++
++	/* Set default value for multicast hash bins */
++	plat->multicast_filter_bins = HASH_TABLE_SIZE;
++
++	/* Set default value for unicast filter entries */
++	plat->unicast_filter_entries = 1;
++
++	/* Set the maxmtu to device's default */
++	plat->maxmtu = BRCM_MAX_MTU;
++
++	/* Set default number of RX and TX queues to use */
++	plat->tx_queues_to_use = BRCM_TX_Q_COUNT;
++	plat->rx_queues_to_use = BRCM_RX_Q_COUNT;
++
++	plat->tx_sched_algorithm = MTL_TX_ALGORITHM_SP;
++	for (i = 0; i < plat->tx_queues_to_use; i++) {
++		plat->tx_queues_cfg[i].use_prio = false;
++		plat->tx_queues_cfg[i].prio = 0;
++		plat->tx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
++	}
++
++	plat->rx_sched_algorithm = MTL_RX_ALGORITHM_SP;
++	for (i = 0; i < plat->rx_queues_to_use; i++) {
++		plat->rx_queues_cfg[i].use_prio = false;
++		plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
++		plat->rx_queues_cfg[i].pkt_route = 0x0;
++		plat->rx_queues_cfg[i].chan = i;
++	}
++}
++
++static int dwxgmac_brcm_default_data(struct pci_dev *pdev,
++				     struct plat_stmmacenet_data *plat)
++{
++	struct brcm_priv_data *brcm_priv = plat->bsp_priv;
++
++	/* Set common default data first */
++	dwxgmac_brcm_common_default_data(plat);
++
++	plat->bus_id = 0;
++	plat->phy_addr = num_instances++;
++	brcm_priv->phy_addr = num_instances;
++	plat->phy_interface = PHY_INTERFACE_MODE_USXGMII;
++
++	plat->dma_cfg->pbl = 32;
++	plat->dma_cfg->pblx8 = 0;
++	plat->dma_cfg->aal = 0;
++	plat->dma_cfg->eame = 1;
++
++	plat->axi->axi_wr_osr_lmt = 31;
++	plat->axi->axi_rd_osr_lmt = 31;
++	plat->axi->axi_fb = 0;
++	plat->axi->axi_blen[0] = 4;
++	plat->axi->axi_blen[1] = 8;
++	plat->axi->axi_blen[2] = 16;
++	plat->axi->axi_blen[3] = 32;
++	plat->axi->axi_blen[4] = 64;
++	plat->axi->axi_blen[5] = 128;
++	plat->axi->axi_blen[6] = 256;
++
++	plat->msi_mac_vec = BRCM_XGMAC_MSI_MAC_VECTOR;
++	plat->msi_rx_base_vec = BRCM_XGMAC_MSI_RX_VECTOR_START;
++	plat->msi_tx_base_vec = BRCM_XGMAC_MSI_TX_VECTOR_START;
++
++	return 0;
++}
++
++static struct dwxgmac_brcm_pci_info dwxgmac_brcm_pci_info = {
++	.setup = dwxgmac_brcm_default_data,
++};
++
++static int brcm_config_multi_msi(struct pci_dev *pdev,
++				 struct plat_stmmacenet_data *plat,
++				 struct stmmac_resources *res)
++{
++	int ret;
++	int i;
++
++	if (plat->msi_rx_base_vec >= STMMAC_MSI_VEC_MAX ||
++	    plat->msi_tx_base_vec >= STMMAC_MSI_VEC_MAX) {
++		dev_err(&pdev->dev, "%s: Invalid RX & TX vector defined\n",
++			__func__);
++		return -EINVAL;
++	}
++
++	ret = pci_alloc_irq_vectors(pdev, 2, STMMAC_MSI_VEC_MAX,
++				    PCI_IRQ_MSI | PCI_IRQ_MSIX);
++	if (ret < 0) {
++		dev_err(&pdev->dev, "%s: multi MSI enablement failed\n",
++			__func__);
++		return ret;
++	}
++
++	/* For RX MSI */
++	for (i = 0; i < plat->rx_queues_to_use; i++)
++		res->rx_irq[i] = pci_irq_vector(pdev,
++						plat->msi_rx_base_vec + i * 2);
++
++	/* For TX MSI */
++	for (i = 0; i < plat->tx_queues_to_use; i++)
++		res->tx_irq[i] = pci_irq_vector(pdev,
++						plat->msi_tx_base_vec + i * 2);
++
++	if (plat->msi_mac_vec < STMMAC_MSI_VEC_MAX)
++		res->irq = pci_irq_vector(pdev, plat->msi_mac_vec);
++
++	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
++	plat->flags |= STMMAC_FLAG_TSO_EN;
++
++	return 0;
++}
++
++/**
++ * dwxgmac_brcm_pci_probe
++ *
++ * @pdev: pci device pointer
++ * @id: pointer to table of device id/id's.
++ *
++ * Description: This probing function gets called for all PCI devices which
++ * match the ID table and are not "owned" by other driver yet. This function
++ * gets passed a "struct pci_dev *" for each device whose entry in the ID table
++ * matches the device. The probe functions returns zero when the driver choose
++ * to take "ownership" of the device or an error code(-ve no) otherwise.
++ */
++static int dwxgmac_brcm_pci_probe(struct pci_dev *pdev,
++				  const struct pci_device_id *id)
++{
++	struct dwxgmac_brcm_pci_info *info =
++		(struct dwxgmac_brcm_pci_info *)id->driver_data;
++	struct plat_stmmacenet_data *plat;
++	struct brcm_priv_data *brcm_priv;
++	struct stmmac_resources res;
++	struct net_device *ndev;
++	struct stmmac_priv *priv;
++	int rx_offset;
++	int tx_offset;
++	int vector;
++	int ret;
++
++	brcm_priv = devm_kzalloc(&pdev->dev, sizeof(*brcm_priv), GFP_KERNEL);
++	if (!brcm_priv)
++		return -ENOMEM;
++
++	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
++	if (!plat)
++		return -ENOMEM;
++
++	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg),
++				     GFP_KERNEL);
++	if (!plat->dma_cfg)
++		return -ENOMEM;
++
++	plat->axi = devm_kzalloc(&pdev->dev, sizeof(*plat->axi), GFP_KERNEL);
++	if (!plat->axi)
++		return -ENOMEM;
++
++	pci_read_config_word(pdev, 2, &brcm_priv->dev_id);
++
++	/* This device interface is directly attached to the switch chip on
++	 *  the SoC. Since no MDIO is present, register fixed_phy.
++	 */
++	brcm_priv->phy_dev =
++		 fixed_phy_register(PHY_POLL,
++				    &dwxgmac_brcm_fixed_phy_status, NULL);
++	if (IS_ERR(brcm_priv->phy_dev)) {
++		dev_err(&pdev->dev, "%s\tNo PHY/fixed_PHY found\n", __func__);
++		return -ENODEV;
++	}
++	phy_attached_info(brcm_priv->phy_dev);
++
++	/* Disable D3COLD as our device does not support it */
++	pci_d3cold_disable(pdev);
++
++	/* Enable PCI device */
++	ret = pcim_enable_device(pdev);
++	if (ret) {
++		dev_err(&pdev->dev, "%s: ERROR: failed to enable device\n",
++			__func__);
++		return ret;
++	}
++
++	/* Get the base address of device */
++	ret = pcim_iomap_regions(pdev, BRCM_XGMAC_BAR0_MASK, pci_name(pdev));
++	if (ret)
++		goto err_disable_device;
++	pci_set_master(pdev);
++
++	memset(&res, 0, sizeof(res));
++	res.addr = pcim_iomap_table(pdev)[0];
++	/* MISC Regs */
++	brcm_priv->misc_regs = res.addr + BRCM_XGMAC_IOMEM_MISC_REG_OFFSET;
++	/* MBOX Regs */
++	brcm_priv->mbox_regs = res.addr + BRCM_XGMAC_IOMEM_MBOX_REG_OFFSET;
++	/* XGMAC config Regs */
++	res.addr += BRCM_XGMAC_IOMEM_CFG_REG_OFFSET;
++
++	plat->bsp_priv = brcm_priv;
++
++	/* Initialize all MSI vectors to invalid so that it can be set
++	 * according to platform data settings below.
++	 * Note: MSI vector takes value from 0 up to 31 (STMMAC_MSI_VEC_MAX)
++	 */
++	plat->msi_mac_vec = STMMAC_MSI_VEC_MAX;
++	plat->msi_wol_vec = STMMAC_MSI_VEC_MAX;
++	plat->msi_lpi_vec = STMMAC_MSI_VEC_MAX;
++	plat->msi_sfty_ce_vec = STMMAC_MSI_VEC_MAX;
++	plat->msi_sfty_ue_vec = STMMAC_MSI_VEC_MAX;
++	plat->msi_rx_base_vec = STMMAC_MSI_VEC_MAX;
++	plat->msi_tx_base_vec = STMMAC_MSI_VEC_MAX;
++
++	ret = info->setup(pdev, plat);
++	if (ret)
++		goto err_disable_device;
++
++	pci_write_config_dword(pdev, XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_LOW,
++			       XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_LO_VALUE);
++	pci_write_config_dword(pdev, XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_HIGH,
++			       XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_HI_VALUE);
++
++	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_LO,
++		     XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_LO_VALUE);
++	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_HI,
++		     XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_HI_VALUE);
++
++	/* SBD Interrupt */
++	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_SBD_ALL,
++		     XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_SBD_ALL_VALUE);
++	/* EP_DOORBELL Interrupt */
++	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST_DBELL,
++		     XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST_DBELL_VALUE);
++	/* EP_H0 Interrupt */
++	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST0,
++		     XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST0_VALUE);
++	/* EP_H1 Interrupt */
++	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST1,
++		     XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST1_VALUE);
++
++	rx_offset = XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_RX0_PF0;
++	tx_offset = XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_TX0_PF0;
++	vector = BRCM_XGMAC_MSI_RX_VECTOR_START;
++	for (int i = 0; i < BRCM_MAX_DMA_CHANNEL_PAIRS; i++) {
++		/* RX Interrupt */
++		misc_iowrite(brcm_priv, rx_offset, vector++);
++		/* TX Interrupt */
++		misc_iowrite(brcm_priv, tx_offset, vector++);
++		rx_offset += 4;
++		tx_offset += 4;
++	}
++
++	/* Enable Switch Link */
++	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MII_CTRL,
++		     XGMAC_PCIE_MISC_MII_CTRL_VALUE);
++	/* Enable MSI-X */
++	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_PCIESS_CTRL,
++		     XGMAC_PCIE_MISC_PCIESS_CTRL_VALUE);
++
++	ret = brcm_config_multi_msi(pdev, plat, &res);
++	if (ret) {
++		dev_err(&pdev->dev,
++			"%s: ERROR: failed to enable IRQ\n", __func__);
++		return ret;
++	}
++
++	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
++	if (ret)
++		goto err_disable_msi;
++
++	/* The stmmac core driver doesn't have the infrastructure to
++	 * support fixed-phy mdio bus for non-platform bus drivers.
++	 * Until a better solution is implemented, initialize the
++	 * following entries after priv structure is populated.
++	 */
++	ndev = dev_get_drvdata(&pdev->dev);
++	priv = netdev_priv(ndev);
++	priv->mii = mdio_find_bus("fixed-0");
++
++	ndev->hw_features &= ~NETIF_F_HW_VLAN_CTAG_RX;
++	priv->hw->hw_vlan_en = false;
++
++	dev_info(&pdev->dev, "%s\tComplete\n", __func__);
++
++	return ret;
++
++err_disable_msi:
++	pci_disable_msi(pdev);
++err_disable_device:
++	pci_disable_device(pdev);
++	return ret;
++}
++
++/**
++ * dwxgmac_brcm_pci_remove
++ *
++ * @pdev: platform device pointer
++ * Description: this function calls the main to free the net resources
++ * and releases the PCI resources.
++ */
++static void dwxgmac_brcm_pci_remove(struct pci_dev *pdev)
++{
++	struct net_device *ndev = dev_get_drvdata(&pdev->dev);
++	struct stmmac_priv *priv = netdev_priv(ndev);
++	struct brcm_priv_data *brcm_priv = priv->plat->bsp_priv;
++	struct phy_device *phydev = brcm_priv->phy_dev;
++
++	priv->mii = NULL;
++	stmmac_dvr_remove(&pdev->dev);
++	pcim_iounmap_regions(pdev, BRCM_XGMAC_BAR0_MASK);
++	pci_clear_master(pdev);
++	fixed_phy_unregister(phydev);
++}
++
++static int __maybe_unused dwxgmac_brcm_pci_suspend(struct device *dev)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	int ret;
++
++	ret = stmmac_suspend(dev);
++	if (ret)
++		return ret;
++
++	ret = pci_save_state(pdev);
++	if (ret)
++		return ret;
++
++	pci_disable_device(pdev);
++	pci_wake_from_d3(pdev, true);
++	return 0;
++}
++
++static int __maybe_unused dwxgmac_brcm_pci_resume(struct device *dev)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	int ret;
++
++	pci_restore_state(pdev);
++	pci_set_power_state(pdev, PCI_D0);
++
++	ret = pci_enable_device(pdev);
++	if (ret)
++		return ret;
++
++	pci_set_master(pdev);
++
++	return stmmac_resume(dev);
++}
++
++static SIMPLE_DEV_PM_OPS(dwxgmac_brcm_pm_ops,
++			 dwxgmac_brcm_pci_suspend,
++			 dwxgmac_brcm_pci_resume);
++
++static const struct pci_device_id dwxgmac_brcm_id_table[] = {
++	{ PCI_DEVICE_DATA(BROADCOM, BCM8958X, &dwxgmac_brcm_pci_info) },
++	{}
++};
++
++MODULE_DEVICE_TABLE(pci, dwxgmac_brcm_id_table);
++
++static struct pci_driver dwxgmac_brcm_pci_driver = {
++	.name = "brcm-bcm8958x",
++	.id_table = dwxgmac_brcm_id_table,
++	.probe	= dwxgmac_brcm_pci_probe,
++	.remove = dwxgmac_brcm_pci_remove,
++	.driver = {
++		.pm = &dwxgmac_brcm_pm_ops,
++	},
++};
++
++module_pci_driver(dwxgmac_brcm_pci_driver);
++
++MODULE_DESCRIPTION("Broadcom 10G Automotive Ethernet PCIe driver");
++MODULE_LICENSE("GPL");
 -- 
 2.25.1
 
