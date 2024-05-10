@@ -1,146 +1,106 @@
-Return-Path: <netdev+bounces-95394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE2C88C2281
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:53:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63EBF8C2285
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:54:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CE4A1C210E7
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:53:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A8391F2176A
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:54:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80AD16C873;
-	Fri, 10 May 2024 10:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF0A1607AC;
+	Fri, 10 May 2024 10:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GbbtysMj"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Vxkx7PKd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B66C16C691
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 10:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63F321340
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 10:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715338381; cv=none; b=EKP8dEM8w2dnO41O3RIfkq2Gsy2GfH5Id5tyLk7ZgEdA0gWF6kFLH7+JnTIapc1Mvf5I5vDLZj0pO+ygmfj4oevwTvnu30peoPklWB+WzLylgp9mPrR/Pa2BSBSgOL+U4qcWDwkl9dfS7pkSzsEsvbQcUbh/7jjJJZTDjyIsUKM=
+	t=1715338456; cv=none; b=eSFVAHmqiDYeBfn/n1mtqKT23j1txit9mITmzIfG/nA4zpqfwR0ehptdYXGw5CWTck5HmtPWg8x/PR4dRY2We6DxFh1EqGRGje7KxTTkGbozvmManov7PEVEUEG27LdzTQ3I7DKw2tKLxrnMTcTUjGlfay7PpYYmyuAjrqu/g0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715338381; c=relaxed/simple;
-	bh=ocV1iitruywNeS3LsDx+ECd6GmmCgzJALrmUamG6X/c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=urNTBLyiNRNDGWpcEjYFRLtRDD3Qgxtqj1mXVAGVVea5xRe3TmqBqgAPkU3Xx0Bnn+uUgpMGAYX/sBI8kTXpMge0q99BK3q45wJdpJRojqKK7ZOLKu7KSaKXtBYfXMMxVOjhULydn23TnO2/7X1j/esrdi+IH8mLBMsN6DrpRck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GbbtysMj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715338379;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=87j9es5GKBqYf1Oh12DDQjpVqARqFQ5m4FHRLb5iAAw=;
-	b=GbbtysMjS+TQrITABEY+9Gqo0iAO4srrhlAd0IVTB62eoEgDB+uaqIaRSqHELEO0DuRCxk
-	ANy13wHI0o/nL/v+2jygSLK0S5h5qj3Xpg2rZYftpRFWz59etvIrb2QyhRu02GLxTPTQBi
-	kfDlkXUKmoWDhFIt8stOjiCkaKMS2Ew=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-482-Kb3_20oLNZufKA3_Eb1Kvw-1; Fri, 10 May 2024 06:52:57 -0400
-X-MC-Unique: Kb3_20oLNZufKA3_Eb1Kvw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-41c01902e60so9703225e9.3
-        for <netdev@vger.kernel.org>; Fri, 10 May 2024 03:52:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715338376; x=1715943176;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=87j9es5GKBqYf1Oh12DDQjpVqARqFQ5m4FHRLb5iAAw=;
-        b=O/anpgUQQHqXENuUgpr3ZIyRArvEApN4ThA70o1prQeVO45jXbMCnhnd42Yavj9D18
-         TtjM9YO3ftR2H4YIJS7HbZ85OFeK/IYe9KHGsvHIS2SZKfdrOoQydUZvbdR0p7Dd1pXG
-         RRWfZvEkEt+/AQSb2cGRaE1uif16M7qV/osCksZLhQGYR6FE7BX3bk8nyi1j+GK/Kk4T
-         gZ33LjnZz+8Vr6ASrJJymg4BvF8VuGce1hvxq8/Ncffc6z5o+dqP7/ORpiVX9i+IYSwr
-         Kmzlttw1gfOvu9VSeNqQkpy2xTOkHCOAnbKnYEUnvPmTA4c3T1kPDTvEqBvchKnnX35c
-         Z2dA==
-X-Gm-Message-State: AOJu0Yy+inIS7ZuvOsjfHsgpkteLph8EIAARv9yp+y9w2ABx5N2cjgpY
-	9liGk4l3xwYvP5deYDEInP+bdHyVE5yj150ptlUCRF3WUpcLAs/Y6mDeQbSXafihiGrmeBTBTbM
-	kSjSJv/95xoN0Im10DTMnfoR6DExIpBJON9cuLKfdCRKOA7XoUGQSDQ==
-X-Received: by 2002:a05:600c:1389:b0:41f:f053:edb4 with SMTP id 5b1f17b1804b1-41ff053ef30mr13398385e9.23.1715338376478;
-        Fri, 10 May 2024 03:52:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGQo8edf9Bbxrqhzc4y+CNPbsI1HGEi8VtkoHr3pgGLi1CN21Bn41Wng4Rd6DNLwV3eJ3w/LA==
-X-Received: by 2002:a05:600c:1389:b0:41f:f053:edb4 with SMTP id 5b1f17b1804b1-41ff053ef30mr13398205e9.23.1715338375927;
-        Fri, 10 May 2024 03:52:55 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:7408:4800:68b:bbd9:73c8:fb50])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccfe1527sm57995985e9.44.2024.05.10.03.52.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 03:52:55 -0700 (PDT)
-Date: Fri, 10 May 2024 06:52:52 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com
-Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
-Message-ID: <20240510065121-mutt-send-email-mst@kernel.org>
-References: <20240509114615.317450-1-jiri@resnulli.us>
- <20240509084050-mutt-send-email-mst@kernel.org>
- <ZjzQTFq5lJIoeSqM@nanopsycho.orion>
- <20240509102643-mutt-send-email-mst@kernel.org>
- <Zj3425_gSqHByw-R@nanopsycho.orion>
+	s=arc-20240116; t=1715338456; c=relaxed/simple;
+	bh=MO/OM/2fhj7aCEeAt1aUngS9eTccDVaXZdZMNYXF4XA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Brfz66fRLuYGs8oXKTwZvms/BWufLZrOBxfS5lxDc4llyaSstVX474b2nRNlzUo7u4UQK1gHutK2BCbfe0pgrHtwGCYX4moYVjv97c95nxgkPIMWEm9DdmOXNPcnAXmYZD1XqRGP3l5Arc70x7tM3LLitj5uQK/OWluOhkcZ6d4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Vxkx7PKd; arc=none smtp.client-ip=99.78.197.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1715338455; x=1746874455;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=qvhr7yzdAZc0C53lsqLNl4G66CvqbeF4DDof8k8rgGY=;
+  b=Vxkx7PKdv1EiVGsTTDzn5kf0zuZ16xPIq9I6MbkQVVvBm31h0dfpJ/mk
+   fzmTZ2Zb35qtgrcGtFIimZku6Jt268VEvvEixuPaRPDrCY6Sh5pY8JIOY
+   QU2fQS2lSWcCvNjpQ7CM3tz+eg2Oc8h+NDame0v5WKX9TKN1ZHfLqHJsL
+   c=;
+X-IronPort-AV: E=Sophos;i="6.08,150,1712620800"; 
+   d="scan'208";a="294221602"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 10:54:13 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:17234]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.40:2525] with esmtp (Farcaster)
+ id 2e030f83-5101-49ad-a75d-463b14a4939f; Fri, 10 May 2024 10:54:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 2e030f83-5101-49ad-a75d-463b14a4939f
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 10 May 2024 10:54:11 +0000
+Received: from 88665a182662.ant.amazon.com (10.119.9.22) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 10 May 2024 10:54:08 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <pabeni@redhat.com>
+CC: <billy@starlabs.sg>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 net] af_unix: Update unix_sk(sk)->oob_skb under sk_receive_queue lock.
+Date: Fri, 10 May 2024 19:54:00 +0900
+Message-ID: <20240510105400.32158-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <6dfcdb8b562c567995ae9786ab399a1f3a24c62a.camel@redhat.com>
+References: <6dfcdb8b562c567995ae9786ab399a1f3a24c62a.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zj3425_gSqHByw-R@nanopsycho.orion>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWA001.ant.amazon.com (10.13.139.62) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, May 10, 2024 at 12:37:15PM +0200, Jiri Pirko wrote:
-> Thu, May 09, 2024 at 04:28:12PM CEST, mst@redhat.com wrote:
-> >On Thu, May 09, 2024 at 03:31:56PM +0200, Jiri Pirko wrote:
-> >> Thu, May 09, 2024 at 02:41:39PM CEST, mst@redhat.com wrote:
-> >> >On Thu, May 09, 2024 at 01:46:15PM +0200, Jiri Pirko wrote:
-> >> >> From: Jiri Pirko <jiri@nvidia.com>
-> >> >> 
-> >> >> Add support for Byte Queue Limits (BQL).
-> >> >> 
-> >> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-> >> >
-> >> >Can we get more detail on the benefits you observe etc?
-> >> >Thanks!
-> >> 
-> >> More info about the BQL in general is here:
-> >> https://lwn.net/Articles/469652/
-> >
-> >I know about BQL in general. We discussed BQL for virtio in the past
-> >mostly I got the feedback from net core maintainers that it likely won't
-> >benefit virtio.
+From: Paolo Abeni <pabeni@redhat.com>
+Date: Fri, 10 May 2024 12:44:58 +0200
+> On Fri, 2024-05-10 at 18:39 +0900, Kuniyuki Iwashima wrote:
+> > diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> > index 0104be9d4704..b87e48e2b51b 100644
+> > --- a/net/unix/garbage.c
+> > +++ b/net/unix/garbage.c
+> > @@ -342,10 +342,12 @@ static void __unix_gc(struct work_struct *work)
+> >  		scan_children(&u->sk, inc_inflight, &hitlist);
+> >  
+> >  #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
+> > +		spin_lock(&u->sk.sk_receive_queue.lock);
+> >  		if (u->oob_skb) {
+> > -			kfree_skb(u->oob_skb);
+> > +			WARN_ON_ONCE(skb_unref(u->oob_skb));
 > 
-> Do you have some link to that, or is it this thread:
-> https://lore.kernel.org/netdev/21384cb5-99a6-7431-1039-b356521e1bc3@redhat.com/
+> Sorry for not asking this first, but it's not clear to me why the above
+> change (just the 'WARN_ON_ONCE' introduction) is needed and if it's
+> related to the addressed issue???
 
+I think I added it to make it clear that here we don't actually free skb
+and consistent with manage_oob().
 
-A quick search on lore turned up this, for example:
-https://lore.kernel.org/all/a11eee78-b2a1-3dbc-4821-b5f4bfaae819@gmail.com/
-
-
-
-
-> I don't see why virtio should be any different from other
-> drivers/devices that benefit from bql. HOL blocking is the same here are
-> everywhere.
-> 
-> >
-> >So I'm asking, what kind of benefit do you observe?
-> 
-> I don't have measurements at hand, will attach them to v2.
-> 
-> Thanks!
-> 
-> >
-> >-- 
-> >MST
-> >
-
+But I don't have strong preference as it will be removed soon.
 
