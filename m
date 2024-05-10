@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-95403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C5DC8C22C6
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:06:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E9288C22CA
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:07:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC95A1C20D29
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:06:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF7E21F212FE
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:07:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E24516D320;
-	Fri, 10 May 2024 11:06:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3625415ECF1;
+	Fri, 10 May 2024 11:07:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="MgIxWLtS"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="uZEEjAGD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2597D16ABC3
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 11:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C388168AFC
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 11:07:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715339195; cv=none; b=VJpqkuzZvKkySkBx58jDSlP9XrWtivXu/EeVgq4dJDdWtysGZgfpX3zMV9FNdj8iDJJ51FTmoFSiuCDEq+PoVKSkwEWKuGjG+esb9xpOqXPSX8+VT9PlMhOlAm1kbF7+sWqoU5kR5Rptd/qykt1zI/yoUeFsn/LRnRmmv8tQ8JM=
+	t=1715339274; cv=none; b=KPPZz0qfo7qP8pefZUh6ndmXpXQoUqtUnv/3BgjKrwZBSQ/lU4tGIavmIsrGywU/BXhcYD9ZGbYCHacjcIT/5ybKN3TgtmtIWDTJEUvFaD9eYth22Cd4Dn2zetnVAN8UvESpyafDeJF8/3BFsJBq73HBF1UGjwNsezIXMM9ljrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715339195; c=relaxed/simple;
-	bh=/Itff6mbcEDfc5kdzcL5eMOjrucEuOoK53QWSWmqLMU=;
+	s=arc-20240116; t=1715339274; c=relaxed/simple;
+	bh=859+QiXU/TnqrPU0DB9n6V6TYTzMlRUMHngv/RVC8cI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dBpOAn5+qvLnKXwTf4gXgYkcIqjuN2KrHd84iUgr8hD6LJNN/8OWKd4zxklGCjGdjeJG0nnD8hY6UAC/CzzGnHMu77ZbeYu8thcCtUvAHmSJD8y4TWNxrpfJ3+el8G059FXxXR4bE2A4oBvqnTv7GeA+YiEZFBVSbp5PEFDSzl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=MgIxWLtS; arc=none smtp.client-ip=209.85.221.53
+	 Content-Type:Content-Disposition:In-Reply-To; b=tCj2v1E0Wtj57hk8fusfVrSmplZEPm2S93YszbPzARM78hEZrrlENjBApYuxxHnlAak+Uz1MKTWAr0OG67RI+HMvkqQWc2o5D4vSQwmrpbjy7eiJQli1JlgZBPUYEiKIj/ixV1RFLVqlUTC3zgRNwVSFi/E2QO53a3o5FE0D4ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=uZEEjAGD; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-34d8f6cfe5bso1421837f8f.3
-        for <netdev@vger.kernel.org>; Fri, 10 May 2024 04:06:32 -0700 (PDT)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2e30c625178so22684791fa.1
+        for <netdev@vger.kernel.org>; Fri, 10 May 2024 04:07:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715339191; x=1715943991; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715339270; x=1715944070; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cNv3h2hPAcC4VeJUM9WPf+YFoITQA3YIHDEMNhnkbuU=;
-        b=MgIxWLtSJ9+/5+t2jElhLESrxGXfdT3u0MQL6x7CWTu90fE+brJ4ZIK6nBOHLvlw06
-         0JDxlvo+keVVSeyyyZGjuFt8oKGezU+0NvDCSlsWnw5LYD87pfGrWLioNBZ4Kgu+jVbT
-         oFhv+JnMwawInET+ncLx/fA5XgzxdZ1LMA0QnsZwo6YVx1tWVrUL4HZfNJ+Vi4OmTl8O
-         P01ObIEPw5fcLj8YZ4GPSQDCDl7w6yteGxcZw/gd4OgEeqRGzAVxWtEoBrG0p3xZDOUZ
-         VoZJyIVekel1YpjciwBrxPaEYmcrUEizXlZrywVNef6m6Ni7Pf7JZfxII2PRh4nGMSX5
-         yO7A==
+        bh=lOzOAqmI9nIWypFH/CIb7APO0wwyBNqPyzkSkyjLNdQ=;
+        b=uZEEjAGDF49Brnuk/HQDG+wVxmKiakaflNabzoXLSxWk4mMqFaaaMQs0OnL5saqyRK
+         hYIkmeC3vr8CxC617Ce/u/sMA/sFAtsKqeYu8sygyIRfjkDjqm7mYo47aDxZonnHIRUd
+         ZfzRmEGbAGQzsl1KGX6stBHfiwZQArH/X5VWNvTccLZhyPvPIZrHFgaLSF4Kg60/ZSmT
+         cBR6L8sFGAiF6P3Bo7hQr5m4/Ml1TRuvVZS8wYyQOMzud5KRlRkYa5ufFYXPyulkCgiB
+         EoOrWd8Lhoh1IBzZZhoSlC6H8Z3hPvFcIDxprS42wXmRXneuKZHk7fWgwdHXKVfl8+Gh
+         nldg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715339191; x=1715943991;
+        d=1e100.net; s=20230601; t=1715339270; x=1715944070;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cNv3h2hPAcC4VeJUM9WPf+YFoITQA3YIHDEMNhnkbuU=;
-        b=PYlLUiCEUFkfC6JneCPcvtGaRO6+chbpVRq4FLXMGn2M2mxbbLxs1uBoKYMQ1zozbm
-         +Jn+FJgUx4kM1WLUNFGG1cYOSFG4BQtLDuptbpy73R5pY6crS+kEYq8ExCw0tiMxeMRR
-         22uDmbAGXvs6NeUG5rMZIG7PHTJDzVi28pHaOp2mzfZlJQYsaKZeHxHRIiETJZUZFmL3
-         wc0zA1hYNRo1GwzCCSlwoStD8JhUhjT0WbBEOrQL/BGb5GT9EcifwNBLVaKOXEkrJ93s
-         Ylr25BCkqBqHU0rsqpBSIpYwwiWe3rCwVNk5h+1JvpF86vLpiQsUlavVDTxmx0/L/64r
-         HC+g==
-X-Forwarded-Encrypted: i=1; AJvYcCXQ/cVPn9yMm8VM5VY0llnAfaTI05W9GV6zjfzUhCZSV1oUz52Tgig3yvhgUKtbwdLoFqvkG4GjgKCca2R1W6EayjquEwdt
-X-Gm-Message-State: AOJu0YxhOXifARmJq+QYb6I8Ip2R0NVzYTLwMjpgxlkH3zJ5m9kauC8V
-	IEmqVdM3FvVc7Z7ZsEZpP7rqTKhvtIlYNmPrY5Iop968pg53M7dOuDvSRGLCRHk=
-X-Google-Smtp-Source: AGHT+IErsx9K72qykBumWEujWyAufY8IZ1byl3WQ4ZzxercswAzMR2gbGDdw18CLAFN+3oRp5/TKqw==
-X-Received: by 2002:a5d:5cc5:0:b0:34d:96ca:8c24 with SMTP id ffacd0b85a97d-3504a73c028mr1372977f8f.37.1715339191092;
-        Fri, 10 May 2024 04:06:31 -0700 (PDT)
+        bh=lOzOAqmI9nIWypFH/CIb7APO0wwyBNqPyzkSkyjLNdQ=;
+        b=aGzEwpX1lrbkYk+NnlcRDgALFhOz4obaq6zRlxQUbdVgu1te63fyTmIXYcISzOoJ0t
+         zdiP/N9u43EwjxhOQjuo+nENOL4bnUh7NRkNbYKDnf7CND+ieIkN/+gdCkBJ04pYQ4A+
+         y+fwWMT3s8usgttXLmp/5Uxqv0Zv+yFi8fA3yPsiWBZkWhhdQSGlV9Dz3Drc6B/yXehR
+         AdZl2UEBl0+1K/fL7F7tSlHAkoXeFYVFyY0+VdEx4N4o1rXtFtD5LZEzgvWR3ajCFD9j
+         rCCjHHksnGONqfmF+jIMkVhpSjq8caDj19Hm1N3h8HwxeKo2V/uJH8PR1fskdFmPx9/W
+         F2pQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX6Ltmriiy1fqQFFDP2DVEdxCTgPN8H7VRzsGbi8CPwdGzstXVhWs8ceSgrEEdVkxxf08z3cDjX5cN0vZLxY53Li71m4aOK
+X-Gm-Message-State: AOJu0Yza6xCFPOUQbYa79D6i4+MYZ2oSWZxzyP+JMDCyN396LJPHQDpD
+	04Ehy45MWJzGjxrzoPGEhT8/70y2IIDggQpze5/LwEvGAVJoFC8dh13GgCbYxOU=
+X-Google-Smtp-Source: AGHT+IGW5QBg7jd7ZGdFB8kWjrOudgTh1Lj0FwS1SZreq7UTrqwgF47iDm7dS4XOHKLf8AuxaLt5AA==
+X-Received: by 2002:a2e:9045:0:b0:2e3:38e0:54c7 with SMTP id 38308e7fff4ca-2e5204b2f26mr13611271fa.38.1715339269900;
+        Fri, 10 May 2024 04:07:49 -0700 (PDT)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b79bd4fsm4331410f8f.7.2024.05.10.04.06.29
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fa90e93absm80088015e9.9.2024.05.10.04.07.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 04:06:30 -0700 (PDT)
-Date: Fri, 10 May 2024 13:06:27 +0200
+        Fri, 10 May 2024 04:07:47 -0700 (PDT)
+Date: Fri, 10 May 2024 13:07:44 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
@@ -75,12 +75,12 @@ Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
 	pio.raczynski@gmail.com, jiri@nvidia.com,
 	mateusz.polchlopek@intel.com, shayd@nvidia.com
-Subject: Re: [iwl-next v1 06/14] ice: base subfunction aux driver
-Message-ID: <Zj3_sxDq5R0ZsYBa@nanopsycho.orion>
+Subject: Re: [iwl-next v1 08/14] ice: create port representor for SF
+Message-ID: <Zj4AAFwZudmyOWTm@nanopsycho.orion>
 References: <20240507114516.9765-1-michal.swiatkowski@linux.intel.com>
- <20240507114516.9765-7-michal.swiatkowski@linux.intel.com>
- <Zjyv8xAEDhtzXAIx@nanopsycho.orion>
- <Zj3K0+JB55UFZYXF@mev-dev>
+ <20240507114516.9765-9-michal.swiatkowski@linux.intel.com>
+ <ZjywddcaIae0W_w3@nanopsycho.orion>
+ <Zj3NQw1BxqtOS9VG@mev-dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,37 +89,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zj3K0+JB55UFZYXF@mev-dev>
+In-Reply-To: <Zj3NQw1BxqtOS9VG@mev-dev>
 
-Fri, May 10, 2024 at 09:20:51AM CEST, michal.swiatkowski@linux.intel.com wrote:
->On Thu, May 09, 2024 at 01:13:55PM +0200, Jiri Pirko wrote:
->> Tue, May 07, 2024 at 01:45:07PM CEST, michal.swiatkowski@linux.intel.com wrote:
->> >From: Piotr Raczynski <piotr.raczynski@intel.com>
+Fri, May 10, 2024 at 09:31:15AM CEST, michal.swiatkowski@linux.intel.com wrote:
+>On Thu, May 09, 2024 at 01:16:05PM +0200, Jiri Pirko wrote:
+>> Tue, May 07, 2024 at 01:45:09PM CEST, michal.swiatkowski@linux.intel.com wrote:
+>> >Store subfunction and VF pointer in port representor structure as an
+>> >union. Add port representor type to distinguish between each of them.
 >> >
->> >Implement subfunction driver. It is probe when subfunction port is
->> >activated.
+>> >Keep the same flow of port representor creation, but instead of general
+>> >attach function create helpers for VF and subfunction attach function.
 >> >
->> >VSI is already created. During the probe VSI is being configured.
->> >MAC unicast and broadcast filter is added to allow traffic to pass.
+>> >Type of port representor can be also known based on VSI type, but it
+>> >is more clean to have it directly saved in port representor structure.
 >> >
->> >Store subfunction pointer in VSI struct. The same is done for VF
->> >pointer. Make union of subfunction and VF pointer as only one of them
->> >can be set with one VSI.
+>> >Create port representor when subfunction port is created.
 >> >
->> >Reviewed-by: Jiri Pirko <jiri@nvidia.com>
->> >Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
+>> >Add devlink lock for whole VF port representor creation and destruction.
+>> >It is done to be symmetric with what happens in case of SF port
+>> >representor. SF port representor is always added or removed with devlink
+>> >lock taken. Doing the same with VF port representor simplify logic.
+>> >
+>> >Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 >> >Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>> >---
+>> > .../ethernet/intel/ice/devlink/devlink_port.c |   6 +-
+>> > .../ethernet/intel/ice/devlink/devlink_port.h |   1 +
+>> > drivers/net/ethernet/intel/ice/ice_eswitch.c  |  85 +++++++++---
+>> > drivers/net/ethernet/intel/ice/ice_eswitch.h  |  22 +++-
+>> > drivers/net/ethernet/intel/ice/ice_repr.c     | 124 +++++++++++-------
+>> > drivers/net/ethernet/intel/ice/ice_repr.h     |  21 ++-
+>> > drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +-
+>> > drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   4 +-
+>> > 8 files changed, 187 insertions(+), 80 deletions(-)
 >> 
->> Perhaps it would make things clearer for reviewer to have all patches
->> related to sf auxdev/devlink/netdev at the end of the patchset, after
->> activation patch. Not sure why you want to mix it here.
+>> This calls for a split to at least 2 patches. One patch to prepare and
+>> one to add the SF support?
 >
->I need this code to use it in port representor implementation. You
->suggested in previous review to move activation at the end [1].
+>Is 187 insertions and 80 deletions too many for one patch? Or the
+>problem is with number of files changed?
 
-Yeah, I just thought that sfdev patches could be separate. Nevermind
-then.
+The patch is hard to follow, that's the problem.
+
 
 >
->[1] https://lore.kernel.org/netdev/Zhje0mQgQTMXwICb@nanopsycho/
+>I don't see what here can be moved to preparation part as most changes
+>depends on each other. Do you want me to have one patch with unused
+>functions that are adding/removing SF repr and another with calling
+>them?
+>
+>Thanks,
+>Michal
 
