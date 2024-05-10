@@ -1,111 +1,140 @@
-Return-Path: <netdev+bounces-95481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E1CF8C2611
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 15:52:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9E758C2616
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 15:53:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 597B5284608
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:52:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F99C1F226CA
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6798A12CD8C;
-	Fri, 10 May 2024 13:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF51812C526;
+	Fri, 10 May 2024 13:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CdTIbV3p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A64OWzCE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D50712C46B;
-	Fri, 10 May 2024 13:52:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D3912C46B;
+	Fri, 10 May 2024 13:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715349136; cv=none; b=nssW72WKJe7s5AQMjTtpI9Ph2G7n50zDPkwGxELBFHjKK9hbNp60A9Hr+nQnZ+fkMmBxcTGAdO4DYHs9HLlu0QNdXU2UZn2YNsyMtsh4FXaq4+IhcmudMXONWEuRfAFRpmKdEji+kpCSVxFI2B8QfzZRbXWtzn1twDFCQGS+wGM=
+	t=1715349188; cv=none; b=VhxhDAVhVc/Mfum4O+enlE6Mf3cdWb2X+ApqGsKpnE74e9zgBXv6mhMhpP7XdEFf7mW2PPMsUPfiNosi1i10R+0L/2HAIyUaHb1SY4iJw1rN56fhRRXemgSTCp3Xc2CnmieQZhLMPuMUA6X8wxOehUbI5NR7yIaAwVGWR+/Qcw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715349136; c=relaxed/simple;
-	bh=P03mPsNFGR0/RNBmpmCMETYGOpewXcdJhDQnp92x98U=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=RdToRcoMLJhLFfSeALD9wMw59LWr+hiO6Q14FTRysi/LZzIfSJwN9l3Dwc+wSn1+ifQrXCbPWB+GmpQirR56oCkACHhO3wfA6djQmcFHDHPerrmWqe2rj5ReW8dclXzddCW+mwn4PJbNilPqjWaJjtaPuc5jwdSQTuPMUoWObCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CdTIbV3p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0484C32781;
-	Fri, 10 May 2024 13:52:12 +0000 (UTC)
+	s=arc-20240116; t=1715349188; c=relaxed/simple;
+	bh=6KpXMrLeritzB8bNaBffhCqm+rUB+tqQRQjkCVrSwOg=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=PbR+04Fg5EPhbPTqKcmH1+cFFA6wW3IRzCYhQjOoIh2+gW88pPn3YRRuaiykdW06od2GhGEyZHBw5/FKCcfs3v5oawVnxGBCcA5F/cUzm0RsSM9Eur4Lm+eWb908rdZxCFj7TdWm/Sphib5WfAgLCvI7ttHPsok/1i2XWYLwzCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A64OWzCE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D53BC113CC;
+	Fri, 10 May 2024 13:53:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715349135;
-	bh=P03mPsNFGR0/RNBmpmCMETYGOpewXcdJhDQnp92x98U=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=CdTIbV3p+4e9dZYYzb9p0raW2kJxdErUtvbB2gTyAlJgbePLaNavSF0S+hRtzQvJv
-	 giA7CUdN2YZIOrk7XANyrFY5jsFCDzKxHXQZpHQGR1fp1Rod9/9XPQEuumQYSe1sZA
-	 1nAY/DLONdV+kC3ws88a7/6D5wCLzwQzyIWzG36sWz3EQSt2g6X8RsArbllW9jORcJ
-	 XJjrNAh5Hlv7JwWB+zX/POAWBGZglSTpJ0O8FqsYHc6ZBnHv6wY4owV2OOVdyv2zkx
-	 bXo/67Gzzo878XtRdQDgTa/2OViokNXOj50RP4qPSvGeeXyzfBT1/JPujSSXHzU6ca
-	 WZgiTxD7fU92Q==
-From: Kalle Valo <kvalo@kernel.org>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: Ansuel Smith <ansuelsmth@gmail.com>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
-  <linux-kernel@vger.kernel.org>,  <ath10k@lists.infradead.org>,
-  <linux-wireless@vger.kernel.org>,  <netdev@vger.kernel.org>,  Sebastian
- Gottschall <s.gottschall@dd-wrt.com>,  Steve deRosier
- <derosier@cal-sierra.com>,  Stefan Lippers-Hollmann <s.l-h@gmx.de>
-Subject: Re: [PATCH v14] ath10k: add LED and GPIO controlling support for
- various chipsets
-References: <20230611080505.17393-1-ansuelsmth@gmail.com>
-	<878rcjbaqs.fsf@kernel.org>
-	<648cdebb.5d0a0220.be7f8.a096@mx.google.com>
-	<648ded2a.df0a0220.b78de.4603@mx.google.com>
-	<CA+_ehUzzVq_sVTgVCM+r=oLp=GNn-6nJRBG=bndJjrRDhCodaw@mail.gmail.com>
-	<87v83nlhb3.fsf@kernel.org>
-	<7585e7c3-8be6-45a6-96b3-ecb4b98b12d8@quicinc.com>
-	<cce2700c-e54f-4a50-b3f0-0b8a82b961a4@quicinc.com>
-Date: Fri, 10 May 2024 16:52:11 +0300
-In-Reply-To: <cce2700c-e54f-4a50-b3f0-0b8a82b961a4@quicinc.com> (Jeff
-	Johnson's message of "Thu, 9 May 2024 09:48:08 -0700")
-Message-ID: <875xvllqpg.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=k20201202; t=1715349188;
+	bh=6KpXMrLeritzB8bNaBffhCqm+rUB+tqQRQjkCVrSwOg=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=A64OWzCEMg4DcJItwWnY/nQEN6c08na6QOnzyyA16EkwyYPWJ0jqdPmypqBP4bPWm
+	 aMs0AL9rwpbVHg1YxLozM2876hLrD+tfiPoHgmt33/rS4iubuU2khWvDeLwHFJCu0C
+	 iNJIv9QfrfvN6SO6RMmb348ykhR/eLLtTsby5SoNDTiz+c0/AHSdlTBHKygkAsTUdQ
+	 FGbRxxawWdHBachzf/P47ZiJ9ealbDgrhjRXW7J6EQIQzlGh+Aa8PTHNVuCak4A4eD
+	 6ML1uJJeDIl7bSuY1ckxngyoXYlQWIl6VeL6FvID6dQP+HGn/8bZTOzPZgWA4QnVB0
+	 FFIvO/XokF11A==
+Date: Fri, 10 May 2024 08:53:06 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Frank Wunderlich <linux@fw-web.de>
+Cc: devicetree@vger.kernel.org, linux-clk@vger.kernel.org, 
+ Stephen Boyd <sboyd@kernel.org>, linux-leds@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org, 
+ Frank Wunderlich <frank-w@public-files.de>, 
+ Eric Woudstra <ericwouds@gmail.com>, Tianling Shen <cnsztl@immortalwrt.org>, 
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+ Pavel Machek <pavel@ucw.cz>, Conor Dooley <conor+dt@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Michael Turquette <mturquette@baylibre.com>, Lee Jones <lee@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+In-Reply-To: <20240510095707.6895-1-linux@fw-web.de>
+References: <20240510095707.6895-1-linux@fw-web.de>
+Message-Id: <171534910744.4114753.13367969845540831259.robh@kernel.org>
+Subject: Re: [PATCH v3 0/2] Add Bananapi R3 Mini
 
-Jeff Johnson <quic_jjohnson@quicinc.com> writes:
 
-> On 5/9/2024 9:37 AM, Jeff Johnson wrote:
->> On 5/8/2024 9:50 PM, Kalle Valo wrote:
->>> Sorry for the delay but finally I looked at this again. I decided to
->>> just remove the fixme and otherwise it looks good for me. Please check
->>> my changes:
->>>
->>> https://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git/commit/?h=pending&id=688130a66ed49f20ca0ce02c3987f6a474f7c93a
->>>
->> 
->> I have a question about the copyrights in the two new files:
->> + * Copyright (c) 2018-2023, The Linux Foundation. All rights reserved.
->> 
->> My understanding is that Qualcomm's affiliation with Linux Foundation via Code
->> Aurora ended in December 2021, and hence any contributions in 2022-2023 should
->> be the copyright of Qualcomm Innovation Center, Inc.
->> 
->> 
->
-> ok it seems like Kalle's v13 had:
->  + * Copyright (c) 2018, The Linux Foundation. All rights reserved.
->
-> and Ansuel's v14 has:
->  + * Copyright (c) 2018-2023, The Linux Foundation. All rights reserved.
->
-> So Ansuel, is your work on behalf of The Linux Foundation?
+On Fri, 10 May 2024 11:57:05 +0200, Frank Wunderlich wrote:
+> From: Frank Wunderlich <frank-w@public-files.de>
+> 
+> Add mt7986 based BananaPi R3 Mini SBC.
+> 
+> changes in v3:
+> - fixed unicde parenthesis in commit description of dts patch
+> - dropped "dts:" from title of binding patch
+> - added AB to binding and RB to dts patch
+> 
+> changes in v2:
+> - dropped patches for unrealated binding fixes which are already fixed in next.
+> - add missing node for nand
+> - add some information about the board in description
+> 
+> change dts based on review from angelo+krzysztof
+> 
+>  - drop fan status
+>  - rename phy14 to phy0 and phy15 to phy1
+>  - drop default-trigger from phys and so also the binding-patch
+>  - use regulator names based on regexp regulator-[0-9]+v[0-9]+
+>  - add comment for pwm
+> 
+> Frank Wunderlich (2):
+>   dt-bindings: arm64: mediatek: add BananaPi R3 Mini
+>   arm64: dts: mediatek: Add  mt7986 based Bananapi R3 Mini
+> 
+>  .../devicetree/bindings/arm/mediatek.yaml     |   1 +
+>  arch/arm64/boot/dts/mediatek/Makefile         |   1 +
+>  .../mediatek/mt7986a-bananapi-bpi-r3-mini.dts | 493 ++++++++++++++++++
+>  3 files changed, 495 insertions(+)
+>  create mode 100644 arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts
+> 
+> --
+> 2.34.1
+> 
+> 
+> 
 
-BTW in the pending branch I can change the copyright back to original so
-no need to resend because of this. But I'll need guidance from Ansuel.
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+My bot found new DTB warnings on the .dts files added or changed in this
+series.
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
+are fixed by another series. Ultimately, it is up to the platform
+maintainer whether these warnings are acceptable or not. No need to reply
+unless the platform maintainer has comments.
+
+If you already ran DT checks and didn't see these error(s), then
+make sure dt-schema is up to date:
+
+  pip3 install dtschema --upgrade
+
+
+New warnings running 'make CHECK_DTBS=y mediatek/mt7986a-bananapi-bpi-r3-mini.dtb' for 20240510095707.6895-1-linux@fw-web.de:
+
+arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dtb: crypto@10320000: interrupts: [[0, 116, 4], [0, 117, 4], [0, 118, 4], [0, 119, 4]] is too short
+	from schema $id: http://devicetree.org/schemas/crypto/inside-secure,safexcel.yaml#
+arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dtb: crypto@10320000: interrupt-names: ['ring0', 'ring1', 'ring2', 'ring3'] is too short
+	from schema $id: http://devicetree.org/schemas/crypto/inside-secure,safexcel.yaml#
+
+
+
+
+
 
