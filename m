@@ -1,197 +1,143 @@
-Return-Path: <netdev+bounces-95603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA1A28C2C82
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 00:16:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E5978C2C88
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 00:19:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 697E61F218FB
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 22:16:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C30D41F22BBC
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 22:19:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1920213CFA4;
-	Fri, 10 May 2024 22:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859CC13CFA8;
+	Fri, 10 May 2024 22:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ca4vn291"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vp5I/vqt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77BE13D249;
-	Fri, 10 May 2024 22:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD5913CF92
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 22:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715379411; cv=none; b=GZUxiDYzuOBsgwtzz0Ql1cBs94sqkWIfrTE4nSWicejKEl7aWKbLBLzka6YSZ7NF99unYEEUFo8R15ZubiS7jBxglAXST7gosSSORAcXxDbhZ86VkVuVwzKbIXcDjORCYDUXmz5iU9igACnqmq42Qjyiw11AfqcBcBZWKuTm+NA=
+	t=1715379565; cv=none; b=n5Njf1QUYzGcqPhsVfNHkn99kqXcjhG7QcUlcJecG3lL0NV7LiVL3IH/GxfM0PgaBRS/MGEB59Y434oEuXe9Bi1F7KC9X7AEJlUiWvOJKZWgWA5tUlEId7PMkUejlRFjbfxXwFWPSlxc4k1QnMKFO/7s3tZ0PQBd8yj8De8Z6Sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715379411; c=relaxed/simple;
-	bh=5OfmgoAYcfgbRVZam+epYxmJECo8KxPiHXd4rLSQ43k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HEaHCr99Xn8wiAfaBR1o8DlhALlDIYiIc4vvjvU2JyMkGAbBwXdB/sv1el+5U3Zr/yzRhjxWGEsXkv/Omd8fXrORI3AC/KBVnqHj3n1qXlWurYG1LOMdJeF2hAmNnLL8FrRZedN8M7bf76NJzQ9iIyi0T3h5Bzjp/lkfd1Xd3XI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ca4vn291; arc=none smtp.client-ip=209.85.219.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-de5b1e6beceso2975367276.0;
-        Fri, 10 May 2024 15:16:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715379403; x=1715984203; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vgEWVwj9CTy6eW4Gl2DhjkJwIccLS9CHbLse7CH8+Zo=;
-        b=Ca4vn291yoaDLv87+QAVyLjisMVzPi/0ALYHU44FzJiPyr8UjnITuS8jfBCsk8/PpZ
-         CWASNkZX3UlKxKGsxeSJbH2p4SDt8PwuvAtVVfGmCnyIzOQAW84P6K1dGxlYqf1z1GMU
-         SOu21Cg0C/DaKR12Cm3Cen8+/Pp8GqP+FtNhvaZc8uHI8S5AmiSTarp8hIY/7jL6Q/FI
-         FDMWvtH8qNChCAtVTYj4ZmoHdfftO7K8zW/Qcb/g8ylKfLniYbC140qCZjKcTvDQ2W80
-         ze7TLd7p1+JoTn26DIWBe81rwiR02Nxuchm2mMVnf2/1xaFooHXRKKf+e2nQhBxbPzWL
-         imlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715379403; x=1715984203;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vgEWVwj9CTy6eW4Gl2DhjkJwIccLS9CHbLse7CH8+Zo=;
-        b=P9hfUZ492ZsITdhZEcQj82h+aTzkPUG0Eoq3vTGrXBqcMmnSoMYl586olxvtDdOlP+
-         T++SrQuaUs9sraZHAVHEcjz+u2Rf6g8ORFCIZQP/+ADgHCvgE2CsqxowW2LDgwb4jW3x
-         Tkf18ZdALOwb9ZGeLS5Se6qzFSTY8JonAqBGYez7xnk5R06+eMjZG2IYgB9hBeBrchPT
-         H5SKfJxJADDk+kIzRym0uZyG/kaQH39eC8SCpot6UXh4dVRVlAYfiE16WD0jBTVLBtYN
-         lLrkjtzeoylp5YWL+731Vxl1WwCauXuG5Qx3lNWh9WEU6eZRmT216aFb2lmzzH0SUUpq
-         m+rg==
-X-Forwarded-Encrypted: i=1; AJvYcCUByKPgH4Me8UfiGuW6gy8IFtRUh5P7OLkjpNvE2UdKm/Yq2Qy5j4UsZ5VubgxuaDgngLEZ8uT7gaaVr2CoAVKx8p/i
-X-Gm-Message-State: AOJu0YyMLU/2YDzg1eq+dHDZfkkT1VUJwU9LQOWuTAp8lx0QMblWDlpD
-	8zy3GVjF7uqnAac19Q2aG4IIB5d+wtX5VL8xnE94QM7cbNBz+druKXeom/gjsgPYYazZvbTAKJW
-	w40wDhuu51nFyd4ioa/FHd29I8DE=
-X-Google-Smtp-Source: AGHT+IFPstVJ9zjwRj0J3D+5ZU5oYSqAiysZbBcR98SC5jP45p7avlBHDk9SXoG1rntWZTSN2yZFxZj/VxRFE1iyoGU=
-X-Received: by 2002:a25:ab48:0:b0:dc2:5553:ca12 with SMTP id
- 3f1490d57ef6-dee4f32be93mr4118871276.14.1715379403488; Fri, 10 May 2024
- 15:16:43 -0700 (PDT)
+	s=arc-20240116; t=1715379565; c=relaxed/simple;
+	bh=P6LZgUfn8EsQd61zA1klV7El2DjPzYvWkadKS5OylZE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JLZY02l1+WjvZTNzRkRyCJuzi+tgSnfZ9nRzuMZfKv0AvS4jTAW4B1WGDllgLHe+hTwPneZ/1FvIPpnVY/p+hH5BLmGM3CYpX7XcYkbhBO0UCG3S7AfwEQs4xVKI8X+je5wQklealOb19B3IZLWIW9peLLOkQf/9BcMM5+HI+QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vp5I/vqt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C96A0C113CC;
+	Fri, 10 May 2024 22:19:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715379564;
+	bh=P6LZgUfn8EsQd61zA1klV7El2DjPzYvWkadKS5OylZE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Vp5I/vqtR9nIAwaQTuntzPUwoAr6G3VZITwbIylviRMuj+Kub+XAkD+2addUqiXMz
+	 X9T1Frv9XyQFFnMbd/2b1/IDkgGiuLx4BPTstMOUpKLr9a3c5OnmdgnByF5vCwGsgU
+	 KxlBbq/sZuXt94FagxoVgbxoHXw34TKwkFBfLl8DIChgbOhMD5Dk0hxYX4NG1Klm/a
+	 4N9FG60BGsfPvnRdPC8ao45rADZg/avCFqphfR5hho4oIkihtju8l/+a+Yv90UC31d
+	 DGjb6nYpLvN5eoqGyJZbwsjyAMwE44fgIzM8DEiPet46stOj3l5jyvK0mFkefKZHnK
+	 h9petVXoqwWZg==
+Date: Fri, 10 May 2024 15:19:23 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com,
+	willemdebruijn.kernel@gmail.com, borisp@nvidia.com, gal@nvidia.com,
+	cratiu@nvidia.com, rrameshbabu@nvidia.com,
+	steffen.klassert@secunet.com, tariqt@nvidia.com
+Subject: Re: [RFC net-next 01/15] psp: add documentation
+Message-ID: <Zj6da1nANulG5cb5@x130.lan>
+References: <20240510030435.120935-1-kuba@kernel.org>
+ <20240510030435.120935-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240510192412.3297104-1-amery.hung@bytedance.com>
- <20240510192412.3297104-3-amery.hung@bytedance.com> <b2486867-0fee-4972-ad71-7b54e8a5d2b6@gmail.com>
-In-Reply-To: <b2486867-0fee-4972-ad71-7b54e8a5d2b6@gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 10 May 2024 15:16:32 -0700
-Message-ID: <CAMB2axN3XwSmvk2eC9OnaUk5QvXS6sLVv148NrepkbtjCixVwg@mail.gmail.com>
-Subject: Re: [RFC PATCH v8 02/20] selftests/bpf: Test referenced kptr
- arguments of struct_ops programs
-To: Kui-Feng Lee <sinquersw@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@kernel.org, 
-	toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com, 
-	xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20240510030435.120935-2-kuba@kernel.org>
 
-On Fri, May 10, 2024 at 2:33=E2=80=AFPM Kui-Feng Lee <sinquersw@gmail.com> =
-wrote:
+On 09 May 20:04, Jakub Kicinski wrote:
+>Add documentation of things which belong in the docs rather
+>than commit messages.
 >
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>---
+> Documentation/networking/index.rst |   1 +
+> Documentation/networking/psp.rst   | 138 +++++++++++++++++++++++++++++
+> 2 files changed, 139 insertions(+)
+> create mode 100644 Documentation/networking/psp.rst
 >
->
-> On 5/10/24 12:23, Amery Hung wrote:
-> > A reference is automatically acquired for a referenced kptr argument
-> > annotated via the stub function with "__ref_acquired" in a struct_ops
-> > program. It must be released and cannot be acquired more than once.
-> >
-> > The test first checks whether a reference to the correct type is acquir=
-ed
-> > in "ref_acquire". Then, we check if the verifier correctly rejects the
-> > program that fails to release the reference (i.e., reference leak) in
-> > "ref_acquire_ref_leak". Finally, we check if the reference can be only
-> > acquired once through the argument in "ref_acquire_dup_ref".
-> >
-> > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> > ---
-> >   .../selftests/bpf/bpf_testmod/bpf_testmod.c   |  7 +++
-> >   .../selftests/bpf/bpf_testmod/bpf_testmod.h   |  2 +
-> >   .../prog_tests/test_struct_ops_ref_acquire.c  | 58 ++++++++++++++++++=
-+
-> >   .../bpf/progs/struct_ops_ref_acquire.c        | 27 +++++++++
-> >   .../progs/struct_ops_ref_acquire_dup_ref.c    | 24 ++++++++
-> >   .../progs/struct_ops_ref_acquire_ref_leak.c   | 19 ++++++
-> >   6 files changed, 137 insertions(+)
-> >   create mode 100644 tools/testing/selftests/bpf/prog_tests/test_struct=
-_ops_ref_acquire.c
-> >   create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_ref_a=
-cquire.c
-> >   create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_ref_a=
-cquire_dup_ref.c
-> >   create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_ref_a=
-cquire_ref_leak.c
-> >
-> >
->   ... skipped ...
-> > +
-> > diff --git a/tools/testing/selftests/bpf/progs/struct_ops_ref_acquire.c=
- b/tools/testing/selftests/bpf/progs/struct_ops_ref_acquire.c
-> > new file mode 100644
-> > index 000000000000..bae342db0fdb
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/bpf/progs/struct_ops_ref_acquire.c
-> > @@ -0,0 +1,27 @@
-> > +#include <vmlinux.h>
-> > +#include <bpf/bpf_tracing.h>
-> > +#include "../bpf_testmod/bpf_testmod.h"
-> > +
-> > +char _license[] SEC("license") =3D "GPL";
-> > +
-> > +void bpf_task_release(struct task_struct *p) __ksym;
-> > +
-> > +/* This is a test BPF program that uses struct_ops to access a referen=
-ced
-> > + * kptr argument. This is a test for the verifier to ensure that it re=
-congnizes
-> > + * the task as a referenced object (i.e., ref_obj_id > 0).
-> > + */
-> > +SEC("struct_ops/test_ref_acquire")
-> > +int BPF_PROG(test_ref_acquire, int dummy,
-> > +          struct task_struct *task)
-> > +{
-> > +     bpf_task_release(task);
->
-> This looks weird for me.
->
-> According to what you mentioned in the patch 1, the purpose is to
-> prevent acquiring multiple references from happening. So, is it possible
-> to return NULL from the acquire function if having returned a reference
-> before?
+>diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
+>index 7664c0bfe461..0376029ecbdf 100644
+>--- a/Documentation/networking/index.rst
+>+++ b/Documentation/networking/index.rst
+>@@ -94,6 +94,7 @@ Refer to :ref:`netdev-FAQ` for a guide on netdev development process specifics.
+>    ppp_generic
+>    proc_net_tcp
+>    pse-pd/index
+>+   psp
+>    radiotap-headers
+>    rds
+>    regulatory
+>diff --git a/Documentation/networking/psp.rst b/Documentation/networking/psp.rst
+>new file mode 100644
+>index 000000000000..a39b464813ab
+>--- /dev/null
+>+++ b/Documentation/networking/psp.rst
+>@@ -0,0 +1,138 @@
+>+.. SPDX-License-Identifier: GPL-2.0-only
+>+
+>+=====================
+>+PSP Security Protocol
+>+=====================
+>+
+>+Protocol
+>+========
+>+
+>+PSP Security Protocol (PSP) was defined at Google and published in:
+>+
+>+https://raw.githubusercontent.com/google/psp/main/doc/PSP_Arch_Spec.pdf
+>+
+>+This section briefly covers protocol aspects crucial for understanding
+>+the kernel API. Refer to the protocol specification for further details.
+>+
+>+Note that the kernel implementation and documentation uses the term
+>+"secret state" in place of "master key", it is both less confusing
+>+to an average developer and is less likely to run afoul any naming
+>+guidelines.
+>+
 
-The purpose of req_acquired is to allow acquiring a referenced kptr in
-struct_ops argument just once. Whether multiple references can be
-acquired/duplicated later I think could be orthogonal.
+[ ... ] 
 
-In bpf qdisc, we ensure unique reference of skb through ref_acquired and
-the fact that there is no bpf_ref_count in sk_buff (so that users cannot
-use bpf_ref_acquire()).
+>+User facing API
+>+===============
+>+
+>+PSP is designed primarily for hardware offloads. There is currently
+>+no software fallback for systems which do not have PSP capable NICs.
+>+There is also no standard (or otherwise defined) way of establishing
+>+a PSP-secured connection or exchanging the symmetric keys.
+>+
+>+The expectation is that higher layer protocols will take care of
+>+protocol and key negotiation. For example one may use TLS key exchange,
+>+announce the PSP capability, and switch to PSP if both endpoints
+>+are PSP-capable.
+>+
 
-In this case, it is true that programs like below will be able to get
-multiple references to task (Is this the scenario you have in mind?).
-Thus, if the users want to enforce the unique reference semantic, they
-need to make bpf_task_acquire() unavailable as well.
+The documentation doesn't include anything about userspace, other than
+highlevel remarks on how this is expected to work.
+What are we planning for userspace? I know we have kperf basic support and
+some experimental python library, but nothing official or psp centric. 
 
-SEC("struct_ops/test_ref_acquire")
-int BPF_PROG(test_ref_acquire, int dummy,
-             struct task_struct *task)
-{
-        struct task_struct task2;
-        task2 =3D bpf_task_acquire(task);
-        bpf_task_release(task);
-        if (task2)
-            bpf_task_release(task2);
-        return 0;
-}
+I propose to start community driven project with a well established
+library, with some concrete sample implementation for key negotiation,
+as a plugin maybe, so anyone can implement their own key-exchange
+mechanisms on top of the official psp library.
 
 
->
->
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +
-> ... skipped ...
 
