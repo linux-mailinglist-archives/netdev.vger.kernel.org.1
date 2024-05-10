@@ -1,164 +1,217 @@
-Return-Path: <netdev+bounces-95501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37AD08C26FE
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 16:37:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44FB98C2701
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 16:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6500C1C22D9E
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:37:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6863E1C21FA1
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E92170899;
-	Fri, 10 May 2024 14:36:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CD7170895;
+	Fri, 10 May 2024 14:37:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jdOtKAb5"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="ZYCSRI7v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2AB2170842;
-	Fri, 10 May 2024 14:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AF412C526;
+	Fri, 10 May 2024 14:37:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715351819; cv=none; b=l7fCUcGdV1ovGfuNXd8mJw+34M4gsdgOYuotfjgyYb5X4NvBGApybED5McoS/U1HqBkPnwevAJQ33DvMyAgapwf21lVlfUSK/JmVO2rlf5t1zafzy+TxCWVly61dYQYFi9nBoFQEt7m7x+7hoZConwol6ZnT3GHkF/m5y9RDcIU=
+	t=1715351856; cv=none; b=MUzpAFqgd+R7Msxwr+wW2thWyF47Fg6F61Hb+pNZbVctxG7Vt54t47vwbbv1DSZ/GA63ghQfclGOMEdXESTYlcitgcr9J3KOIn5qrm3EyS3PFuHsqNdv6swn6q0AgBug9MT6SY0v9S8S+00QVPH7qgBH6D4tWTOluAdwSG6XRlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715351819; c=relaxed/simple;
-	bh=v5SUYvQhGivk1xpYESPgvGUhWkl2K6c7X+yyha3GgBA=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=XXFatCaOaviuu3ckSjR6GQu2XuWuUJu5aMo818LS9L+Lt8eDSCnCj5nJWjdrVHPq5NVry92J0wYH+gYwCgu8gaSso9s4CnlyoTpv8MgcOTd+NZdDj71F3okFKtSLlYJ0CRw+C2IwP3lZmu4MOvsBfRSJcSyDDfWZU57qF9VgfRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jdOtKAb5; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715351818; x=1746887818;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=v5SUYvQhGivk1xpYESPgvGUhWkl2K6c7X+yyha3GgBA=;
-  b=jdOtKAb5FCH8F6JpuZvTJj40B+qz30cO7NOBlvnLmQ9jBMZ59/vrfL6r
-   GeCdxglRLxjf4c9v5PUmeZRcz32LhDekbTe40E7ESebtVsAsKyisE7ZyL
-   Yeh/IHOeLNp29ATzENw/tDHpQoPFzAh3C2ZoJwvpJEO25gyVI3K2BrRt/
-   HBJrTOn14uNMUBGWqvQyWSTn3nyQWeg/2mx7w9m9s3RsZ5qVUvSnAjTfJ
-   9PGvENenMcnTB5SBK+jeSnF0JedyYp1nM7nUm4M9pAPpIfYYo2JbnU9eX
-   UMXeHxJLiDIp8Nf44ssSnW758UbYNDwKT1B+KPzn36k9UU8+KAQEhLkn1
-   Q==;
-X-CSE-ConnectionGUID: J7OBnIFlRdaKRVh0sUlAOA==
-X-CSE-MsgGUID: GRMHc71JRAy1CSmXFFntkg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="11497143"
-X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
-   d="scan'208";a="11497143"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 07:36:57 -0700
-X-CSE-ConnectionGUID: PeCdhXC8SPqAcDo3IBZxGw==
-X-CSE-MsgGUID: ffy7z0hjR26fDCsCFRv8aw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
-   d="scan'208";a="30185232"
-Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.247.85])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 07:36:48 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Fri, 10 May 2024 17:36:43 +0300 (EEST)
-To: Christoph Fritz <christoph.fritz@hexdev.de>
-cc: Jiri Slaby <jirislaby@kernel.org>, Simon Horman <horms@kernel.org>, 
-    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-    Marc Kleine-Budde <mkl@pengutronix.de>, 
-    Oliver Hartkopp <socketcan@hartkopp.net>, 
-    Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-    "David S . Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-    Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-    Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
-    Benjamin Tissoires <bentiss@kernel.org>, 
-    Sebastian Reichel <sre@kernel.org>, 
-    Linus Walleij <linus.walleij@linaro.org>, 
-    Andreas Lauser <andreas.lauser@mercedes-benz.com>, 
-    Jonathan Corbet <corbet@lwn.net>, Pavel Pisa <pisa@cmp.felk.cvut.cz>, 
-    linux-can@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
-    devicetree@vger.kernel.org, linux-input@vger.kernel.org, 
-    linux-serial <linux-serial@vger.kernel.org>
-Subject: Re: [PATCH v4 09/11] can: lin: Handle rx offload config frames
-In-Reply-To: <20240509171736.2048414-10-christoph.fritz@hexdev.de>
-Message-ID: <48b00721-c341-4706-f2f5-af0fcff548aa@linux.intel.com>
-References: <20240509171736.2048414-1-christoph.fritz@hexdev.de> <20240509171736.2048414-10-christoph.fritz@hexdev.de>
+	s=arc-20240116; t=1715351856; c=relaxed/simple;
+	bh=Rs8unjHuGUxifVY/9+LC+KIT6hLlUWyGTvZnyD5tKSI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ioGODtkzXU5uiO9h5ZkU8Nx66tIUQQivomZ0aC2dszG/XYW2laIUhFSJl3HdMdiWbWihR3ehC7J64DsjbECaX8pnuyCCw2U2n1qiz6yVr7OWbFyNZYDiFyKBTAYsIkOGQgulnGvcvc8oy4dFbNjOsbX79Vln4m5PYRl7JKe2tbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=ZYCSRI7v; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 36EF688122;
+	Fri, 10 May 2024 16:37:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1715351846;
+	bh=jOpOKeXB26MZGG5tc6iWhny1B4Ybi73lxsddx0Swstw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ZYCSRI7vYaB9EJXXMJidQqjnmSwNoVkIWGX4FrOSw/9Re8XKPS0fZTBUMumBo/BdT
+	 JRGLaqKHk30YJZBbsU1veZ4D7yeJwn4AGPqLSlADSbKED+7L765V7aoaMP//g5dkmw
+	 UhavJevqRi+k4JszuQEWCS5oPf8IuxJhVgnQvmzc27QrmKdJCOHil92PqC0pd48hnL
+	 acAagRV3kTW1V7vL86Fh30wRxcjO0/eyr7myB4EjBye5MEafwP7dqQXcqNxGy1bMqj
+	 RyQx7GJOmlU8RsYhQGnj3lL1a4YwxHwLCM99zPGFYA/9BZth6FoRMOjCp/5bqM+5LZ
+	 pdIXc9cMimREA==
+From: Lukasz Majewski <lukma@denx.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Casper Andersson <casper.casan@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [net-next PATCH] test: hsr: Extend the hsr_redbox.sh to have more SAN devices connected
+Date: Fri, 10 May 2024 16:37:10 +0200
+Message-Id: <20240510143710.3916631-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Thu, 9 May 2024, Christoph Fritz wrote:
+After this change the single SAN device (ns3eth1) is now replaced with
+two SAN devices - respectively ns4eth1 and ns5eth1.
 
-> The CAN Broadcast Manager now has the capability to dispatch CANFD
-> frames marked with the id LINBUS_RXOFFLOAD_ID.
-> 
-> Introduce functionality to interpret these specific frames, enabling the
-> configuration of RX offloading within the LIN driver.
-> 
-> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
-> ---
->  drivers/net/can/lin.c | 29 +++++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
-> 
-> diff --git a/drivers/net/can/lin.c b/drivers/net/can/lin.c
-> index a22768c17e3f8..f77abd7d7d21c 100644
-> --- a/drivers/net/can/lin.c
-> +++ b/drivers/net/can/lin.c
-> @@ -185,6 +185,27 @@ static const struct attribute_group lin_sysfs_group = {
->  	.attrs = lin_sysfs_attrs,
->  };
->  
-> +static int lin_setup_rxoffload(struct lin_device *ldev,
-> +			       struct canfd_frame *cfd)
-> +{
-> +	struct lin_responder_answer answ;
-> +
-> +	if (!(cfd->flags & CANFD_FDF))
-> +		return -EINVAL;
-> +
-> +	BUILD_BUG_ON(sizeof(answ) > sizeof(cfd->data));
-> +	memcpy(&answ, cfd->data, sizeof(answ));
-> +
-> +	answ.lf.checksum_mode = (cfd->can_id & LIN_ENHANCED_CKSUM_FLAG) ?
-> +			LINBUS_ENHANCED : LINBUS_CLASSIC;
-> +
-> +	if (answ.lf.lin_id > LIN_ID_MASK ||
-> +	    answ.event_associated_id > LIN_ID_MASK)
-> +		return -EINVAL;
+It is possible to extend this script to have more SAN devices connected
+by adding them to ns3br1 bridge.
 
-These can be reverse so that error check occur before the checksum_mode 
-assignment? It would feel more natural that way.
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
+---
+ tools/testing/selftests/net/hsr/hsr_redbox.sh | 71 +++++++++++++------
+ 1 file changed, 49 insertions(+), 22 deletions(-)
 
-...Even better, if the error check could be done before the memcpy().
-
+diff --git a/tools/testing/selftests/net/hsr/hsr_redbox.sh b/tools/testing/selftests/net/hsr/hsr_redbox.sh
+index db69be95ecb3..1f36785347c0 100755
+--- a/tools/testing/selftests/net/hsr/hsr_redbox.sh
++++ b/tools/testing/selftests/net/hsr/hsr_redbox.sh
+@@ -8,12 +8,19 @@ source ./hsr_common.sh
+ do_complete_ping_test()
+ {
+ 	echo "INFO: Initial validation ping (HSR-SAN/RedBox)."
+-	# Each node has to be able each one.
++	# Each node has to be able to reach each one.
+ 	do_ping "${ns1}" 100.64.0.2
+ 	do_ping "${ns2}" 100.64.0.1
+-	# Ping from SAN to hsr1 (via hsr2)
++	# Ping between SANs (test bridge)
++	do_ping "${ns4}" 100.64.0.51
++	do_ping "${ns5}" 100.64.0.41
++	# Ping from SANs to hsr1 (via hsr2) (and opposite)
+ 	do_ping "${ns3}" 100.64.0.1
+ 	do_ping "${ns1}" 100.64.0.3
++	do_ping "${ns1}" 100.64.0.41
++	do_ping "${ns4}" 100.64.0.1
++	do_ping "${ns1}" 100.64.0.51
++	do_ping "${ns5}" 100.64.0.1
+ 	stop_if_error "Initial validation failed."
+ 
+ 	# Wait for MGNT HSR frames being received and nodes being
+@@ -23,8 +30,12 @@ do_complete_ping_test()
+ 	echo "INFO: Longer ping test (HSR-SAN/RedBox)."
+ 	# Ping from SAN to hsr1 (via hsr2)
+ 	do_ping_long "${ns3}" 100.64.0.1
+-	# Ping from hsr1 (via hsr2) to SAN
++	# Ping from hsr1 (via hsr2) to SANs (and opposite)
+ 	do_ping_long "${ns1}" 100.64.0.3
++	do_ping_long "${ns1}" 100.64.0.41
++	do_ping_long "${ns4}" 100.64.0.1
++	do_ping_long "${ns1}" 100.64.0.51
++	do_ping_long "${ns5}" 100.64.0.1
+ 	stop_if_error "Longer ping test failed."
+ 
+ 	echo "INFO: All good."
+@@ -35,22 +46,26 @@ setup_hsr_interfaces()
+ 	local HSRv="$1"
+ 
+ 	echo "INFO: preparing interfaces for HSRv${HSRv} (HSR-SAN/RedBox)."
+-
+-#       |NS1                     |
+-#       |                        |
+-#       |    /-- hsr1 --\        |
+-#       | ns1eth1     ns1eth2    |
+-#       |------------------------|
+-#            |            |
+-#            |            |
+-#            |            |
+-#       |------------------------|        |-----------|
+-#       | ns2eth1     ns2eth2    |        |           |
+-#       |    \-- hsr2 --/        |        |           |
+-#       |            \           |        |           |
+-#       |             ns2eth3    |--------| ns3eth1   |
+-#       |             (interlink)|        |           |
+-#       |NS2 (RedBOX)            |        |NS3 (SAN)  |
++#
++# IPv4 addresses (100.64.X.Y/24), and [X.Y] is presented on below diagram:
++#
++#
++# |NS1                     |               |NS4                |
++# |       [0.1]            |               |                   |
++# |    /-- hsr1 --\        |               |    [0.41]         |
++# | ns1eth1     ns1eth2    |               |    ns4eth1 (SAN)  |
++# |------------------------|               |-------------------|
++#      |            |                                |
++#      |            |                                |
++#      |            |                                |
++# |------------------------|   |-------------------------------|
++# | ns2eth1     ns2eth2    |   |                  ns3eth2      |
++# |    \-- hsr2 --/        |   |                 /             |
++# |      [0.2] \           |   |                /              |  |------------|
++# |             ns2eth3    |---| ns3eth1 -- ns3br1 -- ns3eth3--|--| ns5eth1    |
++# |             (interlink)|   | [0.3]      [0.11]             |  | [0.51]     |
++# |NS2 (RedBOX)            |   |NS3 (BR)                       |  | NS5 (SAN)  |
++#
+ #
+ 	# Check if iproute2 supports adding interlink port to hsrX device
+ 	ip link help hsr | grep -q INTERLINK
+@@ -59,7 +74,9 @@ setup_hsr_interfaces()
+ 	# Create interfaces for name spaces
+ 	ip link add ns1eth1 netns "${ns1}" type veth peer name ns2eth1 netns "${ns2}"
+ 	ip link add ns1eth2 netns "${ns1}" type veth peer name ns2eth2 netns "${ns2}"
+-	ip link add ns3eth1 netns "${ns3}" type veth peer name ns2eth3 netns "${ns2}"
++	ip link add ns2eth3 netns "${ns2}" type veth peer name ns3eth1 netns "${ns3}"
++	ip link add ns3eth2 netns "${ns3}" type veth peer name ns4eth1 netns "${ns4}"
++	ip link add ns3eth3 netns "${ns3}" type veth peer name ns5eth1 netns "${ns5}"
+ 
+ 	sleep 1
+ 
+@@ -70,21 +87,31 @@ setup_hsr_interfaces()
+ 	ip -n "${ns2}" link set ns2eth2 up
+ 	ip -n "${ns2}" link set ns2eth3 up
+ 
+-	ip -n "${ns3}" link set ns3eth1 up
++	ip -n "${ns3}" link add name ns3br1 type bridge
++	ip -n "${ns3}" link set ns3br1 up
++	ip -n "${ns3}" link set ns3eth1 master ns3br1 up
++	ip -n "${ns3}" link set ns3eth2 master ns3br1 up
++	ip -n "${ns3}" link set ns3eth3 master ns3br1 up
++
++	ip -n "${ns4}" link set ns4eth1 up
++	ip -n "${ns5}" link set ns5eth1 up
+ 
+ 	ip -net "${ns1}" link add name hsr1 type hsr slave1 ns1eth1 slave2 ns1eth2 supervision 45 version ${HSRv} proto 0
+ 	ip -net "${ns2}" link add name hsr2 type hsr slave1 ns2eth1 slave2 ns2eth2 interlink ns2eth3 supervision 45 version ${HSRv} proto 0
+ 
+ 	ip -n "${ns1}" addr add 100.64.0.1/24 dev hsr1
+ 	ip -n "${ns2}" addr add 100.64.0.2/24 dev hsr2
++	ip -n "${ns3}" addr add 100.64.0.11/24 dev ns3br1
+ 	ip -n "${ns3}" addr add 100.64.0.3/24 dev ns3eth1
++	ip -n "${ns4}" addr add 100.64.0.41/24 dev ns4eth1
++	ip -n "${ns5}" addr add 100.64.0.51/24 dev ns5eth1
+ 
+ 	ip -n "${ns1}" link set hsr1 up
+ 	ip -n "${ns2}" link set hsr2 up
+ }
+ 
+ check_prerequisites
+-setup_ns ns1 ns2 ns3
++setup_ns ns1 ns2 ns3 ns4 ns5
+ 
+ trap cleanup_all_ns EXIT
+ 
 -- 
- i.
+2.20.1
 
-
-> +	return ldev->ldev_ops->update_responder_answer(ldev, &answ);
-> +}
-> +
->  static void lin_tx_work_handler(struct work_struct *ws)
->  {
->  	struct lin_device *ldev = container_of(ws, struct lin_device,
-> @@ -197,6 +218,14 @@ static void lin_tx_work_handler(struct work_struct *ws)
->  	ldev->tx_busy = true;
->  
->  	cfd = (struct canfd_frame *)ldev->tx_skb->data;
-> +
-> +	if (cfd->can_id & LIN_RXOFFLOAD_DATA_FLAG) {
-> +		ret = lin_setup_rxoffload(ldev, cfd);
-> +		if (ret < 0)
-> +			netdev_err(ndev, "setting up rx failed %d\n", ret);
-> +		goto lin_tx_out;
-> +	}
-> +
->  	lf.checksum_mode = (cfd->can_id & LIN_ENHANCED_CKSUM_FLAG) ?
->  			   LINBUS_ENHANCED : LINBUS_CLASSIC;
->  	lf.lin_id = cfd->can_id & LIN_ID_MASK;
-> 
 
