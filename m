@@ -1,110 +1,340 @@
-Return-Path: <netdev+bounces-95361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E93D8C1F8D
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:13:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 698288C1F8F
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:15:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7862F1C21697
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 08:13:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF8C31F21A8A
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 08:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2954715F410;
-	Fri, 10 May 2024 08:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 606AD15F3F1;
+	Fri, 10 May 2024 08:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ZngF10St"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B156D15F40B;
-	Fri, 10 May 2024 08:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9F414901F;
+	Fri, 10 May 2024 08:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715328786; cv=none; b=opIimh3+rgHSTLtLTNEcoBC1k2TdWvHXCyXQBvQPyQFFhEKfgKS5L6hHNRN9mb+RI19PoPZeKy8/5lljFfnGG1nGOseOd0GYD6oXA6n091ILjbp3NleQMyTAnPmM23rrCLr8c2YfAXhagXDFjmUIz+hMAaEjcOhHlOVdt+4GZ94=
+	t=1715328926; cv=none; b=pBTZ4El930sTCdB01hqxDn91dKm6Vs2QD78p1UBdKXViTAS+oVzZQfTkUilsK1H+l+klNdQCcW6vw0GP5hQYjS5ZlVqwWyzxUA9DF4DBNPEQGbg19xGqdp94M8UFQLRJGKbJPZvu2/02jh+WQHimWG4CYikR2yugGlFpt3XbIxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715328786; c=relaxed/simple;
-	bh=TZfiS6lrEsk38Jd6m1IXLmMxfZu6DuG/Z0mv+clT1Q8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=b1cxLKf8ipPZKjYzFxUlkh1pMYqiXt0HAJ+o4jc8QhrvsxzLBQYleAsgcmYVKNWj5YbFS2Rb/PTr6tgmob7t8vPvcy19aUm6MtaZNv4QvuPTxVpZn87EA1asF7YilUX54TKXv5mVbNxEUeHtkEzp8yz9UZsdwzWCBnYOCx64GDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 44A8CTnmC2567408, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 44A8CTnmC2567408
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 May 2024 16:12:29 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 10 May 2024 16:12:29 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 10 May 2024 16:12:28 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
- RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
- 15.01.2507.035; Fri, 10 May 2024 16:12:28 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "andrew@lunn.ch"
-	<andrew@lunn.ch>,
-        "jiri@resnulli.us" <jiri@resnulli.us>,
-        "horms@kernel.org"
-	<horms@kernel.org>,
-        Ping-Ke Shih <pkshih@realtek.com>,
-        Larry Chiu
-	<larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v18 10/13] rtase: Implement ethtool function
-Thread-Topic: [PATCH net-next v18 10/13] rtase: Implement ethtool function
-Thread-Index: AQHaoUWgPXTTB14VD0aoQIyqdMTInbGPTwiAgADR5MA=
-Date: Fri, 10 May 2024 08:12:28 +0000
-Message-ID: <b5c86321761f4d24921b3a4a1f02c694@realtek.com>
-References: <20240508123945.201524-1-justinlai0215@realtek.com>
-	<20240508123945.201524-11-justinlai0215@realtek.com>
- <20240509204047.149e226e@kernel.org>
-In-Reply-To: <20240509204047.149e226e@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1715328926; c=relaxed/simple;
+	bh=jfrht1k3slQlbQO/XWPTrQUvaVDx9zpVddGp5OuBGWc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jm8QSjLWLaC6KAKOPLD2Pn9IyjnMPV+OpkOYBULOtafiiJZI3RQjwkmOT7ej2NEVSWkERzzDk3FNpAro3IbK2q0RiZWdHJICKRuCSjhzGC/92XBHbERqhpQCD6Rl1CE4db4d2xs+tC4gKShi9XL9F0rF9JcSPfi2VUWQAmQCnbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ZngF10St; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9911C113CC;
+	Fri, 10 May 2024 08:15:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1715328925;
+	bh=jfrht1k3slQlbQO/XWPTrQUvaVDx9zpVddGp5OuBGWc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZngF10StLSpHtWsFx+jr3vPPYzz6eUObYob4HFu8P+jYAORLFjiwC9bsBGnmrRNzc
+	 x4TfzybgyU4GrlC1xGR84oW88GM48negJ2wFd8kPMWe/UgSTq8ZXCKQJciTE6XHhyI
+	 Uawgv15PQk9zu15Btg6NENqIzqvWF5zrhSsErxw4=
+Date: Fri, 10 May 2024 09:15:22 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Shay Drory <shayd@nvidia.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	kuba@kernel.org, edumazet@google.com, david.m.ertman@intel.com,
+	rafael@kernel.org, ira.weiny@intel.com, linux-rdma@vger.kernel.org,
+	leon@kernel.org, tariqt@nvidia.com, Parav Pandit <parav@nvidia.com>
+Subject: Re: [PATCH net-next v4 1/2] driver core: auxiliary bus: show
+ auxiliary device IRQs
+Message-ID: <2024051056-encrypt-divided-30d2@gregkh>
+References: <20240509091411.627775-1-shayd@nvidia.com>
+ <20240509091411.627775-2-shayd@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240509091411.627775-2-shayd@nvidia.com>
 
-> On Wed, 8 May 2024 20:39:42 +0800 Justin Lai wrote:
-> > +     data[0] =3D le64_to_cpu(counters->tx_packets);
-> > +     data[1] =3D le64_to_cpu(counters->rx_packets);
-> > +     data[2] =3D le64_to_cpu(counters->tx_errors);
-> > +     data[3] =3D le32_to_cpu(counters->rx_errors);
-> > +     data[4] =3D le16_to_cpu(counters->rx_missed);
-> > +     data[5] =3D le16_to_cpu(counters->align_errors);
-> > +     data[6] =3D le32_to_cpu(counters->tx_one_collision);
-> > +     data[7] =3D le32_to_cpu(counters->tx_multi_collision);
-> > +     data[8] =3D le64_to_cpu(counters->rx_unicast);
-> > +     data[9] =3D le64_to_cpu(counters->rx_broadcast);
-> > +     data[10] =3D le32_to_cpu(counters->rx_multicast);
-> > +     data[11] =3D le16_to_cpu(counters->tx_aborted);
-> > +     data[12] =3D le16_to_cpu(counters->tx_underun);
->=20
-> Please limit stats you report in ethtool -S to just the stats for which p=
-roper
-> interfaces don't exist. Don't duplicate what's already reported via
-> rtase_get_stats64(), also take a look at what can be reported via various
-> *_stats members of struct ethtool_ops.
+On Thu, May 09, 2024 at 12:14:10PM +0300, Shay Drory wrote:
+> PCI subfunctions (SF) are anchored on the auxiliary bus.
 
-OK, I will check this part and modify it.
+"Some PCI subfunctions can be on the auxiliary bus"
+
+Or maybe "Sometimes the auxiliary bus interface is used for PCI
+subfunctions."
+
+Either way, the text here as-is is not correct as that is not how the
+auxbus code is always used, sorry.
+
+> PCI physical
+> and virtual functions are anchored on the PCI bus;  the irq information
+
+Odd use of ';'?  And an extra ' '?
+
+> of each such function is visible to users via sysfs directory "msi_irqs"
+> containing file for each irq entry. However, for PCI SFs such information
+> is unavailable. Due to this users have no visibility on IRQs used by the
+> SFs.
+
+Not even in /proc/irq/ ?
+
+> Secondly, an SF is a multi function device supporting rdma, netdevice
+
+Not "is", it should be "can be"  Not all the world is your crazy
+hardware :)
+
+> and more. Without irq information at the bus level, the user is unable
+> to view or use the affinity of the SF IRQs.
+
+How would affinity be relevent here?  You are just allowing them to be
+viewed, not set.
+
+> Hence to match to the equivalent PCI PFs and VFs, add "irqs" directory,
+> for supporting auxiliary devices, containing file for each irq entry.
+> 
+> Additionally, the PCI SFs sometimes share the IRQs with peer SFs. This
+> information is also not available to the users. To overcome this
+> limitation, each irq sysfs entry shows if irq is exclusive or shared.
+> 
+> For example:
+> $ ls /sys/bus/auxiliary/devices/mlx5_core.sf.1/irqs/
+> 50  51  52  53  54  55  56  57  58
+> $ cat /sys/bus/auxiliary/devices/mlx5_core.sf.1/irqs/52
+> exclusive
+> 
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Signed-off-by: Shay Drory <shayd@nvidia.com>
+> 
+> ---
+> v3->4:
+> - remove global mutex (Przemek)
+> v2->v3:
+> - fix function declaration in case SYSFS isn't defined (Parav)
+> - convert auxdev->groups array with auxiliary_irqs_groups (Przemek)
+> v1->v2:
+> - move #ifdefs from drivers/base/auxiliary.c to
+>   include/linux/auxiliary_bus.h (Greg)
+> - use EXPORT_SYMBOL_GPL instead of EXPORT_SYMBOL (Greg)
+> - Fix kzalloc(ref) to kzalloc(*ref) (Simon)
+> - Add return description in auxiliary_device_sysfs_irq_add() kdoc (Simon)
+> - Fix auxiliary_irq_mode_show doc (kernel test boot)
+> ---
+>  Documentation/ABI/testing/sysfs-bus-auxiliary |  14 ++
+>  drivers/base/auxiliary.c                      | 178 +++++++++++++++++-
+>  include/linux/auxiliary_bus.h                 |  24 ++-
+>  3 files changed, 213 insertions(+), 3 deletions(-)
+>  create mode 100644 Documentation/ABI/testing/sysfs-bus-auxiliary
+> 
+> diff --git a/Documentation/ABI/testing/sysfs-bus-auxiliary b/Documentation/ABI/testing/sysfs-bus-auxiliary
+> new file mode 100644
+> index 000000000000..3b8299d49d9e
+> --- /dev/null
+> +++ b/Documentation/ABI/testing/sysfs-bus-auxiliary
+> @@ -0,0 +1,14 @@
+> +What:		/sys/bus/auxiliary/devices/.../irqs/
+> +Date:		April, 2024
+> +Contact:	Shay Drory <shayd@nvidia.com>
+> +Description:
+> +		The /sys/devices/.../irqs directory contains a variable set of
+> +		files, with each file is named as irq number similar to PCI PF
+> +		or VF's irq number located in msi_irqs directory.
+
+So this can be msi irqs?  Or not msi irqs?  How do we know?
+
+
+> +
+> +What:		/sys/bus/auxiliary/devices/.../irqs/<N>
+> +Date:		April, 2024
+> +Contact:	Shay Drory <shayd@nvidia.com>
+> +Description:
+> +		auxiliary devices can share IRQs. This attribute indicates if
+> +		the irq is shared with other SFs or exclusively used by the SF.
+> diff --git a/drivers/base/auxiliary.c b/drivers/base/auxiliary.c
+> index d3a2c40c2f12..def02f5f1220 100644
+> --- a/drivers/base/auxiliary.c
+> +++ b/drivers/base/auxiliary.c
+> @@ -158,6 +158,176 @@
+>   *	};
+>   */
+>  
+> +#ifdef CONFIG_SYSFS
+> +/* Xarray of irqs to determine if irq is exclusive or shared. */
+> +static DEFINE_XARRAY(irqs);
+> +
+> +struct auxiliary_irq_info {
+> +	struct device_attribute sysfs_attr;
+> +	int irq;
+> +};
+> +
+> +static struct attribute *auxiliary_irq_attrs[] = {
+> +	NULL
+> +};
+> +
+> +static const struct attribute_group auxiliary_irqs_group = {
+> +	.name = "irqs",
+> +	.attrs = auxiliary_irq_attrs,
+> +};
+> +
+> +static const struct attribute_group *auxiliary_irqs_groups[2] = {
+
+Why list the array size?
+
+> +	&auxiliary_irqs_group,
+> +	NULL
+> +};
+> +
+> +/* Auxiliary devices can share IRQs. Expose to user whether the provided IRQ is
+> + * shared or exclusive.
+> + */
+> +static ssize_t auxiliary_irq_mode_show(struct device *dev,
+> +				       struct device_attribute *attr, char *buf)
+> +{
+> +	struct auxiliary_irq_info *info =
+> +		container_of(attr, struct auxiliary_irq_info, sysfs_attr);
+> +
+> +	if (refcount_read(xa_load(&irqs, info->irq)) > 1)
+
+refcount combined with xa?  That feels wrong, why is refcount used for
+this at all?
+
+> +		return sysfs_emit(buf, "%s\n", "shared");
+> +	else
+> +		return sysfs_emit(buf, "%s\n", "exclusive");
+> +}
+> +
+> +static void auxiliary_irq_destroy(int irq)
+> +{
+> +	refcount_t *ref;
+> +
+> +	xa_lock(&irqs);
+> +	ref = xa_load(&irqs, irq);
+> +	if (refcount_dec_and_test(ref)) {
+> +		__xa_erase(&irqs, irq);
+> +		kfree(ref);
+> +	}
+> +	xa_unlock(&irqs);
+> +}
+> +
+> +static int auxiliary_irq_create(int irq)
+> +{
+> +	refcount_t *new_ref = kzalloc(sizeof(*new_ref), GFP_KERNEL);
+> +	refcount_t *ref;
+> +	int ret = 0;
+> +
+> +	if (!new_ref)
+> +		return -ENOMEM;
+> +
+> +	xa_lock(&irqs);
+> +	ref = xa_load(&irqs, irq);
+> +	if (ref) {
+> +		kfree(new_ref);
+> +		refcount_inc(ref);
+
+Why do you need to use refcounts for these?  What does that help out
+with?
+
+> +		goto out;
+> +	}
+> +
+> +	refcount_set(new_ref, 1);
+> +	ref = __xa_cmpxchg(&irqs, irq, NULL, new_ref, GFP_KERNEL);
+> +	if (ref) {
+> +		kfree(new_ref);
+> +		if (xa_is_err(ref)) {
+> +			ret = xa_err(ref);
+> +			goto out;
+> +		}
+> +
+> +		/* Another thread beat us to creating the enrtry. */
+> +		refcount_inc(ref);
+
+How can that happen?  Why not just use a normal simple lock for all of
+this so you don't have to mess with refcounts at all?  This is not
+performance-relevent code at all, but yet with a refcount you cause
+almost the same issues that a normal lock would have, plus the increased
+complexity of all of the surrounding code (like this, and the crazy
+__xa_cmpxchg() call)
+
+Make this simple please.
+
+
+> +	}
+> +
+> +out:
+> +	xa_unlock(&irqs);
+> +	return ret;
+> +}
+> +
+> +/**
+> + * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
+> + * @auxdev: auxiliary bus device to add the sysfs entry.
+> + * @irq: The associated Linux interrupt number.
+> + *
+> + * This function should be called after auxiliary device have successfully
+> + * received the irq.
+> + *
+> + * Return: zero on success or an error code on failure.
+> + */
+> +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq)
+> +{
+> +	struct device *dev = &auxdev->dev;
+> +	struct auxiliary_irq_info *info;
+> +	int ret;
+> +
+> +	ret = auxiliary_irq_create(irq);
+> +	if (ret)
+> +		return ret;
+> +
+> +	info = kzalloc(sizeof(*info), GFP_KERNEL);
+> +	if (!info) {
+> +		ret = -ENOMEM;
+> +		goto info_err;
+> +	}
+> +
+> +	sysfs_attr_init(&info->sysfs_attr.attr);
+> +	info->sysfs_attr.attr.name = kasprintf(GFP_KERNEL, "%d", irq);
+> +	if (!info->sysfs_attr.attr.name) {
+> +		ret = -ENOMEM;
+> +		goto name_err;
+> +	}
+> +	info->irq = irq;
+> +	info->sysfs_attr.attr.mode = 0444;
+> +	info->sysfs_attr.show = auxiliary_irq_mode_show;
+> +
+> +	ret = xa_insert(&auxdev->irqs, irq, info, GFP_KERNEL);
+> +	if (ret)
+> +		goto auxdev_xa_err;
+> +
+> +	ret = sysfs_add_file_to_group(&dev->kobj, &info->sysfs_attr.attr,
+> +				      auxiliary_irqs_group.name);
+
+Adding dynamic sysfs attributes like this means that you normally just
+raced with userspace and lost.  How are you ensuring that you did not
+just do that?
+
+> +/**
+> + * auxiliary_device_sysfs_irq_remove - remove a sysfs entry for the given IRQ
+> + * @auxdev: auxiliary bus device to add the sysfs entry.
+> + * @irq: the IRQ to remove.
+> + *
+> + * This function should be called to remove an IRQ sysfs entry.
+> + */
+> +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq)
+> +{
+> +	struct auxiliary_irq_info *info = xa_load(&auxdev->irqs, irq);
+> +	struct device *dev = &auxdev->dev;
+> +
+> +	if (WARN_ON(!info))
+
+How can this ever happen?  If not, don't check for it please.  If it can
+happen, properly handle it and move on, don't reboot the box.
+
+thanks,
+
+greg k-h
 
