@@ -1,203 +1,101 @@
-Return-Path: <netdev+bounces-95537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 428B58C28AB
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 18:22:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 149468C28D6
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 18:41:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E766B2504F
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 16:22:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B5421C2185E
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 16:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F20172761;
-	Fri, 10 May 2024 16:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894AC101E3;
+	Fri, 10 May 2024 16:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2eShj/Nm";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="KwVBqgvl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Tmqpq246"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF7261E502;
-	Fri, 10 May 2024 16:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C78A944F;
+	Fri, 10 May 2024 16:41:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715358139; cv=none; b=n+pr9YsXpmCSp1eRbSwjfYRVK/agvMK3LX4Mtg8APOtnG2TrH+YQ/nfmK7IAYD+JVFOat8Fuh9a7hAW0CJBuWeRIpk6yDV58jSNsQf9zLG45GYREq0IggZwKa0ivxqUklp60LRgKYBOyKJ5kekJIjYbZ8SI8Nw2We0JTJTl/l7Y=
+	t=1715359267; cv=none; b=WlLqr9aAjr9P3Oe6bjBgQ6G4H8ys8auUywpFBm7N4T9k2YyD8hZn/uDnXhcHYD8uoI5/0B4dqZNAu0ux9xOHePCkum3CLlez8R4mm3BBwHmhRaSCAa/81kvGkulNemO/Bg6Hl9d3F8rXQ/zev3Jom5q7eGR8Es1nZA8r602krvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715358139; c=relaxed/simple;
-	bh=stogIKj8+hYZVSkbsvVvCqugo9i6JwMiNtwTeMU4yKg=;
+	s=arc-20240116; t=1715359267; c=relaxed/simple;
+	bh=xfRjOrQWpkFkYRyjrM5afF91/RXXzlY/Nebpun8maTw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LT1XnKT5tX/xSEaCN0lMatLT+SXORauT0mn4ObqHJb53npdbHO9fjfIkOiv6QCBkj2wmOnAZ2Vbs/nV3L3xU3O1xmz8/DAtmF5b9akZX7r+J15Vg+pjNgezrcwEjw/tzdlirMJp+buiYqCMDXejs/s1aT+c4uDKYDN7ir71o3kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2eShj/Nm; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=KwVBqgvl; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 10 May 2024 18:22:14 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1715358136;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iPtpHGApZXozzh1sZxS1i2Tmk587abOSGlWr8H4ibcg=;
-	b=2eShj/NmLmytxxN5WI1wco6aozQn7VY0Hq5nQJEQZS+Cf1yBzGOaDxWKVEi7pePUrfr9dw
-	tVjV0yOrPtifsAbZSsS57l952UBPTRowZbp0GYogVxHAwHL2aYqRzO9BDWW7mCttuZt7bR
-	sWiweOdtZT01+I20KOeK+XBax6e0nDhTGP68rcM9HGsbcYUseQaOprN8uqB7plAI4Fw9aR
-	hA96AmPQsns+Uxn1gT7A4am/O8KeQaaqziq1+8spUrhjoHIXEakWLZDfOkSv2HSpCnKYCj
-	OpHZjtQDlV+aIfVgl+Yfyp1oJbNI6oriQCZru3+Bo1qvW9RBaKeeG56M6cTyNA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1715358136;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iPtpHGApZXozzh1sZxS1i2Tmk587abOSGlWr8H4ibcg=;
-	b=KwVBqgvlOC0PIW0klVHR8tZ7CORFnwP6nFMqdQ9H1Nyim76TtK+iTU/ZBDsvYFtgpOXcIu
-	mmzI0kOmkAOeAoDg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
-Subject: Re: [PATCH net-next 14/15 v2] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-Message-ID: <20240510162214.zNWRKgFU@linutronix.de>
-References: <20240503182957.1042122-1-bigeasy@linutronix.de>
- <20240503182957.1042122-15-bigeasy@linutronix.de>
- <87y18mohhp.fsf@toke.dk>
- <CAADnVQJkiwaYXUo+LyKoV96VFFCFL0VY5Jgpuv_0oypksrnciA@mail.gmail.com>
- <20240507123636.cTnT7TvU@linutronix.de>
- <93062ce7-8dfa-48a9-a4ad-24c5a3993b41@kernel.org>
- <20240510162121.f-tvqcyf@linutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=igW+++PqsGIRDS6sIWsZrgPom+yIL6p6r1b11iCFhraKqVxKIX7e/N8Jv06vYj0uWiFQhfSWEbyvHqOqajmm83y0JHTdm7nbBfVb/In3yJ3RywcWvy3ry6aLa+80DjCZ6Jiog/VLPVYnm1XEugv3/IYsImTkAsT95SWUVTFpmiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Tmqpq246; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=w1c2swpE732RMxnnk+KeFHljfGUTrIAHWAXm+YYF3L8=; b=Tmqpq246D9GzLE11q+1Bhe3TOW
+	kzvmGDytr1lt3wk6s/2qhQV5eo+nggFEUJdgmmfOPYKQnzX55HZaSySlcMqgd79BEW0EQPluSsQYb
+	Hh7FJK9UaFuZeEGtFN+w2cxys9nVHhgJMXOVSc/vyhVJCUnIchsIPexXo7w9aF3SVbEk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s5TIo-00F9Xd-Uq; Fri, 10 May 2024 18:40:58 +0200
+Date: Fri, 10 May 2024 18:40:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, jiri@resnulli.us, horms@kernel.org,
+	pkshih@realtek.com, larry.chiu@realtek.com
+Subject: Re: [PATCH net-next v18 06/13] rtase: Implement .ndo_start_xmit
+ function
+Message-ID: <1bb2d174-ccae-43e3-80ec-872b9a140fbe@lunn.ch>
+References: <20240508123945.201524-1-justinlai0215@realtek.com>
+ <20240508123945.201524-7-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240510162121.f-tvqcyf@linutronix.de>
+In-Reply-To: <20240508123945.201524-7-justinlai0215@realtek.com>
 
-On 2024-05-10 18:21:24 [+0200], To Jesper Dangaard Brouer wrote:
-> The XDP redirect process is two staged:
-=E2=80=A6
-On 2024-05-07 15:27:44 [+0200], Jesper Dangaard Brouer wrote:
->=20
-> I need/want to echo Toke's request to benchmark these changes.
+> +static u32 rtase_tx_csum(struct sk_buff *skb, const struct net_device *dev)
+> +{
+> +	u32 csum_cmd = 0;
+> +	u8 ip_protocol;
+> +
+> +	switch (vlan_get_protocol(skb)) {
+> +	case htons(ETH_P_IP):
+> +		csum_cmd = RTASE_TX_IPCS_C;
+> +		ip_protocol = ip_hdr(skb)->protocol;
+> +		break;
+> +
+> +	case htons(ETH_P_IPV6):
+> +		csum_cmd = RTASE_TX_IPV6F_C;
+> +		ip_protocol = ipv6_hdr(skb)->nexthdr;
+> +		break;
+> +
+> +	default:
+> +		ip_protocol = IPPROTO_RAW;
+> +		break;
+> +	}
+> +
+> +	if (ip_protocol == IPPROTO_TCP)
+> +		csum_cmd |= RTASE_TX_TCPCS_C;
+> +	else if (ip_protocol == IPPROTO_UDP)
+> +		csum_cmd |= RTASE_TX_UDPCS_C;
+> +	else
+> +		WARN_ON_ONCE(1);
 
-I have:
-boxA: ixgbe
-boxB: i40e
+I'm not so sure about this WARN_ON_ONCE(). It looks like if i send a
+custom packet which is not IPv4 or IPv6 it will fire. There are other
+protocols then IP. Connecting to an Ethernet switch using DSA tags
+would be a good example. So i don't think you want this warning.
 
-Both are bigger NUMA boxes. I have to patch ixgbe to ignore the 64CPU
-limit and I boot box with only 64CPUs. The IOMMU has been disabled on
-both box as well as CPU mitigations. The link is 10G.
-
-The base for testing I have is commit a17ef9e6c2c1c ("net_sched:
-sch_sfq: annotate data-races around q->perturb_period") which I used to
-rebase my series on top of.
-
-pktgen_sample03_burst_single_flow.sh has been used to send packets and
-"xdp-bench drop $nic -e" to receive them.
-
-baseline
-~~~~~~~~
-boxB -> boxA | gov performance
--t2 (to pktgen)
-| receive total 14,854,233 pkt/s        14,854,233 drop/s                0 =
-error/s     =20
-
--t1 (to pktgen)
-| receive total 10,642,895 pkt/s        10,642,895 drop/s                0 =
-error/s     =20
-
-
-boxB -> boxA | gov powersave
--t2 (to pktgen)
-  receive total 10,196,085 pkt/s        10,196,085 drop/s                0 =
-error/s     =20
-  receive total 10,187,254 pkt/s        10,187,254 drop/s                0 =
-error/s     =20
-  receive total 10,553,298 pkt/s        10,553,298 drop/s                0 =
-error/s
-
--t1
-  receive total 10,427,732 pkt/s        10,427,732 drop/s                0 =
-error/s     =20
-
-=3D=3D=3D=3D=3D=3D
-boxA -> boxB (-t1) gov performance
-performace:
-  receive total 13,171,962 pkt/s        13,171,962 drop/s                0 =
-error/s     =20
-  receive total 13,368,344 pkt/s        13,368,344 drop/s                0 =
-error/s
-
-powersave:
-  receive total 13,343,136 pkt/s        13,343,136 drop/s                0 =
-error/s     =20
-  receive total 13,220,326 pkt/s        13,220,326 drop/s                0 =
-error/s     =20
-
-(I the CPU governor had no impact, just noise)
-
-The series applied (with updated 14/15)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-boxB -> boxA | gov performance
--t2:
-  receive total  14,880,199 pkt/s        14,880,199 drop/s                0=
- error/s
-
--t1:
-  receive total  10,769,082 pkt/s        10,769,082 drop/s                0=
- error/s     =20
-
-boxB -> boxA | gov powersave
--t2:
- receive total   11,163,323 pkt/s        11,163,323 drop/s                0=
- error/s     =20
-
--t1:
- receive total   10,756,515 pkt/s        10,756,515 drop/s                0=
- error/s     =20
-
-boxA -> boxB | gov perfomance
-
- receive total  13,395,919 pkt/s        13,395,919 drop/s                0 =
-error/s     =20
-
-boxA -> boxB | gov perfomance
- receive total  13,290,527 pkt/s        13,290,527 drop/s                0 =
-error/s
-
-
-Based on my numbers, there is just noise.  BoxA hit the CPU limit during
-receive while lowering the CPU-freq. BoxB seems to be unaffected by
-lowing CPU frequency during receive.
-
-I can't comment on anything >10G due to HW limits.
-
-Sebastian
+      Andrew
 
