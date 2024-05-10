@@ -1,340 +1,258 @@
-Return-Path: <netdev+bounces-95362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 698288C1F8F
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:15:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EAAC8C1FBC
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 10:30:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF8C31F21A8A
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 08:15:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 244C5284C37
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 08:30:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 606AD15F3F1;
-	Fri, 10 May 2024 08:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8DB15FA85;
+	Fri, 10 May 2024 08:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ZngF10St"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HAlP0B3a"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9F414901F;
-	Fri, 10 May 2024 08:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715328926; cv=none; b=pBTZ4El930sTCdB01hqxDn91dKm6Vs2QD78p1UBdKXViTAS+oVzZQfTkUilsK1H+l+klNdQCcW6vw0GP5hQYjS5ZlVqwWyzxUA9DF4DBNPEQGbg19xGqdp94M8UFQLRJGKbJPZvu2/02jh+WQHimWG4CYikR2yugGlFpt3XbIxE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715328926; c=relaxed/simple;
-	bh=jfrht1k3slQlbQO/XWPTrQUvaVDx9zpVddGp5OuBGWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jm8QSjLWLaC6KAKOPLD2Pn9IyjnMPV+OpkOYBULOtafiiJZI3RQjwkmOT7ej2NEVSWkERzzDk3FNpAro3IbK2q0RiZWdHJICKRuCSjhzGC/92XBHbERqhpQCD6Rl1CE4db4d2xs+tC4gKShi9XL9F0rF9JcSPfi2VUWQAmQCnbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ZngF10St; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9911C113CC;
-	Fri, 10 May 2024 08:15:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1715328925;
-	bh=jfrht1k3slQlbQO/XWPTrQUvaVDx9zpVddGp5OuBGWc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZngF10StLSpHtWsFx+jr3vPPYzz6eUObYob4HFu8P+jYAORLFjiwC9bsBGnmrRNzc
-	 x4TfzybgyU4GrlC1xGR84oW88GM48negJ2wFd8kPMWe/UgSTq8ZXCKQJciTE6XHhyI
-	 Uawgv15PQk9zu15Btg6NENqIzqvWF5zrhSsErxw4=
-Date: Fri, 10 May 2024 09:15:22 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Shay Drory <shayd@nvidia.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	kuba@kernel.org, edumazet@google.com, david.m.ertman@intel.com,
-	rafael@kernel.org, ira.weiny@intel.com, linux-rdma@vger.kernel.org,
-	leon@kernel.org, tariqt@nvidia.com, Parav Pandit <parav@nvidia.com>
-Subject: Re: [PATCH net-next v4 1/2] driver core: auxiliary bus: show
- auxiliary device IRQs
-Message-ID: <2024051056-encrypt-divided-30d2@gregkh>
-References: <20240509091411.627775-1-shayd@nvidia.com>
- <20240509091411.627775-2-shayd@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574E0161912
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 08:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715329799; cv=fail; b=VpHQ2lmWpIk5VesAY3WX549EcnSwcS5W/D6vA367sWEM1OyW2ashJJvJ6R1BRcgOCqScg0M4UAAVnxUUWPL9mUKEHKJCe7jGlcqBVGJWRnZOtxz0sjWUk6/FYJhHQZBdLYJrqMlQ/80nx61v9xakKpqauoluBXxqMU3VmI5OfHU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715329799; c=relaxed/simple;
+	bh=wOK37iK9GefE1HPMnlliIFqjM6p4ZrTyFd8h56+7+Do=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Pi9okTTg3r2pdSgutM7tAyd6snHxK7pvOHpEa8bkOnAADTRg+4zPYmNJP46BcBkJPGn0qk8h5HoAlOv5nwbUg/gn6au7gxQd/hJB3KBZCsaqi+ueNHzoULkCQz5gVyx0rIMi7X75YBBTtkagigPlff56qsQLTt9RPQDwoHwoRVc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HAlP0B3a; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715329796; x=1746865796;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=wOK37iK9GefE1HPMnlliIFqjM6p4ZrTyFd8h56+7+Do=;
+  b=HAlP0B3aLluHqsfhMaYRaYY/aYMFMwV5Yf/e25bf7VKwvsas4H6wcPX4
+   CwKkRhTbzvOgWG9/ITs9vRfFEaf3OyaWKt2bMu7LqN1aiiZgFI3HBowx9
+   IjWfIvVK8tuFh4oMupfqt4WWwPjOyjMrUevZ5hpK29gJsWh7yZII6qFiF
+   yH5ksGQEYAPGNe6Fv60mBrLu0Slj5UcQpKzud8GMN/LHJp/ule+KLfMh0
+   u0FTgBGFNFkRvexghK/VxsPPad/GkT2ROvuyG6p3Y+rc+Z66ptLyHsDnK
+   t41CEL2dqOD1G670bUfHmI4wZoQeAMtdCqlrmItqOHKPpBOsq0gsHW+18
+   Q==;
+X-CSE-ConnectionGUID: LmXLp9IJQP2ofPtnpL6Ijg==
+X-CSE-MsgGUID: sBz9pKmjQGiO4UcUbJ/BfQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="28783596"
+X-IronPort-AV: E=Sophos;i="6.08,150,1712646000"; 
+   d="scan'208";a="28783596"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 01:29:55 -0700
+X-CSE-ConnectionGUID: TdWt7Wq0Tt+9tBduDzIZEw==
+X-CSE-MsgGUID: YaG5mLfERW+yfhT8H+nV3g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,150,1712646000"; 
+   d="scan'208";a="29480473"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 May 2024 01:29:55 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 10 May 2024 01:29:53 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 10 May 2024 01:29:53 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Fri, 10 May 2024 01:29:53 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.41) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 10 May 2024 01:29:52 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PnIZAkkJ6K8mDJCJNkb7jOOr3fqegyYexG2NzM3FtjSjdowjnvGwP8Orad1TNThe+sOU1PylR42ukfl9B+WW/ERH240fgZ18Xtp1tQjVW/L9q5zGUZgPNL6LQnC+T7SQ20a+xXEP0e+B6r9jE3I7YBHOWVU13T7UEtjT/BAFZQRmduB77/w2sGr3wiNsDBwGbezDrrwqgHRdV1sLPUrVp1IiFm5OTqEaXHkC0kDDv+wKRyNa9Dkm2izDwY+okgFK6LaeRodY+H4ZIDcDo+9oxPBGNm/MEbRlq0SA86hR7bGBZuOCeMOBDfIx4IgPGzWKND6b4AYyI8wklwCcJ6Ccdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vJJL2QmYk2PySZ9Q+3wAS+k2v2rV94us8OPtm3rPyxs=;
+ b=lHhLv/jYg4h8aWHgYAjlgOV3ME+a7koedkC3x+MZhHqeyaTx3wsPC1qwX4seqCbXRKZUpKPfVzKEBu3xnWXAN3V4/fytmwqXfHmrh4FVvs3IBmg/HUw4kVFGQxZEcH6MvfOOd3o1NOcLSOrTTt7LH4eH0DdAoqO8XS9JOjLu0VTcl00TQOnhV8vOLW9uMq+nRHhU5uoatvTZLyBQmSEoz0CjFYWyDdvShkTt4hHZp3+NpM1H8GUYOpFkiPR3ZrHV/TUfwT0W29q/Ge2XHzB9u+zUYlR8IHMmYiVd6gkz1QPTS0gHcD7VafJvd3+L6/oF0h95d+aElQlViZKM7Eag+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by LV8PR11MB8463.namprd11.prod.outlook.com (2603:10b6:408:1ed::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.49; Fri, 10 May
+ 2024 08:29:50 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::faf8:463a:6c86:5996]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::faf8:463a:6c86:5996%6]) with mapi id 15.20.7544.046; Fri, 10 May 2024
+ 08:29:50 +0000
+Date: Fri, 10 May 2024 10:29:42 +0200
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Eric Dumazet <edumazet@google.com>
+CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern
+	<dsahern@kernel.org>, <netdev@vger.kernel.org>, <eric.dumazet@gmail.com>, "Yu
+ Watanabe" <watanabe.yu@gmail.com>
+Subject: Re: [PATCH net] inet: fix inet_fill_ifaddr() flags truncation
+Message-ID: <Zj3a9h/VdgwboRZJ@lzaremba-mobl.ger.corp.intel.com>
+References: <20240510072932.2678952-1-edumazet@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240510072932.2678952-1-edumazet@google.com>
+X-ClientProxiedBy: ZR0P278CA0131.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:40::10) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240509091411.627775-2-shayd@nvidia.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|LV8PR11MB8463:EE_
+X-MS-Office365-Filtering-Correlation-Id: 135c08c4-1838-4039-73fa-08dc70cb5bc5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|1800799015;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?4UylgLi5LwKa5OX1d0cNINrfgQsHVshdVTSVVV4LT+Pv/ggGH/3Xbi8iSIQH?=
+ =?us-ascii?Q?yAeIiZmr3ybURsNm6BUw0cPIDYMaa8piinVgoMVixCZH/lgNhERjDypFxyZM?=
+ =?us-ascii?Q?7adwzsoEGa0kk4nwETOjzgwstEhnZ/qvDcdzZyrdpZEd/ipwzxf2pGkPW9Sz?=
+ =?us-ascii?Q?ORdgV1jDeGfCpQXaQR0hNkfPMb96BvsF5eHyIidXVDXD5YwIsocIL2sLh2mw?=
+ =?us-ascii?Q?LVze6srJzsjIHOaWQdfXUmUWmq4Cry93ZJUPLbgXBO9g8hlzDlsOCfcyMA17?=
+ =?us-ascii?Q?UIKIHXqjrH48S8yFp1hPsem0OsvNzFYLIps+RJHwg/SZy9dtpHCquNlp9WVN?=
+ =?us-ascii?Q?8iqVuN5KvYmHSBdqhisE2sudNOg5g4SqKmm7cSoy3NjvDr29oK/ZRlHgTK2B?=
+ =?us-ascii?Q?k2JJ2xjjlgW+MU1/rFHPdR4G8neO4y/TWUdSTn8B9bSPxqd/KNdBHvJm2vNC?=
+ =?us-ascii?Q?wDRCGeQzr4Rs/VHCctmNTVvPdxaO4oJZxnTXXo0lRPPRBZcU56so0jqbshjg?=
+ =?us-ascii?Q?KMQJToMTQ9Bfn2xVdqLl9CpHBz/P8uSFpdYAasZOa/Ph/aVYqU1FEqdw2kd/?=
+ =?us-ascii?Q?936LboeWDSAvk5IvHQGqxurGKLWFxHT4KJE4pJwRermud/QuTXJG/5nTbLce?=
+ =?us-ascii?Q?0ZlxTGl75SwZHDz1MqxleI9xfiQUKiGMVGq6o4cBuftLpzvkNas+De6P1/dn?=
+ =?us-ascii?Q?rKWS34nBryCggz6lzzeO3Olw2DQEYRvdvXXuYpM3XNqfovabLU5InWUV5YZE?=
+ =?us-ascii?Q?8f2bQSUghV/8j5ihxbLcCR8L/dqWLfy2nEJ07rDXnbKbQNVI6y1JVqXM5f4n?=
+ =?us-ascii?Q?yMdAw69VeJJ/xLqjrbOpImF6Ff/+NseCKWCiI3tnm292ZzPKAaXk2IG1kfAS?=
+ =?us-ascii?Q?6JrSFipgQzqkGUQIMPbA5h6LyRfMuy8/nvw3AyOGxBDUFgGV/vCR2xK8xI9i?=
+ =?us-ascii?Q?L6TOFMZcJPfpcuKCe4zb1fk+lJFcqMVSdSxxSUZMgWYWg17WEM9KvmuGsGN9?=
+ =?us-ascii?Q?v2LfPSGPFdudZZeQNoYDyZcbDuLgCETkwtLAyMgKVUki1bu/K6gRGexn7DTL?=
+ =?us-ascii?Q?5vNbT4klGlst8gYpH1psslGXl2icOAnlJBEV1b4uaMSex+Gx+fRML5PpUqi6?=
+ =?us-ascii?Q?3p1UBJ1iMtp2q5gLSi3VdVrv/h6GEa1IPFidkVfiP5E7T3qiesl7AIJXSc1N?=
+ =?us-ascii?Q?qcXfMcSKFJhdzvazDq485/jnOfErbQps5KrNHD/UGjbcy19eFPQe1M84/5Q?=
+ =?us-ascii?Q?=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Zan68R/WkWjL9azcRRsGrW58RwYhItwFt7cOyp1VZlbO5NApQmIVxgzD3T88?=
+ =?us-ascii?Q?UfJvBI/Rz0QI4yPrex+PpWLKW3NIiSrNYH6VWO+CtbnFdbgQ716FF2+CjVoi?=
+ =?us-ascii?Q?fIooJaE18EEzzSvDA5uy+XSZM7rlNs7DuMvtpHfwAfKCsFcOeQeq+Sclhduk?=
+ =?us-ascii?Q?sQTxSlQf/b8WJ4g9FKW0hK2HMFpHUWF5KkiAONHwFuizZ/MgFCc38MQfC7DH?=
+ =?us-ascii?Q?U3pWRCA5g7vfwv1s7no7+Y1N1NdvUh3bWt/3+zQBap7enwV490keaj/7FHLR?=
+ =?us-ascii?Q?IeXTJoSyeqbpWjMPQbws/hTVZZjaDOP8wqX57qQTMM2uMZoFyrBFWfKQ02iM?=
+ =?us-ascii?Q?1bQwiz/si9Mw9QvBClF1a4Uj5xa2ZZYgwEhxPe1cWSzZZlykrFnx62/q3aCz?=
+ =?us-ascii?Q?mamObESWkvTpaWp6+G2z1pCSRX92Qv1CKzauSiOgDVlJVgm9aFlXusoBEcIX?=
+ =?us-ascii?Q?6H5gLSqoioqR6oPgGgSPGwjYB388UMkB2Z5vzpSx9YRJyXQkMIO3alUTWz0a?=
+ =?us-ascii?Q?EFj5ke+p2+Txp7zLM8BX9Z7jmyjvIDC63eNIrPM2TDhCWDO5shF7IGB35Jrp?=
+ =?us-ascii?Q?BKKc1N7yoFQGDDshDzsnNuVbD85W5Yzw2haYPe5JPMOHgFMXufNblhUqW4tp?=
+ =?us-ascii?Q?T8aiWX1EEBA1CnR6+rxeeLJB76bnC/c3WnLnv2MYiQxWgt6v1pOXfSfCxiMq?=
+ =?us-ascii?Q?JJwWx+dZxRdZD+AqEqtmODJGR36FNvYxjtFq0CZjBEK7LU2Oky9rSt6K+zJc?=
+ =?us-ascii?Q?0dzMHyKAmDPtUyte81qlPGJJHGH3BDL87bwgLZHMele/oD9yqqbNTK6c+UCm?=
+ =?us-ascii?Q?Po5d10JwOqnwhV6hr4tdVSw4523Vyo8BjZOGbZ/i5ar8EBRkN4TzRz8tLitg?=
+ =?us-ascii?Q?/Pgf/Sn+V4SzeYVVlFCPvU7oJkeqEhmOqnmwrG2mISEln5yLc3mC3GI87uOT?=
+ =?us-ascii?Q?wPwuOGcK0F7gsJBxzHITNZyTE1SEEJ8U4MkBcOvb3cNORJO8JS6Sg6D+XJi9?=
+ =?us-ascii?Q?ljx98RFJdMwpApGeuI886ZRxotg/98bvCF6dOmC26dy22fHpQU7kkQY8jpAC?=
+ =?us-ascii?Q?0pHT6LA2pFvyXeLrtGZG1CcJzEgLj3z6VpIhM+ytWJlkWlNy53o9pdjzOmPG?=
+ =?us-ascii?Q?ilZOajTotv9oLO+HwHhLf+HnVAWnJbSFHXcIyYLlXf4/KzQFJT0SL94m4/wZ?=
+ =?us-ascii?Q?ezuEh+r5RyqpnpUmHlkespMblWnXmWuvYLm3a0CHn4Dw76QGV+VpiIpEUvB8?=
+ =?us-ascii?Q?YBfb5y9vv1Cf2v21xLOMfNYKs4mH2tmUdp7VAih61f69hcyJFn4HSDHsVX0v?=
+ =?us-ascii?Q?C6RsfEC6GRs3ak9w/fLL1TNjDUKj6cuTZ9FfioCliR9QJgnN+nGGk8TqZms9?=
+ =?us-ascii?Q?NR3L7oA66NAN/bzzg+oCNvrPQHvymXGJV23thEAdpwCrNy+uiB+c6G8rArVN?=
+ =?us-ascii?Q?7dVY5RPzFYBGKJsTs+ZVmPLb/GqVPrGfiEFMq+MvoJnQkRm94T3no/pJz8QI?=
+ =?us-ascii?Q?X0nrAbSK0N0x3TqJDVRk/GGQ7pXSTbPshw+s/jmxoCVnkcyuR0W8mQ1/347d?=
+ =?us-ascii?Q?w39VKwaFiYsjE34ySkqhA4D7wOLlAawBQ0d1+yLARc7/p+6fKgNCJL9Bt+kb?=
+ =?us-ascii?Q?Bg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 135c08c4-1838-4039-73fa-08dc70cb5bc5
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2024 08:29:50.0971
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2tpZS3r03S/kXvz2bvjgBVTt5z8t4z9K1egKR856a2WKMnRl1ipIU7QaBdaxyNVS5aSXt6OkharGAsA+97oRi9Ch6Xj/c8x4SF6/79vjiNE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8463
+X-OriginatorOrg: intel.com
 
-On Thu, May 09, 2024 at 12:14:10PM +0300, Shay Drory wrote:
-> PCI subfunctions (SF) are anchored on the auxiliary bus.
-
-"Some PCI subfunctions can be on the auxiliary bus"
-
-Or maybe "Sometimes the auxiliary bus interface is used for PCI
-subfunctions."
-
-Either way, the text here as-is is not correct as that is not how the
-auxbus code is always used, sorry.
-
-> PCI physical
-> and virtual functions are anchored on the PCI bus;  the irq information
-
-Odd use of ';'?  And an extra ' '?
-
-> of each such function is visible to users via sysfs directory "msi_irqs"
-> containing file for each irq entry. However, for PCI SFs such information
-> is unavailable. Due to this users have no visibility on IRQs used by the
-> SFs.
-
-Not even in /proc/irq/ ?
-
-> Secondly, an SF is a multi function device supporting rdma, netdevice
-
-Not "is", it should be "can be"  Not all the world is your crazy
-hardware :)
-
-> and more. Without irq information at the bus level, the user is unable
-> to view or use the affinity of the SF IRQs.
-
-How would affinity be relevent here?  You are just allowing them to be
-viewed, not set.
-
-> Hence to match to the equivalent PCI PFs and VFs, add "irqs" directory,
-> for supporting auxiliary devices, containing file for each irq entry.
+On Fri, May 10, 2024 at 07:29:32AM +0000, Eric Dumazet wrote:
+> I missed that (struct ifaddrmsg)->ifa_flags was only 8bits,
+> while (struct in_ifaddr)->ifa_flags is 32bits.
 > 
-> Additionally, the PCI SFs sometimes share the IRQs with peer SFs. This
-> information is also not available to the users. To overcome this
-> limitation, each irq sysfs entry shows if irq is exclusive or shared.
+> Use a temporary 32bit variable as I did in set_ifa_lifetime()
+> and check_lifetime().
 > 
-> For example:
-> $ ls /sys/bus/auxiliary/devices/mlx5_core.sf.1/irqs/
-> 50  51  52  53  54  55  56  57  58
-> $ cat /sys/bus/auxiliary/devices/mlx5_core.sf.1/irqs/52
-> exclusive
-> 
-> Reviewed-by: Parav Pandit <parav@nvidia.com>
-> Signed-off-by: Shay Drory <shayd@nvidia.com>
-> 
+> Fixes: 3ddc2231c810 ("inet: annotate data-races around ifa->ifa_flags")
+> Reported-by: Yu Watanabe <watanabe.yu@gmail.com>
+> Dianosed-by: Yu Watanabe <watanabe.yu@gmail.com>
+> Closes: https://github.com/systemd/systemd/pull/32666#issuecomment-2103977928
+
+Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > ---
-> v3->4:
-> - remove global mutex (Przemek)
-> v2->v3:
-> - fix function declaration in case SYSFS isn't defined (Parav)
-> - convert auxdev->groups array with auxiliary_irqs_groups (Przemek)
-> v1->v2:
-> - move #ifdefs from drivers/base/auxiliary.c to
->   include/linux/auxiliary_bus.h (Greg)
-> - use EXPORT_SYMBOL_GPL instead of EXPORT_SYMBOL (Greg)
-> - Fix kzalloc(ref) to kzalloc(*ref) (Simon)
-> - Add return description in auxiliary_device_sysfs_irq_add() kdoc (Simon)
-> - Fix auxiliary_irq_mode_show doc (kernel test boot)
-> ---
->  Documentation/ABI/testing/sysfs-bus-auxiliary |  14 ++
->  drivers/base/auxiliary.c                      | 178 +++++++++++++++++-
->  include/linux/auxiliary_bus.h                 |  24 ++-
->  3 files changed, 213 insertions(+), 3 deletions(-)
->  create mode 100644 Documentation/ABI/testing/sysfs-bus-auxiliary
+>  net/ipv4/devinet.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
 > 
-> diff --git a/Documentation/ABI/testing/sysfs-bus-auxiliary b/Documentation/ABI/testing/sysfs-bus-auxiliary
-> new file mode 100644
-> index 000000000000..3b8299d49d9e
-> --- /dev/null
-> +++ b/Documentation/ABI/testing/sysfs-bus-auxiliary
-> @@ -0,0 +1,14 @@
-> +What:		/sys/bus/auxiliary/devices/.../irqs/
-> +Date:		April, 2024
-> +Contact:	Shay Drory <shayd@nvidia.com>
-> +Description:
-> +		The /sys/devices/.../irqs directory contains a variable set of
-> +		files, with each file is named as irq number similar to PCI PF
-> +		or VF's irq number located in msi_irqs directory.
-
-So this can be msi irqs?  Or not msi irqs?  How do we know?
-
-
-> +
-> +What:		/sys/bus/auxiliary/devices/.../irqs/<N>
-> +Date:		April, 2024
-> +Contact:	Shay Drory <shayd@nvidia.com>
-> +Description:
-> +		auxiliary devices can share IRQs. This attribute indicates if
-> +		the irq is shared with other SFs or exclusively used by the SF.
-> diff --git a/drivers/base/auxiliary.c b/drivers/base/auxiliary.c
-> index d3a2c40c2f12..def02f5f1220 100644
-> --- a/drivers/base/auxiliary.c
-> +++ b/drivers/base/auxiliary.c
-> @@ -158,6 +158,176 @@
->   *	};
->   */
+> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+> index 7a437f0d41905e6acfdc35743afba3a7abfd0dd5..7e45c34c8340a6d2cf96b4485cd4249fd4da7009 100644
+> --- a/net/ipv4/devinet.c
+> +++ b/net/ipv4/devinet.c
+> @@ -1683,6 +1683,7 @@ static int inet_fill_ifaddr(struct sk_buff *skb, const struct in_ifaddr *ifa,
+>  	struct nlmsghdr  *nlh;
+>  	unsigned long tstamp;
+>  	u32 preferred, valid;
+> +	u32 flags;
 >  
-> +#ifdef CONFIG_SYSFS
-> +/* Xarray of irqs to determine if irq is exclusive or shared. */
-> +static DEFINE_XARRAY(irqs);
+>  	nlh = nlmsg_put(skb, args->portid, args->seq, args->event, sizeof(*ifm),
+>  			args->flags);
+> @@ -1692,7 +1693,13 @@ static int inet_fill_ifaddr(struct sk_buff *skb, const struct in_ifaddr *ifa,
+>  	ifm = nlmsg_data(nlh);
+>  	ifm->ifa_family = AF_INET;
+>  	ifm->ifa_prefixlen = ifa->ifa_prefixlen;
+> -	ifm->ifa_flags = READ_ONCE(ifa->ifa_flags);
 > +
-> +struct auxiliary_irq_info {
-> +	struct device_attribute sysfs_attr;
-> +	int irq;
-> +};
+> +	flags = READ_ONCE(ifa->ifa_flags);
+> +	/* Warning : ifm->ifa_flags is an __u8, it holds only 8 bits.
+> +	 * The 32bit value is given in IFA_FLAGS attribute.
+> +	 */
+> +	ifm->ifa_flags = (__u8)flags;
 > +
-> +static struct attribute *auxiliary_irq_attrs[] = {
-> +	NULL
-> +};
-> +
-> +static const struct attribute_group auxiliary_irqs_group = {
-> +	.name = "irqs",
-> +	.attrs = auxiliary_irq_attrs,
-> +};
-> +
-> +static const struct attribute_group *auxiliary_irqs_groups[2] = {
-
-Why list the array size?
-
-> +	&auxiliary_irqs_group,
-> +	NULL
-> +};
-> +
-> +/* Auxiliary devices can share IRQs. Expose to user whether the provided IRQ is
-> + * shared or exclusive.
-> + */
-> +static ssize_t auxiliary_irq_mode_show(struct device *dev,
-> +				       struct device_attribute *attr, char *buf)
-> +{
-> +	struct auxiliary_irq_info *info =
-> +		container_of(attr, struct auxiliary_irq_info, sysfs_attr);
-> +
-> +	if (refcount_read(xa_load(&irqs, info->irq)) > 1)
-
-refcount combined with xa?  That feels wrong, why is refcount used for
-this at all?
-
-> +		return sysfs_emit(buf, "%s\n", "shared");
-> +	else
-> +		return sysfs_emit(buf, "%s\n", "exclusive");
-> +}
-> +
-> +static void auxiliary_irq_destroy(int irq)
-> +{
-> +	refcount_t *ref;
-> +
-> +	xa_lock(&irqs);
-> +	ref = xa_load(&irqs, irq);
-> +	if (refcount_dec_and_test(ref)) {
-> +		__xa_erase(&irqs, irq);
-> +		kfree(ref);
-> +	}
-> +	xa_unlock(&irqs);
-> +}
-> +
-> +static int auxiliary_irq_create(int irq)
-> +{
-> +	refcount_t *new_ref = kzalloc(sizeof(*new_ref), GFP_KERNEL);
-> +	refcount_t *ref;
-> +	int ret = 0;
-> +
-> +	if (!new_ref)
-> +		return -ENOMEM;
-> +
-> +	xa_lock(&irqs);
-> +	ref = xa_load(&irqs, irq);
-> +	if (ref) {
-> +		kfree(new_ref);
-> +		refcount_inc(ref);
-
-Why do you need to use refcounts for these?  What does that help out
-with?
-
-> +		goto out;
-> +	}
-> +
-> +	refcount_set(new_ref, 1);
-> +	ref = __xa_cmpxchg(&irqs, irq, NULL, new_ref, GFP_KERNEL);
-> +	if (ref) {
-> +		kfree(new_ref);
-> +		if (xa_is_err(ref)) {
-> +			ret = xa_err(ref);
-> +			goto out;
-> +		}
-> +
-> +		/* Another thread beat us to creating the enrtry. */
-> +		refcount_inc(ref);
-
-How can that happen?  Why not just use a normal simple lock for all of
-this so you don't have to mess with refcounts at all?  This is not
-performance-relevent code at all, but yet with a refcount you cause
-almost the same issues that a normal lock would have, plus the increased
-complexity of all of the surrounding code (like this, and the crazy
-__xa_cmpxchg() call)
-
-Make this simple please.
-
-
-> +	}
-> +
-> +out:
-> +	xa_unlock(&irqs);
-> +	return ret;
-> +}
-> +
-> +/**
-> + * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
-> + * @auxdev: auxiliary bus device to add the sysfs entry.
-> + * @irq: The associated Linux interrupt number.
-> + *
-> + * This function should be called after auxiliary device have successfully
-> + * received the irq.
-> + *
-> + * Return: zero on success or an error code on failure.
-> + */
-> +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq)
-> +{
-> +	struct device *dev = &auxdev->dev;
-> +	struct auxiliary_irq_info *info;
-> +	int ret;
-> +
-> +	ret = auxiliary_irq_create(irq);
-> +	if (ret)
-> +		return ret;
-> +
-> +	info = kzalloc(sizeof(*info), GFP_KERNEL);
-> +	if (!info) {
-> +		ret = -ENOMEM;
-> +		goto info_err;
-> +	}
-> +
-> +	sysfs_attr_init(&info->sysfs_attr.attr);
-> +	info->sysfs_attr.attr.name = kasprintf(GFP_KERNEL, "%d", irq);
-> +	if (!info->sysfs_attr.attr.name) {
-> +		ret = -ENOMEM;
-> +		goto name_err;
-> +	}
-> +	info->irq = irq;
-> +	info->sysfs_attr.attr.mode = 0444;
-> +	info->sysfs_attr.show = auxiliary_irq_mode_show;
-> +
-> +	ret = xa_insert(&auxdev->irqs, irq, info, GFP_KERNEL);
-> +	if (ret)
-> +		goto auxdev_xa_err;
-> +
-> +	ret = sysfs_add_file_to_group(&dev->kobj, &info->sysfs_attr.attr,
-> +				      auxiliary_irqs_group.name);
-
-Adding dynamic sysfs attributes like this means that you normally just
-raced with userspace and lost.  How are you ensuring that you did not
-just do that?
-
-> +/**
-> + * auxiliary_device_sysfs_irq_remove - remove a sysfs entry for the given IRQ
-> + * @auxdev: auxiliary bus device to add the sysfs entry.
-> + * @irq: the IRQ to remove.
-> + *
-> + * This function should be called to remove an IRQ sysfs entry.
-> + */
-> +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq)
-> +{
-> +	struct auxiliary_irq_info *info = xa_load(&auxdev->irqs, irq);
-> +	struct device *dev = &auxdev->dev;
-> +
-> +	if (WARN_ON(!info))
-
-How can this ever happen?  If not, don't check for it please.  If it can
-happen, properly handle it and move on, don't reboot the box.
-
-thanks,
-
-greg k-h
+>  	ifm->ifa_scope = ifa->ifa_scope;
+>  	ifm->ifa_index = ifa->ifa_dev->dev->ifindex;
+>  
+> @@ -1701,7 +1708,7 @@ static int inet_fill_ifaddr(struct sk_buff *skb, const struct in_ifaddr *ifa,
+>  		goto nla_put_failure;
+>  
+>  	tstamp = READ_ONCE(ifa->ifa_tstamp);
+> -	if (!(ifm->ifa_flags & IFA_F_PERMANENT)) {
+> +	if (!(flags & IFA_F_PERMANENT)) {
+>  		preferred = READ_ONCE(ifa->ifa_preferred_lft);
+>  		valid = READ_ONCE(ifa->ifa_valid_lft);
+>  		if (preferred != INFINITY_LIFE_TIME) {
+> @@ -1732,7 +1739,7 @@ static int inet_fill_ifaddr(struct sk_buff *skb, const struct in_ifaddr *ifa,
+>  	     nla_put_string(skb, IFA_LABEL, ifa->ifa_label)) ||
+>  	    (ifa->ifa_proto &&
+>  	     nla_put_u8(skb, IFA_PROTO, ifa->ifa_proto)) ||
+> -	    nla_put_u32(skb, IFA_FLAGS, ifm->ifa_flags) ||
+> +	    nla_put_u32(skb, IFA_FLAGS, flags) ||
+>  	    (ifa->ifa_rt_priority &&
+>  	     nla_put_u32(skb, IFA_RT_PRIORITY, ifa->ifa_rt_priority)) ||
+>  	    put_cacheinfo(skb, READ_ONCE(ifa->ifa_cstamp), tstamp,
+> -- 
+> 2.45.0.118.g7fe29c98d7-goog
+> 
+> 
 
