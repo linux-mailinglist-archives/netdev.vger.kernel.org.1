@@ -1,250 +1,151 @@
-Return-Path: <netdev+bounces-95592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A24CF8C2B92
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 23:14:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42DCB8C2BE6
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 23:28:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58614283511
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 21:14:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED0542824DD
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 21:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 384461BDD3;
-	Fri, 10 May 2024 21:14:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DE8B13B78E;
+	Fri, 10 May 2024 21:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gOU/Blj6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k/43edYX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D2810965;
-	Fri, 10 May 2024 21:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C46613B789
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 21:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715375676; cv=none; b=NtdvxSHMMcyzmS8kQNrRjm8ozzc+eEVCpqgZwSyab+6AZkGBumavxhrplUo2ZL5ftYZjCuNCjpahWVFmy01wett9oCZ+0H/EjAQlZzDjwvytX+nWRTbBmRec5TVBVRyvPMpd7EC7b9HmAvzXmxhz/9IMTLU+Xe/3CN1QqwnABYI=
+	t=1715376479; cv=none; b=ml68TPMtIFQEuiGwpT4egHt4eG2qMIwYamBJOWe23FuMksvHUwGmGibVx9WK34dfMDpDSEXYM1T2tA8ko/SlbT+dIFd3kKTBDZsaVUbIQjIxlLP0wk1yM9WrjRdY6K2Er+b0Bp1ZVicGfG08BJs1tK8Fa7OuN3iMhwNejJnaTic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715375676; c=relaxed/simple;
-	bh=FGkaV71OLek7LclhOJcEYNdy1cdW24Ycq11nd9cnN0M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tDxolDwU8O9kzIDp81fzs2N85ZKT89OF1eEjOIegN2jaJ7I0QPvVe8kYQVAZ+YUID345h3LKxwr6kdvHuN7SHbeoc/Mg5cgIvHM973chqlEpB5AAH2S+u+zOVC6V9H826fdTytY/lALUSmmefvFh0Q5ukFxPxQ1w5gH57hjRqjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gOU/Blj6; arc=none smtp.client-ip=209.85.221.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-4df3d4f0bf7so776211e0c.0;
-        Fri, 10 May 2024 14:14:34 -0700 (PDT)
+	s=arc-20240116; t=1715376479; c=relaxed/simple;
+	bh=jG1XzQGVqbPJVaV6zbgB4Vv73mJ0VYF0EnY5DNTHpfc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nPpvRx82hjsmu8/3D1+AwXuZW2rpE1s9V7nFRFI8a0qbnqweW9nxd5IueWytx24RZchfi8izMUCURxlSXjhE78nvayClA7QaL8hA1wA9JrgwApn3J9FVHQwqyQZ9P2hctNyainCUAyg3I1+rr2ceEUCnMhWS1imubDni0q0ca5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k/43edYX; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1e4bf0b3e06so23073005ad.1
+        for <netdev@vger.kernel.org>; Fri, 10 May 2024 14:27:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715375673; x=1715980473; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X85OP7xXWhJk7yn2ouf+qgf9a+li2riRhkXsjEH98U0=;
-        b=gOU/Blj66bGTcMXLFdgW7Yq5Wtg0/e0Xpx6PDaclCsuhE84Lt3Pb007Z6XIPpjSgys
-         Y7DkMwU3kaX/5dEAOmCDsHzzmtZQ4EDpNXhzcrM9F167MvUh9ehL4rmBpgDId1ie552Q
-         VY/cyR6jfFhkM64fkyJWUrmqIMvUU3FqJu3/03qpUGOuQ3VBZy8wYe01o/47q3ZytDnF
-         eKpizBCvj6I4Wxv2gkP6qQ+X7jluhzyds9gWyJN2+iV2TlupA0sq6uRHjAl+b7MlurwZ
-         WYV2fRGLm/Fk8v3dSkil3ICgG9S73x0JhAPyxSRUh+6l8556lHFRivT5LRqGQf/4fjoO
-         8log==
+        d=google.com; s=20230601; t=1715376477; x=1715981277; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3q3hqpMGXKwiEL9x8u2/jKIHxeOXTBiBSvlvRi/TduI=;
+        b=k/43edYX4lRVPreoWrJ1pG65IzPO5HYHH3wkGvwZ6byXewX4ES6DzaK9vLRAfHlKXq
+         wmSnuvZeFKzC3d9TLc9nlDzAcpOszpIofkUrA+/3T7KmxNxc6SARxrM2KtCqP4ORO/zR
+         Z9zpeGWFd7yr1MOxQ9Xdo4Yuc0645gzIs3q9SzBKs37uctNByDpI1I5BhwRjiOqe5Ayv
+         ltxyUTZHmYDrwQ3bxiSUSutALv080hMKvBBXWXQz+owk/7DBaIcXQgIuQ6uoPrpIK695
+         WdmyY5zHeGAxCW1NNgxU42gpNtTSxAYIbm3B6JGazfMLYBYO/nUoDk8kebSfnh+udpxJ
+         SD5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715375673; x=1715980473;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X85OP7xXWhJk7yn2ouf+qgf9a+li2riRhkXsjEH98U0=;
-        b=p5dkAve+hXC4lQjWOJ/aZygDsnSe2I7KLOFZTWiaUqZI7xgKBs9ueKbOz/V6JT+yxx
-         ypziz0i0YurovU3Ml1X0Sa9MO0WxZn7HnVP3IXNx4x1vf2O6GrKFYngOZVu5mtzWCSC5
-         zjPZaB1LPqKOgbgZDqRXDQgBY8mmShC18wSpL4LqVSsfCmXkvsopEqzJ+Mkz7fbCJBmL
-         7GfEZgK0jQwC3r7x0WM4fpG530zn6xQFxKJqQwNFghKl62EsSxPM/+fKEzs/fpO/jj82
-         liIcTjkJuQjBA49fUg+PwpT9ZjsaUpyLhGe7xaJX/n0L8YGi7RwylxvD7Gs6/VqiPmHG
-         mJFg==
-X-Forwarded-Encrypted: i=1; AJvYcCV9wHZReMCOHXxibDTpoQYPACf1fNDRvf8ZrLXVfjC0xjEikpbo/ZCXqi0CVfN18CSRhouWKqPmRXKYAq26PbzKb0l9uFYx
-X-Gm-Message-State: AOJu0YyDZFgDjStQUTKt9ENkZHG6RBg1x2R899XrfMeHvPJxPTEjD/ui
-	wroTUIhFj3GmCKlDAmnU25y0XWoPaI0912mmHa8M+JlP0/vJmxKq
-X-Google-Smtp-Source: AGHT+IHu/daIKFLpFjpHdxY9PpExu4SVNM7SaE4JsMFDWgtXKkz00VBDQAJU8YoWKOtETd/FwbnGQA==
-X-Received: by 2002:a05:6122:4594:b0:4d8:7a5e:392f with SMTP id 71dfb90a1353d-4df8833debamr4342489e0c.12.1715375673135;
-        Fri, 10 May 2024 14:14:33 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4df7c07eb3fsm574161e0c.51.2024.05.10.14.14.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 14:14:32 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2024-05-10
-Date: Fri, 10 May 2024 17:14:28 -0400
-Message-ID: <20240510211431.1728667-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1715376477; x=1715981277;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3q3hqpMGXKwiEL9x8u2/jKIHxeOXTBiBSvlvRi/TduI=;
+        b=oi9Hdw2eviJ5CsA/Ds+4CN9Xci+mZ+FFcfYQigBqdoGXGtCvG9YukYjNe5J2wom3eb
+         b8EvLzjhanhU6xSu73YrOmHZFBd5ru/4dqIrgjTqQnLmDURJ/opTKF5qpDGMf5P7Cr59
+         xW2nWeR364RIg967BT4SxquxnsUL/gy2Y6Bng+dXf37SFzGDy3GL2+rFus6O0/X8dWH8
+         JlngBbAzKpe+XeoBAT9es81cn01pL0dsUA7g6YVK3FMpNMykSH7Gn3E0v6VLj7YTkwgG
+         Rz1cjF2VYnWOIYok1cYjWPvbBm0qc5Kfu6TEJeYpT12rqz9tos4TDlf7lk5dVCO1ubPN
+         PX2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUHksi+fDchjnNvcskDnHwOqwkxuTKys/XJDNvzNoldQs0SNWMqFkl8pJXDEmVhL6w34NoT8X10ocPyXIgO0z7ZTV+SqYOx
+X-Gm-Message-State: AOJu0Yx3qR8uvf4VNHFZktjK1EZw946VmM4RHRobjwtfjkXJjaw9YBsA
+	AdrFFjd/T95dwHfeH+tvXPeGHNdsXYNaPqVphfYxCxBtXgEkHwMW6xpgxEJK85bK8D6qC39KT+1
+	zrAUmT5DB8NJSr5h2PBLxjObAxBp+JxYAwBwt
+X-Google-Smtp-Source: AGHT+IHi+uN9YAG1vR1pnN46m2nVsZ9AeJUZEm4EJmPOcrBsoA8vKk4oUGfskunfiAqx8BEU50tYATpFc9YLOtR0IqU=
+X-Received: by 2002:a17:90a:fe93:b0:2b2:ce88:c68c with SMTP id
+ 98e67ed59e1d1-2b6cc44fa08mr3718925a91.19.1715376477090; Fri, 10 May 2024
+ 14:27:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240502211047.2240237-1-maheshb@google.com> <87fruspxgt.ffs@tglx>
+ <CAF2d9jigGhpSAj2hnUG2QSvYeSzTvD1FUf7tT8BW1NU8EouyOA@mail.gmail.com>
+In-Reply-To: <CAF2d9jigGhpSAj2hnUG2QSvYeSzTvD1FUf7tT8BW1NU8EouyOA@mail.gmail.com>
+From: Yuliang Li <yuliangli@google.com>
+Date: Fri, 10 May 2024 14:27:46 -0700
+Message-ID: <CADj8K+M9qjLGAKcsV_9YoPQ5SGXe3vmi69Y65m1RUyLOMrJeHg@mail.gmail.com>
+Subject: Re: [PATCHv4 net-next] ptp/ioctl: support MONOTONIC_RAW timestamps
+ for PTP_SYS_OFFSET_EXTENDED
+To: =?UTF-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?= <maheshb@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Don Hatchett <hatch@google.com>, 
+	Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, 
+	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Sagi Maimon <maimon.sagi@gmail.com>, Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>, 
+	Mahesh Bandewar <mahesh@bandewar.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The following changes since commit f8beae078c82abde57fed4a5be0bbc3579b59ad0:
+Thank you Mahesh. Please see my answers below.
 
-  Merge tag 'gtp-24-05-07' of git://git.kernel.org/pub/scm/linux/kernel/git/pablo/gtp Pablo neira Ayuso says: (2024-05-10 13:59:27 +0100)
+The mono_raw allows PHC to correlate with a non-adjusted time. This
+enables other types of clock sync algorithms to be developed.
+For example, if we want to measure the drift rate between CPU
+oscillator and PHC. We could run a linear regression over multiple
+pairs of <phc, sys>. But if sys time itself is being adjusted (e.g.,
+clock_realtime), the linear regression is running over a polyline
+hence less effective. With mono_raw, linear regression truly measures
+the drift rate of the CPU oscillator.
+This capability allows more types of clock sync algorithms to be developed.
 
-are available in the Git repository at:
+Thanks,
+Yuliang
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2024-05-10
 
-for you to fetch changes up to 75f819bdf9cafb0f1458e24c05d24eec17b2f597:
-
-  Bluetooth: btintel: Fix compiler warning for multi_v7_defconfig config (2024-05-10 17:04:15 -0400)
-
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
-
- - Add support MediaTek MT7921S SDIO
- - Various fixes for -Wflex-array-member-not-at-end and -Wfamnae
- - Add USB HW IDs for MT7921/MT7922/MT7925
- - Add support for Intel BlazarI and Filmore Peak2 (BE201)
- - Add initial support for Intel PCIe driver
- - Remove HCI_AMP support
- - Add TX timestamping support
-
-----------------------------------------------------------------
-Archie Pusaka (1):
-      Bluetooth: Populate hci_set_hw_info for Intel and Realtek
-
-Chen-Yu Tsai (1):
-      dt-bindings: net: bluetooth: Add MediaTek MT7921S SDIO Bluetooth
-
-Dan Carpenter (1):
-      Bluetooth: qca: Fix error code in qca_read_fw_build_info()
-
-Gustavo A. R. Silva (6):
-      Bluetooth: L2CAP: Avoid -Wflex-array-member-not-at-end warnings
-      Bluetooth: hci_conn, hci_sync: Use __counted_by() to avoid -Wfamnae warnings
-      Bluetooth: hci_conn: Use __counted_by() to avoid -Wfamnae warning
-      Bluetooth: hci_conn: Use struct_size() in hci_le_big_create_sync()
-      Bluetooth: hci_sync: Use cmd->num_cis instead of magic number
-      Bluetooth: hci_conn: Use __counted_by() and avoid -Wfamnae warning
-
-Hans de Goede (1):
-      Bluetooth: hci_bcm: Limit bcm43455 baudrate to 2000000
-
-Ian W MORRISON (1):
-      Bluetooth: Add support for MediaTek MT7922 device
-
-Iulia Tanasescu (2):
-      Bluetooth: ISO: Make iso_get_sock_listen generic
-      Bluetooth: ISO: Handle PA sync when no BIGInfo reports are generated
-
-Jiande Lu (2):
-      Bluetooth: btusb: Add USB HW IDs for MT7921/MT7922/MT7925
-      Bluetooth: btusb: Sort usb_device_id table by the ID
-
-Johan Hovold (3):
-      Bluetooth: qca: drop bogus edl header checks
-      Bluetooth: qca: drop bogus module version
-      Bluetooth: qca: clean up defines
-
-Kiran K (8):
-      Bluetooth: btintel: Define macros for image types
-      Bluetooth: btintel: Add support to download intermediate loader
-      Bluetooth: btintel: Add support for BlazarI
-      Bluetooth: btintel: Add support for Filmore Peak2 (BE201)
-      Bluetooth: btintel: Export few static functions
-      Bluetooth: btintel_pcie: Add *setup* function to download firmware
-      Bluetooth: btintel_pcie: Fix compiler warnings
-      Bluetooth: btintel: Fix compiler warning for multi_v7_defconfig config
-
-Luiz Augusto von Dentz (3):
-      Bluetooth: Add proper definitions for scan interval and window
-      Bluetooth: hci_event: Set DISCOVERY_FINDING on SCAN_ENABLED
-      Bluetooth: HCI: Remove HCI_AMP support
-
-Mahesh Talewad (1):
-      LE Create Connection command timeout increased to 20 secs
-
-Marek Vasut (1):
-      dt-bindings: net: broadcom-bluetooth: Add CYW43439 DT binding
-
-Pauli Virtanen (5):
-      Bluetooth: add support for skb TX timestamping
-      Bluetooth: ISO: add TX timestamping
-      Bluetooth: L2CAP: add TX timestamping
-      Bluetooth: SCO: add TX timestamping
-      Bluetooth: add experimental BT_POLL_ERRQUEUE socket option
-
-Peter Tsao (1):
-      Bluetooth: btusb: Fix the patch for MT7920 the affected to MT7921
-
-Sebastian Urban (1):
-      Bluetooth: compute LE flow credits based on recvbuf space
-
-Sungwoo Kim (1):
-      Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
-
-Tedd Ho-Jeong An (1):
-      Bluetooth: btintel_pcie: Add support for PCIe transport
-
-Uri Arev (2):
-      Bluetooth: hci_intel: Fix multiple issues reported by checkpatch.pl
-      Bluetooth: ath3k: Fix multiple issues reported by checkpatch.pl
-
-Uwe Kleine-König (3):
-      Bluetooth: btqcomsmd: Convert to platform remove callback returning void
-      Bluetooth: hci_bcm: Convert to platform remove callback returning void
-      Bluetooth: hci_intel: Convert to platform remove callback returning void
-
-Zijun Hu (4):
-      Bluetooth: btusb: Correct timeout macro argument used to receive control message
-      Bluetooth: hci_conn: Remove a redundant check for HFP offload
-      Bluetooth: Remove 3 repeated macro definitions
-      Bluetooth: qca: Support downloading board id specific NVM for WCN7850
-
- .../net/bluetooth/mediatek,mt7921s-bluetooth.yaml  |   55 +
- .../bindings/net/broadcom-bluetooth.yaml           |   33 +-
- MAINTAINERS                                        |    1 +
- drivers/bluetooth/Kconfig                          |   11 +
- drivers/bluetooth/Makefile                         |    1 +
- drivers/bluetooth/ath3k.c                          |   25 +-
- drivers/bluetooth/btintel.c                        |   88 +-
- drivers/bluetooth/btintel.h                        |   51 +-
- drivers/bluetooth/btintel_pcie.c                   | 1358 ++++++++++++++++++++
- drivers/bluetooth/btintel_pcie.h                   |  430 +++++++
- drivers/bluetooth/btmrvl_main.c                    |    9 -
- drivers/bluetooth/btqca.c                          |   47 +-
- drivers/bluetooth/btqca.h                          |   60 +-
- drivers/bluetooth/btqcomsmd.c                      |    6 +-
- drivers/bluetooth/btrsi.c                          |    1 -
- drivers/bluetooth/btrtl.c                          |    7 +
- drivers/bluetooth/btsdio.c                         |    8 -
- drivers/bluetooth/btusb.c                          |   55 +-
- drivers/bluetooth/hci_bcm.c                        |    8 +-
- drivers/bluetooth/hci_bcm4377.c                    |    1 -
- drivers/bluetooth/hci_intel.c                      |   25 +-
- drivers/bluetooth/hci_ldisc.c                      |    6 -
- drivers/bluetooth/hci_serdev.c                     |    5 -
- drivers/bluetooth/hci_uart.h                       |    1 -
- drivers/bluetooth/hci_vhci.c                       |   10 +-
- drivers/bluetooth/virtio_bt.c                      |    2 -
- include/net/bluetooth/bluetooth.h                  |   15 +-
- include/net/bluetooth/hci.h                        |  136 +-
- include/net/bluetooth/hci_core.h                   |   80 +-
- include/net/bluetooth/l2cap.h                      |   36 +-
- include/uapi/linux/virtio_bt.h                     |    1 -
- net/bluetooth/6lowpan.c                            |    2 +-
- net/bluetooth/af_bluetooth.c                       |  119 +-
- net/bluetooth/hci_conn.c                           |  261 +++-
- net/bluetooth/hci_core.c                           |  178 +--
- net/bluetooth/hci_event.c                          |  244 +---
- net/bluetooth/hci_request.h                        |    4 -
- net/bluetooth/hci_sock.c                           |    5 +-
- net/bluetooth/hci_sync.c                           |  196 +--
- net/bluetooth/iso.c                                |  183 +--
- net/bluetooth/l2cap_core.c                         |  151 ++-
- net/bluetooth/l2cap_sock.c                         |  114 +-
- net/bluetooth/mgmt.c                               |  149 ++-
- net/bluetooth/sco.c                                |   33 +-
- net/bluetooth/smp.c                                |    2 +-
- 45 files changed, 3046 insertions(+), 1167 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
- create mode 100644 drivers/bluetooth/btintel_pcie.c
- create mode 100644 drivers/bluetooth/btintel_pcie.h
+On Wed, May 8, 2024 at 7:54=E2=80=AFPM Mahesh Bandewar (=E0=A4=AE=E0=A4=B9=
+=E0=A5=87=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=A4=BE=
+=E0=A4=B0)
+<maheshb@google.com> wrote:
+>
+> On Wed, May 8, 2024 at 12:35=E2=80=AFAM Thomas Gleixner <tglx@linutronix.=
+de> wrote:
+> >
+> > On Thu, May 02 2024 at 14:10, Mahesh Bandewar wrote:
+> > > The ability to read the PHC (Physical Hardware Clock) alongside
+> > > multiple system clocks is currently dependent on the specific
+> > > hardware architecture. This limitation restricts the use of
+> > > PTP_SYS_OFFSET_PRECISE to certain hardware configurations.
+> > >
+> > > The generic soultion which would work across all architectures
+> > > is to read the PHC along with the latency to perform PHC-read as
+> > > offered by PTP_SYS_OFFSET_EXTENDED which provides pre and post
+> > > timestamps.  However, these timestamps are currently limited
+> > > to the CLOCK_REALTIME timebase. Since CLOCK_REALTIME is affected
+> > > by NTP (or similar time synchronization services), it can
+> > > experience significant jumps forward or backward. This hinders
+> > > the precise latency measurements that PTP_SYS_OFFSET_EXTENDED
+> > > is designed to provide.
+> >
+> > This is really a handwavy argument.
+> >
+> > Fact is that the time jumps of CLOCK_REALTIME caused by NTP (etc) are
+> > rare and significant enough to be easily filtered out. That's why this
+> > interface allows you to retrieve more than one sample.
+> >
+> > Can you please explain which problem you are actually trying to solve?
+> >
+> > It can't be PTP system time synchronization as that obviously requires
+> > CLOCK_REALTIME.
+> >
+> Let me add a couple of folks from the clock team. @Yuliang Li  @Don Hatch=
+ett
+> I'm just a nomad-kernel-net guy trying to fill-in gaps :(
+>
+> > Thanks,
+> >
+> >         tglx
 
