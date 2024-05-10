@@ -1,171 +1,161 @@
-Return-Path: <netdev+bounces-95552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7414E8C29F0
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 20:31:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 883BC8C29F3
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 20:32:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E7E0281E93
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 18:31:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 153601F23878
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 18:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F060D31A60;
-	Fri, 10 May 2024 18:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AEFC25779;
+	Fri, 10 May 2024 18:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="m0gx9mlq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mymfPGRj"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D688511713;
-	Fri, 10 May 2024 18:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC46811713;
+	Fri, 10 May 2024 18:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715365855; cv=none; b=f/klpoYYH9RrBBEEopubT+CqYc6vEoHF8RHY0DEcITdhS757H9bramjGgnAT6nyHLMnr2AC08ikuIHts2Ac7wBBmWgCW9aSg1rI4cNr9HNhAef8aHm5LTo+uixoyux71XbNfLdnUakunXbPHcs6JxgfTTHXEaAA/mR0nrEg3thE=
+	t=1715365954; cv=none; b=gccDsCkUBgE85ZNZgMeCrGVUVDOSGakKxxWicBLkXS1qZ1/EeCjQgjyK3AgDmHTj2weEZHIWECHzhDW+CBToIL0y70DdkZGu+PY01v98GuYSP9CdcxNvabGHd8M9dix5F7Spbhxwbr4+Omr92FjD/Shx9WhRMQuzu7Z4qp8sOu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715365855; c=relaxed/simple;
-	bh=3iPOfcunpN3iBQwE1TT0LZMff8smSsv0J6fKYFJXBeE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tS8vYR/iShMJP5Sfg/mjfV4Db6S0bb36q/AUTtBLYpJIS8YKxtePEC4UzSIU8ROIrXafisuEwrzKTfOf9gktDPpzMMMi0UWWv45n8qLt/+/oujFTfDRPc+i25iJ2w9PV8YjbWZtr+ZppBCI8pwk34UtWTsrnZSoAMlRqgfgSxSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=m0gx9mlq; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=aONa/loSB4zk1VdXAk5+sCgpvMBlByp57fP/65dugMk=; b=m0gx9mlqN2qsVRL4rOqe25juBc
-	yA0kqCouo2T4ssz09wwpNdH7mciXKGsckJ9h4wZx5M0NEj/pn0Au4FsOokOQwWA598kWpsKMzVwMx
-	8pJPR9OmJipZANVa8/cA/TqsToThER+ithPi34BkEbVzx+xud1JpoRiujhkZ4Nx5rFFCEuXOGPARR
-	YZu3xjc0Vh8RxrfkNQ94R//eogMRxW9YXvi4VFxfI/uetE9ucwLCwDXo2AeItI/uLl+P2zxcXEefF
-	OMaciRmWwrT9sTVx+JJZ3TWyoDQIT+oMBIY6auFOUjVXmWL3s/P3ggHhWx8rYXJyIYVfq+mPFwual
-	Ux5fBVVA==;
-Received: from [50.53.4.147] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s5V18-000000068zh-3Gsl;
-	Fri, 10 May 2024 18:30:50 +0000
-Message-ID: <463d6564-ea67-4f1f-92f2-196a1334cc3c@infradead.org>
-Date: Fri, 10 May 2024 11:30:49 -0700
+	s=arc-20240116; t=1715365954; c=relaxed/simple;
+	bh=G9gYYTn56ZMRHxXCgVo54QvAy2pxEZPAYMOd+dNXTOI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i11/I1d6jKCcy7/4zZ+JAHuiA30uRmIYQCRMrpiegodyOPp/iDrGizz3oy+JpOv7AeivbL2MEMqfZ1y4f8U2wblIqFEcLO3u0lNXD/rWf95TeWVecsKv8KutRrisnjo61/tNd2ltl39N6DTGhKsJucKgoO5tYw9HJwafoZOfBQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mymfPGRj; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715365952; x=1746901952;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=G9gYYTn56ZMRHxXCgVo54QvAy2pxEZPAYMOd+dNXTOI=;
+  b=mymfPGRjH9eiE0vGGMXUay5nNyHr1ahfchjC/yKBzqFhTjSvAI8diFG8
+   re6MRTo0UMNzva4A+pLZBGzWm3IJlEgPF8QLY2mmsx28dm9ytil44AvtJ
+   GgO9dZ0FUJuZB3m3FjG6CzJPlYm6XoZUPi1IRSkUGfMZttK2J4RmPNqgJ
+   l6HOFf3dSlsOHohl2QAqR85kRzg9QPA9BEGYryoc4ER6HHX+Tgborgqit
+   VjZIGzdcxPrlKeqoRAjNLvrYrgIMJcZ0jsLLKhLNSGFQyrOnjflM2+NsV
+   N84Db5BgJRIGXHKcCZqA9s3wF1pJdb782bKGyGAQEScBg9JpS+tsB/Jnq
+   g==;
+X-CSE-ConnectionGUID: 4LtJP3F4QX24hv0OxphQMQ==
+X-CSE-MsgGUID: MCCV+7LpT1aoIUFB3nI+wg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11069"; a="21939974"
+X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
+   d="scan'208";a="21939974"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 11:32:31 -0700
+X-CSE-ConnectionGUID: r4wIFvRLScGBHjGvpUXJDQ==
+X-CSE-MsgGUID: y2uJc1LGTVGEQOFQXka1xg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
+   d="scan'208";a="34135245"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 10 May 2024 11:32:27 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s5V2f-0006U7-0Z;
+	Fri, 10 May 2024 18:32:25 +0000
+Date: Sat, 11 May 2024 02:32:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
+	guwen@linux.alibaba.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, kuba@kernel.org,
+	davem@davemloft.net, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+	tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+Subject: Re: [PATCH net-next 2/2] net/smc: Introduce IPPROTO_SMC
+Message-ID: <202405110225.7378HJe1-lkp@intel.com>
+References: <1715314333-107290-3-git-send-email-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 12/13] mm: page_frag: update documentation for
- page_frag
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Alexander Duyck <alexander.duyck@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Andrew Morton <akpm@linux-foundation.org>,
- linux-mm@kvack.org, linux-doc@vger.kernel.org
-References: <20240508133408.54708-1-linyunsheng@huawei.com>
- <20240508133408.54708-13-linyunsheng@huawei.com>
- <0ac5219b-b756-4a8d-ba31-21601eb1e7f4@infradead.org>
- <ff1089c8-ad02-04bb-f715-ca97c118338b@huawei.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <ff1089c8-ad02-04bb-f715-ca97c118338b@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1715314333-107290-3-git-send-email-alibuda@linux.alibaba.com>
 
-Hi.
+Hi Wythe,
 
-On 5/10/24 5:32 AM, Yunsheng Lin wrote:
-> On 2024/5/9 8:44, Randy Dunlap wrote:
->>
->>
-> 
->>>  
->>> +/**
->>> + * page_frag_cache_is_pfmemalloc() - Check for pfmemalloc.
->>> + * @nc: page_frag cache from which to check
->>> + *
->>> + * Used to check if the current page in page_frag cache is pfmemalloc'ed.
->>> + * It has the same calling context expection as the alloc API.
->>> + *
->>> + * Return:
->>> + * Return true if the current page in page_frag cache is pfmemalloc'ed,
->>
->> Drop the (second) word "Return"...
-> 
-> Did you mean something like below:
-> 
-> * Return:
-> * Return true if the current page in page_frag cache is pfmemalloc'ed,
-> * otherwise false.
-> 
-> Or:
-> 
-> * Return:
-> * true if the current page in page_frag cache is pfmemalloc'ed, otherwise
-> * return false.
+kernel test robot noticed the following build warnings:
 
-This one ^^^^^^^^^^^^^^^^^^^^.
+[auto build test WARNING on net-next/main]
 
-> 
->>
->>> + * otherwise return false.
->>> + */
->>>  static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
->>>  {
->>>  	return encoded_page_pfmemalloc(nc->encoded_va);
->>> @@ -92,6 +109,19 @@ void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
->>>  				 unsigned int fragsz, gfp_t gfp_mask,
->>>  				 unsigned int align_mask);
->>>  
->>> +/**
->>> + * page_frag_alloc_va_align() - Alloc a page fragment with aligning requirement.
->>> + * @nc: page_frag cache from which to allocate
->>> + * @fragsz: the requested fragment size
->>> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
->>
->>                                                       needs
->>
->>> + * @align: the requested aligning requirement for 'va'
->>
->>                  or                                  @va
-> 
-> What does the 'or' means?
+url:    https://github.com/intel-lab-lkp/linux/commits/D-Wythe/net-smc-refatoring-initialization-of-smc-sock/20240510-121442
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/1715314333-107290-3-git-send-email-alibuda%40linux.alibaba.com
+patch subject: [PATCH net-next 2/2] net/smc: Introduce IPPROTO_SMC
+config: x86_64-randconfig-002-20240510 (https://download.01.org/0day-ci/archive/20240511/202405110225.7378HJe1-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240511/202405110225.7378HJe1-lkp@intel.com/reproduce)
 
-I was just trying to say that you could use
-     'va'
-or
-     @va
-here.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405110225.7378HJe1-lkp@intel.com/
 
-> 
->>
-> 
-> ...
-> 
->>
->>                                                  needs
->>
->>> + *
->>> + * Prepare a page fragment with minimum size of ‘fragsz’, 'fragsz' is also used
->>
->>                                                    'fragsz'. 'fragsz'
->> (don't use fancy single quote marks)
-> 
-> You mean using @parameter to replace all the parameters marked with single
-> quote marks, right?
+All warnings (new ones prefixed by >>):
 
-That's what I would do, but there is also the issue of the first occurrence of
-quoted fragsz that uses Unicode quote marks, but the second occurrence of
-quoted fragsz uses plain ASCII quote marks. This happens in multiple places
-(probably due to copy-paste).
+>> net/smc/af_smc.c:3710:1: warning: unused label 'out_inet_prot' [-Wunused-label]
+    3710 | out_inet_prot:
+         | ^~~~~~~~~~~~~~
+   1 warning generated.
 
-> 
-> ...
 
-Thanks.
+vim +/out_inet_prot +3710 net/smc/af_smc.c
+
+  3707	
+  3708		static_branch_enable(&tcp_have_smc);
+  3709		return 0;
+> 3710	out_inet_prot:
+  3711		inet_unregister_protosw(&smc_inet_protosw);
+  3712		proto_unregister(&smc_inet_prot);
+  3713	out_ulp:
+  3714		tcp_unregister_ulp(&smc_ulp_ops);
+  3715	out_lo:
+  3716		smc_loopback_exit();
+  3717	out_ib:
+  3718		smc_ib_unregister_client();
+  3719	out_sock:
+  3720		sock_unregister(PF_SMC);
+  3721	out_proto6:
+  3722		proto_unregister(&smc_proto6);
+  3723	out_proto:
+  3724		proto_unregister(&smc_proto);
+  3725	out_core:
+  3726		smc_core_exit();
+  3727	out_alloc_wqs:
+  3728		destroy_workqueue(smc_close_wq);
+  3729	out_alloc_hs_wq:
+  3730		destroy_workqueue(smc_hs_wq);
+  3731	out_alloc_tcp_ls_wq:
+  3732		destroy_workqueue(smc_tcp_ls_wq);
+  3733	out_pnet:
+  3734		smc_pnet_exit();
+  3735	out_nl:
+  3736		smc_nl_exit();
+  3737	out_ism:
+  3738		smc_clc_exit();
+  3739		smc_ism_exit();
+  3740	out_pernet_subsys_stat:
+  3741		unregister_pernet_subsys(&smc_net_stat_ops);
+  3742	out_pernet_subsys:
+  3743		unregister_pernet_subsys(&smc_net_ops);
+  3744	
+  3745		return rc;
+  3746	}
+  3747	
 
 -- 
-#Randy
-https://people.kernel.org/tglx/notes-about-netiquette
-https://subspace.kernel.org/etiquette.html
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
