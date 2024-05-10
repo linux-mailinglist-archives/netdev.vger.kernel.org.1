@@ -1,301 +1,178 @@
-Return-Path: <netdev+bounces-95301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46A4D8C1D61
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 06:17:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C40198C1D64
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 06:21:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0AC82846F7
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 04:17:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C28661F2260E
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 04:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20ABE14A4E2;
-	Fri, 10 May 2024 04:17:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B5B14BFAB;
+	Fri, 10 May 2024 04:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="QSJmbA8I"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PTh0vVQU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75916149DF0
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 04:17:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64FB314BF92;
+	Fri, 10 May 2024 04:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715314632; cv=none; b=EVG31s3Yy3t01CxKIMLkqvtvVxqlRmLggoeN6PEioU2TCpQjfkc/2MDDTp2r3PTUPF2zP7xssHj3Zjir5qaCa6agw41wU/ZSwQbJRPvhpmaMBJos6ppBmgk+aFfmDqmYTUEFMUElTevq+FXhvIf0uI7Ahqx1VoXK14QCSH8bTWo=
+	t=1715314855; cv=none; b=QkqLSklU/Qz5PTmMAE5PquNJfjGpa/y7LXDwX9WXjQYcCkxxHlDGGNo5F3kIxpfqw7FPLv6tTN1CBMAbVhAJuy4DFJ43+wc7Fqzl9V/gXeek8CiaovFJy+PLW/RfOeM7S8T9zaLylnhkku8XPTYHDJEyF2OBKJGt0eYZnHNCjLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715314632; c=relaxed/simple;
-	bh=sItGtJBIJNMhfVpHFpYOWuJhXQi9rByjma23Wzavzq8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=isnDlBD1rIJBH3jr0cVpMGbYi0iv0WnurPQ5y+32W2nmTQst0b8cZzzFLKvxO1OGElekpJyuVm6+i8L/0VYrdh8EUYwzT57drcsHNfQ/9NVEQKcEJNKVgsHFj5scRF65Y7mC6b48Zm31pWDPKlGX1clmLU3ZDB+zTtUR5yEfVmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=QSJmbA8I; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1edfc57ac0cso12904125ad.3
-        for <netdev@vger.kernel.org>; Thu, 09 May 2024 21:17:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1715314630; x=1715919430; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TpQN7GJz3KBsvp4IKZd1UGER/INOZY+tW+x17mpIBcY=;
-        b=QSJmbA8Ij+tRqdxgxjSuRwqYQMX1aYjnHI/wdXAKrvkLOqM330uhClskWh62PLOME/
-         Mxfjjay4M2F96LAVmviS/pybSCsXaY/rcID6oiLt1hMRJaMiruOI5pr8sxq5rTCm2Sal
-         Q1qIkKCjAf4MQBhC6uwADOOsAO9k5wmKJx7Yw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715314630; x=1715919430;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TpQN7GJz3KBsvp4IKZd1UGER/INOZY+tW+x17mpIBcY=;
-        b=tqQrx0Tl8BAcO07YlRqfs1f8h59S8Smj0lyg6zVhMbprH0hPUI3R0zwliSGjVdcfo6
-         Pd3RUX0KWdS3GAv5PdX4VzXd+YFDNAPf0VsVFWTzYnudC9EGA24iuVfWw9W81+8fUec2
-         5SiTLRBH2HQCMCC21npZBWNqVsaQVNPF0LUaUzKUsJprNIHixwZfjzxSuZHpinfNQ4lb
-         h3bXPwe7wbPWotxMsPwrWhAAE5CmQ9KCsfy2y+WOHTCF0ubIPhsOoX9N2eL1jrJWu7el
-         glw+2j5EQgOGtDYfqbqC7CPRdQ/EXaBXyzXauWfY9wW4upNw3wczdSqI0zEFBmec86Xk
-         vLvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW53xwTfsCtzt2t2yduKycVlknllnuqxftSXJkbZlFif3hqpElOS22PRnoaEm6KSGuKVRoe9vHxdnZq/+mmerrDKjVUf//B
-X-Gm-Message-State: AOJu0Yw0kMsdwYO/AI1y9cD318iE6dRvjhLYkDSDc+zd/J0IUj9kS5lp
-	40YwHXKgPto7RUH1jyTsH/RZEmORz486Kz/+DAPseZwT80TQoVYIb5F4pfLPZ1g=
-X-Google-Smtp-Source: AGHT+IGKqe1bccc6DLMtv1Yamu/Y/iCmWtqFo06blB8qUSDje65ihSgrtrh6NSrRngdN1FJV3QRz8w==
-X-Received: by 2002:a17:903:1cd:b0:1ee:8fb7:dce9 with SMTP id d9443c01a7336-1ef43d18246mr17526025ad.15.1715314629837;
-        Thu, 09 May 2024 21:17:09 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bad634asm22617485ad.87.2024.05.09.21.17.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 May 2024 21:17:09 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1715314855; c=relaxed/simple;
+	bh=yde+e083D+Y6dH3TaJbEx9gaVKpWNaOkIuVpOCVIpfE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d1oVQ16rH2jr5U7O6LxyK/bVkbaDORYXBOR2LQg+/dCfC3zQvObbtnfNT39fV7h3RJ0qpJFArXBwT3BFW9JaUG/vPz8NtCgdoqOvJj3FhJTBum4ov5J5yH5rzU+KhSWWSmakH2njEptYzSS9Vzoj/aqFWeE0x9A7qzxqrOkMn7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PTh0vVQU; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715314850; x=1746850850;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=yde+e083D+Y6dH3TaJbEx9gaVKpWNaOkIuVpOCVIpfE=;
+  b=PTh0vVQUfCciOm6ydc1xegF/UKBYxwEUu1syEBAPTEg9MGtK1Ai/6Nyy
+   rjVRLXGnZb264WtCsHeCUSgtQcgq8GEgox7R831PrLZ8PEkxr6ogQcD/R
+   JkI8mUewpsFiroDwu63XE69+YSVwyf92xTytE6F1pavALQUuci7TDxZN/
+   j4/6aYx2oDeAo+pR24M0dxxLxiP2rOY6S8XSHWZYu2kLjOaLXr5q7Ao/9
+   w1sl4S3mcZhfT4HJAjwZZFmrHBJYNY4qJCVIXWwMIqNKKYAU8uL7hy+Oe
+   DRbeTkC38HPqyYdXEzIMM1jnwCOSUjDwuQb1Ymk84dXKaDu5HpPpHAm9p
+   g==;
+X-CSE-ConnectionGUID: Z4PbYaX7T/W0gK0t+iI7gA==
+X-CSE-MsgGUID: DEsxnRP5SxWtarVLBuNFKA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="28760848"
+X-IronPort-AV: E=Sophos;i="6.08,150,1712646000"; 
+   d="scan'208";a="28760848"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2024 21:20:49 -0700
+X-CSE-ConnectionGUID: Dpc06GWPRJu0PltILmSdeg==
+X-CSE-MsgGUID: nFfoBkN2Q7GX9weKTh8MHA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,150,1712646000"; 
+   d="scan'208";a="29584668"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 09 May 2024 21:20:45 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s5HkQ-0005iZ-0Z;
+	Fri, 10 May 2024 04:20:42 +0000
+Date: Fri, 10 May 2024 12:20:29 +0800
+From: kernel test robot <lkp@intel.com>
+To: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
 	netdev@vger.kernel.org
-Cc: zyjzyj2000@gmail.com,
-	nalramli@fastly.com,
-	Joe Damato <jdamato@fastly.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-rdma@vger.kernel.org (open list:MELLANOX MLX5 core VPI driver)
-Subject: [PATCH net-next v2 1/1] net/mlx5e: Add per queue netdev-genl stats
-Date: Fri, 10 May 2024 04:17:04 +0000
-Message-Id: <20240510041705.96453-2-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240510041705.96453-1-jdamato@fastly.com>
-References: <20240510041705.96453-1-jdamato@fastly.com>
+Cc: oe-kbuild-all@lists.linux.dev, bhelgaas@google.com, corbet@lwn.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	wei.huang2@amd.com
+Subject: Re: [PATCH V1 6/9] PCI/TPH: Retrieve steering tag from ACPI _DSM
+Message-ID: <202405101200.FPuliW1p-lkp@intel.com>
+References: <20240509162741.1937586-7-wei.huang2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240509162741.1937586-7-wei.huang2@amd.com>
 
-Add functions to support the netdev-genl per queue stats API.
+Hi Wei,
 
-./cli.py --spec netlink/specs/netdev.yaml \
---dump qstats-get --json '{"scope": "queue"}'
+kernel test robot noticed the following build errors:
 
-...snip
+[auto build test ERROR on pci/for-linus]
+[also build test ERROR on awilliam-vfio/next linus/master awilliam-vfio/for-linus v6.9-rc7 next-20240509]
+[cannot apply to pci/next horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
- {'ifindex': 7,
-  'queue-id': 62,
-  'queue-type': 'rx',
-  'rx-alloc-fail': 0,
-  'rx-bytes': 105965251,
-  'rx-packets': 179790},
- {'ifindex': 7,
-  'queue-id': 0,
-  'queue-type': 'tx',
-  'tx-bytes': 9402665,
-  'tx-packets': 17551},
+url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Huang/PCI-Introduce-PCIe-TPH-support-framework/20240510-003504
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git for-linus
+patch link:    https://lore.kernel.org/r/20240509162741.1937586-7-wei.huang2%40amd.com
+patch subject: [PATCH V1 6/9] PCI/TPH: Retrieve steering tag from ACPI _DSM
+config: parisc-randconfig-r081-20240510 (https://download.01.org/0day-ci/archive/20240510/202405101200.FPuliW1p-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240510/202405101200.FPuliW1p-lkp@intel.com/reproduce)
 
-...snip
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405101200.FPuliW1p-lkp@intel.com/
 
-Also tested with the script tools/testing/selftests/drivers/net/stats.py
-in several scenarios to ensure stats tallying was correct:
+All errors (new ones prefixed by >>):
 
-- on boot (default queue counts)
-- adjusting queue count up or down (ethtool -L eth0 combined ...)
-- adding mqprio TCs
+   drivers/pci/pcie/tph.c: In function 'tph_msix_table_entry':
+   drivers/pci/pcie/tph.c:95:22: error: 'struct pci_dev' has no member named 'msix_base'; did you mean 'msix_cap'?
+      95 |         entry = dev->msix_base + msi_index * PCI_MSIX_ENTRY_SIZE;
+         |                      ^~~~~~~~~
+         |                      msix_cap
+   drivers/pci/pcie/tph.c: In function 'invoke_dsm':
+>> drivers/pci/pcie/tph.c:221:46: error: 'pci_acpi_dsm_guid' undeclared (first use in this function)
+     221 |         out_obj = acpi_evaluate_dsm(handle, &pci_acpi_dsm_guid, MIN_ST_DSM_REV,
+         |                                              ^~~~~~~~~~~~~~~~~
+   drivers/pci/pcie/tph.c:221:46: note: each undeclared identifier is reported only once for each function it appears in
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- .../net/ethernet/mellanox/mlx5/core/en_main.c | 144 ++++++++++++++++++
- 1 file changed, 144 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index ffe8919494d5..4a675d8b31b5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -39,6 +39,7 @@
- #include <linux/debugfs.h>
- #include <linux/if_bridge.h>
- #include <linux/filter.h>
-+#include <net/netdev_queues.h>
- #include <net/page_pool/types.h>
- #include <net/pkt_sched.h>
- #include <net/xdp_sock_drv.h>
-@@ -5282,6 +5283,148 @@ static bool mlx5e_tunnel_any_tx_proto_supported(struct mlx5_core_dev *mdev)
- 	return (mlx5_vxlan_allowed(mdev->vxlan) || mlx5_geneve_tx_allowed(mdev));
- }
- 
-+static void mlx5e_get_queue_stats_rx(struct net_device *dev, int i,
-+				     struct netdev_queue_stats_rx *stats)
-+{
-+	struct mlx5e_priv *priv = netdev_priv(dev);
-+
-+	if (mlx5e_is_uplink_rep(priv))
-+		return;
-+
-+	struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
-+	struct mlx5e_rq_stats *xskrq_stats = &channel_stats->xskrq;
-+	struct mlx5e_rq_stats *rq_stats = &channel_stats->rq;
-+
-+	stats->packets = rq_stats->packets + xskrq_stats->packets;
-+	stats->bytes = rq_stats->bytes + xskrq_stats->bytes;
-+	stats->alloc_fail = rq_stats->buff_alloc_err +
-+			    xskrq_stats->buff_alloc_err;
-+}
-+
-+static void mlx5e_get_queue_stats_tx(struct net_device *dev, int i,
-+				     struct netdev_queue_stats_tx *stats)
-+{
-+	struct mlx5e_priv *priv = netdev_priv(dev);
-+	struct net_device *netdev = priv->netdev;
-+	struct mlx5e_txqsq *sq;
-+	int j;
-+
-+	if (mlx5e_is_uplink_rep(priv))
-+		return;
-+
-+	for (j = 0; j < netdev->num_tx_queues; j++) {
-+		sq = priv->txq2sq[j];
-+		if (sq->ch_ix == i) {
-+			stats->packets = sq->stats->packets;
-+			stats->bytes = sq->stats->bytes;
-+			return;
-+		}
-+	}
-+}
-+
-+static void mlx5e_get_base_stats(struct net_device *dev,
-+				 struct netdev_queue_stats_rx *rx,
-+				 struct netdev_queue_stats_tx *tx)
-+{
-+	struct mlx5e_priv *priv = netdev_priv(dev);
-+	int i, j;
-+
-+	if (!mlx5e_is_uplink_rep(priv)) {
-+		rx->packets = 0;
-+		rx->bytes = 0;
-+		rx->alloc_fail = 0;
-+
-+		/* compute stats for deactivated RX queues
-+		 *
-+		 * if priv->channels.num == 0 the device is down, so compute
-+		 * stats for every queue.
-+		 *
-+		 * otherwise, compute only the queues which have been deactivated.
-+		 */
-+		if (priv->channels.num == 0)
-+			i = 0;
-+		else
-+			i = priv->channels.params.num_channels;
-+
-+		for (; i < priv->stats_nch; i++) {
-+			struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
-+			struct mlx5e_rq_stats *xskrq_stats = &channel_stats->xskrq;
-+			struct mlx5e_rq_stats *rq_stats = &channel_stats->rq;
-+
-+			rx->packets += rq_stats->packets + xskrq_stats->packets;
-+			rx->bytes += rq_stats->bytes + xskrq_stats->bytes;
-+			rx->alloc_fail += rq_stats->buff_alloc_err +
-+					  xskrq_stats->buff_alloc_err;
-+		}
-+
-+		if (priv->rx_ptp_opened) {
-+			struct mlx5e_rq_stats *rq_stats = &priv->ptp_stats.rq;
-+
-+			rx->packets += rq_stats->packets;
-+			rx->bytes += rq_stats->bytes;
-+		}
-+	}
-+
-+	tx->packets = 0;
-+	tx->bytes = 0;
-+
-+	/* three TX cases to handle:
-+	 *
-+	 * case 1: priv->channels.num == 0, get the stats for every TC
-+	 *         on every queue.
-+	 *
-+	 * case 2: priv->channel.num > 0, so get the stats for every TC on
-+	 *         every deactivated queue.
-+	 *
-+	 * case 3: the number of TCs has changed, so get the stats for the
-+	 *         inactive TCs on active TX queues (handled in the second loop
-+	 *         below).
-+	 */
-+	if (priv->channels.num == 0)
-+		i = 0;
-+	else
-+		i = priv->channels.params.num_channels;
-+
-+	for (; i < priv->stats_nch; i++) {
-+		struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
-+
-+		for (j = 0; j < priv->max_opened_tc; j++) {
-+			struct mlx5e_sq_stats *sq_stats = &channel_stats->sq[j];
-+
-+			tx->packets += sq_stats->packets;
-+			tx->bytes += sq_stats->bytes;
-+		}
-+	}
-+
-+	/* Handle case 3 described above. */
-+	for (i = 0; i < priv->channels.params.num_channels; i++) {
-+		struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
-+		u8 dcb_num_tc = mlx5e_get_dcb_num_tc(&priv->channels.params);
-+
-+		for (j = dcb_num_tc; j < priv->max_opened_tc; j++) {
-+			struct mlx5e_sq_stats *sq_stats = &channel_stats->sq[j];
-+
-+			tx->packets += sq_stats->packets;
-+			tx->bytes += sq_stats->bytes;
-+		}
-+	}
-+
-+	if (priv->tx_ptp_opened) {
-+		for (j = 0; j < priv->max_opened_tc; j++) {
-+			struct mlx5e_sq_stats *sq_stats = &priv->ptp_stats.sq[j];
-+
-+			tx->packets    += sq_stats->packets;
-+			tx->bytes      += sq_stats->bytes;
-+		}
-+	}
-+}
-+
-+static const struct netdev_stat_ops mlx5e_stat_ops = {
-+	.get_queue_stats_rx     = mlx5e_get_queue_stats_rx,
-+	.get_queue_stats_tx     = mlx5e_get_queue_stats_tx,
-+	.get_base_stats         = mlx5e_get_base_stats,
-+};
-+
- static void mlx5e_build_nic_netdev(struct net_device *netdev)
- {
- 	struct mlx5e_priv *priv = netdev_priv(netdev);
-@@ -5299,6 +5442,7 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
- 
- 	netdev->watchdog_timeo    = 15 * HZ;
- 
-+	netdev->stat_ops          = &mlx5e_stat_ops;
- 	netdev->ethtool_ops	  = &mlx5e_ethtool_ops;
- 
- 	netdev->vlan_features    |= NETIF_F_SG;
+vim +/pci_acpi_dsm_guid +221 drivers/pci/pcie/tph.c
+
+   196	
+   197	#define MIN_ST_DSM_REV		7
+   198	#define ST_DSM_FUNC_INDEX	0xf
+   199	static bool invoke_dsm(acpi_handle handle, u32 cpu_uid, u8 ph,
+   200			       u8 target_type, bool cache_ref_valid,
+   201			       u64 cache_ref, union st_info *st_out)
+   202	{
+   203		union acpi_object in_obj, in_buf[3], *out_obj;
+   204	
+   205		in_buf[0].integer.type = ACPI_TYPE_INTEGER;
+   206		in_buf[0].integer.value = 0; /* 0 => processor cache steering tags */
+   207	
+   208		in_buf[1].integer.type = ACPI_TYPE_INTEGER;
+   209		in_buf[1].integer.value = cpu_uid;
+   210	
+   211		in_buf[2].integer.type = ACPI_TYPE_INTEGER;
+   212		in_buf[2].integer.value = ph & 3;
+   213		in_buf[2].integer.value |= (target_type & 1) << 2;
+   214		in_buf[2].integer.value |= (cache_ref_valid & 1) << 3;
+   215		in_buf[2].integer.value |= (cache_ref << 32);
+   216	
+   217		in_obj.type = ACPI_TYPE_PACKAGE;
+   218		in_obj.package.count = ARRAY_SIZE(in_buf);
+   219		in_obj.package.elements = in_buf;
+   220	
+ > 221		out_obj = acpi_evaluate_dsm(handle, &pci_acpi_dsm_guid, MIN_ST_DSM_REV,
+   222					    ST_DSM_FUNC_INDEX, &in_obj);
+   223	
+   224		if (!out_obj)
+   225			return false;
+   226	
+   227		if (out_obj->type != ACPI_TYPE_BUFFER) {
+   228			pr_err("invalid return type %d from TPH _DSM\n",
+   229			       out_obj->type);
+   230			ACPI_FREE(out_obj);
+   231			return false;
+   232		}
+   233	
+   234		st_out->value = *((u64 *)(out_obj->buffer.pointer));
+   235	
+   236		ACPI_FREE(out_obj);
+   237	
+   238		return true;
+   239	}
+   240	
+
 -- 
-2.25.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
