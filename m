@@ -1,77 +1,88 @@
-Return-Path: <netdev+bounces-95343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92CE68C1EFA
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 09:31:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D420B8C1EFF
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 09:33:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BA4D282723
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 07:31:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74E661F21AE1
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 07:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA7B15ECEC;
-	Fri, 10 May 2024 07:31:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AEE315ECD2;
+	Fri, 10 May 2024 07:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dL9r9ZWC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="edgCFKau"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA1D15E810
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 07:31:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5681311B9;
+	Fri, 10 May 2024 07:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715326312; cv=none; b=Z4CfOCqezMihKiY7K1yZxGQeaKi0CDTOXtLwkTCJYcgFu1UYOpw4NpyAkymp5KRt4+sXVIpbiXQO3P9PegHdGejgHCutkuf8fyYnmDZLgqoyu5W50fX42cNOn1a2gz9IfeCg6Dny0BSS1es6AdKX8XYSP4yiFSLAj/+C3zQRkYk=
+	t=1715326380; cv=none; b=WrCZE10nZhqLIPTefOo9U0zU2WYbskAaVL+CU7h/KtL3dVj4s/2iraZS97c7Ht3TJfKVLmlkSCi2nU2ikHGzeJIwK2BRzc+PJq+Add+ni2njbRv8AaODmRoxrCb7TQUhHmdkLqwZAuuaeYtLaxM6UCGJApDL7IPki1eF00ddzHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715326312; c=relaxed/simple;
-	bh=OAlirC+gOM9PRA8w/mTLy087HEypbm6XLwuNEFoWgWY=;
+	s=arc-20240116; t=1715326380; c=relaxed/simple;
+	bh=ByEC9kiMaabF3vVkEOp8v75OMBj+coHKSUUUS2mNNEA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PUZE9D02Obz9m3T2g8gKFBC9Wqsr2DrSVxILprkxxVHv1xkngP9jybNC3X8ZyzXbH+iM9QwN1JzRV70b5jOytLNvYPya9K0rMpSmKdmYFGEjm2rm+7PdNON80VfnTGzjIREMCkLmou2rzkvibE7q3lBXG+fSZ0e5PQgm9GuOQpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dL9r9ZWC; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=q+/O89H9F9Ry9HlNUrNjYwMFOehPCeRSjywsDWC+sxTU7xv8I6xZ5zlvrW5hIyCTwt9nMjFDGB4UOA4qTEHuOP1pcZLDD4yILpIH2ghchJ4N+KrmSKiPquj6sDitZfX32QyomtR9ROYPBEHNS1FQVG0YT8K1uTxgOF/+1g0X1xI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=edgCFKau; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715326311; x=1746862311;
+  t=1715326378; x=1746862378;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=OAlirC+gOM9PRA8w/mTLy087HEypbm6XLwuNEFoWgWY=;
-  b=dL9r9ZWCK+Aapk/PqfQ13MYHydN3DBZPNibSP1YUWgKWtNkkim5rmVli
-   GbFBu/YjwtEbffBPm7j437Q0760uRiyKRdwZWfj8T0B9xz41XVPrGUut0
-   X1SdamJ5KQNTBU8ZBOAHWc8oGFRbo6yPwcZtwdHN0pnF9LgjcWQgX9YsU
-   4rvhmTKZvD0VKCcEtALKVJ3OJKP9yGu3AjLvDolWq3OPgAN2/bFD/B0dq
-   8HOXPav6TnJAjLrNx7UL2jMSkODpftWzmUN269ZALD6vN5T2sow/QnZiT
-   tu/EiuhPBndqzK/0xG2rXJWI79BVGd5RcRUc8YY5ecPG9jQnvpvp/hOTp
+  bh=ByEC9kiMaabF3vVkEOp8v75OMBj+coHKSUUUS2mNNEA=;
+  b=edgCFKauxBiN6Fvb2QgyEqZvaoVcoCK8xIhGWzVcxo8kEf+LLmO68tPN
+   sT7dI9zDb443eoYEzJsE5S9kHr+ot9jNJX14n+JhcGTUEqjNEOBFUYOdh
+   udJZ1R9IaGP709RSeUSgeA8pWiRlquVRGR+5ZpBuiDU//zPoJHk2PIa4n
+   1qCfxztafrEva7MtdmIZF4DSfiL6IaNcOlwG90+MU8a3mmfM83PKjjK5P
+   yMbeQ4wtQqz54ZsnAR98IDGGootS036hVf+Ph3J+G8gb1m+GlAU+/UI5+
+   gXGoaFGDMkB+TVr6Pvkq/uDbIpwp2zB3kRo1T/ivB2OGDN1YBnkh2weOo
    w==;
-X-CSE-ConnectionGUID: qw6iysvlR2+Q11/aTDmPHw==
-X-CSE-MsgGUID: RfcTXRDmSm6J3mIPp53yiA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="21965487"
+X-CSE-ConnectionGUID: iNgg0imQSbCJeGBncwQCyw==
+X-CSE-MsgGUID: Al4nNiqbTF61MpUASuzhBQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="14245272"
 X-IronPort-AV: E=Sophos;i="6.08,150,1712646000"; 
-   d="scan'208";a="21965487"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 00:31:50 -0700
-X-CSE-ConnectionGUID: z0ndINDHSoSj337AvYImAg==
-X-CSE-MsgGUID: 4Jd23kDZRk+YaMH5xlz0HA==
+   d="scan'208";a="14245272"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 00:32:58 -0700
+X-CSE-ConnectionGUID: ybRwEvJsRIG5YlmeO+pHBg==
+X-CSE-MsgGUID: mvMVWbM1Qkmt1ZMeJojlcQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,150,1712646000"; 
-   d="scan'208";a="29906290"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 00:31:47 -0700
-Date: Fri, 10 May 2024 09:31:15 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com, jiri@nvidia.com,
-	mateusz.polchlopek@intel.com, shayd@nvidia.com
-Subject: Re: [iwl-next v1 08/14] ice: create port representor for SF
-Message-ID: <Zj3NQw1BxqtOS9VG@mev-dev>
-References: <20240507114516.9765-1-michal.swiatkowski@linux.intel.com>
- <20240507114516.9765-9-michal.swiatkowski@linux.intel.com>
- <ZjywddcaIae0W_w3@nanopsycho.orion>
+   d="scan'208";a="29589840"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 10 May 2024 00:32:51 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s5KkK-0005qp-2s;
+	Fri, 10 May 2024 07:32:48 +0000
+Date: Fri, 10 May 2024 15:31:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+	mingo@redhat.com, tglx@linutronix.de
+Cc: oe-kbuild-all@lists.linux.dev, x86@kernel.org, netdev@vger.kernel.org,
+	richardcochran@gmail.com, linux-input@vger.kernel.org,
+	dmitry.torokhov@gmail.com, zackr@vmware.com,
+	linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
+	timothym@vmware.com, akaher@vmware.com,
+	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
+	tzimmermann@suse.de, mripard@kernel.org,
+	maarten.lankhorst@linux.intel.com, horms@kernel.org,
+	kirill.shutemov@linux.intel.com,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Zack Rusin <zack.rusin@broadcom.com>
+Subject: Re: [PATCH v9 6/8] drm/vmwgfx: Use VMware hypercall API
+Message-ID: <202405101512.NJRbYcaH-lkp@intel.com>
+References: <20240506215305.30756-7-alexey.makhalov@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,50 +91,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZjywddcaIae0W_w3@nanopsycho.orion>
+In-Reply-To: <20240506215305.30756-7-alexey.makhalov@broadcom.com>
 
-On Thu, May 09, 2024 at 01:16:05PM +0200, Jiri Pirko wrote:
-> Tue, May 07, 2024 at 01:45:09PM CEST, michal.swiatkowski@linux.intel.com wrote:
-> >Store subfunction and VF pointer in port representor structure as an
-> >union. Add port representor type to distinguish between each of them.
-> >
-> >Keep the same flow of port representor creation, but instead of general
-> >attach function create helpers for VF and subfunction attach function.
-> >
-> >Type of port representor can be also known based on VSI type, but it
-> >is more clean to have it directly saved in port representor structure.
-> >
-> >Create port representor when subfunction port is created.
-> >
-> >Add devlink lock for whole VF port representor creation and destruction.
-> >It is done to be symmetric with what happens in case of SF port
-> >representor. SF port representor is always added or removed with devlink
-> >lock taken. Doing the same with VF port representor simplify logic.
-> >
-> >Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> >Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> >---
-> > .../ethernet/intel/ice/devlink/devlink_port.c |   6 +-
-> > .../ethernet/intel/ice/devlink/devlink_port.h |   1 +
-> > drivers/net/ethernet/intel/ice/ice_eswitch.c  |  85 +++++++++---
-> > drivers/net/ethernet/intel/ice/ice_eswitch.h  |  22 +++-
-> > drivers/net/ethernet/intel/ice/ice_repr.c     | 124 +++++++++++-------
-> > drivers/net/ethernet/intel/ice/ice_repr.h     |  21 ++-
-> > drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +-
-> > drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   4 +-
-> > 8 files changed, 187 insertions(+), 80 deletions(-)
-> 
-> This calls for a split to at least 2 patches. One patch to prepare and
-> one to add the SF support?
+Hi Alexey,
 
-Is 187 insertions and 80 deletions too many for one patch? Or the
-problem is with number of files changed?
+kernel test robot noticed the following build errors:
 
-I don't see what here can be moved to preparation part as most changes
-depends on each other. Do you want me to have one patch with unused
-functions that are adding/removing SF repr and another with calling
-them?
+[auto build test ERROR on drm-misc/drm-misc-next]
+[also build test ERROR on dtor-input/next dtor-input/for-linus linus/master v6.9-rc7 next-20240509]
+[cannot apply to tip/x86/vmware]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thanks,
-Michal
+url:    https://github.com/intel-lab-lkp/linux/commits/Alexey-Makhalov/x86-vmware-Move-common-macros-to-vmware-h/20240507-055606
+base:   git://anongit.freedesktop.org/drm/drm-misc drm-misc-next
+patch link:    https://lore.kernel.org/r/20240506215305.30756-7-alexey.makhalov%40broadcom.com
+patch subject: [PATCH v9 6/8] drm/vmwgfx: Use VMware hypercall API
+config: x86_64-buildonly-randconfig-003-20240510 (https://download.01.org/0day-ci/archive/20240510/202405101512.NJRbYcaH-lkp@intel.com/config)
+compiler: gcc-11 (Ubuntu 11.4.0-4ubuntu1) 11.4.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240510/202405101512.NJRbYcaH-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405101512.NJRbYcaH-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   ld: drivers/gpu/drm/vmwgfx/vmwgfx_msg.o: in function `vmw_port_hb_out':
+   vmwgfx_msg.c:(.text+0x182): undefined reference to `vmware_hypercall_mode'
+   ld: drivers/gpu/drm/vmwgfx/vmwgfx_msg.o: in function `vmw_send_msg':
+   vmwgfx_msg.c:(.text+0x46d): undefined reference to `vmware_hypercall_mode'
+   ld: drivers/gpu/drm/vmwgfx/vmwgfx_msg.o: in function `vmw_recv_msg':
+   vmwgfx_msg.c:(.text+0x6f4): undefined reference to `vmware_hypercall_mode'
+>> ld: vmwgfx_msg.c:(.text+0x875): undefined reference to `vmware_hypercall_mode'
+   ld: vmwgfx_msg.c:(.text+0xae0): undefined reference to `vmware_hypercall_mode'
+   ld: drivers/gpu/drm/vmwgfx/vmwgfx_msg.o:vmwgfx_msg.c:(.text+0x136e): more undefined references to `vmware_hypercall_mode' follow
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
