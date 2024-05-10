@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-95414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 227B48C22FD
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:20:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 441158C22FF
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83B401F2189B
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:20:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 673B01C212F3
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53ABA17085C;
-	Fri, 10 May 2024 11:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F232F1708A0;
+	Fri, 10 May 2024 11:19:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hvEo+gQT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ARIWUGbW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2870C170858;
-	Fri, 10 May 2024 11:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53EA17089A;
+	Fri, 10 May 2024 11:19:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715339947; cv=none; b=GRz1O/UZQ+xvhlVT98IMQNOCZ9QextrBWHdvAVjHhyDJNTHVCbcxMxzCyao2ORAVcu1Hsxli+HX64jU6+ngZBZhu528f5APnOT4t7UwXKium/HGu969CyH056E/GZDgl/cNdlOMziYGhnI9ThGAC8s0uff96de8FbX1RDBeLbxk=
+	t=1715339949; cv=none; b=nXsRAFP5/hmMmSlAzF51DvGBgq1H7X1X2NSUquYCHipNPUyZ+BkN8qQwKwAqvhj3FA/EMGG5t2GsUfepxPGoRVj04UJqDDhMtWoSvG+NIoLP5dSNSM4RrkRqUEIkupoZJs8LZBjhPrz1plpP42VpeXPf0fhvlP7y7ZymrtUr+Js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715339947; c=relaxed/simple;
-	bh=mn3cUeuni9YG0Wzwevr2Z6WMUjH1cMxpP/hJKuF0rmw=;
+	s=arc-20240116; t=1715339949; c=relaxed/simple;
+	bh=xbCxQm7NYK+1wRRkdU1YZqrQE67obVDoGOLdbAX28Bo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=CF5of2ofTXilSYdoV+GR3ZOgSp3byUUyBRiVkiE5xM3nICnCN6cNotb5CiqiTQ0j+lM6TSxP/rkLLEg4/3xsfZl2757sT8k6iG3yW/NDLMj+guL76PmXHvNQyXQioUPiIBrpjZ1BqIzO/juwb3PSxu6XqOSk4vAsZy28j4tLXM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hvEo+gQT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E3CDC113CC;
-	Fri, 10 May 2024 11:19:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=AnqAexhRUcz/j0asQ5UxmdO6oTQFhV6MDVcY3So+02ADWQh6C+sJV6SJkxqaaWsrPN+Lj+vrWxXYe5sk933mwRy+2FiYobY8+DNEYHLmUhnQxLEqvImg0Pv+hodmIE/5wZLLCh5gcBldhe/I2ISQiwh04TP9P+ZNvMjVS5aiOuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ARIWUGbW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DF1FC2BD11;
+	Fri, 10 May 2024 11:19:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715339946;
-	bh=mn3cUeuni9YG0Wzwevr2Z6WMUjH1cMxpP/hJKuF0rmw=;
+	s=k20201202; t=1715339949;
+	bh=xbCxQm7NYK+1wRRkdU1YZqrQE67obVDoGOLdbAX28Bo=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=hvEo+gQT9vX5KrEu6smR3HDsQUe/rlydmQxcve33Biv6UklBzfSbiXASCofFVClV9
-	 4Tt4uT86nUo499QB9zFaFYjcdHE5PC8h2KNRmmiA9pcZb3DeSeUon+dEEyeLkoGJrx
-	 eXogtRk2RbwgRqQnRqIxaerc0+dEUl0Jvb8rQIeS02GowrlZGQA3AHd8fzMboIJzUK
-	 84i6lA+p+l9BBbIQU7z745EWEq+Xl+A1amlGJDf5yt84tE+iSAAQ+x5HHkJlhFOvLn
-	 wnQzindeFxJDSBIpCl0wAVW0tAHqXj4WWTKhE43WAh2Kcq2hvPH3JIJM3Vdetw6Kb3
-	 mqG6FcdMehhxw==
+	b=ARIWUGbWqjKWCzXGTQUsQW2kEIY4+1FUaei1Ipim4kPSjhDdPLzYJttG293hD5XUV
+	 cIKGsTfW7rKLfeuGOudfHCPdb1VKXPSHBbUD3PZraHS5zpFhbgQ44LALBsHgpFROWU
+	 qZRNffnB9x5n18eYNYUQAf+X4dAd2XKgFYB5jYW6Y+OaMekwLZTcVWN56m4f2V0sjV
+	 9spu5B272P33AsuXF0VEpOIph2Z3/XLaqAR8FumVd/5+NcBF0UwoLS1bG1qD2M4q49
+	 1XSeDb0fXUrjRcVXSQexJyxrr0KtgFP5D0N4nJ1DMQQkaf8hcOZgW2IurT70hESj8l
+	 VxEVwp5RsISOg==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 10 May 2024 13:18:34 +0200
-Subject: [PATCH net-next 4/8] mptcp: add net.mptcp.available_schedulers
+Date: Fri, 10 May 2024 13:18:35 +0200
+Subject: [PATCH net-next 5/8] mptcp: prefer strscpy over strcpy
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240510-upstream-net-next-20240509-misc-improvements-v1-4-4f25579e62ba@kernel.org>
+Message-Id: <20240510-upstream-net-next-20240509-misc-improvements-v1-5-4f25579e62ba@kernel.org>
 References: <20240510-upstream-net-next-20240509-misc-improvements-v1-0-4f25579e62ba@kernel.org>
 In-Reply-To: <20240510-upstream-net-next-20240509-misc-improvements-v1-0-4f25579e62ba@kernel.org>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
@@ -60,154 +60,95 @@ To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, Florian Westphal <fw@strlen.de>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Gregory Detal <gregory.detal@gmail.com>
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4279; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=t1Yh7WAxI11wVfzjw8nlaeU3n8BxQOHG92M634eRusw=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmPgKcDyBOeI187aOHNMo0SRQQcQ9DSshF6DCfc
- 7Xr+fBJAJWJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZj4CnAAKCRD2t4JPQmmg
- c6JIEADxMIDorQrlhIWMx4E9G4GPEsjfvnbVgRYF7S19eze6fI5+Rl+4cQXjk3Kw9vrpyljInxS
- zr03c4iUmIGaOJNiJ1Bj5Gz1TDx6SXuJUSHxqn1gLaeE/euzN3CLFUqSutAfQxFw6NB8G6gxRLp
- vgABit1HQ/fcrXbfCPPT124SZ1OzOfOrx02an9wdqhG0rUX44eb3xuJXlMOKfSus6rJJh8wlXOS
- 6wMDEX3Iwjg2yo3IfnS7VOH7lk0zJOvs0qUksR+20A7Ulp6OAVbVqkmFaOeY1GJIOlpbDx0uGh0
- bVSTr6Y9IBYo3Ot3Jsvyn7IbE/a1BeQWaLVz1dsadAGw6TLi0UvI8cH54n+kvIz+/lq3HlLGENg
- 156kUyx5nhkSFt+fbl5yTKOuyIbUZilvM4I1eKDdZGIcdaHAXJwfeuLja66MWol2w4RyX/iwhVc
- +axdGE0PDNJbG08T37sNzuQbOOKzUXdlpJ+x1v3qRIOL9sDTHqQoEBhkX1w/NqVbD31vcfxhBIq
- gu3nSPZb0LQaO11WsR6S+8MoX7CqfmhbOO5VzPeSQBknNce2IJt5YTUIOM2PHbszrQ2ZzC9tUMH
- ug2Da/yRORSpBJ8Im8+0qgQwH1XoUjAyygpebNVaq/v1hTt8vjegFQtRS7cbMIzKeGMcvzlXaRp
- GtaggEa9r5E0JwA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2664; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=xbCxQm7NYK+1wRRkdU1YZqrQE67obVDoGOLdbAX28Bo=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmPgKcc2r9q5h7H1i/aLEx24OsCJy2Wa1zE3IeU
+ fhSct5FzEqJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZj4CnAAKCRD2t4JPQmmg
+ c7sPD/4hpkNHeOFB5lQSXgVrUQw2P3twOxcElic9JWU8YWa9taxfoCiyiX3HrgtDf3Q0o4F2lxb
+ OE0UvdLcJ19w/JiBe/zpYPP99i/zsPCjdHSxhABcFC8RNOdm+cQY6AM1EBf7p/dkXc4M0YQrZzv
+ m+mmh/T+Th/8Mz/ZFIL5wRRVB7SQZ+MiSAapKVOEFb+v698ho2LMFYoR1hLi0jp58zYoxCEJNIU
+ JU+eiW9rJitvYfjeUv2XZ8fwfLc2IogattzWZLl600PdCxMpRhPz8VddaCjF5stqLxwD+F88rRJ
+ obyAMIgvRW8CGxdl2TYFjKBLPMrO8OUvKeUfyo01jJJ4iGRfcnKMRrGZM2QB0XUxkfqY4Zsu8HT
+ 39myYfpwbsLdhYe2VbLl+YmVm5NIgY4PgISPPGfzgvvMW3SQWO5CGNVx5Qzz3qS3ibxWdlhaJAv
+ LCbHfX60lhnoojQKcNQsmOQmFcEJ8q4eQTu6JgkBwUOhJf4N9nlFDWs9AY/dXmMx39H8IA1evUB
+ 0ljpYDgA4cqnWQKMsQixTFMaTjN1m/cIftewQFybJRlhy/FmHx9zo5ggXSdscU34a1updoTfRRi
+ k9Gfc1A9pYCGMHEGArpZxmCK09fTgtm9ckdWfwZ48IGheFtTgIxeRX3l6EJ30TCSzFXdVIQHv3w
+ XGyRvEbbr1I0UaQ==
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-From: Gregory Detal <gregory.detal@gmail.com>
+strcpy() performs no bounds checking on the destination buffer. This
+could result in linear overflows beyond the end of the buffer, leading
+to all kinds of misbehaviors. The safe replacement is strscpy() [1].
 
-The sysctl lists the available schedulers that can be set using
-net.mptcp.scheduler similarly to net.ipv4.tcp_available_congestion_control.
+This is in preparation of a possible future step where all strcpy() uses
+will be removed in favour of strscpy() [2].
 
-Signed-off-by: Gregory Detal <gregory.detal@gmail.com>
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Tested-by: Geliang Tang <geliang@kernel.org>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+This fixes CheckPatch warnings:
+
+  WARNING: Prefer strscpy over strcpy
+
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strcpy [1]
+Link: https://github.com/KSPP/linux/issues/88 [2]
+Reviewed-by: Geliang Tang <geliang@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- include/net/mptcp.h  |  3 +++
- net/mptcp/ctrl.c     | 27 ++++++++++++++++++++++++++-
- net/mptcp/protocol.h |  1 +
- net/mptcp/sched.c    | 22 ++++++++++++++++++++++
- 4 files changed, 52 insertions(+), 1 deletion(-)
+ net/mptcp/ctrl.c     | 2 +-
+ net/mptcp/protocol.c | 5 +++--
+ net/mptcp/sockopt.c  | 2 +-
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/mptcp.h b/include/net/mptcp.h
-index fb996124b3d5..0bc4ab03f487 100644
---- a/include/net/mptcp.h
-+++ b/include/net/mptcp.h
-@@ -97,6 +97,9 @@ struct mptcp_out_options {
- };
- 
- #define MPTCP_SCHED_NAME_MAX	16
-+#define MPTCP_SCHED_MAX		128
-+#define MPTCP_SCHED_BUF_MAX	(MPTCP_SCHED_NAME_MAX * MPTCP_SCHED_MAX)
-+
- #define MPTCP_SUBFLOWS_MAX	8
- 
- struct mptcp_sched_data {
 diff --git a/net/mptcp/ctrl.c b/net/mptcp/ctrl.c
-index 49abf80b3fad..542555ba474c 100644
+index 542555ba474c..98b1dd498ff6 100644
 --- a/net/mptcp/ctrl.c
 +++ b/net/mptcp/ctrl.c
-@@ -133,6 +133,24 @@ static int proc_scheduler(struct ctl_table *ctl, int write,
- 	return ret;
+@@ -92,7 +92,7 @@ static void mptcp_pernet_set_defaults(struct mptcp_pernet *pernet)
+ 	pernet->allow_join_initial_addr_port = 1;
+ 	pernet->stale_loss_cnt = 4;
+ 	pernet->pm_type = MPTCP_PM_TYPE_KERNEL;
+-	strcpy(pernet->scheduler, "default");
++	strscpy(pernet->scheduler, "default", sizeof(pernet->scheduler));
  }
  
-+static int proc_available_schedulers(struct ctl_table *ctl,
-+				     int write, void *buffer,
-+				     size_t *lenp, loff_t *ppos)
-+{
-+	struct ctl_table tbl = { .maxlen = MPTCP_SCHED_BUF_MAX, };
-+	int ret;
-+
-+	tbl.data = kmalloc(tbl.maxlen, GFP_USER);
-+	if (!tbl.data)
-+		return -ENOMEM;
-+
-+	mptcp_get_available_schedulers(tbl.data, MPTCP_SCHED_BUF_MAX);
-+	ret = proc_dostring(&tbl, write, buffer, lenp, ppos);
-+	kfree(tbl.data);
-+
-+	return ret;
-+}
-+
- static struct ctl_table mptcp_sysctl_table[] = {
- 	{
- 		.procname = "enabled",
-@@ -187,6 +205,12 @@ static struct ctl_table mptcp_sysctl_table[] = {
- 		.mode = 0644,
- 		.proc_handler = proc_scheduler,
- 	},
-+	{
-+		.procname = "available_schedulers",
-+		.maxlen	= MPTCP_SCHED_BUF_MAX,
-+		.mode = 0644,
-+		.proc_handler = proc_available_schedulers,
-+	},
- 	{
- 		.procname = "close_timeout",
- 		.maxlen = sizeof(unsigned int),
-@@ -214,7 +238,8 @@ static int mptcp_pernet_new_table(struct net *net, struct mptcp_pernet *pernet)
- 	table[4].data = &pernet->stale_loss_cnt;
- 	table[5].data = &pernet->pm_type;
- 	table[6].data = &pernet->scheduler;
--	table[7].data = &pernet->close_timeout;
-+	/* table[7] is for available_schedulers which is read-only info */
-+	table[8].data = &pernet->close_timeout;
+ #ifdef CONFIG_SYSCTL
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index bb8f96f2b86f..a42494d3a71b 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -2814,7 +2814,8 @@ static void mptcp_ca_reset(struct sock *sk)
+ 	struct inet_connection_sock *icsk = inet_csk(sk);
  
- 	hdr = register_net_sysctl_sz(net, MPTCP_SYSCTL_PATH, table,
- 				     ARRAY_SIZE(mptcp_sysctl_table));
-diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-index 4dcce3641d1d..39fc47e6b88a 100644
---- a/net/mptcp/protocol.h
-+++ b/net/mptcp/protocol.h
-@@ -686,6 +686,7 @@ unsigned int mptcp_stale_loss_cnt(const struct net *net);
- unsigned int mptcp_close_timeout(const struct sock *sk);
- int mptcp_get_pm_type(const struct net *net);
- const char *mptcp_get_scheduler(const struct net *net);
-+void mptcp_get_available_schedulers(char *buf, size_t maxlen);
- void __mptcp_subflow_fully_established(struct mptcp_sock *msk,
- 				       struct mptcp_subflow_context *subflow,
- 				       const struct mptcp_options_received *mp_opt);
-diff --git a/net/mptcp/sched.c b/net/mptcp/sched.c
-index 4ab0693c069c..4a7fd0508ad2 100644
---- a/net/mptcp/sched.c
-+++ b/net/mptcp/sched.c
-@@ -51,6 +51,28 @@ struct mptcp_sched_ops *mptcp_sched_find(const char *name)
+ 	tcp_assign_congestion_control(sk);
+-	strcpy(mptcp_sk(sk)->ca_name, icsk->icsk_ca_ops->name);
++	strscpy(mptcp_sk(sk)->ca_name, icsk->icsk_ca_ops->name,
++		sizeof(mptcp_sk(sk)->ca_name));
+ 
+ 	/* no need to keep a reference to the ops, the name will suffice */
+ 	tcp_cleanup_congestion_control(sk);
+@@ -4169,7 +4170,7 @@ int __init mptcp_proto_v6_init(void)
+ 	int err;
+ 
+ 	mptcp_v6_prot = mptcp_prot;
+-	strcpy(mptcp_v6_prot.name, "MPTCPv6");
++	strscpy(mptcp_v6_prot.name, "MPTCPv6", sizeof(mptcp_v6_prot.name));
+ 	mptcp_v6_prot.slab = NULL;
+ 	mptcp_v6_prot.obj_size = sizeof(struct mptcp6_sock);
+ 	mptcp_v6_prot.ipv6_pinfo_offset = offsetof(struct mptcp6_sock, np);
+diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+index cc9ecccf219d..0f6ef494525f 100644
+--- a/net/mptcp/sockopt.c
++++ b/net/mptcp/sockopt.c
+@@ -616,7 +616,7 @@ static int mptcp_setsockopt_sol_tcp_congestion(struct mptcp_sock *msk, sockptr_t
+ 	}
+ 
+ 	if (ret == 0)
+-		strcpy(msk->ca_name, name);
++		strscpy(msk->ca_name, name, sizeof(msk->ca_name));
+ 
+ 	release_sock(sk);
  	return ret;
- }
- 
-+/* Build string with list of available scheduler values.
-+ * Similar to tcp_get_available_congestion_control()
-+ */
-+void mptcp_get_available_schedulers(char *buf, size_t maxlen)
-+{
-+	struct mptcp_sched_ops *sched;
-+	size_t offs = 0;
-+
-+	rcu_read_lock();
-+	spin_lock(&mptcp_sched_list_lock);
-+	list_for_each_entry_rcu(sched, &mptcp_sched_list, list) {
-+		offs += snprintf(buf + offs, maxlen - offs,
-+				 "%s%s",
-+				 offs == 0 ? "" : " ", sched->name);
-+
-+		if (WARN_ON_ONCE(offs >= maxlen))
-+			break;
-+	}
-+	spin_unlock(&mptcp_sched_list_lock);
-+	rcu_read_unlock();
-+}
-+
- int mptcp_register_scheduler(struct mptcp_sched_ops *sched)
- {
- 	if (!sched->get_subflow)
 
 -- 
 2.43.0
