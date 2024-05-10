@@ -1,200 +1,131 @@
-Return-Path: <netdev+bounces-95406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C30778C22D2
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:09:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62B8E8C22E2
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:12:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED9151C20BA5
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:09:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D107C1F230E9
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05A216C844;
-	Fri, 10 May 2024 11:09:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5A116DED7;
+	Fri, 10 May 2024 11:11:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="faQcGGRb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RUeBlgBQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11158168AFC
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 11:09:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A2D16D326
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 11:11:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715339366; cv=none; b=ZOqPrk53tfa7uDXPj2SEm11TKp3HZyn2jJz4+GPiS4J510HNKi+0kNblM9XGDpiniyRkfglzP1tMzkQ0ZXwkN7hgfeV8rfSzgT1uwsC6O6rGEdDsUaVnSrln1lLx3+cip0OGBVEuoRLLfaVVIO36PYkPbvprncE5NjwJ7h3VSL8=
+	t=1715339474; cv=none; b=G1N5wzeqj+iwxDsZYkbKnKdA/2cUIEbyHfJK3W4YfNqGNYZAwfdUe/xAYFqAri018UB96FbFxaFJXaec7BiTTHf0ZawouhCoSyPZXAgWhkdiA463+K/iguQisUzvJdCjxgYwRoKhgwdA5L1Zfxc4FhhTXoD2U1KDTEcM/IktkFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715339366; c=relaxed/simple;
-	bh=yXm0rGv0SpUKCUwVX7b65X94UNh8dxxZjbauFPeL+MM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CRAV734ze/4EFquJ7OLABmt99p4aUMJk6DoTlnyOYANJsUeJU1d+mAOh225AjU1YOkv0aeACP7R50dEVCulObuDj98gpSRXLAFgmXOONXcZIRbK2MBACWa2FIho6W5R2cJFwb/M91KhIqe/PbdCOBMesYsfmqgYDOdWGRi3jmrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=faQcGGRb; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-41ba0bb5837so13205385e9.3
-        for <netdev@vger.kernel.org>; Fri, 10 May 2024 04:09:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715339363; x=1715944163; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kMwf+DCXvMg1n2aNwOdekgphxaHoyXL6HU0CbhNE4i4=;
-        b=faQcGGRbMRMAgY0BIJPOeyUang5o4xOy6ug/5AAJFqam2KAHvDSq3MrJ1wxtpFPWUu
-         PBFo9Aiw+9MEp/KvIYgiPFCulh1fbSXm9cRiZJV44RhKUuSpc6JIXSgTCr8Yy0QtVnWT
-         agaqm1VhWHmGrJ4Xvd2oynhsUz4vsebXFGfYHkTLwY6fy3PgVnXIEVx0Dcx4ep6Yg+in
-         EU5owss5H+h19jY4T/25tuhWNK45QMF3w/gxV5khvjdZbs+/XiSBp1CzWdZy8JSEvvev
-         O4NoFm/hc7SOkoUFIrkXky/vD20FsDfbGuuh7bWBhoxae9hQhv3NJHyA0gaKGIyKywkw
-         wcHg==
+	s=arc-20240116; t=1715339474; c=relaxed/simple;
+	bh=mWhegVltV13dpJK6/P17kRU2b6WzSY1iwJzdoZv5Wt4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=r1WzYVwOLjyoFQ03jF0KgnTj/8xwmsIFtaNciTUG0BcjwpxIWm10Jzbb2JYmdOVoPZwj7uRCD34WLTJhVBa75/g5RTGX/I0pi9+moSfegsMFMsnjL8uPy6ICyKVtEwL5q/HH3ms8RWdXH0GxCTRNkc36PO8jBBxoeW9qXXuh4UQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RUeBlgBQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715339471;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=91sOE+bK42zmtXNZ/WoNezaGVg+1uvC26YMVuzi57gA=;
+	b=RUeBlgBQHSQXPtycGHYVqa/XyxkQi6h0P6K8l8G+W+PJiuk5Mgzh/4jq6sm8o0GFaaZMgX
+	JsdG6koIwxg9tk358YTsPHrMmZYb+buwTvZVYK8mU7BW9m64D9wphgGhQ14hfoYf/YliXy
+	/21RZ/gETzHJJ2Ry5FWEgX+5FuZVJHg=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-494-Cu3faxM2PyOMZJFZ89oM8g-1; Fri, 10 May 2024 07:11:10 -0400
+X-MC-Unique: Cu3faxM2PyOMZJFZ89oM8g-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2e43f513563so2985121fa.3
+        for <netdev@vger.kernel.org>; Fri, 10 May 2024 04:11:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715339363; x=1715944163;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kMwf+DCXvMg1n2aNwOdekgphxaHoyXL6HU0CbhNE4i4=;
-        b=A+DZSYLDJG5MWqFqo4XVtG8J8MtDAdKR4yP9hNvVrlOxUGqJ65umC+aml/7NWZ3Lv+
-         quMYglv0BAFta7Obc0o5jtmHSTy6ZR6rWHOIj97+aYbaL2gUIcWRVgwydiyFIcM9ycxD
-         CShXIZT6hvyem0C5UJ8jiBxiv9QWqD5dsssPrDLLawGN9uPzUffDGCnfN3IPXRND2W8/
-         nn7NlIlrivTRcSxsvEqC+QrcE0hbgWDWSrEZ0Z8Kl0559Kizi4uFkzjGUG7yrRhQ+b7Q
-         ht9qz5ln8vPc/puCogCMWAzOyOliNYUS1C4WkGSz01eG86C4QJ/sv8AREN9Zhe1+8kOG
-         mUOw==
-X-Forwarded-Encrypted: i=1; AJvYcCV9mB77TBH6pK0ORhQu8gj6nP2Lnp2mNnoN03uUJ19b0J1Y9TQ95qYtUONGkZvT9b+8k7QdDE2KJ494jzvysYxr/lMWTQbj
-X-Gm-Message-State: AOJu0YyFKyZeQs6Sums6ITm2Y482i2eSHjmpVoxST/abpRT4X7Chjg/I
-	S3ZrWTXrROR0FmwR+6sVgQvK0xAuyhZrzTX79LBQuK8FxD3kFmj3SnlUnbRUW3qyBH5yVn+Ibpd
-	P
-X-Google-Smtp-Source: AGHT+IH7bU+JTVmvtCYb1yGI1ZN7O+t2cgLqlM6omTt5lqwzAFbTeQgMQmETXsC1cB8cknIhS9uEaQ==
-X-Received: by 2002:a7b:c8cb:0:b0:418:e6fc:3708 with SMTP id 5b1f17b1804b1-41feab40c17mr16382645e9.24.1715339363142;
-        Fri, 10 May 2024 04:09:23 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccbe8f74sm60380915e9.8.2024.05.10.04.09.21
+        d=1e100.net; s=20230601; t=1715339469; x=1715944269;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=91sOE+bK42zmtXNZ/WoNezaGVg+1uvC26YMVuzi57gA=;
+        b=mTPmPD1pUkcltHENmaRKT0QoAbf37DqI0Agn/P2R+TiXGRydVh6/QCfU+BBy+M1BpA
+         qTtoYc6wJh4nEJH96wV4XUtYuysNYsTt4dhueoPOx3WUHDXqJcNifUKEbspMfDKwrsMD
+         zO/ZZzXGHrl4ONMgbUeRv99K4DIkz/hmH5vVaRc59IO6G+0SqOHAxKTRG2l+1mH/NZdu
+         IESTDHr+iI5uyc6IC2Vp1z+v1abKXi1T5cryONYNMBzBTsvEejU+9wx2z77BL7sKkIIY
+         gJ2XNANa0b+iCpHFxjHzjGzv4z51WZsSVmSFH8fSN0CEt5RIIMhyPSR5XJ4upFmh+RXo
+         Imvw==
+X-Forwarded-Encrypted: i=1; AJvYcCXSnXAyL8HL5IYX1yxYtcbCI8Eb6SudpQtlXkrl8GLl4xpQpU5fDF6VzJTz3nQkfGNHpYsEoCklifeXJCiwAnYhyyHU5ahP
+X-Gm-Message-State: AOJu0Yyg32jIYi/HvP9ig+/opHXUWrcKu+DxWHZA8GJRN9I4r9Dv4Hef
+	NvSWjqVWuQRVwFc5VU4FFT5c4La4mh8vGbXH192Bi1Xb8kieygBXGx9d2WcGyzrwK0ITaHrxGSU
+	D2ZBjWpoi2cWZXL//UFxbeBKUes+RS7KVadBbu6ZR/LMWTKMNsdx4pXEVSp1o8A==
+X-Received: by 2002:a2e:9604:0:b0:2e4:4532:3c7 with SMTP id 38308e7fff4ca-2e5204c71bamr14309251fa.4.1715339468893;
+        Fri, 10 May 2024 04:11:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGPGaaiVW0aD/XiguTEkwPCgJWDIWtSkF5T1Mf47gVf/FfvuIhk++yu4ncxkDvDA7S6JzLLXQ==
+X-Received: by 2002:a2e:9604:0:b0:2e4:4532:3c7 with SMTP id 38308e7fff4ca-2e5204c71bamr14309141fa.4.1715339468410;
+        Fri, 10 May 2024 04:11:08 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:1b68:1b10::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502bbc56d1sm4276762f8f.116.2024.05.10.04.11.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 04:09:22 -0700 (PDT)
-Date: Fri, 10 May 2024 13:09:20 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com, jiri@nvidia.com,
-	mateusz.polchlopek@intel.com, shayd@nvidia.com
-Subject: Re: [iwl-next v1 00/14] ice: support devlink subfunction
-Message-ID: <Zj4AYN4uDtL51G1P@nanopsycho.orion>
-References: <20240507114516.9765-1-michal.swiatkowski@linux.intel.com>
- <ZjyxBcVZNbWioRP0@nanopsycho.orion>
- <Zj3LwDMbktRXk0QX@mev-dev>
+        Fri, 10 May 2024 04:11:07 -0700 (PDT)
+Message-ID: <54a73bb8163716f724af91de3ed8b2bd59aa5d39.camel@redhat.com>
+Subject: Re: [PATCH v2 net] af_unix: Update unix_sk(sk)->oob_skb under
+ sk_receive_queue lock.
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: billy@starlabs.sg, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org,  kuni1840@gmail.com, netdev@vger.kernel.org
+Date: Fri, 10 May 2024 13:11:06 +0200
+In-Reply-To: <20240510105400.32158-1-kuniyu@amazon.com>
+References: <6dfcdb8b562c567995ae9786ab399a1f3a24c62a.camel@redhat.com>
+	 <20240510105400.32158-1-kuniyu@amazon.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zj3LwDMbktRXk0QX@mev-dev>
 
-Fri, May 10, 2024 at 09:24:48AM CEST, michal.swiatkowski@linux.intel.com wrote:
->On Thu, May 09, 2024 at 01:18:29PM +0200, Jiri Pirko wrote:
->> Tue, May 07, 2024 at 01:45:01PM CEST, michal.swiatkowski@linux.intel.com wrote:
->> >Hi,
->> >
->> >Currently ice driver does not allow creating more than one networking
->> >device per physical function. The only way to have more hardware backed
->> >netdev is to use SR-IOV.
->> >
->> >Following patchset adds support for devlink port API. For each new
->> >pcisf type port, driver allocates new VSI, configures all resources
->> >needed, including dynamically MSIX vectors, program rules and registers
->> >new netdev.
->> >
->> >This series supports only one Tx/Rx queue pair per subfunction.
->> >
->> >Example commands:
->> >devlink port add pci/0000:31:00.1 flavour pcisf pfnum 1 sfnum 1000
->> >devlink port function set pci/0000:31:00.1/1 hw_addr 00:00:00:00:03:14
->> >devlink port function set pci/0000:31:00.1/1 state active
->> >devlink port function del pci/0000:31:00.1/1
->> >
->> >Make the port representor and eswitch code generic to support
->> >subfunction representor type.
->> >
->> >VSI configuration is slightly different between VF and SF. It needs to
->> >be reflected in the code.
->> >
->> >Most recent previous patchset (not containing port representor for SF
->> >support). [1]
->> >
->> >[1] https://lore.kernel.org/netdev/20240417142028.2171-1-michal.swiatkowski@linux.intel.com/
->> >
->> 
->> 
->> I don't understand howcome the patchset is v1, yet there are patches
->> that came through multiple iterations alread. Changelog is missing
->> completely :/
->> 
->
->What is wrong here? There is a link to previous patchset with whole
->changlog and links to previous ones. I didn't add changlog here as it is
->new patchset (partialy the same as from [1], because of that I added a
->link). I can add the changlog from [1] if you want, but for me it can be
->missleading.
+On Fri, 2024-05-10 at 19:54 +0900, Kuniyuki Iwashima wrote:
+> From: Paolo Abeni <pabeni@redhat.com>
+> Date: Fri, 10 May 2024 12:44:58 +0200
+> > On Fri, 2024-05-10 at 18:39 +0900, Kuniyuki Iwashima wrote:
+> > > diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> > > index 0104be9d4704..b87e48e2b51b 100644
+> > > --- a/net/unix/garbage.c
+> > > +++ b/net/unix/garbage.c
+> > > @@ -342,10 +342,12 @@ static void __unix_gc(struct work_struct *work)
+> > >  		scan_children(&u->sk, inc_inflight, &hitlist);
+> > > =20
+> > >  #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
+> > > +		spin_lock(&u->sk.sk_receive_queue.lock);
+> > >  		if (u->oob_skb) {
+> > > -			kfree_skb(u->oob_skb);
+> > > +			WARN_ON_ONCE(skb_unref(u->oob_skb));
+> >=20
+> > Sorry for not asking this first, but it's not clear to me why the above
+> > change (just the 'WARN_ON_ONCE' introduction) is needed and if it's
+> > related to the addressed issue???
+>=20
+> I think I added it to make it clear that here we don't actually free skb
+> and consistent with manage_oob().
+>=20
+> But I don't have strong preference as it will be removed soon.
 
-It's always good to see what you changed if you send modified patches.
-That's all.
+Ok, thanks for the explanation. I'm fine with the above.
 
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
->
->> 
->> >Michal Swiatkowski (7):
->> >  ice: treat subfunction VSI the same as PF VSI
->> >  ice: create port representor for SF
->> >  ice: don't set target VSI for subfunction
->> >  ice: check if SF is ready in ethtool ops
->> >  ice: netdevice ops for SF representor
->> >  ice: support subfunction devlink Tx topology
->> >  ice: basic support for VLAN in subfunctions
->> >
->> >Piotr Raczynski (7):
->> >  ice: add new VSI type for subfunctions
->> >  ice: export ice ndo_ops functions
->> >  ice: add basic devlink subfunctions support
->> >  ice: allocate devlink for subfunction
->> >  ice: base subfunction aux driver
->> >  ice: implement netdev for subfunction
->> >  ice: allow to activate and deactivate subfunction
->> >
->> > drivers/net/ethernet/intel/ice/Makefile       |   2 +
->> > .../net/ethernet/intel/ice/devlink/devlink.c  |  48 ++
->> > .../net/ethernet/intel/ice/devlink/devlink.h  |   1 +
->> > .../ethernet/intel/ice/devlink/devlink_port.c | 516 ++++++++++++++++++
->> > .../ethernet/intel/ice/devlink/devlink_port.h |  43 ++
->> > drivers/net/ethernet/intel/ice/ice.h          |  19 +-
->> > drivers/net/ethernet/intel/ice/ice_base.c     |   5 +-
->> > drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   1 +
->> > drivers/net/ethernet/intel/ice/ice_eswitch.c  |  85 ++-
->> > drivers/net/ethernet/intel/ice/ice_eswitch.h  |  22 +-
->> > drivers/net/ethernet/intel/ice/ice_ethtool.c  |   7 +-
->> > drivers/net/ethernet/intel/ice/ice_lib.c      |  52 +-
->> > drivers/net/ethernet/intel/ice/ice_lib.h      |   3 +
->> > drivers/net/ethernet/intel/ice/ice_main.c     |  66 ++-
->> > drivers/net/ethernet/intel/ice/ice_repr.c     | 195 +++++--
->> > drivers/net/ethernet/intel/ice/ice_repr.h     |  22 +-
->> > drivers/net/ethernet/intel/ice/ice_sf_eth.c   | 329 +++++++++++
->> > drivers/net/ethernet/intel/ice/ice_sf_eth.h   |  33 ++
->> > .../ethernet/intel/ice/ice_sf_vsi_vlan_ops.c  |  21 +
->> > .../ethernet/intel/ice/ice_sf_vsi_vlan_ops.h  |  13 +
->> > drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +-
->> > drivers/net/ethernet/intel/ice/ice_txrx.c     |   2 +-
->> > drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
->> > drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   4 +-
->> > .../net/ethernet/intel/ice/ice_vsi_vlan_ops.c |   4 +
->> > drivers/net/ethernet/intel/ice/ice_xsk.c      |   2 +-
->> > 26 files changed, 1362 insertions(+), 138 deletions(-)
->> > create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.c
->> > create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
->> > create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_vsi_vlan_ops.c
->> > create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_vsi_vlan_ops.h
->> >
->> >-- 
->> >2.42.0
->> >
->> >
 
