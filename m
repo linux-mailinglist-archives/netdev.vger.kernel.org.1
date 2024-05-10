@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-95452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFFD88C24C5
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:25:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 837FC8C24C6
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:25:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C84B1C21DD7
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:25:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B51331C21A2D
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:25:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75EF5027F;
-	Fri, 10 May 2024 12:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4864B1304BF;
+	Fri, 10 May 2024 12:25:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="apGSHgm5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XTwmRuBu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F1116DED7
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 12:25:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4F516D4F4
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 12:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715343922; cv=none; b=V6q0zdYqwQVw7lY/fLepZd1y1tT66Ii0yKrzaIDMXqhLdMU3yoljvnJMd0K8IvDF8mlPVOdWafc0aDeHt+xJFUQ+ChXUxOrN435ZCfn49KHRxZAHNYueznIuf02EjgWlVHqv4g9tNTTtY6AJVWyxA35CuEJs1LZRrf5wnShrsvE=
+	t=1715343925; cv=none; b=d87KshJVyDtBVliRfVQLqvOuiTSOLyyDjSv/CBtiy8/O5tbyYbMxmpYl+pR07a4T/FUeZa+zoZnOJASzHzfadNEXpoTgj1z7yk1/YDIP295RBS+KW/NVwgkHQfZlcOUpYZX5yJlwXT0RHK2K3D8RyDTuIH5WAaIwy+bGWr9WYL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715343922; c=relaxed/simple;
-	bh=QhLHsr4q9mx8ubOT3pnejzEK0cBC1QdoRCtcOCZIiko=;
+	s=arc-20240116; t=1715343925; c=relaxed/simple;
+	bh=dOPWA5oUMFLJMkyrjOLwiNM4jqXOocS06R2V1tpKFlo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bbncDdcCf+2CyhjgtmKMdjUdsW5kT5o27ZIhOZ7F6AUYiXtHHy6q4E8odKKLYDZZl+cffRm/xD7MpDaLSSolaYmFm5cesBXulpkUvNCOQg3AHgak+/xx8IA1VZ3Ma14oMZMutq/4vYVZI//FQXJIiVtsWhgL/gk5e/B9s8u2wFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=apGSHgm5; arc=none smtp.client-ip=209.85.161.53
+	 MIME-Version; b=UOhh8SCbxWVIWPDo8gSSamx2RK6CR4DcIvHAd4WYxk3ups5SN3bcdUmamTNIHmGVUZZ8dwOKBKyS6PbYPbhMYSWuvsRPTYLWag58capboLrx5EY2S4f+LEk94IWgTicRHzEQ2S2GHRYxjbHOz1aEJtFo2fvuC1EWBOMqUbjEAyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XTwmRuBu; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5b273b9f1deso890878eaf.3
-        for <netdev@vger.kernel.org>; Fri, 10 May 2024 05:25:21 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6f449ea8e37so1671044b3a.3
+        for <netdev@vger.kernel.org>; Fri, 10 May 2024 05:25:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715343920; x=1715948720; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1715343923; x=1715948723; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=q4C5pHde1tDmuDAUEtokuBbtsfGpTSJVnMuEbxlFEPk=;
-        b=apGSHgm50rAFn2h4mStDOozZPsB4PcXlx9GMWvMfVZvMR9PIyXiVXxYGYt7scK56iK
-         dZNm+nIwbWBdVHhNfL3tyrilIaYSmAuPaEbZPSxFges78TE0AXFLHeZa+F/a1VmkK22e
-         zZOUHaTJATW0457YNC25CbwVkJYqxMrxRBmxA2oWl0br4/2Ht8a8X9c0bEfLYTseSNA+
-         jrCCzsUgoxRARMX8M3hm37PqOJjX3I63vRHGqi7yOMv2D1T3ikb3tINJXCQZhQcspV/W
-         wT8Bvjcyyvbbt1WiA688CUp3h8U6sbGakTuoaZBnc2Az/jb6nBHz5h3FqcGw7YIz9Cd7
-         u/4A==
+        bh=UlCmy+iZAQgDelBlhi5+PpnGFmqq4Df4VsGrbrOxgsM=;
+        b=XTwmRuBuSHjYjk1Cczq03RjEyWWuRO1tCmYxaBJ7z4D2B6NMHRKLqZNVk9JV5kC+Tw
+         tF+LWOxgqUcYoVyO0IBYty3ujpCF/D7vZvi+z+tXUlowkZnlM2/BydA/n1wReVCejHyB
+         0+dKkjbitAkJrPobOUSkw2JyxbKEk+tccHmT7m0/6///8tuIuqWdvLDSQ8OtfJptW8nE
+         iR0s/K/PYQ+Hn+SIW8Q8JxTAO5/QntwP7/HNYeqJZCv7c0XoO2o3nAZGk4dlBkxL07Zx
+         bJK/e64iYzcu3Z/rBpHbnqOYChADNU9k3Sakx97++QLBUjtRc2uRqR1tvZMyoqyf8StL
+         SKfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715343920; x=1715948720;
+        d=1e100.net; s=20230601; t=1715343923; x=1715948723;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=q4C5pHde1tDmuDAUEtokuBbtsfGpTSJVnMuEbxlFEPk=;
-        b=fYAPsTCFOFDcaPCNGCirxGhKNymrK2aDgsZQbsOLu76Ejvs5F2cfuA1Z7nxFA50/Da
-         I416CzXDg1uwVD6IOuy0KWb7hGc+ytE6sHd3RHl2LzyGlOTA4fCMx1I7Q2lJcPcHnsfL
-         wfBSXEKSTnOC2YAmzSJks9qS1oKJgSRSauSOCV0WSGzQp1ISqpCNheZ3KeUxEdp5trtO
-         98ZvOthDiW6x6s4Is5W9pdHPyamYdoqFqlxLheoHm5EHI2VfpHVsY1DTmyZfYuz1NUbk
-         TN2C8+XzICYhS8S2SHlmyq01l3aoAKZgEJXtIBZzGBqPz9hRfhLObtt8oaV7/O2PPNRp
-         Lr/g==
-X-Gm-Message-State: AOJu0YxKtizn+LmzXjyQzRnxODK4oaiR56MXByz9EVCGsDslsAheKz5m
-	n23R/6uVdKowQ1VPYEjVfWQ1zmMnQ59+urMYtcTncgHzz4oWgqxX
-X-Google-Smtp-Source: AGHT+IERpy4GujC1MROXjzfTjpMogp2cAILDXypCbn5APb+w3uqVqS1+13DK7LNjMQyFbkIb54e+2g==
-X-Received: by 2002:a05:6358:5694:b0:18d:8c13:b83d with SMTP id e5c5f4694b2df-193baeda1f1mr270393155d.0.1715343920226;
-        Fri, 10 May 2024 05:25:20 -0700 (PDT)
+        bh=UlCmy+iZAQgDelBlhi5+PpnGFmqq4Df4VsGrbrOxgsM=;
+        b=FggrKHuZ7O70R5OGUtSA4bNtQjvxSaJdDsb4iuTfYhQC4Xny1XvnFBIPumauB2/o8L
+         rZLxXDekm5IiMN8loDzjc6QObzh3gasRA5/JYq1BSYHKra0Nq/zR4bwEXf2Orp0VR4pq
+         tO4blBrXRklHzkh7lTWb9I/RGJOek2bApUDQ8xQMjmznFJKJ7xM4qDPBb4o4zwpWRSQD
+         YoEJimIzRzOQOzkHGpGZgCvJCQ0ZY5qHVaMOVjoE2tkIzCVZAB63ajNxeVLtLXMLyath
+         MXHvyOUEkMCsEzxrtfO9YshzhSAOnru89X5As6U/CxGwJwl6a1EFLe8Fp91w1y4D8JQ6
+         4zZA==
+X-Gm-Message-State: AOJu0YzAd40DAUBIVhzAnzkmSgx+gl6GAgvYr/NcDptYf1iRmcEU6tpp
+	UoHqXgm5sBDR8tVuhPW8gX5y5wsebkUHrcsC7KHl2qvPbCcI3rVY
+X-Google-Smtp-Source: AGHT+IHa1IEfofgHSTXuWQF1qnE6SdHpidxY8sgIYZD8gh/Ipx0le+uaNxiPvtGwUu3qOXD+zuaWdw==
+X-Received: by 2002:a05:6a00:391a:b0:6f3:876a:c029 with SMTP id d2e1a72fcca58-6f4e02ac99bmr2752898b3a.10.1715343922979;
+        Fri, 10 May 2024 05:25:22 -0700 (PDT)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6340b57f362sm2943530a12.30.2024.05.10.05.25.17
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6340b57f362sm2943530a12.30.2024.05.10.05.25.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 05:25:19 -0700 (PDT)
+        Fri, 10 May 2024 05:25:22 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: edumazet@google.com,
 	dsahern@kernel.org,
@@ -75,9 +75,9 @@ To: edumazet@google.com,
 Cc: netdev@vger.kernel.org,
 	kerneljasonxing@gmail.com,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v2 4/5] tcp: rstreason: handle timewait cases in the receive path
-Date: Fri, 10 May 2024 20:25:01 +0800
-Message-Id: <20240510122502.27850-5-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next v2 5/5] tcp: rstreason: fully support in tcp_check_req()
+Date: Fri, 10 May 2024 20:25:02 +0800
+Message-Id: <20240510122502.27850-6-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20240510122502.27850-1-kerneljasonxing@gmail.com>
 References: <20240510122502.27850-1-kerneljasonxing@gmail.com>
@@ -91,66 +91,59 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-There are two possible cases where TCP layer can send an RST. Since they
-happen in the same place, I think using one independent reason is enough
-to identify this special situation.
+We're going to send an RST due to invalid syn packet which is already
+checked whether 1) it is in sequence, 2) it is a retransmitted skb.
+
+As RFC 793 says, if the state of socket is not CLOSED/LISTEN/SYN-SENT,
+then we should send an RST when receiving bad syn packet:
+"fourth, check the SYN bit,...If the SYN is in the window it is an
+error, send a reset"
 
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- include/net/rstreason.h | 5 +++++
- net/ipv4/tcp_ipv4.c     | 2 +-
- net/ipv6/tcp_ipv6.c     | 2 +-
- 3 files changed, 7 insertions(+), 2 deletions(-)
+ include/net/rstreason.h  | 8 ++++++++
+ net/ipv4/tcp_minisocks.c | 2 +-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/rstreason.h b/include/net/rstreason.h
-index fc1b99702771..7ae5bb55559b 100644
+index 7ae5bb55559b..2575c85d7f7a 100644
 --- a/include/net/rstreason.h
 +++ b/include/net/rstreason.h
-@@ -15,6 +15,7 @@
- 	FN(TCP_FLAGS)			\
+@@ -16,6 +16,7 @@
  	FN(TCP_OLD_ACK)			\
  	FN(TCP_ABORT_ON_DATA)		\
-+	FN(TCP_TIMEWAIT_SOCKET)		\
+ 	FN(TCP_TIMEWAIT_SOCKET)		\
++	FN(INVALID_SYN)			\
  	FN(MPTCP_RST_EUNSPEC)		\
  	FN(MPTCP_RST_EMPTCP)		\
  	FN(MPTCP_RST_ERESOURCE)		\
-@@ -72,6 +73,10 @@ enum sk_rst_reason {
- 	 */
- 	SK_RST_REASON_TCP_ABORT_ON_DATA,
+@@ -76,6 +77,13 @@ enum sk_rst_reason {
+ 	/* Here start with the independent reasons */
+ 	/** @SK_RST_REASON_TCP_TIMEWAIT_SOCKET: happen on the timewait socket */
+ 	SK_RST_REASON_TCP_TIMEWAIT_SOCKET,
++	/**
++	 * @SK_RST_REASON_INVALID_SYN: receive bad syn packet
++	 * RFC 793 says if the state is not CLOSED/LISTEN/SYN-SENT then
++	 * "fourth, check the SYN bit,...If the SYN is in the window it is
++	 * an error, send a reset"
++	 */
++	SK_RST_REASON_INVALID_SYN,
  
-+	/* Here start with the independent reasons */
-+	/** @SK_RST_REASON_TCP_TIMEWAIT_SOCKET: happen on the timewait socket */
-+	SK_RST_REASON_TCP_TIMEWAIT_SOCKET,
-+
  	/* Copy from include/uapi/linux/mptcp.h.
  	 * These reset fields will not be changed since they adhere to
- 	 * RFC 8684. So do not touch them. I'm going to list each definition
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 108a438dc247..30ef0c8f5e92 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -2427,7 +2427,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 		tcp_v4_timewait_ack(sk, skb);
- 		break;
- 	case TCP_TW_RST:
--		tcp_v4_send_reset(sk, skb, sk_rst_convert_drop_reason(drop_reason));
-+		tcp_v4_send_reset(sk, skb, SK_RST_REASON_TCP_TIMEWAIT_SOCKET);
- 		inet_twsk_deschedule_put(inet_twsk(sk));
- 		goto discard_it;
- 	case TCP_TW_SUCCESS:;
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 7f6693e794bd..4c3605485b68 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1999,7 +1999,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 		tcp_v6_timewait_ack(sk, skb);
- 		break;
- 	case TCP_TW_RST:
--		tcp_v6_send_reset(sk, skb, sk_rst_convert_drop_reason(drop_reason));
-+		tcp_v6_send_reset(sk, skb, SK_RST_REASON_TCP_TIMEWAIT_SOCKET);
- 		inet_twsk_deschedule_put(inet_twsk(sk));
- 		goto discard_it;
- 	case TCP_TW_SUCCESS:
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index 7d543569a180..b93619b2384b 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -879,7 +879,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 		 * avoid becoming vulnerable to outside attack aiming at
+ 		 * resetting legit local connections.
+ 		 */
+-		req->rsk_ops->send_reset(sk, skb, SK_RST_REASON_NOT_SPECIFIED);
++		req->rsk_ops->send_reset(sk, skb, SK_RST_REASON_INVALID_SYN);
+ 	} else if (fastopen) { /* received a valid RST pkt */
+ 		reqsk_fastopen_remove(sk, req, true);
+ 		tcp_reset(sk, skb);
 -- 
 2.37.3
 
