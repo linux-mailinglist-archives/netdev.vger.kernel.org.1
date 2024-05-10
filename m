@@ -1,105 +1,104 @@
-Return-Path: <netdev+bounces-95622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABA868C2D9C
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 01:29:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50B468C2DC1
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 01:58:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE10D1C214BB
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 23:29:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 828E01C213D0
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 23:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8DD24F1F2;
-	Fri, 10 May 2024 23:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8543E17556D;
+	Fri, 10 May 2024 23:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unstable.cc header.i=a@unstable.cc header.b="J0lxu//r"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iiyIfkxV"
 X-Original-To: netdev@vger.kernel.org
-Received: from wilbur.contactoffice.com (wilbur.contactoffice.com [212.3.242.68])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484B413D25B
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 23:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.3.242.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830A613BAFB;
+	Fri, 10 May 2024 23:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715383785; cv=none; b=TspQtV/9WBt7ofa6f/4Kpy6xQfUsFGpGlvtaYatEmE8XgoX9F9c+51I7ioWws4zLL7WvruRkOyyK/PypLLek9rWd62axfZWzNC5iIp/ljO5hqg2dkeQubIs23XG0SDK/nLykLaJ8Y9ToIAt2f1qOH8D0swutstSAtO/3UA8LaPA=
+	t=1715385522; cv=none; b=kLXBm7ay8y90ESwvYvQcPcfeTXUy7wdy5Qy6jXOT2uAT54DQZ1z8DQh0Z1+7LoSMxvXvAaQRUDdi4o4oKB95YEigie14zPvx5PH+k0TssUpgpd2ZX8qV/WEdPjrQq2a1fpuIbEyrbPdjHwqszQ+umuMozbPC16xqNWUIpo0+S14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715383785; c=relaxed/simple;
-	bh=Y2hrMTtaGgbmOFyyuMfCTd9+VOT60OILgWJWOdClOcA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K4ED3yptr3NHLbvJjHsCcQMzPDtScyoIc6fHSJeSIKHnwt5biIa72i/6GwHepB+jbeLERodkJLv0+OQhosuUFTsdNCJWZf0DGDXQVB7F8TCNsDtpDLQVj3vZ059W1mofXhsN9wvG9bmrYSExo7nWHyQ6EuRlx9uyTfIpsP7VnIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unstable.cc; spf=pass smtp.mailfrom=unstable.cc; dkim=pass (2048-bit key) header.d=unstable.cc header.i=a@unstable.cc header.b=J0lxu//r; arc=none smtp.client-ip=212.3.242.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unstable.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unstable.cc
-Received: from smtpauth1.co-bxl (smtpauth1.co-bxl [10.2.0.15])
-	by wilbur.contactoffice.com (Postfix) with ESMTP id 3A6D933FD;
-	Sat, 11 May 2024 01:21:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1715383288;
-	s=20220809-q8oc; d=unstable.cc; i=a@unstable.cc;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Transfer-Encoding;
-	l=1423; bh=hr9wQVtOA52p0p2DIFLfBgFtIR6CZzFY0vvEmSO+yKM=;
-	b=J0lxu//rrWoU9Rysh/wkezwkjrRkfHYiFlcgSUstMuq84G+7UVCabYg4/7rUDReq
-	z4DBJUB9AlQ5a3Bb8U1QeuRYK3KE+edX6wIqk7LMhbiSRysYRZsnO2iro3wTXECqc33
-	MRGM59Li1KfnyQ9iCY+qZ0TP7FybfAZNmJ39xOMjdg5KsXwKDpRl4XRmYol3YJJlAf7
-	laHlyTI1LPJLsFOU5WbIGnT+ouUR5N4KzOCiVmWgpi0D6jxULOIrKkYPmRnFzM+nWam
-	sIIRnWdbq5AKdzDgkKGO9W+4Sv2+f5y+RvfVFE6zaXLm0wOlhso2cR2HPkxz5QXrG0z
-	pGjY7E4HKg==
-Received: by smtp.mailfence.com with ESMTPSA ; Sat, 11 May 2024 01:21:26 +0200 (CEST)
-From: Antonio Quartulli <a@unstable.cc>
-To: donald.hunter@gmail.com
-Cc: kuba@kernel.org,
-	netdev@vger.kernel.org,
-	Antonio Quartulli <a@unstable.cc>
-Subject: [PATCH] ynl: ensure exact-len value is resolved
-Date: Sat, 11 May 2024 01:22:02 +0200
-Message-ID: <20240510232202.24051-1-a@unstable.cc>
-X-Mailer: git-send-email 2.43.2
+	s=arc-20240116; t=1715385522; c=relaxed/simple;
+	bh=Rw2z98v+eDfNW0peI8QlfkbvX2mMcCvJsflxNJVrbCw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mPIs1tEWXw4OxwKYT3LsATod3a0Ox4muZZ09uX7aFmfWhO5ODig/oKlUGusdfCBBKS2a+z4e4sgMfPeV8x8L+xCNaK3Q7uFvNvuMdzFQUSpcbmS9bKtuR20asB6s/Dppo17RPMEkOpTHLJIuZHnJqBwPZUYip52QXr++870Rbac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iiyIfkxV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=i6+svHzw1fQhMuQYrr1eYkC7SUY5MZbc32DdVO9kxYQ=; b=iiyIfkxV+5n/px3gMZflCleO1/
+	QzR70vMV/baXYjrTQroztf3PRQgnBmfog/ICZkBrq9razxGtW3DX56D3DH2F7j/ufKt9eP4SkFlOE
+	3Hhe6zWkG6chov8n9SEhjHoLiBbdG1pEQ5mld+Z3qm0SAlwS14XPTgcYd1bZ2K3R3qhc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s5a7x-00FAkv-9W; Sat, 11 May 2024 01:58:13 +0200
+Date: Sat, 11 May 2024 01:58:13 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Christian Marangi <ansuelsmth@gmail.com>, Pavel Machek <pavel@ucw.cz>,
+	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	William Zhang <william.zhang@broadcom.com>,
+	Anand Gore <anand.gore@broadcom.com>,
+	Kursad Oney <kursad.oney@broadcom.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+	=?iso-8859-1?Q?Fern=E1ndez?= Rojas <noltari@gmail.com>,
+	Sven Schwermer <sven.schwermer@disruptive-technologies.com>,
+	linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: Re: [net-next PATCH v10 3/5] net: phy: add support for PHY LEDs
+ polarity modes
+Message-ID: <bb146832-30fc-4c76-a083-51a1bc087e61@lunn.ch>
+References: <20240125203702.4552-1-ansuelsmth@gmail.com>
+ <20240125203702.4552-4-ansuelsmth@gmail.com>
+ <Zj6qURAmoED2QywF@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-ContactOffice-Account: com:375058688
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zj6qURAmoED2QywF@makrotopia.org>
 
-For type String and Binary we are currently usinig the exact-len
-limit value as is without attempting any name resolution.
-However, the spec may specify the name of a constant rather than an
-actual value, which would result in using the constant name as is
-and thus break the policy.
+> Wanting to make use of this I noticed that polarity settings are only
+> applied once in of_phy_led(), which is not sufficient for my use-case:
+> 
+> I'm writing a LED driver for Aquantia PHYs and those PHYs reset the
+> polarity mode every time a PHY reset is triggered.
+> 
+> I ended up writing the patch below, but I'm not sure if phy_init_hw
+> should take care of this or if the polarity modes should be stored in
+> memory allocated by the PHY driver and re-applied by the driver after
+> reset (eg. in .config_init). Kinda depends on taste and on how common
+> this behavior is in practise, so I thought the best is to reach out to
+> discuss.
 
-Ensure the limit value is passed to get_limit(), which will always
-attempt resolving the name before printing the policy rule.
+There was a similar discussion recently about WoL settings getting
+lost. The conclusion about that was the PHY should keep track of WoL
+setting. So i would say the same applies there. Please store it in a
+local priv structure.
 
-Signed-off-by: Antonio Quartulli <a@unstable.cc>
----
- tools/net/ynl/ynl-gen-c.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index c0b90c104d92..a42d62b23ee0 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -413,7 +413,7 @@ class TypeString(Type):
- 
-     def _attr_policy(self, policy):
-         if 'exact-len' in self.checks:
--            mem = 'NLA_POLICY_EXACT_LEN(' + str(self.checks['exact-len']) + ')'
-+            mem = 'NLA_POLICY_EXACT_LEN(' + str(self.get_limit('exact-len')) + ')'
-         else:
-             mem = '{ .type = ' + policy
-             if 'max-len' in self.checks:
-@@ -465,7 +465,7 @@ class TypeBinary(Type):
- 
-     def _attr_policy(self, policy):
-         if 'exact-len' in self.checks:
--            mem = 'NLA_POLICY_EXACT_LEN(' + str(self.checks['exact-len']) + ')'
-+            mem = 'NLA_POLICY_EXACT_LEN(' + str(self.get_limit('exact-len')) + ')'
-         else:
-             mem = '{ '
-             if len(self.checks) == 1 and 'min-len' in self.checks:
--- 
-2.43.2
-
+      Andrew
 
