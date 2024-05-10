@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-95587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 313518C2B3B
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 22:38:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F33D8C2B3C
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 22:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D73A91F25BF5
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 20:38:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32F7C286CF9
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 20:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34153482FE;
-	Fri, 10 May 2024 20:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8D345BEC;
+	Fri, 10 May 2024 20:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0l9o2tlp"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yk2OBy9B"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99797288D1
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 20:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58BD210965;
+	Fri, 10 May 2024 20:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715373486; cv=none; b=BJ8Hh6lmiQbmKbeU1oYAzY+sUQ8150H7QgWwHAF6eHIrC0mDQ1JWHPhAlGMt3Rogc+9vzuvFeeImoOzB405/oOYZeUzaY4OTenY+1po3TSmW90/NW+497q+wdCCQb7+vRcpYNGu5gs7uhuY6+LJfkG3aVM469LOFyobGSSIM42M=
+	t=1715373625; cv=none; b=bz0LOc5MlNc1adFLkbyGkxp/tjr9pLky1VSwBGrYbeaLUaUilWygFmiqEgbuEBINJIZjaGJCwrai1JsBFL/rU6SKqNMV4nq79Q9AUYP8ksfLKRcsogmuiMbfM8ioPidR1zH96dO5jo8XeFCD4VHE1sB74GQKZXHIdndgA59Pgzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715373486; c=relaxed/simple;
-	bh=Gav7mEC0W3lAe2LFSa8b9Mnyh1uHn54Sdxvb9atfogk=;
+	s=arc-20240116; t=1715373625; c=relaxed/simple;
+	bh=61/pXvIo7oQXuIFVhlpZF63jmnrY8nk6FU1Ool7yifc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CS1Wj5YDq86NWw4yImZsDRhivuGw5cxZ5clkshiGc62I/PSnAcSVyJwkiF6z2xZ31s2X8B5Nr59cPxC/LeM5Aicz6UF5A8iTZX8J+reUGrZXk8Z4AIkQa0sDNFPKMjxEJ1XGWacajkNf5iIGnLjb7E9YucKzt96geH6BkPgwfOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0l9o2tlp; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=pf1DeZaGgUaYHp4l6AythJ57dJUesy3/MWefIMjagHvvMIctgpyPP7pQTMxVxAgJX7ksMuJy+U1LjallqoUwZZve1WhfWC8NarVtdd5VMsoZSbbiTDodbN5jEnDzCR26uIi4iqfsAirUVo3yg0nWt+ET/SDKfyDP0aucbxsM2RU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yk2OBy9B; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,19 +36,33 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WKt0LYmtv2vR+tDj7SEqbOiU2hvfIVFZ7m79y7brpA8=; b=0l9o2tlpLSojDgt3AP9l1wYhcU
-	pcPD5PyNQB3xJhrgWmg1mrXrmc4RuYfmvMFa2M6h7HBNTxol1GinWcEZPcnjNdxUrucil+adP/7ss
-	P9wADlb4QdiyLa6tpLnn41gKXXYDCTXPpvHMsyFwQe3iBkvtHGPgqXHCBKIG1Uqhul/U=;
+	bh=cji/BcjdUVJRGmBr0X3w8bpMZNTFgpdcAnrohJFFXU0=; b=yk2OBy9By6p/Q0+DWDdKsJTm75
+	exankjdzxizDCHsFTQR9J4ql9GnukHgPTGK5zt+VN9aj0vZbyhIntbbPavpDcK5w9HLie7KhAgImf
+	KcMBCmbVdmQPz9DB0UF2CpMFf6ElmfN8ggbZ15DGENoU+Def8M9xx6Y4FZ3MeOjEoxrI=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1s5X0B-00FA8t-OB; Fri, 10 May 2024 22:37:59 +0200
-Date: Fri, 10 May 2024 22:37:59 +0200
+	id 1s5X2P-00FAA2-Py; Fri, 10 May 2024 22:40:17 +0200
+Date: Fri, 10 May 2024 22:40:17 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: James Dutton <james.dutton@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: SFP and SFP+
-Message-ID: <d1cd49e5-c2e4-4457-ad47-eb10e7044284@lunn.ch>
-References: <CAAMvbhHpj+HzmxnGfj_dKFq6nmnAr2C9v__1Ptkd19bnPCxd1w@mail.gmail.com>
+To: Dan Jurgens <danielj@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next 1/2] netdev: Add queue stats for TX stop and wake
+Message-ID: <184399e7-b2c6-436e-91d9-9ad6e0404fe3@lunn.ch>
+References: <20240509163216.108665-1-danielj@nvidia.com>
+ <20240509163216.108665-2-danielj@nvidia.com>
+ <1b16210a-c0dd-4b79-88ac-d7cec2381e11@lunn.ch>
+ <CH0PR12MB85808FC72B8F48C3F6BF3A9DC9E62@CH0PR12MB8580.namprd12.prod.outlook.com>
+ <26e8aa14-b159-4a3c-ab67-bec41f15f7c6@lunn.ch>
+ <CH0PR12MB8580577826135FEA6AC52F8DC9E72@CH0PR12MB8580.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,58 +71,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAAMvbhHpj+HzmxnGfj_dKFq6nmnAr2C9v__1Ptkd19bnPCxd1w@mail.gmail.com>
+In-Reply-To: <CH0PR12MB8580577826135FEA6AC52F8DC9E72@CH0PR12MB8580.namprd12.prod.outlook.com>
 
-On Fri, May 10, 2024 at 03:10:06PM +0100, James Dutton wrote:
-> Hi,
-> 
-> Linux kernel handling of SFP and SFP+ Ethernet transceivers does not
-> seem to be very reliable.
-> I.e. Very few SFP / SFP+ transceivers actually work in Linux, even if
-> they work in a COTS network switch.
-> For example, there are more and more Wireless access points appearing
-> with SFP/SFP+ ports and run the Linux kernel.
-> I think the main stumbling point is that the SFP/SFP+ quirks are based
-> on the Name fields of the transceiver.
-> I have seen two different SFP+ transceivers with exactly the same
-> name, one supporting ROLLBALL and C46 and one supporting neither.
-> Maybe it would be more reliable if one first assumed that the SFP does
-> not do negotiation, C22, C46, ROLLBALL protocols and instead only
-> reports link up / link down. One then implements methods to detect
-> whether the transceiver does anything more feature rich, such as
-> support for C22, C46 or ROLLBALL and if so, then uses those also.
-> It seems like a majority of the problem ones are the ones that have
-> one rate for the SERDES and another rate for the Link itself, with the
-> transceiver doing rate adaption. This is most common for the RJ45
-> SFP/SFP+ transceivers in the 10/100/1000/10000 speed range.
-> It might also be helpful to report with ethtool the PHY Link rate as
-> well as the SERDES rate and also report the link status of the PHY
-> Link and SERDES link separately.
-> 
-> What is the view of people more expert than me on this list?
+> It wouldn't be trivial. The stats are queried from the driver.
 
-First step would be to Cc: the SFP Maintainer:
+So are page pool stats, with the increments happening in the page pool
+code, not the driver.
 
-SFF/SFP/SFP+ MODULE SUPPORT
-M:      Russell King <linux@armlinux.org.uk>
-L:      netdev@vger.kernel.org
-S:      Maintained
-F:      Documentation/devicetree/bindings/net/sff,sfp.yaml
-F:      drivers/net/phy/phylink.c
-F:      drivers/net/phy/sfp*
-F:      include/linux/mdio/mdio-i2c.h
-F:      include/linux/phylink.h
-F:      include/linux/sfp.h
-K:      phylink\.h|struct\s+phylink|\.phylink|>phylink_|phylink_(autoneg|clear|connect|create|destroy|disconnect|ethtool|helper|mac|mii|of|set|start|stop|test|validate)
-
-Also, do you mean C45 instead of C46?
-
-One part of the problem is that BaseT is simply not defined for
-SFPs. Hence OEMs are doing whatever they want when it comes to
-allowing access to the PHYs, and trying to make it as hard as possible
-for interoperability, since they want vendor lock-in. So maybe you
-should also be reaching out the people who write the multi-source
-agreement and ask them to write a document about this?
-
-	Andrew
+      Andrew
 
