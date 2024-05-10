@@ -1,289 +1,855 @@
-Return-Path: <netdev+bounces-95477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 029088C25FC
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 15:45:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B31718C2602
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 15:47:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 269231C21655
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:45:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E13C281DFA
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 13:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6363E12C498;
-	Fri, 10 May 2024 13:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BDE12C520;
+	Fri, 10 May 2024 13:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FgJ+Fvsf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB0612C48A
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 13:45:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB3812C47D;
+	Fri, 10 May 2024 13:46:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715348742; cv=none; b=Ogq6IYQs7dT+YQiKFF3x9zapJN3OawUAAUJ2pDJ9tCQNus91qHYe5/dwgOfWAYJCoKKWawi/rtjVOrxCFhniIeLJHlC3jcmIfoi8o+3HuMeb9hpuRtZKpnI+Vd6g6DWlZDx96CT/TkbBixrxdO45N+BbuQnhG4USTJ3GEzs8IoA=
+	t=1715348821; cv=none; b=UgqLP9JCQGZKIrcAISOYSJY6coMWw6Pkumk61iO0FkuUQ+Fk9PYAy6jCjg9fJxVGBpbYEgtoxx8kqC7htNsba+cvz/15otV/OImgWwrwUqDvKYdR6EYXhV4Jr7YCUR/JOKSWLGLLg5IclDZLn0UZyUJpNyGN/YeumG+ZfmbLBdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715348742; c=relaxed/simple;
-	bh=SjstU1bbZjcSmPd3Beao+Q/duPYs6oHQDLoAtFYHdSA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=UCA2nvTwacBFpLtTL+KE7syL2Qb9iaIF58Vu+rmMibpSFC5FXIR47FGAcYgsZNTi9kRpfZwULs+qi6eggI1VYefrpxFNOqghHjqlovS59dTTxg6Uz7bynsROIXONccwPM1q1dbdDDoTccTAOQRScvsx48HykFBisze2nbAA9LMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-198-Pw1rXLB9NkOuJiPkWqUqFg-1; Fri, 10 May 2024 09:45:28 -0400
-X-MC-Unique: Pw1rXLB9NkOuJiPkWqUqFg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 55464800994;
-	Fri, 10 May 2024 13:45:28 +0000 (UTC)
-Received: from hog (unknown [10.39.193.137])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BD5D417ED5;
-	Fri, 10 May 2024 13:45:27 +0000 (UTC)
-Date: Fri, 10 May 2024 15:45:26 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
-Subject: Re: [PATCH net-next v3 10/24] ovpn: implement basic RX path (UDP)
-Message-ID: <Zj4k9g1hV1eHQ4Ox@hog>
-References: <20240506011637.27272-1-antonio@openvpn.net>
- <20240506011637.27272-11-antonio@openvpn.net>
+	s=arc-20240116; t=1715348821; c=relaxed/simple;
+	bh=kzq6xPktmwyI6cLzBt7/inx8gIMb7qmXJ8/lA7TcBBw=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=lI5mouwWPrXSiVdH6FWUFc6gDiiLVRuzWAjZs96B6maJR/3peemxcY1l9wDNZjc8GeaZRstKlJu9kBcNZsKm4mmnIF1h8tnLIcuNbWl+t8VoWlirR1LWAANfmxssrXw3GqGOTF1tlk1oMGaQzVlnaVEZ6JM+PEW6mbsqIvN1Dk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FgJ+Fvsf; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715348819; x=1746884819;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=kzq6xPktmwyI6cLzBt7/inx8gIMb7qmXJ8/lA7TcBBw=;
+  b=FgJ+FvsfT9/akkco6KopBq6hrAaoN+cECyOkqrNCLVLZDbWzEUkM3iSK
+   QfOUJ+WGhHdWfkgE7T8PtlAtE8ZIhHjx3meDTF/ziLvBQj9E766NPkv6H
+   GrQrid1NXGlpcjKpBHzftN4ayF6kFy+kOLZkj+kbYr3YzL5FKabUrpmUG
+   4HYiwRUd6eN2e4reN0vhatjYLF4aGsWHGi3SPKnPsUdiXbOz6H0JVQS49
+   xlcUGJt7omKm4OLhnp0F2jgpudwaifw3P+AYEhYiNcLiFXhC9MwryieEA
+   32qHoHLln6+bUfjutxND5bx8ANwQ8rJW/36gvMP0fuxxj6SMI9ZA9+utb
+   Q==;
+X-CSE-ConnectionGUID: h20ejQKqSq6W0Q2pYG5vGQ==
+X-CSE-MsgGUID: H1SZdVr9QgOc4g9v0czJRw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="11466736"
+X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
+   d="scan'208";a="11466736"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 06:46:58 -0700
+X-CSE-ConnectionGUID: G9dndEvyRk+TW5n2reYINQ==
+X-CSE-MsgGUID: A5pMg1KXT6aHtSsvTUgLbw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
+   d="scan'208";a="34158748"
+Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.247.85])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 06:46:47 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Fri, 10 May 2024 16:46:43 +0300 (EEST)
+To: Christoph Fritz <christoph.fritz@hexdev.de>
+cc: Jiri Slaby <jirislaby@kernel.org>, Simon Horman <horms@kernel.org>, 
+    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+    Marc Kleine-Budde <mkl@pengutronix.de>, 
+    Oliver Hartkopp <socketcan@hartkopp.net>, 
+    Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+    "David S . Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+    Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+    Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
+    Benjamin Tissoires <bentiss@kernel.org>, 
+    Sebastian Reichel <sre@kernel.org>, 
+    Linus Walleij <linus.walleij@linaro.org>, 
+    Andreas Lauser <andreas.lauser@mercedes-benz.com>, 
+    Jonathan Corbet <corbet@lwn.net>, Pavel Pisa <pisa@cmp.felk.cvut.cz>, 
+    linux-can@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
+    devicetree@vger.kernel.org, linux-input@vger.kernel.org, 
+    linux-serial <linux-serial@vger.kernel.org>
+Subject: Re: [PATCH v4 02/11] HID: hexLIN: Add support for USB LIN adapter
+In-Reply-To: <20240509171736.2048414-3-christoph.fritz@hexdev.de>
+Message-ID: <4bf1a5e9-904c-584e-72df-71abc3f99bd2@linux.intel.com>
+References: <20240509171736.2048414-1-christoph.fritz@hexdev.de> <20240509171736.2048414-3-christoph.fritz@hexdev.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240506011637.27272-11-antonio@openvpn.net>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 
-2024-05-06, 03:16:23 +0200, Antonio Quartulli wrote:
-> diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
-> index 36cfb95edbf4..9935a863bffe 100644
-> --- a/drivers/net/ovpn/io.c
-> +++ b/drivers/net/ovpn/io.c
-> +/* Called after decrypt to write the IP packet to the device.
-> + * This method is expected to manage/free the skb.
-> + */
-> +static void ovpn_netdev_write(struct ovpn_peer *peer, struct sk_buff *sk=
-b)
-> +{
-> +=09/* packet integrity was verified on the VPN layer - no need to perfor=
-m
-> +=09 * any additional check along the stack
+On Thu, 9 May 2024, Christoph Fritz wrote:
 
-But it could have been corrupted before it got into the VPN?
-
-> +=09 */
-> +=09skb->ip_summed =3D CHECKSUM_UNNECESSARY;
-> +=09skb->csum_level =3D ~0;
+> Introduce driver support for hexDEV hexLIN USB LIN adapter, enabling LIN
+> communication over USB for both controller and responder modes. The
+> driver interfaces with the CAN_LIN framework for userland connectivity.
+> 
+> For more details on the adapter, visit: https://hexdev.de/hexlin/
+> 
+> Tested-by: Andreas Lauser <andreas.lauser@mercedes-benz.com>
+> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+> ---
+>  drivers/hid/Kconfig             |  19 +
+>  drivers/hid/Makefile            |   1 +
+>  drivers/hid/hid-hexdev-hexlin.c | 609 ++++++++++++++++++++++++++++++++
+>  drivers/hid/hid-ids.h           |   1 +
+>  drivers/hid/hid-quirks.c        |   3 +
+>  5 files changed, 633 insertions(+)
+>  create mode 100644 drivers/hid/hid-hexdev-hexlin.c
+> 
+> diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
+> index 08446c89eff6e..682e3ab5fdfe5 100644
+> --- a/drivers/hid/Kconfig
+> +++ b/drivers/hid/Kconfig
+> @@ -496,6 +496,25 @@ config HID_GYRATION
+>  	help
+>  	Support for Gyration remote control.
+>  
+> +config HID_MCS_HEXDEV
+> +	tristate "hexDEV LIN-BUS adapter support"
+> +	depends on HID && CAN_NETLINK && CAN_DEV
+> +	select CAN_LIN
+> +	help
+> +	  Support for hexDEV its hexLIN USB LIN bus adapter.
 > +
-
-[...]
-> +int ovpn_napi_poll(struct napi_struct *napi, int budget)
-> +{
-> +=09struct ovpn_peer *peer =3D container_of(napi, struct ovpn_peer, napi)=
-;
-> +=09struct sk_buff *skb;
-> +=09int work_done =3D 0;
+> +	  Local Interconnect Network (LIN) to USB adapter for controller and
+> +	  responder usage.
+> +	  This device driver is using CAN_LIN for a userland connection on
+> +	  one side and USB HID for the actual hardware adapter on the other
+> +	  side.
 > +
-> +=09if (unlikely(budget <=3D 0))
-> +=09=09return 0;
-> +=09/* this function should schedule at most 'budget' number of
-> +=09 * packets for delivery to the interface.
-> +=09 * If in the queue we have more packets than what allowed by the
-> +=09 * budget, the next polling will take care of those
-> +=09 */
-> +=09while ((work_done < budget) &&
-> +=09       (skb =3D ptr_ring_consume_bh(&peer->netif_rx_ring))) {
-> +=09=09ovpn_netdev_write(peer, skb);
-> +=09=09work_done++;
-> +=09}
+> +	  If you have such an adapter, say Y here and see
+> +	  <https://hexdev.de/hexlin>.
 > +
-> +=09if (work_done < budget)
-> +=09=09napi_complete_done(napi, work_done);
+> +	  To compile this driver as a module, choose M here: the
+> +	  module will be called hid-hexlin.
 > +
-> +=09return work_done;
-> +}
-
-Why not use gro_cells? It would avoid all that napi polling and
-netif_rx_ring code (and it's per-cpu, going back to our other
-discussion around napi).
-
-
-> diff --git a/drivers/net/ovpn/proto.h b/drivers/net/ovpn/proto.h
+>  config HID_ICADE
+>  	tristate "ION iCade arcade controller"
+>  	help
+> diff --git a/drivers/hid/Makefile b/drivers/hid/Makefile
+> index ce71b53ea6c54..6af678f283548 100644
+> --- a/drivers/hid/Makefile
+> +++ b/drivers/hid/Makefile
+> @@ -59,6 +59,7 @@ obj-$(CONFIG_HID_GOOGLE_STADIA_FF)	+= hid-google-stadiaff.o
+>  obj-$(CONFIG_HID_VIVALDI)	+= hid-vivaldi.o
+>  obj-$(CONFIG_HID_GT683R)	+= hid-gt683r.o
+>  obj-$(CONFIG_HID_GYRATION)	+= hid-gyration.o
+> +obj-$(CONFIG_HID_MCS_HEXDEV)	+= hid-hexdev-hexlin.o
+>  obj-$(CONFIG_HID_HOLTEK)	+= hid-holtek-kbd.o
+>  obj-$(CONFIG_HID_HOLTEK)	+= hid-holtek-mouse.o
+>  obj-$(CONFIG_HID_HOLTEK)	+= hid-holtekff.o
+> diff --git a/drivers/hid/hid-hexdev-hexlin.c b/drivers/hid/hid-hexdev-hexlin.c
 > new file mode 100644
-> index 000000000000..0a51104ed931
+> index 0000000000000..a9ed080b3e33e
 > --- /dev/null
-> +++ b/drivers/net/ovpn/proto.h
-[...]
-> +/**
-> + * ovpn_key_id_from_skb - extract key ID from the skb head
-> + * @skb: the packet to extract the key ID code from
+> +++ b/drivers/hid/hid-hexdev-hexlin.c
+> @@ -0,0 +1,609 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+> +/*
+> + * LIN bus USB adapter driver https://hexdev.de/hexlin
 > + *
-> + * Note: this function assumes that the skb head was pulled enough
-> + * to access the first byte.
-> + *
-> + * Return: the key ID
+> + * Copyright (C) 2024 hexDEV GmbH
 > + */
-> +static inline u8 ovpn_key_id_from_skb(const struct sk_buff *skb)
-
-> +static inline u32 ovpn_opcode_compose(u8 opcode, u8 key_id, u32 peer_id)
-
-(tiny nit: those aren't used yet in this patch. probably not worth
-moving them into the right patch.)
-
-
-> diff --git a/drivers/net/ovpn/udp.c b/drivers/net/ovpn/udp.c
-> index f434da76dc0a..07182703e598 100644
-> --- a/drivers/net/ovpn/udp.c
-> +++ b/drivers/net/ovpn/udp.c
-> @@ -20,9 +20,117 @@
->  #include "bind.h"
->  #include "io.h"
->  #include "peer.h"
-> +#include "proto.h"
->  #include "socket.h"
->  #include "udp.h"
-> =20
-> +/**
-> + * ovpn_udp_encap_recv - Start processing a received UDP packet.
-> + * @sk: socket over which the packet was received
-> + * @skb: the received packet
-> + *
-> + * If the first byte of the payload is DATA_V2, the packet is further pr=
-ocessed,
-> + * otherwise it is forwarded to the UDP stack for delivery to user space=
-.
-> + *
-> + * Return:
-> + *  0 if skb was consumed or dropped
-> + * >0 if skb should be passed up to userspace as UDP (packet not consume=
-d)
-> + * <0 if skb should be resubmitted as proto -N (packet not consumed)
-> + */
-> +static int ovpn_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
+> +
+> +#include <linux/completion.h>
+> +#include <linux/hid.h>
+> +#include <linux/module.h>
+> +#include <linux/wait.h>
+> +#include <net/lin.h>
+> +#include "hid-ids.h"
+> +
+> +#define HEXLIN_PKGLEN_MAX	64
+> +#define HEXLIN_LEN_RETCODE	1
+> +
+> +enum {
+> +	/* answers */
+> +	HEXLIN_SUCCESS			= 0x01,
+> +	HEXLIN_FRAME			= 0x02,
+> +	HEXLIN_ERROR			= 0x03,
+> +	HEXLIN_FAIL			= 0x0F,
+> +	/* lin-responder */
+> +	HEXLIN_SET_MODE_RESPONDER	= 0x10,
+> +	HEXLIN_SET_RESPONDER_ANSWER_ID	= 0x11,
+> +	HEXLIN_GET_RESPONDER_ANSWER_ID	= 0x12,
+> +	/* lin-controller */
+> +	HEXLIN_SET_MODE_CONTROLLER	= 0x20,
+> +	HEXLIN_SEND_BREAK		= 0x21,
+> +	HEXLIN_SEND_UNCONDITIONAL_FRAME	= 0x22,
+> +	/* lin-div */
+> +	HEXLIN_SET_BAUDRATE		= 0x34,
+> +	HEXLIN_GET_BAUDRATE		= 0x35,
+> +	/* div */
+> +	HEXLIN_RESET			= 0xF0,
+> +	HEXLIN_GET_VERSION		= 0xF1,
+> +};
+> +
+> +struct hexlin_val8_req {
+> +	u8 cmd;
+> +	u8 v;
+> +} __packed;
+> +
+> +struct hexlin_baudrate_req {
+> +	u8 cmd;
+> +	__le16 baudrate;
+> +} __packed;
+> +
+> +struct hexlin_frame {
+> +	__le32 flags;
+> +	u8 len;
+> +	u8 lin_id;
+> +	u8 data[LIN_MAX_DLEN];
+> +	u8 checksum;
+> +	u8 checksum_mode;
+> +} __packed;
+> +
+> +struct hexlin_unconditional_req {
+> +	u8 cmd;
+> +	struct hexlin_frame frm;
+> +} __packed;
+> +
+> +struct hexlin_responder_answer {
+> +	u8 is_active;
+> +	u8 is_event_frame;
+> +	u8 event_associated_id;
+> +	struct hexlin_frame frm;
+> +} __packed;
+> +
+> +struct hexlin_responder_answer_req {
+> +	u8 cmd;
+> +	struct hexlin_responder_answer answ;
+> +} __packed;
+> +
+> +struct hexlin_priv_data {
+> +	struct hid_device *hid_dev;
+> +	struct lin_device *ldev;
+> +	u16 baudrate;
+> +	struct completion wait_in_report;
+> +	bool is_error;
+> +	struct mutex tx_lock;  /* protects hexlin_tx_report() */
+> +	struct hexlin_responder_answer answ;
+> +	u8 fw_version;
+> +};
+> +
+> +static int hexlin_tx_req_status(struct hexlin_priv_data *priv,
+> +				const void *out_report, int len)
 > +{
-> +=09struct ovpn_peer *peer =3D NULL;
-> +=09struct ovpn_struct *ovpn;
-> +=09u32 peer_id;
-> +=09u8 opcode;
-> +=09int ret;
+> +	unsigned long t;
+> +	int n, ret = 0;
 > +
-> +=09ovpn =3D ovpn_from_udp_sock(sk);
-> +=09if (unlikely(!ovpn)) {
-> +=09=09net_err_ratelimited("%s: cannot obtain ovpn object from UDP socket=
-\n",
-> +=09=09=09=09    __func__);
-> +=09=09goto drop;
-> +=09}
+> +	mutex_lock(&priv->tx_lock);
+
+Use guard().
+
+In general btw, if you're instructed to change something, it's useful to 
+check your own patch series for similar cases as review pass is likely to 
+miss some or not even spend time to point out the same thing over and 
+over again. Then they are raised on the next review round which could have 
+been avoided.
+
+> +	reinit_completion(&priv->wait_in_report);
 > +
-> +=09/* Make sure the first 4 bytes of the skb data buffer after the UDP
-> +=09 * header are accessible.
-> +=09 * They are required to fetch the OP code, the key ID and the peer ID=
-.
-> +=09 */
-> +=09if (unlikely(!pskb_may_pull(skb, sizeof(struct udphdr) + 4))) {
+> +	n = hid_hw_output_report(priv->hid_dev, (__u8 *) out_report, len);
 
-Is this OVPN_OP_SIZE_V2?
+The usual is to not leave space between cast and what is being cast. I 
+know hid functions seem to use __u8 but that's intended for uapi and in 
+kernel, u8 should be used (somebody should eventually cleanup the hid 
+function types too).
 
-> +=09=09net_dbg_ratelimited("%s: packet too small\n", __func__);
-> +=09=09goto drop;
-> +=09}
+> +	if (n < 0) {
+> +		mutex_unlock(&priv->tx_lock);
+> +		return n;
+> +	}
+> +	if (n != len) {
+> +		mutex_unlock(&priv->tx_lock);
+> +		return -EIO;
+> +	}
 > +
-> +=09opcode =3D ovpn_opcode_from_skb(skb, sizeof(struct udphdr));
-> +=09if (unlikely(opcode !=3D OVPN_DATA_V2)) {
-> +=09=09/* DATA_V1 is not supported */
-> +=09=09if (opcode =3D=3D OVPN_DATA_V1)
-> +=09=09=09goto drop;
+> +	t = wait_for_completion_killable_timeout(&priv->wait_in_report, HZ);
+> +	if (!t)
+> +		ret = -ETIMEDOUT;
 > +
-> +=09=09/* unknown or control packet: let it bubble up to userspace */
-> +=09=09return 1;
-> +=09}
+> +	if (priv->is_error)
+> +		ret = -EINVAL;
+
+These can return directly when you use guard().
+
+> +	mutex_unlock(&priv->tx_lock);
 > +
-> +=09peer_id =3D ovpn_peer_id_from_skb(skb, sizeof(struct udphdr));
-> +=09/* some OpenVPN server implementations send data packets with the
-> +=09 * peer-id set to undef. In this case we skip the peer lookup by peer=
--id
-> +=09 * and we try with the transport address
-> +=09 */
-> +=09if (peer_id !=3D OVPN_PEER_ID_UNDEF) {
-> +=09=09peer =3D ovpn_peer_get_by_id(ovpn, peer_id);
-> +=09=09if (!peer) {
-> +=09=09=09net_err_ratelimited("%s: received data from unknown peer (id: %=
-d)\n",
-> +=09=09=09=09=09    __func__, peer_id);
-> +=09=09=09goto drop;
-> +=09=09}
-> +=09}
+> +	return ret;
+
+return 0; + drop ret variable.
+
+> +}
 > +
-> +=09if (!peer) {
-> +=09=09/* data packet with undef peer-id */
-> +=09=09peer =3D ovpn_peer_get_by_transp_addr(ovpn, skb);
-> +=09=09if (unlikely(!peer)) {
-> +=09=09=09netdev_dbg(ovpn->dev,
-> +=09=09=09=09   "%s: received data with undef peer-id from unknown source=
-\n",
-> +=09=09=09=09   __func__);
+> +#define HEXLIN_GET_CMD(name, enum_cmd)					\
+> +	static int hexlin_##name(struct hexlin_priv_data *p)		\
+> +	{								\
+> +		u8 *req;						\
+> +		int ret;						\
+> +									\
+> +		req = kmalloc(sizeof(*req), GFP_KERNEL)	;		\
 
-_ratelimited?
+Extra space.
 
-> +=09=09=09goto drop;
-> +=09=09}
-> +=09}
+Use:
+
+u8 *req __free(kfree) = kmalloc(sizeof(*req), GFP_KERNEL);
+
+> +		if (!req)						\
+> +			return -ENOMEM;					\
+> +									\
+> +		*req = enum_cmd;					\
+> +									\
+> +		ret = hexlin_tx_req_status(p, req, sizeof(*req));	\
+> +		if (ret)						\
+> +			hid_err(p->hid_dev, "%s failed, error: %d\n",	\
+> +				#name, ret);				\
+> +									\
+> +		kfree(req);						\
+
+Not needed after using __free().
+
+> +		return ret;						\
+> +	}
 > +
-> +=09/* At this point we know the packet is from a configured peer.
-> +=09 * DATA_V2 packets are handled in kernel space, the rest goes to user
-> +=09 * space.
-> +=09 *
-> +=09 * Return 1 to instruct the stack to let the packet bubble up to
-> +=09 * userspace
-> +=09 */
-> +=09if (unlikely(opcode !=3D OVPN_DATA_V2)) {
+> +HEXLIN_GET_CMD(get_version, HEXLIN_GET_VERSION)
+> +HEXLIN_GET_CMD(reset_dev, HEXLIN_RESET)
+> +HEXLIN_GET_CMD(get_baudrate, HEXLIN_GET_BAUDRATE)
 
-You already handled those earlier, before getting the peer.
+Could you convert the function in the macro into a helper function which 
+is just called by a simple function with the relevant parameters for 
+these 3 cases?
 
+> +#define HEXLIN_VAL_CMD(name, enum_cmd, struct_type, vtype)		\
+> +	static int hexlin_##name(struct hexlin_priv_data *p, vtype val)	\
+> +	{								\
+> +		struct struct_type *req;				\
+> +		int ret;						\
+> +									\
+> +		req = kmalloc(sizeof(*req), GFP_KERNEL)	;		\
 
-[...]
-> @@ -255,10 +368,20 @@ int ovpn_udp_socket_attach(struct socket *sock, str=
-uct ovpn_struct *ovpn)
->  =09=09=09return -EALREADY;
->  =09=09}
-> =20
-> -=09=09netdev_err(ovpn->dev, "%s: provided socket already taken by other =
-user\n",
-> +=09=09netdev_err(ovpn->dev,
-> +=09=09=09   "%s: provided socket already taken by other user\n",
+Extra space.
 
-I guess you meant to break that line in the patch that introduced it,
-rather than here? :)
+Use __free().
 
-
-> +void ovpn_udp_socket_detach(struct socket *sock)
+> +		if (!req)						\
+> +			return -ENOMEM;					\
+> +									\
+> +		req->cmd = enum_cmd;					\
+> +		req->v = val;						\
+> +									\
+> +		ret = hexlin_tx_req_status(p, req, sizeof(*req));	\
+> +		if (ret)						\
+> +			hid_err(p->hid_dev, "%s failed, error: %d\n",	\
+> +				#name, ret);				\
+> +									\
+> +		kfree(req);						\
+> +		return ret;						\
+> +	}
+> +
+> +HEXLIN_VAL_CMD(send_break, HEXLIN_SEND_BREAK, hexlin_val8_req, u8)
+> +
+> +static int hexlin_send_unconditional(struct hexlin_priv_data *priv,
+> +				     const struct hexlin_frame *hxf)
 > +{
-> +=09struct udp_tunnel_sock_cfg cfg =3D { };
+> +	struct hexlin_unconditional_req *req;
+> +	int ret;
 > +
-> +=09setup_udp_tunnel_sock(sock_net(sock->sk), sock, &cfg);
+> +	if (hxf->lin_id > LIN_ID_MASK)
+> +		return -EINVAL;
+> +
+> +	req = kmalloc(sizeof(*req), GFP_KERNEL);
+> +	if (!req)
+> +		return -ENOMEM;
+> +
+> +	req->cmd = HEXLIN_SEND_UNCONDITIONAL_FRAME;
+> +	memcpy(&req->frm, hxf, sizeof(*hxf));
+> +
+> +	ret = hexlin_tx_req_status(priv, req, sizeof(*req));
+> +	if (ret)
+> +		hid_err(priv->hid_dev, "unconditional tx failed: %d\n", ret);
+> +
+> +	kfree(req);
+> +	return ret;
+> +}
+> +
+> +static int hexlin_set_baudrate(struct hexlin_priv_data *priv, u16 baudrate)
+> +{
+> +	struct hexlin_baudrate_req *req;
+> +	int ret;
+> +
+> +	if (baudrate < LIN_MIN_BAUDRATE || baudrate > LIN_MAX_BAUDRATE)
+> +		return -EINVAL;
+> +
+> +	req = kmalloc(sizeof(*req), GFP_KERNEL);
 
-I can't find anything in the kernel currently using
-setup_udp_tunnel_sock the way you're using it here.
+Hmm... Why do you alloc this small structure (3 bytes?) with kmalloc() and 
+not just have it in stack as a local variable?
 
-Does this provide any benefit compared to just letting the kernel
-disable encap when the socket goes away? Are you planning to detach
-and then re-attach the same socket?
+> +	if (!req)
+> +		return -ENOMEM;
+> +
+> +	req->cmd = HEXLIN_SET_BAUDRATE;
+> +	req->baudrate = cpu_to_le16(baudrate);
+> +
+> +	ret = hexlin_tx_req_status(priv, req, sizeof(*req));
+> +	if (ret)
+> +		hid_err(priv->hid_dev, "set baudrate failed: %d\n", ret);
+> +
+> +	kfree(req);
+> +	return ret;
+> +}
+> +
+> +static int hexlin_get_responder_answer_id(struct hexlin_priv_data *priv, u8 id,
+> +					  struct hexlin_responder_answer *ransw)
+> +{
+> +	struct hexlin_val8_req *req;
+> +	int ret;
+> +
+> +	if (id > LIN_ID_MASK)
+> +		return -EINVAL;
+> +
+> +	req = kmalloc(sizeof(*req), GFP_KERNEL);
 
---=20
-Sabrina
+Use a stack variable instead?
+
+> +	if (!req)
+> +		return -ENOMEM;
+> +
+> +	req->cmd = HEXLIN_GET_RESPONDER_ANSWER_ID;
+> +	req->v = id;
+> +
+> +	ret = hexlin_tx_req_status(priv, req, sizeof(*req));
+> +	if (ret) {
+> +		hid_err(priv->hid_dev, "get respond answer failed: %d\n", ret);
+> +		kfree(req);
+> +		return ret;
+> +	}
+> +
+> +	memcpy(ransw, &priv->answ, sizeof(priv->answ));
+> +
+> +	kfree(req);
+> +	return 0;
+> +}
+> +
+> +static int hexlin_set_responder_answer_id(struct hexlin_priv_data *priv,
+> +					  const struct lin_responder_answer *answ)
+> +{
+> +	struct hexlin_responder_answer_req *req;
+> +	int ret;
+> +
+> +	if (answ->lf.lin_id > LIN_ID_MASK ||
+> +	    answ->event_associated_id > LIN_ID_MASK)
+> +		return -EINVAL;
+> +
+> +	req = kmalloc(sizeof(*req), GFP_KERNEL);
+> +	if (!req)
+> +		return -ENOMEM;
+> +
+> +	req->cmd = HEXLIN_SET_RESPONDER_ANSWER_ID;
+> +	req->answ.is_active = answ->is_active;
+> +	req->answ.is_event_frame = answ->is_event_frame;
+> +	req->answ.event_associated_id = answ->event_associated_id;
+> +	req->answ.frm.len = answ->lf.len;
+> +	req->answ.frm.lin_id = answ->lf.lin_id;
+> +	memcpy(req->answ.frm.data, answ->lf.data, LIN_MAX_DLEN);
+> +	req->answ.frm.checksum = answ->lf.checksum;
+> +	req->answ.frm.checksum_mode = answ->lf.checksum_mode;
+> +
+> +	ret = hexlin_tx_req_status(priv, req, sizeof(*req));
+> +	if (ret)
+> +		hid_err(priv->hid_dev, "set respond answer failed: %d\n", ret);
+> +
+> +	kfree(req);
+> +	return ret;
+> +}
+> +
+> +static int hexlin_open(struct lin_device *ldev)
+> +{
+> +	struct hid_device *hdev = to_hid_device(ldev->dev);
+> +
+> +	return hid_hw_open(hdev);
+> +}
+> +
+> +static int hexlin_stop(struct lin_device *ldev)
+> +{
+> +	struct hid_device *hdev = to_hid_device(ldev->dev);
+> +	struct hexlin_priv_data *priv = hid_get_drvdata(hdev);
+> +
+> +	hid_hw_close(hdev);
+> +
+> +	priv->is_error = true;
+> +	complete(&priv->wait_in_report);
+> +
+> +	return 0;
+> +}
+> +
+> +static int hexlin_ldo_tx(struct lin_device *ldev,
+> +			 const struct lin_frame *lf)
+> +{
+> +	struct hid_device *hdev = to_hid_device(ldev->dev);
+> +	struct hexlin_priv_data *priv = hid_get_drvdata(hdev);
+> +	int ret = -EINVAL;
+> +
+> +	hid_dbg(hdev, "id:%02x, len:%u, data:%*ph, checksum:%02x (%s)\n",
+> +		   lf->lin_id, lf->len, lf->len, lf->data, lf->checksum,
+> +		   lf->checksum_mode ? "enhanced" : "classic");
+> +
+> +	if (lf->lin_id && lf->len == 0) {
+> +		ret = hexlin_send_break(priv, lf->lin_id);
+> +	} else if (lf->len <= LIN_MAX_DLEN) {
+> +		struct hexlin_frame hxf;
+> +
+> +		hxf.len = lf->len;
+> +		hxf.lin_id = lf->lin_id;
+> +		memcpy(&hxf.data, lf->data, LIN_MAX_DLEN);
+> +		hxf.checksum = lf->checksum;
+> +		hxf.checksum_mode = lf->checksum_mode;
+> +		ret = hexlin_send_unconditional(priv, &hxf);
+> +	} else {
+> +		hid_err(hdev, "unknown format\n");
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static int hexlin_update_bitrate(struct lin_device *ldev, u16 bitrate)
+> +{
+> +	struct hid_device *hdev = to_hid_device(ldev->dev);
+> +	struct hexlin_priv_data *priv = hid_get_drvdata(hdev);
+> +	int ret;
+> +
+> +	hid_dbg(hdev, "update bitrate to: %u\n", bitrate);
+> +
+> +	ret = hexlin_open(ldev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = hexlin_set_baudrate(priv, bitrate);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = hexlin_get_baudrate(priv);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (priv->baudrate != bitrate) {
+> +		hid_err(hdev, "update bitrate failed\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static int hexlin_get_responder_answer(struct lin_device *ldev, u8 id,
+> +				       struct lin_responder_answer *answ)
+> +{
+> +	struct hid_device *hdev = to_hid_device(ldev->dev);
+> +	struct hexlin_priv_data *priv = hid_get_drvdata(hdev);
+> +	struct hexlin_responder_answer ransw;
+> +	int ret;
+> +
+> +	if (answ == NULL)
+> +		return -EINVAL;
+> +
+> +	ret = hexlin_get_responder_answer_id(priv, id, &ransw);
+> +	if (ret)
+> +		return ret;
+> +
+> +	answ->is_active = ransw.is_active;
+> +	answ->is_event_frame = ransw.is_event_frame;
+> +	answ->event_associated_id = ransw.event_associated_id;
+> +	answ->lf.len = ransw.frm.len;
+> +	answ->lf.lin_id = ransw.frm.lin_id;
+> +	memcpy(answ->lf.data, ransw.frm.data, LIN_MAX_DLEN);
+> +	answ->lf.checksum = ransw.frm.checksum;
+> +	answ->lf.checksum_mode = ransw.frm.checksum_mode;
+> +
+> +	return 0;
+> +}
+> +
+> +static int hexlin_update_resp_answer(struct lin_device *ldev,
+> +				     const struct lin_responder_answer *answ)
+> +{
+> +	struct hid_device *hdev = to_hid_device(ldev->dev);
+> +	struct hexlin_priv_data *priv = hid_get_drvdata(hdev);
+> +
+> +	if (answ == NULL)
+> +		return -EINVAL;
+> +
+> +	return hexlin_set_responder_answer_id(priv, answ);
+> +}
+> +
+> +static const struct lin_device_ops hexlin_ldo = {
+> +	.ldo_open = hexlin_open,
+> +	.ldo_stop = hexlin_stop,
+> +	.ldo_tx = hexlin_ldo_tx,
+> +	.update_bitrate = hexlin_update_bitrate,
+> +	.get_responder_answer = hexlin_get_responder_answer,
+> +	.update_responder_answer = hexlin_update_resp_answer,
+> +};
+> +
+> +static int hexlin_queue_frames_insert(struct hexlin_priv_data *priv,
+> +				      const struct hexlin_frame *hxf)
+> +{
+> +	struct hid_device *hdev = priv->hid_dev;
+> +	struct lin_frame lf;
+> +
+> +	lf.len = hxf->len;
+> +	lf.lin_id = hxf->lin_id;
+> +	memcpy(lf.data, hxf->data, LIN_MAX_DLEN);
+> +	lf.checksum = hxf->checksum;
+> +	lf.checksum_mode = hxf->checksum_mode;
+> +
+> +	hid_dbg(hdev, "id:%02x, len:%u, data:%*ph, chk:%02x (%s), flg:%08x\n",
+> +		lf.lin_id, lf.len, lf.len, lf.data, lf.checksum,
+> +		lf.checksum_mode ? "enhanced" : "classic", hxf->flags);
+> +
+> +	lin_rx(priv->ldev, &lf);
+> +
+> +	return 0;
+> +}
+> +
+> +static int hexlin_raw_event(struct hid_device *hdev,
+> +			    struct hid_report *report, u8 *data, int sz)
+> +{
+> +	struct hexlin_priv_data *priv;
+> +	struct hexlin_baudrate_req *br;
+> +	struct hexlin_responder_answer_req *rar;
+> +	struct hexlin_unconditional_req *hfr;
+> +	struct hexlin_val8_req *vr;
+> +
+> +	if (sz < 1 || sz > HEXLIN_PKGLEN_MAX)
+> +		return -EREMOTEIO;
+> +
+> +	priv = hid_get_drvdata(hdev);
+> +
+> +	hid_dbg(hdev, "%s, size:%i, data[0]: 0x%02x\n", __func__, sz, data[0]);
+> +
+> +	priv->is_error = false;
+> +
+> +	switch (data[0]) {
+> +	case HEXLIN_SUCCESS:
+> +		if (sz != HEXLIN_LEN_RETCODE)
+> +			return -EREMOTEIO;
+> +		hid_dbg(hdev, "HEXLIN_SUCCESS: 0x%02x\n", data[0]);
+> +		complete(&priv->wait_in_report);
+> +		break;
+> +	case HEXLIN_FAIL:
+> +		if (sz != HEXLIN_LEN_RETCODE)
+> +			return -EREMOTEIO;
+> +		hid_err(hdev, "HEXLIN_FAIL: 0x%02x\n", data[0]);
+> +		priv->is_error = true;
+> +		complete(&priv->wait_in_report);
+> +		break;
+> +	case HEXLIN_GET_VERSION:
+> +		if (sz != sizeof(*vr))
+> +			return -EREMOTEIO;
+> +		vr = (struct hexlin_val8_req *) data;
+> +		priv->fw_version = vr->v;
+> +		complete(&priv->wait_in_report);
+> +		break;
+> +	case HEXLIN_GET_RESPONDER_ANSWER_ID:
+> +		if (sz != sizeof(*rar))
+> +			return -EREMOTEIO;
+> +		rar = (struct hexlin_responder_answer_req *) data;
+> +		memcpy(&priv->answ, &rar->answ, sizeof(priv->answ));
+> +		complete(&priv->wait_in_report);
+> +		break;
+> +	case HEXLIN_GET_BAUDRATE:
+> +		if (sz != sizeof(*br))
+> +			return -EREMOTEIO;
+> +		br = (struct hexlin_baudrate_req *) data;
+> +		le16_to_cpus(br->baudrate);
+> +		priv->baudrate = br->baudrate;
+> +		complete(&priv->wait_in_report);
+> +		break;
+> +	/* following cases not initiated by us, so no complete() */
+> +	case HEXLIN_FRAME:
+> +		if (sz != sizeof(*hfr)) {
+> +			hid_err_once(hdev, "frame size mismatch: %i\n", sz);
+> +			return -EREMOTEIO;
+> +		}
+> +		hfr = (struct hexlin_unconditional_req *) data;
+> +		le32_to_cpus(hfr->frm.flags);
+
+I'm bit worried about this from endianness perspective. Perhaps there's 
+some struct reusing that shouldn't be happening because the same field 
+cannot be __le32 and u32 at the same time.
+
+> +		hexlin_queue_frames_insert(priv, &hfr->frm);
+> +		break;
+> +	case HEXLIN_ERROR:
+> +		hid_err(hdev, "error from adapter\n");
+> +		break;
+> +	default:
+> +		hid_err(hdev, "unknown event: 0x%02x\n", data[0]);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int init_hw(struct hexlin_priv_data *priv)
+> +{
+> +	int ret;
+> +
+> +	ret = hexlin_reset_dev(priv);
+> +	if (ret) {
+> +		/* if first reset fails, try one more time */
+> +		ret = hexlin_reset_dev(priv);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	ret = hexlin_get_version(priv);
+> +	if (ret)
+> +		return ret;
+> +
+> +	priv->baudrate = LIN_DEFAULT_BAUDRATE;
+> +	ret = hexlin_set_baudrate(priv, priv->baudrate);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+> +static int hexlin_probe(struct hid_device *hdev,
+> +			const struct hid_device_id *id)
+> +{
+> +	struct hexlin_priv_data *priv;
+> +	int ret;
+> +
+> +	priv = devm_kzalloc(&hdev->dev, sizeof(*priv), GFP_KERNEL);
+> +	if (!priv)
+> +		return -ENOMEM;
+> +
+> +	priv->hid_dev = hdev;
+> +	hid_set_drvdata(hdev, priv);
+> +
+> +	mutex_init(&priv->tx_lock);
+> +
+> +	ret = hid_parse(hdev);
+> +	if (ret) {
+> +		hid_err(hdev, "hid parse failed with %d\n", ret);
+> +		goto fail_and_free;
+> +	}
+> +
+> +	ret = hid_hw_start(hdev, HID_CONNECT_DRIVER);
+> +	if (ret) {
+> +		hid_err(hdev, "hid hw start failed with %d\n", ret);
+> +		goto fail_and_stop;
+> +	}
+> +
+> +	ret = hid_hw_open(hdev);
+> +	if (ret) {
+> +		hid_err(hdev, "hid hw open failed with %d\n", ret);
+> +		goto fail_and_close;
+> +	}
+> +
+> +	init_completion(&priv->wait_in_report);
+> +
+> +	hid_device_io_start(hdev);
+> +
+> +	ret = init_hw(priv);
+> +	if (ret)
+> +		goto fail_and_close;
+> +
+> +	priv->ldev = register_lin(&hdev->dev, &hexlin_ldo);
+> +	if (IS_ERR(priv->ldev)) {
+> +		ret = PTR_ERR(priv->ldev);
+> +		goto fail_and_close;
+> +	}
+> +
+> +	hid_hw_close(hdev);
+> +
+> +	hid_info(hdev, "hexLIN (fw-version: %u) probed\n", priv->fw_version);
+
+By custom, the success path in probe should not print anything so make 
+this dbg level message if the fw version information is valuable in some 
+debugging scenario.
+
+> +	return 0;
+> +
+> +fail_and_close:
+> +	hid_hw_close(hdev);
+> +fail_and_stop:
+> +	hid_hw_stop(hdev);
+> +fail_and_free:
+> +	mutex_destroy(&priv->tx_lock);
+> +	return ret;
+> +}
+> +
+> +static void hexlin_remove(struct hid_device *hdev)
+> +{
+> +	struct hexlin_priv_data *priv = hid_get_drvdata(hdev);
+> +
+> +	unregister_lin(priv->ldev);
+> +	hid_hw_stop(hdev);
+> +}
+> +
+> +static const struct hid_device_id hexlin_table[] = {
+> +	{ HID_USB_DEVICE(USB_VENDOR_ID_MCS, USB_DEVICE_ID_MCS_HEXDEV_HEXLIN) },
+> +	{ }
+> +};
+> +
+> +MODULE_DEVICE_TABLE(hid, hexlin_table);
+> +
+> +static struct hid_driver hexlin_driver = {
+> +	.name = "hexLIN",
+> +	.id_table = hexlin_table,
+> +	.probe = hexlin_probe,
+> +	.remove = hexlin_remove,
+> +	.raw_event = hexlin_raw_event,
+> +};
+> +
+> +module_hid_driver(hexlin_driver);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Christoph Fritz <christoph.fritz@hexdev.de>");
+> +MODULE_DESCRIPTION("LIN bus driver for hexLIN USB adapter");
+> diff --git a/drivers/hid/hid-ids.h b/drivers/hid/hid-ids.h
+> index 61d2a21affa26..c6fe6f99a0e80 100644
+> --- a/drivers/hid/hid-ids.h
+> +++ b/drivers/hid/hid-ids.h
+> @@ -907,6 +907,7 @@
+>  
+>  #define USB_VENDOR_ID_MCS		0x16d0
+>  #define USB_DEVICE_ID_MCS_GAMEPADBLOCK	0x0bcc
+> +#define USB_DEVICE_ID_MCS_HEXDEV_HEXLIN	0x0648
+>  
+>  #define USB_VENDOR_MEGAWORLD		0x07b5
+>  #define USB_DEVICE_ID_MEGAWORLD_GAMEPAD	0x0312
+> diff --git a/drivers/hid/hid-quirks.c b/drivers/hid/hid-quirks.c
+> index e0bbf0c6345d6..d721110d0889b 100644
+> --- a/drivers/hid/hid-quirks.c
+> +++ b/drivers/hid/hid-quirks.c
+> @@ -436,6 +436,9 @@ static const struct hid_device_id hid_have_special_driver[] = {
+>  	{ HID_USB_DEVICE(USB_VENDOR_ID_GYRATION, USB_DEVICE_ID_GYRATION_REMOTE_2) },
+>  	{ HID_USB_DEVICE(USB_VENDOR_ID_GYRATION, USB_DEVICE_ID_GYRATION_REMOTE_3) },
+>  #endif
+> +#if IS_ENABLED(CONFIG_HID_MCS_HEXDEV)
+> +	{ HID_USB_DEVICE(USB_VENDOR_ID_MCS, USB_DEVICE_ID_MCS_HEXDEV_HEXLIN) },
+> +#endif
+>  #if IS_ENABLED(CONFIG_HID_HOLTEK)
+>  	{ HID_USB_DEVICE(USB_VENDOR_ID_HOLTEK, USB_DEVICE_ID_HOLTEK_ON_LINE_GRIP) },
+>  	{ HID_USB_DEVICE(USB_VENDOR_ID_HOLTEK_ALT, USB_DEVICE_ID_HOLTEK_ALT_KEYBOARD) },
+> 
+
+-- 
+ i.
 
 
