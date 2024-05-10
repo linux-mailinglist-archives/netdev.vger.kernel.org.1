@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-95516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17E7B8C27C7
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 17:29:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 292B88C27CB
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 17:29:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C2581F23402
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 15:29:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77985B259BF
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 15:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7E117556B;
-	Fri, 10 May 2024 15:28:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 521D0176FD3;
+	Fri, 10 May 2024 15:28:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GE+88mAG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nxlYdGVu"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0217175563;
-	Fri, 10 May 2024 15:27:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28BD1779A9;
+	Fri, 10 May 2024 15:27:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715354880; cv=none; b=HRh8SfOE8gq1et3S8+hcBIbxPQoVLTpJd4qRpSNXpSKJz176MROazYHZ62q+2Eb7o9XUONqX7N+t7n/0ru8JYRqMxfX/KjhuN7l7mQaVPF5XSVSHx5qD7bzCtQ6bcNCGn4Bst2DDG8gBGVcuioNOvFHxx9eMwjJfQKYrO8hCvrA=
+	t=1715354884; cv=none; b=FLDV51WlRJtrLfMXy01XDMQAj064zte2wZSz09uO4ApI/2YthmOp1XT+wB2T1cXDmQEpaGnMXFA0kmo4pOHyz43eWRtrDpb4pCZnp2zDH51+Gg+cHnjjZVb36Ob9v1+UpDUFqz5OJTp9LfxDYO7zrqj+6w3dzE8GLSYa0SiWiLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715354880; c=relaxed/simple;
-	bh=4E8x16GtYqW9ZgGDgsswEilQ5kdpYMVqNd0tVHyXroI=;
+	s=arc-20240116; t=1715354884; c=relaxed/simple;
+	bh=Yn7lGldHXX5OMvMMtk0QpXcGdcB3Y+0iq/q74WMS+28=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ebx/seAvHlomqV4I4XloR8WHbzx4/RYLewnOLD02c8gdz3A9jlmw8NSZwk8QebxJC6LigRkrXLcpyX5o2b9pw/WspraORfcUAIBI0N8WgAiiYrkEhjtWGeU3v+nCrxFmqAUOFcrgauJ+Mv5QeZ9pBdQPDzQ2tjr0Tx6kE2BRse8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GE+88mAG; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=PVYPCvagLYNwc2cF7aN9kKMtXGkUjcCCzRc1q0hdVCa2ozoRuaC7RQ0ZS+uN7HRMrZgnBNtxHVwHlrPDpK3lyo93N+/407ers5VF+lijyfzDvvYiSmb0zSaV81zJnyoJ/+yKzvSKSWyWQgQeynsFFd4pYMfMLk4iJCZUScBIOZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nxlYdGVu; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715354865; x=1746890865;
+  t=1715354870; x=1746890870;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=4E8x16GtYqW9ZgGDgsswEilQ5kdpYMVqNd0tVHyXroI=;
-  b=GE+88mAG6q7azU1NO5TLC4jryiAy84J9hL4ttudYVttMAUVY9ZvBgFg3
-   YfIICXtNpRh/kl5zZx8vThCUT/VFfMPZVRiaihxSwJHKyhB997iCjeQGE
-   j0yW1CLK6sCucfglX6a3/Or6VJ+mmFfOjUfe36wur+4mkRJUKwcbckwVg
-   1taxZt7TaXsNxy66QmoRz2xWZBITVhnlMN/8JOXGJjz1xCjt8l0ehk7p0
-   cdt65rdW2mjgJMbzRZxmf3pXBS6tyQw84o0XEeAa7B+R88ratagSl6bl/
-   6Y9rplLfDIpGZHTKHE/PTT4HECV4LACLo/vqwLejq6eZLewva3LTcf0VO
-   Q==;
-X-CSE-ConnectionGUID: uhNFiX9cQlS324SP+rSc3w==
-X-CSE-MsgGUID: 3e0zmx/DQ6Kprs2llTFIEw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="15152615"
+  bh=Yn7lGldHXX5OMvMMtk0QpXcGdcB3Y+0iq/q74WMS+28=;
+  b=nxlYdGVuWJq2VVVaT0fwwzfxmpIa5XcGfksLctxBlPNKSOHYA2Qw7J/9
+   jG+WrK45F6DcqySibgcasPmsBYRPvYDi7AdhbgF/YdaRc4YPrKYt+I+XD
+   V/dc67hFQ3pq8XRHQTe81AznbkweKg7ejbPz7Jg3bKicsAcsFCTgqciUq
+   fBnDGme6f4BGDqsxBb4B3uuLYYes1qfFhojAPCuTFYK+rIV17G5S6xen5
+   q1p6oypDzTTH7TIVUZSeKpl/w6c0cEpSrrnlhUILyEZQfOwzZVObAE0Ln
+   hVAXoa8eWOMtXNjeY28EllNytENEaBL5jwiowp9Z6PPuC62UASxTvAlHI
+   w==;
+X-CSE-ConnectionGUID: LwzuHNPzTQuOjBaht870DQ==
+X-CSE-MsgGUID: gkW6RCDMTuqyyX+7w8v4Bw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="15152627"
 X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
-   d="scan'208";a="15152615"
+   d="scan'208";a="15152627"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 08:27:38 -0700
-X-CSE-ConnectionGUID: ZUMWnBRuQjmXIhXkicuANA==
-X-CSE-MsgGUID: 0FdBlTKTSASh8tjNm6WxSw==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 08:27:41 -0700
+X-CSE-ConnectionGUID: qYimk+drTNisAs3/kNNFPg==
+X-CSE-MsgGUID: nHt+izmCS16DdI97daUsKw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,151,1712646000"; 
-   d="scan'208";a="30208273"
+   d="scan'208";a="30208277"
 Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa008.jf.intel.com with ESMTP; 10 May 2024 08:27:35 -0700
+  by orviesa008.jf.intel.com with ESMTP; 10 May 2024 08:27:38 -0700
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
@@ -69,9 +69,9 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH RFC iwl-next 06/12] idpf: merge singleq and splitq &net_device_ops
-Date: Fri, 10 May 2024 17:26:14 +0200
-Message-ID: <20240510152620.2227312-7-aleksander.lobakin@intel.com>
+Subject: [PATCH RFC iwl-next 07/12] idpf: compile singleq code only under default-n CONFIG_IDPF_SINGLEQ
+Date: Fri, 10 May 2024 17:26:15 +0200
+Message-ID: <20240510152620.2227312-8-aleksander.lobakin@intel.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20240510152620.2227312-1-aleksander.lobakin@intel.com>
 References: <20240510152620.2227312-1-aleksander.lobakin@intel.com>
@@ -83,175 +83,169 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It makes no sense to have a second &net_device_ops struct (800 bytes of
-rodata) with only one difference in .ndo_start_xmit, which can easily
-be just one `if`. This `if` is a drop in the ocean and you won't see
-any difference.
-Define unified idpf_xmit_start(). The preparation for sending is the
-same, just call either idpf_tx_splitq_frame() or idpf_tx_singleq_frame()
-depending on the active model to actually map and send the skb.
+Currently, there's no HW supporting idpf in the singleq model. Still,
+this dead code is supported by the driver and often times add hotpath
+branches and redundant cacheline accesses.
+While it can't currently be removed, add CONFIG_IDPF_SINGLEQ and build
+the singleq code only when it's enabled manually. This corresponds to
+-10 Kb of object code size and a good bunch of hotpath checks.
+idpf_is_queue_model_split() works as a gate and compiles out to `true`
+when the config option is disabled.
 
 Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  7 ++---
- drivers/net/ethernet/intel/idpf/idpf_lib.c    | 26 +++-------------
- .../ethernet/intel/idpf/idpf_singleq_txrx.c   | 31 ++-----------------
- drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 10 +++---
- 4 files changed, 15 insertions(+), 59 deletions(-)
+ drivers/net/ethernet/intel/Kconfig            | 13 +---------
+ drivers/net/ethernet/intel/idpf/Kconfig       | 26 +++++++++++++++++++
+ drivers/net/ethernet/intel/idpf/Makefile      |  3 ++-
+ drivers/net/ethernet/intel/idpf/idpf.h        |  3 ++-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  2 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 15 ++++++++---
+ 6 files changed, 43 insertions(+), 19 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/idpf/Kconfig
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 0192d33744ff..015aba5abb3c 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -1190,10 +1190,9 @@ bool idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs,
- 			unsigned int count);
- int idpf_tx_maybe_stop_common(struct idpf_tx_queue *tx_q, unsigned int size);
- void idpf_tx_timeout(struct net_device *netdev, unsigned int txqueue);
--netdev_tx_t idpf_tx_splitq_start(struct sk_buff *skb,
--				 struct net_device *netdev);
--netdev_tx_t idpf_tx_singleq_start(struct sk_buff *skb,
--				  struct net_device *netdev);
-+netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
-+				  struct idpf_tx_queue *tx_q);
-+netdev_tx_t idpf_tx_start(struct sk_buff *skb, struct net_device *netdev);
- bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rxq,
- 				      u16 cleaned_count);
- int idpf_tso(struct sk_buff *skb, struct idpf_tx_offload_params *off);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index a8be09a89943..fe91475c7b4c 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -4,8 +4,7 @@
- #include "idpf.h"
- #include "idpf_virtchnl.h"
+diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
+index e0287fbd501d..0375c7448a57 100644
+--- a/drivers/net/ethernet/intel/Kconfig
++++ b/drivers/net/ethernet/intel/Kconfig
+@@ -384,17 +384,6 @@ config IGC_LEDS
+ 	  Optional support for controlling the NIC LED's with the netdev
+ 	  LED trigger.
  
--static const struct net_device_ops idpf_netdev_ops_splitq;
--static const struct net_device_ops idpf_netdev_ops_singleq;
-+static const struct net_device_ops idpf_netdev_ops;
- 
- /**
-  * idpf_init_vector_stack - Fill the MSIX vector stack with vector index
-@@ -764,10 +763,7 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
- 	}
- 
- 	/* assign netdev_ops */
--	if (idpf_is_queue_model_split(vport->txq_model))
--		netdev->netdev_ops = &idpf_netdev_ops_splitq;
--	else
--		netdev->netdev_ops = &idpf_netdev_ops_singleq;
-+	netdev->netdev_ops = &idpf_netdev_ops;
- 
- 	/* setup watchdog timeout value to be 5 second */
- 	netdev->watchdog_timeo = 5 * HZ;
-@@ -2353,24 +2349,10 @@ void idpf_free_dma_mem(struct idpf_hw *hw, struct idpf_dma_mem *mem)
- 	mem->pa = 0;
- }
- 
--static const struct net_device_ops idpf_netdev_ops_splitq = {
--	.ndo_open = idpf_open,
--	.ndo_stop = idpf_stop,
--	.ndo_start_xmit = idpf_tx_splitq_start,
--	.ndo_features_check = idpf_features_check,
--	.ndo_set_rx_mode = idpf_set_rx_mode,
--	.ndo_validate_addr = eth_validate_addr,
--	.ndo_set_mac_address = idpf_set_mac,
--	.ndo_change_mtu = idpf_change_mtu,
--	.ndo_get_stats64 = idpf_get_stats64,
--	.ndo_set_features = idpf_set_features,
--	.ndo_tx_timeout = idpf_tx_timeout,
--};
+-config IDPF
+-	tristate "Intel(R) Infrastructure Data Path Function Support"
+-	depends on PCI_MSI
+-	select DIMLIB
+-	select PAGE_POOL
+-	select PAGE_POOL_STATS
+-	help
+-	  This driver supports Intel(R) Infrastructure Data Path Function
+-	  devices.
 -
--static const struct net_device_ops idpf_netdev_ops_singleq = {
-+static const struct net_device_ops idpf_netdev_ops = {
- 	.ndo_open = idpf_open,
- 	.ndo_stop = idpf_stop,
--	.ndo_start_xmit = idpf_tx_singleq_start,
-+	.ndo_start_xmit = idpf_tx_start,
- 	.ndo_features_check = idpf_features_check,
- 	.ndo_set_rx_mode = idpf_set_rx_mode,
- 	.ndo_validate_addr = eth_validate_addr,
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-index b51f7cd6db01..a3b60a2dfcaa 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-@@ -351,8 +351,8 @@ static void idpf_tx_singleq_build_ctx_desc(struct idpf_tx_queue *txq,
-  *
-  * Returns NETDEV_TX_OK if sent, else an error code
+-	  To compile this driver as a module, choose M here. The module
+-	  will be called idpf.
++source "drivers/net/ethernet/intel/idpf/Kconfig"
+ 
+ endif # NET_VENDOR_INTEL
+diff --git a/drivers/net/ethernet/intel/idpf/Kconfig b/drivers/net/ethernet/intel/idpf/Kconfig
+new file mode 100644
+index 000000000000..bee83a40f218
+--- /dev/null
++++ b/drivers/net/ethernet/intel/idpf/Kconfig
+@@ -0,0 +1,26 @@
++# SPDX-License-Identifier: GPL-2.0-only
++# Copyright (C) 2024 Intel Corporation
++
++config IDPF
++	tristate "Intel(R) Infrastructure Data Path Function Support"
++	depends on PCI_MSI
++	select DIMLIB
++	select PAGE_POOL
++	select PAGE_POOL_STATS
++	help
++	  This driver supports Intel(R) Infrastructure Data Path Function
++	  devices.
++
++	  To compile this driver as a module, choose M here. The module
++	  will be called idpf.
++
++if IDPF
++
++config IDPF_SINGLEQ
++	bool "idpf singleq support"
++	help
++	  This option enables support for legacy single Rx/Tx queues w/no
++	  completion and fill queues. Only enable if you have such hardware
++	  as it increases the driver size and adds runtme checks on hotpath.
++
++endif # IDPF
+diff --git a/drivers/net/ethernet/intel/idpf/Makefile b/drivers/net/ethernet/intel/idpf/Makefile
+index 6844ead2f3ac..2ce01a0b5898 100644
+--- a/drivers/net/ethernet/intel/idpf/Makefile
++++ b/drivers/net/ethernet/intel/idpf/Makefile
+@@ -12,7 +12,8 @@ idpf-y := \
+ 	idpf_ethtool.o		\
+ 	idpf_lib.o		\
+ 	idpf_main.o		\
+-	idpf_singleq_txrx.o	\
+ 	idpf_txrx.o		\
+ 	idpf_virtchnl.o 	\
+ 	idpf_vf_dev.o
++
++idpf-$(CONFIG_IDPF_SINGLEQ)	+= idpf_singleq_txrx.o
+diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+index f9e43d171f17..5d9529f5b41b 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf.h
++++ b/drivers/net/ethernet/intel/idpf/idpf.h
+@@ -599,7 +599,8 @@ struct idpf_adapter {
   */
--static netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
--					 struct idpf_tx_queue *tx_q)
-+netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
-+				  struct idpf_tx_queue *tx_q)
+ static inline int idpf_is_queue_model_split(u16 q_model)
  {
- 	struct idpf_tx_offload_params offload = { };
- 	struct idpf_tx_buf *first;
-@@ -408,33 +408,6 @@ static netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
- 	return idpf_tx_drop_skb(tx_q, skb);
+-	return q_model == VIRTCHNL2_QUEUE_MODEL_SPLIT;
++	return !IS_ENABLED(CONFIG_IDPF_SINGLEQ) ||
++	       q_model == VIRTCHNL2_QUEUE_MODEL_SPLIT;
  }
  
--/**
-- * idpf_tx_singleq_start - Selects the right Tx queue to send buffer
-- * @skb: send buffer
-- * @netdev: network interface device structure
-- *
-- * Returns NETDEV_TX_OK if sent, else an error code
-- */
--netdev_tx_t idpf_tx_singleq_start(struct sk_buff *skb,
--				  struct net_device *netdev)
--{
--	struct idpf_vport *vport = idpf_netdev_to_vport(netdev);
--	struct idpf_tx_queue *tx_q;
--
--	tx_q = vport->txqs[skb_get_queue_mapping(skb)];
--
--	/* hardware can't handle really short frames, hardware padding works
--	 * beyond this point
--	 */
--	if (skb_put_padto(skb, IDPF_TX_MIN_PKT_LEN)) {
--		idpf_tx_buf_hw_update(tx_q, tx_q->next_to_use, false);
--
--		return NETDEV_TX_OK;
--	}
--
--	return idpf_tx_singleq_frame(skb, tx_q);
--}
--
- /**
-  * idpf_tx_singleq_clean - Reclaim resources from queue
-  * @tx_q: Tx queue to clean
+ #define idpf_is_cap_ena(adapter, field, flag) \
 diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 500754795cc8..4aa5ee781bd7 100644
+index 4aa5ee781bd7..2bc1a5a0b50f 100644
 --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
 +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -2849,14 +2849,13 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
- }
- 
- /**
-- * idpf_tx_splitq_start - Selects the right Tx queue to send buffer
-+ * idpf_tx_start - Selects the right Tx queue to send buffer
-  * @skb: send buffer
-  * @netdev: network interface device structure
-  *
-  * Returns NETDEV_TX_OK if sent, else an error code
-  */
--netdev_tx_t idpf_tx_splitq_start(struct sk_buff *skb,
--				 struct net_device *netdev)
-+netdev_tx_t idpf_tx_start(struct sk_buff *skb, struct net_device *netdev)
+@@ -1306,7 +1306,7 @@ static void idpf_vport_calc_numq_per_grp(struct idpf_vport *vport,
+ static void idpf_rxq_set_descids(const struct idpf_vport *vport,
+ 				 struct idpf_rx_queue *q)
  {
- 	struct idpf_vport *vport = idpf_netdev_to_vport(netdev);
- 	struct idpf_tx_queue *tx_q;
-@@ -2878,7 +2877,10 @@ netdev_tx_t idpf_tx_splitq_start(struct sk_buff *skb,
- 		return NETDEV_TX_OK;
+-	if (vport->rxq_model == VIRTCHNL2_QUEUE_MODEL_SPLIT) {
++	if (idpf_is_queue_model_split(vport->rxq_model)) {
+ 		q->rxdids = VIRTCHNL2_RXDID_2_FLEX_SPLITQ_M;
+ 	} else {
+ 		if (vport->base_rxd)
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+index 44602b87cd41..d1705fcb701a 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+@@ -1256,12 +1256,12 @@ int idpf_send_create_vport_msg(struct idpf_adapter *adapter,
+ 	vport_msg->vport_type = cpu_to_le16(VIRTCHNL2_VPORT_TYPE_DEFAULT);
+ 	vport_msg->vport_index = cpu_to_le16(idx);
+ 
+-	if (adapter->req_tx_splitq)
++	if (adapter->req_tx_splitq || !IS_ENABLED(CONFIG_IDPF_SINGLEQ))
+ 		vport_msg->txq_model = cpu_to_le16(VIRTCHNL2_QUEUE_MODEL_SPLIT);
+ 	else
+ 		vport_msg->txq_model = cpu_to_le16(VIRTCHNL2_QUEUE_MODEL_SINGLE);
+ 
+-	if (adapter->req_rx_splitq)
++	if (adapter->req_rx_splitq || !IS_ENABLED(CONFIG_IDPF_SINGLEQ))
+ 		vport_msg->rxq_model = cpu_to_le16(VIRTCHNL2_QUEUE_MODEL_SPLIT);
+ 	else
+ 		vport_msg->rxq_model = cpu_to_le16(VIRTCHNL2_QUEUE_MODEL_SINGLE);
+@@ -1323,10 +1323,17 @@ int idpf_check_supported_desc_ids(struct idpf_vport *vport)
+ 
+ 	vport_msg = adapter->vport_params_recvd[vport->idx];
+ 
++	if (!IS_ENABLED(CONFIG_IDPF_SINGLEQ) &&
++	    (vport_msg->rxq_model == VIRTCHNL2_QUEUE_MODEL_SINGLE ||
++	     vport_msg->txq_model == VIRTCHNL2_QUEUE_MODEL_SINGLE)) {
++		dev_err(&adapter->pdev->dev, "singleq mode requested, but not compiled-in\n");
++		return -EOPNOTSUPP;
++	}
++
+ 	rx_desc_ids = le64_to_cpu(vport_msg->rx_desc_ids);
+ 	tx_desc_ids = le64_to_cpu(vport_msg->tx_desc_ids);
+ 
+-	if (vport->rxq_model == VIRTCHNL2_QUEUE_MODEL_SPLIT) {
++	if (idpf_is_queue_model_split(vport->rxq_model)) {
+ 		if (!(rx_desc_ids & VIRTCHNL2_RXDID_2_FLEX_SPLITQ_M)) {
+ 			dev_info(&adapter->pdev->dev, "Minimum RX descriptor support not provided, using the default\n");
+ 			vport_msg->rx_desc_ids = cpu_to_le64(VIRTCHNL2_RXDID_2_FLEX_SPLITQ_M);
+@@ -1336,7 +1343,7 @@ int idpf_check_supported_desc_ids(struct idpf_vport *vport)
+ 			vport->base_rxd = true;
  	}
  
--	return idpf_tx_splitq_frame(skb, tx_q);
-+	if (idpf_is_queue_model_split(vport->txq_model))
-+		return idpf_tx_splitq_frame(skb, tx_q);
-+	else
-+		return idpf_tx_singleq_frame(skb, tx_q);
- }
+-	if (vport->txq_model != VIRTCHNL2_QUEUE_MODEL_SPLIT)
++	if (!idpf_is_queue_model_split(vport->txq_model))
+ 		return 0;
  
- /**
+ 	if ((tx_desc_ids & MIN_SUPPORT_TXDID) != MIN_SUPPORT_TXDID) {
 -- 
 2.45.0
 
