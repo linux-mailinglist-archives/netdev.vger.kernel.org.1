@@ -1,650 +1,355 @@
-Return-Path: <netdev+bounces-95381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A513C8C2163
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:57:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 102A78C216B
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 11:58:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0715B2111B
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 09:57:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 338D51C20C4C
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 09:58:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24185165FDB;
-	Fri, 10 May 2024 09:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB57516D336;
+	Fri, 10 May 2024 09:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="ZbdO6lBq"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="d3U6fg+B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout2.routing.net (mxout2.routing.net [134.0.28.12])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E9C16191A;
-	Fri, 10 May 2024 09:57:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C52168AFF;
+	Fri, 10 May 2024 09:57:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715335041; cv=none; b=YIC7pQlrLvDl1gP3T0weAioBPmI+7ec/uxy1mpRBQc6hVYMaPAxfxlLKvF9wAwEjTTB762kGgbqX36zQ2oyyPu+rdJMSV9DngD61Z2rIU0E1iQzMPtJ5/jm0IGY0bjY0/R4yruAartjJiXU14CBR+RK7m1bMYkNV0RLomXlR1/I=
+	t=1715335045; cv=none; b=GAeCZD98+MBo6EnH5rNvVELSte/pNwuy+EchE2vHmWBdRnZfKocicki61iLe8CwdRDzkRqSRA0etkaDlxdE+eb0XjdngUcijzlmC24FCD3I3UCkjK+PQyYWIk6R10Fx0gOUK0QJnXqdI22bF5zE/LuRuxgMllwd8qW0Tdb/MFSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715335041; c=relaxed/simple;
-	bh=V0fw8r6PrsLWBNK4clPjUIssodzhlImrfqIH6z+mOFs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Jf1oFrq2QJvnv2WfsB5w3NeBrTb4yXblmKxxmCNJ/h6VE/72RwwC83HbsKWoQ7yB4VkSBbsyioJxzhMG4hoWUBUag179TQtG810rxEJ2/32KZoYKoYZanXI4VoKkcvop0GH7Brxek25hFo5jEeaTie9+UstmhXqgLQ9nMTmyZp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=ZbdO6lBq; arc=none smtp.client-ip=134.0.28.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbox1.masterlogin.de (unknown [192.168.10.88])
-	by mxout2.routing.net (Postfix) with ESMTP id 1AD8E607A4;
-	Fri, 10 May 2024 09:57:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1715335036;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=t8/gmOR1y3YOa6vERAr0Ghxv411o1HHdllaU0e9hTYw=;
-	b=ZbdO6lBq+btPjAnlsKwLOTtJjNJbXFPcaxauTBaovPaEZ/7mwl14hnZfeQdZF9Zi+Fa+pU
-	B/xYGBTTMVHkeCscijoJDis04hIC6iMPo/BHD2D9CE9uvUxos3QtZosJU/hiwGq+pxTncr
-	q0lEUGGJ+t5WeM7tDUYy6NizyIxRQXk=
-Received: from frank-G5.. (fttx-pool-217.61.152.152.bambit.de [217.61.152.152])
-	by mxbox1.masterlogin.de (Postfix) with ESMTPSA id 145F840029;
-	Fri, 10 May 2024 09:57:15 +0000 (UTC)
-From: Frank Wunderlich <linux@fw-web.de>
-To: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>,
-	Lee Jones <lee@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	Eric Woudstra <ericwouds@gmail.com>,
-	Tianling Shen <cnsztl@immortalwrt.org>,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-clk@vger.kernel.org,
-	linux-leds@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Tianling Shen <cnsztl@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: [PATCH v3 2/2] arm64: dts: mediatek: Add  mt7986 based Bananapi R3 Mini
-Date: Fri, 10 May 2024 11:57:07 +0200
-Message-Id: <20240510095707.6895-3-linux@fw-web.de>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240510095707.6895-1-linux@fw-web.de>
-References: <20240510095707.6895-1-linux@fw-web.de>
+	s=arc-20240116; t=1715335045; c=relaxed/simple;
+	bh=pqQhuZcLAhL6g3xS2gRR+0YT6OXbTzG1VHx/TH+XisU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ueKft122KvkvJ5m4s19Qtkzl+NCDr+Gr5qfp9lylPXaXcaKKagimt2xJkfP0As839d3bgNtWnKVCzEeH3ocCdQWSIJglN6jUEV1ijqtiLm4EgayCi6S71klT16UVhTrZ+mAV+oHcWCx2vxPoxtXkUUqPbmAo07lggCAJ7/da/WM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=d3U6fg+B; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1715335034; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=fL90hMK711UP6AaoMonHpAiF1eq80zVmme3zYnXRgIQ=;
+	b=d3U6fg+BTM3WsEgK/xOo7ndNiW1VJGY3pV4NuF601D0TLGuAS+NS+dFLTRysdCTAPb7tBu2S1CesewZDDkkrzr9NMXzIfj7pAY4Gwr5ZzMnt6wz0wj/3g6SSF/w30o5ku1269UBtLYtU7yIuzw9kg6NTxFLrpsEXTVGegNq24Zo=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067113;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W69y5ZQ_1715335031;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0W69y5ZQ_1715335031)
+          by smtp.aliyun-inc.com;
+          Fri, 10 May 2024 17:57:13 +0800
+Date: Fri, 10 May 2024 17:57:11 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+	tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+Subject: Re: [PATCH net-next 2/2] net/smc: Introduce IPPROTO_SMC
+Message-ID: <20240510095711.GB78725@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <1715314333-107290-1-git-send-email-alibuda@linux.alibaba.com>
+ <1715314333-107290-3-git-send-email-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Mail-ID: 9bb5b8e8-2994-42bd-8623-8605ad83aa3d
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1715314333-107290-3-git-send-email-alibuda@linux.alibaba.com>
 
-From: Frank Wunderlich <frank-w@public-files.de>
+On 2024-05-10 12:12:13, D. Wythe wrote:
+>From: "D. Wythe" <alibuda@linux.alibaba.com>
+>
+>This patch allows to create smc socket via AF_INET,
+>similar to the following code,
+>
+>/* create v4 smc sock */
+>v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
+>
+>/* create v6 smc sock */
+>v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
+>
+>There are several reasons why we believe it is appropriate here:
+>
+>1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
+>address. There is no AF_SMC address at all.
+>
+>2. Create smc socket in the AF_INET(6) path, which allows us to reuse
+>the infrastructure of AF_INET(6) path, such as common ebpf hooks.
+>Otherwise, smc have to implement it again in AF_SMC path.
+>
+>Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>---
+> include/uapi/linux/in.h |   2 +
+> net/smc/af_smc.c        | 129 +++++++++++++++++++++++++++++++++++++++++++++++-
+> net/smc/inet_smc.h      |  32 ++++++++++++
+> 3 files changed, 162 insertions(+), 1 deletion(-)
+> create mode 100644 net/smc/inet_smc.h
+>
+>diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
+>index e682ab6..74c12e33 100644
+>--- a/include/uapi/linux/in.h
+>+++ b/include/uapi/linux/in.h
+>@@ -83,6 +83,8 @@ enum {
+> #define IPPROTO_RAW		IPPROTO_RAW
+>   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
+> #define IPPROTO_MPTCP		IPPROTO_MPTCP
+>+  IPPROTO_SMC = 263,		/* Shared Memory Communications */
+                                                           ^ use tab to align here
+>+#define IPPROTO_SMC		IPPROTO_SMC
+>   IPPROTO_MAX
+> };
+> #endif
+>diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>index 1f03724..b4557828 100644
+>--- a/net/smc/af_smc.c
+>+++ b/net/smc/af_smc.c
+>@@ -54,6 +54,7 @@
+> #include "smc_tracepoint.h"
+> #include "smc_sysctl.h"
+> #include "smc_loopback.h"
+>+#include "inet_smc.h"
+> 
+> static DEFINE_MUTEX(smc_server_lgr_pending);	/* serialize link group
+> 						 * creation on server
+>@@ -3402,6 +3403,16 @@ static int smc_create(struct net *net, struct socket *sock, int protocol,
+> 	.create	= smc_create,
+> };
+> 
 
-Add devicetree for Bananapi R3 Mini SBC.
+Why not put those whole bunch of inet staff into smc_inet.c ?
+Looks like your smc_inet.h is meanless without smc_inet.c
 
-Key features:
-- MediaTek MT7986A(Filogic 830) Quad core ARM Cortex A53
-- Wifi 6 2.4G/5G (MT7976C)
-- 2G DDR RAM
-- 8G eMMC flash
-- 128MB Nand flash
-- 2x 2.5GbE network port
-- 1x M.2 Key B USB interface
-- 1x M.2 KEY M PCIe interface
-- 1x USB2.0 interface
+>+int smc_inet_init_sock(struct sock *sk)
+>+{
+>+	struct net *net = sock_net(sk);
+>+
+>+	/* init common smc sock */
+>+	smc_sock_init(net, sk, IPPROTO_SMC);
+>+	/* create clcsock */
+>+	return __smc_create_clcsk(net, sk, sk->sk_family);
+>+}
+>+
+> static int smc_ulp_init(struct sock *sk)
+> {
+> 	struct socket *tcp = sk->sk_socket;
+>@@ -3460,6 +3471,90 @@ static void smc_ulp_clone(const struct request_sock *req, struct sock *newsk,
+> 	.clone		= smc_ulp_clone,
+> };
+> 
+>+struct proto smc_inet_prot = {
+>+	.name			= "INET_SMC",
+>+	.owner			= THIS_MODULE,
+>+	.init			= smc_inet_init_sock,
+>+	.hash			= smc_hash_sk,
+>+	.unhash			= smc_unhash_sk,
+>+	.release_cb		= smc_release_cb,
+>+	.obj_size		= sizeof(struct smc_sock),
+>+	.h.smc_hash	= &smc_v4_hashinfo,
+>+	.slab_flags	= SLAB_TYPESAFE_BY_RCU,
+                ^
+Align please.
 
-source: https://wiki.banana-pi.org/Banana_Pi_BPI-R3_Mini
 
-Co-developed-by: Eric Woudstra <ericwouds@gmail.com>
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-Co-developed-by: Tianling Shen <cnsztl@gmail.com>
-Signed-off-by: Tianling Shen <cnsztl@gmail.com>
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-Reviewed-by: Daniel Golle <daniel@makrotopia.org>
----
-v3:
-- changed unicode parentheses in commit description
-- added reviewed by
+>+};
+>+
+>+const struct proto_ops smc_inet_stream_ops = {
+>+	.family		= PF_INET,
+>+	.owner		= THIS_MODULE,
+>+	.release	= smc_release,
+>+	.bind		= smc_bind,
+>+	.connect	= smc_connect,
+>+	.socketpair	= sock_no_socketpair,
+>+	.accept		= smc_accept,
+>+	.getname	= smc_getname,
+>+	.poll		= smc_poll,
+>+	.ioctl		= smc_ioctl,
+>+	.listen		= smc_listen,
+>+	.shutdown	= smc_shutdown,
+>+	.setsockopt	= smc_setsockopt,
+>+	.getsockopt	= smc_getsockopt,
+>+	.sendmsg	= smc_sendmsg,
+>+	.recvmsg	= smc_recvmsg,
+>+	.mmap		= sock_no_mmap,
+>+	.splice_read	= smc_splice_read,
 
-v2:
-- add missing node for nand
-- add some information about the board in description
+Ditto
 
-change dts based on review from angelo+krzysztof
+>+};
+>+
+>+struct inet_protosw smc_inet_protosw = {
+>+	.type       = SOCK_STREAM,
+>+	.protocol   = IPPROTO_SMC,
+>+	.prot   = &smc_inet_prot,
+Ditto
 
-- drop fan status
-- rename phy14 to phy0 and phy15 to phy1
-- drop default-trigger from phys and so also the binding-patch
-- use regulator names based on regexp regulator-[0-9]+v[0-9]+
-- add comment for pwm
----
- arch/arm64/boot/dts/mediatek/Makefile         |   1 +
- .../mediatek/mt7986a-bananapi-bpi-r3-mini.dts | 493 ++++++++++++++++++
- 2 files changed, 494 insertions(+)
- create mode 100644 arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts
+>+	.ops    = &smc_inet_stream_ops,
+>+	.flags  = INET_PROTOSW_ICSK,
+>+};
+>+
+>+#if IS_ENABLED(CONFIG_IPV6)
+>+struct proto smc_inet6_prot = {
+>+	.name			= "INET6_SMC",
+>+	.owner			= THIS_MODULE,
+>+	.init			= smc_inet_init_sock,
+>+	.hash			= smc_hash_sk,
+>+	.unhash			= smc_unhash_sk,
+>+	.release_cb		= smc_release_cb,
+>+	.obj_size		= sizeof(struct smc_sock),
+>+	.h.smc_hash		= &smc_v6_hashinfo,
+>+	.slab_flags		= SLAB_TYPESAFE_BY_RCU,
+>+};
+>+
+>+const struct proto_ops smc_inet6_stream_ops = {
+>+	.family		= PF_INET6,
+>+	.owner		= THIS_MODULE,
+>+	.release	= smc_release,
+>+	.bind		= smc_bind,
+>+	.connect	= smc_connect,
+>+	.socketpair	= sock_no_socketpair,
+>+	.accept		= smc_accept,
+>+	.getname	= smc_getname,
+>+	.poll		= smc_poll,
+>+	.ioctl		= smc_ioctl,
+>+	.listen		= smc_listen,
+>+	.shutdown	= smc_shutdown,
+>+	.setsockopt	= smc_setsockopt,
+>+	.getsockopt	= smc_getsockopt,
+>+	.sendmsg	= smc_sendmsg,
+>+	.recvmsg	= smc_recvmsg,
+>+	.mmap		= sock_no_mmap,
+>+	.splice_read	= smc_splice_read,
+Ditto
 
-diff --git a/arch/arm64/boot/dts/mediatek/Makefile b/arch/arm64/boot/dts/mediatek/Makefile
-index 37b4ca3a87c9..1763b001ab06 100644
---- a/arch/arm64/boot/dts/mediatek/Makefile
-+++ b/arch/arm64/boot/dts/mediatek/Makefile
-@@ -11,6 +11,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += mt7622-bananapi-bpi-r64.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7981b-xiaomi-ax3000t.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-acelink-ew-7886cax.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3.dtb
-+dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3-mini.dtb
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3-emmc.dtbo
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3-nand.dtbo
- dtb-$(CONFIG_ARCH_MEDIATEK) += mt7986a-bananapi-bpi-r3-nor.dtbo
-diff --git a/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts b/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts
-new file mode 100644
-index 000000000000..e2a2fea7adf0
---- /dev/null
-+++ b/arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3-mini.dts
-@@ -0,0 +1,493 @@
-+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
-+/*
-+ * Copyright (C) 2021 MediaTek Inc.
-+ * Authors: Frank Wunderlich <frank-w@public-files.de>
-+ *          Eric Woudstra <ericwouds@gmail.com>
-+ *          Tianling Shen <cnsztl@immortalwrt.org>
-+ */
-+
-+/dts-v1/;
-+
-+#include <dt-bindings/gpio/gpio.h>
-+#include <dt-bindings/input/input.h>
-+#include <dt-bindings/leds/common.h>
-+#include <dt-bindings/pinctrl/mt65xx.h>
-+
-+#include "mt7986a.dtsi"
-+
-+/ {
-+	model = "Bananapi BPI-R3 Mini";
-+	chassis-type = "embedded";
-+	compatible = "bananapi,bpi-r3mini", "mediatek,mt7986a";
-+
-+	aliases {
-+		serial0 = &uart0;
-+		ethernet0 = &gmac0;
-+		ethernet1 = &gmac1;
-+	};
-+
-+	chosen {
-+		stdout-path = "serial0:115200n8";
-+	};
-+
-+	dcin: regulator-12v {
-+		compatible = "regulator-fixed";
-+		regulator-name = "12vd";
-+		regulator-min-microvolt = <12000000>;
-+		regulator-max-microvolt = <12000000>;
-+		regulator-boot-on;
-+		regulator-always-on;
-+	};
-+
-+	fan: pwm-fan {
-+		compatible = "pwm-fan";
-+		#cooling-cells = <2>;
-+		/*
-+		 * The signal is inverted on this board and the PWM driver
-+		 * does not support polarity inversion.
-+		 */
-+		/* cooling level (0, 1, 2) */
-+		cooling-levels = <255 96 0>;
-+		pwms = <&pwm 0 10000>;
-+	};
-+
-+	reg_1p8v: regulator-1v8 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "1.8vd";
-+		regulator-min-microvolt = <1800000>;
-+		regulator-max-microvolt = <1800000>;
-+		regulator-boot-on;
-+		regulator-always-on;
-+		vin-supply = <&dcin>;
-+	};
-+
-+	reg_3p3v: regulator-3v3 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "3.3vd";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		regulator-boot-on;
-+		regulator-always-on;
-+		vin-supply = <&dcin>;
-+	};
-+
-+	usb_vbus: regulator-5v {
-+		compatible = "regulator-fixed";
-+		regulator-name = "usb_vbus";
-+		regulator-min-microvolt = <5000000>;
-+		regulator-max-microvolt = <5000000>;
-+		gpios = <&pio 20 GPIO_ACTIVE_LOW>;
-+		regulator-boot-on;
-+	};
-+
-+	en8811_a: regulator-phy1 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "phy1";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		gpio = <&pio 16 GPIO_ACTIVE_LOW>;
-+		regulator-always-on;
-+	};
-+
-+	en8811_b: regulator-phy2 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "phy2";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		gpio = <&pio 17 GPIO_ACTIVE_LOW>;
-+		regulator-always-on;
-+	};
-+
-+	leds {
-+		compatible = "gpio-leds";
-+
-+		green_led: led-0 {
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_POWER;
-+			gpios = <&pio 19 GPIO_ACTIVE_HIGH>;
-+			default-state = "on";
-+		};
-+	};
-+
-+	gpio-keys {
-+		compatible = "gpio-keys";
-+
-+		reset-key {
-+			label = "reset";
-+			linux,code = <KEY_RESTART>;
-+			gpios = <&pio 7 GPIO_ACTIVE_LOW>;
-+		};
-+	};
-+
-+};
-+
-+&cpu_thermal {
-+	cooling-maps {
-+		map0 {
-+			/* active: set fan to cooling level 2 */
-+			cooling-device = <&fan 2 2>;
-+			trip = <&cpu_trip_active_high>;
-+		};
-+
-+		map1 {
-+			/* active: set fan to cooling level 1 */
-+			cooling-device = <&fan 1 1>;
-+			trip = <&cpu_trip_active_med>;
-+		};
-+
-+		map2 {
-+			/* active: set fan to cooling level 0 */
-+			cooling-device = <&fan 0 0>;
-+			trip = <&cpu_trip_active_low>;
-+		};
-+	};
-+};
-+
-+&crypto {
-+	status = "okay";
-+};
-+
-+&eth {
-+	status = "okay";
-+
-+	gmac0: mac@0 {
-+		compatible = "mediatek,eth-mac";
-+		reg = <0>;
-+		phy-mode = "2500base-x";
-+		phy-handle = <&phy0>;
-+	};
-+
-+	gmac1: mac@1 {
-+		compatible = "mediatek,eth-mac";
-+		reg = <1>;
-+		phy-mode = "2500base-x";
-+		phy-handle = <&phy1>;
-+	};
-+
-+	mdio: mdio-bus {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+	};
-+};
-+
-+&mmc0 {
-+	pinctrl-names = "default", "state_uhs";
-+	pinctrl-0 = <&mmc0_pins_default>;
-+	pinctrl-1 = <&mmc0_pins_uhs>;
-+	vmmc-supply = <&reg_3p3v>;
-+	vqmmc-supply = <&reg_1p8v>;
-+};
-+
-+
-+&i2c0 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&i2c_pins>;
-+	status = "okay";
-+
-+	/* MAC Address EEPROM */
-+	eeprom@50 {
-+		compatible = "atmel,24c02";
-+		reg = <0x50>;
-+
-+		address-width = <8>;
-+		pagesize = <8>;
-+		size = <256>;
-+	};
-+};
-+
-+&mdio {
-+	phy0: ethernet-phy@14 {
-+		reg = <14>;
-+		interrupts-extended = <&pio 48 IRQ_TYPE_EDGE_FALLING>;
-+		reset-gpios = <&pio 49 GPIO_ACTIVE_LOW>;
-+		reset-assert-us = <10000>;
-+		reset-deassert-us = <20000>;
-+		phy-mode = "2500base-x";
-+		full-duplex;
-+		pause;
-+		airoha,pnswap-rx;
-+
-+		leds {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+
-+			led@0 { /* en8811_a_gpio5 */
-+				reg = <0>;
-+				color = <LED_COLOR_ID_YELLOW>;
-+				function = LED_FUNCTION_LAN;
-+				function-enumerator = <1>;
-+				default-state = "keep";
-+			};
-+			led@1 { /* en8811_a_gpio4 */
-+				reg = <1>;
-+				color = <LED_COLOR_ID_GREEN>;
-+				function = LED_FUNCTION_LAN;
-+				function-enumerator = <2>;
-+				default-state = "keep";
-+			};
-+		};
-+	};
-+
-+	phy1: ethernet-phy@15 {
-+		reg = <15>;
-+		interrupts-extended = <&pio 46 IRQ_TYPE_EDGE_FALLING>;
-+		reset-gpios = <&pio 47 GPIO_ACTIVE_LOW>;
-+		reset-assert-us = <10000>;
-+		reset-deassert-us = <20000>;
-+		phy-mode = "2500base-x";
-+		full-duplex;
-+		pause;
-+		airoha,pnswap-rx;
-+
-+		leds {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+
-+			led@0 { /* en8811_b_gpio5 */
-+				reg = <0>;
-+				color = <LED_COLOR_ID_YELLOW>;
-+				function = LED_FUNCTION_WAN;
-+				function-enumerator = <1>;
-+				default-state = "keep";
-+			};
-+			led@1 { /* en8811_b_gpio4 */
-+				reg = <1>;
-+				color = <LED_COLOR_ID_GREEN>;
-+				function = LED_FUNCTION_WAN;
-+				function-enumerator = <2>;
-+				default-state = "keep";
-+			};
-+		};
-+	};
-+};
-+
-+&pcie {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pcie_pins>;
-+	status = "okay";
-+};
-+
-+&pcie_phy {
-+	status = "okay";
-+};
-+
-+&pio {
-+	i2c_pins: i2c-pins {
-+		mux {
-+			function = "i2c";
-+			groups = "i2c";
-+		};
-+	};
-+
-+	mmc0_pins_default: mmc0-pins {
-+		mux {
-+			function = "emmc";
-+			groups = "emmc_51";
-+		};
-+		conf-cmd-dat {
-+			pins = "EMMC_DATA_0", "EMMC_DATA_1", "EMMC_DATA_2",
-+			       "EMMC_DATA_3", "EMMC_DATA_4", "EMMC_DATA_5",
-+			       "EMMC_DATA_6", "EMMC_DATA_7", "EMMC_CMD";
-+			input-enable;
-+			drive-strength = <4>;
-+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>; /* pull-up 10K */
-+		};
-+		conf-clk {
-+			pins = "EMMC_CK";
-+			drive-strength = <6>;
-+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>; /* pull-down 50K */
-+		};
-+		conf-ds {
-+			pins = "EMMC_DSL";
-+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>; /* pull-down 50K */
-+		};
-+		conf-rst {
-+			pins = "EMMC_RSTB";
-+			drive-strength = <4>;
-+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>; /* pull-up 10K */
-+		};
-+	};
-+
-+	mmc0_pins_uhs: mmc0-uhs-pins {
-+		mux {
-+			function = "emmc";
-+			groups = "emmc_51";
-+		};
-+		conf-cmd-dat {
-+			pins = "EMMC_DATA_0", "EMMC_DATA_1", "EMMC_DATA_2",
-+			       "EMMC_DATA_3", "EMMC_DATA_4", "EMMC_DATA_5",
-+			       "EMMC_DATA_6", "EMMC_DATA_7", "EMMC_CMD";
-+			input-enable;
-+			drive-strength = <4>;
-+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>; /* pull-up 10K */
-+		};
-+		conf-clk {
-+			pins = "EMMC_CK";
-+			drive-strength = <6>;
-+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>; /* pull-down 50K */
-+		};
-+		conf-ds {
-+			pins = "EMMC_DSL";
-+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>; /* pull-down 50K */
-+		};
-+		conf-rst {
-+			pins = "EMMC_RSTB";
-+			drive-strength = <4>;
-+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>; /* pull-up 10K */
-+		};
-+	};
-+
-+	pcie_pins: pcie-pins {
-+		mux {
-+			function = "pcie";
-+			groups = "pcie_clk", "pcie_wake", "pcie_pereset";
-+		};
-+	};
-+
-+	pwm_pins: pwm-pins {
-+		mux {
-+			function = "pwm";
-+			groups = "pwm0";
-+		};
-+	};
-+
-+	spi_flash_pins: spi-flash-pins {
-+		mux {
-+			function = "spi";
-+			groups = "spi0", "spi0_wp_hold";
-+		};
-+	};
-+
-+	usb_ngff_pins: usb-ngff-pins {
-+		ngff-gnss-off-conf {
-+			pins = "GPIO_6";
-+			drive-strength = <8>;
-+			mediatek,pull-up-adv = <1>;
-+		};
-+		ngff-pe-rst-conf {
-+			pins = "GPIO_7";
-+			drive-strength = <8>;
-+			mediatek,pull-up-adv = <1>;
-+		};
-+		ngff-wwan-off-conf {
-+			pins = "GPIO_8";
-+			drive-strength = <8>;
-+			mediatek,pull-up-adv = <1>;
-+		};
-+		ngff-pwr-off-conf {
-+			pins = "GPIO_9";
-+			drive-strength = <8>;
-+			mediatek,pull-up-adv = <1>;
-+		};
-+		ngff-rst-conf {
-+			pins = "GPIO_10";
-+			drive-strength = <8>;
-+			mediatek,pull-up-adv = <1>;
-+		};
-+		ngff-coex-conf {
-+			pins = "SPI1_CS";
-+			drive-strength = <8>;
-+			mediatek,pull-up-adv = <1>;
-+		};
-+	};
-+
-+	wf_2g_5g_pins: wf-2g-5g-pins {
-+		mux {
-+			function = "wifi";
-+			groups = "wf_2g", "wf_5g";
-+		};
-+		conf {
-+			pins = "WF0_HB1", "WF0_HB2", "WF0_HB3", "WF0_HB4",
-+			       "WF0_HB0", "WF0_HB0_B", "WF0_HB5", "WF0_HB6",
-+			       "WF0_HB7", "WF0_HB8", "WF0_HB9", "WF0_HB10",
-+			       "WF0_TOP_CLK", "WF0_TOP_DATA", "WF1_HB1",
-+			       "WF1_HB2", "WF1_HB3", "WF1_HB4", "WF1_HB0",
-+			       "WF1_HB5", "WF1_HB6", "WF1_HB7", "WF1_HB8",
-+			       "WF1_TOP_CLK", "WF1_TOP_DATA";
-+			drive-strength = <4>;
-+		};
-+	};
-+
-+	wf_dbdc_pins: wf-dbdc-pins {
-+		mux {
-+			function = "wifi";
-+			groups = "wf_dbdc";
-+		};
-+		conf {
-+			pins = "WF0_HB1", "WF0_HB2", "WF0_HB3", "WF0_HB4",
-+			       "WF0_HB0", "WF0_HB0_B", "WF0_HB5", "WF0_HB6",
-+			       "WF0_HB7", "WF0_HB8", "WF0_HB9", "WF0_HB10",
-+			       "WF0_TOP_CLK", "WF0_TOP_DATA", "WF1_HB1",
-+			       "WF1_HB2", "WF1_HB3", "WF1_HB4", "WF1_HB0",
-+			       "WF1_HB5", "WF1_HB6", "WF1_HB7", "WF1_HB8",
-+			       "WF1_TOP_CLK", "WF1_TOP_DATA";
-+			drive-strength = <4>;
-+		};
-+	};
-+
-+	wf_led_pins: wf-led-pins {
-+		mux {
-+			function = "led";
-+			groups = "wifi_led";
-+		};
-+	};
-+};
-+
-+&pwm {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pwm_pins>;
-+	status = "okay";
-+};
-+
-+&spi0 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&spi_flash_pins>;
-+	status = "okay";
-+
-+	flash@0 {
-+		compatible = "spi-nand";
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+		reg = <0>;
-+
-+		spi-max-frequency = <20000000>;
-+		spi-tx-bus-width = <4>;
-+		spi-rx-bus-width = <4>;
-+	};
-+};
-+
-+&ssusb {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&usb_ngff_pins>;
-+	vusb33-supply = <&reg_3p3v>;
-+	vbus-supply = <&usb_vbus>;
-+	status = "okay";
-+};
-+
-+&trng {
-+	status = "okay";
-+};
-+
-+&uart0 {
-+	status = "okay";
-+};
-+
-+&usb_phy {
-+	status = "okay";
-+};
-+
-+&watchdog {
-+	status = "okay";
-+};
-+
-+&wifi {
-+	status = "okay";
-+	pinctrl-names = "default", "dbdc";
-+	pinctrl-0 = <&wf_2g_5g_pins>, <&wf_led_pins>;
-+	pinctrl-1 = <&wf_dbdc_pins>, <&wf_led_pins>;
-+
-+	led {
-+		led-active-low;
-+	};
-+};
-+
--- 
-2.34.1
+>+};
+>+
+>+struct inet_protosw smc_inet6_protosw = {
+>+	.type       = SOCK_STREAM,
+>+	.protocol   = IPPROTO_SMC,
+>+	.prot   = &smc_inet6_prot,
+>+	.ops    = &smc_inet6_stream_ops,
+>+	.flags  = INET_PROTOSW_ICSK,
+Ditto
 
+>+};
+>+#endif
+>+
+> unsigned int smc_net_id;
+> 
+> static __net_init int smc_net_init(struct net *net)
+>@@ -3595,9 +3690,28 @@ static int __init smc_init(void)
+> 		goto out_lo;
+> 	}
+> 
+>+	rc = proto_register(&smc_inet_prot, 1);
+>+	if (rc) {
+>+		pr_err("%s: proto_register smc_inet_prot fails with %d\n", __func__, rc);
+>+		goto out_ulp;
+>+	}
+>+	inet_register_protosw(&smc_inet_protosw);
+>+#if IS_ENABLED(CONFIG_IPV6)
+>+	rc = proto_register(&smc_inet6_prot, 1);
+>+	if (rc) {
+>+		pr_err("%s: proto_register smc_inet6_prot fails with %d\n", __func__, rc);
+>+		goto out_inet_prot;
+>+	}
+>+	inet6_register_protosw(&smc_inet6_protosw);
+>+#endif
+>+
+> 	static_branch_enable(&tcp_have_smc);
+> 	return 0;
+>-
+>+out_inet_prot:
+>+	inet_unregister_protosw(&smc_inet_protosw);
+>+	proto_unregister(&smc_inet_prot);
+>+out_ulp:
+>+	tcp_unregister_ulp(&smc_ulp_ops);
+> out_lo:
+> 	smc_loopback_exit();
+> out_ib:
+>@@ -3634,6 +3748,10 @@ static int __init smc_init(void)
+> static void __exit smc_exit(void)
+> {
+> 	static_branch_disable(&tcp_have_smc);
+>+	inet_unregister_protosw(&smc_inet_protosw);
+>+#if IS_ENABLED(CONFIG_IPV6)
+>+	inet6_unregister_protosw(&smc_inet6_protosw);
+>+#endif
+> 	tcp_unregister_ulp(&smc_ulp_ops);
+> 	sock_unregister(PF_SMC);
+> 	smc_core_exit();
+>@@ -3645,6 +3763,10 @@ static void __exit smc_exit(void)
+> 	destroy_workqueue(smc_hs_wq);
+> 	proto_unregister(&smc_proto6);
+> 	proto_unregister(&smc_proto);
+>+	proto_unregister(&smc_inet_prot);
+>+#if IS_ENABLED(CONFIG_IPV6)
+>+	proto_unregister(&smc_inet6_prot);
+>+#endif
+> 	smc_pnet_exit();
+> 	smc_nl_exit();
+> 	smc_clc_exit();
+>@@ -3661,4 +3783,9 @@ static void __exit smc_exit(void)
+> MODULE_LICENSE("GPL");
+> MODULE_ALIAS_NETPROTO(PF_SMC);
+> MODULE_ALIAS_TCP_ULP("smc");
+>+/* 263 for IPPROTO_SMC and 1 for SOCK_STREAM */
+>+MODULE_ALIAS_NET_PF_PROTO_TYPE(PF_INET, 263, 1);
+>+#if IS_ENABLED(CONFIG_IPV6)
+>+MODULE_ALIAS_NET_PF_PROTO_TYPE(PF_INET6, 263, 1);
+>+#endif
+> MODULE_ALIAS_GENL_FAMILY(SMC_GENL_FAMILY_NAME);
+>diff --git a/net/smc/inet_smc.h b/net/smc/inet_smc.h
+>new file mode 100644
+>index 00000000..fcdcb61
+>--- /dev/null
+>+++ b/net/smc/inet_smc.h
+>@@ -0,0 +1,32 @@
+>+/* SPDX-License-Identifier: GPL-2.0 */
+>+/*
+>+ *  Shared Memory Communications over RDMA (SMC-R) and RoCE
+>+ *
+>+ *  Definitions for the SMC module (socket related)
+>+
+>+ *  Copyright IBM Corp. 2016
+
+You should update this.
+
+>+ *
+>+ */
+>+#ifndef __INET_SMC
+>+#define __INET_SMC
+>+
+>+#include <net/protocol.h>
+>+#include <net/sock.h>
+>+#include <net/tcp.h>
+>+
+>+extern struct proto smc_inet_prot;
+>+extern const struct proto_ops smc_inet_stream_ops;
+>+extern struct inet_protosw smc_inet_protosw;
+>+
+>+#if IS_ENABLED(CONFIG_IPV6)
+>+#include <net/ipv6.h>
+>+/* MUST after net/tcp.h or warning */
+>+#include <net/transp_v6.h>
+>+extern struct proto smc_inet6_prot;
+>+extern const struct proto_ops smc_inet6_stream_ops;
+>+extern struct inet_protosw smc_inet6_protosw;
+>+#endif
+>+
+>+int smc_inet_init_sock(struct sock *sk);
+>+
+>+#endif // __INET_SMC
+         ^
+         use /* __INET_SMC */ instead
+
+>-- 
+>1.8.3.1
+>
 
