@@ -1,345 +1,144 @@
-Return-Path: <netdev+bounces-95596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E6598C2C6F
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 00:06:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE58A8C2C71
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 00:09:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30C2D1C21960
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 22:06:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E69B1F22618
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 22:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A621A13CFA4;
-	Fri, 10 May 2024 22:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE1BF13CFAE;
+	Fri, 10 May 2024 22:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HSegGdgB"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uxWYvcWm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E5913CFA3
-	for <netdev@vger.kernel.org>; Fri, 10 May 2024 22:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F272513CFA3
+	for <netdev@vger.kernel.org>; Fri, 10 May 2024 22:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715378769; cv=none; b=OTabvL7GPCpUpyCehK9GDSLuR6nRgyaYZmloJum7glwsCxKuc6JcRcTcz6tUGs68fNtdIJhlcoWKNi3c760Pb5YRIctSD8srg9jG1LtE9BVkA9kjGry2wuVjIZHgpXB5bVoSqjyiPm7P+cPHuj01plBbt/rVvUHa99OPAeK9SLg=
+	t=1715378937; cv=none; b=oOUK1umZSuLyFBYenr3/5RlZWldWm+pzh73uSE08VW7WYqLIAaIuDxbHpxbTeA1OMgHQ77s4i4X3mLoYlDa00AcbiJu5k73CCFZHpidlT18LXBSkUHWrs4HtGG/Fx9xPCQdN6GtAsZIdQ6GyJJBQB4mKhFczfOShRbFRGeedrko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715378769; c=relaxed/simple;
-	bh=Vh4PKyqzUm8eI1OFfRz+4GaGUH/HSipUQb22rOAuUog=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VoaG5gTStuAoWBsd00AZsZs8/VOwJ1si62zXuWqffM64Jmew0ebTr02UtYIp7xg6hEXGQ/3FrCPRmNIyoTjA9B70md6Q/ECJDVqKRiEGf8YXTonQqFYcPoAP0g9GE+L8sH9oBSfqO6/j0TFrIoBVTXZGth6RotwFswRbHMjkzUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HSegGdgB; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-41ebcf01013so14311505e9.0
-        for <netdev@vger.kernel.org>; Fri, 10 May 2024 15:06:07 -0700 (PDT)
+	s=arc-20240116; t=1715378937; c=relaxed/simple;
+	bh=NAxGgZZsk/VCIqehiX35dghLM0pxpLNGnVZEiM0dv3I=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=nY5EsdOEAfAcIXyAEXnBdo6uZaDh6IecXcFe1sNKCLCF/6ekhBx/NpHwFqaAiB3xMP7Ng7Kd7+QVMG1yA1SAgD12SY35lm1XpK/nF0PRnA5giAdI8/6Fi/fB8fK4MIaiuRF0o7PoX7bxICGjXmOsxOcDhlha7wppEcvUad1Vubk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=uxWYvcWm; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a59b49162aeso612660966b.3
+        for <netdev@vger.kernel.org>; Fri, 10 May 2024 15:08:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715378766; x=1715983566; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=IuOdFTTJrGv04nctXPlh2vl7GGCFUQIA6nTAExRsppo=;
-        b=HSegGdgBmFYFGq8W7r7DQb0+fumo8LZNJ9/86Vy80DLOuogIP0Mlu3ev9iCuxG/P4G
-         jiWwIwR5z1fscHBtBLqR1onmA/zd62PKRlzftqgHX82Lw5mLFAnRC+d6E3bbp2h5JP90
-         FP+pdQDsLWcZU6fpXrzjp38opYt3SkInHnAYGvk6z6FtLLu6rgqXXeT+QXxjDd4NVnMZ
-         7XEdaPzU2Rl8g992Qo1dsB/fQoOgdIwGjzq3OUJuezx25KENI9B9Sp97xgJHw6ng5ARI
-         /hT2ExvXD8Nvx8376MXHoSL/Iqb8FWIjtOapj3M6nVDb0FQp41bRSPVI3mjiUmvbVo+u
-         VMZQ==
+        d=linaro.org; s=google; t=1715378934; x=1715983734; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=o9cRryS+roxCSEoNZ+CfyuLiO+htAgihNDpfk7rVDuQ=;
+        b=uxWYvcWm74nj3vS2ynIA+5YewLt2Ox3yUMOJPnIlcd8jRwoVGiCtyI79RYBhxn89pP
+         0T/hdOUvZD7HUo7pGcmoZoD3aVFAq1dKtT6Ig0r92+koYhrW1QvH9FbOAEhqvOGcBESo
+         1bnsoI5jTvsd3TVN7XhpkvHQzz5xSl/Muyj20HNVpq09p4QebGrCghv8I3mxR3pnYDix
+         /jdPxJpK2ICtQPNgVvpRKVP2Znysi4QOJeOjkJHkgI8ehRjipzWW96WPUezwb6yAEZfH
+         5BWdspYNiKxXYN5qSo/EK7Cf/44wqXcAAKf68dHgrKtMPB5TExM5kXCFef1S09Istlpb
+         8bHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715378766; x=1715983566;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IuOdFTTJrGv04nctXPlh2vl7GGCFUQIA6nTAExRsppo=;
-        b=gsZTT4+8MolCbQx3qwFtLgTKW9c5gr3XIQED6/L7EkIkW031Avy3cgTGtxsVpS8b91
-         P/F+BdFfClI06CGveX8LcSjOqHIJbl4l3d2fF1ZWojwdfjiu4zAmeId3pCmn9iens9lc
-         dhQCXx8uAAiGhGWXJFkdWdsyjGJIlWmIQ2GAG93RhB9mlCREkc8pNjdz1hFMqRaRn0lt
-         lSDRMdKbYXebsrboAWKl9fyhsO/MsJ8t1BIpat5vrNLmGpGPXbTDvrj23BsK2K8+wPIU
-         xqPY322CyV9xknq2EJSJXNI+zOLdvrgtaibyvCeB2/U/rFDC1KHlc11XkerBNMUFskww
-         Ho0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVQtVw/F8NUfhKEyHO+YCqs20asSd2HROrHI6lD+lfPU83rLA1+gq076TwMR5dJSGKFShUQzBsSob0nispTlVh6/txowCtj
-X-Gm-Message-State: AOJu0YzLHeN9v5+3iSlTIMP4HkKA8/87VfKmROalcw1JnLnsk68PljIm
-	oMCjc2ELqrJKnYKVKZdGPswnZjDIo0OrMnpbag42vXO8vQ+hBadT
-X-Google-Smtp-Source: AGHT+IEuu4mqzTaOKEkzofIPv6hV9BtpSHQ6F30ErqUETKlEjr2yxgND/Nnq5YYrDRqKV6bYscBTUQ==
-X-Received: by 2002:a05:600c:4f06:b0:418:2981:c70f with SMTP id 5b1f17b1804b1-41fbcfb8473mr61113725e9.19.1715378765649;
-        Fri, 10 May 2024 15:06:05 -0700 (PDT)
-Received: from ?IPV6:2a01:c23:b9a1:7300:ace1:b314:fd08:7c6a? (dynamic-2a01-0c23-b9a1-7300-ace1-b314-fd08-7c6a.c23.pool.telefonica.de. [2a01:c23:b9a1:7300:ace1:b314:fd08:7c6a])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-41f87d200c6sm111618285e9.23.2024.05.10.15.06.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 May 2024 15:06:05 -0700 (PDT)
-Message-ID: <adfb0005-3283-4138-97d5-b4af3a314d98@gmail.com>
-Date: Sat, 11 May 2024 00:06:04 +0200
+        d=1e100.net; s=20230601; t=1715378934; x=1715983734;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=o9cRryS+roxCSEoNZ+CfyuLiO+htAgihNDpfk7rVDuQ=;
+        b=dQgEWS2SLmaponWeHNVn5sqtaeQr/0aVq9OngVTK64PDDJl9rBXEY5aDzOD9R0fxhR
+         Lkvs/5JU9uuvD4Ljj5/bLCuNDmh7aZOlWNUfoj/PQME6/cWzTFWAl47jUg7nGkZVDaBV
+         1lcH/Z+MPgyL+ApjZD0Q6cyk8kF02GkYzdBiXdv3ZEuoR3Q6N+Wjl6C+dNcWWbhDbsZt
+         7J/gbLs1ynwNK4QB4go3qFEGlSH8NpHfcCuOfFgOOk3JpxHj2kt1md5IioSStOFoJrM4
+         OXWqDx32Byczs4k+TO8EnfczE3waAk0OIU+7WSMaSGyYD1ZwqNdutkJZ3shyv+RWjXCf
+         D7tA==
+X-Gm-Message-State: AOJu0Yxe38LLdiWcgWTcIx4cz0a4+zfHUbJOoVq14IFbDo7I80PuaOOe
+	19BwOZysCsCXI52R9C66cg8OLQeGXKDTsDeUm0DciEiomLm+vRGxq09iquoX08I=
+X-Google-Smtp-Source: AGHT+IF9mXn+w0ex/MK5MBe0KL2x0hpU7kMC3b5ZipHbYH0nlEZKZJSx7fiSD+9y0997fXLlQjn8kg==
+X-Received: by 2002:a17:907:36f:b0:a59:ba18:2fb9 with SMTP id a640c23a62f3a-a5a2d534e9cmr230133166b.12.1715378934327;
+        Fri, 10 May 2024 15:08:54 -0700 (PDT)
+Received: from [192.168.1.140] ([85.235.12.238])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a1781ce3fsm228219866b.4.2024.05.10.15.08.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 May 2024 15:08:53 -0700 (PDT)
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH net-next v2 0/5] net: ethernet: cortina: TSO and pause
+ param
+Date: Sat, 11 May 2024 00:08:38 +0200
+Message-Id: <20240511-gemini-ethernet-fix-tso-v2-0-2ed841574624@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: r8169: transmit queue timeouts and IRQ masking
-To: Ken Milmore <ken.milmore@gmail.com>, netdev@vger.kernel.org
-Cc: nic_swsd@realtek.com
-References: <ad6a0c52-4dcb-444e-88cd-a6c490a817fe@gmail.com>
- <f4197a6d-d829-4adf-8666-1390f2355540@gmail.com>
- <5181a634-fe25-45e7-803e-eb8737990e01@gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <5181a634-fe25-45e7-803e-eb8737990e01@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOaaPmYC/3WNwQqDMBBEf0X23C1J0Ib21P8QDxpXXWiTsgnBI
+ v57U+m1x+HNvNkgkjBFuFUbCGWOHHwJ5lSBW3o/E/JYMhhlatWoC870ZM9IaSHxlHDiFVMMSIO
+ zurbWmWmAsn4JFXSYW/gWPa0JukIWjinI+7jM+uA/+/WvPWtUqJUblR2aetTu/mDfSzgHmaHb9
+ /0DIjH1qMkAAAA=
+To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
+X-Mailer: b4 0.13.0
 
-On 10.05.2024 00:24, Ken Milmore wrote:
-> On 08/05/2024 22:14, Heiner Kallweit wrote:
->>
->> Re-reading &tp->napi may be racy, and I think the code delivers
->> a wrong result if NAPI_STATE_SCHEDand NAPI_STATE_DISABLE
->> both are set.
->>
->>>  out:
->>>         rtl_ack_events(tp, status);
->>
->> The following uses a modified version of napi_schedule_prep()
->> to avoid re-reading the napi state.
->> We would have to see whether this extension to the net core is
->> acceptable, as r8169 would be the only user for now.
->> For testing it's one patch, for submitting it would need to be
->> splitted.
->>
->> ---
->>  drivers/net/ethernet/realtek/r8169_main.c |  6 ++++--
->>  include/linux/netdevice.h                 |  7 ++++++-
->>  net/core/dev.c                            | 12 ++++++------
->>  3 files changed, 16 insertions(+), 9 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
->> index eb329f0ab..94b97a16d 100644
->> --- a/drivers/net/ethernet/realtek/r8169_main.c
->> +++ b/drivers/net/ethernet/realtek/r8169_main.c
->> @@ -4639,6 +4639,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
->>  {
->>  	struct rtl8169_private *tp = dev_instance;
->>  	u32 status = rtl_get_events(tp);
->> +	int ret;
->>  
->>  	if ((status & 0xffff) == 0xffff || !(status & tp->irq_mask))
->>  		return IRQ_NONE;
->> @@ -4657,10 +4658,11 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
->>  		rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
->>  	}
->>  
->> -	if (napi_schedule_prep(&tp->napi)) {
->> +	ret = __napi_schedule_prep(&tp->napi);
->> +	if (ret >= 0)
->>  		rtl_irq_disable(tp);
->> +	if (ret > 0)
->>  		__napi_schedule(&tp->napi);
->> -	}
->>  out:
->>  	rtl_ack_events(tp, status);
->>  
->> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
->> index 42b9e6dc6..3df560264 100644
->> --- a/include/linux/netdevice.h
->> +++ b/include/linux/netdevice.h
->> @@ -498,7 +498,12 @@ static inline bool napi_is_scheduled(struct napi_struct *n)
->>  	return test_bit(NAPI_STATE_SCHED, &n->state);
->>  }
->>  
->> -bool napi_schedule_prep(struct napi_struct *n);
->> +int __napi_schedule_prep(struct napi_struct *n);
->> +
->> +static inline bool napi_schedule_prep(struct napi_struct *n)
->> +{
->> +	return __napi_schedule_prep(n) > 0;
->> +}
->>  
->>  /**
->>   *	napi_schedule - schedule NAPI poll
->> diff --git a/net/core/dev.c b/net/core/dev.c
->> index 4bf081c5a..126eab121 100644
->> --- a/net/core/dev.c
->> +++ b/net/core/dev.c
->> @@ -6102,21 +6102,21 @@ void __napi_schedule(struct napi_struct *n)
->>  EXPORT_SYMBOL(__napi_schedule);
->>  
->>  /**
->> - *	napi_schedule_prep - check if napi can be scheduled
->> + *	__napi_schedule_prep - check if napi can be scheduled
->>   *	@n: napi context
->>   *
->>   * Test if NAPI routine is already running, and if not mark
->>   * it as running.  This is used as a condition variable to
->> - * insure only one NAPI poll instance runs.  We also make
->> - * sure there is no pending NAPI disable.
->> + * insure only one NAPI poll instance runs. Return -1 if
->> + * there is a pending NAPI disable.
->>   */
->> -bool napi_schedule_prep(struct napi_struct *n)
->> +int __napi_schedule_prep(struct napi_struct *n)
->>  {
->>  	unsigned long new, val = READ_ONCE(n->state);
->>  
->>  	do {
->>  		if (unlikely(val & NAPIF_STATE_DISABLE))
->> -			return false;
->> +			return -1;
->>  		new = val | NAPIF_STATE_SCHED;
->>  
->>  		/* Sets STATE_MISSED bit if STATE_SCHED was already set
->> @@ -6131,7 +6131,7 @@ bool napi_schedule_prep(struct napi_struct *n)
->>  
->>  	return !(val & NAPIF_STATE_SCHED);
->>  }
->> -EXPORT_SYMBOL(napi_schedule_prep);
->> +EXPORT_SYMBOL(__napi_schedule_prep);
->>  
->>  /**
->>   * __napi_schedule_irqoff - schedule for receive
-> 
-> Here is a possible alternative (albeit expensive), using a flag in the driver:
-> 
-> diff --git linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
-> index 6e34177..d703af1 100644
-> --- linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c
-> +++ linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -579,6 +579,7 @@ enum rtl_flag {
->         RTL_FLAG_TASK_RESET_PENDING,
->         RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE,
->         RTL_FLAG_TASK_TX_TIMEOUT,
-> +       RTL_FLAG_IRQ_DISABLED,
->         RTL_FLAG_MAX
->  };
->  
-> @@ -4609,6 +4610,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
->  
->         if (napi_schedule_prep(&tp->napi)) {
->                 rtl_irq_disable(tp);
-> +               set_bit(RTL_FLAG_IRQ_DISABLED, tp->wk.flags);
->                 __napi_schedule(&tp->napi);
->         }
->  out:
-> @@ -4655,12 +4657,17 @@ static int rtl8169_poll(struct napi_struct *napi, int budget)
->         struct net_device *dev = tp->dev;
->         int work_done;
->  
-> +       if (!test_and_set_bit(RTL_FLAG_IRQ_DISABLED, tp->wk.flags))
-> +               rtl_irq_disable(tp);
-> +
->         rtl_tx(dev, tp, budget);
->  
->         work_done = rtl_rx(dev, tp, budget);
->  
-> -       if (work_done < budget && napi_complete_done(napi, work_done))
-> +       if (work_done < budget && napi_complete_done(napi, work_done)) {
-> +               clear_bit(RTL_FLAG_IRQ_DISABLED, tp->wk.flags);
->                 rtl_irq_enable(tp);
-> +       }
->  
->         return work_done;
->  }
-> 
-> 
-> 
-> 
+This restores the TSO support as we put it on the back
+burner a while back. This version has been thoroughly
+tested with iperf3 to make sure it really works.
 
-Nice idea. The following is a simplified version.
-It's based on the thought that between scheduling NAPI and start of NAPI
-polling interrupts don't hurt.
+Also included is a patch that implements setting the
+RX or TX pause parameters.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+To: Hans Ulli Kroll <ulli.kroll@googlemail.com>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+
+Changes in v2:
+- Fix up the issue in the previous version where I packed the
+  TSO segments into too small packets: the TSO hardware
+  expects the "MTU" to be set to the length of the resulting
+  ethernet frame for each segment.
+- Add a patch to make use of the TSO also when we do not have
+  any explicit segmenting, which is what the vendor driver
+  was always doing. This works fine with even frames with custom
+  DSA tags.
+- Add a new patch to rename the gmac_adjust_link callback to
+  a recognized name.
+- Add a new patch to make the driver use the autonegitiated
+  RX and TX pause settings from phylib.
+- Rewrite the set_pauseparam() patch to use the existing
+  gmac_set_flow_control() function.
+- Add a call to phy_set_asym_pause() in the set_pauseparam
+  callback, so the phylib is informed of the new TX/RX setting.
+- Link to v1: https://lore.kernel.org/r/20240509-gemini-ethernet-fix-tso-v1-0-10cd07b54d1c@linaro.org
+
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+Linus Walleij (5):
+      net: ethernet: cortina: Restore TSO support
+      net: ethernet: cortina: Use TSO also on common TCP
+      net: ethernet: cortina: Rename adjust link callback
+      net: ethernet: cortina: Use negotiated TX/RX pause
+      net: ethernet: cortina: Implement .set_pauseparam()
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index e5ea827a2..7b04dfecc 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -592,6 +592,7 @@ enum rtl_flag {
- 	RTL_FLAG_TASK_RESET_PENDING,
- 	RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE,
- 	RTL_FLAG_TASK_TX_TIMEOUT,
-+	RTL_FLAG_IRQ_DISABLED,
- 	RTL_FLAG_MAX
- };
- 
-@@ -4657,10 +4658,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
- 		rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
- 	}
- 
--	if (napi_schedule_prep(&tp->napi)) {
--		rtl_irq_disable(tp);
--		__napi_schedule(&tp->napi);
--	}
-+	napi_schedule(&tp->napi);
- out:
- 	rtl_ack_events(tp, status);
- 
-@@ -4714,12 +4712,17 @@ static int rtl8169_poll(struct napi_struct *napi, int budget)
- 	struct net_device *dev = tp->dev;
- 	int work_done;
- 
-+	if (!test_and_set_bit(RTL_FLAG_IRQ_DISABLED, tp->wk.flags))
-+		rtl_irq_disable(tp);
-+
- 	rtl_tx(dev, tp, budget);
- 
- 	work_done = rtl_rx(dev, tp, budget);
- 
--	if (work_done < budget && napi_complete_done(napi, work_done))
-+	if (work_done < budget && napi_complete_done(napi, work_done)) {
-+		clear_bit(RTL_FLAG_IRQ_DISABLED, tp->wk.flags);
- 		rtl_irq_enable(tp);
-+	}
- 
- 	return work_done;
- }
+ drivers/net/ethernet/cortina/gemini.c | 88 +++++++++++++++++++++++++----------
+ 1 file changed, 63 insertions(+), 25 deletions(-)
+---
+base-commit: 8eed0f55df3577f279dfa680f3c7f600072abc45
+change-id: 20240506-gemini-ethernet-fix-tso-ebc71477c2fb
+
+Best regards,
 -- 
-2.45.0
-
+Linus Walleij <linus.walleij@linaro.org>
 
 
