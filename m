@@ -1,178 +1,88 @@
-Return-Path: <netdev+bounces-95461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EC2C8C24EA
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:32:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA28D8C24EE
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 14:32:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D2E71F2298A
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:32:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 838AF281BF0
+	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 12:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB6684E1E;
-	Fri, 10 May 2024 12:32:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7AC3FB87;
+	Fri, 10 May 2024 12:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l8giWwHL"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0407710E;
-	Fri, 10 May 2024 12:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606597710E;
+	Fri, 10 May 2024 12:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715344341; cv=none; b=UN0B1xHjY8iw6486qT6cs2Yj+sG+6rnsQYMB4/BiliqlNJKqIUaTl6UdeCTXf8CbMxQ9+pqKGk8yuA9TnTr8KhO/nK1qEr5D5D4oMCcMZv/+fBVyGXTIdPxY97tOrGQDmlEAQqhSHmWtSofcdDdnp65nK6qVs3pCMqA6HIYCuQI=
+	t=1715344353; cv=none; b=Zug3rkqPatbnA7AFpz6bKMZFeBtB63ltnzpZzDiaKH4CFFUgYCQZGaP8DGV1Z8d+PcGcLCO3ozRuPiL3v2EqQt+wh9OfTKQanGpadE4JIRAwBTHLg4XVFWyeBEPRCpe53RsRaeTyXJ3DKgffYS96hESkNGPR8na1tsxJsqIELXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715344341; c=relaxed/simple;
-	bh=svbvXxDmVnO4Tq8gBc3g88zQQCnetE8Ld/NCaM3Q3+w=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=WAmfNjwJBmcowJ8EZzfmaf/rW0yPhzknqrRG6809ap/qn37/6RiRMAt76rY4XhHrgTZwVMjCuv+XYMTQuE8J+IFs6I+dOHDC4zWMFdY5XNNBvWwXux2/g04yiyAbTPd2p/oP70xQEtGpM2yGnxqQ4nxUaVCCUBkEE4RSUQBYvn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4VbSqD2Xl0z1j1M5;
-	Fri, 10 May 2024 20:28:56 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8F356140124;
-	Fri, 10 May 2024 20:32:14 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 10 May
- 2024 20:32:14 +0800
-Subject: Re: [PATCH net-next v3 12/13] mm: page_frag: update documentation for
- page_frag
-To: Randy Dunlap <rdunlap@infradead.org>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
-	<alexander.duyck@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
-	<akpm@linux-foundation.org>, <linux-mm@kvack.org>,
-	<linux-doc@vger.kernel.org>
-References: <20240508133408.54708-1-linyunsheng@huawei.com>
- <20240508133408.54708-13-linyunsheng@huawei.com>
- <0ac5219b-b756-4a8d-ba31-21601eb1e7f4@infradead.org>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <ff1089c8-ad02-04bb-f715-ca97c118338b@huawei.com>
-Date: Fri, 10 May 2024 20:32:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1715344353; c=relaxed/simple;
+	bh=ccfbAEPf5Tst3ce/2QUnbg7oKbMUyZkRFSjGp/BIMQc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a+hjDYl8h38KpW49EB0/WI2G/NGJKBnNp0uubQVL6HyZ66ddi2IHE9JIZZH0ddb42oWonzuIVjJ1f8KEKSLU6jFHNFSjnJ7kSngKcKp/rjlYiNCTvH9g3RURVCsnoyh8vHmmMiCD9vSMfo+yHYukMN/ar5yGaJKH4GEx3V7A2SM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=l8giWwHL; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=kYvLhiz8ZLdgpAJEUaG2GVgbiir4S057iWOlDZef/0A=; b=l8giWwHL5386gqDRGg9X+/i37t
+	y1gLXjhj29wp1iMLa1uTcOfyWlUaZmX1DYOACtP7FTH8v0FJHWOadnRlrEnJIk28bhkz39vC3DjXC
+	QVmx0mej7C9WEUlEiGWuptRsVAaB0CHhLA0CNl4un2IEJI54qYFriO0XRqQZQu0ObbM4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s5PQE-00F8RW-PQ; Fri, 10 May 2024 14:32:22 +0200
+Date: Fri, 10 May 2024 14:32:22 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sasha Neftin <sasha.neftin@intel.com>
+Cc: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>,
+	Ricky Wu <en-wei.wu@canonical.com>, netdev@vger.kernel.org,
+	rickywu0421@gmail.com, linux-kernel@vger.kernel.org,
+	edumazet@google.com, intel-wired-lan@lists.osuosl.org,
+	kuba@kernel.org, anthony.l.nguyen@intel.com, pabeni@redhat.com,
+	davem@davemloft.net, "Lifshits, Vitaly" <vitaly.lifshits@intel.com>,
+	"naamax.meir" <naamax.meir@linux.intel.com>,
+	"Avivi, Amir" <amir.avivi@intel.com>,
+	"Keller, Jacob E" <jacob.e.keller@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH v2 2/2] e1000e: fix link fluctuations
+ problem
+Message-ID: <5669c185-db96-4ac2-81d5-2198060ae77d@lunn.ch>
+References: <20240503101836.32755-1-en-wei.wu@canonical.com>
+ <83a2c15e-12ef-4a33-a1f1-8801acb78724@lunn.ch>
+ <514e990b-50c6-419b-96f2-09c3d04a2fda@intel.com>
+ <334396b5-0acc-43f7-b046-30bcdab1b6fb@intel.com>
+ <cc58ecfc-53f1-4154-bc38-e73964a59e16@lunn.ch>
+ <b288926e-f9d6-48d5-9851-078a6c9912bf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <0ac5219b-b756-4a8d-ba31-21601eb1e7f4@infradead.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b288926e-f9d6-48d5-9851-078a6c9912bf@intel.com>
 
-On 2024/5/9 8:44, Randy Dunlap wrote:
+> > It would be interesting to see what the link partner sees. What does
+> > it think the I219-LM is advertising? Is it advertising 1000BaseT_Half?
 > 
-> 
+> i219 parts come with LSI PHY. 1000BASE-T half-duplex is not supported.
+> 1000BASET half-duplex not advertised in IEEE 1000BASE-T Control Register 9.
 
->>  
->> +/**
->> + * page_frag_cache_is_pfmemalloc() - Check for pfmemalloc.
->> + * @nc: page_frag cache from which to check
->> + *
->> + * Used to check if the current page in page_frag cache is pfmemalloc'ed.
->> + * It has the same calling context expection as the alloc API.
->> + *
->> + * Return:
->> + * Return true if the current page in page_frag cache is pfmemalloc'ed,
-> 
-> Drop the (second) word "Return"...
+That is the theory. But in practice? What does the link partner really
+see? I've come across systems which get advertisement wrong. However,
+in that case, i suspect it is the software above the PHY, not the PHY
+itself which was wrong.
 
-Did you mean something like below:
-
-* Return:
-* Return true if the current page in page_frag cache is pfmemalloc'ed,
-* otherwise false.
-
-Or:
-
-* Return:
-* true if the current page in page_frag cache is pfmemalloc'ed, otherwise
-* return false.
-
-
-> 
->> + * otherwise return false.
->> + */
->>  static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
->>  {
->>  	return encoded_page_pfmemalloc(nc->encoded_va);
->> @@ -92,6 +109,19 @@ void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
->>  				 unsigned int fragsz, gfp_t gfp_mask,
->>  				 unsigned int align_mask);
->>  
->> +/**
->> + * page_frag_alloc_va_align() - Alloc a page fragment with aligning requirement.
->> + * @nc: page_frag cache from which to allocate
->> + * @fragsz: the requested fragment size
->> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
-> 
->                                                       needs
-> 
->> + * @align: the requested aligning requirement for 'va'
-> 
->                  or                                  @va
-
-What does the 'or' means?
-
-> 
-
-...
-
-> 
->                                                  needs
-> 
->> + *
->> + * Prepare a page fragment with minimum size of ‘fragsz’, 'fragsz' is also used
-> 
->                                                    'fragsz'. 'fragsz'
-> (don't use fancy single quote marks)
-
-You mean using @parameter to replace all the parameters marked with single
-quote marks, right?
-
-...
-
->>  
->> +/**
->> + * page_frag_alloc_prepare - Prepare allocing a page fragment.
->> + * @nc: page_frag cache from which to prepare
->> + * @offset: out as the offset of the page fragment
->> + * @fragsz: in as the requested size, out as the available size
->> + * @va: out as the virtual address of the returned page fragment
->> + * @gfp: the allocation gfp to use when cache need to be refilled
->> + *
->> + * Prepare a page fragment with minimum size of ‘fragsz’, 'fragsz' is also used
-> 
->                                                    'fragsz'. 'fragsz'
-> (don't use fancy single quote marks)
-> 
-> You could also (in several places) refer to the variables as
->                                                     @fragsz. @fragsz
-> 
->> + * to report the maximum size of the page fragment. Return both 'page' and 'va'
->> + * of the fragment to the caller.
->> + *
->> + * Return:
->> + * Return the page fragment, otherwise return NULL.
-> 
-> Drop second "Return". But the paragraph above says that both @page and @va
-> are returned. How is that done?
-
-struct page *page_frag_alloc_prepare(struct page_frag_cache *nc,
-				     unsigned int *offset,
-				     unsigned int *fragsz,
-				     void **va, gfp_t gfp);
-
-As above, @page is returned through the function return, @va is returned
-through double pointer.
-
-Thanks for the detailed review.
+	Andrew
 
