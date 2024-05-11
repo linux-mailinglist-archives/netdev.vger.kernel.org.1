@@ -1,162 +1,74 @@
-Return-Path: <netdev+bounces-95636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 131D18C2E73
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 03:32:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 898C58C2E75
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 03:35:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 451671C20FF7
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 01:32:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF8AF1C212F8
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 01:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049521078B;
-	Sat, 11 May 2024 01:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14774101D5;
+	Sat, 11 May 2024 01:35:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UaDxAK+o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r8cDSJwf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11E16AB8;
-	Sat, 11 May 2024 01:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3ECE320E
+	for <netdev@vger.kernel.org>; Sat, 11 May 2024 01:35:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715391161; cv=none; b=Qa7BjnZ6PSso6tF3AYQiqREIICFY15RYFDKFaHFfaGjaEHd40aHdV9fWN0JtN2Hqaq9YOpKZSZzzF6hWDuLcfrrY5VIwm4PDe3guC81SWwOsS6GftFroz1rZ9fvfNGTc65pcSKxLKr4goIO2iN2CBUcPgutXvaY2mvXvCHmRNY8=
+	t=1715391344; cv=none; b=BjIWvLQP/BjH4/0wivueQlJRd964ZqO5jytp1fXaZUvxGt/Jp4Ozk55Auqq3/p0ICbe2snRVoq6WJnQ/ULaipLk1YV6kTOvlXKY69Kv6pQUoenyIn2L1W0y3lv3V/PZiqxl+lSN0j4y4Pf+RWJ4QKsBIHOkkgv/UZMOwI3w4YFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715391161; c=relaxed/simple;
-	bh=HXNAUk8KaLORbUdTkeXxMvO5IapPVvsxzWrRDTV3Ho4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o6KG3gMppZeN/C5m2Bx3gzcvDV1kAjelY0RVU/Sh94TYz8yhHOgyuEw0jDg9hUOCxD8A4/dtkHW09nxHCwevawNRYi8kxnyxrKa/wOS9VNn5ZrOTP4kHYyT+pEwN+uVO0zs/lAJ+y8/TwhW5/MNDMbkNF7RsGYKyOzq4qrHBcgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UaDxAK+o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 221F8C113CC;
-	Sat, 11 May 2024 01:32:40 +0000 (UTC)
+	s=arc-20240116; t=1715391344; c=relaxed/simple;
+	bh=U8vbSB31xOiAcentt6ly4kV+tG0iJ3j+OpuleLjraGM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FhXkzt60va+mkalzFcfCDk/kZbtEH9W0zgag4zZ3Ub9wu7zSZJRtLjdPTr6TzHgVatFTJPhli4//+s4Eg6zO+ByHLvIDQ2qY23JuFa9lEUl/W98wc8V99izb8KbEupV7V5AZrjqVq6CG32YatKGomaKiQd7nC5+jrffIoS4PD78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r8cDSJwf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EFD1C113CC;
+	Sat, 11 May 2024 01:35:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715391160;
-	bh=HXNAUk8KaLORbUdTkeXxMvO5IapPVvsxzWrRDTV3Ho4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=UaDxAK+oUgyImZRIcmaGVxcogZQkDUnbJyFnJgEaJLWTcmYAjzcdxf9w9n6rUc1+t
-	 4EBsTVdbMC/6aj66ixuFAaW3q0CulXKtoneqm+Vg7+Jtp7f8D5iwl7rWSgJwwNTkc2
-	 a5uue12+PD6kodmd8KWDloY12rwyvriWfh1DCQKCy/r+7/z7JgWHaZlW/b4uQ+O0D9
-	 wws0+MPJ3K5foeVUpHhb6xtGk7JYDyFuYO7S5/j3kKdHaNTXe9POfNzb9AY9Cklkbo
-	 9XHxvRhuNkEMcf3I7g40JGPzMcbSHzb7EFu42gVdMgx4tEVNJ+sZ/YovCUobr17vCs
-	 oFD8GTr2/kYcQ==
+	s=k20201202; t=1715391343;
+	bh=U8vbSB31xOiAcentt6ly4kV+tG0iJ3j+OpuleLjraGM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=r8cDSJwfDd786vR9pviS9ICEDaa5kBKtj2367q16zwpLAfqo8iKcS3CudZY5xSMlC
+	 v6I7GA0pMG2rrhB2KAIiHQfOdWbmdbK2p14jr5V5ud4O6EN7R27YN7NQDBlQBPvYyR
+	 r4vOGmq5T/51AVP/TvgkbaS0+mst+gAMeDCryhTLstfS2kfajd4GleBaPvj6qycRiu
+	 20YnarvWVT0ecpByGteZyCQwRbUi0N/yhsLEluo97wRnPHUlkkLtGQslM63KjIwu1V
+	 b6dtV6Rx8LMy/XL4sHhAmbZ4r7Ey06uQh24PGlBOcMNh8abpgO/hOlMEU1EeaxHnME
+	 DvnGcg/ZO36TQ==
+Date: Fri, 10 May 2024 18:35:42 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	liuhangbin@gmail.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v2] selftests: net: local_termination: annotate the expected failures
-Date: Fri, 10 May 2024 18:32:36 -0700
-Message-ID: <20240511013236.383368-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.45.0
+To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, bcm-kernel-feedback-list@broadcom.com
+Subject: Re: [PATCH, net-next, 2/2] net: stmmac: PCI driver for BCM8958X SoC
+Message-ID: <20240510183542.3165bc96@kernel.org>
+In-Reply-To: <20240510000331.154486-3-jitendra.vegiraju@broadcom.com>
+References: <20240510000331.154486-1-jitendra.vegiraju@broadcom.com>
+	<20240510000331.154486-3-jitendra.vegiraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Vladimir said when adding this test:
+On Thu,  9 May 2024 17:03:31 -0700 Jitendra Vegiraju wrote:
+> + * dwxgmac_brcm_pci_probe
+> + *
+> + * @pdev: pci device pointer
+> + * @id: pointer to table of device id/id's.
 
-  The bridge driver fares particularly badly [...] mainly because
-  it does not implement IFF_UNICAST_FLT.
-
-See commit 90b9566aa5cd ("selftests: forwarding: add a test for
-local_termination.sh").
-
-We don't want to hide the known gaps, but having a test which
-always fails prevents us from catching regressions. Report
-the cases we know may fail as XFAIL.
-
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: liuhangbin@gmail.com
-CC: shuah@kernel.org
-CC: linux-kselftest@vger.kernel.org
-
-v2:
- - remove duplicated log_test_xfail
-v1: https://lore.kernel.org/all/20240509235553.5740-1-kuba@kernel.org/
----
- .../net/forwarding/local_termination.sh       | 21 ++++++++++++++-----
- 1 file changed, 16 insertions(+), 5 deletions(-)
-
-diff --git a/tools/testing/selftests/net/forwarding/local_termination.sh b/tools/testing/selftests/net/forwarding/local_termination.sh
-index c5b0cbc85b3e..4bba9c78db3e 100755
---- a/tools/testing/selftests/net/forwarding/local_termination.sh
-+++ b/tools/testing/selftests/net/forwarding/local_termination.sh
-@@ -73,6 +73,10 @@ check_rcv()
- 	local pattern=$3
- 	local should_receive=$4
- 	local should_fail=
-+	local xfail_sw=$5
-+
-+	local kind=$(ip -j -d link show dev $if_name |
-+			 jq -r '.[].linkinfo.info_kind')
- 
- 	[ $should_receive = true ] && should_fail=0 || should_fail=1
- 	RET=0
-@@ -81,7 +85,14 @@ check_rcv()
- 
- 	check_err_fail "$should_fail" "$?" "reception"
- 
--	log_test "$if_name: $type"
-+	# If not a SW interface, ignore the XFAIL allowance
-+	[ "$kind" != veth ] && [ "$kind" != bridge ] && xfail_sw=
-+
-+	if [ $RET -ne 0 ] && [ "$xfail_sw" == true ]; then
-+	    log_test_xfail "$if_name: $type"
-+	else
-+	    log_test "$if_name: $type"
-+	fi
- }
- 
- mc_route_prepare()
-@@ -157,7 +168,7 @@ run_test()
- 
- 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address" \
- 		"$smac > $UNKNOWN_UC_ADDR1, ethertype IPv4 (0x0800)" \
--		false
-+		false true
- 
- 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address, promisc" \
- 		"$smac > $UNKNOWN_UC_ADDR2, ethertype IPv4 (0x0800)" \
-@@ -165,7 +176,7 @@ run_test()
- 
- 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address, allmulti" \
- 		"$smac > $UNKNOWN_UC_ADDR3, ethertype IPv4 (0x0800)" \
--		false
-+		false true
- 
- 	check_rcv $rcv_if_name "Multicast IPv4 to joined group" \
- 		"$smac > $JOINED_MACV4_MC_ADDR, ethertype IPv4 (0x0800)" \
-@@ -173,7 +184,7 @@ run_test()
- 
- 	check_rcv $rcv_if_name "Multicast IPv4 to unknown group" \
- 		"$smac > $UNKNOWN_MACV4_MC_ADDR1, ethertype IPv4 (0x0800)" \
--		false
-+		false true
- 
- 	check_rcv $rcv_if_name "Multicast IPv4 to unknown group, promisc" \
- 		"$smac > $UNKNOWN_MACV4_MC_ADDR2, ethertype IPv4 (0x0800)" \
-@@ -189,7 +200,7 @@ run_test()
- 
- 	check_rcv $rcv_if_name "Multicast IPv6 to unknown group" \
- 		"$smac > $UNKNOWN_MACV6_MC_ADDR1, ethertype IPv6 (0x86dd)" \
--		false
-+		false true
- 
- 	check_rcv $rcv_if_name "Multicast IPv6 to unknown group, promisc" \
- 		"$smac > $UNKNOWN_MACV6_MC_ADDR2, ethertype IPv6 (0x86dd)" \
+the kdoc format for probe and remove is not completely correct 
+(try ./scripts/kernel-doc -Wall -none $filename)
+I'd just remove it, it doesn't explain anything of importance.
 -- 
-2.45.0
-
+pw-bot: cr
 
