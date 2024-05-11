@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-95645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26BBE8C2EC5
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 04:00:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24E698C2EC8
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 04:01:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0CC9283394
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 02:00:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B20DF1F229C9
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 02:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AECF617BAF;
-	Sat, 11 May 2024 02:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82371B810;
+	Sat, 11 May 2024 02:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e5iytCr7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PXn3mi28"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855C9179BF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838CB18EA1;
 	Sat, 11 May 2024 02:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715392830; cv=none; b=H+M54fpgpFzEwdPHZ/fld0RloqQ/kOMUpEpQo+tKeGqNlfWdRrs5HSBB+1E4LId+tx+9Z1+NDsBPpAvfCR1xLjQDdSCVkHTFzurjX6MnMUFTKXafs1KOXQUP8v3PRGRAK2M+JnLXDwYx9Yg7nBZJmG66Cy2AGxAthQntEhfiynQ=
+	t=1715392831; cv=none; b=nzVeEGNupQFv7AIkJYBYliOIM5998YErlLrNQFWBcAlqDHkhhl9O3HAfowl0XHJz2OQVdqd6EGG5qf/ijEAuG1yQGCunpClDj+VIaFPDOp2HlES9US7gQbOZdYGyR9dofIR+B9moummsQqvEfmxFo5SegF1V2Uar0bAtgqLOkFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715392830; c=relaxed/simple;
-	bh=Yuwm1/a8iGZhCbhXxZBFNy7CnIg7IU5RtKXHX8JlBL0=;
+	s=arc-20240116; t=1715392831; c=relaxed/simple;
+	bh=q8MUC9+F3FMKd16QZ8MNjsaak83xeCmivpsf/vZqHkU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jyDhouMR/V4qASSJsQv5btlj/heUztiRTNR1WfF8g0VFGiRUixtFMpANFoSOLcwaKbi4C6d7yKfQplD/wGYT4UDr1exSy1wmirA/OCfNyXEurb/KwvxX1GRxFWGuY//Z2ooc4UYZ27rI09HcUOpgS76lDikAHkZdwwkqzA2+O98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e5iytCr7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 20675C4AF08;
+	 In-Reply-To:To:Cc; b=LmdO5kOVs6MWIey9TYY8oYpJ8Frrosj8KfXnN0cYqMiTnJhiEbvihA/Ga4mpBsNAeoZ8aJkc6zWdUgWUEXuqSaFykF2W8lvjSO0Zf/NlB7dMiGBkZrZ4DbVe1NIaXPMKDKLupblIGQ8LFnON6HHTquNdUHUWA8pyTBlQTu3gQbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PXn3mi28; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 28792C32786;
 	Sat, 11 May 2024 02:00:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715392830;
-	bh=Yuwm1/a8iGZhCbhXxZBFNy7CnIg7IU5RtKXHX8JlBL0=;
+	bh=q8MUC9+F3FMKd16QZ8MNjsaak83xeCmivpsf/vZqHkU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=e5iytCr7OkXOzSdxy2wclp9A8wwJwVf5Mt8IxQM9NH3VSgYYSHodSaF4MznU0APbF
-	 QmsJa9MC4QPGZmagFeBNGP/R73O9m8Khkb5TQLedYxeFSQWIgmjPbmzV2e2oGsNOIh
-	 NvfXzva7lYqaU85fKbMcsxOrvCD0kGZvi4D1D1+TnMd4JJdQOg2pgTeWOiFzznxMdw
-	 Sr1HbgXJTwvNb04jVc+c6+YGjD+HV/tLBQJ8rk+8T9UFlATorGhJIwmgNhvaUgZhVW
-	 OL+6LSJyVKmDtzGhQUJOWVeEdncPGl0hdsd+sqSXJUDPC8mCtc9dtZ8/FeUbkp08ip
-	 fmKlihY8R8dlA==
+	b=PXn3mi28b0OUS+AmxeXJ71jA6/uGWpBCySJ0w6NaeFLjVMKBthR1Zzt7++l3cZmWU
+	 fjBqAm5agOulMM5Jj7msqRsHjgC1fmjXqHdpb9DdGPFGsj2ghl9zLp3PKGb+n5L6E1
+	 FvZWy7sFM/hcmbBehyuHv+7SumCzMExTNuTn5zqU/+d6WoVn46tTINXgs9uhMG5SJ9
+	 gbPid0g0cNkrsqfkIc7eVtHavLX/LfO0LDB/fzu+G+8nLsNxkgqkbBRJ8qAoaO7grT
+	 2IMStQwm4eyNQWA0GK1BGmueMpc86ABpUWtA8LK5U7JCp8oWRaxSbkLXKN+QYE8UYO
+	 gvcQSD5GGSbkA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 15D10C32759;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1D800C54BA1;
 	Sat, 11 May 2024 02:00:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1 1/1] net: ethernet: adi: adin1110: Replace
- linux/gpio.h by proper one
+Subject: Re: [PATCH net-next v2 0/2] gve: Minor cleanups
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171539283008.14416.409480541220579877.git-patchwork-notify@kernel.org>
+ <171539283011.14416.2158436781698025205.git-patchwork-notify@kernel.org>
 Date: Sat, 11 May 2024 02:00:30 +0000
-References: <20240508114519.972082-1-andriy.shevchenko@linux.intel.com>
-In-Reply-To: <20240508114519.972082-1-andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+References: <20240508-gve-comma-v2-0-1ac919225f13@kernel.org>
+In-Reply-To: <20240508-gve-comma-v2-0-1ac919225f13@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jeroendb@google.com, pkaligineedi@google.com,
+ shailend@google.com, nathan@kernel.org, ndesaulniers@google.com,
+ morbo@google.com, justinstitt@google.com, larysa.zaremba@intel.com,
+ dan.carpenter@linaro.org, keescook@chromium.org, netdev@vger.kernel.org,
+ llvm@lists.linux.dev, linux-hardening@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  8 May 2024 14:45:19 +0300 you wrote:
-> linux/gpio.h is deprecated and subject to remove.
-> The driver doesn't use it directly, replace it
-> with what is really being used.
+On Wed, 08 May 2024 09:32:18 +0100 you wrote:
+> Hi,
 > 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->  drivers/net/ethernet/adi/adin1110.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> This short patchset provides two minor cleanups for the gve driver.
+> 
+> These were found by tooling as mentioned in each patch,
+> and otherwise by inspection.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next,v1,1/1] net: ethernet: adi: adin1110: Replace linux/gpio.h by proper one
-    https://git.kernel.org/netdev/net-next/c/84c8b7ad5e74
+  - [net-next,v2,1/2] gve: Avoid unnecessary use of comma operator
+    https://git.kernel.org/netdev/net-next/c/ebb8308eac84
+  - [net-next,v2,2/2] gve: Use ethtool_sprintf/puts() to fill stats strings
+    https://git.kernel.org/netdev/net-next/c/ba8bcb012b7d
 
 You are awesome, thank you!
 -- 
