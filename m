@@ -1,80 +1,86 @@
-Return-Path: <netdev+bounces-95704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5F458C321E
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 17:29:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 434D08C326B
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 18:17:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3277B20E09
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 15:29:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 683F71C20CA5
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 16:17:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922AE56459;
-	Sat, 11 May 2024 15:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D900F56B72;
+	Sat, 11 May 2024 16:17:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YW5Y3u6L"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jnWhlfqq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E733233;
-	Sat, 11 May 2024 15:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6CD01A2C17;
+	Sat, 11 May 2024 16:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715441389; cv=none; b=srKzAhSXF6EmbQYOjomlhQjXPYFoXCwy925T8k5WjqTGaNDosO+D6KN7KzPgrA8ePAgfbzhGhA6egm19UhsC5CIZWcrjhzCtE6OvSQh1q6jx2f1yGh/n3B4vL0FGZFHqTVUG6wfkWkQ4ho45/olhq7xW15TXFnQdPeBPu2SNEVw=
+	t=1715444232; cv=none; b=YndmwWyCxtKhu/OEyaDEyLKKjWjy9kYPXeb+us3a2+9sq3T28DkOCg5Cn8RGj+WRtU8bRgDbrpUCDKHRqaS7D49KR2gYA/9rP7YgLC6Rw0tQ4ZDcjOVn3nc4qHzRYci7DUZIEvImWjRvG9ZenlVsWhT8h3qdy83LtFxIwzusBNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715441389; c=relaxed/simple;
-	bh=Z0ik06uwvxyBg4rziq0qMGAbQFzb1BP4OALENZqNiPs=;
+	s=arc-20240116; t=1715444232; c=relaxed/simple;
+	bh=tXeSv2dSt8ln+/90g+hFsjKKBLujNvWGP26Ef9T9YwM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GHD7koQ/sZFQzZ+3w+z7+iPskrIU6KN7znT6NrYaxrzwW0q1DZXZJ95gokcy25pOdy0/V0qt8bnPleRBkSKvrc+0TzGG/lrqO322L1MbOLg/OdAODlOw+6/J4OR/CIGOD0CReADBVRIxWp0jy68f6ODlz2z4TMC0eZjXXAv87Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YW5Y3u6L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B90DC2BBFC;
-	Sat, 11 May 2024 15:29:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715441388;
-	bh=Z0ik06uwvxyBg4rziq0qMGAbQFzb1BP4OALENZqNiPs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YW5Y3u6LubkuRZstjNdpkPmN5LHEXa6PrY4TvZs1rzTbIefWgfadqZrXfAiGRUfZF
-	 1pGgToHB4u0sOE9uAKc8aG5HH3XzY2BXpwuhvGaq7UKM2L+K/9mjcJvdxlvDR/txrE
-	 pgmSYekbauKbqQX2lCSE9KsP+zJvRZu/LGJ61dWClks6Dir+DPU4DuyN6774Ddfq8b
-	 5woQZOOI6FD1V0tII26rca7heZIpzqATVHCaSUZ/8xzgd65gy5rRHkiohnz/AY2LPl
-	 NpajaPQNrThVIT1xBUHs6Hg+dXsDWXfWhG1Xm9ijzhonjyAEZWuLWlXve8NUHvRK+w
-	 BokgaLnuR6i2w==
-Date: Sat, 11 May 2024 16:29:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: =?utf-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Manish Chopra <manishc@marvell.com>
-Subject: Re: [PATCH net-next v2] net: qede: flower: validate control flags
-Message-ID: <20240511152943.GM2347895@kernel.org>
-References: <20240511073705.230507-1-ast@fiberby.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OKCUHasyA0mxr8GnugcqcWSEQFl8V0PYW/R7XdJg0kn/2aWK0rKJCPX3TrP4epnDg4zTKBgSMCFXUcN8jZIRsj1hG5e94aJKzCWsAdOYnYzkTz53HNG1IKxlhW5xHxzMPVToCEpOxtTrymn3Pm1zHar1KMd7MEMUTwb7kSClob4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jnWhlfqq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=prI6M59tLGVOP1UtYgtk3OfsC2wBi6ByiWcytpAgf6M=; b=jnWhlfqqkJq6d1vEY7gqpI7+tg
+	r3tpJbN/X9jZCDCT5+2Ms6eszKvAffYV3Zt4UY+Aw5sj/nHd9vZcMhwSlA1Hf0X+ozY+KObvy/XuL
+	SL2/5po73uL+EXRcKCkmvkXgyuOaIGdac4oyRzT2EECNQBAhvVoodIq7uKNSBY9SfN6A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s5pP2-00FCeu-8U; Sat, 11 May 2024 18:16:52 +0200
+Date: Sat, 11 May 2024 18:16:52 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	bcm-kernel-feedback-list@broadcom.com, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
+	richardcochran@gmail.com, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2, net-next, 2/2] net: stmmac: PCI driver for BCM8958X
+ SoC
+Message-ID: <4ede8911-827d-4fad-b327-52c9aa7ed957@lunn.ch>
+References: <20240510000331.154486-3-jitendra.vegiraju@broadcom.com>
+ <20240511015924.41457-1-jitendra.vegiraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240511073705.230507-1-ast@fiberby.net>
+In-Reply-To: <20240511015924.41457-1-jitendra.vegiraju@broadcom.com>
 
-On Sat, May 11, 2024 at 07:37:03AM +0000, Asbjørn Sloth Tønnesen wrote:
-> This driver currently doesn't support any control flags.
-> 
-> Use flow_rule_match_has_control_flags() to check for control flags,
-> such as can be set through `tc flower ... ip_flags frag`.
-> 
-> In case any control flags are masked, flow_rule_match_has_control_flags()
-> sets a NL extended error message, and we return -EOPNOTSUPP.
-> 
-> Only compile-tested.
-> 
-> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+> +	/* This device interface is directly attached to the switch chip on
+> +	 *  the SoC. Since no MDIO is present, register fixed_phy.
+> +	 */
+> +	brcm_priv->phy_dev =
+> +		 fixed_phy_register(PHY_POLL,
+> +				    &dwxgmac_brcm_fixed_phy_status, NULL);
+> +	if (IS_ERR(brcm_priv->phy_dev)) {
+> +		dev_err(&pdev->dev, "%s\tNo PHY/fixed_PHY found\n", __func__);
+> +		return -ENODEV;
+> +	}
+> +	phy_attached_info(brcm_priv->phy_dev);
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+What switch is it? Will there be patches to extend SF2?
+
+	Andrew
+
 
