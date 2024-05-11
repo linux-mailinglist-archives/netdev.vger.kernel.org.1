@@ -1,161 +1,227 @@
-Return-Path: <netdev+bounces-95690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DBDC8C30C2
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 13:02:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06D48C3140
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 14:21:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D91681F218EA
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 11:02:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 531D3B211AD
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 12:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CAC54278;
-	Sat, 11 May 2024 11:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0104655E4F;
+	Sat, 11 May 2024 12:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fVtpwWRQ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TlLqps4Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7D33BB21
-	for <netdev@vger.kernel.org>; Sat, 11 May 2024 11:02:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EAB855C3B
+	for <netdev@vger.kernel.org>; Sat, 11 May 2024 12:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715425359; cv=none; b=Xewz/025cqpkHjooc6bNT+s0WYsO0FsnZ9GGc2vGNap+YwfMMmvJClrQGC5FfpgLk6aJBkxgG/SGp/tY9eEqwCspD2LQFzl5I5DjUQZtyyZpfHxuiYL7I3i1vEDgfrgHHvZ+6YUllq2YWtIvAnz0gFYFvfavZsLwtgKPQgfftQk=
+	t=1715430098; cv=none; b=dBu1Nvpf4r9toZ4N9l+JfeWpFma1E5WxznxdkqwQt9xBSha5OOhf53hjyNVWPOztrkjC0M/cfhgCbr93R/GM36jno43KW+9Dr33oTuCVaqZIdtNWaV6hc2e9m7fOjnMjzo8vxo2RKprjBvSx2hWZRVauM+ABU6P339/f9U6q5EM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715425359; c=relaxed/simple;
-	bh=vDqy2rUJHSBhHFmjJtm+s+VS/KY6qlG35a/J5pyzAcw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eCPRR2Hnb48tXh1D8ZRHk8ys9NpJYz8fOqccR+H32JVw/LOH/3J+DHacoGxSkopa5JPQbNxIyIfODxY6t04AAB8nTcXLBXgCEkipGQ0hihqYtwhbKMenGWjJ02RQOEOXV96aptXXv0EKlu/mkAfG6nmvc86mDeS3GHbzCqZEC1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fVtpwWRQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715425356;
+	s=arc-20240116; t=1715430098; c=relaxed/simple;
+	bh=/s/EJ4Je67SgUx8knRzcJnnkEqUgDovl83UXXVmO9NM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KMO2sG05tBc2aMttNoGcnvYYb8KBdPU4KSxhcn0rF/rLlVQhyb5p8ePbz/zV2mFFPUHSoZaHeeUg+6oaGMuhdV/LZz6cZ/R/S6l8xzzkDNIKgQnmqQen2fNq5U8BKEPG5Zrd8v+oxyaqeLW6+xM8lDi4Szz2bEr6yQ7QycgqilA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TlLqps4Q; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <11f7d33c-80b1-40db-87c0-566ed24c389e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1715430093;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Gnu1vXlSmPcmH/HpL6fCtMgv+98LozLNST85UYYD6a8=;
-	b=fVtpwWRQwLqdJpxvUHp1Lop3w5z+znONvgXesMY9a2wPd4hsV/Qf6wgI00iMUzH3cn6g1h
-	u9ybY05m7a90DkdvBRRklkg5DEJp2Qb66Y/N0i2k7di5i2djvpAR8ln+Jz4NCOTcSll1/t
-	vWHjnBtRL5mQTRcxepFWdGHVpDuDM+Y=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-647-K2UWfr-KPfS8fe0-YtsX9w-1; Sat, 11 May 2024 07:02:35 -0400
-X-MC-Unique: K2UWfr-KPfS8fe0-YtsX9w-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2b265d41949so2596500a91.1
-        for <netdev@vger.kernel.org>; Sat, 11 May 2024 04:02:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715425354; x=1716030154;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Gnu1vXlSmPcmH/HpL6fCtMgv+98LozLNST85UYYD6a8=;
-        b=ZbQCguLA7d5IrCfPunk6Q7cZtXwgQyJl4pEToHY81QJJYJUXiasGlLs4C08VH5yZZh
-         CEQJZVHCcFEpi37NuVIRDjDU/T6UUnt4UgpBDohXvktASWzk84rdsaz9I2xSuct0XXh2
-         OXEWiy5gLJsBhRi+PLdUErT6VB8V4y9+boLKXBg7GmqKfjB2FYVcwlhgr9iz7Zo8D7lo
-         KX0fuGWXGENyyDZUo/DIWhQuWsXmXcmBh5FfPyBiVHKje/kqDywg8mZ4em132nq/7Smx
-         cH1AxGNcGGQhJb+kMxr5a7PWwuMUxUQ7JoiWnbgDHao617u1zKnh3oT4Xqk4bbqmL9bH
-         3ruQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVHjeoSBCSBX/fM79jfyq0FjLDrktNufNM71oPROjndsl4te6+FSpMZ6WBsKZKhHEQvCmkDUZ8x2r28LlSCDYB37Vxh8h0P
-X-Gm-Message-State: AOJu0YzzfIdLPrPl5pAVSS4k7C6Bs80puVx/BHbBU/VbX0SWiku0YoQ9
-	RWAxF2KCLq4YcwRRB7ySS/A/Ehz41Kb9Q4sSktTuu3jiFnhUSQjr6RZ0CfgqXXbaVMazJsnm+IR
-	QNd6pP23Prt6fFNARzEKPSVlJl6zDleC0KsvlxN5E6zf/ApC4HBG+AA==
-X-Received: by 2002:a17:902:db0a:b0:1eb:75de:2a5b with SMTP id d9443c01a7336-1ef4405977fmr65410985ad.62.1715425354117;
-        Sat, 11 May 2024 04:02:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHW1wVcz3JzT6t2/hgM7DFD3R3lj4OMYE08lFFhh193x9UELxrofhUoXM2JG/MivKkiCPpO3Q==
-X-Received: by 2002:a17:902:db0a:b0:1eb:75de:2a5b with SMTP id d9443c01a7336-1ef4405977fmr65410595ad.62.1715425353530;
-        Sat, 11 May 2024 04:02:33 -0700 (PDT)
-Received: from zeus ([240b:10:83a2:bd00:6e35:f2f5:2e21:ae3a])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0b9d1642sm46757925ad.31.2024.05.11.04.02.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 May 2024 04:02:32 -0700 (PDT)
-Date: Sat, 11 May 2024 20:02:28 +0900
-From: Ryosuke Yasuoka <ryasuoka@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: krzk@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, syoshida@redhat.com,
-	syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v4] nfc: nci: Fix uninit-value in nci_rx_work
-Message-ID: <Zj9QRIjGLbVdd7MX@zeus>
-References: <20240509113036.362290-1-ryasuoka@redhat.com>
- <20240510190613.72838bf0@kernel.org>
+	bh=Tlvf+UlQ8ivFvfmxIaptV3Ron15h1w/sRKGEJBxcYgc=;
+	b=TlLqps4QtC+iBmiJlBJAtOvBjiHGZqg3Q+ulvm29I6tV0AwhEVhfKTHlGd+7C95A8FfTeX
+	D8wZc6KevLkBHzx4MwuaFOgSK23JMMUXEkcu1NUbo1NIboMLTFB1yDdPtzF4QaO4dIdRxs
+	HlLHgqQlO72H1Y4THirO1Nb+sa9+veM=
+Date: Sat, 11 May 2024 14:21:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240510190613.72838bf0@kernel.org>
+Subject: Re: [PATCH net-next 1/2] net/smc: refatoring initialization of smc
+ sock
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
+ guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+ tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+References: <1715314333-107290-1-git-send-email-alibuda@linux.alibaba.com>
+ <1715314333-107290-2-git-send-email-alibuda@linux.alibaba.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <1715314333-107290-2-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Thank you for your review.
-
-On Fri, May 10, 2024 at 07:06:13PM -0700, Jakub Kicinski wrote:
-> On Thu,  9 May 2024 20:30:33 +0900 Ryosuke Yasuoka wrote:
-> > -		if (!nci_plen(skb->data)) {
-> > +		if (!skb->len) {
-> >  			kfree_skb(skb);
-> > -			kcov_remote_stop();
-> > -			break;
-> > +			continue;
+在 2024/5/10 6:12, D. Wythe 写道:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
 > 
-> the change from break to continue looks unrelated
-
-OK. I'll leave this break in this patch. I'll send another patch about
-it.
-
-> >  		}
+> This patch aims to isolate the shared components of SMC socket
+> allocation by introducing smc_sock_init() for sock initialization
+> and __smc_create_clcsk() for the initialization of clcsock.
 > 
-> > -			nci_ntf_packet(ndev, skb);
-> > +			if (nci_valid_size(skb, NCI_CTRL_HDR_SIZE))
+> This is in preparation for the subsequent implementation of the
+> AF_INET version of SMC.
 > 
-> > +			if (nci_valid_size(skb, NCI_DATA_HDR_SIZE))
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> ---
+>   net/smc/af_smc.c | 93 +++++++++++++++++++++++++++++++-------------------------
+>   1 file changed, 52 insertions(+), 41 deletions(-)
 > 
-> 
-> #define NCI_CTRL_HDR_SIZE                                       3
-> #define NCI_DATA_HDR_SIZE                                       3
-> 
-> you can add a BUILD_BUG_ON(NCI_CTRL_HDR_SIZE == NCI_DATA_HDR_SIZE)
-> and save all the code duplication.
-> 
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index 9389f0c..1f03724 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -361,34 +361,43 @@ static void smc_destruct(struct sock *sk)
+>   		return;
+>   }
+>   
+> -static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
+> -				   int protocol)
+> +static void smc_sock_init(struct net *net, struct sock *sk, int protocol)
+>   {
+> -	struct smc_sock *smc;
+> -	struct proto *prot;
+> -	struct sock *sk;
+> -
+> -	prot = (protocol == SMCPROTO_SMC6) ? &smc_proto6 : &smc_proto;
+> -	sk = sk_alloc(net, PF_SMC, GFP_KERNEL, prot, 0);
+> -	if (!sk)
+> -		return NULL;
+> +	struct smc_sock *smc = smc_sk(sk);
+>   
+> -	sock_init_data(sock, sk); /* sets sk_refcnt to 1 */
+>   	sk->sk_state = SMC_INIT;
+> -	sk->sk_destruct = smc_destruct;
+>   	sk->sk_protocol = protocol;
+> +	mutex_init(&smc->clcsock_release_lock);
 
-Sorry I don't get it. Do you mean I just insert
-BUILD_BUG_ON(NCI_CTRL_HDR_SIZE != NCI_DATA_HDR_SIZE) or insert this and
-clean up the code duplication like this? (It is just a draft. I just
-share what I mean.) I can avoid to call nci_valid_size() repeatedly
-inside the switch statement.
+Please add mutex_destroy(&smc->clcsock_release_lock); when 
+smc->clcsock_release_lock is no longer used.
 
-static void nci_rx_work(struct work_struct *work)
-{
-...
-		if (!skb->len) {
-			kfree_skb(skb);
-			kcov_remote_stop();
-			break;
-		}
+Or else some tools will notify errors.
 
-		BUILD_BUG_ON(NCI_CTRL_HDR_SIZE != NCI_DATA_HDR_SIZE);
-		unsigned int hdr_size = NCI_CTRL_HDR_SIZE;
+Zhu Yanjun
 
-		if (!nci_valid_size(skb, hdr_size)) {
-			kfree_skb(skb);
-			continue;
-		}
-
-		/* Process frame */
-		switch (nci_mt(skb->data)) {
-		case NCI_MT_RSP_PKT:
-			nci_rsp_packet(ndev, skb);
-			break;
-
-		case NCI_MT_NTF_PKT:
-			nci_ntf_packet(ndev, skb);
-			break;
-
+>   	WRITE_ONCE(sk->sk_sndbuf, 2 * READ_ONCE(net->smc.sysctl_wmem));
+>   	WRITE_ONCE(sk->sk_rcvbuf, 2 * READ_ONCE(net->smc.sysctl_rmem));
+> -	smc = smc_sk(sk);
+>   	INIT_WORK(&smc->tcp_listen_work, smc_tcp_listen_work);
+>   	INIT_WORK(&smc->connect_work, smc_connect_work);
+>   	INIT_DELAYED_WORK(&smc->conn.tx_work, smc_tx_work);
+>   	INIT_LIST_HEAD(&smc->accept_q);
+>   	spin_lock_init(&smc->accept_q_lock);
+>   	spin_lock_init(&smc->conn.send_lock);
+> -	sk->sk_prot->hash(sk);
+> -	mutex_init(&smc->clcsock_release_lock);
+>   	smc_init_saved_callbacks(smc);
+> +	smc->limit_smc_hs = net->smc.limit_smc_hs;
+> +	smc->use_fallback = false; /* assume rdma capability first */
+> +	smc->fallback_rsn = 0;
+> +
+> +	sk->sk_destruct = smc_destruct;
+> +	sk->sk_prot->hash(sk);
+> +}
+> +
+> +static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
+> +				   int protocol)
+> +{
+> +	struct proto *prot;
+> +	struct sock *sk;
+> +
+> +	prot = (protocol == SMCPROTO_SMC6) ? &smc_proto6 : &smc_proto;
+> +	sk = sk_alloc(net, PF_SMC, GFP_KERNEL, prot, 0);
+> +	if (!sk)
+> +		return NULL;
+> +
+> +	sock_init_data(sock, sk); /* sets sk_refcnt to 1 */
+> +	smc_sock_init(net, sk, protocol);
+>   
+>   	return sk;
+>   }
+> @@ -3321,6 +3330,31 @@ static ssize_t smc_splice_read(struct socket *sock, loff_t *ppos,
+>   	.splice_read	= smc_splice_read,
+>   };
+>   
+> +static int __smc_create_clcsk(struct net *net, struct sock *sk, int family)
+> +{
+> +	struct smc_sock *smc = smc_sk(sk);
+> +	int rc;
+> +
+> +	rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
+> +			      &smc->clcsock);
+> +	if (rc) {
+> +		sk_common_release(sk);
+> +		return rc;
+> +	}
+> +
+> +	/* smc_clcsock_release() does not wait smc->clcsock->sk's
+> +	 * destruction;  its sk_state might not be TCP_CLOSE after
+> +	 * smc->sk is close()d, and TCP timers can be fired later,
+> +	 * which need net ref.
+> +	 */
+> +	sk = smc->clcsock->sk;
+> +	__netns_tracker_free(net, &sk->ns_tracker, false);
+> +	sk->sk_net_refcnt = 1;
+> +	get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
+> +	sock_inuse_add(net, 1);
+> +	return 0;
+> +}
+> +
+>   static int __smc_create(struct net *net, struct socket *sock, int protocol,
+>   			int kern, struct socket *clcsock)
+>   {
+> @@ -3346,35 +3380,12 @@ static int __smc_create(struct net *net, struct socket *sock, int protocol,
+>   
+>   	/* create internal TCP socket for CLC handshake and fallback */
+>   	smc = smc_sk(sk);
+> -	smc->use_fallback = false; /* assume rdma capability first */
+> -	smc->fallback_rsn = 0;
+> -
+> -	/* default behavior from limit_smc_hs in every net namespace */
+> -	smc->limit_smc_hs = net->smc.limit_smc_hs;
+>   
+>   	rc = 0;
+> -	if (!clcsock) {
+> -		rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
+> -				      &smc->clcsock);
+> -		if (rc) {
+> -			sk_common_release(sk);
+> -			goto out;
+> -		}
+> -
+> -		/* smc_clcsock_release() does not wait smc->clcsock->sk's
+> -		 * destruction;  its sk_state might not be TCP_CLOSE after
+> -		 * smc->sk is close()d, and TCP timers can be fired later,
+> -		 * which need net ref.
+> -		 */
+> -		sk = smc->clcsock->sk;
+> -		__netns_tracker_free(net, &sk->ns_tracker, false);
+> -		sk->sk_net_refcnt = 1;
+> -		get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
+> -		sock_inuse_add(net, 1);
+> -	} else {
+> +	if (!clcsock)
+> +		rc = __smc_create_clcsk(net, sk, family);
+> +	else
+>   		smc->clcsock = clcsock;
+> -	}
+> -
+>   out:
+>   	return rc;
+>   }
 
 
