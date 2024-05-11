@@ -1,65 +1,61 @@
-Return-Path: <netdev+bounces-95733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7FF38C3301
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 19:50:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5B618C3304
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 19:53:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93C63281BDA
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 17:50:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44B9F1F21C02
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 17:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C031C286;
-	Sat, 11 May 2024 17:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9025A1C693;
+	Sat, 11 May 2024 17:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SOsZuazO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bg3OttkP"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BECB17588;
-	Sat, 11 May 2024 17:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE6E17588;
+	Sat, 11 May 2024 17:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715449822; cv=none; b=TiLecZLJIyd0CCsIFDSfkMqLWzgANGXGsjtrDUY3XT1MZGe2792rFnVD4/kW2EEZ3Thg6Ak/vUZEtyKymUQ7rMadB6q3PftuTT30/3vFJDuj7zMsxCSb8GvOTfBBKpJ8hq77LG88kf6gtCLeG+ThfVJLZqZ8e4XsBiHb5dcjrh8=
+	t=1715450014; cv=none; b=YlkWYI/ZRhlFB+kWLC5DV9/VAhB5ORKwhmdpIpFRzSf7Bzj2H8PsCmJ+T6LxKYoteeNk1jpoksUcRMQGtEGFxIUqJSX31H5zBw/bcjDF0X2rzGWdpS0Qd2jZ7EfDbO5pT+3dy4XIXOhU31jFCHdJzygsORyD51yzUTjEBZzaXI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715449822; c=relaxed/simple;
-	bh=3qrxI+McJJ24PePgQfQ7tnTmV4FgZcW6I+hckmEOAcE=;
+	s=arc-20240116; t=1715450014; c=relaxed/simple;
+	bh=35okiB1iB8bZt1zztcxMY+1mWKZVmAt1sMm6fXCVHRU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TmQsfDqPnOEDCJbyyFlLqvTi0KgWu4qf5nTDBAfsJ66W05Y7Aer1i4Ubq5hBusCsjMwBQhNP0hrX9DQU4aJ+tWnos33DPQ4UmQXyojJjQCaDyqQ3Z8vqY3rYWDDYBtv6H4WuwVrf8UGvU7RiZf/c3fsaLQO6nEUZbQLxvwsmfCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SOsZuazO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kGaJZOB8xwTriljjslRKC+hBQsPPqyV+ILWDtae2JQY=; b=SOsZuazOcT8hf6p0za4IL+Cq4n
-	rwXdOeyvV9AUqMQUGvYvejxlj2Y7/mExGSmrSMVcho/+dLImIGasUzlR4jr14gHYQ9BrlyBLnTYNk
-	ykyGmPzwdKnvbxI7ImGTZf3LLl9vThkHZy8GnZnm29CNiW2MrM0q5VFQI23WcISi7ZjE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s5qrD-00FCyO-4C; Sat, 11 May 2024 19:50:03 +0200
-Date: Sat, 11 May 2024 19:50:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>,
-	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	bcm-kernel-feedback-list@broadcom.com, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
-	richardcochran@gmail.com, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2, net-next, 2/2] net: stmmac: PCI driver for BCM8958X
- SoC
-Message-ID: <08b9be81-52c9-449d-898f-61aa24a7b276@lunn.ch>
-References: <20240510000331.154486-3-jitendra.vegiraju@broadcom.com>
- <20240511015924.41457-1-jitendra.vegiraju@broadcom.com>
- <4ede8911-827d-4fad-b327-52c9aa7ed957@lunn.ch>
- <Zj+nBpQn1cqTMJxQ@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LbuTypLY98lsWNkT922arSd6Gdzn4MXx5gif3Nu4GP9ZCbOJ02cQrWl1xr7g0DXVAWfxwBKqkzWLFZBlhBf5KB+jbAVPuKooqCwp+Pwl0zQPLfTyXpHR+bxbZrCCexJ2q4R0JFrkIm7PQAytS2yVxbxM+dKb0OyMsEKjIBpeub0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bg3OttkP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A705AC2BBFC;
+	Sat, 11 May 2024 17:53:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715450013;
+	bh=35okiB1iB8bZt1zztcxMY+1mWKZVmAt1sMm6fXCVHRU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Bg3OttkPGY5388kU5cRBN8zJrPnSYv4QnuR6ArCOC6Jb6bvj4UifjggL8mJqDD+mC
+	 xUuHqSxQXamYha0GlLqw3n5k1ACfUbwMAdYTeUFN4wco5/TMaUzz2mtTv99riFSCKk
+	 IB98jI7lWiGOOaIRJRyEXS1LinqUwneHHdTux7DByvW03ZXCCZMwuiwRHXA0BY9bAE
+	 q1Xyk9t7ljOy+JgV5jxzDiK2WXIKboS1ny7SFNCF4iTtj3tEXq4NwpylMtzgncG/6T
+	 KpKTVSqsR9ASfYguvWPbJGKK3t1jvDA5ZOMgKsq48MMj2fH1BOn9dhTaHSmg7UeZ81
+	 LYKiaU3BoX3wA==
+Date: Sat, 11 May 2024 18:53:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net-next] virtio_net: Fix error code in
+ __virtnet_get_hw_stats()
+Message-ID: <20240511175327.GT2347895@kernel.org>
+References: <3762ac53-5911-4792-b277-1f1ead2e90a3@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,43 +64,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zj+nBpQn1cqTMJxQ@shell.armlinux.org.uk>
+In-Reply-To: <3762ac53-5911-4792-b277-1f1ead2e90a3@moroto.mountain>
 
-On Sat, May 11, 2024 at 06:12:38PM +0100, Russell King (Oracle) wrote:
-> On Sat, May 11, 2024 at 06:16:52PM +0200, Andrew Lunn wrote:
-> > > +	/* This device interface is directly attached to the switch chip on
-> > > +	 *  the SoC. Since no MDIO is present, register fixed_phy.
-> > > +	 */
-> > > +	brcm_priv->phy_dev =
-> > > +		 fixed_phy_register(PHY_POLL,
-> > > +				    &dwxgmac_brcm_fixed_phy_status, NULL);
-> > > +	if (IS_ERR(brcm_priv->phy_dev)) {
-> > > +		dev_err(&pdev->dev, "%s\tNo PHY/fixed_PHY found\n", __func__);
-> > > +		return -ENODEV;
-> > > +	}
-> > > +	phy_attached_info(brcm_priv->phy_dev);
-> > 
-> > What switch is it? Will there be patches to extend SF2?
+On Fri, May 10, 2024 at 03:50:45PM +0300, Dan Carpenter wrote:
+> The virtnet_send_command_reply() function returns true on success or
+> false on failure.  The "ok" variable is true/false depending on whether
+> it succeeds or not.  It's up to the caller to translate the true/false
+> into -EINVAL on failure or zero for success.
 > 
-> ... and why is this legacy fixed_phy even necessary when stmmac uses
-> phylink which supports fixed links, including with custom fixed status?
+> The bug is that __virtnet_get_hw_stats() returns false for both
+> errors and success.  It's not a bug, but it is confusing that the caller
+> virtnet_get_hw_stats() uses an "ok" variable to store negative error
+> codes.
+> 
+> Fix the bug and clean things up so that it's clear that
+> __virtnet_get_hw_stats() returns zero on success or negative error codes
+> on failure.
+> 
+> Fixes: 941168f8b40e ("virtio_net: support device stats")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-And now you mentions legacy Fixed link:
+Hi Dan, all,
 
-+MODULE_DESCRIPTION("Broadcom 10G Automotive Ethernet PCIe driver");
+Strictly this is doing two things.  But I agree that the "ok" variable in
+virtnet_get_hw_stats() was very confusing, and I'm not sure how long it
+would have taken me to grasp the fix without that change being here too.
 
-This claims it is a 10G device. You cannot represent 10G using legacy
-fixed link.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Does this MAC directly connect to the switch within the SoC? There is
-no external MII interface? Realtek have been posting a MAC driver for
-something similar were the MAC is directly connected to the switch
-within the SoC. The MAC is fixed at 5G, there is no phylink/phylib
-support, set_link_ksetting return -EOPNOTSUPP and get_link_ksettings
-returns hard coded 5G.
-
-We need a better understanding of the architecture here, before we can
-advise the correct way to do this.
-
-      Andrew
 
