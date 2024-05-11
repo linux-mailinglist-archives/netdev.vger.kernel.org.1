@@ -1,65 +1,58 @@
-Return-Path: <netdev+bounces-95702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B3938C3200
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 17:02:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A991E8C321A
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 17:23:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58BEBB20F19
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 15:02:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3E741C20B19
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 15:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E156355C1A;
-	Sat, 11 May 2024 15:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D16E56B63;
+	Sat, 11 May 2024 15:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EOQJlBLk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pNBmlTGI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE69E1E526;
-	Sat, 11 May 2024 15:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE7D5336F;
+	Sat, 11 May 2024 15:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715439754; cv=none; b=e7LkEEJ0wcJSg0laD0ZmwFYAlLfEoU6Bkx5D6ytqKI10QWKay0rHY9ZfI3QRRTyr67EZ/14Oyixq/LuYHq3HgzuKJiIqaAWWtSXbS+ZExpvB5nMFfMR/Pvu7e1YJNII3t4qkhG5Jpe7H3dekyD6vfDY1eQzPP7qk2K2WUa/Fcl4=
+	t=1715440997; cv=none; b=rM90s/eh5fWxgseRuAz2CpIHpeC9SrPt2kTq9TIY0hqsOYQEyF1RzxNN5gmhjCLKOGK30uNbhX+9km3IQn66JItE8jrx77z7BwaGOWqSmSntEzDcfxsV/kZFqOTPRuKcEfai4UGNY4JYDf3fk2f1ihPzTBcGp712/9F1P1sxyM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715439754; c=relaxed/simple;
-	bh=MZAWv/ScyEBJVD21IicPp5L10HCN0chmKIi6qdoF9E0=;
+	s=arc-20240116; t=1715440997; c=relaxed/simple;
+	bh=Vk5ReHWzVVjJeH+buVnWLB+fuULLDSItvRQbW8AbVtw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D/FqEOB2h9+y2JbrfE++4TC5aeN6EWiTWUSWNvAJD7/cQk3TdjfVoGPVROkABlS0El6R9Hu6mxHMaMjY/MH32af3HL0vUhJOxwJOMaaUaJWp/325UCNsZtqch/qGVPpUSAEMAEqxMWxeH0+ZPhOuG7NN/Vp4gFvNcZMipkISiKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EOQJlBLk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CCBCC2BBFC;
-	Sat, 11 May 2024 15:02:27 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=HggaPb+qJfAhwPhgK87wzw7LLnO6bVkDhgU4Wo+QXJ0HZc/duCj0D2h6OLb4wPg0L766B/suKYxD+d1/x7LVLYTIDa+/mPyt6elGvqg/3WtZvgORGem3KPbD6k5XzWb+dAf9rOfyWbfW4p7AOFPE08wrnBvl62Y7ka/fggiF3HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pNBmlTGI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9767BC2BD11;
+	Sat, 11 May 2024 15:23:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715439754;
-	bh=MZAWv/ScyEBJVD21IicPp5L10HCN0chmKIi6qdoF9E0=;
+	s=k20201202; t=1715440996;
+	bh=Vk5ReHWzVVjJeH+buVnWLB+fuULLDSItvRQbW8AbVtw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EOQJlBLkU83hwtxIzoRrpInNyQTz0MO/2OhNMD2dLwkHCxFfjmMQ5NiQmctLMLTWk
-	 Il6ktAJwEbqlKLiSm3cUHjNhMTy/XdqXbtUMFW2Umkx9EpwkBrkN+EVdeW+O6qXEAq
-	 vqK6X61CaKrd2Z3hruLVZy4nU+9MyLljT7j4Qc5Zy/4i4FhOcEXXyNBpkJiZ5vMLON
-	 vAjOzytqc+LdsIBpL9Hcd+ORNqxpTDuUe0y596Dd9TKtRNuuGwQtEkfB3LVFOmCp+n
-	 PlpZuRVhpeVaCcWF5ta1lHDGzebwXWHQ5graYzlNckH2mcii1gkgJPNWDb5/Tg14hg
-	 OaHIGXKF2hJQQ==
-Date: Sat, 11 May 2024 16:02:25 +0100
+	b=pNBmlTGIn6daiLU288vVV/TlWwLKKGfuE2Bg9yFPEEohed4IRu9FS5OYjh97pxLq9
+	 FYzbpPJVPC1lb2iQKMJaBQtEJRaZZtiuggmTELgk5HLTpq0PAoLGgmCoUlBwHa18in
+	 NV54gAJWFRWQaJCHLF/1oxYz2jwd2mEsKB37iqQ72ABQRjBKYkU7HQXYk5729X4M5B
+	 C3dddWbsAc20i54UX8k95whjMYp77fq0lZwq2o/6TUXme6P4OslMPy+FGNgOLXJLvQ
+	 m9dWFso7541iv5/Hwp9bYhwmHSsHphVhTzn8V3Wqs06YX+4GGsSSHAx6+rpDMJaWKv
+	 gvgmCksRbVxRg==
+Date: Sat, 11 May 2024 16:23:10 +0100
 From: Simon Horman <horms@kernel.org>
-To: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
-	mingo@redhat.com, tglx@linutronix.de, x86@kernel.org,
-	netdev@vger.kernel.org, richardcochran@gmail.com,
-	linux-input@vger.kernel.org, dmitry.torokhov@gmail.com,
-	zackr@vmware.com, linux-graphics-maintainer@vmware.com,
-	pv-drivers@vmware.com, timothym@vmware.com, akaher@vmware.com,
-	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
-	tzimmermann@suse.de, mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com, kirill.shutemov@linux.intel.com,
-	Nadav Amit <nadav.amit@gmail.com>, Jeff Sipek <jsipek@vmware.com>
-Subject: Re: [PATCH v9 3/8] x86/vmware: Introduce VMware hypercall API
-Message-ID: <20240511150225.GK2347895@kernel.org>
-References: <20240505182829.GBZjfPzeEijTsBUth5@fat_crate.local>
- <20240506215305.30756-1-alexey.makhalov@broadcom.com>
- <20240506215305.30756-4-alexey.makhalov@broadcom.com>
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, Isaac Ganoung <inventor500@vivaldi.net>,
+	Yongqin Liu <yongqin.liu@linaro.org>
+Subject: Re: [PATCH] net: usb: ax88179_178a: fix link status when link is set
+ to down/up
+Message-ID: <20240511152310.GL2347895@kernel.org>
+References: <20240510090846.328201-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,63 +61,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240506215305.30756-4-alexey.makhalov@broadcom.com>
+In-Reply-To: <20240510090846.328201-1-jtornosm@redhat.com>
 
-On Mon, May 06, 2024 at 02:53:00PM -0700, Alexey Makhalov wrote:
-> Introduce vmware_hypercall family of functions. It is a common
-> implementation to be used by the VMware guest code and virtual
-> device drivers in architecture independent manner.
+On Fri, May 10, 2024 at 11:08:28AM +0200, Jose Ignacio Tornos Martinez wrote:
+> The idea was to keep only one reset at initialization stage in order to
+> reduce the total delay, or the reset from usbnet_probe or the reset from
+> usbnet_open.
 > 
-> The API consists of vmware_hypercallX and vmware_hypercall_hb_{out,in}
-> set of functions by analogy with KVM hypercall API. Architecture
-> specific implementation is hidden inside.
+> I have seen that restarting from usbnet_probe is necessary to avoid doing
+> too complex things. But when the link is set to down/up (for example to
+> configure a different mac address) the link is not correctly recovered
+> unless a reset is commanded from usbnet_open.
 > 
-> It will simplify future enhancements in VMware hypercalls such
-> as SEV-ES and TDX related changes without needs to modify a
-> caller in device drivers code.
+> So, detect the initialization stage (first call) to not reset from
+> usbnet_open after the reset from usbnet_probe and after this stage, always
+> reset from usbnet_open too (when the link needs to be rechecked).
 > 
-> Current implementation extends an idea from commit bac7b4e84323
-> ("x86/vmware: Update platform detection code for VMCALL/VMMCALL
-> hypercalls") to have a slow, but safe path in VMWARE_HYPERCALL
-> earlier during the boot when alternatives are not yet applied.
-> This logic was inherited from VMWARE_CMD from the commit mentioned
-> above. Default alternative code was optimized by size to reduce
-> excessive nop alignment once alternatives are applied. Total
-> default code size is 26 bytes, in worse case (3 bytes alternative)
-> remaining 23 bytes will be aligned by only 3 long NOP instructions.
+> Apply to all the possible devices, the behavior now is going to be the same.
 > 
-> Signed-off-by: Alexey Makhalov <alexey.makhalov@broadcom.com>
-> Reviewed-by: Nadav Amit <nadav.amit@gmail.com>
-> Reviewed-by: Jeff Sipek <jsipek@vmware.com>
+> cc: stable@vger.kernel.org # 6.6+
+> Fixes: 56f78615bcb1 ("net: usb: ax88179_178a: avoid writing the mac address before first reading")
+> Reported-by: Isaac Ganoung <inventor500@vivaldi.net>
+> Reported-by: Yongqin Liu <yongqin.liu@linaro.org>
+> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
 
-...
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> diff --git a/arch/x86/include/asm/vmware.h b/arch/x86/include/asm/vmware.h
-
-...
-
-> +static inline
-> +unsigned long vmware_hypercall3(unsigned long cmd, unsigned long in1,
-> +				uint32_t *out1, uint32_t *out2)
-
-nit: u32 is preferred over uint32_t.
-     Likewise elsewhere in this patch-set.
-...
-
->  /*
-> - * The high bandwidth in call. The low word of edx is presumed to have the
-> - * HB bit set.
-> + * High bandwidth calls are not supported on encrypted memory guests.
-> + * The caller should check cc_platform_has(CC_ATTR_MEM_ENCRYPT) and use
-> + * low bandwidth hypercall it memory encryption is set.
-> + * This assumption simplifies HB hypercall impementation to just I/O port
-
-nit: implementation
-
-     checkpatch.pl --codespell is your friend
-
-> + * based approach without alternative patching.
->   */
-
-...
 
