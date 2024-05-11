@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-95742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CF278C33B3
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 22:16:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C62B88C33BE
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 22:31:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61AAA1F21674
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 20:16:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80EAF1F21662
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 20:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2DB1CD00;
-	Sat, 11 May 2024 20:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D3E21104;
+	Sat, 11 May 2024 20:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DymBGjiZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZQVPtuGr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD9E3C2D;
-	Sat, 11 May 2024 20:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD746FC6;
+	Sat, 11 May 2024 20:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715458560; cv=none; b=GXVJ0o/NZiqd/e3E2h0mDX7MxXcXD74jh6eqjOj7bQF4KS5MMflAutqprkOaoXeHNIfwSyBfYBXCGoMC4qhEduyC2E4n466hjuxfteBuqb5K7exaQe7vN7V7PP9MJmUP52/etO4qGLTXB7cjF3O1iBLUDTZik7rgAraJLLyZ1w8=
+	t=1715459471; cv=none; b=XApxZEWtAfLgV7x1sLpgoCw6CTzUmzN9MXlrwh7Oic+oqBi/nNS0GSsdgrZyKP9N4adFc6DiUqxJ0XhDOGDNPL7lptfPMzZhzgQFO056yVMZb+WXRM/7Z/WPfGuBgszeH0I+UWPGO9ZvGptKrZU5XQdZq7ed9uzosOClHa2wst8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715458560; c=relaxed/simple;
-	bh=1IjAiNYUYctqDc35nFzL2DbzK5lYGMO8OblnXldLPxQ=;
+	s=arc-20240116; t=1715459471; c=relaxed/simple;
+	bh=0DxUzvGB/Qr5c+EC7Gh9eYq9VeFtQn8F4tn+2/QbmNI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e78/789EpAKfXlzjhKb79+giW1wUFsFRq92oaH55ItGTShcGCTytsNv9npJi/EcjqoGEABoDk+W+N4gdW0s37FQZw2wu0as7eT1J0+0K7NBatxRv03vNup2T1OebeFPcTWxMaOmNUrIT81UhgteaaSldfOZtmbrXzPt2wNS/T7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DymBGjiZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC3FCC2BBFC;
-	Sat, 11 May 2024 20:15:56 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=SSRCZKQifSU/370VKLVILC0E0pXWJhHcr6/kr9FngpJBh2P+u5R4tVObUY9TwiD//iu1gqNDa7eCpolL171mbIOzyhdSkBqo3rKidxu5aoow7gv1lFOznqMHVKwCKgCrP/ERISs5r3nQHC4klW0onNNr03GmpN2WcgK8cquPQMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZQVPtuGr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51EC9C2BBFC;
+	Sat, 11 May 2024 20:31:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715458560;
-	bh=1IjAiNYUYctqDc35nFzL2DbzK5lYGMO8OblnXldLPxQ=;
+	s=k20201202; t=1715459470;
+	bh=0DxUzvGB/Qr5c+EC7Gh9eYq9VeFtQn8F4tn+2/QbmNI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DymBGjiZNPVCIetlZ/T6O+8Es8jsNNxDZN+q+kXLRewWQeEKehHcdopzx8pQqOIzA
-	 pjtj7wBSii/hrlGiOdR9OhsPUVCq/wXhe0qUXSFWdM6hqYccgyzTubuTz8cZef9l9J
-	 YjAYjBdhjczWyFJUvnz6IR8gNhUAro1JitTuci2FwDVKhqrNoLaQp1zggr2WzcoisD
-	 SS9aDlZ+UYCfGRG1MUVBkoWvsN9R5gMvqXJgwkJh1vmnLkpYVLXVzoEiBxUU2ykppJ
-	 wV6AAFu2pHlrY+byJ2wEBKi9r2vJa9ysz2BL8rTALsjbI1iiG513k0SW7HgTrx3gpD
-	 6+89gGMUYOISg==
-Date: Sat, 11 May 2024 21:15:54 +0100
+	b=ZQVPtuGrhabTWSuuLYJA0crkQZTOvFp0R+czP+cPQRtib2JY+ItIy+KH43ocCPUb4
+	 m+2hpPVJ40v9H5YqTfV36yv0SoBfGu2MlHH2FItMkgf7jvcgHAvcEdzoOlQW9FBhdQ
+	 +qC0vlcO9jKNwCfzX638npqmL3jBIILZFsHfwSLmYqKveyHmfePOAETh5w9BU9Pf/L
+	 KywvdxR+lklA8JU37vl3pOVhfyXB0Ea2yElsizyqey9KfPjNbW4imTM87PDJDG2Urm
+	 yFGPHY2M2eKnwuZc+Ua7Q7r8NVAUU8WhsPWeAqNavVJTEgvqdmVoAJG0vRIqwau4xO
+	 D4EscBK6Pv/ZQ==
+Date: Sat, 11 May 2024 21:31:04 +0100
 From: Simon Horman <horms@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	bhelgaas@google.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com
-Subject: Re: [PATCH V1 5/9] PCI/TPH: Introduce API functions to get/set
- steering tags
-Message-ID: <20240511201554.GV2347895@kernel.org>
-References: <20240509162741.1937586-1-wei.huang2@amd.com>
- <20240509162741.1937586-6-wei.huang2@amd.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: gregkh@linuxfoundation.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, johannes@sipsolutions.net,
+	philipp.g.hortmann@gmail.com, tdavies@darkphysics.net,
+	garyrookard@fastmail.org, straube.linux@gmail.com,
+	linux-staging@lists.linux.dev, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH 1/3] lib80211: Handle const struct lib80211_crypto_ops in
+ lib80211
+Message-ID: <20240511203104.GW2347895@kernel.org>
+References: <cover.1715443223.git.christophe.jaillet@wanadoo.fr>
+ <d6306f7c76015653e9539ddbcd1ed74d1681a98f.1715443223.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,97 +64,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240509162741.1937586-6-wei.huang2@amd.com>
+In-Reply-To: <d6306f7c76015653e9539ddbcd1ed74d1681a98f.1715443223.git.christophe.jaillet@wanadoo.fr>
 
-On Thu, May 09, 2024 at 11:27:37AM -0500, Wei Huang wrote:
-> This patch introduces two API functions, pcie_tph_get_st() and
-> pcie_tph_set_st(), for a driver to retrieve or configure device's
-> steering tags. There are two possible locations for steering tag
-> table and the code automatically figure out the right location to
-> set the tags if pcie_tph_set_st() is called. Note the tag value is
-> always zero currently and will be extended in the follow-up patches.
+On Sat, May 11, 2024 at 06:32:38PM +0200, Christophe JAILLET wrote:
+> lib80211_register_crypto_ops() and lib80211_unregister_crypto_ops() don't
+> modify their "struct lib80211_crypto_ops *ops" argument. So, it can be
+> declared as const.
 > 
-> Co-developed-by: Eric Van Tassell <Eric.VanTassell@amd.com>
-> Signed-off-by: Eric Van Tassell <Eric.VanTassell@amd.com>
-> Signed-off-by: Wei Huang <wei.huang2@amd.com>
-
-Hi Eric and Wei,
-
-I noticed a few minor problems flagged by Sparse
-which I'd like to bring to your attention.
-
+> Doing so, some adjustments are needed to also constify some date in
+> "struct lib80211_crypt_data", "struct lib80211_crypto_alg" and the
+> return value of lib80211_get_crypto_ops().
+> 
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 > ---
->  drivers/pci/pcie/tph.c  | 383 ++++++++++++++++++++++++++++++++++++++++
->  include/linux/pci-tph.h |  19 ++
->  2 files changed, 402 insertions(+)
-> 
-> diff --git a/drivers/pci/pcie/tph.c b/drivers/pci/pcie/tph.c
+> Compile tested only.
 
-...
+Hi Christophe,
 
-> +/*
-> + * For a given device, return a pointer to the MSI table entry at msi_index.
-> + */
-> +static void __iomem *tph_msix_table_entry(struct pci_dev *dev,
-> +					  __le16 msi_index)
-> +{
-> +	void *entry;
-> +	u16 tbl_sz;
-> +	int ret;
-> +
-> +	ret = tph_get_table_size(dev, &tbl_sz);
-> +	if (ret || msi_index > tbl_sz)
+Unfortunately allmodconfig W=1 build on x86_64 with Clang says:
 
-While tbl_sz is a host-byte order integer value, msi_index is little endian.
-So maths operations involving the latter doesn't seem right.
+.../libipw_wx.c:587:6: error: assigning to 'struct lib80211_crypto_ops *' from 'const struct lib80211_crypto_ops *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+ 587 |         ops = lib80211_get_crypto_ops(alg);
+     |             ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.../libipw_wx.c:590:7: error: assigning to 'struct lib80211_crypto_ops *' from 'const struct lib80211_crypto_ops *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+ 590 |                 ops = lib80211_get_crypto_ops(alg);
+     |                     ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Flagged by Sparse.
-
-> +		return NULL;
-> +
-> +	entry = dev->msix_base + msi_index * PCI_MSIX_ENTRY_SIZE;
-
-Likewise, there seem to be endian problems here here.
-
-Also, entry is used on the line above and below in a way
-where an __iomem annotation is expected, but entry doesn't have one.
-
-Also flagged by Sparse.
-
-> +
-> +	return entry;
-> +}
-
-...
-
-> +/* Write the steering tag to MSI-X vector control register */
-> +static void tph_write_tag_to_msix(struct pci_dev *dev, int msix_nr, u16 tag)
-> +{
-> +	u32 val;
-> +	void __iomem *vec_ctrl;
-> +	struct msi_desc *msi_desc;
-> +
-> +	msi_desc = tph_msix_index_to_desc(dev, msix_nr);
-> +	if (!msi_desc) {
-> +		pr_err("MSI-X descriptor for #%d not found\n", msix_nr);
-> +		return;
-> +	}
-> +
-> +	vec_ctrl = tph_msix_vector_control(dev, msi_desc->msi_index);
-
-According to Sparse, the type of msi_desc->msi_index is unsigned short.
-But tph_msix_vector_control expects it's second argument to be __le16.
-
-> +
-> +	val = readl(vec_ctrl);
-> +	val &= 0xffff;
-> +	val |= (tag << 16);
-> +	writel(val, vec_ctrl);
-> +
-> +	/* read back to flush the update */
-> +	val = readl(vec_ctrl);
-> +	msi_unlock_descs(&dev->dev);
-> +}
-
-...
+-- 
+pw-bot: changes-requested
 
