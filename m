@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-95667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D81A8C2F3F
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 05:14:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95EA58C2F46
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 05:14:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 073A2B22DCD
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 03:14:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C73561C214D2
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 03:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86FD24B29;
-	Sat, 11 May 2024 03:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0683F44C8F;
+	Sat, 11 May 2024 03:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="YUFjv5Pw"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Kqy2r6Jt"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA9B24B4A
-	for <netdev@vger.kernel.org>; Sat, 11 May 2024 03:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BF441A94
+	for <netdev@vger.kernel.org>; Sat, 11 May 2024 03:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715397252; cv=none; b=NxE2Dxab8CNmsaberBmCVhAQQFfjZrlk/QXc7ZsMLBAwe8vPqizvKemDkePD9L0dQZfTNIKeKbdSF0rWXzWiId5rECmON9xAB9HDsSawzvIouV+cqq3mx/Dw1hHzJ5n2I87QaU2bbciE5F8hnUlam9Ck02dhX2tHGZ5o66Lko6Q=
+	t=1715397258; cv=none; b=fIhcJflnGfF2EPt72KCYqzDNGRL1YIa7e4adheo9RMOHtCdfjwZUeteZWaQr3ch6DoaBnuBPirWfFFak5yG1eMVycgovMNADk0dghjMSfk+uQHZFocPYDmxqQvUDoEdtq/2TX+SGKlHkcmutJvjPizWkZ0OF64F4HVm9cOtNr5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715397252; c=relaxed/simple;
-	bh=omzQzopQH0JW8bJGtHY/sj2RzVtBsWUvr+TN0eY6PH4=;
+	s=arc-20240116; t=1715397258; c=relaxed/simple;
+	bh=lKcILrr0CQQbQMTw2bpUm49qL3L6gBAcLwf6s+8t+c8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=piPcFPh0zsRt7sBZTYdzxuzSiAjutDPOgCFGlsukBZufnZFHNKo5YVJZU1TcklF+Pb78ZaW7Y/Imrg+d0qysEJu1Ln2OeNySN34AR0r76qQNpMH1Qz8FncFJmegaLSJhWtAK/GueklZV/wsOxZo6Pyzd3Os/uJcIL2SXHxOXEOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=YUFjv5Pw; arc=none smtp.client-ip=115.124.30.101
+	 MIME-Version; b=gwjucb5nHQTgqBmlJSKo/wjUXzuhEUERcVPZQdEfPW2Zw8MVzpUFu8RB8Tu1ZLmEmvfpZmp9V22h3hLRSczk6EijeVNCu4WP+xP7MA9DAEbLCO7da2nAuHAKMzRMDBTDTHATSfSHCBZLkuFzzbVed51LwdPODEDCS0Hri2q0lGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Kqy2r6Jt; arc=none smtp.client-ip=115.124.30.112
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1715397247; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=5UihLdeeajwF/OQzQRPOPSmBI7ehRGApnTBKHo7SAk0=;
-	b=YUFjv5PwzazkEydC4lQds+XZbm+NpUgxs1MEMregpjWyRCvDyIKrapia/yusJ+WeHk7OZjCcbYTHCrVX+UJX+kckTR0bLSEmWd8YPl59zCrM2ZY1B16jhaWHDmHRFUAbzcMj9OXyPOmPFwdOpNx6F3mVDOgTJGCMO1hVA1jftyo=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R451e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067109;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W6BwHin_1715397245;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W6BwHin_1715397245)
+	t=1715397249; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=3659iuCuj9lMjfvlZ4Ukvy74uMKo7KIC27i8mvKhiEA=;
+	b=Kqy2r6Jt1DycwTBxXKCDkdG1oQb0AZBnkHMC/+mB9zIlhYACHBerSzeKeqNKl3g7/zlMn+S6Ho9oOJBz/oOhsp734bhxSj0kxN4yFhA0TeCHxDc10bBCVMBAYzzeeiuvRH50IHKiQhhYl6397AaIcxiwUiiaSppunc2amJQ9z1s=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045075189;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W6Byw0B_1715397247;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W6Byw0B_1715397247)
           by smtp.aliyun-inc.com;
-          Sat, 11 May 2024 11:14:06 +0800
+          Sat, 11 May 2024 11:14:08 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: netdev@vger.kernel.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>,
@@ -50,9 +50,9 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	virtualization@lists.linux.dev
-Subject: [PATCH net-next v5 1/4] virtio_ring: enable premapped mode whatever use_dma_api
-Date: Sat, 11 May 2024 11:14:01 +0800
-Message-Id: <20240511031404.30903-2-xuanzhuo@linux.alibaba.com>
+Subject: [PATCH net-next v5 2/4] virtio_net: big mode skip the unmap check
+Date: Sat, 11 May 2024 11:14:02 +0800
+Message-Id: <20240511031404.30903-3-xuanzhuo@linux.alibaba.com>
 X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 In-Reply-To: <20240511031404.30903-1-xuanzhuo@linux.alibaba.com>
 References: <20240511031404.30903-1-xuanzhuo@linux.alibaba.com>
@@ -65,43 +65,40 @@ MIME-Version: 1.0
 X-Git-Hash: e1ef52e80115
 Content-Transfer-Encoding: 8bit
 
-Now, we have virtio DMA APIs, the driver can be the premapped
-mode whatever the virtio core uses dma api or not.
-
-So remove the limit of checking use_dma_api from
-virtqueue_set_dma_premapped().
+The virtio-net big mode did not enable premapped mode,
+so we did not need to check the unmap. And the subsequent
+commit will remove the failover code for failing enable
+premapped for merge and small mode. So we need to remove
+the checking do_dma code in the big mode path.
 
 Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Acked-by: Jason Wang <jasowang@redhat.com>
 ---
- drivers/virtio/virtio_ring.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ drivers/net/virtio_net.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-index 6f7e5010a673..2a972752ff1b 100644
---- a/drivers/virtio/virtio_ring.c
-+++ b/drivers/virtio/virtio_ring.c
-@@ -2782,7 +2782,7 @@ EXPORT_SYMBOL_GPL(virtqueue_resize);
-  *
-  * Returns zero or a negative error.
-  * 0: success.
-- * -EINVAL: vring does not use the dma api, so we can not enable premapped mode.
-+ * -EINVAL: too late to enable premapped mode, the vq already contains buffers.
-  */
- int virtqueue_set_dma_premapped(struct virtqueue *_vq)
- {
-@@ -2798,11 +2798,6 @@ int virtqueue_set_dma_premapped(struct virtqueue *_vq)
- 		return -EINVAL;
- 	}
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index ad0fb832b538..724f9310e732 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -959,7 +959,7 @@ static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
  
--	if (!vq->use_dma_api) {
--		END_USE(vq);
--		return -EINVAL;
--	}
--
- 	vq->premapped = true;
- 	vq->do_unmap = false;
+ 	rq = &vi->rq[i];
  
+-	if (rq->do_dma)
++	if (!vi->big_packets || vi->mergeable_rx_bufs)
+ 		virtnet_rq_unmap(rq, buf, 0);
+ 
+ 	virtnet_rq_free_buf(vi, rq, buf);
+@@ -2267,7 +2267,7 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
+ 		}
+ 	} else {
+ 		while (packets < budget &&
+-		       (buf = virtnet_rq_get_buf(rq, &len, NULL)) != NULL) {
++		       (buf = virtqueue_get_buf(rq->vq, &len)) != NULL) {
+ 			receive_buf(vi, rq, buf, len, NULL, xdp_xmit, &stats);
+ 			packets++;
+ 		}
 -- 
 2.32.0.3.g01195cf9f
 
