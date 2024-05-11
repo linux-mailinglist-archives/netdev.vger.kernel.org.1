@@ -1,50 +1,58 @@
-Return-Path: <netdev+bounces-95651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01BBE8C2ED7
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 04:10:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAEDE8C2EFA
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 04:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB9521F22F8E
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 02:10:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99D69282E2F
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 02:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342E712E5B;
-	Sat, 11 May 2024 02:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77151E89C;
+	Sat, 11 May 2024 02:15:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tqn2FRzm"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Wh5jWAj6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E76FEEA9
-	for <netdev@vger.kernel.org>; Sat, 11 May 2024 02:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358D147A57;
+	Sat, 11 May 2024 02:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715393429; cv=none; b=RoJxlwqZhYV2vDQkMbOs60GXl58DM8BUTnFknNdIBnHIdwAF59oziXzTl6JM2MqMdFE3TcT6xXq2ST49rvEF3seHRLiBQM4/ljcF7qxhj/K3LRS39csfGLJA4T8awsH6GXrKH2EmzwlXDi5l14bDFKSrjrX/rimjbAdHIoHM2BI=
+	t=1715393726; cv=none; b=O2s0Z3diVWUChJ7p21t/j2cvQGXYiGRMjZMaLPmmfWT+aXhuGbBQBJ5zUXNCdfV7wF5JrhKYXjGKG5UglyRcBh524wjtZ6SGk+LTcJLwviW4kjkInBwuTd2cGZ7YYwTlosGywTwC1aaeXQnvhXAxPv5w2deQ05vRDN2VGx0HugA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715393429; c=relaxed/simple;
-	bh=2P8ly0j7PStT83TI85/Tvab+YzkPbzWSJQsJvd4RM9k=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=k5omNh4Q8KtlXjzmBoCuoY6hdGmLTh4+t3BpD+uQZs9/MdpD8jem8SfXfXheNpMYG9BBBHX7+IjBaIRVXkyut6+mK3qwvfr23JvyE57YBhKMDepSYsr8LgHzAMudMEmKFK8FYF/BvLsiSKMmXO7Xky/95e5sxVDgNstTXJXdYhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tqn2FRzm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 94C9BC32781;
-	Sat, 11 May 2024 02:10:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715393428;
-	bh=2P8ly0j7PStT83TI85/Tvab+YzkPbzWSJQsJvd4RM9k=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tqn2FRzmVQZjWEA0HuRAZb0RNWT6lA4eKlK6/sl+w7zG9SYu+fK5+am6qdpBwRU+k
-	 RW0utSRqeMlC8rbf4iassidurQ/SgdUX+QE3DrO37e9c+M2PiyjFRQ7RtPTBcw17Tc
-	 C4SNnUUER5dxhdqeLeZS1U6bdJTg+o0VsPmBGiDl/qr7vhA44z1OGN7ugqqf6sKZYS
-	 0CeLPOREMMarmxWwvM/3fbHQSPDXXfZS39LLklvxK88AgJnxsNR6t68XGE6M82WnEO
-	 PK6c4XBFfJNNJsztd8i2axFSRYPsR1iCBDixs1v/6cVFgofMs0aXCrCt18c1vb4Ho9
-	 yhzUSKPl3H83w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8545BE7C112;
-	Sat, 11 May 2024 02:10:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1715393726; c=relaxed/simple;
+	bh=l8+FFc5NYXSgcU89nPC2vhD5HSbSxYtsotzn+MbScqw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SwqcKfuvb6w9aIrF9PeJMRT+qRKYQHqtfcE8vo7n0Gim6dA/ZmUveb6XTZPjD34EVMx+/2+jPGNCjJXKp9Q+2Nf7YVQzon/XbeHYxLB968lEufbrv+VDW3ayqsUcfgGzW3bGzlzgK+96HSXfXuNTrCu/FMw/5Xe4vfBgbh4ewd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Wh5jWAj6; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1715393699; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=J0RjhF8artoRsEJWmf6wYLdXWqFxXMkVDUuaSefLKSw=;
+	b=Wh5jWAj6najeqZyu/dPQJxchDtjji+NzQNnD3HwRq3sHaCw4MYcmxCwzrEERhZa0+x03l9X11/8BYihDJ7VBVuB8+R36ICsRANbyN4xcnYjsI6n6l+FlCNItS1v1WUwzwCP0yebHT23utNlehe8FUddIRT2NFEXQCDQmNwBdQYc=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R331e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033022160150;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W6Bjjv3_1715393690;
+Received: from localhost(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0W6Bjjv3_1715393690)
+          by smtp.aliyun-inc.com;
+          Sat, 11 May 2024 10:14:58 +0800
+From: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+To: davem@davemloft.net
+Cc: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-parisc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+	Abaci Robot <abaci@linux.alibaba.com>
+Subject: [PATCH] tulip: eeprom: clean up some inconsistent indenting
+Date: Sat, 11 May 2024 10:14:48 +0800
+Message-Id: <20240511021448.80526-1-jiapeng.chong@linux.alibaba.com>
+X-Mailer: git-send-email 2.20.1.7.g153144c
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,41 +60,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] af_unix: Add dead flag to struct scm_fp_list.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171539342854.19094.2843739418134181791.git-patchwork-notify@kernel.org>
-Date: Sat, 11 May 2024 02:10:28 +0000
-References: <20240508171150.50601-1-kuniyu@amazon.com>
-In-Reply-To: <20240508171150.50601-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org
 
-Hello:
+No functional modification involved.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+drivers/net/ethernet/dec/tulip/eeprom.c:179 tulip_parse_eeprom() warn: inconsistent indenting.
 
-On Wed, 8 May 2024 10:11:50 -0700 you wrote:
-> Commit 1af2dface5d2 ("af_unix: Don't access successor in unix_del_edges()
-> during GC.") fixed use-after-free by avoid accessing edge->successor while
-> GC is in progress.
-> 
-> However, there could be a small race window where another process could
-> call unix_del_edges() while gc_in_progress is true and __skb_queue_purge()
-> is on the way.
-> 
-> [...]
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=9001
+Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+---
+ drivers/net/ethernet/dec/tulip/eeprom.c | 37 +++++++++++++------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
 
-Here is the summary with links:
-  - [v2,net-next] af_unix: Add dead flag to struct scm_fp_list.
-    https://git.kernel.org/netdev/net-next/c/7172dc93d621
-
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/dec/tulip/eeprom.c b/drivers/net/ethernet/dec/tulip/eeprom.c
+index d5657ff15e3c..738c01d859cf 100644
+--- a/drivers/net/ethernet/dec/tulip/eeprom.c
++++ b/drivers/net/ethernet/dec/tulip/eeprom.c
+@@ -175,25 +175,26 @@ void tulip_parse_eeprom(struct net_device *dev)
+ 					dev->name);
+ 			return;
+ 		}
+-	  /* Do a fix-up based on the vendor half of the station address prefix. */
+-	  for (i = 0; eeprom_fixups[i].name; i++) {
+-		  if (dev->dev_addr[0] == eeprom_fixups[i].addr0 &&
+-		      dev->dev_addr[1] == eeprom_fixups[i].addr1 &&
+-		      dev->dev_addr[2] == eeprom_fixups[i].addr2) {
+-		  if (dev->dev_addr[2] == 0xE8 && ee_data[0x1a] == 0x55)
+-			  i++;			/* An Accton EN1207, not an outlaw Maxtech. */
+-		  memcpy(ee_data + 26, eeprom_fixups[i].newtable,
+-				 sizeof(eeprom_fixups[i].newtable));
+-		  pr_info("%s: Old format EEPROM on '%s' board.  Using substitute media control info\n",
+-			  dev->name, eeprom_fixups[i].name);
+-		  break;
++		/* Do a fix-up based on the vendor half of the station address prefix. */
++		for (i = 0; eeprom_fixups[i].name; i++) {
++			if (dev->dev_addr[0] == eeprom_fixups[i].addr0 &&
++			    dev->dev_addr[1] == eeprom_fixups[i].addr1 &&
++			    dev->dev_addr[2] == eeprom_fixups[i].addr2) {
++				if (dev->dev_addr[2] == 0xE8 && ee_data[0x1a] == 0x55)
++					i++; /* An Accton EN1207, not an outlaw Maxtech. */
++				memcpy(ee_data + 26, eeprom_fixups[i].newtable,
++				       sizeof(eeprom_fixups[i].newtable));
++				pr_info("%s: Old format EEPROM on '%s' board.  Using substitute media control info\n",
++					dev->name, eeprom_fixups[i].name);
++				break;
++			}
++		}
++		/* No fixup found. */
++		if (!eeprom_fixups[i].name) {
++			pr_info("%s: Old style EEPROM with no media selection information\n",
++				dev->name);
++			return;
+ 		}
+-	  }
+-	  if (eeprom_fixups[i].name == NULL) { /* No fixup found. */
+-		  pr_info("%s: Old style EEPROM with no media selection information\n",
+-			  dev->name);
+-		return;
+-	  }
+ 	}
+ 
+ 	controller_index = 0;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.20.1.7.g153144c
 
 
