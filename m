@@ -1,116 +1,115 @@
-Return-Path: <netdev+bounces-95687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DF9B8C3067
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 11:50:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37EB38C306C
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 11:51:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC3D21F2146C
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 09:50:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B7081C20B2A
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 09:51:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73622D600;
-	Sat, 11 May 2024 09:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90D454747;
+	Sat, 11 May 2024 09:51:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=novek.ru header.i=@novek.ru header.b="FM0KsUVC"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="k56XE3N3"
 X-Original-To: netdev@vger.kernel.org
-Received: from novek.ru (unknown [213.148.174.62])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD7AC14F
-	for <netdev@vger.kernel.org>; Sat, 11 May 2024 09:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.148.174.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4881537F5;
+	Sat, 11 May 2024 09:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715421050; cv=none; b=Go02XMzWnYe6niU/ZhEeqqfB889hx1No0t5c5O5dntDkFPpa2zQQy9E2PV/yYSJ6nWx722ENycfI3/UVLSrf08j5CCBVRQ2z1YY3JIQP03fI/hPeql+NbKFM/kmWBErLMi5UclxpXfMY6D2jR8NULvrNvrNy6RXEn+Jof3eul7I=
+	t=1715421082; cv=none; b=hLo1qT7TB6M1I8MXvU4U+q0teDCMTaCT99oP1yXheShClDSEGn2rV4ifefhv/3YO/abP38hBCCzsrcUyArpwKnQONTKXI+RKoIC5VnIahkTw2jq+NK27hcZa61JpOAkVP9bVP1kkw5WYYrGcgCI9k/9+0OPBDERqK0u0+BHgsmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715421050; c=relaxed/simple;
-	bh=m5lTYJyAbkXz4nQ7pNY3YCO4M3SGO5MQzzObDvvBo04=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WeIFrbbSNNknNQUZOGZGj9sIN/ZK0YdXwfDj9ULOQG12tVRWlys7nBEBIWm4OO3m6RrvUdUDspwF0cllPi3zsZ7tVnl7xQOrC48FgXcXO5TWwzOlIgCL7GATkA94gZOaRuhm1Np0yY7C4PnHU9qTUvP3v1A9nx2Pw9mdoAvnPG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=novek.ru; spf=pass smtp.mailfrom=novek.ru; dkim=pass (1024-bit key) header.d=novek.ru header.i=@novek.ru header.b=FM0KsUVC; arc=none smtp.client-ip=213.148.174.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=novek.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=novek.ru
-Received: from [10.223.134.160] (unknown [82.141.252.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by novek.ru (Postfix) with ESMTPSA id 7853B5027B5;
-	Sat, 11 May 2024 12:42:35 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 novek.ru 7853B5027B5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=novek.ru; s=mail;
-	t=1715420558; bh=m5lTYJyAbkXz4nQ7pNY3YCO4M3SGO5MQzzObDvvBo04=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=FM0KsUVC2D3YxMHf05by4hCeyES8V8Uudcr5Y7TQ/5lgdgO90eYizECD2ubZDjhpH
-	 8YcWO6UREoAXWmfW+ZNDMe7hV4fFP1wCEWQXk0++b4rRVVqkY7lz9H0nunNxOAW0RO
-	 yGfoPIXq8sVTsOhkaiPV6neafoiiaZ1Kh91iP9Lg=
-Message-ID: <225228d7-5c4c-4e8c-99d3-77aed6432887@novek.ru>
-Date: Sat, 11 May 2024 10:41:25 +0100
+	s=arc-20240116; t=1715421082; c=relaxed/simple;
+	bh=0cJX+ofKilB0YeAddG2Rk34Tcb84daQhOHXhdzx0r3M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X1Emcb0fYYhIyfj4HDg32a0cLUnd3pWmx0p1eqTDOa+K/dtsGx99nPG6i9Fnxbq0yaMHPghGHN9HnmxE2ySH1nZngEn/mRlDZzJNH3K/XDH5c5MvQZU32BFzpay9cqLlH3U8f6hk+0mwpcNA7zgH/xGNpjc1jvhT2QfLm9mOL2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=k56XE3N3; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1715421078;
+	bh=0cJX+ofKilB0YeAddG2Rk34Tcb84daQhOHXhdzx0r3M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k56XE3N3d4pgs8RXOwLSnRLB27sLWUfITEgcvrDMjZdmJPa/Ir6S6oi9PpE553jPt
+	 sb7k+FxSLFp8Odclpb2t4vqVdgVnPhAwWUDBH9QwI80jAM7LA7gxjkMhJ80aDoR2yw
+	 DUA3ugAMpnt1Nr9pHpMHzjCRdAMZeTMxIBsCjZb8=
+Date: Sat, 11 May 2024 11:51:18 +0200
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To: Kees Cook <keescook@chromium.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Joel Granados <j.granados@samsung.com>, Eric Dumazet <edumazet@google.com>, 
+	Dave Chinner <david@fromorbit.com>, linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-mm@kvack.org, linux-security-module@vger.kernel.org, 
+	bpf@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-xfs@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, kexec@lists.infradead.org, 
+	linux-hardening@vger.kernel.org, bridge@lists.linux.dev, lvs-devel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, linux-sctp@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, apparmor@lists.ubuntu.com
+Subject: Re: [PATCH v3 00/11] sysctl: treewide: constify ctl_table argument
+ of sysctl handlers
+Message-ID: <8d1daa64-3746-46a3-b696-127a70cdf7e7@t-8ch.de>
+References: <20240423-sysctl-const-handler-v3-0-e0beccb836e2@weissschuh.net>
+ <20240424201234.3cc2b509@kernel.org>
+ <202405080959.104A73A914@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 01/15] psp: add documentation
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeed@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com,
- willemdebruijn.kernel@gmail.com, borisp@nvidia.com, gal@nvidia.com,
- cratiu@nvidia.com, rrameshbabu@nvidia.com, steffen.klassert@secunet.com,
- tariqt@nvidia.com, mingtao@meta.com, knekritz@meta.com
-References: <20240510030435.120935-1-kuba@kernel.org>
- <20240510030435.120935-2-kuba@kernel.org> <Zj6da1nANulG5cb5@x130.lan>
- <20240510171132.557ba47e@kernel.org>
-From: Vadim Fedorenko <vfedorenko@novek.ru>
-In-Reply-To: <20240510171132.557ba47e@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: **
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <202405080959.104A73A914@keescook>
 
-On 11.05.2024 01:11, Jakub Kicinski wrote:
-> On Fri, 10 May 2024 15:19:23 -0700 Saeed Mahameed wrote:
->>> +PSP is designed primarily for hardware offloads. There is currently
->>> +no software fallback for systems which do not have PSP capable NICs.
->>> +There is also no standard (or otherwise defined) way of establishing
->>> +a PSP-secured connection or exchanging the symmetric keys.
->>> +
->>> +The expectation is that higher layer protocols will take care of
->>> +protocol and key negotiation. For example one may use TLS key exchange,
->>> +announce the PSP capability, and switch to PSP if both endpoints
->>> +are PSP-capable.
->>
->> The documentation doesn't include anything about userspace, other than
->> highlevel remarks on how this is expected to work.
-> 
-> The cover letter does.
-> 
->> What are we planning for userspace? I know we have kperf basic support and
->> some experimental python library, but nothing official or psp centric.
-> 
-> Remind me, how long did it take for kernel TLS support to be merged
-> into OpenSSL? ;)
+Hi Kees,
 
-I believe it was bad timing for OpenSSL. The patches with kTLS support were
-sitting in the main branch for long time, the problem was postponed release with
-with jump to new versioning schema.
-
-But I agree, there is no easy way to start coding user-space lib without initial
-support from kernel.
-
->> I propose to start community driven project with a well established
->> library, with some concrete sample implementation for key negotiation,
->> as a plugin maybe, so anyone can implement their own key-exchange
->> mechanisms on top of the official psp library.
+On 2024-05-08 10:11:35+0000, Kees Cook wrote:
+> On Wed, Apr 24, 2024 at 08:12:34PM -0700, Jakub Kicinski wrote:
+> > On Tue, 23 Apr 2024 09:54:35 +0200 Thomas Weißschuh wrote:
+> > > The series was split from my larger series sysctl-const series [0].
+> > > It only focusses on the proc_handlers but is an important step to be
+> > > able to move all static definitions of ctl_table into .rodata.
+> > 
+> > Split this per subsystem, please.
 > 
-> Yes, I should have CCed Meta's folks who work on TLS [1]. Adding them
-> now. More than happy to facilitate the discussion, maybe Willem can
-> CC the right Google folks, IDK who else...
-> 
-> We should start moving with the kernel support, IMO, until we do
-> the user space implementation is stalled. I don't expect that the
-> way we install keys in the kernel would be impacted by the handshake.
-> 
-> [1] https://github.com/facebookincubator/fizz
+> I've done a few painful API transitions before, and I don't think the
+> complexity of these changes needs a per-subsystem constification pass. I
+> think this series is the right approach, but that patch 11 will need
+> coordination with Linus. We regularly do system-wide prototype changes
+> like this right at the end of the merge window before -rc1 comes out.
 
+That sounds good.
+
+> The requirements are pretty simple: it needs to be a obvious changes
+> (this certainly is) and as close to 100% mechanical as possible. I think
+> patch 11 easily qualifies. Linus should be able to run the same Coccinelle
+> script and get nearly the same results, etc. And all the other changes
+> need to have landed. This change also has no "silent failure" conditions:
+> anything mismatched will immediately stand out.
+
+Unfortunately coccinelle alone is not sufficient, as some helpers with
+different prototypes are called by handlers and themselves are calling
+handler and therefore need to change in the same commit.
+But if I add a diff for those on top of the coccinelle script to the
+changelog it should be obvious.
+
+> So, have patches 1-10 go via their respective subsystems, and once all
+> of those are in Linus's tree, send patch 11 as a stand-alone PR.
+
+Ack, I'll do that with the cover letter information requested by Joel.
+
+> (From patch 11, it looks like the seccomp read/write function changes
+> could be split out? I'll do that now...)
+
+Thanks!
+
+Thomas
 
