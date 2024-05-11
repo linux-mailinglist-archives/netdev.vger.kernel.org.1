@@ -1,104 +1,171 @@
-Return-Path: <netdev+bounces-95718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D41948C32A9
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 19:13:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18C418C32AD
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 19:15:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88BBF281F8D
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 17:13:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78C8F1F21A22
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 17:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33091B960;
-	Sat, 11 May 2024 17:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C8E1C286;
+	Sat, 11 May 2024 17:15:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1noDtvzm"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="N0dHxiYm"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp-bc08.mail.infomaniak.ch (smtp-bc08.mail.infomaniak.ch [45.157.188.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E5FFD27A;
-	Sat, 11 May 2024 17:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62A11BC2F
+	for <netdev@vger.kernel.org>; Sat, 11 May 2024 17:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715447579; cv=none; b=rFwtp5wHunyJ1hXktedB06VaNYC2dlWvqyLyMxlYbsUSC4tamuu16Ob+tPYc0YRlTtPJp8ECzxV+ntyyCmstUEv8hJJxLlLuD5fUxI+nrLo+N4eIfscm5WvpTOgJTluSvpnw9HQTsnKakqo596x6/rcLRBWHGsAck550TvRKwn0=
+	t=1715447703; cv=none; b=Ya9ufmB+LLj8TwDzcMlzv2BaqKw47AXjSpg3hHA66TNXGlMEV0WoV/ehGqt10j9AH+Cs5M2DVXAGz9rdosv32/H6gaKFGKxHqJEcSG88/xaHvOvZ/aUsoCKM1ulGvjM8ozQuUJsZCY8xDK6CRJ86wlHp386YgVMzStUxtfqR9Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715447579; c=relaxed/simple;
-	bh=Ea+0lH4nexc0bSRa2hoF5FRkiDGoufVtdVxTU4cEfOM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ucKEina5H4JTtFxb4c42/G2/W4UqU1P4iLZ0qhK62X225UgmAJdOeeXQB97ZAco9aTrE3ZpNI/DlZGQccdRyCoCPhol6IXG7DNaQYNtM9Nh1PXp88eKEQxMBlNqMJCwd5dH05/kz0OojYYyNG/brB757eGOtfylsWG9sCC7qVRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1noDtvzm; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+PYJZKJmp4DNEIJz0QH32REFiAYsuHCbhSQAQyPwHDQ=; b=1noDtvzmo/8NcsHS2R9xnr2nF/
-	+HZYubHFsdnVYYib9Z4ABljM4TQHtabJKRYloqxpCmcUtZ0Gq4xCAxPqdPaSo55mmK8XQlBOUX4pS
-	OsnNiL+moSUHSzGX5//3on5yr9Nk6tDf1w1lp8maVEuk+EYk99alEjby65oXCH3jSMSrin6dJcHz9
-	Ce5ZpGad1DHE87yKIpjwEhSAPbsWX6Pue65cWdIacoVDJAjZAjJVJu3x3T/UtfWRRv2HeE8TDz0Il
-	313vTSJPzuwe9M5308HtX7F5SiNWix7eXwAZi+FtAu/K44SZj112tAe60ewKePUYdXj1B2GMT2ECV
-	OgChaOng==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41854)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1s5qH3-00005T-1n;
-	Sat, 11 May 2024 18:12:41 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1s5qH0-0004QC-WA; Sat, 11 May 2024 18:12:39 +0100
-Date: Sat, 11 May 2024 18:12:38 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>,
-	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	bcm-kernel-feedback-list@broadcom.com, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
-	richardcochran@gmail.com, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2, net-next, 2/2] net: stmmac: PCI driver for BCM8958X
- SoC
-Message-ID: <Zj+nBpQn1cqTMJxQ@shell.armlinux.org.uk>
-References: <20240510000331.154486-3-jitendra.vegiraju@broadcom.com>
- <20240511015924.41457-1-jitendra.vegiraju@broadcom.com>
- <4ede8911-827d-4fad-b327-52c9aa7ed957@lunn.ch>
+	s=arc-20240116; t=1715447703; c=relaxed/simple;
+	bh=+tQTqpBZCO71TI+xI+ycJvxEwQZ2ovGc4EulihGFtA4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IpP1FqkCMFtGIE4x2+laT4ttKGCzRAyVBpgudLWQ6JbRUWHz2p9uI4bkbduFyVK3EvNTMWifLcmcVnnJgErliJKSEwW4jC8b2JJ3yoUNp4xvCgRw6niyrA26NGyc3uTQo/ecRrHNG+CnrmKosPaEIL3hkwpE6Bf1bCmFvOBUBrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=N0dHxiYm; arc=none smtp.client-ip=45.157.188.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VcC6g06BzzZwN;
+	Sat, 11 May 2024 19:14:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1715447690;
+	bh=AhX78OfDbhvNohV5s96n3dHIuZwZXD9GikV+VwHjPBk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=N0dHxiYmx8vVCys6IRVXrYH2dIepVwv2/zMpcy+tQzcVlIsHRbh/USCROwlSJ6UnD
+	 4Bh6tkCOOX2dNo9htOlBc63EMhcAuI3Z6Rn7RFHEGt3VmFLvAIIxtqFD4XL9Sa5r4m
+	 ZOAauyRkkzriLHck1Jl9r4HjGL+PSbfDZBHJ9mi4=
+Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4VcC6c3FkrzRFZ;
+	Sat, 11 May 2024 19:14:48 +0200 (CEST)
+From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+To: Christian Brauner <brauner@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kees Cook <keescook@chromium.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mark Brown <broonie@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Shengyu Li <shengyu.li.evgeny@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>
+Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Brendan Higgins <brendanhiggins@google.com>,
+	David Gow <davidgow@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	Ron Economos <re@w6rz.net>,
+	Ronald Warsow <rwarsow@gmx.de>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Will Drewry <wad@chromium.org>,
+	kernel test robot <oliver.sang@intel.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH v7 00/10] Fix Kselftest's vfork() side effects
+Date: Sat, 11 May 2024 19:14:35 +0200
+Message-ID: <20240511171445.904356-1-mic@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4ede8911-827d-4fad-b327-52c9aa7ed957@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
 
-On Sat, May 11, 2024 at 06:16:52PM +0200, Andrew Lunn wrote:
-> > +	/* This device interface is directly attached to the switch chip on
-> > +	 *  the SoC. Since no MDIO is present, register fixed_phy.
-> > +	 */
-> > +	brcm_priv->phy_dev =
-> > +		 fixed_phy_register(PHY_POLL,
-> > +				    &dwxgmac_brcm_fixed_phy_status, NULL);
-> > +	if (IS_ERR(brcm_priv->phy_dev)) {
-> > +		dev_err(&pdev->dev, "%s\tNo PHY/fixed_PHY found\n", __func__);
-> > +		return -ENODEV;
-> > +	}
-> > +	phy_attached_info(brcm_priv->phy_dev);
-> 
-> What switch is it? Will there be patches to extend SF2?
+Hi,
 
-... and why is this legacy fixed_phy even necessary when stmmac uses
-phylink which supports fixed links, including with custom fixed status?
+This seven series fix an issue reported by kernel test robot [3].
 
+Shuah,  I (as well as Kees and Sean [4]) think this should be in -next
+really soon to make sure everything works fine for the v6.9 release,
+which is not currently the case.  I cannot test against all kselftests
+though.  I would prefer to let you handle this, but I guess you're not
+able to do so and I'll push it on my branch without reply from you.
+Even if I push it on my branch, please push it on yours too as soon as
+you see this and I'll remove it from mine.
+
+Mark, Jakub, could you please test this series?
+
+As reported by Kernel Test Robot [1] and Sean Christopherson [2], some
+tests fail since v6.9-rc1 .  This is due to the use of vfork() which
+introduced some side effects.  Similarly, while making it more generic,
+a previous commit made some Landlock file system tests flaky, and
+subject to the host's file system mount configuration.
+
+This series fixes all these side effects by replacing vfork() with
+clone3() and CLONE_VFORK, which is cleaner (no arbitrary shared memory)
+and makes the Kselftest framework more robust.
+
+I tried different approaches and I found this one to be the cleaner and
+less invasive for current test cases.
+
+I successfully ran the following tests (using TEST_F and
+fork/clone/clone3, and KVM_ONE_VCPU_TEST) with this series:
+- kvm:fix_hypercall_test
+- kvm:sync_regs_test
+- kvm:userspace_msr_exit_test
+- kvm:vmx_pmu_caps_test
+- landlock:fs_test
+- landlock:net_test
+- landlock:ptrace_test
+- move_mount_set_group:move_mount_set_group_test
+- net/af_unix:scm_pidfd
+- perf_events:remove_on_exec
+- pidfd:pidfd_getfd_test
+- pidfd:pidfd_setns_test
+- seccomp:seccomp_bpf
+- user_events:abi_test
+
+[1] https://lore.kernel.org/oe-lkp/202403291015.1fcfa957-oliver.sang@intel.com
+[2] https://lore.kernel.org/r/ZjPelW6-AbtYvslu@google.com
+[3] https://lore.kernel.org/r/202405100339.vfBe0t9C-lkp@intel.com
+[4] https://lore.kernel.org/r/202405061002.01D399877A@keescook
+
+Previous versions:
+v1: https://lore.kernel.org/r/20240426172252.1862930-1-mic@digikod.net
+v2: https://lore.kernel.org/r/20240429130931.2394118-1-mic@digikod.net
+v3: https://lore.kernel.org/r/20240429191911.2552580-1-mic@digikod.net
+v4: https://lore.kernel.org/r/20240502210926.145539-1-mic@digikod.net
+v5: https://lore.kernel.org/r/20240503105820.300927-1-mic@digikod.net
+v6: https://lore.kernel.org/r/20240506165518.474504-1-mic@digikod.net
+
+Regards,
+
+Mickaël Salaün (10):
+  selftests/pidfd: Fix config for pidfd_setns_test
+  selftests/landlock: Fix FS tests when run on a private mount point
+  selftests/harness: Fix fixture teardown
+  selftests/harness: Fix interleaved scheduling leading to race
+    conditions
+  selftests/landlock: Do not allocate memory in fixture data
+  selftests/harness: Constify fixture variants
+  selftests/pidfd: Fix wrong expectation
+  selftests/harness: Share _metadata between forked processes
+  selftests/harness: Fix vfork() side effects
+  selftests/harness: Handle TEST_F()'s explicit exit codes
+
+ tools/testing/selftests/kselftest_harness.h   | 127 +++++++++++++-----
+ tools/testing/selftests/landlock/fs_test.c    |  83 +++++++-----
+ tools/testing/selftests/pidfd/config          |   2 +
+ .../selftests/pidfd/pidfd_setns_test.c        |   2 +-
+ 4 files changed, 147 insertions(+), 67 deletions(-)
+
+
+base-commit: e67572cd2204894179d89bd7b984072f19313b03
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.45.0
+
 
