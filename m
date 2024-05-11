@@ -1,74 +1,92 @@
-Return-Path: <netdev+bounces-95649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71DF28C2ED0
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 04:08:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01BBE8C2ED7
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 04:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CDAB283A58
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 02:08:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB9521F22F8E
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 02:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2443B12E5B;
-	Sat, 11 May 2024 02:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342E712E5B;
+	Sat, 11 May 2024 02:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QZahE2HB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tqn2FRzm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D44320E;
-	Sat, 11 May 2024 02:08:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E76FEEA9
+	for <netdev@vger.kernel.org>; Sat, 11 May 2024 02:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715393312; cv=none; b=te5/KW4l1QN+XMBgc1S+ACyqvEX7Ha7Nie3xDzgkqAtKam/2XJrFLMCEN4TH1DVgWh16b/tk4yFu/stQFyOQxxex33Yf9OjFfVhv4IJrp0DSGLD/M/WIgyReTeGRE52lPyHRDTMZ0AfAxOS7/U9qe72LhXsetm9sejulTx3yScc=
+	t=1715393429; cv=none; b=RoJxlwqZhYV2vDQkMbOs60GXl58DM8BUTnFknNdIBnHIdwAF59oziXzTl6JM2MqMdFE3TcT6xXq2ST49rvEF3seHRLiBQM4/ljcF7qxhj/K3LRS39csfGLJA4T8awsH6GXrKH2EmzwlXDi5l14bDFKSrjrX/rimjbAdHIoHM2BI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715393312; c=relaxed/simple;
-	bh=R0x8obuPsGeOf3eMhsjoyyJL1qvGIsDXmpUyjG7RnVU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hq6g47KpMto+g/gAnWv5ALZzn7yze2zRP4yNbGMrf9APXz4Ayl1GUuQGeLEfF09zSJtfFMdKo/4ys45lJuoi89mZzxc4fb7Ki/mYeG2A4cXxlG07safzVKpPzMnyjE0hJOH62lfQndCZgq8dY8zFD/uMbYa/hO9FTgZC/4W3s+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QZahE2HB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1878EC113CC;
-	Sat, 11 May 2024 02:08:31 +0000 (UTC)
+	s=arc-20240116; t=1715393429; c=relaxed/simple;
+	bh=2P8ly0j7PStT83TI85/Tvab+YzkPbzWSJQsJvd4RM9k=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=k5omNh4Q8KtlXjzmBoCuoY6hdGmLTh4+t3BpD+uQZs9/MdpD8jem8SfXfXheNpMYG9BBBHX7+IjBaIRVXkyut6+mK3qwvfr23JvyE57YBhKMDepSYsr8LgHzAMudMEmKFK8FYF/BvLsiSKMmXO7Xky/95e5sxVDgNstTXJXdYhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tqn2FRzm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 94C9BC32781;
+	Sat, 11 May 2024 02:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715393311;
-	bh=R0x8obuPsGeOf3eMhsjoyyJL1qvGIsDXmpUyjG7RnVU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QZahE2HB08jYVtIYa6IMDmfjKfJr/4gdpVVmZdb9GFz9GMY9eTDSBuYnhvDbe2im6
-	 vub9qzWuQ8p+S1Lxv94763m4u3jHIMJR1a8P9RT7jM8+i9a2xvSjlHSWo2HMX1gHXF
-	 H2usIafdSgTez/GtWlXmIjxx+M1j4PuuenFch3dDjTViqDrp1NB6KRrcxLTXyrWwq9
-	 MTuJTxWLImGJes5EgvUrc4gB0jCMKY0Lp9FWAEoz7fWPpGWZ9m7W4PB0qe3VdvvkTV
-	 /ODP+kih6zlSMUPzEJ5MxTsUFmNNvs8zWa5DxSgvhwd4WtcIHjesn4TJOvfUs1I2u2
-	 GZ3Z690511Feg==
-Date: Fri, 10 May 2024 19:08:30 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, bcm-kernel-feedback-list@broadcom.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2, net-next, 2/2] net: stmmac: PCI driver for BCM8958X
- SoC
-Message-ID: <20240510190830.54671849@kernel.org>
-In-Reply-To: <20240511015924.41457-1-jitendra.vegiraju@broadcom.com>
-References: <20240510000331.154486-3-jitendra.vegiraju@broadcom.com>
-	<20240511015924.41457-1-jitendra.vegiraju@broadcom.com>
+	s=k20201202; t=1715393428;
+	bh=2P8ly0j7PStT83TI85/Tvab+YzkPbzWSJQsJvd4RM9k=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tqn2FRzmVQZjWEA0HuRAZb0RNWT6lA4eKlK6/sl+w7zG9SYu+fK5+am6qdpBwRU+k
+	 RW0utSRqeMlC8rbf4iassidurQ/SgdUX+QE3DrO37e9c+M2PiyjFRQ7RtPTBcw17Tc
+	 C4SNnUUER5dxhdqeLeZS1U6bdJTg+o0VsPmBGiDl/qr7vhA44z1OGN7ugqqf6sKZYS
+	 0CeLPOREMMarmxWwvM/3fbHQSPDXXfZS39LLklvxK88AgJnxsNR6t68XGE6M82WnEO
+	 PK6c4XBFfJNNJsztd8i2axFSRYPsR1iCBDixs1v/6cVFgofMs0aXCrCt18c1vb4Ho9
+	 yhzUSKPl3H83w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8545BE7C112;
+	Sat, 11 May 2024 02:10:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net-next] af_unix: Add dead flag to struct scm_fp_list.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171539342854.19094.2843739418134181791.git-patchwork-notify@kernel.org>
+Date: Sat, 11 May 2024 02:10:28 +0000
+References: <20240508171150.50601-1-kuniyu@amazon.com>
+In-Reply-To: <20240508171150.50601-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org
 
-On Fri, 10 May 2024 18:59:24 -0700 Jitendra Vegiraju wrote:
-> v2: code cleanup to address patchwork reports.
+Hello:
 
-Please read:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+On Wed, 8 May 2024 10:11:50 -0700 you wrote:
+> Commit 1af2dface5d2 ("af_unix: Don't access successor in unix_del_edges()
+> during GC.") fixed use-after-free by avoid accessing edge->successor while
+> GC is in progress.
+> 
+> However, there could be a small race window where another process could
+> call unix_del_edges() while gc_in_progress is true and __skb_queue_purge()
+> is on the way.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net-next] af_unix: Add dead flag to struct scm_fp_list.
+    https://git.kernel.org/netdev/net-next/c/7172dc93d621
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
