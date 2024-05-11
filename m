@@ -1,79 +1,77 @@
-Return-Path: <netdev+bounces-95706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42AEE8C326F
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 18:21:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B7C38C3276
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 18:25:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBD6D281F6F
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 16:21:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3682E2822ED
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 16:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B10B56766;
-	Sat, 11 May 2024 16:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F52C56B99;
+	Sat, 11 May 2024 16:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uOasFtus"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="udbpOMaY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9446456B7F
-	for <netdev@vger.kernel.org>; Sat, 11 May 2024 16:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF8456772
+	for <netdev@vger.kernel.org>; Sat, 11 May 2024 16:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715444511; cv=none; b=jgLYlacCjdT/qOSiS9fwLVuzKSSBuy5eL9QcfZ6Dg3ajv8CtiOHT6sKUMSsug0k3S8YuFXDU0EvbVCXNOxQzttkCZzOt8O9ZbzlVw/3g34bSWwQbjPqY5sm6cfBAtScP4NoyA6i53pb5DkRaaVPoYgPKEh5OzVAqG2uPJy0dyxA=
+	t=1715444722; cv=none; b=nvnwrfLtD7viqD5HErrF8tV+UdTorTqPnBtt9c7hbpgA31VKuYQ4OX7zGXdyCVBmYw6nrLbAFtXboL6Jqv9JYGSyvlVlqXnqimQP94z/bkfTFyS/E3Q9UsTbaf5BXpv37irTKlhDugyud435irepUlsIdxHKNCpbXf10Pq/4lK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715444511; c=relaxed/simple;
-	bh=IRDgsuaNPGgDYc3AhL72iXwJ5JSE0WJoBvnx+uWWE7k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fO3Py3cyEVEtwmsLU+o7i4jSZ2inJkqk3CZWFcBkJfAd+Trp44qElvfuUBCwhrsHze9GC+dX3KKY0pb3517w4J+hrgOn8MpbioR4JjFO5KI64B8/oWZkBg43A13qKWGo5poOkyaFgvx4PbbgwCAy5qlTyhg/Qy7LvgJAQYZVOMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uOasFtus; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=E6RJxudjrpTlrvI13ERkzV46DM0JaW6mjeDf7tlPA/c=; b=uOasFtustdwTRJNt06zwBD89si
-	8khWxPNizid+Qfd7WqXcdUBcg88fI26+gDkosKTZ/tai2sw69YHXICLkAWL52L93XBh3khvTFAyPX
-	Yc4qcbKI6XiRXy7X7ZHRURHBLsu+g1UbxTXEkylVad+ygG8X7l2xtLoCFKgWtqt/xeeM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s5pTi-00FCga-1A; Sat, 11 May 2024 18:21:42 +0200
-Date: Sat, 11 May 2024 18:21:42 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/5] net: ethernet: cortina: Rename adjust
- link callback
-Message-ID: <142f59aa-7778-4f95-b142-144dde25292d@lunn.ch>
-References: <20240511-gemini-ethernet-fix-tso-v2-0-2ed841574624@linaro.org>
- <20240511-gemini-ethernet-fix-tso-v2-3-2ed841574624@linaro.org>
+	s=arc-20240116; t=1715444722; c=relaxed/simple;
+	bh=fKdFT3AbR/QLZETAmsnySnRWYTZDDbmIcyaO7hcFTV4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uBE8cnN8RlFr5nARY9WuW6kbXj8xR86kR8iBZIvKmSsMV8vtO5A/5NzKuULlmxvaO7O5lOU2KL4et1sOeQz2ErZMLZ8+/VlaDkaUDnSLKeGZ5lddJCmwnkOlk+pI2DfAi1lkSQoVoBywpVE3ieY3CzvguHhUIDM5cFRraCy6/gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=udbpOMaY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1C9EC2BBFC;
+	Sat, 11 May 2024 16:25:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715444721;
+	bh=fKdFT3AbR/QLZETAmsnySnRWYTZDDbmIcyaO7hcFTV4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=udbpOMaY3wmfOx7CLvSqn7DJbKlIecZFTAaTv09C5vuqQsuWT+qww26+qrjFv1UZm
+	 7DcRCfVZRfxdRlMlcxMqoFXE8T0f5YcVvvJeRjS7EINbUdtkgn7TD189d4wre3Al6B
+	 sSb663rjIJRz5/sL96RO0a/24DOOyS8Fgg9PTxcvBe9mo5Kza8dPCTPVRiF2EpX9lh
+	 eB6uqBcgCZnoprLECXPPvZVKmKRAf+JawFW2SZ7h2T9PaZYR7dwcJbt/GdLFBV9cjk
+	 F0dxAiLXUNku2sK8SrG7UzVeII6baQbUFIdVvzDp0r6t2AQnkYJpsWAk4UQimgTrVR
+	 N07BtA46nXQTA==
+Message-ID: <a3ba49da-ad76-40cf-89ed-fbd40da79140@kernel.org>
+Date: Sat, 11 May 2024 10:25:19 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240511-gemini-ethernet-fix-tso-v2-3-2ed841574624@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 01/15] psp: add documentation
+Content-Language: en-US
+To: Vadim Fedorenko <vfedorenko@novek.ru>, Jakub Kicinski <kuba@kernel.org>,
+ Saeed Mahameed <saeed@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com,
+ willemdebruijn.kernel@gmail.com, borisp@nvidia.com, gal@nvidia.com,
+ cratiu@nvidia.com, rrameshbabu@nvidia.com, steffen.klassert@secunet.com,
+ tariqt@nvidia.com, mingtao@meta.com, knekritz@meta.com
+References: <20240510030435.120935-1-kuba@kernel.org>
+ <20240510030435.120935-2-kuba@kernel.org> <Zj6da1nANulG5cb5@x130.lan>
+ <20240510171132.557ba47e@kernel.org>
+ <225228d7-5c4c-4e8c-99d3-77aed6432887@novek.ru>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <225228d7-5c4c-4e8c-99d3-77aed6432887@novek.ru>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, May 11, 2024 at 12:08:41AM +0200, Linus Walleij wrote:
-> The callback passed to of_phy_get_and_connect() in the
-> Cortina Gemini driver is called "gmac_speed_set" which is
-> archaic, rename it to "gmac_adjust_link" following the
-> pattern of most other drivers.
-> 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+On 5/11/24 3:41 AM, Vadim Fedorenko wrote:
+> But I agree, there is no easy way to start coding user-space lib without
+> initial
+> support from kernel.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-    Andrew
+The 2 sides should be co-developed; it is the only way to merge a sane uapi.
 
