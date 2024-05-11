@@ -1,99 +1,79 @@
-Return-Path: <netdev+bounces-95679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B04CE8C2FEE
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 08:48:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 890028C2FF0
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 08:50:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 609E21F22CFA
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 06:48:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AB2C1F22CE4
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 06:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243C3ECF;
-	Sat, 11 May 2024 06:48:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF59D27A;
+	Sat, 11 May 2024 06:50:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8E3A55;
-	Sat, 11 May 2024 06:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34CC1C2FD
+	for <netdev@vger.kernel.org>; Sat, 11 May 2024 06:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715410108; cv=none; b=qY/xPDeIltPbyUMIwu4q6Xu0LBOKgNWGAHOOTm2Tz4CW75X7Pr5Uvhk/NQ53VIYmocRNrteUhXou9O8KolopUp7Ukoth4HZR7Hzpihf8XEmrOwkOcXbAWJU1ZZmB6YmnE1PvGyB6MGCvEd4CqvAoETlW0iq4OP/+fa05UPXm4N0=
+	t=1715410224; cv=none; b=fxB/YMvHVn8sVfczH7Wej9nP9NBS10iLuwbMm2MN+Xk8JGYb0lJNrrFLGKrM4AoxkYa+gZUq7hx4YbRSEwCpr+BkRzLpeI0eraKZjULRgfu2qrkyt0SD6CBxZTN5TCoT5ft1HEdJ/p+7GGQirJ96lQtWvCNOXOjxswfQ/w9s0Dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715410108; c=relaxed/simple;
-	bh=XS4d/IMX5x4DLImlsgQYJ1Pto/GBGmxSWxBDVruIQ+0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FQZhlVN/TYxZr63JBpxiMuZkogXwmUQWAf/BVKH+h0CM9vjF26Jipb+zteEmLLmLWw2xVWGDHjxdb3v+EGhZkHUa9sfjQEVmC+7JsathM/vLJTc7ecTdGG5QUevWBSbg3JJVvwa5QcfAgPP0wR+ysGZDct3m+fwWmvjtQZrMIvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+	s=arc-20240116; t=1715410224; c=relaxed/simple;
+	bh=4EeXPkw9b3PyURqE69hG6Okyj1vluYDywdgpt+bAYms=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ABCFNvvD04H8WYM3JsJt2QAndJS4NR8eWsq6+dC1lW1SK+amVHxqwh3djHOuq4lG3GsmtOEJxWYIiXROHiGvFpbbZMDl44ye6fnIYFKRQOKAnF4Mo+x2gNov4LLBC96/N6JVulAuOFVgQxnQIc21uHhWUwRw1TmSTptFGQ/2SFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
 Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1s5gWt-0003pT-K1; Sat, 11 May 2024 08:48:23 +0200
+	(envelope-from <fw@strlen.de>)
+	id 1s5gYj-0003qH-Fk; Sat, 11 May 2024 08:50:17 +0200
+Date: Sat, 11 May 2024 08:50:17 +0200
 From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netfilter-devel <netfilter-devel@vger.kernel.org>,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH net-next] selftests: netfilter: nft_flowtable.sh: bump socat timeout to 1m
-Date: Sat, 11 May 2024 08:48:03 +0200
-Message-ID: <20240511064814.561525-1-fw@strlen.de>
-X-Mailer: git-send-email 2.45.0
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Florian Westphal <fw@strlen.de>, Simon Horman <horms@kernel.org>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Jaehee Park <jhpark1013@gmail.com>, Petr Machata <petrm@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Davide Caratti <dcaratti@redhat.com>,
+	Matthieu Baerts <matttbe@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [TEST] Flake report
+Message-ID: <20240511065017.GA31232@breakpoint.cc>
+References: <20240509160958.2987ef50@kernel.org>
+ <20240510083551.GB16079@breakpoint.cc>
+ <20240510074716.1bbb8de8@kernel.org>
+ <20240510090336.54180074@kernel.org>
+ <20240510164147.GE16079@breakpoint.cc>
+ <20240510110243.08eed391@kernel.org>
+ <20240510171441.3a287dcd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240510171441.3a287dcd@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Now that this test runs in netdev CI it looks like 10s isn't enough
-for debug kernels:
-  selftests: net/netfilter: nft_flowtable.sh
-  2024/05/10 20:33:08 socat[12204] E write(7, 0x563feb16a000, 8192): Broken pipe
-  FAIL: file mismatch for ns1 -> ns2
-  -rw------- 1 root root 37345280 May 10 20:32 /tmp/tmp.Am0yEHhNqI
- ...
+Jakub Kicinski <kuba@kernel.org> wrote:
+> > Picked the old tree. Let's see..
+> 
+> Looks like that worked!!
 
-Looks like socat gets zapped too quickly, so increase timeout to 1m.
+Great, thanks a lot!
 
-Could also reduce tx file size for KSFT_MACHINE_SLOW, but its preferrable
-to have same test for both debug and nondebug.
+> So the last fail we see for netfilter is nft-flowtable-sh with kernel
+> debug enabled:
+> 
+> https://netdev.bots.linux.dev/contest.html?executor=vmksft-nf-dbg&test=nft-flowtable-sh
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- tools/testing/selftests/net/netfilter/nft_flowtable.sh | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-index 86d516e8acd6..b3995550856a 100755
---- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-+++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
-@@ -17,6 +17,7 @@
- source lib.sh
- 
- ret=0
-+SOCAT_TIMEOUT=60
- 
- nsin=""
- ns1out=""
-@@ -350,12 +351,12 @@ test_tcp_forwarding_ip()
- 	local dstport=$4
- 	local lret=0
- 
--	timeout 10 ip netns exec "$nsb" socat -4 TCP-LISTEN:12345,reuseaddr STDIO < "$nsin" > "$ns2out" &
-+	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsb" socat -4 TCP-LISTEN:12345,reuseaddr STDIO < "$nsin" > "$ns2out" &
- 	lpid=$!
- 
- 	busywait 1000 listener_ready
- 
--	timeout 10 ip netns exec "$nsa" socat -4 TCP:"$dstip":"$dstport" STDIO < "$nsin" > "$ns1out"
-+	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsa" socat -4 TCP:"$dstip":"$dstport" STDIO < "$nsin" > "$ns1out"
- 
- 	wait $lpid
- 
--- 
-2.45.0
-
+I'd guess socat gets killed off before it hits EOF, I sent a patch to bump the
+timeout to 1m. Lets see if thats enough to make it fly.
 
