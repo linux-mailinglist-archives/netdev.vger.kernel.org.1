@@ -1,146 +1,178 @@
-Return-Path: <netdev+bounces-95738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E715A8C3353
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 21:00:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E9808C3384
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 21:34:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0EF8282237
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 19:00:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2417D1C20D75
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 19:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEBAA1CD00;
-	Sat, 11 May 2024 19:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A161CD37;
+	Sat, 11 May 2024 19:34:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="L5kCz3c6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DhPwpPvY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B4118EBF;
-	Sat, 11 May 2024 19:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98401366;
+	Sat, 11 May 2024 19:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715454042; cv=none; b=Rxhm2FLZknILZlFtq+inuZPNl6fCYMSDJzJ1hjO6A/ezEtDTjFXzwkByqxAWSH9uE2Vhj/Fwu6lDTjbLrSjvumqxchSqWnSOZGJrF79P1oUmYql8HemJ6Sk+7yfq86XyyOaGQKHKrTVa8bq8c5TNRS4Cq4rXzZV8XktLwP1Kow0=
+	t=1715456077; cv=none; b=qbC1Fgw4iEFodqJ7uy+OvR0MFUayTQA1OBQw+2rt0NxMuIQNZzcV/sYGE9knPdBTfaDS2+F5Gammdz49GY1O/8t8FYtyBR2O4GxEZmI35PxOoy8Q8vbJzyHGkNiT01aNAH84pUJPkjz1tIPYbdaj/kyyMON8DHpPUdFkzyZ7XVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715454042; c=relaxed/simple;
-	bh=g1p0fcYuj6Vmv6EravnVzqiDOl2tHcv3wZAdG0Cs3TM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K2BqSEHqQvAE3qliZCsQSeliVcSciw61kOMUwhbpPEdqB/oW8TJh+TJWzDhFyQjW3UZIXb5V9XEwshzCoLK0zqhm4oJY65Ac5s8i3jv5WECVltdDr+Y27IPS/n05FFZtjCKvaXYeddcKwZ+pqzYsGrCStH8wO2PaLyaJZO+2bUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=L5kCz3c6; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44BIbdYX023817;
-	Sat, 11 May 2024 18:55:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2023-11-20;
- bh=V6g8oKn6rig+zs765hUUYo3FL3WRsS9mpUom0ai8PII=;
- b=L5kCz3c6MAFuvjwHXxSN80HLlCHhMi8kw2XYu3pCPFMu0dLU9umpVv5pz0ys/hwoKlgM
- ku074/oaX76Xw3MJCrvXzQsXHyZeX6pxAhFNtuajAwoFjs5FmZ+JM/T5J1ZCV4NcFdyQ
- qPF8uWPNgB1vSsOHt7/dJIJbOCe3g7xhyNrOpRWMTCRCQjgspt7cTQiaXgbGKpEpS3Ku
- h08iKB/n0S6pwiKQStV23Ss/bMJrLnJdQ/f4moTAgsAUd1Tb4Px/PocmW+hqZiqJL8xP
- GXG/rbzHgBPOFjz/ikxDR3Frn3h+XFTL0bm9HZQrThXfoKa3nrN57LSamjfpFzbVWrCQ gA== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3y2c2cg2w6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 11 May 2024 18:55:02 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 44BGN5Dn022420;
-	Sat, 11 May 2024 18:39:58 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3y1y44fn7c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 11 May 2024 18:39:58 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44BIZYPU028255;
-	Sat, 11 May 2024 18:39:57 GMT
-Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3y1y44fn5r-4;
-	Sat, 11 May 2024 18:39:57 +0000
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Tony Nguyen <anthony.l.nguyen@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>,
-        Rasesh Mody <rmody@marvell.com>,
-        Sudarsana Kalluru <skalluru@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-        Anil Gurumurthy <anil.gurumurthy@qlogic.com>,
-        Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        Fabian Frederick <fabf@skynet.be>,
-        Saurav Kashyap <skashyap@marvell.com>,
-        GR-QLogic-Storage-Upstream@marvell.com,
-        Nilesh Javali <nilesh.javali@cavium.com>,
-        Arun Easi <arun.easi@cavium.com>,
-        Manish Rangankar <manish.rangankar@cavium.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Sunil Goutham <sgoutham@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
-        hariprasad <hkelam@marvell.com>,
-        Subbaraya Sundeep <sbhatta@marvell.com>,
-        Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Saurav Kashyap <saurav.kashyap@cavium.com>, linux-s390@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH v2 0/6] Ensure the copied buf is NUL terminated
-Date: Sat, 11 May 2024 14:39:10 -0400
-Message-ID: <171545260076.2119337.3238318559945813238.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240424-fix-oob-read-v2-0-f1f1b53a10f4@gmail.com>
-References: <20240424-fix-oob-read-v2-0-f1f1b53a10f4@gmail.com>
+	s=arc-20240116; t=1715456077; c=relaxed/simple;
+	bh=654Bu+ZWTA8dRAlTroxF0ate7xSXj5crY54eC/GD0PE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WbUHp3PML2/Z3jVizAIku5LYIRa2S1gtrePcNg6ZG/gVyLaES9OyshLIQuT817A9zkWGoj5+6lzWGHOhl5NHuS4WvICVWqbFrS6xQb9qV4dlyunQudpGch/Rrm8IVfYQM7xT4e2h343oZwQOKYEcSYNzMgZN8AZQBMQQ1Yw9Is0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DhPwpPvY; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=w0vU8RMKEb5MAwtOYOzKjXM4x8mAAk3i9b0LbBNQJ0c=; b=DhPwpPvYtTPMPM5y2NYb+kLshS
+	FsmAdMpbWJOJQCl8LDe713iU8PEoyMf61+gp3VRpsxUTzKCPJ5gSOFPZ1zdFn1qr2r7K9GJvP0Z0c
+	1/c7gpeKs2tpmCwn/bGuPr8rqN6imEtd6SLS6wiPGDexUq4BXuKxKlbdFrrjtbyUOoYBkUIDpfsIe
+	sKCt42Y/G1yMRmI5kx2H4RnZUgR7eUDj/bWYFLRdUhZgCIwxRiClnrY07cPgEeHRSX8TvGdO5/WOg
+	vMPQZ8itsE/BUtHV5MrTCj6/jheHx8Z3dauR8+rgbWUCXrFXc+DG+9XX/VyiOkhilKdbik/2p7eIl
+	bYXTYKug==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57162)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1s5sUD-0000B6-0D;
+	Sat, 11 May 2024 20:34:25 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1s5sUA-0004VK-W4; Sat, 11 May 2024 20:34:23 +0100
+Date: Sat, 11 May 2024 20:34:22 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	bcm-kernel-feedback-list@broadcom.com, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
+	richardcochran@gmail.com, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2, net-next, 2/2] net: stmmac: PCI driver for BCM8958X
+ SoC
+Message-ID: <Zj/IPpub11OL3jBo@shell.armlinux.org.uk>
+References: <20240510000331.154486-3-jitendra.vegiraju@broadcom.com>
+ <20240511015924.41457-1-jitendra.vegiraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-11_06,2024-05-10_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=986 adultscore=0
- bulkscore=0 phishscore=0 suspectscore=0 spamscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2405110139
-X-Proofpoint-ORIG-GUID: JSR1LgQlB64XVUSSquWoWZNhZ3hLuE8Y
-X-Proofpoint-GUID: JSR1LgQlB64XVUSSquWoWZNhZ3hLuE8Y
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240511015924.41457-1-jitendra.vegiraju@broadcom.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, 24 Apr 2024 21:44:17 +0700, Bui Quang Minh wrote:
+Hi,
 
-> I found that some drivers contains an out-of-bound read pattern like this
-> 
-> 	kern_buf = memdup_user(user_buf, count);
-> 	...
-> 	sscanf(kern_buf, ...);
-> 
-> The sscanf can be replaced by some other string-related functions. This
-> pattern can lead to out-of-bound read of kern_buf in string-related
-> functions.
-> 
-> [...]
+Thanks for the patch,. but there are things that need some improvement.
 
-Applied to 6.10/scsi-queue, thanks!
+On Fri, May 10, 2024 at 06:59:24PM -0700, Jitendra Vegiraju wrote:
+> +static void dwxgmac_brcm_dma_init_tx_chan(struct stmmac_priv *priv,
+> +					  void __iomem *ioaddr,
+> +					  struct stmmac_dma_cfg *dma_cfg,
+> +					  dma_addr_t phy, u32 chan)
+> +{
+> +	u32 value;
+> +
+> +	value = readl(ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
+> +	value &= ~XGMAC_TxPBL;
+> +	value &= ~GENMASK(6, 4);
+> +	writel(value, ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
+> +
+> +	writel(upper_32_bits(phy), ioaddr + XGMAC_DMA_CH_TxDESC_HADDR(chan));
+> +	writel(lower_32_bits(phy), ioaddr + XGMAC_DMA_CH_TxDESC_LADDR(chan));
 
-[3/6] bfa: ensure the copied buf is NUL terminated
-      https://git.kernel.org/mkp/scsi/c/13d0cecb4626
-[4/6] qedf: ensure the copied buf is NUL terminated
-      https://git.kernel.org/mkp/scsi/c/d0184a375ee7
+Please use "dma_addr" not "phy" here. "phy" could mean ethernet phy.
+I personally dislike "physical address" for DMA stuff because if
+there's an IOMMU or other translation layer present, what you have
+here is *not* a physical address.
+
+> +static void dwxgmac_brcm_dma_init_rx_chan(struct stmmac_priv *priv,
+> +					  void __iomem *ioaddr,
+> +					  struct stmmac_dma_cfg *dma_cfg,
+> +					  dma_addr_t phy, u32 chan)
+> +{
+> +	u32 value;
+> +
+> +	value = readl(ioaddr + XGMAC_DMA_CH_RX_CONTROL(chan));
+> +	value &= ~XGMAC_RxPBL;
+> +	writel(value, ioaddr + XGMAC_DMA_CH_RX_CONTROL(chan));
+> +
+> +	writel(upper_32_bits(phy), ioaddr + XGMAC_DMA_CH_RxDESC_HADDR(chan));
+> +	writel(lower_32_bits(phy), ioaddr + XGMAC_DMA_CH_RxDESC_LADDR(chan));
+
+Ditto.
+
+...
+
+> +static void dwxgmac_brcm_fix_speed(void *priv, unsigned int speed,
+> +				   unsigned int mode)
+> +{
+> +}
+
+If this is empty, do you really need it? The method is optional.
+
+...
+
+> +static int dwxgmac_brcm_pci_probe(struct pci_dev *pdev,
+> +				  const struct pci_device_id *id)
+> +{
+...
+> +	/* This device interface is directly attached to the switch chip on
+> +	 *  the SoC. Since no MDIO is present, register fixed_phy.
+> +	 */
+> +	brcm_priv->phy_dev =
+> +		 fixed_phy_register(PHY_POLL,
+> +				    &dwxgmac_brcm_fixed_phy_status, NULL);
+> +	if (IS_ERR(brcm_priv->phy_dev)) {
+> +		dev_err(&pdev->dev, "%s\tNo PHY/fixed_PHY found\n", __func__);
+> +		return -ENODEV;
+> +	}
+> +	phy_attached_info(brcm_priv->phy_dev);
+
+As pointed out in the other sub-thread, you don't need this. If you need
+a fixed-link and you don't have a firmware description of it, you can
+provide a swnode based description through plat->port_node that will be
+passed to phylink. Through that, you can tell phylink to create a
+fixed link.
+
+> +	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+> +	if (ret)
+> +		goto err_disable_msi;
+> +
+> +	/* The stmmac core driver doesn't have the infrastructure to
+> +	 * support fixed-phy mdio bus for non-platform bus drivers.
+> +	 * Until a better solution is implemented, initialize the
+> +	 * following entries after priv structure is populated.
+> +	 */
+> +	ndev = dev_get_drvdata(&pdev->dev);
+> +	priv = netdev_priv(ndev);
+> +	priv->mii = mdio_find_bus("fixed-0");
+> +
+> +	ndev->hw_features &= ~NETIF_F_HW_VLAN_CTAG_RX;
+> +	priv->hw->hw_vlan_en = false;
+
+Basically... no. Do not do any setup after stmmac_dvr_probe(), because
+the network device has already been registered and published to
+userspace, and userspace may have already opened the network device.
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
