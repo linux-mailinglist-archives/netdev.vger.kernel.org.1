@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-95699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 529E98C31D8
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 16:30:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A73C18C31DC
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 16:32:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84A171C20C8E
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 14:30:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 573C82820A3
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 14:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121E355C1A;
-	Sat, 11 May 2024 14:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2E0A55C29;
+	Sat, 11 May 2024 14:32:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Hf91AIkh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d0bWchKX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F6C154675;
-	Sat, 11 May 2024 14:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACCA1E526;
+	Sat, 11 May 2024 14:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715437811; cv=none; b=nUPAtKUVRuD6YDNuQ7W97UFqoevfRp0WXDr4e6yk+z7lbj/xN/QTuSofqSEzuJv2i5F0Q/kz9WZ2EvLVdL/vlIeeNVHvoOjIrukyZ6+xC/UJpB59YVd71T3X9MmZ1aflBG8MB0+sz6VawVeHNk3e9Z24R4x81+2bXHCKFSd+PZs=
+	t=1715437951; cv=none; b=RgtW4wNRP/SAtYZ7h6iQwHmrh7wBm2NmgG9kWM1LGMq9xLSvfYKSX4+3n/w2I0WThihBVA2WnTLQv/SDy5irltcvbUAnboyyzo43cxMYolEW8JWgcUgPHhxdmlX5wf5LCkUQbakRWdTtnbN3klfDMDs2lxWkJJ8ZW30j8BfF45g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715437811; c=relaxed/simple;
-	bh=Ljf9kyd52InGJKqfdBuV4Ah4NYoQ0uueOOS0D+QxAlE=;
+	s=arc-20240116; t=1715437951; c=relaxed/simple;
+	bh=ZiuHNDka16x6oIRNSgu5bdFvGzb9OB9POj/J0eopbA4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=adqaZeZsj6mMgDAnpUzMQIPcG31zWbBvKuhTn34Eyyb5adj76feXHhYieb8/BCDgb2uZqGfdEwa93YUmBQLZsCEwJz5KOKL35LWGH4slrp+otQCrapX8uYn77HmBR8NgDUjDGK8sS/PhtF6kb9C/bOQXMIQW8SbDIdjYsmUqnV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Hf91AIkh; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5MHosLGyMfOMQTFlE11a37ZDMCC9zCbFJQj+2H5rwUU=; b=Hf91AIkhkaSC/B2WvhNWfwFnWf
-	Kq/EjgoDVI6qd9M6wXYFCYedTgtUun6AbuF8yvyUPI32/G6ilEsrdkmELeZYD1x4pyjh33PZ++2ok
-	xa0UUy15UX1uZDoqYtGX2wzPl4ea9Pyie9+77E5Iu29n/yCdXDzpTH2O/k/0BGTruXz0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s5njP-00FCTL-Pz; Sat, 11 May 2024 16:29:47 +0200
-Date: Sat, 11 May 2024 16:29:47 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
-	richardcochran@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, imx@lists.linux.dev
-Subject: Re: [PATCH v2 net-next] net: fec: Convert fec driver to use lock
- guards
-Message-ID: <b96822ea-4373-415d-8397-d8bc5da88120@lunn.ch>
-References: <20240511030229.628287-1-wei.fang@nxp.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EslHj+f5MkKJv/UJJghbqjsqekn/PyKNVeERKpVOmWVxdv0Qyhqfup8ttqNWCheY2amUXQGJmYMX79Rp8l4SIKU95KHfyNbwqG8SIj0Pxj8FPakgdSN30Jgzx3uYI+hxXV1Wr50VtSMsQBcqIoLVTpjX83Sr2pTBDwO6SnHmsfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d0bWchKX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48370C2BBFC;
+	Sat, 11 May 2024 14:32:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715437950;
+	bh=ZiuHNDka16x6oIRNSgu5bdFvGzb9OB9POj/J0eopbA4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d0bWchKX2n3tp0qqQQkUGfAHsvrDiQfGK+GpEpjfyT8ONkKHP+s+VIQf8zZnFx4zT
+	 eRk6VnfVMci2xt7lW512fbrQ+zHG7DJsy/EOd1Cvpq8sakvnjblj7EEUjmPRXkwgBG
+	 yse4AWeU88txnktKaECxVhj5pH6dP5zlDMCc6vVz4BPJpA5y9MU+M+/uvCfvSaTnl8
+	 fYy6axkHJZhgSd6sRq61ULRV1+6Ir2LxHlFHgIkLNV79MnjG1d5NRaTnhNlQ6pjOam
+	 ZeU/vVyhJhJVoiROSLpHbmkHBQ9IAZtBwdFBzwsgtXqGUkiCGEx+7fkqcE/cLdb+ad
+	 lqHRbO/zVyrug==
+Date: Sat, 11 May 2024 15:32:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ziwei Xiao <ziweixiao@google.com>
+Cc: netdev@vger.kernel.org, jeroendb@google.com, pkaligineedi@google.com,
+	shailend@google.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, willemb@google.com,
+	hramamurthy@google.com, rushilg@google.com, jfraker@google.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/5] gve: Add adminq extended command
+Message-ID: <20240511143224.GI2347895@kernel.org>
+References: <20240507225945.1408516-1-ziweixiao@google.com>
+ <20240507225945.1408516-3-ziweixiao@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,31 +61,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240511030229.628287-1-wei.fang@nxp.com>
+In-Reply-To: <20240507225945.1408516-3-ziweixiao@google.com>
 
-On Sat, May 11, 2024 at 11:02:29AM +0800, Wei Fang wrote:
-> The Scope-based resource management mechanism has been introduced into
-> kernel since the commit 54da6a092431 ("locking: Introduce __cleanup()
-> based infrastructure"). The mechanism leverages the 'cleanup' attribute
-> provided by GCC and Clang, which allows resources to be automatically
-> released when they go out of scope.
-> Therefore, convert the fec driver to use guard() and scoped_guard()
-> defined in linux/cleanup.h to automate lock lifetime control in the
-> fec driver.
+On Tue, May 07, 2024 at 10:59:42PM +0000, Ziwei Xiao wrote:
+> From: Jeroen de Borst <jeroendb@google.com>
+> 
+> The adminq command is limited to 64 bytes per entry and it's 56 bytes
+> for the command itself at maximum. To support larger commands, we need
+> to dma_alloc a separate memory to put the command in that memory and
+> send the dma memory address instead of the actual command.
+> 
+> This change introduces an extended adminq command to wrap the real
+> command with the inner opcode and the allocated dma memory address
+> specified. Once the device receives it, it can get the real command from
+> the given dma memory address. As designed with the device, all the
+> extended commands will use inner opcode larger than 0xFF.
+> 
+> Signed-off-by: Jeroen de Borst <jeroendb@google.com>
+> Co-developed-by: Ziwei Xiao <ziweixiao@google.com>
+> Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
+> Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> ---
+>  drivers/net/ethernet/google/gve/gve_adminq.c | 31 ++++++++++++++++++++
+>  drivers/net/ethernet/google/gve/gve_adminq.h | 12 ++++++++
+>  2 files changed, 43 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
+> index 2c3ec5c3b114..514641b3ccc7 100644
+> --- a/drivers/net/ethernet/google/gve/gve_adminq.c
+> +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
+> @@ -461,6 +461,8 @@ static int gve_adminq_issue_cmd(struct gve_priv *priv,
+>  
+>  	memcpy(cmd, cmd_orig, sizeof(*cmd_orig));
+>  	opcode = be32_to_cpu(READ_ONCE(cmd->opcode));
+> +	if (opcode == GVE_ADMINQ_EXTENDED_COMMAND)
+> +		opcode = be32_to_cpu(cmd->extended_command.inner_opcode);
+>  
+>  	switch (opcode) {
+>  	case GVE_ADMINQ_DESCRIBE_DEVICE:
+> @@ -537,6 +539,35 @@ static int gve_adminq_execute_cmd(struct gve_priv *priv,
+>  	return err;
+>  }
+>  
+> +static int gve_adminq_execute_extended_cmd(struct gve_priv *priv, u32 opcode,
+> +					   size_t cmd_size, void *cmd_orig)
 
-Sorry, it has been decided for netdev we don't want these sort of
-conversions, at least not yet. The main worry is backporting fixes. It
-is likely such bcakports are going to be harder, and also more error
-prone, since the context is quite different.
+Hi Ziewi Xiaoi and Jeroen,
 
-If done correctly, scoped_guard() {} could be useful, and avoid
-issues. So we are O.K. with that in new code. That will also allow us
-to get some experience with it over the next few years. Maybe we will
-then re-evaluate this decision about converting existing code.
+As of this patch, gve_adminq_execute_extended_cmd is defined but unused.
+Which causes an error when compiling with W=1 using gcc-13 or clang-18.
 
-    Andrew
+Perhaps it would be better to squash this patch into the patch that
+uses gve_adminq_execute_extended_cmd.
 
----
-pw-bot: cr
-     
+...
 
