@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-95623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50B468C2DC1
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 01:58:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D13F8C2DCB
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 02:11:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 828E01C213D0
-	for <lists+netdev@lfdr.de>; Fri, 10 May 2024 23:58:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA3461F221D8
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 00:11:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8543E17556D;
-	Fri, 10 May 2024 23:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F757184;
+	Sat, 11 May 2024 00:11:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iiyIfkxV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RumPPV8B"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830A613BAFB;
-	Fri, 10 May 2024 23:58:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735D623A9
+	for <netdev@vger.kernel.org>; Sat, 11 May 2024 00:11:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715385522; cv=none; b=kLXBm7ay8y90ESwvYvQcPcfeTXUy7wdy5Qy6jXOT2uAT54DQZ1z8DQh0Z1+7LoSMxvXvAaQRUDdi4o4oKB95YEigie14zPvx5PH+k0TssUpgpd2ZX8qV/WEdPjrQq2a1fpuIbEyrbPdjHwqszQ+umuMozbPC16xqNWUIpo0+S14=
+	t=1715386302; cv=none; b=OIx5pEuF9zjvcI1c/NBGDiBIR0Qi5DdM9ZYt0arjmeJjzcZieA4IZVq9hvpF5YDMAELBJNsDyvECc3yB8P3+AdYFt4kHMnUw5euo7DYgjh8JPjJKkwyOlWC6bf/XvZjL7AqCVjEVfTMB7476WQScb76tXWKPYbh0f9YieorvRGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715385522; c=relaxed/simple;
-	bh=Rw2z98v+eDfNW0peI8QlfkbvX2mMcCvJsflxNJVrbCw=;
+	s=arc-20240116; t=1715386302; c=relaxed/simple;
+	bh=K3by3DjOrZwXfU4wZxFHidx7ValhSjSrZNBQ5vU4QvQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mPIs1tEWXw4OxwKYT3LsATod3a0Ox4muZZ09uX7aFmfWhO5ODig/oKlUGusdfCBBKS2a+z4e4sgMfPeV8x8L+xCNaK3Q7uFvNvuMdzFQUSpcbmS9bKtuR20asB6s/Dppo17RPMEkOpTHLJIuZHnJqBwPZUYip52QXr++870Rbac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iiyIfkxV; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=qlLl3EeqOBIy2YQ/wN2pcuG3VzyPSQ+hXbjd8zXpJ8k5Xjz28XLzpq7qEf5/zXEYkZIgYM9lhmGAIysoYIyUAmmsUHJW2zqQAoVSHAsqn6sad99xWvuIag8Kp8Bb+qOUgM23Oj7HCBYo/UY40FZJ6M/rLs1W7zm9KkP1/XzZf/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RumPPV8B; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,42 +36,25 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=i6+svHzw1fQhMuQYrr1eYkC7SUY5MZbc32DdVO9kxYQ=; b=iiyIfkxV+5n/px3gMZflCleO1/
-	QzR70vMV/baXYjrTQroztf3PRQgnBmfog/ICZkBrq9razxGtW3DX56D3DH2F7j/ufKt9eP4SkFlOE
-	3Hhe6zWkG6chov8n9SEhjHoLiBbdG1pEQ5mld+Z3qm0SAlwS14XPTgcYd1bZ2K3R3qhc=;
+	bh=VumH+IGmAAGuEK6rL98cdNOhspsTWnZd0mVucWcisj8=; b=RumPPV8BU/el+7tdHGpAZ06E7F
+	aWGePA5BQzcQY083G8QgU/tvfRULZFpgB1uTVV+GocOU9hcFb9rTPjs1GHTAUOkvVkccBTF0aRTRB
+	/sPm9iabedzKkwVwOCJHG+pKNYVeeWY8dSjBTpMltW0/GW1BcUqqQagJthGE34hr1TnA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1s5a7x-00FAkv-9W; Sat, 11 May 2024 01:58:13 +0200
-Date: Sat, 11 May 2024 01:58:13 +0200
+	id 1s5aKo-00FApv-Cg; Sat, 11 May 2024 02:11:30 +0200
+Date: Sat, 11 May 2024 02:11:30 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>, Pavel Machek <pavel@ucw.cz>,
-	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	William Zhang <william.zhang@broadcom.com>,
-	Anand Gore <anand.gore@broadcom.com>,
-	Kursad Oney <kursad.oney@broadcom.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-	=?iso-8859-1?Q?Fern=E1ndez?= Rojas <noltari@gmail.com>,
-	Sven Schwermer <sven.schwermer@disruptive-technologies.com>,
-	linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	netdev@vger.kernel.org
-Subject: Re: [net-next PATCH v10 3/5] net: phy: add support for PHY LEDs
- polarity modes
-Message-ID: <bb146832-30fc-4c76-a083-51a1bc087e61@lunn.ch>
-References: <20240125203702.4552-1-ansuelsmth@gmail.com>
- <20240125203702.4552-4-ansuelsmth@gmail.com>
- <Zj6qURAmoED2QywF@makrotopia.org>
+Subject: Re: [PATCH net-next v2 5/5] net: ethernet: cortina: Implement
+ .set_pauseparam()
+Message-ID: <78fb31fb-98a6-4ab5-9896-f1db8ce5d0fd@lunn.ch>
+References: <20240511-gemini-ethernet-fix-tso-v2-0-2ed841574624@linaro.org>
+ <20240511-gemini-ethernet-fix-tso-v2-5-2ed841574624@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,25 +63,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zj6qURAmoED2QywF@makrotopia.org>
+In-Reply-To: <20240511-gemini-ethernet-fix-tso-v2-5-2ed841574624@linaro.org>
 
-> Wanting to make use of this I noticed that polarity settings are only
-> applied once in of_phy_led(), which is not sufficient for my use-case:
+On Sat, May 11, 2024 at 12:08:43AM +0200, Linus Walleij wrote:
+> The Cortina Gemini ethernet can very well set up TX or RX
+> pausing, so add this functionality to the driver in a
+> .set_pauseparam() callback.
 > 
-> I'm writing a LED driver for Aquantia PHYs and those PHYs reset the
-> polarity mode every time a PHY reset is triggered.
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>  drivers/net/ethernet/cortina/gemini.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 > 
-> I ended up writing the patch below, but I'm not sure if phy_init_hw
-> should take care of this or if the polarity modes should be stored in
-> memory allocated by the PHY driver and re-applied by the driver after
-> reset (eg. in .config_init). Kinda depends on taste and on how common
-> this behavior is in practise, so I thought the best is to reach out to
-> discuss.
+> diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
+> index d3134db032a2..137242a4977c 100644
+> --- a/drivers/net/ethernet/cortina/gemini.c
+> +++ b/drivers/net/ethernet/cortina/gemini.c
+> @@ -2145,6 +2145,17 @@ static void gmac_get_pauseparam(struct net_device *netdev,
+>  	pparam->autoneg = true;
+>  }
+>  
+> +static int gmac_set_pauseparam(struct net_device *netdev,
+> +			       struct ethtool_pauseparam *pparam)
+> +{
+> +	struct phy_device *phydev = netdev->phydev;
+> +
+> +	gmac_set_flow_control(netdev, pparam->tx_pause, pparam->rx_pause);
+> +	phy_set_asym_pause(phydev, pparam->rx_pause, pparam->tx_pause);
 
-There was a similar discussion recently about WoL settings getting
-lost. The conclusion about that was the PHY should keep track of WoL
-setting. So i would say the same applies there. Please store it in a
-local priv structure.
+This is a bit of an odd implementation. Normally the value of the
+pparam.autoneg is used to decide if to directly program the hardware,
+or to pass it to phylib.
 
-      Andrew
+Also, the adjust link callback probably should know so that it does
+not take the autoneg values when auto-neg of pause is disabled.  Or,
+as in your first version, don't allow pparam.autoneg == False.
+
+    Andrew
 
