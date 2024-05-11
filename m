@@ -1,50 +1,59 @@
-Return-Path: <netdev+bounces-95633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A77E08C2E6C
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 03:30:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 131D18C2E73
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 03:32:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A8CF1F2358D
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 01:30:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 451671C20FF7
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 01:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBB314F98;
-	Sat, 11 May 2024 01:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049521078B;
+	Sat, 11 May 2024 01:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N4/lEmyD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UaDxAK+o"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5942C12E68;
-	Sat, 11 May 2024 01:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11E16AB8;
+	Sat, 11 May 2024 01:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715391030; cv=none; b=hpA/mOWODgPJ2Y8Z9dxOeJSTFDF+AYZYi3o9a5dA3m6ZHjZJiUw6fSMSAjDKraelV/G4vB0mUPbD/BMavK0DhR+QT8wf0kdFJSwSdzlLN1SYBzl1kJCUsAl3b2pqrptflbTkvC78NEW7lnAyERfGH85uPclUBnXVZ9I6H5dGi4M=
+	t=1715391161; cv=none; b=Qa7BjnZ6PSso6tF3AYQiqREIICFY15RYFDKFaHFfaGjaEHd40aHdV9fWN0JtN2Hqaq9YOpKZSZzzF6hWDuLcfrrY5VIwm4PDe3guC81SWwOsS6GftFroz1rZ9fvfNGTc65pcSKxLKr4goIO2iN2CBUcPgutXvaY2mvXvCHmRNY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715391030; c=relaxed/simple;
-	bh=1OHzTnDAFehCLp0FJwQukTc+4pNjunRPFFhzwohoQKE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iueLC7jypntg0Y1cNxVptm9VoCBq/L16t7Lia5zpUiwvBZmWnltuUyA5DzaVgL1HQ14qm+X1WtUx2YhGWKhE8udXUk5rrnl/hz4WJGKvO0t8xLWgSwJS2tZ7EjHgAsHdWBF7/+SM+J8/kowXYI1TuWKXyVvNTOucM9ttjBNQ8uU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N4/lEmyD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0D39AC4AF68;
-	Sat, 11 May 2024 01:30:30 +0000 (UTC)
+	s=arc-20240116; t=1715391161; c=relaxed/simple;
+	bh=HXNAUk8KaLORbUdTkeXxMvO5IapPVvsxzWrRDTV3Ho4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o6KG3gMppZeN/C5m2Bx3gzcvDV1kAjelY0RVU/Sh94TYz8yhHOgyuEw0jDg9hUOCxD8A4/dtkHW09nxHCwevawNRYi8kxnyxrKa/wOS9VNn5ZrOTP4kHYyT+pEwN+uVO0zs/lAJ+y8/TwhW5/MNDMbkNF7RsGYKyOzq4qrHBcgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UaDxAK+o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 221F8C113CC;
+	Sat, 11 May 2024 01:32:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715391030;
-	bh=1OHzTnDAFehCLp0FJwQukTc+4pNjunRPFFhzwohoQKE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=N4/lEmyDeW5eiX4KT5hwXZWS4JdHXbOgHexmKNBJq8rJC41ltGbrSL7T8nREAtM5i
-	 NrwJkXFx3vSAfPmY8y2UXQsXbs3zRLkW3PgBW+gh8KcO2EkdyZTtipAo1vWQCKCLS8
-	 ivt2zs1apc9Wz7MTX+q8iB8qVupffObDepqoLKM4Q37VDUW1VVG7EIGUSZUYzFSrm4
-	 6WP0S9NvLtt7mVrk7vBfEYWEQ3Cyebe2L4J3LkbH8nlCY8ARezxbWIOTczEsQ3mATB
-	 piGkm6kLlv8r8+qPpjGyLe+RjI9+3nAUS6yDL5RUsS8b6UWSxcZgYlB5DghFY4/1ye
-	 cVMOCa1/ubQZw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0361AC54BA1;
-	Sat, 11 May 2024 01:30:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1715391160;
+	bh=HXNAUk8KaLORbUdTkeXxMvO5IapPVvsxzWrRDTV3Ho4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UaDxAK+oUgyImZRIcmaGVxcogZQkDUnbJyFnJgEaJLWTcmYAjzcdxf9w9n6rUc1+t
+	 4EBsTVdbMC/6aj66ixuFAaW3q0CulXKtoneqm+Vg7+Jtp7f8D5iwl7rWSgJwwNTkc2
+	 a5uue12+PD6kodmd8KWDloY12rwyvriWfh1DCQKCy/r+7/z7JgWHaZlW/b4uQ+O0D9
+	 wws0+MPJ3K5foeVUpHhb6xtGk7JYDyFuYO7S5/j3kKdHaNTXe9POfNzb9AY9Cklkbo
+	 9XHxvRhuNkEMcf3I7g40JGPzMcbSHzb7EFu42gVdMgx4tEVNJ+sZ/YovCUobr17vCs
+	 oFD8GTr2/kYcQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	liuhangbin@gmail.com,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v2] selftests: net: local_termination: annotate the expected failures
+Date: Fri, 10 May 2024 18:32:36 -0700
+Message-ID: <20240511013236.383368-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,42 +61,102 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] virtio_net: Fix memory leak in virtnet_rx_mod_work
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171539103001.31003.4130867851366024064.git-patchwork-notify@kernel.org>
-Date: Sat, 11 May 2024 01:30:30 +0000
-References: <20240509183634.143273-1-danielj@nvidia.com>
-In-Reply-To: <20240509183634.143273-1-danielj@nvidia.com>
-To: Dan Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- jiri@nvidia.com, axboe@kernel.dk
 
-Hello:
+Vladimir said when adding this test:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+  The bridge driver fares particularly badly [...] mainly because
+  it does not implement IFF_UNICAST_FLT.
 
-On Thu, 9 May 2024 13:36:34 -0500 you wrote:
-> The pointer delcaration was missing the __free(kfree).
-> 
-> Fixes: ff7c7d9f5261 ("virtio_net: Remove command data from control_buf")
-> Reported-by: Jens Axboe <axboe@kernel.dk>
-> Closes: https://lore.kernel.org/netdev/0674ca1b-020f-4f93-94d0-104964566e3f@kernel.dk/
-> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
-> 
-> [...]
+See commit 90b9566aa5cd ("selftests: forwarding: add a test for
+local_termination.sh").
 
-Here is the summary with links:
-  - virtio_net: Fix memory leak in virtnet_rx_mod_work
-    https://git.kernel.org/netdev/net-next/c/b49bd37f0bfd
+We don't want to hide the known gaps, but having a test which
+always fails prevents us from catching regressions. Report
+the cases we know may fail as XFAIL.
 
-You are awesome, thank you!
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: liuhangbin@gmail.com
+CC: shuah@kernel.org
+CC: linux-kselftest@vger.kernel.org
+
+v2:
+ - remove duplicated log_test_xfail
+v1: https://lore.kernel.org/all/20240509235553.5740-1-kuba@kernel.org/
+---
+ .../net/forwarding/local_termination.sh       | 21 ++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/tools/testing/selftests/net/forwarding/local_termination.sh b/tools/testing/selftests/net/forwarding/local_termination.sh
+index c5b0cbc85b3e..4bba9c78db3e 100755
+--- a/tools/testing/selftests/net/forwarding/local_termination.sh
++++ b/tools/testing/selftests/net/forwarding/local_termination.sh
+@@ -73,6 +73,10 @@ check_rcv()
+ 	local pattern=$3
+ 	local should_receive=$4
+ 	local should_fail=
++	local xfail_sw=$5
++
++	local kind=$(ip -j -d link show dev $if_name |
++			 jq -r '.[].linkinfo.info_kind')
+ 
+ 	[ $should_receive = true ] && should_fail=0 || should_fail=1
+ 	RET=0
+@@ -81,7 +85,14 @@ check_rcv()
+ 
+ 	check_err_fail "$should_fail" "$?" "reception"
+ 
+-	log_test "$if_name: $type"
++	# If not a SW interface, ignore the XFAIL allowance
++	[ "$kind" != veth ] && [ "$kind" != bridge ] && xfail_sw=
++
++	if [ $RET -ne 0 ] && [ "$xfail_sw" == true ]; then
++	    log_test_xfail "$if_name: $type"
++	else
++	    log_test "$if_name: $type"
++	fi
+ }
+ 
+ mc_route_prepare()
+@@ -157,7 +168,7 @@ run_test()
+ 
+ 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address" \
+ 		"$smac > $UNKNOWN_UC_ADDR1, ethertype IPv4 (0x0800)" \
+-		false
++		false true
+ 
+ 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address, promisc" \
+ 		"$smac > $UNKNOWN_UC_ADDR2, ethertype IPv4 (0x0800)" \
+@@ -165,7 +176,7 @@ run_test()
+ 
+ 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address, allmulti" \
+ 		"$smac > $UNKNOWN_UC_ADDR3, ethertype IPv4 (0x0800)" \
+-		false
++		false true
+ 
+ 	check_rcv $rcv_if_name "Multicast IPv4 to joined group" \
+ 		"$smac > $JOINED_MACV4_MC_ADDR, ethertype IPv4 (0x0800)" \
+@@ -173,7 +184,7 @@ run_test()
+ 
+ 	check_rcv $rcv_if_name "Multicast IPv4 to unknown group" \
+ 		"$smac > $UNKNOWN_MACV4_MC_ADDR1, ethertype IPv4 (0x0800)" \
+-		false
++		false true
+ 
+ 	check_rcv $rcv_if_name "Multicast IPv4 to unknown group, promisc" \
+ 		"$smac > $UNKNOWN_MACV4_MC_ADDR2, ethertype IPv4 (0x0800)" \
+@@ -189,7 +200,7 @@ run_test()
+ 
+ 	check_rcv $rcv_if_name "Multicast IPv6 to unknown group" \
+ 		"$smac > $UNKNOWN_MACV6_MC_ADDR1, ethertype IPv6 (0x86dd)" \
+-		false
++		false true
+ 
+ 	check_rcv $rcv_if_name "Multicast IPv6 to unknown group, promisc" \
+ 		"$smac > $UNKNOWN_MACV6_MC_ADDR2, ethertype IPv6 (0x86dd)" \
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.45.0
 
 
