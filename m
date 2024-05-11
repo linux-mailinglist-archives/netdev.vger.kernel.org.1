@@ -1,380 +1,133 @@
-Return-Path: <netdev+bounces-95665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12EC48C2F2F
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 05:03:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22D298C2F42
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 05:14:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 964CA1F22851
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 03:03:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 381771C211AD
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 03:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58552376A;
-	Sat, 11 May 2024 03:03:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78ABF3F8F7;
+	Sat, 11 May 2024 03:14:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="DCYU+2mi"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ECGNnmI/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21AA322626;
-	Sat, 11 May 2024 03:02:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627153716D
+	for <netdev@vger.kernel.org>; Sat, 11 May 2024 03:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715396580; cv=none; b=VrS5HRblUsZNQ2AxWGMTR66fasUA7kxX9zCzVD/El83YVbo6DUN0DAEJzlJw3ss1BfDgfiwga2IHNASen1bKOR0qMP+HlR1n5X3VeFzdP8+Q5TqhGmOjxsHEz5PXGQKQySTw7Tzm7XBlYEfVHuU7FY6nrnNcR3Y9mldox55tpGs=
+	t=1715397256; cv=none; b=h+gWcq7MR6oWPcAptEAIDK1vzDGVHAfT9BU2TxY89qv4vPilIdL6EFKDG4HFAc+ySuLFjZcfJBvetjCniyFlHh+4LogtnYKFdyx8KoLZDRK3HVYaf2lSzEZt/KZLeUZ+3Zg43nFs8ZcixTH7M9yFT1A9PB4nHZWbObyiPJPfdJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715396580; c=relaxed/simple;
-	bh=gJS2HlW5YzojZ0FIGOOgAL4KaO0D0ViPOrSjFtem4OM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gcMT5wdtZa14ojfnv4dMoIaQ4+aQwGPqwRsGwtOGfHwQDjk5UfMucoGBuKk/0in2qL72ju9UtMY+NeYXX+4vGdHP/2K/XNv7ie/jpy7WADP4ZmU2oeUG43aehOKw9nb3AtmnNEMI5wTNR6aIzZAE3EOyMpwW0h9J5iMyT0yB56k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=DCYU+2mi; arc=none smtp.client-ip=115.124.30.111
+	s=arc-20240116; t=1715397256; c=relaxed/simple;
+	bh=CcDkkWan88A1XCr91ZzWcpyz3A8ByzYbE5eLB9/o77M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JQrKshPQkG2R443pmCLrahtOLDTsHK12wN7M0L6itmKRrn1p9tw52/Du/u9e5qJYPwXm7PzE2X/MsY1Dkai/qQDl4aVcF5LTEweZBJoTLLrNthV49SaISp9cC1x1IsTH7FUvFHwIeH4/hG72JuhXNL1X+ieZ6/7uaBH2cOya7IQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ECGNnmI/; arc=none smtp.client-ip=115.124.30.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1715396574; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=Ji0a4wW0eSeApwhuPu/5Qg8BzR4svJ8N2SRRk3a1d98=;
-	b=DCYU+2miHb09IBrMz5uQMTAB0aTsNOV/DDVHmPFMD7abt9SyCPocYG3x+FajC2dBCKAkXOXws1gdXz6cE3gCPB46T/LG4QVh0odxrY2fNxk8BsuWhZEkM8bJ6ki5j9Dptj2zrI35V0lpWX2qREvNXA10bxtEj+tsaQfGhrUAdD4=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045046011;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W6Bmov9_1715396570;
-Received: from 30.221.147.218(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W6Bmov9_1715396570)
+	t=1715397246; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=htoVDchsx8815IcYZrFv1YVXLA73nTjibEg1V5cgDGs=;
+	b=ECGNnmI/6qYflpc9pkTPud0AU8STwEIAzCYiBjhT/xzyv9X/QsgEEQx2DrKi0cywY/QU1cyX3u/+IN2/G8PvRSgNaPZKhYUvS6STtorkwInc+8zfhwNLN2XWyCuKGeYXr6amSh29RQd5obfLvaDRoTP4wOnsL0YgB+8CWSwc7/Q=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033022160150;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W6BzGt5_1715397244;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W6BzGt5_1715397244)
           by smtp.aliyun-inc.com;
-          Sat, 11 May 2024 11:02:52 +0800
-Message-ID: <8b32ceed-3f04-4f86-bcaa-dbc64379bef4@linux.alibaba.com>
-Date: Sat, 11 May 2024 11:02:50 +0800
+          Sat, 11 May 2024 11:14:05 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev
+Subject: [PATCH net-next v5 0/4] virtio_net: rx enable premapped mode by default
+Date: Sat, 11 May 2024 11:14:00 +0800
+Message-Id: <20240511031404.30903-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net/smc: Introduce IPPROTO_SMC
-To: dust.li@linux.alibaba.com, kgraul@linux.ibm.com, wenjia@linux.ibm.com,
- jaka@linux.ibm.com, wintera@linux.ibm.com, guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
- tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-References: <1715314333-107290-1-git-send-email-alibuda@linux.alibaba.com>
- <1715314333-107290-3-git-send-email-alibuda@linux.alibaba.com>
- <20240510095711.GB78725@linux.alibaba.com>
- <76710317-8e9d-4efa-b3e9-1e361ee30135@linux.alibaba.com>
- <20240511024613.GC78725@linux.alibaba.com>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <20240511024613.GC78725@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-Git-Hash: e1ef52e80115
 Content-Transfer-Encoding: 8bit
 
+Actually, for the virtio drivers, we can enable premapped mode whatever
+the value of use_dma_api. Because we provide the virtio dma apis.
+So the driver can enable premapped mode unconditionally.
+
+This patch set makes the big mode of virtio-net to support premapped mode.
+And enable premapped mode for rx by default.
+
+Based on the following points, we do not use page pool to manage these
+    pages:
+
+    1. virtio-net uses the DMA APIs wrapped by virtio core. Therefore,
+       we can only prevent the page pool from performing DMA operations, and
+       let the driver perform DMA operations on the allocated pages.
+    2. But when the page pool releases the page, we have no chance to
+       execute dma unmap.
+    3. A solution to #2 is to execute dma unmap every time before putting
+       the page back to the page pool. (This is actually a waste, we don't
+       execute unmap so frequently.)
+    4. But there is another problem, we still need to use page.dma_addr to
+       save the dma address. Using page.dma_addr while using page pool is
+       unsafe behavior.
+    5. And we need space the chain the pages submitted once to virtio core.
+
+    More:
+        https://lore.kernel.org/all/CACGkMEu=Aok9z2imB_c5qVuujSh=vjj1kx12fy9N7hqyi+M5Ow@mail.gmail.com/
+
+Why we do not use the page space to store the dma?
+    http://lore.kernel.org/all/CACGkMEuyeJ9mMgYnnB42=hw6umNuo=agn7VBqBqYPd7GN=+39Q@mail.gmail.com
+
+Please review.
+
+v5: 1. Fix the comments from @Larysa Zaremba
+        http://lore.kernel.org/all/20240508063718.69806-1-xuanzhuo@linux.alibaba.com
+
+v4:
+    1. For the conflict, switch to the net-next branch
+
+v3:
+    1. big mode still use the mode that virtio core does the dma map/unmap
+
+v2:
+    1. make gcc happy in page_chain_get_dma()
+        http://lore.kernel.org/all/202404221325.SX5ChRGP-lkp@intel.com
+
+v1:
+    1. discussed for using page pool
+    2. use dma sync to replace the unmap for the first page
+
+Thanks.
 
 
-On 5/11/24 10:46 AM, Dust Li wrote:
-> On 2024-05-11 10:23:31, D. Wythe wrote:
->>
->> On 5/10/24 5:57 PM, Dust Li wrote:
->>> On 2024-05-10 12:12:13, D. Wythe wrote:
->>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>>>
->>>> This patch allows to create smc socket via AF_INET,
->>>> similar to the following code,
->>>>
->>>> /* create v4 smc sock */
->>>> v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
->>>>
->>>> /* create v6 smc sock */
->>>> v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
->>>>
->>>> There are several reasons why we believe it is appropriate here:
->>>>
->>>> 1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
->>>> address. There is no AF_SMC address at all.
->>>>
->>>> 2. Create smc socket in the AF_INET(6) path, which allows us to reuse
->>>> the infrastructure of AF_INET(6) path, such as common ebpf hooks.
->>>> Otherwise, smc have to implement it again in AF_SMC path.
->>>>
->>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->>>> ---
->>>> include/uapi/linux/in.h |   2 +
->>>> net/smc/af_smc.c        | 129 +++++++++++++++++++++++++++++++++++++++++++++++-
->>>> net/smc/inet_smc.h      |  32 ++++++++++++
->>>> 3 files changed, 162 insertions(+), 1 deletion(-)
->>>> create mode 100644 net/smc/inet_smc.h
->>>>
->>>> diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
->>>> index e682ab6..74c12e33 100644
->>>> --- a/include/uapi/linux/in.h
->>>> +++ b/include/uapi/linux/in.h
->>>> @@ -83,6 +83,8 @@ enum {
->>>> #define IPPROTO_RAW		IPPROTO_RAW
->>>>     IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
->>>> #define IPPROTO_MPTCP		IPPROTO_MPTCP
->>>> +  IPPROTO_SMC = 263,		/* Shared Memory Communications */
->>>                                                              ^ use tab to align here
->> There is a problem here, all previous definitions were aligned with 2 spaces.
-> I mean the tab in the annotation in the end, not the space at the beginning.
 
-Oh... that's true.  Thanks for that.
 
->>>> +#define IPPROTO_SMC		IPPROTO_SMC
->>>>     IPPROTO_MAX
->>>> };
->>>> #endif
->>>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->>>> index 1f03724..b4557828 100644
->>>> --- a/net/smc/af_smc.c
->>>> +++ b/net/smc/af_smc.c
->>>> @@ -54,6 +54,7 @@
->>>> #include "smc_tracepoint.h"
->>>> #include "smc_sysctl.h"
->>>> #include "smc_loopback.h"
->>>> +#include "inet_smc.h"
->>>>
->>>> static DEFINE_MUTEX(smc_server_lgr_pending);	/* serialize link group
->>>> 						 * creation on server
->>>> @@ -3402,6 +3403,16 @@ static int smc_create(struct net *net, struct socket *sock, int protocol,
->>>> 	.create	= smc_create,
->>>> };
->>>>
->>> Why not put those whole bunch of inet staff into smc_inet.c ?
->>> Looks like your smc_inet.h is meanless without smc_inet.c
->>>
->> This header file was originally reserved for future merging of socks. If
->> nobody likes it, I can move it to the
->> af_smc.c
-> I prefer adding a new smc_inet.c, af_smc.c is already very large.
->
-> Best regards,
-> Dust
 
-Sounds Reasonable. I'll try it in next version.
 
-Thanks,
-D. Wythe
->
->>>> +int smc_inet_init_sock(struct sock *sk)
->>>> +{
->>>> +	struct net *net = sock_net(sk);
->>>> +
->>>> +	/* init common smc sock */
->>>> +	smc_sock_init(net, sk, IPPROTO_SMC);
->>>> +	/* create clcsock */
->>>> +	return __smc_create_clcsk(net, sk, sk->sk_family);
->>>> +}
->>>> +
->>>> static int smc_ulp_init(struct sock *sk)
->>>> {
->>>> 	struct socket *tcp = sk->sk_socket;
->>>> @@ -3460,6 +3471,90 @@ static void smc_ulp_clone(const struct request_sock *req, struct sock *newsk,
->>>> 	.clone		= smc_ulp_clone,
->>>> };
->>>>
->>>> +struct proto smc_inet_prot = {
->>>> +	.name			= "INET_SMC",
->>>> +	.owner			= THIS_MODULE,
->>>> +	.init			= smc_inet_init_sock,
->>>> +	.hash			= smc_hash_sk,
->>>> +	.unhash			= smc_unhash_sk,
->>>> +	.release_cb		= smc_release_cb,
->>>> +	.obj_size		= sizeof(struct smc_sock),
->>>> +	.h.smc_hash	= &smc_v4_hashinfo,
->>>> +	.slab_flags	= SLAB_TYPESAFE_BY_RCU,
->>>                   ^
->>> Align please.
->>>
->> Got it.
->>>> +};
->>>> +
->>>> +const struct proto_ops smc_inet_stream_ops = {
->>>> +	.family		= PF_INET,
->>>> +	.owner		= THIS_MODULE,
->>>> +	.release	= smc_release,
->>>> +	.bind		= smc_bind,
->>>> +	.connect	= smc_connect,
->>>> +	.socketpair	= sock_no_socketpair,
->>>> +	.accept		= smc_accept,
->>>> +	.getname	= smc_getname,
->>>> +	.poll		= smc_poll,
->>>> +	.ioctl		= smc_ioctl,
->>>> +	.listen		= smc_listen,
->>>> +	.shutdown	= smc_shutdown,
->>>> +	.setsockopt	= smc_setsockopt,
->>>> +	.getsockopt	= smc_getsockopt,
->>>> +	.sendmsg	= smc_sendmsg,
->>>> +	.recvmsg	= smc_recvmsg,
->>>> +	.mmap		= sock_no_mmap,
->>>> +	.splice_read	= smc_splice_read,
->>> Ditto
->>>
->>>> +};
->>>> +
->>>> +struct inet_protosw smc_inet_protosw = {
->>>> +	.type       = SOCK_STREAM,
->>>> +	.protocol   = IPPROTO_SMC,
->>>> +	.prot   = &smc_inet_prot,
->>> Ditto
->>>
->>>> +	.ops    = &smc_inet_stream_ops,
->>>> +	.flags  = INET_PROTOSW_ICSK,
->>>> +};
->>>> +
->>>> +#if IS_ENABLED(CONFIG_IPV6)
->>>> +struct proto smc_inet6_prot = {
->>>> +	.name			= "INET6_SMC",
->>>> +	.owner			= THIS_MODULE,
->>>> +	.init			= smc_inet_init_sock,
->>>> +	.hash			= smc_hash_sk,
->>>> +	.unhash			= smc_unhash_sk,
->>>> +	.release_cb		= smc_release_cb,
->>>> +	.obj_size		= sizeof(struct smc_sock),
->>>> +	.h.smc_hash		= &smc_v6_hashinfo,
->>>> +	.slab_flags		= SLAB_TYPESAFE_BY_RCU,
->>>> +};
->>>> +
->>>> +const struct proto_ops smc_inet6_stream_ops = {
->>>> +	.family		= PF_INET6,
->>>> +	.owner		= THIS_MODULE,
->>>> +	.release	= smc_release,
->>>> +	.bind		= smc_bind,
->>>> +	.connect	= smc_connect,
->>>> +	.socketpair	= sock_no_socketpair,
->>>> +	.accept		= smc_accept,
->>>> +	.getname	= smc_getname,
->>>> +	.poll		= smc_poll,
->>>> +	.ioctl		= smc_ioctl,
->>>> +	.listen		= smc_listen,
->>>> +	.shutdown	= smc_shutdown,
->>>> +	.setsockopt	= smc_setsockopt,
->>>> +	.getsockopt	= smc_getsockopt,
->>>> +	.sendmsg	= smc_sendmsg,
->>>> +	.recvmsg	= smc_recvmsg,
->>>> +	.mmap		= sock_no_mmap,
->>>> +	.splice_read	= smc_splice_read,
->>> Ditto
->>>
->>>> +};
->>>> +
->>>> +struct inet_protosw smc_inet6_protosw = {
->>>> +	.type       = SOCK_STREAM,
->>>> +	.protocol   = IPPROTO_SMC,
->>>> +	.prot   = &smc_inet6_prot,
->>>> +	.ops    = &smc_inet6_stream_ops,
->>>> +	.flags  = INET_PROTOSW_ICSK,
->>> Ditto
->>>
->>>> +};
->>>> +#endif
->>>> +
->>>> unsigned int smc_net_id;
->>>>
->>>> static __net_init int smc_net_init(struct net *net)
->>>> @@ -3595,9 +3690,28 @@ static int __init smc_init(void)
->>>> 		goto out_lo;
->>>> 	}
->>>>
->>>> +	rc = proto_register(&smc_inet_prot, 1);
->>>> +	if (rc) {
->>>> +		pr_err("%s: proto_register smc_inet_prot fails with %d\n", __func__, rc);
->>>> +		goto out_ulp;
->>>> +	}
->>>> +	inet_register_protosw(&smc_inet_protosw);
->>>> +#if IS_ENABLED(CONFIG_IPV6)
->>>> +	rc = proto_register(&smc_inet6_prot, 1);
->>>> +	if (rc) {
->>>> +		pr_err("%s: proto_register smc_inet6_prot fails with %d\n", __func__, rc);
->>>> +		goto out_inet_prot;
->>>> +	}
->>>> +	inet6_register_protosw(&smc_inet6_protosw);
->>>> +#endif
->>>> +
->>>> 	static_branch_enable(&tcp_have_smc);
->>>> 	return 0;
->>>> -
->>>> +out_inet_prot:
->>>> +	inet_unregister_protosw(&smc_inet_protosw);
->>>> +	proto_unregister(&smc_inet_prot);
->>>> +out_ulp:
->>>> +	tcp_unregister_ulp(&smc_ulp_ops);
->>>> out_lo:
->>>> 	smc_loopback_exit();
->>>> out_ib:
->>>> @@ -3634,6 +3748,10 @@ static int __init smc_init(void)
->>>> static void __exit smc_exit(void)
->>>> {
->>>> 	static_branch_disable(&tcp_have_smc);
->>>> +	inet_unregister_protosw(&smc_inet_protosw);
->>>> +#if IS_ENABLED(CONFIG_IPV6)
->>>> +	inet6_unregister_protosw(&smc_inet6_protosw);
->>>> +#endif
->>>> 	tcp_unregister_ulp(&smc_ulp_ops);
->>>> 	sock_unregister(PF_SMC);
->>>> 	smc_core_exit();
->>>> @@ -3645,6 +3763,10 @@ static void __exit smc_exit(void)
->>>> 	destroy_workqueue(smc_hs_wq);
->>>> 	proto_unregister(&smc_proto6);
->>>> 	proto_unregister(&smc_proto);
->>>> +	proto_unregister(&smc_inet_prot);
->>>> +#if IS_ENABLED(CONFIG_IPV6)
->>>> +	proto_unregister(&smc_inet6_prot);
->>>> +#endif
->>>> 	smc_pnet_exit();
->>>> 	smc_nl_exit();
->>>> 	smc_clc_exit();
->>>> @@ -3661,4 +3783,9 @@ static void __exit smc_exit(void)
->>>> MODULE_LICENSE("GPL");
->>>> MODULE_ALIAS_NETPROTO(PF_SMC);
->>>> MODULE_ALIAS_TCP_ULP("smc");
->>>> +/* 263 for IPPROTO_SMC and 1 for SOCK_STREAM */
->>>> +MODULE_ALIAS_NET_PF_PROTO_TYPE(PF_INET, 263, 1);
->>>> +#if IS_ENABLED(CONFIG_IPV6)
->>>> +MODULE_ALIAS_NET_PF_PROTO_TYPE(PF_INET6, 263, 1);
->>>> +#endif
->>>> MODULE_ALIAS_GENL_FAMILY(SMC_GENL_FAMILY_NAME);
->>>> diff --git a/net/smc/inet_smc.h b/net/smc/inet_smc.h
->>>> new file mode 100644
->>>> index 00000000..fcdcb61
->>>> --- /dev/null
->>>> +++ b/net/smc/inet_smc.h
->>>> @@ -0,0 +1,32 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0 */
->>>> +/*
->>>> + *  Shared Memory Communications over RDMA (SMC-R) and RoCE
->>>> + *
->>>> + *  Definitions for the SMC module (socket related)
->>>> +
->>>> + *  Copyright IBM Corp. 2016
->>> You should update this.
->> Got it.
->>>> + *
->>>> + */
->>>> +#ifndef __INET_SMC
->>>> +#define __INET_SMC
->>>> +
->>>> +#include <net/protocol.h>
->>>> +#include <net/sock.h>
->>>> +#include <net/tcp.h>
->>>> +
->>>> +extern struct proto smc_inet_prot;
->>>> +extern const struct proto_ops smc_inet_stream_ops;
->>>> +extern struct inet_protosw smc_inet_protosw;
->>>> +
->>>> +#if IS_ENABLED(CONFIG_IPV6)
->>>> +#include <net/ipv6.h>
->>>> +/* MUST after net/tcp.h or warning */
->>>> +#include <net/transp_v6.h>
->>>> +extern struct proto smc_inet6_prot;
->>>> +extern const struct proto_ops smc_inet6_stream_ops;
->>>> +extern struct inet_protosw smc_inet6_protosw;
->>>> +#endif
->>>> +
->>>> +int smc_inet_init_sock(struct sock *sk);
->>>> +
->>>> +#endif // __INET_SMC
->>>            ^
->>>            use /* __INET_SMC */ instead
->>>
->>>> -- 
->>>> 1.8.3.1
->>>>
+Xuan Zhuo (4):
+  virtio_ring: enable premapped mode whatever use_dma_api
+  virtio_net: big mode skip the unmap check
+  virtio_net: rx remove premapped failover code
+  virtio_net: remove the misleading comment
+
+ drivers/net/virtio_net.c     | 90 +++++++++++++++---------------------
+ drivers/virtio/virtio_ring.c |  7 +--
+ 2 files changed, 38 insertions(+), 59 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
 
 
