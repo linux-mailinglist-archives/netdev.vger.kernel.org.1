@@ -1,246 +1,93 @@
-Return-Path: <netdev+bounces-95654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BD7B8C2F01
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 04:26:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D44E18C2F08
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 04:30:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 497651C2127E
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 02:26:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 550DFB216FC
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 02:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D1718049;
-	Sat, 11 May 2024 02:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9A022EE4;
+	Sat, 11 May 2024 02:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ZLWaqRDv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OAGfFBH0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4192F17571;
-	Sat, 11 May 2024 02:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651462209F
+	for <netdev@vger.kernel.org>; Sat, 11 May 2024 02:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715394394; cv=none; b=Sh+GW2BuDvEnz1vzpriqDiH+7vKxhMrHSa71WS5iQ/kcJnJzy4gtockK3KkSv9wdkVn7QHCv1GpxGqe3XhQ319SHya2UiYR/5IeMZHkSTmfhHxm5ZtODVb1e+Q+bBT0DKrLLIt8pT6Xm13HbdOtl3HH3DQ1vt5vL8oDpn1AYa7k=
+	t=1715394634; cv=none; b=IJp1vJsqrRK330uBj7f84YInSYBWW6P1YpWrgDHz1w09eYlXXDC08bx1TTeVl4ohbsb3vEspEOGqdtWmzDylaKyxNTz1/tHSFU1AVjR3XTqBqNeUcv0WAB6YW2KgraqKXW6B0YhkOS3glalj5Z0FxKKvCmciUeY6dO3Vu5KYSTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715394394; c=relaxed/simple;
-	bh=ggxlDlG1YI922LNdSkTT04eRxxTmskXyhjlv/HpRgns=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eRiHVrsAWVvjUBbfCHT+uU7b/OmjUTxPi1QzHQg7qgq9uLIWYiJ/KxVwHS+Xles1nosIX3blvLTIfm+oyv70YEnX3L3rB5C7KgczV4bS3o2m1fRKoY6ajVGRfHjAZxYIya2iLtOINkNrCAjyWLZC2bcExMrxIWVdF/K7byZ6HPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ZLWaqRDv; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1715394388; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=45JX5gKumjUQPmfnJ1Yt8cEHN4bW1vuhVImqRYRShoI=;
-	b=ZLWaqRDvje8P9PsZYX4NH7863DCX513vQyrGSy6rtq5C+Ku3BDT6qCQscHzcARqfvQxk6DVgVFjqKwcWOcqAI5COkgC/nr3skqCunkg/+3eKg9tlDUXrtZ74nz+Pv3hQP17MN6wBRCHHkjq+or8wHk04ezqh5dbmlufjXSNQz9c=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033068173054;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W6BhZQd_1715394384;
-Received: from 30.221.147.218(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W6BhZQd_1715394384)
-          by smtp.aliyun-inc.com;
-          Sat, 11 May 2024 10:26:27 +0800
-Message-ID: <c9b24dc5-11da-43e1-9049-c04e6d000371@linux.alibaba.com>
-Date: Sat, 11 May 2024 10:26:23 +0800
+	s=arc-20240116; t=1715394634; c=relaxed/simple;
+	bh=8VkVPsg0MazL+9Dctt2LZU3E8YHe2Z5sxG/eUizypIM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=roznL0OOHDCfQQheEBZ2j5ZHlcDtYT00IUHRDblQxCuLwz5P2qteof55FNsOVljlCsf/1+fHeIXKJFXKFUspR49hIL48Hrievcoq75thB516meCoCGynyuHlcn+aoY++XWDqjY6wE0ZrINMpWfHdHlxY0YDzpCaRGyFUaXzwk4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OAGfFBH0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 01D20C32781;
+	Sat, 11 May 2024 02:30:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715394634;
+	bh=8VkVPsg0MazL+9Dctt2LZU3E8YHe2Z5sxG/eUizypIM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OAGfFBH0Z+VFm12wpNj4MUiql9KVtJNqhu3X2v43/EkI6yJhCOxubo66aN9foQ9cX
+	 zJ4NVp3jj52Tac44bYSg2WqrbGsiVSzlBGMJmOBdm5mAWGwQnwh0Axr8j9P81kHjHU
+	 WEO3xE/ehPVbVCIN08nZCWi39jR4WQjFCBxvxASK6JniwFjICekQtknRV7VRW/JOk6
+	 yBWHHeRJpMjDmeSmuxJAo3+qk3k8RuJBE7bdnIXWlZqpw6JMQYrE/cuoXPZpuZsmvj
+	 /fPOQSaw/Hri3RuSEu0fN6z/nD1XqpMfAt3JWr8krC9tc8diwHz43BvLM8Te0A9tQ/
+	 +E4dHqn+cUJ+g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E1447C32759;
+	Sat, 11 May 2024 02:30:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net/smc: refatoring initialization of smc
- sock
-To: dust.li@linux.alibaba.com, kgraul@linux.ibm.com, wenjia@linux.ibm.com,
- jaka@linux.ibm.com, wintera@linux.ibm.com, guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
- tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-References: <1715314333-107290-1-git-send-email-alibuda@linux.alibaba.com>
- <1715314333-107290-2-git-send-email-alibuda@linux.alibaba.com>
- <20240510095027.GA78725@linux.alibaba.com>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <20240510095027.GA78725@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: ethernet: cortina: Locking fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171539463391.29955.2891193541370648978.git-patchwork-notify@kernel.org>
+Date: Sat, 11 May 2024 02:30:33 +0000
+References: <20240509-gemini-ethernet-locking-v1-1-afd00a528b95@linaro.org>
+In-Reply-To: <20240509-gemini-ethernet-locking-v1-1-afd00a528b95@linaro.org>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: ulli.kroll@googlemail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, mirq-linux@rere.qmqm.pl,
+ netdev@vger.kernel.org
 
+Hello:
 
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On 5/10/24 5:50 PM, Dust Li wrote:
-> On 2024-05-10 12:12:12, D. Wythe wrote:
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>
->> This patch aims to isolate the shared components of SMC socket
->> allocation by introducing smc_sock_init() for sock initialization
->> and __smc_create_clcsk() for the initialization of clcsock.
->>
->> This is in preparation for the subsequent implementation of the
->> AF_INET version of SMC.
->>
->> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->> ---
->> net/smc/af_smc.c | 93 +++++++++++++++++++++++++++++++-------------------------
->> 1 file changed, 52 insertions(+), 41 deletions(-)
->>
->> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->> index 9389f0c..1f03724 100644
->> --- a/net/smc/af_smc.c
->> +++ b/net/smc/af_smc.c
->> @@ -361,34 +361,43 @@ static void smc_destruct(struct sock *sk)
->> 		return;
->> }
->>
->> -static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
->> -				   int protocol)
->> +static void smc_sock_init(struct net *net, struct sock *sk, int protocol)
->> {
->> -	struct smc_sock *smc;
->> -	struct proto *prot;
->> -	struct sock *sk;
->> -
->> -	prot = (protocol == SMCPROTO_SMC6) ? &smc_proto6 : &smc_proto;
->> -	sk = sk_alloc(net, PF_SMC, GFP_KERNEL, prot, 0);
->> -	if (!sk)
->> -		return NULL;
->> +	struct smc_sock *smc = smc_sk(sk);
->>
->> -	sock_init_data(sock, sk); /* sets sk_refcnt to 1 */
->> 	sk->sk_state = SMC_INIT;
->> -	sk->sk_destruct = smc_destruct;
->> 	sk->sk_protocol = protocol;
->> +	mutex_init(&smc->clcsock_release_lock);
->> 	WRITE_ONCE(sk->sk_sndbuf, 2 * READ_ONCE(net->smc.sysctl_wmem));
->> 	WRITE_ONCE(sk->sk_rcvbuf, 2 * READ_ONCE(net->smc.sysctl_rmem));
->> -	smc = smc_sk(sk);
->> 	INIT_WORK(&smc->tcp_listen_work, smc_tcp_listen_work);
->> 	INIT_WORK(&smc->connect_work, smc_connect_work);
->> 	INIT_DELAYED_WORK(&smc->conn.tx_work, smc_tx_work);
->> 	INIT_LIST_HEAD(&smc->accept_q);
->> 	spin_lock_init(&smc->accept_q_lock);
->> 	spin_lock_init(&smc->conn.send_lock);
->> -	sk->sk_prot->hash(sk);
->> -	mutex_init(&smc->clcsock_release_lock);
->> 	smc_init_saved_callbacks(smc);
->> +	smc->limit_smc_hs = net->smc.limit_smc_hs;
->> +	smc->use_fallback = false; /* assume rdma capability first */
->> +	smc->fallback_rsn = 0;
->> +
->> +	sk->sk_destruct = smc_destruct;
->> +	sk->sk_prot->hash(sk);
-> Why change the order here ? e.g.
->
-> Before:
->      sk->sk_destruct = smc_destruct;
->      mutex_init(&smc->clcsock_release_lock);
-> After
->      mutex_init(&smc->clcsock_release_lock);
->      sk->sk_destruct = smc_destruct;
->
-> Same for sk->sk_prot->hash(sk)
+On Thu, 09 May 2024 09:44:54 +0200 you wrote:
+> This fixes a probably long standing problem in the Cortina
+> Gemini ethernet driver: there are some paths in the code
+> where the IRQ registers are written without taking the proper
+> locks.
+> 
+> Fixes: 4d5ae32f5e1e ("net: ethernet: Add a driver for Gemini gigabit ethernet")
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> 
+> [...]
 
-Yes, you are right, I will fix it in the next version.
->
->
->> +}
->> +
->> +static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
->> +				   int protocol)
->> +{
->> +	struct proto *prot;
->> +	struct sock *sk;
->> +
->> +	prot = (protocol == SMCPROTO_SMC6) ? &smc_proto6 : &smc_proto;
->> +	sk = sk_alloc(net, PF_SMC, GFP_KERNEL, prot, 0);
->> +	if (!sk)
->> +		return NULL;
->> +
->> +	sock_init_data(sock, sk); /* sets sk_refcnt to 1 */
->> +	smc_sock_init(net, sk, protocol);
->>
->> 	return sk;
->> }
->> @@ -3321,6 +3330,31 @@ static ssize_t smc_splice_read(struct socket *sock, loff_t *ppos,
->> 	.splice_read	= smc_splice_read,
->> };
->>
->> +static int __smc_create_clcsk(struct net *net, struct sock *sk, int family)
-> Why add '__' prefix here ?
+Here is the summary with links:
+  - [net] net: ethernet: cortina: Locking fixes
+    https://git.kernel.org/netdev/net/c/812552808f7f
 
-Good question, I also realize that this is not suitable, I will delete 
-it in the next version.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thanks.
-
->
->> +{
->> +	struct smc_sock *smc = smc_sk(sk);
->> +	int rc;
->> +
->> +	rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
->> +			      &smc->clcsock);
->> +	if (rc) {
->> +		sk_common_release(sk);
->> +		return rc;
->> +	}
->> +
->> +	/* smc_clcsock_release() does not wait smc->clcsock->sk's
->> +	 * destruction;  its sk_state might not be TCP_CLOSE after
->> +	 * smc->sk is close()d, and TCP timers can be fired later,
->> +	 * which need net ref.
->> +	 */
->> +	sk = smc->clcsock->sk;
->> +	__netns_tracker_free(net, &sk->ns_tracker, false);
->> +	sk->sk_net_refcnt = 1;
->> +	get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
->> +	sock_inuse_add(net, 1);
->> +	return 0;
->> +}
->> +
->> static int __smc_create(struct net *net, struct socket *sock, int protocol,
->> 			int kern, struct socket *clcsock)
->> {
->> @@ -3346,35 +3380,12 @@ static int __smc_create(struct net *net, struct socket *sock, int protocol,
->>
->> 	/* create internal TCP socket for CLC handshake and fallback */
->> 	smc = smc_sk(sk);
->> -	smc->use_fallback = false; /* assume rdma capability first */
->> -	smc->fallback_rsn = 0;
->> -
->> -	/* default behavior from limit_smc_hs in every net namespace */
->> -	smc->limit_smc_hs = net->smc.limit_smc_hs;
->>
->> 	rc = 0;
->> -	if (!clcsock) {
->> -		rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
->> -				      &smc->clcsock);
->> -		if (rc) {
->> -			sk_common_release(sk);
->> -			goto out;
->> -		}
->> -
->> -		/* smc_clcsock_release() does not wait smc->clcsock->sk's
->> -		 * destruction;  its sk_state might not be TCP_CLOSE after
->> -		 * smc->sk is close()d, and TCP timers can be fired later,
->> -		 * which need net ref.
->> -		 */
->> -		sk = smc->clcsock->sk;
->> -		__netns_tracker_free(net, &sk->ns_tracker, false);
->> -		sk->sk_net_refcnt = 1;
->> -		get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
->> -		sock_inuse_add(net, 1);
->> -	} else {
->> +	if (!clcsock)
->> +		rc = __smc_create_clcsk(net, sk, family);
->> +	else
->> 		smc->clcsock = clcsock;
->> -	}
->> -
->> out:
->> 	return rc;
->> }
->> -- 
->> 1.8.3.1
->>
 
 
