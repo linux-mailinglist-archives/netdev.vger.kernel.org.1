@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-95672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F3FB8C2F5E
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 05:32:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C25D8C2F65
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 05:39:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6248C1C20A6B
-	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 03:32:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 062D81C2130F
+	for <lists+netdev@lfdr.de>; Sat, 11 May 2024 03:39:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96E536AFE;
-	Sat, 11 May 2024 03:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03FF636122;
+	Sat, 11 May 2024 03:38:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cc4EKJ4o"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AUQ9pTE8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B431843
-	for <netdev@vger.kernel.org>; Sat, 11 May 2024 03:31:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E31B21A04
+	for <netdev@vger.kernel.org>; Sat, 11 May 2024 03:38:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715398320; cv=none; b=EJxTMH0/3o7U4GJ4TIv3RVupU7vpwDO4gBKTcNTNZRn+wExljSIkaxQiQ/+5WdGA4xSFPOOm0nTI4UEwwtyPRwF2HlTqLegUxZhYifWZuIL5GKnj11RAOBwd2Z4E4OLkk8XnQsBUIjJH4lv4Cnkn+qQo8aeqyY2pVdcyXKSAXKU=
+	t=1715398738; cv=none; b=d5adS8NQHWEsf3fRJfLANUHnagQZ3QDvBYKvqcKMoG2bNXqd9IVhcfl+GOy1fiV3/KgRKFxsRUjGz7rh3yMzgz7p1Yxybt0zhkh7fbM0NL+8r2MXW7tmJSpYdqmeBzNBQGc63r6EP+RGCHpALfbm8cBAnXDbOhG/tY3pgTvnP64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715398320; c=relaxed/simple;
-	bh=k74GQ5uTlanNKEBqFG+YfCXARAad6aZ8GQrXlAA/Gis=;
+	s=arc-20240116; t=1715398738; c=relaxed/simple;
+	bh=rYUj3aHDAjTWCO3zmRdQgFYArGOHZewr+0dPdqdJQMg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SmaoCnnpfNnur7dR8IPWKPkHHodh67TnIeV/1po632UxMDHwX3M/M3gvv8lb33bl5IBF3GKEP4apqjMAuui0rXRnlYlXABRlJYhr0413myFr23gnfoyMCfODwTiMCgbU7Opng2VZdO9/kT6qNXegr93cZxCoJWhukdlst4UdkNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cc4EKJ4o; arc=none smtp.client-ip=209.85.167.47
+	 To:Cc:Content-Type; b=R/6GoxzzDJ7uLlf28Yq7qzYrNIu7rJAau99bxCuCY75qNZJimH7HCZKBWqb0nSjr+tNC1fT5WfplxYa1EVQkvsWRwY7wcUcz9RnLAQH4oVleRLRRa7o0oia0UGKcESihCRAWSVm9D80ZoJHkBFfD+CK4fYXp6I3ylIPKSQXymAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AUQ9pTE8; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-51f12ccff5eso3635139e87.1
-        for <netdev@vger.kernel.org>; Fri, 10 May 2024 20:31:58 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-522297f91easo931418e87.2
+        for <netdev@vger.kernel.org>; Fri, 10 May 2024 20:38:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715398317; x=1716003117; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1715398735; x=1716003535; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Bet+86JPzdUIr/52bYNt4dp7zDPRay7patpJlaTQxt4=;
-        b=cc4EKJ4odMMNFXN5DkeJEYYxNzFzGbPiS0bzHIJzHV0bSNv1kE8S6+ppPfTbCFasZb
-         tXPmt6ymdwvEj+gY+ETkhcjD4T6Hz8Dk41eR1YNtppLnlGZh4zB2kMZGROmQOpQM6RvN
-         nYTA49+JcaPxMxBgPdvgyZA+5qzgkkBMClO+Es9v2OHP5G9YRZpzN1BQxKdT8q4K0H+d
-         c+odc3h7ktyvq7FQoKS6p2g4/+x+HQYO3VgXVve712rvuhooyo9WkTHzsT13OhPULCos
-         hYDgdEngDSNQf7/xDKTOpRbNjssUTWALUbXfYOPjxtcuT2J4zqjXuygIKyd4Rkttv2Dh
-         YORg==
+        bh=QMwJyrS69aBB/AIHg+ejA8vPPkzSH95eVzoKFAGJIhI=;
+        b=AUQ9pTE8z5QejTPaZ4WnXTXKTd58K97YnNqxXARb/2/8NU5rzfWSZKaUykw6P3t8X4
+         x4TRvbDdgDf6I3IUMDLrDyXOGeIpB5dtnhTsBfOnCLvQaULls86kO/tJnFjYeiURlVAg
+         hw++DyTYkvjTQH5YXk0lNGzqgu9ZCQxbmHatrT4oCL05bVJKUQ07tIl8VsOucUtTA8mi
+         A1tB/YhFiWawSNUz4ivCVj3IMOvIKF7llKHU17aIC3boYyBJ+igaDN/1oucFuhHGeB7Q
+         Y6DQIq9KMZW4vPU0zEtkPSPy/2PWqgjqSvsO5NJ7TQ4ugcrwAy453RvqiG1Zi9UGLPih
+         TYBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715398317; x=1716003117;
+        d=1e100.net; s=20230601; t=1715398735; x=1716003535;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Bet+86JPzdUIr/52bYNt4dp7zDPRay7patpJlaTQxt4=;
-        b=VSuenpcOy+yXL/unXmTxntW1fjTLcFjYc2Y0N56c6ErU/Cq39moQfAzYOX+K6BHvfO
-         I6tzUG1cAl41/R3DOUiDVmObIYnuRbcCC4kaO2gaUG+WdkF0kd6Z75qZ2CgRzjBdZqil
-         dwQJBCkoRIBBGmIed2gHBgqtxpWbLL63gfciQjFRBZPmR78ovLOgL+mcsRDi1civ7iDk
-         KIz8QxteLpFkPFX+qilsXSDAVcGMY2XNirsHnWJ5/nrXu1O4NaK35bXYpqBwcIvYJPTF
-         3BkxYcEB2y5hlnd4weA0UCMiPqpIz9WASUVkNL7aMfl6W9S/F/X60RZ6igv2+tmO9YX+
-         P13w==
-X-Gm-Message-State: AOJu0YwC7f+AdUfb4JI/Av+Q8PnxxDqV+khwitGkufGLpzXn9rhtsoU0
-	NStVxTHQk2Chrlc3ovOE8o+olpxWgjiRZ/wHPAjfVZPNpoX+v1O4W4v4IASMlyAweOOWzKdJMYL
-	y2uwHhj+fL8ImSuKCuGFwrUsf10c=
-X-Google-Smtp-Source: AGHT+IHhRTHg5msUv+nda60P8Qu5F8FmHirX2Tw1rE8ahnYhJjqHin8GASHCvEByhmUgihzyEXlNvQ4q+Lkvlkj8nK8=
-X-Received: by 2002:a05:6512:230a:b0:51c:c2c1:6f58 with SMTP id
- 2adb3069b0e04-522105792e0mr3025298e87.55.1715398316715; Fri, 10 May 2024
- 20:31:56 -0700 (PDT)
+        bh=QMwJyrS69aBB/AIHg+ejA8vPPkzSH95eVzoKFAGJIhI=;
+        b=j14Ln98RUlZfeLBa08/IG/B2xk6+1MV1GvVXXxq1K7x4XeKvaKtQVDWahxw9rE4AnG
+         Fm33FupfcwXtTzAJkDiuTKTt0FWVbXsSbyJfAMmPcdOA30xBb1KcMZTByTsNzGPp2cOE
+         NrPaN4v4k/OPcEMg1rJFo0Z/3OQ9dwM6aVGXUk1fNYfAXnWsc/q+OOJ/+HAD/mfFtTF7
+         A1DbPMlRq9UEsm4Ojnsu2Vny8ClVO80AJ0OyEbMcdTPsHmpaPvS+FMAYwajra8LApJCi
+         dD8dMGEwhmU54lRisXHnwie6AjP6vlJab+b6H9/8E8X9Xz3lb1+0x0n/g+3OFwVsaPdR
+         mwyA==
+X-Gm-Message-State: AOJu0YxvVvPyhd9at1W7KtXmiZmgYZxU+JshI+ZvTZAK3As4Lk+9kdgI
+	x9eqd6Vn86JisbRTs6hdjYr1jqOaEg48C9gYTE/M+fBJfPjYstcHvhWHJT6oc39cf5P2a4P+MGN
+	XK2FhwOb/hGE8oVNfXRPHfvfozr8DIJl3dCs=
+X-Google-Smtp-Source: AGHT+IHp03TXfkKPY1+1X+ydJPdmjx3TQTPhvudtPm3tFZLbWL/wLGGLmceTQC3YSFR/Tlea6G2zvZ2FfIAIx7xnuCc=
+X-Received: by 2002:a05:6512:4025:b0:521:9315:670 with SMTP id
+ 2adb3069b0e04-5220fb774eamr3499607e87.9.1715398734995; Fri, 10 May 2024
+ 20:38:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240510201927.1821109-1-danielj@nvidia.com> <20240510201927.1821109-2-danielj@nvidia.com>
-In-Reply-To: <20240510201927.1821109-2-danielj@nvidia.com>
+References: <20240510201927.1821109-1-danielj@nvidia.com> <20240510201927.1821109-3-danielj@nvidia.com>
+In-Reply-To: <20240510201927.1821109-3-danielj@nvidia.com>
 From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 11 May 2024 11:31:19 +0800
-Message-ID: <CAL+tcoB0TmcNoLdFMcfOCKGbkqAttV7UpCZf8D3TTjKwvgw7Yw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/2] netdev: Add queue stats for TX stop and wake
+Date: Sat, 11 May 2024 11:38:18 +0800
+Message-ID: <CAL+tcoBRqEyr+4NPDiORJgM4nUzYjeHNZJLDo2K=dAJhKWvz_g@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/2] virtio_net: Add TX stopped and wake counters
 To: Daniel Jurgens <danielj@nvidia.com>
 Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com, 
 	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev, 
@@ -87,113 +87,130 @@ Content-Transfer-Encoding: quoted-printable
 On Sat, May 11, 2024 at 4:20=E2=80=AFAM Daniel Jurgens <danielj@nvidia.com>=
  wrote:
 >
-> TX queue stop and wake are counted by some drivers.
-> Support reporting these via netdev-genl queue stats.
+> Add a tx queue stop and wake counters, they are useful for debugging.
+>
+> $ ./tools/net/ynl/cli.py --spec netlink/specs/netdev.yaml \
+> --dump qstats-get --json '{"scope": "queue"}'
+> ...
+>  {'ifindex': 13,
+>   'queue-id': 0,
+>   'queue-type': 'tx',
+>   'tx-bytes': 14756682850,
+>   'tx-packets': 226465,
+>   'tx-stop': 113208,
+>   'tx-wake': 113208},
+>  {'ifindex': 13,
+>   'queue-id': 1,
+>   'queue-type': 'tx',
+>   'tx-bytes': 18167675008,
+>   'tx-packets': 278660,
+>   'tx-stop': 8632,
+>   'tx-wake': 8632}]
 >
 > Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
 > Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
-Good to see this finally :)
-
 Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
+Thanks!
+
 > ---
->  Documentation/netlink/specs/netdev.yaml | 14 ++++++++++++++
->  include/net/netdev_queues.h             |  3 +++
->  include/uapi/linux/netdev.h             |  2 ++
->  net/core/netdev-genl.c                  |  4 +++-
->  tools/include/uapi/linux/netdev.h       |  2 ++
->  5 files changed, 24 insertions(+), 1 deletion(-)
+>  drivers/net/virtio_net.c | 28 ++++++++++++++++++++++++++--
+>  1 file changed, 26 insertions(+), 2 deletions(-)
 >
-> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netl=
-ink/specs/netdev.yaml
-> index 2be4b3714d17..11a32373365a 100644
-> --- a/Documentation/netlink/specs/netdev.yaml
-> +++ b/Documentation/netlink/specs/netdev.yaml
-> @@ -439,6 +439,20 @@ attribute-sets:
->            Number of the packets dropped by the device due to the transmi=
-t
->            packets bitrate exceeding the device rate limit.
->          type: uint
-> +      -
-> +        name: tx-stop
-> +        doc: |
-> +          Number of times driver paused accepting new tx packets
-> +          from the stack to this queue, because the queue was full.
-> +          Note that if BQL is supported and enabled on the device
-> +          the networking stack will avoid queuing a lot of data at once.
-> +        type: uint
-> +      -
-> +        name: tx-wake
-> +        doc: |
-> +          Number of times driver re-started accepting send
-> +          requests to this queue from the stack.
-> +        type: uint
->
->  operations:
->    list:
-> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-> index e7b84f018cee..a8a7e48dfa6c 100644
-> --- a/include/net/netdev_queues.h
-> +++ b/include/net/netdev_queues.h
-> @@ -41,6 +41,9 @@ struct netdev_queue_stats_tx {
->         u64 hw_gso_wire_bytes;
->
->         u64 hw_drop_ratelimits;
-> +
-> +       u64 stop;
-> +       u64 wake;
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 218a446c4c27..df6121c38a1b 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -95,6 +95,8 @@ struct virtnet_sq_stats {
+>         u64_stats_t xdp_tx_drops;
+>         u64_stats_t kicks;
+>         u64_stats_t tx_timeouts;
+> +       u64_stats_t stop;
+> +       u64_stats_t wake;
 >  };
 >
->  /**
-> diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-> index cf24f1d9adf8..a8188202413e 100644
-> --- a/include/uapi/linux/netdev.h
-> +++ b/include/uapi/linux/netdev.h
-> @@ -165,6 +165,8 @@ enum {
->         NETDEV_A_QSTATS_TX_HW_GSO_WIRE_PACKETS,
->         NETDEV_A_QSTATS_TX_HW_GSO_WIRE_BYTES,
->         NETDEV_A_QSTATS_TX_HW_DROP_RATELIMITS,
-> +       NETDEV_A_QSTATS_TX_STOP,
-> +       NETDEV_A_QSTATS_TX_WAKE,
+>  struct virtnet_rq_stats {
+> @@ -145,6 +147,8 @@ static const struct virtnet_stat_desc virtnet_rq_stat=
+s_desc[] =3D {
+>  static const struct virtnet_stat_desc virtnet_sq_stats_desc_qstat[] =3D =
+{
+>         VIRTNET_SQ_STAT_QSTAT("packets", packets),
+>         VIRTNET_SQ_STAT_QSTAT("bytes",   bytes),
+> +       VIRTNET_SQ_STAT_QSTAT("stop",    stop),
+> +       VIRTNET_SQ_STAT_QSTAT("wake",    wake),
+>  };
 >
->         __NETDEV_A_QSTATS_MAX,
->         NETDEV_A_QSTATS_MAX =3D (__NETDEV_A_QSTATS_MAX - 1)
-> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> index 4b5054087309..1f6ae6379e0f 100644
-> --- a/net/core/netdev-genl.c
-> +++ b/net/core/netdev-genl.c
-> @@ -517,7 +517,9 @@ netdev_nl_stats_write_tx(struct sk_buff *rsp, struct =
-netdev_queue_stats_tx *tx)
->             netdev_stat_put(rsp, NETDEV_A_QSTATS_TX_HW_GSO_BYTES, tx->hw_=
-gso_bytes) ||
->             netdev_stat_put(rsp, NETDEV_A_QSTATS_TX_HW_GSO_WIRE_PACKETS, =
-tx->hw_gso_wire_packets) ||
->             netdev_stat_put(rsp, NETDEV_A_QSTATS_TX_HW_GSO_WIRE_BYTES, tx=
-->hw_gso_wire_bytes) ||
-> -           netdev_stat_put(rsp, NETDEV_A_QSTATS_TX_HW_DROP_RATELIMITS, t=
-x->hw_drop_ratelimits))
-> +           netdev_stat_put(rsp, NETDEV_A_QSTATS_TX_HW_DROP_RATELIMITS, t=
-x->hw_drop_ratelimits) ||
-> +           netdev_stat_put(rsp, NETDEV_A_QSTATS_TX_STOP, tx->stop) ||
-> +           netdev_stat_put(rsp, NETDEV_A_QSTATS_TX_WAKE, tx->wake))
->                 return -EMSGSIZE;
->         return 0;
->  }
-> diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux=
-/netdev.h
-> index cf24f1d9adf8..a8188202413e 100644
-> --- a/tools/include/uapi/linux/netdev.h
-> +++ b/tools/include/uapi/linux/netdev.h
-> @@ -165,6 +165,8 @@ enum {
->         NETDEV_A_QSTATS_TX_HW_GSO_WIRE_PACKETS,
->         NETDEV_A_QSTATS_TX_HW_GSO_WIRE_BYTES,
->         NETDEV_A_QSTATS_TX_HW_DROP_RATELIMITS,
-> +       NETDEV_A_QSTATS_TX_STOP,
-> +       NETDEV_A_QSTATS_TX_WAKE,
+>  static const struct virtnet_stat_desc virtnet_rq_stats_desc_qstat[] =3D =
+{
+> @@ -1014,6 +1018,9 @@ static void check_sq_full_and_disable(struct virtne=
+t_info *vi,
+>          */
+>         if (sq->vq->num_free < 2+MAX_SKB_FRAGS) {
+>                 netif_stop_subqueue(dev, qnum);
+> +               u64_stats_update_begin(&sq->stats.syncp);
+> +               u64_stats_inc(&sq->stats.stop);
+> +               u64_stats_update_end(&sq->stats.syncp);
+>                 if (use_napi) {
+>                         if (unlikely(!virtqueue_enable_cb_delayed(sq->vq)=
+))
+>                                 virtqueue_napi_schedule(&sq->napi, sq->vq=
+);
+> @@ -1022,6 +1029,9 @@ static void check_sq_full_and_disable(struct virtne=
+t_info *vi,
+>                         free_old_xmit(sq, false);
+>                         if (sq->vq->num_free >=3D 2+MAX_SKB_FRAGS) {
+>                                 netif_start_subqueue(dev, qnum);
+> +                               u64_stats_update_begin(&sq->stats.syncp);
+> +                               u64_stats_inc(&sq->stats.wake);
+> +                               u64_stats_update_end(&sq->stats.syncp);
+>                                 virtqueue_disable_cb(sq->vq);
+>                         }
+>                 }
+> @@ -2322,8 +2332,14 @@ static void virtnet_poll_cleantx(struct receive_qu=
+eue *rq)
+>                         free_old_xmit(sq, true);
+>                 } while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
 >
->         __NETDEV_A_QSTATS_MAX,
->         NETDEV_A_QSTATS_MAX =3D (__NETDEV_A_QSTATS_MAX - 1)
+> -               if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS)
+> +               if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS) {
+> +                       if (netif_tx_queue_stopped(txq)) {
+> +                               u64_stats_update_begin(&sq->stats.syncp);
+> +                               u64_stats_inc(&sq->stats.wake);
+> +                               u64_stats_update_end(&sq->stats.syncp);
+> +                       }
+>                         netif_tx_wake_queue(txq);
+> +               }
+>
+>                 __netif_tx_unlock(txq);
+>         }
+> @@ -2473,8 +2489,14 @@ static int virtnet_poll_tx(struct napi_struct *nap=
+i, int budget)
+>         virtqueue_disable_cb(sq->vq);
+>         free_old_xmit(sq, true);
+>
+> -       if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS)
+> +       if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS) {
+> +               if (netif_tx_queue_stopped(txq)) {
+> +                       u64_stats_update_begin(&sq->stats.syncp);
+> +                       u64_stats_inc(&sq->stats.wake);
+> +                       u64_stats_update_end(&sq->stats.syncp);
+> +               }
+>                 netif_tx_wake_queue(txq);
+> +       }
+>
+>         opaque =3D virtqueue_enable_cb_prepare(sq->vq);
+>
+> @@ -4790,6 +4812,8 @@ static void virtnet_get_base_stats(struct net_devic=
+e *dev,
+>
+>         tx->bytes =3D 0;
+>         tx->packets =3D 0;
+> +       tx->stop =3D 0;
+> +       tx->wake =3D 0;
+>
+>         if (vi->device_stats_cap & VIRTIO_NET_STATS_TYPE_TX_BASIC) {
+>                 tx->hw_drops =3D 0;
 > --
 > 2.45.0
 >
