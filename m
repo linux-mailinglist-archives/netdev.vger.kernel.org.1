@@ -1,180 +1,146 @@
-Return-Path: <netdev+bounces-95756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8352D8C356D
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 10:04:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD53C8C3575
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 10:17:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC9D91F214FB
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 08:04:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC48E1C2090E
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 08:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CA014AAD;
-	Sun, 12 May 2024 08:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD86917548;
+	Sun, 12 May 2024 08:17:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h4fZLsuq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF0517548
-	for <netdev@vger.kernel.org>; Sun, 12 May 2024 08:04:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D183D6A;
+	Sun, 12 May 2024 08:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715501071; cv=none; b=LQKPCysLk65U1HXvH8FmXhcVYMMDc3Epf703ouuf0GEpINkmDsMoXsdCX/NPnpN1fm888dMprJC36NpQo3bciWUuj4WJ2cnNpvZFhexj2ysX7eHdnFvRHVl0pV9asGyRs4U0S90FOwwXF3yLkXjCbEcuZdLAqnMs0ei4NByWTF0=
+	t=1715501836; cv=none; b=bJY6URcaAGlWNXSBYh3nALVOeG4uihpDl6LJAFTYzZ2SHWmtk/JdqAGq6z/SNjX5WEBIAtJUWoqwiq5WME2zKrgxiyuSdZ0Gmuh7O5pY7SJnLhs4o3UfSK1l10Q0lhUCIe+aOcM+ClN235aXokrIMfUEGjxbAI9GkiN+z7ME7Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715501071; c=relaxed/simple;
-	bh=UgkNHWfTVk8YpKE30qIveVOe8pe8nXbSRKLee8Dz4Bo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=lf0RqtoyK+UF40tppOY051YNjMMkallclTcRl+Jk+oDgnDtqme3EVYYFXA10+fPXbvtmvSBKbquMI5o9Dmfq3Xm5/SqWLXqJopNQb5R+ribbaGa2ezCEKgJ5bJOtmVQdf3cGsgo0Gcxg0tD0awY9JXmN31IcvrjA5UnoGOu6z6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-7e1db7e5386so35505239f.3
-        for <netdev@vger.kernel.org>; Sun, 12 May 2024 01:04:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715501069; x=1716105869;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1715501836; c=relaxed/simple;
+	bh=SxRgOz9FrW2nOJVIYf9MsvTis9bo2V8NngiZT8z0rTE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AUArncCdoX82+ACqCSPuxDIOSmKy1kB1y8822Q8noci8rhlegrbMFA1WvrplaSS6ObcocYbkNi7TR+a6JXPkY8x4ILH1ts8zsJepWRvuFiyrOmwxBD8/tdc08W5bi5JSmvG9z48f2x94mSCXcixummPerBylNjMCgcWaZEKXQ+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h4fZLsuq; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41fd5dc0480so19753155e9.1;
+        Sun, 12 May 2024 01:17:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715501833; x=1716106633; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=JA5VCptPjyfIoM7ebz+7WHXx2umUxBAkXBABPwEhn6k=;
-        b=DpmrDSch3/Sr43fAoJfJhASNirIj8QD2aVDvRNkiDZUddnJ1PnnwXUgQwtnNor6hT2
-         jmM8iv0Xy3KWobcImIFTi7ifje3k5ft68/n0FI6MuaT8I8vqsWGt73WsQa94VKlvirar
-         OJhFtFdXMbS5q/0TPzA10KuHztwNfiUBup3+in1jn9NR2xQAEzowAnedUUhcqh47wltw
-         6f8qOXCDenu1kE7d+uM3MTLg4eE5qp2jWXSf71BlEmGbObfn9NIrPZGDLt/mK1HALqch
-         5g0KUbfCW6jqO3BKccV+Yyh+UHBQ8SHXKDNwXXw6UTKsAjsVQYzfnlf8rVYkRWZ1WM/9
-         Xsww==
-X-Forwarded-Encrypted: i=1; AJvYcCVQy93K4dp4cejDkeootq1i1jsuCYzRC1OEhAGnZN4fVFar8e/9ZTLVELgVBKMqIrtVi0XQTWJJ+SinVvzUO2XOvLTA6qM5
-X-Gm-Message-State: AOJu0YzcJsATSWW0dYrPtFVtC5K+5pNcV+o2Z8AUYv7M8NByQI8eEbDz
-	TKeL0aQtmU9sZrwn2lEymB2o54Mx7SU5FEXU0txhjboW7tyUkwRNnLzWc0V6zaEFnbvBWqclMJ7
-	5pJiljWmPjoOAU+ZvxloZ5U2IjzhrVu/fps2tkYuBjf2DHqsMmmFe8dQ=
-X-Google-Smtp-Source: AGHT+IGMCmJFPFJF3fk69Cf2peBO45tLdX3hxvujdc71EobswisJhf13rG+/RIov/aCulJQas0YVTig/qD2uBa5dkW9gn1R5ip5K
+        bh=xXlhXUYBz2j7T8no4wkelMyXb8COeQGHIUfPVvUbzMs=;
+        b=h4fZLsuqvgItmXZzEhyMv3Zu2i8hPCgebsBP7OEHB6rqRwlJuyp4tgBCf5TxUqD0cO
+         dbYLvtLpSUCVU5auEW+Mnuew6ewuy73/1ISp8GmI2EE0C4tAcdl67CVoNmEl6ulJEdL9
+         55GCQIvxG35iEiC/fvRM4XhObASXNkFlgqtCbzciWfRsAqMPYCoaayThGY+V4pyG9JhI
+         OGyRB7tHZEoMzVIconxZgaPh3g7spxoOZGcnrhpxsBB4caHUHZRnnfXAvu1ooWNKUfis
+         WO7Q1R2xq6TZVARXSd850XIaQB5kGmwNVQnzyHxCxupEX/cwJygSNLsU+9TWNSi+WQhG
+         /Ukg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715501833; x=1716106633;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xXlhXUYBz2j7T8no4wkelMyXb8COeQGHIUfPVvUbzMs=;
+        b=qnQSE6ahOl10+UDuwlA6dHAeBg81MCWLeu+w4Gbh1PfTjz2pqI56Yokr4Dz5qtKmsg
+         I6NlYn2dQNsdkHRlvLblZbSYBk5UvPgZ/VJwdS2QFB8/BFSj5rcDpwwwQLX34YZfdAs0
+         FKyTa5HmoYI3lpQPpwikro69qQzRddr57plEDiQmknShjoURFMhsyv3V5sRJTr3z+2WT
+         ZeEXyoxw3fd3IFZOIw1uMOCVHynJskY5PP26KgoyVbuPebFCSlbflZRorCPOGv7Eyv0u
+         JM2wMcRVFOYj8G1J/sBhJChISfw3Jntz1VbZIfXDYSMNlLtNMOGhKiMtFp/aRxHH1Cvg
+         4R6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV2JF30/84kyraR9Rq4mNU+7BuqL+Xq3rtO3KQaB6HqaSBJrmATVaorlSMrCfhmBG9QYYVTrAM1o879BYNdr4DBy7H+zlNXKwYf/R0f1Af2AP6ALKVNv+ZY5p37Je4tNcuoF6gORpWWWRjoX8jHgCjz5Ac0C1oIlc8F7mWzkpLrvA==
+X-Gm-Message-State: AOJu0Yw9gLj6/HLZeMFtLd3HE6+OCeNMSY2Zwtny/jcuU1ncemc0OVqP
+	lRmfec3BHYwv2SWWupY6KjL1WizhQn4Vl/8LCUT8+LTuQEWts6oL
+X-Google-Smtp-Source: AGHT+IEOalB+778r4CqlSVXIAWe1JPzos5Do/QR+Dve78YpSIk5eyo9JJnTF5MDxO8/0sqUEO1y2aQ==
+X-Received: by 2002:a05:600c:3582:b0:418:29d4:1964 with SMTP id 5b1f17b1804b1-41fea539b5amr50417525e9.0.1715501833128;
+        Sun, 12 May 2024 01:17:13 -0700 (PDT)
+Received: from [172.27.21.17] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccce25casm120049505e9.20.2024.05.12.01.17.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 12 May 2024 01:17:12 -0700 (PDT)
+Message-ID: <a4efd162-5dc0-4ed1-b875-de12521a6618@gmail.com>
+Date: Sun, 12 May 2024 11:17:09 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:2b10:b0:7de:d6a0:d9c4 with SMTP id
- ca18e2360f4ac-7e1b5204829mr24194139f.2.1715501069028; Sun, 12 May 2024
- 01:04:29 -0700 (PDT)
-Date: Sun, 12 May 2024 01:04:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d4e70506183d374d@google.com>
-Subject: [syzbot] [bridge?] KMSAN: uninit-value in br_dev_xmit (2)
-From: syzbot <syzbot+a63a1f6a062033cf0f40@syzkaller.appspotmail.com>
-To: bridge@lists.linux.dev, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, razor@blackwall.org, roopa@nvidia.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    dccb07f2914c Merge tag 'for-6.9-rc7-tag' of git://git.kern..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=10b995a8980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=617171361dd3cd47
-dashboard link: https://syzkaller.appspot.com/bug?extid=a63a1f6a062033cf0f40
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122a37c0980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=111a53c0980000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/fdbc7be30633/disk-dccb07f2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a9e4c11aa835/vmlinux-dccb07f2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/43c3a343ea93/bzImage-dccb07f2.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a63a1f6a062033cf0f40@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in br_dev_xmit+0x61d/0x1cb0 net/bridge/br_device.c:65
- br_dev_xmit+0x61d/0x1cb0 net/bridge/br_device.c:65
- __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
- netdev_start_xmit include/linux/netdevice.h:4917 [inline]
- xmit_one net/core/dev.c:3531 [inline]
- dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3547
- __dev_queue_xmit+0x34db/0x5350 net/core/dev.c:4341
- dev_queue_xmit include/linux/netdevice.h:3091 [inline]
- __bpf_tx_skb net/core/filter.c:2136 [inline]
- __bpf_redirect_common net/core/filter.c:2180 [inline]
- __bpf_redirect+0x14a6/0x1620 net/core/filter.c:2187
- ____bpf_clone_redirect net/core/filter.c:2460 [inline]
- bpf_clone_redirect+0x328/0x470 net/core/filter.c:2432
- ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:1997
- __bpf_prog_run512+0xb5/0xe0 kernel/bpf/core.c:2238
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:657 [inline]
- bpf_prog_run include/linux/filter.h:664 [inline]
- bpf_test_run+0x499/0xc30 net/bpf/test_run.c:425
- bpf_prog_test_run_skb+0x14ea/0x1f20 net/bpf/test_run.c:1058
- bpf_prog_test_run+0x6b7/0xad0 kernel/bpf/syscall.c:4269
- __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5678
- __do_sys_bpf kernel/bpf/syscall.c:5767 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5765 [inline]
- __x64_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5765
- x64_sys_call+0x96b/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:322
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:3810 [inline]
- slab_alloc_node mm/slub.c:3851 [inline]
- kmem_cache_alloc_node+0x622/0xc90 mm/slub.c:3894
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
- pskb_expand_head+0x222/0x19d0 net/core/skbuff.c:2251
- skb_ensure_writable+0x412/0x4a0 net/core/skbuff.c:6117
- __bpf_try_make_writable net/core/filter.c:1665 [inline]
- bpf_try_make_writable net/core/filter.c:1671 [inline]
- bpf_try_make_head_writable net/core/filter.c:1679 [inline]
- ____bpf_clone_redirect net/core/filter.c:2454 [inline]
- bpf_clone_redirect+0x17f/0x470 net/core/filter.c:2432
- ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:1997
- __bpf_prog_run512+0xb5/0xe0 kernel/bpf/core.c:2238
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:657 [inline]
- bpf_prog_run include/linux/filter.h:664 [inline]
- bpf_test_run+0x499/0xc30 net/bpf/test_run.c:425
- bpf_prog_test_run_skb+0x14ea/0x1f20 net/bpf/test_run.c:1058
- bpf_prog_test_run+0x6b7/0xad0 kernel/bpf/syscall.c:4269
- __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5678
- __do_sys_bpf kernel/bpf/syscall.c:5767 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5765 [inline]
- __x64_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5765
- x64_sys_call+0x96b/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:322
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 0 PID: 5070 Comm: syz-executor183 Not tainted 6.9.0-rc7-syzkaller-00012-gdccb07f2914c #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-=====================================================
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/3] net/mlx4: Track RX allocation failures in
+ a stat
+To: Joe Damato <jdamato@fastly.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: mkarsten@uwaterloo.ca, nalramli@fastly.com,
+ Tariq Toukan <tariqt@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20240509205057.246191-1-jdamato@fastly.com>
+ <20240509205057.246191-2-jdamato@fastly.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20240509205057.246191-2-jdamato@fastly.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 09/05/2024 23:50, Joe Damato wrote:
+> mlx4_en_alloc_frags currently returns -ENOMEM when mlx4_alloc_page
+> fails but does not increment a stat field when this occurs.
+> 
+> A new field called alloc_fail has been added to struct mlx4_en_rx_ring
+> which is now incremented in mlx4_en_rx_ring when -ENOMEM occurs.
+> 
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> ---
+>   drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 4 +++-
+>   drivers/net/ethernet/mellanox/mlx4/mlx4_en.h | 1 +
+>   2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+> index 8328df8645d5..15c57e9517e9 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+> +++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+> @@ -82,8 +82,10 @@ static int mlx4_en_alloc_frags(struct mlx4_en_priv *priv,
+>   
+>   	for (i = 0; i < priv->num_frags; i++, frags++) {
+>   		if (!frags->page) {
+> -			if (mlx4_alloc_page(priv, frags, gfp))
+> +			if (mlx4_alloc_page(priv, frags, gfp)) {
+> +				ring->alloc_fail++;
+>   				return -ENOMEM;
+> +			}
+>   			ring->rx_alloc_pages++;
+>   		}
+>   		rx_desc->data[i].addr = cpu_to_be64(frags->dma +
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+> index efe3f97b874f..cd70df22724b 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+> +++ b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+> @@ -355,6 +355,7 @@ struct mlx4_en_rx_ring {
+>   	unsigned long xdp_tx;
+>   	unsigned long xdp_tx_full;
+>   	unsigned long dropped;
+> +	unsigned long alloc_fail;
+>   	int hwtstamp_rx_filter;
+>   	cpumask_var_t affinity_mask;
+>   	struct xdp_rxq_info xdp_rxq;
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Counter should be reset in mlx4_en_clear_stats().
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+BTW, there are existing counters that are missing there already.
+We should add them as well, not related to your series though...
 
