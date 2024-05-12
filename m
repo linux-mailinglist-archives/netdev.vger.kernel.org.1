@@ -1,127 +1,147 @@
-Return-Path: <netdev+bounces-95815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDBDC8C3797
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 18:39:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8268C37FE
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 20:37:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97BAD28123C
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 16:39:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCB2E1C20C5F
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 18:37:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73ABD2F873;
-	Sun, 12 May 2024 16:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBFC44436B;
+	Sun, 12 May 2024 18:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ugrDOLiA"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="wdMvA4Qv"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0B042A8E;
-	Sun, 12 May 2024 16:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A203AF4F1
+	for <netdev@vger.kernel.org>; Sun, 12 May 2024 18:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715531945; cv=none; b=EgjOZNW5TKk6+jYww1SNtYna73nzM3haheVN6OukuY6luuje2T+fZBqmqz+gMUvyPU+4cTsnbXVBDPIClCuYOjJGBPVF2LdD1xA+qwo8Mh14BZSihbUH9Ga5KzH7t6SVEykxeNAin6umSBh/J45cOeQW38q/Ryt1xDbheGdvLvo=
+	t=1715539046; cv=none; b=d7xv6nn/lo3Rh688hTTZYyf40KnuYthFTkzq11FK7ruySqrQiEeNws98XG0B01mx8Zy0rzpwNcMjvM4cURfnTIk6Ci3z+tBxeZM2H2hBgOMLnmKp9rbtePnrnnz0+1E09m+ddWizc3/SF2/87oPN1R2wN816mVfGtBGIyFXSTI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715531945; c=relaxed/simple;
-	bh=IWReFbWnSG11vlPQ92I5R2T/g5Ucy9dLLkzpOWm7rMs=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=KKSFqEMpSEbinLNtwUN8AHN0TOCtQslN1KISUrIaWCuAT5ay2g0WtCJoTXjWFEmwg6FsUiNZhPrGFfRZPVsfDSbeV21FWiF1oKtDUYy8ecl/X3juZc1ZimVfwEBpd/E4rFZf1POka34dA5KMI29FREDtwxlbTPzGxZ9A+Szk0s0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ugrDOLiA; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1715531935; h=Message-ID:Subject:Date:From:To;
-	bh=o40wkv9PATkuaNIfkNpU6m7tz6qpatklvvAUQQFo1aM=;
-	b=ugrDOLiA2noYnrbZyOf7Y7XDMv7zW358TJQqBvpcVOSDgbpqZXvfK78KvlcoPLrk7ON+pEeNvqvN2Hjn/39ybMtsl03cEFMuY7MGtmTh2KWQPCues5OdirTMSPSLI8hUbRN/W/OJ2koZrBINIq9vz9q2Of0QX9+EHA3Jpq3kZO0=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=27;SR=0;TI=SMTPD_---0W6FsCq4_1715531932;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W6FsCq4_1715531932)
-          by smtp.aliyun-inc.com;
-          Mon, 13 May 2024 00:38:53 +0800
-Message-ID: <1715531818.6973832-3-hengqi@linux.alibaba.com>
-Subject: Re: [PATCH net-next v13 2/4] ethtool: provide customized dim profile management
-Date: Mon, 13 May 2024 00:36:58 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: kernel test robot <lkp@intel.com>
-Cc: llvm@lists.linux.dev,
- oe-kbuild-all@lists.linux.dev,
- Jakub Kicinski <kuba@kernel.org>,
- "David S . Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>,
- Jason Wang <jasowang@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Brett Creeley <bcreeley@amd.com>,
- Ratheesh Kannoth <rkannoth@marvell.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Tal Gilboa <talgi@nvidia.com>,
- Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Paul Greenwalt <paul.greenwalt@intel.com>,
- Ahmed Zaki <ahmed.zaki@intel.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>,
- justinstitt@google.com,
- donald.hunter@gmail.com,
- netdev@vger.kernel.org,
- virtualization@lists.linux.dev
-References: <20240509044747.101237-1-hengqi@linux.alibaba.com>
- <20240509044747.101237-3-hengqi@linux.alibaba.com>
- <202405100654.5PbLQXnL-lkp@intel.com>
-In-Reply-To: <202405100654.5PbLQXnL-lkp@intel.com>
+	s=arc-20240116; t=1715539046; c=relaxed/simple;
+	bh=EsBxKjiK3YT2IXz67XdPLB6hnSXRyOnEnLz6QQoWq/E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LkjnEYDgR48uFGCoUCn+rDwpJUszWUxK7fEQEt3h9PIjh0hzr9/2viu0MYcYK2Ucl3TeWxF7deI15faNlo6yoRwR76B5eVDguclRpi5ZCoju4t50+k8jCkUsWN2+rLNztJQMBR22McfKF6rOTptGMsrLhq42i5OaMWBmduMA7Lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=wdMvA4Qv; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1ec486198b6so26590085ad.1
+        for <netdev@vger.kernel.org>; Sun, 12 May 2024 11:37:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1715539044; x=1716143844; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xvDALX2Uri5RTgIn6pzRLr5p/TpABW6ze+cHJXhnhz0=;
+        b=wdMvA4QvO9dUJ6/CsD1KXqndM/gwWX/PlXL09eiIqLKMVjvLAyYRzkLxxbOa8OgN9K
+         TiiYmLKLrMg71pBy5XAc1Hwp1Fmeli8fVtTmj36MHgcMccKSQk5IfwlCpxUz0rXFYhEG
+         8zPbHhf+BSqCyEcSzNLG09alINutQhD5JTv5w=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715539044; x=1716143844;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xvDALX2Uri5RTgIn6pzRLr5p/TpABW6ze+cHJXhnhz0=;
+        b=GxW9QPoaIOWdyUeYnmS+HVI5Cyk2M2gxKeenjRW/Fm71MHhPNPb8RUASV2ICzey6cP
+         PhnPyo6zHolJCWOPqmen/ZjzAWHZauRxlUrsqIxlg7Kw2eUUtEexFWjeXaEkfC/zjLWb
+         YZ+4JrHJQB4Jrq3giXidrZsmxM1I7RhERIj+4MQOkzSYsE/7+x2+3AjyjpzdKSj71oTZ
+         9W6+ymXAJP+mtCZUCPsp/imG6fhKkvPRaASe08G3AXlfT/VCygnAPaW3PAUZJHh/L+yG
+         obQ/ycDOZm5Bsen5davWMSzm2JjbHBwCwYfQDOnqjD9FnEPJq5tHWoxEFezYxBNObuoi
+         7Lmg==
+X-Forwarded-Encrypted: i=1; AJvYcCX0Kv8z8xTwhhlcUcfS9jK6H87N5PSkXhiv4SB1D3mzLxaWA0pkDo9zdMlP/obrYUBfS95zrTAVrlSNJuxcPddAr1/2xEzp
+X-Gm-Message-State: AOJu0YzXGHIeinhPK+dBgHnU7IXaGYodmQw1BJKBgVP/YexTIjGLQ/0h
+	6AWF4g//LPAICQ0Y8LpigG0TAjQfYb1dc1lvHZElT5XmSUQN0VJ175Qol4/Gjzs=
+X-Google-Smtp-Source: AGHT+IFkxbq3Rkzvs5WbT/T22/l24x4EHoOEeAsDjLGj1lSmdme4hW/JDJacIPGNIS8Nz9h/fW+3zQ==
+X-Received: by 2002:a17:903:2442:b0:1e4:17e4:3a1f with SMTP id d9443c01a7336-1ef43d2e2b7mr105905115ad.4.1715539043815;
+        Sun, 12 May 2024 11:37:23 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0b9d1a57sm64970295ad.11.2024.05.12.11.37.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 May 2024 11:37:23 -0700 (PDT)
+Date: Sun, 12 May 2024 11:37:20 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	mkarsten@uwaterloo.ca, nalramli@fastly.com,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next v4 1/3] net/mlx4: Track RX allocation failures
+ in a stat
+Message-ID: <ZkEMYDP586iKp1vT@LQ3V64L9R2>
+References: <20240509205057.246191-1-jdamato@fastly.com>
+ <20240509205057.246191-2-jdamato@fastly.com>
+ <a4efd162-5dc0-4ed1-b875-de12521a6618@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a4efd162-5dc0-4ed1-b875-de12521a6618@gmail.com>
 
-On Fri, 10 May 2024 07:09:52 +0800, kernel test robot <lkp@intel.com> wrote:
-> Hi Heng,
+On Sun, May 12, 2024 at 11:17:09AM +0300, Tariq Toukan wrote:
 > 
-> kernel test robot noticed the following build errors:
 > 
-> [auto build test ERROR on net-next/main]
+> On 09/05/2024 23:50, Joe Damato wrote:
+> > mlx4_en_alloc_frags currently returns -ENOMEM when mlx4_alloc_page
+> > fails but does not increment a stat field when this occurs.
+> > 
+> > A new field called alloc_fail has been added to struct mlx4_en_rx_ring
+> > which is now incremented in mlx4_en_rx_ring when -ENOMEM occurs.
+> > 
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> > ---
+> >   drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 4 +++-
+> >   drivers/net/ethernet/mellanox/mlx4/mlx4_en.h | 1 +
+> >   2 files changed, 4 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+> > index 8328df8645d5..15c57e9517e9 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+> > @@ -82,8 +82,10 @@ static int mlx4_en_alloc_frags(struct mlx4_en_priv *priv,
+> >   	for (i = 0; i < priv->num_frags; i++, frags++) {
+> >   		if (!frags->page) {
+> > -			if (mlx4_alloc_page(priv, frags, gfp))
+> > +			if (mlx4_alloc_page(priv, frags, gfp)) {
+> > +				ring->alloc_fail++;
+> >   				return -ENOMEM;
+> > +			}
+> >   			ring->rx_alloc_pages++;
+> >   		}
+> >   		rx_desc->data[i].addr = cpu_to_be64(frags->dma +
+> > diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+> > index efe3f97b874f..cd70df22724b 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+> > +++ b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+> > @@ -355,6 +355,7 @@ struct mlx4_en_rx_ring {
+> >   	unsigned long xdp_tx;
+> >   	unsigned long xdp_tx_full;
+> >   	unsigned long dropped;
+> > +	unsigned long alloc_fail;
+> >   	int hwtstamp_rx_filter;
+> >   	cpumask_var_t affinity_mask;
+> >   	struct xdp_rxq_info xdp_rxq;
 > 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Heng-Qi/linux-dim-move-useful-macros-to-h-file/20240509-125007
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/20240509044747.101237-3-hengqi%40linux.alibaba.com
-> patch subject: [PATCH net-next v13 2/4] ethtool: provide customized dim profile management
-> config: arm-randconfig-002-20240510 (https://download.01.org/0day-ci/archive/20240510/202405100654.5PbLQXnL-lkp@intel.com/config)
-> compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project b910bebc300dafb30569cecc3017b446ea8eafa0)
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240510/202405100654.5PbLQXnL-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202405100654.5PbLQXnL-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
-> >> ld.lld: error: undefined symbol: lockdep_rtnl_is_held
+> Counter should be reset in mlx4_en_clear_stats().
 
-This failed use case seems to come from this series triggering a problem that
-has not been triggered historically, namely lockdep_rtnl_is_held() is not called
-in an environment where CONFIG_NET is not configured and CONFIG_PROVE_LOCKING is
-configured:
-  If CONFIG_PROVE_LOCKING is configured as Y and CONFIG_NET is n, then
-  lockdep_rtnl_is_held is in an undefined state at this time.
+OK, thanks. I'll add that to the v5, alongside any other feedback that
+comes in within the next ~24 hours or so.
 
-So I think we should declare "CONFIG_PROVE_LOCKING depends on CONFIG_NET".
-How do you think?
+> BTW, there are existing counters that are missing there already.
+> We should add them as well, not related to your series though...
 
-Thanks!
-
->    >>> referenced by net_dim.c
->    >>>               lib/dim/net_dim.o:(net_dim_free_irq_moder) in archive vmlinux.a
->    >>> referenced by net_dim.c
->    >>>               lib/dim/net_dim.o:(net_dim_free_irq_moder) in archive vmlinux.a
-> 
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+Yea, I see what you mean about the other counters. I think those can
+potentially be sent as a 'Fixes' later?
 
