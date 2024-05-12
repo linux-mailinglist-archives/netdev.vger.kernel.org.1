@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-95763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E8C8C35CB
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 11:02:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A1B38C35CC
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 11:02:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5D6A1C20A3B
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 09:02:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 172F91F21408
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 09:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A68C1BF47;
-	Sun, 12 May 2024 09:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C33718E2A;
+	Sun, 12 May 2024 09:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VMapq7Ad"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ASoJAJ2z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FCA175AA
-	for <netdev@vger.kernel.org>; Sun, 12 May 2024 09:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3AA175AA
+	for <netdev@vger.kernel.org>; Sun, 12 May 2024 09:02:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715504556; cv=none; b=Q0Z+nM8/V7+hn+1MzajLfH7GF/vIiPickaMbtGunwqLWSrikUlDOHvLixxk9ZF1bvvvnWgrrqr42rjaF+AcTLdXpBD3VIoOaIY26pItv+GJRz03b5xdHQqLpSopg0uDMV1v9/14xLCF8kwnfcoCRHGjvwZjszrNHpSetnOKESbY=
+	t=1715504560; cv=none; b=hVQDtmT3S/+6mma+lZHNnJe6m9t4hcQhsejamOnu2exxobxSCDN6TzVguhxWDhFg6LB9s+Pbh94dj9VLpHo0yjC0mVts0bPf6O6BChfaYz4fXL2w9s2rdyMGlPqD2TPyNdrh+i17x/Hk+vCui8g14cGJpvY0EPzmRPrYoY6xxiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715504556; c=relaxed/simple;
-	bh=YDYSm4pUVcswzuYiFWyCHRLNyBQzjRjl+O6gxwlUL0I=;
+	s=arc-20240116; t=1715504560; c=relaxed/simple;
+	bh=ICT3siwG4tz49HUoV7Y/5O043QtRmj53WFotR+XLGoU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Tlr2X5SX7xXtEcuERxd/onpd+rz8IBOs4GHqu64y9UxbXtQ65u1q+1TtJZrYu2I8pmr7Nzrz166IqxdMi7OZhqarBD8LI2R2zVdGyvDmveC8x9ynn2O/NGXjDtiNWkKcalSi7lpNvNmzLCPhQJCQY67TxPTDKGd6z/bFDKsa3GY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VMapq7Ad; arc=none smtp.client-ip=209.85.216.52
+	 MIME-Version; b=FHj6sdhpxBgbvVM+NOUXL57WhwMPt8LcTiabhkXKSZE7Q3oK48904ICAdMG3td9DK/p0tSsxIL5UI7czYv57XDJQI7aQTQ8RoX3rKYRBRing+W30MYdnqGG09DsEj2MxA7c41w1kVhThdygSPXE6OVGUtbw5h2UxkdCNKwcfnvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ASoJAJ2z; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2b345894600so896756a91.2
-        for <netdev@vger.kernel.org>; Sun, 12 May 2024 02:02:34 -0700 (PDT)
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2b620b0662dso932530a91.0
+        for <netdev@vger.kernel.org>; Sun, 12 May 2024 02:02:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715504554; x=1716109354; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1715504556; x=1716109356; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vyAT1Av4+rrkewyzsZnWvfXBLHNJBGXNMLMORxVEdEU=;
-        b=VMapq7Ad59bnA+pKWf1Vg4zMM0p3VkB3fY3pQilD8EEe42x8oaP2YRyANJ3E3TvOBb
-         CcM5O6ZIj3k0FRR4Hejtccz9kvrhXEfiSyS3IjHIoF/kDwy+OUrtoXUr+1Xv4P/c2ffG
-         FwVs44LhuWaDQAlDxDLCH4rSn4aWFX4HfgWt2KfVjpu2s+7uelFtg2IDGsqbfJyXJFdK
-         Wg5eDWz0+2O464TyWq3wz2hPm1riB3kLthFUmc+X7qKhPuZl2x1fswXR7LNdLgYofC97
-         UfOLIj/tBXclWn46waIJ0oNDj9UPmkmTf2Vps0OvDGVSha4Qv5Voi6PiI7rIYVrjWzwQ
-         QeFg==
+        bh=xOJaY2yg1bwX8hMccEYNu4Sf4C7RBgAssrRmzJD9xKI=;
+        b=ASoJAJ2z+hrrM6LXpjjAM3GIDr0WjKETqVbqkufFODdkHahQZLHd8cnXOdQTuNycKX
+         OoZ19SSYO8d6qCA3PvMaG4Ed8qgS4isC7O0m2k0/sYp0YXJLL77dVQPxLxK3fIog7u8k
+         m+65nYHooS0fYFkcQDSK3DXkb5exMqCdx//Eng7fffX1Bcq+wrjlvv1FX21e2/xNBAcP
+         Ls1HsrB/oZ41nbN6tvz0NnQggOur8PtlTiBBHzF5tnI5I9dxanGGyaAJ1Us7pPvmY1/j
+         E3D3hrMI25S0nIl0ctpwNz4gseHvE3T61USc9PWSMs28WPnlxUUteAY3+D6WwzeXV5Or
+         JDjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715504554; x=1716109354;
+        d=1e100.net; s=20230601; t=1715504556; x=1716109356;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vyAT1Av4+rrkewyzsZnWvfXBLHNJBGXNMLMORxVEdEU=;
-        b=eb+9SFxzhvOFVkgsbLtp5NjZ7i9ViZfDYpEfYqcmEdyTxnNvCVhk4WTGM1AIHovhGU
-         rSGxlq8gIfqpMmk+Uun7u0Jpg3tZixG59xtMVj67+147ASp8kg9WRoq6rPiDWVHljXy0
-         uO1VXbwCqEEqnkrZ7pa7H4Iwnwpb77JQslJ7ZiQW/zsAF1YSXoUWasZDcIm9qiZd6Pww
-         /Fq5olLhs2S7C0OypPR9QQ74Dp96VMhnNhLdfTWkgarC7ggJSjaMGEyBS2BpWGjtFiDy
-         oQG4FiyGQXcnD2BE6+el4HnQ4nrFm38u7ko6MMZs2smH5t0bop1N2r9wW1vcjwgiBT3W
-         i5aQ==
-X-Gm-Message-State: AOJu0YyLQe74WnzA96/KR7BdGEY1oMQ1//AXtcq+BljnDcTek8KbesT+
-	lXWjnHNtepevXQrbEjwge2L6QTFh3BLSTS8XQ8BX5UKAJKSLGVHVcPNoDKJ0
-X-Google-Smtp-Source: AGHT+IHoMYHygfXVt+6viO0NTS1V5tiaZx2JMWCXc4Z0omSiKe6bbw7+z8/apm8m8KThgvrICFRBZw==
-X-Received: by 2002:a05:6a21:32a7:b0:1af:cc80:57b6 with SMTP id adf61e73a8af0-1afde201b83mr8801143637.3.1715504553922;
-        Sun, 12 May 2024 02:02:33 -0700 (PDT)
+        bh=xOJaY2yg1bwX8hMccEYNu4Sf4C7RBgAssrRmzJD9xKI=;
+        b=I4ReQwm8xJqJBc3f3PPa8FFDyDwvlXMx8vTWhNj7PY+MSZuM991h42l8m0LiAo8XSB
+         KX1igf/AWkMcQZA/0IarvvV2o2boXYbf8wIkUT5vtjxQ/UDLfIrCJ3a5j10XhwMSyyGS
+         sbH1i1GvP2D+VVJZN/oWTF3xszTxhoOwX30P2Q+/69JlT177vnt/n/ZG/NI8caSVVGCn
+         Lxu2dEU7sLGL1/YjhegDCxP+BZpADeDmS3WwREvPZWYLRw3nlGhxvy2VXLVKTXWDRvqd
+         hvbG52MCzytfQV5G+bIjUr5D7FzaJ35UEdL8xkBNREsIGEp/MqvT78aUcp6zbnRNbJ0d
+         9YSg==
+X-Gm-Message-State: AOJu0Yz124CdNrYQ646B7RDH0w+lbrxUCi9dgiQGB/5ZpuK57MPXTtrA
+	Fq0rK3uaQX6Q7sHScWlbkBp7bKUo1sdAbYETHqSokvlJMdb6apc9AHNev8eL
+X-Google-Smtp-Source: AGHT+IFFltDEMao440x/ECNR00sI79Zm+WYutxtE7D1prpjX9u3UlvAnnGflW9Zu12mq0z6vQglG5g==
+X-Received: by 2002:a05:6a21:819e:b0:1af:dbe4:b34e with SMTP id adf61e73a8af0-1afde1df5c8mr7148508637.4.1715504556330;
+        Sun, 12 May 2024 02:02:36 -0700 (PDT)
 Received: from rpi.. (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4fff45ce3sm219915b3a.197.2024.05.12.02.02.31
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4fff45ce3sm219915b3a.197.2024.05.12.02.02.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 May 2024 02:02:33 -0700 (PDT)
+        Sun, 12 May 2024 02:02:36 -0700 (PDT)
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -75,9 +75,9 @@ Cc: andrew@lunn.ch,
 	pabeni@redhat.com,
 	linux@armlinux.org.uk,
 	hfdevel@gmx.net
-Subject: [PATCH net-next v6 1/6] net: tn40xx: add pci driver for Tehuti Networks TN40xx chips
-Date: Sun, 12 May 2024 17:56:06 +0900
-Message-Id: <20240512085611.79747-2-fujita.tomonori@gmail.com>
+Subject: [PATCH net-next v6 2/6] net: tn40xx: add register defines
+Date: Sun, 12 May 2024 17:56:07 +0900
+Message-Id: <20240512085611.79747-3-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240512085611.79747-1-fujita.tomonori@gmail.com>
 References: <20240512085611.79747-1-fujita.tomonori@gmail.com>
@@ -89,149 +89,280 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This just adds the scaffolding for an ethernet driver for Tehuti
-Networks TN40xx chips.
+This adds several defines to handle registers in Tehuti Networks
+TN40xx chips for later patches.
 
 Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 ---
- MAINTAINERS                          |  8 +++-
- drivers/net/ethernet/tehuti/Kconfig  | 12 ++++++
- drivers/net/ethernet/tehuti/Makefile |  3 ++
- drivers/net/ethernet/tehuti/tn40.c   | 55 ++++++++++++++++++++++++++++
- drivers/net/ethernet/tehuti/tn40.h   | 11 ++++++
- 5 files changed, 88 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/tehuti/tn40.c
- create mode 100644 drivers/net/ethernet/tehuti/tn40.h
+ drivers/net/ethernet/tehuti/tn40.h      |   2 +
+ drivers/net/ethernet/tehuti/tn40_regs.h | 245 ++++++++++++++++++++++++
+ 2 files changed, 247 insertions(+)
+ create mode 100644 drivers/net/ethernet/tehuti/tn40_regs.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b81b2be60b77..465da26aeb53 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -21840,7 +21840,13 @@ TEHUTI ETHERNET DRIVER
- M:	Andy Gospodarek <andy@greyhouse.net>
- L:	netdev@vger.kernel.org
- S:	Supported
--F:	drivers/net/ethernet/tehuti/*
-+F:	drivers/net/ethernet/tehuti/tehuti.*
-+
-+TEHUTI TN40XX ETHERNET DRIVER
-+M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	drivers/net/ethernet/tehuti/tn40*
- 
- TELECOM CLOCK DRIVER FOR MCPL0010
- M:	Mark Gross <markgross@kernel.org>
-diff --git a/drivers/net/ethernet/tehuti/Kconfig b/drivers/net/ethernet/tehuti/Kconfig
-index 8735633765a1..849e3b4a71c1 100644
---- a/drivers/net/ethernet/tehuti/Kconfig
-+++ b/drivers/net/ethernet/tehuti/Kconfig
-@@ -23,4 +23,16 @@ config TEHUTI
- 	help
- 	  Tehuti Networks 10G Ethernet NIC
- 
-+config TEHUTI_TN40
-+	tristate "Tehuti Networks TN40xx 10G Ethernet adapters"
-+	depends on PCI
-+	help
-+	  This driver supports 10G Ethernet adapters using Tehuti Networks
-+	  TN40xx chips. Currently, adapters with Applied Micro Circuits
-+	  Corporation QT2025 are supported; Tehuti Networks TN9310,
-+	  DLink DXE-810S, ASUS XG-C100F, and Edimax EN-9320.
-+
-+	  To compile this driver as a module, choose M here: the module
-+	  will be called tn40xx.
-+
- endif # NET_VENDOR_TEHUTI
-diff --git a/drivers/net/ethernet/tehuti/Makefile b/drivers/net/ethernet/tehuti/Makefile
-index 13a0ddd62088..1c468d99e476 100644
---- a/drivers/net/ethernet/tehuti/Makefile
-+++ b/drivers/net/ethernet/tehuti/Makefile
-@@ -4,3 +4,6 @@
- #
- 
- obj-$(CONFIG_TEHUTI) += tehuti.o
-+
-+tn40xx-y := tn40.o
-+obj-$(CONFIG_TEHUTI_TN40) += tn40xx.o
-diff --git a/drivers/net/ethernet/tehuti/tn40.c b/drivers/net/ethernet/tehuti/tn40.c
-new file mode 100644
-index 000000000000..6ec436120d18
---- /dev/null
-+++ b/drivers/net/ethernet/tehuti/tn40.c
-@@ -0,0 +1,55 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/* Copyright (c) Tehuti Networks Ltd. */
-+
-+#include <linux/pci.h>
-+
-+#include "tn40.h"
-+
-+static int tn40_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
-+{
-+	int ret;
-+
-+	ret = pci_enable_device(pdev);
-+	if (ret)
-+		return ret;
-+	ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-+	if (ret) {
-+		dev_err(&pdev->dev, "failed to set DMA mask.\n");
-+		goto err_disable_device;
-+	}
-+	return 0;
-+err_disable_device:
-+	pci_disable_device(pdev);
-+	return ret;
-+}
-+
-+static void tn40_remove(struct pci_dev *pdev)
-+{
-+	pci_disable_device(pdev);
-+}
-+
-+static const struct pci_device_id tn40_id_table[] = {
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
-+			 PCI_VENDOR_ID_TEHUTI, 0x3015) },
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
-+			 PCI_VENDOR_ID_DLINK, 0x4d00) },
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
-+			 PCI_VENDOR_ID_ASUSTEK, 0x8709) },
-+	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
-+			 PCI_VENDOR_ID_EDIMAX, 0x8103) },
-+	{ }
-+};
-+
-+static struct pci_driver tn40_driver = {
-+	.name = TN40_DRV_NAME,
-+	.id_table = tn40_id_table,
-+	.probe = tn40_probe,
-+	.remove = tn40_remove,
-+};
-+
-+module_pci_driver(tn40_driver);
-+
-+MODULE_DEVICE_TABLE(pci, tn40_id_table);
-+MODULE_AUTHOR("Tehuti networks");
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Tehuti Network TN40xx Driver");
 diff --git a/drivers/net/ethernet/tehuti/tn40.h b/drivers/net/ethernet/tehuti/tn40.h
-new file mode 100644
-index 000000000000..a5c5b558f56c
---- /dev/null
+index a5c5b558f56c..c0ac64a19c31 100644
+--- a/drivers/net/ethernet/tehuti/tn40.h
 +++ b/drivers/net/ethernet/tehuti/tn40.h
-@@ -0,0 +1,11 @@
+@@ -4,6 +4,8 @@
+ #ifndef _TN40_H_
+ #define _TN40_H_
+ 
++#include "tn40_regs.h"
++
+ #define TN40_DRV_NAME "tn40xx"
+ 
+ #define PCI_VENDOR_ID_EDIMAX 0x1432
+diff --git a/drivers/net/ethernet/tehuti/tn40_regs.h b/drivers/net/ethernet/tehuti/tn40_regs.h
+new file mode 100644
+index 000000000000..95171aa57a9e
+--- /dev/null
++++ b/drivers/net/ethernet/tehuti/tn40_regs.h
+@@ -0,0 +1,245 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
 +/* Copyright (c) Tehuti Networks Ltd. */
 +
-+#ifndef _TN40_H_
-+#define _TN40_H_
++#ifndef _TN40_REGS_H_
++#define _TN40_REGS_H_
 +
-+#define TN40_DRV_NAME "tn40xx"
++/* Register region size */
++#define TN40_REGS_SIZE 0x10000
 +
-+#define PCI_VENDOR_ID_EDIMAX 0x1432
++/* Registers from 0x0000-0x00fc were remapped to 0x4000-0x40fc */
++#define TN40_REG_TXD_CFG1_0 0x4000
++#define TN40_REG_TXD_CFG1_1 0x4004
++#define TN40_REG_TXD_CFG1_2 0x4008
++#define TN40_REG_TXD_CFG1_3 0x400C
 +
-+#endif /* _TN40XX_H */
++#define TN40_REG_RXF_CFG1_0 0x4010
++#define TN40_REG_RXF_CFG1_1 0x4014
++#define TN40_REG_RXF_CFG1_2 0x4018
++#define TN40_REG_RXF_CFG1_3 0x401C
++
++#define TN40_REG_RXD_CFG1_0 0x4020
++#define TN40_REG_RXD_CFG1_1 0x4024
++#define TN40_REG_RXD_CFG1_2 0x4028
++#define TN40_REG_RXD_CFG1_3 0x402C
++
++#define TN40_REG_TXF_CFG1_0 0x4030
++#define TN40_REG_TXF_CFG1_1 0x4034
++#define TN40_REG_TXF_CFG1_2 0x4038
++#define TN40_REG_TXF_CFG1_3 0x403C
++
++#define TN40_REG_TXD_CFG0_0 0x4040
++#define TN40_REG_TXD_CFG0_1 0x4044
++#define TN40_REG_TXD_CFG0_2 0x4048
++#define TN40_REG_TXD_CFG0_3 0x404C
++
++#define TN40_REG_RXF_CFG0_0 0x4050
++#define TN40_REG_RXF_CFG0_1 0x4054
++#define TN40_REG_RXF_CFG0_2 0x4058
++#define TN40_REG_RXF_CFG0_3 0x405C
++
++#define TN40_REG_RXD_CFG0_0 0x4060
++#define TN40_REG_RXD_CFG0_1 0x4064
++#define TN40_REG_RXD_CFG0_2 0x4068
++#define TN40_REG_RXD_CFG0_3 0x406C
++
++#define TN40_REG_TXF_CFG0_0 0x4070
++#define TN40_REG_TXF_CFG0_1 0x4074
++#define TN40_REG_TXF_CFG0_2 0x4078
++#define TN40_REG_TXF_CFG0_3 0x407C
++
++#define TN40_REG_TXD_WPTR_0 0x4080
++#define TN40_REG_TXD_WPTR_1 0x4084
++#define TN40_REG_TXD_WPTR_2 0x4088
++#define TN40_REG_TXD_WPTR_3 0x408C
++
++#define TN40_REG_RXF_WPTR_0 0x4090
++#define TN40_REG_RXF_WPTR_1 0x4094
++#define TN40_REG_RXF_WPTR_2 0x4098
++#define TN40_REG_RXF_WPTR_3 0x409C
++
++#define TN40_REG_RXD_WPTR_0 0x40A0
++#define TN40_REG_RXD_WPTR_1 0x40A4
++#define TN40_REG_RXD_WPTR_2 0x40A8
++#define TN40_REG_RXD_WPTR_3 0x40AC
++
++#define TN40_REG_TXF_WPTR_0 0x40B0
++#define TN40_REG_TXF_WPTR_1 0x40B4
++#define TN40_REG_TXF_WPTR_2 0x40B8
++#define TN40_REG_TXF_WPTR_3 0x40BC
++
++#define TN40_REG_TXD_RPTR_0 0x40C0
++#define TN40_REG_TXD_RPTR_1 0x40C4
++#define TN40_REG_TXD_RPTR_2 0x40C8
++#define TN40_REG_TXD_RPTR_3 0x40CC
++
++#define TN40_REG_RXF_RPTR_0 0x40D0
++#define TN40_REG_RXF_RPTR_1 0x40D4
++#define TN40_REG_RXF_RPTR_2 0x40D8
++#define TN40_REG_RXF_RPTR_3 0x40DC
++
++#define TN40_REG_RXD_RPTR_0 0x40E0
++#define TN40_REG_RXD_RPTR_1 0x40E4
++#define TN40_REG_RXD_RPTR_2 0x40E8
++#define TN40_REG_RXD_RPTR_3 0x40EC
++
++#define TN40_REG_TXF_RPTR_0 0x40F0
++#define TN40_REG_TXF_RPTR_1 0x40F4
++#define TN40_REG_TXF_RPTR_2 0x40F8
++#define TN40_REG_TXF_RPTR_3 0x40FC
++
++/* Hardware versioning */
++#define TN40_FPGA_VER 0x5030
++
++/* Registers from 0x0100-0x0150 were remapped to 0x5100-0x5150 */
++#define TN40_REG_ISR TN40_REG_ISR0
++#define TN40_REG_ISR0 0x5100
++
++#define TN40_REG_IMR TN40_REG_IMR0
++#define TN40_REG_IMR0 0x5110
++
++#define TN40_REG_RDINTCM0 0x5120
++#define TN40_REG_RDINTCM2 0x5128
++
++#define TN40_REG_TDINTCM0 0x5130
++
++#define TN40_REG_ISR_MSK0 0x5140
++
++#define TN40_REG_INIT_SEMAPHORE 0x5170
++#define TN40_REG_INIT_STATUS 0x5180
++
++#define TN40_REG_MAC_LNK_STAT 0x0200
++#define TN40_MAC_LINK_STAT 0x0004 /* Link state */
++
++#define TN40_REG_BLNK_LED 0x0210
++
++#define TN40_REG_GMAC_RXF_A 0x1240
++
++#define TN40_REG_UNC_MAC0_A 0x1250
++#define TN40_REG_UNC_MAC1_A 0x1260
++#define TN40_REG_UNC_MAC2_A 0x1270
++
++#define TN40_REG_VLAN_0 0x1800
++
++#define TN40_REG_MAX_FRAME_A 0x12C0
++
++#define TN40_REG_RX_MAC_MCST0 0x1A80
++#define TN40_REG_RX_MAC_MCST1 0x1A84
++#define TN40_MAC_MCST_NUM 15
++#define TN40_REG_RX_MCST_HASH0 0x1A00
++#define TN40_MAC_MCST_HASH_NUM 8
++
++#define TN40_REG_VPC 0x2300
++#define TN40_REG_VIC 0x2320
++#define TN40_REG_VGLB 0x2340
++
++#define TN40_REG_CLKPLL 0x5000
++
++/* MDIO interface */
++
++#define TN40_REG_MDIO_CMD_STAT 0x6030
++#define TN40_REG_MDIO_CMD 0x6034
++#define TN40_REG_MDIO_DATA 0x6038
++#define TN40_REG_MDIO_ADDR 0x603C
++#define TN40_GET_MDIO_BUSY(x) FIELD_GET(GENMASK(0, 0), (x))
++#define TN40_GET_MDIO_RD_ERR(x) FIELD_GET(GENMASK(1, 1), (x))
++
++#define TN40_REG_REVISION 0x6000
++#define TN40_REG_SCRATCH 0x6004
++#define TN40_REG_CTRLST 0x6008
++#define TN40_REG_MAC_ADDR_0 0x600C
++#define TN40_REG_MAC_ADDR_1 0x6010
++#define TN40_REG_FRM_LENGTH 0x6014
++#define TN40_REG_PAUSE_QUANT 0x6054
++#define TN40_REG_RX_FIFO_SECTION 0x601C
++#define TN40_REG_TX_FIFO_SECTION 0x6020
++#define TN40_REG_RX_FULLNESS 0x6024
++#define TN40_REG_TX_FULLNESS 0x6028
++#define TN40_REG_HASHTABLE 0x602C
++
++#define TN40_REG_RST_PORT 0x7000
++#define TN40_REG_DIS_PORT 0x7010
++#define TN40_REG_RST_QU 0x7020
++#define TN40_REG_DIS_QU 0x7030
++
++#define TN40_REG_CTRLST_TX_ENA 0x0001
++#define TN40_REG_CTRLST_RX_ENA 0x0002
++#define TN40_REG_CTRLST_PRM_ENA 0x0010
++#define TN40_REG_CTRLST_PAD_ENA 0x0020
++
++#define TN40_REG_CTRLST_BASE (TN40_REG_CTRLST_PAD_ENA | REG_CTRLST_PRM_ENA)
++
++/* TXD TXF RXF RXD  CONFIG 0x0000 --- 0x007c */
++#define TN40_TX_RX_CFG1_BASE 0xffffffff /*0-31 */
++#define TN40_TX_RX_CFG0_BASE 0xfffff000 /*31:12 */
++#define TN40_TX_RX_CFG0_RSVD 0x00000ffc /*11:2 */
++#define TN40_TX_RX_CFG0_SIZE 0x00000003 /*1:0 */
++
++/* TXD TXF RXF RXD  WRITE 0x0080 --- 0x00BC */
++#define TN40_TXF_WPTR_WR_PTR 0x00007ff8 /*14:3 */
++
++/* TXD TXF RXF RXD  READ  0x00CO --- 0x00FC */
++#define TN40_TXF_RPTR_RD_PTR 0x00007ff8 /*14:3 */
++
++/* The last 4 bits are dropped size is rounded to 16 */
++#define TN40_TXF_WPTR_MASK 0x7ff0
++
++/* regISR 0x0100 */
++/* regIMR 0x0110 */
++#define TN40_IMR_INPROG 0x80000000 /*31 */
++#define TN40_IR_LNKCHG1 0x10000000 /*28 */
++#define TN40_IR_LNKCHG0 0x08000000 /*27 */
++#define TN40_IR_GPIO 0x04000000 /*26 */
++#define TN40_IR_RFRSH 0x02000000 /*25 */
++#define TN40_IR_RSVD 0x01000000 /*24 */
++#define TN40_IR_SWI 0x00800000 /*23 */
++#define TN40_IR_RX_FREE_3 0x00400000 /*22 */
++#define TN40_IR_RX_FREE_2 0x00200000 /*21 */
++#define TN40_IR_RX_FREE_1 0x00100000 /*20 */
++#define TN40_IR_RX_FREE_0 0x00080000 /*19 */
++#define TN40_IR_TX_FREE_3 0x00040000 /*18 */
++#define TN40_IR_TX_FREE_2 0x00020000 /*17 */
++#define TN40_IR_TX_FREE_1 0x00010000 /*16 */
++#define TN40_IR_TX_FREE_0 0x00008000 /*15 */
++#define TN40_IR_RX_DESC_3 0x00004000 /*14 */
++#define TN40_IR_RX_DESC_2 0x00002000 /*13 */
++#define TN40_IR_RX_DESC_1 0x00001000 /*12 */
++#define TN40_IR_RX_DESC_0 0x00000800 /*11 */
++#define TN40_IR_PSE 0x00000400 /*10 */
++#define TN40_IR_TMR3 0x00000200 /* 9 */
++#define TN40_IR_TMR2 0x00000100 /* 8 */
++#define TN40_IR_TMR1 0x00000080 /* 7 */
++#define TN40_IR_TMR0 0x00000040 /* 6 */
++#define TN40_IR_VNT 0x00000020 /* 5 */
++#define TN40_IR_RxFL 0x00000010 /* 4 */
++#define TN40_IR_SDPERR 0x00000008 /* 3 */
++#define TN40_IR_TR 0x00000004 /* 2 */
++#define TN40_IR_PCIE_LINK 0x00000002 /* 1 */
++#define TN40_IR_PCIE_TOUT 0x00000001 /* 0 */
++
++#define TN40_IR_EXTRA						\
++	(TN40_IR_RX_FREE_0 | TN40_IR_LNKCHG0 | TN40_IR_LNKCHG1 |\
++	TN40_IR_PSE | TN40_IR_TMR0 | TN40_IR_PCIE_LINK |	\
++	TN40_IR_PCIE_TOUT)
++
++#define TN40_GMAC_RX_FILTER_OSEN 0x1000 /* shared OS enable */
++#define TN40_GMAC_RX_FILTER_TXFC 0x0400 /* Tx flow control */
++#define TN40_GMAC_RX_FILTER_RSV0 0x0200 /* reserved */
++#define TN40_GMAC_RX_FILTER_FDA 0x0100 /* filter out direct address */
++#define TN40_GMAC_RX_FILTER_AOF 0x0080 /* accept over run */
++#define TN40_GMAC_RX_FILTER_ACF 0x0040 /* accept control frames */
++#define TN40_GMAC_RX_FILTER_ARUNT 0x0020 /* accept under run */
++#define TN40_GMAC_RX_FILTER_ACRC 0x0010 /* accept crc error */
++#define TN40_GMAC_RX_FILTER_AM 0x0008 /* accept multicast */
++#define TN40_GMAC_RX_FILTER_AB 0x0004 /* accept broadcast */
++#define TN40_GMAC_RX_FILTER_PRM 0x0001 /* [0:1] promiscuous mode */
++
++#define TN40_MAX_FRAME_AB_VAL 0x3fff /* 13:0 */
++
++#define TN40_CLKPLL_PLLLKD 0x0200 /* 9 */
++#define TN40_CLKPLL_RSTEND 0x0100 /* 8 */
++#define TN40_CLKPLL_SFTRST 0x0001 /* 0 */
++
++#define TN40_CLKPLL_LKD (TN40_CLKPLL_PLLLKD | TN40_CLKPLL_RSTEND)
++
++#endif
 -- 
 2.34.1
 
