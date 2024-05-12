@@ -1,119 +1,135 @@
-Return-Path: <netdev+bounces-95785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E216D8C36DE
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 16:47:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD1DD8C3715
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 17:32:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B823281313
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 14:47:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 668091F21499
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 15:32:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B630286A6;
-	Sun, 12 May 2024 14:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2761840879;
+	Sun, 12 May 2024 15:32:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="dcOku1iw"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="b9aNPznu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99CC025634
-	for <netdev@vger.kernel.org>; Sun, 12 May 2024 14:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BF81C683
+	for <netdev@vger.kernel.org>; Sun, 12 May 2024 15:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715525252; cv=none; b=YYt8tEVb5dwtI++U+zTqfqwrOC4AtVXdyC5ST1k7rz3Gagje1K9ruKfP2ckPHqZp9EWKmKqlgoXhhUWSeCt/i9g23PjmJg8yfTzBH8W/oN3g8UJBSZXDlcX6NzQTE02H7axjxMM29Q8YxrdFO/nEjgy8gUSGDW2Un42VGcxsRwU=
+	t=1715527935; cv=none; b=HTNpMqaKCnXOmPKlP9qxQDM2ryH6kd0XRh0XqQLpKhVRtehyWSwTFNeAWIlbDuL+0wQl/20daVM5Lh+FRxywIYN96GepOZI2M5uPYl9puCrYm94XVJO8h/en2KdZ/8UIfYnHfU8GY6JkCi7TVTDYHz4fBLwfVkjXWl3J/vocaKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715525252; c=relaxed/simple;
-	bh=2h73f+YoVF20maKnKYlAZePCDDWtdY1CTLXHGhRiLlc=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Vvlogi872tcn8V+vK6mJGEK8jayV+V4uPXmhOjbWIwewsOWtiscHaUudeikYP00QToQFjziptcz8gad6YyH5HQRxQhPrMemUOYi28Dkq6q0ocXW5ONr3Hcnt8oRiROv5FBdTvA6wCDZT1esvEYvCrq2GLULunfdmtiSPVsGGnGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=dcOku1iw; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1s6ATr-009lKq-Uv; Sun, 12 May 2024 16:47:15 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=GFfvTZkwZFzDKo3CbPkWJqVb8zZQKoB69i1Hzgya63E=; b=dcOku1iw2UdAh4RAjQz8gIjy1w
-	Ew0FHchPJsRU00i8rJYr4VYetclKKtVs2FmaAnGkjBh0lNIwjDHFjcua3ukGB3vSS5n6MsMhGGXuP
-	gl5wn7AfTFG6Tj3EreLHwypWSQlIZZBHVOr3YKECQTavuxIIStxBuH0cYy/dvtlKXpPyGIA49GLFg
-	L3Pmuy8Z0M8cyq0ieqcApAZ/r3ERU7Gq1LMSPj1y7uHLA1VSp8RXNnFjVGCeo5giVNQ2pyqBOEXQb
-	icZMYWL6HlQ4pyp3Tz+8uK/D5hwwriCg4krnqhqOeCSrqerUAK+Vl8nB0TA8dsC+ZYZBszLx6knTL
-	VG5Q7Zxw==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1s6ATr-0003bk-2D; Sun, 12 May 2024 16:47:15 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1s6ATo-003PPY-CW; Sun, 12 May 2024 16:47:12 +0200
-Message-ID: <5670c1c4-985d-4e87-9732-ad1cc59bc8db@rbox.co>
-Date: Sun, 12 May 2024 16:47:11 +0200
+	s=arc-20240116; t=1715527935; c=relaxed/simple;
+	bh=c/xR6XWd0ZJ2Apihi/VXSlbxsQFdOfpx1NEcoN7iM1A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TtLdrRhfNHjdh4QFvqsA69powNY0m5hDTXLjfpSj/jp0dNMQd+Rk8mLgoJZ/BZDNYNlurIJNVzRunm/AvZNFDy3oh+CEJzZgHM/NysFREVNlo5dlqzQ2IQpBhCQPhPoQ0HMFo6ZUdEW4uufnqQV1+FnvuPZCzxYhGWtyronmnJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=b9aNPznu; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-792b8bca915so359661385a.2
+        for <netdev@vger.kernel.org>; Sun, 12 May 2024 08:32:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1715527932; x=1716132732; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0efAPLV7gJorXuDH/HsiT6gIfHOKo8TmSCEI2yyuMFQ=;
+        b=b9aNPznu8DLUvLVOpFdxSCp037hBpS1wchBMrc9ocgVegPi9Fz4P/QowVRwqtmuCDh
+         BtEJIT4l7kX9aWVfDzEukPLA7NOooHfToaCJZUBETD+4GYRXcnPxST2pjUfRIhCaqyXa
+         MS/71JyfLm90aAz0rACx9H4ElFucV/OflJJTl3mIRCm8ATbIQW4GCfO2KrPlm1+MgONj
+         9CIhSBJcdoykJLBbTK2oZ9ZpRG0J1jclVxjL+WROzDYY5G2DMWNslJAmL9pBOKxnsyt2
+         mq8baz4VnSv+0Z+NOG/DjRlXTK7blVuaOyJftshRhc/CKK7Dge6HjaAGH2T+3OgLazDK
+         TjjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715527932; x=1716132732;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0efAPLV7gJorXuDH/HsiT6gIfHOKo8TmSCEI2yyuMFQ=;
+        b=I4zq2AGfzQ6tgLqMBu3rb7CDPLJSeOa1CX+Qrr2dPi9DWn0KEVB2N/upaQb9ghdpe5
+         0NZZG7Ly4x67IkpQqXKaIX2YpJMe3gyBjCmHacD+n2MYOtuCGUNijcE9pRuDj2QAO55k
+         0KH3lESurEpbYI0uR2kPKLxNXrnGvfZJviOU2eCNlxSsd/Xe6J11VEm3JzlP4I2LuQqo
+         uD6Tjr17DqcfLRi9V6IV95cy+3qVYwD2S9pEZJXd/mYaT2Eqr3Ry8YGEL7laoSy3bwJz
+         aULC78I5w89uHhUXibqtX0eEzkeDdfKOtYLZv743Rik0xOQpsuDY8Q/Cr3myJ15hHHAh
+         t09Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX6vEeDuaalBNNNxBAguuwYuz9pONSQ0gPNj0pphXAg0kWP5MbpXgoGY2spQEjWqTP8CpogwH9croWfLBCrWSEGHyFWjhXf
+X-Gm-Message-State: AOJu0YwDM49bO/+iY9SSJCIaWGolkRr7TcNXpM100v6B4Q1PwKOWFvdk
+	Zj1VKSL9RYf1iL+MgYkXTP9msnpP1ZWLd0ukSd5/hKA7ij8CoMOpQ8hiaSboDNQ=
+X-Google-Smtp-Source: AGHT+IF6ABeDSAxVTyR4eCJ86ITbHVICbjDvsIz9fFFVAp47oxU8ErURGU+awbml0lKGxv/RxMvDfA==
+X-Received: by 2002:a05:620a:3bc4:b0:790:fc71:26ec with SMTP id af79cd13be357-792c75ffcd1mr883079885a.48.1715527932515;
+        Sun, 12 May 2024 08:32:12 -0700 (PDT)
+Received: from ziepe.ca ([205.220.129.230])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-792bf280390sm373982785a.35.2024.05.12.08.32.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 May 2024 08:32:11 -0700 (PDT)
+Received: from jgg by jggl with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1s6BBA-0003W4-S6;
+	Sun, 12 May 2024 12:32:00 -0300
+Date: Sun, 12 May 2024 12:32:00 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Greg KH <gregkh@linuxfoundation.org>, Shay Drory <shayd@nvidia.com>,
+	netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	kuba@kernel.org, edumazet@google.com, david.m.ertman@intel.com,
+	rafael@kernel.org, ira.weiny@intel.com, linux-rdma@vger.kernel.org,
+	leon@kernel.org, tariqt@nvidia.com, Parav Pandit <parav@nvidia.com>
+Subject: Re: [PATCH net-next v4 1/2] driver core: auxiliary bus: show
+ auxiliary device IRQs
+Message-ID: <ZkDg8Aj/TdOqFwqf@ziepe.ca>
+References: <20240509091411.627775-1-shayd@nvidia.com>
+ <20240509091411.627775-2-shayd@nvidia.com>
+ <2024051056-encrypt-divided-30d2@gregkh>
+ <22533dbb-3be9-4ff2-9b59-b3d6a650f7b3@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH v2 net] af_unix: Update unix_sk(sk)->oob_skb under
- sk_receive_queue lock.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- Billy Jheng Bing-Jhong <billy@starlabs.sg>
-References: <20240510093905.25510-1-kuniyu@amazon.com>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <20240510093905.25510-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <22533dbb-3be9-4ff2-9b59-b3d6a650f7b3@intel.com>
 
-On 5/10/24 11:39, Kuniyuki Iwashima wrote:
-> @@ -2655,6 +2661,8 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
->  		consume_skb(skb);
->  		skb = NULL;
->  	} else {
-> +		spin_lock(&sk->sk_receive_queue.lock);
-> +
->  		if (skb == u->oob_skb) {
->  			if (copied) {
->  				skb = NULL;
-> @@ -2666,13 +2674,15 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
->  			} else if (flags & MSG_PEEK) {
->  				skb = NULL;
->  			} else {
-> -				skb_unlink(skb, &sk->sk_receive_queue);
-> +				__skb_unlink(skb, &sk->sk_receive_queue);
->  				WRITE_ONCE(u->oob_skb, NULL);
->  				if (!WARN_ON_ONCE(skb_unref(skb)))
->  					kfree_skb(skb);
->  				skb = skb_peek(&sk->sk_receive_queue);
->  			}
->  		}
-> +
-> +		spin_unlock(&sk->sk_receive_queue.lock);
->  	}
->  	return skb;
->  }
+On Fri, May 10, 2024 at 02:54:49PM +0200, Przemek Kitszel wrote:
+> > > +	refcount_set(new_ref, 1);
+> > > +	ref = __xa_cmpxchg(&irqs, irq, NULL, new_ref, GFP_KERNEL);
+> > > +	if (ref) {
+> > > +		kfree(new_ref);
+> > > +		if (xa_is_err(ref)) {
+> > > +			ret = xa_err(ref);
+> > > +			goto out;
+> > > +		}
+> > > +
+> > > +		/* Another thread beat us to creating the enrtry. */
+> > > +		refcount_inc(ref);
+> > 
+> > How can that happen?  Why not just use a normal simple lock for all of
+> > this so you don't have to mess with refcounts at all?  This is not
+> > performance-relevent code at all, but yet with a refcount you cause
+> > almost the same issues that a normal lock would have, plus the increased
+> > complexity of all of the surrounding code (like this, and the crazy
+> > __xa_cmpxchg() call)
+> > 
+> > Make this simple please.
+> 
+> I find current API of xarray not ideal for this use case, and would like
+> to fix it, but let me write a proper RFC to don't derail (or slow down)
+> this series.
 
-Now it is
-  
-  spin_lock(&sk->sk_receive_queue.lock)
-  kfree_skb
-    unix_destruct_scm
-      unix_notinflight
-        spin_lock(&unix_gc_lock)
+I think xarray can do this just fine already??
 
-I.e. sk_receive_queue.lock -> unix_gc_lock, inversion of what unix_gc() does.
-But that's benign, right?
+xa_lock(&irqs);
+used = xa_to_value(xa_load(&irqs, irq));
+used++;
+ret = xa_store(&irqs, irq, xa_mk_value(used));
+xa_unlock(&irqs);
 
-thanks,
-Michal
+And you can safely read the value using the typical xa_load RCU locking.
+
+Jason
 
