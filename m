@@ -1,90 +1,91 @@
-Return-Path: <netdev+bounces-95786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD1DD8C3715
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 17:32:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AA968C3731
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 18:02:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 668091F21499
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 15:32:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 055A8281416
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 16:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2761840879;
-	Sun, 12 May 2024 15:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050F640BE3;
+	Sun, 12 May 2024 16:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="b9aNPznu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iHbcPriN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BF81C683
-	for <netdev@vger.kernel.org>; Sun, 12 May 2024 15:32:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5293D2E85E
+	for <netdev@vger.kernel.org>; Sun, 12 May 2024 16:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715527935; cv=none; b=HTNpMqaKCnXOmPKlP9qxQDM2ryH6kd0XRh0XqQLpKhVRtehyWSwTFNeAWIlbDuL+0wQl/20daVM5Lh+FRxywIYN96GepOZI2M5uPYl9puCrYm94XVJO8h/en2KdZ/8UIfYnHfU8GY6JkCi7TVTDYHz4fBLwfVkjXWl3J/vocaKc=
+	t=1715529728; cv=none; b=UQiTEtidksMErvJMXhpFBzLcL45PrqV2AujxJKwzVzo2y8sI8VIrtJXOOxJAv+R2jTCGkJ8I9u6gUo88Ceohq1wxoI9288vWf1uAZwTU4ndJEYF+ntNuNuu7nK8wSjgk3wksI5DQb5MeJKwHfxTZwTA/08mwqjKOK1Rnljn2v08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715527935; c=relaxed/simple;
-	bh=c/xR6XWd0ZJ2Apihi/VXSlbxsQFdOfpx1NEcoN7iM1A=;
+	s=arc-20240116; t=1715529728; c=relaxed/simple;
+	bh=RxSDTegW7CO/59WWa4N5BIOvsZNO4JGLYbZ0l9O8rwk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TtLdrRhfNHjdh4QFvqsA69powNY0m5hDTXLjfpSj/jp0dNMQd+Rk8mLgoJZ/BZDNYNlurIJNVzRunm/AvZNFDy3oh+CEJzZgHM/NysFREVNlo5dlqzQ2IQpBhCQPhPoQ0HMFo6ZUdEW4uufnqQV1+FnvuPZCzxYhGWtyronmnJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=b9aNPznu; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-792b8bca915so359661385a.2
-        for <netdev@vger.kernel.org>; Sun, 12 May 2024 08:32:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1715527932; x=1716132732; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0efAPLV7gJorXuDH/HsiT6gIfHOKo8TmSCEI2yyuMFQ=;
-        b=b9aNPznu8DLUvLVOpFdxSCp037hBpS1wchBMrc9ocgVegPi9Fz4P/QowVRwqtmuCDh
-         BtEJIT4l7kX9aWVfDzEukPLA7NOooHfToaCJZUBETD+4GYRXcnPxST2pjUfRIhCaqyXa
-         MS/71JyfLm90aAz0rACx9H4ElFucV/OflJJTl3mIRCm8ATbIQW4GCfO2KrPlm1+MgONj
-         9CIhSBJcdoykJLBbTK2oZ9ZpRG0J1jclVxjL+WROzDYY5G2DMWNslJAmL9pBOKxnsyt2
-         mq8baz4VnSv+0Z+NOG/DjRlXTK7blVuaOyJftshRhc/CKK7Dge6HjaAGH2T+3OgLazDK
-         TjjA==
+	 Content-Type:Content-Disposition:In-Reply-To; b=DiQzWnejXqZG/b8I2NeaKeHG7GhYL93d2oqlYemuarzbCf7Nzh7O8eTBmPuxyujiQZgq5Di52DBT+/XqJNnBLF046nbn9YLC5u8Z22l823vrbtmDDI5aRCGwefITd1+o1BGfKGhN/rkRfnpUwqx75Xfp4WKNMWwAQqoFSEIZUxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iHbcPriN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715529726;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AxLpy9sLIlZS5JyNf+AGoRDlBshQGmESMZNZDTclcZQ=;
+	b=iHbcPriNanALp+OLxsD4SNNopdTs4ja5WfF1PZGv78NmeUC9g3g88yelbNJZ+6lGbINCeb
+	bDf8RlTNjrmuz2pOZG/uC5b0ypDRtJO/+/SL7AmXq+lUO+iA5QNheQ8HWRu6/tC1OTSqLQ
+	lBBSxpHpVA3me2ksvSRSToE8xdk6Nic=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-651-f3-ZAIStNbuO_HfRc-AVDw-1; Sun, 12 May 2024 12:02:04 -0400
+X-MC-Unique: f3-ZAIStNbuO_HfRc-AVDw-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a59a1fe7396so238290666b.3
+        for <netdev@vger.kernel.org>; Sun, 12 May 2024 09:02:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715527932; x=1716132732;
+        d=1e100.net; s=20230601; t=1715529723; x=1716134523;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0efAPLV7gJorXuDH/HsiT6gIfHOKo8TmSCEI2yyuMFQ=;
-        b=I4zq2AGfzQ6tgLqMBu3rb7CDPLJSeOa1CX+Qrr2dPi9DWn0KEVB2N/upaQb9ghdpe5
-         0NZZG7Ly4x67IkpQqXKaIX2YpJMe3gyBjCmHacD+n2MYOtuCGUNijcE9pRuDj2QAO55k
-         0KH3lESurEpbYI0uR2kPKLxNXrnGvfZJviOU2eCNlxSsd/Xe6J11VEm3JzlP4I2LuQqo
-         uD6Tjr17DqcfLRi9V6IV95cy+3qVYwD2S9pEZJXd/mYaT2Eqr3Ry8YGEL7laoSy3bwJz
-         aULC78I5w89uHhUXibqtX0eEzkeDdfKOtYLZv743Rik0xOQpsuDY8Q/Cr3myJ15hHHAh
-         t09Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX6vEeDuaalBNNNxBAguuwYuz9pONSQ0gPNj0pphXAg0kWP5MbpXgoGY2spQEjWqTP8CpogwH9croWfLBCrWSEGHyFWjhXf
-X-Gm-Message-State: AOJu0YwDM49bO/+iY9SSJCIaWGolkRr7TcNXpM100v6B4Q1PwKOWFvdk
-	Zj1VKSL9RYf1iL+MgYkXTP9msnpP1ZWLd0ukSd5/hKA7ij8CoMOpQ8hiaSboDNQ=
-X-Google-Smtp-Source: AGHT+IF6ABeDSAxVTyR4eCJ86ITbHVICbjDvsIz9fFFVAp47oxU8ErURGU+awbml0lKGxv/RxMvDfA==
-X-Received: by 2002:a05:620a:3bc4:b0:790:fc71:26ec with SMTP id af79cd13be357-792c75ffcd1mr883079885a.48.1715527932515;
-        Sun, 12 May 2024 08:32:12 -0700 (PDT)
-Received: from ziepe.ca ([205.220.129.230])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-792bf280390sm373982785a.35.2024.05.12.08.32.11
+        bh=AxLpy9sLIlZS5JyNf+AGoRDlBshQGmESMZNZDTclcZQ=;
+        b=IAxHrOyPFvUk1UUCLrfXEtIBRGu4kT+JgGgJlphxs7kyt8yqsSY5dMJgona6g/ybTk
+         1xXBlwjrt8ej8/1i8tYTNiS7x5Cdg87ADcdGaWS46a5pV3uVgC27zygb3+pj8W2rXQD9
+         PeefGZwPmB/pULNmkK/5REQE85F3fNG4H86pUzTZUDWNip97D6PG2oeAPKTn4+dEI/e+
+         x/1JlJpwVouaZbst+Hv2zCwoAnv8mfM1paKtCPA3NHylO0IY9453cp7KTeze2mpXGDQs
+         aHyJXR1PdTu71cX+GAVxgnpTNts4I3AiB1dFWo3bxzF4YPwICe5t2JJCr4oTQxN1v4xZ
+         uJYA==
+X-Forwarded-Encrypted: i=1; AJvYcCW6p1Vo7fvsLOoNVVhbF9Bxg12SlGUWgXDNvv+zbUyiiDFCsG0rLe2WxJAhImMEmo+SICpOC07p3ZbDHxHhAl1JLeL45jcK
+X-Gm-Message-State: AOJu0YwO5yA1g72Om72Aq1pnJenItI2Ayr60iPt3KZJ6wuSFcgT2Bq39
+	iG7rQy93ctXH0zfIwwICJwEOphL87zkPpvVaoF03XGDnOHuetm14+fZUdhL7X/qunSd6fmHHvvt
+	nHLG+Vy/g8mns6nhDLXck21yvuIS2u5VWVHcyNESmsSE0BXB3x/uGdQ==
+X-Received: by 2002:a17:906:c405:b0:a59:c319:f1e0 with SMTP id a640c23a62f3a-a5a2d681e12mr464655466b.75.1715529723151;
+        Sun, 12 May 2024 09:02:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFRCDOgxb5kjSSoH51C64l7LHObzt/SMo/s+DeV5DWeoHqnDcKMdPA3OGfhMkwQa5PjbfnFNQ==
+X-Received: by 2002:a17:906:c405:b0:a59:c319:f1e0 with SMTP id a640c23a62f3a-a5a2d681e12mr464653366b.75.1715529722576;
+        Sun, 12 May 2024 09:02:02 -0700 (PDT)
+Received: from redhat.com ([31.187.78.166])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a1b602b39sm455227466b.50.2024.05.12.09.01.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 May 2024 08:32:11 -0700 (PDT)
-Received: from jgg by jggl with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1s6BBA-0003W4-S6;
-	Sun, 12 May 2024 12:32:00 -0300
-Date: Sun, 12 May 2024 12:32:00 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, Shay Drory <shayd@nvidia.com>,
-	netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	kuba@kernel.org, edumazet@google.com, david.m.ertman@intel.com,
-	rafael@kernel.org, ira.weiny@intel.com, linux-rdma@vger.kernel.org,
-	leon@kernel.org, tariqt@nvidia.com, Parav Pandit <parav@nvidia.com>
-Subject: Re: [PATCH net-next v4 1/2] driver core: auxiliary bus: show
- auxiliary device IRQs
-Message-ID: <ZkDg8Aj/TdOqFwqf@ziepe.ca>
-References: <20240509091411.627775-1-shayd@nvidia.com>
- <20240509091411.627775-2-shayd@nvidia.com>
- <2024051056-encrypt-divided-30d2@gregkh>
- <22533dbb-3be9-4ff2-9b59-b3d6a650f7b3@intel.com>
+        Sun, 12 May 2024 09:02:01 -0700 (PDT)
+Date: Sun, 12 May 2024 12:01:55 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net-next] virtio_net: Fix error code in
+ __virtnet_get_hw_stats()
+Message-ID: <20240512115645-mutt-send-email-mst@kernel.org>
+References: <3762ac53-5911-4792-b277-1f1ead2e90a3@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,43 +94,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <22533dbb-3be9-4ff2-9b59-b3d6a650f7b3@intel.com>
+In-Reply-To: <3762ac53-5911-4792-b277-1f1ead2e90a3@moroto.mountain>
 
-On Fri, May 10, 2024 at 02:54:49PM +0200, Przemek Kitszel wrote:
-> > > +	refcount_set(new_ref, 1);
-> > > +	ref = __xa_cmpxchg(&irqs, irq, NULL, new_ref, GFP_KERNEL);
-> > > +	if (ref) {
-> > > +		kfree(new_ref);
-> > > +		if (xa_is_err(ref)) {
-> > > +			ret = xa_err(ref);
-> > > +			goto out;
-> > > +		}
-> > > +
-> > > +		/* Another thread beat us to creating the enrtry. */
-> > > +		refcount_inc(ref);
-> > 
-> > How can that happen?  Why not just use a normal simple lock for all of
-> > this so you don't have to mess with refcounts at all?  This is not
-> > performance-relevent code at all, but yet with a refcount you cause
-> > almost the same issues that a normal lock would have, plus the increased
-> > complexity of all of the surrounding code (like this, and the crazy
-> > __xa_cmpxchg() call)
-> > 
-> > Make this simple please.
+On Fri, May 10, 2024 at 03:50:45PM +0300, Dan Carpenter wrote:
+> The virtnet_send_command_reply() function returns true on success or
+> false on failure.  The "ok" variable is true/false depending on whether
+> it succeeds or not.  It's up to the caller to translate the true/false
+> into -EINVAL on failure or zero for success.
 > 
-> I find current API of xarray not ideal for this use case, and would like
-> to fix it, but let me write a proper RFC to don't derail (or slow down)
-> this series.
+> The bug is that __virtnet_get_hw_stats() returns false for both
+> errors and success.  It's not a bug, but it is confusing that the caller
+> virtnet_get_hw_stats() uses an "ok" variable to store negative error
+> codes.
 
-I think xarray can do this just fine already??
+The bug is ... It's not a bug ....
 
-xa_lock(&irqs);
-used = xa_to_value(xa_load(&irqs, irq));
-used++;
-ret = xa_store(&irqs, irq, xa_mk_value(used));
-xa_unlock(&irqs);
+I think what you are trying to say is that the error isn't
+really handled anyway, except for printing a warning,
+so it's not a big deal.
 
-And you can safely read the value using the typical xa_load RCU locking.
+Right?
 
-Jason
+I don't know why can't get_ethtool_stats fail - we should
+probably fix that.
+
+
+> Fix the bug and clean things up so that it's clear that
+> __virtnet_get_hw_stats() returns zero on success or negative error codes
+> on failure.
+> 
+> Fixes: 941168f8b40e ("virtio_net: support device stats")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  drivers/net/virtio_net.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 218a446c4c27..4fc0fcdad259 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -4016,7 +4016,7 @@ static int __virtnet_get_hw_stats(struct virtnet_info *vi,
+>  					&sgs_out, &sgs_in);
+>  
+>  	if (!ok)
+> -		return ok;
+> +		return -EINVAL;
+>  
+>  	for (p = reply; p - reply < res_size; p += le16_to_cpu(hdr->size)) {
+>  		hdr = p;
+> @@ -4053,7 +4053,7 @@ static int virtnet_get_hw_stats(struct virtnet_info *vi,
+>  	struct virtio_net_ctrl_queue_stats *req;
+>  	bool enable_cvq;
+>  	void *reply;
+> -	int ok;
+> +	int err;
+>  
+>  	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_DEVICE_STATS))
+>  		return 0;
+> @@ -4100,12 +4100,12 @@ static int virtnet_get_hw_stats(struct virtnet_info *vi,
+>  	if (enable_cvq)
+>  		virtnet_make_stat_req(vi, ctx, req, vi->max_queue_pairs * 2, &j);
+>  
+> -	ok = __virtnet_get_hw_stats(vi, ctx, req, sizeof(*req) * j, reply, res_size);
+> +	err = __virtnet_get_hw_stats(vi, ctx, req, sizeof(*req) * j, reply, res_size);
+>  
+>  	kfree(req);
+>  	kfree(reply);
+>  
+> -	return ok;
+> +	return err;
+>  }
+>  
+>  static void virtnet_get_strings(struct net_device *dev, u32 stringset, u8 *data)
+
 
