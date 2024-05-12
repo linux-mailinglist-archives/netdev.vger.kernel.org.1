@@ -1,338 +1,295 @@
-Return-Path: <netdev+bounces-95768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F128C35D0
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 11:03:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3110A8C35D9
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 11:26:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42057B20DD5
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 09:03:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6156FB20E43
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 09:26:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A761C6A4;
-	Sun, 12 May 2024 09:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9BD1C2AD;
+	Sun, 12 May 2024 09:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BzNHVPxk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IzOIFnxu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14DE1F956
-	for <netdev@vger.kernel.org>; Sun, 12 May 2024 09:02:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D605DDC5;
+	Sun, 12 May 2024 09:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715504569; cv=none; b=HaIo2X0jv/+J3n8cLc7ggp3ITt167nZw6Q+jKjSec6F4VfX6iW9LE7yogtnqWZfdpEuchdrUPSWHyruiQtBjy4rsLXcDw5i2u7FUOZy+fwNo+tluIJUPVhjgCQCZuQqNl+XwWPYKKnWfVfOswrt6E+Sy3owPeVLvOZiQ5kLrjLc=
+	t=1715505957; cv=none; b=fUL5JYy2alBTTemfIb1qYABgWunewMtuxilrBs89NQsJ9fVTRrIIivDmHxhZwp523ZeBjh3CBKXk9cKnzPxV+UTqJokIhmj3a0CBIUhvOep05/ZWu8Z5AZJNpHOGZJsP3thgV+yjLBUbafa+3jSE5Oz4KjSwUNTx3qPAyuxVTFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715504569; c=relaxed/simple;
-	bh=W3M/gfvP5bqnJmvi0hY/FRJiYojpphPQ+RoSociOSx8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jXT6CotSwftDuJTvoXT+sf6pV6fvPDj6Ne4t6WmICI6wxKt8VbDkPzElunz3v8Yo5OfwvMH/zVW6tpA+g0GtqNzRQL2zAj+74SvaR5gum2KKQyVBXyzkRLADbXeDZFqvtQbX7Spc8emxinS+Gpye7v9TXZDy7efXJLxL3Yn7fV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BzNHVPxk; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ab48c14334so896076a91.3
-        for <netdev@vger.kernel.org>; Sun, 12 May 2024 02:02:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715504567; x=1716109367; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HxyOSlxLAkRHbwFPTytufrAZCZr/e1pBezOWlK9xQIU=;
-        b=BzNHVPxkiosgJ3pv5G8p6kxgmYAFQINaFdwzVr9w7IAXKit5FZ1fV/gkotl8/+WmSF
-         dAL73ttFRTFqbMysqP3zZ0ZDbyAvYn0cMCsjCYwqbTHJhL3rMEdcmhKzRHrjshl43DBs
-         Q/7bQsbpqN5GXXOJ5VWXNJ9sG7vkFEWV8G9AeWZB+9XifRw7xGbWRGNstvzgthEH9W9Y
-         E4msZaYkQwBPTijtuthFB+Xt2uLFPS572ZtPKBuLLAR9fEXlwfywlLQLfTE+Ok7JKZUz
-         pNrn2ORE0bjZxMpy6FPatgRPOnb7uvqCC2uwGSQdRe/gJDhi4L8omPRva7Wpc77LOyDg
-         9ZlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715504567; x=1716109367;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HxyOSlxLAkRHbwFPTytufrAZCZr/e1pBezOWlK9xQIU=;
-        b=DUIncJEuB1gbEvVbmpEzbB82omn4WqqSqeQD4IuhigZAjt0Zp68ipxIGzznnIlV85B
-         rC4P2j49Zanlx5/v9bh84xT0AWF2pEsCK8BRtp0RsiCnos1YiZoIpFlEKfQR5J+U1B9x
-         7yvIsmHjQ8k9hgrfr0qQbMZXhEcME5xaYv7kzVQQU97CpVcyeKQlA+IO8KnVveYgIfNg
-         /XImegWTmer1RCH4gWNYbhKnBxJRmlhcI9ZQoEr0I52BloCx/3b4fepRO7lTO1VMKvy3
-         sXssMUPmp4X2FWzjmmuBtjbXc0hozc8MWefRMvKmjWb2o9khCfcKkx9c3Q+KFi656r0e
-         1t/w==
-X-Gm-Message-State: AOJu0YysigIXpqmq2Epy7j9xWwkHb+lJdqc69RIWhHKbExWMSioTG27H
-	DHkcpHRvGQy8n1fGx7DTorL/9585BwShDahLeszCJl411DG9GmbbuOwg0WKn
-X-Google-Smtp-Source: AGHT+IHzAnz28uxP2s92O1MfVyct8FFw+uUi5uUXzq+GcK+PRguh8ZJANvzUfA6jw44UIrFbkPlm8g==
-X-Received: by 2002:a05:6a00:3c5a:b0:6ed:cc50:36cd with SMTP id d2e1a72fcca58-6f4e02f5e58mr7442130b3a.2.1715504566809;
-        Sun, 12 May 2024 02:02:46 -0700 (PDT)
-Received: from rpi.. (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4fff45ce3sm219915b3a.197.2024.05.12.02.02.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 May 2024 02:02:46 -0700 (PDT)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch,
-	horms@kernel.org,
-	kuba@kernel.org,
-	jiri@resnulli.us,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	hfdevel@gmx.net
-Subject: [PATCH net-next v6 6/6] net: tn40xx: add phylink support
-Date: Sun, 12 May 2024 17:56:11 +0900
-Message-Id: <20240512085611.79747-7-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240512085611.79747-1-fujita.tomonori@gmail.com>
-References: <20240512085611.79747-1-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1715505957; c=relaxed/simple;
+	bh=BWXKzgg+yOLk4OIGEuHf6i8solH3Ag+HeQXOT9fuYbA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DXdvNa6Cei1/45vz4ERcR9H0o39SfcsOm/wRLCCZQ2t2cZ6AIZTwIwTq7TMmCSZLqgORmHW4PAf9NUX4XKBSnCsrlGVrDOUS6fGXYtqJGqyV4qYF2RyBEmWcCi+i826ZsUt+EZ/mVknyoZKiiFtQsGoIGLpgk7Vyc223Bd2eZBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IzOIFnxu; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715505955; x=1747041955;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BWXKzgg+yOLk4OIGEuHf6i8solH3Ag+HeQXOT9fuYbA=;
+  b=IzOIFnxup1VEd2WZEzc02fqdFNAuBtxXme4hVcK8AsbLWCup9L3hmgX9
+   uFvb/ZcuRWrEPuIOqBsm8kL9iGne75U9R2248lGq98kv94Mf4r4oV1Mti
+   9hPwOLM52GQlCGbCogB8RiZuoYg2P4ndrapdWsvCQ1rFfXZr/3yrZRTk0
+   GPXq7kjePdWyRiZ/ZYK5Jvg6H4UUI2TUYV8ywjxHwuuHoQO8x9Hbunx2a
+   rtzC757q4auhgPLVFJqqQ4dmmmdkWBYqqPZUxsEew7UjrKSeTUObpe50S
+   1fDKcZlaS012+zz6GcTGPEaFRoJbIVPMcuZKBQv2KyreBvQDI1OgO9UOi
+   w==;
+X-CSE-ConnectionGUID: y5lg7lC7QsiMxjyfgShdNQ==
+X-CSE-MsgGUID: u+ugA2MiQdWsEZY6yV5pEQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11070"; a="11279149"
+X-IronPort-AV: E=Sophos;i="6.08,155,1712646000"; 
+   d="scan'208";a="11279149"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2024 02:25:54 -0700
+X-CSE-ConnectionGUID: PIBJgVICT6mGNG6Do7mq0w==
+X-CSE-MsgGUID: QYL8+nNQTK6lTlUTZ/WJ+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,155,1712646000"; 
+   d="scan'208";a="30180623"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 12 May 2024 02:25:50 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s65Sl-0008TZ-0U;
+	Sun, 12 May 2024 09:25:47 +0000
+Date: Sun, 12 May 2024 17:25:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	gregkh@linuxfoundation.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	johannes@sipsolutions.net, philipp.g.hortmann@gmail.com,
+	tdavies@darkphysics.net, garyrookard@fastmail.org,
+	straube.linux@gmail.com
+Cc: oe-kbuild-all@lists.linux.dev, linux-staging@lists.linux.dev,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH 1/3] lib80211: Handle const struct lib80211_crypto_ops in
+ lib80211
+Message-ID: <202405121630.0zJQqloS-lkp@intel.com>
+References: <d6306f7c76015653e9539ddbcd1ed74d1681a98f.1715443223.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d6306f7c76015653e9539ddbcd1ed74d1681a98f.1715443223.git.christophe.jaillet@wanadoo.fr>
 
-This patch adds supports for multiple PHY hardware with phylink. The
-adapters with TN40xx chips use multiple PHY hardware; AMCC QT2025, TI
-TLK10232, Aqrate AQR105, and Marvell 88X3120, 88X3310, and MV88E2010.
+Hi Christophe,
 
-For now, the PCI ID table of this driver enables adapters using only
-QT2025 PHY. I've tested this driver and the QT2025 PHY driver (SFP+
-10G SR) with Edimax EN-9320 10G adapter.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
----
- drivers/net/ethernet/tehuti/Kconfig    |  1 +
- drivers/net/ethernet/tehuti/Makefile   |  2 +-
- drivers/net/ethernet/tehuti/tn40.c     | 29 ++++++++--
- drivers/net/ethernet/tehuti/tn40.h     |  8 +++
- drivers/net/ethernet/tehuti/tn40_phy.c | 73 ++++++++++++++++++++++++++
- 5 files changed, 109 insertions(+), 4 deletions(-)
- create mode 100644 drivers/net/ethernet/tehuti/tn40_phy.c
+[auto build test WARNING on staging/staging-testing]
+[also build test WARNING on staging/staging-next staging/staging-linus wireless-next/main wireless/main linus/master v6.9-rc7 next-20240510]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/drivers/net/ethernet/tehuti/Kconfig b/drivers/net/ethernet/tehuti/Kconfig
-index 4198fd59e42e..6ad5d37eb0e4 100644
---- a/drivers/net/ethernet/tehuti/Kconfig
-+++ b/drivers/net/ethernet/tehuti/Kconfig
-@@ -27,6 +27,7 @@ config TEHUTI_TN40
- 	tristate "Tehuti Networks TN40xx 10G Ethernet adapters"
- 	depends on PCI
- 	select FW_LOADER
-+	select PHYLINK
- 	help
- 	  This driver supports 10G Ethernet adapters using Tehuti Networks
- 	  TN40xx chips. Currently, adapters with Applied Micro Circuits
-diff --git a/drivers/net/ethernet/tehuti/Makefile b/drivers/net/ethernet/tehuti/Makefile
-index 7a0fe586a243..0d4f4d63a65c 100644
---- a/drivers/net/ethernet/tehuti/Makefile
-+++ b/drivers/net/ethernet/tehuti/Makefile
-@@ -5,5 +5,5 @@
- 
- obj-$(CONFIG_TEHUTI) += tehuti.o
- 
--tn40xx-y := tn40.o tn40_mdio.o
-+tn40xx-y := tn40.o tn40_mdio.o tn40_phy.o
- obj-$(CONFIG_TEHUTI_TN40) += tn40xx.o
-diff --git a/drivers/net/ethernet/tehuti/tn40.c b/drivers/net/ethernet/tehuti/tn40.c
-index 38b2a1fe501a..a5d912f6dc9b 100644
---- a/drivers/net/ethernet/tehuti/tn40.c
-+++ b/drivers/net/ethernet/tehuti/tn40.c
-@@ -7,6 +7,7 @@
- #include <linux/if_vlan.h>
- #include <linux/netdevice.h>
- #include <linux/pci.h>
-+#include <linux/phylink.h>
- 
- #include "tn40.h"
- 
-@@ -1048,7 +1049,7 @@ static void tn40_tx_push_desc_safe(struct tn40_priv *priv, void *data, int size)
- 	}
- }
- 
--static int tn40_set_link_speed(struct tn40_priv *priv, u32 speed)
-+int tn40_set_link_speed(struct tn40_priv *priv, u32 speed)
- {
- 	u32 val;
- 	int i;
-@@ -1186,6 +1187,10 @@ static void tn40_link_changed(struct tn40_priv *priv)
- 				 TN40_REG_MAC_LNK_STAT) & TN40_MAC_LINK_STAT;
- 
- 	netdev_dbg(priv->ndev, "link changed %u\n", link);
-+	if (link)
-+		phylink_mac_change(priv->phylink, true);
-+	else
-+		phylink_mac_change(priv->phylink, false);
- }
- 
- static void tn40_isr_extra(struct tn40_priv *priv, u32 isr)
-@@ -1465,6 +1470,9 @@ static int tn40_close(struct net_device *ndev)
- {
- 	struct tn40_priv *priv = netdev_priv(ndev);
- 
-+	phylink_stop(priv->phylink);
-+	phylink_disconnect_phy(priv->phylink);
-+
- 	napi_disable(&priv->napi);
- 	netif_napi_del(&priv->napi);
- 	tn40_disable_interrupts(priv);
-@@ -1480,10 +1488,17 @@ static int tn40_open(struct net_device *dev)
- 	struct tn40_priv *priv = netdev_priv(dev);
- 	int ret;
- 
-+	ret = phylink_connect_phy(priv->phylink, priv->phydev);
-+	if (ret)
-+		return ret;
-+
- 	tn40_sw_reset(priv);
-+	phylink_start(priv->phylink);
- 	ret = tn40_start(priv);
- 	if (ret) {
- 		netdev_err(dev, "failed to start %d\n", ret);
-+		phylink_stop(priv->phylink);
-+		phylink_disconnect_phy(priv->phylink);
- 		return ret;
- 	}
- 	napi_enable(&priv->napi);
-@@ -1778,19 +1793,26 @@ static int tn40_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		TN40_IR_TMR1;
- 
- 	tn40_mac_init(priv);
-+	ret = tn40_phy_register(priv);
-+	if (ret) {
-+		dev_err(&pdev->dev, "failed to set up PHY.\n");
-+		goto err_free_irq;
-+	}
- 
- 	ret = tn40_priv_init(priv);
- 	if (ret) {
- 		dev_err(&pdev->dev, "failed to initialize tn40_priv.\n");
--		goto err_free_irq;
-+		goto err_unregister_phydev;
- 	}
- 
- 	ret = register_netdev(ndev);
- 	if (ret) {
- 		dev_err(&pdev->dev, "failed to register netdev.\n");
--		goto err_free_irq;
-+		goto err_unregister_phydev;
- 	}
- 	return 0;
-+err_unregister_phydev:
-+	tn40_phy_unregister(priv);
- err_free_irq:
- 	pci_free_irq_vectors(pdev);
- err_unset_drvdata:
-@@ -1811,6 +1833,7 @@ static void tn40_remove(struct pci_dev *pdev)
- 
- 	unregister_netdev(ndev);
- 
-+	tn40_phy_unregister(priv);
- 	pci_free_irq_vectors(priv->pdev);
- 	pci_set_drvdata(pdev, NULL);
- 	iounmap(priv->regs);
-diff --git a/drivers/net/ethernet/tehuti/tn40.h b/drivers/net/ethernet/tehuti/tn40.h
-index e5e3610f9b8f..e448f7ebdd48 100644
---- a/drivers/net/ethernet/tehuti/tn40.h
-+++ b/drivers/net/ethernet/tehuti/tn40.h
-@@ -159,6 +159,9 @@ struct tn40_priv {
- 
- 	struct tn40_rx_page_table rx_page_table;
- 	struct mii_bus *mdio;
-+	struct phy_device *phydev;
-+	struct phylink *phylink;
-+	struct phylink_config phylink_config;
- };
- 
- /* RX FREE descriptor - 64bit */
-@@ -238,6 +241,11 @@ static inline void tn40_write_reg(struct tn40_priv *priv, u32 reg, u32 val)
- 	writel(val, priv->regs + reg);
- }
- 
-+int tn40_set_link_speed(struct tn40_priv *priv, u32 speed);
-+
- int tn40_mdiobus_init(struct tn40_priv *priv);
- 
-+int tn40_phy_register(struct tn40_priv *priv);
-+void tn40_phy_unregister(struct tn40_priv *priv);
-+
- #endif /* _TN40XX_H */
-diff --git a/drivers/net/ethernet/tehuti/tn40_phy.c b/drivers/net/ethernet/tehuti/tn40_phy.c
-new file mode 100644
-index 000000000000..73791b260fc5
---- /dev/null
-+++ b/drivers/net/ethernet/tehuti/tn40_phy.c
-@@ -0,0 +1,73 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/* Copyright (c) Tehuti Networks Ltd. */
-+
-+#include <linux/netdevice.h>
-+#include <linux/pci.h>
-+#include <linux/phylink.h>
-+
-+#include "tn40.h"
-+
-+static void tn40_link_up(struct phylink_config *config, struct phy_device *phy,
-+			 unsigned int mode, phy_interface_t interface,
-+			 int speed, int duplex, bool tx_pause, bool rx_pause)
-+{
-+	struct net_device *ndev = to_net_dev(config->dev);
-+	struct tn40_priv *priv = netdev_priv(ndev);
-+
-+	tn40_set_link_speed(priv, speed);
-+	netif_wake_queue(priv->ndev);
-+}
-+
-+static void tn40_link_down(struct phylink_config *config, unsigned int mode,
-+			   phy_interface_t interface)
-+{
-+	struct net_device *ndev = to_net_dev(config->dev);
-+	struct tn40_priv *priv = netdev_priv(ndev);
-+
-+	tn40_set_link_speed(priv, 0);
-+	netif_stop_queue(priv->ndev);
-+}
-+
-+static void tn40_mac_config(struct phylink_config *config, unsigned int mode,
-+			    const struct phylink_link_state *state)
-+{
-+}
-+
-+static const struct phylink_mac_ops tn40_mac_ops = {
-+	.mac_config = tn40_mac_config,
-+	.mac_link_up = tn40_link_up,
-+	.mac_link_down = tn40_link_down,
-+};
-+
-+int tn40_phy_register(struct tn40_priv *priv)
-+{
-+	struct phylink_config *config;
-+	struct phy_device *phydev;
-+	struct phylink *phylink;
-+
-+	phydev = phy_find_first(priv->mdio);
-+	if (!phydev) {
-+		dev_err(&priv->pdev->dev, "PHY isn't found\n");
-+		return -1;
-+	}
-+
-+	config = &priv->phylink_config;
-+	config->dev = &priv->ndev->dev;
-+	config->type = PHYLINK_NETDEV;
-+	config->mac_capabilities = MAC_10000FD | MLO_AN_PHY;
-+	__set_bit(PHY_INTERFACE_MODE_XAUI, config->supported_interfaces);
-+
-+	phylink = phylink_create(config, NULL, PHY_INTERFACE_MODE_XAUI,
-+				 &tn40_mac_ops);
-+	if (IS_ERR(phylink))
-+		return PTR_ERR(phylink);
-+
-+	priv->phydev = phydev;
-+	priv->phylink = phylink;
-+	return 0;
-+}
-+
-+void tn40_phy_unregister(struct tn40_priv *priv)
-+{
-+	phylink_destroy(priv->phylink);
-+}
+url:    https://github.com/intel-lab-lkp/linux/commits/Christophe-JAILLET/lib80211-Handle-const-struct-lib80211_crypto_ops-in-lib80211/20240512-003642
+base:   staging/staging-testing
+patch link:    https://lore.kernel.org/r/d6306f7c76015653e9539ddbcd1ed74d1681a98f.1715443223.git.christophe.jaillet%40wanadoo.fr
+patch subject: [PATCH 1/3] lib80211: Handle const struct lib80211_crypto_ops in lib80211
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20240512/202405121630.0zJQqloS-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240512/202405121630.0zJQqloS-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405121630.0zJQqloS-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/wireless/intel/ipw2x00/libipw_wx.c: In function 'libipw_wx_set_encodeext':
+>> drivers/net/wireless/intel/ipw2x00/libipw_wx.c:587:13: warning: assignment discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+     587 |         ops = lib80211_get_crypto_ops(alg);
+         |             ^
+   drivers/net/wireless/intel/ipw2x00/libipw_wx.c:590:21: warning: assignment discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+     590 |                 ops = lib80211_get_crypto_ops(alg);
+         |                     ^
+
+
+vim +/const +587 drivers/net/wireless/intel/ipw2x00/libipw_wx.c
+
+b453872c35cfcb net/ieee80211/ieee80211_wx.c                   Jeff Garzik        2005-05-12  501  
+b0a4e7d8a291de drivers/net/wireless/ipw2x00/libipw_wx.c       John W. Linville   2009-08-20  502  int libipw_wx_set_encodeext(struct libipw_device *ieee,
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  503  			       struct iw_request_info *info,
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  504  			       union iwreq_data *wrqu, char *extra)
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  505  {
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  506  	struct net_device *dev = ieee->dev;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  507  	struct iw_point *encoding = &wrqu->encoding;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  508  	struct iw_encode_ext *ext = (struct iw_encode_ext *)extra;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  509  	int i, idx, ret = 0;
+ccd0fda3a6d918 net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  510  	int group_key = 0;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  511  	const char *alg, *module;
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  512  	struct lib80211_crypto_ops *ops;
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  513  	struct lib80211_crypt_data **crypt;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  514  
+b0a4e7d8a291de drivers/net/wireless/ipw2x00/libipw_wx.c       John W. Linville   2009-08-20  515  	struct libipw_security sec = {
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  516  		.flags = 0,
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  517  	};
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  518  
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  519  	idx = encoding->flags & IW_ENCODE_INDEX;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  520  	if (idx) {
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  521  		if (idx < 1 || idx > WEP_KEYS)
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  522  			return -EINVAL;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  523  		idx--;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  524  	} else
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  525  		idx = ieee->crypt_info.tx_keyidx;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  526  
+ccd0fda3a6d918 net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  527  	if (ext->ext_flags & IW_ENCODE_EXT_GROUP_KEY) {
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  528  		crypt = &ieee->crypt_info.crypt[idx];
+ccd0fda3a6d918 net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  529  		group_key = 1;
+ccd0fda3a6d918 net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  530  	} else {
+e189277a3f1cbb net/ieee80211/ieee80211_wx.c                   Volker Braun       2005-10-24  531  		/* some Cisco APs use idx>0 for unicast in dynamic WEP */
+e189277a3f1cbb net/ieee80211/ieee80211_wx.c                   Volker Braun       2005-10-24  532  		if (idx != 0 && ext->alg != IW_ENCODE_ALG_WEP)
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  533  			return -EINVAL;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  534  		if (ieee->iw_mode == IW_MODE_INFRA)
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  535  			crypt = &ieee->crypt_info.crypt[idx];
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  536  		else
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  537  			return -EINVAL;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  538  	}
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  539  
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  540  	sec.flags |= SEC_ENABLED | SEC_ENCRYPT;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  541  	if ((encoding->flags & IW_ENCODE_DISABLED) ||
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  542  	    ext->alg == IW_ENCODE_ALG_NONE) {
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  543  		if (*crypt)
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  544  			lib80211_crypt_delayed_deinit(&ieee->crypt_info, crypt);
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  545  
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  546  		for (i = 0; i < WEP_KEYS; i++)
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  547  			if (ieee->crypt_info.crypt[i] != NULL)
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  548  				break;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  549  
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  550  		if (i == WEP_KEYS) {
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  551  			sec.enabled = 0;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  552  			sec.encrypt = 0;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  553  			sec.level = SEC_LEVEL_0;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  554  			sec.flags |= SEC_LEVEL;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  555  		}
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  556  		goto done;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  557  	}
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  558  
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  559  	sec.enabled = 1;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  560  	sec.encrypt = 1;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  561  
+ccd0fda3a6d918 net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  562  	if (group_key ? !ieee->host_mc_decrypt :
+ccd0fda3a6d918 net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  563  	    !(ieee->host_encrypt || ieee->host_decrypt ||
+ccd0fda3a6d918 net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  564  	      ieee->host_encrypt_msdu))
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  565  		goto skip_host_crypt;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  566  
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  567  	switch (ext->alg) {
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  568  	case IW_ENCODE_ALG_WEP:
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  569  		alg = "WEP";
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  570  		module = "lib80211_crypt_wep";
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  571  		break;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  572  	case IW_ENCODE_ALG_TKIP:
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  573  		alg = "TKIP";
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  574  		module = "lib80211_crypt_tkip";
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  575  		break;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  576  	case IW_ENCODE_ALG_CCMP:
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  577  		alg = "CCMP";
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  578  		module = "lib80211_crypt_ccmp";
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  579  		break;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  580  	default:
+b0a4e7d8a291de drivers/net/wireless/ipw2x00/libipw_wx.c       John W. Linville   2009-08-20  581  		LIBIPW_DEBUG_WX("%s: unknown crypto alg %d\n",
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  582  				   dev->name, ext->alg);
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  583  		ret = -EINVAL;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  584  		goto done;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  585  	}
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  586  
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29 @587  	ops = lib80211_get_crypto_ops(alg);
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  588  	if (ops == NULL) {
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  589  		request_module(module);
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  590  		ops = lib80211_get_crypto_ops(alg);
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  591  	}
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  592  	if (ops == NULL) {
+b0a4e7d8a291de drivers/net/wireless/ipw2x00/libipw_wx.c       John W. Linville   2009-08-20  593  		LIBIPW_DEBUG_WX("%s: unknown crypto alg %d\n",
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  594  				   dev->name, ext->alg);
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  595  		ret = -EINVAL;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  596  		goto done;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  597  	}
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  598  
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  599  	if (*crypt == NULL || (*crypt)->ops != ops) {
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  600  		struct lib80211_crypt_data *new_crypt;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  601  
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  602  		lib80211_crypt_delayed_deinit(&ieee->crypt_info, crypt);
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  603  
+0da974f4f303a6 net/ieee80211/ieee80211_wx.c                   Panagiotis Issaris 2006-07-21  604  		new_crypt = kzalloc(sizeof(*new_crypt), GFP_KERNEL);
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  605  		if (new_crypt == NULL) {
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  606  			ret = -ENOMEM;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  607  			goto done;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  608  		}
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  609  		new_crypt->ops = ops;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  610  		if (new_crypt->ops && try_module_get(new_crypt->ops->owner))
+6eb6edf04acd09 net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-22  611  			new_crypt->priv = new_crypt->ops->init(idx);
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  612  		if (new_crypt->priv == NULL) {
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  613  			kfree(new_crypt);
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  614  			ret = -EINVAL;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  615  			goto done;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  616  		}
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  617  		*crypt = new_crypt;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  618  	}
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  619  
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  620  	if (ext->key_len > 0 && (*crypt)->ops->set_key &&
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  621  	    (*crypt)->ops->set_key(ext->key, ext->key_len, ext->rx_seq,
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  622  				   (*crypt)->priv) < 0) {
+b0a4e7d8a291de drivers/net/wireless/ipw2x00/libipw_wx.c       John W. Linville   2009-08-20  623  		LIBIPW_DEBUG_WX("%s: key setting failed\n", dev->name);
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  624  		ret = -EINVAL;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  625  		goto done;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  626  	}
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  627  
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  628        skip_host_crypt:
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  629  	if (ext->ext_flags & IW_ENCODE_EXT_SET_TX_KEY) {
+274bfb8dc5ffa1 net/ieee80211/ieee80211_wx.c                   John W. Linville   2008-10-29  630  		ieee->crypt_info.tx_keyidx = idx;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  631  		sec.active_key = idx;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  632  		sec.flags |= SEC_ACTIVE_KEY;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  633  	}
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  634  
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  635  	if (ext->alg != IW_ENCODE_ALG_NONE) {
+260a9ad9446723 drivers/net/wireless/intel/ipw2x00/libipw_wx.c Dan Carpenter      2021-04-14  636  		int key_len = clamp_val(ext->key_len, 0, SCM_KEY_LEN);
+260a9ad9446723 drivers/net/wireless/intel/ipw2x00/libipw_wx.c Dan Carpenter      2021-04-14  637  
+260a9ad9446723 drivers/net/wireless/intel/ipw2x00/libipw_wx.c Dan Carpenter      2021-04-14  638  		memcpy(sec.keys[idx], ext->key, key_len);
+260a9ad9446723 drivers/net/wireless/intel/ipw2x00/libipw_wx.c Dan Carpenter      2021-04-14  639  		sec.key_sizes[idx] = key_len;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  640  		sec.flags |= (1 << idx);
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  641  		if (ext->alg == IW_ENCODE_ALG_WEP) {
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  642  			sec.encode_alg[idx] = SEC_ALG_WEP;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  643  			sec.flags |= SEC_LEVEL;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  644  			sec.level = SEC_LEVEL_1;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  645  		} else if (ext->alg == IW_ENCODE_ALG_TKIP) {
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  646  			sec.encode_alg[idx] = SEC_ALG_TKIP;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  647  			sec.flags |= SEC_LEVEL;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  648  			sec.level = SEC_LEVEL_2;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  649  		} else if (ext->alg == IW_ENCODE_ALG_CCMP) {
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  650  			sec.encode_alg[idx] = SEC_ALG_CCMP;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  651  			sec.flags |= SEC_LEVEL;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  652  			sec.level = SEC_LEVEL_3;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  653  		}
+ccd0fda3a6d918 net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  654  		/* Don't set sec level for group keys. */
+ccd0fda3a6d918 net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  655  		if (group_key)
+ccd0fda3a6d918 net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  656  			sec.flags &= ~SEC_LEVEL;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  657  	}
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  658        done:
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  659  	if (ieee->set_security)
+3fc7bc8ea792b4 drivers/net/wireless/ipw2x00/libipw_wx.c       Paul Bolle         2012-09-21  660  		ieee->set_security(dev, &sec);
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  661  
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  662  	return ret;
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  663  }
+e0d369d1d969fc net/ieee80211/ieee80211_wx.c                   James Ketrenos     2005-09-21  664  
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
