@@ -1,49 +1,55 @@
-Return-Path: <netdev+bounces-95751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8FF28C354C
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 09:22:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1D288C3551
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 09:25:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53CA7B20EB9
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 07:22:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11F6BB20DB6
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 07:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C891AFC11;
-	Sun, 12 May 2024 07:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E579D10962;
+	Sun, 12 May 2024 07:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="ltzOaz+m"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out.smtpout.orange.fr (out-18.smtpout.orange.fr [193.252.22.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C2ED101CA;
-	Sun, 12 May 2024 07:22:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28240B64B;
+	Sun, 12 May 2024 07:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715498532; cv=none; b=W3VHfA+oF/NXaill6GprpYFRKQhofOkN/kIshiwwo6Ei8w/xqflexnY03kK59fc3s7hFrQG933GeG76GGNYsWaUoe+obv52i+laa24ocn9AtN0LR4TH2aVum3GLbW2nViYHVzL5+Sa9QTDiGyxeU3bzC89lnrLDvbdCwyQlXnlk=
+	t=1715498748; cv=none; b=XYEgfe2gvUjqG6DQzNnbo8gjOzqAPruAQIkcNsReoSsU08YkNO5WL/eCdFJvDB6OOPNYFugu5OaNLGW3efaJMwz2uJi4tkLPgH4ZbiTlINBopkNnIbguxis31Ji6cmmuo/Yleu9olaNznoaKDaHahSn4I+FQEBYgvdjyKxuq95c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715498532; c=relaxed/simple;
-	bh=66Jqedg9cXpHoydTVuNznaoG+hIkMQD7XMiOtPkepiU=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=j2wcfna48ysxbVDBsJHzQGhqHvBD4sw89OIzFep5V9h6UpWTnisqNHeOmMfAD2IFbD4z0zfgSJ8MfzCCSmj9J3s/zhq7MyJP8aAvIFaDnNrTe6GQBCNb5vBBW9ejBi3uLMNkyqfdE+5AS7ln35+/ZZmCBllZGOm+p2m9uqcHWo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from fsav116.sakura.ne.jp (fsav116.sakura.ne.jp [27.133.134.243])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 44C7LiBq058242;
-	Sun, 12 May 2024 16:21:44 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav116.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp);
- Sun, 12 May 2024 16:21:44 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp)
-Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 44C7Li58058238
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sun, 12 May 2024 16:21:44 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <838e7959-a360-4ac1-b36a-a3469236129b@I-love.SAKURA.ne.jp>
-Date: Sun, 12 May 2024 16:21:44 +0900
+	s=arc-20240116; t=1715498748; c=relaxed/simple;
+	bh=PPOMNBV3Glw3iN++/hQQpbxp0F4wKqd1XkP6JbbUKcY=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=LcBsDFjhGODUZdbw6etwUQtZIlQK/cPxLd+bMtZWwveUMlXpakm8pkoQIebqPkacfx8BCVALpoZgzeT0CArEebPwCE/dL9/Fr/Cg8whUKcT9rEqInNqqpmX1ATFM0wq8reqdVBfQUDNE60yZExQBwDO18cmwpb+cosSjAdPpRPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=ltzOaz+m; arc=none smtp.client-ip=193.252.22.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.37] ([86.243.17.157])
+	by smtp.orange.fr with ESMTPA
+	id 63aWscRyh5iYZ63aWsqXbh; Sun, 12 May 2024 09:25:44 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1715498744;
+	bh=RtPvSUrEN3BQtMhBvVSB3q+A6lvRVAHJyIYgMiIAyuA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To;
+	b=ltzOaz+mHuccNQ8uLvFrW8QIw/2+AI910JD6hnDR0t7mSWSePkhzjJhHCf04FjjDc
+	 GB1RxrMy1mk+wtP5VzJ9FR9yLKC5+GiaNtPwm1w52FE09HWTIbgfF7ofgHVIbKS1xa
+	 8gZa8zWHMyAo4QV7QfjkYwLYIDAtf/g64Blpoz/uVg1+MD9rzSlJgwZoVUv3v0cUmG
+	 opuqrjsWyx1j8lCmRn5BF6ygtl8Vgn6VP8Sqn9Ok7wjDN7jrZI/q1jZiaKTftvNe5t
+	 DvlVTDSgycQrNobLKdSOCuzsaOV7vvGFShjShTj3/tKsQxBmQ5j1w3yVNjQ8kjLKPY
+	 bXSso4icrIOtg==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sun, 12 May 2024 09:25:44 +0200
+X-ME-IP: 86.243.17.157
+Message-ID: <5dd2eceb-4108-4071-b7b5-1fcac0a9d2ef@wanadoo.fr>
+Date: Sun, 12 May 2024 09:25:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,101 +57,79 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: John Fastabend <john.fastabend@gmail.com>,
-        Jakub Sitnicki <jakub@cloudflare.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Network Development
- <netdev@vger.kernel.org>,
-        bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: [PATCH] bpf, sockmap: defer sk_psock_free_link() using RCU
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 1/3] lib80211: Handle const struct lib80211_crypto_ops in
+ lib80211
+From: Marion & Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: Simon Horman <horms@kernel.org>
+Cc: gregkh@linuxfoundation.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, johannes@sipsolutions.net,
+ philipp.g.hortmann@gmail.com, tdavies@darkphysics.net,
+ garyrookard@fastmail.org, straube.linux@gmail.com,
+ linux-staging@lists.linux.dev, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+References: <cover.1715443223.git.christophe.jaillet@wanadoo.fr>
+ <d6306f7c76015653e9539ddbcd1ed74d1681a98f.1715443223.git.christophe.jaillet@wanadoo.fr>
+ <20240511203104.GW2347895@kernel.org>
+ <b6042eae-88cd-4f95-88d8-d1812c2930de@wanadoo.fr>
+Content-Language: en-MW
+In-Reply-To: <b6042eae-88cd-4f95-88d8-d1812c2930de@wanadoo.fr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-If a BPF program is attached to kfree() event, calling kfree()
-with psock->link_lock held triggers lockdep warning.
 
-Defer kfree() using RCU so that the attached BPF program runs
-without holding psock->link_lock.
 
-Reported-by: syzbot+ec941d6e24f633a59172@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=ec941d6e24f633a59172
-Tested-by: syzbot+ec941d6e24f633a59172@syzkaller.appspotmail.com
-Reported-by: syzbot+a4ed4041b9bea8177ac3@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=a4ed4041b9bea8177ac3
-Tested-by: syzbot+a4ed4041b9bea8177ac3@syzkaller.appspotmail.com
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
- include/linux/skmsg.h | 7 +++++--
- net/core/skmsg.c      | 2 ++
- net/core/sock_map.c   | 2 ++
- 3 files changed, 9 insertions(+), 2 deletions(-)
+Le 11/05/2024 à 23:47, Christophe JAILLET a écrit :
+> Le 11/05/2024 à 22:31, Simon Horman a écrit :
+>> On Sat, May 11, 2024 at 06:32:38PM +0200, Christophe JAILLET wrote:
+>>> lib80211_register_crypto_ops() and lib80211_unregister_crypto_ops() 
+>>> don't
+>>> modify their "struct lib80211_crypto_ops *ops" argument. So, it can be
+>>> declared as const.
+>>>
+>>> Doing so, some adjustments are needed to also constify some date in
+>>> "struct lib80211_crypt_data", "struct lib80211_crypto_alg" and the
+>>> return value of lib80211_get_crypto_ops().
+>>>
+>>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+>>> ---
+>>> Compile tested only.
+>>
+>> Hi Christophe,
+>>
+>> Unfortunately allmodconfig W=1 build on x86_64 with Clang says:
+>>
+>> .../libipw_wx.c:587:6: error: assigning to 'struct lib80211_crypto_ops 
+>> *' from 'const struct lib80211_crypto_ops *' discards qualifiers 
+>> [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+>>   587 |         ops = lib80211_get_crypto_ops(alg);
+>>       |             ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> .../libipw_wx.c:590:7: error: assigning to 'struct lib80211_crypto_ops 
+>> *' from 'const struct lib80211_crypto_ops *' discards qualifiers 
+>> [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+>>   590 |                 ops = lib80211_get_crypto_ops(alg);
+>>       |                     ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>
+> 
+> Hi,
+> 
+> I'll dig more tomorrow, but I don't see this error (with gcc), even with 
+> W=1.
+> 
+> The following part of the patch is here to avoid the exact compilation 
+> error that you see.
+> 
+> Strange.
+> 
+> CJ
+> 
 
-diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-index a509caf823d6..66590f20b777 100644
---- a/include/linux/skmsg.h
-+++ b/include/linux/skmsg.h
-@@ -66,7 +66,10 @@ enum sk_psock_state_bits {
- };
- 
- struct sk_psock_link {
--	struct list_head		list;
-+	union {
-+		struct list_head	list;
-+		struct rcu_head		rcu;
-+	};
- 	struct bpf_map			*map;
- 	void				*link_raw;
- };
-@@ -418,7 +421,7 @@ static inline struct sk_psock_link *sk_psock_init_link(void)
- 
- static inline void sk_psock_free_link(struct sk_psock_link *link)
- {
--	kfree(link);
-+	kfree_rcu(link, rcu);
- }
- 
- struct sk_psock_link *sk_psock_link_pop(struct sk_psock *psock);
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index fd20aae30be2..9cebfeecd3c9 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -791,10 +791,12 @@ static void sk_psock_link_destroy(struct sk_psock *psock)
- {
- 	struct sk_psock_link *link, *tmp;
- 
-+	rcu_read_lock();
- 	list_for_each_entry_safe(link, tmp, &psock->link, list) {
- 		list_del(&link->list);
- 		sk_psock_free_link(link);
- 	}
-+	rcu_read_unlock();
- }
- 
- void sk_psock_stop(struct sk_psock *psock)
-diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-index 8598466a3805..8bec4b7a8ec7 100644
---- a/net/core/sock_map.c
-+++ b/net/core/sock_map.c
-@@ -142,6 +142,7 @@ static void sock_map_del_link(struct sock *sk,
- 	bool strp_stop = false, verdict_stop = false;
- 	struct sk_psock_link *link, *tmp;
- 
-+	rcu_read_lock();
- 	spin_lock_bh(&psock->link_lock);
- 	list_for_each_entry_safe(link, tmp, &psock->link, list) {
- 		if (link->link_raw == link_raw) {
-@@ -159,6 +160,7 @@ static void sock_map_del_link(struct sock *sk,
- 		}
- 	}
- 	spin_unlock_bh(&psock->link_lock);
-+	rcu_read_unlock();
- 	if (strp_stop || verdict_stop) {
- 		write_lock_bh(&sk->sk_callback_lock);
- 		if (strp_stop)
--- 
-2.34.1
+Ok, got it.
+Thanks for the pointer.
+
+I don't know how I missed this one. :(
+
+I'll send a v2.
+
+CJ
 
