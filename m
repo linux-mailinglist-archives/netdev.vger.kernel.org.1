@@ -1,78 +1,83 @@
-Return-Path: <netdev+bounces-95777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87B228C369A
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 15:08:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E47EE8C36BB
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 15:46:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 079B1281322
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 13:08:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 777DF281361
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 13:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F4B224D4;
-	Sun, 12 May 2024 13:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2124A23749;
+	Sun, 12 May 2024 13:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="RVaywzD1"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qYUkaD/h"
 X-Original-To: netdev@vger.kernel.org
-Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5200E12E75;
-	Sun, 12 May 2024 13:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA69210FB
+	for <netdev@vger.kernel.org>; Sun, 12 May 2024 13:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715519329; cv=none; b=mn+6tuEadr4grLaCBaB9JFVVhHN2sBVwqWJGpM+Dksa4XMAOuYhy5a8BbIiDjjAHcWlc9DGQYB7npiKz6NjfljLXcsUWDex8L5KGP3BOT9EOZbEPmsKb3B1h0XGwt2EUOFVTPGMJ0cKhb9eBWQ8CE5swslGMR1hn4fNFNI2+16o=
+	t=1715521609; cv=none; b=XwsNcoj3tJLi1siBWcK8Vn2SwFi9+H3nuWnJzRv8aXCubGvApAbVqZTMAjKyO5wBXDPin4sGMjal6xAsvoqZssh5bV8BXtWe7YO3XqjFnwiDPu1CjLBrR4V4a6nw5eE6Vopd2Z+EgCqieBYm2XCY4wupk7sZVO/vJ9/uKcN0wes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715519329; c=relaxed/simple;
-	bh=4dtMV0+T4itEZ3njDueGsSSCXg2qaZAkJUDSJVtpRuM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bGonAyGT9bkKFqpIq6DHnfCss+gJR06a1mImaAwfIB2nXKLzTSJdWl9A6IyH2zrz1nDi7orLcpkm8VrndqvWLf3Aa7iSKAIhVHymgojWPr9zIvNmVSmz+IxLsWEstMQgUI+R3tGov1YDOYKMMYQGQ6vh9zDcZmfBDkylCHHKNFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=RVaywzD1; arc=none smtp.client-ip=213.160.72.247
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
-	s=dkim; h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:Reply-To:From:Subject:Message-ID:Sender:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=/RDTDK04LS9aHKEZT1A3pPZvNdlGdHaOcAg8MrbVz+Q=; b=RVaywzD1qiDcNS0derDvlImqod
-	J3qrmVjaO1x0b16KkAV/CmFAdc99Al8n95tuzFqQk8ssvD6OyJJ6n+9FFjFudPv8BrYU0ZaaBLVQ+
-	vW5LtCThUmLUoSxZy53eDqTuSNY0j5ZvYLejDciQy+awCZzP7k/k+bPSd8CNaMw5tWlM=;
-Received: from 127.0.0.1
-	by fritzc.com with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim latest)
-	(envelope-from <christoph.fritz@hexdev.de>)
-	id 1s68w0-001uX7-29;
-	Sun, 12 May 2024 15:08:13 +0200
-Message-ID: <3070ec70b2477560f205cc4c34dd84b320831365.camel@hexdev.de>
-Subject: Re: [PATCH v4 04/11] tty: serdev: Add method to enable break flags
-From: Christoph Fritz <christoph.fritz@hexdev.de>
-Reply-To: christoph.fritz@hexdev.de
-To: Ilpo =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: Jiri Slaby <jirislaby@kernel.org>, Simon Horman <horms@kernel.org>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Marc Kleine-Budde
- <mkl@pengutronix.de>, Oliver Hartkopp <socketcan@hartkopp.net>, Vincent
- Mailhol <mailhol.vincent@wanadoo.fr>,  "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires
- <bentiss@kernel.org>, Sebastian Reichel <sre@kernel.org>, Linus Walleij
- <linus.walleij@linaro.org>, Andreas Lauser
- <andreas.lauser@mercedes-benz.com>, Jonathan Corbet <corbet@lwn.net>, Pavel
- Pisa <pisa@cmp.felk.cvut.cz>, linux-can@vger.kernel.org, Netdev
- <netdev@vger.kernel.org>,  devicetree@vger.kernel.org,
- linux-input@vger.kernel.org, linux-serial <linux-serial@vger.kernel.org>
-Date: Sun, 12 May 2024 15:08:08 +0200
-In-Reply-To: <36b0d460-1d96-89d8-db4a-76d735f7ee6b@linux.intel.com>
-References: <20240509171736.2048414-1-christoph.fritz@hexdev.de>
-	 <20240509171736.2048414-5-christoph.fritz@hexdev.de>
-	 <36b0d460-1d96-89d8-db4a-76d735f7ee6b@linux.intel.com>
-Organization: hexDEV GmbH
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1715521609; c=relaxed/simple;
+	bh=+TLh0ZqPHrJ3c4eNN7oDbgleQUlJztC8pighhz36VaY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Wt8dQLwxl+TryRX0QO2QxXTsV3ffopQ2y0Ey2nmBykOoUVU+PS6hH/UoWaWKHIV9TDFjcosa8d5UbaZNW1d+Htmn3JvOVrcsrSPQ/x8mXeyARTCphQlBp27gunYGO93HsgY0W3SsmwOAfMt9sapKAfYAJ5YqiAKRhkXUMLCN+MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=qYUkaD/h; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1715521607; x=1747057607;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=0Ofl/BL1ugOGp6T6Eed7vv34jCrqgbFf1Hhx81q0jrk=;
+  b=qYUkaD/hf9KLOBdhVlaUrr3w9yTVSZbloAUS3Op/k7/uqky3zvRZq6EP
+   Vz4bgFZeJ4Vy6Sst7s2VTuTOqeHGOL9CIr8GE2yGvtgnLN+tLa7ulj8UM
+   6AP5f4Elcv7OdCVFDrf6eXTw7ux75d0O+b7dk+4yGYMUNilEkRsoR+EnF
+   0=;
+X-IronPort-AV: E=Sophos;i="6.08,155,1712620800"; 
+   d="scan'208";a="88588567"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2024 13:46:45 +0000
+Received: from EX19MTAUEA001.ant.amazon.com [10.0.0.204:27725]
+ by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.61.78:2525] with esmtp (Farcaster)
+ id 1a611ed6-1803-4693-884c-82a3db643019; Sun, 12 May 2024 13:46:44 +0000 (UTC)
+X-Farcaster-Flow-ID: 1a611ed6-1803-4693-884c-82a3db643019
+Received: from EX19D008UEC004.ant.amazon.com (10.252.135.170) by
+ EX19MTAUEA001.ant.amazon.com (10.252.134.203) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Sun, 12 May 2024 13:46:44 +0000
+Received: from EX19MTAUEA001.ant.amazon.com (10.252.134.203) by
+ EX19D008UEC004.ant.amazon.com (10.252.135.170) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Sun, 12 May 2024 13:46:43 +0000
+Received: from dev-dsk-darinzon-1c-05962a8d.eu-west-1.amazon.com
+ (172.19.80.187) by mail-relay.amazon.com (10.252.134.102) with Microsoft SMTP
+ Server id 15.2.1258.28 via Frontend Transport; Sun, 12 May 2024 13:46:41
+ +0000
+From: <darinzon@amazon.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	<netdev@vger.kernel.org>
+CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, "Woodhouse, David" <dwmw@amazon.com>,
+	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
+	<matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
+	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
+	<nafea@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali"
+	<alisaidi@amazon.com>, "Herrenschmidt, Benjamin" <benh@amazon.com>,
+	"Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>,
+	"Agroskin, Shay" <shayagr@amazon.com>, "Itzko, Shahar" <itzko@amazon.com>,
+	"Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky, Evgeny"
+	<evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>
+Subject: [PATCH v2 net-next 0/5] ENA driver changes May 2024
+Date: Sun, 12 May 2024 13:46:32 +0000
+Message-ID: <20240512134637.25299-1-darinzon@amazon.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,39 +85,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Fri, 2024-05-10 at 17:21 +0300, Ilpo Järvinen wrote:
-> On Thu, 9 May 2024, Christoph Fritz wrote:
-...
-> > diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-> > index 613cb356b918d..23a1e76cb553b 100644
-> > --- a/drivers/tty/serdev/core.c
-> > +++ b/drivers/tty/serdev/core.c
-> > @@ -339,6 +339,17 @@ unsigned int serdev_device_set_baudrate(struct serdev_device *serdev, unsigned i
-> >  }
-> >  EXPORT_SYMBOL_GPL(serdev_device_set_baudrate);
-> >  
-> > +void serdev_device_set_break_detection(struct serdev_device *serdev, bool enable)
-> > +{
-> > +	struct serdev_controller *ctrl = serdev->ctrl;
-> > +
-> > +	if (!ctrl || !ctrl->ops->set_break_detection)
-> > +		return;
-> 
-> Why you need to test for !ctrl?
+From: David Arinzon <darinzon@amazon.com>
 
-In our case we don't, it's an extra check like all the other functions
-here:
+This patchset contains several misc and minor
+changes to the ENA driver.
 
-https://elixir.bootlin.com/linux/v6.9-rc7/source/drivers/tty/serdev/core.c#L330
+Changes from v1:
+- Removed interrupt moderation hint from the
+  patchset. The change is moved back to
+  development state and will be released as
+  part of a different patchset in the future. 
 
-> 
-> > +	ctrl->ops->set_break_detection(ctrl, enable);
-> 
-> I'd use positive logic here:
-> 
-> 	if (ctrl->ops->set_break_detection)
-> 		ctrl->ops->set_break_detection(ctrl, enable);
+David Arinzon (5):
+  net: ena: Add a counter for driver's reset failures
+  net: ena: Reduce holes in ena_com structures
+  net: ena: Add validation for completion descriptors consistency
+  net: ena: Changes around strscpy calls
+  net: ena: Change initial rx_usec interval
 
+ drivers/net/ethernet/amazon/ena/ena_com.h     |  6 +--
+ drivers/net/ethernet/amazon/ena/ena_eth_com.c | 37 ++++++++++++++-----
+ drivers/net/ethernet/amazon/ena/ena_eth_com.h |  2 +-
+ drivers/net/ethernet/amazon/ena/ena_ethtool.c | 17 +++++++--
+ drivers/net/ethernet/amazon/ena/ena_netdev.c  | 37 ++++++++++++++-----
+ drivers/net/ethernet/amazon/ena/ena_netdev.h  |  1 +
+ .../net/ethernet/amazon/ena/ena_regs_defs.h   |  1 +
+ 7 files changed, 73 insertions(+), 28 deletions(-)
+
+-- 
+2.40.1
 
 
