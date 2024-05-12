@@ -1,304 +1,144 @@
-Return-Path: <netdev+bounces-95804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D52FE8C3762
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 18:16:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DE6A8C377C
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 18:28:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 560AF1F2121C
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 16:16:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A1C8281269
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 16:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E0B656B89;
-	Sun, 12 May 2024 16:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A6C47796;
+	Sun, 12 May 2024 16:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="cIiKsjuo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B85D51C27;
-	Sun, 12 May 2024 16:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010FF4776A;
+	Sun, 12 May 2024 16:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715530495; cv=none; b=JppZMD55m8agb8TzJ2RsnetkBKYHvvm5W78S77rrSkO/KoaiwksYDwir7BmBkIPeOM2HCu/BAw8BZtx/L98BKmUHg4Z6tof4jJnPyemKCc/c9hIXZTEF0NLwFzKN4QqaKkymhW7B07UeRvOkN4dCI9vtAr/BQE3szglY70pD294=
+	t=1715531316; cv=none; b=rSrDGYYlT5VQN47jdVG1OD4mj1YiZeHbomoUV4WBQjeRN6PMwQbe7MlQqSoLxtPalDdWc6wIhreAwoOlovPSkFcJcVDLjK0LgYpI7RqzTGyA1DoV/X878PzCPqXJxgoBXnt/LoRtq6zAxhc1Ey4wvIHR3ZneQHh1Eon2dHvHrMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715530495; c=relaxed/simple;
-	bh=G/fMVwpSOKPWdCCsnc31MWNubuwORPRmrR50vef71DQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=q5IzMSgIhDpZdnoGd3zJB4xtm3LpiYEdSO5S2XbQL/negvSjirA1zPB8kyymzNfCGJmt+p8AZKtOGDNb3PBHNwDne6mDsKd0wwQYjaREY8YGv8Cp+cb7/DicoRtWMWUVUCp9g0NsHvwfv1PepTDzNey2+lp98U++Q6lXBnYOw28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net-next 17/17] netfilter: nf_tables: allow clone callbacks to sleep
-Date: Sun, 12 May 2024 18:14:36 +0200
-Message-Id: <20240512161436.168973-18-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240512161436.168973-1-pablo@netfilter.org>
-References: <20240512161436.168973-1-pablo@netfilter.org>
+	s=arc-20240116; t=1715531316; c=relaxed/simple;
+	bh=k10JU34PCsvIgk353jT+uvbWPB/Khr6VTqgo+yzl2H8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Wky1uV6zOoXtPv9gWPvwSX/0Hq9v8W/pzaoVmmcPWvMgwsRsccUDxjDQKgx2z8PKmW/xEm1BrxVAkEGuCQpV4qOvQOGaFHrYNcCZjw/f4v/uySa1J2ap7wzt+5FYLmcPV55syWNmhmyAe8vm0Iyg8wBf1RvucfKdoH22DhXNlJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=cIiKsjuo; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=JKu2ehxGzSJF+b0EShKM7Ynw448P/EHxxma336CQaYQ=; b=cIiKsjuodW7EUMju3m8OYjr8ra
+	6yTuggYzPYm8RrAB7+gtAxmK4diC+T3yMRYkBbG994+VSvtmVTsig2oUgbursPgX6CXwprFzBflFt
+	j4AxQEgY1F0Z02+rOD+V/R26M5x5x5bWsJ4TQbxnBGQdC/PTrXekihbeaOE9rDDPGkJ2OQFwvaUmR
+	mwZS7NEHsJPk575FT8xMwthwK9hljGsKK4WYjZuskmnYLaoyimzw0KHoa0RskZxWm+C2PLMa3Khog
+	QTBiwD6ZsdmSt2TlOoKCAOynmWWQOqurxEltwVYvFKc0u91apsIfY9cJM3nXRu0PPqxv+94FRM/MD
+	WU4ItFwA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40658)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1s6C3i-0000sh-0y;
+	Sun, 12 May 2024 17:28:22 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1s6C3g-0005JR-9p; Sun, 12 May 2024 17:28:20 +0100
+Date: Sun, 12 May 2024 17:28:20 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH RFC 0/6] net: stmmac: convert stmmac "pcs" to phylink
+Message-ID: <ZkDuJAx7atDXjf5m@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Florian Westphal <fw@strlen.de>
+Hi,
 
-Sven Auhagen reports transaction failures with following error:
-  ./main.nft:13:1-26: Error: Could not process rule: Cannot allocate memory
-  percpu: allocation failed, size=16 align=8 atomic=1, atomic alloc failed, no space left
+As I noted recently in a thread (and was ignored) stmmac sucks. (I
+won't hide my distain for drivers that make my life as phylink
+maintainer more difficult!)
 
-This points to failing pcpu allocation with GFP_ATOMIC flag.
-However, transactions happen from user context and are allowed to sleep.
+One of the contract conditions for using phylink is that the driver
+will _not_ mess with the netif carrier. stmmac developers/maintainers
+clearly didn't read that, because stmmac messes with the netif
+carrier, which destroys phylink's guarantee that it'll make certain
+calls in a particular order (e.g. it won't call mac_link_up() twice
+in a row without an intervening mac_link_down().) This is clearly
+stated in the phylink documentation.
 
-One case where we can call into percpu allocator with GFP_ATOMIC is
-nft_counter expression.
+Thus, this patch set attempts to fix this. Why does it mess with the
+netif carrier? It has its own independent PCS implementation that
+completely bypasses phylink _while_ phylink is still being used.
+This is not acceptable. Either the driver uses phylink, or it doesn't
+use phylink. There is no half-way house about this. Therefore, this
+driver needs to either be fixed, or needs to stop using phylink.
 
-Normally this happens from control plane, so this could use GFP_KERNEL
-instead.  But one use case, element insertion from packet path,
-needs to use GFP_ATOMIC allocations (nft_dynset expression).
+Since I was ignored when I brought this up, I've hacked together the
+following patch set - and it is hacky at the moment. It's also broken
+because of recentl changes involving dwmac-qcom-ethqos.c - but there
+isn't sufficient information in the driver for me to fix this. The
+driver appears to use SGMII at 2500Mbps, which simply does not exist.
+What interface mode (and neg_mode) does phylink pass to pcs_config()
+in each of the speeds that dwmac-qcom-ethqos.c is interested in.
+Without this information, I can't do that conversion. So for the
+purposes of this, I've just ignored dwmac-qcom-ethqos.c (which means
+it will fail to build.)
 
-At this time, .clone callbacks always use GFP_ATOMIC for this reason.
+The patch splitup is not ideal, but that's not what I'm interested in
+here. What I want to hear is the results of testing - does this switch
+of the RGMII/SGMII "pcs" stuff to a phylink_pcs work for this driver?
 
-Add gfp_t argument to the .clone function and pass GFP_KERNEL or
-GFP_ATOMIC flag depending on context, this allows all clone memory
-allocations to sleep for the normal (transaction) case.
+Please don't review the patches, but you are welcome to send fixes to
+them. Once we know that the overall implementation works, then I'll
+look at how best to split the patches. In the mean time, the present
+form is more convenient for making changes and fixing things.
 
-Cc: Sven Auhagen <sven.auhagen@voleatech.de>
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- include/net/netfilter/nf_tables.h |  4 ++--
- net/netfilter/nf_tables_api.c     |  8 ++++----
- net/netfilter/nft_connlimit.c     |  4 ++--
- net/netfilter/nft_counter.c       |  4 ++--
- net/netfilter/nft_dynset.c        |  2 +-
- net/netfilter/nft_last.c          |  4 ++--
- net/netfilter/nft_limit.c         | 14 ++++++++------
- net/netfilter/nft_quota.c         |  4 ++--
- 8 files changed, 23 insertions(+), 21 deletions(-)
+There is still more improvement that's needed here.
 
-diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
-index 3f1ed467f951..2796153b03da 100644
---- a/include/net/netfilter/nf_tables.h
-+++ b/include/net/netfilter/nf_tables.h
-@@ -416,7 +416,7 @@ struct nft_expr_info;
- 
- int nft_expr_inner_parse(const struct nft_ctx *ctx, const struct nlattr *nla,
- 			 struct nft_expr_info *info);
--int nft_expr_clone(struct nft_expr *dst, struct nft_expr *src);
-+int nft_expr_clone(struct nft_expr *dst, struct nft_expr *src, gfp_t gfp);
- void nft_expr_destroy(const struct nft_ctx *ctx, struct nft_expr *expr);
- int nft_expr_dump(struct sk_buff *skb, unsigned int attr,
- 		  const struct nft_expr *expr, bool reset);
-@@ -935,7 +935,7 @@ struct nft_expr_ops {
- 						struct nft_regs *regs,
- 						const struct nft_pktinfo *pkt);
- 	int				(*clone)(struct nft_expr *dst,
--						 const struct nft_expr *src);
-+						 const struct nft_expr *src, gfp_t gfp);
- 	unsigned int			size;
- 
- 	int				(*init)(const struct nft_ctx *ctx,
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index a7f54eb68d9a..be3b4c90d2ed 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -3333,7 +3333,7 @@ static struct nft_expr *nft_expr_init(const struct nft_ctx *ctx,
- 	return ERR_PTR(err);
- }
- 
--int nft_expr_clone(struct nft_expr *dst, struct nft_expr *src)
-+int nft_expr_clone(struct nft_expr *dst, struct nft_expr *src, gfp_t gfp)
- {
- 	int err;
- 
-@@ -3341,7 +3341,7 @@ int nft_expr_clone(struct nft_expr *dst, struct nft_expr *src)
- 		return -EINVAL;
- 
- 	dst->ops = src->ops;
--	err = src->ops->clone(dst, src);
-+	err = src->ops->clone(dst, src, gfp);
- 	if (err < 0)
- 		return err;
- 
-@@ -6525,7 +6525,7 @@ int nft_set_elem_expr_clone(const struct nft_ctx *ctx, struct nft_set *set,
- 		if (!expr)
- 			goto err_expr;
- 
--		err = nft_expr_clone(expr, set->exprs[i]);
-+		err = nft_expr_clone(expr, set->exprs[i], GFP_KERNEL_ACCOUNT);
- 		if (err < 0) {
- 			kfree(expr);
- 			goto err_expr;
-@@ -6564,7 +6564,7 @@ static int nft_set_elem_expr_setup(struct nft_ctx *ctx,
- 
- 	for (i = 0; i < num_exprs; i++) {
- 		expr = nft_setelem_expr_at(elem_expr, elem_expr->size);
--		err = nft_expr_clone(expr, expr_array[i]);
-+		err = nft_expr_clone(expr, expr_array[i], GFP_KERNEL_ACCOUNT);
- 		if (err < 0)
- 			goto err_elem_expr_setup;
- 
-diff --git a/net/netfilter/nft_connlimit.c b/net/netfilter/nft_connlimit.c
-index de9d1980df69..92b984fa8175 100644
---- a/net/netfilter/nft_connlimit.c
-+++ b/net/netfilter/nft_connlimit.c
-@@ -210,12 +210,12 @@ static void nft_connlimit_destroy(const struct nft_ctx *ctx,
- 	nft_connlimit_do_destroy(ctx, priv);
- }
- 
--static int nft_connlimit_clone(struct nft_expr *dst, const struct nft_expr *src)
-+static int nft_connlimit_clone(struct nft_expr *dst, const struct nft_expr *src, gfp_t gfp)
- {
- 	struct nft_connlimit *priv_dst = nft_expr_priv(dst);
- 	struct nft_connlimit *priv_src = nft_expr_priv(src);
- 
--	priv_dst->list = kmalloc(sizeof(*priv_dst->list), GFP_ATOMIC);
-+	priv_dst->list = kmalloc(sizeof(*priv_dst->list), gfp);
- 	if (!priv_dst->list)
- 		return -ENOMEM;
- 
-diff --git a/net/netfilter/nft_counter.c b/net/netfilter/nft_counter.c
-index dccc68a5135a..291ed2026367 100644
---- a/net/netfilter/nft_counter.c
-+++ b/net/netfilter/nft_counter.c
-@@ -226,7 +226,7 @@ static void nft_counter_destroy(const struct nft_ctx *ctx,
- 	nft_counter_do_destroy(priv);
- }
- 
--static int nft_counter_clone(struct nft_expr *dst, const struct nft_expr *src)
-+static int nft_counter_clone(struct nft_expr *dst, const struct nft_expr *src, gfp_t gfp)
- {
- 	struct nft_counter_percpu_priv *priv = nft_expr_priv(src);
- 	struct nft_counter_percpu_priv *priv_clone = nft_expr_priv(dst);
-@@ -236,7 +236,7 @@ static int nft_counter_clone(struct nft_expr *dst, const struct nft_expr *src)
- 
- 	nft_counter_fetch(priv, &total);
- 
--	cpu_stats = alloc_percpu_gfp(struct nft_counter, GFP_ATOMIC);
-+	cpu_stats = alloc_percpu_gfp(struct nft_counter, gfp);
- 	if (cpu_stats == NULL)
- 		return -ENOMEM;
- 
-diff --git a/net/netfilter/nft_dynset.c b/net/netfilter/nft_dynset.c
-index c09dba57354c..b4ada3ab2167 100644
---- a/net/netfilter/nft_dynset.c
-+++ b/net/netfilter/nft_dynset.c
-@@ -35,7 +35,7 @@ static int nft_dynset_expr_setup(const struct nft_dynset *priv,
- 
- 	for (i = 0; i < priv->num_exprs; i++) {
- 		expr = nft_setelem_expr_at(elem_expr, elem_expr->size);
--		if (nft_expr_clone(expr, priv->expr_array[i]) < 0)
-+		if (nft_expr_clone(expr, priv->expr_array[i], GFP_ATOMIC) < 0)
- 			return -1;
- 
- 		elem_expr->size += priv->expr_array[i]->ops->size;
-diff --git a/net/netfilter/nft_last.c b/net/netfilter/nft_last.c
-index 8e6d7eaf9dc8..de1b6066bfa8 100644
---- a/net/netfilter/nft_last.c
-+++ b/net/netfilter/nft_last.c
-@@ -102,12 +102,12 @@ static void nft_last_destroy(const struct nft_ctx *ctx,
- 	kfree(priv->last);
- }
- 
--static int nft_last_clone(struct nft_expr *dst, const struct nft_expr *src)
-+static int nft_last_clone(struct nft_expr *dst, const struct nft_expr *src, gfp_t gfp)
- {
- 	struct nft_last_priv *priv_dst = nft_expr_priv(dst);
- 	struct nft_last_priv *priv_src = nft_expr_priv(src);
- 
--	priv_dst->last = kzalloc(sizeof(*priv_dst->last), GFP_ATOMIC);
-+	priv_dst->last = kzalloc(sizeof(*priv_dst->last), gfp);
- 	if (!priv_dst->last)
- 		return -ENOMEM;
- 
-diff --git a/net/netfilter/nft_limit.c b/net/netfilter/nft_limit.c
-index cefa25e0dbb0..21d26b79b460 100644
---- a/net/netfilter/nft_limit.c
-+++ b/net/netfilter/nft_limit.c
-@@ -150,7 +150,7 @@ static void nft_limit_destroy(const struct nft_ctx *ctx,
- }
- 
- static int nft_limit_clone(struct nft_limit_priv *priv_dst,
--			   const struct nft_limit_priv *priv_src)
-+			   const struct nft_limit_priv *priv_src, gfp_t gfp)
- {
- 	priv_dst->tokens_max = priv_src->tokens_max;
- 	priv_dst->rate = priv_src->rate;
-@@ -158,7 +158,7 @@ static int nft_limit_clone(struct nft_limit_priv *priv_dst,
- 	priv_dst->burst = priv_src->burst;
- 	priv_dst->invert = priv_src->invert;
- 
--	priv_dst->limit = kmalloc(sizeof(*priv_dst->limit), GFP_ATOMIC);
-+	priv_dst->limit = kmalloc(sizeof(*priv_dst->limit), gfp);
- 	if (!priv_dst->limit)
- 		return -ENOMEM;
- 
-@@ -223,14 +223,15 @@ static void nft_limit_pkts_destroy(const struct nft_ctx *ctx,
- 	nft_limit_destroy(ctx, &priv->limit);
- }
- 
--static int nft_limit_pkts_clone(struct nft_expr *dst, const struct nft_expr *src)
-+static int nft_limit_pkts_clone(struct nft_expr *dst, const struct nft_expr *src,
-+				gfp_t gfp)
- {
- 	struct nft_limit_priv_pkts *priv_dst = nft_expr_priv(dst);
- 	struct nft_limit_priv_pkts *priv_src = nft_expr_priv(src);
- 
- 	priv_dst->cost = priv_src->cost;
- 
--	return nft_limit_clone(&priv_dst->limit, &priv_src->limit);
-+	return nft_limit_clone(&priv_dst->limit, &priv_src->limit, gfp);
- }
- 
- static struct nft_expr_type nft_limit_type;
-@@ -281,12 +282,13 @@ static void nft_limit_bytes_destroy(const struct nft_ctx *ctx,
- 	nft_limit_destroy(ctx, priv);
- }
- 
--static int nft_limit_bytes_clone(struct nft_expr *dst, const struct nft_expr *src)
-+static int nft_limit_bytes_clone(struct nft_expr *dst, const struct nft_expr *src,
-+				 gfp_t gfp)
- {
- 	struct nft_limit_priv *priv_dst = nft_expr_priv(dst);
- 	struct nft_limit_priv *priv_src = nft_expr_priv(src);
- 
--	return nft_limit_clone(priv_dst, priv_src);
-+	return nft_limit_clone(priv_dst, priv_src, gfp);
- }
- 
- static const struct nft_expr_ops nft_limit_bytes_ops = {
-diff --git a/net/netfilter/nft_quota.c b/net/netfilter/nft_quota.c
-index 3ba12a7471b0..9b2d7463d3d3 100644
---- a/net/netfilter/nft_quota.c
-+++ b/net/netfilter/nft_quota.c
-@@ -233,7 +233,7 @@ static void nft_quota_destroy(const struct nft_ctx *ctx,
- 	return nft_quota_do_destroy(ctx, priv);
- }
- 
--static int nft_quota_clone(struct nft_expr *dst, const struct nft_expr *src)
-+static int nft_quota_clone(struct nft_expr *dst, const struct nft_expr *src, gfp_t gfp)
- {
- 	struct nft_quota *priv_dst = nft_expr_priv(dst);
- 	struct nft_quota *priv_src = nft_expr_priv(src);
-@@ -241,7 +241,7 @@ static int nft_quota_clone(struct nft_expr *dst, const struct nft_expr *src)
- 	priv_dst->quota = priv_src->quota;
- 	priv_dst->flags = priv_src->flags;
- 
--	priv_dst->consumed = kmalloc(sizeof(*priv_dst->consumed), GFP_ATOMIC);
-+	priv_dst->consumed = kmalloc(sizeof(*priv_dst->consumed), gfp);
- 	if (!priv_dst->consumed)
- 		return -ENOMEM;
- 
+Thanks.
+
+ drivers/net/ethernet/stmicro/stmmac/Makefile       |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/common.h       |  12 ++-
+ .../net/ethernet/stmicro/stmmac/dwmac1000_core.c   | 113 ++++++++++++---------
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  | 108 ++++++++++++--------
+ .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    |   6 --
+ drivers/net/ethernet/stmicro/stmmac/hwif.h         |  27 ++---
+ .../net/ethernet/stmicro/stmmac/stmmac_ethtool.c   | 111 +-------------------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  19 ++--
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c   |  57 +++++++++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h   |  84 ++-------------
+ 10 files changed, 227 insertions(+), 312 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
+
 -- 
-2.30.2
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
