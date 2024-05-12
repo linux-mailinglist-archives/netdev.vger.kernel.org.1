@@ -1,214 +1,180 @@
-Return-Path: <netdev+bounces-95755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C42B58C3558
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 09:30:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8352D8C356D
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 10:04:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAB381C209B0
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 07:30:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC9D91F214FB
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 08:04:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92B2134BD;
-	Sun, 12 May 2024 07:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GfWwy9kW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CA014AAD;
+	Sun, 12 May 2024 08:04:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2067.outbound.protection.outlook.com [40.107.102.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A81B64B;
-	Sun, 12 May 2024 07:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715499029; cv=fail; b=SclkVJ/caJuSslF4wFOWnGKOcLIzZ2Wpdjc+QDrJrnmno0lG8tF2rklwKc9gmYbGPFULTTIhde47k7aEJnm7kpZ95MUzixB8VPmQFppBvMVymMHop7GmDQorXTmaq+kb/J3bMIoSPQL96hBYgXdjeHatWqljH/p2t2HWnFfaJYA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715499029; c=relaxed/simple;
-	bh=qLg1P6pXP1J5LX43pYanvsUkDsn7lh7ev2wDrFm/TzI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qxs+5to/et4nR64EUjEoVGaGvgPJH2jDCp7g2Y8DMCpUTLvF2DnddvxgpKHYPGP3uTzEeDzmfwMijgXsf4DnDT57fgFnhacWor0E5kCSxxwj9xiKYIf99kdBkfGoVBboxW0Qx3CbHQwwlSUqWPJswcZfqVvOLP2+Wc4YaNoelVo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GfWwy9kW; arc=fail smtp.client-ip=40.107.102.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AT83Q6nfR14tl9AwsB4hU5w5HW/D14am6eQZF9Xb9Wuu/RWoRg0xeBE+pzwgocfMTvPvMrUk0QrQL0pLMep5Kx/0jfUdeEt4sYlKxf/N2qb0pAucESSnycNYuC8fSO/SkogZdfllxYbdYJwSt4mnA1xfB/6GKyxWj1FQ5FO8IWhjz4Lg/8znPB9jJnnM/S3uFsWetFPXeoMwLs6GjOorN6J5+CtZMim2D4q/CqMOLvdAWmRAPjTJFGQhNtcSJsr209kV38dPpjh/pjnYewhJ+L7j+ztHjs6I1lEDmkI6CQ/llyPdHq+79xqB0ANyHe9KoxTFq2/5pkGQH9Lku3nilA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RyZ78J9rUkDsVwpWZAryMD5rc609w2NZBxPZX133Vqc=;
- b=MqhMrvHhZBIpV5zLu5yFWxH776irIc4cfleKM0M1oRh20FenJftx9BKiCf73KPHWA2CUNcfwWv38ET4JCYky/glp7EJPIZRIGXezipPE6Y9bRnlRCcmSQScQGDUWu2KU4x5Ms3NCCUZtFlpyTB0Zn18Jw606gvf4b0HkkYlsuOKGsXJwk/5ARruk+xX+qUvL8IyX1hh4Xl8D4aMkEcmdEUjkpseGbndnkdhsAJ5T3OLbRCppC+fUz05lD/tm4Osqapm7m6YoTnlqGYqHqGUnPEgLVrk/bUyfkygQodv+3Mry0zAJpyQUqhfC58ofFHSK184K/aC20EtYTzjAqNzCSg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=linuxfoundation.org
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RyZ78J9rUkDsVwpWZAryMD5rc609w2NZBxPZX133Vqc=;
- b=GfWwy9kWJtoMv7HxeEHbo9sgZDZRvmJPXCxS2bCHTrw/fFIXxCWAAzRZfJQWDpS5YMdXZ2z0QC/7hhQppl33ELeSa2dZrn0mJnHHSwYsFL9UPakxj8dvnM68KDQiPBC3S+7oM8CE41GE9hb2tdwn2rT3V27yUp63eNZEGjtJgOf/eW46vBMWlyH/PHKCIsQSXsnN1uHBRh3kHFBwncB3yjuT54TX430nECjl4nzC1hpzTTOZxWeHBvLnNrs8T9ZyY2C1C8EOlqq2Yv2u0AlS9LGhX64Gyto/pW+1Q2jp41ObKblYHB5gzsAJKLvGJ6uyh1IvWRe4/xVOSx7LZpwM/Q==
-Received: from PH3PEPF000040A8.namprd05.prod.outlook.com (2603:10b6:518:1::4a)
- by SA3PR12MB9227.namprd12.prod.outlook.com (2603:10b6:806:398::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Sun, 12 May
- 2024 07:30:24 +0000
-Received: from SN1PEPF0002529D.namprd05.prod.outlook.com
- (2a01:111:f403:c801::1) by PH3PEPF000040A8.outlook.office365.com
- (2603:1036:903:49::3) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.21 via Frontend
- Transport; Sun, 12 May 2024 07:30:24 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF0002529D.mail.protection.outlook.com (10.167.242.4) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7587.21 via Frontend Transport; Sun, 12 May 2024 07:30:24 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 12 May
- 2024 00:30:10 -0700
-Received: from [172.27.19.54] (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 12 May
- 2024 00:30:05 -0700
-Message-ID: <b3baab48-647e-4ba2-9d0a-fcef64984e56@nvidia.com>
-Date: Sun, 12 May 2024 10:30:02 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF0517548
+	for <netdev@vger.kernel.org>; Sun, 12 May 2024 08:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715501071; cv=none; b=LQKPCysLk65U1HXvH8FmXhcVYMMDc3Epf703ouuf0GEpINkmDsMoXsdCX/NPnpN1fm888dMprJC36NpQo3bciWUuj4WJ2cnNpvZFhexj2ysX7eHdnFvRHVl0pV9asGyRs4U0S90FOwwXF3yLkXjCbEcuZdLAqnMs0ei4NByWTF0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715501071; c=relaxed/simple;
+	bh=UgkNHWfTVk8YpKE30qIveVOe8pe8nXbSRKLee8Dz4Bo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=lf0RqtoyK+UF40tppOY051YNjMMkallclTcRl+Jk+oDgnDtqme3EVYYFXA10+fPXbvtmvSBKbquMI5o9Dmfq3Xm5/SqWLXqJopNQb5R+ribbaGa2ezCEKgJ5bJOtmVQdf3cGsgo0Gcxg0tD0awY9JXmN31IcvrjA5UnoGOu6z6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-7e1db7e5386so35505239f.3
+        for <netdev@vger.kernel.org>; Sun, 12 May 2024 01:04:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715501069; x=1716105869;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JA5VCptPjyfIoM7ebz+7WHXx2umUxBAkXBABPwEhn6k=;
+        b=DpmrDSch3/Sr43fAoJfJhASNirIj8QD2aVDvRNkiDZUddnJ1PnnwXUgQwtnNor6hT2
+         jmM8iv0Xy3KWobcImIFTi7ifje3k5ft68/n0FI6MuaT8I8vqsWGt73WsQa94VKlvirar
+         OJhFtFdXMbS5q/0TPzA10KuHztwNfiUBup3+in1jn9NR2xQAEzowAnedUUhcqh47wltw
+         6f8qOXCDenu1kE7d+uM3MTLg4eE5qp2jWXSf71BlEmGbObfn9NIrPZGDLt/mK1HALqch
+         5g0KUbfCW6jqO3BKccV+Yyh+UHBQ8SHXKDNwXXw6UTKsAjsVQYzfnlf8rVYkRWZ1WM/9
+         Xsww==
+X-Forwarded-Encrypted: i=1; AJvYcCVQy93K4dp4cejDkeootq1i1jsuCYzRC1OEhAGnZN4fVFar8e/9ZTLVELgVBKMqIrtVi0XQTWJJ+SinVvzUO2XOvLTA6qM5
+X-Gm-Message-State: AOJu0YzcJsATSWW0dYrPtFVtC5K+5pNcV+o2Z8AUYv7M8NByQI8eEbDz
+	TKeL0aQtmU9sZrwn2lEymB2o54Mx7SU5FEXU0txhjboW7tyUkwRNnLzWc0V6zaEFnbvBWqclMJ7
+	5pJiljWmPjoOAU+ZvxloZ5U2IjzhrVu/fps2tkYuBjf2DHqsMmmFe8dQ=
+X-Google-Smtp-Source: AGHT+IGMCmJFPFJF3fk69Cf2peBO45tLdX3hxvujdc71EobswisJhf13rG+/RIov/aCulJQas0YVTig/qD2uBa5dkW9gn1R5ip5K
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 1/2] driver core: auxiliary bus: show
- auxiliary device IRQs
-To: Greg KH <gregkh@linuxfoundation.org>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>
-CC: <netdev@vger.kernel.org>, <pabeni@redhat.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <edumazet@google.com>, <david.m.ertman@intel.com>,
-	<rafael@kernel.org>, <ira.weiny@intel.com>, <linux-rdma@vger.kernel.org>,
-	<leon@kernel.org>, <tariqt@nvidia.com>, Parav Pandit <parav@nvidia.com>
-References: <20240509091411.627775-1-shayd@nvidia.com>
- <20240509091411.627775-2-shayd@nvidia.com>
- <2024051056-encrypt-divided-30d2@gregkh>
- <22533dbb-3be9-4ff2-9b59-b3d6a650f7b3@intel.com>
- <2024051038-compare-canon-4161@gregkh>
- <ae6e151e-0c34-4ff8-a9f7-40e4cbdb9dee@intel.com>
- <2024051114-gladly-feline-4302@gregkh>
-Content-Language: en-US
-From: Shay Drori <shayd@nvidia.com>
-In-Reply-To: <2024051114-gladly-feline-4302@gregkh>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002529D:EE_|SA3PR12MB9227:EE_
-X-MS-Office365-Filtering-Correlation-Id: 37c3a69d-8ad8-4f89-331c-08dc7255635a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|36860700004|82310400017|7416005|1800799015|376005;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?S0FBZWhsNEJOenQwYnRnQ2VHOXJxWTdkYmVHS24zNXc4SW8yR3ZCa2Q2MEdj?=
- =?utf-8?B?ZXBra1llUTg0VGt3Y0E2S0YyMVVZbGRnMlhWOFdYNFNpWFAxb1ViT21nRitm?=
- =?utf-8?B?aFY1Z25ySlpSVnh3YjNBM0grSm9kVS9Mdld0alpZakNTNHNDaTN0cGJGVzlr?=
- =?utf-8?B?ejRtZVl4S20yV0o4SW9rb0I3ckJZMGNoSzMrdnFUTEdBRkxlRENqZktROU9G?=
- =?utf-8?B?dGF4L3c3WXhXeW80RmdCSkhCYzk0b3liN1ZYSHp0S1B1K3J5TWFvTm13SjdK?=
- =?utf-8?B?OG54Sm5NTTNybVNaQkREcEdQZDFDakxxUFBqVnI1NXZtNlBjVUJ0OXk1U2p0?=
- =?utf-8?B?MTVFUmptOEdraWVWQ2I1YnJrQXNmdVhRTkNSQXlOOFFyM2Z3akFqTjlDdzdN?=
- =?utf-8?B?NFh2Sk9vR29tbnZXR3VCOVltZDVsV205NjBUdEY5T3pzaGFvR0t5Yk9RVXJR?=
- =?utf-8?B?S0kzaGhlN2pOZmFLUWV1bVF0ZXF0bkx5OElDaE1aendFMkhOWDc4NlU2WEsr?=
- =?utf-8?B?cHZ6T0lIZ290SWUvSUJUWWJUZ3J0M3drTVhPMmtsL2lBc3I5bmtOVHZ1YUUr?=
- =?utf-8?B?TEdxdlVjUWc4T1VOVUdYdWNqTUkzUDdJUEF2QUluVWViY3lEODZ4WnZVamps?=
- =?utf-8?B?Q1FTdVJQQjBoUXBTVHBkWDBESXBKei9WZmoyTTY1YThOZ2Q5bmRYdWZCVnQ2?=
- =?utf-8?B?MEN0ek5pSFlWNThQQ1Y4YVVTaFlieVp4cFhsRDFkU2QvNFJ0VkZhcnk0ZkNi?=
- =?utf-8?B?dWgwdjFYZlVKMUliQ1l2OE5USDMyemxCdVBPQTYwWmdRRDc0RVJnbVpYMTZP?=
- =?utf-8?B?dGQ5cEk3Sll5aG1vV0t5S2lRS1FNZ2wrTVA0NXY3aGlKTGVVdVl5ajBKalhy?=
- =?utf-8?B?S0tQTUlhbEdLUHl0QzRJclIzbjFWMC96dzcwZTRJTHU5RWN2N05NMVBJZ0F4?=
- =?utf-8?B?bHZNNCt4NmZQZmY2bEp1T0MvNWFkK0tiUTVubDBlSENHNVhQbnEzVm1HNE4w?=
- =?utf-8?B?SURxanNEUlg3VFJ6WFBQVUMvd2pNQ1pJU0NtQ2VDUCsvcS9KVkNqYWY4aHJi?=
- =?utf-8?B?M29ZUkt0eTZJWFIxcG9oaDF0RlJjaU5LODljRGlNRWkzbmNxSjhkM1BNRmdX?=
- =?utf-8?B?aXc4MXQzUjU2KzFDR200SWVkdWlvS0Z0Vlg0ZGd1Sk5uUTNMQ1pNQzhhNVdq?=
- =?utf-8?B?RmZySER0dkJTY3A0Rm1SRXpYTmxNdnFNdXRQbENNV21ZcW41Z2JYUUUxYmtn?=
- =?utf-8?B?ZlAzN3hZZGw1dmhDUlByRHVKMit6aUVMQlkyK2c2RjNJeWpPcFc3UEl6KzUz?=
- =?utf-8?B?Vm1FcXBMbUJ4WFc3Q0VPbExFdlVOZTdhYk5YWEdhR2o2Q0ZDOWJFZGpNaGk3?=
- =?utf-8?B?ZkZXUkRWRWVFY0Y0K0xEVEtkZ292dXZjbmlqSHlXbEdpeGMwaVdqWEVmUWtr?=
- =?utf-8?B?ZWRjWG5uRnkrNW4xSnlNL05pWFk3U0RoeFhsUkx6QVlHcFJuRy92R3dZeG9Z?=
- =?utf-8?B?ekEzU1c3R3E4T1YzL2UwVFoxUUtRUU4vbXpZVWJTcE5uZVNpR1I0aytGTG1W?=
- =?utf-8?B?QjA4bFVocFVDVEd3aGZLc0VOcjZGRlFIcitCcG1weS9iTnRBVDFSdVVjcE5r?=
- =?utf-8?B?dG9yNUw1dEhQWTdaR083NzNQTWdEazVSdnFNU2kwcGdwOUExUjBXSnlBTk00?=
- =?utf-8?B?aC9lcVNtOTAxdk5TU3dUQ212dzJteG42L3o4ZFVmRFlsSmxLZE1YdDNseDBC?=
- =?utf-8?B?dUdVdkRjWDhWL1AvcnFtKzlzSHRYbkg0U01xNzF5NkZTY1BwTStGR0RnK1Zu?=
- =?utf-8?B?QllXWUl5NmxCT053bjREMnJmWkIzRHJ0YnZnbkhhUlZrdDh0czZMampjSWlY?=
- =?utf-8?Q?QOb1Z9vu/WWWN?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(82310400017)(7416005)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2024 07:30:24.2847
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 37c3a69d-8ad8-4f89-331c-08dc7255635a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002529D.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9227
+X-Received: by 2002:a05:6602:2b10:b0:7de:d6a0:d9c4 with SMTP id
+ ca18e2360f4ac-7e1b5204829mr24194139f.2.1715501069028; Sun, 12 May 2024
+ 01:04:29 -0700 (PDT)
+Date: Sun, 12 May 2024 01:04:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d4e70506183d374d@google.com>
+Subject: [syzbot] [bridge?] KMSAN: uninit-value in br_dev_xmit (2)
+From: syzbot <syzbot+a63a1f6a062033cf0f40@syzkaller.appspotmail.com>
+To: bridge@lists.linux.dev, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, razor@blackwall.org, roopa@nvidia.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    dccb07f2914c Merge tag 'for-6.9-rc7-tag' of git://git.kern..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=10b995a8980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=617171361dd3cd47
+dashboard link: https://syzkaller.appspot.com/bug?extid=a63a1f6a062033cf0f40
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122a37c0980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=111a53c0980000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/fdbc7be30633/disk-dccb07f2.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a9e4c11aa835/vmlinux-dccb07f2.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/43c3a343ea93/bzImage-dccb07f2.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a63a1f6a062033cf0f40@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in br_dev_xmit+0x61d/0x1cb0 net/bridge/br_device.c:65
+ br_dev_xmit+0x61d/0x1cb0 net/bridge/br_device.c:65
+ __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+ xmit_one net/core/dev.c:3531 [inline]
+ dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3547
+ __dev_queue_xmit+0x34db/0x5350 net/core/dev.c:4341
+ dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+ __bpf_tx_skb net/core/filter.c:2136 [inline]
+ __bpf_redirect_common net/core/filter.c:2180 [inline]
+ __bpf_redirect+0x14a6/0x1620 net/core/filter.c:2187
+ ____bpf_clone_redirect net/core/filter.c:2460 [inline]
+ bpf_clone_redirect+0x328/0x470 net/core/filter.c:2432
+ ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:1997
+ __bpf_prog_run512+0xb5/0xe0 kernel/bpf/core.c:2238
+ bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
+ __bpf_prog_run include/linux/filter.h:657 [inline]
+ bpf_prog_run include/linux/filter.h:664 [inline]
+ bpf_test_run+0x499/0xc30 net/bpf/test_run.c:425
+ bpf_prog_test_run_skb+0x14ea/0x1f20 net/bpf/test_run.c:1058
+ bpf_prog_test_run+0x6b7/0xad0 kernel/bpf/syscall.c:4269
+ __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5678
+ __do_sys_bpf kernel/bpf/syscall.c:5767 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5765 [inline]
+ __x64_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5765
+ x64_sys_call+0x96b/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:322
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3810 [inline]
+ slab_alloc_node mm/slub.c:3851 [inline]
+ kmem_cache_alloc_node+0x622/0xc90 mm/slub.c:3894
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
+ pskb_expand_head+0x222/0x19d0 net/core/skbuff.c:2251
+ skb_ensure_writable+0x412/0x4a0 net/core/skbuff.c:6117
+ __bpf_try_make_writable net/core/filter.c:1665 [inline]
+ bpf_try_make_writable net/core/filter.c:1671 [inline]
+ bpf_try_make_head_writable net/core/filter.c:1679 [inline]
+ ____bpf_clone_redirect net/core/filter.c:2454 [inline]
+ bpf_clone_redirect+0x17f/0x470 net/core/filter.c:2432
+ ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:1997
+ __bpf_prog_run512+0xb5/0xe0 kernel/bpf/core.c:2238
+ bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
+ __bpf_prog_run include/linux/filter.h:657 [inline]
+ bpf_prog_run include/linux/filter.h:664 [inline]
+ bpf_test_run+0x499/0xc30 net/bpf/test_run.c:425
+ bpf_prog_test_run_skb+0x14ea/0x1f20 net/bpf/test_run.c:1058
+ bpf_prog_test_run+0x6b7/0xad0 kernel/bpf/syscall.c:4269
+ __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5678
+ __do_sys_bpf kernel/bpf/syscall.c:5767 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5765 [inline]
+ __x64_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5765
+ x64_sys_call+0x96b/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:322
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 0 PID: 5070 Comm: syz-executor183 Not tainted 6.9.0-rc7-syzkaller-00012-gdccb07f2914c #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+=====================================================
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On 11/05/2024 10:44, Greg KH wrote:
-> On Fri, May 10, 2024 at 04:01:01PM +0200, Przemek Kitszel wrote:
->> On 5/10/24 15:07, Greg KH wrote:
->>> On Fri, May 10, 2024 at 02:54:49PM +0200, Przemek Kitszel wrote:
->>>>>> +static ssize_t auxiliary_irq_mode_show(struct device *dev,
->>>>>> +				       struct device_attribute *attr, char *buf)
->>>>>> +{
->>>>>> +	struct auxiliary_irq_info *info =
->>>>>> +		container_of(attr, struct auxiliary_irq_info, sysfs_attr);
->>>>>> +
->>>>>> +	if (refcount_read(xa_load(&irqs, info->irq)) > 1)
->>>>>
->>>>> refcount combined with xa?  That feels wrong, why is refcount used for
->>>>> this at all?
->>>>
->>>> Not long ago I commented on similar usage for ice driver,
->>>> ~"since you are locking anyway this could be a plain counter",
->>>> and author replied
->>>> ~"additional semantics (like saturation) of refcount make me feel warm
->>>> and fuzzy" (sorry if misquoting too much).
->>>> That convinced me back then, so I kept quiet about that here.
->>>
->>> But why is this being incremented / decremented at all?  What is that
->>> for?
->>
->> [global]
->> This is just a counter, it is used to tell if given IRQ is shared or
->> exclusive. Hence there is a global xarray for that.
->> And my argument is for this case precisely.
->>
->> [other]
->> There is also a separate xarray for each auxdev (IIRC) which is used as
->> generic dynamic container [that stores sysfs attrs], any other would
->> work (with different characteristics), but I see no problems with
->> picking xarray here.
-> 
-> Again, why is an xarray needed, why isn't this part of the auxdevice
-> structure to start with?
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If I understand you correctly, you are referring to the xarray of the
-auxdevice (not the global one).
-If so, instead of xarray what can be used by the auxdevice?
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-> 
-> thanks,
-> 
-> greg k-h
-> 
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
