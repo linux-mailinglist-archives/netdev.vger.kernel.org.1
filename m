@@ -1,116 +1,207 @@
-Return-Path: <netdev+bounces-95821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DAA88C389E
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 23:35:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDF508C38F2
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 00:06:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2885128159C
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 21:35:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 809EA28123D
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 22:06:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0294D5B0;
-	Sun, 12 May 2024 21:35:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C143D5476B;
+	Sun, 12 May 2024 22:06:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G3szn+1y"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (unknown [170.10.129.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F325548EF
-	for <netdev@vger.kernel.org>; Sun, 12 May 2024 21:35:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167EF42A8B
+	for <netdev@vger.kernel.org>; Sun, 12 May 2024 22:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715549743; cv=none; b=fGJxwSKv/3krk7Njzx3UzvQnouHQLvjDKqERq9ZrvMBaSwnY+4hezXxfDYFGzR1koTRnpCdqDlPYPDdNL45eUKip7gxnhX4D4VMxbsBHv1CgIcYmSVEG+YiC+VMlm3DfSQlEcufYggyFQE/NrjVinLVUOKxdclsdmk9XV92jsU4=
+	t=1715551615; cv=none; b=RFxEvxVtQEb6t3HFCh3ay4VwpHP+u8icUP1ZY29/cl9ORozFQNqDCK3PNC7vw6l0KlVUd0jcSvGjt0jAzrNNaeBuI6sjh5YD9O/+Rrzex0sWQXCKiyj1mTp18q8LiUo/aaFfSWk8p2oTzA6R1r6mbK0T3RhZCCx22BYgrv+K3UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715549743; c=relaxed/simple;
-	bh=NKEyY2+yCOviPT+SWGh7kDMM81ohfCxWyOiIcNFRaRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=YGUQjvu3vydtE9aT9XJFF3IkTw/W0UdQL5Ns1njYafP7nDGaWqYAi+nEo94ZNW/cOZJ3k0zGg/TSwQAaL4URgfXQOjH+ltWhH6Hh0k1xIsb/ryNUroOUfXxk3cExXsnIHIFLQtA5UdT7H2/Dbhd/SNExTSOK3APCOwP8XhuiJME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=170.10.129.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-3-0sHqjJF0PWOLX-sMoFzzqg-1; Sun, 12 May 2024 17:35:37 -0400
-X-MC-Unique: 0sHqjJF0PWOLX-sMoFzzqg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C3E2A81227E;
-	Sun, 12 May 2024 21:35:36 +0000 (UTC)
-Received: from hog (unknown [10.39.192.5])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 91A1740EF99;
-	Sun, 12 May 2024 21:35:35 +0000 (UTC)
-Date: Sun, 12 May 2024 23:35:34 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
-Subject: Re: [PATCH net-next v3 09/24] ovpn: implement basic TX path (UDP)
-Message-ID: <ZkE2JmBCj-yJ3xYK@hog>
-References: <20240506011637.27272-1-antonio@openvpn.net>
- <20240506011637.27272-10-antonio@openvpn.net>
+	s=arc-20240116; t=1715551615; c=relaxed/simple;
+	bh=ttfN6FeGWHdEoMQZv1ZhJrw+xAJZJl6VblIRW+HOE2U=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=HvJ9ZFwkTQ6qT7+IfyNKJmBslPKUC1quO+V7tqmtdKQrmUYqT0feoQVF0rvFMkPK6brqFEuLtywWEyDWIDR1noG1d8zC59Z/RQNFXArjQE4g0aScyAo13T8cLMDtbU7sSeNo9i8thC8z+HOa1U/sOSpwGSoCyrBW8SRFrdo12W8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G3szn+1y; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42016c8db2aso1533415e9.0
+        for <netdev@vger.kernel.org>; Sun, 12 May 2024 15:06:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715551612; x=1716156412; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hDmXCQLxpbbPKH+gwgNLbt2UwtvU7u5iknn1DtwWHDM=;
+        b=G3szn+1yiouEfxjtwIinfSHq7y4tUC4bgWAm7shhqZVGo2Ca8CFuVLtGdtkaFTf2f4
+         o2XVsVfkB4ZUkyqKsjG7mX800TSyReHZhXZB4j9LQik683O66ioXUsRyNZ8rUDwsNzKt
+         fbZ1Bdk2L475y1eJxhboHNQ5rSCOjiuUUngAHtyk6rSWbI9uxfBJdP1EThlCxogPECpb
+         jA/5q213yGr0Lurezz7KYr67JCDMGx/ebOeldUWa6PYBXKP3hUBwjMamtzYCQarkd8GX
+         AfXMmLmoR/N8uQKhwlqKqFx5ixFuFrNHVvQk0JGMf29ti2nqAIt1W/9hTS1xtF1Uzz1E
+         m+zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715551612; x=1716156412;
+        h=content-transfer-encoding:cc:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=hDmXCQLxpbbPKH+gwgNLbt2UwtvU7u5iknn1DtwWHDM=;
+        b=NEc+IzxEtbzQipRmdr2h7/Ow597ywIteeeqEQO53jcNfQQZyGq3Ig4QOThHVVKHE3I
+         S3EkAuWeD4d2UTpeeJCMnrvLGmmshb9Z96z9kRKRcDSyedtfUJdLiAxG99vDo1l1InoF
+         HopvGt1ZO3JyJngXojZbp/Fz1gW7R1er5IyL6f3GFXwclIFphZcI8s27fCaYnRyKKUME
+         ynqVXF8DHIrKLWYzrA/0mRHZG9PTDuOVDOYcVTWYs4QOkcM3kfjcaWddL30MbymIT2DO
+         b5FT2eQtqcTT2wKCxHSASqqvpiaK6TCLOoRNCuhgW31tWxNJUXvGrru7rOeopPUP3ZXQ
+         oZ1A==
+X-Gm-Message-State: AOJu0YwH6gdECqg+H6PHzdz6LZJexL0eP4I42E6xqb1Uryg40OIVYyX3
+	D1NdgbmFvElPFcPANvpylbgSaG8t2JOSnMpIYw5Z4haWjzPIfXNqYNc7zZ+G
+X-Google-Smtp-Source: AGHT+IFzRGrite4rvZXYzxWAcb2/k3bMi0kT13uOBeHsFCvwKNV/Y6OcBkaKnz7oAv7DEU8vuUU+JA==
+X-Received: by 2002:a05:600c:4286:b0:418:fe93:22d0 with SMTP id 5b1f17b1804b1-41feaa397f7mr55393215e9.11.1715551611998;
+        Sun, 12 May 2024 15:06:51 -0700 (PDT)
+Received: from [192.168.1.58] (186.28.45.217.dyn.plus.net. [217.45.28.186])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502bbbbf08sm9599605f8f.96.2024.05.12.15.06.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 12 May 2024 15:06:51 -0700 (PDT)
+Message-ID: <7ea34300-7d55-4411-8ce9-fcc769e05647@gmail.com>
+Date: Sun, 12 May 2024 23:06:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240506011637.27272-10-antonio@openvpn.net>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
+User-Agent: Mozilla Thunderbird
+Content-Language: en-GB
+From: Ken Milmore <ken.milmore@gmail.com>
+Subject: r8169: RTL8125 timer experimentation
+To: netdev@vger.kernel.org
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com
 Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-2024-05-06, 03:16:22 +0200, Antonio Quartulli wrote:
-> +/* send skb to connected peer, if any */
-> +static void ovpn_queue_skb(struct ovpn_struct *ovpn, struct sk_buff *skb=
-,
-> +=09=09=09   struct ovpn_peer *peer)
-> +{
-> +=09int ret;
-> +
-> +=09if (likely(!peer))
-> +=09=09/* retrieve peer serving the destination IP of this packet */
-> +=09=09peer =3D ovpn_peer_get_by_dst(ovpn, skb);
-> +=09if (unlikely(!peer)) {
-> +=09=09net_dbg_ratelimited("%s: no peer to send data to\n",
-> +=09=09=09=09    ovpn->dev->name);
-> +=09=09goto drop;
-> +=09}
-> +
-> +=09ret =3D ptr_ring_produce_bh(&peer->tx_ring, skb);
-> +=09if (unlikely(ret < 0)) {
-> +=09=09net_err_ratelimited("%s: cannot queue packet to TX ring\n",
-> +=09=09=09=09    peer->ovpn->dev->name);
-> +=09=09goto drop;
-> +=09}
-> +
-> +=09if (!queue_work(ovpn->crypto_wq, &peer->encrypt_work))
-> +=09=09ovpn_peer_put(peer);
+I have been experimenting with the "interrupt moderation" timer on the RTL8125, based largely on reading the NetBSD "rge" driver source.
+This doesn't seem like much of an improvement over a software timer, but the BSD driver as well as the Realtek-supplied r8125 driver both make use of it.
 
-I wanted to come back to this after going through the crypto patch,
-because this felt like a strange construct when I first looked at this
-patch.
+Despite using 32-bit registers it appears that the timer is 16-bit, and runs at 125 MHz.
+The default timeout interval used by the aforementioned drivers is 0x2600 which equates to about 78 us.
+This interval maybe seems a bit long, but I note that both drivers use a ring buffer size of 1024 vs only 256 in the r8169 driver.
 
-Why are you using a workqueue here? Based on the kdoc for crypto_wq
-("used to schedule crypto work that may sleep during TX/RX"), it's to
-deal with async crypto.
+The patch below is just for interest. It modifies r8169 to use the timer when enabling interrupts from rtl8169_poll, following any Tx or Rx work having been done.
+The timer interval can be adjusted via a module parameter.
 
-If so, why not use the more standard way of dealing with async crypto
-in contexts that cannot sleep, ie letting the crypto core call the
-"done" callback asynchronously? You need to do all the proper refcount
-handling, but IMO it's cleaner and simpler than this workqueue and
-ptr_ring. You can see an example of that in macsec (macsec_encrypt_*
-in drivers/net/macsec.c).
 
---=20
-Sabrina
 
+diff --git linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
+index 6e34177..1fc470c 100644
+--- linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c
++++ linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
+@@ -329,6 +329,8 @@ enum rtl8168_registers {
+ enum rtl8125_registers {
+ 	IntrMask_8125		= 0x38,
+ 	IntrStatus_8125		= 0x3c,
++	TimerCnt0_8125		= 0x48,
++	TimerInt0_8125		= 0x58,
+ 	TxPoll_8125		= 0x90,
+ 	MAC0_BKP		= 0x19e0,
+ 	EEE_TXIDLE_TIMER_8125	= 0x6048,
+@@ -660,6 +662,9 @@ MODULE_FIRMWARE(FIRMWARE_8107E_2);
+ MODULE_FIRMWARE(FIRMWARE_8125A_3);
+ MODULE_FIRMWARE(FIRMWARE_8125B_2);
+ 
++static u16 rtl8125_timer_interval __read_mostly = 0x2600;
++module_param(rtl8125_timer_interval, ushort, 0644);
++
+ static inline struct device *tp_to_dev(struct rtl8169_private *tp)
+ {
+ 	return &tp->pci_dev->dev;
+@@ -1324,6 +1329,26 @@ u8 rtl8168d_efuse_read(struct rtl8169_private *tp, int reg_addr)
+ 		RTL_R32(tp, EFUSEAR) & EFUSEAR_DATA_MASK : ~0;
+ }
+ 
++static void rtl8125_hard_irq_enable(struct rtl8169_private *tp)
++{
++	u32 mask = tp->irq_mask & ~PCSTimeout;
++
++	RTL_W32(tp, TimerInt0_8125, 0);
++	RTL_W32(tp, IntrMask_8125, mask);
++}
++
++static void rtl8125_timer_irq_enable(struct rtl8169_private *tp)
++{
++	u16 interval = READ_ONCE(rtl8125_timer_interval);
++
++	if (interval) {
++		RTL_W32(tp, TimerInt0_8125, interval);
++		RTL_W32(tp, TimerCnt0_8125, 1);
++		RTL_W32(tp, IntrMask_8125, PCSTimeout);
++	} else
++		rtl8125_hard_irq_enable(tp);
++}
++
+ static u32 rtl_get_events(struct rtl8169_private *tp)
+ {
+ 	if (rtl_is_8125(tp))
+@@ -1351,7 +1376,7 @@ static void rtl_irq_disable(struct rtl8169_private *tp)
+ static void rtl_irq_enable(struct rtl8169_private *tp)
+ {
+ 	if (rtl_is_8125(tp))
+-		RTL_W32(tp, IntrMask_8125, tp->irq_mask);
++		rtl8125_hard_irq_enable(tp);
+ 	else
+ 		RTL_W16(tp, IntrMask, tp->irq_mask);
+ }
+@@ -4430,7 +4455,7 @@ static void rtl8169_pcierr_interrupt(struct net_device *dev)
+ 	rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
+ }
+ 
+-static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
++static bool rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+ 		   int budget)
+ {
+ 	unsigned int dirty_tx, bytes_compl = 0, pkts_compl = 0;
+@@ -4481,6 +4506,9 @@ static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+ 		 */
+ 		if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+ 			rtl8169_doorbell(tp);
++		return true;
++	} else {
++		return false;
+ 	}
+ }
+ 
+@@ -4654,13 +4682,18 @@ static int rtl8169_poll(struct napi_struct *napi, int budget)
+ 	struct rtl8169_private *tp = container_of(napi, struct rtl8169_private, napi);
+ 	struct net_device *dev = tp->dev;
+ 	int work_done;
++	bool tx_done;
+ 
+-	rtl_tx(dev, tp, budget);
++	tx_done = rtl_tx(dev, tp, budget);
+ 
+ 	work_done = rtl_rx(dev, tp, budget);
+ 
+-	if (work_done < budget && napi_complete_done(napi, work_done))
+-		rtl_irq_enable(tp);
++	if (work_done < budget && napi_complete_done(napi, work_done)) {
++		if (rtl_is_8125(tp) && (work_done || tx_done))
++			rtl8125_timer_irq_enable(tp);
++		else
++			rtl_irq_enable(tp);
++	}
+ 
+ 	return work_done;
+ }
+@@ -5031,6 +5064,9 @@ static void rtl_set_irq_mask(struct rtl8169_private *tp)
+ 		tp->irq_mask |= RxFIFOOver;
+ 	else
+ 		tp->irq_mask |= RxOverflow;
++
++	if (rtl_is_8125(tp))
++		tp->irq_mask |= PCSTimeout;
+ }
+ 
+ static int rtl_alloc_irq(struct rtl8169_private *tp)
 
