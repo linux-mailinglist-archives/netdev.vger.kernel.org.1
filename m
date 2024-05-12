@@ -1,149 +1,183 @@
-Return-Path: <netdev+bounces-95772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F0988C363C
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 13:43:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F29DF8C368C
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 14:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38DDD1C20908
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 11:43:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 686F61F21E03
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 12:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77B61EA91;
-	Sun, 12 May 2024 11:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12E32033A;
+	Sun, 12 May 2024 12:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="jNnTAm1p"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ovGhLpye"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2045.outbound.protection.outlook.com [40.107.94.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85C51B299;
-	Sun, 12 May 2024 11:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715514204; cv=none; b=BA27kReBWmNEOlUbCRZ+L+YM8nHIE7+08QuE49GnB46FyvkyeEH7D7qZKkfkwR8Ob/Cxq2q0+FfMn7su2sJTM92sLBqLJQYy/3z2YZWsBzHUDs4e5pUpzaf9zsEgT2dBkkkKOZjKPHTDuH1qWBqu3Tkf3do1PcMwePEd4xaBqB8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715514204; c=relaxed/simple;
-	bh=qLj4gJFZ/7RuARyGAnZp84xT1mPl/8zeXxVZwa+jfd0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RJ1S9suzAPUGC7roTaw8uDiWx48FMsCaafrGK65LlGMzaezagZ2lv9lpKA7Wm9mK5ef27/4XjWLMb4Yr26nEHloVdI1ZWIIzLH/4jrldmEhO+J+KmRZd0P8fue9YspR0YWNxH4XUIMbcGJKppesa2JFLmGEGhfYlse7lRmSh9bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=jNnTAm1p; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1715514191; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=zP98sGRL72gU8rZzmqd2nC7wYAJhh+7edu3Bc8oq2fM=;
-	b=jNnTAm1psYsmKrvWnYgLkmyZHjZ9i3MAlqgxmqFejqnz5lrEPhX8y1KTD1ZBY8OxEOTX0hXiXFFvZ40zE7eKEUdU4/aZZEh65aJpUFND/Yq/frz813xx1PB2/G5VQlKFuBPuljjrv59PHdpYoOanMPnJOhBMKBfFRe2DLFahokI=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067113;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0W6FbEpK_1715514189;
-Received: from 30.236.12.8(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0W6FbEpK_1715514189)
-          by smtp.aliyun-inc.com;
-          Sun, 12 May 2024 19:43:10 +0800
-Message-ID: <8ba154e0-30cb-4bc4-9aa2-d4a02cb27545@linux.alibaba.com>
-Date: Sun, 12 May 2024 19:43:09 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7D21CAAF
+	for <netdev@vger.kernel.org>; Sun, 12 May 2024 12:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715517853; cv=fail; b=Ldpdmu5qkzpruVwxqeR2i28JTOxZeQUs5WVSFWeX8ArjFWFgTDv8yxFttflGceXqaAsKT4HgvTPY5QzlVZ5O+w4ivZHzxI3P25Gk1qU5Qp5HPMPq/WNclvMwLXVjjZ6WFIbmWNnUFxBjwkPuFlbNF//yxTDR3xxbFNMgiUqy1lA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715517853; c=relaxed/simple;
+	bh=RI55n3p4qvUSlsA6AX5ZJ8qVuBtB/u7zs21hFkRkqzo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uL7lAkWI6gccUlnCS6bV3SrDa5qwPlb/YEvEf80zyx1tJS1tmJQRDxfafkCN7C1ceAM2SarDNKkGnqameB7D/MLAXDo8EkocN87UkXxC+Y8e7kTJ3yJL27wK58Kh/Fazgssemli5a57p5NcZ+eKkx3XOQF+KqgJ4fIi8tKDri1U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ovGhLpye; arc=fail smtp.client-ip=40.107.94.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=X91Ynr/uS/ghmOK0U1O8ksZ1PhlKloQcL8MMsO0sTTjPQBeAWE4hKcgrKqeY8h2CGIFEt1+XLRgfoo2co2MIs7kra8xfY/bYAQmE0yAztfHija11sbyO1NdVug7MDFijZb/4uWDF/15rTbo7ZNDcKNFsSbVwCRFYTfi4APGYWJaXd4q0q2xr2NYXzEuC5ojWBMzumgbMIRs0CqgoAJfolONSf8m1lUKzxqvgiyswIwyjpgW1zzQfHqwrMvi+6rkusKJohShlq0hZLTVYy1+t74oNZ+5fkz9NBjj8n4pYu+tpX/OdJBwAqZ76M7M31fLc86unz0SFe7ZLm4Gk5oBLyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+cnK+S1KUpQZ/LtPbs2Nduy/N4i0RpoE3VzCgJ6e1QU=;
+ b=VVfPgxFfstqvYN6uU1k0vnpGgBGgFD3Zhp1p6gtBzPz2Oq+eHGiDJZU28o2DaSTt19ZMRvPTH8mjVHFZKBbs5YYZ2m1op5XcYvIEPjOwAyFDuvXeimIm4XYndvwa2h7bpIkA9+Cvdy9t22S0OG/Hk395th464lnO8YH7SeYhlBn6hoV66ZOnMyvD26QgQhPXvoly1hhQul7FPOfWk6kznVkRuyo/3MkBo6opb5CAb1Y5diw0/BeRIcYdiHSweKFWVMcoH+VIocpxNHb2zxr1nAAkfeX/uJjLfq/A66cUT94Bn7Rs5iETKWySfVz+wRvtWBljbAAATY+Kb2C8soVG9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+cnK+S1KUpQZ/LtPbs2Nduy/N4i0RpoE3VzCgJ6e1QU=;
+ b=ovGhLpyeMp0wFWBU+gcT8ZPXN8cOhJMdz4tsQymWkZ46Duv0ThqBP8cZ1ZxBQ8VImZvD0a1vo2ZuC53syJUKXCflk41m5S/nIf2jo61lFwerkWd8SRpjSPctTKiSAqx/uHZ3KjZqPEMmFRSW1l2vAtqvL4IA9x5SKnZHUtmR8SnMX1kNu+2AmXWHzphEXEOqgQY/w6FI/FLrLoQ3jAUiFaznIuhPlIu9x8/EBWopdct8gQQbgQYICrRiN4qsgCLTK85I+D2f/p2ViAlCe0U0kUIn7hSxoxGZvbhFngeuGS86MRNQmNDJKcUtzUe+qTs8+Wt1Qhn0XPvPL7i26rWAqw==
+Received: from SN4PR0501CA0069.namprd05.prod.outlook.com
+ (2603:10b6:803:41::46) by DS0PR12MB6629.namprd12.prod.outlook.com
+ (2603:10b6:8:d3::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Sun, 12 May
+ 2024 12:44:08 +0000
+Received: from SN1PEPF000397AE.namprd05.prod.outlook.com
+ (2603:10b6:803:41:cafe::5) by SN4PR0501CA0069.outlook.office365.com
+ (2603:10b6:803:41::46) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.21 via Frontend
+ Transport; Sun, 12 May 2024 12:44:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF000397AE.mail.protection.outlook.com (10.167.248.52) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7587.21 via Frontend Transport; Sun, 12 May 2024 12:44:08 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 12 May
+ 2024 05:43:45 -0700
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 12 May
+ 2024 05:43:44 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Sun, 12 May
+ 2024 05:43:41 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>
+Subject: [PATCH net-next 0/3] mlx5 misc patches
+Date: Sun, 12 May 2024 15:43:02 +0300
+Message-ID: <20240512124306.740898-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: some questions about restrictions in SMC-R v2's implementation
-To: Wenjia Zhang <wenjia@linux.ibm.com>, jaka@linux.ibm.com,
- kgraul@linux.ibm.com
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <6d6e870a-3fbf-4802-9818-32ff46489448@linux.alibaba.com>
- <ba4c7916-d6c4-44b6-a649-1e17c65e87f9@linux.ibm.com>
-Content-Language: en-US
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <ba4c7916-d6c4-44b6-a649-1e17c65e87f9@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF000397AE:EE_|DS0PR12MB6629:EE_
+X-MS-Office365-Filtering-Correlation-Id: 14562b93-c5b8-4c91-4db1-08dc72813738
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|376005|36860700004|82310400017|1800799015;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?QhDcYxkEfPM5sKH3JnO47tXvTjTy38LFqvMd0HdR/WnV8eblWxBAkSoJRWV8?=
+ =?us-ascii?Q?llsynXD/NaciKziq92x9i/Ixkh9tH4c0adSpbej3tiDRef4NqdGYJ9I6DdtC?=
+ =?us-ascii?Q?OR9a8OLnaL5HKZHcdVdctdyy17h34oPcUd+1pLTNa5zZANaus56PViJ14Yxy?=
+ =?us-ascii?Q?esJtO2EQbul1yAiAWz1dHdVBbi0CmAp0IRK2hvtuUed6lGG3lFbQXnMu/W+2?=
+ =?us-ascii?Q?d6u404JbKZGpOyVlNa490FgHuH33CkFGf9dSCEb+L3QjDIu1q9DlQjpXuilW?=
+ =?us-ascii?Q?5NbWW/9IXil+PEOXjxQEQVS8Af1BPXic7wiOIiHy1rmDUzBCpeQ3f2HmKmlD?=
+ =?us-ascii?Q?se9U6knjCT2x1/ePNT1Hb//n81r86GihQ2XHEHUfPIDhjSb5grbSbIGtLxTR?=
+ =?us-ascii?Q?vgi59jIYoX5oP1licEK6Hv+dmKTeicbVm6HOxAJBZ+vLc16c9yM0hS8xKNlo?=
+ =?us-ascii?Q?1KrrznVYSm5crJ1YqeDMsr/E5TFEJuUPHmGjSvaNgem51+P4A967PK0sfewJ?=
+ =?us-ascii?Q?7bsWxE9vnjBK51OIf1u5jROfoxstImHjoDRluG+v/Dc/m8I/wKF+e+ASynOc?=
+ =?us-ascii?Q?cbwSc90rkWBzuWA74n9PzjnbbAgvarBiqyoYPktRA0loNJDh0tm3dDptMCsz?=
+ =?us-ascii?Q?lndfmJ98s+jDlcBdLrtEM5IaaSsg5c/0plwCitGkd/ahLit99AAuTxUMF4d0?=
+ =?us-ascii?Q?AJa1d7Mq+fdPzK2dUdNM7jixmLC+r7AP++2T6AXH4hZ/Xh2fPUTyXTtHSmk5?=
+ =?us-ascii?Q?2ye3r5NRLTuwegAb24UG5OFJ/4CAMb2X4j7r2xpA/gNmfijfdlAwocV14p4u?=
+ =?us-ascii?Q?IVtR6+Q4ZyUwuxAaq3riJWWdhWUENzndbBTcGaxvt6197LKDT3bp/OiIxDgT?=
+ =?us-ascii?Q?MCSwLP1uiOAjlK+yJ4agy7DuNidb3pZ/8txUuZ8EqHWCv5e9lphLZxpyM09r?=
+ =?us-ascii?Q?Eas4VjvpNMcjJML0AR7HFUhXN3uuhcFm4bGbaC2/ypajolpGVGf3ZKjGnLtu?=
+ =?us-ascii?Q?4OdFAjgclmv1/H/Ixq+iQ+rhEsJJh+nmZ94NKAH1LaNVx0lDF7p8odIxZUvH?=
+ =?us-ascii?Q?79vo7mNJP9AMnbOWC+gLu7XVDIzWgwYVugkvgfSMsBP8lv9QaO7H42BFXz6n?=
+ =?us-ascii?Q?0EycGL3SjQkZD6bkXSE0+n3z5ONhRkCbdqZR666xIQ1Ymuht22rH4jpWDeGw?=
+ =?us-ascii?Q?mzzSZHlnu89fuvE9Lwsbjo2Ma4/ss6cYf6Ip9NTXz3Ds1vOAdhUPjpVIaBPK?=
+ =?us-ascii?Q?ZTIfhJa99HBpc8KKJhEqDj4vBkJe961NLcwEnsMQAaMT9+bDKHrGzuYQn2KP?=
+ =?us-ascii?Q?Y1wRomXoIcF9tLVhtVOuG9gObI3S1XnA3GnM0TNmXfcER51dM4TfDzFTA6Ov?=
+ =?us-ascii?Q?BfUEjLxtiUa3VxIMFCN7AqgAjXt9?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400017)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2024 12:44:08.0989
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 14562b93-c5b8-4c91-4db1-08dc72813738
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF000397AE.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6629
 
+Hi,
 
+This series includes patches for the mlx5 driver.
 
-On 2024/5/10 17:40, Wenjia Zhang wrote:
-> 
-> 
-> On 07.05.24 07:54, Guangguan Wang wrote:
->> Hi, Wenjia and Jan,
->>
->> When testing SMC-R v2, I found some scenarios where SMC-R v2 should be worked, but due to some restrictions in SMC-R v2's implementation,
->> fallback happened. I want to know why these restrictions exist and what would happen if these restrictions were removed.
->>
->> The first is in the function smc_ib_determine_gid_rcu, where restricts the subnet matching between smcrv2->saddr and the RDMA related netdev.
->> codes here:
->> static int smc_ib_determine_gid_rcu(...)
->> {
->>      ...
->>          in_dev_for_each_ifa_rcu(ifa, in_dev) {
->>              if (!inet_ifa_match(smcrv2->saddr, ifa))
->>                  continue;
->>              subnet_match = true;
->>              break;
->>          }
->>          if (!subnet_match)
->>              goto out;
->>      ...
->> out:
->>      return -ENODEV;
->> }
->> In my testing environment, either server or client, exists two netdevs, eth0 in netnamespace1 and eth0 in netnamespace2. For the sake of clarity
->> in the following text, we will refer to eth0 in netnamespace1 as eth1, and eth0 in netnamespace2 as eth2. The eth1's ip is 192.168.0.3/32 and the
->> eth2's ip is 192.168.0.4/24. The netmask of eth1 must be 32 due to some reasons. The eth1 is a RDMA related netdev, which means the adaptor of eth1
->> has RDMA function. The eth2 has been associated to the eth1's RDMA device using smc_pnet. When testing connection in netnamespace2(using eth2 for
->> SMC-R connection), we got fallback connection, rsn is 0x03010000, due to the above subnet matching restriction. But in this scenario, I think
->> SMC-R should work.
->> In my another testing environment, either server or client, exists two netdevs, eth0 in netnamespace1 and eth1 in netnamespace1. The eth0's ip is
->> 192.168.0.3/24 and the eth1's ip is 192.168.1.4/24. The eth0 is a RDMA related netdev, which means the adaptor of eth0 has RDMA function. The eth1 has
->> been associated to the eth0's RDMA device using smc_pnet. When testing SMC-R connection through eth1, we got fallback connection, rsn is 0x03010000,
->> due to the above subnet matching restriction. In my environment, eth0 and eth1 have the same network connectivity even though they have different
->> subnet. I think SMC-R should work in this scenario.
->>
->> The other is in the function smc_connect_rdma_v2_prepare, where restricts the symmetric configuration of routing between client and server. codes here:
->> static int smc_connect_rdma_v2_prepare(...)
->> {
->>      ...
->>      if (fce->v2_direct) {
->>          memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
->>          ini->smcrv2.uses_gateway = false;
->>      } else {
->>          if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
->>                smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
->>                ini->smcrv2.nexthop_mac,
->>                &ini->smcrv2.uses_gateway))
->>              return SMC_CLC_DECL_NOROUTE;
->>          if (!ini->smcrv2.uses_gateway) {
->>              /* mismatch: peer claims indirect, but its direct */
->>              return SMC_CLC_DECL_NOINDIRECT;
->>          }
->>      }
->>      ...
->> }
->> In my testing environment, server's ip is 192.168.0.3/24, client's ip 192.168.0.4/24, regarding how many netdev in server or client. Server has special
->> route setting due to some other reasons, which results in indirect route from 192.168.0.3/24 to 192.168.0.4/24. Thus, when CLC handshake, client will
->> get fce->v2_direct==false, but client has no special routing setting and will find direct route from 192.168.0.4/24 to 192.168.0.3/24. Due to the above
->> symmetric configuration of routing restriction, we got fallback connection, rsn is 0x030f0000. But I think SMC-R should work in this scenario.
->> And more, why check the symmetric configuration of routing only when server is indirect route?
->>
->> Waiting for your reply.
->>
->> Thanks,
->> Guangguan Wang
->>
-> Hi Guangguan,
-> 
-> Thank you for the questions. We also asked ourselves the same questions a while ago, and also did some research on it. Unfortunately, it was not yet done and I had to delay it because of my vacation last month. Now it's time to pick it up again ;) I'll come back to you as soon as I can give a very certain answer.
-> 
-> Thanks,
-> Wenjia
+Patch 1 by Shay enables LAG with HCAs of 8 ports.
 
-Hi, Wen Jia,
+Patch 2 by Carolina optimizes the safe switch channels operation for the
+TX-only changes.
 
-So glad to hear that these questions have also caught your attention, and I'm really looking forward to your answers.
+Patch 3 by Parav cleans up some unused code.
+
+Series generated against:
+commit cddd2dc6390b ("Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue")
 
 Thanks,
-Guangguan Wang
+Tariq.
+
+Carolina Jubran (1):
+  net/mlx5e: Modifying channels number and updating TX queues
+
+Parav Pandit (1):
+  net/mlx5: Remove unused msix related exported APIs
+
+Shay Drory (1):
+  net/mlx5: Enable 8 ports LAG
+
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |  1 +
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c | 95 +++++++++----------
+ .../net/ethernet/mellanox/mlx5/core/lag/lag.c |  3 -
+ .../net/ethernet/mellanox/mlx5/core/pci_irq.c | 52 ----------
+ include/linux/mlx5/driver.h                   |  9 +-
+ 6 files changed, 48 insertions(+), 114 deletions(-)
+
+-- 
+2.44.0
+
 
