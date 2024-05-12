@@ -1,72 +1,75 @@
-Return-Path: <netdev+bounces-95822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF508C38F2
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 00:06:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EF868C38F3
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 00:08:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 809EA28123D
-	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 22:06:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D9D61C20C0E
+	for <lists+netdev@lfdr.de>; Sun, 12 May 2024 22:08:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C143D5476B;
-	Sun, 12 May 2024 22:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD5855476B;
+	Sun, 12 May 2024 22:08:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G3szn+1y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D5d3ReUM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167EF42A8B
-	for <netdev@vger.kernel.org>; Sun, 12 May 2024 22:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF75542A8B
+	for <netdev@vger.kernel.org>; Sun, 12 May 2024 22:08:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715551615; cv=none; b=RFxEvxVtQEb6t3HFCh3ay4VwpHP+u8icUP1ZY29/cl9ORozFQNqDCK3PNC7vw6l0KlVUd0jcSvGjt0jAzrNNaeBuI6sjh5YD9O/+Rrzex0sWQXCKiyj1mTp18q8LiUo/aaFfSWk8p2oTzA6R1r6mbK0T3RhZCCx22BYgrv+K3UM=
+	t=1715551685; cv=none; b=lZkWNiYtBQRyymGLL/+q9Q/e8gR0x1FunFVaQsjMXBBmsfapq0GQ2tVbT/e8oU8W8136tE3DuoWgZyj/ip+SvvockR3zhGM8DeHPaG00JT4Upo7sNbTEpN54tQb9OHu0P/z7r3HxmJZep7oCKqhEReD3tqZkh9J5Qp/khshfdzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715551615; c=relaxed/simple;
-	bh=ttfN6FeGWHdEoMQZv1ZhJrw+xAJZJl6VblIRW+HOE2U=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=HvJ9ZFwkTQ6qT7+IfyNKJmBslPKUC1quO+V7tqmtdKQrmUYqT0feoQVF0rvFMkPK6brqFEuLtywWEyDWIDR1noG1d8zC59Z/RQNFXArjQE4g0aScyAo13T8cLMDtbU7sSeNo9i8thC8z+HOa1U/sOSpwGSoCyrBW8SRFrdo12W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G3szn+1y; arc=none smtp.client-ip=209.85.128.44
+	s=arc-20240116; t=1715551685; c=relaxed/simple;
+	bh=3MvlUBbCERYKPZujJQleb/hg7pEbAyL6upQ08fDpIqw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J/YcPU/oL1ihW5+738e+q95HYkIA5JFXzSJtf2vTwFZnY1fbpBc5N7o5tpfA54l2BfvE7ZAWL80ogeW0Z3BobwkvQqkDiNhxZ/1nuijDUtRDxj/LIMZh0+l8Q7vai9o1wxzthpPLDYoipBOhUdVS496/EXkwM3tl5ud9WRWGsx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D5d3ReUM; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42016c8db2aso1533415e9.0
-        for <netdev@vger.kernel.org>; Sun, 12 May 2024 15:06:53 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a59ad12efe3so415216466b.3
+        for <netdev@vger.kernel.org>; Sun, 12 May 2024 15:08:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715551612; x=1716156412; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hDmXCQLxpbbPKH+gwgNLbt2UwtvU7u5iknn1DtwWHDM=;
-        b=G3szn+1yiouEfxjtwIinfSHq7y4tUC4bgWAm7shhqZVGo2Ca8CFuVLtGdtkaFTf2f4
-         o2XVsVfkB4ZUkyqKsjG7mX800TSyReHZhXZB4j9LQik683O66ioXUsRyNZ8rUDwsNzKt
-         fbZ1Bdk2L475y1eJxhboHNQ5rSCOjiuUUngAHtyk6rSWbI9uxfBJdP1EThlCxogPECpb
-         jA/5q213yGr0Lurezz7KYr67JCDMGx/ebOeldUWa6PYBXKP3hUBwjMamtzYCQarkd8GX
-         AfXMmLmoR/N8uQKhwlqKqFx5ixFuFrNHVvQk0JGMf29ti2nqAIt1W/9hTS1xtF1Uzz1E
-         m+zw==
+        d=gmail.com; s=20230601; t=1715551682; x=1716156482; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=LqeDsLW2D7aXO8cAk0OR+9yRjz9z35g5Pyw5R4GtSOk=;
+        b=D5d3ReUMMzzKryhScbjzT5IvI4IxUHbzHoheESDHd0V4AL/kqMPXKh0WuuOJTbzmwD
+         OglN5iZlajSkVL6K8dos6umgNu4fMMCU2Dr1zMW2tAiOIFRB2yVz247VOUtkjTJZBNF2
+         ZvyGuu5SvdK49x6tAp9uKzddU6V7EQKRgi3SdlOib4fSOUbc4HST6mKbDxGX6oh4ohUX
+         SkapsFxX2z7uPuBRCYOLnXTCzoFjWVbbTqtpUOth1y5awSTQ724vzWfphRNuz5qORdZH
+         j4GcuoN3uZajwWffeJWh6kKLTqh9wOO+NaJESjK3Se3RQ4ZGL4ZcI/QP/cpZPcaEsP32
+         HlyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715551612; x=1716156412;
-        h=content-transfer-encoding:cc:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=hDmXCQLxpbbPKH+gwgNLbt2UwtvU7u5iknn1DtwWHDM=;
-        b=NEc+IzxEtbzQipRmdr2h7/Ow597ywIteeeqEQO53jcNfQQZyGq3Ig4QOThHVVKHE3I
-         S3EkAuWeD4d2UTpeeJCMnrvLGmmshb9Z96z9kRKRcDSyedtfUJdLiAxG99vDo1l1InoF
-         HopvGt1ZO3JyJngXojZbp/Fz1gW7R1er5IyL6f3GFXwclIFphZcI8s27fCaYnRyKKUME
-         ynqVXF8DHIrKLWYzrA/0mRHZG9PTDuOVDOYcVTWYs4QOkcM3kfjcaWddL30MbymIT2DO
-         b5FT2eQtqcTT2wKCxHSASqqvpiaK6TCLOoRNCuhgW31tWxNJUXvGrru7rOeopPUP3ZXQ
-         oZ1A==
-X-Gm-Message-State: AOJu0YwH6gdECqg+H6PHzdz6LZJexL0eP4I42E6xqb1Uryg40OIVYyX3
-	D1NdgbmFvElPFcPANvpylbgSaG8t2JOSnMpIYw5Z4haWjzPIfXNqYNc7zZ+G
-X-Google-Smtp-Source: AGHT+IFzRGrite4rvZXYzxWAcb2/k3bMi0kT13uOBeHsFCvwKNV/Y6OcBkaKnz7oAv7DEU8vuUU+JA==
-X-Received: by 2002:a05:600c:4286:b0:418:fe93:22d0 with SMTP id 5b1f17b1804b1-41feaa397f7mr55393215e9.11.1715551611998;
-        Sun, 12 May 2024 15:06:51 -0700 (PDT)
-Received: from [192.168.1.58] (186.28.45.217.dyn.plus.net. [217.45.28.186])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502bbbbf08sm9599605f8f.96.2024.05.12.15.06.51
+        d=1e100.net; s=20230601; t=1715551682; x=1716156482;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LqeDsLW2D7aXO8cAk0OR+9yRjz9z35g5Pyw5R4GtSOk=;
+        b=L5HR3Uan7IM2kl/QBKNV7Qh77VhVz2Ingli+hFGgiFgsgvRPT7WawyzCegRylT8OzJ
+         ATTmP93BFcUPXSN6gpUe40psiF9/yMT1WPkLPqXNAJXTShFSbBTUYislhOrYRu8NXay5
+         ux23IsC4hipDrwgEo7hVtSleQn3sFydbG9j4UD7N097TsvyhIYkIiTS6vM3UelSr3+Ut
+         gImHJEweoVjUGI1oRxhBjHq9Pkksp2WnAsXvEEJS/Xh8YQ40UVK6I3tvW9sA89hSsX4L
+         ZfUHZmM37eXh6TMawOncUNvAFlV8thoy4EJ3qoV1+5GGvg0rK7t0/mIUWsuZYFPPgGZs
+         iKzg==
+X-Forwarded-Encrypted: i=1; AJvYcCWp4VLBTKP/wAbJi1Ep1Iw3GO28ym5GA54Na2nY7KkxyZIeLTd5acKWLonpXukYCnvoeMYS31mjbjDpRaq66X89h+wf+YY6
+X-Gm-Message-State: AOJu0Yw5IaGUoH9cTtIK1A598hK4kHniipUUsNP51N8r2uaQn5o+DNAN
+	lSQFMyq5KUYpHG9AZS6haUPiv0WMtMqL4r2UreSfDGRfZcZYeRo9
+X-Google-Smtp-Source: AGHT+IH0fVyGVF6cYgP87wB5uhiKX3JXZ2HJF3LdrLA2bthvxSHf1vKg90cbeD1EoRCFjjiOAzDQpg==
+X-Received: by 2002:a50:8757:0:b0:572:47be:831d with SMTP id 4fb4d7f45d1cf-5734d5ce595mr7725239a12.20.1715551681896;
+        Sun, 12 May 2024 15:08:01 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:7bdd:8a00:ad81:1135:9a6d:a23f? (dynamic-2a01-0c22-7bdd-8a00-ad81-1135-9a6d-a23f.c22.pool.telefonica.de. [2a01:c22:7bdd:8a00:ad81:1135:9a6d:a23f])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5733bebb6d5sm5222334a12.34.2024.05.12.15.08.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 May 2024 15:06:51 -0700 (PDT)
-Message-ID: <7ea34300-7d55-4411-8ce9-fcc769e05647@gmail.com>
-Date: Sun, 12 May 2024 23:06:51 +0100
+        Sun, 12 May 2024 15:08:01 -0700 (PDT)
+Message-ID: <35fa38fc-9d1e-4a22-86dd-a4c9147d7f70@gmail.com>
+Date: Mon, 13 May 2024 00:08:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,134 +77,140 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Content-Language: en-GB
-From: Ken Milmore <ken.milmore@gmail.com>
-Subject: r8169: RTL8125 timer experimentation
-To: netdev@vger.kernel.org
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com
+Subject: Re: r8169: transmit queue timeouts and IRQ masking
+To: Ken Milmore <ken.milmore@gmail.com>, netdev@vger.kernel.org
+Cc: nic_swsd@realtek.com
+References: <ad6a0c52-4dcb-444e-88cd-a6c490a817fe@gmail.com>
+ <f4197a6d-d829-4adf-8666-1390f2355540@gmail.com>
+ <5181a634-fe25-45e7-803e-eb8737990e01@gmail.com>
+ <adfb0005-3283-4138-97d5-b4af3a314d98@gmail.com>
+ <f0305064-64d9-4705-9846-cdc0fb103b82@gmail.com>
+ <940faa90-81db-40dc-8773-1720520b10ed@gmail.com>
+ <c71a960f-16d3-41f0-9899-0040116b30ee@gmail.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <c71a960f-16d3-41f0-9899-0040116b30ee@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-I have been experimenting with the "interrupt moderation" timer on the RTL8125, based largely on reading the NetBSD "rge" driver source.
-This doesn't seem like much of an improvement over a software timer, but the BSD driver as well as the Realtek-supplied r8125 driver both make use of it.
+On 12.05.2024 21:49, Ken Milmore wrote:
+> 
+> 
+> On 11/05/2024 17:31, Heiner Kallweit wrote:
+>> On 11.05.2024 00:29, Ken Milmore wrote:
+>>>
+>>> Reading this worries me though:
+>>>
+>>> https://docs.kernel.org/networking/napi.html
+>>> "napi_disable() and subsequent calls to the poll method only wait for the ownership of the instance to be released, not for the poll method to exit.
+>>> This means that drivers should avoid accessing any data structures after calling napi_complete_done()."
+>>>
+>> According to kernel doc napi_disable() waits.
+>>
+>> /**
+>>  *	napi_disable - prevent NAPI from scheduling
+>>  *	@n: NAPI context
+>>  *
+>>  * Stop NAPI from being scheduled on this context.
+>>  * Waits till any outstanding processing completes.
+>>  */
+>>
+>>> Which seems to imply that the IRQ enable following napi_complete_done() is unguarded, and might race with the disable on an incoming poll.
+>>> Is that a possibility?
+>>
+>> Same documents states in section "Scheduling and IRQ masking":
+>> IRQ should only be unmasked after a successful call to napi_complete_done()
+>> So I think we should be fine.
+>>
+> 
+> Nevertheless, it would be good if we could get away without the flag.
+> 
+> I had started out with the assumption that an interrupt acknowledgement coinciding with some part of the work being done in rtl8169_poll() might be the cause of the problem.
+> So it seemed natural to try guarding the whole block by disabling interrupts at the beginning.
+> But this seems to work just as well:
+> 
+> diff --git linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
+> index 6e34177..353ce99 100644
+> --- linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c
+> +++ linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -4659,8 +4659,10 @@ static int rtl8169_poll(struct napi_struct *napi, int budget)
+>  
+>  	work_done = rtl_rx(dev, tp, budget);
+>  
+> -	if (work_done < budget && napi_complete_done(napi, work_done))
+> +	if (work_done < budget && napi_complete_done(napi, work_done)) {
+> +		rtl_irq_disable(tp);
+>  		rtl_irq_enable(tp);
+> +	}
+>  
+>  	return work_done;
+>  }
+> 
+> On this basis, I assume the problem may actually involve some subtlety with the behaviour of the interrupt mask and status registers.
+> 
+In the register dump in your original report the interrupt mask is set.
+So it seems rtl_irq_enable() was executed. I don't have an explanation
+why a previous rtl_irq_disable() makes a difference.
+Interesting would be whether it has to be a write to the interrupt mask
+register, or whether a write to any register is sufficient.
 
-Despite using 32-bit registers it appears that the timer is 16-bit, and runs at 125 MHz.
-The default timeout interval used by the aforementioned drivers is 0x2600 which equates to about 78 us.
-This interval maybe seems a bit long, but I note that both drivers use a ring buffer size of 1024 vs only 256 in the r8169 driver.
+> In addition, I'm not sure it is such a good idea to do away with disabling interrupts from within rtl8169_interrupt().
+> This causes a modest, but noticeable increase in IRQ rate which I measured at around 3 to 7%, depending on whether the load is Tx or Rx heavy and also on the setting of gro_flush_timeout and napi_defer_hard_irqs.
+> 
+> e.g.
+> Tx only test with iperf3, gro_flush_timeout=20000, napi_defer_hard_irqs=1:
+> Averaged 32343 vs 30165 interrupts per second, an increase of about 7%.
+> 
+> Bidirectional test with with gro_flush_timeout=0, napi_defer_hard_irqs=0:
+> Averaged 82118 vs 79689 interrupts per second, an increase of about 3%.
+> 
+> Given that these NICs are already fairly heavy on interrupt rate, it seems a shame to make them even worse!
+> 
+> All in all I preferred the solution where we do all the interrupt disabling in rtl8169_interrupt(), notwithstanding that it may require a change to the interface of napi_schedule_prep().
 
-The patch below is just for interest. It modifies r8169 to use the timer when enabling interrupts from rtl8169_poll, following any Tx or Rx work having been done.
-The timer interval can be adjusted via a module parameter.
+I agree.
 
-
-
-diff --git linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
-index 6e34177..1fc470c 100644
---- linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c
-+++ linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
-@@ -329,6 +329,8 @@ enum rtl8168_registers {
- enum rtl8125_registers {
- 	IntrMask_8125		= 0x38,
- 	IntrStatus_8125		= 0x3c,
-+	TimerCnt0_8125		= 0x48,
-+	TimerInt0_8125		= 0x58,
- 	TxPoll_8125		= 0x90,
- 	MAC0_BKP		= 0x19e0,
- 	EEE_TXIDLE_TIMER_8125	= 0x6048,
-@@ -660,6 +662,9 @@ MODULE_FIRMWARE(FIRMWARE_8107E_2);
- MODULE_FIRMWARE(FIRMWARE_8125A_3);
- MODULE_FIRMWARE(FIRMWARE_8125B_2);
- 
-+static u16 rtl8125_timer_interval __read_mostly = 0x2600;
-+module_param(rtl8125_timer_interval, ushort, 0644);
-+
- static inline struct device *tp_to_dev(struct rtl8169_private *tp)
- {
- 	return &tp->pci_dev->dev;
-@@ -1324,6 +1329,26 @@ u8 rtl8168d_efuse_read(struct rtl8169_private *tp, int reg_addr)
- 		RTL_R32(tp, EFUSEAR) & EFUSEAR_DATA_MASK : ~0;
- }
- 
-+static void rtl8125_hard_irq_enable(struct rtl8169_private *tp)
-+{
-+	u32 mask = tp->irq_mask & ~PCSTimeout;
-+
-+	RTL_W32(tp, TimerInt0_8125, 0);
-+	RTL_W32(tp, IntrMask_8125, mask);
-+}
-+
-+static void rtl8125_timer_irq_enable(struct rtl8169_private *tp)
-+{
-+	u16 interval = READ_ONCE(rtl8125_timer_interval);
-+
-+	if (interval) {
-+		RTL_W32(tp, TimerInt0_8125, interval);
-+		RTL_W32(tp, TimerCnt0_8125, 1);
-+		RTL_W32(tp, IntrMask_8125, PCSTimeout);
-+	} else
-+		rtl8125_hard_irq_enable(tp);
-+}
-+
- static u32 rtl_get_events(struct rtl8169_private *tp)
- {
- 	if (rtl_is_8125(tp))
-@@ -1351,7 +1376,7 @@ static void rtl_irq_disable(struct rtl8169_private *tp)
- static void rtl_irq_enable(struct rtl8169_private *tp)
- {
- 	if (rtl_is_8125(tp))
--		RTL_W32(tp, IntrMask_8125, tp->irq_mask);
-+		rtl8125_hard_irq_enable(tp);
- 	else
- 		RTL_W16(tp, IntrMask, tp->irq_mask);
- }
-@@ -4430,7 +4455,7 @@ static void rtl8169_pcierr_interrupt(struct net_device *dev)
- 	rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
- }
- 
--static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
-+static bool rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
- 		   int budget)
- {
- 	unsigned int dirty_tx, bytes_compl = 0, pkts_compl = 0;
-@@ -4481,6 +4506,9 @@ static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
- 		 */
- 		if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
- 			rtl8169_doorbell(tp);
-+		return true;
-+	} else {
-+		return false;
- 	}
- }
- 
-@@ -4654,13 +4682,18 @@ static int rtl8169_poll(struct napi_struct *napi, int budget)
- 	struct rtl8169_private *tp = container_of(napi, struct rtl8169_private, napi);
- 	struct net_device *dev = tp->dev;
- 	int work_done;
-+	bool tx_done;
- 
--	rtl_tx(dev, tp, budget);
-+	tx_done = rtl_tx(dev, tp, budget);
- 
- 	work_done = rtl_rx(dev, tp, budget);
- 
--	if (work_done < budget && napi_complete_done(napi, work_done))
--		rtl_irq_enable(tp);
-+	if (work_done < budget && napi_complete_done(napi, work_done)) {
-+		if (rtl_is_8125(tp) && (work_done || tx_done))
-+			rtl8125_timer_irq_enable(tp);
-+		else
-+			rtl_irq_enable(tp);
-+	}
- 
- 	return work_done;
- }
-@@ -5031,6 +5064,9 @@ static void rtl_set_irq_mask(struct rtl8169_private *tp)
- 		tp->irq_mask |= RxFIFOOver;
- 	else
- 		tp->irq_mask |= RxOverflow;
-+
-+	if (rtl_is_8125(tp))
-+		tp->irq_mask |= PCSTimeout;
- }
- 
- static int rtl_alloc_irq(struct rtl8169_private *tp)
 
