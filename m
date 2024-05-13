@@ -1,90 +1,140 @@
-Return-Path: <netdev+bounces-96140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1BFD8C473C
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:55:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 436FF8C473F
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:57:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E45D1C22F28
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 18:55:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 619CC1C214AD
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 18:57:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059603C08A;
-	Mon, 13 May 2024 18:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A13D4206A;
+	Mon, 13 May 2024 18:57:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L2c5wLXQ"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WH5YCYqI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EDD537E7;
-	Mon, 13 May 2024 18:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB2F3D54B
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 18:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715626526; cv=none; b=JsF9Pc5nclT9/at2MBh0OCQpyJzSyQt4x8uCxc48fqjXDasPsNatVg2BVuesqiNS6UfaZiv7kZADpLY1/BQF4pDX3iJorg1neoHPEhs4XlajI4NDpx2WRfJ6q5UgpS0VbjXnfLOrskeC0e1Cg2J9yOMjupdObyHjTn7fXcLzrrk=
+	t=1715626628; cv=none; b=mnQZ9sHwKpl2mKg6NKgeW13TtXs9IiuLzmupYC1wQ1JJZyunQBjuYNbfu6sseDPVTmK2lT6AE9AkoUUc8pt3zWbD55f55vYwbuqCLxF5rjBz8qFnufd0G4anPtz08IsS4YYbEht2hLzSZarr9oSlLy7FkmxcT+UYe72J+NOHQ1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715626526; c=relaxed/simple;
-	bh=GZV/Vfwlmaxtj4wAoHOeOIS1lpiVCIVCn9kJZPfG650=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pZevpvQ2KrA9aU27o0tIjmnbyIMHtyeuYyjtTnR4bP7j8PULZKCb49sapiPEfOBAwqeZ/fpunvDcxsr45fuy1eccJW7IJDrDvzTEax6aGEUCKNSCKTc6cXuGIGhpjF+4HT3g/2SUqHkOvCoRl5k2XrV5aiyBbJjYQ6L4bgcuq7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L2c5wLXQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB248C113CC;
-	Mon, 13 May 2024 18:55:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715626526;
-	bh=GZV/Vfwlmaxtj4wAoHOeOIS1lpiVCIVCn9kJZPfG650=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L2c5wLXQcyT2Ddu0xxVsRugbQm2r19tFz29/0ox6iEp5r22M02s99LV/89p0SUhww
-	 yjvDvPtSCgK+ybmIR5aq0pCwnYi9PllDMBORgjfAXlOLh06nNG9RGLk8Vi20HOjX4X
-	 l8XnwSfAB5ECLkhW7/kW+BlhSYVaeiTd9ekwQI5Bwiidj+odvjJqAsDR7oYgEj5F+U
-	 kRyXRJEP/TaRoe+xa0wMMk6OmIIrHGu7B23iqvcMGmjfyN5ldcRrgL9wvTEWtcP3EI
-	 R11dVf519U/WBWoFfVAJjh5oVRFngSTcLpOB2qw3bq1Rqhi91L+1gtMaeJjWnj8jYi
-	 VSw6AMBq7sbGw==
-Date: Mon, 13 May 2024 11:55:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, zyjzyj2000@gmail.com, nalramli@fastly.com, Saeed
- Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- "open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 1/1] net/mlx5e: Add per queue netdev-genl
- stats
-Message-ID: <20240513115525.15043cfb@kernel.org>
-In-Reply-To: <ZkJgIe71mz12qCe1@LQ3V64L9R2>
-References: <20240510041705.96453-1-jdamato@fastly.com>
-	<20240510041705.96453-2-jdamato@fastly.com>
-	<20240513075827.66d42cc1@kernel.org>
-	<ZkJO6BIhor3VEJA2@LQ3V64L9R2>
-	<ZkJgIe71mz12qCe1@LQ3V64L9R2>
+	s=arc-20240116; t=1715626628; c=relaxed/simple;
+	bh=q5wPdG/4nQ7huyx+fHjYRyb5vaRB6g0n6Fi2oJpjudg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=thS6h3zQelDXd7Fz1h1+ivIUP5Chv1XhJuIcZ8KA5OLfTylpOPvWPzTj2vzYX0bU4bnuWLXw76hp7Bx7YLp03PxRTNZuLSedt6ekc83NrYObW3Zb+sQI97de0pHrzZ9lL0W4JBV4xE71F7d6U2MQ0LLPi4Z2hqj4Qi0eVYhhTHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=WH5YCYqI; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5ce6b5e3c4eso2793544a12.2
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 11:57:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1715626625; x=1716231425; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Sr9kb5P0bdJ6cwmhx72J5XTZqy5p16gtf0vFcQMPyY=;
+        b=WH5YCYqIc8Jge3V/TDdAYdAP9FxsCdf0v/8mvIAgJkeEcji+qwKYD4Qk2p3wdKKANp
+         Pvg/RJlUMxDO68KxfJL93NYkgY+GN3AwySDULVBqXtEK02qja+Bo/i0B6YUJ5zjiVihk
+         MjMc+uUJl97mvLUsNNG4GO4ic3eFgFQ6wJhm8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715626625; x=1716231425;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9Sr9kb5P0bdJ6cwmhx72J5XTZqy5p16gtf0vFcQMPyY=;
+        b=cMU1ssBlwZ40uU0jYsfA+dOtO60eC2EVFS8K0TIl+cgEWB42fBctCcS/QxPPYrWr5J
+         JfQq7MhDC2NGDLKBOtO4AW0VsddcOLbrhOoIJ0falsiDDlj4HiplRQpaawu2MnsvHrCm
+         DgHh2juAwemAQ+I7+K8k6i6xOa6JEKjHtj8da9cqJLOiMvAcE/0Kqjy6qP8IiscsuVaF
+         /V9CmdyEtgdD3AQ3VCrxGO16Awht6q5SvjxTwIx054LaYE0+45W5wtxLGLCOCF02q+jw
+         3XjzjABhDkazZmD1bCPNWmMfNDGtjRwkJN73hsNXvl4SKbDL12MtcPuzdneh4g4Km0J2
+         Oy+g==
+X-Forwarded-Encrypted: i=1; AJvYcCW5Cxr66hqT72JveSI1UnZcL/hTdB6g24KUTq8TjY+Tzjf8ryQyTj6QrvU4LBctpOixBZzA/A3dIPNlXejSvFMrIyi+qj/1
+X-Gm-Message-State: AOJu0YwJiNNRIkRhUUCQmma8F+qolTbAfeDuPDAJTzhLpMzzJZpfakDl
+	BEIIAfZMeFnakbaDmldIBOOq6d0jke2fsVa0LgFg+0WXVRhb2+tr7LytbV6rng==
+X-Google-Smtp-Source: AGHT+IFZy10S65Q1vfaN/XWvg9gq6x4mClMImz+nVw5XGcRK6RvacpVEeTsgn5spmcSloAx5/jBJ3w==
+X-Received: by 2002:a05:6a21:2b0a:b0:1af:cd4a:1e1d with SMTP id adf61e73a8af0-1afde1c554bmr8986093637.40.1715626625368;
+        Mon, 13 May 2024 11:57:05 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bf31a7asm84964695ad.140.2024.05.13.11.57.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 May 2024 11:57:04 -0700 (PDT)
+Date: Mon, 13 May 2024 11:57:04 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Erick Archer <erick.archer@outlook.com>
+Cc: Taras Chornyi <taras.chornyi@plvision.eu>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: Re: [PATCH] net: prestera: Add flex arrays to some structs
+Message-ID: <202405131154.BABC943C@keescook>
+References: <AS8PR02MB7237E8469568A59795F1F0408BE12@AS8PR02MB7237.eurprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AS8PR02MB7237E8469568A59795F1F0408BE12@AS8PR02MB7237.eurprd02.prod.outlook.com>
 
-On Mon, 13 May 2024 11:46:57 -0700 Joe Damato wrote:
-> > FYI: I've also sent a v5 of the mlx4 patches which is only a very minor
-> > change from the v4 as suggested by Tariq (see the changelog in that cover
-> > letter).
-> > 
-> > I am not trying to "rush" either in, to to speak, but if they both made it
-> > to 6.10 it would be great to have the same support on both drivers in the
-> > same kernel release :)  
+On Sun, May 12, 2024 at 06:10:27PM +0200, Erick Archer wrote:
+> The "struct prestera_msg_vtcam_rule_add_req" uses a dynamically sized
+> set of trailing elements. Specifically, it uses an array of structures
+> of type "prestera_msg_acl_action actions_msg".
 > 
-> Err, sorry, just going through emails now and saw that net-next was closed
-> just before I sent the v5.
+> The "struct prestera_msg_flood_domain_ports_set_req" also uses a
+> dynamically sized set of trailing elements. Specifically, it uses an
+> array of structures of type "prestera_msg_acl_action actions_msg".
 > 
-> My apologies for missing that announcement.
+> So, use the preferred way in the kernel declaring flexible arrays [1].
 > 
-> Do I need to re-send after net-next re-opens or will it automatically be in
-> the queue for net-next?
+> At the same time, prepare for the coming implementation by GCC and Clang
+> of the __counted_by attribute. Flexible array members annotated with
+> __counted_by can have their accesses bounds-checked at run-time via
+> CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE (for
+> strcpy/memcpy-family functions). In this case, it is important to note
+> that the attribute used is specifically __counted_by_le since the
+> counters are of type __le32.
+> 
+> The logic does not need to change since the counters for the flexible
+> arrays are asigned before any access to the arrays.
+> 
+> The order in which the structure prestera_msg_vtcam_rule_add_req and the
+> structure prestera_msg_flood_domain_ports_set_req are defined must be
+> changed to avoid incomplete type errors.
+> 
+> Also, avoid the open-coded arithmetic in memory allocator functions [2]
+> using the "struct_size" macro.
+> 
+> Moreover, the new structure members also allow us to avoid the open-
+> coded arithmetic on pointers. So, take advantage of this refactoring
+> accordingly.
+> 
+> This code was detected with the help of Coccinelle, and audited and
+> modified manually.
+> 
+> Link: https://www.kernel.org/doc/html/next/process/deprecated.html#zero-length-and-one-element-arrays [1]
+> Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [2]
+> Signed-off-by: Erick Archer <erick.archer@outlook.com>
 
-Right, unless it somehow magically gets into our 6.10 PR - you'll most
-likely have to make a fresh posting after the merge window :)
+This is a really nice cleanup. :) Fewer lines of code, more readable,
+and protected by __counted_by!
+
+Reviewed-by: Kees Cook <keescook@chromium.org>
+
+-- 
+Kees Cook
 
