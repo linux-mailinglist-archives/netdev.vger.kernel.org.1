@@ -1,86 +1,90 @@
-Return-Path: <netdev+bounces-96052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36C7D8C4210
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 15:38:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76BD48C4271
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 15:48:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E73E928648D
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:38:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3185D286F2F
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E78153506;
-	Mon, 13 May 2024 13:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="moSZqF9A"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1894A154BF7;
+	Mon, 13 May 2024 13:46:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mxb.hotsplots.de (mxb.hotsplots.de [185.46.137.13])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570421534FB;
-	Mon, 13 May 2024 13:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C989154C00
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 13:46:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.46.137.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715607513; cv=none; b=TJoQFDcl7v+lXPvelX+8q3tbPNqn4UiXjaGoEohOH7GzqgT28urh12s8e4+C8FLuMtGIonb016n180vOqkgCpT+pSql0ob5VwbhZkfwIhRxO7eyKszfEn25Gq1Ou28Avx/+EhVS4MUkTo6SU20U3rTutWy3cfwGiuoG09WBhCn0=
+	t=1715607965; cv=none; b=RWojlbRI6wTlmxxBdLU5CB0uMniQNSx3dhDtaippdVAX0Sjk+Dq2T0HSH7QBSFc4Dg5AmqwZAdonj9kb4mqRisCfIdTN40uFgtKttdN2OcLdS93uFEowm+jvfTivv3wQ/vP84sWCDhnJh6em1Whm2Bn4VEtpqcT8Cll6Y7R+xEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715607513; c=relaxed/simple;
-	bh=mh/t03ZZbzAx8imyqom2xpDGT0pPXCZk5cCoNnf+L/g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GMAgA3JBcUcAkYVivbNuv7PcSUpu0hpJpZqcAzExOABu7g9SkmrcgyQV89IyLQwtY4EJ7DCK/ys1m+wvpdTw/1fWxGGznX5ytJdcu0nT3DOszBSCOdFbMvZMwwURLCRooDPcC5Vs2UZfJLssfB73WF8oa2pzEDde24UXTkXBcMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=moSZqF9A; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1SnTd9k2lziBSzHlw4brSEyZXyK4FJXbfhkdkXg1tl8=; b=moSZqF9A6T45xFix3ilfY7n/K7
-	29DzYBTdt+eKEOZ/ZdA12Nw4iEcqd44+CwsFUetM1F8UfXYlJgMU8KbWHknImXfIi4R44y7+EBwkr
-	CceWo240NBUPFoBltYs/BK35TFH8xN7vcKXWJbnszww3Bymr3YozyahX+/bnFaV8uHqM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s6Vsg-00FJBa-CB; Mon, 13 May 2024 15:38:18 +0200
-Date: Mon, 13 May 2024 15:38:18 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev <netdev@vger.kernel.org>,
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Subject: Re: [net-next,v5] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <d0d97b5a-02ab-41c6-8fe5-13bb9d9fc6c6@lunn.ch>
-References: <20240509210903.3738334-1-niklas.soderlund+renesas@ragnatech.se>
- <CAMuHMdWY-Ewm_ke6LxF1cpqQEdL3AnumyNKcTWvpFBJW_8wXJA@mail.gmail.com>
- <20240513100931.GA3015543@ragnatech.se>
- <CAMuHMdVF-szo7An5rXEahmZMu3RAzo6krSnU-qsgtNL0a-NrSg@mail.gmail.com>
+	s=arc-20240116; t=1715607965; c=relaxed/simple;
+	bh=NGJniBEAmQSKTOk9H/vLsPNyxbrJ/NiKLpTW3dO3mN0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=k03xEgIlxzYb4C7zbKLybPXURpnQq9V+P2Wtk/Boeopdm2IV9tTpZ1qmjRjlENMMdvOpIAvOJnhQ9tp+roHq26KthumbqCNCHIQXZiKslCMyZAX7G+XpHbDDdWoxqHchqfgChmxCbm3gpiAREKk0Wu6atjkv4KC1uxjvmPfiUIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotsplots.de; spf=pass smtp.mailfrom=hotsplots.de; arc=none smtp.client-ip=185.46.137.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotsplots.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotsplots.de
+Received: from build2.hotsplots.bln (unknown [217.66.62.140])
+	by mxb.hotsplots.de (Postfix) with ESMTPS id 094878C01F9;
+	Mon, 13 May 2024 15:38:44 +0200 (CEST)
+Received: from mf by build2.hotsplots.bln with local (Exim 4.89)
+	(envelope-from <faecknitz@hotsplots.de>)
+	id 1s6Vt5-0007nk-U2; Mon, 13 May 2024 15:38:43 +0200
+From: =?UTF-8?q?Martin=20F=C3=A4cknitz?= <faecknitz@hotsplots.de>
+To: netdev@vger.kernel.org
+Cc: =?UTF-8?q?Martin=20F=C3=A4cknitz?= <faecknitz@hotsplots.de>
+Subject: [PATCH net] net: mhi: set skb mac header before entering RX path
+Date: Mon, 13 May 2024 15:38:30 +0200
+Message-Id: <20240513133830.26285-1-faecknitz@hotsplots.de>
+X-Mailer: git-send-email 2.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdVF-szo7An5rXEahmZMu3RAzo6krSnU-qsgtNL0a-NrSg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Bar: --------------------------------------------------
+X-Rspamd-Server: mxb
+X-Rspamd-Queue-Id: 094878C01F9
+Authentication-Results: mxb.hotsplots.de;
+	none
+X-Spamd-Result: default: False [-50.00 / 500.00];
+	 ASN(0.00)[asn:33811, ipnet:217.66.48.0/20, country:DE];
+	 IP_WHITELIST(-50.00)[217.66.62.140]
 
-> The PHY never applies the {rx,tx}-internal-delay-ps properties, as
-> these are meant for the MAC (cfr. "internal").
-> The PHY does apply the "*-skew-ps" properties.
-> 
-> If you mask any *ID part from the phy_interface_t, you lose the ability
-> to let the PHY apply any additional delay.
+skb->mac_header must be set before passing the skb to the network stack,
+because skb->mac_len is calculated from skb->mac_header in
+__netif_receive_skb_core.
 
-You should still be able to apply the PHY skews.
-{rx,tx}-internal-delay-ps and PHY skews should work independent of the
-RGMII modes, since they are meant to be small fine tuning of the
-delays, steps of a few 10s of ps.
+Some network stack components, like xfrm, are using skb->mac_len to
+check for an existing MAC header, which doesn't exist in this case. This
+leads to memory corruption.
 
-	Andrew
+Signed-off-by: Martin Fäcknitz <faecknitz@hotsplots.de>
+---
+ drivers/net/mhi_net.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
+index ae169929a9d8..e432efddcb22 100644
+--- a/drivers/net/mhi_net.c
++++ b/drivers/net/mhi_net.c
+@@ -221,6 +221,8 @@ static void mhi_net_dl_callback(struct mhi_device *mhi_dev,
+ 			break;
+ 		}
+ 
++		skb_reset_mac_header(skb);
++
+ 		u64_stats_update_begin(&mhi_netdev->stats.rx_syncp);
+ 		u64_stats_inc(&mhi_netdev->stats.rx_packets);
+ 		u64_stats_add(&mhi_netdev->stats.rx_bytes, skb->len);
+-- 
+2.11.0
 
 
