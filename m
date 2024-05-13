@@ -1,92 +1,74 @@
-Return-Path: <netdev+bounces-96173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AF948C4903
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:50:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9E428C4908
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:51:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B40BE1F222F6
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 21:50:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A926B20ACC
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 21:51:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 829DC8405D;
-	Mon, 13 May 2024 21:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8094A83CD6;
+	Mon, 13 May 2024 21:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oMykfLG7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PKYzTCPv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5991E83CD8;
-	Mon, 13 May 2024 21:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597822AF09;
+	Mon, 13 May 2024 21:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715637031; cv=none; b=k4GS/KnZPaqKDHpB5J2YTfvz8ME72j3FgB/LihzDe9BkPMle/GwK3PDkajFhkC86SAtQBfLs6Nfzunq4A9d8fRtrcGxTILz/cGX1Wr2d7ickcGTQDhmIiU9CyjedLElIadFThSAEPxmuu5Fp9COl4pZZopyYjl2lxCB0IPFvKb4=
+	t=1715637091; cv=none; b=LZjVd2rmXoaqkJf+w4furNO+AECKV20XAkr9VDe+fsro6/nW61Jo9TPEPUcrMlFQHknUyMfzbGTV8tmstQINtgYzwghCwP96pmfO0CuAhHugghLvjyFI6gpjMfsw2+RKHsWSeRntV2uW89iJvpSfnVJoOg9wIX+DKAE6k25mTi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715637031; c=relaxed/simple;
-	bh=/v94wCrI5Tt9uoU+Je782os68BLsBtrCi4hB4GKppGg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FMy613OqHu1qWQzCne3yJayf9E2+Kshvpixo6xD4ASnQ9ewu7XFr/TIoISX7l4Xn9TrJK/uQvAxHovxO8LOZrCrCXiEYXcYSS6AhugoFO00k/L1xZPKymgyJ5cImZrROMyKwzZCdmV2BuDCXZcyVkNY+cUUeRnmXP1my+SYisd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oMykfLG7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D5CCBC4AF09;
-	Mon, 13 May 2024 21:50:30 +0000 (UTC)
+	s=arc-20240116; t=1715637091; c=relaxed/simple;
+	bh=qjDaR7GpKVcHlSgdXco8X6U5ApfVTHDXF71c1j23G6Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LMtbelNqUrdZyC7SJJTMK86GuSDgTv8x2LSo6oiKAqoj5P6Uvyfb60nV+U9Hjm9Fsgipn9xm0SEET2Ue0aVEpw7A/ctnSfdYbCUAJxKNpNuoWgyfh5coy6l/GsdE/XcPreIBXg/ZpaCdDcArRWcGxiU5G6JxB9JwGs5AWH6DrQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PKYzTCPv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF0B9C113CC;
+	Mon, 13 May 2024 21:51:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715637030;
-	bh=/v94wCrI5Tt9uoU+Je782os68BLsBtrCi4hB4GKppGg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oMykfLG7R0bIQpPLGUFIeNvpzB6hyIwSB8t8P8ZokkJe2l+PheXP9FCZdUoq3JaWu
-	 txOI89oOG3IxdZQ40MsaM4fO/M+mKNab8d28n+mb/ZSOIjD75SAWz6QBbO60LmdK+I
-	 BS/qBve0X3pe1hVeGBV0UcFLpxpzMQcj2loS4VQOblyamUzQ3JVCB6wd5sC6DNKMPO
-	 jfsis7StpoGmAv1eFOHrmuazigeD7mJ85JlZXlMtE1Jv61++Otkuyyze4FYtXJCfZc
-	 6a2SGsfgfP5O9aD8S9W9/iLBRSD8TFe2AeWwQi5CNQ9le/iDGGdAHCGR3s0Ci6JP03
-	 VEQse3CPCJHjQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BB0A4C43443;
-	Mon, 13 May 2024 21:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1715637091;
+	bh=qjDaR7GpKVcHlSgdXco8X6U5ApfVTHDXF71c1j23G6Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PKYzTCPvDQEq3qqSq4LvLpV7by4JwQCgW+DL/tlfBikBTc7tcQvlL1OjVxsKKNfe3
+	 g6JurEYbAdO5k0ZPpGLsMHZOUWcc8g0lexIHpRbiVl9q4+DYuI6EsyQ+j8Z8QTol1s
+	 CCd33VgQyogWUZ5EgVut4ofxmiLdNyo8FoqhoAE2ftSGbbpQc1Goe4emg7pJ9RDN7t
+	 WEsgj3VIxGIBBcuYrf7YhASpOZ+HALztfvsMx6ZpGk9ydD5vh+DUH6GEe37aCTdTpy
+	 VIxWB3RqQ4kufHo0uwws40I3javIeHgqg0KqIKdH1javzjdxmLVYdjle+3R9ObG3Rx
+	 9oHb5KjcMYR8Q==
+Date: Mon, 13 May 2024 14:51:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ thepacketgeek@gmail.com, Aijay Adams <aijay@meta.com>,
+ netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+ linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH net-next] netconsole: Do not shutdown dynamic
+ configuration if cmdline is invalid
+Message-ID: <20240513145129.6f094f92@kernel.org>
+In-Reply-To: <20240510103005.3001545-1-leitao@debian.org>
+References: <20240510103005.3001545-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: netfilter: nft_flowtable.sh: bump socat
- timeout to 1m
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171563703076.25518.10933025249444977806.git-patchwork-notify@kernel.org>
-Date: Mon, 13 May 2024 21:50:30 +0000
-References: <20240511064814.561525-1-fw@strlen.de>
-In-Reply-To: <20240511064814.561525-1-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, netfilter-devel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 10 May 2024 03:30:05 -0700 Breno Leitao wrote:
+> +static inline bool dynamic_netconsole_enabled(void)
+> +{
+> +	return IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC);
+> +}
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 11 May 2024 08:48:03 +0200 you wrote:
-> Now that this test runs in netdev CI it looks like 10s isn't enough
-> for debug kernels:
->   selftests: net/netfilter: nft_flowtable.sh
->   2024/05/10 20:33:08 socat[12204] E write(7, 0x563feb16a000, 8192): Broken pipe
->   FAIL: file mismatch for ns1 -> ns2
->   -rw------- 1 root root 37345280 May 10 20:32 /tmp/tmp.Am0yEHhNqI
->  ...
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] selftests: netfilter: nft_flowtable.sh: bump socat timeout to 1m
-    https://git.kernel.org/netdev/net-next/c/5fcc17dfe05e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Why the separate static inline?
+We can put IS_ENABLED.. directly in the if condition.
 
