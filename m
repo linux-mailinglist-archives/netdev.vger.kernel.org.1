@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-96174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDB748C4906
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:50:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AF948C4903
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6535BB22BBB
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 21:50:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B40BE1F222F6
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 21:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E5484A30;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 829DC8405D;
 	Mon, 13 May 2024 21:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QBZclq8V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oMykfLG7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598EA83CD7;
-	Mon, 13 May 2024 21:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5991E83CD8;
+	Mon, 13 May 2024 21:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715637031; cv=none; b=bRcRKTPlXaOwuaV19HYQRnBObeJLYamZqsqKbdii4pFL+D3HItzxVCONMKpT1wbtGxjD2jidg12fVZUWgjuE+njrAkDKUjS7v0PNEjLiPbbjRg8FiHVBfc7/m7pt+fZJe6KZRef/67c8eGMSxVXAp2prTHOzLKaCY3+8uonvILc=
+	t=1715637031; cv=none; b=k4GS/KnZPaqKDHpB5J2YTfvz8ME72j3FgB/LihzDe9BkPMle/GwK3PDkajFhkC86SAtQBfLs6Nfzunq4A9d8fRtrcGxTILz/cGX1Wr2d7ickcGTQDhmIiU9CyjedLElIadFThSAEPxmuu5Fp9COl4pZZopyYjl2lxCB0IPFvKb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715637031; c=relaxed/simple;
-	bh=hI+GX/zFN5C3JSm074gb0Fm3v0+UFXHKI7nwlokL8rc=;
+	bh=/v94wCrI5Tt9uoU+Je782os68BLsBtrCi4hB4GKppGg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DZ1LHnlcj8ot1S4mW4EM8oprNAdHheKzVrovSSzOzlYFQRJYKJbLBnQswru/Zb9v4Lwuv3kadFWz2lYWtqgPbLnDDe7odL4+KZSL7WnucoRGgkUm7ygaav+yOOOZt0zd5/ZOiq/ep/gkZB9lsSk3GpPM6xtyhUI7wAGGek3WleE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QBZclq8V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BB097C2BD11;
+	 In-Reply-To:To:Cc; b=FMy613OqHu1qWQzCne3yJayf9E2+Kshvpixo6xD4ASnQ9ewu7XFr/TIoISX7l4Xn9TrJK/uQvAxHovxO8LOZrCrCXiEYXcYSS6AhugoFO00k/L1xZPKymgyJ5cImZrROMyKwzZCdmV2BuDCXZcyVkNY+cUUeRnmXP1my+SYisd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oMykfLG7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D5CCBC4AF09;
 	Mon, 13 May 2024 21:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715637030;
-	bh=hI+GX/zFN5C3JSm074gb0Fm3v0+UFXHKI7nwlokL8rc=;
+	bh=/v94wCrI5Tt9uoU+Je782os68BLsBtrCi4hB4GKppGg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QBZclq8VcGdRRHEPMuQB8mGeh6ODwpeTVkKhPexqYb2fsXR7kQpVzmn1mi8wIP76d
-	 ZgzqZGQu5VvrVU8/8LNjQDpNhyUu27IBqh0nqsPeEiVBfoeJS1uIWkzyzttFg48TGz
-	 00g9a7Q21IU3QjQo3CVxxDM17760tEADQbURBL2SFrLQEjNmgUzS9UbV4So/AQYhax
-	 FX7Mpg/JYe9HXgc5cBfSf44dzS34kxHXlNCNTqGC1R2Vuw0QsN4ZITbydlFIqtcnCE
-	 OCKEPq/HlsMvfCPeHMo2vGKhTs2CEa25B5z5wzc2OwhPKgL45Yti1pB1okBmuM9Rzn
-	 HPeyotlpwvYig==
+	b=oMykfLG7R0bIQpPLGUFIeNvpzB6hyIwSB8t8P8ZokkJe2l+PheXP9FCZdUoq3JaWu
+	 txOI89oOG3IxdZQ40MsaM4fO/M+mKNab8d28n+mb/ZSOIjD75SAWz6QBbO60LmdK+I
+	 BS/qBve0X3pe1hVeGBV0UcFLpxpzMQcj2loS4VQOblyamUzQ3JVCB6wd5sC6DNKMPO
+	 jfsis7StpoGmAv1eFOHrmuazigeD7mJ85JlZXlMtE1Jv61++Otkuyyze4FYtXJCfZc
+	 6a2SGsfgfP5O9aD8S9W9/iLBRSD8TFe2AeWwQi5CNQ9le/iDGGdAHCGR3s0Ci6JP03
+	 VEQse3CPCJHjQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A966FC433E9;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BB0A4C43443;
 	Mon, 13 May 2024 21:50:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,43 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v10 0/3] net: gro: remove network_header use,
- move p->{flush/flush_id} calculations to L4
+Subject: Re: [PATCH net-next] selftests: netfilter: nft_flowtable.sh: bump socat
+ timeout to 1m
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171563703068.25518.8674170823657898620.git-patchwork-notify@kernel.org>
+ <171563703076.25518.10933025249444977806.git-patchwork-notify@kernel.org>
 Date: Mon, 13 May 2024 21:50:30 +0000
-References: <20240509190819.2985-1-richardbgobert@gmail.com>
-In-Reply-To: <20240509190819.2985-1-richardbgobert@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, willemdebruijn.kernel@gmail.com, dsahern@kernel.org,
- alexander.duyck@gmail.com, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20240511064814.561525-1-fw@strlen.de>
+In-Reply-To: <20240511064814.561525-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, netfilter-devel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  9 May 2024 21:08:16 +0200 you wrote:
-> The cb fields network_offset and inner_network_offset are used instead of
-> skb->network_header throughout GRO.
-> 
-> These fields are then leveraged in the next commit to remove flush_id state
-> from napi_gro_cb, and stateful code in {ipv6,inet}_gro_receive which may be
-> unnecessarily complicated due to encapsulation support in GRO. These fields
-> are checked in L4 instead.
+On Sat, 11 May 2024 08:48:03 +0200 you wrote:
+> Now that this test runs in netdev CI it looks like 10s isn't enough
+> for debug kernels:
+>   selftests: net/netfilter: nft_flowtable.sh
+>   2024/05/10 20:33:08 socat[12204] E write(7, 0x563feb16a000, 8192): Broken pipe
+>   FAIL: file mismatch for ns1 -> ns2
+>   -rw------- 1 root root 37345280 May 10 20:32 /tmp/tmp.Am0yEHhNqI
+>  ...
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v10,1/3] net: gro: use cb instead of skb->network_header
-    https://git.kernel.org/netdev/net-next/c/186b1ea73ad8
-  - [net-next,v10,2/3] net: gro: move L3 flush checks to tcp_gro_receive and udp_gro_receive_segment
-    https://git.kernel.org/netdev/net-next/c/4b0ebbca3e16
-  - [net-next,v10,3/3] selftests/net: add flush id selftests
-    https://git.kernel.org/netdev/net-next/c/bc21faefbe58
+  - [net-next] selftests: netfilter: nft_flowtable.sh: bump socat timeout to 1m
+    https://git.kernel.org/netdev/net-next/c/5fcc17dfe05e
 
 You are awesome, thank you!
 -- 
