@@ -1,110 +1,154 @@
-Return-Path: <netdev+bounces-95900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE9548C3D19
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 10:24:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A4E28C3D25
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 10:29:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD6DF1C20309
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 08:24:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 082211F220CA
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 08:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5322146D6B;
-	Mon, 13 May 2024 08:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9945D1474D8;
+	Mon, 13 May 2024 08:28:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=radisson97@web.de header.b="DOWpL+KJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NXJz6/UC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FB41EA8F
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 08:24:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488E71474B4;
+	Mon, 13 May 2024 08:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715588678; cv=none; b=pAlClOHhsbrwXZc8IO5+ekfhwR5PCulUsNqFUCitLc5cH07iC9WQ0q59tHvx3Qn1/3Vlpln272qUWF9VbPJgywPn6d5SfAmCI6OQG3AZSmWzB568GdrCn5HERuFALY0sc5DeEoSH96FNxzFrkVUkYc0NtiO7usKXtQErWSFJs0Q=
+	t=1715588939; cv=none; b=AJ2SulBQeJCjyDl3FvjdDUVG80jvtyYrQoYnS3EF6VqDEXFymxH3Nd0DOBRyUhwJ0mggK8o4uBjb4vUBZ6N2EC7nPc7UGvrgElLQVI7L329bwi/b4oFwCIrpg28NMU+EOZlmsSgRWQC50HAngZGWYlb96/zhMiNgDiTOemmG20Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715588678; c=relaxed/simple;
-	bh=kPZGcUciagk9Zkn2GCD+FcojYZ9ri8LToUCaM8U8kAI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=Tvr1iXhPh/9h2YabwvXGAN5nhYkbmwogMQP88paHjW5J6Cko7FPVZEmWsFyQW3tqHmtFVFQxy66e84RBiTAvxBsugWGcieNBo91I9F7MN2Y2kC/BNGIrrAkbTaL/9RHf3i/zyQmHtxBC5HFjoqLM6/tuWlKuzn+ye/uUeNfojMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=radisson97@web.de header.b=DOWpL+KJ; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1715588666; x=1716193466; i=radisson97@web.de;
-	bh=kPZGcUciagk9Zkn2GCD+FcojYZ9ri8LToUCaM8U8kAI=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:
-	 References:Cc:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=DOWpL+KJD59+ddKr0yDT3ERyt3f7cWmhTyUJjIjwulkOVnnXM46Ar5i63QJM+3aU
-	 8VSMIWzUrsP9Z01rYXlEwDtF5F06aUQdk/eqLhfn7RENW5KlTHGUl9GmjQrdX/7Tz
-	 5uKdB9KSmDauldj8h1YN5ELvYgiRHJ2UQ2W0Q6kFfAeo3aY2LVTNRZjcdWhlvGBsT
-	 eEGXbtFk0zxCf7G4N9wXE12eaRILnZsDfOGls7GF3OEgILuU90FZbS6m5ZxBvE0mt
-	 Jd4wH6bica/lUmVEuXHydG5hus2GV5bVtTPzdvEEwP9zQ/WZpt0RvEwmtqi6aWCZZ
-	 p76juWFxOKfTOb7+cw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [10.186.1.202] ([193.174.231.69]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mfc4q-1sm6S20wFE-00qO9Q; Mon, 13
- May 2024 10:24:26 +0200
-Message-ID: <d655c5d6-86fa-4e42-a276-522e681062bb@web.de>
-Date: Mon, 13 May 2024 10:24:22 +0200
+	s=arc-20240116; t=1715588939; c=relaxed/simple;
+	bh=1l1gBuhAghDzGTpmKFRmMZDa6k+2TjMJBTuOI8PxFZE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=dtUGb6iGhk+tX5oJZzwotMy6FGi+A5L8VMPEfULLNT6r5iXwmT2KSojNPUlLfpyXQ8Bsd+8frrpUSBp7oxLMtdkLAP30RqnXsU1AgAXXDc2tCiroB9l0x37MNZHnPSXIG3yIO9/Vl9AVLpyWTW0bqtzkHCZuhpzNuhf9dlG2TyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NXJz6/UC; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1eeabda8590so28650975ad.0;
+        Mon, 13 May 2024 01:28:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715588937; x=1716193737; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1l1gBuhAghDzGTpmKFRmMZDa6k+2TjMJBTuOI8PxFZE=;
+        b=NXJz6/UCsHfN69FkJrnXVRpR2hjmYOuQw1c86t8EYPFel9wSfFloPc9DenfrKL2o/B
+         JPDVxwR1hjHhFIjYtPCFb4NAg1Gza7roAAdykQiQpJxLuSFog2ahRjFnGSsx9fYl/ylX
+         tvyPv8S8hBW2D1FK/vxeGXwDHW98aJt+W2PqfhiOLv9EcrpwGsOHQODDjcd2RH5sMHr/
+         1Hujs00I6QpGpKx0r6YAvibSlVmaRth/07l32zE/gPbJXwTGG50JG1ezpWf/aK/zCYMV
+         8C2fIBRv2Zpqox2n9i16poAyhYayivhG+hi+1S2zmu2t0c1UREZxF5bLoEAVes8AKY22
+         ll5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715588937; x=1716193737;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1l1gBuhAghDzGTpmKFRmMZDa6k+2TjMJBTuOI8PxFZE=;
+        b=VhY6afu/lfmORJPQ/24qNchvAIxuwh8fLjKhOrumR9zT3z6eMpah1ezMWumTIlXp6t
+         K8JyGorqNW1uaj5oM/IAwNsxl0DEzuat5qSBiz9KZsO+o4QXiR3tX6bKbcWeGMJ0K6qE
+         oRS+mUo7gtyD/lcCD+p/x4e4vtm/6tXlV3FuGM7NkE6x/NOujsjuspqudvHfdgm98Py6
+         5CQHDG6K5zSjwfwedcd2Lp+PGj3LN/XgwC/jPwQfNpPo6EJ82u6X67aQyIlX6M6njaJD
+         zN8e1JV0X45l8iYcOoIYTGqIPjqAeTY9StYa2cImfSEKYYe2HPPQpv6dVQbO/EnAndzA
+         B2Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCUs++Q5J8Uzh5R1ma4NCyp3X0Ws5fbpg6hQBXCb4l1fcd1QOVIGw51intTRsuJQtsOfIutDoG67gDq/3jnBOcFMRwZcKFL2
+X-Gm-Message-State: AOJu0YxCfzT5SDN+zysiz1SGulVZ2j7g3Rv9tv/7Jh1gF3zM5BDslMuK
+	ohm8I/9/HITb30YLDOR88CNUxrJEJNOxWDR8mP/H7Vq8/3LPvuZT
+X-Google-Smtp-Source: AGHT+IEyFi9OkHesvUDKD8WJBIa2kU2vFMcbgW2nT+sM0xKfUBCZ7S9sE6dvQzu9KaR545YjlGNXYw==
+X-Received: by 2002:a17:902:da8c:b0:1eb:4a72:f468 with SMTP id d9443c01a7336-1ef4416113fmr111274895ad.52.1715588937322;
+        Mon, 13 May 2024 01:28:57 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0b9d1807sm73594535ad.59.2024.05.13.01.28.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 May 2024 01:28:56 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 26731184762DF; Mon, 13 May 2024 15:28:52 +0700 (WIB)
+Date: Mon, 13 May 2024 15:28:52 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Regressions <regressions@lists.linux.dev>,
+	Linux Networking <netdev@vger.kernel.org>,
+	intel-wired-lan@lists.osuosl.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	lukas.probsthain@googlemail.com
+Subject: pi
+Message-ID: <ZkHPRBLlHJpRytIB@archie.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: patch device tree and AX88796B
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-References: <a2ef46ba-ba3a-42ea-8449-3e3ae773fa1e@web.de>
- <d8e47275-db48-441e-a06b-0aeb16e32700@lunn.ch>
-Cc: vadim.fedorenko@linux.dev, netdev@vger.kernel.org
-From: Peter Radisson <radisson97@web.de>
-In-Reply-To: <d8e47275-db48-441e-a06b-0aeb16e32700@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="MqJ187FVOnOf64oY"
+Content-Disposition: inline
+
+
+--MqJ187FVOnOf64oY
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:UlcVDPFduENorii7odb36Iig3hhdUW0kQhDjzbIfsWi3nN4srZd
- Og0ddHQYVhXuhCCZf8dQct9demYvZLjLo3H7KocU2tygkzElItGbgAyenOPta7R4gFL+qJj
- k3F/MZ39meXD5HFWM04E/RukYgmDqpV5UJdE+yQbeM6AF9oENJIW9dvXpj4Ec8BKxg/M8mp
- NdyO6s4cZYakXKaNeWo8g==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:pAGpMGr2PMw=;JF9KTGs9OOqiZAqohutPvWPVGy9
- A7fUHg+C6DxHIz4WsGN4trU42z9S+y4ffPJbhBLwZAAPUFrWhI0NkI16bZTBJwA9TVyREhpXZ
- 3xgZ3XFmw5C1lj/l9z5DJZwA4vbNqy3pTlS/xgBfavlHoSDpuSzMGxm+Fi0j0pkpnkcJO22Gf
- HCsTqqPVqBVu/ouISV+7zZunBekisYhMMMBSFhB9jGoIL7MDvpSTXePApiXptXIbiEoUfYgzi
- yIWv1TjbxU3TYyzmqri2VbXtAh6FkgXbKMPH67cXSr7oanFiwi1Ej15frkY/f/0FfvDfbfvsh
- w2I1RpNwMRHYO6ee7laIpEkFWGwXcfWUrVlBG+FltVdXB0LWahv3uDg+3MIgueNWqnFywK7SD
- 9LxJ4IzPBZxX+Qp6xc2zFdMamGNevivDIVAkSQVah0JKpfjMXm+O4Zgch9tvHQIXUMgx/tW6S
- zbBaCQ2feDHO80TM60ST4D3XjikK1i0PXNGHVVn6BBoQ9OcDHsafpACEU5H0lvle0N4jZB33W
- Lt6y8Z0eEIMI+AuImj21YIj9eyA0pAeAQEALL9c6iuogbNzJEbTI53OB7vbsRELqpKBzdGewz
- u0kP3ieq9kfwiRfGI1af1y1LPgTrbpUtYpNLT/qNtBcfkYwQy4wyoo5anlY2Hk2komHDKLqDl
- aRhG4ChVRRhYIH/a9UvdhNDQw2MFFYm/FDKneceJ7TymQx3OYFQTv+jUHaYxrC4CmIG6PHnSG
- jwZHhcbxeoeo+I935IY/omvPzXolKl8IdBKNG1sp3FFm34n7Z8YlpAbEwwgunnDPFZ5mv76/b
- +qiHNVkGwFsYoZxudB2lG9EfjsWhTWMivpD2824zUXkbU=
 
+Hi,
 
+<lukas.probsthain@googlemail.com> reported on Bugzilla
+(https://bugzilla.kernel.org/show_bug.cgi?id=3D218826) regression on his Th=
+inkpad
+T480 with Intel I219-LM:
 
-Am 29.04.24 um 17:28 schrieb Andrew Lunn:
-> On Mon, Apr 29, 2024 at 12:24:31PM +0200, Peter Radisson wrote:
->> Hello,
->> we have a custom board that has a AX88796B on board. We have a company
->> that wrote a device tree mapper for the driver (actualy for kernel 5.4)=
-.
->> Is somebody interessted in picking that up ?
->
-> I'm not saying i will pick it up, but i'm curious.
->
-> Do you have patches which extend drivers/net/ethernet/8390/ax88796.c
-> to add device tree support?
->
+> After updating from kernel version 6.1.90 to 6.6.30, the e1000e driver ex=
+hibits a regression on a Lenovo Thinkpad T480 with an Intel I219-LM Etherne=
+t controller. The system experiences a freeze when an Ethernet cable is plu=
+gged in. The issue is not present in the previous kernel version 6.1.90.
+>=20
+> System Information:
+> - Model: Lenovo Thinkpad T480
+> - BIOS Version: N24ET76W (1.51) dated 02/27/2024
+> - Ethernet Controller: Intel Corporation Ethernet Connection (4) I219-LM =
+(rev 21)
+> - Kernel Module in Use: e1000e
+> - Operating System: Manjaro Linux, kernel version 6.6.30-1
+>=20
+> Steps to Reproduce:
+> 1. Boot system with kernel version 6.6.30.
+> 2. Connect the Ethernet cable to the laptop.
+> 3. Observe that the system freezes.
+>=20
+> Expected Behavior:
+> The system should remain stable and maintain network connectivity without=
+ freezing when the Ethernet cable is connected.
+>=20
+> Actual Behavior:
+> The system freezes immediately upon plugging in the Ethernet cable.
+>=20
+> Additional Information:
+> The regression seems to be introduced in one of the updates between kerne=
+l versions 6.1.90 and 6.6.30. The issue does not occur with the older kerne=
+l version 6.1.90.
 
-Hello everyone,
-could you do use my patches ?
+Thanks.
 
-CU
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--MqJ187FVOnOf64oY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZkHPOgAKCRD2uYlJVVFO
+o5k0AQCvBu6nHDzpTwo8OJz3jjdqc5D6AsxCg7E3p+QX6zJ72AEA1/QI1liupwSO
+V+b6OxS6Ih+R0okARxUMwGuT3svVQw8=
+=hyi0
+-----END PGP SIGNATURE-----
+
+--MqJ187FVOnOf64oY--
 
