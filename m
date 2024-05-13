@@ -1,99 +1,76 @@
-Return-Path: <netdev+bounces-96199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A47C8C4A15
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:31:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E37C28C4A21
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:38:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D30BB1F21A90
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:31:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D435C1C20C80
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7758592B;
-	Mon, 13 May 2024 23:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4E182488;
+	Mon, 13 May 2024 23:38:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UJ4+eKX9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HcrFw7oC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A8C446BD;
-	Mon, 13 May 2024 23:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F6F1D559
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 23:38:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715643078; cv=none; b=pkcuLdlTR8fO/SZlvGe+Ae00t54/L6kVUjuzosgQIOeuzI1C8ITt6o3Nd70yfX78jxGSviS+vv2whGofolgeHQSbDoTuNe3w4n/AIf9d6kUxsXFT09xuN+YDHW937/jvTseMT3Ltx2dkQk6/+gmjs2zQinlBIS7IbXTUPtJ77Xo=
+	t=1715643525; cv=none; b=h64P89V6nBSvKRC90XR9nHzJYV/DPqbBo6DKkGpVAwiY7GESjy0d8r7bwyvHE1WPcctZOJOnW08L9U7JlGxRKhoYWgI8zj+aNEpHaxW2X+GzasFUjnOTQM5+TCWQO7lnNcahuR+cOMhmxAtq3LYn+xoypvZPj6vHU35PE1f6FXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715643078; c=relaxed/simple;
-	bh=edYEvfVF7LrKCEOZSZcW2VnvwSmiDi2QkoyU4leeWL4=;
+	s=arc-20240116; t=1715643525; c=relaxed/simple;
+	bh=N0onKzk9vxiH3LWDCbUxd7eqoNDM23RUelEZ/NvMBCM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hGpCKcoY/w6Gln9pm+E5v3EZag0SfSBcqz1EyQLe43Y+miE4IpBPQ4AWaqsqI7iDxUDKEnBMUZBhktO1YpqkOtTJaM/UGIEFtBRsQoxgK5R6QHxGZsOE/jIO9TCXaZp7y4nz/vNz70f1ijAvblhNpKELP3DD+f82BYQUxZ9/W/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UJ4+eKX9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 781EFC113CC;
-	Mon, 13 May 2024 23:31:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ZTrc3v5heczxzFvKGQpYyu21aBGw3cML9cfJdNIKj7QLG2XF9/NTcbk470ukMF2U+N6Ho1NXVN2Boh9kB0H0flt0ulPy/VQNNwTwpmz25U1LX2lmku0MdsWtfzSH0Yvx71deztNYLy8uZqqn59nRIGuJnPsDw+w7AYAVSWlbiSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HcrFw7oC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E52E3C113CC;
+	Mon, 13 May 2024 23:38:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715643077;
-	bh=edYEvfVF7LrKCEOZSZcW2VnvwSmiDi2QkoyU4leeWL4=;
+	s=k20201202; t=1715643525;
+	bh=N0onKzk9vxiH3LWDCbUxd7eqoNDM23RUelEZ/NvMBCM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UJ4+eKX9Jjb5n009vEa+fw3qm93HTsbq6E/2kjaqWw2wukzg/halQAfNZEZXm/LE4
-	 VseHIcoczFEhUFNJrX+hE4brEcaqhJYLF5QDeawrQXHzGtVSeWHqMAph2zfIoqyKzs
-	 dOJA+Rc3OrJVxsqBTVfE67aPPpe9lMIgv3q46l/7C7ygJVD9GHoY5L6Ff+NHFHfw2i
-	 EpUgZS3K/R4TIL0bsax/NTea+fsRH6i/BQKSVamsq7sDeOuVD37dm9gghM9OITGk7Y
-	 MbBxbNA6+ZDp6bsz2N1nY5IAOc0jzEJb0dHK2wgUTlLTS0Qe7idImQezxoSFuJYfYW
-	 r/H0ew9pGJ3Hg==
-Date: Mon, 13 May 2024 16:31:14 -0700
+	b=HcrFw7oCf4UKhCdhJgzb0mPVCo1wIzxQHZcVd3Pe/GOL/A1nCTh23Xp+QUOP0xh/R
+	 xSXfIctIeAqfc4rPy8d9Adn6AhY7RfMFYCk+fVBue1D0HRIRSiqxWN3+t5yeyvnlby
+	 EloBkaEKuObzfFHrLH0dCLGx1m2utxOZkWA8z1VpmD3cG8xtI2xaJtgpJushq3N8ss
+	 zlzJowi4yuC5N6CCZqGXfqkUjZbZVPSJRtDzHxA80Kwizn8oRaqidnGz6swEL/bf8x
+	 V22QsPvX55WFwzNbbgPr73FTvNU3NXcxz9HyLeCKfyVZitEtDuDSb/6d7tNVpl2YIp
+	 sLCnXxC8dAZJw==
+Date: Mon, 13 May 2024 16:38:44 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, Ivan
- Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
- Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
- <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan
- <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, "Christian
- =?UTF-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Pavel Begunkov
- <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe
- <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand
- <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-Subject: Re: [PATCH net-next v9 00/14] Device Memory TCP
-Message-ID: <20240513163114.52b44f66@kernel.org>
-In-Reply-To: <20240510232128.1105145-1-almasrymina@google.com>
-References: <20240510232128.1105145-1-almasrymina@google.com>
+To: Martin =?UTF-8?B?RsOkY2tuaXR6?= <faecknitz@hotsplots.de>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: mhi: set skb mac header before entering RX
+ path
+Message-ID: <20240513163844.402a926d@kernel.org>
+In-Reply-To: <20240513133830.26285-1-faecknitz@hotsplots.de>
+References: <20240513133830.26285-1-faecknitz@hotsplots.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 10 May 2024 16:21:11 -0700 Mina Almasry wrote:
-> Device Memory TCP
+On Mon, 13 May 2024 15:38:30 +0200 Martin F=C3=A4cknitz wrote:
+> skb->mac_header must be set before passing the skb to the network stack,
+> because skb->mac_len is calculated from skb->mac_header in
+> __netif_receive_skb_core.
+>=20
+> Some network stack components, like xfrm, are using skb->mac_len to
+> check for an existing MAC header, which doesn't exist in this case. This
+> leads to memory corruption.
 
-Sorry Mina, this is too big to apply during the merge window :(
--- 
-pw-bot: defer
+Could you add a Fixes tag identifying the commit where the buggy code
+was added? And please make sure to CC the relevant maintainers (I mean
+the maintainers of the MHI code, specifically) on v2.
+--=20
+pw-bot: cr
 
