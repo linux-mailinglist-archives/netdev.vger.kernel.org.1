@@ -1,320 +1,100 @@
-Return-Path: <netdev+bounces-95968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FB678C3ED1
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 12:24:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05ABA8C3ECC
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 12:23:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 686A82868AE
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 10:24:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 374D61C226CD
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 10:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86C214A0AC;
-	Mon, 13 May 2024 10:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mpB/8D+6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F229214A0BB;
+	Mon, 13 May 2024 10:23:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCBD31A67
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 10:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D7A14A4F9
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 10:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715595857; cv=none; b=Q9M0+DJj2XaBa4ZOuQ6muhCyhcKz70D7GV2aHsVVLzx9H5Wsj0/LSkmjlNpcB1wsxj5BUYPFfby6Ha9YShjDm3da7gma08LSzy8LpPnLCvclI9Wa2cK0VQFH1XuSEnmHWRlEH3HsRoXv/tYvMIBd3zk8Fb4g7nsUET5jlH3FWXw=
+	t=1715595809; cv=none; b=aIo7hMnnK2yCqQBr64fSEjefQyn1hhjDcxgc6kYbi6/s/3vLGkuCS3bTN/UUPtmWRfoYHwikSb2vwRaAiDGL4zq22ZdxnA6EB4Q2fM6ec8OB6ZivDr1rn0jsa2ZVJyTq6iW/5lJ5rnj1cZiN8I0z569tAaw4qkaOaK19OYmutNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715595857; c=relaxed/simple;
-	bh=pBBU7E/gtz9WY1lWQ+akg9uuH8MCanT18u/3BHM39i4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tjMqSCxrcYeLIbcu050MVaHddYVHv1QbKFiRqS9UqCpKgrhDJq6t2IfxtqlCgfMc3UsvLcl/HLNC5XWcnTe0cmNpAOY8vqU/URFvfC55X8t3f14s2d4XANqN3jNZvVjrEAv2StDdpVCDdkfNHxi2fYHN3sV/ShAKXXgOrYJp5gU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mpB/8D+6; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715595855; x=1747131855;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=pBBU7E/gtz9WY1lWQ+akg9uuH8MCanT18u/3BHM39i4=;
-  b=mpB/8D+6ISyDfAm6pWI22u3AEPwtmow10XESkj3rv6zu20S1xcysmX1w
-   izUNHKPIRnop/ZHcaEoyk69gpOgZhskypH1mtNMQpRhqPEh0d29a3yvsJ
-   oR6Z3tZRWhEFbTgdzm5WYQQxzJEKxQUlFhHCstc0s91mn9l3Op381/Bsq
-   JrhBhIIL9I/jOv3Fcr1CTJOFDFgcwqcUArLSJBk611o5pbqSlAEHvvI+t
-   68nNviIW9+S1Y2stwZKON51FZSNE290U796pDpdb+SiOJBQji+NEVSIZL
-   FsmXhIzofRZbtlfMvvdcEPydnKpMFjF5DMi61uNuQl8NZ0Zp/yqHxw3S5
-   Q==;
-X-CSE-ConnectionGUID: LDa4K/pCThqGBbqv18i6Cg==
-X-CSE-MsgGUID: Be4JLaSZTmmBVyz7QYNPOQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11071"; a="36901315"
-X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
-   d="scan'208";a="36901315"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 03:24:15 -0700
-X-CSE-ConnectionGUID: 4kNn58ZHRm+lH4hA8psGXA==
-X-CSE-MsgGUID: gnA2tiEvR76Yw5iLPF4grw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
-   d="scan'208";a="35053877"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 03:24:12 -0700
-Date: Mon, 13 May 2024 12:22:49 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Cc: shayd@nvidia.com, maciej.fijalkowski@intel.com,
-	mateusz.polchlopek@intel.com, netdev@vger.kernel.org,
-	jiri@nvidia.com, michal.kubiak@intel.com,
-	intel-wired-lan@lists.osuosl.org, pio.raczynski@gmail.com,
-	sridhar.samudrala@intel.com, jacob.e.keller@intel.com,
-	wojciech.drewek@intel.com, przemyslaw.kitszel@intel.com
-Subject: Re: [Intel-wired-lan] [iwl-next v2 05/15] ice: allocate devlink for
- subfunction
-Message-ID: <ZkHp+fIvfw2m4De0@mev-dev>
-References: <20240513083735.54791-1-michal.swiatkowski@linux.intel.com>
- <20240513083735.54791-6-michal.swiatkowski@linux.intel.com>
- <CAH-L+nPnpxJKscC74YoDUr6pirHNuiBBFN8U+o9zRsW8gw2C8w@mail.gmail.com>
+	s=arc-20240116; t=1715595809; c=relaxed/simple;
+	bh=eYJIZTrc7lzAFpFrWS+2BOwADKlCJhROg36dbqRAgE0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IF5oFWPRi5fzq8SK3sTHxdDbSrCKQcgv7LI80/qlWC75oM9m2cvhc3k7Dh8dek7AMUr1ekBG5FcjRMiyvq+aQV9lVFWwfptQnIyK/1GP/cWwNlqJAnt3Qg8d8lrrRtBb/GsCBcBVScYC4w+92erohFNPliCL20cpG0hBnM6UHGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.112.247])
+	by gateway (Coremail) with SMTP id _____8CxBesd6kFmMCMMAA--.18175S3;
+	Mon, 13 May 2024 18:23:25 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.112.247])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxLN4b6kFmu9IcAA--.51613S3;
+	Mon, 13 May 2024 18:23:24 +0800 (CST)
+Message-ID: <02e83207-d2a9-4057-8205-4954f34cc3ec@loongson.cn>
+Date: Mon, 13 May 2024 18:23:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 08/15] net: stmmac: dwmac-loongson: Add phy
+ mask for Loongson GMAC
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+References: <cover.1714046812.git.siyanteng@loongson.cn>
+ <d0607989f5bf64c4251259af72d8816469e8865f.1714046812.git.siyanteng@loongson.cn>
+ <uc3stkm4yyaudv7x3gaarx2xipxglrrnwo4ixht35gkaq2bec2@zpg6roiq5pnu>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <uc3stkm4yyaudv7x3gaarx2xipxglrrnwo4ixht35gkaq2bec2@zpg6roiq5pnu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH-L+nPnpxJKscC74YoDUr6pirHNuiBBFN8U+o9zRsW8gw2C8w@mail.gmail.com>
+X-CM-TRANSID:AQAAf8AxLN4b6kFmu9IcAA--.51613S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj9xXoWrtFW5XrW7uF4rWr1fCw4ftFc_yoWxZrgEga
+	1YqwnF9w4IvF1Fkr47KFy5ZFy7WFyjvrn3KryxGwsrCw1Fyr45Jrn8G3s3ZFyrXa1IyF1q
+	9rs8ur4agryqkosvyTuYvTs0mTUanT9S1TB71UUUUj7qnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbSkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	tVWrXwAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
+	xGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+	JVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+	vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+	x2IY67AKxVW5JVW7JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26c
+	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26F4j6r4UJwCI42IY6I8E87Iv6xkF7I0E
+	14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU82jg7UUUUU==
 
-On Mon, May 13, 2024 at 02:55:48PM +0530, Kalesh Anakkur Purayil wrote:
-> On Mon, May 13, 2024 at 2:03 PM Michal Swiatkowski
-> <michal.swiatkowski@linux.intel.com> wrote:
-> >
-> > From: Piotr Raczynski <piotr.raczynski@intel.com>
-> >
-> > Make devlink allocation function generic to use it for PF and for SF.
-> >
-> > Add function for SF devlink port creation. It will be used in next
-> > patch.
-> >
-> > Create header file for subfunction device. Define subfunction device
-> > structure there as it is needed for devlink allocation and port
-> > creation.
-> >
-> > Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
-> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> > ---
-> >  .../net/ethernet/intel/ice/devlink/devlink.c  | 33 ++++++++++++
-> >  .../net/ethernet/intel/ice/devlink/devlink.h  |  1 +
-> >  .../ethernet/intel/ice/devlink/devlink_port.c | 50 +++++++++++++++++++
-> >  .../ethernet/intel/ice/devlink/devlink_port.h |  3 ++
-> >  drivers/net/ethernet/intel/ice/ice_sf_eth.h   | 21 ++++++++
-> >  5 files changed, 108 insertions(+)
-> >  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
-> >
-> > diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> > index 3fb3a7e828a4..c1fe3726f6c0 100644
-> > --- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> > +++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> > @@ -10,6 +10,7 @@
-> >  #include "ice_eswitch.h"
-> >  #include "ice_fw_update.h"
-> >  #include "ice_dcb_lib.h"
-> > +#include "ice_sf_eth.h"
-> >
-> >  /* context for devlink info version reporting */
-> >  struct ice_info_ctx {
-> > @@ -1282,6 +1283,8 @@ static const struct devlink_ops ice_devlink_ops = {
-> >         .port_new = ice_devlink_port_new,
-> >  };
-> >
-> > +static const struct devlink_ops ice_sf_devlink_ops;
-> > +
-> >  static int
-> >  ice_devlink_enable_roce_get(struct devlink *devlink, u32 id,
-> >                             struct devlink_param_gset_ctx *ctx)
-> > @@ -1419,6 +1422,7 @@ static void ice_devlink_free(void *devlink_ptr)
-> >   * Allocate a devlink instance for this device and return the private area as
-> >   * the PF structure. The devlink memory is kept track of through devres by
-> >   * adding an action to remove it when unwinding.
-> > + *
-> >   */
-> >  struct ice_pf *ice_allocate_pf(struct device *dev)
-> >  {
-> > @@ -1435,6 +1439,35 @@ struct ice_pf *ice_allocate_pf(struct device *dev)
-> >         return devlink_priv(devlink);
-> >  }
-> >
-> > +/**
-> > + * ice_allocate_sf - Allocate devlink and return SF structure pointer
-> > + * @dev: the device to allocate for
-> > + * @pf: pointer to the PF structure
-> > + *
-> > + * Allocate a devlink instance for SF.
-> > + *
-> > + * Return: void pointer to allocated memory
-> > + */
-> > +struct ice_sf_priv *ice_allocate_sf(struct device *dev, struct ice_pf *pf)
-> > +{
-> > +       struct devlink *devlink;
-> > +       int err;
-> > +
-> > +       devlink = devlink_alloc_ns(&ice_sf_devlink_ops,
-> > +                                  sizeof(struct ice_sf_priv),
-> > +                                  devlink_net(priv_to_devlink(pf)), dev);
-> > +       if (!devlink)
-> > +               return NULL;
-> > +
-> > +       err = devl_nested_devlink_set(priv_to_devlink(pf), devlink);
-> > +       if (err) {
-> > +               devlink_free(devlink);
-> > +               return ERR_PTR(err);
-> > +       }
-> > +
-> > +       return devlink_priv(devlink);
-> > +}
-> > +
-> >  /**
-> >   * ice_devlink_register - Register devlink interface for this PF
-> >   * @pf: the PF to register the devlink for.
-> > diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.h b/drivers/net/ethernet/intel/ice/devlink/devlink.h
-> > index d291c0e2e17b..1af3b0763fbb 100644
-> > --- a/drivers/net/ethernet/intel/ice/devlink/devlink.h
-> > +++ b/drivers/net/ethernet/intel/ice/devlink/devlink.h
-> > @@ -5,6 +5,7 @@
-> >  #define _ICE_DEVLINK_H_
-> >
-> >  struct ice_pf *ice_allocate_pf(struct device *dev);
-> > +struct ice_sf_priv *ice_allocate_sf(struct device *dev, struct ice_pf *pf);
-> >
-> >  void ice_devlink_register(struct ice_pf *pf);
-> >  void ice_devlink_unregister(struct ice_pf *pf);
-> > diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-> > index 812b306e9048..1355ea042f1d 100644
-> > --- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-> > +++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-> > @@ -432,6 +432,56 @@ void ice_devlink_destroy_vf_port(struct ice_vf *vf)
-> >         devl_port_unregister(&vf->devlink_port);
-> >  }
-> >
-> > +/**
-> > + * ice_devlink_create_sf_dev_port - Register virtual port for a subfunction
-> > + * @sf_dev: the subfunction device to create a devlink port for
-> > + *
-> > + * Register virtual flavour devlink port for the subfunction auxiliary device
-> > + * created after activating a dynamically added devlink port.
-> > + *
-> > + * Return: zero on success or an error code on failure.
-> > + */
-> > +int ice_devlink_create_sf_dev_port(struct ice_sf_dev *sf_dev)
-> > +{
-> > +       struct devlink_port_attrs attrs = {};
-> > +       struct devlink_port *devlink_port;
-> > +       struct ice_dynamic_port *dyn_port;
-> [Kalesh] Try to maintain RCT order for variable declaration.
 
-Maybe I don't understand RCT order correctly, but based on my
-understanding it is fine. Which declaration here break RCT order?
+在 2024/5/4 02:28, Serge Semin 写道:
+> On Thu, Apr 25, 2024 at 09:06:11PM +0800, Yanteng Si wrote:
+>> The phy mask of gmac(and gnet) is 0.
+> First of all the GNET PHY mask won't be zero as you setting it up to
+> ~BIT(2) in the patch 13 yourself. Secondly the stmmac_mdio_bus_data
+> structure instance is Z-malloced, thus it will be zeroed anyway. So
+> the only reason why the explicit stmmac_mdio_bus_data::phy_mask
+> zeroing would be useful is to signify the difference between the GMAC
+> and GNET devices. But that difference could be relatively easy
+> inferred from the code. So to speak IMO the patch has a little value.
+> I would drop it.
 
-Do you mean that ice_dynamic_port is longer than devlink_port and should
-be moved up? Didn't know that RCT is also applied to inner part of
-declaration. If there will be more comments I will move it in another
-spin.
+OK, drop it.
 
-> > +       struct devlink *devlink;
-> > +       struct ice_vsi *vsi;
-> > +       struct device *dev;
-> > +       struct ice_pf *pf;
-> > +       int err;
-> > +
-> > +       dyn_port = sf_dev->dyn_port;
-> > +       vsi = dyn_port->vsi;
-> > +       pf = dyn_port->pf;
-> > +       dev = ice_pf_to_dev(pf);
-> > +
-> > +       devlink_port = &sf_dev->priv->devlink_port;
-> > +
-> > +       attrs.flavour = DEVLINK_PORT_FLAVOUR_VIRTUAL;
-> > +
-> > +       devlink_port_attrs_set(devlink_port, &attrs);
-> > +       devlink = priv_to_devlink(sf_dev->priv);
-> > +
-> > +       err = devl_port_register(devlink, devlink_port, vsi->idx);
-> > +       if (err)
-> > +               dev_err(dev, "Failed to create virtual devlink port for auxiliary subfunction device");
-> > +
-> > +       return err;
-> > +}
-> > +
-> > +/**
-> > + * ice_devlink_destroy_sf_dev_port - Destroy virtual port for a subfunction
-> > + * @sf_dev: the subfunction device to create a devlink port for
-> > + *
-> > + * Unregisters the virtual port associated with this subfunction.
-> > + */
-> > +void ice_devlink_destroy_sf_dev_port(struct ice_sf_dev *sf_dev)
-> > +{
-> > +       devl_port_unregister(&sf_dev->priv->devlink_port);
-> > +}
-> > +
-> >  /**
-> >   * ice_dealloc_dynamic_port - Deallocate and remove a dynamic port
-> >   * @dyn_port: dynamic port instance to deallocate
-> > diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-> > index f20d7cc522a6..e4acd855d9f9 100644
-> > --- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-> > +++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-> > @@ -5,6 +5,7 @@
-> >  #define _DEVLINK_PORT_H_
-> >
-> >  #include "../ice.h"
-> > +#include "../ice_sf_eth.h"
-> >
-> >  /**
-> >   * struct ice_dynamic_port - Track dynamically added devlink port instance
-> > @@ -33,6 +34,8 @@ int ice_devlink_create_vf_port(struct ice_vf *vf);
-> >  void ice_devlink_destroy_vf_port(struct ice_vf *vf);
-> >  int ice_devlink_create_sf_port(struct ice_dynamic_port *dyn_port);
-> >  void ice_devlink_destroy_sf_port(struct ice_dynamic_port *dyn_port);
-> > +int ice_devlink_create_sf_dev_port(struct ice_sf_dev *sf_dev);
-> > +void ice_devlink_destroy_sf_dev_port(struct ice_sf_dev *sf_dev);
-> >
-> >  #define ice_devlink_port_to_dyn(p) \
-> >         container_of(port, struct ice_dynamic_port, devlink_port)
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.h b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-> > new file mode 100644
-> > index 000000000000..a08f8b2bceef
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-> > @@ -0,0 +1,21 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/* Copyright (c) 2024, Intel Corporation. */
-> > +
-> > +#ifndef _ICE_SF_ETH_H_
-> > +#define _ICE_SF_ETH_H_
-> > +
-> > +#include <linux/auxiliary_bus.h>
-> > +#include "ice.h"
-> > +
-> > +struct ice_sf_dev {
-> > +       struct auxiliary_device adev;
-> > +       struct ice_dynamic_port *dyn_port;
-> > +       struct ice_sf_priv *priv;
-> > +};
-> > +
-> > +struct ice_sf_priv {
-> > +       struct ice_sf_dev *dev;
-> > +       struct devlink_port devlink_port;
-> > +};
-> > +
-> > +#endif /* _ICE_SF_ETH_H_ */
-> > --
-> > 2.42.0
-> >
-> >
-> 
-> 
-> -- 
-> Regards,
-> Kalesh A P
 
+Thanks,
+
+Yanteng
 
 
