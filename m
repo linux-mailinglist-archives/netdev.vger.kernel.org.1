@@ -1,168 +1,128 @@
-Return-Path: <netdev+bounces-95845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C85B78C3A58
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 05:03:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC2168C3A5D
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 05:08:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A69E280E8E
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 03:03:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C0DC1F211D3
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 03:08:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA12F145B18;
-	Mon, 13 May 2024 03:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TaAz/ENJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED1F145B20;
+	Mon, 13 May 2024 03:08:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6023E47E
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 03:03:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122F2145B03;
+	Mon, 13 May 2024 03:08:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715569421; cv=none; b=n86Whskpcof+RQKgfdJMJCCyDVXHszWjdliC/7yfhEG+bAhSzUc3m2yHRJAXsnJLzJFidamQWCTz90QKmCMdG1XwUbhNVZsKqt0lQvWU05hnryRjmeg0T//XLmBRfo8Xm0m9X+akEVEA3dYLkH7q8grPHfn2ruP/6yi1mSjEkzI=
+	t=1715569696; cv=none; b=UN7fgsTyqS4Z43hYevb+isTp707Q7hvtKsxd4JskabY0ORWu25WglUvtE6Y/5o+vt0bBakMX7/RnwQDfnozhh/V9V+JLtX3k5fjsaCGK9rEOEYlCu3GEqvO8gZacIU2x7AnJVgjiceZL8XVhK6gR0NC++KZkoGD8+IIIylq/xbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715569421; c=relaxed/simple;
-	bh=z4NlVMZtR0r+DtTYPkbCuUFcxQnmejuMc8+xSsKlqFA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MoP3JtckDNJATLDLRgXF7UjohmdUDr5VQDmN5sipgBuyu/om8xqrOdfGjpQfCyBXfkNlpiLaEGBQaNhFEcVuC2gAYOCNGIsE9wuSF6WyrTeJYwPvgChhz3oQIcxQXj4tLYpkWPpnq/Ma2W1CoKb8W+IRijy3kRKppVQZ+bbg53o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=TaAz/ENJ; arc=none smtp.client-ip=209.85.160.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-23f5a31d948so2749555fac.0
-        for <netdev@vger.kernel.org>; Sun, 12 May 2024 20:03:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1715569419; x=1716174219; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yzBJEORmly2uweAvFf1l8zuxXIyjPhUuwee5HZnj+NQ=;
-        b=TaAz/ENJRmk2nXOWjPkrKvqSHiD+1amGYqc9jImroruKtcSZhetmkp/p8WRydH4e1c
-         qRkmec0KhfxkupyvIKJR7oc0GGOjy7YTPKTkNHKaXNvjVI5gjtXPSJ8Zz+5uxdTrEOM7
-         Hr7F5R3d8A3z72lkUJnCe4iN4gYcXs0+KhOtE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715569419; x=1716174219;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yzBJEORmly2uweAvFf1l8zuxXIyjPhUuwee5HZnj+NQ=;
-        b=EiCi+peJHXNlsRU1816kia66MxsUZLI3SZ5Ct0ApiysjpMQhwr8lcW/+dzDsZMS2Zr
-         FawCUSnqmWCzxsLjeDcMeCLbg/xi/s6rFeMBvi1KiE7Ht6bTM9mqr6WHnRzibw1jbo9I
-         yzVFQS96kMje5K42yYV780zNEGaHUwUHiQ1k6kCydXZxyDs0c8CiWIcoWQdDPYgTtFHA
-         XG2dpoaht6SbVMFHJl8KoyBRblMgkp57Iz5aNmyCsBCyzHMGaTtSVK5WELk6gndm4miS
-         wVC/DAqXqLPmNh+p4s7gSPn62QCg6JUOB/f9c378312hff7SeYQnHeq3KsN6KyZPc+xk
-         538A==
-X-Forwarded-Encrypted: i=1; AJvYcCW0uRtdoqBqYVoom36dBUWzGfTHo4Zmd0OBuZQ+H4d/+MnHrHPKEu7Tfo6tAsnB76IkMXuk9R6t2KTfmnwCZWX7v7f4zDbX
-X-Gm-Message-State: AOJu0Yw/p07mcqtvZG9zPTfW4fqE5Vp6hoW8ro6DFnbObIQTFuwp4w+3
-	o6Ga6KRyekas8gcdoMegezKrHGPIThsY16tWFCN9/ZWMn6MO2mMuoBQNyCAzPQ==
-X-Google-Smtp-Source: AGHT+IGLWGypu7OaOGynSM5xuNyLMM/e8nAmPw78+sRaeDRTGamx3zP5noERhX/KkAF69EuemkT4TQ==
-X-Received: by 2002:a05:6870:b6a7:b0:23e:6d9a:8f45 with SMTP id 586e51a60fabf-24172f79503mr10911205fac.48.1715569419606;
-        Sun, 12 May 2024 20:03:39 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2b30341sm6317982b3a.208.2024.05.12.20.03.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 May 2024 20:03:39 -0700 (PDT)
-Date: Sun, 12 May 2024 20:03:38 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Erick Archer <erick.archer@outlook.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH v2] tty: rfcomm: prefer struct_size over open coded
- arithmetic
-Message-ID: <202405121959.50F6DDA@keescook>
-References: <AS8PR02MB7237262C62B054FABD7229168BE12@AS8PR02MB7237.eurprd02.prod.outlook.com>
+	s=arc-20240116; t=1715569696; c=relaxed/simple;
+	bh=qMsAsGDNQ4GHMd5TD/Xe+g54+qy2vdkDoNDAsdxcdSY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SMfA39ktJWCfrIrRIbEMNxsBCisBRnMp2jz2j1/EHlvxTb1yBui6F/qu4vmIjEyebtypX52AxBv+pFYDlOUbGrcF4Lb6O+Yf0DN6DNae/M5bPYGYSAryqBPTTQWC/UKMMtf31DPXvNeMKTvj0E7/5Bzhd2kB5wHuezAbKa6lzyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 44D37fXsA1107450, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 44D37fXsA1107450
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 13 May 2024 11:07:41 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 13 May 2024 11:07:40 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 13 May 2024 11:07:39 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Mon, 13 May 2024 11:07:39 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org" <horms@kernel.org>,
+        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v18 06/13] rtase: Implement .ndo_start_xmit function
+Thread-Topic: [PATCH net-next v18 06/13] rtase: Implement .ndo_start_xmit
+ function
+Thread-Index: AQHaoUVFS3AReltz50OiDSH+k5DKnbGQKQQAgARZsNA=
+Date: Mon, 13 May 2024 03:07:39 +0000
+Message-ID: <76de0f7149bf4024998758120a5552ab@realtek.com>
+References: <20240508123945.201524-1-justinlai0215@realtek.com>
+ <20240508123945.201524-7-justinlai0215@realtek.com>
+ <1bb2d174-ccae-43e3-80ec-872b9a140fbe@lunn.ch>
+In-Reply-To: <1bb2d174-ccae-43e3-80ec-872b9a140fbe@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AS8PR02MB7237262C62B054FABD7229168BE12@AS8PR02MB7237.eurprd02.prod.outlook.com>
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Sun, May 12, 2024 at 01:17:24PM +0200, Erick Archer wrote:
-> This is an effort to get rid of all multiplications from allocation
-> functions in order to prevent integer overflows [1][2].
-> 
-> As the "dl" variable is a pointer to "struct rfcomm_dev_list_req" and
-> this structure ends in a flexible array:
-> 
-> struct rfcomm_dev_list_req {
-> 	[...]
-> 	struct   rfcomm_dev_info dev_info[];
-> };
-> 
-> the preferred way in the kernel is to use the struct_size() helper to
-> do the arithmetic instead of the calculation "size + count * size" in
-> the kzalloc() and copy_to_user() functions.
-> 
-> At the same time, prepare for the coming implementation by GCC and Clang
-> of the __counted_by attribute. Flexible array members annotated with
-> __counted_by can have their accesses bounds-checked at run-time via
-> CONFIG_UBSAN_BOUNDS (for array indexing) and CONFIG_FORTIFY_SOURCE (for
-> strcpy/memcpy-family functions).
-> 
-> In this case, it is important to note that the logic needs a little
-> refactoring to ensure that the "dev_num" member is initialized before
-> the first access to the flex array. Specifically, add the assignment
-> before the list_for_each_entry() loop.
-> 
-> Also remove the "size" variable as it is no longer needed and refactor
-> the list_for_each_entry() loop to use di[n] instead of (di + n).
-> 
-> This way, the code is more readable, idiomatic and safer.
-> 
-> This code was detected with the help of Coccinelle, and audited and
-> modified manually.
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [1]
-> Link: https://github.com/KSPP/linux/issues/160 [2]
-> Signed-off-by: Erick Archer <erick.archer@outlook.com>
+>=20
+> > +static u32 rtase_tx_csum(struct sk_buff *skb, const struct net_device
+> > +*dev) {
+> > +     u32 csum_cmd =3D 0;
+> > +     u8 ip_protocol;
+> > +
+> > +     switch (vlan_get_protocol(skb)) {
+> > +     case htons(ETH_P_IP):
+> > +             csum_cmd =3D RTASE_TX_IPCS_C;
+> > +             ip_protocol =3D ip_hdr(skb)->protocol;
+> > +             break;
+> > +
+> > +     case htons(ETH_P_IPV6):
+> > +             csum_cmd =3D RTASE_TX_IPV6F_C;
+> > +             ip_protocol =3D ipv6_hdr(skb)->nexthdr;
+> > +             break;
+> > +
+> > +     default:
+> > +             ip_protocol =3D IPPROTO_RAW;
+> > +             break;
+> > +     }
+> > +
+> > +     if (ip_protocol =3D=3D IPPROTO_TCP)
+> > +             csum_cmd |=3D RTASE_TX_TCPCS_C;
+> > +     else if (ip_protocol =3D=3D IPPROTO_UDP)
+> > +             csum_cmd |=3D RTASE_TX_UDPCS_C;
+> > +     else
+> > +             WARN_ON_ONCE(1);
+>=20
+> I'm not so sure about this WARN_ON_ONCE(). It looks like if i send a cust=
+om
+> packet which is not IPv4 or IPv6 it will fire. There are other protocols =
+then IP.
+> Connecting to an Ethernet switch using DSA tags would be a good example. =
+So
+> i don't think you want this warning.
+>=20
+>       Andrew
 
-Looks good!
-
-Reviewed-by: Kees Cook <keescook@chromium.org>
-
-> [...]
-> -		bacpy(&(di + n)->src, &dev->src);
-> -		bacpy(&(di + n)->dst, &dev->dst);
-> +		bacpy(&di[n].src, &dev->src);
-> +		bacpy(&di[n].dst, &dev->dst);
-
-Not an issue with your patch, but this helper is really pointless in the
-Bluetooth tree:
-
-static inline void bacpy(bdaddr_t *dst, const bdaddr_t *src)
-{
-        memcpy(dst, src, sizeof(bdaddr_t));
-}
-
-So the above could just be:
-
-		di[n].src = dev->src;
-		di[n].dst = dev->dst;
-
-:P
-
--Kees
-
--- 
-Kees Cook
+Hi Andrew,
+Thank you for your review, I will confirm and modify this part.
 
