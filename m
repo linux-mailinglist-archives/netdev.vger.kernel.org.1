@@ -1,73 +1,84 @@
-Return-Path: <netdev+bounces-96034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF5218C410A
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 14:51:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 655128C4116
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 14:55:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B763288350
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 12:51:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6979B20F63
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 12:54:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCEF2152182;
-	Mon, 13 May 2024 12:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C15881514C4;
+	Mon, 13 May 2024 12:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PfvJ4kSM"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DCPybtLw"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B4A1509B2;
-	Mon, 13 May 2024 12:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F352E15098E;
+	Mon, 13 May 2024 12:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715604657; cv=none; b=MB/DhgQFYt7VYbpcefEe3MNyDIgj7ZtlugVB99dbpxJi0rocvlyliJUJAJsurIOZADiZ39NoyAgnmcXt/Q22iN4hfW2DKqjc+Kh22VIwYLYX6c/5WuIFPrX9YxJNiky+mOOT+P0B4MbA+66DGRgY5n5cy9h9X0dh5rSbYItuWaM=
+	t=1715604882; cv=none; b=W8Us78r5jaSCKu4zIG9S8f+8oQ+VrV6NAEEMcrGt7ueb8YIw6wn0LstQ4KMXhboKjNcUJKvE7vaukSwEeksPIaPC2xctzBdo7FtW5En0dr43XsCqUV5Xx18AtMglAqAlgTe68a6Wx3VhEGW8myilptx/j0mNe1/PcP8IgJFEq4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715604657; c=relaxed/simple;
-	bh=ibad/oLXETdJ6gFZRASre3kHqdrQdhHpfWRltMesjec=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a5bgkqQs/DDmw5nJA9CmXzcTiwzlsAHRqXhqlcXlcOAmuaRqfp7qPiGKPHZjmtO3ho2xRcLCBLb1iM2VDzILajax3qEPy4KMLqGjPU7rwsCbRw5Qt+EP8djDI8ZVFzDgfuvtb6QtvSXk1O99GW8WezO5EnXscVYw6V7wBYeeVfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PfvJ4kSM; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0DD66FF802;
-	Mon, 13 May 2024 12:50:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1715604653;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BCTHEqncHX7PpEXTjLxoQdryl0DYK6TWxvSfa/L8L6Q=;
-	b=PfvJ4kSMsWdc2j20yS/BOvIQFEbCf0UaU26pGEq3zLcq4cfh7I6E2XepIPqefEp7JIoS3q
-	+frr91kLTPSGDdBbWLqlB9rTxQZrHw/1NkU+teVpLo98aE/NMjQZAKTFZAf12w5Opo9lyj
-	C5Btp70PYJWoZlhmyRjNrONij0ceSrk7knM6u84j1Mp55i2iUCEEN4LvCb0FL1goTfQxMP
-	g02b39pfRFpXccgMNDb7AreOac005qT1B9SZ/HksUJQrwC9q69TCmDLYo6oiAm1qTJpeNR
-	zDDyg7AJolHp2Z4jmB3izsOiRXr3gheK1EMpsKWhfhfhkPq6uDiJsrl28nsYBw==
-Date: Mon, 13 May 2024 14:50:49 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: <Steen.Hegelund@microchip.com>
-Cc: <tglx@linutronix.de>, <robh@kernel.org>, <krzk+dt@kernel.org>,
- <conor+dt@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
- <kuba@kernel.org>, <pabeni@redhat.com>, <lee@kernel.org>, <arnd@arndb.de>,
- <Horatiu.Vultur@microchip.com>, <UNGLinuxDriver@microchip.com>,
- <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
- <saravanak@google.com>, <bhelgaas@google.com>, <p.zabel@pengutronix.de>,
- <Lars.Povlsen@microchip.com>, <Daniel.Machon@microchip.com>,
- <alexandre.belloni@bootlin.com>, <linux-kernel@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-pci@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <Allan.Nielsen@microchip.com>, <luca.ceresoli@bootlin.com>,
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH 12/17] irqchip: Add support for LAN966x OIC
-Message-ID: <20240513145049.25695b4a@bootlin.com>
-In-Reply-To: <D143YFK7334S.3MM7YORC0H24X@microchip.com>
-References: <20240430083730.134918-1-herve.codina@bootlin.com>
-	<20240430083730.134918-13-herve.codina@bootlin.com>
-	<D143YFK7334S.3MM7YORC0H24X@microchip.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1715604882; c=relaxed/simple;
+	bh=TG35ABlfr/gUBh6hxqOCQKtGj8bXdt0sjJdHpeJbLag=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Zzy98WRfBugyDvjiPeX9mlERTnY5UrFKnwpAunyfzWcXw2KGyaf3BczuaMb881X5sQ4hEZB9Sdb29NzreYK27lvVEy/qJX9oaX+U8g1LaBj6wIOkFykf+IEebI/NNwq2jSMbKT+yYtKPZTg1iHqoU900HqeprnUaKJzykvPBmX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=DCPybtLw; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44DCOBrD027951;
+	Mon, 13 May 2024 12:54:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=corp-2023-11-20;
+ bh=asPw8Na3vKhJc4WBcLxe3ZTCvPqcnYlUc+TTZ6Jwr4Y=;
+ b=DCPybtLwZ+7MNGaetDYKkFPkopsSD6nGVYDq7QJdAgR8SBXNxrpI206O9fd+JxTMohcC
+ +hWdw/gyDDxhv75ms4X6I5HhVpJpXUDqNPDqK8AxOKVHj6rxIVBCsIrWjUIimVuPyik7
+ 3UAamxljaqE4pu+4vjUsdy/gdeM9YhOe4Z/RamNJtJw5s2kMacv626RPtnuJCxfvMLTH
+ ZZWisSG1Din7TAVTs+oELXqjCLo3lNL1qo/QtuboiRj/sYs+1JSAK9NdBmQnV5egppxn
+ zfWhcU467LKBxKk5byNDdfJERZpMZk9bmuBzhRFBtoY1oO0DD8mIT2pMVdzzG+M+7x9w dQ== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3y3ce28vpa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 13 May 2024 12:54:13 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 44DBBFXk018131;
+	Mon, 13 May 2024 12:54:12 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3y1y4c1348-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 13 May 2024 12:54:12 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44DCq97u001819;
+	Mon, 13 May 2024 12:54:12 GMT
+Received: from lab61.no.oracle.com (lab61.no.oracle.com [10.172.144.82])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3y1y4c12sj-1;
+	Mon, 13 May 2024 12:54:11 +0000
+From: =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>
+To: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+        Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Tejun Heo <tj@kernel.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Allison Henderson <allison.henderson@oracle.com>,
+        Manjunath Patil <manjunath.b.patil@oracle.com>,
+        Mark Zhang <markzhang@nvidia.com>,
+        =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Shiraz Saleem <shiraz.saleem@intel.com>,
+        Yang Li <yang.lee@linux.alibaba.com>
+Subject: [PATCH 0/6] rds: rdma: Add ability to force GFP_NOIO
+Date: Mon, 13 May 2024 14:53:40 +0200
+Message-Id: <20240513125346.764076-1-haakon.bugge@oracle.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,31 +87,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-13_08,2024-05-10_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
+ adultscore=0 mlxscore=0 spamscore=0 suspectscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2405130082
+X-Proofpoint-GUID: j_l2RydB90BZJl-lij9T-2hpDFYUH-5w
+X-Proofpoint-ORIG-GUID: j_l2RydB90BZJl-lij9T-2hpDFYUH-5w
 
-Hi Steen,
+This series enables RDS and the RDMA stack to be used as a block I/O
+device. This to support a filesystem on top of a raw block device
+which uses RDS and the RDMA stack as the network transport layer.
 
-On Wed, 8 May 2024 08:08:30 +0000
-<Steen.Hegelund@microchip.com> wrote:
+Under intense memory pressure, we get memory reclaims. Assume the
+filesystem reclaims memory, goes to the raw block device, which calls
+into RDS, which calls the RDMA stack. Now, if regular GFP_KERNEL
+allocations in RDS or the RDMA stack require reclaims to be fulfilled,
+we end up in a circular dependency.
 
-...
-> > +/* Mapping of source to destination interrupts (_n = 0..8) */  
-> 
-> Are the indices really needed on LAN966X_OIC_DST_INTR_MAP* and _IDENT*
-> You do not appear to be using them?
-> 
-> 
-> > +#define LAN966X_OIC_DST_INTR_MAP(_n)   0x78
+We break this circular dependency by:
 
-Indeed, I missed them.
-These registers are defined from 0 to 8 in the document:
-  https://microchip-ung.github.io/lan9662_reginfo/reginfo_LAN9662.html?select=cpu,intr
+1. Force all allocations in RDS and the relevant RDMA stack to use
+   GFP_NOIO, by means of a parenthetic use of
+   memalloc_noio_{save,restore} on all relevant entry points.
 
-The code use only the indice 0.
-In the next iteration, I will keep indices and update the definition of
-registers like that:
-  #define LAN966X_OIC_DST_INTR_MAP(_n)   (0x78 + (_n) * 4)
+2. Make sure work-queues inherits current->flags
+   wrt. PF_MEMALLOC_{NOIO,NOFS}, such that work executed on the
+   work-queue inherits the same flag(s).
 
-Best regards
-Hervé
+Håkon Bugge (6):
+  workqueue: Inherit NOIO and NOFS alloc flags
+  rds: Brute force GFP_NOIO
+  RDMA/cma: Brute force GFP_NOIO
+  RDMA/cm: Brute force GFP_NOIO
+  RDMA/mlx5: Brute force GFP_NOIO
+  net/mlx5: Brute force GFP_NOIO
+
+ drivers/infiniband/core/cm.c                  | 15 ++++-
+ drivers/infiniband/core/cma.c                 | 20 ++++++-
+ drivers/infiniband/hw/mlx5/main.c             | 22 +++++--
+ .../net/ethernet/mellanox/mlx5/core/main.c    | 14 ++++-
+ include/linux/workqueue.h                     |  2 +
+ kernel/workqueue.c                            | 17 ++++++
+ net/rds/af_rds.c                              | 60 ++++++++++++++++++-
+ 7 files changed, 138 insertions(+), 12 deletions(-)
+
+--
+2.39.3
+
 
