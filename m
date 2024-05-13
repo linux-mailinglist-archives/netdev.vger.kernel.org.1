@@ -1,107 +1,108 @@
-Return-Path: <netdev+bounces-96125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F1F88C4656
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 19:41:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F348E8C467F
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 19:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F28FF1F24C89
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:41:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEC34288231
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C7422331;
-	Mon, 13 May 2024 17:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5E7249F5;
+	Mon, 13 May 2024 17:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Pb2uO5Dg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OO2MpxNM"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6AC2E631;
-	Mon, 13 May 2024 17:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307F757C8D;
+	Mon, 13 May 2024 17:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715622110; cv=none; b=XmLDvcWeDLujTKIQ8gi+DkWNEweyYzHi1v1ojk/yLNv2lQGCB8a4a1CRMbDE2w+mjtSLAsypwogf8eMsyS4ih5ALlNp30X1BlCOugRZ38U9b6+LN6dckklLnajOCrHyVEcRcOy1YoIZLiVf177fld/4F5cI/YykiBTBGLFEBHj8=
+	t=1715622694; cv=none; b=Wqk6K53/M4FtNgpwdFmE+Lqx7nUZucdXw1pbMfR1IYHwn3QCsag9dV3xlm04ehN2PQria9ZeMg6zk81M0px4hJlbUxcoWMMXJz1r7UjpXq4N7hhYDQw6veZBmxTme3N12F+kb/kKDgpskapQ+BYJVdPrOynOBNN/ltFua/rAj74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715622110; c=relaxed/simple;
-	bh=J95ZIj5DQY4xsPzzP3zbUWueHNVgzry7B1maNkLWf0c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uAEv+OGMObVcmhh6E4ZsOKcYy6Zmv3KK12XjrrfbT+ptLjBWNN3fHxYG1pqqKNb+wgOS4UmX5JtidKNF7dIM+SBEWdF/Mtsx1UxkNcKGbmWi9ObbcjgDmUUG23J265CE1lxgFUeQhYHw3FNFyGi792hjIGfSw/pOqPFZJQeXvSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Pb2uO5Dg; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Z0WT9I02yh5cFXXMMJOdCfqjrNnWp6CwWdTqqwOw/vY=; b=Pb2uO5DgiupsjtJj1PwMPpOgm5
-	WZhPvQiyWo4uSZ7UtYyeh4O1y8ib7T0hXwGVGDlSdGwKWQnpE8JsM1unseo3YMCwKC+VlNyD4t/3N
-	4Xht1YsPG2UnomW3i9UpBQL546OD8bsh0Xa6+auznj5rD4R6LZNtxltwo03Ia+OV1LmybTAcMEtgM
-	24P/cSLTzADDxs3z8eYLruxYKBy8ZNK0AMS8lUxjdys44+XxBhujsFYIZUJvzqckRagbEjEhmMDDe
-	1ffE1atNHrKH91hQxG2hmCIm9/1yihuWWs0ytfMF3KxPYnqRHXNPBVcxi9xdrv81gn4BXha+hfBrJ
-	ZlST7+Uw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50092)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1s6ZgA-00028n-20;
-	Mon, 13 May 2024 18:41:38 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1s6Zg8-0006I4-5m; Mon, 13 May 2024 18:41:36 +0100
-Date: Mon, 13 May 2024 18:41:35 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	bcm-kernel-feedback-list@broadcom.com, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
-	richardcochran@gmail.com, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2, net-next, 2/2] net: stmmac: PCI driver for BCM8958X
- SoC
-Message-ID: <ZkJQz9u8pQ9YmM5n@shell.armlinux.org.uk>
-References: <20240510000331.154486-3-jitendra.vegiraju@broadcom.com>
- <20240511015924.41457-1-jitendra.vegiraju@broadcom.com>
- <Zj/IPpub11OL3jBo@shell.armlinux.org.uk>
- <CAMdnO-KCC0qXEsE1iDGNZwdd0PAcsRinmxe8_-5Anp=e1c5WFA@mail.gmail.com>
+	s=arc-20240116; t=1715622694; c=relaxed/simple;
+	bh=DA+UD3fsPCm2aGviXf6VM5/MCw3pyuso45xWeS6YsPQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=fjSDVfiR1Re41+Rzdh1hkwp7Ap8WEzTojKcCWgfRgtwiCdcyQVSSUO/2NRc+JSVzzXTCNqD7fjMxsfh+ERZzlacaOVb+YIj7ZiFnqXlLtAGso8AfQy3aYgyXsbhqT1dbjSJTLc5/Rcu1SWrayMxjfNUjb43YxnPANdOeC4r0+oY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OO2MpxNM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F072C113CC;
+	Mon, 13 May 2024 17:51:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715622693;
+	bh=DA+UD3fsPCm2aGviXf6VM5/MCw3pyuso45xWeS6YsPQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=OO2MpxNMj1H+5IPfIKaI+0XY2q/eDAH6nd5DVELGDFmMSsdww3S0gviR2LYgG4+55
+	 DS/C82prJmvyciUR3FtcWjcQcZ0AFsq+cz/hgzCxsc7hysyZrTBa+LA/6BIYku9Tq0
+	 lXnVs/piTxPAFFh0QiFdLLtMiAxOhWK+6J04cOcFpyHYkChNw0Ow/IUCn9ElJHV6gp
+	 rXLqYcDR4WKa72sI8dmfu3P7SqfMCAe6YzslsnyXlRGmQraPjKEWgeNGTvzFgirb11
+	 HdzL7v9Zo3P+bVoUD+mrSyit29r7xxSehPxvi524Ya+R6bOfP+uxjSNBLtRXr2qCp3
+	 viZ+c5otVPfiA==
+Date: Mon, 13 May 2024 12:51:31 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Ajit Khaparde <ajit.khaparde@broadcom.com>
+Cc: bhelgaas@google.com, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	andrew.gospodarek@broadcom.com, michael.chan@broadcom.com,
+	kuba@kernel.org, davem@davemloft.net,
+	Andy Gospodarek <gospo@broadcom.com>
+Subject: Re: [PATCH] pci: Add ACS quirk for Broadcom BCM5760X NIC
+Message-ID: <20240513175131.GA1991153@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMdnO-KCC0qXEsE1iDGNZwdd0PAcsRinmxe8_-5Anp=e1c5WFA@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20240510204228.73435-1-ajit.khaparde@broadcom.com>
 
-On Mon, May 13, 2024 at 10:38:46AM -0700, Jitendra Vegiraju wrote:
-> Thanks for reviewing the patch.
-> On Sat, May 11, 2024 at 12:34 PM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> > As pointed out in the other sub-thread, you don't need this. If you need
-> > a fixed-link and you don't have a firmware description of it, you can
-> > provide a swnode based description through plat->port_node that will be
-> > passed to phylink. Through that, you can tell phylink to create a
-> > fixed link.
-> >
-> Thank you for the pointers or software node support.
-> Since the driver is initially targetted for X86/_64, we were not sure
-> how to deal with lack of OF support.
-> We will try out the software node facility.
+On Fri, May 10, 2024 at 01:42:28PM -0700, Ajit Khaparde wrote:
+> The Broadcom BCM5760X NIC may be a multi-function device.
+> While it does not advertise an ACS capability, peer-to-peer
+> transactions are not possible between the individual functions.
+> So it is ok to treat them as fully isolated.
+> 
+> Add an ACS quirk for this device so the functions can be in independent
+> IOMMU groups and attached individually to userspace applications using
+> VFIO.
+> 
+> Signed-off-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+> Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
 
-You may wish to have a look at drivers/net/ethernet/wangxun/ which
-also creates software nodes for phylink.
+Looks like this was applied by Krzysztof to pci/acs for v6.10.
 
-Thanks.
+I'm hoping Broadcom is still working on using the standard ACS so we
+don't have to add quirks forever:
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+https://lore.kernel.org/all/CACKFLinvohm+jRupNZAV=G+OHg1buXvLDrs0yGgPY3o6NB8biA@mail.gmail.com/#t
+
+> ---
+>  drivers/pci/quirks.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+> index eff7f5df08e2..3d8aa3f709e2 100644
+> --- a/drivers/pci/quirks.c
+> +++ b/drivers/pci/quirks.c
+> @@ -5099,6 +5099,10 @@ static const struct pci_dev_acs_enabled {
+>  	{ PCI_VENDOR_ID_BROADCOM, 0x1750, pci_quirk_mf_endpoint_acs },
+>  	{ PCI_VENDOR_ID_BROADCOM, 0x1751, pci_quirk_mf_endpoint_acs },
+>  	{ PCI_VENDOR_ID_BROADCOM, 0x1752, pci_quirk_mf_endpoint_acs },
+> +	{ PCI_VENDOR_ID_BROADCOM, 0x1760, pci_quirk_mf_endpoint_acs },
+> +	{ PCI_VENDOR_ID_BROADCOM, 0x1761, pci_quirk_mf_endpoint_acs },
+> +	{ PCI_VENDOR_ID_BROADCOM, 0x1762, pci_quirk_mf_endpoint_acs },
+> +	{ PCI_VENDOR_ID_BROADCOM, 0x1763, pci_quirk_mf_endpoint_acs },
+>  	{ PCI_VENDOR_ID_BROADCOM, 0xD714, pci_quirk_brcm_acs },
+>  	/* Amazon Annapurna Labs */
+>  	{ PCI_VENDOR_ID_AMAZON_ANNAPURNA_LABS, 0x0031, pci_quirk_al_acs },
+> -- 
+> 2.39.2 (Apple Git-143)
+> 
+
+
 
