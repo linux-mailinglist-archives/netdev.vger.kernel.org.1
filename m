@@ -1,59 +1,40 @@
-Return-Path: <netdev+bounces-95962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A468C8C3EB6
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 12:16:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C66DD8C3EBA
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 12:17:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD13F1F224B5
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 10:16:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 665A61F2230D
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 10:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD0A149E10;
-	Mon, 13 May 2024 10:16:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="EczDoF69"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB7214A088;
+	Mon, 13 May 2024 10:17:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5E11487EC
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 10:16:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C62B1487EC
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 10:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715595391; cv=none; b=d8rfaKx9Zw2616noFQ6a5/JK60ECuaun3krNRlaW9zScpuggiIDXG4Aw3DYKtqbIG1hfRo5URuDJ1SWEbCAnW0qf35q71pTjFK4e5GAiWlCQUrqqO/5NYeorRbdwogM4GulGKOUpYtRP9v/Mku14RG+6X8dm8VUHqe0x/LFIre0=
+	t=1715595422; cv=none; b=oTRU+t+8qnSlU1IyOnkPZFF8fZbGB+6WfRLsanExTEa439iDhAxfVMKz5MDkV0x97FLPBX0/NoXwzEdPL2uvRd6tjkaClgLBQTaFi7E3Onv3Zm5OnymDZBVkTiheqTojmF5J6QAwB57DseTTpZhlDj0Voj1e96nwpLxtpCutB0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715595391; c=relaxed/simple;
-	bh=3YxdM5aqGhCgeCgDlg1RXuR0BDGDgoeo1GTxksBh85Y=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=n3zjipopWGqFKfnvrSPVaGdBou4YYTe9Bv+SdXmoCK6r3SfoSEO+laRTVvKk5ghMA0tcBQuDGIbrIqodiskZ5FVdGQEo0RNsrXi0UIWiY0tUbj0GFOph0aNVymL1GseOLSNpKAgJw/nHaekTlgifCxs+loNbkAkGBrZnNHsIBdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=EczDoF69; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1s6SjE-00Bc2i-Ba; Mon, 13 May 2024 12:16:20 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=a8osHBdpEHe8VaYYEDJvMcVxEvdIpZ/M2bv/VFp/ru0=; b=EczDoF69A4eBEqLOLDh57VXji9
-	p9jMBS76RpJboi7TPpJC48T6BQtdNwxkpdbe8x58NoX/EZ8i97wJJ1FBbYfnzWZwHGCihKn09WJIb
-	EH5nejdy/4AGqZjJtljnrgSbY4E02zuY7T8YcBUdsah16/19bQiqvPtvpfU0vQLp5SzgRmJ42jNOG
-	8KM+mMZNB/eEnVQReq513CRZj98dydcT2dv9svw06M7QJGXXQlD+UDIZKq85E9HmL0KTqda4iXciO
-	g3b+AmNPMsPz1QJS51R1eF2TClhS+ygrknpxtNm86F1/jeqb9ShhF80cFhbxdpNDO59lcl0Ir6evU
-	klYEUFcw==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1s6SjD-00019h-8X; Mon, 13 May 2024 12:16:19 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1s6Sit-0079pu-Jc; Mon, 13 May 2024 12:15:59 +0200
-Message-ID: <30bb2dd9-f84e-4615-9217-fea3e656fa49@rbox.co>
-Date: Mon, 13 May 2024 12:15:57 +0200
+	s=arc-20240116; t=1715595422; c=relaxed/simple;
+	bh=DC8k8kR4rqntnjIWBWVWRgtiIvWvURVycOjvWUecDKI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RuSWgWyYst/jupP03aiRVNwcMFOhGYj7Lzg553/8RF60GQQDcJI19g9MQRH8s3Q4HG43H4hUPOdC+AA98cnvMVMOAsatiYo+sF1uMJvADDADz3BoiNPNHQ/FuLj+cDe6iGXAYPoPud7FNONriwdIqX1mhWA38zyOtThpl0l+Q/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.112.247])
+	by gateway (Coremail) with SMTP id _____8BxtOqZ6EFmsSIMAA--.17549S3;
+	Mon, 13 May 2024 18:16:57 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.112.247])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxtFaX6EFmHdEcAA--.34929S3;
+	Mon, 13 May 2024 18:16:56 +0800 (CST)
+Message-ID: <67de62f1-c4c5-4534-979a-7eb430a836de@loongson.cn>
+Date: Mon, 13 May 2024 18:16:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,56 +42,98 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH v2 net] af_unix: Update unix_sk(sk)->oob_skb under
- sk_receive_queue lock.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: billy@starlabs.sg, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
- pabeni@redhat.com
-References: <3bbea91b-5b2b-4695-bb5d-793482f05e9f@rbox.co>
- <20240513092426.12297-1-kuniyu@amazon.com>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <20240513092426.12297-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net-next v12 12/15] net: stmmac: dwmac-loongson: Fixed
+ failure to set network speed to 1000.
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+References: <cover.1714046812.git.siyanteng@loongson.cn>
+ <9b9f8ddd1e3ac9e05fa0d15585e172a4965f675f.1714046812.git.siyanteng@loongson.cn>
+ <2pxumw5ctsnvr2mzqxnj7lvlzttxtokmzhwvswmq7ujigatdsz@mcfh5tlte3cl>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <2pxumw5ctsnvr2mzqxnj7lvlzttxtokmzhwvswmq7ujigatdsz@mcfh5tlte3cl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxtFaX6EFmHdEcAA--.34929S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7Zry3uFykZryxCw13tF15ZFc_yoW8Kry5pr
+	93Aa4a9rZFqr17Cws3Zwn8ZF95ZFW2qrWkWF4Iywn3uF93AayjqryjvFWY9Fy7Ars5ZF1a
+	qrWUur4UWFs8CrbCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	tVWrXwAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
+	xGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+	JVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+	vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+	x2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26c
+	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26F4j6r4UJwCI42IY6I8E87Iv6xkF7I0E
+	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU28nYUUUUU
 
-On 5/13/24 11:24, Kuniyuki Iwashima wrote:
-> From: Michal Luczaj <mhal@rbox.co>
-> Date: Mon, 13 May 2024 11:14:39 +0200
->> On 5/13/24 09:44, Kuniyuki Iwashima wrote:
->>> From: Michal Luczaj <mhal@rbox.co>
->>> Date: Mon, 13 May 2024 08:40:34 +0200
->>>> What I'm talking about is the quoted above (unchanged) part in manage_oob():
->>>>
->>>> 	if (!WARN_ON_ONCE(skb_unref(skb)))
->>>>   		kfree_skb(skb);
->>>
->>> Ah, I got your point, good catch!
->>>
->>> Somehow I was thinking of new GC where alive recvq is not touched
->>> and lockdep would end up with false-positive.
->>>
->>> We need to delay freeing oob_skb in that case like below.
->>> ...
+
+在 2024/5/5 06:13, Serge Semin 写道:
+> On Thu, Apr 25, 2024 at 09:10:37PM +0800, Yanteng Si wrote:
+>> GNET devices with dev revision 0x00 do not support manually
+>> setting the speed to 1000.
 >>
->> So this not a lockdep false positive after all?
+>> Signed-off-by: Feiyang Chen<chenfeiyang@loongson.cn>
+>> Signed-off-by: Yinggang Gu<guyinggang@loongson.cn>
+>> Signed-off-by: Yanteng Si<siyanteng@loongson.cn>
+>> ---
+>>   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 8 ++++++++
+>>   drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 6 ++++++
+>>   include/linux/stmmac.h                               | 1 +
+>>   3 files changed, 15 insertions(+)
 >>
->> Here's my understanding: the only way manage_oob() can lead to an inverted locking
->> order is when the receiver socket is _not_ in gc_candidates. And when it's not
->> there, no risk of deadlock. What do you think?
-> 
-> For the new GC, it's false positive, but for the old GC, it's not.
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> index df5899bec91a..a16bba389417 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> @@ -10,6 +10,7 @@
+>>   #include "stmmac.h"
+>>   
+>>   #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
+>> +#define PCI_DEVICE_ID_LOONGSON_GNET	0x7a13
+>>   
+>>   struct stmmac_pci_info {
+>>   	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
+>> @@ -179,6 +180,13 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   
+>>   	ret = loongson_dwmac_config_legacy(pdev, plat, &res, np);
+>>   
+>> +	/* GNET devices with dev revision 0x00 do not support manually
+>> +	 * setting the speed to 1000.
+>> +	 */
+>> +	if (pdev->device == PCI_DEVICE_ID_LOONGSON_GNET &&
+>> +	    pdev->revision == 0x00)
+>> +		plat->flags |= STMMAC_FLAG_DISABLE_FORCE_1000;
+>> +
+> That's why it's important to wait for the discussions being finished.
+> If you waited for some time I would have told you that the only part
+> what was required to move to the separate patch was the changes in the
+> files:
+> drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> include/linux/stmmac.h
 >
-> The old GC locks unix_gc_lock and could iterate alive sockets if
-> they are linked to gc_inflight_list, and then recvq is locked.
-> ...
+> So please move the changes above to the patch
+> [PATCH net-next v12 13/15] net: stmmac: dwmac-loongson: Add Loongson GNET support
+> * with the flag setup being done in the loongson_gnet_data() method.
+>
+> Thus you'll be able to drop the patch 14
+> [PATCH net-next v12 14/15] net: stmmac: dwmac-loongson: Move disable_force flag to _gnet_date
 
-The recvq is locked not for all sockets in gc_inflight_list, but only its
-subset, gc_candidates, i.e. sockets that fulfil the 'total_refs == u->inflight'
-condition, right? So doesn't this imply that our receiver is not user-reachable
-and manage_oob() cannot be called/raced?
+OK.
 
-I wouldn't be surprised if I was missing something important, but it's not like
-I didn't try deadlocking this code :)
+
+Thanks,
+
+Yanteng
+
 
