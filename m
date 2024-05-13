@@ -1,92 +1,85 @@
-Return-Path: <netdev+bounces-96152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E42E8C481C
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 22:20:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5465C8C481E
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 22:22:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D0D61F25160
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:20:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A945285B53
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEA6A7D414;
-	Mon, 13 May 2024 20:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E587D40D;
+	Mon, 13 May 2024 20:22:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DVcp0GZN"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RHVUT5fc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E3B76056;
-	Mon, 13 May 2024 20:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 674AB39FD8;
+	Mon, 13 May 2024 20:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715631630; cv=none; b=eNaZNY605R8PrHkr3fb3t7yf4j4LNOztc6YWVbQ+WkTVcuvsEYfCq2YymB7CyV8jrjpaXtKY4WCHto9+X5kzUwJd5GzTVYVpgh41TaUlfnioSFIcpr2yxelEJWqi93iawwl91Zsr6QpiE2QzIhmMW3KUl2Y8fNzfkc3t3AvK1PU=
+	t=1715631735; cv=none; b=hDOxKTpf6XdcqAKOU1RVyGsaz4/L6HR8DPnx/tNI3kA0ftO73nMSjZkX+nxiXSGqLZDiLblQLbfq+jiROL5ZteQacBtk9u2KOysm1vaK4Cx8lel5Sim3uxN9WaTcuP1vXvos3I+dRH9pp8noFEvzG2LpoR+EvGwcC1JDod/Vph0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715631630; c=relaxed/simple;
-	bh=uLZg/VXmHHiqkXQDPmJqHEN4hVWn3nhTgaSaXct+gVs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gLODLJTj9aY8/lpsHl9X4MaFvJ/4QAIQSz7ql0J40YZegD/zpLs+df/eH3IY+n4lpvw4UNzIExBTMLKvvxlQS3HbNr9rXVO+566t2YfRezS0r0+PChRyUXer5QFOVR0fmgX7L0f1EzuTNWxGWhp88irQkuJT/BhH7s3O13j7WWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DVcp0GZN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F3718C113CC;
-	Mon, 13 May 2024 20:20:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715631630;
-	bh=uLZg/VXmHHiqkXQDPmJqHEN4hVWn3nhTgaSaXct+gVs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DVcp0GZNluc0r2sPIT07pb62dz4+dzvWS/+8k6T1MTpMOqBaDlNHiJKkfEUJFrcAA
-	 ov4uY6KzmsG8LSXvyJu+apLncdKW0gusX5iSqIJNvaR0xKtmOdpTKnNtXQh9X9W6AT
-	 Ns0q6yVKWEzUVqe2AJj2iOf45xfV+0chpJibzh/X/9ethxE7VsPOn3xRNmSpQFJ6AQ
-	 VuGLcNgASKObj47mU+mmP5dWJD3HgY4vtyv4LdeELMEhB+/6uMlb0D0zcLWIL6hE/b
-	 1vzZbC5RH+LcvjEgKkiM+5FzRD4WNvNvLcfkyMxQKbQgx4wCKAPcFvlGtcEu+2QgXk
-	 qTqS3VQFgXE0g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DE3EBC43443;
-	Mon, 13 May 2024 20:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1715631735; c=relaxed/simple;
+	bh=xkIyIbZAjoDJctNIIOzX6lUajmD5zufFz56zALxN/9Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UtDL3AuNsusCK1F0DJmhpK71vZmXzDiN8DBPB7ov9DVgF1im5WxJ7hvWzMFFJ0lE3L+pvAdmwP8P05/WI+bmff0V1hZ/1zH1j8avc98FfVwGJ9WNIfR99DSE1V40k+t8zjDC0n2WDHHUbRWagXNY+lnZRHmrOpVTHY2D2eccg30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RHVUT5fc; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=DtIfyWjCrgt1EGu9Lx9mzz635kI1F/8RrAF0bzMyy8M=; b=RHVUT5fcdaSQi2xY9RuDoEotGV
+	D8Q+vaZuNHykP1iItOiM1cP3c0rgA5U+5D8Qj4ptLlD8F1ZnjX2oXjeq0RlIJvbaNIRCwArPTWLJv
+	3NBJMBQR1GPStEAWw9L9unnnBaDgNM78dbtwHi9Sixr7hmAn2IL72LbWfJ5JBY9rkmJc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s6cBQ-00FKk3-2V; Mon, 13 May 2024 22:22:04 +0200
+Date: Mon, 13 May 2024 22:22:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: admiyo@os.amperecomputing.com
+Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] mctp pcc: Implement MCTP over PCC Transport
+Message-ID: <9006463d-27db-4715-a1ab-61c41823ce3c@lunn.ch>
+References: <20240513173546.679061-1-admiyo@os.amperecomputing.com>
+ <20240513173546.679061-2-admiyo@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf 2024-05-13
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171563162990.3504.17279054249056404557.git-patchwork-notify@kernel.org>
-Date: Mon, 13 May 2024 20:20:29 +0000
-References: <20240513041845.31040-1-daniel@iogearbox.net>
-In-Reply-To: <20240513041845.31040-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240513173546.679061-2-admiyo@os.amperecomputing.com>
 
-Hello:
+> +struct mctp_pcc_hw_addr {
+> +	int inbox_index;
+> +	int outbox_index;
+> +};
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> +static void  mctp_pcc_setup(struct net_device *ndev)
+> +{
+> +	ndev->type = ARPHRD_MCTP;
+> +	ndev->hard_header_len = 0;
+> +	ndev->addr_len = sizeof(struct mctp_pcc_hw_addr);
 
-On Mon, 13 May 2024 06:18:45 +0200 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
-> 
-> The following pull-request contains BPF updates for your *net* tree.
-> 
-> We've added 3 non-merge commits during the last 2 day(s) which contain
-> a total of 2 files changed, 62 insertions(+), 8 deletions(-).
-> 
-> [...]
+Another reason you should be using u32. ndev->addr_len is going to
+vary between 32 and 64 bit systems. I also wounder if when calling
+dev_addr_set() these need to be byte swapped? Does the specification
+define this?
 
-Here is the summary with links:
-  - pull-request: bpf 2024-05-13
-    https://git.kernel.org/netdev/net/c/c9f9df3f6347
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+     Andrew
 
