@@ -1,131 +1,212 @@
-Return-Path: <netdev+bounces-95954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAFD48C3E69
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:53:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C6548C3E8F
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 12:04:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5080DB21718
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 09:53:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDA9E1C217B5
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 10:04:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 167D0148855;
-	Mon, 13 May 2024 09:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EFC41494A7;
+	Mon, 13 May 2024 10:04:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oDH8BtR7"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XMT3Pls5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2053.outbound.protection.outlook.com [40.107.244.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFFA147C91;
-	Mon, 13 May 2024 09:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715594021; cv=none; b=gTXABifL8+mEdgZM1EeGSo92A7no2/mt5IsuCUk7istVFh3J745YEnP2gOmUqNH+o0LwMjZzbbR8oqI1TORg9JeP0IbYA2OUrx873MedZDQXDsoOSolUG7DbsrtqJ7wcA+9b/C7wAFIVC5Mi3nqnLrMJr3XsrHwN0mNUKJ8nBds=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715594021; c=relaxed/simple;
-	bh=pSaP0oKyXtPiLCTwVDsndP7Da0tNxbGDydC7EAOZaOc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KqzfSCuhqO96ADpsZCr4mobXXZlxtDfbKwDCCc9NAlKWsuoOnAa8TB1dUUWdu6Y9tmgWDpYf3c60dTA1MrpMw2KwetrjEEzp1lgkaTZqosGP9yZ7JHKJ0k2LPIlP8qghP4esWlri+AusACHfFti7N6r67BfrW5tPnyUToTi/FIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oDH8BtR7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A134FC113CC;
-	Mon, 13 May 2024 09:53:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715594020;
-	bh=pSaP0oKyXtPiLCTwVDsndP7Da0tNxbGDydC7EAOZaOc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oDH8BtR7U1DF64D91khI6qNkuu0IIMeFSn6k0bWuBvr6N7gvCZE+agcNrkqSUmjul
-	 xqcun+22g6m4282s6JvtoQDvBKxrtOgNFNQgEQlXePsE9Z9yrWBmAyYdt4o+n6F5NM
-	 btbDXu6kHmA08Ep1pgAKCLcTS+1i5iJZE0VfvoY0YA2XrQ7zVdVCP/bniB/1hR7BwZ
-	 XsJzN7zfTVjyqBdSOeva+VKdYH39d3sq2EKXkIuOpZg0qjDo2p8A1TU9D6JbhUpbWZ
-	 8O4bI70twUxCU6nRnI5ZXnghsNWD8+3muRVF1Zr4TQH005zkZVi7ll9WwQhA9PXKnv
-	 Ny/3PndzxRSWQ==
-Date: Mon, 13 May 2024 10:52:03 +0100
-From: Simon Horman <horms@kernel.org>
-To: Christoph Fritz <christoph.fritz@hexdev.de>
-Cc: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Sebastian Reichel <sre@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Andreas Lauser <andreas.lauser@mercedes-benz.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Pavel Pisa <pisa@cmp.felk.cvut.cz>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-serial@vger.kernel.org
-Subject: Re: [PATCH v4 01/11] can: Add LIN bus as CAN abstraction
-Message-ID: <20240513095203.GJ2787@kernel.org>
-References: <20240509171736.2048414-1-christoph.fritz@hexdev.de>
- <20240509171736.2048414-2-christoph.fritz@hexdev.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9981D146D5D
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 10:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715594661; cv=fail; b=oucgdNemUAmRZhfwBd7Sw70db5rGd8t3zJYBR/hT/SHPbAxk5b3HIWwroHmVO8XoI+rXnB3WpEO4nfBOyvHzU6Zn56rJpM1j32CNwkRKsq4Ad3U+J0Cd4e361xnNGh5OfUrwXw9lvRY/dMNNVKB7rc/VEFVkEvAdVJV+gHRrUD0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715594661; c=relaxed/simple;
+	bh=78xIHZoabkRsmmY7QnDkhR8TTR4rqWCoSihn0ycssAg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bVoHPV1vjdrdkOw8Nv1kd0Xxk7KcoUIjY6agB8fnxD8jhtbgzqvm/VWhWdbY+nqnP0K/D94IpHe8aJibiTXEOwBOQYmbsr4FzdlzQ/O1ZWTcwLw4G3gcHohILAy/gG6UfBFOSmtgiTksFzxj2sco2FUClIsPATq5DwEraO2dvGA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XMT3Pls5; arc=fail smtp.client-ip=40.107.244.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RI6n7sq5VXp9oq1JiMCnZQBSG3SiNvffc4kmfPmET3xh3i7dx9nmmTdd4/Q82DkT+qbjvJiptE4tGkHqLIByvmn2AucvRGlRDHq8UfTSHpdOmo1KWuu9rOf1+5JhT8lPHCbfEIqSJoaOuAOCEZS1nXnYEkiqAdXJYIg4qY651WDAFrqNbmtdsiZLTYhZ4h1OfEilPwJE3TpUOqJSmIZ1a+ZXUaZZoTCugEwldYnRVwDcs14WfzHfwM7L62XZ8tGaA8axmqkKVnJlRIgO0z7TOF85dxefCyqK0NHCVtvf9VtfvCXb0xct3pwRXHib+ayHKUz9yYbs32JJECt6lBLJdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6CBqBgDYTZ+Y9S9HSMVBlbtG80jii4aG3CDyUM4eeaY=;
+ b=Ib6sn3GYCCLte3u7gHRX7lgWHUTb8x8H0N3Mfm0asSJZ5HsPaVdDBcr2P03uufHrAOH8iH4NmCFmkbR45joxoS+r1Pk5I9ebTyuITJPuqsTJxFJm9iFhjG6MSXQl1ruC22JZ4RAF/C4Gnvm559RabHbeET2Vh6yt1uZbQQjSPeHpW+VlWZY43+ofGriN272Q/Mjb/QP6w8Q7PWBvUa+UquZbZdHRpLT9ASehh0jZv0zT3h/9rp/k7nHQzNCEAS+bDu6XSdfesiyniU4CfxtCcw3th1utUKo/tnmzJB2oQA37Ub6iI6oi9/qSNCqERIee+l+ET0Z+Y2MLaxyuOw+IUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6CBqBgDYTZ+Y9S9HSMVBlbtG80jii4aG3CDyUM4eeaY=;
+ b=XMT3Pls5G1suv7pOHv8bbJ1j8bvIx/w9mgg/OTTpmiQm4zZZ3rl644+CVEJx+gwKKvQCk+K3bSM0MLPRWMksjcRNGoLJ/M+cvw9o4QYWOCHrN/WCC0TaJaAn8AO1mmn+FwVBFrSXVZBjny9SB7e9A+Et2uGkKLJ1o76Wbvkdu1MWHvWv8YleVuLl2hWXUq7CTVL7+zy6QxrNETtdru9loZhDJYYR1dYC36ofzkh7/xiivQIStqpwyywrOCq3UAh7V4f+DnksUWSWmdSCx+gd87TNUp6JtvEoNFf4KhF47FkEF2ysjt4fScnd7AmdmbZRz2IxKr77OvROAtbarYcReQ==
+Received: from PH8PR02CA0002.namprd02.prod.outlook.com (2603:10b6:510:2d0::11)
+ by CY5PR12MB9054.namprd12.prod.outlook.com (2603:10b6:930:36::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Mon, 13 May
+ 2024 10:04:16 +0000
+Received: from SA2PEPF000015C9.namprd03.prod.outlook.com
+ (2603:10b6:510:2d0:cafe::ad) by PH8PR02CA0002.outlook.office365.com
+ (2603:10b6:510:2d0::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55 via Frontend
+ Transport; Mon, 13 May 2024 10:04:16 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SA2PEPF000015C9.mail.protection.outlook.com (10.167.241.199) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7587.21 via Frontend Transport; Mon, 13 May 2024 10:04:16 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 13 May
+ 2024 03:03:53 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 13 May
+ 2024 03:03:53 -0700
+Received: from localhost.localdomain (10.127.8.10) by mail.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 13 May 2024 03:03:51 -0700
+From: Jianbo Liu <jianbol@nvidia.com>
+To: <netdev@vger.kernel.org>, <edumazet@google.com>
+CC: Jianbo Liu <jianbol@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>
+Subject: [PATCH net] net: drop secpath extension before skb deferral free
+Date: Mon, 13 May 2024 13:02:46 +0300
+Message-ID: <20240513100246.85173-1-jianbol@nvidia.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240509171736.2048414-2-christoph.fritz@hexdev.de>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015C9:EE_|CY5PR12MB9054:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0800a8d8-3074-4783-e428-08dc73340c93
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|36860700004|376005|82310400017|1800799015;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?cbNuvRt67sHeqpSoMSb/uSk+q/YN2uNtCq+B1vygngY/7zCL++VCMIDRikiT?=
+ =?us-ascii?Q?jTAv37ZDt5Kc5ZvdEdtRQAq7TDiSgMBBuqpVOqaf3qGXZw30WkeP9IxbGmfH?=
+ =?us-ascii?Q?SotvJ4XfdglO36Ja8IP9Mzz1OQImMfZoDItbrh97ZMPNXYuGInxqa47W22ew?=
+ =?us-ascii?Q?883SAbDqaF+RaeF0chqlEWymfjRE83PDakxixvhF/5UdQ1pi354mrpmSHHSo?=
+ =?us-ascii?Q?EWsxQev79HySwN4mZXl/ZOzWQ9Ou+owMediXprBVSa2dH+FNTp3lJvjeYUIr?=
+ =?us-ascii?Q?iEfHAk9Nfl+65i7sMKH3gTBL5UoS9Dmq9WhjvxibTKDWzws3rtNAMRBDEkcj?=
+ =?us-ascii?Q?0X/GLZ+wMB8J5vplSSZ49/g2VWf1wq92pgObvqXKoiLYgcwy27Gl/QSFt+EK?=
+ =?us-ascii?Q?zLam4BzVkxtP2QuFl3d6szErZoBLGKrvhIWxG7DuGorJHDzLObMJaJul25La?=
+ =?us-ascii?Q?iK/CipBG57lmQA3SZfNMlM/rHK3BG66tZ0deP84xjNvuXkPb/GnqzqY5JVe1?=
+ =?us-ascii?Q?Pm3Gmd3hsYVX34wR0+VFDGhCT4ShG4rvjylTj1mQgJ3pfESJEOC3hJta8p+Z?=
+ =?us-ascii?Q?DaASBmMpg+2zAPL/OYupdby2+m5yQGwzKYPOBWbiboXa5QqiqI9LotmRy3Bi?=
+ =?us-ascii?Q?WpRGwVyHalXt4ZcyOlJCgvk8PiHH5nsbUuftW/htThZQb4ntNZ8UBPDCyvsY?=
+ =?us-ascii?Q?LLrHMFkAHsL5e/VOcgWx+AIDoTa5ruO6bspcJnJA1JRbqy8BydzRafKhmI6Y?=
+ =?us-ascii?Q?KIb42ZKWDRe2fLmQdd/8FwynB+5at7jMbywz/VIR0q0PR5gUDTI8E/HQtQYo?=
+ =?us-ascii?Q?SdMWQ9xo5VpcuRVNZOQrfbz/GAnnCoWuf3eL81Dl4GiWrXUy9f1rtpUr+M3y?=
+ =?us-ascii?Q?lSAHwpObi5sTlE1CAq2W0/oAnWPGHJlYvl1ojBjvQEDXQ+NMmQkmUPsEHFoR?=
+ =?us-ascii?Q?sh96ht6TVSwFfQbH2zKoIGPXGtBy3vLGY8cXMX4u/nyz7jh3zUI2v4KqJjGB?=
+ =?us-ascii?Q?/ea5lVXkf0ciicS8RbKXB0Ils1hCMECSwoAPYnVaAesKQUTEIBOdfZCeYyN+?=
+ =?us-ascii?Q?tRmsxy7SnU1oLLjcykMjHhghu2I0Q1KMpz8cySlAuUIWOY7mtWUnMGqzp49Y?=
+ =?us-ascii?Q?CpOack/PYOuvp4rKNzoOWf+HNVKHy7fI44ZG47xZiIuu9xKnSLP25WkUPubv?=
+ =?us-ascii?Q?hACzLJfdzwRcSr3zduHe71akeycZLgWPLKQ9Oix5nnmRJ9/k1azRD/lsewLm?=
+ =?us-ascii?Q?9FuDnhsjyVxswX1pgLFtiOzOwOmtvTtLYe0k2cz2RCX7fScGtzGgzQJneRKE?=
+ =?us-ascii?Q?Xqc84nvg81umlrnCcA2vMMR4pQS7nf+gZQkfFoWlC0bNxQZzbYTGMTgvZwvV?=
+ =?us-ascii?Q?ckwgwX7Z7MsIW7SSwbYfzEIHFXhX?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(376005)(82310400017)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2024 10:04:16.5030
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0800a8d8-3074-4783-e428-08dc73340c93
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF000015C9.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB9054
 
-On Thu, May 09, 2024 at 07:17:26PM +0200, Christoph Fritz wrote:
-> Introduce a LIN (local interconnect network) abstraction on top of CAN.
-> This is a glue driver adapting CAN on one side while offering LIN
-> abstraction on the other side. So that upcoming LIN device drivers can
-> make use of it.
-> 
-> Tested-by: Andreas Lauser <andreas.lauser@mercedes-benz.com>
-> Signed-off-by: Christoph Fritz <christoph.fritz@hexdev.de>
+In commit 68822bdf76f1 ("net: generalize skb freeing deferral to
+per-cpu lists"), skb can be queued on remote cpu list for deferral
+free.
 
-...
+The remote cpu is kicked if the queue reaches half capacity. As
+mentioned in the patch, this seems very unlikely to trigger
+NET_RX_SOFTIRQ on the remote CPU in this way. But that seems not true,
+we actually saw something that indicates this: skb is not freed
+immediately, or even kept for a long time. And the possibility is
+increased if there are more cpu cores.
 
-> +#define LID(_name) \
-> +	struct device_attribute linid_##_name = __ATTR(_name, 0644, \
-> +	lin_identifier_show, lin_identifier_store)
-> +
-> +LID(00); LID(01); LID(02); LID(03); LID(04); LID(05); LID(06); LID(07);
-> +LID(08); LID(09); LID(0a); LID(0b); LID(0c); LID(0d); LID(0e); LID(0f);
-> +LID(10); LID(11); LID(12); LID(13); LID(14); LID(15); LID(16); LID(17);
-> +LID(18); LID(19); LID(1a); LID(1b); LID(1c); LID(1d); LID(1e); LID(1f);
-> +LID(20); LID(21); LID(22); LID(23); LID(24); LID(25); LID(26); LID(27);
-> +LID(28); LID(29); LID(2a); LID(2b); LID(2c); LID(2d); LID(2e); LID(2f);
-> +LID(30); LID(31); LID(32); LID(33); LID(34); LID(35); LID(36); LID(37);
-> +LID(38); LID(39); LID(3a); LID(3b); LID(3c); LID(3d); LID(3e); LID(3f);
+As skb is not freed, its extension is not freed as well. An error
+occurred while unloading the driver after running TCP traffic with
+IPsec, where both crypto and packet were offloaded. However, in the
+case of crypto offload, this failure was rare and significantly more
+challenging to replicate.
 
-Hi Christoph,
+ unregister_netdevice: waiting for eth2 to become free. Usage count = 2
+ ref_tracker: eth%d@000000007421424b has 1/1 users at
+      xfrm_dev_state_add+0xe5/0x4d0
+      xfrm_add_sa+0xc5c/0x11e0
+      xfrm_user_rcv_msg+0xfa/0x240
+      netlink_rcv_skb+0x54/0x100
+      xfrm_netlink_rcv+0x31/0x40
+      netlink_unicast+0x1fc/0x2c0
+      netlink_sendmsg+0x232/0x4a0
+      __sock_sendmsg+0x38/0x60
+      ____sys_sendmsg+0x1e3/0x200
+      ___sys_sendmsg+0x80/0xc0
+      __sys_sendmsg+0x51/0x90
+      do_syscall_64+0x40/0xe0
+      entry_SYSCALL_64_after_hwframe+0x46/0x4e
 
-Sparse flags that the structures defined by the above code are not
-declared elsewhere, and therefore likely should be static.
-> +
-> +static struct attribute *lin_sysfs_attrs[] = {
-> +	&linid_00.attr, &linid_01.attr, &linid_02.attr, &linid_03.attr,
-> +	&linid_04.attr, &linid_05.attr, &linid_06.attr, &linid_07.attr,
-> +	&linid_08.attr, &linid_09.attr, &linid_0a.attr, &linid_0b.attr,
-> +	&linid_0c.attr, &linid_0d.attr, &linid_0e.attr, &linid_0f.attr,
-> +	&linid_10.attr, &linid_11.attr, &linid_12.attr, &linid_13.attr,
-> +	&linid_14.attr, &linid_15.attr, &linid_16.attr, &linid_17.attr,
-> +	&linid_18.attr, &linid_19.attr, &linid_1a.attr, &linid_1b.attr,
-> +	&linid_1c.attr, &linid_1d.attr, &linid_1e.attr, &linid_1f.attr,
-> +	&linid_20.attr, &linid_21.attr, &linid_22.attr, &linid_23.attr,
-> +	&linid_24.attr, &linid_25.attr, &linid_26.attr, &linid_27.attr,
-> +	&linid_28.attr, &linid_29.attr, &linid_2a.attr, &linid_2b.attr,
-> +	&linid_2c.attr, &linid_2d.attr, &linid_2e.attr, &linid_2f.attr,
-> +	&linid_30.attr, &linid_31.attr, &linid_32.attr, &linid_33.attr,
-> +	&linid_34.attr, &linid_35.attr, &linid_36.attr, &linid_37.attr,
-> +	&linid_38.attr, &linid_39.attr, &linid_3a.attr, &linid_3b.attr,
-> +	&linid_3c.attr, &linid_3d.attr, &linid_3e.attr, &linid_3f.attr,
-> +	NULL
-> +};
+The ref_tracker shows the netdev is hold when the offloading xfrm
+state is first added to hardware. When receiving packet, the secpath
+extension, which saves xfrm state, is added to skb by ipsec offload,
+and the xfrm state is hence hold by the received skb. It can't be
+flushed till skb is dequeued from the defer list, then skb and its
+extension are really freed. Also, the netdev can't be unregistered
+because it still referred by xfrm state.
 
-...
+To fix this issue, drop this extension before skb is queued to the
+defer list, so xfrm state destruction is not blocked.
+
+Fixes: 68822bdf76f1 ("net: generalize skb freeing deferral to per-cpu lists")
+Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+---
+ net/core/skbuff.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index b99127712e67..d7f5024f3c08 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -7025,6 +7025,10 @@ nodefer:	__kfree_skb(skb);
+ 	if (READ_ONCE(sd->defer_count) >= defer_max)
+ 		goto nodefer;
+ 
++#ifdef CONFIG_XFRM
++	skb_ext_del(skb, SKB_EXT_SEC_PATH);
++#endif
++
+ 	spin_lock_bh(&sd->defer_lock);
+ 	/* Send an IPI every time queue reaches half capacity. */
+ 	kick = sd->defer_count == (defer_max >> 1);
+-- 
+2.38.1
+
 
