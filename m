@@ -1,252 +1,187 @@
-Return-Path: <netdev+bounces-95871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A8D8C3B80
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 08:41:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 215458C3B84
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 08:41:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 530221F2156B
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 06:41:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D13F3281522
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 06:41:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF23626CB;
-	Mon, 13 May 2024 06:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136E614659C;
+	Mon, 13 May 2024 06:41:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="IzfbNO1f"
+	dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b="B1ELTYSh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9A9145FEB
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 06:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A087145B3D
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 06:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715582452; cv=none; b=qFh5nUFvAMG8EoPLwqeQfkSKkDLsQb8sGrCEZR8N7nurr47O2SMCGF4utIdfzvTjNeeBWPm+PlLGhd/PDyl7UscyXSDwKNeY51GcISFZJg2G8O2WTuSMNYQymw9Ssf7xU6mmmimBsRsN/Wk4bo2407uZ9imkm3N9iCv1alB9p4c=
+	t=1715582512; cv=none; b=sT4qHErQl0kZpjpRp/zaFoT8oZJ3goYM6JWK37MZD51YyTwJwi14SoOYIgDA/RZyjP84oJEli6asYzgQP0N0czl8Dy099Aq+8AQDpyvecItAJYJt+gx2xVUjXO7nZCAZk6Fn+bleL5VoR+LYDiQongeTqg4iQJHXdwwNphAISQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715582452; c=relaxed/simple;
-	bh=dgk3FveaLEZ4qbAhZK/LUxX+03pFLoSmpQir+R01ik4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FAU6TMK92wfDdTL10CIGF1KZVALJUyBdpHfzcH8fV6DcYJwC+1szmygyn6UC4GLaY1NFZqNjDxKEuHD9CR98+wnViN+1gzx82qDOpYnkwe7rYUG2pbDbLza3FVp6AknIigp9NZfz5hs7xr+GuAAYfMvzatt28swKIIPMG+XZq1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=IzfbNO1f; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1s6PMU-00BJuJ-KG; Mon, 13 May 2024 08:40:38 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=o8FoIHqHyz8ToVZ84VuMJ7sOuL5D0UtxTsaoYm4v+fo=; b=IzfbNO1fZSNKgCDUuz8fXODTA3
-	9wwmA+mN0oGxD7JXYtYyMExfp8AV3kYguTJgeMeP/bttIRV37L/x+YKqR6tXiOBaO4NGab4hOPXFq
-	xPrK08CHa8soXZMm3SwUsb0GbHB7ypZLHJ8Fv5qwlvvwKXJ8OqTkyHsjogKXCwfzTmfKXW1qHZbi/
-	DlU5MZmcvFoYqepmHCPARWs154sg82OdRAy+AZYXo5F8rwk6r7DR5FgJQnmA5gvHYmHnyL+dzjxTb
-	zHR3XhjCOBksvvbZgl+shuh13q1747p/e5fMaqLhCk8PUS85whkbaY1O7zlebVoXuW/sNx+3QzLn+
-	kQjNT0Dg==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1s6PMT-00080F-RV; Mon, 13 May 2024 08:40:38 +0200
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1s6PMR-005oMP-I3; Mon, 13 May 2024 08:40:35 +0200
-Message-ID: <a00d3993-c461-43f2-be6d-07259c98509a@rbox.co>
-Date: Mon, 13 May 2024 08:40:34 +0200
+	s=arc-20240116; t=1715582512; c=relaxed/simple;
+	bh=AZDUvNbYds6+BDMS2Gs+L0RuM6sC7odAJpRGoP07xS8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aoOnH2Iq32QNBB72wLGcnGawSC+PvNDxVcWCbNc/7xx40wlRF5wYpYMWLBZgz1ueI0yw42day4ps9HQO36SVv4M/LirMK4kyuTVcyV8EoxOq1Pao0tLUD/Gk/uj49Dmq0SxHIS6IS/+yKgsrBAAZKmrEqWjsm9E88rQ3TbB11HU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se; spf=pass smtp.mailfrom=ferroamp.se; dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b=B1ELTYSh; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ferroamp.se
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2e564cad1f6so23648381fa.1
+        for <netdev@vger.kernel.org>; Sun, 12 May 2024 23:41:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ferroamp-se.20230601.gappssmtp.com; s=20230601; t=1715582508; x=1716187308; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jgmYXspuQD6m2g2YDHV5QyLok17L1hPzYPTwYzpfjV0=;
+        b=B1ELTYSh3jmT5u6rpF71dNBwxlamZq/1yK4Cm+3XE7FrQgXePAi6HN4VxJsUNPHmLz
+         Or5TujoCY/gvVzHkG4nSAJK+hhsFB4URSVPdKNrWzFKmjUdHgAAQaQUyzfjRHg6YJCPC
+         FpfjBqPFMdD+0ppj7KpaIn2FYSsYH/MBuAo8bIe7jZIT4epGjH2rhNPwCcH4tTgGuHAF
+         CXajicjQuucbBrBSwwVG48Dgpgk8WQSFoPn5U2jfpWrw9FkDJMRk8tkDbhTm1wPIuITL
+         C+p79FEUtAFL8lgsKLowoQTU8SIXzOoi1elQdd5vINdfwl46kxNjU0p2cFBDQdYRX45Q
+         sznA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715582508; x=1716187308;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jgmYXspuQD6m2g2YDHV5QyLok17L1hPzYPTwYzpfjV0=;
+        b=e/APoe1ohxvOfuPGubFMr49eJbZCO3BO5GqqzvmyzqGVArjmer7LDNTdptLNisCYsf
+         nYQafXaZgiKWPUS7uSs7PukiLYQ6D9Qp2yFgt48Q9H99IdBeHppVDbqg24F3H7+RglpL
+         wJ8EsPcyuDsaT3QoyiSvmJ10OXFo1+0sNGbS8dytIsHIbTv8S5ipOEttZ7DlYQzlEdcu
+         ror1oYxeTZ6g3hLY9pfmWHl4Kmlns0dePBiVsZOg/JfF82GCw3JylEVNXHwe2zv5LKIV
+         2pXa5eivJxTYGqtWhvjt6LwSnkfj6Ee3nAun7KphyvvNND5hBHaYIne9KVv2PEc3OLmD
+         2Ibg==
+X-Forwarded-Encrypted: i=1; AJvYcCXX8W2qBZuQAwGR9gCTiKOYywIUWUPrOUMF1eZWIn6EvIe3YJngP8mKanguRKi1Otl3SGnmwABCbsuuMM0hpSdF+LOkTxqa
+X-Gm-Message-State: AOJu0YzpqPzf6FOs91xFQR7mrYKU0VEgsSe4BxR2w1TXAf569VNFkMlV
+	rjkNxlncYFFmxcVK2jzX/kxuMyZfIYGF741vbigoa734ZKBHZJAhnG4fPv80JJw=
+X-Google-Smtp-Source: AGHT+IEIkeRxVZ7/wwKjFiJVGfzq6Dh2wr3o8ZQIJjCu0AGpKE+fr3Hj0hV6u+O7KQYjw+iUt7WzAA==
+X-Received: by 2002:a05:651c:510:b0:2df:97b1:e21c with SMTP id 38308e7fff4ca-2e520066fa4mr67361691fa.31.1715582508290;
+        Sun, 12 May 2024 23:41:48 -0700 (PDT)
+Received: from minibuilder (c188-149-135-220.bredband.tele2.se. [188.149.135.220])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2e4d183450csm12842611fa.133.2024.05.12.23.41.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 May 2024 23:41:47 -0700 (PDT)
+Date: Mon, 13 May 2024 08:41:45 +0200
+From: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
+To: Piergiorgio Beruto <Pier.Beruto@onsemi.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	"Parthiban.Veerasooran@microchip.com" <Parthiban.Veerasooran@microchip.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"saeedm@nvidia.com" <saeedm@nvidia.com>,
+	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"Horatiu.Vultur@microchip.com" <Horatiu.Vultur@microchip.com>,
+	"ruanjinjie@huawei.com" <ruanjinjie@huawei.com>,
+	"Steen.Hegelund@microchip.com" <Steen.Hegelund@microchip.com>,
+	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+	"UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>,
+	"Thorsten.Kummermehr@microchip.com" <Thorsten.Kummermehr@microchip.com>,
+	Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>,
+	"Nicolas.Ferre@microchip.com" <Nicolas.Ferre@microchip.com>,
+	"benjamin.bigler@bernformulastudent.ch" <benjamin.bigler@bernformulastudent.ch>
+Subject: Re: [PATCH net-next v4 05/12] net: ethernet: oa_tc6: implement error
+ interrupts unmasking
+Message-ID: <ZkG2Kb_1YsD8T1BF@minibuilder>
+References: <Zi1Xbz7ARLm3HkqW@builder>
+ <77d7d190-0847-4dc9-8fc5-4e33308ce7c8@lunn.ch>
+ <Zi4czGX8jlqSdNrr@builder>
+ <874654d4-3c52-4b0e-944a-dc5822f54a5d@lunn.ch>
+ <ZjKJ93uPjSgoMOM7@builder>
+ <b7c7aad7-3e93-4c57-82e9-cb3f9e7adf64@microchip.com>
+ <ZjNorUP-sEyMCTG0@builder>
+ <ae801fb9-09e0-49a3-a928-8975fe25a893@microchip.com>
+ <fd5d0d2a-7562-4fb1-b552-6a11d024da2f@lunn.ch>
+ <BY5PR02MB678683EADBC47A29A4F545A59D1C2@BY5PR02MB6786.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] af_unix: Update unix_sk(sk)->oob_skb under
- sk_receive_queue lock.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: billy@starlabs.sg, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
- pabeni@redhat.com
-References: <5670c1c4-985d-4e87-9732-ad1cc59bc8db@rbox.co>
- <20240513061244.12229-1-kuniyu@amazon.com>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <20240513061244.12229-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BY5PR02MB678683EADBC47A29A4F545A59D1C2@BY5PR02MB6786.namprd02.prod.outlook.com>
 
-On 5/13/24 08:12, Kuniyuki Iwashima wrote:
-> From: Michal Luczaj <mhal@rbox.co>
-> Date: Sun, 12 May 2024 16:47:11 +0200
->> On 5/10/24 11:39, Kuniyuki Iwashima wrote:
->>> @@ -2655,6 +2661,8 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
->>>  		consume_skb(skb);
->>>  		skb = NULL;
->>>  	} else {
->>> +		spin_lock(&sk->sk_receive_queue.lock);
->>> +
->>>  		if (skb == u->oob_skb) {
->>>  			if (copied) {
->>>  				skb = NULL;
->>> @@ -2666,13 +2674,15 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
->>>  			} else if (flags & MSG_PEEK) {
->>>  				skb = NULL;
->>>  			} else {
->>> -				skb_unlink(skb, &sk->sk_receive_queue);
->>> +				__skb_unlink(skb, &sk->sk_receive_queue);
->>>  				WRITE_ONCE(u->oob_skb, NULL);
->>>  				if (!WARN_ON_ONCE(skb_unref(skb)))
->>>  					kfree_skb(skb);
->>>  				skb = skb_peek(&sk->sk_receive_queue);
->>>  			}
->>>  		}
->>> +
->>> +		spin_unlock(&sk->sk_receive_queue.lock);
->>>  	}
->>>  	return skb;
->>>  }
->>
->> Now it is
->>   
->>   spin_lock(&sk->sk_receive_queue.lock)
->>   kfree_skb
+> The RXBOE is basically a warning, indicating that for some reason the SPI host is not fast enough in retrieving frames from the device.
+> In my experience, this is typically caused by excessive latency of the SPI driver, or if you have an unoptimized network driver for the MACPHY.
 > 
-> This does not free skb actually and just drops a refcount by skb_get()
-> in queue_oob().
-
-I suspect you refer to change in __unix_gc()
-
- 	if (u->oob_skb) {
--		kfree_skb(u->oob_skb);
-+		WARN_ON_ONCE(skb_unref(u->oob_skb));
- 	}
-
-What I'm talking about is the quoted above (unchanged) part in manage_oob():
-
-	if (!WARN_ON_ONCE(skb_unref(skb)))
-  		kfree_skb(skb);
-
-I might be missing something, but
-
-from array import array
-from socket import *
-a, b = socketpair(AF_UNIX, SOCK_STREAM)
-scm = (SOL_SOCKET, SCM_RIGHTS, array("i", [b.fileno()]))
-b.sendmsg([b'x'], [scm], MSG_OOB)
-b.close()
-a.recv(MSG_DONTWAIT)
-
-[   72.513125] ======================================================
-[   72.513148] WARNING: possible circular locking dependency detected
-[   72.513170] 6.9.0-rc7nokasan+ #25 Not tainted
-[   72.513193] ------------------------------------------------------
-[   72.513215] python/1054 is trying to acquire lock:
-[   72.513237] ffffffff83563898 (unix_gc_lock){+.+.}-{2:2}, at: unix_notinflight+0x23/0x100
-[   72.513266]
-               but task is already holding lock:
-[   72.513288] ffff88811eb10898 (rlock-AF_UNIX){+.+.}-{2:2}, at: unix_stream_read_generic+0x178/0xbc0
-[   72.513313]
-               which lock already depends on the new lock.
-
-[   72.513336]
-               the existing dependency chain (in reverse order) is:
-[   72.513358]
-               -> #1 (rlock-AF_UNIX){+.+.}-{2:2}:
-[   72.513381]        _raw_spin_lock+0x2f/0x40
-[   72.513404]        scan_inflight+0x36/0x1e0
-[   72.513428]        __unix_gc+0x17c/0x4b0
-[   72.513450]        process_one_work+0x217/0x700
-[   72.513474]        worker_thread+0x1ca/0x3b0
-[   72.513497]        kthread+0xdd/0x110
-[   72.513519]        ret_from_fork+0x2d/0x50
-[   72.513543]        ret_from_fork_asm+0x1a/0x30
-[   72.513565]
-               -> #0 (unix_gc_lock){+.+.}-{2:2}:
-[   72.513589]        __lock_acquire+0x137b/0x20e0
-[   72.513612]        lock_acquire+0xc5/0x2c0
-[   72.513635]        _raw_spin_lock+0x2f/0x40
-[   72.513657]        unix_notinflight+0x23/0x100
-[   72.513680]        unix_destruct_scm+0x95/0xa0
-[   72.513702]        skb_release_head_state+0x20/0x60
-[   72.513726]        kfree_skb_reason+0x53/0x1e0
-[   72.513748]        unix_stream_read_generic+0xb69/0xbc0
-[   72.513771]        unix_stream_recvmsg+0x68/0x80
-[   72.513794]        sock_recvmsg+0xb9/0xc0
-[   72.513817]        __sys_recvfrom+0xa1/0x110
-[   72.513840]        __x64_sys_recvfrom+0x20/0x30
-[   72.513862]        do_syscall_64+0x93/0x190
-[   72.513886]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   72.513909]
-               other info that might help us debug this:
-
-[   72.513932]  Possible unsafe locking scenario:
-
-[   72.513954]        CPU0                    CPU1
-[   72.513976]        ----                    ----
-[   72.513998]   lock(rlock-AF_UNIX);
-[   72.514020]                                lock(unix_gc_lock);
-[   72.514043]                                lock(rlock-AF_UNIX);
-[   72.514066]   lock(unix_gc_lock);
-[   72.514088]
-                *** DEADLOCK ***
-
-[   72.514110] 3 locks held by python/1054:
-[   72.514133]  #0: ffff88811eb10cf0 (&u->iolock){+.+.}-{3:3}, at: unix_stream_read_generic+0xd4/0xbc0
-[   72.514158]  #1: ffff88811eb10de0 (&u->lock){+.+.}-{2:2}, at: unix_stream_read_generic+0x110/0xbc0
-[   72.514184]  #2: ffff88811eb10898 (rlock-AF_UNIX){+.+.}-{2:2}, at: unix_stream_read_generic+0x178/0xbc0
-[   72.514209]
-               stack backtrace:
-[   72.514231] CPU: 4 PID: 1054 Comm: python Not tainted 6.9.0-rc7nokasan+ #25
-[   72.514254] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
-[   72.514278] Call Trace:
-[   72.514300]  <TASK>
-[   72.514321]  dump_stack_lvl+0x73/0xb0
-[   72.514345]  check_noncircular+0x108/0x120
-[   72.514369]  __lock_acquire+0x137b/0x20e0
-[   72.514392]  lock_acquire+0xc5/0x2c0
-[   72.514415]  ? unix_notinflight+0x23/0x100
-[   72.514439]  _raw_spin_lock+0x2f/0x40
-[   72.514461]  ? unix_notinflight+0x23/0x100
-[   72.514484]  unix_notinflight+0x23/0x100
-[   72.514507]  unix_destruct_scm+0x95/0xa0
-[   72.514530]  skb_release_head_state+0x20/0x60
-[   72.514553]  kfree_skb_reason+0x53/0x1e0
-[   72.514575]  unix_stream_read_generic+0xb69/0xbc0
-[   72.514600]  unix_stream_recvmsg+0x68/0x80
-[   72.514623]  ? __pfx_unix_stream_read_actor+0x10/0x10
-[   72.514646]  sock_recvmsg+0xb9/0xc0
-[   72.514669]  __sys_recvfrom+0xa1/0x110
-[   72.514692]  ? lock_release+0x133/0x290
-[   72.514715]  ? syscall_exit_to_user_mode+0x11/0x280
-[   72.514739]  ? do_syscall_64+0xa0/0x190
-[   72.514762]  __x64_sys_recvfrom+0x20/0x30
-[   72.514784]  do_syscall_64+0x93/0x190
-[   72.514807]  ? clear_bhb_loop+0x45/0xa0
-[   72.514829]  ? clear_bhb_loop+0x45/0xa0
-[   72.514852]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   72.514875] RIP: 0033:0x7fc16bb3594d
-[   72.514899] Code: 02 02 00 00 00 5d c3 66 0f 1f 44 00 00 f3 0f 1e fa 80 3d 25 8a 0c 00 00 41 89 ca 74 20 45 31 c9 45 31 c0 b8 2d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 6b c3 66 2e 0f 1f 84 00 00 00 00 00 55 48 89
-[   72.514925] RSP: 002b:00007fffae4ab2f8 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
-[   72.514949] RAX: ffffffffffffffda RBX: 00007fffae4ab3c8 RCX: 00007fc16bb3594d
-[   72.514972] RDX: 0000000000000040 RSI: 00007fc15e298f30 RDI: 0000000000000003
-[   72.514994] RBP: 00007fffae4ab310 R08: 0000000000000000 R09: 0000000000000000
-[   72.515017] R10: 0000000000000000 R11: 0000000000000246 R12: 00007fc15e34af90
-[   72.515040] R13: 0000000000000000 R14: ffffffffc4653600 R15: 0000000000000000
-[   72.515064]  </TASK>
-
->>     unix_destruct_scm
-> 
-> So, here we don't reach unix_destruct_scm().
-> 
-> That's why I changed kfree_skb() to skb_unref() in __unix_gc().
-> 
-> Thanks!
+> Thanks,
+> Piergiorgio
 > 
 > 
->>       unix_notinflight
->>         spin_lock(&unix_gc_lock)
->>
->> I.e. sk_receive_queue.lock -> unix_gc_lock, inversion of what unix_gc() does.
->> But that's benign, right?
+> > [  285.482275] LAN865X Rev.B0 Internal Phy spi0.0:00: attached PHY 
+> > driver (mii_bus:phy_addr=spi0.0:00, irq=POLL) [  285.534760] lan865x 
+> > spi0.0 eth1: Link is Up - 10Mbps/Half - flow control off [  
+> > 341.466221] eth1: Receive buffer overflow error [  345.730222] eth1: 
+> > Receive buffer overflow error [  345.891126] eth1: Receive buffer 
+> > overflow error [  346.074220] eth1: Receive buffer overflow error
+> 
+> Generally we only log real errors. Is a receive buffer overflow a real error? I would say not. But it would be good to count it.
+> 	Andrew
 
+Hi,
+
+I've been busy throwing stuff at the wall until something sticks. I've
+managed to narrow a few things down.
+First and foremost, when running a periodic udp6 multicast in the
+background I don't get a hang in the driver, or it becomes considerably
+harder to provoke.
+
+When I make sure that the bespoke Ferroamp upd server is not started
+(which just joins a mcast group and sends a less than MTU packet every
+~500ms and listens for incoming multicast messages in the same group),
+it becomes very simple to get to a live-lock.
+
+My steasp of reproducing is setting a ipv4 address on both ends of the
+link, then running the follwing script on both ends using the other ends
+ip as argument.
+
+#!/bin/env python3
+import socket
+import sys
+
+if __name__ == '__main__':
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    while True:
+        sock.sendto(b'0'*2048, (sys.argv[1], 4040))
+
+Neither ends opens a listening socket. I get to the live lock in 10s or
+less.
+I've enabled some debugging options but so far nothing seems to hit.
+What I've been able to conclude is that there still is SPI
+communication, the macphy interrupt is still pulled low, and the cpu
+does the ack so that it's reset to inactive.
+But from there it seems no data is passed up the network stack. Some
+symptoms are
+
+* net_device stats are no longer incremented
+* can't ping
+* can't connect to sockets on the board etc.
+* cpu usage jumps to and stays at 100% for the worker thread
+
+The worker thread is released by the irq handler and it does some of the
+expected work, but not all.
+I'm adding some instrumentation to the code in an effort to figure out
+where things break apart.
+It might be possible to catch it in gdb as well, but I think you only
+get one try as the timing will be pretty borked after the first break.
+
+R
 
