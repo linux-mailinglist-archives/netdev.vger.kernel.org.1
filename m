@@ -1,121 +1,85 @@
-Return-Path: <netdev+bounces-96107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA1748C45D1
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 19:15:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C4EC8C45DA
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 19:17:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 951C1282E50
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:15:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F2BFB227FE
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:17:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7AD4208BA;
-	Mon, 13 May 2024 17:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1DE20310;
+	Mon, 13 May 2024 17:17:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="PXQC96iq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="trH6o5dc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5797420332
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 17:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD7623748;
+	Mon, 13 May 2024 17:17:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715620549; cv=none; b=Yc5RDQ53VAv3+oH74+s/S7UtHFz4eUfoLMg12aTfMoxxXUPm/rcezfIBYUbv81gaY6O+1E9CcNNJcH29LZ/Pk0ao/d1sJEHylUy9xkS9tzfjCwBCwVNX59+6MiyvXlgsONsfGyNPVHkD45tU0OJuwrE3UmxiHNXkaUuTlsxK70U=
+	t=1715620667; cv=none; b=iQNnw/VwkSpdzyqhqyAS2QQ0UBw1lpwyeMJ3K7uzZbPBxeaWxUvcSQ07CYdJioIreSwnr5OsT7TU/oQH8CvntuAdsJCIA19g5jCX0clNU6p4WEDnXYh0QzH1oN94qGj4vJJgTWg+3l5QS4QR+KIFc+VjQfHOeHcgwE8l69bghxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715620549; c=relaxed/simple;
-	bh=Kpqsl0XSnFWNY3VT/3iCR1YsNFUYLpITGe1YGMB5gWY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K29psEfDfAW81prG7kMglMiGLENdRRWh6ipuUm0iz451AZcwg776aCL8FbejXvxY0HV8OrAGeMp/QbyyQZNZ9MOdJPJGi7cix4fORw4t5AjarQXdTL6AEZQ+OW19l7mg3Epf1SipoSq1bXYWQNSiEp7kzt8m3kjnAP2+O2Oj6vM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=PXQC96iq; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-7e1b8606bfdso24892939f.3
-        for <netdev@vger.kernel.org>; Mon, 13 May 2024 10:15:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1715620547; x=1716225347; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dkhS35s9f4IrzQ+xDWVyzbK3FS+T/wMMOlTPXDBz7SM=;
-        b=PXQC96iqmBFhpewiiaLtUIx131w4X7zkSiQZxwfApKEPDJEQEtsPPmCIcvbdbP2wYa
-         us10KJPxTokfHPdI9HRhhdpBvIDR2uQo5FP6rhS6lZHpf9YqMIy4B+DsJubBXBC55R1v
-         tgI34GZ7lmdKolCGMIlKVzmuaG/JIWgkUJwtY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715620547; x=1716225347;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dkhS35s9f4IrzQ+xDWVyzbK3FS+T/wMMOlTPXDBz7SM=;
-        b=JIA+9+gzreiE3OHNvoBJNA4jfYdY5nXtEUuXsWVndR/d8JdwaQmd0+5EC7AGdPshM2
-         M0qgMxNjRgY7eiqJWvD48gFrr2GVUyzH54B5am+wYnC3zQ0ZScr4HWIkGwBoXH8QWfHF
-         FwRAqqn+cOiRteVoepIJR05KRZ9a3Qpn0NQfiKU526Tc4kt+1KJi+Q5RdO0oGMIHWqF1
-         QzxxbbKhqPtifPU3wecCAw1alYuI7FBxGGnr6Tu1jWxn39Dj5zGVYS8MtDaYml+hXDy0
-         pdE1zSr/WuTWfybNFivyOw9AQ0hIaaAvHMZ3qCr7gDdkQIFVnsNse9RL8sP1WBGcKf0L
-         eCag==
-X-Forwarded-Encrypted: i=1; AJvYcCUUbjRqrO6tYsT240vpqEqqspvxvbekis2k8HNrL+GVdSm4uIlP+x9O0Ej550CMDnRGrSR4F3SmTnMIPxDzMkbzqn8855Ac
-X-Gm-Message-State: AOJu0YzFtjT68heigh4uO07rBQg3IVpOQALDk6caZKa06g0BVEPfHWQE
-	X+OIcpWQ+CbmvsuSSFcBt1WQhdUL7LbTG2MGGp198RVlI1eak/9SoWsk1NAwozo=
-X-Google-Smtp-Source: AGHT+IEsUUvesNSzDOZXBVwOpH/mJvxScDlUqihZEzqBcc1/za2BRTRLILpTeNLwc1aaK6xtRTtPOg==
-X-Received: by 2002:a6b:5007:0:b0:7de:b4dc:9b8f with SMTP id ca18e2360f4ac-7e1b5238e16mr1143476539f.2.1715620547263;
-        Mon, 13 May 2024 10:15:47 -0700 (PDT)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4893714d92esm2559667173.75.2024.05.13.10.15.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 May 2024 10:15:46 -0700 (PDT)
-Message-ID: <6016b316-d266-48cf-aca9-127c72f9681b@linuxfoundation.org>
-Date: Mon, 13 May 2024 11:15:45 -0600
+	s=arc-20240116; t=1715620667; c=relaxed/simple;
+	bh=xXJ2xfsVZr5m0SDYHs8VXPitjHPTAc8dVXhYkI6O4pg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eQHQEPK4FmeJho2J8uwUKVWguWEzRU4ftLN8EALpP9gsm/744iDpXufYSlDilWNjpNFXXeSwNFvmzlwPJs24dk1bE6HrM74sRD9Wlqs0lfMNYO3J2gvdaUZUX7tbXgKnVAtD7pEkNP7PlvVQsIHMRqBPIHgwTffiuLRk6ls0qNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=trH6o5dc; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=kat9PfXQHTpWcmnzIUnLFRT8Ol171C09OwLL2tg1hrw=; b=trH6o5dcxGkLEy9v84ytt6FOIY
+	kpCeijP2gdbDv0W3Bvhdj1zpaKTrLZ4rgImC8Rz2Ao8HVsxX4k73KQbJ7Hn0a011q7D1L3t44JQXP
+	INwRLsIUmHJUoUQ1Wi+PAND3K4/ySulbQrgDoPErM9Ncy9cFnfpDzru4GoX9S8/Uqys4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s6ZIy-00FKAr-I1; Mon, 13 May 2024 19:17:40 +0200
+Date: Mon, 13 May 2024 19:17:40 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Regressions <regressions@lists.linux.dev>,
+	Linux Networking <netdev@vger.kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	lukas.probsthain@googlemail.com
+Subject: Re: Regression of e1000e (I219-LM) from 6.1.90 to 6.6.30
+Message-ID: <b2897fda-08e8-40de-b78a-86e92bde41db@lunn.ch>
+References: <ZkHSipExKpQC8bWJ@archie.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] Kselftest fixes for v6.9
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
- Linus Torvalds <torvalds@linux-foundation.org>, Shuah Khan <shuah@kernel.org>
-Cc: Bagas Sanjaya <bagasdotme@gmail.com>,
- Brendan Higgins <brendanhiggins@google.com>,
- Christian Brauner <brauner@kernel.org>, David Gow <davidgow@google.com>,
- "David S . Miller" <davem@davemloft.net>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
- Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>,
- Ron Economos <re@w6rz.net>, Ronald Warsow <rwarsow@gmx.de>,
- Sasha Levin <sashal@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Shengyu Li <shengyu.li.evgeny@gmail.com>,
- Stephen Rothwell <sfr@canb.auug.org.au>, Will Drewry <wad@chromium.org>,
- kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
- shuah <shuah@kernel.org>
-References: <20240512105657.931466-1-mic@digikod.net>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20240512105657.931466-1-mic@digikod.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZkHSipExKpQC8bWJ@archie.me>
 
-On 5/12/24 04:56, Mickaël Salaün wrote:
-> Hi Linus,
+On Mon, May 13, 2024 at 03:42:50PM +0700, Bagas Sanjaya wrote:
+> Hi,
 > 
-> Without reply from Shuah, and given the importance of these fixes [1], here is
-> a PR to fix Kselftest (broken since v6.9-rc1) for at least KVM, pidfd, and
-> Landlock.  I cannot test against all kselftests though.  This has been in
-> linux-next since the beginning of this week, and so far only one issue has been
-> reported [2] and fixed [3].
+> <lukas.probsthain@googlemail.com> reported on Bugzilla
+> (https://bugzilla.kernel.org/show_bug.cgi?id=218826) regression on his Thinkpad
+> T480 with Intel I219-LM:
 > 
-> Feel free to take this PR if you see fit.
+> > After updating from kernel version 6.1.90 to 6.6.30, the e1000e driver exhibits a regression on a Lenovo Thinkpad T480 with an Intel I219-LM Ethernet controller.
 
-Thank you - I totally missed the emails about sending these up for 6.9 :(
+Could you try a git bisect between these two kernel versions? You
+might be able to limit it to drivers/net/ethernet/intel/e1000e, which
+only had around 15 patches.
 
-I see that these are already in Linux 6.9
-
-thanks,
--- Shuah
-
+     Andrew
 
