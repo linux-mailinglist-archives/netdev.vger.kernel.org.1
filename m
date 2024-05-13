@@ -1,78 +1,100 @@
-Return-Path: <netdev+bounces-96196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D10F8C49FA
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:18:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4406C8C49FC
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A45DB2273E
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:18:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FB161C20F2E
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8F484FD2;
-	Mon, 13 May 2024 23:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614A284FD2;
+	Mon, 13 May 2024 23:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KxPZk5cN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/y9ASq3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C9E2B9D9;
-	Mon, 13 May 2024 23:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C22185622;
+	Mon, 13 May 2024 23:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715642299; cv=none; b=F6Au+hPUXNymyRTscSc8pMXXP8LNmXp9WWP81QII/TCLL5pxn9+a9O0LYKLIDe1NDHFHLe2erUYVw7FhYQpCPtpiTMKF6Z4/F5WabeHmuXouLkjUrrL6JjJIm1EpHI9ZHlmRXIE/p57TrDiuDxu8FAcYwiVkjo/lCz8V+w2qXRk=
+	t=1715642432; cv=none; b=oMcIRlal1GUNp6p36Xj0nWULV9qLtpkJWmgvZcyT/oUkds1dTKtx7TUl2GfyMoqbblaRh0l+77GsYxM1ZfcHbNEIfBT4I2Bk79HdPr8eXUfA4N2VefwgzbvwPKPdIz8O6mWiVS0mgAGHlQP7b1tncD86db0NYo6brImpe1IOEo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715642299; c=relaxed/simple;
-	bh=7YP5DnUgFJ0rvhvCbLRxYGZmXgJBxA/RcgKKAIsDeD4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J91WflabfmehWnMpfkVYFtn7jf6sMASpSuRd+JLBCtlZC+iWmKiFg2h3H6foOcLrXQGueD2YxDzylUcQCB3S34cKF4kccMk2NN7/TbGbdK3RBEiCoFVHxQMzEzXNQjuHyhLA1+XYeQr1BSfTyAuKpORhWfGZqu9gJKr7eVmpxA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KxPZk5cN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F206C113CC;
-	Mon, 13 May 2024 23:18:18 +0000 (UTC)
+	s=arc-20240116; t=1715642432; c=relaxed/simple;
+	bh=LW7czoZwatdQXRO+YVercOrMx1lCPFkpDoEbGYPmtrM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=AYAjXkge2mp5oz4OaxFPe9V0hhxWHUal4BS2jBhL6r4Sd9mHPX/2j9X4KNXHtHfNjHclymmjKMyF3lSLWA5L3Xkq3bZ33atOJf8p4HksP3clNvK5JEPA5qP+NOHkT79gLezQJ1NZuotpjcbxFC1tSjh7bcnC7MyMtanBjX1Zksc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/y9ASq3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9C1C6C32781;
+	Mon, 13 May 2024 23:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715642299;
-	bh=7YP5DnUgFJ0rvhvCbLRxYGZmXgJBxA/RcgKKAIsDeD4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KxPZk5cNzBgI/xgadMO90TKRdGIYWHs20CtlIS/29/dq88KGmodXHMmkCo8Ng+wzY
-	 XLfKXPPNny0OH2/V5pjBQTyvxH9HrXpI2+OlPgUzv+2ZLNVaticNX+gUWb/xFoumD+
-	 oG7NKNq8KyfiriRjsBVhjH+2BC4cuOzLUnF+UFO6tu/EPuVS/7PwZB3Vlp+aDYKHt/
-	 C3N45FkSErMSCPLlhGAqouGFnV1urt29Rw4hsUXuLU5qEhYwPz93POgxXpnPfCshA+
-	 63Mtbf93+69Zeei8BF/nJxBkcLExDNvkG2oP0rNf1+6Jmmf4SaB+CPHODRHz0JMZaD
-	 RRgSP82ZyPpQQ==
-Date: Mon, 13 May 2024 16:18:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <davem@davemloft.net>, <sgoutham@marvell.com>, <gakula@marvell.com>,
- <jerinj@marvell.com>, <lcherian@marvell.com>, <sbhatta@marvell.com>,
- <naveenm@marvell.com>, <edumazet@google.com>, <pabeni@redhat.com>
-Subject: Re: [PATCH] octeontx2-pf: devlink params support to set TL1 round
- robin priority
-Message-ID: <20240513161817.048123bf@kernel.org>
-In-Reply-To: <20240513053546.4067-1-hkelam@marvell.com>
-References: <20240513053546.4067-1-hkelam@marvell.com>
+	s=k20201202; t=1715642431;
+	bh=LW7czoZwatdQXRO+YVercOrMx1lCPFkpDoEbGYPmtrM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=i/y9ASq3hC2V1cno1xImJ6wv49pyQRzknjuwdQyCQa/e2Z1Ghij1XOLmVAwM3CtYv
+	 p30vNPrMt1uaKkSSTzT4lNwTSMcnTnPyakJYGGkhWfW51IoyJ5a8A6yLmVgVwX1qy7
+	 NQNDeBVtrNUFeBL1z1WHjUO0+WGb3DfyCUKAm8yoBNqx3mIGxgIVmcJw58oP8ly6X9
+	 JHO9i6aqOuiBV3INyBR8ahkVzAR4AeVE95bpPLrGTdieeN3XYxYfXFHuMg6kQ4vVyi
+	 +wfQ9oGACH5IZWJ2YznX2/eTElJkLLGlvOO8vvQp4TYsrxqnbEVHp0bDhx6UrrlW4u
+	 StHBCUcPA0aXA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 82C47C43443;
+	Mon, 13 May 2024 23:20:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v7 0/3] ax25: Fix issues of ax25_dev and net_device
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171564243153.13558.7234535622239803096.git-patchwork-notify@kernel.org>
+Date: Mon, 13 May 2024 23:20:31 +0000
+References: <cover.1715247018.git.duoming@zju.edu.cn>
+In-Reply-To: <cover.1715247018.git.duoming@zju.edu.cn>
+To: Duoming Zhou <duoming@zju.edu.cn>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hams@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, jreuter@yaina.de, dan.carpenter@linaro.org,
+ rkannoth@marvell.com, davem@davemloft.net, lars@oddbit.com
 
-On Mon, 13 May 2024 11:05:46 +0530 Hariprasad Kelam wrote:
-> Added support for setting or modifying transmit level (tl1) round robin
-> priority at runtime via devlink params.
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu,  9 May 2024 17:35:59 +0800 you wrote:
+> The first patch uses kernel universal linked list to implement
+> ax25_dev_list, which makes the operation of the list easier.
+> The second and third patch fix reference count leak issues of
+> the object "ax25_dev" and "net_device".
 > 
-> Octeontx2 and CN10K silicon's support five transmit levels (TL5 to TL1).
-> On each transmit level Hardware supports DWRR and strict priority,
-> depend on the configuration the hardware will choose the appropriate method
-> to select packets for the next level in the transmission process.
+> Duoming Zhou (3):
+>   ax25: Use kernel universal linked list to implement ax25_dev_list
+>   ax25: Fix reference count leak issues of ax25_dev
+>   ax25: Fix reference count leak issue of net_device
+> 
+> [...]
 
-Configuring DWRR parameters seems in no way HW specific.
-Please work on extending one of the Tx scheduling APIs to express this.
+Here is the summary with links:
+  - [net,v7,1/3] ax25: Use kernel universal linked list to implement ax25_dev_list
+    https://git.kernel.org/netdev/net/c/a7d6e36b9ad0
+  - [net,v7,2/3] ax25: Fix reference count leak issues of ax25_dev
+    https://git.kernel.org/netdev/net/c/b505e0319852
+  - [net,v7,3/3] ax25: Fix reference count leak issue of net_device
+    https://git.kernel.org/netdev/net/c/36e56b1b002b
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
