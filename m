@@ -1,95 +1,80 @@
-Return-Path: <netdev+bounces-96184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF6158C49BE
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 00:50:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E4548C49CE
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:00:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 815D61F216BA
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 22:50:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E85E0281B91
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59FB84FC3;
-	Mon, 13 May 2024 22:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B6D84DE3;
+	Mon, 13 May 2024 23:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hcKnbC1o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fCAcHdOD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0D284E17;
-	Mon, 13 May 2024 22:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6ADA446A5
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 23:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715640629; cv=none; b=WnPv8pEGi8BhqAkTyuLbY9dYvo4s///2aQlqNxDtSs5IHjucg32x/7XyNPIWQEEPaE5U0H7ncunG9VjQQYqFY3hliBABZvS5NlO/vseW6p9GUm45cSxDrnw/psIL2aT0EpNR9WJYa8wfVZc9x9qhjzWf5zA7jbNUIMkLr09Uh7g=
+	t=1715641229; cv=none; b=J/D439JcNrALj5EkWR4SqYexuQ0P6CUScj2oxGiMdnJNQms1ETSB4V2803iXiecJepObaI4HCTJTdeMx/s2m9tjTNDmDtrU+4JWVtULXLzHSVm0l6J1FrSvr7zmLEQrr0/W3B6I7G2BoqXCaW0fWD8fczln1vFeXxG8ZgrcCtis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715640629; c=relaxed/simple;
-	bh=A8F0aLeTOkEVQsYb3Ruds4GUVKytrjaVyrUlAwe2LYQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rxvVf4X5JlcmcPHGHjckESlLKaxNUGBKe4+yzLmETFqfOpiwnMDkQcYJGgd/p6rpmtC9jXtcmKr/TedhajLOQm3YqESVISG5hU3xY91QwrUbDEEK+jrxasS79U2k0Yn0IDT/aGuHVYW77BtRXUVcioZ057LMRiWTEKk3en9zz20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hcKnbC1o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 10046C4AF0D;
-	Mon, 13 May 2024 22:50:29 +0000 (UTC)
+	s=arc-20240116; t=1715641229; c=relaxed/simple;
+	bh=7/lsj1n2mP6ZcUoNKBtIEVK9Xi32uNbuVT+ShFMEnVI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lEBMzQM2zzA2JOJuABKwj3KjVelDBOZijjbWrlhHgq7yZKggtbLTOCk41hx6TpydUTNWOfwS6mHKuPk7TouuKUhZkw9lT0PpKua/j6KO3F3Z2vgx9gsuUBFgd0TAJu8qoHXnuqrCFcIQPDym1HSyg+4/1XNyr0yCItqMSEq2d3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fCAcHdOD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2009FC113CC;
+	Mon, 13 May 2024 23:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715640629;
-	bh=A8F0aLeTOkEVQsYb3Ruds4GUVKytrjaVyrUlAwe2LYQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hcKnbC1oCTRS2Y5rent0/h2FqHJE+HTwqroLF1381GE/8OmZHPDIUWJ3EbACtXb5K
-	 EIooOm5YfEnH/X8+wZ//tvX5B/uspm4GHp4Dq08dJykKzpFPD2kZHoE6Mu46RCNlOX
-	 BK4ge80PuM0z+QfXjAi9Yp7LuzLtmmTlEEfC4UrN20WqS/a4chOWzHBWsEBvc2OS2M
-	 DRAGXBc1N5taW7gZ4OgkOd+yShak9IKinDF138Pq9PNvPvAAn8UKYAPdrGc5Q7EGjG
-	 Wkn4biUuXc2QE3TVunNNOu2h0YjoFhTjSSbqZgXpKUU+FxTcs0CPW2hMiAqpLYyalE
-	 DLBnYNzsXIF1w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EC85FC433F2;
-	Mon, 13 May 2024 22:50:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1715641228;
+	bh=7/lsj1n2mP6ZcUoNKBtIEVK9Xi32uNbuVT+ShFMEnVI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fCAcHdODyiEjYlgLV1WS0D/+aHmQs625b42CoKco/iAcj3wtMOLCz/YOJU+4qonfS
+	 f5Xu/OiBAhXgC9j8QzHxaSkNIXD3Swk8bxZUJ3FV6ArNJXT2YB508VdJGGnkrCZqG7
+	 qr6M2nmIwMwXs3poFP90o2hFnz24dGHX/yGaDNHbnjSv0fTTnOhg2GglAA/GI2VWf+
+	 UYLC+lrI1TJZVGuSzidGN5pmn1JqRL4M1LHvvWa/3/fOX2jKWzegfNjR/E+abNwuWG
+	 XK9om0x+668fWqNOPgyQF+cOwX/y16Zb6aUUZdBaG/KYgOr8FhTSuDjBRdmrrL0PRT
+	 GEyRv0DP0wKaw==
+Date: Mon, 13 May 2024 16:00:27 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ linux@armlinux.org.uk, horms@kernel.org, andrew@lunn.ch,
+ netdev@vger.kernel.org, mengyuanlou@net-swift.com, Sai Krishna
+ <saikrishnag@marvell.com>
+Subject: Re: [PATCH net v3 2/3] net: wangxun: match VLAN CTAG and STAG
+ features
+Message-ID: <20240513160027.6a4a2350@kernel.org>
+In-Reply-To: <20240510061751.2240-3-jiawenwu@trustnetic.com>
+References: <20240510061751.2240-1-jiawenwu@trustnetic.com>
+	<20240510061751.2240-3-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] Add TX stop/wake counters
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171564062896.28873.12862899277990003394.git-patchwork-notify@kernel.org>
-Date: Mon, 13 May 2024 22:50:28 +0000
-References: <20240510201927.1821109-1-danielj@nvidia.com>
-In-Reply-To: <20240510201927.1821109-1-danielj@nvidia.com>
-To: Dan Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- jiri@nvidia.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 10 May 2024 14:17:50 +0800 Jiawen Wu wrote:
+> Hardware requires VLAN CTAG and STAG configuration always matches. And
+> whether VLAN CTAG or STAG changes, the configuration needs to be changed
+> as well.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+With this patch the resulting configuration will depend on the order of
+actions. Basically the features will be disable if the last action is
+either stag or ctag disable. This may cause to subtle bugs if some
+refactoring changes the order of enable and disable.
 
-On Fri, 10 May 2024 23:19:25 +0300 you wrote:
-> Several drivers provide TX stop and wake counters via ethtool stats. Add
-> those to the netdev queue stats, and use them in virtio_net.
-> 
-> v2:
-> 	- Fixed an accidental line deletion
-> 	- Enhanced documentation
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2,1/2] netdev: Add queue stats for TX stop and wake
-    https://git.kernel.org/netdev/net-next/c/b56035101e1c
-  - [net-next,v2,2/2] virtio_net: Add TX stopped and wake counters
-    https://git.kernel.org/netdev/net-next/c/c39add9b2423
-
-You are awesome, thank you!
+It'd be better to turn both features on if _either_ feature was
+requested. And require that _both_ are disabled before disabling.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
