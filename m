@@ -1,114 +1,107 @@
-Return-Path: <netdev+bounces-96012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ECBD8C3FBF
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:22:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 298C08C3FCD
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:27:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B01861C216B9
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:22:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59F2A1C22B0D
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9388714C595;
-	Mon, 13 May 2024 11:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA5014C5A0;
+	Mon, 13 May 2024 11:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FdqWtABd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a/2OZPed"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02296146A8B;
-	Mon, 13 May 2024 11:22:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D0514C595
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 11:27:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715599353; cv=none; b=lWNSe4VhKp4itwhZJGQAJiImoz+QLURdc7v5zeiZ/wwm7Agfjg+78KzU1CE0OUEi99z8f/tzneKs03+WHoHqlzV64poC/LNJZANcOqdbPE2P/ST/pt95/4WKiEwSMcsTVXOiCVImGhuXSVphEhwAfCI+zhSUOcVJQo6H9p7Q2pw=
+	t=1715599629; cv=none; b=a0rH/P/TtbFmBBG3dmeRqD4QHljqx+zEaGtOgLuljYVaQXnJo7YlYShx8OWZ5WpfEZoAxHAClaBN2qJD28ppNNiS/tr4iOBYjghisPm9iVirxtHF748Wwvg58rwnAl5VEUQVIDo60TJkxCs75/gyNonhOY/vyuyLQ9Fnn6zK7Sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715599353; c=relaxed/simple;
-	bh=/hr2bOpRFgqi9fvGXlP0M2gVxTzgKVlXnL3zKDV3ZG4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iZKN4xpUA1scBTA0kiTgx3RsH8emFxtXH4NZ9eybZG+jF7fTd/OIZLtu055MQvE0tWahW23WKP985nhUbTXm1GRUMdoTakXbWpqKvuawkZAoVvSYHg6O/ToOvW672ijmBXnyKretDUB606iG3xtgNZVs/UdD2A4L3AiCNhnk+RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FdqWtABd; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715599352; x=1747135352;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/hr2bOpRFgqi9fvGXlP0M2gVxTzgKVlXnL3zKDV3ZG4=;
-  b=FdqWtABdOrz4htu8eEOe9Lo1CfofH1QTdchMGWqgloNY5j+/Gb9lG9qd
-   nY2xvFT1QlmAX1vBgdkjY+ThiTZTqTurZYZ6WnEX5nXHS3F8rOCh9A0hj
-   TfM2cKqOKIM0vCA5xiEQjoHp8va+Qu9Mhh6VY83LrCyd+IXBn5FLDWxDN
-   ngUqrv23YnpGAzBKUK1pCWYs46HKOzHwTVtSQaSiyMt3uEhzPXc09Vo2k
-   Rz/Xs76kgd3UMGLaju4gaYolsJ8+adDYVi+60Bx7P/8kFsW3npjAjpxS2
-   E4Pi5nf3krv2Z60PRDLGPuNlaulCOtGHfQxYT7NoURtT4dWSxLy1DceGa
-   Q==;
-X-CSE-ConnectionGUID: xABn3XmfT4qkB5V3N6YLzw==
-X-CSE-MsgGUID: XtB/xx0ETKKYwvfEj3XgJw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11071"; a="22676147"
-X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
-   d="scan'208";a="22676147"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 04:22:31 -0700
-X-CSE-ConnectionGUID: 8npUnQQuTcWgTKsh91B/bw==
-X-CSE-MsgGUID: DXVFtzbcRkqhUIKafUb5sA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
-   d="scan'208";a="30866900"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 04:22:26 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1s6Tl8-000000076qh-0yhd;
-	Mon, 13 May 2024 14:22:22 +0300
-Date: Mon, 13 May 2024 14:22:21 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: lakshmi.sowjanya.d@intel.com
-Cc: tglx@linutronix.de, jstultz@google.com, giometti@enneenne.com,
-	corbet@lwn.net, linux-kernel@vger.kernel.org, x86@kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, eddie.dong@intel.com,
-	christopher.s.hall@intel.com, jesse.brandeburg@intel.com,
-	davem@davemloft.net, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, mcoquelin.stm32@gmail.com, perex@perex.cz,
-	linux-sound@vger.kernel.org, anthony.l.nguyen@intel.com,
-	peter.hilber@opensynergy.com, pandith.n@intel.com,
-	subramanian.mohan@intel.com, thejesh.reddy.t.r@intel.com
-Subject: Re: [PATCH v8 12/12] ABI: pps: Add ABI documentation for Intel TIO
-Message-ID: <ZkH37Sc9LU4zmcGB@smile.fi.intel.com>
-References: <20240513103813.5666-1-lakshmi.sowjanya.d@intel.com>
- <20240513103813.5666-13-lakshmi.sowjanya.d@intel.com>
+	s=arc-20240116; t=1715599629; c=relaxed/simple;
+	bh=0k5DBiev6Hez4iRlP0Z+hV0EZ/1rw9D59hE5bmw14XQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NldrjMyk2F52SmHQoYs8dutAnTcXUm2DU+lrVDh5C6zpaq2TlKl5Rt4y8mU5jryYIpXJBhMiKZYRyoDbTaxK9GK2gmw/LmN09sAN/+2iqwZ0PVnEivt1kjqTjLgVo4Qoc+k106GpA+nqINj+EfbQBLvGgdxq5NlLcW9R68wLhGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a/2OZPed; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715599627;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=54evBAuhpnIbgDCbHAgBJwdKwEdND6gn70BNk2pLCuo=;
+	b=a/2OZPedn/UJH2dJnDCOXjJvbn8+Ig1S06MlpCkgHePcDHoZbioHdcgwFIgHtqDgdHpqis
+	L6cNxq8m5ljDGb9dh00hZvkAg9n87ciostMYN4AqfOmdViIKYpaARqDwELL5hUZSoO3Pi+
+	jpZOB3sDjF11mHPeOsFAqKpjlEotN4o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-76-b22GMANPMli0g95TKxwUrg-1; Mon, 13 May 2024 07:27:02 -0400
+X-MC-Unique: b22GMANPMli0g95TKxwUrg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A3D328025F9;
+	Mon, 13 May 2024 11:27:01 +0000 (UTC)
+Received: from alecto.usersys.redhat.com (unknown [10.43.17.36])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6AC691C00A90;
+	Mon, 13 May 2024 11:27:00 +0000 (UTC)
+From: Artem Savkov <asavkov@redhat.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Artem Savkov <asavkov@redhat.com>,
+	Jan Stancek <jstancek@redhat.com>
+Subject: [PATCH bpf-next] bpftool: fix make dependencies for vmlinux.h
+Date: Mon, 13 May 2024 13:26:58 +0200
+Message-ID: <20240513112658.43691-1-asavkov@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240513103813.5666-13-lakshmi.sowjanya.d@intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-On Mon, May 13, 2024 at 04:08:13PM +0530, lakshmi.sowjanya.d@intel.com wrote:
-> From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
-> 
-> Document sysfs interface for Intel Timed I/O PPS driver.
+With pre-generated vmlinux.h there is no dependency on neither vmlinux
+nor bootstrap bpftool. Define dependencies separately for both modes.
+This avoids needless rebuilds in some corner cases.
 
-...
+Suggested-by: Jan Stancek <jstancek@redhat.com>
+Signed-off-by: Artem Savkov <asavkov@redhat.com>
+---
+ tools/bpf/bpftool/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> +Date:		June 2024
-
-Is this checked by phb?
-
-"the v6.11 kernel predictions: merge window closes on Sunday, 2024-08-04 and
- release on Sunday, 2024-09-29"
-
-> +KernelVersion:	6.11
-
+diff --git a/tools/bpf/bpftool/Makefile b/tools/bpf/bpftool/Makefile
+index dfa4f1bebbb31..ba927379eb201 100644
+--- a/tools/bpf/bpftool/Makefile
++++ b/tools/bpf/bpftool/Makefile
+@@ -204,10 +204,11 @@ ifeq ($(feature-clang-bpf-co-re),1)
+ 
+ BUILD_BPF_SKELS := 1
+ 
+-$(OUTPUT)vmlinux.h: $(VMLINUX_BTF) $(BPFTOOL_BOOTSTRAP)
+ ifeq ($(VMLINUX_H),)
++$(OUTPUT)vmlinux.h: $(VMLINUX_BTF) $(BPFTOOL_BOOTSTRAP)
+ 	$(QUIET_GEN)$(BPFTOOL_BOOTSTRAP) btf dump file $< format c > $@
+ else
++$(OUTPUT)vmlinux.h: $(VMLINUX_H)
+ 	$(Q)cp "$(VMLINUX_H)" $@
+ endif
+ 
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.44.0
 
 
