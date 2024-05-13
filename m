@@ -1,62 +1,59 @@
-Return-Path: <netdev+bounces-96086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A5768C444A
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:34:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8136B8C4456
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:35:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C9241C2317A
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 15:34:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 217B91F21BDB
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 15:35:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8A3154431;
-	Mon, 13 May 2024 15:32:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C8B15443A;
+	Mon, 13 May 2024 15:34:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tg9r/kC5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jbyYxF7/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B63414F103;
-	Mon, 13 May 2024 15:32:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3118D15442D
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 15:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715614347; cv=none; b=ftL/cjnCBShE1WfTkukapAAp5PniLMBR39Gj3pVfhX/nmgn2r3+I9X0VzavestHzN4NcfLJLABMei5amrQA1pmyf7VmnrTWMT1F5QwPuhA7E8qmBvyoEDpU1pTpgaf+o7afmhIPcMyaJWy/5/PmcUWtFciQqqufJpy1LEkiwa4A=
+	t=1715614494; cv=none; b=bBFbZJHv73+ca3lV2GrLDOEB2tryd8+3liPuhpoTnOCFT5vsYO4TiojX0EWWu3N9+UoVyMRS+kphee6TjUyUsFbAvKSqaT4KebcsYlCoGb9aNM/F+71RwFZUBNb7hufHn9qdIAKAtfrGf0FJW2Vmf0mitbhZEa2uFRB5HLqR+j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715614347; c=relaxed/simple;
-	bh=jar4ZIkYznevo+scBPt1nRHEl+qcfb0bftbjz3Sb1yA=;
+	s=arc-20240116; t=1715614494; c=relaxed/simple;
+	bh=RjxsJcSs6mQfDHKt0IIgZxrvLhm0NZHbmMn6MvcVX5g=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hdKPBpMVMlhgyHzsZdDSvtBHBBGTa2kN0RgF8Dek1B8pkkXLTS9KEBP7l+I878yw4D79OwMK7+RXQw9nF0ar4N3GyVjrh4Vq8kQIHhrFbjYLVQcSdHJky3DipuH55xN5dJW/FGxGyRc74ROKlXgUipiEPJ9y7DhQfewT7DdQd74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tg9r/kC5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87C2FC2BD11;
-	Mon, 13 May 2024 15:32:26 +0000 (UTC)
+	 MIME-Version:Content-Type; b=XOjfK0ZD/IUPw1Ch7K3eLlqI13UUmsNOKZtkPrX5WEv8p42XNNSpkuTaO6WyFOICoDJhIX1sbiginEZiTptiEVofCSvarAKZ5X6g1U+eSyrr5OgWeLVkoc4zNvEB+NsDrAblaZi6Bce4HvRKgjh8f30cA1d+vBszrj3nk7PgJ2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jbyYxF7/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B5B6C32786;
+	Mon, 13 May 2024 15:34:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715614346;
-	bh=jar4ZIkYznevo+scBPt1nRHEl+qcfb0bftbjz3Sb1yA=;
+	s=k20201202; t=1715614493;
+	bh=RjxsJcSs6mQfDHKt0IIgZxrvLhm0NZHbmMn6MvcVX5g=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tg9r/kC5256VEq85o6scWYVAGk1eQYr+jXLK2h0AYpcj1LmRJ2SE1CwIuOU/Z5mMM
-	 8aM2jP9brEUJ4/2pYsbgYTeWmM3GL8QDRln8Y7B6O2VZqP47rOey3zz3lnN6yG+WRm
-	 1PqJV5w8RAcc8xvdIyGPK6vEVON+ol+0OprF5a+6MkuMRlF3E2nOb6A0pwtGx2ZwmM
-	 bkUX2JEfRuHTkcM3+AU4hTLVkNxSX6FjJsB6G2QZXaMC7r5DTusWdR1+UDDhCv/D+x
-	 lcB3Ooxou2JY2kA6NnyizV4Fxig4Zrbtw7gPpQfMOrsGVmPl1sBQ7H2wPzhaXRXaRf
-	 tKRD/7OMhrq7w==
-Date: Mon, 13 May 2024 08:32:25 -0700
+	b=jbyYxF7//qPQ5JFOsHvi5HviQNIGreeS+X57UQulapnC30vEWcUIadNF3lNcJIsum
+	 3W+OlYA57+51NrZ5/PCd3qiYSSQFPNyir7xVeju2J5U183jKKonmMj96MVnB9Z+vLm
+	 3+MPu9/NPhSPboiGRDz3bFM3ISd2ie6nMHp+jFt3VHjcgD9C8DCBUHQRY6hkKkWsBB
+	 E85I3QSTbGqslsHURqXT8ON1Tqase9rhjtXMNiOTajiyqrKNx3WV5udix07ZnL4yby
+	 BTHf6mr83SxiRFChEA4+4ma+j9PmM36a+AcIScfZ1q06itA+1Q8TjX0XnVA6ilUX3U
+	 lrAW8eRrVRtCQ==
+Date: Mon, 13 May 2024 08:34:52 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Josua Mayer <josua@solid-run.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Mor Nagli
- <mor.nagli@solid-run.com>
-Subject: Re: [PATCH net-next v3] net: dsa: mv88e6xxx: control mdio bus-id
- truncation for long paths
-Message-ID: <20240513083225.1043f59e@kernel.org>
-In-Reply-To: <c30a0242-9c68-4930-a752-80fb4ad499d9@solid-run.com>
-References: <20240505-mv88e6xxx-truncate-busid-v3-1-e70d6ec2f3db@solid-run.com>
-	<A40C71BD-A733-43D2-A563-FEB1322ECB5C@gmail.com>
-	<c30a0242-9c68-4930-a752-80fb4ad499d9@solid-run.com>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Simon Horman <horms@kernel.org>, Sergey Ryazanov
+ <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>, Esben Haabendal
+ <esben@geanix.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 13/24] ovpn: implement TCP transport
+Message-ID: <20240513083452.1a594ee3@kernel.org>
+In-Reply-To: <4b42fa39-f204-481d-a097-7d41da53f7d6@openvpn.net>
+References: <20240506011637.27272-1-antonio@openvpn.net>
+	<20240506011637.27272-14-antonio@openvpn.net>
+	<4b42fa39-f204-481d-a097-7d41da53f7d6@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,18 +63,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 7 May 2024 12:03:31 +0000 Josua Mayer wrote:
-> > The idea and implementation is reasonable but this could affect other drivers than mv88e6xxx, why not move that logic to mdiobus_register() and tracking the truncation index globally within the MDIO bus layer?  
-> Conceptually I agree, it would be nice to have a centralized
-> solution to this problem, it probably can occur in multiple places.
+On Mon, 13 May 2024 15:37:54 +0200 Antonio Quartulli wrote:
+> >    * @netif_rx_ring: queue of packets to be sent to the netdevice via NAPI
+> >    * @napi: NAPI object
+> >    * @sock: the socket being used to talk to this peer
+> > + * @tcp.tx_ring: queue for packets to be forwarded to userspace (TCP only)
+> > + * @tcp.tx_work: work for processing outgoing socket data (TCP only)
+> > + * @tcp.rx_work: wok for processing incoming socket data (TCP only)
+> > + * @tcp.raw_len: next packet length as read from the stream (TCP only)  
 > 
-> My reasoning is that solving the problem within a single driver
-> is a much smaller task, especially for sporadic contributors
-> who lack a deep understanding for how all layers interact.
+> can you please help me with the following warning from kerneldoc?
+> As you can see below, raw_len is an array.
 > 
-> Perhaps agreeing on a good solution within this driver
-> can inform a more general solution to be added later.
+> May that be the reason why the script isn't picking it up correctly?
+> 
+> drivers/net/ovpn/peer.h:101: warning: Function parameter or struct 
+> member 'raw_len' not described in 'ovpn_peer'
+> drivers/net/ovpn/peer.h:101: warning: Excess struct member 'tcp.raw_len' 
+> description in 'ovpn_peer'
+> 
+> (line number may differ as I am in the middle of a rebase)
 
-I agree with Florian, FWIW. The choice of how to truncate is a bit
-arbitrary, if core does it at least it will be consistent.
+Hm, the script itself is a fairly simple file of perl regexps
+You can try to tweak it and send a fix to the list.
+I presume using sizeof() to declare an array is fairly uncommon.
+Or forgo the sizeof() and use literal 2? :)
 
