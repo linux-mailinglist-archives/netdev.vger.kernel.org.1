@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-96053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E808C4212
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 15:38:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 466398C4213
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 15:39:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54DF41C20F65
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:38:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A248A286477
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D5A1534FE;
-	Mon, 13 May 2024 13:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516C81534EC;
+	Mon, 13 May 2024 13:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sRhkFym2"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hOswRWZz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2810A1534EC
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 13:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DE91534EA
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 13:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715607533; cv=none; b=hsTRoZnd8mj97lRK3D28qjOPUBnUfftqRjPofWA6yianPthBJxUuilVTWZlIsOtLRC/t1AR5VMBY/B15F95ejxF2JuVJlyjDUNLxtmKJgg4N8kGrvWq8WQ4DnYT9+oEr6QzCgzfQkEwq33b+SiYFtJtE6kD3FPe/Ta0itkxQnQA=
+	t=1715607535; cv=none; b=glGFGqZgYCWn3LuXUJf/e3HZJ3+Zr9TJdCtCix+rNCy647mi7/3yiqyPtGd727mKL90hs+IzaOMKKNByXii4r+94HiC7u+psSebVvZv+ozbAk+LmaIfNPa5NV7Lt8yLUvo1PjkmCztLmd7eTL99XGTfZtsaqLYqhzCQxIkzC6sA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715607533; c=relaxed/simple;
-	bh=AEKf2hm9eO0+nDhH/ent8tNelXk3FBd5l342y4lOn/s=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GIErK0K83zlqYCrS9tw4mrI+qjUzYd59ONFG1vnfGLiPws5khd6TYGrVYxBKDyWjBjbdJPP/luJHbDaX8jnPQF4dAnVttF2o/kZhln74PE4vbAOt5KROTbwZRMced4UgIlaZdfCOPWEq0on0RZnjJf0vlvHSK1RMktRKYnrD/So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sRhkFym2; arc=none smtp.client-ip=209.85.167.52
+	s=arc-20240116; t=1715607535; c=relaxed/simple;
+	bh=TOcnDy0PN34+98xhqM6Q+UsUioQYwT3XmDQis0oaur4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=NHEj6Fd2VwvTkxnfm35nERDbSALw0HAt2kApIz9Z9RFOHdPL2R68PWPdBS6teVbcDvliZpwOKOlq6YSbupb/vXbhPC8msjmnZhgIhzKcbxy48LCkcWRRCGeYoGp7c7OTK7hDIHFQjJtSud+yIs8LLiOGp5ubU83fV4aPkHDbjIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hOswRWZz; arc=none smtp.client-ip=209.85.167.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-51f4d2676d1so4716897e87.3
-        for <netdev@vger.kernel.org>; Mon, 13 May 2024 06:38:51 -0700 (PDT)
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-51fea3031c3so5695085e87.0
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 06:38:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1715607530; x=1716212330; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=j+d6WkcJl1hJ21/tMXT/q5+gbY45Eg2KAsk/MVIxHRQ=;
-        b=sRhkFym2vIIvjlS3Ci3V1HDFBZxcob1HMSAPIgiwetGGxXS76nxGqlAHzqbQpuViHk
-         jVjApXh5VncjUvBUnQ7bgGC7DvKqHUetn0qykVEJ14AsGvaDbb6G7Ni9jnrLbyTa9kZ8
-         UWjTVSwmTW5n7oxFSr9dgMt0GeRrEVNvmvopOMATrD90cbMXJ5R8HahOQgH+Ugnu7/Iv
-         8DMrfP5XDHLfXWWbhOx5aBvNd6YMjo8O6INKZeQ9KIbT85m+tPxTkRXhHrVcs+c/4Jxg
-         vPinrpvbpW27zfW1MavQsl/ZSK9S8DrvAgmtYFp4CuD//bbdY7to9WbS+XG+KTo8o9p7
-         ptwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715607530; x=1716212330;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=linaro.org; s=google; t=1715607531; x=1716212331; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=j+d6WkcJl1hJ21/tMXT/q5+gbY45Eg2KAsk/MVIxHRQ=;
-        b=MHffBvrxmTW6pjc0JsAiTIyYsNWgdWqa5crRTGnqhaQvHiDkBvoJEo6TOklf5Qp/ey
-         3G0CWBi1eEWepJYt3MZRg2kATPHOOXDPPMqtTMQ9gLLQ3xpzxpBJDe1FwxDmKA4FvSaB
-         0P50mnD/Tsp/8X14d2+UHfiZRK+UAC68u3E++6T1SeiVVlZiPGLbTqUgIkkyyk7q2GV6
-         NLpDiCn/iyRQ0lYHBfdgJIr5l0/nkHE12vS5v5yvut3b3IBjTOo3q4Y7FNLo9F7ZasI+
-         Y4oc9r2atp2V8rMDodYfUo5f6uwdkHv+7J6R0eXCGobBUGuW2xwz07C+ZkGt0saXVKhI
-         0HhA==
-X-Gm-Message-State: AOJu0YwrIFxFgiOAIJ40OwvCGIR8YTLsNwJfcRFmg83nTW+aP4w0p/wn
-	MP3u+blcLrZV5ruR7poBkSrJKrFBr96LD7dcBF+996bkJAZ/YYOXWoIAdCI5LbI=
-X-Google-Smtp-Source: AGHT+IGkAxsr7XwaySA1rSBDPToZ/by8C+d0CoMgToGSnLllJBtsmMXcPa1rPLckNbXLcnbF9PYOLg==
-X-Received: by 2002:ac2:54b9:0:b0:51f:d72:cd2d with SMTP id 2adb3069b0e04-5220fc7aeb4mr6032918e87.22.1715607530221;
-        Mon, 13 May 2024 06:38:50 -0700 (PDT)
+        bh=GkfteHNXU4Gc7U7F5jS8dOpIBUIN8TpFTqroJmbcsZ8=;
+        b=hOswRWZzgenocMjNlMVaZu8LHh+wlX/N5JcZ5eFxoU3TQ9p5TeRbD2uCv+CfIIpH9o
+         oAC1fxR+mjNlICAgbXX0syXYOr9xnlEw3+lC9epyiYbrNGKU74Pabhz+Va81PLtf8Mrx
+         bMzkz30jBUzDS3ZyvuFgLnED9nTvpm6VRTN+6Q4y27UZZWQih6ncwTp/HXxA3x2PDML4
+         /y/InR+XKMpyYfMkOhsRKvSwVn3YmCzNvBH/IHdAkt6YnJ/jcrJ/ZRoUX740+jiEq9ty
+         SbceELEjUD44UHSBfWqI9rSHXpA48QdzAUIoVcbuXSesiT7Botol9FYj2FPlM82FKrn3
+         wDVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715607531; x=1716212331;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GkfteHNXU4Gc7U7F5jS8dOpIBUIN8TpFTqroJmbcsZ8=;
+        b=YpzbnDyOlUhKh9zQfQHvkz2cLurP8g0gnNpuy5pUetJK/J3u+GJacD+JPdUJNQXsAT
+         cnUfNLIUT26o7j2/u25hdNFG+vmMPn1DZQa54376DiG4N5dn6aFHMsC6ISFNPuBEs/73
+         EDUfP1yIpzRjxedxsIMTrTCPjHQGr4aQk2GvsPGwMLikodbyuhVlGLTEg59vt+kslfUC
+         erArQ3FtF1tq7QBokRq6GWZbLZ8zWO5HW+b6xgJ+rTfo/g0I1o9NeE5utNUrYVDFN8UC
+         8/fNRirHtv0RQDbH4Al45vZzbXf8hv2ZvN9f/4SQnujRBEOwY9nByNLfO4UmB1mBWsmN
+         PpIw==
+X-Gm-Message-State: AOJu0Yy+x1EEv2SFX7pHfrs4wcdQ8UHBIapInV/vR/RiEIZV7VyxyLfh
+	ZBlTOEYf9EQLFsBtIyzQ6O7nGtK7fpRDVOqQygJX8xkNxK56xPh9z2yfphGs3fw=
+X-Google-Smtp-Source: AGHT+IFmzbeiaXhGbxDLOql85bYhNtluAasIp5mNZxG2qYihdJZetfrJSZ4lz3Z8qeotT39T+mDnxA==
+X-Received: by 2002:a05:6512:3c9a:b0:521:7846:69d3 with SMTP id 2adb3069b0e04-5221027858amr10287838e87.55.1715607531539;
+        Mon, 13 May 2024 06:38:51 -0700 (PDT)
 Received: from [192.168.1.140] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-521f38d899asm1757367e87.231.2024.05.13.06.38.49
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-521f38d899asm1757367e87.231.2024.05.13.06.38.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 06:38:49 -0700 (PDT)
+        Mon, 13 May 2024 06:38:51 -0700 (PDT)
 From: Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH net-next v3 0/5] net: ethernet: cortina: TSO and pause
- param
-Date: Mon, 13 May 2024 15:38:47 +0200
-Message-Id: <20240513-gemini-ethernet-fix-tso-v3-0-b442540cc140@linaro.org>
+Date: Mon, 13 May 2024 15:38:48 +0200
+Subject: [PATCH net-next v3 1/5] net: ethernet: cortina: Restore TSO
+ support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,10 +78,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAOcXQmYC/3XNQQ7CIBAF0Ks0rMUwSIu68h7GRUun7SQKBgipa
- Xp3kbjQRZc/f/6bhQX0hIGdq4V5TBTI2RwOu4qZqbUjcupzZlJIJWrR8BEfZIljnNBbjHygmcf
- gOHZGg9LayKFjef30mKsiX9nn0OIc2S03E4Xo/Ku8TFD6r37a1BNwwUGYXuiuVj2Yy51s693e+
- bGgSf5AANuQzJDE/qig1qqR6g9a1/UNXNN/CxIBAAA=
+Message-Id: <20240513-gemini-ethernet-fix-tso-v3-1-b442540cc140@linaro.org>
+References: <20240513-gemini-ethernet-fix-tso-v3-0-b442540cc140@linaro.org>
+In-Reply-To: <20240513-gemini-ethernet-fix-tso-v3-0-b442540cc140@linaro.org>
 To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -88,58 +88,128 @@ To: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
 Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
 X-Mailer: b4 0.13.0
 
-This restores the TSO support as we put it on the back
-burner a while back. This version has been thoroughly
-tested with iperf3 to make sure it really works.
+An earlier commit deleted the TSO support in the Cortina Gemini
+driver because the driver was confusing gso_size and MTU,
+probably because what the Linux kernel calls "gso_size" was
+called "MTU" in the datasheet.
 
-Also included is a patch that implements setting the
-RX or TX pause parameters.
+Restore the functionality properly reading the gso_size from
+the skbuff.
 
+Tested with iperf3, running a server on a different machine
+and client on the device with the cortina gemini ethernet:
+
+Connecting to host 192.168.1.2, port 5201
+60008000.ethernet-port eth0: segment offloading mss = 05ea len=1c8a
+60008000.ethernet-port eth0: segment offloading mss = 05ea len=1c8a
+60008000.ethernet-port eth0: segment offloading mss = 05ea len=27da
+60008000.ethernet-port eth0: segment offloading mss = 05ea len=0b92
+60008000.ethernet-port eth0: segment offloading mss = 05ea len=2bda
+(...)
+
+(The hardware MSS 0x05ea here includes the ethernet headers.)
+
+If I disable all segment offloading on the receiving host and
+dump packets using tcpdump -xx like this:
+
+ethtool -K enp2s0 gro off gso off tso off
+tcpdump -xx -i enp2s0 host 192.168.1.136
+
+I get segmented packages such as this when running iperf3:
+
+23:16:54.024139 IP OpenWrt.lan.59168 > Fecusia.targus-getdata1:
+Flags [.], seq 1486:2934, ack 1, win 4198,
+options [nop,nop,TS val 3886192908 ecr 3601341877], length 1448
+0x0000:  fc34 9701 a0c6 14d6 4da8 3c4f 0800 4500
+0x0010:  05dc 16a0 4000 4006 9aa1 c0a8 0188 c0a8
+0x0020:  0102 e720 1451 ff25 9822 4c52 29cf 8010
+0x0030:  1066 ac8c 0000 0101 080a e7a2 990c d6a8
+(...)
+0x05c0:  5e49 e109 fe8c 4617 5e18 7a82 7eae d647
+0x05d0:  e8ee ae64 dc88 c897 3f8a 07a4 3a33 6b1b
+0x05e0:  3501 a30f 2758 cc44 4b4a
+
+Several such packets often follow after each other verifying
+the segmentation into 0x05a8 (1448) byte packages also on the
+reveiving end. As can be seen, the ethernet frames are
+0x05ea (1514) in size.
+
+Performance with iperf3 before this patch: ~15.5 Mbit/s
+Performance with iperf3 after this patch: ~175 Mbit/s
+
+This was running a 60 second test (twice) the best measurement
+was 179 Mbit/s.
+
+For comparison if I run iperf3 with UDP I get around 1.05 Mbit/s
+both before and after this patch.
+
+While this is a gigabit ethernet interface, the CPU is a cheap
+D-Link DIR-685 router (based on the ARMv5 Faraday FA526 at
+~50 MHz), and the software is not supposed to drive traffic,
+as the device has a DSA chip, so this kind of numbers can be
+expected.
+
+Fixes: ac631873c9e7 ("net: ethernet: cortina: Drop TSO support")
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
-Changes in v3:
-- Do the pause setting unconditionally in the full duplex
-  case in adjust_link just like the code used to be,
-  phydev->autoneg should not influence this.
-- Bail out of .set_pauseparam() if pparam->autoneg is not
-  true.
-- Link to v2: https://lore.kernel.org/r/20240511-gemini-ethernet-fix-tso-v2-0-2ed841574624@linaro.org
+ drivers/net/ethernet/cortina/gemini.c | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
 
-Changes in v2:
-- Fix up the issue in the previous version where I packed the
-  TSO segments into too small packets: the TSO hardware
-  expects the "MTU" to be set to the length of the resulting
-  ethernet frame for each segment.
-- Add a patch to make use of the TSO also when we do not have
-  any explicit segmenting, which is what the vendor driver
-  was always doing. This works fine with even frames with custom
-  DSA tags.
-- Add a new patch to rename the gmac_adjust_link callback to
-  a recognized name.
-- Add a new patch to make the driver use the autonegitiated
-  RX and TX pause settings from phylib.
-- Rewrite the set_pauseparam() patch to use the existing
-  gmac_set_flow_control() function.
-- Add a call to phy_set_asym_pause() in the set_pauseparam
-  callback, so the phylib is informed of the new TX/RX setting.
-- Link to v1: https://lore.kernel.org/r/20240509-gemini-ethernet-fix-tso-v1-0-10cd07b54d1c@linaro.org
+diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
+index f9523022be9b..b2ac9dfe1aae 100644
+--- a/drivers/net/ethernet/cortina/gemini.c
++++ b/drivers/net/ethernet/cortina/gemini.c
+@@ -79,7 +79,8 @@ MODULE_PARM_DESC(debug, "Debug level (0=none,...,16=all)");
+ #define GMAC0_IRQ4_8 (GMAC0_MIB_INT_BIT | GMAC0_RX_OVERRUN_INT_BIT)
+ 
+ #define GMAC_OFFLOAD_FEATURES (NETIF_F_SG | NETIF_F_IP_CSUM | \
+-			       NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM)
++			       NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM | \
++			       NETIF_F_TSO | NETIF_F_TSO_ECN | NETIF_F_TSO6)
+ 
+ /**
+  * struct gmac_queue_page - page buffer per-page info
+@@ -1148,13 +1149,25 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
+ 	skb_frag_t *skb_frag;
+ 	dma_addr_t mapping;
+ 	void *buffer;
++	u16 mss;
+ 	int ret;
+ 
+-	/* TODO: implement proper TSO using MTU in word3 */
+ 	word1 = skb->len;
+ 	word3 = SOF_BIT;
+ 
+-	if (skb->len >= ETH_FRAME_LEN) {
++	mss = skb_shinfo(skb)->gso_size;
++	if (mss) {
++		/* This means we are dealing with TCP and skb->len is the
++		 * sum total of all the segments. The TSO will deal with
++		 * chopping this up for us.
++		 */
++		/* The accelerator needs the full frame size here */
++		mss += skb_tcp_all_headers(skb);
++		netdev_dbg(netdev, "segment offloading mss = %04x len=%04x\n",
++			   mss, skb->len);
++		word1 |= TSS_MTU_ENABLE_BIT;
++		word3 |= mss;
++	} else if (skb->len >= ETH_FRAME_LEN) {
+ 		/* Hardware offloaded checksumming isn't working on frames
+ 		 * bigger than 1514 bytes. A hypothesis about this is that the
+ 		 * checksum buffer is only 1518 bytes, so when the frames get
+@@ -1169,7 +1182,9 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
+ 				return ret;
+ 		}
+ 		word1 |= TSS_BYPASS_BIT;
+-	} else if (skb->ip_summed == CHECKSUM_PARTIAL) {
++	}
++
++	if (skb->ip_summed == CHECKSUM_PARTIAL) {
+ 		int tcp = 0;
+ 
+ 		/* We do not switch off the checksumming on non TCP/UDP
 
----
-Linus Walleij (5):
-      net: ethernet: cortina: Restore TSO support
-      net: ethernet: cortina: Use TSO also on common TCP
-      net: ethernet: cortina: Rename adjust link callback
-      net: ethernet: cortina: Use negotiated TX/RX pause
-      net: ethernet: cortina: Implement .set_pauseparam()
-
- drivers/net/ethernet/cortina/gemini.c | 86 ++++++++++++++++++++++++++---------
- 1 file changed, 64 insertions(+), 22 deletions(-)
----
-base-commit: 8eed0f55df3577f279dfa680f3c7f600072abc45
-change-id: 20240506-gemini-ethernet-fix-tso-ebc71477c2fb
-
-Best regards,
 -- 
-Linus Walleij <linus.walleij@linaro.org>
+2.45.0
 
 
