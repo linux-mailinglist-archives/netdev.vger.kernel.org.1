@@ -1,272 +1,354 @@
-Return-Path: <netdev+bounces-95982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F5D78C3F24
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 12:40:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4AA08C3F4A
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 12:50:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32BAB1C21869
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 10:40:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACF3A1C227B7
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 10:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E192914C593;
-	Mon, 13 May 2024 10:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="EuosQUu5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F254E1487E1;
+	Mon, 13 May 2024 10:50:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E30414A614;
-	Mon, 13 May 2024 10:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715596741; cv=fail; b=EM3+WHEWExH/szgbiDX+t/1ajPidKxkxyBVUqfu3HyGe12fcLeM8ou3LHF7wilXUbTKxgF4JBKdK0SvuF5iW1f1tF7wlNBR62djp2yJ3TU6nPdxm2UNh+IaUXlFmtHh29X/RdLN03zMGBNQj47/8smwSoeG+8TqTMTmGlDUgXpE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715596741; c=relaxed/simple;
-	bh=WGcaoZgPoVHP6K47Ag5U1Eff6cwikOn8uaF7KULQ3bA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tsFhSAxxdHcawxOVCoI6AINByLjej0IrKLl4g/MToSt+DauVowUa0FGoe6eEPcYqFf6ZfDqG4EOPsAfdt1EsyF++vf8LeGJdbeoTbW3ozINg+wIMI+RQnkgSfPaIw3oA3uzZe6ilp/UnEGBCSVWyaRvIMV2fq3Jq6DsMckstu1s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=EuosQUu5; arc=fail smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44D9ffDH014150;
-	Mon, 13 May 2024 03:38:49 -0700
-Received: from nam04-bn8-obe.outbound.protection.outlook.com (mail-bn8nam04lp2040.outbound.protection.outlook.com [104.47.74.40])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3y3gf4g4bn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 May 2024 03:38:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=U3kW3DxLNasQBYeFU3OVtQrLYZ/C9iF7leV95etrXpnNzInzzkGV2gbKY66hlcr2EgDb239cmRxo/qpwxfTeUyclhjTB1GrdrMBHO2cFZSDSap7cijPDOLi50SgiCxmx9kyBPK/v2abquaC0bcO/FAaX+teI9cyY6rKtCFiJMclkbnCmtVZ2re/RIhneQKaIgkdfaKtUezGPibg/+mplx7af8gRVFg0bB1X+uwTJN7GcJ9Jje8nWiShSspxQB3EQfQTVGhPeCBFBS3vlYavj7AhLRbsJcYH0U+n1jhJb9yOd/hUZMIZg9HuJjb4qTelnPu0Uw+mYLWpKh38SvIem2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=22aIVxNHNShy1jRK9pFWbgiPd8Qm47IL0T104jPuFyw=;
- b=eKuM+eBqmlE2djs+d7vblS3AHXQP+tkucnQ4UoBbeldC99dqjAsM1mrsRoFhQwC++pEyQIBl3WpDZ1UC32xV/5NC58HSMz2DeQPFDUPGfUa3ETxuDR7Cs20zNTvDfVkUehq/o1a+pQdpDJOBOqI6q5ebHvYyyT0/PLWqQaktzQ9Bj7pVG17K8WWw8FQb5c6EoXJiHG4v8IUe3dj67AlRIDy9y2WBECs66qR2qMd20q3C7ov6LfvoHFYPO1Lhjcp5nqW3Ql61bcpdPgkfSCUzs2biMC04knGFLbM4eU4SHz6H/wDJkBc7HQpRzifnn67VQQqiBIcliJcX3z+xVlIslg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=22aIVxNHNShy1jRK9pFWbgiPd8Qm47IL0T104jPuFyw=;
- b=EuosQUu5f/9ih7s8WBl3GWZ3YqFNwSZWFtaemQY6jjAP62Gro6twzcfND9qJIOUVIchbCHEoftSAE0l+XRnyp8zjMPMEP4VIBGeo5pidfVaQkoTSwF2KerlQLoCqbk6WSw6FVNoBi+ONZu8ZXl3vnxAiP/dAGBcddkbwYxkQ6IM=
-Received: from CH0PR18MB4339.namprd18.prod.outlook.com (2603:10b6:610:d2::17)
- by DM4PR18MB4381.namprd18.prod.outlook.com (2603:10b6:5:39a::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Mon, 13 May
- 2024 10:38:46 +0000
-Received: from CH0PR18MB4339.namprd18.prod.outlook.com
- ([fe80::61a0:b58d:907c:16af]) by CH0PR18MB4339.namprd18.prod.outlook.com
- ([fe80::61a0:b58d:907c:16af%5]) with mapi id 15.20.7544.052; Mon, 13 May 2024
- 10:38:46 +0000
-From: Geethasowjanya Akula <gakula@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "edumazet@google.com" <edumazet@google.com>,
-        Sunil Kovvuri Goutham
-	<sgoutham@marvell.com>,
-        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-        Hariprasad Kelam <hkelam@marvell.com>
-Subject: RE: [EXTERNAL] Re: [net-next PATCH v4 03/10] octeontx2-pf: Create
- representor netdev
-Thread-Topic: [EXTERNAL] Re: [net-next PATCH v4 03/10] octeontx2-pf: Create
- representor netdev
-Thread-Index: AQHaoJ0n31dqKn1PqEi4BSrztzCWvrGSGMIAgALpFRA=
-Date: Mon, 13 May 2024 10:38:46 +0000
-Message-ID: 
- <CH0PR18MB433916E129849A20259D4568CDE22@CH0PR18MB4339.namprd18.prod.outlook.com>
-References: <20240507163921.29683-1-gakula@marvell.com>
- <20240507163921.29683-4-gakula@marvell.com>
- <20240511141036.GG2347895@kernel.org>
-In-Reply-To: <20240511141036.GG2347895@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH0PR18MB4339:EE_|DM4PR18MB4381:EE_
-x-ms-office365-filtering-correlation-id: 05e9431b-4bc6-46fa-a74d-08dc7338de47
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|366007|1800799015|376005|38070700009;
-x-microsoft-antispam-message-info: 
- =?us-ascii?Q?DRmDIMf4S5YHyu1twYZ+LfNHvAWako2AvizgZ0OCzKwpW1sigec7KfbGDt1t?=
- =?us-ascii?Q?/MzfibgIRWx6ZcL9GjiyjfHK/TCA6pe4l4xjtueuMvWxRMJs2zBbLa7Z3PZY?=
- =?us-ascii?Q?zwbf9aM8DYIp4GiAeDsxhvoKN+IoZzz8iLNTt+ZpaMncdnO1z9hOQhIpvom6?=
- =?us-ascii?Q?byjUZgDwrzaiFTJ+ZiYY6PqId7DX0axsrIuPK4pxQBRgJDgJxtsJ+tiloW+F?=
- =?us-ascii?Q?iPh9Ni1lqWv2GkBPiaU18ztcq9im57fOpz0O5obFaSKAUe7HSmw/qhhrOnZS?=
- =?us-ascii?Q?dr0Qg5gE3RwKnM9XVUEp8pWJgcJDWWKgNeG5HSfKtRK9EzOthXjT4yqe64lv?=
- =?us-ascii?Q?XO2yRHsJEUyK+AIBVjqXfpR9cmoistjCg+pn8bkdDKIUPeJ4pr2/sgui29aK?=
- =?us-ascii?Q?7AZ+gmEI8tcqaWzTxW9IKaoyj8lYjwl/1AItZ97KVGV7a44hwErByEgYL0pq?=
- =?us-ascii?Q?S47Lve8+fwS0gjf84UlzHU+/Wd07KIzp7MTuPHogi+JJ968XV0yXRCmCU+uA?=
- =?us-ascii?Q?Sl/23xR/EhDEYMLjFGs6OAGo83vdzLzFQcWrVQPx79TqrtaBBU6cuJ9YX85V?=
- =?us-ascii?Q?rIk8JNgWltx+mNMkTUgoasS8zIwh8ZP7vPC1dbXbq0sgPkuDM0eWFU4Vpn2N?=
- =?us-ascii?Q?Gj3eDhtDeN/dGRvbrg+0xZeHttXULm0d8QaGeeuEJ996+5q7hTBeny5rKxUq?=
- =?us-ascii?Q?JoasdbM7wPHgEOsU+stwBAPZjl+ywoQrGiO6edjOyLAsy97AhXP3ozrh4AGL?=
- =?us-ascii?Q?QE426QHx3mZYyTiCUBVh8TGjDjs5hhvMNFFExA8W4KC2dGmQrICbzC4fWC/d?=
- =?us-ascii?Q?74CMnJxwLZGf14deZijlyAcvFc/rH0+exUt5PT47ZnPLCeQOwEgFNZppkC7l?=
- =?us-ascii?Q?84qfEai9xsiytjYf3Kx5RhjtpUx/ZWSQ4ZlT29YvjkJSQGAV4vLRGsJH47Uo?=
- =?us-ascii?Q?s3YlKoIUPZdFBsp9v5XKe+SrQkfyTREfzletOBYSTLOsUwJlrQE1+DfVVSbe?=
- =?us-ascii?Q?aYUSu652LXlwoM3Aiu2Y8ptS05YifJJrfLYsIKjg54F1dZCmLNv05uSphvae?=
- =?us-ascii?Q?23W08PeWZfQd1bs6Eq3drpYIuu6meSdanvyKPw/OQp1WfNnvUh7RFR9cakhW?=
- =?us-ascii?Q?6WzJL7e/S0sv3F7NxqOqd01hBcOOnqiht44azqcPdivOL6M1VQLRRZGznFXz?=
- =?us-ascii?Q?nuhKIIRybhrMGR1Dv9SUJvaVOLE1VadEV3ybGlsFm+cKYfZmlXjBr0B1HnB5?=
- =?us-ascii?Q?N97GH9AYojRHDFH/ICN1ieUo05A/ZVZcrGw8VGqUsg=3D=3D?=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR18MB4339.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?ifodmtVBwL7UlG3vYlOIpFbucMIqHuIL+ys2kQ5oj7o9sKxbRY32PO4b3Nx9?=
- =?us-ascii?Q?+68y3kPYfSNQ2XvlnJQYoPHyFIt2VnPOyhIm2w/AeIra8YxjEtEiD6Z1AsIP?=
- =?us-ascii?Q?w/imlZpjuW7T37H6v096LgLqw8w7COl7cp+55zCO2EfyvjArybFtl45l2VJu?=
- =?us-ascii?Q?s21IeP4rqr4bGUky+Yeaxt4djIEyrq97Xj1NnB98MSl7+6HbvnFANKmMXcDz?=
- =?us-ascii?Q?8fMpClABo7kR0LTvAUQVC055OpZGNP/+WJCRjhii3D7k7H6iVkVf9w5oPUIA?=
- =?us-ascii?Q?HlTeOybcDtRCfxuLyIplUDUJ9Z6r+SnkAlIJwmMjtqbrZzmy3AqN23wTAkEc?=
- =?us-ascii?Q?3k2ulXyWQsiJA3Ki2up+++3ZWNPXsJFg3U5TEkz7R5nxbRUutNyfe8DwnsZJ?=
- =?us-ascii?Q?RHk/OcuB9gxM8aVxQbgnKCE5KIwKlcdHfo/oQC1+nHMijhSVH7mBN/hkr1pZ?=
- =?us-ascii?Q?a6XveJNiOvyFJ1Labgri28RNgbv8iSubZxWj4uuhTkXo/PrmhIzI5sulLHj1?=
- =?us-ascii?Q?ofh2i/DlTJ6VKlIdymVvxiiVMGdkw2SO84GZ8NK+luRbKgUEzK8dTDA5LcHO?=
- =?us-ascii?Q?jWOJorv7X7ntZA3nVvsZnLRQgaedu26jM8N4q0dmGvX/9DCvX3sTw9c647GL?=
- =?us-ascii?Q?fczKvE8erlQNXt32kZY/n+WtVsJQJ8LQ1/ViXm8EUdTniXPgAOHzYgnPLuov?=
- =?us-ascii?Q?gBnXpeI/51ZWKdCl/SdPF8FovYNvQVlgFgxIt97PLlxf1RF5ygrQwl+WA4D+?=
- =?us-ascii?Q?4vFVUU+1ymj4uysBO2QRUI240U3eXSb/Rmt4qweo4gpsYkeWy8gEcVrr2MFc?=
- =?us-ascii?Q?CnLvwbqJDjW7ocb/dSROYYFoYrqkPVM4VjLJ1FPqH9gFI3DlCCantIfJ0gih?=
- =?us-ascii?Q?oLsb2tmBUPfMcIF7yqcrbRkieSbbKokLY1EiZd9+xNlEAOUVJD/fHoFeU1nK?=
- =?us-ascii?Q?pD1DKNY1f8aqoERq3jSex7XQy/eim4fCVmdpfpaV9MF/WKcPcS8lC5Qeqscp?=
- =?us-ascii?Q?iY2+oYek7qEhcTmYsGtyKRpgYLPSPW89BVrBEY6QbseNk0MJhMeaxWCT73Ph?=
- =?us-ascii?Q?y3zgef54dlWMcNWjszEU88QUI6175PlVuW0CysM27bTx9gmXZKED9dNbtUnw?=
- =?us-ascii?Q?aI7nFDL2aiMwPJCIEc5K7IFXIgPoa3PLn7c3BcCRIKyf+QMASEB2anhCVq+7?=
- =?us-ascii?Q?cX+uBUDEKS5KgRV71pBQHQ2ZL/qksY+ucFi720GI4W/Hf6Mohtl6zxmv2P7M?=
- =?us-ascii?Q?xkbvqCyKUJvgX0lXGoRxFFfWPYNylEL3MvIVeMoSpWTlsvYIVDNAgSU1bye1?=
- =?us-ascii?Q?N6My03WEYPDR0hzGeHI0aAcdWZbLSsPNHucYn4HeqnKObl09AwrDeZJIYBH8?=
- =?us-ascii?Q?P/Qe6slNvquTDddI882HNAR6Y7oVaWEAClB1hp5ARcEfKw2mAWuNCGbs6LK/?=
- =?us-ascii?Q?Qb6Y50eKICqfWzyH6tb3mqpUvS/MomIMOXfHB3sFukoiy7eH7wWaUkDNkWxM?=
- =?us-ascii?Q?Q08IHjtJIqa1kOf3t557WH6khS7S++MC7a4kct8gPPnevidYOHZQ4fdgsU8h?=
- =?us-ascii?Q?9qMnustVblX2dfvrrjM=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B1452F9E
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 10:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715597402; cv=none; b=aA79nneeunPCqzok/iKTAZnA24NB+YWPA/jg1SaorJzscH7gyBrZfwnv5Wq3CjJxmXNkBZiEDs0w43K7kt7W+63HrAA9dDtrsNFUzz+DiMeuNQxui4UgnM87TOp5rxZICpqZ5D12ZD+1FfNdtuDirGTJIadmuptUp/VrjgKcxnc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715597402; c=relaxed/simple;
+	bh=EHgIOxYCxAwXf++jZOVRchnqagrz1O0gg6IWM5silJg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gNWB+6ckQtCnIo5YllSgWMG37eyZuB9kjy2ZIHYc3K2+BMIPp2qIihNx6WdTyPIAK4bZqg3jFX2fD6elIy8WyJDBiVy6GHcQ05hIzfjxrIautFBClg/95wXQs2df5RJHmiTlaUYoaBejfD5uObOXQk1VjI4cvRXmecB7jlCCFvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.112.247])
+	by gateway (Coremail) with SMTP id _____8AxiPBU8EFm7yQMAA--.29654S3;
+	Mon, 13 May 2024 18:49:56 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.112.247])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxTN5S8EFm5tccAA--.52109S3;
+	Mon, 13 May 2024 18:49:55 +0800 (CST)
+Message-ID: <ab6c1855-59b8-4bc5-bd34-082e48935e5c@loongson.cn>
+Date: Mon, 13 May 2024 18:49:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR18MB4339.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 05e9431b-4bc6-46fa-a74d-08dc7338de47
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 May 2024 10:38:46.4236
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ByULsSLKrKYbVYmMluXhU8rghES0op7XygV9oAChvbKseohAn8x7mPynp8zlVU7Fzk+LiKQ48UtaGtFAt8/CqQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR18MB4381
-X-Proofpoint-ORIG-GUID: Z_N5ufNoJKy7V2w3F91nN3kPD5mu9mqG
-X-Proofpoint-GUID: Z_N5ufNoJKy7V2w3F91nN3kPD5mu9mqG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-13_07,2024-05-10_02,2023-05-22_02
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 10/15] net: stmmac: dwmac-loongson: Add full
+ PCI support
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+References: <cover.1714046812.git.siyanteng@loongson.cn>
+ <d3bad82c41964925f9284ccdd8ec07160cac5519.1714046812.git.siyanteng@loongson.cn>
+ <rvz3ebfbxuz4fq34epujowab5tyf4o2uhvrcc2bqzla6odxfnl@aqypyjpr6awj>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <rvz3ebfbxuz4fq34epujowab5tyf4o2uhvrcc2bqzla6odxfnl@aqypyjpr6awj>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8CxTN5S8EFm5tccAA--.52109S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3JFyrKw15tr13uF15Ary7Jwc_yoWfGFWkp3
+	yfCasxKrZ7Xry2gw4kXrWUXFyYvrWYy34jkw42ka4xKa90vr1SqFy8KFWUCr97ArWkCw42
+	vw1jgr4kWFyqkFgCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
+	xGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+	JVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+	vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+	x2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26F4j6r4UJwCI42IY6I8E87Iv6xkF7I0E
+	14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU8oGQDUUUUU==
+
+
+在 2024/5/5 04:46, Serge Semin 写道:
+>> [PATCH net-next v12 10/15] net: stmmac: dwmac-loongson: Add full PCI support
+> I would have changed the subject to:
+>
+> net: stmmac: dwmac-loongson: Add DT-less GMAC PCI-device support
+OK.
+>
+> On Thu, Apr 25, 2024 at 09:10:35PM +0800, Yanteng Si wrote:
+>> Current dwmac-loongson only support LS2K in the "probed with PCI and
+>> configured with DT" manner. Add LS7A support on which the devices are
+>> fully PCI (non-DT).
+>>
+>> Others:
+>> LS2K is a SoC and LS7A is a bridge chip.
+> The text seems like misleading or just wrong. I see both of these
+> platforms having the GMAC defined in the DT source:
+>
+> arch/mips/boot/dts/loongson/loongson64-2k1000.dtsi
+> arch/mips/boot/dts/loongson/ls7a-pch.dtsi
+>
+> What do I miss in your description?
+You are right.
+>
+> If nothing has been missed and it's just wrong I suggest to convert
+> the commit log to something like this:
+>
+> "The Loongson GMAC driver currently supports the network controllers
+> installed on the LS2K1000 SoC and LS7A1000 chipset, for which the GMAC
+> devices are required to be defined in the platform device tree source.
+> Let's extend the driver functionality with the case of having the
+> Loongson GMAC probed on the PCI bus with no device tree node defined
+> for it. That requires to make the device DT-node optional, to rely on
+> the IRQ line detected by the PCI core and to have the MDIO bus ID
+> calculated using the PCIe Domain+BDF numbers."
+
+OK, Thanks!
+
+>
+>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+>> ---
+>>   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 113 ++++++++++--------
+>>   1 file changed, 65 insertions(+), 48 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> index e989cb835340..1022bceaa680 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> @@ -11,8 +11,17 @@
+>>   
+>>   #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
+>>   
+>> -static void loongson_default_data(struct plat_stmmacenet_data *plat)
+>> +struct stmmac_pci_info {
+>> +	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
+>> +};
+> Please move this and the rest of the setup-callback introduction
+> change into a separate patch. It' subject could be something like
+> this:
+> net: stmmac: dwmac-loongson: Introduce PCI device info data
+OK.
+>
+>> +
+>> +static void loongson_default_data(struct pci_dev *pdev,
+>> +				  struct plat_stmmacenet_data *plat)
+>>   {
+>> +	/* Get bus_id, this can be overloaded later */
+> s/overloaded/overwritten
+OK
+>
+>> +	plat->bus_id = (pci_domain_nr(pdev->bus) << 16) |
+>> +			PCI_DEVID(pdev->bus->number, pdev->devfn);
+> Em, so you removed the code from the probe() function:
+> -     plat->bus_id = of_alias_get_id(np, "ethernet");
+> -     if (plat->bus_id < 0)
+> -             plat->bus_id = pci_dev_id(pdev);
+> and instead of using the pci_dev_id() method here just opencoded it'
+> content. Nice. Why not to use pci_dev_id() instead of PCI_DEVID()?
+OK, I will try it!
+>
+>> +
+>>   	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+>>   	plat->has_gmac = 1;
+>>   	plat->force_sf_dma_mode = 1;
+>> @@ -44,9 +53,10 @@ static void loongson_default_data(struct plat_stmmacenet_data *plat)
+>>   	plat->multicast_filter_bins = 256;
+>>   }
+>>   
+>> -static int loongson_gmac_data(struct plat_stmmacenet_data *plat)
+>> +static int loongson_gmac_data(struct pci_dev *pdev,
+>> +			      struct plat_stmmacenet_data *plat)
+>>   {
+>> -	loongson_default_data(plat);
+>> +	loongson_default_data(pdev, plat);
+>>   
+>>   	plat->mdio_bus_data->phy_mask = 0;
+>>   	plat->phy_interface = PHY_INTERFACE_MODE_RGMII_ID;
+>> @@ -54,20 +64,20 @@ static int loongson_gmac_data(struct plat_stmmacenet_data *plat)
+>>   	return 0;
+>>   }
+>>   
+>> +static struct stmmac_pci_info loongson_gmac_pci_info = {
+>> +	.setup = loongson_gmac_data,
+>> +};
+>> +
+> To the separate patch please.
+OK.
+>
+>>   static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>>   {
+>>   	struct plat_stmmacenet_data *plat;
+>> +	int ret, i, bus_id, phy_mode;
+>> +	struct stmmac_pci_info *info;
+>>   	struct stmmac_resources res;
+>>   	struct device_node *np;
+>> -	int ret, i, phy_mode;
+> You can drop the bus_id and phy_mode variables, and use ret in the
+> respective statements instead.
+OK, I will try it.
+>
+>>   
+>>   	np = dev_of_node(&pdev->dev);
+>>   
+>> -	if (!np) {
+>> -		pr_info("dwmac_loongson_pci: No OF node\n");
+>> -		return -ENODEV;
+>> -	}
+>> -
+>>   	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+>>   	if (!plat)
+>>   		return -ENOMEM;
+>> @@ -78,12 +88,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   	if (!plat->mdio_bus_data)
+>>   		return -ENOMEM;
+>>   
+>> -	plat->mdio_node = of_get_child_by_name(np, "mdio");
+>> -	if (plat->mdio_node) {
+>> -		dev_info(&pdev->dev, "Found MDIO subnode\n");
+>> -		plat->mdio_bus_data->needs_reset = true;
+>> -	}
+>> -
+>>   	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
+>>   	if (!plat->dma_cfg) {
+>>   		ret = -ENOMEM;
+>> @@ -107,46 +111,59 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   		break;
+>>   	}
+>>   
+>> -	plat->bus_id = of_alias_get_id(np, "ethernet");
+>> -	if (plat->bus_id < 0)
+>> -		plat->bus_id = pci_dev_id(pdev);
+>> +	pci_set_master(pdev);
+>>   
+>> -	phy_mode = device_get_phy_mode(&pdev->dev);
+>> -	if (phy_mode < 0) {
+>> -		dev_err(&pdev->dev, "phy_mode not found\n");
+>> -		ret = phy_mode;
+>> +	info = (struct stmmac_pci_info *)id->driver_data;
+>> +	ret = info->setup(pdev, plat);
+>> +	if (ret)
+>>   		goto err_disable_device;
+> To the separate patch please.
+OK.
+>
+>> -	}
+>>   
+>> -	plat->phy_interface = phy_mode;
+>> -
+>> -	pci_set_master(pdev);
+>> +	if (np) {
+>> +		plat->mdio_node = of_get_child_by_name(np, "mdio");
+>> +		if (plat->mdio_node) {
+>> +			dev_info(&pdev->dev, "Found MDIO subnode\n");
+>> +			plat->mdio_bus_data->needs_reset = true;
+>> +		}
+>> +
+>> +		bus_id = of_alias_get_id(np, "ethernet");
+>> +		if (bus_id >= 0)
+>> +			plat->bus_id = bus_id;
+> 		ret = of_alias_get_id(np, "ethernet");
+> 		if (ret >= 0)
+> 			plat->bus_id = ret;
+>
+>> +
+>> +		phy_mode = device_get_phy_mode(&pdev->dev);
+>> +		if (phy_mode < 0) {
+>> +			dev_err(&pdev->dev, "phy_mode not found\n");
+>> +			ret = phy_mode;
+>> +			goto err_disable_device;
+>> +		}
+>> +		plat->phy_interface = phy_mode;
+> 		ret = device_get_phy_mode(&pdev->dev);
+> 		if (ret < 0) {
+> 			dev_err(&pdev->dev, "phy_mode not found\n");
+> 			goto err_disable_device;
+> 		}
+> 		
+> 		plat->phy_interface = ret;
+>
+> * note empty line between the if-clause and the last statement.
+OK.
+>
+>> +
+>> +		res.irq = of_irq_get_byname(np, "macirq");
+>> +		if (res.irq < 0) {
+>> +			dev_err(&pdev->dev, "IRQ macirq not found\n");
+>> +			ret = -ENODEV;
+>> +			goto err_disable_msi;
+>> +		}
+>> +
+>> +		res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+>> +		if (res.wol_irq < 0) {
+>> +			dev_info(&pdev->dev, "IRQ eth_wake_irq not found, using macirq\n");
+>> +			res.wol_irq = res.irq;
+>> +		}
+>> +
+>> +		res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
+>> +		if (res.lpi_irq < 0) {
+>> +			dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+>> +			ret = -ENODEV;
+>> +			goto err_disable_msi;
+>> +		}
+>> +	} else {
+>> +		res.irq = pdev->irq;
+>> +	}
+>>   
+>> -	loongson_gmac_data(plat);
+> To the separate patch please.
+OK.
+>
+>>   	pci_enable_msi(pdev);
+>>   	memset(&res, 0, sizeof(res));
+>>   	res.addr = pcim_iomap_table(pdev)[0];
+>>   
+>> -	res.irq = of_irq_get_byname(np, "macirq");
+>> -	if (res.irq < 0) {
+>> -		dev_err(&pdev->dev, "IRQ macirq not found\n");
+>> -		ret = -ENODEV;
+>> -		goto err_disable_msi;
+>> -	}
+>> -
+>> -	res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+>> -	if (res.wol_irq < 0) {
+>> -		dev_info(&pdev->dev, "IRQ eth_wake_irq not found, using macirq\n");
+>> -		res.wol_irq = res.irq;
+>> -	}
+>> -
+>> -	res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
+>> -	if (res.lpi_irq < 0) {
+>> -		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+>> -		ret = -ENODEV;
+>> -		goto err_disable_msi;
+>> -	}
+>> -
+>>   	plat->tx_queues_to_use = 1;
+>>   	plat->rx_queues_to_use = 1;
+>>   
+>> @@ -224,7 +241,7 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
+>>   			 loongson_dwmac_resume);
+>>   
+>>   static const struct pci_device_id loongson_dwmac_id_table[] = {
+>> -	{ PCI_DEVICE_DATA(LOONGSON, GMAC, NULL) },
+>> +	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+> To the separate patch please.
+OK.
 
 
 
-> -----Original Message-----
-> From: Simon Horman <horms@kernel.org>
-> Sent: Saturday, May 11, 2024 7:41 PM
-> To: Geethasowjanya Akula <gakula@marvell.com>
-> Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; kuba@kernel.org=
-;
-> davem@davemloft.net; pabeni@redhat.com; edumazet@google.com; Sunil
-> Kovvuri Goutham <sgoutham@marvell.com>; Subbaraya Sundeep Bhatta
-> <sbhatta@marvell.com>; Hariprasad Kelam <hkelam@marvell.com>
-> Subject: [EXTERNAL] Re: [net-next PATCH v4 03/10] octeontx2-pf: Create
-> representor netdev
->=20
-> ----------------------------------------------------------------------
-> On Tue, May 07, 2024 at 10:09:14PM +0530, Geetha sowjanya wrote:
-> > Adds initial devlink support to set/get the switchdev mode.
-> > Representor netdevs are created for each rvu devices when the switch
-> > mode is set to 'switchdev'. These netdevs are be used to control and
-> > configure VFs.
-> >
-> > Signed-off-by: Geetha sowjanya <gakula@marvell.com>
->=20
-> ...
->=20
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-> > b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-> > index 33ebbcb223e1..ff4318f414f8 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-> > @@ -28,6 +28,157 @@ MODULE_DESCRIPTION(DRV_STRING);
-> > MODULE_LICENSE("GPL");  MODULE_DEVICE_TABLE(pci, rvu_rep_id_table);
-> >
-> > +static int rvu_rep_napi_init(struct otx2_nic *priv, struct
-> > +netlink_ext_ack *extack) {
-> > +	struct otx2_cq_poll *cq_poll =3D NULL;
-> > +	struct otx2_qset *qset =3D &priv->qset;
-> > +	struct otx2_hw *hw =3D &priv->hw;
-> > +	int err =3D 0, qidx, vec;
-> > +	char *irq_name;
->=20
-> Please consider using reverse xmas tree - longest line to shortest - for =
-local
-> variable declarations in new Networking code.
-Will fix it in next version.
->=20
-> This tool can be helpful: https://urldefense.proofpoint.com/v2/url?u=3Dht=
-tps-
-> 3A__github.com_ecree-
-> 2Dsolarflare_xmastree&d=3DDwIBAg&c=3DnKjWec2b6R0mOyPaz7xtfQ&r=3DUiEt_nU
-> eYFctu7JVLXVlXDhTmq_EAfooaZEYInfGuEQ&m=3DMq4aRWpUpar1zTktQDlrt8Jl6
-> 8BXQjkee8RpXExMCFcKMalirC_mVOYEGA0fcuSf&s=3DKg1fSyZvUeZAO0TSWVB5
-> A1GPqngBfG82Tx1Dz46ZH8c&e=3D
->=20
-> ...
->=20
-> > +int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack
-> > +*extack) {
-> > +	int rep_cnt =3D priv->rep_cnt;
-> > +	struct net_device *ndev;
-> > +	struct rep_dev *rep;
-> > +	int rep_id, err;
-> > +	u16 pcifunc;
-> > +
-> > +	priv->reps =3D devm_kcalloc(priv->dev, rep_cnt, sizeof(struct rep_dev=
- *),
-> > +				  GFP_KERNEL);
-> > +	if (!priv->reps)
-> > +		return -ENOMEM;
-> > +
-> > +	for (rep_id =3D 0; rep_id < rep_cnt; rep_id++) {
-> > +		ndev =3D alloc_etherdev(sizeof(*rep));
-> > +		if (!ndev) {
-> > +			NL_SET_ERR_MSG_FMT_MOD(extack, "PFVF
-> representor:%d
-> > +					       creation failed", rep_id);
->=20
-> gcc-13 seems unhappy with a string spanning multiple lines.
-> I suggest living with a line longer than 80 columns in this case.
-> Maybe:
->=20
-> 			NL_SET_ERR_MSG_FMT_MOD(extack,
-> 					       "PFVF representor:%d creation
-> failed",
-> 					       rep_id);
->=20
-> > +			err =3D -ENOMEM;
-> > +			goto exit;
-> > +		}
->=20
-Thanks for the feedback. Will submit next version with the suggested change=
-s.
-> ...
+Thanks,
+
+Yanteng
+
 
