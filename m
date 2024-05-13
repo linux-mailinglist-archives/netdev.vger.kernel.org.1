@@ -1,135 +1,218 @@
-Return-Path: <netdev+bounces-95867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B71218C3B32
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 08:13:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA54A8C3B45
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 08:27:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D3681F21126
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 06:13:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FFEB1C20EC8
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 06:27:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 095BE146595;
-	Mon, 13 May 2024 06:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D7914659C;
+	Mon, 13 May 2024 06:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="o8JGHN8d"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ayQV59t3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59354C81
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 06:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD6D4C81;
+	Mon, 13 May 2024 06:27:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715580785; cv=none; b=KvGbwpgfRI3hNptRd26le/8Eb2fjt/IVqBJSkG4f2ONUdIQF0S2/mIfNs81nQGw7PLh0nLgJfa2icMAmRwxm6YRxyPfkWuoPqhiI7AKD/QKee+0oFhnYlFpDVFsD8ihg8cKsCgSbD7V3BE0qma49CFiAbZvLeYplyndRqAp5iF0=
+	t=1715581636; cv=none; b=JhB1tHetnls8jM4rezDLG6zt8qJ9r+Z5qzDMdLEqkuqf4wZT0K7dIaXZANKCFetIze8H5JdPio22fwzIwywy5bxexv6ELCKVogRH4Duye7n5dgmPee4HHu8V04C/2SVznV2fhDIDJKmyz5sD/TbCy0QDPLsxHhUT7zk2bRkNXSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715580785; c=relaxed/simple;
-	bh=ZpBSWgX7S3Vy0VaKDHHUVKTqEODFQeRl/aOmN4v2thI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YdoKLqtWGDeRu+fslgcDjjzUweTByv7qjs0ZBZ50ca2ffLLQaRsWFNQrRfUpcMv8lJ5A+xQvbLjRwnDNSPPplLm9bw41MJd5L8YUvWLTNhU+AHai4MmEFiefv8lH8ufMV82zfMdhReyMXbjJ8/bDLoiHI6REm9yOYWhyY9/YVZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=o8JGHN8d; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1715580784; x=1747116784;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=M6IccWyDz3BZ1i/emZwgxcgG+H1i2MIrz6b8w1Bbfxk=;
-  b=o8JGHN8dKNSsCpK/sJ6hW4ubqSNOsG+csh+zTV/IMmxIi7M+0TxWZw/M
-   +OaXTlqS1DxNzZjgzSEk0tLDxfdg/eDoQtqfpE4kZYhV3P9RMfsuW85fZ
-   GF0cFeGjf/iWflODAgp5j62K8i5rRx7NZRtHjQSPUEa4ZtSUs07a7Dsdc
-   A=;
-X-IronPort-AV: E=Sophos;i="6.08,157,1712620800"; 
-   d="scan'208";a="400728316"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 06:13:00 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:11983]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.40:2525] with esmtp (Farcaster)
- id 26b96598-34df-4419-82f9-bcf00d0a24f3; Mon, 13 May 2024 06:13:00 +0000 (UTC)
-X-Farcaster-Flow-ID: 26b96598-34df-4419-82f9-bcf00d0a24f3
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 13 May 2024 06:12:59 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.118.251.117) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Mon, 13 May 2024 06:12:55 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <mhal@rbox.co>
-CC: <billy@starlabs.sg>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v2 net] af_unix: Update unix_sk(sk)->oob_skb under sk_receive_queue lock.
-Date: Mon, 13 May 2024 15:12:44 +0900
-Message-ID: <20240513061244.12229-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <5670c1c4-985d-4e87-9732-ad1cc59bc8db@rbox.co>
-References: <5670c1c4-985d-4e87-9732-ad1cc59bc8db@rbox.co>
+	s=arc-20240116; t=1715581636; c=relaxed/simple;
+	bh=UJ8u1P/0powQExzTZ7qC5TrAfTmjb24w0U2OTkahp8w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=aFfX152/2Wf3qFX3nsWMdAWyC044naUqXENxkgl9UmFO0Xd6HlnQh4ZJjD+bIntGOQR2tgXCnQPoX+vyiacusIU5rjoSyAWhwlGGvSLQ4Ju37bDSYWYiQwvil2fY7I3/gxXrJP7Fh0pE79Hxu+GFIp0/XrTbsqt/6KoPnstn7bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ayQV59t3; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44D6QPtI036976;
+	Mon, 13 May 2024 01:26:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1715581585;
+	bh=e74PeFwbuX5U2n4ShRWkGGibNdGSScWO2TR29iGBNQs=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=ayQV59t3BgELYDJR0Zz3Cvi3RHrU6wi/hoSbemuIMPHZ9RfZ8DOpXISo7EAT8HZoY
+	 PyTS9CcBpzT/Rxvw22i/uOM0QcvFSj54z2vBjfZsJxlodacp+0lvpx6oizqaS2DKqd
+	 Z795cXcOQSQiCoud53kqj+bH9L5G1AwBVUiwVJsQ=
+Received: from DFLE109.ent.ti.com (dfle109.ent.ti.com [10.64.6.30])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44D6QPXo011521
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 13 May 2024 01:26:25 -0500
+Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 13
+ May 2024 01:26:24 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 13 May 2024 01:26:24 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44D6QH63026776;
+	Mon, 13 May 2024 01:26:18 -0500
+Message-ID: <55eeec88-63ea-4838-865a-17493dfb847d@ti.com>
+Date: Mon, 13 May 2024 11:56:17 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB004.ant.amazon.com (10.13.138.84) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5] net: ti: icssg_prueth: add TAPRIO offload
+ support
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, Dan Carpenter <dan.carpenter@linaro.org>,
+        Andrew Lunn <andrew@lunn.ch>, Jan Kiszka <jan.kiszka@siemens.com>,
+        Simon
+ Horman <horms@kernel.org>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Randy
+ Dunlap <rdunlap@infradead.org>,
+        Diogo Ivo <diogo.ivo@siemens.com>,
+        Wolfram
+ Sang <wsa+renesas@sang-engineering.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>,
+        Roger
+ Quadros <rogerq@ti.com>,
+        Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>
+References: <20240429103022.808161-1-danishanwar@ti.com>
+ <74be4e2e25644e0b65ac1894ccb9c2d0971bb643.camel@redhat.com>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <74be4e2e25644e0b65ac1894ccb9c2d0971bb643.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-From: Michal Luczaj <mhal@rbox.co>
-Date: Sun, 12 May 2024 16:47:11 +0200
-> On 5/10/24 11:39, Kuniyuki Iwashima wrote:
-> > @@ -2655,6 +2661,8 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
-> >  		consume_skb(skb);
-> >  		skb = NULL;
-> >  	} else {
-> > +		spin_lock(&sk->sk_receive_queue.lock);
-> > +
-> >  		if (skb == u->oob_skb) {
-> >  			if (copied) {
-> >  				skb = NULL;
-> > @@ -2666,13 +2674,15 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
-> >  			} else if (flags & MSG_PEEK) {
-> >  				skb = NULL;
-> >  			} else {
-> > -				skb_unlink(skb, &sk->sk_receive_queue);
-> > +				__skb_unlink(skb, &sk->sk_receive_queue);
-> >  				WRITE_ONCE(u->oob_skb, NULL);
-> >  				if (!WARN_ON_ONCE(skb_unref(skb)))
-> >  					kfree_skb(skb);
-> >  				skb = skb_peek(&sk->sk_receive_queue);
-> >  			}
-> >  		}
-> > +
-> > +		spin_unlock(&sk->sk_receive_queue.lock);
-> >  	}
-> >  	return skb;
-> >  }
+Hi Paolo,
+
+On 02/05/24 5:29 pm, Paolo Abeni wrote:
+> On Mon, 2024-04-29 at 16:00 +0530, MD Danish Anwar wrote:
+>> +static int emac_taprio_replace(struct net_device *ndev,
+>> +			       struct tc_taprio_qopt_offload *taprio)
+>> +{
+>> +	struct prueth_emac *emac = netdev_priv(ndev);
+>> +	struct tc_taprio_qopt_offload *est_new;
+>> +	int ret;
+>> +
+>> +	if (taprio->cycle_time_extension) {
+>> +		NL_SET_ERR_MSG_MOD(taprio->extack, "Cycle time extension not supported");
+>> +		return -EOPNOTSUPP;
+>> +	}
+>> +
+>> +	if (taprio->cycle_time < TAS_MIN_CYCLE_TIME) {
+>> +		NL_SET_ERR_MSG_FMT_MOD(taprio->extack, "cycle_time %llu is less than min supported cycle_time %d",
+>> +				       taprio->cycle_time, TAS_MIN_CYCLE_TIME);
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	if (taprio->num_entries > TAS_MAX_CMD_LISTS) {
+>> +		NL_SET_ERR_MSG_FMT_MOD(taprio->extack, "num_entries %lu is more than max supported entries %d",
+>> +				       taprio->num_entries, TAS_MAX_CMD_LISTS);
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	if (emac->qos.tas.taprio_admin)
+>> +		devm_kfree(&ndev->dev, emac->qos.tas.taprio_admin);
 > 
-> Now it is
->   
->   spin_lock(&sk->sk_receive_queue.lock)
->   kfree_skb
-
-This does not free skb actually and just drops a refcount by skb_get()
-in queue_oob().
-
-
->     unix_destruct_scm
-
-So, here we don't reach unix_destruct_scm().
-
-That's why I changed kfree_skb() to skb_unref() in __unix_gc().
-
-Thanks!
-
-
->       unix_notinflight
->         spin_lock(&unix_gc_lock)
+> it looks like 'qos.tas.taprio_admin' is initialized from
+> taprio_offload_get(), so it should be free with taprio_offload_free(),
+> right?
 > 
-> I.e. sk_receive_queue.lock -> unix_gc_lock, inversion of what unix_gc() does.
-> But that's benign, right?
+
+'qos.tas.taprio_admin' is assigned by "emac->qos.tas.taprio_admin =
+taprio_offload_get(taprio);". Here I will free it with taprio_offload_free()
+
+>> +
+>> +	est_new = devm_kzalloc(&ndev->dev,
+>> +			       struct_size(est_new, entries, taprio->num_entries),
+>> +			       GFP_KERNEL);
+>> +	if (!est_new)
+>> +		return -ENOMEM;
+> 
+> Why are you allocating 'est_new'? it looks like it's not used
+> anywhere?!? 
+> 
+
+Sorry my bad. Forgot to remove est_new. I will remove it.
+
+>> +
+>> +	emac->qos.tas.taprio_admin = taprio_offload_get(taprio);
+>> +	ret = tas_update_oper_list(emac);
+>> +	if (ret)
+>> +		return ret;
+> 
+> Should the above clear 'taprio_admin' on error, as well? 
+> 
+
+Yes here also we should clear taprio_admin and taprio on error. I will
+add a goto label and clear taprio on both errors.
+
+Below is the diff to address handling of taprio and taprio_admin.
+
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.c
+b/drivers/net/ethernet/ti/icssg/icssg_qos.c
+index 459463ea6c20..c7cadab0edec 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_qos.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_qos.c
+@@ -210,7 +210,7 @@ static int emac_taprio_replace(struct net_device *ndev,
+ 	}
+
+ 	if (emac->qos.tas.taprio_admin)
+-		devm_kfree(&ndev->dev, emac->qos.tas.taprio_admin);
++		taprio_offload_free(emac->qos.tas.taprio_admin);
+
+ 	est_new = devm_kzalloc(&ndev->dev,
+ 			       struct_size(est_new, entries, taprio->num_entries),
+@@ -221,13 +221,15 @@ static int emac_taprio_replace(struct net_device
+*ndev,
+ 	emac->qos.tas.taprio_admin = taprio_offload_get(taprio);
+ 	ret = tas_update_oper_list(emac);
+ 	if (ret)
+-		return ret;
++		goto clear_taprio;
+
+ 	ret = tas_set_state(emac, TAS_STATE_ENABLE);
+-	if (ret) {
+-		emac->qos.tas.taprio_admin = NULL;
+-		taprio_offload_free(taprio);
+-	}
++	if (ret)
++		goto clear_taprio;
++
++clear_taprio:
++	emac->qos.tas.taprio_admin = NULL;
++	taprio_offload_free(taprio);
+
+ 	return ret;
+ }
+
+Please have a look and let me know if this looks ok to you.
+
+
+>>
+> Thanks,
+> 
+> Paolo
+> 
+
+-- 
+Thanks and Regards,
+Danish
 
