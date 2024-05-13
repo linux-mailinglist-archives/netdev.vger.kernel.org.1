@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-95861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B3D78C3B0E
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 07:47:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C476F8C3B10
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 07:48:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 327D4281555
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 05:47:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B7782815F0
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 05:48:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50103146D79;
-	Mon, 13 May 2024 05:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C08801474C5;
+	Mon, 13 May 2024 05:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="V+V4IxZr"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="E3hEufRd"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AA9146D4E;
-	Mon, 13 May 2024 05:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E651465A6;
+	Mon, 13 May 2024 05:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715579220; cv=none; b=IFleXOBcsn6NR10ds4Xj/W6cHr9CeoZPya0UWlmdiAZNj6gMiQJje8FS1pOjWzdp2o/xtKkkopqRg3J5XynzU5oQSFp3fYnlij2Sg+i++7bELrWQnUX3Hd2RcXOoIOtAOmT7+7ntv76ayqVJSKS3a0UjCdWKPDVNIpt6TWj6RWY=
+	t=1715579223; cv=none; b=CnuDYL9gltvnm2AOFBgar1spnroM460RH8XHvqke/6cEHSFOZV9YIC7PQVHZstliIkQPfUsKHMdp7nJi3t2T2Wo9CSXRZKEt3SXbzerXVQu7moR5WlN010Vqf7kz2aS838kjm468nzWSe/41u6aQlxBJuRG4NeJznIWLE6OLxX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715579220; c=relaxed/simple;
-	bh=yccS83eQrgIRQpXxePuKivGMyj3jz+zBokfRB4ccVmI=;
+	s=arc-20240116; t=1715579223; c=relaxed/simple;
+	bh=ZvvbsE3Ps3u6dRB+s63zEIfloyzLm8bUm5nkqCtL1G8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tx6E+OBp+p3I8KZsIaMdMuyJ9cbHK36mkGZkKFR7vipEFGMCJfsN0TLaRENEVT6uL8T8j4pn6RTaQpST9ESAQbn6ptyMtYQlnByO23ZehSwZgySq9Mxo8Z/bKzd46tYgta4fKDOuirnzKDIkZBA/A9SaKX/jdXjvn1GrKRDUwY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=V+V4IxZr; arc=none smtp.client-ip=67.231.156.173
+	 MIME-Version:Content-Type; b=fubEHAHRFSsWsukTnZo9EbOxfvWcM55z4LILV778UD0d1Wde7oxh6B5CgBYZT6bPioiWiZy+Y3mXyzt+PneAI17exwpzX1dRsVA6Y8esbyahoDBMDZQCu85fhcdNky/OiFuvNO6TTADpXKi0tz60jy0B/hSITE/5mn/w2d9uFDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=E3hEufRd; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44CNUTC4015860;
-	Sun, 12 May 2024 22:46:51 -0700
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44CLjKqF018797;
+	Sun, 12 May 2024 22:46:55 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:content-type; s=
-	pfpt0220; bh=ZklP2bPa1AsEY7Yx7Y7XQor1WEp3K6KZkzp3Etp6lL4=; b=V+V
-	4IxZrS+3TMr9Ymg7oHEtC59Ih6YtcB4OuWvNoE2KYQGaJgzbTvCcsrnoXJ8GaAOu
-	K9P0+m+mJ3/0hWZv8NUgXVEUA+zRPIzXoyU9gRjLB4wi2QKoJ7zYHs2uVjMDSdKA
-	4YpD5OhTJ2T4nelmXwQb08R6Ng3Sbb3kejYJ2G2SZyRH9zOrDaZwq/ndA4s0XKUa
-	CXBpF71Sx3nBMuMBp0m8CLJ7aP3FAdhpznEAYF+ISXgV9a1ZOY/mSkG5w8N0aDKT
-	SX56HdT0d5OpDyYDW+EKOaG1I+94yKJMhPW0OT/c0VpAQIPH9BVZOu0RJreFOvl/
-	3Nag6bPtnijuNlJ3ZVA==
+	pfpt0220; bh=z8MiNGLM0cgSrru9dlnnvbuIL6BXJO3+OEeJbyuxJnw=; b=E3h
+	EufRdb2B0TAd6Ve32mrqNd+s+FXZpnZC8Wil+5FNgepsXYRlkiDq95QRbCEAP7Up
+	le9U3pZGbujqxv1cgUHFNHkIcIKrxQaO2m7/LhlaYXcIxQDVZpZceTCgdoSdamah
+	vLzgt6JZVtNRC/lyOYj2mnCNvHJKC3YmMKFpRfemNdPLn2bC/JSXPWtIjvsKhbOu
+	qqG8kXhOli61lG8DM2ttTx91utZGXlKY9Mekx63xmOKtl1O6gISYHmgcL5TQVd4L
+	pwbelcfytx2v12dGP0ntuKkKG+y5LNz3SlFihSEV/fR/sgadEDTjvaJXjoLiI6UB
+	V2X5Ls5i9LkFimTWUZw==
 Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3y286jb8na-1
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3y286jb8nt-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 12 May 2024 22:46:51 -0700 (PDT)
+	Sun, 12 May 2024 22:46:55 -0700 (PDT)
 Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
  DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Sun, 12 May 2024 22:46:49 -0700
+ 15.2.1544.4; Sun, 12 May 2024 22:46:53 -0700
 Received: from bharat-OptiPlex-3070.marvell.com (10.69.176.80) by
  DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server id
- 15.2.1544.4 via Frontend Transport; Sun, 12 May 2024 22:46:46 -0700
+ 15.2.1544.4 via Frontend Transport; Sun, 12 May 2024 22:46:50 -0700
 From: Bharat Bhushan <bbhushan2@marvell.com>
 To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
         <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>
 CC: Bharat Bhushan <bbhushan2@marvell.com>
-Subject: [PATCH 5/8] cn10k-ipsec: Add SA add/delete support for outb inline ipsec
-Date: Mon, 13 May 2024 11:16:20 +0530
-Message-ID: <20240513054623.270366-6-bbhushan2@marvell.com>
+Subject: [PATCH 6/8] cn10k-ipsec: Process inline ipsec transmit offload
+Date: Mon, 13 May 2024 11:16:21 +0530
+Message-ID: <20240513054623.270366-7-bbhushan2@marvell.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240513054623.270366-1-bbhushan2@marvell.com>
 References: <20240513054623.270366-1-bbhushan2@marvell.com>
@@ -75,639 +75,521 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-GUID: aN0220KaAxCjp3ZDDc_SjJQUWw9tWKTM
-X-Proofpoint-ORIG-GUID: aN0220KaAxCjp3ZDDc_SjJQUWw9tWKTM
+X-Proofpoint-GUID: mZA_JFqej_Co7WmuQO2pot9KvLlN6h8P
+X-Proofpoint-ORIG-GUID: mZA_JFqej_Co7WmuQO2pot9KvLlN6h8P
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
  definitions=2024-05-13_04,2024-05-10_02,2023-05-22_02
 
-This patch adds support to add and delete Security Association
-(SA) xfrm ops. Hardware maintains SA context in memory allocated
-by software. Each SA context is 128 byte aligned and size of
-each context is multiple of 128-byte. Add support for transport
-and tunnel ipsec mode, ESP protocol, aead aes-gcm-icv16, key size
-128/192/256-bits with 32bit salt.
+Prepare and submit crypto hardware (CPT) instruction for
+outbound inline ipsec crypto mode offload. The CPT instruction
+have authentication offset, IV offset and encapsulation offset
+in input packet. Also provide SA context pointer which have
+details about algo, keys, salt etc. Crypto hardware encrypt,
+authenticate and provide the ESP packet to networking hardware.
 
 Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
 ---
- .../marvell/octeontx2/nic/cn10k_ipsec.c       | 433 +++++++++++++++++-
- .../marvell/octeontx2/nic/cn10k_ipsec.h       | 114 +++++
- 2 files changed, 546 insertions(+), 1 deletion(-)
+ .../marvell/octeontx2/nic/cn10k_ipsec.c       | 224 ++++++++++++++++++
+ .../marvell/octeontx2/nic/cn10k_ipsec.h       |  40 ++++
+ .../marvell/octeontx2/nic/otx2_common.c       |  23 ++
+ .../marvell/octeontx2/nic/otx2_common.h       |   3 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   2 +
+ .../marvell/octeontx2/nic/otx2_txrx.c         |  33 ++-
+ .../marvell/octeontx2/nic/otx2_txrx.h         |   3 +
+ 7 files changed, 325 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-index c6e115ab39df..db544dac0424 100644
+index db544dac0424..98a200879b3b 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
-@@ -153,7 +153,7 @@ static inline void cn10k_outb_cptlf_iq_disable(struct otx2_nic *pf)
+@@ -7,8 +7,11 @@
+ #include <net/xfrm.h>
+ #include <linux/netdevice.h>
+ #include <linux/bitfield.h>
++#include <crypto/aead.h>
++#include <crypto/gcm.h>
  
- 		usleep_range(10000, 20000);
- 		if (timeout-- < 0) {
--			dev_err(pf->dev, "Error CPT LF is still busy\n");
-+			netdev_err(pf->netdev, "Timeout to empty IQ\n");
- 			break;
- 		}
- 	} while (1);
-@@ -336,6 +336,12 @@ static int cn10k_outb_cpt_clean(struct otx2_nic *pf)
- 	/* Set inline ipsec disabled for this device */
- 	pf->flags &= ~OTX2_FLAG_INLINE_IPSEC_ENABLED;
+ #include "otx2_common.h"
++#include "otx2_struct.h"
+ #include "cn10k_ipsec.h"
  
-+	if (!bitmap_empty(pf->ipsec.sa_bitmap, CN10K_IPSEC_OUTB_MAX_SA)) {
-+		netdev_err(pf->netdev, "SA installed on this device\n");
-+		mutex_unlock(&pf->ipsec.lock);
-+		return -EBUSY;
-+	}
-+
- 	/* Disable CPTLF Instruction Queue (IQ) */
- 	cn10k_outb_cptlf_iq_disable(pf);
- 
-@@ -356,6 +362,414 @@ static int cn10k_outb_cpt_clean(struct otx2_nic *pf)
- 	return err;
+ static bool is_dev_support_inline_ipsec(struct pci_dev *pdev)
+@@ -820,3 +823,224 @@ void cn10k_ipsec_clean(struct otx2_nic *pf)
+ 	qmem_free(pf->dev, pf->ipsec.outb_sa);
+ 	cn10k_outb_cpt_clean(pf);
  }
- 
-+static int cn10k_outb_get_sa_index(struct otx2_nic *pf,
-+				   struct cn10k_tx_sa_s *sa_entry)
++
++static u16 cn10k_ipsec_get_ip_data_len(struct xfrm_state *x,
++				       struct sk_buff *skb)
 +{
-+	u32 sa_size = pf->ipsec.sa_size;
-+	u32 sa_index;
++	struct ipv6hdr *ipv6h;
++	struct iphdr *iph;
++	u8 *src;
 +
-+	if (!sa_entry || ((void *)sa_entry < pf->ipsec.outb_sa->base))
-+		return -EINVAL;
++	src = (u8 *)skb->data + ETH_HLEN;
 +
-+	sa_index = ((void *)sa_entry - pf->ipsec.outb_sa->base) / sa_size;
-+	if (sa_index >= CN10K_IPSEC_OUTB_MAX_SA)
-+		return -EINVAL;
-+
-+	return sa_index;
-+}
-+
-+static dma_addr_t cn10k_outb_get_sa_iova(struct otx2_nic *pf,
-+					 struct cn10k_tx_sa_s *sa_entry)
-+{
-+	u32 sa_index = cn10k_outb_get_sa_index(pf, sa_entry);
-+
-+	if (sa_index < 0)
-+		return 0;
-+	return pf->ipsec.outb_sa->iova + sa_index * pf->ipsec.sa_size;
-+}
-+
-+static struct cn10k_tx_sa_s *cn10k_outb_alloc_sa(struct otx2_nic *pf)
-+{
-+	u32 sa_size = pf->ipsec.sa_size;
-+	struct cn10k_tx_sa_s *sa_entry;
-+	u32 sa_index;
-+
-+	sa_index = find_first_zero_bit(pf->ipsec.sa_bitmap,
-+				       CN10K_IPSEC_OUTB_MAX_SA);
-+	if (sa_index == CN10K_IPSEC_OUTB_MAX_SA)
-+		return NULL;
-+
-+	set_bit(sa_index, pf->ipsec.sa_bitmap);
-+
-+	sa_entry = pf->ipsec.outb_sa->base + sa_index * sa_size;
-+	return sa_entry;
-+}
-+
-+static void cn10k_outb_free_sa(struct otx2_nic *pf,
-+			       struct cn10k_tx_sa_s *sa_entry)
-+{
-+	u32 sa_index = cn10k_outb_get_sa_index(pf, sa_entry);
-+
-+	if (sa_index < 0)
-+		return;
-+	clear_bit(sa_index, pf->ipsec.sa_bitmap);
-+}
-+
-+static void cn10k_cpt_inst_flush(struct otx2_nic *pf, struct cpt_inst_s *inst,
-+				 u64 size)
-+{
-+	struct otx2_lmt_info *lmt_info;
-+	u64 val = 0, tar_addr = 0;
-+
-+	lmt_info = per_cpu_ptr(pf->hw.lmt_info, smp_processor_id());
-+	/* FIXME: val[0:10] LMT_ID.
-+	 * [12:15] no of LMTST - 1 in the burst.
-+	 * [19:63] data size of each LMTST in the burst except first.
-+	 */
-+	val = (lmt_info->lmt_id & 0x7FF);
-+	/* Target address for LMTST flush tells HW how many 128bit
-+	 * words are present.
-+	 * tar_addr[6:4] size of first LMTST - 1 in units of 128b.
-+	 */
-+	tar_addr |= pf->ipsec.io_addr | (((size / 16) - 1) & 0x7) << 4;
-+	dma_wmb();
-+	memcpy((u64 *)lmt_info->lmt_addr, inst, size);
-+	cn10k_lmt_flush(val, tar_addr);
-+}
-+
-+static int cn10k_wait_for_cpt_respose(struct otx2_nic *pf,
-+				      struct cpt_res_s *res)
-+{
-+	unsigned long timeout = jiffies + msecs_to_jiffies(10000);
-+
-+	do {
-+		if (time_after(jiffies, timeout)) {
-+			netdev_err(pf->netdev, "CPT response timeout\n");
-+			return -EBUSY;
-+		}
-+	} while (res->compcode == CN10K_CPT_COMP_E_NOTDONE);
-+
-+	if (!(res->compcode == CN10K_CPT_COMP_E_GOOD ||
-+	      res->compcode == CN10K_CPT_COMP_E_WARN) || res->uc_compcode) {
-+		netdev_err(pf->netdev, "compcode=%x doneint=%x\n",
-+			   res->compcode, res->doneint);
-+		netdev_err(pf->netdev, "uc_compcode=%x uc_info=%llx esn=%llx\n",
-+			   res->uc_compcode, (u64)res->uc_info, res->esn);
++	if (x->props.family == AF_INET) {
++		iph = (struct iphdr *)src;
++		return ntohs(iph->tot_len);
 +	}
-+	return 0;
++
++	ipv6h = (struct ipv6hdr *)src;
++	return ntohs(ipv6h->payload_len) + sizeof(struct ipv6hdr);
 +}
 +
-+static int cn10k_outb_write_sa(struct otx2_nic *pf, struct cn10k_tx_sa_s *sa_cptr)
++/* Prepare CPT and NIX SQE scatter/gather subdescriptor structure.
++ * SG of NIX and CPT are same in size.
++ * Layout of a NIX SQE and CPT SG entry:
++ *      -----------------------------
++ *     |     CPT Scatter Gather      |
++ *     |       (SQE SIZE)            |
++ *     |                             |
++ *      -----------------------------
++ *     |       NIX SQE               |
++ *     |       (SQE SIZE)            |
++ *     |                             |
++ *      -----------------------------
++ */
++bool otx2_sqe_add_sg_ipsec(struct otx2_nic *pfvf, struct otx2_snd_queue *sq,
++			   struct sk_buff *skb, int num_segs, int *offset)
 +{
-+	dma_addr_t res_iova, dptr_iova, sa_iova;
-+	struct cn10k_tx_sa_s *sa_dptr;
++	struct cpt_sg_s *cpt_sg = NULL;
++	struct nix_sqe_sg_s *sg = NULL;
++	u64 dma_addr, *iova = NULL;
++	u64 *cpt_iova = NULL;
++	u16 *sg_lens = NULL;
++	int seg, len;
++
++	sq->sg[sq->head].num_segs = 0;
++	cpt_sg = (struct cpt_sg_s *)(sq->sqe_base - sq->sqe_size);
++
++	for (seg = 0; seg < num_segs; seg++) {
++		if ((seg % MAX_SEGS_PER_SG) == 0) {
++			sg = (struct nix_sqe_sg_s *)(sq->sqe_base + *offset);
++			sg->ld_type = NIX_SEND_LDTYPE_LDD;
++			sg->subdc = NIX_SUBDC_SG;
++			sg->segs = 0;
++			sg_lens = (void *)sg;
++			iova = (void *)sg + sizeof(*sg);
++			/* Next subdc always starts at a 16byte boundary.
++			 * So if sg->segs is whether 2 or 3, offset += 16bytes.
++			 */
++			if ((num_segs - seg) >= (MAX_SEGS_PER_SG - 1))
++				*offset += sizeof(*sg) + (3 * sizeof(u64));
++			else
++				*offset += sizeof(*sg) + sizeof(u64);
++
++			cpt_sg += (seg / MAX_SEGS_PER_SG) * 4;
++			cpt_iova = (void *)cpt_sg + sizeof(*cpt_sg);
++		}
++		dma_addr = otx2_dma_map_skb_frag(pfvf, skb, seg, &len);
++		if (dma_mapping_error(pfvf->dev, dma_addr))
++			return false;
++
++		sg_lens[seg % MAX_SEGS_PER_SG] = len;
++		sg->segs++;
++		*iova++ = dma_addr;
++		*cpt_iova++ = dma_addr;
++
++		/* Save DMA mapping info for later unmapping */
++		sq->sg[sq->head].dma_addr[seg] = dma_addr;
++		sq->sg[sq->head].size[seg] = len;
++		sq->sg[sq->head].num_segs++;
++
++		*cpt_sg = *(struct cpt_sg_s *)sg;
++		cpt_sg->rsvd_63_50 = 0;
++	}
++
++	sq->sg[sq->head].skb = (u64)skb;
++	return true;
++}
++
++static inline u16 cn10k_ipsec_get_param1(u8 iv_offset)
++{
++	u16 param1_val;
++
++	/* Set Crypto mode, disable L3/L4 checksum */
++	param1_val = CN10K_IPSEC_INST_PARAM1_CRYPTO_MODE |
++		      CN10K_IPSEC_INST_PARAM1_DIS_L4_CSUM |
++		      CN10K_IPSEC_INST_PARAM1_DIS_L3_CSUM;
++	param1_val |= (u16)iv_offset << CN10K_IPSEC_INST_PARAM1_IV_OFFSET_SHIFT;
++	return param1_val;
++}
++
++bool cn10k_ipsec_transmit(struct otx2_nic *pf, struct netdev_queue *txq,
++			  struct otx2_snd_queue *sq, struct sk_buff *skb,
++			  int num_segs, int size)
++{
++	struct cpt_ctx_info_s *sa_info;
 +	struct cpt_inst_s inst;
 +	struct cpt_res_s *res;
-+	u32 sa_size, off;
-+	u64 reg_val;
-+	int ret;
++	struct xfrm_state *x;
++	dma_addr_t dptr_iova;
++	struct sec_path *sp;
++	u8 encap_offset;
++	u8 auth_offset;
++	u8 gthr_size;
++	u8 iv_offset;
++	u16 dlen;
 +
-+	sa_iova = cn10k_outb_get_sa_iova(pf, sa_cptr);
-+	if (!sa_iova)
-+		return -EINVAL;
-+
-+	res = dma_alloc_coherent(pf->dev, sizeof(struct cpt_res_s),
-+				 &res_iova, GFP_ATOMIC);
-+	if (!res)
-+		return -ENOMEM;
-+
-+	sa_size = sizeof(struct cn10k_tx_sa_s);
-+	sa_dptr = dma_alloc_coherent(pf->dev, sa_size, &dptr_iova, GFP_ATOMIC);
-+	if (!sa_dptr) {
-+		dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res,
-+				  res_iova);
-+		return -ENOMEM;
++	/* Check for Inline IPSEC enabled */
++	if (!(pf->flags & OTX2_FLAG_INLINE_IPSEC_ENABLED)) {
++		netdev_err(pf->netdev, "Ipsec not enabled, drop packet\n");
++		goto drop;
 +	}
 +
-+	for (off = 0; off < (sa_size / 8); off++)
-+		*((u64 *)sa_dptr + off) = cpu_to_be64(*((u64 *)sa_cptr + off));
++	sp = skb_sec_path(skb);
++	if (unlikely(!sp->len)) {
++		netdev_err(pf->netdev, "%s: no xfrm state len = %d\n",
++			   __func__, sp->len);
++		goto drop;
++	}
++
++	x = xfrm_input_state(skb);
++	if (unlikely(!x)) {
++		netdev_err(pf->netdev, "no xfrm_input_state()\n");
++		goto drop;
++	}
++
++	if (x->props.mode != XFRM_MODE_TRANSPORT &&
++	    x->props.mode != XFRM_MODE_TUNNEL) {
++		netdev_err(pf->netdev, "un supported offload mode %d\n",
++			   x->props.mode);
++		goto drop;
++	}
++
++	dlen = cn10k_ipsec_get_ip_data_len(x, skb);
++	if (dlen == 0) {
++		netdev_err(pf->netdev, "Invalid IP header, ip-length zero\n");
++		goto drop;
++	}
++
++	/* Check for valid SA context */
++	sa_info = (struct cpt_ctx_info_s *)x->xso.offload_handle;
++	if (!sa_info || !sa_info->sa_iova) {
++		netdev_err(pf->netdev, "Invalid SA conext\n");
++		goto drop;
++	}
 +
 +	memset(&inst, 0, sizeof(struct cpt_inst_s));
 +
-+	res->compcode = CN10K_CPT_COMP_E_NOTDONE;
-+	inst.res_addr = res_iova;
-+	inst.dptr = (u64)dptr_iova;
-+	inst.param2 = sa_size >> 3;
-+	inst.dlen = sa_size;
-+	inst.opcode_major = CN10K_IPSEC_MAJOR_OP_WRITE_SA;
-+	inst.opcode_minor = CN10K_IPSEC_MINOR_OP_WRITE_SA;
-+	inst.cptr = sa_iova;
++	/* Get authentication offset */
++	if (x->props.family == AF_INET)
++		auth_offset = sizeof(struct iphdr);
++	else
++		auth_offset = sizeof(struct ipv6hdr);
++
++	/* IV offset is after ESP header */
++	iv_offset = auth_offset + sizeof(struct ip_esp_hdr);
++	/* Encap will start after IV */
++	encap_offset = iv_offset + GCM_RFC4106_IV_SIZE;
++
++	/* CPT Instruction word-1 */
++	res = (struct cpt_res_s *)(sq->cpt_resp->base + (64 * sq->head));
++	res->compcode = 0;
++	inst.res_addr = sq->cpt_resp->iova + (64 * sq->head);
++
++	/* CPT Instruction word-2 */
++	inst.rvu_pf_func = pf->pcifunc;
++
++	/* CPT Instruction word-3:
++	 * Set QORD to force CPT_RES_S write completion
++	 */
++	inst.qord = 1;
++
++	/* CPT Instruction word-4 */
++	inst.dlen = dlen + ETH_HLEN;
++	inst.opcode_major = CN10K_IPSEC_MAJOR_OP_OUTB_IPSEC;
++	inst.param1 = cn10k_ipsec_get_param1(iv_offset);
++
++	inst.param2 = encap_offset <<
++		       CN10K_IPSEC_INST_PARAM2_ENC_DATA_OFFSET_SHIFT;
++	inst.param2 |= (u16)auth_offset <<
++			CN10K_IPSEC_INST_PARAM2_AUTH_DATA_OFFSET_SHIFT;
++
++	/* CPT Instruction word-5 */
++	gthr_size = num_segs / MAX_SEGS_PER_SG;
++	gthr_size = (num_segs % MAX_SEGS_PER_SG) ? gthr_size + 1 : gthr_size;
++
++	gthr_size &= 0xF;
++	dptr_iova = (sq->sqe_ring->iova + (sq->head * (sq->sqe_size * 2)));
++	inst.dptr = dptr_iova | ((u64)gthr_size << 60);
++
++	/* CPT Instruction word-6 */
++	inst.rptr = inst.dptr;
++
++	/* CPT Instruction word-7 */
++	inst.cptr = sa_info->sa_iova;
 +	inst.ctx_val = 1;
 +	inst.egrp = CN10K_DEF_CPT_IPSEC_EGRP;
 +
++	/* CPT Instruction word-0 */
++	inst.nixtxl = (size / 16) - 1;
++	inst.dat_offset = ETH_HLEN;
++	inst.nixtx_offset = sq->sqe_size;
++
++	netdev_tx_sent_queue(txq, skb->len);
++
++	/* Finally Flush the CPT instruction */
++	sq->head++;
++	sq->head &= (sq->sqe_cnt - 1);
 +	cn10k_cpt_inst_flush(pf, &inst, sizeof(struct cpt_inst_s));
-+	dmb(sy);
-+	ret = cn10k_wait_for_cpt_respose(pf, res);
-+	if (ret)
-+		goto out;
-+
-+	/* Trigger CTX flush to write dirty data back to DRAM */
-+	reg_val = FIELD_PREP(CPT_LF_CTX_FLUSH, sa_iova >> 7);
-+	otx2_write64(pf, CN10K_CPT_LF_CTX_FLUSH, reg_val);
-+
-+out:
-+	dma_free_coherent(pf->dev, sa_size, sa_dptr, dptr_iova);
-+	dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res, res_iova);
-+	return ret;
++	return true;
++drop:
++	dev_kfree_skb_any(skb);
++	return false;
 +}
-+
-+static inline int cn10k_ipsec_get_hw_ctx_offset(void)
-+{
-+	/* Offset on Hardware-context offset in word */
-+	return (offsetof(struct cn10k_tx_sa_s, hw_ctx) / sizeof(u64)) & 0x7F;
-+}
-+
-+static inline int cn10k_ipsec_get_ctx_push_size(void)
-+{
-+	/* Context push size is round up and in multiple of 8 Byte */
-+	return (roundup(offsetof(struct cn10k_tx_sa_s, hw_ctx), 8) / 8) & 0x7F;
-+}
-+
-+static inline int cn10k_ipsec_get_aes_key_len(int key_len)
-+{
-+	if (key_len == 16)
-+		return CN10K_IPSEC_SA_AES_KEY_LEN_128;
-+	else if (key_len == 24)
-+		return CN10K_IPSEC_SA_AES_KEY_LEN_192;
-+	else
-+		return CN10K_IPSEC_SA_AES_KEY_LEN_256;
-+}
-+
-+static void cn10k_outb_prepare_sa(struct xfrm_state *x,
-+				  struct cn10k_tx_sa_s *sa_entry)
-+{
-+	int key_len = (x->aead->alg_key_len + 7) / 8;
-+	struct net_device *netdev = x->xso.dev;
-+	u8 *key = x->aead->alg_key;
-+	struct otx2_nic *pf;
-+	u32 *tmp_salt;
-+	u64 *tmp_key;
-+	int idx;
-+
-+	memset(sa_entry, 0, sizeof(struct cn10k_tx_sa_s));
-+
-+	/* context size, 128 Byte aligned up */
-+	pf = netdev_priv(netdev);
-+	sa_entry->ctx_size = (pf->ipsec.sa_size / OTX2_ALIGN)  & 0xF;
-+	sa_entry->hw_ctx_off = cn10k_ipsec_get_hw_ctx_offset();
-+	sa_entry->ctx_push_size = cn10k_ipsec_get_ctx_push_size();
-+
-+	/* Ucode to skip two words of CPT_CTX_HW_S */
-+	sa_entry->ctx_hdr_size = 1;
-+
-+	/* Allow Atomic operation (AOP) */
-+	sa_entry->aop_valid = 1;
-+
-+	/* Outbound, ESP TRANSPORT/TUNNEL Mode, AES-GCM with AES key length
-+	 * 128bit.
-+	 */
-+	sa_entry->sa_dir = CN10K_IPSEC_SA_DIR_OUTB;
-+	sa_entry->ipsec_protocol = CN10K_IPSEC_SA_IPSEC_PROTO_ESP;
-+	sa_entry->enc_type = CN10K_IPSEC_SA_ENCAP_TYPE_AES_GCM;
-+	if (x->props.mode == XFRM_MODE_TUNNEL)
-+		sa_entry->ipsec_mode = CN10K_IPSEC_SA_IPSEC_MODE_TUNNEL;
-+	else
-+		sa_entry->ipsec_mode = CN10K_IPSEC_SA_IPSEC_MODE_TRANSPORT;
-+
-+	sa_entry->spi = cpu_to_be32(x->id.spi);
-+
-+	/* Last 4 bytes are salt */
-+	key_len -= 4;
-+	sa_entry->aes_key_len = cn10k_ipsec_get_aes_key_len(key_len);
-+	memcpy(sa_entry->cipher_key, key, key_len);
-+	tmp_key = (u64 *)sa_entry->cipher_key;
-+
-+	for (idx = 0; idx < key_len / 8; idx++)
-+		tmp_key[idx] = be64_to_cpu(tmp_key[idx]);
-+
-+	memcpy(&sa_entry->iv_gcm_salt, key + key_len, 4);
-+	tmp_salt = (u32 *)&sa_entry->iv_gcm_salt;
-+	*tmp_salt = be32_to_cpu(*tmp_salt);
-+
-+	/* Write SA context data to memory before enabling */
-+	wmb();
-+
-+	/* Enable SA */
-+	sa_entry->sa_valid = 1;
-+}
-+
-+static inline int cn10k_ipsec_validate_state(struct xfrm_state *x)
-+{
-+	struct net_device *netdev = x->xso.dev;
-+
-+	if (x->props.aalgo != SADB_AALG_NONE) {
-+		netdev_err(netdev, "Cannot offload authenticated xfrm states\n");
-+		return -EINVAL;
-+	}
-+	if (x->props.ealgo != SADB_X_EALG_AES_GCM_ICV16) {
-+		netdev_err(netdev, "Only AES-GCM-ICV16 xfrm state may be offloaded\n");
-+		return -EINVAL;
-+	}
-+	if (x->props.calgo != SADB_X_CALG_NONE) {
-+		netdev_err(netdev, "Cannot offload compressed xfrm states\n");
-+		return -EINVAL;
-+	}
-+	if (x->props.flags & XFRM_STATE_ESN) {
-+		netdev_err(netdev, "Cannot offload ESN xfrm states\n");
-+		return -EINVAL;
-+	}
-+	if (x->props.family != AF_INET && x->props.family != AF_INET6) {
-+		netdev_err(netdev, "Only IPv4/v6 xfrm states may be offloaded\n");
-+		return -EINVAL;
-+	}
-+	if (x->props.mode != XFRM_MODE_TRANSPORT &&
-+	    x->props.mode != XFRM_MODE_TUNNEL) {
-+		dev_info(&netdev->dev, "Only tunnel/transport xfrm states may be offloaded\n");
-+		return -EINVAL;
-+	}
-+	if (x->id.proto != IPPROTO_ESP) {
-+		netdev_err(netdev, "Only ESP xfrm state may be offloaded\n");
-+		return -EINVAL;
-+	}
-+	if (x->encap) {
-+		netdev_err(netdev, "Encapsulated xfrm state may not be offloaded\n");
-+		return -EINVAL;
-+	}
-+	if (!x->aead) {
-+		netdev_err(netdev, "Cannot offload xfrm states without aead\n");
-+		return -EINVAL;
-+	}
-+
-+	if (x->aead->alg_icv_len != 128) {
-+		netdev_err(netdev, "Cannot offload xfrm states with AEAD ICV length other than 128bit\n");
-+		return -EINVAL;
-+	}
-+	if (x->aead->alg_key_len != 128 + 32 &&
-+	    x->aead->alg_key_len != 192 + 32 &&
-+	    x->aead->alg_key_len != 256 + 32) {
-+		netdev_err(netdev, "Cannot offload xfrm states with AEAD key length other than 128/192/256bit\n");
-+		return -EINVAL;
-+	}
-+	if (x->tfcpad) {
-+		netdev_err(netdev, "Cannot offload xfrm states with tfc padding\n");
-+		return -EINVAL;
-+	}
-+	if (!x->geniv) {
-+		netdev_err(netdev, "Cannot offload xfrm states without geniv\n");
-+		return -EINVAL;
-+	}
-+	if (strcmp(x->geniv, "seqiv")) {
-+		netdev_err(netdev, "Cannot offload xfrm states with geniv other than seqiv\n");
-+		return -EINVAL;
-+	}
-+	return 0;
-+}
-+
-+static int cn10k_ipsec_add_state(struct xfrm_state *x,
-+				 struct netlink_ext_ack *extack)
-+{
-+	struct net_device *netdev = x->xso.dev;
-+	struct cn10k_tx_sa_s *sa_entry;
-+	struct cpt_ctx_info_s *sa_info;
-+	struct otx2_nic *pf;
-+	int err;
-+
-+	err = cn10k_ipsec_validate_state(x);
-+	if (err)
-+		return err;
-+
-+	if (x->xso.dir == XFRM_DEV_OFFLOAD_IN) {
-+		netdev_err(netdev, "xfrm inbound offload not supported\n");
-+		err = -ENODEV;
-+	} else {
-+		pf = netdev_priv(netdev);
-+		if (!mutex_trylock(&pf->ipsec.lock)) {
-+			netdev_err(netdev, "IPSEC device is busy\n");
-+			return -EBUSY;
-+		}
-+
-+		if (!(pf->flags & OTX2_FLAG_INLINE_IPSEC_ENABLED)) {
-+			netdev_err(netdev, "IPSEC not enabled/supported on device\n");
-+			err = -ENODEV;
-+			goto unlock;
-+		}
-+
-+		sa_entry = cn10k_outb_alloc_sa(pf);
-+		if (!sa_entry) {
-+			netdev_err(netdev, "SA maximum limit %x reached\n",
-+				   CN10K_IPSEC_OUTB_MAX_SA);
-+			err = -EBUSY;
-+			goto unlock;
-+		}
-+
-+		cn10k_outb_prepare_sa(x, sa_entry);
-+
-+		err = cn10k_outb_write_sa(pf, sa_entry);
-+		if (err) {
-+			netdev_err(netdev, "Error writing outbound SA\n");
-+			cn10k_outb_free_sa(pf, sa_entry);
-+			goto unlock;
-+		}
-+
-+		sa_info = kmalloc(sizeof(*sa_info), GFP_KERNEL);
-+		sa_info->sa_entry = sa_entry;
-+		sa_info->sa_iova = cn10k_outb_get_sa_iova(pf, sa_entry);
-+		x->xso.offload_handle = (unsigned long)sa_info;
-+	}
-+
-+unlock:
-+	mutex_unlock(&pf->ipsec.lock);
-+	return err;
-+}
-+
-+static void cn10k_ipsec_del_state(struct xfrm_state *x)
-+{
-+	struct net_device *netdev = x->xso.dev;
-+	struct cn10k_tx_sa_s *sa_entry;
-+	struct cpt_ctx_info_s *sa_info;
-+	struct otx2_nic *pf;
-+	u32 sa_index;
-+
-+	if (x->xso.dir == XFRM_DEV_OFFLOAD_IN)
-+		return;
-+
-+	pf = netdev_priv(netdev);
-+	if (!mutex_trylock(&pf->ipsec.lock)) {
-+		netdev_err(netdev, "IPSEC device is busy\n");
-+		return;
-+	}
-+
-+	sa_info = (struct cpt_ctx_info_s *)x->xso.offload_handle;
-+	sa_entry = sa_info->sa_entry;
-+	sa_index = cn10k_outb_get_sa_index(pf, sa_entry);
-+	if (sa_index < 0 || !test_bit(sa_index, pf->ipsec.sa_bitmap)) {
-+		netdev_err(netdev, "Invalid SA (sa-index %d)\n", sa_index);
-+		goto error;
-+	}
-+
-+	memset(sa_entry, 0, sizeof(struct cn10k_tx_sa_s));
-+
-+	/* Disable SA in CPT h/w */
-+	sa_entry->ctx_push_size = cn10k_ipsec_get_ctx_push_size();
-+	sa_entry->ctx_size = (pf->ipsec.sa_size / OTX2_ALIGN)  & 0xF;
-+	sa_entry->aop_valid = 1;
-+
-+	if (cn10k_outb_write_sa(pf, sa_entry)) {
-+		netdev_err(netdev, "Failed to delete sa index %d\n", sa_index);
-+		goto error;
-+	}
-+	x->xso.offload_handle = 0;
-+	clear_bit(sa_index, pf->ipsec.sa_bitmap);
-+	kfree(sa_info);
-+error:
-+	mutex_unlock(&pf->ipsec.lock);
-+}
-+
-+static const struct xfrmdev_ops cn10k_ipsec_xfrmdev_ops = {
-+	.xdo_dev_state_add	= cn10k_ipsec_add_state,
-+	.xdo_dev_state_delete	= cn10k_ipsec_del_state,
-+};
-+
- int cn10k_ipsec_ethtool_init(struct net_device *netdev, bool enable)
- {
- 	struct otx2_nic *pf = netdev_priv(netdev);
-@@ -374,10 +788,25 @@ int cn10k_ipsec_ethtool_init(struct net_device *netdev, bool enable)
- int cn10k_ipsec_init(struct net_device *netdev)
- {
- 	struct otx2_nic *pf = netdev_priv(netdev);
-+	u32 sa_size;
-+	int err;
- 
- 	if (!is_dev_support_inline_ipsec(pf->pdev))
- 		return 0;
- 
-+	/* Each SA entry size is 128 Byte round up in size */
-+	sa_size = sizeof(struct cn10k_tx_sa_s) % OTX2_ALIGN ?
-+			 (sizeof(struct cn10k_tx_sa_s) / OTX2_ALIGN + 1) *
-+			 OTX2_ALIGN : sizeof(struct cn10k_tx_sa_s);
-+	err = qmem_alloc(pf->dev, &pf->ipsec.outb_sa, CN10K_IPSEC_OUTB_MAX_SA,
-+			 sa_size);
-+	if (err)
-+		return err;
-+
-+	pf->ipsec.sa_size = sa_size;
-+	memset(pf->ipsec.outb_sa->base, 0, sa_size * CN10K_IPSEC_OUTB_MAX_SA);
-+	bitmap_zero(pf->ipsec.sa_bitmap, CN10K_IPSEC_OUTB_MAX_SA);
-+
- 	mutex_init(&pf->ipsec.lock);
- 	return 0;
- }
-@@ -387,5 +816,7 @@ void cn10k_ipsec_clean(struct otx2_nic *pf)
- 	if (!is_dev_support_inline_ipsec(pf->pdev))
- 		return;
- 
-+	bitmap_zero(pf->ipsec.sa_bitmap, CN10K_IPSEC_OUTB_MAX_SA);
-+	qmem_free(pf->dev, pf->ipsec.outb_sa);
- 	cn10k_outb_cpt_clean(pf);
- }
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
-index f7c9f4339cb2..00c0cfd9b698 100644
+index 00c0cfd9b698..f6c0cf6c86e0 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
-@@ -50,6 +50,22 @@
- #define CN10K_CPT_LF_NQX(a)		(CPT_LFBASE | 0x400 | (a) << 3)
- #define CN10K_CPT_LF_CTX_FLUSH		(CPT_LFBASE | 0x510)
+@@ -56,6 +56,7 @@
+ /* IPSEC Instruction opcodes */
+ #define CN10K_IPSEC_MAJOR_OP_WRITE_SA 0x01UL
+ #define CN10K_IPSEC_MINOR_OP_WRITE_SA 0x09UL
++#define CN10K_IPSEC_MAJOR_OP_OUTB_IPSEC 0x28UL
  
-+/* Outbound SA */
-+#define CN10K_IPSEC_OUTB_MAX_SA 64
-+
-+/* IPSEC Instruction opcodes */
-+#define CN10K_IPSEC_MAJOR_OP_WRITE_SA 0x01UL
-+#define CN10K_IPSEC_MINOR_OP_WRITE_SA 0x09UL
-+
-+enum cn10k_cpt_comp_e {
-+	CN10K_CPT_COMP_E_NOTDONE = 0x00,
-+	CN10K_CPT_COMP_E_GOOD = 0x01,
-+	CN10K_CPT_COMP_E_FAULT = 0x02,
-+	CN10K_CPT_COMP_E_HWERR = 0x04,
-+	CN10K_CPT_COMP_E_INSTERR = 0x05,
-+	CN10K_CPT_COMP_E_WARN = 0x06
-+};
-+
- struct cn10k_cpt_inst_queue {
- 	u8 *vaddr;
- 	u8 *real_vaddr;
-@@ -64,6 +80,101 @@ struct cn10k_ipsec {
- 	/* Lock to protect SA management */
- 	struct mutex lock;
- 	struct cn10k_cpt_inst_queue iq;
-+	/* SA info */
-+	struct qmem *outb_sa;
-+	u32 sa_size;
-+	DECLARE_BITMAP(sa_bitmap, CN10K_IPSEC_OUTB_MAX_SA);
-+};
-+
-+/* CN10K IPSEC Security Association (SA) */
-+/* SA direction */
-+#define CN10K_IPSEC_SA_DIR_INB			0
-+#define CN10K_IPSEC_SA_DIR_OUTB			1
-+/* SA protocol */
-+#define CN10K_IPSEC_SA_IPSEC_PROTO_AH		0
-+#define CN10K_IPSEC_SA_IPSEC_PROTO_ESP		1
-+/* SA Encryption Type */
-+#define CN10K_IPSEC_SA_ENCAP_TYPE_AES_GCM	5
-+/* SA IPSEC mode Transport/Tunnel */
-+#define CN10K_IPSEC_SA_IPSEC_MODE_TRANSPORT	0
-+#define CN10K_IPSEC_SA_IPSEC_MODE_TUNNEL	1
-+/* SA AES Key Length */
-+#define CN10K_IPSEC_SA_AES_KEY_LEN_128 1
-+#define CN10K_IPSEC_SA_AES_KEY_LEN_192 2
-+#define CN10K_IPSEC_SA_AES_KEY_LEN_256 3
-+
-+struct cn10k_tx_sa_s {
-+	u64 esn_en		: 1; /* W0 */
-+	u64 rsvd_w0_1_8		: 8;
-+	u64 hw_ctx_off		: 7;
-+	u64 ctx_id		: 16;
-+	u64 rsvd_w0_32_47	: 16;
-+	u64 ctx_push_size	: 7;
-+	u64 rsvd_w0_55		: 1;
-+	u64 ctx_hdr_size	: 2;
-+	u64 aop_valid		: 1;
-+	u64 rsvd_w0_59		: 1;
-+	u64 ctx_size		: 4;
-+	u64 w1;			/* W1 */
-+	u64 sa_valid		: 1; /* W2 */
-+	u64 sa_dir		: 1;
-+	u64 rsvd_w2_2_3		: 2;
-+	u64 ipsec_mode		: 1;
-+	u64 ipsec_protocol	: 1;
-+	u64 aes_key_len		: 2;
-+	u64 enc_type		: 3;
-+	u64 rsvd_w2_11_31	: 21;
-+	u64 spi			: 32;
-+	u64 w3;			/* W3 */
-+	u8 cipher_key[32];	/* W4 - W7 */
-+	u32 rsvd_w8_0_31;	/* W8 : IV */
-+	u32 iv_gcm_salt;
-+	u64 rsvd_w9_w30[22];	/* W9 - W30 */
-+	u64 hw_ctx[6];		/* W31 - W36 */
-+};
-+
-+/* CPT Instruction Structure */
-+struct cpt_inst_s {
-+	u64 nixtxl		: 3; /* W0 */
-+	u64 doneint		: 1;
-+	u64 rsvd_w0_4_15	: 12;
-+	u64 dat_offset		: 8;
-+	u64 ext_param1		: 8;
-+	u64 nixtx_offset	: 20;
-+	u64 rsvd_w0_52_63	: 12;
-+	u64 res_addr;		/* W1 */
-+	u64 tag			: 32; /* W2 */
-+	u64 tt			: 2;
-+	u64 grp			: 10;
-+	u64 rsvd_w2_44_47	: 4;
-+	u64 rvu_pf_func		: 16;
-+	u64 qord		: 1; /* W3 */
-+	u64 rsvd_w3_1_2		: 2;
-+	u64 wqe_ptr		: 61;
-+	u64 dlen		: 16; /* W4 */
-+	u64 param2		: 16;
-+	u64 param1		: 16;
-+	u64 opcode_major	: 8;
-+	u64 opcode_minor	: 8;
-+	u64 dptr;		/* W5 */
-+	u64 rptr;		/* W6 */
-+	u64 cptr		: 60; /* W7 */
-+	u64 ctx_val		: 1;
-+	u64 egrp		: 3;
-+};
-+
-+/* CPT Instruction Result Structure */
-+struct cpt_res_s {
-+	u64 compcode		: 7; /* W0 */
-+	u64 doneint		: 1;
-+	u64 uc_compcode		: 8;
-+	u64 uc_info		: 48;
-+	u64 esn;		/* W1 */
-+};
-+
-+struct cpt_ctx_info_s {
-+	struct cn10k_tx_sa_s *sa_entry;
-+	dma_addr_t sa_iova;
+ enum cn10k_cpt_comp_e {
+ 	CN10K_CPT_COMP_E_NOTDONE = 0x00,
+@@ -133,6 +134,16 @@ struct cn10k_tx_sa_s {
+ 	u64 hw_ctx[6];		/* W31 - W36 */
  };
  
- /* CPT LF_INPROG Register */
-@@ -81,6 +192,9 @@ struct cn10k_ipsec {
- /* CPT LF_Q_SIZE Register */
- #define CPT_LF_Q_SIZE_DIV40 GENMASK_ULL(14, 0)
- 
-+/* CPT LF CTX Flush Register */
-+#define CPT_LF_CTX_FLUSH GENMASK_ULL(45, 0)
++/* CPT instruction parameter-1 */
++#define CN10K_IPSEC_INST_PARAM1_DIS_L4_CSUM		0x1
++#define CN10K_IPSEC_INST_PARAM1_DIS_L3_CSUM		0x2
++#define CN10K_IPSEC_INST_PARAM1_CRYPTO_MODE		0x20
++#define CN10K_IPSEC_INST_PARAM1_IV_OFFSET_SHIFT		8
 +
- #ifdef CONFIG_XFRM_OFFLOAD
++/* CPT instruction parameter-2 */
++#define CN10K_IPSEC_INST_PARAM2_ENC_DATA_OFFSET_SHIFT	0
++#define CN10K_IPSEC_INST_PARAM2_AUTH_DATA_OFFSET_SHIFT	8
++
+ /* CPT Instruction Structure */
+ struct cpt_inst_s {
+ 	u64 nixtxl		: 3; /* W0 */
+@@ -177,6 +188,15 @@ struct cpt_ctx_info_s {
+ 	dma_addr_t sa_iova;
+ };
+ 
++/* CPT SG structure */
++struct cpt_sg_s {
++	u64 seg1_size	: 16;
++	u64 seg2_size	: 16;
++	u64 seg3_size	: 16;
++	u64 segs	: 2;
++	u64 rsvd_63_50	: 14;
++};
++
+ /* CPT LF_INPROG Register */
+ #define CPT_LF_INPROG_INFLIGHT	GENMASK_ULL(8, 0)
+ #define CPT_LF_INPROG_GRB_CNT	GENMASK_ULL(39, 32)
+@@ -199,6 +219,11 @@ struct cpt_ctx_info_s {
  int cn10k_ipsec_init(struct net_device *netdev);
  void cn10k_ipsec_clean(struct otx2_nic *pf);
+ int cn10k_ipsec_ethtool_init(struct net_device *netdev, bool enable);
++bool otx2_sqe_add_sg_ipsec(struct otx2_nic *pfvf, struct otx2_snd_queue *sq,
++			   struct sk_buff *skb, int num_segs, int *offset);
++bool cn10k_ipsec_transmit(struct otx2_nic *pf, struct netdev_queue *txq,
++			  struct otx2_snd_queue *sq, struct sk_buff *skb,
++			  int num_segs, int size);
+ #else
+ static __maybe_unused int cn10k_ipsec_init(struct net_device *netdev)
+ {
+@@ -214,5 +239,20 @@ int cn10k_ipsec_ethtool_init(struct net_device *netdev, bool enable)
+ {
+ 	return 0;
+ }
++
++static __maybe_unused
++bool otx2_sqe_add_sg_ipsec(struct otx2_nic *pfvf, struct otx2_snd_queue *sq,
++			   struct sk_buff *skb, int num_segs, int *offset)
++{
++	return true;
++}
++
++static __maybe_unused
++bool cn10k_ipsec_transmit(struct otx2_nic *pf, struct netdev_queue *txq,
++			  struct otx2_snd_queue *sq, struct sk_buff *skb,
++			  int num_segs, int size)
++{
++	return true;
++}
+ #endif
+ #endif // CN10K_IPSEC_H
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index e9d2e039a322..eaa318012162 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -936,6 +936,29 @@ int otx2_sq_init(struct otx2_nic *pfvf, u16 qidx, u16 sqb_aura)
+ 	if (err)
+ 		return err;
+ 
++	/* Allocate memory for NIX SQE (which includes NIX SG) and CPT SG.
++	 * SG of NIX and CPT are same in size. Allocate memory for CPT SG
++	 * same as NIX SQE for base address alignment.
++	 * Layout of a NIX SQE and CPT SG entry:
++	 *      -----------------------------
++	 *     |     CPT Scatter Gather      |
++	 *     |       (SQE SIZE)            |
++	 *     |                             |
++	 *      -----------------------------
++	 *     |       NIX SQE               |
++	 *     |       (SQE SIZE)            |
++	 *     |                             |
++	 *      -----------------------------
++	 */
++	err = qmem_alloc(pfvf->dev, &sq->sqe_ring, qset->sqe_cnt,
++			 sq->sqe_size * 2);
++	if (err)
++		return err;
++
++	err = qmem_alloc(pfvf->dev, &sq->cpt_resp, qset->sqe_cnt, 64);
++	if (err)
++		return err;
++
+ 	if (qidx < pfvf->hw.tx_queues) {
+ 		err = qmem_alloc(pfvf->dev, &sq->tso_hdrs, qset->sqe_cnt,
+ 				 TSO_HEADER_SIZE);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index 859bbc78e653..9471ee572625 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -54,6 +54,9 @@
+ #define NIX_PF_PFC_PRIO_MAX			8
+ #endif
+ 
++/* Number of segments per SG structure */
++#define MAX_SEGS_PER_SG 3
++
+ enum arua_mapped_qtypes {
+ 	AURA_NIX_RQ,
+ 	AURA_NIX_SQ,
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index a7e17d870420..bc34074454b3 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1444,6 +1444,8 @@ static void otx2_free_sq_res(struct otx2_nic *pf)
+ 		if (!sq->sqe)
+ 			continue;
+ 		qmem_free(pf->dev, sq->sqe);
++		qmem_free(pf->dev, sq->sqe_ring);
++		qmem_free(pf->dev, sq->cpt_resp);
+ 		qmem_free(pf->dev, sq->tso_hdrs);
+ 		kfree(sq->sg);
+ 		kfree(sq->sqb_ptrs);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+index f368eac28fdd..b0e1524ea4bd 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+@@ -11,6 +11,7 @@
+ #include <linux/bpf.h>
+ #include <linux/bpf_trace.h>
+ #include <net/ip6_checksum.h>
++#include <net/xfrm.h>
+ 
+ #include "otx2_reg.h"
+ #include "otx2_common.h"
+@@ -32,6 +33,16 @@ static bool otx2_xdp_rcv_pkt_handler(struct otx2_nic *pfvf,
+ 				     struct otx2_cq_queue *cq,
+ 				     bool *need_xdp_flush);
+ 
++static void otx2_sq_set_sqe_base(struct otx2_snd_queue *sq,
++				 struct sk_buff *skb)
++{
++	if (unlikely(xfrm_offload(skb)))
++		sq->sqe_base = sq->sqe_ring->base + sq->sqe_size +
++				(sq->head * (sq->sqe_size * 2));
++	else
++		sq->sqe_base = sq->sqe->base;
++}
++
+ static int otx2_nix_cq_op_status(struct otx2_nic *pfvf,
+ 				 struct otx2_cq_queue *cq)
+ {
+@@ -580,7 +591,6 @@ void otx2_sqe_flush(void *dev, struct otx2_snd_queue *sq,
+ 	sq->head &= (sq->sqe_cnt - 1);
+ }
+ 
+-#define MAX_SEGS_PER_SG	3
+ /* Add SQE scatter/gather subdescriptor structure */
+ static bool otx2_sqe_add_sg(struct otx2_nic *pfvf, struct otx2_snd_queue *sq,
+ 			    struct sk_buff *skb, int num_segs, int *offset)
+@@ -1116,6 +1126,11 @@ bool otx2_sq_append_skb(struct net_device *netdev, struct otx2_snd_queue *sq,
+ 	struct otx2_nic *pfvf = netdev_priv(netdev);
+ 	int offset, num_segs, free_desc;
+ 	struct nix_sqe_hdr_s *sqe_hdr;
++	int ipsec = 0;
++	bool ret;
++
++	if (unlikely(xfrm_offload(skb)))
++		ipsec = 1;
+ 
+ 	/* Check if there is enough room between producer
+ 	 * and consumer index.
+@@ -1132,6 +1147,7 @@ bool otx2_sq_append_skb(struct net_device *netdev, struct otx2_snd_queue *sq,
+ 	/* If SKB doesn't fit in a single SQE, linearize it.
+ 	 * TODO: Consider adding JUMP descriptor instead.
+ 	 */
++
+ 	if (unlikely(num_segs > OTX2_MAX_FRAGS_IN_SQE)) {
+ 		if (__skb_linearize(skb)) {
+ 			dev_kfree_skb_any(skb);
+@@ -1148,6 +1164,9 @@ bool otx2_sq_append_skb(struct net_device *netdev, struct otx2_snd_queue *sq,
+ 		return true;
+ 	}
+ 
++	/* Set sqe base address */
++	otx2_sq_set_sqe_base(sq, skb);
++
+ 	/* Set SQE's SEND_HDR.
+ 	 * Do not clear the first 64bit as it contains constant info.
+ 	 */
+@@ -1160,7 +1179,12 @@ bool otx2_sq_append_skb(struct net_device *netdev, struct otx2_snd_queue *sq,
+ 	otx2_sqe_add_ext(pfvf, sq, skb, &offset);
+ 
+ 	/* Add SG subdesc with data frags */
+-	if (!otx2_sqe_add_sg(pfvf, sq, skb, num_segs, &offset)) {
++	if (unlikely(ipsec))
++		ret = otx2_sqe_add_sg_ipsec(pfvf, sq, skb, num_segs, &offset);
++	else
++		ret = otx2_sqe_add_sg(pfvf, sq, skb, num_segs, &offset);
++
++	if (!ret) {
+ 		otx2_dma_unmap_skb_frags(pfvf, &sq->sg[sq->head]);
+ 		return false;
+ 	}
+@@ -1169,11 +1193,14 @@ bool otx2_sq_append_skb(struct net_device *netdev, struct otx2_snd_queue *sq,
+ 
+ 	sqe_hdr->sizem1 = (offset / 16) - 1;
+ 
++	if (unlikely(ipsec))
++		return cn10k_ipsec_transmit(pfvf, txq, sq, skb, num_segs,
++					    offset);
++
+ 	netdev_tx_sent_queue(txq, skb->len);
+ 
+ 	/* Flush SQE to HW */
+ 	pfvf->hw_ops->sqe_flush(pfvf, sq, offset, qidx);
+-
+ 	return true;
+ }
+ EXPORT_SYMBOL(otx2_sq_append_skb);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+index 3f1d2655ff77..248fd78ef0e9 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+@@ -101,6 +101,9 @@ struct otx2_snd_queue {
+ 	struct queue_stats	stats;
+ 	u16			sqb_count;
+ 	u64			*sqb_ptrs;
++	/* SQE ring and CPT response queue for Inline IPSEC */
++	struct qmem		*sqe_ring;
++	struct qmem		*cpt_resp;
+ } ____cacheline_aligned_in_smp;
+ 
+ enum cq_type {
 -- 
 2.34.1
 
