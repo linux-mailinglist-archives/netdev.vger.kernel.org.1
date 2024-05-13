@@ -1,136 +1,126 @@
-Return-Path: <netdev+bounces-95850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6F6C8C3A86
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 05:44:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8E748C3ABD
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 06:35:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C5851C20D73
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 03:44:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 932F32812BC
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 04:35:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B36B145B38;
-	Mon, 13 May 2024 03:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91912D05E;
+	Mon, 13 May 2024 04:35:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="UV/hin/B"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF3222F08;
-	Mon, 13 May 2024 03:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E68A3214;
+	Mon, 13 May 2024 04:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715571859; cv=none; b=WrmJld3edVRpe5XkjS/xpXdOnZRw9BRZvlDKLMJ54a3qBboZXJPGMw+8oGoSXudr+2W5do5nXw+NcxW9ldzMHwu0sBjzEGVh6DWyiHZA61sRaFdu4bW+Sd2BOqX7YizRPhNqBrxghhjLdaagEcc9Wqzl+/04VuZ6mQv2OsBKZfk=
+	t=1715574945; cv=none; b=Ye6AkHyBKO/et7vRBXtk0WhQK57jR7i9xpV+2y5g3+EsrhlQj7KapOw2hAQNAK1wb6jb72RNBGQKFUxnzWTJJHFyvQjltfCpjC1IuUeLcd0KmHbDomx3vK6sWOQBZRdC70C/p+gL2Rqe8Ilx3qQfmKFmWLxYP6TTdD573dMBgQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715571859; c=relaxed/simple;
-	bh=wGiZC2HBCgKBqxT3zraC65pPgnrqP9p/UeRv8YvsqWs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=jvYragaYdvO43W8g5zEkw8OrbRhoB2BC+tOZXEfEBfvLXXJVE6XQ18hQgOHvRAliK642dqrAaGkqsiXZSHQAJe82ZTRIKrb1ojIp6vGav/nYdqmci0d54UT9G8V2eL+fjsSTDINc6JZv7xJbVBrKCYIz7p/wbEQF6PJH15p6www=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 44D3hqX131129703, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 44D3hqX131129703
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 13 May 2024 11:43:53 +0800
-Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 13 May 2024 11:43:52 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 13 May 2024 11:43:52 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
- RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
- 15.01.2507.035; Mon, 13 May 2024 11:43:52 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "jiri@resnulli.us" <jiri@resnulli.us>,
-        "horms@kernel.org" <horms@kernel.org>,
-        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v18 06/13] rtase: Implement .ndo_start_xmit function
-Thread-Topic: [PATCH net-next v18 06/13] rtase: Implement .ndo_start_xmit
- function
-Thread-Index: AQHaoUVFS3AReltz50OiDSH+k5DKnbGQKQQAgARjhdA=
-Date: Mon, 13 May 2024 03:43:52 +0000
-Message-ID: <7f1ff93c4f7d4fc9bdefbb646c18acc1@realtek.com>
-References: <20240508123945.201524-1-justinlai0215@realtek.com>
- <20240508123945.201524-7-justinlai0215@realtek.com>
- <1bb2d174-ccae-43e3-80ec-872b9a140fbe@lunn.ch>
-In-Reply-To: <1bb2d174-ccae-43e3-80ec-872b9a140fbe@lunn.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1715574945; c=relaxed/simple;
+	bh=Z0dpvmrI28eS45WbkEYgkTyMwjgnIk1pOV23QNe9tlY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mEpydEH/ElGBKBsjtyDmNUqKzhZWBf5Mvoph5gh3NzPAEQ4gPkBSisZTOIS5KUymi5Y+KjUHd6mteXqk/cSsqDxvLfDf76VJyeAws/Ek4w2UQKMCgeAy80yKDT0vyfbvbZpivzDUp94/bdykdjFrlChy5qCZq3c/ofLpbYPHI4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=UV/hin/B; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=+sDYxjeeVc0BhplR7Zet4dAgkgFt/tCSA/bSQmrCSdw=; b=UV/hin/BgQMGOaPvHyPvH6z8Bq
+	V16plrNrV3oeoHrlOUQgL6qKKLMdLfcssW2hLVICN68tqBQCWCqAvtCMmr96VLMfecdqG9c2WbZep
+	dnJMMUU10xH9jBRcGAMLXOkhwBvFJQzc41pov/eNGA+dXab/CwGyYz4EOBHr7w38CS4nNFU8B2JIs
+	EZgNhJ6DX1FPiq+6X29/Y+Qum3Viws5m1ZEpu5HpN58PDv7cGs8yh8f7t3vER22qzYtG8xvDMmPhx
+	0pcxsO7GldBy+GMy0FgX+xQWLg6tc65qOE/nFY+7qaeszjdkQkcorqcXm8EymPxlhWaYOm40MKwHY
+	YDmhRuaw==;
+Received: from mob-194-230-158-151.cgn.sunrise.net ([194.230.158.151] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1s6N9E-0005yl-Rg; Mon, 13 May 2024 06:18:49 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2024-05-13
+Date: Mon, 13 May 2024 06:18:45 +0200
+Message-Id: <20240513041845.31040-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27273/Sun May 12 10:22:49 2024)
 
->=20
-> > +static u32 rtase_tx_csum(struct sk_buff *skb, const struct net_device
-> > +*dev) {
-> > +     u32 csum_cmd =3D 0;
-> > +     u8 ip_protocol;
-> > +
-> > +     switch (vlan_get_protocol(skb)) {
-> > +     case htons(ETH_P_IP):
-> > +             csum_cmd =3D RTASE_TX_IPCS_C;
-> > +             ip_protocol =3D ip_hdr(skb)->protocol;
-> > +             break;
-> > +
-> > +     case htons(ETH_P_IPV6):
-> > +             csum_cmd =3D RTASE_TX_IPV6F_C;
-> > +             ip_protocol =3D ipv6_hdr(skb)->nexthdr;
-> > +             break;
-> > +
-> > +     default:
-> > +             ip_protocol =3D IPPROTO_RAW;
-> > +             break;
-> > +     }
-> > +
-> > +     if (ip_protocol =3D=3D IPPROTO_TCP)
-> > +             csum_cmd |=3D RTASE_TX_TCPCS_C;
-> > +     else if (ip_protocol =3D=3D IPPROTO_UDP)
-> > +             csum_cmd |=3D RTASE_TX_UDPCS_C;
-> > +     else
-> > +             WARN_ON_ONCE(1);
->=20
-> I'm not so sure about this WARN_ON_ONCE(). It looks like if i send a cust=
-om
-> packet which is not IPv4 or IPv6 it will fire. There are other protocols =
-then IP.
-> Connecting to an Ethernet switch using DSA tags would be a good example. =
-So
-> i don't think you want this warning.
->=20
->       Andrew
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-Hi Andrew,
-The condition for entering this function is checksum_partial, which require=
-s
-hardware to help calculate the checksum, so protocols that are not supporte=
-d
-by the hardware will issue warn_on_once.
+The following pull-request contains BPF updates for your *net* tree.
+
+We've added 3 non-merge commits during the last 2 day(s) which contain
+a total of 2 files changed, 62 insertions(+), 8 deletions(-).
+
+The main changes are:
+
+1) Fix a case where syzkaller found that it's unexpectedly possible to attach a
+   cgroup_skb program to the sockopt hooks. The fix adds missing attach_type
+   enforcement for the link_create case along with selftests, from Stanislav Fomichev.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Eduard Zingerman
+
+----------------------------------------------------------------
+
+The following changes since commit b867247555c4181bf84eb10b72b176862c29112d:
+
+  Merge branch 'qed-error-codes' (2024-04-29 10:02:43 +0100)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to 3e9bc0472b910d4115e16e9c2d684c7757cb6c60:
+
+  Merge branch 'bpf: Add BPF_PROG_TYPE_CGROUP_SKB attach type enforcement in BPF_LINK_CREATE' (2024-04-30 10:45:44 -0700)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Martin KaFai Lau (1):
+      Merge branch 'bpf: Add BPF_PROG_TYPE_CGROUP_SKB attach type enforcement in BPF_LINK_CREATE'
+
+Stanislav Fomichev (3):
+      bpf: Add BPF_PROG_TYPE_CGROUP_SKB attach type enforcement in BPF_LINK_CREATE
+      selftests/bpf: Extend sockopt tests to use BPF_LINK_CREATE
+      selftests/bpf: Add sockopt case to verify prog_type
+
+ kernel/bpf/syscall.c                             |  5 ++
+ tools/testing/selftests/bpf/prog_tests/sockopt.c | 65 +++++++++++++++++++++---
+ 2 files changed, 62 insertions(+), 8 deletions(-)
 
