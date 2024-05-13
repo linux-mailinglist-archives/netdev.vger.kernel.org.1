@@ -1,187 +1,209 @@
-Return-Path: <netdev+bounces-95872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 215458C3B84
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 08:41:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13C9F8C3BC5
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 09:14:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D13F3281522
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 06:41:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E84FB20BED
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 07:14:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136E614659C;
-	Mon, 13 May 2024 06:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b="B1ELTYSh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A77EA146A7B;
+	Mon, 13 May 2024 07:14:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A087145B3D
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 06:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D06146A67
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 07:14:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715582512; cv=none; b=sT4qHErQl0kZpjpRp/zaFoT8oZJ3goYM6JWK37MZD51YyTwJwi14SoOYIgDA/RZyjP84oJEli6asYzgQP0N0czl8Dy099Aq+8AQDpyvecItAJYJt+gx2xVUjXO7nZCAZk6Fn+bleL5VoR+LYDiQongeTqg4iQJHXdwwNphAISQE=
+	t=1715584480; cv=none; b=jM2wKX9hgHYrIpgIzQ4t6p6yLDy5ieFbKAnBDrgpI/g1CxcSlLaas/yCXEVYhFuQfydgyD7lCzLJLKRLm7rf+B9TF+2EKUUSB3aa/6HJNYEBxGbNxH7ZAVaoN7+FsyROwjZ3ABQUxbLhBUPb00U4tJASOE4W5fEjK/b+xSgs3iY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715582512; c=relaxed/simple;
-	bh=AZDUvNbYds6+BDMS2Gs+L0RuM6sC7odAJpRGoP07xS8=;
+	s=arc-20240116; t=1715584480; c=relaxed/simple;
+	bh=suY7gdj5WEzlYkeyc21b5k/5NgIk2dmm7ryt+mMo7mg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aoOnH2Iq32QNBB72wLGcnGawSC+PvNDxVcWCbNc/7xx40wlRF5wYpYMWLBZgz1ueI0yw42day4ps9HQO36SVv4M/LirMK4kyuTVcyV8EoxOq1Pao0tLUD/Gk/uj49Dmq0SxHIS6IS/+yKgsrBAAZKmrEqWjsm9E88rQ3TbB11HU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se; spf=pass smtp.mailfrom=ferroamp.se; dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b=B1ELTYSh; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ferroamp.se
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2e564cad1f6so23648381fa.1
-        for <netdev@vger.kernel.org>; Sun, 12 May 2024 23:41:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ferroamp-se.20230601.gappssmtp.com; s=20230601; t=1715582508; x=1716187308; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jgmYXspuQD6m2g2YDHV5QyLok17L1hPzYPTwYzpfjV0=;
-        b=B1ELTYSh3jmT5u6rpF71dNBwxlamZq/1yK4Cm+3XE7FrQgXePAi6HN4VxJsUNPHmLz
-         Or5TujoCY/gvVzHkG4nSAJK+hhsFB4URSVPdKNrWzFKmjUdHgAAQaQUyzfjRHg6YJCPC
-         FpfjBqPFMdD+0ppj7KpaIn2FYSsYH/MBuAo8bIe7jZIT4epGjH2rhNPwCcH4tTgGuHAF
-         CXajicjQuucbBrBSwwVG48Dgpgk8WQSFoPn5U2jfpWrw9FkDJMRk8tkDbhTm1wPIuITL
-         C+p79FEUtAFL8lgsKLowoQTU8SIXzOoi1elQdd5vINdfwl46kxNjU0p2cFBDQdYRX45Q
-         sznA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715582508; x=1716187308;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jgmYXspuQD6m2g2YDHV5QyLok17L1hPzYPTwYzpfjV0=;
-        b=e/APoe1ohxvOfuPGubFMr49eJbZCO3BO5GqqzvmyzqGVArjmer7LDNTdptLNisCYsf
-         nYQafXaZgiKWPUS7uSs7PukiLYQ6D9Qp2yFgt48Q9H99IdBeHppVDbqg24F3H7+RglpL
-         wJ8EsPcyuDsaT3QoyiSvmJ10OXFo1+0sNGbS8dytIsHIbTv8S5ipOEttZ7DlYQzlEdcu
-         ror1oYxeTZ6g3hLY9pfmWHl4Kmlns0dePBiVsZOg/JfF82GCw3JylEVNXHwe2zv5LKIV
-         2pXa5eivJxTYGqtWhvjt6LwSnkfj6Ee3nAun7KphyvvNND5hBHaYIne9KVv2PEc3OLmD
-         2Ibg==
-X-Forwarded-Encrypted: i=1; AJvYcCXX8W2qBZuQAwGR9gCTiKOYywIUWUPrOUMF1eZWIn6EvIe3YJngP8mKanguRKi1Otl3SGnmwABCbsuuMM0hpSdF+LOkTxqa
-X-Gm-Message-State: AOJu0YzpqPzf6FOs91xFQR7mrYKU0VEgsSe4BxR2w1TXAf569VNFkMlV
-	rjkNxlncYFFmxcVK2jzX/kxuMyZfIYGF741vbigoa734ZKBHZJAhnG4fPv80JJw=
-X-Google-Smtp-Source: AGHT+IEIkeRxVZ7/wwKjFiJVGfzq6Dh2wr3o8ZQIJjCu0AGpKE+fr3Hj0hV6u+O7KQYjw+iUt7WzAA==
-X-Received: by 2002:a05:651c:510:b0:2df:97b1:e21c with SMTP id 38308e7fff4ca-2e520066fa4mr67361691fa.31.1715582508290;
-        Sun, 12 May 2024 23:41:48 -0700 (PDT)
-Received: from minibuilder (c188-149-135-220.bredband.tele2.se. [188.149.135.220])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2e4d183450csm12842611fa.133.2024.05.12.23.41.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 May 2024 23:41:47 -0700 (PDT)
-Date: Mon, 13 May 2024 08:41:45 +0200
-From: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
-To: Piergiorgio Beruto <Pier.Beruto@onsemi.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	"Parthiban.Veerasooran@microchip.com" <Parthiban.Veerasooran@microchip.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"Horatiu.Vultur@microchip.com" <Horatiu.Vultur@microchip.com>,
-	"ruanjinjie@huawei.com" <ruanjinjie@huawei.com>,
-	"Steen.Hegelund@microchip.com" <Steen.Hegelund@microchip.com>,
-	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
-	"UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>,
-	"Thorsten.Kummermehr@microchip.com" <Thorsten.Kummermehr@microchip.com>,
-	Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>,
-	"Nicolas.Ferre@microchip.com" <Nicolas.Ferre@microchip.com>,
-	"benjamin.bigler@bernformulastudent.ch" <benjamin.bigler@bernformulastudent.ch>
-Subject: Re: [PATCH net-next v4 05/12] net: ethernet: oa_tc6: implement error
- interrupts unmasking
-Message-ID: <ZkG2Kb_1YsD8T1BF@minibuilder>
-References: <Zi1Xbz7ARLm3HkqW@builder>
- <77d7d190-0847-4dc9-8fc5-4e33308ce7c8@lunn.ch>
- <Zi4czGX8jlqSdNrr@builder>
- <874654d4-3c52-4b0e-944a-dc5822f54a5d@lunn.ch>
- <ZjKJ93uPjSgoMOM7@builder>
- <b7c7aad7-3e93-4c57-82e9-cb3f9e7adf64@microchip.com>
- <ZjNorUP-sEyMCTG0@builder>
- <ae801fb9-09e0-49a3-a928-8975fe25a893@microchip.com>
- <fd5d0d2a-7562-4fb1-b552-6a11d024da2f@lunn.ch>
- <BY5PR02MB678683EADBC47A29A4F545A59D1C2@BY5PR02MB6786.namprd02.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WxXWDQDxseiYt9yOnYieNmsghA1VDb5ztXkXzHlOv12j5eHy65h7q+MZOl3CLXbn0kA9Q78Ps17PTB+OUClK6yf4SiNx9rKFxk2YWguePVzfFSE18E8vqCmJXsggjVdDnStyOyE4b28Vn7bVVzC5FR/8mfGOvT3f0OEvgss0Ls8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1s6Pt9-0001Jd-LQ; Mon, 13 May 2024 09:14:23 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1s6Pt7-0017rX-OP; Mon, 13 May 2024 09:14:21 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1s6Pt7-009OQ9-24;
+	Mon, 13 May 2024 09:14:21 +0200
+Date: Mon, 13 May 2024 09:14:21 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Shigeru Yoshida <syoshida@redhat.com>
+Cc: robin@protonic.nl, kernel@pengutronix.de, socketcan@hartkopp.net,
+	mkl@pengutronix.de, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzbot+5681e40d297b30f5b513@syzkaller.appspotmail.com
+Subject: Re: [PATCH] can: j1939: Initialize unused data in j1939_send_one()
+Message-ID: <ZkG9zbYwd0BL7B2r@pengutronix.de>
+References: <20240512160307.2604215-1-syoshida@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <BY5PR02MB678683EADBC47A29A4F545A59D1C2@BY5PR02MB6786.namprd02.prod.outlook.com>
-
-> The RXBOE is basically a warning, indicating that for some reason the SPI host is not fast enough in retrieving frames from the device.
-> In my experience, this is typically caused by excessive latency of the SPI driver, or if you have an unoptimized network driver for the MACPHY.
-> 
-> Thanks,
-> Piergiorgio
-> 
-> 
-> > [  285.482275] LAN865X Rev.B0 Internal Phy spi0.0:00: attached PHY 
-> > driver (mii_bus:phy_addr=spi0.0:00, irq=POLL) [  285.534760] lan865x 
-> > spi0.0 eth1: Link is Up - 10Mbps/Half - flow control off [  
-> > 341.466221] eth1: Receive buffer overflow error [  345.730222] eth1: 
-> > Receive buffer overflow error [  345.891126] eth1: Receive buffer 
-> > overflow error [  346.074220] eth1: Receive buffer overflow error
-> 
-> Generally we only log real errors. Is a receive buffer overflow a real error? I would say not. But it would be good to count it.
-> 	Andrew
+In-Reply-To: <20240512160307.2604215-1-syoshida@redhat.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 Hi,
 
-I've been busy throwing stuff at the wall until something sticks. I've
-managed to narrow a few things down.
-First and foremost, when running a periodic udp6 multicast in the
-background I don't get a hang in the driver, or it becomes considerably
-harder to provoke.
+On Mon, May 13, 2024 at 01:03:07AM +0900, Shigeru Yoshida wrote:
+> syzbot reported kernel-infoleak in raw_recvmsg() [1]. j1939_send_one()
+> creates full frame including unused data, but it doesn't initialize it.
+> This causes the kernel-infoleak issue. Fix this by initializing unused
+> data.
+> 
+> [1]
+> BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+> BUG: KMSAN: kernel-infoleak in copy_to_user_iter lib/iov_iter.c:24 [inline]
+> BUG: KMSAN: kernel-infoleak in iterate_ubuf include/linux/iov_iter.h:29 [inline]
+> BUG: KMSAN: kernel-infoleak in iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+> BUG: KMSAN: kernel-infoleak in iterate_and_advance include/linux/iov_iter.h:271 [inline]
+> BUG: KMSAN: kernel-infoleak in _copy_to_iter+0x366/0x2520 lib/iov_iter.c:185
+>  instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+>  copy_to_user_iter lib/iov_iter.c:24 [inline]
+>  iterate_ubuf include/linux/iov_iter.h:29 [inline]
+>  iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+>  iterate_and_advance include/linux/iov_iter.h:271 [inline]
+>  _copy_to_iter+0x366/0x2520 lib/iov_iter.c:185
+>  copy_to_iter include/linux/uio.h:196 [inline]
+>  memcpy_to_msg include/linux/skbuff.h:4113 [inline]
+>  raw_recvmsg+0x2b8/0x9e0 net/can/raw.c:1008
+>  sock_recvmsg_nosec net/socket.c:1046 [inline]
+>  sock_recvmsg+0x2c4/0x340 net/socket.c:1068
+>  ____sys_recvmsg+0x18a/0x620 net/socket.c:2803
+>  ___sys_recvmsg+0x223/0x840 net/socket.c:2845
+>  do_recvmmsg+0x4fc/0xfd0 net/socket.c:2939
+>  __sys_recvmmsg net/socket.c:3018 [inline]
+>  __do_sys_recvmmsg net/socket.c:3041 [inline]
+>  __se_sys_recvmmsg net/socket.c:3034 [inline]
+>  __x64_sys_recvmmsg+0x397/0x490 net/socket.c:3034
+>  x64_sys_call+0xf6c/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:300
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> Uninit was created at:
+>  slab_post_alloc_hook mm/slub.c:3804 [inline]
+>  slab_alloc_node mm/slub.c:3845 [inline]
+>  kmem_cache_alloc_node+0x613/0xc50 mm/slub.c:3888
+>  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
+>  __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
+>  alloc_skb include/linux/skbuff.h:1313 [inline]
+>  alloc_skb_with_frags+0xc8/0xbf0 net/core/skbuff.c:6504
+>  sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2795
+>  sock_alloc_send_skb include/net/sock.h:1842 [inline]
+>  j1939_sk_alloc_skb net/can/j1939/socket.c:878 [inline]
+>  j1939_sk_send_loop net/can/j1939/socket.c:1142 [inline]
+>  j1939_sk_sendmsg+0xc0a/0x2730 net/can/j1939/socket.c:1277
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg+0x30f/0x380 net/socket.c:745
+>  ____sys_sendmsg+0x877/0xb60 net/socket.c:2584
+>  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+>  __sys_sendmsg net/socket.c:2667 [inline]
+>  __do_sys_sendmsg net/socket.c:2676 [inline]
+>  __se_sys_sendmsg net/socket.c:2674 [inline]
+>  __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2674
+>  x64_sys_call+0xc4b/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:47
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> Bytes 12-15 of 16 are uninitialized
+> Memory access of size 16 starts at ffff888120969690
+> Data copied to user address 00000000200017c0
+> 
+> CPU: 1 PID: 5050 Comm: syz-executor198 Not tainted 6.9.0-rc5-syzkaller-00031-g71b1543c83d6 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+> 
+> Fixes: 9d71dd0c7009 ("can: add support of SAE J1939 protocol")
+> Reported-and-tested-by: syzbot+5681e40d297b30f5b513@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=5681e40d297b30f5b513
+> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
 
-When I make sure that the bespoke Ferroamp upd server is not started
-(which just joins a mcast group and sends a less than MTU packet every
-~500ms and listens for incoming multicast messages in the same group),
-it becomes very simple to get to a live-lock.
+Thank you for your investigation!
 
-My steasp of reproducing is setting a ipv4 address on both ends of the
-link, then running the follwing script on both ends using the other ends
-ip as argument.
+> ---
+>  net/can/j1939/main.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/can/j1939/main.c b/net/can/j1939/main.c
+> index a6fb89fa6278..df01628c6509 100644
+> --- a/net/can/j1939/main.c
+> +++ b/net/can/j1939/main.c
+> @@ -344,6 +344,9 @@ int j1939_send_one(struct j1939_priv *priv, struct sk_buff *skb)
+>  	/* make it a full can frame again */
+>  	skb_put(skb, J1939_CAN_FTR + (8 - dlc));
+>  
+> +	/* initialize unused data  */
+> +	memset(cf->data + dlc, 0, 8 - dlc);
+> +
+>  	canid = CAN_EFF_FLAG |
+>  		(skcb->priority << 26) |
+>  		(skcb->addr.pgn << 8) |
+> -- 
+> 2.44.0
 
-#!/bin/env python3
-import socket
-import sys
+Can you please change it to:
 
-if __name__ == '__main__':
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+--- a/net/can/j1939/main.c
++++ b/net/can/j1939/main.c
+@@ -30,10 +30,6 @@ MODULE_ALIAS("can-proto-" __stringify(CAN_J1939));
+ /* CAN_HDR: #bytes before can_frame data part */
+ #define J1939_CAN_HDR (offsetof(struct can_frame, data))
+ 
+-/* CAN_FTR: #bytes beyond data part */
+-#define J1939_CAN_FTR (sizeof(struct can_frame) - J1939_CAN_HDR - \
+-		 sizeof(((struct can_frame *)0)->data))
+-
+ /* lowest layer */
+ static void j1939_can_recv(struct sk_buff *iskb, void *data)
+ {
+@@ -342,7 +338,7 @@ int j1939_send_one(struct j1939_priv *priv, struct sk_buff *skb)
+ 	memset(cf, 0, J1939_CAN_HDR);
+ 
+ 	/* make it a full can frame again */
+-	skb_put(skb, J1939_CAN_FTR + (8 - dlc));
++	skb_put_zero(skb, 8 - dlc);
+ 
+ 	canid = CAN_EFF_FLAG |
+ 		(skcb->priority << 26) |
 
-    while True:
-        sock.sendto(b'0'*2048, (sys.argv[1], 4040))
+With this change included, you can add my:
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-Neither ends opens a listening socket. I get to the live lock in 10s or
-less.
-I've enabled some debugging options but so far nothing seems to hit.
-What I've been able to conclude is that there still is SPI
-communication, the macphy interrupt is still pulled low, and the cpu
-does the ack so that it's reset to inactive.
-But from there it seems no data is passed up the network stack. Some
-symptoms are
-
-* net_device stats are no longer incremented
-* can't ping
-* can't connect to sockets on the board etc.
-* cpu usage jumps to and stays at 100% for the worker thread
-
-The worker thread is released by the irq handler and it does some of the
-expected work, but not all.
-I'm adding some instrumentation to the code in an effort to figure out
-where things break apart.
-It might be possible to catch it in gdb as well, but I think you only
-get one try as the timing will be pretty borked after the first break.
-
-R
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
