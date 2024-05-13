@@ -1,155 +1,144 @@
-Return-Path: <netdev+bounces-96017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EAB38C400D
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:46:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21E8A8C4000
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:44:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5DC8B23E64
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:46:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CDCF1F22B1B
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8D414D2A2;
-	Mon, 13 May 2024 11:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A54814D298;
+	Mon, 13 May 2024 11:44:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="h02zrtwJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V269bNYO"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C2314F102;
-	Mon, 13 May 2024 11:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499E314D293
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 11:44:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715600718; cv=none; b=qIdiFVm8QQvMmIe9/eNwZyOE8ewbWIbxLHLadmLVMwfH6+k+zc16WEtRCFrkxY0sfmmb66sq3TUH4iamIZ5V8H5OBoYOrTe6NeI9Cu5AYQMLbkKSdfHBgDF0wCM5vGUW0C/ysxA+RryYq7U2QhXAO52YmfvpZ23RZpFE2P2qkG0=
+	t=1715600693; cv=none; b=n59O7V0A240vKdXPfQYTpb/GLx0/n0nZJwEdBNLYm89haXRTWcfcgAMMvcsldEQEMQSP5/hVzSgDB2LIQBGpbkhblyA8AFA5WZpnqTsPaABPsZuQ1X3vjVPCQl6FYifkxWPSfwBCU+Eown3rCPltH96XatPBR4rLPaJEJNTpDVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715600718; c=relaxed/simple;
-	bh=eAyTMUMGGuqdLpsBgzQWqQ1HResoKyZy1l6rRRccU3g=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=acEYlAjWFqwwOLtgs0aUk0yH8Mc2qtM6sSWVLqtUc+MM3cZcvau2EixEYpW1WC0qBe0TjapZoxuoaspAlXghLvgSwyHUoseyTOzq6EfWL1P6kcdVvZNUCsSjIZUH4IRPZohhA57oQN7x7fjTjb4dfMEELidTzxd/incKvFI6H7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=h02zrtwJ; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1715600693; c=relaxed/simple;
+	bh=nK3+LcnXzXyftikuQXDRPxJYaEKa1l+sJltWiV5/bCM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j3rlVfmha+dps6EauIQYcoBihd+PMz/c0wUl3F1yPuT7GVpm+S7o8fyHIRgND708rMwVnG0q7VyvQCMpHkr/mOW1ueZzVNAb7YANQBG4NOzgeP4A2ocD+/A2S/d/+d4fd5S5hMunGiFLNSGt3Xxt+YFPpbsnv2x6mlLyLmF43IA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V269bNYO; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1715600716; x=1747136716;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715600691; x=1747136691;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=eAyTMUMGGuqdLpsBgzQWqQ1HResoKyZy1l6rRRccU3g=;
-  b=h02zrtwJZyDDMuzOEnq/jEE9jZ2f+N0PnhzxjGCl05YUrAmpU14AyDVX
-   JQ76mnVd6HeKDdLOMiwiIiIjpvmZxkVmfiepKuGlNcY6zfZ+WRNFyxUos
-   R71tqeym9NSYkhbL6rxS/s6Nlqk3+KiuOscZQEu2An3r8W1RZNQOXUuOd
-   DPAAknzJXWwfYsXkW1LFZd8dQntremg8mCbYE0RTo8SdcQbUVn250+FCl
-   wA8j2WGSpuLTMgvbuTsxKDy4XEJUHzPUmnizeLCIavqlmNbJEuwIgpuhi
-   cjh6toa+hJ6wQPHrd/tX1iC2BJdY6mqL18epah7G3YVPEOc8zrl/3SSbn
-   Q==;
-X-CSE-ConnectionGUID: bvZzCf3dQ5+hvTmN+nHzBQ==
-X-CSE-MsgGUID: C9csftaRRSujjB9EEGCyAw==
+  bh=nK3+LcnXzXyftikuQXDRPxJYaEKa1l+sJltWiV5/bCM=;
+  b=V269bNYO6oEOaPreU18tKWtEX7zXQRWaQMjxIxVUbvPfZHPoEQb3nG8a
+   XF8ae/bvjci6W+u/Z+R1GwBU2WrTRyTc6Gx8HYb1qodgktIxD6IrT9kjt
+   VH1rsZqRKlRpJiDDSjZ1f3SIXTxKyLnvXZqLBwWoj9nb6XlN/73TuAcT7
+   R0FkL+7+4FAEFnX0tERcZgiB7kI5WIzfDkDbIHbj/OmTrLdmni2/1k310
+   Wt9Q4TkP/AvSUXKsrXwT+74PvwqkKKpsljmUqK5sPgwehAmENQjrQ/0a2
+   OBwTwD+TspXXcM6KPlRQey2ohiUTWmSs9Bv1VFVLS1v4m8RCVbMZRpsqW
+   g==;
+X-CSE-ConnectionGUID: fofo97L5RgWRHqVWcknYbQ==
+X-CSE-MsgGUID: 3fg40C1MREuxBGw5Zc+8kg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11071"; a="29020523"
 X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
-   d="scan'208";a="24493015"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 May 2024 04:44:09 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 13 May 2024 04:44:08 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Mon, 13 May 2024 04:44:08 -0700
-Date: Mon, 13 May 2024 13:44:07 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Herve Codina <herve.codina@bootlin.com>
-CC: <UNGLinuxDriver@microchip.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Allan Nielsen
-	<allan.nielsen@microchip.com>, Steen Hegelund <steen.hegelund@microchip.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, <stable@vger.kernel.org>
-Subject: Re: [PATCH net v2] net: lan966x: remove debugfs directory in probe()
- error path
-Message-ID: <20240513114407.t2iqcx7txoxkbnlj@DEN-DL-M31836.microchip.com>
-References: <20240513111853.58668-1-herve.codina@bootlin.com>
+   d="scan'208";a="29020523"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 04:44:51 -0700
+X-CSE-ConnectionGUID: TEI0SCc0QwOaAJJtVouqWQ==
+X-CSE-MsgGUID: i1kOB4utSNKe5vIesbfTyg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
+   d="scan'208";a="30870121"
+Received: from unknown (HELO mev-dev) ([10.237.112.144])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 04:44:48 -0700
+Date: Mon, 13 May 2024 13:44:14 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	jacob.e.keller@intel.com, michal.kubiak@intel.com,
+	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
+	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
+	pio.raczynski@gmail.com, jiri@nvidia.com,
+	mateusz.polchlopek@intel.com, shayd@nvidia.com
+Subject: Re: [iwl-next v2 03/15] ice: add basic devlink subfunctions support
+Message-ID: <ZkH9DurNJ/OFDvT/@mev-dev>
+References: <20240513083735.54791-1-michal.swiatkowski@linux.intel.com>
+ <20240513083735.54791-4-michal.swiatkowski@linux.intel.com>
+ <ZkHztwMeJFU73WQm@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240513111853.58668-1-herve.codina@bootlin.com>
+In-Reply-To: <ZkHztwMeJFU73WQm@nanopsycho.orion>
 
-Hi,
+On Mon, May 13, 2024 at 01:04:23PM +0200, Jiri Pirko wrote:
+> Mon, May 13, 2024 at 10:37:23AM CEST, michal.swiatkowski@linux.intel.com wrote:
+> 
+> [...]
+> 
+> 
+> 
+> >+int ice_devlink_create_sf_port(struct ice_dynamic_port *dyn_port)
+> >+{
+> >+	struct devlink_port_attrs attrs = {};
+> >+	struct devlink_port *devlink_port;
+> >+	struct devlink *devlink;
+> >+	struct ice_vsi *vsi;
+> >+	struct device *dev;
+> >+	struct ice_pf *pf;
+> >+	int err;
+> >+
+> >+	vsi = dyn_port->vsi;
+> >+	pf = dyn_port->pf;
+> >+	dev = ice_pf_to_dev(pf);
+> >+
+> >+	devlink_port = &dyn_port->devlink_port;
+> >+
+> >+	attrs.flavour = DEVLINK_PORT_FLAVOUR_PCI_SF;
+> >+	attrs.pci_sf.pf = pf->hw.bus.func;
+> >+	attrs.pci_sf.sf = dyn_port->sfnum;
+> >+
+> >+	devlink_port_attrs_set(devlink_port, &attrs);
+> >+	devlink = priv_to_devlink(pf);
+> >+
+> >+	err = devl_port_register_with_ops(devlink, devlink_port, vsi->idx,
+> >+					  &ice_devlink_port_sf_ops);
+> >+	if (err) {
+> >+		dev_err(dev, "Failed to create devlink port for Subfunction %d",
+> >+			vsi->idx);
+> 
+> Either use extack or avoid this error message entirely. Could you please
+> double you don't write dmesg error messages in case you have extack
+> available in the rest of this patchset?
+> 
+> 
 
-The 05/13/2024 13:18, Herve Codina wrote:
-> 
-> A debugfs directory entry is create early during probe(). This entry is
-> not removed on error path leading to some "already present" issues in
-> case of EPROBE_DEFER.
-> 
-> Create this entry later in the probe() code to avoid the need to change
-> many 'return' in 'goto' and add the removal in the already present error
-> path.
-> 
-> Fixes: 942814840127 ("net: lan966x: Add VCAP debugFS support")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Sure, I can avoid, as this is called from port representor creeation
+function. I don't want to pass extack there (code is generic for VF and
+SF, and VF call doesn't have extack).
 
-This looks OK to me. As the debugfs_root is used inside lan966x_vcap_init
-which is called at the end of the probe.
+We have this pattern in few place in code (using dev_err even extack can
+be passed). Is it recommended to pass extact to all functions
+which probably want to write some message in case of error (assuming the
+call context has the extack)? 
 
-Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-
-> ---
->  drivers/net/ethernet/microchip/lan966x/lan966x_main.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+> >+		return err;
+> >+	}
+> >+
+> >+	return 0;
+> >+}
+> >+
 > 
-> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-> index 2635ef8958c8..61d88207eed4 100644
-> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-> @@ -1087,8 +1087,6 @@ static int lan966x_probe(struct platform_device *pdev)
->         platform_set_drvdata(pdev, lan966x);
->         lan966x->dev = &pdev->dev;
-> 
-> -       lan966x->debugfs_root = debugfs_create_dir("lan966x", NULL);
-> -
->         if (!device_get_mac_address(&pdev->dev, mac_addr)) {
->                 ether_addr_copy(lan966x->base_mac, mac_addr);
->         } else {
-> @@ -1179,6 +1177,8 @@ static int lan966x_probe(struct platform_device *pdev)
->                 return dev_err_probe(&pdev->dev, -ENODEV,
->                                      "no ethernet-ports child found\n");
-> 
-> +       lan966x->debugfs_root = debugfs_create_dir("lan966x", NULL);
-> +
->         /* init switch */
->         lan966x_init(lan966x);
->         lan966x_stats_init(lan966x);
-> @@ -1257,6 +1257,8 @@ static int lan966x_probe(struct platform_device *pdev)
->         destroy_workqueue(lan966x->stats_queue);
->         mutex_destroy(&lan966x->stats_lock);
-> 
-> +       debugfs_remove_recursive(lan966x->debugfs_root);
-> +
->         return err;
->  }
-> 
-> --
-> 
-> This patch was previously sent as part of a bigger series:
->   https://lore.kernel.org/lkml/20240430083730.134918-9-herve.codina@bootlin.com/
-> As it is a simple fix, this v2 is the patch extracted from the series
-> and sent alone to net.
-> 
-> Changes v1 -> v2
->   Add 'Reviewed-by: Andrew Lunn <andrew@lunn.ch>'
-> 
-> 2.44.0
-
--- 
-/Horatiu
+> [...]
 
