@@ -1,63 +1,59 @@
-Return-Path: <netdev+bounces-95870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D45F78C3B7D
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 08:40:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5A8D8C3B80
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 08:41:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A1271F2144D
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 06:40:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 530221F2156B
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 06:41:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E360B1465A3;
-	Mon, 13 May 2024 06:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF23626CB;
+	Mon, 13 May 2024 06:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="fz8SeCcn"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="IzfbNO1f"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C9E52F9B;
-	Mon, 13 May 2024 06:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9A9145FEB
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 06:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715582437; cv=none; b=miIlUwV2raCMpekwBTZq9cASjYfLvQKH8H2xzDt1WVcSKJBLH8Ug+kcMbbw4k+sUKexYb1Y/YMdz5YtbdqVFbFyyrRNc4uDDjCRR+LVUyfYZ2zBN7r/8g1rxyWrOzFHERrlXUvu38kJD6yI2ZKdgG/JfTxp8H9FQij1y5dETQHQ=
+	t=1715582452; cv=none; b=qFh5nUFvAMG8EoPLwqeQfkSKkDLsQb8sGrCEZR8N7nurr47O2SMCGF4utIdfzvTjNeeBWPm+PlLGhd/PDyl7UscyXSDwKNeY51GcISFZJg2G8O2WTuSMNYQymw9Ssf7xU6mmmimBsRsN/Wk4bo2407uZ9imkm3N9iCv1alB9p4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715582437; c=relaxed/simple;
-	bh=lqcEe4hZIzl0ewoaZ/vN2AJJvQPMQLnu4BDGTpFrGFM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=jIkXsIyaDBok2JOgSNv/vPylwCutYrdXA0BORqoMQM8rmz4y5K7z+9IBCyCLVNOy4JiUbjBju3G3NAHiXGGwzLpOICoT1Zww6IXTyMyWERhwlXMqiy7waVutGRVVP2ONZ9Ul5uqSSaWWX9QkS8WVOjvH8vaF/+9BTc907HU/Z1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=fz8SeCcn; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44D6e52h010669;
-	Mon, 13 May 2024 01:40:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1715582405;
-	bh=EznlNRZRqFxgIXuvyRQEXYusN2dLWKllykgxYp3lDds=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=fz8SeCcnbcWfSGP42Pl8maqcPtERRwY5/QbwF3ekjMm++Nmp/Vb3DgfX5OE41gQxj
-	 Fxm+q3Z6jNGoNjXv5qUs5BC4wXl0ArxaC1WbVJsxpsLOIr4vyRCAzy+yPjb/fEdyxd
-	 J+6r6C8ZJNrgkJWX+kzbrmdTS+yN4jEWYHfucYEU=
-Received: from DLEE101.ent.ti.com (dlee101.ent.ti.com [157.170.170.31])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44D6e5ob021930
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 13 May 2024 01:40:05 -0500
-Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE101.ent.ti.com
- (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 13
- May 2024 01:40:05 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE111.ent.ti.com
- (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 13 May 2024 01:40:05 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44D6dwwk076174;
-	Mon, 13 May 2024 01:39:58 -0500
-Message-ID: <7542d6ed-28aa-467d-a81a-ab44f82cef72@ti.com>
-Date: Mon, 13 May 2024 12:09:57 +0530
+	s=arc-20240116; t=1715582452; c=relaxed/simple;
+	bh=dgk3FveaLEZ4qbAhZK/LUxX+03pFLoSmpQir+R01ik4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FAU6TMK92wfDdTL10CIGF1KZVALJUyBdpHfzcH8fV6DcYJwC+1szmygyn6UC4GLaY1NFZqNjDxKEuHD9CR98+wnViN+1gzx82qDOpYnkwe7rYUG2pbDbLza3FVp6AknIigp9NZfz5hs7xr+GuAAYfMvzatt28swKIIPMG+XZq1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=IzfbNO1f; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1s6PMU-00BJuJ-KG; Mon, 13 May 2024 08:40:38 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=o8FoIHqHyz8ToVZ84VuMJ7sOuL5D0UtxTsaoYm4v+fo=; b=IzfbNO1fZSNKgCDUuz8fXODTA3
+	9wwmA+mN0oGxD7JXYtYyMExfp8AV3kYguTJgeMeP/bttIRV37L/x+YKqR6tXiOBaO4NGab4hOPXFq
+	xPrK08CHa8soXZMm3SwUsb0GbHB7ypZLHJ8Fv5qwlvvwKXJ8OqTkyHsjogKXCwfzTmfKXW1qHZbi/
+	DlU5MZmcvFoYqepmHCPARWs154sg82OdRAy+AZYXo5F8rwk6r7DR5FgJQnmA5gvHYmHnyL+dzjxTb
+	zHR3XhjCOBksvvbZgl+shuh13q1747p/e5fMaqLhCk8PUS85whkbaY1O7zlebVoXuW/sNx+3QzLn+
+	kQjNT0Dg==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1s6PMT-00080F-RV; Mon, 13 May 2024 08:40:38 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1s6PMR-005oMP-I3; Mon, 13 May 2024 08:40:35 +0200
+Message-ID: <a00d3993-c461-43f2-be6d-07259c98509a@rbox.co>
+Date: Mon, 13 May 2024 08:40:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,111 +61,192 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5] net: ti: icssg_prueth: add TAPRIO offload
- support
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, Dan Carpenter <dan.carpenter@linaro.org>,
-        Andrew Lunn <andrew@lunn.ch>, Jan Kiszka <jan.kiszka@siemens.com>,
-        Simon
- Horman <horms@kernel.org>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Randy
- Dunlap <rdunlap@infradead.org>,
-        Diogo Ivo <diogo.ivo@siemens.com>,
-        Wolfram
- Sang <wsa+renesas@sang-engineering.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>,
-        Roger
- Quadros <rogerq@ti.com>,
-        Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>
-References: <20240429103022.808161-1-danishanwar@ti.com>
- <74be4e2e25644e0b65ac1894ccb9c2d0971bb643.camel@redhat.com>
- <cc9eae8f17e3e0ad142c9efa3fe5dff7afe2554c.camel@redhat.com>
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <cc9eae8f17e3e0ad142c9efa3fe5dff7afe2554c.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v2 net] af_unix: Update unix_sk(sk)->oob_skb under
+ sk_receive_queue lock.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: billy@starlabs.sg, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
+ pabeni@redhat.com
+References: <5670c1c4-985d-4e87-9732-ad1cc59bc8db@rbox.co>
+ <20240513061244.12229-1-kuniyu@amazon.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20240513061244.12229-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-
-
-On 02/05/24 5:32 pm, Paolo Abeni wrote:
-> On Thu, 2024-05-02 at 13:59 +0200, Paolo Abeni wrote:
->> On Mon, 2024-04-29 at 16:00 +0530, MD Danish Anwar wrote:
->>> +static int emac_taprio_replace(struct net_device *ndev,
->>> +			       struct tc_taprio_qopt_offload *taprio)
->>> +{
->>> +	struct prueth_emac *emac = netdev_priv(ndev);
->>> +	struct tc_taprio_qopt_offload *est_new;
->>> +	int ret;
+On 5/13/24 08:12, Kuniyuki Iwashima wrote:
+> From: Michal Luczaj <mhal@rbox.co>
+> Date: Sun, 12 May 2024 16:47:11 +0200
+>> On 5/10/24 11:39, Kuniyuki Iwashima wrote:
+>>> @@ -2655,6 +2661,8 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
+>>>  		consume_skb(skb);
+>>>  		skb = NULL;
+>>>  	} else {
+>>> +		spin_lock(&sk->sk_receive_queue.lock);
 >>> +
->>> +	if (taprio->cycle_time_extension) {
->>> +		NL_SET_ERR_MSG_MOD(taprio->extack, "Cycle time extension not supported");
->>> +		return -EOPNOTSUPP;
->>> +	}
+>>>  		if (skb == u->oob_skb) {
+>>>  			if (copied) {
+>>>  				skb = NULL;
+>>> @@ -2666,13 +2674,15 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
+>>>  			} else if (flags & MSG_PEEK) {
+>>>  				skb = NULL;
+>>>  			} else {
+>>> -				skb_unlink(skb, &sk->sk_receive_queue);
+>>> +				__skb_unlink(skb, &sk->sk_receive_queue);
+>>>  				WRITE_ONCE(u->oob_skb, NULL);
+>>>  				if (!WARN_ON_ONCE(skb_unref(skb)))
+>>>  					kfree_skb(skb);
+>>>  				skb = skb_peek(&sk->sk_receive_queue);
+>>>  			}
+>>>  		}
 >>> +
->>> +	if (taprio->cycle_time < TAS_MIN_CYCLE_TIME) {
->>> +		NL_SET_ERR_MSG_FMT_MOD(taprio->extack, "cycle_time %llu is less than min supported cycle_time %d",
->>> +				       taprio->cycle_time, TAS_MIN_CYCLE_TIME);
->>> +		return -EINVAL;
->>> +	}
->>> +
->>> +	if (taprio->num_entries > TAS_MAX_CMD_LISTS) {
->>> +		NL_SET_ERR_MSG_FMT_MOD(taprio->extack, "num_entries %lu is more than max supported entries %d",
->>> +				       taprio->num_entries, TAS_MAX_CMD_LISTS);
->>> +		return -EINVAL;
->>> +	}
->>> +
->>> +	if (emac->qos.tas.taprio_admin)
->>> +		devm_kfree(&ndev->dev, emac->qos.tas.taprio_admin);
+>>> +		spin_unlock(&sk->sk_receive_queue.lock);
+>>>  	}
+>>>  	return skb;
+>>>  }
 >>
->> it looks like 'qos.tas.taprio_admin' is initialized from
->> taprio_offload_get(), so it should be free with taprio_offload_free(),
->> right?
->>
->>> +
->>> +	est_new = devm_kzalloc(&ndev->dev,
->>> +			       struct_size(est_new, entries, taprio->num_entries),
->>> +			       GFP_KERNEL);
->>> +	if (!est_new)
->>> +		return -ENOMEM;
->>
->> Why are you allocating 'est_new'? it looks like it's not used
->> anywhere?!? 
->>
->>> +
->>> +	emac->qos.tas.taprio_admin = taprio_offload_get(taprio);
->>> +	ret = tas_update_oper_list(emac);
->>> +	if (ret)
->>> +		return ret;
->>
->> Should the above clear 'taprio_admin' on error, as well? 
+>> Now it is
+>>   
+>>   spin_lock(&sk->sk_receive_queue.lock)
+>>   kfree_skb
 > 
-> Side note: the patch itself is rather big, I guess it would be better
-> split it. You can make a small series putting the the struct definition
-> move in a separate patch. 
+> This does not free skb actually and just drops a refcount by skb_get()
+> in queue_oob().
 
+I suspect you refer to change in __unix_gc()
 
-Sure Paolo, I will split the "struct definition move" to a separate
-patch and post both the patches as a small series in v6.
+ 	if (u->oob_skb) {
+-		kfree_skb(u->oob_skb);
++		WARN_ON_ONCE(skb_unref(u->oob_skb));
+ 	}
 
+What I'm talking about is the quoted above (unchanged) part in manage_oob():
+
+	if (!WARN_ON_ONCE(skb_unref(skb)))
+  		kfree_skb(skb);
+
+I might be missing something, but
+
+from array import array
+from socket import *
+a, b = socketpair(AF_UNIX, SOCK_STREAM)
+scm = (SOL_SOCKET, SCM_RIGHTS, array("i", [b.fileno()]))
+b.sendmsg([b'x'], [scm], MSG_OOB)
+b.close()
+a.recv(MSG_DONTWAIT)
+
+[   72.513125] ======================================================
+[   72.513148] WARNING: possible circular locking dependency detected
+[   72.513170] 6.9.0-rc7nokasan+ #25 Not tainted
+[   72.513193] ------------------------------------------------------
+[   72.513215] python/1054 is trying to acquire lock:
+[   72.513237] ffffffff83563898 (unix_gc_lock){+.+.}-{2:2}, at: unix_notinflight+0x23/0x100
+[   72.513266]
+               but task is already holding lock:
+[   72.513288] ffff88811eb10898 (rlock-AF_UNIX){+.+.}-{2:2}, at: unix_stream_read_generic+0x178/0xbc0
+[   72.513313]
+               which lock already depends on the new lock.
+
+[   72.513336]
+               the existing dependency chain (in reverse order) is:
+[   72.513358]
+               -> #1 (rlock-AF_UNIX){+.+.}-{2:2}:
+[   72.513381]        _raw_spin_lock+0x2f/0x40
+[   72.513404]        scan_inflight+0x36/0x1e0
+[   72.513428]        __unix_gc+0x17c/0x4b0
+[   72.513450]        process_one_work+0x217/0x700
+[   72.513474]        worker_thread+0x1ca/0x3b0
+[   72.513497]        kthread+0xdd/0x110
+[   72.513519]        ret_from_fork+0x2d/0x50
+[   72.513543]        ret_from_fork_asm+0x1a/0x30
+[   72.513565]
+               -> #0 (unix_gc_lock){+.+.}-{2:2}:
+[   72.513589]        __lock_acquire+0x137b/0x20e0
+[   72.513612]        lock_acquire+0xc5/0x2c0
+[   72.513635]        _raw_spin_lock+0x2f/0x40
+[   72.513657]        unix_notinflight+0x23/0x100
+[   72.513680]        unix_destruct_scm+0x95/0xa0
+[   72.513702]        skb_release_head_state+0x20/0x60
+[   72.513726]        kfree_skb_reason+0x53/0x1e0
+[   72.513748]        unix_stream_read_generic+0xb69/0xbc0
+[   72.513771]        unix_stream_recvmsg+0x68/0x80
+[   72.513794]        sock_recvmsg+0xb9/0xc0
+[   72.513817]        __sys_recvfrom+0xa1/0x110
+[   72.513840]        __x64_sys_recvfrom+0x20/0x30
+[   72.513862]        do_syscall_64+0x93/0x190
+[   72.513886]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   72.513909]
+               other info that might help us debug this:
+
+[   72.513932]  Possible unsafe locking scenario:
+
+[   72.513954]        CPU0                    CPU1
+[   72.513976]        ----                    ----
+[   72.513998]   lock(rlock-AF_UNIX);
+[   72.514020]                                lock(unix_gc_lock);
+[   72.514043]                                lock(rlock-AF_UNIX);
+[   72.514066]   lock(unix_gc_lock);
+[   72.514088]
+                *** DEADLOCK ***
+
+[   72.514110] 3 locks held by python/1054:
+[   72.514133]  #0: ffff88811eb10cf0 (&u->iolock){+.+.}-{3:3}, at: unix_stream_read_generic+0xd4/0xbc0
+[   72.514158]  #1: ffff88811eb10de0 (&u->lock){+.+.}-{2:2}, at: unix_stream_read_generic+0x110/0xbc0
+[   72.514184]  #2: ffff88811eb10898 (rlock-AF_UNIX){+.+.}-{2:2}, at: unix_stream_read_generic+0x178/0xbc0
+[   72.514209]
+               stack backtrace:
+[   72.514231] CPU: 4 PID: 1054 Comm: python Not tainted 6.9.0-rc7nokasan+ #25
+[   72.514254] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
+[   72.514278] Call Trace:
+[   72.514300]  <TASK>
+[   72.514321]  dump_stack_lvl+0x73/0xb0
+[   72.514345]  check_noncircular+0x108/0x120
+[   72.514369]  __lock_acquire+0x137b/0x20e0
+[   72.514392]  lock_acquire+0xc5/0x2c0
+[   72.514415]  ? unix_notinflight+0x23/0x100
+[   72.514439]  _raw_spin_lock+0x2f/0x40
+[   72.514461]  ? unix_notinflight+0x23/0x100
+[   72.514484]  unix_notinflight+0x23/0x100
+[   72.514507]  unix_destruct_scm+0x95/0xa0
+[   72.514530]  skb_release_head_state+0x20/0x60
+[   72.514553]  kfree_skb_reason+0x53/0x1e0
+[   72.514575]  unix_stream_read_generic+0xb69/0xbc0
+[   72.514600]  unix_stream_recvmsg+0x68/0x80
+[   72.514623]  ? __pfx_unix_stream_read_actor+0x10/0x10
+[   72.514646]  sock_recvmsg+0xb9/0xc0
+[   72.514669]  __sys_recvfrom+0xa1/0x110
+[   72.514692]  ? lock_release+0x133/0x290
+[   72.514715]  ? syscall_exit_to_user_mode+0x11/0x280
+[   72.514739]  ? do_syscall_64+0xa0/0x190
+[   72.514762]  __x64_sys_recvfrom+0x20/0x30
+[   72.514784]  do_syscall_64+0x93/0x190
+[   72.514807]  ? clear_bhb_loop+0x45/0xa0
+[   72.514829]  ? clear_bhb_loop+0x45/0xa0
+[   72.514852]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   72.514875] RIP: 0033:0x7fc16bb3594d
+[   72.514899] Code: 02 02 00 00 00 5d c3 66 0f 1f 44 00 00 f3 0f 1e fa 80 3d 25 8a 0c 00 00 41 89 ca 74 20 45 31 c9 45 31 c0 b8 2d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 6b c3 66 2e 0f 1f 84 00 00 00 00 00 55 48 89
+[   72.514925] RSP: 002b:00007fffae4ab2f8 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
+[   72.514949] RAX: ffffffffffffffda RBX: 00007fffae4ab3c8 RCX: 00007fc16bb3594d
+[   72.514972] RDX: 0000000000000040 RSI: 00007fc15e298f30 RDI: 0000000000000003
+[   72.514994] RBP: 00007fffae4ab310 R08: 0000000000000000 R09: 0000000000000000
+[   72.515017] R10: 0000000000000000 R11: 0000000000000246 R12: 00007fc15e34af90
+[   72.515040] R13: 0000000000000000 R14: ffffffffc4653600 R15: 0000000000000000
+[   72.515064]  </TASK>
+
+>>     unix_destruct_scm
 > 
-> Thanks,
+> So, here we don't reach unix_destruct_scm().
 > 
-> Paolo
+> That's why I changed kfree_skb() to skb_unref() in __unix_gc().
 > 
+> Thanks!
+> 
+> 
+>>       unix_notinflight
+>>         spin_lock(&unix_gc_lock)
+>>
+>> I.e. sk_receive_queue.lock -> unix_gc_lock, inversion of what unix_gc() does.
+>> But that's benign, right?
 
--- 
-Thanks and Regards,
-Danish
 
