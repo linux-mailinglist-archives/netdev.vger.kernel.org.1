@@ -1,161 +1,166 @@
-Return-Path: <netdev+bounces-96138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82A198C472F
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:51:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E00278C4731
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:52:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A506F1C21342
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 18:51:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EFC128211A
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 18:52:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853794207A;
-	Mon, 13 May 2024 18:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A9C3BB24;
+	Mon, 13 May 2024 18:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="chCf5mVF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eh4k1GU+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8874C3FE5D
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 18:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6163A1BB
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 18:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715626302; cv=none; b=CKwk9vUSQmZyy+AxoOBcZU9NcuQ1UPBDWQlmIWu/vPWrc4COk32yhbgSNeE641yTUHxBBbVUMbKyJL9iQ0c55V3EOSq4uyVsLfht7feEPiZ7WQK7GZnAXlFN0mmnYZrvPu+HZNga+1HprA78qU2mGzFs0fQDzc+Ev/lIrltQhJg=
+	t=1715626351; cv=none; b=eJa05VZYY4AJcyvWHLzyvNrmkuS3c3LPCeF33FXYjtFR77B1OUglVcBD0YUd17Q19vRl6kcFOplTx/IbaHeeMfMeac+mHMBrgSoAzpo4pWO4ShvSo7qSevIVyXR8etWw3RAqQRiQYsVjRKkt73R/c2jxF/dug3dyugd09Ei1UWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715626302; c=relaxed/simple;
-	bh=bvx6mCnzX8C2T7z/ykshZS5xSeo3dI7Pp2H7YdnXt/4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UsjE8kxLK8gAMQBWUOcKqXBZmAmc8F6kFz20jpe9BOlyvUFPiOi7RF5jJN8AOLWpvlk/maKLzK8wi96Sgx/BC9FZUZjIDo9k39MoW+VjdqcbQr0ejtB0i0ldrnHYmxyPEzeN6zmh7Lqn5IqC98HAomnWB4Jvu6AFB3nghWOlNHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=chCf5mVF; arc=none smtp.client-ip=209.85.161.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5b2a66dce8fso1370115eaf.1
-        for <netdev@vger.kernel.org>; Mon, 13 May 2024 11:51:39 -0700 (PDT)
+	s=arc-20240116; t=1715626351; c=relaxed/simple;
+	bh=RHFxF++MdlcifyUKUTPD5PlJXCL9xvyKsliGs+ma++s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oibDgCSfipd/plBmygdR1whef+HQULMTs/HnqYjWnLfE1ImnyibnGwT/XxzC9ys4sXTMeHuBVD6o/hOIoCUrz5dx3eftWiTlQKzBNjKBFLfQkV+Ez/WfJzVWKomh9U8e37K8CXAZu1RyhzFMGdlMqSEP6W1iFFB2XE/S/hcnYbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eh4k1GU+; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-420104e5390so21653625e9.1
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 11:52:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1715626298; x=1716231098; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=uyix+o2/yzI/teQyeT3mBLMMtNsSET+xVm+DqXsTGyI=;
-        b=chCf5mVFJ8CkQzfA9IqZt8XTTy+24M+77aVJuIbrAev3NEheKEiorAcdUJYFhaKd8d
-         MeoUM+Rm89aS4dcMF68cIZFPvZivkpNa7zVdnzXgyLcZr08VjbcbtDn1oBeFzb4FykpE
-         OmY2LgVtqqG8dPyMGgiDdNWMVSRjYcdwKZg9Q=
+        d=gmail.com; s=20230601; t=1715626347; x=1716231147; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QlvjfWk3Cg8lMMByaTZxOZWwgPplDnEQz1EYH4IRBaM=;
+        b=eh4k1GU+Pr/PjEkXfaeENb53ejvamF3CtF7W/gYkRu0jRmFIJtIFHe+HxZCNE0TXog
+         qvl3S9xV8uG27ZSv7UdUmKvz0vjk6ct8GhT7H+B9mRZWRNun9dM4IWkhSHZf8Vy3sKSJ
+         ouZYKu3fGMmn1nSP/8HBN7P/sPaXD5RspRAwZPB427p5FMPI6UnO14xUt+u8glsLMmbP
+         dOMi6Pz5Syi1RRkGickst938JMbCr4DB+eRMBq33Hrw57x2IB/JoaKrv61v7Lyut3oSw
+         I75WRlISuWXXgffVw4DU7pRC1YQCTz8EArqEevjgSO7zDBfP429xvySBhBW7hdjODQ4p
+         MfFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715626298; x=1716231098;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uyix+o2/yzI/teQyeT3mBLMMtNsSET+xVm+DqXsTGyI=;
-        b=O1Sq/jTXuNTg0BcjM4b6PVj4pRyi6UKS/gNgkWnHdfhLOXv9hDSFbPjAtAbnnStJwj
-         mzHvP1w9OcsP3RXyIdnvpus0EhMjvAVahfND1n4nGHV+EC0ADY30tVg1YDQTfZG+rwz8
-         0KY9s4szLbEmoujwrfesVjFOAgXFyPY2aFhGAKxzRRblBXKJSS7X36Qb9skPMPhETsOq
-         cKuPGonqWCROZcoK4OXx8D9VaC+5krSLiyByrdq2mh2rrkRyzYVc/oZ1oXX2ZLH8I6Ul
-         kB9bXvmBpzg5c/F6O5DcH2PmShuLSidBuvtB/ZtaTVf7v2O5koqz3FMMEwqPMFvCO9YK
-         GBBw==
-X-Forwarded-Encrypted: i=1; AJvYcCWMYLRbqgybd2G34be/b/jBmHcClrqojP3tvaog81Mmfg61rjlQj9Cpm43BzZIAWNud8PvjYsoAfG3wj6xnRj8s1iwLoGJN
-X-Gm-Message-State: AOJu0Yz/P8csQEKDoaENDpBtU2cbl4uJleSfsT/1rp4uf1fLNTiMHl07
-	UkdUvoSlm1xZKerW9zd6/4xaoD2o5fEqHF7f/dSXfPSK9JxjsJ+Jh9TtRlhp9w==
-X-Google-Smtp-Source: AGHT+IGv1B1Gx2wKtJWfijbWmucGg9LEe4iuF9AOrXx3x9zQT6qPe6BMe/LLFnyboO/EG8WWyTenMw==
-X-Received: by 2002:a05:6358:6505:b0:192:5b28:1ace with SMTP id e5c5f4694b2df-193bd007a1cmr1186924055d.29.1715626298112;
-        Mon, 13 May 2024 11:51:38 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-634103f6982sm6959074a12.60.2024.05.13.11.51.37
+        d=1e100.net; s=20230601; t=1715626347; x=1716231147;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QlvjfWk3Cg8lMMByaTZxOZWwgPplDnEQz1EYH4IRBaM=;
+        b=uLXEknxItl53JJvbUrHx3cfezv1JxSBEAW6roAKHlDWgDMwVDdm/LJP82/ZUOEGKP7
+         6CWGZSbX/JbFZw6ZU3d8H9SmfInSEqFbxR0BOYB7dSmsgLww4J5zVQi7u+TpfVd3P1bd
+         lBJxf1Z9h/YJK6ktD/M72L/xpidxWYkb8dTdmZ8t5/8yCs2DqAk4MGed+7UATYkjpyoG
+         wQM4jcl+2rM6Epo4X8oh0wkMlomfsNjfXDvT1KS7vVDucdNfCg3NGfYAtUN7OsogdeRa
+         H3Z+M752e8wNE/WkNnbWjIXXRZjGHO32R/wTAdE1OuJl1qgWtZ0Qw05+tNM1ff+XaGOT
+         CkmA==
+X-Gm-Message-State: AOJu0YwkDYxjPxgyoP6N0yWVRmaV4u/5Kirb2dECnWyqOz8DjUz3zhxa
+	hcEkCcpIT1QNv5Ytk+CUhr2s1RY9clyAyjL4m9l9t7eEDTZGfJC8zkFTlsj+
+X-Google-Smtp-Source: AGHT+IHjHfgQAcUDXPphj32sijqAAQ1DtlnIEXSvHbvjSvuiSxCPG3JerM7ZNtUMN6uhpopoR6eL6g==
+X-Received: by 2002:a05:600c:3d87:b0:420:182e:eb46 with SMTP id 5b1f17b1804b1-420182ef112mr30441315e9.38.1715626346362;
+        Mon, 13 May 2024 11:52:26 -0700 (PDT)
+Received: from lenovo-lap.localdomain (89-139-137-21.bb.netvision.net.il. [89.139.137.21])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3502bbbc082sm11772308f8f.107.2024.05.13.11.52.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 11:51:37 -0700 (PDT)
-Date: Mon, 13 May 2024 11:51:37 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Erick Archer <erick.archer@outlook.com>
-Cc: Jiri Slaby <jirislaby@kernel.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S.  Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH v2] tty: rfcomm: prefer struct_size over open coded
- arithmetic
-Message-ID: <202405131150.31B872F41A@keescook>
-References: <AS8PR02MB7237262C62B054FABD7229168BE12@AS8PR02MB7237.eurprd02.prod.outlook.com>
- <d11dacfa-5925-4040-b60b-02ab731d5f1a@kernel.org>
- <CABBYNZ+4CcoBvkj8ze7mZ4vVfWfm_tyBxdFspvreVASi0VR=6A@mail.gmail.com>
- <AS8PR02MB72379B760CF7B6A26A69C5558BE22@AS8PR02MB7237.eurprd02.prod.outlook.com>
+        Mon, 13 May 2024 11:52:25 -0700 (PDT)
+From: Yedaya Katsman <yedaya.ka@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	Yedaya Katsman <yedaya.ka@gmail.com>
+Subject: [PATCH] rtmon: Align usage with ip help
+Date: Mon, 13 May 2024 21:52:17 +0300
+Message-Id: <20240513185217.13925-1-yedaya.ka@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <AS8PR02MB72379B760CF7B6A26A69C5558BE22@AS8PR02MB7237.eurprd02.prod.outlook.com>
 
-On Mon, May 13, 2024 at 07:12:57PM +0200, Erick Archer wrote:
-> Hi Kees, Jiri and Luiz,
-> First of all, thanks for the reviews.
-> 
-> On Mon, May 13, 2024 at 12:29:04PM -0400, Luiz Augusto von Dentz wrote:
-> > Hi Jiri, Eric,
-> > 
-> > On Mon, May 13, 2024 at 1:07 AM Jiri Slaby <jirislaby@kernel.org> wrote:
-> > >
-> > > On 12. 05. 24, 13:17, Erick Archer wrote:
-> > > > This is an effort to get rid of all multiplications from allocation
-> > > > functions in order to prevent integer overflows [1][2].
-> > > >
-> > > > As the "dl" variable is a pointer to "struct rfcomm_dev_list_req" and
-> > > > this structure ends in a flexible array:
-> > > ...
-> > > > --- a/include/net/bluetooth/rfcomm.h
-> > > > +++ b/include/net/bluetooth/rfcomm.h
-> > > ...
-> > > > @@ -528,12 +527,12 @@ static int rfcomm_get_dev_list(void __user *arg)
-> > > >       list_for_each_entry(dev, &rfcomm_dev_list, list) {
-> > > >               if (!tty_port_get(&dev->port))
-> > > >                       continue;
-> > > > -             (di + n)->id      = dev->id;
-> > > > -             (di + n)->flags   = dev->flags;
-> > > > -             (di + n)->state   = dev->dlc->state;
-> > > > -             (di + n)->channel = dev->channel;
-> > > > -             bacpy(&(di + n)->src, &dev->src);
-> > > > -             bacpy(&(di + n)->dst, &dev->dst);
-> > > > +             di[n].id      = dev->id;
-> > > > +             di[n].flags   = dev->flags;
-> > > > +             di[n].state   = dev->dlc->state;
-> > > > +             di[n].channel = dev->channel;
-> > > > +             bacpy(&di[n].src, &dev->src);
-> > > > +             bacpy(&di[n].dst, &dev->dst);
-> > >
-> > > This does not relate much to "prefer struct_size over open coded
-> > > arithmetic". It should have been in a separate patch.
-> > 
-> > +1, please split these changes into its own patch so we can apply it separately.
-> 
-> Ok, no problem. Also, I will simplify the "bacpy" lines with direct
-> assignments as Kees suggested:
-> 
->    di[n].src = dev->src;
->    di[n].dst = dev->dst;
-> 
-> instead of:
-> 
->    bacpy(&di[n].src, &dev->src);
->    bacpy(&di[n].dst, &dev->dst);
+Also update the man page accordingly, and add ip-monitor to see also
 
-I think that's a separate thing and you can leave bacpy() as-is for now.
+Signed-off-by: Yedaya Katsman <yedaya.ka@gmail.com>
+---
+ ip/rtmon.c       |  4 ++--
+ man/man8/rtmon.8 | 31 +++++++++++++++++++++++++------
+ 2 files changed, 27 insertions(+), 8 deletions(-)
 
+diff --git a/ip/rtmon.c b/ip/rtmon.c
+index 08105d686c08..470f4ba641dc 100644
+--- a/ip/rtmon.c
++++ b/ip/rtmon.c
+@@ -58,10 +58,10 @@ static int dump_msg2(struct nlmsghdr *n, void *arg)
+ static void usage(void)
+ {
+ 	fprintf(stderr,
+-		"Usage: rtmon [ OPTIONS ] file FILE [ all | LISTofOBJECTS ]\n"
++		"Usage: rtmon [ OPTIONS ] file FILE [ all | OBJECTS ]\n"
+ 		"OPTIONS := { -f[amily] { inet | inet6 | link | help } |\n"
+ 		"             -4 | -6 | -0 | -V[ersion] }\n"
+-		"LISTofOBJECTS := [ link ] [ address ] [ route ]\n");
++		"OBJECTS := [ link ] [ address ] [ route ]\n");
+ 	exit(-1);
+ }
+ 
+diff --git a/man/man8/rtmon.8 b/man/man8/rtmon.8
+index 38a2b77470e6..f3b9f774413f 100644
+--- a/man/man8/rtmon.8
++++ b/man/man8/rtmon.8
+@@ -1,9 +1,27 @@
+ .TH RTMON 8
+-.SH NAME
++.SH "NAME"
+ rtmon \- listens to and monitors RTnetlink
+-.SH SYNOPSIS
+-.B rtmon
+-.RI "[ options ] file FILE [ all | LISTofOBJECTS ]"
++.SH "SYNOPSIS"
++.sp
++.ad l
++.in +8
++.ti -8
++.B "rtmon"
++.RI "[ " OPTIONS " ] "
++.BI "file " FILE
++.BR "[ " all
++.RI "| " OBJECTS
++.RB "]"
++
++.ti -8
++.IR OPTIONS
++.RI ":= { f[amily] { inet | inet6 | link | help } |"
++.RI "-4 | -6 | -0 | -V[ersion] }"
++
++.ti -8
++.I OBJECTS
++.B ":= [" link "]" "[" address "]" "[" route "]"
++
+ .SH DESCRIPTION
+ This manual page documents briefly the
+ .B rtmon
+@@ -32,8 +50,8 @@ Print version and exit.
+ .B help
+ Show summary of options.
+ .TP
+-.B file FILE [ all | LISTofOBJECTS ]
+-Log output to FILE. LISTofOBJECTS is the list of object types that we
++.B file FILE [ all | OBJECTS ]
++Log output to FILE. OBJECTS is the list of object types that we
+ want to monitor. It may contain 'link', 'address', 'route'
+ and 'all'. 'link' specifies the network device, 'address' the protocol
+ (IP or IPv6) address on a device, 'route' the routing table entry
+@@ -60,6 +78,7 @@ Log to file /var/log/rtmon.log, then run:
+ to display logged output from file.
+ .SH SEE ALSO
+ .BR ip (8)
++.BR ip-monitor (8)
+ .SH AUTHOR
+ .B rtmon
+ was written by Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>.
 -- 
-Kees Cook
+2.34.1
+
 
