@@ -1,224 +1,278 @@
-Return-Path: <netdev+bounces-96027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5B678C40AA
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 14:25:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD0598C40B8
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 14:28:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 046AD1C22C79
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 12:25:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 936CA287090
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 12:28:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8197A14F133;
-	Mon, 13 May 2024 12:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 547C214F9C6;
+	Mon, 13 May 2024 12:28:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="frN0szYk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tyx1nlK9"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2047.outbound.protection.outlook.com [40.107.21.47])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA8B14F12E;
-	Mon, 13 May 2024 12:24:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715603099; cv=fail; b=UHP7MyBR1LICwiAIhcrBCmGvHg2EBcR6WJ6xMequnsgM2ZTDZKApJpMZxwtDbB5BdcIYEJFJMVyfEsKLBIUQJnlNzoaEIpvPWqS/SSvWMd+bQt10PafiKCZk6FbgoxGs6TV1Z1j4DNT/02VRG8WuPV0oSJUctPFEXi6KeKZrbig=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715603099; c=relaxed/simple;
-	bh=ay9f4t7N4PQ58t/7erElnWry+IUpmPBRZhAFXPWxw90=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=AMx6C+GjAOPs91KuGQmbKkWroQO83XBK9fi7NxTfUHrOt71wzBfjyex0+7H2smugz/moiWedMtvLcI99mVPOHSTYV2Xk3h6cFyObBfRSldWpjVkY6Ubm3OCmmDD0QYsJe68QWzsk1LvNjHheCnphdn8poomR+7Yu/DZ/qy5VrBU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=frN0szYk; arc=fail smtp.client-ip=40.107.21.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FCB2UJEDhZ7zmx3k0W/v89vk4p7nv7Ok3+BOOd+4ZxfWzc63H9wK3TpsCEKQlwC6c7nUSh181P+kMhj2V/BS+d3g0Gl79b49H+nRxA5TykY1Iyg1aIcLBIozZxZmeLGBZn+fbGcA6BLBEXBISqSfkSte37phqd8xFC2UxXS3uuuXD+KAavUyH37Cvu7rFtJHZs2GGMsruXWrcE60vMmVyZmHqlp9FNauLrmgqY9wuRczUoxmLHsBFB9Y+09dpMbb6GtExWV6wENhgNJCQJ2kepm9NmBuC/gcra9fPJ9o7YLISDWz1qROe2hyZZsd868OgJfZJjsLtcEWLSAb5Ba4og==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ay9f4t7N4PQ58t/7erElnWry+IUpmPBRZhAFXPWxw90=;
- b=FiX+GlLyW/ZIqSO9JwBNHHGyiBxZse1QDfcxoqUrKuCEBdkcQi3QDa7NkzZ4R9WhOlWrr2ffEO80Ck8lmaxsTrlZETVXl+dy6Qc5t8brEkYMsd2II6vnr3OYPXQyWo51chDAcuLVa+P96Wc/vGsEGug2uUu3bPGfL73XIuYuourzQnhEDa6xpNs8FbPgZAA22oY+WyDbYUPIZJ9s7FxT3E/e8rRoOisnm1WCBf4xeCQBx9wBB3OABb9pkIA+9CEwTT/26AECrStOMWT57riLGyhWiMbyYVXPohigJuORAi06rDYOivY67uLpNoNHEOfFGZnLjRaxSQXI8YsQ2zOoGQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ay9f4t7N4PQ58t/7erElnWry+IUpmPBRZhAFXPWxw90=;
- b=frN0szYkn5J39VNo84exkhLxOIlGqeTOHcVwCL2Hio+E01VTXF+iGbgN3Z+oF3Tcwg1dS6YoGMZC1Yzk7o8xEGlF1bncDslCoUCKUHBjci7mxfc/XKgRP6vkfFZ/2+iOszmPuRoG3ReQFE40RFRJp73UAsy/2my3Bq3IFDUx4U0=
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by AM0PR04MB6771.eurprd04.prod.outlook.com (2603:10a6:208:18d::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Mon, 13 May
- 2024 12:24:49 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::baed:1f6d:59b4:957]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::baed:1f6d:59b4:957%5]) with mapi id 15.20.7544.052; Mon, 13 May 2024
- 12:24:49 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Hariprasad Kelam <hkelam@marvell.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>, "andrew@lunn.ch"
-	<andrew@lunn.ch>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>
-Subject: RE: [PATCH net] net: fec: avoid lock evasion when reading pps_enable
-Thread-Topic: [PATCH net] net: fec: avoid lock evasion when reading pps_enable
-Thread-Index: AQHapNmrkXK8ZZdjQEWnp7p3Tpjf6LGU5dKAgAAvzyA=
-Date: Mon, 13 May 2024 12:24:49 +0000
-Message-ID:
- <PAXPR04MB851010A6DBA52A04DA104E1C88E22@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20240513015127.961360-1-wei.fang@nxp.com>
- <PH0PR18MB4474D5050F6CBA0B2D4A6041DEE22@PH0PR18MB4474.namprd18.prod.outlook.com>
-In-Reply-To:
- <PH0PR18MB4474D5050F6CBA0B2D4A6041DEE22@PH0PR18MB4474.namprd18.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|AM0PR04MB6771:EE_
-x-ms-office365-filtering-correlation-id: 6ed486d2-481e-4874-a1f9-08dc7347af00
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230031|366007|1800799015|7416005|376005|921011|38070700009;
-x-microsoft-antispam-message-info:
- =?gb2312?B?b1dRS0dxMmtyMUIvbU4rb28zS2NxWFpNU1F6ZXAxcW9IYU0yY0NtZWVTREhw?=
- =?gb2312?B?L3NRRzMvaEtXU1VOWVNGU2pyYmFPMm9uUzFwdjBINW5YaWRoUzRSYkhVTHhE?=
- =?gb2312?B?N0tnSmRpMmVlaldydEhobExJa0docWhoUnk3MjdvdnRqa3RPa0x3d25Fbm9y?=
- =?gb2312?B?U2JISlNtV2NUdTZDaEhWOElZMHY5bjNuZ2hnTy9NZFFpMjRKRnFNNWZnempQ?=
- =?gb2312?B?bjZzMTNkMVQrVzlBOHdYRHFuRWN1M1FIaGNFZHd3T2ZseGlxODRNZUNESUt0?=
- =?gb2312?B?U2lWMXpndDRablBlSHlkeXp4SjhKTWZBSWRINksvYk1PeHVyN28yMW41MXhN?=
- =?gb2312?B?RXhzODlGU2FMeWxCZ0hBcVF0Vy9UQ2pSV0MrVVc4K0E1c0ZKUXVqazhmQ3hS?=
- =?gb2312?B?Nm9hQzhDOXY0NUh1aDJxSytrbFRtZ3NTU0J0NTgxUjJHbGFMY1pabGkzTjY5?=
- =?gb2312?B?dExTdFBwcEZVdGRaSitYSGtYdUlaYWcvbE1MdTFwOStna1F1MzRIYXRqcllh?=
- =?gb2312?B?UEE5NWhucThQbTRJNmhKK2IyR1J4MElHa2ExTDBzbm10di9pNGxIWkNTTUda?=
- =?gb2312?B?aFRxV2pQc1FIOGZQTEtLWTNhS1hQc3dDdW0xdE8wWkJ1RjY0NFBGNTZ1N3lv?=
- =?gb2312?B?Z1k2LzlsaitwbkJ2eEFsRFFoMWFwU0dzL0lGb0dDRDY5dDJTaVNaOElTZ1dC?=
- =?gb2312?B?VnhhcWREMjVYdHB1c21QaGNxNnpvSjRTaUYrOVhEUzdvdHdhQUc4SVpuSndi?=
- =?gb2312?B?YUc2ZDZqYmpPaTBRSDc0ODF1WGpmTUl6c0pMcTlXaXJTZkRYTVRlTDR1K3hC?=
- =?gb2312?B?TW9NZUtLQ3dMdzBKMHRybWhhY25pS2xQVWhMaVIxN2hqemhsMjlTL3Q4MERK?=
- =?gb2312?B?SEdUYnhhZHp2UXlxcjNYQVhHWHZmdEVMcG9qSlp3eFRjelhGQWF5bno4SjN5?=
- =?gb2312?B?MFArajBvSDhqc01UbU1UV2R0UkhaK1VCMXBjaWUvU2tRNDBUVWp5OGc5Tk0y?=
- =?gb2312?B?SVlwTG9TMStwQVhYdU1SR2pSR3hZZUVsT2dkODVva1lSN002cWFnYm01VnRs?=
- =?gb2312?B?cFZCeWl3eGx1U0hDU3BTeTJYQnNOYU45ZGFYN1YrcDhnT0NhZExMWFRzcHdU?=
- =?gb2312?B?by9pcUJGOVZZaDZnWXFFVmpjYUZXS3RIVWM1Q0J4U0FlbnNlbHRhZlpuNVRs?=
- =?gb2312?B?TTlFV1RFZlM1MGc4dXJQS3hubWxmZ1dXaXQwK2UzWi9xSjE3S3c0OE03bXRB?=
- =?gb2312?B?M1lYc3BINVRxNGtpbnZ5aWJ6Wm1wcGxIT3dXMHVLNVdwUGUwOU9ZTGdPMGc1?=
- =?gb2312?B?RDRyR2Nqa0o0d1NmNEsvbXIxZ205eDVjT3pta2MvUTBITVpwVG14QitlY1I0?=
- =?gb2312?B?Q1FPc0hrN0JYUm1FczRuYll0TXBBajNhYVF5czNaam5IMFFLQ3o3VDdlWUdN?=
- =?gb2312?B?ZDE2K1l2b202TDk5U0FaWXZDa3VpTnJmOFdpbHhMUGpMNmt1Q1BNUkdCQWNt?=
- =?gb2312?B?QkVhRnlQcnE5akVzQ29RKy9ubDdoY2d0cFFDUU9lK0hSdkJQQmZoUFR6ajkr?=
- =?gb2312?B?Q0R3eXU5YjhLYjBxaUVwZDNsNWltRUUrbmRXTG8xWCtLek82QWhnbXFRU3Fq?=
- =?gb2312?B?cVlPRFU1eWwrMmNNUkJyT3dzV1Nla3BLK2d6bVlJaXU4YnNlUWMxbE1ycWxy?=
- =?gb2312?B?UVNLZmRqY3h2bGFBRllOMGJyQmtROXV3MlJjeUdpUzNZVGZycE81NG9iaDNF?=
- =?gb2312?B?S1YySkN2emdMTzlrcEFzWTdpM2FhS2ptN01hdkhiQjdzSWw0MXFqM1hhS2Jq?=
- =?gb2312?Q?aowJbIiv0hRhX2NKYT3KvRwtO/3iwyzbL+WUI=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:zh-cn;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(7416005)(376005)(921011)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?gb2312?B?VEFJUS8veWZ2VTBkaGc5Q1grV2ZQeDkxaXVBSi9WbVc0RUNmWldTb3FLMFk5?=
- =?gb2312?B?ZzdWV0Y1ZlAzRGk5UnlsZjIzWEVaWWVkTnpoUDNHNllpcXEwcis3Q0NOYkM4?=
- =?gb2312?B?RlZTK0trL1VUY1U4eldBUDFJcW9hUjU3TSsyU0RmakNXQUdldFFrL3R5NS9u?=
- =?gb2312?B?NlBuTlJWWHBrT0JVTEk4Qkk4a3A2ekdmeWZVaUV1OUhHMUlQRktvbVVKbGFO?=
- =?gb2312?B?bGlDM21wQzN4dmxlYWFISWpBTnM4dCtCTStnUkVLa241TG5zQ2hOWitIbDRq?=
- =?gb2312?B?SlRtZjFRa3Nhd0NQTW5EL0lpNTBPTmE3RXR5MW5DSE43RzhmaFdXcE10QzYx?=
- =?gb2312?B?akNMZXV0cFdPZHRkU1BHRVVnK3dVdE4wMDhCa0VreW0zWkxOQ1J6V09vZWxS?=
- =?gb2312?B?L2ZEcnhmejV6VzdVbWl1a2FlRlJpTHR6L3dBalNDVWhBMHN1dU9NeW5heTZO?=
- =?gb2312?B?YzlkdlJlQzM4eVJ2QndMbUpuWnZraUpsdGtNY0I2aWdGK0luNllUWlpCaUt6?=
- =?gb2312?B?MjI3ZWFURlZXYkxFakhXWWJhNXVmZkhQOXg5a0lEdkV4Rkp6aURNUStpSVp3?=
- =?gb2312?B?UWFTeFIvVTZXSWZ4TTBqUHBCSjRWNSs2a2I3em1JZDJ4Q3B1cDNHUW83UGQy?=
- =?gb2312?B?QURjakpsZ0I4Um42MkkxQThDSGNsTlZCUFYyeWZZM3Q5SVovaG5VbjVoU29B?=
- =?gb2312?B?VDRmR2Yzc05KbEUwTEw3ZnV3RFNxdnNDR29MOGR5YWFWU1M5c0NBZkFkUlo5?=
- =?gb2312?B?ZG91TUJBdHJVdkFlTGJwRWNMa3F4MENPSlo3WllWbjlMUGgwTDdwWm9MK2sx?=
- =?gb2312?B?MmpaQzd5NHZTcXBlVzVHOFgwWDVJbEFtNXJxTUJRU2FKK2JQR2FMM0w0dFk0?=
- =?gb2312?B?KzQ4c0MrRTRxWG1PdlNKWUdWMmhpTTJkMnJiT3hNSy9LbVpyM3picWlxNGxu?=
- =?gb2312?B?eDlORXI4aEFET3dyVGRpeGd5aVZJUGxCdWNKKzR2TVl2SUo1cG5JcFVoUElj?=
- =?gb2312?B?bWdmOEZsMklpUXl2S01Mb2RPUFBBWW9BQ3kwM01NQ2IxVThSWGlnQ2xmWXAw?=
- =?gb2312?B?cGFaRGlBc0dGN0d5cUtSb0Z4S2JYMHZ4dVpFUmtaVEtyK09WU0k0QkJpWTI5?=
- =?gb2312?B?TVBZWXdVaUVLUHNQa2F5c0tscUZOa04xaTV4em80NEhBRm9nNzFaenVKK3dS?=
- =?gb2312?B?d09zbzMzNmdTMkkzcVgvZHB5SVpWQ1ZhOGd0RHk4aEJhbDB4TjlDYW43Y0VW?=
- =?gb2312?B?VU45RUFYS3dwQjh5VC9UQVJXejU0VENPeCt4cmJZbGs4ais3ZU5zTVRHcUdF?=
- =?gb2312?B?RlM5dUVIRHdPN1FaME1Uck82VXF1TFlqM1NKbmhQT1J6VUZxL2VXZ1ZMbDBu?=
- =?gb2312?B?Q01jZTQrcVJqT1R1ZnlacHA5L2RCUys4ZnNlSWttUGZrS285WlhzVVkzRGF4?=
- =?gb2312?B?TjkxNGRLT2ZFZDBsaUIwSHkvSlhMRkF5UmZrUTZheStkUkRCTWRVWFkwY05P?=
- =?gb2312?B?blRjRTArLzJOTVJBdVVJTjluMm9KMCtHcllUR21QQ095MDd4SG9uaWJJQXFp?=
- =?gb2312?B?UDBjeWdWYlZuK2M5NFlWTTRicDBveDdUdk11V3NMR1k5bThmVTJRMzg1RWJD?=
- =?gb2312?B?SXN5c0xLOW9qMGRJcS9WdzFIRWEwNmZNSE5CYU9wemtvTDRTZ25FMTlGRDBl?=
- =?gb2312?B?RS8zRzJnQ0wxV3JyTGExb2tYQVlKdVgrMmlQcnF0U0ZidDE1WXN4cUtDeUFM?=
- =?gb2312?B?V3dzZzR5OVRNSFg2czB0YVp0WWpqYzVWOXdLOVVpQVlrbHhVZnpoSDZmdWpi?=
- =?gb2312?B?QmVMTE5yRHRuczFOREFkSU42QU5vRzdrTWI0VlpxQnVuYlhBSVdRVElWZlE5?=
- =?gb2312?B?WGFWWjN0ZStmMlRBYlFsUXZJejd4M25TWUgyajNjMDc3emhNQUp1eEpTVER0?=
- =?gb2312?B?M3NBMFpnWG9tTDlBQUZzTlE0TXlvbHBwemZlV0YvVE5rTkY2eEpFbDIzcFFE?=
- =?gb2312?B?ZHk0WG13OHZ3NWlCRFBrSnNlTU9xNGpzZExJL3A0QitMSWl0R001c2tJN2xh?=
- =?gb2312?B?cVhSYk42WUpyMlpoUUpMR1NXZGFqSVJSeVovRGVsMVUydWxiRmxFNlVQN3px?=
- =?gb2312?Q?3pdY=3D?=
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B2914F103;
+	Mon, 13 May 2024 12:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715603292; cv=none; b=BRop9kfYfQSOLAxXiiAclR4SSy6hlUh6skvQ/ud4y7xXKkUTwpAeDqIVEmoLCN60/3GN3MpAVcVMEJ5T5xJE7iGPX6VizsA5wucD2w24ScC9+uHCTFlGkVhxXvc9ETKI5pk8qWwc3CCJPmnYmLGGzVSn2PReqNBwdgnXHAIhxwU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715603292; c=relaxed/simple;
+	bh=pelZmS6zFQdTzAjl9pAUlFxDeQyc9gffvbQ7dqOMy98=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=IjRHh7YL6Nn2ZFnw/iadrdB5MM83T1yXoBV/tLCr4WgR1GDO2oTIU0breNH0CEnZr6skOAXm7Nto16X37WiX1qjQyg/6VYCDYXU8kUaZGWIuef2NJnhshL8dkD5uT1NGvTHW9Z5lGf6zcLtvh9bcLicrFOX1PxKpvHKpxbRdZAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tyx1nlK9; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715603291; x=1747139291;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=pelZmS6zFQdTzAjl9pAUlFxDeQyc9gffvbQ7dqOMy98=;
+  b=Tyx1nlK9zeOZgbITWcWyGbwcVdBARt1IP9u2TDgz5774s1i1GMLWZTed
+   TwznyHjPk7eYoGGNNH9aVHReaEvtdhdCo43/Us7+p0xwylNmJOmAifvxA
+   sZHucWfM3/UIq+7TmTUmc5R3W/79BysDfg3CJS1/VViJMcArTn4z91NJC
+   O7XZc040c/4TMgr8MqSJR1JIg/mkENPPeEJJaDJW1r/dhGMS1fSEUHD4G
+   zPiLpFt40Eab5qP4nk9vBiMun59wm/GFJP/PTUjR1MdWPn0saCj/hg+Ga
+   MbP8hSc001tuQbNv8Pw4MKhNKT2MKYLSbH5TMGkTN7BOfqoVGz+lKWyKW
+   A==;
+X-CSE-ConnectionGUID: d2ruA6gpRVSDgtQnrjPYFQ==
+X-CSE-MsgGUID: 9Er9zJ2sRW+K9pcq/yb/nQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11071"; a="22682054"
+X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
+   d="scan'208";a="22682054"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 05:28:10 -0700
+X-CSE-ConnectionGUID: WF3DJ0yaRmykx5Jte4aWwg==
+X-CSE-MsgGUID: Ln+RwkV9RU2JRw/D6ynj7g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
+   d="scan'208";a="30437389"
+Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.247.89])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 05:28:01 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Mon, 13 May 2024 15:27:56 +0300 (EEST)
+To: Christoph Fritz <christoph.fritz@hexdev.de>
+cc: Jiri Slaby <jirislaby@kernel.org>, Simon Horman <horms@kernel.org>, 
+    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+    Marc Kleine-Budde <mkl@pengutronix.de>, 
+    Oliver Hartkopp <socketcan@hartkopp.net>, 
+    Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+    "David S . Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+    Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+    Conor Dooley <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
+    Benjamin Tissoires <bentiss@kernel.org>, 
+    Sebastian Reichel <sre@kernel.org>, 
+    Linus Walleij <linus.walleij@linaro.org>, 
+    Andreas Lauser <andreas.lauser@mercedes-benz.com>, 
+    Jonathan Corbet <corbet@lwn.net>, Pavel Pisa <pisa@cmp.felk.cvut.cz>, 
+    linux-can@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
+    devicetree@vger.kernel.org, linux-input@vger.kernel.org, 
+    linux-serial <linux-serial@vger.kernel.org>
+Subject: Re: [PATCH v4 02/11] HID: hexLIN: Add support for USB LIN adapter
+In-Reply-To: <8738628a5c1b87c6521fdd8d05a3b36e5c32b48a.camel@hexdev.de>
+Message-ID: <d91451f2-5636-2526-391d-f575a7feb17c@linux.intel.com>
+References: <20240509171736.2048414-1-christoph.fritz@hexdev.de>  <20240509171736.2048414-3-christoph.fritz@hexdev.de>  <4bf1a5e9-904c-584e-72df-71abc3f99bd2@linux.intel.com> <8738628a5c1b87c6521fdd8d05a3b36e5c32b48a.camel@hexdev.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ed486d2-481e-4874-a1f9-08dc7347af00
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 May 2024 12:24:49.5251
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WH+os4djnRR/TVsQoHOiJwSPvcR+pOcvWGXCsp7OBGST84woCLhgIvC8cI/RnBd5JyTJ3E9/zFIWy3w0cpNR5w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB6771
+Content-Type: text/plain; charset=US-ASCII
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBIYXJpcHJhc2FkIEtlbGFtIDxo
-a2VsYW1AbWFydmVsbC5jb20+DQo+IFNlbnQ6IDIwMjTE6jXUwjEzyNUgMTc6MjcNCj4gVG86IFdl
-aSBGYW5nIDx3ZWkuZmFuZ0BueHAuY29tPjsgZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsNCj4gZWR1bWF6
-ZXRAZ29vZ2xlLmNvbTsga3ViYUBrZXJuZWwub3JnOyBwYWJlbmlAcmVkaGF0LmNvbTsgU2hlbndl
-aQ0KPiBXYW5nIDxzaGVud2VpLndhbmdAbnhwLmNvbT47IENsYXJrIFdhbmcgPHhpYW9uaW5nLndh
-bmdAbnhwLmNvbT47DQo+IHJpY2hhcmRjb2NocmFuQGdtYWlsLmNvbTsgYW5kcmV3QGx1bm4uY2g7
-IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmcNCj4gQ2M6IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5v
-cmc7IGlteEBsaXN0cy5saW51eC5kZXYNCj4gU3ViamVjdDogW1BBVENIIG5ldF0gbmV0OiBmZWM6
-IGF2b2lkIGxvY2sgZXZhc2lvbiB3aGVuIHJlYWRpbmcgcHBzX2VuYWJsZQ0KPiANCj4gU2VlIGlu
-bGluZSwNCj4gDQo+ID4gVGhlIGFzc2lnbm1lbnQgb2YgcHBzX2VuYWJsZSBpcyBwcm90ZWN0ZWQg
-YnkgdG1yZWdfbG9jaywgYnV0IHRoZSByZWFkDQo+ID4gb3BlcmF0aW9uIG9mIHBwc19lbmFibGUg
-aXMgbm90LiBTbyB0aGUgQ292ZXJpdHkgdG9vbCByZXBvcnRzIGEgbG9jaw0KPiA+IGV2YXNpb24g
-d2FybmluZyB3aGljaCBtYXkgY2F1c2UgZGF0YSByYWNlIHRvIG9jY3VyIHdoZW4gcnVubmluZyBp
-biBhDQo+ID4gbXVsdGl0aHJlYWQgZW52aXJvbm1lbnQuIEFsdGhvdWdoIHRoaXMgaXNzdWUgaXMg
-YWxtb3N0IGltcG9zc2libGUgdG8NCj4gPiBvY2N1ciwgd2UnZCBiZXR0ZXIgZml4IGl0LCBhdCBs
-ZWFzdCBpdCBzZWVtcyBtb3JlIGxvZ2ljYWxseQ0KPiA+IHJlYXNvbmFibGUsIGFuZCBpdCBhbHNv
-IHByZXZlbnRzIENvdmVyaXR5IGZyb20gY29udGludWluZyB0byBpc3N1ZSB3YXJuaW5ncy4NCj4g
-Pg0KPiA+IEZpeGVzOiAyNzhkMjQwNDc4OTEgKCJuZXQ6IGZlYzogcHRwOiBFbmFibGUgUFBTIG91
-dHB1dCBiYXNlZCBvbiBwdHANCj4gPiBjbG9jayIpDQo+ID4gU2lnbmVkLW9mZi1ieTogV2VpIEZh
-bmcgPHdlaS5mYW5nQG54cC5jb20+DQo+ID4gLS0tDQo+ID4gIGRyaXZlcnMvbmV0L2V0aGVybmV0
-L2ZyZWVzY2FsZS9mZWNfcHRwLmMgfCA4ICsrKysrLS0tDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCA1
-IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9uZXQvZXRoZXJuZXQvZnJlZXNjYWxlL2ZlY19wdHAuYw0KPiA+IGIvZHJpdmVycy9uZXQv
-ZXRoZXJuZXQvZnJlZXNjYWxlL2ZlY19wdHAuYw0KPiA+IGluZGV4IDE4MWQ5YmZiZWUyMi4uOGQz
-NzI3NGEzZmIwIDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ZyZWVzY2Fs
-ZS9mZWNfcHRwLmMNCj4gPiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9mcmVlc2NhbGUvZmVj
-X3B0cC5jDQo+ID4gQEAgLTEwNCwxNCArMTA0LDE2IEBAIHN0YXRpYyBpbnQgZmVjX3B0cF9lbmFi
-bGVfcHBzKHN0cnVjdA0KPiA+IGZlY19lbmV0X3ByaXZhdGUgKmZlcCwgdWludCBlbmFibGUpDQo+
-ID4gIAlzdHJ1Y3QgdGltZXNwZWM2NCB0czsNCj4gPiAgCXU2NCBuczsNCj4gPg0KPiA+IC0JaWYg
-KGZlcC0+cHBzX2VuYWJsZSA9PSBlbmFibGUpDQo+ID4gLQkJcmV0dXJuIDA7DQo+ID4gLQ0KPiA+
-ICAJZmVwLT5wcHNfY2hhbm5lbCA9IERFRkFVTFRfUFBTX0NIQU5ORUw7DQo+ID4gIAlmZXAtPnJl
-bG9hZF9wZXJpb2QgPSBQUFNfT1VQVVRfUkVMT0FEX1BFUklPRDsNCj4gPg0KPiA+ICAJc3Bpbl9s
-b2NrX2lycXNhdmUoJmZlcC0+dG1yZWdfbG9jaywgZmxhZ3MpOw0KPiA+DQo+ID4gKwlpZiAoZmVw
-LT5wcHNfZW5hYmxlID09IGVuYWJsZSkgew0KPiANCj4gQ2FuIHdlIGF0b21pY19zZXQvZ2V0IGlu
-c3RlYWQgb2Ygc3Bpbl9sb2NrIGhlcmUuDQo+IA0KSSdtIGFmcmFpZCB0aGF0IGNhbm5vdCBlbGlt
-aW5hdGUgdGhlIGxvY2sgZXZhc2lvbiB3YXJuaW5nLCBiZWNhdXNlDQppdCdzIHN0aWxsIHBvc3Np
-YmxlIHRoYXQgbXVsdGl0aHJlYWRzIHRha2UgdGhlIGZhbHNlIGJyYW5jaCBvZg0KImlmIChmZXAt
-PnBwc19lbmFibGUgPT0gZW5hYmxlKSIgYmVmb3JlIHBwc19lbmFibGUgaXMgdXBkYXRlZC4NCg0K
-DQo+IFRoYW5rcywNCj4gSGFyaXByYXNhZCBrDQo+ID4gKwkJc3Bpbl91bmxvY2tfaXJxcmVzdG9y
-ZSgmZmVwLT50bXJlZ19sb2NrLCBmbGFncyk7DQo+ID4gKwkJcmV0dXJuIDA7DQo+ID4gKwl9DQo+
-ID4gKw0KPiA+ICAJaWYgKGVuYWJsZSkgew0KPiA+ICAJCS8qIGNsZWFyIGNhcHR1cmUgb3Igb3V0
-cHV0IGNvbXBhcmUgaW50ZXJydXB0IHN0YXR1cyBpZiBoYXZlLg0KPiA+ICAJCSAqLw0KPiA+IC0t
-DQo+ID4gMi4zNC4xDQo+ID4NCg0K
+On Sat, 11 May 2024, Christoph Fritz wrote:
+
+> ...
+> > > diff --git a/drivers/hid/hid-hexdev-hexlin.c b/drivers/hid/hid-hexdev-hexlin.c
+> > > new file mode 100644
+> > > index 0000000000000..a9ed080b3e33e
+> > > --- /dev/null
+> > > +++ b/drivers/hid/hid-hexdev-hexlin.c
+> > > 
+> ...
+> > 
+> > > +}
+> > > +
+> > > +#define HEXLIN_GET_CMD(name, enum_cmd)					\
+> > > +	static int hexlin_##name(struct hexlin_priv_data *p)		\
+> > > +	{								\
+> > > +		u8 *req;						\
+> > > +		int ret;						\
+> > > +									\
+> > > +		req = kmalloc(sizeof(*req), GFP_KERNEL)	;		\
+> > 
+> > Extra space.
+> > 
+> > Use:
+> > 
+> > u8 *req __free(kfree) = kmalloc(sizeof(*req), GFP_KERNEL);
+> > 
+> > > +		if (!req)						\
+> > > +			return -ENOMEM;					\
+> > > +									\
+> > > +		*req = enum_cmd;					\
+> > > +									\
+> > > +		ret = hexlin_tx_req_status(p, req, sizeof(*req));	\
+> > > +		if (ret)						\
+> > > +			hid_err(p->hid_dev, "%s failed, error: %d\n",	\
+> > > +				#name, ret);				\
+> > > +									\
+> > > +		kfree(req);						\
+> > 
+> > Not needed after using __free().
+> > 
+> > > +		return ret;						\
+> > > +	}
+> > > +
+> > > +HEXLIN_GET_CMD(get_version, HEXLIN_GET_VERSION)
+> > > +HEXLIN_GET_CMD(reset_dev, HEXLIN_RESET)
+> > > +HEXLIN_GET_CMD(get_baudrate, HEXLIN_GET_BAUDRATE)
+> > 
+> > Could you convert the function in the macro into a helper function which 
+> > is just called by a simple function with the relevant parameters for 
+> > these 3 cases?
+> 
+> The device actually has a lot more features that I'm using in my debug
+> version and which might end up here in the future. So I would like to
+> keep it. Any objections?
+
+I don't follow, HEXLIN_GET_CMD() will always produce a copy of that same 
+function even if you use it 1000 times?? (Except for the enum and string 
+which can easily be passed as arguments to a common function).
+
+You can still keep HEXLIN_GET_CMD() which just calls that common function
+if you want to avoid giving those two parameters directly.
+
+> > > +static int hexlin_set_baudrate(struct hexlin_priv_data *priv, u16 baudrate)
+> > > +{
+> > > +	struct hexlin_baudrate_req *req;
+> > > +	int ret;
+> > > +
+> > > +	if (baudrate < LIN_MIN_BAUDRATE || baudrate > LIN_MAX_BAUDRATE)
+> > > +		return -EINVAL;
+> > > +
+> > > +	req = kmalloc(sizeof(*req), GFP_KERNEL);
+> > 
+> > Hmm... Why do you alloc this small structure (3 bytes?) with kmalloc() and 
+> > not just have it in stack as a local variable?
+> 
+> This buffer must be suitable for DMA (see docu for struct urb).
+> 
+> So with a stack variable we would need to use kmemdup() before the
+> actual sending call, but that's what you did not like since v3 so I
+> changed it to this which now you also don't like.
+>
+> Let's dial it back to the original kmemdup() usage, ok?
+
+I asked a question. Since you have a good reason for alloc, just keep the 
+alloc then.
+
+Now I notice it's kmalloc(), why not kzalloc()?
+
+> > > +static int hexlin_queue_frames_insert(struct hexlin_priv_data *priv,
+> > > +				      const struct hexlin_frame *hxf)
+> > > +{
+> > > +	struct hid_device *hdev = priv->hid_dev;
+> > > +	struct lin_frame lf;
+> > > +
+> > > +	lf.len = hxf->len;
+> > > +	lf.lin_id = hxf->lin_id;
+> > > +	memcpy(lf.data, hxf->data, LIN_MAX_DLEN);
+> > > +	lf.checksum = hxf->checksum;
+> > > +	lf.checksum_mode = hxf->checksum_mode;
+> > > +
+> > > +	hid_dbg(hdev, "id:%02x, len:%u, data:%*ph, chk:%02x (%s), flg:%08x\n",
+> > > +		lf.lin_id, lf.len, lf.len, lf.data, lf.checksum,
+> > > +		lf.checksum_mode ? "enhanced" : "classic", hxf->flags);
+> > > +
+> > > +	lin_rx(priv->ldev, &lf);
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > > +static int hexlin_raw_event(struct hid_device *hdev,
+> > > +			    struct hid_report *report, u8 *data, int sz)
+> > > +{
+> > > +	struct hexlin_priv_data *priv;
+> > > +	struct hexlin_baudrate_req *br;
+> > > +	struct hexlin_responder_answer_req *rar;
+> > > +	struct hexlin_unconditional_req *hfr;
+> > > +	struct hexlin_val8_req *vr;
+> > > +
+> > > +	if (sz < 1 || sz > HEXLIN_PKGLEN_MAX)
+> > > +		return -EREMOTEIO;
+> > > +
+> > > +	priv = hid_get_drvdata(hdev);
+> > > +
+> > > +	hid_dbg(hdev, "%s, size:%i, data[0]: 0x%02x\n", __func__, sz, data[0]);
+> > > +
+> > > +	priv->is_error = false;
+> > > +
+> > > +	switch (data[0]) {
+> > > +	case HEXLIN_SUCCESS:
+> > > +		if (sz != HEXLIN_LEN_RETCODE)
+> > > +			return -EREMOTEIO;
+> > > +		hid_dbg(hdev, "HEXLIN_SUCCESS: 0x%02x\n", data[0]);
+> > > +		complete(&priv->wait_in_report);
+> > > +		break;
+> > > +	case HEXLIN_FAIL:
+> > > +		if (sz != HEXLIN_LEN_RETCODE)
+> > > +			return -EREMOTEIO;
+> > > +		hid_err(hdev, "HEXLIN_FAIL: 0x%02x\n", data[0]);
+> > > +		priv->is_error = true;
+> > > +		complete(&priv->wait_in_report);
+> > > +		break;
+> > > +	case HEXLIN_GET_VERSION:
+> > > +		if (sz != sizeof(*vr))
+> > > +			return -EREMOTEIO;
+> > > +		vr = (struct hexlin_val8_req *) data;
+> > > +		priv->fw_version = vr->v;
+> > > +		complete(&priv->wait_in_report);
+> > > +		break;
+> > > +	case HEXLIN_GET_RESPONDER_ANSWER_ID:
+> > > +		if (sz != sizeof(*rar))
+> > > +			return -EREMOTEIO;
+> > > +		rar = (struct hexlin_responder_answer_req *) data;
+> > > +		memcpy(&priv->answ, &rar->answ, sizeof(priv->answ));
+> > > +		complete(&priv->wait_in_report);
+> > > +		break;
+> > > +	case HEXLIN_GET_BAUDRATE:
+> > > +		if (sz != sizeof(*br))
+> > > +			return -EREMOTEIO;
+> > > +		br = (struct hexlin_baudrate_req *) data;
+> > > +		le16_to_cpus(br->baudrate);
+> > > +		priv->baudrate = br->baudrate;
+> > > +		complete(&priv->wait_in_report);
+> > > +		break;
+> > > +	/* following cases not initiated by us, so no complete() */
+> > > +	case HEXLIN_FRAME:
+> > > +		if (sz != sizeof(*hfr)) {
+> > > +			hid_err_once(hdev, "frame size mismatch: %i\n", sz);
+> > > +			return -EREMOTEIO;
+> > > +		}
+> > > +		hfr = (struct hexlin_unconditional_req *) data;
+> > > +		le32_to_cpus(hfr->frm.flags);
+> > 
+> > I'm bit worried about this from endianness perspective. Perhaps there's 
+> > some struct reusing that shouldn't be happening because the same field 
+> > cannot be __le32 and u32 at the same time.
+> 
+> Can you propose a solution?
+
+Just do a le32_to_cpu(hfr->frm.flags) in the debug print's arguments?
+
+-- 
+ i.
+
 
