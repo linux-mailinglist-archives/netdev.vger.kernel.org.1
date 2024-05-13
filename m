@@ -1,143 +1,108 @@
-Return-Path: <netdev+bounces-95825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A62138C3998
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 02:27:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C8D18C39AD
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 02:43:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53E7A1F21356
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 00:27:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DC0A1C20959
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 00:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB89636D;
-	Mon, 13 May 2024 00:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114046FCC;
+	Mon, 13 May 2024 00:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BFcAA63x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gOqVZq6v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BE017E
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 00:27:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D0C6FC2;
+	Mon, 13 May 2024 00:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715560048; cv=none; b=Py8wmlHxT0H4CmoX+/3wadPsGrSHvEb2iwAOLiIed8pIAXCaEN1V7FAZ8dLKLMTRHcTM9CwvnSHZvv1xT24bTei1dJuxHiz+1FdsGweWiFMTZffspgO0gwndCxaNqg76kudG1028gd0ODpAnSwD5OgSj3tuaTJMPY/AB/dXo0p4=
+	t=1715560990; cv=none; b=e77eJPBhzmQMYDQWzF7JSADRPEoDmq2nfF6B63RNaK7vCbQ1GViUxuCP/TxRDAkeKwmjuNDGpXX07T4/qBtOjgdCkr0h7o+LLPD5iVCcZrlZZCLn5XQiVro3+lkP224jc2KeDejSjwJEGp2EpKYcGH9HBE2rw4VXzGzIq7mPjGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715560048; c=relaxed/simple;
-	bh=RcChCK/e2P8PPV38DAKw/luj9UjKgRLyOb6xsiyRB/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qYVNTsg+RnzIbycOJJn6H+P3mLUYmTlbjl6CztFpMR2udXPbNtdqlxHg5F0LdDR4bpEsYAbKjH03hfWJSTOIVi7jy2uToWEPQoqYVdkU4rst+ZkA1Dqv89dy4U279G3M7tGk/iagnkwuzLr4DtRaAz1QAZsOyKStbDaKFQt4h9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BFcAA63x; arc=none smtp.client-ip=209.85.221.44
+	s=arc-20240116; t=1715560990; c=relaxed/simple;
+	bh=dLUHedqTLE2k6E1OvZAEYDSZFfIFsDbOzJeTJwXgdUw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=IJLPs1nsncV4wWCkPmiRptCUsEN19ZT7/yb5H3sHIMWmSJf9bUV/LxS+bUN1DXYA0bzoOSmgaAUrjNHlQO/oDtwO+DBhqHZohMjeGfRZtMMo7AEHzGfkzJnOJcYPWqf3MAiXTn0Y+1vTQyRCheu3EQQ1WoGRcndq5osR57Kwbhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gOqVZq6v; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-34e7a35d5d4so3150053f8f.2
-        for <netdev@vger.kernel.org>; Sun, 12 May 2024 17:27:26 -0700 (PDT)
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-792c34f891eso314382985a.1;
+        Sun, 12 May 2024 17:43:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715560045; x=1716164845; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3JRaPexzqE9WZbiz3ZPDh0MH19zYg04J06+HDVDUWdQ=;
-        b=BFcAA63xLtpozmhl1edtAsqczWggScxqrFszAGORd1JqLE7LCqxrAEQCFjHB/CtehT
-         iXvcAShBL3vD0oyNhtgy4kLBeOhdNVUgwHkjoyKc57Mk6pe0jJwJg0GIO1h9KxtiKo3o
-         chKi8PEqDA+oPrM3dM47Vlg2NXHYXWa17sMeAZIOHF3aTfV7jj4e9D7bzMxGGNUxVuXd
-         x20bEIjIVMCxGT9Ai1hPhJ6R/n1KlfoVp7O+cZZXTbPI7ZDYlwvPE6hB+Z7NSwsnaQft
-         WIJTGd3J3l+sbHFW3Ou5vyjAi2QjzxYaNnSwRDje95x2HYKKEOH9nJcs4DPyJWxI44ra
-         7YkA==
+        d=gmail.com; s=20230601; t=1715560987; x=1716165787; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=etKO/mOZpG5gRuJLHMhccLvQr/g8BHMhEr7ucEVcBD4=;
+        b=gOqVZq6vxI1Kp0L+MhHK5lZhGw4jQo20eKkg8Is5KVf714T0srg5grk8lNxjC1VbsQ
+         EboQhK7Wxp/LnxeU9KLLumzvjSX0/YFRas20LZBxJvRRVmLPND+yR3IET3dlszqgY3FZ
+         4m39nI7Cjy02WPp6Th+ixFteL9se+APGyOKboRol1a/HjKcKWzzz5MROOapXefUb7d9e
+         EVIa4+yUuC8efm7TRkTbRZGbE/i0SCXLU2DieWMLb3MbTAIi6rXNtrkZjkoun6BfT78e
+         Nh7W6ZeC6KZCIQtp7tLm3PkjT/rNr/fX1AOcvaWHuSmqrhOoEiZg3E9Y6cruFLZHKRJh
+         vAPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715560045; x=1716164845;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3JRaPexzqE9WZbiz3ZPDh0MH19zYg04J06+HDVDUWdQ=;
-        b=gm6u4A6iR/cNowejsYs6ksYvJiX15mOoCzGXk22JtV4AjqVxgvLK3OQP+VcbQOAygY
-         Z2Ly71HI+XekADcoX0rV/OeO6lHICQtkH2NWIvbTl99L32Hs7xF8+JDlLJb5/ImwkuVn
-         S6wYPRepAED/guwLZz6XAPQ48KqxK16siHaZNx4zGHPYroJC0Ksilcbsuw8L82/dcc5x
-         wZv4ifQ01xJldHlRubxyPFtN17VLVwkmGcchzsSBBoR9/AY6VjCJQTYkLmCv4pQFQt75
-         mx05eWdPmyH59p0VCpR8LzYx+IcDq5lmunmeTcJR8kzio3enm8WhDnM8BS5Kz3JetBiI
-         Pf3g==
-X-Forwarded-Encrypted: i=1; AJvYcCVAtFZsXnkrLruzFbCxahEqYlNVU/xC1FZeSBlrDhdr2fK9Maq8nxSYE3WlAs64xxtiCRzQ7pX/XLZ1mTojysxH4i7xyDe2
-X-Gm-Message-State: AOJu0YyUqm1YZjVttKa4IIu1hXv6O4OntglPnEnbxlIH5v91C8ZTNhA/
-	AzRP+zkQP65Eib7Qn9Bv91ykGHPyiqSsydDPWmAAA7hqk1Sjz43L
-X-Google-Smtp-Source: AGHT+IHcxOC//KVIkrzhguV3cMvMxSX/17hb5BtojA51FsVqPabuYS8aNLOWVECgH6xa+UD/6IoDcQ==
-X-Received: by 2002:adf:ed8d:0:b0:34d:8bc0:3f5a with SMTP id ffacd0b85a97d-3504a206d19mr5768723f8f.0.1715560045070;
-        Sun, 12 May 2024 17:27:25 -0700 (PDT)
-Received: from [192.168.1.58] (186.28.45.217.dyn.plus.net. [217.45.28.186])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3518d817ee2sm6129666f8f.2.2024.05.12.17.27.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 May 2024 17:27:24 -0700 (PDT)
-Message-ID: <d4e9e118-b4c0-4917-b9f0-39ac52229d30@gmail.com>
-Date: Mon, 13 May 2024 01:27:24 +0100
+        d=1e100.net; s=20230601; t=1715560987; x=1716165787;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=etKO/mOZpG5gRuJLHMhccLvQr/g8BHMhEr7ucEVcBD4=;
+        b=o4RTRMUMGE1KVlAU+TgkbgE5WQoBY6WkRBNVHQmEa7p9n8V8vLu7YUrEfiWOF4tiX4
+         RiHQGDRL7EZfCviMFhDATTTxl5jYqXaV3H3TIIcqJUiYGEER6aDrS8qiByfGGl+UCY5e
+         VX4i8Xx/jNpPhqbR8Tbn93jQBuc9KwSa/Qt1CVh8/sGb1ncB0HXCzA79T0YPxe3dJomn
+         oS1oDjCajnxdb0+jBHKG76wtKqCsf3IN/M9z6BHMUqu8EgWKDKCfuHWz46vUbyq40TTq
+         RT7wcOLLnTrqxiKNk4exfYv6ojkcxb5rn9u+29bnGSzfP+E597YeGUmrKL4vVEDRm2xf
+         +bMw==
+X-Forwarded-Encrypted: i=1; AJvYcCX4aBLzLYwVxY0YQvrBnXEbbWeVDn2+o6tqHZT53oVO6iUqkn2RJznUWfBdgaO3dcZDK3nd6fb1DjNXxd8fbpMcVy5yEH9Ey7DJTNVyiiRSRCdfnlSGIlt9LE4tBAIWC4fS1Sock+sYErihPhNLSahi+yZ1S80cjov3sIsV38lQjSbCM/r3
+X-Gm-Message-State: AOJu0YzVkyafgFFIiXOyXum8FWbRvm8DAl1M96g/bzh3s2DKVDX0IjpI
+	3iLYVqNKEbhvnnFPo+1bRj/Yy7Mk90xoUCMiY+I8Dglo0rQW3Yf8
+X-Google-Smtp-Source: AGHT+IE+qHC/EvACXpTQJp4HbD6triYEnSehqBb+djbiw0RtJzx4W4lQ12DF60j0Raa88xz1VBg0ww==
+X-Received: by 2002:a05:6214:448c:b0:69b:a42:5c85 with SMTP id 6a1803df08f44-6a16819ef55mr94597756d6.30.1715560987503;
+        Sun, 12 May 2024 17:43:07 -0700 (PDT)
+Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f1852fdsm38808916d6.32.2024.05.12.17.43.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 May 2024 17:43:07 -0700 (PDT)
+Date: Sun, 12 May 2024 20:43:06 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ willemdebruijn.kernel@gmail.com, 
+ dsahern@kernel.org, 
+ alexander.duyck@gmail.com, 
+ shuah@kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Cc: Richard Gobert <richardbgobert@gmail.com>
+Message-ID: <6641621ac1e27_1d6c6729465@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240509190819.2985-2-richardbgobert@gmail.com>
+References: <20240509190819.2985-1-richardbgobert@gmail.com>
+ <20240509190819.2985-2-richardbgobert@gmail.com>
+Subject: Re: [PATCH net-next v10 1/3] net: gro: use cb instead of
+ skb->network_header
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: r8169: transmit queue timeouts and IRQ masking
-To: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org
-Cc: nic_swsd@realtek.com
-References: <ad6a0c52-4dcb-444e-88cd-a6c490a817fe@gmail.com>
- <f4197a6d-d829-4adf-8666-1390f2355540@gmail.com>
- <5181a634-fe25-45e7-803e-eb8737990e01@gmail.com>
- <adfb0005-3283-4138-97d5-b4af3a314d98@gmail.com>
- <f0305064-64d9-4705-9846-cdc0fb103b82@gmail.com>
- <940faa90-81db-40dc-8773-1720520b10ed@gmail.com>
- <c71a960f-16d3-41f0-9899-0040116b30ee@gmail.com>
- <35fa38fc-9d1e-4a22-86dd-a4c9147d7f70@gmail.com>
-Content-Language: en-GB
-From: Ken Milmore <ken.milmore@gmail.com>
-In-Reply-To: <35fa38fc-9d1e-4a22-86dd-a4c9147d7f70@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On 12/05/2024 23:08, Heiner Kallweit wrote:
-> On 12.05.2024 21:49, Ken Milmore wrote:
->>
->> I had started out with the assumption that an interrupt acknowledgement coinciding with some part of the work being done in rtl8169_poll() might be the cause of the problem.
->> So it seemed natural to try guarding the whole block by disabling interrupts at the beginning.
->> But this seems to work just as well:
->>
->> diff --git linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
->> index 6e34177..353ce99 100644
->> --- linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c
->> +++ linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
->> @@ -4659,8 +4659,10 @@ static int rtl8169_poll(struct napi_struct *napi, int budget)
->>  
->>  	work_done = rtl_rx(dev, tp, budget);
->>  
->> -	if (work_done < budget && napi_complete_done(napi, work_done))
->> +	if (work_done < budget && napi_complete_done(napi, work_done)) {
->> +		rtl_irq_disable(tp);
->>  		rtl_irq_enable(tp);
->> +	}
->>  
->>  	return work_done;
->>  }
->>
->> On this basis, I assume the problem may actually involve some subtlety with the behaviour of the interrupt mask and status registers.
->>
-> In the register dump in your original report the interrupt mask is set.
-> So it seems rtl_irq_enable() was executed. I don't have an explanation
-> why a previous rtl_irq_disable() makes a difference.
-> Interesting would be whether it has to be a write to the interrupt mask
-> register, or whether a write to any register is sufficient.
+Richard Gobert wrote:
+> This patch converts references of skb->network_header to napi_gro_cb's
+> network_offset and inner_network_offset.
 > 
+> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
 
-In place of calling rtl_irq_disable(), I tried poking at the doorbell and at some of the unused timer registers. These had no effect.
-
-I tried writing various different values to the mask register:
-
-RTL_W32(tp, IntrMask_8125, 0x00); // worked, naturally
-RTL_W32(tp, IntrMask_8125, 0x3f); // no effect
-RTL_W32(tp, IntrMask_8125, 0x3b); // no effect
-RTL_W32(tp, IntrMask_8125, 0x3a); // worked!
-
-So masking both TxOK and RxOK before unmasking seemed to work, but masking either of them individually didn't.
-
-Also, masking just TxOK then just RxOK in sequence, or vice versa didn't seem to work; they both had to be masked together.
-
-YMMV! :-)
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
