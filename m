@@ -1,164 +1,191 @@
-Return-Path: <netdev+bounces-95943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D85FF8C3E35
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:36:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E60D8C3E45
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:40:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B683281F24
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 09:36:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 338F62835F1
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 09:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 777F31474B1;
-	Mon, 13 May 2024 09:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B4B1487EC;
+	Mon, 13 May 2024 09:40:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F0453398
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 09:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009F627715;
+	Mon, 13 May 2024 09:40:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715593015; cv=none; b=W4/TdJjMLZh8FrNKsiVbc+PvpaaFMCXFTL1yu6S20pTUCgFq3DGn7XQ8ho8FGjMDNlB646D+Gi8hjcNmfA3A+jAVtB1jLoIdQymKKwu4Mv6/xx0lKwBDjmleHd5QG2W5ERsMo/00S/JRKRxr6i9qdfVIq4RX9bNqvq3zT7C66rI=
+	t=1715593211; cv=none; b=iwyOVN8hQOuO29J6W98ozrTgDksdTaIKyalqUldlURDI4XGOnSGkTgGZ5zMGtrWuZO3RbbITDZhqnzMx+40+au1itUKuWbro21+FDn9L7z/2F/V+zBn8pUQ1Dkbe6wGkBADKEZ1KQeLbV9S0qqlsLgf2RtnBY0ar2OufOdYFLLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715593015; c=relaxed/simple;
-	bh=NJhgzsWZRJVsYO5SWnYBu3WkIWy49govnXd7Z7CErnE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=BhSeH+CgNAvpG17irpTbthBg30Ue8fX886LxeZ6VQDzdNXoXtv1c+BQ3qPoNphiYcenXSoyk643M7lt8rR7VTqTAXhFW6T7gsF8kC01cyFJ1mFwZSqk2sVBnx5R4JvoYGb7aCOnusIB1uj8rHheJV57XtwRUrlGjVvWrCnKETnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-8T-8oHxDO2S5VrVeXl3WDw-1; Mon, 13 May 2024 05:36:48 -0400
-X-MC-Unique: 8T-8oHxDO2S5VrVeXl3WDw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5B4D0185A78E;
-	Mon, 13 May 2024 09:36:48 +0000 (UTC)
-Received: from hog (unknown [10.39.192.5])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0141A2BA;
-	Mon, 13 May 2024 09:36:46 +0000 (UTC)
-Date: Mon, 13 May 2024 11:36:45 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
-Subject: Re: [PATCH net-next v3 09/24] ovpn: implement basic TX path (UDP)
-Message-ID: <ZkHfLWPJAznta1A4@hog>
-References: <20240506011637.27272-1-antonio@openvpn.net>
- <20240506011637.27272-10-antonio@openvpn.net>
- <ZkE2JmBCj-yJ3xYK@hog>
- <2d707980-72d1-49d1-a9e8-f794fcc590cb@openvpn.net>
+	s=arc-20240116; t=1715593211; c=relaxed/simple;
+	bh=Nmnc+c3/hr7r3AjTueUe6J1xRTmDFMiUlZX1tBMVHcg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WgxeKT7GFZEeaLiMEa21i1xFKKdgQs+glbDHDIhebH90tAExhau6p1RX6lkFNOv1Syy2qv0fwcbjS4KWaRmudEeDJ3CnxeDeOffsb/w43Yg3MSt0f3QNZSLwFtP0YMnMqbP8Dgzp2oZqO4iNMH4zjFA+0rPUHgH1xpCXoZxMAPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-61e0c1ec7e2so44946937b3.0;
+        Mon, 13 May 2024 02:40:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715593208; x=1716198008;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ng3FAsG/JCaeFPdwQybfr3K8lHPR7N52nVbw3VV2iys=;
+        b=pRb+6AtpqAr1j3GyXz9gTujAt7e/Brh+emAetWqkSrbjveHrLvVQ4YjcjbT7VHJofT
+         l6XFxBWzEtEaIaDQGMOTubLi8kXivae8Lj5HqZtrdyIOipifZgxZxHUxktJF66QSj0Bc
+         78m/7H/2m1FA9hZAYq7Dw+4N/qKtUAyBPgBe4tnedLhxX4ZlxGILKJqY1STt1mbL2YVP
+         4TDyypNNZtX0QkGqGyJ3/XNjH25gegHPngz/o/g77sYSX6XbvfLkdpwcc/+O3bq6Pbyc
+         ynnDTruvy1qvIXIvYD03+O7ZZiAN+nOQRYrKLnpv/s8eb7Yx0u+Py8PufrdyrUnqKMr5
+         ofLg==
+X-Forwarded-Encrypted: i=1; AJvYcCXnv0v1gY9F9vSV43ZRNFroVmk0ziiw2u7wvj0Dk04kUStWqkJW0WFpR1jKsAQamENPnZoAbOJ6Vhj+M8e/jBcvYupiodsqvIIYW2d0C2+qIlXLtdKOhHaghJKx4jV3GOnhatxnUWEBsMc=
+X-Gm-Message-State: AOJu0YzoND2mhbYSDyT69twQxzRn/B6UMCrM5o4P6ZvnHLgYPUhyxzYu
+	9BlTtGID66NQl9nKGGqwlMuE6/7z08Ynlnr1Br58Rk/55kmxE9jWUy51tE1k
+X-Google-Smtp-Source: AGHT+IED3vSJf9a2K4j63XFA0B0/7Ess+zk+VrMmLX2ManhwWjQO7gn0nH0vWGwOrkc/iLoevEL/hw==
+X-Received: by 2002:a81:6ccb:0:b0:618:48ab:e597 with SMTP id 00721157ae682-622af7c7228mr70661627b3.8.1715593208319;
+        Mon, 13 May 2024 02:40:08 -0700 (PDT)
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com. [209.85.219.174])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6209e37926fsm19858057b3.106.2024.05.13.02.40.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 May 2024 02:40:07 -0700 (PDT)
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dee72970df8so969974276.0;
+        Mon, 13 May 2024 02:40:07 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWNTrv1l07AKWVLworNiMBcaH4Vizvqh4VnTBqB235cLCu4SEVixXnqz2uWUROg0VFl2sFrVtd0YerahqTtGlqfZ06aPeU9Hqt409FAcv9NyNQ/iM3dgiEbm9iJ0GmLd+ukL2h7E1yremw=
+X-Received: by 2002:a25:86c5:0:b0:dc6:c670:c957 with SMTP id
+ 3f1490d57ef6-debcfc35a33mr8336373276.32.1715593207006; Mon, 13 May 2024
+ 02:40:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <2d707980-72d1-49d1-a9e8-f794fcc590cb@openvpn.net>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
+References: <20240509210903.3738334-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20240509210903.3738334-1-niklas.soderlund+renesas@ragnatech.se>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 13 May 2024 11:39:54 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWY-Ewm_ke6LxF1cpqQEdL3AnumyNKcTWvpFBJW_8wXJA@mail.gmail.com>
+Message-ID: <CAMuHMdWY-Ewm_ke6LxF1cpqQEdL3AnumyNKcTWvpFBJW_8wXJA@mail.gmail.com>
+Subject: Re: [net-next,v5] net: ethernet: rtsn: Add support for Renesas Ethernet-TSN
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>, 
+	Andrew Lunn <andrew@lunn.ch>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev <netdev@vger.kernel.org>, 
+	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-2024-05-13, 09:37:06 +0200, Antonio Quartulli wrote:
-> On 12/05/2024 23:35, Sabrina Dubroca wrote:
-> > 2024-05-06, 03:16:22 +0200, Antonio Quartulli wrote:
-> > > +/* send skb to connected peer, if any */
-> > > +static void ovpn_queue_skb(struct ovpn_struct *ovpn, struct sk_buff =
-*skb,
-> > > +=09=09=09   struct ovpn_peer *peer)
-> > > +{
-> > > +=09int ret;
-> > > +
-> > > +=09if (likely(!peer))
-> > > +=09=09/* retrieve peer serving the destination IP of this packet */
-> > > +=09=09peer =3D ovpn_peer_get_by_dst(ovpn, skb);
-> > > +=09if (unlikely(!peer)) {
-> > > +=09=09net_dbg_ratelimited("%s: no peer to send data to\n",
-> > > +=09=09=09=09    ovpn->dev->name);
-> > > +=09=09goto drop;
-> > > +=09}
-> > > +
-> > > +=09ret =3D ptr_ring_produce_bh(&peer->tx_ring, skb);
-> > > +=09if (unlikely(ret < 0)) {
-> > > +=09=09net_err_ratelimited("%s: cannot queue packet to TX ring\n",
-> > > +=09=09=09=09    peer->ovpn->dev->name);
-> > > +=09=09goto drop;
-> > > +=09}
-> > > +
-> > > +=09if (!queue_work(ovpn->crypto_wq, &peer->encrypt_work))
-> > > +=09=09ovpn_peer_put(peer);
-> >=20
-> > I wanted to come back to this after going through the crypto patch,
-> > because this felt like a strange construct when I first looked at this
-> > patch.
-> >=20
-> > Why are you using a workqueue here? Based on the kdoc for crypto_wq
-> > ("used to schedule crypto work that may sleep during TX/RX"), it's to
-> > deal with async crypto.
-> >=20
-> > If so, why not use the more standard way of dealing with async crypto
-> > in contexts that cannot sleep, ie letting the crypto core call the
-> > "done" callback asynchronously? You need to do all the proper refcount
-> > handling, but IMO it's cleaner and simpler than this workqueue and
-> > ptr_ring. You can see an example of that in macsec (macsec_encrypt_*
-> > in drivers/net/macsec.c).
->=20
-> Aha! You don't know how happy I was when I found the doc describing how t=
-o
-> convert the async code into sync-looking :-) With the detail that I had t=
-o
-> move to a different context, as the code may want to sleep (hence the
-> introduction of the workqueue).
->=20
-> It looks like I am little fan of WQs, while you are telling me to avoid t=
-hem
-> if possible.
+Hi Niklas, Andrew,
 
-I'm mainly trying to simplify the code (get rid of some ptr_rings, get
-rid of some ping-pong between functions and changes of context,
-etc). And here, I'm also trying to make it look more like other
-similar pieces of code, because I'm already familiar with a few kernel
-implementations of protocols doing crypto (macsec, ipsec, tls).
+On Thu, May 9, 2024 at 11:10=E2=80=AFPM Niklas S=C3=B6derlund
+<niklas.soderlund+renesas@ragnatech.se> wrote:
+> Add initial support for Renesas Ethernet-TSN End-station device of R-Car
+> V4H. The Ethernet End-station can connect to an Ethernet network using a
+> 10 Mbps, 100 Mbps, or 1 Gbps full-duplex link via MII/GMII/RMII/RGMII.
+> Depending on the connected PHY.
+>
+> The driver supports Rx checksum and offload and hardware timestamps.
+>
+> While full power management and suspend/resume is not yet supported the
+> driver enables runtime PM in order to enable the module clock. While
+> explicit clock management using clk_enable() would suffice for the
+> supported SoC, the module could be reused on SoCs where the module is
+> part of a power domain.
+>
+> Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.=
+se>
+> ---
+> * Changes since v4
+> - Enable GPOUT_RDM and GPOUT_TDM delays depending on phy-mode.
 
-> I presume that using WQs comes with a non-negligible cost, therefore if w=
-e
-> can just get things done without having to use them, then I should just
-> don't.
+Thanks for the update!
 
-If you're using AESNI for your GCM implementation, the crypto API will
-also be using a workqueue (see crypto/cryptd.c), but only when the
-crypto can't be done immediately (ie, when the FPU is already busing).
+> +static void rtsn_set_delay_mode(struct rtsn_private *priv)
+> +{
+> +       u32 val =3D 0;
+> +
+> +       /* The MAC is capable of applying a delay on both Rx and Tx. Each
+> +        * delay can either be on or off, there is no way to set its leng=
+th.
+> +        *
+> +        * The exact delay applied depends on electric characteristics of=
+ the
+> +        * board. The datasheet describes a typical Rx delay of 1800 ps a=
+nd a
+> +        * typical Tx delay of 2000 ps.
+> +        *
+> +        * There are boards where the RTSN device is used together with P=
+HYs
+> +        * who do not support a large enough internal delays to function.=
+ These
+> +        * boards depends on the MAC applying these inexact delays.
+> +        */
+> +
+> +       /* If the phy-mode is rgmii or rgmii-rxid apply Rx delay on the M=
+AC */
+> +       if (priv->iface =3D=3D PHY_INTERFACE_MODE_RGMII_ID ||
+> +           priv->iface =3D=3D PHY_INTERFACE_MODE_RGMII_RXID)
+> +               val |=3D GPOUT_RDM;
+> +
+> +       /* If the phy-mode is rgmii or rgmii-txid apply Tx delay on the M=
+AC */
+> +       if (priv->iface =3D=3D PHY_INTERFACE_MODE_RGMII_ID ||
+> +           priv->iface =3D=3D PHY_INTERFACE_MODE_RGMII_TXID)
+> +               val |=3D GPOUT_TDM;
+> +
+> +       rtsn_write(priv, GPOUT, val);
+> +}
 
-In the case of crypto accelerators, there might be benefits from
-queueing multiple requests and then letting them live their life,
-instead of waiting for each request separately. I don't have access to
-that HW so I cannot test this.
+> +static int rtsn_phy_init(struct rtsn_private *priv)
+> +{
+> +       struct device_node *np =3D priv->ndev->dev.parent->of_node;
+> +       struct phy_device *phydev;
+> +       struct device_node *phy;
+> +       phy_interface_t iface;
+> +
+> +       /* Delays, if any, are applied by the MAC. Mask RGMII mode passed=
+ to the
+> +        * PHY to avoid it also adding the delay.
+> +        */
+> +       switch (priv->iface) {
+> +       case PHY_INTERFACE_MODE_RGMII:
+> +       case PHY_INTERFACE_MODE_RGMII_ID:
+> +       case PHY_INTERFACE_MODE_RGMII_RXID:
+> +       case PHY_INTERFACE_MODE_RGMII_TXID:
+> +               iface =3D PHY_INTERFACE_MODE_RGMII;
+> +               break;
+> +       default:
+> +               iface =3D priv->iface;
+> +               break;
+> +       }
 
-> I think I could go back to no-workqueue encrypt/decrypt.
-> Do you think this may have any impact on any future multi-core optimizati=
-on?
-> Back then I also thought that going through workers may make improvements=
- in
-> this area easier. But I could just be wrong.
+This introduces the same issues (the "workaround" state below) we had
+with ravb before.
+9b23203c32ee02cd ("ravb: Mask PHY mode to avoid inserting delays twice")
+was the workaround,
+a6f51f2efa742df0 ("ravb: Add support for explicit internal clock delay
+configuration")
+was the final fix.
 
-Without thinking about it too deeply, the workqueue looks more like a
-bottleneck that a no-workqueue approach just wouldn't have. You would
-probably need per-CPU WQs (probably separated for encrypt and
-decrypt). cryptd_enqueue_request (crypto/cryptd.c) has an example of
-that.
+Do we really want to repeat that mistake?
+
+Gr{oetje,eeting}s,
+
+                        Geert
 
 --=20
-Sabrina
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
