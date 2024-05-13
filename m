@@ -1,122 +1,92 @@
-Return-Path: <netdev+bounces-96151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55C428C481A
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 22:18:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E42E8C481C
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 22:20:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE935B2126A
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:18:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D0D61F25160
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205BD7E110;
-	Mon, 13 May 2024 20:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEA6A7D414;
+	Mon, 13 May 2024 20:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Aqo9/W9Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DVcp0GZN"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB09D7E0FB;
-	Mon, 13 May 2024 20:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E3B76056;
+	Mon, 13 May 2024 20:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715631481; cv=none; b=EmRaBT0TOUCTCtQa7U8wgmUFsVldHIY1xKbMdM7/GDFWWR2AnIWeaR/5lNXo26m9AeWl6zNvZ3iUxecsnfCyzbWvFZ5aSRckMDKXpKGUGKNJr58v0FqmrTPZ9lLyQ0RzpA0BQhgH8Rz/teLcscf1APyQ4z01Sx33mU/ow2EoEQk=
+	t=1715631630; cv=none; b=eNaZNY605R8PrHkr3fb3t7yf4j4LNOztc6YWVbQ+WkTVcuvsEYfCq2YymB7CyV8jrjpaXtKY4WCHto9+X5kzUwJd5GzTVYVpgh41TaUlfnioSFIcpr2yxelEJWqi93iawwl91Zsr6QpiE2QzIhmMW3KUl2Y8fNzfkc3t3AvK1PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715631481; c=relaxed/simple;
-	bh=QPPucxNzMGci2VCLPJG4C88e7OqjvcCNvLSfh/GvPJc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RY/FmrL0iz1KguJ6crl93GI8+16a/ArjAWQ+mSGJUdyicmuEKD5lFjTU7NopQi/DjuwCelV50FM8pe/qg5EjwqxbfqFHe7sya2ea7rkED2VJYP+Yw1psHp+jJMWHdIXDorMmYgEJdO1EdSw51BVr02FN19DXZhqgh8RNeW3Wc+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Aqo9/W9Y; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nqxnckkmky72wratqJjxCB8HyiXkypohHfXZ7n/n1OE=; b=Aqo9/W9YcKQK58JqM5gceiv3OA
-	O7McD0Us4UBR9Wt3OtqfTkFTx5WhU26b2UENWil4GbLhCsw+Ducd7MSH9pyByfoZnRIGuFYzsVLEN
-	+oZ4F+aurC5YQekgLuoq3RDs9uKvuVK2g/97r7fJ5jEPllYvZVqDHSpqO8HKk/bgOU78=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s6c7I-00FKip-6L; Mon, 13 May 2024 22:17:48 +0200
-Date: Mon, 13 May 2024 22:17:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: admiyo@os.amperecomputing.com
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] mctp pcc: Implement MCTP over PCC Transport
-Message-ID: <48ef7972-4b8f-4027-a2ca-357e53dcdd0f@lunn.ch>
-References: <20240513173546.679061-1-admiyo@os.amperecomputing.com>
- <20240513173546.679061-2-admiyo@os.amperecomputing.com>
+	s=arc-20240116; t=1715631630; c=relaxed/simple;
+	bh=uLZg/VXmHHiqkXQDPmJqHEN4hVWn3nhTgaSaXct+gVs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=gLODLJTj9aY8/lpsHl9X4MaFvJ/4QAIQSz7ql0J40YZegD/zpLs+df/eH3IY+n4lpvw4UNzIExBTMLKvvxlQS3HbNr9rXVO+566t2YfRezS0r0+PChRyUXer5QFOVR0fmgX7L0f1EzuTNWxGWhp88irQkuJT/BhH7s3O13j7WWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DVcp0GZN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F3718C113CC;
+	Mon, 13 May 2024 20:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715631630;
+	bh=uLZg/VXmHHiqkXQDPmJqHEN4hVWn3nhTgaSaXct+gVs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DVcp0GZNluc0r2sPIT07pb62dz4+dzvWS/+8k6T1MTpMOqBaDlNHiJKkfEUJFrcAA
+	 ov4uY6KzmsG8LSXvyJu+apLncdKW0gusX5iSqIJNvaR0xKtmOdpTKnNtXQh9X9W6AT
+	 Ns0q6yVKWEzUVqe2AJj2iOf45xfV+0chpJibzh/X/9ethxE7VsPOn3xRNmSpQFJ6AQ
+	 VuGLcNgASKObj47mU+mmP5dWJD3HgY4vtyv4LdeELMEhB+/6uMlb0D0zcLWIL6hE/b
+	 1vzZbC5RH+LcvjEgKkiM+5FzRD4WNvNvLcfkyMxQKbQgx4wCKAPcFvlGtcEu+2QgXk
+	 qTqS3VQFgXE0g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DE3EBC43443;
+	Mon, 13 May 2024 20:20:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240513173546.679061-2-admiyo@os.amperecomputing.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bpf 2024-05-13
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171563162990.3504.17279054249056404557.git-patchwork-notify@kernel.org>
+Date: Mon, 13 May 2024 20:20:29 +0000
+References: <20240513041845.31040-1-daniel@iogearbox.net>
+In-Reply-To: <20240513041845.31040-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
-> +static struct mctp_pcc_packet *mctp_pcc_extract_data(struct sk_buff *old_skb,
-> +						     void *buffer, int outbox_index)
-> +{
-> +	struct mctp_pcc_packet *mpp;
-> +
-> +	mpp = buffer;
-> +	writel(PCC_MAGIC | outbox_index, &mpp->pcc_header.signature);
-> +	writel(0x1, &mpp->pcc_header.flags);
-> +	memcpy_toio(mpp->pcc_header.mctp_signature, MCTP_SIGNATURE, SIGNATURE_LENGTH);
-> +	writel(old_skb->len + SIGNATURE_LENGTH,  &mpp->pcc_header.length);
-> +	memcpy_toio(mpp->header_data,    old_skb->data, old_skb->len);
-> +	return mpp;
-> +}
+Hello:
 
-...
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct net_device *ndev)
-> +{
-> +	unsigned char *buffer;
-> +	struct mctp_pcc_ndev *mpnd;
-> +	struct mctp_pcc_packet  *mpp;
-> +	unsigned long flags;
-> +	int rc;
-> +
-> +	netif_stop_queue(ndev);
-> +	ndev->stats.tx_bytes += skb->len;
-> +	mpnd = (struct mctp_pcc_ndev *)netdev_priv(ndev);
-> +	spin_lock_irqsave(&mpnd->lock, flags);
-> +	buffer =  mpnd->pcc_comm_outbox_addr;
-> +	mpp = mctp_pcc_extract_data(skb, mpnd->pcc_comm_outbox_addr, mpnd->hw_addr.outbox_index);
+On Mon, 13 May 2024 06:18:45 +0200 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
+> 
+> The following pull-request contains BPF updates for your *net* tree.
+> 
+> We've added 3 non-merge commits during the last 2 day(s) which contain
+> a total of 2 files changed, 62 insertions(+), 8 deletions(-).
+> 
+> [...]
 
-I don't see any length checks here. How do you know the skb contains
-sizeof(struct mctp_pcc_packet)?
+Here is the summary with links:
+  - pull-request: bpf 2024-05-13
+    https://git.kernel.org/netdev/net/c/c9f9df3f6347
 
-> +static int create_mctp_pcc_netdev(struct acpi_device *acpi_dev,
-> +				  struct device *dev, int inbox_index,
-> +				  int outbox_index)
-> +{
-> +	int rc;
-> +	int mctp_pcc_mtu;
-> +	char name[32];
-> +	struct net_device *ndev;
-> +	struct mctp_pcc_ndev *mctp_pcc_dev;
-> +	struct mctp_pcc_hw_addr physical_link_addr;
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Since this is networking code, you should be using reverse christmas
-tree for all your functions.
 
-> +	snprintf(name, sizeof(name), "mctpipcc%x", inbox_index);
-> +	ndev = alloc_netdev(sizeof(struct mctp_pcc_ndev), name, NET_NAME_ENUM, mctp_pcc_setup);
-
-%x is very unusual for network device names.
-
-	Andrew
 
