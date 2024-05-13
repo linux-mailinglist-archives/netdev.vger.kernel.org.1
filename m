@@ -1,153 +1,157 @@
-Return-Path: <netdev+bounces-95853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE6028C3AE0
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 07:11:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CC478C3AF8
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 07:26:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69CBE28120B
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 05:11:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10DA82814EA
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 05:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E103F14600B;
-	Mon, 13 May 2024 05:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="hw3En7ij"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3230314601C;
+	Mon, 13 May 2024 05:26:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-1909.mail.infomaniak.ch (smtp-1909.mail.infomaniak.ch [185.125.25.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7D9146006
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 05:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6EF146006;
+	Mon, 13 May 2024 05:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715577109; cv=none; b=bJ4pbziFiCJ+0sOBn+K0waAapSvo2Y+1KgUCbLFX031l2tVmxaz8/ZoiGg+r4tBfX1xYewKbU6iwcmNsJF8nB4nTHcBB9WIkuNj8+X9TGIhpICHUXdLdEACZPlgQBPOAQs9yR5IkK4ZxgjFijwJiZBP5t4wrjMFHJSS2sXYcKHk=
+	t=1715577972; cv=none; b=ZvpHvaTywDqs6Fh5Imk89+0k2Aqd2Zr3XyBdgSZps1+WUAF3l2Ycw4WMVh37h+NmOTv9H/K6WjwUJFWvyzsm8zn1S1nEtYcAUVpL32A4qo8tSDmCRP/9WNAQxAKeaexGoORqK9F0o7CtX7TcwqseDaNV8NhzgX/uQGGdiWa5p3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715577109; c=relaxed/simple;
-	bh=KFDDDGcGm/oWMDzWP22M7FfCz2XpGYOkwlgc6byenZc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X8/11aHOFkNwC9QH7lOBw9xHjFjJjXJpaXjiBKefoh7MagcoNdexedsgBpbmxH1Bo4M/B/qKpvXXRlhOMlq4xaND3XjYWM+HBU349w6y71ue5lwyqpCmbbYuMCwG8j1Iw4xFsHoVVYXOhRVDqXSue+PI71BpM1uqbG+tUwQptZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=hw3En7ij; arc=none smtp.client-ip=185.125.25.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Vd6zD72sYzBRV;
-	Mon, 13 May 2024 07:11:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1715577096;
-	bh=NzaTA4RcapZkISmaHLv46iIYK7VaukIA9ZguF6MFZZA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hw3En7ijFCwNJoThQiowXkrUxCT44rzwcTmIeGAxmMKpeUBmBD1BLh+85VHxhgwc7
-	 JBbg/rqFfZCDo0dPtfgcvOHScY8qdox00AoYekCDtfXJcIcsUmdc+pInQOE27YE5Ni
-	 +P34v4BDOwCSyvCB1aryA/Skhpq3+1VxUbfjd74w=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Vd6z94yx1zHTv;
-	Mon, 13 May 2024 07:11:33 +0200 (CEST)
-Date: Mon, 13 May 2024 07:11:31 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Edward Liaw <edliaw@google.com>
-Cc: shuah@kernel.org, =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	Christian Brauner <brauner@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Muhammad Usama Anjum <usama.anjum@collabora.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kernel-team@android.com, linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, bpf@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v3 27/68] selftests/landlock: Drop define _GNU_SOURCE
-Message-ID: <20240513.wo9coof8Dae4@digikod.net>
-References: <20240509200022.253089-1-edliaw@google.com>
- <20240509200022.253089-28-edliaw@google.com>
+	s=arc-20240116; t=1715577972; c=relaxed/simple;
+	bh=h/nNwkdROHIhqlfkjh2JQ26tRYtuEy/4mF4v+a+sLKo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MkDksrSf3vstHax0CM+Knqmj8/TUCMW2y+WhkqBCrKe+gMs5kLS3iuNkLoBhef5aQH5GuPWn4vqtNuESiii5A9oJfV0GltYgcdQPuWuMPY2ziACvtCorC01WGLbWM7OGbFskC2dvFvpDzvsEQdAIvuAGR5QssNFbxNeu2XiDPmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a59ad344f7dso795005466b.0;
+        Sun, 12 May 2024 22:26:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715577968; x=1716182768;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qHLzZwQi5gHnfmzUd/O46iK9xy6a6Bk4cuL6KxXx1po=;
+        b=tbFq95sSv2sjFw5DklzmRm2LYSC3m7e0+Snj9Upcm3VgDSCNdrO4TlsT+3qbMqWrKE
+         O1D7eipsFKKDFSXru0vSnjoMVVk0QkrOb3TfU04Sz58ymEdcTkwTUGspXJTgd2p9G+tU
+         P8ncl8TFUHpsFU1xDhyaCLTbsHoujXZA3OU5veyDbJb4gBAWVSkwzRCasVNAuRNYNZJt
+         dz+KidcI0ZwB33jXkvsB5cuWEr7GQ+duCNPG0owmyv3E2N4SGn+NwNCetI6iOXPaqvZl
+         cr468ztqNKsE1a52v/QGR1Z4OuF7CAiP/rrAo26VPqBvcLRS3z14q2VgFmE2w87IppcY
+         x9Zw==
+X-Forwarded-Encrypted: i=1; AJvYcCVnYdAox/9nf0Icl6u419fDW83mXBx1Xi1ZRMm3wewBIJd6INnhTGPtOSFirBIt3fAnu4ZJfYSLfNJhXUMfj6o+d+b/iqepFhTn3kgUMZGcXj476JCqlaPR+uYRAOs6G/nmMjVrBw/6yzBLK2ALYUFdQgEhK0wNG7InxAMa5UY3Aa5dsao8O2y2zBqqoISUtVbn9HnA4aQ6s+8+WEjsHoZGucNpNmKO5nfKcN/u6vyA+x3fW62L/Zk/
+X-Gm-Message-State: AOJu0YxxiVffvhoPM6V5Ofn2NJzS+6MdiWp99q9t1AE01lRDAS/xKI+Q
+	M7Q94v+I+xaAl3f4e/2B6dSjjV2K95t9Gsq6hPFhYMLn5rJtsIHlNO8xh/hf
+X-Google-Smtp-Source: AGHT+IEQmj/CsAUX+RnrSsR/oOFTJkE8oGAEEKYrgMbWKGWvf2Q5jg/FggAEQ3LnT71BavYqOh1+AA==
+X-Received: by 2002:a17:906:4a42:b0:a59:ae6e:486f with SMTP id a640c23a62f3a-a5a2d68098fmr526771166b.65.1715577967912;
+        Sun, 12 May 2024 22:26:07 -0700 (PDT)
+Received: from ?IPV6:2a0b:e7c0:0:107::aaaa:69? ([2a0b:e7c0:0:107::aaaa:69])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a179c822fsm541509966b.138.2024.05.12.22.26.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 12 May 2024 22:26:07 -0700 (PDT)
+Message-ID: <1405110f-5a1b-40d5-b607-72081e5153d3@kernel.org>
+Date: Mon, 13 May 2024 07:26:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 02/11] HID: hexLIN: Add support for USB LIN adapter
+To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Christoph Fritz <christoph.fritz@hexdev.de>
+Cc: Simon Horman <horms@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Marc Kleine-Budde <mkl@pengutronix.de>,
+ Oliver Hartkopp <socketcan@hartkopp.net>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>,
+ Benjamin Tissoires <bentiss@kernel.org>, Sebastian Reichel <sre@kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Andreas Lauser <andreas.lauser@mercedes-benz.com>,
+ Jonathan Corbet <corbet@lwn.net>, Pavel Pisa <pisa@cmp.felk.cvut.cz>,
+ linux-can@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+ devicetree@vger.kernel.org, linux-input@vger.kernel.org,
+ linux-serial <linux-serial@vger.kernel.org>
+References: <20240509171736.2048414-1-christoph.fritz@hexdev.de>
+ <20240509171736.2048414-3-christoph.fritz@hexdev.de>
+ <4bf1a5e9-904c-584e-72df-71abc3f99bd2@linux.intel.com>
+Content-Language: en-US
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <4bf1a5e9-904c-584e-72df-71abc3f99bd2@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240509200022.253089-28-edliaw@google.com>
-X-Infomaniak-Routing: alpha
 
-On Thu, May 09, 2024 at 07:58:19PM +0000, Edward Liaw wrote:
-> _GNU_SOURCE is provided by lib.mk, so it should be dropped to prevent
-> redefinition warnings.
+On 10. 05. 24, 15:46, Ilpo Järvinen wrote:
+>> +	reinit_completion(&priv->wait_in_report);
+>> +
+>> +	n = hid_hw_output_report(priv->hid_dev, (__u8 *) out_report, len);
 > 
-> Fixes: 809216233555 ("selftests/harness: remove use of LINE_MAX")
-> Reviewed-by: John Hubbard <jhubbard@nvidia.com>
-> Reviewed-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
-> Signed-off-by: Edward Liaw <edliaw@google.com>
+> The usual is to not leave space between cast and what is being cast. I
+> know hid functions seem to use __u8 but that's intended for uapi and in
+> kernel, u8 should be used (somebody should eventually cleanup the hid
+> function types too).
 
-Please only remove lines with _GNU_SOURCE, not the empty lines.  I think
-it would be better to not change such style choice for other subsystems
-too.
-With this change for the Landlock selftests:
-Acked-by: Mickaël Salaün <mic@digikod.net>
+Apart from that, you are attached to USB, so this goes down to usbhid 
+(the ll driver). Are you sure the put-const-away cast is right thing to 
+do here? (usbhid passes it to usb_interrupt_msg().)
 
-> ---
->  tools/testing/selftests/landlock/base_test.c   | 2 --
->  tools/testing/selftests/landlock/fs_test.c     | 2 --
->  tools/testing/selftests/landlock/net_test.c    | 2 --
->  tools/testing/selftests/landlock/ptrace_test.c | 2 --
->  4 files changed, 8 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/landlock/base_test.c b/tools/testing/selftests/landlock/base_test.c
-> index 3c1e9f35b531..c86e6f87b398 100644
-> --- a/tools/testing/selftests/landlock/base_test.c
-> +++ b/tools/testing/selftests/landlock/base_test.c
-> @@ -5,8 +5,6 @@
->   * Copyright © 2017-2020 Mickaël Salaün <mic@digikod.net>
->   * Copyright © 2019-2020 ANSSI
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <errno.h>
->  #include <fcntl.h>
->  #include <linux/landlock.h>
-> diff --git a/tools/testing/selftests/landlock/fs_test.c b/tools/testing/selftests/landlock/fs_test.c
-> index 6b5a9ff88c3d..eec0d9a44d50 100644
-> --- a/tools/testing/selftests/landlock/fs_test.c
-> +++ b/tools/testing/selftests/landlock/fs_test.c
-> @@ -6,8 +6,6 @@
->   * Copyright © 2020 ANSSI
->   * Copyright © 2020-2022 Microsoft Corporation
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <asm/termbits.h>
->  #include <fcntl.h>
->  #include <libgen.h>
-> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
-> index f21cfbbc3638..eed040adcbac 100644
-> --- a/tools/testing/selftests/landlock/net_test.c
-> +++ b/tools/testing/selftests/landlock/net_test.c
-> @@ -5,8 +5,6 @@
->   * Copyright © 2022-2023 Huawei Tech. Co., Ltd.
->   * Copyright © 2023 Microsoft Corporation
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <arpa/inet.h>
->  #include <errno.h>
->  #include <fcntl.h>
-> diff --git a/tools/testing/selftests/landlock/ptrace_test.c b/tools/testing/selftests/landlock/ptrace_test.c
-> index a19db4d0b3bd..c831e6d03b02 100644
-> --- a/tools/testing/selftests/landlock/ptrace_test.c
-> +++ b/tools/testing/selftests/landlock/ptrace_test.c
-> @@ -5,8 +5,6 @@
->   * Copyright © 2017-2020 Mickaël Salaün <mic@digikod.net>
->   * Copyright © 2019-2020 ANSSI
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <errno.h>
->  #include <fcntl.h>
->  #include <linux/landlock.h>
-> -- 
-> 2.45.0.118.g7fe29c98d7-goog
-> 
-> 
+That is the only reason why you have the cast in there in the first place…
+
+regards,
+-- 
+js
+
 
