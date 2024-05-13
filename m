@@ -1,123 +1,129 @@
-Return-Path: <netdev+bounces-96084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74A988C43EC
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:16:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79BFD8C4417
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:24:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF1B51C230C7
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 15:16:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB2B21C20D48
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 15:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC946139;
-	Mon, 13 May 2024 15:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F04961F614;
+	Mon, 13 May 2024 15:24:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="6fxuUzc0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GhLdQ2Ug"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7432B1EB5B;
-	Mon, 13 May 2024 15:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45B6539C;
+	Mon, 13 May 2024 15:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715613357; cv=none; b=LdTeKFXfQan5yhKXSI/xXUFpqvOHtCMyaycLtlA/PDx2MgMVUH7OaZBh5AxK7Sqc1OEF5lBv7Xkdh8D/6khvr1bBSEb5RSGw7Mu0Sr64XpCiAXVWPwHOgtGMgwfSCQx3TKpU+b5y8MdvKd0OfU4smO26qAoJSRgeP4Ec9TTNR5Q=
+	t=1715613854; cv=none; b=QIX/XiB+tFzJ6o7I9dD5GRw0K0bnOSmF9p7SmSp8Uw01fLW5f5RHAu6kwIgRMty9qW+PaPFnuju//yDmaRZbVg6kyaLJWporyV38+Hy6dnKRrbPeU4fRoDPparRJo3YR9VzO6qX+OTFQJZJdBwGy6zWzu7Ym5oKgHD/fwnfoQRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715613357; c=relaxed/simple;
-	bh=wN+bxMewYfk59ZhO6FatFbnK3XTXhM/uncKw4+2rhy4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=snbJdAvcQ76B4gdBRLaeZC6Di4ne86lgm9WgZglpkMF2/2IMtRu12CDu05VVgXSFntl6iU1pzpmJtCMIteyH0IDJLfHaSSyPbR51ZWqLMaSU8DgYwLhAiihy4xo9r3Edo2q4UGQO6RHOPIjo0WyatHVtC1yM40tDbaEb1sTgAYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=6fxuUzc0; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44DCEFNO012993;
-	Mon, 13 May 2024 17:15:27 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=/001sYINRF3QuS2WXNucZ6g4afwEJpHTPMm7u6dV36I=; b=6f
-	xuUzc0q+Uhb6FnzVUh0pFqLdOW/11qBYWlQ8eR/p/IRtf6hiFXWx9SwAzsvKYy+b
-	QscKscbuLpWfluMRuURat1XI/gw3X1pYQLP+FjoeMG3BvcRMRmbd+fWC4hIHMBwa
-	M4jLbitCejlFAR/2aTc4JLgPhSLfprychXoLH8TT3VtVOrPueu4HEjW6/XI8PppQ
-	XqH8D2zbfUlrAwDN6UhTtZ+rbo5vLFwFeJnCNAbVk3ZZQXml9UvTH2VeID3zkysD
-	7N6Tpm7CpI4vEeszdtwzk/7QuZ/RGkR+z3ozcnWByOfYUrIFsZwPJTh0FjY5EMYl
-	zPUK7v2J92++F4vzvAPw==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3y1y8n7dfw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 May 2024 17:15:27 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 7DF6540044;
-	Mon, 13 May 2024 17:15:23 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 2EC3E22365C;
-	Mon, 13 May 2024 17:14:11 +0200 (CEST)
-Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 13 May
- 2024 17:14:08 +0200
-Message-ID: <742bc68a-63a8-4f6e-b5ad-1f37a543f24f@foss.st.com>
-Date: Mon, 13 May 2024 17:14:07 +0200
+	s=arc-20240116; t=1715613854; c=relaxed/simple;
+	bh=BcO42AIw8mo5P5+wktc4jRATWiDSkrrN2JRiiYqFvsY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Sz8u4Kph+eBiPB5edoA2Y04Es+HsNo4VOl8V7Cq9l5t1+Lmi1HNiWhy3hoDd5UBVg2YYw3vFRd8iwiryQoA+2MHGe/y9GtH77WGRHNnGhyJuIdByuwSWruw8okz3jwjue+w8dXaMTAzdx8TbIB4N7NljCRXeAnHXrk1pm4JFK24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GhLdQ2Ug; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CE8EC113CC;
+	Mon, 13 May 2024 15:24:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715613854;
+	bh=BcO42AIw8mo5P5+wktc4jRATWiDSkrrN2JRiiYqFvsY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GhLdQ2UgHNg7HTNWnyl+NvUzvPP6xLJjBMtuUDcho6j8QcOEoF6R8Fbpn8vATJ5Iz
+	 Efe+ErQ4NNcOW9rWGw//opXPmcxvxsk3d8QiTMo4cDuxbPZ6D67YCKBbWlOI/a8OsT
+	 CjzotsSbWCL2Zp0E8Jdb7rh48vhD/XSvn6IBIZUCJNXZlbHWS14JkakvQqwq0n2pgt
+	 bSJWIhPceV2HtyWfWd1tLHJwsaWcXNJB4BNClG872N1wtmPxQ0DJsfHgTnLKGZgoGX
+	 ZvX5S52kZdHaJliMixWlJ3G8zBq3M3ZHNiEdbCDEcwfCpAUoQSqUh3qXau+aBeHktt
+	 B2IVquzfMxEmA==
+Date: Mon, 13 May 2024 08:24:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: kernel test robot <lkp@intel.com>, llvm@lists.linux.dev,
+ oe-kbuild-all@lists.linux.dev, "David S . Miller" <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Jason
+  Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Brett
+  Creeley <bcreeley@amd.com>, Ratheesh Kannoth <rkannoth@marvell.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Tal Gilboa <talgi@nvidia.com>, Jonathan 
+ Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Jiri Pirko <jiri@resnulli.us>, Paul 
+ Greenwalt <paul.greenwalt@intel.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Kory Maincent
+ <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
+ justinstitt@google.com, donald.hunter@gmail.com, netdev@vger.kernel.org,
+ virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v13 2/4] ethtool: provide customized dim
+ profile management
+Message-ID: <20240513082412.2a27f965@kernel.org>
+In-Reply-To: <1715611933.2264705-1-hengqi@linux.alibaba.com>
+References: <20240509044747.101237-1-hengqi@linux.alibaba.com>
+	<20240509044747.101237-3-hengqi@linux.alibaba.com>
+	<202405100654.5PbLQXnL-lkp@intel.com>
+	<1715531818.6973832-3-hengqi@linux.alibaba.com>
+	<20240513072249.7b0513b0@kernel.org>
+	<1715611933.2264705-1-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 06/11] net: stmmac: dwmac-stm32: clean the way to
- manage wol irqwake
-To: Marek Vasut <marex@denx.de>, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Liam Girdwood
-	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20240426125707.585269-1-christophe.roullier@foss.st.com>
- <20240426125707.585269-7-christophe.roullier@foss.st.com>
- <5b8b52cf-bd43-40c0-962a-c6936637b7de@denx.de>
-Content-Language: en-US
-From: Christophe ROULLIER <christophe.roullier@foss.st.com>
-In-Reply-To: <5b8b52cf-bd43-40c0-962a-c6936637b7de@denx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-13_10,2024-05-10_02,2023-05-22_02
 
+On Mon, 13 May 2024 22:52:13 +0800 Heng Qi wrote:
+> > > So I think we should declare "CONFIG_PROVE_LOCKING depends on CONFIG_NET".
+> > > How do you think?  
+> > 
+> > Doesn't sound right, `can we instead make building lib/dim/net_dim.c  
+> 
+> Why? IIUC, the reason is that if CONFIG_NET is not set to Y, the net/core
+> directory will not be compiled, so the lockdep_rtnl_is_held symbol is not
+> present.
 
-On 4/26/24 17:40, Marek Vasut wrote:
-> On 4/26/24 2:57 PM, Christophe Roullier wrote:
->> On STM32 platforms it is no longer needed to use a dedicated wakeup to
->> wake up system from CStop.
->
-> This really needs more clarification.
->
-> Why was the code needed before ? Maybe because it was used by some of 
-> the older STM32F4/F7/H7 SoCs ? Is it still needed by those SoCs ? Will 
-> this patch break those older SoCs ?
-Yes you are right, if power mode use in STM32F4/F7/H7 SoC, issue with 
-this patch, I will abandon it.
->
->> This patch removes the dedicated wake up usage
->> and clean the way to register the wake up irq.
->
-> [...]
+Maybe I don't understand what you;re proposing. 
+Show an actual diff please.
+
+> > dependent on CONFIG_NET? Untested but I'm thinking something like:
+> > 
+> > diff --git a/lib/dim/Makefile b/lib/dim/Makefile
+> > index c4cc4026c451..c02c306e2975 100644
+> > --- a/lib/dim/Makefile
+> > +++ b/lib/dim/Makefile
+> > @@ -4,4 +4,8 @@
+> >  
+> >  obj-$(CONFIG_DIMLIB) += dimlib.o
+> >  
+> > -dimlib-objs := dim.o net_dim.o rdma_dim.o
+> > +dimlib-objs := dim.o rdma_dim.o
+> > +
+> > +ifeq ($(CONFIG_NET),y)
+> > +dimlib-objs += net_dim.o
+> > +endif  
+> 
+> 1. This is unlikely to work if the kernel is configured as[1]:
+> 
+> [1] kernel configuration
+> CONFIG_NET=n, CONFIG_ETHTOOL_NETLINK=n, CONFIG_PROVE_LOCKING=y,
+> (CONFIG_FSL_MC_DPIO=y && CONFIG_FSL_MC_BUS=y) select CONFIG_DIMLIB=y.
+> 
+> 
+> Then, because CONFIG_NET is not enabled, so there is no net_dim.o,
+> the following warning appears:
+> 
+> ld.lld: error: undefined symbol: net_dim_get_rx_moderation
+> referenced by dpio-service.c
+> drivers/soc/fsl/dpio/dpio-service.o:(dpaa2_io_dim_work) in archive vmlinux.a
+> 
+> ld.lld: error: undefined symbol: net_dim
+> referenced by dpio-service.c
+> drivers/soc/fsl/dpio/dpio-service.o:(dpaa2_io_update_net_dim) in archive vmlinux.a
+
+Simple, dpio-service should depend on NET if it wants NET_DIM
 
