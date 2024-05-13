@@ -1,76 +1,186 @@
-Return-Path: <netdev+bounces-96200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E37C28C4A21
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:38:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 472998C4A2B
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:44:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D435C1C20C80
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:38:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69E461C20EA9
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4E182488;
-	Mon, 13 May 2024 23:38:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017458564F;
+	Mon, 13 May 2024 23:44:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HcrFw7oC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NjNYnPRL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F6F1D559
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 23:38:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06C885622;
+	Mon, 13 May 2024 23:44:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715643525; cv=none; b=h64P89V6nBSvKRC90XR9nHzJYV/DPqbBo6DKkGpVAwiY7GESjy0d8r7bwyvHE1WPcctZOJOnW08L9U7JlGxRKhoYWgI8zj+aNEpHaxW2X+GzasFUjnOTQM5+TCWQO7lnNcahuR+cOMhmxAtq3LYn+xoypvZPj6vHU35PE1f6FXk=
+	t=1715643859; cv=none; b=C8WC1rPfJZppXzqx2wBhkiwYZ/speoY36PZfreaYPrCg6AznKImGP7mbf6YwvmHCMkG4MzWoLY8VWOto+KdfO29ead7t4ZvcyCozoBLcTTWszvdTZNy34AsmKeEwtoVHIl2pAZRMkh+5PIMYihHUZsnHQQgo/Vw9jkatN5FArMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715643525; c=relaxed/simple;
-	bh=N0onKzk9vxiH3LWDCbUxd7eqoNDM23RUelEZ/NvMBCM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZTrc3v5heczxzFvKGQpYyu21aBGw3cML9cfJdNIKj7QLG2XF9/NTcbk470ukMF2U+N6Ho1NXVN2Boh9kB0H0flt0ulPy/VQNNwTwpmz25U1LX2lmku0MdsWtfzSH0Yvx71deztNYLy8uZqqn59nRIGuJnPsDw+w7AYAVSWlbiSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HcrFw7oC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E52E3C113CC;
-	Mon, 13 May 2024 23:38:44 +0000 (UTC)
+	s=arc-20240116; t=1715643859; c=relaxed/simple;
+	bh=G3IvKKUo7Fg0MTYOPPCwaU5WF0TElpgBbZXvzcAdX2g=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Eog6dLfuXwlxQ7RfoGuzx8hHGWmco5ePfT+Pv7RbxexIWIFY5fXEmM/lCh6rVCKxS+TuhMjRXyo5TOXMhehvzFmVZczYGmngXhgf/EfgU3PX+hGbmdSLFzNNWr1GDOATO274CoPVM5Qy8iWPQjC++LRXPd8qdFjRwa2ZOr3qp0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NjNYnPRL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23B69C113CC;
+	Mon, 13 May 2024 23:44:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715643525;
-	bh=N0onKzk9vxiH3LWDCbUxd7eqoNDM23RUelEZ/NvMBCM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HcrFw7oCf4UKhCdhJgzb0mPVCo1wIzxQHZcVd3Pe/GOL/A1nCTh23Xp+QUOP0xh/R
-	 xSXfIctIeAqfc4rPy8d9Adn6AhY7RfMFYCk+fVBue1D0HRIRSiqxWN3+t5yeyvnlby
-	 EloBkaEKuObzfFHrLH0dCLGx1m2utxOZkWA8z1VpmD3cG8xtI2xaJtgpJushq3N8ss
-	 zlzJowi4yuC5N6CCZqGXfqkUjZbZVPSJRtDzHxA80Kwizn8oRaqidnGz6swEL/bf8x
-	 V22QsPvX55WFwzNbbgPr73FTvNU3NXcxz9HyLeCKfyVZitEtDuDSb/6d7tNVpl2YIp
-	 sLCnXxC8dAZJw==
-Date: Mon, 13 May 2024 16:38:44 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Martin =?UTF-8?B?RsOkY2tuaXR6?= <faecknitz@hotsplots.de>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: mhi: set skb mac header before entering RX
- path
-Message-ID: <20240513163844.402a926d@kernel.org>
-In-Reply-To: <20240513133830.26285-1-faecknitz@hotsplots.de>
-References: <20240513133830.26285-1-faecknitz@hotsplots.de>
+	s=k20201202; t=1715643859;
+	bh=G3IvKKUo7Fg0MTYOPPCwaU5WF0TElpgBbZXvzcAdX2g=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+	b=NjNYnPRLL1xOtTtE3GPQWJCEzsdM2v7MU3aj12ve9yEIB62WeEZaYFnDGsYouHk+Q
+	 p0DObeynWtbokCcujzjYtQwxMXlgSTwFpSHOh5Ma/TmrVk9Nq5kT+D4eWRJEMxCwLF
+	 3DwlONtK1CpD+79fRbczEmIs1pcunRAr6Tsgfk/UBKA/56eTEEsXAT9wewgQdQyW5G
+	 IOivE05HE5juwXO4ZVn2AfE+shtH/bijT/MiS1uug+XWsrvPauNlu7PkXakpkSs72E
+	 nNL2jv/E0WlosMEveLrkPKnzWryiVFcDvMmkZMHhlHIX2f7ohsQLAqL6WOyK+3gDfi
+	 nRXU5LK1kIFKw==
+Date: Mon, 13 May 2024 16:44:18 -0700 (PDT)
+From: Mat Martineau <martineau@kernel.org>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    Alexander Duyck <alexander.duyck@gmail.com>, 
+    Ayush Sawal <ayush.sawal@chelsio.com>, Eric Dumazet <edumazet@google.com>, 
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+    Jason Wang <jasowang@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
+    Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, 
+    Vincent Guittot <vincent.guittot@linaro.org>, 
+    Dietmar Eggemann <dietmar.eggemann@arm.com>, 
+    Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, 
+    Mel Gorman <mgorman@suse.de>, 
+    Daniel Bristot de Oliveira <bristot@redhat.com>, 
+    Valentin Schneider <vschneid@redhat.com>, 
+    John Fastabend <john.fastabend@gmail.com>, 
+    Jakub Sitnicki <jakub@cloudflare.com>, David Ahern <dsahern@kernel.org>, 
+    Matthieu Baerts <matttbe@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+    Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+    Jiri Pirko <jiri@resnulli.us>, Boris Pismenny <borisp@nvidia.com>, 
+    bpf@vger.kernel.org, mptcp@lists.linux.dev
+Subject: Re: [PATCH net-next v3 11/13] net: replace page_frag with
+ page_frag_cache
+In-Reply-To: <444d0349-476b-a04b-f6f1-d59ee57e2054@huawei.com>
+Message-ID: <bcd2a227-9d0e-6d81-2439-2b7f1922bccb@kernel.org>
+References: <20240508133408.54708-1-linyunsheng@huawei.com> <20240508133408.54708-12-linyunsheng@huawei.com> <334a8c67-87c8-a918-9517-0afbfae0d02b@kernel.org> <b8877f3a-831d-f899-9678-b1665739dbe9@huawei.com> <9a3cea15-2001-2222-0d0d-5f61f90507c3@kernel.org>
+ <444d0349-476b-a04b-f6f1-d59ee57e2054@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-On Mon, 13 May 2024 15:38:30 +0200 Martin F=C3=A4cknitz wrote:
-> skb->mac_header must be set before passing the skb to the network stack,
-> because skb->mac_len is calculated from skb->mac_header in
-> __netif_receive_skb_core.
->=20
-> Some network stack components, like xfrm, are using skb->mac_len to
-> check for an existing MAC header, which doesn't exist in this case. This
-> leads to memory corruption.
+On Mon, 13 May 2024, Yunsheng Lin wrote:
 
-Could you add a Fixes tag identifying the commit where the buggy code
-was added? And please make sure to CC the relevant maintainers (I mean
-the maintainers of the MHI code, specifically) on v2.
---=20
-pw-bot: cr
+> On 2024/5/11 1:29, Mat Martineau wrote:
+>> On Fri, 10 May 2024, Yunsheng Lin wrote:
+>>
+>>> On 2024/5/10 0:22, Mat Martineau wrote:
+>>>> On Wed, 8 May 2024, Yunsheng Lin wrote:
+>>>>
+>>>>> Use the newly introduced prepare/probe/commit API to
+>>>>> replace page_frag with page_frag_cache for sk_page_frag().
+>>>>>
+>>>>> CC: Alexander Duyck <alexander.duyck@gmail.com>
+>>>>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>>>>> ---
+>>>>> .../chelsio/inline_crypto/chtls/chtls.h       |   3 -
+>>>>> .../chelsio/inline_crypto/chtls/chtls_io.c    | 100 ++++---------
+>>>>> .../chelsio/inline_crypto/chtls/chtls_main.c  |   3 -
+>>>>> drivers/net/tun.c                             |  28 ++--
+>>>>> include/linux/sched.h                         |   4 +-
+>>>>> include/net/sock.h                            |  14 +-
+>>>>> kernel/exit.c                                 |   3 +-
+>>>>> kernel/fork.c                                 |   3 +-
+>>>>> net/core/skbuff.c                             |  32 ++--
+>>>>> net/core/skmsg.c                              |  22 +--
+>>>>> net/core/sock.c                               |  46 ++++--
+>>>>> net/ipv4/ip_output.c                          |  33 +++--
+>>>>> net/ipv4/tcp.c                                |  35 ++---
+>>>>> net/ipv4/tcp_output.c                         |  28 ++--
+>>>>> net/ipv6/ip6_output.c                         |  33 +++--
+>>>>> net/kcm/kcmsock.c                             |  30 ++--
+>>>>> net/mptcp/protocol.c                          |  70 +++++----
+>>>>> net/sched/em_meta.c                           |   2 +-
+>>>>> net/tls/tls_device.c                          | 139 ++++++++++--------
+>>>>> 19 files changed, 331 insertions(+), 297 deletions(-)
+>>>>>
+>>>>
+>>>> <snip>
+>>>>
+>>>>> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+>>>>> index bb8f96f2b86f..ab844011d442 100644
+>>>>> --- a/net/mptcp/protocol.c
+>>>>> +++ b/net/mptcp/protocol.c
+>>>>> @@ -960,17 +960,18 @@ static bool mptcp_skb_can_collapse_to(u64 write_seq,
+>>>>> }
+>>>>>
+>>>>> /* we can append data to the given data frag if:
+>>>>> - * - there is space available in the backing page_frag
+>>>>> - * - the data frag tail matches the current page_frag free offset
+>>>>> + * - there is space available for the current page
+>>>>> + * - the data frag tail matches the current page and offset
+>>>>>  * - the data frag end sequence number matches the current write seq
+>>>>>  */
+>>>>> static bool mptcp_frag_can_collapse_to(const struct mptcp_sock *msk,
+>>>>> -                       const struct page_frag *pfrag,
+>>>>> +                       const struct page *page,
+>>>>> +                       const unsigned int offset,
+>>>>> +                       const unsigned int size,
+>>>>
+>>>> Hi Yunsheng -
+>>>>
+>>>> Why add the 'size' parameter here? It's checked to be a nonzero value, but it can only be 0 if page is also NULL. In this case "page == df->page" will be false, so the function will return false even without checking 'size'.
+>>>
+>>> Is it possible that the pfrag->page is also NULL, which may cause
+>>> mptcp_frag_can_collapse_to() to return true?
+>>
+>> Not sure. But I do know that df->page will never be NULL, so "page == df->page" will always be false when page == NULL.
+>>
+>>>
+>>> I just found out that the 'size' is not set to zero when return
+>>> NULL for the implementation of probe API for the current version.
+>>> Perhaps it makes more sense to expect the API caller to make sure
+>>> the the returned 'page' not being NULL before using the 'offset',
+>>> 'size' and 'va', like below:
+>>>
+>>> df && page && page == df->page
+>>>
+>>
+>> Given that df->page is never NULL, I don't think the extra "&& page" is needed.
+>
+> Not checking the extra "&& page" seems to cause the below warning, it seems we
+> have the below options:
+> 1. ignore the warning.
+> 2. set offset to zero if there is no enough space when probe API asks for a specific
+>   amount of available space as you suggested.
+> 3. add the "&& page" in mptcp_frag_can_collapse_to()
+>
+> what is your favour option? or any other better option?
+>
+> net-mptcp-protocol.c:warning:variable-offset-is-used-uninitialized-whenever-if-condition-is-false
+>
+
+Hi Yunsheng -
+
+That static analyzer is correct that "offset" is *passed* uninitialized in 
+that scenario, but it doesn't recognize that "offset" is never compared 
+when page == NULL. So, it's a false positive in a way.
+
+I don't think implementing fix #2 in the page_frag_alloc_probe() macro is 
+best, since the warning is specific to the MPTCP code and other 
+page_frag_cache users may have reasons to choose nonzero default values 
+for the offset. I suggest initializing offset = 0 where it is declared in 
+mptcp_sendmsg().
+
+
+- Mat
+
 
