@@ -1,90 +1,84 @@
-Return-Path: <netdev+bounces-96007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9B028C3F90
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:12:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B019B8C3FA6
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:19:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7B6FB2375B
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:12:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 386791F21AF6
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:19:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897E714BF91;
-	Mon, 13 May 2024 11:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4270014D281;
+	Mon, 13 May 2024 11:19:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEyCCncm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VXIz1x4z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FB81C683;
-	Mon, 13 May 2024 11:12:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD4114C591;
+	Mon, 13 May 2024 11:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715598757; cv=none; b=Vo3HcaNoodA/aDHx30BKYlDgcw0ufUOl+o8h+etQmxhvpv43gsfynqu7/RZduY6DyPWn2swTlY6mUpjqOtcW7feb+/37Ymi9M/fePd8m++Pi0BCevZ5Ud6spePxH4kXSRsEA7z9pIq2aDgYly4G5zYszCecOz/+cfYnN55EMWrQ=
+	t=1715599141; cv=none; b=thsBUszX8D02joM94qRGZSS7s1t47PaGqBIbh6pYeagCDmx1He1QrrVXBIZ5Zb0BthgcSHfN4l5u1ZFF0V/LUOImZO7lgW1zQGDQIlRw92bvPhnm3+eyI1SWSqsyzuy5PSvBIeHLC2t2r3s27C8Gy+FUWKf2EI/GiqBAnFa0MPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715598757; c=relaxed/simple;
-	bh=ovWECFyus9fyusYiUp7lb7F22QlyMqy46p2ZM0gDVzE=;
+	s=arc-20240116; t=1715599141; c=relaxed/simple;
+	bh=Hq107+KzbP8LLfL/8/jiKEoxV4uQvEu20/9t6yULhgY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hAs9cs4VezWHKmachxNoLdCeMvCLUN0rOYYbvLUYoH9XfA5X6IE10fQvwr2A4un2K/QtjY57T3mMi7wK9fR423KJiP7LLewELuO/EtsD9bmDR1X4/JNWMZFpKhtxmtCtVa3VVOrrJ+iqtvCxIPX1Ez8UTvaWXefuBhwia5pX4xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEyCCncm; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2e576057c2bso26691231fa.1;
-        Mon, 13 May 2024 04:12:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715598754; x=1716203554; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CsXgR3w2FhQE+aSDSS2Gv40EZ/tbmCX2jDPHP8DnHb8=;
-        b=dEyCCncmOQTQZFjsEba16Wyf6ihjRTTyisSM4lDK5aSsWbvkErgZRMo3ipM5rf84td
-         iDXymqAfAf0UGzWknw7mFNK394MS7b96DKKSHHIcRRhlAokEgdoy2zQKKoAYo/GEm+JD
-         K7p/r/uHJr8DzzdQruse0/x1+HRPLWBY+X0gMOaSA30BXaFreh+Azq44jr2FmaPFxEDP
-         rxlOP3usuY4Hqp4mf/1gmLf4qf1nnU1o2XwvqWmoXX0YQ3p0xnoa3i7CBRic1oeXzHo8
-         lz66pHtf9tqHlMY8erfXkYs4wgfCx6K70rwmBqrC7hpCajt0GtPpdDGAL4kRGUyrRApZ
-         LsDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715598754; x=1716203554;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CsXgR3w2FhQE+aSDSS2Gv40EZ/tbmCX2jDPHP8DnHb8=;
-        b=Ij1rNjpXW7bldXESGHzCPhcgRkTqq9cOElAJ0MwzIcf9cJURwJGg7DwinbUXP0nqKV
-         N+knpakm7CJND5e85jo3i2Q6BdqnKbZJqfFNPVyCNkajtI6oVbR3rdZe8alIALeBzm0l
-         B+nieDq1a9yUcRi+jFb3FxiGWHOAX9Lp5BBB3Ptaoiiqji9Zz2/Po3HOZzzzUFuVjjtF
-         U+Q9Me9JeM9UhtfXAnJNjfiGW2kwAo8AeAAlWFelRP/4XDF/IqN159KAmV3KiStjidYv
-         95HCCQKNgPw2SNBOfiRd8mHPLdtm1cB5Mc7wPz/LHkaqBNJLZ5i5KRd2WOCWXOpNCP4H
-         WH3g==
-X-Forwarded-Encrypted: i=1; AJvYcCX95XhBk7xVfJlxjqs7pNGgos/7fABRx9hG3hxWOfbEVJu8y2Vbk2Aq3AWQowmEBPeSTUiaqPXZ/PVXEl3Kh5L5isa9cTg81/GLF2HbvWU4WVonDWJNZrFS9FubNgKosD1Jl/1iGuMmAAVSfqVFvzn+KQ6oOV4GsZKODYhzPIK72o5fVD88FIEtkhxC2aAniXVMaj1MqyvNhsFZpIXRNfO4zo0s
-X-Gm-Message-State: AOJu0Yxf3ZXc0R5Mphk1YF2ZWvYSEMvmIQtjTogGNj3/8anmbVyI1Rcn
-	PvkJwLt9f18byrDe2P8h6Aos4MW0cuTTmSXm0bD//Jk8+pTWV5R0zjg29nn/
-X-Google-Smtp-Source: AGHT+IFNrzH1ND0SZWwUAgn/8uMLO2dCcSkwSoLKZfE1t1yAXNHUDLcBvn8cGIMU+gIVm1ldgnIHuA==
-X-Received: by 2002:a05:651c:b0c:b0:2dd:bc53:e80 with SMTP id 38308e7fff4ca-2e52039daccmr90950591fa.51.1715598753491;
-        Mon, 13 May 2024 04:12:33 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2e4d0bbd6a7sm14048281fa.6.2024.05.13.04.12.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 04:12:32 -0700 (PDT)
-Date: Mon, 13 May 2024 14:12:29 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Subject: Re: [PATCH net-next v7 2/7] net: stmmac: Add dedicated XPCS cleanup
- method
-Message-ID: <u3t3zu4ihqoc44gl2mvw74seamtoas5wvxr7kqzxxhvu3enhbx@7txzs5fsse25>
-References: <20240513-rzn1-gmac1-v7-0-6acf58b5440d@bootlin.com>
- <20240513-rzn1-gmac1-v7-2-6acf58b5440d@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rpFssj9aaXuKAnHi16PV8OtPHf6FM/lD90jaui4Ywc+Z0WFXK9SkUq54Ca/ruwgjLX1hovdri9oMC242/tLJq7CN6uk5c4l1aRy8wSoyCcG7BwEAfrcu+4bqJYhI0b+c4+Hz/8B8dm8VaMhttWB6rdKbgDtyZSD5qoxA35pit+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VXIz1x4z; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715599139; x=1747135139;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Hq107+KzbP8LLfL/8/jiKEoxV4uQvEu20/9t6yULhgY=;
+  b=VXIz1x4zN7CGf108Oit/tDx6Ijfe5sFzd+w61hHKxRIV4S6fP0+YD+Sk
+   znr7WG2l1a9pZ2Ptr7AG+sOBXXvKvkVo29EKqxbU1QU5ktATAP0LTx5G+
+   Us+1fFuIfi6n0UBfQL+trogIwFfeyGfm5D+osC78wO9b4sE8N7GExDWJK
+   pQpAhfFnQQWF12EQiAPszWXoTBdgVtUyU65UP1RjAlZhdEySEwC9LE7nT
+   E/T9pb0mpRx1fjQUJUgyRw5HWFD+PDjNDEi/WQCRDsPzI6pteDLmZEwKO
+   q/05b6cKB28/mc3zbJqdmnZaFMjSs5PNpRVu9xKK8cKomEsnlf906pd/1
+   w==;
+X-CSE-ConnectionGUID: yrb9+5eXTO66xLQJviy6qw==
+X-CSE-MsgGUID: kBlGDfLdTtOA7uI8/s1QbQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11071"; a="11349939"
+X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
+   d="scan'208";a="11349939"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 04:18:58 -0700
+X-CSE-ConnectionGUID: Em0EdL3kS+ebItk6iQqS3Q==
+X-CSE-MsgGUID: 2h063URmRbasVo6zRP4CkA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
+   d="scan'208";a="61123834"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 04:18:53 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1s6Thh-000000076l1-1gxQ;
+	Mon, 13 May 2024 14:18:49 +0300
+Date: Mon, 13 May 2024 14:18:48 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: lakshmi.sowjanya.d@intel.com
+Cc: tglx@linutronix.de, jstultz@google.com, giometti@enneenne.com,
+	corbet@lwn.net, linux-kernel@vger.kernel.org, x86@kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, eddie.dong@intel.com,
+	christopher.s.hall@intel.com, jesse.brandeburg@intel.com,
+	davem@davemloft.net, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, mcoquelin.stm32@gmail.com, perex@perex.cz,
+	linux-sound@vger.kernel.org, anthony.l.nguyen@intel.com,
+	peter.hilber@opensynergy.com, pandith.n@intel.com,
+	subramanian.mohan@intel.com, thejesh.reddy.t.r@intel.com
+Subject: Re: [PATCH v8 10/12] pps: generators: Add PPS Generator TIO Driver
+Message-ID: <ZkH3GP2b9WTz9W3W@smile.fi.intel.com>
+References: <20240513103813.5666-1-lakshmi.sowjanya.d@intel.com>
+ <20240513103813.5666-11-lakshmi.sowjanya.d@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,113 +87,142 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240513-rzn1-gmac1-v7-2-6acf58b5440d@bootlin.com>
+In-Reply-To: <20240513103813.5666-11-lakshmi.sowjanya.d@intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Hi Romain
-
-On Mon, May 13, 2024 at 09:25:13AM +0200, Romain Gantois wrote:
-> From: Serge Semin <fancer.lancer@gmail.com>
+On Mon, May 13, 2024 at 04:08:11PM +0530, lakshmi.sowjanya.d@intel.com wrote:
+> From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
 > 
-> Currently the XPCS handler destruction is performed in the
-> stmmac_mdio_unregister() method. It doesn't look good because the handler
-> isn't originally created in the corresponding protagonist
-> stmmac_mdio_unregister(), but in the stmmac_xpcs_setup() function. In
-> order to have more coherent MDIO and XPCS setup/cleanup procedures,
-> let's move the DW XPCS destruction to the dedicated stmmac_pcs_clean()
-> method.
+> The Intel Timed IO PPS generator driver outputs a PPS signal using
+> dedicated hardware that is more accurate than software actuated PPS.
+> The Timed IO hardware generates output events using the ART timer.
+> The ART timer period varies based on platform type, but is less than 100
+> nanoseconds for all current platforms. Timed IO output accuracy is
+> within 1 ART period.
 > 
-> This method will also be used to cleanup PCS hardware using the
-> pcs_exit() callback that will be introduced to stmmac in a subsequent
-> patch.
-> 
-> Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
-> Co-developed-by: Romain Gantois <romain.gantois@bootlin.com>
-> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
-> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> PPS output is enabled by writing '1' the 'enable' sysfs attribute. The
+> driver uses hrtimers to schedule a wake-up 10 ms before each event
+> (edge) target time. At wakeup, the driver converts the target time in
+> terms of CLOCK_REALTIME to ART trigger time and writes this to the Timed
+> IO hardware. The Timed IO hardware generates an event precisely at the
+> requested system time without software involvement.
 
-Looking good. Thanks!
-* Not sure whether my explicit Rb tag will be required in such the tags
-disposition.)
+...
 
--Serge(y)
-
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac.h      |  1 +
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  6 +++++-
->  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c | 14 +++++++++++---
->  3 files changed, 17 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> index dddcaa9220cc3..badfe686a5702 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> @@ -361,6 +361,7 @@ int stmmac_mdio_unregister(struct net_device *ndev);
->  int stmmac_mdio_register(struct net_device *ndev);
->  int stmmac_mdio_reset(struct mii_bus *mii);
->  int stmmac_xpcs_setup(struct mii_bus *mii);
-> +void stmmac_pcs_clean(struct net_device *ndev);
->  void stmmac_set_ethtool_ops(struct net_device *netdev);
->  
->  int stmmac_init_tstamp_counter(struct stmmac_priv *priv, u32 systime_flags);
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 3d828904db0d3..0ac99c132733d 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -7789,8 +7789,9 @@ int stmmac_dvr_probe(struct device *device,
->  
->  error_netdev_register:
->  	phylink_destroy(priv->phylink);
-> -error_xpcs_setup:
->  error_phy_setup:
-> +	stmmac_pcs_clean(ndev);
-> +error_xpcs_setup:
->  	if (priv->hw->pcs != STMMAC_PCS_TBI &&
->  	    priv->hw->pcs != STMMAC_PCS_RTBI)
->  		stmmac_mdio_unregister(ndev);
-> @@ -7832,6 +7833,9 @@ void stmmac_dvr_remove(struct device *dev)
->  	if (priv->plat->stmmac_rst)
->  		reset_control_assert(priv->plat->stmmac_rst);
->  	reset_control_assert(priv->plat->stmmac_ahb_rst);
-> +
-> +	stmmac_pcs_clean(ndev);
-> +
->  	if (priv->hw->pcs != STMMAC_PCS_TBI &&
->  	    priv->hw->pcs != STMMAC_PCS_RTBI)
->  		stmmac_mdio_unregister(ndev);
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> index 0542cfd1817e6..73ba9901a4439 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> @@ -523,6 +523,17 @@ int stmmac_xpcs_setup(struct mii_bus *bus)
->  	return 0;
->  }
->  
-> +void stmmac_pcs_clean(struct net_device *ndev)
+> +static ssize_t enable_store(struct device *dev, struct device_attribute *attr, const char *buf,
+> +			    size_t count)
 > +{
-> +	struct stmmac_priv *priv = netdev_priv(ndev);
+> +	struct pps_tio *tio = dev_get_drvdata(dev);
+> +	bool enable;
+> +	int err;
+
+(1)
+
+> +	err = kstrtobool(buf, &enable);
+> +	if (err)
+> +		return err;
 > +
-> +	if (!priv->hw->xpcs)
-> +		return;
-> +
-> +	xpcs_destroy(priv->hw->xpcs);
-> +	priv->hw->xpcs = NULL;
+> +	guard(spinlock_irqsave)(&tio->lock);
+> +	if (enable && !tio->enabled) {
+
+> +		if (!timekeeping_clocksource_has_base(CSID_X86_ART)) {
+> +			dev_err(tio->dev, "PPS cannot be started as clock is not related to ART");
+
+Why not simply dev_err(dev, ...)?
+
+> +			return -EPERM;
+> +		}
+
+I'm wondering if we can move this check to (1) above.
+Because currently it's a good question if we are able to stop PPS which was run
+by somebody else without this check done.
+
+I.o.w. this sounds too weird to me and reading the code doesn't give any hint
+if it's even possible. And if it is, are we supposed to touch that since it was
+definitely *not* us who ran it.
+
+> +		pps_tio_direction_output(tio);
+> +		hrtimer_start(&tio->timer, first_event(tio), HRTIMER_MODE_ABS);
+> +		tio->enabled = true;
+> +	} else if (!enable && tio->enabled) {
+> +		hrtimer_cancel(&tio->timer);
+> +		pps_tio_disable(tio);
+> +		tio->enabled = false;
+> +	}
+> +	return count;
 > +}
+
+...
+
+> +static int pps_tio_probe(struct platform_device *pdev)
+> +{
+
+	struct device *dev = &pdev->dev;
+
+> +	struct pps_tio *tio;
 > +
->  /**
->   * stmmac_mdio_register
->   * @ndev: net device structure
-> @@ -679,9 +690,6 @@ int stmmac_mdio_unregister(struct net_device *ndev)
->  	if (!priv->mii)
->  		return 0;
->  
-> -	if (priv->hw->xpcs)
-> -		xpcs_destroy(priv->hw->xpcs);
-> -
->  	mdiobus_unregister(priv->mii);
->  	priv->mii->priv = NULL;
->  	mdiobus_free(priv->mii);
-> 
-> -- 
-> 2.44.0
-> 
+> +	if (!(cpu_feature_enabled(X86_FEATURE_TSC_KNOWN_FREQ) &&
+> +	      cpu_feature_enabled(X86_FEATURE_ART))) {
+> +		dev_warn(&pdev->dev, "TSC/ART is not enabled");
+
+		dev_warn(dev, "TSC/ART is not enabled");
+
+> +		return -ENODEV;
+> +	}
+> +
+> +	tio = devm_kzalloc(&pdev->dev, sizeof(*tio), GFP_KERNEL);
+
+	tio = devm_kzalloc(dev, sizeof(*tio), GFP_KERNEL);
+
+
+> +	if (!tio)
+> +		return -ENOMEM;
+> +
+> +	tio->dev = &pdev->dev;
+
+	tio->dev = dev;
+
+> +	tio->base = devm_platform_ioremap_resource(pdev, 0);
+> +	if (IS_ERR(tio->base))
+> +		return PTR_ERR(tio->base);
+
+> +	pps_tio_disable(tio);
+
+This...
+
+> +	hrtimer_init(&tio->timer, CLOCK_REALTIME, HRTIMER_MODE_ABS);
+> +	tio->timer.function = hrtimer_callback;
+> +	spin_lock_init(&tio->lock);
+
+> +	tio->enabled = false;
+
+...and this should go together, which makes me look at the enabled flag over
+the code and it seems there are a few places where you missed to sync it with
+the reality.
+
+I would think of something like this:
+
+	pps_tio_direction_output() ==> true
+	pps_tio_disable(tio) ==> false
+
+where "==> X" means assignment of enabled flag.
+
+And perhaps this:
+
+	tio->enabled = pps_generate_next_pulse(tio, expires + SAFE_TIME_NS);
+	if (!tio->enabled)
+		...
+
+But the above is just thinking out loudly, you may find the better approach(es).
+
+> +	platform_set_drvdata(pdev, tio);
+> +
+> +	return 0;
+> +}
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
