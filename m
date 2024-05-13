@@ -1,98 +1,136 @@
-Return-Path: <netdev+bounces-95849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E5528C3A76
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 05:28:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6F6C8C3A86
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 05:44:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD94F281355
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 03:28:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C5851C20D73
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 03:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5117145B1E;
-	Mon, 13 May 2024 03:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B36B145B38;
+	Mon, 13 May 2024 03:44:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AACE145A11;
-	Mon, 13 May 2024 03:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF3222F08;
+	Mon, 13 May 2024 03:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715570933; cv=none; b=NoIfI9dxL7oHS1/kmSKyjckUOn7vi4Lc3qvGd53GUKvQ+5RzAW/FAxdrZojDhUGBNaIpSkivR+zTrbKlol1RVGOfwM+S+M2uGrRji1tMUv2Tc0iXCEq9VeLUayA6QYw/nN2Xn/eoxVvCn3qiX8Ra77y+tVnXYfRH92OkbaR62Uc=
+	t=1715571859; cv=none; b=WrmJld3edVRpe5XkjS/xpXdOnZRw9BRZvlDKLMJ54a3qBboZXJPGMw+8oGoSXudr+2W5do5nXw+NcxW9ldzMHwu0sBjzEGVh6DWyiHZA61sRaFdu4bW+Sd2BOqX7YizRPhNqBrxghhjLdaagEcc9Wqzl+/04VuZ6mQv2OsBKZfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715570933; c=relaxed/simple;
-	bh=Sc4lVwGwuwh8l0GV0drplYsEgllKtx/zFNNahESzNn0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i83FHlG2ZcKTWjUiG+aNxfKlPE2PzxAhfdF9//mzwS18wRsGrk9fgXhQOUYwDm2InwfPItUiKKzc9hhebd8lz6hl3gEGr+bZ8Ee0ko5WdpNk1YStVwc92Jn/xERHQFYAr3PqMd/tOjjhJsluqf6HU/NimD7zaQ+VLBuzZNbboeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost (unknown [124.16.138.129])
-	by APP-05 (Coremail) with SMTP id zQCowAB3fubciEFmiSW6Cg--.38107S2;
-	Mon, 13 May 2024 11:28:29 +0800 (CST)
-From: Chen Ni <nichen@iscas.ac.cn>
-To: vadim.fedorenko@linux.dev,
-	arkadiusz.kubalewski@intel.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	jan.glaza@intel.com,
-	przemyslaw.kitszel@intel.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chen Ni <nichen@iscas.ac.cn>
-Subject: [PATCH] dpll: fix return value check for kmemdup
-Date: Mon, 13 May 2024 11:28:24 +0800
-Message-Id: <20240513032824.2410459-1-nichen@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1715571859; c=relaxed/simple;
+	bh=wGiZC2HBCgKBqxT3zraC65pPgnrqP9p/UeRv8YvsqWs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=jvYragaYdvO43W8g5zEkw8OrbRhoB2BC+tOZXEfEBfvLXXJVE6XQ18hQgOHvRAliK642dqrAaGkqsiXZSHQAJe82ZTRIKrb1ojIp6vGav/nYdqmci0d54UT9G8V2eL+fjsSTDINc6JZv7xJbVBrKCYIz7p/wbEQF6PJH15p6www=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 44D3hqX131129703, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 44D3hqX131129703
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 13 May 2024 11:43:53 +0800
+Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 13 May 2024 11:43:52 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 13 May 2024 11:43:52 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Mon, 13 May 2024 11:43:52 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org" <horms@kernel.org>,
+        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v18 06/13] rtase: Implement .ndo_start_xmit function
+Thread-Topic: [PATCH net-next v18 06/13] rtase: Implement .ndo_start_xmit
+ function
+Thread-Index: AQHaoUVFS3AReltz50OiDSH+k5DKnbGQKQQAgARjhdA=
+Date: Mon, 13 May 2024 03:43:52 +0000
+Message-ID: <7f1ff93c4f7d4fc9bdefbb646c18acc1@realtek.com>
+References: <20240508123945.201524-1-justinlai0215@realtek.com>
+ <20240508123945.201524-7-justinlai0215@realtek.com>
+ <1bb2d174-ccae-43e3-80ec-872b9a140fbe@lunn.ch>
+In-Reply-To: <1bb2d174-ccae-43e3-80ec-872b9a140fbe@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAB3fubciEFmiSW6Cg--.38107S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrKF4kKr47Gw45tw48Ww4fGrg_yoW3KrcEk3
-	48JrsrXry5G3Z8J3WYka93Wry2ywnrXrn5XryIqFWftayjvryDur4Ivrs8Gr1DXayUuF9r
-	G3yxu3W8Cw4kCjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbz8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
-	1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-	6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAK
-	I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
-	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-	67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-The return value of kmemdup() is dst->freq_supported, not
-src->freq_supported. Update the check accordingly.
+>=20
+> > +static u32 rtase_tx_csum(struct sk_buff *skb, const struct net_device
+> > +*dev) {
+> > +     u32 csum_cmd =3D 0;
+> > +     u8 ip_protocol;
+> > +
+> > +     switch (vlan_get_protocol(skb)) {
+> > +     case htons(ETH_P_IP):
+> > +             csum_cmd =3D RTASE_TX_IPCS_C;
+> > +             ip_protocol =3D ip_hdr(skb)->protocol;
+> > +             break;
+> > +
+> > +     case htons(ETH_P_IPV6):
+> > +             csum_cmd =3D RTASE_TX_IPV6F_C;
+> > +             ip_protocol =3D ipv6_hdr(skb)->nexthdr;
+> > +             break;
+> > +
+> > +     default:
+> > +             ip_protocol =3D IPPROTO_RAW;
+> > +             break;
+> > +     }
+> > +
+> > +     if (ip_protocol =3D=3D IPPROTO_TCP)
+> > +             csum_cmd |=3D RTASE_TX_TCPCS_C;
+> > +     else if (ip_protocol =3D=3D IPPROTO_UDP)
+> > +             csum_cmd |=3D RTASE_TX_UDPCS_C;
+> > +     else
+> > +             WARN_ON_ONCE(1);
+>=20
+> I'm not so sure about this WARN_ON_ONCE(). It looks like if i send a cust=
+om
+> packet which is not IPv4 or IPv6 it will fire. There are other protocols =
+then IP.
+> Connecting to an Ethernet switch using DSA tags would be a good example. =
+So
+> i don't think you want this warning.
+>=20
+>       Andrew
 
-Fixes: 830ead5fb0c5 ("dpll: fix pin dump crash for rebound module")
-Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
----
- drivers/dpll/dpll_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
-index d0f6693ca142..32019dc33cca 100644
---- a/drivers/dpll/dpll_core.c
-+++ b/drivers/dpll/dpll_core.c
-@@ -449,7 +449,7 @@ static int dpll_pin_prop_dup(const struct dpll_pin_properties *src,
- 				   sizeof(*src->freq_supported);
- 		dst->freq_supported = kmemdup(src->freq_supported,
- 					      freq_size, GFP_KERNEL);
--		if (!src->freq_supported)
-+		if (!dst->freq_supported)
- 			return -ENOMEM;
- 	}
- 	if (src->board_label) {
--- 
-2.25.1
-
+Hi Andrew,
+The condition for entering this function is checksum_partial, which require=
+s
+hardware to help calculate the checksum, so protocols that are not supporte=
+d
+by the hardware will issue warn_on_once.
 
