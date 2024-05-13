@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-96155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B5878C4822
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 22:23:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D787F8C482D
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 22:26:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92C8DB22989
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:23:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 151811C20CA5
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39A8D7E572;
-	Mon, 13 May 2024 20:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A807E575;
+	Mon, 13 May 2024 20:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MYCeqSv7"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yRKjcqLT"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4BE39FD8;
-	Mon, 13 May 2024 20:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87857AE5D;
+	Mon, 13 May 2024 20:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715631822; cv=none; b=uVZc2M3uyR5Yd70V/3F3IfAc3zPsiF72HICDLhDzcgAOpVGQr9OY2AQ6KHDp193QCefCQHXdeUml4oQSUsU6rWlQEBARAtLLrN7yCw9DH66dnw41N9Vn/VwO6UlBBYpJfinihpkRoQ1WDn8pUwtOBqOe2dqNniflzLPFbNj/PuQ=
+	t=1715632005; cv=none; b=kamyyPNcz9n9lyCm7gdxL0k4v67AdLD7Q+VBtBhAz8bbla7uxljFukhQ52kr1EqRNQ5OgX5hp7goljZZ/2/D0IJUKmi2ifQYalyLvAoZJxtSGiFAktSYfrKa85HLbPxDTuJ8DGVjyBsn+tjfsPw6GBH5rShB6FkOf/s8bkD5EIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715631822; c=relaxed/simple;
-	bh=2y6lIR7UUi3HT4p1jrZVxbAYi7+AJOkRG82ari9GLCM=;
+	s=arc-20240116; t=1715632005; c=relaxed/simple;
+	bh=VNEzvjA8rLwZG4zn5sjyLB2KhundQsyggo28iU3zm20=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kdj/+V0cDAT1tnKpX02c97Txy+Abnb55zjsfNUTU9xZLmqlFGwqFSmVlv8lw+1T61RxgZYZeJnfD+NxmHustnO/aWeHFY9NRHiM5mhYtkryzvuam9P8/NTPgniUmNPrFLs0vtl6fTEgdn52RWbfC9rDxWoVto6ighuTJ4MTwS6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MYCeqSv7; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=JRp6gD8kzWnKBO7MpThUH0iyA2h+60cwqst6CHpvPl2uTQiaJYMkqkM8sUd3zxkQeP8NDMHBsEl7XF9X28FT2mMLaqeZU3GRfTjWxsQPMAvjfrTjD0rRC0soEWlmu/ExTeLu/cMUXjD4JWBx81ojFvYR4oVSox3sFVJW0l8a894=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yRKjcqLT; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,31 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KSM9V1vBTjgznXi3QwcS9ZgOCMBEU14RG9Mn0qnphd0=; b=MYCeqSv7+rarJu+j4nANfmy+iI
-	km7e3QibYVWSCpz2HMuJ7vh9uxH4jk7fJ3NyMzVum2Cg06tTHsNAfjXFNfokyP+52S/rsnQ4VbYU0
-	6Y1Bfbk0r3uVClGNKs8FgbYVXOrFAodGFtOEzdl7PzQA9ib+4t6xSMfqMvrenVpsfXws=;
+	bh=gcTnuspTzcXG4upolGwGV93OP3g/85J3TNVtbNWq9DA=; b=yRKjcqLTVCPpyMC1N/BQilmMAg
+	6JeUvm+AXURNc8QMCO3JmUx2ERzhMAmu+1o+lNWCVhtT+Iy6XOnEzivqSizTVZu9D9A2DDRZ9uWxI
+	SXXGG0/NhdjUErhNKAHRd2OIrSN3qwSienA3orbizr5k1d45PnHDGs/6LJ0zsdgYZZ8w=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1s6cCq-00FKlF-Uk; Mon, 13 May 2024 22:23:32 +0200
-Date: Mon, 13 May 2024 22:23:32 +0200
+	id 1s6cFh-00FKm1-My; Mon, 13 May 2024 22:26:29 +0200
+Date: Mon, 13 May 2024 22:26:29 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: admiyo@os.amperecomputing.com
-Cc: Robert Moore <robert.moore@intel.com>,
+Cc: Sudeep Holla <sudeep.holla@arm.com>,
+	Jassi Brar <jassisinghbrar@gmail.com>,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Robert Moore <robert.moore@intel.com>,
 	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
 	Len Brown <lenb@kernel.org>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] mctp pcc: Allow PCC Data Type in MCTP resource.
-Message-ID: <51bfbccf-9891-4766-a7a7-6b507b3ebc2c@lunn.ch>
+Subject: Re: [PATCH 3/3] mctp pcc: RFC Check before sending MCTP PCC response
+ ACK
+Message-ID: <9e893038-e78e-43d9-82b3-c95cd7b51f18@lunn.ch>
 References: <20240513173546.679061-1-admiyo@os.amperecomputing.com>
- <20240513173546.679061-3-admiyo@os.amperecomputing.com>
+ <20240513173546.679061-4-admiyo@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,33 +69,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240513173546.679061-3-admiyo@os.amperecomputing.com>
+In-Reply-To: <20240513173546.679061-4-admiyo@os.amperecomputing.com>
 
-On Mon, May 13, 2024 at 01:35:45PM -0400, admiyo@os.amperecomputing.com wrote:
+On Mon, May 13, 2024 at 01:35:46PM -0400, admiyo@os.amperecomputing.com wrote:
 > From: Adam Young <admiyo@os.amperecomputing.com>
 > 
-> Note that this patch sfor code that will be merged
-> in via ACPICA changes.  The corresponding patch in ACPCA
-> has already merged.
+> Type 4 PCC channels have an option to send back a response
+> to the platform when they are done processing the request.
+> The flag to indicate whether or not to respond is inside
+> the message body, and thus is not available to the pcc
+> mailbox.  Since only one message can be processed at once per
+> channel, the value of this flag is checked during message processing
+> and passed back via the channels global structure.
 > 
-> Signed-off-by: Adam Young <admiyo@os.amperecomputing.com>
-> ---
->  drivers/acpi/acpica/rsaddr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/acpi/acpica/rsaddr.c b/drivers/acpi/acpica/rsaddr.c
-> index fff48001d7ef..6bd9704f17b0 100644
-> --- a/drivers/acpi/acpica/rsaddr.c
-> +++ b/drivers/acpi/acpica/rsaddr.c
-> @@ -282,7 +282,7 @@ acpi_rs_get_address_common(struct acpi_resource *resource,
->  
->  	/* Validate the Resource Type */
->  
-> -	if ((address.resource_type > 2) && (address.resource_type < 0xC0)) {
-> +	if ((address.resource_type > 2) && (address.resource_type < 0xC0) && (address.resource_type != 10)) {
->  		return (FALSE);
+> Ideally, the mailbox callback function would return a value
+> indicating whether the message requires an ACK, but that
+> would be a change to the mailbox API.  That would involve
+> some change to all of the mailbox based drivers.
 
-More magic numbers. Please add some #defines.
+How many mailbox drivers are there?
 
-     Andrew
+Generally, taking the path of least resistance will cost more in the
+long run. It is better to do it properly from the start.
+
+    Andrew
 
