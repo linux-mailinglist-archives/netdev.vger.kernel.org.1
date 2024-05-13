@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-96110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25B938C45E4
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 19:20:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BFB58C45E8
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 19:22:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BCE51C21066
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:20:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B49E1F2123B
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FE220332;
-	Mon, 13 May 2024 17:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D2D20310;
+	Mon, 13 May 2024 17:22:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="G5DcfSeG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KRgaCc5a"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D8C1CA89
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 17:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C55022612
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 17:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715620841; cv=none; b=J3ZCSBHBk5JBB7TdmVEcWEH9sw6ynrY+X9ktODT15aAP2Ind0n9HUKmnbhKixVdIa2SVpJDO22EZh+AX7i3gZH9ld9JuBnnnQ9A4T2NiFsRdBe4gyXGWFBDCaX6PY9rJQAmwKxPZKH6/NhSpuhj3BNU2DQiLTwr6nI1oUNu0ZEw=
+	t=1715620936; cv=none; b=UCnk62ZCB4Rf7iGmYSUs0Myp9i39O/QsVwHOCFHFYHf6mQ8YQi0WW9hBcv6gpsyL2vQGGEscau4eq8+i0f6Z8Q1Ip7nobkXEq+l6oP+d0rt6PN6wNCAouZ+BjdL26w9Wn8DcqoDlU+KmhE295BDUrwrzJLlRONDBdP29W4WsBX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715620841; c=relaxed/simple;
-	bh=Yl1irXY7zS6ZdKqAXZGx2bV/egMOGekvZj1V6jSGdes=;
+	s=arc-20240116; t=1715620936; c=relaxed/simple;
+	bh=LapeqVwNKoAt+AhxqyrVNxWf38B0S/SBFikjDYrknGQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GdKgx4/9GHP0n+7rVoFiQujovmOxBXBXkpIHE/V1isOSA25s1pSpwW4zIgUHH3q5bl85L3fJlpgKBmVIw/6BBMGPPTLrlfy8lTqiW0rD10XsBhTNppef9eWDgucEHC95j6ICczUGD08tgO+dwtZH4KbsxmC88xkt7/QvL6P75U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=G5DcfSeG; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=P7C4soD+XKSUZpuOYhMxYpT4LjOrULvwB9R4iduyulo+U1s/bHt2TOoz2kAlvbp+/ukZa4ZyMk64pQtxCxVMFNHxyV+yMhdU8Hw4oygyb1juWyTCmpPN8gNKBwGVAt4DRl6N4Lm2zDo8ycpDF8qBgBtpXFfNcdB+FiiIMGZLh64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KRgaCc5a; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=P7Dg67nTj6NsmCr27Lipct1RdGRABUIwR9zqXbH+AMQ=; b=G5DcfSeGvBgNgwWSw/IMJPlqnP
-	uhaR14X7CBP0hU8M7XLS3eeB2nxSzYtdjdA43Pz+b10gfFVp9a5zA2qw9Kam/UowlDTYLsrMymP3G
-	/Ojy/1RW1qEspLXflxW1TIsrJvPeha31zNz/T9LwQA2umUi6nzP2Knvif2rup4CwGo3U=;
+	bh=P0ZrwzNqwtkYQgW/SBWRNMaRlv1kWQBbVtFFH/Xl9H4=; b=KRgaCc5aeBLmtX4zHQtjklNxpW
+	D3jq4a4SKcLSWegI+tlzrO5E5vJgr8wBO75BedTp+lDLtlF1JXw/ssaSzTK8Szntp+BYR0I6cM5lq
+	sraA55dob9ftkGglMJmrCwvlWpNKWDt/Jk56ds8NF9YaUNazk7VwhfZk560Aa7knJWHs=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1s6ZLi-00FKC6-OA; Mon, 13 May 2024 19:20:30 +0200
-Date: Mon, 13 May 2024 19:20:30 +0200
+	id 1s6ZNI-00FKD6-KI; Mon, 13 May 2024 19:22:08 +0200
+Date: Mon, 13 May 2024 19:22:08 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Linus Walleij <linus.walleij@linaro.org>
 Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
@@ -50,11 +50,11 @@ Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3 4/5] net: ethernet: cortina: Use negotiated
- TX/RX pause
-Message-ID: <7ddcdf22-bf68-4877-8d44-eef9689f1106@lunn.ch>
+Subject: Re: [PATCH net-next v3 5/5] net: ethernet: cortina: Implement
+ .set_pauseparam()
+Message-ID: <9d7d7e8b-8838-410b-a694-2f2da21602c1@lunn.ch>
 References: <20240513-gemini-ethernet-fix-tso-v3-0-b442540cc140@linaro.org>
- <20240513-gemini-ethernet-fix-tso-v3-4-b442540cc140@linaro.org>
+ <20240513-gemini-ethernet-fix-tso-v3-5-b442540cc140@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,16 +63,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240513-gemini-ethernet-fix-tso-v3-4-b442540cc140@linaro.org>
+In-Reply-To: <20240513-gemini-ethernet-fix-tso-v3-5-b442540cc140@linaro.org>
 
-On Mon, May 13, 2024 at 03:38:51PM +0200, Linus Walleij wrote:
-> Instead of directly poking into registers of the PHY, use
-> the existing function to query phylib about this directly.
+On Mon, May 13, 2024 at 03:38:52PM +0200, Linus Walleij wrote:
+> The Cortina Gemini ethernet can very well set up TX or RX
+> pausing, so add this functionality to the driver in a
+> .set_pauseparam() callback.
 > 
-> Suggested-by: Andrew Lunn <andrew@lunn.ch>
 > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>  drivers/net/ethernet/cortina/gemini.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
+> index 85a9777083ba..4ae25a064407 100644
+> --- a/drivers/net/ethernet/cortina/gemini.c
+> +++ b/drivers/net/ethernet/cortina/gemini.c
+> @@ -2146,6 +2146,20 @@ static void gmac_get_pauseparam(struct net_device *netdev,
+>  	pparam->autoneg = true;
+>  }
+>  
+> +static int gmac_set_pauseparam(struct net_device *netdev,
+> +			       struct ethtool_pauseparam *pparam)
+> +{
+> +	struct phy_device *phydev = netdev->phydev;
+> +
+> +	if (!pparam->autoneg)
+> +		return -EOPNOTSUPP;
+> +
+> +	gmac_set_flow_control(netdev, pparam->tx_pause, pparam->rx_pause);
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+It is not obvious to my why you need this call here?
 
-    Andrew
+	Andrew
 
