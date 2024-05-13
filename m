@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-95936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 784C28C3E23
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:30:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 344858C3E27
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:31:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C7421F2235F
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 09:30:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E48F1F22302
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 09:31:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0891487E3;
-	Mon, 13 May 2024 09:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60C61487E6;
+	Mon, 13 May 2024 09:31:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="bYbR06SU"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="gNWiK+O/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379151487E2
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 09:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2171474B1
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 09:31:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715592619; cv=none; b=ATW0CY4430Fgj8NffdZ/R5HJAEIhdva1wGJAFUVkxofe8mSASzvtmeVRQV6oIOHGHIbqR2ztqQpWctS9d6sR8ArQSPWSuXGZEDwtzEjCXS8OdGiMPQpu6guoYDgIxwfCrCdWaOBvKDaRTpWTFuehP1HqCkBTTTxVi56G/jxZM6Q=
+	t=1715592708; cv=none; b=BNce7U4ww1lO6hwNe2ITE9m6+LKaUoG4EgkjqF15H781wgUpsJYv4d3ncSBWcKwMH9/ongnIcSaYeHOjPGGoNoZs+mZi6+VBNgtH9zlJJerofP2pSV/PLevWyIJTIEwoG9I4s9f9OeJ+PItv4iyGa0Hmn1RLa2mjBqSMAhv92mY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715592619; c=relaxed/simple;
-	bh=YhyN9HgEQxvRkgHFBcycPIaUzMSKBWyHrjpi0ZTkHTw=;
+	s=arc-20240116; t=1715592708; c=relaxed/simple;
+	bh=ZHLHrLEIKqkYkqB76vMfGr0ZZqadUcDF/H5Z79PziIg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c/QhY3LcMgivRCA1mB1VJACRqU829zeFCJPl4/m0Nlw0RJ59wIxSbyIJq4Q5XhsxxdxKmga3KE6KsISQDrAVCFqd6LBgmuFzhlKMxSzplwwn3PdTw/m+M2eF2/PgN/AtpgJ/CSTaf96HXEBh2WV0AczvHzOrclUwBYoU9QUM3yI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=bYbR06SU; arc=none smtp.client-ip=209.85.208.177
+	 In-Reply-To:Content-Type; b=Jtj24BjmHAhmEmwbizi2nzHV2yf8FGlv1XPGjmLfgw5vA2WyLpPauwbGY4/ELp3y2CU2/IVbGD5HyyOdBVpzFmrzGKcZsmtZNjwzh+gaB4EBP2PyKIzogj6fXdFgJtxzlb+YdbmC16KVvEftu3HjGxJmqZllHkK8yqJGfN5Okgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=gNWiK+O/; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2e538a264e0so40045971fa.1
-        for <netdev@vger.kernel.org>; Mon, 13 May 2024 02:30:16 -0700 (PDT)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-41ffad242c8so17776135e9.3
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 02:31:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1715592615; x=1716197415; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1715592704; x=1716197504; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=6g//TlHlLYQxLBNznZsrdWmB56OlPntFCh/5zXrqD90=;
-        b=bYbR06SUond48gM3/00CWhTimt7SDoWQJINDiZbIuHNFlpqCqpIS4R6+dwOyVi8nXg
-         qPOM2JF9+1g2m8ilv1kc1IAk4JWc5u28WQ3WJOsMtNXm3d323LdpLqWRUtwkKGMuBdyZ
-         xz36PRHstiiDVPlVve0nfFXsajzOet6Zn032uzrrJTNheZAcw9vItdLYCJWtbogJuadw
-         jFjUgqXwslwAjfYGJOrv4LOG7iG3OESRr7EWyOS/POVsjCOx+Qv4H3Y9ajJo7gNg6qgQ
-         qeCzj35rZXHJf13FVDogixP1IREE6meVJ2iGhApVJskIHJWG6Tbpk2pTxkBkl7RYAno8
-         /IAA==
+        bh=RfMSVAy5fNk1eJoLJdNzw5ugMJreN9ffXxikfBLEVUA=;
+        b=gNWiK+O/jev0MzRA2jA6swiM69doKlATz56ZhXsxHOeZR/Df61X/nLYeL1yeJbMx9R
+         huWlWM2oqHZXoPu4SDac8ehcREa/cw2xowJFEE6Iis20DxysFN3mxndlk+4D/cpGHg49
+         R6U3Nw5ORgb+DXwfDbINlfV98K47BkW3TknYSsnAdYwVW61LOVG234AXLBic66YmPeIe
+         ZPu3+MrRUM+Zrlnx2uKp3ti/OWe6i7qfiiqEcr97xUD1tc6vTkpIESj/Puvw9TCiOzGE
+         zyz2qhhSnbpzLNYCw1V5TzaZzWwN8O38YRUkCldB7/dmP3aCt0zs92JAtVyrocCUFadV
+         JiXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715592615; x=1716197415;
+        d=1e100.net; s=20230601; t=1715592704; x=1716197504;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6g//TlHlLYQxLBNznZsrdWmB56OlPntFCh/5zXrqD90=;
-        b=uxLVtjvHrEQ6HT3Glw3I5EFcPq9JOTZtfvRr5eNyv0iNqlDeaB+CFUj2KJ5lXLO6te
-         0XxZWtHja7Uk+3/oLnhinu5uWfkrJEpp3cYq9eri5dXqc14gx/9z1HBXmMLxnhBpItqL
-         UzRioR0dUYvHy9wdBVSMwrRqCviiTvDxqut48LdPEtIwsYjx92oYzW9++Ma6DZcII44D
-         v5AOy5AMjdxqxJ0pGyuj6HYUIx1rxFDUCZ4CDvZSF4WhkBJUHzGLiOJX4I73CHQAT1BP
-         MRkOfUx6atcif053pzLyUgKGjwmXsjmNytfQmVGLxrse1+DnzCDTSUDVsYVjIjbb3RDC
-         Ry/A==
-X-Gm-Message-State: AOJu0YwQqKrPwkraxmBqbLXGI6zDlQe1mc526B/fc3qCcgy+chwrgmw4
-	j8D48QaKEB4NCGufTqLRgFJkUPV7CPf8uQ3W3yJW/7/LUhK2iGgJhVPawW7q+bg=
-X-Google-Smtp-Source: AGHT+IEgZoC8eMVyfR1wunJ5nSeixVAdywLpEwHN8BQIvFrkag6ck8czwJJW0KFQ49ZAq4z+PBxDaw==
-X-Received: by 2002:a2e:86d0:0:b0:2da:7944:9547 with SMTP id 38308e7fff4ca-2e51fd3feb4mr91374981fa.5.1715592615089;
-        Mon, 13 May 2024 02:30:15 -0700 (PDT)
+        bh=RfMSVAy5fNk1eJoLJdNzw5ugMJreN9ffXxikfBLEVUA=;
+        b=KQ61U6tvVQEDv3gbrkwdnmj/KEJpoXFOX+QoWOaegcqyR/wWYdzAyBf+Sfe5JeuU68
+         GKyVA3IA+DYekbVozVG11cXz2tQ7VrzKqGUGADvJ+eyEV5GNBZPE/ektscrsRTmAbIkI
+         MIKbwvZCH2Vqda7Ofco1o4Xrw2hZRNjKWb3bgD2NHhKzz71QwowhbBwYw1d8HozAPQtI
+         vdjmmFJXVrV9Dx8zqh0t0WfwRFyYthqXn1Cy4Qn3ZaXpz57K+fdlq0re04Fr4GHlCZav
+         9cHrL1fuqCGXXPlL2qzuub2c0l669ZY33ayjWtBdJsaKrBztgZZdIWnhrHodElNX7H0T
+         qF9g==
+X-Gm-Message-State: AOJu0YyUHvV8u0PMWI96jR4jb3ZnqWVD5XPPXaAu6UjTI7Voy/jR/0Bw
+	QRRAu7UAj5C0ZmhB9cM3eocEBt8StNjuUPb8f+mUyFt+I4VBEYrBe55ZCkjyzNKjHCqiC3+kudm
+	Z
+X-Google-Smtp-Source: AGHT+IF+wVYW+HEatrmsM30XLOxJtqQzUJWVYjacYAbKKaxCgL68b26tmWmsXqtJanCAIGo/S29psg==
+X-Received: by 2002:a05:600c:1f87:b0:41a:aa6:b59e with SMTP id 5b1f17b1804b1-41fea931b71mr116849215e9.5.1715592704123;
+        Mon, 13 May 2024 02:31:44 -0700 (PDT)
 Received: from ?IPV6:2001:67c:2fbc:0:b0a4:8921:8456:9b28? ([2001:67c:2fbc:0:b0a4:8921:8456:9b28])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b8a77f8sm10565649f8f.54.2024.05.13.02.30.13
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42014f563adsm38852415e9.38.2024.05.13.02.31.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 May 2024 02:30:14 -0700 (PDT)
-Message-ID: <9d8318b3-81b6-45dd-af91-2edd8381dd98@openvpn.net>
-Date: Mon, 13 May 2024 11:31:34 +0200
+        Mon, 13 May 2024 02:31:43 -0700 (PDT)
+Message-ID: <81f2c217-e1ac-4f72-949f-b3e2ec5c4650@openvpn.net>
+Date: Mon, 13 May 2024 11:33:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,15 +77,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 11/24] ovpn: implement packet processing
+Subject: Re: [PATCH net-next v3 12/24] ovpn: store tunnel and transport
+ statistics
 To: Sabrina Dubroca <sd@queasysnail.net>
 Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
  Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
  Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
  Esben Haabendal <esben@geanix.com>
 References: <20240506011637.27272-1-antonio@openvpn.net>
- <20240506011637.27272-12-antonio@openvpn.net> <ZkCB2sFnpIluo3wm@hog>
- <d2733aaa-58fa-47da-a469-a848a6100759@openvpn.net> <ZkHcMw6p31m-ErqY@hog>
+ <20240506011637.27272-13-antonio@openvpn.net> <ZkCCPvzuRED57RKL@hog>
+ <f4d2dfc1-5585-4e87-b53d-28890eec4c13@openvpn.net> <ZkHbEKr1k9Q7vgIu@hog>
 Content-Language: en-US
 From: Antonio Quartulli <antonio@openvpn.net>
 Autocrypt: addr=antonio@openvpn.net; keydata=
@@ -127,132 +129,64 @@ Autocrypt: addr=antonio@openvpn.net; keydata=
  ify06RjcfKmutBiS7jNrNWDK7nOpAP4zMYxYTD9DP03i1MqmJjR9hD+RhBiB63Rsh/UqZ8iN
  VL3XJZMQ2E9SfVWyWYLTfb0Q8c4zhhtKwyOr6wvpEpkCH6uevqKx4YC5
 Organization: OpenVPN Inc.
-In-Reply-To: <ZkHcMw6p31m-ErqY@hog>
+In-Reply-To: <ZkHbEKr1k9Q7vgIu@hog>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 13/05/2024 11:24, Sabrina Dubroca wrote:
->>>> +struct ovpn_crypto_key_slot *
->>>> +ovpn_aead_crypto_key_slot_new(const struct ovpn_key_config *kc)
->>>> +{
->>>> +	return ovpn_aead_crypto_key_slot_init(kc->cipher_alg,
->>>> +					      kc->encrypt.cipher_key,
->>>> +					      kc->encrypt.cipher_key_size,
->>>> +					      kc->decrypt.cipher_key,
->>>> +					      kc->decrypt.cipher_key_size,
->>>> +					      kc->encrypt.nonce_tail,
->>>> +					      kc->encrypt.nonce_tail_size,
->>>> +					      kc->decrypt.nonce_tail,
->>>> +					      kc->decrypt.nonce_tail_size,
->>>> +					      kc->key_id);
->>>> +}
+On 13/05/2024 11:19, Sabrina Dubroca wrote:
+> 2024-05-13, 09:25:29 +0200, Antonio Quartulli wrote:
+>> On 12/05/2024 10:47, Sabrina Dubroca wrote:
+>>> 2024-05-06, 03:16:25 +0200, Antonio Quartulli wrote:
+>>>> Byte/packet counters for in-tunnel and transport streams
+>>>> are now initialized and updated as needed.
+>>>>
+>>>> To be exported via netlink.
+>>>>
+>>>> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+>>>> ---
+>>>>    drivers/net/ovpn/Makefile |  1 +
+>>>>    drivers/net/ovpn/io.c     | 10 ++++++++
+>>>>    drivers/net/ovpn/peer.c   |  3 +++
+>>>>    drivers/net/ovpn/peer.h   | 13 +++++++---
+>>>>    drivers/net/ovpn/stats.c  | 21 ++++++++++++++++
+>>>>    drivers/net/ovpn/stats.h  | 52 +++++++++++++++++++++++++++++++++++++++
 >>>
->>> Why the wrapper? You could just call ovpn_aead_crypto_key_slot_init
->>> directly.
+>>> What I'm seeing in this patch are "success" counters. I don't see any
+>>> stats for dropped packets that would help the user figure out why
+>>> their VPN isn't working, or why their CPU is burning up decrypting
+>>> packets that don't show up on the host, etc. You can guess there are
+>>> issues by subtracting the link and vpn stats, but that's very limited.
 >>
->> Mostly for ahestetic reasons, being the call very large.
-> 
-> But that wrapper doesn't really do anything.
-> 
-> In case my previous comment wasn't clear: I would keep the single
-> argument at the callsite (whether it's called _new or _init), and kill
-> the 10-args variant (it's too verbose and _very_ easy to mess up).
-
-Oh ok, then I misunderstood your earlier comment.
-
-Now it's clear and I totally agree. Originally there was a crypto 
-abstraction in ovpn, to allow more crypto families later on.
-
-But I deemed it being too complex and overkill.
-This wrapper is a useless leftover of that approach.
-
-Will get rid of this 10-args variant.
-
-> 
-> 
->>>> @@ -132,7 +157,81 @@ int ovpn_recv(struct ovpn_struct *ovpn, struct ovpn_peer *peer,
->>>>    static int ovpn_decrypt_one(struct ovpn_peer *peer, struct sk_buff *skb)
->>>>    {
->>>> -	return true;
+>> This stats are just the bare minimum to make our current userspace happy :-)
+>>
+>> But we can always extend the stats reporting later on, no?
+>>
 >>>
->>> I missed that in the RX patch, true isn't an int :)
->>> Were you intending this function to be bool like ovpn_encrypt_one?
->>> Since you're not actually using the returned value in the caller, it
->>> would be reasonable, but you'd have to convert all the <0 error values
->>> to bool.
->>
->> Mhh let me think what's best and I wil make this uniform.
-> 
-> Yes please. If you can make the returns consistent (on success, one
-> returns true and the other returns 0), it would be nice.
-
-I am normally all for int, as I don't like failing with no exact code.
-Will most likely go with that.
-
-> 
-> 
->>>> +	ret = ptr_ring_produce_bh(&peer->netif_rx_ring, skb);
->>>> +drop:
->>>> +	if (likely(allowed_peer))
->>>> +		ovpn_peer_put(allowed_peer);
->>>> +
->>>> +	if (unlikely(ret < 0))
->>>> +		kfree_skb(skb);
->>>> +
->>>> +	return ret;
+>>> For example:
+>>>    - counter for packets dropped during the udp encap/decap
+>>>    - counter for failed encrypt/decrypt (especially failed decrypt)
+>>>    - counter for replay protection failures
+>>>    - counter for malformed packets
 >>>
->>> Mixing the drop/success returns looks kind of strange. This would be a
->>> bit simpler:
->>>
->>> ovpn_peer_put(allowed_peer);
->>> return ptr_ring_produce_bh(&peer->netif_rx_ring, skb);
->>>
->>> drop:
->>> if (allowed_peer)
->>>       ovpn_peer_put(allowed_peer);
->>> kfree_skb(skb);
->>> return ret;
-> 
-> Scratch that, it's broken (we'd leak the skb if ptr_ring_produce_bh
-> fails). Let's keep your version.
-
-Right.
-
-> 
->> Honestly I have seen this pattern fairly often (and implemented it this way
->> fairly often).
+>>> Maybe not a separate counter for each of the prints you added in the
+>>> rx/tx code, but at least enough of them to start figuring out what's
+>>> going on without enabling all the prints and parsing dmesg.
 >>
->> I presume it is mostly a matter of taste.
+>> Definitely a good suggestion! I'd just postpone it for later, unless you
+>> think it's a blocker.
 > 
-> Maybe. As a reader I find it confusing to land into the "drop" label
-> on success and conditionally free the skb.
+> I'm not sure. It's not strictly necessary to make the driver work, but
+> from a user/admin's point of view, I think counters would be really
+> useful.
 > 
->> The idea is: when exiting a function 90% of the code is shared between
->> success and failure, therefore let's just write it once and simply add a few
->> branches based on ret.
-> 
-> If it's 90%, yes. Here, it looked like very little common code.
-> 
->> This way we have less code and if we need to chang somethig in the exit
->> path, we can change it once only.
->>
->> A few examples:
->> * https://elixir.bootlin.com/linux/v6.9-rc7/source/net/batman-adv/translation-table.c#L813
->> * https://elixir.bootlin.com/linux/v6.9-rc7/source/net/batman-adv/routing.c#L269
->> * https://elixir.bootlin.com/linux/v6.9-rc7/source/net/mac80211/scan.c#L1344
->>
->>
->> ovpn code can be further simplified by setting skb to NULL in case of
->> success (this way we avoid checking ret) and let ovpn_peer_put handle the
->> case of peer == NULL (we avoid the NULL check before calling it).
-> 
-> That won't be needed if you don't take a reference. Anyway,
-> netif_rx_ring will be gone if you switch to gro_cells, so that code is
-> likely to change.
+> Maybe at least increment the rx_dropped/rx_errors/etc counters from
+> rtnl_link_stats on the netdevice?
 
-Yap, working on gro_cells right now!
+Ok, will start with this and see how much work is to add the err 
+counters right away.
 
-Thanks
+Thanks for the hint!
+
 
 -- 
 Antonio Quartulli
