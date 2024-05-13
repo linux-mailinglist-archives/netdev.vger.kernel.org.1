@@ -1,166 +1,113 @@
-Return-Path: <netdev+bounces-96081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19EA8C43CF
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:09:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD54A8C43D6
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:11:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BDA8B208DA
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 15:09:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A8B91C213A0
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 15:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 945D74C7E;
-	Mon, 13 May 2024 15:09:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 375C2539C;
+	Mon, 13 May 2024 15:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Ot2s94kg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VuH21bQ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E642746BF;
-	Mon, 13 May 2024 15:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2D5538A;
+	Mon, 13 May 2024 15:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715612948; cv=none; b=mAC/7TFMZugcpoEwri+LSdRhAhMUvsFMNQ7BGQC9cjOUtEP/qV1RsI4kZoknbXCi6vNTcCsqfA/6gLpaiH1Uj6JXowXA/8g2sXZIL2m5zDPzmgB5ZqAf4RFLybZ+BUqXF44eRjJ4L4pQz3jfOOp0Q3sgUXhrbGzdKtdB8olkEhk=
+	t=1715613101; cv=none; b=A2nuX3YMZ6N9CysOND5xbliMXrnuNbrIjUlj+2OFShJzpW0ETiiWX831uLQSEmXrcjIOp5brWAx/N+fKSzfI3kudNAXuvQdq5g0IAWGZvGKI/6b+THhx0Nq2zcNOc7lpCegWPGnUDBza6vuSfW34Z4RUdEN6vgsayPiVKgBKwx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715612948; c=relaxed/simple;
-	bh=ImN2q9/z9gWMEu16rbIbzzPAMPmRzbl4JRpfAmk7AiE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=JQgbG63jOK5jym+vJkbEv4gyhLI+NTI3Ex25TYVu83v6l8xKZoONW+6OiVHT3pDgyh4BtzX5fvsBd3nVZ7rS4ogaP8fBp6wuliqlMdnfs2DhfOHR6K/6AzGqZTdU5/2EwoCVle9XV7awbs7KezGft0uirBneptAuJM/w1iEuqTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Ot2s94kg; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44DBUkAn007037;
-	Mon, 13 May 2024 15:08:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=bsQVXHQhWcmCU6NOkodQMdmrvCdS8Y6ZYWpxSKXCq5k=; b=Ot
-	2s94kgxemLwA0C1ORnZVlYrsU4hNHoTC3atqoxeFML79O4bm19olYVpqllB6nVGb
-	3Hep4rdlTJq2NYb853/N1KBriosnWWkH5yg08nE2aHiPAUbraSuzYoi7uRy2f0s3
-	xjE3a6IjmVg4pd+t03QbhHkRi1QHPtuzlKfuTE9arTWefviC/0Tk9AcAce+GSY9o
-	XsS/7fxwZ5FFvWW7SDzEsAo552XQmQK4EapJT27Z21Y8wa+kef6GsRq5hKbI6Yo0
-	3nsE4StRJC3r0mWdcOZL+v1rK+fIUV8Uq99KN40AZV9tfuccOGxUHjxJZIPx7wut
-	A1PYpTgST3o5IqOYCX7w==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3y3j28ger0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 May 2024 15:08:46 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44DF8jgx007751
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 May 2024 15:08:45 GMT
-Received: from [10.110.0.4] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 13 May
- 2024 08:08:43 -0700
-Message-ID: <a3854bed-7229-47a9-a71b-72f5f68ec13e@quicinc.com>
-Date: Mon, 13 May 2024 08:08:42 -0700
+	s=arc-20240116; t=1715613101; c=relaxed/simple;
+	bh=ZGgil73BE3HNKRxqE46JpywWmkJeK1/QT9NbcobOA2M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gRK55UGFdDzb315b2sDS98bbGkoCTdDl5Zhf/hMx84CZkRcIzCFuKaHSPUkCb1Mnz42U9cbCBmcJOsvyEQYGN1fKERVuST7o4Y7GIlhGpIZAPXk6+yvz/4TBgIFwbaR8tu/o6xUYCQLk6oulqi2MP9R3QHtvFEhmO6CMYpIvKOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VuH21bQ5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 895FCC113CC;
+	Mon, 13 May 2024 15:11:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715613100;
+	bh=ZGgil73BE3HNKRxqE46JpywWmkJeK1/QT9NbcobOA2M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VuH21bQ5WI78cvv9gorAje7f4LxViRt/6ZEJddl/oyAmKbrP+lHltNpQL7En0zFVG
+	 4Uq9A1K7XYEfY9b0uLlVKsOP9J7JGYf1WTDVsPxMyA/uCanS57pMrZu4Qcis+z4ZKC
+	 GL+RbGQPpb/DzobAJ14IPDP7DrrDTbLVHE/r3tr2jNgVJ69rk1eGVycB6pVZ6UO9ns
+	 nBYGfYgPp5+xKss9kSexxs3Hb5wi/0WMxqQ/GuasaTR6g/R790e15nS6imntO1dDaV
+	 m8N/krTeN5mp43/dcqavMvEArPbImlqsvNGabI2Gq6gl1zgOSL8iVsueVhhnllqiAr
+	 Ss8SDnI1Ku3og==
+Date: Mon, 13 May 2024 08:11:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Nathan Chancellor <nathan@kernel.org>, davem@davemloft.net, Paolo Abeni
+ <pabeni@redhat.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, linux-arm-kernel@lists.infradead.org, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Marek =?UTF-8?B?QmVow7pu?=
+ <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>
+Subject: Re: [PATCH net-next 0/2] Fix phy_link_topology initialization
+Message-ID: <20240513081138.7e7eb3d0@kernel.org>
+In-Reply-To: <ZkHaRD8WGrhrzemn@shell.armlinux.org.uk>
+References: <20240507102822.2023826-1-maxime.chevallier@bootlin.com>
+	<20240513063636.GA652533@thelio-3990X>
+	<ZkHaRD8WGrhrzemn@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14] ath10k: add LED and GPIO controlling support for
- various chipsets
-Content-Language: en-US
-To: Kalle Valo <kvalo@kernel.org>
-CC: Christian Marangi <ansuelsmth@gmail.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
-        <ath10k@lists.infradead.org>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>,
-        Sebastian
- Gottschall <s.gottschall@dd-wrt.com>,
-        Steve deRosier
-	<derosier@cal-sierra.com>,
-        Stefan Lippers-Hollmann <s.l-h@gmx.de>
-References: <20230611080505.17393-1-ansuelsmth@gmail.com>
- <878rcjbaqs.fsf@kernel.org> <648cdebb.5d0a0220.be7f8.a096@mx.google.com>
- <648ded2a.df0a0220.b78de.4603@mx.google.com>
- <CA+_ehUzzVq_sVTgVCM+r=oLp=GNn-6nJRBG=bndJjrRDhCodaw@mail.gmail.com>
- <87v83nlhb3.fsf@kernel.org>
- <7585e7c3-8be6-45a6-96b3-ecb4b98b12d8@quicinc.com>
- <cce2700c-e54f-4a50-b3f0-0b8a82b961a4@quicinc.com>
- <663e2bd9.5d0a0220.d970d.cbf8@mx.google.com>
- <a56bd4f9-d76b-4924-a901-554d71ea17bd@quicinc.com>
- <87seyojuuq.fsf@kernel.org>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <87seyojuuq.fsf@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: voR0tJwiuCbfgjHvs1Pyr62cWm_ZV8QO
-X-Proofpoint-GUID: voR0tJwiuCbfgjHvs1Pyr62cWm_ZV8QO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-13_10,2024-05-10_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- impostorscore=0 malwarescore=0 phishscore=0 bulkscore=0 suspectscore=0
- mlxscore=0 clxscore=1015 priorityscore=1501 mlxlogscore=848
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405010000 definitions=main-2405130098
 
-On 5/11/2024 7:17 AM, Kalle Valo wrote:
-> Jeff Johnson <quic_jjohnson@quicinc.com> writes:
+On Mon, 13 May 2024 10:15:48 +0100 Russell King (Oracle) wrote:
+> ... and Maxime has been working on trying to get an acceptable fix for
+> it over that time, with to-and-fro discussions. Maxime still hasn't got
+> an ack from Heiner for the fixes, and changes are still being
+> requested.
 > 
->> On 5/10/2024 7:14 AM, Christian Marangi wrote:
->>
->>> On Thu, May 09, 2024 at 09:48:08AM -0700, Jeff Johnson wrote:
->>>> On 5/9/2024 9:37 AM, Jeff Johnson wrote:
->>>>> On 5/8/2024 9:50 PM, Kalle Valo wrote:
->>>>>> Sorry for the delay but finally I looked at this again. I decided to
->>>>>> just remove the fixme and otherwise it looks good for me. Please check
->>>>>> my changes:
->>>>>>
->>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git/commit/?h=pending&id=688130a66ed49f20ca0ce02c3987f6a474f7c93a
->>>>>>
->>>>>
->>>>> I have a question about the copyrights in the two new files:
->>>>> + * Copyright (c) 2018-2023, The Linux Foundation. All rights reserved.
->>>>>
->>>>> My understanding is that Qualcomm's affiliation with Linux Foundation via Code
->>>>> Aurora ended in December 2021, and hence any contributions in 2022-2023 should
->>>>> be the copyright of Qualcomm Innovation Center, Inc.
->>>>>
->>>>>
->>>>
->>>> ok it seems like Kalle's v13 had:
->>>>  + * Copyright (c) 2018, The Linux Foundation. All rights reserved.
->>>>
->>>> and Ansuel's v14 has:
->>>>  + * Copyright (c) 2018-2023, The Linux Foundation. All rights reserved.
->>>>
->>>> So Ansuel, is your work on behalf of The Linux Foundation?
->>>>
->>>
->>> When I resubmitted this at times, I just updated the copyright to the
->>> current year so I guess it was wrong doing that?
->>>
->>> As you can see from the copyright header this patch went all around and
->>> I think at the end (around 2018) the Linux copyright was added as it was
->>> submitted upstream. (can't remember if maintainers were asking that)
->>>
->>> So me watching the old year and resubmitting it, just updated the date.
->>>
->>> Soo I think we should revert to 2018?
->>>
->>
->> Yes, in this case changing the Linux Foundation copyright back to 2018 is correct.
+> I think, sadly, the only way forward at this point would be to revert
+> the original commit. I've just tried reverting 6916e461e793 in my
+> net-next tree and it's possible, although a little noisy:
 > 
-> I changed it now back to 2018, please check:
+> $ git revert 6916e461e793
+> Performing inexact rename detection: 100% (8904/8904), done.
+> Auto-merging net/core/dev.c
+> Auto-merging include/uapi/linux/ethtool.h
+> Removing include/linux/phy_link_topology_core.h
+> Removing include/linux/phy_link_topology.h
+> Auto-merging include/linux/phy.h
+> Auto-merging include/linux/netdevice.h
+> Removing drivers/net/phy/phy_link_topology.c
+> Auto-merging drivers/net/phy/phy_device.c
+> Auto-merging MAINTAINERS
+> hint: Waiting for your editor to close the file...
 > 
-> https://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git/commit/?h=pending&id=5eff06bef76b6d4e1553c2d4978025c329d8db35
+> I haven't checked whether that ends up with something that's buildable.
 > 
-LGTM, thanks!
+> Any views Jakub/Dave/Paolo?
+
+I think you're right. The series got half-merged, we shouldn't push it
+into a release in this state. We should revert all of it, I reckon?
+
+6916e461e793 ("net: phy: Introduce ethernet link topology representation")
+0ec5ed6c130e ("net: sfp: pass the phy_device when disconnecting an sfp module's PHY")
+e75e4e074c44 ("net: phy: add helpers to handle sfp phy connect/disconnect")
+fdd353965b52 ("net: sfp: Add helper to return the SFP bus name")
+841942bc6212 ("net: ethtool: Allow passing a phy index for some commands")
+
+Does anyone feel strongly that we should try to patch it up instead?
 
