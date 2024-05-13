@@ -1,118 +1,176 @@
-Return-Path: <netdev+bounces-96018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E81868C4013
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:47:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D85E8C4027
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:53:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23A881C22BA2
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:47:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAF3E1F21E4A
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920B314D2A2;
-	Mon, 13 May 2024 11:47:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="6BayJbT6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3DA214D2BF;
+	Mon, 13 May 2024 11:53:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BD643AAB;
-	Mon, 13 May 2024 11:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CFE14D29E;
+	Mon, 13 May 2024 11:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715600823; cv=none; b=irQ/MGRUrAVZNIXPMOzbYxNNflfK0QIhcvlmDQTGc63Ss5mGF4MCBXp1jhHISHmkYZtbeCZ0BKgbvIcb5WusHydD/Mw20x/xpzfiRbwdJLA8D7cti3OT/uhscCru220YZNkYs8Csjf0b8RnNKBGnZkcsF/KY29lAJorMYltlxyI=
+	t=1715601193; cv=none; b=fuxcoUd9FfggwgpZD78naucb/92j1E5S+kqwNSBZe7wdmn5m7pOkw9V2ee5JVHBea/9wE+OA+eSw+XnZy1lsKyKGDZC4GMSAMgtN8R3CAXhYn/VWeiTtx4sVYq1gyvziHJbQ0X0B48cUfZQETkGj0NfQRAt6CyxSNUDVn1Hvn1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715600823; c=relaxed/simple;
-	bh=bkl5mIpaXX5R+0JYXYWav244dyOdyvV/LK6ynmQSRXM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Ca1Gl33QOYwDrCTOBF7HkYATzUhkYAEOlH9gty1HoAYNXTMRAS7FSYwTaZDunY+Fwf4NzHs2ZHWpZpSOxO9+ZpspqNdw8OKc+hH7AKBtuN/ohyd6TfHgkCo99c/YdcVDykB5lgXwzBvbZub69nII+XZv2yEGQtCSyBcCceWHmzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=6BayJbT6; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44D8Jhwq004753;
-	Mon, 13 May 2024 13:46:27 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=+Ud1oJct5YusRDi0DBo0DqaYGoRY5+vpKVG6u0z0jyM=; b=6B
-	ayJbT6RGR5CsoE/qdXQJIeTFJXL2WOSwoC7ERbRYG1NszkOkgLMeZHDAqrA1lHqi
-	JTrKRQeXbQBdfxnrcfrfAnvw6LME4ex7/x1jiXRXsTM4kjXH8lT9jp89TgEczHOp
-	fpmh9++24iKg0yt0fwe4fot+uRkgmZqz70d87x8nu3z/J+St3LgNgFOHqnhfbp1g
-	Cea/ZC0oGPS7jBq3QLh1je8D49/zGVvJMGtjjraC1M4lBSfeM9l0uSINqN2HcBLz
-	q08k+PflE3/HAhWgLxNOjzzQZ6bnGRD4mCGGQ0jVcpcPpLrZmtxnMTSohnu0J4qp
-	e9V/APaAKpF+Kus9QkQA==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3y2kmhm4k8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 May 2024 13:46:27 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 89A9940044;
-	Mon, 13 May 2024 13:46:21 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id CFB90217B95;
-	Mon, 13 May 2024 13:45:06 +0200 (CEST)
-Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 13 May
- 2024 13:45:05 +0200
-Message-ID: <0ef43ed5-24f5-4889-abb2-d01ee445a02d@foss.st.com>
-Date: Mon, 13 May 2024 13:45:04 +0200
+	s=arc-20240116; t=1715601193; c=relaxed/simple;
+	bh=973yi3/moS9nP33izvSYXjFm6aTvdo5cVj1K5rMMWH0=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=F+zkIMDNZayZnIX39HluC0h3baJK88AwAUwSyJhEUh8cvrnibKcnIed0rLkD4YjEgQtTeFoJ3nKZ0d/N8V7OvG/rhzaBEXT8uGZUCNGbtwhfJVssRLqIpzGajDlNmEp3f7NZnxu2f15CiCRnzPeWPjnuvNRdzji5BLiKRPCF2Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VdHpR0cMWz1S52Z;
+	Mon, 13 May 2024 19:49:35 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 75184180060;
+	Mon, 13 May 2024 19:53:01 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 13 May
+ 2024 19:53:01 +0800
+Subject: Re: [PATCH net-next v3 11/13] net: replace page_frag with
+ page_frag_cache
+To: Mat Martineau <martineau@kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
+	<alexander.duyck@gmail.com>, Ayush Sawal <ayush.sawal@chelsio.com>, Eric
+ Dumazet <edumazet@google.com>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>, Ingo
+ Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Juri Lelli
+	<juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt
+	<rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, Mel Gorman
+	<mgorman@suse.de>, Daniel Bristot de Oliveira <bristot@redhat.com>, Valentin
+ Schneider <vschneid@redhat.com>, John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>, David Ahern <dsahern@kernel.org>,
+	Matthieu Baerts <matttbe@kernel.org>, Geliang Tang <geliang@kernel.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>, Boris Pismenny <borisp@nvidia.com>,
+	<bpf@vger.kernel.org>, <mptcp@lists.linux.dev>
+References: <20240508133408.54708-1-linyunsheng@huawei.com>
+ <20240508133408.54708-12-linyunsheng@huawei.com>
+ <334a8c67-87c8-a918-9517-0afbfae0d02b@kernel.org>
+ <b8877f3a-831d-f899-9678-b1665739dbe9@huawei.com>
+ <9a3cea15-2001-2222-0d0d-5f61f90507c3@kernel.org>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <444d0349-476b-a04b-f6f1-d59ee57e2054@huawei.com>
+Date: Mon, 13 May 2024 19:53:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 02/11] dt-bindings: net: add phy-supply property for
- stm32
-To: Marek Vasut <marex@denx.de>, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Liam Girdwood
-	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20240426125707.585269-1-christophe.roullier@foss.st.com>
- <20240426125707.585269-3-christophe.roullier@foss.st.com>
- <4e03e7a4-c52b-4c68-b7e5-a03721401cdf@denx.de>
+In-Reply-To: <9a3cea15-2001-2222-0d0d-5f61f90507c3@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-From: Christophe ROULLIER <christophe.roullier@foss.st.com>
-In-Reply-To: <4e03e7a4-c52b-4c68-b7e5-a03721401cdf@denx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-13_08,2024-05-10_02,2023-05-22_02
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-Hi,
-
-On 4/26/24 16:47, Marek Vasut wrote:
-> On 4/26/24 2:56 PM, Christophe Roullier wrote:
->> Phandle to a regulator that provides power to the PHY. This
->> regulator will be managed during the PHY power on/off sequence.
+On 2024/5/11 1:29, Mat Martineau wrote:
+> On Fri, 10 May 2024, Yunsheng Lin wrote:
+> 
+>> On 2024/5/10 0:22, Mat Martineau wrote:
+>>> On Wed, 8 May 2024, Yunsheng Lin wrote:
+>>>
+>>>> Use the newly introduced prepare/probe/commit API to
+>>>> replace page_frag with page_frag_cache for sk_page_frag().
+>>>>
+>>>> CC: Alexander Duyck <alexander.duyck@gmail.com>
+>>>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>>>> ---
+>>>> .../chelsio/inline_crypto/chtls/chtls.h       |   3 -
+>>>> .../chelsio/inline_crypto/chtls/chtls_io.c    | 100 ++++---------
+>>>> .../chelsio/inline_crypto/chtls/chtls_main.c  |   3 -
+>>>> drivers/net/tun.c                             |  28 ++--
+>>>> include/linux/sched.h                         |   4 +-
+>>>> include/net/sock.h                            |  14 +-
+>>>> kernel/exit.c                                 |   3 +-
+>>>> kernel/fork.c                                 |   3 +-
+>>>> net/core/skbuff.c                             |  32 ++--
+>>>> net/core/skmsg.c                              |  22 +--
+>>>> net/core/sock.c                               |  46 ++++--
+>>>> net/ipv4/ip_output.c                          |  33 +++--
+>>>> net/ipv4/tcp.c                                |  35 ++---
+>>>> net/ipv4/tcp_output.c                         |  28 ++--
+>>>> net/ipv6/ip6_output.c                         |  33 +++--
+>>>> net/kcm/kcmsock.c                             |  30 ++--
+>>>> net/mptcp/protocol.c                          |  70 +++++----
+>>>> net/sched/em_meta.c                           |   2 +-
+>>>> net/tls/tls_device.c                          | 139 ++++++++++--------
+>>>> 19 files changed, 331 insertions(+), 297 deletions(-)
+>>>>
+>>>
+>>> <snip>
+>>>
+>>>> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+>>>> index bb8f96f2b86f..ab844011d442 100644
+>>>> --- a/net/mptcp/protocol.c
+>>>> +++ b/net/mptcp/protocol.c
+>>>> @@ -960,17 +960,18 @@ static bool mptcp_skb_can_collapse_to(u64 write_seq,
+>>>> }
+>>>>
+>>>> /* we can append data to the given data frag if:
+>>>> - * - there is space available in the backing page_frag
+>>>> - * - the data frag tail matches the current page_frag free offset
+>>>> + * - there is space available for the current page
+>>>> + * - the data frag tail matches the current page and offset
+>>>>  * - the data frag end sequence number matches the current write seq
+>>>>  */
+>>>> static bool mptcp_frag_can_collapse_to(const struct mptcp_sock *msk,
+>>>> -                       const struct page_frag *pfrag,
+>>>> +                       const struct page *page,
+>>>> +                       const unsigned int offset,
+>>>> +                       const unsigned int size,
+>>>
+>>> Hi Yunsheng -
+>>>
+>>> Why add the 'size' parameter here? It's checked to be a nonzero value, but it can only be 0 if page is also NULL. In this case "page == df->page" will be false, so the function will return false even without checking 'size'.
 >>
->> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
->
-> Maybe this entire regulator business should be separate series from 
-> the MP13 DWMAC ethernet series ?
-I prefer push it with MP13 Ethernet series if possible.
+>> Is it possible that the pfrag->page is also NULL, which may cause
+>> mptcp_frag_can_collapse_to() to return true?
+> 
+> Not sure. But I do know that df->page will never be NULL, so "page == df->page" will always be false when page == NULL.
+> 
+>>
+>> I just found out that the 'size' is not set to zero when return
+>> NULL for the implementation of probe API for the current version.
+>> Perhaps it makes more sense to expect the API caller to make sure
+>> the the returned 'page' not being NULL before using the 'offset',
+>> 'size' and 'va', like below:
+>>
+>> df && page && page == df->page
+>>
+> 
+> Given that df->page is never NULL, I don't think the extra "&& page" is needed.
+
+Not checking the extra "&& page" seems to cause the below warning, it seems we
+have the below options:
+1. ignore the warning.
+2. set offset to zero if there is no enough space when probe API asks for a specific
+   amount of available space as you suggested.
+3. add the "&& page" in mptcp_frag_can_collapse_to()
+
+what is your favour option? or any other better option?
+
+net-mptcp-protocol.c:warning:variable-offset-is-used-uninitialized-whenever-if-condition-is-false
+
+> 
+> - Mat
+> .
+> 
 
