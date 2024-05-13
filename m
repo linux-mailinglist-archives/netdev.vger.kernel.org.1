@@ -1,144 +1,227 @@
-Return-Path: <netdev+bounces-96016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21E8A8C4000
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:44:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49E228C3FFF
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CDCF1F22B1B
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:44:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97DA0B22D58
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 11:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A54814D298;
-	Mon, 13 May 2024 11:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V269bNYO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F33714D28C;
+	Mon, 13 May 2024 11:44:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499E314D293
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 11:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70CB224F6;
+	Mon, 13 May 2024 11:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715600693; cv=none; b=n59O7V0A240vKdXPfQYTpb/GLx0/n0nZJwEdBNLYm89haXRTWcfcgAMMvcsldEQEMQSP5/hVzSgDB2LIQBGpbkhblyA8AFA5WZpnqTsPaABPsZuQ1X3vjVPCQl6FYifkxWPSfwBCU+Eown3rCPltH96XatPBR4rLPaJEJNTpDVk=
+	t=1715600680; cv=none; b=QQF89CEDhh4FLFXY0dGjplj1fQ4fYTFy/3zpJW3Y5KGVUtLpqs6IBmigEvEzIclTSMoLbkGujqCQ8qhxpYtoPr4RbuM0GBy7EiLgsMJaHkOJmIs2Q9Pw75SuGqUovjGrq91IIQDE1K5spfSeGj7KHG1bngG6fnLECTlLviMi1SA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715600693; c=relaxed/simple;
-	bh=nK3+LcnXzXyftikuQXDRPxJYaEKa1l+sJltWiV5/bCM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j3rlVfmha+dps6EauIQYcoBihd+PMz/c0wUl3F1yPuT7GVpm+S7o8fyHIRgND708rMwVnG0q7VyvQCMpHkr/mOW1ueZzVNAb7YANQBG4NOzgeP4A2ocD+/A2S/d/+d4fd5S5hMunGiFLNSGt3Xxt+YFPpbsnv2x6mlLyLmF43IA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V269bNYO; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715600691; x=1747136691;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nK3+LcnXzXyftikuQXDRPxJYaEKa1l+sJltWiV5/bCM=;
-  b=V269bNYO6oEOaPreU18tKWtEX7zXQRWaQMjxIxVUbvPfZHPoEQb3nG8a
-   XF8ae/bvjci6W+u/Z+R1GwBU2WrTRyTc6Gx8HYb1qodgktIxD6IrT9kjt
-   VH1rsZqRKlRpJiDDSjZ1f3SIXTxKyLnvXZqLBwWoj9nb6XlN/73TuAcT7
-   R0FkL+7+4FAEFnX0tERcZgiB7kI5WIzfDkDbIHbj/OmTrLdmni2/1k310
-   Wt9Q4TkP/AvSUXKsrXwT+74PvwqkKKpsljmUqK5sPgwehAmENQjrQ/0a2
-   OBwTwD+TspXXcM6KPlRQey2ohiUTWmSs9Bv1VFVLS1v4m8RCVbMZRpsqW
-   g==;
-X-CSE-ConnectionGUID: fofo97L5RgWRHqVWcknYbQ==
-X-CSE-MsgGUID: 3fg40C1MREuxBGw5Zc+8kg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11071"; a="29020523"
-X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
-   d="scan'208";a="29020523"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 04:44:51 -0700
-X-CSE-ConnectionGUID: TEI0SCc0QwOaAJJtVouqWQ==
-X-CSE-MsgGUID: i1kOB4utSNKe5vIesbfTyg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,158,1712646000"; 
-   d="scan'208";a="30870121"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 04:44:48 -0700
-Date: Mon, 13 May 2024 13:44:14 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com, jiri@nvidia.com,
-	mateusz.polchlopek@intel.com, shayd@nvidia.com
-Subject: Re: [iwl-next v2 03/15] ice: add basic devlink subfunctions support
-Message-ID: <ZkH9DurNJ/OFDvT/@mev-dev>
-References: <20240513083735.54791-1-michal.swiatkowski@linux.intel.com>
- <20240513083735.54791-4-michal.swiatkowski@linux.intel.com>
- <ZkHztwMeJFU73WQm@nanopsycho.orion>
+	s=arc-20240116; t=1715600680; c=relaxed/simple;
+	bh=ubdPbDda7Pl3Y2//DWttS+YCfN9R/aF/O6ZvVFdP1Yg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=InvK2DTazThYJnrZwkVj7UiDbU0WolMaBaYwRVpQ+Exe3dVa0UmDkuKH65XiCLnBpIdETBH5Tv62kCupLaiU9uJXiAea9dJ3kkJtVLFUG2I1PuuQtZgmFW6phBHHVygGG8yq5VxkE6pW6aEjCywwafmxF+vyb6Xpkmmdpx7Ttmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-61bb219737dso46164097b3.2;
+        Mon, 13 May 2024 04:44:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715600676; x=1716205476;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vR7QzxF8bZYZ+b5kWEkyWpGab/01JykZeSVdzh+wO9E=;
+        b=mE+nfw/hswcRVZwyUrWRvbXIe15tJWyLlndOol+3ee+wL4ZBRWgvwH3wOQn0srGXK+
+         2TiFfKWYu2HwGhip2kAekY8FjccCF8Od2xaLPyrikqzW4tXb9hyKmobAoWsZjE+Ps3+u
+         dgTD4vmTPOpLb8pkwJRpm33+lWHYcSOClv/70krDAfp/Nf+iMJuU9ghie+2OLTSkZJpW
+         blenhsZrT6EOeZd8Ae9uGjKLh5afypoDvpNY2qOP7+QEy2WKNz6BcMvDcIMxBKpXkNNL
+         kHcDNUwXJcC5cIe1OZUtJFc4FnEVIi7bW8LPuxskmnyPxd1ehR4fZT+9x+N6itF4EVnO
+         13rg==
+X-Forwarded-Encrypted: i=1; AJvYcCVzIGYSNsMvzN8Ql8U3+HeVmIKKlUU6TcFFh7y5+YguVw6IcC1JD8Th0seo0m8fzoqrKDO+96MtF4vyoYDpcpispgJf2wmDQy/Sl1FynwCAZcjUUDld+utGGfdZSDy+vQ0L5sY5xm6aU+I=
+X-Gm-Message-State: AOJu0YxAgY0RIdM32FVPt2cdW5lGUWVQdqDeppg4uCDoL+g6vTjDiEnB
+	d9lPesZo0p4KWr45rKiPNfmvx7hhb8+DAC0p/VyWm3MVnW9aMrjiZGxuK1yC
+X-Google-Smtp-Source: AGHT+IELhiDesUqQhwEqikipDtcE5ccXffLkuHz4u6YFIM3hCXtdYxSRxk0TjhZGOAxQhOy2GCjkEg==
+X-Received: by 2002:a05:690c:b9d:b0:61b:3454:dbeb with SMTP id 00721157ae682-622affefd33mr106594407b3.46.1715600676433;
+        Mon, 13 May 2024 04:44:36 -0700 (PDT)
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com. [209.85.128.170])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6209e26ae7esm20770137b3.57.2024.05.13.04.44.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 May 2024 04:44:35 -0700 (PDT)
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-61df496df01so31646027b3.3;
+        Mon, 13 May 2024 04:44:35 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV9H3obs6JHDcr220tdNyivgNTXIDkbvBD/GvT8OEQ3mSWBL7LAnkLvml5UlIp+lAfb60NDH4NPS8yfQWuCtzCL4KgjOPylQiQsz2lnTrkhgY0wc+O6Rz28GGqHMlAXyvHxUfyFwuh0+I0=
+X-Received: by 2002:a05:690c:5:b0:61b:bd7f:c602 with SMTP id
+ 00721157ae682-622affd9ff0mr113400937b3.38.1715600675703; Mon, 13 May 2024
+ 04:44:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZkHztwMeJFU73WQm@nanopsycho.orion>
+References: <20240509210903.3738334-1-niklas.soderlund+renesas@ragnatech.se>
+ <CAMuHMdWY-Ewm_ke6LxF1cpqQEdL3AnumyNKcTWvpFBJW_8wXJA@mail.gmail.com> <20240513100931.GA3015543@ragnatech.se>
+In-Reply-To: <20240513100931.GA3015543@ragnatech.se>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 13 May 2024 13:44:22 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVF-szo7An5rXEahmZMu3RAzo6krSnU-qsgtNL0a-NrSg@mail.gmail.com>
+Message-ID: <CAMuHMdVF-szo7An5rXEahmZMu3RAzo6krSnU-qsgtNL0a-NrSg@mail.gmail.com>
+Subject: Re: [net-next,v5] net: ethernet: rtsn: Add support for Renesas Ethernet-TSN
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Andrew Lunn <andrew@lunn.ch>, Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev <netdev@vger.kernel.org>, 
+	Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 13, 2024 at 01:04:23PM +0200, Jiri Pirko wrote:
-> Mon, May 13, 2024 at 10:37:23AM CEST, michal.swiatkowski@linux.intel.com wrote:
-> 
-> [...]
-> 
-> 
-> 
-> >+int ice_devlink_create_sf_port(struct ice_dynamic_port *dyn_port)
-> >+{
-> >+	struct devlink_port_attrs attrs = {};
-> >+	struct devlink_port *devlink_port;
-> >+	struct devlink *devlink;
-> >+	struct ice_vsi *vsi;
-> >+	struct device *dev;
-> >+	struct ice_pf *pf;
-> >+	int err;
-> >+
-> >+	vsi = dyn_port->vsi;
-> >+	pf = dyn_port->pf;
-> >+	dev = ice_pf_to_dev(pf);
-> >+
-> >+	devlink_port = &dyn_port->devlink_port;
-> >+
-> >+	attrs.flavour = DEVLINK_PORT_FLAVOUR_PCI_SF;
-> >+	attrs.pci_sf.pf = pf->hw.bus.func;
-> >+	attrs.pci_sf.sf = dyn_port->sfnum;
-> >+
-> >+	devlink_port_attrs_set(devlink_port, &attrs);
-> >+	devlink = priv_to_devlink(pf);
-> >+
-> >+	err = devl_port_register_with_ops(devlink, devlink_port, vsi->idx,
-> >+					  &ice_devlink_port_sf_ops);
-> >+	if (err) {
-> >+		dev_err(dev, "Failed to create devlink port for Subfunction %d",
-> >+			vsi->idx);
-> 
-> Either use extack or avoid this error message entirely. Could you please
-> double you don't write dmesg error messages in case you have extack
-> available in the rest of this patchset?
-> 
-> 
+Hi Niklas,
 
-Sure, I can avoid, as this is called from port representor creeation
-function. I don't want to pass extack there (code is generic for VF and
-SF, and VF call doesn't have extack).
+On Mon, May 13, 2024 at 12:09=E2=80=AFPM Niklas S=C3=B6derlund
+<niklas.soderlund+renesas@ragnatech.se> wrote:
+> On 2024-05-13 11:39:54 +0200, Geert Uytterhoeven wrote:
+> > On Thu, May 9, 2024 at 11:10=E2=80=AFPM Niklas S=C3=B6derlund
+> > <niklas.soderlund+renesas@ragnatech.se> wrote:
+> > > Add initial support for Renesas Ethernet-TSN End-station device of R-=
+Car
+> > > V4H. The Ethernet End-station can connect to an Ethernet network usin=
+g a
+> > > 10 Mbps, 100 Mbps, or 1 Gbps full-duplex link via MII/GMII/RMII/RGMII=
+.
+> > > Depending on the connected PHY.
+> > >
+> > > The driver supports Rx checksum and offload and hardware timestamps.
+> > >
+> > > While full power management and suspend/resume is not yet supported t=
+he
+> > > driver enables runtime PM in order to enable the module clock. While
+> > > explicit clock management using clk_enable() would suffice for the
+> > > supported SoC, the module could be reused on SoCs where the module is
+> > > part of a power domain.
+> > >
+> > > Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnat=
+ech.se>
+> > > ---
+> > > * Changes since v4
+> > > - Enable GPOUT_RDM and GPOUT_TDM delays depending on phy-mode.
+> >
+> > Thanks for the update!
+> >
+> > > +static void rtsn_set_delay_mode(struct rtsn_private *priv)
+> > > +{
+> > > +       u32 val =3D 0;
+> > > +
+> > > +       /* The MAC is capable of applying a delay on both Rx and Tx. =
+Each
+> > > +        * delay can either be on or off, there is no way to set its =
+length.
+> > > +        *
+> > > +        * The exact delay applied depends on electric characteristic=
+s of the
+> > > +        * board. The datasheet describes a typical Rx delay of 1800 =
+ps and a
+> > > +        * typical Tx delay of 2000 ps.
+> > > +        *
+> > > +        * There are boards where the RTSN device is used together wi=
+th PHYs
+> > > +        * who do not support a large enough internal delays to funct=
+ion. These
+> > > +        * boards depends on the MAC applying these inexact delays.
+> > > +        */
+> > > +
+> > > +       /* If the phy-mode is rgmii or rgmii-rxid apply Rx delay on t=
+he MAC */
+> > > +       if (priv->iface =3D=3D PHY_INTERFACE_MODE_RGMII_ID ||
+> > > +           priv->iface =3D=3D PHY_INTERFACE_MODE_RGMII_RXID)
+> > > +               val |=3D GPOUT_RDM;
+> > > +
+> > > +       /* If the phy-mode is rgmii or rgmii-txid apply Tx delay on t=
+he MAC */
+> > > +       if (priv->iface =3D=3D PHY_INTERFACE_MODE_RGMII_ID ||
+> > > +           priv->iface =3D=3D PHY_INTERFACE_MODE_RGMII_TXID)
+> > > +               val |=3D GPOUT_TDM;
+> > > +
+> > > +       rtsn_write(priv, GPOUT, val);
+> > > +}
+> >
+> > > +static int rtsn_phy_init(struct rtsn_private *priv)
+> > > +{
+> > > +       struct device_node *np =3D priv->ndev->dev.parent->of_node;
+> > > +       struct phy_device *phydev;
+> > > +       struct device_node *phy;
+> > > +       phy_interface_t iface;
+> > > +
+> > > +       /* Delays, if any, are applied by the MAC. Mask RGMII mode pa=
+ssed to the
+> > > +        * PHY to avoid it also adding the delay.
+> > > +        */
+> > > +       switch (priv->iface) {
+> > > +       case PHY_INTERFACE_MODE_RGMII:
+> > > +       case PHY_INTERFACE_MODE_RGMII_ID:
+> > > +       case PHY_INTERFACE_MODE_RGMII_RXID:
+> > > +       case PHY_INTERFACE_MODE_RGMII_TXID:
+> > > +               iface =3D PHY_INTERFACE_MODE_RGMII;
+> > > +               break;
+> > > +       default:
+> > > +               iface =3D priv->iface;
+> > > +               break;
+> > > +       }
+> >
+> > This introduces the same issues (the "workaround" state below) we had
+> > with ravb before.
+> > 9b23203c32ee02cd ("ravb: Mask PHY mode to avoid inserting delays twice"=
+)
+> > was the workaround,
+> > a6f51f2efa742df0 ("ravb: Add support for explicit internal clock delay
+> > configuration")
+> > was the final fix.
+> >
+> > Do we really want to repeat that mistake?
+>
+> Is it the same issue?
 
-We have this pattern in few place in code (using dev_err even extack can
-be passed). Is it recommended to pass extact to all functions
-which probably want to write some message in case of error (assuming the
-call context has the extack)? 
+Sort of: you end up in a state similar to between the two commits fixing
+the issue on ravb.
 
-> >+		return err;
-> >+	}
-> >+
-> >+	return 0;
-> >+}
-> >+
-> 
-> [...]
+> The RAVB issue is around PHY drivers adjusting
+> delays based on [rt]xc-skew-ps properties. The RTSN bindings only deal
+> with {rx,tx}-internal-delay-ps properties.
+>
+> After a discussion with Andrew my understanding is that the PHY shall
+> not attempt to add any delays from {rx,tx}-internal-delay-ps properties
+> if the phy-mode used in of_phy_connect() is PHY_INTERFACE_MODE_RGMII. As
+> we mask the phy-mode here the PHY shall never attempt to add delays as
+> we deal with that in the MAC.
+>
+> It feels like I missed something? Sorry if I'm confused.
+
+The PHY never applies the {rx,tx}-internal-delay-ps properties, as
+these are meant for the MAC (cfr. "internal").
+The PHY does apply the "*-skew-ps" properties.
+
+If you mask any *ID part from the phy_interface_t, you lose the ability
+to let the PHY apply any additional delay.
+
+We have several boards that use both the internal MAC delay and
+the PHY skew properties.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
