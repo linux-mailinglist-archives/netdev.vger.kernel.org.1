@@ -1,125 +1,76 @@
-Return-Path: <netdev+bounces-96158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9B608C4858
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 22:40:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F8C8C485B
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 22:42:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB6981C20C7A
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:40:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31699282A64
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B1880032;
-	Mon, 13 May 2024 20:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E6DA80624;
+	Mon, 13 May 2024 20:42:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U1upaMZ3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kxP1MNYN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBC980025;
-	Mon, 13 May 2024 20:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B39B42070;
+	Mon, 13 May 2024 20:42:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715632833; cv=none; b=EDP7T6GQmzmc4QjJH1detxI/Nh2uSvsyKycr36mlS+HHJ3kV63XHqzcq8l/pLILAzP4hEz5GB4Ukl/22e/eI351rY7u+J33lmOSew2PQOp85HBOVRBojMWTC6TK/5uZOAFl9m6GbhXerLLyDgion2shx7uxO32lubXzTACnw8rs=
+	t=1715632924; cv=none; b=PMslo6HuKXea2+2tMZAsUWvLP9d4KXjO+YyjJSWIez56yuIp5S01BF3+Fjt/0v6ZlY4zCvLiALNi79ODtkfPjZQCj7s/z3I5DnuttRqb4pkZjg61PDZZeX+EnnxOndB5INgpkREXOXvmkDBv3B3nQV//18bq/7oZ4uIjnpVCFUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715632833; c=relaxed/simple;
-	bh=nhREZzGfxBPZonTWw41F9AJ1wgiTA8z2Ts1mor1k/e8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EV/zU6MCnZQygrHohPp8Tbo65tPL5llzAhdleBIVlfYFjmokgcLmuAo2d8iZtu3Fx1YKBrgKUCYXuST7ZNLgulz4idOrkL2kAHUHYGQ76DWWrkUTNoM/SELVnR8985FB0NfjwahVau5rhoqPjz9Kc50D+fU0o+3DiAeL1DOT/yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U1upaMZ3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D2FBAC2BD11;
-	Mon, 13 May 2024 20:40:32 +0000 (UTC)
+	s=arc-20240116; t=1715632924; c=relaxed/simple;
+	bh=1w74yuUnytY/YP1jUnzke8Tc+lQ7zmpdid5rdAqGZv0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YSKAA+iAuEYuckxpFPvF+NeirZAslRboueL2ZJDMI4GiPx0hodVA/AEUlMibDN79YxB9S/5XD+weEJDC3ZPwQBYfevdOSCE2hU0fKEAFa/mtQdNbNwD6ob3x9d3q5Y0u31q9mIIq5BY8mmEfRvXKWhZOJ1p1ugcla4PRWQABgpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kxP1MNYN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3F4BC2BD11;
+	Mon, 13 May 2024 20:42:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715632832;
-	bh=nhREZzGfxBPZonTWw41F9AJ1wgiTA8z2Ts1mor1k/e8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=U1upaMZ3tOGXqSs2ecLDfmW7ABEGuAitxpoZuNm/s1Mm8AIM7kHbSM/aZDE6riecm
-	 z5bkKmvPrNb+poXuBD/L1jw6QVI/FWcIBvCAB8+borWwhH58vWUupbdI4rY2qvBlNX
-	 DVJBnXI0v9zErss0+E/c0sMXzfYFvx6slafTeECuPcraULv96vr3+XAftkoR0HKDEc
-	 w/lERvd+hay46ztR5OiyHAlkLf/5niUsQgQy+qeQ51m5WYFYI3G3R9K4/pPmLxJ3PN
-	 +fdJ2RHC0Ggx835wAtuv5FJWYZaDUTelDgXO1tSsci0nkjO3exik8oxODmOJLWAPDD
-	 ZDOFfv/dQTTKQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C0F7AC433F2;
-	Mon, 13 May 2024 20:40:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1715632923;
+	bh=1w74yuUnytY/YP1jUnzke8Tc+lQ7zmpdid5rdAqGZv0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kxP1MNYNtVjqMKp/vXe9iiaCYrMPXnJU3+A49xwVFsrx5RQA8NyLyqEfR38eagpdO
+	 RUfeSmEJFuiXYZ/zurncIYmkvAONAtyLrgNkgWjGpmTjPO7MhsVXBVCjo97+dSqXll
+	 UH3PZDWc8Ysn5s1M0SFaMhXvq6HCcb0QcFyPjXYALAg3b06QumId0rEP3u7IimK0aY
+	 22RXNrdQehJe2DOiy6us022ngqVfZbUIcMvgNBogSmDW3b3u4PlJAKd6jZ0EneaUxq
+	 lCmfEP+cVRyWG+Gxga/lepmgUpZxr1zDZ714Oa9zPw3qGKIr2RdGVn5zSRpz1IpSEn
+	 izeyp4uRJEYgQ==
+Date: Mon, 13 May 2024 13:42:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
+ paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
+ davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, leon@kernel.org, longli@microsoft.com,
+ ssengar@linux.microsoft.com, linux-rdma@vger.kernel.org,
+ daniel@iogearbox.net, john.fastabend@gmail.com, bpf@vger.kernel.org,
+ ast@kernel.org, hawk@kernel.org, tglx@linutronix.de,
+ shradhagupta@linux.microsoft.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: mana: Enable MANA driver on ARM64 with 4K
+ page size
+Message-ID: <20240513134201.5f5acbae@kernel.org>
+In-Reply-To: <1715632141-8089-1-git-send-email-haiyangz@microsoft.com>
+References: <1715632141-8089-1-git-send-email-haiyangz@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 01/17] netfilter: nf_tables: skip transaction if
- update object is not implemented
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171563283278.13316.6020125107742527253.git-patchwork-notify@kernel.org>
-Date: Mon, 13 May 2024 20:40:32 +0000
-References: <20240512161436.168973-2-pablo@netfilter.org>
-In-Reply-To: <20240512161436.168973-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 13 May 2024 13:29:01 -0700 Haiyang Zhang wrote:
+> -	depends on PCI_MSI && X86_64
+> +	depends on PCI_MSI
+> +	depends on X86_64 || (ARM64 && !CPU_BIG_ENDIAN && ARM64_4K_PAGES)
 
-This series was applied to netdev/net-next.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
-
-On Sun, 12 May 2024 18:14:20 +0200 you wrote:
-> Turn update into noop as a follow up for:
-> 
->   9fedd894b4e1 ("netfilter: nf_tables: fix unexpected EOPNOTSUPP error")
-> 
-> instead of adding a transaction object which is simply discarded at a
-> later stage of the commit protocol.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,01/17] netfilter: nf_tables: skip transaction if update object is not implemented
-    https://git.kernel.org/netdev/net-next/c/84b1a0c0140a
-  - [net-next,02/17] netfilter: nf_tables: remove NETDEV_CHANGENAME from netdev chain event handler
-    https://git.kernel.org/netdev/net-next/c/6e20eef413d5
-  - [net-next,03/17] netfilter: conntrack: fix ct-state for ICMPv6 Multicast Router Discovery
-    https://git.kernel.org/netdev/net-next/c/4a3540a8bf3c
-  - [net-next,04/17] netfilter: conntrack: dccp: try not to drop skb in conntrack
-    https://git.kernel.org/netdev/net-next/c/40616789ec46
-  - [net-next,05/17] netfilter: use NF_DROP instead of -NF_DROP
-    https://git.kernel.org/netdev/net-next/c/8edc27fc4f22
-  - [net-next,06/17] netfilter: conntrack: documentation: remove reference to non-existent sysctl
-    https://git.kernel.org/netdev/net-next/c/f9a6e7fb521c
-  - [net-next,07/17] netfilter: conntrack: remove flowtable early-drop test
-    https://git.kernel.org/netdev/net-next/c/119c790a271d
-  - [net-next,08/17] netfilter: nft_set_pipapo: move prove_locking helper around
-    https://git.kernel.org/netdev/net-next/c/a590f4760922
-  - [net-next,09/17] netfilter: nft_set_pipapo: make pipapo_clone helper return NULL
-    https://git.kernel.org/netdev/net-next/c/80efd2997fb9
-  - [net-next,10/17] netfilter: nft_set_pipapo: prepare destroy function for on-demand clone
-    https://git.kernel.org/netdev/net-next/c/8b8a2417558c
-  - [net-next,11/17] netfilter: nft_set_pipapo: prepare walk function for on-demand clone
-    https://git.kernel.org/netdev/net-next/c/6c108d9bee44
-  - [net-next,12/17] netfilter: nft_set_pipapo: merge deactivate helper into caller
-    https://git.kernel.org/netdev/net-next/c/c5444786d0ea
-  - [net-next,13/17] netfilter: nft_set_pipapo: prepare pipapo_get helper for on-demand clone
-    https://git.kernel.org/netdev/net-next/c/a238106703ab
-  - [net-next,14/17] netfilter: nft_set_pipapo: move cloning of match info to insert/removal path
-    https://git.kernel.org/netdev/net-next/c/3f1d886cc7c3
-  - [net-next,15/17] netfilter: nft_set_pipapo: remove dirty flag
-    https://git.kernel.org/netdev/net-next/c/532aec7e878b
-  - [net-next,16/17] selftests: netfilter: add packetdrill based conntrack tests
-    https://git.kernel.org/netdev/net-next/c/a8a388c2aae4
-  - [net-next,17/17] netfilter: nf_tables: allow clone callbacks to sleep
-    https://git.kernel.org/netdev/net-next/c/fa23e0d4b756
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Can ARM64 be big endian?
 
