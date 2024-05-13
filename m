@@ -1,100 +1,123 @@
-Return-Path: <netdev+bounces-96197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4406C8C49FC
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:20:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B9D38C49FF
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:22:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FB161C20F2E
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:20:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D9F91C20CD5
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 23:22:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614A284FD2;
-	Mon, 13 May 2024 23:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E7C85284;
+	Mon, 13 May 2024 23:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/y9ASq3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NyaprXNz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C22185622;
-	Mon, 13 May 2024 23:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75B882488;
+	Mon, 13 May 2024 23:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715642432; cv=none; b=oMcIRlal1GUNp6p36Xj0nWULV9qLtpkJWmgvZcyT/oUkds1dTKtx7TUl2GfyMoqbblaRh0l+77GsYxM1ZfcHbNEIfBT4I2Bk79HdPr8eXUfA4N2VefwgzbvwPKPdIz8O6mWiVS0mgAGHlQP7b1tncD86db0NYo6brImpe1IOEo4=
+	t=1715642516; cv=none; b=cKClsFA1XXln8FdeePM7ZOr2LVnoley2JndhcMJmOHDWaJ/khhOFcjHvqByYy9fEow6C9hXW13zolH72uK1q4EOrur7wpH58nlvN1v0iIa41I3/61VVxNmICC6frRtLuiGTMe6qvR69IrJRlzjWbozG6wdDdB/jbaCfSvtwtMu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715642432; c=relaxed/simple;
-	bh=LW7czoZwatdQXRO+YVercOrMx1lCPFkpDoEbGYPmtrM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=AYAjXkge2mp5oz4OaxFPe9V0hhxWHUal4BS2jBhL6r4Sd9mHPX/2j9X4KNXHtHfNjHclymmjKMyF3lSLWA5L3Xkq3bZ33atOJf8p4HksP3clNvK5JEPA5qP+NOHkT79gLezQJ1NZuotpjcbxFC1tSjh7bcnC7MyMtanBjX1Zksc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/y9ASq3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9C1C6C32781;
-	Mon, 13 May 2024 23:20:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715642431;
-	bh=LW7czoZwatdQXRO+YVercOrMx1lCPFkpDoEbGYPmtrM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=i/y9ASq3hC2V1cno1xImJ6wv49pyQRzknjuwdQyCQa/e2Z1Ghij1XOLmVAwM3CtYv
-	 p30vNPrMt1uaKkSSTzT4lNwTSMcnTnPyakJYGGkhWfW51IoyJ5a8A6yLmVgVwX1qy7
-	 NQNDeBVtrNUFeBL1z1WHjUO0+WGb3DfyCUKAm8yoBNqx3mIGxgIVmcJw58oP8ly6X9
-	 JHO9i6aqOuiBV3INyBR8ahkVzAR4AeVE95bpPLrGTdieeN3XYxYfXFHuMg6kQ4vVyi
-	 +wfQ9oGACH5IZWJ2YznX2/eTElJkLLGlvOO8vvQp4TYsrxqnbEVHp0bDhx6UrrlW4u
-	 StHBCUcPA0aXA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 82C47C43443;
-	Mon, 13 May 2024 23:20:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1715642516; c=relaxed/simple;
+	bh=5Hu3Ue1JCG8w+Uoj6MasMKr4x/laIiBHPQdLygw00SE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tfoKvKNpLKkOslCNjG4yTABYmONhz+odTO+l6faDNGhfG71zaiUQ9B3FZpuamQUCjzYMDwmqThEUnPSAqzagywKQX5rO1bJRi1/AMcsTVf1Eq31l9d+F4VR2yaC0uPMXjVSiMsgXEtjSuRTajdokmwH9Lk6O2YE7RI3wH81tlpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=NyaprXNz; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=FjwP5rNIPk7wislr0WzdyfpykGMwHjroQxITaXdC+UA=; b=NyaprXNzRSUuVsKQHvEPtW1l3X
+	pt7i21YkM0E2XUC2EbXrGOrr5aip+1VIOzK6DihejQNUocOqg4kpl7fcpSaJkvjF/s1JZ67AQ1yZu
+	yhgMYfv70QUA2ddS2tt/3Er356HDMimN5895M/gL/gZmwPShcEc/dZK35eX+0uFoHW4o2JIXVPO0X
+	LJhDypc8pDcgAT+8um0Yy5nrgNd586K2vETUAyffOn3FB01W1PhrQ38EDTLXuLtjCKCF6xPbkKK0g
+	3K7u172/QK27E/dfLlH1BtPLU8nBor/vLo+MX6TrRjH5EDyqvXmtcg3lWJyh5/Jk6BtKA9ZUFs+t4
+	mHYcaoOg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:32964)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1s6ezH-0002OH-2r;
+	Tue, 14 May 2024 00:21:43 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1s6ezG-0006Vz-8j; Tue, 14 May 2024 00:21:42 +0100
+Date: Tue, 14 May 2024 00:21:42 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH RFC 0/6] net: stmmac: convert stmmac "pcs" to phylink
+Message-ID: <ZkKghpox1r6ZqtyB@shell.armlinux.org.uk>
+References: <ZkDuJAx7atDXjf5m@shell.armlinux.org.uk>
+ <y2iz5uhcj5xh3dtpg3rnxap4qgvmgavzkf6qd7c2vqysmll3yx@drhs7upgpojz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v7 0/3] ax25: Fix issues of ax25_dev and net_device
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171564243153.13558.7234535622239803096.git-patchwork-notify@kernel.org>
-Date: Mon, 13 May 2024 23:20:31 +0000
-References: <cover.1715247018.git.duoming@zju.edu.cn>
-In-Reply-To: <cover.1715247018.git.duoming@zju.edu.cn>
-To: Duoming Zhou <duoming@zju.edu.cn>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hams@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
- edumazet@google.com, jreuter@yaina.de, dan.carpenter@linaro.org,
- rkannoth@marvell.com, davem@davemloft.net, lars@oddbit.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <y2iz5uhcj5xh3dtpg3rnxap4qgvmgavzkf6qd7c2vqysmll3yx@drhs7upgpojz>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu,  9 May 2024 17:35:59 +0800 you wrote:
-> The first patch uses kernel universal linked list to implement
-> ax25_dev_list, which makes the operation of the list easier.
-> The second and third patch fix reference count leak issues of
-> the object "ax25_dev" and "net_device".
+On Tue, May 14, 2024 at 02:04:00AM +0300, Serge Semin wrote:
+> Hi Russell
 > 
-> Duoming Zhou (3):
->   ax25: Use kernel universal linked list to implement ax25_dev_list
->   ax25: Fix reference count leak issues of ax25_dev
->   ax25: Fix reference count leak issue of net_device
-> 
-> [...]
+> I'll give your series a try later on this week on my DW GMAC with the
+> RGMII interface (alas I don't have an SGMII capable device, so can't
+> help with the AN-part testing).
 
-Here is the summary with links:
-  - [net,v7,1/3] ax25: Use kernel universal linked list to implement ax25_dev_list
-    https://git.kernel.org/netdev/net/c/a7d6e36b9ad0
-  - [net,v7,2/3] ax25: Fix reference count leak issues of ax25_dev
-    https://git.kernel.org/netdev/net/c/b505e0319852
-  - [net,v7,3/3] ax25: Fix reference count leak issue of net_device
-    https://git.kernel.org/netdev/net/c/36e56b1b002b
+Thanks!
 
-You are awesome, thank you!
+> Today I've made a brief glance on it
+> and already noted a few places which may require a fix to make the
+> change working for RGMII (at least the RGSMIIIS IRQ must be got back
+> enabled). After making the patch set working for my device in what
+> form would you prefer me to submit the fixes? As incremental patches
+> in-reply to this thread?
+
+I think it depends on where the issues are.
+
+If they are addressing issues that are also present in the existing
+code, then it would make sense to get those patched as the driver
+stands today, because backporting them to stable would be easier.
+
+If they are for "new" issues, given that this patch series is more
+or less experimental, I would prefer to roll them into these
+patches. As mentioned, when it comes to submitting these patches,
+the way I've split them wouldn't make much sense, but it does
+make sense for where I am with it. Hence, I'll want to resplit
+the series into something better for submission than it currently
+is. If you want to reply to this thread, that is fine.
+
+There's still a few netif_carrier_off()/netif_carrier_on()s left
+in the driver even after this patch series, but I think they're in
+more obscure paths, but I will also want to address those as well.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
