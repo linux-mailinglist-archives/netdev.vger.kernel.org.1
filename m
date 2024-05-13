@@ -1,120 +1,176 @@
-Return-Path: <netdev+bounces-96131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51A8C8C46B3
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:07:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A66948C46BB
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:14:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD512B21D59
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 18:07:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 324E41F21A7F
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 18:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3CC22C1A9;
-	Mon, 13 May 2024 18:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1692936122;
+	Mon, 13 May 2024 18:14:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UvfWN3y5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uuTpDKT+"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417A629D0B;
-	Mon, 13 May 2024 18:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D093B2E647;
+	Mon, 13 May 2024 18:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715623656; cv=none; b=hAC0eYTkwfFH6kLmxQsof25rIVEFVwVNSbsb56YXz3k2z1gWQfoFbRiRFHy2jjqsjoQDn/UKkCvcXjZ/wjogPCfOZz5e8cqJ+TJim8sKAF9SPXjIiZMSIC+3DttuKSzwZcZAlRM2zga8jlA4ItyseF6V9cLBiIvMXOEa71QywFA=
+	t=1715624071; cv=none; b=KWAW7umYiG/ItkHwr1eqCCIDmLi3FVM4vSeTDJ9TDwEKAW/x5uVCOIj7DFN+qbnDJPrxyUGkWiNVdUg8FrRP3EZkzThhSb+Frsfj5RCwu/5FxHNIRydktUh1G/+ncCOlU2/Xp2yVw79sSSsR4bWmGeVvQR15+0/UuDb3SsjJc/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715623656; c=relaxed/simple;
-	bh=nZVPVyq1aztg9r8lTsw449FeY1mUplfFw33FzVNogD4=;
+	s=arc-20240116; t=1715624071; c=relaxed/simple;
+	bh=+rxemvwnzoV10RvCe8M2I4H331E50lxDd6UYYKgz8B8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B8276kfIhVS/EOvzlsqkvvLsxCWkRYhTPZnUi4V2CPhVtHOMCRxXi8ylQBoqNv7Y9MiYpxqyoVqnwvk6H5l2qr8PoEioyslGlVnToYPMftoczcG+eIzftJXZFoiI3pP+HNOS2TPYfbjYcsOGm//XsjtH24EK/nXrKGWJPIxDhlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UvfWN3y5; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=qv4aa2y30wKDIpbTtsqV7m9XFw7hrbmhzvePIaRnkJs=; b=UvfWN3y5pfzUTvOPr5g8P+RC7S
-	9msDnr0XJmQf7mI4Ln2mXe2UWfeeFM0FZ9qnl2YU+bdIGup1THUwQ9gZeYUoJ4i1MkedVU8M8kDhM
-	YUCPfJOMIuU3Nqn01Y9s8uqK2+PR4ttjSRM9YSm9h72ebhsaRPVe4yxQ1mChxBXmh5lk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s6a51-00FKNw-JD; Mon, 13 May 2024 20:07:19 +0200
-Date: Mon, 13 May 2024 20:07:19 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bcm-kernel-feedback-list@broadcom.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2, net-next, 2/2] net: stmmac: PCI driver for BCM8958X
- SoC
-Message-ID: <1484c1b7-90aa-4495-a417-a400add8602a@lunn.ch>
-References: <20240510000331.154486-3-jitendra.vegiraju@broadcom.com>
- <20240511015924.41457-1-jitendra.vegiraju@broadcom.com>
- <4ede8911-827d-4fad-b327-52c9aa7ed957@lunn.ch>
- <Zj+nBpQn1cqTMJxQ@shell.armlinux.org.uk>
- <08b9be81-52c9-449d-898f-61aa24a7b276@lunn.ch>
- <CAMdnO-+V2npKBoXW5o-5avS9HP84LV+nQkvW6AxbLwFOrZuAGg@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bhRyVDenyDZBlZmDInYSS561kBsVdU044XBVkskFDi+kqd11rT9kur0C2L/WSkVvY7ReZcfwKGuLHHlu1mRgPpdshgCeRM5jcriRZZ/itmx/r4O/E+fI18LePezoKmzTPtymgtI8H7E+ovs9wBhtBNFnI9dNvmHjMWFX50/IA6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uuTpDKT+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31DCBC2BD11;
+	Mon, 13 May 2024 18:14:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715624071;
+	bh=+rxemvwnzoV10RvCe8M2I4H331E50lxDd6UYYKgz8B8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uuTpDKT+/dgLfyi7mquP/3z1x4NV6xq9HH36oJx82FLiTJ/nczLjRHS7koxzmyf79
+	 zAz57mdFGzjA2l9bKnQky64bxUqvPZcJQx3hMPg1R7bnTTiNudR4eLzmAy/TWbEnuO
+	 /qGd4DC4VnhyWhvD5wkF/ju8+RVwMZprkWrbtBsfxCjllnzferND6i1zz575R5k6/z
+	 bTlHLpcKSy+9zFxlcmvb8r5a38SMZXbOTg80cTuBfXjSpJUyfhmrmIso7OlPmGtIf5
+	 +H+FrB32gal4ZCzPCA/mGGXTk0KpYPvh6QXW4EvxidOkct1EW+BpLAQpxY2wk1SkRp
+	 tUbNS9J+d1/LQ==
+Date: Mon, 13 May 2024 19:14:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: =?utf-8?B?SMOla29u?= Bugge <haakon.bugge@oracle.com>
+Cc: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
+	Allison Henderson <allison.henderson@oracle.com>,
+	Manjunath Patil <manjunath.b.patil@oracle.com>,
+	Mark Zhang <markzhang@nvidia.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Shiraz Saleem <shiraz.saleem@intel.com>,
+	Yang Li <yang.lee@linux.alibaba.com>
+Subject: Re: [PATCH 2/6] rds: Brute force GFP_NOIO
+Message-ID: <20240513181424.GU2787@kernel.org>
+References: <20240513125346.764076-1-haakon.bugge@oracle.com>
+ <20240513125346.764076-3-haakon.bugge@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAMdnO-+V2npKBoXW5o-5avS9HP84LV+nQkvW6AxbLwFOrZuAGg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240513125346.764076-3-haakon.bugge@oracle.com>
 
-> Yes, the MAC directly connects to switch within the SoC with no external MII.
-> The SoC is BCM89586M/BCM89587 automotive ethernet switch.
-> The SOC presents PCIE interfaces on BCM89586M/BCM89587 automotive
-> ethernet switch.
-> The switch supports many ethernet interfaces out of which one or two
-> interfaces are presented as PCIE endpoints to the host connected on
-> the PCIE bus.
-> The MAC connects to switch using XGMII interface internal to the SOC.
-> The high level diagram is shown below:
+On Mon, May 13, 2024 at 02:53:42PM +0200, Håkon Bugge wrote:
+> For most entry points to RDS, we call memalloc_noio_{save,restore} in
+> a parenthetic fashion when enabled by the module parameter force_noio.
 > 
-> +==================================================+
->    +--------+                     |                     BCM8958X
-> switch SoC               +----------------+         |
->    | Host   |                      |  +----------------+
->     +-------+                 |                     |         | ===
-> more ethernet IFs
->    | CPU   | ===PCIE===| PCIE endpoint |==DMA==| MAC |==XGMII==|
-> switch fabric |         | === more ethernet IFs
->    |Linux   |                      | +----------------+
->    +-------+                 |                      |         |
->    +-------+                       |
->                                       +-----------------+        |
+> We skip the calls to memalloc_noio_{save,restore} in rds_ioctl(), as
+> no memory allocations are executed in this function or its callees.
 > 
-> +==================================================+
-> Since the legacy fixed link cannot support 10G, we are initializing to
-> fixed speed 1G.
+> The reason we execute memalloc_noio_{save,restore} in rds_poll(), is
+> due to the following call chain:
+> 
+> rds_poll()
+>         poll_wait()
+>                 __pollwait()
+>                         poll_get_entry()
+>                                 __get_free_page(GFP_KERNEL)
+> 
+> The function rds_setsockopt() allocates memory in its callee's
+> rds_get_mr() and rds_get_mr_for_dest(). Hence, we need
+> memalloc_noio_{save,restore} in rds_setsockopt().
+> 
+> In rds_getsockopt(), we have rds_info_getsockopt() that allocates
+> memory. Hence, we need memalloc_noio_{save,restore} in
+> rds_getsockopt().
+> 
+> All the above, in order to conditionally enable RDS to become a block I/O
+> device.
+> 
+> Signed-off-by: Håkon Bugge <haakon.bugge@oracle.com>
 
-You ASCII art is broken, probably because you are not using a fixed
-width font.
+Hi Håkon,
 
-So the interface between the MAC and the switch is fixed at XGMII. Is
-the MAC actually capable of anything other than XGMII? If XGMII is all
-it can do, then there is no need for a fixed link. You use a
-fixed-link when you have a conventional off the shelf MAC which can do
-10BaseT_Half through to 10GBaseT. Normally there would be a PHY
-connected to the MAC and phylib/phylink will determine the line rate
-and tell the MAC what speed to operate at. However, if this device
-only supports XGMII, it is impossible to connect to a PHY because
-there is no external MII interface, then skip all the phylib/phylink
-support and hard code it. Look at the patches on the netdev list for
-the RealTek automotive driver which seems to be pretty similar.
+Some minor feedback from my side.
 
-	   Andrew
+> ---
+>  net/rds/af_rds.c | 60 +++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 57 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
+> index 8435a20968ef5..a89d192aabc0b 100644
+> --- a/net/rds/af_rds.c
+> +++ b/net/rds/af_rds.c
+> @@ -37,10 +37,16 @@                                                           >  #include <linux/in.h>
+>  #include <linux/ipv6.h>
+>  #include <linux/poll.h>
+> +#include <linux/sched/mm.h>
+>  #include <net/sock.h>
+>
+>  #include "rds.h"
+>
+> +bool rds_force_noio;
+> +EXPORT_SYMBOL(rds_force_noio);
 
-	       
+rds_force_noio seems to be only used within this file.
+I wonder if it should it be static and not EXPORTed?
+
+Flagged by Sparse.
+
+> +module_param_named(force_noio, rds_force_noio, bool, 0444);
+> +MODULE_PARM_DESC(force_noio, "Force the use of GFP_NOIO (Y/N)");
+> +
+>  /* this is just used for stats gathering :/ */
+>  static DEFINE_SPINLOCK(rds_sock_lock);
+>  static unsigned long rds_sock_count;
+> @@ -60,6 +66,10 @@ static int rds_release(struct socket *sock)
+>  {
+>  	struct sock *sk = sock->sk;
+>  	struct rds_sock *rs;
+> +	unsigned int noio_flags;
+
+Please consider using reverse xmas tree order - longest line to shortest -
+for local variable declarations in Networking code.
+
+This tool can be of assistance: https://github.com/ecree-solarflare/xmastree
+
+> +
+> +	if (rds_force_noio)
+> +		noio_flags = memalloc_noio_save();
+>  
+>  	if (!sk)
+>  		goto out;
+
+...
+
+> @@ -324,6 +346,8 @@ static int rds_cancel_sent_to(struct rds_sock *rs, sockptr_t optval, int len)
+>  
+>  	rds_send_drop_to(rs, &sin6);
+>  out:
+> +	if (rds_force_noio)
+> +		noio_flags = memalloc_noio_save();
+
+noio_flags appears to be set but otherwise unused in this function.
+
+Flagged by W=1 builds.
+
+>  	return ret;
+>  }
+>  
+
+...
 
