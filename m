@@ -1,164 +1,148 @@
-Return-Path: <netdev+bounces-96118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 397CA8C4614
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 19:32:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63D758C461B
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 19:33:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84ABCB2100E
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:32:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A14928217F
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 17:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377FC20DF7;
-	Mon, 13 May 2024 17:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 820E0224CE;
+	Mon, 13 May 2024 17:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="U2YkRFCI"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="PBHbiJ16"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B183C20DE8
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 17:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2FF20DF4
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 17:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715621553; cv=none; b=hRLRxTsdWcK6JbnOOUc+tZhQxlL3AqfloA8sqdf/5jQ3oAip+6TQyGumMzD9bDvqVIhvNk18+npya0PM6dk9BiOeIXAKIr07RCEnOQnndobWwT+NbOsaSjOSme/5LVKZebEBVNiKmvLiqFso8dQbe5L53fgjwGGioXIT3gPxM6o=
+	t=1715621614; cv=none; b=kD+rR2Ikb0eSjiUSPfbfKlEhNBUpUNKzwLO57nWmztZVkvAwcIOTaw4r8cUaMMyZ8tRMt8MEkCOQXHx81MaIrcHt9/LLaumsfbdbUdfxkJXDDEhtlrElhQTc0wXRMqzy2nEOAq/vtD+DjcWBzdK94pZQuMrZOF3QLoQns7vM8Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715621553; c=relaxed/simple;
-	bh=fXGQ64UwaBGW2PqZrX1S/gcdyXJ/tJlPbgzzA2oT+MI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qPhsk1aQgRougCoFXKjP8AouT6Oo3QPFd911g7hy+/V35ca5L4LGQwMH6hbQ6ahhktLFVMApQgFxgF3B7MbUpXXMwH6sOGJK+Oyb7YFNbbMclp3dWgUfYLXEaqFRZusemO7VH8KYoqpDruHtLuitpfl5VHnj2G/ORJaUaaBTqEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=U2YkRFCI; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2b2bc7b37bcso4086148a91.2
-        for <netdev@vger.kernel.org>; Mon, 13 May 2024 10:32:31 -0700 (PDT)
+	s=arc-20240116; t=1715621614; c=relaxed/simple;
+	bh=004wZ/BTyT9fE4JXjqxo7dvB6azeLVxU7gAlJEphKdU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zeq2U1IpGWWpyUrdZHw8B+eqGw/2Ycu1BAg/y1ijX3BGj/sTVdse+XB7z04SzbtQChgFFVJipWL0jyPWBi1a7THxgyZw3HmzhBXXU84A2HQTNe/HYicBb+vH4ITFGRgSSOiRvCpDhetSzIxwsszEviG8oGDWOxruDVWl1j0nyJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=PBHbiJ16; arc=none smtp.client-ip=209.85.161.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5b2768410d3so2089023eaf.2
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 10:33:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1715621551; x=1716226351; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qBskcfG9aM08EQ3NqSBzF1A9Ml9c1SIZv/ydH3cvOC8=;
-        b=U2YkRFCI60P/XRuJlR8+NK/0cAsD0Ch4VG/5GHHAOK0awnX1C46PgOVjhkG9rVapxa
-         M8E5VklMMQAsHZUeedEdnZzafdaj2EckpYD9g9nuNsTt6CiqumyaTIPtHSyibgsXINV8
-         vvuS0+6N5kdPKW4w24p8ZJri96se96SFA3ymY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715621551; x=1716226351;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=fastly.com; s=google; t=1715621612; x=1716226412; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qBskcfG9aM08EQ3NqSBzF1A9Ml9c1SIZv/ydH3cvOC8=;
-        b=OV6lW0VluKpRKovftApfJTAgMASXyp5Al9gG1t/dsf8ZYGJd4Ii0FyqGGrWiRecXeL
-         XCuk0CKpEfm1VlLIuMZn/10a/OrC3cx4dLdHYZ8zKHc6tteFoZQM1i+fArQhOY6UIfSX
-         O0zg5yjYiNhtVrBx+GeSJIyTFxUhJUQ5CvN1UJ1Vv+H7wbugeONoRglsKT47sol9CfZN
-         ABm98UH25+bYpkiaky5dMGFARO52LhawFDDieMzReG7gVI0396jlaOtiqD6EEqZ3tSKd
-         WBJeK5rzKYVSmeLtO+cvlUqELZ2lhcOILFRMNJHJ6Qhbo9Nzwkj3ZHeZz9HaS1QyN4r5
-         I7fQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUQ/TWIouHcS4OvynmRFVtzaU/pEekBKprI5vNwTTbif7X7KBbLLznmdTCmOzHYQfej0jKfAlX7BC2wOrIFKySODWxMEfqg
-X-Gm-Message-State: AOJu0YyEFrt9jVlQFFatl91ZOGxQ8ryc2HWBnpyeTGnX7oSaJqoCp3/1
-	HwO2Jc3yB5YbZMeZqbV5LCmbVAyatom7LTGz/m6LwleUqe9IVDqS4LNsziZEWiyGGx8HzUBYdH3
-	pqno8KybWp9QJ7x/KuSavxW7jd6OPCqDvya+Q
-X-Google-Smtp-Source: AGHT+IF7+dEtjAXbfnCYpn8cxOY0NsZcjmqTQO78In26AeAGJNxjpO+h8xHhH1On7C8lWFuqkMS0FE5B4iZVrdBg0b4=
-X-Received: by 2002:a17:90b:4f82:b0:2a1:f586:d203 with SMTP id
- 98e67ed59e1d1-2b6ccd8874amr9380254a91.41.1715621550896; Mon, 13 May 2024
- 10:32:30 -0700 (PDT)
+        bh=nWgFC3S2PfP1iJSh371S2lssW1zUAEloG1SEMk5tnQo=;
+        b=PBHbiJ16yUyRq8xxXOantAlgyE+09KxSYjBca7c1xc4qrO7q0VcT1Jd86n/6qd2N0n
+         L8hp46JRPfQEs9ncx3lrKtwI4o0tLCDylmw8DicDZDngxrxs+7ECFbH0+B9LsTtr2cUj
+         KG+Lh/nwg5DSwJL7rYxyzx2LhBz1xsEYVWX5o=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715621612; x=1716226412;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nWgFC3S2PfP1iJSh371S2lssW1zUAEloG1SEMk5tnQo=;
+        b=GA5LOGijOiqacyx8K62OkT6loXrvlTFBs0CY1VlywYlfXLhN3HxiXMrHA8VHwjzAo5
+         gKKyjfF838RtWpV01/e2niT4OeieHKBLs3/Ba9WeShCi6oNkvlOHQVQdlCXLFjxPdyiI
+         Lc1BPZSUTuDwfojJe3wnG56ncomCSdg2Dg3EicgJc5udSP8adB+k3yDKRYu9P+6MiOXw
+         LID9CaaAM9ghONmRZ0/X2T5hko5OaSxmLro2NWR0gjHwOSrHVEl6tnT8KO5pQLAh4nYj
+         AioLTHFM3vGSFFxRnKEu9k6Qh8LDG/IX4lNahva0mKl315ltGtZt0UXE+XSiAO7/vsm1
+         TcGg==
+X-Forwarded-Encrypted: i=1; AJvYcCWijUB3vHQMfAXhEAtjGWo8ARki+HjHoWerwOST1fQ9xKkzM8a3JgfzURGI2ArQeT7DG5nOe8XDVfaN/8akmZG7WP/N4knt
+X-Gm-Message-State: AOJu0YxOuqUjBq50u6A7ZZO9mCTSpy+ToGz7TRDwZ5KiOyJ7Q5Q0gCrl
+	+KjxgRy58tDTQ2qw/4BVfh59tBQEFRerntovfxKIgf4/5jgwjtbtTMvSt9F3WuY=
+X-Google-Smtp-Source: AGHT+IGLySbm6b/4r6B+YP3EJ/0D5HsDixyPGRii0Uq+ZLUeYN7X2cixlwoD4AR5edXW/aNBuPaBkA==
+X-Received: by 2002:a05:6870:c185:b0:22e:a451:57d1 with SMTP id 586e51a60fabf-24172f69da0mr10682085fac.52.1715621612005;
+        Mon, 13 May 2024 10:33:32 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6340a449e0esm7969360a12.13.2024.05.13.10.33.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 May 2024 10:33:31 -0700 (PDT)
+Date: Mon, 13 May 2024 10:33:28 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, zyjzyj2000@gmail.com, nalramli@fastly.com,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 1/1] net/mlx5e: Add per queue netdev-genl
+ stats
+Message-ID: <ZkJO6BIhor3VEJA2@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	zyjzyj2000@gmail.com, nalramli@fastly.com,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>
+References: <20240510041705.96453-1-jdamato@fastly.com>
+ <20240510041705.96453-2-jdamato@fastly.com>
+ <20240513075827.66d42cc1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240510000331.154486-3-jitendra.vegiraju@broadcom.com>
- <20240511015924.41457-1-jitendra.vegiraju@broadcom.com> <4ede8911-827d-4fad-b327-52c9aa7ed957@lunn.ch>
- <Zj+nBpQn1cqTMJxQ@shell.armlinux.org.uk> <08b9be81-52c9-449d-898f-61aa24a7b276@lunn.ch>
-In-Reply-To: <08b9be81-52c9-449d-898f-61aa24a7b276@lunn.ch>
-From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Date: Mon, 13 May 2024 10:32:19 -0700
-Message-ID: <CAMdnO-+V2npKBoXW5o-5avS9HP84LV+nQkvW6AxbLwFOrZuAGg@mail.gmail.com>
-Subject: Re: [PATCH v2, net-next, 2/2] net: stmmac: PCI driver for BCM8958X SoC
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	bcm-kernel-feedback-list@broadcom.com, alexandre.torgue@foss.st.com, 
-	joabreu@synopsys.com, mcoquelin.stm32@gmail.com, richardcochran@gmail.com, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240513075827.66d42cc1@kernel.org>
 
-On Sat, May 11, 2024 at 10:50=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> On Sat, May 11, 2024 at 06:12:38PM +0100, Russell King (Oracle) wrote:
-> > On Sat, May 11, 2024 at 06:16:52PM +0200, Andrew Lunn wrote:
-> > > > + /* This device interface is directly attached to the switch chip =
-on
-> > > > +  *  the SoC. Since no MDIO is present, register fixed_phy.
-> > > > +  */
-> > > > + brcm_priv->phy_dev =3D
-> > > > +          fixed_phy_register(PHY_POLL,
-> > > > +                             &dwxgmac_brcm_fixed_phy_status, NULL)=
-;
-> > > > + if (IS_ERR(brcm_priv->phy_dev)) {
-> > > > +         dev_err(&pdev->dev, "%s\tNo PHY/fixed_PHY found\n", __fun=
-c__);
-> > > > +         return -ENODEV;
-> > > > + }
-> > > > + phy_attached_info(brcm_priv->phy_dev);
-> > >
-> > > What switch is it? Will there be patches to extend SF2?
-> >
-> > ... and why is this legacy fixed_phy even necessary when stmmac uses
-> > phylink which supports fixed links, including with custom fixed status?
->
-> And now you mentions legacy Fixed link:
->
-> +MODULE_DESCRIPTION("Broadcom 10G Automotive Ethernet PCIe driver");
->
-> This claims it is a 10G device. You cannot represent 10G using legacy
-> fixed link.
->
-> Does this MAC directly connect to the switch within the SoC? There is
-> no external MII interface? Realtek have been posting a MAC driver for
-> something similar were the MAC is directly connected to the switch
-> within the SoC. The MAC is fixed at 5G, there is no phylink/phylib
-> support, set_link_ksetting return -EOPNOTSUPP and get_link_ksettings
-> returns hard coded 5G.
->
-> We need a better understanding of the architecture here, before we can
-> advise the correct way to do this.
->
-Yes, the MAC directly connects to switch within the SoC with no external MI=
-I.
-The SoC is BCM89586M/BCM89587 automotive ethernet switch.
-The SOC presents PCIE interfaces on BCM89586M/BCM89587 automotive
-ethernet switch.
-The switch supports many ethernet interfaces out of which one or two
-interfaces are presented as PCIE endpoints to the host connected on
-the PCIE bus.
-The MAC connects to switch using XGMII interface internal to the SOC.
-The high level diagram is shown below:
+On Mon, May 13, 2024 at 07:58:27AM -0700, Jakub Kicinski wrote:
+> On Fri, 10 May 2024 04:17:04 +0000 Joe Damato wrote:
+> > Add functions to support the netdev-genl per queue stats API.
+> > 
+> > ./cli.py --spec netlink/specs/netdev.yaml \
+> > --dump qstats-get --json '{"scope": "queue"}'
+> > 
+> > ...snip
+> > 
+> >  {'ifindex': 7,
+> >   'queue-id': 62,
+> >   'queue-type': 'rx',
+> >   'rx-alloc-fail': 0,
+> >   'rx-bytes': 105965251,
+> >   'rx-packets': 179790},
+> >  {'ifindex': 7,
+> >   'queue-id': 0,
+> >   'queue-type': 'tx',
+> >   'tx-bytes': 9402665,
+> >   'tx-packets': 17551},
+> > 
+> > ...snip
+> > 
+> > Also tested with the script tools/testing/selftests/drivers/net/stats.py
+> > in several scenarios to ensure stats tallying was correct:
+> > 
+> > - on boot (default queue counts)
+> > - adjusting queue count up or down (ethtool -L eth0 combined ...)
+> > - adding mqprio TCs
+> > 
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> 
+> Tariq, could you take a look? Is it good enough to make 6.10? 
+> Would be great to have it..
 
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D+
-   +--------+                     |                     BCM8958X
-switch SoC               +----------------+         |
-   | Host   |                      |  +----------------+
-    +-------+                 |                     |         | =3D=3D=3D
-more ethernet IFs
-   | CPU   | =3D=3D=3DPCIE=3D=3D=3D| PCIE endpoint |=3D=3DDMA=3D=3D| MAC |=
-=3D=3DXGMII=3D=3D|
-switch fabric |         | =3D=3D=3D more ethernet IFs
-   |Linux   |                      | +----------------+
-   +-------+                 |                      |         |
-   +-------+                       |
-                                      +-----------------+        |
+Thanks Jakub.
 
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D+
-Since the legacy fixed link cannot support 10G, we are initializing to
-fixed speed 1G.
->       Andrew
+FYI: I've also sent a v5 of the mlx4 patches which is only a very minor
+change from the v4 as suggested by Tariq (see the changelog in that cover
+letter).
+
+I am not trying to "rush" either in, to to speak, but if they both made it
+to 6.10 it would be great to have the same support on both drivers in the
+same kernel release :)
 
