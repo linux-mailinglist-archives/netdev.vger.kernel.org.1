@@ -1,370 +1,210 @@
-Return-Path: <netdev+bounces-95831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27D768C39BD
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 03:02:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BBBC8C39D0
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 03:22:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F6AB280FD0
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 01:02:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23E4A1F21080
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 01:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4FA4A92E;
-	Mon, 13 May 2024 01:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13B6AD49;
+	Mon, 13 May 2024 01:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="crRcEY96"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="WoOykfw8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on2059.outbound.protection.outlook.com [40.107.15.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE115A923
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 01:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715562163; cv=none; b=ORHo3ieo5H1MOk9O0cDP/mkRD15Rh6b+7tCu9CUKgH+mJ/Adn7C0XmqHdFx9x7nBtlbgPo+ctx7m3Mf7Fd7aKNqMzskAFUL8KB6jCfUbBqnuRQ6lA8mzup9NP3qWXq9E8BS3BXthxjOKUx+F8TaS4o8kcrVCWJD7OEbFm0vqEcI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715562163; c=relaxed/simple;
-	bh=m9d/0JZ9holQQwUZtlmkc6t63qvmCYckQFML4gOaclM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=P9CNP/Ouwj8qPJkHsKyP6QqRr4N18H0DaTd5X/jx/b7FtIgGT9UMK6EkxZBWqeRSb9Wljim/OCDuiOOPwhHnQfgKrlAkh3aSCUjJq98wUF7qLyXf8oBqKofPUQNd/ZPY3+1IcAucAyqi9EfrROiEvBDoWo7ULkYtqrwRb3bkXFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=crRcEY96; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-792b94301eeso359551785a.3
-        for <netdev@vger.kernel.org>; Sun, 12 May 2024 18:02:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715562161; x=1716166961; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lxl/rjAM4RBmQmdFQ0b3uOPqptfw9RCy7CU9eKyOP2I=;
-        b=crRcEY96gVjYSYuYk0J/9ZEAUOtuEjsKeLuGUGmtJ1A1otln/j8Eno8ncE9XvS83ST
-         iTvVEwAaxCsQmFZs9f5Qf8bdBZoYUAGq9Z8ctaLyabo6/vtrl+t5A5kWTCEM/AEhClD5
-         G9OeLGPhfzCIpg4SQXX0jHA5oCzOMAvl1Y5/fgTxip+3X0JWcvy45QtwN3DGlIbJ97xI
-         Y2FzOoz02DEVuGM/4PmQTMFzRu8TjiAn4ZsItXFo09B1eIfr+l0jJYVIs1hHnJ+oa1MM
-         5iq3XydH4X25p6CY2+0uU0slncuO2E9znkzaYXhos6Xru4aCH5qRGlDOMXs0CD0lpBNx
-         vl0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715562161; x=1716166961;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=lxl/rjAM4RBmQmdFQ0b3uOPqptfw9RCy7CU9eKyOP2I=;
-        b=lU76aH1LmBdU9Pwy75NS7tsLTjpioRrsLWhng7zMlGZybdEAAKDnVXxWOO7j8Tx4Hj
-         5YCQGmd4dgAPg8EC/z9jPqesk+0kJvg6E9drmaODGsZWFPAQdBS3b/DUByh/Jf5wC5Qp
-         5hTh1L9vI6w6PraskAUrpF3ciV3NFUViQXLePlnGnMYGEnUBGw3dLfIrjrcT4/h7oC5N
-         y34lpbqT8ZpQ9SHgdtoMoIveRSACvzjta4qOLkMu9g+xniesh/tm5sMbwIeI90k47IH1
-         MFt65Sah0986MBSi9YyeJb9CqZCa+0T2SajEjzxBseeiSZzvoffgo1nG5DfGalUyDh5X
-         u7zA==
-X-Forwarded-Encrypted: i=1; AJvYcCU9ksONMVm30+j8UUOc1SsZjeGRMuby8tTZHyox9dbcbQLKtOSbMYGEWMpa1raBe+k5DoAnc/tCEVxtOeOXV5eD6VlE49ep
-X-Gm-Message-State: AOJu0Yyq1uADW25E9FsFbLvCVZE1DVQaMu97WMYsBkQIVET8vuQznFfc
-	f0rm79me18cdnckqkf4KvscH+6L3oKJ0/d4hjqzPPPPc5I/CMIZk
-X-Google-Smtp-Source: AGHT+IGjk5DEYc777NROMywOVOpfvhcNNaw4djEtXbQJ7wXLOrdfyrGUSQVRuNP7wkXg2Li4u9aQUQ==
-X-Received: by 2002:a05:620a:204c:b0:792:9248:c2e9 with SMTP id af79cd13be357-792c75f4506mr902259585a.48.1715562160571;
-        Sun, 12 May 2024 18:02:40 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-792bf2fc5a7sm407332485a.84.2024.05.12.18.02.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 May 2024 18:02:40 -0700 (PDT)
-Date: Sun, 12 May 2024 21:02:40 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: zijianzhang@bytedance.com, 
- netdev@vger.kernel.org
-Cc: edumazet@google.com, 
- willemdebruijn.kernel@gmail.com, 
- cong.wang@bytedance.com, 
- xiaochun.lu@bytedance.com, 
- Zijian Zhang <zijianzhang@bytedance.com>
-Message-ID: <664166b015bdb_1d6c6729419@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240510155900.1825946-4-zijianzhang@bytedance.com>
-References: <20240510155900.1825946-1-zijianzhang@bytedance.com>
- <20240510155900.1825946-4-zijianzhang@bytedance.com>
-Subject: Re: [PATCH net-next v3 3/3] selftests: add MSG_ZEROCOPY msg_control
- notification test
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B457494;
+	Mon, 13 May 2024 01:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.15.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715563318; cv=fail; b=ewD1f8g3g2lhxjEo1ec+AWPhsyYXdu21J2mFrzarv27GnniI0nFnt3oX0Tna2DZtOyN8Ahzs6bj6RgeYrxl/6/5qk2tSXBh6GFZDWa0MMGxQaD/SLhh/mXPhTSTgJaJKOt03IPUrsURkjeRWZlRtu7xv06zHY3Acxg8voKUOX6s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715563318; c=relaxed/simple;
+	bh=l4zaL+KtHADNLhMortfw3+frv6ZlM+j/VXvuL37NIag=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=QXkz4ad+yd/cmVyNp0r84ufzRH6bvqPL5IQImgjCZMcp7IySNPZqe+GoVuNp63y05f6QrcKqwR9ycMDYEKFtUsHn3oOjo2xcImNj9UZQmZeklmM8WUEvK/K9o2XoI3PGmA5ngjUu34Xa8DxJZjV/YGgu4QsiTrIaKgGgM+g8AUg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=WoOykfw8; arc=fail smtp.client-ip=40.107.15.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ycl6YqmkGXvhgMYC+CKsFE+W8UReKTMiwUovoGPqfAFsRXbZY21687Sl9N+S6ONV/1iCa73G4Y/JvVhqgRF3cAHBjiaRR2Dl+SeKNyO5MmtqtBev8IKj1RDmHOeOwnyKqUiex5nnY9HaOKb+q128Nzf+qwAX940tgr2NtWa4POMTI6tfFuNiN/59tZoMAeL8jqditYMleOzSHYdOwYOGO7Qrtt7J5CXiTve+mlJXK0Zryo2w5beU2RhARKw5wGG8iMOKhZuNOc/N6nwTJbPZyw8ijE3f45l+gZv35QjWtS9a2fKADUYv1kR5afC4xRwl67mTyQlDagLFNYnmvyHyuA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=l4zaL+KtHADNLhMortfw3+frv6ZlM+j/VXvuL37NIag=;
+ b=MF6KC/pWiXT3qh7kLq5b2o6PpEYgacWTf114cl6libfvVNCMpbvh2oTQdWz6bNI/38D3RMo+5ZQw0UhqQQsS1A/Uq/slQRZaTsgAqB+552Zhy7WpQznugUjBNKCvLiPbirLVbS0aSFCKBf1gHc6kFruNtw8zJaXPutekNGu8MwllMKmrLLFxJ9ophj+wWj5TBGwUjIXexMmwGrO9aFhDSIxYF8VkK19wZ4xsUym5kUO3Lwi238yKjhznNh7iOKNnxmmH5zNn15jhSO8aAMXO9esgxSprtpP0/FWok9GvtEu0qios05U+TAPLx2VDB2qEVQoiNQTHUowdJdWc8Grcjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=l4zaL+KtHADNLhMortfw3+frv6ZlM+j/VXvuL37NIag=;
+ b=WoOykfw8yc3IZ9xn3RKuk6PQyfFHPjmAdS/C7rlOJqTep3zs6zeJ5duS1246RcD8j7pZxT0Tyc0j0LmOcdeDSS5zh0BLe0OZmDufgTwjgSD9c18hwr9nS6b/JBwi2JOxFVOss89SgfzItOxbGqJjMAfhI+2TT85lkxBwhb0xpXs=
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by VE1PR04MB7214.eurprd04.prod.outlook.com (2603:10a6:800:1a6::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Mon, 13 May
+ 2024 01:21:53 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::baed:1f6d:59b4:957]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::baed:1f6d:59b4:957%5]) with mapi id 15.20.7544.052; Mon, 13 May 2024
+ 01:21:52 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>
+Subject: RE: [PATCH v2 net-next] net: fec: Convert fec driver to use lock
+ guards
+Thread-Topic: [PATCH v2 net-next] net: fec: Convert fec driver to use lock
+ guards
+Thread-Index: AQHao1E3Rn7FvRcfoU2u3mKYC6d4drGSGLaAgAJIEQA=
+Date: Mon, 13 May 2024 01:21:52 +0000
+Message-ID:
+ <PAXPR04MB85100FF5080EA3C8E093C39988E22@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20240511030229.628287-1-wei.fang@nxp.com>
+ <b96822ea-4373-415d-8397-d8bc5da88120@lunn.ch>
+In-Reply-To: <b96822ea-4373-415d-8397-d8bc5da88120@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|VE1PR04MB7214:EE_
+x-ms-office365-filtering-correlation-id: 5a5fa138-3658-421b-e0b0-08dc72eb1215
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|376005|366007|1800799015|38070700009;
+x-microsoft-antispam-message-info:
+ =?gb2312?B?alo5U3hTenVPVXNFbGdTeUV5aDBTMU1pa0ZTcDV6eTk2clpYd2E1L0dZWEkw?=
+ =?gb2312?B?MWUyZWl3V3o4dXZLeEFJTEVQZXd1U1d4Ull5Ymk5MXpJZ3RVZnM3MDFkQUp5?=
+ =?gb2312?B?dHROb3QwbU5KZS92ZHZPbHdGZU5ic2N3OHNUVWlVV0NKNVdpd2x0ck43Z1hv?=
+ =?gb2312?B?ZVNqSnQ0eFF3aFN3aEdBcktrWjZ2TkxGY2NPYW5RK0xwY1hVMTZHVTlXZURB?=
+ =?gb2312?B?S2FMM3lRQms1ZS9zQU1waGs0MXlaci8xRkkvWjl1TDV4MzBMNzdXaTYyZ2I0?=
+ =?gb2312?B?T010WE9YOFR0ZkJhRVcwNnkrN2RUWjZzSE9rS3dFUzNKcjNGejBqNzQ2ZFM2?=
+ =?gb2312?B?cVgyRXZTZkdvMnhRcVVPMEpKSFVORUxLdEhXS0tOanN1aFNlVDRYSWdaZ0k0?=
+ =?gb2312?B?Q3hGWjFrMENFZkh5Q2w1VjRzR214TlN0WC9SR1M0cnZKVXQ2L0RaY3FOVkEx?=
+ =?gb2312?B?WFN4MmUxTmJGdDZnWkl3R3k1QlFJT2RIM2N1cHlKODhMWHA2LzR0azlKNU9s?=
+ =?gb2312?B?cGRHcjdWMjUvVzlNMUxWQzZReUZZdlFCdFVYSXhvbis0bHY3bVl3MkdrbEFj?=
+ =?gb2312?B?QUoyaGVXQ1RUOUlySXVyMWEyUldmeGtnMXk3RkYxM0U2SnFIMHRRUzNnWi9I?=
+ =?gb2312?B?QmJ3eCtSUTdYeDlrRW1sUVBiN2dBWWlLbncrUkxMbmtuclBGS2JmWUdOYm9R?=
+ =?gb2312?B?M3A3dVZzVXFYMTdZVW1ka2VuRkE1MEY0RTA0UXAzMko0QVo0NUwwQWVpVUlm?=
+ =?gb2312?B?ZXAyNFhYR0ljWG95aUw3eDBqWmVIRzE2ZC9YVkZhV1l2UkZIS0JXc01Ja1Fr?=
+ =?gb2312?B?ZDZ1WG10UmZKQzRvdlVnYmQ1bS9ENjZIazkyamhEM0RXZVZldjNpdUpxKzhu?=
+ =?gb2312?B?VnlHd0E2aFlqZHUzQ0dqd0phenA3cThkZlY5WVRkR2dESjFkblU0dXJXMWl0?=
+ =?gb2312?B?S25ybXAvakpwTWlORFVPYzE2TGpEODhjalZlRFNKeDUyb29VZlVYNDIrdERB?=
+ =?gb2312?B?WE11MXplam41MzBuWFNCR2JmSFVXS0Z3cTNNaVVsZWVYUjNON2ZwRkJ3WnBF?=
+ =?gb2312?B?bWJBOG5udDIrTzhHcGdMOUNqN01iZisrZUl4L1Y0Ynk1ZDUzUG1tUVppNENH?=
+ =?gb2312?B?S01vYkhWZURDUitrRXY2WUF3UUJ3eDFKVHVTdFloTVN6VGQwdGt1cXhSaVlW?=
+ =?gb2312?B?ZmR4TkJKRHQrc09XRWpicHQ2TEVxQjhqQ21oWm5yQnhaWHFqK21ITW1JZ3ly?=
+ =?gb2312?B?RnFRSUl1MGlpc0JERTBoTEcwVXgreVdiTkZNbkhKS0NNVWVkZ1lOcFdvU1Ni?=
+ =?gb2312?B?ODRYMC81M0RTUnd1RHNDWGRSaFNCZnVIdzU5N1hwaUJ3RngzU3JIQTBKOTJX?=
+ =?gb2312?B?Kzlwa012NnVxd2VjSEZIZWYva2FxdmIyVHR5TmdFeTJKYndVcnVSeGZnQzU4?=
+ =?gb2312?B?dmptclpaam5ESjJCTExodTY4RC9yWjZ5dHF3R3RXOG50Z0tIUW9OTHBsUjFG?=
+ =?gb2312?B?a1JkeTR0emFPdVBkRWJhRGtyYkJhRWpEVjk1TjZZOHNXS3QwVjFTRzdxNmFM?=
+ =?gb2312?B?VThpckJxa2FRc0lscmVMbDlFV1dMVEJJSkFVVVB0VU1jTlZUMUV4NlRHUjQx?=
+ =?gb2312?B?M3cweWlza0pFNVduYXRSZ0QxWDRDbnNKc2ZqTjVabzMxYnVEbkljeWJlMnJy?=
+ =?gb2312?B?VkxjODlmT3VEenFiTkZKdTByUWYvZk9QZU9mbzNMcEU5N0xZS3hyWkRGQ3By?=
+ =?gb2312?B?TWozRTZzZjhFazRSNFhMN1lTbk1xTWd1VnBhQkpuZUJRcEpmbStnekFnVGhI?=
+ =?gb2312?B?bWk4NkNiTkJlS3I3bGRFZz09?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:zh-cn;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?gb2312?B?aGFLTEVCRmQ5bmhrZm1OS0ZsRmk0dkRvV3VRc3laa0ZUWHZuK3hJVWc4b3Mx?=
+ =?gb2312?B?WWhaQ1B4Q0JDWkpSbVZta2Z1a0YzQVA4dUxjbFJoeDJTN2JGK29vNGYwc2R3?=
+ =?gb2312?B?ZDJZKytkUWRqWkx2b0VNSXR0WU1OeW5mQU9RVzRmaHRicUxnRTE3cVZodXRS?=
+ =?gb2312?B?Nk1LdlFXL1lJdTRPRXV2cDA2bWk2NWFsVkFCdmRUVDhLVFlTQXQ3a1JOaldp?=
+ =?gb2312?B?UGVZQWx1V0c5bndyVEZGdCtlUTVGY2NzZHpXMGVueHkyU2Q3TFI4RUFnZ0FL?=
+ =?gb2312?B?Z08rRVNUcEk0RGV6dmczdTNGWlJraXZrV1g0Tmcybmw0TUpxQU1aTUdCcnpG?=
+ =?gb2312?B?dTdISW5IYUwrQ1MrZ2V3bjBCaFlNaTlRRllKNXNSV1MzZ3ZBRTFWNVRzUjla?=
+ =?gb2312?B?dU9oRTFnQnhLVnlEb0pHNU9GbXI0UFI3dUxLQVlBY1hzd1dIUGM0aTUxT1Za?=
+ =?gb2312?B?WTRYT2ZTNVU3Q2M0aTJlWEp3L3NOU2IweG82VWlTVHJjaHZPYUkrQlJ1Wkdp?=
+ =?gb2312?B?SHJVbzljVW5YNGkzNUxGVllTdXFOU2RQSkpXUSs4a1RMeExNWnR1Vk82UVhp?=
+ =?gb2312?B?bXcvWXhRTnVHM1hZY2hJK2YzeGhUVFNHU0Fnem5nRkk3S0IwMCtXbTlFdTVI?=
+ =?gb2312?B?YWVFaGdBUCttaUdld29lVDJnOVI4NlhJQXd2V3p1V3VMNGZvNko5d3dJU1ZC?=
+ =?gb2312?B?a1hERFl2UWc3eVU4L21PcGJ0bDVRTzRHYTZrSEFRaXlZRnhNd2Vrdnd6Nnhh?=
+ =?gb2312?B?dU5jNy82cHkxUGdXK3JBSWc4UjZtOW83M1lwQlBZTHpLVlNGUnZNSG90OXBM?=
+ =?gb2312?B?YWFQOGZKa21nb09WOE5oV3UxMXBsYmpzeGNlSTZNdmsrdlNXemVjZEFrYVJv?=
+ =?gb2312?B?WWVpSGhLSmRDbnRZZ2xxN1RwNzNRZHJ6dUlqSGhTUE1oNjBteEI1ZTNhUzky?=
+ =?gb2312?B?THJYVzBQNHdWRXJFeTcxa2haWk1KS0hvd3BpdGEzZzZIVFgrWmlEMVBHSHIz?=
+ =?gb2312?B?TmRGKzZ5OW9VYzUxVUt5ZkhVMkloQ1VhQ3B4WnVHaUVZZkdxN2lPUjVvTkJM?=
+ =?gb2312?B?NkZUdm1zZmVqWStjeU5rQTVxaEQ4N2tMODRtc1JyeDFIL3NmRTBHNmVtT2gz?=
+ =?gb2312?B?cGV3aTBqeG1XMWNpNi9IeTVxNk52dnF6ZGpQYzhtYUk5dGFPVk13NmMwZGZ0?=
+ =?gb2312?B?dkx4YnhsY0tyUUhNVzVNRnFLeFh0eUNWanVCcW9LZmgrRk5vd1FvYlpERGpY?=
+ =?gb2312?B?THBGS2tobVM0LzBOOXNGaHROb2xxWjNKaU5iTFQva2Roa3F3eHpyRXZOWEJm?=
+ =?gb2312?B?OVE5MktwR3c4SXdBdTM4SGsyZ0h2VitiNFR6dFJnZjc2ZkQ4aHQrcFpEdHJk?=
+ =?gb2312?B?Z2RTRjJMdkQycXM4dUp1dGU0c1V5TnRtUmx2SEFHNWJEYjRZWWlCOVZVTjBN?=
+ =?gb2312?B?ajZnM3FHcTRQMUdvbXFNODgwZC9obG1ZYmViU2Z5TmpDZGU1cElIQjgzRDQx?=
+ =?gb2312?B?N1htT2JvK0pmM2o3WlRzaHJtOVhmYUxHQ0pyYzdiOTNXMFI2TEhST2JSbWRo?=
+ =?gb2312?B?cFRCMWJXSzVWcE05QXZQQ2FXQmpKdmpIQWRuYlI1NUdMeWRNT2k3ZUNocjhq?=
+ =?gb2312?B?Y3pIQXZhSFdrdXhHbFRCK0FKRlBPL1VNWWc1clZnNHFYcmlWWFJxNGVGc1NH?=
+ =?gb2312?B?aU5oRnJCWUp2OWFSUXJaRUpldzF1OFhCc2NSb2VsNkZ4WEJwOThOc09tV1pu?=
+ =?gb2312?B?YlBMZmVvOXUyYWFwR1ZnYjA3d09EVkp2N21Pc3drTjVUNUgvSWU0R2VxYXBq?=
+ =?gb2312?B?N1dpZW9qMHNxMGNSeEpKYUkwUkJJZlkxV3d5eHUzYkQ3eWZTcm05RXFvbEQ5?=
+ =?gb2312?B?MHR3dG1aMEw1Y3RBWlJIT3AzNTF1Vlc4OWlTWEhaMjBVaFowWTBBUEI5L3ph?=
+ =?gb2312?B?WnFhNGFkOHZrOHdLdGxxOTI1WVptZDRpUmhOdzdLbGVRTjcwUUNSa2VXcEhZ?=
+ =?gb2312?B?dDQyUGgxN2pHRFhzL0Y0S05HSTlqSmJKcXpaRDZJZGJMYWN1YUNhVlJuNmFO?=
+ =?gb2312?B?RHF5NkN3b3hOYUp2YUlCNG9TYkN1bTU4Szh1M3dEQzJHckxIRVpuSWZiRG95?=
+ =?gb2312?Q?yQ08=3D?=
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a5fa138-3658-421b-e0b0-08dc72eb1215
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 May 2024 01:21:52.5486
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: GMi4LJEUKWOdDKrTWR1gqBBEqQbWXhek8OwP2qbalvcoe9JHz9X/fTYGdmWIbrI4jzgMPMeVVcKTolVE4KIyQA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7214
 
-zijianzhang@ wrote:
-> From: Zijian Zhang <zijianzhang@bytedance.com>
-> 
-> We update selftests/net/msg_zerocopy.c to accommodate the new mechanism.
-> 
-> Test result from selftests/net/msg_zerocopy.c,
-> cfg_notification_limit = 1, in this case MSG_ZEROCOPY approximately
-> aligns with the semantics of MSG_ZEROCOPY_UARG. In this case, the new
-> flag has around 13% cpu savings in TCP and 18% cpu savings in UDP.
-> +---------------------+---------+---------+---------+---------+
-> | Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
-> +---------------------+---------+---------+---------+---------+
-> | ZCopy (MB)          | 5147    | 4885    | 7489    | 7854    |
-> +---------------------+---------+---------+---------+---------+
-> | New ZCopy (MB)      | 5859    | 5505    | 9053    | 9236    |
-> +---------------------+---------+---------+---------+---------+
-> | New ZCopy / ZCopy   | 113.83% | 112.69% | 120.88% | 117.59% |
-> +---------------------+---------+---------+---------+---------+
-> 
-> cfg_notification_limit = 32, it means less poll + recvmsg overhead,
-> the new mechanism performs 8% better in TCP. For UDP, no obvious
-> performance gain is observed and sometimes may lead to degradation.
-> Thus, if users don't need to retrieve the notification ASAP in UDP,
-> the original mechanism is preferred.
-> +---------------------+---------+---------+---------+---------+
-> | Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
-> +---------------------+---------+---------+---------+---------+
-> | ZCopy (MB)          | 6272    | 6138    | 12138   | 10055   |
-> +---------------------+---------+---------+---------+---------+
-> | New ZCopy (MB)      | 6774    | 6620    | 11504   | 10355   |
-> +---------------------+---------+---------+---------+---------+
-> | New ZCopy / ZCopy   | 108.00% | 107.85% | 94.78%  | 102.98% |
-> +---------------------+---------+---------+---------+---------+
-> 
-> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
-> Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
-> ---
->  tools/testing/selftests/net/msg_zerocopy.c  | 103 ++++++++++++++++++--
->  tools/testing/selftests/net/msg_zerocopy.sh |   1 +
->  2 files changed, 97 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/msg_zerocopy.c b/tools/testing/selftests/net/msg_zerocopy.c
-> index ba6c257f689c..48750a7a162c 100644
-> --- a/tools/testing/selftests/net/msg_zerocopy.c
-> +++ b/tools/testing/selftests/net/msg_zerocopy.c
-> @@ -1,3 +1,4 @@
-> +// SPDX-License-Identifier: GPL-2.0
->  /* Evaluate MSG_ZEROCOPY
->   *
->   * Send traffic between two processes over one of the supported
-> @@ -66,6 +67,10 @@
->  #define SO_ZEROCOPY	60
->  #endif
->  
-> +#ifndef SCM_ZC_NOTIFICATION
-> +#define SCM_ZC_NOTIFICATION	78
-> +#endif
-> +
->  #ifndef SO_EE_CODE_ZEROCOPY_COPIED
->  #define SO_EE_CODE_ZEROCOPY_COPIED	1
->  #endif
-> @@ -74,6 +79,13 @@
->  #define MSG_ZEROCOPY	0x4000000
->  #endif
->  
-> +#define ZC_MSGERR_NOTIFICATION 1
-> +#define ZC_MSGCTL_NOTIFICATION 2
-
-Please define an enum
-
-And consider less truncated, more descriptive, names. E.g.,
-
-   MSG_ZEROCOPY_NOTIFY_ERRQUEUE
-   MSG_ZEROCOPY_NOTIFY_SENDMSG
-
-> +
-> +#define SOCK_ZC_INFO_NUM 8
-> +
-> +#define INVALID_ZEROCOPY_VAL 2
-> +
->  static int  cfg_cork;
->  static bool cfg_cork_mixed;
->  static int  cfg_cpu		= -1;		/* default: pin to last cpu */
-> @@ -86,13 +98,16 @@ static int  cfg_runtime_ms	= 4200;
->  static int  cfg_verbose;
->  static int  cfg_waittime_ms	= 500;
->  static int  cfg_notification_limit = 32;
-> -static bool cfg_zerocopy;
-> +static int  cfg_zerocopy;           /* Either 1 or 2, mode for SO_ZEROCOPY */
->  
->  static socklen_t cfg_alen;
->  static struct sockaddr_storage cfg_dst_addr;
->  static struct sockaddr_storage cfg_src_addr;
->  
->  static char payload[IP_MAXPACKET];
-> +static struct zc_info_elem zc_info[SOCK_ZC_INFO_NUM];
-> +static char zc_ckbuf[CMSG_SPACE(sizeof(void *))];
-> +static struct zc_info_elem *zc_info_ptr = zc_info;
->  static long packets, bytes, completions, expected_completions;
->  static int  zerocopied = -1;
->  static uint32_t next_completion;
-> @@ -170,6 +185,26 @@ static int do_accept(int fd)
->  	return fd;
->  }
->  
-> +static void add_zcopy_info(struct msghdr *msg)
-> +{
-> +	int i;
-> +	struct cmsghdr *cm;
-> +
-> +	if (!msg->msg_control)
-> +		error(1, errno, "NULL user arg");
-> +	cm = (void *)msg->msg_control;
-> +	/* Although only the address of the array will be written into the
-> +	 * zc_ckbuf, we assign cmsg_len to CMSG_LEN(sizeof(zc_info)) to specify
-> +	 * the length of the array.
-> +	 */
-> +	cm->cmsg_len = CMSG_LEN(sizeof(zc_info));
-> +	cm->cmsg_level = SOL_SOCKET;
-> +	cm->cmsg_type = SCM_ZC_NOTIFICATION;
-> +	memcpy(CMSG_DATA(cm), &zc_info_ptr, sizeof(zc_info_ptr));
-> +	for (i = 0; i < SOCK_ZC_INFO_NUM; i++)
-> +		zc_info[i].zerocopy = INVALID_ZEROCOPY_VAL;
-> +}
-> +
->  static void add_zcopy_cookie(struct msghdr *msg, uint32_t cookie)
->  {
->  	struct cmsghdr *cm;
-> @@ -183,7 +218,7 @@ static void add_zcopy_cookie(struct msghdr *msg, uint32_t cookie)
->  	memcpy(CMSG_DATA(cm), &cookie, sizeof(cookie));
->  }
->  
-> -static bool do_sendmsg(int fd, struct msghdr *msg, bool do_zerocopy, int domain)
-> +static bool do_sendmsg(int fd, struct msghdr *msg, int do_zerocopy, int domain)
->  {
->  	int ret, len, i, flags;
->  	static uint32_t cookie;
-> @@ -201,6 +236,15 @@ static bool do_sendmsg(int fd, struct msghdr *msg, bool do_zerocopy, int domain)
->  			msg->msg_controllen = CMSG_SPACE(sizeof(cookie));
->  			msg->msg_control = (struct cmsghdr *)ckbuf;
->  			add_zcopy_cookie(msg, ++cookie);
-> +		} else if (do_zerocopy == ZC_MSGCTL_NOTIFICATION) {
-> +			memset(&msg->msg_control, 0, sizeof(msg->msg_control));
-> +			/* Although only the address of the array will be written into the
-> +			 * zc_ckbuf, msg_controllen must be larger or equal than any cmsg_len
-> +			 * in it. Otherwise, we will get -EINVAL.
-> +			 */
-> +			msg->msg_controllen = CMSG_SPACE(sizeof(zc_info));
-> +			msg->msg_control = (struct cmsghdr *)zc_ckbuf;
-> +			add_zcopy_info(msg);
->  		}
->  	}
->  
-> @@ -219,7 +263,7 @@ static bool do_sendmsg(int fd, struct msghdr *msg, bool do_zerocopy, int domain)
->  		if (do_zerocopy && ret)
->  			expected_completions++;
->  	}
-> -	if (do_zerocopy && domain == PF_RDS) {
-> +	if (msg->msg_control) {
->  		msg->msg_control = NULL;
->  		msg->msg_controllen = 0;
->  	}
-> @@ -393,6 +437,42 @@ static bool do_recvmsg_completion(int fd)
->  	return ret;
->  }
->  
-> +static void do_recv_completions2(void)
-> +{
-> +	int i;
-> +	__u32 hi, lo, range;
-> +	__u8 zerocopy;
-> +
-> +	for (i = 0; zc_info[i].zerocopy != INVALID_ZEROCOPY_VAL; i++) {
-> +		struct zc_info_elem elem = zc_info[i];
-> +
-> +		hi = elem.hi;
-> +		lo = elem.lo;
-> +		zerocopy = elem.zerocopy;
-> +		range = hi - lo + 1;
-> +
-> +		if (cfg_verbose && lo != next_completion)
-> +			fprintf(stderr, "gap: %u..%u does not append to %u\n",
-> +				lo, hi, next_completion);
-> +		next_completion = hi + 1;
-> +
-> +		if (zerocopied == -1)
-> +			zerocopied = zerocopy;
-> +		else if (zerocopied != zerocopy) {
-> +			fprintf(stderr, "serr: inconsistent\n");
-> +			zerocopied = zerocopy;
-> +		}
-> +
-> +		completions += range;
-> +
-> +		if (cfg_verbose >= 2)
-> +			fprintf(stderr, "completed: %u (h=%u l=%u)\n",
-> +				range, hi, lo);
-> +	}
-> +
-> +	sendmsg_counter -= i;
-> +}
-> +
->  static bool do_recv_completion(int fd, int domain)
->  {
->  	struct sock_extended_err *serr;
-> @@ -554,11 +634,15 @@ static void do_tx(int domain, int type, int protocol)
->  		else
->  			do_sendmsg(fd, &msg, cfg_zerocopy, domain);
->  
-> -		if (cfg_zerocopy && sendmsg_counter >= cfg_notification_limit)
-> +		if (cfg_zerocopy == ZC_MSGERR_NOTIFICATION &&
-> +			sendmsg_counter >= cfg_notification_limit)
->  			do_recv_completions(fd, domain);
->  
-> +		if (cfg_zerocopy == ZC_MSGCTL_NOTIFICATION)
-> +			do_recv_completions2();
-> +
->  		while (!do_poll(fd, POLLOUT)) {
-> -			if (cfg_zerocopy)
-> +			if (cfg_zerocopy == ZC_MSGERR_NOTIFICATION)
->  				do_recv_completions(fd, domain);
->  		}
->  
-> @@ -716,7 +800,7 @@ static void parse_opts(int argc, char **argv)
->  
->  	cfg_payload_len = max_payload_len;
->  
-> -	while ((c = getopt(argc, argv, "46c:C:D:i:l:mp:rs:S:t:vz")) != -1) {
-> +	while ((c = getopt(argc, argv, "46c:C:D:i:l:mnp:rs:S:t:vz")) != -1) {
->  		switch (c) {
->  		case '4':
->  			if (cfg_family != PF_UNSPEC)
-> @@ -750,6 +834,9 @@ static void parse_opts(int argc, char **argv)
->  		case 'm':
->  			cfg_cork_mixed = true;
->  			break;
-> +		case 'n':
-> +			cfg_zerocopy = ZC_MSGCTL_NOTIFICATION;
-> +			break;
->  		case 'p':
->  			cfg_port = strtoul(optarg, NULL, 0);
->  			break;
-> @@ -769,7 +856,7 @@ static void parse_opts(int argc, char **argv)
->  			cfg_verbose++;
->  			break;
->  		case 'z':
-> -			cfg_zerocopy = true;
-> +			cfg_zerocopy = ZC_MSGERR_NOTIFICATION;
->  			break;
->  		}
->  	}
-> @@ -780,6 +867,8 @@ static void parse_opts(int argc, char **argv)
->  			error(1, 0, "-D <server addr> required for PF_RDS\n");
->  		if (!cfg_rx && !saddr)
->  			error(1, 0, "-S <client addr> required for PF_RDS\n");
-> +		if (cfg_zerocopy == ZC_MSGCTL_NOTIFICATION)
-> +			error(1, 0, "PF_RDS does not support ZC_MSGCTL_NOTIFICATION");
->  	}
->  	setup_sockaddr(cfg_family, daddr, &cfg_dst_addr);
->  	setup_sockaddr(cfg_family, saddr, &cfg_src_addr);
-> diff --git a/tools/testing/selftests/net/msg_zerocopy.sh b/tools/testing/selftests/net/msg_zerocopy.sh
-> index 89c22f5320e0..022a6936d86f 100755
-> --- a/tools/testing/selftests/net/msg_zerocopy.sh
-> +++ b/tools/testing/selftests/net/msg_zerocopy.sh
-> @@ -118,4 +118,5 @@ do_test() {
->  
->  do_test "${EXTRA_ARGS}"
->  do_test "-z ${EXTRA_ARGS}"
-> +do_test "-n ${EXTRA_ARGS}"
->  echo ok
-> -- 
-> 2.20.1
-> 
-
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbmRyZXcgTHVubiA8YW5kcmV3
+QGx1bm4uY2g+DQo+IFNlbnQ6IDIwMjTE6jXUwjExyNUgMjI6MzANCj4gVG86IFdlaSBGYW5nIDx3
+ZWkuZmFuZ0BueHAuY29tPg0KPiBDYzogZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgZWR1bWF6ZXRAZ29v
+Z2xlLmNvbTsga3ViYUBrZXJuZWwub3JnOw0KPiBwYWJlbmlAcmVkaGF0LmNvbTsgU2hlbndlaSBX
+YW5nIDxzaGVud2VpLndhbmdAbnhwLmNvbT47IENsYXJrIFdhbmcNCj4gPHhpYW9uaW5nLndhbmdA
+bnhwLmNvbT47IHJpY2hhcmRjb2NocmFuQGdtYWlsLmNvbTsNCj4gbmV0ZGV2QHZnZXIua2VybmVs
+Lm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgaW14QGxpc3RzLmxpbnV4LmRldg0K
+PiBTdWJqZWN0OiBSZTogW1BBVENIIHYyIG5ldC1uZXh0XSBuZXQ6IGZlYzogQ29udmVydCBmZWMg
+ZHJpdmVyIHRvIHVzZSBsb2NrIGd1YXJkcw0KPiANCj4gT24gU2F0LCBNYXkgMTEsIDIwMjQgYXQg
+MTE6MDI6MjlBTSArMDgwMCwgV2VpIEZhbmcgd3JvdGU6DQo+ID4gVGhlIFNjb3BlLWJhc2VkIHJl
+c291cmNlIG1hbmFnZW1lbnQgbWVjaGFuaXNtIGhhcyBiZWVuIGludHJvZHVjZWQNCj4gaW50bw0K
+PiA+IGtlcm5lbCBzaW5jZSB0aGUgY29tbWl0IDU0ZGE2YTA5MjQzMSAoImxvY2tpbmc6IEludHJv
+ZHVjZSBfX2NsZWFudXAoKQ0KPiA+IGJhc2VkIGluZnJhc3RydWN0dXJlIikuIFRoZSBtZWNoYW5p
+c20gbGV2ZXJhZ2VzIHRoZSAnY2xlYW51cCcNCj4gPiBhdHRyaWJ1dGUgcHJvdmlkZWQgYnkgR0ND
+IGFuZCBDbGFuZywgd2hpY2ggYWxsb3dzIHJlc291cmNlcyB0byBiZQ0KPiA+IGF1dG9tYXRpY2Fs
+bHkgcmVsZWFzZWQgd2hlbiB0aGV5IGdvIG91dCBvZiBzY29wZS4NCj4gPiBUaGVyZWZvcmUsIGNv
+bnZlcnQgdGhlIGZlYyBkcml2ZXIgdG8gdXNlIGd1YXJkKCkgYW5kIHNjb3BlZF9ndWFyZCgpDQo+
+ID4gZGVmaW5lZCBpbiBsaW51eC9jbGVhbnVwLmggdG8gYXV0b21hdGUgbG9jayBsaWZldGltZSBj
+b250cm9sIGluIHRoZQ0KPiA+IGZlYyBkcml2ZXIuDQo+IA0KPiBTb3JyeSwgaXQgaGFzIGJlZW4g
+ZGVjaWRlZCBmb3IgbmV0ZGV2IHdlIGRvbid0IHdhbnQgdGhlc2Ugc29ydCBvZiBjb252ZXJzaW9u
+cywNCj4gYXQgbGVhc3Qgbm90IHlldC4gVGhlIG1haW4gd29ycnkgaXMgYmFja3BvcnRpbmcgZml4
+ZXMuIEl0IGlzIGxpa2VseSBzdWNoIGJjYWtwb3J0cw0KPiBhcmUgZ29pbmcgdG8gYmUgaGFyZGVy
+LCBhbmQgYWxzbyBtb3JlIGVycm9yIHByb25lLCBzaW5jZSB0aGUgY29udGV4dCBpcyBxdWl0ZQ0K
+PiBkaWZmZXJlbnQuDQo+IA0KPiBJZiBkb25lIGNvcnJlY3RseSwgc2NvcGVkX2d1YXJkKCkge30g
+Y291bGQgYmUgdXNlZnVsLCBhbmQgYXZvaWQgaXNzdWVzLiBTbyB3ZSBhcmUNCj4gTy5LLiB3aXRo
+IHRoYXQgaW4gbmV3IGNvZGUuIFRoYXQgd2lsbCBhbHNvIGFsbG93IHVzIHRvIGdldCBzb21lIGV4
+cGVyaWVuY2Ugd2l0aA0KPiBpdCBvdmVyIHRoZSBuZXh0IGZldyB5ZWFycy4gTWF5YmUgd2Ugd2ls
+bCB0aGVuIHJlLWV2YWx1YXRlIHRoaXMgZGVjaXNpb24gYWJvdXQNCj4gY29udmVydGluZyBleGlz
+dGluZyBjb2RlLg0KPiANCk9rYXksIGl0J3MgZmluZSwgdGhhbmtzLg0KPiANCg==
 
