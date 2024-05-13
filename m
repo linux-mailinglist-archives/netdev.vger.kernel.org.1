@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-96091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A79988C44D0
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 18:06:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A4138C44D9
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 18:10:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 620C3280D35
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 16:06:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B70F1C21399
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 16:10:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC3E8153BF6;
-	Mon, 13 May 2024 16:05:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70DD155351;
+	Mon, 13 May 2024 16:09:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lApNT+j5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="imdllbMD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D3C57CAA
-	for <netdev@vger.kernel.org>; Mon, 13 May 2024 16:05:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35C215534D
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 16:09:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715616356; cv=none; b=TdtIetOccK+gNghc5lWzQS31qnNTJvyk8OjzyY4WIZU/66gXB2y/vKpg07zTs1UM9mgNzU/HhLQ4j/d+zzBhm42bJl42sTLXzIhmQNeYPSRgxE14p3AYtILwuDAO3Wc0Xazaq0r4NgEgsGZqAe3vKVtGe/5W+J8exu+G3EmZbaM=
+	t=1715616592; cv=none; b=ZZdVl3P8rtjK5ZpJiHVTilhDD8aBflCkqT2goKGCUrIpUkMgsRekwNv72eN0+4Aazlnr2d4HElRs00B0SfYBcTV9YvTkWKM1kGULannBD1zD7U1qLmy7QGreliwLufdc+OEjZawefqT++OYEFCqDkegzhxSN8RwCkWogBbltuQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715616356; c=relaxed/simple;
-	bh=LORKsNqk+QgxIQWMAMEAfbSBqWqiSfgiC4QfHFnqnHk=;
+	s=arc-20240116; t=1715616592; c=relaxed/simple;
+	bh=cbtWqYrDgwnkSB19r6+N772IAd9Ks2qmFgoKuDX/Mck=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MSftSKba9RoChW5riL5wTgeYM7lapOxuIdvFK+CKM0F/wFxM9OqSUCko/gk0Cu/wfIquWOOjacRSKkEUEJjdK8oo6QQQef1WoWL4+vHFjeRGH9O/8jY8X6uaT+qjYvje1IUIQ3gTk3Fekco2/d2Vdch/9nH7v3SinYfUEGOnaHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lApNT+j5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B38BAC2BD11;
-	Mon, 13 May 2024 16:05:53 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=gMUhQ/Co9UF4+aqXd9Yowe0KoUfQ6Hy81ri+B5bREqR232lSiCp15TH10H5rRZgCibU9YxFfVAxwy5yc42yYE/Oata2kWJg/thqwYsRMYIoj6qo4ZLR3xIUH41vU33+sFv3HVdniWQM5QPIZilPW+02cTms2Z90eOF9P45rJT+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=imdllbMD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B874EC2BD11;
+	Mon, 13 May 2024 16:09:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715616356;
-	bh=LORKsNqk+QgxIQWMAMEAfbSBqWqiSfgiC4QfHFnqnHk=;
+	s=k20201202; t=1715616592;
+	bh=cbtWqYrDgwnkSB19r6+N772IAd9Ks2qmFgoKuDX/Mck=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lApNT+j56bSWl+lAyBfrV6icWyBXcdM973hE4o1lKxBAwj8xDUaN+A1/iwVnokSlx
-	 BXjiYadaySb6J70NHsihZloSRVcKs/44UrBGhIYnG75C5V47HlG3OCxFVYZ1kbM3+9
-	 g6w4N1FVW4OM+ampO7l9lBJLuPDrxbS1elI9bT3p8OJXrEH0Gie/3BFslspuDAUhzN
-	 /AurJF3h121wp4AE4T32vnxZNOUFex6Zdd97jp5SKVNtSChCBrtiL7cg9YI+0ZAxUn
-	 a/M6RaxEPbyi1mOQRCPWKdyGlhbxJvPzYcIg14vPDobpoElr/7FGCbLbU/NwcZ86HQ
-	 TGicU+03yvMhw==
-Date: Mon, 13 May 2024 17:05:51 +0100
+	b=imdllbMDqD3BqHC47qwYsFHScle2A4eNPfcxNiIoTRhtI8hZoRzSW3Uf9Y7QXDiar
+	 QuwS1uprtgagrESOXzT2pd+xQzbrAIgi8xceDKcnd/FDB/D1zBvCe8cUdBvpY65ZT4
+	 VFjyvFMWdTCilXBxtiqTq1B3LqLiM32feUL1Yc6B54lOhfzYut9sSn3KCPoNlc2Zx/
+	 SChT3XLHUJaqme+4gbeHXfCNViMDP9zzr14VlrqrO9AI0lq10MECSRvLX8I8fMkBaW
+	 PRHx0ktZqmer+kcvXVfoyfJY0iVacLTfjuTvrFBrP6px3I222JivCbcDdDq0ThZwz1
+	 XsWQPFNfrhewQ==
+Date: Mon, 13 May 2024 17:09:47 +0100
 From: Simon Horman <horms@kernel.org>
 To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
@@ -50,10 +50,10 @@ Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
 	pio.raczynski@gmail.com, jiri@nvidia.com,
 	mateusz.polchlopek@intel.com, shayd@nvidia.com
-Subject: Re: [iwl-next v2 03/15] ice: add basic devlink subfunctions support
-Message-ID: <20240513160551.GP2787@kernel.org>
+Subject: Re: [iwl-next v2 08/15] ice: make reprresentor code generic
+Message-ID: <20240513160947.GQ2787@kernel.org>
 References: <20240513083735.54791-1-michal.swiatkowski@linux.intel.com>
- <20240513083735.54791-4-michal.swiatkowski@linux.intel.com>
+ <20240513083735.54791-9-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,43 +62,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240513083735.54791-4-michal.swiatkowski@linux.intel.com>
+In-Reply-To: <20240513083735.54791-9-michal.swiatkowski@linux.intel.com>
 
-On Mon, May 13, 2024 at 10:37:23AM +0200, Michal Swiatkowski wrote:
+On Mon, May 13, 2024 at 10:37:28AM +0200, Michal Swiatkowski wrote:
+> Keep the same flow of port representor creation, but instead of general
+> attach function create helpers for specific representor type.
+> 
+> Store function pointer for add and remove representor.
+> 
+> Type of port representor can be also known based on VSI type, but it
+> is more clean to have it directly saved in port representor structure.
+> 
+> Add devlink lock for whole port representor creation and destruction.
+> 
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-...
+nit: In subject, reprresentor -> representor
 
+> ---
+>  .../ethernet/intel/ice/devlink/devlink_port.h |  1 +
+>  drivers/net/ethernet/intel/ice/ice_eswitch.c  | 74 +++++++++++-----
+>  drivers/net/ethernet/intel/ice/ice_eswitch.h  | 11 +--
+>  drivers/net/ethernet/intel/ice/ice_repr.c     | 88 +++++++++----------
+>  drivers/net/ethernet/intel/ice/ice_repr.h     | 16 +++-
+>  drivers/net/ethernet/intel/ice/ice_sriov.c    |  4 +-
+>  drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  4 +-
+>  7 files changed, 121 insertions(+), 77 deletions(-)
+> 
 > diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-> index 9223bcdb6444..f20d7cc522a6 100644
+> index e4acd855d9f9..6e14b9e4d621 100644
 > --- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
 > +++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-> @@ -4,9 +4,42 @@
->  #ifndef _DEVLINK_PORT_H_
->  #define _DEVLINK_PORT_H_
+> @@ -23,6 +23,7 @@ struct ice_dynamic_port {
+>  	struct devlink_port devlink_port;
+>  	struct ice_pf *pf;
+>  	struct ice_vsi *vsi;
+> +	unsigned long repr_id;
+
+nit: Please add an entry for repr_id to the Kernel doc for this structure.
+
+     And also the attached field which is added by the last patch
+     of this series.
+
+>  	u32 sfnum;
+>  };
 >  
-> +#include "../ice.h"
-> +
-> +/**
-> + * struct ice_dynamic_port - Track dynamically added devlink port instance
-> + * @hw_addr: the HW address for this port
-> + * @active: true if the port has been activated
-> + * @devlink_port: the associated devlink port structure
-> + * @pf: pointer to the PF private structure
-> + * @vsi: the VSI associated with this port
-
-nit: An entry for @sfnum should go here.
-
-> + *
-> + * An instance of a dynamically added devlink port. Each port flavour
-> + */
-> +struct ice_dynamic_port {
-> +	u8 hw_addr[ETH_ALEN];
-> +	u8 active: 1;
-> +	struct devlink_port devlink_port;
-> +	struct ice_pf *pf;
-> +	struct ice_vsi *vsi;
-> +	u32 sfnum;
-> +};
 
 ...
 
