@@ -1,75 +1,58 @@
-Return-Path: <netdev+bounces-96135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA568C4711
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:42:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E2628C471A
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:46:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A185C28146E
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 18:42:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EA1B1C2149F
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 18:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7894739FEC;
-	Mon, 13 May 2024 18:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FE73BBD5;
+	Mon, 13 May 2024 18:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E0fLk6CX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UKPPw/+M"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A08C1CAAF;
-	Mon, 13 May 2024 18:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CA81C6A4;
+	Mon, 13 May 2024 18:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715625755; cv=none; b=cVY7VcUO0Hmd/etgeKcE2xEyrQ32GUjMWNF4K2w/GuAfcnqsMcz1DhnRoSPFf6treB2dsNBeMENUAO7KxPA5aAJP9YZoLPhcSulO1UdwpnZeUj0CDfq5R2a1GX0Ha5zj1lWfazedmZFDsA5Yi4mX+ou0oDLV2+JNcGr8GOJz33g=
+	t=1715626010; cv=none; b=bRTHrGpArIycx43y34j8lh0/jq+cjhulxPXv+JdsX6pNQKsnPw7Qlxbkf4YxZF9p7TYaJwxIdL+U3kK+h7vlW0ZsxNnSZoQ71qoHccs6Z5NZw6LrmVTtHS5iD7RD0dJhXbsZSD2CtK4Z0DnOujzOnKwKTNC8PVc+GyqixebNJ4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715625755; c=relaxed/simple;
-	bh=vflVzp1A0GkWtNm4fegjMCm97wJdDl9jRPwd9eWvaOM=;
+	s=arc-20240116; t=1715626010; c=relaxed/simple;
+	bh=JDIRg2qmzi1h/Y7XpCRFX2kK31gZ2skohimiZqp27LI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZUyHTXRoKAPloovZFoJ4qGZM2ttJjVFh+Nj1GxujWvVvc5G53uNybQqfi1H6YbWV1J9W5nTe6SOr1jlORMlOgnKv+p9IP6DXiE+VJnA+eJwgeg21xk9pfuVGuojrWjc2K+azS0fsysHUuU7I72VKthlYWGu2Z34AEn6ITHidfcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E0fLk6CX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB838C113CC;
-	Mon, 13 May 2024 18:42:33 +0000 (UTC)
+	 MIME-Version:Content-Type; b=WiNjw4v6UL9DA054GNOkDzOQs/+Mbu9/x7cmQo/4jUxGR/R9l29VFdTtoinE52Vt7K1rbmJx3p5q11UYem2D8fX1WDXYA1vVBQkuncuKYr56Iwn7sLcJJ78H4kcUUbd3ugg83D9vodHbWjm0viDD8NI/+wro4D572k/fwjMc4zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UKPPw/+M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09E23C113CC;
+	Mon, 13 May 2024 18:46:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715625754;
-	bh=vflVzp1A0GkWtNm4fegjMCm97wJdDl9jRPwd9eWvaOM=;
+	s=k20201202; t=1715626010;
+	bh=JDIRg2qmzi1h/Y7XpCRFX2kK31gZ2skohimiZqp27LI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=E0fLk6CX6RRojI58r5e26p+XLRtH96irn9lbWm+4TKsr0x7WmUO2TgZhnjf6RbVBl
-	 nefqqJR9+RQUKtbLyi6ORIFmQXdjzHhuUMDlQ0j8O05dHrp0dvIGRqTKa+RFRGRXwk
-	 r5OULfz1e5BY7LXfn6AAvh8zKfj6rMNSTdxb9xvwS3fJ0XJTUyWSxbnCH3DWxijVAo
-	 dkIqcft4g3eXAbl5OEFpBSotYUTjt5n8J+ZKgtxERxwxgtOMbjk9PKD+xRF3E4F1CM
-	 gU0o8kfdQ7YyzGGsSFrhOgzyMxNlrIXwYVJz7EwG/zulansonU+Qczo30CUwfUZHE3
-	 x4ZUKj+QU3r6g==
-Date: Mon, 13 May 2024 11:42:33 -0700
+	b=UKPPw/+MqfbJysICHEmw4uABDW5P6zrloQP76mEoxaIa4WzlrCwwqi8TSqUyYesXi
+	 NJigUW2zEvI351ImGNv2lVqVe/WahxN85/UQQ1dhwO/QoduqD5jSxMuRxLnNsdWgKQ
+	 Iv0AWQD04PUTVhjPXt8ZXIomStbeF71bvs/8feOa70a7dqWiQAKplWVDCMGNRFXZZs
+	 HJX2T3yStoLIIwbm9PTC7eZXJa2VAi52sEm4c5RNxvxq6IuOgzWFpK+vtZ5vVs8oz0
+	 NO58FjD6BLU4in3WT64z6GwWzn7/znXP7gn6fBqid7nXax3x7z1ZtzyjAaq3s96Rdb
+	 iUEnD/W9NcLQA==
+Date: Mon, 13 May 2024 11:46:49 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: kernel test robot <lkp@intel.com>, llvm@lists.linux.dev,
- oe-kbuild-all@lists.linux.dev, "David S . Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Jason
-   Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Brett
-   Creeley <bcreeley@amd.com>, Ratheesh Kannoth <rkannoth@marvell.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Tal Gilboa <talgi@nvidia.com>, Jonathan  
- Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Jiri Pirko <jiri@resnulli.us>, Paul  
- Greenwalt <paul.greenwalt@intel.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Kory Maincent
- <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
- justinstitt@google.com, donald.hunter@gmail.com, netdev@vger.kernel.org,
- virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v13 2/4] ethtool: provide customized dim
- profile management
-Message-ID: <20240513114233.6eb8799e@kernel.org>
-In-Reply-To: <1715614744.0497134-3-hengqi@linux.alibaba.com>
-References: <20240509044747.101237-1-hengqi@linux.alibaba.com>
-	<20240509044747.101237-3-hengqi@linux.alibaba.com>
-	<202405100654.5PbLQXnL-lkp@intel.com>
-	<1715531818.6973832-3-hengqi@linux.alibaba.com>
-	<20240513072249.7b0513b0@kernel.org>
-	<1715611933.2264705-1-hengqi@linux.alibaba.com>
-	<20240513082412.2a27f965@kernel.org>
-	<1715614744.0497134-3-hengqi@linux.alibaba.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ fw@strlen.de
+Subject: Re: [PATCH net-next 16/17] selftests: netfilter: add packetdrill
+ based conntrack tests
+Message-ID: <20240513114649.6d764307@kernel.org>
+In-Reply-To: <20240512161436.168973-17-pablo@netfilter.org>
+References: <20240512161436.168973-1-pablo@netfilter.org>
+	<20240512161436.168973-17-pablo@netfilter.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,13 +62,48 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 13 May 2024 23:39:04 +0800 Heng Qi wrote:
->  config PROVE_LOCKING
->         bool "Lock debugging: prove locking correctness"
-> -       depends on DEBUG_KERNEL && LOCK_DEBUGGING_SUPPORT
-> +       depends on DEBUG_KERNEL && LOCK_DEBUGGING_SUPPORT && NET
+On Sun, 12 May 2024 18:14:35 +0200 Pablo Neira Ayuso wrote:
+> From: Florian Westphal <fw@strlen.de>
+> 
+> Add a new test script that uses packetdrill tool to exercise conntrack
+> state machine.
 
-We can't make lockdep dependent on NET.
-People working on other subsystems should be able to use LOCKDEP 
-with minimal builds.
+Hi Florian, I installed packetdrill in the morning and the test..
+almost.. passes:
+
+make -C tools/testing/selftests TARGETS=net/netfilter TEST_PROGS=nf_conntrrack_packetdrill.sh TEST_GEN_PROGS="" run_tests
+make: Entering directory '/home/virtme/testing-15/tools/testing/selftests'
+make[1]: Entering directory '/home/virtme/testing-15/tools/testing/selftests/net/netfilter'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/home/virtme/testing-15/tools/testing/selftests/net/netfilter'
+make[1]: Entering directory '/home/virtme/testing-15/tools/testing/selftests/net/netfilter'
+TAP version 13
+1..1
+# timeout set to 1800
+# selftests: net/netfilter: nf_conntrack_packetdrill.sh
+# Replaying packetdrill test cases:
+# packetdrill/conntrack_ack_loss_stall.pkt          (ipv4)                    OK
+# packetdrill/conntrack_ack_loss_stall.pkt          (ipv6)                    OK
+# packetdrill/conntrack_inexact_rst.pkt             (ipv4)                    OK
+# packetdrill/conntrack_inexact_rst.pkt             (ipv6)                    OK
+# packetdrill/conntrack_syn_challenge_ack.pkt       (ipv4)                    OK
+# packetdrill/conntrack_syn_challenge_ack.pkt       (ipv6)                    OK
+# packetdrill/conntrack_synack_old.pkt              (ipv4)                    OK
+# packetdrill/conntrack_synack_old.pkt              (ipv6)                    OK
+# packetdrill/conntrack_synack_reuse.pkt            (ipv4)                    OK
+# packetdrill/conntrack_synack_reuse.pkt            (ipv6)                    packetdrill/conntrack_synack_reuse.pkt:33: error executing `conntrack -L -p tcp --dport 8080 2>/dev/null | grep -q SYN_RECV` command: non-zero status 1
+# FAIL
+# packetdrill/conntrack_rst_invalid.pkt             (ipv4)                    OK
+# packetdrill/conntrack_rst_invalid.pkt             (ipv6)                    OK
+not ok 1 selftests: net/netfilter: nf_conntrack_packetdrill.sh # exit=1
+make[1]: Leaving directory '/home/virtme/testing-15/tools/testing/selftests/net/netfilter'
+make: Leaving directory '/home/virtme/testing-15/tools/testing/selftests'
+
+https://netdev-3.bots.linux.dev/vmksft-nf/results/593541/23-nf-conntrack-packetdrill-sh/stdout
+
+same for the retry:
+
+https://netdev-3.bots.linux.dev/vmksft-nf/results/593541/23-nf-conntrack-packetdrill-sh-retry/stdout
+
+Not much to go on here, anything I can do to help debug?
 
