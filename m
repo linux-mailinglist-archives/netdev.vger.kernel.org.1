@@ -1,154 +1,137 @@
-Return-Path: <netdev+bounces-95921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-95922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60FB08C3D74
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 10:43:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 462248C3D7F
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 10:46:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B859FB209DF
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 08:43:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 717191C21258
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 08:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C19147C91;
-	Mon, 13 May 2024 08:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 588CC147C7F;
+	Mon, 13 May 2024 08:46:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Syxg9neN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GZyl9YrV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9FB147C7F;
-	Mon, 13 May 2024 08:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0C81474C8
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 08:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715589775; cv=none; b=iMRatYZY/Q6mmz0mRaRbHHJvsMrgnPlAz3/Aa55298uDuTAD6z9vMozjz00uiBcXgHRrt7mZEctLgyOTn29M1B4i16Bk5lbKaTLk2Qp1O8Mh3Ob/aR6tOJBgWU4E4Lj6GYblakla9t60Gxv2lxYI6LAzfbInIsmDcOZobKteH10=
+	t=1715590005; cv=none; b=VCH5C+2ItXt0/m9cdGrTZBBTOgRVLt5G7J9Zol0OqNkpNrPA2Tg4J9FvGTMCnGzubmYo5Iphz8nZVHWYPAhBqQaCi2RX4TRltrAdZe/EfSzt3J/LOuDxiEPq49bD6JGaciFn4aIkIOyrNXVa6vBjnKZ8oVruNgaKX0ARJawPOyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715589775; c=relaxed/simple;
-	bh=y7lPqf6Kbd8pfKb7R0gWDlNSm18f/VWp7Do2LxaEh3w=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=h5e3AKyGl3a0ECVAMz3sv3vk7mohDnmRiPg7FI5I+bC7lZIMdvurdkJSPkMf7NMPL3pVPv47IZcL4f31KoM12Y2gLfq2JsRHFBsW+KcLRiE9H3cs9+RabjQSci5l8GoPVEWUwOrQjrfxWxxOLQOJ3a88vGK09H5e3yFpVcHIQao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Syxg9neN; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1715590005; c=relaxed/simple;
+	bh=llMwm1BKII5UXiY/o5N362Dkysqg12XYpo/sRjuvWxM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=VlgxaCERqZlgeQ5H/dcx0hjdTb/a7xEtQ0uQLUhxycQO1+38upD5ppnPcCnqq9x0Oq6vQZ2aVfd5pgkNJaUZX7+2R9rvGV1O417k/+xRscwM+OCcOlIlxva+pKqzaMaGRNO7px34aKUogMtetVY24Uzm3cXopXH6FqKl8GxOsJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GZyl9YrV; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1ec69e3dbcfso30530475ad.0;
-        Mon, 13 May 2024 01:42:54 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a59a64db066so1017381666b.3
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 01:46:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715589774; x=1716194574; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y7lPqf6Kbd8pfKb7R0gWDlNSm18f/VWp7Do2LxaEh3w=;
-        b=Syxg9neNdLuft7fTZdu9MhWAWgirpHfemMYhZaber6dr6kfUuoZUd7W2FWBZyO1xxX
-         f1TAiHc3cNSRDtqFneqYdsIfisWW2vnT2nv4hLWPOW0m3Uwa+eDMYchBtTcr4NB9fzW9
-         HQJHjBD0nzJAEcd6Ca6+Kfn3UX3Kqgj7XUExfsQG1o8jcCiovp5C2/x8flkjCdRNnlyj
-         Osw1o3gukIBcYI1SYdf1dIsVTxJ3bAoCKbZ7j4Z/RLZNhpaTSkZxR9D22+GodM8VLJDS
-         JYG7PMI6oKH+rscTycPXXC8NV42sofTrHjX1aeP2A1+P0lXrbe6j88r+1IPwJ9+JDvj3
-         HDdA==
+        d=gmail.com; s=20230601; t=1715590002; x=1716194802; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=llMwm1BKII5UXiY/o5N362Dkysqg12XYpo/sRjuvWxM=;
+        b=GZyl9YrVjNNHlwzeKVi4CeR2PsgaMBk8BpuDZNW4D4DslJo0xe/24BrLMB2Um4ww2x
+         QfkYwRpn5QU5esZAs5ctg5qdZKLKl8brfmx3f/uwSubmNJ4OAyYN6NMs/2LQhdvA8Rpy
+         G8pLplbwklmWmPpC21Tbkfaep3E3/JIlvmDoiHnuNcwukYxeeq2tQSATuriGMvSN4dfa
+         VO0cwXzFbSVQt456T2jkKYDSp5LLJfc5iCtY+HwXJpiECJWqiq0uHs8ZJ+yMdlSymsgf
+         vatRd9qgyPHLRAvDvNSuIf5R+NVmR9UKPBDJFAXPxFsJPyLzK+FfuYiePi+dv02ak9L6
+         lqYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715589774; x=1716194574;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y7lPqf6Kbd8pfKb7R0gWDlNSm18f/VWp7Do2LxaEh3w=;
-        b=pnE/ti4yMYa8bAE2oSzaqwpo/EkDWEGzI60Hyn74MJvDxCpe0okXYxsjlxsdsW2M3f
-         26bJqQJgq+jTiUCovb42XOklWFWun59rddpn7B5jdGcYcDrs9cU1AI984d7SZJryCvOB
-         b8+gfBVaVVRqio4D2YbO2GwkgyLHjFc5BMfBZyV45YwlB4lzzPoMBvfEMq3zseDUMMEF
-         E5JGdgciteH4NBeoP2m6ZPeuy0clleJe5WF9aEHqvrVrn2SxR6MbcD35aqXjw+w+25zb
-         HxYb8yQ1wd9BIoQSyE/kVIsLSXvkdtkjHn2VhEeFS3W2e37u1hghjO4SthtzXb7SAsUP
-         Vcsg==
-X-Forwarded-Encrypted: i=1; AJvYcCU+9M9aD8/8yWTAioR0BJsaQtYYMxVcW3B2zfq9anTREunaL+p42o6Ep4/1FRieciOL5KhMXQeQw0tMCwp0eWCeKNXzvYqo
-X-Gm-Message-State: AOJu0YyZzrF9fRJeN8Ql/FGJ3m8Zob6+jbRLdK847cuAEq+ijyT15JaO
-	NFgGs61uj8oisqaBCjmmAgyPDBbN8lhGCuaTJZf9pXY5pAd39ugg
-X-Google-Smtp-Source: AGHT+IG75rkNOpcpo5GhLpsIDduIrQUEWF6yC924gDigs5v7pfDFIFCXraNZ7Di0/yOikq6t4XIz3Q==
-X-Received: by 2002:a17:903:1251:b0:1eb:5344:6a01 with SMTP id d9443c01a7336-1ef4404a25bmr103311395ad.44.1715589773717;
-        Mon, 13 May 2024 01:42:53 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bf31a32sm75607045ad.123.2024.05.13.01.42.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 01:42:53 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id EB5A2181C8FA4; Mon, 13 May 2024 15:42:50 +0700 (WIB)
-Date: Mon, 13 May 2024 15:42:50 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Regressions <regressions@lists.linux.dev>,
-	Linux Networking <netdev@vger.kernel.org>,
-	intel-wired-lan@lists.osuosl.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	lukas.probsthain@googlemail.com
-Subject: Regression of e1000e (I219-LM) from 6.1.90 to 6.6.30
-Message-ID: <ZkHSipExKpQC8bWJ@archie.me>
+        d=1e100.net; s=20230601; t=1715590002; x=1716194802;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=llMwm1BKII5UXiY/o5N362Dkysqg12XYpo/sRjuvWxM=;
+        b=jH3DvgMbL4goM3t1oDr1Z2CTKjtBFF2HgKpKrEsbLLUd5Qd4J10/TLH/5MDnXc6Up6
+         1EGYYQy3Wlz34DaNRE1wMbH8y37mY4QKIcAxWQqc/vmBA1Fu3M/pOpCeI84P33dfaB/N
+         8u55stoAWPDl98YvSAcMar4BwNhjFg5GeZZ2ES7r6imhinhruv4zg0XfQYYOduSKCUDr
+         Bbf29F8bPC3S+qyPb9G+bJ4+ombgUtja2GNZ5as6XjDY0Hx6/RJYmY6O4tjbPKcF7nQI
+         hOEmZYceqWpkI3P4GUUY/jzFtDLjkBUrGGUyU1NyAZGu+65qBOzjfyFckcmS7ma/qvGf
+         SDUw==
+X-Gm-Message-State: AOJu0Yz56KtMtiU135XXLsXWrlDYpHRIltrGm/QebAkp+3BV1ObiArF8
+	1RZvWckXi4sHhSt3IfEkHsplvYjod5iCNrYbTThkOCj4RWfjAlubFGKoNqbbt6SwZ38OCGR2fKK
+	xOPday1XtFGxud3YgGYFZgMdRB6mecHiZe9z7Lw==
+X-Google-Smtp-Source: AGHT+IGw4UeaEF1A2A8SIdOzsKRDhgmp35ANu/NeoOBUvSCQC6Muqom+dHlIuY0oc3PVomnwn6kqv2PkPtl/jsgNIpc=
+X-Received: by 2002:a50:9e64:0:b0:56e:2daf:1ee6 with SMTP id
+ 4fb4d7f45d1cf-5734d5c156bmr5350777a12.16.1715590001814; Mon, 13 May 2024
+ 01:46:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2ae47ss+eiIbn41c"
-Content-Disposition: inline
+From: Antaryo Prospero <jansaley@gmail.com>
+Date: Mon, 13 May 2024 11:46:30 +0300
+Message-ID: <CACFj3Te-_zda_VKa-So3NMkpDn6Tijj=u+S6GSejB8FALSexEQ@mail.gmail.com>
+Subject: [BUG] IPv6 GRE does not work in multipoint mode
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+I tried to use GRE in multipoint mode, without specifying the remote
+address in GRE config.
 
---2ae47ss+eiIbn41c
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I use the following configurations for tests:
+Host1 - Router - Host2
 
-Hi,
+#Host1 GRE
 
-<lukas.probsthain@googlemail.com> reported on Bugzilla
-(https://bugzilla.kernel.org/show_bug.cgi?id=3D218826) regression on his Th=
-inkpad
-T480 with Intel I219-LM:
+auto mgre0
+iface mgre0 inet6 static
+address 2024:10::21/112
+pre-up ip tunnel add mgre0 mode ip6gre key 1 tos inherit ttl 64 local
+7d:168::2001
+pre-up ip link set mgre0 mtu 1400
+pre-up ip link set mgre0 multicast on
+post-up ethtool -K mgre0 tx-checksumming off > /dev/null
+post-down ip link del mgre0
 
-> After updating from kernel version 6.1.90 to 6.6.30, the e1000e driver ex=
-hibits a regression on a Lenovo Thinkpad T480 with an Intel I219-LM Etherne=
-t controller. The system experiences a freeze when an Ethernet cable is plu=
-gged in. The issue is not present in the previous kernel version 6.1.90.
->=20
-> System Information:
-> - Model: Lenovo Thinkpad T480
-> - BIOS Version: N24ET76W (1.51) dated 02/27/2024
-> - Ethernet Controller: Intel Corporation Ethernet Connection (4) I219-LM =
-(rev 21)
-> - Kernel Module in Use: e1000e
-> - Operating System: Manjaro Linux, kernel version 6.6.30-1
->=20
-> Steps to Reproduce:
-> 1. Boot system with kernel version 6.6.30.
-> 2. Connect the Ethernet cable to the laptop.
-> 3. Observe that the system freezes.
->=20
-> Expected Behavior:
-> The system should remain stable and maintain network connectivity without=
- freezing when the Ethernet cable is connected.
->=20
-> Actual Behavior:
-> The system freezes immediately upon plugging in the Ethernet cable.
->=20
-> Additional Information:
-> The regression seems to be introduced in one of the updates between kerne=
-l versions 6.1.90 and 6.6.30. The issue does not occur with the older kerne=
-l version 6.1.90.
+#Host2 GRE
 
-Thanks.
+auto mgre0
+iface mgre0 inet6 static
+address 2024:10::22/112
+pre-up ip tunnel add mgre0 mode ip6gre key 1 tos inherit ttl 64 local
+7d:168::2002
+pre-up ip link set mgre0 mtu 1400
+pre-up ip link set mgre0 multicast on
+post-up ethtool -K mgre0 tx-checksumming off > /dev/null
+post-down ip link del mgre0
 
---=20
-An old man doll... just what I always wanted! - Clara
+where 7d:168::2001 and 7d:168::2002 are the local network addresses of
+Host1 and Host2 respectively.
 
---2ae47ss+eiIbn41c
-Content-Type: application/pgp-signature; name="signature.asc"
+Because iproute2 takes IPv6 addresses as invalid MAC addresses, I have
+to use my own tool based on iproute2 to create neighbour records.
 
------BEGIN PGP SIGNATURE-----
+But, as the result, the packets are dropped. At the same time, GRE in
+IPv4 multipoint mode works and allows to connect two or more nodes.
 
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZkHSigAKCRD2uYlJVVFO
-o0Z/AQCIkJz7plid8wPPU7db5xKtA7Ftq60HC/uJ7718jfmBkgEAtvtduKsDn2CB
-sliUh8IN6Cx7oNQTIYq+Il73paLXMAk=
-=lNxt
------END PGP SIGNATURE-----
+E.g. this IPv4 GRE config, which differs only by IP address family, works:
 
---2ae47ss+eiIbn41c--
+#Host1
+auto mgre0
+iface mgre0 inet static
+address 10.10.10.3/24
+pre-up ip tunnel add mgre0 mode gre key 1 tos inherit ttl 64 local 172.168.10.3
+pre-up ip link set mgre0 mtu 1400
+pre-up ip link set mgre0 multicast on
+post-up ethtool -K mgre0 tx-checksumming off > /dev/null
+post-down ip link del mgre0
+
+#Host2
+auto mgre0
+iface mgre0 inet static
+address 10.10.10.4/24
+pre-up ip tunnel add mgre0 mode gre key 1 tos inherit ttl 64 local 172.168.10.4
+pre-up ip link set mgre0 mtu 1400
+pre-up ip link set mgre0 multicast on
+post-up ethtool -K mgre0 tx-checksumming off > /dev/null
+post-down ip link del mgre0
 
