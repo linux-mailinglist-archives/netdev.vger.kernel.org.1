@@ -1,501 +1,175 @@
-Return-Path: <netdev+bounces-96059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83BC08C421B
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 15:41:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E0E98C427F
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 15:50:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A47FE1C2131D
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:41:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5D261F20C27
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 13:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C8C1534F5;
-	Mon, 13 May 2024 13:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E291B153515;
+	Mon, 13 May 2024 13:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="orMPQuCI"
+	dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b="LIOJ2fL/"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503C4152192;
-	Mon, 13 May 2024 13:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8B7153502
+	for <netdev@vger.kernel.org>; Mon, 13 May 2024 13:50:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715607687; cv=none; b=K/P3GQelXEdsMGdq8+Gz65LJR8B8M1vcqiMmDIwBsHIxLlzB2O3iIjCBQgARw6iyeMj13n9oANYKN7Cduzshx04QEh816Qpxiy+0cd/QfoTUFvyJEu3FGol9y05OtqXWG5qbXdl9KbsalMmrEgm9eqd9h5jfhadwiutZX+ykPQY=
+	t=1715608213; cv=none; b=I6X5Or9a6z1D9w78tiY2T2LZYXiD85KbYvvoumkiF4ASYcQlbyRsLY8cp7EUBiE3laFKAdP0156r5G1Z4OpjU+eMv+X5/hdPBeDYX4xfNa1PKPoU1Ir5Tw/tutvaQuvbXSW7klnSTKLZMt7AWBszeozCo3e0u+LNrWOvIUZq2iU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715607687; c=relaxed/simple;
-	bh=kOtmQucOjdTVQ4C4CCGVBpAud+gWItSwdt+VC1ta+HE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=g5QrRDgR2Mmp7QnqMCql4NE9Nk6r9MIRh9bSafjmIsUhqPeZlO4MjXzIhKrrpXjZW44W72JvCYfCtuo6PzZvR/CEickF9kVJkEGllhLMkvURTrICwSFx4PP+pRIbR23aWHYBdgmhD9uPJ8ZCgFfmwtSHV+swiOG2rAt3Zqo7hz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=orMPQuCI; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=M8D91Jgd2OMdgh40j58EK2k+j4VPLZ6VACEDz24PHFg=; b=orMPQuCIzT/oDszvt9qfR5R0zU
-	TNL5qoag8Gz9nE93PlbQP3fgxIExnPQtT+6S3xh0WiO8oTFykK899wGwyTEuMPN7RdCWrj2n6IL6X
-	87NCAwEBfzxlFhTdPQZDKTOV3dzc5V2Ic6Ii5ZkNgkCYZovrzzY/ljotz110chulxmkkxLAmtbPkk
-	V+5UAw1jrsXD8LqXlOwx8wbYLwLf9HmeEVcanNXsosGxb2HQ3Pe+udvwzmYOBjzIE0Cr+g65QzCDN
-	tSt1NswtX7pHCTdGNGUsq+DnVWTmppFgXYcq/QriGGRiphZcALoNG8vlTX4m8x6d3wlt9S6ygbh8Q
-	BQ05UFdw==;
-Received: from mob-194-230-158-151.cgn.sunrise.net ([194.230.158.151] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1s6Vva-000DBd-I4; Mon, 13 May 2024 15:41:19 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf-next 2024-05-13
-Date: Mon, 13 May 2024 15:41:14 +0200
-Message-Id: <20240513134114.17575-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	s=arc-20240116; t=1715608213; c=relaxed/simple;
+	bh=QgVlfxYOcO6a2FGRtcT89N1sWNGBmwzz5a1/43rPcZ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CeDN3Hrc8Ya1SK3RpBcztVmMgGv3jPacFa0gFnraU1glkKAo5mzSQTIcOFedIza3ipA4CInP+BPfLBFU3UALN2ftTyyUo3bkRwAuC2Adq8rBzleLFgEuftL/9SIyZgGC+xUdo/eFXWXqZ9m+wCVsANjVjmHYWFnHSOr/Jgqcix0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se; spf=pass smtp.mailfrom=ferroamp.se; dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b=LIOJ2fL/; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ferroamp.se
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-51fc01b6fe7so4541883e87.0
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 06:50:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ferroamp-se.20230601.gappssmtp.com; s=20230601; t=1715608210; x=1716213010; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7SH0MPbViZO4ZlHlcqCmeWajuCbTevJze0Tg6yt/BEo=;
+        b=LIOJ2fL/YVmZ8mWaZo13qPlgAz/M5QqzftaLqIqyGU4eZ7YrWn8/NQBgGbUBwY6wQM
+         Y1e0x1qTlYQ8sp/lcfPLBTD15Qs0pKrccrkhvxaa/2zybEO2vuAqmBOLYrYqBgZ/pO2e
+         Q9zyIiDBb74NxJ3b5KS+Zs/M1AqN73tGrnnLjYGzFWoKvrj6f9LAw7/3Kh47Mtc48qen
+         e02c6rVsZs7Egm3YSVHbdzix+9wbxutlMN1LwPLISXIeY3ImL0Wjbhd4uYV3Jq+NFLK9
+         +ijaetGyW1AriRqYa8dn6rPzlb1pjFgqGXb1h9UwclNaOBZUT1J+Ws3vc0sbbjtMV36F
+         /C+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715608210; x=1716213010;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7SH0MPbViZO4ZlHlcqCmeWajuCbTevJze0Tg6yt/BEo=;
+        b=h5TE9IGhDR1QFXB78SLXdobGtaRW9ys6B5qGkPCJYv1I1edBh5BcoQjwbr2a45zYtx
+         S5jUZyMo/9XjRE6ZaJv0BmgoRT2yZcbrp5dQjfV4HMtOQI2X4J17EuaDUZfe65g1W8lN
+         2H6ZbZmyIxAHgHxLCz2Iaq2+Mi7OY+A8trMgX+LvIDIMdxf2SyyGEEZotvuYNUSfPs2R
+         D5cyaRvz2oFql4Y3RwqfP3fpP1nGY94TT34cWt2x4ykTt9eA5pdBPftdeyA+orOyzwGG
+         szLB/nDStGSjuSPicjR/QSprO06KJgVtZV+mHrSKe5fM19zeMpv2vOr8LcoSgLZXgK+K
+         Wo8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUxX9r/CiHsHMVilVuJsD33Niq7gos68+cw1r7V3FaZxMPqfYONEaPqoJkKcx5YeERxxWFLpq7WlFP1CX4qAYGcmfwUmEhU
+X-Gm-Message-State: AOJu0YyUEKUpkve6XK15wJKu9IiSBDHMMYTr57h140BPAI6WLDWZaQrY
+	cowyfWRh+r9KVDOk2gBpnlymOeoiSP4As5wSy2gYn+gBIsz1r8V05G2HiR5+bpk=
+X-Google-Smtp-Source: AGHT+IE6Fh0wozcrwTaLf5Ahj24hiWMshe8JoObyBhlcx94qEfxBLJBCl9i+5vlSidtgIAFlzmLVlg==
+X-Received: by 2002:a19:e01e:0:b0:51e:ef3f:e74d with SMTP id 2adb3069b0e04-522105847a4mr6673352e87.62.1715608210347;
+        Mon, 13 May 2024 06:50:10 -0700 (PDT)
+Received: from minibuilder (c188-149-135-220.bredband.tele2.se. [188.149.135.220])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-521f39d3674sm1782660e87.295.2024.05.13.06.50.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 May 2024 06:50:09 -0700 (PDT)
+Date: Mon, 13 May 2024 15:50:08 +0200
+From: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
+	"Parthiban.Veerasooran@microchip.com" <Parthiban.Veerasooran@microchip.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"saeedm@nvidia.com" <saeedm@nvidia.com>,
+	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"Horatiu.Vultur@microchip.com" <Horatiu.Vultur@microchip.com>,
+	"ruanjinjie@huawei.com" <ruanjinjie@huawei.com>,
+	"Steen.Hegelund@microchip.com" <Steen.Hegelund@microchip.com>,
+	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+	"UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>,
+	"Thorsten.Kummermehr@microchip.com" <Thorsten.Kummermehr@microchip.com>,
+	Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>,
+	"Nicolas.Ferre@microchip.com" <Nicolas.Ferre@microchip.com>,
+	"benjamin.bigler@bernformulastudent.ch" <benjamin.bigler@bernformulastudent.ch>
+Subject: Re: [PATCH net-next v4 05/12] net: ethernet: oa_tc6: implement error
+ interrupts unmasking
+Message-ID: <ZkIakC6ixYpRMiUV@minibuilder>
+References: <Zi4czGX8jlqSdNrr@builder>
+ <874654d4-3c52-4b0e-944a-dc5822f54a5d@lunn.ch>
+ <ZjKJ93uPjSgoMOM7@builder>
+ <b7c7aad7-3e93-4c57-82e9-cb3f9e7adf64@microchip.com>
+ <ZjNorUP-sEyMCTG0@builder>
+ <ae801fb9-09e0-49a3-a928-8975fe25a893@microchip.com>
+ <fd5d0d2a-7562-4fb1-b552-6a11d024da2f@lunn.ch>
+ <BY5PR02MB678683EADBC47A29A4F545A59D1C2@BY5PR02MB6786.namprd02.prod.outlook.com>
+ <ZkG2Kb_1YsD8T1BF@minibuilder>
+ <708d29de-b54a-40a4-8879-67f6e246f851@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27274/Mon May 13 10:25:26 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <708d29de-b54a-40a4-8879-67f6e246f851@lunn.ch>
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+On Mon, May 13, 2024 at 03:00:48PM +0200, Andrew Lunn wrote:
+> > I've enabled some debugging options but so far nothing seems to hit.
+> > What I've been able to conclude is that there still is SPI
+> > communication, the macphy interrupt is still pulled low, and the cpu
+> > does the ack so that it's reset to inactive.
+> 
+> Is it doing this in an endless cycle?
 
-The following pull-request contains BPF updates for your *net-next* tree.
+Exactly, so what I'm seeing is when the driver livelocks the macphy is
+periodically pulling the irq pin low, the driver clears the interrupt
+and repeat.
 
-We've added 119 non-merge commits during the last 14 day(s) which contain
-a total of 134 files changed, 9462 insertions(+), 4742 deletions(-).
+> 
+> Probably the debug tools are not showing anything because it is not
+> looping in just one location. It is a complex loop, interrupts
+> triggering a thread which runs to completion etc. So it looks like
+> normal behaviour.
 
-The main changes are:
+Gotcha. The 'do work' func called in the worker threads loop does run
+and return, so I guess there is not much to trigger on.
 
-1) Add BPF JIT support for 32-bit ARCv2 processors, from Shahab Vahedi.
+> 
+> If it is an endless cycle, it sounds like an interrupt storm. Some
+> interrupt bit is not getting cleared, so it immediately fires again as
+> soon as interrupts are enabled.
 
-2) Add BPF range computation improvements to the verifier in particular around XOR and OR
-   operators, refactoring of checks for range computation and relaxing MUL range computation
-   so that src_reg can also be an unknown scalar, from Cupertino Miranda.
+Good input. I'll add some instrumentation/stats for how many jiffies
+have elapsed between releases of the worker thread and for the irq
+handler. I can probably find a gpio to toggle as well if it's really
+tight timings.
 
-3) Add support to attach kprobe BPF programs through kprobe_multi link in a session mode, meaning,
-   a BPF program is attached to both function entry and return, the entry program can decide if
-   the return program gets executed and the entry program can share u64 cookie value with return
-   program. Session mode is a common use-case for tetragon and bpftrace, from Jiri Olsa.
+The irq pin is inactive/high for 100s of us to ms in the measurments
+I've done. But I've been using multiple channels and not the fanciest
+equipment so samplerates might be playing tricks, I'll rerun some tests
+while only measuring the irq pin.
 
-4) Fix a potential overflow in libbpf's ring__consume_n() and improve libbpf as well as
-   BPF selftest's struct_ops handling, from Andrii Nakryiko.
+> 
+> Is this your dual device board? Do you have both devices on the same
+> SPI bus? Do they share interrupt lines?
+> 
 
-5) Improvements to BPF selftests in context of BPF gcc backend, from Jose E. Marchesi & David Faust.
+It's on the dual device board, the macphys are using separate spi buses,
+one chip shares the bus with another spi device, but the other is the
+only tenant on the bus.
 
-6) Migrate remaining BPF selftest tests from test_sock_addr.c to prog_test-style in order to
-   retire the old test, run it in BPF CI and additionally expand test coverage, from Jordan Rife.
+No device shares an irq line.
 
-7) Big batch for BPF selftest refactoring in order to remove duplicate code around common network
-   helpers, from Geliang Tang.
+Pretty sure I can replicate the result for both devices, but need to 
+double check, been to much testing of random things for me to keep track.
 
-8) Another batch of improvements to BPF selftests to retire obsolete bpf_tcp_helpers.h as
-   everything is available vmlinux.h, from Martin KaFai Lau.
+I'll do some more digging, I think we're getting pretty close to
+understading the behaviour now.
 
-9) Fix BPF map tear-down to not walk the map twice on free when both timer and wq is
-   used, from Benjamin Tissoires.
-
-10) Fix BPF verifier assumptions about socket->sk that it can be non-NULL, from Alexei Starovoitov.
-
-11) Change BTF build scripts to using --btf_features for pahole v1.26+, from Alan Maguire.
-
-12) Small improvements to BPF reusing struct_size() and krealloc_array(), from Andy Shevchenko.
-
-13) Fix s390 JIT to emit a barrier for BPF_FETCH instructions, from Ilya Leoshkevich.
-
-14) Extend TCP ->cong_control() callback in order to feed in ack and flag parameters and
-    allow write-access to tp->snd_cwnd_stamp from BPF program, from Miao Xu.
-
-15) Add support for internal-only per-CPU instructions to inline bpf_get_smp_processor_id()
-    helper call for arm64 and riscv64 BPF JITs, from Puranjay Mohan.
-
-16) Follow-up to remove the redundant ethtool.h from tooling infrastructure,
-    from Tushar Vyavahare.
-
-17) Extend libbpf to support "module:<function>" syntax for tracing programs,
-    from Viktor Malik.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Andrii Nakryiko, Björn Töpel, Eduard Zingerman, Eric Dumazet, Jakub 
-Kicinski, John Fastabend, kernel test robot, Kumar Kartikeya Dwivedi, 
-Liam Wisehart, Pu Lehui, Puranjay Mohan, Quentin Monnet, Toke 
-Høiland-Jørgensen, Yonghong Song
-
-----------------------------------------------------------------
-
-The following changes since commit 89de2db19317fb89a6e9163f33c3a7b23ee75a18:
-
-  Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next (2024-04-29 13:12:19 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-for you to fetch changes up to ba39486d2c43ba7c103c438540aa56c8bde3b6c7:
-
-  bpf: make list_for_each_entry portable (2024-05-12 17:41:44 -0700)
-
-----------------------------------------------------------------
-bpf-next-for-netdev
-
-----------------------------------------------------------------
-Alan Maguire (1):
-      kbuild,bpf: Switch to using --btf_features for pahole v1.26 and later
-
-Alexei Starovoitov (5):
-      bpf: Fix verifier assumptions about socket->sk
-      Merge branch 'bpf-verifier-range-computation-improvements'
-      Merge branch 'selftests-bpf-retire-bpf_tcp_helpers-h'
-      Merge branch 'bpf-inline-helpers-in-arm64-and-riscv-jits'
-      Merge branch 'retire-progs-test_sock_addr'
-
-Andrii Nakryiko (17):
-      Merge branch 'free-strdup-memory-in-selftests'
-      libbpf: handle nulled-out program in struct_ops correctly
-      selftests/bpf: validate nulled-out struct_ops program is handled properly
-      Merge branch 'bpf-introduce-kprobe_multi-session-attach'
-      Merge branch 'libbpf-support-module-function-syntax-for-tracing-programs'
-      libbpf: better fix for handling nulled-out struct_ops program
-      libbpf: fix potential overflow in ring__consume_n()
-      libbpf: fix ring_buffer__consume_n() return result logic
-      Merge branch 'bpf-avoid-attribute-ignored-warnings-in-gcc'
-      Merge branch 'fix-number-of-arguments-in-test'
-      libbpf: remove unnecessary struct_ops prog validity check
-      libbpf: handle yet another corner case of nulling out struct_ops program
-      selftests/bpf: add another struct_ops callback use case test
-      libbpf: fix libbpf_strerror_r() handling unknown errors
-      libbpf: improve early detection of doomed-to-fail BPF program loading
-      selftests/bpf: validate struct_ops early failure detection logic
-      selftests/bpf: shorten subtest names for struct_ops_module test
-
-Andy Shevchenko (2):
-      bpf: Use struct_size()
-      bpf: Switch to krealloc_array()
-
-Benjamin Tissoires (3):
-      bpf: Do not walk twice the map on free
-      bpf: Do not walk twice the hash map on free
-      selftests/bpf: Drop an unused local variable
-
-Cupertino Miranda (9):
-      bpf/verifier: replace calls to mark_reg_unknown.
-      bpf/verifier: refactor checks for range computation
-      bpf/verifier: improve XOR and OR range computation
-      selftests/bpf: XOR and OR range computation tests.
-      bpf/verifier: relax MUL range computation check
-      selftests/bpf: MUL range computation tests.
-      selftests/bpf: Add CFLAGS per source file and runner
-      selftests/bpf: Change functions definitions to support GCC
-      selftests/bpf: Fix a few tests for GCC related warnings.
-
-David Faust (1):
-      bpf: avoid gcc overflow warning in test_xdp_vlan.c
-
-Dmitrii Bundin (1):
-      bpf: Include linux/types.h for u32
-
-Geliang Tang (12):
-      selftests/bpf: Free strdup memory in test_sockmap
-      selftests/bpf: Free strdup memory in veristat
-      selftests/bpf: Add opts argument for __start_server
-      selftests/bpf: Make start_mptcp_server static
-      selftests/bpf: Drop start_server_proto helper
-      selftests/bpf: Add post_socket_cb for network_helper_opts
-      selftests/bpf: Use start_server_addr in sockopt_inherit
-      selftests/bpf: Use start_server_addr in test_tcp_check_syncookie
-      selftests/bpf: Use connect_to_fd in sockopt_inherit
-      selftests/bpf: Use connect_to_fd in test_tcp_check_syncookie
-      selftests/bpf: Drop get_port in test_tcp_check_syncookie
-      selftests/bpf: Free strdup memory in xdp_hw_metadata
-
-Haiyue Wang (1):
-      bpf: Remove redundant page mask of vmf->address
-
-Ilya Leoshkevich (1):
-      s390/bpf: Emit a barrier for BPF_FETCH instructions
-
-Jiri Olsa (9):
-      bpf: Add support for kprobe session attach
-      bpf: Add support for kprobe session context
-      bpf: Add support for kprobe session cookie
-      libbpf: Add support for kprobe session attach
-      libbpf: Add kprobe session attach type name to attach_type_name
-      selftests/bpf: Add kprobe session test
-      selftests/bpf: Add kprobe session cookie test
-      libbpf: Fix error message in attach_kprobe_session
-      libbpf: Fix error message in attach_kprobe_multi
-
-John Hubbard (1):
-      bpftool, selftests/hid/bpf: Fix 29 clang warnings
-
-Jordan Rife (23):
-      selftests/bpf: Fix bind program for big endian systems
-      selftests/bpf: Implement socket kfuncs for bpf_testmod
-      selftests/bpf: Implement BPF programs for kernel socket operations
-      selftests/bpf: Move IPv4 and IPv6 sockaddr test cases
-      selftests/bpf: Make sock configurable for each test case
-      selftests/bpf: Add kernel socket operation tests
-      selftests/bpf: Migrate recvmsg* return code tests to verifier_sock_addr.c
-      selftests/bpf: Use program name for skel load/destroy functions
-      selftests/bpf: Handle LOAD_REJECT test cases
-      selftests/bpf: Handle ATTACH_REJECT test cases
-      selftests/bpf: Handle SYSCALL_EPERM and SYSCALL_ENOTSUPP test cases
-      selftests/bpf: Migrate WILDCARD_IP test
-      selftests/bpf: Migrate sendmsg deny test cases
-      selftests/bpf: Migrate sendmsg6 v4 mapped address tests
-      selftests/bpf: Migrate wildcard destination rewrite test
-      selftests/bpf: Migrate expected_attach_type tests
-      selftests/bpf: Migrate ATTACH_REJECT test cases
-      selftests/bpf: Remove redundant sendmsg test cases
-      selftests/bpf: Retire test_sock_addr.(c|sh)
-      selftests/bpf: Expand sockaddr program return value tests
-      sefltests/bpf: Expand sockaddr hook deny tests
-      selftests/bpf: Expand getsockname and getpeername tests
-      selftests/bpf: Expand ATTACH_REJECT tests
-
-Jose E. Marchesi (13):
-      bpf: Missing trailing slash in tools/testing/selftests/bpf/Makefile
-      libbpf: Fix bpf_ksym_exists() in GCC
-      libbpf: Avoid casts from pointers to enums in bpf_tracing.h
-      bpf: Avoid __hidden__ attribute in static object
-      bpf: Disable some `attribute ignored' warnings in GCC
-      bpf: Temporarily define BPF_NO_PRESEVE_ACCESS_INDEX for GCC
-      bpf: avoid uninitialized warnings in verifier_global_subprogs.c
-      bpf: avoid UB in usages of the __imm_insn macro
-      bpf: guard BPF_NO_PRESERVE_ACCESS_INDEX in skb_pkt_end.c
-      bpf: Avoid uninitialized value in BPF_CORE_READ_BITFIELD
-      bpf: disable strict aliasing in test_global_func9.c
-      bpf: ignore expected GCC warning in test_global_func10.c
-      bpf: make list_for_each_entry portable
-
-Martin KaFai Lau (16):
-      Merge branch 'use network helpers, part 3'
-      Merge branch 'selftests/bpf: Add sockaddr tests for kernel networking'
-      Merge branch 'Add new args into tcp_congestion_ops' cong_control'
-      selftests/bpf: Use bpf_tracing.h instead of bpf_tcp_helpers.h
-      Merge branch 'libbpf: further struct_ops fixes and improvements'
-      selftests/bpf: Remove bpf_tracing_net.h usages from two networking tests
-      selftests/bpf: Add a few tcp helper functions and macros to bpf_tracing_net.h
-      selftests/bpf: Reuse the tcp_sk() from the bpf_tracing_net.h
-      selftests/bpf: Sanitize the SEC and inline usages in the bpf-tcp-cc tests
-      selftests/bpf: Rename tcp-cc private struct in bpf_cubic and bpf_dctcp
-      selftests/bpf: Use bpf_tracing_net.h in bpf_cubic
-      selftests/bpf: Use bpf_tracing_net.h in bpf_dctcp
-      selftests/bpf: Remove bpf_tcp_helpers.h usages from other misc bpf tcp-cc tests
-      selftests/bpf: Remove the bpf_tcp_helpers.h usages from other non tcp-cc tests
-      selftests/bpf: Retire bpf_tcp_helpers.h
-      Merge branch 'use network helpers, part 4'
-
-Miao Xu (3):
-      tcp: Add new args for cong_control in tcp_congestion_ops
-      bpf: tcp: Allow to write tp->snd_cwnd_stamp in bpf_tcp_ca
-      selftests/bpf: Add test for the use of new args in cong_control
-
-Michal Schmidt (1):
-      selftests/bpf: Fix pointer arithmetic in test_xdp_do_redirect
-
-Puranjay Mohan (6):
-      bpf, arm64: Add support for lse atomics in bpf_arena
-      riscv, bpf: add internal-only MOV instruction to resolve per-CPU addrs
-      riscv, bpf: inline bpf_get_smp_processor_id()
-      arm64, bpf: add internal-only MOV instruction to resolve per-CPU addrs
-      bpf, arm64: inline bpf_get_smp_processor_id() helper
-      riscv, bpf: make some atomic operations fully ordered
-
-Shahab Vahedi (1):
-      ARC: Add eBPF JIT support
-
-Tao Chen (1):
-      samples/bpf: Add valid info for VMLINUX_BTF
-
-Tushar Vyavahare (1):
-      tools: remove redundant ethtool.h from tooling infra
-
-Vadim Fedorenko (1):
-      bpf: crypto: fix build when CONFIG_CRYPTO=m
-
-Viktor Malik (3):
-      selftests/bpf: Run cgroup1_hierarchy test in own mount namespace
-      libbpf: support "module: Function" syntax for tracing programs
-      selftests/bpf: add tests for the "module: Function" syntax
-
-Xiao Wang (1):
-      riscv, bpf: Fix typo in comment
-
- Documentation/admin-guide/sysctl/net.rst           |    1 +
- Documentation/networking/filter.rst                |    4 +-
- MAINTAINERS                                        |    6 +
- arch/arc/Kbuild                                    |    1 +
- arch/arc/Kconfig                                   |    1 +
- arch/arc/net/Makefile                              |    6 +
- arch/arc/net/bpf_jit.h                             |  164 ++
- arch/arc/net/bpf_jit_arcv2.c                       | 3005 ++++++++++++++++++++
- arch/arc/net/bpf_jit_core.c                        | 1425 ++++++++++
- arch/arm64/include/asm/insn.h                      |    8 +
- arch/arm64/lib/insn.c                              |   11 +
- arch/arm64/net/bpf_jit.h                           |    8 +
- arch/arm64/net/bpf_jit_comp.c                      |   87 +-
- arch/riscv/net/bpf_jit.h                           |    4 +-
- arch/riscv/net/bpf_jit_comp64.c                    |   70 +-
- arch/s390/net/bpf_jit_comp.c                       |    8 +-
- include/linux/btf_ids.h                            |    2 +
- include/linux/filter.h                             |    1 +
- include/net/tcp.h                                  |    2 +-
- include/uapi/linux/bpf.h                           |    1 +
- kernel/bpf/Makefile                                |    2 +-
- kernel/bpf/arena.c                                 |    2 +-
- kernel/bpf/arraymap.c                              |   15 +-
- kernel/bpf/btf.c                                   |    3 +
- kernel/bpf/core.c                                  |   25 +-
- kernel/bpf/hashtab.c                               |   49 +-
- kernel/bpf/syscall.c                               |    7 +-
- kernel/bpf/verifier.c                              |  140 +-
- kernel/trace/bpf_trace.c                           |  106 +-
- net/ipv4/bpf_tcp_ca.c                              |    6 +-
- net/ipv4/tcp_bbr.c                                 |    2 +-
- net/ipv4/tcp_input.c                               |    2 +-
- samples/bpf/Makefile                               |    2 +-
- scripts/Makefile.btf                               |   15 +-
- tools/bpf/bpftool/Makefile                         |    2 +-
- tools/include/uapi/linux/bpf.h                     |    1 +
- tools/include/uapi/linux/ethtool.h                 | 2271 ---------------
- tools/lib/bpf/bpf.c                                |    1 +
- tools/lib/bpf/bpf_core_read.h                      |    1 +
- tools/lib/bpf/bpf_helpers.h                        |   17 +-
- tools/lib/bpf/bpf_tracing.h                        |   70 +-
- tools/lib/bpf/libbpf.c                             |  129 +-
- tools/lib/bpf/libbpf.h                             |    4 +-
- tools/lib/bpf/ringbuf.c                            |    4 +-
- tools/lib/bpf/str_error.c                          |   16 +-
- tools/lib/bpf/usdt.bpf.h                           |   24 +-
- tools/testing/selftests/bpf/.gitignore             |    1 -
- tools/testing/selftests/bpf/DENYLIST.aarch64       |    1 -
- tools/testing/selftests/bpf/Makefile               |   40 +-
- tools/testing/selftests/bpf/bpf_arena_list.h       |    4 +-
- tools/testing/selftests/bpf/bpf_experimental.h     |   33 +-
- tools/testing/selftests/bpf/bpf_kfuncs.h           |    3 +
- tools/testing/selftests/bpf/bpf_tcp_helpers.h      |  241 --
- .../selftests/bpf/bpf_testmod/bpf_testmod.c        |  255 ++
- .../selftests/bpf/bpf_testmod/bpf_testmod_kfunc.h  |   27 +
- tools/testing/selftests/bpf/cgroup_helpers.c       |    3 +
- tools/testing/selftests/bpf/network_helpers.c      |   49 +-
- tools/testing/selftests/bpf/network_helpers.h      |    5 +-
- .../testing/selftests/bpf/prog_tests/bpf_tcp_ca.c  |   24 +
- .../selftests/bpf/prog_tests/cgroup1_hierarchy.c   |    7 +-
- .../selftests/bpf/prog_tests/kprobe_multi_test.c   |   74 +
- .../selftests/bpf/prog_tests/module_attach.c       |    6 +
- tools/testing/selftests/bpf/prog_tests/mptcp.c     |   16 +
- tools/testing/selftests/bpf/prog_tests/sock_addr.c | 2359 ++++++++++++++-
- .../selftests/bpf/prog_tests/sockopt_inherit.c     |   64 +-
- .../bpf/prog_tests/test_struct_ops_module.c        |   96 +-
- tools/testing/selftests/bpf/prog_tests/verifier.c  |    2 +
- tools/testing/selftests/bpf/prog_tests/wq.c        |    2 -
- .../selftests/bpf/prog_tests/xdp_do_redirect.c     |    4 +-
- tools/testing/selftests/bpf/progs/arena_list.c     |    2 +-
- .../bpf/progs/bench_local_storage_create.c         |    5 +-
- tools/testing/selftests/bpf/progs/bind4_prog.c     |   24 +-
- tools/testing/selftests/bpf/progs/bind6_prog.c     |   24 +-
- tools/testing/selftests/bpf/progs/bind_prog.h      |   19 +
- tools/testing/selftests/bpf/progs/bpf_cc_cubic.c   |  189 ++
- tools/testing/selftests/bpf/progs/bpf_cubic.c      |   74 +-
- tools/testing/selftests/bpf/progs/bpf_dctcp.c      |   62 +-
- .../selftests/bpf/progs/bpf_dctcp_release.c        |   10 +-
- tools/testing/selftests/bpf/progs/bpf_tcp_nogpl.c  |    8 +-
- .../testing/selftests/bpf/progs/bpf_tracing_net.h  |   52 +
- tools/testing/selftests/bpf/progs/connect4_prog.c  |   12 +-
- tools/testing/selftests/bpf/progs/connect6_prog.c  |    6 +
- .../selftests/bpf/progs/connect_unix_prog.c        |    6 +
- tools/testing/selftests/bpf/progs/cpumask_common.h |    2 +-
- .../testing/selftests/bpf/progs/cpumask_failure.c  |    3 -
- tools/testing/selftests/bpf/progs/dynptr_fail.c    |   12 +-
- tools/testing/selftests/bpf/progs/fib_lookup.c     |    2 +-
- .../selftests/bpf/progs/getpeername4_prog.c        |   24 +
- .../selftests/bpf/progs/getpeername6_prog.c        |   31 +
- .../selftests/bpf/progs/getsockname4_prog.c        |   24 +
- .../selftests/bpf/progs/getsockname6_prog.c        |   31 +
- .../selftests/bpf/progs/jeq_infer_not_null_fail.c  |    4 +
- .../selftests/bpf/progs/kprobe_multi_session.c     |   79 +
- .../bpf/progs/kprobe_multi_session_cookie.c        |   58 +
- tools/testing/selftests/bpf/progs/local_storage.c  |   20 +-
- tools/testing/selftests/bpf/progs/lsm_cgroup.c     |    8 +-
- tools/testing/selftests/bpf/progs/mptcp_sock.c     |    4 +-
- tools/testing/selftests/bpf/progs/sendmsg4_prog.c  |    6 +
- tools/testing/selftests/bpf/progs/sendmsg6_prog.c  |   57 +
- .../selftests/bpf/progs/sendmsg_unix_prog.c        |    6 +
- tools/testing/selftests/bpf/progs/skb_pkt_end.c    |    2 +
- tools/testing/selftests/bpf/progs/sock_addr_kern.c |   65 +
- .../selftests/bpf/progs/sockopt_qos_to_cc.c        |   16 +-
- .../selftests/bpf/progs/struct_ops_forgotten_cb.c  |   19 +
- .../selftests/bpf/progs/struct_ops_module.c        |    7 +
- .../selftests/bpf/progs/struct_ops_nulled_out_cb.c |   22 +
- .../selftests/bpf/progs/tcp_ca_incompl_cong_ops.c  |   12 +-
- tools/testing/selftests/bpf/progs/tcp_ca_kfunc.c   |   28 +-
- .../selftests/bpf/progs/tcp_ca_unsupp_cong_op.c    |    2 +-
- tools/testing/selftests/bpf/progs/tcp_ca_update.c  |   18 +-
- .../selftests/bpf/progs/tcp_ca_write_sk_pacing.c   |   20 +-
- .../selftests/bpf/progs/test_btf_skc_cls_ingress.c |   16 +-
- .../selftests/bpf/progs/test_global_func10.c       |    4 +
- .../selftests/bpf/progs/test_lwt_redirect.c        |    2 +-
- .../selftests/bpf/progs/test_module_attach.c       |   23 +
- .../testing/selftests/bpf/progs/test_sock_fields.c |    5 +-
- .../testing/selftests/bpf/progs/test_tcpbpf_kern.c |   13 +-
- .../testing/selftests/bpf/progs/test_tunnel_kern.c |   47 +-
- .../selftests/bpf/progs/test_xdp_noinline.c        |   27 +-
- tools/testing/selftests/bpf/progs/test_xdp_vlan.c  |    2 +-
- tools/testing/selftests/bpf/progs/timer.c          |    3 +-
- tools/testing/selftests/bpf/progs/timer_failure.c  |    2 +-
- tools/testing/selftests/bpf/progs/timer_mim.c      |    2 +-
- .../testing/selftests/bpf/progs/timer_mim_reject.c |    2 +-
- .../testing/selftests/bpf/progs/verifier_bounds.c  |   63 +
- .../selftests/bpf/progs/verifier_global_subprogs.c |    7 +
- .../bpf/progs/verifier_iterating_callbacks.c       |    9 +-
- .../selftests/bpf/progs/verifier_sock_addr.c       |  331 +++
- tools/testing/selftests/bpf/test_sock_addr.c       | 1332 ---------
- tools/testing/selftests/bpf/test_sock_addr.sh      |   58 -
- tools/testing/selftests/bpf/test_sockmap.c         |   10 +-
- .../selftests/bpf/test_tcp_check_syncookie_user.c  |  117 +-
- tools/testing/selftests/bpf/veristat.c             |    5 +-
- tools/testing/selftests/bpf/xdp_hw_metadata.c      |    2 +
- 134 files changed, 9462 insertions(+), 4742 deletions(-)
- create mode 100644 arch/arc/net/Makefile
- create mode 100644 arch/arc/net/bpf_jit.h
- create mode 100644 arch/arc/net/bpf_jit_arcv2.c
- create mode 100644 arch/arc/net/bpf_jit_core.c
- delete mode 100644 tools/include/uapi/linux/ethtool.h
- delete mode 100644 tools/testing/selftests/bpf/bpf_tcp_helpers.h
- create mode 100644 tools/testing/selftests/bpf/progs/bind_prog.h
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_cc_cubic.c
- create mode 100644 tools/testing/selftests/bpf/progs/getpeername4_prog.c
- create mode 100644 tools/testing/selftests/bpf/progs/getpeername6_prog.c
- create mode 100644 tools/testing/selftests/bpf/progs/getsockname4_prog.c
- create mode 100644 tools/testing/selftests/bpf/progs/getsockname6_prog.c
- create mode 100644 tools/testing/selftests/bpf/progs/kprobe_multi_session.c
- create mode 100644 tools/testing/selftests/bpf/progs/kprobe_multi_session_cookie.c
- create mode 100644 tools/testing/selftests/bpf/progs/sock_addr_kern.c
- create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_forgotten_cb.c
- create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_nulled_out_cb.c
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_sock_addr.c
- delete mode 100644 tools/testing/selftests/bpf/test_sock_addr.c
- delete mode 100755 tools/testing/selftests/bpf/test_sock_addr.sh
+R
 
