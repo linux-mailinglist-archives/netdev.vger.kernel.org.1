@@ -1,195 +1,72 @@
-Return-Path: <netdev+bounces-96069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC6D48C435E
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 16:39:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D86188C4372
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 16:45:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58C301F21A6D
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 14:39:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A8BF285ADF
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 14:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FEF2A3F;
-	Mon, 13 May 2024 14:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5DB21C01;
+	Mon, 13 May 2024 14:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=rwahl@gmx.de header.b="FP5RlYOg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJR5ZPv6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC4B17F0;
-	Mon, 13 May 2024 14:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846DA17E9;
+	Mon, 13 May 2024 14:45:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715611193; cv=none; b=N7Thc1GG2y4PGBF4D82Mo1wprRVYMK7ZbybPRorznpS547QrDMU/RW9D2U0ITyymikjoDDR7Bja0Pckz8a+WPrLGvZOo40JJC4dJL6I3L34vlgE85AmxG4V19wRdTDCmkW72caRzGBoKdyTc4feco0+CSLHpfMizxzyRUV8DWDw=
+	t=1715611543; cv=none; b=Da6yNtN0IpAr6uXui+9cKb8aqB35FU9+AK9zCh7a2S7akywoBm+FI0kh3qRpJVx2z5SDMv7xGgGMkL0QgTZUE2C4SmNljA+mrSnto+31TI6drf6eUB1VRfuSdP8VdxuMeWdRntKXup8uOcyav45onQVmfwSXts4JesYXMILjF8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715611193; c=relaxed/simple;
-	bh=nBZcZltCZOCCgCCz9X3U6IvAol9wgYdcC2MRlSfWNj4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ejBeQd7IIk/cjw0U+1JHGZOIW/zQk1nkrm/TtaXEDQto/GnuBV8E56ZFRDMjw7k1zXy3V5hI0i4Hsn4L/1/1vZdA6OiQU/MyJ/yVDQjfWkXvBha+LVsrZJuL7Ve4rvUyhtZAPF8Ptb1IXnX8RzDR5pc1Cgv9rUZ00nZrG+B+iKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=rwahl@gmx.de header.b=FP5RlYOg; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1715611167; x=1716215967; i=rwahl@gmx.de;
-	bh=WCImdjPm9LvjalrqDqycwUi4gWN9eNIaTR2r5ILNxqA=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
-	 MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=FP5RlYOgV4nTPr+ta3Q6EbyPtYAcLeEXFrViVdF4GnP1hGFtG6lGI4Cp6fAzLAav
-	 ZUxisHhfdVr9/x38xDICIO3qsAojcrlAjiSWUGw8QXY1mSpAWefzy93eUNTpvVDVc
-	 ktN71R+Yx+yQtfGLI6pKywtndHdJSdfYcZKimMMdryZMR7ZuuipDsOOnSXKj3t+5J
-	 dF91/K/jxnTOnlSI5TItJjDZRB+gRgvNsHmmRRZskSJ76zyJ9HmlO8kE9P4/Mu6YP
-	 n48UHdyf/gcOM/m8pXpeXXxOwoGncDGFqkR+in8fU6yXPWxPRg97cQwoTlPUJHu6U
-	 N8sn1kIqoClaFkxA0g==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from rohan.localdomain ([84.156.159.24]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MryT9-1suPz00yeL-00nxSY; Mon, 13
- May 2024 16:39:27 +0200
-From: Ronald Wahl <rwahl@gmx.de>
-To: Ronald Wahl <rwahl@gmx.de>
-Cc: Ronald Wahl <ronald.wahl@raritan.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] net: ks8851: Fix another TX stall caused by wrong ISR flag handling
-Date: Mon, 13 May 2024 16:39:22 +0200
-Message-ID: <20240513143922.1330122-1-rwahl@gmx.de>
-X-Mailer: git-send-email 2.45.0
+	s=arc-20240116; t=1715611543; c=relaxed/simple;
+	bh=UTDWmhibw40wrJxd0qE69FWWlql8iuQLSMqXuReqqHk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iSH9yFGRWv3NIELMqDdAawIIY+/M02jNu7pThr4Vg2IPto5RgHOyeG3c3nwVVAMvXe1G+FDEMsrU1nbBphDm3cVv0uu+lJiWaVQylaA6Mhh6k0qaAfOo2Su+SJdT0P/wwsWXR6qxR4eT8ungMbZf5bLQCLYtE50G3ilxtOex6dM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tJR5ZPv6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E0DFC113CC;
+	Mon, 13 May 2024 14:45:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715611543;
+	bh=UTDWmhibw40wrJxd0qE69FWWlql8iuQLSMqXuReqqHk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tJR5ZPv69tehJFx2Lf9zjTWpCQNVy2VGY1OVcTuYd/cMiOdOowdd5SOjYX1mZdATH
+	 4KP9G1j0mAUPE1HW6G+ICmTMAiDJFyDNdunzh1st3I7ghGzx9CBuf+SjzCTNMQdUEb
+	 CkSeJ7VL+PMDlmguVQj9DiA+ZJINdwZbjM6G/r+cnu3gtCkdy8zkg2INAcVkSiKS4y
+	 74Ng9qpMHEBJ4Iu7XMyl0Dpbc00EQ/L+AovSQJue9sWjXKOzSxp2MScWjQmjtcFUBY
+	 aLnzQf+T+1Q30qj09H56CiLJsHNgbNJOzbXbbsoAwGu7xyz2eWNyDZvsgzLAtw02Jc
+	 nGP2hLTcN5iug==
+Date: Mon, 13 May 2024 07:45:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Abaci Robot <abaci@linux.alibaba.com>
+Subject: Re: [PATCH] tulip: eeprom: clean up some inconsistent indenting
+Message-ID: <20240513074541.09744f80@kernel.org>
+In-Reply-To: <20240511021448.80526-1-jiapeng.chong@linux.alibaba.com>
+References: <20240511021448.80526-1-jiapeng.chong@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:V/8xv8BKRPLWuIfHGHa0+ngDPh6HhmfG0BbstvqlzzoWWh0LzzO
- J84huiEM6LJHHBIf/nyikhyw9huCyucjkxElO1JezBTbf4aWdfCI58xSGRtK3JFuQj0IW5D
- +/sg4yiKtWTZw2biI8tEl3PjquPprnTmsgmRJNsm6+N8SU8fOErISGxXAxCdn1bVQ0xu0OI
- x3NY1WnlZQ5vFADSuAPZg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:8WeweyECWII=;jcWaY0mCcksn0j2ds+gE9bzXBTr
- KDPGSXUlP/JvhUisQ87I7Nz+2JbJUT9YjMn57bq/f1XAxRDz7O45KIMaM1vAnP1LG8vfmVe47
- K35sSnx//f5ySUflcMh78oz0avXMCR5Fdcpu5vFrnbautH3ybgGy8rjpv3EbRl+6sq8qb1vNJ
- md/u89w/AzKPClk7SQDNnAd/aQ0xtc9NPia5ZOPNIiqmJIjmC8R6PkZquWE+9G2sUnx578hwZ
- L4BwNSpLdqxXE7mojtUeUfXDe7T6jIz456vJSih3eh4uMFgdMT5tlGWE9EAAVcraT3Oaiw9TD
- 0SB71lv70os6GwtxiOHOs8zb7Jx+Xci9Uc+hS5B8/vmA3aObLj/1bAoiXcDwJiknghZta6+U3
- tAtzQNfAqoI7GJL44DTv52/UKtM5X14PLIcpRVWi7pDMJeUbVNC7JuiV7Bx/CRvTn8RCkPVr/
- xfYJaGX4Jgy5xlkTJH6okwAML+xYzd3poL4UyHUfJNDu7Yonp9Uu/r0RuZHlX5gpDAmD4OQSe
- K6u2meJMFk2qVirSJLhW02Yar1tnQLuojiS3+wMJ0KKOkTDjmEcjR7QY82ItqzToBflO+xuQv
- K9b0qCUWybjz/vX3tAQbOzPdrgUZzRMfOX1BHirsz0Q6rkHp4GBcnMelDcYdGzZMsCmlLB/Zl
- AnZ2LV/s7LAY3khFdIFFkTIqsD9twTvVAS4oMcibYH+GkJr6ujwh0mdLoP7oB2GSYyIUTqbrE
- 4TdxSWHdeRZDy8IjTLmIcNCsg+z7CzX1dPhj0bqRoT1Xs6FQVqY9t2W5tZDYij/IJ0PsUDt/i
- y61UUe3roo6BOGt40/I53ylETBRyJbL7Nwb93yVlonjTI=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Ronald Wahl <ronald.wahl@raritan.com>
+On Sat, 11 May 2024 10:14:48 +0800 Jiapeng Chong wrote:
+> No functional modification involved.
+> 
+> drivers/net/ethernet/dec/tulip/eeprom.c:179 tulip_parse_eeprom() warn: inconsistent indenting.
 
-Under some circumstances it may happen that the ks8851 Ethernet driver
-stops sending data.
-
-Currently the interrupt handler resets the interrupt status flags in the
-hardware after handling TX. With this approach we may lose interrupts in
-the time window between handling the TX interrupt and resetting the TX
-interrupt status bit.
-
-When all of the three following conditions are true then transmitting
-data stops:
-
-  - TX queue is stopped to wait for room in the hardware TX buffer
-  - no queued SKBs in the driver (txq) that wait for being written to hw
-  - hardware TX buffer is empty and the last TX interrupt was lost
-
-This is because reenabling the TX queue happens when handling the TX
-interrupt status but if the TX status bit has already been cleared then
-this interrupt will never come.
-
-With this commit the interrupt status flags will be cleared before they
-are handled. That way we stop losing interrupts.
-
-The wrong handling of the ISR flags was there from the beginning but
-with commit 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX
-buffer overrun") the issue becomes apparent.
-
-Fixes: 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX buffer overru=
-n")
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org # 5.10+
-Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-=2D--
- drivers/net/ethernet/micrel/ks8851_common.c | 18 +-----------------
- 1 file changed, 1 insertion(+), 17 deletions(-)
-
-diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/eth=
-ernet/micrel/ks8851_common.c
-index 502518cdb461..6453c92f0fa7 100644
-=2D-- a/drivers/net/ethernet/micrel/ks8851_common.c
-+++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -328,7 +328,6 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
- {
- 	struct ks8851_net *ks =3D _ks;
- 	struct sk_buff_head rxq;
--	unsigned handled =3D 0;
- 	unsigned long flags;
- 	unsigned int status;
- 	struct sk_buff *skb;
-@@ -336,24 +335,17 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
- 	ks8851_lock(ks, &flags);
-
- 	status =3D ks8851_rdreg16(ks, KS_ISR);
-+	ks8851_wrreg16(ks, KS_ISR, status);
-
- 	netif_dbg(ks, intr, ks->netdev,
- 		  "%s: status 0x%04x\n", __func__, status);
-
--	if (status & IRQ_LCI)
--		handled |=3D IRQ_LCI;
--
- 	if (status & IRQ_LDI) {
- 		u16 pmecr =3D ks8851_rdreg16(ks, KS_PMECR);
- 		pmecr &=3D ~PMECR_WKEVT_MASK;
- 		ks8851_wrreg16(ks, KS_PMECR, pmecr | PMECR_WKEVT_LINK);
--
--		handled |=3D IRQ_LDI;
- 	}
-
--	if (status & IRQ_RXPSI)
--		handled |=3D IRQ_RXPSI;
--
- 	if (status & IRQ_TXI) {
- 		unsigned short tx_space =3D ks8851_rdreg16(ks, KS_TXMIR);
-
-@@ -365,20 +357,12 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
- 		if (netif_queue_stopped(ks->netdev))
- 			netif_wake_queue(ks->netdev);
- 		spin_unlock(&ks->statelock);
--
--		handled |=3D IRQ_TXI;
- 	}
-
--	if (status & IRQ_RXI)
--		handled |=3D IRQ_RXI;
--
- 	if (status & IRQ_SPIBEI) {
- 		netdev_err(ks->netdev, "%s: spi bus error\n", __func__);
--		handled |=3D IRQ_SPIBEI;
- 	}
-
--	ks8851_wrreg16(ks, KS_ISR, handled);
--
- 	if (status & IRQ_RXI) {
- 		/* the datasheet says to disable the rx interrupt during
- 		 * packet read-out, however we're masking the interrupt
-=2D-
-2.45.0
-
+We don't accept pure formatting or checkpatch "fixes" in networking.
+Especially for ancient HW.
+-- 
+pw-bot: reject
 
