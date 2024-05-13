@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-96150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CC538C480B
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 22:08:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55C428C481A
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 22:18:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 330911F22B38
-	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:08:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE935B2126A
+	for <lists+netdev@lfdr.de>; Mon, 13 May 2024 20:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FE97CF25;
-	Mon, 13 May 2024 20:08:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205BD7E110;
+	Mon, 13 May 2024 20:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="svcateWi"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Aqo9/W9Y"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3417BB12;
-	Mon, 13 May 2024 20:08:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB09D7E0FB;
+	Mon, 13 May 2024 20:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715630911; cv=none; b=tDMpGrxEq+O5/bgY7ZtE3Bn10U8AOP+voPHU6d/VrAVF71bL2F6PD0xTy23TSD3qfZ0Z/aTgArkZGUkT2hreMEtS2T6N1Kdo533bfCzg7S2efAIkgI+pdMmnI+qb/Z3P1HS1pDbW98DdNhtRmdDlKKt978rVPY4Sg13QnzGn7Cg=
+	t=1715631481; cv=none; b=EmRaBT0TOUCTCtQa7U8wgmUFsVldHIY1xKbMdM7/GDFWWR2AnIWeaR/5lNXo26m9AeWl6zNvZ3iUxecsnfCyzbWvFZ5aSRckMDKXpKGUGKNJr58v0FqmrTPZ9lLyQ0RzpA0BQhgH8Rz/teLcscf1APyQ4z01Sx33mU/ow2EoEQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715630911; c=relaxed/simple;
-	bh=EXgu6swCEGC/mWOd4154HwA6kZ1C3Y/hV7wHFjYnz9o=;
+	s=arc-20240116; t=1715631481; c=relaxed/simple;
+	bh=QPPucxNzMGci2VCLPJG4C88e7OqjvcCNvLSfh/GvPJc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nW57WRWK1S9qR8i3Vzvuq9en1nu+66uILHIDh8YHUbRjoXi2pi6rgIovDgshnv7CtMi0UYu4qSWLIQEPhdqCGsNj1HvdXokz2b0sJxa9kh0OYY4bxiO5fkSt8gL0nl0j9+qHVFJ+Oh7G7IgrKadQjiHXXN8otlKIsQkFcPUhQ7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=svcateWi; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=RY/FmrL0iz1KguJ6crl93GI8+16a/ArjAWQ+mSGJUdyicmuEKD5lFjTU7NopQi/DjuwCelV50FM8pe/qg5EjwqxbfqFHe7sya2ea7rkED2VJYP+Yw1psHp+jJMWHdIXDorMmYgEJdO1EdSw51BVr02FN19DXZhqgh8RNeW3Wc+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Aqo9/W9Y; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=BBbU0N/GofBCvp79/gpgCjNhyGoIydeQdyHeE8NSkdM=; b=svcateWiUd1keI6Pe8ykjBxrnZ
-	f38uSpNWdz4p953/U16PKOwQaahojU8t2c2ssBqOm1iSxuTCyEdKULz/iGzY4EHFDD7Nw/jjJwXX+
-	0YHAsedUThfxNba654MD6o4N9bCe7CpSXYxhK5qFmRpVp0H8RMoFrLYftF4lN0gtx7hU=;
+	bh=nqxnckkmky72wratqJjxCB8HyiXkypohHfXZ7n/n1OE=; b=Aqo9/W9YcKQK58JqM5gceiv3OA
+	O7McD0Us4UBR9Wt3OtqfTkFTx5WhU26b2UENWil4GbLhCsw+Ducd7MSH9pyByfoZnRIGuFYzsVLEN
+	+oZ4F+aurC5YQekgLuoq3RDs9uKvuVK2g/97r7fJ5jEPllYvZVqDHSpqO8HKk/bgOU78=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1s6by4-00FKhM-Jh; Mon, 13 May 2024 22:08:16 +0200
-Date: Mon, 13 May 2024 22:08:16 +0200
+	id 1s6c7I-00FKip-6L; Mon, 13 May 2024 22:17:48 +0200
+Date: Mon, 13 May 2024 22:17:48 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: admiyo@os.amperecomputing.com
 Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
@@ -52,7 +52,7 @@ Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 1/3] mctp pcc: Implement MCTP over PCC Transport
-Message-ID: <6d3aed83-ee56-4c3c-bb23-0f7d1f471ea4@lunn.ch>
+Message-ID: <48ef7972-4b8f-4027-a2ca-357e53dcdd0f@lunn.ch>
 References: <20240513173546.679061-1-admiyo@os.amperecomputing.com>
  <20240513173546.679061-2-admiyo@os.amperecomputing.com>
 Precedence: bulk
@@ -65,145 +65,58 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20240513173546.679061-2-admiyo@os.amperecomputing.com>
 
-> +struct mctp_pcc_hdr {
-> +	u32 signature;
-> +	u32  flags;
-
-There looks to be an extra space here, or a tab vs space issue.
-
-> +	u32 length;
-> +	char mctp_signature[4];
-> +};
-> +
-> +struct mctp_pcc_packet {
-> +	struct mctp_pcc_hdr pcc_header;
-> +	union {
-> +		struct mctp_hdr     mctp_header;
-
-and more here. I would expect checkpatch to point these out.
-
-> +struct mctp_pcc_hw_addr {
-> +	int inbox_index;
-> +	int outbox_index;
-> +};
-> +	physical_link_addr.inbox_index =
-> +		htonl(mctp_pcc_dev->hw_addr.inbox_index);
-
-
-These are {in|out}box_index are u32s right? Otherwise you would not be
-using htonl() on them. Maybe specify the type correctly.
-
-> +	physical_link_addr.outbox_index =
-> +		htonl(mctp_pcc_dev->hw_addr.outbox_index);
-
-You should also mark the physical_link_addr members as being big
-endian so sparse can check you are not missing any byte swaps.
-
-> +	dev_addr_set(ndev, (const u8 *)&physical_link_addr);
-> +	rc = register_netdev(ndev);
-> +	if (rc)
-> +		goto cleanup_in_channel;
-> +	list_add_tail(&mctp_pcc_dev->head, &mctp_pcc_ndevs);
-> +	return 0;
-> +cleanup_in_channel:
-
-It would be normal to add a blink line after the return, just to make
-it easier to see where the error cleanup code starts.
-
-
-> +	mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->in_chan);
-> +cleanup_out_channel:
-> +	mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->out_chan);
-> +free_netdev:
-> +	unregister_netdev(ndev);
-
-Can you get here with the ndev actually registered?
-
-> +static acpi_status lookup_pcct_indices(struct acpi_resource *ares, void *context)
+> +static struct mctp_pcc_packet *mctp_pcc_extract_data(struct sk_buff *old_skb,
+> +						     void *buffer, int outbox_index)
 > +{
-> +	struct acpi_resource_address32 *addr;
-> +	struct lookup_context *luc = context;
+> +	struct mctp_pcc_packet *mpp;
 > +
-> +	switch (ares->type) {
-> +	case 0x0c:
-> +	case 0x0a:
+> +	mpp = buffer;
+> +	writel(PCC_MAGIC | outbox_index, &mpp->pcc_header.signature);
+> +	writel(0x1, &mpp->pcc_header.flags);
+> +	memcpy_toio(mpp->pcc_header.mctp_signature, MCTP_SIGNATURE, SIGNATURE_LENGTH);
+> +	writel(old_skb->len + SIGNATURE_LENGTH,  &mpp->pcc_header.length);
+> +	memcpy_toio(mpp->header_data,    old_skb->data, old_skb->len);
+> +	return mpp;
+> +}
 
-Please replace these magic numbers of #defines.
+...
 
-> +static int mctp_pcc_driver_add(struct acpi_device *adev)
+> +static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct net_device *ndev)
 > +{
-> +	int inbox_index;
-> +	int outbox_index;
-> +	acpi_handle dev_handle;
-> +	acpi_status status;
-> +	struct lookup_context context = {0, 0, 0};
-> +
-> +	dev_info(&adev->dev, "Adding mctp_pcc device for HID  %s\n", acpi_device_hid(adev));
-
-It would be better to not spam the logs when a driver probes, unless
-there is an actual error.
-
-> +	dev_handle = acpi_device_handle(adev);
-> +	status = acpi_walk_resources(dev_handle, "_CRS", lookup_pcct_indices, &context);
-> +	if (ACPI_SUCCESS(status)) {
-> +		inbox_index = context.inbox_index;
-> +		outbox_index = context.outbox_index;
-> +		return create_mctp_pcc_netdev(adev, &adev->dev, inbox_index, outbox_index);
-> +	}
-> +	dev_err(&adev->dev, "FAILURE to lookup PCC indexes from CRS");
-> +	return -EINVAL;
-> +};
-> +
-> +/* pass in adev=NULL to remove all devices
-> + */
-> +static void mctp_pcc_driver_remove(struct acpi_device *adev)
-> +{
-> +	struct mctp_pcc_ndev *mctp_pcc_dev = NULL;
-> +	struct list_head *ptr;
-> +	struct list_head *tmp;
-> +
-> +	list_for_each_safe(ptr, tmp, &mctp_pcc_ndevs) {
-> +		mctp_pcc_dev = list_entry(ptr, struct mctp_pcc_ndev, head);
-> +		if (!adev || mctp_pcc_dev->acpi_device == adev) {
-> +			struct net_device *ndev;
-> +
-> +			mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->out_chan);
-> +			mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->in_chan);
-> +			ndev = mctp_pcc_dev->mdev.dev;
-> +			if (ndev)
-> +				mctp_unregister_netdev(ndev);
-> +			list_del(ptr);
-> +			if (adev)
-> +				break;
-> +		}
-> +	}
-> +};
-> +
-> +static const struct acpi_device_id mctp_pcc_device_ids[] = {
-> +	{ "DMT0001", 0},
-> +	{ "", 0},
-> +};
-> +
-> +static struct acpi_driver mctp_pcc_driver = {
-> +	.name = "mctp_pcc",
-> +	.class = "Unknown",
-> +	.ids = mctp_pcc_device_ids,
-> +	.ops = {
-> +		.add = mctp_pcc_driver_add,
-> +		.remove = mctp_pcc_driver_remove,
-> +		.notify = NULL,
-> +	},
-> +	.owner = THIS_MODULE,
-> +
-> +};
-> +
-> +static int __init mctp_pcc_mod_init(void)
-> +{
+> +	unsigned char *buffer;
+> +	struct mctp_pcc_ndev *mpnd;
+> +	struct mctp_pcc_packet  *mpp;
+> +	unsigned long flags;
 > +	int rc;
 > +
-> +	pr_info("initializing MCTP over PCC\n");
+> +	netif_stop_queue(ndev);
+> +	ndev->stats.tx_bytes += skb->len;
+> +	mpnd = (struct mctp_pcc_ndev *)netdev_priv(ndev);
+> +	spin_lock_irqsave(&mpnd->lock, flags);
+> +	buffer =  mpnd->pcc_comm_outbox_addr;
+> +	mpp = mctp_pcc_extract_data(skb, mpnd->pcc_comm_outbox_addr, mpnd->hw_addr.outbox_index);
 
-More useless log spamming... pr_dbg(), or remove altogether.
+I don't see any length checks here. How do you know the skb contains
+sizeof(struct mctp_pcc_packet)?
+
+> +static int create_mctp_pcc_netdev(struct acpi_device *acpi_dev,
+> +				  struct device *dev, int inbox_index,
+> +				  int outbox_index)
+> +{
+> +	int rc;
+> +	int mctp_pcc_mtu;
+> +	char name[32];
+> +	struct net_device *ndev;
+> +	struct mctp_pcc_ndev *mctp_pcc_dev;
+> +	struct mctp_pcc_hw_addr physical_link_addr;
+
+Since this is networking code, you should be using reverse christmas
+tree for all your functions.
+
+> +	snprintf(name, sizeof(name), "mctpipcc%x", inbox_index);
+> +	ndev = alloc_netdev(sizeof(struct mctp_pcc_ndev), name, NET_NAME_ENUM, mctp_pcc_setup);
+
+%x is very unusual for network device names.
 
 	Andrew
 
