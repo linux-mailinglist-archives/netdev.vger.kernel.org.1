@@ -1,116 +1,138 @@
-Return-Path: <netdev+bounces-96346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0C078C55EC
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:19:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F4B08C55EF
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:20:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28F3D1F21D7B
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 12:19:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35F341F21F59
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 12:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4F7F3F9D2;
-	Tue, 14 May 2024 12:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A93041A87;
+	Tue, 14 May 2024 12:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YcLVZSqv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sUVlJvbL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D86219E7
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 12:19:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3EB2D60A;
+	Tue, 14 May 2024 12:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715689144; cv=none; b=B1AYf3y1LOVkF73i5eATDZO5nOsZynbmXFLo3ERaS3gbv+OlvBmIrEE1RpoT0qLBBc7WUl0iEEAVLSzjZxvuMbYZH8Sq8EasfUYYzUIRb3tFCjX0ZRjh4qe0GeoQhCz+6c0+mEk4fqQjD8UYAMVdr1Xbyv+liB0R3EpZqLcd44w=
+	t=1715689211; cv=none; b=IQhmLH1+5XCagUgA5YPr6IdrRyqlKQdCnqZGBqEYQcSLkgJ03XEsXxIvahtuTpIdE414X+6PK+KQnc0mdnNdYGQFf8wnnCyPe+RMQr8K70fbTUAK1yTqElXrjzJlbrANhUdD2sEH1r3OoLAcuqdEdca12zmKvdTQwCqfXC/DPz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715689144; c=relaxed/simple;
-	bh=SOBTkwoiFDlqkTZRK8lPUxvTkg7sOoOa00MeqX29k1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ABNxPPuwq24GpGV/mv2+3jp+ZN71s0DkXSpQ5NE9eiVtUbbXTJoMF0aH9ssjf5nm5X3XrSmeLqO4S1VhBKI7bjXtFdacOtEyByKfuPiZABBhGBfLWvT7ItpOhZXDrjZ8Ms7u2f3znulTNBL3CXKkyQ6prntMzpUuQmCFRTZL4ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YcLVZSqv; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2b9702e05easo696329a91.1
-        for <netdev@vger.kernel.org>; Tue, 14 May 2024 05:19:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715689143; x=1716293943; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C/M6RcHxLr7rqLfy5+3tJEltYq84WQeLwXWf97w/s/4=;
-        b=YcLVZSqvzYB2CNkA8C2IY3vm8Qstmog2LGrujnNgwGDCa1OuaIHbIx7JDIT0OD/6iZ
-         Jym56suzvJtwtOJbdmT+h87KEWyMUxuCKuzoBDKW9+J0EkUi5RbsTE/o9G8uiGzOobPm
-         vD2plrj17uyQdn6au8spo1ZBYrlpW32tynTe5aFEYL0g3DoennUsCSZoX+CqkgHx6vUc
-         Kt6rXZu2wiEu8cB9TdMn2mIPD/XxCSaoEdI8T8OlOKa+YCJxqduojlgkfFxWQKHKbXNE
-         TNE/qHg8oY4mviA4YCddDeXYZubNhHYH9E/hM8PTTY7M+oNfwHJK9m/Q8spWOybbBLfg
-         ssiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715689143; x=1716293943;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C/M6RcHxLr7rqLfy5+3tJEltYq84WQeLwXWf97w/s/4=;
-        b=QCE9Jp9jmF81nYOkIk68fUaTWvoSr22fzegk6avQCxIMKXvox04BdaTU7iDYhuZwT6
-         NpoGBorcrQ8WaJQ3yIEH122DGQDHtxyueA9NyTDuk637H7BC0GF8TUpcmgenSkDj4Mwu
-         uLiJjgjaZuEvCe/y7fSAXaB1pPW2GMnvYzHH2KFuC3V5YujNgqamtD5oIlf1xqO28zAD
-         n3z22qI1uG1meFCozjR/qGG292oGzB3bcvNCjiQgHBc8hy3f4Nhv5vP/c5IIC12HCvrb
-         +LrLQfee7V9m2wdxkvD0y1b8etKKzMAPHjbM4ikYTdz8AHyaAgN7GZVdi1WMSZuUZb+t
-         1KyQ==
-X-Gm-Message-State: AOJu0Yze2gRTfa7mwOhEgkSfwzvCvlC05CO6j/YDwxR5NI/EdVyskNqr
-	W8pmLfhjj2/8/OPmjDNnxYSbP3xcZ0qgow6gjWg/N6F/Tk7YIpxP
-X-Google-Smtp-Source: AGHT+IFtqdhlT/FlzWhzWeejBHdaSlmdcrHWnWz+l+xcoHaLF9lHC52dvea04HREoO9qhPea5ZYmww==
-X-Received: by 2002:a17:90a:d18e:b0:2b4:36d7:b6b5 with SMTP id 98e67ed59e1d1-2b6ccd85bf8mr11254959a91.34.1715689142540;
-        Tue, 14 May 2024 05:19:02 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b5e02ba6dasm7288971a91.1.2024.05.14.05.19.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 May 2024 05:19:02 -0700 (PDT)
-Date: Tue, 14 May 2024 20:18:57 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, roopa@nvidia.com,
-	bridge@lists.linux.dev, edumazet@google.com, pabeni@redhat.com
-Subject: Re: [PATCH net] selftests: net: bridge: increase IGMP/MLD exclude
- timeout membership interval
-Message-ID: <ZkNWsR04SdTpjWRZ@Laptop-X1>
-References: <20240513105257.769303-1-razor@blackwall.org>
- <ZkKzcJm5owdvdu6B@Laptop-X1>
- <186278b5-b2d5-408e-8d89-8cdff6efe41a@blackwall.org>
+	s=arc-20240116; t=1715689211; c=relaxed/simple;
+	bh=obSDg9eXO8e+fTU+HDY+zB/5/5ss2adUhKUPzf6dSAQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=shkGcrbZWE+Rp8qSCsflL6oyu4T9LpClVkoo7OYo2tZ7FdzOZkEn6YhJJ4TZlmXi5VLoT4/KVfWoczSLoWqLfhSchm2uqgovIr/JfRJVyEbdymJVph71TOYc4S6MgaSpMlcZdd2RMPjlg8nLe/EKh3YLz5Lj6iRZ34rqy6qCxCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sUVlJvbL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 384B2C2BD10;
+	Tue, 14 May 2024 12:20:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715689210;
+	bh=obSDg9eXO8e+fTU+HDY+zB/5/5ss2adUhKUPzf6dSAQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=sUVlJvbLDHFFQVdNDvNLxb6SbKJvUoQxFlHMxlDt9oyJNwsbnjlnHD6sApYm+tGIu
+	 Dz0E2qEePDXxhCk90BtwYMe1JvbQY3Kh6t0MmbdC50hTwlNXfgRNEyb0uWdNEmFflo
+	 doP2BxC+wAM06Myb8yI2Van73/yQ1Ob+uH21gveMcAuraJAyJCAKXQBIi/g0800AhK
+	 aJvw8rb9DFnCxIhphCQHT1ZI6CdbXPDEGvevzNVQAPF1UyDqeIeu6ceYsgYWCfwBwz
+	 so/Im7iyOwFeV5+r2gmqkBQBMAhBwjkoeAqfo2oZKZZfiWwN7a+SxBmTUmpuz4nXok
+	 ill1zMx8crXUA==
+Message-ID: <e4123697-3e6e-4d4a-8b06-f69e1c453225@kernel.org>
+Date: Tue, 14 May 2024 14:20:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <186278b5-b2d5-408e-8d89-8cdff6efe41a@blackwall.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 14/15 v2] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Boqun Feng <boqun.feng@gmail.com>,
+ Daniel Borkmann <daniel@iogearbox.net>, Eric Dumazet <edumazet@google.com>,
+ Frederic Weisbecker <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+ Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
+References: <20240503182957.1042122-1-bigeasy@linutronix.de>
+ <20240503182957.1042122-15-bigeasy@linutronix.de> <87y18mohhp.fsf@toke.dk>
+ <CAADnVQJkiwaYXUo+LyKoV96VFFCFL0VY5Jgpuv_0oypksrnciA@mail.gmail.com>
+ <20240507123636.cTnT7TvU@linutronix.de>
+ <93062ce7-8dfa-48a9-a4ad-24c5a3993b41@kernel.org>
+ <20240510162121.f-tvqcyf@linutronix.de>
+ <20240510162214.zNWRKgFU@linutronix.de>
+ <4949dca0-377a-45b1-a0fd-17bdf5a6ab10@kernel.org>
+ <20240514054345.DZkx7fJs@linutronix.de>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20240514054345.DZkx7fJs@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 14, 2024 at 10:46:15AM +0300, Nikolay Aleksandrov wrote:
-> >> diff --git a/tools/testing/selftests/net/forwarding/bridge_mld.sh b/tools/testing/selftests/net/forwarding/bridge_mld.sh
-> >> index e2b9ff773c6b..f84ab2e65754 100755
-> >> --- a/tools/testing/selftests/net/forwarding/bridge_mld.sh
-> >> +++ b/tools/testing/selftests/net/forwarding/bridge_mld.sh
-> >>  
-> >>  	$MZ $h1 -c 1 $MZPKT_ALLOW2 -q
-> >> -	sleep 3
-> >> +	sleep 5
-> >>  	bridge -j -d -s mdb show dev br0 \
-> >>  		| jq -e ".[].mdb[] | \
-> >>  			 select(.grp == \"$TEST_GROUP\" and \
-> > 
-> > Maybe use a slow_wait to check the result?
-> > 
-> > Thanks
-> > Hangbin
+
+
+On 14/05/2024 07.43, Sebastian Andrzej Siewior wrote:
+> On 2024-05-14 07:07:21 [+0200], Jesper Dangaard Brouer wrote:
+>>> pktgen_sample03_burst_single_flow.sh has been used to send packets and
+>>> "xdp-bench drop $nic -e" to receive them.
+>>>
+>>
+>> Sorry, but a XDP_DROP test will not activate the code you are modifying.
+>> Thus, this test is invalid and doesn't tell us anything about your code
+>> changes.
+>>
+>> The code is modifying the XDP_REDIRECT handling system. Thus, the
+>> benchmark test needs to activate this code.
 > 
-> What would it improve? The wait is exact, we know how many seconds
-> exactly so a plain sleep is enough and easier to backport if this
-> is applied to -net.
+> This was a misunderstanding on my side then. What do you suggest
+> instead? Same setup but "redirect" on the same interface instead of
+> "drop"?
+> 
 
-I just afraid it fails on debug kernel with this exact time. If you think
-the time is enough. I'm OK with it.
+Redirect is more flexible, but redirect back-out same interface is one
+option, but I've often seen this will give issues, because it will
+overload the traffic generator (without people realizing this) leading
+to false-results. Thus, verify packet generator is sending faster than
+results you are collecting. (I use this tool[2] on generator machine, in
+another terminal, to see of something funky is happening with ethtool
+stats).
 
-Thanks
-Hangbin
+To workaround this issue, I've previously redirected to device 'lo'
+localhost, which is obviously invalid so packet gets dropped, but I can
+see that when we converted from kernel samples/bpf/ to this tool, this
+trick/hack is no longer supported.
+
+The xdp-bench[1] tool also provide a number of redirect sub-commands.
+E.g. redirect / redirect-cpu / redirect-map / redirect-multi.
+Given you also modify CPU-map code, I would say we also need a
+'redirect-cpu' test case.
+
+Trick for CPU-map to do early drop on remote CPU:
+
+  # ./xdp-bench redirect-cpu --cpu 3 --remote-action drop ixgbe1
+
+I recommend using Ctrl+\ while running to show more info like CPUs being
+used and what kthread consumes.  To catch issues e.g. if you are CPU
+redirecting to same CPU as RX happen to run on.
+
+--Jesper
+
+[1] https://github.com/xdp-project/xdp-tools/tree/master/xdp-bench
+[2] 
+https://github.com/netoptimizer/network-testing/blob/master/bin/ethtool_stats.pl
 
