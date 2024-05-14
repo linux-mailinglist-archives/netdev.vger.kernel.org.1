@@ -1,183 +1,112 @@
-Return-Path: <netdev+bounces-96422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5948F8C5B62
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 20:51:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1163F8C5B63
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 20:55:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9427B21562
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 18:51:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD961F215FD
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 18:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE93B181300;
-	Tue, 14 May 2024 18:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC236180A88;
+	Tue, 14 May 2024 18:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b4zn1G+p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mEQXshWq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395FB180A88
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 18:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234DE1E88D;
+	Tue, 14 May 2024 18:55:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715712696; cv=none; b=Pkf1f654XJKdEVhs5Kw2BgNzztyawDtFJODGg8BMbeU9B5k5RNvVN8Nck4YhquYxLdrzK9VCMYUteoy/EIh+xwLn9hV6xEmU2tVJ1impszJZvDWKmqyRDCrNdjvlBYD2IHxD4cq4nC16S+nhH4JGtmNEjuobNS4nYy9mbuYCwzc=
+	t=1715712944; cv=none; b=KzLrhH189hnLHfFMQMepMJQNv6UZO2pN0Lurw/DXMCe9Q++cqifX3Ob4KwRQyzsblknZTTvoUMtmOLsEfW659WStwwGlaOuBL/iIiHE2U1QkF8OcubDSAbxoniCzgScj6IXXbKpjvR/aQ+khJfw1FB3td1e0fmbkW2QzlgVh4WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715712696; c=relaxed/simple;
-	bh=cxSGeqBEj3jGq8L7IdRvbdtaeISt+kkASP3vN+kaCSI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=h+uoF//lt5ngJm7yPE6qXTQiDB3+Fj5qgWpyAanIryUUnh/YWPqpSRWbPvgjnFpFYJ0NUM84qdz5HiSm78p5nRqGTgfs+D22L9qBzh8NIMYjXJDGZfyfw5+VinbVQDpPIdBI+xAljSo2KpqYf/d6OaPkxfOjDKs0u4dZNdQP2Sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b4zn1G+p; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715712695; x=1747248695;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=cxSGeqBEj3jGq8L7IdRvbdtaeISt+kkASP3vN+kaCSI=;
-  b=b4zn1G+pUPFLJUh7dPOKUNZwSNAg9mpg3L863ogRZU5Or89dWIBDYFf/
-   NpU6yfnpKOCpewsvmVIYVjSoGqoVRH8iD4i6/6QwPErn38xPYWDgSeIGr
-   TgedWybyoCC9VdKdDYkJWYPIXdDiU1Gqkzyet8T8aAIjhaYKnuXwLHXL8
-   7XZgb0RqiIInvrQGcQp9cvbCGHI8Id1uxcLbqzqhgYtfbrBxKfOlwhPG6
-   4+bt65SndMqiXHuzj7BKMeQGkgjp02gU+R70OmR6tFBWhVrX6PGknG/T8
-   w1mIOVkdrJOhjNpgyToHkDL40pE2XnH2cwEO4CX1YOT7fX2DhEsuVsLR1
-   w==;
-X-CSE-ConnectionGUID: jPDK+EpXTBu8zRAIYvJfUw==
-X-CSE-MsgGUID: RO1MfV8aS7u4CT1S6jRqWg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11073"; a="29240329"
-X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="29240329"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 11:51:31 -0700
-X-CSE-ConnectionGUID: x7UBrBoXQyqFKkhpn+soTQ==
-X-CSE-MsgGUID: x3+cSWNVRPWL8U+mXgnNLw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="30789940"
-Received: from jekeller-desk.amr.corp.intel.com ([10.166.241.1])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 11:51:31 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Tue, 14 May 2024 11:51:13 -0700
-Subject: [PATCH net 2/2] idpf: Interpret .set_channels() input differently
+	s=arc-20240116; t=1715712944; c=relaxed/simple;
+	bh=TxuqIu3e2EFPMV+34yJQkIWnIE1+hACr2KaJ1NiXlmA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FrvXG/bIXbOm61uq33LmXcWrNfscx0IYkCZB6p2xGfYXSYeBpStinVXyOgnEnRYw7V4fiRGSRxiHPuBhsYh7sLzUDVui3Ug7x2n1x8O7A+Fb1+0DGodDZjm6zQv3c0GBDxQcaHKrEYciW+uB21bs9udK1FpQ7RfJr2/chQhCy/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mEQXshWq; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-34db6a29a1eso4790469f8f.1;
+        Tue, 14 May 2024 11:55:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715712941; x=1716317741; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y7Oo9YahnQFZHzOwJoUrSXdH2NtFloyrj46IdMn32Ao=;
+        b=mEQXshWqfzu5sk8VcPOb6PlDcNNhRHihd+l6BYijCZxg7+vNKziYShWjWZirP6wlGt
+         u3m54Sgwp74l1Uc54gA1wPFD2Xg4w4XuaicqehN/k2L3Nrzvlwxr5SZDuxlsC3EkPSTm
+         xqoDvKLq8xOY7F6GCxIJeJfBTG+om2rCeziJd13PZGe00cYxEnr/qAAwxw1MJS4U8K1t
+         zsgoWGVppCgBm8c2VYN15edT4L+S8Z2dv1I3ulHH126tICbxiUnYq9UmH9fiZa/GRUn7
+         IChvNIIRoATzkfKS6MFgFueyhZf4Lw/KwjQAzI/4vX0x8lJvvXoa9pyTetXPjQq/F39e
+         EtbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715712941; x=1716317741;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y7Oo9YahnQFZHzOwJoUrSXdH2NtFloyrj46IdMn32Ao=;
+        b=HTIz/L02SYFL80Dm9PzKvdrF4B+uqlmuTBvF/u2O21qftWtVYPV+J6n8xt3FTdByXR
+         e4XVySwtV8etXDwhpOuzByi7vLJPzLJMaKGrXibCgjkcpROV6wvCW7cqsbGWpw+x47GO
+         p4FR3/pr93iYgMC/DjssdGJEOJwTjIk6fMOZGg5QWcFAYNQzwMu4WuumuNogGoOXhfOq
+         IN7nnbuz84Dh6LJ1KuRrjr3IxVOj7y/xW/rGNZzWnyXyb7rxUfqkPPDv+mxayICVNS/e
+         5MjZJvmOYk84fKrLj+Ub1/Ht7MAGw2g5v3N0N7/W5OKpu4IIGua/T7ICothSeelVIv7N
+         eLTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWHB30vLzha5rQbyfc6ZggUQD9C+bTN0tNoUCF+kc47eYfoz2yhqYF1bo54I5gArUjxKOg1tnUnDIOmVA8iirTe3accyzAy+BnF+VQDATMRHmaRBxmzSUo1nHtSvKZjquB89dLaD4gSMmER1t5MR9Ff3OWOKnqQBLLcNhvVZdVntQ==
+X-Gm-Message-State: AOJu0YzpmY6GKfGB310ZenH4ft7CVnB2L+ur/o3yDsKLRQySkKkeL9AZ
+	dnjsyFmI40/fxGcraQfIl715p4iFSqbt9MYhvNVssLjN1v28Pv4g
+X-Google-Smtp-Source: AGHT+IGNkCtzE/Iiz5DXAhHblOEJmpApRQVsn2jigYFY1/Yyg75oBgFXUVZ9vWcrLPC4RxTIW6zxLA==
+X-Received: by 2002:adf:e582:0:b0:34d:a738:30b8 with SMTP id ffacd0b85a97d-3504a62ff93mr8418176f8f.12.1715712941303;
+        Tue, 14 May 2024 11:55:41 -0700 (PDT)
+Received: from [172.27.21.185] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502bbbc077sm14253552f8f.104.2024.05.14.11.55.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 May 2024 11:55:40 -0700 (PDT)
+Message-ID: <4a331dcb-5635-46de-9638-1fc32d143721@gmail.com>
+Date: Tue, 14 May 2024 21:55:38 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 2/3] net/mlx4: link NAPI instances to queues
+ and IRQs
+To: Joe Damato <jdamato@fastly.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: mkarsten@uwaterloo.ca, nalramli@fastly.com,
+ Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>
+References: <20240513172909.473066-1-jdamato@fastly.com>
+ <20240513172909.473066-3-jdamato@fastly.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20240513172909.473066-3-jdamato@fastly.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240514-iwl-net-2024-05-14-set-channels-fixes-v1-2-eb18d88e30c3@intel.com>
-References: <20240514-iwl-net-2024-05-14-set-channels-fixes-v1-0-eb18d88e30c3@intel.com>
-In-Reply-To: <20240514-iwl-net-2024-05-14-set-channels-fixes-v1-0-eb18d88e30c3@intel.com>
-To: netdev <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
- David Miller <davem@davemloft.net>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, 
- Larysa Zaremba <larysa.zaremba@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Igor Bagnucki <igor.bagnucki@intel.com>, 
- Krishneil Singh <krishneil.k.singh@intel.com>, 
- Simon Horman <horms@kernel.org>
-X-Mailer: b4 0.13.0
 
-From: Larysa Zaremba <larysa.zaremba@intel.com>
 
-Unlike ice, idpf does not check, if user has requested at least 1 combined
-channel. Instead, it relies on a check in the core code. Unfortunately, the
-check does not trigger for us because of the hacky .set_channels()
-interpretation logic that is not consistent with the core code.
 
-This naturally leads to user being able to trigger a crash with an invalid
-input. This is how:
+On 13/05/2024 20:29, Joe Damato wrote:
+> Make mlx4 compatible with the newly added netlink queue GET APIs.
+> 
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>   drivers/net/ethernet/mellanox/mlx4/en_cq.c   | 14 ++++++++++++++
+>   drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  1 +
+>   2 files changed, 15 insertions(+)
+> 
 
-1. ethtool -l <IFNAME> -> combined: 40
-2. ethtool -L <IFNAME> rx 0 tx 0
-   combined number is not specified, so command becomes {rx_count = 0,
-   tx_count = 0, combined_count = 40}.
-3. ethnl_set_channels checks, if there is at least 1 RX and 1 TX channel,
-   comparing (combined_count + rx_count) and (combined_count + tx_count)
-   to zero. Obviously, (40 + 0) is greater than zero, so the core code
-   deems the input OK.
-4. idpf interprets `rx 0 tx 0` as 0 channels and tries to proceed with such
-   configuration.
 
-The issue has to be solved fundamentally, as current logic is also known to
-cause AF_XDP problems in ice [0].
-
-Interpret the command in a way that is more consistent with ethtool
-manual [1] (--show-channels and --set-channels) and new ice logic.
-
-Considering that in the idpf driver only the difference between RX and TX
-queues forms dedicated channels, change the correct way to set number of
-channels to:
-
-ethtool -L <IFNAME> combined 10 /* For symmetric queues */
-ethtool -L <IFNAME> combined 8 tx 2 rx 0 /* For asymmetric queues */
-
-[0] https://lore.kernel.org/netdev/20240418095857.2827-1-larysa.zaremba@intel.com/
-[1] https://man7.org/linux/man-pages/man8/ethtool.8.html
-
-Fixes: 02cbfba1add5 ("idpf: add ethtool callbacks")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_ethtool.c | 21 ++++++---------------
- 1 file changed, 6 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-index 986d429d1175..1cf3067a9c31 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-@@ -222,14 +222,19 @@ static int idpf_set_channels(struct net_device *netdev,
- 			     struct ethtool_channels *ch)
- {
- 	struct idpf_vport_config *vport_config;
--	u16 combined, num_txq, num_rxq;
- 	unsigned int num_req_tx_q;
- 	unsigned int num_req_rx_q;
- 	struct idpf_vport *vport;
-+	u16 num_txq, num_rxq;
- 	struct device *dev;
- 	int err = 0;
- 	u16 idx;
- 
-+	if (ch->rx_count && ch->tx_count) {
-+		netdev_err(netdev, "Dedicated RX or TX channels cannot be used simultaneously\n");
-+		return -EINVAL;
-+	}
-+
- 	idpf_vport_ctrl_lock(netdev);
- 	vport = idpf_netdev_to_vport(netdev);
- 
-@@ -239,20 +244,6 @@ static int idpf_set_channels(struct net_device *netdev,
- 	num_txq = vport_config->user_config.num_req_tx_qs;
- 	num_rxq = vport_config->user_config.num_req_rx_qs;
- 
--	combined = min(num_txq, num_rxq);
--
--	/* these checks are for cases where user didn't specify a particular
--	 * value on cmd line but we get non-zero value anyway via
--	 * get_channels(); look at ethtool.c in ethtool repository (the user
--	 * space part), particularly, do_schannels() routine
--	 */
--	if (ch->combined_count == combined)
--		ch->combined_count = 0;
--	if (ch->combined_count && ch->rx_count == num_rxq - combined)
--		ch->rx_count = 0;
--	if (ch->combined_count && ch->tx_count == num_txq - combined)
--		ch->tx_count = 0;
--
- 	num_req_tx_q = ch->combined_count + ch->tx_count;
- 	num_req_rx_q = ch->combined_count + ch->rx_count;
- 
-
--- 
-2.44.0.53.g0f9d4d28b7e6
-
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 
