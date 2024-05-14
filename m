@@ -1,95 +1,141 @@
-Return-Path: <netdev+bounces-96343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ECB28C55C1
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:06:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF5FD8C55D5
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:11:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0C8FB2190C
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 12:06:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85C491F22EB9
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 12:11:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 714F81E4B1;
-	Tue, 14 May 2024 12:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35BDB2D60A;
+	Tue, 14 May 2024 12:11:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2B647F4B;
-	Tue, 14 May 2024 12:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB43320F;
+	Tue, 14 May 2024 12:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.216.63.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715688392; cv=none; b=ik+2TF6mxlGLHc1uvJ8qy8YhW7xSdkUrx+7YwON7r8jEjTp0UDMzzYxgllcNe3o2Nn0qHu2QqrhPNm54xVjxyfwTD5s/BVIZwcYE/5YUUHhgfPUGc/fiyKz/UxjjP+4u/0suLdFRBY5vzTK/QywPw2K1BGzO+6kuSHgatMhw4fQ=
+	t=1715688677; cv=none; b=ZV8HW7K3ELJEgymTi+yymMgQYE9U59dusoeoRKDnfSebkN5zT1NEsf3TPTCUrKMHW9HrBHfVMUXRiJfBQsvwery8Xf7xHfWpvBCmK3a5V7+M0L5bzfMOc85Lam5xeHPOopZA0gkLLiT4r8Di6ccKFwYI8WrCkW7751JOzRv+2zY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715688392; c=relaxed/simple;
-	bh=9155WRY98DaWbSA/SvQg5vVQwzBmCC5BMumb5sZl11Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XoLMqbiRz5tYKTdUg1zTMLKN/rxUuD9sDarrCOExxSKcsARDyrCMhPvoMRZTjTqB2E8JdhXx8by41y+8rZfiD9g4b4p9vVSKuXgrgFkRukihqa6h5pjmay7w2Nm0FeoUMzZTh5NCg5zcH3Hx9M0NQOEG7kQBa7A8uKjGFJe2txg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-51f12ccff5eso7584007e87.1;
-        Tue, 14 May 2024 05:06:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715688389; x=1716293189;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JGkgGEHSqVLLz9R443YRfxbCiDfzB4VKiKAy/L5beOQ=;
-        b=hbE63WYkYw2MOUhF87qDBuouYmARVPnTIxOGEjANiJHwLGBz7MZthZcNI24/YNwXJa
-         mHpFw/Xd3hsVARmze9LNkcYR7ND08AB841HImY+L/5nxg1xO/VzjCsQYjVG9Uav/G5mT
-         gvIIQBO/kVAAyEiDnxSMYtyqJi72O1BwlYYr9MAF1x4VAsG4W0P/bGgOS+/aSZE3B8mk
-         D6YjyIVVle9EZe07BAOKp6g/YKzyE6mvHJqN56Lm1vbcdB1gVRE+pyBUd3tWkKPWXNnO
-         ojOsLjR5GKsTVR33aRP9CVmVG6d1hcx5jVavpXFHrHcUeDL2it1dINu1LLcQxc0VSAIh
-         t6Yg==
-X-Forwarded-Encrypted: i=1; AJvYcCXfIWWoBwi2jBeNAWo8Qk/g5WLi8vMyqlM+9A7KTocEPzzt0u3fx5gsM3vZ9jN1jbJjWgl3VlTAyO/pUeQqaPjqiq8xLwHmNJMa/IVAHqsY5KuhhxCZWkrgEVu7fbajP3uFLj9n
-X-Gm-Message-State: AOJu0YwXzOnfVBuobxSakPnSWe1J44lfxSynd3wdbOHfU5S60kQU/6T0
-	GaPZG1FRW73eGqjdXWB0dyAE6QLnGXyVzawvPbknfbaQXWvmST6L
-X-Google-Smtp-Source: AGHT+IGMr05Y60lrruFUFnI8kXR9DXre6tVIZf/nmdvmabZ4MKTWKPmXc2BV0Vh2JS6zNm6KK7f/yA==
-X-Received: by 2002:a05:6512:a91:b0:51c:a0e1:2a44 with SMTP id 2adb3069b0e04-5221006fde3mr9451845e87.26.1715688388551;
-        Tue, 14 May 2024 05:06:28 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-118.fbsv.net. [2a03:2880:30ff:76::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a1787c6ffsm711848766b.49.2024.05.14.05.06.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 May 2024 05:06:28 -0700 (PDT)
-Date: Tue, 14 May 2024 05:06:26 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	thepacketgeek@gmail.com, Aijay Adams <aijay@meta.com>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] netconsole: Do not shutdown dynamic
- configuration if cmdline is invalid
-Message-ID: <ZkNTwrlLLol1w4gw@gmail.com>
-References: <20240510103005.3001545-1-leitao@debian.org>
- <20240513145129.6f094f92@kernel.org>
+	s=arc-20240116; t=1715688677; c=relaxed/simple;
+	bh=LLAcg8dgAcq42TteRCQbf45yE6Bj+8PkBxYFXSDJRvk=;
+	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=LM9irKrSdKmVlyZcVxZ6LUiRstDQ/fDzeXA8/qAM1VJ/gfnRjcsnxhMtn/wsRmrrZpmZZ4LAWjqMUIeEVxlSl4s/M2IfACOkHnx7pPLlpGME8ZMfeDmdbwHheJSE7F4o/iBo7DafWoDR/Zr4WJ6ExpRbssSb1du9QflCWJsPBq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=63.216.63.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4VdwDk62y6z8XrX5;
+	Tue, 14 May 2024 20:11:02 +0800 (CST)
+Received: from xaxapp03.zte.com.cn ([10.88.97.17])
+	by mse-fl1.zte.com.cn with SMTP id 44ECAwb2004590;
+	Tue, 14 May 2024 20:10:58 +0800 (+08)
+	(envelope-from xu.xin16@zte.com.cn)
+Received: from mapi (xaxapp01[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Tue, 14 May 2024 20:11:02 +0800 (CST)
+Date: Tue, 14 May 2024 20:11:02 +0800 (CST)
+X-Zmail-TransId: 2af9664354d614f-9c8c9
+X-Mailer: Zmail v1.0
+Message-ID: <20240514201102055dD2Ba45qKbLlUMxu_DTHP@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240513145129.6f094f92@kernel.org>
+Mime-Version: 1.0
+From: <xu.xin16@zte.com.cn>
+To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <dsahern@gmail.com>, <xu.xin16@zte.com.cn>, <fan.yu9@zte.com.cn>,
+        <yang.yang29@zte.com.cn>, <si.hao@zte.com.cn>,
+        <zhang.yunkai@zte.com.cn>, <he.peilin@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIXSBuZXQvaXB2NjogRml4IHJvdXRlIGRlbGV0aW5nIGZhaWx1cmUgd2hlbiBtZXRyaWMgZXF1YWxzIDA=?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 44ECAwb2004590
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 664354D6.001/4VdwDk62y6z8XrX5
 
-On Mon, May 13, 2024 at 02:51:29PM -0700, Jakub Kicinski wrote:
-> On Fri, 10 May 2024 03:30:05 -0700 Breno Leitao wrote:
-> > +static inline bool dynamic_netconsole_enabled(void)
-> > +{
-> > +	return IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC);
-> > +}
-> 
-> Why the separate static inline?
+From: xu xin <xu.xin16@zte.com.cn>
 
-I thought it would make the code easier to read.
+Problem
+=========
+After commit 67f695134703 ("ipv6: Move setting default metric for routes"),
+we noticed that the logic of assigning the default value of fc_metirc
+changed in the ioctl process. That is, when users use ioctl(fd, SIOCADDRT,
+rt) with a non-zero metric to add a route,  then they may fail to delete a
+route with passing in a metric value of 0 to the kernel by ioctl(fd,
+SIOCDELRT, rt). But iproute can succeed in deleting it.
 
-> We can put IS_ENABLED.. directly in the if condition.
+As a reference, when using iproute tools by netlink to delete routes with
+a metric parameter equals 0, like the command as follows:
 
-Sure. I will send a v2 with the IS_ENABLED() inside the if condition.
+	ip -6 route del fe80::/64 via fe81::5054:ff:fe11:3451 dev eth0 metric 0
 
-Thanks for the review.
+the user can still succeed in deleting the route entry with the smallest
+metric.
+
+Root Reason
+===========
+After commit 67f695134703 ("ipv6: Move setting default metric for routes"),
+When ioctl() pass in SIOCDELRT with a zero metric, rtmsg_to_fib6_config()
+will set a defalut value (1024) to cfg->fc_metric in kernel, and in
+ip6_route_del() and the line 4074 at net/ipv3/route.c, it will check by
+
+	if (cfg->fc_metric && cfg->fc_metric != rt->fib6_metric)
+		continue;
+
+and the condition is true and skip the later procedure (deleting route)
+because cfg->fc_metric != rt->fib6_metric. But before that commit,
+cfg->fc_metric is still zero there, so the condition is false and it
+will do the following procedure (deleting).
+
+Solution
+========
+In order to keep a consistent behaviour across netlink() and ioctl(), we
+should allow to delete a route with a metric value of 0. So we only do
+the default setting of fc_metric in route adding.
+
+CC: stable@vger.kernel.org # 5.4+
+Fixes: 67f695134703 ("ipv6: Move setting default metric for routes")
+Co-developed-by: Fan Yu <fan.yu9@zte.com.cn>
+Signed-off-by: Fan Yu <fan.yu9@zte.com.cn>
+Signed-off-by: xu xin <xu.xin16@zte.com.cn>
+---
+ net/ipv6/route.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index c43b0616742e..bbc2a0dd9314 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -4445,7 +4445,7 @@ static void rtmsg_to_fib6_config(struct net *net,
+ 		.fc_table = l3mdev_fib_table_by_index(net, rtmsg->rtmsg_ifindex) ?
+ 			 : RT6_TABLE_MAIN,
+ 		.fc_ifindex = rtmsg->rtmsg_ifindex,
+-		.fc_metric = rtmsg->rtmsg_metric ? : IP6_RT_PRIO_USER,
++		.fc_metric = rtmsg->rtmsg_metric,
+ 		.fc_expires = rtmsg->rtmsg_info,
+ 		.fc_dst_len = rtmsg->rtmsg_dst_len,
+ 		.fc_src_len = rtmsg->rtmsg_src_len,
+@@ -4475,6 +4475,9 @@ int ipv6_route_ioctl(struct net *net, unsigned int cmd, struct in6_rtmsg *rtmsg)
+ 	rtnl_lock();
+ 	switch (cmd) {
+ 	case SIOCADDRT:
++		/* Only do the default setting of fc_metric in route adding */
++		if (cfg.fc_metric == 0)
++			cfg.fc_metric = IP6_RT_PRIO_USER;
+ 		err = ip6_route_add(&cfg, GFP_KERNEL, NULL);
+ 		break;
+ 	case SIOCDELRT:
+-- 
+2.15.2
 
