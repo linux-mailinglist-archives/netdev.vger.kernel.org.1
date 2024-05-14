@@ -1,286 +1,288 @@
-Return-Path: <netdev+bounces-96328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 057C28C515B
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:29:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 426A98C5152
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:28:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27D101C2135E
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 11:29:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CB92B2168B
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 11:28:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F16135A45;
-	Tue, 14 May 2024 10:59:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01FF71304A2;
+	Tue, 14 May 2024 10:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NFl1MJ1F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qh904XOk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035EC13540C
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 10:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715684357; cv=fail; b=Y8on4fbASLyhNd4RyhydYg0diwjMCPBRghg/46Hq8J32huRfUoqRay/UorFi4aTOIMIMXPNZvpbFSGB1MURYZCOHUcTX3UOUGDs0gbzZzj/R/sM39wg50QbKfGXOdr7XifTepM5cC2Rc5ZfkFpst6+KIbT1iDixxaVvfyzXU/wY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715684357; c=relaxed/simple;
-	bh=FOxBrMAifOhBRQVfVQAR+zIyMTApMA1URQko3sksSew=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=UROz/7Efq80V21iCty0ZZqry1u/HAh/d7fx1VnmSyknXO5H0NRckpAMzNNaf0vT4oOEp3eLKxzKD0FxgH5xRy6kC6leDASZdrChSSNjhxOeNnNdb0MJVRGh9ywpOux1AajyzZT7kjcckmL/wFCUIylgzYOCd8Vt/h58oZQafAnU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NFl1MJ1F; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715684356; x=1747220356;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=FOxBrMAifOhBRQVfVQAR+zIyMTApMA1URQko3sksSew=;
-  b=NFl1MJ1Fe1wSEKKszg2f8vcUfG6ORc+3b7BaQzx9f1t3dpGIGujW3KPF
-   L54dL2asTWRv+taTarCBwr9wi81Xzq0jqf2aPzdFvyKslpHANmoj+7CUP
-   rlEUrrFi5SovuEuXlURMLs2Koo/dOTpwq2VD5k3Vl8p13vHx26UWPm4r/
-   PQ/uvukvKQFscEuyhK8FfiNMN0Bmz7+B9uoaixYQU6aMGs8rI062sXDv1
-   Xke1jq4CKRBHFd+BvnAPdcjqSqC+sltQmNToQRPxxPj4XuUcitQWvCcxn
-   5ccbYS6CUCWITnhgLTL3T3jTZZvpAaa9zfUiKKLmhPX8XirNTduwpZkcC
-   w==;
-X-CSE-ConnectionGUID: r0To6603Qde3/1ZgnpAI6A==
-X-CSE-MsgGUID: +nKSijvyR72YgQj0Vw0n1A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11072"; a="23061805"
-X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="23061805"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 03:59:15 -0700
-X-CSE-ConnectionGUID: 67KLJS8yQky7HinYifJNtQ==
-X-CSE-MsgGUID: x+zsQNcsRN+xtfscaEKoQQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="30776591"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 May 2024 03:59:15 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 14 May 2024 03:59:14 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 14 May 2024 03:59:14 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 14 May 2024 03:59:14 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 14 May 2024 03:59:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WGLPZoQH/dpuZhjsJF/SYikm/cPODwIlvE3tmpXqhBc/dJAM32cefWcB+PdugibZkK/2/gwgG506YYJQnhh+f3MaWj8bjowq7dgODTMArpogiPDS5wQgYUNDdB88xDg83gkiCLjUrgehIJrzCbAJerItLhQ/bhNciKjzm6UdOoNwbPUJue9+cMN971TXMImE7DbCoQaxqa68UXYBduELTqn2tk3lFbgxl/30QC6fnND8h2PH8KKio2AFo+5lyBswhAnGc4zcJhkjavkv3UdLYJWZfFaafI/trYNlVVg74LWuJfQP/w67zIM9Mxmk6zvhcwEc/qdJ603TliwT/5P4XQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NELVv/0+RqDAKgnOBAwXDkyuR+OaSu3QZLO7fysw4Ek=;
- b=Y9a6CTz0VmK78DVhBffpiahyWDHvZvgCVVObYTuweH6PcrgKhtqG81oo6cHHCeSv1N9Ts7EWRHe9bsg5Q91qP8WrRPN3u8ZqXXOLqcNusTV6kIbFanSak3k3tXXkJqGLjmYRz+0jXCkbSeyJ8Zp0evX//Wkbk1J45+jun6RQxx3L3aQnUcWdeiWDoZNik5k76SuUV6k6hBtoiajb/T8fEgtcv1LYXrc24SEtI+0nWF8d4EnPWq7pJrwe0IsjyhUCxZFSg/Cfrclt6t316Z7hlqsTzyA/k8/nhcgfTVJCemaq09Hv0di9v/0f6++UNIDlGr5b1UaUkHhxvbS7kNe0DQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by SA1PR11MB5874.namprd11.prod.outlook.com (2603:10b6:806:229::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Tue, 14 May
- 2024 10:59:12 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.7544.052; Tue, 14 May 2024
- 10:59:12 +0000
-Message-ID: <0555b297-5f8c-42a1-b651-e3119b1851ba@intel.com>
-Date: Tue, 14 May 2024 12:58:01 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next:main 13/66] include/linux/compiler_types.h:460:45:
- error: call to '__compiletime_assert_654' declared with attribute error:
- BUILD_BUG_ON failed: !IS_ALIGNED(offsetof(struct napi_gro_cb, zeroed),
- sizeof(u32))
-To: Richard Gobert <richardbgobert@gmail.com>
-CC: kernel test robot <lkp@intel.com>, <oe-kbuild-all@lists.linux.dev>,
-	<netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn
-	<willemb@google.com>
-References: <202405141504.J6WdljEp-lkp@intel.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <202405141504.J6WdljEp-lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR2P278CA0022.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:46::7) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153CA320F;
+	Tue, 14 May 2024 10:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715684324; cv=none; b=Uu5Ypiwx8hQUHjSCOQeSDskpb60CVNFMWkrew8gy1APZesXVma8NmX4K1vr6FHVBJ5Ho5ZwYYQQNTPF4B7wb34z5X6QhrKQjfiqtPjw21iNXH15EejpR20ZD733WloOMXZPLUuFexL3E0YIL4Z1h6AWE7iSE2PfS9Eg9JeCTPag=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715684324; c=relaxed/simple;
+	bh=lpcqTqrvcgADw0vPU8bnP14Eq09pMdEMy88+H2lqisc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oXZLo7KEBg+f+Dob9qwXm1hp6XwCOvM4aD2nuXErrdHdbgOk6l+dlWCeegS2XSzQO8kj0s7sNA2Aty+LhM+jhcNH50O3uRbuEri3vzuJd9sSZ9Sc93Tq8JVDTIX9xPrS3+0ms6pHEiKpVf1JzKiBxtTKSikG53t1MgI4bLKkziw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qh904XOk; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-41ff5e3d86aso28248265e9.1;
+        Tue, 14 May 2024 03:58:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715684321; x=1716289121; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zcss4NldlyQ6tiuFcBRQjRJyCadmCYp5vKGWkvqedX8=;
+        b=Qh904XOk7LMUyNy7Q5+GqF0I2UviQeY33yJ5uoLesm/l6BiRfyXFiimax2YzrQWYIt
+         xJA4WrM4Dibyi4WRCHaaRqjTZdbo/3dhScI3CxF6yjVzfw+R7dIBrjaJAXg3eQVZ9W1v
+         owqSwpR0mbps4s8cXRA3pNBzyqXz3CHUVGIR3Z54VhmztTmO2cOo3HcT6K5HlHUp0WTC
+         ch64YeqElZKlSs676krVvvRsK4tGn1WuNCmVIR5/TaC2TZjmW9LKujOmr1WDui3ujv83
+         i9wbXBizJJjlJvq698htrM7eYZzAEPFieLJWOMDdDvNMRots6soyIagtNRv8ep7J4PJ7
+         C64g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715684321; x=1716289121;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zcss4NldlyQ6tiuFcBRQjRJyCadmCYp5vKGWkvqedX8=;
+        b=gt4pL/ow0/lWaeu7FLXu3b2yqlV0Me7bwy+MOqO+cQEtngOm0gWdHfdgpflrS47+GW
+         Ja0NzebhSPSgxhAYVRy/1H1IbO+oJvdz9ZScU18RdKyHLda0vpM7U3NjWgKNURsNKqF0
+         g+8kAb0F+WMHxc3+BCEIZGwJHaF4xu+U1m3IWPAFTo3q4ZPwn8vSqmmXSnVTQ1s8M+we
+         O14R7dv30PPjsMjj2vu4XJJHBhkhHnRwNxAZy3TNsLhJxz4itvkDq5z+Yjl9eBwX3xzS
+         30s+S15VoXNbH6y3bEl8sUoXjbqGThQKlVuB7F/DeblsL8YfZGt/7kxzE7wcPmrmhM9Z
+         Acgg==
+X-Forwarded-Encrypted: i=1; AJvYcCXrlsM7bdFpUjcRAD81Cis/TK7O54Rezw23sNpBbdAnizxpUf3deHGJZeeNI9lKkgPwnHGb7Hr8slza8j5JRPBqwS9j2AXZHlTVGDE9+VLCnLD6eyMZvefHOokUi/UvqMkf020g7opkLHwXVtw6bQG8ODGtA8J9VB8Mmi0VTYwatR4ybAk/D9o8XxXw4rrZvfirOVSbNAfN
+X-Gm-Message-State: AOJu0YzE4qzKFWTuQOyBJRZmzOxLezpvhE2s9VCi1LM1wersH9kxNKgY
+	/qJiN3i2WoHD4/1FwC0F6uEAv/709NUy5QiWJNukk82nCKgX1Cxu
+X-Google-Smtp-Source: AGHT+IHavPP3p7VgtypkEZA30JLLaKH02FZ4mtDF6rpdxpx+nbNFgjPzyo0LtoD2LFO9QdAan7y7bQ==
+X-Received: by 2002:adf:eb12:0:b0:347:9bec:9ba3 with SMTP id ffacd0b85a97d-3504aa64997mr9449373f8f.66.1715684321125;
+        Tue, 14 May 2024 03:58:41 -0700 (PDT)
+Received: from vitor-nb.corp.toradex.com (31-10-206-125.static.upc.ch. [31.10.206.125])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b79bca6sm13355328f8f.12.2024.05.14.03.58.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 May 2024 03:58:40 -0700 (PDT)
+From: Vitor Soares <ivitro@gmail.com>
+To: Marc Kleine-Budde <mkl@pengutronix.de>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Thomas Kopp <thomas.kopp@microchip.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Vitor Soares <vitor.soares@toradex.com>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ivitro@gmail.com,
+	stable@vger.kernel.org
+Subject: [PATCH v5] can: mcp251xfd: fix infinite loop when xmit fails
+Date: Tue, 14 May 2024 11:58:22 +0100
+Message-Id: <20240514105822.99986-1-ivitro@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|SA1PR11MB5874:EE_
-X-MS-Office365-Filtering-Correlation-Id: f5d47ea3-b13c-416a-8d69-08dc7404e33c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|1800799015;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?NkprZ0FTRjQrcnlIeXJQNkd4UWF1Z2gwVHA4RitUeitoUjR2MEJnWmp3Yks1?=
- =?utf-8?B?Y0RVdGdGdE1zcENQVVVSOXpYSnFXdUt2Qzd6ZXMxdXlqdW0xRUVtWmZhNTJQ?=
- =?utf-8?B?SWdvdStrS1RnNmNyeSs4cUFNMFRjRHBzaTNTZjlROW1JSCttZm1WZEovOGFx?=
- =?utf-8?B?LzUzRExLTVlQVk9mZXNKdzlUbWE0Vy95K0IvQW14cDlzbmorUkJUZzBtWUVI?=
- =?utf-8?B?OWQ2bTYyN2pTTlVWUk9sQ3E4TU1FaTREV1lsWk9JY3VMTGF0VUhrTW5uMW5I?=
- =?utf-8?B?eEl4bkxSYWpuU2F3ZFRVQUlOaEpCZFdaN0RsYlZyTEJPNzNRaHNkZzJmWVQ2?=
- =?utf-8?B?NXF3cWhWa2pVdDgxK3YrclBtTmx1VUczd0xTWUNqb2JXdllvZWZIMGpSS0FS?=
- =?utf-8?B?Yit6WWJQb3NtRHBwK1FjdnlMdFJmL1NST0JjWDdWZEJ5WEFvNTFydWplZk9Q?=
- =?utf-8?B?TUEyNWlFRTFPWldzT2F0dW9iSCthOGJGcWs5K2V0K016VWs1anM5V1B2MDFj?=
- =?utf-8?B?K2FkMFlBLzljRDA5cWhIckVuRmsvVzBWUjJXWXJuNndiY2pLYkJvRWN0SjFE?=
- =?utf-8?B?V2ZyS1NsVzIvb2tHcmhES0RxSHphV1ZTMXBYNmxzYkpLdDRENnhOZHR2NjU4?=
- =?utf-8?B?YVg2T01YNGswdytsTXR1TnRNWXFoZWxvdllKWGUyUHZtYkRHNy9TNHJ3TUlH?=
- =?utf-8?B?ZTNXNzlOZDlHa3VxL0dYZmx3aXIrNlRQOUIwbjU2bHlySlBpbndMQnJlUkpi?=
- =?utf-8?B?V2I4MTBXRkNDZ2VwUEh1KzZaYTJKR3pRTUFUQ3RTdjhRb0t5MnI5OTNlRWdR?=
- =?utf-8?B?U3hnamoyaWJ3eEx1WjJYYm8wcENmRXJBbkZrQlVYUHE0OUdMSDA4YjZiQnph?=
- =?utf-8?B?ZDd0ajFKSHJIZ2pKTjZJdjAzK3ZrbVVYTmRuK0QzL204VHV6SkNNeDRocXJ1?=
- =?utf-8?B?eDkwc0ZQcXZIdi9Jc2JSdlNkTlBoZmZvckNYVEdibFR4RThXSDFucGNZN1NS?=
- =?utf-8?B?dmRrdktOU3pkWG4vU0drOEQrNlQ3SnRiOTZsdTZzZnpiREFCaEV6UEhhSXNj?=
- =?utf-8?B?SWMrMlduZ0xGUXpqZlBUUUNuZ0NpTjRORmlkdEVNb2RlekVyOS9PZHd1cFpw?=
- =?utf-8?B?aUdROVE5cVErQWhZanJ4K3k5dWhkUXdJZXprU1I4Vk1WemlTcXI4eVBRamVk?=
- =?utf-8?B?VVVwL3pmMGZzbmVSV2R4WFA4bG9Yd2hudUZqZ3NWdjl4RGQ1Wmt4aE9FdDI5?=
- =?utf-8?B?USt0QlY4TVo1R0VxUk1iUTJ6MzV1cjlYaktuVzZBNVJ6UitIL21RZlpBOW5X?=
- =?utf-8?B?S2poQVAzd3BYTSt0TERsOFpNMVR4UXlsZXJXMVVwa1lJc2h2RmZicnZhQUNk?=
- =?utf-8?B?MStVelVJM2xWb2pSMy94K3FHaDJ1WGdUN08yNXJkTkJoWkI3blYrZU9FZFZ6?=
- =?utf-8?B?NEVkRXpaREcwajRVMGU5Z3JLSFY2OStiUWtwWDNNY25rK3hZMlRscmpuY0lW?=
- =?utf-8?B?RktEWnFpMWtyVTFPcE1pMXkxeDBZSHpxV05mN2JhdnZHcW9YcUlrdjVBR1VU?=
- =?utf-8?B?dW94SjZnTFV4YXQ0WkltVjFLN1EzM2pGNFBzb3BLKzczdUZycGdFUlA5V3J6?=
- =?utf-8?Q?DOQSvOkSOWv7Ie3i167uruLc/G2tVaQVe7Fc335c9dag=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aUROdkFyaDRCRXZSM1BJa1loSnFVYjlkODR4ZkRYZm9mZ1c2c2F5RkhBdHB2?=
- =?utf-8?B?Ti9BTHBUbUFKY2JCajk1RzFlMXRPanVFMlMxNUdXSHZFTTZNVVdOa3VUTkQr?=
- =?utf-8?B?enNhWkpYZU8vUUNkTmhBRVB5RU92aFJXay95MW1tUnFYeEROTktwN3Y1V1o0?=
- =?utf-8?B?aGF1LzlLZW9GRFBZYStKa2wvb2M2OEsxMFVhZm9RYnVwcXVpeUFQaUYrTGJk?=
- =?utf-8?B?T2xYU0VzZjlYT0ZtSTJtUEtNNDFpQVdiamNLZ01MemZTRkhSU3owVnZNcTFG?=
- =?utf-8?B?NmVOVVNTNWRQT1Fwd09ac1VYUTU3WFpTUng0ZThodXd1TmYwL3dvdyt2SHlv?=
- =?utf-8?B?VjA3RnpBZk1wWWZYT3llY0ZpcStIcFkwUkplTkxSalp2OGpNd01yaUs5Wlhw?=
- =?utf-8?B?eEhvSmJpcTgxVGY3U3JEQS84c002aEpSS09EMmplbFBvTUNkam9sdTVkeVNM?=
- =?utf-8?B?NWFVNElYSENwYmpDM0syZ0YyTUJTcjRUcUpmYXZZa3lOS3VhQVRqQXc3cU9q?=
- =?utf-8?B?OVFrc2VNa3lSR1l3ZkZwMFRJZnQ1ZXJDdzZjUE5MTmlrNDIxREM3SmtiTUFB?=
- =?utf-8?B?MUlMM2lKTGdPR1JFMGQ4WnU5ekxvb2ZITVUzTmswZ2FSb3p5RkxqU0xReTBh?=
- =?utf-8?B?SXR3ZkxCWXZVT1dCQkR3alNVdkVIeGRhWCtQSU9hNmRGaXRGZGFMeVh5ZjRi?=
- =?utf-8?B?b1UzWU5GSFFuemx6YXp6aUZ5NzBBV0JIRlROTUltVXRHSzVUUzhIR2ZEaEJK?=
- =?utf-8?B?N3dPMy9uWkQyYVBnZWpUY2FZd1g0TXNpTHJlZFVzTnpUYjc4MHkycjFPTExv?=
- =?utf-8?B?dVFFMHJ1VFB3WFhkN0lITXlQRkh0ZmozTDRPZVJHSXhyaGgzL0NCOGVJbklr?=
- =?utf-8?B?VzNhSk9ZdUxhSjNzaTlTR0RNcXRQdVdDZXRuMzdBc0NLNnJMM2NpVVZBenVp?=
- =?utf-8?B?TS9SSmo5bjNWdnp5TnRPZmltb2FNbWw3b2tXbFdLUVFYZWF4Wnl1RTBnZkY5?=
- =?utf-8?B?MzZnOTR5SFFpRjFoeWJkL1JEVmZNNkc4VGhmMkVsaVhKL1lrL2VzbzBJbndM?=
- =?utf-8?B?ZHFzZU9uQjkwWDZJeEM4cndTQkJlUGY5UENLTjZrRmRXNkJRdlVRcDNicUpv?=
- =?utf-8?B?NDJCNzhkZXY3cDlybC9TRjlMYndIcS9xeUl1V0NIRTd3UUMvbWo2V0ZXUVZ5?=
- =?utf-8?B?SXNZbllBTFJtWFZrVVJHbkNlekJJZnRmcUR0ZHEyYXRFZzdNeE9xVU13UUJ0?=
- =?utf-8?B?TVN2Vnd1S2Y1cndPZXIwNnJ0aUxWMXh0NFlzZlZyT0hKaUhOMlp6eHYyd0V6?=
- =?utf-8?B?YzdjTXJPcVNkVHdOWmRzWDZBSEEzODhJUmc3U2pPU1hBUGdKSCtMM2dWRG1p?=
- =?utf-8?B?bGZSNjdmQTlSc1FHN1BKTkIrbVlaSktkcHVTSEFEeTZRODY2REpTblhWNlpj?=
- =?utf-8?B?VWRzNmlYb3RDY0tXV3luUEF0Nmg5OStNc0F3T29rTWgvM2x0Y1BCNitVK0pw?=
- =?utf-8?B?d003Nlh3dUsrSmwxNCtJT3BYaUZZVnRCakM2NktqZEpPbVpwOFg4cUxoWDFE?=
- =?utf-8?B?dGxuR0JJa2FaYkJMeENmR2RMbG9ZRFYzWkIyTWFDeEtTNWhINGZFWUc1SFBX?=
- =?utf-8?B?RzhaVkJUT0FCWHBFaHNrM1plSEJZaE05SERSYW8wbGdFTzloMS9xSjFqZmRX?=
- =?utf-8?B?N1Y2cXJyaldHbFN3ZGxpdGRONlpIZG5CSnZyMmVSMVozc1llUHc0d2RpUTE2?=
- =?utf-8?B?aXV1cUxTMCs0UUFlV2c3Ym1jcmU5ME43OTQzTkRnMlQzMEJwdHR5WW1vM3B5?=
- =?utf-8?B?OUhkL0JjbzBwK0w2eC9QblZRQmlMbURNcGFSVWNKRmdDVGZFSEVrVGNtRlNj?=
- =?utf-8?B?aGk4WTF5Smk5bzN3OXBMT1hlMnZ0Ym92ZmNTMWg0SHQ3QWNFc3B6YmdzU2p3?=
- =?utf-8?B?bUY1eUJVV0lWdEFuaFRDV3RycnlISDdSb3Nybzh6UXlYZ1c5TEMxNndnZjJL?=
- =?utf-8?B?RUlwRlhHZEtLK1pRU2lJUGUwUUxQMXh5bEQwWHFmeXhsZXJpZlB3QVhteHBo?=
- =?utf-8?B?T01DUlM4ZU5FTzQ2RUVjVkl1THlFWnBGa2kzc29icGovNVBHRFFtdUlqUkUw?=
- =?utf-8?B?SEI0c3VHSG9UWjQvbk1pVzRGRWpTdHhmUzBiMWZIdU5DZHpsZjZJUGNrcDFy?=
- =?utf-8?B?VEE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5d47ea3-b13c-416a-8d69-08dc7404e33c
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2024 10:59:12.1971
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XXcOBtxCAcRU6ulfRwtIKjlzdbZBZuIGero84vVwQDGpPVUJkIgVRmAA9KrBvbw8gbY9PfsbfxRghhNhdcbUHFNROdki1E9JUvQv5XTwjdU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB5874
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-From: Kernel Test Robot <lkp@intel.com>
-Date: Tue, 14 May 2024 15:53:43 +0800
+From: Vitor Soares <vitor.soares@toradex.com>
 
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git main
-> head:   5c1672705a1a2389f5ad78e0fea6f08ed32d6f18
-> commit: 4b0ebbca3e1679765c06d5c466ee7f3228d4b156 [13/66] net: gro: move L3 flush checks to tcp_gro_receive and udp_gro_receive_segment
-> config: m68k-mvme16x_defconfig (https://download.01.org/0day-ci/archive/20240514/202405141504.J6WdljEp-lkp@intel.com/config)
-> compiler: m68k-linux-gcc (GCC) 13.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240514/202405141504.J6WdljEp-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202405141504.J6WdljEp-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
->    In file included from <command-line>:
->    net/core/gro.c: In function 'dev_gro_receive':
->>> include/linux/compiler_types.h:460:45: error: call to '__compiletime_assert_654' declared with attribute error: BUILD_BUG_ON failed: !IS_ALIGNED(offsetof(struct napi_gro_cb, zeroed), sizeof(u32))
+When the mcp251xfd_start_xmit() function fails, the driver stops
+processing messages, and the interrupt routine does not return,
+running indefinitely even after killing the running application.
 
-Hi Richard,
+Error messages:
+[  441.298819] mcp251xfd spi2.0 can0: ERROR in mcp251xfd_start_xmit: -16
+[  441.306498] mcp251xfd spi2.0 can0: Transmit Event FIFO buffer not empty. (seq=0x000017c7, tef_tail=0x000017cf, tef_head=0x000017d0, tx_head=0x000017d3).
+... and repeat forever.
 
-In the mentioned commit, you moved some fields placed before
-napi_gro_cb::zeroed and seems like on some architectures this misplaced
-napi_gro_cb::zeroed and it's not aligned to 4 bytes there anymore.
-Since ::zeroed is used as one u32 to quickly zero the hot fields,
-it must be aligned to 4 to avoid slow unaligned accesses.
-Which means you need to move some more fields around a bit, so that its
-offset would again be aligned to 4.
+The issue can be triggered when multiple devices share the same
+SPI interface. And there is concurrent access to the bus.
 
->      460 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
->          |                                             ^
->    include/linux/compiler_types.h:441:25: note: in definition of macro '__compiletime_assert'
->      441 |                         prefix ## suffix();                             \
->          |                         ^~~~~~
->    include/linux/compiler_types.h:460:9: note: in expansion of macro '_compiletime_assert'
->      460 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
->          |         ^~~~~~~~~~~~~~~~~~~
->    include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
->       39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
->          |                                     ^~~~~~~~~~~~~~~~~~
->    include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
->       50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
->          |         ^~~~~~~~~~~~~~~~
->    net/core/gro.c:496:9: note: in expansion of macro 'BUILD_BUG_ON'
->      496 |         BUILD_BUG_ON(!IS_ALIGNED(offsetof(struct napi_gro_cb, zeroed),
->          |         ^~~~~~~~~~~~
-> 
-> 
-> vim +/__compiletime_assert_654 +460 include/linux/compiler_types.h
-> 
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  446  
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  447  #define _compiletime_assert(condition, msg, prefix, suffix) \
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  448  	__compiletime_assert(condition, msg, prefix, suffix)
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  449  
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  450  /**
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  451   * compiletime_assert - break build and emit msg if condition is false
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  452   * @condition: a compile-time constant condition to check
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  453   * @msg:       a message to emit if condition is false
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  454   *
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  455   * In tradition of POSIX assert, this macro will break the build if the
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  456   * supplied condition is *false*, emitting the supplied error message if the
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  457   * compiler has support to do so.
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  458   */
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  459  #define compiletime_assert(condition, msg) \
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21 @460  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-> eb5c2d4b45e3d2 Will Deacon 2020-07-21  461  
-> 
-> :::::: The code at line 460 was first introduced by commit
-> :::::: eb5c2d4b45e3d2d5d052ea6b8f1463976b1020d5 compiler.h: Move compiletime_assert() macros into compiler_types.h
-> 
-> :::::: TO: Will Deacon <will@kernel.org>
-> :::::: CC: Will Deacon <will@kernel.org>
+The problem occurs because tx_ring->head increments even if
+mcp251xfd_start_xmit() fails. Consequently, the driver skips one
+TX package while still expecting a response in
+mcp251xfd_handle_tefif_one().
 
-Thanks,
-Olek
+This patch resolves the issue by starting a workqueue to write
+the tx obj synchronously if err = -EBUSY. In case of another error,
+it decrements tx_ring->head, removes skb from the echo stack, and
+drops the message.
+
+Fixes: 55e5b97f003e ("can: mcp25xxfd: add driver for Microchip MCP25xxFD SPI CAN")
+Cc: stable@vger.kernel.org
+Signed-off-by: Vitor Soares <vitor.soares@toradex.com>
+---
+
+V4->V5:
+  - Start a workqueue to write tx obj with spi_sync() when spi_async() == -EBUSY.
+
+V3->V4:
+  - Leave can_put_echo_skb() and stop the queue if needed, before mcp251xfd_tx_obj_write().
+  - Re-sync head and remove echo skb if mcp251xfd_tx_obj_write() fails.
+  - Revert -> return NETDEV_TX_BUSY if mcp251xfd_tx_obj_write() == -EBUSY.
+
+V2->V3:
+  - Add tx_dropped stats.
+  - netdev_sent_queue() only if can_put_echo_skb() succeed.
+
+V1->V2:
+  - Return NETDEV_TX_BUSY if mcp251xfd_tx_obj_write() == -EBUSY.
+  - Rework the commit message to address the change above.
+  - Change can_put_echo_skb() to be called after mcp251xfd_tx_obj_write() succeed.
+    Otherwise, we get Kernel NULL pointer dereference error.
+
+ .../net/can/spi/mcp251xfd/mcp251xfd-core.c    | 13 ++++-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c  | 51 ++++++++++++++++---
+ drivers/net/can/spi/mcp251xfd/mcp251xfd.h     |  5 ++
+ 3 files changed, 60 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
+index 1d9057dc44f2..6cca853f2b1e 100644
+--- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
++++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
+@@ -2141,15 +2141,25 @@ static int mcp251xfd_probe(struct spi_device *spi)
+ 	if (err)
+ 		goto out_free_candev;
+ 
++	priv->tx_work_obj = NULL;
++	priv->wq = alloc_workqueue("mcp251xfd_wq", WQ_FREEZABLE, 0);
++	if (!priv->wq) {
++		err = -ENOMEM;
++		goto out_can_rx_offload_del;
++	}
++	INIT_WORK(&priv->tx_work, mcp251xfd_tx_obj_write_sync);
++
+ 	err = mcp251xfd_register(priv);
+ 	if (err) {
+ 		dev_err_probe(&spi->dev, err, "Failed to detect %s.\n",
+ 			      mcp251xfd_get_model_str(priv));
+-		goto out_can_rx_offload_del;
++		goto out_can_free_wq;
+ 	}
+ 
+ 	return 0;
+ 
++ out_can_free_wq:
++	destroy_workqueue(priv->wq);
+  out_can_rx_offload_del:
+ 	can_rx_offload_del(&priv->offload);
+  out_free_candev:
+@@ -2165,6 +2175,7 @@ static void mcp251xfd_remove(struct spi_device *spi)
+ 	struct mcp251xfd_priv *priv = spi_get_drvdata(spi);
+ 	struct net_device *ndev = priv->ndev;
+ 
++	destroy_workqueue(priv->wq);
+ 	can_rx_offload_del(&priv->offload);
+ 	mcp251xfd_unregister(priv);
+ 	spi->max_speed_hz = priv->spi_max_speed_hz_orig;
+diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
+index 160528d3cc26..1e7ddf316643 100644
+--- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
++++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
+@@ -131,6 +131,41 @@ mcp251xfd_tx_obj_from_skb(const struct mcp251xfd_priv *priv,
+ 	tx_obj->xfer[0].len = len;
+ }
+ 
++static void mcp251xfd_tx_failure_drop(const struct mcp251xfd_priv *priv,
++				      struct mcp251xfd_tx_ring *tx_ring,
++				      int err)
++{
++	struct net_device *ndev = priv->ndev;
++	struct net_device_stats *stats = &ndev->stats;
++	unsigned int frame_len = 0;
++	u8 tx_head;
++
++	tx_ring->head--;
++	stats->tx_dropped++;
++	tx_head = mcp251xfd_get_tx_head(tx_ring);
++	can_free_echo_skb(ndev, tx_head, &frame_len);
++	netdev_completed_queue(ndev, 1, frame_len);
++	netif_wake_queue(ndev);
++
++	if (net_ratelimit())
++		netdev_err(priv->ndev, "ERROR in %s: %d\n", __func__, err);
++}
++
++void mcp251xfd_tx_obj_write_sync(struct work_struct *ws)
++{
++	struct mcp251xfd_priv *priv = container_of(ws, struct mcp251xfd_priv,
++						   tx_work);
++	struct mcp251xfd_tx_obj *tx_obj = priv->tx_work_obj;
++	struct mcp251xfd_tx_ring *tx_ring = priv->tx;
++	int err;
++
++	err = spi_sync(priv->spi, &tx_obj->msg);
++	if (err)
++		mcp251xfd_tx_failure_drop(priv, tx_ring, err);
++
++	priv->tx_work_obj = NULL;
++}
++
+ static int mcp251xfd_tx_obj_write(const struct mcp251xfd_priv *priv,
+ 				  struct mcp251xfd_tx_obj *tx_obj)
+ {
+@@ -175,7 +210,7 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
+ 	if (can_dev_dropped_skb(ndev, skb))
+ 		return NETDEV_TX_OK;
+ 
+-	if (mcp251xfd_tx_busy(priv, tx_ring))
++	if (mcp251xfd_tx_busy(priv, tx_ring) || priv->tx_work_obj)
+ 		return NETDEV_TX_BUSY;
+ 
+ 	tx_obj = mcp251xfd_get_tx_obj_next(tx_ring);
+@@ -193,13 +228,13 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
+ 		netdev_sent_queue(priv->ndev, frame_len);
+ 
+ 	err = mcp251xfd_tx_obj_write(priv, tx_obj);
+-	if (err)
+-		goto out_err;
+-
+-	return NETDEV_TX_OK;
+-
+- out_err:
+-	netdev_err(priv->ndev, "ERROR in %s: %d\n", __func__, err);
++	if (err == -EBUSY) {
++		priv->tx_work_obj = tx_obj;
++		netif_stop_queue(ndev);
++		queue_work(priv->wq, &priv->tx_work);
++	} else if (err) {
++		mcp251xfd_tx_failure_drop(priv, tx_ring, err);
++	}
+ 
+ 	return NETDEV_TX_OK;
+ }
+diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd.h b/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
+index 24510b3b8020..4e27a33f4030 100644
+--- a/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
++++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
+@@ -633,6 +633,10 @@ struct mcp251xfd_priv {
+ 	struct mcp251xfd_rx_ring *rx[MCP251XFD_FIFO_RX_NUM];
+ 	struct mcp251xfd_tx_ring tx[MCP251XFD_FIFO_TX_NUM];
+ 
++	struct workqueue_struct *wq;
++	struct work_struct tx_work;
++	struct mcp251xfd_tx_obj *tx_work_obj;
++
+ 	DECLARE_BITMAP(flags, __MCP251XFD_FLAGS_SIZE__);
+ 
+ 	u8 rx_ring_num;
+@@ -952,6 +956,7 @@ void mcp251xfd_skb_set_timestamp(const struct mcp251xfd_priv *priv,
+ void mcp251xfd_timestamp_init(struct mcp251xfd_priv *priv);
+ void mcp251xfd_timestamp_stop(struct mcp251xfd_priv *priv);
+ 
++void mcp251xfd_tx_obj_write_sync(struct work_struct *ws);
+ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
+ 				 struct net_device *ndev);
+ 
+-- 
+2.34.1
+
 
