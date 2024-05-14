@@ -1,99 +1,109 @@
-Return-Path: <netdev+bounces-96208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C56358C4A65
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:20:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80D028C4A6A
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:24:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8133F2845EB
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 00:20:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34ED228287D
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 00:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943EC365;
-	Tue, 14 May 2024 00:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F51537E;
+	Tue, 14 May 2024 00:24:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QB3j1u5R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YY6CfJ0P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADC8191;
-	Tue, 14 May 2024 00:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7068F7EF;
+	Tue, 14 May 2024 00:24:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715646029; cv=none; b=YXEqqTd2UC5mGZZYhKxwFD/6nKS2xVVV1sJyiJcJlzSUdIEs7HlXQNa+2H6jX8Zl+/Hokj0kaVvvmK6QTwZVz1eI2SLv2N6gh0C767gKj/8NJT4Fz4ruv9e7F/SAQwtI251IwAWZcLjbc9UcbSm8Qj0EupYKrOYb7LpUTzJUCnY=
+	t=1715646250; cv=none; b=ag1mbY+X+3LLFLJ/56jU+8nGruWiPctN59yz067uFsIP2s0NAxccdRmpiTlJKNipKT3YagV0XxOPvJY9VzOfNNNKsBYwf8L0KT0HAeAHVG/jCgAEdRIZG7wXROuEr+17Hok+fx1delfTMxTNgvwuNH6G0eIvNPjzMQYoKt8UaYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715646029; c=relaxed/simple;
-	bh=kEv2P8VEAhzSpPP4oNzBwxUgCk18mS9kUZsVlSL24S8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ddroGpfqWHpz+OnU9guxVsmb2/Dne3gnp8nStXDDIWv8DHk+d/bngoSN3UxgiLfU/+JTN+6JzlsD8wc7AJvQo4Jz6yO+/YRMPOW4VY0IkkXO1ETAjHK23cfRbqGEAnmnOyr5F/RVmxAKGIHs5dwMrbqGMOMV1vYcZGxptMjLSX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QB3j1u5R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DC133C32781;
-	Tue, 14 May 2024 00:20:28 +0000 (UTC)
+	s=arc-20240116; t=1715646250; c=relaxed/simple;
+	bh=NW6vEkjncf0dhMOgViKtjptdXYcJxVIDHjLO2k1Cf+4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=VWPS2sKPuhrXlZgGDTjAhucQ5Elgm7XUmb3LaYAr5CSMdom+Ztf2V0YAxFV/yZqEcVAGRq3HQbmJMIVp0hqce9/awcMec/nekKe46Rworq5CXJ/W9RMtFNqAzK9Ff3zJEfDWhRrUqgKEFWa8bO7DmFCjFR6RQ2kPF4UG/HOIRZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YY6CfJ0P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE084C32781;
+	Tue, 14 May 2024 00:24:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715646028;
-	bh=kEv2P8VEAhzSpPP4oNzBwxUgCk18mS9kUZsVlSL24S8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QB3j1u5RZ2mK2m5yQQzvxT3C7T9gm3KyfXKDT9LpG7/do85GuaIIFK5tjFtVQiLUr
-	 HyqttZMBGHPAHwntuM/kQJ3xyf8+PndFqef7Jt9sqkx8AsXbb+bwpz4uGadLu/4mTZ
-	 kex4aY2UuD7mdwpTxi+IHttxO21XIthFPHMLZSkJePQ/+S3wGAVWieeQUjzYM2HiZ0
-	 MHTpCT9CPgF6NSjyct8vbXmzFoF7zw/1t4KFCT4jguGxjm+z6sxf/n8ICWxxqCkIqo
-	 qxIso4ZIET8v+GA3H62zcxWXmngOPm1Vut7XSQo7zXIbxPk1jYhWHuJ0suBGjG3WIL
-	 oq+PPELN3aj3Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C6CDCC433F2;
-	Tue, 14 May 2024 00:20:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1715646249;
+	bh=NW6vEkjncf0dhMOgViKtjptdXYcJxVIDHjLO2k1Cf+4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+	b=YY6CfJ0PGVF7B07+H/k3VNW6PimUAYUiQdS6YEcxDPuL8N9zcSOblOZsgD0udZvGf
+	 r5Xx7oAu0YKMiNsw7SnrcedNr7F5Hy0u5mZmKPluFT5/OBNvgC1P6UKgf02CI2tYQ5
+	 8RWabP++zrcR2Od/WO54fvExmWwHQoqFoxUgJRQ+XyOYEajbjtBJz8eg4phc3lxzJ8
+	 HUDqFHudSiJigaMKkHnC5KXcbo+aUEIzpYxR66oEa0XlH5nCWOPUHuUZsHHHR+DZnT
+	 S2A/igTGxG3MQFRn5GEWZNAFpfvIZAhcSDSCztGLFrlmHSRzA5is/nYbGUuDBb3dgV
+	 D3JCyDb+IiYEw==
+Date: Mon, 13 May 2024 17:24:08 -0700 (PDT)
+From: Mat Martineau <martineau@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+cc: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, mptcp@lists.linux.dev, 
+    Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+    Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org, Gregory Detal <gregory.detal@gmail.com>
+Subject: Re: [PATCH net-next 0/8] mptcp: small improvements, fix and
+ clean-ups
+In-Reply-To: <20240513160630.545c3024@kernel.org>
+Message-ID: <f60cac35-5a2b-16cf-4706-b2e41acfacae@kernel.org>
+References: <20240510-upstream-net-next-20240509-misc-improvements-v1-0-4f25579e62ba@kernel.org> <20240513160630.545c3024@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/4] virtio_net: rx enable premapped mode by
- default
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171564602881.15402.11255289410552772554.git-patchwork-notify@kernel.org>
-Date: Tue, 14 May 2024 00:20:28 +0000
-References: <20240511031404.30903-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240511031404.30903-1-xuanzhuo@linux.alibaba.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- virtualization@lists.linux.dev
+Content-Type: text/plain; format=flowed; charset=US-ASCII
 
-Hello:
+On Mon, 13 May 2024, Jakub Kicinski wrote:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> On Fri, 10 May 2024 13:18:30 +0200 Matthieu Baerts (NGI0) wrote:
+>> This series contain mostly unrelated patches:
+>>
+>> - The two first patches can be seen as "fixes". They are part of this
+>>   series for -next because it looks like the last batch of fixes for
+>>   v6.9 has already been sent. These fixes are not urgent, so they can
+>>   wait if an unlikely v6.9-rc8 is published. About the two patches:
+>>     - Patch 1 fixes getsockopt(SO_KEEPALIVE) support on MPTCP sockets
+>>     - Patch 2 makes sure the full TCP keep-alive feature is supported,
+>>       not just SO_KEEPALIVE.
+>>
+>> - Patch 3 is a small optimisation when getsockopt(MPTCP_INFO) is used
+>>   without buffer, just to check if MPTCP is still being used: no
+>>   fallback to TCP.
+>>
+>> - Patch 4 adds net.mptcp.available_schedulers sysctl knob to list packet
+>>   schedulers, similar to net.ipv4.tcp_available_congestion_control.
+>>
+>> - Patch 5 and 6 fix CheckPatch warnings: "prefer strscpy over strcpy"
+>>   and "else is not generally useful after a break or return".
+>>
+>> - Patch 7 and 8 remove and add header includes to avoid unused ones, and
+>>   add missing ones to be self-contained.
+>
+> Seems to conflict with:
+> https://lore.kernel.org/all/20240509-upstream-net-next-20240509-mptcp-tcp_is_mptcp-v1-1-f846df999202@kernel.org/
 
-On Sat, 11 May 2024 11:14:00 +0800 you wrote:
-> Actually, for the virtio drivers, we can enable premapped mode whatever
-> the value of use_dma_api. Because we provide the virtio dma apis.
-> So the driver can enable premapped mode unconditionally.
-> 
-> This patch set makes the big mode of virtio-net to support premapped mode.
-> And enable premapped mode for rx by default.
-> 
-> [...]
+Hi Jakub -
 
-Here is the summary with links:
-  - [net-next,v5,1/4] virtio_ring: enable premapped mode whatever use_dma_api
-    https://git.kernel.org/netdev/net-next/c/f9dac92ba908
-  - [net-next,v5,2/4] virtio_net: big mode skip the unmap check
-    https://git.kernel.org/netdev/net-next/c/a377ae542d8d
-  - [net-next,v5,3/4] virtio_net: rx remove premapped failover code
-    https://git.kernel.org/netdev/net-next/c/defd28aa5acb
-  - [net-next,v5,4/4] virtio_net: remove the misleading comment
-    https://git.kernel.org/netdev/net-next/c/9719f039d328
+The conflict here is purely in the diff context, patch 2 of this series 
+and "tcp: socket option to check for MPTCP fallback to TCP" add cases to 
+the same switch statement and have a couple of unmodified lines between 
+their additions.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+"git am -3" handles it cleanly in this case, if you have time and 
+inclination for a second attempt. But I realize you're working through a 
+backlog and net-next is now closed, so that time might not be available. 
+We'll try again when net-next reopens if needed.
 
 
+Thanks,
+Mat
 
