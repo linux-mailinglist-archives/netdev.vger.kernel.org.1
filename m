@@ -1,114 +1,123 @@
-Return-Path: <netdev+bounces-96313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 053008C4F0A
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 12:31:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 262178C4F16
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 12:33:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50C871F22258
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 10:31:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAC79B20B97
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 10:33:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D1E135A79;
-	Tue, 14 May 2024 09:48:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A49139D12;
+	Tue, 14 May 2024 09:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="kGzY9Grk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SprSUAb/"
 X-Original-To: netdev@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357A357880;
-	Tue, 14 May 2024 09:48:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D7055C1A;
+	Tue, 14 May 2024 09:52:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715680119; cv=none; b=mIx0JwavA5+i1SW79t6FML+d0JPRRyOMFdgJT/ER/5/JomLn2ktx6hojqK3HNNqaxHXhqIWB0FURJzfJdu31W83OS44p8F6nx1V6COLE1aNqW6TQy2U+r0Pn0LiwP7cGjop/K43hnbxvaqkM4mDUIJOj7/h+nhVJabxXHGgPNqo=
+	t=1715680363; cv=none; b=PX0sYMPbdqKA9M7rakMPvxNd4QrAy8f4D1k5+v963wR8TXLYfCWAIWXjtLtdvdC6HSzBrP4KBL+Y2924DpFUUUGXE+Px+8UQCRBwN+fSp22keo9sfZoH2r+XYDuh2W6MACkkFVbwrd4fktdW1cDlJO/Kb7SHgtXFRdXXaZsOGPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715680119; c=relaxed/simple;
-	bh=OftvRN5FYOGb0QnfwZasmhuCm52IoMGg8swzhWcgK/0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z5ZxU3CyjklcKyG4KouedCmsJbEkJqZwWJPDkZUzodQ4NuWmd1XB/ZqmThG2TYrON9t1XPRSIPGjI3ODnYf9YwSvW+xQO4jD3xsqD5sLz3gRqoFlmMcy2NHrIKEBciv8Ais7Ff5txxs3b9bEPEKBq5PpPTIuuRdv4yPMfnVjP8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=kGzY9Grk; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=OftvRN5FYOGb0QnfwZasmhuCm52IoMGg8swzhWcgK/0=; t=1715680117;
-	x=1716112117; b=kGzY9Grk6KEhop/IWLfdCtviAVSYObF4RDzRK8WGDttEmW0ipHbWLcgsqk5El
-	Ywfj8LnMtDxg0/2AUlnsolzYvJjkq2rATS7tJT0ZDtZSmYyztGfZUMjCo/LDgpRMWkhXQh6kfYKSy
-	n9Wp5RAMbUyXh4eew5gEL3J4Z9Phwbse7EMwMMoxc83mH4C5R+tVYMKfM4pWhUmV6CMLEE0mw8lgf
-	ANXnE2QmRrZcGaya05MLub5kJ1mcHdg2wX7U6ga6b5UfP6jlmUbhmqJc9egkGxoNWcNZZd/lS9nig
-	z8GxBZVWREFkqMmfcoBm4RQqVNP6zqcmHAtQlQ4vElwKDEngCg==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1s6olk-0001jy-TO; Tue, 14 May 2024 11:48:24 +0200
-Message-ID: <ce8b63da-8bc0-456d-8fff-23e937871246@leemhuis.info>
-Date: Tue, 14 May 2024 11:48:22 +0200
+	s=arc-20240116; t=1715680363; c=relaxed/simple;
+	bh=qQPs/RR8CzraieUgoteO0FaGhWNGB9R+qGNZhaCRM5I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nNufSIuFpyH6LFUEXX0ArcSnPf8mGijoTFNpqrP7Vj2X+1UQ0cPsodv1FKhfDI53ilTAImzW+tPsQYEu8Kir+D9kRbO7gcqD3MC5D5jtjPZRLUp5CONBXSFZ/xP6nsafWI9eqi/YpzEeW6/eiLAQU+CYfGMYjJAFcNIIUK/uc7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SprSUAb/; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1ed96772f92so43202855ad.0;
+        Tue, 14 May 2024 02:52:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715680361; x=1716285161; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sFfP3mz64I/XOp3gx3OATpkgLA0E1TNomVcVvuvhZP0=;
+        b=SprSUAb/lQHHZ7E3Y8nlYj3SVjcpy/7CWvj6Vdmpeoq5REciq/zQVvSzwc2eU0xbi5
+         L9uq9zubk//MQuejHtUpWpkGSHjWtzvPE05Eh2N8G8avJNju6fqxKmLEpYsKcT3WrUjX
+         sLlVQSS/l3mjOi3hV46uYqukTk1GtseZL+zya7lhc3rXuUPXIUCqGhbaoo0V1CQ+lGbx
+         I2r76NUXDEmNWWkoYsEqOPKzQ/CnR+JrhJ+bFeAjfL3KqlstXOcNoyfpqGsp5BlOqJtS
+         +YEp92IQavtIe8p8lxBtTk8nhgepgloGbsCubxcFY6RlFk/PfNFfhD+y4GoKcCRNMDKI
+         Z2ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715680361; x=1716285161;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sFfP3mz64I/XOp3gx3OATpkgLA0E1TNomVcVvuvhZP0=;
+        b=AxbFBfKEkgw+a1Jum/okdAkVW6trCwGIM8FbaQ0QdLoDzBwNWEbvoEtRbCXuwRxl7k
+         V+sM4aNy0fsgI6wcq4Rk0JXA1/doW9TLthEh6yHoqwn+40BSP7DwE9XsF0WZ+VxqsDe2
+         /w9tBT5Zieqxkb6XMneHX+bCD43UQ+lzhweJWSHLibQfvFQJyhETXlmdCTNuznrh8HtO
+         t/UJbEvumwczfLAU33oCnyo3e/SzkDA3iFthhilSquHUl3nudWMVd08Yh6TAzhdz6Hoc
+         DM7gTikaAL8lDU0IRjOsipx/MVDLU704+TDfkZ8hmUknOjlBRqp8gncWHfT9MOgD1Jtd
+         LZ/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW8uOtWXKgJVYTcYdNtTxkCKaWjipG31n/sYHoPEowbUM1ACUTw1QGX6vVe98q07VyNIlkfoPGGh8TsQIrDmRed5HymEM5xoKoVK6/k1cFS
+X-Gm-Message-State: AOJu0YxJmI8enHvzL1z6t9kRjrL0djChAJZSeqDaSxaAreyjhWIvUVFz
+	zwj9QO8x/Gak6U7dJm9luWMepAIAO0sRnqsm250+KG8zRY61ceijc9ithCPhLj4=
+X-Google-Smtp-Source: AGHT+IHUu136zWycDASDkbcbItzfJk6e0j3+jTBu17osPkQw2LJFVcxd8eZnTdwlaeuEiSUB4voT6w==
+X-Received: by 2002:a17:902:684c:b0:1eb:fb02:c454 with SMTP id d9443c01a7336-1ef4404966amr119717435ad.53.1715680361112;
+        Tue, 14 May 2024 02:52:41 -0700 (PDT)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bad7dc1sm93451065ad.89.2024.05.14.02.52.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 May 2024 02:52:40 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net] selftests/net: reduce xfrm_policy test time
+Date: Tue, 14 May 2024 17:52:27 +0800
+Message-ID: <20240514095227.2597730-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Regression of e1000e (I219-LM) from 6.1.90 to 6.6.30
-To: Bagas Sanjaya <bagasdotme@gmail.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Networking <netdev@vger.kernel.org>, intel-wired-lan@lists.osuosl.org,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- lukas.probsthain@googlemail.com
-References: <ZkHSipExKpQC8bWJ@archie.me>
- <b2897fda-08e8-40de-b78a-86e92bde41db@lunn.ch>
- <56463a97-eb90-4884-b2f5-c165f6c3516a@gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
-In-Reply-To: <56463a97-eb90-4884-b2f5-c165f6c3516a@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1715680118;2a0210a5;
-X-HE-SMSGID: 1s6olk-0001jy-TO
+Content-Transfer-Encoding: 8bit
 
-On 14.05.24 06:34, Bagas Sanjaya wrote:
-> On 5/14/24 00:17, Andrew Lunn wrote:
->> On Mon, May 13, 2024 at 03:42:50PM +0700, Bagas Sanjaya wrote:
->>>
->>> <lukas.probsthain@googlemail.com> reported on Bugzilla
->>> (https://bugzilla.kernel.org/show_bug.cgi?id=218826) regression on his Thinkpad
->>> T480 with Intel I219-LM:
+The check_random_order test add/get plenty of xfrm rules, which consume
+a lot time on debug kernel and always TIMEOUT. Let's reduce the test
+loop and see if it works.
 
-Bagas, why did you start forwarding these bugs by mail yourself again
-after we had agreed you forward them to me, so I can handle it from there?
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ tools/testing/selftests/net/xfrm_policy.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Yes, you forwarded that particular bug to me a few days ago and I didn't
-do anything. But that was on purpose: I usually wait at least two
-working days before doing so, as some subsystem are active in bugzilla
-and might feel annoyed by starting a separate thread on the mailing list.
+diff --git a/tools/testing/selftests/net/xfrm_policy.sh b/tools/testing/selftests/net/xfrm_policy.sh
+index 457789530645..3eeeeffb4005 100755
+--- a/tools/testing/selftests/net/xfrm_policy.sh
++++ b/tools/testing/selftests/net/xfrm_policy.sh
+@@ -293,7 +293,7 @@ check_random_order()
+ 	local ns=$1
+ 	local log=$2
+ 
+-	for i in $(seq 100); do
++	for i in $(seq 50); do
+ 		ip -net $ns xfrm policy flush
+ 		for j in $(seq 0 16 255 | sort -R); do
+ 			ip -net $ns xfrm policy add dst $j.0.0.0/24 dir out priority 10 action allow
+@@ -306,7 +306,7 @@ check_random_order()
+ 		done
+ 	done
+ 
+-	for i in $(seq 100); do
++	for i in $(seq 50); do
+ 		ip -net $ns xfrm policy flush
+ 		for j in $(seq 0 16 255 | sort -R); do
+ 			local addr=$(printf "e000:0000:%02x00::/56" $j)
+-- 
+2.43.0
 
-Side note: you also apparently make it not obvious enough that you are
-just forwarding the bug, as both here and in the other bug your
-forwarded today the developer apparently thought it was a bug you face.
-
-Please lets avoid all of that again and switch back to the model we
-agreed on a few months ago.
-
->>>> After updating from kernel version 6.1.90 to 6.6.30, the e1000e driver exhibits a regression on a Lenovo Thinkpad T480 with an Intel I219-LM Ethernet controller.
->>
->> Could you try a git bisect between these two kernel versions? You
->> might be able to limit it to drivers/net/ethernet/intel/e1000e, which
->> only had around 15 patches.
->
-> The BZ reporter (Cc'ed) says that bisection is in progress. You may
-> want to log in to BZ to reach him.
-
-Side note: you should not assume every developer has a BZ account (or is
-willing to create one).
-
-Ciao, Thorsten
 
