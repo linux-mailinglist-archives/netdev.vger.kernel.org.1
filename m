@@ -1,342 +1,227 @@
-Return-Path: <netdev+bounces-96282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A47528C4CF9
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 09:28:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58BED8C4D09
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 09:30:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B1FE283B0F
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 07:28:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EB4F282A4E
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 07:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C124F39FCF;
-	Tue, 14 May 2024 07:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB5813ACC;
+	Tue, 14 May 2024 07:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jqbziBmD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg156.qq.com (smtpbg156.qq.com [15.184.82.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C9639FE4
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 07:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.82.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715671546; cv=none; b=ruMqbQW1BL4uAK+SQWUm6ZDAa8DDVhG6FxFisIq7mNJbJSAbNJQieMOi2KGy6Ra1OJ2qwtxoKW2NJsLy0Mb8HVonSCJfJ2AjlHcuJ3E3PbKfHKxA4sZTIFxYP7YkrPxNVl104qN0zvtYaqn3/4fFPHd5ilVHmzstLEhiOM2F00Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715671546; c=relaxed/simple;
-	bh=RvIFluOWOpslUUQ73tC3zO9f94/GU+UEEXOwzEwNx+M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YwoChQfa5alnldgRm9F06coeOdb32lD/pbLVrr72UxiRUhgDkbOOYiJLv8LidJy1Ae19jqKiw+DxX+O2gxqP3qLAoFMKCSks7ZeYDdH7w2mgYM7zv5l4CgI2AifZ/9NAhPnMs2ZYuEuM0e0sjs3dwOQfD1ot+Bf+/NHZG1+Ap4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=15.184.82.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtpsz14t1715671429tqq91j
-X-QQ-Originating-IP: Z1o6SpNAGc9jK3Far5g/wf4/y+1DSotEI0pst0znT/c=
-Received: from lap-jiawenwu.trustnetic.com ( [125.120.144.133])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 14 May 2024 15:23:48 +0800 (CST)
-X-QQ-SSF: 01400000000000L0Z000000A0000000
-X-QQ-FEAT: KdphKkgTc+R8imp9R5FHPoXD9Tnwx/PWD4Ila7r1b0AkVHmigcZuKjVnW9oSs
-	S0QYYFkXNFLntzrIuj6LR3j/1zlwcp6mSx2+22o30c/Y5DZaSYURLVaq/U1ZbnNkWKhAOpq
-	Eq188mEfVC8/sbSI3GgGme2ySoDyD7cXbAOniHQXAb5u87YIGZBBHXeOEvWzBCeh/hiVbHC
-	VCLkyHA6UMY/9hcKYr4dI2dcr/BPQGEjvUI4d5MmMfqt/IN6H8yhdkILz4XByx+ZEX05p6s
-	be134si+cllPz0+6EO2x/kBtZMY/wsuy+WOBTeH5mSg7OyXMi0nqL3psXNn4kyBWjkekjnc
-	9huxBO85XH8PZ0TVAzrtXCo60ia6L0UiDSAsaJnHnZTZSIZD4ESkq3XoF0sohCx95VgUPHd
-	Aal2ViZ99F4=
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 14303428013247071284
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	rmk+kernel@armlinux.org.uk,
-	andrew@lunn.ch,
-	netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	duanqiangwen@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net v4 3/3] net: txgbe: fix to control VLAN strip
-Date: Tue, 14 May 2024 15:23:30 +0800
-Message-Id: <20240514072330.14340-4-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20240514072330.14340-1-jiawenwu@trustnetic.com>
-References: <20240514072330.14340-1-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65E718C31
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 07:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715671778; cv=fail; b=INRdVlK9BzL4O6nibdzFl50sAxphIQVEeE5RYJSD7FZVR7eeCOzOhmhnhOnuXSQr0TCEKtWG36jn6WQUOaCpjPnLradj/Cdp50ghNJfxI6v2LN476W+Xpapg+BSYiEms7H0EQ62iwA4HWJfGsobpPIHHgfvL+YpaKdRM6er2dPQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715671778; c=relaxed/simple;
+	bh=NCyMDvGPDp2TDUwuvHGe3N3A/YF28Wjo4wQdRnpNQ6g=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DjqhMyns5YJ7xqTTqXFlCpiq/yKObj24VZ0ZKP67Mfeb5bKfxXcfiTG4awjsITFenmMEn5mx8U4CUIE/t3G0VVi2qyTa4X6iGXwbRtKRCItGCELcv88G/tqS0pR+SfXzqpV1sbCksNcKOfHnxiVW63rUyT2JrcUJ4exwvDb4ato=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jqbziBmD; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715671776; x=1747207776;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=NCyMDvGPDp2TDUwuvHGe3N3A/YF28Wjo4wQdRnpNQ6g=;
+  b=jqbziBmDNq/aJF4TV2Sk1/BLP8DGhiyUw1MUUpIoWGuFT1ToYRyVkJU4
+   C2zXnGnuSweSfvYM57p3E9HEmQsCPrHc/ycQZimaqFl3dINr5vMuP8c/A
+   MshjiZopbpyOd23t00QtdPbHBGUi+nqv97tg1MSV3FCdYq7kNgUMRca3g
+   Tlslgg1MYbfTEozIb84HDVgQ7i7zpX4QKu7ds/FPpuicfAEKSuTdQeV9d
+   0hvASpAvT29P2RdYDV332wB8MYTS4E/WeTDSxwr8qo8SJpsLH629xzyVR
+   /40gErP115OIjYKmTsWk8bFP/AXceOA8DlRInHimbrMl/YxdU0AFJBe1H
+   w==;
+X-CSE-ConnectionGUID: uWuVIV+cQbGYveLugLYAdQ==
+X-CSE-MsgGUID: kXSadp/zRh+LrRKN+vv4hA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11072"; a="22309491"
+X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
+   d="scan'208";a="22309491"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 00:29:35 -0700
+X-CSE-ConnectionGUID: AMzs2t21TAOTzieW12hS0A==
+X-CSE-MsgGUID: trz0XnnbQ+Cm2ub2tvQttQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
+   d="scan'208";a="30672943"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 May 2024 00:29:33 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 14 May 2024 00:28:46 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 14 May 2024 00:28:46 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 14 May 2024 00:28:46 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BbGa5nVgTWIRmHvjLFzCXy9r3vnCywqTJAMn8Ea3WsZHPbQ9vQpVnPjvRzFEwNurOQ1jYGd4DNYk8b9b+CRLPAjaRqIQp9UfcFb5WVbkbJYHJdoWcvY1CCY291U7WkB3u5QtEAM2NoD5TPwcexM83NmGSsOLhEOUw7kYOVsLU7+MezouyZmIVIg1CErd82FsO9ul2GhkgT0RAWykXn3u1256JI9k3QL2Fe2SAC77y21IhNpXCvaR15F+YIUSwXbc1DsTYQhU/xmLxNWCtqCDueoZ7SaXXoLwo+pr0odNGiRq1/4dpHUq0tLd1ba98nIBgO0j6at2Rvj+jYnqtTAqQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MFE7RJC/bKtTvPZPPUg9gUiec7D5woulHV0qzgqQ6VI=;
+ b=V4dIiv0PaFJqDn3z8aer+9tDA4JVAlPd8aQbxPjPOSUzcPm9eVDdhu1MwSKqc+UeVj7LK2yGHAax+99fkk8KgZhR3V/JlkXeEfXIAJIy3F8tI5+OyW/6/LVgwUIEyXsE5rMsTPIBQdUPeYoFxD1OKKqG/KfYcuLHqYU7jjRMnhDXFZEWdzqBq/Zq8oaus+RzCgLaez0WkCfKRp0O/Uo8Hd6oqgB1giu6eya17S9143lGF8aLVmr/C5NQ1OYWIFy2BL69KT4Oj1UH631KjIFck4T8geL9hk6s4WGU5nPAh0V5pOOCzJfBR2gkILL8DyZcx/TRRFXDn3qFgtFy8f5O9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
+ by MW5PR11MB5931.namprd11.prod.outlook.com (2603:10b6:303:198::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Tue, 14 May
+ 2024 07:28:44 +0000
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::1c54:1589:8882:d22b]) by PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::1c54:1589:8882:d22b%5]) with mapi id 15.20.7544.052; Tue, 14 May 2024
+ 07:28:44 +0000
+From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "shayd@nvidia.com" <shayd@nvidia.com>, "Fijalkowski, Maciej"
+	<maciej.fijalkowski@intel.com>, "Samudrala, Sridhar"
+	<sridhar.samudrala@intel.com>, "Polchlopek, Mateusz"
+	<mateusz.polchlopek@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "jiri@nvidia.com" <jiri@nvidia.com>, "Kubiak,
+ Michal" <michal.kubiak@intel.com>, "pio.raczynski@gmail.com"
+	<pio.raczynski@gmail.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
+	"Drewek, Wojciech" <wojciech.drewek@intel.com>
+Subject: RE: [Intel-wired-lan] [iwl-next v2 1/4] ice: store representor ID in
+ bridge port
+Thread-Topic: [Intel-wired-lan] [iwl-next v2 1/4] ice: store representor ID in
+ bridge port
+Thread-Index: AQHan5FUQFCR9TPYVkOPT3YdbU7TebGWYX9g
+Date: Tue, 14 May 2024 07:28:44 +0000
+Message-ID: <PH0PR11MB501388175237E5C497F90B8096E32@PH0PR11MB5013.namprd11.prod.outlook.com>
+References: <20240506084653.532111-1-michal.swiatkowski@linux.intel.com>
+ <20240506084653.532111-2-michal.swiatkowski@linux.intel.com>
+In-Reply-To: <20240506084653.532111-2-michal.swiatkowski@linux.intel.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|MW5PR11MB5931:EE_
+x-ms-office365-filtering-correlation-id: 14601a9c-d436-4adb-6bfa-08dc73e77c5e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|366007|1800799015|376005|38070700009;
+x-microsoft-antispam-message-info: =?us-ascii?Q?Qq+KDic6hy9SjCKzj5lm0XOek2KfzRuSqnzBwmLOhZq9y+02JvQZV2mz2GQQ?=
+ =?us-ascii?Q?Lh1XB2eHRr2fojuTI/L2EHzPujVfQxxCW56PiVdQh7VqNEQ/NV6TIW7BCY5J?=
+ =?us-ascii?Q?+tzraJ6eOB6SLl5n7Zs7B7sE7Fd01TS8wQCeehGJIvKKMCYh4+ZDBAzvqW1i?=
+ =?us-ascii?Q?ST3TOREJMmIP+z/snBjy73Mesrx66aUz58DC/K11RZYOH3tahGXXNQxQ2/I8?=
+ =?us-ascii?Q?k1ImLeumUVirIGcBZWERczpnrGTA+vKYd65MywvjB16zxfevMktE61U9kNlv?=
+ =?us-ascii?Q?FTbG1gk4JEL3PqbhjuO9lObaFO5BOvTqjZVt/I5ioaLF31psoqvLIgCu0YVZ?=
+ =?us-ascii?Q?Jf4Y82M9WKpruIzkKOT8jY0yrC+bfonSwrX0N2J/9SPSHejLunhoEbw2Ii6M?=
+ =?us-ascii?Q?pzKKwqc4Mdu+klEjYRf+zGU17AJb+mxZbrjpuzMQE2recXgNFGL6XZaeaY3b?=
+ =?us-ascii?Q?Y2hXAScWUQs4FDVIZCQSKUXidZoAHWKsnkPmHHeSsMjvvfoSw5j5adQhsAGg?=
+ =?us-ascii?Q?ppH67AdAD07q6Bg6453dMNhG2zMhdE19dTXQI64O6XHv3ZaiBymsRXrVeqPM?=
+ =?us-ascii?Q?6cOg6MedY6OHSGaBzwoRIeOrcTziK4aysbPOkU7YRvLof0sg0qCsQY0Kaif3?=
+ =?us-ascii?Q?+mdH5AT4+gJNQGpgn8hi3JPYX4JiSmBlFm67nMs1uK2GkaDBvRrDOR3HOgof?=
+ =?us-ascii?Q?24P0sn0lbJKrQmzF0V+faDFcUf1A+VHWceADJFVyNXjZVNz8qVdlJVCf7Rlc?=
+ =?us-ascii?Q?nTo4PjdqTWDvNAcnjm6qPkj+CooZKk3/oe3g5HfZhUuAyqJc+uCUsU1gaITz?=
+ =?us-ascii?Q?RUbU2T3U1MEAZPu5Eiz1EjYo+nZYNhV+jjv4CZumRBKDBuXdeXXb69xeO1e8?=
+ =?us-ascii?Q?//loRvReNEnlb3PRwbWEPvFBRu92pJQcoAJ4BCvKnU15SGzelJ2XPyGOrV7v?=
+ =?us-ascii?Q?1UEf8jjjvUii5zZfpZaxhYm6AHe04SuBEdq3FDcHTqahG2AhFtnnC324qA3t?=
+ =?us-ascii?Q?VA0Ce4WVmAOR7OJvfP3inC1nXpxb3fu/G0VK3ZG/NzeV4hJE5Zv5h5Tso0Dh?=
+ =?us-ascii?Q?EmvbdmsiipCiL1c4NL1SrWDkCPcsbeJ0W1cMyMrFqGViKdikXTEDPIZad4F0?=
+ =?us-ascii?Q?E1S+b5OaJWKTJa/rLjtlbindTigeFpZGEF9MQMPelWws1nWhLzeCJBUjEOxx?=
+ =?us-ascii?Q?Qgp8i8PBa05KS4GgBP8vT7L5ea+j6MA0yPjspAVP3bb7jqiNp3Gq9Lp1kXv/?=
+ =?us-ascii?Q?OXTfcTMKuAXXSIXYz11qzCpnjRFsGGfzP7LXOGOjfn8hGsk8YFFlAFDQfO7t?=
+ =?us-ascii?Q?WIeNlgT74z0j5Pfp6lLThOdRbz0nt7Sh0QqPXhQAeZufdA=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?bKA6rTKGZBiMmpy1PaeDcrKdwtheTqKjSKelFqrgSPZ6geyx2UpjWYcHzj43?=
+ =?us-ascii?Q?cBl01KP8M0TL3jDkWl8Jm3p7tSu24d7VLM4yd3zi8XazI950PE7qvJgy2s6Y?=
+ =?us-ascii?Q?cdCeDt+b6WKzFCiSYHf/lMJh8GITOAm7aZWGDu4ZzsH3Kr0m01W1o4CkJir2?=
+ =?us-ascii?Q?jP2ZigMEMxWFLfK0aTXAeuHBGuUYR3BRub33Qjs0Nm0Fle0QkKe7qZqswO2M?=
+ =?us-ascii?Q?4GM5B/oGhywmXPhKGew4YhUylB5u7XaKyBl8Pe17Mh72jncTApz/+QSsg3kF?=
+ =?us-ascii?Q?HFLdDjmh3NwXCBuiduvjoYG8aaY48IgSdV6xIIYjZ7a4If3wMmCh1pBb8LnX?=
+ =?us-ascii?Q?GPYs9/v8VVgtVvHhhoWh4FbYqwABf770ZfsH0dSzRZQDitgzFjdsXvSJ6A2W?=
+ =?us-ascii?Q?AGAg0LHHutjxG//+SfT6N1okGD5POG/nPthdXK0TWbd5CUpLBpT4mdbsrI/A?=
+ =?us-ascii?Q?yzFsD51y/oj6h8maATdwi0WGU2hejbH48xgjcEyWnRYhwTI3K7QSKwU7HLkD?=
+ =?us-ascii?Q?Xm2D263548tVZ0il28V3QrcIxWj3M29GKAAgeQCwaRfNjPCLpJDSxa5soHvK?=
+ =?us-ascii?Q?VyIZc3BySZjkv5ovKdDTeRa/BXZVJWhu5HzBFSmvUPfbl8nxYGckDUuKDu8j?=
+ =?us-ascii?Q?nb57o9EEI9cKvoYDMDJEBBJ5XQu4nsgLk/El4GHnTCKffzr8ZOhEZBvQornD?=
+ =?us-ascii?Q?neEdHEqM5i53/4Fj+i4SyGipYlbmWI7TIpVCG6H91e2YTwqJy9m94472shpE?=
+ =?us-ascii?Q?SJuscHLF1Fsh/U90SWyjSOrJCGlFJw4JrnMyEveDsQ1RoxFKtaF21PnJD9Np?=
+ =?us-ascii?Q?tlW6e8qIZ+3cdbWgEici7pVGZZwF3e5fseNrfaWk52gMdJoAbV7/P6Bj4AOf?=
+ =?us-ascii?Q?uri9zLVnl74ORr48/UKW/HhrOhn4IIY5+9ZVunU0cgaXTehYmXz8xtfSG1vq?=
+ =?us-ascii?Q?vIiU70RlMbdGlNyfOqRKLBvtjkAWwpg4oq3RDgVlHeQppAUlIOa8q8mM5Afm?=
+ =?us-ascii?Q?P+K+LFEZyjaRM2lTN7XjXAwIKivXdAqq16o0voZs18VFzIsU8gi7ROzzWXKa?=
+ =?us-ascii?Q?Fd9anxDGlXuOTABBZZze0k95/ZOtzVkqBjd6bsQya2X5oHb6xRP2Z2vuijjb?=
+ =?us-ascii?Q?opLZ29PgHBhdRAahIoHWEvVv2I5jNQbLY0L/rlYXbXVzsd4FtTifMXL+9GFF?=
+ =?us-ascii?Q?AbBMWPmk+V04ta8Gz2/+0F7sZHMspgUu8xalShKQcrEHfdgsccx0EtAxg0g6?=
+ =?us-ascii?Q?KHfywihdFbzL0CP3DgGC8CuuUQM/v6iWj9qQFW2MRlgo0a0No/F1mhKqsHcP?=
+ =?us-ascii?Q?83BDrEn2MnxwVtr+KRyKfdKpiluHfX3H60XSSHMEjtDo/TJ6aegseN2NZpbh?=
+ =?us-ascii?Q?IlvlkaK6D6TYr37R3cAf9neeEuIlNOVsJ88m82uqHcnUkLAfDnmgwipCxUnv?=
+ =?us-ascii?Q?UCcmaH5UwuR3LU/uIkWsh6RS2emMVB4v/vZwfz4PQpQZ8TN5xO2g6HF+uuYt?=
+ =?us-ascii?Q?iiNZ7ZasgMVs7F9FM/RL2y5wzNHk6M7wlPPNIBdHv+HOP/S9xKb0ZrdKx+v8?=
+ =?us-ascii?Q?XRujiMkMyJKlsMgE/d5dK3ze8iHtJ6HFRWE8QdcjVWLihy9lRsNOTuf0YXJy?=
+ =?us-ascii?Q?LA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 14601a9c-d436-4adb-6bfa-08dc73e77c5e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 May 2024 07:28:44.0416
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lUGQN1cq2CDdQiQQuQ3o8i84l2OMGF9HeXXOd9OUVMBEYwx+8saK4lA/fEhmQp9bBL/zGGBAhMLeXUgWYboDNSq/m1AzHw/3C6/uyZg5pG8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5931
+X-OriginatorOrg: intel.com
 
-When VLAN tag strip is changed to enable or disable, the hardware requires
-the Rx ring to be in a disabled state, otherwise the feature cannot be
-changed.
-
-Fixes: f3b03c655f67 ("net: wangxun: Implement vlan add and kill functions")
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  2 ++
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  6 ++--
- drivers/net/ethernet/wangxun/libwx/wx_type.h  | 22 ++++++++++++++
- .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  | 18 +++++++----
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    | 18 +++++++----
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 30 +++++++++++++++++++
- .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  1 +
- 7 files changed, 84 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index 945c13d1a982..c09a6f744575 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -1958,6 +1958,8 @@ int wx_sw_init(struct wx *wx)
- 		return -ENOMEM;
- 	}
- 
-+	bitmap_zero(wx->state, WX_STATE_NBITS);
-+
- 	return 0;
- }
- EXPORT_SYMBOL(wx_sw_init);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 28599e03cf4e..0d913ee7bcd7 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -2692,9 +2692,9 @@ int wx_set_features(struct net_device *netdev, netdev_features_t features)
- 
- 	netdev->features = features;
- 
--	if (changed &
--	    (NETIF_F_HW_VLAN_CTAG_RX |
--	     NETIF_F_HW_VLAN_STAG_RX))
-+	if (wx->mac.type == wx_mac_sp && changed & NETIF_F_HW_VLAN_CTAG_RX)
-+		wx->do_reset(netdev);
-+	else if (changed & (NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_CTAG_FILTER))
- 		wx_set_rx_mode(netdev);
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 1fdeb464d5f4..5aaf7b1fa2db 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -982,8 +982,13 @@ struct wx_hw_stats {
- 	u64 qmprc;
- };
- 
-+enum wx_state {
-+	WX_STATE_RESETTING,
-+	WX_STATE_NBITS,		/* must be last */
-+};
- struct wx {
- 	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
-+	DECLARE_BITMAP(state, WX_STATE_NBITS);
- 
- 	void *priv;
- 	u8 __iomem *hw_addr;
-@@ -1071,6 +1076,8 @@ struct wx {
- 	u64 hw_csum_rx_good;
- 	u64 hw_csum_rx_error;
- 	u64 alloc_rx_buff_failed;
-+
-+	void (*do_reset)(struct net_device *netdev);
- };
- 
- #define WX_INTR_ALL (~0ULL)
-@@ -1131,4 +1138,19 @@ static inline struct wx *phylink_to_wx(struct phylink_config *config)
- 	return container_of(config, struct wx, phylink_config);
- }
- 
-+static inline int wx_set_state_reset(struct wx *wx)
-+{
-+	u8 timeout = 50;
-+
-+	while (test_and_set_bit(WX_STATE_RESETTING, wx->state)) {
-+		timeout--;
-+		if (!timeout)
-+			return -EBUSY;
-+
-+		usleep_range(1000, 2000);
-+	}
-+
-+	return 0;
-+}
-+
- #endif /* _WX_TYPE_H_ */
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-index 786a652ae64f..46a5a3e95202 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-@@ -52,7 +52,7 @@ static int ngbe_set_ringparam(struct net_device *netdev,
- 	struct wx *wx = netdev_priv(netdev);
- 	u32 new_rx_count, new_tx_count;
- 	struct wx_ring *temp_ring;
--	int i;
-+	int i, err = 0;
- 
- 	new_tx_count = clamp_t(u32, ring->tx_pending, WX_MIN_TXD, WX_MAX_TXD);
- 	new_tx_count = ALIGN(new_tx_count, WX_REQ_TX_DESCRIPTOR_MULTIPLE);
-@@ -64,6 +64,10 @@ static int ngbe_set_ringparam(struct net_device *netdev,
- 	    new_rx_count == wx->rx_ring_count)
- 		return 0;
- 
-+	err = wx_set_state_reset(wx);
-+	if (err)
-+		return err;
-+
- 	if (!netif_running(wx->netdev)) {
- 		for (i = 0; i < wx->num_tx_queues; i++)
- 			wx->tx_ring[i]->count = new_tx_count;
-@@ -72,14 +76,16 @@ static int ngbe_set_ringparam(struct net_device *netdev,
- 		wx->tx_ring_count = new_tx_count;
- 		wx->rx_ring_count = new_rx_count;
- 
--		return 0;
-+		goto clear_reset;
- 	}
- 
- 	/* allocate temporary buffer to store rings in */
- 	i = max_t(int, wx->num_tx_queues, wx->num_rx_queues);
- 	temp_ring = kvmalloc_array(i, sizeof(struct wx_ring), GFP_KERNEL);
--	if (!temp_ring)
--		return -ENOMEM;
-+	if (!temp_ring) {
-+		err = -ENOMEM;
-+		goto clear_reset;
-+	}
- 
- 	ngbe_down(wx);
- 
-@@ -89,7 +95,9 @@ static int ngbe_set_ringparam(struct net_device *netdev,
- 	wx_configure(wx);
- 	ngbe_up(wx);
- 
--	return 0;
-+clear_reset:
-+	clear_bit(WX_STATE_RESETTING, wx->state);
-+	return err;
- }
- 
- static int ngbe_set_channels(struct net_device *dev,
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-index db675512ce4d..31fde3fa7c6b 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-@@ -19,7 +19,7 @@ static int txgbe_set_ringparam(struct net_device *netdev,
- 	struct wx *wx = netdev_priv(netdev);
- 	u32 new_rx_count, new_tx_count;
- 	struct wx_ring *temp_ring;
--	int i;
-+	int i, err = 0;
- 
- 	new_tx_count = clamp_t(u32, ring->tx_pending, WX_MIN_TXD, WX_MAX_TXD);
- 	new_tx_count = ALIGN(new_tx_count, WX_REQ_TX_DESCRIPTOR_MULTIPLE);
-@@ -31,6 +31,10 @@ static int txgbe_set_ringparam(struct net_device *netdev,
- 	    new_rx_count == wx->rx_ring_count)
- 		return 0;
- 
-+	err = wx_set_state_reset(wx);
-+	if (err)
-+		return err;
-+
- 	if (!netif_running(wx->netdev)) {
- 		for (i = 0; i < wx->num_tx_queues; i++)
- 			wx->tx_ring[i]->count = new_tx_count;
-@@ -39,14 +43,16 @@ static int txgbe_set_ringparam(struct net_device *netdev,
- 		wx->tx_ring_count = new_tx_count;
- 		wx->rx_ring_count = new_rx_count;
- 
--		return 0;
-+		goto clear_reset;
- 	}
- 
- 	/* allocate temporary buffer to store rings in */
- 	i = max_t(int, wx->num_tx_queues, wx->num_rx_queues);
- 	temp_ring = kvmalloc_array(i, sizeof(struct wx_ring), GFP_KERNEL);
--	if (!temp_ring)
--		return -ENOMEM;
-+	if (!temp_ring) {
-+		err = -ENOMEM;
-+		goto clear_reset;
-+	}
- 
- 	txgbe_down(wx);
- 
-@@ -55,7 +61,9 @@ static int txgbe_set_ringparam(struct net_device *netdev,
- 
- 	txgbe_up(wx);
- 
--	return 0;
-+clear_reset:
-+	clear_bit(WX_STATE_RESETTING, wx->state);
-+	return err;
- }
- 
- static int txgbe_set_channels(struct net_device *dev,
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index b3c0058b045d..8c7a74981b90 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -269,6 +269,8 @@ static int txgbe_sw_init(struct wx *wx)
- 	wx->tx_work_limit = TXGBE_DEFAULT_TX_WORK;
- 	wx->rx_work_limit = TXGBE_DEFAULT_RX_WORK;
- 
-+	wx->do_reset = txgbe_do_reset;
-+
- 	return 0;
- }
- 
-@@ -421,6 +423,34 @@ int txgbe_setup_tc(struct net_device *dev, u8 tc)
- 	return 0;
- }
- 
-+static void txgbe_reinit_locked(struct wx *wx)
-+{
-+	int err = 0;
-+
-+	netif_trans_update(wx->netdev);
-+
-+	err = wx_set_state_reset(wx);
-+	if (err) {
-+		wx_err(wx, "wait device reset timeout\n");
-+		return;
-+	}
-+
-+	txgbe_down(wx);
-+	txgbe_up(wx);
-+
-+	clear_bit(WX_STATE_RESETTING, wx->state);
-+}
-+
-+void txgbe_do_reset(struct net_device *netdev)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+
-+	if (netif_running(netdev))
-+		txgbe_reinit_locked(wx);
-+	else
-+		txgbe_reset(wx);
-+}
-+
- static const struct net_device_ops txgbe_netdev_ops = {
- 	.ndo_open               = txgbe_open,
- 	.ndo_stop               = txgbe_close,
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index 1b4ff50d5857..f434a7865cb7 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -134,6 +134,7 @@ extern char txgbe_driver_name[];
- void txgbe_down(struct wx *wx);
- void txgbe_up(struct wx *wx);
- int txgbe_setup_tc(struct net_device *dev, u8 tc);
-+void txgbe_do_reset(struct net_device *netdev);
- 
- #define NODE_PROP(_NAME, _PROP)			\
- 	(const struct software_node) {		\
--- 
-2.27.0
-
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Michal Swiatkowski
+> Sent: Monday, May 6, 2024 2:17 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: shayd@nvidia.com; Fijalkowski, Maciej <maciej.fijalkowski@intel.com>;
+> Samudrala, Sridhar <sridhar.samudrala@intel.com>; Polchlopek, Mateusz
+> <mateusz.polchlopek@intel.com>; netdev@vger.kernel.org; jiri@nvidia.com;
+> Kubiak, Michal <michal.kubiak@intel.com>; pio.raczynski@gmail.com;
+> Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; Keller, Jacob E
+> <jacob.e.keller@intel.com>; Drewek, Wojciech
+> <wojciech.drewek@intel.com>
+> Subject: [Intel-wired-lan] [iwl-next v2 1/4] ice: store representor ID in=
+ bridge
+> port
+>=20
+> It is used to get representor structure during cleaning.
+>=20
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_eswitch_br.c | 4 +++-
+> drivers/net/ethernet/intel/ice/ice_eswitch_br.h | 1 +
+>  drivers/net/ethernet/intel/ice/ice_repr.c       | 7 ++-----
+>  drivers/net/ethernet/intel/ice/ice_repr.h       | 1 +
+>  4 files changed, 7 insertions(+), 6 deletions(-)
+>=20
+Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
 
