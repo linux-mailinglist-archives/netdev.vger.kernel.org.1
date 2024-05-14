@@ -1,288 +1,195 @@
-Return-Path: <netdev+bounces-96327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 426A98C5152
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:28:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89F728C519B
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:31:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CB92B2168B
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 11:28:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EB6F1F22679
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 11:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01FF71304A2;
-	Tue, 14 May 2024 10:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAFC13A410;
+	Tue, 14 May 2024 11:06:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qh904XOk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="orLD7FKA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153CA320F;
-	Tue, 14 May 2024 10:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA6D54903
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 11:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715684324; cv=none; b=Uu5Ypiwx8hQUHjSCOQeSDskpb60CVNFMWkrew8gy1APZesXVma8NmX4K1vr6FHVBJ5Ho5ZwYYQQNTPF4B7wb34z5X6QhrKQjfiqtPjw21iNXH15EejpR20ZD733WloOMXZPLUuFexL3E0YIL4Z1h6AWE7iSE2PfS9Eg9JeCTPag=
+	t=1715684772; cv=none; b=pYUPd9S1TOojclaQE3BKmV77L2B3APwjSUXPIwgoDv+fhni0JT4WeRaiz6GZ/SLOs4Y8C6FpYTdmajFbE4Xmz2kDrUmH477GUu02umlK5pIEDgB3voRMJmYhrriGbj9z23n04/1HtDrpsVPqI83kVSi5hqTzYk+n/A28Pyy4aSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715684324; c=relaxed/simple;
-	bh=lpcqTqrvcgADw0vPU8bnP14Eq09pMdEMy88+H2lqisc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oXZLo7KEBg+f+Dob9qwXm1hp6XwCOvM4aD2nuXErrdHdbgOk6l+dlWCeegS2XSzQO8kj0s7sNA2Aty+LhM+jhcNH50O3uRbuEri3vzuJd9sSZ9Sc93Tq8JVDTIX9xPrS3+0ms6pHEiKpVf1JzKiBxtTKSikG53t1MgI4bLKkziw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qh904XOk; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-41ff5e3d86aso28248265e9.1;
-        Tue, 14 May 2024 03:58:42 -0700 (PDT)
+	s=arc-20240116; t=1715684772; c=relaxed/simple;
+	bh=f1wGa5NT1c7hGMlirdU3cDizJuHelfjw3OMTCt8SoG0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=edoLt1fAD5ZZrznp06NS8+lxKvsDwRtApxmWFiegNrnXH1a9sZKGAcnBNGbmHlR2jxAJ0CD/DvsNM9ppDdLGRVoqRVXSWGjQF0RyP2XzJCYD2BqhUMDfWpBslI0zLqDotIesMuDQAk620rDEY01rRhd0r83rP2/ptIDVghj+Xmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=orLD7FKA; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso8857a12.1
+        for <netdev@vger.kernel.org>; Tue, 14 May 2024 04:06:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715684321; x=1716289121; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zcss4NldlyQ6tiuFcBRQjRJyCadmCYp5vKGWkvqedX8=;
-        b=Qh904XOk7LMUyNy7Q5+GqF0I2UviQeY33yJ5uoLesm/l6BiRfyXFiimax2YzrQWYIt
-         xJA4WrM4Dibyi4WRCHaaRqjTZdbo/3dhScI3CxF6yjVzfw+R7dIBrjaJAXg3eQVZ9W1v
-         owqSwpR0mbps4s8cXRA3pNBzyqXz3CHUVGIR3Z54VhmztTmO2cOo3HcT6K5HlHUp0WTC
-         ch64YeqElZKlSs676krVvvRsK4tGn1WuNCmVIR5/TaC2TZjmW9LKujOmr1WDui3ujv83
-         i9wbXBizJJjlJvq698htrM7eYZzAEPFieLJWOMDdDvNMRots6soyIagtNRv8ep7J4PJ7
-         C64g==
+        d=google.com; s=20230601; t=1715684769; x=1716289569; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vKnTerFEn+Wos0ATvUe45uW0pD+tSOcbATEmfcCvxP8=;
+        b=orLD7FKA8S5QpRgbK9o4y0z8eg01+CzTMMayZveew6LB3NQIqvj6c2bg9K7jCPMB3c
+         Qo0couefG06yadPQIgCYuQFSwbwKFi8sN7rO7/oU4AWh4A16VXpNRExQE6iV+7VfTp01
+         FkqbVBpp7LqYC+oF4yGCh+uxZf+2IY+1ynIUqQOwUJ4uXtgn6kYw4bLiL2XXigpmbORY
+         4190bzDpqnPmxPni7ilMWxE/VgRHHUIiwep9d6KlCz/G2X9VXXvsy4WpPxBf46dm8TEJ
+         pk++z+AJeJQy5NvAcxqa7O6amV61nlXDhrUpbhIJtPTrZ+NFMUF0xLVp9A55dLT6XTPY
+         8saA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715684321; x=1716289121;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zcss4NldlyQ6tiuFcBRQjRJyCadmCYp5vKGWkvqedX8=;
-        b=gt4pL/ow0/lWaeu7FLXu3b2yqlV0Me7bwy+MOqO+cQEtngOm0gWdHfdgpflrS47+GW
-         Ja0NzebhSPSgxhAYVRy/1H1IbO+oJvdz9ZScU18RdKyHLda0vpM7U3NjWgKNURsNKqF0
-         g+8kAb0F+WMHxc3+BCEIZGwJHaF4xu+U1m3IWPAFTo3q4ZPwn8vSqmmXSnVTQ1s8M+we
-         O14R7dv30PPjsMjj2vu4XJJHBhkhHnRwNxAZy3TNsLhJxz4itvkDq5z+Yjl9eBwX3xzS
-         30s+S15VoXNbH6y3bEl8sUoXjbqGThQKlVuB7F/DeblsL8YfZGt/7kxzE7wcPmrmhM9Z
-         Acgg==
-X-Forwarded-Encrypted: i=1; AJvYcCXrlsM7bdFpUjcRAD81Cis/TK7O54Rezw23sNpBbdAnizxpUf3deHGJZeeNI9lKkgPwnHGb7Hr8slza8j5JRPBqwS9j2AXZHlTVGDE9+VLCnLD6eyMZvefHOokUi/UvqMkf020g7opkLHwXVtw6bQG8ODGtA8J9VB8Mmi0VTYwatR4ybAk/D9o8XxXw4rrZvfirOVSbNAfN
-X-Gm-Message-State: AOJu0YzE4qzKFWTuQOyBJRZmzOxLezpvhE2s9VCi1LM1wersH9kxNKgY
-	/qJiN3i2WoHD4/1FwC0F6uEAv/709NUy5QiWJNukk82nCKgX1Cxu
-X-Google-Smtp-Source: AGHT+IHavPP3p7VgtypkEZA30JLLaKH02FZ4mtDF6rpdxpx+nbNFgjPzyo0LtoD2LFO9QdAan7y7bQ==
-X-Received: by 2002:adf:eb12:0:b0:347:9bec:9ba3 with SMTP id ffacd0b85a97d-3504aa64997mr9449373f8f.66.1715684321125;
-        Tue, 14 May 2024 03:58:41 -0700 (PDT)
-Received: from vitor-nb.corp.toradex.com (31-10-206-125.static.upc.ch. [31.10.206.125])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b79bca6sm13355328f8f.12.2024.05.14.03.58.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 May 2024 03:58:40 -0700 (PDT)
-From: Vitor Soares <ivitro@gmail.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Thomas Kopp <thomas.kopp@microchip.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Vitor Soares <vitor.soares@toradex.com>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ivitro@gmail.com,
-	stable@vger.kernel.org
-Subject: [PATCH v5] can: mcp251xfd: fix infinite loop when xmit fails
-Date: Tue, 14 May 2024 11:58:22 +0100
-Message-Id: <20240514105822.99986-1-ivitro@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1715684769; x=1716289569;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vKnTerFEn+Wos0ATvUe45uW0pD+tSOcbATEmfcCvxP8=;
+        b=YzK2i3sI18Liks1bIQvpF8kzu+GY76x4bCapx0B9NQn8XtBDEmDPwGW2j10emlUTm/
+         8oPGRiUx/2ks5d+FxACJU+g9fY9DrwYj2LRUKrY58idea6/rs6CBynF6KXAlCMWOuUp7
+         JeQi3/KGs2k3ZEoX9ku3F0AzCRDKvDG19Pm8gCaDglK0gqWTYKNN52gyDhhSCbe0bWei
+         LFBYOwJHCmZwTpPZi1khcRVETevVP/NtmZ2uOq82bxx1IwDQRSWpU2LXCwvwsjgTKqUT
+         6a+Cxe1krwA9E+mrAl9gi7Cu8r/GEZZnUrxSGDD+YsmVgUB/VGnXLolxjYsyUqgeV9ek
+         +ITA==
+X-Forwarded-Encrypted: i=1; AJvYcCUoav5cK+FeNqEsqX6/AcMenHkSqfA8rP7YDbDId6fLlwJQDy9nciFlNDHdUQmmhW6m//ni9s/0EZfeyFhKMHYz1Trhh14U
+X-Gm-Message-State: AOJu0Yx5fNuudolhDihoBwx6/krX4Fz/IqlJSQJAbtM7XpaT8tTKoAya
+	6WbLR1m5rq2gAuH2BkeylFXKvDnPht8tOFwkzadORFkWjzztT9VFEoSzypzqEaehrbhWnk5x0wC
+	ycD9JHpYLk2NK1rlyYcwyKdrll3AwgKtozCX6
+X-Google-Smtp-Source: AGHT+IFT0SS7UZOVhXRm4IgRepygooS5WXIhEgKkYrcmn3Rpfxvi8bvmZb99whT4pCsh4mE83I9tk3rQ8iH7NdU04vw=
+X-Received: by 2002:a50:cac7:0:b0:572:a23b:1d81 with SMTP id
+ 4fb4d7f45d1cf-574ae574b9dmr453540a12.5.1715684769295; Tue, 14 May 2024
+ 04:06:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <6d4a0450-9be1-4d91-ba18-5e9bd750fa40@gmail.com>
+ <ef333a8c-1bb2-49a7-b721-68b28df19b0e@gmail.com> <CANn89iLgj0ph5gRWOA2M2J8N_4hQd3Ndm73gATR8WODXaOM_LA@mail.gmail.com>
+ <e8f548f8-6d16-4a30-9408-80e4212afe9c@intel.com>
+In-Reply-To: <e8f548f8-6d16-4a30-9408-80e4212afe9c@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 May 2024 13:05:55 +0200
+Message-ID: <CANn89i+yKgXGHUyJxVLYTAMKj7wpoV+8X7UR8cWh75yxVLSA6Q@mail.gmail.com>
+Subject: Re: [PATCH net 2/2] r8169: disable interrupts also for GRO-scheduled NAPI
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>, 
+	Realtek linux nic maintainers <nic_swsd@realtek.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	Ken Milmore <ken.milmore@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Vitor Soares <vitor.soares@toradex.com>
+On Tue, May 14, 2024 at 12:53=E2=80=AFPM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Eric Dumazet <edumazet@google.com>
+> Date: Tue, 14 May 2024 11:45:05 +0200
+>
+> > On Tue, May 14, 2024 at 8:52=E2=80=AFAM Heiner Kallweit <hkallweit1@gma=
+il.com> wrote:
+> >>
+> >> Ken reported that RTL8125b can lock up if gro_flush_timeout has the
+> >> default value of 20000 and napi_defer_hard_irqs is set to 0.
+> >> In this scenario device interrupts aren't disabled, what seems to
+> >> trigger some silicon bug under heavy load. I was able to reproduce thi=
+s
+> >> behavior on RTL8168h.
+> >> Disabling device interrupts if NAPI is scheduled from a place other th=
+an
+> >> the driver's interrupt handler is a necessity in r8169, for other
+> >> drivers it may still be a performance optimization.
+> >>
+> >> Fixes: 7274c4147afb ("r8169: don't try to disable interrupts if NAPI i=
+s scheduled already")
+> >> Reported-by: Ken Milmore <ken.milmore@gmail.com>
+> >> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> >> ---
+> >>  drivers/net/ethernet/realtek/r8169_main.c | 6 ++++--
+> >>  1 file changed, 4 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/e=
+thernet/realtek/r8169_main.c
+> >> index e5ea827a2..01f0ca53d 100644
+> >> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> >> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> >> @@ -4639,6 +4639,7 @@ static irqreturn_t rtl8169_interrupt(int irq, vo=
+id *dev_instance)
+> >>  {
+> >>         struct rtl8169_private *tp =3D dev_instance;
+> >>         u32 status =3D rtl_get_events(tp);
+> >> +       int ret;
+> >>
+> >>         if ((status & 0xffff) =3D=3D 0xffff || !(status & tp->irq_mask=
+))
+> >>                 return IRQ_NONE;
+> >> @@ -4657,10 +4658,11 @@ static irqreturn_t rtl8169_interrupt(int irq, =
+void *dev_instance)
+> >>                 rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
+> >>         }
+> >>
+> >> -       if (napi_schedule_prep(&tp->napi)) {
+> >> +       ret =3D __napi_schedule_prep(&tp->napi);
+> >> +       if (ret >=3D 0)
+> >>                 rtl_irq_disable(tp);
+> >> +       if (ret > 0)
+> >>                 __napi_schedule(&tp->napi);
+> >> -       }
+> >>  out:
+> >>         rtl_ack_events(tp, status);
+> >>
+> >
+> > I do not understand this patch.
+> >
+> > __napi_schedule_prep() would only return -1 if NAPIF_STATE_DISABLE was =
+set,
+> > but this should not happen under normal operations ?
+>
+> Without this patch, napi_schedule_prep() returns false if it's either
+> scheduled already OR it's disabled. Drivers disable interrupts only if
+> it returns true, which means they don't do that if it's already scheduled=
+.
+> With this patch, __napi_schedule_prep() returns -1 if it's disabled and
+> 0 if it was already scheduled. Which means we can disable interrupts
+> when the result is >=3D 0, i.e. regardless if it was scheduled before the
+> call or within the call.
+>
+> IIUC, this addresses such situations:
+>
+> napi_schedule()         // we disabled interrupts
+> napi_poll()             // we polled < budget frames
+> napi_complete_done()    // reenable the interrupts, no repoll
+>   hrtimer_start()       // GRO flush is queued
+>     napi_schedule()
+>       napi_poll()       // GRO flush, BUT interrupts are enabled
+>
+> On r8169, this seems to cause issues. On other drivers, it seems to be
+> okay, but with this new helper, you can save some cycles.
+>
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-When the mcp251xfd_start_xmit() function fails, the driver stops
-processing messages, and the interrupt routine does not return,
-running indefinitely even after killing the running application.
+Rephrasing the changelog is not really helping.
 
-Error messages:
-[  441.298819] mcp251xfd spi2.0 can0: ERROR in mcp251xfd_start_xmit: -16
-[  441.306498] mcp251xfd spi2.0 can0: Transmit Event FIFO buffer not empty. (seq=0x000017c7, tef_tail=0x000017cf, tef_head=0x000017d0, tx_head=0x000017d3).
-... and repeat forever.
+Consider myself as a network maintainer, not as a casual patch reviewer.
 
-The issue can be triggered when multiple devices share the same
-SPI interface. And there is concurrent access to the bus.
+"This seems to cause issues" is rather weak.
 
-The problem occurs because tx_ring->head increments even if
-mcp251xfd_start_xmit() fails. Consequently, the driver skips one
-TX package while still expecting a response in
-mcp251xfd_handle_tefif_one().
+I would simply revert the faulty commit, because the interrupts are
+going to be disabled no matter what.
 
-This patch resolves the issue by starting a workqueue to write
-the tx obj synchronously if err = -EBUSY. In case of another error,
-it decrements tx_ring->head, removes skb from the echo stack, and
-drops the message.
+Old logic was very simple and rock solid. A revert is a clear stable candid=
+ate.
 
-Fixes: 55e5b97f003e ("can: mcp25xxfd: add driver for Microchip MCP25xxFD SPI CAN")
-Cc: stable@vger.kernel.org
-Signed-off-by: Vitor Soares <vitor.soares@toradex.com>
----
+rtl_irq_disable(tp);
+napi_schedule(&tp->napi);
 
-V4->V5:
-  - Start a workqueue to write tx obj with spi_sync() when spi_async() == -EBUSY.
-
-V3->V4:
-  - Leave can_put_echo_skb() and stop the queue if needed, before mcp251xfd_tx_obj_write().
-  - Re-sync head and remove echo skb if mcp251xfd_tx_obj_write() fails.
-  - Revert -> return NETDEV_TX_BUSY if mcp251xfd_tx_obj_write() == -EBUSY.
-
-V2->V3:
-  - Add tx_dropped stats.
-  - netdev_sent_queue() only if can_put_echo_skb() succeed.
-
-V1->V2:
-  - Return NETDEV_TX_BUSY if mcp251xfd_tx_obj_write() == -EBUSY.
-  - Rework the commit message to address the change above.
-  - Change can_put_echo_skb() to be called after mcp251xfd_tx_obj_write() succeed.
-    Otherwise, we get Kernel NULL pointer dereference error.
-
- .../net/can/spi/mcp251xfd/mcp251xfd-core.c    | 13 ++++-
- drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c  | 51 ++++++++++++++++---
- drivers/net/can/spi/mcp251xfd/mcp251xfd.h     |  5 ++
- 3 files changed, 60 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-index 1d9057dc44f2..6cca853f2b1e 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-@@ -2141,15 +2141,25 @@ static int mcp251xfd_probe(struct spi_device *spi)
- 	if (err)
- 		goto out_free_candev;
- 
-+	priv->tx_work_obj = NULL;
-+	priv->wq = alloc_workqueue("mcp251xfd_wq", WQ_FREEZABLE, 0);
-+	if (!priv->wq) {
-+		err = -ENOMEM;
-+		goto out_can_rx_offload_del;
-+	}
-+	INIT_WORK(&priv->tx_work, mcp251xfd_tx_obj_write_sync);
-+
- 	err = mcp251xfd_register(priv);
- 	if (err) {
- 		dev_err_probe(&spi->dev, err, "Failed to detect %s.\n",
- 			      mcp251xfd_get_model_str(priv));
--		goto out_can_rx_offload_del;
-+		goto out_can_free_wq;
- 	}
- 
- 	return 0;
- 
-+ out_can_free_wq:
-+	destroy_workqueue(priv->wq);
-  out_can_rx_offload_del:
- 	can_rx_offload_del(&priv->offload);
-  out_free_candev:
-@@ -2165,6 +2175,7 @@ static void mcp251xfd_remove(struct spi_device *spi)
- 	struct mcp251xfd_priv *priv = spi_get_drvdata(spi);
- 	struct net_device *ndev = priv->ndev;
- 
-+	destroy_workqueue(priv->wq);
- 	can_rx_offload_del(&priv->offload);
- 	mcp251xfd_unregister(priv);
- 	spi->max_speed_hz = priv->spi_max_speed_hz_orig;
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-index 160528d3cc26..1e7ddf316643 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-@@ -131,6 +131,41 @@ mcp251xfd_tx_obj_from_skb(const struct mcp251xfd_priv *priv,
- 	tx_obj->xfer[0].len = len;
- }
- 
-+static void mcp251xfd_tx_failure_drop(const struct mcp251xfd_priv *priv,
-+				      struct mcp251xfd_tx_ring *tx_ring,
-+				      int err)
-+{
-+	struct net_device *ndev = priv->ndev;
-+	struct net_device_stats *stats = &ndev->stats;
-+	unsigned int frame_len = 0;
-+	u8 tx_head;
-+
-+	tx_ring->head--;
-+	stats->tx_dropped++;
-+	tx_head = mcp251xfd_get_tx_head(tx_ring);
-+	can_free_echo_skb(ndev, tx_head, &frame_len);
-+	netdev_completed_queue(ndev, 1, frame_len);
-+	netif_wake_queue(ndev);
-+
-+	if (net_ratelimit())
-+		netdev_err(priv->ndev, "ERROR in %s: %d\n", __func__, err);
-+}
-+
-+void mcp251xfd_tx_obj_write_sync(struct work_struct *ws)
-+{
-+	struct mcp251xfd_priv *priv = container_of(ws, struct mcp251xfd_priv,
-+						   tx_work);
-+	struct mcp251xfd_tx_obj *tx_obj = priv->tx_work_obj;
-+	struct mcp251xfd_tx_ring *tx_ring = priv->tx;
-+	int err;
-+
-+	err = spi_sync(priv->spi, &tx_obj->msg);
-+	if (err)
-+		mcp251xfd_tx_failure_drop(priv, tx_ring, err);
-+
-+	priv->tx_work_obj = NULL;
-+}
-+
- static int mcp251xfd_tx_obj_write(const struct mcp251xfd_priv *priv,
- 				  struct mcp251xfd_tx_obj *tx_obj)
- {
-@@ -175,7 +210,7 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
- 	if (can_dev_dropped_skb(ndev, skb))
- 		return NETDEV_TX_OK;
- 
--	if (mcp251xfd_tx_busy(priv, tx_ring))
-+	if (mcp251xfd_tx_busy(priv, tx_ring) || priv->tx_work_obj)
- 		return NETDEV_TX_BUSY;
- 
- 	tx_obj = mcp251xfd_get_tx_obj_next(tx_ring);
-@@ -193,13 +228,13 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
- 		netdev_sent_queue(priv->ndev, frame_len);
- 
- 	err = mcp251xfd_tx_obj_write(priv, tx_obj);
--	if (err)
--		goto out_err;
--
--	return NETDEV_TX_OK;
--
-- out_err:
--	netdev_err(priv->ndev, "ERROR in %s: %d\n", __func__, err);
-+	if (err == -EBUSY) {
-+		priv->tx_work_obj = tx_obj;
-+		netif_stop_queue(ndev);
-+		queue_work(priv->wq, &priv->tx_work);
-+	} else if (err) {
-+		mcp251xfd_tx_failure_drop(priv, tx_ring, err);
-+	}
- 
- 	return NETDEV_TX_OK;
- }
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd.h b/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
-index 24510b3b8020..4e27a33f4030 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
-@@ -633,6 +633,10 @@ struct mcp251xfd_priv {
- 	struct mcp251xfd_rx_ring *rx[MCP251XFD_FIFO_RX_NUM];
- 	struct mcp251xfd_tx_ring tx[MCP251XFD_FIFO_TX_NUM];
- 
-+	struct workqueue_struct *wq;
-+	struct work_struct tx_work;
-+	struct mcp251xfd_tx_obj *tx_work_obj;
-+
- 	DECLARE_BITMAP(flags, __MCP251XFD_FLAGS_SIZE__);
- 
- 	u8 rx_ring_num;
-@@ -952,6 +956,7 @@ void mcp251xfd_skb_set_timestamp(const struct mcp251xfd_priv *priv,
- void mcp251xfd_timestamp_init(struct mcp251xfd_priv *priv);
- void mcp251xfd_timestamp_stop(struct mcp251xfd_priv *priv);
- 
-+void mcp251xfd_tx_obj_write_sync(struct work_struct *ws);
- netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
- 				 struct net_device *ndev);
- 
--- 
-2.34.1
-
+If this is still broken, we might have similar issues in old/legacy drivers=
+.
 
