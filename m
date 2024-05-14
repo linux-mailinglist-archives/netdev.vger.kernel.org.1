@@ -1,138 +1,134 @@
-Return-Path: <netdev+bounces-96244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D3D88C4B2B
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 04:26:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B94B68C4B30
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 04:34:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBA09286641
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:26:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4867B1F22295
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:34:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88C1749C;
-	Tue, 14 May 2024 02:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 597821C36;
+	Tue, 14 May 2024 02:34:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W7UEjUWM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e0tJbCJy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342891C36;
-	Tue, 14 May 2024 02:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0482CAD24;
+	Tue, 14 May 2024 02:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715653559; cv=none; b=f6sFgWvZWvJnPEBycYL1Y3bIlJGrBMJ8DuSaq7TJb8dlt3k5IsG2Xgu915hAVaDzNEtW0GsLOJzm0a9Be/Bp+NII0D6f7bHgs7hLNzpGTE6YH9ZwaTCwHKo8aY3fuwb9gH/QvlyWQAn2og2kcU3kfBzi/ozIEyKu0c5E+SwWv+4=
+	t=1715654053; cv=none; b=ga2wqmgGxY8WBNeIlnQTL/hFJBFkWP70oqlBwnIP+WE1Xl1VeMYMHDucCdMqQhdj1Bct6OuYkXoqNQVOJUNrodxApz6o2icwtCsfYVDhH7GaasNmplHumscfQ17l2vpMdTCts7aKiiSiVepU6HokNu3RGbwA4SWmbR660aVCZ4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715653559; c=relaxed/simple;
-	bh=+a2RxBxWnxcA46Thf9ANLvCZNlU+Od+JII0GFSrtrTM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Wyh8XsfmkvN5t4XFoYehlITS0lXacRRPopDbq0Dz1fo13spEepXzUD5zQgY6swjnOZ/J+yO1uYsKda/+BEhgoxLEJ12sYkGDCd1AT0Pv1o+lf6thU+IRw9jQiXSeigmKqC8GmTkdH2C9DOpSmrCyet3RmvQxUSTsdTEhNG7Bv2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W7UEjUWM; arc=none smtp.client-ip=209.85.128.181
+	s=arc-20240116; t=1715654053; c=relaxed/simple;
+	bh=Fj4L+WmJwBpI33hWG+XhSdn5v/27r+qCR0+i4uR74Mw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hYNV+mDXUCpUMSSf2iA4mwNggi1/0aXZIaClhMfYZTz1B5i7Jsr5OzPD6fwuosCoMTZ67j+SjGja3kjBp68Er6qMqF8W29oKqLC/S5GMhaaX4cnU6ezfK0rS8XfHz5E7pFDivcGT5bWF0p1+dHldW0iKagPbvoUZ4iFJhIjEtmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e0tJbCJy; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-61af74a010aso47780587b3.0;
-        Mon, 13 May 2024 19:25:57 -0700 (PDT)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6f44e3fd382so4155979b3a.1;
+        Mon, 13 May 2024 19:34:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715653557; x=1716258357; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mx4RFDf6WgXAWKWwP6oMkLQ8rk0CdMUrz/uyMHvaUJY=;
-        b=W7UEjUWMHKZPwBAv+42MNRfR2YVu5H5tpE1S/EYADt7mIn13DS5JPStzU6KdynwLaO
-         t/TgvhXdK1AfZbRo5xMUEIhwWEN2uYkhs8xLDgFaRa4L7GwiofY8s81017fgNJ5L0Ohw
-         Mj1R5UmBnEHuVSEDQJIfkPc0zMl8V8aiLU//hEv1fitHLq/AAFc9jACLyZ2fij9cV47w
-         3bD9A2+vHMImnkQKfJJxbI8gqmZ5dZdyAqjfROwlxBx05VlaNBxRkSQCYfU2aj+DOXQe
-         afTzrEIRlPpHa57mob6tgbgCNfp3COFKdMNCdVSZqid3EWpFjn4E7djR382el4RzV2Ct
-         qizg==
+        d=gmail.com; s=20230601; t=1715654051; x=1716258851; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KncoJsONQXdGs8dpSt8iIGQs9fO0BdlhjynEZlhIVCk=;
+        b=e0tJbCJyTMEkOEytoEuoWPAwA2ZR5GFMi3CY+mWXmRzWyG14NT0qeaPMAKYCYM3niS
+         DtG+lmJspo2vVPqiVmkeL3hpMoQQAQMrTJeIqWSLgclV4N9L/ITM+iKhyS5ojHOS7V1+
+         XKEnL3DEimpvfYx7kEAjgumVL4+bqm2FcPurtg+7YYRwd1VYMY3dpjz35s0/4lS8KpnB
+         7g6Ny6yzV3SHvZ/pqf3E57BCAz5G+SnPZrVaVuEG35oe8b3jhegbzJn8tDNUJOuxLfLU
+         5n8CggDD2FgnxaC+rJrmh8Hq1vxo6s+1C+y/qL/JVpltUqUT/rKBGiTWrKsJNdvF/ca/
+         KFMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715653557; x=1716258357;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mx4RFDf6WgXAWKWwP6oMkLQ8rk0CdMUrz/uyMHvaUJY=;
-        b=o12lOTLbafnalwpqtelre7+7GG025BuHkp815oVOo1Kz0xCiIwsfEUwhVJHziicBjU
-         tI92RWUDAdKr6P4UGo9+77odr3K3E8ada7oObq1PWfbmerm0PAWpTEbEKrtInk4mZMCd
-         e3c4LYhAwN4UrjDLIqJa7dpClQ2Szb9yRnwzm7NTWW5U50aCthYrtptb4K9xFL3IyRbw
-         vGtht8aEYWTVgYf/+jmmzj1kCodp9/EBzsjbL9auR9tmUk9LfRbLgRDZPJWyq0/dZ9k5
-         ZNlYVuwoxlYey4IWRwV7YKBcP1k4TUoJae6wSev4doQXDPZMk3MtWzsZKdbPO8XB77e7
-         nmIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW07OBGwo0UE8s8G8670aOspbBpOnsJRtCfUal+QyZprjCHqUqnIj8Iz7W8pHj8pSu0tYDiJa7Q0wzIFWRWq/UwENmVBQVpUMWTu6+gO2kQpTQqBR0DINfnE6pMz7UgFMBAfr8v0YOR
-X-Gm-Message-State: AOJu0YxaFhueWWCfe+2PRrC7cNIg6K40ovbz/NUuGbB0P4j+YoP1RQRK
-	JzTd/4G6T9eMVM+IOM5so4lMDYz6U6GLfTBxDEQbujOSHrzOT1MLoY1qxA==
-X-Google-Smtp-Source: AGHT+IHniwQQiYpd+TSCEkO0ItdZFVEhjPhlluaGCZGQkZZy2E2jyDTudjBeqgvzDdoqqXThA+rIjg==
-X-Received: by 2002:a0d:d6c9:0:b0:61e:a36:8d85 with SMTP id 00721157ae682-622b01384d2mr102100187b3.50.1715653557034;
-        Mon, 13 May 2024 19:25:57 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43e19256258sm20030401cf.49.2024.05.13.19.25.56
+        d=1e100.net; s=20230601; t=1715654051; x=1716258851;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KncoJsONQXdGs8dpSt8iIGQs9fO0BdlhjynEZlhIVCk=;
+        b=QXDVZBtJqLKcR/0D34Vmb1FjUW400GCclEQZeSEkwcVCoLol+zA71UYkfkSkN/votp
+         VrWMLXAhphJhaW+TC6hSFlTA7ts62wv7feXEgjP7POA9E56rBZ3cIxepUTkaDHD0Z3Ii
+         4MnL2XH5iB8KXqPpbxobFD8DMZUpTQxfskZzHRmUYd6wYmo5+IHXssjvDzqeYvpqIW2V
+         jz2cgevquv4aLRBp641Un44mR/yuYiyZTxz/zTfR57XujUOCuC23Nw7BAsWPy2W/v3k9
+         xZABF4v37KbAmjZFaJ7lG7QDSJ0cCrHaLerfNeyCvjn6hgX1Xbp6+6iAZVWOyCIujve6
+         tyTA==
+X-Forwarded-Encrypted: i=1; AJvYcCWHAhqjtOJDBwD/Uquyw8JH8f6HYU3MgR9pJ81ye9gfZ/Y+JSeZG8LhLYGEZFlvo2xTrMnDceWcUOL2R6Ewzn0TkgcNu798szcA8PI4sDaC
+X-Gm-Message-State: AOJu0YxqiOIlpXq801T5TLhUvQAlVfAVo1yQBs12KI/7J5KUFLAy+2l1
+	2y4bZr4jQfiRTLwKI+iI5BQebOnDQ08ALEAIu/oXGfsnZsezrlmtDQU3f5kRpJo=
+X-Google-Smtp-Source: AGHT+IFfea6LdpiGGC40sAYZGj4ALwsOvNL8Ai5AGYQdrZlHQTPYfzgBnPhpgl7aB0oT7edFpiG2/A==
+X-Received: by 2002:a05:6a20:a12a:b0:1ad:80ed:41 with SMTP id adf61e73a8af0-1afde238daemr12434379637.58.1715654050940;
+        Mon, 13 May 2024 19:34:10 -0700 (PDT)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bf30c6fsm86475955ad.156.2024.05.13.19.34.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 19:25:56 -0700 (PDT)
-Date: Mon, 13 May 2024 22:25:56 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net, 
- linux-bluetooth@vger.kernel.org, 
- netdev@vger.kernel.org, 
- Pauli Virtanen <pav@iki.fi>
-Message-ID: <6642cbb4309a1_205cc6294a4@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CABBYNZKdbvyev+BV=CMGrzWPECJraP4OVJeysQYV=EFLKf_WVw@mail.gmail.com>
-References: <20240510211431.1728667-1-luiz.dentz@gmail.com>
- <20240513142641.0d721b18@kernel.org>
- <CABBYNZKn5YBRjj+RT_TVDtjOBS6V_H7BQmFMufQj-cOTC=RXDA@mail.gmail.com>
- <20240513154332.16e4e259@kernel.org>
- <6642bf28469d6_203b4c294bc@willemb.c.googlers.com.notmuch>
- <CABBYNZKJSpQcY+k8pczPgNYEoF+OE6enZFE5=Qu_HeWDkcfZEg@mail.gmail.com>
- <6642c7f3427b5_20539c2949a@willemb.c.googlers.com.notmuch>
- <CABBYNZKdbvyev+BV=CMGrzWPECJraP4OVJeysQYV=EFLKf_WVw@mail.gmail.com>
-Subject: Re: pull request: bluetooth-next 2024-05-10
+        Mon, 13 May 2024 19:34:10 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Petr Machata <petrm@nvidia.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests/net/lib: no need to record ns name if it already exist
+Date: Tue, 14 May 2024 10:33:59 +0800
+Message-ID: <20240514023400.1293236-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-> > > > As for the "experimental" BT_POLL_ERRQUEUE. This is an addition to the
-> > > > ABI, right? So immutable. Is it fair to call that experimental?
-> > >
-> > > I guess you are referring to the fact that sockopt ID reserved to
-> > > BT_POLL_ERRQUEUE cannot be reused anymore even if we drop its usage in
-> > > the future, yes that is correct, but we can actually return
-> > > ENOPROTOOPT as it current does:
-> > >
-> > >         if (!bt_poll_errqueue_enabled())
-> > >             return -ENOPROTOOPT
-> >
-> > I see. Once applications rely on a feature, it can be hard to actually
-> > deprecate. But in this case it may be possible.
-> >
-> > > Anyway I would be really happy to drop it so we don't have to worry
-> > > about it later.
-> > >
-> > > > It might be safer to only suppress the sk_error_report in
-> > > > sock_queue_err_skb. Or at least in bt_sock_poll to check the type of
-> > > > all outstanding errors and only suppress if all are timestamps.
-> > >
-> > > Or perhaps we could actually do that via poll/epoll directly? Not that
-> > > it would make it much simpler since the library tends to wrap the
-> > > usage of poll/epoll but POLLERR meaning both errors or errqueue events
-> > > is sort of the problem we are trying to figure out how to process them
-> > > separately.
-> >
-> > The process would still be awoken, of course. If bluetoothd can just
-> > be modified to ignore the reports, that would indeed be easiest from
-> > a kernel PoV.
-> 
-> @Pauli Virtanen tried that but apparently it would keep waking up the
-> process until the errqueue is fully read, maybe we are missing
-> something, or glib is not really doing a good job wrt to poll/epoll
-> handling.
+There is no need to add the name to ns_list again if the netns already
+recoreded.
 
-Perhaps this is because poll is level triggered. Maybe epoll in edge
-triggered mode would avoid re-waking for the same outstanding events.
+Fixes: 25ae948b4478 ("selftests/net: add lib.sh")
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ tools/testing/selftests/net/lib.sh | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
+index f9fe182dfbd4..56a9454b7ba3 100644
+--- a/tools/testing/selftests/net/lib.sh
++++ b/tools/testing/selftests/net/lib.sh
+@@ -73,15 +73,17 @@ setup_ns()
+ 	local ns=""
+ 	local ns_name=""
+ 	local ns_list=""
++	local ns_exist=
+ 	for ns_name in "$@"; do
+ 		# Some test may setup/remove same netns multi times
+ 		if unset ${ns_name} 2> /dev/null; then
+ 			ns="${ns_name,,}-$(mktemp -u XXXXXX)"
+ 			eval readonly ${ns_name}="$ns"
++			ns_exist=false
+ 		else
+ 			eval ns='$'${ns_name}
+ 			cleanup_ns "$ns"
+-
++			ns_exist=true
+ 		fi
+ 
+ 		if ! ip netns add "$ns"; then
+@@ -90,7 +92,7 @@ setup_ns()
+ 			return $ksft_skip
+ 		fi
+ 		ip -n "$ns" link set lo up
+-		ns_list="$ns_list $ns"
++		! $ns_exist && ns_list="$ns_list $ns"
+ 	done
+ 	NS_LIST="$NS_LIST $ns_list"
+ }
+-- 
+2.43.0
+
 
