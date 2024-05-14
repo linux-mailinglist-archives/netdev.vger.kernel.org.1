@@ -1,248 +1,242 @@
-Return-Path: <netdev+bounces-96382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B648B8C5867
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 17:00:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83C818C586B
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 17:02:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3089EB21288
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 15:00:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8D98B215BB
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 15:02:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 606EF17EB81;
-	Tue, 14 May 2024 15:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECFA17EB82;
+	Tue, 14 May 2024 15:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b6wzAdqH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lGkcLv9o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B43D144D0D;
-	Tue, 14 May 2024 15:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715698820; cv=fail; b=RyEip9+XgUfdiwLLMCgtmpl18mxPAwzZYEctBcOoaicKABzWIiL8Qx6y5h05xIHkdPu8jlGu8z64FxxfiiEGkAuy26My4TJXRk8EAJ7KRDdn3aXlW79kDhmCD6zCViuTkg85eDdncOiLpXFV9Se4sUbbgUqxsgwhLo+HGLK9/xs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715698820; c=relaxed/simple;
-	bh=rIBV6LSjPKtx1wojQKbbdwJW5Nsm0pt1tTdnZfKwoWE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XukSJnZgT/BH2SspOgEhZLh8M8Bltz6eEZZDQqghTxpHcgR1hCj9JQfG1HJCBfGXDtkeIMJXyIZ4Ein7GSRs7NWHnYAx1+llNiGBCQscER1OSMiYXZeArAajva5sVkaaZr0D/IFTyd9DVOwuTqDLgA1Gge6Yyp//VJhLlHcz05k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b6wzAdqH; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715698818; x=1747234818;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=rIBV6LSjPKtx1wojQKbbdwJW5Nsm0pt1tTdnZfKwoWE=;
-  b=b6wzAdqHo9LmMc7SkoNpxzSrRu9LeroJv+jDQcr0PPXCOGVBi18yIs6S
-   zYK/eHjfgKQsat4VndXkJ5qh6z/5KHiQtRJupVgbXsiEd3mCrTYXzj4a8
-   RkdFP7wgCOdD8ak63WzLsxNNJC1NkguSdc6D9WIJa9jgjvblHfXgZfXWb
-   7r9g39uI3ecTsUG9bm2Ub7E8BK3cOKfISwOXYpieEFtivBIDDdBg/ujp2
-   q2oPEMcCRWSK2frOKEjskA5Ddit9lcQhTYoQO1Z+8tthPi/J4ejHI7vDx
-   EAUAsKYF4TzLTZmkM7TgdVU85OdjSgUzuttVaaTIZdl7O8g+g4+q8hxJg
-   w==;
-X-CSE-ConnectionGUID: HfFKUgb/RxuSAgGfWCRwBA==
-X-CSE-MsgGUID: fH/fqSrgSES2n0CGGaJkZA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11073"; a="29207056"
-X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="29207056"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 08:00:16 -0700
-X-CSE-ConnectionGUID: DYe7sj9tSyqMuqY7lv7APQ==
-X-CSE-MsgGUID: v0Vo92zRSTuwwBc5BBGtIQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="30546110"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 May 2024 08:00:16 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 14 May 2024 08:00:15 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 14 May 2024 08:00:14 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 14 May 2024 08:00:14 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 14 May 2024 08:00:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hlR58cyhXwCA19t2tfkGsAFdeZBoYwprGUbfkyqypRzVzQFmVyDcZyBPRnSmUmPC8pAigzmWtkZcVcQSXZILvTwnWkx6bjdE4tV3mT4EkLYRMW7G2eLqOPtNqzYXmjKFytHFijQCNGHPXCmMBwZKqIErp67UTCzoSJR5uvaxpPeTWpoeERdDffbTNY1ZT9s1Ri1Us+Wq+F5eHq3Bt01hopkqUrY0BjXuNuQNjio61+A4+4C04xQa+PDKfa6G9lOzuqscxt7NzNQks9fTGlpNvOn0fuv4nOCaN5VKGj+rewE+gmzjB+1cRl9YLcxFxLm3tOmaieBV8anID9TzOvRQHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oIe+F1T4nOJplS5i7BjycX3dxlI9Prs7JtkCvIjCums=;
- b=hbkBfcSzc1jS7tANhsw9PmY+9+IPTK2aaV3jFhaAp0emDSBcfrZfCSuPRn8A9Gwvi+2kDaNNg3VNAEWjBXLUybtX4u8I6kfglaEcSVf/cPbx3U0m/P2fHj+GZUjfMtFVE+2mDWgFxzOdSrLrWHS6LyRoTs6nOQZ4VnMt6Mmu5xP/ol2IGzNxJDO91/noMFxTiXHNl5vUhKVhL0xq30CRhOoU2XrNWRPwHVUTdBF+mhw/oboSY02lAqF7RVGQOwDTC3eJKZKh9UpM2iSKjwX+jQ6V2u2MXjwN9F23NnNJ3VpbSETx5jUCIBUOgXNSDo9RAK8SRJKB6OIIhu+C21Wu2A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
- by CY8PR11MB6939.namprd11.prod.outlook.com (2603:10b6:930:59::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Tue, 14 May
- 2024 15:00:13 +0000
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::4f97:ad9d:79a9:899f]) by CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::4f97:ad9d:79a9:899f%5]) with mapi id 15.20.7544.041; Tue, 14 May 2024
- 15:00:12 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>
-CC: Jesper Dangaard Brouer <hawk@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Richard Cochran <richardcochran@gmail.com>, "John
- Fastabend" <john.fastabend@gmail.com>, Alexei Starovoitov <ast@kernel.org>,
-	"Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>, Eric Dumazet <edumazet@google.com>, "Nguyen,
- Anthony L" <anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-Subject: RE: [Intel-wired-lan] [PATCH net-next v2 1/1] net: intel: Use *-y
- instead of *-objs in Makefile
-Thread-Topic: [Intel-wired-lan] [PATCH net-next v2 1/1] net: intel: Use *-y
- instead of *-objs in Makefile
-Thread-Index: AQHaoXHjkPUX/AAaokuzOzHnGTI1hLGW24ng
-Date: Tue, 14 May 2024 15:00:12 +0000
-Message-ID: <CYYPR11MB8429506961A4010D31B6D674BDE32@CYYPR11MB8429.namprd11.prod.outlook.com>
-References: <20240508180057.1947637-1-andriy.shevchenko@linux.intel.com>
-In-Reply-To: <20240508180057.1947637-1-andriy.shevchenko@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|CY8PR11MB6939:EE_
-x-ms-office365-filtering-correlation-id: c831c0a0-10b3-438b-7349-08dc74268e8f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|7416005|1800799015|366007|376005|38070700009;
-x-microsoft-antispam-message-info: =?us-ascii?Q?4EO0Gio/ezpze+FFb9dZ4Z+F5uufYVyxnN02wWQI7UHYDu4NoJeJ05m5ZTNL?=
- =?us-ascii?Q?hvWBXSrmUK2ulzPnPh4DXyaH74WwnoexGxqt/al3UU7Nw6FREXKVlQEUY8BE?=
- =?us-ascii?Q?akwU30gGyVAMSu8MPafcplNsG6rGOQStug9Jj//2ZD1x5y9Jz9LBu97GF5Ya?=
- =?us-ascii?Q?AOP7PC2LMqSCQte22+uN3qnb5p0vk+qV/QQw39tpVY06VGzoAVYkG3ClmU1A?=
- =?us-ascii?Q?skgd1xlb7jvz79c5mQaNC7f55Lu5TA1XLamowo/+D1Igj5DF+G54J8Hr02HO?=
- =?us-ascii?Q?L/V4NIRLm//m0X1FYZ1EnSupUprZYfy+wLRfXGxD1dIkR6ew1U7M19GEEr3/?=
- =?us-ascii?Q?kgp96DHpuKNyxypXGkfs1/C/n0fwCVq96MCgE3ImAMZofApJ/570C2T0BVrU?=
- =?us-ascii?Q?IH08JARFzgq35kAvL1Cr5P05NEfTJNP6t5aVTqcoH3UYzn7Y8Vgrc+5IJvpO?=
- =?us-ascii?Q?3h2nNfxeIJU5mpkxZ40WVKCYSUwK6FPXHffGwFcuXOanTjf1SKHM2gLjUf8r?=
- =?us-ascii?Q?nk4IdfKXVMPdP2Nl27eqnZ/1KJjoZmEHQmSZe2Vrmdbm9nllgkRC5M3mC1Ny?=
- =?us-ascii?Q?onUFddy3+CSEkUCF05ZFLo5K8EusY+7m1hsFKBBhzJEJJjLlbaDCK0ZFB6BM?=
- =?us-ascii?Q?hL7+sK5ppmmj5uyBMAc2Q1GHFzMhYejEbHsAKV0L0Yceu7X/PPfzYkBrllJQ?=
- =?us-ascii?Q?czcU/i85eaU6NgiIT1wgmCbi5hH0pYJNVxEw/KgAjtkKM43lhzH5oxRQCAIA?=
- =?us-ascii?Q?w6pMxZw3LiUE5dIooJVKztidUioIU2O26KY1Y0cMkeZzaY7i/XBqMqYFFQSh?=
- =?us-ascii?Q?gVg36usqK1Y+Y0hPlt+847DUhzXimmfVRSGnbHhRsPMVPAMSGLP/ihgmZvkG?=
- =?us-ascii?Q?VqMqAbcEzkfZ2aYRdRwE6xP5lxtsyRKNFrAO2imTOYBkDFWlYwV3BPyB/NoW?=
- =?us-ascii?Q?pd7t2CwO0ka4IPq75AFsMlFjkBip1YmOd11z0zSGoRe0J8A20cUAnsPmwIXT?=
- =?us-ascii?Q?/l4VFgWDUgNUmDHSv5V0z2wkj5ao8LM52/i90Vz1BiuP+qAC7f0xrIxOb6Fw?=
- =?us-ascii?Q?CjSUTTPMOeaAD7YcJROR63CJ9wT0LFl8JBlUoGcgdQO97yEphr8Fewb4b83s?=
- =?us-ascii?Q?ueX7kOm7dHgs1ZJFpg9rsx4dlIu2+NY4Mq7YSRgX87sYYdd/MvkAp7FuLKfD?=
- =?us-ascii?Q?eYVeTkfXEdYJy6ozCFTF9NnYyw88ra81hxpGmmQqjrA6PrOaY3rpWkV6hZgh?=
- =?us-ascii?Q?GFCq0C8wRiTwla9v/6qYNaf9dvqHcyhEjTDR5BGEGyiy60nhv4KZAOIuMrjX?=
- =?us-ascii?Q?+D8waX4dI5e51P6qtHoMCAr1HnQyTfO6uPlIT66PWYqs3Q=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(366007)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?XfFBuWFw2IqQ7NVvDJXHgKLIou3Insk5j5ya9yRbIzhDJSxZsR7MegW/oPj6?=
- =?us-ascii?Q?kTLFekYiRrD6G7E97z5vaMEDXv2fWgjt0bJ4Lqv9UxetbAADrU8HeLC+bQw6?=
- =?us-ascii?Q?okwZYcmN0gFIKs6lMT/dL36kj7LdXiae8OfGQFHrxE3YxtsEMomiW9MzsZrl?=
- =?us-ascii?Q?17lUFohWsrMyKBpxwfUnyEn6PbP5U1Lo4AQqDdEyjVMWg8Hesv3TJ7E5IHpD?=
- =?us-ascii?Q?ZxodNNfvD3kELklKA2Wrgl+mh+bf/40/ij7PHK0SG9ZdsmXzovnRm1m3VZPX?=
- =?us-ascii?Q?FhmwOpbF/knLsrH35EzVtNSYOeCDImCurOBwWkDbpgPeD/nmvV+rnQrZdyRC?=
- =?us-ascii?Q?eE/wC3wnoxuoO9q+cvRUTHFEQEVlAvlTeFOX4I4BVmK5Ks+/CJ5vy6AKK5+6?=
- =?us-ascii?Q?g4D+O8HZYrf8HY6oPHj8h9Bg5PhandlCiXj6Eh7vxF2X7NSaTVPG6zHxflpy?=
- =?us-ascii?Q?Ky6SCQ5JDkCFcDAnyDfFI00H47NktdPlMIo/pdhJwjmvu7ciNe2BgBM1wbs6?=
- =?us-ascii?Q?ikSQrytIAR2H3031RWe4RGw+1JI8APiMDXuvibNtFZNHayXMcnWM1ORzAEf3?=
- =?us-ascii?Q?QXoDFCtFiGRAMliSc2LjPHOwcsDY2a6hTWnNmEsb2qFdzAtMb2sG7MHwCgRE?=
- =?us-ascii?Q?PVzYTvsPSP67fyalrWiilqLBYyMnlbiSUkw3NpdOgt1WanxuZVKtvQF3MwJh?=
- =?us-ascii?Q?zvI9ifbmDcowfQxvxNDIk1qoHp5DcHXFcdKm/65TOV+sweZhNixYxC/8tMTP?=
- =?us-ascii?Q?fsPl6wsyaqnqvO9BUAViaeAk+q+CopOT/zcURI5kuQg6qQpiCCCsuU9S1jw+?=
- =?us-ascii?Q?fX96oafABvRmjF41kGaMs25uveccXgJeAbIq8g3bSAb/z5YdprR0E920x8/C?=
- =?us-ascii?Q?J16Ii7TpYZwbMhET+1IeGKSn49+zU7t5cZeSsOOco4W59PXMP134N22p7rzs?=
- =?us-ascii?Q?6j1iZL6+hC1USKd3Es6s84wRL0QzRn2oI9l/AvB9POCxdXH3hKRiYy63n9Mu?=
- =?us-ascii?Q?7aZI4CgLrGSok/fYMTd1nzckz0nW00kQuZAVgNutMlL/T5rQQ5KguP18ul0Y?=
- =?us-ascii?Q?vM27l8Wwi6D9SvEaVtrhj1svR3XZoyWvKTGG5sl4iBiWrwkBAQrjNyPp0PlU?=
- =?us-ascii?Q?tKdEtTHavZzCxmbRzkhl04ehhVFSsaRiE21gairkcYAbNrjaCLYG0hqecfsJ?=
- =?us-ascii?Q?gFoKT2WzE8diCgBT0B2zMOCtaAZnirnaYJdvPQ7I40qlMv1XYK6YSc2liLky?=
- =?us-ascii?Q?3tjAmwHo8wikw3T4LrKrHCxZw3jHuRwC6GWtBplFeW6gHlw4MRROBiaaRFra?=
- =?us-ascii?Q?vVLkyfY/DjSyZ41Qh/mUSczFgyIqhBVafaIQti0MtoVDKi3K9o+HROoZim4a?=
- =?us-ascii?Q?9F2R+r9P4kiFTZAyr+3MAP3DEQaf20Gd6J8AzNAwo84gfca7iw5LUlopC21D?=
- =?us-ascii?Q?GPg14xyQhfbmlWjszMnGmodb4e4AI7aIyWpby7mZzFQ3TNEWjRAAHmH7FnLo?=
- =?us-ascii?Q?X3QjC0p5+SXcEz1skOp7ElV3AswDYKOFe9up7tqh6KyUzOvPewc0WOJLwF4f?=
- =?us-ascii?Q?uEeXt5r710cT4OPQiTjRQ3OCq7ZPy6nhjLXSG7/E7ZtbOrCoFSi0U1CEeHUr?=
- =?us-ascii?Q?aw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A719A17EB81;
+	Tue, 14 May 2024 15:02:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715698932; cv=none; b=rEzvbNYPS3BaMA+0CWPQc4/brYXHwaHZcuBtyWd4q8b8yk6aZ9149dIb98WN+bmijDN7HTDRntBiZD8nkIssPYbQ4BwJOgvxUB7iVAExGSZhRmIT2hWqVHhcdBDp9OAVnrnNXIw0LvkadPHnpywNRQDGqGypGdkixIG7b/oINbs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715698932; c=relaxed/simple;
+	bh=uL706ERLxax8CVCWmr1ckFml1YkVLZD9P3IuhvqfeGg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Vle5W957eaEZndBLI/e3E4pq06Ps1K+0Y71GQBD9wXkNz6PkXYWQjNeQRlSpGw+MSfhqWgvBs/cf8+OJ5vsoKb3tw7+rYqeBRTI2ljyhvzAzVncrKDIfJCgg/V6MGZ0yK6yHZHIBa36gzzwqdqAmpzI9mKPMYo+reXUoWoJO/N8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lGkcLv9o; arc=none smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6f0e82221f6so1861439a34.1;
+        Tue, 14 May 2024 08:02:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715698930; x=1716303730; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dPQ5SRZzKjB2hMryxTxvLA/TaX3bnrFYzZCTF/URZwo=;
+        b=lGkcLv9otvGRk1QDdcqG7tSTEb6wLHzESkyG5/JeevtjdgM3b47/Wezf7Vadksc/NN
+         IeQfY3by+drutcZ5GbxQqPhUvlXv8WTrCop62xiHHmszLcNh+7Hwb2wsTOm2F3fYsdK/
+         ubTrbcns+7gS/unkvnSfcKh4zZfFP5Igdm1bVpkMsgftut5k1dgVkJaga9NMyBRAgf2A
+         senL+oGY85IO6rT2jNL4UwWXLj6b8ysDWCrR8Zn2nQeMzKo2whq1lb4w+HNKtWu4mjTO
+         Bbxyx2lp8D34zvsnTLlsf6xF5UncCQezjU//DfSbeH5zcujOmvQdbNJERuQxaiRlOt6G
+         oBLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715698930; x=1716303730;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dPQ5SRZzKjB2hMryxTxvLA/TaX3bnrFYzZCTF/URZwo=;
+        b=IgntoT0ZwyzaU5IwXB7lwksDmpYVtr2YnWr5pyOZR1ukVfE+eSh28tr3k4wK+sczj2
+         f8AExtqQO5yUXBw5v3PsJ8sUZbuvCkcKCgZQUWmzJ4xbjXrWPtc5PnGXjAStxsv+gxCB
+         s3e1vzk/fSOQuMc67VCLZCGil2gOeEK2B787HnMiyDaAwfEPOv4avZ7bNT3bfZO2cItv
+         YKCtDw5Bqw3tjMDITCXmei5PiEHLoAcPgjUH1ZRpsMttm/zDfoDY+RMjzRwNEuZM133e
+         ailYA9QnypzX0Va078lPe9wESXdwwELzfWc+NhDCsT9fGazAr6Rx8wI03W1yn7TAbXdU
+         2B5A==
+X-Forwarded-Encrypted: i=1; AJvYcCX+EIJDKn3iqnIqwKrt79k5Qn9DZxubsLpRabCSvBHId4B8uU6uGWj8zutLh4jhnofi0akov1cRNvAjWYhdqBqMoHiqzpyV
+X-Gm-Message-State: AOJu0YzxFoBposFh9FEZQqp0r8Gs+djAGcmOp66ykiLecSPehz8Q1mV+
+	W1v9xwV6tIX7vrwtbN37oovnmti27SwWJiBDcS+u953A3MA1NvsF
+X-Google-Smtp-Source: AGHT+IGoETGVNm/bQqb9izpIJYtF62f2SZAB9c3rvvQ2JHWxqXWXMwsAC0tE+8F+qaf8Ky6XbKwKWQ==
+X-Received: by 2002:a05:6808:220f:b0:3c9:6a90:caa4 with SMTP id 5614622812f47-3c997023d43mr17347817b6e.10.1715698928594;
+        Tue, 14 May 2024 08:02:08 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-7f8ffec6e4fsm1544193241.25.2024.05.14.08.02.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 May 2024 08:02:07 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2024-05-14
+Date: Tue, 14 May 2024 11:02:05 -0400
+Message-ID: <20240514150206.606432-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c831c0a0-10b3-438b-7349-08dc74268e8f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 May 2024 15:00:12.8531
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tXkzzMIpb1ZaWd/M9ApnTtjHW1Waxv0WvN25YYbDBOYjavoa04OZFjfB0+7stMFqq4QOqHjZokSEr1S3MT3Br7AjRtgJtz2raSpC+zpF/J+755dyKc7cLPFaASYiL2vZ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6939
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of A=
-ndy Shevchenko
-> Sent: Wednesday, May 8, 2024 11:30 PM
-> To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>; intel-wired-lan@=
-lists.osuosl.org; netdev@vger.kernel.org; linux-kernel@vger.kernel.org; bpf=
-@vger.kernel.org
-> Cc: Jesper Dangaard Brouer <hawk@kernel.org>; Daniel Borkmann <daniel@iog=
-earbox.net>; Richard Cochran <richardcochran@gmail.com>; John Fastabend <jo=
-hn.fastabend@gmail.com>; Alexei Starovoitov <ast@kernel.org>; Loktionov, Al=
-eksandr <aleksandr.loktionov@intel.com>; Lobakin, Aleksander <aleksander.lo=
-bakin@intel.com>; Eric Dumazet <edumazet@google.com>; Nguyen, Anthony L <an=
-thony.l.nguyen@intel.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <p=
-abeni@redhat.com>; David S. Miller <davem@davemloft.net>
-> Subject: [Intel-wired-lan] [PATCH net-next v2 1/1] net: intel: Use *-y in=
-stead of *-objs in Makefile
->
-> *-objs suffix is reserved rather for (user-space) host programs while usu=
-ally *-y suffix is used for kernel drivers (although *-objs works for that =
-purpose for now).
->
-> Let's correct the old usages of *-objs in Makefiles.
->
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
-> v2: added tags (Olek, Aleksandr), fixed misplaced line in one case (LKP)
->  drivers/net/ethernet/intel/e1000/Makefile   | 2 +-
->  drivers/net/ethernet/intel/e1000e/Makefile  | 7 +++----
->  drivers/net/ethernet/intel/i40e/Makefile    | 2 +-
->  drivers/net/ethernet/intel/iavf/Makefile    | 5 ++---
->  drivers/net/ethernet/intel/igb/Makefile     | 6 +++---
->  drivers/net/ethernet/intel/igbvf/Makefile   | 6 +-----
->  drivers/net/ethernet/intel/igc/Makefile     | 6 +++---
->  drivers/net/ethernet/intel/ixgbe/Makefile   | 8 ++++----
->  drivers/net/ethernet/intel/ixgbevf/Makefile | 6 +-----  drivers/net/ethe=
-rnet/intel/libeth/Makefile  | 2 +-
->  drivers/net/ethernet/intel/libie/Makefile   | 2 +-
->  11 files changed, 21 insertions(+), 31 deletions(-)
->
+The following changes since commit 5c1672705a1a2389f5ad78e0fea6f08ed32d6f18:
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+  net: revert partially applied PHY topology series (2024-05-13 18:35:02 -0700)
 
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2024-05-14
+
+for you to fetch changes up to 6a486c1361ea588938898ae812b32dcfbd4022f2:
+
+  Bluetooth: btintel_pcie: Refactor and code cleanup (2024-05-14 10:58:30 -0400)
+
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
+
+ - Add support MediaTek MT7921S SDIO
+ - Various fixes for -Wflex-array-member-not-at-end and -Wfamnae
+ - Add USB HW IDs for MT7921/MT7922/MT7925
+ - Add support for Intel BlazarI and Filmore Peak2 (BE201)
+ - Add initial support for Intel PCIe driver
+ - Remove HCI_AMP support
+
+----------------------------------------------------------------
+Archie Pusaka (1):
+      Bluetooth: Populate hci_set_hw_info for Intel and Realtek
+
+Chen-Yu Tsai (1):
+      dt-bindings: net: bluetooth: Add MediaTek MT7921S SDIO Bluetooth
+
+Dan Carpenter (1):
+      Bluetooth: qca: Fix error code in qca_read_fw_build_info()
+
+Gustavo A. R. Silva (6):
+      Bluetooth: L2CAP: Avoid -Wflex-array-member-not-at-end warnings
+      Bluetooth: hci_conn, hci_sync: Use __counted_by() to avoid -Wfamnae warnings
+      Bluetooth: hci_conn: Use __counted_by() to avoid -Wfamnae warning
+      Bluetooth: hci_conn: Use struct_size() in hci_le_big_create_sync()
+      Bluetooth: hci_sync: Use cmd->num_cis instead of magic number
+      Bluetooth: hci_conn: Use __counted_by() and avoid -Wfamnae warning
+
+Hans de Goede (1):
+      Bluetooth: hci_bcm: Limit bcm43455 baudrate to 2000000
+
+Ian W MORRISON (1):
+      Bluetooth: Add support for MediaTek MT7922 device
+
+Iulia Tanasescu (2):
+      Bluetooth: ISO: Make iso_get_sock_listen generic
+      Bluetooth: ISO: Handle PA sync when no BIGInfo reports are generated
+
+Jiande Lu (2):
+      Bluetooth: btusb: Add USB HW IDs for MT7921/MT7922/MT7925
+      Bluetooth: btusb: Sort usb_device_id table by the ID
+
+Johan Hovold (3):
+      Bluetooth: qca: drop bogus edl header checks
+      Bluetooth: qca: drop bogus module version
+      Bluetooth: qca: clean up defines
+
+Kiran K (10):
+      Bluetooth: btintel: Define macros for image types
+      Bluetooth: btintel: Add support to download intermediate loader
+      Bluetooth: btintel: Add support for BlazarI
+      Bluetooth: btintel: Add support for Filmore Peak2 (BE201)
+      Bluetooth: btintel: Export few static functions
+      Bluetooth: btintel_pcie: Add *setup* function to download firmware
+      Bluetooth: btintel_pcie: Fix compiler warnings
+      Bluetooth: btintel: Fix compiler warning for multi_v7_defconfig config
+      Bluetooth: btintel_pcie: Fix warning reported by sparse
+      Bluetooth: btintel_pcie: Refactor and code cleanup
+
+Luiz Augusto von Dentz (4):
+      Bluetooth: Add proper definitions for scan interval and window
+      Bluetooth: hci_event: Set DISCOVERY_FINDING on SCAN_ENABLED
+      Bluetooth: HCI: Remove HCI_AMP support
+      Bluetooth: hci_core: Fix not handling hdev->le_num_of_adv_sets=1
+
+Mahesh Talewad (1):
+      LE Create Connection command timeout increased to 20 secs
+
+Marek Vasut (1):
+      dt-bindings: net: broadcom-bluetooth: Add CYW43439 DT binding
+
+Peter Tsao (1):
+      Bluetooth: btusb: Fix the patch for MT7920 the affected to MT7921
+
+Sebastian Urban (1):
+      Bluetooth: compute LE flow credits based on recvbuf space
+
+Sungwoo Kim (1):
+      Bluetooth: L2CAP: Fix div-by-zero in l2cap_le_flowctl_init()
+
+Tedd Ho-Jeong An (1):
+      Bluetooth: btintel_pcie: Add support for PCIe transport
+
+Uri Arev (2):
+      Bluetooth: hci_intel: Fix multiple issues reported by checkpatch.pl
+      Bluetooth: ath3k: Fix multiple issues reported by checkpatch.pl
+
+Uwe Kleine-König (3):
+      Bluetooth: btqcomsmd: Convert to platform remove callback returning void
+      Bluetooth: hci_bcm: Convert to platform remove callback returning void
+      Bluetooth: hci_intel: Convert to platform remove callback returning void
+
+Zijun Hu (4):
+      Bluetooth: btusb: Correct timeout macro argument used to receive control message
+      Bluetooth: hci_conn: Remove a redundant check for HFP offload
+      Bluetooth: Remove 3 repeated macro definitions
+      Bluetooth: qca: Support downloading board id specific NVM for WCN7850
+
+ .../net/bluetooth/mediatek,mt7921s-bluetooth.yaml  |   55 +
+ .../bindings/net/broadcom-bluetooth.yaml           |   33 +-
+ MAINTAINERS                                        |    1 +
+ drivers/bluetooth/Kconfig                          |   11 +
+ drivers/bluetooth/Makefile                         |    1 +
+ drivers/bluetooth/ath3k.c                          |   25 +-
+ drivers/bluetooth/btintel.c                        |   88 +-
+ drivers/bluetooth/btintel.h                        |   51 +-
+ drivers/bluetooth/btintel_pcie.c                   | 1357 ++++++++++++++++++++
+ drivers/bluetooth/btintel_pcie.h                   |  430 +++++++
+ drivers/bluetooth/btmrvl_main.c                    |    9 -
+ drivers/bluetooth/btqca.c                          |   47 +-
+ drivers/bluetooth/btqca.h                          |   60 +-
+ drivers/bluetooth/btqcomsmd.c                      |    6 +-
+ drivers/bluetooth/btrsi.c                          |    1 -
+ drivers/bluetooth/btrtl.c                          |    7 +
+ drivers/bluetooth/btsdio.c                         |    8 -
+ drivers/bluetooth/btusb.c                          |   55 +-
+ drivers/bluetooth/hci_bcm.c                        |    8 +-
+ drivers/bluetooth/hci_bcm4377.c                    |    1 -
+ drivers/bluetooth/hci_intel.c                      |   25 +-
+ drivers/bluetooth/hci_ldisc.c                      |    6 -
+ drivers/bluetooth/hci_serdev.c                     |    5 -
+ drivers/bluetooth/hci_uart.h                       |    1 -
+ drivers/bluetooth/hci_vhci.c                       |   10 +-
+ drivers/bluetooth/virtio_bt.c                      |    2 -
+ include/net/bluetooth/bluetooth.h                  |    2 +-
+ include/net/bluetooth/hci.h                        |  136 +-
+ include/net/bluetooth/hci_core.h                   |   69 +-
+ include/net/bluetooth/l2cap.h                      |   33 +-
+ include/uapi/linux/virtio_bt.h                     |    1 -
+ net/bluetooth/hci_conn.c                           |  150 ++-
+ net/bluetooth/hci_core.c                           |  170 +--
+ net/bluetooth/hci_event.c                          |  240 +---
+ net/bluetooth/hci_request.h                        |    4 -
+ net/bluetooth/hci_sock.c                           |    5 +-
+ net/bluetooth/hci_sync.c                           |  207 +--
+ net/bluetooth/iso.c                                |  151 ++-
+ net/bluetooth/l2cap_core.c                         |  140 +-
+ net/bluetooth/l2cap_sock.c                         |   91 +-
+ net/bluetooth/mgmt.c                               |   84 +-
+ net/bluetooth/sco.c                                |    6 +-
+ 42 files changed, 2651 insertions(+), 1141 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+ create mode 100644 drivers/bluetooth/btintel_pcie.c
+ create mode 100644 drivers/bluetooth/btintel_pcie.h
 
