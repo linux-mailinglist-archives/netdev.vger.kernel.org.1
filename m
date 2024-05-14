@@ -1,311 +1,529 @@
-Return-Path: <netdev+bounces-96336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E48F78C5343
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:44:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EBBD8C538E
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:46:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83686285E88
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 11:44:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1D3EB21D1A
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 11:46:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B9C6F077;
-	Tue, 14 May 2024 11:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3623A129E86;
+	Tue, 14 May 2024 11:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jFljaHvx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YXP9vZ+p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B5B1D54D
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 11:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9381292D2;
+	Tue, 14 May 2024 11:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715686401; cv=none; b=aXDooMtRDDksSO6JcqYhfTaPOt1uVA5dlW/E3pITEs44lI6o6oFBoOVlt89X0yGf6KyA9f4yTdLvkSPa4W+ZIALdjXS0zLi1ZL+DwJglqhtz08VnqfR7XPqgX0EIDa4LntkbuT2hv9t8Reu/UmFcsimaJC6tCMVylBtmbjdl0oE=
+	t=1715686609; cv=none; b=J2TC++BkNvVruOmQEPkco1W8WtZldpzdgifwGBkYzX+i/NC9EZJQqAUQtUgGV/CZW+ABv2OgzhlwfwBf0y4KQ1cSM+/pP5zsrN9JpRBYtynMeWZRbPCBqn1x0YPDpv5Jkq7FuoI/RW/RCENa3H5oT0w+iF/5EiK0nqFlAFNFVqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715686401; c=relaxed/simple;
-	bh=8e7jHfPa/Xg2tVdxnlNWY7/DM50Jf1wkw65g9fwLhdA=;
+	s=arc-20240116; t=1715686609; c=relaxed/simple;
+	bh=YPOH09Lf8waYjzXH+D9qx0+KCjKdFS1sZnI5Ft7mCnw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HmO1uwzxXkRztF98/TOR3lQpGNkrIUydds4LPEXu0/XwZ/ez6WuvUfvknpl3mJ5Q9KUud8zEKaOBFtF7oNbBdnblh6lEMytdIsPKNr4VAqIH1JvqLQcxJg+ikZV6raab1FM3I7axo3fuaIDZshIRx9BXhwozZTdLzIz4MGmH78s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jFljaHvx; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-51f60817e34so6065369e87.2
-        for <netdev@vger.kernel.org>; Tue, 14 May 2024 04:33:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715686397; x=1716291197; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=VszNoK63Mz+szQfZ4LtfFejgcMxEf1ilixpxvdRuzwM=;
-        b=jFljaHvxlnSaVeOzQqbUiNE/62EkSPhKv5qlUN6Pnf/ddKF2lC25YPRS/iOShUdeov
-         GRqqsqOI+GQmbU7/KvgCGaQtG8sOhp78PptmuKLeHOmJt020QSz+nsPgieBcYv1qR5Tw
-         gbDvFIeMzZD04Ah4L8cM+aAAQ97ZOLLpHtOHKGMtBAQb0dWaVq3Uc004xllHNWpxupZd
-         aes6EDzt2fcRMkgv6NiMica3L0p9n3p1M6kbEiFan4OCuImbHMe24qHW5ulO7Sgl961l
-         1LZTWjX7kgef6YG6Qvy+gCHWaB6eZk+ydKTxpPQ3eYgdZkltjnvEmkqmuc+xS6BmfMAj
-         zRyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715686397; x=1716291197;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VszNoK63Mz+szQfZ4LtfFejgcMxEf1ilixpxvdRuzwM=;
-        b=ksKC8NmHfJ9lPl8aB66yOcUGv7arOgtI7DKnmwuRYx/QwIFpOZacogsI3B6xonxfDC
-         mp5+sT7hDCrPuB0JI7mYcLgFHNZZY1hP3qs8OrFrOBJS//Kxr/ASCmaxcz0r6CbLAL7v
-         74FnzOByEVzx7HyziClrtXOEvU/4+fI8pJ+IahCiBVMuvRS6D6uOIYBtWS+dJRC+58JS
-         I+rigN/tSULvWz3QsCBA13bjZ482O4fr15eS3mVZmGPCUy01mXcr9M82jr47sWKEG/r6
-         4PPDJJT69AyOU2m8m89T+6Pr4SZ/gVxAbHFWXaUxgzd5vMllB7cAWAXnF7jHadZs9Wig
-         Md0A==
-X-Forwarded-Encrypted: i=1; AJvYcCWaTcUrX8+DEMwXYvY5Sx82syMblgXc9qx0kbHWdeR/pSlFHWQ15P70WZ9yftsjSNqhsu/SDkLIyqnTNFUn1tWLFEHd1Sv7
-X-Gm-Message-State: AOJu0YyHM2zhjKkS9E0xjEJFsIHK/eoXGN109PYxuIbbPAPpBVQP6zFN
-	IWu8bI88MWvQO46d7SnSbdBMFT32qTo0qU8uJ/v3Zb0kDASI03/i
-X-Google-Smtp-Source: AGHT+IFDiM6UUe/DTegRL9Gob22ssk5IAKt//W66jwKzj22kx/rmBUAo35D7KOn1EGak82OdYKGk9w==
-X-Received: by 2002:ac2:57c7:0:b0:51d:70d9:f6ce with SMTP id 2adb3069b0e04-5220fe78a6bmr6619901e87.53.1715686396705;
-        Tue, 14 May 2024 04:33:16 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-521f35ba4f6sm2143087e87.84.2024.05.14.04.33.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 May 2024 04:33:16 -0700 (PDT)
-Date: Tue, 14 May 2024 14:33:13 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Yanteng Si <siyanteng@loongson.cn>, andrew@lunn.ch, 
-	hkallweit1@gmail.com, peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, 
-	joabreu@synopsys.com, Jose.Abreu@synopsys.com, linux@armlinux.org.uk, 
-	guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, 
-	siyanteng01@gmail.com
-Subject: Re: [PATCH net-next v12 13/15] net: stmmac: dwmac-loongson: Add
- Loongson GNET support
-Message-ID: <d2ibcsxpzrhjzjt4zu7tmopgyp6q77omgweobzidsp53yadcgz@x5774dqqs7qr>
-References: <jkjgjraqvih4zu7wvqykerq5wisgkhqf2n2pouha7qhfoeif7v@tkwyx53dfrdw>
- <150b03ff-70b5-488a-b5e6-5f74b6398b20@loongson.cn>
- <pdyqoki5qw4zabz3uv5ff2e2o43htcr6xame652zmbqh23tjji@lt5gmp6m3lkm>
- <CAAhV-H7Dz0CVysUVVVe4Y8qGxpmwJ0i6y2wKnATzNS=5DR_vZg@mail.gmail.com>
- <tbjruh7sx7zovj4ypvfmer3tkgp63zrwhsaxj6hpcfc7ljaqes@zyd3acrqchik>
- <7b56eabc-53e1-4fbe-bf92-81bb1c91ddfc@loongson.cn>
- <kw7fb7mcy7ungrungmbe6z6rmfzswastesx66phtcxxez6vvgw@dal7dt2kj54u>
- <CAAhV-H4TtoV9LAfhx1+fu40XgDqQ+W-tXt36XoieK87_ucBgcQ@mail.gmail.com>
- <nt5bjlmul5jchxvx6zzgvbmdsegpwwz7quzt57vfejnxng7smz@abqdfipuclzh>
- <CAAhV-H5UMJvOtt+YFChqPC1eMkj5UjCEnFJ_YksWjk+uriZPzw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WwRuqrUIAaKkjYZ8AktCAPi6Aj69/eO1mfZ3dxt9tkOAFDvvu7c5xlFmWjLVSNl3hrFtJpbwjr6eQMcfeXjgz3djAAyGkqJbOTb1fDEmNeuw7d3W89YFMiH5u+nzXv3Sgs8XHnf68eVpXN5gaVAseWEXN0YTKt+8rUt9qCb417g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YXP9vZ+p; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715686606; x=1747222606;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YPOH09Lf8waYjzXH+D9qx0+KCjKdFS1sZnI5Ft7mCnw=;
+  b=YXP9vZ+pXRSUQ67n3tpj0sVLWw4LzSORTd3AN9VYsD8baGgarlgDKOAC
+   MZdnvaiKINwL4rZjTCaXz+iH7jZAt1UL8HwoYH4pC8h+ObkK2mLuTNTtj
+   awqn0rQ2yHOxPANfuqIa+GOEXIcRo2b6DNNgYUSBhu3WKIaxDdfcQXRUL
+   eQYewS6J1x+TcVc3Z7KeflvGhVJ9YPdTbzUeuAXXNbdU4yh++EaHihF7T
+   wzx/bA8r1Bh+5nmf5s/MLTIgXs3u3kcKU906JNxL8CzOJLmdIrdYOJJ99
+   viWGfS7giF/Jgp0aKUWjYrXlgTMuqjo8yEo25H9xKmGpgNQt82dLTHZ/7
+   w==;
+X-CSE-ConnectionGUID: mxZOZP/NR+qe6howGIxsCA==
+X-CSE-MsgGUID: h/o3dd1VSZmIouSaPAD/ZQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11072"; a="29180842"
+X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
+   d="scan'208";a="29180842"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 04:36:45 -0700
+X-CSE-ConnectionGUID: qPpmPOKNR2mSmQvklq+k7Q==
+X-CSE-MsgGUID: iJUYB5bZRraVzQ+hErEYhQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
+   d="scan'208";a="61485223"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 14 May 2024 04:36:42 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s6qSV-000BRX-2w;
+	Tue, 14 May 2024 11:36:39 +0000
+Date: Tue, 14 May 2024 19:36:27 +0800
+From: kernel test robot <lkp@intel.com>
+To: admiyo@os.amperecomputing.com, Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Adam Young <admiyo@os.amperecomputing.com>
+Subject: Re: [PATCH 1/3] mctp pcc: Implement MCTP over PCC Transport
+Message-ID: <202405141800.J2dxEpiu-lkp@intel.com>
+References: <20240513173546.679061-2-admiyo@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAhV-H5UMJvOtt+YFChqPC1eMkj5UjCEnFJ_YksWjk+uriZPzw@mail.gmail.com>
+In-Reply-To: <20240513173546.679061-2-admiyo@os.amperecomputing.com>
 
-On Tue, May 14, 2024 at 12:58:33PM +0800, Huacai Chen wrote:
-> On Tue, May 14, 2024 at 12:11 AM Serge Semin <fancer.lancer@gmail.com> wrote:
-> >
-> > On Mon, May 13, 2024 at 09:26:11PM +0800, Huacai Chen wrote:
-> > > Hi, Serge,
-> > >
-> > > On Mon, May 13, 2024 at 6:57 PM Serge Semin <fancer.lancer@gmail.com> wrote:
-> > > >
-> > > > On Thu, May 09, 2024 at 04:57:44PM +0800, Yanteng Si wrote:
-> > > > > Hi Serge
-> > > > >
-...
-> > > >
-> > > > > No, only devices that support multiple channels can deliver both PCI MSI
-> > > > > IRQs
-> > > > >
-> > > > > and direct GIC IRQs, other devices can only deliver GIC IRQs.
-> > > > >
-> > > > > Furthermore, multiple channel features are bundled with MSI. If we want to
-> > > > >
-> > > > > enable multiple channels, we must enable MSI.
-> > > >
-> > > > Sadly to say but this information changes a lot. Based on that the
-> > > > only platform with optional DT-node is the LS2K2000 GNET device. The
-> > > > rest of the devices (GMACs and LS7A2000 GNET) must be equipped with a
-> > > > node-pointer otherwise they won't work. Due to that the logic of the
-> > > > patches
-> > > > [PATCH net-next v12 10/15] net: stmmac: dwmac-loongson: Add full PCI support
-> > > > [PATCH net-next v12 11/15] net: stmmac: dwmac-loongson: Add loongson_dwmac_config_legacy
-> > > > is incorrect.
-> > > >
-> > > > 1. [PATCH net-next v12 10/15] net: stmmac: dwmac-loongson: Add full PCI support
-> > > > So this patch doesn't add a pure PCI-based probe procedure after all
-> > > > because the Loongson GMACs are required to have a DT-node. AFAICS
-> > > > pdev->irq is actually the IRQ retrieved from the DT-node. So the "if
-> > > > (np) {} else {}" clause doesn't really make sense.
-> > > >
-> > > > 2. [PATCH net-next v12 11/15] net: stmmac: dwmac-loongson: Add loongson_dwmac_config_legacy
-> > > > First of all the function name is incorrect. The IRQ signal isn't legacy
-> > > > (INTx-based), but is retrieved from the DT-node. Secondly the
-> > > > "if (np) {} else {}" statement is very much redundant because if no
-> > > > DT-node found the pdev->irq won't be initialized at all, and the
-> > > > driver won't work with no error printed.
-> > > >
-> > > > All of that also affects the patch/commit logs. Glad we figured that
-> > > > out at this stage. Seeing there have been tons of another comments
-> > > > let's postpone the discussion around this problem for v13 then. I'll
-> > > > keep in mind the info you shared in this thread and think of the way
-> > > > to fix the patches after v13 is submitted for review.
-> > > Let me clarify the interrupt information, hope that can help you to
-> > > understand better:
-> >
-> > > 1, Loongson machines may use UEFI (implies ACPI) or PMON/UBOOT
-> > > (implies FDT) as the BIOS.
-> >
-> > Ok. Aside with the OF-based platform there is an ACPI case.
-> >
-> > > 2, The BIOS type has no relationship with device types, which means:
-> > > machines with GMAC can be either ACPI-based or FDT-based, machines
-> > > with GNET can also be either ACPI-based or FDT-based.
-> >
-> > Ok. It's either-or. Got it.
-> >
-> > > 3, The existing Loongson driver can only support FDT, which means the
-> > > device should be PCI-probed and DT-configured. Though the existing
-> > > driver only supports GMAC, it doesn't mean that GMAC is bound to FDT.
-> > > GMAC can also work with ACPI, in that case we say it is "full PCI",
-> > > which means we don't need "np".
-> >
-> > "full PCI" statement can't be utilized for the case of the ACPI-based
-> > IRQ assignment. "full PCI" is the way the GNET probe procedure works -
-> > everything required for the device handling is detected in runtime
-> > with no ACPI/DT stuff.
-> >
-> > So the patch 10 with the "full PCI"-related subject doesn't actually
-> > adds the PCIe-only-based device probe support, but actually converts
-> > the driver to supporting the ACPI-case.)
+Hi,
 
-> Yes, the commit message can be improved.
+kernel test robot noticed the following build errors:
 
-Can be? It must be changed, because at the very least it's misleading,
-but frankly speaking it now sounds just wrong.
+[auto build test ERROR on rafael-pm/linux-next]
+[also build test ERROR on rafael-pm/bleeding-edge linus/master v6.9 next-20240514]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> 
-> >
-> > > 4, At present, multi-channel devices support MSI, currently only GNET
-> > > support MSI, but in future there may also GMAC support MSI.
-> >
-> > It's better to avoid adding a support for hypothetical devices and
-> > prohibit all the currently unreal cases. It will simplify the code,
-> > ease it' maintenance, reduce the bugs probability.
-> >
-> > > 5, So, in Yanteng's patches, a device firstly request MSI, and since
-> > > MSI is dynamically allocated, it doesn't care about the BIOS type
-> > > (ACPI or FDT). However, if MSI fails (either because MSI is exhausted
-> > > or the device doesn't support it), it fallback to "legacy" interrupt,
-> > > which means irq lines mapped to INT-A/B/C/D of PCI.
-> >
-> > Unless we are talking about the actual PCI devices (not PCI express)
-> > or the cases where the INT-x is emulated by means the specific PCIe
-> > TLPs, I wouldn't mentioned the INTx or "legacy" names in the current
-> > context. It's just a platform ACPI/DT IRQs.
+url:    https://github.com/intel-lab-lkp/linux/commits/admiyo-os-amperecomputing-com/mctp-pcc-Implement-MCTP-over-PCC-Transport/20240514-013734
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm.git linux-next
+patch link:    https://lore.kernel.org/r/20240513173546.679061-2-admiyo%40os.amperecomputing.com
+patch subject: [PATCH 1/3] mctp pcc: Implement MCTP over PCC Transport
+config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20240514/202405141800.J2dxEpiu-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project b910bebc300dafb30569cecc3017b446ea8eafa0)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240514/202405141800.J2dxEpiu-lkp@intel.com/reproduce)
 
-> Yes, it is probably a platform ACPI/DT IRQ, but I think the "legacy"
-> name is still reasonable in this case.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405141800.J2dxEpiu-lkp@intel.com/
 
-Probably? These _are_ pure platform IRQs.
+All error/warnings (new ones prefixed by >>):
 
-> Otherwise, what does "legacy"
-> stand for in "PCI_IRQ_LEGACY/PCI_IRQ_MSI/PCI_IRQ_MSIX"?
+   In file included from drivers/net/mctp/mctp-pcc.c:8:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:10:
+   In file included from include/linux/mm.h:2210:
+   include/linux/vmstat.h:522:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     522 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   In file included from drivers/net/mctp/mctp-pcc.c:8:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     547 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from drivers/net/mctp/mctp-pcc.c:8:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from drivers/net/mctp/mctp-pcc.c:8:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     584 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   In file included from drivers/net/mctp/mctp-pcc.c:17:
+>> include/acpi/acpi_drivers.h:72:43: warning: declaration of 'struct acpi_pci_root' will not be visible outside of this function [-Wvisibility]
+      72 | struct pci_bus *pci_acpi_scan_root(struct acpi_pci_root *root);
+         |                                           ^
+>> drivers/net/mctp/mctp-pcc.c:90:70: warning: omitting the parameter name in a function definition is a C23 extension [-Wc23-extensions]
+      90 | static void mctp_pcc_client_rx_callback(struct mbox_client *c, void *)
+         |                                                                      ^
+   drivers/net/mctp/mctp-pcc.c:96:16: warning: variable 'buf_ptr_val' set but not used [-Wunused-but-set-variable]
+      96 |         unsigned long buf_ptr_val;
+         |                       ^
+   drivers/net/mctp/mctp-pcc.c:122:17: warning: variable 'buffer' set but not used [-Wunused-but-set-variable]
+     122 |         unsigned char *buffer;
+         |                        ^
+>> drivers/net/mctp/mctp-pcc.c:287:16: error: incomplete definition of type 'struct acpi_device'
+     287 |         dev_info(&adev->dev, "Adding mctp_pcc device for HID  %s\n", acpi_device_hid(adev));
+         |                   ~~~~^
+   include/linux/dev_printk.h:150:46: note: expanded from macro 'dev_info'
+     150 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fmt), ##__VA_ARGS__)
+         |                                                     ^~~
+   include/linux/dev_printk.h:110:11: note: expanded from macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                         ^~~
+   include/linux/acpi.h:794:8: note: forward declaration of 'struct acpi_device'
+     794 | struct acpi_device;
+         |        ^
+>> drivers/net/mctp/mctp-pcc.c:287:63: error: call to undeclared function 'acpi_device_hid'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     287 |         dev_info(&adev->dev, "Adding mctp_pcc device for HID  %s\n", acpi_device_hid(adev));
+         |                                                                      ^
+   drivers/net/mctp/mctp-pcc.c:287:63: note: did you mean 'acpi_device_dep'?
+   include/acpi/acpi_bus.h:41:6: note: 'acpi_device_dep' declared here
+      41 | bool acpi_device_dep(acpi_handle target, acpi_handle match);
+         |      ^
+>> drivers/net/mctp/mctp-pcc.c:288:15: error: call to undeclared function 'acpi_device_handle'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     288 |         dev_handle = acpi_device_handle(adev);
+         |                      ^
+>> drivers/net/mctp/mctp-pcc.c:288:13: error: incompatible integer to pointer conversion assigning to 'acpi_handle' (aka 'void *') from 'int' [-Wint-conversion]
+     288 |         dev_handle = acpi_device_handle(adev);
+         |                    ^ ~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/mctp/mctp-pcc.c:293:44: error: incomplete definition of type 'struct acpi_device'
+     293 |                 return create_mctp_pcc_netdev(adev, &adev->dev, inbox_index, outbox_index);
+         |                                                      ~~~~^
+   include/linux/acpi.h:794:8: note: forward declaration of 'struct acpi_device'
+     794 | struct acpi_device;
+         |        ^
+   drivers/net/mctp/mctp-pcc.c:295:15: error: incomplete definition of type 'struct acpi_device'
+     295 |         dev_err(&adev->dev, "FAILURE to lookup PCC indexes from CRS");
+         |                  ~~~~^
+   include/linux/dev_printk.h:144:44: note: expanded from macro 'dev_err'
+     144 |         dev_printk_index_wrap(_dev_err, KERN_ERR, dev, dev_fmt(fmt), ##__VA_ARGS__)
+         |                                                   ^~~
+   include/linux/dev_printk.h:110:11: note: expanded from macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                         ^~~
+   include/linux/acpi.h:794:8: note: forward declaration of 'struct acpi_device'
+     794 | struct acpi_device;
+         |        ^
+>> drivers/net/mctp/mctp-pcc.c:329:27: error: variable has incomplete type 'struct acpi_driver'
+     329 | static struct acpi_driver mctp_pcc_driver = {
+         |                           ^
+   drivers/net/mctp/mctp-pcc.c:329:15: note: forward declaration of 'struct acpi_driver'
+     329 | static struct acpi_driver mctp_pcc_driver = {
+         |               ^
+>> drivers/net/mctp/mctp-pcc.c:348:7: error: call to undeclared function 'acpi_bus_register_driver'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     348 |         rc = acpi_bus_register_driver(&mctp_pcc_driver);
+         |              ^
+>> drivers/net/mctp/mctp-pcc.c:358:2: error: call to undeclared function 'acpi_bus_unregister_driver'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     358 |         acpi_bus_unregister_driver(&mctp_pcc_driver);
+         |         ^
+   11 warnings and 9 errors generated.
 
-It means that the platform IRQs has just been implemented via the
-already available old-school API, which has been in the kernel since
-the plain PCI devices. The platform IRQs and the traditional PCI INTx
-are normally mutually exclusive, so I guess that's why they have been
-implemented in framework of the same interface. Another reason could
-be to have less troubles with adopting the PCI drivers for both type
-of the IRQs delivery.
 
-Moreover just recently the so called _legacy_ flag name has been
-deprecated in favor of the more generic INTx one:
-https://lore.kernel.org/linux-pci/20231122060406.14695-1-dlemoal@kernel.org/
+vim +287 drivers/net/mctp/mctp-pcc.c
 
-Once again about the naming. From the retrospective point of view the
-so called legacy PCI IRQs (in fact PCI INTx) and the platform IRQs
-look similar because these are just the level-type signals connected
-to the system IRQ controller. But when it comes to the PCI _Express_,
-the implementation is completely different. The PCIe INTx is just the
-PCIe TLPs of special type, like MSI. Upon receiving these special
-messages the PCIe host controller delivers the IRQ up to the
-respective system IRQ controller. So in order to avoid the confusion
-between the actual legacy PCI INTx, PCI Express INTx and the just
-platform IRQs, it's better to emphasize the actual way of the IRQs
-delivery. In this case it's the later method.
+    89	
+  > 90	static void mctp_pcc_client_rx_callback(struct mbox_client *c, void *)
+    91	{
+    92		struct sk_buff *skb;
+    93		struct mctp_pcc_packet *mpp;
+    94		struct mctp_skb_cb *cb;
+    95		int data_len;
+    96		unsigned long buf_ptr_val;
+    97		struct mctp_pcc_ndev *mctp_pcc_dev = container_of(c, struct mctp_pcc_ndev, inbox_client);
+    98		void *skb_buf;
+    99	
+   100		mpp = (struct mctp_pcc_packet *)mctp_pcc_dev->pcc_comm_inbox_addr;
+   101		buf_ptr_val = (unsigned long)mpp;
+   102		data_len = readl(&mpp->pcc_header.length) + MCTP_HEADER_LENGTH;
+   103		skb = netdev_alloc_skb(mctp_pcc_dev->mdev.dev, data_len);
+   104		if (!skb) {
+   105			mctp_pcc_dev->mdev.dev->stats.rx_dropped++;
+   106			return;
+   107		}
+   108		skb->protocol = htons(ETH_P_MCTP);
+   109		skb_buf = skb_put(skb, data_len);
+   110		memcpy_fromio(skb_buf, mpp, data_len);
+   111		skb_reset_mac_header(skb);
+   112		skb_pull(skb, sizeof(struct mctp_pcc_hdr));
+   113		skb_reset_network_header(skb);
+   114		cb = __mctp_cb(skb);
+   115		cb->halen = 0;
+   116		skb->dev =  mctp_pcc_dev->mdev.dev;
+   117		netif_rx(skb);
+   118	}
+   119	
+   120	static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct net_device *ndev)
+   121	{
+   122		unsigned char *buffer;
+   123		struct mctp_pcc_ndev *mpnd;
+   124		struct mctp_pcc_packet  *mpp;
+   125		unsigned long flags;
+   126		int rc;
+   127	
+   128		netif_stop_queue(ndev);
+   129		ndev->stats.tx_bytes += skb->len;
+   130		mpnd = (struct mctp_pcc_ndev *)netdev_priv(ndev);
+   131		spin_lock_irqsave(&mpnd->lock, flags);
+   132		buffer =  mpnd->pcc_comm_outbox_addr;
+   133		mpp = mctp_pcc_extract_data(skb, mpnd->pcc_comm_outbox_addr, mpnd->hw_addr.outbox_index);
+   134		rc = mpnd->out_chan->mchan->mbox->ops->send_data(mpnd->out_chan->mchan, mpp);
+   135		spin_unlock_irqrestore(&mpnd->lock, flags);
+   136	
+   137		dev_consume_skb_any(skb);
+   138		netif_start_queue(ndev);
+   139		if (!rc)
+   140			return NETDEV_TX_OK;
+   141		return NETDEV_TX_BUSY;
+   142	}
+   143	
+   144	static const struct net_device_ops mctp_pcc_netdev_ops = {
+   145		.ndo_start_xmit = mctp_pcc_tx,
+   146		.ndo_uninit = NULL
+   147	};
+   148	
+   149	static void  mctp_pcc_setup(struct net_device *ndev)
+   150	{
+   151		ndev->type = ARPHRD_MCTP;
+   152		ndev->hard_header_len = 0;
+   153		ndev->addr_len = sizeof(struct mctp_pcc_hw_addr);
+   154		ndev->tx_queue_len = DEFAULT_TX_QUEUE_LEN;
+   155		ndev->flags = IFF_NOARP;
+   156		ndev->netdev_ops = &mctp_pcc_netdev_ops;
+   157		ndev->needs_free_netdev = true;
+   158	}
+   159	
+   160	static int create_mctp_pcc_netdev(struct acpi_device *acpi_dev,
+   161					  struct device *dev, int inbox_index,
+   162					  int outbox_index)
+   163	{
+   164		int rc;
+   165		int mctp_pcc_mtu;
+   166		char name[32];
+   167		struct net_device *ndev;
+   168		struct mctp_pcc_ndev *mctp_pcc_dev;
+   169		struct mctp_pcc_hw_addr physical_link_addr;
+   170	
+   171		snprintf(name, sizeof(name), "mctpipcc%x", inbox_index);
+   172		ndev = alloc_netdev(sizeof(struct mctp_pcc_ndev), name, NET_NAME_ENUM, mctp_pcc_setup);
+   173		if (!ndev)
+   174			return -ENOMEM;
+   175		mctp_pcc_dev = (struct mctp_pcc_ndev *)netdev_priv(ndev);
+   176		INIT_LIST_HEAD(&mctp_pcc_dev->head);
+   177		spin_lock_init(&mctp_pcc_dev->lock);
+   178	
+   179		mctp_pcc_dev->outbox_client.tx_prepare = NULL;
+   180		mctp_pcc_dev->outbox_client.tx_done = NULL;
+   181		mctp_pcc_dev->hw_addr.inbox_index = inbox_index;
+   182		mctp_pcc_dev->hw_addr.outbox_index = outbox_index;
+   183		mctp_pcc_dev->inbox_client.rx_callback = mctp_pcc_client_rx_callback;
+   184		mctp_pcc_dev->cleanup_channel = pcc_mbox_free_channel;
+   185		mctp_pcc_dev->out_chan =
+   186			pcc_mbox_request_channel(&mctp_pcc_dev->outbox_client,
+   187						 outbox_index);
+   188		if (IS_ERR(mctp_pcc_dev->out_chan)) {
+   189			rc = PTR_ERR(mctp_pcc_dev->out_chan);
+   190			goto free_netdev;
+   191		}
+   192		mctp_pcc_dev->in_chan =
+   193			pcc_mbox_request_channel(&mctp_pcc_dev->inbox_client,
+   194						 inbox_index);
+   195		if (IS_ERR(mctp_pcc_dev->in_chan)) {
+   196			rc = PTR_ERR(mctp_pcc_dev->in_chan);
+   197			goto cleanup_out_channel;
+   198		}
+   199		mctp_pcc_dev->pcc_comm_inbox_addr =
+   200			devm_ioremap(dev, mctp_pcc_dev->in_chan->shmem_base_addr,
+   201				     mctp_pcc_dev->in_chan->shmem_size);
+   202		if (!mctp_pcc_dev->pcc_comm_inbox_addr) {
+   203			rc = -EINVAL;
+   204			goto cleanup_in_channel;
+   205		}
+   206		mctp_pcc_dev->pcc_comm_outbox_addr =
+   207			devm_ioremap(dev, mctp_pcc_dev->out_chan->shmem_base_addr,
+   208				     mctp_pcc_dev->out_chan->shmem_size);
+   209		if (!mctp_pcc_dev->pcc_comm_outbox_addr) {
+   210			rc = -EINVAL;
+   211			goto cleanup_in_channel;
+   212		}
+   213		mctp_pcc_dev->acpi_device = acpi_dev;
+   214		mctp_pcc_dev->inbox_client.dev = dev;
+   215		mctp_pcc_dev->outbox_client.dev = dev;
+   216		mctp_pcc_dev->mdev.dev = ndev;
+   217	
+   218	/* There is no clean way to pass the MTU to the callback function
+   219	 * used for registration, so set the values ahead of time.
+   220	 */
+   221		mctp_pcc_mtu = mctp_pcc_dev->out_chan->shmem_size -
+   222			sizeof(struct mctp_pcc_hdr);
+   223		ndev->mtu = mctp_pcc_mtu;
+   224		ndev->max_mtu = mctp_pcc_mtu;
+   225		ndev->min_mtu = MCTP_MIN_MTU;
+   226	
+   227		physical_link_addr.inbox_index =
+   228			htonl(mctp_pcc_dev->hw_addr.inbox_index);
+   229		physical_link_addr.outbox_index =
+   230			htonl(mctp_pcc_dev->hw_addr.outbox_index);
+   231		dev_addr_set(ndev, (const u8 *)&physical_link_addr);
+   232		rc = register_netdev(ndev);
+   233		if (rc)
+   234			goto cleanup_in_channel;
+   235		list_add_tail(&mctp_pcc_dev->head, &mctp_pcc_ndevs);
+   236		return 0;
+   237	cleanup_in_channel:
+   238		mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->in_chan);
+   239	cleanup_out_channel:
+   240		mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->out_chan);
+   241	free_netdev:
+   242		unregister_netdev(ndev);
+   243		free_netdev(ndev);
+   244		return rc;
+   245	}
+   246	
+   247	struct lookup_context {
+   248		int index;
+   249		int inbox_index;
+   250		int outbox_index;
+   251	};
+   252	
+   253	static acpi_status lookup_pcct_indices(struct acpi_resource *ares, void *context)
+   254	{
+   255		struct acpi_resource_address32 *addr;
+   256		struct lookup_context *luc = context;
+   257	
+   258		switch (ares->type) {
+   259		case 0x0c:
+   260		case 0x0a:
+   261			break;
+   262		default:
+   263			return AE_OK;
+   264		}
+   265	
+   266		addr = ACPI_CAST_PTR(struct acpi_resource_address32, &ares->data);
+   267		switch (luc->index) {
+   268		case 0:
+   269			luc->outbox_index = addr[0].address.minimum;
+   270			break;
+   271		case 1:
+   272			luc->inbox_index = addr[0].address.minimum;
+   273			break;
+   274		}
+   275		luc->index++;
+   276		return AE_OK;
+   277	}
+   278	
+   279	static int mctp_pcc_driver_add(struct acpi_device *adev)
+   280	{
+   281		int inbox_index;
+   282		int outbox_index;
+   283		acpi_handle dev_handle;
+   284		acpi_status status;
+   285		struct lookup_context context = {0, 0, 0};
+   286	
+ > 287		dev_info(&adev->dev, "Adding mctp_pcc device for HID  %s\n", acpi_device_hid(adev));
+ > 288		dev_handle = acpi_device_handle(adev);
+   289		status = acpi_walk_resources(dev_handle, "_CRS", lookup_pcct_indices, &context);
+   290		if (ACPI_SUCCESS(status)) {
+   291			inbox_index = context.inbox_index;
+   292			outbox_index = context.outbox_index;
+   293			return create_mctp_pcc_netdev(adev, &adev->dev, inbox_index, outbox_index);
+   294		}
+   295		dev_err(&adev->dev, "FAILURE to lookup PCC indexes from CRS");
+   296		return -EINVAL;
+   297	};
+   298	
+   299	/* pass in adev=NULL to remove all devices
+   300	 */
+   301	static void mctp_pcc_driver_remove(struct acpi_device *adev)
+   302	{
+   303		struct mctp_pcc_ndev *mctp_pcc_dev = NULL;
+   304		struct list_head *ptr;
+   305		struct list_head *tmp;
+   306	
+   307		list_for_each_safe(ptr, tmp, &mctp_pcc_ndevs) {
+   308			mctp_pcc_dev = list_entry(ptr, struct mctp_pcc_ndev, head);
+   309			if (!adev || mctp_pcc_dev->acpi_device == adev) {
+   310				struct net_device *ndev;
+   311	
+   312				mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->out_chan);
+   313				mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->in_chan);
+   314				ndev = mctp_pcc_dev->mdev.dev;
+   315				if (ndev)
+   316					mctp_unregister_netdev(ndev);
+   317				list_del(ptr);
+   318				if (adev)
+   319					break;
+   320			}
+   321		}
+   322	};
+   323	
+   324	static const struct acpi_device_id mctp_pcc_device_ids[] = {
+   325		{ "DMT0001", 0},
+   326		{ "", 0},
+   327	};
+   328	
+ > 329	static struct acpi_driver mctp_pcc_driver = {
+   330		.name = "mctp_pcc",
+   331		.class = "Unknown",
+   332		.ids = mctp_pcc_device_ids,
+   333		.ops = {
+   334			.add = mctp_pcc_driver_add,
+   335			.remove = mctp_pcc_driver_remove,
+   336			.notify = NULL,
+   337		},
+   338		.owner = THIS_MODULE,
+   339	
+   340	};
+   341	
+   342	static int __init mctp_pcc_mod_init(void)
+   343	{
+   344		int rc;
+   345	
+   346		pr_info("initializing MCTP over PCC\n");
+   347		INIT_LIST_HEAD(&mctp_pcc_ndevs);
+ > 348		rc = acpi_bus_register_driver(&mctp_pcc_driver);
+   349		if (rc < 0)
+   350			ACPI_DEBUG_PRINT((ACPI_DB_ERROR, "Error registering driver\n"));
+   351		return rc;
+   352	}
+   353	
+   354	static __exit void mctp_pcc_mod_exit(void)
+   355	{
+   356		pr_info("Removing MCTP over PCC transport driver\n");
+   357		mctp_pcc_driver_remove(NULL);
+ > 358		acpi_bus_unregister_driver(&mctp_pcc_driver);
+   359	}
+   360	
 
-> 
-> >
-> > > 6. In the legacy case, the irq is get from DT-node (FDT case), or
-> > > already in pdev->irq (ACPI case).
-> >
-> > It will be in the pdev->irq in any case whether it's DT or ACPI. See:
-> >
-> > ACPI:
-> > pci_device_probe():
-> > +-> arch/loongarch/pci/pci.c:pcibios_alloc_irq()
-> >
-> > DT:
-> > pci_device_probe():
-> > +-> pci_assign_irq();
-> >     +-> pci_host_bridge::map_irq()
-> >         +-> of_irq_parse_and_map_pci()
-> >         or in case of Loongson PCIe host controller:
-> >         +-> drivers/pci/controller/pci-loongson.c::loongson_map_irq()
-> >
-> > Moreover unless the MSI IRQs are enabled, the platform IRQ (and the
-> > legacy IRQ) can be retrieved by means of the pci_irq_vector() method.
-> > The only reason of having the direct OF-based IRQs getting in the
-> > Loongson DWMAC driver I see is that the LPI IRQ will be missing in
-> > case of the pci_irq_vector() method utilization. In the rest of the
-> > cases the pci_irq_vector() function could be freely used.
-> Yes, in the DT case, they may be macirq, eth_wake_irq and eth_lpi,
-> rather than a single irq, so we need an if-else here.
-> 
-> >
-> > >  So Yanteng use a "if (np) { } else {
-> > > }", which is reasonable from my point of view.
-> > >
-> >
-> > At least one problem is there. What if pdev->irq isn't initialized
-> > (initialized with zero)?..
-
-> As you said above, both ACPI and DT initialized pdev->irq, unless
-> there is a bug in BIOS.
-
-I meant that based on the platform firmware nature the pdev->irq field
-shall be initialized with an IRQ number in accordance with the DT or
-ACPI logic. I never said it was impossible to have the field
-uninitialized (that is being left zero). It's absolutely possible.
-There are much more reasons to have that than just a firmware bug. On
-the top of my mind: MSI being enabled, kernel misconfiguration, kernel
-bug, DT/ACPI lacking the IRQ property, ...
-
--Serge(y)
-
-> 
-> 
-> Huacai
-> 
-> >
-> > > So Yanteng's interrupt code is good for me, but I also agree to
-> > > improve that after v13, if needed.
-> >
-> > Ok. I've got much better picture about what is going on under the
-> > hood. Thanks. In anyway I'll get back to this topic in details in v13.
-> >
-> > -Serge(y)
-> >
-> > >
-> > > Huacai
-> > >
-> > > >
-> > > > Thanks
-> > > > -Serge(y)
-> > > >
-> > > > >
-> > > > > Thanks,
-> > > > >
-> > > > > Yanteng
-> > > > >
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
