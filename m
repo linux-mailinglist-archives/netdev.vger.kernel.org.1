@@ -1,62 +1,59 @@
-Return-Path: <netdev+bounces-96362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D5218C573D
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 15:36:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD74E8C574E
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 15:44:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D390B1F216D9
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:36:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBBB81C2190C
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94DD9144312;
-	Tue, 14 May 2024 13:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7D2144D0E;
+	Tue, 14 May 2024 13:43:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/ZZKvEG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dIlB4YsJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA58144306;
-	Tue, 14 May 2024 13:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBEDC13E030
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 13:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715693765; cv=none; b=rmZXtJbzkHasJm8dhFO6+YuEgEd4EYuE2T5Y0X1fgBpTyn6p6FaAR6CZATFYtvHBBXJBK/7hUF/bMmatCd7UpIUF9Pcp99y/ID6v3gKuj8UgG9C1+LQli+7a7wh1hwffzxFO0pUF0ZbeNqgxYxDgQHCWpet5EW34vsP78wZGGX4=
+	t=1715694231; cv=none; b=B0ACIzJaz6PMWQN02cSxDGt3LzQii3zfENq5qyee5BZZyezXnJDlVBLs/QolGTJGcGCO9KLLVy0PujGdBFFgfUCQijn5uggJCKqObHki+lCik8FlMvIHgj8ATt9jgnRkJUZk2ZqKZfZ3k9xHkU6KYL+W/T3NQJ2F3YSsbvHla8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715693765; c=relaxed/simple;
-	bh=kX5gvg7vRassOfVg9WOjYsBfAxZcTK6+oGoeDBE0bjk=;
+	s=arc-20240116; t=1715694231; c=relaxed/simple;
+	bh=SZfpWtVKtz8L1iJq4FseAQG+Wa0A54B99TXCVBu0y8Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tK30Kw0KXG2VkOV4+L+ACkVxNUvEDj0vxUQWZ9gflPIfHAV4T3rCUNLDs7Bpu304TRJuFNMzEU3H2VQ5uDaAh7I7MjA4+3AvwM76FW02xJQphyD567T9IqOvzJBo+u7wFcj31EoAaOEL4DyDfg++22kdZTovb/RLKyco/MYn0YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/ZZKvEG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DD53C2BD10;
-	Tue, 14 May 2024 13:36:04 +0000 (UTC)
+	 MIME-Version:Content-Type; b=comf1fILqeA7tnrkXW4XPtLEaXjprz2bN02uVsmc9Pi6nfNLAgPN0OnHWnWggcfv6ZFMtnZdGwEqZcN2rKK4fJl3jiLVagPuBv6BAWacltxb5hs/JqD5fesh1/NBUibs4Ahzpydadj9iHH/ztd/TQnBgRauqckwhiYwtpw2Hqu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dIlB4YsJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA8ABC2BD10;
+	Tue, 14 May 2024 13:43:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715693765;
-	bh=kX5gvg7vRassOfVg9WOjYsBfAxZcTK6+oGoeDBE0bjk=;
+	s=k20201202; t=1715694231;
+	bh=SZfpWtVKtz8L1iJq4FseAQG+Wa0A54B99TXCVBu0y8Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i/ZZKvEGTtTlMy9h4QqPNGhXBCpv2BuvaEarn709cxyl1e2mon3dt4/AsER9FnOzT
-	 wjVrFXby+A7W1/KU1GI7ENSPZuqJY9YfzdXPLCWAJGEdccE9lb6QGm4w7lviwYgUj9
-	 nBf3TN0XhuVzRyMiYDhznZlECWmJWUXhV2NxbF/48XsJYiByiOpeq9NvCJJFmUGwLR
-	 pS4ntF9CxYUwRftT+QdzijqrSxadokn9nY/H7yDNWV9Vv5NnIPdpwzna99CDnLA79d
-	 +zdv2y+1MCNz11pJtXu4svZW84twyrU6ReGgVjIyS7UtW5qtNAL3DzckVKXEbbjvkj
-	 HK7dl7tTCM6QA==
-Date: Tue, 14 May 2024 06:36:03 -0700
+	b=dIlB4YsJhHYTTMPdBnSrqudfvZwVcKhPM0f2qcf8w3+rplkNvE4P+WZTankrxCnyr
+	 NI/iDW3R9pZyaa01bEGEAzr4gWao+CZ6NwEDCe0vitXeOiVLy2sCg2QwdWOrI5sCDk
+	 UKNu7H6jW1i6THdk6cDAJLzQpWpei8csteCUe3QkbhXMrBZI9zmvwCdD6B577g5yOM
+	 AF9hsfmM0Nz3QxQZ7yhXbmrg2w1VQSLdvNPrro1sewkgEIDnkkSRVVf+KJ/aEcMl0H
+	 etLA4P8p+m/eBejmpxQNdVhGiaeFRmjBEhZuP5UBv77fXNCcoqgkEc1pt0yNVwIfgC
+	 EQoWDrtPJghaw==
+Date: Tue, 14 May 2024 06:43:49 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
- netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com
-Subject: Re: [PATCH net-next 16/17] selftests: netfilter: add packetdrill
- based conntrack tests
-Message-ID: <20240514063603.45234a45@kernel.org>
-In-Reply-To: <20240514050930.GC17004@breakpoint.cc>
-References: <20240512161436.168973-1-pablo@netfilter.org>
-	<20240512161436.168973-17-pablo@netfilter.org>
-	<20240513114649.6d764307@kernel.org>
-	<20240513200314.GA3104@breakpoint.cc>
-	<20240513144114.2ae7bf1a@kernel.org>
-	<20240514050930.GC17004@breakpoint.cc>
+To: Petr Machata <petrm@nvidia.com>
+Cc: Florian Westphal <fw@strlen.de>, Simon Horman <horms@kernel.org>,
+ "Hangbin Liu" <liuhangbin@gmail.com>, Jaehee Park <jhpark1013@gmail.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel
+ <idosch@nvidia.com>, Davide Caratti <dcaratti@redhat.com>, Matthieu Baerts
+ <matttbe@kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: [TEST] Flake report
+Message-ID: <20240514064349.399ffcd7@kernel.org>
+In-Reply-To: <87a5kslqk4.fsf@nvidia.com>
+References: <20240509160958.2987ef50@kernel.org>
+	<87a5kslqk4.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,18 +63,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 14 May 2024 07:09:30 +0200 Florian Westphal wrote:
-> Jakub Kicinski <kuba@kernel.org> wrote:
-> > Ah, makes sense. I added a local patch to the system, it should be
-> > applied on the next test, just to confirm.  
+On Mon, 13 May 2024 18:52:25 +0200 Petr Machata wrote:
+> > sch-tbf-ets-sh, sch-tbf-prio-sh
+> > ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > To: Petr Machata <petrm@nvidia.com>
+> >
+> > These fail way too often on non-debug kernels :(
+> > Perhaps we can extend the lower bound?  
 > 
-> Test is passing now, thanks!
-> 
-> Would you apply the patch to net-next or do you want
-> me to send it myself?
-> 
-> Either way is fine for me.
+> Hm, it sometimes goes even below -10%. It looks like we'd need to go as
+> low as -15%.
 
-You know all the deets, better if you send one, I reckon.
-To whichever tree you prefer.
+A more crazy idea would be to run a low prio stress program while 
+the test is running. I'm guessing that perf is low because VM gets
+scheduled out and doesn't get scheduled in in time. Or we can try
+to increase the burst size in TBF?
 
