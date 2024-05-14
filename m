@@ -1,252 +1,278 @@
-Return-Path: <netdev+bounces-96395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E1398C599C
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 18:19:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E878C59A3
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 18:20:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BFBB1C21B0B
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 16:19:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF81A1F23A02
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 16:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CC917F37A;
-	Tue, 14 May 2024 16:19:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059DC17F375;
+	Tue, 14 May 2024 16:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ONpLFzS2"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="TxRAVepN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D181417F375
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 16:19:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715703545; cv=none; b=b9JcfYy+fzwLlwLTCYaj2baPpGKbWuAlP2v6vOHuBWW8HrV1/vk6kaaL6uq+y/eMb9/ftrJj/nejbl3lFWPeZn8CSugBRn98GEwBu7tYynvhEjEnYORi3huk5OAokzldUwPy8ej0Cp1w37DFACQMNzk6ll6Px936yuSCv7k0l7U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715703545; c=relaxed/simple;
-	bh=tzuPpVvNGF5R8cqMgC2/C7rVkczTw5aMBGnafmHJUoE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u0WsTJ7SVU+HXkffXE4ZU44Mx059h5UzewNfrYODTd5kkgCBxfKtM4Ln8nm5k99SDHveWxOnZLYIFrWJAW3GVl+eM3pq8Hp8x4A1YJMWqXWz81TDNOIYi/muIID7AGfXzf/mSkcAcT3jgp4OtyLykpV1MIY8FXPyFsw0sbWXUws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ONpLFzS2; arc=none smtp.client-ip=209.85.160.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-23f0d4353abso3729085fac.3
-        for <netdev@vger.kernel.org>; Tue, 14 May 2024 09:19:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1715703543; x=1716308343; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eOhgsN4qloKzvtlv2/oQhzA2eDBYz08heuWW79sHK4Y=;
-        b=ONpLFzS2GKB0lllHzAwcp2px7HG29mUBGiDQMGIW4E8lzZhm9QJtDali1oMt8NQNNA
-         i4y6LG8zAX1YG1UY62VZJ/WyVl+ZIKRAsOLSLD6wNkQojoFV7EoNrRaRHQ8MLq/loxlE
-         6LIIYbO/5LjHrxtvlw6MRX9L6X9wlQrLlJH/Y=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715703543; x=1716308343;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eOhgsN4qloKzvtlv2/oQhzA2eDBYz08heuWW79sHK4Y=;
-        b=F9ShxmwVYx0PfW7mmetazT3x7iRkoBf3QrQCuV3JhiR5YB7J5D4wQKiV+Kjo7CLi25
-         Ysm2oEFk6eNbx4ozpzceaSAYH7XmTw1hGNjAtWRA5QeLCizRLvAmUAcJK9z+KxSL/LzT
-         rY9blHVOeNgqyGuMhhhkt5iBYmScGRRpph4YZJj2Z6tPVnBG160V8XYWxTJnUcjyOSbn
-         pDklsh1JtmyynnzCUxc6dHkWhQrzi9rbfkgZtbEVMXXklyiRdScvf7jwkunhcfmpaQvZ
-         +UV0knKjXmacS40IDvDbXL3voyenvLBjkI7cxFn/uFlQa60bUnWb7HtZc8LKjxW0zkm/
-         SUWw==
-X-Forwarded-Encrypted: i=1; AJvYcCW1ALxIlShrWxIc82F/bX8JLY781skwmlHo+7SshWDb1AUsfTVy7Gy7c45whLLhtmYdnBwgrSVOtuhXMy6HyAybl7Fbdvke
-X-Gm-Message-State: AOJu0YzqeEG74M8RIs1PJ55yaI/q+bwU8eEb8xqUy1Khcrz43mU9eAWS
-	74u5XFzgE9ftqrqo0Lg27CWIGFS9kbVwKGZh9V8H2/B9jDqWxf6Rh+X7noxb8Q==
-X-Google-Smtp-Source: AGHT+IF2ewaJVD1LzEO+vqz3ydWh3/qbq2GeQLndNlRZ8UA5rV7R4D6zZHabQ632jLlNiyfDK2ehlQ==
-X-Received: by 2002:a05:6870:f10b:b0:239:876a:8fd8 with SMTP id 586e51a60fabf-241722e3806mr16636169fac.0.1715703542711;
-        Tue, 14 May 2024 09:19:02 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43dfa0fc2e1sm64315721cf.56.2024.05.14.09.18.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 May 2024 09:19:00 -0700 (PDT)
-Message-ID: <2859e842-fe0b-4daf-b926-fa7db535b968@broadcom.com>
-Date: Tue, 14 May 2024 09:18:57 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD6E5B1FB;
+	Tue, 14 May 2024 16:19:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715703602; cv=pass; b=dE4r2EmxxJirIFn2xp0gT7I7FY/raa0Eu3Dlu3S+vQq8W02M3NOa4JOTNc4EZLwqCBsbgs+ow7qPLjg6eoDTdQOlRPveNuYhSmNFfjv0ONqcOUVIgNjzSl8d2hciBclYEAXvBOINLbzYKT5WnXWri5OU/J3Kwu1FTJ/oMeuVmio=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715703602; c=relaxed/simple;
+	bh=oI7iDxdgw3FF3BufaXB1EpX/XLByQJk6QZ5FiKCR904=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=YAUfBRrObI9aC+V/irexXqeObkk+zbOXEJ2v0RJdtjeHmFbpfUc8HC/l3j0+Zx4HKeg1Lqq52uiBIKrOv9nDmO/IIG7QGNw/re3Bmray8nARhnyvW5+NvPQao2FX8NBqzO4EN20ZmxLxA+SN9pAAMPREFmTwD2kDJRtKPy6UuKI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=TxRAVepN; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a03d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Vf1ln0xMcz49Pwn;
+	Tue, 14 May 2024 19:19:48 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1715703591;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=75CUswRmwmhL4GTcmw7gRTNs6P6579eEZKUjc/QHq64=;
+	b=TxRAVepNW+GhhWHoa4TC3TtNV87XH366p4/whjOutypeiE8sYscJjszyHeMhCwC9slkOF8
+	sRdKL8n6HS3+tf201dL+zOHiHTeRaAoRMtP3woaPUbX3ydL/Cy9c+YQ56MNwBk97N1eyHw
+	LatfJU7asLVLQZ7Rkm1FKkOMDMXPWJjPCQUkxaTga256Pebu0D1FhfsRJMTH0Ukacx+ABs
+	SpSPCEY8e+elfCrH9OoMEYCeWGpx6Eezm5wzVtqASQS4kkCiNEUq6ddYVBwIxursX9FBjS
+	pyPnKb8SCWhbvBIq8ijNGGN2xfHkOQfmgMdN/v/wrSs9SCh6mRAFceRFYy6Aag==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1715703591; a=rsa-sha256;
+	cv=none;
+	b=sRqWTw4h2G/mChCmLHXx5ToAtPjih1hsLu9Tok2WrDupZE9R8251WH0Ri64wqkMyXLGDks
+	NRi5LFo+nxcAY7UzAimXJREwZMSiWkgRQh+4kMVa4jcLGf2wH92DaQ7Yn0qF8m61AKbneR
+	tZra6idWQUAKg+Bh5BvUr0KJoQPHFToXdHJHQyXYxJGXUdSlHZg/k1bcjdrIClktSK/JBa
+	76CRqQgBhfID0MZmI41A36OD+CBEDqCO6nOcYe/QARQ4IZt3DvUIpI06xv6umB9s6jPSiy
+	AZnE4/GIeUShpY95fECPgyACgPes0jCyULuUI1ENAO8BOXrWcd3eRXJgNBqxYA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1715703591;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=75CUswRmwmhL4GTcmw7gRTNs6P6579eEZKUjc/QHq64=;
+	b=QvBs3Z7lYf+xvffu2nW8J490EkpsHNcmDMd64BZBpsd7qGpgiLsAmG8VQFOKcueJcDbkwh
+	MMop8fVs09lnWwvqycqkOGRIG9oUU7I4YR0FvwUNyLMPHh/fSGlfGMrAGC4dJqRe8Zy7ts
+	d78cspISb2cJE2INGUNuuycyYAuk6Pw3azu2M2Iw1RpDcKnutgtKsCd7VDgsUYDGAP6zUS
+	zQVTDGZ8GN/ycXPYgS7uhALpsA9e6i5EVPVh5LIgUffezP0c9c4+jji7IacoC1i0bnj7gS
+	uLssgYkVdXu+B12Qaq8ct+ncs3WVXYjPj+ibXhj39+kZxg/72ZLVbmO+NqVJWA==
+Message-ID: <7ade362f178297751e8a0846e0342d5086623edc.camel@iki.fi>
+Subject: Re: pull request: bluetooth-next 2024-05-10
+From: Pauli Virtanen <pav@iki.fi>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Luiz Augusto von
+ Dentz <luiz.dentz@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Date: Tue, 14 May 2024 19:19:45 +0300
+In-Reply-To: <6642c7f3427b5_20539c2949a@willemb.c.googlers.com.notmuch>
+References: <20240510211431.1728667-1-luiz.dentz@gmail.com>
+	 <20240513142641.0d721b18@kernel.org>
+	 <CABBYNZKn5YBRjj+RT_TVDtjOBS6V_H7BQmFMufQj-cOTC=RXDA@mail.gmail.com>
+	 <20240513154332.16e4e259@kernel.org>
+	 <6642bf28469d6_203b4c294bc@willemb.c.googlers.com.notmuch>
+	 <CABBYNZKJSpQcY+k8pczPgNYEoF+OE6enZFE5=Qu_HeWDkcfZEg@mail.gmail.com>
+	 <6642c7f3427b5_20539c2949a@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.1 (3.52.1-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2, net-next, 2/2] net: stmmac: PCI driver for BCM8958X
- SoC
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, bcm-kernel-feedback-list@broadcom.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20240510000331.154486-3-jitendra.vegiraju@broadcom.com>
- <20240511015924.41457-1-jitendra.vegiraju@broadcom.com>
- <4ede8911-827d-4fad-b327-52c9aa7ed957@lunn.ch>
- <Zj+nBpQn1cqTMJxQ@shell.armlinux.org.uk>
- <08b9be81-52c9-449d-898f-61aa24a7b276@lunn.ch>
- <CAMdnO-+V2npKBoXW5o-5avS9HP84LV+nQkvW6AxbLwFOrZuAGg@mail.gmail.com>
- <ZkMeoB05cV/pK89B@shell.armlinux.org.uk>
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <ZkMeoB05cV/pK89B@shell.armlinux.org.uk>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000003ba81e06186c5ceb"
 
---0000000000003ba81e06186c5ceb
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi all,
 
-On 5/14/24 01:19, Russell King (Oracle) wrote:
-> On Mon, May 13, 2024 at 10:32:19AM -0700, Jitendra Vegiraju wrote:
->> +==================================================+
->> Since the legacy fixed link cannot support 10G, we are initializing to
->> fixed speed 1G.
-> 
-> Or to put it a different way... "I can't represent my hardware so I'm
-> going to hack around with the kernel in a way that lies to the kernel
-> about what the hardware is doing but it'll work for me!"
-> 
-> Sorry, but no, this isn't some hacky github project, this is the kernel
-> where we engineer proper solutions.
+Thanks for the comments, I guess the original series should have been
+Cc'd more widely to get them earlier.
 
-You are painting a picture of someone who is a first time contributor to 
-Linux, there should not be any ill intentions at that point, just a 
-knowledge gap that needs to be filled.
+ma, 2024-05-13 kello 22:09 -0400, Willem de Bruijn kirjoitti:
+> Luiz Augusto von Dentz wrote:
+> > Hi Willem,
+> >=20
+> > On Mon, May 13, 2024 at 9:32=E2=80=AFPM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >=20
+> > > Jakub Kicinski wrote:
+> > > > On Mon, 13 May 2024 18:09:31 -0400 Luiz Augusto von Dentz wrote:
+> > > > > > There is one more warning in the Intel driver:
+> > > > > >=20
+> > > > > > drivers/bluetooth/btintel_pcie.c:673:33: warning: symbol 'cause=
+s_list'
+> > > > > > was not declared. Should it be static?
+> > > > >=20
+> > > > > We have a fix for that but I was hoping to have it in before the =
+merge
+> > > > > window and then have the fix merged later.
+> > > > >=20
+> > > > > > It'd also be great to get an ACK from someone familiar with the=
+ socket
+> > > > > > time stamping (Willem?) I'm not sure there's sufficient detail =
+in the
+> > > > > > commit message to explain the choices to:
+> > > > > >  - change the definition of SCHED / SEND to mean queued / compl=
+eted,
+> > > > > >    while for Ethernet they mean queued to qdisc, queued to HW.
+> > > > >=20
+> > > > > hmm I thought this was hardware specific, it obviously won't work
+> > > > > exactly as Ethernet since it is a completely different protocol s=
+tack,
+> > > > > or are you suggesting we need other definitions for things like T=
+X
+> > > > > completed?
+> > > >=20
+> > > > I don't know anything about queuing in BT, in terms of timestamping
+> > > > the SEND - SCHED difference is supposed to indicate the level of
+> > > > host delay or host congestion. If the queuing in BT happens mostly =
+in
+> > > > the device HW queue then it may make sense to generate SCHED when
+> > > > handing over to the driver. OTOH if the devices can coalesce or del=
+ay
+> > > > completions the completion timeout may be less accurate than stampi=
+ng
+> > > > before submitting to HW... I'm looking for the analysis that the ch=
+oices
+> > > > were well thought thru.
+> > >=20
+> > > SCM_TSTAMP_SND is taken before an skb is passed to the device.
+> > > This matches request SOF_TIMESTAMPING_TX_SOFTWARE.
+> > >=20
+> > > A timestamp returned on transmit completion is requested as
+> > > SOF_TIMESTAMPING_TX_HARDWARE. We do not have a type for a software
+> > > timestamp taken at tx completion cleaning. If anything, I would think
+> > > it would be a passes as a hardware timestamp.
+> >=20
+> > In that case I think we probably misinterpret it, at least I though
+> > that TX_HARDWARE would really be a hardware generated timestamp using
+> > it own clock
+>=20
+> It normally is. It is just read from the tx descriptor on completion.
+>=20
+> We really don't have a good model for a software timestamp taken at
+> completion processing.
+>=20
+> It may be worthwhile more broadly, especially for devices that do not
+> support true hardware timestamps.
+>=20
+> Perhaps we should add an SCM_TSTAMP_TXCOMPLETION for this case. And a
+> new SOF_TIMESTAMPING option to go with it. Similar to what we did for
+> SCM_STAMP_SCHED.
 
-When I reviewed the patches internally the topic of fixed-link versus 
-using PHYLINK did come up, and I should have dug a lot more and asked 
-more questions to understand the full picture. Since the bulk of the 
-changes had to do with hooking up a different DMA engine and 
-configuration, I focused on that part and let the PHY connectivity 
-aspect slip.
-
-I will work with Jitendra to bring him up to speed with the software 
-nodes, the work that Herve is doing on supporting OF overlays with PCIe 
-root complexes and when net-next re-opens, we should have a different 
-submission for you to look at then.
-
-Thanks for your patience.
--- 
-Florian
+Ok, I was also under the impression TX_HARDWARE was only for actual HW
+timestamps. TSTAMP_ACK appeared to not really match semantics either,
+so TSTAMP_SND it then was.
 
 
---0000000000003ba81e06186c5ceb
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+The general timestamping flow here was:
 
-MIIQeQYJKoZIhvcNAQcCoIIQajCCEGYCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-gg3QMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
-MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
-vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
-rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
-aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
-e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
-cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
-MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
-KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
-/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
-TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
-YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
-b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
-c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
-CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
-BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
-jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
-9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
-/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
-jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
-AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
-dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
-MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
-IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
-XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
-J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
-nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIO6quiaWrQX4QfIU
-jFFmFrF/f50f4JlQm4Nv0vxROeZcMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTI0MDUxNDE2MTkwM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAAWJjU2uXefSkPMiSFZJQ4Cw8X0fiYwR7q
-Qd3CLMf7gxrzVN+GzzLSw2/IAKqD9WbQ6lOaaKX5AyCcK/0MyghgC50io3f5m65e2koDF7a09EYF
-XCQePGZ67zoXO8fUBDzY6O3y8Br1gzRcpoIp9gKhK4Mi58gatSdqCiTG79jqfEmdRuGJX1LiIvmU
-t8NQ7UFnIDd9xgdTjCBdxQHpgUI4J/Zd7LllDh2b1DfCbzIXvMHvFfh00dBI8hqBQmrCfPiunfmg
-IuApzBKWp3TSjhm8WRP7JqNAQYnXIgRcmnit7VaUeoYvr5pjxh/7OIgmRPo65J3p3vTuXKG7krr2
-KUrx
---0000000000003ba81e06186c5ceb--
+sendmsg() from user generates skbs to net/bluetooth side queue
+|
+* wait in net/bluetooth side queue until HW has free packet slot
+|
+* send to driver (-> SCM_TSTAMP_SCHED*)
+|
+* driver (usu. ASAP) queues to transport e.g. USB
+|
+* transport tx complete, skb freed
+|
+* packet waits in hardware-side buffers (usu. the largest delay)
+|
+* packet completion report from HW (-> SCM_TSTAMP_SND*)
+|
+* for one packet type, HW timestamp for last tx packet can queried
+
+The packet completion report does not imply the packet was received.
+
+From the above, I gather SCHED* should be SND, and SND* should be
+TXCOMPLETION. Then I'm not sure when we should generate SCHED, if at
+all, unless it's done more or less in sendmsg() when it generates the
+skbs.
+
+Possibly the SND timestamp could also be generated on driver side if
+one wants to have it taken at transport tx completion. I don't
+immediately know what is the use case would be though, as the packet
+may still have to wait on HW side before it goes over the air.
+
+For the use case here, we want to know the total latency, so the
+completion timestamp is the interesting one. In the audio use case, in
+normal operation there is a free HW slot and packets do not wait in
+net/bluetooth queues but end up in HW buffers ASAP (fast, maybe < 1
+ms), and then wait a much longer time (usu. 5-50 ms) in the HW buffers
+before it reports completion.
+
+> > if you are saying that TX_HARDWARE is just marking the
+> > TX completion of the packet at the host then we can definitely align
+> > with the current exception, that said we do have a command to actually
+> > read out the actual timestamp from the BT controller, that is usually
+> > more precise since some of the connection do require usec precision
+> > which is something that can get skew by the processing of HCI events
+> > themselves, well I guess we use that if the controller supports it and
+> > if it doesn't then we do based on the host timestamp when processing
+> > the HCI event indicating the completion of the transmission.
+> >=20
+> > > Returning SCHED when queuing to a device and SND later on receiving
+> > > completions seems like not following SO_TIMESTAMPING convention to me=
+.
+> > > But I don't fully know the HCI model.
+> > >=20
+> > > As for the "experimental" BT_POLL_ERRQUEUE. This is an addition to th=
+e
+> > > ABI, right? So immutable. Is it fair to call that experimental?
+> >=20
+> > I guess you are referring to the fact that sockopt ID reserved to
+> > BT_POLL_ERRQUEUE cannot be reused anymore even if we drop its usage in
+> > the future, yes that is correct, but we can actually return
+> > ENOPROTOOPT as it current does:
+> >=20
+> >         if (!bt_poll_errqueue_enabled())
+> >             return -ENOPROTOOPT
+>=20
+> I see. Once applications rely on a feature, it can be hard to actually
+> deprecate. But in this case it may be possible.
+>=20
+> > Anyway I would be really happy to drop it so we don't have to worry
+> > about it later.
+> >=20
+> > > It might be safer to only suppress the sk_error_report in
+> > > sock_queue_err_skb. Or at least in bt_sock_poll to check the type of
+> > > all outstanding errors and only suppress if all are timestamps.
+> >=20
+> > Or perhaps we could actually do that via poll/epoll directly? Not that
+> > it would make it much simpler since the library tends to wrap the
+> > usage of poll/epoll but POLLERR meaning both errors or errqueue events
+> > is sort of the problem we are trying to figure out how to process them
+> > separately.
+>=20
+> The process would still be awoken, of course. If bluetoothd can just
+> be modified to ignore the reports, that would indeed be easiest from
+> a kernel PoV.
+
+This can be done on bluetoothd side, the ugly part is just the wakeup
+on every TX timestamp, which is every ~10ms in these use cases if every
+packet is stamped. EPOLLET probably would indeed avoid busy looping on
+the same timestamp though.
+
+In the first round of this patchset, this was handled on bluetoothd
+side without kernel additions, with rate limiting the polling. If
+POLL_ERRQUEUE sounds like a bad idea, maybe we can go back to that.
+
+--=20
+Pauli Virtanen
 
