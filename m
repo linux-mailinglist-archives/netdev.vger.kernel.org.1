@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-96316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93A928C4F29
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 12:38:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8CF98C4F2E
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 12:39:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FBFF1F211DA
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 10:38:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 667642823D3
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 10:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CCC913C689;
-	Tue, 14 May 2024 09:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9BF13C911;
+	Tue, 14 May 2024 10:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QiC7SazM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TyZ6gHPt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5982A133402
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 09:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B569B58ACC;
+	Tue, 14 May 2024 10:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715680603; cv=none; b=nT8CmL79Yh895hTIft1dolkow861CGr+fVqB5RG+CtMRhct2ZGQCWmz+W6cuuUCSmTel/nQ7sZx2OaOUK7ceLZJPNFINjbCY8L0JKa4udTt1vK7SvWEbPEHBtg7vLlD3/0WCQsX+cB1rPuDDUBzNPl2o8OKDl+M8wHBuRpDNpvI=
+	t=1715680985; cv=none; b=XfDWfEalwct0veq6Vng3THfU/fQucyr0eOzxa/iCrnKNHdvzBXmon0QDivw+jLFP5/CuNAIlt6rOVtyLZ21i4M3SbC6hlaX9XSlfRrBl+F9smj/2agKEhpmkXCuncmjyX9IgzCB/2xlO82ZlcjS0DByHXQYZoInZtjc0iYWY1pQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715680603; c=relaxed/simple;
-	bh=gZrU37Bnrk2g/V7MyPmOEN+NfkYpCEkrj9K5YIMfcxc=;
+	s=arc-20240116; t=1715680985; c=relaxed/simple;
+	bh=56LqVfznygd3cTbpewjX5Ek365TWbWYMxYpG+tsrTOU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RU2g3TMqWWn2UmTz1VxWoGAfwzbHGrl4yOQ7l553wCO2/YkY15Y1oJK8CU3uZ4mLbAO+GqOlEDFIY2CXLfNNUZZTFOwSMeBfZc35yaYw0IkDscfU6+Qqq5uwfy6MsnZJYUUbmOY0jTVPUnXdgSyyYo9jQsdL1rFCZ61vJvfubiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QiC7SazM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BD32C2BD10;
-	Tue, 14 May 2024 09:55:54 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=QcwVQ3WhejKBJzCMKZkESc/wB9PoR2ka97vxw72qi3NXyfVWB7nT57B6O97vrDK7KaPlqk+nwU+WPVkrwcqcn1i2MTCbcyAVrb2CbdgWeC6hx8Us1yTfi7BHbS+hxqAvuaY8hOZVtSrkmNzZCeSpBSOivuiyKshWKRcrUfiEHCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TyZ6gHPt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CF3BC32781;
+	Tue, 14 May 2024 10:02:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715680602;
-	bh=gZrU37Bnrk2g/V7MyPmOEN+NfkYpCEkrj9K5YIMfcxc=;
+	s=k20201202; t=1715680985;
+	bh=56LqVfznygd3cTbpewjX5Ek365TWbWYMxYpG+tsrTOU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QiC7SazMf72R5Ui1qCY3ZLZ6O0jD6kv9YD5T30415oP2P5Ti1wh6PHAh8jf50wXIg
-	 Z1Podplr0v5ollmJ+NGZYEYApS+l25VfuKmTFvEoSuF3Q/MHq6ZegK+gzG5VWgQhE5
-	 hnBH1fViJ8pHHTB6V8iT1pLyTNR8GPnvyQennhrHzNDIDC4Qgxxlcf9o7B1Tc8XSyo
-	 CumnP4fe6RLeZAYHAcK+g6Ka73ssGBKiDonZkka6yP3papouIVHz7auawGWKN7xH3w
-	 I+udsNmC74ndX3ymphtodX9PoIuQWkcHsgmlGD8wiw9OMLDy3IBFD0PxuTpfbmHRNC
-	 BZFaHGGcHiPSA==
-Date: Tue, 14 May 2024 10:55:05 +0100
+	b=TyZ6gHPtwi8y0QQd6zf2dDt9XnDQriEmPwYhVa9+VSZ3jLGat3WbBr7taJgntiUY1
+	 XYsFZLO4foBpQLO/SteMTqwx7fOcRhkRqG3nQfW24E2cVZATmwZShIbjIPrA00xufD
+	 vnXRza4vCOum3VDj1uyT28tUeHWl11rrFJez01hW6MVMU2S6AexuLROyy1SaWI/xLs
+	 YhKUDJOPnv4wPNyXAdbIUTTWB6hZJI3naRoME/SpGRLs6iHIa0aJ4YwGoyH67a5mdq
+	 npDV4nWylvrIWxDj4ln8vNiEEk25vf4Jxaog4Kz2xDcRBGqaANIdo9U1v3TpOiAEBH
+	 SIPIUUAD35+3g==
+Date: Tue, 14 May 2024 11:02:13 +0100
 From: Simon Horman <horms@kernel.org>
-To: Thinh Tran <thinhtr@linux.ibm.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com, przemyslaw.kitszel@intel.com,
-	jesse.brandeburg@intel.com, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org, rob.thomas@ibm.com
-Subject: Re: [PATCH iwl-net V2,0/2] Fix repeated EEH reports in MSI domain
-Message-ID: <20240514095505.GZ2787@kernel.org>
-References: <20240513175549.609-1-thinhtr@linux.ibm.com>
+To: Ronald Wahl <rwahl@gmx.de>
+Cc: Ronald Wahl <ronald.wahl@raritan.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] net: ks8851: Fix another TX stall caused by wrong ISR
+ flag handling
+Message-ID: <20240514100213.GA2787@kernel.org>
+References: <20240513143922.1330122-1-rwahl@gmx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,49 +61,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240513175549.609-1-thinhtr@linux.ibm.com>
+In-Reply-To: <20240513143922.1330122-1-rwahl@gmx.de>
 
-On Mon, May 13, 2024 at 12:55:47PM -0500, Thinh Tran wrote:
-> The patch fixes an issue where repeated EEH reports with a single error
-> on the bus of Intel X710 4-port 10G Base-T adapter in the MSI domain
-> causes the device to be permanently disabled.  It fully resets and
-> restarts the device when handling the PCI EEH error.
+On Mon, May 13, 2024 at 04:39:22PM +0200, Ronald Wahl wrote:
+> From: Ronald Wahl <ronald.wahl@raritan.com>
 > 
-> Two new functions, i40e_io_suspend() and i40e_io_resume(), have been
-> introduced.  These functions were factored out from the existing
-> i40e_suspend() and i40e_resume() respectively.  This factoring was
-> done due to concerns about the logic of the I40E_SUSPENSED state, which
-> caused the device not able to recover.  The functions are now used in the
-> EEH handling for device suspend/resume callbacks.
+> Under some circumstances it may happen that the ks8851 Ethernet driver
+> stops sending data.
 > 
-> - In the PCI error detected callback, replaced i40e_prep_for_reset()
->   with i40e_io_suspend(). The change is to fully suspend all I/O
->   operations
-> - In the PCI error slot reset callback, replaced pci_enable_device_mem()
->   with pci_enable_device(). This change enables both I/O and memory of 
->   the device.
-> - In the PCI error resume callback, replaced i40e_handle_reset_warning()
->   with i40e_io_resume(). This change allows the system to resume I/O 
->   operations
+> Currently the interrupt handler resets the interrupt status flags in the
+> hardware after handling TX. With this approach we may lose interrupts in
+> the time window between handling the TX interrupt and resetting the TX
+> interrupt status bit.
 > 
-> v2: fixed typos and split into two commits
+> When all of the three following conditions are true then transmitting
+> data stops:
+> 
+>   - TX queue is stopped to wait for room in the hardware TX buffer
+>   - no queued SKBs in the driver (txq) that wait for being written to hw
+>   - hardware TX buffer is empty and the last TX interrupt was lost
+> 
+> This is because reenabling the TX queue happens when handling the TX
+> interrupt status but if the TX status bit has already been cleared then
+> this interrupt will never come.
+> 
+> With this commit the interrupt status flags will be cleared before they
+> are handled. That way we stop losing interrupts.
+> 
+> The wrong handling of the ISR flags was there from the beginning but
+> with commit 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX
+> buffer overrun") the issue becomes apparent.
+> 
+> Fixes: 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX buffer overrun")
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: netdev@vger.kernel.org
+> Cc: stable@vger.kernel.org # 5.10+
+> Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
 
-Hi,
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-These patches look good to me, but I think it would be worth adding parts
-of the text above to the commit messages of each patch. This will make the
-information easier to find in git logs in future.
-
-> 
-> Thinh Tran (2):
->   i40e: fractoring out i40e_suspend/i40e_resume
->   i40e: Fully suspend and resume IO operations in EEH case
-> 
->  drivers/net/ethernet/intel/i40e/i40e_main.c | 257 +++++++++++---------
->  1 file changed, 140 insertions(+), 117 deletions(-)
-> 
-> -- 
-> 2.25.1
-> 
-> 
 
