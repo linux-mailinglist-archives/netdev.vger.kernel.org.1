@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-96276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FB748C4C73
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 08:50:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19A108C4C74
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 08:52:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2F9B1C20D07
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 06:50:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86CCA1F217F3
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 06:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8735010A1C;
-	Tue, 14 May 2024 06:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943D8E541;
+	Tue, 14 May 2024 06:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hQido4S3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SHON0GRY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D598BF9EB
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 06:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF11DAD31
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 06:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715669439; cv=none; b=jBk0SFXxTJo4RHelS6ZM553akkh5qsGjXTGnuF1+iPtO9ElIS7vcU2yDl0aiYxQr0V45q5X3Q9XEWXyrzVcG+dRZCRyy+HsYicCGGLXx7qOOLOYWXbPsbQfg6BE2WYdcKKaDhpeaOApA3sYa6DRdJSgg9R6uHWmvdoqdqcxLzgU=
+	t=1715669523; cv=none; b=HrOHpp55n2GYotAvRuF3bBMx8EgtFRkqffLPRTd2PQUvmGVegM+mKJU8yVFZL3ArIq9tZo79HnVRNqJV1s3FaT7ZePdwYbte2DrWdZ+gYcpBUdKnIEpD9ZrCH5s4Ji2FGj7QkPDyN6LW3oraYCjIcBEvNcTH57XFQ60oCmih7dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715669439; c=relaxed/simple;
-	bh=CT4gFOhxkGTIZojg6vOmOn8kKV4jwLeWGltPPUuoxd8=;
+	s=arc-20240116; t=1715669523; c=relaxed/simple;
+	bh=hlvfRT3+9iTRqzstC9w35j1g7ZU0RN4NTBfIM4irZfw=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=jdip+jpsxTypjtcvBCLhizaH8RIRIlvpvRRThcobhkd+gALYSu0Gzw1couRxUqF8SIhrKkzVFFOMUpCvWKazg7UA9yalAGMkbUDLH32bs/Wb7DFclXYk1RMjhGCA787JBbR+N5IBdvi2mq925V45I/7DbQPB2O6yix8DPs0l/9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hQido4S3; arc=none smtp.client-ip=209.85.218.49
+	 In-Reply-To:Content-Type; b=f8XxJq2Bre6eVERotWCHBVWN+5J1nDkmY0jRZWuJWlEKccBVFCi+0DTceIESBc95hbBHWhp3Gqm2GdIVJeDRCpDCqvIas4LT8b8PaUHIw+3jsVm3DSAnqwSY6oGGLZ26CyxQWCf+WXZ+VAWNNsQdhRv6YMfQgCIiDjqYT6U6AFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SHON0GRY; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a5a1054cf61so1389962366b.1
-        for <netdev@vger.kernel.org>; Mon, 13 May 2024 23:50:37 -0700 (PDT)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a599a298990so1288049966b.2
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 23:52:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715669436; x=1716274236; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1715669520; x=1716274320; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tBmD6gHKQv3j88q1yGMQVupefwYk8GAsEaxm7xsEh+A=;
-        b=hQido4S3qSjnytVuwrSm+qFj8aPbPhAoxWsfziG+VwRRdT2HFL7nKI0IWwLIcFdNSy
-         ZbYv4mSr06yJKW1qSDAzbwCGtIU751uFloCBtdzjejQo2cg+6TVyfjW0RPjVxmazn1tb
-         Uaidp54eTehlW/pdfKHWjxTNLjSWfXKJs9I6B5Hr6GrLaYSRHhdcP41kRTu9JvUluh4h
-         4BI5iukZpDRToFLCtFZ48ZS2gF5xjIjw0oNKoWKWEznx+lPWC/PCAemvmkDmwgdi1l8+
-         IbdUxa5/N9SMqphM4ffOgHhxI2va9PxJs53qs1pPSIEbSHXfYC7mJlg+77ynta4+zWCO
-         SgzQ==
+        bh=aBCccPcnbqs+PszrwTamxb6p4tfBEjqyELRAdKtZL0A=;
+        b=SHON0GRYDPLqw5lyOgsSnDPiTnYjP1i0RPZn85XpI2LKnmbVAFhkiM75W7IgrHOrB1
+         gOnf7+5pTo/68VncB5T2R3WNtmUbTiE1K08gU0Wm+AURMrafmMuY4VdI5S2TeBtWKblE
+         UwxOhp/Ugz0H8ppvfmQ9Jx9GTbWsMzKVG7n2ZKni/pdLtf+C9QfqBI5Ahta8vE6VCszx
+         3pCxZArXKxl2+CnVtzSgVEoWesjSIau7OBeHMF1FfHJTRDa9xaoNz2o+dE2zHLiXLDTZ
+         PVit2IMticIMwzlqEebfc9efWrAbW4vpioM3gB3vybrOX6poebdXzt3MrBw5QAHcz16S
+         cflg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715669436; x=1716274236;
+        d=1e100.net; s=20230601; t=1715669520; x=1716274320;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tBmD6gHKQv3j88q1yGMQVupefwYk8GAsEaxm7xsEh+A=;
-        b=I0iBXhbxm8kHKsU+8ipmNM0l6JR9nIgIR/7wiZvckMk0SftCj2bkzFV6zL6Gc5qt8I
-         WeD1JQ7VdcPI6U/X2HkFnLk7amrSrd33W5jVzG56BUGNKDHVDG7CdeWl6RYtPrk1r4FK
-         bWd6Pvg72JSWuH299HoLywSyl+K8EIIJEyL9ebwuLJEZQEAVjRHpePL9A6BjForiO+vz
-         HYyqI4SipDsWyWxMT+3zVsWNxJoKK9flLS7kVwFC+zEpMBGO7aqPFgjIcJ4IDYMT5fr6
-         7VTGV8dIhQRT2dD2MOQWaBrKUPPyEPidZ3XmeJ1E9rQrJ10w70oXuBB03YrBRVubFneM
-         xSBQ==
-X-Gm-Message-State: AOJu0YwS00zHzHVUFT4QX1OYYGp5u7PiT+sdHsHC+vBsdxnJ2hZ9TT4x
-	TibZuZQYWc6cMGKU3nW+4P7zFwhLw6vVjSJ7QRwwjV1sDYEms/AzC7Wa6g==
-X-Google-Smtp-Source: AGHT+IESUB70AoGKivrKY2TxUl3yfKtPvpa6PLU3MrZHwF/cNt2h/Fhl3QPn7X1EwbEHbKO63OrEzQ==
-X-Received: by 2002:a50:a6d7:0:b0:572:475c:a38e with SMTP id 4fb4d7f45d1cf-5734d5e20abmr11580270a12.19.1715669435920;
-        Mon, 13 May 2024 23:50:35 -0700 (PDT)
+        bh=aBCccPcnbqs+PszrwTamxb6p4tfBEjqyELRAdKtZL0A=;
+        b=MPvop21jIYj/K3RzCfINL0cX9HJU4qY3E37bDdkBydRGmN4+4+HdCNyLLLqu6xvAVR
+         Dfuf5Le1qJ8IKRG0wF/zxKrIRjqrLWQgFZSydSCSrDVrQ5JUx1wCdkhdUA3S/1FqXxcW
+         667e36wPg3ILbevv6PzloG2W+6cdPUI2qx+WTgiTfQ9OfHodCncmXfRG26b6ezDYetGN
+         W9T80iTWljT+eCcr++3bkHRd5/ZMcdOjBVfantogoK6qGsJpzaoDR9GxcEwBVPrGyCZp
+         XKsAjQd4k0Lz3JFrsyaEfkErefr8A/4ZcARsM9546D4uMbTG5GkODsL876+qbJLM6atC
+         y6tA==
+X-Gm-Message-State: AOJu0YwUgFjlF4+f29OHlHKY6w5T8h8kZDrmYCqh5mGtBKmPIaePaCCx
+	dwr1Mepa5kVk8/WgzpleOrw2d9jw5E2cdhX/vKekoMA/UT7dFav2
+X-Google-Smtp-Source: AGHT+IEdM9SJUk52GNmBTu0QdHTDnVMpGNelkNR6Y2I1Tsq0uzQ9O3VCX8Ny/zT/fumKSZgUR3+x1w==
+X-Received: by 2002:a17:906:305a:b0:a59:db0f:6be4 with SMTP id a640c23a62f3a-a5a2d534ec4mr804166866b.5.1715669520130;
+        Mon, 13 May 2024 23:52:00 -0700 (PDT)
 Received: from ?IPV6:2a02:3100:9109:bf00:c19f:1548:8365:252b? (dynamic-2a02-3100-9109-bf00-c19f-1548-8365-252b.310.pool.telefonica.de. [2a02:3100:9109:bf00:c19f:1548:8365:252b])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-574b6f6c53asm4045942a12.16.2024.05.13.23.50.35
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a5a17b17f37sm684960866b.224.2024.05.13.23.51.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 May 2024 23:50:35 -0700 (PDT)
-Message-ID: <d739aa6d-f1e0-45fa-aad8-b4a1da779b30@gmail.com>
-Date: Tue, 14 May 2024 08:50:37 +0200
+        Mon, 13 May 2024 23:51:59 -0700 (PDT)
+Message-ID: <ef333a8c-1bb2-49a7-b721-68b28df19b0e@gmail.com>
+Date: Tue, 14 May 2024 08:52:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,8 +76,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net 1/2] net: add napi_schedule_prep variant with more
- granular return value
+Subject: [PATCH net 2/2] r8169: disable interrupts also for GRO-scheduled NAPI
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
  Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
@@ -133,75 +132,48 @@ In-Reply-To: <6d4a0450-9be1-4d91-ba18-5e9bd750fa40@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-For deciding whether to disable device interrupts, drivers may need the
-information whether NAPIF_STATE_DISABLE or NAPIF_STATE_SCHED was set.
-Therefore add a __napi_schedule_prep() which returns -1 in case
-NAPIF_STATE_DISABLE was set.
+Ken reported that RTL8125b can lock up if gro_flush_timeout has the
+default value of 20000 and napi_defer_hard_irqs is set to 0.
+In this scenario device interrupts aren't disabled, what seems to
+trigger some silicon bug under heavy load. I was able to reproduce this
+behavior on RTL8168h.
+Disabling device interrupts if NAPI is scheduled from a place other than
+the driver's interrupt handler is a necessity in r8169, for other
+drivers it may still be a performance optimization.
 
+Fixes: 7274c4147afb ("r8169: don't try to disable interrupts if NAPI is scheduled already")
+Reported-by: Ken Milmore <ken.milmore@gmail.com>
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- include/linux/netdevice.h |  7 ++++++-
- net/core/dev.c            | 12 ++++++------
- 2 files changed, 12 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index cf261fb89..d1515cf8c 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -498,7 +498,12 @@ static inline bool napi_is_scheduled(struct napi_struct *n)
- 	return test_bit(NAPI_STATE_SCHED, &n->state);
- }
- 
--bool napi_schedule_prep(struct napi_struct *n);
-+int __napi_schedule_prep(struct napi_struct *n);
-+
-+static inline bool napi_schedule_prep(struct napi_struct *n)
-+{
-+	return __napi_schedule_prep(n) > 0;
-+}
- 
- /**
-  *	napi_schedule - schedule NAPI poll
-diff --git a/net/core/dev.c b/net/core/dev.c
-index d2ce91a33..66f55fc50 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6116,21 +6116,21 @@ void __napi_schedule(struct napi_struct *n)
- EXPORT_SYMBOL(__napi_schedule);
- 
- /**
-- *	napi_schedule_prep - check if napi can be scheduled
-+ *	__napi_schedule_prep - check if napi can be scheduled
-  *	@n: napi context
-  *
-  * Test if NAPI routine is already running, and if not mark
-  * it as running.  This is used as a condition variable to
-- * insure only one NAPI poll instance runs.  We also make
-- * sure there is no pending NAPI disable.
-+ * insure only one NAPI poll instance runs. Return -1 if
-+ * there is a pending NAPI disable.
-  */
--bool napi_schedule_prep(struct napi_struct *n)
-+int __napi_schedule_prep(struct napi_struct *n)
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index e5ea827a2..01f0ca53d 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -4639,6 +4639,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
  {
- 	unsigned long new, val = READ_ONCE(n->state);
+ 	struct rtl8169_private *tp = dev_instance;
+ 	u32 status = rtl_get_events(tp);
++	int ret;
  
- 	do {
- 		if (unlikely(val & NAPIF_STATE_DISABLE))
--			return false;
-+			return -1;
- 		new = val | NAPIF_STATE_SCHED;
+ 	if ((status & 0xffff) == 0xffff || !(status & tp->irq_mask))
+ 		return IRQ_NONE;
+@@ -4657,10 +4658,11 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
+ 		rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
+ 	}
  
- 		/* Sets STATE_MISSED bit if STATE_SCHED was already set
-@@ -6145,7 +6145,7 @@ bool napi_schedule_prep(struct napi_struct *n)
+-	if (napi_schedule_prep(&tp->napi)) {
++	ret = __napi_schedule_prep(&tp->napi);
++	if (ret >= 0)
+ 		rtl_irq_disable(tp);
++	if (ret > 0)
+ 		__napi_schedule(&tp->napi);
+-	}
+ out:
+ 	rtl_ack_events(tp, status);
  
- 	return !(val & NAPIF_STATE_SCHED);
- }
--EXPORT_SYMBOL(napi_schedule_prep);
-+EXPORT_SYMBOL(__napi_schedule_prep);
- 
- /**
-  * __napi_schedule_irqoff - schedule for receive
 -- 
 2.45.0
 
