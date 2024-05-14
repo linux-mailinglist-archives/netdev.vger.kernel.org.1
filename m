@@ -1,84 +1,73 @@
-Return-Path: <netdev+bounces-96245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B94B68C4B30
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 04:34:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 730F38C4B42
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 04:42:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4867B1F22295
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:34:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A38C61C212CF
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 597821C36;
-	Tue, 14 May 2024 02:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FA18AD48;
+	Tue, 14 May 2024 02:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e0tJbCJy"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="riuR2R3I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0482CAD24;
-	Tue, 14 May 2024 02:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE30AD2C
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 02:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715654053; cv=none; b=ga2wqmgGxY8WBNeIlnQTL/hFJBFkWP70oqlBwnIP+WE1Xl1VeMYMHDucCdMqQhdj1Bct6OuYkXoqNQVOJUNrodxApz6o2icwtCsfYVDhH7GaasNmplHumscfQ17l2vpMdTCts7aKiiSiVepU6HokNu3RGbwA4SWmbR660aVCZ4w=
+	t=1715654539; cv=none; b=ivC2T2UqDEURhIvitWb7FmhR0akigJ5Z2z/3hRBPnfeq+kVeitGjXJc5dW6t0R0c22nWXrUmA1e6x50XI8Qu5pYFG7twdmefE4FlsQn2nSXDtStP8cJ7gtT7Stj8qxtVBwS5xehCZfQaHCutyOdJr7Pe9qGNzuxvFApNU5ygY+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715654053; c=relaxed/simple;
-	bh=Fj4L+WmJwBpI33hWG+XhSdn5v/27r+qCR0+i4uR74Mw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hYNV+mDXUCpUMSSf2iA4mwNggi1/0aXZIaClhMfYZTz1B5i7Jsr5OzPD6fwuosCoMTZ67j+SjGja3kjBp68Er6qMqF8W29oKqLC/S5GMhaaX4cnU6ezfK0rS8XfHz5E7pFDivcGT5bWF0p1+dHldW0iKagPbvoUZ4iFJhIjEtmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e0tJbCJy; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6f44e3fd382so4155979b3a.1;
-        Mon, 13 May 2024 19:34:11 -0700 (PDT)
+	s=arc-20240116; t=1715654539; c=relaxed/simple;
+	bh=td8c6It5hj+uCP6+zImTMaaBrNjETg5EepsjyHX3zao=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IFUW1wN0hFqGcth2PmORwqlKhlDKw9ekkYprzKt4TgzPtkApp51N61jjYRnJl3d1lkf8pq7qeF5veRs9dtadY1bZhWrNBV4uumrfu6Ne3tYPxgJkxQ7OD5F/qorw9I7aSPeOuWm8JbrE/rZeNjhxkskXCCed/2qt8/k7Z2aTXWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=riuR2R3I; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715654051; x=1716258851; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KncoJsONQXdGs8dpSt8iIGQs9fO0BdlhjynEZlhIVCk=;
-        b=e0tJbCJyTMEkOEytoEuoWPAwA2ZR5GFMi3CY+mWXmRzWyG14NT0qeaPMAKYCYM3niS
-         DtG+lmJspo2vVPqiVmkeL3hpMoQQAQMrTJeIqWSLgclV4N9L/ITM+iKhyS5ojHOS7V1+
-         XKEnL3DEimpvfYx7kEAjgumVL4+bqm2FcPurtg+7YYRwd1VYMY3dpjz35s0/4lS8KpnB
-         7g6Ny6yzV3SHvZ/pqf3E57BCAz5G+SnPZrVaVuEG35oe8b3jhegbzJn8tDNUJOuxLfLU
-         5n8CggDD2FgnxaC+rJrmh8Hq1vxo6s+1C+y/qL/JVpltUqUT/rKBGiTWrKsJNdvF/ca/
-         KFMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715654051; x=1716258851;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KncoJsONQXdGs8dpSt8iIGQs9fO0BdlhjynEZlhIVCk=;
-        b=QXDVZBtJqLKcR/0D34Vmb1FjUW400GCclEQZeSEkwcVCoLol+zA71UYkfkSkN/votp
-         VrWMLXAhphJhaW+TC6hSFlTA7ts62wv7feXEgjP7POA9E56rBZ3cIxepUTkaDHD0Z3Ii
-         4MnL2XH5iB8KXqPpbxobFD8DMZUpTQxfskZzHRmUYd6wYmo5+IHXssjvDzqeYvpqIW2V
-         jz2cgevquv4aLRBp641Un44mR/yuYiyZTxz/zTfR57XujUOCuC23Nw7BAsWPy2W/v3k9
-         xZABF4v37KbAmjZFaJ7lG7QDSJ0cCrHaLerfNeyCvjn6hgX1Xbp6+6iAZVWOyCIujve6
-         tyTA==
-X-Forwarded-Encrypted: i=1; AJvYcCWHAhqjtOJDBwD/Uquyw8JH8f6HYU3MgR9pJ81ye9gfZ/Y+JSeZG8LhLYGEZFlvo2xTrMnDceWcUOL2R6Ewzn0TkgcNu798szcA8PI4sDaC
-X-Gm-Message-State: AOJu0YxqiOIlpXq801T5TLhUvQAlVfAVo1yQBs12KI/7J5KUFLAy+2l1
-	2y4bZr4jQfiRTLwKI+iI5BQebOnDQ08ALEAIu/oXGfsnZsezrlmtDQU3f5kRpJo=
-X-Google-Smtp-Source: AGHT+IFfea6LdpiGGC40sAYZGj4ALwsOvNL8Ai5AGYQdrZlHQTPYfzgBnPhpgl7aB0oT7edFpiG2/A==
-X-Received: by 2002:a05:6a20:a12a:b0:1ad:80ed:41 with SMTP id adf61e73a8af0-1afde238daemr12434379637.58.1715654050940;
-        Mon, 13 May 2024 19:34:10 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bf30c6fsm86475955ad.156.2024.05.13.19.34.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 19:34:10 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Petr Machata <petrm@nvidia.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] selftests/net/lib: no need to record ns name if it already exist
-Date: Tue, 14 May 2024 10:33:59 +0800
-Message-ID: <20240514023400.1293236-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.43.0
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1715654537; x=1747190537;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+88Lxof3ZLN1swkWfngGcIz7Js7Vef0fYSdDqIGxrLI=;
+  b=riuR2R3IF4HwxukEFBlSbOjn6/3cJWlcWBfEgh1DPXSprhf5hQmpXcqo
+   +OltYnl5U4WYOoZtLaigGYRJlDQmiAn0+r0uZ/+4LmcvJLoAAOV5h9Esk
+   VDtAZghNhonFNSkToGFNNNwPI7aI0V4KiAc1MtPW0oBfXMtyCgGG6p89l
+   o=;
+X-IronPort-AV: E=Sophos;i="6.08,159,1712620800"; 
+   d="scan'208";a="88937110"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 02:42:16 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:1843]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.62:2525] with esmtp (Farcaster)
+ id adf642e2-8738-4cd3-a982-71b99db410b9; Tue, 14 May 2024 02:42:15 +0000 (UTC)
+X-Farcaster-Flow-ID: adf642e2-8738-4cd3-a982-71b99db410b9
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 14 May 2024 02:42:15 +0000
+Received: from 88665a182662.ant.amazon.com (10.37.244.7) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 14 May 2024 02:42:11 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <horms@kernel.org>
+CC: <billy@starlabs.sg>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>, <mhal@rbox.co>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v3 net] af_unix: Update unix_sk(sk)->oob_skb under sk_receive_queue lock.
+Date: Tue, 14 May 2024 11:42:02 +0900
+Message-ID: <20240514024202.10366-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240513165747.GT2787@kernel.org>
+References: <20240513165747.GT2787@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,49 +75,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWA004.ant.amazon.com (10.13.139.56) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-There is no need to add the name to ns_list again if the netns already
-recoreded.
+From: Simon Horman <horms@kernel.org>
+Date: Mon, 13 May 2024 17:57:47 +0100
+> On Mon, May 13, 2024 at 10:06:28PM +0900, Kuniyuki Iwashima wrote:
+> 
+> ...
+> 
+> > @@ -2666,13 +2681,19 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
+> >  			} else if (flags & MSG_PEEK) {
+> >  				skb = NULL;
+> >  			} else {
+> > -				skb_unlink(skb, &sk->sk_receive_queue);
+> > +				__skb_unlink(skb, &sk->sk_receive_queue);
+> >  				WRITE_ONCE(u->oob_skb, NULL);
+> > -				if (!WARN_ON_ONCE(skb_unref(skb)))
+> > -					kfree_skb(skb);
+> > +				unlinked_skb = skb;
+> >  				skb = skb_peek(&sk->sk_receive_queue);
+> >  			}
+> >  		}
+> > +
+> > +		spin_unlock(&sk->sk_receive_queue.lock);
+> > +
+> > +		if (unlinked_skb) {
+> > +			WARN_ON_ONCE(skb_unref(skb));
+> > +			kfree_skb(skb);
+> 
+> Hi Iwashima-san,
+> 
+> Here skb is kfree'd.
 
-Fixes: 25ae948b4478 ("selftests/net: add lib.sh")
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- tools/testing/selftests/net/lib.sh | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Ah, I apparently made a typo...
 
-diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
-index f9fe182dfbd4..56a9454b7ba3 100644
---- a/tools/testing/selftests/net/lib.sh
-+++ b/tools/testing/selftests/net/lib.sh
-@@ -73,15 +73,17 @@ setup_ns()
- 	local ns=""
- 	local ns_name=""
- 	local ns_list=""
-+	local ns_exist=
- 	for ns_name in "$@"; do
- 		# Some test may setup/remove same netns multi times
- 		if unset ${ns_name} 2> /dev/null; then
- 			ns="${ns_name,,}-$(mktemp -u XXXXXX)"
- 			eval readonly ${ns_name}="$ns"
-+			ns_exist=false
- 		else
- 			eval ns='$'${ns_name}
- 			cleanup_ns "$ns"
--
-+			ns_exist=true
- 		fi
- 
- 		if ! ip netns add "$ns"; then
-@@ -90,7 +92,7 @@ setup_ns()
- 			return $ksft_skip
- 		fi
- 		ip -n "$ns" link set lo up
--		ns_list="$ns_list $ns"
-+		! $ns_exist && ns_list="$ns_list $ns"
- 	done
- 	NS_LIST="$NS_LIST $ns_list"
- }
--- 
-2.43.0
-
+Will fix in v4, thanks!
 
