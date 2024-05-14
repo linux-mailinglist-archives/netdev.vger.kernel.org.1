@@ -1,107 +1,106 @@
-Return-Path: <netdev+bounces-96266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 059598C4C1C
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 07:55:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31A5F8C4C38
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 08:18:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0B8B1F23579
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 05:55:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA3B2282196
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 06:18:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD11618E11;
-	Tue, 14 May 2024 05:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761BA1CA92;
+	Tue, 14 May 2024 06:18:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fnRBuXES"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="RvN8Kb2c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BC4182AE;
-	Tue, 14 May 2024 05:55:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D8791862A;
+	Tue, 14 May 2024 06:18:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715666144; cv=none; b=n1QG5rNh9AGWoR20aNI08GhxeYkKsOJbvegJHOV80iUxuVaKh/UZDa0C0m1oGE57Atx8mOm+eKmMpncpn02XykXXQ4GJo2eefJI72K7dVrv2C7SsYzucd+ACSsEORRYOOO94yq52DqFRGzyCJkzngjdnLCvpNIN8+Wu3HE6+PuY=
+	t=1715667520; cv=none; b=t4AHYFsypLdcnOL41gewIJlimwB6UsbCwqM2vzJjjN2z/s4aUPXzOTwXSiOkhKzqnveCZht5XUeI5hn9PX/7D1JMCm3R9By7xCWVRhhFer7hAoeEsqgLLGnMdhQz+V5BDX5HtxscwOYxThzRSmJ3EyLNtLBy8osTIDGx8xxQrD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715666144; c=relaxed/simple;
-	bh=7E4zl3qvXcx4BC+TUlRpaN+JchwtVW7K20SANmRkhvU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XhQU2SK0T4X/DEYQIRhGQ8Uw2yMvnQuGrNzJqLalnZSihkWxLLV7bhXbUU4DBj8SYR7ikaShbDRigv217LSVQSYq+4pJjGXu7olc8IJuH8qUqUNWpZZ5MxtjhrsV7rxPNiVVlv6yrou8dAqAoxR9PK9/Q3bDfwDAzkdNpR+vmQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fnRBuXES; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1ed835f3c3cso45429685ad.3;
-        Mon, 13 May 2024 22:55:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715666143; x=1716270943; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Valc74lvXAwD6+y7W85medmI0BL8q37OKUd2fSWd/YU=;
-        b=fnRBuXESOHxOuhqm3pVyL3bDENwb5A/mV4MBIVV+IHsJlbiw53FScgmDYxFR/kUubJ
-         Q8ltDR6H2yZfD10l1KnkrGS8FtpS0DErNCsuqH9/hMC9mzAlpHhkClPZZiSmugWn6bQx
-         yQm9gkMvPBni46L86ufj88g9vSO/XeFrQoT6RReN3vyVu90AibJ4g+xSuETtizrFdemk
-         uECJlL84f76GWXxOgnN7wS1T64T9jsz5f8s0MJZnxcIguKxy74P99HmiO1FkiAtIwJ6u
-         8k51XWYu0KxrGtvanzG0oZsnMesLqsAA4nCeYhH0TXiHykTYtdN9NK/juEQps5WQz5ER
-         Qk3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715666143; x=1716270943;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Valc74lvXAwD6+y7W85medmI0BL8q37OKUd2fSWd/YU=;
-        b=CY8WD9SZlxrHsokYOG21c9wWMd4CqBd4z42Cep08dOmF2K7DSgP0alB5yQKtWn2jD4
-         VZxIXA4z8F0a/qE/z7aqDTP1SYWmbpPuVNuIuS3HwLgdlMcTJM3PI5lwR2Tqgni422cm
-         B6bY2HbPG5cyrR0y8GWZ/rPmxk+o5JVw9E+33ui9XhWS0rvnanbeRnRNzC7fvq1U++3C
-         LgYnOjY3xriwtj/MHFVjIIN0N8n6oluI1XyleXWw9pWp6rMrtOpTskGuaXjz59xoW/R0
-         yhzFhVfyleJKOCLSoGHh53jPzPyPRAPCFR7dIJIPC8UQOjPiueHhzHtdPDYTW0x364Qu
-         OcPw==
-X-Forwarded-Encrypted: i=1; AJvYcCWl2pfSxfZC2+af3jakl+xnKyLi2HzpkUlVrAFdYPbC164Arsl7pmugQw8gw4twr/3jVRbgbBDpp5E9eI3bVFGaGzuwfm/6ooHrSk/hUja7A+rHazC+cz03CQ4C3Ro58Q==
-X-Gm-Message-State: AOJu0YwnvKkQCbHnVzhuX3xJipLi3Z76NnapvEDyo5ZFBg3vVvX8p/li
-	0CXca0W0/0kAeCz/Xy4T60FCT5TCNu/F+lbtWNkICxuGeMlmb8zKVWwmnA==
-X-Google-Smtp-Source: AGHT+IEvsJOgch+NsjTC4HgYob0dTbJ1kB6MJhSMWFi6JZDGO7axZbb1C1z9Uw3RNRGIVU/lYe8GMA==
-X-Received: by 2002:a17:903:22c9:b0:1dd:878d:9dca with SMTP id d9443c01a7336-1ef4404a347mr156742045ad.48.1715666142601;
-        Mon, 13 May 2024 22:55:42 -0700 (PDT)
-Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c0362d4sm88776495ad.210.2024.05.13.22.55.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 22:55:42 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Mon, 13 May 2024 19:55:40 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: hannes@cmpxchg.org, lizefan.x@bytedance.com, cgroups@vger.kernel.org,
-	yosryahmed@google.com, longman@redhat.com, netdev@vger.kernel.org,
-	linux-mm@kvack.org, shakeel.butt@linux.dev,
-	kernel-team@cloudflare.com,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH v1] cgroup/rstat: add cgroup_rstat_cpu_lock helpers and
- tracepoints
-Message-ID: <ZkL83GKD7sga8tFX@slm.duckdns.org>
-References: <171457225108.4159924.12821205549807669839.stgit@firesoul>
- <0ef04a5c-ced8-4e30-bcde-43c218e35387@kernel.org>
+	s=arc-20240116; t=1715667520; c=relaxed/simple;
+	bh=N1VRulDAS++FeTPHfhkVLv3G8zsvXTwRKOdXYJ5+O9I=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Ddt881BdVK/UKT6sTenTf4eiLfhFemeI5msA0b8GNfTdBU5jJRSki0/Tnd6HSGzte6B02aiJ7GMM9mLl7FJ9uVPFnw1r97FoBP2fDV+GCgB78EyjVgvF0XwFkTsek16t7jXj2Yc2aP4aGNveb8HlGRBQZzCUDROJdrWLq7lEvp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=RvN8Kb2c; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1715667513;
+	bh=TdCVAdsQiKHXL8qKY8rCV7UQ49gcVDI4OxkT8Nf/+88=;
+	h=Date:From:To:Cc:Subject:From;
+	b=RvN8Kb2cvGV3/CYKwn/TnbUNLwuf2HBc7uOZVOowWjeanyl3+OlnpoWZ+3bNp85SC
+	 aidfj0LkpBTkdMjjz+TMK/DxXztlZrl/2NhzJdBQu4BfT/BG7ycY2a2GHj5vkZgivf
+	 OJPJsPG7CdWrGUSQD0ic3LdJg/8YxjMHcG8iChkveE51VmSCP8piDRQFmdUIeT6QXG
+	 9Quu/A6B3TcNgLL5nhXcG4kdIrzt8dTdQdDLnMzTSu6ndH99Zk9P7v3VGwNOSihW36
+	 9vb17lOzfv6RedsmVo3IadaldzAMggnskiw7FMqik+Ff+LPiJFPtyq93wXlBC403hX
+	 viOODGl+iw+Pg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VdmQ024Sfz4wc1;
+	Tue, 14 May 2024 16:18:32 +1000 (AEST)
+Date: Tue, 14 May 2024 16:18:29 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>, David Miller
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patch in the vhost tree
+Message-ID: <20240514161829.3b51ac01@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0ef04a5c-ced8-4e30-bcde-43c218e35387@kernel.org>
+Content-Type: multipart/signed; boundary="Sig_/L+9gZudwmTpea5/cEP2apXG";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Tue, May 14, 2024 at 07:18:18AM +0200, Jesper Dangaard Brouer wrote:
-> Hi Tejun,
-> 
-> Could we please apply this for-6.10, to avoid splitting tracepoint changes
-> over multiple kernel versions?
+--Sig_/L+9gZudwmTpea5/cEP2apXG
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Yeah, I can. Waiman, would that be okay?
+Hi all,
 
-Thanks.
+The following commit is also in the net-next tree as different commit (but =
+the same patch):
 
--- 
-tejun
+  a2205e1e9603 ("virtio_net: remove the misleading comment")
+
+This is commit
+
+  9719f039d328 ("virtio_net: remove the misleading comment")
+
+in the net-next tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/L+9gZudwmTpea5/cEP2apXG
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmZDAjUACgkQAVBC80lX
+0GxJwQf/Qjy+gs0259ctKpY1XM0aVGH9cx8ivjSO/h8XPxvqhshrsgq4jSJd359J
+kcC02Sbyy2Rm9y09P5QclBZP5i11kcf5rqsIzPWZH2hxZvWL1nZiCize9K9Q0/rY
+yLgMMdsMCX5Bhuk4vSd1iHF0ps8S60DuCx8VOdmO0BhqC8cDRws8cKvIW09PGAEC
+GS8zlb1LzOGxSCAmh7iVBPZrUst5vPFTWCeK7RBEEDtOXBrSgUyQU8znwAaPxkCX
+F+OEWxWQP1QEjdRFthkoiUqL7f3WlTFx/RGNSn7WVhaeI59O8k0K/vnGpBG5+8Ar
+sWtqjnGOmm4dIVvPeg9SBqrMgoRTEg==
+=eiaN
+-----END PGP SIGNATURE-----
+
+--Sig_/L+9gZudwmTpea5/cEP2apXG--
 
