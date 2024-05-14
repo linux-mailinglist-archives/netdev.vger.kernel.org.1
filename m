@@ -1,79 +1,93 @@
-Return-Path: <netdev+bounces-96408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99D6D8C5A8B
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 19:49:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 844DA8C5ABE
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 20:00:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5213E1F2311D
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 17:49:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B900B2237C
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 18:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DAEC1802A2;
-	Tue, 14 May 2024 17:49:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06951802BA;
+	Tue, 14 May 2024 18:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iDtJzht1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="smzu9orB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191DE2AD1C
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 17:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FE71802B6;
+	Tue, 14 May 2024 18:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715708957; cv=none; b=DQ04d9PowrWwijH5y12+B4f3STlcGVMznV6DxLxYwqvylshN6mr628ufyHlvFFzByOkwruc9fXnxlevclB5oYSFSwTU88UAh6feXP9JGOZ72+SPqPF/7QEJPt7YdQPAcARE5FRcbiaPtckS9TLv7GpEoPIw+jOPk4uv8ZQxZgwM=
+	t=1715709636; cv=none; b=gus/o+mpkS0PJennkigNvT36tjexTHTFFUUW6l3XqgQSgCypAmGjYujmbdu6ERrsK/CfcNFAkz82l3jUtDkvXjOJLCLi5oxAnE2oAcJfLKW6xUil70NuHKk6ShUz5PByANeMb4WChrw5+2vDxvH8HWE3G+33ci0UDO8Ifn/4AFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715708957; c=relaxed/simple;
-	bh=Z4k2yMiTbZYDV/ETJRssrJDrw5rVkBItIYIpyQmM43E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NvjztbnEBNb0sQamkTBNS77veGNTPp2nNO61eFo+0mUrr7RUB7AWCkkWkWupzEH4fshMwHqxrZTSv3xYnxoxZp2TuTfEQTXSoepvSMqPJd4uQ79XPWSod64Y49kPN8MmRtxXi7u6Hagjvjg6wt+nvOWJejiedleBWt4a0AERVAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iDtJzht1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 346F8C2BD10;
-	Tue, 14 May 2024 17:49:16 +0000 (UTC)
+	s=arc-20240116; t=1715709636; c=relaxed/simple;
+	bh=gWj3fG5ZnY7U44F+K62ZaU89IC+Dfdcn3LBo82zut0g=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=VuASJEpe3bLfotp0kBhGRABi4m1qNSQ16/PVZM7HbHlOdQ1N2nj2L8uIOfXKJyHDy3Q2j+W2+dtYvLSL6Q6byp44fpfpmEbcGGppKkjc71hnecNaEH+ugf5rbGdfxZndXPsdRkD9sgI2EAiUIHJjHzisKM/mCwA9O5Lwn/qYY18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=smzu9orB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D63BC2BD11;
+	Tue, 14 May 2024 18:00:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715708956;
-	bh=Z4k2yMiTbZYDV/ETJRssrJDrw5rVkBItIYIpyQmM43E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iDtJzht1j52zw9RUhirUvT+Cpd3jGFQy7B76EvtWFOuXISgXrZzvU6//LKzx7/kMs
-	 xqw9j/x5zQ0XfyI08pSAIm/zbIkfveK/BUBYSQKNOt9hxUVZD596bKrwGDJeSddcVz
-	 EW6ogkQO3clI4e3l9A3W4IGCvJNDCo3j/vKDebksGOZyS1nxGMm6DnPXZR7SVmdUrj
-	 oAL+kOh0ZH5vKWeYwa0CRuTk8VSw7eVWccuzUbCJE2pClGDZFf83ghI37cG1EVgu59
-	 Mx8oFDZuvFETvwKVMnr+hhclxHyMfelBXBpcOPKGk6Xq56YOnA7eDDVV6SC/WN7tOj
-	 l2Ct5C/YPTuVg==
-Date: Tue, 14 May 2024 10:49:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, David Miller
- <davem@davemloft.net>, Realtek linux nic maintainers
- <nic_swsd@realtek.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Ken Milmore <ken.milmore@gmail.com>
-Subject: Re: [PATCH net 2/2] r8169: disable interrupts also for
- GRO-scheduled NAPI
-Message-ID: <20240514104915.500fc7ad@kernel.org>
-In-Reply-To: <20240514104739.2d06fb10@kernel.org>
-References: <6d4a0450-9be1-4d91-ba18-5e9bd750fa40@gmail.com>
-	<ef333a8c-1bb2-49a7-b721-68b28df19b0e@gmail.com>
-	<CANn89iLgj0ph5gRWOA2M2J8N_4hQd3Ndm73gATR8WODXaOM_LA@mail.gmail.com>
-	<e8f548f8-6d16-4a30-9408-80e4212afe9c@intel.com>
-	<CANn89i+yKgXGHUyJxVLYTAMKj7wpoV+8X7UR8cWh75yxVLSA6Q@mail.gmail.com>
-	<20240514071100.70fcca3e@kernel.org>
-	<78fb284b-f78a-4dde-8398-d4f175e49723@gmail.com>
-	<20240514094908.61593793@kernel.org>
-	<cdaf9e9a-881c-4324-a886-0ed38e2de72e@gmail.com>
-	<20240514104739.2d06fb10@kernel.org>
+	s=k20201202; t=1715709636;
+	bh=gWj3fG5ZnY7U44F+K62ZaU89IC+Dfdcn3LBo82zut0g=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=smzu9orBPiC+x/wxDv7HfvOKKHrKXhGSSC1L3XMfhMjtbWoYW5NHQw+duyrZCLMr0
+	 YrFSiCCwOUWC6h+C2RmJ34ZDf1akQG8MOyakkCY5pYctDDyY39Q6gMFdulk6YUAHSq
+	 1fXe0il15pWpbKmp1WTIG0GIpJ780HSjAznBLo+X/fpA8XxBZTbDgbl9uMpHbmpvZj
+	 6YiRupM3TsW/TYx61/iYeGJwgvk7G3mil1JPn4PnJ9ZVTcCZYRCgeHyUUsAYKRWt6r
+	 LGXahcjoijVb2HeVW0kJsqp0o1H03laeqnaiqIM2UX2T406SZHF7f4mevk/T4uF33T
+	 pt4DN314rZBdw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 495ABC1614E;
+	Tue, 14 May 2024 18:00:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] selftests: netfilter: fix packetdrill conntrack
+ testcase
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171570963629.9672.16728319012552942219.git-patchwork-notify@kernel.org>
+Date: Tue, 14 May 2024 18:00:36 +0000
+References: <20240514144415.11433-1-fw@strlen.de>
+In-Reply-To: <20240514144415.11433-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pablo@netfilter.org,
+ netfilter-devel@vger.kernel.org
 
-On Tue, 14 May 2024 10:47:39 -0700 Jakub Kicinski wrote:
-> enable NAPI 
+Hello:
 
-enable IRQ
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 14 May 2024 16:44:09 +0200 you wrote:
+> Some versions of conntrack(8) default to ipv4-only, so this needs to request
+> ipv6 explicitly, like all other spots already do.
+> 
+> Fixes: a8a388c2aae4 ("selftests: netfilter: add packetdrill based conntrack tests")
+> Reported-by: Jakub Kicinski <kuba@kernel.org>
+> Closes: https://lore.kernel.org/netdev/20240513114649.6d764307@kernel.org/
+> Signed-off-by: Florian Westphal <fw@strlen.de>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] selftests: netfilter: fix packetdrill conntrack testcase
+    https://git.kernel.org/netdev/net-next/c/dc9dfd8ae4b5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
