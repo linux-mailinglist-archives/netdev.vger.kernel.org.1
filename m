@@ -1,89 +1,92 @@
-Return-Path: <netdev+bounces-96213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A79E88C4A7D
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:33:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AF568C4A7F
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:40:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D41611C22DBF
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 00:33:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E10121F2203F
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 00:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B64F7EF;
-	Tue, 14 May 2024 00:33:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C281280C;
+	Tue, 14 May 2024 00:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TKX9uw4Y"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gGhpV4Yx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F21365;
-	Tue, 14 May 2024 00:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFB27EF;
+	Tue, 14 May 2024 00:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715646796; cv=none; b=mV5RlYsMu/gqHrQ4Ajp2iA9cyIYhhYJ+Icwnjz8AEdumbqt7NRtyY9rfnXRYjMGZKlbFO37OxEN/olHbo2mPKL7jLDvYSKrT6urVAw8AjHbIbxKr2EspSrbTedGomXbOFTMES7hTQC+F9BRtUUona9hxM1eZNzW7TJ0PhLAt8+A=
+	t=1715647231; cv=none; b=buZECNZbA1UwoHgglDB1RTzWr9gRJO0LWZ22hswb7flx7APTVhnsmVMHgV58FNnKSEeeTTy5buLFiDiIgQmzbBhZDi1bzxbhDUC+GSWvDL7Q+j9dBUbNPuBa2yqYe+MA0vwVcLHqndVoJyTC6IikNYmeGV2FUeMoHU8gtIhFNCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715646796; c=relaxed/simple;
-	bh=lx8yZjJS6r5vrZlyzYsfq4bdwT/KN7OYEyGeSe3S9PE=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=B1A5W9L9+6lQOkVDc1WngqbmwDKXCt/sPqKkiq+kh2V6auVQsMd85yrXcaMekDXqM/NG3DQwSRCJZLKGpOpogVrLlb/BKinsFEIjyoqj5G+0r5ILJL2/OgQ66kdfPdhfSQIR+cKE7Lb4Xtk1DjgQ+tv+2PS8GUm13+QxvjBP01U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKX9uw4Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B433C113CC;
-	Tue, 14 May 2024 00:33:15 +0000 (UTC)
+	s=arc-20240116; t=1715647231; c=relaxed/simple;
+	bh=GuggH1Zyj8T2UnJBxaBdCkD187tntfeAmpE8CK3VXoo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nQennCraVqidkomhnLlvU+who1gx2rbD+6oOgsQKX6oJiE4JtOV/+pDO10SNE2aj94wrwQQrFV0+oq5GuxRIuxIUojdnyeKVYDYPv+XLePP4wL5Kb6YAMFf6+4+7f+YIFb+7oUZN9mBCGihX91NLzAqUWbMvaCju1FS4WBrpEok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gGhpV4Yx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 05C4AC32782;
+	Tue, 14 May 2024 00:40:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715646795;
-	bh=lx8yZjJS6r5vrZlyzYsfq4bdwT/KN7OYEyGeSe3S9PE=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=TKX9uw4Y5lW8JGWhx5LP5UTypDsdGKUNTiP/EPqytsyYUpf5piSwxwc8JdAeKVCQB
-	 1/fCobKgYS3Pd/8+I6i0cLYNiiy5WPoM5Yv23fuWA0g+L8xedYGRTRCcQUJFR4TYR9
-	 gB5HIDEPSGFl6zvYOxkXqUI6GFhrRdXC48sYR+IupE6v44+uuvm1wcOvgbF0ZPimAk
-	 16uaZXtqrVf2qCBwcUEbzNKpTA6D1y7EssjDzVrDyOKLDBy3T1c0pkq0bWQL1TkXBw
-	 aN1teOX+eYkutA+T/1BP9Cm+9epqt8zRZNo414bwYQN4kdiCKu+p7Wc2QtESlb3qAe
-	 RW8+b1+Oy2Shw==
-Date: Mon, 13 May 2024 17:33:14 -0700 (PDT)
-From: Mat Martineau <martineau@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-cc: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, mptcp@lists.linux.dev, 
-    Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-    Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, Gregory Detal <gregory.detal@gmail.com>
-Subject: Re: [PATCH net-next 0/8] mptcp: small improvements, fix and
- clean-ups
-In-Reply-To: <20240513172941.290cc5cd@kernel.org>
-Message-ID: <8829dfe5-d05a-4103-34af-90f0434ef390@kernel.org>
-References: <20240510-upstream-net-next-20240509-misc-improvements-v1-0-4f25579e62ba@kernel.org> <20240513160630.545c3024@kernel.org> <f60cac35-5a2b-16cf-4706-b2e41acfacae@kernel.org> <20240513172941.290cc5cd@kernel.org>
+	s=k20201202; t=1715647231;
+	bh=GuggH1Zyj8T2UnJBxaBdCkD187tntfeAmpE8CK3VXoo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gGhpV4Yx8FbQ3eR2vHxmS2nC809Umd0oPBuCLxUMsqkUr9l+Q6nVGzczfrpLfVjAN
+	 79aXdvicR9igfjMdoH+K3B8JqTy/RwIe5aqFihS5EkZq3aaHcKOjG3KOVTeW8Dcu01
+	 xrIKCORojuRQ5VE+kuYEl2GaH+phIXCTnf+UZtSJepj4wwUg6NEHgE915Z1si/R8fW
+	 4eod9d1Ao/0qtje0nrF/bhWTY9S3KPTwbDacxb5lcEzn4obi90GhwGpVUkXFiksxwr
+	 Up4hCVWWfReA3WMZEg3kYUTLtLShXrdKv+SqEQF26dOhmBl7/Zx/1bIeFGiTqB6Evc
+	 V9bIWJ2GU7qBQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E0096C433E9;
+	Tue, 14 May 2024 00:40:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] net: qede: flower: validate control flags
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171564723091.24946.3728093094904006906.git-patchwork-notify@kernel.org>
+Date: Tue, 14 May 2024 00:40:30 +0000
+References: <20240511073705.230507-1-ast@fiberby.net>
+In-Reply-To: <20240511073705.230507-1-ast@fiberby.net>
+To: =?utf-8?b?QXNiasO4cm4gU2xvdGggVMO4bm5lc2VuIDxhc3RAZmliZXJieS5uZXQ+?=@codeaurora.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, manishc@marvell.com
 
-On Mon, 13 May 2024, Jakub Kicinski wrote:
+Hello:
 
-> On Mon, 13 May 2024 17:24:08 -0700 (PDT) Mat Martineau wrote:
->> The conflict here is purely in the diff context, patch 2 of this series
->> and "tcp: socket option to check for MPTCP fallback to TCP" add cases to
->> the same switch statement and have a couple of unmodified lines between
->> their additions.
->>
->> "git am -3" handles it cleanly in this case, if you have time and
->> inclination for a second attempt. But I realize you're working through a
->> backlog and net-next is now closed, so that time might not be available.
->> We'll try again when net-next reopens if needed.
->
-> Your -3 must be more powerful somehow, or my scripts are broken because
-> it isn't enough on my end.
->
-> If you can do a quick resend there's still a chance. The patches look
-> quite simple.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 11 May 2024 07:37:03 +0000 you wrote:
+> This driver currently doesn't support any control flags.
+> 
+> Use flow_rule_match_has_control_flags() to check for control flags,
+> such as can be set through `tc flower ... ip_flags frag`.
+> 
+> In case any control flags are masked, flow_rule_match_has_control_flags()
+> sets a NL extended error message, and we return -EOPNOTSUPP.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2] net: qede: flower: validate control flags
+    https://git.kernel.org/netdev/net-next/c/486ffc33c2dd
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Thanks Jakub! Spinning a quick v2 right now.
-
-
-- Mat
 
