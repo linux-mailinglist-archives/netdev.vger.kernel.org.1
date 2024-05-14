@@ -1,228 +1,233 @@
-Return-Path: <netdev+bounces-96248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4012C8C4B8C
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 05:41:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E39818C4B94
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 06:08:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DE481C20AD6
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 03:41:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2DAC1C21417
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 04:08:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34726BA45;
-	Tue, 14 May 2024 03:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81AF1DDBB;
+	Tue, 14 May 2024 04:08:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HMVoaVoE"
+	dkim=pass (1024-bit key) header.d=menlosecurity.com header.i=@menlosecurity.com header.b="jHu1216T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f227.google.com (mail-qk1-f227.google.com [209.85.222.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5FEAD53
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 03:41:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA26CBE47
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 04:08:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715658078; cv=none; b=czfJy8pEqvn5SHOxL8q/UQQgRC5Z5sa1+BjV199CsMsqM1yQCPYSRBnZZvqcvN5+4VIo+gIh3m4na/R/WVVhvsE8tjLU3FzEyMErn6KC8z8BzuPSFxoT/K+pVKuuD8CLbm5k0178SByi+96LwzMRa+iNoxcSpJS5bRPYG1nCnVo=
+	t=1715659707; cv=none; b=RCdfJUODVkt7KDvxG6iSj7Hu5jHbK135p4QW7MNiR5RV10EK0wNihdalHVrNSCvZGX3tDFYzFDy94Cz8G4SnZ3xAjsD4n48qbodA31H/hDYJiZTstqbDJAHqoiDmSPwcMyRoLfgp1L/XKqNhLR3GRd+19CRQJq6f+CopehE172I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715658078; c=relaxed/simple;
-	bh=FGRwMTq/Mo0xUUMXD7Y5KEeyZwN0z6WnuUGUhZKjFQw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hxtsIAhCdN7qrQFUR8/bYhjRVRetk/y+eMVVxgW2saCJbWkdYJ6LfA0OBk4ODB0fJD51oRSYwnirVHghGo62L93igBMXFV9Y/R2ubsGpIQ8n+DrOEC+krAFaE4QS/P0ezVjfyhxdvN1+HrGSuuKeGxqFHlChE1hzWefVpD75lck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HMVoaVoE; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715658075; x=1747194075;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=FGRwMTq/Mo0xUUMXD7Y5KEeyZwN0z6WnuUGUhZKjFQw=;
-  b=HMVoaVoE+7UaeSGnXu9XV9BGuPXDk17yEX3Tamyod5th8oK5m0jxRN37
-   UNizZXNjHFSvVc1Bg0zgRlE+PCYnXyDlKD2cFf+P+KXkMvt6WG2O6AsSm
-   f6S2PWetMCn99ELCoFb4avSAhahjMj5rGFy9Vs3KzQ7/hVGlqqLGBNm08
-   zXUwa3DPSrGnxHicd4eqZ2cUPgxdFf+zc0M69f2JSW0bGsr6B3iXup0h4
-   Id0Av5iXDViyGthBTNocMzw0Hk0YKWSGnwYki1gUWmcqtIZjhMwGCexxJ
-   Oii5mKTv2LZ1wxVWYsF2cOVpb0pCMCVB0w+wsWxLUJUSrmg3qzimHKFG8
-   g==;
-X-CSE-ConnectionGUID: B2sTYwt5SAeFsPMVB2u0og==
-X-CSE-MsgGUID: 6m1tc08GTgu2HbN4w9pOgQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11072"; a="29110806"
-X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="29110806"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 20:41:15 -0700
-X-CSE-ConnectionGUID: DG29+5awSzmcBlIREUO0LQ==
-X-CSE-MsgGUID: IXzWdtmPQ+yqLozkpfPcoA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="53747983"
-Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 13 May 2024 20:41:12 -0700
-Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s6j2M-000B1L-0h;
-	Tue, 14 May 2024 03:41:10 +0000
-Date: Tue, 14 May 2024 11:40:32 +0800
-From: kernel test robot <lkp@intel.com>
-To: zijianzhang@bytedance.com, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, edumazet@google.com,
-	willemdebruijn.kernel@gmail.com, cong.wang@bytedance.com,
-	xiaochun.lu@bytedance.com, Zijian Zhang <zijianzhang@bytedance.com>
-Subject: Re: [PATCH net-next v4 2/3] sock: add MSG_ZEROCOPY notification
- mechanism based on msg_control
-Message-ID: <202405141135.xZDS5YLg-lkp@intel.com>
-References: <20240513211755.2751955-3-zijianzhang@bytedance.com>
+	s=arc-20240116; t=1715659707; c=relaxed/simple;
+	bh=Gkssj7fVV8DWBaS/VSJJY1GpSWJnjm1oZcE2ZAsuAeM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ZqHFMdbNf8HvsgfJHBVF3kK6xVlkaEVKou819t3dQXp+h15pkbmUTnF+AQR0J1S0PHSdTsix0wD2Ux0wh7psJi/OJyUbaqQJ3T1/aVFEZgI/6TBockcQsMIjCGB0aHChbe3yV1oSvv2OyAcgSeMlGfT7lUNKwOVEcPw7A0LJyfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=menlosecurity.com; spf=pass smtp.mailfrom=menlosecurity.com; dkim=pass (1024-bit key) header.d=menlosecurity.com header.i=@menlosecurity.com header.b=jHu1216T; arc=none smtp.client-ip=209.85.222.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=menlosecurity.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=menlosecurity.com
+Received: by mail-qk1-f227.google.com with SMTP id af79cd13be357-78f043eaee9so346658485a.3
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 21:08:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715659704; x=1716264504;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=00pZGSfZvxtd2x6OPcAwxm2rcxM/6aU6eD+HxhDSMGY=;
+        b=IgUiMqJ5yyouzN2zRGQBb7Y6tUWG33P7aOPBmdmUpXmtKn0d8Sp7+M3Yt2qVZ36rBn
+         IvPpTpInzjoNWYTPxlF3l52Fog+/wHFDqVHFISj3jm5lt9oD8clIz5HygEyo0+OE/37t
+         ZA7OqMFUNBx/q2E01O3ceG/X/xLurfXKV1iMzjmnEw95Ytki5JE6O4X9TB+ZRg7+K6qE
+         f5tTr5ja9Z5BrtFJ4X3Ejyhyf8p85mMcD9Ttu/Giq/yO1W9ZbkPect0UMvkTEFz5j/3O
+         PM/J99+EDXkow1c2NBiy2xmjezEVfPpDcuEMoSYNz9VGI/CnchKba+1rXnbcROGZdOhk
+         pCUA==
+X-Gm-Message-State: AOJu0Yw8lzqYea50aG53sAflxasZP0OhalISykX9/TIdXiVXHlLEIjDv
+	KUAFrcMi5ZZXpkxIAfZyw4+AUNFEzCyPPkPE+YPkmi0IQUIq7iLn5z+WAe6o2BkPlsomXc9yPIw
+	4hpMvgOKv8nzUiqhnJn3O/hFE44ZBjSv9cGfgVtMBObI=
+X-Google-Smtp-Source: AGHT+IGDGTUv/CwCIwyFdHFpf3XEc3eax/vNbTWKymAorydOk6ICDJzuSlEDb4htx01TWTCj90r5lZttGy9O
+X-Received: by 2002:a05:6214:5885:b0:6a0:7d91:8752 with SMTP id 6a1803df08f44-6a16825d75bmr141021856d6.58.1715659704539;
+        Mon, 13 May 2024 21:08:24 -0700 (PDT)
+Received: from restore.menlosecurity.com ([13.56.32.63])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-6a15f1ab5c8sm6634786d6.7.2024.05.13.21.08.23
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 13 May 2024 21:08:24 -0700 (PDT)
+X-Relaying-Domain: menlosecurity.com
+Received: from safemail-prod-029060369cr-re.menlosecurity.com (13.56.32.52)
+    by restore.menlosecurity.com (13.56.32.63)
+    with SMTP id 9acafe60-11a7-11ef-b5a9-a1c600cc9c19;
+    Tue, 14 May 2024 04:08:24 GMT
+Received: from mail-oo1-f70.google.com (209.85.161.70)
+    by safemail-prod-029060369cr-re.menlosecurity.com (13.56.32.52)
+    with SMTP id 9acafe60-11a7-11ef-b5a9-a1c600cc9c19;
+    Tue, 14 May 2024 04:08:23 GMT
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-5aa253241ecso8659883eaf.3
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 21:08:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=menlosecurity.com; s=google; t=1715659701; x=1716264501; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=00pZGSfZvxtd2x6OPcAwxm2rcxM/6aU6eD+HxhDSMGY=;
+        b=jHu1216TH/E/sDlI3G507ghuLEuR9105IfLiPHJkPuXQsWuiWttHmcbiyBAi+Z7as0
+         i+Ey5SjdvrQBeTLJ2dkeUwWJyLhBJNYsqS7KGaoxaQi1IgoeQBXnP+bLZEmdCTcxpLcu
+         tgF2HUjSlmX3K63MBCI6btWUXIqTDGeq5tbVI=
+X-Received: by 2002:a05:6358:2826:b0:18d:f1bc:904a with SMTP id e5c5f4694b2df-193bb518116mr1282544655d.9.1715659701195;
+        Mon, 13 May 2024 21:08:21 -0700 (PDT)
+X-Received: by 2002:a05:6358:2826:b0:18d:f1bc:904a with SMTP id e5c5f4694b2df-193bb518116mr1282543255d.9.1715659700653;
+        Mon, 13 May 2024 21:08:20 -0700 (PDT)
+Received: from localhost.localdomain ([108.63.133.160])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-634119041b2sm7353904a12.94.2024.05.13.21.08.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 May 2024 21:08:20 -0700 (PDT)
+From: Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>
+To: netdev@vger.kernel.org
+Cc: dsahern@gmail.com,
+	adrian.oliver@menlosecurity.com,
+	Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>
+Subject: [PATCH] net/ipv6: Fix kernel soft lockup in fib6_select_path under high  next hop churn
+Date: Mon, 13 May 2024 21:07:57 -0700
+Message-Id: <20240514040757.1957761-1-omid.ehtemamhaghighi@menlosecurity.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240513211755.2751955-3-zijianzhang@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Kernel soft lockups have been observed in clusters of Linux-based edge
+routers located in a highly dynamic environment. These routers
+consistently update BGP-advertised routes due to frequently changing 
+next hop destinations, while managing significant IPv6 traffic. The
+lockups occur during the traversal of the multipath circular linked-list
+in the fib6_select_path function, particularly while iterating through
+siblings in the list. The issue arises when nodes in the linked list are
+unexpectedly deleted concurrently on another CPU core—indicated by their
+'next' and 'previous' elements pointing back to the node itself and
+their reference count dropping to zero. This causes an infinite loop,
+leading to a kernel soft lockup that triggers a kernel panic via the
+watchdog timer (log attached below).
 
-kernel test robot noticed the following build warnings:
+To reproduce the issue, we set up a test environment designed to simulate
+the conditions that lead to soft lockups. This was achieved by periodically
+modifying the routing table and generating a heavy load of outgoing IPv6
+traffic through four iperf3 clients. This setup consistently triggered
+soft lockups in less than a minute.
 
-[auto build test WARNING on net-next/main]
+As a solution, I applied RCU locks in places that are identified as
+culprits, which has successfully resolved the issue within our testing
+parameters.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/zijianzhang-bytedance-com/selftests-fix-OOM-problem-in-msg_zerocopy-selftest/20240514-051839
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240513211755.2751955-3-zijianzhang%40bytedance.com
-patch subject: [PATCH net-next v4 2/3] sock: add MSG_ZEROCOPY notification mechanism based on msg_control
-config: openrisc-defconfig (https://download.01.org/0day-ci/archive/20240514/202405141135.xZDS5YLg-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240514/202405141135.xZDS5YLg-lkp@intel.com/reproduce)
+Kernel log:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405141135.xZDS5YLg-lkp@intel.com/
+ 0 [ffffbd13003e8d30] machine_kexec at ffffffff8ceaf3eb
+ 1 [ffffbd13003e8d90] __crash_kexec at ffffffff8d0120e3
+ 2 [ffffbd13003e8e58] panic at ffffffff8cef65d4
+ 3 [ffffbd13003e8ed8] watchdog_timer_fn at ffffffff8d05cb03
+ 4 [ffffbd13003e8f08] __hrtimer_run_queues at ffffffff8cfec62f
+ 5 [ffffbd13003e8f70] hrtimer_interrupt at ffffffff8cfed756
+ 6 [ffffbd13003e8fd0] __sysvec_apic_timer_interrupt at ffffffff8cea01af
+ 7 [ffffbd13003e8ff0] sysvec_apic_timer_interrupt at ffffffff8df1b83d
+-- <IRQ stack> --
+ 8 [ffffbd13003d3708] asm_sysvec_apic_timer_interrupt at ffffffff8e000ecb
+    [exception RIP: fib6_select_path+299]
+    RIP: ffffffff8ddafe7b  RSP: ffffbd13003d37b8  RFLAGS: 00000287
+    RAX: ffff975850b43600  RBX: ffff975850b40200  RCX: 0000000000000000
+    RDX: 000000003fffffff  RSI: 0000000051d383e4  RDI: ffff975850b43618
+    RBP: ffffbd13003d3800   R8: 0000000000000000   R9: ffff975850b40200
+    R10: 0000000000000000  R11: 0000000000000000  R12: ffffbd13003d3830
+    R13: ffff975850b436a8  R14: ffff975850b43600  R15: 0000000000000007
+    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+ 9 [ffffbd13003d3808] ip6_pol_route at ffffffff8ddb030c
+10 [ffffbd13003d3888] ip6_pol_route_input at ffffffff8ddb068c
+11 [ffffbd13003d3898] fib6_rule_lookup at ffffffff8ddf02b5
+12 [ffffbd13003d3928] ip6_route_input at ffffffff8ddb0f47
+13 [ffffbd13003d3a18] ip6_rcv_finish_core.constprop.0 at ffffffff8dd950d0
+14 [ffffbd13003d3a30] ip6_list_rcv_finish.constprop.0 at ffffffff8dd96274
+15 [ffffbd13003d3a98] ip6_sublist_rcv at ffffffff8dd96474
+16 [ffffbd13003d3af8] ipv6_list_rcv at ffffffff8dd96615
+17 [ffffbd13003d3b60] __netif_receive_skb_list_core at ffffffff8dc16fec
+18 [ffffbd13003d3be0] netif_receive_skb_list_internal at ffffffff8dc176b3
+19 [ffffbd13003d3c50] napi_gro_receive at ffffffff8dc565b9
+20 [ffffbd13003d3c80] ice_receive_skb at ffffffffc087e4f5 [ice]
+21 [ffffbd13003d3c90] ice_clean_rx_irq at ffffffffc0881b80 [ice]
+22 [ffffbd13003d3d20] ice_napi_poll at ffffffffc088232f [ice]
+23 [ffffbd13003d3d80] __napi_poll at ffffffff8dc18000
+24 [ffffbd13003d3db8] net_rx_action at ffffffff8dc18581
+25 [ffffbd13003d3e40] __do_softirq at ffffffff8df352e9
+26 [ffffbd13003d3eb0] run_ksoftirqd at ffffffff8ceffe47
+27 [ffffbd13003d3ec0] smpboot_thread_fn at ffffffff8cf36a30
+28 [ffffbd13003d3ee8] kthread at ffffffff8cf2b39f
+29 [ffffbd13003d3f28] ret_from_fork at ffffffff8ce5fa64
+30 [ffffbd13003d3f50] ret_from_fork_asm at ffffffff8ce03cbb
 
-All warnings (new ones prefixed by >>):
+Signed-off-by: Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>
+---
+ net/ipv6/ip6_fib.c | 6 +++---
+ net/ipv6/route.c   | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-   net/core/sock.c: In function '__sock_cmsg_send':
->> net/core/sock.c:2850:39: warning: unused variable 'tmp' [-Wunused-variable]
-    2850 |                 struct sk_buff *skb, *tmp;
-         |                                       ^~~
-
-
-vim +/tmp +2850 net/core/sock.c
-
-  2807	
-  2808	int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
-  2809			     struct sockcm_cookie *sockc)
-  2810	{
-  2811		u32 tsflags;
-  2812	
-  2813		switch (cmsg->cmsg_type) {
-  2814		case SO_MARK:
-  2815			if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
-  2816			    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
-  2817				return -EPERM;
-  2818			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
-  2819				return -EINVAL;
-  2820			sockc->mark = *(u32 *)CMSG_DATA(cmsg);
-  2821			break;
-  2822		case SO_TIMESTAMPING_OLD:
-  2823		case SO_TIMESTAMPING_NEW:
-  2824			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
-  2825				return -EINVAL;
-  2826	
-  2827			tsflags = *(u32 *)CMSG_DATA(cmsg);
-  2828			if (tsflags & ~SOF_TIMESTAMPING_TX_RECORD_MASK)
-  2829				return -EINVAL;
-  2830	
-  2831			sockc->tsflags &= ~SOF_TIMESTAMPING_TX_RECORD_MASK;
-  2832			sockc->tsflags |= tsflags;
-  2833			break;
-  2834		case SCM_TXTIME:
-  2835			if (!sock_flag(sk, SOCK_TXTIME))
-  2836				return -EINVAL;
-  2837			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u64)))
-  2838				return -EINVAL;
-  2839			sockc->transmit_time = get_unaligned((u64 *)CMSG_DATA(cmsg));
-  2840			break;
-  2841		/* SCM_RIGHTS and SCM_CREDENTIALS are semantically in SOL_UNIX. */
-  2842		case SCM_RIGHTS:
-  2843		case SCM_CREDENTIALS:
-  2844			break;
-  2845		case SCM_ZC_NOTIFICATION: {
-  2846			struct zc_info_elem zc_info_kern[SOCK_ZC_INFO_MAX];
-  2847			int cmsg_data_len, zc_info_elem_num;
-  2848			struct sk_buff_head *q, local_q;
-  2849			struct sock_exterr_skb *serr;
-> 2850			struct sk_buff *skb, *tmp;
-  2851			void __user	*usr_addr;
-  2852			unsigned long flags;
-  2853			int ret, i = 0;
-  2854	
-  2855			if (!sock_flag(sk, SOCK_ZEROCOPY) || sk->sk_family == PF_RDS)
-  2856				return -EINVAL;
-  2857	
-  2858			cmsg_data_len = cmsg->cmsg_len - sizeof(struct cmsghdr);
-  2859			if (cmsg_data_len % sizeof(struct zc_info_elem))
-  2860				return -EINVAL;
-  2861	
-  2862			zc_info_elem_num = cmsg_data_len / sizeof(struct zc_info_elem);
-  2863			if (!zc_info_elem_num || zc_info_elem_num > SOCK_ZC_INFO_MAX)
-  2864				return -EINVAL;
-  2865	
-  2866			if (in_compat_syscall())
-  2867				usr_addr = compat_ptr(*(compat_uptr_t *)CMSG_DATA(cmsg));
-  2868			else
-  2869				usr_addr = (void __user *)*(void **)CMSG_DATA(cmsg);
-  2870			if (!access_ok(usr_addr, cmsg_data_len))
-  2871				return -EFAULT;
-  2872	
-  2873			q = &sk->sk_error_queue;
-  2874			skb_queue_head_init(&local_q);
-  2875			spin_lock_irqsave(&q->lock, flags);
-  2876			skb = skb_peek(q);
-  2877			while (skb && i < zc_info_elem_num) {
-  2878				struct sk_buff *skb_next = skb_peek_next(skb, q);
-  2879	
-  2880				serr = SKB_EXT_ERR(skb);
-  2881				if (serr->ee.ee_errno == 0 &&
-  2882				    serr->ee.ee_origin == SO_EE_ORIGIN_ZEROCOPY) {
-  2883					zc_info_kern[i].hi = serr->ee.ee_data;
-  2884					zc_info_kern[i].lo = serr->ee.ee_info;
-  2885					zc_info_kern[i].zerocopy = !(serr->ee.ee_code
-  2886									& SO_EE_CODE_ZEROCOPY_COPIED);
-  2887					__skb_unlink(skb, q);
-  2888					__skb_queue_tail(&local_q, skb);
-  2889					i++;
-  2890				}
-  2891				skb = skb_next;
-  2892			}
-  2893			spin_unlock_irqrestore(&q->lock, flags);
-  2894	
-  2895			ret = copy_to_user(usr_addr,
-  2896					   zc_info_kern,
-  2897						i * sizeof(struct zc_info_elem));
-  2898	
-  2899			if (unlikely(ret)) {
-  2900				spin_lock_irqsave(&q->lock, flags);
-  2901				skb_queue_splice_init(&local_q, q);
-  2902				spin_unlock_irqrestore(&q->lock, flags);
-  2903				return -EFAULT;
-  2904			}
-  2905	
-  2906			while ((skb = __skb_dequeue(&local_q)))
-  2907				consume_skb(skb);
-  2908			break;
-  2909		}
-  2910		default:
-  2911			return -EINVAL;
-  2912		}
-  2913		return 0;
-  2914	}
-  2915	EXPORT_SYMBOL(__sock_cmsg_send);
-  2916	
-
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index c1f62352a481..b4f3627dd045 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -1037,7 +1037,7 @@ static void fib6_purge_rt(struct fib6_info *rt, struct fib6_node *fn,
+ 	fib6_drop_pcpu_from(rt, table);
+ 
+ 	if (rt->nh && !list_empty(&rt->nh_list))
+-		list_del_init(&rt->nh_list);
++		list_del_rcu(&rt->nh_list);
+ 
+ 	if (refcount_read(&rt->fib6_ref) != 1) {
+ 		/* This route is used as dummy address holder in some split
+@@ -1247,7 +1247,7 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
+ 							 fib6_siblings)
+ 					sibling->fib6_nsiblings--;
+ 				rt->fib6_nsiblings = 0;
+-				list_del_init(&rt->fib6_siblings);
++				list_del_rcu(&rt->fib6_siblings);
+ 				rt6_multipath_rebalance(next_sibling);
+ 				return err;
+ 			}
+@@ -1965,7 +1965,7 @@ static void fib6_del_route(struct fib6_table *table, struct fib6_node *fn,
+ 					 &rt->fib6_siblings, fib6_siblings)
+ 			sibling->fib6_nsiblings--;
+ 		rt->fib6_nsiblings = 0;
+-		list_del_init(&rt->fib6_siblings);
++		list_del_rcu(&rt->fib6_siblings);
+ 		rt6_multipath_rebalance(next_sibling);
+ 	}
+ 
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 1f4b935a0e57..485a14098958 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -414,7 +414,7 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
+ 		      struct flowi6 *fl6, int oif, bool have_oif_match,
+ 		      const struct sk_buff *skb, int strict)
+ {
+-	struct fib6_info *sibling, *next_sibling;
++	struct fib6_info *sibling;
+ 	struct fib6_info *match = res->f6i;
+ 
+ 	if (!match->nh && (!match->fib6_nsiblings || have_oif_match))
+@@ -441,8 +441,8 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
+ 	if (fl6->mp_hash <= atomic_read(&match->fib6_nh->fib_nh_upper_bound))
+ 		goto out;
+ 
+-	list_for_each_entry_safe(sibling, next_sibling, &match->fib6_siblings,
+-				 fib6_siblings) {
++	list_for_each_entry_rcu(sibling, &match->fib6_siblings,
++				fib6_siblings) {
+ 		const struct fib6_nh *nh = sibling->fib6_nh;
+ 		int nh_upper_bound;
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
+
 
