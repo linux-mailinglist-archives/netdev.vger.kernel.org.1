@@ -1,174 +1,228 @@
-Return-Path: <netdev+bounces-96373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDD5B8C57CD
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 16:21:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFF738C57E5
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 16:27:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15E59B21142
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:21:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1DFD28196F
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26294144D2C;
-	Tue, 14 May 2024 14:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39551144D0D;
+	Tue, 14 May 2024 14:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z7jRAG4I"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NptKQzql"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8863F144D0F
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 14:21:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E71144D0B
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 14:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715696477; cv=none; b=pPXbxgWisSTBE+ux4+lDlC2hGdKe854oo6YJCutQPayfKrTxt2LUx143OdGarTwZArz+Z7XSXIivbRq0GVboocQYv+Kcir6gtPdMS2nAUMvHUKT2zSq+a9edNmq263z2bcbZUzGAzw1SQ2JOLiImVUj/UAivsKE5dOEXkRf7/Hg=
+	t=1715696845; cv=none; b=EqsmrecUUu8dgSSnwc245YhhjRbjSbPobOYfCIYZ1nDNELI8uXSbD3dQwWZalVzdxiOOjjOM67CI/I3OI9TLDS5FC7u4VtypOL4vMQ7X3GpdtnvX7DY7MolIGSCReVApjK6RObzfjlEo2g+GG2Rw/bp0kWJz9njf7zsCMlcvWVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715696477; c=relaxed/simple;
-	bh=mb9prdjWdxs8QhqBtDx5hq9jsiLUMbnbxsK7OW+06fQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TD9Tne8XM56mwwcxQw1FeEypyw+vGEi9RkLMKRkgurI+3FAVFV9NgJ1XxXqHT/DMw24fyzP50FMWmSEdl0jjTKTTDJ92YSXBJFrDBkMGBNPzKL+wM0mbEf8y4+GoV7875TjvoOOexROxYWXbndkmMrKAXRFUfOgE6v2oVCh3m7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z7jRAG4I; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715696474;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P7ZgVaL8/eOSNblYzy1jG+2SJhG8I5uOlBOL0tTqS5w=;
-	b=Z7jRAG4IziDpgON04Ns9/UdDCH8/UQq9qGhC48FRwTTuxbagGu7eN4k4YuKEih4fBQ43g0
-	PwMkkWix7Zyu1nJVpWRVULYTRG8oxj5k31avHrp+NTK4L9Tc7gv8gn+ZFJUvj2nX/ihYh1
-	Jx/i7Vc0M/8jo9SnAlWo+RWRVQRVSzk=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-126-oPRD6FRIMF2cLumv6d_tyA-1; Tue, 14 May 2024 10:21:12 -0400
-X-MC-Unique: oPRD6FRIMF2cLumv6d_tyA-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6a0ce87adf5so54287736d6.3
-        for <netdev@vger.kernel.org>; Tue, 14 May 2024 07:21:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715696472; x=1716301272;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1715696845; c=relaxed/simple;
+	bh=tvjYoDii/CT/NWLq1pFNfvbNan0Tvk+tQ1tKxI1i4l4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a82DaKNeo3wU8C5Z7USvproMsZ3fQKxm+AXhupXHCEDtSg+62bg1D9HmOJ6yMmvQNkdJF57NgUS5ZKqcMCxRxb9vVTC591IXWHH+UVBv+7tSx8EwDOGXd1GWkZOd/HnuxmQtsu/r18IH/en29AcNkDXmwkOBt2z0DBSRdwiI15k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NptKQzql; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso11301a12.1
+        for <netdev@vger.kernel.org>; Tue, 14 May 2024 07:27:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715696842; x=1716301642; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=P7ZgVaL8/eOSNblYzy1jG+2SJhG8I5uOlBOL0tTqS5w=;
-        b=QbmjjGcFQ8J6RSIxbmTwJhYpxMKPHM4OFVzgBEt+4RATaeFKbaRzODVXWBTU4xfJlj
-         p6r62qKnV557Y/Wh4WrX8D4gyX7xUxTuWsmI++6R9MZCJgQiAL+UiEnwe9GVaHguPS73
-         vD0frcQqXRNoNx0M1ocHBnckDc1/blPgDdo94bilgbC7FV4z1mS8eLD6/Zufku0RN1Jg
-         XAKtkskIGXvZ+mk92CgRGvn+T717x41So5SZaZ1jEJpBtatl75AtWM0qQB9K+TA/wNXe
-         +a8zt15QL4SmLdVJNU49hcijpLpDvRiZnBIs0ddcWtjgeh7JNndl8RS756LpdqT47mQH
-         Z3Fw==
-X-Forwarded-Encrypted: i=1; AJvYcCVmKSF2S4q+kibhynqI43zdDbzGZ8HEQZlroTbOhNYDjllF/v1pRq7j92ND0nhNo04LietY468Dz/LdNjG5t65/TEWAA4iF
-X-Gm-Message-State: AOJu0YwBG48HjECrigvbyi1w/yg9QJ0q1ma0AZ/UUtP9VPDtU+PpxwEP
-	l9JiXsxAqCdY+KgsWqxKfbxYGpqDHY6Q1jrSH4c76GGUcAMkbphjSsdzOSoxfEJgfI16aPf7Mcb
-	lh/tO2dbJBrNTn9+aiWaIKq8FUQ3x93xAtNkUzwUOTQx7R7ZP+ActYw==
-X-Received: by 2002:a05:6214:5884:b0:6a0:c950:451f with SMTP id 6a1803df08f44-6a16824d066mr181211666d6.56.1715696471337;
-        Tue, 14 May 2024 07:21:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFbsVCbj1Cb0QAJjQcQTQzpXOgJEE+UQ7YtcrHN0c+VfPfJITNLkLvCT5i63ZS9WnW1NIp63w==
-X-Received: by 2002:a05:6214:5884:b0:6a0:c950:451f with SMTP id 6a1803df08f44-6a16824d066mr181211246d6.56.1715696470833;
-        Tue, 14 May 2024 07:21:10 -0700 (PDT)
-Received: from x1gen2nano ([2600:1700:1ff0:d0e0::33])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f1cccf3sm53820546d6.86.2024.05.14.07.21.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 May 2024 07:21:10 -0700 (PDT)
-Date: Tue, 14 May 2024 09:21:08 -0500
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Vinod Koul <vkoul@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, kernel@quicinc.com, linux-arm-msm@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 0/2] Mark Ethernet devices on sa8775p as DMA-coherent
-Message-ID: <5z22b7vrugyxqj7h25qevyd5aj5tsofqqyxqn7mfy4dl4wk7zw@fipvp44y4kbb>
-References: <20240507-mark_ethernet_devices_dma_coherent-v3-0-dbe70d0fa971@quicinc.com>
+        bh=lLJRRPkOIqx81oYQZLAGpU8I7pBO8rz+kK0CzoxcsAE=;
+        b=NptKQzqlnYwfORkr3r+RvPFhgOolfXkqQUDnZWOpyouZtfSfsGVTNv4DUQKpj6lQv8
+         wB5L8UUlTeS3A2bQPF1bu60gt9oRR45wk+8DVitKlPb9uRsDw1ApLJuX/RbCFoYPTZmC
+         QJKyWdYh2YcGBFRTVI5FKeGs7zSDfQOkZPMVx6sKEW/Uz1v7yVVD1ppnXW1yNl40CW9s
+         jx2M9rBCnY8+14OItYuR24RV/tNOZG8iMCzJWWydKgkZTvisXBZ8aTbuNtWnHtcZkF+j
+         +q07RRmqqIRN1OrMurGm3oD1xA5ge3fD8gcNfMwuJ2fPFCRgWOGVGJAXy4OqGPzZv3LD
+         DAgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715696842; x=1716301642;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lLJRRPkOIqx81oYQZLAGpU8I7pBO8rz+kK0CzoxcsAE=;
+        b=OottBPgdpuKVmpn1kmeSCgQf3xlLgIr3ljNMiiT1ZzX0rNatWNNG6F8AnyQzGovmse
+         Rkrxk8MMwtEL2Aaq0t06fT/hAslM66L41PTSW7tWUzwydK5LQGwEDwXVuwisqqcPrGaq
+         EI781kGCEuh+9K7JNvDC3/dqOge5VP6K9MqkoxNVPJazMlXag6+A10o9GVtu8MG1DuI1
+         4CJm443qW9Tz0Hb7A1iysdXkmVQgXnr9w/zzOmnubg2tSVMlfTFIUU9mFfkk3LlI+w9s
+         CN3U2YxlP539pyxSKgPvAuQy6b28K+tr9+I39V2vE5dPEO7aXxrU4CJvt6MaaKBITK1d
+         xLLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVlFxtMv9rDfMH4qX5RW7fydu+IlDfPqqM3cHVicGDrTA12JrCLjBnuZH8ElqBv0l4v+0rsWEY/JqHhCCgE2Zi8rrUGDQEg
+X-Gm-Message-State: AOJu0YzR/gg1O8Iy27lReX75/9W+zk0fsSwMtJ2pUWI6qbqZMp8aRJqJ
+	ermGXSk1Hio0nWFk3QV7lbi93xzNSQFV+Yz5vw8mG+RsJKhagxI1aEvPPDE/auFLOyRE97raYWP
+	Y56+i4opjfeYPJtSc0KOiw9A5CpJBPWXAyd9/
+X-Google-Smtp-Source: AGHT+IFZBVyJIO3FUr1aqlMPVgL+tstkO+6JpmTthh5YcCMXuBh8mZRoGoWooIMJTXQYPo8VC5cXQ0vHhCfvgf1A/A8=
+X-Received: by 2002:a50:c943:0:b0:573:4a04:619 with SMTP id
+ 4fb4d7f45d1cf-57443d30f6cmr548888a12.4.1715696841458; Tue, 14 May 2024
+ 07:27:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240507-mark_ethernet_devices_dma_coherent-v3-0-dbe70d0fa971@quicinc.com>
+References: <6d4a0450-9be1-4d91-ba18-5e9bd750fa40@gmail.com>
+ <ef333a8c-1bb2-49a7-b721-68b28df19b0e@gmail.com> <CANn89iLgj0ph5gRWOA2M2J8N_4hQd3Ndm73gATR8WODXaOM_LA@mail.gmail.com>
+ <e8f548f8-6d16-4a30-9408-80e4212afe9c@intel.com> <CANn89i+yKgXGHUyJxVLYTAMKj7wpoV+8X7UR8cWh75yxVLSA6Q@mail.gmail.com>
+ <e7e6cbde-8f66-454b-b417-64581cc3896c@intel.com>
+In-Reply-To: <e7e6cbde-8f66-454b-b417-64581cc3896c@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 May 2024 16:27:07 +0200
+Message-ID: <CANn89iKHuaMsUq1Os9+eEpbovphiauchggjsei3ki8gggiPQtA@mail.gmail.com>
+Subject: Re: [PATCH net 2/2] r8169: disable interrupts also for GRO-scheduled NAPI
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>, 
+	Realtek linux nic maintainers <nic_swsd@realtek.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	Ken Milmore <ken.milmore@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 07, 2024 at 06:30:59PM GMT, Sagar Cheluvegowda wrote:
-> To: Bjorn Andersson <andersson@kernel.org>
-> To: Konrad Dybcio <konrad.dybcio@linaro.org>
-> To: Rob Herring <robh@kernel.org>
-> To: Krzysztof Kozlowski <krzk+dt@kernel.org>
-> To: Conor Dooley <conor+dt@kernel.org>
-> To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> To: Andrew Halaney <ahalaney@redhat.com>
-> To: Vinod Koul <vkoul@kernel.org>
-> To: David S. Miller <davem@davemloft.net>
-> To: Eric Dumazet <edumazet@google.com>
-> To: Jakub Kicinski <kuba@kernel.org>
-> To: Paolo Abeni <pabeni@redhat.com>
-> To: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> Cc: kernel@quicinc.com
-> Cc: linux-arm-msm@vger.kernel.org
-> Cc: devicetree@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> 
-> Patch 1 :- This patch marks Ethernet devices on Sa8775p as DMA-coherent
-> as both the devices are cache coherent.
-> 
-> Patch 2 :- Update the schema of qcom,ethqos to allow specifying Ethernet
-> devices as "dma-coherent".
+On Tue, May 14, 2024 at 1:18=E2=80=AFPM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Eric Dumazet <edumazet@google.com>
+> Date: Tue, 14 May 2024 13:05:55 +0200
+>
+> > On Tue, May 14, 2024 at 12:53=E2=80=AFPM Alexander Lobakin
+> > <aleksander.lobakin@intel.com> wrote:
+> >>
+> >> From: Eric Dumazet <edumazet@google.com>
+> >> Date: Tue, 14 May 2024 11:45:05 +0200
+> >>
+> >>> On Tue, May 14, 2024 at 8:52=E2=80=AFAM Heiner Kallweit <hkallweit1@g=
+mail.com> wrote:
+> >>>>
+> >>>> Ken reported that RTL8125b can lock up if gro_flush_timeout has the
+> >>>> default value of 20000 and napi_defer_hard_irqs is set to 0.
+> >>>> In this scenario device interrupts aren't disabled, what seems to
+> >>>> trigger some silicon bug under heavy load. I was able to reproduce t=
+his
+> >>>> behavior on RTL8168h.
+> >>>> Disabling device interrupts if NAPI is scheduled from a place other =
+than
+> >>>> the driver's interrupt handler is a necessity in r8169, for other
+> >>>> drivers it may still be a performance optimization.
+> >>>>
+> >>>> Fixes: 7274c4147afb ("r8169: don't try to disable interrupts if NAPI=
+ is scheduled already")
+> >>>> Reported-by: Ken Milmore <ken.milmore@gmail.com>
+> >>>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> >>>> ---
+> >>>>  drivers/net/ethernet/realtek/r8169_main.c | 6 ++++--
+> >>>>  1 file changed, 4 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net=
+/ethernet/realtek/r8169_main.c
+> >>>> index e5ea827a2..01f0ca53d 100644
+> >>>> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> >>>> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> >>>> @@ -4639,6 +4639,7 @@ static irqreturn_t rtl8169_interrupt(int irq, =
+void *dev_instance)
+> >>>>  {
+> >>>>         struct rtl8169_private *tp =3D dev_instance;
+> >>>>         u32 status =3D rtl_get_events(tp);
+> >>>> +       int ret;
+> >>>>
+> >>>>         if ((status & 0xffff) =3D=3D 0xffff || !(status & tp->irq_ma=
+sk))
+> >>>>                 return IRQ_NONE;
+> >>>> @@ -4657,10 +4658,11 @@ static irqreturn_t rtl8169_interrupt(int irq=
+, void *dev_instance)
+> >>>>                 rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
+> >>>>         }
+> >>>>
+> >>>> -       if (napi_schedule_prep(&tp->napi)) {
+> >>>> +       ret =3D __napi_schedule_prep(&tp->napi);
+> >>>> +       if (ret >=3D 0)
+> >>>>                 rtl_irq_disable(tp);
+> >>>> +       if (ret > 0)
+> >>>>                 __napi_schedule(&tp->napi);
+> >>>> -       }
+> >>>>  out:
+> >>>>         rtl_ack_events(tp, status);
+> >>>>
+> >>>
+> >>> I do not understand this patch.
+> >>>
+> >>> __napi_schedule_prep() would only return -1 if NAPIF_STATE_DISABLE wa=
+s set,
+> >>> but this should not happen under normal operations ?
+> >>
+> >> Without this patch, napi_schedule_prep() returns false if it's either
+> >> scheduled already OR it's disabled. Drivers disable interrupts only if
+> >> it returns true, which means they don't do that if it's already schedu=
+led.
+> >> With this patch, __napi_schedule_prep() returns -1 if it's disabled an=
+d
+> >> 0 if it was already scheduled. Which means we can disable interrupts
+> >> when the result is >=3D 0, i.e. regardless if it was scheduled before =
+the
+> >> call or within the call.
+> >>
+> >> IIUC, this addresses such situations:
+> >>
+> >> napi_schedule()         // we disabled interrupts
+> >> napi_poll()             // we polled < budget frames
+> >> napi_complete_done()    // reenable the interrupts, no repoll
+> >>   hrtimer_start()       // GRO flush is queued
+> >>     napi_schedule()
+> >>       napi_poll()       // GRO flush, BUT interrupts are enabled
+> >>
+> >> On r8169, this seems to cause issues. On other drivers, it seems to be
+> >> okay, but with this new helper, you can save some cycles.
+> >>
+> >> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> >
+> > Rephrasing the changelog is not really helping.
+> >
+> > Consider myself as a network maintainer, not as a casual patch reviewer=
+.
+>
+> And?
+>
+> >
+> > "This seems to cause issues" is rather weak.
+>
+> It has "Reported-by", so it really causes issues.
 
-I've been keeping my eye on this series, and realized that I should know
-better (but don't). How can I tell what tree these should go through?
+And ?
 
-Just trolling through the list, it seems dt-bindings go through netdev,
-whereas dts changes go through the Qualcomm tree.
+Revert ?
 
-Is there something in the get_maintainers.pl output that I should be
-interpreting differently to understand what patch should target what
-maintainer tree?
+>
+> >
+> > I would simply revert the faulty commit, because the interrupts are
+> > going to be disabled no matter what.
+> >
+> > Old logic was very simple and rock solid. A revert is a clear stable ca=
+ndidate.
+> >
+> > rtl_irq_disable(tp);
+> > napi_schedule(&tp->napi);
+> >
+> > If this is still broken, we might have similar issues in old/legacy dri=
+vers.
+>
+> I might agree that we could just revert the mentioned commit for stable,
+> but for the next net-next, avoid unnecessary
+> scheduling/enabling/disabling interrupts makes sense, not only for
+> "old/legacy" drivers.
+> "Very simple and rock solid" is not an argument for avoiding improvements=
+.
 
-    halaney@x1gen2nano ~/git/linux-next (git)-[remotes/net/main] % ./scripts/get_maintainer.pl Documentation/devicetree/bindings/net/qcom,ethqos.yaml     :(
-    Vinod Koul <vkoul@kernel.org> (maintainer:QUALCOMM ETHQOS ETHERNET DRIVER)
-    Bjorn Andersson <andersson@kernel.org> (maintainer:ARM/QUALCOMM SUPPORT)
-    Konrad Dybcio <konrad.dybcio@linaro.org> (maintainer:ARM/QUALCOMM SUPPORT)
-    "David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING DRIVERS)
-    Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING DRIVERS)
-    Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING DRIVERS)
-    Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING DRIVERS)
-    Rob Herring <robh@kernel.org> (maintainer:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
-    Krzysztof Kozlowski <krzk+dt@kernel.org> (maintainer:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
-    Conor Dooley <conor+dt@kernel.org> (maintainer:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
-    Bhupesh Sharma <bhupesh.sharma@linaro.org> (in file)
-    netdev@vger.kernel.org (open list:QUALCOMM ETHQOS ETHERNET DRIVER)
-    linux-arm-msm@vger.kernel.org (open list:QUALCOMM ETHQOS ETHERNET DRIVER)
-    devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
-    linux-kernel@vger.kernel.org (open list)
+I explained that I failed to see the 'so called' improvement there.
 
-I don't know how to figure out who takes this patch in the end based on
-the output above :)
-
-    ahalaney@x1gen2nano ~/git/linux-next (git)-[remotes/net/main] % ./scripts/get_maintainer.pl arch/arm64/boot/dts/qcom/sa8775p.dtsi                 
-    Bjorn Andersson <andersson@kernel.org> (maintainer:ARM/QUALCOMM SUPPORT)
-    Konrad Dybcio <konrad.dybcio@linaro.org> (maintainer:ARM/QUALCOMM SUPPORT)
-    Rob Herring <robh@kernel.org> (maintainer:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
-    Krzysztof Kozlowski <krzk+dt@kernel.org> (maintainer:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
-    Conor Dooley <conor+dt@kernel.org> (maintainer:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
-    linux-arm-msm@vger.kernel.org (open list:ARM/QUALCOMM SUPPORT)
-    devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
-    linux-kernel@vger.kernel.org (open list)
-    ahalaney@x1gen2nano ~/git/linux-next (git)-[remotes/net/main] %
-
-This one's a little more obviously Qualcomm specific.. but yeah. Sorry
-for the obvious question, was talking to Sagar offline and realized I
-didn't have a good way to tell him how to figure that out other than dig
-through lkml, so just asking directly here!
-
-Thanks,
-Andrew
-
+You explained nothing really, just that you like some approach that I
+think is for net-next.
 
