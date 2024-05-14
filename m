@@ -1,165 +1,120 @@
-Return-Path: <netdev+bounces-96251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B7418C4BA9
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 06:22:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BA6D8C4BB4
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 06:34:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA90F1F22B04
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 04:22:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 578BAB23822
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 04:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17311FC1F;
-	Tue, 14 May 2024 04:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E494111A8;
+	Tue, 14 May 2024 04:34:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="cXpF7Y3q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEu2iQ9g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E8B1879;
-	Tue, 14 May 2024 04:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4105ED8;
+	Tue, 14 May 2024 04:34:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715660572; cv=none; b=WrQCFhGyYnwSEk3heve/2SLPN6GExEcR6vFPwD9QyAB279hz4aSIJI3e0j1Paaot+lxcLyZf3biemtn9ZojvjY+6nGjPBzycN51bko1J/Yd28bKFp1eGmHhPR/5dypqtvi7iqXNpf2ATbL5P0g4a25QnXLyHfye0fezNFGHBPj0=
+	t=1715661283; cv=none; b=Rf+CGiK0XJcRUzTPmaZCZjyQVHWiZh7vRk38kiub68rgW95S5xRQ6rAc4K22W+YDj9a0fBr6nhSihJBvlQRwqVwSY5if6RK57BAQvgtNImNkIq8/PLE+VtFHxhI0/USuzoiMqaGQQ+MgZdjqsBvmXaOsJlWVKr2SOOK8+vNL2tI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715660572; c=relaxed/simple;
-	bh=QoKsGdXZS0B6Nj7Jvxwcoscgt7kWUmbSCYPw2leGIak=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gYpOUbWXvgXgkr1GU4VkHx1GBcS8ODOPlw2oRNQ4ynGxF6H/JJ1DaUzqogE3TnarfHB0CgallIv8gu/hR8qFs7QVdvXdvR1CZ1DiDJ5IVh73D2RVMW1gfGVe9MTmJaeuGE2oUyBNERfsvdi22/Y2ooRAKfuIWUdSBSpVvUndw4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=cXpF7Y3q; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1715660567;
-	bh=iAOCyJKi+2/8125nMqNtr3l6ARg/uQFutn/P4zyso2I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cXpF7Y3q+Q+2FzTk7LPuoeiKOJ10iS6kahIUSYOm4GcI964ijpkTWKYKrJvjmiGx8
-	 06TrgBJEqTMWQNuMBxbmgeMn9oRURRqmL4oVWFwFyrC6nGb+ZgcphV+wL21JgbRxnl
-	 eWFeQP+PeLe2ND60nlya1mvWGWT3mBRYImxp56p3bzPP16cNjIUmBCbgwubboxtYv+
-	 E3Sbm6lpXD12cE4fLK3WTMIbrXB3a+NLZZ+1ntpgFaVw9bMB0+86KbqftcjJncjUaE
-	 gaiSftcAtIpT3R18lebrabpBcM8UgZerX92GqYVOpYg7AKs/car5YusfNQhb0RE05v
-	 TWbvYZaRzDR5w==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VdjrP2N8Fz4wby;
-	Tue, 14 May 2024 14:22:45 +1000 (AEST)
-Date: Tue, 14 May 2024 14:22:44 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Rob Herring <robh@kernel.org>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexandre
- Torgue <alexandre.torgue@st.com>
-Cc: Networking <netdev@vger.kernel.org>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Gatien Chevallier
- <gatien.chevallier@foss.st.com>, "Kory Maincent (Dent Project)"
- <kory.maincent@bootlin.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Saravana Kannan <saravanak@google.com>
-Subject: Re: linux-next: manual merge of the devicetree tree with the
- net-next, stm32 trees
-Message-ID: <20240514142244.26010149@canb.auug.org.au>
-In-Reply-To: <20240424134038.28532f2f@canb.auug.org.au>
-References: <20240424134038.28532f2f@canb.auug.org.au>
+	s=arc-20240116; t=1715661283; c=relaxed/simple;
+	bh=dGUECzmT71vk7yUXupEDNgZTgp6YkFQ58WJ3CImg2IM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AfegyeJYh6PRNX68x1CUHlFfMhdwp06UkY1D3mJckTNVch4Xlo6c4j1XstQlUvzyuKnqn2BkfBKFY5FsiBa7rKX/3wL9Wgu1SPqzBh+EU6nIU6ExYXPqs5jqrS6wh7LcWB4lsMhgZFRP/c+rerIqeLec8kvTRO0Yf7F11Y7JoNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEu2iQ9g; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6f4dcc3eeb3so2814338b3a.0;
+        Mon, 13 May 2024 21:34:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715661281; x=1716266081; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VpL9ckhM2YONgCKwIgIxImKCVVLS7o9hHr+mnWRzhqs=;
+        b=dEu2iQ9g55Z9YV9Ohov6goV1vUFgnKJZDcjMLjCczTscmPYQNmVfhC2uBBl6H39hs9
+         OSDs7I5g6hOOHQ/Dy9+DKl+Z+FEjpIIZfos2Yryh//r7uaWm7WebaSm6X9sLWTmG3h1r
+         wlBoDJMOAdmcuDJWhMvw5IhQd8oaKi13SUO5a1N7ftQdtL2qnT7moKd/EfcgV7Glceg0
+         FfqH1ZsVUlLqX3I/Dv5Io/X9coukuY84zWxrWxuEK0YukcL+6Hf53qBOcE23/tc7isiR
+         HZFMmp8rULObtvdoESlCp7AJ10LvO/LYcNigZuOJUC2P1Jr5PWSsc+gNjR5AIJQeAL5n
+         +dBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715661281; x=1716266081;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VpL9ckhM2YONgCKwIgIxImKCVVLS7o9hHr+mnWRzhqs=;
+        b=C0jTcKr+cMW9pFgn+oJivc6XxRFXdOLJX6zwqP0DIpdEt0qGPhWHP7h5y08rXPIZCk
+         Z2j3xA9YGV+xzdt5xDa8+v718pm7S1zN5Zwja3wGkwSCDu63SnOm6xRE7wGAuHCBFMJc
+         elEaKT+vYdscgd6NvZFFQleCLi91l+3jpfX+Advz93MrXsQqeMlB/dxjg6L9gtms66Ef
+         wfPkgsx9hA0tb31AWbXlOak08C7lXP3KuGRihjOP9dBPityhDn3GIhCD30/Kh+zIIZeB
+         fw7j1sblzE5bm921NOyoRr8/nuyJbxPfcmUnmNJfKkuV95DrrAs8MnBVFB+tXyx0OMNL
+         koJA==
+X-Forwarded-Encrypted: i=1; AJvYcCXewyysZyRXXEGKAVDlAyYWukIs4qT5+r54J41YTZH09xFcSmjv0k9GiQR3PV8BTOnnV59THCMbco5Thk8GAfWJCP0YlxWR
+X-Gm-Message-State: AOJu0YzBJXLWq0SfxNW1sBALR01QuzTt6olnwgLb1YOOapZD8+VR91mZ
+	hpjzemiIego0J1JyStddjQdxFL8RdDsznCsrOkVBNMmX7YWfZvH0SzLyUQ==
+X-Google-Smtp-Source: AGHT+IHXgL9debFvWZAoCQrU5U3M+829xjnxkEz0F7kqoip4AF5ZVEbhUB6ydMsOHSFm+eW2DZtPlg==
+X-Received: by 2002:a05:6a21:628:b0:1a7:9cf6:6044 with SMTP id adf61e73a8af0-1afde0dc45cmr9412708637.27.1715661279888;
+        Mon, 13 May 2024 21:34:39 -0700 (PDT)
+Received: from [192.168.0.107] ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0b9d47e0sm87638805ad.5.2024.05.13.21.34.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 May 2024 21:34:39 -0700 (PDT)
+Message-ID: <56463a97-eb90-4884-b2f5-c165f6c3516a@gmail.com>
+Date: Tue, 14 May 2024 11:34:32 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/wR5ZyYnSJ+GNMNmf.=HWaa4";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla Thunderbird
+Subject: Re: Regression of e1000e (I219-LM) from 6.1.90 to 6.6.30
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux Networking <netdev@vger.kernel.org>, intel-wired-lan@lists.osuosl.org,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ lukas.probsthain@googlemail.com
+References: <ZkHSipExKpQC8bWJ@archie.me>
+ <b2897fda-08e8-40de-b78a-86e92bde41db@lunn.ch>
+Content-Language: en-US
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+In-Reply-To: <b2897fda-08e8-40de-b78a-86e92bde41db@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---Sig_/wR5ZyYnSJ+GNMNmf.=HWaa4
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 5/14/24 00:17, Andrew Lunn wrote:
+> On Mon, May 13, 2024 at 03:42:50PM +0700, Bagas Sanjaya wrote:
+>> Hi,
+>>
+>> <lukas.probsthain@googlemail.com> reported on Bugzilla
+>> (https://bugzilla.kernel.org/show_bug.cgi?id=218826) regression on his Thinkpad
+>> T480 with Intel I219-LM:
+>>
+>>> After updating from kernel version 6.1.90 to 6.6.30, the e1000e driver exhibits a regression on a Lenovo Thinkpad T480 with an Intel I219-LM Ethernet controller.
+> 
+> Could you try a git bisect between these two kernel versions? You
+> might be able to limit it to drivers/net/ethernet/intel/e1000e, which
+> only had around 15 patches.
+> 
 
-Hi all,
+The BZ reporter (Cc'ed) says that bisection is in progress. You may
+want to log in to BZ to reach him.
 
-On Wed, 24 Apr 2024 13:40:38 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
->
-> Today's linux-next merge of the devicetree tree got a conflict in:
->=20
->   drivers/of/property.c
->=20
-> between commits:
->=20
->   6a15368c1c6d ("of: property: fw_devlink: Add support for "access-contro=
-ller"")
->   93c0d8c0ac30 ("of: property: Add fw_devlink support for pse parent")
->=20
-> from the net-next, stm32 trees and commit:
->=20
->   669430b183fc ("of: property: fw_devlink: Add support for "power-supplie=
-s" binding")
->=20
-> from the devicetree tree.
->=20
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
+Thanks.
 
-Due to the addition of commit
+-- 
+An old man doll... just what I always wanted! - Clara
 
-  d976c6f4b32c ("of: property: Add fw_devlink support for interrupt-map pro=
-perty")
-
-to the devicetree tree, the resolution now looks like below.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc drivers/of/property.c
-index 0320f1ae9b4d,21f59e3cd6aa..000000000000
---- a/drivers/of/property.c
-+++ b/drivers/of/property.c
-@@@ -1252,8 -1241,7 +1241,9 @@@ DEFINE_SIMPLE_PROP(backlight, "backligh
-  DEFINE_SIMPLE_PROP(panel, "panel", NULL)
-  DEFINE_SIMPLE_PROP(msi_parent, "msi-parent", "#msi-cells")
-  DEFINE_SIMPLE_PROP(post_init_providers, "post-init-providers", NULL)
- +DEFINE_SIMPLE_PROP(access_controllers, "access-controllers", "#access-con=
-troller-cells")
- +DEFINE_SIMPLE_PROP(pses, "pses", "#pse-cells")
-+ DEFINE_SIMPLE_PROP(power_supplies, "power-supplies", NULL)
-  DEFINE_SUFFIX_PROP(regulators, "-supply", NULL)
-  DEFINE_SUFFIX_PROP(gpio, "-gpio", "#gpio-cells")
- =20
-@@@ -1359,10 -1398,10 +1400,12 @@@ static const struct supplier_bindings o
-  	{ .parse_prop =3D parse_backlight, },
-  	{ .parse_prop =3D parse_panel, },
-  	{ .parse_prop =3D parse_msi_parent, },
- +	{ .parse_prop =3D parse_pses, },
-+ 	{ .parse_prop =3D parse_power_supplies, },
-  	{ .parse_prop =3D parse_gpio_compat, },
-  	{ .parse_prop =3D parse_interrupts, },
-+ 	{ .parse_prop =3D parse_interrupt_map, },
- +	{ .parse_prop =3D parse_access_controllers, },
-  	{ .parse_prop =3D parse_regulators, },
-  	{ .parse_prop =3D parse_gpio, },
-  	{ .parse_prop =3D parse_gpios, },
-
---Sig_/wR5ZyYnSJ+GNMNmf.=HWaa4
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmZC5xQACgkQAVBC80lX
-0Gzv1Qf+PrVZES3IAyzKbzajZbZJC4kEgAdW2nCeyMfcsTOFMIDIhoX6qbSmtM5c
-lqzjU5G6HcJp3xmNLRHpnckQteCdDYqbcfL+dhKp8b2tlwX5v/FiRir1uTZI9xe7
-tiioiReCopq2niygDmn7ZlBIppbGCEmcDM5OOAP34Z51J2iAp3lSY18ms2fx01Of
-rvLGTEVEL52rKFRUWiqqvSCkpErVl/WdBj+gD8YiBQpeW1/eJk472JV78ojoVN0+
-V4BC8SaeboYgErtn8i+m6pBIEuVuavkF9ZCPAINIZ9rHrZzvsGBb8fZmev/NS3ql
-m502uxAcP3c+SMLNDB5xfMTyfphx3Q==
-=Ts1P
------END PGP SIGNATURE-----
-
---Sig_/wR5ZyYnSJ+GNMNmf.=HWaa4--
 
