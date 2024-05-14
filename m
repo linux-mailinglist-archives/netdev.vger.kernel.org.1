@@ -1,180 +1,390 @@
-Return-Path: <netdev+bounces-96238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 264B48C4B0A
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 04:01:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A978A8C4B10
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 04:01:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AB201F21D58
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:01:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FE0D28456D
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AEB1C36;
-	Tue, 14 May 2024 02:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74DB469D;
+	Tue, 14 May 2024 02:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRL91vMd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gEDePHWI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD05337E;
-	Tue, 14 May 2024 02:01:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715652088; cv=none; b=sknbstoIJ2j2PantAc+KbrdPGM5sLsFSvRmJkqKpkiRSfI/JCWeDfDoCr22UGVu7ALtemV0eduxnS5V566kCjhthFhhS4mq1eC0ZsyspR8GxfQf25C6noYzaew1wJqqwTM49W5LTbUgXTMwAVmDjjPgPX6W5FpDW7c4FsDs6IyE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715652088; c=relaxed/simple;
-	bh=P4266udIk1kTA9hr9/NWp2eRfavDEJtZUKiIJP3fKac=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kTxMmuDxDhUcm9F9AAWA12V2HcdFcyisS5OamfZZYKZfcRI5EZ1nS7SMYDuy7yBsOLbjNwC+O/h1+Yo1jQVC/YAr7XFAWJLrEaiwdYaIvkG1qN1Uy7D3hrEMA5Vfi71BVV5QiDT/X8sSwC0zhaygg5d6TfVhroDsVNyLvGWiR8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRL91vMd; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2e564cad1f6so39611241fa.1;
-        Mon, 13 May 2024 19:01:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715652085; x=1716256885; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tBIbT1+z/UG8r876DsuaiHGNkQ3y0jDhRxoR140bF/A=;
-        b=eRL91vMdqaf7iM9chmVZ45O6VGsUFNghUyPBiuLKYvHBqAZm/byyhcG+9AKNTInuoZ
-         pdhC/ibgEcEkm19N6O3b3O69wGO7Sp7prsvKeORIaZ9RQcWEV/04ZfFQQSUJ1IXMvdlP
-         dYqoR5BNfowSJRWZpSdQ2nkv7O9NWE0hZMHkyK0oPXuzXauLT5DpAWDKjnSgo7wonM/q
-         7cT+8MQDxSAoJq4oCJEr9+JvF0L8G4xfBPg8GaYyBzoy8yj7LCPuED7mGQRo/w14geev
-         ZrzwZ5B1Em5z0XsGYQBkNKRgZDcHmhlPbhcvU8ylk6pUoP9H42lBmpNK5I2VxRHCSEpU
-         CPVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715652085; x=1716256885;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tBIbT1+z/UG8r876DsuaiHGNkQ3y0jDhRxoR140bF/A=;
-        b=a5a7rRj5EAOQqXKnHfNpgwIQKPvyBaD1cYot3oTywuHqua6A7q8icFuENn+g4UV71t
-         FiLZcH/shMf4OtenLCGFsrnShcT2XsCiTZLgU9/A8mBXE4fgjuZ0tAYvuUroJ9x979TH
-         R9e4kobss4FUDy4q4YjBvhrO82WwiDWcakGnCAFHhMPrsmIKYr9SOBbLPSbZwLezTk4x
-         EgyX/hzIR23PtfM5hkVGRBe2eynChHiyw5m4I5o1mJbGKDmk15EL015NG8/DJKMM+dtV
-         F5enEEc1kGOCiwN25Y8Vg4hEJJ4rpC0HPaMiVFNQMYf0O8SwyrDJzpatDkWi9SAN9dx+
-         dgkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUly1VonvGDjHAD1TMXde9vwSTLV5gk55ZZ1ivS+IcxaKrMiPToZIp5FRIFLiaNpPQKroN1SYRXNIw/UgozDa3D/2lzII133wbEZYDu0nbGQzDIqAoVA9e7/6u4PIfSeCCiOxldp64X
-X-Gm-Message-State: AOJu0YzaHxN7cSLkBr54gMLKEDEgwTtJIPzKA+wb6ZFdcQUu15Xr5J9g
-	GESCoXkr3QTr/c+M1/G004dh4CwGVY1z7lRb5jNq9hqQIOLHwbdsr4Eqr+75dguwNcfUx9GB+VE
-	3xomfbYOYnDHSQbc8wJmUJWTSOpI=
-X-Google-Smtp-Source: AGHT+IET7ta6lBI99PQq3TaG4ZO+dxRteM5+ujR/OkvBGtDyjuyQ8IvKOKYvXdgnzciRonA7ecwJYpMDk3HHZ77tlB0=
-X-Received: by 2002:a2e:b618:0:b0:2da:50f8:dfab with SMTP id
- 38308e7fff4ca-2e51fd4a80bmr66233941fa.7.1715652084535; Mon, 13 May 2024
- 19:01:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CF3B653;
+	Tue, 14 May 2024 02:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715652097; cv=fail; b=r25pJK3ZVk7gnGjpe/kKxS1AZ5SUVV5Xjr0Ukas+c25cQiv5/Bnj6kkInk98QCB/6/HVqGlopMIuUfgMSPGS+4dhRyhaS6O1dpFRO+b1seFFelVX+IfypwG44EvGIEZzgDFElAPDiRDEk+AxuE7fkAzdmxX7MdT0GohFejOBCxY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715652097; c=relaxed/simple;
+	bh=m2H1lv4pb3oKgcM/Ls/p8NN4sfJGHfynXNZhp3glPUE=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ROnyROFCSNALf357Ct/9+jUuhbVZrCXFwtC5xXMeZLaedzvK2rZGThZYi+huIir45R90vMfLC9Y0rSM5ibxJl55T2MmpWU5ODEmP0mPo4vC11TZiIbc6NB6Hon+JB7ze4r38mzxKgIcEKaCGyIYf62z32CwCYbLmrRAARZWvJI4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gEDePHWI; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715652096; x=1747188096;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=m2H1lv4pb3oKgcM/Ls/p8NN4sfJGHfynXNZhp3glPUE=;
+  b=gEDePHWIlFzl5I7ofjuH67at7KMkeSOaSA4bQSpFyk2hjJpS0pgHlBn0
+   JFFdXwj0lD5u8QyJU5v3CUagzIP8mtUM0KUOWZuxyvsn2oGNVcEQMnCTz
+   4IvyChAZGdKX9vrn2L7aGyq2SIoJgrPKRbIqEUw3gVzCmWXA4QEyi/Vjm
+   Su+sfzB4ek2f7TvGjhoCaJmdtZ9f2S3Wht1qGWYx9/2QqNacqMa6ZretM
+   sJaMpOfXmAAG5kodJcuvw5hK5u2G/I9Tp+neD//1FIyxQPu132Fa3kvo8
+   FQ1nW5/vNLlYi1KQV/t3lpuY/1s/dRy4fo9OI78nybnBRtG9VmaTfOI1g
+   Q==;
+X-CSE-ConnectionGUID: FO75xV15SSSqawVrgxX+vw==
+X-CSE-MsgGUID: BebOS1PrSmmTWYx6buOHpA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11072"; a="11775098"
+X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
+   d="scan'208";a="11775098"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 19:01:36 -0700
+X-CSE-ConnectionGUID: IjfqtJ/zSdyW0NMGAGSjWg==
+X-CSE-MsgGUID: neduB8gQQHKmBDf1m+Of6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
+   d="scan'208";a="34969922"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 May 2024 19:01:35 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 13 May 2024 19:01:35 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 13 May 2024 19:01:35 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 13 May 2024 19:01:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RbFJ2DkkakPK207wUflPBDiDmUD71yvTTLxa9qGAA2SFGQY30Pk+vpNwZJGXeNLW9GQaz6DUg/irnjekfulUfNR4k+IuH7xY/3Q1LbPpyB5YYffeBCM3veggsq45PT6pVyCS+JJAsMR+rCefbpuwANUU3GRLH/8zVH1hcY4HczLlAhzuM88I+QL6oNN2BoaeC061f5taHO9wU24EI7b2KLAA9QY6q3A3xh3Xjx3iK1xg/RbvYNmNh6bb0YBNC0d3PczmKy1q4Zl2JsRK+m7iz/K5eNn0boPL7vwGPU4vqh4qt4sEVUoM6BgOHdMJgvt/l8BPCpzYOan7F7T45bnXnQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mVAUaaWtPcpxYRfY7nLLEgFFB1rhYGuGhKeBSk+Q+/A=;
+ b=AWsIONmpO5Y8uYhztCRpHId3PBfabq2TjDZHkYycgLOZAX9z40eBrpqMUZX7lc4XkxG8obIpRCkHOPgiv2o339iCg8RoY6C8B8gZ+7W1vi5mwWyokghiglt2YCAFbVtgXyMSiu5NiEElA2C1Zt2unWJpN49pXLdzQmkiQ9vrpW/Xpv6Djp0E3o2kFGb4luYQGRXDJrOva2WGj3Rz2q5cFrZ2VKtgTyaNIOACJi/o9OfmoVbAmDebuoDKzLA8Z+JVo+IgDy+ZNj5+B4w5Gb14B3R8qj+oKKDmCBv/r4ZK0UIN0+rFlEn666uF4dHdqrqalIsVOKbB5pJmmkj6zaTzsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW3PR11MB4538.namprd11.prod.outlook.com (2603:10b6:303:57::12)
+ by PH0PR11MB7562.namprd11.prod.outlook.com (2603:10b6:510:287::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Tue, 14 May
+ 2024 02:01:33 +0000
+Received: from MW3PR11MB4538.namprd11.prod.outlook.com
+ ([fe80::e117:2595:337:e067]) by MW3PR11MB4538.namprd11.prod.outlook.com
+ ([fe80::e117:2595:337:e067%7]) with mapi id 15.20.7544.052; Tue, 14 May 2024
+ 02:01:33 +0000
+Message-ID: <033c24ce-b0e4-4653-ab8a-2cefbbec0893@intel.com>
+Date: Mon, 13 May 2024 19:01:30 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH RFC iwl-next 07/12] idpf: compile
+ singleq code only under default-n CONFIG_IDPF_SINGLEQ
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	<nex.sw.ncis.osdt.itp.upstreaming@intel.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>
+References: <20240510152620.2227312-1-aleksander.lobakin@intel.com>
+ <20240510152620.2227312-8-aleksander.lobakin@intel.com>
+Content-Language: en-US
+From: "Tantilov, Emil S" <emil.s.tantilov@intel.com>
+In-Reply-To: <20240510152620.2227312-8-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR03CA0005.namprd03.prod.outlook.com
+ (2603:10b6:a03:33a::10) To MW3PR11MB4538.namprd11.prod.outlook.com
+ (2603:10b6:303:57::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240510211431.1728667-1-luiz.dentz@gmail.com>
- <20240513142641.0d721b18@kernel.org> <CABBYNZKn5YBRjj+RT_TVDtjOBS6V_H7BQmFMufQj-cOTC=RXDA@mail.gmail.com>
- <20240513154332.16e4e259@kernel.org> <6642bf28469d6_203b4c294bc@willemb.c.googlers.com.notmuch>
-In-Reply-To: <6642bf28469d6_203b4c294bc@willemb.c.googlers.com.notmuch>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 13 May 2024 22:01:12 -0400
-Message-ID: <CABBYNZKJSpQcY+k8pczPgNYEoF+OE6enZFE5=Qu_HeWDkcfZEg@mail.gmail.com>
-Subject: Re: pull request: bluetooth-next 2024-05-10
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, Pauli Virtanen <pav@iki.fi>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW3PR11MB4538:EE_|PH0PR11MB7562:EE_
+X-MS-Office365-Filtering-Correlation-Id: 23face3c-283b-40d3-6588-08dc73b9c75a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|366007|376005;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?NFpOZEZVVUhnU1JsN3lZWDVqUlFlbmczY2h2a3FYYWVseVZVM1NNdmlyaTJW?=
+ =?utf-8?B?d3UyZDlqZVFKdjhpU0hBMnA4aXdnOEVvQTFDdjFEcndHYys5dVJqek9ucG04?=
+ =?utf-8?B?M3Q4WTB5by9LQ2NKTnlMVWxINE5LcHpER0tBSXRoQ29kNHFZTU5rNjdFdnp3?=
+ =?utf-8?B?bHpnRmxGZTZSYlROWEIwMUpYbElSY1d3UFAxVFd5c2VBWEdsRVRvMjN5b0d2?=
+ =?utf-8?B?dW9zMWJpV3FjeHRwZkE4a2ladnNHMDRIOUpjUmpwWDJ6R0FnTm9saldzTFY3?=
+ =?utf-8?B?VWpJcjY4blgzby92VGt0cGpyRlErYWNxNDQxV0FuMHdHL2E5KzFjcDhsRmxt?=
+ =?utf-8?B?VFBTSXdXNWxKSHppdUQ1SnB3UWJvWTQxMmNodDM5SmJ3WVc0NHBHVUxkbFg4?=
+ =?utf-8?B?bkUvRmFhcXRJTkRGbG0ybEx5c1dwMXA5SVJXczB1a2doaFcxQlMyTnJzelRx?=
+ =?utf-8?B?MXcwS0RlSzRoY3Z1b252VFVxa3J3bCtNWXlad1hrNWJBMFhPaG13M3QzQW40?=
+ =?utf-8?B?Q3UwUGdzb2ttVTZBT01kQzEwZmtVYlJ3dHVadGZKR3dTU2E4MkszOXI2UU1p?=
+ =?utf-8?B?WlFISjVMQ1V5aVhCYzJEd3U3U012UE5tc2VvWnRIMkF1TzNSakZ4VjVxR0VD?=
+ =?utf-8?B?L3l1TXNLUlZWQ0dnaVViL0I1SUYvbTJrMm1wMnk3RXFacUhIWmN6K2Q5QUV5?=
+ =?utf-8?B?ZmNUOSttbnZaZGdSNkc5dUI4Z25Fa1hYWEwxZlJwS0s3c1llUVJmb0RHOFph?=
+ =?utf-8?B?UU5pVlZGcW4zVENTMzNQUFo3SjA4ZTdYeUF2STVDRmlwUy9CNHVINDduVnNz?=
+ =?utf-8?B?bGJSbklOOGZ2U0ZTNnhZMS9LODNzZmFMK1pEenNWTXdlRC9PdFo0QXh6d21H?=
+ =?utf-8?B?TFNQSnNsNzFEc3liY0phUWZvT3AvRzZHMjZQTnBPKy9SMjVzTDdhM2RIN0k0?=
+ =?utf-8?B?WVdBMXFrbnU0NngraFFwNG5YL3Q4Q3NDczFhL2c3RkZXYjhUREVKYXpianZu?=
+ =?utf-8?B?a00xcytUK3hJek9QaHU5MEhxbytzZGc2MUdCL3FlMFBOWlJzVXdUQm9mUlUz?=
+ =?utf-8?B?dDIrNlI4NU82emVkaUhhcDVvazBiM0ZVR2tBYyt6d3AwcnBzOUhPbkJabzlO?=
+ =?utf-8?B?RjA2VHZjdU5BeU9aMXBxSWgzU1BRWGVsdXAyMUZWS05TRnJ2K0M0SGVYZzI5?=
+ =?utf-8?B?SmFFMUdseFFBT3VuWVd4NFEwMVgxY0Fna1hsQzRuYW9vR0NsbWd3KzBNMDk2?=
+ =?utf-8?B?RWEvUHBKR3pCMEF3QUUvUGkvTDh6V003Ny9TT29wUzhiQ203S1ZrN05CbEdm?=
+ =?utf-8?B?L0pjYkdZMksxc1U4TVB5VVVCV1RMcWJjdWR6RmZseVFjQWcxaDd5T0ZuQ2pz?=
+ =?utf-8?B?dVRzd3BXRGJReFBLLzRKZWFkQkxTNnEvRDJxb1pvWnJJSVNHUnNyOG9ONlFn?=
+ =?utf-8?B?RHVPY0JtY3E4SWVUVnh3SEkzeEgzSlcxWW9uVDd4M2pSKzdGMGpneDhZZVJa?=
+ =?utf-8?B?c3VFaFdrb3pKUkJNVjVNZFBJTUJUUjBLNWM5VXllVlZMdVQ3b3RPZVQ4SU85?=
+ =?utf-8?B?cXRNMjJodmEzUUtuQnVxRTJMZnN1M2l2VzE5TXZMbmFKSExHU1R0MzdSNCth?=
+ =?utf-8?B?RkN3R1RxWGhBM29aQ1l2bjc5YnRSNnIzNnZGN2NuMnBjWGVZQi9pbVIwZTk4?=
+ =?utf-8?B?b05hQU1KUnhoYk1Vc0J2TGkxWWhKV0JDSGc2VlE4VHBYK01zRlpFZTl3PT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4538.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VXhQVmI0QXc4d2NZcHJsOGRHQ3lubmdhYjdsaGo4NnpMVys5bEoyQytnUWFV?=
+ =?utf-8?B?ajBIVHcxMnZVZUtNbXhQalRuTE9DSWF6Z3FuTU1WZkR0YzdaM1JvQTNpSG9x?=
+ =?utf-8?B?cnBDb280cVdnQjFDTmYvRnZIVFBSdkN3RUExQTJtS1ZabmZuT3g3eS9Mekhm?=
+ =?utf-8?B?N1pLVGY0aHZPbXBWYmR0eFNVVnVoUFRWWGc3d0xqQ05SVHN2VVV0RCtodWk4?=
+ =?utf-8?B?WkhWR1JxSnZjbGpmbFRJQ1lTUlNjSXNhZG40cTlyUzJmell1OFdRVU9KNVl6?=
+ =?utf-8?B?T3lGRStGOWNRMVNwWWV4UGxQa3JuUlhjU3JPY3ZvOHRlWlBsRG8rZS9pRzZP?=
+ =?utf-8?B?dnM3YmR4TFh4TzViSnBwQTJvQ3p3aWNQa3F3VG5nbU1VVW9UcVF6SlpkYnRx?=
+ =?utf-8?B?bjFwYVVxVTIvcGlGVVU0ZCtjem1zT3lsRnF5eHhZSCs5THJkVXc5OFBrb3dM?=
+ =?utf-8?B?T1libFpkY3ZhdTVEYWhJSkNZNm1KQmtIMWVncEVOVFVzOUg0UE9XUzFvcHFZ?=
+ =?utf-8?B?WU5xQk1wZ3FMaG9PQ1FXc000b2RVWmxmT1VLcVRpU3ZYdFNrUTc4NGlxVzZW?=
+ =?utf-8?B?MFl1c3lJSEswQlZxWFNRNUFoclZHam0vTGNDTjRJeDNxZm5YcklTRytJbTBP?=
+ =?utf-8?B?WlRwYzdFa0gvUkxkdGdqbndqZ1BSQVh1NHJpUjRPSkpiRUYvNzBrdmVXazNi?=
+ =?utf-8?B?ZHlqNktZRVh5N2xkb0p0V2UwNTQrMnExNUpGYzdZbzZHOURJUkxoMFU0QnFG?=
+ =?utf-8?B?K0szMzBxTG9TcTdGQUlEUGMwbUUvVVJJTC9hcnJOcFhPdVNnRnhqMDFyNXVR?=
+ =?utf-8?B?M1V0YnI1N0JidVJxUStsNHF6a3EvNTMrdUZGSHdiVGpNN0FwSytod2dOVWtO?=
+ =?utf-8?B?R3ZleFcyaTJpT21nZmZFdHI1emhmRGttZU9BUjRZVGJVbHY0UHV4cDhpbS9y?=
+ =?utf-8?B?WVYxQ2JlOUsxSEllWlBSR254U21rUUFwcVh1cnVLNU5zUThpOXkvY0JWc3NB?=
+ =?utf-8?B?cEsyN01DcUQ0UGh5dW5jNElFRkNVZy9MTDFiMEJsc1M2d0FsUGg2b3BndjBB?=
+ =?utf-8?B?WFd5Z1VxNkxXSG9JTGJKTVRPS2RUUlZpVXNLMzVEdk1LWFZyc3Z4SUo0eEM0?=
+ =?utf-8?B?ZE5HSWQvelNnYUl5OHozb1pxZEtjSm5pTjRrV0o4V1FEMUJoNGZuVmdEaW0r?=
+ =?utf-8?B?TlBPYzlqQkFHK1lYTnBDV1lQeHRnTVR5cmdmNUFyeWNLcWFPSVppM2lSU3F5?=
+ =?utf-8?B?bnlvcXY3WkFoQWRtZVBMcHZGZElEM09QVFlVTW1YbTUwU1IwZFJyMXJrSWtG?=
+ =?utf-8?B?MmJnRDFOREJaZ1NPSEdSY3VENDFZTUI4bU80cFZSVk5yQjhScENMQkV0NUd3?=
+ =?utf-8?B?L2VaZEZsZ1NkSGxreTNKeWFETC83c2VvOGtZYkliQ28wRnJvdFpGRXJOZ0hl?=
+ =?utf-8?B?MkROZWFwOUdTYmQvMGhCM25KZHNDa3VSdERUa1FNRTd2UlRZRWJlcXZqcVN0?=
+ =?utf-8?B?Z1FQRU1WOEYzY2s0S21ka0lSbjVEMXBDZ0ZoejF6Y3c1Z1Q3cURJMHYxNml6?=
+ =?utf-8?B?Ti8vYy9jUEJtQ1VlNVdmQ2hyUkNabjZHdHVkRG1hbTJ6cjBpUFNYQTB0V2lr?=
+ =?utf-8?B?Q2diTjhoTlZsa3ovdUs1L1hENmNGT256ck8xVjZoMVhhaC9zSlhidmJGSitS?=
+ =?utf-8?B?ZFFoZWtBOGZKUTdoc1JaVDR2TG01ajJSQm1KMFRCVjNqQ3YxTlhRdG9aUThj?=
+ =?utf-8?B?TUZDSE1kbUs3VWY1UTBycHMvN1lzdXhrbUgydWIwSXNMMDBCQi9HZ3NnMElE?=
+ =?utf-8?B?Q1RxdGk3cjZxYXNEa2JYZzdwVTRkT3dOUUprbU0zRWhlVjBvS0pDVkZzWWFS?=
+ =?utf-8?B?cWRBNk5ORFBlMS9Ma2JlZlNUYVMyYmpxa3VCMHc3MzhmS3JYRkw5WEJ3L0E3?=
+ =?utf-8?B?M0lzdGIxL3B6VSsyZkl0MFpJVGgrcWJoN0xXZUVySkNUT1Q5QkN3QnJpek9X?=
+ =?utf-8?B?QTJKQUZUOHgyeWcvS1J4bEtnaDZrbGk4amRSdXpScVh1WGlPNnZGTHBiNDhS?=
+ =?utf-8?B?dXF6TkxZS3pZYnc4RFpzcVFmYzJWZU02a01CNktEMDFqNmYzOEt3eUtobzZm?=
+ =?utf-8?B?VDdieDROWmNwSDVTVGt6TEpiR08waWpYenhWQUdrRnVaNDViMEdyTktnRlV6?=
+ =?utf-8?B?OUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23face3c-283b-40d3-6588-08dc73b9c75a
+X-MS-Exchange-CrossTenant-AuthSource: MW3PR11MB4538.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2024 02:01:33.1502
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5t8jT8pmIIuMMDbK5oWTV/NWVAf6rbx/RD/tcfGzA6k3VbivEVSfRIOXDQMpGLIZZOi9fu+pdRmMwzE35Wge7Ki22iQY34NpxIPWTguOyqw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7562
+X-OriginatorOrg: intel.com
 
-Hi Willem,
+On 5/10/2024 8:26 AM, Alexander Lobakin wrote:
+> Currently, there's no HW supporting idpf in the singleq model. Still,
+> this dead code is supported by the driver and often times add hotpath
+The driver supports the HW in single queue mode (not the other way 
+around), so I would like to point out that all current HW on which idpf 
+can load supports this model.
 
-On Mon, May 13, 2024 at 9:32=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jakub Kicinski wrote:
-> > On Mon, 13 May 2024 18:09:31 -0400 Luiz Augusto von Dentz wrote:
-> > > > There is one more warning in the Intel driver:
-> > > >
-> > > > drivers/bluetooth/btintel_pcie.c:673:33: warning: symbol 'causes_li=
-st'
-> > > > was not declared. Should it be static?
-> > >
-> > > We have a fix for that but I was hoping to have it in before the merg=
-e
-> > > window and then have the fix merged later.
-> > >
-> > > > It'd also be great to get an ACK from someone familiar with the soc=
-ket
-> > > > time stamping (Willem?) I'm not sure there's sufficient detail in t=
-he
-> > > > commit message to explain the choices to:
-> > > >  - change the definition of SCHED / SEND to mean queued / completed=
-,
-> > > >    while for Ethernet they mean queued to qdisc, queued to HW.
-> > >
-> > > hmm I thought this was hardware specific, it obviously won't work
-> > > exactly as Ethernet since it is a completely different protocol stack=
-,
-> > > or are you suggesting we need other definitions for things like TX
-> > > completed?
-> >
-> > I don't know anything about queuing in BT, in terms of timestamping
-> > the SEND - SCHED difference is supposed to indicate the level of
-> > host delay or host congestion. If the queuing in BT happens mostly in
-> > the device HW queue then it may make sense to generate SCHED when
-> > handing over to the driver. OTOH if the devices can coalesce or delay
-> > completions the completion timeout may be less accurate than stamping
-> > before submitting to HW... I'm looking for the analysis that the choice=
-s
-> > were well thought thru.
->
-> SCM_TSTAMP_SND is taken before an skb is passed to the device.
-> This matches request SOF_TIMESTAMPING_TX_SOFTWARE.
->
-> A timestamp returned on transmit completion is requested as
-> SOF_TIMESTAMPING_TX_HARDWARE. We do not have a type for a software
-> timestamp taken at tx completion cleaning. If anything, I would think
-> it would be a passes as a hardware timestamp.
+> branches and redundant cacheline accesses.
+> While it can't currently be removed, add CONFIG_IDPF_SINGLEQ and build
+> the singleq code only when it's enabled manually. This corresponds to
+> -10 Kb of object code size and a good bunch of hotpath checks.
+> idpf_is_queue_model_split() works as a gate and compiles out to `true`
+> when the config option is disabled.
+Compiling singleq out does introduce an issue for the users that would 
+end up without a netdev if the driver is loaded on a setup where the 
+Control Plane is configured for singlq mode. In that scenario the user 
+will have to recompile the driver/kernel in order to load the driver 
+successfully.
 
-In that case I think we probably misinterpret it, at least I though
-that TX_HARDWARE would really be a hardware generated timestamp using
-it own clock, if you are saying that TX_HARDWARE is just marking the
-TX completion of the packet at the host then we can definitely align
-with the current exception, that said we do have a command to actually
-read out the actual timestamp from the BT controller, that is usually
-more precise since some of the connection do require usec precision
-which is something that can get skew by the processing of HCI events
-themselves, well I guess we use that if the controller supports it and
-if it doesn't then we do based on the host timestamp when processing
-the HCI event indicating the completion of the transmission.
+> 
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>   drivers/net/ethernet/intel/Kconfig            | 13 +---------
+>   drivers/net/ethernet/intel/idpf/Kconfig       | 26 +++++++++++++++++++
+>   drivers/net/ethernet/intel/idpf/Makefile      |  3 ++-
+>   drivers/net/ethernet/intel/idpf/idpf.h        |  3 ++-
+>   drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  2 +-
+>   .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 15 ++++++++---
+>   6 files changed, 43 insertions(+), 19 deletions(-)
+>   create mode 100644 drivers/net/ethernet/intel/idpf/Kconfig
+> 
+> diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
+> index e0287fbd501d..0375c7448a57 100644
+> --- a/drivers/net/ethernet/intel/Kconfig
+> +++ b/drivers/net/ethernet/intel/Kconfig
+> @@ -384,17 +384,6 @@ config IGC_LEDS
+>   	  Optional support for controlling the NIC LED's with the netdev
+>   	  LED trigger.
+>   
+> -config IDPF
+> -	tristate "Intel(R) Infrastructure Data Path Function Support"
+> -	depends on PCI_MSI
+> -	select DIMLIB
+> -	select PAGE_POOL
+> -	select PAGE_POOL_STATS
+> -	help
+> -	  This driver supports Intel(R) Infrastructure Data Path Function
+> -	  devices.
+> -
+> -	  To compile this driver as a module, choose M here. The module
+> -	  will be called idpf.
+> +source "drivers/net/ethernet/intel/idpf/Kconfig"
+>   
+>   endif # NET_VENDOR_INTEL
+> diff --git a/drivers/net/ethernet/intel/idpf/Kconfig b/drivers/net/ethernet/intel/idpf/Kconfig
+> new file mode 100644
+> index 000000000000..bee83a40f218
+> --- /dev/null
+> +++ b/drivers/net/ethernet/intel/idpf/Kconfig
+> @@ -0,0 +1,26 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +# Copyright (C) 2024 Intel Corporation
+> +
+> +config IDPF
+> +	tristate "Intel(R) Infrastructure Data Path Function Support"
+> +	depends on PCI_MSI
+> +	select DIMLIB
+> +	select PAGE_POOL
+> +	select PAGE_POOL_STATS
+> +	help
+> +	  This driver supports Intel(R) Infrastructure Data Path Function
+> +	  devices.
+> +
+> +	  To compile this driver as a module, choose M here. The module
+> +	  will be called idpf.
+> +
+> +if IDPF
+> +
+> +config IDPF_SINGLEQ
+> +	bool "idpf singleq support"
+> +	help
+> +	  This option enables support for legacy single Rx/Tx queues w/no
+> +	  completion and fill queues. Only enable if you have such hardware
+This description is not accurate - all HW supports single queue. The 
+configuration is done by the Control Plane. Furthermore, without access 
+to the Control Plane config, there is no way for the user to know what 
+mode is enabled.
 
-> Returning SCHED when queuing to a device and SND later on receiving
-> completions seems like not following SO_TIMESTAMPING convention to me.
-> But I don't fully know the HCI model.
->
-> As for the "experimental" BT_POLL_ERRQUEUE. This is an addition to the
-> ABI, right? So immutable. Is it fair to call that experimental?
+Thanks,
+Emil
 
-I guess you are referring to the fact that sockopt ID reserved to
-BT_POLL_ERRQUEUE cannot be reused anymore even if we drop its usage in
-the future, yes that is correct, but we can actually return
-ENOPROTOOPT as it current does:
-
-        if (!bt_poll_errqueue_enabled())
-            return -ENOPROTOOPT
-
-Anyway I would be really happy to drop it so we don't have to worry
-about it later.
-
-> It might be safer to only suppress the sk_error_report in
-> sock_queue_err_skb. Or at least in bt_sock_poll to check the type of
-> all outstanding errors and only suppress if all are timestamps.
-
-Or perhaps we could actually do that via poll/epoll directly? Not that
-it would make it much simpler since the library tends to wrap the
-usage of poll/epoll but POLLERR meaning both errors or errqueue events
-is sort of the problem we are trying to figure out how to process them
-separately.
-
---=20
-Luiz Augusto von Dentz
+> +	  as it increases the driver size and adds runtme checks on hotpath.
+> +
+> +endif # IDPF
+> diff --git a/drivers/net/ethernet/intel/idpf/Makefile b/drivers/net/ethernet/intel/idpf/Makefile
+> index 6844ead2f3ac..2ce01a0b5898 100644
+> --- a/drivers/net/ethernet/intel/idpf/Makefile
+> +++ b/drivers/net/ethernet/intel/idpf/Makefile
+> @@ -12,7 +12,8 @@ idpf-y := \
+>   	idpf_ethtool.o		\
+>   	idpf_lib.o		\
+>   	idpf_main.o		\
+> -	idpf_singleq_txrx.o	\
+>   	idpf_txrx.o		\
+>   	idpf_virtchnl.o 	\
+>   	idpf_vf_dev.o
+> +
+> +idpf-$(CONFIG_IDPF_SINGLEQ)	+= idpf_singleq_txrx.o
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+> index f9e43d171f17..5d9529f5b41b 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf.h
+> +++ b/drivers/net/ethernet/intel/idpf/idpf.h
+> @@ -599,7 +599,8 @@ struct idpf_adapter {
+>    */
+>   static inline int idpf_is_queue_model_split(u16 q_model)
+>   {
+> -	return q_model == VIRTCHNL2_QUEUE_MODEL_SPLIT;
+> +	return !IS_ENABLED(CONFIG_IDPF_SINGLEQ) ||
+> +	       q_model == VIRTCHNL2_QUEUE_MODEL_SPLIT;
+>   }
+>   
+>   #define idpf_is_cap_ena(adapter, field, flag) \
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> index 4aa5ee781bd7..2bc1a5a0b50f 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> @@ -1306,7 +1306,7 @@ static void idpf_vport_calc_numq_per_grp(struct idpf_vport *vport,
+>   static void idpf_rxq_set_descids(const struct idpf_vport *vport,
+>   				 struct idpf_rx_queue *q)
+>   {
+> -	if (vport->rxq_model == VIRTCHNL2_QUEUE_MODEL_SPLIT) {
+> +	if (idpf_is_queue_model_split(vport->rxq_model)) {
+>   		q->rxdids = VIRTCHNL2_RXDID_2_FLEX_SPLITQ_M;
+>   	} else {
+>   		if (vport->base_rxd)
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> index 44602b87cd41..d1705fcb701a 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> @@ -1256,12 +1256,12 @@ int idpf_send_create_vport_msg(struct idpf_adapter *adapter,
+>   	vport_msg->vport_type = cpu_to_le16(VIRTCHNL2_VPORT_TYPE_DEFAULT);
+>   	vport_msg->vport_index = cpu_to_le16(idx);
+>   
+> -	if (adapter->req_tx_splitq)
+> +	if (adapter->req_tx_splitq || !IS_ENABLED(CONFIG_IDPF_SINGLEQ))
+>   		vport_msg->txq_model = cpu_to_le16(VIRTCHNL2_QUEUE_MODEL_SPLIT);
+>   	else
+>   		vport_msg->txq_model = cpu_to_le16(VIRTCHNL2_QUEUE_MODEL_SINGLE);
+>   
+> -	if (adapter->req_rx_splitq)
+> +	if (adapter->req_rx_splitq || !IS_ENABLED(CONFIG_IDPF_SINGLEQ))
+>   		vport_msg->rxq_model = cpu_to_le16(VIRTCHNL2_QUEUE_MODEL_SPLIT);
+>   	else
+>   		vport_msg->rxq_model = cpu_to_le16(VIRTCHNL2_QUEUE_MODEL_SINGLE);
+> @@ -1323,10 +1323,17 @@ int idpf_check_supported_desc_ids(struct idpf_vport *vport)
+>   
+>   	vport_msg = adapter->vport_params_recvd[vport->idx];
+>   
+> +	if (!IS_ENABLED(CONFIG_IDPF_SINGLEQ) &&
+> +	    (vport_msg->rxq_model == VIRTCHNL2_QUEUE_MODEL_SINGLE ||
+> +	     vport_msg->txq_model == VIRTCHNL2_QUEUE_MODEL_SINGLE)) {
+> +		dev_err(&adapter->pdev->dev, "singleq mode requested, but not compiled-in\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+>   	rx_desc_ids = le64_to_cpu(vport_msg->rx_desc_ids);
+>   	tx_desc_ids = le64_to_cpu(vport_msg->tx_desc_ids);
+>   
+> -	if (vport->rxq_model == VIRTCHNL2_QUEUE_MODEL_SPLIT) {
+> +	if (idpf_is_queue_model_split(vport->rxq_model)) {
+>   		if (!(rx_desc_ids & VIRTCHNL2_RXDID_2_FLEX_SPLITQ_M)) {
+>   			dev_info(&adapter->pdev->dev, "Minimum RX descriptor support not provided, using the default\n");
+>   			vport_msg->rx_desc_ids = cpu_to_le64(VIRTCHNL2_RXDID_2_FLEX_SPLITQ_M);
+> @@ -1336,7 +1343,7 @@ int idpf_check_supported_desc_ids(struct idpf_vport *vport)
+>   			vport->base_rxd = true;
+>   	}
+>   
+> -	if (vport->txq_model != VIRTCHNL2_QUEUE_MODEL_SPLIT)
+> +	if (!idpf_is_queue_model_split(vport->txq_model))
+>   		return 0;
+>   
+>   	if ((tx_desc_ids & MIN_SUPPORT_TXDID) != MIN_SUPPORT_TXDID) {
 
