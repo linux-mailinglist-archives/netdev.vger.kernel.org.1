@@ -1,194 +1,97 @@
-Return-Path: <netdev+bounces-96356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 548978C5665
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:56:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97C168C566D
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:57:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74FAD1C21D0C
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 12:56:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39AB41F22C5F
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 12:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 791A97E574;
-	Tue, 14 May 2024 12:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A94F26D1D7;
+	Tue, 14 May 2024 12:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SqHcSbng"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QnwoHlLj"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6605A79B;
-	Tue, 14 May 2024 12:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9C46CDC0;
+	Tue, 14 May 2024 12:56:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715691334; cv=none; b=ZVGgFFP70v07VQmhzkFIeXcfxzGyJy/AaubjpnnV0Gv734i3gQj5ogi0xAOUyt8LsOY0zkaKYbV0/j0kSx5+E7nphvBsTWzqHQT90X2dMnx7I5VjrjdJLJfQ8alBRf82EIIBU4mq4TlF5fM0uuHi1KR0NEAhGxfPl2GyHIYNZKE=
+	t=1715691386; cv=none; b=mfJ5+c93rFJP8beumyuHqigbHGlFEI9ixpc6QOZTdKBosdClLSczpWMOc1JKcWZVc0n3OEa9dyHHKcAKCNZcoAj74rcJu8/b6n7Kre++ZdwYogZXXnrusoGFacIYLivagCRLfKZt9kPwFn0m/ggyuCLa8a+3lCQvnYLJCEB7rew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715691334; c=relaxed/simple;
-	bh=ogLSvab9s/uaYk8nU1V6GvKZYCgdD8Qs2Pc34NIY5X0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=REk401ZHEAYvgdh8g52Z1C6NddsmO9qCrrMJ2qGJfTKPMX4lQfBgBVorSikqnMco0AEEwRu8kN/ZZSXPf9NRKEBgwlYNZ6uewoNuys+L9m4J7LtUQDNvOfKQMmj6d/7pbv5fS3Wkp52lMuoTO2K72q0oP7r3bQovx944Na8TGA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SqHcSbng; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 103CD20007;
-	Tue, 14 May 2024 12:55:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1715691323;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1U1lSHyn+UBGYjOWsepzisKyKSuUqvB3hMNBkgKOiVw=;
-	b=SqHcSbngLJlpXZ3Qfg4KbR4KsZwO0iwvwjzI88o8+Tf2e/Q0DD67RsrnIP/SgrGMEJZ3hQ
-	Op8bxR6zbPwZWcXBE35qbKg9Z3diV2VFHHT+H3fyKu2MHKiNGs2FNi+dsvqmB9Id1OI8L0
-	Zcrk4xCQCpNsWLtad7RjLVLwn70oLnGzp+xvl+4UIL1PutKDvt9wCLEPbs0sRSkiIcTmXk
-	x8OVkso3DFNW+I0RFrCfQa9Y5hfPaxWMG0z9OJYQmMRGmNsXb167RC3WrZi0FrHHdbi+5H
-	hL27DJm0xrFQ4QSjQosQYjpgMA0WqCpPxwAYZRB1OAK1XvcexRfN+zuhnoMJTA==
-Date: Tue, 14 May 2024 14:55:18 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: <Steen.Hegelund@microchip.com>
-Cc: <tglx@linutronix.de>, <robh@kernel.org>, <krzk+dt@kernel.org>,
- <conor+dt@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
- <kuba@kernel.org>, <pabeni@redhat.com>, <lee@kernel.org>, <arnd@arndb.de>,
- <Horatiu.Vultur@microchip.com>, <UNGLinuxDriver@microchip.com>,
- <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
- <saravanak@google.com>, <bhelgaas@google.com>, <p.zabel@pengutronix.de>,
- <Lars.Povlsen@microchip.com>, <Daniel.Machon@microchip.com>,
- <alexandre.belloni@bootlin.com>, <linux-kernel@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-pci@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <Allan.Nielsen@microchip.com>, <luca.ceresoli@bootlin.com>,
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH 16/17] mfd: Add support for LAN966x PCI device
-Message-ID: <20240514145518.3e989b83@bootlin.com>
-In-Reply-To: <D1447AHUWV6C.13V6FOWZ80GH@microchip.com>
-References: <20240430083730.134918-1-herve.codina@bootlin.com>
-	<20240430083730.134918-17-herve.codina@bootlin.com>
-	<D1447AHUWV6C.13V6FOWZ80GH@microchip.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1715691386; c=relaxed/simple;
+	bh=HAxSR/4xgfFZEgqmz4A4R4Xt2tlSyYyyjFhU6JoKErk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lv6ccwTrMzXH3hqxXS40P1/oz3xPFbndFSBINAOIqroXHQTcX5dFbZ2YhOXZr2Z/fLXdiQHhLjgXVtbSNotF/y4159vXWHZddysTR7dh6V/JrUfBf4V52RFIWhxIBXoBzVi3R/L/0EV4ASMwiYPUMGZlxZTHP0fnghcoOe2Snpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QnwoHlLj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=iuh+sM1RhuG5a5VhdEyIfFjcwRIdbj2qhxsxFsT5mnU=; b=QnwoHlLj8uidUvP3RLH4tvSOUW
+	0HV7dpGgas2oQ3GEZ4ZEyWHTLTM/xcIQVzIw1NwygLTcNj/Fh8vOPgnKIsRMd1FLfAh1f29cBPgF+
+	S1IhLvFKgzXqKwnJpli6ZD7hzrWT3ZlIvb/sOugP8cO+MHSlh/t05UDC6OXGB3XARVxA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s6rhY-00FO7z-Ex; Tue, 14 May 2024 14:56:16 +0200
+Date: Tue, 14 May 2024 14:56:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Thomas Gessler <thomas.gessler@brueckmann-gmbh.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	MD Danish Anwar <danishanwar@ti.com>,
+	Ravi Gunasekaran <r-gunasekaran@ti.com>
+Subject: Re: [PATCH 2/2] net: phy: dp83869: Fix RGMII-SGMII and 1000BASE-X
+Message-ID: <38bc6947-391b-478d-ab71-6cc8d9428275@lunn.ch>
+References: <20240514122728.1490156-1-thomas.gessler@brueckmann-gmbh.de>
+ <20240514122728.1490156-2-thomas.gessler@brueckmann-gmbh.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240514122728.1490156-2-thomas.gessler@brueckmann-gmbh.de>
 
-Hi Steen,
-
-On Wed, 8 May 2024 08:20:04 +0000
-<Steen.Hegelund@microchip.com> wrote:
-
-...
-> > +
-> > +static irqreturn_t pci_dev_irq_handler(int irq, void *data)
-> > +{
-> > +       struct pci_dev_intr_ctrl *intr_ctrl = data;
-> > +       int ret;
-> > +
-> > +       ret = generic_handle_domain_irq(intr_ctrl->irq_domain, 0);
-> > +       return ret ? IRQ_NONE : IRQ_HANDLED;
-> > +}
-> > +
-> > +static struct pci_dev_intr_ctrl *pci_dev_create_intr_ctrl(struct pci_dev *pdev)
-> > +{
-> > +       struct pci_dev_intr_ctrl *intr_ctrl;
-> > +       struct fwnode_handle *fwnode;
-> > +       int ret;
-> > +
-> > +       if (!pdev->irq)
-> > +               return ERR_PTR(-EOPNOTSUPP);
-> > +
-> > +       fwnode = dev_fwnode(&pdev->dev);
-> > +       if (!fwnode)
-> > +               return ERR_PTR(-ENODEV);
-> > +
-> > +       intr_ctrl = kmalloc(sizeof(*intr_ctrl), GFP_KERNEL);
-> > +       if (!intr_ctrl)
-> > +               return ERR_PTR(-ENOMEM);
-> > +
-> > +       intr_ctrl->pci_dev = pdev;
-> > +
-> > +       intr_ctrl->irq_domain = irq_domain_create_linear(fwnode, 1, &pci_dev_irq_domain_ops,
-> > +                                                        intr_ctrl);
-> > +       if (!intr_ctrl->irq_domain) {
-> > +               pci_err(pdev, "Failed to create irqdomain\n");
-> > +               ret = -ENOMEM;
-> > +               goto err_free_intr_ctrl;
-> > +       }
-> > +
-> > +       ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_LEGACY);
-> > +       if (ret < 0) {
-> > +               pci_err(pdev, "Unable alloc irq vector (%d)\n", ret);
-> > +               goto err_remove_domain;
-> > +       }
-> > +       intr_ctrl->irq = pci_irq_vector(pdev, 0);
-> > +       ret = request_irq(intr_ctrl->irq, pci_dev_irq_handler, IRQF_SHARED,
-> > +                         dev_name(&pdev->dev), intr_ctrl);
-> > +       if (ret) {
-> > +               pci_err(pdev, "Unable to request irq %d (%d)\n", intr_ctrl->irq, ret);
-> > +               goto err_free_irq_vector;
-> > +       }
-> > +
-> > +       return intr_ctrl;
-> > +
-> > +err_free_irq_vector:
-> > +       pci_free_irq_vectors(pdev);
-> > +err_remove_domain:
-> > +       irq_domain_remove(intr_ctrl->irq_domain);
-> > +err_free_intr_ctrl:
-> > +       kfree(intr_ctrl);
-> > +       return ERR_PTR(ret);
-> > +}
-> > +
-> > +static void pci_dev_remove_intr_ctrl(struct pci_dev_intr_ctrl *intr_ctrl)
-> > +{
-> > +       free_irq(intr_ctrl->irq, intr_ctrl);
-> > +       pci_free_irq_vectors(intr_ctrl->pci_dev);
-> > +       irq_dispose_mapping(irq_find_mapping(intr_ctrl->irq_domain, 0));
-> > +       irq_domain_remove(intr_ctrl->irq_domain);
-> > +       kfree(intr_ctrl);
-> > +}
-> > +  
+On Tue, May 14, 2024 at 02:27:28PM +0200, Thomas Gessler wrote:
+> The PHY supports multiple modes of which not all are properly
+> implemented by the driver. In the case of the RGMII-to-SGMII and
+> 1000BASE-X modes, this was primarily due to the use of non-standard
+> registers for auto-negotiation settings and link status. This patch adds
+> device-specific get_features(), config_aneg(), aneg_done(), and
+> read_status() functions for these modes. They are based on the genphy_*
+> versions with the correct registers and fall back to the genphy_*
+> versions for other modes.
 > 
-> It looks like the two functions below (and their helper functions) are so
-> generic that they could be part of the pci driver core support.
-> Any plans for that?
+> The RGMII-to-SGMII mode is special, because the chip does not really act
+> as a PHY in this mode but rather as a bridge.
 
-Indeed, I tried to write them in a generic way.
-Right now, at least for the next iteration of this series, I don't plan to
-move them as part of the PCI code.
-This piece of code did not get any feedback and I would prefer to keep them
-here for the moment.
+It is known as a media converter. You see them used between an RGMII
+port and an SFP cage. Is that your use case?
 
-Of course, they could be move out of the LAN966x PCI driver later.
+It requires a connected
+> SGMII PHY and gets the negotiated speed and duplex from it through SGMII
+> auto-negotiation. To use the DP83869 as a virtual PHY, we assume that
+> the connected SGMII PHY supports 10/100/1000M half/full duplex and
+> therefore support and always advertise those settings.
 
-> 
-> > +static void devm_pci_dev_remove_intr_ctrl(void *data)
-> > +{
-> > +       struct pci_dev_intr_ctrl *intr_ctrl = data;
-> > +
-> > +       pci_dev_remove_intr_ctrl(intr_ctrl);
-> > +}
-> > +
-> > +static int devm_pci_dev_create_intr_ctrl(struct pci_dev *pdev)
-> > +{
-> > +       struct pci_dev_intr_ctrl *intr_ctrl;
-> > +
-> > +       intr_ctrl = pci_dev_create_intr_ctrl(pdev);
-> > +
-> > +       if (IS_ERR(intr_ctrl))
-> > +               return PTR_ERR(intr_ctrl);
-> > +
-> > +       return devm_add_action_or_reset(&pdev->dev, devm_pci_dev_remove_intr_ctrl, intr_ctrl);
-> > +}
-> > +  
-> 
+Not all copper SFP modules support auto-neg. This is all really messy
+because there is no standardisation. Also 1000BaseT_Half is often not
+supported.
 
-Best regards,
-Hervé
+	Andrew
 
