@@ -1,109 +1,85 @@
-Return-Path: <netdev+bounces-96209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80D028C4A6A
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:24:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48BC48C4A6C
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:24:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34ED228287D
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 00:24:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AAF71C214D3
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 00:24:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F51537E;
-	Tue, 14 May 2024 00:24:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C76D365;
+	Tue, 14 May 2024 00:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YY6CfJ0P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FUTByTDR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7068F7EF;
-	Tue, 14 May 2024 00:24:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E251C20;
+	Tue, 14 May 2024 00:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715646250; cv=none; b=ag1mbY+X+3LLFLJ/56jU+8nGruWiPctN59yz067uFsIP2s0NAxccdRmpiTlJKNipKT3YagV0XxOPvJY9VzOfNNNKsBYwf8L0KT0HAeAHVG/jCgAEdRIZG7wXROuEr+17Hok+fx1delfTMxTNgvwuNH6G0eIvNPjzMQYoKt8UaYU=
+	t=1715646265; cv=none; b=Kjg2wPQc+vHoaZLMey4Qwlk8O37M8Q99Efp2fNnw/XaXnLSjEuy82rksjPCtTEqiBzkdESuT7JBWT0A2Gb+cKYzNB1yHauof4V6R7030+aO4cqsbwGXtLt1/gahjrKx6dVU5RovopkbIjRualOoiCvyTXj+iz89qd9L5FphBaUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715646250; c=relaxed/simple;
-	bh=NW6vEkjncf0dhMOgViKtjptdXYcJxVIDHjLO2k1Cf+4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=VWPS2sKPuhrXlZgGDTjAhucQ5Elgm7XUmb3LaYAr5CSMdom+Ztf2V0YAxFV/yZqEcVAGRq3HQbmJMIVp0hqce9/awcMec/nekKe46Rworq5CXJ/W9RMtFNqAzK9Ff3zJEfDWhRrUqgKEFWa8bO7DmFCjFR6RQ2kPF4UG/HOIRZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YY6CfJ0P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE084C32781;
-	Tue, 14 May 2024 00:24:09 +0000 (UTC)
+	s=arc-20240116; t=1715646265; c=relaxed/simple;
+	bh=A7Plmx1hi7FN0erRws0eJ5j+s2dPPXRAeZTYL40TeCc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kxLYA0+EI/ORj5zJXxKI8ZoHDeiHr60Mj15l1TGuE46Qezc2VcnEWj1gkd6VohJlV8r6erPCa8B0d/BncJxPbWj8gcHKJvI0RxbCxEP6tPB1jWU4cAGwVilXXyK71EeL7NVT55kK2ONLOy4rUpnI1hiDpJG29P2RdlP3BImw3DE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FUTByTDR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 730A5C113CC;
+	Tue, 14 May 2024 00:24:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715646249;
-	bh=NW6vEkjncf0dhMOgViKtjptdXYcJxVIDHjLO2k1Cf+4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=YY6CfJ0PGVF7B07+H/k3VNW6PimUAYUiQdS6YEcxDPuL8N9zcSOblOZsgD0udZvGf
-	 r5Xx7oAu0YKMiNsw7SnrcedNr7F5Hy0u5mZmKPluFT5/OBNvgC1P6UKgf02CI2tYQ5
-	 8RWabP++zrcR2Od/WO54fvExmWwHQoqFoxUgJRQ+XyOYEajbjtBJz8eg4phc3lxzJ8
-	 HUDqFHudSiJigaMKkHnC5KXcbo+aUEIzpYxR66oEa0XlH5nCWOPUHuUZsHHHR+DZnT
-	 S2A/igTGxG3MQFRn5GEWZNAFpfvIZAhcSDSCztGLFrlmHSRzA5is/nYbGUuDBb3dgV
-	 D3JCyDb+IiYEw==
-Date: Mon, 13 May 2024 17:24:08 -0700 (PDT)
-From: Mat Martineau <martineau@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-cc: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, mptcp@lists.linux.dev, 
-    Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-    Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, Gregory Detal <gregory.detal@gmail.com>
-Subject: Re: [PATCH net-next 0/8] mptcp: small improvements, fix and
- clean-ups
-In-Reply-To: <20240513160630.545c3024@kernel.org>
-Message-ID: <f60cac35-5a2b-16cf-4706-b2e41acfacae@kernel.org>
-References: <20240510-upstream-net-next-20240509-misc-improvements-v1-0-4f25579e62ba@kernel.org> <20240513160630.545c3024@kernel.org>
+	s=k20201202; t=1715646263;
+	bh=A7Plmx1hi7FN0erRws0eJ5j+s2dPPXRAeZTYL40TeCc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FUTByTDR38k/n/01oUKEUD0VI/Zfi1UTUv6ToQy8CnXsbQBFEdgGszz/8P459yZb7
+	 bP9hxd4DYLlIKsgGn5lt3jihVnp+9qUDAg90JnEmMrhqabVhv9zgyv8d/ykMqgjHhY
+	 DB1ULA1A5tA3+UVROK3IGeAwpbtOHyOWTfRmougu5Xhuc6i3bYDZikVWLV5J4QSC7C
+	 8mD56Z4rBiif1URvBURFIR+NPY1sDMZmsp+Zj1w5KQffgkfDJmVnc5lJuVsrVz1OdK
+	 SjbRZzd7OW+FnbWvycwXM7dzgsGRSn2U2+KhXVv6ckylsLKAYjRwlYjCLyA/rQyGAg
+	 OsUp/8ntnq9vw==
+Date: Mon, 13 May 2024 17:24:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Niklas =?UTF-8?B?U8O2ZGVybHVuZA==?=
+ <niklas.soderlund+renesas@ragnatech.se>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next,v5] net: ethernet: rtsn: Add support for Renesas
+ Ethernet-TSN
+Message-ID: <20240513172422.47dc34a5@kernel.org>
+In-Reply-To: <20240509210903.3738334-1-niklas.soderlund+renesas@ragnatech.se>
+References: <20240509210903.3738334-1-niklas.soderlund+renesas@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 13 May 2024, Jakub Kicinski wrote:
+On Thu,  9 May 2024 23:09:03 +0200 Niklas S=C3=B6derlund wrote:
+> Add initial support for Renesas Ethernet-TSN End-station device of R-Car
+> V4H. The Ethernet End-station can connect to an Ethernet network using a
+> 10 Mbps, 100 Mbps, or 1 Gbps full-duplex link via MII/GMII/RMII/RGMII.
+> Depending on the connected PHY.
+>=20
+> The driver supports Rx checksum and offload and hardware timestamps.
+>=20
+> While full power management and suspend/resume is not yet supported the
+> driver enables runtime PM in order to enable the module clock. While
+> explicit clock management using clk_enable() would suffice for the
+> supported SoC, the module could be reused on SoCs where the module is
+> part of a power domain.
 
-> On Fri, 10 May 2024 13:18:30 +0200 Matthieu Baerts (NGI0) wrote:
->> This series contain mostly unrelated patches:
->>
->> - The two first patches can be seen as "fixes". They are part of this
->>   series for -next because it looks like the last batch of fixes for
->>   v6.9 has already been sent. These fixes are not urgent, so they can
->>   wait if an unlikely v6.9-rc8 is published. About the two patches:
->>     - Patch 1 fixes getsockopt(SO_KEEPALIVE) support on MPTCP sockets
->>     - Patch 2 makes sure the full TCP keep-alive feature is supported,
->>       not just SO_KEEPALIVE.
->>
->> - Patch 3 is a small optimisation when getsockopt(MPTCP_INFO) is used
->>   without buffer, just to check if MPTCP is still being used: no
->>   fallback to TCP.
->>
->> - Patch 4 adds net.mptcp.available_schedulers sysctl knob to list packet
->>   schedulers, similar to net.ipv4.tcp_available_congestion_control.
->>
->> - Patch 5 and 6 fix CheckPatch warnings: "prefer strscpy over strcpy"
->>   and "else is not generally useful after a break or return".
->>
->> - Patch 7 and 8 remove and add header includes to avoid unused ones, and
->>   add missing ones to be self-contained.
->
-> Seems to conflict with:
-> https://lore.kernel.org/all/20240509-upstream-net-next-20240509-mptcp-tcp_is_mptcp-v1-1-f846df999202@kernel.org/
-
-Hi Jakub -
-
-The conflict here is purely in the diff context, patch 2 of this series 
-and "tcp: socket option to check for MPTCP fallback to TCP" add cases to 
-the same switch statement and have a couple of unmodified lines between 
-their additions.
-
-"git am -3" handles it cleanly in this case, if you have time and 
-inclination for a second attempt. But I realize you're working through a 
-backlog and net-next is now closed, so that time might not be available. 
-We'll try again when net-next reopens if needed.
-
-
-Thanks,
-Mat
+I need to close net-next today, and I'm not sure if the discussion
+is fully concluded. So unfortunately this will have to wait for 6.11.
+If someone disagrees please shout.
+--=20
+pw-bot: defer
 
