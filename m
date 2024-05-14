@@ -1,233 +1,285 @@
-Return-Path: <netdev+bounces-96320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 653F48C4F4D
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 12:45:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 161DC8C50BD
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:11:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8936B1C211C2
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 10:45:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3980B1C2094A
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 11:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A31D13E3EB;
-	Tue, 14 May 2024 10:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C016E612;
+	Tue, 14 May 2024 10:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="pwwVVuuL"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="1o9+PPhI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EABA64CCC
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 10:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3166D1B2;
+	Tue, 14 May 2024 10:47:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715681668; cv=none; b=roPR4dqNSm7rlFzZrFL/WIjzyXkbeYlWQZ7WiigaoSBoMjE6ofdpVU3UmhyTPh9UhiWdInSpQ/cCLg8IecK3L0arIuYvPNg1SyzThgxjxugbjRTcUboVHtnJwDKV0cEuQFBq9QIkZJ38Jln0lZhKs3ZcDzTV+Z5uZB+URreUZow=
+	t=1715683634; cv=none; b=DH7BVsxHR9AYi2ZuvXXzVO/sPk8XFvC9zJKWfDWvntI/O/XjGLFzvYcF9HroKlYviqGNnjtL8rxxlFwRrssykJgzOH/jVdYup0uJF3aURrjVL6htmFNUnPuGvaqQ8E9DrfcR4ZCGsSu0DGJbLYOIn79tK+w7O6uZllTihHpZNrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715681668; c=relaxed/simple;
-	bh=bNtDU03a3v5G0GdtsFJG7yzeyOpgxV3v9BfTR1Z+az8=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=qci4vs3oN9qLGhLE0GOCWzY3eCU7prQVrpOyJCS62lJ0eiHo8KVEjci9AcuLScMEOrGKf/UE2LcsibtMALoMHdDVW0mjvYE/FxnmSA/LnM/PWlPmspxqIf8V77uxAH5PGGZjguOL+9hrdCTKEvWr34hg+91iVbdP5ay0JN++56A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=pwwVVuuL; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1s6pAH-00EQDJ-Mh; Tue, 14 May 2024 12:13:45 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=Jep7rVpfKnWdGgRck8zcllYxioJ8DAwieJDcV63yyiY=; b=pwwVVuuLC/U8Ce5GPVyjuAN7q3
-	WFZGNiBXWt7PlRIje9mCsNjOGxPkPDjhyvVLjyPYW0PGC1XLoN/t+B7BP1qc/UgcicunM0l/0D6/U
-	hjmHSJpwZffrWxqte2tmLH2LtapzeBPVkz2QYP8vU1k3Q1mWXpdl5qosDju28NCH80rJMA1O8tECt
-	0y2OquR2qZ37hzOHEgF1csDd3R4rpM4MivdHpRo+WAIx0/BYyxeT+oQ2rZnz5XLY+YnOeiGBf6XLb
-	dH1eTejU9q07h2xEdKceM0vInKborn+yTBPePhqtr2CG6cBD+Mhpvms6ILxpXw2tKU1c0tYMOywPj
-	+110J62Q==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1s6pAG-000603-D6; Tue, 14 May 2024 12:13:44 +0200
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1s6pAA-00AJe3-3D; Tue, 14 May 2024 12:13:38 +0200
-Message-ID: <6915a10c-cc57-4a68-9f91-a5efdf42091d@rbox.co>
-Date: Tue, 14 May 2024 12:13:36 +0200
+	s=arc-20240116; t=1715683634; c=relaxed/simple;
+	bh=1SdUOKjD0c5njCQBVoCU+hfClD9oyLBIqpmRLfyxKkM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=av3KHxHK0KjWQ7qRYrTecaz3HuPYSNk45u4o/XIMGIzKKBE1icxybUYs0z2qpLnYVzxTGTpqSwMroBQucAgV6UvWKV+kextB+hvRJyo1EqvuCFAG1kljy5WVwjebxmLg2enIPYSR+3lFjwsKUVEhdYrM/KXzVv3QdI3QE5kuF+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=1o9+PPhI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31A05C2BD10;
+	Tue, 14 May 2024 10:47:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1715683633;
+	bh=1SdUOKjD0c5njCQBVoCU+hfClD9oyLBIqpmRLfyxKkM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=1o9+PPhI3qlDC8URViKYDv5mn0/32yHGY8cjHWrSFEGgD/ANabYTK7lZUp54SzB5b
+	 dbj6HSLTfOr+0chKD3t1ohPdiTMZI5Qyh1D2KH+AuCIu4FP79NwBcWBQcKNfUXiELI
+	 H5y4LIQp5mEFIMI1DAsCc8TNBY64l5A+iTxjPzo4=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	netdev@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.8 216/336] rxrpc: Fix the names of the fields in the ACK trailer struct
+Date: Tue, 14 May 2024 12:17:00 +0200
+Message-ID: <20240514101046.767087625@linuxfoundation.org>
+X-Mailer: git-send-email 2.45.0
+In-Reply-To: <20240514101038.595152603@linuxfoundation.org>
+References: <20240514101038.595152603@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH v4 net] af_unix: Update unix_sk(sk)->oob_skb under
- sk_receive_queue lock.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- Billy Jheng Bing-Jhong <billy@starlabs.sg>
-References: <20240514025250.12604-1-kuniyu@amazon.com>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <20240514025250.12604-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 5/14/24 04:52, Kuniyuki Iwashima wrote:
-> ...
-> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-> index 0104be9d4704..b87e48e2b51b 100644
-> --- a/net/unix/garbage.c
-> +++ b/net/unix/garbage.c
-> @@ -342,10 +342,12 @@ static void __unix_gc(struct work_struct *work)
->  		scan_children(&u->sk, inc_inflight, &hitlist);
->  
->  #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-> +		spin_lock(&u->sk.sk_receive_queue.lock);
->  		if (u->oob_skb) {
-> -			kfree_skb(u->oob_skb);
-> +			WARN_ON_ONCE(skb_unref(u->oob_skb));
->  			u->oob_skb = NULL;
->  		}
-> +		spin_unlock(&u->sk.sk_receive_queue.lock);
->  #endif
->  	}
+6.8-stable review patch.  If anyone has any objections, please let me know.
 
-I've realised this part of GC is broken for embryos. And adding a rq lock
-here turns a warning into a possible deadlock, so below is my attempt at
-fixing the underlying problem.
+------------------
 
-It's based it on top of your patch, so should I post it now or wait until
-your patch lands in net?
+From: David Howells <dhowells@redhat.com>
+
+[ Upstream commit 17469ae0582aaacad36e8e858f58b86c369f21ef ]
+
+>From AFS-3.3 a trailer containing extra info was added to the ACK packet
+format - but AF_RXRPC has the names of some of the fields mixed up compared
+to other AFS implementations.
+
+Rename the struct and the fields to make them match.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+Stable-dep-of: ba4e103848d3 ("rxrpc: Fix congestion control algorithm")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-Subject: [PATCH] af_unix: Fix garbage collection of embryos carrying
- OOB/SCM_RIGHTS
+ include/trace/events/rxrpc.h |  2 +-
+ net/rxrpc/conn_event.c       | 16 ++++++++--------
+ net/rxrpc/input.c            | 22 +++++++++++-----------
+ net/rxrpc/output.c           | 14 +++++++-------
+ net/rxrpc/protocol.h         |  6 +++---
+ 5 files changed, 30 insertions(+), 30 deletions(-)
 
-GC attempts to explicitly drop oob_skb before purging the hit list. The
-problem is with embryos: instead of trying to kfree_skb(u->oob_skb) of an
-embryo socket, GC goes for its parent-listener socket, which never carries
-u->oob_skb. Effectively oob_skb is removed from the receive queue, but
-remains reachable via u->oob_skb.
-
-Tell GC to dispose the right socket's oob_skb.
-
-Fixes: aa82ac51d633 ("af_unix: Drop oob_skb ref before purging queue in GC.")
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
-from array import array
-from socket import *
-
-addr = 'unix-oob-splat'
-lis = socket(AF_UNIX, SOCK_STREAM)
-lis.bind(addr)
-lis.listen(1)
-
-s = socket(AF_UNIX, SOCK_STREAM)
-s.connect(addr)
-scm = (SOL_SOCKET, SCM_RIGHTS, array('i', [lis.fileno()]))
-s.sendmsg([b'x'], [scm], MSG_OOB)
-lis.close()
-
-[   22.208683] WARNING: CPU: 2 PID: 546 at net/unix/garbage.c:371 __unix_gc+0x50e/0x520
-[   22.208687] Modules linked in: 9p netfs kvm_intel kvm 9pnet_virtio 9pnet i2c_piix4 zram crct10dif_pclmul crc32_pclmul crc32c_intel virtio_blk ghash_clmulni_intel serio_raw fuse qemu_fw_cfg virtio_console
-[   22.208701] CPU: 2 PID: 546 Comm: kworker/u32:5 Not tainted 6.9.0-rc7nokasan+ #28
-[   22.208703] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
-[   22.208704] Workqueue: events_unbound __unix_gc
-[   22.208706] RIP: 0010:__unix_gc+0x50e/0x520
-[   22.208708] Code: 83 fa 01 0f 84 07 fe ff ff 85 d2 0f 8f 01 fe ff ff be 03 00 00 00 e8 f1 f7 9a ff e9 f2 fd ff ff e8 b7 f9 ff ff e9 28 fd ff ff <0f> 0b e9 07 ff ff ff e8 36 0a 1a 00 66 0f 1f 44 00 00 90 90 90 90
-[   22.208710] RSP: 0018:ffffc9000051fd90 EFLAGS: 00010283
-[   22.208712] RAX: ffff88810b316f30 RBX: ffffffff83563230 RCX: 0000000000000001
-[   22.208713] RDX: 0000000000000001 RSI: ffffffff82956cfb RDI: ffffffff83563880
-[   22.208714] RBP: ffffc9000051fe38 R08: 00000000cba2db62 R09: 00000000000003e5
-[   22.208715] R10: 0000000000000000 R11: 0000000000000000 R12: ffffc9000051fdb0
-[   22.208716] R13: ffff88810b316a00 R14: ffffc9000051fd90 R15: ffffffff83563860
-[   22.208717] FS:  0000000000000000(0000) GS:ffff88842fb00000(0000) knlGS:0000000000000000
-[   22.208718] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   22.208719] CR2: 0000557b30b7406c CR3: 000000011e5be000 CR4: 0000000000750ef0
-[   22.208722] PKRU: 55555554
-[   22.208723] Call Trace:
-[   22.208724]  <TASK>
-[   22.208725]  ? __warn.cold+0xb1/0x13e
-[   22.208728]  ? __unix_gc+0x50e/0x520
-[   22.208730]  ? report_bug+0xe6/0x170
-[   22.208733]  ? handle_bug+0x3c/0x80
-[   22.208735]  ? exc_invalid_op+0x13/0x60
-[   22.208737]  ? asm_exc_invalid_op+0x16/0x20
-[   22.208741]  ? __unix_gc+0x50e/0x520
-[   22.208747]  process_one_work+0x21f/0x590
-[   22.208750]  ? move_linked_works+0x70/0xa0
-[   22.208753]  worker_thread+0x1bf/0x3d0
-[   22.208756]  ? __pfx_worker_thread+0x10/0x10
-[   22.208757]  kthread+0xdd/0x110
-[   22.208759]  ? __pfx_kthread+0x10/0x10
-[   22.208761]  ret_from_fork+0x2d/0x50
-[   22.208763]  ? __pfx_kthread+0x10/0x10
-[   22.208765]  ret_from_fork_asm+0x1a/0x30
-[   22.208770]  </TASK>
-[   22.208771] irq event stamp: 198563
-[   22.208772] hardirqs last  enabled at (198569): [<ffffffff811b617d>] console_unlock+0x10d/0x140
-[   22.208775] hardirqs last disabled at (198574): [<ffffffff811b6162>] console_unlock+0xf2/0x140
-[   22.208777] softirqs last  enabled at (196450): [<ffffffff81110f4d>] __irq_exit_rcu+0x9d/0x100
-[   22.208778] softirqs last disabled at (196445): [<ffffffff81110f4d>] __irq_exit_rcu+0x9d/0x100
-
- net/unix/garbage.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
-
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index b87e48e2b51b..beecd0bfbf48 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -170,10 +170,11 @@ static void scan_inflight(struct sock *x, void (*func)(struct unix_sock *),
- 			/* Process the descriptors of this socket */
- 			int nfd = UNIXCB(skb).fp->count;
- 			struct file **fp = UNIXCB(skb).fp->fp;
-+			struct unix_sock *u;
+diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
+index 87b8de9b6c1c4..ecf9da5462359 100644
+--- a/include/trace/events/rxrpc.h
++++ b/include/trace/events/rxrpc.h
+@@ -83,7 +83,7 @@
+ 	EM(rxrpc_badmsg_bad_abort,		"bad-abort")		\
+ 	EM(rxrpc_badmsg_bad_jumbo,		"bad-jumbo")		\
+ 	EM(rxrpc_badmsg_short_ack,		"short-ack")		\
+-	EM(rxrpc_badmsg_short_ack_info,		"short-ack-info")	\
++	EM(rxrpc_badmsg_short_ack_trailer,	"short-ack-trailer")	\
+ 	EM(rxrpc_badmsg_short_hdr,		"short-hdr")		\
+ 	EM(rxrpc_badmsg_unsupported_packet,	"unsup-pkt")		\
+ 	EM(rxrpc_badmsg_zero_call,		"zero-call")		\
+diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
+index 1f251d758cb9d..598b4ee389fc1 100644
+--- a/net/rxrpc/conn_event.c
++++ b/net/rxrpc/conn_event.c
+@@ -88,7 +88,7 @@ void rxrpc_conn_retransmit_call(struct rxrpc_connection *conn,
+ 			struct rxrpc_ackpacket ack;
+ 		};
+ 	} __attribute__((packed)) pkt;
+-	struct rxrpc_ackinfo ack_info;
++	struct rxrpc_acktrailer trailer;
+ 	size_t len;
+ 	int ret, ioc;
+ 	u32 serial, mtu, call_id, padding;
+@@ -122,8 +122,8 @@ void rxrpc_conn_retransmit_call(struct rxrpc_connection *conn,
+ 	iov[0].iov_len	= sizeof(pkt.whdr);
+ 	iov[1].iov_base	= &padding;
+ 	iov[1].iov_len	= 3;
+-	iov[2].iov_base	= &ack_info;
+-	iov[2].iov_len	= sizeof(ack_info);
++	iov[2].iov_base	= &trailer;
++	iov[2].iov_len	= sizeof(trailer);
  
- 			while (nfd--) {
- 				/* Get the socket the fd matches if it indeed does so */
--				struct unix_sock *u = unix_get_socket(*fp++);
-+				u = unix_get_socket(*fp++);
+ 	serial = rxrpc_get_next_serial(conn);
  
- 				/* Ignore non-candidates, they could have been added
- 				 * to the queues after starting the garbage collection
-@@ -187,6 +188,14 @@ static void scan_inflight(struct sock *x, void (*func)(struct unix_sock *),
- 			if (hit && hitlist != NULL) {
- 				__skb_unlink(skb, &x->sk_receive_queue);
- 				__skb_queue_tail(hitlist, skb);
-+
-+#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-+				u = unix_sk(x);
-+				if (u->oob_skb == skb) {
-+					WARN_ON_ONCE(skb_unref(u->oob_skb));
-+					u->oob_skb = NULL;
-+				}
-+#endif
- 			}
- 		}
+@@ -158,14 +158,14 @@ void rxrpc_conn_retransmit_call(struct rxrpc_connection *conn,
+ 		pkt.ack.serial		= htonl(skb ? sp->hdr.serial : 0);
+ 		pkt.ack.reason		= skb ? RXRPC_ACK_DUPLICATE : RXRPC_ACK_IDLE;
+ 		pkt.ack.nAcks		= 0;
+-		ack_info.rxMTU		= htonl(rxrpc_rx_mtu);
+-		ack_info.maxMTU		= htonl(mtu);
+-		ack_info.rwind		= htonl(rxrpc_rx_window_size);
+-		ack_info.jumbo_max	= htonl(rxrpc_rx_jumbo_max);
++		trailer.maxMTU		= htonl(rxrpc_rx_mtu);
++		trailer.ifMTU		= htonl(mtu);
++		trailer.rwind		= htonl(rxrpc_rx_window_size);
++		trailer.jumbo_max	= htonl(rxrpc_rx_jumbo_max);
+ 		pkt.whdr.flags		|= RXRPC_SLOW_START_OK;
+ 		padding			= 0;
+ 		iov[0].iov_len += sizeof(pkt.ack);
+-		len += sizeof(pkt.ack) + 3 + sizeof(ack_info);
++		len += sizeof(pkt.ack) + 3 + sizeof(trailer);
+ 		ioc = 3;
+ 
+ 		trace_rxrpc_tx_ack(chan->call_debug_id, serial,
+diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
+index 9691de00ade75..718ffd184ddb6 100644
+--- a/net/rxrpc/input.c
++++ b/net/rxrpc/input.c
+@@ -670,14 +670,14 @@ static void rxrpc_complete_rtt_probe(struct rxrpc_call *call,
+ /*
+  * Process the extra information that may be appended to an ACK packet
+  */
+-static void rxrpc_input_ackinfo(struct rxrpc_call *call, struct sk_buff *skb,
+-				struct rxrpc_ackinfo *ackinfo)
++static void rxrpc_input_ack_trailer(struct rxrpc_call *call, struct sk_buff *skb,
++				    struct rxrpc_acktrailer *trailer)
+ {
+ 	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
+ 	struct rxrpc_peer *peer;
+ 	unsigned int mtu;
+ 	bool wake = false;
+-	u32 rwind = ntohl(ackinfo->rwind);
++	u32 rwind = ntohl(trailer->rwind);
+ 
+ 	if (rwind > RXRPC_TX_MAX_WINDOW)
+ 		rwind = RXRPC_TX_MAX_WINDOW;
+@@ -691,7 +691,7 @@ static void rxrpc_input_ackinfo(struct rxrpc_call *call, struct sk_buff *skb,
+ 	if (call->cong_ssthresh > rwind)
+ 		call->cong_ssthresh = rwind;
+ 
+-	mtu = min(ntohl(ackinfo->rxMTU), ntohl(ackinfo->maxMTU));
++	mtu = min(ntohl(trailer->maxMTU), ntohl(trailer->ifMTU));
+ 
+ 	peer = call->peer;
+ 	if (mtu < peer->maxdata) {
+@@ -837,7 +837,7 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
+ 	struct rxrpc_ack_summary summary = { 0 };
+ 	struct rxrpc_ackpacket ack;
+ 	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
+-	struct rxrpc_ackinfo info;
++	struct rxrpc_acktrailer trailer;
+ 	rxrpc_serial_t ack_serial, acked_serial;
+ 	rxrpc_seq_t first_soft_ack, hard_ack, prev_pkt, since;
+ 	int nr_acks, offset, ioffset;
+@@ -917,11 +917,11 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
+ 		goto send_response;
  	}
-@@ -338,19 +347,9 @@ static void __unix_gc(struct work_struct *work)
- 	 * which are creating the cycle(s).
- 	 */
- 	skb_queue_head_init(&hitlist);
--	list_for_each_entry(u, &gc_candidates, link) {
-+	list_for_each_entry(u, &gc_candidates, link)
- 		scan_children(&u->sk, inc_inflight, &hitlist);
  
--#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
--		spin_lock(&u->sk.sk_receive_queue.lock);
--		if (u->oob_skb) {
--			WARN_ON_ONCE(skb_unref(u->oob_skb));
--			u->oob_skb = NULL;
--		}
--		spin_unlock(&u->sk.sk_receive_queue.lock);
--#endif
--	}
--
- 	/* not_cycle_list contains those sockets which do not make up a
- 	 * cycle.  Restore these to the inflight list.
- 	 */
+-	info.rxMTU = 0;
++	trailer.maxMTU = 0;
+ 	ioffset = offset + nr_acks + 3;
+-	if (skb->len >= ioffset + sizeof(info) &&
+-	    skb_copy_bits(skb, ioffset, &info, sizeof(info)) < 0)
+-		return rxrpc_proto_abort(call, 0, rxrpc_badmsg_short_ack_info);
++	if (skb->len >= ioffset + sizeof(trailer) &&
++	    skb_copy_bits(skb, ioffset, &trailer, sizeof(trailer)) < 0)
++		return rxrpc_proto_abort(call, 0, rxrpc_badmsg_short_ack_trailer);
+ 
+ 	if (nr_acks > 0)
+ 		skb_condense(skb);
+@@ -950,8 +950,8 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
+ 	}
+ 
+ 	/* Parse rwind and mtu sizes if provided. */
+-	if (info.rxMTU)
+-		rxrpc_input_ackinfo(call, skb, &info);
++	if (trailer.maxMTU)
++		rxrpc_input_ack_trailer(call, skb, &trailer);
+ 
+ 	if (first_soft_ack == 0)
+ 		return rxrpc_proto_abort(call, 0, rxrpc_eproto_ackr_zero);
+diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
+index 4a292f860ae37..cad6a7d18e040 100644
+--- a/net/rxrpc/output.c
++++ b/net/rxrpc/output.c
+@@ -83,7 +83,7 @@ static size_t rxrpc_fill_out_ack(struct rxrpc_connection *conn,
+ 				 struct rxrpc_txbuf *txb,
+ 				 u16 *_rwind)
+ {
+-	struct rxrpc_ackinfo ackinfo;
++	struct rxrpc_acktrailer trailer;
+ 	unsigned int qsize, sack, wrap, to;
+ 	rxrpc_seq_t window, wtop;
+ 	int rsize;
+@@ -126,16 +126,16 @@ static size_t rxrpc_fill_out_ack(struct rxrpc_connection *conn,
+ 	qsize = (window - 1) - call->rx_consumed;
+ 	rsize = max_t(int, call->rx_winsize - qsize, 0);
+ 	*_rwind = rsize;
+-	ackinfo.rxMTU		= htonl(rxrpc_rx_mtu);
+-	ackinfo.maxMTU		= htonl(mtu);
+-	ackinfo.rwind		= htonl(rsize);
+-	ackinfo.jumbo_max	= htonl(jmax);
++	trailer.maxMTU		= htonl(rxrpc_rx_mtu);
++	trailer.ifMTU		= htonl(mtu);
++	trailer.rwind		= htonl(rsize);
++	trailer.jumbo_max	= htonl(jmax);
+ 
+ 	*ackp++ = 0;
+ 	*ackp++ = 0;
+ 	*ackp++ = 0;
+-	memcpy(ackp, &ackinfo, sizeof(ackinfo));
+-	return txb->ack.nAcks + 3 + sizeof(ackinfo);
++	memcpy(ackp, &trailer, sizeof(trailer));
++	return txb->ack.nAcks + 3 + sizeof(trailer);
+ }
+ 
+ /*
+diff --git a/net/rxrpc/protocol.h b/net/rxrpc/protocol.h
+index e8ee4af43ca89..4fe6b4d20ada9 100644
+--- a/net/rxrpc/protocol.h
++++ b/net/rxrpc/protocol.h
+@@ -135,9 +135,9 @@ struct rxrpc_ackpacket {
+ /*
+  * ACK packets can have a further piece of information tagged on the end
+  */
+-struct rxrpc_ackinfo {
+-	__be32		rxMTU;		/* maximum Rx MTU size (bytes) [AFS 3.3] */
+-	__be32		maxMTU;		/* maximum interface MTU size (bytes) [AFS 3.3] */
++struct rxrpc_acktrailer {
++	__be32		maxMTU;		/* maximum Rx MTU size (bytes) [AFS 3.3] */
++	__be32		ifMTU;		/* maximum interface MTU size (bytes) [AFS 3.3] */
+ 	__be32		rwind;		/* Rx window size (packets) [AFS 3.4] */
+ 	__be32		jumbo_max;	/* max packets to stick into a jumbo packet [AFS 3.5] */
+ };
 -- 
-2.45.0
+2.43.0
+
+
+
 
