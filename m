@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-96229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 777508C4ACC
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 03:14:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 534B08C4ACD
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 03:14:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E8091F22F13
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:14:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0716E283136
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C34817F6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9EADB65D;
 	Tue, 14 May 2024 01:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GUZ8U8ZH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GwKSVFV8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DADA94B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81181AD5A;
 	Tue, 14 May 2024 01:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715649223; cv=none; b=SejsbJ7M4xzuSiNZ1sFxzZHNMFAaIL/4rd4RPXKxIa4Sh4uJcEIgi9dThe+v4U4W4ENvVA6QudLO0tw6jWI/xlvXPttlWDUlfm5vJTWV07Wo4p1rzhERURNa7CqohpaatnDKUyBMGSI+28Q5jJIOTUhg7rvH7x8d5qGrNSwO5Pc=
+	t=1715649223; cv=none; b=fElJFr06KbWTza51CTZntMNbw5zgbza/iSjPai4b319KUbxxngHrKzj9EpuDrWp++qD/TlUSgWqpPEK63XSA8o80/nFHILnIXKikpALrNbbEan0wJcgo61P8i/ctR84GEhaDxbG5ItxbVc9/+bv+OrhmmKL8MCGkAJrbmlgUms0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715649223; c=relaxed/simple;
-	bh=gFakMct8wqfURtjlv4dVJOCOcVG3xoX/nIjOFY3vLYM=;
+	bh=SuBQO5z3Rf1aCOlyglm3AKTFHnDNU1WgZ4qtAUIiPDM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KeRh37CRI1mAVA1dUpPOsJDlaBnBbmB1EKM+V5vzq4eQlzdV5Bn0O288mPEOR1yVgNx4GXba49sILTeYD5nipKYjJ0vLk1FLAVJjYiLDt4e8FxrJI2Lp6lgG+STMmJrhUJJdvHspkU/NGU1+JYFdgRiJNNqOFLl/Lz3BgeygY88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GUZ8U8ZH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9B28C4DDEA;
-	Tue, 14 May 2024 01:13:42 +0000 (UTC)
+	 MIME-Version; b=K8E8v/qDjcrWvoShxg9Z5BCTcB222oFLzzv2Xc3Xj3U1LxZ20VC2wDMcmiGpnx/oJDRnU47MWkNywexVoHKFC++AOu4UP/CitKZvf9VHPuKYMyU1jOIn5QO9YcGS0BG4PuUmvUTunbOd0ikdx4vaiiXKisRCoaEDkTI+pfKH38s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GwKSVFV8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2313CC4DDE2;
+	Tue, 14 May 2024 01:13:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715649223;
-	bh=gFakMct8wqfURtjlv4dVJOCOcVG3xoX/nIjOFY3vLYM=;
+	bh=SuBQO5z3Rf1aCOlyglm3AKTFHnDNU1WgZ4qtAUIiPDM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GUZ8U8ZHaCczR6fkAeWWdG61qy5Qlc68EQ3UNDExq1KinGktXNHW12ftQQgLcLh59
-	 xzq+q4j09ob5+tVIAdLFCDa6mUFxj5Xazg5K7GbSgJP4tE5AzqYMMscK4ohZeRxwxa
-	 gwistGvddn8MTq/c8gNuOyeR5QcgkWUZeKTR+aJssiDaFDGtBPIWe6kQMNSV8nZHGc
-	 /PB4utNpC+wWI3JNWTy9QFdo2sTPEBgCVY22y/Hsj2WNNTIh+6wWKe1J8X7Tpljypc
-	 f4z0JMoHEyIlVzn5jht1l1dAFQialjm4p73l51Ap9Oig1sJXeRc4AVJmRf6Cgqretv
-	 mSnyVq75NsbWQ==
+	b=GwKSVFV8l52+D30/uQIgifgwxne5su7EhYEYrWH2tYXNhvCKB7Kl3f5eWGNCHoiFC
+	 ozuNQWQMYfNGgiNRXd0jHzzEI7DRaXKcDuhAzWzv1wIBUsfO4Vs02zilEA9Ol8Rqai
+	 2kotIXA8DsdyJIW0rYmyGSzUi2HZfkOD9PbUVuvGcLr32CQ7SYvGS6l1GgSZ7EQG/K
+	 IF6I470PAfBMNtcOnLS/2U03QDVrkQG71ZtE3TufIlCJsKgJbpv/L/xmwZCj+0BU5M
+	 FlreYGd7ZcO9DW0I49gOErSS/wjggoqFWyKgt5bN7xP/3IWP5c9Wga6JOgwQCTiGkD
+	 0lT7XvAKfAIgg==
 From: Mat Martineau <martineau@kernel.org>
 To: mptcp@lists.linux.dev,
 	geliang@kernel.org,
@@ -52,9 +52,9 @@ To: mptcp@lists.linux.dev,
 Cc: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
 	netdev@vger.kernel.org,
 	Mat Martineau <martineau@kernel.org>
-Subject: [PATCH net-next v2 5/8] mptcp: prefer strscpy over strcpy
-Date: Mon, 13 May 2024 18:13:29 -0700
-Message-ID: <20240514011335.176158-6-martineau@kernel.org>
+Subject: [PATCH net-next v2 6/8] mptcp: remove unnecessary else statements
+Date: Mon, 13 May 2024 18:13:30 -0700
+Message-ID: <20240514011335.176158-7-martineau@kernel.org>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240514011335.176158-1-martineau@kernel.org>
 References: <20240514011335.176158-1-martineau@kernel.org>
@@ -68,77 +68,75 @@ Content-Transfer-Encoding: 8bit
 
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 
-strcpy() performs no bounds checking on the destination buffer. This
-could result in linear overflows beyond the end of the buffer, leading
-to all kinds of misbehaviors. The safe replacement is strscpy() [1].
-
-This is in preparation of a possible future step where all strcpy() uses
-will be removed in favour of strscpy() [2].
+The 'else' statements are not needed here, because their previous 'if'
+block ends with a 'return'.
 
 This fixes CheckPatch warnings:
 
-  WARNING: Prefer strscpy over strcpy
+  WARNING: else is not generally useful after a break or return
 
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strcpy [1]
-Link: https://github.com/KSPP/linux/issues/88 [2]
 Reviewed-by: Geliang Tang <geliang@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 Signed-off-by: Mat Martineau <martineau@kernel.org>
 ---
- net/mptcp/ctrl.c     | 2 +-
- net/mptcp/protocol.c | 5 +++--
- net/mptcp/sockopt.c  | 2 +-
- 3 files changed, 5 insertions(+), 4 deletions(-)
+ net/mptcp/subflow.c | 32 +++++++++++++++++---------------
+ 1 file changed, 17 insertions(+), 15 deletions(-)
 
-diff --git a/net/mptcp/ctrl.c b/net/mptcp/ctrl.c
-index 542555ba474c..98b1dd498ff6 100644
---- a/net/mptcp/ctrl.c
-+++ b/net/mptcp/ctrl.c
-@@ -92,7 +92,7 @@ static void mptcp_pernet_set_defaults(struct mptcp_pernet *pernet)
- 	pernet->allow_join_initial_addr_port = 1;
- 	pernet->stale_loss_cnt = 4;
- 	pernet->pm_type = MPTCP_PM_TYPE_KERNEL;
--	strcpy(pernet->scheduler, "default");
-+	strscpy(pernet->scheduler, "default", sizeof(pernet->scheduler));
- }
- 
- #ifdef CONFIG_SYSCTL
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index bb8f96f2b86f..a42494d3a71b 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -2814,7 +2814,8 @@ static void mptcp_ca_reset(struct sock *sk)
- 	struct inet_connection_sock *icsk = inet_csk(sk);
- 
- 	tcp_assign_congestion_control(sk);
--	strcpy(mptcp_sk(sk)->ca_name, icsk->icsk_ca_ops->name);
-+	strscpy(mptcp_sk(sk)->ca_name, icsk->icsk_ca_ops->name,
-+		sizeof(mptcp_sk(sk)->ca_name));
- 
- 	/* no need to keep a reference to the ops, the name will suffice */
- 	tcp_cleanup_congestion_control(sk);
-@@ -4169,7 +4170,7 @@ int __init mptcp_proto_v6_init(void)
- 	int err;
- 
- 	mptcp_v6_prot = mptcp_prot;
--	strcpy(mptcp_v6_prot.name, "MPTCPv6");
-+	strscpy(mptcp_v6_prot.name, "MPTCPv6", sizeof(mptcp_v6_prot.name));
- 	mptcp_v6_prot.slab = NULL;
- 	mptcp_v6_prot.obj_size = sizeof(struct mptcp6_sock);
- 	mptcp_v6_prot.ipv6_pinfo_offset = offsetof(struct mptcp6_sock, np);
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index a77b33488176..f9a4fb17b5b7 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -616,7 +616,7 @@ static int mptcp_setsockopt_sol_tcp_congestion(struct mptcp_sock *msk, sockptr_t
+diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+index c1d13e555d10..612c38570a64 100644
+--- a/net/mptcp/subflow.c
++++ b/net/mptcp/subflow.c
+@@ -1119,6 +1119,8 @@ static enum mapping_status get_mapping_status(struct sock *ssk,
  	}
  
- 	if (ret == 0)
--		strcpy(msk->ca_name, name);
-+		strscpy(msk->ca_name, name, sizeof(msk->ca_name));
+ 	if (mpext->data_fin == 1) {
++		u64 data_fin_seq;
++
+ 		if (data_len == 1) {
+ 			bool updated = mptcp_update_rcv_data_fin(msk, mpext->data_seq,
+ 								 mpext->dsn64);
+@@ -1131,26 +1133,26 @@ static enum mapping_status get_mapping_status(struct sock *ssk,
+ 				 */
+ 				skb_ext_del(skb, SKB_EXT_MPTCP);
+ 				return MAPPING_OK;
+-			} else {
+-				if (updated)
+-					mptcp_schedule_work((struct sock *)msk);
+-
+-				return MAPPING_DATA_FIN;
+ 			}
+-		} else {
+-			u64 data_fin_seq = mpext->data_seq + data_len - 1;
  
- 	release_sock(sk);
- 	return ret;
+-			/* If mpext->data_seq is a 32-bit value, data_fin_seq
+-			 * must also be limited to 32 bits.
+-			 */
+-			if (!mpext->dsn64)
+-				data_fin_seq &= GENMASK_ULL(31, 0);
++			if (updated)
++				mptcp_schedule_work((struct sock *)msk);
+ 
+-			mptcp_update_rcv_data_fin(msk, data_fin_seq, mpext->dsn64);
+-			pr_debug("DATA_FIN with mapping seq=%llu dsn64=%d",
+-				 data_fin_seq, mpext->dsn64);
++			return MAPPING_DATA_FIN;
+ 		}
+ 
++		data_fin_seq = mpext->data_seq + data_len - 1;
++
++		/* If mpext->data_seq is a 32-bit value, data_fin_seq must also
++		 * be limited to 32 bits.
++		 */
++		if (!mpext->dsn64)
++			data_fin_seq &= GENMASK_ULL(31, 0);
++
++		mptcp_update_rcv_data_fin(msk, data_fin_seq, mpext->dsn64);
++		pr_debug("DATA_FIN with mapping seq=%llu dsn64=%d",
++			 data_fin_seq, mpext->dsn64);
++
+ 		/* Adjust for DATA_FIN using 1 byte of sequence space */
+ 		data_len--;
+ 	}
 -- 
 2.45.0
 
