@@ -1,77 +1,79 @@
-Return-Path: <netdev+bounces-96379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 681FD8C5827
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 16:41:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 600CD8C585D
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 16:57:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A1851C21F24
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:41:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1146F1F23649
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C16B217BB27;
-	Tue, 14 May 2024 14:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iqfhj3UE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5AA17BB1C;
+	Tue, 14 May 2024 14:57:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEE8144D01;
-	Tue, 14 May 2024 14:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E3D1E487;
+	Tue, 14 May 2024 14:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715697704; cv=none; b=iZaQ9CH0FWSqk2fY8WtvkFZ0NOm/FF6B+Xv+OSONfmpuaRO6vKLnke+wEiF5iQUo4sPDu8NEFS/vMMdWewIRGy1RZnQQOYmYoW14kD62uH6rn2b6Z7NJeYOuC1otWU6n4pX8Do/Dg6Jx7kx6adkQ97KmW0cFdUt6TGnWT4SS6vM=
+	t=1715698660; cv=none; b=HOutgrAby4iZYqEpGRBKOe4G32o25fMbiahuLq5IonQymxulMIORa6Vgo4zHNANqfwt2gMOul/lb9zJj9DhYxwUFRae0f1/JKxb39lHk3t+tT+ZwH/WboyQlmPgyjD2PePGNcl5IdeXXlkTwa3Hh7pWrJgpPSX8P5YhQZNI7A+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715697704; c=relaxed/simple;
-	bh=GehxexP+mxbBsUeyRVVy+3SbM8PqCsrvHJ91hWjfIqA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z4NvcVNncwWA9QCCQtEy6ZiTVJLaMMsu5GVXNcpIeiGjfOLpPmIyPSJqAkP7DS+rQWloCtPo8EbXZQT8KxgUThfd6f+MN8Cj4uX5+acusNiCJPHkAPNd/U0pF/YPfdjGaGS9ll4Ze3sUKkHecRNHCB4OCJRXr8tn8mIB8/FukGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iqfhj3UE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C890C2BD10;
-	Tue, 14 May 2024 14:41:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715697704;
-	bh=GehxexP+mxbBsUeyRVVy+3SbM8PqCsrvHJ91hWjfIqA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Iqfhj3UEqaT3worVopO0RpiRzx1qOt7PcnJOUZJdwYY51NoMWpzrrz10bI8eUn1nE
-	 TZO697fwiRdUcSL0ShUuX4BJiHAo1jQq0TRq/FObNHIFbLjiMLvVmfZYn5FzrtEBrU
-	 is3PRBztwKG5b9SYgAAcmmB8ILHzSZkiWhssKTpiVufR5iO9BIpVQ1DyMa4gZA3PdP
-	 qXaFXEJpjAcWPy4ocsVjT6UX56T/0E8aOImnBp/4kiaeFFeymSd7YZCyD7CERBI36d
-	 8re3DAqt1YzMDNMA7pwaO2qnttWMwW5nofBKBKFr8KbM3yrksJ4WBYd8StBNExOhne
-	 yRoAQLWa5LXIA==
-Date: Tue, 14 May 2024 07:41:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: Sagar Cheluvegowda <quic_scheluve@quicinc.com>, Bjorn Andersson
- <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, Rob
- Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
- Dooley <conor+dt@kernel.org>, Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>, Vinod Koul <vkoul@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
- kernel@quicinc.com, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH v3 0/2] Mark Ethernet devices on sa8775p as DMA-coherent
-Message-ID: <20240514074142.007261f2@kernel.org>
-In-Reply-To: <5z22b7vrugyxqj7h25qevyd5aj5tsofqqyxqn7mfy4dl4wk7zw@fipvp44y4kbb>
-References: <20240507-mark_ethernet_devices_dma_coherent-v3-0-dbe70d0fa971@quicinc.com>
-	<5z22b7vrugyxqj7h25qevyd5aj5tsofqqyxqn7mfy4dl4wk7zw@fipvp44y4kbb>
+	s=arc-20240116; t=1715698660; c=relaxed/simple;
+	bh=RZQZpzHs2BgG3hOCcNdUNpDuaLfwbtWKwlnC4BAy3FM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gVmjfXYdvY3BjSzrO7zBMiEw5mVSqpxs5r5qH9SiYWaIr+KBxtPBaWNlp/sJ8VObq1XX2s7mpwQf+s74Tw6/SRPeI+e9i2Zz5ldFnfXL94+ib5WR0HSXr9Jv/ulVw6EX/QNP8/ijHp1uP+/UVJIEdLS+bs5dnxm47+7J+tUVZE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1s6tax-0001vl-Sk; Tue, 14 May 2024 16:57:35 +0200
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	<netfilter-devel@vger.kernel.org>,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCH net-next] selftests: netfilter: fix packetdrill conntrack testcase
+Date: Tue, 14 May 2024 16:44:09 +0200
+Message-ID: <20240514144415.11433-1-fw@strlen.de>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 14 May 2024 09:21:08 -0500 Andrew Halaney wrote:
-> I don't know how to figure out who takes this patch in the end based on
-> the output above :)
+Some versions of conntrack(8) default to ipv4-only, so this needs to request
+ipv6 explicitly, like all other spots already do.
 
-bindings/net is usually going via netdev, but my reading of Krzysztof's
-comment was that there will be a v4...
+Fixes: a8a388c2aae4 ("selftests: netfilter: add packetdrill based conntrack tests")
+Reported-by: Jakub Kicinski <kuba@kernel.org>
+Closes: https://lore.kernel.org/netdev/20240513114649.6d764307@kernel.org/
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ Can't target net because ATM Fixes-commit is only in net-next.
+
+ .../net/netfilter/packetdrill/conntrack_synack_reuse.pkt        | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/net/netfilter/packetdrill/conntrack_synack_reuse.pkt b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_synack_reuse.pkt
+index 21e1bb6395e4..842242f8ccf7 100644
+--- a/tools/testing/selftests/net/netfilter/packetdrill/conntrack_synack_reuse.pkt
++++ b/tools/testing/selftests/net/netfilter/packetdrill/conntrack_synack_reuse.pkt
+@@ -30,5 +30,5 @@
+ 
+ 1.5 < S 2000:2000(0) win 32792 <mss 1000,nop,wscale 0, TS val 233 ecr 0,nop,nop>
+ 
+-+0 `conntrack -L -p tcp --dport 8080 2>/dev/null | grep -q SYN_RECV`
+++0 `conntrack -f $NFCT_IP_VERSION -L -p tcp --dport 8080 2>/dev/null | grep -q SYN_RECV`
+ +0 `iptables -v -S INPUT | grep INVALID | grep -q -- "-c 0 0"`
+-- 
+2.43.2
+
 
