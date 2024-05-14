@@ -1,78 +1,77 @@
-Return-Path: <netdev+bounces-96378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 498558C5824
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 16:40:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 681FD8C5827
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 16:41:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0F9A1F232E5
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:40:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A1851C21F24
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E70361586C6;
-	Tue, 14 May 2024 14:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C16B217BB27;
+	Tue, 14 May 2024 14:41:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1Uq+In2C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iqfhj3UE"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05418144D01
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 14:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEE8144D01;
+	Tue, 14 May 2024 14:41:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715697608; cv=none; b=EG9C9T6fzex12dlDFqUnpCzoF53K1/ala0kK1NN3HoWaA+PaF7lwhxxRhDcKQZ6F2dsxC51Wyir1JTO2cEwwTjdskLgjezdqZqtA4Myh/A1Xs+X5ifFgDplSLouKR5dLljVTJ+GaXkDpBWFApeIKwzH6bmnaYFbUZxJoAosX7zw=
+	t=1715697704; cv=none; b=iZaQ9CH0FWSqk2fY8WtvkFZ0NOm/FF6B+Xv+OSONfmpuaRO6vKLnke+wEiF5iQUo4sPDu8NEFS/vMMdWewIRGy1RZnQQOYmYoW14kD62uH6rn2b6Z7NJeYOuC1otWU6n4pX8Do/Dg6Jx7kx6adkQ97KmW0cFdUt6TGnWT4SS6vM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715697608; c=relaxed/simple;
-	bh=34412/uB/5KGZUNEIEUPCf8vNT0T1Q2LJb9Ukub2WJ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EJPU5KLdPWJr4GIF/RkTVBqE1YViOYiemXRzqPByH+y70wfcWCT0OnZJs6VY0FWq4d9YRaDnd31IgqA2vz7MvpUrcFq64BnvCmzv+Fln3oYTAK2IyMPk6DvtGyLTFn6og2z810FYlkUFxfgkHG1gqFMACrVnO1tiCjbVfE0Zwtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1Uq+In2C; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=7h/y1gRYtuUpIVYM/KFLxBK1msBAYCpV20ArwysoWsI=; b=1U
-	q+In2CuSPufR9Y6BO4qz6+nTzLo/mmRTL7IsqeF7/AgYQg8UaiNeTHVVgqDDNhnULaXw4AJkd0Gw3
-	5xczU2PzPzmPQr4TsMvBUpx479juoqxBItPAYDjZgtMM7wJ+I1H2+ZbZJQ/Xrq370AjATDhCeH3nS
-	r7f2k/UfYdMTvaA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s6tK0-00FOTn-Ja; Tue, 14 May 2024 16:40:04 +0200
-Date: Tue, 14 May 2024 16:40:04 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: William <wtrelawny@proton.me>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: How to submit pull request to ip(8) manpage
-Message-ID: <da56268c-f74c-41d6-b396-893e57267fc8@lunn.ch>
-References: <lcAJXzyuvgWzFPAZ0cW9Y2z21zgYiYVSLXj4i9u-i6dXP47oMmbDDrMlVfT47GltBXynLRXZk-3rMZ4eS37WCgPIQrEF1J4NwqnvgEfZ-ik=@proton.me>
+	s=arc-20240116; t=1715697704; c=relaxed/simple;
+	bh=GehxexP+mxbBsUeyRVVy+3SbM8PqCsrvHJ91hWjfIqA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z4NvcVNncwWA9QCCQtEy6ZiTVJLaMMsu5GVXNcpIeiGjfOLpPmIyPSJqAkP7DS+rQWloCtPo8EbXZQT8KxgUThfd6f+MN8Cj4uX5+acusNiCJPHkAPNd/U0pF/YPfdjGaGS9ll4Ze3sUKkHecRNHCB4OCJRXr8tn8mIB8/FukGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iqfhj3UE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C890C2BD10;
+	Tue, 14 May 2024 14:41:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715697704;
+	bh=GehxexP+mxbBsUeyRVVy+3SbM8PqCsrvHJ91hWjfIqA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Iqfhj3UEqaT3worVopO0RpiRzx1qOt7PcnJOUZJdwYY51NoMWpzrrz10bI8eUn1nE
+	 TZO697fwiRdUcSL0ShUuX4BJiHAo1jQq0TRq/FObNHIFbLjiMLvVmfZYn5FzrtEBrU
+	 is3PRBztwKG5b9SYgAAcmmB8ILHzSZkiWhssKTpiVufR5iO9BIpVQ1DyMa4gZA3PdP
+	 qXaFXEJpjAcWPy4ocsVjT6UX56T/0E8aOImnBp/4kiaeFFeymSd7YZCyD7CERBI36d
+	 8re3DAqt1YzMDNMA7pwaO2qnttWMwW5nofBKBKFr8KbM3yrksJ4WBYd8StBNExOhne
+	 yRoAQLWa5LXIA==
+Date: Tue, 14 May 2024 07:41:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Halaney <ahalaney@redhat.com>
+Cc: Sagar Cheluvegowda <quic_scheluve@quicinc.com>, Bjorn Andersson
+ <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, Rob
+ Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
+ Dooley <conor+dt@kernel.org>, Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>, Vinod Koul <vkoul@kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+ kernel@quicinc.com, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v3 0/2] Mark Ethernet devices on sa8775p as DMA-coherent
+Message-ID: <20240514074142.007261f2@kernel.org>
+In-Reply-To: <5z22b7vrugyxqj7h25qevyd5aj5tsofqqyxqn7mfy4dl4wk7zw@fipvp44y4kbb>
+References: <20240507-mark_ethernet_devices_dma_coherent-v3-0-dbe70d0fa971@quicinc.com>
+	<5z22b7vrugyxqj7h25qevyd5aj5tsofqqyxqn7mfy4dl4wk7zw@fipvp44y4kbb>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <lcAJXzyuvgWzFPAZ0cW9Y2z21zgYiYVSLXj4i9u-i6dXP47oMmbDDrMlVfT47GltBXynLRXZk-3rMZ4eS37WCgPIQrEF1J4NwqnvgEfZ-ik=@proton.me>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 14, 2024 at 01:45:15PM +0000, William wrote:
+On Tue, 14 May 2024 09:21:08 -0500 Andrew Halaney wrote:
+> I don't know how to figure out who takes this patch in the end based on
+> the output above :)
 
-> Hello, I would like to submit a pull request for clarifications on
-> the manpage for the `ip` command, but I cannot find a way to do
-> this. Can you please direct me to the git repo containing the
-> manpage so I can fork it?
-
-You can clone git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
-
-then email patches to this list. See:
-
-https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/tree/README.devel
-
-	Andrew
+bindings/net is usually going via netdev, but my reading of Krzysztof's
+comment was that there will be a v4...
 
