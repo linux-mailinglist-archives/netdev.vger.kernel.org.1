@@ -1,106 +1,126 @@
-Return-Path: <netdev+bounces-96267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31A5F8C4C38
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 08:18:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C19388C4C42
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 08:28:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA3B2282196
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 06:18:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E8F31F216BC
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 06:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761BA1CA92;
-	Tue, 14 May 2024 06:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B950E1CFA9;
+	Tue, 14 May 2024 06:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="RvN8Kb2c"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QDYdqOSi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D8791862A;
-	Tue, 14 May 2024 06:18:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212E21BF3F
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 06:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715667520; cv=none; b=t4AHYFsypLdcnOL41gewIJlimwB6UsbCwqM2vzJjjN2z/s4aUPXzOTwXSiOkhKzqnveCZht5XUeI5hn9PX/7D1JMCm3R9By7xCWVRhhFer7hAoeEsqgLLGnMdhQz+V5BDX5HtxscwOYxThzRSmJ3EyLNtLBy8osTIDGx8xxQrD0=
+	t=1715668079; cv=none; b=tRdPrPitYbuFS6nX4E87bP04wkuUKeoYM++6ssaAO1c4eUEtF/4kglU86/bwHTfVOeVGQJYvQX0yNs00wncOBfhFlOQ4u4AgjFTTgzNM2rihiFdK9JVn4DDXvpQMFCHxnLFN/K5tu8f930ngfNKeIpHbiCDRQp0/b9Rheg7LWGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715667520; c=relaxed/simple;
-	bh=N1VRulDAS++FeTPHfhkVLv3G8zsvXTwRKOdXYJ5+O9I=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Ddt881BdVK/UKT6sTenTf4eiLfhFemeI5msA0b8GNfTdBU5jJRSki0/Tnd6HSGzte6B02aiJ7GMM9mLl7FJ9uVPFnw1r97FoBP2fDV+GCgB78EyjVgvF0XwFkTsek16t7jXj2Yc2aP4aGNveb8HlGRBQZzCUDROJdrWLq7lEvp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=RvN8Kb2c; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1715667513;
-	bh=TdCVAdsQiKHXL8qKY8rCV7UQ49gcVDI4OxkT8Nf/+88=;
-	h=Date:From:To:Cc:Subject:From;
-	b=RvN8Kb2cvGV3/CYKwn/TnbUNLwuf2HBc7uOZVOowWjeanyl3+OlnpoWZ+3bNp85SC
-	 aidfj0LkpBTkdMjjz+TMK/DxXztlZrl/2NhzJdBQu4BfT/BG7ycY2a2GHj5vkZgivf
-	 OJPJsPG7CdWrGUSQD0ic3LdJg/8YxjMHcG8iChkveE51VmSCP8piDRQFmdUIeT6QXG
-	 9Quu/A6B3TcNgLL5nhXcG4kdIrzt8dTdQdDLnMzTSu6ndH99Zk9P7v3VGwNOSihW36
-	 9vb17lOzfv6RedsmVo3IadaldzAMggnskiw7FMqik+Ff+LPiJFPtyq93wXlBC403hX
-	 viOODGl+iw+Pg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VdmQ024Sfz4wc1;
-	Tue, 14 May 2024 16:18:32 +1000 (AEST)
-Date: Tue, 14 May 2024 16:18:29 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: "Michael S. Tsirkin" <mst@redhat.com>, David Miller
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patch in the vhost tree
-Message-ID: <20240514161829.3b51ac01@canb.auug.org.au>
+	s=arc-20240116; t=1715668079; c=relaxed/simple;
+	bh=5m+xGYlMBwxNRJDWZERhtAnbSDV3/VyF/8EZ/X++y9w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tHciivS7D9T2BlO9JzEq5GDShsxfYrwlfVLcOEu8yG5q7MSC0InxCiY6PpsLs4hQwRj3m8eMG7QWQhwKCgUYcZGssMItI0Pq5IqAky3VuzZzZyVvBhnCRI85UMjv0xVaJsmP86UxjkDd56Rb7ic9Rb4HUTZp8ev9jVHeeNOVUqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QDYdqOSi; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715668078; x=1747204078;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5m+xGYlMBwxNRJDWZERhtAnbSDV3/VyF/8EZ/X++y9w=;
+  b=QDYdqOSiQEiwS0MQAkKX7juRTkG8LcGoy5+HYn0dUkNG961X05DkDVCa
+   3A+/iTLvFE6cO6gny93IA4yD2tYJmiBddC9BUNpXIWu1+XhWDvYjqtqja
+   H5dXSdZuErfLYhGjE5NiInqm5BEEqh6S0ncVsmJnXYiM2/Uz0bjFG3oyz
+   0gXYe//RBooVoXpZ3NjSjXJlyHorgmLxYURiPQpINNoveVeruIYK2wJbB
+   izgtcky46+PHB7J/U+aenVVIrseq7NTsr1V4KAUVKNC1QjRV18dvMrEFh
+   qZcG8AXRVaIYFXbhauQSUzzecs8VZHBTJEew0NTdkymIlcszUGldLwP9D
+   g==;
+X-CSE-ConnectionGUID: w3VyE3wFTR2+qj70LHmayA==
+X-CSE-MsgGUID: +Y18y0bpRsmddSh2qqZWYQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11072"; a="11847424"
+X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
+   d="scan'208";a="11847424"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 23:27:57 -0700
+X-CSE-ConnectionGUID: c/U7QafnSAiVHGH/v6KDnw==
+X-CSE-MsgGUID: M26YKeuXQC2oV9oJNWM6EQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
+   d="scan'208";a="35125409"
+Received: from unknown (HELO mev-dev) ([10.237.112.144])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 23:27:54 -0700
+Date: Tue, 14 May 2024 08:27:22 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Simon Horman <horms@kernel.org>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	jacob.e.keller@intel.com, michal.kubiak@intel.com,
+	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
+	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
+	pio.raczynski@gmail.com, jiri@nvidia.com,
+	mateusz.polchlopek@intel.com, shayd@nvidia.com
+Subject: Re: [iwl-next v2 03/15] ice: add basic devlink subfunctions support
+Message-ID: <ZkMESjRIQc2fHF6M@mev-dev>
+References: <20240513083735.54791-1-michal.swiatkowski@linux.intel.com>
+ <20240513083735.54791-4-michal.swiatkowski@linux.intel.com>
+ <20240513160551.GP2787@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/L+9gZudwmTpea5/cEP2apXG";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240513160551.GP2787@kernel.org>
 
---Sig_/L+9gZudwmTpea5/cEP2apXG
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Mon, May 13, 2024 at 05:05:51PM +0100, Simon Horman wrote:
+> On Mon, May 13, 2024 at 10:37:23AM +0200, Michal Swiatkowski wrote:
+> 
+> ...
+> 
+> > diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
+> > index 9223bcdb6444..f20d7cc522a6 100644
+> > --- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
+> > +++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
+> > @@ -4,9 +4,42 @@
+> >  #ifndef _DEVLINK_PORT_H_
+> >  #define _DEVLINK_PORT_H_
+> >  
+> > +#include "../ice.h"
+> > +
+> > +/**
+> > + * struct ice_dynamic_port - Track dynamically added devlink port instance
+> > + * @hw_addr: the HW address for this port
+> > + * @active: true if the port has been activated
+> > + * @devlink_port: the associated devlink port structure
+> > + * @pf: pointer to the PF private structure
+> > + * @vsi: the VSI associated with this port
+> 
+> nit: An entry for @sfnum should go here.
+> 
 
-Hi all,
+Thanks, will add it
 
-The following commit is also in the net-next tree as different commit (but =
-the same patch):
-
-  a2205e1e9603 ("virtio_net: remove the misleading comment")
-
-This is commit
-
-  9719f039d328 ("virtio_net: remove the misleading comment")
-
-in the net-next tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/L+9gZudwmTpea5/cEP2apXG
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmZDAjUACgkQAVBC80lX
-0GxJwQf/Qjy+gs0259ctKpY1XM0aVGH9cx8ivjSO/h8XPxvqhshrsgq4jSJd359J
-kcC02Sbyy2Rm9y09P5QclBZP5i11kcf5rqsIzPWZH2hxZvWL1nZiCize9K9Q0/rY
-yLgMMdsMCX5Bhuk4vSd1iHF0ps8S60DuCx8VOdmO0BhqC8cDRws8cKvIW09PGAEC
-GS8zlb1LzOGxSCAmh7iVBPZrUst5vPFTWCeK7RBEEDtOXBrSgUyQU8znwAaPxkCX
-F+OEWxWQP1QEjdRFthkoiUqL7f3WlTFx/RGNSn7WVhaeI59O8k0K/vnGpBG5+8Ar
-sWtqjnGOmm4dIVvPeg9SBqrMgoRTEg==
-=eiaN
------END PGP SIGNATURE-----
-
---Sig_/L+9gZudwmTpea5/cEP2apXG--
+> > + *
+> > + * An instance of a dynamically added devlink port. Each port flavour
+> > + */
+> > +struct ice_dynamic_port {
+> > +	u8 hw_addr[ETH_ALEN];
+> > +	u8 active: 1;
+> > +	struct devlink_port devlink_port;
+> > +	struct ice_pf *pf;
+> > +	struct ice_vsi *vsi;
+> > +	u32 sfnum;
+> > +};
+> 
+> ...
 
