@@ -1,67 +1,101 @@
-Return-Path: <netdev+bounces-96364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3B518C5752
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 15:45:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0FF48C5755
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 15:46:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10D111C21199
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:45:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9D19281FD8
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761FD144312;
-	Tue, 14 May 2024 13:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5681448D4;
+	Tue, 14 May 2024 13:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="Ddo4i6EO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l+nwBFyI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9501411DC
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 13:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF45C135A40;
+	Tue, 14 May 2024 13:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715694324; cv=none; b=Ml27B1Cp0mO2cR5zLJrPGi9pxbL6w4NTQz6pYdbvfGIoujl4HFS+GOlZ8u1EB7QrxSdiwhLxN4CYV+6UeaiUFwREz2meOIQ9Pdf1Y0xBkydMF3ktquj9x5rqF8hRaPRbgsD+fLNDIhgqcoXn8kvpAxp3kzzJL6DPgQs1m5/WgrE=
+	t=1715694389; cv=none; b=kErFygxB9XKPbUC7BLddBRW6EnsgTKfGE0VNYy3bxf9qUrXiYdr79u46ZBo5ScI/lMK076s6262nBXddbfceSd6nkvTkjSCLInXjMWJ8rr2gJqgOCBJS3Lo2sHUF/HtFuQ30C6gENiSUyZUdEOpobCC1OzhVBxNZYsVOwCQ6eQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715694324; c=relaxed/simple;
-	bh=hazaavQ9oXyOqOj2+giBjdK0Qhv7QHN4tr4k538q6LU=;
-	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=hvDx5hqluQwHLm7v9O5MMplXoRCQn0C8e64aldruGngrFaOGJT/GnSr/KO8dtvyOH/AtgHu8uIE/tpurmseIi4wdU3lfWoYR6030YNykJmB5f09rn5w04ktLTNZkRr2JM2EqKlNMClg+iVYAyqYb/Oui1xjAc0ZtvBml8Z3CpJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=Ddo4i6EO; arc=none smtp.client-ip=185.70.43.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1715694318; x=1715953518;
-	bh=hazaavQ9oXyOqOj2+giBjdK0Qhv7QHN4tr4k538q6LU=;
-	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=Ddo4i6EOUCtxfKkm1kNlr0hb5X6XlEv3HUzqTzPGLSdjhKUnjFHFCAIVUP633owgB
-	 buaXAjVUjzrE+EkceInyUQkQ9xdbnHL7KUFH0qfQNPPz8SCh01dWtFCYzUH1bjZ4nY
-	 XvtRx6wwFNCcWT6XcnyojaJTpNg9q1qb8sLsIOD7h5Nwx3cEE75VBLfqvAga8rwOI5
-	 9lhpHn65rgvHfZeX8Psb6rAhYDqRAq67Z916vCb15y5rqCq23glJc64EHTbhJvl2MF
-	 b9I79MxyH6O3n4wnLBO9HKXlDAsGHJQiWcJEe1qq1FdIy+EikWYg8UWwLQhnFTyhRp
-	 2xvEQg5lEXieg==
-Date: Tue, 14 May 2024 13:45:15 +0000
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: William <wtrelawny@proton.me>
-Subject: How to submit pull request to ip(8) manpage
-Message-ID: <lcAJXzyuvgWzFPAZ0cW9Y2z21zgYiYVSLXj4i9u-i6dXP47oMmbDDrMlVfT47GltBXynLRXZk-3rMZ4eS37WCgPIQrEF1J4NwqnvgEfZ-ik=@proton.me>
-Feedback-ID: 46067363:user:proton
-X-Pm-Message-ID: 6349d2c918f74d83ef9f054e303709a7def2f18c
+	s=arc-20240116; t=1715694389; c=relaxed/simple;
+	bh=zBSGEEVkAYXfxfHKmHO3J9UMnIn9Z43RNoE8U8/JUJs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cXT1sNrOGL/2b7UZwGHW3lbIlnJdMmY4xTjb79DninaNE7IrqD7qZ9mM7MwfT4T7eHo3mOUttWGPK09GJmFfk66Ll8jC9fCWN8f+l0ouB4ExJVN7toodN8CIMh9bhB0EFjFbJ6jo7S7RWdnmg2FtD4B9K1ia8pvXrjBdhaYrKBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l+nwBFyI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49328C2BD10;
+	Tue, 14 May 2024 13:46:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715694388;
+	bh=zBSGEEVkAYXfxfHKmHO3J9UMnIn9Z43RNoE8U8/JUJs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=l+nwBFyIporfF0UR4fTxoN8Lx4/bsH7hRvZEErPJk897JJ3CMiUBYxZKLILVJY5is
+	 pTOtImxqbpf50N34AaIr58fAovsJ3UZeVT6U49wtDBhi7qyd4XSQRyEPKjYMwdt9Uz
+	 g7RQ+0I7lkvQimxMs9+w3cdebdI0Wbv+SrbxI6S1DBEc+V8Kn/m1y7XoLn+dpRwTm+
+	 p/lfrJFNQPkOZm+ZkwmPeYH3kU9o2CzYBj2NLd6XoCY6FRqoera6YlYyvylZN04hiH
+	 wzt/rhaBxz1IZuXW6/NsZ5uzEGPq5MF9oVTKVEEpZx0spfVYDpKLMIfzFObhT6k9Lp
+	 WT2ozW4nGRFYw==
+Date: Tue, 14 May 2024 06:46:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: kernel test robot <lkp@intel.com>, llvm@lists.linux.dev,
+ oe-kbuild-all@lists.linux.dev, "David S . Miller" <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Jason
+    Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ Brett    Creeley <bcreeley@amd.com>, Ratheesh Kannoth
+ <rkannoth@marvell.com>, Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Tal Gilboa <talgi@nvidia.com>,
+ Jonathan    Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>, Jiri Pirko <jiri@resnulli.us>,
+ Paul    Greenwalt <paul.greenwalt@intel.com>, Ahmed Zaki
+ <ahmed.zaki@intel.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Kory
+ Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
+ justinstitt@google.com, donald.hunter@gmail.com, netdev@vger.kernel.org,
+ virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v13 2/4] ethtool: provide customized dim
+ profile management
+Message-ID: <20240514064626.44778d98@kernel.org>
+In-Reply-To: <1715652495.6335685-4-hengqi@linux.alibaba.com>
+References: <20240509044747.101237-1-hengqi@linux.alibaba.com>
+	<20240509044747.101237-3-hengqi@linux.alibaba.com>
+	<202405100654.5PbLQXnL-lkp@intel.com>
+	<1715531818.6973832-3-hengqi@linux.alibaba.com>
+	<20240513072249.7b0513b0@kernel.org>
+	<1715611933.2264705-1-hengqi@linux.alibaba.com>
+	<20240513082412.2a27f965@kernel.org>
+	<1715614744.0497134-3-hengqi@linux.alibaba.com>
+	<20240513114233.6eb8799e@kernel.org>
+	<1715652495.6335685-4-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello, I would like to submit a pull request for clarifications on the manp=
-age for the=C2=A0`ip` command, but I cannot find a way to do this. Can you =
-please direct me to the git repo containing the manpage so I can fork it?
+On Tue, 14 May 2024 10:08:15 +0800 Heng Qi wrote:
+> > We can't make lockdep dependent on NET.
+> > People working on other subsystems should be able to use LOCKDEP 
+> > with minimal builds.  
+> 
+> Got it. Then I declare "DIMLIB depends on NET" and clean up other places.
 
-Thank you,
+I'm not sure if there's any legit DIM (but not net_dim) user, if there
+isn't that SGTM. The RDMA is fine to depend on NET.
 
-- William
+> One more friendly request, I see net-next is closed today, but our downstream
+> kernel release deadline is 5.20, so I want to test and release the new v14 today,
+> is it ok?
+
+You'll need to post as RFC since it can't be applied but you can post
+to continue review. Please wait a day or two tho, I'm currently swamped
+trying to go thru the PR preparations.
 
