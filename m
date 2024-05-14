@@ -1,120 +1,109 @@
-Return-Path: <netdev+bounces-96386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 591818C5888
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 17:13:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D9DE98C58FA
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 17:43:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFB771F22287
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 15:13:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B92A1F22F75
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 15:43:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC7C17EB81;
-	Tue, 14 May 2024 15:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238B217EB87;
+	Tue, 14 May 2024 15:43:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iNl5I8Oc"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="nhWOf3hZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486F712B177;
-	Tue, 14 May 2024 15:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FF41E480
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 15:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715699623; cv=none; b=HYTB6EvyeiCZ7OK8+MnFLtMJkYyu0Wz7bxCljpf46VOolGvrT/oTtiikwJdWnXvbK7gY6EPd7p/+j93F7QwwPdFfCfKcUWVvloBKylb1ly3TsJr4SiiEB5x5tbgDOsn0YPUW/z44bDCGiA+HNIqPnJPUkN9VK2bqMG/dId3IV1k=
+	t=1715701420; cv=none; b=a9s5X1Zd4tiqbppAtBRS0pGwdK/81De5iSTNuUGVUh0KGSmR6ZRZdrCFj89DsUPKMBeiKO1pFxBimD+acOFVFzfbNhpE6flSSstdIdKjuvRWIzgbJgg4ywPeg1pH1e8lwh2H3bqMAFfmSBXR3i84Do22eO/uEibujk0lWQj3f1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715699623; c=relaxed/simple;
-	bh=EihJtzlA6mfpqd02t2ulG1Tfdp9EZ0d2PsknBA2nYeg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rZ34IaICP0RWLbT+GQHBPaYUyi5sF8GVuV7+BdzwIUz4mEU7gSheR7pL5kpU+s54qnyYSNUxoGTEx40KHUZCV5dLZLCp+JAV6M/vcFLK3bgyr7VM8ACWd7PYZEhIhCOdkKy7eclYbK9cRf3mXZEmRHXsQxnZSNnnFcut3yM28+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iNl5I8Oc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EFFCC2BD10;
-	Tue, 14 May 2024 15:13:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715699622;
-	bh=EihJtzlA6mfpqd02t2ulG1Tfdp9EZ0d2PsknBA2nYeg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=iNl5I8OcMQjKzC1YkTBVimMVAaoVqxl50Zp7lNiMsX3ntRIXrwfMf9JENhj9D9r+q
-	 BH06AV26INRmzeIhnbmfiVzw+wp/fAUohvq684oH3V4oUeop8WuhcRQK1mSKJU/ac2
-	 1beOPn2F5J5zBH8LU0rsb7VzYD+jUm4Vw0/wbwy9lYmIG3QWQnR0LDGf1h4xdVBke4
-	 q8G2ZgsTDAdiCuZxrBHWFM+mlbHoOis0BM/YBmPqHVuVbiJvoKG0AzXQK+4YEkPDFg
-	 8OfPOgME0+sdsLWERAXQbkaeZBRT2uF8pMMMuV604fcxs1fMBYl/y+zt6rr3nlAE2c
-	 m8VpEsEr+/Pyw==
-Message-ID: <3e9595ec-f233-4d93-84ff-77e0183c73a7@kernel.org>
-Date: Tue, 14 May 2024 09:13:41 -0600
+	s=arc-20240116; t=1715701420; c=relaxed/simple;
+	bh=bqZtTfqPK7ohbPAafUNheKg9VbnYE8/HuBdNNZX68Wk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CVT2NTTdQhNfEnmJw7KiCzwmrHhWxA4CUcp8LlOfNviI78SMp+lY4Tuhiyq7zbEvGP3P3hTA50HW608h/hN3Aja+CxJ/e06JU8RIzBKMVuKO2SFMsPDLLGad6JF3iHXbtWDEBwPvMYMpqFtB8DyFycpd8tRddYyjLV6XUB7aLcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=nhWOf3hZ; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1edf506b216so39421165ad.2
+        for <netdev@vger.kernel.org>; Tue, 14 May 2024 08:43:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1715701418; x=1716306218; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R/Fq7MH/4tj4k5lG6x4wK3Bqj5WyXiB5FuHbHgeQfs4=;
+        b=nhWOf3hZ50K9lj/al5ZRgGN1qU59cN9k/sK5agh+I3aFHeX6jrtLBpwNTSKGzctrR+
+         XZr0P2XeTlrt3NGloYHRXyXQPxExsjUHHE9tH3xcIjeoLdQ4GS8JUobym2pYJbYP6Wg3
+         F64NnIasrWzFbJFvJb5r0OHZvDJsrC95fywNTMIF0zOCUqLMJWNDynDzsOSe9/NZBw+z
+         X+E/nTWD2ZzA+klULuwyz5e+qBVR503JVPXBh3B8LrvcYf9vxeLnxzTeTUni8F/QdHpR
+         A/yBJnorZH1vyniz8NZi+b39NzYAzKh6BHDwFtUg3NJQo94Nsxehv6uMK6ocbH+5Yf6l
+         Nh8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715701418; x=1716306218;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R/Fq7MH/4tj4k5lG6x4wK3Bqj5WyXiB5FuHbHgeQfs4=;
+        b=ptKNJovFJpxK4aDXjnVTpHcuPW6zSXdKtbpqjF3uAG8ILBlv49Ofm1h4tqiLhbyPQC
+         OEjU+ITMmh90CKUVeEx1L9XQzjYF8GSg/ri1bMTlyjc9tNPelKV2xZKiYP964eFjBTFQ
+         bKmxS7I9b7c8vmz1S3eZ9/3XfI/r3uXUsIBjroaa4+L+EIkDsVAGGhxM3xZPk62ywxJQ
+         bZLWN/qtMcmaeh3+YpV0AEb6FWSQpAZQjN4Ch9Rsi1XKGPY9n7WdNotbkgvIAkk6h30M
+         ypW3y1/MQ9m290/MClIPf30ZAf7vNw4k0EG8MOI8FtQJxCunN7htmIQ4dtUHlqIG9wHb
+         eXvg==
+X-Gm-Message-State: AOJu0Yz1Z68+0We5MX1Y9fB2y8BNVZSIbfRbKd/52fAtZGUfyxh5298F
+	0QRs3nU1nFBqmDwpwViuAdIi7fMbNQ+XDlGWZOVCL9GlUtT46q9khGFsVBrUEA0=
+X-Google-Smtp-Source: AGHT+IFvFBCCBOQRz8GgLKHeIaRkciQM6C/qF86j9Oi7JZw0TfVMmYbaL4rp0bNgLxhucSyQmqf0kQ==
+X-Received: by 2002:a17:903:245:b0:1e4:4ade:f504 with SMTP id d9443c01a7336-1ef44161e45mr144760295ad.46.1715701417699;
+        Tue, 14 May 2024 08:43:37 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c1394b8sm99590645ad.271.2024.05.14.08.43.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 May 2024 08:43:37 -0700 (PDT)
+Date: Tue, 14 May 2024 08:43:35 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Brahmajit Das <brahmajit.xyz@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH 1/1] Fix implicit declaration of function 'htobe64' in
+ gcc 14 on musl systems
+Message-ID: <20240514084335.19f5b280@hermes.local>
+In-Reply-To: <20240514063811.383371-1-brahmajit.xyz@gmail.com>
+References: <20240514063811.383371-1-brahmajit.xyz@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/ipv6: Fix route deleting failure when metric equals 0
-To: xu.xin16@zte.com.cn, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, dsahern@gmail.com,
- fan.yu9@zte.com.cn, yang.yang29@zte.com.cn, si.hao@zte.com.cn,
- zhang.yunkai@zte.com.cn, he.peilin@zte.com.cn
-References: <20240514201102055dD2Ba45qKbLlUMxu_DTHP@zte.com.cn>
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240514201102055dD2Ba45qKbLlUMxu_DTHP@zte.com.cn>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 5/14/24 6:11 AM, xu.xin16@zte.com.cn wrote:
-> From: xu xin <xu.xin16@zte.com.cn>
-> 
-> Problem
-> =========
-> After commit 67f695134703 ("ipv6: Move setting default metric for routes"),
-> we noticed that the logic of assigning the default value of fc_metirc
-> changed in the ioctl process. That is, when users use ioctl(fd, SIOCADDRT,
-> rt) with a non-zero metric to add a route,  then they may fail to delete a
-> route with passing in a metric value of 0 to the kernel by ioctl(fd,
-> SIOCDELRT, rt). But iproute can succeed in deleting it.
-> 
-> As a reference, when using iproute tools by netlink to delete routes with
-> a metric parameter equals 0, like the command as follows:
-> 
-> 	ip -6 route del fe80::/64 via fe81::5054:ff:fe11:3451 dev eth0 metric 0
-> 
-> the user can still succeed in deleting the route entry with the smallest
-> metric.
-> 
-> Root Reason
-> ===========
-> After commit 67f695134703 ("ipv6: Move setting default metric for routes"),
-> When ioctl() pass in SIOCDELRT with a zero metric, rtmsg_to_fib6_config()
-> will set a defalut value (1024) to cfg->fc_metric in kernel, and in
-> ip6_route_del() and the line 4074 at net/ipv3/route.c, it will check by
-> 
-> 	if (cfg->fc_metric && cfg->fc_metric != rt->fib6_metric)
-> 		continue;
-> 
-> and the condition is true and skip the later procedure (deleting route)
-> because cfg->fc_metric != rt->fib6_metric. But before that commit,
-> cfg->fc_metric is still zero there, so the condition is false and it
-> will do the following procedure (deleting).
-> 
-> Solution
-> ========
-> In order to keep a consistent behaviour across netlink() and ioctl(), we
-> should allow to delete a route with a metric value of 0. So we only do
-> the default setting of fc_metric in route adding.
-> 
-> CC: stable@vger.kernel.org # 5.4+
-> Fixes: 67f695134703 ("ipv6: Move setting default metric for routes")
-> Co-developed-by: Fan Yu <fan.yu9@zte.com.cn>
-> Signed-off-by: Fan Yu <fan.yu9@zte.com.cn>
-> Signed-off-by: xu xin <xu.xin16@zte.com.cn>
-> ---
->  net/ipv6/route.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
+On Tue, 14 May 2024 06:35:37 +0000
+Brahmajit Das <brahmajit.xyz@gmail.com> wrote:
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+> On musl systems with GCC 14 and above, the htobe64 function cannot be
+> found by default. From the man page[0], the function is from endian.h
+> header file. If the file is not included in, then we get the following
+> error message. The issue however cannot be reproduced on glibc systems.
+> 
+> In file included from ../include/libgenl.h:5,
+>                  from libgenl.c:12:
+> ../include/libnetlink.h: In function 'rta_getattr_be64':
+> ../include/libnetlink.h:281:16: error: implicit declaration of function 'htobe64' [-Wimplicit-function-declaration]
+>   281 |         return htobe64(rta_getattr_u64(rta));
+>       |                ^~~~~~~
+> make[1]: *** [../config.include:24: libgenl.o] Error 1
+> 
+> [0]: https://linux.die.net/man/3/htobe64
+> 
+> Signed-off-by: Brahmajit Das <brahmajit.xyz@gmail.com>
 
 
+Fixes: 976dca372e4c ("f_flower: implement pfcp opts")
 
