@@ -1,104 +1,116 @@
-Return-Path: <netdev+bounces-96399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A7438C59D4
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 18:37:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 353A98C59E3
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 18:49:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AB54B20A01
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 16:37:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA4751F21E0A
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 16:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2609351C42;
-	Tue, 14 May 2024 16:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE80A179647;
+	Tue, 14 May 2024 16:49:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TeaGyAij"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQy9LbOa"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 524E71E4A0;
-	Tue, 14 May 2024 16:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B05CF501
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 16:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715704618; cv=none; b=A3hdNVNN/TJMZbexS8Jsr/248kvDEVSb2Vl436+y+vlRmvRsWSoC07Hd1/VjRP7z/dgv/gNYsZs6E7UYBsCt7ZXDWoSl85AJw3hXk2zjRxO48xIua6aVyXr5YJFgEVFfce2GNt+V/8B3QTjRIyr9BJ2Oyi3IxjYxfXztQi7IAJw=
+	t=1715705350; cv=none; b=uPmZcf+vct1URjJ5Y89kVz1u2EiB7Yij8yen8hMrqGMCd1q2feVEeime0aYG0CUAOzon1u7qLR/TOPR02cCOfY5j3Z7vkvdxKTQygAYNz7fjGntCrc3pTrq2p0XcuAkzoZf6+bOFliDGyvkj2sJNi2HS377/e/VliWGdwQ+6vzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715704618; c=relaxed/simple;
-	bh=nqcFAEXxwiPw3in3vd/H7/+fYyvOU8CLAGLOLtfVL9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m/glMmzYLDwXtCjyN9YGcWtEtY5IdVjToZFl1QALQ553wMA1Ksl+xQO3NaqLqdqp8Br+MnpDZlqomTGIq9WO10NVtMGBhn9z3BE5V1y5e6QUFBWsB7z5rO6+FwXBio9asGJ91R7hssuiN5BXJEy1CcOLfsX/sVl66NtTYhtP6EE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TeaGyAij; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=YcukAh0HocjCtBqiwt2lxfdiQZRo1TjafRxTMWwqbQ8=; b=TeaGyAijbpaaSRoUjduMd0DyiP
-	hElXRqvwXTs8NCYUjPp3uFgpEw7yqxTHiFCzDnbp9ax1AwkRt2gJ0SdUhzrYt9zOhngNPnPvSdJ48
-	AWLT42F74JmUCQM2FtLRWccuSc+dbxXF1W7e8Ed/Z3BNG9FV2moA+oi0zTFQSQ0+xbHE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s6v8a-00FOvA-TE; Tue, 14 May 2024 18:36:24 +0200
-Date: Tue, 14 May 2024 18:36:24 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, kernel test robot <lkp@intel.com>,
-	llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Brett Creeley <bcreeley@amd.com>,
-	Ratheesh Kannoth <rkannoth@marvell.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Tal Gilboa <talgi@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Paul Greenwalt <paul.greenwalt@intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Kory Maincent <kory.maincent@bootlin.com>, justinstitt@google.com,
-	donald.hunter@gmail.com, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v13 2/4] ethtool: provide customized dim profile
- management
-Message-ID: <87bbcd23-e837-477f-99b6-affe8199ce16@lunn.ch>
-References: <20240509044747.101237-1-hengqi@linux.alibaba.com>
- <20240509044747.101237-3-hengqi@linux.alibaba.com>
- <202405100654.5PbLQXnL-lkp@intel.com>
- <1715531818.6973832-3-hengqi@linux.alibaba.com>
- <20240513072249.7b0513b0@kernel.org>
- <1715611933.2264705-1-hengqi@linux.alibaba.com>
- <20240513082412.2a27f965@kernel.org>
- <1715614744.0497134-3-hengqi@linux.alibaba.com>
- <20240513114233.6eb8799e@kernel.org>
- <1715652495.6335685-4-hengqi@linux.alibaba.com>
+	s=arc-20240116; t=1715705350; c=relaxed/simple;
+	bh=uZIxiLbqPeEM51hn5tB74OvRp0QvLuGB8WNYmSsQVEc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Dq42NFejtEYavjb27y6S2l9Ar+jYO5hb2z99n1mgTd4AiZgGzQIywxGTfAZcqRJ3JtOewOyqora3PtGNAfIYFz26Q2MCDE7Aoou/s/LGSBWVzvDdhYUZNjo0fjFMS8Ft5WK/J2ISS93vzLSi1n2FrTVasaa8uoNb2jC05gypZ1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQy9LbOa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99C00C2BD10;
+	Tue, 14 May 2024 16:49:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715705350;
+	bh=uZIxiLbqPeEM51hn5tB74OvRp0QvLuGB8WNYmSsQVEc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QQy9LbOaJw8dhWXqFy8aTEQLbPXjJzNZjQYAfsmmcVCXtxpizEHI2VO3C4wp8+SIe
+	 gmmlA83TB3Pv/1d9vbiIIzYDeB8bl5h2E5ZUudn4pcbMIRyszIEwIedv9OGyuWmrje
+	 RuYUrNjVKf8QMsbu06IKIsAClkxqkCw41A509ddduhXojDiARrcyn5Qc0s/8MUtZA1
+	 3hRZrDaf9G7KAe1h5J3G/3OLVuRQ43uPEHgDQjy04PIZGS6RWlhAZzgxyXER/bAAFn
+	 XwOICyHVhfd+188jPHT8SbcuhmJ7lJrJvXu7XZ2X4RJnEQt4HGbG7Kb7ZlypTVlZ5f
+	 lW3g/e61ASkCQ==
+Date: Tue, 14 May 2024 09:49:08 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, David Miller
+ <davem@davemloft.net>, Realtek linux nic maintainers
+ <nic_swsd@realtek.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Ken Milmore <ken.milmore@gmail.com>
+Subject: Re: [PATCH net 2/2] r8169: disable interrupts also for
+ GRO-scheduled NAPI
+Message-ID: <20240514094908.61593793@kernel.org>
+In-Reply-To: <78fb284b-f78a-4dde-8398-d4f175e49723@gmail.com>
+References: <6d4a0450-9be1-4d91-ba18-5e9bd750fa40@gmail.com>
+	<ef333a8c-1bb2-49a7-b721-68b28df19b0e@gmail.com>
+	<CANn89iLgj0ph5gRWOA2M2J8N_4hQd3Ndm73gATR8WODXaOM_LA@mail.gmail.com>
+	<e8f548f8-6d16-4a30-9408-80e4212afe9c@intel.com>
+	<CANn89i+yKgXGHUyJxVLYTAMKj7wpoV+8X7UR8cWh75yxVLSA6Q@mail.gmail.com>
+	<20240514071100.70fcca3e@kernel.org>
+	<78fb284b-f78a-4dde-8398-d4f175e49723@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1715652495.6335685-4-hengqi@linux.alibaba.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> One more friendly request, I see net-next is closed today, but our downstream
-> kernel release deadline is 5.20, so I want to test and release the new v14 today,
-> is it ok?
+On Tue, 14 May 2024 18:35:46 +0200 Heiner Kallweit wrote:
+> > I thought the bug is because of a race with disable.  
+> 
+> No, the second napi_poll() in this scenario is executed with device
+> interrupts enabled, what triggers a (supposedly) hw bug under heavy
+> load. So the fix is to disable device interrupts also in the case
+> that NAPI is already scheduled when entering the interrupt handler.
+> 
+> > But there's already a synchronize_net() after disable, so NAPI poll
+> > must fully exit before we mask in rtl8169_cleanup().
+> > 
+> > If the bug is double-enable you describe the fix is just making 
+> > the race window smaller. But I don't think that's the bug.
+> > 
+> > BTW why are events only acked in rtl8169_interrupt() and not
+> > rtl8169_poll()?   
+> 
+> You mean clearing the rx/tx-related interrupt status bits only
+> after napi_complete_done(), as an alternative to disabling
+> device interrupts?
 
-5.20? Didn't Linus run out of fingers and thumbs and went from 5.19 to
-6.0?
+Before, basically ack them at the start of a poll function.
+If gro_timeout / IRQ suppression is not enabled it won't make 
+much of a difference. Probably also won't make much difference
+with iperf.
 
-Anyway, this is your internal issue, since netdev only accepts new
-features patches for the next kernel release, not stable kernels. If
-you are forced to do upstream first, you are going to have to wait
-until the next cycle starts, and net-next reopens.
+But normally traffic is bursty so with gro_timeout we can see 
+something like:
 
-      Andrew
+    packets: x x  x  x x   <  no more packets  >
+IRQ pending: xxx  xxxxxxxxxxxxxxxxxxxxxx
+        ISR:    []                      []
+    IRQ ack:    x                       x
+       NAPI:     [=====] < timeout > [=] [=] < timeout > [=]
+
+Acking at the beginning of NAPI poll can't make us miss events 
+but we'd clear the pending IRQ on the "deferred" NAPI run, avoiding 
+an extra HW IRQ and 2 NAPI calls:
+
+    packets: x x  x  x x   <  no more packets  >
+IRQ pending: xxxx xxxxxxxxxxxxxxxxxxx
+        ISR:    []                   
+    IRQ ack:     x                   x
+       NAPI:     [=====] < timeout > [=]
 
