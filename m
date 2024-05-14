@@ -1,144 +1,149 @@
-Return-Path: <netdev+bounces-96264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E68758C4C0F
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 07:50:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E828C4C1A
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 07:53:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88B74B23095
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 05:50:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53A19280C35
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 05:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8871918622;
-	Tue, 14 May 2024 05:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="b098mQF6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC9D18C36;
+	Tue, 14 May 2024 05:53:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F394D18C36
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 05:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE03B1802B
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 05:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715665798; cv=none; b=ENeOwfsHXkbwnw5w/IY8Bcou8K8DlRtPU1SBLrE7WGxp/oTzplcwt2ZeRdgiSPJ+iQZpaDQW5xR8IDtUwMktM1N4IFSo6+ATdTo2w55TKgZTgtjGBVJ+LOXf2m0lIdVdvwF8KqLx+7aeh99ftr243jz5YKPDy2UAILeHkOsXkNw=
+	t=1715666005; cv=none; b=WPHspAF/7OqWAv388S7+X3HXGBOdeOkM+lSsbBNV0L8XLTKrzusJBDkjmv3fvwf4sGquXkDJym0toeRJ9fXTlgNJEuSTqomgLan646F9cSQcu5IEV3s65G90mSAgkacnipsRkfoOpawJaA/NQS5SRA2Q6mDvOR0wcKeB6Un+kKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715665798; c=relaxed/simple;
-	bh=N7yQDXUwAdMII/0o6Jb7o7sMy9XOiB5X0F3FoWxeWrE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mYyfmQ/MSC++t91Ok48n0fy1pa5zJCjOO1p5c8GLJAsEjgyxXJAkCTVTXo7rdT50KLhc8+pzPf77owTKY9cU7dEXU7fgEsMU+UWxnbWqDRghv+dKb2vaWWSVh08klwcdjFGy0pFDsRm/z4kqtZS8evMqCF69TQtJVej8mi5bQFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=b098mQF6; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6f447260f9dso4097940b3a.0
-        for <netdev@vger.kernel.org>; Mon, 13 May 2024 22:49:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1715665796; x=1716270596; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rk/9cCSuKPAzQ7d7k8DYOmgE1U27tp+avu7N/6VE0BI=;
-        b=b098mQF6X9bHmfJOj2UMxXvYNCOYEBZ7lxcJloMkNOepgQOJE/fvCx5/jMqxkaF/Ye
-         t9mmXKtCU4cLwUTnndJ/bvhsoq7dFNVbVqXewwDusQpQ0JVEqVdHc2GDUK5HWCc17s7O
-         0adQnUHRagfAp3L4ShnKjCCiuHsOJpZZUhSDY=
+	s=arc-20240116; t=1715666005; c=relaxed/simple;
+	bh=Tx+ZO6ZStpcgBKfJqMtByoaVvsqTZuTvEjZvNL0g7oY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=aINlNai0ldaUuv/cnF/+WCoUZ+Iff4N3tiEf5dXnP0F8XcO/VvNtvLf5+zKUeaTLIkp3K4zBnzwRoSe15pYFJSta7Td95pP0wv0BRL1ITG/hb3Fnrz8WHAI//XKeFvIVK3gd+V6+AVUUlle+P3DrhUabF69KxzLnz9CmFajHfGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-7dabc125bddso624270739f.1
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 22:53:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715665796; x=1716270596;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rk/9cCSuKPAzQ7d7k8DYOmgE1U27tp+avu7N/6VE0BI=;
-        b=S5XWF0nmP11q8gDXWg3Y/TX8XRnv2hIN7rslFjRfpD9nhcX5e2STyMGFhPFVYtZvif
-         o5hv7iSM0B98ah3P/s9aA6cEHgs2SVOl3UMBDM3YC/gpVVR7+a6gfz+WyaBNPhoW6HU9
-         H/2tynN/6hUKxSu//b6wtmzG9iy7aby3DPZvM9an8QThCBuFxisSQLFZACqi8A+7pwxP
-         ILbaD1NAbmRoLWzDFcqq6yWxN0QVBRWinIr4EkQihT24BIXC8nmK8ha8O6wMHq9qNsdO
-         8J5O5woQ/ZFroilf9BIy+syDBScQsKNeIvpWLrQm95HAsrIVKPFIohcdXO/7x/18isTD
-         9RGw==
-X-Forwarded-Encrypted: i=1; AJvYcCXl+2SpI5UanJyb2nPO05IVj9iNX8dK04/gBth++VqH2bar3JQhtmN2dJQSViwBrDsmTj0OiepNNhdoJKM7s2OAmsXVCzop
-X-Gm-Message-State: AOJu0YzJLjIGvA9KaQZBqZCH2Lt8VSMCPPkEcZ2pWPq22ZOwdDmKjtHX
-	QrL0sU3uZKBqVuEizFjLUNNxaMbXp7ECcn1lVXur9zuHHS3Big8g7UW/lJO1Yw==
-X-Google-Smtp-Source: AGHT+IEPTKz5GyCkr08NrFCu81IdrD63NGlNxv736d9HhFlB58SSNTeMeE90nf4HCldQN4VyiI9ANQ==
-X-Received: by 2002:a05:6a00:2d8e:b0:6e6:946b:a983 with SMTP id d2e1a72fcca58-6f4e02ac8e1mr13440522b3a.10.1715665796214;
-        Mon, 13 May 2024 22:49:56 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2ae0f7fsm8289079b3a.120.2024.05.13.22.49.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 22:49:55 -0700 (PDT)
-Date: Mon, 13 May 2024 22:49:54 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Sam James <sam@gentoo.org>
-Cc: chunkeey@gmail.com, chunkeey@googlemail.com, davem@davemloft.net,
-	edumazet@google.com, helmut.schaa@googlemail.com,
-	johannes@sipsolutions.net, kernel@quicinc.com, kuba@kernel.org,
-	kvalo@kernel.org, linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, pkshih@realtek.com, quic_jjohnson@quicinc.com,
-	stf_xl@wp.pl, toke@toke.dk
-Subject: Re: [PATCH v2 2/2] mac80211: Use flexible array in struct
- ieee80211_tim_ie
-Message-ID: <202405132245.017023A@keescook>
-References: <202308301529.AC90A9EF98@keescook>
- <87jzjxgfnt.fsf@gentoo.org>
+        d=1e100.net; s=20230601; t=1715666003; x=1716270803;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UJS8OugN1Io4mcRudsWjqu7ocl6GdQM9o1oBO8nz1wA=;
+        b=AUc3d/IEl3/cUgA2huvIzRqWdb4sT1pmPeR3cPxC+VqThbaE0SOxTFD/DhbfGkr3vg
+         tjUDqUCNtvw0zf2XmlfEI/O3nLU6Q20MEFfNp4a/EA4XYKHpzf5n3SPnFjGG6pFJ8jqw
+         Fm6AfeOW2WuB6Z1/dXfsiNKU9bVaIJNL3ZEMlafrCGoDkjX9Tq7x+5e79uz7OyhPg3iX
+         V62rjgzkdGcpV6QwbANCjXAXhsQVKFM8Mw01VQYB47EBjh/PMMc3WJYHk1CUetC74lGM
+         vrI4xkP4Q6Cu905xvQ0sdmea0gLA8MDn9EVq4zBU+DQxIp9xh9nvv3bvQ7HFrcPIJd6Y
+         /CMg==
+X-Forwarded-Encrypted: i=1; AJvYcCUi5QtnHIWfItyPsN6yGDpcqltAK9h5eJMFsvc9wdXtnMuiwMfFoYTX65fP0MUP5RfcUznaZt7T2J5sGWJ56mgJ/3nQuT2f
+X-Gm-Message-State: AOJu0Yz5ys5Wp9sBtgdRNLU6vJ9drVyAietk/xKXtJ88NeOmn4En3Rjf
+	Ah32See97Uoioq/+f/9z2iqIfPYTjabuVatVvgHpzgjGC9W8QN241HslARCoy3xFmVB2V5dvj2h
+	tSFkKgZ4thTybDanyx2fM5XN9RX0mrh5IA9HDsEhAzUA18k7CMDKtqR8=
+X-Google-Smtp-Source: AGHT+IEV9/8JkSZA0U1eFI0Ng6ILKQfhEkWhktf5UC+TZX5qtFeutbeYRg69tsmFypCG3MZaXBBETTrhyLDcuDs3z8nsyJ8auYI2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87jzjxgfnt.fsf@gentoo.org>
+X-Received: by 2002:a05:6602:1352:b0:7de:de58:3b1f with SMTP id
+ ca18e2360f4ac-7e1b5229103mr58422939f.4.1715666002927; Mon, 13 May 2024
+ 22:53:22 -0700 (PDT)
+Date: Mon, 13 May 2024 22:53:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a875ac0618639edb@google.com>
+Subject: [syzbot] [net?] [nfc?] KMSAN: uninit-value in nci_rsp_packet (2)
+From: syzbot <syzbot+cb0a0caa117154656cf8@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, krzk@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, May 14, 2024 at 05:51:02AM +0100, Sam James wrote:
-> I think I've just hit this, unless it's been fixed since and it's just
-> similar.
-> 
-> ```
-> [  291.051876] ================================================================================
-> [  291.051892] UBSAN: array-index-out-of-bounds in /var/tmp/portage/sys-kernel/gentoo-kernel-6.6.30/work/linux-6.6/include/linux/ieee80211.h:4455:28
-> [  291.051901] index 1 is out of range for type 'u8 [1]'
-> [  291.051908] CPU: 2 PID: 627 Comm: kworker/2:3 Not tainted 6.6.30-gentoo-dist-hardened #1
-> [  291.051917] Hardware name: ASUSTeK COMPUTER INC. UX305FA/UX305FA, BIOS UX305FA.216 04/17/2019
-> [  291.051922] Workqueue: events cfg80211_wiphy_work [cfg80211]
-> [  291.052082] Call Trace:
-> [  291.052088]  <TASK>
-> [  291.052096] dump_stack_lvl (lib/dump_stack.c:107) 
-> [  291.052114] __ubsan_handle_out_of_bounds (lib/ubsan.c:218 (discriminator 1) lib/ubsan.c:348 (discriminator 1)) 
-> [  291.052130] ieee80211_rx_mgmt_beacon (include/linux/ieee80211.h:4455 net/mac80211/mlme.c:6047) mac80211
+Hello,
 
-This looks like it's this line in ieee80211_rx_mgmt_beacon():
+syzbot found the following issue on:
 
-            ieee80211_check_tim(elems->tim, elems->tim_len, vif_cfg->aid)) {
+HEAD commit:    45db3ab70092 Merge tag '6.9-rc7-ksmbd-fixes' of git://git...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1350fb70980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=617171361dd3cd47
+dashboard link: https://syzkaller.appspot.com/bug?extid=cb0a0caa117154656cf8
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-which is:
+Unfortunately, I don't have any reproducer for this issue yet.
 
-static inline bool ieee80211_check_tim(const struct ieee80211_tim_ie *tim,
-                                       u8 tim_len, u16 aid)
-{ ...
-        return !!(tim->virtual_map[index] & mask);
-                  ^^^^^^^^^^^^^^^^^^^^^^^
-}
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/232e7c2a73a5/disk-45db3ab7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7e9bf7c936ab/vmlinux-45db3ab7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5e8f98ee02d8/bzImage-45db3ab7.xz
 
-UBSAN says it's because the array is defined as "virtual_map[1]":
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cb0a0caa117154656cf8@syzkaller.appspotmail.com
 
-struct ieee80211_tim_ie {
-        u8 dtim_count;
-        u8 dtim_period;
-        u8 bitmap_ctrl;
-        /* variable size: 1 - 251 bytes */
-        u8 virtual_map[1];
-} __packed;
+=====================================================
+BUG: KMSAN: uninit-value in nci_core_init_rsp_packet_v2 net/nfc/nci/rsp.c:107 [inline]
+BUG: KMSAN: uninit-value in nci_core_init_rsp_packet net/nfc/nci/rsp.c:131 [inline]
+BUG: KMSAN: uninit-value in nci_rsp_packet+0x2b4f/0x2c00 net/nfc/nci/rsp.c:376
+ nci_core_init_rsp_packet_v2 net/nfc/nci/rsp.c:107 [inline]
+ nci_core_init_rsp_packet net/nfc/nci/rsp.c:131 [inline]
+ nci_rsp_packet+0x2b4f/0x2c00 net/nfc/nci/rsp.c:376
+ nci_rx_work+0x268/0x5d0 net/nfc/nci/core.c:1527
+ process_one_work kernel/workqueue.c:3267 [inline]
+ process_scheduled_works+0xa81/0x1bd0 kernel/workqueue.c:3348
+ worker_thread+0xea5/0x1560 kernel/workqueue.c:3429
+ kthread+0x3e2/0x540 kernel/kthread.c:388
+ ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
 
-This was fixed in
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3810 [inline]
+ slab_alloc_node mm/slub.c:3851 [inline]
+ kmem_cache_alloc_node+0x622/0xc90 mm/slub.c:3894
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
+ __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
+ alloc_skb include/linux/skbuff.h:1313 [inline]
+ virtual_ncidev_write+0x6d/0x290 drivers/nfc/virtual_ncidev.c:120
+ vfs_write+0x49b/0x1520 fs/read_write.c:588
+ ksys_write+0x20f/0x4c0 fs/read_write.c:643
+ __do_sys_write fs/read_write.c:655 [inline]
+ __se_sys_write fs/read_write.c:652 [inline]
+ __x64_sys_write+0x93/0xe0 fs/read_write.c:652
+ x64_sys_call+0x3062/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:2
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-	commit 2ae5c9248e06 ("wifi: mac80211: Use flexible array in struct ieee80211_tim_ie")
+CPU: 0 PID: 57 Comm: kworker/u8:3 Not tainted 6.9.0-rc7-syzkaller-00056-g45db3ab70092 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+Workqueue: nfc2_nci_rx_wq nci_rx_work
+=====================================================
 
-which was part of the v6.7 release.
 
-> (It was a fun mini-adventure to get the trace usable and I should send
-> some patches to decode_stacktrace.sh, I think...)
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Please do! :)
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
--- 
-Kees Cook
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
