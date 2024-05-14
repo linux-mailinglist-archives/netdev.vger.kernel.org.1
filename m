@@ -1,50 +1,59 @@
-Return-Path: <netdev+bounces-96221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 142DA8C4AB2
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 03:00:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D47D98C4AC7
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 03:13:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86968B22485
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:00:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7189D1F22F4F
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 01:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F35F315A8;
-	Tue, 14 May 2024 01:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE58617C2;
+	Tue, 14 May 2024 01:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pUHaHtSP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1umBCQ1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C142FEDC;
-	Tue, 14 May 2024 01:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F64B1370;
+	Tue, 14 May 2024 01:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715648429; cv=none; b=GWn+sfoZMr08Wvlf1RG8bO/C7JyBtOaYm7rvEbh3y5oxU63D+EYe2iq7j1UMvO0mbIZ7JsNXm9nSS2dX2d0O/P1QmHb2R7Tgnbn8drAn8WIIlm3hqXfEsEzo7UD9EagrYboknW0lBaa9rXSuUUVfYwiDdh8xO+cLP/z49ZJP2UU=
+	t=1715649221; cv=none; b=OBypplT+075f+xPQdpogGfuQE3aKkJkfpnUMHUZVLxiCqOZztDugKn/Rg5F+9HRgUHZKlKVz0ea6SzfSzZK+eFJ1QmlQx7RsmnmlapRKBkC88RozrHYpfmB57MpXz1l6pnJIikwFzWNQleesFe3kdg/NRh4VO3ph9wsKltw6iK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715648429; c=relaxed/simple;
-	bh=E5AY8dfKlOU1rOU80YnyA0n26lpjKt6Wld2wUg4Wwas=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Kkk7+CHzFh2sRL8TrdSjgv4dzyJK4YjEVSXl/+6pFHWyzuDT8VFNkXA8eRNDuyFixbEi/AwU5X9zRJZnh+mY0sj54XGEDHSDBEc837FHIn1LR9SPi8v3e0jI5YmQpJX2W3ZmYjNGJ0rTGc4viLhpG7O8hASDFWGKLU3+v8ZxXAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pUHaHtSP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 418A7C32782;
-	Tue, 14 May 2024 01:00:29 +0000 (UTC)
+	s=arc-20240116; t=1715649221; c=relaxed/simple;
+	bh=aasZvWkODEWjN+l+JIrTwlnPD99FUSWRDgFhstM7p9c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JqOXcqaPM21cJAoa53M92YLCwsY+2+BmwVxkySI4fsTSo0xFf684W2SwgQWv27wH2q1RpLWX8cmHXgxVW0KMFwPl4wuLgGO7ApxREIJvKYIk0FLtYoLfKgdB1T1Z4QEbsXKoJuPxdL7bwlRxM1/JI+yxHqL3Rgf86FmXzGNTMgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n1umBCQ1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7217C113CC;
+	Tue, 14 May 2024 01:13:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715648429;
-	bh=E5AY8dfKlOU1rOU80YnyA0n26lpjKt6Wld2wUg4Wwas=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pUHaHtSP4HIltHGM0u7E5/7IB0rDPt9DB7zWnDsiPUOiloWFJjzDjw5Sq9yZgRI8f
-	 QhMDzt+exPKpDYWomMTPxAvPiEpj7+hp5Y8NrhP0x0JwqRfq/uE5DcMespnkKbCTDx
-	 GegOLB4s2AUzT90BHqyprF8bOWHjZv0cWHi4t9NrVz4T5w2jhz0mWDri9J2kkMq+kC
-	 OWc11fTAxIhi+CmEbkFH1NULrbzV0TQtWKDEGrWmoKvLr0AcH5x1hvBS+lbv6q+izx
-	 S96ea2deDI+Ua1w1PnsjvESR7DxcJwpfj4EQ2kgEQBAh0AXilo0Fgy1fWlE3/+Dj07
-	 bUIDNtDLQKjaA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 298C6C433F2;
-	Tue, 14 May 2024 01:00:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1715649221;
+	bh=aasZvWkODEWjN+l+JIrTwlnPD99FUSWRDgFhstM7p9c=;
+	h=From:To:Cc:Subject:Date:From;
+	b=n1umBCQ1TNbm6r5JTQvTMQLWXQdrtk+YWjcq+Q4BIaChXzMAhFzL8Fv3AleYgpvQY
+	 BIU/vi9ol8BvrCN+GuXfRpzt+YWiSkU3N9xcmE2XqPAUjwQPi4nJCHJO6rPifO27v1
+	 HCXWYmGL/UqqorKfW83upuloZO0BbzTaY58H9NZqGACEYu6HlMUY4x13Ny10Hlkwpw
+	 1nSNO4OP7+lLaWEB4oryEkfvEpj3VRRw3Jye7O7h1NL0z54Z1VSV3E3S8C60GvhO0e
+	 sgMnHofsBCtvOQYLrCp4hrDbTCvUWyI4fA6i3teaI3FO3YF5r5EXLKBplff+IDp9et
+	 f8qHbXYuyE50Q==
+From: Mat Martineau <martineau@kernel.org>
+To: mptcp@lists.linux.dev,
+	geliang@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	fw@strlen.de
+Cc: Mat Martineau <martineau@kernel.org>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v2 0/8] mptcp: small improvements, fix and clean-ups
+Date: Mon, 13 May 2024 18:13:24 -0700
+Message-ID: <20240514011335.176158-1-martineau@kernel.org>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,44 +61,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: fec: remove .ndo_poll_controller to avoid deadlocks
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171564842916.4255.8652669521897481692.git-patchwork-notify@kernel.org>
-Date: Tue, 14 May 2024 01:00:29 +0000
-References: <20240511062009.652918-1-wei.fang@nxp.com>
-In-Reply-To: <20240511062009.652918-1-wei.fang@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev
 
-Hello:
+This series contain mostly unrelated patches:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+- The two first patches can be seen as "fixes". They are part of this
+  series for -next because it looks like the last batch of fixes for
+  v6.9 has already been sent. These fixes are not urgent, so they can
+  wait if an unlikely v6.9-rc8 is published. About the two patches:
+    - Patch 1 fixes getsockopt(SO_KEEPALIVE) support on MPTCP sockets
+    - Patch 2 makes sure the full TCP keep-alive feature is supported,
+      not just SO_KEEPALIVE.
 
-On Sat, 11 May 2024 14:20:09 +0800 you wrote:
-> There is a deadlock issue found in sungem driver, please refer to the
-> commit ac0a230f719b ("eth: sungem: remove .ndo_poll_controller to avoid
-> deadlocks"). The root cause of the issue is that netpoll is in atomic
-> context and disable_irq() is called by .ndo_poll_controller interface
-> of sungem driver, however, disable_irq() might sleep. After analyzing
-> the implementation of fec_poll_controller(), the fec driver should have
-> the same issue. Due to the fec driver uses NAPI for TX completions, the
-> .ndo_poll_controller is unnecessary to be implemented in the fec driver,
-> so fec_poll_controller() can be safely removed.
-> 
-> [...]
+- Patch 3 is a small optimisation when getsockopt(MPTCP_INFO) is used
+  without buffer, just to check if MPTCP is still being used: no
+  fallback to TCP.
 
-Here is the summary with links:
-  - [net] net: fec: remove .ndo_poll_controller to avoid deadlocks
-    https://git.kernel.org/netdev/net/c/c2e0c58b25a0
+- Patch 4 adds net.mptcp.available_schedulers sysctl knob to list packet
+  schedulers, similar to net.ipv4.tcp_available_congestion_control.
 
-You are awesome, thank you!
+- Patch 5 and 6 fix CheckPatch warnings: "prefer strscpy over strcpy"
+  and "else is not generally useful after a break or return".
+
+- Patch 7 and 8 remove and add header includes to avoid unused ones, and
+  add missing ones to be self-contained.
+
+v2: Rebased
+
+Gregory Detal (1):
+  mptcp: add net.mptcp.available_schedulers
+
+Matthieu Baerts (NGI0) (7):
+  mptcp: SO_KEEPALIVE: fix getsockopt support
+  mptcp: fix full TCP keep-alive support
+  mptcp: sockopt: info: stop early if no buffer
+  mptcp: prefer strscpy over strcpy
+  mptcp: remove unnecessary else statements
+  mptcp: move mptcp_pm_gen.h's include
+  mptcp: include inet_common in mib.h
+
+ include/net/mptcp.h      |  3 ++
+ net/mptcp/ctrl.c         | 29 ++++++++++++++++--
+ net/mptcp/mib.h          |  2 ++
+ net/mptcp/pm_netlink.c   |  1 +
+ net/mptcp/pm_userspace.c |  1 +
+ net/mptcp/protocol.c     |  5 +--
+ net/mptcp/protocol.h     |  6 ++--
+ net/mptcp/sched.c        | 22 ++++++++++++++
+ net/mptcp/sockopt.c      | 66 ++++++++++++++++++++++++++++++++++++++--
+ net/mptcp/subflow.c      | 32 ++++++++++---------
+ 10 files changed, 143 insertions(+), 24 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.45.0
 
 
