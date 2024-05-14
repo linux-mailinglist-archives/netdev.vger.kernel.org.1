@@ -1,120 +1,119 @@
-Return-Path: <netdev+bounces-96326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD6148C510C
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:18:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 057C28C515B
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:29:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 979841F21943
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 11:18:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27D101C2135E
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 11:29:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD2112F365;
-	Tue, 14 May 2024 10:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F16135A45;
+	Tue, 14 May 2024 10:59:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IJkjrR/p"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NFl1MJ1F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D590E55C0A
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 10:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035EC13540C
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 10:59:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715684016; cv=fail; b=Y4cDkI/BAceCi7OF/3a9CM+e8EBDjA2/uZH5DVyx6AgBJpltoAQsgRCxuULw0URnLasLtHRXZHif/QYLiEeIaTZ2bqWppsD/zFIf6DDF/litqWvsJj+KggNFZlWb2dk1y+J86jjmkdpfYGnMKddKt8nuDSNEV70MeqJ0pe8+DQA=
+	t=1715684357; cv=fail; b=Y8on4fbASLyhNd4RyhydYg0diwjMCPBRghg/46Hq8J32huRfUoqRay/UorFi4aTOIMIMXPNZvpbFSGB1MURYZCOHUcTX3UOUGDs0gbzZzj/R/sM39wg50QbKfGXOdr7XifTepM5cC2Rc5ZfkFpst6+KIbT1iDixxaVvfyzXU/wY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715684016; c=relaxed/simple;
-	bh=tIDaq9/5PyKQfqtK2h8Zy/CIYZY4VUyXnl9VAbyDTK0=;
+	s=arc-20240116; t=1715684357; c=relaxed/simple;
+	bh=FOxBrMAifOhBRQVfVQAR+zIyMTApMA1URQko3sksSew=;
 	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LhEjkzVG0VjRKkMjeqw+a+vEXcFwdIaneioBmx2AfN6DriZzCUd47kBj9dMCjlpKo8B29msVIk3rYldAHBwpvBprRUIcZjcWrD8mwBz0T4PjmLEWhRXWLRqhLTZFnySuZ8/1pCMuKbsxRWdrQDoKRhaMP4fSGYlYIzw/NFRWwao=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IJkjrR/p; arc=fail smtp.client-ip=192.198.163.19
+	 Content-Type:MIME-Version; b=UROz/7Efq80V21iCty0ZZqry1u/HAh/d7fx1VnmSyknXO5H0NRckpAMzNNaf0vT4oOEp3eLKxzKD0FxgH5xRy6kC6leDASZdrChSSNjhxOeNnNdb0MJVRGh9ywpOux1AajyzZT7kjcckmL/wFCUIylgzYOCd8Vt/h58oZQafAnU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NFl1MJ1F; arc=fail smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715684015; x=1747220015;
+  t=1715684356; x=1747220356;
   h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=tIDaq9/5PyKQfqtK2h8Zy/CIYZY4VUyXnl9VAbyDTK0=;
-  b=IJkjrR/p2rp9qHIpoQgqmaq+N4LMjj4yKvKc6++JKBI3HKSvqHe6jw5O
-   wxVKIveq6YsUEMASP0d17oWupbdsK8/wRwiGABNwUmCHZlTp5Bw7BrC92
-   rfOC8B1M6PHdES86kemy6OSWGSCC9xYyEGDxDK+gZ5XSoZj91LWwhaZiv
-   ScSS7yViQiPwjfLVacmp1wd5docn5ENoT8jwBkIUZIle2RdcbcDKhyBky
-   DY90Lkj2iiaCqcavsbJ/2XFW8pO4U13RaRgt1KWAwJlP50+R/BI6rFdov
-   74d4i6Hr7snlrVP0EpS4C4V9YJ1q4wg2zRvXlqV3n4Ham6DxXXyWRcQSI
+  bh=FOxBrMAifOhBRQVfVQAR+zIyMTApMA1URQko3sksSew=;
+  b=NFl1MJ1Fe1wSEKKszg2f8vcUfG6ORc+3b7BaQzx9f1t3dpGIGujW3KPF
+   L54dL2asTWRv+taTarCBwr9wi81Xzq0jqf2aPzdFvyKslpHANmoj+7CUP
+   rlEUrrFi5SovuEuXlURMLs2Koo/dOTpwq2VD5k3Vl8p13vHx26UWPm4r/
+   PQ/uvukvKQFscEuyhK8FfiNMN0Bmz7+B9uoaixYQU6aMGs8rI062sXDv1
+   Xke1jq4CKRBHFd+BvnAPdcjqSqC+sltQmNToQRPxxPj4XuUcitQWvCcxn
+   5ccbYS6CUCWITnhgLTL3T3jTZZvpAaa9zfUiKKLmhPX8XirNTduwpZkcC
    w==;
-X-CSE-ConnectionGUID: LgtNaRXvQFCbNsKYQL2TqQ==
-X-CSE-MsgGUID: KxdO3CZBSvuYMmX+muA2PA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11072"; a="11513208"
+X-CSE-ConnectionGUID: r0To6603Qde3/1ZgnpAI6A==
+X-CSE-MsgGUID: +nKSijvyR72YgQj0Vw0n1A==
+X-IronPort-AV: E=McAfee;i="6600,9927,11072"; a="23061805"
 X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="11513208"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 03:53:34 -0700
-X-CSE-ConnectionGUID: riaQ+x8qRdKAUxG0j74DPQ==
-X-CSE-MsgGUID: 2DhqnfyySeaQ3zpe9bhAUw==
+   d="scan'208";a="23061805"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 03:59:15 -0700
+X-CSE-ConnectionGUID: 67KLJS8yQky7HinYifJNtQ==
+X-CSE-MsgGUID: x+zsQNcsRN+xtfscaEKoQQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="35174867"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 May 2024 03:53:33 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+   d="scan'208";a="30776591"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 May 2024 03:59:15 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 14 May 2024 03:53:33 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ 15.1.2507.35; Tue, 14 May 2024 03:59:14 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 14 May 2024 03:53:33 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ 15.1.2507.35; Tue, 14 May 2024 03:59:14 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 14 May 2024 03:53:33 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ 15.1.2507.35 via Frontend Transport; Tue, 14 May 2024 03:59:14 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 14 May 2024 03:53:32 -0700
+ 15.1.2507.35; Tue, 14 May 2024 03:59:14 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SAk5mm7fewrJYhegD3HcJ9HK2/nSVdyRlhIqSWKo9i/s8ZrKdo/LPB0gYt0Kl5TaYso0HfNC2xk4aqA2oItxPPYP5WuyWH9c0Seu1o2V5vec4lD2zfMhyGoYXPTcHFQaeSnDbRb1AGqeIRk1j3emY2DQWChaRZEq/o17UMJm6PHMblBzECrjFCpyfZVVbqTlJ4J9y7XcAdEHysG7YeyLZQWyWyLPKtK231sM2h6NrexDJT0ZOXs8MpLHL8HRqV6ltV9tlGXXp5r1FRUWc/cWfA275Goepy2QnTqaw1OtPIvBHJPkt+OCH/jYUOM7saNXdcdj/949P5PzILZCUCzsEg==
+ b=WGLPZoQH/dpuZhjsJF/SYikm/cPODwIlvE3tmpXqhBc/dJAM32cefWcB+PdugibZkK/2/gwgG506YYJQnhh+f3MaWj8bjowq7dgODTMArpogiPDS5wQgYUNDdB88xDg83gkiCLjUrgehIJrzCbAJerItLhQ/bhNciKjzm6UdOoNwbPUJue9+cMN971TXMImE7DbCoQaxqa68UXYBduELTqn2tk3lFbgxl/30QC6fnND8h2PH8KKio2AFo+5lyBswhAnGc4zcJhkjavkv3UdLYJWZfFaafI/trYNlVVg74LWuJfQP/w67zIM9Mxmk6zvhcwEc/qdJ603TliwT/5P4XQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pnXtftCza+0rJOz89i8kOYe2bqA9MuIiBHHGc6khxXY=;
- b=gGVG2jm3rUc8CGRY3bRWQbBbIzLTOjv31H2FjYdwXS4FWuiZIXirfFad2wt/a4Kyorwe+R/cGMIM7nXCM2kGbiOod8oOtp6aRGYPv+9BcjpPbuytaft7KIg0wefrAaBH/ME6nnjTE0XUutELLMVt0esXphFgOCgkB4JIv+vcnyp1x0PbO99RBv/fyadAiqUuMFpFClVJ/5dgdcwYE7J6ZEuI1mrgIN3O+mvb8Ng25N/meGnZWaV5vLXikOiHe8eEtXT7L6ne33xGRK1q5hkynz/xArJVfQxCjQFJremqt8nEW/Kna1rrzdTgxR7LOVdA5fK9wNSUrrmXDWcuDDoBQw==
+ bh=NELVv/0+RqDAKgnOBAwXDkyuR+OaSu3QZLO7fysw4Ek=;
+ b=Y9a6CTz0VmK78DVhBffpiahyWDHvZvgCVVObYTuweH6PcrgKhtqG81oo6cHHCeSv1N9Ts7EWRHe9bsg5Q91qP8WrRPN3u8ZqXXOLqcNusTV6kIbFanSak3k3tXXkJqGLjmYRz+0jXCkbSeyJ8Zp0evX//Wkbk1J45+jun6RQxx3L3aQnUcWdeiWDoZNik5k76SuUV6k6hBtoiajb/T8fEgtcv1LYXrc24SEtI+0nWF8d4EnPWq7pJrwe0IsjyhUCxZFSg/Cfrclt6t316Z7hlqsTzyA/k8/nhcgfTVJCemaq09Hv0di9v/0f6++UNIDlGr5b1UaUkHhxvbS7kNe0DQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by PH8PR11MB7070.namprd11.prod.outlook.com (2603:10b6:510:216::10) with
+ by SA1PR11MB5874.namprd11.prod.outlook.com (2603:10b6:806:229::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Tue, 14 May
- 2024 10:53:30 +0000
+ 2024 10:59:12 +0000
 Received: from DS0PR11MB8718.namprd11.prod.outlook.com
  ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
  ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.7544.052; Tue, 14 May 2024
- 10:53:30 +0000
-Message-ID: <e8f548f8-6d16-4a30-9408-80e4212afe9c@intel.com>
-Date: Tue, 14 May 2024 12:52:18 +0200
+ 10:59:12 +0000
+Message-ID: <0555b297-5f8c-42a1-b651-e3119b1851ba@intel.com>
+Date: Tue, 14 May 2024 12:58:01 +0200
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] r8169: disable interrupts also for GRO-scheduled
- NAPI
-To: Eric Dumazet <edumazet@google.com>
-CC: Heiner Kallweit <hkallweit1@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>, Realtek
- linux nic maintainers <nic_swsd@realtek.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Ken Milmore <ken.milmore@gmail.com>
-References: <6d4a0450-9be1-4d91-ba18-5e9bd750fa40@gmail.com>
- <ef333a8c-1bb2-49a7-b721-68b28df19b0e@gmail.com>
- <CANn89iLgj0ph5gRWOA2M2J8N_4hQd3Ndm73gATR8WODXaOM_LA@mail.gmail.com>
+Subject: Re: [net-next:main 13/66] include/linux/compiler_types.h:460:45:
+ error: call to '__compiletime_assert_654' declared with attribute error:
+ BUILD_BUG_ON failed: !IS_ALIGNED(offsetof(struct napi_gro_cb, zeroed),
+ sizeof(u32))
+To: Richard Gobert <richardbgobert@gmail.com>
+CC: kernel test robot <lkp@intel.com>, <oe-kbuild-all@lists.linux.dev>,
+	<netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn
+	<willemb@google.com>
+References: <202405141504.J6WdljEp-lkp@intel.com>
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 Content-Language: en-US
-In-Reply-To: <CANn89iLgj0ph5gRWOA2M2J8N_4hQd3Ndm73gATR8WODXaOM_LA@mail.gmail.com>
+In-Reply-To: <202405141504.J6WdljEp-lkp@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: WA2P291CA0010.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1e::16) To DS0PR11MB8718.namprd11.prod.outlook.com
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZR2P278CA0022.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:46::7) To DS0PR11MB8718.namprd11.prod.outlook.com
  (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -123,168 +122,164 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|PH8PR11MB7070:EE_
-X-MS-Office365-Filtering-Correlation-Id: c84cbfb1-db59-4b7e-b57c-08dc74041763
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|SA1PR11MB5874:EE_
+X-MS-Office365-Filtering-Correlation-Id: f5d47ea3-b13c-416a-8d69-08dc7404e33c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|1800799015|366007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?TG5ieWNXamlzWjhyS0psR3V0d1dja05TdzgzOTFCZGZHSk1GcGQ4M3g1Mk9o?=
- =?utf-8?B?N3RSRTZzUy9DR1RzSzR4Uk5MTHlydEE1Y0tSakE1V0FGY2FTdStjVWhEK3FC?=
- =?utf-8?B?VFZOOWxsb2l3SXhGNDE5c3MvblVROEtwakp1cFpraS9kZmxydllocW8xTk1s?=
- =?utf-8?B?Z2JRSUVraFFvTVptTEE2SWdmME5lVzBBNStNcHFQOUxiQkVTaXRZN2l1L3dx?=
- =?utf-8?B?WUI4c3I3VHdTRnlyZjlGbFpNRGVjbHdqUkVPRXk4NkZrRUlqb1pEKzAxcU8y?=
- =?utf-8?B?c2V5ZTdzd2hDdENLdUlsSllZRWh3NDFwMmpDa2phQzFFUzcvaVBFYlA4ODdl?=
- =?utf-8?B?NTJQZ09DZ2hXbWcvbldTMDVSWmc2L3l0Y2pkZTZJUmtzOEdySlBxQy94RUZH?=
- =?utf-8?B?ZkpMalJUTUdmT294M0VKVEFEZ2lzS2Q3VkNFd1d4ZHdhWnFXV25MMFNWRVRP?=
- =?utf-8?B?S2dGWVI5bzlPQmFIRUlnNHNHeEpGNCtLV0JxUUxHWEZCL1NKS2pPQit1bFY1?=
- =?utf-8?B?UitxVVJLbUh3Umh1RE1QajJhVEFNL1N3VWZ1Wk5HTklhMk1VVHNDZjhiYnZu?=
- =?utf-8?B?RUVzMzY1aThDcnVSZXQxNGFoNTZ0WC92dTZ3eFhpVW5HQmhXS0lwd0k1bkJy?=
- =?utf-8?B?d01RekhwQTl2TWp3K3hnazQrdXU4Kzl0Mlc3ZjNlRVMyeklqZFBNdUJKOVdq?=
- =?utf-8?B?aDJXV3RGNVFxK1BtRWhkNEtsR0JqWktuc05HNDVGNmEvZE1US2R1SVlyS05i?=
- =?utf-8?B?TGhKM1FlV0J3bzJQdW5ZM0pxVGQ1SzFsUXlNS1RSMDJvaUJPeERGZ0lpNU4x?=
- =?utf-8?B?WTBDQlZTbW5iU3E4OVo2elhSVXE3NzArYlFCRHJ2VWVDaUJYODNvRjQ1Y0Ro?=
- =?utf-8?B?a2JBUi9rSW5Rem9WSEs4UEpiTkc1ZDUwSjBPcGRZWkM0SmlPZmE2YVpPblNn?=
- =?utf-8?B?UHhlNWVVRE0zRjNCU0gvSUxxK3ptRVJJWHN4NG1OakZyUHVFcE9KMkFDVldp?=
- =?utf-8?B?aUtMN3EvU2xEWEJqbTk1NkU1RHRmcGVGRVRKbjN3R2Y2emlNVGpYZEhIT3RL?=
- =?utf-8?B?YllGSExqNldiMTFRZDFLU0dOQ21STG4zL2UvQUdrK3plWnFMZzBOd3VPKzNH?=
- =?utf-8?B?T2dHSUxQSEtmYkFQSzdGMEFqNHE2eTArdG9JRVBEN3Z0WFNMeXEyNWRQWWR0?=
- =?utf-8?B?Y2xZYnVJcFJoTGl5dVEzZHZNVGpOQzZaZEVDblpVZFhLNDlGQXJzQS9DQ3Fp?=
- =?utf-8?B?MUl2N29TMUJ1byt5ekZ4OUR3UFQzd0lORk1TYVozRWNDcEZLS3lTWFA0dnE3?=
- =?utf-8?B?cm1sT3lXbTkzY09DR1ozQ0ZHRW1GZGZXUDRwOVZZZC9SNDVTeS9lT3R4cThO?=
- =?utf-8?B?blhMVHZ2NUVxZmdJQnc0QmNhY2xMRmVmTU9ob0YzZFhiNDR6b1lXR0Z6S2hx?=
- =?utf-8?B?emtGK1NwY0FSb05xMGs3WCtiUExic3ovT2tneGZJOFpSdzVLWnVQRTR2enlu?=
- =?utf-8?B?Z2svNkRDYjNyOXU2MTB0T0d3RGExeXFRZFFsbWtyYW4vTStZOHlMTCtWYWRy?=
- =?utf-8?B?Z2RzSGlpQXo1ek9taFozTXRkTjZlblNTRWFabWNXTEhvU09OSUF6MmV4dkJq?=
- =?utf-8?B?a0xXYlV2dDE0eElsOTdSTi9GZ2FBdmxFWlREN0piQ3ZjbVJ2aDBiakdvd0VV?=
- =?utf-8?B?SXZBS3gwVU5jT0tFZDYrbzhOTXo1ZFFCTVFqcVc0ZXMvTytmYTlPZTlnPT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|1800799015;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?NkprZ0FTRjQrcnlIeXJQNkd4UWF1Z2gwVHA4RitUeitoUjR2MEJnWmp3Yks1?=
+ =?utf-8?B?Y0RVdGdGdE1zcENQVVVSOXpYSnFXdUt2Qzd6ZXMxdXlqdW0xRUVtWmZhNTJQ?=
+ =?utf-8?B?SWdvdStrS1RnNmNyeSs4cUFNMFRjRHBzaTNTZjlROW1JSCttZm1WZEovOGFx?=
+ =?utf-8?B?LzUzRExLTVlQVk9mZXNKdzlUbWE0Vy95K0IvQW14cDlzbmorUkJUZzBtWUVI?=
+ =?utf-8?B?OWQ2bTYyN2pTTlVWUk9sQ3E4TU1FaTREV1lsWk9JY3VMTGF0VUhrTW5uMW5I?=
+ =?utf-8?B?eEl4bkxSYWpuU2F3ZFRVQUlOaEpCZFdaN0RsYlZyTEJPNzNRaHNkZzJmWVQ2?=
+ =?utf-8?B?NXF3cWhWa2pVdDgxK3YrclBtTmx1VUczd0xTWUNqb2JXdllvZWZIMGpSS0FS?=
+ =?utf-8?B?Yit6WWJQb3NtRHBwK1FjdnlMdFJmL1NST0JjWDdWZEJ5WEFvNTFydWplZk9Q?=
+ =?utf-8?B?TUEyNWlFRTFPWldzT2F0dW9iSCthOGJGcWs5K2V0K016VWs1anM5V1B2MDFj?=
+ =?utf-8?B?K2FkMFlBLzljRDA5cWhIckVuRmsvVzBWUjJXWXJuNndiY2pLYkJvRWN0SjFE?=
+ =?utf-8?B?V2ZyS1NsVzIvb2tHcmhES0RxSHphV1ZTMXBYNmxzYkpLdDRENnhOZHR2NjU4?=
+ =?utf-8?B?YVg2T01YNGswdytsTXR1TnRNWXFoZWxvdllKWGUyUHZtYkRHNy9TNHJ3TUlH?=
+ =?utf-8?B?ZTNXNzlOZDlHa3VxL0dYZmx3aXIrNlRQOUIwbjU2bHlySlBpbndMQnJlUkpi?=
+ =?utf-8?B?V2I4MTBXRkNDZ2VwUEh1KzZaYTJKR3pRTUFUQ3RTdjhRb0t5MnI5OTNlRWdR?=
+ =?utf-8?B?U3hnamoyaWJ3eEx1WjJYYm8wcENmRXJBbkZrQlVYUHE0OUdMSDA4YjZiQnph?=
+ =?utf-8?B?ZDd0ajFKSHJIZ2pKTjZJdjAzK3ZrbVVYTmRuK0QzL204VHV6SkNNeDRocXJ1?=
+ =?utf-8?B?eDkwc0ZQcXZIdi9Jc2JSdlNkTlBoZmZvckNYVEdibFR4RThXSDFucGNZN1NS?=
+ =?utf-8?B?dmRrdktOU3pkWG4vU0drOEQrNlQ3SnRiOTZsdTZzZnpiREFCaEV6UEhhSXNj?=
+ =?utf-8?B?SWMrMlduZ0xGUXpqZlBUUUNuZ0NpTjRORmlkdEVNb2RlekVyOS9PZHd1cFpw?=
+ =?utf-8?B?aUdROVE5cVErQWhZanJ4K3k5dWhkUXdJZXprU1I4Vk1WemlTcXI4eVBRamVk?=
+ =?utf-8?B?VVVwL3pmMGZzbmVSV2R4WFA4bG9Yd2hudUZqZ3NWdjl4RGQ1Wmt4aE9FdDI5?=
+ =?utf-8?B?USt0QlY4TVo1R0VxUk1iUTJ6MzV1cjlYaktuVzZBNVJ6UitIL21RZlpBOW5X?=
+ =?utf-8?B?S2poQVAzd3BYTSt0TERsOFpNMVR4UXlsZXJXMVVwa1lJc2h2RmZicnZhQUNk?=
+ =?utf-8?B?MStVelVJM2xWb2pSMy94K3FHaDJ1WGdUN08yNXJkTkJoWkI3blYrZU9FZFZ6?=
+ =?utf-8?B?NEVkRXpaREcwajRVMGU5Z3JLSFY2OStiUWtwWDNNY25rK3hZMlRscmpuY0lW?=
+ =?utf-8?B?RktEWnFpMWtyVTFPcE1pMXkxeDBZSHpxV05mN2JhdnZHcW9YcUlrdjVBR1VU?=
+ =?utf-8?B?dW94SjZnTFV4YXQ0WkltVjFLN1EzM2pGNFBzb3BLKzczdUZycGdFUlA5V3J6?=
+ =?utf-8?Q?DOQSvOkSOWv7Ie3i167uruLc/G2tVaQVe7Fc335c9dag=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UHZrVlc4TzFueU1iZjFQdC9XUHQ5b3dHLzh5amRzZmNocENlSTAyMjVreEY5?=
- =?utf-8?B?WVBIOUVUWkszS3FPVkpVWFNldWVXKytRUnRDMjVxeENmelpsNkZLSnlIRVJi?=
- =?utf-8?B?clFpQXF6ZC9mYll3SEp2anlVQnVGVjdpVFZQdDBIdFQ3K1dOeWNGSnBtL0pk?=
- =?utf-8?B?eVNIais3Um5TS1Y1V1c1UGVlekJCT1JRYVozMmpUcUs4QzdYRDdkdHJsN0lY?=
- =?utf-8?B?STRUSjhGYW5Zc3BrYnljTnZROXdSUndlUktHeHB5bm9jeE4rOVN1SFJKMytB?=
- =?utf-8?B?a2d5TDVPckJSakRBUlFZSVc2VUU2a1ZwU01ieW1nMDNMcFVNMm9kemR6cjZr?=
- =?utf-8?B?Sjh6VUczTVVsQ2l0Z3FzUXJvZFYzTm9ZS1AzWG42MWliSDc1aXkzdVluTnFU?=
- =?utf-8?B?VGlHZUgvTDgyM3l5bWFMaFByczRvM0x4eTJ4S1lKeEVwc3BHOXBOaGZGcDZY?=
- =?utf-8?B?Z051OWpKcGE5Tk8vQWpIN09yeGxVZUg5VUJIaTdqRTRmMDlGN1ExN0h2STBi?=
- =?utf-8?B?a1UrM2hTSDVWK3lZMWQrbzY1SnNNZTZKb081TWJhVDhWNUJYRlR5ajVHOUdq?=
- =?utf-8?B?MS9VTWVIZG50ZVpBMDNJbFoyTk5FRk5HL2VGSnJyT1A2dFc5S0dpd1ZLVitK?=
- =?utf-8?B?Qms4ZVliWkJuay9ud1ZtNktnYUZxUDNicVFyZ0JBczZzbnlRYjhNcGYxZXUw?=
- =?utf-8?B?VFJyVy9aZUF1aW54OGVINzdCZmpSUHpSeStUMnZSdWNxU3U0MzFNRjlkSXJJ?=
- =?utf-8?B?Y0QwQnQwaGppVVE2RnZNc0V3b1Y3KzJqQ0dvcWxPelo5VGx3YVJ0eUh5Tmhp?=
- =?utf-8?B?bmlwUEFGaWV1RUNMUnJoV2pRemFSQU52eWZ3MDVucHpSTUJVYW5LdUFtZ1Nu?=
- =?utf-8?B?emMxd01kWUZTTjVaMnhKL2tGZGNueEI3dnhDMzJUVUdUWitmcG5xTkN2SWM2?=
- =?utf-8?B?cy8xME1DMStXUDFDcFpNTW1WTUFJT0xZNEFCclA1OTJnaEROaGY2U2FWSkYr?=
- =?utf-8?B?WVYraWxhMVNXSUNaVEJrT0JoVFBqR1VwZGhHbFJQcjlLeG83RDZ3ckFScFB5?=
- =?utf-8?B?Z21ZYVZLOG0wNitCZGxheDBQaGNBR0FOZ0owY2JYR0dtR3pyd2o4QzQ4b0FO?=
- =?utf-8?B?aWNTcFUrb3Qxd1hKYW1aK0pkR1pUZDdkOWo1cUtBVDN2NFhISUZ0ZHIzWTNI?=
- =?utf-8?B?Uzh3YVBYbmFjUjFOK05jZWtUSytzNVUvTksyTTJsbk9iaVVNVk1qb0xXTnFU?=
- =?utf-8?B?OUMrSExHaGxTZnJVZlZHKzFIckNnaG92a2pteldaa0JNdDd2UlJSR3NvdGhx?=
- =?utf-8?B?VXlTNm9FT0FIdUhJNUVvUFQ3S0FtQjRSTU1YT2luS0FnNkxCM3BrcDJQWEYy?=
- =?utf-8?B?bkRLVGRjZTU1YTBXZjcyVWtKMGxRZFNZTnY0TGY1OXdKQ1RlMjVZdDJ5WGJ5?=
- =?utf-8?B?QVJKTEpFL0pOc0w4QXQ0QUgzclBJRFlJQTNnYUdrWmE5TXVMVGl6QjBTRFYy?=
- =?utf-8?B?SjhVNytwL0xxUjYyV2Z4NEVkbGt5Nk9DRk5vZUVsb1BBOTJ6YTMwekFOcFdX?=
- =?utf-8?B?SHB2Ykk5Rkc5THJFR2t6T0YyajY4TUt1dUQ3Rk1FZjZMT1FacUxRVW5XeTlE?=
- =?utf-8?B?ODQ1OWVlTzBxcHcyaTJVYkRQT2xFaTBlR1RNRnVYOGVEdElERFlMM3c4YTRC?=
- =?utf-8?B?NWNPOFB6Yk1lVkJqLzVtUTlLT0M2aU9aTjhHOHhlZmVUVGdsQjI0RmJXbkdx?=
- =?utf-8?B?TWYwNnVPaW83bHBOdHVSbWxEZ0F2NDRJbHhqbGU1OGVQd0lYSGF0bjJTQ1VE?=
- =?utf-8?B?STYvdXpJRHZwSFFsWENpZEltemR3SUkyY0VMWTNnWEsvdGp5YVVZNmFDdnBQ?=
- =?utf-8?B?emZtcjJVRGJvdk9KWnlSOEh1N3FkY1A1bUp4cGI2KzI4UlF3VEt3a1VIcDU2?=
- =?utf-8?B?SUc0MzF5SnBlaFgzRS82a0N2aTVBdUcvRDVXdDBEN0czMVd6NDJMWHRPeTFs?=
- =?utf-8?B?RUlaSXZOVUFENHQzaE9UbVJwc0g3cHFKNGhDY0ZuRmd2VjZ5ZWxHeGY5Q3VO?=
- =?utf-8?B?WnBLTTFIK0JaM3o3ZkFBYXpoWkZ3Umk2NnE0ZHI1ZjlmVGExMzFURTc0ZFRl?=
- =?utf-8?B?dGdJZytmRjdKcVhyK2c2Q2Rkdjd2K2xHS2lvWk9pb0VPOVdEaGZkelU4WWYr?=
- =?utf-8?B?Q3c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: c84cbfb1-db59-4b7e-b57c-08dc74041763
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aUROdkFyaDRCRXZSM1BJa1loSnFVYjlkODR4ZkRYZm9mZ1c2c2F5RkhBdHB2?=
+ =?utf-8?B?Ti9BTHBUbUFKY2JCajk1RzFlMXRPanVFMlMxNUdXSHZFTTZNVVdOa3VUTkQr?=
+ =?utf-8?B?enNhWkpYZU8vUUNkTmhBRVB5RU92aFJXay95MW1tUnFYeEROTktwN3Y1V1o0?=
+ =?utf-8?B?aGF1LzlLZW9GRFBZYStKa2wvb2M2OEsxMFVhZm9RYnVwcXVpeUFQaUYrTGJk?=
+ =?utf-8?B?T2xYU0VzZjlYT0ZtSTJtUEtNNDFpQVdiamNLZ01MemZTRkhSU3owVnZNcTFG?=
+ =?utf-8?B?NmVOVVNTNWRQT1Fwd09ac1VYUTU3WFpTUng0ZThodXd1TmYwL3dvdyt2SHlv?=
+ =?utf-8?B?VjA3RnpBZk1wWWZYT3llY0ZpcStIcFkwUkplTkxSalp2OGpNd01yaUs5Wlhw?=
+ =?utf-8?B?eEhvSmJpcTgxVGY3U3JEQS84c002aEpSS09EMmplbFBvTUNkam9sdTVkeVNM?=
+ =?utf-8?B?NWFVNElYSENwYmpDM0syZ0YyTUJTcjRUcUpmYXZZa3lOS3VhQVRqQXc3cU9q?=
+ =?utf-8?B?OVFrc2VNa3lSR1l3ZkZwMFRJZnQ1ZXJDdzZjUE5MTmlrNDIxREM3SmtiTUFB?=
+ =?utf-8?B?MUlMM2lKTGdPR1JFMGQ4WnU5ekxvb2ZITVUzTmswZ2FSb3p5RkxqU0xReTBh?=
+ =?utf-8?B?SXR3ZkxCWXZVT1dCQkR3alNVdkVIeGRhWCtQSU9hNmRGaXRGZGFMeVh5ZjRi?=
+ =?utf-8?B?b1UzWU5GSFFuemx6YXp6aUZ5NzBBV0JIRlROTUltVXRHSzVUUzhIR2ZEaEJK?=
+ =?utf-8?B?N3dPMy9uWkQyYVBnZWpUY2FZd1g0TXNpTHJlZFVzTnpUYjc4MHkycjFPTExv?=
+ =?utf-8?B?dVFFMHJ1VFB3WFhkN0lITXlQRkh0ZmozTDRPZVJHSXhyaGgzL0NCOGVJbklr?=
+ =?utf-8?B?VzNhSk9ZdUxhSjNzaTlTR0RNcXRQdVdDZXRuMzdBc0NLNnJMM2NpVVZBenVp?=
+ =?utf-8?B?TS9SSmo5bjNWdnp5TnRPZmltb2FNbWw3b2tXbFdLUVFYZWF4Wnl1RTBnZkY5?=
+ =?utf-8?B?MzZnOTR5SFFpRjFoeWJkL1JEVmZNNkc4VGhmMkVsaVhKL1lrL2VzbzBJbndM?=
+ =?utf-8?B?ZHFzZU9uQjkwWDZJeEM4cndTQkJlUGY5UENLTjZrRmRXNkJRdlVRcDNicUpv?=
+ =?utf-8?B?NDJCNzhkZXY3cDlybC9TRjlMYndIcS9xeUl1V0NIRTd3UUMvbWo2V0ZXUVZ5?=
+ =?utf-8?B?SXNZbllBTFJtWFZrVVJHbkNlekJJZnRmcUR0ZHEyYXRFZzdNeE9xVU13UUJ0?=
+ =?utf-8?B?TVN2Vnd1S2Y1cndPZXIwNnJ0aUxWMXh0NFlzZlZyT0hKaUhOMlp6eHYyd0V6?=
+ =?utf-8?B?YzdjTXJPcVNkVHdOWmRzWDZBSEEzODhJUmc3U2pPU1hBUGdKSCtMM2dWRG1p?=
+ =?utf-8?B?bGZSNjdmQTlSc1FHN1BKTkIrbVlaSktkcHVTSEFEeTZRODY2REpTblhWNlpj?=
+ =?utf-8?B?VWRzNmlYb3RDY0tXV3luUEF0Nmg5OStNc0F3T29rTWgvM2x0Y1BCNitVK0pw?=
+ =?utf-8?B?d003Nlh3dUsrSmwxNCtJT3BYaUZZVnRCakM2NktqZEpPbVpwOFg4cUxoWDFE?=
+ =?utf-8?B?dGxuR0JJa2FaYkJMeENmR2RMbG9ZRFYzWkIyTWFDeEtTNWhINGZFWUc1SFBX?=
+ =?utf-8?B?RzhaVkJUT0FCWHBFaHNrM1plSEJZaE05SERSYW8wbGdFTzloMS9xSjFqZmRX?=
+ =?utf-8?B?N1Y2cXJyaldHbFN3ZGxpdGRONlpIZG5CSnZyMmVSMVozc1llUHc0d2RpUTE2?=
+ =?utf-8?B?aXV1cUxTMCs0UUFlV2c3Ym1jcmU5ME43OTQzTkRnMlQzMEJwdHR5WW1vM3B5?=
+ =?utf-8?B?OUhkL0JjbzBwK0w2eC9QblZRQmlMbURNcGFSVWNKRmdDVGZFSEVrVGNtRlNj?=
+ =?utf-8?B?aGk4WTF5Smk5bzN3OXBMT1hlMnZ0Ym92ZmNTMWg0SHQ3QWNFc3B6YmdzU2p3?=
+ =?utf-8?B?bUY1eUJVV0lWdEFuaFRDV3RycnlISDdSb3Nybzh6UXlYZ1c5TEMxNndnZjJL?=
+ =?utf-8?B?RUlwRlhHZEtLK1pRU2lJUGUwUUxQMXh5bEQwWHFmeXhsZXJpZlB3QVhteHBo?=
+ =?utf-8?B?T01DUlM4ZU5FTzQ2RUVjVkl1THlFWnBGa2kzc29icGovNVBHRFFtdUlqUkUw?=
+ =?utf-8?B?SEI0c3VHSG9UWjQvbk1pVzRGRWpTdHhmUzBiMWZIdU5DZHpsZjZJUGNrcDFy?=
+ =?utf-8?B?VEE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5d47ea3-b13c-416a-8d69-08dc7404e33c
 X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2024 10:53:30.1802
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2024 10:59:12.1971
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GpPhqxCAk3R927Om0VRTBbXH4E7pPTecalGPrwSekUEZbbhdfRJoo1AIKvlYBiTurw7nVd/DmxbQMr/teDtInpfxgZuA4NXA98DyEoWqso0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7070
+X-MS-Exchange-CrossTenant-UserPrincipalName: XXcOBtxCAcRU6ulfRwtIKjlzdbZBZuIGero84vVwQDGpPVUJkIgVRmAA9KrBvbw8gbY9PfsbfxRghhNhdcbUHFNROdki1E9JUvQv5XTwjdU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB5874
 X-OriginatorOrg: intel.com
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 14 May 2024 11:45:05 +0200
+From: Kernel Test Robot <lkp@intel.com>
+Date: Tue, 14 May 2024 15:53:43 +0800
 
-> On Tue, May 14, 2024 at 8:52 AM Heiner Kallweit <hkallweit1@gmail.com> wrote:
->>
->> Ken reported that RTL8125b can lock up if gro_flush_timeout has the
->> default value of 20000 and napi_defer_hard_irqs is set to 0.
->> In this scenario device interrupts aren't disabled, what seems to
->> trigger some silicon bug under heavy load. I was able to reproduce this
->> behavior on RTL8168h.
->> Disabling device interrupts if NAPI is scheduled from a place other than
->> the driver's interrupt handler is a necessity in r8169, for other
->> drivers it may still be a performance optimization.
->>
->> Fixes: 7274c4147afb ("r8169: don't try to disable interrupts if NAPI is scheduled already")
->> Reported-by: Ken Milmore <ken.milmore@gmail.com>
->> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->> ---
->>  drivers/net/ethernet/realtek/r8169_main.c | 6 ++++--
->>  1 file changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
->> index e5ea827a2..01f0ca53d 100644
->> --- a/drivers/net/ethernet/realtek/r8169_main.c
->> +++ b/drivers/net/ethernet/realtek/r8169_main.c
->> @@ -4639,6 +4639,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
->>  {
->>         struct rtl8169_private *tp = dev_instance;
->>         u32 status = rtl_get_events(tp);
->> +       int ret;
->>
->>         if ((status & 0xffff) == 0xffff || !(status & tp->irq_mask))
->>                 return IRQ_NONE;
->> @@ -4657,10 +4658,11 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
->>                 rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
->>         }
->>
->> -       if (napi_schedule_prep(&tp->napi)) {
->> +       ret = __napi_schedule_prep(&tp->napi);
->> +       if (ret >= 0)
->>                 rtl_irq_disable(tp);
->> +       if (ret > 0)
->>                 __napi_schedule(&tp->napi);
->> -       }
->>  out:
->>         rtl_ack_events(tp, status);
->>
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git main
+> head:   5c1672705a1a2389f5ad78e0fea6f08ed32d6f18
+> commit: 4b0ebbca3e1679765c06d5c466ee7f3228d4b156 [13/66] net: gro: move L3 flush checks to tcp_gro_receive and udp_gro_receive_segment
+> config: m68k-mvme16x_defconfig (https://download.01.org/0day-ci/archive/20240514/202405141504.J6WdljEp-lkp@intel.com/config)
+> compiler: m68k-linux-gcc (GCC) 13.2.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240514/202405141504.J6WdljEp-lkp@intel.com/reproduce)
 > 
-> I do not understand this patch.
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202405141504.J6WdljEp-lkp@intel.com/
 > 
-> __napi_schedule_prep() would only return -1 if NAPIF_STATE_DISABLE was set,
-> but this should not happen under normal operations ?
-
-Without this patch, napi_schedule_prep() returns false if it's either
-scheduled already OR it's disabled. Drivers disable interrupts only if
-it returns true, which means they don't do that if it's already scheduled.
-With this patch, __napi_schedule_prep() returns -1 if it's disabled and
-0 if it was already scheduled. Which means we can disable interrupts
-when the result is >= 0, i.e. regardless if it was scheduled before the
-call or within the call.
-
-IIUC, this addresses such situations:
-
-napi_schedule()		// we disabled interrupts
-napi_poll()		// we polled < budget frames
-napi_complete_done()	// reenable the interrupts, no repoll
-  hrtimer_start()	// GRO flush is queued
-    napi_schedule()
-      napi_poll()	// GRO flush, BUT interrupts are enabled
-
-On r8169, this seems to cause issues. On other drivers, it seems to be
-okay, but with this new helper, you can save some cycles.
-
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-
+> All errors (new ones prefixed by >>):
 > 
-> A simple revert would avoid adding yet another NAPI helper.
+>    In file included from <command-line>:
+>    net/core/gro.c: In function 'dev_gro_receive':
+>>> include/linux/compiler_types.h:460:45: error: call to '__compiletime_assert_654' declared with attribute error: BUILD_BUG_ON failed: !IS_ALIGNED(offsetof(struct napi_gro_cb, zeroed), sizeof(u32))
+
+Hi Richard,
+
+In the mentioned commit, you moved some fields placed before
+napi_gro_cb::zeroed and seems like on some architectures this misplaced
+napi_gro_cb::zeroed and it's not aligned to 4 bytes there anymore.
+Since ::zeroed is used as one u32 to quickly zero the hot fields,
+it must be aligned to 4 to avoid slow unaligned accesses.
+Which means you need to move some more fields around a bit, so that its
+offset would again be aligned to 4.
+
+>      460 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+>          |                                             ^
+>    include/linux/compiler_types.h:441:25: note: in definition of macro '__compiletime_assert'
+>      441 |                         prefix ## suffix();                             \
+>          |                         ^~~~~~
+>    include/linux/compiler_types.h:460:9: note: in expansion of macro '_compiletime_assert'
+>      460 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+>          |         ^~~~~~~~~~~~~~~~~~~
+>    include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+>       39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+>          |                                     ^~~~~~~~~~~~~~~~~~
+>    include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+>       50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
+>          |         ^~~~~~~~~~~~~~~~
+>    net/core/gro.c:496:9: note: in expansion of macro 'BUILD_BUG_ON'
+>      496 |         BUILD_BUG_ON(!IS_ALIGNED(offsetof(struct napi_gro_cb, zeroed),
+>          |         ^~~~~~~~~~~~
+> 
+> 
+> vim +/__compiletime_assert_654 +460 include/linux/compiler_types.h
+> 
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  446  
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  447  #define _compiletime_assert(condition, msg, prefix, suffix) \
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  448  	__compiletime_assert(condition, msg, prefix, suffix)
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  449  
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  450  /**
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  451   * compiletime_assert - break build and emit msg if condition is false
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  452   * @condition: a compile-time constant condition to check
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  453   * @msg:       a message to emit if condition is false
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  454   *
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  455   * In tradition of POSIX assert, this macro will break the build if the
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  456   * supplied condition is *false*, emitting the supplied error message if the
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  457   * compiler has support to do so.
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  458   */
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  459  #define compiletime_assert(condition, msg) \
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21 @460  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+> eb5c2d4b45e3d2 Will Deacon 2020-07-21  461  
+> 
+> :::::: The code at line 460 was first introduced by commit
+> :::::: eb5c2d4b45e3d2d5d052ea6b8f1463976b1020d5 compiler.h: Move compiletime_assert() macros into compiler_types.h
+> 
+> :::::: TO: Will Deacon <will@kernel.org>
+> :::::: CC: Will Deacon <will@kernel.org>
 
 Thanks,
 Olek
