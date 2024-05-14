@@ -1,116 +1,110 @@
-Return-Path: <netdev+bounces-96215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96FC48C4A81
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:40:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8772B8C4A88
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 02:42:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C819E1C22DD7
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 00:40:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 414FE284E3B
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 00:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47BDED8;
-	Tue, 14 May 2024 00:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD365A34;
+	Tue, 14 May 2024 00:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y3R/oS7C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gBk4+8QN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF84625;
-	Tue, 14 May 2024 00:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEEA7EF
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 00:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715647231; cv=none; b=XmfdmvTjVHyz/aCCSuHx/pnhLqQul8gsYb/YcbDUpKIgmilnyl/M0qzf2nEdnw9cyzV3RtoQxLkVFE8T+qQRWjBF9S8RWpMJq2dAApaEl1A3ogRytZPY+ldEP+8TecQ+gCm4GdCZyBMghKcdYm6eK6+q8LYrYTzEIyWBc02IXsM=
+	t=1715647351; cv=none; b=mBYOXUBMAk8pUGwmVzKN4F66TIg4B0GYJ9zmfHeIJFW2rtPGD7iR5YIHbnOUTyiqdulL+wD+fydllFDLM/7idpqNo/GPRKEkFYM7Fdv0p/zHCZGQiQDJoubqlDPAoNPo+U4oLfa1WrSjrBAJTgOxRKaI68DkY9TZ2uCgr2tKzn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715647231; c=relaxed/simple;
-	bh=93n0YB5LyuStAJQCV97FzZlYnXBJBJnFNuQFhpwqgUg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nggKxZP6AuYhMLNNrWoFDBiXd/GhRGC1HToNsop9Q6aNQ1qi/36EttPZVWkd81oskdGuvEPYndqKgUTDroces/zwZAiXs0ev/treJ7NpD4oUMdQ4nGlQ0MfvDfgqtxlggW1cFLxNiDRdWIaO2z1B/yduMHB7GHncz1h34Ixmh2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y3R/oS7C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E908AC32781;
-	Tue, 14 May 2024 00:40:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715647231;
-	bh=93n0YB5LyuStAJQCV97FzZlYnXBJBJnFNuQFhpwqgUg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Y3R/oS7CelvSJjiGRbUYW0K3tTmD6WxGxsVSkpWnpXYoAOjcKZl4btM0HUThza2le
-	 hcwU2XonmUY5W5XsN4x0lYg50gj5wBh8Q3NxemDvgrn/6Gp/3F3NSuHdCNPAdbU2Ot
-	 YXCeFiZSRhqzxXa4kfQAEQEL0pAHY0fT/fNXlq/0TOpwLUqOHRDGFj08xaBYrZ2eBc
-	 yJgAWLD6nztNlG2kGwIF1MjF36GE5cMmYVGdTVdfuHy6KQ+lRNimUYmjv/mbygHnWO
-	 T4xQ2Gl5nP/coZ9Ys/E8UDB6eRhFN0nksAP7aNr6uwYjr8CF8wLkRK3zSU2YYI9rf9
-	 reY0tk1AOa/+g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D5F95C43443;
-	Tue, 14 May 2024 00:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1715647351; c=relaxed/simple;
+	bh=2MpnvqBD6DvqAhTrqX5oyxnhPl3vca3CQazvTQrvUig=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZPjL9O5NlXeYUCVJMBsGT0xXIgDK8FyUYcYhhk0cWQ4wud1d5nr0Zu1lM5AqluWCNrpa2uXSleVPYi4ibWkDsXiSSzV1tN/fADN5t8yPpDQMZVK130ztTZIuxH723t58YvW+00SDqn74B4lRTJNNe/gQiFu9X7VCMTJNdFJh3xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gBk4+8QN; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1ee954e0aa6so38618705ad.3
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 17:42:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715647350; x=1716252150; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TDv6WulsmLQrx5i35Hr3ztFDpTYtAjDplykoKz/q3Co=;
+        b=gBk4+8QNAt+r8A0772q/zG3EMYqBVgDUc+vng4Vp+ysnUkejuRG9/fWfDg67SLJgOJ
+         vBc9YYfcCOyNQs8VY0lNv/Hd5bKW5seatuOYDS161YrgUHmAt0CCZ+Af8zttTVcmWplW
+         gIzAIKwdu05q+NXga+tZcdm6+KHhyFJ0YYDOdVOzlvYZL1Fjl/55EHdy3IoBk3qAxdGL
+         4mDAw/3BEoSaB6JDFMx4eo/mepTxtkbPZ1ukPWteJEyT4vniGMZuzvrgLpSgK2NPXuAj
+         kut/TpO7dwEANTOkO8P8lO5y3OxgvkJ6djkQDRXJWkAvOQvmAsxaA7dK8fNMNZgdGJS3
+         zc+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715647350; x=1716252150;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TDv6WulsmLQrx5i35Hr3ztFDpTYtAjDplykoKz/q3Co=;
+        b=E5KmEBrsqAOwt+AyhQJNbzn0hfib3pVeqbF85OXCbHMv3jD7fu4vtpixVDka9fViK8
+         +VeVK9PyAqL846P3aggnsAc/I0c6/+RZqcwAD3xLUnVkMrVo6JMEd10VLp0U8iAo43DA
+         fJ1CDuPrUbjH28wWO8AciIESta0q/H0y8QAr4xYpX446JW8pPkjMKRu/bZxLApRkQ5H2
+         jTAAq5Gb2ghPHPvx6+8oIFdjpN84Sicq8i9rdDjkz5FaextYWiPb+D8aYjDZcj2YSQKN
+         hT5jQLcvit1JlzJTV2yG+jftOXANg5BYP/M72KaDle/Pnuqg3KXfVabIYxJgYLqrUfHS
+         LGoA==
+X-Gm-Message-State: AOJu0YwnGN7yu3YvlOAdl0Lfj8tzSGJU/m9MImUm508R9zP/9VeqDHMs
+	frc8jk3bYKb5OA3WaTwXRQgrurVr4Ad4SbzHM+BM4SwV/AkA+p78
+X-Google-Smtp-Source: AGHT+IG5uMm/dHhBbasES+H6x57LswrMla0Z7VCj9EWBhZ6qfKlLw+MjzvxjiMh4HCjxxKWH9XIEXQ==
+X-Received: by 2002:a17:903:110f:b0:1ea:b125:81a2 with SMTP id d9443c01a7336-1ef44161e50mr137549585ad.53.1715647349499;
+        Mon, 13 May 2024 17:42:29 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c036952sm84761515ad.214.2024.05.13.17.42.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 May 2024 17:42:28 -0700 (PDT)
+Date: Tue, 14 May 2024 08:42:24 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, roopa@nvidia.com,
+	bridge@lists.linux.dev, edumazet@google.com, pabeni@redhat.com
+Subject: Re: [PATCH net] selftests: net: bridge: increase IGMP/MLD exclude
+ timeout membership interval
+Message-ID: <ZkKzcJm5owdvdu6B@Laptop-X1>
+References: <20240513105257.769303-1-razor@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v7 0/7] net: stmmac: Add support for RZN1 GMAC
- devices
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171564723087.24946.4336582223559029417.git-patchwork-notify@kernel.org>
-Date: Tue, 14 May 2024 00:40:30 +0000
-References: <20240513-rzn1-gmac1-v7-0-6acf58b5440d@bootlin.com>
-In-Reply-To: <20240513-rzn1-gmac1-v7-0-6acf58b5440d@bootlin.com>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, geert+renesas@glider.be, magnus.damm@gmail.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- mcoquelin.stm32@gmail.com, linux@armlinux.org.uk, clement.leger@bootlin.com,
- fancer.lancer@gmail.com, thomas.petazzoni@bootlin.com,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, rmk+kernel@armlinux.org.uk,
- maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240513105257.769303-1-razor@blackwall.org>
 
-Hello:
+On Mon, May 13, 2024 at 01:52:57PM +0300, Nikolay Aleksandrov wrote:
+>  	$MZ $h1 -c 1 -b $ALL_MAC -B $ALL_GROUP -t ip "proto=2,p=$MZPKT_ALLOW2" -q
+> -	sleep 3
+> +	sleep 5
+>  	bridge -j -d -s mdb show dev br0 \
+>  		| jq -e ".[].mdb[] | \
+>  			 select(.grp == \"$TEST_GROUP\" and \
+> diff --git a/tools/testing/selftests/net/forwarding/bridge_mld.sh b/tools/testing/selftests/net/forwarding/bridge_mld.sh
+> index e2b9ff773c6b..f84ab2e65754 100755
+> --- a/tools/testing/selftests/net/forwarding/bridge_mld.sh
+> +++ b/tools/testing/selftests/net/forwarding/bridge_mld.sh
+>  
+>  	$MZ $h1 -c 1 $MZPKT_ALLOW2 -q
+> -	sleep 3
+> +	sleep 5
+>  	bridge -j -d -s mdb show dev br0 \
+>  		| jq -e ".[].mdb[] | \
+>  			 select(.grp == \"$TEST_GROUP\" and \
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Maybe use a slow_wait to check the result?
 
-On Mon, 13 May 2024 09:25:11 +0200 you wrote:
-> Hello everyone,
-> 
-> This is version seven of my series that adds support for a Gigabit Ethernet
-> controller featured in the Renesas r9a06g032 SoC, of the RZ/N1 family. This
-> GMAC device is based on a Synopsys IP and is compatible with the stmmac driver.
-> 
-> My former colleague Clément Léger originally sent a series for this driver,
-> but an issue in bringing up the PCS clock had blocked the upstreaming
-> process. This issue has since been resolved by the following series:
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v7,1/7] dt-bindings: net: renesas,rzn1-gmac: Document RZ/N1 GMAC support
-    https://git.kernel.org/netdev/net-next/c/ab5588703981
-  - [net-next,v7,2/7] net: stmmac: Add dedicated XPCS cleanup method
-    https://git.kernel.org/netdev/net-next/c/d5c50937d50f
-  - [net-next,v7,3/7] net: stmmac: Make stmmac_xpcs_setup() generic to all PCS devices
-    https://git.kernel.org/netdev/net-next/c/f9cdff1bdacc
-  - [net-next,v7,4/7] net: stmmac: introduce pcs_init/pcs_exit stmmac operations
-    https://git.kernel.org/netdev/net-next/c/f0ef433fc264
-  - [net-next,v7,5/7] net: stmmac: dwmac-socfpga: use pcs_init/pcs_exit
-    https://git.kernel.org/netdev/net-next/c/81b418a65657
-  - [net-next,v7,6/7] net: stmmac: add support for RZ/N1 GMAC
-    https://git.kernel.org/netdev/net-next/c/f360446ec1d0
-  - [net-next,v7,7/7] ARM: dts: r9a06g032: describe GMAC1
-    (no matching commit)
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks
+Hangbin
 
