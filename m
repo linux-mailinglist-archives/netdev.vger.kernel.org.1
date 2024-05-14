@@ -1,135 +1,129 @@
-Return-Path: <netdev+bounces-96269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C8AE8C4C46
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 08:28:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 375008C4C4F
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 08:30:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82E1E1C20ABA
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 06:28:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6892D1C20B40
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 06:30:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206751CAA4;
-	Tue, 14 May 2024 06:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA0469445;
+	Tue, 14 May 2024 06:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SmuyXb4K"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g5DNN69z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385E71B7FD
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 06:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3244C386
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 06:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715668115; cv=none; b=CFB7t9xtxYFeZvch/Uer+/GSNCyKJp3pJ7OW0XLVw/MS1hmMx+dFrElkQ0TE6l35XGIK1wz5znITUtKHb+wP+UqkKQDQNgdqBNxbXIAaLushn9U6+bE66dHXH62SxcYLGH0JTUnKsfiWFBE6xvTEnZn6IFvtRAnFBv+9DuLDU5g=
+	t=1715668211; cv=none; b=ilsU3W1gVRTD3T7VAilRjDhiF60kbE/PL7VTyQThEsHjEBEWx/iLhB4M1LlVhHkaudLkDhqxaY8oxahlSKCAzW1KKX9c2HWJB7k0oGBl8RanyfFzjmyRH3qCc2EFU/cgWwNdYxcATzaDfyWJxnqwrN7F9XonGQ9dJK7Gsb08Hg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715668115; c=relaxed/simple;
-	bh=uvLtRB2vRXuhGSiN6dmEWnhdZEwKhSyXzmwhQ4T0ths=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r2kSoDD4wbay4+DopsyMmK/272vWP3tQqld7gFkrcGlm6xSvkiX7n+F8K0R0d3jXr7Xz51rV7QviQHWugtjI8NOUhKeLjKjadVhLGKgwO7BpRi28ou4LY9XUc94r33D6Y4kMr1A/SBcqQTm+PADHP5mpcUCNM2jqpAm0LsYn2JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SmuyXb4K; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715668113; x=1747204113;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uvLtRB2vRXuhGSiN6dmEWnhdZEwKhSyXzmwhQ4T0ths=;
-  b=SmuyXb4KkOfhBLg5uXmRoyld1CENjrsw64fJ4gNx0mvp9VTjT940FE2u
-   y15h9eh2xsWQWQqGKgL6iC/fnNeCgY1XRSD/bo1l03srXikBthI7uB3Gg
-   Cf5vAIPSljiwbFf4dSMI6lIrlZca3eLZi6b8S1IbzJdo3myus0ciODTwW
-   kZC1RCZbwQXk7vMq6/Fux4w2vOTrjAX/8L/Hf/KnPWLvUqs1rZA/zC6Bh
-   23wtUGPZTZlSWqc9FVmxqx4OPpeymGSoePKrpCiza0F2FGgJURi7n1hP7
-   pzdkrNQt4IJLbNfvdThBdw/RA/atI/RazxLBYa5ZHkAf0F5WGE+wiEKpy
-   Q==;
-X-CSE-ConnectionGUID: g//uZVJWRV+DgfLf+6y/MA==
-X-CSE-MsgGUID: iNxJkVauQUK7c7OCArzx1Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11072"; a="23032218"
-X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="23032218"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 23:28:33 -0700
-X-CSE-ConnectionGUID: //F9auJcTIWsJ3JlW9L7eQ==
-X-CSE-MsgGUID: wYzLra60TIy7l8Y0KH2v0g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="30526862"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 23:28:30 -0700
-Date: Tue, 14 May 2024 08:27:57 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Simon Horman <horms@kernel.org>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com, jiri@nvidia.com,
-	mateusz.polchlopek@intel.com, shayd@nvidia.com
-Subject: Re: [iwl-next v2 08/15] ice: make reprresentor code generic
-Message-ID: <ZkMEbayPH5ms+Qzc@mev-dev>
-References: <20240513083735.54791-1-michal.swiatkowski@linux.intel.com>
- <20240513083735.54791-9-michal.swiatkowski@linux.intel.com>
- <20240513160947.GQ2787@kernel.org>
+	s=arc-20240116; t=1715668211; c=relaxed/simple;
+	bh=ZfAjRDouTO7ZvYghB+NJtnhbR2ZdJwmxgXE8P3wfpQ4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SzxBSqepY45ceT1VDUcCx3ql0nYC5N0xe/b6s3ic7xTxMbUWQZOiM90MYe2yleYjETaE17CVzydTOo7cLauWl6/1dEpRSrXKn5oyRK0cGL9ciLAqyfZ3z8Z6CkBwCIZgqdX7dpzjsgbsJDjQCB8cTXMv65LQ/JzZtpuOW4vVabE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=g5DNN69z; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-61bee45d035so53536427b3.1
+        for <netdev@vger.kernel.org>; Mon, 13 May 2024 23:30:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1715668209; x=1716273009; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=RL/HT373iFNB5/gmrPBbQbaIWBxFdiHHF2SpPtkNj6E=;
+        b=g5DNN69ziRlus2VeNnifNs5kjD9k5PmggkgQY0giZsCWMvS6W/onDv5rPWHJvV5y29
+         J89koFeZjn57bDbv56DRTcH/gFV/HvOthC7xvf70w95CP+dIC4IG3n+iH8oCfzNn7keS
+         0TTbNKrv3MVEsnoPWHGclVTPk9B0nR/Auj4+t2A7zdiuHGEGQHX3tZziMTEgvmYnoETX
+         +buCp+6EskM6IyF6nzoyxO9UNAEIHQIFYTMliQl7OSJHQIGq2hBAUj9IIwtUga3+KQ71
+         /SllDw4L3JCKbpLrBHmU1xqmCj2htLIGrLNLgPASku0taSTAhh3zn2zLgtCf03uz2z6Z
+         S5qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715668209; x=1716273009;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RL/HT373iFNB5/gmrPBbQbaIWBxFdiHHF2SpPtkNj6E=;
+        b=NMkel6b33RWEo68DQHEqbOiiMJUSsUqKOBHfUmBD4K4tNIADKsJieS4RRSJXrFv/In
+         mQqsgwGkeECiabrtcMWY+cw5KqRSopWlf0NefP35RhhmVYYYxMhN7asdchXCZ2yx1PVq
+         kpPCWg2B/O2Mn5HsrqszhT7SjisT56/mGn9J5QyHgAySr/aczIGpWZMMZ2bB7Ajr9HwM
+         G/hbXpEC+iLxXfcKEcEZd9vI8gciD0FovRA4ebQS0QUg+dw6VZ9tqrUwdKfjOgePbArD
+         PdMqqgm4w/iXLqeeHTfGRKN2Be2BfxVTxx8aaVwOozySHi8ufZreys6ICjhIGP43xnEG
+         0rlA==
+X-Forwarded-Encrypted: i=1; AJvYcCWeCR5KOradmj2/WCITjvlRZkjvjdiV16ihCl2r7yFB0hGGZq40GL6EaK46xB6EkoMLpn5EnN7FQROWWMF3KSQ8wuB/V5wL
+X-Gm-Message-State: AOJu0YzthC+blw9Dc/yBooqPM9bvDbNEjVTv/HcrpUxitWpUC70+0Ad7
+	zhWnOuHu7Am8Hpitx8qaiAxs7+j4ARQCRh6mlFOURGZP/sdnIL6ypScl8dK8fkJ9BUDeuVX+PaK
+	TSuBMX/YvrYyIEoaYhjHuQIGOM3VHF+Av75lwMg==
+X-Google-Smtp-Source: AGHT+IEmSQRtsmi9qrBir2bfVjCB/SQEucaaV9YGbI3BoFMzakNXhdNYP6vrUbPSuXDlSiSULIWHOWNxXgTkE8klnbg=
+X-Received: by 2002:a05:690c:60c6:b0:615:c96:1a8f with SMTP id
+ 00721157ae682-622affe1b3amr131034567b3.17.1715668207682; Mon, 13 May 2024
+ 23:30:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240513160947.GQ2787@kernel.org>
+References: <CAMSo37UN11V8UeDM4cyD+iXyRR1Us53a00e34wTy+zP6vx935A@mail.gmail.com>
+ <20240508075658.7164-1-jtornosm@redhat.com> <CAMSo37XddAvE199QpA_WR5uwQUjzemF8GxqoWfETUNtFw6iCrg@mail.gmail.com>
+In-Reply-To: <CAMSo37XddAvE199QpA_WR5uwQUjzemF8GxqoWfETUNtFw6iCrg@mail.gmail.com>
+From: Yongqin Liu <yongqin.liu@linaro.org>
+Date: Tue, 14 May 2024 08:29:56 +0200
+Message-ID: <CAMSo37XWZ118=R9tFHZqw+wc7Sy_QNHHLdkQhaxjhCeuQQhDJw@mail.gmail.com>
+Subject: Re: [PATCH v2] net: usb: ax88179_178a: avoid writing the mac address
+ before first reading
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: amit.pundir@linaro.org, davem@davemloft.net, edumazet@google.com, 
+	inventor500@vivaldi.net, jarkko.palviainen@gmail.com, jstultz@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org, 
+	sumit.semwal@linaro.org, vadim.fedorenko@linux.dev, vmartensson@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, May 13, 2024 at 05:09:47PM +0100, Simon Horman wrote:
-> On Mon, May 13, 2024 at 10:37:28AM +0200, Michal Swiatkowski wrote:
-> > Keep the same flow of port representor creation, but instead of general
-> > attach function create helpers for specific representor type.
-> > 
-> > Store function pointer for add and remove representor.
-> > 
-> > Type of port representor can be also known based on VSI type, but it
-> > is more clean to have it directly saved in port representor structure.
-> > 
-> > Add devlink lock for whole port representor creation and destruction.
-> > 
-> > Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> 
-> nit: In subject, reprresentor -> representor
-> 
-> > ---
-> >  .../ethernet/intel/ice/devlink/devlink_port.h |  1 +
-> >  drivers/net/ethernet/intel/ice/ice_eswitch.c  | 74 +++++++++++-----
-> >  drivers/net/ethernet/intel/ice/ice_eswitch.h  | 11 +--
-> >  drivers/net/ethernet/intel/ice/ice_repr.c     | 88 +++++++++----------
-> >  drivers/net/ethernet/intel/ice/ice_repr.h     | 16 +++-
-> >  drivers/net/ethernet/intel/ice/ice_sriov.c    |  4 +-
-> >  drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  4 +-
-> >  7 files changed, 121 insertions(+), 77 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-> > index e4acd855d9f9..6e14b9e4d621 100644
-> > --- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-> > +++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-> > @@ -23,6 +23,7 @@ struct ice_dynamic_port {
-> >  	struct devlink_port devlink_port;
-> >  	struct ice_pf *pf;
-> >  	struct ice_vsi *vsi;
-> > +	unsigned long repr_id;
-> 
-> nit: Please add an entry for repr_id to the Kernel doc for this structure.
-> 
->      And also the attached field which is added by the last patch
->      of this series.
-> 
+Hi, Jose
 
-Thanks, will recheck every field
+On Wed, 8 May 2024 at 12:41, Yongqin Liu <yongqin.liu@linaro.org> wrote:
+>
+> Hi, Jose
+>
+> On Wed, 8 May 2024 at 15:57, Jose Ignacio Tornos Martinez
+> <jtornosm@redhat.com> wrote:
+> >
+> > Hello Yongqin,
+> >
+> > Sorry for the inconveniences.
+> >
+> > I don't have the db845c, could you provide information about the type of
+> > device and protocol used?
+>
+> The db845c uses an RJ45 as the physical interface.
+> It has the translation from PCIe0 to USB and USB to Gigabit Ethernet controller.
+>
+> For details, maybe you could check the hardware details from the documents here:
+>     https://www.96boards.org/documentation/consumer/dragonboard/dragonboard845c/hardware-docs/
+>
+> > Related driver logs would be very helpful for this.
+>
+> Here is the log from the serial console side:
+>     https://gist.github.com/liuyq/809247d8a12aa1d9e03058e8371a4d44
+>
+> Please let me know if I could try and provide more information for the
+> investigation.
 
-> >  	u32 sfnum;
-> >  };
-> >  
-> 
-> ...
+Just want to check, not sure if you have checked the serial log file,
+or do you have other suggestions about what we should try next,
+
+-- 
+Best Regards,
+Yongqin Liu
+---------------------------------------------------------------
+#mailing list
+linaro-android@lists.linaro.org
+http://lists.linaro.org/mailman/listinfo/linaro-android
 
