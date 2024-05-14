@@ -1,215 +1,87 @@
-Return-Path: <netdev+bounces-96368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E310D8C5763
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 15:52:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 970E18C57B6
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 16:11:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21243B21C4D
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 13:52:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C08A1F22851
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 14:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84EE81448D9;
-	Tue, 14 May 2024 13:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251511448E4;
+	Tue, 14 May 2024 14:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fo32lb3T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CxAaiHyq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D021448E4
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 13:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31FF6D1A7
+	for <netdev@vger.kernel.org>; Tue, 14 May 2024 14:11:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715694749; cv=none; b=h/SE/Ne+OiASlCsOcGyGyV395yuXtAAJlBNtSfsROFT/5SFA/4rJtDpue2BFHo6lh9YvDOWCh8FaZVLAXOHH52O8Dr3Mr+isd8z7PpqFVzDG4X6SQK+u2SfmWMVgeab6XWIJyAsNoYHy4/efchfWNIwyvBPF/ccAFnIJOHg+sF8=
+	t=1715695862; cv=none; b=CUuv9Cy7lqhWY60rM2tBObFFgkyM49HUG+iF5p3PrHyILsrEQ4UrKEk28Fnz17q738vc9N8KgQa4CA4NTtSo3OJuBgUB4B6iccKK+E8wLDvw6NYpetDIHs1II3rz9qcmMb2QuyQw1bvYG9u7tuYQBtxF1RtEEVOqU7HMgDMmhBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715694749; c=relaxed/simple;
-	bh=r7IiO1Xeb2szjHBIn38qHN9aDTifNIqwfBWyVHFFGkQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Orx3lFWNqKDufGaCXlDt/41NZbxNjvdS3W8CCoe344xv8IV8Op9nb93tLgborxOVsNuPO3SSC0+E4w4Gi1RHJe9SOLDn8CtzngPmt/83K8CG+yNPlIFm8xscueIfyyfiUsWlAguhJYcOUlQshZfHAgs/mwXUD7d+vIiXG/RWv3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fo32lb3T; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715694746;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/QPVyi6U0s8ueyPqr+U0UHZJyOKip8AC8X/u8ky+kLg=;
-	b=Fo32lb3TvIG6oSqQT6VvRM/fVKspH8UBO+2PEniH5HJBy7od6ikfswjB6fb5xYg4mHbtsK
-	FTNHXx9pZzIOJruNo/wa0DsXej0kkEvCqy0kouG8PMUMdy14Y6W5ySTaW7e8mKyHg5eyel
-	ueJYCjqrlfvOYcQ5caJoc/r0XGWiqMg=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-198-mrJHI_-TP8CxcAzeC9A7fw-1; Tue,
- 14 May 2024 09:52:20 -0400
-X-MC-Unique: mrJHI_-TP8CxcAzeC9A7fw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8C55E280095E;
-	Tue, 14 May 2024 13:52:19 +0000 (UTC)
-Received: from RHTRH0061144 (dhcp-17-72.bos.redhat.com [10.18.17.72])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D6E28C15BF3;
-	Tue, 14 May 2024 13:52:18 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>,  Florian Westphal <fw@strlen.de>,
-  Hangbin Liu <liuhangbin@gmail.com>,  Jaehee Park <jhpark1013@gmail.com>,
-  Petr Machata <petrm@nvidia.com>,  Nikolay Aleksandrov
- <razor@blackwall.org>,  Ido Schimmel <idosch@nvidia.com>,  Davide Caratti
- <dcaratti@redhat.com>,  Matthieu Baerts <matttbe@kernel.org>,
-  netdev@vger.kernel.org
-Subject: Re: [TEST] Flake report
-In-Reply-To: <20240511132724.GF2347895@kernel.org> (Simon Horman's message of
-	"Sat, 11 May 2024 14:27:24 +0100")
-References: <20240509160958.2987ef50@kernel.org>
-	<20240511132724.GF2347895@kernel.org>
-Date: Tue, 14 May 2024 09:52:18 -0400
-Message-ID: <f7ta5ks7b71.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1715695862; c=relaxed/simple;
+	bh=jjVOh6+7U4byGkHWRXe+pTFO9pOTWWYdHCIOSrdporY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CreXcd+Frtfzz8uugcWhkvyeW2WCV2b3jAXG+3s+q0krSj2XRVo108j49nDy2JZcpm9gZZGeeZKVAdBAC7DoJpPxt/wOEgZ5bbIemGvmxgIxtzPLpaNw5xlG4b5LarzFMXDHqXRL4Kf9GBWdCPRHCMFXUKPfaa3KSUiw7J0Bc5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CxAaiHyq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D9D2C2BD10;
+	Tue, 14 May 2024 14:11:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715695861;
+	bh=jjVOh6+7U4byGkHWRXe+pTFO9pOTWWYdHCIOSrdporY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CxAaiHyqnTx+zbJ18g8MaQyRW+8QBdVG2zhvufX6tMyADbX1vDVLDDtFnrd4fltVH
+	 XQSdjs9WzxUIBM8WqSFkHuKtDOA27qq+Kz7nCLP9peXzSpXLIydoMVxm/9flKxpAc8
+	 p0oFt6bWfHTQwVHYrKuEIjupPkLdM2rI8wzNG/mCQau56AtFX+M2CYA49/MJSwkHST
+	 77pRwG6viUi08DoVrBIJ5iZE0o0BvtKPjKUjScb95B+sXm8hXG3q984jiwlPZxGuxN
+	 WjS2U018LhTWN8pykiFjNCxCmkC1nwJekyK8f9yl9W61KEmPmM0wIYvy6ujt6Nbocv
+	 eS9EbqeeSYNVw==
+Date: Tue, 14 May 2024 07:11:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Eric Dumazet <edumazet@google.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Paolo Abeni <pabeni@redhat.com>, David Miller
+ <davem@davemloft.net>, Realtek linux nic maintainers
+ <nic_swsd@realtek.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Ken Milmore <ken.milmore@gmail.com>
+Subject: Re: [PATCH net 2/2] r8169: disable interrupts also for
+ GRO-scheduled NAPI
+Message-ID: <20240514071100.70fcca3e@kernel.org>
+In-Reply-To: <CANn89i+yKgXGHUyJxVLYTAMKj7wpoV+8X7UR8cWh75yxVLSA6Q@mail.gmail.com>
+References: <6d4a0450-9be1-4d91-ba18-5e9bd750fa40@gmail.com>
+	<ef333a8c-1bb2-49a7-b721-68b28df19b0e@gmail.com>
+	<CANn89iLgj0ph5gRWOA2M2J8N_4hQd3Ndm73gATR8WODXaOM_LA@mail.gmail.com>
+	<e8f548f8-6d16-4a30-9408-80e4212afe9c@intel.com>
+	<CANn89i+yKgXGHUyJxVLYTAMKj7wpoV+8X7UR8cWh75yxVLSA6Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Simon Horman <horms@kernel.org> writes:
+On Tue, 14 May 2024 13:05:55 +0200 Eric Dumazet wrote:
+> > napi_schedule()         // we disabled interrupts
+> > napi_poll()             // we polled < budget frames
+> > napi_complete_done()    // reenable the interrupts, no repoll
+> >   hrtimer_start()       // GRO flush is queued
+> >     napi_schedule()
+> >       napi_poll()       // GRO flush, BUT interrupts are enabled
 
-> + Aaron
->
-> On Thu, May 09, 2024 at 04:09:58PM -0700, Jakub Kicinski wrote:
->> Hi!
->> 
->> Feels like the efforts to get rid of flaky tests have slowed down a bit,
->> so I thought I'd poke people..
->> 
->> Here's the full list:
->> https://netdev.bots.linux.dev/flakes.html?min-flip=0&pw-y=0
->> click on test name to get the list of runs and links to outputs.
->> 
->> As a reminder please see these instructions for repro:
->> https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
->> 
->> I'll try to tag folks who touched the tests most recently, but please
->> don't hesitate to chime in.
->> 
->> 
->> net
->> ---
->> 
->> arp-ndisc-untracked-subnets-sh
->> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> To: Jaehee Park <jhpark1013@gmail.com>
->> Cc: Hangbin Liu <liuhangbin@gmail.com>
->> 
->> Times out on debug kernels, passes on non-debug.
->> This is a real timeout, eats full 7200 seconds.
->> 
->> xfrm-policy-sh
->> ~~~~~~~~~~~~~~
->> To: Hangbin Liu <liuhangbin@gmail.com>
->> 
->> Times out on debug kernels, passed on non-debug,
->> This is a "inactivity" timeout, test doesn't print anything
->> for 900 seconds so the runner kills it. We can bump the timeout
->> but not printing for 15min is bad..
->> 
->> cmsg-time-sh
->> ~~~~~~~~~~~~
->> To: Jakub Kicinski <kuba@kernel.org> (forgot I wrote this :D)
->> 
->> Fails randomly.
->> 
->> pmtu-sh
->> ~~~~~~~
->> To: Simon Horman <horms@kernel.org>
->> 
->> Skipped because it wants full OVS tooling.
->
-> My understanding is that Aaron (CCed) is working on addressing
-> this problem by allowing the test to run without full OVS tooling.
+I thought the bug is because of a race with disable.
+But there's already a synchronize_net() after disable, so NAPI poll
+must fully exit before we mask in rtl8169_cleanup().
 
-Yes.
+If the bug is double-enable you describe the fix is just making 
+the race window smaller. But I don't think that's the bug.
 
->> forwarding
->> ----------
->> 
->> sch-tbf-ets-sh, sch-tbf-prio-sh
->> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> To: Petr Machata <petrm@nvidia.com>
->> 
->> These fail way too often on non-debug kernels :(
->> Perhaps we can extend the lower bound?
->> 
->> bridge-igmp-sh, bridge-mld-sh
->> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> To: Nikolay Aleksandrov <razor@blackwall.org>
->> Cc: Ido Schimmel <idosch@nvidia.com>
->> 
->> On debug kernels it always fails with:
->> 
->> # TEST: IGMPv3 group 239.10.10.10 exclude timeout                     [FAIL]
->> # Entry 192.0.2.21 has blocked flag failed
->> 
->> For MLD:
->> 
->> # TEST: MLDv2 group ff02::cc exclude timeout                          [FAIL]
->> # Entry 2001:db8:1::21 has blocked flag failed
->> 
->> vxlan-bridge-1d-sh
->> ~~~~~~~~~~~~~~~~~~
->> To: Ido Schimmel <idosch@nvidia.com>
->> Cc: Petr Machata <petrm@nvidia.com>
->> 
->> Flake fails almost always, with some form of "Expected to capture 0
->> packets, got $X"
->> 
->> mirror-gre-lag-lacp-sh
->> ~~~~~~~~~~~~~~~~~~~~~~
->> To: Petr Machata <petrm@nvidia.com>
->> 
->> Often fails on debug with:
->> 
->> # TEST: mirror to gretap: LAG first slave (skip_hw)                   [FAIL]
->> # Expected to capture 10 packets, got 13.
->> 
->> mirror-gre-vlan-bridge-1q-sh, mirror-gre-bridge-1d-vlan-sh
->> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> To: Petr Machata <petrm@nvidia.com>
->> 
->> Same kind of failure as above but less often and both on debug and non-debug.
->> 
->> tc-actions-sh
->> ~~~~~~~~~~~~~
->> To: Davide Caratti <dcaratti@redhat.com>
->> 
->> It triggers a random unhandled interrupt, somehow (look at stderr).
->> It's the only test that does that.
->> 
->> 
->> mptcp
->> -----
->> To: Matthieu Baerts <matttbe@kernel.org>
->> 
->> simult-flows-sh is still quite flaky :(
->> 
->> 
->> nf
->> --
->> To: Florian Westphal <fw@strlen.de>
->> 
->> These are skipped because of some compatibility issues:
->> 
->>  nft-flowtable-sh, bridge-brouter-sh, nft-audit-sh
->> 
->> Please LMK if I need to update the CLI tooling. 
->> Or is this missing kernel config?
->> 
-
+BTW why are events only acked in rtl8169_interrupt() and not
+rtl8169_poll()? 
 
