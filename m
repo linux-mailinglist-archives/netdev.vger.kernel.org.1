@@ -1,181 +1,71 @@
-Return-Path: <netdev+bounces-96256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 444D88C4BD6
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 07:07:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F17598C4BE1
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 07:09:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E3451C22921
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 05:07:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9137E1F22FBF
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 05:09:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC4EC14287;
-	Tue, 14 May 2024 05:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oFqzZzY5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7800714287;
+	Tue, 14 May 2024 05:09:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785B1125AC;
-	Tue, 14 May 2024 05:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97CF1755C;
+	Tue, 14 May 2024 05:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715663248; cv=none; b=qFkVt4XD8ooajPVBLqIDc5YNYgCmMFN0SQj6AfqBfsLagUWeqgg7W2KcEwYUUQDyGKdzbmkfwX0DtIB6uNHzeHtBkyHsPHw3Iofax+6TT7AzqPx1PxsJLYlOUvqiGRxfU0ESTM4AWoFgmaM3ABtXN1gRzhU+7lCmpFZkYUGwX1c=
+	t=1715663380; cv=none; b=uXQKGsrdkaF+ioQc3jvwpZnL99g1oDMXy4eJpJ1j+P+W4ghpvVoBpUcKfP8zQRMh99U3im0CoMzyocXr9cSIStXN3XtR9DvxeKdiEZPb87OqDR/hmQnT7L7UYQuBktRPeUwMN94r1XBsekntDSI9rcdJqgn/hNyHM9V91BxRzeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715663248; c=relaxed/simple;
-	bh=x7gcYCI6zg5BeEO0luHV8XtsAQCN7ZUeWGlfdaEHzWc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l1Rl3figGh0t53VnOO4Y8E4LkFznrfaFFqNLJI7IwGCnQjZv5Vr49YQejzlw4/mDP97+V5h3DRtc6727vUEZdntW0S3Ehfo8g3fP11iYixI61SmjTPJalwgk1DDNLMZ1Z0YxHhBwpPA+rP7fleSNVOun/PV07nxzs0K+15A3urs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oFqzZzY5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E784DC2BD10;
-	Tue, 14 May 2024 05:07:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715663248;
-	bh=x7gcYCI6zg5BeEO0luHV8XtsAQCN7ZUeWGlfdaEHzWc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=oFqzZzY52lmQF+bcteQFS12LctlsVlKgDmgV8AuMqGnU0Nayi2+VbePt3B7KE5hFJ
-	 EZCueac1uRYtr2yq7RDc/PhQXQNEiBOc2C00TrIMhbPf4wuivxY8Gm2C/NFjnm9Y7E
-	 vnZJBQ8Xe9WBR+kxgXG4YYvQoL/HkGtB1HCIQ194V3Ur5o0orKgoOqSTc85w+HezUx
-	 iJSkznecvRQClXvKp5DfaJdIo6iG4Uwx8DabgwP3zeoKUwKLDNpYnecl9aIwRJEE+T
-	 QhZ76R/ygwv1ILhLEIrsTUNmjvw1khqZdyspxsAzoSEuFrCxKxLyFyPULC4uocjKHR
-	 Uo0b4DFOv5jzQ==
-Message-ID: <4949dca0-377a-45b1-a0fd-17bdf5a6ab10@kernel.org>
-Date: Tue, 14 May 2024 07:07:21 +0200
+	s=arc-20240116; t=1715663380; c=relaxed/simple;
+	bh=o7ny/45AD8rAZ5JiLK0CkJTz0igQRS/P8gYHN5qWrgs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PrkRwUOfCZhEWAmky1245myxPqXJQpa5ZFkNjZlkLzp7SGpML2qs8Y0OQV8pRcx6a0w/n4g5SOkvLTZ0rPhk7X33KwtbJtAKWym/wNDmmj0RiTb6vMyDUGUOddx3d7KwvaIcQrgufHO8V7LrR+d258qNUjzn5W06tWKkQIPOjWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1s6kPq-000745-Hh; Tue, 14 May 2024 07:09:30 +0200
+Date: Tue, 14 May 2024 07:09:30 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Florian Westphal <fw@strlen.de>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	netfilter-devel@vger.kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com
+Subject: Re: [PATCH net-next 16/17] selftests: netfilter: add packetdrill
+ based conntrack tests
+Message-ID: <20240514050930.GC17004@breakpoint.cc>
+References: <20240512161436.168973-1-pablo@netfilter.org>
+ <20240512161436.168973-17-pablo@netfilter.org>
+ <20240513114649.6d764307@kernel.org>
+ <20240513200314.GA3104@breakpoint.cc>
+ <20240513144114.2ae7bf1a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 14/15 v2] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- LKML <linux-kernel@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Boqun Feng <boqun.feng@gmail.com>,
- Daniel Borkmann <daniel@iogearbox.net>, Eric Dumazet <edumazet@google.com>,
- Frederic Weisbecker <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
- Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
- Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
-References: <20240503182957.1042122-1-bigeasy@linutronix.de>
- <20240503182957.1042122-15-bigeasy@linutronix.de> <87y18mohhp.fsf@toke.dk>
- <CAADnVQJkiwaYXUo+LyKoV96VFFCFL0VY5Jgpuv_0oypksrnciA@mail.gmail.com>
- <20240507123636.cTnT7TvU@linutronix.de>
- <93062ce7-8dfa-48a9-a4ad-24c5a3993b41@kernel.org>
- <20240510162121.f-tvqcyf@linutronix.de>
- <20240510162214.zNWRKgFU@linutronix.de>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20240510162214.zNWRKgFU@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240513144114.2ae7bf1a@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
+Jakub Kicinski <kuba@kernel.org> wrote:
+> Ah, makes sense. I added a local patch to the system, it should be
+> applied on the next test, just to confirm.
 
+Test is passing now, thanks!
 
-On 10/05/2024 18.22, Sebastian Andrzej Siewior wrote:
-> On 2024-05-10 18:21:24 [+0200], To Jesper Dangaard Brouer wrote:
->> The XDP redirect process is two staged:
-> …
-> On 2024-05-07 15:27:44 [+0200], Jesper Dangaard Brouer wrote:
->>
->> I need/want to echo Toke's request to benchmark these changes.
-> 
-> I have:
-> boxA: ixgbe
-> boxB: i40e
-> 
-> Both are bigger NUMA boxes. I have to patch ixgbe to ignore the 64CPU
-> limit and I boot box with only 64CPUs. The IOMMU has been disabled on
-> both box as well as CPU mitigations. The link is 10G.
-> 
-> The base for testing I have is commit a17ef9e6c2c1c ("net_sched:
-> sch_sfq: annotate data-races around q->perturb_period") which I used to
-> rebase my series on top of.
-> 
-> pktgen_sample03_burst_single_flow.sh has been used to send packets and
-> "xdp-bench drop $nic -e" to receive them.
-> 
+Would you apply the patch to net-next or do you want
+me to send it myself?
 
-Sorry, but a XDP_DROP test will not activate the code you are modifying.
-Thus, this test is invalid and doesn't tell us anything about your code 
-changes.
-
-The code is modifying the XDP_REDIRECT handling system. Thus, the
-benchmark test needs to activate this code.
-
-
-> baseline
-> ~~~~~~~~
-> boxB -> boxA | gov performance
-> -t2 (to pktgen)
-> | receive total 14,854,233 pkt/s        14,854,233 drop/s                0 error/s
-> 
-> -t1 (to pktgen)
-> | receive total 10,642,895 pkt/s        10,642,895 drop/s                0 error/s
-> 
-> 
-> boxB -> boxA | gov powersave
-> -t2 (to pktgen)
->    receive total 10,196,085 pkt/s        10,196,085 drop/s                0 error/s
->    receive total 10,187,254 pkt/s        10,187,254 drop/s                0 error/s
->    receive total 10,553,298 pkt/s        10,553,298 drop/s                0 error/s
-> 
-> -t1
->    receive total 10,427,732 pkt/s        10,427,732 drop/s                0 error/s
-> 
-> ======
-> boxA -> boxB (-t1) gov performance
-> performace:
->    receive total 13,171,962 pkt/s        13,171,962 drop/s                0 error/s
->    receive total 13,368,344 pkt/s        13,368,344 drop/s                0 error/s
-> 
-> powersave:
->    receive total 13,343,136 pkt/s        13,343,136 drop/s                0 error/s
->    receive total 13,220,326 pkt/s        13,220,326 drop/s                0 error/s
-> 
-> (I the CPU governor had no impact, just noise)
-> 
-> The series applied (with updated 14/15)
-> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> boxB -> boxA | gov performance
-> -t2:
->    receive total  14,880,199 pkt/s        14,880,199 drop/s                0 error/s
-> 
-> -t1:
->    receive total  10,769,082 pkt/s        10,769,082 drop/s                0 error/s
-> 
-> boxB -> boxA | gov powersave
-> -t2:
->   receive total   11,163,323 pkt/s        11,163,323 drop/s                0 error/s
-> 
-> -t1:
->   receive total   10,756,515 pkt/s        10,756,515 drop/s                0 error/s
-> 
-> boxA -> boxB | gov perfomance
-> 
->   receive total  13,395,919 pkt/s        13,395,919 drop/s                0 error/s
-> 
-> boxA -> boxB | gov perfomance
->   receive total  13,290,527 pkt/s        13,290,527 drop/s                0 error/s
-> 
-> 
-> Based on my numbers, there is just noise.  BoxA hit the CPU limit during
-> receive while lowering the CPU-freq. BoxB seems to be unaffected by
-> lowing CPU frequency during receive.
-> 
-> I can't comment on anything >10G due to HW limits.
-> 
-> Sebastian
+Either way is fine for me.
 
