@@ -1,109 +1,161 @@
-Return-Path: <netdev+bounces-96387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9DE98C58FA
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 17:43:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 759698C5929
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 17:57:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B92A1F22F75
-	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 15:43:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23C402859F5
+	for <lists+netdev@lfdr.de>; Tue, 14 May 2024 15:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238B217EB87;
-	Tue, 14 May 2024 15:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7601417EBB5;
+	Tue, 14 May 2024 15:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="nhWOf3hZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqU/sBjS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FF41E480
-	for <netdev@vger.kernel.org>; Tue, 14 May 2024 15:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A6C17EBAA;
+	Tue, 14 May 2024 15:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715701420; cv=none; b=a9s5X1Zd4tiqbppAtBRS0pGwdK/81De5iSTNuUGVUh0KGSmR6ZRZdrCFj89DsUPKMBeiKO1pFxBimD+acOFVFzfbNhpE6flSSstdIdKjuvRWIzgbJgg4ywPeg1pH1e8lwh2H3bqMAFfmSBXR3i84Do22eO/uEibujk0lWQj3f1s=
+	t=1715702254; cv=none; b=PgDDt6V1La9m7Pg/XkNlYiHTwHimwI2+/CNWBZu8LXgrCdOjnnbpwPg/EPP7I1ArfvLOtXLtvHtfvCekctltl3mNjcjI03vdvW1Vd4BShZiYG2Lc+ulNmxJrKp/6SpTFtAL3/1D0V72fV3cStNeosquUidp5vpTIMDLFIFeQLGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715701420; c=relaxed/simple;
-	bh=bqZtTfqPK7ohbPAafUNheKg9VbnYE8/HuBdNNZX68Wk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CVT2NTTdQhNfEnmJw7KiCzwmrHhWxA4CUcp8LlOfNviI78SMp+lY4Tuhiyq7zbEvGP3P3hTA50HW608h/hN3Aja+CxJ/e06JU8RIzBKMVuKO2SFMsPDLLGad6JF3iHXbtWDEBwPvMYMpqFtB8DyFycpd8tRddYyjLV6XUB7aLcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=nhWOf3hZ; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1edf506b216so39421165ad.2
-        for <netdev@vger.kernel.org>; Tue, 14 May 2024 08:43:38 -0700 (PDT)
+	s=arc-20240116; t=1715702254; c=relaxed/simple;
+	bh=7vQ9caJ69PPA/iWpxP0PVdG/Xnyf24O2zVxjSm9eec0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=asedzKwJ8iF1eOh3iECzKZrqAvDHsaf0MJErPcvJZnhWDyIcIcPbOrXa1h0vOxGcfwq3WYHMG8X0P4x59qjCW5i/gKcdWC2MVOrFYPLWMPmLNFY4zLj6iML++oCB7VGB9OAC+VPV2UJ85P7fk2K1qkVMA8zRySMciaUVgRPfih4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dqU/sBjS; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-34d8d11a523so3650309f8f.2;
+        Tue, 14 May 2024 08:57:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1715701418; x=1716306218; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R/Fq7MH/4tj4k5lG6x4wK3Bqj5WyXiB5FuHbHgeQfs4=;
-        b=nhWOf3hZ50K9lj/al5ZRgGN1qU59cN9k/sK5agh+I3aFHeX6jrtLBpwNTSKGzctrR+
-         XZr0P2XeTlrt3NGloYHRXyXQPxExsjUHHE9tH3xcIjeoLdQ4GS8JUobym2pYJbYP6Wg3
-         F64NnIasrWzFbJFvJb5r0OHZvDJsrC95fywNTMIF0zOCUqLMJWNDynDzsOSe9/NZBw+z
-         X+E/nTWD2ZzA+klULuwyz5e+qBVR503JVPXBh3B8LrvcYf9vxeLnxzTeTUni8F/QdHpR
-         A/yBJnorZH1vyniz8NZi+b39NzYAzKh6BHDwFtUg3NJQo94Nsxehv6uMK6ocbH+5Yf6l
-         Nh8w==
+        d=gmail.com; s=20230601; t=1715702251; x=1716307051; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=T+d4421rpsL7HiUws1Ztdbm4DVzL1jztBkW9+LQ+UBo=;
+        b=dqU/sBjSwLu4bozDDv2XKBuqOl8eeZ+3hp2B4XnRatnNrIVuWow/8w1/b20UMc5vG9
+         uyJc0Jyr0A0fUDN/2UYa9eLtOQs9G10nQIfz+8C6o+g8xUYPR7d29TRLJGgJofiSnl7L
+         nQ0FwOVRb3a/0qBp1OwPapDuonBup8t2zP4xqi9wwO2852/YFjBB03w+B1vmoclsQf+j
+         UstRiJ74Qb+tiimw7tlTEYZ5V438JMDuQx16oNOPCV2QpgWnJTallS/8T7G2I2RRNuzu
+         A+EN6bsGiA7cYNO7gRPBXmaEA3wG1Um9oXXXQGVsfWvNhSF0PFttkFowvfxZLmV4UWoJ
+         Tkyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715701418; x=1716306218;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R/Fq7MH/4tj4k5lG6x4wK3Bqj5WyXiB5FuHbHgeQfs4=;
-        b=ptKNJovFJpxK4aDXjnVTpHcuPW6zSXdKtbpqjF3uAG8ILBlv49Ofm1h4tqiLhbyPQC
-         OEjU+ITMmh90CKUVeEx1L9XQzjYF8GSg/ri1bMTlyjc9tNPelKV2xZKiYP964eFjBTFQ
-         bKmxS7I9b7c8vmz1S3eZ9/3XfI/r3uXUsIBjroaa4+L+EIkDsVAGGhxM3xZPk62ywxJQ
-         bZLWN/qtMcmaeh3+YpV0AEb6FWSQpAZQjN4Ch9Rsi1XKGPY9n7WdNotbkgvIAkk6h30M
-         ypW3y1/MQ9m290/MClIPf30ZAf7vNw4k0EG8MOI8FtQJxCunN7htmIQ4dtUHlqIG9wHb
-         eXvg==
-X-Gm-Message-State: AOJu0Yz1Z68+0We5MX1Y9fB2y8BNVZSIbfRbKd/52fAtZGUfyxh5298F
-	0QRs3nU1nFBqmDwpwViuAdIi7fMbNQ+XDlGWZOVCL9GlUtT46q9khGFsVBrUEA0=
-X-Google-Smtp-Source: AGHT+IFvFBCCBOQRz8GgLKHeIaRkciQM6C/qF86j9Oi7JZw0TfVMmYbaL4rp0bNgLxhucSyQmqf0kQ==
-X-Received: by 2002:a17:903:245:b0:1e4:4ade:f504 with SMTP id d9443c01a7336-1ef44161e45mr144760295ad.46.1715701417699;
-        Tue, 14 May 2024 08:43:37 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c1394b8sm99590645ad.271.2024.05.14.08.43.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 May 2024 08:43:37 -0700 (PDT)
-Date: Tue, 14 May 2024 08:43:35 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Brahmajit Das <brahmajit.xyz@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH 1/1] Fix implicit declaration of function 'htobe64' in
- gcc 14 on musl systems
-Message-ID: <20240514084335.19f5b280@hermes.local>
-In-Reply-To: <20240514063811.383371-1-brahmajit.xyz@gmail.com>
-References: <20240514063811.383371-1-brahmajit.xyz@gmail.com>
+        d=1e100.net; s=20230601; t=1715702251; x=1716307051;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=T+d4421rpsL7HiUws1Ztdbm4DVzL1jztBkW9+LQ+UBo=;
+        b=uupcYeRcfrI3YEzv51OkDY3M4UXuGpV5bGPWlsz2TWWGxVZ/1am0Lc5B8SqFQ4/r5M
+         QAgjylRk764qqgSesqajSOwEkUqJ51OqGpst9DsAJ5tL0KIesDcyIjQ2tKbToC6DJraJ
+         zJCqBkXL7oV6bYWkTPM/2ozhGOPL817WXNXwJqkU44PVF6kU55VmU3zeYY6p7fAbF1Sh
+         4ZZCM3eje51uG1efFzRNamNE+s/KcL517ZilY8lWP0EQAAn3YkkTSkivt60bLmdZtoK3
+         zxZrECXBDr0pgm7mBGfY0mwEZ5W82E7RXTmtfW0RBawnMVxJPU975IQpyZZF2RxUm+gv
+         1i8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUap3VSv6HTQF2yDeTOgGFNlMuT6uY5xLevdpqs+YebtwPK2vTIvlzlvjsfKaGoS2xqN2fplzad/BRXb2PGGrakOwRYSZudULcHgLxbEGGRQghNS2ruvMYTNqqTfxI4txF4hZFaIdF9IVTyoaWntVTjsjsXf8e4NGKTg79ppz+OxQCoxKOp
+X-Gm-Message-State: AOJu0YzyGbJAlcncBZrkdQQ9bDnJq63YxnL9B/uMCm2Sicqlwt6q5c1d
+	69XqDKh7GzDuv5JgZcqNO+BTZ+OjB4d66KyAO2FVxiOvWS+AKSko
+X-Google-Smtp-Source: AGHT+IGfTM40WEprBTch2H967ZRRzRzKTT0rxn3GV9l1lNsS/HTRokQXI1/DIIFxF4ck9xhTstklVQ==
+X-Received: by 2002:a5d:6451:0:b0:34e:34c5:2312 with SMTP id ffacd0b85a97d-3504aa62fd3mr9068696f8f.59.1715702250770;
+        Tue, 14 May 2024 08:57:30 -0700 (PDT)
+Received: from debian ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502bbbc082sm14042487f8f.107.2024.05.14.08.57.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 May 2024 08:57:30 -0700 (PDT)
+Message-ID: <8e0b027d-4d30-4f0f-82ef-113287f17c6a@gmail.com>
+Date: Tue, 14 May 2024 17:56:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net-next v10 2/3] net: gro: move L3 flush checks to
+ tcp_gro_receive and udp_gro_receive_segment
+To: Jakub Kicinski <kuba@kernel.org>,
+ Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ willemdebruijn.kernel@gmail.com, dsahern@kernel.org,
+ alexander.duyck@gmail.com, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20240509190819.2985-1-richardbgobert@gmail.com>
+ <20240509190819.2985-3-richardbgobert@gmail.com>
+ <CAMuHMdXFJwxexojG+41ppD=2EmyXsVM6bwh+-cxCxfSsM_yJiw@mail.gmail.com>
+ <20240514071407.257c0003@kernel.org>
+From: Richard Gobert <richardbgobert@gmail.com>
+In-Reply-To: <20240514071407.257c0003@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, 14 May 2024 06:35:37 +0000
-Brahmajit Das <brahmajit.xyz@gmail.com> wrote:
-
-> On musl systems with GCC 14 and above, the htobe64 function cannot be
-> found by default. From the man page[0], the function is from endian.h
-> header file. If the file is not included in, then we get the following
-> error message. The issue however cannot be reproduced on glibc systems.
+Jakub Kicinski wrote:
+> On Tue, 14 May 2024 14:13:21 +0200 Geert Uytterhoeven wrote:
+>> On Thu, May 9, 2024 at 9:09 PM Richard Gobert <richardbgobert@gmail.com> wrote:
+>>> {inet,ipv6}_gro_receive functions perform flush checks (ttl, flags,
+>>> iph->id, ...) against all packets in a loop. These flush checks are used in
+>>> all merging UDP and TCP flows.
+>>>
+>>> These checks need to be done only once and only against the found p skb,
+>>> since they only affect flush and not same_flow.
+>>>
+>>> This patch leverages correct network header offsets from the cb for both
+>>> outer and inner network headers - allowing these checks to be done only
+>>> once, in tcp_gro_receive and udp_gro_receive_segment. As a result,
+>>> NAPI_GRO_CB(p)->flush is not used at all. In addition, flush_id checks are
+>>> more declarative and contained in inet_gro_flush, thus removing the need
+>>> for flush_id in napi_gro_cb.
+>>>
+>>> This results in less parsing code for non-loop flush tests for TCP and UDP
+>>> flows.
+>>>
+>>> To make sure results are not within noise range - I've made netfilter drop
+>>> all TCP packets, and measured CPU performance in GRO (in this case GRO is
+>>> responsible for about 50% of the CPU utilization).
+>>>
+>>> perf top while replaying 64 parallel IP/TCP streams merging in GRO:
+>>> (gro_receive_network_flush is compiled inline to tcp_gro_receive)
+>>> net-next:
+>>>         6.94% [kernel] [k] inet_gro_receive
+>>>         3.02% [kernel] [k] tcp_gro_receive
+>>>
+>>> patch applied:
+>>>         4.27% [kernel] [k] tcp_gro_receive
+>>>         4.22% [kernel] [k] inet_gro_receive
+>>>
+>>> perf top while replaying 64 parallel IP/IP/TCP streams merging in GRO (same
+>>> results for any encapsulation, in this case inet_gro_receive is top
+>>> offender in net-next)
+>>> net-next:
+>>>         10.09% [kernel] [k] inet_gro_receive
+>>>         2.08% [kernel] [k] tcp_gro_receive
+>>>
+>>> patch applied:
+>>>         6.97% [kernel] [k] inet_gro_receive
+>>>         3.68% [kernel] [k] tcp_gro_receive
+>>>
+>>> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>  
+>>
+>> Thanks for your patch, which is now commit 4b0ebbca3e167976 ("net: gro:
+>> move L3 flush checks to tcp_gro_receive and udp_gro_receive_segment")
+>> in net-next/main (next-20240514).
+>>
+>> noreply@ellerman.id.au reports build failures on m68k, e.g.
+>> http://kisskb.ellerman.id.au/kisskb/buildresult/15168903/
+>>
+>>     net/core/gro.c: In function ‘dev_gro_receive’:
+>>     ././include/linux/compiler_types.h:460:38: error: call to
+>> ‘__compiletime_assert_654’ declared with attribute error: BUILD_BUG_ON
+>> failed: !IS_ALIGNED(offsetof(struct napi_gro_cb, zeroed), sizeof(u32))
 > 
-> In file included from ../include/libgenl.h:5,
->                  from libgenl.c:12:
-> ../include/libnetlink.h: In function 'rta_getattr_be64':
-> ../include/libnetlink.h:281:16: error: implicit declaration of function 'htobe64' [-Wimplicit-function-declaration]
->   281 |         return htobe64(rta_getattr_u64(rta));
->       |                ^~~~~~~
-> make[1]: *** [../config.include:24: libgenl.o] Error 1
-> 
-> [0]: https://linux.die.net/man/3/htobe64
-> 
-> Signed-off-by: Brahmajit Das <brahmajit.xyz@gmail.com>
+> Hi Richard, any chance of getting this fixed within the next 2 hours?
+> I can't send the net-next PR if it doesn't build on one of the arches..
 
-
-Fixes: 976dca372e4c ("f_flower: implement pfcp opts")
+Hi Jakub and Geert,
+I'm only seeing this mail now, sorry for the late response.
+I can fix this within the next two hours, would you prefer a standalone 
+patch or should I add it to this patch series?
 
