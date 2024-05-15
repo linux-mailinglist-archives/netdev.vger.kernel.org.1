@@ -1,132 +1,117 @@
-Return-Path: <netdev+bounces-96525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF1598C64F7
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:29:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF32C8C6513
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:46:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77543283F95
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:29:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98EB6281351
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75BA75A11F;
-	Wed, 15 May 2024 10:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A165EE80;
+	Wed, 15 May 2024 10:46:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EejJup9G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NCOCZHFj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E225FB87
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 10:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911A45A7AB;
+	Wed, 15 May 2024 10:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715768985; cv=none; b=i2Ih43xozlUyga6ZAJOZt+OmIho4YJsXt312FnLMCGT2u6NgCOzUWdp0LLB5P9nL0/IpmcADzDPXDYxtyBe7SYXWkxFJWR7PU4RCC07bivMJvS9TIT96sv6h1XgAnQrgjVNawZ6c8IAW7uslKnFy2CA7GEG7kYZyyA5DL7dVDmY=
+	t=1715769990; cv=none; b=cC01iWgmHAhhJ5+scMePEEMd1lrxb2rhBuSLpIPuuK9dhINbjxco3UGZWW8Rr9OLpAj3rViEU2ZZycziDzcAZh5uN9TKvNt9Jf2RjixMEMDN2JKOq+PDvsahu0Fp/7HMrFaKrU0cGxnDNw6wNWCDSCTTmKwFEZ6+ksbLGIyddUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715768985; c=relaxed/simple;
-	bh=rj28eTDzEICny43y6e3oMxikszWeWB/4UDA4a0mTl5k=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=MWkWJ9evxryCXYqE1v8rZJklK8updi1WATZ3h8q2FPijISWknuElhloAzyR7aVso4RWk3I55aMgT2XT/6GjtG9o8OVPghNqxGy4z14QddjfdZGyjYS573OwSHAeP/hItcJwUeT7nnE/5g/0M+YvyrbP4g4OfD2MADm3xXUdPnJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EejJup9G; arc=none smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5b299c3ff63so162602eaf.1
-        for <netdev@vger.kernel.org>; Wed, 15 May 2024 03:29:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715768983; x=1716373783; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6UvtjDEeMSsNWuEgiZU66lYfptCJM8gucEfi5L4lf9Y=;
-        b=EejJup9G9cK0+iuSjI+vpl6CeeX80R9x3QbRgChjRBBegv+vHql2QH6siP5MyRPySl
-         J7H69vy717yVUr6pAwEPBPfwmqNXeYCjlT9qwXrCo1uK+8QEn9MJjV8GBzSGq0DW0Nml
-         0PiJwWjKYg2R2iRW9EpCmV//qUYB+bAqR+8znBtIFGi3zawiIS3BTgCBmeHdwEM8orrF
-         f2WucYjEizKT3wnEynoCoRaDk2xpvvVov1kTFhlGbNkxUOaYRQoB3zsablG9CDSA2QOi
-         aCxYLD/Z39R8QMVufSxnmMNzUE21rp3MKI9h3PsaVuvF5TCmybdeLrrFmoAKEIbpBrrK
-         DKbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715768983; x=1716373783;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=6UvtjDEeMSsNWuEgiZU66lYfptCJM8gucEfi5L4lf9Y=;
-        b=QpDIvQPms7Y+xFm7dCqeb6Hcv5oQvjtNWDHavDUAnnuQP9uRxLCtjwfgT5F8iD7GPY
-         Mn4+28rSWBmDY24FqzmWzpA6wzKXrJE3krnOqQqPom9eOnraHJ16KXabB+Y4EUxs+t1W
-         vPwppeGNS93YPPKqyd2wxLX3PLfLU9OGFTccZcYh2EmvYYc5wBoStszchjuzF4POhnZc
-         WCqBqE2XR4QLaER8c5hF9wqQaKUQZRDYeosyoKNsdBsEnYnI+WNwoSYlkXhMWD0ymXuj
-         BVqRYQ0GH/a82cmhDdMvesRaL4+z5FCelgmpw5JyA65KbkkGJ9PvZNPYoJW3VF6ylcUU
-         9Y5g==
-X-Forwarded-Encrypted: i=1; AJvYcCW3FVUyW59rmOAZzrWG/if8uTay7F5Y3wJ5Ci6f6m3pqAy26+VxqJKlSldHxU0nCcE2CGYm4J7I9E/9LuBLdNNUyN7Mtr9j
-X-Gm-Message-State: AOJu0Ywdlwe6kYt6T8QoAPd+eTppqVlqqDDMKLTFADy5+3tFj1+Z+ukF
-	IF91Hbkpt05e4w553KdutubIG9IWOYdGQnzRauKXwUO+KaaDitUO
-X-Google-Smtp-Source: AGHT+IFTRtVfgKahJZt1zfvDZG2w4y6n7l/19nUtY0UMVQZUbvoJs2+kyzRqvXJHqjkzl2JUK9VuZw==
-X-Received: by 2002:a05:6870:cb94:b0:239:6927:6826 with SMTP id 586e51a60fabf-241721ade50mr19916796fac.0.1715768982962;
-        Wed, 15 May 2024 03:29:42 -0700 (PDT)
-Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2a66585sm11074805b3a.10.2024.05.15.03.29.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 03:29:42 -0700 (PDT)
-Date: Wed, 15 May 2024 19:29:38 +0900 (JST)
-Message-Id: <20240515.192938.1400783775062196516.fujita.tomonori@gmail.com>
-To: naveenm@marvell.com
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
- horms@kernel.org, kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
- linux@armlinux.org.uk, hfdevel@gmx.net
-Subject: Re: [PATCH net-next v6 5/6] net: tn40xx: add mdio bus support
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <SJ2PR18MB5635B758C9807AA7520E01EFA2E22@SJ2PR18MB5635.namprd18.prod.outlook.com>
-References: <20240512085611.79747-1-fujita.tomonori@gmail.com>
-	<20240512085611.79747-6-fujita.tomonori@gmail.com>
-	<SJ2PR18MB5635B758C9807AA7520E01EFA2E22@SJ2PR18MB5635.namprd18.prod.outlook.com>
+	s=arc-20240116; t=1715769990; c=relaxed/simple;
+	bh=/rLKChhWLP3moBzwPC9iIEN3AWU0pKFpfn1wMMxX0S8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NeTbbZMLck6qAHdv43xmPadb9meWCLawIYxw1PsfgKGNtpr5H7bO2eQgVnk3BSiZkKPWOjzjH8mXwD1rrWBUAhel+TkWRUBvwkNkog0SorpC4ZqmkxlJBTHz1d9/m7bKvkSF2SmrGs6wcpKfc98cM4jW+IBNY4ypgEEwNX5bjSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NCOCZHFj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61E89C116B1;
+	Wed, 15 May 2024 10:46:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715769990;
+	bh=/rLKChhWLP3moBzwPC9iIEN3AWU0pKFpfn1wMMxX0S8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NCOCZHFjGs+4hl9Elm+1KR5bv1Q8AlpOOFTS3ECufjk9GzxCMQyEHDHn0FZSPJq2G
+	 BUzhVOxsaNRS4hmgOZCulLJgX+tLj0iJoyFMJnRmS+9SXneipEf0UxTDWGFZy2lQuG
+	 ZmfDDUrMkngptubVOXcuCY3qD8/reCh7ItEVPnToWQIdzUhUQvZxbnYcAX00XnYWuJ
+	 M6gTivVLmqWrWlEiYS9J3WQskoQC6RT/BLbN69BcTybRuqsXBt3mj8xDku72RS4m9/
+	 /HkkSVYFFCsnRA+yRZNNivi/Qy/MY76KOeIYWQgtQUbnfnb6KNmMklZZSQbIhzCK3U
+	 U9I/RyD/jiLXg==
+Date: Wed, 15 May 2024 11:46:26 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ronak Doshi <ronak.doshi@broadcom.com>
+Cc: netdev@vger.kernel.org,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/4] vmxnet3: add latency measurement support in
+ vmxnet3
+Message-ID: <20240515104626.GE154012@kernel.org>
+References: <20240514182050.20931-1-ronak.doshi@broadcom.com>
+ <20240514182050.20931-3-ronak.doshi@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240514182050.20931-3-ronak.doshi@broadcom.com>
 
-Hi,
-
-On Mon, 13 May 2024 09:40:08 +0000
-Naveen Mamindlapalli <naveenm@marvell.com> wrote:
-
->> +static u32 tn40_mdio_stat(struct tn40_priv *priv) {
->> +	void __iomem *regs = priv->regs;
->> +
->> +	return readl(regs + TN40_REG_MDIO_CMD_STAT); }
->> +
->> +static int tn40_mdio_get(struct tn40_priv *priv, u32 *val) {
+On Tue, May 14, 2024 at 11:20:47AM -0700, Ronak Doshi wrote:
+> This patch enhances vmxnet3 to support latency measurement.
+> This support will help to track the latency in packet processing
+> between guest virtual nic driver and host. For this purpose, we
+> introduce a new timestamp ring in vmxnet3 which will be per Tx/Rx
+> queue. This ring will be used to carry timestamp of the packets
+> which will be used to calculate the latency.
 > 
-> The argument "val" is not used inside this function.
+> Signed-off-by: Ronak Doshi <ronak.doshi@broadcom.com>
+> Acked-by: Guolin Yang <guolin.yang@broadcom.com>
 
-Oops, I'll fix in v7.
+...
 
+> index b3f3136cc8be..74cb63e3d311 100644
+> --- a/drivers/net/vmxnet3/vmxnet3_drv.c
+> +++ b/drivers/net/vmxnet3/vmxnet3_drv.c
+> @@ -143,6 +143,29 @@ vmxnet3_tq_stop(struct vmxnet3_tx_queue *tq, struct vmxnet3_adapter *adapter)
+>  	netif_stop_subqueue(adapter->netdev, (tq - adapter->tx_queue));
+>  }
+>  
+> +static u64
+> +vmxnet3_get_cycles(int pmc)
+> +{
+> +	u32 low, high;
+> +
+> +	asm volatile("rdpmc" : "=a" (low), "=d" (high) : "c" (pmc));
+> +	return (low | ((u_int64_t)high << 32));
+> +}
 
->> +static int tn40_mdio_write(struct tn40_priv *priv, int port, int device,
->> +			   u16 regnum, u16 data)
->> +{
->> +	void __iomem *regs = priv->regs;
->> +	u32 tmp_reg = 0;
->> +	int ret;
->> +
->> +	/* wait until MDIO is not busy */
->> +	if (tn40_mdio_get(priv, NULL))
->> +		return -EIO;
->> +	writel(TN40_MDIO_CMD_VAL(device, port), regs +
->> TN40_REG_MDIO_CMD);
->> +	writel((u32)regnum, regs + TN40_REG_MDIO_ADDR);
->> +	if (tn40_mdio_get(priv, NULL))
->> +		return -EIO;
->> +	writel((u32)data, regs + TN40_REG_MDIO_DATA);
->> +	/* read CMD_STAT until not busy */
->> +	ret = tn40_mdio_get(priv, &tmp_reg);
-> 
-> Is "tn40_mdio_get()" supposed to return any status in tmp_reg (which is missing?).
+Hi Ronak,
 
-Indeed.
+This seems to open-code the rdpmc macro.
 
-Thanks a lot!
+And it also seems to exclude compilation of this driver other than for x86.
+This seems undesirable as, in general, networking drivers are supposed to
+be architecture independent. I'd say, doubly so, for software devices.
+
+Moreover, rdpmc outside of x86 architecture-specific code seems highly
+unusual to me. So I wonder if there is a better approach to the problem at
+hand.
+
+If not, I would suggest making this feature optional and only compiled
+for x86. That might mean factoring it out into a different file. I'm
+unsure.
+
+If not, I think the driver's Kconfig needs to be updated to reflect
+that it can only be compiled for x86.
+
+...
 
