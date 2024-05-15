@@ -1,251 +1,159 @@
-Return-Path: <netdev+bounces-96633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 182468C6CC7
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 21:26:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F32638C6CCC
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 21:26:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AF79B20AD6
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 19:25:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90D9AB20ADB
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 19:26:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE62915920F;
-	Wed, 15 May 2024 19:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B1B3159575;
+	Wed, 15 May 2024 19:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bTk7ldrt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JGg//A2m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46683219F;
-	Wed, 15 May 2024 19:25:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF503C466
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 19:26:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715801153; cv=none; b=Vg6Mfop56HHFi44XTk5FdPhPD71Mk9+JUnR5Z8B3A+/rL5XNpsVlnqkqcFgxOccT92lMi47EKwtj3U/i6FjKAQAkG8t+RvOE9qHOsK/0RyKBtMkgPqPJBYUsreYGldgoMtZjUfHy7Il+f+G6jMYolxf+so6HFyYeYNt8w/DCPkk=
+	t=1715801203; cv=none; b=P/rY2YTvxg/9lQVXMdL5KAKIADRfI9EpwE41HlbbFYO/n9mbDI60lvhUntHXVJJIEixTHfQPCpDBE2rjqesMz9fxMLGGdQDYyp/YoSpr/1fHPUPSpuE6mDnPalNi5NzmDYZZeJ4oJUc9bUv0A2P+uLi8NA+pqe4EM3srTDgEs5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715801153; c=relaxed/simple;
-	bh=+pQV1tr2gL7ZtCgUzkmoIRDh9F7dBK3E7xZjtXZ+irc=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=c3ZFM7jZE9F1fa9YtsfZGnU5VnfTPzgGOq0eDvJhOQSBUzUEI6O1M4AgjCSke3sl635yIg2XZO4MhjzjXnrRZE1z0J+5JGQqR0wqp215vabYv7SOHEYXM6lsY1hcjznwD2G2ic1erWgEoSOKk+NvsAp0rt5YXZFQAM7fOVqL6+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bTk7ldrt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12D1AC116B1;
-	Wed, 15 May 2024 19:25:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715801153;
-	bh=+pQV1tr2gL7ZtCgUzkmoIRDh9F7dBK3E7xZjtXZ+irc=;
-	h=Date:From:To:Subject:From;
-	b=bTk7ldrtQ4vYwsRZOuvxRUx0SGOxHANJOVBfdmnQXUPw9X3GHiPC5F7FSP6MNZyRV
-	 6IUgKI9lOothQwRQ83MHsEH0RhExa1XLAUP3URMM3OpY7j23XJ6xYv3TBUryAevOEX
-	 fTP5AWOofn8bDgcVuu82ri6ps6p/yZlH7VuRT8Wd2CcuqD33PKtvDsMPPVj6COtF0A
-	 h8QGwK3LVCEyIYDHE1z9uoU2XrhYRJG/e+Bvfi4UiDJcAWrb6Xh/9nsuUTxmI1eSVm
-	 h65T3XQgpEf7J2XFkf1Mu/D/47eTnaxRMGBck0osDOb9L0CXtD9nNv9bLyu9ILilLq
-	 +6Opw1nOXMUmA==
-Date: Wed, 15 May 2024 12:25:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: [ANN] netdev development stats for 6.10
-Message-ID: <20240515122552.34af8692@kernel.org>
+	s=arc-20240116; t=1715801203; c=relaxed/simple;
+	bh=cSQVTv2d9BXPFda8vob3Un13SPavHfyDxWtocFcP/BA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kmexe6fWkLkWTV/gRfM92pSy29yD0v+e8I/ZyDJptWaEB256XZQ1jCqsqhNZ2ntxroazIVqS+ee+5DY3XzNm2Npe8DFJ8vqbpYbVfNMuA34Or1zFFbNXHdbDo53CHcT97mlSClWRdjNjRdRlIUkAdot7k1+dX3/XNwU1L4/rzu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JGg//A2m; arc=none smtp.client-ip=209.85.166.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-7e1b5173ddcso311306939f.1
+        for <netdev@vger.kernel.org>; Wed, 15 May 2024 12:26:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715801201; x=1716406001; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mh1X4wxl6umafgg1entrLFlRyYMICGJ0KakJDXOUNEk=;
+        b=JGg//A2ms1YCcRs6BfL4xaLBYGZZDvF3MYypCGlnGRSGeGSSoP6aQq212+yzvvMf5w
+         0l4OsppgAFNRK1JrIc1SL//OFtoQrBNVJowMVFgRwTiQxIbYSQC0NTLpeFoBl5Oo9S2/
+         tFXJYJJhnU3bQPwk2j8tYQRtkgZzttDbBCGlCMdGrco+5BCJKzn/C6/TThENuY1UKzSH
+         AZA9/cAFShP9TLlp0RCj482iva38l4PXXwPQhtG2aV+RwT0jFlwfatB9QAv38OUW1B3j
+         1cAE1SD/tY3QkZDEPv5oFbAyoenLdAgb7AXkdpuPtJ7fAV1N2kXAzdJLbgaYtP1Ujlo6
+         dQWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715801201; x=1716406001;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mh1X4wxl6umafgg1entrLFlRyYMICGJ0KakJDXOUNEk=;
+        b=DEKXjjF7qjzkN88ZzJvdchcdWJf2Hl5QVMpvVdkPP513ouAALrqLPid/Ay5WEIQ0YS
+         WdRZXBHcOP4jPNYUnOdo5vqq/72gbs4c3EBho43VZhZ16+mGK77FOkGUij3wcBcaThA5
+         I7ZsG+qhscnJvrKNoT1Ifol/AZzrBNi19UVGXk4nnpg8xE9fnaK2DKnObn5UdTkxPiGI
+         rddDTzeEYYMAEEZ/H0YEbA8GbM58W7GctoqONzS+yjXhnFGQ1KVoU93Liaf6xGmP8sy7
+         U/Isq9fZq5oLrO6+0hHx3izR5gofs5JuSSWxfU6XcDrZH2BWCxDt8NqdhfAMCXR4Raam
+         F49g==
+X-Forwarded-Encrypted: i=1; AJvYcCWJhxS9T6Qu6DgB8TRCVeIJrxYWHAMIkaeJI8JlPMyyaJeOE+r/ZJBCg0kBJXyPPfbEyfrar+wF67nnpHOwCvBIRd+OXMLa
+X-Gm-Message-State: AOJu0YxbPU/XKPY+RlyRsKzoz136YcRtsW7IA5cvkxjp6xYUneTPeWHP
+	3YUmMVTNbdr+jUNZwOO19Fs4yePiD9pSrKmJGulZFHWbfk5nEzvg
+X-Google-Smtp-Source: AGHT+IHNGUcUOcu4YNorNPqCQ4+qhMeprgUlUD5T+DCXWk3I5FwJU4bW1CgSnxzwKuo5fv2647Aiow==
+X-Received: by 2002:a5e:a507:0:b0:7da:a00d:8b55 with SMTP id ca18e2360f4ac-7e1b521e4d4mr1970933939f.17.1715801200823;
+        Wed, 15 May 2024 12:26:40 -0700 (PDT)
+Received: from ?IPV6:2601:282:1e81:c7a0:9589:ebc6:34a5:b5f0? ([2601:282:1e81:c7a0:9589:ebc6:34a5:b5f0])
+        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-4893714d7a7sm3666299173.74.2024.05.15.12.26.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 May 2024 12:26:40 -0700 (PDT)
+Message-ID: <a21b8fb8-6615-47a2-89a4-4ba97922bd46@gmail.com>
+Date: Wed, 15 May 2024 13:26:38 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/ipv6: Fix kernel soft lockup in fib6_select_path
+ under high next hop churn
+Content-Language: en-US
+To: Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>,
+ netdev@vger.kernel.org
+Cc: adrian.oliver@menlosecurity.com, Ido Schimmel <idosch@nvidia.com>,
+ Nicolas Dichtel <nicolas.dichtel@6wind.com>
+References: <20240514040757.1957761-1-omid.ehtemamhaghighi@menlosecurity.com>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20240514040757.1957761-1-omid.ehtemamhaghighi@menlosecurity.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-Intro
------
+On 5/13/24 10:07 PM, Omid Ehtemam-Haghighi wrote:
+> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+> index c1f62352a481..b4f3627dd045 100644
+> --- a/net/ipv6/ip6_fib.c
+> +++ b/net/ipv6/ip6_fib.c
+> @@ -1037,7 +1037,7 @@ static void fib6_purge_rt(struct fib6_info *rt, struct fib6_node *fn,
+>  	fib6_drop_pcpu_from(rt, table);
+>  
+>  	if (rt->nh && !list_empty(&rt->nh_list))
+> -		list_del_init(&rt->nh_list);
+> +		list_del_rcu(&rt->nh_list);
 
-We have posted our pull requests with networking changes for the 6.10
-kernel release last night. As is tradition here are the development
-statistics based on mailing list traffic on netdev@vger.
-
-These stats are somewhat like LWN stats: https://lwn.net/Articles/956765/
-but more focused on mailing list participation.
-
-Previous stats (for 6.9): https://lore.kernel.org/all/20240312124346.5aa3b1=
-4a@kernel.org/
-
-General stats
--------------
-
-The cycle started on Mon, 11 Mar and ended Tue, 14 May. Same length
-as the previous cycle.
-
-Mailing list volume didn't change much, we saw 266 emails a day.
-Similarly the number of people discussing things on the list remained
-almost unchanged.
-
-Netdev maintainers applied 20 commits a day, which is 13% down from 6.9
-(6.9 was record high, so not too alarming).
-
-Review coverage by tags in the git repo recovered by 2%, 63% of commits
-had at least one review tag, and 56% had one from a person using a different
-email domain than the author.
-
-Review coverage by number of changesets which got applied after receiving
-at least one comment on the mailing list (across all revisions) dropped
-to 60%.
-
-Testing
--------
-
-The netdev selftest runner went live during the previous release cycle.
-Last time I mentioned that there were 66 ignored cases, those were either
-too flaky or always failing. I'm happy to report that we got the number
-down to 20. We were using results from 243 selftests at the end of 6.9
-cycle, I counted 283 tests in use now, so 40 extra tests. Many of the tests
-are more of test suites than single tests, for example we run full BPF CI
-now, but the point is - there's growth :)
-
-Here are top 10 individuals with the highest number of commits[*] to selfte=
-sts:
-
-   1 [ 43] Jakub Kicinski
-   2 [ 42] Florian Westphal
-   3 [ 23] Petr Machata
-   4 [ 13] Geliang Tang
-   5 [  7] Kuniyuki Iwashima
-   6 [  6] Lukasz Majewski
-   7 [  4] Ido Schimmel
-   8 [  4] Jiri Pirko
-   9 [  4] Dmitry Safonov
-  10 [  2] Willem de Bruijn
-
-[*] commits which were applied directly by netdev maintainers.
-
-I also tried to figure out which tests give us the most signal. It's
-not easy to calculate because of flakes (BTW when I say flake I usually
-mean that the test fails, but passes on retry - we auto-retry all tests
-run directly by NIPA).=20
-
-I used the following criteria: overall fail rate lower than 3%, never
-flaked. With that the tests which failed the most are:
-
-   | Group                  Test                 Fail cnt
----------------------------------------------------------
- 1 | vmksft-net-dbg         test-vxlan-mdb-sh          24
- 2 | vmksft-net             ioam6-sh                   21
- 3 | vmksft-net             test-vxlan-under-vrf-sh    20
- 4 | vmksft-forwarding-dbg  q-in-vni-ipv6-sh           20
- 5 | vmksft-forwarding-dbg  vxlan-asymmetric-sh        20
- 6 | vmksft-forwarding-dbg  vxlan-symmetric-ipv6-sh    20
- 7 | vmksft-forwarding-dbg  vxlan-symmetric-sh         20
- 8 | doc-build              htmldoc                    20
- 9 | vmksft-net             icmp-redirect-sh           19
-10 | vmksft-forwarding-dbg  vxlan-asymmetric-ipv6-sh   19
-11 | vmksft-net             big-tcp-sh                 18
-12 | vmksft-net             test-vxlan-mdb-sh          18
-13 | vmksft-net             test-vxlan-vnifiltering-sh 17
-14 | vmksft-net-dbg         tls                        17
-15 | vmksft-forwarding-dbg  dual-vxlan-bridge-sh       17
-
-Which may or may not mean those tests caught the most bugs.
-
-Almost exactly 1/8th of commits we applied were touching selftests
-(12.51%). That doesn't seem very high.
-
-Developer rankings
-------------------
-
-Top reviewers (cs):                  Top reviewers (msg):               =20
-   1 ( +1) [27] Simon Horman            1 (   ) [57] Jakub Kicinski     =20
-   2 ( -1) [25] Jakub Kicinski          2 (   ) [55] Simon Horman       =20
-   3 ( +1) [11] Paolo Abeni             3 (   ) [35] Andrew Lunn        =20
-   4 ( +2) [10] Eric Dumazet            4 ( +1) [24] Eric Dumazet       =20
-   5 ( -2) [10] Andrew Lunn             5 ( +7) [20] Willem de Bruijn   =20
-   6 ( -1) [ 8] Jiri Pirko              6 (   ) [19] Paolo Abeni        =20
-   7 (   ) [ 5] David Ahern             7 ( -3) [17] Jiri Pirko         =20
-   8 ( +1) [ 5] Willem de Bruijn        8 ( +7) [11] Jason Wang         =20
-   9 ( +2) [ 3] Florian Fainelli        9 (***) [ 8] Sabrina Dubroca    =20
-  10 ( +3) [ 3] Jacob Keller           10 ( -2) [ 8] David Ahern        =20
-  11 ( -1) [ 3] Krzysztof Kozlowski    11 ( -4) [ 8] Krzysztof Kozlowski=20
-  12 (   ) [ 3] Russell King           12 ( -1) [ 8] Russell King       =20
-  13 (+20) [ 3] Dan Carpenter          13 ( -4) [ 6] Florian Fainelli   =20
-  14 ( +8) [ 2] Przemek Kitszel        14 ( +7) [ 6] Serge Semin        =20
-  15 (+22) [ 2] Alexander Lobakin      15 ( -1) [ 6] Jacob Keller       =20
-
-Willem jumps into the top 5 after being quite active this month (all
-over core networking and selftests), Sabrina reviewed a number of
-network crypto changes (xfrm, macsec, opvpn).=20
-
-On the "by changeset" side Jake climbs into top 10, with Przemek and
-Olek also in the top 15, this is a strong cycle for Intel! Dan caught
-and reported a number of bugs as well as helped to review and guide=20
-bug fix contributions from others (ax25 patches most recently).
-
-Thank you all very much for your work!
+This path is only for the separate nexthop objects (the rt->nh check),
+while you seem to be dependent on the legacy IPv6 multipath code.
 
 
-Top authors (cs):                    Top authors (msg):                 =20
-   1 (   ) [9] Eric Dumazet             1 ( +1) [21] Jakub Kicinski     =20
-   2 (   ) [5] Jakub Kicinski           2 ( -1) [19] Eric Dumazet       =20
-   3 (***) [4] Asbj=C3=B8rn Sloth T=C3=B8nnesen   3 (***) [17] Edward Liaw =
-       =20
-   4 (+45) [3] Russell King             4 (***) [14] Karol Kolacinski   =20
-   5 ( +2) [2] Kuniyuki Iwashima        5 (***) [14] Kory Maincent
-   6 ( -3) [2] Breno Leitao             6 (***) [14] Jason Xing         =20
-   7 (+43) [2] Florian Westphal         7 (***) [13] Mike Rapoport      =20
- =20
-Asbj=C3=B8rn takes a high position on the author list with the improvements
-to error checking in a large number of driver flower offloads.
-Russell worked on converting phylink drivers to newer APIs.
-(Both used a somewhat limited amount of threading when posting.)
+>  
+>  	if (refcount_read(&rt->fib6_ref) != 1) {
+>  		/* This route is used as dummy address holder in some split
+> @@ -1247,7 +1247,7 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
+>  							 fib6_siblings)
+>  					sibling->fib6_nsiblings--;
+>  				rt->fib6_nsiblings = 0;
+> -				list_del_init(&rt->fib6_siblings);
+> +				list_del_rcu(&rt->fib6_siblings);
 
-Florian W, in addition to his usual work, moved and reworked netfilter
-tests, which now run in netdev CI.
-
-On the right side Mike R and Edward L are "non netdev people" who just
-CCed netdev on their large series.
+If using rcu for fib6_siblings fixes your problem, then all references
+should be updated to annotate or use the rcu apis.
 
 
-Top scores (positive):               Top scores (negative):             =20
-   1 ( +1) [395] Simon Horman           1 (***) [67] Edward Liaw        =20
-   2 ( -1) [351] Jakub Kicinski         2 (***) [58] Karol Kolacinski   =20
-   3 (   ) [176] Andrew Lunn            3 (***) [55] Kory Maincent (Dent Pr=
-oject)
-   4 ( +1) [158] Paolo Abeni            4 (***) [52] Mike Rapoport      =20
-   5 ( -1) [111] Jiri Pirko             5 (***) [44] Asbj=C3=B8rn Sloth T=
-=C3=B8nnesen
-   6 ( +2) [109] Willem de Bruijn       6 ( -4) [38] Xuan Zhuo          =20
-   7 (+32) [ 99] Eric Dumazet           7 (+37) [36] Mateusz Polchlopek =20
-   8 ( -1) [ 70] David Ahern            8 (+14) [36] Oleksij Rempel     =20
-   9 ( +8) [ 49] Jason Wang             9 ( +1) [34] Breno Leitao       =20
-  10 ( +3) [ 47] Jacob Keller          10 (+18) [33] Michal Swiatkowski =20
+>  				rt6_multipath_rebalance(next_sibling);
+>  				return err;
+>  			}
+> @@ -1965,7 +1965,7 @@ static void fib6_del_route(struct fib6_table *table, struct fib6_node *fn,
+>  					 &rt->fib6_siblings, fib6_siblings)
+>  			sibling->fib6_nsiblings--;
+>  		rt->fib6_nsiblings = 0;
+> -		list_del_init(&rt->fib6_siblings);
+> +		list_del_rcu(&rt->fib6_siblings);
+>  		rt6_multipath_rebalance(next_sibling);
+>  	}
+>  
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> index 1f4b935a0e57..485a14098958 100644
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -414,7 +414,7 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
+>  		      struct flowi6 *fl6, int oif, bool have_oif_match,
+>  		      const struct sk_buff *skb, int strict)
+>  {
+> -	struct fib6_info *sibling, *next_sibling;
+> +	struct fib6_info *sibling;
+>  	struct fib6_info *match = res->f6i;
+>  
+>  	if (!match->nh && (!match->fib6_nsiblings || have_oif_match))
+> @@ -441,8 +441,8 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
+>  	if (fl6->mp_hash <= atomic_read(&match->fib6_nh->fib_nh_upper_bound))
+>  		goto out;
+>  
+> -	list_for_each_entry_safe(sibling, next_sibling, &match->fib6_siblings,
+> -				 fib6_siblings) {
+> +	list_for_each_entry_rcu(sibling, &match->fib6_siblings,
+> +				fib6_siblings) {
+>  		const struct fib6_nh *nh = sibling->fib6_nh;
+>  		int nh_upper_bound;
+>  
 
-Company rankings
-----------------
-
-Top reviewers (cs):                  Top reviewers (msg):               =20
-   1 (   ) [41] RedHat                  1 (   ) [106] RedHat            =20
-   2 (   ) [30] Meta                    2 (   ) [ 81] Meta              =20
-   3 (   ) [17] Google                  3 ( +1) [ 55] Google            =20
-   4 ( +1) [16] Intel                   4 ( +1) [ 43] Intel             =20
-   5 ( +1) [11] nVidia                  5 ( -2) [ 35] Andrew Lunn       =20
-   6 ( -2) [10] Andrew Lunn             6 ( +1) [ 30] nVidia            =20
-   7 (   ) [ 8] Linaro                  7 ( -1) [ 18] Linaro            =20
-
-Top authors (cs):                    Top authors (msg):                 =20
-   1 ( +2) [14] Intel                   1 (   ) [86] Intel              =20
-   2 ( -1) [13] RedHat                  2 ( +1) [60] Google             =20
-   3 ( +1) [12] Google                  3 ( +2) [52] RedHat             =20
-   4 ( -2) [10] Meta                    4 (   ) [46] nVidia             =20
-   5 (   ) [ 6] nVidia                  5 ( -3) [45] Meta               =20
-   6 (***) [ 4] Asbj=C3=B8rn Sloth T=C3=B8nnesen  6 ( +1) [29] Alibaba     =
-       =20
-   7 ( +3) [ 3] Amazon                  7 (+16) [20] Linaro             =20
-
-Top scores (positive):               Top scores (negative):             =20
-   1 (   ) [500] RedHat                 1 ( +1) [86] Alibaba            =20
-   2 (   ) [359] Meta                   2 (+12) [65] Huawei             =20
-   3 (   ) [176] Andrew Lunn            3 ( +5) [58] Intel              =20
-   4 ( +1) [110] Google                 4 (***) [55] Dent Project
-   5 ( +1) [ 70] Enfabrica              5 (+45) [44] Asbj=C3=B8rn Sloth T=
-=C3=B8nnesen
-   6 ( +1) [ 53] Oracle                 6 ( -5) [38] Bootlin            =20
-   7 ( -3) [ 47] Linaro                =20
---=20
-Code: https://github.com/kuba-moo/ml-stat
-Raw output: https://netdev.bots.linux.dev/static/nipa/stats-6.10/stdout
 
