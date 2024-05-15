@@ -1,727 +1,168 @@
-Return-Path: <netdev+bounces-96463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67F368C6097
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 08:04:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8790E8C60A9
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 08:18:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FCDA282D3A
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 06:04:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A345D1C20BE5
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 06:18:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2629C40867;
-	Wed, 15 May 2024 06:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32BB3B781;
+	Wed, 15 May 2024 06:18:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="XSx6iugy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NuZU26kF"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B3B3C068;
-	Wed, 15 May 2024 06:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9933C460
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 06:18:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715753057; cv=none; b=TW68hQA94j0TCG82fQWBrYqh9H40cw/wVXhthqOIG/B3Zw7QyH95kfSrW1muT/4Tp3v9yw+KOxfTLYXdN43tz3VL3MkvjUSDWUMJUj+QuWrr1npdUhGg4W9Xm8bxXgvfWopPyhcyYy+6ELFtsQ0EMTxfOfLJ0I99coqajEVpyVw=
+	t=1715753884; cv=none; b=b7GCFJ5ZVJmsMsteC+IayLbdLJmQsQS18QK8zm13Nf7RnlLk6KETWVpqWAC69DPuYVmY+iSlGpNBwVuGTnf0in3ZetTQngIMF72V9D5bofHKq6gynSlHJ6SiQS2RWUaMRu8KsfergQYNY9bbdYttZSjD1/vvlueDlJT76uoYOtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715753057; c=relaxed/simple;
-	bh=aFgs+yhqiO3qjw7TrsTz3WzYhFSx4UPuGJBcbr+otS4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OQHN1lJz7j4on8FayBEE/8MFxVRwTvXcifoVH0e/QygmSxedVDUZuilZgcRkNPDboEPVPclDr/d3qvsyljhEWqAU8OwwJt+wtyMEkoHnOrRvxLDyRlECQdPAU18iUOXehGC6yuILLVeeuV+fZxEImhBNJhDgdS2goqU53fAndy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=XSx6iugy; arc=none smtp.client-ip=198.47.23.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44F63UGg087681;
-	Wed, 15 May 2024 01:03:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1715753010;
-	bh=EKlLwEQp+Dp8/YK9lZtDfahgA18l0aqTNte4gRfMSGI=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=XSx6iugyH90YkDSM27+THHzUDDrL46XOrHJReHVRPuxcgSy8ASVKBz59V7LA2IATO
-	 FCgnig+/CXdFerNhCc4/nDjoc6KOC1JBh4AqGIwMjE3FGrsDvmoBhLae8aPsZqUOiP
-	 GAm6HNI9E6kbSWqqHT9zcMVEBtcDTNwaanztX3hI=
-Received: from DFLE109.ent.ti.com (dfle109.ent.ti.com [10.64.6.30])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44F63U74068830
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 15 May 2024 01:03:30 -0500
-Received: from DFLE110.ent.ti.com (10.64.6.31) by DFLE109.ent.ti.com
- (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 15
- May 2024 01:03:30 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE110.ent.ti.com
- (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 15 May 2024 01:03:30 -0500
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44F63U0n071382;
-	Wed, 15 May 2024 01:03:30 -0500
-Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 44F63Tuh021303;
-	Wed, 15 May 2024 01:03:29 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>,
-        Jan Kiszka
-	<jan.kiszka@siemens.com>, Andrew Lunn <andrew@lunn.ch>,
-        Simon Horman
-	<horms@kernel.org>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Wolfram Sang
-	<wsa+renesas@sang-engineering.com>,
-        Arnd Bergmann <arnd@arndb.de>, Diogo Ivo
-	<diogo.ivo@siemens.com>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>,
-        Roger
- Quadros <rogerq@kernel.org>,
-        MD Danish Anwar <danishanwar@ti.com>, Paolo
- Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>, <r-gunasekaran@ti.com>
-Subject: [RFC PATCH net-next v4 3/3] net: ti: icssg-prueth: Add support for ICSSG switch firmware
-Date: Wed, 15 May 2024 11:33:20 +0530
-Message-ID: <20240515060320.2783244-4-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240515060320.2783244-1-danishanwar@ti.com>
-References: <20240515060320.2783244-1-danishanwar@ti.com>
+	s=arc-20240116; t=1715753884; c=relaxed/simple;
+	bh=SmCF5UexwgEyfY1H/U9hOms5bAG51QR+6EjgsKeilzw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=X/lO4LFdDRO+GsmZRyY6GvvOQD5nKz3Ecn6zzsTjMg5WOB3/ASE83BG+RnWfbZA73JKXpWRwVCsqnbHBUiYCPDOUx5Ty0uQCnpl9JTqTm1ECAm56ph71MGshpAfHB50scNjcUXgIch4pF0MJTW1NBw65wl/XSA85RXgTO10EwMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NuZU26kF; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-572a93890d1so1248767a12.3
+        for <netdev@vger.kernel.org>; Tue, 14 May 2024 23:18:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715753881; x=1716358681; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5yOZ+JB3zuprcdgRJbYmgGrWwuRHSScuPFo4uTF+AWs=;
+        b=NuZU26kFLJBb6V2WBlYbwsLU/r4DzSRyJHylr++komlnEu8MK1jgMOBFDPBvAlmgnQ
+         DqfI24/PhF3Rh5GssnOmNEwDoSX0aZPrXTGTReP5Mwtc2muhJNO231nevsSny7dhqxn7
+         2l8912laIwZX7wZL/4B4B5OkrN+ytsDyk67FVo95N3qvSy+D4960QkvDKt1jIv/8IJvN
+         eHKWQ738DfBceGQ+fo7nNGlJLHzkbGullRPR+7R0HyLo1z1Uip9rJ9s1WmNh92SAhAa3
+         MoMXe3dsFhpWWZlD16/iwGtjyzQS+5/3d9Dh0vdldolzgM17M5E8Rl0izKJ7CsjIRHei
+         /3eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715753881; x=1716358681;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5yOZ+JB3zuprcdgRJbYmgGrWwuRHSScuPFo4uTF+AWs=;
+        b=wqGIR/a8Dfx4YDN5OHLZSLj0g3cN7+94g1/Q3gYUTIp2zd0vBjHQBQucvGrwL9kyn2
+         oBMPSWpeTL6Dhyt2V/nwXJw/ao/7g1SNc7u6sEwUwlnKrw1QycsySsyTKwaMNUS5Lbiq
+         mEKPyKfHyDSXT7j+IAp9vWseG2gX1LOyUTS5/CPL8wh6nkaLYk0QXzrYAEouFdqGzYZi
+         W//oujke6Csc2Uvft7AczloEFlnhxaT5Ri48TLvg5tGHGM6ebWVZp5afdEVZbF6WoA4C
+         cXImonygh0KXz4PdBv+pAsM667Eu34NHgnvJhwyEzSgNfE329GrkGjAfE4lvFpwwTlbn
+         Nt+w==
+X-Gm-Message-State: AOJu0YxjmfHTgFr7h7zZhJEmYXCGCSpaMtNhXhT8SJqwtHUPZpUlKPIY
+	jh37QFfdu0oeV/p1t6Wy3rQfkuFgCGMZWe32EkFIMZUOOKc+Wts7A0/Ymg==
+X-Google-Smtp-Source: AGHT+IGb8fVucwgExpHXDsKGTnWPDG9FNwYs9KvjxEVLD/VWGhcDcO9uTvUlfCnxiEPbE3iXxiGBtg==
+X-Received: by 2002:a50:f60d:0:b0:572:7c13:c7d8 with SMTP id 4fb4d7f45d1cf-5734d6effa0mr13861376a12.34.1715753881015;
+        Tue, 14 May 2024 23:18:01 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:7731:9200:5d4a:ed7b:b883:3704? (dynamic-2a01-0c22-7731-9200-5d4a-ed7b-b883-3704.c22.pool.telefonica.de. [2a01:c22:7731:9200:5d4a:ed7b:b883:3704])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5733bea65aasm8444933a12.5.2024.05.14.23.18.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 May 2024 23:18:00 -0700 (PDT)
+Message-ID: <9b5b6f4c-4f54-4b90-b0b3-8d8023c2e780@gmail.com>
+Date: Wed, 15 May 2024 08:18:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Realtek linux nic maintainers <nic_swsd@realtek.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Ken Milmore <ken.milmore@gmail.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net] Revert "r8169: don't try to disable interrupts if NAPI
+ is, scheduled already"
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add support for ICSSG switch firmware using existing Dual EMAC driver
-with switchdev.
+This reverts commit 7274c4147afbf46f45b8501edbdad6da8cd013b9.
 
-Limitations:
-VLAN offloading is limited to 0-256 IDs.
-MDB/FDB static entries are limited to 511 entries and different FDBs can
-hash to same bucket and thus may not completely offloaded
+Ken reported that RTL8125b can lock up if gro_flush_timeout has the
+default value of 20000 and napi_defer_hard_irqs is set to 0.
+In this scenario device interrupts aren't disabled, what seems to
+trigger some silicon bug under heavy load. I was able to reproduce this
+behavior on RTL8168h. Fix this by reverting 7274c4147afb.
 
-Example assuming ETH1 and ETH2 as ICSSG2 interfaces:
-
-Switch to ICSSG Switch mode:
- ip link add name br0 type bridge
- ip link set dev eth1 master br0
- ip link set dev eth2 master br0
- ip link set dev br0 up
- bridge vlan add dev br0 vid 1 pvid untagged self
-
-Going back to Dual EMAC mode:
-
- ip link set dev br0 down
- ip link set dev eth1 nomaster
- ip link set dev eth2 nomaster
- ip link del name br0 type bridge
-
-By default, Dual EMAC firmware is loaded, and can be changed to switch
-mode by above steps
-
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+Fixes: 7274c4147afb ("r8169: don't try to disable interrupts if NAPI is scheduled already")
+Cc: stable@vger.kernel.org
+Reported-by: Ken Milmore <ken.milmore@gmail.com>
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
-NOTE: The second interface can be added before / after the bridge is up
-      and still forwarding would work. Similarly the second interface can
-      be removed before / after bringing the bridge down and driver will
-      transition back into dual emac mode.
+ drivers/net/ethernet/realtek/r8169_main.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-      As we are not restarting the interfaces, the DRAM, SMEM and MSMC RAM
-      doesn't get cleared. As a result with this approach all
-      configurations will be saved.
-
- drivers/net/ethernet/ti/Kconfig              |   1 +
- drivers/net/ethernet/ti/Makefile             |   3 +-
- drivers/net/ethernet/ti/icssg/icssg_common.c |   2 +
- drivers/net/ethernet/ti/icssg/icssg_config.c | 136 ++++++++++-
- drivers/net/ethernet/ti/icssg/icssg_config.h |   7 +
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 238 ++++++++++++++++++-
- 6 files changed, 372 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
-index 1729eb0e0b41..f160a3b71499 100644
---- a/drivers/net/ethernet/ti/Kconfig
-+++ b/drivers/net/ethernet/ti/Kconfig
-@@ -204,6 +204,7 @@ config TI_ICSSG_PRUETH_SR1
- 	select TI_ICSS_IEP
- 	select TI_K3_CPPI_DESC_POOL
- 	depends on PRU_REMOTEPROC
-+	depends on NET_SWITCHDEV
- 	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
- 	help
- 	  Support dual Gigabit Ethernet ports over the ICSSG PRU Subsystem.
-diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
-index 6e086b4c0384..59cd20a38267 100644
---- a/drivers/net/ethernet/ti/Makefile
-+++ b/drivers/net/ethernet/ti/Makefile
-@@ -39,7 +39,8 @@ icssg-prueth-y := icssg/icssg_prueth.o \
- 		  icssg/icssg_config.o \
- 		  icssg/icssg_mii_cfg.o \
- 		  icssg/icssg_stats.o \
--		  icssg/icssg_ethtool.o
-+		  icssg/icssg_ethtool.o \
-+		  icssg/icssg_switchdev.o
- obj-$(CONFIG_TI_ICSSG_PRUETH_SR1) += icssg-prueth-sr1.o
- icssg-prueth-sr1-y := icssg/icssg_prueth_sr1.o \
- 		      icssg/icssg_common.o \
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-index 1d62c05b5f7c..1044a814b2ad 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_common.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
-@@ -557,6 +557,8 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
- 	} else {
- 		/* send the filled skb up the n/w stack */
- 		skb_put(skb, pkt_len);
-+		if (emac->prueth->is_switch_mode)
-+			skb->offload_fwd_mark = emac->offload_fwd_mark;
- 		skb->protocol = eth_type_trans(skb, ndev);
- 		napi_gro_receive(&emac->napi_rx, skb);
- 		ndev->stats.rx_bytes += pkt_len;
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-index 2213374d4d45..328b6564091f 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-@@ -107,28 +107,49 @@ static const struct map hwq_map[2][ICSSG_NUM_OTHER_QUEUES] = {
- 	},
- };
- 
-+static void icssg_config_mii_init_switch(struct prueth_emac *emac)
-+{
-+	struct prueth *prueth = emac->prueth;
-+	int mii = prueth_emac_slice(emac);
-+	u32 txcfg_reg, pcnt_reg, txcfg;
-+	struct regmap *mii_rt;
-+
-+	mii_rt = prueth->mii_rt;
-+
-+	txcfg_reg = (mii == ICSS_MII0) ? PRUSS_MII_RT_TXCFG0 :
-+				       PRUSS_MII_RT_TXCFG1;
-+	pcnt_reg = (mii == ICSS_MII0) ? PRUSS_MII_RT_RX_PCNT0 :
-+				       PRUSS_MII_RT_RX_PCNT1;
-+
-+	txcfg = PRUSS_MII_RT_TXCFG_TX_ENABLE |
-+		PRUSS_MII_RT_TXCFG_TX_AUTO_PREAMBLE |
-+		PRUSS_MII_RT_TXCFG_TX_IPG_WIRE_CLK_EN;
-+
-+	if (emac->phy_if == PHY_INTERFACE_MODE_MII && mii == ICSS_MII1)
-+		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
-+	else if (emac->phy_if != PHY_INTERFACE_MODE_MII && mii == ICSS_MII0)
-+		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
-+
-+	regmap_write(mii_rt, txcfg_reg, txcfg);
-+	regmap_write(mii_rt, pcnt_reg, 0x1);
-+}
-+
- static void icssg_config_mii_init(struct prueth_emac *emac)
- {
--	u32 rxcfg, txcfg, rxcfg_reg, txcfg_reg, pcnt_reg;
- 	struct prueth *prueth = emac->prueth;
- 	int slice = prueth_emac_slice(emac);
-+	u32 txcfg, txcfg_reg, pcnt_reg;
- 	struct regmap *mii_rt;
- 
- 	mii_rt = prueth->mii_rt;
- 
--	rxcfg_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_RXCFG0 :
--				       PRUSS_MII_RT_RXCFG1;
- 	txcfg_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_TXCFG0 :
- 				       PRUSS_MII_RT_TXCFG1;
- 	pcnt_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_RX_PCNT0 :
- 				       PRUSS_MII_RT_RX_PCNT1;
- 
--	rxcfg = MII_RXCFG_DEFAULT;
- 	txcfg = MII_TXCFG_DEFAULT;
- 
--	if (slice == ICSS_MII1)
--		rxcfg |= PRUSS_MII_RT_RXCFG_RX_MUX_SEL;
--
- 	/* In MII mode TX lines swapped inside ICSSG, so TX_MUX_SEL cfg need
- 	 * to be swapped also comparing to RGMII mode.
- 	 */
-@@ -137,7 +158,6 @@ static void icssg_config_mii_init(struct prueth_emac *emac)
- 	else if (emac->phy_if != PHY_INTERFACE_MODE_MII && slice == ICSS_MII1)
- 		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
- 
--	regmap_write(mii_rt, rxcfg_reg, rxcfg);
- 	regmap_write(mii_rt, txcfg_reg, txcfg);
- 	regmap_write(mii_rt, pcnt_reg, 0x1);
- }
-@@ -257,6 +277,66 @@ static int emac_r30_is_done(struct prueth_emac *emac)
- 	return 1;
- }
- 
-+static int prueth_switch_buffer_setup(struct prueth_emac *emac)
-+{
-+	struct icssg_buffer_pool_cfg __iomem *bpool_cfg;
-+	struct icssg_rxq_ctx __iomem *rxq_ctx;
-+	struct prueth *prueth = emac->prueth;
-+	int slice = prueth_emac_slice(emac);
-+	u32 addr;
-+	int i;
-+
-+	addr = lower_32_bits(prueth->msmcram.pa);
-+	if (slice)
-+		addr += PRUETH_NUM_BUF_POOLS * PRUETH_EMAC_BUF_POOL_SIZE;
-+
-+	if (addr % SZ_64K) {
-+		dev_warn(prueth->dev, "buffer pool needs to be 64KB aligned\n");
-+		return -EINVAL;
-+	}
-+
-+	bpool_cfg = emac->dram.va + BUFFER_POOL_0_ADDR_OFFSET;
-+	/* workaround for f/w bug. bpool 0 needs to be initilalized */
-+	for (i = 0; i <  PRUETH_NUM_BUF_POOLS; i++) {
-+		writel(addr, &bpool_cfg[i].addr);
-+		writel(PRUETH_EMAC_BUF_POOL_SIZE, &bpool_cfg[i].len);
-+		addr += PRUETH_EMAC_BUF_POOL_SIZE;
-+	}
-+
-+	if (!slice)
-+		addr += PRUETH_NUM_BUF_POOLS * PRUETH_EMAC_BUF_POOL_SIZE;
-+	else
-+		addr += PRUETH_SW_NUM_BUF_POOLS_HOST * PRUETH_SW_BUF_POOL_SIZE_HOST;
-+
-+	for (i = PRUETH_NUM_BUF_POOLS;
-+	     i < 2 * PRUETH_SW_NUM_BUF_POOLS_HOST + PRUETH_NUM_BUF_POOLS;
-+	     i++) {
-+		/* The driver only uses first 4 queues per PRU so only initialize them */
-+		if (i % PRUETH_SW_NUM_BUF_POOLS_HOST < PRUETH_SW_NUM_BUF_POOLS_PER_PRU) {
-+			writel(addr, &bpool_cfg[i].addr);
-+			writel(PRUETH_SW_BUF_POOL_SIZE_HOST, &bpool_cfg[i].len);
-+			addr += PRUETH_SW_BUF_POOL_SIZE_HOST;
-+		} else {
-+			writel(0, &bpool_cfg[i].addr);
-+			writel(0, &bpool_cfg[i].len);
-+		}
-+	}
-+
-+	if (!slice)
-+		addr += PRUETH_SW_NUM_BUF_POOLS_HOST * PRUETH_SW_BUF_POOL_SIZE_HOST;
-+	else
-+		addr += PRUETH_EMAC_RX_CTX_BUF_SIZE;
-+
-+	rxq_ctx = emac->dram.va + HOST_RX_Q_PRE_CONTEXT_OFFSET;
-+	for (i = 0; i < 3; i++)
-+		writel(addr, &rxq_ctx->start[i]);
-+
-+	addr += PRUETH_EMAC_RX_CTX_BUF_SIZE;
-+	writel(addr - SZ_2K, &rxq_ctx->end);
-+
-+	return 0;
-+}
-+
- static int prueth_emac_buffer_setup(struct prueth_emac *emac)
- {
- 	struct icssg_buffer_pool_cfg __iomem *bpool_cfg;
-@@ -333,13 +413,41 @@ static void icssg_init_emac_mode(struct prueth *prueth)
- 	icssg_class_set_host_mac_addr(prueth->miig_rt, mac);
- }
- 
-+static void icssg_init_switch_mode(struct prueth *prueth)
-+{
-+	u32 addr = prueth->shram.pa + EMAC_ICSSG_SWITCH_DEFAULT_VLAN_TABLE_OFFSET;
-+	int i;
-+
-+	if (prueth->emacs_initialized)
-+		return;
-+
-+	/* Set VLAN TABLE address base */
-+	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, SMEM_VLAN_OFFSET_MASK,
-+			   addr <<  SMEM_VLAN_OFFSET);
-+	/* Set enable VLAN aware mode, and FDBs for all PRUs */
-+	regmap_write(prueth->miig_rt, FDB_GEN_CFG2, FDB_EN_ALL);
-+	prueth->vlan_tbl = (struct prueth_vlan_tbl __force *)(prueth->shram.va +
-+			    EMAC_ICSSG_SWITCH_DEFAULT_VLAN_TABLE_OFFSET);
-+	for (i = 0; i < SZ_4K - 1; i++) {
-+		prueth->vlan_tbl[i].fid = i;
-+		prueth->vlan_tbl[i].fid_c1 = 0;
-+	}
-+
-+	if (prueth->hw_bridge_dev)
-+		icssg_class_set_host_mac_addr(prueth->miig_rt, prueth->hw_bridge_dev->dev_addr);
-+	icssg_set_pvid(prueth, prueth->default_vlan, PRUETH_PORT_HOST);
-+}
-+
- int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
- {
- 	void __iomem *config = emac->dram.va + ICSSG_CONFIG_OFFSET;
- 	struct icssg_flow_cfg __iomem *flow_cfg;
- 	int ret;
- 
--	icssg_init_emac_mode(prueth);
-+	if (prueth->is_switch_mode)
-+		icssg_init_switch_mode(prueth);
-+	else
-+		icssg_init_emac_mode(prueth);
- 
- 	memset_io(config, 0, TAS_GATE_MASK_LIST0);
- 	icssg_miig_queues_init(prueth, slice);
-@@ -353,7 +461,10 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
- 	regmap_update_bits(prueth->miig_rt, ICSSG_CFG_OFFSET,
- 			   ICSSG_CFG_DEFAULT, ICSSG_CFG_DEFAULT);
- 	icssg_miig_set_interface_mode(prueth->miig_rt, slice, emac->phy_if);
--	icssg_config_mii_init(emac);
-+	if (prueth->is_switch_mode)
-+		icssg_config_mii_init_switch(emac);
-+	else
-+		icssg_config_mii_init(emac);
- 	icssg_config_ipg(emac);
- 	icssg_update_rgmii_cfg(prueth->miig_rt, emac);
- 
-@@ -376,7 +487,10 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
- 	writeb(0, config + SPL_PKT_DEFAULT_PRIORITY);
- 	writeb(0, config + QUEUE_NUM_UNTAGGED);
- 
--	ret = prueth_emac_buffer_setup(emac);
-+	if (prueth->is_switch_mode)
-+		ret = prueth_switch_buffer_setup(emac);
-+	else
-+		ret = prueth_emac_buffer_setup(emac);
- 	if (ret)
- 		return ret;
- 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
-index 9d8558bd0f15..57206662d5c5 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
-@@ -35,6 +35,13 @@ struct icssg_flow_cfg {
- 	(2 * (PRUETH_EMAC_BUF_POOL_SIZE * PRUETH_NUM_BUF_POOLS + \
- 	 PRUETH_EMAC_RX_CTX_BUF_SIZE * 2))
- 
-+#define PRUETH_SW_BUF_POOL_SIZE_HOST	SZ_4K
-+#define PRUETH_SW_NUM_BUF_POOLS_HOST	8
-+#define PRUETH_SW_NUM_BUF_POOLS_PER_PRU 4
-+#define MSMC_RAM_SIZE_SWITCH_MODE \
-+	(MSMC_RAM_SIZE + \
-+	(2 * PRUETH_SW_BUF_POOL_SIZE_HOST * PRUETH_SW_NUM_BUF_POOLS_HOST))
-+
- #define PRUETH_SWITCH_FDB_MASK ((SIZE_OF_FDB / NUMBER_OF_FDB_BUCKET_ENTRIES) - 1)
- 
- struct icssg_rxq_ctx {
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 7ece91b75aeb..92e30dba09c4 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -27,6 +27,7 @@
- #include <linux/remoteproc/pruss.h>
- #include <linux/regmap.h>
- #include <linux/remoteproc.h>
-+#include <net/switchdev.h>
- 
- #include "icssg_prueth.h"
- #include "icssg_mii_rt.h"
-@@ -35,6 +36,10 @@
- 
- #define PRUETH_MODULE_DESCRIPTION "PRUSS ICSSG Ethernet driver"
- 
-+#define DEFAULT_VID		1
-+#define DEFAULT_PORT_MASK	1
-+#define DEFAULT_UNTAG_MASK	1
-+
- /* CTRLMMR_ICSSG_RGMII_CTRL register bits */
- #define ICSSG_CTRL_RGMII_ID_MODE                BIT(24)
- 
-@@ -113,6 +118,19 @@ static irqreturn_t prueth_tx_ts_irq(int irq, void *dev_id)
- 	return IRQ_HANDLED;
- }
- 
-+static struct icssg_firmwares icssg_switch_firmwares[] = {
-+	{
-+		.pru = "ti-pruss/am65x-sr2-pru0-prusw-fw.elf",
-+		.rtu = "ti-pruss/am65x-sr2-rtu0-prusw-fw.elf",
-+		.txpru = "ti-pruss/am65x-sr2-txpru0-prusw-fw.elf",
-+	},
-+	{
-+		.pru = "ti-pruss/am65x-sr2-pru1-prusw-fw.elf",
-+		.rtu = "ti-pruss/am65x-sr2-rtu1-prusw-fw.elf",
-+		.txpru = "ti-pruss/am65x-sr2-txpru1-prusw-fw.elf",
-+	}
-+};
-+
- static struct icssg_firmwares icssg_emac_firmwares[] = {
- 	{
- 		.pru = "ti-pruss/am65x-sr2-pru0-prueth-fw.elf",
-@@ -132,7 +150,10 @@ static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
- 	struct device *dev = prueth->dev;
- 	int slice, ret;
- 
--	firmwares = icssg_emac_firmwares;
-+	if (prueth->is_switch_mode)
-+		firmwares = icssg_switch_firmwares;
-+	else
-+		firmwares = icssg_emac_firmwares;
- 
- 	slice = prueth_emac_slice(emac);
- 	if (slice < 0) {
-@@ -436,9 +457,8 @@ static int emac_ndo_open(struct net_device *ndev)
- 	ether_addr_copy(emac->mac_addr, ndev->dev_addr);
- 
- 	icssg_class_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
--	icssg_ft1_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
--
- 	icssg_class_default(prueth->miig_rt, slice, 0, false);
-+	icssg_ft1_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
- 
- 	/* Notify the stack of the actual queue counts. */
- 	ret = netif_set_real_num_tx_queues(ndev, num_data_chn);
-@@ -829,6 +849,203 @@ bool prueth_dev_check(const struct net_device *ndev)
- 	return false;
- }
- 
-+static void prueth_offload_fwd_mark_update(struct prueth *prueth)
-+{
-+	int set_val = 0;
-+	int i;
-+
-+	if (prueth->br_members == (BIT(PRUETH_PORT_MII0) | BIT(PRUETH_PORT_MII1)))
-+		set_val = 1;
-+
-+	dev_dbg(prueth->dev, "set offload_fwd_mark %d\n", set_val);
-+
-+	for (i = PRUETH_MAC0; i < PRUETH_NUM_MACS; i++) {
-+		struct prueth_emac *emac = prueth->emac[i];
-+
-+		if (!emac || !emac->ndev)
-+			continue;
-+
-+		emac->offload_fwd_mark = set_val;
-+	}
-+}
-+
-+static void prueth_emac_restart(struct prueth *prueth)
-+{
-+	struct prueth_emac *emac0 = prueth->emac[PRUETH_MAC0];
-+	struct prueth_emac *emac1 = prueth->emac[PRUETH_MAC1];
-+
-+	/* Detach the net_device for both PRUeth ports*/
-+	if (netif_running(emac0->ndev))
-+		netif_device_detach(emac0->ndev);
-+	if (netif_running(emac1->ndev))
-+		netif_device_detach(emac1->ndev);
-+
-+	/* Disable both PRUeth ports */
-+	emac_set_port_state(emac0, ICSSG_EMAC_PORT_DISABLE);
-+	emac_set_port_state(emac1, ICSSG_EMAC_PORT_DISABLE);
-+
-+	/* Stop both pru cores for both PRUeth ports*/
-+	prueth_emac_stop(emac0);
-+	prueth->emacs_initialized--;
-+	prueth_emac_stop(emac1);
-+	prueth->emacs_initialized--;
-+
-+	/* Start both pru cores for both PRUeth ports */
-+	prueth_emac_start(prueth, emac0);
-+	prueth->emacs_initialized++;
-+	prueth_emac_start(prueth, emac1);
-+	prueth->emacs_initialized++;
-+
-+	/* Enable forwarding for both PRUeth ports */
-+	emac_set_port_state(emac0, ICSSG_EMAC_PORT_FORWARD);
-+	emac_set_port_state(emac1, ICSSG_EMAC_PORT_FORWARD);
-+
-+	/* Attache net_device for both PRUeth ports */
-+	netif_device_attach(emac0->ndev);
-+	netif_device_attach(emac1->ndev);
-+}
-+
-+static void icssg_enable_switch_mode(struct prueth *prueth)
-+{
-+	struct prueth_emac *emac;
-+	int mac;
-+
-+	prueth_emac_restart(prueth);
-+
-+	for (mac = PRUETH_MAC0; mac < PRUETH_NUM_MACS; mac++) {
-+		emac = prueth->emac[mac];
-+		if (netif_running(emac->ndev)) {
-+			icssg_fdb_add_del(emac, eth_stp_addr, prueth->default_vlan,
-+					  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
-+					  ICSSG_FDB_ENTRY_P1_MEMBERSHIP |
-+					  ICSSG_FDB_ENTRY_P2_MEMBERSHIP |
-+					  ICSSG_FDB_ENTRY_BLOCK,
-+					  true);
-+			icssg_vtbl_modify(emac, emac->port_vlan | DEFAULT_VID,
-+					  BIT(emac->port_id) | DEFAULT_PORT_MASK,
-+					  BIT(emac->port_id) | DEFAULT_UNTAG_MASK,
-+					  true);
-+			icssg_set_pvid(prueth, emac->port_vlan, emac->port_id);
-+			emac_set_port_state(emac, ICSSG_EMAC_PORT_VLAN_AWARE_ENABLE);
-+		}
-+	}
-+}
-+
-+static int prueth_netdevice_port_link(struct net_device *ndev,
-+				      struct net_device *br_ndev,
-+				      struct netlink_ext_ack *extack)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth *prueth = emac->prueth;
-+	int err;
-+
-+	if (!prueth->br_members) {
-+		prueth->hw_bridge_dev = br_ndev;
-+	} else {
-+		/* This is adding the port to a second bridge, this is
-+		 * unsupported
-+		 */
-+		if (prueth->hw_bridge_dev != br_ndev)
-+			return -EOPNOTSUPP;
-+	}
-+
-+	err = switchdev_bridge_port_offload(br_ndev, ndev, emac,
-+					    &prueth->prueth_switchdev_nb,
-+					    &prueth->prueth_switchdev_bl_nb,
-+					    false, extack);
-+	if (err)
-+		return err;
-+
-+	prueth->br_members |= BIT(emac->port_id);
-+
-+	if (!prueth->is_switch_mode) {
-+		if (prueth->br_members & BIT(PRUETH_PORT_MII0) &&
-+		    prueth->br_members & BIT(PRUETH_PORT_MII1)) {
-+			prueth->is_switch_mode = true;
-+			prueth->default_vlan = 1;
-+			emac->port_vlan = prueth->default_vlan;
-+			icssg_enable_switch_mode(prueth);
-+		}
-+	}
-+
-+	prueth_offload_fwd_mark_update(prueth);
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static void prueth_netdevice_port_unlink(struct net_device *ndev)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth *prueth = emac->prueth;
-+
-+	prueth->br_members &= ~BIT(emac->port_id);
-+
-+	if (prueth->is_switch_mode) {
-+		prueth->is_switch_mode = false;
-+		emac->port_vlan = 0;
-+		prueth_emac_restart(prueth);
-+	}
-+
-+	prueth_offload_fwd_mark_update(prueth);
-+
-+	if (!prueth->br_members)
-+		prueth->hw_bridge_dev = NULL;
-+}
-+
-+/* netdev notifier */
-+static int prueth_netdevice_event(struct notifier_block *unused,
-+				  unsigned long event, void *ptr)
-+{
-+	struct netlink_ext_ack *extack = netdev_notifier_info_to_extack(ptr);
-+	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
-+	struct netdev_notifier_changeupper_info *info;
-+	int ret = NOTIFY_DONE;
-+
-+	if (ndev->netdev_ops != &emac_netdev_ops)
-+		return NOTIFY_DONE;
-+
-+	switch (event) {
-+	case NETDEV_CHANGEUPPER:
-+		info = ptr;
-+
-+		if (netif_is_bridge_master(info->upper_dev)) {
-+			if (info->linking)
-+				ret = prueth_netdevice_port_link(ndev, info->upper_dev, extack);
-+			else
-+				prueth_netdevice_port_unlink(ndev);
-+		}
-+		break;
-+	default:
-+		return NOTIFY_DONE;
-+	}
-+
-+	return notifier_from_errno(ret);
-+}
-+
-+static int prueth_register_notifiers(struct prueth *prueth)
-+{
-+	int ret = 0;
-+
-+	prueth->prueth_netdevice_nb.notifier_call = &prueth_netdevice_event;
-+	ret = register_netdevice_notifier(&prueth->prueth_netdevice_nb);
-+	if (ret) {
-+		dev_err(prueth->dev, "can't register netdevice notifier\n");
-+		return ret;
-+	}
-+
-+	ret = prueth_switchdev_register_notifiers(prueth);
-+	if (ret)
-+		unregister_netdevice_notifier(&prueth->prueth_netdevice_nb);
-+
-+	return ret;
-+}
-+
-+static void prueth_unregister_notifiers(struct prueth *prueth)
-+{
-+	prueth_switchdev_unregister_notifiers(prueth);
-+	unregister_netdevice_notifier(&prueth->prueth_netdevice_nb);
-+}
-+
- static int prueth_probe(struct platform_device *pdev)
- {
- 	struct device_node *eth_node, *eth_ports_node;
-@@ -956,6 +1173,9 @@ static int prueth_probe(struct platform_device *pdev)
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 0fc5fe564ae5..69606c8081a3 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -4655,10 +4655,8 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
+ 		rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
  	}
  
- 	msmc_ram_size = MSMC_RAM_SIZE;
-+	prueth->is_switchmode_supported = prueth->pdata.switch_mode;
-+	if (prueth->is_switchmode_supported)
-+		msmc_ram_size = MSMC_RAM_SIZE_SWITCH_MODE;
+-	if (napi_schedule_prep(&tp->napi)) {
+-		rtl_irq_disable(tp);
+-		__napi_schedule(&tp->napi);
+-	}
++	rtl_irq_disable(tp);
++	napi_schedule(&tp->napi);
+ out:
+ 	rtl_ack_events(tp, status);
  
- 	/* NOTE: FW bug needs buffer base to be 64KB aligned */
- 	prueth->msmcram.va =
-@@ -1051,6 +1271,14 @@ static int prueth_probe(struct platform_device *pdev)
- 		phy_attached_info(prueth->emac[PRUETH_MAC1]->ndev->phydev);
- 	}
- 
-+	if (prueth->is_switchmode_supported) {
-+		ret = prueth_register_notifiers(prueth);
-+		if (ret)
-+			goto netdev_unregister;
-+
-+		sprintf(prueth->switch_id, "%s", dev_name(dev));
-+	}
-+
- 	dev_info(dev, "TI PRU ethernet driver initialized: %s EMAC mode\n",
- 		 (!eth0_node || !eth1_node) ? "single" : "dual");
- 
-@@ -1120,6 +1348,8 @@ static void prueth_remove(struct platform_device *pdev)
- 	struct device_node *eth_node;
- 	int i;
- 
-+	prueth_unregister_notifiers(prueth);
-+
- 	for (i = 0; i < PRUETH_NUM_MACS; i++) {
- 		if (!prueth->registered_netdevs[i])
- 			continue;
-@@ -1161,10 +1391,12 @@ static void prueth_remove(struct platform_device *pdev)
- static const struct prueth_pdata am654_icssg_pdata = {
- 	.fdqring_mode = K3_RINGACC_RING_MODE_MESSAGE,
- 	.quirk_10m_link_issue = 1,
-+	.switch_mode = 1,
- };
- 
- static const struct prueth_pdata am64x_icssg_pdata = {
- 	.fdqring_mode = K3_RINGACC_RING_MODE_RING,
-+	.switch_mode = 1,
- };
- 
- static const struct of_device_id prueth_dt_match[] = {
 -- 
-2.34.1
+2.45.0
 
 
