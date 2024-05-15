@@ -1,196 +1,221 @@
-Return-Path: <netdev+bounces-96549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B01828C66A0
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:56:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB958C6690
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:54:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C1981F22F83
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:56:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8DED283DBD
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3CCF12A158;
-	Wed, 15 May 2024 12:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ACD284D14;
+	Wed, 15 May 2024 12:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="abbjIaF0"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Qru3J4zy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156C412A14C;
-	Wed, 15 May 2024 12:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68DB84D22
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 12:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715777688; cv=none; b=ZPQs56phd+qaMw+rKkVlPQFs1GCisu04RiQTtWOeTpJM7mMNAxp+1pUKKRIuMh8kOtHFq/rclWBlgDfEt5Ebm/d/It3Rq+ojFnZ/miEIjHT+e0l0AbdvilwOP7/E5z7LA2vn/dTSDkat/aaMteoys+en5ENirdbtZND1GU4a/7A=
+	t=1715777654; cv=none; b=V21Ywnrhkt5sxLigV2pWIg2hVgh+FTwHpBO3KxME/0Xpfp7zbw0iw/UgRqQtLTuOYM+SNT6nkMpOP6pzyUk6G28fqsDQMlGPNEspduNEUC8Z9YWlftL1Q4VV632HNEceaA2/20Z4N9k40I1nsR/jykKaB7dPeVf9lbIFgmNFd60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715777688; c=relaxed/simple;
-	bh=BwJptKrYjAbKhxsaZQSlX4GaCMh473E6P/Oc3sa5jBg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eGukuESUSM/IQRhg6II/IENxMyn5nAajc7BCe2NIlC32Mz0KbgUofnm12zCnLW2kDqoPyszBHD6kElmA3r3HWl40xEcZXW6OX8ITc2YrOBb84qfVuMGAORlWXH5ZMS8F3r4MYw32w5LgUNs+rlLJRf+kED9cVdi4j+igO7xJFSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=abbjIaF0; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44F7nSqc020198;
-	Wed, 15 May 2024 12:54:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2023-11-20;
- bh=s0o7+CZvTIXe6mctHjZROAylxKEWHdEvfBwqKM9aQ9o=;
- b=abbjIaF0AwNIVU8KK/hiL64wblA/l9agjjV6C+0tS4HXrSL4j9ZCQ9KNzp0CkxGnStWY
- 4ze8kyDLHTdTGBJoS4omt00OUHuH6EP/D3H7dzTpM3EdkJmj4JTul1DLpiBCzusrMfDX
- Vlk7CTCOBk11ZJN5E0Q+GXgGnUi6C6Gy0wGCqtTT56EfwSuGz3W4Fho1nZWe1OGurpBE
- TgSMh8GZ/umtuGjljh4PPDFVyKRsludETde96qiHo0woiJeZ7wf9Q8HgG2H7+/KH0a/w
- Y+Ei6JIwpj0KSz32mBq/+qGebYmzfxc403btMpNWZMuG+mxUHJS9G/rfQWS+E7oU26T5 /g== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3y3rh7d68a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 15 May 2024 12:54:18 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 44FCoUj7038301;
-	Wed, 15 May 2024 12:54:17 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3y24pxgv26-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 15 May 2024 12:54:17 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44FCmlrp038458;
-	Wed, 15 May 2024 12:54:16 GMT
-Received: from lab61.no.oracle.com (lab61.no.oracle.com [10.172.144.82])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3y24pxgud9-7;
-	Wed, 15 May 2024 12:54:15 +0000
-From: =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>
-To: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-        Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Tejun Heo <tj@kernel.org>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Allison Henderson <allison.henderson@oracle.com>,
-        Manjunath Patil <manjunath.b.patil@oracle.com>,
-        Mark Zhang <markzhang@nvidia.com>,
-        =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Shiraz Saleem <shiraz.saleem@intel.com>,
-        Yang Li <yang.lee@linux.alibaba.com>
-Subject: [PATCH v2 6/6] net/mlx5: Brute force GFP_NOIO
-Date: Wed, 15 May 2024 14:53:42 +0200
-Message-Id: <20240515125342.1069999-7-haakon.bugge@oracle.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240515125342.1069999-1-haakon.bugge@oracle.com>
-References: <20240515125342.1069999-1-haakon.bugge@oracle.com>
+	s=arc-20240116; t=1715777654; c=relaxed/simple;
+	bh=fa0lk4wrnn3s5FADJjPgnJrV+uzfIIxTSfTO+n9aVOI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TDC8id96LZrYY30nAxHK/hw+2ZI6DRcCRbxbBdfCT2U04FuHeijp+pvq/3oSMuX0cn7fOOa6J4YEY76vsp0lfBNnUH6Li04cA7lmRkCVXyhBiC4/aYGNF9rNOxPDSMvFFZoT2Qo+QVGF7tI3jY9AtsjJMMZOarRKpOi/igkiKkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Qru3J4zy; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-34d7b0dac54so3940344f8f.0
+        for <netdev@vger.kernel.org>; Wed, 15 May 2024 05:54:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715777650; x=1716382450; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=399YWrOQm2u/X7iwRgitAignXFxnAABjsBtmCgGDs6o=;
+        b=Qru3J4zy2tBxa1HUOCFfXYdLB7V1WzuiloDhH3saLmb26QHg0e9mhLNSo4s83Oi9Ht
+         XBgxPMJgzYeVkPLIs0fw5BNlhgTwgYMz1P0gc3ULkEtm1+2Moiz1PW09FTJFiJGWvhna
+         nrhuuvjjYaBDfl84nPWaGYIQKfz8clWhxO99onmDW3IWQTDsdqlM8HEAQSfz2KhlArsa
+         B38jTbp4COJH3HdeW9shvnt6VeOM04cInne2TFtna5ddzhWmYrMosMlRMj0Ya6+0zrd8
+         yYLNhQPBi+3v88UjukamAA4l0CTBDmXWRPvMujLW+O9fCnGRJLTAjGoRycAo8UDlUF4C
+         d3fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715777650; x=1716382450;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=399YWrOQm2u/X7iwRgitAignXFxnAABjsBtmCgGDs6o=;
+        b=P8bNjo7/725F8rs33abDx2JlcfKwXHBlqyI3NHgeO0vJXbI4c4HLBOdAVUgbKtMRiG
+         OZVksfmHuFlqWHe9KX3ir/dVGMJCUqG6Q1VnBfmuXpayzZv+nCcKnozytymwwGRTpfPp
+         Fd5ESIUTknuybPtd3z/NmHIxf0BOi/f41W50hJPiiJtSytjBU38oHe5baDMAqhAZI7BQ
+         O+0ROuOGRSyymG26BMoBUfg7BEevtyuNe9/jZ4S/jvRVYmbPY9rtbCG84AYjfTk7ZQHW
+         BpCpGkBVujOOIgL7E1XRzdobwfr/kJHD1GUbvDzP/iMWIObOYcprZ1DnuM3kcus172y1
+         Q3Jg==
+X-Gm-Message-State: AOJu0Yz3HWq/RBkXl9vP5t8mU5FDMJajZRbF5OyA4UGL8FByz1OpXHmK
+	QcRPBWmw1wBD64KnZ9/XLevPRjiZfBKszKOivFKitg/fe8obOvDmvURWm4b9+FgD3rVvb843aKr
+	5
+X-Google-Smtp-Source: AGHT+IE4YrrtRuAFNWww2vR5w1DpfKkKPKDKWLHkD81iqzTV9ozJs4BXxNZfFL3AHXUrn1Eq821Dfw==
+X-Received: by 2002:a5d:6e0b:0:b0:34c:cae0:c989 with SMTP id ffacd0b85a97d-35049bbf662mr14131125f8f.33.1715777649820;
+        Wed, 15 May 2024 05:54:09 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b79bc3bsm16388034f8f.13.2024.05.15.05.54.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 May 2024 05:54:09 -0700 (PDT)
+Date: Wed, 15 May 2024 14:54:05 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com
+Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
+Message-ID: <ZkSwbaA74z1QwwJz@nanopsycho.orion>
+References: <20240509084050-mutt-send-email-mst@kernel.org>
+ <ZjzQTFq5lJIoeSqM@nanopsycho.orion>
+ <20240509102643-mutt-send-email-mst@kernel.org>
+ <Zj3425_gSqHByw-R@nanopsycho.orion>
+ <20240510065121-mutt-send-email-mst@kernel.org>
+ <Zj4A9XY7z-TzEpdz@nanopsycho.orion>
+ <20240510072431-mutt-send-email-mst@kernel.org>
+ <ZkRlcBU0Nb3O-Kg1@nanopsycho.orion>
+ <20240515041909-mutt-send-email-mst@kernel.org>
+ <ZkSKo1npMxCVuLfT@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-15_06,2024-05-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0 mlxscore=0
- spamscore=0 phishscore=0 suspectscore=0 mlxlogscore=999 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2405150090
-X-Proofpoint-ORIG-GUID: N-dzc11NI8Kv6kMPLKg5cydwUWlPdkj4
-X-Proofpoint-GUID: N-dzc11NI8Kv6kMPLKg5cydwUWlPdkj4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZkSKo1npMxCVuLfT@nanopsycho.orion>
 
-In mlx5_core_init(), we call memalloc_noio_{save,restore} in a parenthetic
-fashion when enabled by the module parameter force_noio.
+Wed, May 15, 2024 at 12:12:51PM CEST, jiri@resnulli.us wrote:
+>Wed, May 15, 2024 at 10:20:04AM CEST, mst@redhat.com wrote:
+>>On Wed, May 15, 2024 at 09:34:08AM +0200, Jiri Pirko wrote:
+>>> Fri, May 10, 2024 at 01:27:08PM CEST, mst@redhat.com wrote:
+>>> >On Fri, May 10, 2024 at 01:11:49PM +0200, Jiri Pirko wrote:
+>>> >> Fri, May 10, 2024 at 12:52:52PM CEST, mst@redhat.com wrote:
+>>> >> >On Fri, May 10, 2024 at 12:37:15PM +0200, Jiri Pirko wrote:
+>>> >> >> Thu, May 09, 2024 at 04:28:12PM CEST, mst@redhat.com wrote:
+>>> >> >> >On Thu, May 09, 2024 at 03:31:56PM +0200, Jiri Pirko wrote:
+>>> >> >> >> Thu, May 09, 2024 at 02:41:39PM CEST, mst@redhat.com wrote:
+>>> >> >> >> >On Thu, May 09, 2024 at 01:46:15PM +0200, Jiri Pirko wrote:
+>>> >> >> >> >> From: Jiri Pirko <jiri@nvidia.com>
+>>> >> >> >> >> 
+>>> >> >> >> >> Add support for Byte Queue Limits (BQL).
+>>> >> >> >> >> 
+>>> >> >> >> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>>> >> >> >> >
+>>> >> >> >> >Can we get more detail on the benefits you observe etc?
+>>> >> >> >> >Thanks!
+>>> >> >> >> 
+>>> >> >> >> More info about the BQL in general is here:
+>>> >> >> >> https://lwn.net/Articles/469652/
+>>> >> >> >
+>>> >> >> >I know about BQL in general. We discussed BQL for virtio in the past
+>>> >> >> >mostly I got the feedback from net core maintainers that it likely won't
+>>> >> >> >benefit virtio.
+>>> >> >> 
+>>> >> >> Do you have some link to that, or is it this thread:
+>>> >> >> https://lore.kernel.org/netdev/21384cb5-99a6-7431-1039-b356521e1bc3@redhat.com/
+>>> >> >
+>>> >> >
+>>> >> >A quick search on lore turned up this, for example:
+>>> >> >https://lore.kernel.org/all/a11eee78-b2a1-3dbc-4821-b5f4bfaae819@gmail.com/
+>>> >> 
+>>> >> Says:
+>>> >> "Note that NIC with many TX queues make BQL almost useless, only adding extra
+>>> >>  overhead."
+>>> >> 
+>>> >> But virtio can have one tx queue, I guess that could be quite common
+>>> >> configuration in lot of deployments.
+>>> >
+>>> >Not sure we should worry about performance for these though.
+>>> >What I am saying is this should come with some benchmarking
+>>> >results.
+>>> 
+>>> I did some measurements with VDPA, backed by ConnectX6dx NIC, single
+>>> queue pair:
+>>> 
+>>> super_netperf 200 -H $ip -l 45 -t TCP_STREAM &
+>>> nice -n 20 netperf -H $ip -l 10 -t TCP_RR
+>>> 
+>>> RR result with no bql:
+>>> 29.95
+>>> 32.74
+>>> 28.77
+>>> 
+>>> RR result with bql:
+>>> 222.98
+>>> 159.81
+>>> 197.88
+>>> 
+>>
+>>Okay. And on the other hand, any measureable degradation with
+>>multiqueue and when testing throughput?
+>
+>With multiqueue it depends if the flows hits the same queue or not. If
+>they do, the same results will likely be shown.
 
-This in order to conditionally enable mlx5_core to work aligned with
-I/O devices. Any work queued later on work-queues created during
-module initialization will inherit the PF_MEMALLOC_{NOIO,NOFS}
-flag(s), due to commit ("workqueue: Inherit NOIO and NOFS alloc
-flags").
+RR 1q, w/o bql:
+29.95
+32.74
+28.77
 
-We do this in order to enable ULPs using the RDMA stack and the
-mlx5_core driver to be used as a network block I/O device. This to
-support a filesystem on top of a raw block device which uses said
-ULP(s) and the RDMA stack as the network transport layer.
+RR 1q, with bql:
+222.98
+159.81
+197.88
 
-Under intense memory pressure, we get memory reclaims. Assume the
-filesystem reclaims memory, goes to the raw block device, which calls
-into the ULP in question, which calls the RDMA stack. Now, if regular
-GFP_KERNEL allocations in ULP or the RDMA stack require reclaims to be
-fulfilled, we end up in a circular dependency.
+RR 4q, w/o bql:
+355.82
+364.58
+233.47
 
-We break this circular dependency by:
+RR 4q, with bql:
+371.19
+255.93
+337.77
 
-1. Force all allocations in the ULP and the relevant RDMA stack to use
-   GFP_NOIO, by means of a parenthetic use of
-   memalloc_noio_{save,restore} on all relevant entry points.
+So answer to your question is: "no measurable degradation with 4
+queues".
 
-2. Make sure work-queues inherits current->flags
-   wrt. PF_MEMALLOC_{NOIO,NOFS}, such that work executed on the
-   work-queue inherits the same flag(s).
 
-Signed-off-by: Håkon Bugge <haakon.bugge@oracle.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/main.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-index 331ce47f51a17..aa1bf8bb5d15c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-@@ -48,6 +48,7 @@
- #include <linux/mlx5/vport.h>
- #include <linux/version.h>
- #include <net/devlink.h>
-+#include <linux/sched/mm.h>
- #include "mlx5_core.h"
- #include "lib/eq.h"
- #include "fs_core.h"
-@@ -87,6 +88,10 @@ static unsigned int prof_sel = MLX5_DEFAULT_PROF;
- module_param_named(prof_sel, prof_sel, uint, 0444);
- MODULE_PARM_DESC(prof_sel, "profile selector. Valid range 0 - 2");
- 
-+static bool mlx5_core_force_noio;
-+module_param_named(force_noio, mlx5_core_force_noio, bool, 0444);
-+MODULE_PARM_DESC(force_noio, "Force the use of GFP_NOIO (Y/N)");
-+
- static u32 sw_owner_id[4];
- #define MAX_SW_VHCA_ID (BIT(__mlx5_bit_sz(cmd_hca_cap_2, sw_vhca_id)) - 1)
- static DEFINE_IDA(sw_vhca_ida);
-@@ -2312,8 +2317,12 @@ static void mlx5_core_verify_params(void)
- 
- static int __init mlx5_init(void)
- {
-+	unsigned int noio_flags;
- 	int err;
- 
-+	if (mlx5_core_force_noio)
-+		noio_flags = memalloc_noio_save();
-+
- 	WARN_ONCE(strcmp(MLX5_ADEV_NAME, KBUILD_MODNAME),
- 		  "mlx5_core name not in sync with kernel module name");
- 
-@@ -2334,7 +2343,7 @@ static int __init mlx5_init(void)
- 	if (err)
- 		goto err_pci;
- 
--	return 0;
-+	goto out;
- 
- err_pci:
- 	mlx5_sf_driver_unregister();
-@@ -2342,6 +2351,9 @@ static int __init mlx5_init(void)
- 	mlx5e_cleanup();
- err_debug:
- 	mlx5_unregister_debugfs();
-+out:
-+	if (mlx5_core_force_noio)
-+		memalloc_noio_restore(noio_flags);
- 	return err;
- }
- 
--- 
-2.45.0
-
+>
+>
+>>
+>>
+>>> 
+>>> >
+>>> >
+>>> >> 
+>>> >> >
+>>> >> >
+>>> >> >
+>>> >> >
+>>> >> >> I don't see why virtio should be any different from other
+>>> >> >> drivers/devices that benefit from bql. HOL blocking is the same here are
+>>> >> >> everywhere.
+>>> >> >> 
+>>> >> >> >
+>>> >> >> >So I'm asking, what kind of benefit do you observe?
+>>> >> >> 
+>>> >> >> I don't have measurements at hand, will attach them to v2.
+>>> >> >> 
+>>> >> >> Thanks!
+>>> >> >> 
+>>> >> >> >
+>>> >> >> >-- 
+>>> >> >> >MST
+>>> >> >> >
+>>> >> >
+>>> >
+>>
 
