@@ -1,93 +1,136 @@
-Return-Path: <netdev+bounces-96584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02B848C68D2
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:34:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECB9F8C68EC
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:41:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB086281AA4
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:34:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 221CF1C20F85
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:41:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01461155733;
-	Wed, 15 May 2024 14:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 701AD155727;
+	Wed, 15 May 2024 14:41:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nZpLk0vF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WlGXC00U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C794315572E;
-	Wed, 15 May 2024 14:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F281553A8
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 14:41:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715783682; cv=none; b=t1896TA9WDXY3wQB2Nd+Tz6nlRVsPx3HkVF7Vicai/NEVYjwZvAA9a1Dzngwx+0auzFIzAUP/n3us+e7DkZZHDHj4+FUUNQKTr6ERjv3YuwIaBmra6DniLA6KywhUB/268mAuKlUpyK2Wph0AT8MR8haVB2qpzArv1ZZ596Au2g=
+	t=1715784078; cv=none; b=acbYbJ28i6W7UXMuz/fleYgA6U0eTxrXjBt4DxItWPeyzllAl+mkVFAoXNX56QjEHgKQZ9LY02wwYkefHd0xOAYDp/lWkm/r/Sa7DXyD20mv7+tl5zA4Q7a5cHSBbNnapqtsQB7rnYyoPmR0ICxJqtwBTxw6Q7OabiD6SyeNxoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715783682; c=relaxed/simple;
-	bh=3kDYWvufU5LSKxYoN0RemwT7hW2iNiWwqCnq6/jg+iY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JODMHRLD6R+qUloxmdJTgWzTCWsxAXwYmrFMdfUv+UCRmzCoiehwi//DgYy/D6w2gqWjhKOBji38KOluk/h4LUQuGetTHFohT6ZpvhVncEArQWepUiJ0CvaVwAWvfzoW2h2QNsygcSe/ZI3/70APMYafLY26YCrxCBmaHr+ETqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nZpLk0vF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8C21EC4AF13;
-	Wed, 15 May 2024 14:34:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715783682;
-	bh=3kDYWvufU5LSKxYoN0RemwT7hW2iNiWwqCnq6/jg+iY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nZpLk0vF/ClttMbxwv9CrSiDaylO0t36xCpk+66TdR9pxAwPUdShPj2lmimAqzpVq
-	 9xitz36byVxZS0vcIwP3rFLnk7CcYAZAsTiyyKPflYwoui67V2kxGkF4ieYwoNOXWe
-	 y2dD+CZvGE94yxgF6w8Za4O60KipTIbULjUzewhE8f43iExlbSnhLCZ47djTKefFAq
-	 N9F+r+FOybSDisIxFsKE5BgYlrhUnL7+WTSidI+sO5yuj7obi6tmd4t26ezuTsol+P
-	 VozlZ4D3EbHF4sXEGlCEHYASoc9L+5nVFz0NblpFy3YTScA3fsU8C2Taus8rKKjKwF
-	 3mn32ndyD6pgw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7B406C54BB7;
-	Wed, 15 May 2024 14:34:42 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1715784078; c=relaxed/simple;
+	bh=Qy/VvClyjItna3Z71NC6Q0+ChyqPZvHzoT23NRjxlH4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C0Q0rsyoYkFMiXChbc5Q+FSM/KwATXwvvcytQIk9EtPpmYWHm3ZX1sy9thmrK2wlSG2/FOmbEO79IwgNUyRDQA9MzfYIYm0mmMpFJvSGGc4qUMzK+3ZB+zbkSrtuw6DN8B/3FsQX5wJfAizPH5NsBNC2PCQ7TYJY+0P7/aZmb6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WlGXC00U; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=TpZxcbD7+RJosYvywScnhUpX3neggChT3dECqogwgGc=; b=WlGXC00U4Ted/uGnpAzgEaUuaq
+	4xD0Jkkh7rslv7CWFnYnFNG7DqotfXKHo3yoQjFYgw5oCeDuVWILnGNgmnJP7R+DEFwLvD7nrGiTJ
+	swS4OJP4zNlmYN/t8SDkzBsfJFbqZsmxFxtmzdMAjWCvWotCn1aA7FaNX9qcBGiMQg3A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s7Fob-00FSSi-RW; Wed, 15 May 2024 16:41:09 +0200
+Date: Wed, 15 May 2024 16:41:09 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [RFC PATCH] net: introduce HW Rate Limiting Driver API
+Message-ID: <3130d582-a04c-4db5-b4a6-c02f213851be@lunn.ch>
+References: <3d1e2d945904a0fb55258559eb7322d7e11066b6.1715199358.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] Networking for v6.10
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171578368250.11862.10400880543348690872.git-patchwork-notify@kernel.org>
-Date: Wed, 15 May 2024 14:34:42 +0000
-References: <20240514231155.1004295-1-kuba@kernel.org>
-In-Reply-To: <20240514231155.1004295-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, davem@davemloft.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
- bpf@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3d1e2d945904a0fb55258559eb7322d7e11066b6.1715199358.git.pabeni@redhat.com>
 
-Hello:
+> + * struct net_shaper_info - represents a shaping node on the NIC H/W
+> + * @metric: Specify if the bw limits refers to PPS or BPS
+> + * @bw_min: Minimum guaranteed rate for this shaper
+> + * @bw_max: Maximum peak bw allowed for this shaper
+> + * @burst: Maximum burst for the peek rate of this shaper
+> + * @priority: Scheduling priority for this shaper
+> + * @weight: Scheduling weight for this shaper
+> + */
+> +struct net_shaper_info {
+> +	enum net_shaper_metric metric;
+> +	u64 bw_min;	/* minimum guaranteed bandwidth, according to metric */
+> +	u64 bw_max;	/* maximum allowed bandwidth */
+> +	u32 burst;	/* maximum burst in bytes for bw_max */
+> +	u32 priority;	/* scheduling strict priority */
+> +	u32 weight;	/* scheduling WRR weight*/
+> +};
 
-This pull request was applied to netdev/net-next.git (main)
-by Linus Torvalds <torvalds@linux-foundation.org>:
+...
 
-On Tue, 14 May 2024 16:11:55 -0700 you wrote:
-> Hi Linus!
-> 
-> Full disclosure I hit a KASAN OOB read warning in BPF when testing
-> on Meta's production servers (which load a lot of BPF).
-> BPF folks aren't super alarmed by it, and also they are partying at
-> LSFMM so I don't think it's worth waiting for the fix.
-> But you may feel differently...  https://pastebin.com/0fzqy3cW
-> 
-> [...]
+> +	/** set - Update the specified shaper, if it exists
+> +	 * @dev: Netdevice to operate on.
+> +	 * @handle: the shaper identifier
+> +	 * @shaper: Configuration of shaper.
+> +	 * @extack: Netlink extended ACK for reporting errors.
+> +	 *
+> +	 * Return:
+> +	 * * %0 - Success
+> +	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
+> +	 *                  or core for any reason. @extack should be set to
+> +	 *                  text describing the reason.
+> +	 * * Other negative error values on failure.
+> +	 */
+> +	int (*set)(struct net_device *dev, u32 handle,
+> +		   const struct net_shaper_info *shaper,
+> +		   struct netlink_ext_ack *extack);
 
-Here is the summary with links:
-  - [GIT,PULL] Networking for v6.10
-    https://git.kernel.org/netdev/net-next/c/1b294a1f3561
+> + * net_shaper_make_handle - creates an unique shaper identifier
+> + * @scope: the shaper scope
+> + * @vf: virtual function number
+> + * @id: queue group or queue id
+> + *
+> + * Return: an unique identifier for the shaper
+> + *
+> + * Combines the specified arguments to create an unique identifier for
+> + * the shaper.
+> + * The virtual function number is only used within @NET_SHAPER_SCOPE_VF,
+> + * @NET_SHAPER_SCOPE_QUEUE_GROUP and @NET_SHAPER_SCOPE_QUEUE.
+> + * The @id number is only used for @NET_SHAPER_SCOPE_QUEUE_GROUP and
+> + * @NET_SHAPER_SCOPE_QUEUE, and must be, respectively, the queue group
+> + * identifier or the queue number.
+> + */
+> +u32 net_shaper_make_handle(enum net_shaper_scope scope, int vf, int id);
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+One thing i'm missing here is a function which does the opposite of
+net_shaper_make_handle(). Given a handle, it returns the scope, vf and
+the id.
 
+When the set() op is called, i somehow need to find the software
+instance representing the hardware block. If i know the id, it is just
+an array access. Otherwise i need additional bookkeeping, maybe a
+linked list of handles and pointers to structures etc.
+
+Or net_shaper_make_handle() could maybe take an addition void * priv,
+and provide a function void * net_shape_priv(u32 handle);
+
+    Andrew
 
 
