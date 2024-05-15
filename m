@@ -1,131 +1,203 @@
-Return-Path: <netdev+bounces-96657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2510F8C6EDE
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 01:03:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5F68C6F1C
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 01:21:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFC2428280B
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 23:03:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 300F21C21396
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 23:21:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F954086A;
-	Wed, 15 May 2024 23:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7934C627;
+	Wed, 15 May 2024 23:21:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fBW12Ns/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghnZU6Lo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A36A93FBA7;
-	Wed, 15 May 2024 23:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328353C48E;
+	Wed, 15 May 2024 23:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715814195; cv=none; b=jLc+ZuAv692gkX81bphfNXcMlDg5LNXHgqxBGOuHu55zrpWhAFYhA5/bCuJLH/0N7oyJttb2DR9WEnKIX4pNmEAq9oVGyA99rUynYDF7hzg/VyiQ8AK+KPl8zJgzvz8AqvkEU0V2vwJTcf51aPwpAMvuIGS+ak5n9KDbrFnjC7A=
+	t=1715815294; cv=none; b=XwPPGvRYFRorT4+T54DCASVXcIeQpNxMNtjaJrso7BhCHQ0UP3oIO2yrJ2thkGKhLNQzaBXO2/u1byrqhmFlyuRLfkl3bFkuCDzpRKToTjAYF1RPixtY5CgspuiiX/2nZ+W49rrAk0oS4+1rZZhoBd7gkiH78CMrA4SLycaVoUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715814195; c=relaxed/simple;
-	bh=sRqB680VTQvj7fzPc84hv8BNalE+uhs8Ck1nsl+35K4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UEiFsELsOVKHu9r3kzMOmxwmxfKq1EM9WWTQW5EOcXDFZImhvICJ6Oh5g9zlF2AIYw1glXsba8ZLMYtO+XoKrnqX1n6vZHMbxay8+b0bxNCN5YtYuprWhueJ6tItp1FF8/kne1vSdAMmaLkGEaulO5EDzXscdAbAleh7bFHT4r8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fBW12Ns/; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715814193; x=1747350193;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=sRqB680VTQvj7fzPc84hv8BNalE+uhs8Ck1nsl+35K4=;
-  b=fBW12Ns/l/R/HXN04kR3gWCtmxqfjmOYAriISI5FUMjXaav1QmknaQt2
-   ONw6Bk+PeyFxMJeNLiBxIO0Pjx32Z1EG/00GuvdsODbJEGBJXcpmhnvzG
-   V7AXgW8kkqxzCYHbXLtPBbsdtNHNlXgegiZULbkJ4BSBch+ucOAz7nbVb
-   HcUP7izg1uMh8LOBDMHQHECS+xVEOQscCBOIByx+DIUZkGyyHIFWR3JzJ
-   8d2domGYjDIHLjNfpJOYyK4L9r1cGdja4V/4DIJcfmUt4DQzphfsE9ijT
-   gENst+hqCFBGgT7utOgPvNQXW/vGQ+KI7DWBO2OiH47bBa7sbt+mhomMw
-   g==;
-X-CSE-ConnectionGUID: PlXFYgTlRB6N6bYrMAY+Kw==
-X-CSE-MsgGUID: 4rqEAhh8TA62Wh1uWzudmA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="12019056"
-X-IronPort-AV: E=Sophos;i="6.08,162,1712646000"; 
-   d="scan'208";a="12019056"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2024 16:03:12 -0700
-X-CSE-ConnectionGUID: /y/vCtaLSxi9YEwbpTT0qA==
-X-CSE-MsgGUID: Sg5o04ROTVaneSLM+lXQ7Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,162,1712646000"; 
-   d="scan'208";a="35779249"
-Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 15 May 2024 16:03:10 -0700
-Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s7NeN-000DKq-34;
-	Wed, 15 May 2024 23:03:07 +0000
-Date: Thu, 16 May 2024 07:02:46 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ronak Doshi <ronak.doshi@broadcom.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Ronak Doshi <ronak.doshi@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/4] vmxnet3: add latency measurement support in
- vmxnet3
-Message-ID: <202405160624.WdmYFkNm-lkp@intel.com>
-References: <20240514182050.20931-3-ronak.doshi@broadcom.com>
+	s=arc-20240116; t=1715815294; c=relaxed/simple;
+	bh=87pAH5rgJ9duXfdK2NawbTwlmgvDGgI55KthCb1lDmk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WsAf9pKtgegoYk65MtyaPByqf3yNNQCXWJchG+kYk4VfsJ+FjYFGZy+mgxFZctfJ+8kTrrkoAnadqLBjXcEt7UiuH7U9J4O2HjqPDs2sx+IILzpXQh340tYU2bTVj9dnqS+TjM4P8rDAwKolQeA7ySWXc+sxQR7+3qwfld6QyH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ghnZU6Lo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D31EC116B1;
+	Wed, 15 May 2024 23:21:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715815293;
+	bh=87pAH5rgJ9duXfdK2NawbTwlmgvDGgI55KthCb1lDmk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ghnZU6LoTFF6lwPJXdDDnAfS7ApnRky1jXlgI4CC5+L+mel7zKhwzfBMTzqFaceXS
+	 5pHhj8uFQGm3sxvfc1TQHr7hr7iupgkb7U5FCcVc44vWpBQyzxLC+KG0hJXmdfSxcJ
+	 xhHLHqkv8U3QWQCDnhocE/S7BdAQDItKNb195m6/VbMhxLOtYDCPpw6KzDz/ObK5fC
+	 y4jfx3Az2HZpIAjsnHZu5US+yFcQrqW+0ALyc63oVWEHSAXCNcs1RfZyqL9yMCJ+xL
+	 HOeuuwXjyzquFJlV2DYJTXGSY65reg8EPzuEmi8MNCLE+Ey/S7i5VPr8fP+oYXXevZ
+	 +ns0c2p+ly4dw==
+Date: Wed, 15 May 2024 16:21:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <vladimir.oltean@nxp.com>, <shuah@kernel.org>,
+ <liuhangbin@gmail.com>, <bpoirier@nvidia.com>,
+ <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next] selftests: net: local_termination: annotate
+ the expected failures
+Message-ID: <20240515162132.476a6b43@kernel.org>
+In-Reply-To: <87y18bju1n.fsf@nvidia.com>
+References: <20240509235553.5740-1-kuba@kernel.org>
+	<875xvhu97r.fsf@nvidia.com>
+	<20240514174321.376039a5@kernel.org>
+	<87y18bju1n.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240514182050.20931-3-ronak.doshi@broadcom.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Hi Ronak,
+On Wed, 15 May 2024 11:02:28 +0200 Petr Machata wrote:
+> >> And then either replace the existing xfail_on_veth's (there are just a
+> >> handful) or convert xfail_on_veth to a wrapper around xfail_on_kind. =
+=20
+> >
+> > I think the bridge thing we can workaround by just checking
+> > if ${NETIFS[p1]} is veth, rather than $rcv_if_name.
+> > Since the two behave the same. =20
+>=20
+> I don't follow. The test has two legs, one creates a VRF and attaches
+> p2, the other creates a bridge and attaches p2. Whether p1 and p2 are
+> veth or HW seems orthogonal to whether $rcv_if_name is a bridge or a
+> veth.
 
-kernel test robot noticed the following build errors:
+Right, my superficial understanding was that the main distinction is
+whether p2/h2 can do the filtering (or possibly some offload happens).
+So if p1,p2 are veths we know to XFAIL, doesn't matter if we're in=20
+the vrf or bridge configuration, cause these construct will not filter
+either.
 
-[auto build test ERROR on net-next/main]
+If I'm not making sense - I'm probably confused, I can code up what you
+suggested, it will work, just more LoC :)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ronak-Doshi/vmxnet3-prepare-for-version-9-changes/20240515-023833
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240514182050.20931-3-ronak.doshi%40broadcom.com
-patch subject: [PATCH net-next 2/4] vmxnet3: add latency measurement support in vmxnet3
-config: csky-randconfig-r081-20240516 (https://download.01.org/0day-ci/archive/20240516/202405160624.WdmYFkNm-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240516/202405160624.WdmYFkNm-lkp@intel.com/reproduce)
+--->8------
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405160624.WdmYFkNm-lkp@intel.com/
+=46rom 7a645eb425530f647e88590ba7ba01681e73812e Mon Sep 17 00:00:00 2001
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Thu, 9 May 2024 16:28:41 -0700
+Subject: selftests: net: local_termination: annotate the expected failures
 
-All errors (new ones prefixed by >>):
+Vladimir said when adding this test:
 
-   In function 'vmxnet3_get_cycles',
-       inlined from 'vmxnet3_rq_rx_complete' at drivers/net/vmxnet3/vmxnet3_drv.c:1675:25:
->> drivers/net/vmxnet3/vmxnet3_drv.c:151:9: error: impossible constraint in 'asm'
-     151 |         asm volatile("rdpmc" : "=a" (low), "=d" (high) : "c" (pmc));
-         |         ^~~
+  The bridge driver fares particularly badly [...] mainly because
+  it does not implement IFF_UNICAST_FLT.
 
+See commit 90b9566aa5cd ("selftests: forwarding: add a test for
+local_termination.sh").
 
-vim +/asm +151 drivers/net/vmxnet3/vmxnet3_drv.c
+We don't want to hide the known gaps, but having a test which
+always fails prevents us from catching regressions. Report
+the cases we know may fail as XFAIL.
 
-   145	
-   146	static u64
-   147	vmxnet3_get_cycles(int pmc)
-   148	{
-   149		u32 low, high;
-   150	
- > 151		asm volatile("rdpmc" : "=a" (low), "=d" (high) : "c" (pmc));
-   152		return (low | ((u_int64_t)high << 32));
-   153	}
-   154	
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: liuhangbin@gmail.com
+CC: shuah@kernel.org
+CC: linux-kselftest@vger.kernel.org
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+v2:
+ - remove duplicated log_test_xfail
+v1: https://lore.kernel.org/all/20240509235553.5740-1-kuba@kernel.org/
+---
+ tools/testing/selftests/net/forwarding/lib.sh       |  7 +++++++
+ .../selftests/net/forwarding/local_termination.sh   | 13 ++++++++-----
+ 2 files changed, 15 insertions(+), 5 deletions(-)
+
+diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/=
+selftests/net/forwarding/lib.sh
+index 112c85c35092..79aa3c8bc288 100644
+--- a/tools/testing/selftests/net/forwarding/lib.sh
++++ b/tools/testing/selftests/net/forwarding/lib.sh
+@@ -473,6 +473,13 @@ ret_set_ksft_status()
+ # Whether FAILs should be interpreted as XFAILs. Internal.
+ FAIL_TO_XFAIL=3D
+=20
++# Clear internal failure tracking for the next test case
++begin_test()
++{
++    RET=3D0
++    FAIL_TO_XFAIL=3D
++}
++
+ check_err()
+ {
+ 	local err=3D$1
+diff --git a/tools/testing/selftests/net/forwarding/local_termination.sh b/=
+tools/testing/selftests/net/forwarding/local_termination.sh
+index c5b0cbc85b3e..a241acc02498 100755
+--- a/tools/testing/selftests/net/forwarding/local_termination.sh
++++ b/tools/testing/selftests/net/forwarding/local_termination.sh
+@@ -73,9 +73,12 @@ check_rcv()
+ 	local pattern=3D$3
+ 	local should_receive=3D$4
+ 	local should_fail=3D
++	local xfail_sw=3D$5
+=20
+ 	[ $should_receive =3D true ] && should_fail=3D0 || should_fail=3D1
+-	RET=3D0
++	begin_test
++	# check if main interface is veth
++	[ "$xfail_sw" =3D=3D true ] && xfail_on_veth $h1
+=20
+ 	tcpdump_show $if_name | grep -q "$pattern"
+=20
+@@ -157,7 +160,7 @@ run_test()
+=20
+ 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address" \
+ 		"$smac > $UNKNOWN_UC_ADDR1, ethertype IPv4 (0x0800)" \
+-		false
++		false true
+=20
+ 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address, promisc" \
+ 		"$smac > $UNKNOWN_UC_ADDR2, ethertype IPv4 (0x0800)" \
+@@ -165,7 +168,7 @@ run_test()
+=20
+ 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address, allmulti" \
+ 		"$smac > $UNKNOWN_UC_ADDR3, ethertype IPv4 (0x0800)" \
+-		false
++		false true
+=20
+ 	check_rcv $rcv_if_name "Multicast IPv4 to joined group" \
+ 		"$smac > $JOINED_MACV4_MC_ADDR, ethertype IPv4 (0x0800)" \
+@@ -173,7 +176,7 @@ run_test()
+=20
+ 	check_rcv $rcv_if_name "Multicast IPv4 to unknown group" \
+ 		"$smac > $UNKNOWN_MACV4_MC_ADDR1, ethertype IPv4 (0x0800)" \
+-		false
++		false true
+=20
+ 	check_rcv $rcv_if_name "Multicast IPv4 to unknown group, promisc" \
+ 		"$smac > $UNKNOWN_MACV4_MC_ADDR2, ethertype IPv4 (0x0800)" \
+@@ -189,7 +192,7 @@ run_test()
+=20
+ 	check_rcv $rcv_if_name "Multicast IPv6 to unknown group" \
+ 		"$smac > $UNKNOWN_MACV6_MC_ADDR1, ethertype IPv6 (0x86dd)" \
+-		false
++		false true
+=20
+ 	check_rcv $rcv_if_name "Multicast IPv6 to unknown group, promisc" \
+ 		"$smac > $UNKNOWN_MACV6_MC_ADDR2, ethertype IPv6 (0x86dd)" \
+--=20
+2.45.0
+
 
