@@ -1,84 +1,117 @@
-Return-Path: <netdev+bounces-96605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D188B8C69C5
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 17:31:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E55AE8C6A33
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 18:09:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89B541F216D5
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 15:31:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 227C11C214EC
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B7B15575A;
-	Wed, 15 May 2024 15:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312F4156248;
+	Wed, 15 May 2024 16:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X9J3HCG9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n6NR1mc+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B10149DEE
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 15:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394F113EFE5;
+	Wed, 15 May 2024 16:09:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715787094; cv=none; b=RBxnl1OlNCeoXX5Gv1TNnsnYh1yqkA1MhsIcqWl0x++G2ZMuM2tc+RaWO0XFyc2LXmhkf3RgzT0PyX+q1gxC6+kp0ghHKfQjL+h8iONY8nBq8pgt7RWsrXQHEFyLGnxbeVbCyngnTS6dCUOmYEo3b8IFmKpFKsCjmHebQ+g5SA4=
+	t=1715789358; cv=none; b=aLmv7qbwAN4POs+bBJRlSkoVHaiDoO0Ga42pnPWCOp0ad/UvL4sARHK1rk0PKNvE44TZkpF8pvOHH4haG0PVuYguEzYovU9fMS63oZ8PQUF56rxbCTIPbbI0vRIS3TArKuwRGpkgRP1I91uyzfqoRRxKfhlTYxlZlBI8L0DJX5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715787094; c=relaxed/simple;
-	bh=77ytUDYWnryGCErzSsaUzWktmtB9aQWry3aROJ9oCZc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XcNXD+ul4CH+2fLG1TPlXC+io5hkkQTs1xoL2r2QO2hOc3nElKB81CFHk0BDWrqFEw6KzwuPJ5VfVDCEBFZm02r1xmq7AYsqmQd3F9z3WlyFAzeXE8ACsOVT8nyEYbdke7H5q99Euj996tuwSV2dPF4PzC6qpw0fpL4yOS8B7+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X9J3HCG9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21966C2BD11;
-	Wed, 15 May 2024 15:31:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715787094;
-	bh=77ytUDYWnryGCErzSsaUzWktmtB9aQWry3aROJ9oCZc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X9J3HCG9FOreOPSQz1yLQgpXgx11CpWIQR117xtSQEsjFh3WjDeH29vacxaiPUgsN
-	 RNTIrbEcR+mj32djjnVfhBBvNoDBlT5aZcBLbIlI0xCDzbEAzVLKIGXGSS50nbvJwi
-	 eYaior8xgE2uImm010WVfIqssg4vDg9D26tDu2tczYQ5NLoq4E6JTYMVl0NF/saS5e
-	 Xl6n40Y8lbQOPOVrOJZiZFEaSr04aPGxPOUMcDAEWpyOCErZGX/4LMXDqYTc39M16y
-	 CV+vy0ceajntuXcxHSImZU0BK6QoOkt9xB5/5SiM883mgbUUtcdg3KjiUOzBYZwova
-	 3ibr4ECH7GYmw==
-Date: Wed, 15 May 2024 16:31:31 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mengyuan Lou <mengyuanlou@net-swift.com>
-Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
-	duanqiangwen@net-swift.com
-Subject: Re: [PATCH net-next v3 0/6] add sriov support for wangxun NICs
-Message-ID: <20240515153131.GP154012@kernel.org>
-References: <A621A96B7D9B15C2+20240515100830.32920-1-mengyuanlou@net-swift.com>
+	s=arc-20240116; t=1715789358; c=relaxed/simple;
+	bh=nTVevPGzNWh4s9PReJpsEP/R9Arj6uGdwElEHpIpPH4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZwzsIIpTl02Uwaf70e8SbruV/lKJIiDJIGyoUxteupJazcOFbg9GtZ1lkcPjmhmDp5OGslLAWnLA39p0CiPTekHKSsCnj19aF01lMhjMbF0c+MDlQn2cbcI6Cu+5FEqz+aGGu4a8fC85r2x2bmv7RyXaNLQ7XKc7qg4cGP1izR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n6NR1mc+; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715789356; x=1747325356;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=nTVevPGzNWh4s9PReJpsEP/R9Arj6uGdwElEHpIpPH4=;
+  b=n6NR1mc+iJMElevA92dvPV+cMFuEmxJqIHsp5v2YpBHo86XxOWEWh8Oh
+   haohwcXGHQqDT1VtODWIM7cusR4HcfLeve52HHJDOiHDguLGSlwdGfMN2
+   q1rVmnPkglf19obkOvfX9Rittzis9SG3SDyucUDBK2k/8H0Ywms4N2ERS
+   uKiHl2GUKhwNALjyH1fddNVVc20f4GDcPhxoRXabolN2XEJGMbccR5ouc
+   pCTUwnxSzs5mzBNV5i9N6QDbbwXhOaqsPwmMNGL6lD+Oqd1U3DMrTMxFg
+   RDGOpYCIjTSXHQu1hriKjV1oeupZn+aGRgwYoUOQyjlE5CKNIBjpllN7a
+   Q==;
+X-CSE-ConnectionGUID: 7Y/CP5g9RCKzQPCyzNGBDw==
+X-CSE-MsgGUID: kzul5gNeS7SB/2kxCgINJg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="11666344"
+X-IronPort-AV: E=Sophos;i="6.08,162,1712646000"; 
+   d="scan'208";a="11666344"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2024 09:09:15 -0700
+X-CSE-ConnectionGUID: GANiKUvAR7uiRZ8GlOHq8g==
+X-CSE-MsgGUID: 72pTt72QRii18KEvAsm9hw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,162,1712646000"; 
+   d="scan'208";a="62297177"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa001.fm.intel.com with ESMTP; 15 May 2024 09:09:11 -0700
+Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 3DA332878C;
+	Wed, 15 May 2024 17:09:05 +0100 (IST)
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	Jacob Keller <jacob.e.keller@intel.com>
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	maciej.fijalkowski@intel.com,
+	Magnus Karlsson <magnus.karlsson@gmail.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	igor.bagnucki@intel.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH iwl-net 0/3] Fix AF_XDP problems after changing queue number
+Date: Wed, 15 May 2024 18:02:13 +0200
+Message-ID: <20240515160246.5181-1-larysa.zaremba@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <A621A96B7D9B15C2+20240515100830.32920-1-mengyuanlou@net-swift.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 15, 2024 at 05:50:03PM +0800, Mengyuan Lou wrote:
-> Add sriov_configure for ngbe and txgbe drivers.
-> Reallocate queue and irq resources when sriov is enabled.
-> Add wx_msg_task in interrupts handler, which is used to process the
-> configuration sent by vfs.
-> Add ping_vf for wx_pf to tell vfs about pf link change.
+Presented fixes address the following test-case:
+* Run xdpsock on queue 10
+* change number of combined channels to 20
+* observe an error on xdpsock side
 
-Hi Mengyuan Lou,
+The first 2 patches deal with errors, the last one addresses the lack of
+traffic.
 
-Thanks for your updated patch-set.
+Larysa Zaremba (3):
+  ice: remove af_xdp_zc_qps bitmap
+  ice: add flag to distinguish reset from .ndo_bpf in XDP rings config
+  ice: map XDP queues to vectors in ice_vsi_map_rings_to_vectors()
 
-Unfortunately net-next is currently closed for the v6.10 merge window.
-Please consider reposting as a PATCH once net-next re-opens, after 27th May.
+ drivers/net/ethernet/intel/ice/ice.h      |  44 +++++---
+ drivers/net/ethernet/intel/ice/ice_base.c |   3 +
+ drivers/net/ethernet/intel/ice/ice_lib.c  |  27 ++---
+ drivers/net/ethernet/intel/ice/ice_main.c | 118 +++++++++++++---------
+ drivers/net/ethernet/intel/ice/ice_xsk.c  |  13 ++-
+ 5 files changed, 119 insertions(+), 86 deletions(-)
 
-In the meantime, feel free to post new versions as you get feedback,
-but please switch to posting as RFC during that time.
+-- 
+2.43.0
 
-Link: https://docs.kernel.org/process/maintainer-netdev.html
-
-Also, please be sure to seed the CC list of your patch submissions
-using the output of get-maintainers.pl PATCH. b4 can also be of
-assistance here.
 
