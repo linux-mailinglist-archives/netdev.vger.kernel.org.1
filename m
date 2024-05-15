@@ -1,127 +1,136 @@
-Return-Path: <netdev+bounces-96589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE05A8C6901
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:50:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B7728C690E
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:56:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2751D1C21483
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:50:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A7771C2100A
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF8E15573A;
-	Wed, 15 May 2024 14:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zbx7+7IS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0ACC155730;
+	Wed, 15 May 2024 14:56:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD15B155730
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 14:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1F25C8EF
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 14:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715784653; cv=none; b=qOP9dG0U/8iEUWW71tGw8usgkKBAhKvbzKQxkaVuf4jEKvqDBbjgGoW6lKgta8CxbGO5forQ+WYa43dqpS2kgrAC+AsVn3c8dZXuL/eMXI6HFyZPw/sQnMRm1/3BvfGVjKRSCjGDEYASQgU5DqhLnSUMNkkW+ZuSbchzLiDEx+k=
+	t=1715784965; cv=none; b=HvCZc2p7a4q1WJPT4RvrNLxIGn9GN/4M47c3sqE0nI2LyGhGr4wx4mFlbq/sMSj8CXlnjSKJWbKE9L5VijNOtncPN1Ccy+4qtjY3RF7/pywcEp8CAzmYgjD3cT68ajR4Ea2ew9oVSEC6S6hfrh/Od7y2TEqlQNcU4pDuIBrAXcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715784653; c=relaxed/simple;
-	bh=5TCp5CXvuptPmYaBhT5jPeD5TXNBV/1+PLyuz7yUB3E=;
+	s=arc-20240116; t=1715784965; c=relaxed/simple;
+	bh=DFMKzg8vdG22kegRKB3JF5okMkshbZ52JRDhPdf289M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tuWkPgNSGa0PX9Ua/K1tQheCDDkSOZk+ZDl3u+1l2ugGqj2b6mcIYqGndWtSTNIHM/fF/3BK0CyITVbmNr8qi0/hTNS0RoKQoqqHyfgGarYd9q4lFo0YCM/FldA6UK1LAJ4/pcQnMFmwwznrWg/5uny5XG018qwoXk+4QyQnGwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zbx7+7IS; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41fd5dc0439so47299585e9.0
-        for <netdev@vger.kernel.org>; Wed, 15 May 2024 07:50:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1715784650; x=1716389450; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mm2oQckW7dl+Jy0xL0CP8kgBBxNAcYsRe32+op0a91g=;
-        b=zbx7+7ISHCCqkG5AC7HaiHzS71Te2zaBV42OUjPY+ceSz5DlR3aljW28eUu26s/wPk
-         KHGaig/Rns+tZjWhTmXWRMkCxoVu3iduVgLpiT9YxmJGyrLGCJESQ8ESQ03you9uuwsE
-         hxRZMelNgjxZ6NbH9BvbjrC5Zlywz9P0VmzSTst62t0bJFxXBzXiUZen0RypWLwtUTqB
-         mdN0+yUeEUEblHWb5QwFgs1Ep2AAYan2XKQmnida/kjxA3P8gbZVG0ZvFjLa7h0zcIl5
-         uq9t3KsXbcisEjDA2zJ7o68MiE0VsbhV9DFlNHLDBEJo1n6GOT3OEBfi/kHknyABvNd6
-         Qq/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715784650; x=1716389450;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Mm2oQckW7dl+Jy0xL0CP8kgBBxNAcYsRe32+op0a91g=;
-        b=AfqVoifJcLjzES8TD6MJyC1VpFynwoBS2NhPYRR1WFLdyBecQK62BZuF4ebfZSQTE7
-         Zl6HZCngRg3iutGcy168qaqTZfp0SGuzLj3yAqeRJjMFQ/rVUqGzDKedv6OeqUf+RJw2
-         0OM/cxvttxl/U++OSiJX3Hf4lqOWvv7Bx8EjmyA/YvzYmvDhGCXFVBoq8RzFTEoLcHTb
-         5LmPDAUhCaJjYGCod8HuOq4bu8A9pl4eKDEH/cTeIKP/OxORlaHI8gjsVRVydlKDcXo1
-         DVG7RS8NET86u5yJ9skY2YB653XxhJbpE0FkMG+6lopG0rW+3Be4GK9kbkwbo/tOqeKO
-         bacw==
-X-Forwarded-Encrypted: i=1; AJvYcCWfiKmPi/crILE9nPuHaYX1moDOs3R2nmCa9SsyrPoE798Tgi2rfS694SsehhxD4hmKOsjozvvfFDKNnw+gALsOKlY1o/9p
-X-Gm-Message-State: AOJu0Yxfjlg3KB0c2aHVpisFJhW3BxKYy5WDtPXqv6VkLyjo0B8ReuDr
-	bpBrb0T72kiYz2Kb77yZLCSDEF77r7yD5zpi+B0Y/GCL1ap3ad7lCxmC7vXTjHk=
-X-Google-Smtp-Source: AGHT+IHc88s0jQf5xDyEKdeY62SQPNAtebdb3EiQmKtKM1DRT1aZC4sH7hbL/Wt0Qqg56kktMNhVNQ==
-X-Received: by 2002:a05:600c:3502:b0:41f:d4e1:5abc with SMTP id 5b1f17b1804b1-41fea927ea9mr107194485e9.8.1715784649874;
-        Wed, 15 May 2024 07:50:49 -0700 (PDT)
-Received: from localhost ([149.14.240.163])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41ff063d8cesm202702315e9.46.2024.05.15.07.50.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 07:50:49 -0700 (PDT)
-Date: Wed, 15 May 2024 16:50:48 +0200
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net-next] virtio_net: Fix error code in
- __virtnet_get_hw_stats()
-Message-ID: <1682873e-eb14-48e4-9ac6-c0a69ea62959@suswa.mountain>
-References: <3762ac53-5911-4792-b277-1f1ead2e90a3@moroto.mountain>
- <20240512115645-mutt-send-email-mst@kernel.org>
+	 In-Reply-To:Content-Type:Content-Disposition; b=u488bnvK+mk78XWYZcywp1YwhXjjmooaUbZlVSBRsBS2+JNG1IODn1rKHC3drsVc1q2FGKLlzVFJGkb+EXvhhQwGJBDIAWQ25aHtXuM3z74STA59+T5srQKgnLTG/93K9hsngwzEy1+He0sfaIsQwv+rX1lABPgsWXJtSSNzHXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-211-2JX7tYKdMoKGhuQx3yS0Ag-1; Wed,
+ 15 May 2024 10:55:52 -0400
+X-MC-Unique: 2JX7tYKdMoKGhuQx3yS0Ag-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8727E29AC00B;
+	Wed, 15 May 2024 14:55:51 +0000 (UTC)
+Received: from hog (unknown [10.39.192.5])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 537C540C6CB6;
+	Wed, 15 May 2024 14:55:50 +0000 (UTC)
+Date: Wed, 15 May 2024 16:55:49 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
+Subject: Re: [PATCH net-next v3 13/24] ovpn: implement TCP transport
+Message-ID: <ZkTM9b8oU8Rw31Qp@hog>
+References: <20240506011637.27272-1-antonio@openvpn.net>
+ <20240506011637.27272-14-antonio@openvpn.net>
+ <ZkIosadLULByXFKc@hog>
+ <73433bdf-763b-4023-8cb9-ffd9487744e0@openvpn.net>
+ <ZkMnpy3_T8YO3eHD@hog>
+ <2ddf759d-378f-475c-8fc1-30c6e83c2d14@openvpn.net>
+ <ZkSMPeSSS4VZxHrf@hog>
+ <6de315a7-8ef1-4b5d-8adc-fcfae26f6f88@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6de315a7-8ef1-4b5d-8adc-fcfae26f6f88@openvpn.net>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
-In-Reply-To: <20240512115645-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, May 12, 2024 at 12:01:55PM -0400, Michael S. Tsirkin wrote:
-> On Fri, May 10, 2024 at 03:50:45PM +0300, Dan Carpenter wrote:
-> > The virtnet_send_command_reply() function returns true on success or
-> > false on failure.  The "ok" variable is true/false depending on whether
-> > it succeeds or not.  It's up to the caller to translate the true/false
-> > into -EINVAL on failure or zero for success.
-> > 
-> > The bug is that __virtnet_get_hw_stats() returns false for both
-> > errors and success.  It's not a bug, but it is confusing that the caller
-> > virtnet_get_hw_stats() uses an "ok" variable to store negative error
-> > codes.
-> 
-> The bug is ... It's not a bug ....
-> 
-> I think what you are trying to say is that the error isn't
-> really handled anyway, except for printing a warning,
-> so it's not a big deal.
-> 
-> Right?
-> 
+2024-05-15, 14:54:49 +0200, Antonio Quartulli wrote:
+> On 15/05/2024 12:19, Sabrina Dubroca wrote:
+> > 2024-05-15, 00:11:28 +0200, Antonio Quartulli wrote:
+> > > On 14/05/2024 10:58, Sabrina Dubroca wrote:
+> > > > > > The UDP code differentiates "socket already owned by this inter=
+face"
+> > > > > > from "already taken by other user". That doesn't apply to TCP?
+> > > > >=20
+> > > > > This makes me wonder: how safe it is to interpret the user data a=
+s an object
+> > > > > of type ovpn_socket?
+> > > > >=20
+> > > > > When we find the user data already assigned, we don't know what w=
+as really
+> > > > > stored in there, right?
+> > > > > Technically this socket could have gone through another module wh=
+ich
+> > > > > assigned its own state.
+> > > > >=20
+> > > > > Therefore I think that what UDP does [ dereferencing ((struct ovp=
+n_socket
+> > > > > *)user_data)->ovpn ] is probably not safe. Would you agree?
+> > > >=20
+> > > > Hmmm, yeah, I think you're right. If you checked encap_type =3D=3D
+> > > > UDP_ENCAP_OVPNINUDP before (sk_prot for TCP), then you'd know it's
+> > > > really your data. Basically call ovpn_from_udp_sock during attach i=
+f
+> > > > you want to check something beyond EBUSY.
+> > >=20
+> > > right. Maybe we can leave with simply reporting EBUSY and be done wit=
+h it,
+> > > without adding extra checks and what not.
+> >=20
+> > I don't know. What was the reason for the EALREADY handling in udp.c
+> > and the corresponding refcount increase in ovpn_socket_new?
+>=20
+> it's just me that likes to be verbose when doing error reporting.
 
-No, I'm sorry, that was confusing.  The change to __virtnet_get_hw_stats()
-is a bugfix but the change to virtnet_get_hw_stats() was not a bugfix.
-I viewed this all as really one thing, because it's cleaning up the
-error codes which happens to fix a bug.  It seems very related.  At the
-same time, I can also see how people would disagree.
+With the "already owned by this interface" message? Sure, I get that.
 
-I'm traveling until May 23.  I can resend this.  Probably as two patches
-for simpler review.
+> But eventually the exact error is ignored and we release the reference. F=
+rom
+> netlink.c:
+>=20
+> 342                 peer->sock =3D ovpn_socket_new(sock, peer);
+> 343                 if (IS_ERR(peer->sock)) {
+> 344                         sockfd_put(sock);
+> 345                         peer->sock =3D NULL;
+> 346                         ret =3D -ENOTSOCK;
+>=20
+> so no added value in distinguishing the two cases.
 
-regards,
-dan carpenter
- 
+But ovpn_socket_new currently turns EALREADY into a valid result, so
+we won't go through the error hanadling here. That's the part I'm
+unclear about.
+
+--=20
+Sabrina
+
 
