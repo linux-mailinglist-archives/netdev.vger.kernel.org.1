@@ -1,90 +1,93 @@
-Return-Path: <netdev+bounces-96592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77EC08C6936
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 17:06:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F33608C6941
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 17:07:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14458B22A6A
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 15:06:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7CD1B21F09
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 15:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04798155750;
-	Wed, 15 May 2024 15:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30813155743;
+	Wed, 15 May 2024 15:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZSmYjFm0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B0WSBoyd"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D618C13F422
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 15:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753B915575A
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 15:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715785553; cv=none; b=ZkRHLP325HI8p8P5FehxsV9LEJMO56s8GcwtZQwAB3GQ6iGLf+bAYezB+HB6J+c7ZTvpaVKAvK7ZhvTGoXx76I//wQl7RM4Equp55VEB8BJU/CJ/cYpITr8Rfih774Y7TiDwXCnNv3x6QHHdOzdHbcejpxbZj2ENnKUj27BcTD4=
+	t=1715785658; cv=none; b=aLg/Q6Fw16vpht4FkqIyZLtooDdr4GclrL8lphBa7jvkog3dkSx28NrKs9yb7cwV4Q4RyHCUszvUZcHTxZn7QhQBg+c+55CyvIsNVCRSuUpPzA65JJ26fZWVu98wW9ridkv8avy6dhJHC5Y5mVo03qHbhAhTEQctN4x37BsxmIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715785553; c=relaxed/simple;
-	bh=Eqhliyv/rLaqDzkaLcjCJEDibkGNoMMtCnsez51KbII=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=jYNJIt6DDFw+ViUNxH1zH1LaTaq/Bg5I5habx0/LLaM5Pe4WVXhgN7LDVX6DH2RmgBVKuNK8qIMFPsIweNVSkm73VnWCR24jWBogdLSq9/3sx+XgjuxrEInxokGFPrluPqEhlDFuvE51pmQ4qjHc1ZP3jp+IC+fKp1/3F1qxXSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZSmYjFm0; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1715785658; c=relaxed/simple;
+	bh=nB/Wx+bzRLvAZM9HJrayest7/Jl5WbZCbrJZngd9CQA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BnyeXEKwGyFR++WmjFKYucKlDnqxw1xhmBrdUsPjRqeE8di3EbjXfwQ9cLxZMDe4ZwThVv0Rv0Nd8zqjxdi7TBf1j7DN9nBnlkhbPOSYamlcpNKWwKTP5zPVbDe6k61qh6MzlCFgxYgK4Sg2bOFVzWzDK14Dw/WWdqvBUlSenjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B0WSBoyd; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715785549;
+	s=mimecast20190719; t=1715785655;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=5HsQnBBLUP3Pazt+byzwwgyn37KXCpOuxjPpikdkNik=;
-	b=ZSmYjFm0MHQMDWa0aiKkvIRrfjy+0cdAKxXhhqZ4bo/nOAsROJf6n8lYKmzR7SF1J6oKoV
-	GnvTFX25TFNvbBXbUWlPS832iC6Kbu3JWfJ1rIgz9FzRTubx8rZili01BFKmYdPJ9KnxUX
-	aMv8jnKV8RYJvf+0kZs/QLjayC9/o2o=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dbrWi8lbFLyv72mKMlVkkmYPCKHUduDQsR6vbInAIJA=;
+	b=B0WSBoydQ0DcjpMXt7SB7HRsmBXyO9vec2OngHu3ALAw5HS+4mwaZwF8icTwrIv5qWjPMT
+	tPrEepkzYyxijkzCl/fbsp8X8OczeHXhL24vcL4sm2/rIt+Ca+1IEqOe2Wkwv3jlxJ4qjy
+	WVbQ26m/vPscnMNtzlGWT/ZilejM4GM=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-160-qdDbHy75Mhq_JmUBmk-oaw-1; Wed, 15 May 2024 11:05:48 -0400
-X-MC-Unique: qdDbHy75Mhq_JmUBmk-oaw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4200efb9ac6so24648405e9.2
-        for <netdev@vger.kernel.org>; Wed, 15 May 2024 08:05:48 -0700 (PDT)
+ us-mta-498-W2EbU-TTMlGbeKj4SxJEuw-1; Wed, 15 May 2024 11:07:18 -0400
+X-MC-Unique: W2EbU-TTMlGbeKj4SxJEuw-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2e482d3d843so67358941fa.1
+        for <netdev@vger.kernel.org>; Wed, 15 May 2024 08:07:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715785547; x=1716390347;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5HsQnBBLUP3Pazt+byzwwgyn37KXCpOuxjPpikdkNik=;
-        b=cWe7BewpD3WZzqM5uo/UcNbdrsL4cK/aO0QsI0TK07bNYYJx8NDi1Gf1SZPkUAIIHE
-         4JG/CVUhCnEy63Djtap6V9h79o9lorww3icx4jFUqhVh0A1h8v59QEn/I/UyBa/JVgRt
-         Do6HQq2jNSLN3r3mmBZ2z7mpsJGC3gETjr80mSmc8DRdTntWRBJWok2Zzw9U6I+wEvgA
-         s+lTflqr1uFKQec/3diO4SppRwX0hWP6uJrsfaKJwpT4XfjirW4clSuXNm2gcwm8BCNl
-         u/fKY/6Ce5F59yWtsdzoc2H3exvJPBS1bDWp4Nl/9ESXSyhyFLq4by17Yc/Wi1PEGd5A
-         r4uA==
-X-Forwarded-Encrypted: i=1; AJvYcCWFHh3fbdX+rHuFl3UWgfHNprZPHrmwji68pErYj9twIYWJ5DRv/RUh8U6ixOILvimpAwPv7sRCiOP58O9Sm4H2GCseMecy
-X-Gm-Message-State: AOJu0YxA0er4OKsc0Z9VcClr+xcQJVLlbedHwN8f7FF9Lf7PTO+uUUA5
-	dtuZhyiW11O2ZrLl6Otc3KMTvSSufhL8kl7/x4nPwXyLvkYzz33OSXqcNc1mBxLCKIjpqO9cnBk
-	CdlcAP2gLAyNpV3ie2MhLquIjD8za2e5dpSaVX6dnlWDHX9DQBpg4YQ==
-X-Received: by 2002:a05:600c:a44:b0:41a:34c3:2297 with SMTP id 5b1f17b1804b1-41fea93a34cmr139867965e9.5.1715785547154;
-        Wed, 15 May 2024 08:05:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFwcKYJU04KRN+C9m9RrjwdUumM+NzjuDj85eoasrKYaMbDWv5ZX8CZUBelGxUEWCXHzSMp8A==
-X-Received: by 2002:a05:600c:a44:b0:41a:34c3:2297 with SMTP id 5b1f17b1804b1-41fea93a34cmr139867595e9.5.1715785546575;
-        Wed, 15 May 2024 08:05:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715785635; x=1716390435;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dbrWi8lbFLyv72mKMlVkkmYPCKHUduDQsR6vbInAIJA=;
+        b=kI9wj7ogQRiWNOPptEn+pGUraBI8gR5PxYUI7IvJj60pdcBKSVcecY0mzq0gFkPvT2
+         JPVNu6KB5oy/nMQoflnWWHsoap5D3FIwfQfzxkbv7ZjcJuI9InVS64lfQKpKlIV+kSw4
+         hY9VJkd2ZwQOtvnrErZacsEvWHvwvt4agBG/dBmdM7Ov4Yz0hX9OF73DHPD41DzOI3Zi
+         N8Ze20XmOYHiL8Fdjldbsk1dLQXX4R/QW2V8q5WVUfuZahT06LR+Y9LOebggH8M/2szh
+         ro1N9y9RAWpeG+V00FpnSe8i066K1OQdydGM4RoBagf5wSQ6AsXuHbMGEsRMSPQpOVwZ
+         II8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUvLuhisyQ3j5XxQ3jUmAeCv7xRGYUiE8RH0ER311nH/fNRZOL3qpx9QILdxy1kHBiJuRcnQvg8G5fE5wbRLkbqoThSN/BH
+X-Gm-Message-State: AOJu0YxgqhxVBraBSce+Knkj7D7OimQ4W429Cbov2P2vEymudEZZ4DzU
+	/o0HWQFanJttDitdyBURC3soe54voQNSAevptNNzUE5CkJlDgyLeHTkF9XWi+pHnL7QK6BWB24Z
+	5yoPQJ+vT6HYFpO0+nLdPPuIa9kBVKJiCGsJqPe6mnb+x7XfHVrzXbg==
+X-Received: by 2002:a2e:7c0d:0:b0:2e3:7121:aba6 with SMTP id 38308e7fff4ca-2e5205c61a3mr133092461fa.46.1715785635243;
+        Wed, 15 May 2024 08:07:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEA2MjU83PmPbl4SP+crO3lzmgqKP48+f4i5kvUwU7C8/1az1QdYe3lnvRKkMDiMLe7dIqRJw==
+X-Received: by 2002:a2e:7c0d:0:b0:2e3:7121:aba6 with SMTP id 38308e7fff4ca-2e5205c61a3mr133092081fa.46.1715785634668;
+        Wed, 15 May 2024 08:07:14 -0700 (PDT)
 Received: from redhat.com ([2a02:14f:175:c01e:6df5:7e14:ad03:85bd])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41ff7a840d2sm197154985e9.39.2024.05.15.08.05.44
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b79bccesm16825319f8f.5.2024.05.15.08.07.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 08:05:45 -0700 (PDT)
-Date: Wed, 15 May 2024 11:05:43 -0400
+        Wed, 15 May 2024 08:07:13 -0700 (PDT)
+Date: Wed, 15 May 2024 11:07:10 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com,
-	Jeongjun Park <aha310510@gmail.com>,
-	Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
 	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH] vhost/vsock: always initialize seqpacket_allow
-Message-ID: <bcc17a060d93b198d8a17a9b87b593f41337ee28.1715785488.git.mst@redhat.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net-next] virtio_net: Fix error code in
+ __virtnet_get_hw_stats()
+Message-ID: <20240515110626-mutt-send-email-mst@kernel.org>
+References: <3762ac53-5911-4792-b277-1f1ead2e90a3@moroto.mountain>
+ <20240512115645-mutt-send-email-mst@kernel.org>
+ <1682873e-eb14-48e4-9ac6-c0a69ea62959@suswa.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,63 +96,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+In-Reply-To: <1682873e-eb14-48e4-9ac6-c0a69ea62959@suswa.mountain>
 
-There are two issues around seqpacket_allow:
-1. seqpacket_allow is not initialized when socket is
-   created. Thus if features are never set, it will be
-   read uninitialized.
-2. if VIRTIO_VSOCK_F_SEQPACKET is set and then cleared,
-   then seqpacket_allow will not be cleared appropriately
-   (existing apps I know about don't usually do this but
-    it's legal and there's no way to be sure no one relies
-    on this).
+On Wed, May 15, 2024 at 04:50:48PM +0200, Dan Carpenter wrote:
+> On Sun, May 12, 2024 at 12:01:55PM -0400, Michael S. Tsirkin wrote:
+> > On Fri, May 10, 2024 at 03:50:45PM +0300, Dan Carpenter wrote:
+> > > The virtnet_send_command_reply() function returns true on success or
+> > > false on failure.  The "ok" variable is true/false depending on whether
+> > > it succeeds or not.  It's up to the caller to translate the true/false
+> > > into -EINVAL on failure or zero for success.
+> > > 
+> > > The bug is that __virtnet_get_hw_stats() returns false for both
+> > > errors and success.  It's not a bug, but it is confusing that the caller
+> > > virtnet_get_hw_stats() uses an "ok" variable to store negative error
+> > > codes.
+> > 
+> > The bug is ... It's not a bug ....
+> > 
+> > I think what you are trying to say is that the error isn't
+> > really handled anyway, except for printing a warning,
+> > so it's not a big deal.
+> > 
+> > Right?
+> > 
+> 
+> No, I'm sorry, that was confusing.  The change to __virtnet_get_hw_stats()
+> is a bugfix but the change to virtnet_get_hw_stats() was not a bugfix.
+> I viewed this all as really one thing, because it's cleaning up the
+> error codes which happens to fix a bug.  It seems very related.  At the
+> same time, I can also see how people would disagree.
+> 
+> I'm traveling until May 23.  I can resend this.  Probably as two patches
+> for simpler review.
+> 
+> regards,
+> dan carpenter
+>  
 
-To fix:
-	- initialize seqpacket_allow after allocation
-	- set it unconditionally in set_features
-
-Reported-by: syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com
-Reported-by: Jeongjun Park <aha310510@gmail.com>
-Fixes: ced7b713711f ("vhost/vsock: support SEQPACKET for transport").
-Cc: Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Tested-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-
----
+Yea, no rush - bugfixes are fine after 23. And it's ok to combine into
+one - we don't want inconsistent code - just please write a clear
+commit log message.
 
 
-Reposting now it's been tested.
-
- drivers/vhost/vsock.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index ec20ecff85c7..bf664ec9341b 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -667,6 +667,7 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
- 	}
- 
- 	vsock->guest_cid = 0; /* no CID assigned yet */
-+	vsock->seqpacket_allow = false;
- 
- 	atomic_set(&vsock->queued_replies, 0);
- 
-@@ -810,8 +811,7 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
- 			goto err;
- 	}
- 
--	if (features & (1ULL << VIRTIO_VSOCK_F_SEQPACKET))
--		vsock->seqpacket_allow = true;
-+	vsock->seqpacket_allow = features & (1ULL << VIRTIO_VSOCK_F_SEQPACKET);
- 
- 	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
- 		vq = &vsock->vqs[i];
 -- 
 MST
 
