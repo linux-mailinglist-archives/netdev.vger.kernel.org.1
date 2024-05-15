@@ -1,127 +1,135 @@
-Return-Path: <netdev+bounces-96586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 072958C68ED
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:41:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D3AC8C687D
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:22:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63FB4B209F4
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:41:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18C71B243A1
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0901515572A;
-	Wed, 15 May 2024 14:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D4E13FD65;
+	Wed, 15 May 2024 14:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="d5QztQud"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aFQ1MO4t"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCFE13F44E
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 14:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4286214D
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 14:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715784098; cv=none; b=PinbTpAgoISgio5KRBwDK50s+scJCcLl2QYCWlHLyFfTj6+WGcr/17Y3/MXKyJAbO1P3rfZFEaepPEcFEu4TenTyJIoNw1vAOtVZFR4plKUZocHcRbj0HXYTAasbFrRp6BxksnH2r0HyYANvILZ3WbBmOamXm0jBQ4XsZuCDs/Y=
+	t=1715782943; cv=none; b=VYGVtEo7UJhZ6CAtN6B/rf2JTSvmnf4m7JzwuTSuXsTcHF+fycMNXYnWqNp3BuVRrEnyHbsSrfImfPO4g6AYG0ZWI0p2HAJsGEvXdiJVhBYzZKGxCpCivgvK2Kq82iJSCRZAdRykM84AVaqvOlqQ/JiOdOhzcgddM1GGvdhbIrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715784098; c=relaxed/simple;
-	bh=uc2B356NgOd5xziKevFPSAwaBRXvTWkP8ZmbBGMBYGw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y8g99/3yBFnogjNvTPxmc36WFhscQr3vjXPpxwAtUxpDSrtKo5J3LqlXQ/xJfP6YimY6aaCR8mxtyincNZQLpobTp5CiAhL+Gsw57Gi8kdRbALT46su6q/W8u7vNFx1N+21oztwjJ9E7hy+qMBvYH4NQoj5UDqy7oaqlMKnOSzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=d5QztQud; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=QPwI0ChI8F6aEXFXOSbeXRXlCjThwTzwtVR2a3FOBMM=; b=d5QztQudkDn1DVdRnEOF/+6dqJ
-	PL4rdMWGSQXQHj4XVuWHDB+TVj9jLlFO8+U7Xz29mBjES7vVttlU/NG5CIlNBpVWstjef10wEhdg+
-	0uMPWpss0sSOpjmSznRT26JkJtjuG3Nx9Nqg3GbFfMMm4A5dmgwTVIlBCFUVI4icRuyg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s7FU5-00FSON-L8; Wed, 15 May 2024 16:19:57 +0200
-Date: Wed, 15 May 2024 16:19:57 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Simon Horman <horms@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [RFC PATCH] net: introduce HW Rate Limiting Driver API
-Message-ID: <79767d80-4f9c-4eec-8e9d-32ea94d0e06a@lunn.ch>
-References: <3d1e2d945904a0fb55258559eb7322d7e11066b6.1715199358.git.pabeni@redhat.com>
- <f6d15624-cd25-4484-9a25-86f08b5efd51@lunn.ch>
- <e2cbbbc416700486e0b4dd5bc9d80374b53aaf79.camel@redhat.com>
- <9dd818dc-1fef-4633-b388-6ce7272f9cb4@lunn.ch>
- <f7fa91a89f16e45de56c1aa8d2c533c6f94648ba.camel@redhat.com>
- <a0ada382-105a-4994-ad0f-1a485cef12c4@lunn.ch>
- <db51b7ccff835dd5a96293fb84d527be081de062.camel@redhat.com>
- <20240515095147.GB154012@kernel.org>
+	s=arc-20240116; t=1715782943; c=relaxed/simple;
+	bh=NxGDLbAcKdwbtB6J8mw2EZXSli0OWp4mkgAH1PlvTWY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Nzn85bPnOSje41bKfuLX1RUWVdYUXR84HH52kSBak1v3H2gmbyHQPl+Ne60Ywwg+LkUumJsODSyrxuDHplBMotRe9vIAu3NPbKUpQznLJ+8Ox2bBc5QSInYTp8y+i9woBuMBydudwAyeaWOxrN0e3P28QRzsOX9GhgOGQhHakyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aFQ1MO4t; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715782941;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QlQKAhS3Nec4t63RXRL98E390ZIIDklcYvobV4PMdfI=;
+	b=aFQ1MO4tIUsix2385dupMSJTIFviX1p5I0bAnLO9fnS7w+LZY0qj82YHc2qO0W9KPCvfy4
+	xXcd7/dDrsL1VaE7cS5rvV7NjEONoGKIGFnNLLUAcaDfz8t0MZN2FEk/ihAcHk/LBmaPcs
+	KaXB0NVupNhtxgNGf2Cxk2RCvKa9lIg=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-363-w8YsbS0INcuFErP9kKATHg-1; Wed,
+ 15 May 2024 10:22:18 -0400
+X-MC-Unique: w8YsbS0INcuFErP9kKATHg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AFF523C0E642;
+	Wed, 15 May 2024 14:22:17 +0000 (UTC)
+Received: from ksundara-mac.redhat.com (unknown [10.74.16.52])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 460B51C22B67;
+	Wed, 15 May 2024 14:22:09 +0000 (UTC)
+From: Karthik Sundaravel <ksundara@redhat.com>
+To: jesse.brandeburg@intel.com,
+	wojciech.drewek@intel.com,
+	sumang@marvell.com,
+	jacob.e.keller@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org
+Cc: pmenzel@molgen.mpg.de,
+	jiri@resnulli.us,
+	michal.swiatkowski@linux.intel.com,
+	rjarry@redhat.com,
+	aharivel@redhat.com,
+	vchundur@redhat.com,
+	ksundara@redhat.com,
+	cfontain@redhat.com
+Subject: [PATCH iwl-next v9] ice: Add get/set hw address for VFs using devlink commands 
+Date: Wed, 15 May 2024 19:52:06 +0530
+Message-Id: <20240515142207.27369-1-ksundara@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240515095147.GB154012@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-> > If I read correctly, allowing each NIC to expose it's own different
-> > starting configuration still will not solve the problem for this H/W to
-> > switch from WRR to SP (and vice versa).
+Dear Maintainers,
+    Thanks for the review and suggestions for my patch.
 
-I also suspect this is not unique to this hardware. I've not looked at
-other SOHO switches, but it is reasonably common to have different
-queues for different priority classes, and then one shaper for the
-overall port rate.
+v8 -> v9
+--------
+- Rebasing against dev-queue branch of next-queue tree
 
-> > AFAICS, what would be needed there is an atomic set of operations:
-> > 'set_many' (and e.v. 'delete_many', 'create_many') that will allow
-> > changing all the shapers at once. 
+v7 -> v8
+--------
+- Added const keyword for the parameter ``mac`` in ice_set_vf_fn_mac()
 
-Yep.
+v6 -> v7
+--------
+- Addressed Smatch and checkpatch issues
 
-> > With such operations, that H/W could still fit the expected 'no-op'
-> > default, as WRR on the queue shapers is what we expect. I agree with
-> > Jakub, handling the complexity of arbitrary starting configuration
-> > would pose a lot of trouble to the user/admin.
-> > 
-> > If all the above stands together, I think we have a few options (in
-> > random order):
-> > 
-> > - add both set of operations: the ones operating on a single shaper and
-> > the ones operating on multiple shapers
-> > - use only the multiple shapers ops.
-> > 
-> > And the latter looks IMHO the simple/better.
+v5 -> v6
+--------
+- Changed data type of vf_id to u16
+- Used container_of(port, struct ice_vf, devlink_port) to
+  get the vf instead of ice_get_vf_by_id()/ice_put_vf()
 
-I would agree, start with only multiple shaper opps. If we find that
-many implementation end up just iterating the list and dealing with
-them individually, would could pull that iterator into the core, and
-expand the ops to either/or, multiple or single.
+v4 -> v5
+--------
+- Cloned ice_set_vf_mac() to ice_set_vf_fn_mac() so that the
+  parameter ice_pf is used instead of net_device of vf
+- removed redundant error handling
 
-> > int (*set)(struct net_device *dev, int how_many, const u32 *handles,
-> > 	   const struct net_shaper_info *shapers,
-> >            struct netlink_ext_ack *extack);
-> > int (*reset)(struct net_device *dev, int how_many, const u32 *handles,
-> >              struct netlink_ext_ack *extack);
-> > int (*move)(struct net_device *dev, int how_many, const u32 *handles,
-> >             const u32 *new_parent_handles,
-> > 	    struct netlink_ext_ack *extack);
-> > 
-> > An NIC with 'static' shapers can implement a dummy move always
-> > returning EOPNOTSUPP and eventually filling a detailed extack.
+v3 -> v4
+--------
+- Released the vf device by calling ice_put_vf()
 
-The extack is going to be important here, we are going to need
-meaningful error messages.
+v2 -> v3
+--------
+- Fill the extack message instead of dev_err()
 
-Overall, i think this can be made to work with the hardware i have.
+v1 -> v2
+--------
+- called ice_set_vf_mac() directly from the devlink port function
+  handlers.
 
-	 Andrew
+RFC -> v1
+---------
+- Add the function handlers to set and get the HW address for the
+  VF representor ports.
+
 
