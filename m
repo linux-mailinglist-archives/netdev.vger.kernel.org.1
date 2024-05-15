@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-96529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 464CC8C6524
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:50:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB468C6528
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:50:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 777A61C20A38
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:50:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9ADC5B238B1
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C2B5EE67;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45C885FDA9;
 	Wed, 15 May 2024 10:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zbw2GKK7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nGvK9RTy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9A55A0E1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A3F5FB87;
 	Wed, 15 May 2024 10:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715770230; cv=none; b=Pt4jeRalZ2q42eEJ3jMVOTK7Tjc8dGgHTg7mLY2WZtcXthxPPWy1Ok7sXkactqqTwiBdSK5xIIKyX2ZH3eHBZ3I4Wo/1XrWhjeSn/o+TAdhv1dY4xUrAVC1P1R2wfLK+Zhb5u200S9hOWvbcq3RdmSt0dA8AP3ecZaoB8EoRs98=
+	t=1715770230; cv=none; b=jelIK8OvphPIn2mXj/EkUpVI9l5kauFLArULYY3Suh6iqpn48AfiqmHRWSSVtxx8mMzyc6QLxp5a9IKcza1613t+bEdynuPksX35S5YmCvsppzcywJh1AeeWefTKDRCFWnpkRAErgCLpimYxzEq3pM8Y9wMH2ivSqdhr1Xs1teQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715770230; c=relaxed/simple;
-	bh=eYiAvt81Ifc4i08Fxt8B3PLugWWqn76VxBHBJToJ99k=;
+	bh=h8/sKbJq0L9KSMNi6aEnhEU/Z5pFEd/YN2L1lnRYszQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ddbtdGwf8vyi2j86JYeDMdiDSfpKrxbifE0i6JZ2FsHo7urLskjqprixPU/U4UU/Gm+spJ+sPoTM093t90QQ9vUKF14ipX4MR/wA3UkOX7W9bE81IdPNVUEGxM7bJaHz8NLIglRHH0TDhKPXyOXh2Rf9/lz+mS17iOGjosblGbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zbw2GKK7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BAC71C4AF09;
+	 In-Reply-To:To:Cc; b=jnVp8EDWKQx26OAJoUnoK3J9NP/Wuewo3GLn8R7Dj69pBYh7pHE6Ahz7c5xn3OTeVEOlv5UW+BbXsGAOPdqDEegyABD73Kv57RhKzF2rSk8Q6Dld7kuuJsiMm+7fmPr03+lases/NDvxvf5i3cYzArG6iQp1TzT7uj45AKKCVVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nGvK9RTy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B3D5FC32786;
 	Wed, 15 May 2024 10:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715770229;
-	bh=eYiAvt81Ifc4i08Fxt8B3PLugWWqn76VxBHBJToJ99k=;
+	bh=h8/sKbJq0L9KSMNi6aEnhEU/Z5pFEd/YN2L1lnRYszQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Zbw2GKK74LlQcx1v1+qnrQTzJgQZ2pUcUbCmpTXX6gqcAFAWvv5EvC+rZBPXhFDuh
-	 r52ezM6TzCAtu7HbYP/VIQxaYuRhLn76s3lIJyJCqXEBsccaJ3UUiU8+NeiCMG8uRy
-	 HxTZZ3G7ZRGF8aEE8UotTLIn9YmTfwOQzdaANWm3PnF6+lbVq1GUgWoDS8vQxbeYO3
-	 cZksOvnYOG3Elni6wbTKmlZT+pVME/+Pq2O//hSiemjZp4hMNmyIid2aSP9ffioSt1
-	 vhBed/lNtqULGnq1Lqt76PDeYtuciEX0yesjtQcGSjq/LoiHKz3+f5lIgBxC8tikGy
-	 X5MvyuOeW+9EA==
+	b=nGvK9RTybWOLMV9zbYVyVSEbU9xhUijPEsEG8T+jX4cAl3+HVNBMxZujWTcx5oZ4H
+	 z17k5MvFlFoVwZ5zVEQ6wtueb6LQbiFyB9rMdyyEJXdkUhdiMHITw9FJKPyUtnGb5H
+	 /ZKnAaw3FtzbWO4TG7Jlt7AmqtHCpeIQE67hME2OX4Y4NCJlgRZOijlL6B6V65zm+H
+	 NF6LamAH+kGDyxrwF0dq1SGgh87zIxu16IS+pvLpQODr200np9ccAqC4yjJCXLr1Wu
+	 SwcYiA8AVmnNHXNbfm2j/XolbputnJBf/NzG57O7JMVcrC9Zi0Zc5mAFldSFnPpGqg
+	 aeNh7NSu8eibw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AFC36C54BDC;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A7EFAC41620;
 	Wed, 15 May 2024 10:50:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,44 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: bridge: xmit: make sure we have at least eth header
- len bytes
+Subject: Re: [PATCH net] selftests: net: bridge: increase IGMP/MLD exclude timeout
+ membership interval
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171577022971.14646.4487627386797578993.git-patchwork-notify@kernel.org>
+ <171577022968.14646.2766126822531337987.git-patchwork-notify@kernel.org>
 Date: Wed, 15 May 2024 10:50:29 +0000
-References: <20240513103419.768040-1-razor@blackwall.org>
-In-Reply-To: <20240513103419.768040-1-razor@blackwall.org>
+References: <20240513105257.769303-1-razor@blackwall.org>
+In-Reply-To: <20240513105257.769303-1-razor@blackwall.org>
 To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: netdev@vger.kernel.org, roopa@nvidia.com, bridge@lists.linux.dev,
- davem@davemloft.net, kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
- syzkaller-bugs@googlegroups.com,
- syzbot+a63a1f6a062033cf0f40@syzkaller.appspotmail.com
+Cc: netdev@vger.kernel.org, kuba@kernel.org, roopa@nvidia.com,
+ bridge@lists.linux.dev, edumazet@google.com, pabeni@redhat.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Mon, 13 May 2024 13:34:19 +0300 you wrote:
-> syzbot triggered an uninit value[1] error in bridge device's xmit path
-> by sending a short (less than ETH_HLEN bytes) skb. To fix it check if
-> we can actually pull that amount instead of assuming.
-> 
-> Tested with dropwatch:
->  drop at: br_dev_xmit+0xb93/0x12d0 [bridge] (0xffffffffc06739b3)
->  origin: software
->  timestamp: Mon May 13 11:31:53 2024 778214037 nsec
->  protocol: 0x88a8
->  length: 2
->  original length: 2
->  drop reason: PKT_TOO_SMALL
+On Mon, 13 May 2024 13:52:57 +0300 you wrote:
+> When running the bridge IGMP/MLD selftests on debug kernels we can get
+> spurious errors when setting up the IGMP/MLD exclude timeout tests
+> because the membership interval is just 3 seconds and the setup has 2
+> seconds of sleep plus various validations, the one second that is left
+> is not enough. Increase the membership interval from 3 to 5 seconds to
+> make room for the setup validation and 2 seconds of sleep.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: bridge: xmit: make sure we have at least eth header len bytes
-    https://git.kernel.org/netdev/net/c/8bd67ebb50c0
+  - [net] selftests: net: bridge: increase IGMP/MLD exclude timeout membership interval
+    https://git.kernel.org/netdev/net/c/06080ea23095
 
 You are awesome, thank you!
 -- 
