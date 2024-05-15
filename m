@@ -1,122 +1,132 @@
-Return-Path: <netdev+bounces-96619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CC4C8C6B0C
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 18:56:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2878D8C6B1E
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 18:58:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8DF7B22CB5
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:55:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFB5B284E2F
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D281D286A6;
-	Wed, 15 May 2024 16:55:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 200F038DE9;
+	Wed, 15 May 2024 16:58:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gf6LTHIw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RobFTo1s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBDE12B6C;
-	Wed, 15 May 2024 16:55:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BF084D03;
+	Wed, 15 May 2024 16:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715792152; cv=none; b=feNc+pdM59ohHBLQk8pcUUJJferPTO0JUSevJx/bY1YytjrvGnMRqS5S6DeoHW9+O0AZNiVnCF4JaiDMoKKa6rxvcAJpUCtrxIObhyyfyPAkZ8w8VNpYXyxL4SfUgIVI5H6z04nLjqSVV8V8Ypzh9JoVq9iPs9BsxL5VZ/31nsM=
+	t=1715792299; cv=none; b=SUTNe9bez+GchVk3FqbyGnv9SCIg8A2azkvL+MP1dTFLaY+K44dYwaKwoV12NHJuYh20rr1WFDcNUkjchlIcZhgrXlOB+JjGE27wQj1oMW0ROAYxYlwtV3jDktMwsLBNLs3HslFQUUrKpxIL5lhcQ2rZpnA5906PIlPygWcfx/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715792152; c=relaxed/simple;
-	bh=MZshctqx6xM45b+tkX0cDNyL7J8LzYDeaWLENgouLDE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FXFw8scukVG31bzJuyq3th33INMjpbP1KgpSNCZEwqY0Qu1kdUWzomnrINlCPLWavhJSQ4adpS6ht7IkP67XIGKUc7U5WendCiqGPQM4tY/lUA9I4qL0GQ3Rtn4+A5j4PmK1CCOukKPmkeWRbtWNMnJ7jKswj7j+WM1ywihdwuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gf6LTHIw; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1715792299; c=relaxed/simple;
+	bh=ShbHlmZ5HSYMg7vUemRsJ6CUyHdN2PXIXd0r1VRWU1M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L1+287dufM+L9wzIFJ0PN6rA8Ig6uVejsSrEqt6Z3AECCnEh7sD8LJKK/YAt9sAFMkb089oZS0+2u4C7WJVqIpRD2nER1Z/Tr/9a1yppaFEWZaWiZjrrgWTHIjIgT7hKzWO6qvxiQS4a3r2fqW5OvbR2soszPKBQmlEvN6GJ7Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RobFTo1s; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-34dc8d3fbf1so5836001f8f.1;
-        Wed, 15 May 2024 09:55:50 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1eecc71311eso59363695ad.3;
+        Wed, 15 May 2024 09:58:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715792149; x=1716396949; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wn71j5PCDcdMbECQ7d4+bOhBU+DyfxybRg35BEWpRjk=;
-        b=gf6LTHIw1ABxl5TEaBWMFBgNgJysuo8iw85wnGo5s7XjCxsIctlGjDBbTZB7/92u7J
-         4oYPmNMqJIDQfuY464yR+HF6Wpe1p0ynWFxe1z9K4tZHjIojbLo+RDb4ONtCpgWE1n0d
-         QzHhEbNwyiSZkN+vNgDtGtiRmSynjCAoQCAMIahDfP/Baif0UWW5YZVbDU0QITW3wtqt
-         5UbXZAAKNH4BGPTlRGVvdQjFjchzDjGW1Voy0MDjlHsJiZybchf/wRudWVVwbO75yJil
-         tG1NVKSBv3XtT9hDjpQCeMP4yv664dhdZoXGGmonkGvkIR5ov3C3V8Ke0xxMbrVFcIXt
-         O0cQ==
+        d=gmail.com; s=20230601; t=1715792297; x=1716397097; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jshxQ4zKsW5Ka5jjJJJHS/DYAFWEr1OvskuDDmMdj64=;
+        b=RobFTo1sNa1WhUss7//7KaomdbKhoclY6C/HKFhLr248DrrCv0JCN7FMyvApt+t7Ka
+         kYwnBDCfMc+xbhOZV47GtamXGQNov0dE4lkisH0Y+xt867LhAQ461/n7+CC3pNCwG0It
+         8GBTGmV/Y25huZbdQX+qt0n1nbLzTT2TMJ1nkl0O4C0mq7ELd8mF85j6ND/HTl6GHQOh
+         wdS0O0HclEMpiOKUOm9S79Qq90stKvc5fQjIXx20JMrkeJwH2zmiJ4XILzye7CTu53iD
+         G/QizNtP6KAIEiaR/TAqmKCKh/pfgMdc/Rjf9B3/H2WbjoQRbTqlQudAr8TLUcU6XF8L
+         kRXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715792149; x=1716396949;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1715792297; x=1716397097;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wn71j5PCDcdMbECQ7d4+bOhBU+DyfxybRg35BEWpRjk=;
-        b=OYZLMDZAHmyPqgD4J5KODzz1+EpH6eNPtYr3HAeLtLqwc0ln4Jc2kD5/2WAoeS3GB5
-         qaKdgduNMi3rIaIkqt5if4A5TvUaH//cFQXAUswN7e3KGC7vZwq4wvJTPKTB1bMCAeMs
-         no+U/ERRTC2UDMkfZtzmdj5dhdy32W7q1MhHsW4z18JN4U8AtfEpmt05y/6fIljUIf3W
-         LKQeBOOwhmJ3de6KDa7xv2w55CnrN1esEg1bRoJp8ujTYL4oVr3zG+TTkpw0fFipf3pb
-         OINHI3DGsWTXRGA5iSyAx+MY7aqHvkENT0VdfjIAZkNNF8FKjJFak92X+FwdYKjitqU0
-         YnCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX14yaBv/SV3RUvckK5d9Wc4UFsduLpwqxmulAmTwd6UKN3jhOXTIf6SjMc1LiF3WFyQRtwLhpCCKM931rE3eFxQ2fB
-X-Gm-Message-State: AOJu0YxjuTxLNlSNQy00qBwR35Rd6pYbl26v/ZQuh3GaZsY+JvxOrN9F
-	IkrdXltFKLE96CFq4oGNwffWjU0mciKwVL3bJHNO3f4aXHehyE0B0h+Z15gpl8nrfz52KAjhMDW
-	nYsomDcWQRKgOJ6zbPu35CuYbbqg=
-X-Google-Smtp-Source: AGHT+IG5vRNg0MCDMX50ze0WgRNZOel7HD3ZgSa/j3WNzn6FCm4JV8E429RhjFr7HAOrBrcooJXl8ikIqyzcnZymTTc=
-X-Received: by 2002:a5d:4801:0:b0:34d:a5fd:977b with SMTP id
- ffacd0b85a97d-3504a969ffcmr11308913f8f.60.1715792149046; Wed, 15 May 2024
- 09:55:49 -0700 (PDT)
+        bh=jshxQ4zKsW5Ka5jjJJJHS/DYAFWEr1OvskuDDmMdj64=;
+        b=bhnM3JFWjpfE1O2LxTdrT9Y4Vv5yWD5ioHl0Lfoy/8BUvDTUyBxV44YcjQBAXf0j2t
+         y8oSlKwPcU2kz4LGU/m4G76LiuX5WK+tZyAD2Ipl1zB7VHvYIf35JAq87AV/O4WQUvdc
+         T8RKaTXcx8a1NnTwAOyTHauEWFNSAGd0Bw1UorQjS9y7ustHAoOFgQ/NGe277WOdiIzk
+         leOnO6j57uHwU0v1113XnUefb8B4VRLJU8kUOd76FMa+T6txxhovjnB4ncdo4OjI089b
+         vNMmr3zikUUhRwS1R19sPwlraF/YFFommDaWo9oZcDnp7oqpvZ8ziMked698qlTS0H/6
+         yTDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVKPq3W++SSJNuiEF6JwgvDcMbriqNcOBSKlTlznWmIyG3J7DIPR92Bxl73+/aJ4SGmC3aL3oIcMm4+aakUd7JuSNnoW/Ioh0Nk0bkvTOPlwYtC0sT6XcwJwUo3PFHdyQ==
+X-Gm-Message-State: AOJu0Yx2mOcUrZ4bqDGrekyqJ+01JCaRROqAx43TB2SjXf9X917Wvj4g
+	NtJqdydfrj21o8+37TfzXiyosSqrgT+rKz7ajiz3Ew9n2D1Vxf1t
+X-Google-Smtp-Source: AGHT+IG5wszVZqanvB9HgaZHryt+doBbEuUEmVA2UhF/VUutBbI6rJ319TrdzyCrZZK/ucZyFKPcYw==
+X-Received: by 2002:a17:903:2311:b0:1e3:c327:35c0 with SMTP id d9443c01a7336-1ef43c095c2mr245697405ad.2.1715792296999;
+        Wed, 15 May 2024 09:58:16 -0700 (PDT)
+Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0badcae8sm120624315ad.103.2024.05.15.09.58.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 May 2024 09:58:08 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 15 May 2024 06:58:07 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: hannes@cmpxchg.org, lizefan.x@bytedance.com, cgroups@vger.kernel.org,
+	yosryahmed@google.com, longman@redhat.com, netdev@vger.kernel.org,
+	linux-mm@kvack.org, shakeel.butt@linux.dev,
+	kernel-team@cloudflare.com,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [PATCH v1] cgroup/rstat: add cgroup_rstat_cpu_lock helpers and
+ tracepoints
+Message-ID: <ZkTpn3gxDdPlcDFk@slm.duckdns.org>
+References: <171457225108.4159924.12821205549807669839.stgit@firesoul>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240515062440.846086-1-andrii@kernel.org>
-In-Reply-To: <20240515062440.846086-1-andrii@kernel.org>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 15 May 2024 09:55:37 -0700
-Message-ID: <CAADnVQLg4zcS99=bCLgczZWCTbUwRXyyoTFC+_LU08rQ1_EbZQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] bpf: save extended inner map info for percpu
- array maps as well
-To: Andrii Nakryiko <andrii@kernel.org>
-Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
-	Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <171457225108.4159924.12821205549807669839.stgit@firesoul>
 
-On Tue, May 14, 2024 at 11:24=E2=80=AFPM Andrii Nakryiko <andrii@kernel.org=
-> wrote:
->
-> ARRAY_OF_MAPS and HASH_OF_MAPS map types have special logic to save
-> a few extra fields required for correct operations of ARRAY maps, when
-> they are used as inner maps. PERCPU_ARRAY maps have similar
-> requirements as they now support generating inline element lookup
-> logic. So make sure that both classes of maps are handled correctly.
->
-> Reported-by: Jakub Kicinski <kuba@kernel.org>
-> Fixes: db69718b8efa ("bpf: inline bpf_map_lookup_elem() for PERCPU_ARRAY =
-maps")
-> Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> ---
->  kernel/bpf/map_in_map.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/kernel/bpf/map_in_map.c b/kernel/bpf/map_in_map.c
-> index 8ef269e66ba5..b4f18c85d7bc 100644
-> --- a/kernel/bpf/map_in_map.c
-> +++ b/kernel/bpf/map_in_map.c
-> @@ -32,7 +32,7 @@ struct bpf_map *bpf_map_meta_alloc(int inner_map_ufd)
->
->         inner_map_meta_size =3D sizeof(*inner_map_meta);
->         /* In some cases verifier needs to access beyond just base map. *=
-/
-> -       if (inner_map->ops =3D=3D &array_map_ops)
-> +       if (inner_map->ops =3D=3D &array_map_ops || inner_map->ops =3D=3D=
- &percpu_array_map_ops)
->                 inner_map_meta_size =3D sizeof(struct bpf_array);
+On Wed, May 01, 2024 at 04:04:11PM +0200, Jesper Dangaard Brouer wrote:
+> This closely resembles helpers added for the global cgroup_rstat_lock in
+> commit fc29e04ae1ad ("cgroup/rstat: add cgroup_rstat_lock helpers and
+> tracepoints"). This is for the per CPU lock cgroup_rstat_cpu_lock.
+> 
+> Based on production workloads, we observe the fast-path "update" function
+> cgroup_rstat_updated() is invoked around 3 million times per sec, while the
+> "flush" function cgroup_rstat_flush_locked(), walking each possible CPU,
+> can see periodic spikes of 700 invocations/sec.
+> 
+> For this reason, the tracepoints are split into normal and fastpath
+> versions for this per-CPU lock. Making it feasible for production to
+> continuously monitor the non-fastpath tracepoint to detect lock contention
+> issues. The reason for monitoring is that lock disables IRQs which can
+> disturb e.g. softirq processing on the local CPUs involved. When the
+> global cgroup_rstat_lock stops disabling IRQs (e.g converted to a mutex),
+> this per CPU lock becomes the next bottleneck that can introduce latency
+> variations.
+> 
+> A practical bpftrace script for monitoring contention latency:
+> 
+>  bpftrace -e '
+>    tracepoint:cgroup:cgroup_rstat_cpu_lock_contended {
+>      @start[tid]=nsecs; @cnt[probe]=count()}
+>    tracepoint:cgroup:cgroup_rstat_cpu_locked {
+>      if (args->contended) {
+>        @wait_ns=hist(nsecs-@start[tid]); delete(@start[tid]);}
+>      @cnt[probe]=count()}
+>    interval:s:1 {time("%H:%M:%S "); print(@wait_ns); print(@cnt); clear(@cnt);}'
+> 
+> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
-Applied the fix to stop the bleeding,
-but we need to fix this fragility long term.
+Applied to cgroup/for-6.10.
+
+Thanks.
+
+-- 
+tejun
 
