@@ -1,223 +1,144 @@
-Return-Path: <netdev+bounces-96506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DE408C641D
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 11:48:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B74918C6425
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 11:48:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFD521C21660
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 09:48:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAFF81C21477
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 09:48:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCBEA5A0FD;
-	Wed, 15 May 2024 09:48:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC59E5A0E0;
+	Wed, 15 May 2024 09:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="MQJRNZmo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIqJy+Oz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC87B58AC3
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 09:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B195914C;
+	Wed, 15 May 2024 09:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715766495; cv=none; b=PFTW9o45jQUgkdEoZfPAXkPDKLxFqpobCtYk2/C2JXyuNZINjB+pWU/8kR8mTutBnJf30/sFsSAyZUr4Io/pEri9zvNzp9gvbpx+MNuBH8UgVEz7udaNCj9VGQEWK8Gf0XNkaq7Tc/fwNkLPUgF7Uuhs1j8uzZ720tbt+duCQdQ=
+	t=1715766515; cv=none; b=TrSza2ReL8b6cMnra4sQVS1ERymG8iE52egcUTmNdl/1n2PwtQEvRfyWZ+/oEUHSAwsVW9df8kCb/fGTqw/SPRc90m5IMTRW6DY0pBqALn4dwaJ5Jvieop9juMtwf3v2Sk7cZk8swOnsM28IDMLz7kTXFJm9SL78l2WFG8+2aSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715766495; c=relaxed/simple;
-	bh=H9I5y314uT6KJjlHzr5ZCjJZM5vCbb5k41Bcy2g85JE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YkbAh2CFIoliwyqwXZSIAMqIrLkekvfDoL66Nu+mClgrNuP6zFvsEI1eBkbYlu0F3i77EerS4rCxFFxWjp9HBCi7F3ptIeec7GpZ+vRssWTJdCkmJOPchApq/LGHHGR8/G7RFZlks42o5l07ZCE+LUz3qTw9WqBpn+7+7q/DLE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=MQJRNZmo; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a59ad344f7dso110305766b.0
-        for <netdev@vger.kernel.org>; Wed, 15 May 2024 02:48:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1715766491; x=1716371291; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SvdvxKzsIXlbkkCS/c8FlBp7an8yZdRF5H/FBmVMbF0=;
-        b=MQJRNZmo4nT0duU8DCTFLPZ/3u3ZjshzYZ5EWUWK2vmHxJTCBLtRxUgaWY5E/A9qLK
-         3vZLnWozA5PLUX/2ZmZ+r5h+hHjIQx46NMm/eVhFuo/42/9uo4py+QLz2vS3cMBy7Csl
-         Zx/6JHTsoSzR9hFRNyKhsKsHp9zzd52GzTXedgmgnwZll+psNyb8tvw8Pv4wgHde5LIM
-         lPWwtJ4SdsTfVgL7nZgd87Y5FKCuuT99uad3zKWDZiZiBPmL8eZlJT8tsRIGZxpPejBG
-         vmNQH7ojWz+vOstWWcUn/S/IPtaA0YGWeqHHLCGN0WE19yTcLa5g8YxV5vQxIKCsU557
-         jqxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715766491; x=1716371291;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SvdvxKzsIXlbkkCS/c8FlBp7an8yZdRF5H/FBmVMbF0=;
-        b=sQXwW3aRxUljNJ+Ov5iTgByMSqSzUDBmREPvpNqTwNkI67uwPIxWhFyPd2MmA+7zif
-         9l6zONdORYohLFRZnOWUa7XqxhUHHY6tOdwS3WBEnylAcRpKXUruY54tM3nmSMUMnVqS
-         SLtvRka5lwKjjts8sbajxWSJpFAc9RTpbOy3RjRPIxF2sVIYO+9p7SE3udUVhLeYek+d
-         t0sAK3X/ohem+ElFA+A2cr8/4SnJ0wytmABXgJ8PCw7heeTBvlT9aNGtxLBt21OeriK4
-         VCZEp9tkFMdgLr8QHu0hJIpKmeh8utr0kueAymTo+oflW/RyMhvlYL6v2GDOpW0qv2Zk
-         UDdA==
-X-Forwarded-Encrypted: i=1; AJvYcCVo9V3Z3NRWPLE4RiUO+BpoNAf9nlUxsWKJVUA84XeJcE59sORb4ah/BVDF8kGEjwmJtfXUDe/eL8rnfB/vagNEpmGlS+FX
-X-Gm-Message-State: AOJu0Yy5mMCyoNG1dpWSU8syAg7rVPdec/hl0fhiSRzWuq5jsm60mRHH
-	NbUOvpyScCgOPzIT9D+HPkQLAD9KWonxvpU4oTxFqB0KnTSOQexGRLO+98q+0lU=
-X-Google-Smtp-Source: AGHT+IHyuK8hf39Mrn4kHBbuQOKmVcIaKCNYD4xN1HPPn/SRu5yzRFnMwhRQ8pYbw4tPVT3jc9hndQ==
-X-Received: by 2002:a17:906:f296:b0:a58:f13d:d378 with SMTP id a640c23a62f3a-a5a2d54c5d6mr1072040666b.13.1715766491126;
-        Wed, 15 May 2024 02:48:11 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:4d])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a88a2ba62sm170355966b.91.2024.05.15.02.48.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 02:48:10 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Feng zhou <zhoufeng.zf@bytedance.com>
-Cc: edumazet@google.com,  ast@kernel.org,  daniel@iogearbox.net,
-  andrii@kernel.org,  martin.lau@linux.dev,  eddyz87@gmail.com,
-  song@kernel.org,  yonghong.song@linux.dev,  john.fastabend@gmail.com,
-  kpsingh@kernel.org,  sdf@google.com,  haoluo@google.com,
-  jolsa@kernel.org,  davem@davemloft.net,  dsahern@kernel.org,
-  kuba@kernel.org,  pabeni@redhat.com,  laoar.shao@gmail.com,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  bpf@vger.kernel.org,  yangzhenze@bytedance.com,
-  wangdongdong.6@bytedance.com
-Subject: Re: [PATCH bpf-next] bpf: tcp: Improve bpf write tcp opt performance
-In-Reply-To: <20240515081901.91058-1-zhoufeng.zf@bytedance.com> (Feng zhou's
-	message of "Wed, 15 May 2024 16:19:01 +0800")
-References: <20240515081901.91058-1-zhoufeng.zf@bytedance.com>
-User-Agent: mu4e 1.12.4; emacs 29.1
-Date: Wed, 15 May 2024 11:48:09 +0200
-Message-ID: <87seyjwgme.fsf@cloudflare.com>
+	s=arc-20240116; t=1715766515; c=relaxed/simple;
+	bh=dW4XzXkdq+Ja/Dw/2N3tZiM/mGQj/ucsHQwY0STLJoQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=adNGv8EPbLzzXs8U0LfxG3NTiy/iGgbjydXUQyz7awamQsKZK4xhXgDe46E5USbPaWz53qRUg97mLfGKRhOcvBgJro52Ur2jzUX3csxIfV/fDRcBKzsPLTz4oSx3OUtU7iCILf4dieDukdX0Q6N6qSJ+m9rFepDuBWhDr1EV8Og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIqJy+Oz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A60AC32786;
+	Wed, 15 May 2024 09:48:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715766515;
+	bh=dW4XzXkdq+Ja/Dw/2N3tZiM/mGQj/ucsHQwY0STLJoQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QIqJy+OzRu2eANqM1Cr1r30LZxK8LnzmlifBnWfhLA7KlvhGlm7z7uw1rVbUE204n
+	 I4QWDSD7SLNPl2eq+eQPUKJSsdp1aFfH1VWfxfhJsmLkEZz6qWuvxCPrp3ugmw8RuO
+	 q8IaYmsbwuMvmHYrMm1gdb97Cv0s4Z11la/ATeotiD3TkKqvRFDQd4IdI8K3Q6TFkL
+	 VlA+pyy95m5tolQH0SNLFpupWBqPn1hYQe0Ox3f2VEmSyJ7MTDmMZQ7lspg7k0tN4g
+	 nKD2FTfLaFkOedVL6+/ka9pxHwlLttrWXjj05xQiuGqr7NVBjfU0lg7VUqRmnPDBuY
+	 ryrYLvBHbPnuw==
+Date: Wed, 15 May 2024 10:48:31 +0100
+From: Simon Horman <horms@kernel.org>
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net v2] selftests: net: kill smcrouted in the cleanup
+ logic in amt.sh
+Message-ID: <20240515094831.GA154012@kernel.org>
+References: <20240513060852.1105380-1-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240513060852.1105380-1-ap420073@gmail.com>
 
-On Wed, May 15, 2024 at 04:19 PM +08, Feng zhou wrote:
-> From: Feng Zhou <zhoufeng.zf@bytedance.com>
->
-> Set the full package write tcp option, the test found that the loss
-> will be 20%. If a package wants to write tcp option, it will trigger
-> bpf prog three times, and call "tcp_send_mss" calculate mss_cache,
-> call "tcp_established_options" to reserve tcp opt len, call
-> "bpf_skops_write_hdr_opt" to write tcp opt, but "tcp_send_mss" before
-> TSO. Through bpftrace tracking, it was found that during the pressure
-> test, "tcp_send_mss" call frequency was 90w/s. Considering that opt
-> len does not change often, consider caching opt len for optimization.
-
-You could also make your BPF sock_ops program cache the value and return
-the cached value when called for BPF_SOCK_OPS_HDR_OPT_LEN_CB.
-
-If that is in your opinion prohibitevely expensive then it would be good
-to see a sample program and CPU cycle measurements (bpftool prog profile).
-
->
-> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
+On Mon, May 13, 2024 at 06:08:52AM +0000, Taehee Yoo wrote:
+> The amt.sh requires smcrouted for multicasting routing.
+> So, it starts smcrouted before forwarding tests.
+> It must be stopped after all tests, but it isn't.
+> 
+> To fix this issue, it kills smcrouted in the cleanup logic.
+> 
+> Fixes: c08e8baea78e ("selftests: add amt interface selftest script")
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 > ---
->  include/linux/tcp.h            |  3 +++
->  include/uapi/linux/bpf.h       |  8 +++++++-
->  net/ipv4/tcp_output.c          | 12 +++++++++++-
->  tools/include/uapi/linux/bpf.h |  8 +++++++-
->  4 files changed, 28 insertions(+), 3 deletions(-)
->
-> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-> index 6a5e08b937b3..74437fcf94a2 100644
-> --- a/include/linux/tcp.h
-> +++ b/include/linux/tcp.h
-> @@ -455,6 +455,9 @@ struct tcp_sock {
->  					  * to recur itself by calling
->  					  * bpf_setsockopt(TCP_CONGESTION, "itself").
->  					  */
-> +	u8	bpf_opt_len;		/* save tcp opt len implementation
-> +					 * BPF_SOCK_OPS_HDR_OPT_LEN_CB fast path
-> +					 */
->  #define BPF_SOCK_OPS_TEST_FLAG(TP, ARG) (TP->bpf_sock_ops_cb_flags & ARG)
->  #else
->  #define BPF_SOCK_OPS_TEST_FLAG(TP, ARG) 0
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index 90706a47f6ff..f2092de1f432 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -6892,8 +6892,14 @@ enum {
->  	 * options first before the BPF program does.
->  	 */
->  	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
-> +	/* Fast path to reserve space in a skb under
-> +	 * sock_ops->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB.
-> +	 * opt length doesn't change often, so it can save in the tcp_sock. And
-> +	 * set BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG to no bpf call.
-> +	 */
-> +	BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG = (1<<7),
->  /* Mask of all currently supported cb flags */
-> -	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0x7F,
-> +	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0xFF,
->  };
+> The v1 patch is here:
+> https://lore.kernel.org/netdev/20240508040643.229383-1-ap420073@gmail.com/
+> 
+> v2
+>  - Headline change.
+>  - Kill smcrouted process only if amt.pid exists.
+>  - Do not remove the return value.
+>  - Remove timeout logic because it was already fixed by following commit
+>    4c639b6a7b9d ("selftests: net: move amt to socat for better compatibility")
+>  - Fix shebang.
+> 
+>  tools/testing/selftests/net/amt.sh | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftests/net/amt.sh
+> index 5175a42cbe8a..d458b45c775b 100755
+> --- a/tools/testing/selftests/net/amt.sh
+> +++ b/tools/testing/selftests/net/amt.sh
+> @@ -1,4 +1,4 @@
+> -#!/bin/sh
+> +#!/bin/bash
+>  # SPDX-License-Identifier: GPL-2.0
 >  
->  /* List of known BPF sock_ops operators.
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index ea7ad7d99245..0e7480a58012 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -488,12 +488,21 @@ static void bpf_skops_hdr_opt_len(struct sock *sk, struct sk_buff *skb,
->  {
->  	struct bpf_sock_ops_kern sock_ops;
->  	int err;
-> +	struct tcp_sock *th = (struct tcp_sock *)sk;
->  
-> -	if (likely(!BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk),
-> +	if (likely(!BPF_SOCK_OPS_TEST_FLAG(th,
->  					   BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG)) ||
->  	    !*remaining)
->  		return;
->  
-> +	if (likely(BPF_SOCK_OPS_TEST_FLAG(th,
-> +					  BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG)) &&
-> +	    th->bpf_opt_len) {
-> +		*remaining -= th->bpf_opt_len;
+>  # Author: Taehee Yoo <ap420073@gmail.com>
 
-What if *remaining value shrinks from one call to the next?
+Hi.
 
-BPF sock_ops program can't react to change. Feels like there should be a
-safety check to prevent an underflow.
+I think that the change above is not related to the fix below.
+I think it should be in a separate patch targeted at net-next.
+And as net-next is currently closed it should be posted once it
+reopens, after the 27th May.
 
-> +		opts->bpf_opt_len = th->bpf_opt_len;
-> +		return;
-> +	}
-> +
->  	/* *remaining has already been aligned to 4 bytes, so *remaining >= 4 */
+The changes below look good to me.
+I suggest resending only those changes, targeted at net, as v3.
+
+Thanks.
+
+> @@ -77,6 +77,7 @@ readonly LISTENER=$(mktemp -u listener-XXXXXXXX)
+>  readonly GATEWAY=$(mktemp -u gateway-XXXXXXXX)
+>  readonly RELAY=$(mktemp -u relay-XXXXXXXX)
+>  readonly SOURCE=$(mktemp -u source-XXXXXXXX)
+> +readonly SMCROUTEDIR="$(mktemp -d)"
+>  ERR=4
+>  err=0
 >  
->  	/* init sock_ops */
-> @@ -538,6 +547,7 @@ static void bpf_skops_hdr_opt_len(struct sock *sk, struct sk_buff *skb,
->  	opts->bpf_opt_len = *remaining - sock_ops.remaining_opt_len;
->  	/* round up to 4 bytes */
->  	opts->bpf_opt_len = (opts->bpf_opt_len + 3) & ~3;
-> +	th->bpf_opt_len = opts->bpf_opt_len;
+> @@ -85,6 +86,11 @@ exit_cleanup()
+>  	for ns in "$@"; do
+>  		ip netns delete "${ns}" 2>/dev/null || true
+>  	done
+> +	if [ -f "$SMCROUTEDIR/amt.pid" ]; then
+> +		smcpid=$(< $SMCROUTEDIR/amt.pid)
+> +		kill $smcpid
+> +	fi
+> +	rm -rf $SMCROUTEDIR
 >  
->  	*remaining -= opts->bpf_opt_len;
+>  	exit $ERR
 >  }
-> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-> index 90706a47f6ff..f2092de1f432 100644
-> --- a/tools/include/uapi/linux/bpf.h
-> +++ b/tools/include/uapi/linux/bpf.h
-> @@ -6892,8 +6892,14 @@ enum {
->  	 * options first before the BPF program does.
->  	 */
->  	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
-> +	/* Fast path to reserve space in a skb under
-> +	 * sock_ops->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB.
-> +	 * opt length doesn't change often, so it can save in the tcp_sock. And
-> +	 * set BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG to no bpf call.
-> +	 */
-> +	BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG = (1<<7),
-
-Have you considered a bpf_reserve_hdr_opt() flag instead?
-
-An example or test coverage would to show this API extension in action
-would help.
-
->  /* Mask of all currently supported cb flags */
-> -	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0x7F,
-> +	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0xFF,
->  };
+> @@ -167,7 +173,7 @@ setup_iptables()
 >  
->  /* List of known BPF sock_ops operators.
+>  setup_mcast_routing()
+>  {
+> -	ip netns exec "${RELAY}" smcrouted
+> +	ip netns exec "${RELAY}" smcrouted -P $SMCROUTEDIR/amt.pid
+>  	ip netns exec "${RELAY}" smcroutectl a relay_src \
+>  		172.17.0.2 239.0.0.1 amtr
+>  	ip netns exec "${RELAY}" smcroutectl a relay_src \
+
+-- 
+pw-bot: changes-requested
+> 
 
