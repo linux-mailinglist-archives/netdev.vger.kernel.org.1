@@ -1,180 +1,106 @@
-Return-Path: <netdev+bounces-96481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5398B8C61BD
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 09:34:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ED6B8C6223
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 09:52:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76B9B1C2176D
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 07:34:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB7AE1C20B3B
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 07:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6396943ABE;
-	Wed, 15 May 2024 07:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3AB481AC;
+	Wed, 15 May 2024 07:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NBbunJm8"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="SmgL9IFq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B6E43AA4
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 07:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CEC342AAD;
+	Wed, 15 May 2024 07:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715758458; cv=none; b=FTym/HTMb+okwIP/7pRJyhDgc+4dJPe+CZZKHnDWM1RqHo4j+JJ2B0VP3lnjy8Q+2DewcWRaiCTnkU6YrjwBitz3iIedZIryNCEdn6qAX5s+Vc1wtZHwPZy91aURBnaIxW3RwsVfvNnjgkMWtpt1VNk+U+7pip0MiHABAcLUFJ0=
+	t=1715759545; cv=none; b=VFitBySnrJdp5Z/HItbjwYODDmvkU0HKM2uSmaNDJBcTQgZBwJYMb/8gorfrrQcw6KtKILoIZ2HpfMYas33+z/TikXrYdKGvLOP0pJIv5pvEK4BoQW97RD5nPr0Emm8nl0fL4R/m9Pc45aQngXS7P6gX5VhSWpWlBBt//JI6lWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715758458; c=relaxed/simple;
-	bh=QrPNpXvWtBe6xHxCSukZbnvU65TQ0fHmMLbaLO3xAOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZfVIhTuBj/CtJS8gCIwo1pwD3hmCUBRlUMBzMlXn9BVOmEykHbhCMfFHfDSdZWNQ4N8oI+hT6PhWupqnCRZVPyYDpRQTJhgm7K3C34C9Cz+2k5sN07oSEWxwaDVy7A7YNmCjpTI/k3bKp5QqaElkjBMG2NK3zfs8OHwC9DNMoz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=NBbunJm8; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2e27277d2c1so87027521fa.2
-        for <netdev@vger.kernel.org>; Wed, 15 May 2024 00:34:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715758454; x=1716363254; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kD8/1Qg80X1Lu2w9XeEJiUVipNk99bLcKl/O4FD4s+U=;
-        b=NBbunJm8Xr045fFCVx/HxyTPXTSDTbJ/55IOShs1YnnrYC06RQ+Qh5Q7Oc+Jlr1Sp0
-         +EH7ijsbPMsKYBM5P2bTpxncA7y0laTsA78pnq5Ib+ADYzSP3oQmXihcB2OOtdrtEhjI
-         IHtU7MyjwRVcrykWX6ckVPbZsv0fzkjR1JUvxoE9nqzXBN+59Mwid+iPQ2DdBMNWqYQm
-         D47QcFNEwN7T0TJl/4dcxcP32YyS16zSyrif2no2l/2LA+qMLbu64WPz6vgTlLfJMToO
-         48NaShTxpPfhNdiBuLFXoITSKxZJPuZ+2RVx3BxNhtCmUAf6sNmY5ttWZHEGQdIlnsg/
-         pYKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715758454; x=1716363254;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kD8/1Qg80X1Lu2w9XeEJiUVipNk99bLcKl/O4FD4s+U=;
-        b=FxeDvGah1SDsn76Ae1+bIqphdOzIvalzK0NNRjytdbb9FIvBcD3BvpFqQpWD3pQKpi
-         5Q5zoDrw/WTrcLr40qrxn5EoJYUox8M8pGZUBywmkxQHUsZ9iIB3U+ggedIUbQdfckhr
-         dz0na0NovgJ2mKfBVTFK3j3CqVwIdWbCa4xmaWA4MJDPlc01jZyUwbekcyFulq93ND82
-         SdB+66rSg19GStw3EoWb+Jihu5vTXPwuycbgJ8fsaFboJe0Grd+0tTjMjecdXiNh0y29
-         HzK0k4G7wublFnCGksiTeLO/3VZtLTyR5xAInukyVk7m84jj6vPQUPiEgFsInE12uONd
-         yxjw==
-X-Gm-Message-State: AOJu0Yzm+68Px9FGfx3g9Ab8NBRhNiMVcECQRNYC9qcB+KPypIfEML0e
-	xd6Sn0JJLq/uOM0MvjiN7sBjXTtxDWO/WdwNeBiCaP6KWt69Tm+pI2Pdw3FN5z8=
-X-Google-Smtp-Source: AGHT+IGqKKl0cYTL0wrQzzLOxVpGGYXpsmUrxwQj9LAhg/ZB7zM77qtac7G3ooq+SI3f8B3O1F/AWg==
-X-Received: by 2002:a2e:a98a:0:b0:2e6:f769:5124 with SMTP id 38308e7fff4ca-2e6f769532emr7988691fa.39.1715758453984;
-        Wed, 15 May 2024 00:34:13 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccbe8f8asm222070475e9.10.2024.05.15.00.34.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 00:34:12 -0700 (PDT)
-Date: Wed, 15 May 2024 09:34:08 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com
-Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
-Message-ID: <ZkRlcBU0Nb3O-Kg1@nanopsycho.orion>
-References: <20240509114615.317450-1-jiri@resnulli.us>
- <20240509084050-mutt-send-email-mst@kernel.org>
- <ZjzQTFq5lJIoeSqM@nanopsycho.orion>
- <20240509102643-mutt-send-email-mst@kernel.org>
- <Zj3425_gSqHByw-R@nanopsycho.orion>
- <20240510065121-mutt-send-email-mst@kernel.org>
- <Zj4A9XY7z-TzEpdz@nanopsycho.orion>
- <20240510072431-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1715759545; c=relaxed/simple;
+	bh=EseU8l9i6FsdcgIhuNlxtMXNzYYXWc+xZzlPU9p9RDA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Dw+x1fR5L4OGXAjfsmY8tp7NK6mISF4FmQD23iqwcmxW6sZQZbcbOxTvvVw4KtXk2+Gp7OU+EAdKVdHZf6gU9ZIyltlwLSuA6Wwk7c7yRel3JbjBW3p7ByQi8HmcZImoAWBv8R4Pvro+ftVMhE0bvEr9dmHu1osXO7j5vrwD1Pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=SmgL9IFq; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: f2f16930128d11efb92737409a0e9459-20240515
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=+Kk+4ccaigRSqLMLy3uDs3B3e9ohN0+aD87eOWCOx5o=;
+	b=SmgL9IFq2Ru43vBV3kmX/sDe/qXSzHH8X6hknfXWr0a1+8WLEs0BRbGCCE1GP32Yvs/HlDboT5q4IJy79/NTU/oxe3J54EE3LBn/YMS6SQW/DqnmCGHIf8YE1K1MHpoa7n1EQvRglaRq7MdXAKcxgeS9ZQG95zihT50AGG9LM+Q=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:4ac413ad-28e7-4a18-815d-eae2a2a796df,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:82c5f88,CLOUDID:5a3a1dfc-ed05-4274-9204-014369d201e8,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: f2f16930128d11efb92737409a0e9459-20240515
+Received: from mtkmbs09n1.mediatek.inc [(172.21.101.35)] by mailgw01.mediatek.com
+	(envelope-from <yenchia.chen@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 410055962; Wed, 15 May 2024 15:37:14 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 15 May 2024 15:37:13 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Wed, 15 May 2024 15:37:13 +0800
+From: Yenchia Chen <yenchia.chen@mediatek.com>
+To: <stable@vger.kernel.org>
+CC: yenchia.chen <yenchia.chen@mediatek.com>, "David S. Miller"
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Matthias Brugger
+	<matthias.bgg@gmail.com>, Eric Dumazet <edumazet@google.com>, Sasha Levin
+	<sashal@kernel.org>, Simon Horman <horms@kernel.org>, Pedro Tammela
+	<pctammela@mojatatu.com>, Zhengchao Shao <shaozhengchao@huawei.com>, Ryosuke
+ Yasuoka <ryasuoka@redhat.com>, Thomas Graf <tgraf@suug.ch>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+Subject: [PATCH 5.15 0/2] netlink, fix issues caught by syzbot
+Date: Wed, 15 May 2024 15:36:36 +0800
+Message-ID: <20240515073644.32503-1-yenchia.chen@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240510072431-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain
 
-Fri, May 10, 2024 at 01:27:08PM CEST, mst@redhat.com wrote:
->On Fri, May 10, 2024 at 01:11:49PM +0200, Jiri Pirko wrote:
->> Fri, May 10, 2024 at 12:52:52PM CEST, mst@redhat.com wrote:
->> >On Fri, May 10, 2024 at 12:37:15PM +0200, Jiri Pirko wrote:
->> >> Thu, May 09, 2024 at 04:28:12PM CEST, mst@redhat.com wrote:
->> >> >On Thu, May 09, 2024 at 03:31:56PM +0200, Jiri Pirko wrote:
->> >> >> Thu, May 09, 2024 at 02:41:39PM CEST, mst@redhat.com wrote:
->> >> >> >On Thu, May 09, 2024 at 01:46:15PM +0200, Jiri Pirko wrote:
->> >> >> >> From: Jiri Pirko <jiri@nvidia.com>
->> >> >> >> 
->> >> >> >> Add support for Byte Queue Limits (BQL).
->> >> >> >> 
->> >> >> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->> >> >> >
->> >> >> >Can we get more detail on the benefits you observe etc?
->> >> >> >Thanks!
->> >> >> 
->> >> >> More info about the BQL in general is here:
->> >> >> https://lwn.net/Articles/469652/
->> >> >
->> >> >I know about BQL in general. We discussed BQL for virtio in the past
->> >> >mostly I got the feedback from net core maintainers that it likely won't
->> >> >benefit virtio.
->> >> 
->> >> Do you have some link to that, or is it this thread:
->> >> https://lore.kernel.org/netdev/21384cb5-99a6-7431-1039-b356521e1bc3@redhat.com/
->> >
->> >
->> >A quick search on lore turned up this, for example:
->> >https://lore.kernel.org/all/a11eee78-b2a1-3dbc-4821-b5f4bfaae819@gmail.com/
->> 
->> Says:
->> "Note that NIC with many TX queues make BQL almost useless, only adding extra
->>  overhead."
->> 
->> But virtio can have one tx queue, I guess that could be quite common
->> configuration in lot of deployments.
->
->Not sure we should worry about performance for these though.
->What I am saying is this should come with some benchmarking
->results.
+From: "yenchia.chen" <yenchia.chen@mediatek.com>
 
-I did some measurements with VDPA, backed by ConnectX6dx NIC, single
-queue pair:
+Hi,
 
-super_netperf 200 -H $ip -l 45 -t TCP_STREAM &
-nice -n 20 netperf -H $ip -l 10 -t TCP_RR
+We think 5.15.y could pick these commits.
 
-RR result with no bql:
-29.95
-32.74
-28.77
+Below is the mainline commit:
 
-RR result with bql:
-222.98
-159.81
-197.88
+netlink: annotate lockless accesses to nlk->max_recvmsg_len
+[ Upstream commit a1865f2e7d10dde00d35a2122b38d2e469ae67ed ]
 
+netlink: annotate data-races around sk->sk_err
+[ Upstream commit d0f95894fda7d4f895b29c1097f92d7fee278cb2 ]
 
+Eric Dumazet (2):
+  netlink: annotate lockless accesses to nlk->max_recvmsg_len
+  netlink: annotate data-races around sk->sk_err
 
->
->
->> 
->> >
->> >
->> >
->> >
->> >> I don't see why virtio should be any different from other
->> >> drivers/devices that benefit from bql. HOL blocking is the same here are
->> >> everywhere.
->> >> 
->> >> >
->> >> >So I'm asking, what kind of benefit do you observe?
->> >> 
->> >> I don't have measurements at hand, will attach them to v2.
->> >> 
->> >> Thanks!
->> >> 
->> >> >
->> >> >-- 
->> >> >MST
->> >> >
->> >
->
+ net/netlink/af_netlink.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
+
+-- 
+2.18.0
+
 
