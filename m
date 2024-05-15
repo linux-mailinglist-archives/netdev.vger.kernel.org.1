@@ -1,221 +1,282 @@
-Return-Path: <netdev+bounces-96544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EB958C6690
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:54:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDC518C6686
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:53:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8DED283DBD
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:54:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0A781C20EA8
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:53:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ACD284D14;
-	Wed, 15 May 2024 12:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F269881736;
+	Wed, 15 May 2024 12:53:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Qru3J4zy"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="S4e2Xitr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68DB84D22
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 12:54:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D1C84A46
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 12:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715777654; cv=none; b=V21Ywnrhkt5sxLigV2pWIg2hVgh+FTwHpBO3KxME/0Xpfp7zbw0iw/UgRqQtLTuOYM+SNT6nkMpOP6pzyUk6G28fqsDQMlGPNEspduNEUC8Z9YWlftL1Q4VV632HNEceaA2/20Z4N9k40I1nsR/jykKaB7dPeVf9lbIFgmNFd60=
+	t=1715777612; cv=none; b=O9zw9r6aL6da7EL1v/0f7kxglksROD4pjLVnIklUjq50KZ3rQTXTnl4ldB0KgGNAaABn0dLYlh1QgEKGPX3xzKNYvQjj7z+H2X5uU+0N1Lt+tbBi+MRT001dzUPyyKx3dMBvhaDQo6dCuHPnKcxhPzacMmOEZN+W7e3Xx9vBMok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715777654; c=relaxed/simple;
-	bh=fa0lk4wrnn3s5FADJjPgnJrV+uzfIIxTSfTO+n9aVOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TDC8id96LZrYY30nAxHK/hw+2ZI6DRcCRbxbBdfCT2U04FuHeijp+pvq/3oSMuX0cn7fOOa6J4YEY76vsp0lfBNnUH6Li04cA7lmRkCVXyhBiC4/aYGNF9rNOxPDSMvFFZoT2Qo+QVGF7tI3jY9AtsjJMMZOarRKpOi/igkiKkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Qru3J4zy; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-34d7b0dac54so3940344f8f.0
-        for <netdev@vger.kernel.org>; Wed, 15 May 2024 05:54:11 -0700 (PDT)
+	s=arc-20240116; t=1715777612; c=relaxed/simple;
+	bh=ebrfLUmJa7BPXFIDiD8p6gSFo4rINyOoIZZDKBzVjwA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TI/fS2cIV8rBGoQsPC8VeyNhZysHcxSVateJrZSwtFR8n83Ns4iYgIXbGquhgVQ0EY0bZ7RvxQFFwNYQR2fJey1TSgiztqZMAcpXOFl1xQn2a/8BlomiQHCI0e2jLLl+X3ururAApHpxtMcI8BXnT8exJJ/+SQhDvWNQJAqesq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=S4e2Xitr; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-572d2461001so1743249a12.0
+        for <netdev@vger.kernel.org>; Wed, 15 May 2024 05:53:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715777650; x=1716382450; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=399YWrOQm2u/X7iwRgitAignXFxnAABjsBtmCgGDs6o=;
-        b=Qru3J4zy2tBxa1HUOCFfXYdLB7V1WzuiloDhH3saLmb26QHg0e9mhLNSo4s83Oi9Ht
-         XBgxPMJgzYeVkPLIs0fw5BNlhgTwgYMz1P0gc3ULkEtm1+2Moiz1PW09FTJFiJGWvhna
-         nrhuuvjjYaBDfl84nPWaGYIQKfz8clWhxO99onmDW3IWQTDsdqlM8HEAQSfz2KhlArsa
-         B38jTbp4COJH3HdeW9shvnt6VeOM04cInne2TFtna5ddzhWmYrMosMlRMj0Ya6+0zrd8
-         yYLNhQPBi+3v88UjukamAA4l0CTBDmXWRPvMujLW+O9fCnGRJLTAjGoRycAo8UDlUF4C
-         d3fg==
+        d=openvpn.net; s=google; t=1715777609; x=1716382409; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0H1F6DzOQdPqwfC+T7Ts/8jCBWptxIZx1xVD8Z+RTdg=;
+        b=S4e2Xitre/qjBWZyNaMvC+nRxSa/zLcSFJDD+3qxkdnLE6gjAWOGKe7llvcpe3oqDk
+         UKpWbkEOrNKSV5gyV6Ks/PvTnW+q01cbhzQKrZh4IWIBmvAovyYHyn84RreIkKqO8OBS
+         Vvow5JJUS/CGWsBshctSIujABmIh4CnHZuJ2vtbEuDyj80pySf+HUyiTWz4/q9eisz2J
+         ateHlxwVv7qI9I6Adb5rL3gMQUyNBzSxAf3n0v4ZOjWXcMHLtwhNCmf8RCCaFLs9Ikbk
+         mqT2dSFTZ/ARfBR5BnAB9gTR0mc1g3mwBMQJ/zCzwG548k/X5WY4rNC2JpEuzzbeJIRA
+         ssTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715777650; x=1716382450;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1715777609; x=1716382409;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=399YWrOQm2u/X7iwRgitAignXFxnAABjsBtmCgGDs6o=;
-        b=P8bNjo7/725F8rs33abDx2JlcfKwXHBlqyI3NHgeO0vJXbI4c4HLBOdAVUgbKtMRiG
-         OZVksfmHuFlqWHe9KX3ir/dVGMJCUqG6Q1VnBfmuXpayzZv+nCcKnozytymwwGRTpfPp
-         Fd5ESIUTknuybPtd3z/NmHIxf0BOi/f41W50hJPiiJtSytjBU38oHe5baDMAqhAZI7BQ
-         O+0ROuOGRSyymG26BMoBUfg7BEevtyuNe9/jZ4S/jvRVYmbPY9rtbCG84AYjfTk7ZQHW
-         BpCpGkBVujOOIgL7E1XRzdobwfr/kJHD1GUbvDzP/iMWIObOYcprZ1DnuM3kcus172y1
-         Q3Jg==
-X-Gm-Message-State: AOJu0Yz3HWq/RBkXl9vP5t8mU5FDMJajZRbF5OyA4UGL8FByz1OpXHmK
-	QcRPBWmw1wBD64KnZ9/XLevPRjiZfBKszKOivFKitg/fe8obOvDmvURWm4b9+FgD3rVvb843aKr
-	5
-X-Google-Smtp-Source: AGHT+IE4YrrtRuAFNWww2vR5w1DpfKkKPKDKWLHkD81iqzTV9ozJs4BXxNZfFL3AHXUrn1Eq821Dfw==
-X-Received: by 2002:a5d:6e0b:0:b0:34c:cae0:c989 with SMTP id ffacd0b85a97d-35049bbf662mr14131125f8f.33.1715777649820;
-        Wed, 15 May 2024 05:54:09 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b79bc3bsm16388034f8f.13.2024.05.15.05.54.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 05:54:09 -0700 (PDT)
-Date: Wed, 15 May 2024 14:54:05 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com
-Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
-Message-ID: <ZkSwbaA74z1QwwJz@nanopsycho.orion>
-References: <20240509084050-mutt-send-email-mst@kernel.org>
- <ZjzQTFq5lJIoeSqM@nanopsycho.orion>
- <20240509102643-mutt-send-email-mst@kernel.org>
- <Zj3425_gSqHByw-R@nanopsycho.orion>
- <20240510065121-mutt-send-email-mst@kernel.org>
- <Zj4A9XY7z-TzEpdz@nanopsycho.orion>
- <20240510072431-mutt-send-email-mst@kernel.org>
- <ZkRlcBU0Nb3O-Kg1@nanopsycho.orion>
- <20240515041909-mutt-send-email-mst@kernel.org>
- <ZkSKo1npMxCVuLfT@nanopsycho.orion>
+        bh=0H1F6DzOQdPqwfC+T7Ts/8jCBWptxIZx1xVD8Z+RTdg=;
+        b=nzcBDiiciUnfRwbD5LiibzpnNO89NDOPRIdZpHC5Je6dNWm4HBq6r3hfC/V+pQpXkp
+         KWaxphKHXYKFImNTNCayj5FisyRJz0oprO+HVKrgSCoLcaInr0TYL6Jhk8JhSCd3zxlK
+         9CTzPHk2g25ZdrmPeT0+aExeSKZbp/J09Jz4sIj2OHCSDHuB8HvH5U7xiqdGSSvlApNm
+         SXTkMv68Ds6v0oStl49L1TJJybvzoyUAxrlcDBFu0c23YnSepYgUhzGKNiom0hX351TQ
+         ODMvDuKgOARA0l2KDmoV55M8FK9vUSMWDT1RP+XSzMn9LWrZ+Ya2wEjpFqPTdgljho27
+         fCEQ==
+X-Gm-Message-State: AOJu0YwIjzthvm1VrU7G9hI35FmJVo4Yi3X20vsU+0fE9RrfR69rGXvv
+	Tklvam8CYzRvhlS78a/0+ZIWn0zssg6SBrKuwBtkZ34DowLlsv07NQ8COJXT6NM=
+X-Google-Smtp-Source: AGHT+IHQA8nalxEHUea6n1xJCr3e535I0XItXlJo9ZwqzSCezm47cSbD4OOqCQcSTTYEk3eFQNoXOw==
+X-Received: by 2002:aa7:d3c3:0:b0:573:5c4f:27a8 with SMTP id 4fb4d7f45d1cf-5735c4f27e2mr10459802a12.35.1715777608761;
+        Wed, 15 May 2024 05:53:28 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:0:1ebc:be00:b4c3:bcf2? ([2001:67c:2fbc:0:1ebc:be00:b4c3:bcf2])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-574f73a7ee0sm1074541a12.4.2024.05.15.05.53.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 May 2024 05:53:28 -0700 (PDT)
+Message-ID: <6de315a7-8ef1-4b5d-8adc-fcfae26f6f88@openvpn.net>
+Date: Wed, 15 May 2024 14:54:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZkSKo1npMxCVuLfT@nanopsycho.orion>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 13/24] ovpn: implement TCP transport
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
+ Esben Haabendal <esben@geanix.com>
+References: <20240506011637.27272-1-antonio@openvpn.net>
+ <20240506011637.27272-14-antonio@openvpn.net> <ZkIosadLULByXFKc@hog>
+ <73433bdf-763b-4023-8cb9-ffd9487744e0@openvpn.net> <ZkMnpy3_T8YO3eHD@hog>
+ <2ddf759d-378f-475c-8fc1-30c6e83c2d14@openvpn.net> <ZkSMPeSSS4VZxHrf@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <ZkSMPeSSS4VZxHrf@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Wed, May 15, 2024 at 12:12:51PM CEST, jiri@resnulli.us wrote:
->Wed, May 15, 2024 at 10:20:04AM CEST, mst@redhat.com wrote:
->>On Wed, May 15, 2024 at 09:34:08AM +0200, Jiri Pirko wrote:
->>> Fri, May 10, 2024 at 01:27:08PM CEST, mst@redhat.com wrote:
->>> >On Fri, May 10, 2024 at 01:11:49PM +0200, Jiri Pirko wrote:
->>> >> Fri, May 10, 2024 at 12:52:52PM CEST, mst@redhat.com wrote:
->>> >> >On Fri, May 10, 2024 at 12:37:15PM +0200, Jiri Pirko wrote:
->>> >> >> Thu, May 09, 2024 at 04:28:12PM CEST, mst@redhat.com wrote:
->>> >> >> >On Thu, May 09, 2024 at 03:31:56PM +0200, Jiri Pirko wrote:
->>> >> >> >> Thu, May 09, 2024 at 02:41:39PM CEST, mst@redhat.com wrote:
->>> >> >> >> >On Thu, May 09, 2024 at 01:46:15PM +0200, Jiri Pirko wrote:
->>> >> >> >> >> From: Jiri Pirko <jiri@nvidia.com>
->>> >> >> >> >> 
->>> >> >> >> >> Add support for Byte Queue Limits (BQL).
->>> >> >> >> >> 
->>> >> >> >> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->>> >> >> >> >
->>> >> >> >> >Can we get more detail on the benefits you observe etc?
->>> >> >> >> >Thanks!
->>> >> >> >> 
->>> >> >> >> More info about the BQL in general is here:
->>> >> >> >> https://lwn.net/Articles/469652/
->>> >> >> >
->>> >> >> >I know about BQL in general. We discussed BQL for virtio in the past
->>> >> >> >mostly I got the feedback from net core maintainers that it likely won't
->>> >> >> >benefit virtio.
->>> >> >> 
->>> >> >> Do you have some link to that, or is it this thread:
->>> >> >> https://lore.kernel.org/netdev/21384cb5-99a6-7431-1039-b356521e1bc3@redhat.com/
->>> >> >
->>> >> >
->>> >> >A quick search on lore turned up this, for example:
->>> >> >https://lore.kernel.org/all/a11eee78-b2a1-3dbc-4821-b5f4bfaae819@gmail.com/
->>> >> 
->>> >> Says:
->>> >> "Note that NIC with many TX queues make BQL almost useless, only adding extra
->>> >>  overhead."
->>> >> 
->>> >> But virtio can have one tx queue, I guess that could be quite common
->>> >> configuration in lot of deployments.
->>> >
->>> >Not sure we should worry about performance for these though.
->>> >What I am saying is this should come with some benchmarking
->>> >results.
->>> 
->>> I did some measurements with VDPA, backed by ConnectX6dx NIC, single
->>> queue pair:
->>> 
->>> super_netperf 200 -H $ip -l 45 -t TCP_STREAM &
->>> nice -n 20 netperf -H $ip -l 10 -t TCP_RR
->>> 
->>> RR result with no bql:
->>> 29.95
->>> 32.74
->>> 28.77
->>> 
->>> RR result with bql:
->>> 222.98
->>> 159.81
->>> 197.88
->>> 
+On 15/05/2024 12:19, Sabrina Dubroca wrote:
+> 2024-05-15, 00:11:28 +0200, Antonio Quartulli wrote:
+>> On 14/05/2024 10:58, Sabrina Dubroca wrote:
+>>>>> The UDP code differentiates "socket already owned by this interface"
+>>>>> from "already taken by other user". That doesn't apply to TCP?
+>>>>
+>>>> This makes me wonder: how safe it is to interpret the user data as an object
+>>>> of type ovpn_socket?
+>>>>
+>>>> When we find the user data already assigned, we don't know what was really
+>>>> stored in there, right?
+>>>> Technically this socket could have gone through another module which
+>>>> assigned its own state.
+>>>>
+>>>> Therefore I think that what UDP does [ dereferencing ((struct ovpn_socket
+>>>> *)user_data)->ovpn ] is probably not safe. Would you agree?
+>>>
+>>> Hmmm, yeah, I think you're right. If you checked encap_type ==
+>>> UDP_ENCAP_OVPNINUDP before (sk_prot for TCP), then you'd know it's
+>>> really your data. Basically call ovpn_from_udp_sock during attach if
+>>> you want to check something beyond EBUSY.
 >>
->>Okay. And on the other hand, any measureable degradation with
->>multiqueue and when testing throughput?
->
->With multiqueue it depends if the flows hits the same queue or not. If
->they do, the same results will likely be shown.
+>> right. Maybe we can leave with simply reporting EBUSY and be done with it,
+>> without adding extra checks and what not.
+> 
+> I don't know. What was the reason for the EALREADY handling in udp.c
+> and the corresponding refcount increase in ovpn_socket_new?
 
-RR 1q, w/o bql:
-29.95
-32.74
-28.77
+it's just me that likes to be verbose when doing error reporting.
+But eventually the exact error is ignored and we release the reference. 
+ From netlink.c:
 
-RR 1q, with bql:
-222.98
-159.81
-197.88
+342                 peer->sock = ovpn_socket_new(sock, peer);
+343                 if (IS_ERR(peer->sock)) {
+344                         sockfd_put(sock);
+345                         peer->sock = NULL;
+346                         ret = -ENOTSOCK;
 
-RR 4q, w/o bql:
-355.82
-364.58
-233.47
+so no added value in distinguishing the two cases.
 
-RR 4q, with bql:
-371.19
-255.93
-337.77
-
-So answer to your question is: "no measurable degradation with 4
-queues".
-
-
->
->
+> 
+> 
+>>>>>> +int __init ovpn_tcp_init(void)
+>>>>>> +{
+>>>>>> +	/* We need to substitute the recvmsg and the sock_is_readable
+>>>>>> +	 * callbacks in the sk_prot member of the sock object for TCP
+>>>>>> +	 * sockets.
+>>>>>> +	 *
+>>>>>> +	 * However sock->sk_prot is a pointer to a static variable and
+>>>>>> +	 * therefore we can't directly modify it, otherwise every socket
+>>>>>> +	 * pointing to it will be affected.
+>>>>>> +	 *
+>>>>>> +	 * For this reason we create our own static copy and modify what
+>>>>>> +	 * we need. Then we make sk_prot point to this copy
+>>>>>> +	 * (in ovpn_tcp_socket_attach())
+>>>>>> +	 */
+>>>>>> +	ovpn_tcp_prot = tcp_prot;
+>>>>>
+>>>>> Don't you need a separate variant for IPv6, like TLS does?
+>>>>
+>>>> Never did so far.
+>>>>
+>>>> My wild wild wild guess: for the time this socket is owned by ovpn, we only
+>>>> use callbacks that are IPvX agnostic, hence v4 vs v6 doesn't make any
+>>>> difference.
+>>>> When this socket is released, we reassigned the original prot.
+>>>
+>>> That seems a bit suspicious to me. For example, tcpv6_prot has a
+>>> different backlog_rcv. And you don't control if the socket is detached
+>>> before being closed, or which callbacks are needed. Your userspace
+>>> client doesn't use them, but someone else's might.
+>>>
+>>>>>> +	ovpn_tcp_prot.recvmsg = ovpn_tcp_recvmsg;
+>>>>>
+>>>>> You don't need to replace ->sendmsg as well? The userspace client is
+>>>>> not expected to send messages?
+>>>>
+>>>> It is, but my assumption is that those packets will just go through the
+>>>> socket as usual. No need to be handled by ovpn (those packets are not
+>>>> encrypted/decrypted, like data traffic is).
+>>>> And this is how it has worked so far.
+>>>>
+>>>> Makes sense?
+>>>
+>>> Two things come to mind:
+>>>
+>>> - userspace is expected to prefix the messages it inserts on the
+>>>     stream with the 2-byte length field? otherwise, the peer won't be
+>>>     able to parse them out of the stream
 >>
+>> correct. userspace sends those packets as if ovpn is not running, therefore
+>> this happens naturally.
+> 
+> ok.
+> 
+> 
+>>> - I'm not convinced this would be safe wrt kernel writing partial
+>>>     messages. if ovpn_tcp_send_one doesn't send the full message, you
+>>>     could interleave two messages:
+>>>
+>>>     +------+-------------------+------+--------+----------------+
+>>>     | len1 | (bytes from msg1) | len2 | (msg2) | (rest of msg1) |
+>>>     +------+-------------------+------+--------+----------------+
+>>>
+>>>     and the RX side would parse that as:
+>>>
+>>>     +------+-----------------------------------+------+---------
+>>>     | len1 | (bytes from msg1) | len2 | (msg2) | ???? | ...
+>>>     +------+-------------------+---------------+------+---------
+>>>
+>>>     and try to interpret some random bytes out of either msg1 or msg2 as
+>>>     a length prefix, resulting in a broken stream.
 >>
->>> 
->>> >
->>> >
->>> >> 
->>> >> >
->>> >> >
->>> >> >
->>> >> >
->>> >> >> I don't see why virtio should be any different from other
->>> >> >> drivers/devices that benefit from bql. HOL blocking is the same here are
->>> >> >> everywhere.
->>> >> >> 
->>> >> >> >
->>> >> >> >So I'm asking, what kind of benefit do you observe?
->>> >> >> 
->>> >> >> I don't have measurements at hand, will attach them to v2.
->>> >> >> 
->>> >> >> Thanks!
->>> >> >> 
->>> >> >> >
->>> >> >> >-- 
->>> >> >> >MST
->>> >> >> >
->>> >> >
->>> >
+>> hm you are correct. if multiple sendmsg can overlap, then we might be in
+>> troubles, but are we sure this can truly happen?
+> 
+> What would prevent this? The kernel_sendmsg call in ovpn_tcp_send_one
+> could send a partial message, and then what would stop userspace from
+> sending its own message during the cond_resched from ovpn_tcp_tx_work?
+
+I was under the impression that ovpn_tcp_send_one() would always send an 
+entire packet, but this may not be the case. So you're definitely right.
+
+We may end up having interleaving sendmsg from kernelspace and userspace.
+
+> 
+>>> The stream format looks identical to ESP in TCP [1] (2B length prefix
+>>> followed by the actual message), so I think the espintcp code (both tx
+>>> and rx, except for actual protocol parsing) should look very
+>>> similar. The problems that need to be solved for both protocols are
+>>> pretty much the same.
 >>
+>> ok, will have a look. maybe this will simplify the code even more and we
+>> will get rid of some of the issues we were discussing above.
+> 
+> I doubt dealing with possible interleaving will make the code simpler,
+> but I think it has to be done.
+
+Yap.
+
+Thanks a lot for pointing this out and for the pointers you gave me.
+
+> 
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
