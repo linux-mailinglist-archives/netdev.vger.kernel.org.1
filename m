@@ -1,197 +1,188 @@
-Return-Path: <netdev+bounces-96611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEA078C6A91
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 18:29:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34B818C6AA3
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 18:32:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1D431C223D3
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:29:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E085A28542C
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A437015665A;
-	Wed, 15 May 2024 16:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EB3ABA46;
+	Wed, 15 May 2024 16:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PvPLn1wK"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BX6rxjzK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2042.outbound.protection.outlook.com [40.107.223.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E618113EFE5;
-	Wed, 15 May 2024 16:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715790583; cv=none; b=F24c/v2oBywfTw1nNjhPJx+IkWfBAb1a05g445B5B5xJAr4E+d9X5lwXC4+L0LVvkryx+dORSdcvQNHfUTLBcRwFdh6oENY2QQCkoDt5noqX7QCTjqx3G/qvS+UZgEwvYrKFdY3+PxDoUHxOzSTk+AYCGqNOfrORwiyJkCtDZKU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715790583; c=relaxed/simple;
-	bh=rBBC+aSahEmVK7ZPwrfWO9sJBrFh5xxG85dkqntLIq8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Le4iUkKVIlE8V44OKta/dyxXZiNE5ffXPwU/E3+BzkOEhixb7SWLGvGZ7nlgfHov1dy7JZAPyaLgPucCUSNU+iQPsISKwNsr0a59ZIx5zB4imehyO04V9wjHLnhyA5UGIT4suZoaXw4mcqhdlWp7qlAB6G1nBmmGipwIncqXsWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PvPLn1wK; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a59a9d66a51so189768266b.2;
-        Wed, 15 May 2024 09:29:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715790580; x=1716395380; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rBBC+aSahEmVK7ZPwrfWO9sJBrFh5xxG85dkqntLIq8=;
-        b=PvPLn1wKsSO9PJVvmVG+2WmNPx8vq5hWDU4auhlA+p075eYdXAfaLq0cSh8ebRZQEX
-         aU67e6aD63RAaQndV5fDagv90+iSY8BfRlnBJmUqnwnWjKPUahwuP5RjL8s7OYIx05QK
-         9avF+sslYmvsjgzJExtf0LSnWgG/mi6DM5647Ap7i1pjR963CjiV5msa9zCEd3Ix7Xtn
-         0dCA/fK3+7pEYbmW4WVVEFR0dXHF6a2ZehfE84xM57TOgv/0NUPbtk9sOzDFVE4PeBSa
-         rDrQXL7Ub1qlxkaBec/xZQTgJJ27FofvkLgG9I88Om8C+qLCj1MAwfRTpByASTC0/vEY
-         9G7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715790580; x=1716395380;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rBBC+aSahEmVK7ZPwrfWO9sJBrFh5xxG85dkqntLIq8=;
-        b=H4HBUuHVP6LLL7XYQYagi8vCAdSGiYDt9YJk/Rnvm5Z88H5wbDcq3HQkR1XRled9mq
-         x4/3f5+rR7HEXUzxdnPeff39/40A7VTg03YCYiaO37NvIGV+2IjhdYL0BRrQMU/x2csv
-         eGmE40WISuC93cCeqbHcroCJ1fU836LuZgxBtVOFEZiNZ2txt9pBdxTUBia+PLN5zZe6
-         5/4M0+xhL//ObCGfE3k1F64nen7ArzaKl/Z6OtJB06I2PXV6yODckxJTc/SEzoDY7zpL
-         4fyzFjlkVDzIRhVTdb2g6cEWD5UVZTmTq6wIOWe4TtWeU9wC9g/wxWBjARD6Y/I+nkrm
-         4ULA==
-X-Forwarded-Encrypted: i=1; AJvYcCUTmdvU/A3yTrG2z3HqinXdKMMC9Gavd6G45mqrAWtG03M9llrDCwUdw5gTiGV5cSPzYg3SX6DivBAwEjgvlUTAiGSaeJZh19HHPokckzyCFA33kuK8V+oe5yBcOUC2ETSgjnP9Y/M/IM6tysIqCNPmosBIAvDe8Y8cy/LYVIpU37xd3fLO5R/5RD4Z1lZwlLeJHORpzbqt
-X-Gm-Message-State: AOJu0Yy3+sQg2e9qrUe4P+mNXvGZzTEx/Reqi9W3KwzuWA7kE//A4Hyu
-	Ydk++98GubBj37aM8ppIrhNUREXDiFqdCFe2lsBX7dXbsMJEk750
-X-Google-Smtp-Source: AGHT+IFKimaUstziNEwfRQmnoURBuwCag4JfaSU65VBAInR3zjN+zSk8n2vTRLiJ26j9RrK4poO98A==
-X-Received: by 2002:a17:906:5a5a:b0:a5a:34ae:10ea with SMTP id a640c23a62f3a-a5a34ae118emr924333366b.76.1715790579864;
-        Wed, 15 May 2024 09:29:39 -0700 (PDT)
-Received: from [192.168.10.8] (31-10-206-125.static.upc.ch. [31.10.206.125])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a17894d57sm881641966b.73.2024.05.15.09.29.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 09:29:39 -0700 (PDT)
-Message-ID: <11e4ff07ad6c0e9077326cf288665922ccfc0afd.camel@gmail.com>
-Subject: Re: [PATCH v5] can: mcp251xfd: fix infinite loop when xmit fails
-From: Vitor Soares <ivitro@gmail.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Thomas Kopp
- <thomas.kopp@microchip.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Vitor Soares <vitor.soares@toradex.com>,
- linux-can@vger.kernel.org,  netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Date: Wed, 15 May 2024 17:29:38 +0100
-In-Reply-To: <20240515-athletic-sensible-swine-4e7692-mkl@pengutronix.de>
-References: <20240514105822.99986-1-ivitro@gmail.com>
-	 <20240514-corgi-of-marvelous-peace-968f5c-mkl@pengutronix.de>
-	 <465a2ddb222beed7c90b36c523633fc5648715bb.camel@gmail.com>
-	 <20240515-athletic-sensible-swine-4e7692-mkl@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7EA1392
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 16:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715790723; cv=fail; b=GgghSf30Wf5nloBk+/88C9qXwHB+N4hZS2N0Jlh6T4o+DbTSuNfFiGzzQYe3X1yvmE8DNxIJ7IJbxf7aZHPXnDxHRiYuXnUo2EXydnLD5y7RRiODUee1O+1Ap3mvn7qyVQmSd+jnwV3+3+lmkXPcw90bA2ON3gxiRYNW6ESKVrg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715790723; c=relaxed/simple;
+	bh=MggjUVMhsZsVZIDpD0tuKk6IXs2LzRj1/MsGzF2VOCA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=O/BAInbOrTeFxAOIFCdgdiCBTuMIr4TIsuzQw79ZyfokKH2+fnJMGNpTzamLU6LVWwOy3cOXvBOS3VDRWiyTbXpiXKEhuTSqz/AB9OVeVYNUysx6N0CaQvCrjmoCHJzMwCFmODTZOXHWWJGWKSQUIVzT87/z8gairRld28mj/yc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=BX6rxjzK; arc=fail smtp.client-ip=40.107.223.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=c88WekXe6+wHvBeNmFzXZlF0sZ3eJHjQ9eJgmE14bf0fKQYVDG+XUxYIoObL4gr2LgYnl4mwfOHcWTTsxlOoI79hKFHfNs1QcSUIAvQJ1r9zpZGeJqEeRJEchxg9bn5ZCrP8+CQjr42LXxBjgUWlqAo5xnLvRCmu9tNdyERDr6wFdbkfy4HyOB+zg0PcppR0MwMXxr1j1PWfH/eFwqy1OnDMARofl1qoFEFZUVbrnMQ81na5Nl1Q/3VRwDGLx5H3BonowDPe8A63GR2+0tfhPXWqBT8DrRi4BST2qTIaUB0gdfYWWhYdxKwv6f1b1xn133/fVBCBDyQn0sxrufJd4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fBIvjOs88Aj2CY6XbOtzW2LSJ5cGx3sCDIYKJJTiWfQ=;
+ b=c3bLakC6/B0EHBKsMbBbgli4xjy0ZnZXfY2X/9hGfRXc2hTDxVtrJTJkCU72yAhe35nBDocsr354AN/Z+xZ23BAQAY3vtkCUF3ne3KcxKzMoJFwTXdeY69ztNkkJaVLEC7bmz8A5Uj6r5uEG7tXfqA91mhtkTb6MJKNC1qxadwQvA3Wz0hHbbxyDDC2N4hWQ4i9ac/hIg6+8Vo6MYUlijcjIoGOMaxKItvrk2VLp6tTHLqZFZpHcPh8sr6y+AdySXX4iIUBWsbfQStYxXRRSy3bmI2g4Mw297rN7X2rdMFDhSMv6KoGT/ei2X1NDAhC+rWI8n3d8iw1Ov2whSYNdlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fBIvjOs88Aj2CY6XbOtzW2LSJ5cGx3sCDIYKJJTiWfQ=;
+ b=BX6rxjzKHyI1xUuNCrvYnrpNoXg8TTuZzO7K2xEuxgkDMgAIaedfuL68dJuagLduXM9t6B7XAP5sQ++qNcLpsMSYcN64E4I7Ty/BjWtajqEGF3fbNOk3Dta0Q9fNLxAVgxKUp9xONkDBVZTDfjz3PYF9TRYTnjRWU30DnvYcfns76hhEbV2d5o0vGBebEvOT5bESo+G3XP9VhbCwJz9C9bHsfe0uIJZxYDfjqg8bvFiT5tntcozdJDdjQkshG0f6SBRESjuW/WbSu6XGTRcRgWVebNRo8nVtvRcTgeiKSFEyGZ4odMsC3Bqnlq4wWbcizJcy6j4UJEnAeCML8zpvEQ==
+Received: from DM6PR02CA0059.namprd02.prod.outlook.com (2603:10b6:5:177::36)
+ by PH0PR12MB7905.namprd12.prod.outlook.com (2603:10b6:510:28b::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.27; Wed, 15 May
+ 2024 16:31:57 +0000
+Received: from DS2PEPF00003442.namprd04.prod.outlook.com
+ (2603:10b6:5:177:cafe::e0) by DM6PR02CA0059.outlook.office365.com
+ (2603:10b6:5:177::36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.27 via Frontend
+ Transport; Wed, 15 May 2024 16:31:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS2PEPF00003442.mail.protection.outlook.com (10.167.17.69) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7587.21 via Frontend Transport; Wed, 15 May 2024 16:31:56 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 15 May
+ 2024 09:31:31 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 15 May
+ 2024 09:31:30 -0700
+Received: from vdi.nvidia.com (10.127.8.13) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Wed, 15 May
+ 2024 09:31:29 -0700
+From: Daniel Jurgens <danielj@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
+	<virtualization@lists.linux.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<jiri@nvidia.com>, Daniel Jurgens <danielj@nvidia.com>, Eric Dumazet
+	<edumaset@google.com>
+Subject: [PATCH v3] virtio_net: Fix missed rtnl_unlock
+Date: Wed, 15 May 2024 11:31:25 -0500
+Message-ID: <20240515163125.569743-1-danielj@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003442:EE_|PH0PR12MB7905:EE_
+X-MS-Office365-Filtering-Correlation-Id: 61cbeeaf-d8b4-4753-032c-08dc74fc8992
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|82310400017|36860700004|376005|7416005|1800799015;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?/kBOdpb09xwpjV+aqf+mOc1PxlYd96AVXD/9cimLRKKtFd3ONlbQ+jrH88WU?=
+ =?us-ascii?Q?YNQn8jWGn1aioJ8KCYSmHQuaCI6c/eadI8XFWJymNQFsrXoH1OdgplHOeDKN?=
+ =?us-ascii?Q?HuJF2dkXFZN8v/3b9sKAMOvY/QwgNtVeVa0XQ9gVbjG/KHQ6Hhq3e4K+awDw?=
+ =?us-ascii?Q?R8K6nliC2OS5YeZre2n2T0cEwBEL8R8fLKV7JoAagw8ymLKZg+b/n6ASbLdo?=
+ =?us-ascii?Q?XSxbQFQu3sKfDN4kVRShkZn+RKfcYCx0SBWDTuzMDDMILT0ZMu+zJ1l1Pj9H?=
+ =?us-ascii?Q?cgVsgNK/0NIAPt6JCam9odSLRl02cEUtPK8pS1o3s5XY+IMF/g8pDFL8pNAn?=
+ =?us-ascii?Q?iaBbErCAKBTEPauK5PnZr4fTWuwjSZC8deD7D79piph0NZhEahInWfUr3ziw?=
+ =?us-ascii?Q?PgjSbpXmKMGTeMTu6D9tlznOe0cNnXLlwV5FouJxxggB0JnyTnW9pelFLyId?=
+ =?us-ascii?Q?l/RlFhqxShD+HRAYqa+t/Yc+jFdcvT7eylLCtbXxzeTKl2f0vaSSv2M1EAEd?=
+ =?us-ascii?Q?K/N3+9WBfiigpGugm4KrdA/FL72luaM8BZM1f1n2EPsVjpGOotjKJio5Tnwo?=
+ =?us-ascii?Q?+aH3Slzb6avs6oNjGo8JDQrAJ/vArQVKBQfDTAMRy5wiN/iz+xL4N3NDhFxp?=
+ =?us-ascii?Q?9IsSxoYPqFsz383bokRmrTTiP5lBSzACMxtDoEmqUvlnNXHaK8dkve0luVuF?=
+ =?us-ascii?Q?tVE0cbB8uBeowQzqKZBRBv9eoOhztFzq0+7wDe32HTKqfzkF6KVfq+jjJg5c?=
+ =?us-ascii?Q?swfzPxqwfDdS9PBEgZgC5/Q+UtR9ylBoLLj+k53A+wp2X28wVEJbGgSJH/zG?=
+ =?us-ascii?Q?Vm5Rta0H8kuzeTtLDG9CTLPx62eEMT0xkQcu5BWYLLG7wnUWlyuJTjnTKPiv?=
+ =?us-ascii?Q?fJG31b64efp4IajUp+AsJcWIQYvVVOTJhsSWhbd5cf2xKEmr89d1PntOM42Y?=
+ =?us-ascii?Q?6pZFfneA+Z5eMzGpoWYv7pngSrdqbol1t9JEQoaxSNyEvxKDqf7VrbOTB5J4?=
+ =?us-ascii?Q?/ljBhjG6DcEkA1gOaiTPBE0Dol4z+wuL+JbghnD+F1IM8zIABS9/J9CYgZfM?=
+ =?us-ascii?Q?vKMeD7P2n6bB9VfPf/7nm5/Ls9RykseJUsBvapkCey/OnAPCVPRU+87GuHc2?=
+ =?us-ascii?Q?8q6023g+4xXbNMpYOSyeJ/HbnCCUtS2VBCVbB7BKG4uT+zucr0vuneToQM+C?=
+ =?us-ascii?Q?YvSnsEzAXfgh1IE19tgCJ8tlLAIVAFPJJ/Dxl9EzAuYhGz5+5/ViqpRp+FyQ?=
+ =?us-ascii?Q?/r8exetLD1aOhCeS1YWOod/UZWMxbQwFLP2BIdS9NZwVCZdzJTUEjQ1lgJXP?=
+ =?us-ascii?Q?ss/AMgv3CBblw/QvDYyqKpd/8EXhZ7Wu7GaErJahqXex4pD+4mUsM4OT0fKi?=
+ =?us-ascii?Q?69mLmkb41Q3kz9zYBUIKIjUincMO?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400017)(36860700004)(376005)(7416005)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2024 16:31:56.6677
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61cbeeaf-d8b4-4753-032c-08dc74fc8992
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF00003442.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7905
 
-On Wed, 2024-05-15 at 13:12 +0200, Marc Kleine-Budde wrote:
-> On 14.05.2024 15:34:01, Vitor Soares wrote:
-> > > > +void mcp251xfd_tx_obj_write_sync(struct work_struct *ws)
-> > > > +{
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct mcp251xfd_priv *priv =
-=3D container_of(ws, struct
-> > > > mcp251xfd_priv,
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 tx_work);
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct mcp251xfd_tx_obj *tx_o=
-bj =3D priv->tx_work_obj;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct mcp251xfd_tx_ring *tx_=
-ring =3D priv->tx;
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int err;
-> > > > +
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 err =3D spi_sync(priv->spi, &=
-tx_obj->msg);
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (err)
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 mcp251xfd_tx_failure_drop(priv, tx_ring, err);
-> > > > +
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 priv->tx_work_obj =3D NULL;
-> > >=20
-> > > Race condition:
-> > > - after spi_sync() the CAN frame is send
-> > > - after the TX complete IRQ the TX queue is restarted
-> > > - the xmit handler might get BUSY
-> > > - fill the tx_work_obj again
->=20
-> You can avoid the race condition by moving "priv->tx_work_obj =3D NULL;"
-> in front of the "spi_sync();". Right?
->=20
-> > > > +}
-> > > > +
-> > > > =C2=A0static int mcp251xfd_tx_obj_write(const struct mcp251xfd_priv=
- *priv,
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct mcp251xfd_=
-tx_obj *tx_obj)
-> > > > =C2=A0{
-> > > > @@ -175,7 +210,7 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff
-> > > > *skb,
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (can_dev_dropped_skb(=
-ndev, skb))
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 return NETDEV_TX_OK;
-> > > > =C2=A0
-> > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (mcp251xfd_tx_busy(priv, t=
-x_ring))
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (mcp251xfd_tx_busy(priv, t=
-x_ring) || priv->tx_work_obj)
-> > >=20
-> > > This should not happen, but better save than sorry.
-> >=20
-> > As there is the race condition you mentioned above, on this condition:
-> > priv->tx_work_obj =3D tx_obj --> xmit will return NETDEV_TX_BUSY
-> >=20
-> > or
-> >=20
-> > priv->tx_work_obj =3D NULL --> It goes through the rest of the code or
-> > the workqueue may sleep after setting tx_work_obj to NULL. Should I
-> > use work_busy() here instead or do you have another suggestion?
->=20
-> Yes, introduce mcp251xfd_work_busy().
->=20
+The rtnl_lock would stay locked if allocating promisc_allmulti failed.
+Also changed the allocation to GFP_KERNEL.
 
-I'll implement it.
+Fixes: ff7c7d9f5261 ("virtio_net: Remove command data from control_buf")
+Reported-by: Eric Dumazet <edumaset@google.com>
+Link: https://lore.kernel.org/netdev/CANn89iLazVaUCvhPm6RPJJ0owra_oFnx7Fhc8d60gV-65ad3WQ@mail.gmail.com/
+Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+---
+v3:
+	- Changed to promisc_allmulti alloc to GPF_KERNEL
+v2:
+	- Added fixes tag.
+---
+ drivers/net/virtio_net.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> I'm not sure what happens if the xmit is called between the
-> "priv->tx_work_obj =3D NULL" and the end of the work. Will queue_work()
-> return false, as the queue is still running?
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 19a9b50646c7..4e1a0fc0d555 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -2902,14 +2902,14 @@ static void virtnet_rx_mode_work(struct work_struct *work)
+ 	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_RX))
+ 		return;
+ 
+-	rtnl_lock();
+-
+-	promisc_allmulti = kzalloc(sizeof(*promisc_allmulti), GFP_ATOMIC);
++	promisc_allmulti = kzalloc(sizeof(*promisc_allmulti), GFP_KERNEL);
+ 	if (!promisc_allmulti) {
+ 		dev_warn(&dev->dev, "Failed to set RX mode, no memory.\n");
+ 		return;
+ 	}
+ 
++	rtnl_lock();
++
+ 	*promisc_allmulti = !!(dev->flags & IFF_PROMISC);
+ 	sg_init_one(sg, promisc_allmulti, sizeof(*promisc_allmulti));
+ 
+-- 
+2.45.0
 
-From the test I did so far, my understanding is the following:
-
-If mcp251xfd_tx_obj_write doesn't fail, everything is OK.
-
-if mcp251xfd_tx_obj_write fails with EBUSY=20
- - stop netif queue
- - fill the tx_work_obj
- - start worker
-
-queue_work() doesn't return false even when work_busy() =3D true.=20
- - xmit handler return, and wait netif_wake_queue()
- - the work handler waits until the previous job gets done before starting =
-the=20
-next one.
- - after the TX completes IRQ, the TX queue is restarted
-
-If the TX queue is restarted immediately after queue_work(), tx_work_obj is
-filled, making the xmit handler return NETDEV_TX_BUSY.
-
-The tests were done with a delay after priv->tx_work_obj =3D NULL.
-
-
-Best regards,
-Vitor Soares
 
