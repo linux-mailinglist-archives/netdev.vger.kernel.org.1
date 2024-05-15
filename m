@@ -1,89 +1,90 @@
-Return-Path: <netdev+bounces-96641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3026A8C6D80
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 23:08:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D7C38C6D81
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 23:08:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA0131F22360
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 21:08:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C53201F221C1
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 21:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA85415B148;
-	Wed, 15 May 2024 21:07:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C4A15B54E;
+	Wed, 15 May 2024 21:07:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TQ0fhvHZ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Im9gBaq5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B844158DD8
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 21:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6C315B129
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 21:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715807276; cv=none; b=dRWLJZUFlbkAgXZXoxliByt1fyPJOLE+EuHDTQBDvCqkDWfmYXLnfjDsXICNKyFZzOpOJt63rnqcZ0ktqh9yZYH99KscrADv6A/ygnDh/olvBVMvS6Ca17pzCPnNNfUxGI08RDhB64dQzrjdtx+kckNasyD6hhbhcrCTYUQky28=
+	t=1715807277; cv=none; b=esw3n7xr88HFbypmYUAV5QwW5+77KmXBhyx3xzy9mgt4UOzufiD3TxI+MzisWPRf4XwKg8tuWSp9eK0/a0RxkXF4hNypXQ92L8U4cbqQmLe5pNm6/vdSwv2uIaaiXxdRCDPlGJzZVJUEh1KF6KPCvI32GkFwTWIs/9JWEngtQJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715807276; c=relaxed/simple;
-	bh=07wdaSzyDRNLYis02ECk0etkjRbAxkc1N6GI7tWpCQc=;
+	s=arc-20240116; t=1715807277; c=relaxed/simple;
+	bh=QG4ohtzM33XftuXeaYkaO5n8PugkI9wJCvZuDmqLmV8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sYZnNgbH+uGLq9pdczg4fHG8RqwjRVdTa/fracNZNWEr7OUAYN7WzodKsBhgd4/SxelJDiGJh1IdrlED4jpREec27uWw3KQL/U+dsbN0G/Au8/15omQARKbeHpbrgLTzDvoogbZqdxfcERG3rgrgWYiSCvrCiJq5DWTwQAJGNLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=TQ0fhvHZ; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=UjCVsYWQTB1X79lVcuH4a0UE6rZqiTRAvEMueuzcP1VuKGJCK6mD/kql5tG+K0OOmfz1pBDjXyPLZrsF9H3m5yKO4NcjPA5ge1HAT7yb3Kaz3FQ+YguQeYUSB03DW2BLF8S+VH5FbInXvmp6Lkbv8EdWz7h/1/ULPlDX8g8Vp5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Im9gBaq5; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44FK1WoW025494;
-	Wed, 15 May 2024 21:07:31 GMT
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44FKbQin017679;
+	Wed, 15 May 2024 21:07:34 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=fLkahyt4/llrQpCkpvfij/GdqruggEubDeceEBRgNuQ=;
- b=TQ0fhvHZD9U2m/in4pV7ryg4P8Nh8oxxiMrHqch3QSS7p4OKOgqEF6/gq9GKefHLc2oq
- y9co4CsCqzAqD2OFLyFsl0XtK6PyKKzHuFnD0Obq9uSZyzmPUOdV2Zoj2/i0QWq44Hjf
- SfM/YKX22bGKM/i3xpgYPOEt/uL6AtdX5W47tjynQ2wAzrIisyLbGfzQUkJ1At7itQUu
- nEFeUu68HF58/rmXcD2Riy4mXLYXsuxuUiS2bAkrLhiQMuDW66dJaS7FXiFk3RoY2/pq
- ioJpTn0fJQ5Hgr6K1BlHx5qQapmV1xPuiGeqUYgXWD5Ka5F8uMuAG5Bk9ZiFXBuPgzhE cw== 
+ bh=bzzXFgKg1rdEQSE4vr331IXTULHw0GQKEPgX7dcGB2Y=;
+ b=Im9gBaq5njr62mwmR8Xu9LMkzCE0bovmmuKzaEgtnFbyyh3OkhIpdji0hWHn9skhelMF
+ i6p/mDVces/OZF1qNsbrO7w8wIX4ddE+tP3WtVHCtgnO/ChimwsJXazwpEzOIYtNhDSO
+ 38fDITaD4O1rJ5EGpEiSHv6tMr9DVnzLehb37IIBjczfeDj+1L8W//7CuIFrhlmhiZKA
+ IwQxf/jvR0O4fIRI6c82Fd+9wcdY591CTpb4oexJRvgOJVjOtn+wQp5JTnbTiOl9n91i
+ UEJ9nmy1cW+HAENvmruBI/paCF13h6eKwaOGMyeGXZCRV6DuT+nln781P+vyEaoLDjBp kg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y4w9r96p6-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y5486r2bm-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 May 2024 21:07:31 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44FL7U8B027361;
-	Wed, 15 May 2024 21:07:30 GMT
+	Wed, 15 May 2024 21:07:34 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44FL7XHD004790;
+	Wed, 15 May 2024 21:07:33 GMT
 Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y4w9r96p3-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y5486r2be-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 May 2024 21:07:30 +0000
+	Wed, 15 May 2024 21:07:33 +0000
 Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44FIQ7VB002310;
-	Wed, 15 May 2024 21:07:29 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3y2m0pdvr4-1
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44FIQ7VC002310;
+	Wed, 15 May 2024 21:07:32 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3y2m0pdvrb-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 May 2024 21:07:29 +0000
+	Wed, 15 May 2024 21:07:32 +0000
 Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44FL7QEi42008942
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44FL7Txi24773160
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 15 May 2024 21:07:28 GMT
+	Wed, 15 May 2024 21:07:31 GMT
 Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7D0A258051;
-	Wed, 15 May 2024 21:07:26 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 0C1E15805C;
+	Wed, 15 May 2024 21:07:29 +0000 (GMT)
 Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4869158062;
-	Wed, 15 May 2024 21:07:26 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id CF5275805A;
+	Wed, 15 May 2024 21:07:28 +0000 (GMT)
 Received: from linux.vnet.ibm.com (unknown [9.41.99.196])
 	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 15 May 2024 21:07:26 +0000 (GMT)
+	Wed, 15 May 2024 21:07:28 +0000 (GMT)
 From: Thinh Tran <thinhtr@linux.ibm.com>
 To: netdev@vger.kernel.org, kuba@kernel.org, anthony.l.nguyen@intel.com,
         aleksandr.loktionov@intel.com, przemyslaw.kitszel@intel.com,
         pmenzel@molgen.mpg.de
 Cc: jesse.brandeburg@intel.com, davem@davemloft.net, edumazet@google.com,
         pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
-        rob.thomas@ibm.com, Thinh Tran <thinhtr@linux.ibm.com>
-Subject: [PATCH iwl-net V4,1/2] i40e: factoring out i40e_suspend/i40e_resume
-Date: Wed, 15 May 2024 16:07:04 -0500
-Message-Id: <20240515210705.620-2-thinhtr@linux.ibm.com>
+        rob.thomas@ibm.com, Thinh Tran <thinhtr@linux.ibm.com>,
+        Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH iwl-net V4,2/2] i40e: Fully suspend and resume IO operations in EEH case
+Date: Wed, 15 May 2024 16:07:05 -0500
+Message-Id: <20240515210705.620-3-thinhtr@linux.ibm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240515210705.620-1-thinhtr@linux.ibm.com>
 References: <20240515210705.620-1-thinhtr@linux.ibm.com>
@@ -95,321 +96,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: KJ6WCN4YrLhl7V9SFJhUCC1TuK0STJc7
-X-Proofpoint-GUID: 3B6l9Pd4k7vD35FCXfsmBqA0LPJj-Hx5
+X-Proofpoint-GUID: r6z84ZXkDb45nEgqQr0ZYRUWxeDBV9rq
+X-Proofpoint-ORIG-GUID: yOmzwD4q6gJl-f4k-8Y_5DdIxYMZbmQi
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
  definitions=2024-05-15_13,2024-05-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- impostorscore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0
- malwarescore=0 mlxscore=0 suspectscore=0 phishscore=0 clxscore=1015
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ adultscore=0 malwarescore=0 spamscore=0 clxscore=1011 phishscore=0
+ priorityscore=1501 impostorscore=0 suspectscore=0 mlxlogscore=999
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2405010000 definitions=main-2405150150
 
-Two new functions, i40e_io_suspend() and i40e_io_resume(), have been
-introduced.  These functions were factored out from the existing
-i40e_suspend() and i40e_resume() respectively.  This factoring was
-done due to concerns about the logic of the I40E_SUSPENSED state, which
-caused the device to be unable to recover.  The functions are now used
-in the EEH handling for device suspend/resume callbacks.
+When EEH events occurs, the callback functions in the i40e, which are
+managed by the EEH driver, will completely suspend and resume all IO
+operations.
 
-The function i40e_enable_mc_magic_wake() has been moved ahead of
-i40e_io_suspend() to ensure it is declared before being used.
+- In the PCI error detected callback, replaced i40e_prep_for_reset()
+  with i40e_io_suspend(). The change is to fully suspend all I/O
+  operations
+- In the PCI error slot reset callback, replaced pci_enable_device_mem()
+  with pci_enable_device(). This change enables both I/O and memory of
+  the device.
+- In the PCI error resume callback, replaced i40e_handle_reset_warning()
+  with i40e_io_resume(). This change allows the system to resume I/O
+  operations
 
+Fixes: a5f3d2c17b07 ("powerpc/pseries/pci: Add MSI domains")
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Tested-by: Robert Thomas <rob.thomas@ibm.com>
 Signed-off-by: Thinh Tran <thinhtr@linux.ibm.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_main.c | 248 +++++++++++---------
- 1 file changed, 134 insertions(+), 114 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index ffb9f9f15c52..281c8ec27af2 100644
+index 281c8ec27af2..9f71a61e0c52 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
 +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -16303,6 +16303,138 @@ static void i40e_remove(struct pci_dev *pdev)
- 	pci_disable_device(pdev);
- }
- 
-+/**
-+ * i40e_enable_mc_magic_wake - enable multicast magic packet wake up
-+ * using the mac_address_write admin q function
-+ * @pf: pointer to i40e_pf struct
-+ **/
-+static void i40e_enable_mc_magic_wake(struct i40e_pf *pf)
-+{
-+	struct i40e_hw *hw = &pf->hw;
-+	u8 mac_addr[6];
-+	u16 flags = 0;
-+	int ret;
-+
-+	/* Get current MAC address in case it's an LAA */
-+	if (pf->vsi[pf->lan_vsi] && pf->vsi[pf->lan_vsi]->netdev) {
-+		ether_addr_copy(mac_addr,
-+				pf->vsi[pf->lan_vsi]->netdev->dev_addr);
-+	} else {
-+		dev_err(&pf->pdev->dev,
-+			"Failed to retrieve MAC address; using default\n");
-+		ether_addr_copy(mac_addr, hw->mac.addr);
-+	}
-+
-+	/* The FW expects the mac address write cmd to first be called with
-+	 * one of these flags before calling it again with the multicast
-+	 * enable flags.
-+	 */
-+	flags = I40E_AQC_WRITE_TYPE_LAA_WOL;
-+
-+	if (hw->func_caps.flex10_enable && hw->partition_id != 1)
-+		flags = I40E_AQC_WRITE_TYPE_LAA_ONLY;
-+
-+	ret = i40e_aq_mac_address_write(hw, flags, mac_addr, NULL);
-+	if (ret) {
-+		dev_err(&pf->pdev->dev,
-+			"Failed to update MAC address registers; cannot enable Multicast Magic packet wake up");
-+		return;
-+	}
-+
-+	flags = I40E_AQC_MC_MAG_EN
-+			| I40E_AQC_WOL_PRESERVE_ON_PFR
-+			| I40E_AQC_WRITE_TYPE_UPDATE_MC_MAG;
-+	ret = i40e_aq_mac_address_write(hw, flags, mac_addr, NULL);
-+	if (ret)
-+		dev_err(&pf->pdev->dev,
-+			"Failed to enable Multicast Magic Packet wake up\n");
-+}
-+
-+/**
-+ * i40e_io_suspend - suspend all IO operations
-+ * @pf: pointer to i40e_pf struct
-+ *
-+ **/
-+static int i40e_io_suspend(struct i40e_pf *pf)
-+{
-+	struct i40e_hw *hw = &pf->hw;
-+
-+	set_bit(__I40E_DOWN, pf->state);
-+
-+	/* Ensure service task will not be running */
-+	del_timer_sync(&pf->service_timer);
-+	cancel_work_sync(&pf->service_task);
-+
-+	/* Client close must be called explicitly here because the timer
-+	 * has been stopped.
-+	 */
-+	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi], false);
-+
-+	if (test_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps) &&
-+	    pf->wol_en)
-+		i40e_enable_mc_magic_wake(pf);
-+
-+	/* Since we're going to destroy queues during the
-+	 * i40e_clear_interrupt_scheme() we should hold the RTNL lock for this
-+	 * whole section
-+	 */
-+	rtnl_lock();
-+
-+	i40e_prep_for_reset(pf);
-+
-+	wr32(hw, I40E_PFPM_APM, (pf->wol_en ? I40E_PFPM_APM_APME_MASK : 0));
-+	wr32(hw, I40E_PFPM_WUFC, (pf->wol_en ? I40E_PFPM_WUFC_MAG_MASK : 0));
-+
-+	/* Clear the interrupt scheme and release our IRQs so that the system
-+	 * can safely hibernate even when there are a large number of CPUs.
-+	 * Otherwise hibernation might fail when mapping all the vectors back
-+	 * to CPU0.
-+	 */
-+	i40e_clear_interrupt_scheme(pf);
-+
-+	rtnl_unlock();
-+
-+	return 0;
-+}
-+
-+/**
-+ * i40e_io_resume - resume IO operations
-+ * @pf: pointer to i40e_pf struct
-+ *
-+ **/
-+static int i40e_io_resume(struct i40e_pf *pf)
-+{
-+	int err;
-+
-+	/* We need to hold the RTNL lock prior to restoring interrupt schemes,
-+	 * since we're going to be restoring queues
-+	 */
-+	rtnl_lock();
-+
-+	/* We cleared the interrupt scheme when we suspended, so we need to
-+	 * restore it now to resume device functionality.
-+	 */
-+	err = i40e_restore_interrupt_scheme(pf);
-+	if (err) {
-+		dev_err(&pf->pdev->dev, "Cannot restore interrupt scheme: %d\n",
-+			err);
-+	}
-+
-+	clear_bit(__I40E_DOWN, pf->state);
-+	i40e_reset_and_rebuild(pf, false, true);
-+
-+	rtnl_unlock();
-+
-+	/* Clear suspended state last after everything is recovered */
-+	clear_bit(__I40E_SUSPENDED, pf->state);
-+
-+	/* Restart the service task */
-+	mod_timer(&pf->service_timer,
-+		  round_jiffies(jiffies + pf->service_timer_period));
-+
-+	return 0;
-+}
-+
- /**
-  * i40e_pci_error_detected - warning that something funky happened in PCI land
-  * @pdev: PCI device information struct
-@@ -16415,53 +16547,6 @@ static void i40e_pci_error_resume(struct pci_dev *pdev)
- 	i40e_handle_reset_warning(pf, false);
- }
- 
--/**
-- * i40e_enable_mc_magic_wake - enable multicast magic packet wake up
-- * using the mac_address_write admin q function
-- * @pf: pointer to i40e_pf struct
-- **/
--static void i40e_enable_mc_magic_wake(struct i40e_pf *pf)
--{
--	struct i40e_hw *hw = &pf->hw;
--	u8 mac_addr[6];
--	u16 flags = 0;
--	int ret;
--
--	/* Get current MAC address in case it's an LAA */
--	if (pf->vsi[pf->lan_vsi] && pf->vsi[pf->lan_vsi]->netdev) {
--		ether_addr_copy(mac_addr,
--				pf->vsi[pf->lan_vsi]->netdev->dev_addr);
--	} else {
--		dev_err(&pf->pdev->dev,
--			"Failed to retrieve MAC address; using default\n");
--		ether_addr_copy(mac_addr, hw->mac.addr);
--	}
--
--	/* The FW expects the mac address write cmd to first be called with
--	 * one of these flags before calling it again with the multicast
--	 * enable flags.
--	 */
--	flags = I40E_AQC_WRITE_TYPE_LAA_WOL;
--
--	if (hw->func_caps.flex10_enable && hw->partition_id != 1)
--		flags = I40E_AQC_WRITE_TYPE_LAA_ONLY;
--
--	ret = i40e_aq_mac_address_write(hw, flags, mac_addr, NULL);
--	if (ret) {
--		dev_err(&pf->pdev->dev,
--			"Failed to update MAC address registers; cannot enable Multicast Magic packet wake up");
--		return;
--	}
--
--	flags = I40E_AQC_MC_MAG_EN
--			| I40E_AQC_WOL_PRESERVE_ON_PFR
--			| I40E_AQC_WRITE_TYPE_UPDATE_MC_MAG;
--	ret = i40e_aq_mac_address_write(hw, flags, mac_addr, NULL);
--	if (ret)
--		dev_err(&pf->pdev->dev,
--			"Failed to enable Multicast Magic Packet wake up\n");
--}
--
- /**
-  * i40e_shutdown - PCI callback for shutting down
-  * @pdev: PCI device information struct
-@@ -16521,48 +16606,11 @@ static void i40e_shutdown(struct pci_dev *pdev)
- static int __maybe_unused i40e_suspend(struct device *dev)
- {
- 	struct i40e_pf *pf = dev_get_drvdata(dev);
--	struct i40e_hw *hw = &pf->hw;
- 
- 	/* If we're already suspended, then there is nothing to do */
- 	if (test_and_set_bit(__I40E_SUSPENDED, pf->state))
- 		return 0;
--
--	set_bit(__I40E_DOWN, pf->state);
--
--	/* Ensure service task will not be running */
--	del_timer_sync(&pf->service_timer);
--	cancel_work_sync(&pf->service_task);
--
--	/* Client close must be called explicitly here because the timer
--	 * has been stopped.
--	 */
--	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi], false);
--
--	if (test_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps) &&
--	    pf->wol_en)
--		i40e_enable_mc_magic_wake(pf);
--
--	/* Since we're going to destroy queues during the
--	 * i40e_clear_interrupt_scheme() we should hold the RTNL lock for this
--	 * whole section
--	 */
--	rtnl_lock();
--
--	i40e_prep_for_reset(pf);
--
--	wr32(hw, I40E_PFPM_APM, (pf->wol_en ? I40E_PFPM_APM_APME_MASK : 0));
--	wr32(hw, I40E_PFPM_WUFC, (pf->wol_en ? I40E_PFPM_WUFC_MAG_MASK : 0));
--
--	/* Clear the interrupt scheme and release our IRQs so that the system
--	 * can safely hibernate even when there are a large number of CPUs.
--	 * Otherwise hibernation might fail when mapping all the vectors back
--	 * to CPU0.
--	 */
--	i40e_clear_interrupt_scheme(pf);
--
--	rtnl_unlock();
--
--	return 0;
-+	return i40e_io_suspend(pf);
+@@ -11138,6 +11138,8 @@ static void i40e_reset_and_rebuild(struct i40e_pf *pf, bool reinit,
+ 	ret = i40e_reset(pf);
+ 	if (!ret)
+ 		i40e_rebuild(pf, reinit, lock_acquired);
++	else
++		dev_err(&pf->pdev->dev, "%s: i40e_reset() FAILED", __func__);
  }
  
  /**
-@@ -16572,39 +16620,11 @@ static int __maybe_unused i40e_suspend(struct device *dev)
- static int __maybe_unused i40e_resume(struct device *dev)
- {
- 	struct i40e_pf *pf = dev_get_drvdata(dev);
--	int err;
+@@ -16459,7 +16461,7 @@ static pci_ers_result_t i40e_pci_error_detected(struct pci_dev *pdev,
  
- 	/* If we're not suspended, then there is nothing to do */
+ 	/* shutdown all operations */
  	if (!test_bit(__I40E_SUSPENDED, pf->state))
- 		return 0;
--
--	/* We need to hold the RTNL lock prior to restoring interrupt schemes,
--	 * since we're going to be restoring queues
--	 */
--	rtnl_lock();
--
--	/* We cleared the interrupt scheme when we suspended, so we need to
--	 * restore it now to resume device functionality.
--	 */
--	err = i40e_restore_interrupt_scheme(pf);
--	if (err) {
--		dev_err(dev, "Cannot restore interrupt scheme: %d\n",
--			err);
--	}
--
--	clear_bit(__I40E_DOWN, pf->state);
--	i40e_reset_and_rebuild(pf, false, true);
--
--	rtnl_unlock();
--
--	/* Clear suspended state last after everything is recovered */
--	clear_bit(__I40E_SUSPENDED, pf->state);
--
--	/* Restart the service task */
--	mod_timer(&pf->service_timer,
--		  round_jiffies(jiffies + pf->service_timer_period));
--
--	return 0;
-+	return i40e_io_resume(pf);
+-		i40e_prep_for_reset(pf);
++		i40e_io_suspend(pf);
+ 
+ 	/* Request a slot reset */
+ 	return PCI_ERS_RESULT_NEED_RESET;
+@@ -16481,7 +16483,8 @@ static pci_ers_result_t i40e_pci_error_slot_reset(struct pci_dev *pdev)
+ 	u32 reg;
+ 
+ 	dev_dbg(&pdev->dev, "%s\n", __func__);
+-	if (pci_enable_device_mem(pdev)) {
++	/* enable I/O and memory of the device  */
++	if (pci_enable_device(pdev)) {
+ 		dev_info(&pdev->dev,
+ 			 "Cannot re-enable PCI device after reset.\n");
+ 		result = PCI_ERS_RESULT_DISCONNECT;
+@@ -16544,7 +16547,7 @@ static void i40e_pci_error_resume(struct pci_dev *pdev)
+ 	if (test_bit(__I40E_SUSPENDED, pf->state))
+ 		return;
+ 
+-	i40e_handle_reset_warning(pf, false);
++	i40e_io_resume(pf);
  }
  
- static const struct pci_error_handlers i40e_err_handler = {
+ /**
 -- 
 2.25.1
 
