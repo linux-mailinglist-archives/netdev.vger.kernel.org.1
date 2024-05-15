@@ -1,208 +1,284 @@
-Return-Path: <netdev+bounces-96523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37D208C64E9
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:20:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D79538C64DE
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:20:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A88D1C23435
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:20:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05BDD1C21F69
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6986B5CDF2;
-	Wed, 15 May 2024 10:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DEB35A116;
+	Wed, 15 May 2024 10:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="DK+gEtqm"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6E85FB8B
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 10:19:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCD15EE82
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 10:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715768403; cv=none; b=OxMd2tL7MgygmY2TYDyWzgmbnJ+lBGTQbgmjnPykXABHyaFLZqhH34lIkcZs+Tq7Vwv9z4izSrS+QkjNFKMeuMJQDwD3+I7TcKy1JoMGtdNZuUkjPiTgOqey6yoeTcXYxBgdhBkyssjPsw+LB+zG1KR5yLjaJvGK7Xbgx0OSOJA=
+	t=1715768395; cv=none; b=jSATdxRyot8ccszMji6PlhSG8FCQ3UgXrltbSGzlEDwi8xIivLeT3Xg3GvTRse3AvOyXn+L5pu3L7/tsT5qhPm0Sbnv9GE/RCmK2OI/VXHnkfwWwb80r3QDg5jnKlBeBU2IOceRiQsn/L5YebJS/r4dkig05qFxYTjKmWauFJ48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715768403; c=relaxed/simple;
-	bh=bZaAouL6m20iRsGJzAAx8tWwH2MJjIaZojEmDYcJEbM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=OnW/39NRvd+MRQDcdienIkejVj9eQVo3K907UlZ/Y3pyVbvGw6ZZhZF3cx4Zb/fHBktCnGVpNL+4262AyTEnGvuMD2CWBRY3jbG8FOSt5it/11xdmXobSq323jKyODKca+lLwxj5NhlnD1WttWyi6yrqkN4EOAizVcOOdOBGdPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-146-tCmo3yy5M3q_6Aeiy1DYtA-1; Wed,
- 15 May 2024 06:19:44 -0400
-X-MC-Unique: tCmo3yy5M3q_6Aeiy1DYtA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0B9DD1C0512F;
-	Wed, 15 May 2024 10:19:44 +0000 (UTC)
-Received: from hog (unknown [10.39.192.5])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id AF6443C27;
-	Wed, 15 May 2024 10:19:42 +0000 (UTC)
-Date: Wed, 15 May 2024 12:19:41 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
-Subject: Re: [PATCH net-next v3 13/24] ovpn: implement TCP transport
-Message-ID: <ZkSMPeSSS4VZxHrf@hog>
-References: <20240506011637.27272-1-antonio@openvpn.net>
- <20240506011637.27272-14-antonio@openvpn.net>
- <ZkIosadLULByXFKc@hog>
- <73433bdf-763b-4023-8cb9-ffd9487744e0@openvpn.net>
- <ZkMnpy3_T8YO3eHD@hog>
- <2ddf759d-378f-475c-8fc1-30c6e83c2d14@openvpn.net>
+	s=arc-20240116; t=1715768395; c=relaxed/simple;
+	bh=+EMK6b7qfktIFvrX/yoLCEmiPgCxTGiziO7yYK3P3rU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=LHRwecfeBD6AYxEOvf2MGQYFmZSllmXGXXppMWmfVi6o5QNi8H4YsT8BOwrLYaDVGXWnD000Q2sAKSzokIw9TJrVv7R/kTf6DZhqXzNeSOALIz8G9h58K/I00Xi/+aVeHfcdV/kCGbHergfwIiAZeeFaYSgKPub52Kjt1Hoh0WE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=DK+gEtqm; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-56e69888a36so1432351a12.3
+        for <netdev@vger.kernel.org>; Wed, 15 May 2024 03:19:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1715768391; x=1716373191; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fdHvJkxYgHA+IRrFREj5QbL1lv8V1e57nVmevFIQbVs=;
+        b=DK+gEtqmkb0jZ/CHh7UFa0VObjCqX95pEIy9AVKWg8R9+uBAQeX1wq1kySemn5w3pJ
+         0k9SCtvjvzqxKGOAZKIQaSUiQlw/2yQ4e13tjG9Q+SL1gECZK5IzNkOCLLXybSi6QDmr
+         yUqNDnXq7FbT9kkRg3qgpIOdVsAmgeGaSzsfm2qyrDNgDJTa1YPWz8fhKcqKqGLu5lZu
+         TaTYgVSAMqtgIczhmzHNK2pu1kQqag85ESBXKoX+eVPkXy2wAFkr9UQGJRkCh8bRVbnA
+         Pbz/mZLWkbtj2rebXLzLoMhm+rQiiremoorBu9eXu0nPNa7FIhkhLZ6OLaoOfcZuNqtJ
+         WOoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715768391; x=1716373191;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fdHvJkxYgHA+IRrFREj5QbL1lv8V1e57nVmevFIQbVs=;
+        b=OoYZ9WrP1EAuUkd75hVAqAsKZNLjztH8w5jSW+csyGBF8QfezRfqQzDwy1aGAhwghs
+         yJdSzD92Jjt4DOSvmPlabCw6lktBgaQLyZeNapEKwRxYnDYCU0w0J70KOQ4COYZq092j
+         Hj9hCOUR2jt16uWwT2A8tn9l+nvj33syge6WJOtoNmAxM69hY7zAFcNyfc+1elJb+fvU
+         9UmU37MiO6e2JWoGX10KOMWlTflq3cKjk52qPhOxzRDtD6MvJgGSrE5R9Lw3TzoBRlBm
+         dPRRvYWpBHERMclUWB2jz1OrP1UrgNWTzvv5MVALPIch33BvIHr/msURTq0KqSGvElqU
+         uYyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW9RZMJRzTUmJYFG3Q/dLVBNQZCnswQrJ0duaN2pXumT1y62mFvlKbJYQx11CON78wfDYYIExvZYu6z3JyYPShp+/yuLCsj
+X-Gm-Message-State: AOJu0YxqIqqG+B8Am/oLJO3H4xQf+FK/gAPmSXe/eXW1QfVwZ4/Ma9fP
+	UTt8w3ijZ1MhV2+yWd4A8iBIaLycLwPUF5qNYyh/39gCzaUiHr2jd/EImPnL6Xg=
+X-Google-Smtp-Source: AGHT+IHWaSA/H+4L2d0rsT1ymvAysPmXQv4l8zitT6YQF2Rw+C8vn0POfuJW4lu+DIxHSNpoY53xBA==
+X-Received: by 2002:a50:d59d:0:b0:572:7e7e:4296 with SMTP id 4fb4d7f45d1cf-5734d5c152dmr11481093a12.3.1715768391400;
+        Wed, 15 May 2024 03:19:51 -0700 (PDT)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-574b18dff66sm6291338a12.27.2024.05.15.03.19.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 May 2024 03:19:50 -0700 (PDT)
+Message-ID: <f9a8f912-5cb7-4184-be2d-187052c04e2e@blackwall.org>
+Date: Wed, 15 May 2024 13:19:47 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <2ddf759d-378f-475c-8fc1-30c6e83c2d14@openvpn.net>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 04/14] netdev: support binding dma-buf to
+ netdevice
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20240510232128.1105145-1-almasrymina@google.com>
+ <20240510232128.1105145-5-almasrymina@google.com>
+ <59b1ec87-03dc-4336-8ce1-cb97e5abb7d6@blackwall.org>
+Content-Language: en-US
+In-Reply-To: <59b1ec87-03dc-4336-8ce1-cb97e5abb7d6@blackwall.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-2024-05-15, 00:11:28 +0200, Antonio Quartulli wrote:
-> On 14/05/2024 10:58, Sabrina Dubroca wrote:
-> > > > The UDP code differentiates "socket already owned by this interface=
-"
-> > > > from "already taken by other user". That doesn't apply to TCP?
-> > >=20
-> > > This makes me wonder: how safe it is to interpret the user data as an=
- object
-> > > of type ovpn_socket?
-> > >=20
-> > > When we find the user data already assigned, we don't know what was r=
-eally
-> > > stored in there, right?
-> > > Technically this socket could have gone through another module which
-> > > assigned its own state.
-> > >=20
-> > > Therefore I think that what UDP does [ dereferencing ((struct ovpn_so=
-cket
-> > > *)user_data)->ovpn ] is probably not safe. Would you agree?
-> >=20
-> > Hmmm, yeah, I think you're right. If you checked encap_type =3D=3D
-> > UDP_ENCAP_OVPNINUDP before (sk_prot for TCP), then you'd know it's
-> > really your data. Basically call ovpn_from_udp_sock during attach if
-> > you want to check something beyond EBUSY.
->=20
-> right. Maybe we can leave with simply reporting EBUSY and be done with it=
-,
-> without adding extra checks and what not.
+On 15/05/2024 13:01, Nikolay Aleksandrov wrote:
+> On 11/05/2024 02:21, Mina Almasry wrote:
+>> Add a netdev_dmabuf_binding struct which represents the
+>> dma-buf-to-netdevice binding. The netlink API will bind the dma-buf to
+>> rx queues on the netdevice. On the binding, the dma_buf_attach
+>> & dma_buf_map_attachment will occur. The entries in the sg_table from
+>> mapping will be inserted into a genpool to make it ready
+>> for allocation.
+>>
+>> The chunks in the genpool are owned by a dmabuf_chunk_owner struct which
+>> holds the dma-buf offset of the base of the chunk and the dma_addr of
+>> the chunk. Both are needed to use allocations that come from this chunk.
+>>
+>> We create a new type that represents an allocation from the genpool:
+>> net_iov. We setup the net_iov allocation size in the
+>> genpool to PAGE_SIZE for simplicity: to match the PAGE_SIZE normally
+>> allocated by the page pool and given to the drivers.
+>>
+>> The user can unbind the dmabuf from the netdevice by closing the netlink
+>> socket that established the binding. We do this so that the binding is
+>> automatically unbound even if the userspace process crashes.
+>>
+>> The binding and unbinding leaves an indicator in struct netdev_rx_queue
+>> that the given queue is bound, but the binding doesn't take effect until
+>> the driver actually reconfigures its queues, and re-initializes its page
+>> pool.
+>>
+>> The netdev_dmabuf_binding struct is refcounted, and releases its
+>> resources only when all the refs are released.
+>>
+>> Signed-off-by: Willem de Bruijn <willemb@google.com>
+>> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+>> Signed-off-by: Mina Almasry <almasrymina@google.com>
+>>
+>> ---
+>>
+>> v9: https://lore.kernel.org/all/20240403002053.2376017-5-almasrymina@google.com/
+>> - Removed net_devmem_restart_rx_queues and put it in its own patch
+>>   (David).
+>>
+>> v8:
+>> - move dmabuf_devmem_ops usage to later patch to avoid patch-by-patch
+>>   build error.
+>>
+>> v7:
+>> - Use IS_ERR() instead of IS_ERR_OR_NULL() for the dma_buf_get() return
+>>   value.
+>> - Changes netdev_* naming in devmem.c to net_devmem_* (Yunsheng).
+>> - DMA_BIDIRECTIONAL -> DMA_FROM_DEVICE (Yunsheng).
+>> - Added a comment around recovering of the old rx queue in
+>>   net_devmem_restart_rx_queue(), and added freeing of old_mem if the
+>>   restart of the old queue fails. (Yunsheng).
+>> - Use kernel-family sock-priv (Jakub).
+>> - Put pp_memory_provider_params in netdev_rx_queue instead of the
+>>   dma-buf specific binding (Pavel & David).
+>> - Move queue management ops to queue_mgmt_ops instead of netdev_ops
+>>   (Jakub).
+>> - Remove excess whitespaces (Jakub).
+>> - Use genlmsg_iput (Jakub).
+>>
+>> v6:
+>> - Validate rx queue index
+>> - Refactor new functions into devmem.c (Pavel)
+>>
+>> v5:
+>> - Renamed page_pool_iov to net_iov, and moved that support to devmem.h
+>>   or netmem.h.
+>>
+>> v1:
+>> - Introduce devmem.h instead of bloating netdevice.h (Jakub)
+>> - ENOTSUPP -> EOPNOTSUPP (checkpatch.pl I think)
+>> - Remove unneeded rcu protection for binding->list (rtnl protected)
+>> - Removed extraneous err_binding_put: label.
+>> - Removed dma_addr += len (Paolo).
+>> - Don't override err on netdev_bind_dmabuf_to_queue failure.
+>> - Rename devmem -> dmabuf (David).
+>> - Add id to dmabuf binding (David/Stan).
+>> - Fix missing xa_destroy bound_rq_list.
+>> - Use queue api to reset bound RX queues (Jakub).
+>> - Update netlink API for rx-queue type (tx/re) (Jakub).
+>>
+>> RFC v3:
+>> - Support multi rx-queue binding
+>>
+>> ---
+>>  Documentation/netlink/specs/netdev.yaml |   4 +
+>>  include/net/devmem.h                    | 111 +++++++++++
+>>  include/net/netdev_rx_queue.h           |   2 +
+>>  include/net/netmem.h                    |  10 +
+>>  include/net/page_pool/types.h           |   5 +
+>>  net/core/Makefile                       |   2 +-
+>>  net/core/dev.c                          |   3 +
+>>  net/core/devmem.c                       | 254 ++++++++++++++++++++++++
+>>  net/core/netdev-genl-gen.c              |   4 +
+>>  net/core/netdev-genl-gen.h              |   4 +
+>>  net/core/netdev-genl.c                  | 105 +++++++++-
+>>  11 files changed, 501 insertions(+), 3 deletions(-)
+>>  create mode 100644 include/net/devmem.h
+>>  create mode 100644 net/core/devmem.c
+>>
+> [snip]
+>> +/* Protected by rtnl_lock() */
+>> +static DEFINE_XARRAY_FLAGS(net_devmem_dmabuf_bindings, XA_FLAGS_ALLOC1);
+>> +
+>> +void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
+>> +{
+>> +	struct netdev_rx_queue *rxq;
+>> +	unsigned long xa_idx;
+>> +	unsigned int rxq_idx;
+>> +
+>> +	if (!binding)
+>> +		return;
+>> +
+>> +	if (binding->list.next)
+>> +		list_del(&binding->list);
+>> +
+> 
+> minor nit:
+> In theory list.next can still be != null if it's poisoned (e.g. after del). You can
+> use the list api here (!list_empty(&binding->list) -> list_del_init(&binding->list))
+> if you initialize it in net_devmem_bind_dmabuf(), then you'll also get nice list
+> debugging.
+> 
 
-I don't know. What was the reason for the EALREADY handling in udp.c
-and the corresponding refcount increase in ovpn_socket_new?
+On second thought nevermind this, sorry for the noise.
 
-
-> > > > > +int __init ovpn_tcp_init(void)
-> > > > > +{
-> > > > > +=09/* We need to substitute the recvmsg and the sock_is_readable
-> > > > > +=09 * callbacks in the sk_prot member of the sock object for TCP
-> > > > > +=09 * sockets.
-> > > > > +=09 *
-> > > > > +=09 * However sock->sk_prot is a pointer to a static variable an=
-d
-> > > > > +=09 * therefore we can't directly modify it, otherwise every soc=
-ket
-> > > > > +=09 * pointing to it will be affected.
-> > > > > +=09 *
-> > > > > +=09 * For this reason we create our own static copy and modify w=
-hat
-> > > > > +=09 * we need. Then we make sk_prot point to this copy
-> > > > > +=09 * (in ovpn_tcp_socket_attach())
-> > > > > +=09 */
-> > > > > +=09ovpn_tcp_prot =3D tcp_prot;
-> > > >=20
-> > > > Don't you need a separate variant for IPv6, like TLS does?
-> > >=20
-> > > Never did so far.
-> > >=20
-> > > My wild wild wild guess: for the time this socket is owned by ovpn, w=
-e only
-> > > use callbacks that are IPvX agnostic, hence v4 vs v6 doesn't make any
-> > > difference.
-> > > When this socket is released, we reassigned the original prot.
-> >=20
-> > That seems a bit suspicious to me. For example, tcpv6_prot has a
-> > different backlog_rcv. And you don't control if the socket is detached
-> > before being closed, or which callbacks are needed. Your userspace
-> > client doesn't use them, but someone else's might.
-> >=20
-> > > > > +=09ovpn_tcp_prot.recvmsg =3D ovpn_tcp_recvmsg;
-> > > >=20
-> > > > You don't need to replace ->sendmsg as well? The userspace client i=
-s
-> > > > not expected to send messages?
-> > >=20
-> > > It is, but my assumption is that those packets will just go through t=
-he
-> > > socket as usual. No need to be handled by ovpn (those packets are not
-> > > encrypted/decrypted, like data traffic is).
-> > > And this is how it has worked so far.
-> > >=20
-> > > Makes sense?
-> >=20
-> > Two things come to mind:
-> >=20
-> > - userspace is expected to prefix the messages it inserts on the
-> >    stream with the 2-byte length field? otherwise, the peer won't be
-> >    able to parse them out of the stream
->=20
-> correct. userspace sends those packets as if ovpn is not running, therefo=
-re
-> this happens naturally.
-
-ok.
-
-
-> > - I'm not convinced this would be safe wrt kernel writing partial
-> >    messages. if ovpn_tcp_send_one doesn't send the full message, you
-> >    could interleave two messages:
-> >=20
-> >    +------+-------------------+------+--------+----------------+
-> >    | len1 | (bytes from msg1) | len2 | (msg2) | (rest of msg1) |
-> >    +------+-------------------+------+--------+----------------+
-> >=20
-> >    and the RX side would parse that as:
-> >=20
-> >    +------+-----------------------------------+------+---------
-> >    | len1 | (bytes from msg1) | len2 | (msg2) | ???? | ...
-> >    +------+-------------------+---------------+------+---------
-> >=20
-> >    and try to interpret some random bytes out of either msg1 or msg2 as
-> >    a length prefix, resulting in a broken stream.
->=20
-> hm you are correct. if multiple sendmsg can overlap, then we might be in
-> troubles, but are we sure this can truly happen?
-
-What would prevent this? The kernel_sendmsg call in ovpn_tcp_send_one
-could send a partial message, and then what would stop userspace from
-sending its own message during the cond_resched from ovpn_tcp_tx_work?
-
-> > The stream format looks identical to ESP in TCP [1] (2B length prefix
-> > followed by the actual message), so I think the espintcp code (both tx
-> > and rx, except for actual protocol parsing) should look very
-> > similar. The problems that need to be solved for both protocols are
-> > pretty much the same.
->=20
-> ok, will have a look. maybe this will simplify the code even more and we
-> will get rid of some of the issues we were discussing above.
-
-I doubt dealing with possible interleaving will make the code simpler,
-but I think it has to be done.
-
---=20
-Sabrina
+>> +	xa_for_each(&binding->bound_rxq_list, xa_idx, rxq) {
+>> +		if (rxq->mp_params.mp_priv == binding) {
+>> +			/* We hold the rtnl_lock while binding/unbinding
+>> +			 * dma-buf, so we can't race with another thread that
+>> +			 * is also modifying this value. However, the page_pool
+>> +			 * may read this config while it's creating its
+>> +			 * rx-queues. WRITE_ONCE() here to match the
+>> +			 * READ_ONCE() in the page_pool.
+>> +			 */
+>> +			WRITE_ONCE(rxq->mp_params.mp_ops, NULL);
+>> +			WRITE_ONCE(rxq->mp_params.mp_priv, NULL);
+>> +
+>> +			rxq_idx = get_netdev_rx_queue_index(rxq);
+>> +
+>> +			netdev_rx_queue_restart(binding->dev, rxq_idx);
+>> +		}
+>> +	}
+>> +
+>> +	xa_erase(&net_devmem_dmabuf_bindings, binding->id);
+>> +
+>> +	net_devmem_dmabuf_binding_put(binding);
+>> +}
+> [snip]
+> 
+> Cheers,
+>  Nik
+> 
 
 
