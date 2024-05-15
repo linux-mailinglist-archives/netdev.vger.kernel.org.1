@@ -1,203 +1,145 @@
-Return-Path: <netdev+bounces-96658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C5F68C6F1C
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 01:21:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF1C68C6F1F
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 01:22:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 300F21C21396
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 23:21:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F12351C21192
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 23:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7934C627;
-	Wed, 15 May 2024 23:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56EBB4EB20;
+	Wed, 15 May 2024 23:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghnZU6Lo"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="fAky7Prs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328353C48E;
-	Wed, 15 May 2024 23:21:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2DC4C627;
+	Wed, 15 May 2024 23:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715815294; cv=none; b=XwPPGvRYFRorT4+T54DCASVXcIeQpNxMNtjaJrso7BhCHQ0UP3oIO2yrJ2thkGKhLNQzaBXO2/u1byrqhmFlyuRLfkl3bFkuCDzpRKToTjAYF1RPixtY5CgspuiiX/2nZ+W49rrAk0oS4+1rZZhoBd7gkiH78CMrA4SLycaVoUI=
+	t=1715815354; cv=none; b=F5NOPsiJpUOvi9RB9TUGeKrp4fpLjXe8KV4FezVF7yAlsKDTUFgLfqNiDbyNWFnw9fdfvyHLsutfeqK8UM6qXmHuXdjKagAeB/ESaMFhqGk+CwFWtbdSXJeU/OAQdl+h61Gy9wNYG0HAQksx6y9z/BRXwYwGMFfkNjcbN1BvGnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715815294; c=relaxed/simple;
-	bh=87pAH5rgJ9duXfdK2NawbTwlmgvDGgI55KthCb1lDmk=;
+	s=arc-20240116; t=1715815354; c=relaxed/simple;
+	bh=OEdW9AZJDIyE2felfcDOz7mV2aanGxXRcf0OFsWsynQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WsAf9pKtgegoYk65MtyaPByqf3yNNQCXWJchG+kYk4VfsJ+FjYFGZy+mgxFZctfJ+8kTrrkoAnadqLBjXcEt7UiuH7U9J4O2HjqPDs2sx+IILzpXQh340tYU2bTVj9dnqS+TjM4P8rDAwKolQeA7ySWXc+sxQR7+3qwfld6QyH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ghnZU6Lo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D31EC116B1;
-	Wed, 15 May 2024 23:21:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715815293;
-	bh=87pAH5rgJ9duXfdK2NawbTwlmgvDGgI55KthCb1lDmk=;
+	 MIME-Version:Content-Type; b=m6vL1oTh1w4gtusaDB3RbBWcSpwbhUuFllwZIPIMphVo7T1Ijv5+akxOz2rMBHf5G+u8MWmrRclpf5mDU/Zf4NR6nnFa5ihzjR8Y+BHFp8Gm5zgR6hgMWoiqr51MHylL3DTTmxvBkz7UwsJEaF8rwExyvSOKVYkCqh3xYV5p5nE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=fAky7Prs; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1715815350;
+	bh=kUby/j+ReeSIDLN6iTz0UTB+VZBhGJuMu6AvdFgvwR8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ghnZU6LoTFF6lwPJXdDDnAfS7ApnRky1jXlgI4CC5+L+mel7zKhwzfBMTzqFaceXS
-	 5pHhj8uFQGm3sxvfc1TQHr7hr7iupgkb7U5FCcVc44vWpBQyzxLC+KG0hJXmdfSxcJ
-	 xhHLHqkv8U3QWQCDnhocE/S7BdAQDItKNb195m6/VbMhxLOtYDCPpw6KzDz/ObK5fC
-	 y4jfx3Az2HZpIAjsnHZu5US+yFcQrqW+0ALyc63oVWEHSAXCNcs1RfZyqL9yMCJ+xL
-	 HOeuuwXjyzquFJlV2DYJTXGSY65reg8EPzuEmi8MNCLE+Ey/S7i5VPr8fP+oYXXevZ
-	 +ns0c2p+ly4dw==
-Date: Wed, 15 May 2024 16:21:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
- <pabeni@redhat.com>, <vladimir.oltean@nxp.com>, <shuah@kernel.org>,
- <liuhangbin@gmail.com>, <bpoirier@nvidia.com>,
- <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next] selftests: net: local_termination: annotate
- the expected failures
-Message-ID: <20240515162132.476a6b43@kernel.org>
-In-Reply-To: <87y18bju1n.fsf@nvidia.com>
-References: <20240509235553.5740-1-kuba@kernel.org>
-	<875xvhu97r.fsf@nvidia.com>
-	<20240514174321.376039a5@kernel.org>
-	<87y18bju1n.fsf@nvidia.com>
+	b=fAky7PrsILAqbmsS2pWVk6UqeoTkAiy5gWeAFTsaAUDMvxcwiMOCvcREZZNgsTiEW
+	 nbw1dgfoL5SRtmpspQ4Od1dnWxjoorCuGXFAaOECUUUbk6+BkGkyZUIG99O+oYr6rF
+	 Gi3HokG0H/rm4fCXEYtt1cNGPibqHUtYhpcV4Ydk51PzZm1r3EDMeZkIEaavIsWXJs
+	 fGYuojQGXd9LnlTYryigfRtK4tLDtXy+pXTDKV9Hi7cmVKMv+C9qj7KIak/n1wT/G2
+	 9rou4yRe2JZSCR969hRyZetQdBJqr8aDO8Qxej8sdSOq/8gi1ONC9ZhPKGyRa0eTV+
+	 Z7yrwcaKOTk8Q==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Vfq5171rzz4x1T;
+	Thu, 16 May 2024 09:22:29 +1000 (AEST)
+Date: Thu, 16 May 2024 09:22:28 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>,
+ Johannes Berg <johannes.berg@intel.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Miri Korenblit
+ <miriam.rachel.korenblit@intel.com>
+Subject: Re: linux-next: manual merge of the net-next tree with the kbuild
+ tree
+Message-ID: <20240516092228.485bbd9b@canb.auug.org.au>
+In-Reply-To: <20240506112810.02ae6c17@canb.auug.org.au>
+References: <20240506112810.02ae6c17@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/AhHSsggpw0kU4Mga+WYew2F";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/AhHSsggpw0kU4Mga+WYew2F
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 15 May 2024 11:02:28 +0200 Petr Machata wrote:
-> >> And then either replace the existing xfail_on_veth's (there are just a
-> >> handful) or convert xfail_on_veth to a wrapper around xfail_on_kind. =
-=20
-> >
-> > I think the bridge thing we can workaround by just checking
-> > if ${NETIFS[p1]} is veth, rather than $rcv_if_name.
-> > Since the two behave the same. =20
+Hi all,
+
+On Mon, 6 May 2024 11:28:10 +1000 Stephen Rothwell <sfr@canb.auug.org.au> w=
+rote:
+>
+> Hi all,
 >=20
-> I don't follow. The test has two legs, one creates a VRF and attaches
-> p2, the other creates a bridge and attaches p2. Whether p1 and p2 are
-> veth or HW seems orthogonal to whether $rcv_if_name is a bridge or a
-> veth.
+> Today's linux-next merge of the net-next tree got a conflict in:
+>=20
+>   drivers/net/wireless/intel/iwlwifi/mvm/Makefile
+>=20
+> between commit:
+>=20
+>   7c972986689b ("kbuild: use $(src) instead of $(srctree)/$(src) for sour=
+ce directory")
+>=20
+> from the kbuild tree and commit:
+>=20
+>   2887af4d22f9 ("wifi: iwlwifi: mvm: implement link grading")
+>=20
+> from the net-next tree.
+>=20
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+> --=20
+> Cheers,
+> Stephen Rothwell
+>=20
+> diff --cc drivers/net/wireless/intel/iwlwifi/mvm/Makefile
+> index 764ba73cde1e,5c754b87ea20..000000000000
+> --- a/drivers/net/wireless/intel/iwlwifi/mvm/Makefile
+> +++ b/drivers/net/wireless/intel/iwlwifi/mvm/Makefile
+> @@@ -15,4 -16,4 +16,4 @@@ iwlmvm-$(CONFIG_IWLWIFI_LEDS) +=3D led.
+>   iwlmvm-$(CONFIG_PM) +=3D d3.o
+>   iwlmvm-$(CONFIG_IWLMEI) +=3D vendor-cmd.o
+>  =20
+> - ccflags-y +=3D -I $(src)/../
+>  -subdir-ccflags-y +=3D -I $(srctree)/$(src)/../
+> ++subdir-ccflags-y +=3D -I $(src)/../
 
-Right, my superficial understanding was that the main distinction is
-whether p2/h2 can do the filtering (or possibly some offload happens).
-So if p1,p2 are veths we know to XFAIL, doesn't matter if we're in=20
-the vrf or bridge configuration, cause these construct will not filter
-either.
+This is now a conflict between the kbuild tree and Linus' tree.
 
-If I'm not making sense - I'm probably confused, I can code up what you
-suggested, it will work, just more LoC :)
-
---->8------
-
-=46rom 7a645eb425530f647e88590ba7ba01681e73812e Mon Sep 17 00:00:00 2001
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Thu, 9 May 2024 16:28:41 -0700
-Subject: selftests: net: local_termination: annotate the expected failures
-
-Vladimir said when adding this test:
-
-  The bridge driver fares particularly badly [...] mainly because
-  it does not implement IFF_UNICAST_FLT.
-
-See commit 90b9566aa5cd ("selftests: forwarding: add a test for
-local_termination.sh").
-
-We don't want to hide the known gaps, but having a test which
-always fails prevents us from catching regressions. Report
-the cases we know may fail as XFAIL.
-
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: liuhangbin@gmail.com
-CC: shuah@kernel.org
-CC: linux-kselftest@vger.kernel.org
-
-v2:
- - remove duplicated log_test_xfail
-v1: https://lore.kernel.org/all/20240509235553.5740-1-kuba@kernel.org/
----
- tools/testing/selftests/net/forwarding/lib.sh       |  7 +++++++
- .../selftests/net/forwarding/local_termination.sh   | 13 ++++++++-----
- 2 files changed, 15 insertions(+), 5 deletions(-)
-
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/=
-selftests/net/forwarding/lib.sh
-index 112c85c35092..79aa3c8bc288 100644
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -473,6 +473,13 @@ ret_set_ksft_status()
- # Whether FAILs should be interpreted as XFAILs. Internal.
- FAIL_TO_XFAIL=3D
-=20
-+# Clear internal failure tracking for the next test case
-+begin_test()
-+{
-+    RET=3D0
-+    FAIL_TO_XFAIL=3D
-+}
-+
- check_err()
- {
- 	local err=3D$1
-diff --git a/tools/testing/selftests/net/forwarding/local_termination.sh b/=
-tools/testing/selftests/net/forwarding/local_termination.sh
-index c5b0cbc85b3e..a241acc02498 100755
---- a/tools/testing/selftests/net/forwarding/local_termination.sh
-+++ b/tools/testing/selftests/net/forwarding/local_termination.sh
-@@ -73,9 +73,12 @@ check_rcv()
- 	local pattern=3D$3
- 	local should_receive=3D$4
- 	local should_fail=3D
-+	local xfail_sw=3D$5
-=20
- 	[ $should_receive =3D true ] && should_fail=3D0 || should_fail=3D1
--	RET=3D0
-+	begin_test
-+	# check if main interface is veth
-+	[ "$xfail_sw" =3D=3D true ] && xfail_on_veth $h1
-=20
- 	tcpdump_show $if_name | grep -q "$pattern"
-=20
-@@ -157,7 +160,7 @@ run_test()
-=20
- 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address" \
- 		"$smac > $UNKNOWN_UC_ADDR1, ethertype IPv4 (0x0800)" \
--		false
-+		false true
-=20
- 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address, promisc" \
- 		"$smac > $UNKNOWN_UC_ADDR2, ethertype IPv4 (0x0800)" \
-@@ -165,7 +168,7 @@ run_test()
-=20
- 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address, allmulti" \
- 		"$smac > $UNKNOWN_UC_ADDR3, ethertype IPv4 (0x0800)" \
--		false
-+		false true
-=20
- 	check_rcv $rcv_if_name "Multicast IPv4 to joined group" \
- 		"$smac > $JOINED_MACV4_MC_ADDR, ethertype IPv4 (0x0800)" \
-@@ -173,7 +176,7 @@ run_test()
-=20
- 	check_rcv $rcv_if_name "Multicast IPv4 to unknown group" \
- 		"$smac > $UNKNOWN_MACV4_MC_ADDR1, ethertype IPv4 (0x0800)" \
--		false
-+		false true
-=20
- 	check_rcv $rcv_if_name "Multicast IPv4 to unknown group, promisc" \
- 		"$smac > $UNKNOWN_MACV4_MC_ADDR2, ethertype IPv4 (0x0800)" \
-@@ -189,7 +192,7 @@ run_test()
-=20
- 	check_rcv $rcv_if_name "Multicast IPv6 to unknown group" \
- 		"$smac > $UNKNOWN_MACV6_MC_ADDR1, ethertype IPv6 (0x86dd)" \
--		false
-+		false true
-=20
- 	check_rcv $rcv_if_name "Multicast IPv6 to unknown group, promisc" \
- 		"$smac > $UNKNOWN_MACV6_MC_ADDR2, ethertype IPv6 (0x86dd)" \
 --=20
-2.45.0
+Cheers,
+Stephen Rothwell
 
+--Sig_/AhHSsggpw0kU4Mga+WYew2F
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmZFQ7QACgkQAVBC80lX
+0GwCLQf/SD2RL7WHWmYpOgmJlZKYIGQjpRCg7q99HXgIfjQ0KRu9dNzkJDC0HCOf
+wQnlcXsxn/w2ESo77AMpB71lSqxT5jHdhQSiDCxSd6pAu0ORgvi8tW7IWKl8kD+H
+arXtcpXm11jBPf4S3Xb/JF1A5eQTjYrr3EgB1I5lM1nBArx2QigCAhIgpoqCbSuc
+dUsOI+LD+KCuxehW94TFHkcJjJ1Tdc6jz8Io0Oq5ADt3Tj/w3mh5kEGZvRC2Nx8y
+lWl6eBy9QRARBaf2bQ1rv+PYen06T87NHk+WTnROqN4sHdPjTsh30k9phjL5B43u
+LShT2vFKXW5uIJ7gOb+V8X1KTw7EsQ==
+=Qsan
+-----END PGP SIGNATURE-----
+
+--Sig_/AhHSsggpw0kU4Mga+WYew2F--
 
