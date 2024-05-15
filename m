@@ -1,193 +1,251 @@
-Return-Path: <netdev+bounces-96632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3F6B8C6C45
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 20:41:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 182468C6CC7
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 21:26:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 762261F25016
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 18:41:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AF79B20AD6
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 19:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E21D5336D;
-	Wed, 15 May 2024 18:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE62915920F;
+	Wed, 15 May 2024 19:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bTk7ldrt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7BE3BBD4
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 18:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46683219F;
+	Wed, 15 May 2024 19:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715798489; cv=none; b=KBMd7tVue6WTMCByJlaFn/lsqkS3uIHRhcY/WKG3lFPHk4EkBsa3MbhCN+jrU2tAro5t/V5lQspvFsvGFBWM2xwWgKdFM6btRa8l3WIo3E3p/wGryQeGFI7iQ1N6zsMFuu3+QkY24Vgv9HQR6ja9X1eb1kQs8tZxpIUJnVtYzpg=
+	t=1715801153; cv=none; b=Vg6Mfop56HHFi44XTk5FdPhPD71Mk9+JUnR5Z8B3A+/rL5XNpsVlnqkqcFgxOccT92lMi47EKwtj3U/i6FjKAQAkG8t+RvOE9qHOsK/0RyKBtMkgPqPJBYUsreYGldgoMtZjUfHy7Il+f+G6jMYolxf+so6HFyYeYNt8w/DCPkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715798489; c=relaxed/simple;
-	bh=8OhLvQwQwLI7Eff6M/XbtKRb/G+QPkaf5lcYwu/FQng=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Y0l52nEdmfy3EZ6kyJaL8X+GbuEw1c5+CarUQkmDJX+DQAjjzfvvp5uMm38Amvv1Ebb5NJXeyg315C/D1Av6VFOEJeuANchKBUBJxv6JaeQvScpi1RzsEzzvQ2g8VHtpouRMiVA/j+1Ijbk/XpdYoiUWz2ZCpy2INRoPZVcyshA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-36cc59a84bcso65777885ab.1
-        for <netdev@vger.kernel.org>; Wed, 15 May 2024 11:41:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715798487; x=1716403287;
-        h=content-transfer-encoding:to:from:subject:message-id:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WX5EZnFlrIpQAeCtrJHYpc8nSed7polYaoKaA2Ch3X0=;
-        b=N3LaMvRL1Ymlia7saodZIsKvVNGkQRmUh3I+Blb8zwoOu8/MSZQLckOq+ndxj2vr2P
-         gMVQkE8PEwPrrav0fz6Yq+d7RLIsg/pRLL+1b90bTqGzmsaLyXkt+f0ttoNfN1gjwfPf
-         l2C/JJJocm35JeFidk+Dkh/icXc1Dv+yZykW1tUTJw34o1ZNO3fUyDKcCIAwWkztrp1x
-         b8S4y18V3Q1tmQwTDLqF74UARLeoAYxEXKDwX2qJO/8BlIX2PLEt4vvfGo2LrDDmI2i1
-         O37boxGmTlrNSc/sn+tNG1zTQtd8Opah6mhGcNfxLg7aPw1o8fyYPEVbwc7lRod2Hqip
-         1bZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX5ucdsEBzVB9vJWXn/f1yvC/3ku2V7eRvXkAlmo4PDcaOA2QAue6XMt8xxPuo1FThjsZsvm5NKQA+ybqax3ZHWI2VJTRnV
-X-Gm-Message-State: AOJu0YwrewTTkqLRst1x6964S8Vgj2wCiZsNzsS/Ckx0kHszk34EXkpv
-	NREBaWhzpag+xAvyGcI+sVo0nZQJaVPXsfMdLC/RVi2hVIfGqqI+1aTZMXYNKbqTdhLrCLxqa95
-	58PqBOhRGPYW1GN+kJY1xs1J8nImFFNX5O8IPb0LvHzFV7Ho4VMwamCg=
-X-Google-Smtp-Source: AGHT+IEcIEPIbJ6ZCE6ljJ1uiqKnpkRKk9UKeXauhWWFn2J5kMeV81Q1oAaHclHggsG4WEDehTfASC3o8xniY0CDhbVUTo/9oCzU
+	s=arc-20240116; t=1715801153; c=relaxed/simple;
+	bh=+pQV1tr2gL7ZtCgUzkmoIRDh9F7dBK3E7xZjtXZ+irc=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=c3ZFM7jZE9F1fa9YtsfZGnU5VnfTPzgGOq0eDvJhOQSBUzUEI6O1M4AgjCSke3sl635yIg2XZO4MhjzjXnrRZE1z0J+5JGQqR0wqp215vabYv7SOHEYXM6lsY1hcjznwD2G2ic1erWgEoSOKk+NvsAp0rt5YXZFQAM7fOVqL6+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bTk7ldrt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12D1AC116B1;
+	Wed, 15 May 2024 19:25:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715801153;
+	bh=+pQV1tr2gL7ZtCgUzkmoIRDh9F7dBK3E7xZjtXZ+irc=;
+	h=Date:From:To:Subject:From;
+	b=bTk7ldrtQ4vYwsRZOuvxRUx0SGOxHANJOVBfdmnQXUPw9X3GHiPC5F7FSP6MNZyRV
+	 6IUgKI9lOothQwRQ83MHsEH0RhExa1XLAUP3URMM3OpY7j23XJ6xYv3TBUryAevOEX
+	 fTP5AWOofn8bDgcVuu82ri6ps6p/yZlH7VuRT8Wd2CcuqD33PKtvDsMPPVj6COtF0A
+	 h8QGwK3LVCEyIYDHE1z9uoU2XrhYRJG/e+Bvfi4UiDJcAWrb6Xh/9nsuUTxmI1eSVm
+	 h65T3XQgpEf7J2XFkf1Mu/D/47eTnaxRMGBck0osDOb9L0CXtD9nNv9bLyu9ILilLq
+	 +6Opw1nOXMUmA==
+Date: Wed, 15 May 2024 12:25:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
+Subject: [ANN] netdev development stats for 6.10
+Message-ID: <20240515122552.34af8692@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:d190:0:b0:36d:92b9:8f30 with SMTP id
- e9e14a558f8ab-36d92b98fe7mr1543295ab.1.1715798486898; Wed, 15 May 2024
- 11:41:26 -0700 (PDT)
-Date: Wed, 15 May 2024 11:41:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000516ace0618827799@google.com>
-Subject: [syzbot] [wireguard?] WARNING: locking bug in try_to_wake_up
-From: syzbot <syzbot+8aaf2df2ef0164ffe1fb@syzkaller.appspotmail.com>
-To: Jason@zx2c4.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Intro
+-----
 
-syzbot found the following issue on:
+We have posted our pull requests with networking changes for the 6.10
+kernel release last night. As is tradition here are the development
+statistics based on mailing list traffic on netdev@vger.
 
-HEAD commit:    cf87f46fd34d Merge tag 'drm-fixes-2024-05-11' of https://g.=
-.
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D16b04970980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3D6d14c12b661fb43
-dashboard link: https://syzkaller.appspot.com/bug?extid=3D8aaf2df2ef0164ffe=
-1fb
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debia=
-n) 2.40
+These stats are somewhat like LWN stats: https://lwn.net/Articles/956765/
+but more focused on mailing list participation.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Previous stats (for 6.9): https://lore.kernel.org/all/20240312124346.5aa3b1=
+4a@kernel.org/
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1aa5ad92dfce/disk-=
-cf87f46f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/67c336f7c1c7/vmlinux-=
-cf87f46f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/bb5b717bd2b8/bzI=
-mage-cf87f46f.xz
+General stats
+-------------
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit=
-:
-Reported-by: syzbot+8aaf2df2ef0164ffe1fb@syzkaller.appspotmail.com
+The cycle started on Mon, 11 Mar and ended Tue, 14 May. Same length
+as the previous cycle.
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-[ BUG: Invalid wait context ]
-6.9.0-rc7-syzkaller-00183-gcf87f46fd34d #0 Not tainted
------------------------------
-kworker/0:5/10404 is trying to lock:
-ffff8880b953e698 (iattr_mutex){+.+.}-{3:3}, at: raw_spin_rq_lock_nested+0x2=
-a/0x140 kernel/sched/core.c:559
-other info that might help us debug this:
-context-{4:4}
-5 locks held by kworker/0:5/10404:
- #0: ffff888069fd5d48 ((wq_completion)wg-crypt-wg0#12){+.+.}-{0:0}, at: pro=
-cess_one_work kernel/workqueue.c:3242 [inline]
- #0: ffff888069fd5d48 ((wq_completion)wg-crypt-wg0#12){+.+.}-{0:0}, at: pro=
-cess_scheduled_works+0x8e0/0x17c0 kernel/workqueue.c:3348
- #1: ffffc9000a4b7d00 ((work_completion)(&({ do { const void *__vpp_verify =
-=3D (typeof((worker) + 0))((void *)0); (void)__vpp_verify; } while (0); ({ =
-unsigned long __ptr; __ptr =3D (unsigned long) ((typeof(*((worker))) *)((wo=
-rker))); (typeof((typeof(*((worker))) *)((worker)))) (__ptr + (((__per_cpu_=
-offset[(cpu)])))); }); })->work)){+.+.}-{0:0}, at: process_one_work kernel/=
-workqueue.c:3243 [inline]
- #1: ffffc9000a4b7d00 ((work_completion)(&({ do { const void *__vpp_verify =
-=3D (typeof((worker) + 0))((void *)0); (void)__vpp_verify; } while (0); ({ =
-unsigned long __ptr; __ptr =3D (unsigned long) ((typeof(*((worker))) *)((wo=
-rker))); (typeof((typeof(*((worker))) *)((worker)))) (__ptr + (((__per_cpu_=
-offset[(cpu)])))); }); })->work)){+.+.}-{0:0}, at: process_scheduled_works+=
-0x91b/0x17c0 kernel/workqueue.c:3348
- #2: ffffffff8e334da0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire inc=
-lude/linux/rcupdate.h:329 [inline]
- #2: ffffffff8e334da0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock includ=
-e/linux/rcupdate.h:781 [inline]
- #2: ffffffff8e334da0 (rcu_read_lock){....}-{1:2}, at: __queue_work+0x198/0=
-xef0 kernel/workqueue.c:2337
- #3: ffff8880b953de18 (&pool->lock){-.-.}-{2:2}, at: __queue_work+0x6ec/0xe=
-f0
- #4: ffff8880206b6410 (&p->pi_lock){-.-.}-{2:2}, at: class_raw_spinlock_irq=
-save_constructor include/linux/spinlock.h:553 [inline]
- #4: ffff8880206b6410 (&p->pi_lock){-.-.}-{2:2}, at: try_to_wake_up+0xb0/0x=
-1470 kernel/sched/core.c:4262
-stack backtrace:
-CPU: 0 PID: 10404 Comm: kworker/0:5 Not tainted 6.9.0-rc7-syzkaller-00183-g=
-cf87f46fd34d #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Goo=
-gle 04/02/2024
-Workqueue: wg-crypt-wg0 wg_packet_encrypt_worker
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- print_lock_invalid_wait_context kernel/locking/lockdep.c:4751 [inline]
- check_wait_context kernel/locking/lockdep.c:4821 [inline]
- __lock_acquire+0x1507/0x1fd0 kernel/locking/lockdep.c:5087
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
- _raw_spin_lock_nested+0x31/0x40 kernel/locking/spinlock.c:378
- raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:559
- raw_spin_rq_lock kernel/sched/sched.h:1387 [inline]
- rq_lock kernel/sched/sched.h:1701 [inline]
- ttwu_queue kernel/sched/core.c:4055 [inline]
- try_to_wake_up+0x7d3/0x1470 kernel/sched/core.c:4378
- kick_pool+0x45c/0x620 kernel/workqueue.c:1288
- __queue_work+0xc30/0xef0 kernel/workqueue.c:2414
- queue_work_on+0x14f/0x250 kernel/workqueue.c:2448
- wg_queue_enqueue_per_peer_tx+0x21f/0x4b0 drivers/net/wireguard/queueing.h:=
-188
- wg_packet_encrypt_worker+0x1240/0x1610 drivers/net/wireguard/send.c:305
- process_one_work kernel/workqueue.c:3267 [inline]
- process_scheduled_works+0xa12/0x17c0 kernel/workqueue.c:3348
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3429
- kthread+0x2f2/0x390 kernel/kthread.c:388
- ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+Mailing list volume didn't change much, we saw 266 emails a day.
+Similarly the number of people discussing things on the list remained
+almost unchanged.
+
+Netdev maintainers applied 20 commits a day, which is 13% down from 6.9
+(6.9 was record high, so not too alarming).
+
+Review coverage by tags in the git repo recovered by 2%, 63% of commits
+had at least one review tag, and 56% had one from a person using a different
+email domain than the author.
+
+Review coverage by number of changesets which got applied after receiving
+at least one comment on the mailing list (across all revisions) dropped
+to 60%.
+
+Testing
+-------
+
+The netdev selftest runner went live during the previous release cycle.
+Last time I mentioned that there were 66 ignored cases, those were either
+too flaky or always failing. I'm happy to report that we got the number
+down to 20. We were using results from 243 selftests at the end of 6.9
+cycle, I counted 283 tests in use now, so 40 extra tests. Many of the tests
+are more of test suites than single tests, for example we run full BPF CI
+now, but the point is - there's growth :)
+
+Here are top 10 individuals with the highest number of commits[*] to selfte=
+sts:
+
+   1 [ 43] Jakub Kicinski
+   2 [ 42] Florian Westphal
+   3 [ 23] Petr Machata
+   4 [ 13] Geliang Tang
+   5 [  7] Kuniyuki Iwashima
+   6 [  6] Lukasz Majewski
+   7 [  4] Ido Schimmel
+   8 [  4] Jiri Pirko
+   9 [  4] Dmitry Safonov
+  10 [  2] Willem de Bruijn
+
+[*] commits which were applied directly by netdev maintainers.
+
+I also tried to figure out which tests give us the most signal. It's
+not easy to calculate because of flakes (BTW when I say flake I usually
+mean that the test fails, but passes on retry - we auto-retry all tests
+run directly by NIPA).=20
+
+I used the following criteria: overall fail rate lower than 3%, never
+flaked. With that the tests which failed the most are:
+
+   | Group                  Test                 Fail cnt
+---------------------------------------------------------
+ 1 | vmksft-net-dbg         test-vxlan-mdb-sh          24
+ 2 | vmksft-net             ioam6-sh                   21
+ 3 | vmksft-net             test-vxlan-under-vrf-sh    20
+ 4 | vmksft-forwarding-dbg  q-in-vni-ipv6-sh           20
+ 5 | vmksft-forwarding-dbg  vxlan-asymmetric-sh        20
+ 6 | vmksft-forwarding-dbg  vxlan-symmetric-ipv6-sh    20
+ 7 | vmksft-forwarding-dbg  vxlan-symmetric-sh         20
+ 8 | doc-build              htmldoc                    20
+ 9 | vmksft-net             icmp-redirect-sh           19
+10 | vmksft-forwarding-dbg  vxlan-asymmetric-ipv6-sh   19
+11 | vmksft-net             big-tcp-sh                 18
+12 | vmksft-net             test-vxlan-mdb-sh          18
+13 | vmksft-net             test-vxlan-vnifiltering-sh 17
+14 | vmksft-net-dbg         tls                        17
+15 | vmksft-forwarding-dbg  dual-vxlan-bridge-sh       17
+
+Which may or may not mean those tests caught the most bugs.
+
+Almost exactly 1/8th of commits we applied were touching selftests
+(12.51%). That doesn't seem very high.
+
+Developer rankings
+------------------
+
+Top reviewers (cs):                  Top reviewers (msg):               =20
+   1 ( +1) [27] Simon Horman            1 (   ) [57] Jakub Kicinski     =20
+   2 ( -1) [25] Jakub Kicinski          2 (   ) [55] Simon Horman       =20
+   3 ( +1) [11] Paolo Abeni             3 (   ) [35] Andrew Lunn        =20
+   4 ( +2) [10] Eric Dumazet            4 ( +1) [24] Eric Dumazet       =20
+   5 ( -2) [10] Andrew Lunn             5 ( +7) [20] Willem de Bruijn   =20
+   6 ( -1) [ 8] Jiri Pirko              6 (   ) [19] Paolo Abeni        =20
+   7 (   ) [ 5] David Ahern             7 ( -3) [17] Jiri Pirko         =20
+   8 ( +1) [ 5] Willem de Bruijn        8 ( +7) [11] Jason Wang         =20
+   9 ( +2) [ 3] Florian Fainelli        9 (***) [ 8] Sabrina Dubroca    =20
+  10 ( +3) [ 3] Jacob Keller           10 ( -2) [ 8] David Ahern        =20
+  11 ( -1) [ 3] Krzysztof Kozlowski    11 ( -4) [ 8] Krzysztof Kozlowski=20
+  12 (   ) [ 3] Russell King           12 ( -1) [ 8] Russell King       =20
+  13 (+20) [ 3] Dan Carpenter          13 ( -4) [ 6] Florian Fainelli   =20
+  14 ( +8) [ 2] Przemek Kitszel        14 ( +7) [ 6] Serge Semin        =20
+  15 (+22) [ 2] Alexander Lobakin      15 ( -1) [ 6] Jacob Keller       =20
+
+Willem jumps into the top 5 after being quite active this month (all
+over core networking and selftests), Sabrina reviewed a number of
+network crypto changes (xfrm, macsec, opvpn).=20
+
+On the "by changeset" side Jake climbs into top 10, with Przemek and
+Olek also in the top 15, this is a strong cycle for Intel! Dan caught
+and reported a number of bugs as well as helped to review and guide=20
+bug fix contributions from others (ax25 patches most recently).
+
+Thank you all very much for your work!
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Top authors (cs):                    Top authors (msg):                 =20
+   1 (   ) [9] Eric Dumazet             1 ( +1) [21] Jakub Kicinski     =20
+   2 (   ) [5] Jakub Kicinski           2 ( -1) [19] Eric Dumazet       =20
+   3 (***) [4] Asbj=C3=B8rn Sloth T=C3=B8nnesen   3 (***) [17] Edward Liaw =
+       =20
+   4 (+45) [3] Russell King             4 (***) [14] Karol Kolacinski   =20
+   5 ( +2) [2] Kuniyuki Iwashima        5 (***) [14] Kory Maincent
+   6 ( -3) [2] Breno Leitao             6 (***) [14] Jason Xing         =20
+   7 (+43) [2] Florian Westphal         7 (***) [13] Mike Rapoport      =20
+ =20
+Asbj=C3=B8rn takes a high position on the author list with the improvements
+to error checking in a large number of driver flower offloads.
+Russell worked on converting phylink drivers to newer APIs.
+(Both used a somewhat limited amount of threading when posting.)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Florian W, in addition to his usual work, moved and reworked netfilter
+tests, which now run in netdev CI.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+On the right side Mike R and Edward L are "non netdev people" who just
+CCed netdev on their large series.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+Top scores (positive):               Top scores (negative):             =20
+   1 ( +1) [395] Simon Horman           1 (***) [67] Edward Liaw        =20
+   2 ( -1) [351] Jakub Kicinski         2 (***) [58] Karol Kolacinski   =20
+   3 (   ) [176] Andrew Lunn            3 (***) [55] Kory Maincent (Dent Pr=
+oject)
+   4 ( +1) [158] Paolo Abeni            4 (***) [52] Mike Rapoport      =20
+   5 ( -1) [111] Jiri Pirko             5 (***) [44] Asbj=C3=B8rn Sloth T=
+=C3=B8nnesen
+   6 ( +2) [109] Willem de Bruijn       6 ( -4) [38] Xuan Zhuo          =20
+   7 (+32) [ 99] Eric Dumazet           7 (+37) [36] Mateusz Polchlopek =20
+   8 ( -1) [ 70] David Ahern            8 (+14) [36] Oleksij Rempel     =20
+   9 ( +8) [ 49] Jason Wang             9 ( +1) [34] Breno Leitao       =20
+  10 ( +3) [ 47] Jacob Keller          10 (+18) [33] Michal Swiatkowski =20
 
-If you want to undo deduplication, reply with:
-#syz undup
+Company rankings
+----------------
+
+Top reviewers (cs):                  Top reviewers (msg):               =20
+   1 (   ) [41] RedHat                  1 (   ) [106] RedHat            =20
+   2 (   ) [30] Meta                    2 (   ) [ 81] Meta              =20
+   3 (   ) [17] Google                  3 ( +1) [ 55] Google            =20
+   4 ( +1) [16] Intel                   4 ( +1) [ 43] Intel             =20
+   5 ( +1) [11] nVidia                  5 ( -2) [ 35] Andrew Lunn       =20
+   6 ( -2) [10] Andrew Lunn             6 ( +1) [ 30] nVidia            =20
+   7 (   ) [ 8] Linaro                  7 ( -1) [ 18] Linaro            =20
+
+Top authors (cs):                    Top authors (msg):                 =20
+   1 ( +2) [14] Intel                   1 (   ) [86] Intel              =20
+   2 ( -1) [13] RedHat                  2 ( +1) [60] Google             =20
+   3 ( +1) [12] Google                  3 ( +2) [52] RedHat             =20
+   4 ( -2) [10] Meta                    4 (   ) [46] nVidia             =20
+   5 (   ) [ 6] nVidia                  5 ( -3) [45] Meta               =20
+   6 (***) [ 4] Asbj=C3=B8rn Sloth T=C3=B8nnesen  6 ( +1) [29] Alibaba     =
+       =20
+   7 ( +3) [ 3] Amazon                  7 (+16) [20] Linaro             =20
+
+Top scores (positive):               Top scores (negative):             =20
+   1 (   ) [500] RedHat                 1 ( +1) [86] Alibaba            =20
+   2 (   ) [359] Meta                   2 (+12) [65] Huawei             =20
+   3 (   ) [176] Andrew Lunn            3 ( +5) [58] Intel              =20
+   4 ( +1) [110] Google                 4 (***) [55] Dent Project
+   5 ( +1) [ 70] Enfabrica              5 (+45) [44] Asbj=C3=B8rn Sloth T=
+=C3=B8nnesen
+   6 ( +1) [ 53] Oracle                 6 ( -5) [38] Bootlin            =20
+   7 ( -3) [ 47] Linaro                =20
+--=20
+Code: https://github.com/kuba-moo/ml-stat
+Raw output: https://netdev.bots.linux.dev/static/nipa/stats-6.10/stdout
 
