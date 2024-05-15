@@ -1,133 +1,124 @@
-Return-Path: <netdev+bounces-96487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75BDD8C6294
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:12:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9577F8C629E
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:16:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7FD01C21D4A
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 08:12:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 317EDB211CC
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 08:16:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839124AEF2;
-	Wed, 15 May 2024 08:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hZlaLlzm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610184C61C;
+	Wed, 15 May 2024 08:16:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mxout37.expurgate.net (mxout37.expurgate.net [91.198.224.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7F45337A;
-	Wed, 15 May 2024 08:11:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B49C38394;
+	Wed, 15 May 2024 08:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.224.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715760715; cv=none; b=gk5AyFmgWqK3U1c1+AkRF4HTVXSnZVLSvd+aoEGhT/L8tGEscBxBONIUIeAxlt18NP3EjgOIaKwns+vXOuA5WK/4qlS2+ZZtZzgjVsgPf10vtbBbSwM0nEJDbNRQRfuA2K/GzWyPnJilo8UZdW34vvfTvab7jwicKWS6e2m51FM=
+	t=1715761005; cv=none; b=Pag61lRWsOL36Syds1O3urp8jaZhZ9ly7HfJrbaVHcZOsfmTtEBAi2S4J57plg0hzK2dsduoB/ezIeHMEkGrCFBVfGYPXGc+Wj/YkJOb9Yis3EPS1pwgbLFRrhtwwFJVfJyqosEuIz2L6KpRrUtBVRqd1ZK1ahAYGqhhKHP3n78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715760715; c=relaxed/simple;
-	bh=xlZElKdHr4a3u0ZpkMceEK9THjOVXhJE1vBAP3K8u0s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zzy1FB6sA+MPZywEyGHl78OH/SYqQn6S1x/LGx3q2yP1nQFqytdP925kXGXvVEeNoyGlBq4OAfOwmntGsnr1U35hWRCBYaTHRgtSORbkRlBgI0aPvJcJNBvaheSyseDfP0QTww905hVi6NybdambywrHEKkoP7lWPew5vOhDtH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hZlaLlzm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0EC3C116B1;
-	Wed, 15 May 2024 08:11:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715760714;
-	bh=xlZElKdHr4a3u0ZpkMceEK9THjOVXhJE1vBAP3K8u0s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hZlaLlzmHdg1FD6Hzwp2yBFdQCy39R26PEzGd+jnOwJbE54ltKIh6Z56QuHnt3JZP
-	 caX2lD+hUwAcD8dp/DfhKaxJEPCGNQMpXe7Ab9u4yo6fXgPOkRh7kjIE5h5Sp9f4bj
-	 YSuOMhIkvu9eT4V23I/TJ3EmO5hQ556DFFPUOSAiArkUWfvdimjkaX9xAYIPORd3S6
-	 uf7fkKmyfoiR7zPO6TlRtsag16KPN1v7nZYo3jthhKy+0BI1BWrekSPCSyn4OUEnla
-	 UKhRat+ZZq1wIkWIHDUOUV+FrX+fpI9NOFnTD1Q2Qq+fuO4RAxiijNoA8HLb9nkmDq
-	 PGLteRhZKhjIg==
-Message-ID: <cbb8d16b-4de2-44fa-8420-62b826df0756@kernel.org>
-Date: Wed, 15 May 2024 10:11:49 +0200
+	s=arc-20240116; t=1715761005; c=relaxed/simple;
+	bh=0CMSPU5h0J/+LSIFiRA0tPZIyssveOFv2H3maVZ1/UE=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=nkDJ/R4gsoeCHlMK9NBpszOu67lmjgRA6eg2QeHxNxaNry/ZnarzKFHtffEaWJnQMJc2GL3SylY89Pi8lbXJ7mCJhboiPS+CiCTWa1XjEeR0esJCuP5YhRY2vbUJ1j1gZ+eIWQSb3LCCOt4lm4vfHDoKKT5hi1d5FDLrbYad4rM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=brueckmann-gmbh.de; spf=pass smtp.mailfrom=brueckmann-gmbh.de; arc=none smtp.client-ip=91.198.224.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=brueckmann-gmbh.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=brueckmann-gmbh.de
+Received: from [127.0.0.1] (helo=localhost)
+	by relay.expurgate.net with smtp (Exim 4.92)
+	(envelope-from <gessler_t@brueckmann-gmbh.de>)
+	id 1s79oI-00GvF1-Jj; Wed, 15 May 2024 10:16:26 +0200
+Received: from [217.239.223.202] (helo=zimbra.brueckmann-gmbh.de)
+	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <gessler_t@brueckmann-gmbh.de>)
+	id 1s79oH-00FeBY-7h; Wed, 15 May 2024 10:16:25 +0200
+Received: from zimbra.brueckmann-gmbh.de (localhost [127.0.0.1])
+	by zimbra.brueckmann-gmbh.de (Postfix) with ESMTPS id 16524CA6082;
+	Wed, 15 May 2024 10:16:24 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.brueckmann-gmbh.de (Postfix) with ESMTP id 073C6CA6122;
+	Wed, 15 May 2024 10:16:24 +0200 (CEST)
+Received: from zimbra.brueckmann-gmbh.de ([127.0.0.1])
+ by localhost (zimbra.brueckmann-gmbh.de [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id Tando0cXENj8; Wed, 15 May 2024 10:16:24 +0200 (CEST)
+Received: from [10.0.11.14] (unknown [10.0.11.14])
+	by zimbra.brueckmann-gmbh.de (Postfix) with ESMTPSA id DE4B5CA6082;
+	Wed, 15 May 2024 10:16:23 +0200 (CEST)
+Date: Wed, 15 May 2024 10:15:33 +0200 (CEST)
+From: =?ISO-8859-15?Q?Thomas_Ge=DFler?= <gessler_t@brueckmann-gmbh.de>
+To: Andrew Lunn <andrew@lunn.ch>
+cc: Thomas Gessler <thomas.gessler@brueckmann-gmbh.de>, 
+    Heiner Kallweit <hkallweit1@gmail.com>, 
+    Russell King <linux@armlinux.org.uk>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org, MD Danish Anwar <danishanwar@ti.com>, 
+    Ravi Gunasekaran <r-gunasekaran@ti.com>
+Subject: Re: [PATCH 2/2] net: phy: dp83869: Fix RGMII-SGMII and 1000BASE-X
+In-Reply-To: <38bc6947-391b-478d-ab71-6cc8d9428275@lunn.ch>
+Message-ID: <338669-229a-5eac-3170-3477e5ae840@brueckmann-gmbh.de>
+References: <20240514122728.1490156-1-thomas.gessler@brueckmann-gmbh.de> <20240514122728.1490156-2-thomas.gessler@brueckmann-gmbh.de> <38bc6947-391b-478d-ab71-6cc8d9428275@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/2] dt-bindings: net: qcom: ethernet: Allow
- dma-coherent
-To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Andrew Halaney <ahalaney@redhat.com>, Vinod Koul <vkoul@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc: kernel@quicinc.com, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240514-mark_ethernet_devices_dma_coherent-v4-0-04e1198858c5@quicinc.com>
- <20240514-mark_ethernet_devices_dma_coherent-v4-2-04e1198858c5@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240514-mark_ethernet_devices_dma_coherent-v4-2-04e1198858c5@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+X-purgate: clean
+X-purgate-type: clean
+X-purgate-ID: 151534::1715760986-FD9A0776-272ED94F/0/0
 
-On 15/05/2024 02:06, Sagar Cheluvegowda wrote:
-> On SA8775P, Ethernet DMA controller is coherent with the CPU.
-> allow specifying that.
+On Tue, 14 May 2024, Andrew Lunn wrote:
+> On Tue, May 14, 2024 at 02:27:28PM +0200, Thomas Gessler wrote:
+> > The RGMII-to-SGMII mode is special, because the chip does not really act
+> > as a PHY in this mode but rather as a bridge.
 > 
-> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-> ---
->  Documentation/devicetree/bindings/net/qcom,ethqos.yaml | 2 ++
->  1 file changed, 2 insertions(+)
+> It is known as a media converter. You see them used between an RGMII
+> port and an SFP cage. Is that your use case?
+
+Basically. I would call this an RGMII-SGMII bridge. A "media converter" I
+would call a device that changes the physical medium, like 1000BASE-T
+copper/RJ45 to 1000BASE-X fiber/SFP.
+
+We have this chip on a daughter card with exposed SGMII lines that can be
+plugged into customer-specific motherboards. The motherboard will have
+either an SGMII-copper PHY (this can also be a DP83869) with 10/100/1000
+auto-neg enabled but without MDIO exposed to the CPU on the daughter card;
+or an SFP cage. The SFP module, in turn, can be for 1000BASE-X fiber,
+1000BASE-X-to-1000-BASE-T copper, or SGMII copper supporting 10/100/1000
+auto-neg.
+
+So I would like to support all those configurations, which can be done
+with this chip.
+
+> > SGMII PHY and gets the negotiated speed and duplex from it through SGMII
+> > auto-negotiation. To use the DP83869 as a virtual PHY, we assume that
+> > the connected SGMII PHY supports 10/100/1000M half/full duplex and
+> > therefore support and always advertise those settings.
 > 
+> Not all copper SFP modules support auto-neg. This is all really messy
+> because there is no standardisation. Also 1000BaseT_Half is often not
+> supported.
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+I agree. Is there a better way to implement this use case? The problem
+remains that in this mode the chip is not really a PHY, but rather a
+bridge to an external PHY. See also Russell's e-mail.
 
-Best regards,
-Krzysztof
+I actually started out by NOT supporting or advertising any of the
+10/100/1000BASE-T speeds when in RGMII-to-SGMII mode. This also works for
+the SGMII auto-negotiation, since all it does is get the negotiated
+speed/duplex from the connected PHY. However, this leads to a problem when
+trying to disable auto-neg and force speed with ethtool.
+phy_sanitize_settings() will then limit the speed to 10M because 100M and
+1000M do not match any supported speeds.
 
+Thomas
 
