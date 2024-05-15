@@ -1,132 +1,98 @@
-Return-Path: <netdev+bounces-96621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2878D8C6B1E
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 18:58:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 922B88C6B17
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 18:58:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFB5B284E2F
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:58:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2D4D1C21ACC
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:58:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 200F038DE9;
-	Wed, 15 May 2024 16:58:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E083032A;
+	Wed, 15 May 2024 16:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RobFTo1s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o8wYuvOr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BF084D03;
-	Wed, 15 May 2024 16:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503F347F4A;
+	Wed, 15 May 2024 16:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715792299; cv=none; b=SUTNe9bez+GchVk3FqbyGnv9SCIg8A2azkvL+MP1dTFLaY+K44dYwaKwoV12NHJuYh20rr1WFDcNUkjchlIcZhgrXlOB+JjGE27wQj1oMW0ROAYxYlwtV3jDktMwsLBNLs3HslFQUUrKpxIL5lhcQ2rZpnA5906PIlPygWcfx/M=
+	t=1715792292; cv=none; b=ggMpUj2kS2aMnennFtxjgv3yJMyOO++ULDID1w9FsCDQ6M7pFWmCIPd/WFTnyrkffdBL3KEBjVJAMwGNYXHBdSnmuHOZAtOKPRjtsf1yZ8niojG6yU4c9Dc6QP4gdPmOYhsKSghIKBspClebNhqUNn1c5cJ/UAVeThReSX/tTp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715792299; c=relaxed/simple;
-	bh=ShbHlmZ5HSYMg7vUemRsJ6CUyHdN2PXIXd0r1VRWU1M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L1+287dufM+L9wzIFJ0PN6rA8Ig6uVejsSrEqt6Z3AECCnEh7sD8LJKK/YAt9sAFMkb089oZS0+2u4C7WJVqIpRD2nER1Z/Tr/9a1yppaFEWZaWiZjrrgWTHIjIgT7hKzWO6qvxiQS4a3r2fqW5OvbR2soszPKBQmlEvN6GJ7Os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RobFTo1s; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1eecc71311eso59363695ad.3;
-        Wed, 15 May 2024 09:58:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715792297; x=1716397097; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jshxQ4zKsW5Ka5jjJJJHS/DYAFWEr1OvskuDDmMdj64=;
-        b=RobFTo1sNa1WhUss7//7KaomdbKhoclY6C/HKFhLr248DrrCv0JCN7FMyvApt+t7Ka
-         kYwnBDCfMc+xbhOZV47GtamXGQNov0dE4lkisH0Y+xt867LhAQ461/n7+CC3pNCwG0It
-         8GBTGmV/Y25huZbdQX+qt0n1nbLzTT2TMJ1nkl0O4C0mq7ELd8mF85j6ND/HTl6GHQOh
-         wdS0O0HclEMpiOKUOm9S79Qq90stKvc5fQjIXx20JMrkeJwH2zmiJ4XILzye7CTu53iD
-         G/QizNtP6KAIEiaR/TAqmKCKh/pfgMdc/Rjf9B3/H2WbjoQRbTqlQudAr8TLUcU6XF8L
-         kRXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715792297; x=1716397097;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jshxQ4zKsW5Ka5jjJJJHS/DYAFWEr1OvskuDDmMdj64=;
-        b=bhnM3JFWjpfE1O2LxTdrT9Y4Vv5yWD5ioHl0Lfoy/8BUvDTUyBxV44YcjQBAXf0j2t
-         y8oSlKwPcU2kz4LGU/m4G76LiuX5WK+tZyAD2Ipl1zB7VHvYIf35JAq87AV/O4WQUvdc
-         T8RKaTXcx8a1NnTwAOyTHauEWFNSAGd0Bw1UorQjS9y7ustHAoOFgQ/NGe277WOdiIzk
-         leOnO6j57uHwU0v1113XnUefb8B4VRLJU8kUOd76FMa+T6txxhovjnB4ncdo4OjI089b
-         vNMmr3zikUUhRwS1R19sPwlraF/YFFommDaWo9oZcDnp7oqpvZ8ziMked698qlTS0H/6
-         yTDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVKPq3W++SSJNuiEF6JwgvDcMbriqNcOBSKlTlznWmIyG3J7DIPR92Bxl73+/aJ4SGmC3aL3oIcMm4+aakUd7JuSNnoW/Ioh0Nk0bkvTOPlwYtC0sT6XcwJwUo3PFHdyQ==
-X-Gm-Message-State: AOJu0Yx2mOcUrZ4bqDGrekyqJ+01JCaRROqAx43TB2SjXf9X917Wvj4g
-	NtJqdydfrj21o8+37TfzXiyosSqrgT+rKz7ajiz3Ew9n2D1Vxf1t
-X-Google-Smtp-Source: AGHT+IG5wszVZqanvB9HgaZHryt+doBbEuUEmVA2UhF/VUutBbI6rJ319TrdzyCrZZK/ucZyFKPcYw==
-X-Received: by 2002:a17:903:2311:b0:1e3:c327:35c0 with SMTP id d9443c01a7336-1ef43c095c2mr245697405ad.2.1715792296999;
-        Wed, 15 May 2024 09:58:16 -0700 (PDT)
-Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0badcae8sm120624315ad.103.2024.05.15.09.58.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 09:58:08 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 15 May 2024 06:58:07 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: hannes@cmpxchg.org, lizefan.x@bytedance.com, cgroups@vger.kernel.org,
-	yosryahmed@google.com, longman@redhat.com, netdev@vger.kernel.org,
-	linux-mm@kvack.org, shakeel.butt@linux.dev,
-	kernel-team@cloudflare.com,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH v1] cgroup/rstat: add cgroup_rstat_cpu_lock helpers and
- tracepoints
-Message-ID: <ZkTpn3gxDdPlcDFk@slm.duckdns.org>
-References: <171457225108.4159924.12821205549807669839.stgit@firesoul>
+	s=arc-20240116; t=1715792292; c=relaxed/simple;
+	bh=EUv6Q0T3GbOdxQR7AOx78ZIeKRWWeELUi2KPEKQmIIk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=AMZnDLWf52FmhmTdJEZLOFT5nzYD0q75KrQnSYBapUbeah6TtJ18eWhy7unIaad8qVXCOC9IdZbscPkxuWDakd8hv1LJPGxZxdu8V0OElrQ7ydL+35K+oRyME5bY96Q+Icd4Q4lLvbBqkY0JH2zZlJXI5BWbmhFOXVO8JbjDcDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o8wYuvOr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 259C2C32786;
+	Wed, 15 May 2024 16:58:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715792292;
+	bh=EUv6Q0T3GbOdxQR7AOx78ZIeKRWWeELUi2KPEKQmIIk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=o8wYuvOrdVCSi4CN6kJsW/2oTFYznPs32qdxz0e4BsIuGNO8ZkWGYAhBzFt2cv7/A
+	 Zv4X7rfCiMrFMSfKJPybufmk2Q4e6rUDMtwoQFX46lWbA3WDPLwFSIYSrBp+0ETsUz
+	 Yq/KeiQruklAq/dpIkmkwJY/NDXwGELhy/VIIoMn3t65xgYxM73CtQncLqZkOKlLGz
+	 M2tam3eMD3AXV8rimvCIzsf71JISL0U7HQ/EY2BANfnk11EY40brVj7t3QNf4fiFyv
+	 eiTtyA+X25cO4/qDYusjIepUyrC0JwemH0wlR8RJLNWckcDDPpjp0xV//UOk7bkv+K
+	 pvEUATChPpDPg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 14F1EC43332;
+	Wed, 15 May 2024 16:58:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <171457225108.4159924.12821205549807669839.stgit@firesoul>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 1/2] bpf: save extended inner map info for percpu
+ array maps as well
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171579229208.15564.10606641897493999885.git-patchwork-notify@kernel.org>
+Date: Wed, 15 May 2024 16:58:12 +0000
+References: <20240515062440.846086-1-andrii@kernel.org>
+In-Reply-To: <20240515062440.846086-1-andrii@kernel.org>
+To: Andrii Nakryiko <andrii@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, martin.lau@kernel.org, torvalds@linux-foundation.org,
+ kuba@kernel.org
 
-On Wed, May 01, 2024 at 04:04:11PM +0200, Jesper Dangaard Brouer wrote:
-> This closely resembles helpers added for the global cgroup_rstat_lock in
-> commit fc29e04ae1ad ("cgroup/rstat: add cgroup_rstat_lock helpers and
-> tracepoints"). This is for the per CPU lock cgroup_rstat_cpu_lock.
-> 
-> Based on production workloads, we observe the fast-path "update" function
-> cgroup_rstat_updated() is invoked around 3 million times per sec, while the
-> "flush" function cgroup_rstat_flush_locked(), walking each possible CPU,
-> can see periodic spikes of 700 invocations/sec.
-> 
-> For this reason, the tracepoints are split into normal and fastpath
-> versions for this per-CPU lock. Making it feasible for production to
-> continuously monitor the non-fastpath tracepoint to detect lock contention
-> issues. The reason for monitoring is that lock disables IRQs which can
-> disturb e.g. softirq processing on the local CPUs involved. When the
-> global cgroup_rstat_lock stops disabling IRQs (e.g converted to a mutex),
-> this per CPU lock becomes the next bottleneck that can introduce latency
-> variations.
-> 
-> A practical bpftrace script for monitoring contention latency:
-> 
->  bpftrace -e '
->    tracepoint:cgroup:cgroup_rstat_cpu_lock_contended {
->      @start[tid]=nsecs; @cnt[probe]=count()}
->    tracepoint:cgroup:cgroup_rstat_cpu_locked {
->      if (args->contended) {
->        @wait_ns=hist(nsecs-@start[tid]); delete(@start[tid]);}
->      @cnt[probe]=count()}
->    interval:s:1 {time("%H:%M:%S "); print(@wait_ns); print(@cnt); clear(@cnt);}'
-> 
-> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+Hello:
 
-Applied to cgroup/for-6.10.
+This series was applied to bpf/bpf.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-Thanks.
+On Tue, 14 May 2024 23:24:39 -0700 you wrote:
+> ARRAY_OF_MAPS and HASH_OF_MAPS map types have special logic to save
+> a few extra fields required for correct operations of ARRAY maps, when
+> they are used as inner maps. PERCPU_ARRAY maps have similar
+> requirements as they now support generating inline element lookup
+> logic. So make sure that both classes of maps are handled correctly.
+> 
+> Reported-by: Jakub Kicinski <kuba@kernel.org>
+> Fixes: db69718b8efa ("bpf: inline bpf_map_lookup_elem() for PERCPU_ARRAY maps")
+> Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> 
+> [...]
 
+Here is the summary with links:
+  - [net-next,1/2] bpf: save extended inner map info for percpu array maps as well
+    https://git.kernel.org/bpf/bpf/c/9ee982290831
+  - [net-next,2/2] selftests/bpf: add more variations of map-in-map situations
+    https://git.kernel.org/bpf/bpf/c/2322113ac9d0
+
+You are awesome, thank you!
 -- 
-tejun
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
