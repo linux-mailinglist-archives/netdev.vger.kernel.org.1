@@ -1,102 +1,100 @@
-Return-Path: <netdev+bounces-96599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28FED8C699B
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 17:24:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 543AB8C699D
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 17:25:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3D922825F1
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 15:24:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 103C6282EF3
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 15:25:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F1C15574D;
-	Wed, 15 May 2024 15:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4635C15575C;
+	Wed, 15 May 2024 15:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TG1JAc5X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eySLR15T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f67.google.com (mail-ed1-f67.google.com [209.85.208.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C6162A02
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 15:24:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C3315573E;
+	Wed, 15 May 2024 15:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715786687; cv=none; b=mLX6aWB6+CL5zF+rbW60cy+kPL35I2CT0DMvLpy/0TF/SN7KnNZ0azq9So0xDtSFgWj2qg6JVM7/DxZAjRV4mYDk9g91hBcRyUYsznMPXuA4U4uUeqkXItCIS1bJU3bC0AFzUNlcRPw+FHy4iHWotN7M1yHvEBmcCOiGxMS2RlE=
+	t=1715786744; cv=none; b=VcJWkHqiL0P3YPA+cBjo5HAiXeAuCmPZWmhCkpQanq316rqlDJaKkJdoFv676vfSKSI4KHRST77qkzcpuqvgTcsZHBlTQOC2SKlh19bwmFWcmJqx4C4fYJcELDmrvqaVVusVoT0KAWO0XVTVReedQ9pPxuh6K66yj74B8dKxqqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715786687; c=relaxed/simple;
-	bh=Dqdq8kCCShqQZUG0983dcBrTGziOnRdSUphm/+wFrnM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CyiinRH42Ifgfux9bxPGUE5Af37CkWGVAMpWlxThuvotz2XMe2cJ/iDXkHSnYPZSwbEqZIJd4VG5KVAvxhLXrBVLe6sPmqZq2CVpKPDTxQxksR+FuY62TeFImVGOttg7EYC1dSDvNz4Rx7DjnVtGAGaf/eM0hWueNCbk/GQvy94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TG1JAc5X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66E01C116B1;
-	Wed, 15 May 2024 15:24:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715786686;
-	bh=Dqdq8kCCShqQZUG0983dcBrTGziOnRdSUphm/+wFrnM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TG1JAc5XCQGOdHgjklK4JQC5qZxMhUl6u8b80yrB713PoW5+BFAV4M9DVGxYpWrii
-	 vFDpuOCE7wJC+ITJfZtacrviGVDUQYeQgJFGr3KmSdq2yymeP1OFbBc5CjQUDXt9a4
-	 p/G1LtlfYwRMtbA51YQ95vUkuvfrHabF4gUCaWHa/GbGNz0zFb5HgFy+utIAF9Xjyb
-	 KRKwnym1jjYjGGEXbfvQSiLFHWHLFDhBR8+mXS4i3C3YbHjYWf0RbyQw5fOnoqQLH9
-	 nQ4MbdzztuamKvAvD8G8FWlIs/IrrVBavsGjWqJFvFosuw20zu1ulUsMOkymEcU/eW
-	 XfE5CUAnoIgmQ==
-Date: Wed, 15 May 2024 16:24:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mengyuan Lou <mengyuanlou@net-swift.com>
-Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
-	duanqiangwen@net-swift.com
-Subject: Re: [PATCH net-next v3 4/6] net: libwx: Add msg task func
-Message-ID: <20240515152443.GN154012@kernel.org>
-References: <20240515100830.32920-1-mengyuanlou@net-swift.com>
- <50864E85C9DB3EB1+20240515100830.32920-5-mengyuanlou@net-swift.com>
+	s=arc-20240116; t=1715786744; c=relaxed/simple;
+	bh=ekQu6l8UVVNVkUjVcmcdczKoulddjvrzz3Upabd+m2c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BgOGodr+x03/P9IifXOUkECS1WZXrPWd9nt2r3riZm8iZZqeVzDSDNITgpl4VdoJw8/7dly8sYOQH5LAqeZLIDq9mQ8ZI8GefBl06FK1cr405jHSSt3pQ3vLxAPGuygs3XcL3MO3A5/F8dVKhDniB0ply5PYqjXRgTtp0wJpXSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eySLR15T; arc=none smtp.client-ip=209.85.208.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f67.google.com with SMTP id 4fb4d7f45d1cf-5709cb80b03so2225747a12.2;
+        Wed, 15 May 2024 08:25:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715786740; x=1716391540; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ekQu6l8UVVNVkUjVcmcdczKoulddjvrzz3Upabd+m2c=;
+        b=eySLR15T+OBYzI0z8b7iPHcuVh8vP8xK0vhPP1/NMQ2bXT430X7He50SDNxzOrkgWN
+         VlESHN20t/sGXp/RxAPVK90fgCJKVWuPlZQ1zGiz/Zw/Jsl+6vI4Bbv+HjlknCdk33gE
+         Yse+CU9+irjF5NIGZhRJuFY+a9ECzr5v29FFs5gPIvis23rgGSUxnuV1dq8QobG86+U4
+         ftdAaRs46kPcp2e/CfKGxf64Nr00O3SdUnuM5HJjvd90ZQX3Ud6pg9HJQOuTUCsIDhqn
+         6TRzq49/U+yjjRzNP7r2zYrPgcBedwK6JbmNn4QLkevU8UU9BeRCXpyEVn2w/ivWTof7
+         O3XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715786740; x=1716391540;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ekQu6l8UVVNVkUjVcmcdczKoulddjvrzz3Upabd+m2c=;
+        b=bCMYoVnSSNNY0vTHPYxzlrjpau6u5thyAnHkdMGuNbw8JW7rEQRTl5PBul3MmpwnLE
+         Ng0AbxRsET16jdr2H+4m0EMvgimw2MU0W6mZ7ECoWitY7DT+aLo+ebB10I2APNE0tz1A
+         hQi56mot13hjYe+zrX0MJhN0+uT7SVmPQccuM6CJwk/Clx4QMvEWgBWAgq5CjQKlQEeu
+         GalbR3iHst8dMoYXOK8A80WccF+dAbf4xLQJ5yd8FqWfAm2YlN+LQroOVImAv3dalLkP
+         jeAE2k8x97nv+f4QYRrxifMz3eSUYrgCOZpCo3m+XmAjtoM5aot3/ZQKhxTUxCEZzy7R
+         AkRg==
+X-Forwarded-Encrypted: i=1; AJvYcCVH/afRyl2rwAH9/N//A/n2FL2ocqOgCc1oFI0S8hJLmQendwm8pRKVc0ddTt2iwC1KIq7mYWxLMAyZAOx2dxlKW0u1
+X-Gm-Message-State: AOJu0YyeeS/YhdUlIS1jZEZVc1QOKU4Qba0tJ4+Rp5eeMqE1Taqhqvqr
+	4OyhCPUpFXLGTqTsnq51qPcfY/3aaT5RaUCQfQASCLwdiqLlJEdu3IF/9Sk+HjGPtNUkMrRDqE5
+	DcnFzOLeCJh9Qu0htHJRUsD0w3I8=
+X-Google-Smtp-Source: AGHT+IFOOz6XjLsCUnykrsTh4I2zrKCNz//LZi0zmMAPj4wBAZcDL/1aJOqWR2rhv263BtLvZWbhkl1FLEFVI4kvUYE=
+X-Received: by 2002:a50:a417:0:b0:572:9503:4f8c with SMTP id
+ 4fb4d7f45d1cf-5734d67aed2mr10313575a12.34.1715786739755; Wed, 15 May 2024
+ 08:25:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <50864E85C9DB3EB1+20240515100830.32920-5-mengyuanlou@net-swift.com>
+References: <20240515062440.846086-1-andrii@kernel.org>
+In-Reply-To: <20240515062440.846086-1-andrii@kernel.org>
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date: Wed, 15 May 2024 17:25:03 +0200
+Message-ID: <CAP01T74yJD508cSUtb4pFpuj0M8AM+t-sbxE8BE9Wt7zj4gHmg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] bpf: save extended inner map info for percpu
+ array maps as well
+To: Andrii Nakryiko <andrii@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, martin.lau@kernel.org, torvalds@linux-foundation.org, 
+	Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, May 15, 2024 at 05:50:07PM +0800, Mengyuan Lou wrote:
-> Implement wx_msg_task which is used to process mailbox
-> messages sent by vf.
-> 
-> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+On Wed, 15 May 2024 at 08:24, Andrii Nakryiko <andrii@kernel.org> wrote:
+>
+> ARRAY_OF_MAPS and HASH_OF_MAPS map types have special logic to save
+> a few extra fields required for correct operations of ARRAY maps, when
+> they are used as inner maps. PERCPU_ARRAY maps have similar
+> requirements as they now support generating inline element lookup
+> logic. So make sure that both classes of maps are handled correctly.
+>
+> Reported-by: Jakub Kicinski <kuba@kernel.org>
+> Fixes: db69718b8efa ("bpf: inline bpf_map_lookup_elem() for PERCPU_ARRAY maps")
+> Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> ---
 
-...
-
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-
-...
-
-> +static inline void wx_ping_vf(struct wx *wx, int vf)
-> +{
-> +	u32 ping;
-> +
-> +	ping = WX_PF_CONTROL_MSG;
-> +	if (wx->vfinfo[vf].clear_to_send)
-> +		ping |= WX_VT_MSGTYPE_CTS;
-> +	wx_write_mbx_pf(wx, &ping, 1, vf);
-> +}
-
-Please avoid using the static keyword for functions in .c files,
-unless there is a demonstrable reason to do so. Generally the
-compiler can figure out when best to inline functions.
-
-Also, wx_ping_vf does not seem to be used until PATCH 6/6.
-If so, it would be best to add it as part of that patch.
-
-> +
-> +/**
-> + * wx_set_vf_rx_tx - Set VF rx tx
-> + * @wx: Pointer to wx struct
-> + * @vf: VF identifier
-> + *
-> + * Set or reset correct transmit and receive for vf
-> + **/
-
-...
+Acked-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
 
