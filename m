@@ -1,278 +1,116 @@
-Return-Path: <netdev+bounces-96512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E42108C6471
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:01:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DED5F8C64C8
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:09:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94CFB2854E4
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:01:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ABF21C224A0
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39275D903;
-	Wed, 15 May 2024 10:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="K1RcWlVF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E6F39855;
+	Wed, 15 May 2024 10:08:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F2E5A11F
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 10:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2575EE67
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 10:08:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715767282; cv=none; b=DRtHfdFkIKrOlVPqeQ4LAMCXRRKLs8yrL35meLircnuX/qlFkR3IOG23RT0gYZME1YFHfrzpFvz10mCtD4F082GtVjKPOWlOldveZ3Cf302k75r9CHxHPWUlqQF4t5dARFLWTyJUtddhXaUaFbdgqZP9w58ByEt9nxCAwpC7Xjw=
+	t=1715767738; cv=none; b=DKOjUc87lxcNkTbCkgIVAt4LlwRAGKFa5Xfxq0Ybpq/COzRFbwwH4XizbragfaO04kVP0Nm894Ua594sWBzKi0xxCYvJio+tWnRT8W91ohAkH8ld0kvDkDvuFxu30bDiwWHMcitI2cQNleqtikHqCA8kkaq5ym5oR5zUYVsdlyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715767282; c=relaxed/simple;
-	bh=tFC4Uagubb4eoXf9w6qPRw0dVqgXqCUj9Gg59g6y8cY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mKNjZAOp1XUMcvKik8gb5xncJ6gTuNceMY21oSFJH4X17vZNZz5rGksObTjqJ+7XiAcirhHV1A90OvLD0PZg8KlR5THpK6StSO/dLUfmvsvlEQQF8bLK5ZbudQcBeWn7smXcjlatvGyvFdTgv/OBwRWirm1p1ZLXqpOproPb+Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=K1RcWlVF; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-51ffff16400so10924422e87.2
-        for <netdev@vger.kernel.org>; Wed, 15 May 2024 03:01:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1715767277; x=1716372077; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ukpqZZkZ02pF7RH8XXzq5qjyGt8/k5nmv3oeZg4UY0I=;
-        b=K1RcWlVF7Y7Z2kmuv2U08evyQJO5O88iW/TZktke7hjOwzENLKqs6pqbtoMo/mQXpd
-         NWEsVJGSfsXVHn5TJi6teJ3btLF0MQLm92TBGcVx8KVaBDA3iVt3I1PoIx8ORd3xiPWh
-         9vsj7EzFcg7il8x3V7bH1W6VDWR2CGNzqXMnOpqDQ7OlrIXCvfIGFcil+drnBNad9TKX
-         rGjUD6RLAyHJc115+6GwEi6eL5LFoDqAqsNngvXRyA4AjD68zW6rZyVN0MHtVWHfuIwT
-         F7kRt5KReQfMK+DCwYtTNTiVEWm6sN6HEQGdlXjULZNKkBOsEYFsjFNNmv79oR9saiB9
-         sqVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715767277; x=1716372077;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ukpqZZkZ02pF7RH8XXzq5qjyGt8/k5nmv3oeZg4UY0I=;
-        b=lDzBWr1utHb5hh5cqRDrS2PwnRw6lHFPEV5Hotxxp5QU2cJ3ZAfveudaohvPI1eQci
-         tNBbqE9HBEXXzfB+UeGijke+zzNkTCZbvjM7aiL1+OYkX+BU3C5M/4CEa0IfibKuZ7V5
-         KAyGVJtGM0bhZcz7oW11H+CiCeKzTVQYB8FabNAwzIZ2AAOZ2hFGhyEYJUH0q6VoLjFD
-         tBvZUDsLFeVkdTBYFIfUhOQAvvCI8wuvccCu4zo7xf/NLxxy3g8iRs6GfA4cvaGC3FnR
-         YWLbM8g140nfVIz+N8EunELNKov61ELCQDARHVG96WjN/fMkPoo2UhC1bx71ZRrEZbzt
-         rcug==
-X-Forwarded-Encrypted: i=1; AJvYcCX++Trfu7UKWkc1U3niegL8U/e5mEQz9R5fQUMn3+6z74ueOeh+6kOeYm9CWRp9fX/qOiZ1GKNg8HJTM8QZorS3OPLYGWi9
-X-Gm-Message-State: AOJu0YzL7LKqDO+2p45iuW9ymDZ42N1ESipqrYS3j12MXBCb6DFIgEha
-	Y4aaijHgtPrmLYhVGSYDXuwNFjJkwEdL/gQ4m6usET6dnK+E00nx80gCNdM108k=
-X-Google-Smtp-Source: AGHT+IFdKwRcFcJDPoxpjnHjRZfubVEt9+BPb8Ln+L2DQVxYwERLJdr4JLAoMMUPEl1bmgBYy5XENg==
-X-Received: by 2002:a05:6512:3e17:b0:51d:605e:f0ce with SMTP id 2adb3069b0e04-52210278698mr17687805e87.50.1715767276761;
-        Wed, 15 May 2024 03:01:16 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a17b01724sm837186066b.162.2024.05.15.03.01.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 May 2024 03:01:16 -0700 (PDT)
-Message-ID: <59b1ec87-03dc-4336-8ce1-cb97e5abb7d6@blackwall.org>
-Date: Wed, 15 May 2024 13:01:12 +0300
+	s=arc-20240116; t=1715767738; c=relaxed/simple;
+	bh=Di9Kim94ygb02301djPn7hMJ8KvPpbwvRiFwX8Eb5xE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nu18G3mroRP3ugo/HTjSM1SlcPy9y8gmsa+5tTnyEb+TDVmHQaES5SaVWk+9V2GyDYEC6ym75cefxAjul4jLah8ao6G2LzwAAQt4DOcW/NuCxweGrnl1iyRtLBdCT21HxQ3zjFf+IZ5a3vHqtyG7oO+JxW9s5g5vUcfXvV035mA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.206.34.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtp80t1715767721tw9194m8
+X-QQ-Originating-IP: xgmsRMiO+JeID2kETMK+72w/pl1iHnbPF23WLKPaGT8=
+Received: from localhost.localdomain ( [125.120.144.133])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 15 May 2024 18:08:32 +0800 (CST)
+X-QQ-SSF: 01400000000000O0Z000000A0000000
+X-QQ-FEAT: lD1qCo/DrEAUFgJp4e+urXIvlMvW1qKiIrysgCEGqI1mqqp5Lxyu4v3BxDvGR
+	jRHGq0SZCh+2X0alI/mS7N8LGiN/15zkGrXeavdKynY4KCP2By+xaY52HpCj54ZIfUaXM22
+	/gotVwx5blvepQTTyosRQbUNNI/plVLMg/WJRfMlq3N3ABDFIju4TlMG2hGGgza2Zp+c/A3
+	1/hXFXeU8RU3lWc85GZzzgJNwcCJ29ZmHo/NiDwEcnU2qrTQNALfSOKR4nWaFuz5oX8hOhJ
+	UfIJqIbXyCxXaOoQk3o4n1ve4fAA3HpRFUiApyDUUbHid/Ki7jja5GiTqlXayJPTpPXVrva
+	8HrKKabwUATenJp3X33teHAqjnG2gpoVRtZjID6PxGoFUOuoQmKwhA04B9wJuxw7LyAQ1Kh
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 6619159292630094861
+From: Mengyuan Lou <mengyuanlou@net-swift.com>
+To: netdev@vger.kernel.org
+Cc: jiawenwu@trustnetic.com,
+	duanqiangwen@net-swift.com,
+	Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v3 0/6] add sriov support for wangxun NICs
+Date: Wed, 15 May 2024 17:50:03 +0800
+Message-ID: <A621A96B7D9B15C2+20240515100830.32920-1-mengyuanlou@net-swift.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 04/14] netdev: support binding dma-buf to
- netdevice
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
- Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>,
- Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20240510232128.1105145-1-almasrymina@google.com>
- <20240510232128.1105145-5-almasrymina@google.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240510232128.1105145-5-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
 
-On 11/05/2024 02:21, Mina Almasry wrote:
-> Add a netdev_dmabuf_binding struct which represents the
-> dma-buf-to-netdevice binding. The netlink API will bind the dma-buf to
-> rx queues on the netdevice. On the binding, the dma_buf_attach
-> & dma_buf_map_attachment will occur. The entries in the sg_table from
-> mapping will be inserted into a genpool to make it ready
-> for allocation.
-> 
-> The chunks in the genpool are owned by a dmabuf_chunk_owner struct which
-> holds the dma-buf offset of the base of the chunk and the dma_addr of
-> the chunk. Both are needed to use allocations that come from this chunk.
-> 
-> We create a new type that represents an allocation from the genpool:
-> net_iov. We setup the net_iov allocation size in the
-> genpool to PAGE_SIZE for simplicity: to match the PAGE_SIZE normally
-> allocated by the page pool and given to the drivers.
-> 
-> The user can unbind the dmabuf from the netdevice by closing the netlink
-> socket that established the binding. We do this so that the binding is
-> automatically unbound even if the userspace process crashes.
-> 
-> The binding and unbinding leaves an indicator in struct netdev_rx_queue
-> that the given queue is bound, but the binding doesn't take effect until
-> the driver actually reconfigures its queues, and re-initializes its page
-> pool.
-> 
-> The netdev_dmabuf_binding struct is refcounted, and releases its
-> resources only when all the refs are released.
-> 
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> 
-> ---
-> 
-> v9: https://lore.kernel.org/all/20240403002053.2376017-5-almasrymina@google.com/
-> - Removed net_devmem_restart_rx_queues and put it in its own patch
->   (David).
-> 
-> v8:
-> - move dmabuf_devmem_ops usage to later patch to avoid patch-by-patch
->   build error.
-> 
-> v7:
-> - Use IS_ERR() instead of IS_ERR_OR_NULL() for the dma_buf_get() return
->   value.
-> - Changes netdev_* naming in devmem.c to net_devmem_* (Yunsheng).
-> - DMA_BIDIRECTIONAL -> DMA_FROM_DEVICE (Yunsheng).
-> - Added a comment around recovering of the old rx queue in
->   net_devmem_restart_rx_queue(), and added freeing of old_mem if the
->   restart of the old queue fails. (Yunsheng).
-> - Use kernel-family sock-priv (Jakub).
-> - Put pp_memory_provider_params in netdev_rx_queue instead of the
->   dma-buf specific binding (Pavel & David).
-> - Move queue management ops to queue_mgmt_ops instead of netdev_ops
->   (Jakub).
-> - Remove excess whitespaces (Jakub).
-> - Use genlmsg_iput (Jakub).
-> 
-> v6:
-> - Validate rx queue index
-> - Refactor new functions into devmem.c (Pavel)
-> 
-> v5:
-> - Renamed page_pool_iov to net_iov, and moved that support to devmem.h
->   or netmem.h.
-> 
-> v1:
-> - Introduce devmem.h instead of bloating netdevice.h (Jakub)
-> - ENOTSUPP -> EOPNOTSUPP (checkpatch.pl I think)
-> - Remove unneeded rcu protection for binding->list (rtnl protected)
-> - Removed extraneous err_binding_put: label.
-> - Removed dma_addr += len (Paolo).
-> - Don't override err on netdev_bind_dmabuf_to_queue failure.
-> - Rename devmem -> dmabuf (David).
-> - Add id to dmabuf binding (David/Stan).
-> - Fix missing xa_destroy bound_rq_list.
-> - Use queue api to reset bound RX queues (Jakub).
-> - Update netlink API for rx-queue type (tx/re) (Jakub).
-> 
-> RFC v3:
-> - Support multi rx-queue binding
-> 
-> ---
->  Documentation/netlink/specs/netdev.yaml |   4 +
->  include/net/devmem.h                    | 111 +++++++++++
->  include/net/netdev_rx_queue.h           |   2 +
->  include/net/netmem.h                    |  10 +
->  include/net/page_pool/types.h           |   5 +
->  net/core/Makefile                       |   2 +-
->  net/core/dev.c                          |   3 +
->  net/core/devmem.c                       | 254 ++++++++++++++++++++++++
->  net/core/netdev-genl-gen.c              |   4 +
->  net/core/netdev-genl-gen.h              |   4 +
->  net/core/netdev-genl.c                  | 105 +++++++++-
->  11 files changed, 501 insertions(+), 3 deletions(-)
->  create mode 100644 include/net/devmem.h
->  create mode 100644 net/core/devmem.c
-> 
-[snip]
-> +/* Protected by rtnl_lock() */
-> +static DEFINE_XARRAY_FLAGS(net_devmem_dmabuf_bindings, XA_FLAGS_ALLOC1);
-> +
-> +void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
-> +{
-> +	struct netdev_rx_queue *rxq;
-> +	unsigned long xa_idx;
-> +	unsigned int rxq_idx;
-> +
-> +	if (!binding)
-> +		return;
-> +
-> +	if (binding->list.next)
-> +		list_del(&binding->list);
-> +
+Add sriov_configure for ngbe and txgbe drivers.
+Reallocate queue and irq resources when sriov is enabled.
+Add wx_msg_task in interrupts handler, which is used to process the
+configuration sent by vfs.
+Add ping_vf for wx_pf to tell vfs about pf link change.
 
-minor nit:
-In theory list.next can still be != null if it's poisoned (e.g. after del). You can
-use the list api here (!list_empty(&binding->list) -> list_del_init(&binding->list))
-if you initialize it in net_devmem_bind_dmabuf(), then you'll also get nice list
-debugging.
+changes v3:
+- Jakub Kicinski
+Do not accept any new implementations of the old SR-IOV API.
+So remove ndo_vf_xxx in these patches. Switch mode ops will be added
+in vf driver which will be submitted later.
+changes v2:
+- Simon Horman:
+Fix some used uninitialised.
+- Sunil:
+Use poll + yield with delay instead of busy poll of 10 times
+in mbx_lock obtain.
+Split ndo_vf_xxx , msg_task and flow into separate patches.
 
-> +	xa_for_each(&binding->bound_rxq_list, xa_idx, rxq) {
-> +		if (rxq->mp_params.mp_priv == binding) {
-> +			/* We hold the rtnl_lock while binding/unbinding
-> +			 * dma-buf, so we can't race with another thread that
-> +			 * is also modifying this value. However, the page_pool
-> +			 * may read this config while it's creating its
-> +			 * rx-queues. WRITE_ONCE() here to match the
-> +			 * READ_ONCE() in the page_pool.
-> +			 */
-> +			WRITE_ONCE(rxq->mp_params.mp_ops, NULL);
-> +			WRITE_ONCE(rxq->mp_params.mp_priv, NULL);
-> +
-> +			rxq_idx = get_netdev_rx_queue_index(rxq);
-> +
-> +			netdev_rx_queue_restart(binding->dev, rxq_idx);
-> +		}
-> +	}
-> +
-> +	xa_erase(&net_devmem_dmabuf_bindings, binding->id);
-> +
-> +	net_devmem_dmabuf_binding_put(binding);
-> +}
-[snip]
+Mengyuan Lou (6):
+  net: libwx: Add malibox api for wangxun pf drivers
+  net: libwx: Add sriov api for wangxun nics
+  net: libwx: Redesign flow when sriov is enabled
+  net: libwx: Add msg task func
+  net: ngbe: add sriov function support
+  net: txgbe: add sriov function support
 
-Cheers,
- Nik
+ drivers/net/ethernet/wangxun/libwx/Makefile   |    2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  310 ++++-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |    4 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  146 ++-
+ drivers/net/ethernet/wangxun/libwx/wx_mbx.c   |  191 +++
+ drivers/net/ethernet/wangxun/libwx/wx_mbx.h   |   86 ++
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 1053 +++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.h |   14 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |   99 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   58 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |   10 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |    2 +
+ .../net/ethernet/wangxun/txgbe/txgbe_irq.c    |   25 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   24 +
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |    8 +
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |    4 +-
+ 16 files changed, 2007 insertions(+), 29 deletions(-)
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.c
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.h
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.h
+
+-- 
+2.43.2
 
 
