@@ -1,67 +1,90 @@
-Return-Path: <netdev+bounces-96591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEB1F8C6911
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:56:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77EC08C6936
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 17:06:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 136B8B211CD
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:56:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14458B22A6A
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 15:06:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077721553A8;
-	Wed, 15 May 2024 14:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04798155750;
+	Wed, 15 May 2024 15:05:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qqrGtocc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZSmYjFm0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D480C1E480
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 14:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D618C13F422
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 15:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715785008; cv=none; b=HtsKDPJDSPnliFagf7i3TuURuy1JIW6bfgPk/RLy9BD1XUUoHi7k7c73j6eNuws6mnF7/vUj9kB/ZuXAGdTNpJy5j0yqjuuKQaYMM2ygI9/mMPQeAtcgoRoVjfyosIRHetMbc3AWVXIaQCjTfL/U0eRDjjW6xLdNo1zfiH/XhGI=
+	t=1715785553; cv=none; b=ZkRHLP325HI8p8P5FehxsV9LEJMO56s8GcwtZQwAB3GQ6iGLf+bAYezB+HB6J+c7ZTvpaVKAvK7ZhvTGoXx76I//wQl7RM4Equp55VEB8BJU/CJ/cYpITr8Rfih774Y7TiDwXCnNv3x6QHHdOzdHbcejpxbZj2ENnKUj27BcTD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715785008; c=relaxed/simple;
-	bh=RFkL11pfTPku1nR02FTH7pW7etzGfiQ7u8dwNZ670wo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mE1cI9nGAevXhzqZZ9jbf1fUBpqE4VhrOksgGThvoXeC/8PyMkzh9VzshorPfPc5lKpL2YxhOYeoRa6wRDh1FEr6GEDP+pAxXsFtcJBDSj/08mIMg50WlARs+Iym4Zvlm+SuJ7GAp/ToSaObdrVWCiIl6EglDiaBFrmOaHGjLgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qqrGtocc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47B77C116B1;
-	Wed, 15 May 2024 14:56:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715785008;
-	bh=RFkL11pfTPku1nR02FTH7pW7etzGfiQ7u8dwNZ670wo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qqrGtoccr6IEhIBwR/cQtt8+jCh93yPQ2KDBcq8O5rTyVC6GTFSLPlQ3ZQlE9bWXV
-	 UexPthtKuQrJt6IGIvsOyC7Hd+fO7mVaWfxFjSS5lo3VTmCZ+yUZERkhIkVydkyI29
-	 8uO8OdFRF6jOIZfiPAR+fyQAMGxJhHbnzQEMLIiXg4WrzvhBwOJDz5f9HHxwBdAAg8
-	 4piWMB4ryEi4NdXLlz09bhDt4MQD3pq+hoqDQ8/lmZwZpfpuMjlwDZ1XHx+yoQJ/TE
-	 ziRb/LGmrkBUsh483gd6wqKsgoctu4HGMR0LS1K7EdSCqe4MeS6c3YwHKw/a17V1q3
-	 gLblT57zdbVIQ==
-Date: Wed, 15 May 2024 15:56:44 +0100
-From: Simon Horman <horms@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [RFC PATCH] net: introduce HW Rate Limiting Driver API
-Message-ID: <20240515145644.GL154012@kernel.org>
-References: <3d1e2d945904a0fb55258559eb7322d7e11066b6.1715199358.git.pabeni@redhat.com>
- <f6d15624-cd25-4484-9a25-86f08b5efd51@lunn.ch>
- <e2cbbbc416700486e0b4dd5bc9d80374b53aaf79.camel@redhat.com>
- <9dd818dc-1fef-4633-b388-6ce7272f9cb4@lunn.ch>
- <f7fa91a89f16e45de56c1aa8d2c533c6f94648ba.camel@redhat.com>
- <a0ada382-105a-4994-ad0f-1a485cef12c4@lunn.ch>
- <db51b7ccff835dd5a96293fb84d527be081de062.camel@redhat.com>
- <20240515095147.GB154012@kernel.org>
- <79767d80-4f9c-4eec-8e9d-32ea94d0e06a@lunn.ch>
+	s=arc-20240116; t=1715785553; c=relaxed/simple;
+	bh=Eqhliyv/rLaqDzkaLcjCJEDibkGNoMMtCnsez51KbII=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=jYNJIt6DDFw+ViUNxH1zH1LaTaq/Bg5I5habx0/LLaM5Pe4WVXhgN7LDVX6DH2RmgBVKuNK8qIMFPsIweNVSkm73VnWCR24jWBogdLSq9/3sx+XgjuxrEInxokGFPrluPqEhlDFuvE51pmQ4qjHc1ZP3jp+IC+fKp1/3F1qxXSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZSmYjFm0; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715785549;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=5HsQnBBLUP3Pazt+byzwwgyn37KXCpOuxjPpikdkNik=;
+	b=ZSmYjFm0MHQMDWa0aiKkvIRrfjy+0cdAKxXhhqZ4bo/nOAsROJf6n8lYKmzR7SF1J6oKoV
+	GnvTFX25TFNvbBXbUWlPS832iC6Kbu3JWfJ1rIgz9FzRTubx8rZili01BFKmYdPJ9KnxUX
+	aMv8jnKV8RYJvf+0kZs/QLjayC9/o2o=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-160-qdDbHy75Mhq_JmUBmk-oaw-1; Wed, 15 May 2024 11:05:48 -0400
+X-MC-Unique: qdDbHy75Mhq_JmUBmk-oaw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4200efb9ac6so24648405e9.2
+        for <netdev@vger.kernel.org>; Wed, 15 May 2024 08:05:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715785547; x=1716390347;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5HsQnBBLUP3Pazt+byzwwgyn37KXCpOuxjPpikdkNik=;
+        b=cWe7BewpD3WZzqM5uo/UcNbdrsL4cK/aO0QsI0TK07bNYYJx8NDi1Gf1SZPkUAIIHE
+         4JG/CVUhCnEy63Djtap6V9h79o9lorww3icx4jFUqhVh0A1h8v59QEn/I/UyBa/JVgRt
+         Do6HQq2jNSLN3r3mmBZ2z7mpsJGC3gETjr80mSmc8DRdTntWRBJWok2Zzw9U6I+wEvgA
+         s+lTflqr1uFKQec/3diO4SppRwX0hWP6uJrsfaKJwpT4XfjirW4clSuXNm2gcwm8BCNl
+         u/fKY/6Ce5F59yWtsdzoc2H3exvJPBS1bDWp4Nl/9ESXSyhyFLq4by17Yc/Wi1PEGd5A
+         r4uA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFHh3fbdX+rHuFl3UWgfHNprZPHrmwji68pErYj9twIYWJ5DRv/RUh8U6ixOILvimpAwPv7sRCiOP58O9Sm4H2GCseMecy
+X-Gm-Message-State: AOJu0YxA0er4OKsc0Z9VcClr+xcQJVLlbedHwN8f7FF9Lf7PTO+uUUA5
+	dtuZhyiW11O2ZrLl6Otc3KMTvSSufhL8kl7/x4nPwXyLvkYzz33OSXqcNc1mBxLCKIjpqO9cnBk
+	CdlcAP2gLAyNpV3ie2MhLquIjD8za2e5dpSaVX6dnlWDHX9DQBpg4YQ==
+X-Received: by 2002:a05:600c:a44:b0:41a:34c3:2297 with SMTP id 5b1f17b1804b1-41fea93a34cmr139867965e9.5.1715785547154;
+        Wed, 15 May 2024 08:05:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFwcKYJU04KRN+C9m9RrjwdUumM+NzjuDj85eoasrKYaMbDWv5ZX8CZUBelGxUEWCXHzSMp8A==
+X-Received: by 2002:a05:600c:a44:b0:41a:34c3:2297 with SMTP id 5b1f17b1804b1-41fea93a34cmr139867595e9.5.1715785546575;
+        Wed, 15 May 2024 08:05:46 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:175:c01e:6df5:7e14:ad03:85bd])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41ff7a840d2sm197154985e9.39.2024.05.15.08.05.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 May 2024 08:05:45 -0700 (PDT)
+Date: Wed, 15 May 2024 11:05:43 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com,
+	Jeongjun Park <aha310510@gmail.com>,
+	Arseny Krasnov <arseny.krasnov@kaspersky.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: [PATCH] vhost/vsock: always initialize seqpacket_allow
+Message-ID: <bcc17a060d93b198d8a17a9b87b593f41337ee28.1715785488.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,70 +93,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <79767d80-4f9c-4eec-8e9d-32ea94d0e06a@lunn.ch>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
-On Wed, May 15, 2024 at 04:19:57PM +0200, Andrew Lunn wrote:
-> > > If I read correctly, allowing each NIC to expose it's own different
-> > > starting configuration still will not solve the problem for this H/W to
-> > > switch from WRR to SP (and vice versa).
-> 
-> I also suspect this is not unique to this hardware. I've not looked at
-> other SOHO switches, but it is reasonably common to have different
-> queues for different priority classes, and then one shaper for the
-> overall port rate.
+There are two issues around seqpacket_allow:
+1. seqpacket_allow is not initialized when socket is
+   created. Thus if features are never set, it will be
+   read uninitialized.
+2. if VIRTIO_VSOCK_F_SEQPACKET is set and then cleared,
+   then seqpacket_allow will not be cleared appropriately
+   (existing apps I know about don't usually do this but
+    it's legal and there's no way to be sure no one relies
+    on this).
 
-Yes, understood. It's about creating a sufficiently general solution.
-And the HW you have in mind has lead us to see some shortcomings
-of the proposed API in that area. Because it drew a bit too much on
-understanding of a different category of HW.
+To fix:
+	- initialize seqpacket_allow after allocation
+	- set it unconditionally in set_features
 
-> > > AFAICS, what would be needed there is an atomic set of operations:
-> > > 'set_many' (and e.v. 'delete_many', 'create_many') that will allow
-> > > changing all the shapers at once. 
-> 
-> Yep.
-> 
-> > > With such operations, that H/W could still fit the expected 'no-op'
-> > > default, as WRR on the queue shapers is what we expect. I agree with
-> > > Jakub, handling the complexity of arbitrary starting configuration
-> > > would pose a lot of trouble to the user/admin.
-> > > 
-> > > If all the above stands together, I think we have a few options (in
-> > > random order):
-> > > 
-> > > - add both set of operations: the ones operating on a single shaper and
-> > > the ones operating on multiple shapers
-> > > - use only the multiple shapers ops.
-> > > 
-> > > And the latter looks IMHO the simple/better.
-> 
-> I would agree, start with only multiple shaper opps. If we find that
-> many implementation end up just iterating the list and dealing with
-> them individually, would could pull that iterator into the core, and
-> expand the ops to either/or, multiple or single.
+Reported-by: syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com
+Reported-by: Jeongjun Park <aha310510@gmail.com>
+Fixes: ced7b713711f ("vhost/vsock: support SEQPACKET for transport").
+Cc: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Tested-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
 
-FWIIW, this was my thinking too.
+---
 
-> > > int (*set)(struct net_device *dev, int how_many, const u32 *handles,
-> > > 	   const struct net_shaper_info *shapers,
-> > >            struct netlink_ext_ack *extack);
-> > > int (*reset)(struct net_device *dev, int how_many, const u32 *handles,
-> > >              struct netlink_ext_ack *extack);
-> > > int (*move)(struct net_device *dev, int how_many, const u32 *handles,
-> > >             const u32 *new_parent_handles,
-> > > 	    struct netlink_ext_ack *extack);
-> > > 
-> > > An NIC with 'static' shapers can implement a dummy move always
-> > > returning EOPNOTSUPP and eventually filling a detailed extack.
-> 
-> The extack is going to be important here, we are going to need
-> meaningful error messages.
 
-Always :)
+Reposting now it's been tested.
 
-> Overall, i think this can be made to work with the hardware i have.
+ drivers/vhost/vsock.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Great, I think the next step is for us to propose a revised API
-with multiple shaper ops in place of single shaper ops.
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index ec20ecff85c7..bf664ec9341b 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -667,6 +667,7 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
+ 	}
+ 
+ 	vsock->guest_cid = 0; /* no CID assigned yet */
++	vsock->seqpacket_allow = false;
+ 
+ 	atomic_set(&vsock->queued_replies, 0);
+ 
+@@ -810,8 +811,7 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
+ 			goto err;
+ 	}
+ 
+-	if (features & (1ULL << VIRTIO_VSOCK_F_SEQPACKET))
+-		vsock->seqpacket_allow = true;
++	vsock->seqpacket_allow = features & (1ULL << VIRTIO_VSOCK_F_SEQPACKET);
+ 
+ 	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
+ 		vq = &vsock->vqs[i];
+-- 
+MST
 
 
