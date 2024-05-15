@@ -1,124 +1,122 @@
-Return-Path: <netdev+bounces-96618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDAA98C6B04
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 18:54:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CC4C8C6B0C
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 18:56:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 878B52815B5
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:54:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8DF7B22CB5
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 16:55:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66CC2574F;
-	Wed, 15 May 2024 16:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D281D286A6;
+	Wed, 15 May 2024 16:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EtLiJ4b9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gf6LTHIw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701BF1802B;
-	Wed, 15 May 2024 16:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBDE12B6C;
+	Wed, 15 May 2024 16:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715792054; cv=none; b=YSFNlPxQpKSCwfkPQsBabVivkc/vUcgO3IdelWtJ8tDemWYg60mk3CPhYZLuaYnGtclaPxLtxGAhBAAhSdHi99GrzUu0XogHpw6FZ+kyZfm/X4wQLqllkHoh8ulDSid/M2ircmNmgGgfWJw77tSBlnopRIHh21jW0/32iIe1Wj8=
+	t=1715792152; cv=none; b=feNc+pdM59ohHBLQk8pcUUJJferPTO0JUSevJx/bY1YytjrvGnMRqS5S6DeoHW9+O0AZNiVnCF4JaiDMoKKa6rxvcAJpUCtrxIObhyyfyPAkZ8w8VNpYXyxL4SfUgIVI5H6z04nLjqSVV8V8Ypzh9JoVq9iPs9BsxL5VZ/31nsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715792054; c=relaxed/simple;
-	bh=ztXRocSxSM/WZSEM+IHjw3F+GdmcJfnokqhzl/hw0tw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u1tuPfpr5B8hYXjMA3vTKRiBFL9JYs6+3oAVwfRHH33EjiDCVcf9QSBO5KwiEHl7hNee/yTvcACx83rdocyhlz0hp9pruRwjYwFuclT0YEu5JMBNMgOrCCmS57LxJGHELc1KosrjdfIlwri1vCi8dv5Z8FufLTAGll2uL24lkgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EtLiJ4b9; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	s=arc-20240116; t=1715792152; c=relaxed/simple;
+	bh=MZshctqx6xM45b+tkX0cDNyL7J8LzYDeaWLENgouLDE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FXFw8scukVG31bzJuyq3th33INMjpbP1KgpSNCZEwqY0Qu1kdUWzomnrINlCPLWavhJSQ4adpS6ht7IkP67XIGKUc7U5WendCiqGPQM4tY/lUA9I4qL0GQ3Rtn4+A5j4PmK1CCOukKPmkeWRbtWNMnJ7jKswj7j+WM1ywihdwuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gf6LTHIw; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1ec4dc64c6cso51134795ad.0;
-        Wed, 15 May 2024 09:54:13 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-34dc8d3fbf1so5836001f8f.1;
+        Wed, 15 May 2024 09:55:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715792053; x=1716396853; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oeJ50cYOsMUIbdy+0kSEcT3sVthjv83+PS4iIfn9wB8=;
-        b=EtLiJ4b9rloK6CeJ3utu470aHTW19dq7WUj1h3FJK6LQO/OXX6EoV+Niqb35VGFha2
-         NdfbNH7NLAt5ZT6jaIZrx/BJkKhIEHsLY4k0gKFM6xIW4XVJ7oUDlhy9leEFRdvGnZol
-         S8tWtX2x6pEaqcteCBM3hTLdUUG1Za2MIrA4oRD3EMpGCrymduHJgSsvfi+XVzeRLx13
-         y8ty6CS4AGnoZEU6l1KIXgIIMbBzvQx+YEEHDQxgEIO4iro7b4CQI8f7efcNEgS2VhJw
-         ExRF2NkbShNIzH7hCRr57cS82SDAEGlxKl7fnW8Woli28crU7idQ1kp/4gwi85C2Z+hu
-         64qQ==
+        d=gmail.com; s=20230601; t=1715792149; x=1716396949; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wn71j5PCDcdMbECQ7d4+bOhBU+DyfxybRg35BEWpRjk=;
+        b=gf6LTHIw1ABxl5TEaBWMFBgNgJysuo8iw85wnGo5s7XjCxsIctlGjDBbTZB7/92u7J
+         4oYPmNMqJIDQfuY464yR+HF6Wpe1p0ynWFxe1z9K4tZHjIojbLo+RDb4ONtCpgWE1n0d
+         QzHhEbNwyiSZkN+vNgDtGtiRmSynjCAoQCAMIahDfP/Baif0UWW5YZVbDU0QITW3wtqt
+         5UbXZAAKNH4BGPTlRGVvdQjFjchzDjGW1Voy0MDjlHsJiZybchf/wRudWVVwbO75yJil
+         tG1NVKSBv3XtT9hDjpQCeMP4yv664dhdZoXGGmonkGvkIR5ov3C3V8Ke0xxMbrVFcIXt
+         O0cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715792053; x=1716396853;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1715792149; x=1716396949;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oeJ50cYOsMUIbdy+0kSEcT3sVthjv83+PS4iIfn9wB8=;
-        b=S1qBuo4O9am94kjhJQdpzatrySJkUmn+6akXzKFlx6YqA/Iybu+vdAtcvKx1hKpPDK
-         YZ//TJMvVRa32s7PSa2v7w1PjpUNFSgC13bx9MGKokgUXCJSVgXYUSF6He64on5YD76O
-         SAncWciVxfnL3wAvBFPrBFWFYX/h/F5MSHcn2UgEkaucVWvHlyD2BN6H9C3p2PP3fi9H
-         7F4cwHZEvuSRp34+6IzdeHjGNdlJ5o9VmbMT97ewNAU/9lmGNxdHswu8A7h11yhIFa/C
-         /IS8s7Qh+pBcttnsYAEfGO2e180WNwZ6ySsKDscar9qJ9gujMkqmQtD+oDUz04KzlCm9
-         na9g==
-X-Forwarded-Encrypted: i=1; AJvYcCUrXFVeVvmoiwHT6RF+J2bQuxFj3mKiNa/nB9NGNlBAum/7uwh2H1HVAATYKWbOg2TJUsHCAr7q1lHXcULHnCI/TfxcedfNNAKTKhiu8MbIja7hj5bQAA+NYcRes8TTVnUSzMDO
-X-Gm-Message-State: AOJu0YxYI4vcL+7D3RbaeatDDDYU0XkvSIuUylSYfhPg4vzLOAz9VuPU
-	BmMlFaInWh3VXkk+kK+4ulE2fyeV8Bjno0WSRWB5Xbc44HFlPkum
-X-Google-Smtp-Source: AGHT+IFrbKFQTo/9tl2R+tjDagtwuK7RCCzKhqhw+kSduSrujAOUzv/xEE0Ml9CrO9VBTYqRD7m7dw==
-X-Received: by 2002:a17:903:32c4:b0:1e4:2879:3a38 with SMTP id d9443c01a7336-1ef43f51f37mr217088535ad.47.1715792052588;
-        Wed, 15 May 2024 09:54:12 -0700 (PDT)
-Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0b9d1658sm120548375ad.35.2024.05.15.09.54.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 09:54:12 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 15 May 2024 06:54:11 -1000
-From: Tejun Heo <tj@kernel.org>
-To: =?iso-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>
-Cc: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	Manjunath Patil <manjunath.b.patil@oracle.com>,
-	Mark Zhang <markzhang@nvidia.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Shiraz Saleem <shiraz.saleem@intel.com>,
-	Yang Li <yang.lee@linux.alibaba.com>
-Subject: Re: [PATCH v2 1/6] workqueue: Inherit NOIO and NOFS alloc flags
-Message-ID: <ZkTos2YXowEFS2fR@slm.duckdns.org>
-References: <20240515125342.1069999-1-haakon.bugge@oracle.com>
- <20240515125342.1069999-2-haakon.bugge@oracle.com>
+        bh=wn71j5PCDcdMbECQ7d4+bOhBU+DyfxybRg35BEWpRjk=;
+        b=OYZLMDZAHmyPqgD4J5KODzz1+EpH6eNPtYr3HAeLtLqwc0ln4Jc2kD5/2WAoeS3GB5
+         qaKdgduNMi3rIaIkqt5if4A5TvUaH//cFQXAUswN7e3KGC7vZwq4wvJTPKTB1bMCAeMs
+         no+U/ERRTC2UDMkfZtzmdj5dhdy32W7q1MhHsW4z18JN4U8AtfEpmt05y/6fIljUIf3W
+         LKQeBOOwhmJ3de6KDa7xv2w55CnrN1esEg1bRoJp8ujTYL4oVr3zG+TTkpw0fFipf3pb
+         OINHI3DGsWTXRGA5iSyAx+MY7aqHvkENT0VdfjIAZkNNF8FKjJFak92X+FwdYKjitqU0
+         YnCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX14yaBv/SV3RUvckK5d9Wc4UFsduLpwqxmulAmTwd6UKN3jhOXTIf6SjMc1LiF3WFyQRtwLhpCCKM931rE3eFxQ2fB
+X-Gm-Message-State: AOJu0YxjuTxLNlSNQy00qBwR35Rd6pYbl26v/ZQuh3GaZsY+JvxOrN9F
+	IkrdXltFKLE96CFq4oGNwffWjU0mciKwVL3bJHNO3f4aXHehyE0B0h+Z15gpl8nrfz52KAjhMDW
+	nYsomDcWQRKgOJ6zbPu35CuYbbqg=
+X-Google-Smtp-Source: AGHT+IG5vRNg0MCDMX50ze0WgRNZOel7HD3ZgSa/j3WNzn6FCm4JV8E429RhjFr7HAOrBrcooJXl8ikIqyzcnZymTTc=
+X-Received: by 2002:a5d:4801:0:b0:34d:a5fd:977b with SMTP id
+ ffacd0b85a97d-3504a969ffcmr11308913f8f.60.1715792149046; Wed, 15 May 2024
+ 09:55:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240515125342.1069999-2-haakon.bugge@oracle.com>
+References: <20240515062440.846086-1-andrii@kernel.org>
+In-Reply-To: <20240515062440.846086-1-andrii@kernel.org>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 15 May 2024 09:55:37 -0700
+Message-ID: <CAADnVQLg4zcS99=bCLgczZWCTbUwRXyyoTFC+_LU08rQ1_EbZQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] bpf: save extended inner map info for percpu
+ array maps as well
+To: Andrii Nakryiko <andrii@kernel.org>
+Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> @@ -5583,6 +5600,10 @@ struct workqueue_struct *alloc_workqueue(const char *fmt,
->  
->  	/* init wq */
->  	wq->flags = flags;
-> +	if (current->flags & PF_MEMALLOC_NOIO)
-> +		wq->flags |= __WQ_NOIO;
-> +	if (current->flags & PF_MEMALLOC_NOFS)
-> +		wq->flags |= __WQ_NOFS;
+On Tue, May 14, 2024 at 11:24=E2=80=AFPM Andrii Nakryiko <andrii@kernel.org=
+> wrote:
+>
+> ARRAY_OF_MAPS and HASH_OF_MAPS map types have special logic to save
+> a few extra fields required for correct operations of ARRAY maps, when
+> they are used as inner maps. PERCPU_ARRAY maps have similar
+> requirements as they now support generating inline element lookup
+> logic. So make sure that both classes of maps are handled correctly.
+>
+> Reported-by: Jakub Kicinski <kuba@kernel.org>
+> Fixes: db69718b8efa ("bpf: inline bpf_map_lookup_elem() for PERCPU_ARRAY =
+maps")
+> Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> ---
+>  kernel/bpf/map_in_map.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/kernel/bpf/map_in_map.c b/kernel/bpf/map_in_map.c
+> index 8ef269e66ba5..b4f18c85d7bc 100644
+> --- a/kernel/bpf/map_in_map.c
+> +++ b/kernel/bpf/map_in_map.c
+> @@ -32,7 +32,7 @@ struct bpf_map *bpf_map_meta_alloc(int inner_map_ufd)
+>
+>         inner_map_meta_size =3D sizeof(*inner_map_meta);
+>         /* In some cases verifier needs to access beyond just base map. *=
+/
+> -       if (inner_map->ops =3D=3D &array_map_ops)
+> +       if (inner_map->ops =3D=3D &array_map_ops || inner_map->ops =3D=3D=
+ &percpu_array_map_ops)
+>                 inner_map_meta_size =3D sizeof(struct bpf_array);
 
-So, yeah, please don't do this. What if a NOIO callers wants to scheduler a
-work item so that it can user GFP_KERNEL allocations. I don't mind a
-convenience feature to workqueue for this but this doesn't seem like the
-right way. Also, memalloc_noio_save() and memalloc_nofs_save() are
-convenience wrappers around memalloc_flags_save(), so it'd probably be
-better to deal with gfp flags directly rather than singling out these two
-flags.
-
-Thanks.
-
--- 
-tejun
+Applied the fix to stop the bleeding,
+but we need to fix this fragility long term.
 
