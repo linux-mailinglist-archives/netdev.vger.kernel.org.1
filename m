@@ -1,184 +1,165 @@
-Return-Path: <netdev+bounces-96534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 452E18C654C
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 13:03:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A5638C6556
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 13:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D35101F23957
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 11:03:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E42F2822FC
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 11:13:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA54862171;
-	Wed, 15 May 2024 11:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I2jODLZD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C089629E4;
+	Wed, 15 May 2024 11:13:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CEF5684;
-	Wed, 15 May 2024 11:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7BB6EB51
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 11:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715771003; cv=none; b=tLFTfCp13Y9ZOIDcAtExGyWmfT+qr6z//qpjAdcYXyz4aRWfwLuk6/ji90WSCUI5MfjksW1nudYxf6tbE57Ki6tmKOsvA0mgk2rUvoEa/ozN+N3PcYnS50qahreRlKjJX6RehbZfl04FYHo0iiY4GoxbeSv1sLC392ROB0zNODg=
+	t=1715771580; cv=none; b=aP1SxPedU/XnVDkKdywNUGQkQheN+VDZtN0PLwgn3rKEH/gJ7MxKvTc1APD1RvW0JgXlsbSP1giVd3XjE57P/uMXuDZ8u13qLDbcdMnjoXbAm/XF5c17ehHgmutmAqc7ehYJdYZDhcMlScTVQUXMJu68/BeXJBJmtqii7BTxrL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715771003; c=relaxed/simple;
-	bh=bhPWCNAUIK6VfX6XoxIhdW3f+hVkZo9HiaN1p3ULkuc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y/3nUVf+kuF0qyzPnRIauI4PiYAx33x6GZjWWaOCEyk8vR/HpgVSwG70aHLi3BpDgbI5kxb523VYJho8ycRlEPZykDHC89IXp5W/OcM7OeVlUc4vGTPM0pdyDNtH1DFniV0i8mgLu+zcifQbxxrTfR2jmUegiNYb6P7nUt9fduM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I2jODLZD; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-56e48d0a632so2068773a12.2;
-        Wed, 15 May 2024 04:03:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715771000; x=1716375800; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bhPWCNAUIK6VfX6XoxIhdW3f+hVkZo9HiaN1p3ULkuc=;
-        b=I2jODLZD7VpFLPkrBw2Abr+rAbvL/CpQxBlU45ZUcPq8P67dhhGu1J9vJFETarZi2Z
-         VGWvcDea66i3UalaTuyw+8xmVj/ZQqB4n4wtoCL2n/ecaWPAtF1LRjTg0MUboDcGCEpl
-         LOiFjGEC5GcTE8lfonlkgIktiQF4ozNjfm6MejTrQk51j4TEkXGjIgVmyWkf3xXMDO9m
-         P95ZYo3FLjiSS+KbuStjMqIYLVdS3mBSvYQpqhfZXfr1CQAQfDMct0nzGl7SGikYCMFd
-         +kPwj0V6jH+hQZmzrNNwpasXgM3rlBUkhRqg6B1Pm+fNCJx6uP+L3BcYbFQNJScY9y44
-         cy4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715771000; x=1716375800;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bhPWCNAUIK6VfX6XoxIhdW3f+hVkZo9HiaN1p3ULkuc=;
-        b=jYL0CSSsRzFVD5g5OmxjJLmjQ4iz4jcbhWbCQBMhGmENk5dhs/l47Gk9PyVAbOqL1r
-         9wVhxhA/J9fEA1ydkla0wlUbyrdvrVsnOJZA/Pfv/vRLiVz4XDBGXz59V3NrOZoZC/VI
-         XLoAwXVmLsQtX7VbiawXenzufU97YqY8pJVn2rH8sQPbnQajYcJqqai6B++gVll8Wb6N
-         rhQL/iLgJt73A+H+FroCScoJ5acXASZ4Hg9H0lGwrcdaZM6wMTSZJDv28+Wjmve5SFoo
-         OFT/enV81Db/AJAzpAS3MYDdPFZCc4/YVdrBluMA0xtVvZQL567/QaTAhDmaRi9lTsak
-         EUaA==
-X-Forwarded-Encrypted: i=1; AJvYcCXUKrr3er+NPk6vbDJNdoCagbIUi6vWKmtFHjA9RSStxYoROZMGIOtUku3bM6vqMrM21fwryR3Q9LkmBKCyjYtr4ypdioxSEORYwbJcjyLMNvJ7/14UWurLGmYkoKIujr/jjkQ8vEvq
-X-Gm-Message-State: AOJu0YxRijf7GIUdQiDqJogod4hCeoCm0CwWNZ7PlyL2je0y9tHnkH2K
-	xqxKt5pDphvKJDlhulvwu0q4j+fbblACI3ckFy+sazyhY7Iu26x8b2MZW5NVF+rIMnNGahIVoqc
-	NHr+SUw1PEb7xlHbPZNB4/ufHbb4=
-X-Google-Smtp-Source: AGHT+IEtXNaXRMhwfYMzWT333xACm9XANBbz96ElsQaKYUeGoZRpoAaYTuoUVKMvt1tPjthuQ3VsFiFR8s3pNeR7Ayk=
-X-Received: by 2002:a50:aa94:0:b0:56b:cecb:a4c8 with SMTP id
- 4fb4d7f45d1cf-5734d70603cmr16238930a12.39.1715771000175; Wed, 15 May 2024
- 04:03:20 -0700 (PDT)
+	s=arc-20240116; t=1715771580; c=relaxed/simple;
+	bh=iarP7kXKMwaOizVjSKT+Ft0Wz+Wp8DKeQCoXPj/XugM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VAhJHR62/KzfGS3/AyP+ckszKt9TV+zG24la3b2npyLvN2hfCqlk1IsHvmciEdUNvN65A//4hlimxBCgvFGN6fgFAQe/dG4dfXqdEFGvf27lRWWoWNVBvz3raD7U4Yt6McAFgbCDpECuUIEBBZ/wlsBSbajwtI2j95+P6eJfsnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1s7CYq-00021g-LW; Wed, 15 May 2024 13:12:40 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1s7CYo-001WWJ-9x; Wed, 15 May 2024 13:12:38 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id DE1782D1C71;
+	Wed, 15 May 2024 11:12:37 +0000 (UTC)
+Date: Wed, 15 May 2024 13:12:37 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Vitor Soares <ivitro@gmail.com>
+Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+	Thomas Kopp <thomas.kopp@microchip.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Vitor Soares <vitor.soares@toradex.com>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v5] can: mcp251xfd: fix infinite loop when xmit fails
+Message-ID: <20240515-athletic-sensible-swine-4e7692-mkl@pengutronix.de>
+References: <20240514105822.99986-1-ivitro@gmail.com>
+ <20240514-corgi-of-marvelous-peace-968f5c-mkl@pengutronix.de>
+ <465a2ddb222beed7c90b36c523633fc5648715bb.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240513060852.1105380-1-ap420073@gmail.com> <20240515094831.GA154012@kernel.org>
-In-Reply-To: <20240515094831.GA154012@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Wed, 15 May 2024 20:03:08 +0900
-Message-ID: <CAMArcTW4G+_XM1Gf=1mJCptGYLEc=+b8FeOAD_+Cuba8tvjyKg@mail.gmail.com>
-Subject: Re: [PATCH net v2] selftests: net: kill smcrouted in the cleanup
- logic in amt.sh
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="p2gqh7q5mtz2efsu"
+Content-Disposition: inline
+In-Reply-To: <465a2ddb222beed7c90b36c523633fc5648715bb.camel@gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+
+--p2gqh7q5mtz2efsu
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 15, 2024 at 6:48=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
-te:
->
+On 14.05.2024 15:34:01, Vitor Soares wrote:
+> > > +void mcp251xfd_tx_obj_write_sync(struct work_struct *ws)
+> > > +{
+> > > +       struct mcp251xfd_priv *priv =3D container_of(ws, struct
+> > > mcp251xfd_priv,
+> > > +                                                  tx_work);
+> > > +       struct mcp251xfd_tx_obj *tx_obj =3D priv->tx_work_obj;
+> > > +       struct mcp251xfd_tx_ring *tx_ring =3D priv->tx;
+> > > +       int err;
+> > > +
+> > > +       err =3D spi_sync(priv->spi, &tx_obj->msg);
+> > > +       if (err)
+> > > +               mcp251xfd_tx_failure_drop(priv, tx_ring, err);
+> > > +
+> > > +       priv->tx_work_obj =3D NULL;
+> >=20
+> > Race condition:
+> > - after spi_sync() the CAN frame is send
+> > - after the TX complete IRQ the TX queue is restarted
+> > - the xmit handler might get BUSY
+> > - fill the tx_work_obj again
 
-Hi Simon,
-Thanks for the review!
+You can avoid the race condition by moving "priv->tx_work_obj =3D NULL;"
+in front of the "spi_sync();". Right?
 
-> On Mon, May 13, 2024 at 06:08:52AM +0000, Taehee Yoo wrote:
-> > The amt.sh requires smcrouted for multicasting routing.
-> > So, it starts smcrouted before forwarding tests.
-> > It must be stopped after all tests, but it isn't.
-> >
-> > To fix this issue, it kills smcrouted in the cleanup logic.
-> >
-> > Fixes: c08e8baea78e ("selftests: add amt interface selftest script")
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
-> > The v1 patch is here:
-> > https://lore.kernel.org/netdev/20240508040643.229383-1-ap420073@gmail.c=
-om/
-> >
-> > v2
-> > - Headline change.
-> > - Kill smcrouted process only if amt.pid exists.
-> > - Do not remove the return value.
-> > - Remove timeout logic because it was already fixed by following commit
-> > 4c639b6a7b9d ("selftests: net: move amt to socat for better compatibili=
-ty")
-> > - Fix shebang.
-> >
-> > tools/testing/selftests/net/amt.sh | 10 ++++++++--
-> > 1 file changed, 8 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftes=
-ts/net/amt.sh
-> > index 5175a42cbe8a..d458b45c775b 100755
-> > --- a/tools/testing/selftests/net/amt.sh
-> > +++ b/tools/testing/selftests/net/amt.sh
-> > @@ -1,4 +1,4 @@
-> > -#!/bin/sh
-> > +#!/bin/bash
-> > # SPDX-License-Identifier: GPL-2.0
-> >
-> > # Author: Taehee Yoo <ap420073@gmail.com>
->
-> Hi.
->
-> I think that the change above is not related to the fix below.
-> I think it should be in a separate patch targeted at net-next.
-> And as net-next is currently closed it should be posted once it
-> reopens, after the 27th May.
->
-> The changes below look good to me.
-> I suggest resending only those changes, targeted at net, as v3.
->
+> > > +}
+> > > +
+> > >  static int mcp251xfd_tx_obj_write(const struct mcp251xfd_priv *priv,
+> > >                                   struct mcp251xfd_tx_obj *tx_obj)
+> > >  {
+> > > @@ -175,7 +210,7 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *=
+skb,
+> > >         if (can_dev_dropped_skb(ndev, skb))
+> > >                 return NETDEV_TX_OK;
+> > > =20
+> > > -       if (mcp251xfd_tx_busy(priv, tx_ring))
+> > > +       if (mcp251xfd_tx_busy(priv, tx_ring) || priv->tx_work_obj)
+> >=20
+> > This should not happen, but better save than sorry.
+>=20
+> As there is the race condition you mentioned above, on this condition:
+> priv->tx_work_obj =3D tx_obj --> xmit will return NETDEV_TX_BUSY
+>=20
+> or
+>=20
+> priv->tx_work_obj =3D NULL --> It goes through the rest of the code or
+> the workqueue may sleep after setting tx_work_obj to NULL. Should I
+> use work_busy() here instead or do you have another suggestion?
 
-Okay, I will send a v3 patch that will not change the shebang.
+Yes, introduce mcp251xfd_work_busy().
 
-> Thanks.
->
-> > @@ -77,6 +77,7 @@ readonly LISTENER=3D$(mktemp -u listener-XXXXXXXX)
-> > readonly GATEWAY=3D$(mktemp -u gateway-XXXXXXXX)
-> > readonly RELAY=3D$(mktemp -u relay-XXXXXXXX)
-> > readonly SOURCE=3D$(mktemp -u source-XXXXXXXX)
-> > +readonly SMCROUTEDIR=3D"$(mktemp -d)"
-> > ERR=3D4
-> > err=3D0
-> >
-> > @@ -85,6 +86,11 @@ exit_cleanup()
-> > for ns in "$@"; do
-> > ip netns delete "${ns}" 2>/dev/null || true
-> > done
-> > + if [ -f "$SMCROUTEDIR/amt.pid" ]; then
-> > + smcpid=3D$(< $SMCROUTEDIR/amt.pid)
-> > + kill $smcpid
-> > + fi
-> > + rm -rf $SMCROUTEDIR
-> >
-> > exit $ERR
-> > }
-> > @@ -167,7 +173,7 @@ setup_iptables()
-> >
-> > setup_mcast_routing()
-> > {
-> > - ip netns exec "${RELAY}" smcrouted
-> > + ip netns exec "${RELAY}" smcrouted -P $SMCROUTEDIR/amt.pid
-> > ip netns exec "${RELAY}" smcroutectl a relay_src \
-> > 172.17.0.2 239.0.0.1 amtr
-> > ip netns exec "${RELAY}" smcroutectl a relay_src \
->
-> --
-> pw-bot: changes-requested
-> >
+I'm not sure what happens if the xmit is called between the
+"priv->tx_work_obj =3D NULL" and the end of the work. Will queue_work()
+return false, as the queue is still running?
 
-Thanks a lot!
-Taehee Yoo
+> Everything else is clear to me and I'm addressing it for the v6.
+
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--p2gqh7q5mtz2efsu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmZEmKAACgkQKDiiPnot
+vG8QuAf/Sdxq15eqo964upghsJzAYE2c+AqyhOJ41rndONHflyczJems3Jbk1t+3
+BiFwD7+PFKsXec+6qguGK2vnmu74D5+PYi2zYI2Cyz5eBJhAj8M/fgpfzroPD9Oe
+6tFYeTC6lRi3YW0pHxefQxP44OpTnac3CLYhPREMM0OpJJ8VLljSzEUdx2xWgFmk
+M4foDpuran5XVYH/cSh9ecEXkNiJjZ7XZf3f4hXM/K0BdN2og/CyT7xGQG/Yl3lL
+ZRZZDV8O6sC/tQhx4UukoaUP7bwR4z6oho8SyYU+wUsiKO6zn9xXZyEFbMmD3iJ0
+lym7DsDGUyRI2gCPRjFhnJbBaIWDAQ==
+=56G6
+-----END PGP SIGNATURE-----
+
+--p2gqh7q5mtz2efsu--
 
