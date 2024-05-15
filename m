@@ -1,58 +1,60 @@
-Return-Path: <netdev+bounces-96532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B798C652D
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:52:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 126488C652F
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:54:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E755282A31
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:52:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43F531C20FD7
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7891A60B95;
-	Wed, 15 May 2024 10:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3014C5FDD2;
+	Wed, 15 May 2024 10:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uAN9dlhN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AQtFtcoc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517B05FBAA;
-	Wed, 15 May 2024 10:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEE65BAFC
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 10:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715770334; cv=none; b=qTFqU9uGQ1GITSzap82piDrvJysIh9mf8udSARYzLbQH+pErdEYSZb5UDrvkaapdN3Olr3gL+sUlZrW5L/SeAjYyatIyw4IYB8F9MoxSR6P3AmDi9V2jEavbk4hPTb/JyNFVMVIFZx8Ubqbo3XgyAjB1hwsgqNmHtjTOlTh2dJo=
+	t=1715770438; cv=none; b=uOu3O1FWgjPa7zF/wB9A9152r4kLOBLHKreSSfYQAe8mFImImNEm4g5Y1GeZ+qC/69gUp4l3P/8COkSqoPW1AAhnwYPbWvTSld/lA+HGGGZrEeIxDtgZDVUnP67pGxe3P3GmMYLatvGmRz5eqCKt5F6izu0LqinYr0b51XzF8Uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715770334; c=relaxed/simple;
-	bh=lGHAt4xU2kIiopBIW1/Ux+TejeEfO1DXsnZmDmGzX/M=;
+	s=arc-20240116; t=1715770438; c=relaxed/simple;
+	bh=QRw6nwRXyqsgD3nh5DvfIUqZjW7P971Rcz1253oIkog=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dpv/fwKnOtdl8CTQtqvtpF7mZeZPKYTAISqRW+23ZhnYTe8UW++rODAIT/74thcv0pUV+rCXIw5zjk2CNIx28cDjgRjzdhwo8ZNbLE5Zjl2dO3vbBEjjL8pKuY32gSXvnVzg4aDYYZIE41RmjtBTxSgG0vLqVOuDkdPWedoEefQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uAN9dlhN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7805DC116B1;
-	Wed, 15 May 2024 10:52:12 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=IuGiTBpmuh7aeM9HWaZMf14D5uialTSdJ86aorRsSimSLJ55GMJWsiQ1kzO+UoSo2vtSZdbrVQM6NjvPShv9ZxldUrKEYYwm6LMACT1f9aulrOs5dYL48EWDUzFkqtgy0fhSvjvv1YfbIT7omJTLHB8MiKg+QRxGVgTg3YyYbmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AQtFtcoc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BE13C32781;
+	Wed, 15 May 2024 10:53:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715770334;
-	bh=lGHAt4xU2kIiopBIW1/Ux+TejeEfO1DXsnZmDmGzX/M=;
+	s=k20201202; t=1715770437;
+	bh=QRw6nwRXyqsgD3nh5DvfIUqZjW7P971Rcz1253oIkog=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uAN9dlhN15F5QZlsl8XIXBWLk9e78dI/D6EkVY5Bin55x/ZxBeryQe5UOTjKgWX7C
-	 oNcWWMvO5aLR+OuBS3+A8v9PYsL2AAvMWcap1YUPry2Q3MQS07H/K9JqntpuC8R2Aq
-	 2RJ1KVmCEtOQaOV6qDxb+Id/CNas/pKSjI6qO3h76BIdG1dViZCxqnFSUsh/dyxqRY
-	 vRQMx0HteHLTN4Fyh9Ev8jCrRujXHiUzhv6meplYSpJ1oxWaivpeMErPu/Sq5dc0x3
-	 loTGi2saRjGr+Lp+2b+NR5qznz6V+owg4pxMxoHf6XtYXuPZnIJCAU2sMPbpeBjeO2
-	 UkzFJdFewVuXw==
-Date: Wed, 15 May 2024 11:52:10 +0100
+	b=AQtFtcocSBKa1+7HU5Lh2w0c+w0PIRtPBcAhoGdf/JqL9Wy+otYSZ+T46+IUoe/2z
+	 maZhxkjZgUjPK/M4geG5nIbwPTorXYxN3xDdU2rAyMk7hTix1grK/s9osnOpJBzbxP
+	 HkDYzNrX/+SyB1A0dx00vDkQaM7/1G6NJQiALCjUMTcNaK7vPalcTJIlPV1+5tU9YA
+	 h4Fe8d0HMOiXKMCbYhFF9pYOCPjSrmGEt8YuoQxtdj6Y5SMFwNzUvzY8Bey2OZ6JKJ
+	 d41pZGyXyQtRJYirAE4WjdxHZyDyQHkZCukEJerV+7TRwYm/b+dQ6SSMr1LpmAItDA
+	 uhgQH4BsEMvjA==
+Date: Wed, 15 May 2024 11:53:53 +0100
 From: Simon Horman <horms@kernel.org>
-To: Ronak Doshi <ronak.doshi@broadcom.com>
-Cc: netdev@vger.kernel.org,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 0/4] vmxnet3: upgrade to version 9
-Message-ID: <20240515105210.GH154012@kernel.org>
-References: <20240514182050.20931-1-ronak.doshi@broadcom.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Chandan Kumar Rout <chandanx.rout@intel.com>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: Re: [PATCH net 1/2] ice: Interpret .set_channels() input differently
+Message-ID: <20240515105353.GI154012@kernel.org>
+References: <20240514-iwl-net-2024-05-14-set-channels-fixes-v1-0-eb18d88e30c3@intel.com>
+ <20240514-iwl-net-2024-05-14-set-channels-fixes-v1-1-eb18d88e30c3@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,30 +63,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240514182050.20931-1-ronak.doshi@broadcom.com>
+In-Reply-To: <20240514-iwl-net-2024-05-14-set-channels-fixes-v1-1-eb18d88e30c3@intel.com>
 
-On Tue, May 14, 2024 at 11:20:45AM -0700, Ronak Doshi wrote:
-> vmxnet3 emulation has recently added timestamping feature which allows the
-> hypervisor (ESXi) to calculate latency from guest virtual NIC driver to all
-> the way up to the physical NIC. This patch series extends vmxnet3 driver
-> to leverage these new feature.
+On Tue, May 14, 2024 at 11:51:12AM -0700, Jacob Keller wrote:
+> From: Larysa Zaremba <larysa.zaremba@intel.com>
+> 
+> A bug occurs because a safety check guarding AF_XDP-related queues in
+> ethnl_set_channels(), does not trigger. This happens, because kernel and
+> ice driver interpret the ethtool command differently.
+> 
+> How the bug occurs:
+> 1. ethtool -l <IFNAME> -> combined: 40
+> 2. Attach AF_XDP to queue 30
+> 3. ethtool -L <IFNAME> rx 15 tx 15
+>    combined number is not specified, so command becomes {rx_count = 15,
+>    tx_count = 15, combined_count = 40}.
+> 4. ethnl_set_channels checks, if there are any AF_XDP of queues from the
+>    new (combined_count + rx_count) to the old one, so from 55 to 40, check
+>    does not trigger.
+> 5. ice interprets `rx 15 tx 15` as 15 combined channels and deletes the
+>    queue that AF_XDP is attached to.
+> 
+> Interpret the command in a way that is more consistent with ethtool
+> manual [0] (--show-channels and --set-channels).
+> 
+> Considering that in the ice driver only the difference between RX and TX
+> queues forms dedicated channels, change the correct way to set number of
+> channels to:
+> 
+> ethtool -L <IFNAME> combined 10 /* For symmetric queues */
+> ethtool -L <IFNAME> combined 8 tx 2 rx 0 /* For asymmetric queues */
+> 
+> [0] https://man7.org/linux/man-pages/man8/ethtool.8.html
+> 
+> Fixes: 87324e747fde ("ice: Implement ethtool ops for channels")
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com>
+> Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+> Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 
-Hi Ronak,
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Thanks for your patch-set.
-
-Unfortunately net-next is currently closed for the v6.10 merge window.
-Please consider reposting as a PATCH once net-next re-opens, after 27th May.
-
-In the meantime, feel free to post new versions as you get feedback,
-but please switch to posting as RFC during that time.
-
-Link: https://docs.kernel.org/process/maintainer-netdev.html
-
-Also, not strictly related to this patch-set.
-I notice that Sparse flags a number of endian warnings in this driver.
-It would be great if they could be addressed at some point.
-
--- 
-pw-bot: defer
 
