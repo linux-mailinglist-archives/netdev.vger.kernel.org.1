@@ -1,247 +1,131 @@
-Return-Path: <netdev+bounces-96656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1159A8C6ED5
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 00:55:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2510F8C6EDE
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 01:03:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E0281C20C8D
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 22:55:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFC2428280B
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 23:03:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75A740861;
-	Wed, 15 May 2024 22:55:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F954086A;
+	Wed, 15 May 2024 23:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="MpXxLqcs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fBW12Ns/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6463C68C;
-	Wed, 15 May 2024 22:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A36A93FBA7;
+	Wed, 15 May 2024 23:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715813711; cv=none; b=gVramRTwqSf2FStKpPFUmUBFlwO6JvJOpADMau0LlyrJmLx+YQTxwDn9+RG2JoBWFukUw/K5049EZo75L1sKnxT/BxMFVQ4h00Evi+GaOmELIzP753QtNNpKwtD4iqvF5rkZFsp0QkvoJc6IpSHC9Gu/g/IcsOpyGckqpgyITJA=
+	t=1715814195; cv=none; b=jLc+ZuAv692gkX81bphfNXcMlDg5LNXHgqxBGOuHu55zrpWhAFYhA5/bCuJLH/0N7oyJttb2DR9WEnKIX4pNmEAq9oVGyA99rUynYDF7hzg/VyiQ8AK+KPl8zJgzvz8AqvkEU0V2vwJTcf51aPwpAMvuIGS+ak5n9KDbrFnjC7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715813711; c=relaxed/simple;
-	bh=o4DgAy62qyJ0nADFKG9xG856wIaWqxAtZHJ9t5cc5SU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W8ZDc/WKh2bbbAsTzzWAetfEtXroYb4V7zbiQXxB0JjW/yNi3yc89NPxZTr4jwZpnHf/Ru1hv21uFeitOgJWD1MSwWI2KGxMtJiBDQU2Krx2b48Q4kBLIlHgKAlNntXS3IF3GUkJouBrWk9Qs6IYqm0A82nyMiB0p23sQWxndi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=MpXxLqcs; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1715813707;
-	bh=oo8tP2JjIO5kS3+u8DU/4QjZmOqGxW1CPFiQYmO+7XQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MpXxLqcsr/gXdzRBKYTTnyyE2Dn4g/Z73Ry0b6qoADkG2uIuCp153biTBK2DI9/CF
-	 IFASQLOEcPUkQfzD0LMbwR9WdqSZPl0Kguw9baslpgbW1juaep6ReS6+Xs6KwYLOLw
-	 35yW0BdyFemcgSCGWWglmNHWHP5fNwbyt+BsSw+CBR76+RuNLxtCd0aYfC6i7ETinS
-	 MGdV9AU00WnTOPGD+83NJVbbWHb5xHymeCEvUoHxNdt5QJ489jfQRJeGpI01ZSOYYc
-	 Qzn6W7S26r9dSIM3x6qPx7c1I2rj18/FF466kggwjBvw7DK+u2rsWVzKFHJg5h/Q0k
-	 vZzQJhJ2HwyYA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VfpTR0JDtz4wxf;
-	Thu, 16 May 2024 08:55:07 +1000 (AEST)
-Date: Thu, 16 May 2024 08:55:06 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>,
- Alexander Lobakin <aleksander.lobakin@intel.com>, Kent Overstreet
- <kent.overstreet@linux.dev>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Suren
- Baghdasaryan <surenb@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: Re: linux-next: manual merge of the net-next tree with the mm tree
-Message-ID: <20240516085506.6169f45f@canb.auug.org.au>
-In-Reply-To: <20240516085140.5c654de5@canb.auug.org.au>
-References: <20240429114302.7af809e8@canb.auug.org.au>
-	<20240516085140.5c654de5@canb.auug.org.au>
+	s=arc-20240116; t=1715814195; c=relaxed/simple;
+	bh=sRqB680VTQvj7fzPc84hv8BNalE+uhs8Ck1nsl+35K4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UEiFsELsOVKHu9r3kzMOmxwmxfKq1EM9WWTQW5EOcXDFZImhvICJ6Oh5g9zlF2AIYw1glXsba8ZLMYtO+XoKrnqX1n6vZHMbxay8+b0bxNCN5YtYuprWhueJ6tItp1FF8/kne1vSdAMmaLkGEaulO5EDzXscdAbAleh7bFHT4r8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fBW12Ns/; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715814193; x=1747350193;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sRqB680VTQvj7fzPc84hv8BNalE+uhs8Ck1nsl+35K4=;
+  b=fBW12Ns/l/R/HXN04kR3gWCtmxqfjmOYAriISI5FUMjXaav1QmknaQt2
+   ONw6Bk+PeyFxMJeNLiBxIO0Pjx32Z1EG/00GuvdsODbJEGBJXcpmhnvzG
+   V7AXgW8kkqxzCYHbXLtPBbsdtNHNlXgegiZULbkJ4BSBch+ucOAz7nbVb
+   HcUP7izg1uMh8LOBDMHQHECS+xVEOQscCBOIByx+DIUZkGyyHIFWR3JzJ
+   8d2domGYjDIHLjNfpJOYyK4L9r1cGdja4V/4DIJcfmUt4DQzphfsE9ijT
+   gENst+hqCFBGgT7utOgPvNQXW/vGQ+KI7DWBO2OiH47bBa7sbt+mhomMw
+   g==;
+X-CSE-ConnectionGUID: PlXFYgTlRB6N6bYrMAY+Kw==
+X-CSE-MsgGUID: 4rqEAhh8TA62Wh1uWzudmA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="12019056"
+X-IronPort-AV: E=Sophos;i="6.08,162,1712646000"; 
+   d="scan'208";a="12019056"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2024 16:03:12 -0700
+X-CSE-ConnectionGUID: /y/vCtaLSxi9YEwbpTT0qA==
+X-CSE-MsgGUID: Sg5o04ROTVaneSLM+lXQ7Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,162,1712646000"; 
+   d="scan'208";a="35779249"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 15 May 2024 16:03:10 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s7NeN-000DKq-34;
+	Wed, 15 May 2024 23:03:07 +0000
+Date: Thu, 16 May 2024 07:02:46 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ronak Doshi <ronak.doshi@broadcom.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Ronak Doshi <ronak.doshi@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/4] vmxnet3: add latency measurement support in
+ vmxnet3
+Message-ID: <202405160624.WdmYFkNm-lkp@intel.com>
+References: <20240514182050.20931-3-ronak.doshi@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/TsITq.qB1112D2X9O+uw5/w";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240514182050.20931-3-ronak.doshi@broadcom.com>
 
---Sig_/TsITq.qB1112D2X9O+uw5/w
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi Ronak,
 
-Hi all,
+kernel test robot noticed the following build errors:
 
-On Thu, 16 May 2024 08:51:40 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
->
-> On Mon, 29 Apr 2024 11:43:02 +1000 Stephen Rothwell <sfr@canb.auug.org.au=
-> wrote:
-> >
-> > Today's linux-next merge of the net-next tree got a conflict in:
-> >=20
-> >   include/linux/slab.h
-> >=20
-> > between commit:
-> >=20
-> >   7bd230a26648 ("mm/slab: enable slab allocation tagging for kmalloc an=
-d friends")
-> >=20
-> > from the mm_unstable branch of the mm tree and commit:
-> >=20
-> >   a1d6063d9f2f ("slab: introduce kvmalloc_array_node() and kvcalloc_nod=
-e()")
-> >=20
-> > from the net-next tree.
-> >=20
->
-> This is now a conflict between the mm-stable tree and Linus' tree.
+[auto build test ERROR on net-next/main]
 
-But with the revised fixup below, of course.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ronak-Doshi/vmxnet3-prepare-for-version-9-changes/20240515-023833
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240514182050.20931-3-ronak.doshi%40broadcom.com
+patch subject: [PATCH net-next 2/4] vmxnet3: add latency measurement support in vmxnet3
+config: csky-randconfig-r081-20240516 (https://download.01.org/0day-ci/archive/20240516/202405160624.WdmYFkNm-lkp@intel.com/config)
+compiler: csky-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240516/202405160624.WdmYFkNm-lkp@intel.com/reproduce)
 
---=20
-Cheers,
-Stephen Rothwell
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405160624.WdmYFkNm-lkp@intel.com/
 
-diff --cc include/linux/slab.h
-index 4cc37ef22aae,d1d1fa5e7983..88426b015faa
---- a/include/linux/slab.h
-+++ b/include/linux/slab.h
-@@@ -773,40 -744,66 +773,54 @@@ static inline __alloc_size(1, 2) void *
-   * @size: how many bytes of memory are required.
-   * @flags: the type of memory to allocate (see kmalloc).
-   */
- -static inline __alloc_size(1) void *kzalloc(size_t size, gfp_t flags)
- +static inline __alloc_size(1) void *kzalloc_noprof(size_t size, gfp_t fla=
-gs)
-  {
- -	return kmalloc(size, flags | __GFP_ZERO);
- +	return kmalloc_noprof(size, flags | __GFP_ZERO);
-  }
- +#define kzalloc(...)				alloc_hooks(kzalloc_noprof(__VA_ARGS__))
- +#define kzalloc_node(_size, _flags, _node)	kmalloc_node(_size, (_flags)|_=
-_GFP_ZERO, _node)
- =20
- -/**
- - * kzalloc_node - allocate zeroed memory from a particular memory node.
- - * @size: how many bytes of memory are required.
- - * @flags: the type of memory to allocate (see kmalloc).
- - * @node: memory node from which to allocate
- - */
- -static inline __alloc_size(1) void *kzalloc_node(size_t size, gfp_t flags=
-, int node)
- -{
- -	return kmalloc_node(size, flags | __GFP_ZERO, node);
- -}
- +extern void *kvmalloc_node_noprof(size_t size, gfp_t flags, int node) __a=
-lloc_size(1);
- +#define kvmalloc_node(...)			alloc_hooks(kvmalloc_node_noprof(__VA_ARGS__=
-))
- =20
- -extern void *kvmalloc_node(size_t size, gfp_t flags, int node) __alloc_si=
-ze(1);
- -static inline __alloc_size(1) void *kvmalloc(size_t size, gfp_t flags)
- -{
- -	return kvmalloc_node(size, flags, NUMA_NO_NODE);
- -}
- -static inline __alloc_size(1) void *kvzalloc_node(size_t size, gfp_t flag=
-s, int node)
- -{
- -	return kvmalloc_node(size, flags | __GFP_ZERO, node);
- -}
- -static inline __alloc_size(1) void *kvzalloc(size_t size, gfp_t flags)
- -{
- -	return kvmalloc(size, flags | __GFP_ZERO);
- -}
- +#define kvmalloc(_size, _flags)			kvmalloc_node(_size, _flags, NUMA_NO_NO=
-DE)
- +#define kvmalloc_noprof(_size, _flags)		kvmalloc_node_noprof(_size, _flag=
-s, NUMA_NO_NODE)
- +#define kvzalloc(_size, _flags)			kvmalloc(_size, _flags|__GFP_ZERO)
- =20
- -static inline __alloc_size(1, 2) void *
- -kvmalloc_array_node(size_t n, size_t size, gfp_t flags, int node)
- +#define kvzalloc_node(_size, _flags, _node)	kvmalloc_node(_size, _flags|_=
-_GFP_ZERO, _node)
- +
-- static inline __alloc_size(1, 2) void *kvmalloc_array_noprof(size_t n, si=
-ze_t size, gfp_t flags)
-++static inline __alloc_size(1, 2) void *kvmalloc_array_node_noprof(size_t =
-n, size_t size, gfp_t flags, int node)
-  {
-  	size_t bytes;
- =20
-  	if (unlikely(check_mul_overflow(n, size, &bytes)))
-  		return NULL;
- =20
-- 	return kvmalloc_node_noprof(bytes, flags, NUMA_NO_NODE);
- -	return kvmalloc_node(bytes, flags, node);
-++	return kvmalloc_node_noprof(bytes, flags, node);
-+ }
-+=20
-++#define kvmalloc_array_node(...)	alloc_hooks(kvmalloc_array_node_noprof(_=
-_VA_ARGS__))
-++
-+ static inline __alloc_size(1, 2) void *
-+ kvmalloc_array(size_t n, size_t size, gfp_t flags)
-+ {
-+ 	return kvmalloc_array_node(n, size, flags, NUMA_NO_NODE);
-+ }
-++#define kvmalloc_array_noprof(_n, _size, _flags)	kvmalloc_array(_n, _size=
-, _flags)
-+=20
-+ static inline __alloc_size(1, 2) void *
-+ kvcalloc_node(size_t n, size_t size, gfp_t flags, int node)
-+ {
- -	return kvmalloc_array_node(n, size, flags | __GFP_ZERO, node);
-++	return kvmalloc_array_node_noprof(n, size, flags | __GFP_ZERO, node);
-  }
- =20
-- #define kvmalloc_array(...)			alloc_hooks(kvmalloc_array_noprof(__VA_ARGS=
-__))
- -static inline __alloc_size(1, 2) void *kvcalloc(size_t n, size_t size, gf=
-p_t flags)
- -{
- -	return kvmalloc_array(n, size, flags | __GFP_ZERO);
- -}
- +#define kvcalloc(_n, _size, _flags)		kvmalloc_array(_n, _size, _flags|__G=
-FP_ZERO)
-- #define kvcalloc_noprof(_n, _size, _flags)	kvmalloc_array_noprof(_n, _siz=
-e, _flags|__GFP_ZERO)
-++#define kvcalloc_noprof(_n, _size, _flags)	kvmalloc_array_node_noprof(_n,=
- _size, _flags|__GFP_ZERO)
- =20
- -extern void *kvrealloc(const void *p, size_t oldsize, size_t newsize, gfp=
-_t flags)
- +extern void *kvrealloc_noprof(const void *p, size_t oldsize, size_t newsi=
-ze, gfp_t flags)
-  		      __realloc_size(3);
- +#define kvrealloc(...)				alloc_hooks(kvrealloc_noprof(__VA_ARGS__))
- +
-  extern void kvfree(const void *addr);
-  DEFINE_FREE(kvfree, void *, if (_T) kvfree(_T))
- =20
+All errors (new ones prefixed by >>):
 
---Sig_/TsITq.qB1112D2X9O+uw5/w
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+   In function 'vmxnet3_get_cycles',
+       inlined from 'vmxnet3_rq_rx_complete' at drivers/net/vmxnet3/vmxnet3_drv.c:1675:25:
+>> drivers/net/vmxnet3/vmxnet3_drv.c:151:9: error: impossible constraint in 'asm'
+     151 |         asm volatile("rdpmc" : "=a" (low), "=d" (high) : "c" (pmc));
+         |         ^~~
 
------BEGIN PGP SIGNATURE-----
 
-iQEyBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmZFPUoACgkQAVBC80lX
-0GwAfwf3bdnCyFNkWI2rog8o8I9W7GGzCO+n+Y3t8qoq8pN2+lkNyOUKGsTvQYmw
-C0S2o81B1rczgjPM9zJA+wp7KXQdw9ZIq/Ack7h2PThGxwiOpf7tS76E69zV+Td+
-V2GmEE/3/KlgcfDMsu0V+DQfTSR9HF96A1O9wnPVsmhGxEEeFWIRuznsepKit7B9
-6KDbCzg24gZOaJcA3csImuQ+sTf6SUzpZHyrDmEA0nR7EnlFAKXUppATqA8yAFzR
-yUhp9Qv5Za2uDvIoBQn+3QIom55zfSvUBcBao3VcyD9H6VwBxzadK6AxUJf1gGsx
-FqZ/0eBcN6x3RJsn3Gxa+mvE1OzR
-=/sGT
------END PGP SIGNATURE-----
+vim +/asm +151 drivers/net/vmxnet3/vmxnet3_drv.c
 
---Sig_/TsITq.qB1112D2X9O+uw5/w--
+   145	
+   146	static u64
+   147	vmxnet3_get_cycles(int pmc)
+   148	{
+   149		u32 low, high;
+   150	
+ > 151		asm volatile("rdpmc" : "=a" (low), "=d" (high) : "c" (pmc));
+   152		return (low | ((u_int64_t)high << 32));
+   153	}
+   154	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
