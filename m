@@ -1,160 +1,128 @@
-Return-Path: <netdev+bounces-96508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3A678C643D
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 11:51:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FB8C8C6452
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 11:53:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10B461C211F0
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 09:51:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE46E1F22075
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 09:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7D5859B4A;
-	Wed, 15 May 2024 09:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KZz+nbjC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766825A0F5;
+	Wed, 15 May 2024 09:52:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24A359148
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 09:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38074EB45;
+	Wed, 15 May 2024 09:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.237.72.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715766712; cv=none; b=YJJBiH3U84lNtf8KpMO/ROqn3uZLx7TlCYe5EzvwEC/idWrEbSH+PQoaLvUYQKf42CxSD3TQAdwXkJG6DfZtUYW7wOyXkUGMsXk9lTBQqfSpFaGZ+qyFocjViePu0pjG1+nUz0a+VVtPBoxZhDpDNxX7tQrwfmtdATRwmJc2mio=
+	t=1715766778; cv=none; b=IxBRZkiMcQFijI2xHmVGdHqMKmElC+RaY8AKpyteR1JbymmUiXgFuGsWOv44kx+NJ5muC7hE36CDWKGFwnmFPb9bNc98SbWImsj7KlIHObbo+5OMhZ3tswi+7GPyKATCQ7H3m29r4bzeiMjg8CqoHunFVP5Lszs9s3RYYQeFVyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715766712; c=relaxed/simple;
-	bh=BkyFfaGVIKCZ1ZyJ0xTQOY4oniQInKidgfDLsMQakvE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DC5JV/l8vy24RJMEfDWj6QQhkVb+cz/LaEVNQXCMGGFUP5LuHrNUEqcuELtgL/AmzQDQYyGkOEr0tRmWSni3pwWOgQjqxT5hiUc1hXo5GO/66w9awt5IW8BCenBOdQ5ASrLqq0X030Rjz4Z3pZscDK+7VGMkSufibEyPMtRWupg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KZz+nbjC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F92DC32781;
-	Wed, 15 May 2024 09:51:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715766712;
-	bh=BkyFfaGVIKCZ1ZyJ0xTQOY4oniQInKidgfDLsMQakvE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KZz+nbjCTnu1mZMx4e/yM6+ide2jo02D48ZD4U9yR9dlly+GRJbaCrujfDtaf9iBX
-	 q8Ax9liFq8p7p0dGBdcEed/sS7ZhkiYxF8AomF6J+2u/UnoeKuOLqvgr9i5k1A1gkh
-	 DRkUDFixnqWem5gFwrQd0HHczZ3g0ec0jHNxQ0UFsnRBolQG4qGbsrKCsv5Ly1Aifs
-	 nMPUSVtUdYWl9etD1kiP8W05p9ExjSQmnGmZ1tj6sKHNNmpnkeeA08sOLVzoqoyjD5
-	 uLvX6QzFH10VdEBAe3MrNWEg35LjXukAHHD8OoadICxpIkopAxq2JIo8pFnVSklyir
-	 HEvcxaNaCIchg==
-Date: Wed, 15 May 2024 10:51:47 +0100
-From: Simon Horman <horms@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [RFC PATCH] net: introduce HW Rate Limiting Driver API
-Message-ID: <20240515095147.GB154012@kernel.org>
-References: <3d1e2d945904a0fb55258559eb7322d7e11066b6.1715199358.git.pabeni@redhat.com>
- <f6d15624-cd25-4484-9a25-86f08b5efd51@lunn.ch>
- <e2cbbbc416700486e0b4dd5bc9d80374b53aaf79.camel@redhat.com>
- <9dd818dc-1fef-4633-b388-6ce7272f9cb4@lunn.ch>
- <f7fa91a89f16e45de56c1aa8d2c533c6f94648ba.camel@redhat.com>
- <a0ada382-105a-4994-ad0f-1a485cef12c4@lunn.ch>
- <db51b7ccff835dd5a96293fb84d527be081de062.camel@redhat.com>
+	s=arc-20240116; t=1715766778; c=relaxed/simple;
+	bh=OCHKhs8Cm8aoHBT0E1a8uUJBNZF8AziQdz9PQz0Ura8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=nTcraJOPCvxU5OGqdengg/RZgZBL5+ZTYLyozoScsewapdfSE5bV2FcXHft2Gkm+TnF7hUL7q/sPLviw2tJU+OvY6z7G9b2iCHGp6MuyVFaBEJgs2E0aZPrz7zhzfl5k3EeiAVt7Gx8qsDp2q2WX/W5NC7czeJd4xj2joaXYEFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=52.237.72.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from duoming$zju.edu.cn ( [221.192.180.251] ) by
+ ajax-webmail-mail-app3 (Coremail) ; Wed, 15 May 2024 17:52:25 +0800
+ (GMT+08:00)
+Date: Wed, 15 May 2024 17:52:25 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: duoming@zju.edu.cn
+To: "Lars Kellogg-Stedman" <lars@oddbit.com>
+Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, jreuter@yaina.de,
+	dan.carpenter@linaro.org
+Subject: Re: [PATCH net] ax25: Fix refcount leak issues of ax25_dev
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT5 build
+ 20231205(37e20f0e) Copyright (c) 2002-2024 www.mailtech.cn zju.edu.cn
+In-Reply-To: <my4l7ljo35dnwxl33maqhyvw7666dmuwtduwtyhnzdlb6bbf5m@5sbp4tvg246f>
+References: <20240501060218.32898-1-duoming@zju.edu.cn>
+ <my4l7ljo35dnwxl33maqhyvw7666dmuwtduwtyhnzdlb6bbf5m@5sbp4tvg246f>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <db51b7ccff835dd5a96293fb84d527be081de062.camel@redhat.com>
+Message-ID: <ac6f090.eaff.18f7baadb40.Coremail.duoming@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:cC_KCgDnPlXahURmYOeTAA--.14308W
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwUCAWZDiAoNowA6s2
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-On Fri, May 10, 2024 at 01:05:41PM +0200, Paolo Abeni wrote:
-> On Thu, 2024-05-09 at 18:17 +0200, Andrew Lunn wrote:
-> > > > Now the question is, how do i get between these two states? It is not
-> > > > possible to mix WRR and strict priority. Any kAPI which only modifies
-> > > > one queue at once will go straight into an invalid state, and the
-> > > > driver will need to return -EOPNOTSUPP. So it seems like there needs
-> > > > to be an atomic set N queue configuration at once, so i can cleanly go
-> > > > from strict priority across 8 queues to WRR across 8 queues. Is that
-> > > > foreseen?
-> > > 
-> > > You could delete all the WRR shapers and then create/add SP based ones.
-> > 
-> > But that does not match the hardware. I cannot delete the hardware. It
-> > will either do strict priority or WRR. If i delete the software
-> > representation of the shaper, the hardware shaper will keep on doing
-> > what it was doing. So i don't see this as a good model. I think the
-> > driver will create shapers to represent the hardware, and you are not
-> > allowed to delete them or add more of them, because that is what the
-> > hardware is. All you can do is configure the shapers that exist.
-> > 
-> > > The 'create' op is just an abstraction to tell the NIC to switch from
-> > > the default configuration to the specified one.
-> > 
-> > Well, the hardware default is i think WRR for the queues, and line
-> > rate. That will be what the software representation of the shapers
-> > will be set to when the driver probes and creates the shapers
-> > representors.
-> 
-> If I read correctly, allowing each NIC to expose it's own different
-> starting configuration still will not solve the problem for this H/W to
-> switch from WRR to SP (and vice versa).
-> 
-> AFAICS, what would be needed there is an atomic set of operations:
-> 'set_many' (and e.v. 'delete_many', 'create_many') that will allow
-> changing all the shapers at once. 
-> 
-> With such operations, that H/W could still fit the expected 'no-op'
-> default, as WRR on the queue shapers is what we expect. I agree with
-> Jakub, handling the complexity of arbitrary starting configuration
-> would pose a lot of trouble to the user/admin.
-> 
-> If all the above stands together, I think we have a few options (in
-> random order):
-> 
-> - add both set of operations: the ones operating on a single shaper and
-> the ones operating on multiple shapers
-> - use only the multiple shapers ops.
-> 
-> And the latter looks IMHO the simple/better. At that point I would
-> probably drop the 'add' op and would rename 'delete' as
-> 'reset':
-> 
-> int (*set)(struct net_device *dev, int how_many, const u32 *handles,
-> 	   const struct net_shaper_info *shapers,
->            struct netlink_ext_ack *extack);
-> int (*reset)(struct net_device *dev, int how_many, const u32 *handles,
->              struct netlink_ext_ack *extack);
-> int (*move)(struct net_device *dev, int how_many, const u32 *handles,
->             const u32 *new_parent_handles,
-> 	    struct netlink_ext_ack *extack);
-> 
-> An NIC with 'static' shapers can implement a dummy move always
-> returning EOPNOTSUPP and eventually filling a detailed extack.
-> 
-> NIC without any constraints on mixing and matching different kind of
-> shapers could implement the above as a loop over whatever they will do
-> for the corresponding 'single shaper op'
-> 
-> NIC with constrains alike the one you pointed out could validate the
-> final state before atomically applying the specified operation.
-> 
-> After a successful  'reset' operation, the kernel could drop any data
-> it retains/caches for the relevant shapers - the current idea is to
-> keep a copy of all successfully configured shaper_info in a xarray,
-> using the 'handle' as the index.
-> 
-> Side note: the move() operation could look like a complex artifact, but
-> it's the simplest instrument I could think of to support scenarios
-> where the user creates/configures/sets a queue group and 'move' some
-> queue under the newly created group
-> 
-> WDYT?
-
-Hi Andrew,
-
-Picking up this discussion, I'm wondering if Paolo's proposal
-addresses your concerns.
+T24gV2VkLCAxIE1heSAyMDI0IDIxOjI5OjE2IC0wNDAwIExhcnMgS2VsbG9nZy1TdGVkbWFuIHdy
+b3RlOgo+IEFzc3VtZSB3ZSBoYXZlIHRoZSBmb2xsb3dpbmcgdHdvIGludGVyZmFjZXMgY29uZmln
+dXJlZCBvbiBhIHN5c3RlbToKPiAKPiAgICAgJCBjYXQgL2V0Yy9heDI1L2F4cG9ydHMKPiAgICAg
+dWRwMCB0ZXN0MC0wIDk2MDAgMjU1IDIgYXh1ZHAwCj4gICAgIHVkcDEgdGVzdDAtMSA5NjAwIDI1
+NSAyIGF4dWRwMQo+IAo+IEFuZCB3ZSBoYXZlIGF4MjVkIGxpc3RlbmluZyBvbiBib3RoIGludGVy
+ZmFjZXM6Cj4gCj4gICAgIFt1ZHAwXQo+ICAgICBkZWZhdWx0ICAqICogKiAqICogKiAgLSByb290
+ICAvdXNyL3NiaW4vYXh3cmFwcGVyIGF4d3JhcHBlciAtLSAvYmluL3NoIHNoIC9ldGMvYXgyNS9l
+eGFtcGxlLW91dHB1dC5zaAo+ICAgICBbdWRwMV0KPiAgICAgZGVmYXVsdCAgKiAqICogKiAqICog
+IC0gcm9vdCAgL3Vzci9zYmluL2F4d3JhcHBlciBheHdyYXBwZXIgLS0gL2Jpbi9zaCBzaCAvZXRj
+L2F4MjUvZXhhbXBsZS1vdXRwdXQuc2gKPiAKPiBVc2luZyB0aGUgJ2F4LWRldnMnIGFuZCAnYXgt
+c29ja2V0cycgZ2RiIGNvbW1hbmRzIHNob3duIGF0IHRoZSBlbmQgb2YKPiB0aGlzIG1lc3NhZ2Us
+IHdlIHN0YXJ0IHdpdGg6Cj4gCj4gICAgIChnZGIpIGF4LWRldnMKPiAgICAgYXgxIGF4X3JlZmNu
+dDoyIGRldl9yZWZjbnQ6OSBkZXZfdW50cmFja2VkOjEgZGV2X25vdHJhY2s6MQo+ICAgICBheDAg
+YXhfcmVmY250OjIgZGV2X3JlZmNudDo5IGRldl91bnRyYWNrZWQ6MSBkZXZfbm90cmFjazoxCj4g
+ICAgIChnZGIpIGF4LXNvY2tldHMKPiAgICAgMHhmZmZmODg4MTAwMmI2ODAwIGlmOmF4MSBzdGF0
+ZTowIHJlZmNudDoyIGRldl90cmFja2VyOjB4ZmZmZjg4ODEwMGRlZDIwMAo+ICAgICAweGZmZmY4
+ODgxMDFhYzRlMDAgaWY6YXgwIHN0YXRlOjAgcmVmY250OjIgZGV2X3RyYWNrZXI6MHhmZmZmODg4
+MTAwZGVjNGMwCj4gCj4gV2UgaW5pdGlhdGUgYSBjb25uZWN0aW9uIGZyb20gYXgwIHRvIGF4MToK
+PiAKPiAgICAgY2FsbCAtciB1ZHAwIHRlc3QwLTEKPiAKPiBXaGVuIHdlIGZpcnN0IGVudGVyIGF4
+MjVfcmN2LCB3ZSBoYXZlOgo+IAo+ICAgICAoZ2RiKSBheC1kZXZzCj4gICAgIGF4MSBheF9yZWZj
+bnQ6MiBkZXZfcmVmY250OjkgZGV2X3VudHJhY2tlZDoxIGRldl9ub3RyYWNrOjEKPiAgICAgYXgw
+IGF4X3JlZmNudDozIGRldl9yZWZjbnQ6MTAgZGV2X3VudHJhY2tlZDoxIGRldl9ub3RyYWNrOjEK
+PiAgICAgKGdkYikgYXgtc29ja2V0cwo+ICAgICAweGZmZmY4ODgxMDFhYzgwMDAgaWY6YXgwIHN0
+YXRlOjEgcmVmY250OjIgZGV2X3RyYWNrZXI6MHhmZmZmODg4MTAwZGVkYjgwCj4gICAgIDB4ZmZm
+Zjg4ODEwMDJiNjgwMCBpZjpheDEgc3RhdGU6MCByZWZjbnQ6MiBkZXZfdHJhY2tlcjoweGZmZmY4
+ODgxMDBkZWQyMDAKPiAgICAgMHhmZmZmODg4MTAxYWM0ZTAwIGlmOmF4MCBzdGF0ZTowIHJlZmNu
+dDoyIGRldl90cmFja2VyOjB4ZmZmZjg4ODEwMGRlYzRjMAo+IAo+IEFmdGVyIHdlIHJlYWNoIGxp
+bmUgNDEzIChpbiBuZXQvYXgyNS9heDI1X2luLmMpIGFuZCBhZGQgYSBuZXcgY29udHJvbAo+IGJs
+b2NrOgo+IAo+ICAgICBheDI1X2NiX2FkZChheDI1KQo+IAo+IFdlIGhhdmU6Cj4gCj4gICAgIChn
+ZGIpIGF4LWRldnMKPiAgICAgYXgxIGF4X3JlZmNudDoyIGRldl9yZWZjbnQ6OSBkZXZfdW50cmFj
+a2VkOjEgZGV2X25vdHJhY2s6MQo+ICAgICBheDAgYXhfcmVmY250OjMgZGV2X3JlZmNudDoxMCBk
+ZXZfdW50cmFja2VkOjEgZGV2X25vdHJhY2s6MQo+ICAgICAoZ2RiKSBheC1zb2NrZXRzCj4gICAg
+IDB4ZmZmZjg4ODEwMjQ1YWMwMCBpZjpheDEgc3RhdGU6MyByZWZjbnQ6MiBkZXZfdHJhY2tlcjow
+eDAgPGZpeGVkX3BlcmNwdV9kYXRhPgo+ICAgICAweGZmZmY4ODgxMDI0NWJhMDAgaWY6YXgwIHN0
+YXRlOjEgcmVmY250OjIgZGV2X3RyYWNrZXI6MHhmZmZmODg4MTAxMzZjODAwCj4gICAgIDB4ZmZm
+Zjg4ODEwMGM3OWUwMCBpZjpheDEgc3RhdGU6MCByZWZjbnQ6MiBkZXZfdHJhY2tlcjoweGZmZmY4
+ODgxMDEzNmM2ZTAKPiAgICAgMHhmZmZmODg4MTAxOGU5ODAwIGlmOmF4MCBzdGF0ZTowIHJlZmNu
+dDoyIGRldl90cmFja2VyOjB4ZmZmZjg4ODEwMTcwYzg2MAo+IAo+IE5vdGUgdGhhdCAoYSkgYXgy
+NS0+ZGV2X3RyYWNrZXIgaXMgTlVMTCwgYW5kIChiKSB3ZSBoYXZlIGluY3JlbWV0ZWQgdGhlCj4g
+cmVmY291bnQgb24gYXgwICh0aGUgc291cmNlIGludGVyZmFjZSksIGJ1dCBub3Qgb24gYXgxICh0
+aGUgZGVzdGluYXRpb24KPiBpbnRlcmZhY2UpLiBXaGVuIHdlIGNhbGwgYXgyNV9yZWxlYXNlIGZv
+ciB0aGlzIGNvbnRyb2wgYmxvY2ssIHdlIGdldCB0bzoKPiAKPiAgICAgbmV0ZGV2X3B1dChheDI1
+X2Rldi0+ZGV2LCAmYXgyNS0+ZGV2X3RyYWNrZXIpOwo+ICAgICBheDI1X2Rldl9wdXQoYXgyNV9k
+ZXYpOwo+IAo+IFdpdGg6Cj4gCj4gICAgIChnZGIpIGF4LWRldnMKPiAgICAgYXgxIGF4X3JlZmNu
+dDoyIGRldl9yZWZjbnQ6OSBkZXZfdW50cmFja2VkOjEgZGV2X25vdHJhY2s6MQo+ICAgICBheDAg
+YXhfcmVmY250OjMgZGV2X3JlZmNudDoxMCBkZXZfdW50cmFja2VkOjEgZGV2X25vdHJhY2s6MQo+
+IAo+IEFmdGVyIHRoZSBjYWxscyB0byBuZXRkZXZfcHV0KCkgYW5kIGF4MjVfZGV2X3B1dCgpLCB3
+ZSBoYXZlOgo+IAo+ICAgICAoZ2RiKSBheC1kZXZzCj4gICAgIGF4MSBheF9yZWZjbnQ6MSBkZXZf
+cmVmY250OjggZGV2X3VudHJhY2tlZDotMTA3Mzc0MTgyNCBkZXZfbm90cmFjazoxCj4gICAgIGF4
+MCBheF9yZWZjbnQ6MiBkZXZfcmVmY250OjkgZGV2X3VudHJhY2tlZDoxIGRldl9ub3RyYWNrOjEK
+PiAKPiBZb3UgY2FuIHNlZSB0aGF0IChhKSBheDI1X2Rldi0+ZGV2LT5yZWZjbnRfdHJhY2tlci0+
+dW50cmFja2VkIGlzIG5vdwo+IGludmFsaWQsIGFuZCBheDI1X2Rldi0+ZGV2LT5kZXZfcmVmY250
+IGlzIGluIHRyb3VibGU6IGl0IGRlY3JlbWVudHMgYnkKPiBvbmUgZm9yIGVhY2ggY2xvc2VkIGNv
+bm5lY3Rpb24sIGV2ZW4gdGhvdWdoIGl0IHdhcyBuZXZlciBpbmNyZW1lbnRlZAo+IHdoZW4gd2Ug
+YWNjZXB0ZWQgdGhlIGNvbm5lY3Rpb24uIFRoZSB1bmRlcmZsb3cgaW4KPiAuLi5yZWZjbnRfdHJh
+Y2tlci0+dW50cmFja2VkIHlpZWxkcyB0aGUgdHJhY2ViYWNrIHdpdGg6Cj4gCj4gICAgIHJlZmNv
+dW50X3Q6IGRlY3JlbWVudCBoaXQgMDsgbGVha2luZyBtZW1vcnkuCj4gCj4gQWRkaXRpb25hbCBj
+b25uZWN0aW9ucyB3aWxsIGV2ZW50dWFsbHkgdHJpZ2dlciBtb3JlIHByb2JsZW1zOyB3ZSB3aWxs
+Cj4gdWx0aW1hdGVseSB1bmRlcmZsb3cgYXgyNV9kZXYtPmRldi0+ZGV2X3JlZmNudCwgYnV0IHdl
+IG1heSBhbHNvIHJ1biBpbnRvCj4gbWVtb3J5IGNvcnJ1cHRpb24gYmVjYXVzZSBvZiB0aGUgaW52
+YWxpZCB0cmFja2VyIGRhdGEsIHJlc3VsdGluZyBpbjoKPiAKPiAgICAgQlVHOiB1bmFibGUgdG8g
+aGFuZGxlIHBhZ2UgZmF1bHQgZm9yIGFkZHJlc3M6IDAwMDAwMDEwMDAwMDAzYjAKCkRvIHlvdSBr
+bm93IGhvdyB0byB0cmlnZ2VyIHRoaXMgYnVnPyBDb3VsZCB5b3Ugc2hhcmUgdGhlIFBPQz8KCkJl
+c3QgcmVnYXJkcywKRHVvbWluZyBaaG91Cg==
 
