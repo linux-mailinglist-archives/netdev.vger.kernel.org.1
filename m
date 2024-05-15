@@ -1,124 +1,215 @@
-Return-Path: <netdev+bounces-96488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9577F8C629E
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:16:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 795EA8C62AC
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:19:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 317EDB211CC
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 08:16:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3026C281F76
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 08:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610184C61C;
-	Wed, 15 May 2024 08:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768AB4D10A;
+	Wed, 15 May 2024 08:19:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="eoB6MZCa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout37.expurgate.net (mxout37.expurgate.net [91.198.224.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B49C38394;
-	Wed, 15 May 2024 08:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.224.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8139F4C634
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 08:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715761005; cv=none; b=Pag61lRWsOL36Syds1O3urp8jaZhZ9ly7HfJrbaVHcZOsfmTtEBAi2S4J57plg0hzK2dsduoB/ezIeHMEkGrCFBVfGYPXGc+Wj/YkJOb9Yis3EPS1pwgbLFRrhtwwFJVfJyqosEuIz2L6KpRrUtBVRqd1ZK1ahAYGqhhKHP3n78=
+	t=1715761159; cv=none; b=Z5n0Q4EWVXBHzSYs9860JiIEKmT9zi03slahjVYNpS3qr95o7y4yAOMiGzxx5vMzzQz8WKqLzujmkDSy4R4zK0CZDM94I4UauMSRaWj+TediBVgHexO4w8AyzZV9pBJlhLO9a+GxghaQBZaWghD408nI797qz34frkLRmwNoKus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715761005; c=relaxed/simple;
-	bh=0CMSPU5h0J/+LSIFiRA0tPZIyssveOFv2H3maVZ1/UE=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=nkDJ/R4gsoeCHlMK9NBpszOu67lmjgRA6eg2QeHxNxaNry/ZnarzKFHtffEaWJnQMJc2GL3SylY89Pi8lbXJ7mCJhboiPS+CiCTWa1XjEeR0esJCuP5YhRY2vbUJ1j1gZ+eIWQSb3LCCOt4lm4vfHDoKKT5hi1d5FDLrbYad4rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=brueckmann-gmbh.de; spf=pass smtp.mailfrom=brueckmann-gmbh.de; arc=none smtp.client-ip=91.198.224.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=brueckmann-gmbh.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=brueckmann-gmbh.de
-Received: from [127.0.0.1] (helo=localhost)
-	by relay.expurgate.net with smtp (Exim 4.92)
-	(envelope-from <gessler_t@brueckmann-gmbh.de>)
-	id 1s79oI-00GvF1-Jj; Wed, 15 May 2024 10:16:26 +0200
-Received: from [217.239.223.202] (helo=zimbra.brueckmann-gmbh.de)
-	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <gessler_t@brueckmann-gmbh.de>)
-	id 1s79oH-00FeBY-7h; Wed, 15 May 2024 10:16:25 +0200
-Received: from zimbra.brueckmann-gmbh.de (localhost [127.0.0.1])
-	by zimbra.brueckmann-gmbh.de (Postfix) with ESMTPS id 16524CA6082;
-	Wed, 15 May 2024 10:16:24 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.brueckmann-gmbh.de (Postfix) with ESMTP id 073C6CA6122;
-	Wed, 15 May 2024 10:16:24 +0200 (CEST)
-Received: from zimbra.brueckmann-gmbh.de ([127.0.0.1])
- by localhost (zimbra.brueckmann-gmbh.de [127.0.0.1]) (amavis, port 10026)
- with ESMTP id Tando0cXENj8; Wed, 15 May 2024 10:16:24 +0200 (CEST)
-Received: from [10.0.11.14] (unknown [10.0.11.14])
-	by zimbra.brueckmann-gmbh.de (Postfix) with ESMTPSA id DE4B5CA6082;
-	Wed, 15 May 2024 10:16:23 +0200 (CEST)
-Date: Wed, 15 May 2024 10:15:33 +0200 (CEST)
-From: =?ISO-8859-15?Q?Thomas_Ge=DFler?= <gessler_t@brueckmann-gmbh.de>
-To: Andrew Lunn <andrew@lunn.ch>
-cc: Thomas Gessler <thomas.gessler@brueckmann-gmbh.de>, 
-    Heiner Kallweit <hkallweit1@gmail.com>, 
-    Russell King <linux@armlinux.org.uk>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, MD Danish Anwar <danishanwar@ti.com>, 
-    Ravi Gunasekaran <r-gunasekaran@ti.com>
-Subject: Re: [PATCH 2/2] net: phy: dp83869: Fix RGMII-SGMII and 1000BASE-X
-In-Reply-To: <38bc6947-391b-478d-ab71-6cc8d9428275@lunn.ch>
-Message-ID: <338669-229a-5eac-3170-3477e5ae840@brueckmann-gmbh.de>
-References: <20240514122728.1490156-1-thomas.gessler@brueckmann-gmbh.de> <20240514122728.1490156-2-thomas.gessler@brueckmann-gmbh.de> <38bc6947-391b-478d-ab71-6cc8d9428275@lunn.ch>
+	s=arc-20240116; t=1715761159; c=relaxed/simple;
+	bh=z0zhb+QV5hbyDviqfqShLmfRPBX/cjad8dM1YySRgs0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QIOD6OiEyibjqnIjo6xoNC5TTJJvFJznQOMTXlMx6o1hM/PTMUCj8q5koEvU0DCZJO2aU6eH614vJxtfDwAkN3HHQQLuIZEEwN8hW0xfe0dkZ7MVruMtqxXVuA0CeJOt2B23+kt7G+a+YTisy/GhLEnIflQr2j19cD5x4ND6D24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=eoB6MZCa; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1f082d92864so16918235ad.1
+        for <netdev@vger.kernel.org>; Wed, 15 May 2024 01:19:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1715761157; x=1716365957; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6o942XCtPQjJiLKQGAB2J6bVbP8KodkalImgwSTnKDA=;
+        b=eoB6MZCa7wHl/a21R4eOuLGD9Dbzy8ctbadhXKIVghpUnJhdQ4LQpGip8bVe7boojU
+         pdLZvuFTDrTQRAD/S9Hu8Os2OwdTZScmi5vLrMCuwyaIjbXPxX/B0407M4JVYa1qmu57
+         /5gllz8UFvpI4x6NlQj5BWz/SdnW3ZY8EwWmJDc1Uywptp/IecNA6UfS80RmxqoFc1Y1
+         QPxVM2sjQHqja9ON8IgVangV8fs4hPaDaV1niw5N0HOJL3PhruWLZeLvMPjwwa+xFCd4
+         SYOdZigioQjJQm5J4cUUL0cxHxTapu2l3I7E7jP3zZ5AOV5s/PoRWpn0BHm93gRCl0kM
+         /ITg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715761157; x=1716365957;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6o942XCtPQjJiLKQGAB2J6bVbP8KodkalImgwSTnKDA=;
+        b=DjeqLrgBqqTZhVDq/GhzJvAi7JDDuQ4+iiu6gn4CfqWTFy8VrwxE2oXBQec8Y+eSWn
+         H5xlUITNKYVmWUO0L/rJ34DsKrxl+YHpbQY+J+HQC+1pGcX04qvfvGKY/9ayoOd5Mb0K
+         nzLV2QuBZ3MYR1Fv+vxI95V2lAeBjaJpedcs0gZxB+0ZK0ptLvThumACpabj0TLZ8BcB
+         FVf2uVMT86rOgLBapYmeJ7NTx8Gn89sS8geUksdouqNQ7kzhaiqn9Ek1XP1FDhdcOdYE
+         gZ6h3wWCDIDcV69dfsTY5ojkYTEk2ESG9XOmWA6g9mmTxqWYud/YVZr+MBM9bGQO/u23
+         mPPg==
+X-Gm-Message-State: AOJu0Yx36voziS0ufMrFCrIa7K1MfnTZPRNqv+c7SdvM5KX6QwrnrB+E
+	0a+CapFjLwBtkVhuoqOKXFtb22wMVw1nFdwAEUC/kaGgtaPxQvirdw5vcllZUo8=
+X-Google-Smtp-Source: AGHT+IFOULpzfkEKoKEGmcSN0BoNscI93ZPof/9O69rlmHT7S8HVoLA+6CXd6uunVdUipbdH0C4ExQ==
+X-Received: by 2002:a17:902:6546:b0:1ea:cb6f:ee5b with SMTP id d9443c01a7336-1ef43e2796fmr155486445ad.38.1715761156601;
+        Wed, 15 May 2024 01:19:16 -0700 (PDT)
+Received: from C02F52LSML85.bytedance.net ([203.208.167.150])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bad62fesm112051265ad.83.2024.05.15.01.19.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 May 2024 01:19:16 -0700 (PDT)
+From: Feng zhou <zhoufeng.zf@bytedance.com>
+To: edumazet@google.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	laoar.shao@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	yangzhenze@bytedance.com,
+	wangdongdong.6@bytedance.com,
+	zhoufeng.zf@bytedance.com
+Subject: [PATCH bpf-next] bpf: tcp: Improve bpf write tcp opt performance
+Date: Wed, 15 May 2024 16:19:01 +0800
+Message-Id: <20240515081901.91058-1-zhoufeng.zf@bytedance.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-purgate: clean
-X-purgate-type: clean
-X-purgate-ID: 151534::1715760986-FD9A0776-272ED94F/0/0
+Content-Transfer-Encoding: 8bit
 
-On Tue, 14 May 2024, Andrew Lunn wrote:
-> On Tue, May 14, 2024 at 02:27:28PM +0200, Thomas Gessler wrote:
-> > The RGMII-to-SGMII mode is special, because the chip does not really act
-> > as a PHY in this mode but rather as a bridge.
-> 
-> It is known as a media converter. You see them used between an RGMII
-> port and an SFP cage. Is that your use case?
+From: Feng Zhou <zhoufeng.zf@bytedance.com>
 
-Basically. I would call this an RGMII-SGMII bridge. A "media converter" I
-would call a device that changes the physical medium, like 1000BASE-T
-copper/RJ45 to 1000BASE-X fiber/SFP.
+Set the full package write tcp option, the test found that the loss
+will be 20%. If a package wants to write tcp option, it will trigger
+bpf prog three times, and call "tcp_send_mss" calculate mss_cache,
+call "tcp_established_options" to reserve tcp opt len, call
+"bpf_skops_write_hdr_opt" to write tcp opt, but "tcp_send_mss" before
+TSO. Through bpftrace tracking, it was found that during the pressure
+test, "tcp_send_mss" call frequency was 90w/s. Considering that opt
+len does not change often, consider caching opt len for optimization.
 
-We have this chip on a daughter card with exposed SGMII lines that can be
-plugged into customer-specific motherboards. The motherboard will have
-either an SGMII-copper PHY (this can also be a DP83869) with 10/100/1000
-auto-neg enabled but without MDIO exposed to the CPU on the daughter card;
-or an SFP cage. The SFP module, in turn, can be for 1000BASE-X fiber,
-1000BASE-X-to-1000-BASE-T copper, or SGMII copper supporting 10/100/1000
-auto-neg.
+Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
+---
+ include/linux/tcp.h            |  3 +++
+ include/uapi/linux/bpf.h       |  8 +++++++-
+ net/ipv4/tcp_output.c          | 12 +++++++++++-
+ tools/include/uapi/linux/bpf.h |  8 +++++++-
+ 4 files changed, 28 insertions(+), 3 deletions(-)
 
-So I would like to support all those configurations, which can be done
-with this chip.
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index 6a5e08b937b3..74437fcf94a2 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -455,6 +455,9 @@ struct tcp_sock {
+ 					  * to recur itself by calling
+ 					  * bpf_setsockopt(TCP_CONGESTION, "itself").
+ 					  */
++	u8	bpf_opt_len;		/* save tcp opt len implementation
++					 * BPF_SOCK_OPS_HDR_OPT_LEN_CB fast path
++					 */
+ #define BPF_SOCK_OPS_TEST_FLAG(TP, ARG) (TP->bpf_sock_ops_cb_flags & ARG)
+ #else
+ #define BPF_SOCK_OPS_TEST_FLAG(TP, ARG) 0
+diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+index 90706a47f6ff..f2092de1f432 100644
+--- a/include/uapi/linux/bpf.h
++++ b/include/uapi/linux/bpf.h
+@@ -6892,8 +6892,14 @@ enum {
+ 	 * options first before the BPF program does.
+ 	 */
+ 	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
++	/* Fast path to reserve space in a skb under
++	 * sock_ops->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB.
++	 * opt length doesn't change often, so it can save in the tcp_sock. And
++	 * set BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG to no bpf call.
++	 */
++	BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG = (1<<7),
+ /* Mask of all currently supported cb flags */
+-	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0x7F,
++	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0xFF,
+ };
+ 
+ /* List of known BPF sock_ops operators.
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index ea7ad7d99245..0e7480a58012 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -488,12 +488,21 @@ static void bpf_skops_hdr_opt_len(struct sock *sk, struct sk_buff *skb,
+ {
+ 	struct bpf_sock_ops_kern sock_ops;
+ 	int err;
++	struct tcp_sock *th = (struct tcp_sock *)sk;
+ 
+-	if (likely(!BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk),
++	if (likely(!BPF_SOCK_OPS_TEST_FLAG(th,
+ 					   BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG)) ||
+ 	    !*remaining)
+ 		return;
+ 
++	if (likely(BPF_SOCK_OPS_TEST_FLAG(th,
++					  BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG)) &&
++	    th->bpf_opt_len) {
++		*remaining -= th->bpf_opt_len;
++		opts->bpf_opt_len = th->bpf_opt_len;
++		return;
++	}
++
+ 	/* *remaining has already been aligned to 4 bytes, so *remaining >= 4 */
+ 
+ 	/* init sock_ops */
+@@ -538,6 +547,7 @@ static void bpf_skops_hdr_opt_len(struct sock *sk, struct sk_buff *skb,
+ 	opts->bpf_opt_len = *remaining - sock_ops.remaining_opt_len;
+ 	/* round up to 4 bytes */
+ 	opts->bpf_opt_len = (opts->bpf_opt_len + 3) & ~3;
++	th->bpf_opt_len = opts->bpf_opt_len;
+ 
+ 	*remaining -= opts->bpf_opt_len;
+ }
+diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+index 90706a47f6ff..f2092de1f432 100644
+--- a/tools/include/uapi/linux/bpf.h
++++ b/tools/include/uapi/linux/bpf.h
+@@ -6892,8 +6892,14 @@ enum {
+ 	 * options first before the BPF program does.
+ 	 */
+ 	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
++	/* Fast path to reserve space in a skb under
++	 * sock_ops->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB.
++	 * opt length doesn't change often, so it can save in the tcp_sock. And
++	 * set BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG to no bpf call.
++	 */
++	BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG = (1<<7),
+ /* Mask of all currently supported cb flags */
+-	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0x7F,
++	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0xFF,
+ };
+ 
+ /* List of known BPF sock_ops operators.
+-- 
+2.30.2
 
-> > SGMII PHY and gets the negotiated speed and duplex from it through SGMII
-> > auto-negotiation. To use the DP83869 as a virtual PHY, we assume that
-> > the connected SGMII PHY supports 10/100/1000M half/full duplex and
-> > therefore support and always advertise those settings.
-> 
-> Not all copper SFP modules support auto-neg. This is all really messy
-> because there is no standardisation. Also 1000BaseT_Half is often not
-> supported.
-
-I agree. Is there a better way to implement this use case? The problem
-remains that in this mode the chip is not really a PHY, but rather a
-bridge to an external PHY. See also Russell's e-mail.
-
-I actually started out by NOT supporting or advertising any of the
-10/100/1000BASE-T speeds when in RGMII-to-SGMII mode. This also works for
-the SGMII auto-negotiation, since all it does is get the negotiated
-speed/duplex from the connected PHY. However, this leads to a problem when
-trying to disable auto-neg and force speed with ethtool.
-phy_sanitize_settings() will then limit the speed to 10M because 100M and
-1000M do not match any supported speeds.
-
-Thomas
 
