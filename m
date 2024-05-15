@@ -1,102 +1,124 @@
-Return-Path: <netdev+bounces-96468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 200538C60E2
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 08:41:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A14478C60EA
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 08:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18BB01C21622
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 06:41:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EEB4B21C62
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 06:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A0D3FBA7;
-	Wed, 15 May 2024 06:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25D3141C6D;
+	Wed, 15 May 2024 06:42:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Pd75HkEm";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="varEdGvP"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="AHs5v94M"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C0D3D57D;
-	Wed, 15 May 2024 06:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39E740861;
+	Wed, 15 May 2024 06:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715755304; cv=none; b=dveRcIIblKMtOJcfGcTYYKud4vDdQnXDmwjQwpGWGfS19invTrv9e3qgfwzOs5sTdWGMSi2j2w+gnPixIXSKMT5B5N6r6lNzUYluO0bFsNCHT9gQGD3PE2zKvWZBrFd9V4iFK/RPCxd+4/SYXw8WELt77iK4DxAqHcM2E97bR6U=
+	t=1715755323; cv=none; b=MdiKdRD7XUzGoN9zdstYg0mjM8Wf/yX3Qkj/4G1lL05HaSpXbQ06Kpe2UT7KEYbH0fWiJltl0zV9+mHJhcUSJxEHL0Ojm9RjTuVK9B/QDtUUP1nF9sOXdQBrjSXv9Lrdd7nKecxbmU3FbkbAzcmsL1NwaBVau5lan30wYjHu6Xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715755304; c=relaxed/simple;
-	bh=Ohn1QWuD3hXSwNdh6G51TarJNpVtb+Kw3FSPuiN8i50=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ia5FFsozes7PMod2Y3d+eypdID100pbbnWnl7duq1N+1xm4qRIkOwGf69i+JSkJv63hgjL06jmkxzfVe1K6fDHAhEI3U/48Ltc3PjI/+urK31Wdjia/lyHitQ78ffbVZL0OgC5ZBKi+n+5Qz7HSvj+6ug0SQrh/WrTLJFXukDsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Pd75HkEm; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=varEdGvP; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 15 May 2024 08:41:39 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1715755300;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sio4TZAEBlWZFidC5qng46z8XhrKeWRYfPlszR0wiFY=;
-	b=Pd75HkEm8Fk++MIPte3Ib689xrqTVqJnkvEYJkgsDvUzbpysVYUPHV2/jlMU8HlODuWg/r
-	UHDoxca5tLQEnRxqaT7gb0J9/aApdcCR6lnEZQDiYkuzl2WrGFKgX26tBnSJn/Wf1DAbpI
-	cfYAi6JcKF11x77OCaB59KpALE/jz7YogPZBp4gy1nlDVA+MY+oSIdEbcTiGlB4nxvodg3
-	w4Julu2a4bC2p1SCdcVTQw7EeGkJkWxVTHmbUXNPVqnKoxeK7+px4MlJjoVLl1m0lmZvU/
-	cp1qpsiqNvB2yKkF3SNOr1yrtziKXQ+tmtpLLR3xB8e4Z6Mphki6MeyKd64jOw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1715755300;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sio4TZAEBlWZFidC5qng46z8XhrKeWRYfPlszR0wiFY=;
-	b=varEdGvPU/kzLsy/+oGCdvuJBJ6bJV0koxFc0gab29K7iX/zd0709MV4JyUarw3AP4GDYV
-	eW8ICv2ZuMMqVuBw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
-	Ravi Gunasekaran <r-gunasekaran@ti.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
-	Murali Karicheri <m-karicheri2@ti.com>,
-	Arvid Brodin <Arvid.Brodin@xdin.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	Casper Andersson <casper.casan@gmail.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: hsr: Setup and delete proxy prune timer only when
- RedBox is enabled
-Message-ID: <20240515064139.-B-_Hf0_@linutronix.de>
-References: <20240514091306.229444-1-lukma@denx.de>
+	s=arc-20240116; t=1715755323; c=relaxed/simple;
+	bh=93b5nFLFjaYh/CcuEhy7EREFQkZjm9ntSS9RZGMNoV8=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=Tux/RUjvQbtzRwfs1Y14aVMq+kM4oWZuEaEmWwPKSWWX86zpP/Xw7YR0gwHHcLwnjz5T6A8LuuEe21DkAfY8p/lMG8JDBj/l6QgU78sH9ASzEqCr6QZm7LcnQdqwuicg5jj9DKx+xVY8p5YobygIReItb1Y3uGCi9oifqmMnCAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=AHs5v94M; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1715755312; h=From:To:Subject:Date:Message-Id;
+	bh=qM1ZBNxE6nnn6t/Eohb/7USkilkh1LqteSxTB7R5TJc=;
+	b=AHs5v94MvO+jtZET3Hk2PuVXglUJfe2Lr0OU/7GfHOHEk7krZlZgc97gxZ8ccDvWuSz3NmM57DDXYcbBmC7VfAW5PRjNzcxaqw9zoVom+BynQ3P+r/Sa4xZIaBRw6CP/Eq6nLEZ7DXk92L6P3hHcox8UuSxplmSPYqTWI8bcuiQ=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R861e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W6X3t-X_1715755306;
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W6X3t-X_1715755306)
+          by smtp.aliyun-inc.com;
+          Wed, 15 May 2024 14:41:51 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	wintera@linux.ibm.com,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	tonylu@linux.alibaba.com,
+	pabeni@redhat.com,
+	edumazet@google.com
+Subject: [PATCH net-next v2 0/3] Introduce IPPROTO_SMC
+Date: Wed, 15 May 2024 14:41:43 +0800
+Message-Id: <1715755306-22347-1-git-send-email-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240514091306.229444-1-lukma@denx.de>
 
-On 2024-05-14 11:13:06 [+0200], Lukasz Majewski wrote:
-> The timer for removing entries in the ProxyNodeTable shall be only active
-> when the HSR driver works as RedBox (HSR-SAN).
-> 
-> Moreover, the obsolete del_timer_sync() is replaced with
-> timer_delete_sync().
-> 
-> This patch improves fix from commit 3c668cef61ad
-> ("net: hsr: init prune_proxy_timer sooner") as the prune node
-> timer shall be setup only when HSR RedBox is supported in the node.
+From: "D. Wythe" <alibuda@linux.alibaba.com>
 
-Is it problematic to init/ delete the timer in non-redbox mode? It looks
-easier and it is not a hotpath.
+This patch allows to create smc socket via AF_INET,
+similar to the following code,
 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+/* create v4 smc sock */
+v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
 
-Sebastian
+/* create v6 smc sock */
+v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
+
+There are several reasons why we believe it is appropriate here:
+
+1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
+address. There is no AF_SMC address at all.
+
+2. Create smc socket in the AF_INET(6) path, which allows us to reuse
+the infrastructure of AF_INET(6) path, such as common ebpf hooks.
+Otherwise, smc have to implement it again in AF_SMC path. Such as:
+  1. Replace IPPROTO_TCP with IPPROTO_SMC in the socket() syscall
+     initiated by the user, without the use of LD-PRELOAD.
+  2. Select whether immediate fallback is required based on peer's port/ip
+     before connect().
+
+A very significant result is that we can now use eBPF to implement smc_run
+instead of LD_PRELOAD, who is completely ineffective in scenarios of static
+linking.
+
+Another potential value is that we are attempting to optimize the performance of
+fallback socks, where merging socks is an important part, and it relies on the
+creation of SMC sockets under the AF_INET path. (More information :
+https://lore.kernel.org/netdev/1699442703-25015-1-git-send-email-alibuda@linux.alibaba.com/T/)
+
+v1 -> v2 :
+
+- Code formatting, mainly including alignment and annotation repair.
+- move inet_smc proto ops to inet_smc.c, avoiding af_smc.c becoming too bulky.
+- Fix the issue where refactoring affects the initialization order.
+- Fix compile warning (unused out_inet_prot) while CONFIG_IPV6 was not set.
+
+D. Wythe (3):
+  net/smc: refatoring initialization of smc sock
+  net/smc: expose smc proto operations
+  net/smc: Introduce IPPROTO_SMC
+
+ include/uapi/linux/in.h |   2 +
+ net/smc/Makefile        |   2 +-
+ net/smc/af_smc.c        | 183 ++++++++++++++++++++++++++++++------------------
+ net/smc/inet_smc.c      | 107 ++++++++++++++++++++++++++++
+ net/smc/inet_smc.h      |  32 +++++++++
+ net/smc/smc.h           |  38 ++++++++++
+ 6 files changed, 294 insertions(+), 70 deletions(-)
+ create mode 100644 net/smc/inet_smc.c
+ create mode 100644 net/smc/inet_smc.h
+
+-- 
+1.8.3.1
+
 
