@@ -1,109 +1,184 @@
-Return-Path: <netdev+bounces-96533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 126488C652F
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:54:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 452E18C654C
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 13:03:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43F531C20FD7
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 10:54:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D35101F23957
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 11:03:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3014C5FDD2;
-	Wed, 15 May 2024 10:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA54862171;
+	Wed, 15 May 2024 11:03:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AQtFtcoc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I2jODLZD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEE65BAFC
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 10:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CEF5684;
+	Wed, 15 May 2024 11:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715770438; cv=none; b=uOu3O1FWgjPa7zF/wB9A9152r4kLOBLHKreSSfYQAe8mFImImNEm4g5Y1GeZ+qC/69gUp4l3P/8COkSqoPW1AAhnwYPbWvTSld/lA+HGGGZrEeIxDtgZDVUnP67pGxe3P3GmMYLatvGmRz5eqCKt5F6izu0LqinYr0b51XzF8Uw=
+	t=1715771003; cv=none; b=tLFTfCp13Y9ZOIDcAtExGyWmfT+qr6z//qpjAdcYXyz4aRWfwLuk6/ji90WSCUI5MfjksW1nudYxf6tbE57Ki6tmKOsvA0mgk2rUvoEa/ozN+N3PcYnS50qahreRlKjJX6RehbZfl04FYHo0iiY4GoxbeSv1sLC392ROB0zNODg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715770438; c=relaxed/simple;
-	bh=QRw6nwRXyqsgD3nh5DvfIUqZjW7P971Rcz1253oIkog=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IuGiTBpmuh7aeM9HWaZMf14D5uialTSdJ86aorRsSimSLJ55GMJWsiQ1kzO+UoSo2vtSZdbrVQM6NjvPShv9ZxldUrKEYYwm6LMACT1f9aulrOs5dYL48EWDUzFkqtgy0fhSvjvv1YfbIT7omJTLHB8MiKg+QRxGVgTg3YyYbmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AQtFtcoc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BE13C32781;
-	Wed, 15 May 2024 10:53:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715770437;
-	bh=QRw6nwRXyqsgD3nh5DvfIUqZjW7P971Rcz1253oIkog=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AQtFtcocSBKa1+7HU5Lh2w0c+w0PIRtPBcAhoGdf/JqL9Wy+otYSZ+T46+IUoe/2z
-	 maZhxkjZgUjPK/M4geG5nIbwPTorXYxN3xDdU2rAyMk7hTix1grK/s9osnOpJBzbxP
-	 HkDYzNrX/+SyB1A0dx00vDkQaM7/1G6NJQiALCjUMTcNaK7vPalcTJIlPV1+5tU9YA
-	 h4Fe8d0HMOiXKMCbYhFF9pYOCPjSrmGEt8YuoQxtdj6Y5SMFwNzUvzY8Bey2OZ6JKJ
-	 d41pZGyXyQtRJYirAE4WjdxHZyDyQHkZCukEJerV+7TRwYm/b+dQ6SSMr1LpmAItDA
-	 uhgQH4BsEMvjA==
-Date: Wed, 15 May 2024 11:53:53 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: netdev <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	David Miller <davem@davemloft.net>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Chandan Kumar Rout <chandanx.rout@intel.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: Re: [PATCH net 1/2] ice: Interpret .set_channels() input differently
-Message-ID: <20240515105353.GI154012@kernel.org>
-References: <20240514-iwl-net-2024-05-14-set-channels-fixes-v1-0-eb18d88e30c3@intel.com>
- <20240514-iwl-net-2024-05-14-set-channels-fixes-v1-1-eb18d88e30c3@intel.com>
+	s=arc-20240116; t=1715771003; c=relaxed/simple;
+	bh=bhPWCNAUIK6VfX6XoxIhdW3f+hVkZo9HiaN1p3ULkuc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y/3nUVf+kuF0qyzPnRIauI4PiYAx33x6GZjWWaOCEyk8vR/HpgVSwG70aHLi3BpDgbI5kxb523VYJho8ycRlEPZykDHC89IXp5W/OcM7OeVlUc4vGTPM0pdyDNtH1DFniV0i8mgLu+zcifQbxxrTfR2jmUegiNYb6P7nUt9fduM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I2jODLZD; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-56e48d0a632so2068773a12.2;
+        Wed, 15 May 2024 04:03:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715771000; x=1716375800; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bhPWCNAUIK6VfX6XoxIhdW3f+hVkZo9HiaN1p3ULkuc=;
+        b=I2jODLZD7VpFLPkrBw2Abr+rAbvL/CpQxBlU45ZUcPq8P67dhhGu1J9vJFETarZi2Z
+         VGWvcDea66i3UalaTuyw+8xmVj/ZQqB4n4wtoCL2n/ecaWPAtF1LRjTg0MUboDcGCEpl
+         LOiFjGEC5GcTE8lfonlkgIktiQF4ozNjfm6MejTrQk51j4TEkXGjIgVmyWkf3xXMDO9m
+         P95ZYo3FLjiSS+KbuStjMqIYLVdS3mBSvYQpqhfZXfr1CQAQfDMct0nzGl7SGikYCMFd
+         +kPwj0V6jH+hQZmzrNNwpasXgM3rlBUkhRqg6B1Pm+fNCJx6uP+L3BcYbFQNJScY9y44
+         cy4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715771000; x=1716375800;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bhPWCNAUIK6VfX6XoxIhdW3f+hVkZo9HiaN1p3ULkuc=;
+        b=jYL0CSSsRzFVD5g5OmxjJLmjQ4iz4jcbhWbCQBMhGmENk5dhs/l47Gk9PyVAbOqL1r
+         9wVhxhA/J9fEA1ydkla0wlUbyrdvrVsnOJZA/Pfv/vRLiVz4XDBGXz59V3NrOZoZC/VI
+         XLoAwXVmLsQtX7VbiawXenzufU97YqY8pJVn2rH8sQPbnQajYcJqqai6B++gVll8Wb6N
+         rhQL/iLgJt73A+H+FroCScoJ5acXASZ4Hg9H0lGwrcdaZM6wMTSZJDv28+Wjmve5SFoo
+         OFT/enV81Db/AJAzpAS3MYDdPFZCc4/YVdrBluMA0xtVvZQL567/QaTAhDmaRi9lTsak
+         EUaA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUKrr3er+NPk6vbDJNdoCagbIUi6vWKmtFHjA9RSStxYoROZMGIOtUku3bM6vqMrM21fwryR3Q9LkmBKCyjYtr4ypdioxSEORYwbJcjyLMNvJ7/14UWurLGmYkoKIujr/jjkQ8vEvq
+X-Gm-Message-State: AOJu0YxRijf7GIUdQiDqJogod4hCeoCm0CwWNZ7PlyL2je0y9tHnkH2K
+	xqxKt5pDphvKJDlhulvwu0q4j+fbblACI3ckFy+sazyhY7Iu26x8b2MZW5NVF+rIMnNGahIVoqc
+	NHr+SUw1PEb7xlHbPZNB4/ufHbb4=
+X-Google-Smtp-Source: AGHT+IEtXNaXRMhwfYMzWT333xACm9XANBbz96ElsQaKYUeGoZRpoAaYTuoUVKMvt1tPjthuQ3VsFiFR8s3pNeR7Ayk=
+X-Received: by 2002:a50:aa94:0:b0:56b:cecb:a4c8 with SMTP id
+ 4fb4d7f45d1cf-5734d70603cmr16238930a12.39.1715771000175; Wed, 15 May 2024
+ 04:03:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240514-iwl-net-2024-05-14-set-channels-fixes-v1-1-eb18d88e30c3@intel.com>
+References: <20240513060852.1105380-1-ap420073@gmail.com> <20240515094831.GA154012@kernel.org>
+In-Reply-To: <20240515094831.GA154012@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Wed, 15 May 2024 20:03:08 +0900
+Message-ID: <CAMArcTW4G+_XM1Gf=1mJCptGYLEc=+b8FeOAD_+Cuba8tvjyKg@mail.gmail.com>
+Subject: Re: [PATCH net v2] selftests: net: kill smcrouted in the cleanup
+ logic in amt.sh
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 14, 2024 at 11:51:12AM -0700, Jacob Keller wrote:
-> From: Larysa Zaremba <larysa.zaremba@intel.com>
-> 
-> A bug occurs because a safety check guarding AF_XDP-related queues in
-> ethnl_set_channels(), does not trigger. This happens, because kernel and
-> ice driver interpret the ethtool command differently.
-> 
-> How the bug occurs:
-> 1. ethtool -l <IFNAME> -> combined: 40
-> 2. Attach AF_XDP to queue 30
-> 3. ethtool -L <IFNAME> rx 15 tx 15
->    combined number is not specified, so command becomes {rx_count = 15,
->    tx_count = 15, combined_count = 40}.
-> 4. ethnl_set_channels checks, if there are any AF_XDP of queues from the
->    new (combined_count + rx_count) to the old one, so from 55 to 40, check
->    does not trigger.
-> 5. ice interprets `rx 15 tx 15` as 15 combined channels and deletes the
->    queue that AF_XDP is attached to.
-> 
-> Interpret the command in a way that is more consistent with ethtool
-> manual [0] (--show-channels and --set-channels).
-> 
-> Considering that in the ice driver only the difference between RX and TX
-> queues forms dedicated channels, change the correct way to set number of
-> channels to:
-> 
-> ethtool -L <IFNAME> combined 10 /* For symmetric queues */
-> ethtool -L <IFNAME> combined 8 tx 2 rx 0 /* For asymmetric queues */
-> 
-> [0] https://man7.org/linux/man-pages/man8/ethtool.8.html
-> 
-> Fixes: 87324e747fde ("ice: Implement ethtool ops for channels")
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com>
-> Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-> Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+On Wed, May 15, 2024 at 6:48=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
+te:
+>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Hi Simon,
+Thanks for the review!
 
+> On Mon, May 13, 2024 at 06:08:52AM +0000, Taehee Yoo wrote:
+> > The amt.sh requires smcrouted for multicasting routing.
+> > So, it starts smcrouted before forwarding tests.
+> > It must be stopped after all tests, but it isn't.
+> >
+> > To fix this issue, it kills smcrouted in the cleanup logic.
+> >
+> > Fixes: c08e8baea78e ("selftests: add amt interface selftest script")
+> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> > ---
+> > The v1 patch is here:
+> > https://lore.kernel.org/netdev/20240508040643.229383-1-ap420073@gmail.c=
+om/
+> >
+> > v2
+> > - Headline change.
+> > - Kill smcrouted process only if amt.pid exists.
+> > - Do not remove the return value.
+> > - Remove timeout logic because it was already fixed by following commit
+> > 4c639b6a7b9d ("selftests: net: move amt to socat for better compatibili=
+ty")
+> > - Fix shebang.
+> >
+> > tools/testing/selftests/net/amt.sh | 10 ++++++++--
+> > 1 file changed, 8 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftes=
+ts/net/amt.sh
+> > index 5175a42cbe8a..d458b45c775b 100755
+> > --- a/tools/testing/selftests/net/amt.sh
+> > +++ b/tools/testing/selftests/net/amt.sh
+> > @@ -1,4 +1,4 @@
+> > -#!/bin/sh
+> > +#!/bin/bash
+> > # SPDX-License-Identifier: GPL-2.0
+> >
+> > # Author: Taehee Yoo <ap420073@gmail.com>
+>
+> Hi.
+>
+> I think that the change above is not related to the fix below.
+> I think it should be in a separate patch targeted at net-next.
+> And as net-next is currently closed it should be posted once it
+> reopens, after the 27th May.
+>
+> The changes below look good to me.
+> I suggest resending only those changes, targeted at net, as v3.
+>
+
+Okay, I will send a v3 patch that will not change the shebang.
+
+> Thanks.
+>
+> > @@ -77,6 +77,7 @@ readonly LISTENER=3D$(mktemp -u listener-XXXXXXXX)
+> > readonly GATEWAY=3D$(mktemp -u gateway-XXXXXXXX)
+> > readonly RELAY=3D$(mktemp -u relay-XXXXXXXX)
+> > readonly SOURCE=3D$(mktemp -u source-XXXXXXXX)
+> > +readonly SMCROUTEDIR=3D"$(mktemp -d)"
+> > ERR=3D4
+> > err=3D0
+> >
+> > @@ -85,6 +86,11 @@ exit_cleanup()
+> > for ns in "$@"; do
+> > ip netns delete "${ns}" 2>/dev/null || true
+> > done
+> > + if [ -f "$SMCROUTEDIR/amt.pid" ]; then
+> > + smcpid=3D$(< $SMCROUTEDIR/amt.pid)
+> > + kill $smcpid
+> > + fi
+> > + rm -rf $SMCROUTEDIR
+> >
+> > exit $ERR
+> > }
+> > @@ -167,7 +173,7 @@ setup_iptables()
+> >
+> > setup_mcast_routing()
+> > {
+> > - ip netns exec "${RELAY}" smcrouted
+> > + ip netns exec "${RELAY}" smcrouted -P $SMCROUTEDIR/amt.pid
+> > ip netns exec "${RELAY}" smcroutectl a relay_src \
+> > 172.17.0.2 239.0.0.1 amtr
+> > ip netns exec "${RELAY}" smcroutectl a relay_src \
+>
+> --
+> pw-bot: changes-requested
+> >
+
+Thanks a lot!
+Taehee Yoo
 
