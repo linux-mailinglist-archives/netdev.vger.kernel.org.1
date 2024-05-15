@@ -1,128 +1,254 @@
-Return-Path: <netdev+bounces-96509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB8C8C6452
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 11:53:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99F528C6456
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 11:53:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE46E1F22075
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 09:53:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 438DB283857
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 09:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766825A0F5;
-	Wed, 15 May 2024 09:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252B05F873;
+	Wed, 15 May 2024 09:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="CyTK+oMk"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38074EB45;
-	Wed, 15 May 2024 09:52:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.237.72.81
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5540A4EB45
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 09:53:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715766778; cv=none; b=IxBRZkiMcQFijI2xHmVGdHqMKmElC+RaY8AKpyteR1JbymmUiXgFuGsWOv44kx+NJ5muC7hE36CDWKGFwnmFPb9bNc98SbWImsj7KlIHObbo+5OMhZ3tswi+7GPyKATCQ7H3m29r4bzeiMjg8CqoHunFVP5Lszs9s3RYYQeFVyQ=
+	t=1715766785; cv=none; b=aRaKKcxjx81vINK8Aegf37aghSdrkKBxUDybGPl7jOnKkURzX9+A/9YVYoG8gXOJqPqoTk8LZxHvLPl/7rq/49EFDjY6k9yt+Y+PWmlv/slHRz1+yisdnoq9YxCo3HbSdQK+Tx+LsV2aKUB0uun+CkaYhmCwb8Jw71S9uH19EZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715766778; c=relaxed/simple;
-	bh=OCHKhs8Cm8aoHBT0E1a8uUJBNZF8AziQdz9PQz0Ura8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=nTcraJOPCvxU5OGqdengg/RZgZBL5+ZTYLyozoScsewapdfSE5bV2FcXHft2Gkm+TnF7hUL7q/sPLviw2tJU+OvY6z7G9b2iCHGp6MuyVFaBEJgs2E0aZPrz7zhzfl5k3EeiAVt7Gx8qsDp2q2WX/W5NC7czeJd4xj2joaXYEFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=52.237.72.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from duoming$zju.edu.cn ( [221.192.180.251] ) by
- ajax-webmail-mail-app3 (Coremail) ; Wed, 15 May 2024 17:52:25 +0800
- (GMT+08:00)
-Date: Wed, 15 May 2024 17:52:25 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: duoming@zju.edu.cn
-To: "Lars Kellogg-Stedman" <lars@oddbit.com>
-Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net, jreuter@yaina.de,
-	dan.carpenter@linaro.org
-Subject: Re: [PATCH net] ax25: Fix refcount leak issues of ax25_dev
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT5 build
- 20231205(37e20f0e) Copyright (c) 2002-2024 www.mailtech.cn zju.edu.cn
-In-Reply-To: <my4l7ljo35dnwxl33maqhyvw7666dmuwtduwtyhnzdlb6bbf5m@5sbp4tvg246f>
-References: <20240501060218.32898-1-duoming@zju.edu.cn>
- <my4l7ljo35dnwxl33maqhyvw7666dmuwtduwtyhnzdlb6bbf5m@5sbp4tvg246f>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1715766785; c=relaxed/simple;
+	bh=TsOk3vFqremJkiKTf83L+7lVwN7NONoMxe4kSI6IvYw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ANUsh0DDsu8IGzj7/gHjv4+UZfoHKVGosfLRSeZRSijz2zrYluauhw2lScgX39pNotGIltaa7DOUiNQG5jNP1AMON/Y0q10md/SrxfgdBjs3vSYVd91P8kmexke4Xe//ehxbGb7Zlx6d2oGdhLyikjMuVxYeErca8SdK7Iql7t4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=CyTK+oMk; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-572ba002a6bso1457738a12.1
+        for <netdev@vger.kernel.org>; Wed, 15 May 2024 02:53:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1715766782; x=1716371582; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=S1lmRXypy+tgqjJjCBelLKezDGdnEAnnPizIiNZdruM=;
+        b=CyTK+oMkbUZvJX+UEpXD2WFMSiEdaF9FbbEkHgrzxqIOXJh3IjX7fUED53WyhtfNCd
+         n2EIRkb6K9WTdMARS9VuK3lIcwCF+typcSHLH8KJGqwuPma5t+cvhe1NS61b8h6qwBS9
+         mwkIWHGaxIqTXF7Z16UhZF5rk3gXWnzQYKdn3/bSx+l9CaYvAZ7b1mGjre/zhtmIw1DR
+         RKNJlKAICoTaHxukGyzYNIJyvWGUzOle01tTAWgalCoZoqZ6ZcgK2yzNZGrfyW/vCVKi
+         Cqm3jpwjE0S+sh5WKfhm6aGR9HpoF3H7IOUypLZ8RwI1GxjJa/GYPwQbzgxCpJMUYCBL
+         n9Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715766782; x=1716371582;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S1lmRXypy+tgqjJjCBelLKezDGdnEAnnPizIiNZdruM=;
+        b=gs09W5ODFC4SPNdC0lSXfoJDWXxsamd8aBkzOykT/f3RzIQIC1+yUpX/L5dg5L2f+z
+         Ja98jwCvYQardzLey/BKv3/srHrGRSfHj23cB65CgUikaYpRVKETf4IjyEATWwxC/wrF
+         R6bM0xsTyYLDGB9Y/CiSyTiRjffAoq4k1g7IYiKtfozl2BvWLfP84c27VArG2VbtpThp
+         ssbZzVeqfLig875ZOt40zNcsxc82iiKOktK4gMUtpzYzmp/6mEu34sGONI5BAf58kt0X
+         Iwb+JBcuq2VEJ5T7ivt2loZwKoL3/2RIvk4bDBm1gR+Du2rPnX7hwXnnT9F+MHGC1+Rq
+         s8Dg==
+X-Forwarded-Encrypted: i=1; AJvYcCXUq1fCIr1M3s+b3wRBOELlG3F18MgemYREy9tPw7Ay6zX4X+fTCXdCNyPSrQvkDnEClZjL6mMIEJsHm07HOC/zXMIxG2E5
+X-Gm-Message-State: AOJu0YwCk0TRUn9fsSDvinhgMy4rXW9u+GcPpUWgk5uDAJKGBT04KtA4
+	ZpuqmJUBlGFtfk+BiUqAQAsaxH5aAH6nzrFxUaUVjoNMeBekB7HJSBk+buMFAzE=
+X-Google-Smtp-Source: AGHT+IHJ/nIQ9Mj+hR5RkGPoGTlj6+iE5Zdg+QT5yPe2HHYjGXYAnkxMww7zPjsNTDTMLKdw2VFCRA==
+X-Received: by 2002:a50:f699:0:b0:56e:f64:aaf6 with SMTP id 4fb4d7f45d1cf-5734d5c16dfmr11167023a12.5.1715766781663;
+        Wed, 15 May 2024 02:53:01 -0700 (PDT)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5733bebb687sm8592378a12.25.2024.05.15.02.52.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 May 2024 02:53:01 -0700 (PDT)
+Message-ID: <0e5007fb-2d95-4cbb-b0a6-baa0d20e9469@blackwall.org>
+Date: Wed, 15 May 2024 12:52:57 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <ac6f090.eaff.18f7baadb40.Coremail.duoming@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cC_KCgDnPlXahURmYOeTAA--.14308W
-X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwUCAWZDiAoNowA6s2
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 12/14] net: add SO_DEVMEM_DONTNEED setsockopt
+ to release RX frags
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20240510232128.1105145-1-almasrymina@google.com>
+ <20240510232128.1105145-13-almasrymina@google.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20240510232128.1105145-13-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-T24gV2VkLCAxIE1heSAyMDI0IDIxOjI5OjE2IC0wNDAwIExhcnMgS2VsbG9nZy1TdGVkbWFuIHdy
-b3RlOgo+IEFzc3VtZSB3ZSBoYXZlIHRoZSBmb2xsb3dpbmcgdHdvIGludGVyZmFjZXMgY29uZmln
-dXJlZCBvbiBhIHN5c3RlbToKPiAKPiAgICAgJCBjYXQgL2V0Yy9heDI1L2F4cG9ydHMKPiAgICAg
-dWRwMCB0ZXN0MC0wIDk2MDAgMjU1IDIgYXh1ZHAwCj4gICAgIHVkcDEgdGVzdDAtMSA5NjAwIDI1
-NSAyIGF4dWRwMQo+IAo+IEFuZCB3ZSBoYXZlIGF4MjVkIGxpc3RlbmluZyBvbiBib3RoIGludGVy
-ZmFjZXM6Cj4gCj4gICAgIFt1ZHAwXQo+ICAgICBkZWZhdWx0ICAqICogKiAqICogKiAgLSByb290
-ICAvdXNyL3NiaW4vYXh3cmFwcGVyIGF4d3JhcHBlciAtLSAvYmluL3NoIHNoIC9ldGMvYXgyNS9l
-eGFtcGxlLW91dHB1dC5zaAo+ICAgICBbdWRwMV0KPiAgICAgZGVmYXVsdCAgKiAqICogKiAqICog
-IC0gcm9vdCAgL3Vzci9zYmluL2F4d3JhcHBlciBheHdyYXBwZXIgLS0gL2Jpbi9zaCBzaCAvZXRj
-L2F4MjUvZXhhbXBsZS1vdXRwdXQuc2gKPiAKPiBVc2luZyB0aGUgJ2F4LWRldnMnIGFuZCAnYXgt
-c29ja2V0cycgZ2RiIGNvbW1hbmRzIHNob3duIGF0IHRoZSBlbmQgb2YKPiB0aGlzIG1lc3NhZ2Us
-IHdlIHN0YXJ0IHdpdGg6Cj4gCj4gICAgIChnZGIpIGF4LWRldnMKPiAgICAgYXgxIGF4X3JlZmNu
-dDoyIGRldl9yZWZjbnQ6OSBkZXZfdW50cmFja2VkOjEgZGV2X25vdHJhY2s6MQo+ICAgICBheDAg
-YXhfcmVmY250OjIgZGV2X3JlZmNudDo5IGRldl91bnRyYWNrZWQ6MSBkZXZfbm90cmFjazoxCj4g
-ICAgIChnZGIpIGF4LXNvY2tldHMKPiAgICAgMHhmZmZmODg4MTAwMmI2ODAwIGlmOmF4MSBzdGF0
-ZTowIHJlZmNudDoyIGRldl90cmFja2VyOjB4ZmZmZjg4ODEwMGRlZDIwMAo+ICAgICAweGZmZmY4
-ODgxMDFhYzRlMDAgaWY6YXgwIHN0YXRlOjAgcmVmY250OjIgZGV2X3RyYWNrZXI6MHhmZmZmODg4
-MTAwZGVjNGMwCj4gCj4gV2UgaW5pdGlhdGUgYSBjb25uZWN0aW9uIGZyb20gYXgwIHRvIGF4MToK
-PiAKPiAgICAgY2FsbCAtciB1ZHAwIHRlc3QwLTEKPiAKPiBXaGVuIHdlIGZpcnN0IGVudGVyIGF4
-MjVfcmN2LCB3ZSBoYXZlOgo+IAo+ICAgICAoZ2RiKSBheC1kZXZzCj4gICAgIGF4MSBheF9yZWZj
-bnQ6MiBkZXZfcmVmY250OjkgZGV2X3VudHJhY2tlZDoxIGRldl9ub3RyYWNrOjEKPiAgICAgYXgw
-IGF4X3JlZmNudDozIGRldl9yZWZjbnQ6MTAgZGV2X3VudHJhY2tlZDoxIGRldl9ub3RyYWNrOjEK
-PiAgICAgKGdkYikgYXgtc29ja2V0cwo+ICAgICAweGZmZmY4ODgxMDFhYzgwMDAgaWY6YXgwIHN0
-YXRlOjEgcmVmY250OjIgZGV2X3RyYWNrZXI6MHhmZmZmODg4MTAwZGVkYjgwCj4gICAgIDB4ZmZm
-Zjg4ODEwMDJiNjgwMCBpZjpheDEgc3RhdGU6MCByZWZjbnQ6MiBkZXZfdHJhY2tlcjoweGZmZmY4
-ODgxMDBkZWQyMDAKPiAgICAgMHhmZmZmODg4MTAxYWM0ZTAwIGlmOmF4MCBzdGF0ZTowIHJlZmNu
-dDoyIGRldl90cmFja2VyOjB4ZmZmZjg4ODEwMGRlYzRjMAo+IAo+IEFmdGVyIHdlIHJlYWNoIGxp
-bmUgNDEzIChpbiBuZXQvYXgyNS9heDI1X2luLmMpIGFuZCBhZGQgYSBuZXcgY29udHJvbAo+IGJs
-b2NrOgo+IAo+ICAgICBheDI1X2NiX2FkZChheDI1KQo+IAo+IFdlIGhhdmU6Cj4gCj4gICAgIChn
-ZGIpIGF4LWRldnMKPiAgICAgYXgxIGF4X3JlZmNudDoyIGRldl9yZWZjbnQ6OSBkZXZfdW50cmFj
-a2VkOjEgZGV2X25vdHJhY2s6MQo+ICAgICBheDAgYXhfcmVmY250OjMgZGV2X3JlZmNudDoxMCBk
-ZXZfdW50cmFja2VkOjEgZGV2X25vdHJhY2s6MQo+ICAgICAoZ2RiKSBheC1zb2NrZXRzCj4gICAg
-IDB4ZmZmZjg4ODEwMjQ1YWMwMCBpZjpheDEgc3RhdGU6MyByZWZjbnQ6MiBkZXZfdHJhY2tlcjow
-eDAgPGZpeGVkX3BlcmNwdV9kYXRhPgo+ICAgICAweGZmZmY4ODgxMDI0NWJhMDAgaWY6YXgwIHN0
-YXRlOjEgcmVmY250OjIgZGV2X3RyYWNrZXI6MHhmZmZmODg4MTAxMzZjODAwCj4gICAgIDB4ZmZm
-Zjg4ODEwMGM3OWUwMCBpZjpheDEgc3RhdGU6MCByZWZjbnQ6MiBkZXZfdHJhY2tlcjoweGZmZmY4
-ODgxMDEzNmM2ZTAKPiAgICAgMHhmZmZmODg4MTAxOGU5ODAwIGlmOmF4MCBzdGF0ZTowIHJlZmNu
-dDoyIGRldl90cmFja2VyOjB4ZmZmZjg4ODEwMTcwYzg2MAo+IAo+IE5vdGUgdGhhdCAoYSkgYXgy
-NS0+ZGV2X3RyYWNrZXIgaXMgTlVMTCwgYW5kIChiKSB3ZSBoYXZlIGluY3JlbWV0ZWQgdGhlCj4g
-cmVmY291bnQgb24gYXgwICh0aGUgc291cmNlIGludGVyZmFjZSksIGJ1dCBub3Qgb24gYXgxICh0
-aGUgZGVzdGluYXRpb24KPiBpbnRlcmZhY2UpLiBXaGVuIHdlIGNhbGwgYXgyNV9yZWxlYXNlIGZv
-ciB0aGlzIGNvbnRyb2wgYmxvY2ssIHdlIGdldCB0bzoKPiAKPiAgICAgbmV0ZGV2X3B1dChheDI1
-X2Rldi0+ZGV2LCAmYXgyNS0+ZGV2X3RyYWNrZXIpOwo+ICAgICBheDI1X2Rldl9wdXQoYXgyNV9k
-ZXYpOwo+IAo+IFdpdGg6Cj4gCj4gICAgIChnZGIpIGF4LWRldnMKPiAgICAgYXgxIGF4X3JlZmNu
-dDoyIGRldl9yZWZjbnQ6OSBkZXZfdW50cmFja2VkOjEgZGV2X25vdHJhY2s6MQo+ICAgICBheDAg
-YXhfcmVmY250OjMgZGV2X3JlZmNudDoxMCBkZXZfdW50cmFja2VkOjEgZGV2X25vdHJhY2s6MQo+
-IAo+IEFmdGVyIHRoZSBjYWxscyB0byBuZXRkZXZfcHV0KCkgYW5kIGF4MjVfZGV2X3B1dCgpLCB3
-ZSBoYXZlOgo+IAo+ICAgICAoZ2RiKSBheC1kZXZzCj4gICAgIGF4MSBheF9yZWZjbnQ6MSBkZXZf
-cmVmY250OjggZGV2X3VudHJhY2tlZDotMTA3Mzc0MTgyNCBkZXZfbm90cmFjazoxCj4gICAgIGF4
-MCBheF9yZWZjbnQ6MiBkZXZfcmVmY250OjkgZGV2X3VudHJhY2tlZDoxIGRldl9ub3RyYWNrOjEK
-PiAKPiBZb3UgY2FuIHNlZSB0aGF0IChhKSBheDI1X2Rldi0+ZGV2LT5yZWZjbnRfdHJhY2tlci0+
-dW50cmFja2VkIGlzIG5vdwo+IGludmFsaWQsIGFuZCBheDI1X2Rldi0+ZGV2LT5kZXZfcmVmY250
-IGlzIGluIHRyb3VibGU6IGl0IGRlY3JlbWVudHMgYnkKPiBvbmUgZm9yIGVhY2ggY2xvc2VkIGNv
-bm5lY3Rpb24sIGV2ZW4gdGhvdWdoIGl0IHdhcyBuZXZlciBpbmNyZW1lbnRlZAo+IHdoZW4gd2Ug
-YWNjZXB0ZWQgdGhlIGNvbm5lY3Rpb24uIFRoZSB1bmRlcmZsb3cgaW4KPiAuLi5yZWZjbnRfdHJh
-Y2tlci0+dW50cmFja2VkIHlpZWxkcyB0aGUgdHJhY2ViYWNrIHdpdGg6Cj4gCj4gICAgIHJlZmNv
-dW50X3Q6IGRlY3JlbWVudCBoaXQgMDsgbGVha2luZyBtZW1vcnkuCj4gCj4gQWRkaXRpb25hbCBj
-b25uZWN0aW9ucyB3aWxsIGV2ZW50dWFsbHkgdHJpZ2dlciBtb3JlIHByb2JsZW1zOyB3ZSB3aWxs
-Cj4gdWx0aW1hdGVseSB1bmRlcmZsb3cgYXgyNV9kZXYtPmRldi0+ZGV2X3JlZmNudCwgYnV0IHdl
-IG1heSBhbHNvIHJ1biBpbnRvCj4gbWVtb3J5IGNvcnJ1cHRpb24gYmVjYXVzZSBvZiB0aGUgaW52
-YWxpZCB0cmFja2VyIGRhdGEsIHJlc3VsdGluZyBpbjoKPiAKPiAgICAgQlVHOiB1bmFibGUgdG8g
-aGFuZGxlIHBhZ2UgZmF1bHQgZm9yIGFkZHJlc3M6IDAwMDAwMDEwMDAwMDAzYjAKCkRvIHlvdSBr
-bm93IGhvdyB0byB0cmlnZ2VyIHRoaXMgYnVnPyBDb3VsZCB5b3Ugc2hhcmUgdGhlIFBPQz8KCkJl
-c3QgcmVnYXJkcywKRHVvbWluZyBaaG91Cg==
+On 11/05/2024 02:21, Mina Almasry wrote:
+> Add an interface for the user to notify the kernel that it is done
+> reading the devmem dmabuf frags returned as cmsg. The kernel will
+> drop the reference on the frags to make them available for reuse.
+> 
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> 
+> ---
+> 
+> v7:
+> - Updated SO_DEVMEM_* uapi to use the next available entry (Arnd).
+> 
+> v6:
+> - Squash in locking optimizations from edumazet@google.com. With his
+>   changes we lock the xarray once per sock_devmem_dontneed operation
+>   rather than once per frag.
+> 
+> Changes in v1:
+> - devmemtoken -> dmabuf_token (David).
+> - Use napi_pp_put_page() for refcounting (Yunsheng).
+> - Fix build error with missing socket options on other asms.
+> 
+> ---
+>  arch/alpha/include/uapi/asm/socket.h  |  1 +
+>  arch/mips/include/uapi/asm/socket.h   |  1 +
+>  arch/parisc/include/uapi/asm/socket.h |  1 +
+>  arch/sparc/include/uapi/asm/socket.h  |  1 +
+>  include/uapi/asm-generic/socket.h     |  1 +
+>  include/uapi/linux/uio.h              |  4 ++
+>  net/core/sock.c                       | 61 +++++++++++++++++++++++++++
+>  7 files changed, 70 insertions(+)
+> 
+[snip]
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 8d6e638b5426d..2edb988259e8d 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -124,6 +124,7 @@
+>  #include <linux/netdevice.h>
+>  #include <net/protocol.h>
+>  #include <linux/skbuff.h>
+> +#include <linux/skbuff_ref.h>
+>  #include <net/net_namespace.h>
+>  #include <net/request_sock.h>
+>  #include <net/sock.h>
+> @@ -1049,6 +1050,62 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
+>  	return 0;
+>  }
+>  
+> +#ifdef CONFIG_PAGE_POOL
+> +static noinline_for_stack int
+> +sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> +{
+> +	unsigned int num_tokens, i, j, k, netmem_num = 0;
+> +	struct dmabuf_token *tokens;
+> +	netmem_ref netmems[16];
+> +	int ret;
+> +
+> +	if (sk->sk_type != SOCK_STREAM || sk->sk_protocol != IPPROTO_TCP)
+> +		return -EBADF;
+> +
+> +	if (optlen % sizeof(struct dmabuf_token) ||
+> +	    optlen > sizeof(*tokens) * 128)
+> +		return -EINVAL;
+> +
+> +	tokens = kvmalloc_array(128, sizeof(*tokens), GFP_KERNEL);
+> +	if (!tokens)
+> +		return -ENOMEM;
+> +
+> +	num_tokens = optlen / sizeof(struct dmabuf_token);
+> +	if (copy_from_sockptr(tokens, optval, optlen))
+> +		return -EFAULT;
+
+tokens isn't freed in this error case
+
+> +
+> +	ret = 0;
+> +
+> +	xa_lock_bh(&sk->sk_user_frags);
+> +	for (i = 0; i < num_tokens; i++) {
+> +		for (j = 0; j < tokens[i].token_count; j++) {
+> +			netmem_ref netmem = (__force netmem_ref)__xa_erase(
+> +				&sk->sk_user_frags, tokens[i].token_start + j);
+> +
+> +			if (netmem &&
+> +			    !WARN_ON_ONCE(!netmem_is_net_iov(netmem))) {
+> +				netmems[netmem_num++] = netmem;
+> +				if (netmem_num == ARRAY_SIZE(netmems)) {
+> +					xa_unlock_bh(&sk->sk_user_frags);
+> +					for (k = 0; k < netmem_num; k++)
+> +						WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
+> +					netmem_num = 0;
+> +					xa_lock_bh(&sk->sk_user_frags);
+> +				}
+> +				ret++;
+> +			}
+> +		}
+> +	}
+> +
+> +	xa_unlock_bh(&sk->sk_user_frags);
+> +	for (k = 0; k < netmem_num; k++)
+> +		WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
+> +
+> +	kvfree(tokens);
+> +	return ret;
+> +}
+> +#endif
+> +
+>  void sockopt_lock_sock(struct sock *sk)
+>  {
+>  	/* When current->bpf_ctx is set, the setsockopt is called from
+> @@ -1200,6 +1257,10 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+>  			ret = -EOPNOTSUPP;
+>  		return ret;
+>  		}
+> +#ifdef CONFIG_PAGE_POOL
+> +	case SO_DEVMEM_DONTNEED:
+> +		return sock_devmem_dontneed(sk, optval, optlen);
+> +#endif
+>  	}
+>  
+>  	sockopt_lock_sock(sk);
+
 
