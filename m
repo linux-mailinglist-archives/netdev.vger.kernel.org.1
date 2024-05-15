@@ -1,103 +1,153 @@
-Return-Path: <netdev+bounces-96500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB4FF8C63C3
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 11:35:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 693398C63D7
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 11:37:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACB192814E6
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 09:35:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 962651C22A72
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 09:37:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E77F58AA5;
-	Wed, 15 May 2024 09:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0E225916B;
+	Wed, 15 May 2024 09:37:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="TSRU48GK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ih6BVQNR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B99E5A0E0
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 09:35:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B0C59155
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 09:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715765723; cv=none; b=gs6crxdLcF7ncBpwqy9mRAcpdPpV1fS8rS9cALuKL2BVih9MuqGNL4befnZgjQv+ahCUrQZs5cNVmeqAa2mjmcL0ktVkvIyhPaBti+FeDzOEXMFT27v8MsMDUwRgUcugqa7sIQBNtWpHhFbzwmsoZVH8TpOzNN+ZBFYezUMlpo4=
+	t=1715765847; cv=none; b=M6bY5n3SH3zwniCJGBjz7CVJQsokzY/BvSrig4Zx3pLIcRD2JyjrXyQdlOk4XfOU+uTxZrW0EpYfWaauT5CMzRmFkHfxOTMLqWISqTOejKuvwSpredDTDijcxL2MzbrNK9QTyWUgSD0zr+2iMoOVrBZwHy0REkMP/aR+0A4nEQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715765723; c=relaxed/simple;
-	bh=irgGQsPBq16ModwGXSDA8nu4SGX8iYA0vyU6UciN8kg=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=qGm7qeK+r8nCFTQehg41Ixsg+F4GNk1wUcdq/KouHdBQoffiRUIu2tb1X1gCN3DQc8R48CF/bN9ao2R2tH6Ww7Ai9+GTGimCfALefwtdT34H719a5t/d5i189sxQynI/5YdeHpyu6793lZigT2y9Dj0jJ/hHAVpFCNbIaVTtqDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=TSRU48GK; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1s7B2V-00Gzmr-1w; Wed, 15 May 2024 11:35:11 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=1t1Hd7cKkwE2rC4FroJaaCHc+KsQeuYesdrL5E7I+VA=; b=TSRU48GKNAFNBfzozMnUBLFrgh
-	twAjFN952eO+JATTSnqVvKohNUQTKYU+W7FDIaelMbpfxGuls0iB/3W/PGJ5zsA0k/TPZDEei4H6w
-	YWUhDOU8Kp0fvl+5MxbnoteQt7F3Ja3yyodR2zye8KPUqo9lPYp+0IK0It14+ToPO8Y5rabRQGeHZ
-	sx4/MkTBKOg3UwxZ5pN3eQ7JfUTgcjNtl+ailDj2H2pDEQI93Zljjm5fc+ZmFWpemxaLgwgGH8lEa
-	NVRQG5ZLzeYiKq3nmL+Gw1DCAMeOGiPwCLDnPBCUKZVeGPKtWeENScMd9kd4bfMbx4gTiQ5wPzBc0
-	Q2DJJmTQ==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1s7B2U-0003Pq-9v; Wed, 15 May 2024 11:35:10 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1s7B2D-00E0ji-NS; Wed, 15 May 2024 11:34:53 +0200
-Message-ID: <c6eb5987-4ffa-47cf-a0c7-dcc7b969d2ca@rbox.co>
-Date: Wed, 15 May 2024 11:34:51 +0200
+	s=arc-20240116; t=1715765847; c=relaxed/simple;
+	bh=rL5jMTiDnb5jjSpXW0gR2o+NoebryN5IT0s2xIEfXYc=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=j20nbf8Z7nblqwfmoqax1y42Zszj0EZevFPE9sXdCFTWz6gtsm4Fm29xRpG/8RgEYZ5DvnYYdhscrSuS/9fiBDhbg8tNjGe1XCEAt9oy+LBjsoxRqm8PI21FRqhZTGXKM6fjOmwEKeQiRAH5sobn9KjPX7LNJbmteTFp4lqRRZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ih6BVQNR; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2b432d0252cso1635819a91.2
+        for <netdev@vger.kernel.org>; Wed, 15 May 2024 02:37:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715765845; x=1716370645; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0+HBUktTN7oxu+GjJ+n+Y0Eo/t/C1NRi/FEC7xKjuyo=;
+        b=ih6BVQNRUreExDVTrhGaODFmEkouo39yBc3rZL9zoDbnYNrJCDi0IE0PU+CRmW/BBP
+         0WlpVZmxo4TOVAFlcZb0jJoB45wgFC9Ce6izKl6nVKV4zjspOJk8FDYz2/aYXrz/9SPA
+         41NURIzVygrbzyTVXcfjvXbWKT3R1bvtYOw5j4uUVKEerD/VR+Z+94e+u/e2d6DXN1Xw
+         PgN8qzMyPpKdVi8qpmg3UV/2Cu/xkwBOgvxh2f1QwiP6gyCSUdXJBIRUb20o2cx/8/OZ
+         0RZSLl8T8/7oExQBVjWSq+YLkHwyu9KYu9BTjCHLOlaLBWyjlsgplF1PZxU7VBKix1FK
+         O5Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715765845; x=1716370645;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0+HBUktTN7oxu+GjJ+n+Y0Eo/t/C1NRi/FEC7xKjuyo=;
+        b=Orl7bLpzzZhH9JU3+z93yeVDWN7xWZJcPyp1mgHkrx4UwlU7lrOQ+yIP6FzP7WZL0K
+         E/gIXeeZsZkZTh6iPTjO+vBmPsUJSQmSetcRdIxmfiXR6EPK1twwJUnQqZo9u1l1KDO2
+         z7vf7FYbyXFR+1WEESMX/xbQ7cxUnqKYzxHSXMH2q6GdWCbVAwBrImtC2g40PS8ffVLp
+         vEdEYrXo/GJZbHKeblEuFLqtJmprriE4tTtSWF61/B2yhl4ZjBRPAaJVP9xj+84GLRKN
+         WYVa+O5AtKMK8vE3T9yJW7JqE2YuSKIdMAhFKArD5esyqAqs0zE0c2ExSVK1ehT9lpeJ
+         LYMw==
+X-Forwarded-Encrypted: i=1; AJvYcCVFAtwc5aZwzC7KicXvoTen2JCuhpwLGSaCmHRay3Q0LYIuWoettJSrgTABUdvojlUk6r61yYeFjI0p0SWgjBdIviH78BJI
+X-Gm-Message-State: AOJu0YwNvfkjTgtikQMCX3Z8yU+lmOcV6CpQsxnIO+IuFfGUxPQX9DDL
+	JcBm3pkcjhycnUUUPYfDHIGl3lRXhYZOrUiL3U+skjr2FLbct6ol
+X-Google-Smtp-Source: AGHT+IG+ZyDZ+WUABpkXm8E7lwfC7AmQkgs7fTNu4j01lzw/vpE/RsLXWLAqMQtSvOGV/r61uMtF+A==
+X-Received: by 2002:a05:6a20:3ca9:b0:1af:aeb7:7a10 with SMTP id adf61e73a8af0-1afde07d850mr19744433637.1.1715765845536;
+        Wed, 15 May 2024 02:37:25 -0700 (PDT)
+Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c2565b6sm113322495ad.295.2024.05.15.02.37.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 May 2024 02:37:25 -0700 (PDT)
+Date: Wed, 15 May 2024 18:37:19 +0900 (JST)
+Message-Id: <20240515.183719.2094245718391165470.fujita.tomonori@gmail.com>
+To: jdamato@fastly.com
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
+ horms@kernel.org, kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
+ linux@armlinux.org.uk, hfdevel@gmx.net
+Subject: Re: [PATCH net-next v6 4/6] net: tn40xx: add basic Rx handling
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <ZkJd55Y3MwsBFG2_@LQ3V64L9R2>
+References: <20240512085611.79747-1-fujita.tomonori@gmail.com>
+	<20240512085611.79747-5-fujita.tomonori@gmail.com>
+	<ZkJd55Y3MwsBFG2_@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH v5 net 1/2] af_unix: Fix garbage collection of embryos
- carrying OOB/SCM_RIGHTS.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-References: <20240515003204.43153-1-kuniyu@amazon.com>
- <20240515003204.43153-2-kuniyu@amazon.com>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <20240515003204.43153-2-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-On 5/15/24 02:32, Kuniyuki Iwashima wrote:
-> ...
-> The python script below [0] sends a listener's fd to its embryo as OOB
-> data.  Then, GC does not iterates the embryo from the listener to drop
-> the OOB skb's refcount, and the skb in embryo's receive queue keeps the
-> listener's refcount.  As a result, the listener is leaked and the warning
-> [1] is hit.
-> ...
+Hi,
 
-Sorry, this does not convey what I wrote. And I think your edit is
-incorrect.
+Thanks for reviewing the patch!
 
-GC starts from the in-flight listener and *does* iterate the embryo; see
-scan_children() where scan_inflight() is called for all the embryos.
-The skb in embryo's RQ *does not* keep the listener's refcount; skb from RQ
-ends up in the hit list and is purged.
-It is embryo's oob_skb that holds the refcount; see how __unix_gc() goes
-over gc_candidates attempting to kfree_skb(u->oob_skb), notice that `u`
-here is a listener, not an embryo.
+On Mon, 13 May 2024 11:37:27 -0700
+Joe Damato <jdamato@fastly.com> wrote:
 
-I understand you're "in rush for the merge window", but would it be okay if
-I ask you not to edit my commit messages so heavily?
+> On Sun, May 12, 2024 at 05:56:09PM +0900, FUJITA Tomonori wrote:
+>> This patch adds basic Rx handling. The Rx logic uses three major data
+>> structures; two ring buffers with NIC and one database. One ring
+>> buffer is used to send information to NIC about memory to be stored
+>> packets to be received. The other is used to get information from NIC
+>> about received packets. The database is used to keep the information
+>> about DMA mapping. After a packet arrived, the db is used to pass the
+>> packet to the network stack.
+> 
+> I left one comment below, but had a higher level question unrelated to my
+> comment below:
+> 
+> Have you considered using the page pool for allocating/recycling RX
+> buffers? It might simplify your code significantly and reduce the amount of
+> code that needs to be maintained. Several drivers are using the page pool
+> already, so there are many examples.
+> 
+> My apologies if you answered this in an earlier version and I just missed
+> it.
 
-Thanks,
-Michal
+The page pool hasn't been mentioned before. I'll try it.
+
+
+>> +static int tn40_poll(struct napi_struct *napi, int budget)
+>> +{
+>> +	struct tn40_priv *priv = container_of(napi, struct tn40_priv, napi);
+>> +	int work_done;
+>> +
+>> +	tn40_tx_cleanup(priv);
+>> +
+>> +	if (!budget)
+>> +		return 0;
+>> +
+>> +	work_done = tn40_rx_receive(priv, &priv->rxd_fifo0, budget);
+>> +	if (work_done == budget)
+>> +		return budget;
+>> +
+>> +	napi_complete_done(napi, work_done);
+> 
+> I believe the return value of napi_complete_done should be checked here and
+> only if it returns true, should IRQs be re-enabled.
+> 
+> For example:
+> 
+>   if (napi_complete_done(napi, work_done))
+>     tn40_enable_interrupts(priv); 
+> 
+>> +	tn40_enable_interrupts(priv);
+>> +	return work_done;
+>> +}
+
+Ah, I messed up when I changed the poller to handle zero budget. I'll
+fix in v7.
+
+Thanks!
 
