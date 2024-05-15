@@ -1,98 +1,93 @@
-Return-Path: <netdev+bounces-96600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 543AB8C699D
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 17:25:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C04838C69A0
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 17:27:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 103C6282EF3
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 15:25:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0D341C20B2B
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 15:27:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4635C15575C;
-	Wed, 15 May 2024 15:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15ECF155A26;
+	Wed, 15 May 2024 15:26:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eySLR15T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IzYYOYD7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f67.google.com (mail-ed1-f67.google.com [209.85.208.67])
+Received: from mail-lf1-f66.google.com (mail-lf1-f66.google.com [209.85.167.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C3315573E;
-	Wed, 15 May 2024 15:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B6915574D;
+	Wed, 15 May 2024 15:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715786744; cv=none; b=VcJWkHqiL0P3YPA+cBjo5HAiXeAuCmPZWmhCkpQanq316rqlDJaKkJdoFv676vfSKSI4KHRST77qkzcpuqvgTcsZHBlTQOC2SKlh19bwmFWcmJqx4C4fYJcELDmrvqaVVusVoT0KAWO0XVTVReedQ9pPxuh6K66yj74B8dKxqqI=
+	t=1715786819; cv=none; b=EGGRiNJPg7Wy6ba6XJSUgGoEIDOjySjA885fL+qK2lHNybezWVwGQvZy2BgQUiTka4Fml1o2bSN3v2bzK1qWmGdqUeYADssQAf166+W/kLR/9VPRSFPvZaAJDG1KOz/TIgqvlcpNuNT5rRTtdXz2LLftNGciUx0RsfX2p1MqfM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715786744; c=relaxed/simple;
-	bh=ekQu6l8UVVNVkUjVcmcdczKoulddjvrzz3Upabd+m2c=;
+	s=arc-20240116; t=1715786819; c=relaxed/simple;
+	bh=85I2Ogb/APtmNidN/wmWTf+pvmq6bjY59wnXmqevuWw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BgOGodr+x03/P9IifXOUkECS1WZXrPWd9nt2r3riZm8iZZqeVzDSDNITgpl4VdoJw8/7dly8sYOQH5LAqeZLIDq9mQ8ZI8GefBl06FK1cr405jHSSt3pQ3vLxAPGuygs3XcL3MO3A5/F8dVKhDniB0ply5PYqjXRgTtp0wJpXSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eySLR15T; arc=none smtp.client-ip=209.85.208.67
+	 To:Cc:Content-Type; b=dbr7UwB1wAelogQ2wDYCO31WCveZSndLH7zERj2xYPWMgMUWKrL7hyhGREPDx50JqNqoF0qrOm+qHTY06TJnCIeDntYKTPTinpkt3exANv6zbnZwcu0h26fUTCgeI+5BIfTqKsvR1nDxTOAihmi3ufuOzgR6uO2qvg7FYx5oXDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IzYYOYD7; arc=none smtp.client-ip=209.85.167.66
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f67.google.com with SMTP id 4fb4d7f45d1cf-5709cb80b03so2225747a12.2;
-        Wed, 15 May 2024 08:25:41 -0700 (PDT)
+Received: by mail-lf1-f66.google.com with SMTP id 2adb3069b0e04-520f9d559f6so8326401e87.3;
+        Wed, 15 May 2024 08:26:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715786740; x=1716391540; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1715786815; x=1716391615; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ekQu6l8UVVNVkUjVcmcdczKoulddjvrzz3Upabd+m2c=;
-        b=eySLR15T+OBYzI0z8b7iPHcuVh8vP8xK0vhPP1/NMQ2bXT430X7He50SDNxzOrkgWN
-         VlESHN20t/sGXp/RxAPVK90fgCJKVWuPlZQ1zGiz/Zw/Jsl+6vI4Bbv+HjlknCdk33gE
-         Yse+CU9+irjF5NIGZhRJuFY+a9ECzr5v29FFs5gPIvis23rgGSUxnuV1dq8QobG86+U4
-         ftdAaRs46kPcp2e/CfKGxf64Nr00O3SdUnuM5HJjvd90ZQX3Ud6pg9HJQOuTUCsIDhqn
-         6TRzq49/U+yjjRzNP7r2zYrPgcBedwK6JbmNn4QLkevU8UU9BeRCXpyEVn2w/ivWTof7
-         O3XQ==
+        bh=85I2Ogb/APtmNidN/wmWTf+pvmq6bjY59wnXmqevuWw=;
+        b=IzYYOYD7xBy4xvhveyxRkS1OtEUVSxApH50ZbPo2OgaKybT/3E5hhVLY0ClptqksWZ
+         hyKOUGT/7+FaImWeGZ4byDetCGVg4bF6F2GGEHESHC4SBq3iei29zr/EN3ilINKGOfVU
+         ghu1+e2aXTWSJRWhKn+DKejWfSkLH+YJxvhmre2HFRaX/AXaohaxfMRM6xGLIoamXCGz
+         lPtLi8MzZNLVRRLbB1eqDdyMW5mwFyDag/UgYo0lyC0pv9FluZOTSRxNU6DJvywavDWe
+         uY1rg7A798evWBNOQmBhHIlUwpR91QvL0IHJNbR7cPrD0oGPACyZHKmpA7J0By67FNxv
+         j0aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715786740; x=1716391540;
+        d=1e100.net; s=20230601; t=1715786815; x=1716391615;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ekQu6l8UVVNVkUjVcmcdczKoulddjvrzz3Upabd+m2c=;
-        b=bCMYoVnSSNNY0vTHPYxzlrjpau6u5thyAnHkdMGuNbw8JW7rEQRTl5PBul3MmpwnLE
-         Ng0AbxRsET16jdr2H+4m0EMvgimw2MU0W6mZ7ECoWitY7DT+aLo+ebB10I2APNE0tz1A
-         hQi56mot13hjYe+zrX0MJhN0+uT7SVmPQccuM6CJwk/Clx4QMvEWgBWAgq5CjQKlQEeu
-         GalbR3iHst8dMoYXOK8A80WccF+dAbf4xLQJ5yd8FqWfAm2YlN+LQroOVImAv3dalLkP
-         jeAE2k8x97nv+f4QYRrxifMz3eSUYrgCOZpCo3m+XmAjtoM5aot3/ZQKhxTUxCEZzy7R
-         AkRg==
-X-Forwarded-Encrypted: i=1; AJvYcCVH/afRyl2rwAH9/N//A/n2FL2ocqOgCc1oFI0S8hJLmQendwm8pRKVc0ddTt2iwC1KIq7mYWxLMAyZAOx2dxlKW0u1
-X-Gm-Message-State: AOJu0YyeeS/YhdUlIS1jZEZVc1QOKU4Qba0tJ4+Rp5eeMqE1Taqhqvqr
-	4OyhCPUpFXLGTqTsnq51qPcfY/3aaT5RaUCQfQASCLwdiqLlJEdu3IF/9Sk+HjGPtNUkMrRDqE5
-	DcnFzOLeCJh9Qu0htHJRUsD0w3I8=
-X-Google-Smtp-Source: AGHT+IFOOz6XjLsCUnykrsTh4I2zrKCNz//LZi0zmMAPj4wBAZcDL/1aJOqWR2rhv263BtLvZWbhkl1FLEFVI4kvUYE=
-X-Received: by 2002:a50:a417:0:b0:572:9503:4f8c with SMTP id
- 4fb4d7f45d1cf-5734d67aed2mr10313575a12.34.1715786739755; Wed, 15 May 2024
- 08:25:39 -0700 (PDT)
+        bh=85I2Ogb/APtmNidN/wmWTf+pvmq6bjY59wnXmqevuWw=;
+        b=u8URtkmLhWHI+GpFx3GliHSfeXqIHRCeFS4dct8188AuTFNFOt8H/WNmh2fGISKQEI
+         bH5KuTkGhY5IrXS3fngu1GXGaN4fdTRHp5NqyT1zpSobdryOg4OLOD+fk0tvu3K2pZu0
+         Hg5U9H5gQ3rpUzvezpgd5np8hAvcOsij2n1zo8yJs40cL2125t2jmrRrcZYZhOHPAM2Y
+         O5bEVNJcgAVBLTQv/Ht+8XfqCcIZHjfo1TmBu9vxAsY5hqZdpz3n+rE/Q8gVFa3Oxkdt
+         vfgi7mWyS8EvZ6Q3LayrqH3HQdvTD1oNG0Odb7ESgfu2uHml23hsHQmcReFknZIuG5q7
+         nKfw==
+X-Forwarded-Encrypted: i=1; AJvYcCVXJvnc/TpDWRcBHD+QGzkAVRUPquVRHPrw5Fi9e4QVFsXd/ePvJqymC4VyiF7Pg89lZRhHMFDEH14UhF3MTAnyJx/M
+X-Gm-Message-State: AOJu0YxCoDaJZNjEdwvwCEVAGNmUG8vh0z75TvKW1ef8srNSsbQLxXAv
+	vwS78FEAf5x9Fz03NRKXIP2Z4cIuXu9MQm9xeD4fnbZ2s2hAkXzxSY/h+xwYASAkjuOPm89uNLZ
+	WJrrorkpFo6qRgxerBABbsL3XyLCl3JYrv+8=
+X-Google-Smtp-Source: AGHT+IEAWBnVNdW0B7Pcnsyup6hRL1fHkAu0Vd4B7zPlexKRnbsNWQE5l5NcE/Ntusu+cVm39zby+GhSV26CFOdhCtA=
+X-Received: by 2002:a05:6512:23a7:b0:523:48f2:e3fd with SMTP id
+ 2adb3069b0e04-52348f2e4f3mr6838376e87.16.1715786815191; Wed, 15 May 2024
+ 08:26:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240515062440.846086-1-andrii@kernel.org>
-In-Reply-To: <20240515062440.846086-1-andrii@kernel.org>
+References: <20240515062440.846086-1-andrii@kernel.org> <20240515062440.846086-2-andrii@kernel.org>
+In-Reply-To: <20240515062440.846086-2-andrii@kernel.org>
 From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Date: Wed, 15 May 2024 17:25:03 +0200
-Message-ID: <CAP01T74yJD508cSUtb4pFpuj0M8AM+t-sbxE8BE9Wt7zj4gHmg@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] bpf: save extended inner map info for percpu
- array maps as well
+Date: Wed, 15 May 2024 17:26:17 +0200
+Message-ID: <CAP01T75TwjxmBCE5kNNNjW+m+Qfa6yRK+HxXpwtfa1XjLvqfug@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] selftests/bpf: add more variations of
+ map-in-map situations
 To: Andrii Nakryiko <andrii@kernel.org>
 Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, ast@kernel.org, 
 	daniel@iogearbox.net, martin.lau@kernel.org, torvalds@linux-foundation.org, 
 	Jakub Kicinski <kuba@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 15 May 2024 at 08:24, Andrii Nakryiko <andrii@kernel.org> wrote:
+On Wed, 15 May 2024 at 08:25, Andrii Nakryiko <andrii@kernel.org> wrote:
 >
-> ARRAY_OF_MAPS and HASH_OF_MAPS map types have special logic to save
-> a few extra fields required for correct operations of ARRAY maps, when
-> they are used as inner maps. PERCPU_ARRAY maps have similar
-> requirements as they now support generating inline element lookup
-> logic. So make sure that both classes of maps are handled correctly.
+> Add test cases validating usage of PERCPU_ARRAY and PERCPU_HASH maps as
+> inner maps.
 >
-> Reported-by: Jakub Kicinski <kuba@kernel.org>
-> Fixes: db69718b8efa ("bpf: inline bpf_map_lookup_elem() for PERCPU_ARRAY maps")
 > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
 > ---
 
