@@ -1,141 +1,108 @@
-Return-Path: <netdev+bounces-96538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E39A8C6630
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:11:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99C2F8C6651
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 14:24:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 095BD283214
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:11:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F81B1F21DAD
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 12:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 681B87350E;
-	Wed, 15 May 2024 12:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7313745D9;
+	Wed, 15 May 2024 12:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gmXbYVAD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FwVsGTbI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB56219E8;
-	Wed, 15 May 2024 12:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8257443E
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 12:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715775092; cv=none; b=ZIK/9unn4QJqQheqQ48VUZqvSctmwfIO4e9WzGltHkr/BB27wD+iSBNFvojWPrVoOcXxFfjCqWzgHQuGcQ1GfKKkL+OkxcF/9qGsEO0xaED7oz3MnEnm5Qqxwj26NB374z1lDPUwKyyutDFJv6NPEX3PSUfKvHYEEUeE1yYrsc8=
+	t=1715775842; cv=none; b=XJCXWUN8oVkfy5Q7kc0KF9dT3VFVgNVkaEXen9Co8yE/xenF1PlsJk8SiD9/tLNAgBFHp11ioAuxtbl/xurbSkfmebwjcCncUX/NDSbBGQDEKBgvAaYIO9UguJ6ed5wKRsD98FVXrz31v/qZephUS6vtkb5J5nYa71Pa+tHT99E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715775092; c=relaxed/simple;
-	bh=TRsDlL8sCyl98mO7vQCQry7hPCiEZjBcOThVQmDnsAE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aDMRAkTfBLnagQIrOj92uiiylA5vevadQpULak3PxHLWocV5ZoDCcQNYQqAe3IPmPxz0zhHcdqPBCilsROUCsWhjw0gycLrQHn2XHKZ55rVLcRAvKySlEyq+UZbAquYVgug5Hw/6Vcrv+feK7wypUiTWLWcH4utQUgOZjjLFOJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gmXbYVAD; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6f4ed9dc7beso2867310b3a.1;
-        Wed, 15 May 2024 05:11:30 -0700 (PDT)
+	s=arc-20240116; t=1715775842; c=relaxed/simple;
+	bh=AZcyxAapPfK5P4Ckoo19AiAWhCRUntdAjC9y9nmel9A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TFdh6bAmGumRLQua/FLoKtDzl55PVll2pA16fN+G50TZd6Kdqd6zZRTcSduVG91GPWsOrw8kQSDmUpJ+s+nYRNEXF38y6SixCWWUDOJvj75Gx7C9k9hQIKiBzmvYoTogpHnksGjgb/xqcYBxIQefsosAoW+9dMivr2MCGooQBuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FwVsGTbI; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-572f6c56cdaso35391a12.0
+        for <netdev@vger.kernel.org>; Wed, 15 May 2024 05:24:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715775090; x=1716379890; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uRO1GLnelDCAkzspkfFkF5Khl58EqY3Lr1TOrAInGvA=;
-        b=gmXbYVADnOoQlMaDrdYfLO1IDK0Lx+34fQAv94a1XUPqn9EvsquYyXFZrKyUNnGc6l
-         EX2FzsMEmf/wGwhffT06nQKmBq8ZM96RYQRAiGoDN5i+rJx2/bi9rZUukxxUTZi01a9i
-         kvmR1eohvrQ+60LNJr9nkajBSfbkzvYQx4oA2pbOw6a+O5xkS9QcA65emHfnJt04Zba7
-         Z7baC9Tf2PMmzqDwmSDSDj0c6BgExKsymKi98d6l9WlqFxsFfZz4b7pFnfkiom+wciL+
-         wyS4dtA8IycFTsi1joCIBBsVlVKuXQVD8VtxvOlOrhjxpXWO78dZ2OwNNdwY2sJ9sClo
-         SzZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715775090; x=1716379890;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1715775839; x=1716380639; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uRO1GLnelDCAkzspkfFkF5Khl58EqY3Lr1TOrAInGvA=;
-        b=UnwD0Ok+lin9CLXvvjscV4y5xB6k4nccDHiazCu3jZZD+4Un2z+ykRPIqZx8N0q5vR
-         qlYKEZOYg6Y81DWBcGxH/VbDapDqShmVW54Bkb630NBHb0wDowno4CFWIq93z8c0Hccf
-         RZwFq+7sAiZrNQBY1/4TSJT276Jg3oepr9b/Cpc6UNbgZYKmMN0H9zccsmFrxCW16NgV
-         9VEVWv25PwQfKVtPPPVpyqsEibGHDCwvYTkQwZj/Lo93OV+dKgNUh/n5XLW24O1rmZwV
-         Hf9ZRR+XGrQi9243kpE4GN+7z1cza+Rn1nqODpBrV2uNW/fytIx6nnCsqEZfdUQ9ts3i
-         0nng==
-X-Forwarded-Encrypted: i=1; AJvYcCXYHiWJW0nmGNV0/pZneMbZmn51nhFOgtZeARvXtP0W7du6a88yA+9+Rs/Rcnwa3//+p4i2xelELfjw5qZDon45Pe+hHumNvCnJEOaBFtt8yIKGnzx/TeACvH4yc0DUBJCIOLAo1Fuaaag22L3njPYQYPw3eN5JF9p58P6Aum3YtaGsYucCyjERUTz/MDhHEeSeLNgDVhy/R+Ho
-X-Gm-Message-State: AOJu0YwbPHEg9Ho082cUHsZtj9xRCHpngTaVJ8P/rzZyRtYTKRsuEv58
-	K4nlW5rG2Ml6MMcCIlWV8RggD2x0Tgxa72oZq5m3eflYX2zUuSlZnEmAlQ==
-X-Google-Smtp-Source: AGHT+IHG7hHxrV/oUj7QxhLr2TFdf3HfhAtMErEVrrunpdY238v3hTNUjjGBpDRhqlnNkn7dL17tRg==
-X-Received: by 2002:a05:6a00:984:b0:6f3:e6c3:eadf with SMTP id d2e1a72fcca58-6f4df44ca45mr25106612b3a.15.1715775090173;
-        Wed, 15 May 2024 05:11:30 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f66897e209sm3228060b3a.136.2024.05.15.05.11.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 05:11:29 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 04746187C5760; Wed, 15 May 2024 19:11:25 +0700 (WIB)
-Date: Wed, 15 May 2024 19:11:25 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: bhelgaas@google.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com
-Subject: Re: [PATCH V1 7/9] PCI/TPH: Add TPH documentation
-Message-ID: <ZkSmbZr_9hFj4kZi@archie.me>
-References: <20240509162741.1937586-1-wei.huang2@amd.com>
- <20240509162741.1937586-8-wei.huang2@amd.com>
+        bh=AZcyxAapPfK5P4Ckoo19AiAWhCRUntdAjC9y9nmel9A=;
+        b=FwVsGTbIuk1DSohpGzSYenjmQvwExvxxJlZkHLMrEO3weWkKhU3P6CE89u0QgZmo7q
+         RtU9qpe6p8V1ea+dayUgT+pbQlcueCSLe4vGJWpqw9AfB4ZjS8w6u2FxN57o84pUEGGR
+         fA+pBGYMufdjvszG9q3z/0LtD4ojZNwT/ZDf9+G07ranr3N5MAgbVoxDO7umDdDkTRzk
+         gg5ph9JcV4TK6bJcSr2tJw5k+tBsOg3c2RuBJTn86zVUb/P7aSDnpYaIZ/kODQ68Zdmg
+         j9F/ErtuwKtvlmEK6byG9on/26gdMiZxqyl2CNTbwm63kpE/tgTckt80pBgyK6dgAB64
+         o2Ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715775839; x=1716380639;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AZcyxAapPfK5P4Ckoo19AiAWhCRUntdAjC9y9nmel9A=;
+        b=Lahy2upz1G9manLqneZEOlgochsI67Qpn/8jw33jIffQBIHzL3dedjA4mW6vvmIXp3
+         I4JjC1H+cCepQz7xo/Xzi3cVITkiG+UOejO0h46QofTkYvawVTFUmGyh3Y5o7OF0CHPq
+         N43U/A6zqU/sEeEXwzLLxoFPbml1rcgL2kp6kuYUlmHYo6pSDrHCVGHomjf/RHCCmdki
+         pEz4slNI6Bvqz1k81F3c7pw/DsT1mKA26syaqppiZBgRQQGvK+Q6yGnH0uO/MxOO9+vg
+         n1mV44HnUbThNIrlD89/pjO/0cbrX9lTSREpTPmEFdfVASutidrlPso72rVoyUlvLT3e
+         9+dQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXJBHIIRVCuZZkpI4fpzrGrx+WehupYCYtKlT+JCQb3o8LPh2ZHXVzhjQRoVFmYEzS8PmuopmuVa1JMagwiJhjMHr4qTS/c
+X-Gm-Message-State: AOJu0YwjB+7LPSOTNHGKye+EGy5uIWjnxuXzOe1cVzrf+U4N6JT0DgzV
+	OBeQAh4tc2skX/bunm8Vbc3SXhvKcb5Efu2rvw+cwUdkEUeIKcOonsfKxpxr++QNKOKiq1dgiBx
+	DLduZWOkbwDFqQV+8kHAHeB9gDSQxvJeADWh7
+X-Google-Smtp-Source: AGHT+IHpCFpQL5uqLrfVahn3W6J2Er1NtP2/bamNIZFHqaokc8zdLUfzhHx6gWowQBzSl67vXhZChDGPV6w+y3pDbP8=
+X-Received: by 2002:a50:c943:0:b0:573:4a04:619 with SMTP id
+ 4fb4d7f45d1cf-57443d30f6cmr770395a12.4.1715775839103; Wed, 15 May 2024
+ 05:23:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vG4xZd3V2A4WD42D"
-Content-Disposition: inline
-In-Reply-To: <20240509162741.1937586-8-wei.huang2@amd.com>
-
-
---vG4xZd3V2A4WD42D
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <9b5b6f4c-4f54-4b90-b0b3-8d8023c2e780@gmail.com>
+In-Reply-To: <9b5b6f4c-4f54-4b90-b0b3-8d8023c2e780@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 15 May 2024 14:23:43 +0200
+Message-ID: <CANn89iKFmnJpTQ6-y-cQffWRjith63JtS-gSVhx1S6Nb_XF_2w@mail.gmail.com>
+Subject: Re: [PATCH net] Revert "r8169: don't try to disable interrupts if
+ NAPI is, scheduled already"
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
+	David Miller <davem@davemloft.net>, Realtek linux nic maintainers <nic_swsd@realtek.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Ken Milmore <ken.milmore@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 09, 2024 at 11:27:39AM -0500, Wei Huang wrote:
-> +:Copyright: |copy| 2024 Advanced Micro Devices, Inc.
-> +:Authors: - Eric van Tassell <eric.vantassell@amd.com>
-> +          - Wei Huang <wei.huang2@amd.com>
+On Wed, May 15, 2024 at 8:18=E2=80=AFAM Heiner Kallweit <hkallweit1@gmail.c=
+om> wrote:
+>
+> This reverts commit 7274c4147afbf46f45b8501edbdad6da8cd013b9.
+>
+> Ken reported that RTL8125b can lock up if gro_flush_timeout has the
+> default value of 20000 and napi_defer_hard_irqs is set to 0.
+> In this scenario device interrupts aren't disabled, what seems to
+> trigger some silicon bug under heavy load. I was able to reproduce this
+> behavior on RTL8168h. Fix this by reverting 7274c4147afb.
+>
+> Fixes: 7274c4147afb ("r8169: don't try to disable interrupts if NAPI is s=
+cheduled already")
+> Cc: stable@vger.kernel.org
+> Reported-by: Ken Milmore <ken.milmore@gmail.com>
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-You can directly embed copyright symbol without having to pull in <isonum.t=
-xt>:
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
----- >8 ----
-diff --git a/Documentation/PCI/tph.rst b/Documentation/PCI/tph.rst
-index ea9c8313f3e4f8..d7043fb0b71b3a 100644
---- a/Documentation/PCI/tph.rst
-+++ b/Documentation/PCI/tph.rst
-@@ -5,7 +5,7 @@ TPH Support
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=20
-=20
--:Copyright: |copy| 2024 Advanced Micro Devices, Inc.
-+:Copyright: =C2=A9 2024 Advanced Micro Devices, Inc.
- :Authors: - Eric van Tassell <eric.vantassell@amd.com>
-           - Wei Huang <wei.huang2@amd.com>
-=20
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---vG4xZd3V2A4WD42D
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZkSmbQAKCRD2uYlJVVFO
-o2/fAQDWwU+Co9SFTXcGix+apuCZ0tAf7zDMA5Y56ZXlRYlm1gD/VpD3ni4CLkMP
-Iq5VgmqCFz0/e1qtYk4/CevT7Ltelg8=
-=6Crw
------END PGP SIGNATURE-----
-
---vG4xZd3V2A4WD42D--
+Thanks !
 
