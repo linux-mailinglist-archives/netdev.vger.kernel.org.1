@@ -1,114 +1,121 @@
-Return-Path: <netdev+bounces-96456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D32C38C5F98
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 06:06:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 884E78C5FD1
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 06:47:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7733C1F22C35
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 04:06:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B6C11F21582
+	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 04:47:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C065381DE;
-	Wed, 15 May 2024 04:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83211E4B1;
+	Wed, 15 May 2024 04:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="ba/rrUgM"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="VRsz+pIZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EAA538F98
-	for <netdev@vger.kernel.org>; Wed, 15 May 2024 04:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632BE3A1AC
+	for <netdev@vger.kernel.org>; Wed, 15 May 2024 04:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715745988; cv=none; b=iKywrpMZjm5MkVJAx3JpIy09hTaq18Uf/CKpAyczafeFRFVYWPk7aC8dSjFHXoJjNWbJ2QiuX3Y3SREYO3NEqe6Vcp/dLIvEyJJWIbh7MaWzcYeUs7dVbVsCVDHFhr9nLNtVCgYUYqyxYObFdkQS0SUyLcxUvheQLTwYpoYG3kg=
+	t=1715748427; cv=none; b=ebz3QvWbzOqurNxr9WP/7SgU6CJXgZ098fs5VwmJArVPPSg3MNste77Z7gbhR0ocFaCvlAHxSp81g2bhRrPK44bxUJevFFnOjL8/NxE8YS/MjpCW2gdQk8LQJb7tMHrZuSiuMkiruqykIOfJ4vbf4rzyGzlEAZz1UsXzU58Tz08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715745988; c=relaxed/simple;
-	bh=oDK0dZjxuFm0H+MXlbyx+nVtTUik/dIpxYkVCNyTtUw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SDhlSqxlU/yFNeFL5dQsO4ZYWaZ7QhC6fH8pd0RpdLIs/6dL2o2q+XTru3L+3Eo9X2yrt8FTplwRte24BhA37sfgrLFQs6rqqykKLeqWH86TyEfTbSFEyqYWQpcv4VZjXTkY0opO8bR09a0rczgqc3N89xReAHaIS/kZGxZ32X0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=ba/rrUgM; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-56e1baf0380so1169850a12.3
-        for <netdev@vger.kernel.org>; Tue, 14 May 2024 21:06:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1715745985; x=1716350785; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+u4pNlcSDf7Fk1kCACrrWSs8MI1xPyfKcfZOZfur+Vc=;
-        b=ba/rrUgMqTY3COfZZjp0hpAesSpYB71Oi6ydTUngd4rWDWzhCFGmaNI5K6Bi1nfxmw
-         h9KKZY3XlUYkn7IbXDib1H0auNWB2+ZPcVEjKJh39ZUygevs4kXjA/cYkR8QXJMrpGI7
-         yPAUe8xfCRBsFcMkkQ9fcCq65dMvLhpUPhDm0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715745985; x=1716350785;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+u4pNlcSDf7Fk1kCACrrWSs8MI1xPyfKcfZOZfur+Vc=;
-        b=ZJVYl62iqIYMmEwid+x1+ccj7m3xX6ae71GFU6gSAtPvNOjSrHABi/sTQWwijEU57T
-         +Co35Ea8QysvXhK1uBndLPdJrp2F0LRTmfvbIdiz86wApANvPLsjYhud+7NOOvVsAJEX
-         OszBdWYJLuvCLD2odcHfTlzhgg+fzY4Ow+XPb6GRe0UfWR1s98F/zJ+y6CHg6GYmU49Y
-         VxBakI/4t8x/44Gg59oFXCjUlTzdINhDekcKtrAEIK8ILO11h9IoSo01mxZ0t2MG5YkZ
-         FolgNFe4dqXY9sm28Q2PaUlRXfk4d+WN2Ntgsm4WH53GdhyiMqJ60u6RkFECs15dfe7v
-         xWEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXKwRdmIhBnL5TpcQ3VaXVNC0mhpcPDl0PwouCAz4e5Vku0uEX8T4I4cqQw/izj1LedjQBoFaNuQrnnr5I0X9pmPwmUn/0k
-X-Gm-Message-State: AOJu0YxQEgFEWTvHg+89xwTV3rTDiJpnelhfoH+/px5eH+RLTlL70RdA
-	QxVbVA0W3vaMIEw+AnrBSTg5co4xTMkZBAITBsJiFQxl9XBQO+z43Jb1/Gzhtakjh/Ndp614bzA
-	uw9FVig==
-X-Google-Smtp-Source: AGHT+IGw7PJ4p2mWbM4y3pVWG/Eb+eCBdF5vNaaTCVY0Ex7x3T4TkNM4sPfUFiDksJ8jj9oJBpveYw==
-X-Received: by 2002:a50:9353:0:b0:56c:5990:813e with SMTP id 4fb4d7f45d1cf-5734d5bfbd8mr9214292a12.13.1715745984674;
-        Tue, 14 May 2024 21:06:24 -0700 (PDT)
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com. [209.85.218.50])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-574ec273185sm991432a12.42.2024.05.14.21.06.23
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 May 2024 21:06:23 -0700 (PDT)
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a59c0a6415fso117374866b.1
-        for <netdev@vger.kernel.org>; Tue, 14 May 2024 21:06:23 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCViN3O7Iok7Bb95QbDTImalssP+BsXqzn7EpKSZSJZ+qVVl/vk3ap7EVIybS/rOmuVV0mqDWt/bKTq/0kVaFyjdTWH8DH8Q
-X-Received: by 2002:a17:906:7196:b0:a55:5ba7:2889 with SMTP id
- a640c23a62f3a-a5a2d5c9f69mr956803166b.42.1715745983374; Tue, 14 May 2024
- 21:06:23 -0700 (PDT)
+	s=arc-20240116; t=1715748427; c=relaxed/simple;
+	bh=xBCO48F4VlEonIidmAAYgiXO6TO9qNUwGnzwrkOyBOw=;
+	h=Message-ID:Date:MIME-Version:To:CC:From:Subject:Content-Type; b=UeWJOTgR5ju5HnELJSq78xszA8GSiDd5cWInzdXaH1UnozSp2KdbYvc3zmwpar7MNUf/IXEtQOJxHSIRxfOW9x083Fh0SV0ozsg8zh7rTDzTzWL+2du2jF+hgbAKxTGYYZtw0D5/Ej1eBfmCVCH7pdVI2nflHB1IKHcVRtguF1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=VRsz+pIZ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44F0DJgL022689;
+	Wed, 15 May 2024 04:46:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:to:cc:from:subject:content-type
+	:content-transfer-encoding; s=qcppdkim1; bh=RHr/LSm25AZ44tYtvlVb
+	N5CoKUPTVGevI3xiz1+4y8Q=; b=VRsz+pIZxNBN8P5eWq2feeGV1czgmK/Rf3o1
+	d3ZUYjPNLrxi2fU7xTEG5IQqsNHiby++s2mVEmuk2bsEr3w6huqJBc6xBMboaLsI
+	7HTQIwKv3LW5gvvfklNEVbgevKIOuKylExBuHYNgPnB4DMLMvcNpyfDdB6UpW/tc
+	mlUq8StBQf9XV2zA0jhqrtS2Nv3bKO1/MWrmsoMguwJ8ZmlKBaXjXAiBxwQwxI6Y
+	G/s8Jm79v0qrMfSgxG+2meysTceYhnTJc6vdfDPrl4qz5DOweFTs8V4OYZDRgm6l
+	/YDvnmiaHwyElwkxBkaPNl4iw45JojcFCtMvDWaGa1SOIust7Q==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3y47eg9x2b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 May 2024 04:46:57 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44F4kuLY012020
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 May 2024 04:46:56 GMT
+Received: from [10.110.99.73] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 14 May
+ 2024 21:46:55 -0700
+Message-ID: <7ec9b05b-7587-4182-b011-625bde9cef92@quicinc.com>
+Date: Tue, 14 May 2024 22:46:51 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240514231155.1004295-1-kuba@kernel.org> <CAHk-=wiSiGppp-J25Ww-gN6qgpc7gZRb_cP+dn3Q8_zdntzgYQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wiSiGppp-J25Ww-gN6qgpc7gZRb_cP+dn3Q8_zdntzgYQ@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Tue, 14 May 2024 21:06:06 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wj2ZJ_YE2CWJ6TXNQoOm+Q6H5LpQNLWmfft+SO21PW5Bg@mail.gmail.com>
-Message-ID: <CAHk-=wj2ZJ_YE2CWJ6TXNQoOm+Q6H5LpQNLWmfft+SO21PW5Bg@mail.gmail.com>
-Subject: Re: [GIT PULL] Networking for v6.10
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	pabeni@redhat.com, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: <edumazet@google.com>, <soheil@google.com>, <ncardwell@google.com>,
+        <yyd@google.com>, <ycheng@google.com>
+CC: <quic_stranche@quicinc.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+        <netdev@vger.kernel.org>
+From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
+Subject: Potential impact of commit dfa2f0483360 ("tcp: get rid of
+ sysctl_tcp_adv_win_scale")
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: v4dpMRLU9Lr9QuAkYvshVIRpLaTXBTIU
+X-Proofpoint-ORIG-GUID: v4dpMRLU9Lr9QuAkYvshVIRpLaTXBTIU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-14_16,2024-05-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ malwarescore=0 phishscore=0 spamscore=0 mlxlogscore=710 lowpriorityscore=0
+ clxscore=1011 impostorscore=0 suspectscore=0 priorityscore=1501
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405010000 definitions=main-2405150031
 
-On Tue, 14 May 2024 at 20:32, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> Why does it do that disgusting
->
->         struct bpf_array *array = container_of(map, struct bpf_array, map);
->         ...
->                 *insn++ = BPF_ALU32_IMM(BPF_AND, BPF_REG_0, array->index_mask);
->
-> thing? As far as I can tell, a bpf map can be embedded in many
-> different structures, not just that 'bpf_array' thing.
+We recently noticed that a device running a 6.6.17 kernel (A) was having 
+a slower single stream download speed compared to a device running 
+6.1.57 kernel (B). The test here is over mobile radio with iperf3 with 
+window size 4M from a third party server.
 
-Bah. It still needs to do that array->elem_size, so it's not just the
-spectre-v1 code that needs that 'bpf_array' thing.
+The radio conditions are the same between the devices so that maximum 
+achievable download speed will be the same. Both devices have the same 
+tcp_rmem values.
 
-And the non-percpu case seems to do all the same contortions, so I
-don't know why the new percpu array would show issues.
+We captured tcpdump at the device and the main difference was that the 
+receiver window advertised in the ACKs was going upto a maximum of ~2M 
+in A vs ~6M in B. By explicitly increasing the window size in iperf3 in 
+A, the download speed of A was able to match that of B which suggests 
+that the RTT was high and needed a larger window size to achieve the 
+download speed. We do not have tcp_shrink_window enabled.
 
-Oh well. I guess the bpf people will figure it out once they come back
-from "partying at LSFMM" as you put it.
+We noticed that there were some changes to window size done in commit 
+dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale"). After 
+reverting this commit in A, we observed that the receiver window 
+advertised in ACKs matches B.
 
-           Linus
+We logged free_space, allowed_space and full_space in 
+__tcp_select_window() in both devices and observed that the 
+allowed_space was 6MB+ on both devices, however the full_space was 
+smaller in A as the tp->window_clamp was smaller. The free_space was 
+smaller in A compared to B which I believe is an expected consequence of 
+the commit.
+
+Could you please advise on how we need to handle this. We are open to 
+trying out any debug patches.
 
