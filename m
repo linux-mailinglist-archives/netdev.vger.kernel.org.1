@@ -1,145 +1,149 @@
-Return-Path: <netdev+bounces-96764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36A408C7A5B
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 18:29:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 542778C7A64
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 18:31:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E53E328232C
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 16:29:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FC4A281A73
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 16:31:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50BCF1514D0;
-	Thu, 16 May 2024 16:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CCD8611B;
+	Thu, 16 May 2024 16:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TibPwk7S"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="TGZ+rhCh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B241509BC;
-	Thu, 16 May 2024 16:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B44801
+	for <netdev@vger.kernel.org>; Thu, 16 May 2024 16:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715876980; cv=none; b=mPrb5r+PRL9CkEuEtohE0c4eOR4jfpom/gCptkYqc2MDckFu3StE7FiX9DZ+iMXE+uxG1n4nQN3nEaTxON35dUDvhSHtznPm8up7rrZWyQIEUJRRKnbfVq1KVLnvCSbRMari14MfMX1xkaXNUkQGRs4N9rRcR5pMrFyWoBB0pUw=
+	t=1715877079; cv=none; b=LQf95fVTaIrGRSnDMVMk9lwvhExYQsXNQxjGSW8y5uPNA/72ufvOyph5s/S8o1MQ8YDo6LAwimLJC9Sj23g8Xl9TAVOALcCZpmVngf7I1nPT6nFjfbKqmRoDJ3hx5OFHW4iKzsGrDpGXZSl6G26yHYqtfirGJAJgIdlXYp6oHK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715876980; c=relaxed/simple;
-	bh=lY+7S4A6XSmJq1CdWc9SPvUyzxh3QRd8mgOGmumG8w0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WhSwoYn0/6VL8x5qs2nEEeLn8f/ExEbzJkup/xmyXLLrS8RsAFg5LK5XXA66+Lz2xwebfYhY5pOzQhZbISzQeB2J7W3UuOnpCR6KfXWTtUezeM4kPgo4xgQQXYGyQGg25iyfs7/8dskgifVXSUa0Tlk/BwJ4xkJm4Dw5B9sey0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TibPwk7S; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1ed0abbf706so61765135ad.2;
-        Thu, 16 May 2024 09:29:38 -0700 (PDT)
+	s=arc-20240116; t=1715877079; c=relaxed/simple;
+	bh=xkfznAhSXPPgMUvz2RZcB9OT2Zux0dt6kJDr+ShFPrA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TLn4wxdc3RG/1FZVUXwDD5F1lIhUNrrYYB1UVBC23F/ZIWFDb1A9kKeGp25YNJy1/1zu3Wq18UDIHykwLjE0bh3pSw+ju30ePOrTO5UXcg1fydPO5gUU5jkqXghxH7E0jXZTuqSnEJ6ObGmTOUelarXNrH0J4AlU7YMeL1bX1UY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=TGZ+rhCh; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-7e1fb2a81fdso5728939f.1
+        for <netdev@vger.kernel.org>; Thu, 16 May 2024 09:31:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715876978; x=1716481778; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qCM0vLqYp4D0LsdwKJQuyqySBeLV8hOPzh1mYzxab6U=;
-        b=TibPwk7SwXwBkqnqnN4wCILAFaPmj6p0GuOdXjyvAvzpKD9rLIo6AFG0vLeiWOjuDx
-         TMBdDYSvEVlkyPG5ZPZllRnfBh/ej73hEskaC1TzJRRDg49/ylg5UVbOnczcJj7sOR5z
-         muR855P2HL0OIAb41CTbpGFqfUXx2KLpAfyTTpYgFyvA5jEyaH7wURNjnBSst7qT7cWq
-         tXJHy/A57czsVGyE0nUYbGITaUXTy8n3SMnXoyhGPTr+vIEljSYQ95S6y7yFRZ2cr6Uc
-         DoxoJ7g/OTUL8zNVAtiOkquWvF48T7eEe9KdcwxEB22RD/RVHfTevKYnLpK9HpzO3ukP
-         Lb5w==
+        d=linuxfoundation.org; s=google; t=1715877076; x=1716481876; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pDnoiv+aAilJOglosMLJSLeZ15PVLhndVRN5KP2yh64=;
+        b=TGZ+rhChyRj5oWtecIQsAYYU5joL5ZarwVOJkKi6LVVn1xVoi0hSNjEtIObQLT8hdM
+         WIx5VkA6oEqMxG6aR2Yw7bwo1q4jd2ADzaHp2AXIyzKhZO4n3mtUjsfANJL7Et5QhgEA
+         8kIUJIrRB90zzkeSDU1NGARAEQHe6sXTJsed8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715876978; x=1716481778;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qCM0vLqYp4D0LsdwKJQuyqySBeLV8hOPzh1mYzxab6U=;
-        b=cwxid7mfPH3ylpDMly4GLfGpROT1kqJgaxHCm1RKrJjaI62iwNunJKnSclBzHqP8li
-         hWi0x0fCTzKRRVjpWqi87sbdQPXBh6uRgSm/wRftr8GRmn2hLtoQxxlJ5xPG80RH4FYm
-         rfTjKP64jkrMy/bS3ueXhkd2lpvY5zUjfIdhGfYw9tiyJOsmk6uUDZJzESTxqIb5o4oh
-         cA63MfEpQZ/BsszylBnf27+lwJgxz3TipX4vvDxcOnXqy+NVoleMpIi+mgckZzOTrFZ1
-         /bkkiByzEDS+sDT+I1w8wxmdDmmeFfh9i8d8c0jzpSir0AV7CzcrgE4MsgyFpU0XTcVW
-         sF9g==
-X-Forwarded-Encrypted: i=1; AJvYcCUInG6fnSk9p58YIKkJU/Qpk/V2TCYtNX/gHGSV5x1BTbd5RpwbLxX89v7cqmHzNr5YS46D82UqFeOC01E2JPfZfR3KvjjYKuxboM9Gr8gPmk81ygloRSLlK210u90/CJ3B5vVq
-X-Gm-Message-State: AOJu0Yz2luYjbVdjtnN++Dbteeut2PknwT8fcBSRC7DWBhNvaLz15uQb
-	CRdHT+4q3sHHTHeJPvYGYdS8xRnSCr83kxtHg+oePE692F3IcKk/
-X-Google-Smtp-Source: AGHT+IEKSm615OM2jZEEZXeRy8N6csz1RX69uyZnxpvohc49WnXZe704AwFWfI/zi975MB8nCXBC9A==
-X-Received: by 2002:a17:903:230b:b0:1e6:7731:80 with SMTP id d9443c01a7336-1ef43d16e69mr252547495ad.11.1715876977933;
-        Thu, 16 May 2024 09:29:37 -0700 (PDT)
-Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bf30c09sm140439565ad.130.2024.05.16.09.29.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 May 2024 09:29:37 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 16 May 2024 06:29:36 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Haakon Bugge <haakon.bugge@oracle.com>
-Cc: OFED mailing list <linux-rdma@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	netdev <netdev@vger.kernel.org>,
-	"rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	Manjunath Patil <manjunath.b.patil@oracle.com>,
-	Mark Zhang <markzhang@nvidia.com>,
-	Chuck Lever III <chuck.lever@oracle.com>,
-	Shiraz Saleem <shiraz.saleem@intel.com>,
-	Yang Li <yang.lee@linux.alibaba.com>
-Subject: Re: [PATCH v2 1/6] workqueue: Inherit NOIO and NOFS alloc flags
-Message-ID: <ZkY0cIiFOmkwzn5G@slm.duckdns.org>
-References: <20240515125342.1069999-1-haakon.bugge@oracle.com>
- <20240515125342.1069999-2-haakon.bugge@oracle.com>
- <ZkTos2YXowEFS2fR@slm.duckdns.org>
- <D9786636-CACE-47E1-B4B6-26AB2C4244C3@oracle.com>
+        d=1e100.net; s=20230601; t=1715877076; x=1716481876;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pDnoiv+aAilJOglosMLJSLeZ15PVLhndVRN5KP2yh64=;
+        b=XzQDgOyTZMS13htBfCWqUiFQouHo0Q/bWrusH2TKaLCiZGSbBAAQtB90xcwpyd7I79
+         OvQfZbn+fSnvAWziGZH+fDo+MhA1Mz8IFYHIJX2L0aauEN0fIkKsw+M16JGtvjvUfsl9
+         e+7UR8R/AFsQvdaGsqU/CGQz7tOcLbsBKRMMXFF0Dzit5aGykYMnn9WEAfCEhQqUorC+
+         zIuj5mANwucwIhP59NOzV8mZeO938HtTjnFFwXgXoy/IoAJ7KYbIko561TW12LJ90bO3
+         qWYIt0gX+QnomTnBGvjSGIYZ3dhEYErjUvOK0dfrEBJZpZtwpJpZHkXgeuCUoGC7Y85e
+         RIrA==
+X-Forwarded-Encrypted: i=1; AJvYcCXR4zt39H+xFc9/VC/cr6q1Tiu9RdopQjWS1aXQENfmJBizkwzC0fJPzsLUPdyrCwN+vU+PORA+o+r+ngZE8rDJBG0bBMXo
+X-Gm-Message-State: AOJu0Yyw95OPvBfXH2npd9PbZRafyPhgkxFJgW3iAZaouVVdyoqp5ix5
+	Yfxf+JTMyoxvbTdv6psS5Xi1Wz6luqcjDDrUZSxOUl5VpVTAXhT8iKrPawYoS08=
+X-Google-Smtp-Source: AGHT+IHC7NWHiVtGdW49HXEWLPpD9poqjpxpz8h5HFbktLyqnUrR9q12B55ixwuwmtZx24K1zeLkFg==
+X-Received: by 2002:a05:6e02:1c8b:b0:36c:c599:698a with SMTP id e9e14a558f8ab-36cc599af7dmr211295495ab.2.1715877075869;
+        Thu, 16 May 2024 09:31:15 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-36dbbd191b0sm7514315ab.17.2024.05.16.09.31.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 May 2024 09:31:15 -0700 (PDT)
+Message-ID: <9e72d97a-9a04-4423-a711-0c21c1c8b161@linuxfoundation.org>
+Date: Thu, 16 May 2024 10:31:13 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <D9786636-CACE-47E1-B4B6-26AB2C4244C3@oracle.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 08/66] selftests/cgroup: Drop define _GNU_SOURCE
+To: Tejun Heo <tj@kernel.org>
+Cc: Edward Liaw <edliaw@google.com>, shuah@kernel.org,
+ =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+ =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
+ Christian Brauner <brauner@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Zefan Li
+ <lizefan.x@bytedance.com>, Johannes Weiner <hannes@cmpxchg.org>,
+ Muchun Song <muchun.song@linux.dev>, Michal Hocko <mhocko@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Yosry Ahmed <yosryahmed@google.com>,
+ Nhat Pham <nphamcs@gmail.com>, Chengming Zhou <chengming.zhou@linux.dev>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-team@android.com, linux-security-module@vger.kernel.org,
+ netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+ bpf@vger.kernel.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20240510000842.410729-1-edliaw@google.com>
+ <20240510000842.410729-9-edliaw@google.com>
+ <ZkJHvrwZEqg6RJK5@slm.duckdns.org>
+ <bec3f30e-fc9a-45e2-b6ea-d739b2a2d019@linuxfoundation.org>
+ <ZkYymMDd690uufZy@slm.duckdns.org>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <ZkYymMDd690uufZy@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
-
-On Thu, May 16, 2024 at 03:27:15PM +0000, Haakon Bugge wrote:
-> > So, yeah, please don't do this. What if a NOIO callers wants to scheduler a
-> > work item so that it can user GFP_KERNEL allocations.
+On 5/16/24 10:21, Tejun Heo wrote:
+> On Thu, May 16, 2024 at 09:50:06AM -0600, Shuah Khan wrote:
+>> On 5/13/24 11:02, Tejun Heo wrote:
+>>> On Fri, May 10, 2024 at 12:06:25AM +0000, Edward Liaw wrote:
+>>>> _GNU_SOURCE is provided by lib.mk, so it should be dropped to prevent
+>>>> redefinition warnings.
+>>>>
+>>>> Signed-off-by: Edward Liaw <edliaw@google.com>
+>>>
+>>> Applied to cgroup/for-6.10.
+>>>
+>>> Thanks.
+>>>
+>>
+>> Hi Tejun,
+>>
+>> Please don't include this in your PR to Linus. This patch series needs
+>> to go together as it is causing several build warns and some errors.
 > 
-> If one work function want to use GPF_KERNEL and another using GFP_NOIO,
-> queued on the same workqueue, one could create two workqueues. Create one
-> that is surrounded by memalloc_noio_{save,restore}, another surrounded by
-> memalloc_flags_save() + current->flags &= ~PF_MEMALLOC_NOIO and
-> memalloc_flags_restore().
+> I'm afraid it's too late. The PR is too late. Do you want me to send an
+> amended PR with the commit reverted? If it's just temporary issues in
+> selftests, maybe we can just wait it out?
+> 
 
-This is too subtle and the default behavior doesn't seem great either - in
-most cases, the code path which sets up workqueues would be in GFP_KERNEL
-context as init paths usually are, so it's not like this would make things
-work automatically in most cases. In addition, now, the memory allocations
-for workqueues themselves have to be subject to the same GFP restrictions
-even when alloc_workqueue() is called from GFP_KERNEL context. It just
-doesn't seem well thought out.
+I am exploring options and leaning towards reverting the patch
 
-> When you say "deal with gfp flags directly", do you imply during WQ
-> creation or queuing work on one? I am OK with adding the other per-process
-> memory allocation flags, but that doesn's solve your initial issue ("if a
-> NOIO callers wants to scheduler a work item so that it can user
-> GFP_KERNEL").
+daef47b89efd ("selftests: Compile kselftest headers with -D_GNU_SOURCE")
 
-It being a purely convenience feature, I don't think there's hard
-requirement on where this should go although I don't know where you'd carry
-this information if you tied it to each work item. And, please don't single
-out specific GFP flags. Please make the feature generic so that users who
-may need different GFP masking can also use it too. The underlying GFP
-feature is already like that. There's no reason to restrict it from
-workqueue side.
+Your amending the PR helps me if I have to send revert. I am sorry
+for the trouble.
 
-Thanks.
+I can all of them together in a second update or after the merge window
+closes.
 
--- 
-tejun
+thanks,
+-- Shuah
+
+
 
