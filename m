@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-96773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B18118C7AF5
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 19:17:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 923C58C7B01
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 19:19:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E32011C20C04
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 17:17:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA5D21C20FEC
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 17:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BFC1154BF0;
-	Thu, 16 May 2024 17:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80E8C156238;
+	Thu, 16 May 2024 17:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xzDhDO0z"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nrZipxZp"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB0A1429E;
-	Thu, 16 May 2024 17:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9711429E;
+	Thu, 16 May 2024 17:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715879818; cv=none; b=aoGNOkhJgX5WCr4DTh90XET9VAHLtscP/GsQrnUXg7y2N0CZKOmbIgasoAJZdrwf03dnA3dN5nPdXgmCOIG/0AkZXRP+jA9Mxrca9VV380hvP+vs4k1z/znd79tbXgTHHkiAaHPuJr2biC5EQ8MwVck+Cf5HRVnsCYAonmPt02I=
+	t=1715879944; cv=none; b=liHEzB3IOLoEJb8ICbYt4uDBOhO6o21ZwC2+sOAoHJNfnm7pnLIO5UEjIjWdnOtJLkS6eWBsGBXROyM8lAZ6efD6FVVFKXd+0iG0QGjcWEiBVtIR4W90eUPic3Yc9aHJPv/ChL/4ek1mT83bXjWxHqwwx3rfWfcExyKZqenAOiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715879818; c=relaxed/simple;
-	bh=ggWmeHnyrvQuqQvGyWMWOlym1DXS5hCVdvJpfdraodk=;
+	s=arc-20240116; t=1715879944; c=relaxed/simple;
+	bh=MvMJ500IcUju/J5qbNPK3z8cC6mXwc3HjbRxf8hRgco=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kBXxbNyaJr86tRhq/ZXLkKyJrR51fvJcbpVGq8Js7IZCFVoRiXiPGbs1zjTJJcqsZXOHxuZBII3bpZQMmz8SUl4wtZ1cs8Q/zK9adE4IlMYZzAcnG9QfNieGmReXF3IbdShiAcKhz7JYVBI9d/8w1wel5B/zs+RkyI0wYcutBL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xzDhDO0z; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tz0/XYpu08UwnKZCJ8Z/2ioj1rQLP3SPvE4e1S+2mFnlsF74PKEsJWcZeEDpqipjcTgRAwWf41ODHPQqd+apRTRcMq2k5Uz8uoBgBRT2hpPIij3q4sx00muzb7k6jswyTObwMVRqx2mWpmMUfrYs1PGh/kguKllqXB7+esOihTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nrZipxZp; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,27 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=L3wGeenFMy7/WOW4QFAgkiw9kjyavP6D58uibLg+zeQ=; b=xzDhDO0zy8jM8TbZ/zEH94TD45
-	O2iu36ZSzdCma/wwtnxy6P0+0gktQUwCUkhd67e4NcERMUg1dxU96geVKOcCl4cEfgiyxrG5JHUFx
-	ZA9TKMI/wlxXqd2FXq9ebpRVkMs+6mXiT4qtuf2T0LuqhDh8zMcWTExPzW66f/0s2HyE=;
+	bh=xxQYQK2/Vh6beHOFwpkTAc40DkWP8JdY+uh5YwSLWrQ=; b=nrZipxZp3XsCImZTe22oaTOTPr
+	4vihGnamFREThHGpVWBMw5lG8IAMgZg0g4WnuFvxKTfRwXk5mJFkCleLY9nOHM11FHahkUvj5Nsx5
+	9R9h2FQc2Qm1uQJiO4PDaxB73rrhHWh3lx3os2mMunSO7oDMaiYnH7bPbxlwbadAGd5Q=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1s7eiR-00FWcm-Rw; Thu, 16 May 2024 19:16:27 +0200
-Date: Thu, 16 May 2024 19:16:27 +0200
+	id 1s7ekZ-00FWeX-Bd; Thu, 16 May 2024 19:18:39 +0200
+Date: Thu, 16 May 2024 19:18:39 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Thorsten Blum <thorsten.blum@toblux.com>
-Cc: arnd@arndb.de, davem@davemloft.net, edumazet@google.com,
-	glaubitz@physik.fu-berlin.de, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, lkp@intel.com, netdev@vger.kernel.org,
-	nico@fluxnic.net, pabeni@redhat.com
-Subject: Re: [PATCH v2] net: smc91x: Fix pointer types
-Message-ID: <0efd687d-3df5-49dd-b01c-d5bd977ae12e@lunn.ch>
-References: <AEF82223-BB2B-4AF0-9732-0F2F605AAEC2@toblux.com>
- <20240516155610.191612-3-thorsten.blum@toblux.com>
+To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+	yury.norov@gmail.com, leon@kernel.org, cai.huoqing@linux.dev,
+	ssengar@linux.microsoft.com, vkuznets@redhat.com,
+	tglx@linutronix.de, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, schakrabarti@microsoft.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: mana: Fix the extra HZ in mana_hwc_send_request
+Message-ID: <d9a7f46e-1e57-4c66-8e47-dfdd696f8f43@lunn.ch>
+References: <1715875538-21499-1-git-send-email-schakrabarti@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,39 +65,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240516155610.191612-3-thorsten.blum@toblux.com>
+In-Reply-To: <1715875538-21499-1-git-send-email-schakrabarti@linux.microsoft.com>
 
-On Thu, May 16, 2024 at 05:56:12PM +0200, Thorsten Blum wrote:
-> Use void __iomem pointers as parameters for mcf_insw() and mcf_outsw()
-> to align with the parameter types of readw() and writew().
+On Thu, May 16, 2024 at 09:05:38AM -0700, Souradeep Chakrabarti wrote:
+> Commit 62c1bff593b7 added an extra HZ along with msecs_to_jiffies.
+> This patch fixes that.
 > 
-> Use lp->base instead of ioaddr when calling SMC_outsw(), SMC_outsb(),
-> SMC_insw(), and SMC_insb() to retain its type across macro boundaries
-> and to fix the following warnings reported by kernel test robot:
-> 
-> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse: warning: incorrect type in argument 1 (different address spaces)
-> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse:    expected void *a
-> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse:    got void [noderef] __iomem *
-> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse: warning: incorrect type in argument 1 (different address spaces)
-> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse:    expected void *a
-> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse:    got void [noderef] __iomem *
-> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse: warning: incorrect type in argument 1 (different address spaces)
-> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse:    expected void *a
-> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse:    got void [noderef] __iomem *
-> drivers/net/ethernet/smsc/smc91x.c:483:17: sparse: warning: incorrect type in argument 1 (different address spaces)
-> drivers/net/ethernet/smsc/smc91x.c:483:17: sparse:    expected void *a
-> drivers/net/ethernet/smsc/smc91x.c:483:17: sparse:    got void [noderef] __iomem *
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202405160853.3qyaSj8w-lkp@intel.com/
-> Acked-by: Nicolas Pitre <nico@fluxnic.net>
+> Cc: stable@vger.kernel.org
+> Fixes: 62c1bff593b7 ("net: mana: Configure hwc timeout from hardware")
+> Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#netdev-faq
 
-You could add a follow up patch which removes the 
-void __iomem *__ioaddr = ioaddr; lines and uses lp->base.
-The code will then be more uniform.
+Please set the Subject line to [PATCH net] to indicate which tree this
+applies to.
 
 	Andrew
 
