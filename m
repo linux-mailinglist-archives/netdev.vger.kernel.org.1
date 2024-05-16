@@ -1,157 +1,228 @@
-Return-Path: <netdev+bounces-96749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBAB8C794C
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 17:25:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75D748C794E
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 17:25:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AAE91F2275C
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 15:25:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98EB91C21EC0
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 15:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C908E14D443;
-	Thu, 16 May 2024 15:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E832314B97B;
+	Thu, 16 May 2024 15:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gsbox4WI"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="BOdDqJPW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99CAA14D439;
-	Thu, 16 May 2024 15:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFFE14B978
+	for <netdev@vger.kernel.org>; Thu, 16 May 2024 15:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715873119; cv=none; b=MxI1B+N3xjc2KMAx7xnLqz8JGxa/b3A2x5D4uy5HzH//O95/Xroqs8B06FGmxeC1N1nid5WkodN9F/qwCVoak4t0Xx/pq9WNett8gqU3zem7s9dU3eEp/sjuFpRdgasdJH+zutYi4uy6Ko6c3nxsppBUN5axUprjDHylClN0ZjI=
+	t=1715873129; cv=none; b=pXslzZIud5EnNWKKrLwKj4ALDTprCH62TNhAAxZM4SwMyNpx3I2vduwnlmO2jCtXU+ThpsKPDghtob81tm5lvqYlxz2fjkK1Kj9MRg+W8k1Iey6RB0/v1qrMiqtsL3iNv7V/uKgG827T4sgk+wcr1lX3CbYluSgFTIQfiPSuP64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715873119; c=relaxed/simple;
-	bh=hjj/nXZu32n4CjvTA1Xw1/LPmTE9VwI8rF+cAW747CU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PJV/5DLSki2xNsf3u9pTSiDzsfwiYJzWVFw8RD4Uddi8mJkLJQjDQdVWJmO764PbnE7XsSkXMJZVi328LEXwgWMyhhbyDbPlz2bS9roagYl7/il6CzNenxBoCWFZdQtjigJ5Fx5cQ/ebJR34v/7xFt/zaKulUk0Jb8u64vU7iQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gsbox4WI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5F6AC113CC;
-	Thu, 16 May 2024 15:25:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715873119;
-	bh=hjj/nXZu32n4CjvTA1Xw1/LPmTE9VwI8rF+cAW747CU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=gsbox4WIarrcvlGApHd3bAgvUb14EEBRLQdy9wYXYbyAUhMURC4QHzxvk8Xtkm9eq
-	 3TQaW6gbJczpa3JF62JxDdeqpTmiBe7rNSPNMBu5zzHxi7rLLCt/TQqJHnnBBjgF2b
-	 a4rVOSiqoJM2P4ZUOCRRSqSso3Z+mH2Ym4FbuxCQYaOGdYzF9VCfQIwhzUVgQNcRXA
-	 QWN40g8z2mIuugW9VXPNYpVDZyN3/Y2o6Vy6zpCfmgtEsUbnpTj57hHYpgyfi005Lc
-	 TKt5v0PEiZ5M2DnQGfeQsEdfD5cJKvQ6oVqIAJDHiLqKMmJk2hQ+Fo/3EZhMTR/g17
-	 jLSHHkAXamOdg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	liuhangbin@gmail.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Petr Machata <petrm@nvidia.com>,
-	vladimir.oltean@nxp.com
-Subject: [PATCH net v3] selftests: net: local_termination: annotate the expected failures
-Date: Thu, 16 May 2024 08:25:13 -0700
-Message-ID: <20240516152513.1115270-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.45.0
+	s=arc-20240116; t=1715873129; c=relaxed/simple;
+	bh=f3SS1eFWt0ACAdjmZS/GbnlBgkVs0UinCkd30Yl50cY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gEh1Q9doezVZaH7gommOHQ8WpnnfTQ+8gWB7nyEGVaVPWdIucSRRorW/2vigR0lDuBeFHvZ0Vu9pO1PN8hDKR7rFGVeH9QcKtYJnnzFTh9zLeml0+W4d+6ngmJrRFdtEo8vzzSSq1DTGHGybqmT3zCZ9IDJrcr3GCJXeGOFC9+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=BOdDqJPW; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-56e1bbdb362so2901390a12.1
+        for <netdev@vger.kernel.org>; Thu, 16 May 2024 08:25:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715873126; x=1716477926; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=iMEsJHMiD/X46uJXawQgYh9V4HrqmWeXXkDDfg4vbl0=;
+        b=BOdDqJPWWeDYqRkH9oKHu1PGzkc2R+A4pjrTfFZs+V2dvMGxdyhck1dLeV7/bQfVl0
+         4T40GswY/XLxMLxn2zUK0qm5u6D4F2lT8UDLX2DUMFsvn620pP2lQcB3fBAulV4XITHY
+         eEq+z7TxIc4h1eEKaRaxe3YExhJiHdQKT5zwrA63+fqrt50WX0OWXmy5WjgHudNDXuP+
+         pJsUdJNOxboHxGKnsB71Y4iX9YXDFz2uEDwH5B4yYO/wpFrzN8TXs7ILN6noFFgQuFhw
+         wMQ/F/1SkDLm/+s5MMF4rtMRRbn6hYHynjynpfJTyDsgJ+C1FXRgJUYxsSEy/J64W1fS
+         SEFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715873126; x=1716477926;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iMEsJHMiD/X46uJXawQgYh9V4HrqmWeXXkDDfg4vbl0=;
+        b=AmHitxQSrIfaEEEgB+v9udMrczHZ2hQnjEVhN0EpwamQ/l5wRbVsAsB3T5J0g3rYGM
+         JBwmkwoJiJfGpVbFJqsSAeTYxEUiaGEJDpUjy6o6sN8+way6DyJS7EqEHBwDDUTcKamn
+         n9PJ7q3N9m/xp0po3BhJRPZzc7HYu88n2ocY5/ZxiEQpjXX6JeFc7k8GEAImxfcfKwYg
+         ORkZClYTiAp0IuRmHSGxnmS/Q29Uxl/W8nee+NfGeteNMIGwAigiWk4Ljz5yxCB51D0y
+         hG5rzTBUGplWrqPTAIUQ7W4yVCNcVkrH2WkHPAZM+5qKqA6bq7iEcNX4AJHKdC/iRTqQ
+         bXGg==
+X-Forwarded-Encrypted: i=1; AJvYcCWPBWeAM8ktov0plUoKwgs6Bhh4vQLJli+UdHHeggPWik4GOjrWA6FGRfZxxYpR3aPlIFIiXdXNk00ktup27oOVXbp526aN
+X-Gm-Message-State: AOJu0YwG5py6hnSvHns352bAlu4gHjhAfr6kJIgxmA1OzOAt83FR9nhW
+	coKKi8l4mnV7CkCfuiOoic+zf+1KhZT+5xsiB33Cac21ItOndaQCxi7rIDLEt58=
+X-Google-Smtp-Source: AGHT+IH6QhUzPVp4eNTpup0OheM47LaT+Z/ki9a3NhbHKFKIi97/nvnM8TTY4J9sQHrYRWv51epAMg==
+X-Received: by 2002:a50:aade:0:b0:572:9b21:e0c9 with SMTP id 4fb4d7f45d1cf-5734d5cf9damr20696976a12.14.1715873125834;
+        Thu, 16 May 2024 08:25:25 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-573413b2ac3sm10377997a12.38.2024.05.16.08.25.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 May 2024 08:25:24 -0700 (PDT)
+Date: Thu, 16 May 2024 17:25:20 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
+	virtualization@lists.linux.dev, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com
+Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
+Message-ID: <ZkYlYLFthXVmHOaQ@nanopsycho.orion>
+References: <20240510065121-mutt-send-email-mst@kernel.org>
+ <Zj4A9XY7z-TzEpdz@nanopsycho.orion>
+ <20240510072431-mutt-send-email-mst@kernel.org>
+ <ZkRlcBU0Nb3O-Kg1@nanopsycho.orion>
+ <20240515041909-mutt-send-email-mst@kernel.org>
+ <ZkSKo1npMxCVuLfT@nanopsycho.orion>
+ <ZkSwbaA74z1QwwJz@nanopsycho.orion>
+ <CACGkMEsLfLLwjfHu5MT8Ug0_tS_LASvw-raiXiYx_WHJzMcWbg@mail.gmail.com>
+ <ZkXmAjlm-A50m4dx@nanopsycho.orion>
+ <20240516083100-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240516083100-mutt-send-email-mst@kernel.org>
 
-Vladimir said when adding this test:
+Thu, May 16, 2024 at 02:31:59PM CEST, mst@redhat.com wrote:
+>On Thu, May 16, 2024 at 12:54:58PM +0200, Jiri Pirko wrote:
+>> Thu, May 16, 2024 at 06:48:38AM CEST, jasowang@redhat.com wrote:
+>> >On Wed, May 15, 2024 at 8:54 PM Jiri Pirko <jiri@resnulli.us> wrote:
+>> >>
+>> >> Wed, May 15, 2024 at 12:12:51PM CEST, jiri@resnulli.us wrote:
+>> >> >Wed, May 15, 2024 at 10:20:04AM CEST, mst@redhat.com wrote:
+>> >> >>On Wed, May 15, 2024 at 09:34:08AM +0200, Jiri Pirko wrote:
+>> >> >>> Fri, May 10, 2024 at 01:27:08PM CEST, mst@redhat.com wrote:
+>> >> >>> >On Fri, May 10, 2024 at 01:11:49PM +0200, Jiri Pirko wrote:
+>> >> >>> >> Fri, May 10, 2024 at 12:52:52PM CEST, mst@redhat.com wrote:
+>> >> >>> >> >On Fri, May 10, 2024 at 12:37:15PM +0200, Jiri Pirko wrote:
+>> >> >>> >> >> Thu, May 09, 2024 at 04:28:12PM CEST, mst@redhat.com wrote:
+>> >> >>> >> >> >On Thu, May 09, 2024 at 03:31:56PM +0200, Jiri Pirko wrote:
+>> >> >>> >> >> >> Thu, May 09, 2024 at 02:41:39PM CEST, mst@redhat.com wrote:
+>> >> >>> >> >> >> >On Thu, May 09, 2024 at 01:46:15PM +0200, Jiri Pirko wrote:
+>> >> >>> >> >> >> >> From: Jiri Pirko <jiri@nvidia.com>
+>> >> >>> >> >> >> >>
+>> >> >>> >> >> >> >> Add support for Byte Queue Limits (BQL).
+>> >> >>> >> >> >> >>
+>> >> >>> >> >> >> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>> >> >>> >> >> >> >
+>> >> >>> >> >> >> >Can we get more detail on the benefits you observe etc?
+>> >> >>> >> >> >> >Thanks!
+>> >> >>> >> >> >>
+>> >> >>> >> >> >> More info about the BQL in general is here:
+>> >> >>> >> >> >> https://lwn.net/Articles/469652/
+>> >> >>> >> >> >
+>> >> >>> >> >> >I know about BQL in general. We discussed BQL for virtio in the past
+>> >> >>> >> >> >mostly I got the feedback from net core maintainers that it likely won't
+>> >> >>> >> >> >benefit virtio.
+>> >> >>> >> >>
+>> >> >>> >> >> Do you have some link to that, or is it this thread:
+>> >> >>> >> >> https://lore.kernel.org/netdev/21384cb5-99a6-7431-1039-b356521e1bc3@redhat.com/
+>> >> >>> >> >
+>> >> >>> >> >
+>> >> >>> >> >A quick search on lore turned up this, for example:
+>> >> >>> >> >https://lore.kernel.org/all/a11eee78-b2a1-3dbc-4821-b5f4bfaae819@gmail.com/
+>> >> >>> >>
+>> >> >>> >> Says:
+>> >> >>> >> "Note that NIC with many TX queues make BQL almost useless, only adding extra
+>> >> >>> >>  overhead."
+>> >> >>> >>
+>> >> >>> >> But virtio can have one tx queue, I guess that could be quite common
+>> >> >>> >> configuration in lot of deployments.
+>> >> >>> >
+>> >> >>> >Not sure we should worry about performance for these though.
+>> >> >>> >What I am saying is this should come with some benchmarking
+>> >> >>> >results.
+>> >> >>>
+>> >> >>> I did some measurements with VDPA, backed by ConnectX6dx NIC, single
+>> >> >>> queue pair:
+>> >> >>>
+>> >> >>> super_netperf 200 -H $ip -l 45 -t TCP_STREAM &
+>> >> >>> nice -n 20 netperf -H $ip -l 10 -t TCP_RR
+>> >> >>>
+>> >> >>> RR result with no bql:
+>> >> >>> 29.95
+>> >> >>> 32.74
+>> >> >>> 28.77
+>> >> >>>
+>> >> >>> RR result with bql:
+>> >> >>> 222.98
+>> >> >>> 159.81
+>> >> >>> 197.88
+>> >> >>>
+>> >> >>
+>> >> >>Okay. And on the other hand, any measureable degradation with
+>> >> >>multiqueue and when testing throughput?
+>> >> >
+>> >> >With multiqueue it depends if the flows hits the same queue or not. If
+>> >> >they do, the same results will likely be shown.
+>> >>
+>> >> RR 1q, w/o bql:
+>> >> 29.95
+>> >> 32.74
+>> >> 28.77
+>> >>
+>> >> RR 1q, with bql:
+>> >> 222.98
+>> >> 159.81
+>> >> 197.88
+>> >>
+>> >> RR 4q, w/o bql:
+>> >> 355.82
+>> >> 364.58
+>> >> 233.47
+>> >>
+>> >> RR 4q, with bql:
+>> >> 371.19
+>> >> 255.93
+>> >> 337.77
+>> >>
+>> >> So answer to your question is: "no measurable degradation with 4
+>> >> queues".
+>> >
+>> >Thanks but I think we also need benchmarks in cases other than vDPA.
+>> >For example, a simple virtualization setup.
+>> 
+>> For virtualization setup, I get this:
+>> 
+>> VIRT RR 1q, w/0 bql:
+>> 49.18
+>> 49.75
+>> 50.07
+>> 
+>> VIRT RR 1q, with bql:
+>> 51.33
+>> 47.88
+>> 40.40
+>> 
+>> No measurable/significant difference.
+>
+>Seems the results became much noisier? Also
 
-  The bridge driver fares particularly badly [...] mainly because
-  it does not implement IFF_UNICAST_FLT.
+Not enough data to assume that I believe.
 
-See commit 90b9566aa5cd ("selftests: forwarding: add a test for
-local_termination.sh").
 
-We don't want to hide the known gaps, but having a test which
-always fails prevents us from catching regressions. Report
-the cases we know may fail as XFAIL.
+>I'd expect a regression if any to be in a streaming benchmark.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: liuhangbin@gmail.com
-CC: shuah@kernel.org
-CC: linux-kselftest@vger.kernel.org
-CC: Petr Machata <petrm@nvidia.com>
-CC: vladimir.oltean@nxp.com
+Can you elaborate?
 
-v3:
- - use xfail_on_veth correctly as a "prefix" call
- - dropping Vladimir's tags since the code is quite different now
-v2: https://lore.kernel.org/r/20240509235553.5740-1-kuba@kernel.org/
- - remove duplicated log_test_xfail
-v1: https://lore.kernel.org/all/20240509235553.5740-1-kuba@kernel.org/
----
- .../net/forwarding/local_termination.sh       | 30 +++++++++++--------
- 1 file changed, 18 insertions(+), 12 deletions(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/local_termination.sh b/tools/testing/selftests/net/forwarding/local_termination.sh
-index c5b0cbc85b3e..4b364cdf3ef0 100755
---- a/tools/testing/selftests/net/forwarding/local_termination.sh
-+++ b/tools/testing/selftests/net/forwarding/local_termination.sh
-@@ -155,25 +155,30 @@ run_test()
- 		"$smac > $MACVLAN_ADDR, ethertype IPv4 (0x0800)" \
- 		true
- 
--	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address" \
--		"$smac > $UNKNOWN_UC_ADDR1, ethertype IPv4 (0x0800)" \
--		false
-+	xfail_on_veth $h1 \
-+		check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address" \
-+			"$smac > $UNKNOWN_UC_ADDR1, ethertype IPv4 (0x0800)" \
-+			false
- 
- 	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address, promisc" \
- 		"$smac > $UNKNOWN_UC_ADDR2, ethertype IPv4 (0x0800)" \
- 		true
- 
--	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address, allmulti" \
--		"$smac > $UNKNOWN_UC_ADDR3, ethertype IPv4 (0x0800)" \
--		false
-+	xfail_on_veth $h1 \
-+		check_rcv $rcv_if_name \
-+			"Unicast IPv4 to unknown MAC address, allmulti" \
-+			"$smac > $UNKNOWN_UC_ADDR3, ethertype IPv4 (0x0800)" \
-+			false
- 
- 	check_rcv $rcv_if_name "Multicast IPv4 to joined group" \
- 		"$smac > $JOINED_MACV4_MC_ADDR, ethertype IPv4 (0x0800)" \
- 		true
- 
--	check_rcv $rcv_if_name "Multicast IPv4 to unknown group" \
--		"$smac > $UNKNOWN_MACV4_MC_ADDR1, ethertype IPv4 (0x0800)" \
--		false
-+	xfail_on_veth $h1 \
-+		check_rcv $rcv_if_name \
-+			"Multicast IPv4 to unknown group" \
-+			"$smac > $UNKNOWN_MACV4_MC_ADDR1, ethertype IPv4 (0x0800)" \
-+			false
- 
- 	check_rcv $rcv_if_name "Multicast IPv4 to unknown group, promisc" \
- 		"$smac > $UNKNOWN_MACV4_MC_ADDR2, ethertype IPv4 (0x0800)" \
-@@ -187,9 +192,10 @@ run_test()
- 		"$smac > $JOINED_MACV6_MC_ADDR, ethertype IPv6 (0x86dd)" \
- 		true
- 
--	check_rcv $rcv_if_name "Multicast IPv6 to unknown group" \
--		"$smac > $UNKNOWN_MACV6_MC_ADDR1, ethertype IPv6 (0x86dd)" \
--		false
-+	xfail_on_veth $h1 \
-+		check_rcv $rcv_if_name "Multicast IPv6 to unknown group" \
-+			"$smac > $UNKNOWN_MACV6_MC_ADDR1, ethertype IPv6 (0x86dd)" \
-+			false
- 
- 	check_rcv $rcv_if_name "Multicast IPv6 to unknown group, promisc" \
- 		"$smac > $UNKNOWN_MACV6_MC_ADDR2, ethertype IPv6 (0x86dd)" \
--- 
-2.45.0
-
+>
+>-- 
+>MST
+>
 
