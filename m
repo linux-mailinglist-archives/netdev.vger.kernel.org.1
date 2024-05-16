@@ -1,173 +1,163 @@
-Return-Path: <netdev+bounces-96685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69D528C724F
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 09:58:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1283E8C7258
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 10:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C8491C2178A
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 07:58:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43FED1C217E7
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 08:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5E052F64;
-	Thu, 16 May 2024 07:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F2C604D5;
+	Thu, 16 May 2024 08:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m4ovsxHe"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="UmMcVkWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E7950A80
-	for <netdev@vger.kernel.org>; Thu, 16 May 2024 07:57:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2232F4120A;
+	Thu, 16 May 2024 08:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715846277; cv=none; b=fdNVo9HJZ2Py7wj8oN2Jk8vwo11oolB4nwlLQPVeTUVSyBBx4Kmd9JXBfCJaG4b4D9KOMwmjmzl/IeiTeBlnfUBcgNFIYR61hCgjFKTyLTpBjQU1zak849O/s7F+Fj3SmIy6kGanBdT/0MQUnVHXvw9ApQ1b9OfPE1/IH8+iujA=
+	t=1715846437; cv=none; b=kkV9bx82fXTqGymhLjO15eB4eheshaLIzrgXBnUuLSZf1DJauturWZDN625kJ7JuMrLu6hMKxwaTH8b5jfML7FxkKk9UmpcU9cQ7pOHCFcaeF3cP2wxSKSuBOEymLzpOXnLew1rembSBs/G7bTstsH+aifeYV3Tiz9UAr3I+czw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715846277; c=relaxed/simple;
-	bh=EgBouWkS1lUrZ4JKXbjXsxiuGM/lqPDFzwZ0dypANqc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j4AURrvkr7p7kZ75+NibRkhPyDTilfYkdth49xaw9m86OSZbjPHQOcEetv7iuLMuzQ1kyZe2KK+UroVJbO620t8sUSuT3BRIvkhGF/uiTB3UoUV1G8l+FMMUoZVhxtiPpKCyZltniMZts7U2osr/W5BHYrn2BsW0ffGMjaI4Av0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m4ovsxHe; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-572f6c56cdaso51024a12.0
-        for <netdev@vger.kernel.org>; Thu, 16 May 2024 00:57:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715846274; x=1716451074; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zwCPDgEvz1cHD8BgxkzBvHnQ1zEbnlyRVVrwyIv21c4=;
-        b=m4ovsxHebgiW6Dg4Svl34pzL0JJCxXmKhXr6AVmTG2/7yBWUE+S/M+an7CYLU0GGJ+
-         pFMakfX9MsWd9/YjJIuO4mvNDmgonXknUZsfKXO9KbYBzXWi6cxH2n5ro5n4i9ioDNuD
-         0fc8UwG6HfwNbjpUIBP7+26/xPXtwb6HvtHmuSRwndAq0747ZOHtIHfxMeBgL1uO6BiN
-         wMaqEObQd5/Aj5HOIiS2EqNYsV3QsXbcl85IlxWnnVgQG6ELD9z9MAPrPeN7xuY4q+Gx
-         JKP/uXPnucQa0Tz/pCA/iut90XNh5zZPY1oSTZNj0Wj/cxWrTuWzFHwWbW76VclSQf9J
-         nDjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715846274; x=1716451074;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zwCPDgEvz1cHD8BgxkzBvHnQ1zEbnlyRVVrwyIv21c4=;
-        b=r/e2aRBUKU+87wZHVBeMJtUroyAcNRO2zK3wYmCWorjY8BbGDWBUbioHs6T0zmsvAZ
-         1bdFF16x7EnBDstukWJnBwoOcn0eUygPSS+odN8AreofgwSOs3BonGnEffZNLRtDSvOy
-         cJLHn5Tdx1e54SIaWp+O2nSheMycUyrBqpEkiG46Rmn6oXCSHkIIHXtqfUceJ8Jtz1z7
-         4SPOK3u6FoqjtORrfXpVDVjd8ap8eKvC+eL2igseyZ+oKbBp1/UcK/e+8sLJ3DojVyen
-         h8w6ZZMKkl6IuDT5azUukL30Vy2SXcLJMneQ8NeSAAoo6ixHPCEHmFeguPKUDO7VrCZy
-         sVAw==
-X-Forwarded-Encrypted: i=1; AJvYcCXCpbbc2dyFxIqEBjeUzkDHRyYSjYBJSWHUyH1eI68WC8ngVsIbHEHGqWc2OnOT1spxc1cn9+hwBToRDH0ey3O2+QGLSSRY
-X-Gm-Message-State: AOJu0YzgdL1UaGEoxrvETYp3zRMLq04+5vmIMuWvxCs2yglYIGw8TLKc
-	A4y2b/zxwvEr2TLBXY5yI5lk4hDRygmDX+uTzfAu8GzN7fuyMzZStltkP0kxvcxvR1M+yCR6Hwm
-	ODX2cUeiw5TcJBQtJUZqJm2EYTKWLHBfl6XU1
-X-Google-Smtp-Source: AGHT+IGtVps28vwJJ/kd/CB5egGBhMT/xkCd1XCgqZF0kyn/71HMYJIBukN9B132dEKdBuEFt3rx/CWzJRt9In4KlhA=
-X-Received: by 2002:a50:cb8c:0:b0:573:438c:778d with SMTP id
- 4fb4d7f45d1cf-574ae3c1280mr925656a12.1.1715846274034; Thu, 16 May 2024
- 00:57:54 -0700 (PDT)
+	s=arc-20240116; t=1715846437; c=relaxed/simple;
+	bh=ir7OEPsIB4tXdeYYmNY7Cbeyj6ggj2jZXmerEjaLdfE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=sdbweVHhURrhZcoWqC1oGEuf0WnOb3RuGArqixvr0pMbitOhSui9cBHbUi6DvmtaQvhGhxXYFC7j6YalCjDRoySNlE6D/XnWuNwAWcX/oku+ica9S9FdDjIL/Fxm5JNyt/MmaVmVozbRmTkD7UwURvL6RAZYe/ppmhs569HCtlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=UmMcVkWG; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44G7e2A0009990;
+	Thu, 16 May 2024 10:00:03 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	selector1; bh=Y9trgIEu9RJeCdLikqsHLkO6L244vgMdpxM1Z3pwaD0=; b=Um
+	McVkWGSeyAqG7zib2bWvlJJKU1n11jEEZc09GsrTpzqCiEXZypojsxCIhQ6QGb2R
+	h/85D95WXhwEGLy/EIbDDASXYgx1N9neWTvA7r2fGgB6Ram2rWeAe1YrfAtlcfy8
+	wwfOFzXocBd8Z0W7NA8jrn9cHAO7OhfaY/5ZriS/jmiH4tZRzWVOWpx8QUJfXTLA
+	gyVWgOjZ7tP0MiI8vnu46iBBTPLOM6ywtH7uujQMgnWfhJvJ0hEp9BAmIIaMTAhH
+	X4D+tcpYqpTsMOrhEIuDyLJa5Z5rBuzsiaCGm0RCL9IIf8QtU+FHgHuNpyPuMPQx
+	jH+uBQgahirt8dZKazAQ==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3y4sxv4f6v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 May 2024 10:00:03 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 3999440044;
+	Thu, 16 May 2024 09:59:58 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 39B872122F0;
+	Thu, 16 May 2024 09:58:48 +0200 (CEST)
+Received: from [10.48.86.79] (10.48.86.79) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 16 May
+ 2024 09:58:47 +0200
+Message-ID: <5544e11b-25a8-4465-a7cc-f1e9b1d0f0cc@foss.st.com>
+Date: Thu, 16 May 2024 09:58:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <7ec9b05b-7587-4182-b011-625bde9cef92@quicinc.com>
- <CANn89iKRuxON3pWjivs0kU-XopBiqTZn4Mx+wOKHVmQ97zAU5A@mail.gmail.com>
- <60b04b0a-a50e-4d4a-a2bf-ea420f428b9c@quicinc.com> <CANn89i+QM1D=+fXQVeKv0vCO-+r0idGYBzmhKnj59Vp8FEhdxA@mail.gmail.com>
- <c0257948-ba11-4300-aa5c-813b4db81157@quicinc.com>
-In-Reply-To: <c0257948-ba11-4300-aa5c-813b4db81157@quicinc.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 16 May 2024 09:57:38 +0200
-Message-ID: <CANn89iKPqdBWQMQMuYXDo=SBi7gjQgnBMFFnHw0BZK328HKFwA@mail.gmail.com>
-Subject: Re: Potential impact of commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-To: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
-Cc: soheil@google.com, ncardwell@google.com, yyd@google.com, ycheng@google.com, 
-	quic_stranche@quicinc.com, davem@davemloft.net, kuba@kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 10/11] ARM: dts: stm32: add ethernet1 and ethernet2 for
+ STM32MP135F-DK board
+To: Marek Vasut <marex@denx.de>,
+        Christophe Roullier
+	<christophe.roullier@foss.st.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Richard
+ Cochran <richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Liam
+ Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20240426125707.585269-1-christophe.roullier@foss.st.com>
+ <20240426125707.585269-11-christophe.roullier@foss.st.com>
+ <43024130-dcd6-4175-b958-4401edfb5fd8@denx.de>
+ <8bf3be27-3222-422d-bfff-ff67271981d8@foss.st.com>
+ <9c1d80eb-03e7-4d39-b516-cbcae0d50e4a@denx.de>
+Content-Language: en-US
+From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+In-Reply-To: <9c1d80eb-03e7-4d39-b516-cbcae0d50e4a@denx.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-16_03,2024-05-15_01,2023-05-22_02
 
-On Thu, May 16, 2024 at 9:16=E2=80=AFAM Subash Abhinov Kasiviswanathan (KS)
-<quic_subashab@quicinc.com> wrote:
->
-> On 5/15/2024 11:36 PM, Eric Dumazet wrote:
-> > On Thu, May 16, 2024 at 4:32=E2=80=AFAM Subash Abhinov Kasiviswanathan =
-(KS)
-> > <quic_subashab@quicinc.com> wrote:
-> >>
-> >> On 5/15/2024 1:10 AM, Eric Dumazet wrote:
-> >>> On Wed, May 15, 2024 at 6:47=E2=80=AFAM Subash Abhinov Kasiviswanatha=
-n (KS)
-> >>> <quic_subashab@quicinc.com> wrote:
-> >>>>
-> >>>> We recently noticed that a device running a 6.6.17 kernel (A) was ha=
-ving
-> >>>> a slower single stream download speed compared to a device running
-> >>>> 6.1.57 kernel (B). The test here is over mobile radio with iperf3 wi=
-th
-> >>>> window size 4M from a third party server.
-> >>>
-> >
-> > DRS is historically sensitive to initial conditions.
-> >
-> > tcp_rmem[1] seems too big here for DRS to kick smoothly.
-> >
-> > I would use 0.5 MB perhaps, this will also also use less memory for
-> > local (small rtt) connections
-> I tried 0.5MB for the rmem[1] and I see the same behavior where the
-> receiver window is not scaling beyond half of what is specified on
-> iperf3 and is not matching the download speed of B.
+Hi
 
+On 5/16/24 02:23, Marek Vasut wrote:
+> On 5/13/24 6:01 PM, Alexandre TORGUE wrote:
+>> Hi Marek
+> 
+> Hi,
+> 
+>> On 4/26/24 17:44, Marek Vasut wrote:
+>>> On 4/26/24 2:57 PM, Christophe Roullier wrote:
+>>>> Add dual Ethernet:
+>>>> -Ethernet1: RMII with crystal
+>>>> -Ethernet2: RMII without crystal
+>>>> PHYs used are SMSC (LAN8742A)
+>>>>
+>>>> With Ethernet1, we can performed WoL from PHY instead of GMAC point
+>>>> of view.
+>>>> (in this case IRQ for WoL is managed as wakeup pin and configured
+>>>> in OS secure).
+>>>
+>>> How does the Linux PHY driver process such a PHY IRQ ?
+>>>
+>>> Or is Linux unaware of the PHY IRQ ? Doesn't that cause issues ?
+>>
+>> In this case, we want to have an example to wakeup the system from 
+>> Standby low power mode (VDDCPU and VDD_CORE off) thanks to a magic 
+>> packet detected by the PHY. The PHY then assert his interrupt output 
+>> signal.
+>> On MP13 DK platform, this PHY signal is connected to a specific GPIO
+>> aka "Wakeup pins" (only 6 wakeup pins an MP13). Those specific GPIOs 
+>> are handled by the PWR peripheral which is controlled by the secure OS.
+> 
+> What does configure the PHY for this wakeup mode ?
 
-What do you mean by "specified by iperf3" ?
+Linux device tree.
 
-We can not guarantee any stable performance for applications setting SO_RCV=
-BUF.
+> 
+>> On WoL packet, the Secure OS catches the PHY interrupt and uses 
+>> asynchronous notification mechanism to warn Linux (on our platform we 
+>> use a PPI). On Linux side, Optee core driver creates an irq 
+>> domain/irqchip triggered on the asynchronous notification. Each device 
+>> which use a wakeup pin need then to request an IRQ on this "Optee irq 
+>> domain".
+>>
+>> This OPTEE irq domain will be pushed soon.
+> 
+> I suspect it might make sense to add this WoL part separately from the 
+> actual ethernet DT nodes, so ethernet could land and the WoL 
+> functionality can be added when it is ready ?
 
-This is because the memory overhead depends from one version to the other.
+If at the end we want to have this Wol from PHY then I agree we need to 
+wait. We could push a WoL from MAC for this node before optee driver 
+patches merge but not sure it makes sens.
 
->
-> >>
-> >> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/=
-drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c?h=3Dv6.6.17#n385
-> >
-> > Hmm... rmnet_map_deaggregate() looks very strange.
-> >
-> > I also do not understand why this NIC driver uses gro_cells, which was
-> > designed for virtual drivers like tunnels.
-> >
-> > ca32fb034c19e00c changelog is sparse,
-> > it does not explain why standard GRO could not be directly used.
-> >
-> rmnet doesn't directly interface with HW. It is a virtual driver which
-> attaches over real hardware drivers like MHI (PCIe), QMI_WWAN (USB), IPA
-> to expose networking across different mobile APNs.
->
-> As rmnet didn't have it's own NAPI struct, I added support for GRO using
-> cells. I tried disabling GRO and I don't see a difference in download
-> speeds or the receiver window either.
->
-> >>
-> >>   From netif_receive_skb_entry tracing, I see that the truesize is aro=
-und
-> >> ~2.5K for ~1.5K packets.
-> >
-> > This is a bit strange, this does not match :
-> >
-> >> ESTAB       4324072 0      192.0.0.2:42278                223.62.236.1=
-0:5215
-> >>        ino:129232 sk:3218 fwmark:0xc0078 <->
-> >>            skmem:(r4511016,
-> >
-> > -> 4324072 bytes of payload , using 4511016 bytes of memory
-> I probably need to dig into this further. If the memory usage here was
-> inline with the actual size to truesize ratio, would it cause the
-> receiver window to grow.
->
-> Only explicitly increasing the window size to 16M in iperf3 matches the
-> download speed of B which suggests that sender server is unable to scale
-> the throughput for 4M case due to limited receiver window advertised by
-> A for the RTT in this specific configuration.
-
-What happens if you let autotuning enabled ?
+Alex
 
