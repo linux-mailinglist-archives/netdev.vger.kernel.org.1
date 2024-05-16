@@ -1,281 +1,137 @@
-Return-Path: <netdev+bounces-96669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54E328C7093
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 05:16:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63D508C70AE
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 05:31:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 717DE1C21189
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 03:16:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E99D1F2274F
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 03:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D360E1A2C39;
-	Thu, 16 May 2024 03:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758684411;
+	Thu, 16 May 2024 03:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="L5pc85aC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I+bmX6qu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC421862
-	for <netdev@vger.kernel.org>; Thu, 16 May 2024 03:15:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA87523A6;
+	Thu, 16 May 2024 03:31:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715829356; cv=none; b=UtJ6eFfLquNyaeMzsUpExJpJAogMq/5k+FkRr7IBrJzPwtvhv7MAzIHIGsRZZX5l9Fgqm0xcT728ZkJtfx4clrNRCpqFm/a3aBAzdmkYv9IEJ8ItMj1HFXYonuJh4qLMGpnsFOiHATX07jjwILgnH2jhD+lx29CX8L61VvTfLkY=
+	t=1715830291; cv=none; b=BHQ1YjUSJ2YOphpsnn9rSUfM+ZswvXH+SFftcxfgEIxl6POidzhLk7aJ5ujoOjt7/dp0Cx2z66qZkCDX2wd2haQYONelebxEozcjS6ipkqTkXScXKq0QIZ4mcjvizGI1xXruyhJ/q0YPhm8H0Ql3WT8Dsu0XOy6bwisbvHpjmGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715829356; c=relaxed/simple;
-	bh=Ck2Nw3i0eBNHAfwrtTAecQi2+lDsbfEH+mb9QGsN5TI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UEwuAQOOInXWiRLEI84cI51wIP+TBQlvxjslq7oEhlkJfLU8kL+E2jus6mZ/1cICXof1DnL1HzpSW8iAgJSsCleJTRD08juxGq3wpB/uQzK+NgT4vQXwhvEqMpBonrkDdGmd5fNO55d7uC2XXvJQRbi781MwrJ1BC4yzR4NR7/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=L5pc85aC; arc=none smtp.client-ip=209.85.161.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-5b27369b0e3so4157485eaf.1
-        for <netdev@vger.kernel.org>; Wed, 15 May 2024 20:15:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1715829354; x=1716434154; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mc6P0QBJk/o6Xns5zeCFfeIHIpvdDG/dknYVsSKeQ3I=;
-        b=L5pc85aCFoCYUWOGmjg2PoT8v3cR3//lNLRfmu1r1YAB/R7QYkpW2HNChKGiddwKXK
-         uv+K/3sRokLlpmdjfCJFrYB6Hc/JhqUD6a6PhUu10YU/GkpJhFOAY2HR0sD2e04SCGhX
-         Zj/mZDxqKzTpmmytLRiSxPs4wXNn1R8AbTFw1GnXjMG1mEhqaplXwQSkeOkO7bcdq79A
-         i4rHdARqmMaFNH1R0ARHVnSnaAnQ9mV3zHAKAORkqgz8k1mBzZ3o/8hT+lBXcJPjszG5
-         in8TKjDy46Y7w+O23/CPwiAbhX3QHykFE+dcIJ3Kwj1RQYzLDr32ZiNHn7Ctt4XQx6kX
-         w5Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715829354; x=1716434154;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mc6P0QBJk/o6Xns5zeCFfeIHIpvdDG/dknYVsSKeQ3I=;
-        b=Z47UCTvkQrS5ZkdIbY3ijfWQ3w7OkpkOnVDeWAohPoyFbEJgO+jd+xMfayCZffJ9C3
-         CXw49jUIH9Utt8QvHh5xOpDxV3aa5YJrh5nICjU6jsxArF1grgpK2esyahzAwRwnhpHG
-         vk+WbyjJeN7DBEFVdXYRGUsJsYrkcdpRmtAkHmjTSQq57jCogZOjKGtvBTxpTix9J6jF
-         O6ek1Qy78vq4EUluM92VNp1N1+MOAsa65KuRdihL97G1OU82HuV26TC7aj4V7L/z7QP7
-         bc95w3XU4Dg45+ZayeRlgvBuTQy6StyLqqTeEE8qlg7WfTdQnGIXmQg9Nc5Hf3LB6eUu
-         p1BA==
-X-Forwarded-Encrypted: i=1; AJvYcCWT/G7k0wVZjR3dYCGRdCsHqIzfQ6npK19lj/tsv/WsKSeF1jyOnV+K8l4klZsg3p7iRc2HqSJSUbx6TTbDQp9cujIF/f2H
-X-Gm-Message-State: AOJu0YwGpSx+nJaU6zLw3gmNF/REgeTby9/szgYkNzvis81x61MirqjV
-	d2kIT4EzUH9RI9ih6rneXKh7O/aYI1LPfIN1ZYfv6BWmtyWarq8u4SKTK3BeA/Y=
-X-Google-Smtp-Source: AGHT+IF7Xp+lktXA8GPkGnB7Vs0YYEJLSeV+njJLOz6ktfH2aQw+bMeP//pkZK/RozRmiuZtbeukjg==
-X-Received: by 2002:a05:6870:d153:b0:244:ba40:8b29 with SMTP id 586e51a60fabf-244ba409c58mr16014187fac.43.1715829353960;
-        Wed, 15 May 2024 20:15:53 -0700 (PDT)
-Received: from [10.84.154.38] ([203.208.167.149])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-658764fda40sm655658a12.5.2024.05.15.20.15.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 May 2024 20:15:53 -0700 (PDT)
-Message-ID: <1803b7c0-bc56-46d6-835f-f3802b8b7e00@bytedance.com>
-Date: Thu, 16 May 2024 11:15:43 +0800
+	s=arc-20240116; t=1715830291; c=relaxed/simple;
+	bh=6nIFCyTBysDjoWLfPU6KU5s1MlTbkpP/5bwNBnLHUxw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XuZ+ToWJJg7y6nOG8mOcb/aeGjkIAUzEoFWylYDce71xKYlnEc5gD1TR4KMg0KgcR8pQFtZsRixkruF7RvaCVg7plwQb+7B7yL5kTqMhYH7o4s1nVvPpU5Ih+gS4p8m6XcEpeANb6cRC4aP4p4x5Pg0rm+oFysmwGkU4REiqbOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I+bmX6qu; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715830290; x=1747366290;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6nIFCyTBysDjoWLfPU6KU5s1MlTbkpP/5bwNBnLHUxw=;
+  b=I+bmX6quc3YUH9Ntn0NHwkv8Fok9o6K/6DfbY6308BXUXLC98HrKidTa
+   DDcWTIJxTt8YsLZMG6RS+3UPdcQwdZlNF4LgW1V9OmyrvmRbBD9u9rylg
+   nsPArq9KAQ66VDyvwQg4LapPJrOjSJmo6CJaqv0IlFZqYPrHllpWPbGrI
+   VT5lbv5h2qGo6G2mMK2O7MctFWckjO93FCqtlLU9Y2VcETX3Jg6Q7lqxl
+   BhJWUz96D+qmWDyX3vsLBFMtLITTp3vSRRgs4QpmlOLhWXebz1k4Ictev
+   KZulfv9jtXaxhOH1JBkv7XKEbh6lcXI5TZtl+sPsyvrYDhLlG325dsLDE
+   w==;
+X-CSE-ConnectionGUID: Fn8U16i9TlSGqouH9j4GZw==
+X-CSE-MsgGUID: 3UVcfwqEQpmawZyFM00LeA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="15744027"
+X-IronPort-AV: E=Sophos;i="6.08,163,1712646000"; 
+   d="scan'208";a="15744027"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2024 20:31:29 -0700
+X-CSE-ConnectionGUID: 1v3OYIM+SeapcY81BgdmRg==
+X-CSE-MsgGUID: frZcW+IsRWGRidxMfJAYKA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,163,1712646000"; 
+   d="scan'208";a="62119217"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 15 May 2024 20:31:27 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s7Rq0-000DZo-2b;
+	Thu, 16 May 2024 03:31:24 +0000
+Date: Thu, 16 May 2024 11:31:20 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ronak Doshi <ronak.doshi@broadcom.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Ronak Doshi <ronak.doshi@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/4] vmxnet3: add latency measurement support in
+ vmxnet3
+Message-ID: <202405161123.iWtQjhIw-lkp@intel.com>
+References: <20240514182050.20931-3-ronak.doshi@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Re: [PATCH bpf-next] bpf: tcp: Improve bpf write tcp opt
- performance
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: edumazet@google.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
- laoar.shao@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20240515081901.91058-1-zhoufeng.zf@bytedance.com>
- <87seyjwgme.fsf@cloudflare.com>
-From: Feng Zhou <zhoufeng.zf@bytedance.com>
-In-Reply-To: <87seyjwgme.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240514182050.20931-3-ronak.doshi@broadcom.com>
 
-在 2024/5/15 17:48, Jakub Sitnicki 写道:
-> On Wed, May 15, 2024 at 04:19 PM +08, Feng zhou wrote:
->> From: Feng Zhou <zhoufeng.zf@bytedance.com>
->>
->> Set the full package write tcp option, the test found that the loss
->> will be 20%. If a package wants to write tcp option, it will trigger
->> bpf prog three times, and call "tcp_send_mss" calculate mss_cache,
->> call "tcp_established_options" to reserve tcp opt len, call
->> "bpf_skops_write_hdr_opt" to write tcp opt, but "tcp_send_mss" before
->> TSO. Through bpftrace tracking, it was found that during the pressure
->> test, "tcp_send_mss" call frequency was 90w/s. Considering that opt
->> len does not change often, consider caching opt len for optimization.
-> 
-> You could also make your BPF sock_ops program cache the value and return
-> the cached value when called for BPF_SOCK_OPS_HDR_OPT_LEN_CB.
-> 
-> If that is in your opinion prohibitevely expensive then it would be good
-> to see a sample program and CPU cycle measurements (bpftool prog profile).
-> 
+Hi Ronak,
 
-I'm not referring to the overhead introduced by the time-consuming
-operation of bpf prog. I have tested that bpf prog does nothing and
-returns directly, and the loss is still 20%. During the pressure test
-process, "tcp_send_mss" and "__tcp_transmit_skb" the call frequency per
-second
+kernel test robot noticed the following build warnings:
 
-@[
-     bpf_skops_hdr_opt_len.isra.46+1
-     tcp_established_options+730
-     tcp_current_mss+81
-     tcp_send_mss+23
-     tcp_sendmsg_locked+285
-     tcp_sendmsg+58
-     sock_sendmsg+48
-     sock_write_iter+151
-     new_sync_write+296
-     vfs_write+165
-     ksys_write+89
-     do_syscall_64+89
-     entry_SYSCALL_64_after_hwframe+68
-]: 3671671
+[auto build test WARNING on net-next/main]
 
-@[
-     bpf_skops_write_hdr_opt.isra.47+1
-     __tcp_transmit_skb+761
-     tcp_write_xmit+822
-     __tcp_push_pending_frames+52
-     tcp_close+813
-     inet_release+60
-     __sock_release+55
-     sock_close+17
-     __fput+179
-     task_work_run+112
-     exit_to_usermode_loop+245
-     do_syscall_64+456
-     entry_SYSCALL_64_after_hwframe+68
-]: 36125
+url:    https://github.com/intel-lab-lkp/linux/commits/Ronak-Doshi/vmxnet3-prepare-for-version-9-changes/20240515-023833
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240514182050.20931-3-ronak.doshi%40broadcom.com
+patch subject: [PATCH net-next 2/4] vmxnet3: add latency measurement support in vmxnet3
+config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20240516/202405161123.iWtQjhIw-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240516/202405161123.iWtQjhIw-lkp@intel.com/reproduce)
 
-"tcp_send_mss" before TSO, without packet aggregation, and
-"__tcp_transmit_skb" after TSO, the gap between the two is
-100 times.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405161123.iWtQjhIw-lkp@intel.com/
 
->>
->> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
->> ---
->>   include/linux/tcp.h            |  3 +++
->>   include/uapi/linux/bpf.h       |  8 +++++++-
->>   net/ipv4/tcp_output.c          | 12 +++++++++++-
->>   tools/include/uapi/linux/bpf.h |  8 +++++++-
->>   4 files changed, 28 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
->> index 6a5e08b937b3..74437fcf94a2 100644
->> --- a/include/linux/tcp.h
->> +++ b/include/linux/tcp.h
->> @@ -455,6 +455,9 @@ struct tcp_sock {
->>   					  * to recur itself by calling
->>   					  * bpf_setsockopt(TCP_CONGESTION, "itself").
->>   					  */
->> +	u8	bpf_opt_len;		/* save tcp opt len implementation
->> +					 * BPF_SOCK_OPS_HDR_OPT_LEN_CB fast path
->> +					 */
->>   #define BPF_SOCK_OPS_TEST_FLAG(TP, ARG) (TP->bpf_sock_ops_cb_flags & ARG)
->>   #else
->>   #define BPF_SOCK_OPS_TEST_FLAG(TP, ARG) 0
->> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
->> index 90706a47f6ff..f2092de1f432 100644
->> --- a/include/uapi/linux/bpf.h
->> +++ b/include/uapi/linux/bpf.h
->> @@ -6892,8 +6892,14 @@ enum {
->>   	 * options first before the BPF program does.
->>   	 */
->>   	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
->> +	/* Fast path to reserve space in a skb under
->> +	 * sock_ops->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB.
->> +	 * opt length doesn't change often, so it can save in the tcp_sock. And
->> +	 * set BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG to no bpf call.
->> +	 */
->> +	BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG = (1<<7),
->>   /* Mask of all currently supported cb flags */
->> -	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0x7F,
->> +	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0xFF,
->>   };
->>   
->>   /* List of known BPF sock_ops operators.
->> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
->> index ea7ad7d99245..0e7480a58012 100644
->> --- a/net/ipv4/tcp_output.c
->> +++ b/net/ipv4/tcp_output.c
->> @@ -488,12 +488,21 @@ static void bpf_skops_hdr_opt_len(struct sock *sk, struct sk_buff *skb,
->>   {
->>   	struct bpf_sock_ops_kern sock_ops;
->>   	int err;
->> +	struct tcp_sock *th = (struct tcp_sock *)sk;
->>   
->> -	if (likely(!BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk),
->> +	if (likely(!BPF_SOCK_OPS_TEST_FLAG(th,
->>   					   BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG)) ||
->>   	    !*remaining)
->>   		return;
->>   
->> +	if (likely(BPF_SOCK_OPS_TEST_FLAG(th,
->> +					  BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG)) &&
->> +	    th->bpf_opt_len) {
->> +		*remaining -= th->bpf_opt_len;
-> 
-> What if *remaining value shrinks from one call to the next?
-> 
-> BPF sock_ops program can't react to change. Feels like there should be a
-> safety check to prevent an underflow.
-> 
+All warnings (new ones prefixed by >>):
 
-Thanks for the reminder, I'll add a judgment.
+   In function 'vmxnet3_get_cycles',
+       inlined from 'vmxnet3_rq_rx_complete' at drivers/net/vmxnet3/vmxnet3_drv.c:1675:25:
+>> drivers/net/vmxnet3/vmxnet3_drv.c:151:9: warning: 'asm' operand 2 probably does not match constraints
+     151 |         asm volatile("rdpmc" : "=a" (low), "=d" (high) : "c" (pmc));
+         |         ^~~
+   drivers/net/vmxnet3/vmxnet3_drv.c:151:9: error: impossible constraint in 'asm'
+   In function 'vmxnet3_get_cycles',
+       inlined from 'vmxnet3_tq_xmit.isra' at drivers/net/vmxnet3/vmxnet3_drv.c:1316:28:
+>> drivers/net/vmxnet3/vmxnet3_drv.c:151:9: warning: 'asm' operand 2 probably does not match constraints
+     151 |         asm volatile("rdpmc" : "=a" (low), "=d" (high) : "c" (pmc));
+         |         ^~~
 
->> +		opts->bpf_opt_len = th->bpf_opt_len;
->> +		return;
->> +	}
->> +
->>   	/* *remaining has already been aligned to 4 bytes, so *remaining >= 4 */
->>   
->>   	/* init sock_ops */
->> @@ -538,6 +547,7 @@ static void bpf_skops_hdr_opt_len(struct sock *sk, struct sk_buff *skb,
->>   	opts->bpf_opt_len = *remaining - sock_ops.remaining_opt_len;
->>   	/* round up to 4 bytes */
->>   	opts->bpf_opt_len = (opts->bpf_opt_len + 3) & ~3;
->> +	th->bpf_opt_len = opts->bpf_opt_len;
->>   
->>   	*remaining -= opts->bpf_opt_len;
->>   }
->> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
->> index 90706a47f6ff..f2092de1f432 100644
->> --- a/tools/include/uapi/linux/bpf.h
->> +++ b/tools/include/uapi/linux/bpf.h
->> @@ -6892,8 +6892,14 @@ enum {
->>   	 * options first before the BPF program does.
->>   	 */
->>   	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
->> +	/* Fast path to reserve space in a skb under
->> +	 * sock_ops->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB.
->> +	 * opt length doesn't change often, so it can save in the tcp_sock. And
->> +	 * set BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG to no bpf call.
->> +	 */
->> +	BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG = (1<<7),
-> 
-> Have you considered a bpf_reserve_hdr_opt() flag instead?
-> 
-> An example or test coverage would to show this API extension in action
-> would help.
-> 
 
-bpf_reserve_hdr_opt () flag can't finish this. I want to optimize
-that bpf prog will not be triggered frequently before TSO. Provide
-a way for users to not trigger bpf prog when opt len is unchanged.
-Then when writing opt, if len changes, clear the flag, and then
-change opt len in the next package.
+vim +/asm +151 drivers/net/vmxnet3/vmxnet3_drv.c
 
-In the next version, I will add test cases.
+   145	
+   146	static u64
+   147	vmxnet3_get_cycles(int pmc)
+   148	{
+   149		u32 low, high;
+   150	
+ > 151		asm volatile("rdpmc" : "=a" (low), "=d" (high) : "c" (pmc));
+   152		return (low | ((u_int64_t)high << 32));
+   153	}
+   154	
 
->>   /* Mask of all currently supported cb flags */
->> -	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0x7F,
->> +	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0xFF,
->>   };
->>   
->>   /* List of known BPF sock_ops operators.
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
