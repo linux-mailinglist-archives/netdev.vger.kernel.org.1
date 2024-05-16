@@ -1,160 +1,155 @@
-Return-Path: <netdev+bounces-96680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 410F68C71E0
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 09:16:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A94D8C71FF
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 09:23:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D263B20EEF
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 07:16:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 164DB1F21074
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 07:23:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20B825765;
-	Thu, 16 May 2024 07:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4AD9134CE3;
+	Thu, 16 May 2024 07:23:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="MOkONVXm"
+	dkim=pass (2048-bit key) header.d=scaleway.com header.i=@scaleway.com header.b="JJzHXs7+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5942410A26
-	for <netdev@vger.kernel.org>; Thu, 16 May 2024 07:16:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587A313174F
+	for <netdev@vger.kernel.org>; Thu, 16 May 2024 07:23:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715843800; cv=none; b=jGBcuIBdYcZCCg6Jd2vKCAnUCfyKuUuGdgYtIf/npcqGDNaF9ca48RqAP3cNJD6MP/tH1cERH4X7zISaTx+xQ1UxAnHsb73yYoDmfXNhQorTQHcibUqcbKYRe/ZV/7wCKUbKqmG0DOQk510FszLgli72HPP+KcCiSHznyTqxKVM=
+	t=1715844232; cv=none; b=tv102zWekNpuOrq1XxfaYH9NyEJoSS/qt6VKVvajsixNWlpNmDSq2l2RohQkvyXCtERNfrsl+23n5PiDd2YV1w7D+r+DuM/ve1TVQ4lkd8qjXNAFPiEtXksG3MXP0eGx2Jog/k7OaSgjbQeCcQwSZRHkeMjKYE7xA16aW1dg7v0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715843800; c=relaxed/simple;
-	bh=MbheoSNBz8GTcK8zgg1rp3CDQ6E/XZ4PVqndWeYq4zc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=b3FtFwmOfHJSVFek3pGtDYeFPpeQWGWdtL4wySZkrCNYEukpZtFZM97C76eqg4XLNdC6UNBZnwecH5rDS5H4Gv28foRLeGCVciNaThkLMCwAJTGQNKdOyM/qUb1PwaMOz7vWVxt6haA8+SQqdQQyXTAo3JXffWNO060OsOe1AhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=MOkONVXm; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44FHpi3B002468;
-	Thu, 16 May 2024 07:16:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=tNGv9zP6R4hvEkkOU6L8626izOjceDm6nUegDVe0gVU=; b=MO
-	kONVXmVscmxKU56M/D5YxzUVpWaQRj9BtENc7teChMgW8CLQw3JNZ+njzn4yaiF0
-	1nz3XuibT242/TldeLN0T0sSv6oORkjmPLH5OIl2NYp3t/fqyPTKsCaxfMCI6IES
-	lHf8056ATO9PscXDX1VN8t1EbKfElk9JvUOkq/UfTJIXjEp2rwdjN9b3Cedkv3dQ
-	t/WDoY2bWg04CHogP3MbjSHqEy/lEIRmvBAWP53DuAYRkU5Hts1eLuxtB4KrxJrX
-	rZvEj2Ba/1sHljk0dncM8uY8On9NWEh6VvyoowiJIRLHFlsPP+/XSmtMnlMZ7PQJ
-	eUGrg8/Iypxt0phNqgbA==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3y51tuh84r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 May 2024 07:16:32 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44G7GV16005860
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 May 2024 07:16:31 GMT
-Received: from [10.110.99.73] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 16 May
- 2024 00:16:30 -0700
-Message-ID: <c0257948-ba11-4300-aa5c-813b4db81157@quicinc.com>
-Date: Thu, 16 May 2024 01:16:29 -0600
+	s=arc-20240116; t=1715844232; c=relaxed/simple;
+	bh=BM28czHJkrxIOn/sbZz4geF2C2RwLLHZzoDcy2dKKIk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=ptnts1KFzZhJw60NoaPqdNSi/FJalSU1hUpp08lGMeqkJJymwHKGihn33DHC1DmDjUkD16USHtSR2yJle/kobSf150B3jroCM/PvxtGH4sa/LpNIETzWUYH/E0Fwtci2Mke2OqManMmXthKLgsNUKZVwDZr8GNkHWrL3WgYIQMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=scaleway.com; spf=pass smtp.mailfrom=scaleway.com; dkim=pass (2048-bit key) header.d=scaleway.com header.i=@scaleway.com header.b=JJzHXs7+; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=scaleway.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scaleway.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-34dc8d3fbf1so6342569f8f.1
+        for <netdev@vger.kernel.org>; Thu, 16 May 2024 00:23:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=scaleway.com; s=google; t=1715844196; x=1716448996; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XL0FTfvENfwWrCYwB+MmbP6gqgnUiHTPhyDgj2XRp7o=;
+        b=JJzHXs7+H0THnZJeCIljmQ0yzdqMNHNYTRl6CauRI7TsKw+IYnjG/TorUOShUgjGIn
+         LbONcnl2U3wS8Kd/UmBOeZjVvzUZvnyoO6EnSS8J5FHa5m5t3F7x/JTDQvMbEdlGvZmY
+         K4QtEeRd5hq2UDj8JsXgz94eYsFLhEb6dyRIQVzfoJNxD33i2SxT/rPb/ApqKhD2LkUV
+         0ZdBPINzy1XjSGK1qqm/8QNXvDErHkUZtX0XD2UjGbbWrGLjirD1DNG6bTqvRSBG9SXQ
+         K8kjhNDYob4KaVmrsma4pvlikFfrCApWTukqx+bSB+PKa3HNDxx3D0QZxphD8SL9TLP7
+         mzcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715844196; x=1716448996;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XL0FTfvENfwWrCYwB+MmbP6gqgnUiHTPhyDgj2XRp7o=;
+        b=bzGPbWWKU4fcpIIVVlcKJ2s4kXQl2j2qKqAv3gUukfKPhQNFTBOcj1Qm6ItCIXwQbd
+         f6PGYpdFsddJ0ZhjO8ZKUJpx3DYte6EkUayc3f9JvEwyTGO07/ynrEPvQTYXW0WCyt1N
+         oaDwB+SBCY0rNQnpk5uPDbJIKBfpHQLRtFdbo7bNzKFaPYswzI7djMRG+23GyJmDn7oJ
+         AACPklrUx1VBAe8ZQ5mYsDkKNBNoR8C+o4hyFUO8dSGaloL6ed4+pNFTE2wSiKcMa/D0
+         jXixc8nvXSqU4aJVaJW9NVVhw4MAbSfzIVfTJEPP7daQhcCWs7oh6aL4QKrG/H8fXxHp
+         3UQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVUg/Oi1WZXB2+ViQAsFjpRit9mPZZCc9X3NclTncav/AHUoteRWCwgKVWhP/VBwBZGkcaBBzu+8TMJ4vl+JNK/hTPpGzdC
+X-Gm-Message-State: AOJu0YzbSge4Y3P3UyAHe57ieQ8aICad/y7KP8gmqeRrBrbxSU1d9NbK
+	FvkdTD3gwS6y/awimDOS3/vgEDWU3nMuLneLvotZYZgVaEXLAtmQcpnmXhw3S2OW8zohcKwj5QL
+	QZStYEimF9QazrORpY1iszoJJbi6eRxHIlHuo0TCbqEW84ztMSkc=
+X-Google-Smtp-Source: AGHT+IEbBukBnzsyHqEO/oQoeZxlHx6cB8ynz0XKJg9oOYoFGq7/Dm/8ZydoKwUYG/jcVm7jAo7DM9I44o/Pg5RNylA=
+X-Received: by 2002:a5d:61cd:0:b0:34d:b47c:7e6f with SMTP id
+ ffacd0b85a97d-3504a6334c4mr11338959f8f.27.1715844196381; Thu, 16 May 2024
+ 00:23:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Potential impact of commit dfa2f0483360 ("tcp: get rid of
- sysctl_tcp_adv_win_scale")
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-CC: <soheil@google.com>, <ncardwell@google.com>, <yyd@google.com>,
-        <ycheng@google.com>, <quic_stranche@quicinc.com>,
-        <davem@davemloft.net>, <kuba@kernel.org>, <netdev@vger.kernel.org>
-References: <7ec9b05b-7587-4182-b011-625bde9cef92@quicinc.com>
- <CANn89iKRuxON3pWjivs0kU-XopBiqTZn4Mx+wOKHVmQ97zAU5A@mail.gmail.com>
- <60b04b0a-a50e-4d4a-a2bf-ea420f428b9c@quicinc.com>
- <CANn89i+QM1D=+fXQVeKv0vCO-+r0idGYBzmhKnj59Vp8FEhdxA@mail.gmail.com>
-From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
-In-Reply-To: <CANn89i+QM1D=+fXQVeKv0vCO-+r0idGYBzmhKnj59Vp8FEhdxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: UHPWRS4lIlHXmom_V5AZODchUroq4Gxv
-X-Proofpoint-GUID: UHPWRS4lIlHXmom_V5AZODchUroq4Gxv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-16_03,2024-05-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
- spamscore=0 impostorscore=0 bulkscore=0 suspectscore=0 clxscore=1015
- mlxscore=0 lowpriorityscore=0 mlxlogscore=999 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405010000 definitions=main-2405160050
+From: Frederic TOULBOT <ftoulbot@scaleway.com>
+Date: Thu, 16 May 2024 09:23:05 +0200
+Message-ID: <CAAV7vNcRbVb00vp_u1q0f6jjqwVhx4GFAzWoP0AsRA1MhAfeBw@mail.gmail.com>
+Subject: ethtool module info only reports hex info
+To: mkubecek@suse.cz, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 5/15/2024 11:36 PM, Eric Dumazet wrote:
-> On Thu, May 16, 2024 at 4:32 AM Subash Abhinov Kasiviswanathan (KS)
-> <quic_subashab@quicinc.com> wrote:
->>
->> On 5/15/2024 1:10 AM, Eric Dumazet wrote:
->>> On Wed, May 15, 2024 at 6:47 AM Subash Abhinov Kasiviswanathan (KS)
->>> <quic_subashab@quicinc.com> wrote:
->>>>
->>>> We recently noticed that a device running a 6.6.17 kernel (A) was having
->>>> a slower single stream download speed compared to a device running
->>>> 6.1.57 kernel (B). The test here is over mobile radio with iperf3 with
->>>> window size 4M from a third party server.
->>>
-> 
-> DRS is historically sensitive to initial conditions.
-> 
-> tcp_rmem[1] seems too big here for DRS to kick smoothly.
-> 
-> I would use 0.5 MB perhaps, this will also also use less memory for
-> local (small rtt) connections
-I tried 0.5MB for the rmem[1] and I see the same behavior where the 
-receiver window is not scaling beyond half of what is specified on 
-iperf3 and is not matching the download speed of B.
+Hello, I have the impression that there is an unwanted change in the
+output of the ethtool -m command with a certain QSFP type
 
->>
->> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c?h=v6.6.17#n385
-> 
-> Hmm... rmnet_map_deaggregate() looks very strange.
-> 
-> I also do not understand why this NIC driver uses gro_cells, which was
-> designed for virtual drivers like tunnels.
-> 
-> ca32fb034c19e00c changelog is sparse,
-> it does not explain why standard GRO could not be directly used.
-> 
-rmnet doesn't directly interface with HW. It is a virtual driver which 
-attaches over real hardware drivers like MHI (PCIe), QMI_WWAN (USB), IPA 
-to expose networking across different mobile APNs.
+I tested versions 6.5-1 / 5.16-1 / 5.4-1
 
-As rmnet didn't have it's own NAPI struct, I added support for GRO using 
-cells. I tried disabling GRO and I don't see a difference in download 
-speeds or the receiver window either.
+The bug seems very close to this one
+https://lists.openwall.net/netdev/2023/11/23/118
 
->>
->>   From netif_receive_skb_entry tracing, I see that the truesize is around
->> ~2.5K for ~1.5K packets.
-> 
-> This is a bit strange, this does not match :
-> 
->> ESTAB       4324072 0      192.0.0.2:42278                223.62.236.10:5215
->>        ino:129232 sk:3218 fwmark:0xc0078 <->
->>            skmem:(r4511016,
-> 
-> -> 4324072 bytes of payload , using 4511016 bytes of memory
-I probably need to dig into this further. If the memory usage here was 
-inline with the actual size to truesize ratio, would it cause the 
-receiver window to grow.
+lsb_release -a
+No LSB modules are available.
+Distributor ID: Ubuntu
+Description: Ubuntu 22.04.4 LTS
+Release: 22.04
+Codename: jammy
 
-Only explicitly increasing the window size to 16M in iperf3 matches the 
-download speed of B which suggests that sender server is unable to scale 
-the throughput for 4M case due to limited receiver window advertised by 
-A for the RTT in this specific configuration.
+With ethtool 6.5-1 and 5.16-1
+~# ethtool -m ens1f1
+Offset Values
+------ ------
+0x0000: 11 07 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0010: 00 00 00 00 00 00 1d 0e 00 00 81 85 00 00 00 00
+0x0020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0040: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0050: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0060: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0x0070: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+And with version 5.4.1, we receive the expected result
+
+
+lsb_release -a
+No LSB modules are available.
+Distributor ID: Ubuntu
+Description: Ubuntu 20.04 LTS
+Release: 20.04
+Codename: focal
+
+dpkg -l ethtool
+ii  ethtool        1:5.4-1      amd64        display or change
+Ethernet device settings
+~# ethtool -m ens1f0
+Identifier                                : 0x11 (QSFP28)
+Extended identifier                       : 0x10
+Extended identifier description           : 1.5W max. Power consumption
+Extended identifier description           : No CDR in TX, No CDR in RX
+Extended identifier description           : High Power Class (> 3.5 W)
+not enabled
+Connector                                 : 0x23 (No separable connector)
+Transceiver codes                         : 0x80 0x00 0x00 0x00 0x00
+0x00 0x00 0x00
+Transceiver type                          : 100G Ethernet: 100G
+Base-CR4 or 25G Base-CR CA-L
+Encoding                                  : 0x05 (64B/66B)
+BR, Nominal                               : 25500Mbps
+Rate identifier                           : 0x00
+Length (SMF,km)                           : 0km
+Length (OM3 50um)                         : 0m
+Length (OM2 50um)                         : 0m
+Length (OM1 62.5um)                       : 0m
+Length (Copper or Active cable)           : 2m
+Transmitter technology                    : 0xa0 (Copper cable unequalized)
+Attenuation at 2.5GHz                     : 7db
+Attenuation at 5.0GHz                     : 10db
+Attenuation at 7.0GHz                     : 13db
+Attenuation at 12.9GHz                    : 18db
+Vendor name                               : CISCO-PUREOPTICS
+Vendor OUI                                : 00:00:00
+Vendor PN                                 : QSFP-4SFP25G-CU2
+Vendor rev                                : 6
+Vendor SN                                 : M9BE9185
+Date code                                 : 220412
+Revision Compliance                       : SFF-8636 Rev 2.5/2.6/2.7
+Module temperature                        : 29.05 degrees C / 84.30 degrees F
+Module voltage                            : 3.3157 V
+Alarm/warning flags implemented           : Yes
+Laser tx ...
 
