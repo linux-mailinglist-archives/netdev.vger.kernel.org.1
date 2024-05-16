@@ -1,101 +1,173 @@
-Return-Path: <netdev+bounces-96792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C142F8C7D8A
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 21:59:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ECF58C7D9A
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 22:10:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 655DCB21A3E
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 19:59:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C22E21C20F6F
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 20:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A230715746A;
-	Thu, 16 May 2024 19:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FF8157E61;
+	Thu, 16 May 2024 20:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aTz8MYYW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PiG+NjFe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B95014B95D
-	for <netdev@vger.kernel.org>; Thu, 16 May 2024 19:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0D4157480
+	for <netdev@vger.kernel.org>; Thu, 16 May 2024 20:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715889567; cv=none; b=luEqSlYDPEdnK4yvs1TOfkeJQkVYE+c2VRR2SCfC9crJSdF4SGkeWHNTSnggKqiuuuxhjW5BcOl3OsbVknk5qoX8pEn2yLesNSHrHGKQNEIEzDO40gqI3kBQtrW7WV2Y0O1SbqqbG7lytklAyzpgCjV5TvJFF2RwiuIXhrbhPYU=
+	t=1715890191; cv=none; b=YGlO29mLwbFPXX4r4XRmwUFhn2GVBjuJ38vOYfIcXLE2FDBqSawtc6Liq2Gt59h8gpM16wdzuqfhZwR3yTJLviGxp5Let165q/qFFQnZzNCfZl0TDT0BrYmVL5bLHJpV/RDAVAvK2eppizs/4i6+zvdCDWDeUaZyFJf7r/qKAAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715889567; c=relaxed/simple;
-	bh=mOvYAjzd3Xb/tKCwrrQVTVeFMalRcpZobe/y6ZpOHx8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ivCYfVziTbdMRQ0YXvx8SImVXuxSxFRVK9TkKuRBQk3KPMytgMxUggljXOZ7FDYhSz/9jmywsF4JzLtm/XUoFG28pdAqXo/Jq4gqJYluCf2khNnS82IrJjEv+Ql3JW4PLWx9vsN/2cSwmZN8b9Mq+O1rnxqVUnRmc6shw3xVbwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aTz8MYYW; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-43e4020db92so6035321cf.0
-        for <netdev@vger.kernel.org>; Thu, 16 May 2024 12:59:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715889565; x=1716494365; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mOvYAjzd3Xb/tKCwrrQVTVeFMalRcpZobe/y6ZpOHx8=;
-        b=aTz8MYYWqsOC5PBy637qq+VhZTU2cpZFsNbiDa50M95zqm/4fkUOhIZWmbaGbi7uTs
-         ho9WWVN9kjOoPPek/sPm/Y3QYRUkNhx92G7vrxt+cQ2XeV7AbJDje2W2qw63cN4C6qHe
-         PNnNR08lERUEdAAdqFLH8M5NkT6MRAlX96X/aQYQd/8yk6a3EHPgMN376JrcXFyy2P+C
-         HyJkubE9Z9AMI0PPvhVWSbq7ceXQDo0hQX3rTF0cdAm6yCBTpQ3APXbrk5B/OlzXBUh5
-         C67pqu+rPOTCN7zVcd+9BzaVRCk4EH1+QTwPOPZdNNR80uzxbKAOgcQn2tFFEVgFa9Ot
-         d5bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715889565; x=1716494365;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mOvYAjzd3Xb/tKCwrrQVTVeFMalRcpZobe/y6ZpOHx8=;
-        b=rq+2w4EBFBwLP439+bjoxjE8ZuBhmCkbq1HwgSoeHmeSYCZUHjSmMRBfFV+Hp0fDT8
-         qOvGszZDmLZXb19C5laK6MwhJ+BO2dyqb1fdf7hJueagxCtshJlxZE1kKX88zzy6ugBS
-         HKxJKHlFqkcctvVHPR373rK40dU2GsPbYWYbBZ24dDPeXQf80WOgiDc+agIxg/AWnnZQ
-         C2UUrwuQsNLQxKX/25mxhL4nt0SvXl+NhO1E0WlLrOMvE2po11E9yly5/2ucZiV0V4jy
-         GWo0rKKp3n69tAUv3G5v7rlOvVT1YEPP6PCtYlp9oZAQtsU/bA2Au3FOSV7SmKims9cC
-         l/HQ==
-X-Gm-Message-State: AOJu0YyUtZa0hhowFLnul7w4lqfXE7gOE7T1p7R7mG36l6g0STPSYKq2
-	YfjgN8J1lamxD2nTI7J7YrclS3UjDeAALmO7nRI3bpsS6b10VVjmgNDRZQgIe0rA8GNvFxNqcTB
-	3WA185nhUxLlr6OVJfZodBQLXvjY=
-X-Google-Smtp-Source: AGHT+IFKP3k8qLENCqT/FrsYZPMvrj65Wfwrl3+zlOymXPvGRfwn6O0D2/e1rsmNkfPmzYOne5wW22iNyYSKfmsrvqU=
-X-Received: by 2002:ac8:5a49:0:b0:43b:b5e:cb3f with SMTP id
- d75a77b69052e-43dfdb482abmr248616271cf.47.1715889565029; Thu, 16 May 2024
- 12:59:25 -0700 (PDT)
+	s=arc-20240116; t=1715890191; c=relaxed/simple;
+	bh=EUpklSxQlvL3tJx+fqvIYMYmd+ITdKsrjLKSxUT+MoQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cDrCxEXt6TmN9J5QiJIwKkeXocvm2aH0hYirgSAmZvaD4lerWjqCVLxkGIev0Vw19HNSlOgpoXyXQl18fsVs8nejHMaPexmhrgwPilyLS3SHXxeeS7FQiXHxaTuKgP/5rUp7mMPD2wOv04nU/doX+dytafBILCQt+b0bnhSJCa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PiG+NjFe; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715890189;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=enjpFwxkMXeucLrOY4GgEKclmokFGniBJ7j/L6UJXVo=;
+	b=PiG+NjFeJJ4r+pxhBKEInjaWbVKzSZiwoGho2egMHs2B7E7Trk/WHZUkLyTUL/FY7GSJ3r
+	j2bmQ/BY5qqcjRSiwdt1B4gshzW8G087fAuu+qjKDYG8ixGiLhfA7/IuUy7EkxhHhzkYZT
+	PKZi7XX/YH8dUT07YJKbBRFE2B+avrI=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-120-tBxs6JIdNQqniI-x0ABOzg-1; Thu,
+ 16 May 2024 16:09:43 -0400
+X-MC-Unique: tBxs6JIdNQqniI-x0ABOzg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C670D3806711;
+	Thu, 16 May 2024 20:09:42 +0000 (UTC)
+Received: from RHTRH0061144.redhat.com (unknown [10.22.17.148])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D1BF9C15BB1;
+	Thu, 16 May 2024 20:09:41 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: netdev@vger.kernel.org
+Cc: dev@openvswitch.org,
+	linux-kernel@vger.kernel.org,
+	Pravin B Shelar <pshelar@ovn.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jesse Gross <jesse@nicira.com>,
+	Eelco Chaudron <echaudro@redhat.com>,
+	Ilya Maximets <i.maximets@ovn.org>,
+	Simon Horman <horms@ovn.org>,
+	Jaime Caamano <jcaamano@redhat.com>
+Subject: [PATCH v2 net] openvswitch: Set the skbuff pkt_type for proper pmtud support.
+Date: Thu, 16 May 2024 16:09:41 -0400
+Message-ID: <20240516200941.16152-1-aconole@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240510030435.120935-1-kuba@kernel.org> <20240510030435.120935-6-kuba@kernel.org>
-In-Reply-To: <20240510030435.120935-6-kuba@kernel.org>
-From: Lance Richardson <lance604@gmail.com>
-Date: Thu, 16 May 2024 15:59:14 -0400
-Message-ID: <CADuNpCxb3NV84BLQd7064q5YEjnYutDqerY6dvTRDsqdK2fO3Q@mail.gmail.com>
-Subject: Re: [RFC net-next 05/15] psp: add op for rotation of secret state
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, willemdebruijn.kernel@gmail.com, 
-	borisp@nvidia.com, gal@nvidia.com, cratiu@nvidia.com, rrameshbabu@nvidia.com, 
-	steffen.klassert@secunet.com, tariqt@nvidia.com, 
-	Lance Richardson <rlance@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-On Thu, May 9, 2024 at 11:05=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> Rotating the secret state is a key part of the PSP protocol design.
-> Some external daemon needs to do it once a day, or so.
-> Add a netlink op to perform this operation.
-> Add a notification group for informing users that key has been
-> rotated and they should rekey (next rotation will cut them off).
->
-Does this allow for the possibility of NIC firmware or the driver initiatin=
-g
-a rotation? E.g. during key generation if the SPI space has been
-exhausted a rotation will be required in order to generate a new
-derived key.
+Open vSwitch is originally intended to switch at layer 2, only dealing with
+Ethernet frames.  With the introduction of l3 tunnels support, it crossed
+into the realm of needing to care a bit about some routing details when
+making forwarding decisions.  If an oversized packet would need to be
+fragmented during this forwarding decision, there is a chance for pmtu
+to get involved and generate a routing exception.  This is gated by the
+skbuff->pkt_type field.
+
+When a flow is already loaded into the openvswitch module this field is
+set up and transitioned properly as a packet moves from one port to
+another.  In the case that a packet execute is invoked after a flow is
+newly installed this field is not properly initialized.  This causes the
+pmtud mechanism to omit sending the required exception messages across
+the tunnel boundary and a second attempt needs to be made to make sure
+that the routing exception is properly setup.  To fix this, we set the
+outgoing packet's pkt_type to PACKET_OUTGOING, since it can only get
+to the openvswitch module via a port device or packet command.
+
+Even for bridge ports as users, the pkt_type needs to be reset when
+doing the transmit as the packet is truly outgoing and routing needs
+to get involved post packet transformations, in the case of
+VXLAN/GENEVE/udp-tunnel packets.  In general, the pkt_type on output
+gets ignored, since we go straight to the driver, but in the case of
+tunnel ports they go through IP routing layer.
+
+This issue is periodically encountered in complex setups, such as large
+openshift deployments, where multiple sets of tunnel traversal occurs.
+A way to recreate this is with the ovn-heater project that can setup
+a networking environment which mimics such large deployments.  We need
+larger environments for this because we need to ensure that flow
+misses occur.  In these environment, without this patch, we can see:
+
+  ./ovn_cluster.sh start
+  podman exec ovn-chassis-1 ip r a 170.168.0.5/32 dev eth1 mtu 1200
+  podman exec ovn-chassis-1 ip netns exec sw01p1 ip r flush cache
+  podman exec ovn-chassis-1 ip netns exec sw01p1 \
+         ping 21.0.0.3 -M do -s 1300 -c2
+  PING 21.0.0.3 (21.0.0.3) 1300(1328) bytes of data.
+  From 21.0.0.3 icmp_seq=2 Frag needed and DF set (mtu = 1142)
+
+  --- 21.0.0.3 ping statistics ---
+  ...
+
+Using tcpdump, we can also see the expected ICMP FRAG_NEEDED message is not
+sent into the server.
+
+With this patch, setting the pkt_type, we see the following:
+
+  podman exec ovn-chassis-1 ip netns exec sw01p1 \
+         ping 21.0.0.3 -M do -s 1300 -c2
+  PING 21.0.0.3 (21.0.0.3) 1300(1328) bytes of data.
+  From 21.0.0.3 icmp_seq=1 Frag needed and DF set (mtu = 1222)
+  ping: local error: message too long, mtu=1222
+
+  --- 21.0.0.3 ping statistics ---
+  ...
+
+In this case, the first ping request receives the FRAG_NEEDED message and
+a local routing exception is created.
+
+Tested-by: Jaime Caamano <jcaamano@redhat.com>
+Reported-at: https://issues.redhat.com/browse/FDP-164
+Fixes: 58264848a5a7 ("openvswitch: Add vxlan tunneling support.")
+Signed-off-by: Aaron Conole <aconole@redhat.com>
+---
+v1->v2: Include a comment as requested by Eelco, and add some details about
+        bridge port packets.
+
+ net/openvswitch/actions.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+index 6fcd7e2ca81fe..9642255808247 100644
+--- a/net/openvswitch/actions.c
++++ b/net/openvswitch/actions.c
+@@ -936,6 +936,12 @@ static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
+ 				pskb_trim(skb, ovs_mac_header_len(key));
+ 		}
+ 
++		/* Need to set the pkt_type to involve the routing layer.  The
++		 * packet movement through the OVS datapath doesn't generally
++		 * use routing, but this is needed for tunnel cases.
++		 */
++		skb->pkt_type = PACKET_OUTGOING;
++
+ 		if (likely(!mru ||
+ 		           (skb->len <= mru + vport->dev->hard_header_len))) {
+ 			ovs_vport_send(vport, skb, ovs_key_mac_proto(key));
+-- 
+2.45.0
+
 
