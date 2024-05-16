@@ -1,55 +1,57 @@
-Return-Path: <netdev+bounces-96744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD81E8C78C4
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 16:56:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41C5B8C78C2
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 16:56:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32A2BB21796
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 14:56:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7FFA1F238AD
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 14:56:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D82E14B968;
-	Thu, 16 May 2024 14:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E10014B965;
+	Thu, 16 May 2024 14:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="cF4L4SLH"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="aIMAJkjx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0899E14B96A
-	for <netdev@vger.kernel.org>; Thu, 16 May 2024 14:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA2B147C77
+	for <netdev@vger.kernel.org>; Thu, 16 May 2024 14:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715871378; cv=none; b=ScsoFC/bKrnBxtvHey5i2pPNssRJTlkfk+ghyRfCa4Ei49f03gRwzJDe2r5uvBL+r0zl/jDHjRBwyeKeXxs9GLRMNlN+oQf5br80BKpGIrKbRy5YKqV+u/AX/egc7YKiYYmJLTGrxviD2lGlY4thgXi5PUad+YeFJmHUO5LnxhU=
+	t=1715871370; cv=none; b=UlULbYfTQwXbr+QO/TPhYGPz3wiY1dMXSYUlNl2k+z0JtmzeQDFwQwi1qDXUiA6Vi68GTuVdaXnT1mTRPO9JRcFh0/OSAQh4v8cilTLHFl8OSUcZjcIGbG2DKxvJPEzSAddiJQRzsd/a82PN0pnJD/f4M9lof3EXbSSe8szv8Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715871378; c=relaxed/simple;
-	bh=VtdBMM1WW+Q3udahX0tztc1juhXswqSHXtkYU2EIaZ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uUdpNqPjZSX6MlGkwMw3w8/We2fM3dn+/ILTXCEoVaECG0ZGfcCYLzv9eZODveFbiwbvNiBaWwzsNb0A1q8fe0HCJt11B0639UJ7n+TBo5gMRIuumfBXWFBKflS2H/cx1x3HbcASvAOAnffkusf5EPQ2ryzzg8WBErhGJfvNycM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=cF4L4SLH; arc=none smtp.client-ip=185.226.149.37
+	s=arc-20240116; t=1715871370; c=relaxed/simple;
+	bh=UvEMDoEskkrb8PTU8San+gck2ocf1oXdDH2rewNETwk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZS6UHKkAb6C5tYCQyQOYMxgcAu4FtQyLIDrHnRovjJ167J9yuVSB+7nJKl6VXU+jJzXnf+dpuGlpXfAf7WH4SKaEZmPw5CMfcmRilC1abT7MWj71kORM3LSnXTVKLn6Kad5ZyeFuoZgmrlhBGjcANem3V4UPCmz3fMug3xyrvTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=aIMAJkjx; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1s7cWU-002r3P-Cr; Thu, 16 May 2024 16:55:58 +0200
+	id 1s7cWW-0030RR-7R; Thu, 16 May 2024 16:56:00 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
-	:Cc:To:From; bh=eo95MCl0j9f5NP/EIXzqCCi7OrAR51P7VVqvLgV9gZY=; b=cF4L4SLHcx/EN
-	jun54IvaQjD2WxddU0jB+WClvtfNNt1a2f+ivRPTjKvd6b6RQgQpw0T1B9m1OwL6XXOrr2L4abtDG
-	pTiKvwDpYLdv0EWUouF38CN2NhG6MH4P8frQ0+OliRfabY/Co6GDGx3AlfGvY43SmIKcGdr34CEIg
-	jCriCofTRPioNk9BMvamAVk/YOBvg88XbgeKtn1niMW+AtYbKbKiN9UfrwXIEKsoO+P+xA96Ocoqm
-	dCv4VpzhEcm20qn49cP5TW7CnxCq7a3KH5c5U2SLOB9YWyqhcxtAY/LHCzzq+85TX7e9Q3wne5q86
-	AcmDmr58etIXQM6JbST0g==;
+	s=selector2; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+	Message-ID:Date:Subject:Cc:To:From;
+	bh=RaW+5qfz0YHC/9NJr/iWaBlW5djn61H2HuiWRRF/D6Q=; b=aIMAJkjxrQnQNXi/XfZatrz0Iu
+	oeM4vyj3u0Zx2Qh5t7JNPumLMy9LbeEN/0FrFs1T6mWGwbwVCSnP3wCTmIe1n0oKgUTTj+lyFhOAa
+	oqqEDCYQhUNaVTQ5LrN9xi+XUrAppPkQkC2Eqcw0QEX4O/vNHPGHFL6X11CtMkLgcaVa7aW7P5lAG
+	PjVlygw2EQyS3zxSlY6ZrAMywXbgqFWdm/zaBoTdAFLwkMEHz8aO61vgC1sf82xLgVh4aOyuEhVPH
+	wZQc/uGXZBh6HirNIQy/Cq7rs8I4qjiTjAQ/Mz14jiRFcrldu3cODu/OyCbdLekWhKUpHtlcCEnNh
+	PR+tBmnQ==;
 Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1s7cWT-00067y-KR; Thu, 16 May 2024 16:55:57 +0200
+	id 1s7cWV-0008CA-Ls; Thu, 16 May 2024 16:55:59 +0200
 Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1s7cWO-000xkA-SV; Thu, 16 May 2024 16:55:52 +0200
+	id 1s7cWP-000xkA-Cj; Thu, 16 May 2024 16:55:53 +0200
 From: Michal Luczaj <mhal@rbox.co>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -59,10 +61,12 @@ Cc: davem@davemloft.net,
 	kuniyu@amazon.com,
 	shuah@kernel.org,
 	Michal Luczaj <mhal@rbox.co>
-Subject: [PATCH net v2 0/2] af_unix: Fix GC and improve selftest
-Date: Thu, 16 May 2024 16:50:08 +0200
-Message-ID: <20240516145457.1206847-1-mhal@rbox.co>
+Subject: [PATCH net v2 1/2] af_unix: Fix garbage collection of embryos carrying OOB with SCM_RIGHTS
+Date: Thu, 16 May 2024 16:50:09 +0200
+Message-ID: <20240516145457.1206847-2-mhal@rbox.co>
 X-Mailer: git-send-email 2.45.0
+In-Reply-To: <20240516145457.1206847-1-mhal@rbox.co>
+References: <20240516145457.1206847-1-mhal@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,29 +75,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Series deals with AF_UNIX garbage collector mishandling some in-flight
-graph cycles. Embryos carrying OOB packets with SCM_RIGHTS cause issues.
+GC attempts to explicitly drop oob_skb before purging the hit list.
 
-Patch 1/2 fixes the memory leak.
-Patch 2/2 tweaks the selftest for a better OOB coverage.
+The problem is with embryos: kfree_skb(u->oob_skb) is never called on an
+embryo socket, as those sockets are not directly stacked by the SCC walk.
 
-v2:
-  - Patch 1/2: remove WARN_ON_ONCE() (Kuniyuki)
-  - Combine both patches into a series (Kuniyuki)
+The python script below [0] sends a listener's fd to its embryo as OOB
+data.  While GC does collect the embryo's queue, it fails to drop the OOB
+skb's refcount.  The skb which was in embryo's receive queue stays as
+unix_sk(sk)->oob_skb and keeps the listener's refcount [1].
 
-v1: https://lore.kernel.org/netdev/20240516103049.1132040-1-mhal@rbox.co/
+Tell GC to dispose embryo's oob_skb.
 
-Kuniyuki Iwashima (1):
-  selftest: af_unix: Make SCM_RIGHTS into OOB data.
+[0]:
+from array import array
+from socket import *
 
-Michal Luczaj (1):
-  af_unix: Fix garbage collection of embryos carrying OOB with
-    SCM_RIGHTS
+addr = '\x00unix-oob'
+lis = socket(AF_UNIX, SOCK_STREAM)
+lis.bind(addr)
+lis.listen(1)
 
- net/unix/garbage.c                            | 23 +++++++++++--------
- .../selftests/net/af_unix/scm_rights.c        |  4 ++--
- 2 files changed, 16 insertions(+), 11 deletions(-)
+s = socket(AF_UNIX, SOCK_STREAM)
+s.connect(addr)
+scm = (SOL_SOCKET, SCM_RIGHTS, array('i', [lis.fileno()]))
+s.sendmsg([b'x'], [scm], MSG_OOB)
+lis.close()
 
+[1]
+$ grep unix-oob /proc/net/unix
+$ ./unix-oob.py
+$ grep unix-oob /proc/net/unix
+0000000000000000: 00000002 00000000 00000000 0001 02     0 @unix-oob
+0000000000000000: 00000002 00000000 00010000 0001 01  6072 @unix-oob
+
+Fixes: 4090fa373f0e ("af_unix: Replace garbage collection algorithm.")
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+ net/unix/garbage.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index 1f8b8cdfcdc8..dfe94a90ece4 100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -342,6 +342,18 @@ enum unix_recv_queue_lock_class {
+ 	U_RECVQ_LOCK_EMBRYO,
+ };
+ 
++static void unix_collect_queue(struct unix_sock *u, struct sk_buff_head *hitlist)
++{
++	skb_queue_splice_init(&u->sk.sk_receive_queue, hitlist);
++
++#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
++	if (u->oob_skb) {
++		WARN_ON_ONCE(skb_unref(u->oob_skb));
++		u->oob_skb = NULL;
++	}
++#endif
++}
++
+ static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist)
+ {
+ 	struct unix_vertex *vertex;
+@@ -365,18 +377,11 @@ static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist
+ 
+ 				/* listener -> embryo order, the inversion never happens. */
+ 				spin_lock_nested(&embryo_queue->lock, U_RECVQ_LOCK_EMBRYO);
+-				skb_queue_splice_init(embryo_queue, hitlist);
++				unix_collect_queue(unix_sk(skb->sk), hitlist);
+ 				spin_unlock(&embryo_queue->lock);
+ 			}
+ 		} else {
+-			skb_queue_splice_init(queue, hitlist);
+-
+-#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
+-			if (u->oob_skb) {
+-				kfree_skb(u->oob_skb);
+-				u->oob_skb = NULL;
+-			}
+-#endif
++			unix_collect_queue(u, hitlist);
+ 		}
+ 
+ 		spin_unlock(&queue->lock);
 -- 
 2.45.0
 
