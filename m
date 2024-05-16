@@ -1,71 +1,59 @@
-Return-Path: <netdev+bounces-96757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A62D8C79DA
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 17:55:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E9CF8C79E5
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 17:56:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D4B21F23375
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 15:55:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5361D1F22D1E
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 15:56:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7962D14D452;
-	Thu, 16 May 2024 15:55:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C6514D44D;
+	Thu, 16 May 2024 15:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="g2MMtuiR"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="SPWfcI5K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A8114D2A8
-	for <netdev@vger.kernel.org>; Thu, 16 May 2024 15:55:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650F114C599
+	for <netdev@vger.kernel.org>; Thu, 16 May 2024 15:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715874907; cv=none; b=b9Ky/u2B38LSGJejJ4lSlU9WCi5z581WEyB5xQ6bUpvv+Qws7zw6VhjSY1FNueIIwP6u6JzfjFvPnh9ufuCnrsG4ByaDpJuCtj4MReIFf5D32w4MrCUDfhpkSGEP9WVL8N+APi0p6W65QfMjbt85J+HvJdX2dwCdLfHj4lkmh0o=
+	t=1715874957; cv=none; b=OyQCioBsDKDMMNmXnLNUvBXNOoDxQE1qsYjMOoOI3l7FXjZ1eVK4qqszEVPkcmXD/h27ogIzwBqgV90vXHbQp9hzSdfWuv17osrrpc/mp0HILicXevmSUUo042KMmGOcqKsw2lwex3lfsA/vsIUxbUqIGqjf0EXNIXSUcy3OXiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715874907; c=relaxed/simple;
-	bh=nN00p+BB6G3oXDgct+EBmEwHz4fIJMGD6RriYL6RGhY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZP5yAL/tWQ9uQkwUg9LbJQnG48CjNABu1J+LWvP5irWBVBYzzsxqJ/XFlZ3eWAk3fCn19qKI9czCT4pgbyJHizDpQhEpXiaoImnr4PF+5BFsNPYzXRBKHVq2RMkS16chiwKZ5YXl3Ub1rAHh+xSBWf9bGAw75heDJBldEWHA36I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=g2MMtuiR; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-7e1d952ace4so6371339f.1
-        for <netdev@vger.kernel.org>; Thu, 16 May 2024 08:55:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1715874905; x=1716479705; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ab4/9SXReNXDQjfL5I+PFsnXsCfrtKWnsASearG9QQU=;
-        b=g2MMtuiRfR8eHXbLO01GoAyMEOgBmWwpF20hCztLiCp2zPTkPtmpSjvaUsPZUBsfaA
-         BGotKNuX3/E07EZ4cDdg2Fb8ZTArNUIS2XHGHS0OgLdveMuodH/vKu9T6QCsARjYGgDE
-         MLB5r4wc2CdpXcSXJQ0+NxE+SkJjRejGqo1fo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715874905; x=1716479705;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ab4/9SXReNXDQjfL5I+PFsnXsCfrtKWnsASearG9QQU=;
-        b=Fcs7PqCoxEAs8Dipc3+Y+dhIFCWA6o8+RqoHOGoXib6DobWrr8xkWxz9TpJiStF7hf
-         5EHwTKzZiVfyhHUzsWAkt2GFXO3xll+pHMJPeyulsA/NNYOeMBa8peK8mrTlKGMgpezN
-         H3l2Gl4Z+aVZCUzuixZ2apXZ2tPiUwOIPuZH2uTmou5teRx7PaIEFpgeYW0OGc8jomk7
-         j494sXyy63nQRMrIJdUJTKJoNoogi0ZZs3sBdIEd5UX0EoJe1gPp3VixNxeaDjJAAxg+
-         qRntPobfmUdKfGY9Vl5d81lCKE7+xHmJDalTRuD62HERQm9GSZ0Bi66b9j3IlhyBhE5t
-         jXOA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFSO7DVPnKd9d2QVaZfTOe8NOGM8cqBc1Sm9HrwXGOIxA4rp7A5iGK4aisMHyLYzDfH4MNlxm+MWcKQzhEa/ftKtjLXczL
-X-Gm-Message-State: AOJu0YwP2FOk4hXv/FL9Zano+p4qRshmuW7j6zfXFdTKXe3ZdQfy69d0
-	u1kdUSoU9oAIFPebv0YpGwUGG5h6eCRO8mrNiPIj0H/zD5f/SVFrAAk4x2MoxWY=
-X-Google-Smtp-Source: AGHT+IFkrQ63gFwV/5y3qWi0SsRylHli+g/GXjCSjbCIbAnwmlot3x2PILn1QDwIRhTHEUwb7pHpvA==
-X-Received: by 2002:a6b:d203:0:b0:7e1:8bc8:8228 with SMTP id ca18e2360f4ac-7e1b501f23dmr1984498939f.0.1715874905028;
-        Thu, 16 May 2024 08:55:05 -0700 (PDT)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-7e20378a041sm127028439f.26.2024.05.16.08.55.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 May 2024 08:55:04 -0700 (PDT)
-Message-ID: <bf762b3d-4776-4041-864f-03094a9bea66@linuxfoundation.org>
-Date: Thu, 16 May 2024 09:55:03 -0600
+	s=arc-20240116; t=1715874957; c=relaxed/simple;
+	bh=AMbY8qXQj7Cet0EFGXEck3uVtIQnO99hPKqBn/Uw04A=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=pIKK82rS8EazdbtPCIdfkxmbhP+CzJHh7z0K4JgavHVlTjMYDqVcbdYeMJrarr8GaNPzXEEqCgxXRRX6jdjXHT8BE7DSVX8ynZkZWcxrL64xayEqDhQurx3JqdhZfvD6seTrXnBLjrCn6o1PE3I0e+m17/NgjNtXvfqlHttcOGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=SPWfcI5K; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1s7dSO-00394a-3S; Thu, 16 May 2024 17:55:48 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
+	bh=U9oRo34tk8GKL1JV3i2UbgrpYUdRKaQ8wRvuXFebzKg=; b=SPWfcI5KzfBegBXQx8Uo5tFtE5
+	w7/7q+AFKAnC7fHFSbf/Qi5OCKI9olWRR2yPcsTSZxjMTiT9TfNfIRsP87NQVriYSJLalY2QqaO5S
+	ensJhr3ic8UG2c8mQjhZtUcoCtIYPoBQpY1Oz4OzK15uyVUBfLeHziarFawgvsIim/UCQSkNmG/pw
+	53CGCSW7uRCF8gbqkLNsajkU3BvXJQITqDiYcIogwMnC9fLgp15UTcR3Ug3W9Yqew4rxAOrgT5d/X
+	vQRPsy9HVabx98aOudcinP/qWsjHWqCoK4+ujYVZoMLAfKnrZI2Qi0t8BA1PTmpQEzLVc1OOD6zBU
+	yOkLKSDQ==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1s7dSN-0003db-69; Thu, 16 May 2024 17:55:47 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1s7dSM-001CMB-MK; Thu, 16 May 2024 17:55:46 +0200
+Message-ID: <b2d99a52-2603-4027-9a24-efe13656d019@rbox.co>
+Date: Thu, 16 May 2024 17:55:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,66 +61,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 00/66] Define _GNU_SOURCE for sources using
-To: Edward Liaw <edliaw@google.com>, shuah@kernel.org,
- =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
- =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
- Christian Brauner <brauner@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Mark Brown <broonie@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kernel-team@android.com, linux-security-module@vger.kernel.org,
- netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
- bpf@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>
-References: <20240510000842.410729-1-edliaw@google.com>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20240510000842.410729-1-edliaw@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH net] af_unix: Fix garbage collection of embryos carrying
+ OOB with SCM_RIGHTS
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com
+References: <20240516103049.1132040-1-mhal@rbox.co>
+ <20240516123120.99486-1-kuniyu@amazon.com>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <20240516123120.99486-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 5/9/24 18:06, Edward Liaw wrote:
-> Centralizes the definition of _GNU_SOURCE into KHDR_INCLUDES and removes
-> redefinitions of _GNU_SOURCE from source code.
+On 5/16/24 14:31, Kuniyuki Iwashima wrote:
+> From: Michal Luczaj <mhal@rbox.co>
+> Date: Thu, 16 May 2024 12:20:48 +0200
+>> ...
+>> @@ -583,6 +588,8 @@ static void __unix_gc(struct work_struct *work)
+>>  	skb_queue_walk(&hitlist, skb) {
+>>  		if (UNIXCB(skb).fp)
+>>  			UNIXCB(skb).fp->dead = true;
+>> +
+>> +		WARN_ON_ONCE(refcount_read(&skb->users) != 1);
 > 
-> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
-> asprintf into kselftest_harness.h, which is a GNU extension and needs
-> _GNU_SOURCE to either be defined prior to including headers or with the
-> -D_GNU_SOURCE flag passed to the compiler.
+> Given we will refactor OOB with no additional refcount, this will not
+> make sense.  Rather, I'd add a test case in a selftest to catch the
+> future regression.
+
+Sure, I get it.
+
+> And I noticed that I actually tried to catch this in
 > 
-> v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-edliaw@google.com/
-> v2: https://lore.kernel.org/linux-kselftest/20240507214254.2787305-1-edliaw@google.com/
->   - Add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
->     location.
->   - Remove #define _GNU_SOURCE from source code to resolve redefinition
->     warnings.
-> v3: https://lore.kernel.org/linux-kselftest/20240509200022.253089-1-edliaw@google.com/
->   - Rebase onto linux-next 20240508.
->   - Split patches by directory.
->   - Add -D_GNU_SOURCE directly to CFLAGS in lib.mk.
->   - Delete additional _GNU_SOURCE definitions from source code in
->     linux-next.
->   - Delete additional -D_GNU_SOURCE flags from Makefiles.
-> v4:
->   - Rebase onto linux-next 20240509.
->   - Remove Fixes tag from patches that drop _GNU_SOURCE definition.
->   - Restore space between comment and includes for selftests/damon.
-> > Edward Liaw (66):
->    selftests: Compile with -D_GNU_SOURCE when including lib.mk
+>   tools/testing/selftests/net/af_unix/scm_rights.c
+> 
+> , and what is missing is... :S
+> ...
+> Could you remove the WARN_ON_ONCE() and repost with my patch
+> above ?
 
-This above change is causing some build problems - I didn't
-notice them when I tested on linux-next. However some problems
-are seen by Mark. He sent in a fix for ALSA and a change to
-descalate build warn.
-
-Please don't apply these for 6.10 for now. I will take all
-of these together.
+Done: https://lore.kernel.org/all/20240516145457.1206847-1-mhal@rbox.co/
 
 thanks,
--- Shuah
+Michal
 
