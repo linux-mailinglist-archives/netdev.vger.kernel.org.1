@@ -1,102 +1,100 @@
-Return-Path: <netdev+bounces-96741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70C458C784F
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 16:14:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD81E8C78C4
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 16:56:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10C541F221C8
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 14:14:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32A2BB21796
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 14:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A98514884E;
-	Thu, 16 May 2024 14:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D82E14B968;
+	Thu, 16 May 2024 14:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iau85TuQ"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="cF4L4SLH"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43EFB147C6E;
-	Thu, 16 May 2024 14:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0899E14B96A
+	for <netdev@vger.kernel.org>; Thu, 16 May 2024 14:56:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715868846; cv=none; b=YYs/V5fjMNNnUvBl+bLglSLkSLgo83Vo15ZVKNx9uIaW1LAKDvvDJlunM+G4uKTd4WuRr5Nn9xgCn4Pxp3UjAYB/ymaj0HD6EMxbyfSrIO+45lpsGjsri/Sj+3es1z/b78HxH1nv/3Oo8Lf3WLb1uEITKYmea6Ij0muqNY4luV4=
+	t=1715871378; cv=none; b=ScsoFC/bKrnBxtvHey5i2pPNssRJTlkfk+ghyRfCa4Ei49f03gRwzJDe2r5uvBL+r0zl/jDHjRBwyeKeXxs9GLRMNlN+oQf5br80BKpGIrKbRy5YKqV+u/AX/egc7YKiYYmJLTGrxviD2lGlY4thgXi5PUad+YeFJmHUO5LnxhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715868846; c=relaxed/simple;
-	bh=DljRi1gAVLhNjMhkBNML4Mys92kIb7fRsmAUlbeVYeI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bm8WzyIP56aif0YLpV+A54K7lJtmiks5EhwV7gZ5GJxRTqxLMCBXpyzHBreW/SZKnZMalkFxjRsKerphenKTKrQyFTSSJzD6bCh8JREsx5EOX3A0ZJfsgf4crIQ5xAQlLCLEBRgeE9HXRdr8wgpuLcL6kI+ZhmDR1eclITlAdBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iau85TuQ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=srq/5gaQL99coY1BQJnPkM6P8FfTUHHR+hVB7Lf6F+M=; b=iau85TuQEkJez5Yl3zhXy2V6Cg
-	yFX5SZvFaO+fP924k3+pywvz67iHXYoT2e+58jXEMk4aB5F2A+U3Dgat/crReZ53l4ZYfN1YXtFw4
-	YHVyw3r+SSli9XzIohJI9knG7Z/0cop7BaY34DHbb3pYNeVFmCtwaz415hcw3grKvryI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s7bra-00FW3d-Qz; Thu, 16 May 2024 16:13:42 +0200
-Date: Thu, 16 May 2024 16:13:42 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Thorsten Blum <thorsten.blum@toblux.com>
-Cc: Nicolas Pitre <nico@fluxnic.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	Arnd Bergmann <arnd@arndb.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH] net: smc91x: Fix pointer types
-Message-ID: <b15d7689-0385-4d9c-b5e0-afc525ac9578@lunn.ch>
-References: <20240516121142.181934-3-thorsten.blum@toblux.com>
+	s=arc-20240116; t=1715871378; c=relaxed/simple;
+	bh=VtdBMM1WW+Q3udahX0tztc1juhXswqSHXtkYU2EIaZ0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uUdpNqPjZSX6MlGkwMw3w8/We2fM3dn+/ILTXCEoVaECG0ZGfcCYLzv9eZODveFbiwbvNiBaWwzsNb0A1q8fe0HCJt11B0639UJ7n+TBo5gMRIuumfBXWFBKflS2H/cx1x3HbcASvAOAnffkusf5EPQ2ryzzg8WBErhGJfvNycM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=cF4L4SLH; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1s7cWU-002r3P-Cr; Thu, 16 May 2024 16:55:58 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
+	:Cc:To:From; bh=eo95MCl0j9f5NP/EIXzqCCi7OrAR51P7VVqvLgV9gZY=; b=cF4L4SLHcx/EN
+	jun54IvaQjD2WxddU0jB+WClvtfNNt1a2f+ivRPTjKvd6b6RQgQpw0T1B9m1OwL6XXOrr2L4abtDG
+	pTiKvwDpYLdv0EWUouF38CN2NhG6MH4P8frQ0+OliRfabY/Co6GDGx3AlfGvY43SmIKcGdr34CEIg
+	jCriCofTRPioNk9BMvamAVk/YOBvg88XbgeKtn1niMW+AtYbKbKiN9UfrwXIEKsoO+P+xA96Ocoqm
+	dCv4VpzhEcm20qn49cP5TW7CnxCq7a3KH5c5U2SLOB9YWyqhcxtAY/LHCzzq+85TX7e9Q3wne5q86
+	AcmDmr58etIXQM6JbST0g==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1s7cWT-00067y-KR; Thu, 16 May 2024 16:55:57 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1s7cWO-000xkA-SV; Thu, 16 May 2024 16:55:52 +0200
+From: Michal Luczaj <mhal@rbox.co>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kuniyu@amazon.com,
+	shuah@kernel.org,
+	Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net v2 0/2] af_unix: Fix GC and improve selftest
+Date: Thu, 16 May 2024 16:50:08 +0200
+Message-ID: <20240516145457.1206847-1-mhal@rbox.co>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240516121142.181934-3-thorsten.blum@toblux.com>
+Content-Transfer-Encoding: 8bit
 
-> -#define SMC_PUSH_DATA(lp, p, l)					\
-> +#define SMC_PUSH_DATA(lp, p, l)						\
->  	do {								\
-> -		if (SMC_32BIT(lp)) {				\
-> +		void __iomem *__ioaddr = ioaddr;			\
+Series deals with AF_UNIX garbage collector mishandling some in-flight
+graph cycles. Embryos carrying OOB packets with SCM_RIGHTS cause issues.
 
-ioaddr is not a parameter passed to this macro. 
+Patch 1/2 fixes the memory leak.
+Patch 2/2 tweaks the selftest for a better OOB coverage.
 
-> +		if (SMC_32BIT(lp)) {					\
->  			void *__ptr = (p);				\
->  			int __len = (l);				\
-> -			void __iomem *__ioaddr = ioaddr;		\
->  			if (__len >= 2 && (unsigned long)__ptr & 2) {	\
->  				__len -= 2;				\
-> -				SMC_outsw(ioaddr, DATA_REG(lp), __ptr, 1); \
-> +				SMC_outsw(__ioaddr, DATA_REG(lp), __ptr, 1); \
+v2:
+  - Patch 1/2: remove WARN_ON_ONCE() (Kuniyuki)
+  - Combine both patches into a series (Kuniyuki)
 
-You probably should use lp->base here, which is passed into this
-macro, and should have the correct type.
+v1: https://lore.kernel.org/netdev/20240516103049.1132040-1-mhal@rbox.co/
 
-> @@ -1072,7 +1072,7 @@ static const char * chip_ids[ 16 ] =  {
->  				 */					\
->  				__ptr -= 2;				\
->  				__len += 2;				\
-> -				SMC_SET_PTR(lp,			\
-> +				SMC_SET_PTR(lp,				\
->  					2|PTR_READ|PTR_RCV|PTR_AUTOINC); \
->  			}						\
->  			if (SMC_CAN_USE_DATACS && lp->datacs)		\
+Kuniyuki Iwashima (1):
+  selftest: af_unix: Make SCM_RIGHTS into OOB data.
 
-This is just a whitespace change. Please put that into a different
-patch.
+Michal Luczaj (1):
+  af_unix: Fix garbage collection of embryos carrying OOB with
+    SCM_RIGHTS
 
-	Andrew
+ net/unix/garbage.c                            | 23 +++++++++++--------
+ .../selftests/net/af_unix/scm_rights.c        |  4 ++--
+ 2 files changed, 16 insertions(+), 11 deletions(-)
+
+-- 
+2.45.0
+
 
