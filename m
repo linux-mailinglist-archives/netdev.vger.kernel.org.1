@@ -1,208 +1,122 @@
-Return-Path: <netdev+bounces-96795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A5058C7DE5
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 23:10:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF72F8C7DEA
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 23:12:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9AE12829FD
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 21:10:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A5D31F210AF
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 21:12:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205E9157E82;
-	Thu, 16 May 2024 21:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7A11581EA;
+	Thu, 16 May 2024 21:12:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nKipVV9H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iWUjoyL7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E74726AEA
-	for <netdev@vger.kernel.org>; Thu, 16 May 2024 21:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 227481581E7;
+	Thu, 16 May 2024 21:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715893829; cv=none; b=jN38yexHPjt6crU/GCZ/3Ngkt3/XKCLAuSnS8/tT45gsN1HUpK83IzL2o5l2/LibsRXLoUSm4UbtvLTCpSl0qGpng7PE/4+D5edc+ZVhmZ5nHayl1sTN12f3AFzbjtQoO5csYQJw66Scwn7WKf3yWLSPco+8wY1l4Xt1WEMYxo0=
+	t=1715893951; cv=none; b=nhtx8+m8UuxW+nSyywpRQIZW19ZbxGgGUgjuljhGtfiIP2wGMEQ2cs5PFO4GURbW9GV9rcO5ZSyfQx1xyCfHXN5WeBiffk/WNIUG6rTtiRjqqNZTpivM+YQ8PeQ5Ri+0lL4n22FNRvOXDByPU034ROQoe3JFeCGHtbLT0uaZETY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715893829; c=relaxed/simple;
-	bh=61To3U1BJ8KIm1flnm6QXQ7nH7fJUD1gP+QELq943Rs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hPUkwxnpRD6DvM7PUQ5JW+dmXFu9D5ShXlFpcpm1k3irIbe+dn7jB6kYwkXxoIflHD0sEj64cAobmaoPcMdsbZw1A3ogyCvxQnsxcFeuSzt0mxBmuwEF3Q/1n1hUv2S56XYxaSpJ76kdOnOuL4MzVTSmmcn40j3F3t7oR9Jexrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nKipVV9H; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1715893951; c=relaxed/simple;
+	bh=wx9aXGL4fOtXdHE8CNQE+6FHvEPWji0l2JcHJZKefo4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BheWY3J7pp4kqOKOx2Mrw9woOgE1a151RTf3JhmwwfLVl/OC9O1hDoWGy/zCcSpu12xCZkJclwSkVPvTG6T2TElRPuPMzXGWP2+qEmQfUUZlKW9FIfFP3oBj4Fy87WX8/SpPK1tYPLDcCCVdVjzCXXbCXd4yBzNtqep/llursOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iWUjoyL7; arc=none smtp.client-ip=209.85.215.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42016c8daa7so34428105e9.2
-        for <netdev@vger.kernel.org>; Thu, 16 May 2024 14:10:27 -0700 (PDT)
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-61be599ab77so441743a12.1;
+        Thu, 16 May 2024 14:12:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715893825; x=1716498625; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WOiA4Wp2oUV3fRuzQBIO2gbiVYSCBWCran4MYc20h+A=;
-        b=nKipVV9HPK+jsiuOrot/ePhbeaKtbIoKpcgLx3gbiOdeHX5Uzt/D9ACnz8b9DUeoi/
-         UmYaVqIY5Mmu7MDNtxYqMP25C2wBYK5wl7MtOK8rGocFh6MQrOnARwgjs+Q3oNcMveOy
-         GTTMelPnXCqmNiPCMA15fvqyHYQ6v9Cpw/IqQ0lgtah05nqkJejg1tz8Wj0guJnKz3NS
-         qubnk8v/HvDAOfAfkMg0aSnOKXHu7IocBHS6C3jaoz3pF3QyC282k+UMwDqpVEneqsbB
-         CTx9NQAp5PWP3yCQ/u9lDGGt9yr4MnzN4Q342DmBt4IATeRzQnTFKco3gm7WasDEz6GM
-         23+w==
+        d=gmail.com; s=20230601; t=1715893949; x=1716498749; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ruv0DIKIAesJEAsoXoRLgxEpKi4m5Tnsvj4DfPFrnpo=;
+        b=iWUjoyL7dqz+skiTRxF0JA1XQBVHinYS65RWUKbRhHqI24WkJ2DKNc9fWANDSj/FT5
+         007d1WL/RLtjXN2g17S6UAKdRjFXU0vIsPZuK4dZBC+wmy/aZKIymFBWv7vCXMm+kSoY
+         O7joz3moZIGsE536v1s5MssAi+DLhC84EdGAYvw3FODyHxpW6tqkAWkcdjnGZWz9fO+h
+         YOnqqlRVob3XZYbrwntfTIRYUKv0so9yLFjOu/ihIWEXYIS7rfzu+Xa5qIMUMmrCfjLR
+         8fzRqmDCSneOBkdSuborc0x4YQSZ5k1OBLgCR0c9U4MOfn07YLBdR4P1/5Uv3/oCImR7
+         9BYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715893825; x=1716498625;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WOiA4Wp2oUV3fRuzQBIO2gbiVYSCBWCran4MYc20h+A=;
-        b=lR+VVSYsT3k1kmuTWSiYv4slxEyHDMqf4I5+vLAthQCrupRBQ8Q6enTL4igxE4kYSQ
-         b2zCkrOvFQGi0NVlQL84LbkMlm7rz/70emnpCgAdLSfyFCp5D4OTeMSN+/06x/zhqGDe
-         2oqJsVaVk9CMZSkVqJ0tcRLwdVxiU2znNE3uIgRGsB5cda4Pgft7XRfW3eQhwzcpB27Q
-         6nGIT1xM2Yve3T5d5zhKoeYyMjFahVgo1evX5nNpm2S1T0kDMEG7GAxFkMNfZ+tIwIjd
-         1UM72z0UhP+u3ZSv5kU8KO87ih1/fZpEOywQelfsLAQ0OHzwCXSXZOBaCLSTMsQUg2yg
-         c+dQ==
-X-Gm-Message-State: AOJu0Yxcp9veY5NqOMn/0rRg0Krv2GRTtbivLuXoYF1DQsVcxWtRcadX
-	DstjRL9QKKTOb5mKOr2dLd8FNBelOhX6UvOOrBCtYlTojzGo0N/jrPfAqUky
-X-Google-Smtp-Source: AGHT+IEWA/yX9LlZl0B3A/A9aO6KHmaVWhUaXQZy9h6Fojswg7TxXyg2js2haO+LdQRXObx/YMNguw==
-X-Received: by 2002:a05:600c:4f83:b0:418:2ccf:cbc7 with SMTP id 5b1f17b1804b1-41feaa2f473mr144691995e9.2.1715893824689;
-        Thu, 16 May 2024 14:10:24 -0700 (PDT)
-Received: from [192.168.1.58] (186.28.45.217.dyn.plus.net. [217.45.28.186])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccbe8e3csm283039525e9.1.2024.05.16.14.10.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 May 2024 14:10:24 -0700 (PDT)
-Message-ID: <84d8b645-d756-4a07-9062-cece62fcfd50@gmail.com>
-Date: Thu, 16 May 2024 22:10:23 +0100
+        d=1e100.net; s=20230601; t=1715893949; x=1716498749;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ruv0DIKIAesJEAsoXoRLgxEpKi4m5Tnsvj4DfPFrnpo=;
+        b=lLfPXtqlZyjI6XBuDykx1+Pu/ZLW5ZX9oHy4Ww7UIlXaa3Pdrtc5Cdd0A+1nLYnDCR
+         raHjLjUg//iiDaHJ+ootynPnj7mqQ8j29AdkERRZ+46IUFiY4vU3KDXO87rNLbTI+iea
+         b2YAO3rjKgV4iNmps/oMEt41mQpxvxJPQsRRWla66TIw00F9eqFiWY6vDMHNTvxAUrsK
+         YzbYQ5NCUbOacpB7nIWRNgJu9gLfTSo0cjzCwZb31avjbmohKH0FU+ftVq+5Lkk0/2DS
+         a5TEmnkKCnKsHhlP7fSUVNmBx62n4vlzgq0v8Jhw2K2hembWLcKL77HphCJVORMsv9t0
+         YVmg==
+X-Forwarded-Encrypted: i=1; AJvYcCU73AtfE+QniJrlquWuxIM1UeFkkKaJRdy9qFChC5zv69I4FOLwI6qaFjFYuvDSEBzmlOC8XYyLDuWUxK2IXOUXyPwTocfoqHao3+pLSDA8kiTj4LALWvcFKuz2/p9ao6MHVMk+
+X-Gm-Message-State: AOJu0Yx4hKSNUiF/G/bSG42mt5GkSHFpUy6oVOx+IVXdsBmDZfomYYTd
+	gkskd2PugzSORI2Ajht3u2+25+iNc8HXAngibHv2EZT7VXSwQlDggR43BQ==
+X-Google-Smtp-Source: AGHT+IGu3WDRq62QboOOfJi0Pwov9wNPTLiji//Ed1hstPNX8PwPniKAtFNW4JzZrdgJpra0ZpzbTw==
+X-Received: by 2002:a17:90a:12c2:b0:2b2:a1d0:b61c with SMTP id 98e67ed59e1d1-2b6ccfeee24mr14181018a91.47.1715893948832;
+        Thu, 16 May 2024 14:12:28 -0700 (PDT)
+Received: from stbirv-lnx-1.igp.broadcom.net ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b628ca5279sm16116918a91.41.2024.05.16.14.12.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 May 2024 14:12:28 -0700 (PDT)
+From: Doug Berger <opendmb@gmail.com>
+To: stable@vger.kernel.org
+Cc: Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	bcm-kernel-feedback-list@broadcom.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH stable 5.4 0/2] net: bcmgenet: revisit MAC reset
+Date: Thu, 16 May 2024 14:11:51 -0700
+Message-Id: <20240516211153.140679-1-opendmb@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] Revert "r8169: don't try to disable interrupts if
- NAPI is, scheduled already"
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>
-References: <9b5b6f4c-4f54-4b90-b0b3-8d8023c2e780@gmail.com>
-Content-Language: en-GB
-From: Ken Milmore <ken.milmore@gmail.com>
-In-Reply-To: <9b5b6f4c-4f54-4b90-b0b3-8d8023c2e780@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 15/05/2024 07:18, Heiner Kallweit wrote:
-> This reverts commit 7274c4147afbf46f45b8501edbdad6da8cd013b9.
-> 
-> Ken reported that RTL8125b can lock up if gro_flush_timeout has the
-> default value of 20000 and napi_defer_hard_irqs is set to 0.
-> In this scenario device interrupts aren't disabled, what seems to
-> trigger some silicon bug under heavy load. I was able to reproduce this
-> behavior on RTL8168h. Fix this by reverting 7274c4147afb.
-> 
-> Fixes: 7274c4147afb ("r8169: don't try to disable interrupts if NAPI is scheduled already")
-> Cc: stable@vger.kernel.org
-> Reported-by: Ken Milmore <ken.milmore@gmail.com>
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 0fc5fe564ae5..69606c8081a3 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -4655,10 +4655,8 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
->  		rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
->  	}
->  
-> -	if (napi_schedule_prep(&tp->napi)) {
-> -		rtl_irq_disable(tp);
-> -		__napi_schedule(&tp->napi);
-> -	}
-> +	rtl_irq_disable(tp);
-> +	napi_schedule(&tp->napi);
->  out:
->  	rtl_ack_events(tp, status);
->  
+Commit 3a55402c9387 ("net: bcmgenet: use RGMII loopback for MAC
+reset") was intended to resolve issues with reseting the UniMAC
+core within the GENET block by providing better control over the
+clocks used by the UniMAC core. Unfortunately, it is not
+compatible with all of the supported system configurations so an
+alternative method must be applied.
 
-FYI, by now I am reasonably well convinced that the behaviour we've been seeing
-is not in fact a silicon bug, but rather a very specific behaviour regarding how
-these devices raise MSI interrupts.
+This commit set provides such an alternative. The first commit
+reverts the previous change and the second commit provides the
+alternative reset sequence that addresses the concerns observed
+with the previous implementation.
 
-This is largely due to the investigations by David Dillow described exhaustively
-in the 2009 netdev thread linked below. I wish I had spotted this much sooner!
-This information has been corroborated by my own testing on the RTL8125b:
-https://lore.kernel.org/netdev/1242001754.4093.12.camel@obelisk.thedillows.org/T/
+This replacement implementation should be applied to the stable
+branches wherever commit 3a55402c9387 ("net: bcmgenet: use RGMII
+loopback for MAC reset") has been applied.
 
-To summarise precisely what I think the behaviour is:
+Unfortunately, reverting that commit may conflict with some
+restructuring changes introduced by commit 4f8d81b77e66 ("net:
+bcmgenet: Refactor register access in bcmgenet_mii_config").
+The first commit in this set has been manually edited to
+resolve the conflict on stable/linux-5.4.y.
 
-********
-An interrupt is generated *only* when the device registers undergo a transition
-from (status & mask) == 0 to (status & mask) != 0.
-********
+Doug Berger (2):
+  Revert "net: bcmgenet: use RGMII loopback for MAC reset"
+  net: bcmgenet: keep MAC in reset until PHY is up
 
-If the above holds, then calling rtl_irq_disable() will immediately force the
-condition (status & mask) == 0, so we are ready to raise another interrupt when
-interrupts are subsequently enabled again. 
+ .../net/ethernet/broadcom/genet/bcmgenet.c    | 10 ++---
+ .../ethernet/broadcom/genet/bcmgenet_wol.c    |  6 ++-
+ drivers/net/ethernet/broadcom/genet/bcmmii.c  | 39 +++----------------
+ 3 files changed, 16 insertions(+), 39 deletions(-)
 
-To try and verify this, I tried the code below, which locks up the network
-traffic immediately, regardless of the setting of napi_defer_hard_irqs:
+-- 
+2.34.1
 
-diff --git linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
-index 2ce4bff..add5bdd 100644
---- linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c
-+++ linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
-@@ -4607,10 +4607,13 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
- 		rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
- 	}
- 
--	rtl_irq_disable(tp);
- 	napi_schedule(&tp->napi);
- out:
-+	u32 status2 = rtl_get_events(tp);
- 	rtl_ack_events(tp, status);
-+	if(status2 & ~status)
-+		printk_ratelimited("rtl8169_interrupt: status=%x status2=%x\n",
-+				   status, status2);
- 
- 	return IRQ_HANDLED;
- }
-
-Here's some typical dmesg output:
-
-[11315.581136] rtl8169_interrupt: status=1 status2=85
-[11324.142176] r8169 0000:07:00.0 eth0: ASPM disabled on Tx timeout
-[11324.151765] rtl8169_interrupt: status=4 status2=84
-
-We can see that when a new interrupt is flagged in the interval between reading
-the status register and writing to it, we may never achieve the condition
-(status & mask) == 0.
-
-So, if we read 0x01 (RxOK) from the status register, we will then write
-0x01 back to acknowledge the interrupt. But in the meantime, 0x04 (TxOK) has
-been flagged, as well as 0x80 (TxDescUnavail), so the register now contains
-0x85. We acknowledge by writing back 0x01, so the status register should now
-contain 0x84. If interrupts are unmasked throughout, then (status & mask) != 0
-throughout, so no interrupt will be raised for the missed TxOK event, unless
-something else should occur to set one of the other status bits.
-
-To test this hypothesis, I tried the code below, which never disables
-interrupts but instead clears out the status register on every interrupt:
-
-index 2ce4bff..dbda9ef 100644
---- linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c
-+++ linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
-@@ -4610,7 +4610,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
- 	rtl_irq_disable(tp);
- 	napi_schedule(&tp->napi);
- out:
--	rtl_ack_events(tp, status);
-+	rtl_ack_events(tp, tp->irq_mask);
- 
- 	return IRQ_HANDLED;
- }
-
-This passed my iperf3 test perfectly! It is likely to cause other problems
-though: Specifically it opens the possibility that we will miss a SYSErr,
-LinkChg or RxFIFOOver interrupt. Hence the rationale for achieving the required
-(status & mask) == 0 condition by clearing the mask register instead.
-
-I hope this information may prove useful in the future.
 
