@@ -1,96 +1,91 @@
-Return-Path: <netdev+bounces-96701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08BAA8C7332
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 10:50:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A5C38C733D
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 10:51:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3970E1C22678
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 08:50:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B6D01C226D6
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 08:51:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 413F6142E96;
-	Thu, 16 May 2024 08:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2F6142E8C;
+	Thu, 16 May 2024 08:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GDw8YUFf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P4tRZmgo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1291369A6;
-	Thu, 16 May 2024 08:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF22D130AFA
+	for <netdev@vger.kernel.org>; Thu, 16 May 2024 08:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715849430; cv=none; b=n9Vv1gAjM0zLIgZjcKfzSVOlHCG3558aLFMVbv0hy+gXGbcyiQLEoVAIkkWX+sHz5YoLgUTHsERPDd0igL5MqJBoJmetOvCCRJndYPNReENXEirifO7kpOVJORqgDCHwq1NUHGynSa8TvR958t6yPXfIJ1Pna8nD41jH4iPOP7U=
+	t=1715849458; cv=none; b=U6cyC6IkRRcr6p+D2+VZDP98qGK+JIJcOZQ9L++YyW9o1YfOp97l9C9MNNMc0ju+rTl5X6FG2gIa2CiybZD7icbijAtBxv06Yq/pdVzAnGVjh6cLo72etvEurNq37c4syLw2PMTvrJeDQ14BctqJZ+N9va+zWhcZyxSO0rPcRN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715849430; c=relaxed/simple;
-	bh=jGZ1Q8ASZwPpFqiD9bNHm16JhmI8gL6wk9d+T6GjM9E=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sowb/PJwiLbnogYyI8foIRBhjE1BKuwuJWKDg2P5JBJniBIkJEVn99wz2uU1kWXmwr7ljkc5/z9zY5sJKI0pkuBVnBIi0Cd3cD0ycD9qZZOqS9zq0zbIX5gy0ftn0MIUvepcaGaugPcSGwFDUYtiGa3YA9Cre/oh09wYb3H1/F0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GDw8YUFf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 97473C32782;
-	Thu, 16 May 2024 08:50:29 +0000 (UTC)
+	s=arc-20240116; t=1715849458; c=relaxed/simple;
+	bh=0o141OsbQBSWlhcqmL6WnzLb6HnjbT/RtgVx14YaTw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZTvjq2l0nxQn8c4Qnk+gXV7Gh3T9kpRVoUSGy3lRa5DV/rTIJKB0Tg+xRvkOUZyXqVgGEweM1bDELyIVLadHyYdI7b7WxrZujZ2k+c3O9z25zkoEoV3OMn1UtfD/Ba1+PB29f9bEiaxJ+dIlwV0gwj5v/32xQFQLGHNuuVxwKz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P4tRZmgo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDD46C113CC;
+	Thu, 16 May 2024 08:50:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715849429;
-	bh=jGZ1Q8ASZwPpFqiD9bNHm16JhmI8gL6wk9d+T6GjM9E=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GDw8YUFfEXRxPKJS78D7fgbPRNnYCsOOlSD1EJLjNmac2/3GvyZCX7DE8sBUnQhv5
-	 UeNvNaPigSECyw3fmVmbFbmjpgbpRnLDU/BhvhPv65o0vgGGVfmXWzNERT6lB453U3
-	 QI6UgTOTuIUd0WNKUF842jM8z4gy1nyZ2qfRUOLSLwCxZLpcfWgQK4313yZB4WAzHI
-	 c16bYoYPo//vvak7cpF7cb0l2sZ0Y1nZr7AFO21jUsYGKFRZaiwvDiXzIpUq/I3pwf
-	 mwZjd4XniQYsqvmMLR2Bu6Lod62XnvcpRGcLjtJx5PEIs1vaFQefi++rxJXwjDdkME
-	 vCqlymYymcTyA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8A33EC54BB7;
-	Thu, 16 May 2024 08:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1715849457;
+	bh=0o141OsbQBSWlhcqmL6WnzLb6HnjbT/RtgVx14YaTw4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=P4tRZmgo0ifCRZ0sgKBMyhEudpMasEKTxrUlzebbBviVwrEeIXXl5TNvdH2m7CLdL
+	 31ISu/5cFsTCMfEiXX68qqOzsZhhg7RskOu1r+izVqknr+PDOXOsTKurrzL61n9l/Y
+	 wP2HGYLOAZISLLKoZMs5HfVnscmghhI9Z8FQ3nmQYzaCSCtMFVbaJg37qE72MbZDDg
+	 jEpDKKns+Rty9Qs7Ws1Y3TbF4Whhmqy5iSnz1xRcPAk3FR3fryc/xzpKqTKwS+dENq
+	 Y/eJo7V9EPH0btu2YRaT5JGH2AF8+WPpbOvIqGl7Rwn+K5DyrZ1IU58re0z2vdHzn7
+	 vrlWT0Z1M1SSw==
+Date: Thu, 16 May 2024 09:50:52 +0100
+From: Simon Horman <horms@kernel.org>
+To: Thinh Tran <thinhtr@linux.ibm.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com, przemyslaw.kitszel@intel.com,
+	pmenzel@molgen.mpg.de, jesse.brandeburg@intel.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org, rob.thomas@ibm.com
+Subject: Re: [PATCH iwl-net V4,1/2] i40e: factoring out
+ i40e_suspend/i40e_resume
+Message-ID: <20240516085052.GG179178@kernel.org>
+References: <20240515210705.620-1-thinhtr@linux.ibm.com>
+ <20240515210705.620-2-thinhtr@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: lan966x: remove debugfs directory in probe()
- error path
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171584942956.27746.704741396527709628.git-patchwork-notify@kernel.org>
-Date: Thu, 16 May 2024 08:50:29 +0000
-References: <20240513111853.58668-1-herve.codina@bootlin.com>
-In-Reply-To: <20240513111853.58668-1-herve.codina@bootlin.com>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: horatiu.vultur@microchip.com, UNGLinuxDriver@microchip.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew@lunn.ch, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- allan.nielsen@microchip.com, steen.hegelund@microchip.com,
- thomas.petazzoni@bootlin.com, stable@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240515210705.620-2-thinhtr@linux.ibm.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Mon, 13 May 2024 13:18:53 +0200 you wrote:
-> A debugfs directory entry is create early during probe(). This entry is
-> not removed on error path leading to some "already present" issues in
-> case of EPROBE_DEFER.
+On Wed, May 15, 2024 at 04:07:04PM -0500, Thinh Tran wrote:
+> Two new functions, i40e_io_suspend() and i40e_io_resume(), have been
+> introduced.  These functions were factored out from the existing
+> i40e_suspend() and i40e_resume() respectively.  This factoring was
+> done due to concerns about the logic of the I40E_SUSPENSED state, which
+> caused the device to be unable to recover.  The functions are now used
+> in the EEH handling for device suspend/resume callbacks.
 > 
-> Create this entry later in the probe() code to avoid the need to change
-> many 'return' in 'goto' and add the removal in the already present error
-> path.
+> The function i40e_enable_mc_magic_wake() has been moved ahead of
+> i40e_io_suspend() to ensure it is declared before being used.
 > 
-> [...]
+> Tested-by: Robert Thomas <rob.thomas@ibm.com>
+> Signed-off-by: Thinh Tran <thinhtr@linux.ibm.com>
 
-Here is the summary with links:
-  - [net,v2] net: lan966x: remove debugfs directory in probe() error path
-    https://git.kernel.org/netdev/net/c/99975ad644c7
+Hi Thrinh,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Sorry to nit-pick, but the request from Paul in his review of v3
+was to use imperative mood in the title.
 
+	Factor out i40e_suspend/i40e_resume
 
+In any case, this patch looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
