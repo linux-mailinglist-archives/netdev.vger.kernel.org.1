@@ -1,176 +1,92 @@
-Return-Path: <netdev+bounces-96812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1F528C7EEF
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 01:21:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F05B8C7EFF
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 01:37:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 599BC281C23
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 23:21:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE6A51F22B93
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 23:37:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 123F32837B;
-	Thu, 16 May 2024 23:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2C92AF16;
+	Thu, 16 May 2024 23:37:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="YFJAVgjX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T70QQrre"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7262AF15
-	for <netdev@vger.kernel.org>; Thu, 16 May 2024 23:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323B124A08;
+	Thu, 16 May 2024 23:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715901681; cv=none; b=PHrcqbTsXLsq1Tq0Tz3uZLwxCcShsFY1xWGBFLXO3wenWz7xAWEs+4zQMjNfagt+KqzzDi0oZBBtSNJcFKknJ84/vB1Qvh5MFsr995PtCrXceYumed9muz68Y+LXdwBdgniq4IGLg+xid1YOAG2L8uvuAHU2sXJCnAnV6Sggn7A=
+	t=1715902659; cv=none; b=PY4UBaQ9Y9aWC+6p3S/Jp0kwS5asgL5PcuKv3cKjK1tAtsb5TkyGGspMFp+N1QPSncNYLPZSTRGpbPerFog00tFyGoJtPwLpsh6BpiZOXgQGLr24gbvXF+eySqvqrxx2ut2Hwac2bEvF2306/4VBavBr8K0g/xa9RoJa3sYzCzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715901681; c=relaxed/simple;
-	bh=Qui0DEbevuwNLaQ5JuIVShEJXLfv1M7Yu4u8VZtKVeM=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=MMGflL7Y33y0/1j8vtUveolFZdZRrsYJ3yGCtFfj6T/WF+cbcuqSgoLoZ1tBvBjZ5MaC9Fm5mWmxIH5+/XT71IUd9iq/CLRjoL8i+7z6TAO3vi08QvB7pYW9Y4OfjXmIDNwOakMhBg7+QpKdOVqACaR3bBJogJtOGVqaHqmk06U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=YFJAVgjX; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-34d7b0dac54so5031511f8f.0
-        for <netdev@vger.kernel.org>; Thu, 16 May 2024 16:21:18 -0700 (PDT)
+	s=arc-20240116; t=1715902659; c=relaxed/simple;
+	bh=ba6fEHDbMImxiDuLINNOeuiTXyrwLnTUOG11weRAuFE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qwJaqdvkgGCkRCUrcyZGyj6LVAYp4mYISf705n1WyfaGSflpp6m00HFv8lF9zmO8u4m2PyNyIVOk6cZvqBUmBOJXcnP+iW13JpXbBL8rTVor86djl5r51Fl1yOJ0UEWzkpF9s7WwsLw4qOBAqlYbUS+E0cUi+QEJ8IE9DzZHGeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T70QQrre; arc=none smtp.client-ip=209.85.219.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-de46b113a5dso8528948276.3;
+        Thu, 16 May 2024 16:37:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1715901677; x=1716506477; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lp5Q4kFI8X/cmoTJxmxu71qy/umo6wOz6GO12/MOAWM=;
-        b=YFJAVgjXgPMDvfKpjas29KRGtjZbCn+OLM/26D1l5/mTYQZCe2frNM/j0j2kfgXGDg
-         kIQb79ENVSRdV8A7phKrflSIVQpjXN64OlAxYn1YuRojCWtmIc3I3QbIdhXuPDjwiNJx
-         DevigPwXbyHsnU3FSUz0i+9/PyZC+K7KBEIZLB4oHn+pGcfqaYTjlLhFcziDi6N8zpbE
-         cRL5WwgKrwalFEtV3uo1UCFPEdbOcqGPq67Tl8SSZcZ8LeVAyO2yBgpG3Rd6ZytkPI5A
-         Lf5m6FEVI+9fPFZBpsCBePkKr+JDhj+29gkyjlmVxF4+kx9dstZEOnSlLvMaAdZR7b87
-         khYQ==
+        d=gmail.com; s=20230601; t=1715902657; x=1716507457; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ba6fEHDbMImxiDuLINNOeuiTXyrwLnTUOG11weRAuFE=;
+        b=T70QQrre5IOTnnmYVc0Ku1hy5YE1g2+usjP7n35ZXRCWYWJD1bj/ELs/QoD6pwZ/AP
+         fQ+uEs20mqR7QseFwcRl0jgsl2SoZfCzp4BpT1HqGeLB9mFszPv4wTaZzpbNojl9ZP+/
+         m73u1H+1OuDD1gKT6bfLLe27Xsh6wX0RIlNf65T4Taf1RIZyf0mlZh1f7Zvd5exdujF0
+         L/+UuFb52b6yr3BJX3RdRwCMEO7yd/YVe6cQe74OfxFt/yDO3aSeqUn5uaaDH7aDk41h
+         MI1kvFqhdnXvnA5ckhvoZr7Hnh4VXVA6daVztw4sgRojTCzuyx+9FPAPQ8PeQTMjYIh2
+         beDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715901677; x=1716506477;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lp5Q4kFI8X/cmoTJxmxu71qy/umo6wOz6GO12/MOAWM=;
-        b=wCMWBx/AD5TzAcdJKqzMhpwUtyKwNAp+fG2TRfF5Zk/EsaQ+v71pY0y+UuTAEs1AFh
-         gNliOn9vpN8/tO7AtdsjsvRptcccdPZUgoqUBVk9T9DFoX1ZJENvaCL5t+uwQ13nexUQ
-         Y5ymTYpw2O2otW/yCogXQShNfSdTVp9XR/Y514MB9kODb3aJELghcA1L2cuhBxGk2Lng
-         eVTDGv+w1/ZnO3A0VQxdImRQmWA2c+8RNGF7YjBd45U4Z4FcwuAmaZuredHmfeaSacH+
-         4b0fC+GV+Fx9q2TzzSNYlrG0Tu/SXEFEjynVtKcY6udAppgO/G18c/PlfegLh4mZWDNg
-         Txmg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4QI8KBr5GEqnPYIxj88ntfngULFGXd/XxpNonDuOKkqRiuIs87LQ2gVGNV5qKAMPUljzcezwlYmO8m7YnkRa0Da2inqlk
-X-Gm-Message-State: AOJu0YwEXwsErrJpoHC0LetMx+70oC2ilUDSwRjr8L/WuZcFvJTOW2sl
-	bR10ysySAN0YWBStVXVyxX5T51xLGXAG4zlcSB6Vv8UHTb6k9MdRHDYjgGd0rdU=
-X-Google-Smtp-Source: AGHT+IG/4VDfaLpKv9+Hy9psRkakHJC/Qh+jThNDXbSICnYlct9NikIvzEy+1yhDJ0NQy6xbO4H4Ig==
-X-Received: by 2002:a5d:5889:0:b0:352:12ff:2323 with SMTP id ffacd0b85a97d-35212ff240bmr1780438f8f.28.1715901677079;
-        Thu, 16 May 2024 16:21:17 -0700 (PDT)
-Received: from smtpclient.apple ([2001:a61:aa3:5c01:4c77:13bf:9f9f:140])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502baad1f0sm20293435f8f.89.2024.05.16.16.21.15
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 16 May 2024 16:21:16 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
+        d=1e100.net; s=20230601; t=1715902657; x=1716507457;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ba6fEHDbMImxiDuLINNOeuiTXyrwLnTUOG11weRAuFE=;
+        b=bfpbX3E40aLUBTlxfcUi26jmo/ioxTpjXoxQXKXWNOxcPbsGSOeCxCxezSGv54suKH
+         XstC0skt8C7W11C0NCgKhnbyUEi2wBmpZOovruQSCYF0+87GfBRqqX8+CmZUnnoqJZjc
+         A0lR7k970Tbmqp70Ls1PsgOaJewYA4GD7AolQjC/2YLKEdkOidTvP8lfGpd7z9EdJYQd
+         3EUE/pjQ8i/NvfQ9PyC5GuZVp8eaIB62gxsUTzlz8wUEPffSSNRYJ2rR7vsiXiMf6PeM
+         a0xG6nFhi26Kae8cMWcOmvYSqn2YsNUKo1l01O+kXIg65mHDdzPregZlEoCxI+nHoZS1
+         B86g==
+X-Gm-Message-State: AOJu0YxVApU0zobZu37IAYDYtDnoQUCC+jhBUIc6FsDhaurXQiJz+O6e
+	AdKzQcEKf4eF+KeWOIgm+ZgZ1Jagedr1e3pbCe5GI1hE6P+LVzDQ0R7STVdyJfy/IdieUsaD1Jq
+	0UZu3lOhGtJaup8R1+FngOKF6xqDp0/wL
+X-Google-Smtp-Source: AGHT+IHYOANYPoz3miSDViLtRhoi9BUYOzxXwMBEE1TtHastq1ZxZH0y90VMkdWc3x/+Hi5yLfehQ7oKn4Ocr2zTqsw=
+X-Received: by 2002:a25:6f87:0:b0:de5:d8d3:e288 with SMTP id
+ 3f1490d57ef6-dee4f2db0e2mr18305215276.24.1715902657224; Thu, 16 May 2024
+ 16:37:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.500.171.1.1\))
-Subject: Re: [PATCH v3] net: smc91x: Fix pointer types
-From: Thorsten Blum <thorsten.blum@toblux.com>
-In-Reply-To: <f192113c-9aee-47be-85f6-cd19fcb81a5e@lunn.ch>
-Date: Fri, 17 May 2024 01:21:04 +0200
-Cc: Arnd Bergmann <arnd@arndb.de>,
- "David S. Miller" <davem@davemloft.net>,
- edumazet@google.com,
- glaubitz@physik.fu-berlin.de,
- kuba@kernel.org,
- linux-kernel@vger.kernel.org,
- lkp@intel.com,
- netdev@vger.kernel.org,
- nico@fluxnic.net,
- pabeni@redhat.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <66AB9A6F-4D24-4033-96B9-E5F2F700029D@toblux.com>
-References: <0efd687d-3df5-49dd-b01c-d5bd977ae12e@lunn.ch>
- <20240516223004.350368-2-thorsten.blum@toblux.com>
- <f192113c-9aee-47be-85f6-cd19fcb81a5e@lunn.ch>
-To: Andrew Lunn <andrew@lunn.ch>
-X-Mailer: Apple Mail (2.3774.500.171.1.1)
+MIME-Version: 1.0
+References: <20240510192412.3297104-1-amery.hung@bytedance.com> <20240510192412.3297104-10-amery.hung@bytedance.com>
+In-Reply-To: <20240510192412.3297104-10-amery.hung@bytedance.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 16 May 2024 16:37:26 -0700
+Message-ID: <CAMB2axPv3PgKSBPkN+__AhgGk5wGo2+VtzKroPWGJwDtg5o4eg@mail.gmail.com>
+Subject: Re: [RFC PATCH v8 09/20] bpf: Find special BTF fields in union
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@kernel.org, sinquersw@gmail.com, 
+	toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com, 
+	xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 17. May 2024, at 00:51, Andrew Lunn <andrew@lunn.ch> wrote:
-> On Fri, May 17, 2024 at 12:30:05AM +0200, Thorsten Blum wrote:
->> Use void __iomem pointers as parameters for mcf_insw() and =
-mcf_outsw()
->> to align with the parameter types of readw() and writew() to fix the
->> following warnings reported by kernel test robot:
->>=20
->> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse: warning: incorrect =
-type in argument 1 (different address spaces)
->> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse:    expected void *a
->> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse:    got void =
-[noderef] __iomem *
->> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse: warning: incorrect =
-type in argument 1 (different address spaces)
->> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse:    expected void *a
->> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse:    got void =
-[noderef] __iomem *
->> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse: warning: incorrect =
-type in argument 1 (different address spaces)
->> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse:    expected void *a
->> drivers/net/ethernet/smsc/smc91x.c:590:9: sparse:    got void =
-[noderef] __iomem *
->> drivers/net/ethernet/smsc/smc91x.c:483:17: sparse: warning: incorrect =
-type in argument 1 (different address spaces)
->> drivers/net/ethernet/smsc/smc91x.c:483:17: sparse:    expected void =
-*a
->> drivers/net/ethernet/smsc/smc91x.c:483:17: sparse:    got void =
-[noderef] __iomem *
->>=20
->> Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
->> Reported-by: kernel test robot <lkp@intel.com>
->> Closes: =
-https://lore.kernel.org/oe-kbuild-all/202405160853.3qyaSj8w-lkp@intel.com/=
+The implementation of supporting adding skb to collections is flaky as
+Kui-Feng has pointed out in offline discussion. Basically, supporting
+special BTF fields in unions needs more care.
 
->> Acked-by: Nicolas Pitre <nico@fluxnic.net>
->> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->> ---
->> Changes in v2:
->> - Use lp->base instead of __ioaddr as suggested by Andrew Lunn. They =
-are
->> essentially the same, but using lp->base results in a smaller diff
->> - Remove whitespace only changes as suggested by Andrew Lunn
->> - Preserve Acked-by: Nicolas Pitre tag (please let me know if you
->> somehow disagree with the changes in v2 or v3)
->>=20
->> Changes in v3:
->> - Revert changing the macros as this is unnecessary. Neither the =
-types
->>  nor the __iomem attributes get lost across macro boundaries
->> - Preserve Reviewed-by: Andrew Lunn tag (please let me know if you
->>  somehow disagree with the changes in v3)
->=20
-> This fixes the warning, but we still have the macro accessing things
-> not passed to them. If you are going to brother to fix the warnings,
-> it would also be good to fix the bad practice. Please make a patchset
-> to do this.
-
-I would prefer to submit another patch to fix the macros. I submitted v3
-because the patch description for v2 was wrong (type information or
-attributes don't get lost across macro boundaries) and the macro changes
-are unnecessary to fix the warnings.
-
-I should never have changed the macros, but after first adding __iomem
-to mcf_insw() and mcf_outsw(), I kept getting the same errors and looked
-for the problem in the SMC_* macros. I probably didn't do a clean build
-or forgot to save my changes and just refactored the macros as a side
-effect.
-
-> It would also be good if you read:
->=20
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-Will do.
-
-Thanks,
-Thorsten=
+I will defer patch 5-12 to another patchset after the first BPF Qdisc
+patchset lands. While the performance of qdiscs implemented with the first
+series will not be as good, this will make the patchset easier to review.
 
