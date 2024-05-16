@@ -1,183 +1,130 @@
-Return-Path: <netdev+bounces-96660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C58828C6F22
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 01:24:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 218088C6F7C
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 02:24:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D4E92816F9
-	for <lists+netdev@lfdr.de>; Wed, 15 May 2024 23:24:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8194B22CAD
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 00:24:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E4A4D9E0;
-	Wed, 15 May 2024 23:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF3E3C39;
+	Thu, 16 May 2024 00:24:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="PmnaoTIW"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="ayMHRsU9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBAE3FBA7;
-	Wed, 15 May 2024 23:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29217E1;
+	Thu, 16 May 2024 00:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715815446; cv=none; b=Yikz4q+0TA52663C4OzSKeB7z3GA74WPga5D2B0H4RqK23Dai2Y3aurGF9D5JVZQqBX1VlhrGqAZ46U2grLeszfEbUKM3aJhM1cc3j8JfcbAnBz6TBBGQLL4rIgiVVzyrUtMae6YB8uWBObCW32NCUiOaSbE7ucU8qgRTKGgj6I=
+	t=1715819048; cv=none; b=e9R1koynFzTaE+50EcKg8TKOKhfVDe3Pm45KCnO8wr18MkF/d+xxMHvBf32zWVG7MmqkP2XN/NoQSi6iOOY9SR2Vs4Et74g5awhaK7cbA5zX9qy9agVrFUycan1idmRZ4PGXaevCbvuaw9BLkuGidGgT5DnrXnLbP9ENhEy0HKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715815446; c=relaxed/simple;
-	bh=Q8VPkE29IY3yc1Ga9qKaqmduPct/QBAS7mlBMvMJWI0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uFTBx089CYE6Le6UPIP5IqM49H/O396dwQgKW5kcaOUBgN5P4oc6ofs8CQuDhhGZZiKa3Yji80rZM5fQM4M3OkKDOb+Gvr1nKzztsd4GBGwJnOJJwu/kvSCAmkm/JK6brr9o9kPrNc0f9E3KutYe3zhgHjp460+IMPFV6pUI9fI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=PmnaoTIW; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1715815443;
-	bh=d98LuK1KfsLFwZxjpmtakns62dhgVIQuZbCW8Ow/p4g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PmnaoTIWJQ55BQJBEg/AEUhVUuzta/XESSmq1HP+LG7DLaLHKFCLLFWe9Y3JVAL7T
-	 qelhM8EmbwVFGOHp6NnuRWY+iX7Ea2dPP4NPxTwzKj04yiutK6XGO9/ea4FUHNTnWM
-	 3OXt0QoN5bJyJ4jZvZl5hQigbjfWWslnVoHq4E4/I4vHPMonKdf/A9AN9nzjeWpY0j
-	 eTSF9wVyjTgiWLXyEF0rwyLuoi61XhjGtwcKWPFf9Ucimku1rGAqeoMqUijRuydt5W
-	 vEP/sF9PUw6cyTAKkoqlARTlWhuIM60DNLbDlgzmH7lfzDqGMSE5HShxcNL+SbHJAO
-	 I7lUoA7AyqfuQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	s=arc-20240116; t=1715819048; c=relaxed/simple;
+	bh=LQrgsqIByN2f+qZpuZYvsf4zHse06e3f1SdS7MR9PyE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YkAEbvM2YjjZ0eova3+6OGPzXtIM6oAKx/WM7ENAucLWnTu4jKLFgegaYxVdQL5oM7Ke7wUz6BJhGIVtBRzK3nUWLPAvsFpv4/bL5UD3jAAjDx007ahYc29r0XQzHALlZYr6uyafyiVctil5Ur9GT5uyM6B3qpNXQ0Aq9hF4gGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=ayMHRsU9; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Vfq6p192nz4x1T;
-	Thu, 16 May 2024 09:24:02 +1000 (AEST)
-Date: Thu, 16 May 2024 09:24:01 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Christoph Hellwig <hch@lst.de>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the net-next tree with the
- dma-mapping tree
-Message-ID: <20240516092401.5257bf0e@canb.auug.org.au>
-In-Reply-To: <20240509115307.71ae8787@canb.auug.org.au>
-References: <20240509115307.71ae8787@canb.auug.org.au>
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 4250B87EF7;
+	Thu, 16 May 2024 02:23:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1715819038;
+	bh=jG1kyEHStM/G4Bx69cnZ9ynPKSC8S8yZPDjm5wi4i4Q=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ayMHRsU9bOUstMRI7s2hcFPlwsAQONW2aXEHzKPB8nCX3D6FtQMDFRMmx1mxxi+BP
+	 5ky2+jR2Jr3j7N0oAkQuIMB+5Gl5K26MjsPPaWL7KqmRCLUOMfwxgfCTPMONCIvkqL
+	 SqGAcXwUuRuUAmMzIxvfEr7IXpjwl7iDxtsZw+IJPQOcqufFWg/DUrlpKxNbAkGhJ0
+	 aN6/aP1dRQ5VlfzYKYii3cU7PolA1UvwvCtDYMZNtnquw2M7qcDXLoe0wBC6ECr1QU
+	 FdLw9aAbGx587PlLFTMQT5i+kTGmfznpVsaumkZFEwNZ0Aa56qrto+S+bHv6g0/6WD
+	 1TfGLe9G7saKw==
+Message-ID: <9c1d80eb-03e7-4d39-b516-cbcae0d50e4a@denx.de>
+Date: Thu, 16 May 2024 02:23:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/XcPvDPn//a2UViAc0ysycQ_";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 10/11] ARM: dts: stm32: add ethernet1 and ethernet2 for
+ STM32MP135F-DK board
+To: Alexandre TORGUE <alexandre.torgue@foss.st.com>,
+ Christophe Roullier <christophe.roullier@foss.st.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>, Jose Abreu
+ <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240426125707.585269-1-christophe.roullier@foss.st.com>
+ <20240426125707.585269-11-christophe.roullier@foss.st.com>
+ <43024130-dcd6-4175-b958-4401edfb5fd8@denx.de>
+ <8bf3be27-3222-422d-bfff-ff67271981d8@foss.st.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <8bf3be27-3222-422d-bfff-ff67271981d8@foss.st.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
---Sig_/XcPvDPn//a2UViAc0ysycQ_
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 5/13/24 6:01 PM, Alexandre TORGUE wrote:
+> Hi Marek
 
-Hi all,
+Hi,
 
-On Thu, 9 May 2024 11:53:07 +1000 Stephen Rothwell <sfr@canb.auug.org.au> w=
-rote:
->
-> Today's linux-next merge of the net-next tree got a conflict in:
->=20
->   net/core/page_pool.c
->=20
-> between commit:
->=20
->   4321de4497b2 ("page_pool: check for DMA sync shortcut earlier")
->=20
-> from the dma-mapping tree and commit:
->=20
->   ef9226cd56b7 ("page_pool: constify some read-only function arguments")
->=20
-> from the net-next tree.
->=20
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
->=20
->=20
-> diff --cc net/core/page_pool.c
-> index 4f9d1bd7f4d1,8bcc7014a61a..000000000000
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@@ -398,26 -384,16 +399,26 @@@ static struct page *__page_pool_get_cac
->   	return page;
->   }
->  =20
->  -static void page_pool_dma_sync_for_device(const struct page_pool *pool,
->  -					  const struct page *page,
->  -					  unsigned int dma_sync_size)
->  +static void __page_pool_dma_sync_for_device(const struct page_pool *poo=
-l,
-> - 					    struct page *page,
-> ++					    const struct page *page,
->  +					    u32 dma_sync_size)
->   {
->  +#if defined(CONFIG_HAS_DMA) && defined(CONFIG_DMA_NEED_SYNC)
->   	dma_addr_t dma_addr =3D page_pool_get_dma_addr(page);
->  =20
->   	dma_sync_size =3D min(dma_sync_size, pool->p.max_len);
->  -	dma_sync_single_range_for_device(pool->p.dev, dma_addr,
->  -					 pool->p.offset, dma_sync_size,
->  -					 pool->p.dma_dir);
->  +	__dma_sync_single_for_device(pool->p.dev, dma_addr + pool->p.offset,
->  +				     dma_sync_size, pool->p.dma_dir);
->  +#endif
->  +}
->  +
->  +static __always_inline void
->  +page_pool_dma_sync_for_device(const struct page_pool *pool,
-> - 			      struct page *page,
-> ++			      const struct page *page,
->  +			      u32 dma_sync_size)
->  +{
->  +	if (pool->dma_sync && dma_dev_need_sync(pool->p.dev))
->  +		__page_pool_dma_sync_for_device(pool, page, dma_sync_size);
->   }
->  =20
->   static bool page_pool_dma_map(struct page_pool *pool, struct page *page)
-> @@@ -708,10 -688,11 +710,9 @@@ __page_pool_put_page(struct page_pool *
->   	if (likely(__page_pool_page_can_be_recycled(page))) {
->   		/* Read barrier done in page_ref_count / READ_ONCE */
->  =20
->  -		if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
->  -			page_pool_dma_sync_for_device(pool, page,
->  -						      dma_sync_size);
->  +		page_pool_dma_sync_for_device(pool, page, dma_sync_size);
->  =20
-> - 		if (allow_direct && in_softirq() &&
-> - 		    page_pool_recycle_in_cache(page, pool))
-> + 		if (allow_direct && page_pool_recycle_in_cache(page, pool))
->   			return NULL;
->  =20
->   		/* Page found as candidate for recycling */
+> On 4/26/24 17:44, Marek Vasut wrote:
+>> On 4/26/24 2:57 PM, Christophe Roullier wrote:
+>>> Add dual Ethernet:
+>>> -Ethernet1: RMII with crystal
+>>> -Ethernet2: RMII without crystal
+>>> PHYs used are SMSC (LAN8742A)
+>>>
+>>> With Ethernet1, we can performed WoL from PHY instead of GMAC point
+>>> of view.
+>>> (in this case IRQ for WoL is managed as wakeup pin and configured
+>>> in OS secure).
+>>
+>> How does the Linux PHY driver process such a PHY IRQ ?
+>>
+>> Or is Linux unaware of the PHY IRQ ? Doesn't that cause issues ?
+> 
+> In this case, we want to have an example to wakeup the system from 
+> Standby low power mode (VDDCPU and VDD_CORE off) thanks to a magic 
+> packet detected by the PHY. The PHY then assert his interrupt output 
+> signal.
+> On MP13 DK platform, this PHY signal is connected to a specific GPIO
+> aka "Wakeup pins" (only 6 wakeup pins an MP13). Those specific GPIOs are 
+> handled by the PWR peripheral which is controlled by the secure OS.
 
-This is now a conflict between the dma-mapping tree and Linus' tree.
+What does configure the PHY for this wakeup mode ?
 
---=20
-Cheers,
-Stephen Rothwell
+> On WoL packet, the Secure OS catches the PHY interrupt and uses 
+> asynchronous notification mechanism to warn Linux (on our platform we 
+> use a PPI). On Linux side, Optee core driver creates an irq 
+> domain/irqchip triggered on the asynchronous notification. Each device 
+> which use a wakeup pin need then to request an IRQ on this "Optee irq 
+> domain".
+> 
+> This OPTEE irq domain will be pushed soon.
 
---Sig_/XcPvDPn//a2UViAc0ysycQ_
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmZFRBEACgkQAVBC80lX
-0GyBLAgAjOyX7LRNLBPiTsX9UYXq3Dj5vzSJE9dv5mqGbXU+39GRYPRVpADcZaXo
-8cNjiP7nkub+BQYXPFndeyB/J3hngcEPdMt1fY1qMBikrRBpIkt1XPuiRP1K8YR7
-p9Kb4C4GZ/UR2m6xSGXhXDROgMXYknqOcHX3SNQUXn/lc+MyAxl5PKHGxcoLqGnw
-BG7UTF8Fs0J4MUIZ31hzgw23q37ULLLULk6uzFtjZgI+UcSMHRVLkBzVYSDZvzlF
-xO08zGVXSqtih/VwzDRNtLR6GLiroTa/FR1K+9v6glrfoUNuSpA+ncqWcoqTQQjh
-vt0nklB3T5+hFrlsveDZsjhNWvaWrw==
-=hnQX
------END PGP SIGNATURE-----
-
---Sig_/XcPvDPn//a2UViAc0ysycQ_--
+I suspect it might make sense to add this WoL part separately from the 
+actual ethernet DT nodes, so ethernet could land and the WoL 
+functionality can be added when it is ready ?
 
