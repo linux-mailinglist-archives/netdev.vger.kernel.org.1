@@ -1,184 +1,173 @@
-Return-Path: <netdev+bounces-96684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD4808C721C
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 09:37:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69D528C724F
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 09:58:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E07B91C2138B
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 07:37:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C8491C2178A
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 07:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0DA64120A;
-	Thu, 16 May 2024 07:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5E052F64;
+	Thu, 16 May 2024 07:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="M47PdHeQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m4ovsxHe"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2063.outbound.protection.outlook.com [40.107.6.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9438B1E48A;
-	Thu, 16 May 2024 07:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.6.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715845055; cv=fail; b=MMaN6JlEh5kxH+Z9Uyd4tMkXFpunQyZMr0JhD6ai1RvkH8XiJPqfEj6cqY+fXU9dTSS8w14YhelP12Bq08mfO6sMjDH5JNqhP4igyFv//yRJgQus9hRjFk5QshIDi1rK6mIJSYp5sOPxhgg+4o/CoPZ2EpBfzN1gESStTK6rSQs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715845055; c=relaxed/simple;
-	bh=/Et4y1Wa1lI9teH9+PbjnK5sQsFtjS7eia/RYFigoe0=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=Qe13DhQ83WU/oEq1jihJ609d5PBFuvOoknhdccH9uO/GkLXpeZhq/kFUOJXXEzlcv+NNti+yA7T8M2UfV+bnssBNYVsC1mkTmj/rYx65zE7PXm9VEoqkdaERRs12lHG8rQ3wJpN/n1s0O60w/q/wY1hFUOlYkg39G+Co3Ym5Tfs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=M47PdHeQ; arc=fail smtp.client-ip=40.107.6.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KmP86vyB/Vrf0yJmnwxpVTpPms7NhEij7II/zuPFWXq/1ElKfaIyCPDuK/m2dBWtN5kdg/9tMC0k0S2hvOpKgy/medGjOufHKKDrb/8Q9otSgCd1XR2i68C+mbYw/xPVMAQ8ZNGTkDkIMs2n4xIyAZcF2HpoWFW7wX2lPsVo6JZEZ8GzMjQJMWfBe8TkCG8WJFdNYJdT8IWCVenYvPcVcWiteUUZyQ8kM6qZK6IUAbMI/YdyRvGC5qKIX54dBGH/rutnHcKoLVRraoI8P1PzIQMtuGBaBf+7Nc3On4YWyIV92Eu57QP/zZmf1wc0kpMzaYW8mpU74WJKjrHP/TQSxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TzK6KCnL75iIeu/0keC44iFjDBrEbb/opc6DTStlLd0=;
- b=OyFxnfEfiUdG/YzUXTuyWyvL9weTsWbAulWo6UVwvab5TGKHCn5eNdtXvmEKbCpyq8X6tY5xSUwRBX/oK1ka0upLMJoZE1jFX98/6JjAJNGCRW5tJAAuJ3uOMRMQvS/VxKM30n1cZpDQ4Zr/N4eW7GIXwMsrYnalJF3Bpti1KtjbG69gHfUUICOr1bSmnFPA7sx46ar/ATuX17pSUOmY+vNHdcjLg2DOQVqwMXUSqlKFAxHsuJalCwvyIGZ/+0cJaOGIyJPRVJmhbUWTyK9B6bN+QkJee7YHgfPrimGUNoAopuozHHEcYjTQEGUvD1Jxkhs4WAkIaXKZc7XaQGfEew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector2-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TzK6KCnL75iIeu/0keC44iFjDBrEbb/opc6DTStlLd0=;
- b=M47PdHeQrgcSSfpObRoTxTYgsEyWZ9Coov+rWVOqAv4nH1Bry2Pac80mkHJOrC0TSbMLaVBBqpYzzokrh6o1Eu+Apm8In7Qt8ON/i7MrIS6IXoyOeNH5zAgQrxHvluz2mxQwoTiRDLs4WqTOdGz67Un+two18GZn5LlCnAcub/I=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from DU0PR04MB9417.eurprd04.prod.outlook.com (2603:10a6:10:358::11)
- by PAXPR04MB8813.eurprd04.prod.outlook.com (2603:10a6:102:20c::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.28; Thu, 16 May
- 2024 07:37:30 +0000
-Received: from DU0PR04MB9417.eurprd04.prod.outlook.com
- ([fe80::557f:6fcf:a5a7:981c]) by DU0PR04MB9417.eurprd04.prod.outlook.com
- ([fe80::557f:6fcf:a5a7:981c%6]) with mapi id 15.20.7587.026; Thu, 16 May 2024
- 07:37:30 +0000
-From: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	virtualization@lists.linux-foundation.org,
-	eperezma@redhat.com
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Peng Fan <peng.fan@nxp.com>
-Subject: [PATCH] vhost: use pr_err for vq_err
-Date: Thu, 16 May 2024 15:46:29 +0800
-Message-Id: <20240516074629.1785921-1-peng.fan@oss.nxp.com>
-X-Mailer: git-send-email 2.37.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SGBP274CA0010.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::22)
- To DU0PR04MB9417.eurprd04.prod.outlook.com (2603:10a6:10:358::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E7950A80
+	for <netdev@vger.kernel.org>; Thu, 16 May 2024 07:57:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715846277; cv=none; b=fdNVo9HJZ2Py7wj8oN2Jk8vwo11oolB4nwlLQPVeTUVSyBBx4Kmd9JXBfCJaG4b4D9KOMwmjmzl/IeiTeBlnfUBcgNFIYR61hCgjFKTyLTpBjQU1zak849O/s7F+Fj3SmIy6kGanBdT/0MQUnVHXvw9ApQ1b9OfPE1/IH8+iujA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715846277; c=relaxed/simple;
+	bh=EgBouWkS1lUrZ4JKXbjXsxiuGM/lqPDFzwZ0dypANqc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j4AURrvkr7p7kZ75+NibRkhPyDTilfYkdth49xaw9m86OSZbjPHQOcEetv7iuLMuzQ1kyZe2KK+UroVJbO620t8sUSuT3BRIvkhGF/uiTB3UoUV1G8l+FMMUoZVhxtiPpKCyZltniMZts7U2osr/W5BHYrn2BsW0ffGMjaI4Av0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m4ovsxHe; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-572f6c56cdaso51024a12.0
+        for <netdev@vger.kernel.org>; Thu, 16 May 2024 00:57:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715846274; x=1716451074; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zwCPDgEvz1cHD8BgxkzBvHnQ1zEbnlyRVVrwyIv21c4=;
+        b=m4ovsxHebgiW6Dg4Svl34pzL0JJCxXmKhXr6AVmTG2/7yBWUE+S/M+an7CYLU0GGJ+
+         pFMakfX9MsWd9/YjJIuO4mvNDmgonXknUZsfKXO9KbYBzXWi6cxH2n5ro5n4i9ioDNuD
+         0fc8UwG6HfwNbjpUIBP7+26/xPXtwb6HvtHmuSRwndAq0747ZOHtIHfxMeBgL1uO6BiN
+         wMaqEObQd5/Aj5HOIiS2EqNYsV3QsXbcl85IlxWnnVgQG6ELD9z9MAPrPeN7xuY4q+Gx
+         JKP/uXPnucQa0Tz/pCA/iut90XNh5zZPY1oSTZNj0Wj/cxWrTuWzFHwWbW76VclSQf9J
+         nDjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715846274; x=1716451074;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zwCPDgEvz1cHD8BgxkzBvHnQ1zEbnlyRVVrwyIv21c4=;
+        b=r/e2aRBUKU+87wZHVBeMJtUroyAcNRO2zK3wYmCWorjY8BbGDWBUbioHs6T0zmsvAZ
+         1bdFF16x7EnBDstukWJnBwoOcn0eUygPSS+odN8AreofgwSOs3BonGnEffZNLRtDSvOy
+         cJLHn5Tdx1e54SIaWp+O2nSheMycUyrBqpEkiG46Rmn6oXCSHkIIHXtqfUceJ8Jtz1z7
+         4SPOK3u6FoqjtORrfXpVDVjd8ap8eKvC+eL2igseyZ+oKbBp1/UcK/e+8sLJ3DojVyen
+         h8w6ZZMKkl6IuDT5azUukL30Vy2SXcLJMneQ8NeSAAoo6ixHPCEHmFeguPKUDO7VrCZy
+         sVAw==
+X-Forwarded-Encrypted: i=1; AJvYcCXCpbbc2dyFxIqEBjeUzkDHRyYSjYBJSWHUyH1eI68WC8ngVsIbHEHGqWc2OnOT1spxc1cn9+hwBToRDH0ey3O2+QGLSSRY
+X-Gm-Message-State: AOJu0YzgdL1UaGEoxrvETYp3zRMLq04+5vmIMuWvxCs2yglYIGw8TLKc
+	A4y2b/zxwvEr2TLBXY5yI5lk4hDRygmDX+uTzfAu8GzN7fuyMzZStltkP0kxvcxvR1M+yCR6Hwm
+	ODX2cUeiw5TcJBQtJUZqJm2EYTKWLHBfl6XU1
+X-Google-Smtp-Source: AGHT+IGtVps28vwJJ/kd/CB5egGBhMT/xkCd1XCgqZF0kyn/71HMYJIBukN9B132dEKdBuEFt3rx/CWzJRt9In4KlhA=
+X-Received: by 2002:a50:cb8c:0:b0:573:438c:778d with SMTP id
+ 4fb4d7f45d1cf-574ae3c1280mr925656a12.1.1715846274034; Thu, 16 May 2024
+ 00:57:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU0PR04MB9417:EE_|PAXPR04MB8813:EE_
-X-MS-Office365-Filtering-Correlation-Id: 18584296-1a3f-4e0d-dbf6-08dc757b0aaf
-X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|376005|52116005|1800799015|366007|38350700005;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?v6zCA4rj6yahO8JXGmcdfw7AnzGvxfvcFWxkbOg3WjtRwf1RlswjKO/5cSPi?=
- =?us-ascii?Q?xvj2lN0w8aM3cbraz8H5pJwARvmFirJPz0llzzih/Lm4dHGq93y7QHm8pzMr?=
- =?us-ascii?Q?JQUUDavLjKzE8dd58GzxeT4oNQn5w26clHBXQTTQkA71KBglU0jvP+nV0/50?=
- =?us-ascii?Q?NAQ+MZ7Cbm3bQ6InJASYQ1UK7dvGLrv2Z1AqfDM1on7gMVlBcp3YIDf3c11b?=
- =?us-ascii?Q?ZzYnv6gpBrcx9FEfK+JbZjRnzE48bHQY/Le9jv4lrYU19GdZ43AXKXC20P6W?=
- =?us-ascii?Q?vUX51Ds4AqSbwB2YlmsvRKRbGfKNXKEoiW7VQD1qCZ8NiY20afvFb8qaie+i?=
- =?us-ascii?Q?v63tHKuwv6I92o+BUp52J32SLYDh6qymtfwamIcZEwqP/i6nYgi8Wr5DXCjB?=
- =?us-ascii?Q?bgNqYu/xAyEPDkG/p35coNibgj1HYn3YRBk9yb2op/JSZF+pGPwpfl8z3hVu?=
- =?us-ascii?Q?lSnUCIhTgDrKfni2fVXn8w+t5lEXOYIW5wyU/KZwplbca/BcIPi5GwJCUdCV?=
- =?us-ascii?Q?FwwGyiPtXzdyG3Av3sIlFpNyIaWegrMN4gs9fNG22/BfS0va4YTVlfgazg+6?=
- =?us-ascii?Q?5Sky3B8+KXNkBp5JAI8pcZYaN4x6bUnGPTa7RbgntIke/vIN8xcTrp+8qPYF?=
- =?us-ascii?Q?9cVR+QRJx0MwOcuI/sVaNnz9kWFbnTvaRMRcEeRbqFJ32cujNfs2P76+slYF?=
- =?us-ascii?Q?q7syU308J16gmRIXPKl8j94X8prhFGlcOh+30wVF7mk+mk174FPECxogktHV?=
- =?us-ascii?Q?UUDgCzB1tzGAo8TdAmStqF8HGsiZce3vnjKKhtafXWukV3hADzAxdFIZ6h+5?=
- =?us-ascii?Q?2PC4vvab054mDJ0flzc+/H1bb7ZAzQxT6mUd9miwXaaP/LV4qZZ1Nc4b/HAt?=
- =?us-ascii?Q?aU3lScZd2yarWZiYYzLVdW4KWy6mgmqOo08BCFvhjzERC7GaGs1FyI8Efcu8?=
- =?us-ascii?Q?1aAvGEEMymnvQlHUS4z1YQzkaHjrg8EXhHBYoXPLrGoq1lvMBKxuFiBggS+J?=
- =?us-ascii?Q?hDIhpK0PgSFaoietXqVVSaTDv+994TLa847uxAXREwRW669n8wAkvUwbkcnX?=
- =?us-ascii?Q?aQrcsoJbu6lAk7U2LfW7J2isFovdMFHFZtRjLfHhnQYQKP2ae+7IPV//Kbi9?=
- =?us-ascii?Q?Fud3OvC4gGx7w1gObgT3mGZuOXLWbmUFeXCJHo6C4gSqkulx21TwZpk2E3yd?=
- =?us-ascii?Q?KooUB7Wleg5cQhR6PvxTCA5vRRbV8yqCkBaLMd0BgXMqrqeTDMpy73LAUZ4+?=
- =?us-ascii?Q?zOrVZ+c7EHlKY8NjmT7/W252oieknwlytLH5UcZ3Sp4yW6Draqcv/2TwgZFM?=
- =?us-ascii?Q?OIx+ty61zTng3QbZ2JCR/s+aLTBcy25quJ9Jiloe6DZODw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9417.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(52116005)(1800799015)(366007)(38350700005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?tJqt41nC2OHqTwT9xJEWpfBVt8rLRlEPIkhydc2lxTGDqeyLsLVL6bMx541u?=
- =?us-ascii?Q?h/4KQgLyCp7h8Eke/lGai3oxSwfaw5MfzuDQBlmdG9NDIbLnIfEug3XVNViN?=
- =?us-ascii?Q?A9Wi0du7FQaRLiZNL1jSZ/FQYf3t1a4Z0wS84vrueTSOLkSReOWapwcNRyHB?=
- =?us-ascii?Q?Pncx9FzjzY8u1GVZdp1RJQ1wPnYaKaUkz/aMIfpkq9Nv1e+EhixkQczWHVLT?=
- =?us-ascii?Q?RKJ/ZOVqcAZWnX46G/l5ZQErUn5AfJCGw0F9rWGP2WBWeKeoNXQ2URLv/Haq?=
- =?us-ascii?Q?QOgDGLwGgK3PRsTcn/vpj1/eOJFt9Qgs1KZqVNzXu2KeYCurAe0Ljn4Nesuo?=
- =?us-ascii?Q?uoJWHz68VNIrGPhhVWuZtcjx1Ou7p2v+UEBk1CqfyvPIkXnGRfeD++4+nxNm?=
- =?us-ascii?Q?PBcWtGg5wXngw+xZFayNyvbxKlbMhuyl6bWi2K/LU2VSF0ol8qtqa8Jbqk2g?=
- =?us-ascii?Q?OaCf2/I4Bf8qHAlwqDiNCARyBdzxueX1WfffNORFVudAs2XhXiqV/8Crkumm?=
- =?us-ascii?Q?1na/XvUJxNr9OHas5iWyfivvFHrkHQ9wR6yS3zRmFyAhkaOoxxi7Rd6DYTN6?=
- =?us-ascii?Q?fZ38mVRVIZAnO0GWqvVIwQegx/Zc0aizDMHlsHgXYBqjy0/7Gq5Vd6PiD2wh?=
- =?us-ascii?Q?qyzXQLMt8FT/LkH+gxGQ2dK1/hq3bbfK41KxM/kyBPEMqMD8Qg1J7ay6+lI3?=
- =?us-ascii?Q?zMZe0yQUSJLroEmKKgfMfHZeHnKdt4lfXm/cd+iz9+LcXKpl84IAcQu170lH?=
- =?us-ascii?Q?Clk1icZ4YEPXwibUIpmGBBzlA3Hn7oFV7df4CKdasC49YTitPS+c4+sB520I?=
- =?us-ascii?Q?m9Pa5QUJPWl6OMVKxh6ypc7yvCSdQPhpt/A1j2X2qV5NrTUbySz4GDHrzNXa?=
- =?us-ascii?Q?r36rQRic3hiQTS6ZoN3ypXhCAv8j911/EWS4zBKkgDTnM3nZd2ymsvi+jhun?=
- =?us-ascii?Q?zAbmg4LvSfHOBYpR5IYHrbt9PKM4AQTsG8GnkOkzxUfuGtHOjwBe/KJXQOhj?=
- =?us-ascii?Q?sEsr5HlMN8Lz2WvgoazvEHiMEKjcCB6y7ymX6lrHGvTsPvvWqb+uKeuKrdxi?=
- =?us-ascii?Q?DYiMwbnYBDefjOz3WaP/3KktLyclUfR6n80MQGIgfAerx8pzcyHMWJzLflA3?=
- =?us-ascii?Q?hJAipCVl9a1UfYdvEelhOvuv9eV6U42VH6gpg5MR309C9/R6NPy74+B5A5QI?=
- =?us-ascii?Q?idDrOmhwxAMi5LiAhfitzM9c16/YciqvVsIy9mHQ0Cd3b2qB5+wg0thaEs/X?=
- =?us-ascii?Q?PfSslcrJnZMrxVyXTksF1Z7Az/9mYikX8MdaMYnYb7deQDEbniUaCEMmpQUX?=
- =?us-ascii?Q?B7fFubYIaY5WL7iYABoRlU1mtiWNG3yIcS13Qvbzx3o7+qedqGQgPMEhp9hp?=
- =?us-ascii?Q?0zWD4vu1IQkEqBJwOxpJcqd5o/HSaFXcw9n9dFo2WIgKYEtiIY0JcY3fsmEa?=
- =?us-ascii?Q?uSJH7P9E8mIfcAl0hjDfcKTQB8OJNVgLiTY6RSf9FZyC6Gm2tZ1BMP/M43xW?=
- =?us-ascii?Q?gWCOG183tvmguoXnkE9SI92e0UKS9I/bS918Zpn2aSJtgGtnW702wgUbKV1F?=
- =?us-ascii?Q?WV24apsxFNAC6XYfPEtLvi2t5m4dICYqQ23dwrCH?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18584296-1a3f-4e0d-dbf6-08dc757b0aaf
-X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9417.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 May 2024 07:37:30.4011
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cu0m9vC+1gMxccMSkDMYITlC+Zk1fpnvFYuNkfPG1U4DuC553au9GCqIi9s3TK5Np4mLTN29Hob8yAjZ53+n/Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8813
+References: <7ec9b05b-7587-4182-b011-625bde9cef92@quicinc.com>
+ <CANn89iKRuxON3pWjivs0kU-XopBiqTZn4Mx+wOKHVmQ97zAU5A@mail.gmail.com>
+ <60b04b0a-a50e-4d4a-a2bf-ea420f428b9c@quicinc.com> <CANn89i+QM1D=+fXQVeKv0vCO-+r0idGYBzmhKnj59Vp8FEhdxA@mail.gmail.com>
+ <c0257948-ba11-4300-aa5c-813b4db81157@quicinc.com>
+In-Reply-To: <c0257948-ba11-4300-aa5c-813b4db81157@quicinc.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 16 May 2024 09:57:38 +0200
+Message-ID: <CANn89iKPqdBWQMQMuYXDo=SBi7gjQgnBMFFnHw0BZK328HKFwA@mail.gmail.com>
+Subject: Re: Potential impact of commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
+To: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
+Cc: soheil@google.com, ncardwell@google.com, yyd@google.com, ycheng@google.com, 
+	quic_stranche@quicinc.com, davem@davemloft.net, kuba@kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Peng Fan <peng.fan@nxp.com>
+On Thu, May 16, 2024 at 9:16=E2=80=AFAM Subash Abhinov Kasiviswanathan (KS)
+<quic_subashab@quicinc.com> wrote:
+>
+> On 5/15/2024 11:36 PM, Eric Dumazet wrote:
+> > On Thu, May 16, 2024 at 4:32=E2=80=AFAM Subash Abhinov Kasiviswanathan =
+(KS)
+> > <quic_subashab@quicinc.com> wrote:
+> >>
+> >> On 5/15/2024 1:10 AM, Eric Dumazet wrote:
+> >>> On Wed, May 15, 2024 at 6:47=E2=80=AFAM Subash Abhinov Kasiviswanatha=
+n (KS)
+> >>> <quic_subashab@quicinc.com> wrote:
+> >>>>
+> >>>> We recently noticed that a device running a 6.6.17 kernel (A) was ha=
+ving
+> >>>> a slower single stream download speed compared to a device running
+> >>>> 6.1.57 kernel (B). The test here is over mobile radio with iperf3 wi=
+th
+> >>>> window size 4M from a third party server.
+> >>>
+> >
+> > DRS is historically sensitive to initial conditions.
+> >
+> > tcp_rmem[1] seems too big here for DRS to kick smoothly.
+> >
+> > I would use 0.5 MB perhaps, this will also also use less memory for
+> > local (small rtt) connections
+> I tried 0.5MB for the rmem[1] and I see the same behavior where the
+> receiver window is not scaling beyond half of what is specified on
+> iperf3 and is not matching the download speed of B.
 
-Use pr_err to print out error message without enabling DEBUG. This could
-make people catch error easier.
 
-Signed-off-by: Peng Fan <peng.fan@nxp.com>
----
- drivers/vhost/vhost.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+What do you mean by "specified by iperf3" ?
 
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index bb75a292d50c..0bff436d1ce9 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -248,7 +248,7 @@ void vhost_iotlb_map_free(struct vhost_iotlb *iotlb,
- 			  struct vhost_iotlb_map *map);
- 
- #define vq_err(vq, fmt, ...) do {                                  \
--		pr_debug(pr_fmt(fmt), ##__VA_ARGS__);       \
-+		pr_err(pr_fmt(fmt), ##__VA_ARGS__);       \
- 		if ((vq)->error_ctx)                               \
- 				eventfd_signal((vq)->error_ctx);\
- 	} while (0)
--- 
-2.37.1
+We can not guarantee any stable performance for applications setting SO_RCV=
+BUF.
 
+This is because the memory overhead depends from one version to the other.
+
+>
+> >>
+> >> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/=
+drivers/net/ethernet/qualcomm/rmnet/rmnet_map_data.c?h=3Dv6.6.17#n385
+> >
+> > Hmm... rmnet_map_deaggregate() looks very strange.
+> >
+> > I also do not understand why this NIC driver uses gro_cells, which was
+> > designed for virtual drivers like tunnels.
+> >
+> > ca32fb034c19e00c changelog is sparse,
+> > it does not explain why standard GRO could not be directly used.
+> >
+> rmnet doesn't directly interface with HW. It is a virtual driver which
+> attaches over real hardware drivers like MHI (PCIe), QMI_WWAN (USB), IPA
+> to expose networking across different mobile APNs.
+>
+> As rmnet didn't have it's own NAPI struct, I added support for GRO using
+> cells. I tried disabling GRO and I don't see a difference in download
+> speeds or the receiver window either.
+>
+> >>
+> >>   From netif_receive_skb_entry tracing, I see that the truesize is aro=
+und
+> >> ~2.5K for ~1.5K packets.
+> >
+> > This is a bit strange, this does not match :
+> >
+> >> ESTAB       4324072 0      192.0.0.2:42278                223.62.236.1=
+0:5215
+> >>        ino:129232 sk:3218 fwmark:0xc0078 <->
+> >>            skmem:(r4511016,
+> >
+> > -> 4324072 bytes of payload , using 4511016 bytes of memory
+> I probably need to dig into this further. If the memory usage here was
+> inline with the actual size to truesize ratio, would it cause the
+> receiver window to grow.
+>
+> Only explicitly increasing the window size to 16M in iperf3 matches the
+> download speed of B which suggests that sender server is unable to scale
+> the throughput for 4M case due to limited receiver window advertised by
+> A for the RTT in this specific configuration.
+
+What happens if you let autotuning enabled ?
 
