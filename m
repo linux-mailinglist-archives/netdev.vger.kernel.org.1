@@ -1,153 +1,208 @@
-Return-Path: <netdev+bounces-96794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F2628C7DE1
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 23:06:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A5058C7DE5
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 23:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F8581C214EC
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 21:06:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9AE12829FD
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 21:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC5F157E9E;
-	Thu, 16 May 2024 21:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205E9157E82;
+	Thu, 16 May 2024 21:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O9xpuRdU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nKipVV9H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1E9157E82
-	for <netdev@vger.kernel.org>; Thu, 16 May 2024 21:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E74726AEA
+	for <netdev@vger.kernel.org>; Thu, 16 May 2024 21:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715893561; cv=none; b=YHje06y4cahUdlnNboJhsZs4wbXoHLSuhq0wT7OKZKROcYGMwD5/X3+FdZxnvphwLY8jDKnjbNp2U/LVOYoluP+OcmFtXIpdF4kzWC6sCl7UA2PB9ozjmHFcqxZ6D7NCm6ar3xP3jTVgw6sEZG0Odn9V7mxVEQ79X23AQHm0MVk=
+	t=1715893829; cv=none; b=jN38yexHPjt6crU/GCZ/3Ngkt3/XKCLAuSnS8/tT45gsN1HUpK83IzL2o5l2/LibsRXLoUSm4UbtvLTCpSl0qGpng7PE/4+D5edc+ZVhmZ5nHayl1sTN12f3AFzbjtQoO5csYQJw66Scwn7WKf3yWLSPco+8wY1l4Xt1WEMYxo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715893561; c=relaxed/simple;
-	bh=kB38o85pn/GJarPAddnJlZVHN6WB91yX6h3Qc6dHZsM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VFjVolCHUm2dM6GZyNq7xa5l0+/HoMhNCYhA+w1C5Ot2HqIBM07ras6aMGlHcwfYWxXqyNskknckHYIrbU2tDrtjhSzHgk7TLlWh9rBAeOgkxlKD/LDKKyVYW6plb9vTxh/U/G9oZKKzSIEJVwgKsuvrXMfEo2ygyUgw3fZTZJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=O9xpuRdU; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-deb99fa47c3so8814175276.2
-        for <netdev@vger.kernel.org>; Thu, 16 May 2024 14:05:59 -0700 (PDT)
+	s=arc-20240116; t=1715893829; c=relaxed/simple;
+	bh=61To3U1BJ8KIm1flnm6QXQ7nH7fJUD1gP+QELq943Rs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hPUkwxnpRD6DvM7PUQ5JW+dmXFu9D5ShXlFpcpm1k3irIbe+dn7jB6kYwkXxoIflHD0sEj64cAobmaoPcMdsbZw1A3ogyCvxQnsxcFeuSzt0mxBmuwEF3Q/1n1hUv2S56XYxaSpJ76kdOnOuL4MzVTSmmcn40j3F3t7oR9Jexrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nKipVV9H; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42016c8daa7so34428105e9.2
+        for <netdev@vger.kernel.org>; Thu, 16 May 2024 14:10:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1715893559; x=1716498359; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vdQVJALIhd9J+5MaB3JGG80Txdx/1fS6o6hU1+crkwk=;
-        b=O9xpuRdUUDqcRavlYV2GvPe9of4mRVouJb/lhck5tnxRggTC3cvzQYa2AIiiwt7jfl
-         YrzTdIgdxy9DMN0d82cSpxjgRP14Kbs6S4fluFLs4Xue1ptB4O2ndn8c79HNmdyk1jmK
-         nDS/FVDal2+jQtG1Onh9SRwKt0L8zm4fPVJ6Z1oGVpaEdw6qDIYo4KjQcfdgLT/Zz0iG
-         fkH9fHaKUNexxDCGwFbvKK4zPikzh4C+y6XVuwBLxOTZb0jaxlD5AjDKpi4DxsSGz0Cj
-         ZdCTpYMOjmju6Us4Av7NInpuyOYtofgEyDDkfzZYb0wY+56Ru4ONQJKgCV3YXoomRwEW
-         MDLg==
+        d=gmail.com; s=20230601; t=1715893825; x=1716498625; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WOiA4Wp2oUV3fRuzQBIO2gbiVYSCBWCran4MYc20h+A=;
+        b=nKipVV9HPK+jsiuOrot/ePhbeaKtbIoKpcgLx3gbiOdeHX5Uzt/D9ACnz8b9DUeoi/
+         UmYaVqIY5Mmu7MDNtxYqMP25C2wBYK5wl7MtOK8rGocFh6MQrOnARwgjs+Q3oNcMveOy
+         GTTMelPnXCqmNiPCMA15fvqyHYQ6v9Cpw/IqQ0lgtah05nqkJejg1tz8Wj0guJnKz3NS
+         qubnk8v/HvDAOfAfkMg0aSnOKXHu7IocBHS6C3jaoz3pF3QyC282k+UMwDqpVEneqsbB
+         CTx9NQAp5PWP3yCQ/u9lDGGt9yr4MnzN4Q342DmBt4IATeRzQnTFKco3gm7WasDEz6GM
+         23+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715893559; x=1716498359;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vdQVJALIhd9J+5MaB3JGG80Txdx/1fS6o6hU1+crkwk=;
-        b=lpG8iAX1PbNqYexstpT46NXf562DNHdmCVrdmif8hC0VQBKz8nZ/Fl/ON6BKlV6zPQ
-         o07HeGL6qfHtsNUgUUWD11Qj0dMkwngOyyBEDxclxwivyw5D7EV0Y5xjQvQqWw578SXx
-         JtrON/3JDozCnYhLGQ/SlUNpvq0V+7UpQ0MIUN7zmSQUEBJxeWc0rhQ7fnfI/Jlze/IR
-         pY6/hr6aDiExxANBjSC/AXBO3bTYZ+j/wOjuS8MtIIuIOAqg7DONXh+qqPdWd4x/2CO9
-         5p3xE64l8LOYJDvKSynKFKjsv+s6dvkj9hfW9OuV3XBqK1x4BYZlKayBefLAslh76l8/
-         mbCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUD/Er1mCzj/3MLBmPsDjeWJ2C+CX2cz9+UtDpvE0GC08bRBayYqTQ/rul7zCM4jusetTpNvcIEQqP8eJWJktMTB6AIIU56
-X-Gm-Message-State: AOJu0YyBUu9aGVPfFebPGOaoWSEiHAP/b1p6O0csAsyFXmNz4U/XJH3K
-	KHp8bnTlmobEBvAG4+JvFjnvcpTR+j6tgc4S3tFXepfcPnhLe8ycAdFnUcjBiITSkEAPyv8hren
-	+Z1+RpLNCbkPleM28pbcIJRM8NqitUfejeZdCbw==
-X-Google-Smtp-Source: AGHT+IGPVI7xUKR6WSZ8Rlc31e14V3f37LgbLOEi82rBg1xrqYEaOrRWPX+MwjIkDuFNMNGbSL5VXpr3n/oPxM83b3s=
-X-Received: by 2002:a25:8e81:0:b0:dc6:b820:bb45 with SMTP id
- 3f1490d57ef6-dee4f2fe16amr18028910276.27.1715893558734; Thu, 16 May 2024
- 14:05:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715893825; x=1716498625;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WOiA4Wp2oUV3fRuzQBIO2gbiVYSCBWCran4MYc20h+A=;
+        b=lR+VVSYsT3k1kmuTWSiYv4slxEyHDMqf4I5+vLAthQCrupRBQ8Q6enTL4igxE4kYSQ
+         b2zCkrOvFQGi0NVlQL84LbkMlm7rz/70emnpCgAdLSfyFCp5D4OTeMSN+/06x/zhqGDe
+         2oqJsVaVk9CMZSkVqJ0tcRLwdVxiU2znNE3uIgRGsB5cda4Pgft7XRfW3eQhwzcpB27Q
+         6nGIT1xM2Yve3T5d5zhKoeYyMjFahVgo1evX5nNpm2S1T0kDMEG7GAxFkMNfZ+tIwIjd
+         1UM72z0UhP+u3ZSv5kU8KO87ih1/fZpEOywQelfsLAQ0OHzwCXSXZOBaCLSTMsQUg2yg
+         c+dQ==
+X-Gm-Message-State: AOJu0Yxcp9veY5NqOMn/0rRg0Krv2GRTtbivLuXoYF1DQsVcxWtRcadX
+	DstjRL9QKKTOb5mKOr2dLd8FNBelOhX6UvOOrBCtYlTojzGo0N/jrPfAqUky
+X-Google-Smtp-Source: AGHT+IEWA/yX9LlZl0B3A/A9aO6KHmaVWhUaXQZy9h6Fojswg7TxXyg2js2haO+LdQRXObx/YMNguw==
+X-Received: by 2002:a05:600c:4f83:b0:418:2ccf:cbc7 with SMTP id 5b1f17b1804b1-41feaa2f473mr144691995e9.2.1715893824689;
+        Thu, 16 May 2024 14:10:24 -0700 (PDT)
+Received: from [192.168.1.58] (186.28.45.217.dyn.plus.net. [217.45.28.186])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccbe8e3csm283039525e9.1.2024.05.16.14.10.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 May 2024 14:10:24 -0700 (PDT)
+Message-ID: <84d8b645-d756-4a07-9062-cece62fcfd50@gmail.com>
+Date: Thu, 16 May 2024 22:10:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240427-realtek-led-v2-0-5abaddc32cf6@gmail.com>
- <20240427-realtek-led-v2-3-5abaddc32cf6@gmail.com> <20240429063923.648c927f@kernel.org>
- <CAJq09z6kBRXKG6QVyfUO6qzKaOZL6sbRnNXu8aT+siywjX7xLg@mail.gmail.com>
-In-Reply-To: <CAJq09z6kBRXKG6QVyfUO6qzKaOZL6sbRnNXu8aT+siywjX7xLg@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 16 May 2024 23:05:47 +0200
-Message-ID: <CACRpkda9W7SjX+saGY9U5ct6MdD_f-B6C0PTF0OffCRPEsEnrQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] net: dsa: realtek: add LED drivers for rtl8366rb
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] Revert "r8169: don't try to disable interrupts if
+ NAPI is, scheduled already"
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>
+References: <9b5b6f4c-4f54-4b90-b0b3-8d8023c2e780@gmail.com>
+Content-Language: en-GB
+From: Ken Milmore <ken.milmore@gmail.com>
+In-Reply-To: <9b5b6f4c-4f54-4b90-b0b3-8d8023c2e780@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 16, 2024 at 7:30=E2=80=AFPM Luiz Angelo Daros de Luca
-<luizluca@gmail.com> wrote:
-> > On Sat, 27 Apr 2024 02:11:30 -0300 Luiz Angelo Daros de Luca wrote:
-> > > +static int rtl8366rb_setup_leds(struct realtek_priv *priv)
-> > > +{
-> > > +     struct device_node *leds_np, *led_np;
-> > > +     struct dsa_switch *ds =3D &priv->ds;
-> > > +     struct dsa_port *dp;
-> > > +     int ret =3D 0;
-> > > +
-> > > +     dsa_switch_for_each_port(dp, ds) {
-> > > +             if (!dp->dn)
-> > > +                     continue;
-> > > +
-> > > +             leds_np =3D of_get_child_by_name(dp->dn, "leds");
-> > > +             if (!leds_np) {
-> > > +                     dev_dbg(priv->dev, "No leds defined for port %d=
-",
-> > > +                             dp->index);
-> > > +                     continue;
-> > > +             }
-> > > +
-> > > +             for_each_child_of_node(leds_np, led_np) {
-> > > +                     ret =3D rtl8366rb_setup_led(priv, dp,
-> > > +                                               of_fwnode_handle(led_=
-np));
-> > > +                     if (ret) {
-> > > +                             of_node_put(led_np);
-> > > +                             break;
-> > > +                     }
-> > > +             }
-> > > +
-> > > +             of_node_put(leds_np);
-> > > +             if (ret)
-> > > +                     return ret;
-> > > +     }
-> > > +     return 0;
-> > > +}
-> >
-> > coccicheck generates this warning:
-> >
-> > drivers/net/dsa/realtek/rtl8366rb.c:1032:4-15: ERROR: probable double p=
-ut.
-> >
-> > I think it's a false positive.
->
-> Me too. I don't think it is a double put. The put for led_np is called
-> in the increment code inside the for_each_child_of_node macro. With a
-> break, we skip that part and we need to put it before leaving. I don't
-> know coccicheck but maybe it got confused by the double for.
+On 15/05/2024 07:18, Heiner Kallweit wrote:
+> This reverts commit 7274c4147afbf46f45b8501edbdad6da8cd013b9.
+> 
+> Ken reported that RTL8125b can lock up if gro_flush_timeout has the
+> default value of 20000 and napi_defer_hard_irqs is set to 0.
+> In this scenario device interrupts aren't disabled, what seems to
+> trigger some silicon bug under heavy load. I was able to reproduce this
+> behavior on RTL8168h. Fix this by reverting 7274c4147afb.
+> 
+> Fixes: 7274c4147afb ("r8169: don't try to disable interrupts if NAPI is scheduled already")
+> Cc: stable@vger.kernel.org
+> Reported-by: Ken Milmore <ken.milmore@gmail.com>
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 0fc5fe564ae5..69606c8081a3 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -4655,10 +4655,8 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
+>  		rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
+>  	}
+>  
+> -	if (napi_schedule_prep(&tp->napi)) {
+> -		rtl_irq_disable(tp);
+> -		__napi_schedule(&tp->napi);
+> -	}
+> +	rtl_irq_disable(tp);
+> +	napi_schedule(&tp->napi);
+>  out:
+>  	rtl_ack_events(tp, status);
+>  
 
-Maybe I can use for_each_child_of_node_scoped() and
-get the handling for free? The checkers should learn about
-*_scoped now.
+FYI, by now I am reasonably well convinced that the behaviour we've been seeing
+is not in fact a silicon bug, but rather a very specific behaviour regarding how
+these devices raise MSI interrupts.
 
-(I'm still working on the patch, I'm just slow.)
+This is largely due to the investigations by David Dillow described exhaustively
+in the 2009 netdev thread linked below. I wish I had spotted this much sooner!
+This information has been corroborated by my own testing on the RTL8125b:
+https://lore.kernel.org/netdev/1242001754.4093.12.camel@obelisk.thedillows.org/T/
 
-Yours,
-Linus Walleij
+To summarise precisely what I think the behaviour is:
+
+********
+An interrupt is generated *only* when the device registers undergo a transition
+from (status & mask) == 0 to (status & mask) != 0.
+********
+
+If the above holds, then calling rtl_irq_disable() will immediately force the
+condition (status & mask) == 0, so we are ready to raise another interrupt when
+interrupts are subsequently enabled again. 
+
+To try and verify this, I tried the code below, which locks up the network
+traffic immediately, regardless of the setting of napi_defer_hard_irqs:
+
+diff --git linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
+index 2ce4bff..add5bdd 100644
+--- linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c
++++ linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
+@@ -4607,10 +4607,13 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
+ 		rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
+ 	}
+ 
+-	rtl_irq_disable(tp);
+ 	napi_schedule(&tp->napi);
+ out:
++	u32 status2 = rtl_get_events(tp);
+ 	rtl_ack_events(tp, status);
++	if(status2 & ~status)
++		printk_ratelimited("rtl8169_interrupt: status=%x status2=%x\n",
++				   status, status2);
+ 
+ 	return IRQ_HANDLED;
+ }
+
+Here's some typical dmesg output:
+
+[11315.581136] rtl8169_interrupt: status=1 status2=85
+[11324.142176] r8169 0000:07:00.0 eth0: ASPM disabled on Tx timeout
+[11324.151765] rtl8169_interrupt: status=4 status2=84
+
+We can see that when a new interrupt is flagged in the interval between reading
+the status register and writing to it, we may never achieve the condition
+(status & mask) == 0.
+
+So, if we read 0x01 (RxOK) from the status register, we will then write
+0x01 back to acknowledge the interrupt. But in the meantime, 0x04 (TxOK) has
+been flagged, as well as 0x80 (TxDescUnavail), so the register now contains
+0x85. We acknowledge by writing back 0x01, so the status register should now
+contain 0x84. If interrupts are unmasked throughout, then (status & mask) != 0
+throughout, so no interrupt will be raised for the missed TxOK event, unless
+something else should occur to set one of the other status bits.
+
+To test this hypothesis, I tried the code below, which never disables
+interrupts but instead clears out the status register on every interrupt:
+
+index 2ce4bff..dbda9ef 100644
+--- linux-source-6.1~/drivers/net/ethernet/realtek/r8169_main.c
++++ linux-source-6.1/drivers/net/ethernet/realtek/r8169_main.c
+@@ -4610,7 +4610,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
+ 	rtl_irq_disable(tp);
+ 	napi_schedule(&tp->napi);
+ out:
+-	rtl_ack_events(tp, status);
++	rtl_ack_events(tp, tp->irq_mask);
+ 
+ 	return IRQ_HANDLED;
+ }
+
+This passed my iperf3 test perfectly! It is likely to cause other problems
+though: Specifically it opens the possibility that we will miss a SYSErr,
+LinkChg or RxFIFOOver interrupt. Hence the rationale for achieving the required
+(status & mask) == 0 condition by clearing the mask register instead.
+
+I hope this information may prove useful in the future.
 
