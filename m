@@ -1,148 +1,95 @@
-Return-Path: <netdev+bounces-96767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 164FC8C7A7C
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 18:41:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EEEC8C7AA0
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 18:44:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4761A1C20D5F
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 16:41:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 541C62841E3
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 16:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F7D443D;
-	Thu, 16 May 2024 16:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7327D4C90;
+	Thu, 16 May 2024 16:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jFJK9VU7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mPH86tQY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 973D48BFD
-	for <netdev@vger.kernel.org>; Thu, 16 May 2024 16:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FE64691;
+	Thu, 16 May 2024 16:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715877694; cv=none; b=hpINFeWUe1DTZ0cxUVQlvv+IGy/KnqgkUy7vLpj/LE5PlLUQD//ojgbv90fS5aTRvWkuChT8zLOviP0k36s8X8i3aHf8EQ14QyKkurAOI9edn/ttAdMknr924Yn4t+cnfos+XpHnF/BYaftlgpvaiFsa2vfoTeGfcFjCtZlwnEI=
+	t=1715877880; cv=none; b=kpNO2AGurfaenW0l68GX0k5F/YvG3QDcmf3zMKtv2Xn07oFvPaIRmFmvRfTkM9lk6yhAMNcPqeJmxXmdcD7PvS9q/umca6Cspb2ag+Q7BYSepdhmxHjcec7a2u+DML3VUMFzVnXPrTTof65/yM4zc0TF6yqofaDAs/mWhTewujM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715877694; c=relaxed/simple;
-	bh=KKc5YzIGflCFVRWirSlgWVS98jJqwHzUqZyoeAjsiFY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Cd6kmhCidcjQgJZ3z/9xLSQKR9g6ztgQJr25M33V2aTOIK9zTeVCiKSMM+jT9ewMF3eHUP58zRXiEmxk8HPQ0d8wC46e6+jRa5P2zCdSmqg592LWZBjk8BU3guBrL57kbai4aGaFt4+TcIIAQ4N6e0tX9JkLqRR3TWGlo25d4Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jFJK9VU7; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715877693; x=1747413693;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=KKc5YzIGflCFVRWirSlgWVS98jJqwHzUqZyoeAjsiFY=;
-  b=jFJK9VU7sL3n7ju09vXet3Lz8MexxTfnk6JqgMtOJ6ZVn84O2pSFE6bO
-   cnBLAL4i/cPppxx1myqJstgplvV4VXvPlWQydUGmW/ga+PuN63Zw+xMH5
-   mM2gf5JHwv44ngLHM1RVoRWKhJJBnYkqXSOMgaQwSNsW1SIqD/BKorvLm
-   906ihXfoT/Vpz1A8l2lL0kDpce7J5OjQ7Lc9cWWoZ9XjBg6kzHFZyegq9
-   Rnm1PzZJExqbJN5KfMFX2ZQU1E2V7pzodjo/gmtb76qUsUMOrPR8EQLQM
-   tj4C7KniadvFH9GmPva5szRgduvLw3N1VPk/FHnWDK59BqRvJNVoZiyjU
-   w==;
-X-CSE-ConnectionGUID: H1xfjbCrSpaLMceQ4t65kw==
-X-CSE-MsgGUID: pZ/6HlwUTvuqmmMma2onbA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="15831389"
-X-IronPort-AV: E=Sophos;i="6.08,165,1712646000"; 
-   d="scan'208";a="15831389"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 09:41:32 -0700
-X-CSE-ConnectionGUID: 70hJClljT9qHePJ18wTgVA==
-X-CSE-MsgGUID: eMhh/MtoQOebtSvF5uVSVw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,165,1712646000"; 
-   d="scan'208";a="68942623"
-Received: from kkazimiedevpc.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.102.224])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 09:41:30 -0700
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: maciej.fijalkowski@intel.com,
-	netdev@vger.kernel.org,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: [PATCH iwl-net] i40e: Fix XDP program unloading while removing the driver
-Date: Thu, 16 May 2024 18:41:08 +0200
-Message-Id: <20240516164108.1482192-1-michal.kubiak@intel.com>
-X-Mailer: git-send-email 2.33.1
+	s=arc-20240116; t=1715877880; c=relaxed/simple;
+	bh=/pARYUQYKZlIEe+lzeqOG3LjBCS679vNc/Y1OvbTZeA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=galfxBa2lPWxKz+mcXCn6d6yGCco/HBVGh76HdDkh9fVmnJ3EnIYzzgksKsMXQlKo0EtcqoSDNh4mb61QIhwEhW42mGrm3yM0m6x0S/61oHt3Z0kQF6kWcHEk6Afa52DHeUO2zURhWAyxPeeZnYvsCD6slne5jcPa/DW3obU4k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mPH86tQY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5094DC113CC;
+	Thu, 16 May 2024 16:44:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715877879;
+	bh=/pARYUQYKZlIEe+lzeqOG3LjBCS679vNc/Y1OvbTZeA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mPH86tQYR6xXHGbAjJqR5uFfFZTKQCJPJ32JBPja3MJMnB2dKCMki+wLHY0DF0vnQ
+	 rwO4ZjbmlvF6QRogqX4kDQJUA6UhGcVQqczKA/B6JKy4hNCzEOID7QjpjcGcy816Yx
+	 ti+naaJPelDWy/LS3j+sGSblb/icnQ0KAaCumAV1l7VysLRMjAVLDbEuicrD1au1u9
+	 W0DQ7eX3nMUJAEcpis4GvuJDz2HaftE//nlLkeuiNXyMFTOyhDsy7l+v2z+O6COkPQ
+	 5ZGh2TUgKULkbOOUNmHBxuQuyYf34L6kT7u10mBHZklRVntKihYCIxIW7wNQg2oDYP
+	 nl1cf3+WSdPjw==
+Date: Thu, 16 May 2024 17:44:35 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Ravi Gunasekaran <r-gunasekaran@ti.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	s-vadapalli@ti.com, rogerq@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] dt-bindings: net: ti: Update maintainers list
+Message-ID: <20240516-google-uneasy-26689ba09e54@spud>
+References: <20240516054932.27597-1-r-gunasekaran@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="CDKkeplkW31DdT+L"
+Content-Disposition: inline
+In-Reply-To: <20240516054932.27597-1-r-gunasekaran@ti.com>
 
-The commit 6533e558c650 ("i40e: Fix reset path while removing
-the driver") introduced a new PF state "__I40E_IN_REMOVE" to block
-modifying the XDP program while the driver is being removed.
-Unfortunately, such a change is useful only if the ".ndo_bpf()"
-callback was called out of the rmmod context because unloading the
-existing XDP program is also a part of driver removing procedure.
-In other words, from the rmmod context the driver is expected to
-unload the XDP program without reporting any errors. Otherwise,
-the kernel warning with callstack is printed out to dmesg.
 
-Example failing scenario:
- 1. Load the i40e driver.
- 2. Load the XDP program.
- 3. Unload the i40e driver (using "rmmod" command).
+--CDKkeplkW31DdT+L
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Fix this by improving checks in ".ndo_bpf()" to determine if that
-callback was called from the removing context and if the kernel
-wants to unload the XDP program. Allow for unloading the XDP program
-in such a case.
+On Thu, May 16, 2024 at 11:19:32AM +0530, Ravi Gunasekaran wrote:
+> Update the list with the current maintainers of TI's CPSW ethernet
+> peripheral.
+>=20
+> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
 
-Fixes: 6533e558c650 ("i40e: Fix reset path while removing the driver")
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index ffb9f9f15c52..19fc043e351f 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -13264,6 +13264,20 @@ static int i40e_xdp_setup(struct i40e_vsi *vsi, struct bpf_prog *prog,
- 	bool need_reset;
- 	int i;
- 
-+	/* Called from netdev unregister context. Unload the XDP program. */
-+	if (vsi->netdev->reg_state == NETREG_UNREGISTERING) {
-+		xdp_features_clear_redirect_target(vsi->netdev);
-+		old_prog = xchg(&vsi->xdp_prog, NULL);
-+		if (old_prog)
-+			bpf_prog_put(old_prog);
-+
-+		return 0;
-+	}
-+
-+	/* VSI shall be deleted in a moment, just return EINVAL */
-+	if (test_bit(__I40E_IN_REMOVE, pf->state))
-+		return -EINVAL;
-+
- 	/* Don't allow frames that span over multiple buffers */
- 	if (vsi->netdev->mtu > frame_size - I40E_PACKET_HDR_PAD) {
- 		NL_SET_ERR_MSG_MOD(extack, "MTU too large for linear frames and XDP prog does not support frags");
-@@ -13272,14 +13286,9 @@ static int i40e_xdp_setup(struct i40e_vsi *vsi, struct bpf_prog *prog,
- 
- 	/* When turning XDP on->off/off->on we reset and rebuild the rings. */
- 	need_reset = (i40e_enabled_xdp_vsi(vsi) != !!prog);
--
- 	if (need_reset)
- 		i40e_prep_for_reset(pf);
- 
--	/* VSI shall be deleted in a moment, just return EINVAL */
--	if (test_bit(__I40E_IN_REMOVE, pf->state))
--		return -EINVAL;
--
- 	old_prog = xchg(&vsi->xdp_prog, prog);
- 
- 	if (need_reset) {
--- 
-2.33.1
+Cheers,
+Conor.
 
+--CDKkeplkW31DdT+L
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZkY38wAKCRB4tDGHoIJi
+0vduAQCjBpJW7uMQmDVo0mRFQD44wXWB75Qp1QJORAxJ4zgyKQEAmxUqrGnfSt8D
+tIm5YY7WALxWFizNcrKITgEthlrlUAA=
+=Wyp2
+-----END PGP SIGNATURE-----
+
+--CDKkeplkW31DdT+L--
 
