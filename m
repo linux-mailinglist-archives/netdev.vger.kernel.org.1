@@ -1,261 +1,225 @@
-Return-Path: <netdev+bounces-96730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B99EF8C7675
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 14:32:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1430C8C7670
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 14:32:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FA3B2821B0
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 12:32:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 375CE1C20C6B
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 12:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD98146009;
-	Thu, 16 May 2024 12:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 827E97E763;
+	Thu, 16 May 2024 12:32:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="hlgrh1to"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A6b3W+hz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D7A145FE7
-	for <netdev@vger.kernel.org>; Thu, 16 May 2024 12:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D303BBE6
+	for <netdev@vger.kernel.org>; Thu, 16 May 2024 12:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715862742; cv=none; b=JehfA3D1tP8pB+fwggwiIwR+duqXeWRYCP6P6T905WBGvebBllKmmD+fYhU2Sq5aHezN2QAPZna3ayra1su8wV5w4yNXjunUaM1olyBa7f+etjbto0o6jtRVXIamwl1Qs6Sb+PcaWtktWyFPRQqzYl29qUC7mESNSSy2yUBRkrs=
+	t=1715862732; cv=none; b=s1FZD2A2Poo/4GtxoxtTyFcO4UUpFehJKCzXPOwNhfAwRX99ENdtyBcXM9k8EwdO62jseprBIrC81jDJBhytT5IahgmZhYTinsuD6BvinEH15nz8ARAWBE0OW2y8p7pyftcV+06Wph9sDMLXVyQMwzqrKPqWwRnYe/MvIGMXWi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715862742; c=relaxed/simple;
-	bh=hn+7UqggRbHLGeK9tG32xru/Y6sh6O3c54rjilkwnH4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f5jlPGt7r9vi6dFSzVzLskSmJj3A6F0UdyY0vIH1b0x6ckMo5R63SSVb5W1Skn4Eo4KoclfO4Wip7vqFF3+9Q7OIFLfRaNxdRDCwjJ75XtrJ0mOl/zGlXq4nbejeoFJ4vvX0paJIOSMaTOqlhQWYHhxJrzFVpz58Cwd0v8CGx/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=hlgrh1to; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1715862741; x=1747398741;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=TrjzQ1k7xiLZn4Ptz7EhL5RB+ZZois0XDU3II4qxm+I=;
-  b=hlgrh1toC6t664DJaC/308FUYN2bZ6qdSyQUv6EW6O2ySh37LeQZkJx9
-   psNGnhD7+8j9YgQVC/Vl27c48GRc72ducGxkiYyg2Qxhtcu0eZXJ+mhX7
-   kFogr7/ScuRW/GsHsz2iMLpKos/NBA8UChcP4cCWw3jaoTm+3ZdWzhmmm
-   w=;
-X-IronPort-AV: E=Sophos;i="6.08,164,1712620800"; 
-   d="scan'208";a="654515514"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 12:32:18 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:41452]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.175:2525] with esmtp (Farcaster)
- id b2627827-c6e0-4cbc-b26a-c1a69c68ae0d; Thu, 16 May 2024 12:32:16 +0000 (UTC)
-X-Farcaster-Flow-ID: b2627827-c6e0-4cbc-b26a-c1a69c68ae0d
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 16 May 2024 12:32:16 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.118.251.223) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 16 May 2024 12:32:11 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <mhal@rbox.co>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net] af_unix: Fix garbage collection of embryos carrying OOB with SCM_RIGHTS
-Date: Thu, 16 May 2024 21:31:21 +0900
-Message-ID: <20240516123120.99486-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240516103049.1132040-1-mhal@rbox.co>
-References: <20240516103049.1132040-1-mhal@rbox.co>
+	s=arc-20240116; t=1715862732; c=relaxed/simple;
+	bh=88gTpqB5Ftz6F6woFWb8LTvWrxcCnYccA8e3KlmMLjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ToMEPXM+IS2CQbuGq5sKcoCyspgP/YyocFOwquAofvum093mj+CtYrA9XrOd1+MVNNATR4rxQb+99/RO1U8GKuosdiFZ8k4piuOMyUEN/4nQkXFw0XROkf68L0e8G1kTIPgtBmUCqEQ6eoek4EFHgX3hYzVj4ra+bLWUCfhnymg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A6b3W+hz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715862729;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qhHbQMjCYZe2tVGaOVo8jm6NxFMaMenPci+l9CbDFR8=;
+	b=A6b3W+hzZZldRF590amPkcynebrl5pr0M026fcj17wGFhPnmwBDWnvjhZOBrG0EbPFClAS
+	3j0zx+Ui3TDWXvpLZ4h00s+SOeKzNIBb5+kEDTE3YquTxhRPwtUvfW5IgJwOX8emWQK/em
+	Hpe5wnuAe416XYdr0zEKc0iIyO99/Aw=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-qjzWK89uOqOpD-vW3_dD4g-1; Thu, 16 May 2024 08:32:07 -0400
+X-MC-Unique: qjzWK89uOqOpD-vW3_dD4g-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-574ebea4810so2724223a12.0
+        for <netdev@vger.kernel.org>; Thu, 16 May 2024 05:32:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715862726; x=1716467526;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qhHbQMjCYZe2tVGaOVo8jm6NxFMaMenPci+l9CbDFR8=;
+        b=u5qcVfRmDwKC/Pg2WrgdvRL39XvN1mACWwBkbsOQEBAeHUfU/tNIza+3cfoPuPTMQR
+         DfDCkdmB0cBfwvAdy/wntXU2sit6o7L8vzZ/Igb5Gs++dXkaM8oLpNOJDpybGwVRB9Mp
+         WhmbFBRjAogivp6oizpM/sbxfh/zhmN1t+PXthk+592pZvcqUp+8OMYqcjU6o8F6dulr
+         SzTttVyFq5xVE2WR/WNw0ZiKRGIQml3afCqLvRO9ldAuCv70EbMymHI2oGSTa5JhtAKh
+         qBaGpMWH1u9Mcj3yHAU2hcfKsSyNWmS2SYBciI7pMGRq6hV9v2VS2hI6ONQ3915OY0qc
+         t+4g==
+X-Forwarded-Encrypted: i=1; AJvYcCWb3KxxTjtasEX0wIgtUD+/+oRVfOlhP6dzTIaNEUFaPvWAyK1PyoLgxZLsSUhfstb3EyXpBDXX6XOOVtsVSrcWGV0vILWN
+X-Gm-Message-State: AOJu0YyYKOc3lAGt3E21zsAtMkU67LH5DhzC4ROnT4Bks+gsoOzZ9Kou
+	i5yQUqbQRwsiB9ABXOvrhWiHKXYWUu8ULTiXIdm8vYrFo8OzYb62pqqJh6ZUfVgSX/4CAXaEJq1
+	G+L7O37z5KUJ6VgCf8NFRxhmdcwBOCRw4uwsnNpxvCsOUcWB/UY1iCQ==
+X-Received: by 2002:a50:9fa7:0:b0:572:a172:be71 with SMTP id 4fb4d7f45d1cf-5734d6f2765mr17566227a12.14.1715862726513;
+        Thu, 16 May 2024 05:32:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFImWIsxwOBVoe62bfajvu5GwknXbPVawtJ1C+lr8xulQduklxf5v3r+XFuu3k3muscwMPhoQ==
+X-Received: by 2002:a50:9fa7:0:b0:572:a172:be71 with SMTP id 4fb4d7f45d1cf-5734d6f2765mr17566196a12.14.1715862725867;
+        Thu, 16 May 2024 05:32:05 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc7:443:357d:1f98:7ef8:1117:f7bb])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5733bebb57asm10381581a12.26.2024.05.16.05.32.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 May 2024 05:32:05 -0700 (PDT)
+Date: Thu, 16 May 2024 08:31:59 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
+	virtualization@lists.linux.dev, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com
+Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
+Message-ID: <20240516083100-mutt-send-email-mst@kernel.org>
+References: <Zj3425_gSqHByw-R@nanopsycho.orion>
+ <20240510065121-mutt-send-email-mst@kernel.org>
+ <Zj4A9XY7z-TzEpdz@nanopsycho.orion>
+ <20240510072431-mutt-send-email-mst@kernel.org>
+ <ZkRlcBU0Nb3O-Kg1@nanopsycho.orion>
+ <20240515041909-mutt-send-email-mst@kernel.org>
+ <ZkSKo1npMxCVuLfT@nanopsycho.orion>
+ <ZkSwbaA74z1QwwJz@nanopsycho.orion>
+ <CACGkMEsLfLLwjfHu5MT8Ug0_tS_LASvw-raiXiYx_WHJzMcWbg@mail.gmail.com>
+ <ZkXmAjlm-A50m4dx@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB003.ant.amazon.com (10.13.139.176) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+In-Reply-To: <ZkXmAjlm-A50m4dx@nanopsycho.orion>
 
-From: Michal Luczaj <mhal@rbox.co>
-Date: Thu, 16 May 2024 12:20:48 +0200
-> GC attempts to explicitly drop oob_skb before purging the hit list.
+On Thu, May 16, 2024 at 12:54:58PM +0200, Jiri Pirko wrote:
+> Thu, May 16, 2024 at 06:48:38AM CEST, jasowang@redhat.com wrote:
+> >On Wed, May 15, 2024 at 8:54 PM Jiri Pirko <jiri@resnulli.us> wrote:
+> >>
+> >> Wed, May 15, 2024 at 12:12:51PM CEST, jiri@resnulli.us wrote:
+> >> >Wed, May 15, 2024 at 10:20:04AM CEST, mst@redhat.com wrote:
+> >> >>On Wed, May 15, 2024 at 09:34:08AM +0200, Jiri Pirko wrote:
+> >> >>> Fri, May 10, 2024 at 01:27:08PM CEST, mst@redhat.com wrote:
+> >> >>> >On Fri, May 10, 2024 at 01:11:49PM +0200, Jiri Pirko wrote:
+> >> >>> >> Fri, May 10, 2024 at 12:52:52PM CEST, mst@redhat.com wrote:
+> >> >>> >> >On Fri, May 10, 2024 at 12:37:15PM +0200, Jiri Pirko wrote:
+> >> >>> >> >> Thu, May 09, 2024 at 04:28:12PM CEST, mst@redhat.com wrote:
+> >> >>> >> >> >On Thu, May 09, 2024 at 03:31:56PM +0200, Jiri Pirko wrote:
+> >> >>> >> >> >> Thu, May 09, 2024 at 02:41:39PM CEST, mst@redhat.com wrote:
+> >> >>> >> >> >> >On Thu, May 09, 2024 at 01:46:15PM +0200, Jiri Pirko wrote:
+> >> >>> >> >> >> >> From: Jiri Pirko <jiri@nvidia.com>
+> >> >>> >> >> >> >>
+> >> >>> >> >> >> >> Add support for Byte Queue Limits (BQL).
+> >> >>> >> >> >> >>
+> >> >>> >> >> >> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+> >> >>> >> >> >> >
+> >> >>> >> >> >> >Can we get more detail on the benefits you observe etc?
+> >> >>> >> >> >> >Thanks!
+> >> >>> >> >> >>
+> >> >>> >> >> >> More info about the BQL in general is here:
+> >> >>> >> >> >> https://lwn.net/Articles/469652/
+> >> >>> >> >> >
+> >> >>> >> >> >I know about BQL in general. We discussed BQL for virtio in the past
+> >> >>> >> >> >mostly I got the feedback from net core maintainers that it likely won't
+> >> >>> >> >> >benefit virtio.
+> >> >>> >> >>
+> >> >>> >> >> Do you have some link to that, or is it this thread:
+> >> >>> >> >> https://lore.kernel.org/netdev/21384cb5-99a6-7431-1039-b356521e1bc3@redhat.com/
+> >> >>> >> >
+> >> >>> >> >
+> >> >>> >> >A quick search on lore turned up this, for example:
+> >> >>> >> >https://lore.kernel.org/all/a11eee78-b2a1-3dbc-4821-b5f4bfaae819@gmail.com/
+> >> >>> >>
+> >> >>> >> Says:
+> >> >>> >> "Note that NIC with many TX queues make BQL almost useless, only adding extra
+> >> >>> >>  overhead."
+> >> >>> >>
+> >> >>> >> But virtio can have one tx queue, I guess that could be quite common
+> >> >>> >> configuration in lot of deployments.
+> >> >>> >
+> >> >>> >Not sure we should worry about performance for these though.
+> >> >>> >What I am saying is this should come with some benchmarking
+> >> >>> >results.
+> >> >>>
+> >> >>> I did some measurements with VDPA, backed by ConnectX6dx NIC, single
+> >> >>> queue pair:
+> >> >>>
+> >> >>> super_netperf 200 -H $ip -l 45 -t TCP_STREAM &
+> >> >>> nice -n 20 netperf -H $ip -l 10 -t TCP_RR
+> >> >>>
+> >> >>> RR result with no bql:
+> >> >>> 29.95
+> >> >>> 32.74
+> >> >>> 28.77
+> >> >>>
+> >> >>> RR result with bql:
+> >> >>> 222.98
+> >> >>> 159.81
+> >> >>> 197.88
+> >> >>>
+> >> >>
+> >> >>Okay. And on the other hand, any measureable degradation with
+> >> >>multiqueue and when testing throughput?
+> >> >
+> >> >With multiqueue it depends if the flows hits the same queue or not. If
+> >> >they do, the same results will likely be shown.
+> >>
+> >> RR 1q, w/o bql:
+> >> 29.95
+> >> 32.74
+> >> 28.77
+> >>
+> >> RR 1q, with bql:
+> >> 222.98
+> >> 159.81
+> >> 197.88
+> >>
+> >> RR 4q, w/o bql:
+> >> 355.82
+> >> 364.58
+> >> 233.47
+> >>
+> >> RR 4q, with bql:
+> >> 371.19
+> >> 255.93
+> >> 337.77
+> >>
+> >> So answer to your question is: "no measurable degradation with 4
+> >> queues".
+> >
+> >Thanks but I think we also need benchmarks in cases other than vDPA.
+> >For example, a simple virtualization setup.
 > 
-> The problem is with embryos: kfree_skb(u->oob_skb) is never called on an
-> embryo socket, as those sockets are not directly stacked by the SCC walk.
+> For virtualization setup, I get this:
 > 
-> The python script below [0] sends a listener's fd to its embryo as OOB
-> data.  While GC does collect the embryo's queue, it fails to drop the OOB
-> skb's refcount.  The skb which was in embryo's receive queue stays as
-> unix_sk(sk)->oob_skb and keeps the listener's refcount [1].
+> VIRT RR 1q, w/0 bql:
+> 49.18
+> 49.75
+> 50.07
 > 
-> Tell GC to dispose embryo's oob_skb.
+> VIRT RR 1q, with bql:
+> 51.33
+> 47.88
+> 40.40
 > 
-> [0]:
-> from array import array
-> from socket import *
-> 
-> addr = '\x00unix-oob'
-> lis = socket(AF_UNIX, SOCK_STREAM)
-> lis.bind(addr)
-> lis.listen(1)
-> 
-> s = socket(AF_UNIX, SOCK_STREAM)
-> s.connect(addr)
-> scm = (SOL_SOCKET, SCM_RIGHTS, array('i', [lis.fileno()]))
-> s.sendmsg([b'x'], [scm], MSG_OOB)
-> lis.close()
-> 
-> [1]
-> $ grep unix-oob /proc/net/unix
-> $ ./unix-oob.py
-> $ grep unix-oob /proc/net/unix
-> 0000000000000000: 00000002 00000000 00000000 0001 02     0 @unix-oob
-> 0000000000000000: 00000002 00000000 00010000 0001 01  6072 @unix-oob
-> 
-> Fixes: 4090fa373f0e ("af_unix: Replace garbage collection algorithm.")
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> ---
->  net/unix/garbage.c | 25 ++++++++++++++++---------
->  1 file changed, 16 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-> index 1f8b8cdfcdc8..8e9431955ab7 100644
-> --- a/net/unix/garbage.c
-> +++ b/net/unix/garbage.c
-> @@ -342,6 +342,18 @@ enum unix_recv_queue_lock_class {
->  	U_RECVQ_LOCK_EMBRYO,
->  };
->  
-> +static void unix_collect_queue(struct unix_sock *u, struct sk_buff_head *hitlist)
-> +{
-> +	skb_queue_splice_init(&u->sk.sk_receive_queue, hitlist);
-> +
-> +#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-> +	if (u->oob_skb) {
-> +		WARN_ON_ONCE(skb_unref(u->oob_skb));
-> +		u->oob_skb = NULL;
-> +	}
-> +#endif
-> +}
-> +
->  static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist)
->  {
->  	struct unix_vertex *vertex;
-> @@ -365,18 +377,11 @@ static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist
->  
->  				/* listener -> embryo order, the inversion never happens. */
->  				spin_lock_nested(&embryo_queue->lock, U_RECVQ_LOCK_EMBRYO);
-> -				skb_queue_splice_init(embryo_queue, hitlist);
-> +				unix_collect_queue(unix_sk(skb->sk), hitlist);
->  				spin_unlock(&embryo_queue->lock);
->  			}
->  		} else {
-> -			skb_queue_splice_init(queue, hitlist);
-> -
-> -#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-> -			if (u->oob_skb) {
-> -				kfree_skb(u->oob_skb);
-> -				u->oob_skb = NULL;
-> -			}
-> -#endif
-> +			unix_collect_queue(u, hitlist);
->  		}
->  
->  		spin_unlock(&queue->lock);
-> @@ -583,6 +588,8 @@ static void __unix_gc(struct work_struct *work)
->  	skb_queue_walk(&hitlist, skb) {
->  		if (UNIXCB(skb).fp)
->  			UNIXCB(skb).fp->dead = true;
-> +
-> +		WARN_ON_ONCE(refcount_read(&skb->users) != 1);
+> No measurable/significant difference.
 
-Given we will refactor OOB with no additional refcount, this will not
-make sense.  Rather, I'd add a test case in a selftest to catch the
-future regression.
+Seems the results became much noisier? Also
+I'd expect a regression if any to be in a streaming benchmark.
 
-And I noticed that I actually tried to catch this in
+-- 
+MST
 
-  tools/testing/selftests/net/af_unix/scm_rights.c
-
-, and what is missing is... :S
-
----8<---
-From f6f47b3cdd22e7c4ed48bf1de089babd09c606e0 Mon Sep 17 00:00:00 2001
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Thu, 16 May 2024 12:10:45 +0000
-Subject: [PATCH] selftest: af_unix: Make SCM_RIGHTS into OOB data.
-
-scm_rights.c covers various test cases for inflight file descriptors
-and garbage collector for AF_UNIX sockets.
-
-Currently, SCM_RIGHTS messages are sent with 3-bytes string, and it's
-not good for MSG_OOB cases, as SCM_RIGTS cmsg goes with the first 2-bytes,
-which is non-OOB data.
-
-Let's send SCM_RIGHTS messages with 1-byte character to pack SCM_RIGHTS
-into OOB data.
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-diff --git a/tools/testing/selftests/net/af_unix/scm_rights.c b/tools/testing/selftests/net/af_unix/scm_rights.c
-index bab606c9f1eb..2bfed46e0b19 100644
---- a/tools/testing/selftests/net/af_unix/scm_rights.c
-+++ b/tools/testing/selftests/net/af_unix/scm_rights.c
-@@ -197,8 +197,8 @@ void __send_fd(struct __test_metadata *_metadata,
- 	       const FIXTURE_VARIANT(scm_rights) *variant,
- 	       int inflight, int receiver)
- {
--#define MSG "nop"
--#define MSGLEN 3
-+#define MSG "x"
-+#define MSGLEN 1
- 	struct {
- 		struct cmsghdr cmsghdr;
- 		int fd[2];
-
----8<---
-
-
-With this, we can catch the case properly,
-
-#  RUN           scm_rights.stream_listener_oob.self_ref ...
-# scm_rights.c:119:self_ref:Expected 0 (0) == ret (6)
-# self_ref: Test terminated by assertion
-#          FAIL  scm_rights.stream_listener_oob.self_ref
-not ok 13 scm_rights.stream_listener_oob.self_ref
-#  RUN           scm_rights.stream_listener_oob.triangle ...
-# scm_rights.c:119:triangle:Expected 0 (0) == ret (18)
-# triangle: Test terminated by assertion
-#          FAIL  scm_rights.stream_listener_oob.triangle
-not ok 14 scm_rights.stream_listener_oob.triangle
-#  RUN           scm_rights.stream_listener_oob.cross_edge ...
-# scm_rights.c:119:cross_edge:Expected 0 (0) == ret (24)
-# cross_edge: Test terminated by assertion
-#          FAIL  scm_rights.stream_listener_oob.cross_edge
-not ok 15 scm_rights.stream_listener_oob.cross_edge
-# FAILED: 12 / 15 tests passed.
-# Totals: pass:12 fail:3 xfail:0 xpass:0 skip:0 error:0
-
-
-And with your patch, all good !
-
-#  RUN           scm_rights.stream_listener_oob.self_ref ...
-#            OK  scm_rights.stream_listener_oob.self_ref
-ok 13 scm_rights.stream_listener_oob.self_ref
-#  RUN           scm_rights.stream_listener_oob.triangle ...
-#            OK  scm_rights.stream_listener_oob.triangle
-ok 14 scm_rights.stream_listener_oob.triangle
-#  RUN           scm_rights.stream_listener_oob.cross_edge ...
-#            OK  scm_rights.stream_listener_oob.cross_edge
-ok 15 scm_rights.stream_listener_oob.cross_edge
-# PASSED: 15 / 15 tests passed.
-# Totals: pass:15 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-
-Could you remove the WARN_ON_ONCE() and repost with my patch
-above ?
-
-Thanks!
 
