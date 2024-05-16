@@ -1,139 +1,108 @@
-Return-Path: <netdev+bounces-96688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59E3D8C7270
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 10:07:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B12238C726B
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 10:05:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E337CB22E38
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 08:07:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22E9C2830FF
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 08:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2F076023;
-	Thu, 16 May 2024 08:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A533136E32;
+	Thu, 16 May 2024 08:04:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="lHRcDfor"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3Fz/mo6S"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD86769D2B;
-	Thu, 16 May 2024 08:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9381369A1
+	for <netdev@vger.kernel.org>; Thu, 16 May 2024 08:04:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715846790; cv=none; b=ExeHYijwIiQrf69ji6P52qKTeC3udtOeOikXHhQFS9M1NzuzyvtayeQlBmexDH9/JPXDRzqZmfuf0+jfuNLNljVy3riGkYqkxItwboHOjsKC6gdAqaGTKxiPxXu8VHzL1is0tlfjh3WSVLqL3VItvF6BEuToIhxHDneMNYfvc0Y=
+	t=1715846660; cv=none; b=cJVf7i4Xi4AtHI4uA7qxHPNDyq1rzgJfJSbEgX3o1CObxMWP9A2oaqtsN2aBan721Cm90Nex4ngppbir62jE95tKoI6i5fqwqdvszXhOYhw27ryz/Kj7OWM+aISYxtCJl7V/Cw0043eDP9bABG8cr3mjEqsWU3YTIZT6EFdfi+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715846790; c=relaxed/simple;
-	bh=owQIT5HD7OJm8jW2vo7iEeB4HQZrjCDFv0xnzHggShY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fJr2VEi5hkdzfjArZ36cUwAquGl7U3U7MRCrVZUcPDfrQU05ubqMrtVl6S6O+PLPSTzDHt1igAx/bvZGNCllYPA519nCwOG3ic6KwEi5bCgrlTnRTwjaZWiugWv0+Q5FSIRoYO1eDOmHtIfClhY+EJZIlHQPaW0PyJzawCWXmQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=lHRcDfor; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1715846660; c=relaxed/simple;
+	bh=yobwgRL6pIzLvUO+E6nJFjrsnlzyspZDqXXMbvg3zfI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kw70l/P13uwrX6GBTNzugyjqaX85VZsKUtKW7rV/t21PnkrvIw0MynE/nwuJK5rDfuhwCII8b659UFeNfpZUEmCuNVVuD5tNANZxMux2Ww+Wwx48Dovap9MRsg6ngfYGoUQ1M29F7pAdKtYMjxE8K7tZulgBgGZ5wAWFqLqzfCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3Fz/mo6S; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-572a1b3d6baso44284a12.1
+        for <netdev@vger.kernel.org>; Thu, 16 May 2024 01:04:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1715846788; x=1747382788;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=2HnucdSCbwmmrq18H0sTxqOAmaX8YFcHdjs/KVqRrxo=;
-  b=lHRcDforotFU1Uqv1GBzrQGutIniwBTctJi4YI1lnmty+aIzfdd7NrEs
-   1xp175kfZ0U53xTcagJ663pv4yeh5oJP+MJiUf3WD5icH50e3iPMrMFfC
-   ylIU/zGbgwM/uKswuk+WPrZy9bBEo9M8dEd68Wxv+3vYycHcRZ3+GK60r
-   s=;
-X-IronPort-AV: E=Sophos;i="6.08,163,1712620800"; 
-   d="scan'208";a="89622299"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 08:06:25 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:39479]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.39.135:2525] with esmtp (Farcaster)
- id de62bcfb-7319-429d-bc38-d1d0827c5886; Thu, 16 May 2024 08:06:24 +0000 (UTC)
-X-Farcaster-Flow-ID: de62bcfb-7319-429d-bc38-d1d0827c5886
-Received: from EX19D002EUA004.ant.amazon.com (10.252.50.181) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 16 May 2024 08:06:23 +0000
-Received: from EX19MTAUEA001.ant.amazon.com (10.252.134.203) by
- EX19D002EUA004.ant.amazon.com (10.252.50.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 16 May 2024 08:06:23 +0000
-Received: from dev-dsk-hagarhem-1b-b868d8d5.eu-west-1.amazon.com
- (10.253.65.58) by mail-relay.amazon.com (10.252.134.102) with Microsoft SMTP
- Server id 15.2.1258.28 via Frontend Transport; Thu, 16 May 2024 08:06:23
- +0000
-Received: by dev-dsk-hagarhem-1b-b868d8d5.eu-west-1.amazon.com (Postfix, from userid 23002382)
-	id 169CC20AC1; Thu, 16 May 2024 08:06:23 +0000 (UTC)
-From: Hagar Hemdan <hagarhem@amazon.com>
-To:
-CC: Norbert Manthey <nmanthey@amazon.de>, Hagar Hemdan <hagarhem@amazon.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, David
- Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Sabrina
- Dubroca" <sd@queasysnail.net>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH] net: esp: cleanup esp_output_tail_tcp() in case of unsupported ESPINTCP
-Date: Thu, 16 May 2024 08:03:09 +0000
-Message-ID: <20240516080309.1872-1-hagarhem@amazon.com>
-X-Mailer: git-send-email 2.40.1
+        d=google.com; s=20230601; t=1715846657; x=1716451457; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yobwgRL6pIzLvUO+E6nJFjrsnlzyspZDqXXMbvg3zfI=;
+        b=3Fz/mo6S/qFaA3f0h22G9pLlPdW99lTBLr73sjmHSHjgqR2RZx2rXxtoCZdLnfqGoa
+         Sw9e6B80mlDW4tvO452ICqHrqUnkV7HChFmaGiBxd7+JPQCx+tb4Dg9mY5h7O+qZfmCN
+         ol6p32P2OY78HSviv5VjjE3yDgo/fZdZHVizZZXgqxYgVeuX5n0Ly/uEGihELhzUdNQT
+         JVAt8TYLR8Hs5CVa0CSN2a/qVz8gQt5OaTmzSzW8oBJAX+5Fe/Jx8dF+Ap0Thlk42pII
+         h5UDHwS5ILG7FfovcEa4WleU7X7LGKET08jcDlKTi861tGjXW1KLtHHssylOY8g7kcTf
+         YIpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715846657; x=1716451457;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yobwgRL6pIzLvUO+E6nJFjrsnlzyspZDqXXMbvg3zfI=;
+        b=PPvlOyPboqdb8tWMlrxpi/97aaegpv49qg7N9XBhgDc5r7apsTg92Z/7sp3bc0BOLZ
+         KHHNgaylOkxe4j6RFAz3YJugjh+yqkWmrDjBbP8oTYNbrkqLgJn8O3eWNe0NlXf5CvNr
+         nCY6scQH/2/G7rJkHlZz3A4cBual+mVcn3w8jSqFzsGsqusY98tANhINpJHMo2tG3R/i
+         q4m+sQkxjH8P1RxaJJj4T4MO6Yycg8QxSRYT0ECZXceFJOXSUywTr0qy5/VYEY2MWIM/
+         3S0hCaYw8Zu+Wzv/0zKjWzclXLPy5+tOpzXNSnEiIdMqZMMbiMxaongJPZH3XH1u7MMJ
+         x1mw==
+X-Forwarded-Encrypted: i=1; AJvYcCXS7DhpsLqLhfJ5zdCvtnHQKro0pwatqTBWQqm6P3C2t4Kil3QkA90TgTzWVMCCT2Q44LbZvDJoeIzFFewCPvVu0a7lHq0m
+X-Gm-Message-State: AOJu0Yx6ngYEbONFLuUKto4zv2ZJs7f15hm8alwoQXAwfIYSY1geKELi
+	bgYaW1rInZ9V+DGIKmCBTwJVgJAEIeF6HvNFA1Zgj7knxEiEw3jHG5Mc9Jej7OVIQLrORYQx8J1
+	GU2LjID3A+0ZlqYMNzWy8UYs+Boha6+RUMDrV
+X-Google-Smtp-Source: AGHT+IFOjJE7/drUhfz3WH3Wd4RMmJrXvKRepr/xyCK6pfgjJDPTwfmtoVdUPxPYQENLXVwBndM6A2LJ2rHeFI3FW7s=
+X-Received: by 2002:a50:c90b:0:b0:572:a33d:437f with SMTP id
+ 4fb4d7f45d1cf-5743a0a4739mr935198a12.2.1715846656620; Thu, 16 May 2024
+ 01:04:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+References: <7ec9b05b-7587-4182-b011-625bde9cef92@quicinc.com>
+ <CANn89iKRuxON3pWjivs0kU-XopBiqTZn4Mx+wOKHVmQ97zAU5A@mail.gmail.com>
+ <60b04b0a-a50e-4d4a-a2bf-ea420f428b9c@quicinc.com> <CANn89i+QM1D=+fXQVeKv0vCO-+r0idGYBzmhKnj59Vp8FEhdxA@mail.gmail.com>
+ <c0257948-ba11-4300-aa5c-813b4db81157@quicinc.com>
+In-Reply-To: <c0257948-ba11-4300-aa5c-813b4db81157@quicinc.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 16 May 2024 10:04:05 +0200
+Message-ID: <CANn89iK40zw8hqtut8u9Jp4+24eCM9m9S-kwdDNRq-P=jkF=ng@mail.gmail.com>
+Subject: Re: Potential impact of commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
+To: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
+Cc: soheil@google.com, ncardwell@google.com, yyd@google.com, ycheng@google.com, 
+	quic_stranche@quicinc.com, davem@davemloft.net, kuba@kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-xmit() functions should consume skb or return error codes in error
-paths.
-When the configuration "CONFIG_INET_ESPINTCP" is not used, the
-implementation of the function "esp_output_tail_tcp" violates this rule.
-The function frees the skb and returns the error code.
-This change removes the kfree_skb from both functions, for both
-esp4 and esp6.
+On Thu, May 16, 2024 at 9:16=E2=80=AFAM Subash Abhinov Kasiviswanathan (KS)
+<quic_subashab@quicinc.com> wrote:
 
-This should not be reachable in the current code, so this change is just
-a cleanup.
+> rmnet doesn't directly interface with HW. It is a virtual driver which
+> attaches over real hardware drivers like MHI (PCIe), QMI_WWAN (USB), IPA
+> to expose networking across different mobile APNs.
+>
+> As rmnet didn't have it's own NAPI struct, I added support for GRO using
+> cells. I tried disabling GRO and I don't see a difference in download
+> speeds or the receiver window either.
 
-This bug was discovered and resolved using Coverity Static Analysis
-Security Testing (SAST) by Synopsys, Inc.
+If you do not use native NAPI GRO but gro_cells instead, there is no
+reordering avoidance.
 
-Fixes: e27cca96cd68 ("xfrm: add espintcp (RFC 8229)")
-Signed-off-by: Hagar Hemdan <hagarhem@amazon.com>
----
- net/ipv4/esp4.c | 3 +--
- net/ipv6/esp6.c | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+Make sure that only one cpu is feeding packets to the gro_cell for a
+given RX queue.
 
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index d33d12421814..e73de3abe37c 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -238,8 +238,7 @@ static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
- #else
- static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
- {
--	kfree_skb(skb);
--
-+	WARN_ON(1);
- 	return -EOPNOTSUPP;
- }
- #endif
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index 7371886d4f9f..600402e54ccd 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -255,8 +255,7 @@ static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
- #else
- static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
- {
--	kfree_skb(skb);
--
-+	WARN_ON(1);
- 	return -EOPNOTSUPP;
- }
- #endif
--- 
-2.40.1
-
+This is probably orthogonal, but could matter at high speeds.
 
