@@ -1,69 +1,58 @@
-Return-Path: <netdev+bounces-96722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B868C7587
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 13:59:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B82B8C7590
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 14:03:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 545B01F22868
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 11:59:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBA921C209B5
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 12:03:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5FDF145A15;
-	Thu, 16 May 2024 11:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FCD2145FF5;
+	Thu, 16 May 2024 12:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rtpd81Dv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V8JHdMeg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F3026AD0;
-	Thu, 16 May 2024 11:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14AC0145A06;
+	Thu, 16 May 2024 12:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715860788; cv=none; b=hfuTQm02Lqcwy7tkLNbdThkDJnr8VEa6RqHiA4W98PA1x6jN3EZGsOyc5RjjeYnx/sDylhSthlrd11yA/seOwFORAjzIowkTRpNrCJ29GjAWfegTnh+5bLH1F0SUDWzjIat6/f5oU66JY+uqL558sHlR/yDNSLDzF/OcEKIias0=
+	t=1715861017; cv=none; b=faNLQeTtGSF2M2vvY9C2ovIkLbs4ohLFNnQOAv29Iy1CTST7eBOX3RTkAe48CBGt4g2F4D7vbpPQ+pNxjFXW8P+pf7kfax3ovpI96Nx+g+2QfDOFWgj03nK1JopK2chy//5DVaOHG1OCFmNLpw0Q3TlTQJCPHciBiyeCtxDTATg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715860788; c=relaxed/simple;
-	bh=jsj/eofNjP8sdAjFMeOlBKjV9ZvXIiu5BqPSaWoUy+E=;
+	s=arc-20240116; t=1715861017; c=relaxed/simple;
+	bh=ao3vT+/wgbwOmNIGPIj0yiu9lABcaUGxyDAadsmJeK0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LwSin3UFPo0bNy7iGys1+iER1JFVI34ZNua7/lGU2l62McRql9moCJueeobukgjsN50GQ62p6OTcmlrSEQGPSMgO2xb3v2Pw8irHMzvwJzDLNutDpzhGUKAQhWCGA3WqVi+mOJbuJhR0VyCFwx3Ytuartb5n9lnBlPx8w04ZUYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rtpd81Dv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E48F8C113CC;
-	Thu, 16 May 2024 11:59:44 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=qHlkVQdBtCXEbtpkah+BMvXbJZ95p7jBCuQDc4bHktDhgjryqGgDJ2/dWe0HKhqipLC9jbPZftq2TlPM6nVqq9FYrkyGWbJ66WHs1OnOgn7YU7PvNEaEp4D4X4P1T4eVbeJ0JREYez7x+5M140Kb13ieqF+xfz80bp6DvIpWO6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V8JHdMeg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C47DBC113CC;
+	Thu, 16 May 2024 12:03:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715860788;
-	bh=jsj/eofNjP8sdAjFMeOlBKjV9ZvXIiu5BqPSaWoUy+E=;
+	s=k20201202; t=1715861016;
+	bh=ao3vT+/wgbwOmNIGPIj0yiu9lABcaUGxyDAadsmJeK0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rtpd81Dvtk3pD15dyALA+g2al7nPqswFU22XDpkzZ3WGVh/vJgKYO4g6EjY9tt6r0
-	 5lXBu1sZVqF8RNiIX671IQH0GIDMsu1j+Txw8riCjWuly1WjfgoPAmtfFD+JrNekYW
-	 tN1mj5ak5CBe9RUmBjP0AZRrWsOXS09E7d+GTDeA7KbmO1AqeDHoS527s8rTC+mZKy
-	 K2udUbMesf7Vs+/dKbzCNf+q17xzRhNH0T9VTFvP4rg/q9n6D8wQ65Nu/mMT6XtugO
-	 hpUwwiqvkGTCzkzaEE/TE5cFgJ5LqMewNWWkj+3a9Yj6flq+6ODHn9Z1gj7fv13xKQ
-	 nsHotV+a1eSaQ==
-Date: Thu, 16 May 2024 12:59:42 +0100
+	b=V8JHdMegnhJJfdQwfbG/Po0osKXDtPq89J2E86h/wMBCidUzF6BQOxsmrHLHc1/zy
+	 eSwX59oExTKxdILgy2f3icMFNHrBtS0+uH3QYYyqLUH3tdTn6ksBbs8KdOLCNF84zd
+	 7mK9EYogE0k2pKc6YMajLgYfNcBgFBYk/6Ic498ttBbNE4bsa3YFSyDe3rvp8SLD6W
+	 Ft0EZ9yD9mNwrOEuAKrnj9dsP0+TaghtkGZVCP5aT3HpqdezEwSKz5mD9II0m8+KnF
+	 CqGijKUefTUEF1/XdhLAqp34mAdsYYrxrfmrhDWoLlJgP+SS3sBs8H6EwjW1O1h8C0
+	 zGnvxeIOrr++w==
+Date: Thu, 16 May 2024 13:03:32 +0100
 From: Simon Horman <horms@kernel.org>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	maciej.fijalkowski@intel.com,
-	Magnus Karlsson <magnus.karlsson@gmail.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	igor.bagnucki@intel.com, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH iwl-net 3/3] ice: map XDP queues to vectors in
- ice_vsi_map_rings_to_vectors()
-Message-ID: <20240516115942.GA443134@kernel.org>
-References: <20240515160246.5181-1-larysa.zaremba@intel.com>
- <20240515160246.5181-4-larysa.zaremba@intel.com>
- <20240516082713.GC179178@kernel.org>
- <ZkXxVp3hFvczWr8r@lzaremba-mobl.ger.corp.intel.com>
+To: Ryosuke Yasuoka <ryasuoka@redhat.com>
+Cc: krzk@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, syoshida@redhat.com
+Subject: Re: [PATCH net] nfc: nci: Fix handling of zero-length payload
+ packets in nci_rx_work()
+Message-ID: <20240516120332.GB443134@kernel.org>
+References: <20240515151757.457353-1-ryasuoka@redhat.com>
+ <20240516084348.GF179178@kernel.org>
+ <ZkXQ5h8fla1KhX6A@zeus>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,58 +61,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZkXxVp3hFvczWr8r@lzaremba-mobl.ger.corp.intel.com>
+In-Reply-To: <ZkXQ5h8fla1KhX6A@zeus>
 
-On Thu, May 16, 2024 at 01:43:18PM +0200, Larysa Zaremba wrote:
-> On Thu, May 16, 2024 at 09:27:13AM +0100, Simon Horman wrote:
-> > On Wed, May 15, 2024 at 06:02:16PM +0200, Larysa Zaremba wrote:
-> > > ice_pf_dcb_recfg() re-maps queues to vectors with
-> > > ice_vsi_map_rings_to_vectors(), which does not restore the previous
-> > > state for XDP queues. This leads to no AF_XDP traffic after rebuild.
+On Thu, May 16, 2024 at 06:24:54PM +0900, Ryosuke Yasuoka wrote:
+> Thank you for your review and comment, Simon.
+> 
+> On Thu, May 16, 2024 at 09:43:48AM +0100, Simon Horman wrote:
+> > Hi Yasuoka-san,
+> > 
+> > On Thu, May 16, 2024 at 12:17:07AM +0900, Ryosuke Yasuoka wrote:
+> > > When nci_rx_work() receives a zero-length payload packet, it should
+> > > discard the packet without exiting the loop. Instead, it should continue
+> > > processing subsequent packets.
+> > 
+> > nit: I think it would be clearer to say:
+> > 
+> > ... it should not discard the packet and exit the loop. Instead, ...
+> 
+> Great. I'll update commit msg like this.
+> 
 > > > 
-> > > Map XDP queues to vectors in ice_vsi_map_rings_to_vectors().
-> > > Also, move the code around, so XDP queues are mapped independently only
-> > > through .ndo_bpf().
+> > > Fixes: d24b03535e5e ("nfc: nci: Fix uninit-value in nci_dev_up and nci_ntf_packet")
+> > > Closes: https://lore.kernel.org/lkml/20240428134525.GW516117@kernel.org/T/
 > > 
-> > Hi Larysa,
-> > 
-> > I take it the last sentence refers to the placement of ice_map_xdp_rings()
-> > in ice_prepare_xdp_rings() after rather than before the
-> > (cfg_type == ICE_XDP_CFG_PART) condition.
-> > 
-> > If so, I see that it is a small change. But I do wonder if it is separate
-> > from fixing the issue described in the first paragraph. And thus would
-> > be better as a separate patch.
+> > nit: I'm not sure this Closes link is adding much,
+> >      there are more changes coming, right?
 > 
-> This is not neccessary for the fix to work, but I think this is intergral to
-> making the change properly. I mean, before the change in the rebuild path we map
-> XDP rings to vectors only once and after the change we do this only once, just
-> previously it was in ice_prepare_xdp_rings() and now it is in
-> ice_vsi_map_rings_to_vectors().
+> No. I just wanna show the URL link as a reference where this bug is
+> found. This URL discuss a little bit different topic as you know.
 > 
-> > 
-> > Also, (I'm raising a separate issue :) breaking out logic into
-> > ice_xdp_ring_from_qid() seems very nice.  But I wonder if this ought to be
-> > part of a cleanup-patch for 'iwl' rather than a fixes patch for 'iwl-next'.
-> >
+> In the following discussion [1], Jakub pointed out that changing
+> continue statement to break is not related to the patch "Fix
+> uninit-value in nci_rw_work". So I posted this new small patch before
+> posting v5 patch for "Fix: uninit-value in nci_rw_work".
 > 
-> I have separated this into a separate function, because 2 lines exceeded 80 
-> characters, which is not in line with our current style for drivers.
-> And I do not think that this small function creates any more additional 
-> potentian applying problems for this patch. And the change is small enough to 
-> see that the logic stays the same.
-> 
-> > OTOH, I do see that breaking out ice_map_xdp_rings() makes sense in the
-> > context of this fix as the same logic is to be called in two places.
-> > 
-> > Splitting patches aside, the resulting code looks good to me.
-> > 
-> > ...
+> If Closes tag is not appropriate, I can remove this in this v2 patch.
+> What do you think?
 
-Hi Larysa,
+Thanks, if it was me I would drop the Closes tag.
 
-Thanks for your explanation, this all seems reasonable to me.
+> [1] https://lore.kernel.org/all/20240510190613.72838bf0@kernel.org/
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+...
 
