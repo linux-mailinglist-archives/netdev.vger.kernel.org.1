@@ -1,108 +1,115 @@
-Return-Path: <netdev+bounces-96782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59528C7BA8
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 19:51:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1593A8C7BB3
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 19:59:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A83A28446B
-	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 17:51:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B89161F22A92
+	for <lists+netdev@lfdr.de>; Thu, 16 May 2024 17:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F811581F7;
-	Thu, 16 May 2024 17:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E624B156673;
+	Thu, 16 May 2024 17:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Uvk25VVJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FR67lSmG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45756156C7C
-	for <netdev@vger.kernel.org>; Thu, 16 May 2024 17:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B5B145A06;
+	Thu, 16 May 2024 17:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715881567; cv=none; b=S9AhnEMIc4kHWgwOXCbPiaB9z5/OAUaFgebeaIGqsd9jKA35LJ/gETeJKzhpoJ9wF4M1AmxyvVHv4qVsL5/zipyfavYhj6VgsQGQtEPt7p/TSdkxqXvM+pC+O8ZBjevP6sHqcgxjmTbycyO0MMgMiD77Z0slMZzpgGHsuDYKon0=
+	t=1715882388; cv=none; b=aq1ud61yMcmoFiB0vatjS9QJE9EOLJeEqB8/fmDp5HoJye2vDnBw7Nd/SWhBONwHUD/0bVJY0o+b7lAippgM/J/O9ARGhaO/psW9mQOW5ej02nYM6bhPfhYLhqYyGF4Ocm7R5FIUC38buyA+q2g8+6zzithKTcGzF3BH2fi/0VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715881567; c=relaxed/simple;
-	bh=r6E6bcuwh58uSy+ZKgcCZUW+Is/CdxBIlTsB4jQwdaU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ngA140XM2CxusHP/wPEwyxaHXm9h1C9bK2OYtF0zf47mgcBCrTdagRiuh4Lou8pDj+KE65qwVFJbYjNX5Ht1IfuJhQiN7LlXSimCu+D4Bxqo5ZVFf/UtDDJf+2mQR0gP5W0/4CIZIGnqECDhDGWgqnQBqgpRurmpWpcEotG1Ryc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Uvk25VVJ; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a5a88339780so373872466b.0
-        for <netdev@vger.kernel.org>; Thu, 16 May 2024 10:46:06 -0700 (PDT)
+	s=arc-20240116; t=1715882388; c=relaxed/simple;
+	bh=UL+0E+dEyW4smbrMu6MGZKPVd1DNfF5RLCnQF+Jbby8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=rSKPvEX/zUGA4vmbDhFFm80GaAuI4proV0zmQlUXMkeFZrVSIdHsriE12l3Ea9IG+GnoGEuZRpQNyAuheCwtRSsOqGkp7ERKF6KeOgJTDfs/gmJd6W85rh5o66WQzYHeX9c0WpdeEKJZ1HduvJ7UF9oq57VR1S/sCkkf9+nYJZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FR67lSmG; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6a3652a74f9so3484026d6.2;
+        Thu, 16 May 2024 10:59:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715881565; x=1716486365; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1715882386; x=1716487186; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=r6E6bcuwh58uSy+ZKgcCZUW+Is/CdxBIlTsB4jQwdaU=;
-        b=Uvk25VVJ9qbuzNpsL4oChQJRfYlnagT5+r09sGWMK8+VC5E7d42aFumVLuCBUx2R+H
-         O2/I4e4BQgCX8VxtxTJTuyE4bTivpQW+DwcPpWLpknm36LMKsbzc2KQERnhnZfWiG5B9
-         mFdxJ3h8TGu4sq3yW09XEBiv0CfJCgILIT1H6vBlRjqit0UNJLPx3BMdn1rTRkrYW29z
-         fAdDmgN265mqTniWjLbqUUgGLzMoCxHLyvBSsDM8uUCv2gguF8YyvFjEozHTpBWT5aDG
-         Aec2B+fYLVJ/lWU8+5znnJ3hxebXUwF35Pi6mUGtjQDQyGpFULmoj6LjVi0n8JC1OJhR
-         +k+Q==
+        bh=c2+WnzvsrG3q05AgFPxDjhS97HlYQRIW0WgMF8TeUeo=;
+        b=FR67lSmG+viUYDkDT6xwHR5ayK1pQRZdqwHJSGA1mbsI4DXrTSYKOD7mo7I8zY8Yxj
+         CEEP8IPKSj9ZpVy3Os1nqjSeMJAy1B+FIGhYT2gmpDlUrqDCOfdSsTWQdh3xMMlj7NMw
+         prFXeiU57uAjcN/osBgLfS32XXZ0ZG8kui/fcD5rsSYANXA64uH/x3rDYNYDeQsvG9de
+         G8MMtpIr1uiST4ACbansycEzu4Xv0PLnRXl1bCRZ7tMEUeyXW98Sb6JR04bMAu+XYAoV
+         /gy/Ph2VyMA5VMSdZmGhY/b2NbLl+0bmiOyZgDfO5mXvi3QnLJ2bJkA1z+GzdbKiZ0Z7
+         pBkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715881565; x=1716486365;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r6E6bcuwh58uSy+ZKgcCZUW+Is/CdxBIlTsB4jQwdaU=;
-        b=gBPQAWqfynWaULKlKNNxfD2Op0cOVpjGF3H69Q4Inw+PsIb1moeXQhb3HigjXdbOOl
-         f33EwGepcN3/AaXVtVHMcfNQNFdczbUd7Iz+bVEe02bdq0wDCXY672LcnDrzGjcSLF6F
-         uKkJH6PXppf/+bTEnu0mAR1zlh8QHVT1ZtFjlrEyQhmN8+6MzC0KKU/r/JCWGS/K2ckC
-         3iM/Be00PasqJzxJXVqjLnEA7K84bCsHRPZusokCY/VtieJqrLO1JFPc0X97q5r1HnSw
-         VqroMTyFzOGY9QKgSDwpfA0E/08dmaYrhuOZxr34Ghzk2j7hKntpUK6nD8bM1GnBqJq2
-         9eFA==
-X-Forwarded-Encrypted: i=1; AJvYcCXRmdwcYdVzR+vwoN5Sy3hQ/5sByefUFz4HXeLykKae8sXxzg/Gg7JgUt5iMGT5vZUbcgWLC9iYyiqcMBD07YVYb5N64VuR
-X-Gm-Message-State: AOJu0YzBO29//SDq55v+pWI4aWPe1JSAsoJgF0gyEHbEy4u7Cb3vFuPJ
-	RGg7aiWvLOdAtnbLY3PNGi2rNYw4Rt/VrnX1R9n9gvH0BrnQP++idmMvfGqvsxfVxRA+m7D6vjg
-	Mu24zYLva6bpa0Rbq08OH+7SL8K9FcibQF40g
-X-Google-Smtp-Source: AGHT+IFtVHnI/HeI6RHiNHcOM4sVWOXQMemsaRcFuf/AFZHYdohKi+ZquyO7RYepjpYsIMd518QWrm82tL8e3zmrYb8=
-X-Received: by 2002:a17:906:7045:b0:a58:c80e:edd9 with SMTP id
- a640c23a62f3a-a5a2d68127cmr1194167166b.77.1715881564304; Thu, 16 May 2024
- 10:46:04 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715882386; x=1716487186;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=c2+WnzvsrG3q05AgFPxDjhS97HlYQRIW0WgMF8TeUeo=;
+        b=MxImKjmUwSy6GKTZCvyCT+XSwVUyKJ7EBoEl644jQm6K8FN2dDp338jDdmE05jZCFq
+         rRvXYfj85LbtWg9bDQRFL8DI9yAmjbQNU7V7gV/kqbyVRVLB10K6gC8h87L4Nurou/O+
+         N53j3w5NyM1jd3fBhGWvcXJiSwtEErQFLyq5NpkWXZ06lLTUKj7wOjHoYLMOsiSe3ekg
+         d7yhN0lcQZMVswEyVauop1f0li4MfRKq7+urNvtSOh3NszHOaHAFwE+9lrT4Cf3GhW8T
+         umP0XSSogT/cUHyjFI6sxkOWKwM8WKiOvIcllhgbc2y41tYqUlQB4JMCUi8hApipfZ29
+         LeKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXtkhtjcGgA2shL+FGFbrPX8lAbsRYK6do47tumH6KpqM9/QcWOffw7PpajU4QEUBUcs8oSFJdflvOagMyh1kzl7hXKtQvjg5NmTKYEaJziWYiDJMXzz5cdn4c/XVrKrVJY
+X-Gm-Message-State: AOJu0YwnmEe9ZNOn4q2ozs93YLrYJcVSxADpRqOxiU80E4YJM+9GrNYZ
+	F5wbOB8XNDs65fx/wsaSS6Sr59cFS1b4bNif70r8DaFKmH01cZz1n+pKCg==
+X-Google-Smtp-Source: AGHT+IEWyZIM0yefQfIkE6t7siD2O8yJ1NSI73yOkYWbSn6ECBo0aIWC5Iwg350Su939bcRRENZVGQ==
+X-Received: by 2002:a05:6214:5a08:b0:6a0:b594:177e with SMTP id 6a1803df08f44-6a16825a4b1mr207278616d6.57.1715882386314;
+        Thu, 16 May 2024 10:59:46 -0700 (PDT)
+Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f187c47sm77551616d6.48.2024.05.16.10.59.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 May 2024 10:59:45 -0700 (PDT)
+Date: Thu, 16 May 2024 13:59:45 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: dracoding <dracodingfly@gmail.com>, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ kafai@fb.com, 
+ songliubraving@fb.com, 
+ yhs@fb.com, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org
+Cc: netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ Fred Li <dracodingfly@gmail.com>
+Message-ID: <66464991ac8ea_54e932947a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240515144313.61680-1-dracodingfly@gmail.com>
+References: <20240515144313.61680-1-dracodingfly@gmail.com>
+Subject: Re: [PATCH] net: Fix the gso BUG_ON that treat the skb which
+ head_frag is true as non head_frag
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240510152620.2227312-1-aleksander.lobakin@intel.com> <20240510152620.2227312-3-aleksander.lobakin@intel.com>
-In-Reply-To: <20240510152620.2227312-3-aleksander.lobakin@intel.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 16 May 2024 10:45:49 -0700
-Message-ID: <CAHS8izMRaw3TyURSwdoAnd67EHpgdfazm7-jOFUAWuCAOd39ng@mail.gmail.com>
-Subject: Re: [PATCH RFC iwl-next 02/12] idpf: stop using macros for accessing
- queue descriptors
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 10, 2024 at 8:28=E2=80=AFAM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> In C, we have structures and unions.
-> Casting `void *` via macros is not only error-prone, but also looks
-> confusing and awful in general.
-> In preparation for splitting the queue structs, replace it with a
-> union and direct array dereferences.
->
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+dracoding wrote:
+> From: Fred Li <dracodingfly@gmail.com>
+> 
+> The crashed kernel version is 5.16.20, and I have not test this patch
+> because I dont find a way to reproduce it, and the mailine may be
+> has the same problem.
 
-FWIW,
+That is a pretty old kernel.
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-
---=20
-Thanks,
-Mina
+There has been work in this space in the meantime. Such as commit
+3dcbdb134f32 ("net: gso: Fix skb_segment splat when splitting gso_size
+mangled skb having linear-headed frag_list") or commit 9e4b7a99a03a
+("net: gso: fix panic on frag_list with mixed head alloc types").
 
