@@ -1,118 +1,132 @@
-Return-Path: <netdev+bounces-96943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E3668C84FF
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 12:42:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 813DC8C8505
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 12:43:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0DE91F2214F
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 10:42:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B45BC1C2293C
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 10:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C9F939AC3;
-	Fri, 17 May 2024 10:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53AA3A1DA;
+	Fri, 17 May 2024 10:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="W5yVvBpd"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="GxiHN3AN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D578539ACD
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 10:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DFA39AC3;
+	Fri, 17 May 2024 10:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715942534; cv=none; b=ftB3fg/OlHlHmgGvv1hVmwjvfGA+hJNrEnvhIMh9QXIvx01oHfqBCTXSCaXSEQ85Q3uzmpNBIC2fVukWQJPJ4Fn0WGJk04bjNp/smGw8JuD7eZgRLs7LGOpV8fkGaJ+5O0Sd1613ennxo+TXTjeqomkbbxcPCxHkHofFIMkqPVg=
+	t=1715942590; cv=none; b=SxsiOC3DctNC4xwT4bdXvCUBMWC6Xyq2HH9pBaiydIv5Rq4akzlVJ4tserDYYi2ZLWgQt2BvDpkrx7lAIcsuGTehH0QzimS5wb5UuT9+4fefMFGsEqjyo+8OnLq17bTyzMG3LDRLjxAdjczdkVIE/puk47ELzQMOwcA+/t4DMrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715942534; c=relaxed/simple;
-	bh=Tn3gqGvORrVVvUWeX/AlaSoh4Q4PaVl79FZuGUvXRVM=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=XfLexUSh/rQOsCGzq69ur3Y4sd0KgsxUcV+1usBLmJxjoCJH3NAWlQ0aB1ijmL66LPxCAHnvFiwaRCPm75L1hotnGjhBSbKySkrAvqYd10P4WIOucjxMusz1etANSaPgLBaD4yaLaw6FxV92E5m3/yVImHz0QEmgPreiYaiu6rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=W5yVvBpd; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-34f7d8bfaa0so6260014f8f.0
-        for <netdev@vger.kernel.org>; Fri, 17 May 2024 03:42:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1715942531; x=1716547331; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wVVuKeze+/l/m/6SZ6VdHyTwnjR9+FVuJKaedifARXs=;
-        b=W5yVvBpd/7OUn1ILgmrsHHpwBps/y4ZoF5IxCHhI36HCYs2P2DclUN0IibsfDugno4
-         8NP54E0VkzBNNgeDHY/EyAjcAomYn8DcDTtBhKmwE/1a4PNBwQ3Duk07YbDJj5NsON0L
-         xse9GNn5uQkE5F9h+svANAAeRb2ga2MX7UaYGLlbBO3Acr2bYYJ1gqsFcL+0n0NZ2c3l
-         M3idv+hO2FGo9220K2R0q/jJQTF2fPZTu0x52Djtuu7AJwSwcj5YlFRwj5+dPuDcbx9B
-         kE2T0kVv3Qt9HuXc0+ZTS5jMDxqXKxHJEJvQEvcVYO8BKLMdBKXpKyYBRtLVshvA5qxX
-         Vrgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715942531; x=1716547331;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wVVuKeze+/l/m/6SZ6VdHyTwnjR9+FVuJKaedifARXs=;
-        b=oZwKBYNEJfPugY12ZuWalWbdKTfDNY+JS7t0LfZyA50dzJm5anxsDd00X1OSQDYs1P
-         cYsUDdrnfvWidwfnJ2dTw7LOWwQ310XfWGi27PJRYD4F+8LaHX62L9tJGfhVCS3aoTpf
-         jyaX2xOaVvTuwTYOU/osb1hCJFeDDvstP+qqKot4ABo+zoDMMoc0cQNyZTzkDkRAgTVU
-         Gdi+gsd24QA9dqwrhrJBVPAz1FYFCGKSt3oVGU8PPeQwvzjNslJGh/3h3pxRQuZRseDN
-         6sDJYh+DPQ/TrUY6RcdnvEjxBzp0VGTloHXVljjm91cZm2ZUZoyZODDVe9XNwU41UNi9
-         HgVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWyoFyqQIeKryAEuTXxd6t1+GCkLbEwfLxzG28ttZpHxla7OSdZlt+wqXyPfpxZfJHbxZdCecilw8BddM6Kw3SuZVFrwbwf
-X-Gm-Message-State: AOJu0YzLGp35Tp8pzaBQjO6cwqdkw5LRg6LYgiRIXjxZXoHPl4UyMulr
-	zQ4GF6ATx1CwHpssP4lLdK5knq6sSBsbTZwYVcCvBqzDFprebuxp6M9d0CIKpqI=
-X-Google-Smtp-Source: AGHT+IEjp9qU1QWmuNE004NYUawbuKUIq/KMDMvkPFdBJndlTyNLfoME36VKIbnsStbPx3wk0bzvww==
-X-Received: by 2002:adf:fd0d:0:b0:34c:ab55:bf1 with SMTP id ffacd0b85a97d-3504a62ffb2mr15439295f8f.2.1715942530954;
-        Fri, 17 May 2024 03:42:10 -0700 (PDT)
-Received: from smtpclient.apple ([2001:a61:aa3:5c01:15a2:d0b5:26bc:4a17])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-351b55b4655sm14658221f8f.76.2024.05.17.03.42.10
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 17 May 2024 03:42:10 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1715942590; c=relaxed/simple;
+	bh=SJuo25o9LoMUEm/F94EbRLfquKMxEdPWPXj7az7yy40=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Tr/kjN7qbl6n1dyh9IwuWadeu9rj0UztrJi8jKq+PEWwlgfEt4qSp13PCfGrT4CvdaYCj6alAybuUs7SiTaym+CYPpeYxnQci3W42Bc15y932sMj1mZXUK7bCxbcejb/uEMVTIc+I5V6y5Yli6wtzlW/zlrBYeuyEv3/e6H5wkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=GxiHN3AN; arc=none smtp.client-ip=198.47.23.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44HAgo7B015708;
+	Fri, 17 May 2024 05:42:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1715942570;
+	bh=hCY2MlVKCECjcvQ9bJMFL5Y1YG+Xc59NVUViWmYbtBE=;
+	h=From:To:CC:Subject:Date;
+	b=GxiHN3ANJg9fTsZdBRzH8VQ6z6Rg/jmQxo+ijplzgZ8aS6bKp/D2yzO7fkzPhxfNB
+	 VlJHPVGcgDcXLApR+hzkPQfdLj2wF86uZoalRPbYnoRQ/+HBq3lrroKVVMaWgQ4Aas
+	 xYLPMpj78x9AuCOrFMc/NS6ffrzjSA2FPpay4XsM=
+Received: from DFLE107.ent.ti.com (dfle107.ent.ti.com [10.64.6.28])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44HAgoZ4008214
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 17 May 2024 05:42:50 -0500
+Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE107.ent.ti.com
+ (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 17
+ May 2024 05:42:49 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 17 May 2024 05:42:49 -0500
+Received: from udit-HP-Z2-Tower-G9-Workstation-Desktop-PC.dhcp.ti.com (udit-hp-z2-tower-g9-workstation-desktop-pc.dhcp.ti.com [172.24.227.18])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44HAgjiT021387;
+	Fri, 17 May 2024 05:42:46 -0500
+From: Udit Kumar <u-kumar1@ti.com>
+To: <vigneshr@ti.com>, <nm@ti.com>, <davem@davemloft.net>
+CC: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Udit Kumar <u-kumar1@ti.com>,
+        Kip Broadhurst
+	<kbroadhurst@ti.com>
+Subject: [PATCH] dt-bindings: net: dp8386x: Add MIT license along with GPL-2.0
+Date: Fri, 17 May 2024 16:12:26 +0530
+Message-ID: <20240517104226.3395480-1-u-kumar1@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.500.171.1.1\))
-Subject: Re: [PATCH v3] net: smc91x: Fix pointer types
-From: Thorsten Blum <thorsten.blum@toblux.com>
-In-Reply-To: <66AB9A6F-4D24-4033-96B9-E5F2F700029D@toblux.com>
-Date: Fri, 17 May 2024 12:41:59 +0200
-Cc: Arnd Bergmann <arnd@arndb.de>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- glaubitz@physik.fu-berlin.de,
- kuba@kernel.org,
- linux-kernel@vger.kernel.org,
- lkp@intel.com,
- netdev@vger.kernel.org,
- nico@fluxnic.net,
- pabeni@redhat.com
-Content-Transfer-Encoding: 7bit
-Message-Id: <BB22F3F9-BB2E-45B2-A3C3-8A4218B018B2@toblux.com>
-References: <0efd687d-3df5-49dd-b01c-d5bd977ae12e@lunn.ch>
- <20240516223004.350368-2-thorsten.blum@toblux.com>
- <f192113c-9aee-47be-85f6-cd19fcb81a5e@lunn.ch>
- <66AB9A6F-4D24-4033-96B9-E5F2F700029D@toblux.com>
-To: Andrew Lunn <andrew@lunn.ch>
-X-Mailer: Apple Mail (2.3774.500.171.1.1)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On 17. May 2024, at 01:21, Thorsten Blum <thorsten.blum@toblux.com> wrote:
-> On 17. May 2024, at 00:51, Andrew Lunn <andrew@lunn.ch> wrote:
->> It would also be good if you read:
->> 
->> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-> 
-> Will do.
+Modify license to include dual licensing as GPL-2.0-only OR MIT
+license for TI specific phy header files. This allows for Linux
+kernel files to be used in other Operating System ecosystems
+such as Zephyr or FreeBSD.
 
-Reading this was helpful and I learned that:
-- net-next is closed during a merge window
-- patches should be prefixed with the tree name
+While at this, update the TI copyright year to sync with current year
+to indicate license change.
 
-I'll submit the patch that cleans up ioaddr from all SMC_* macros when
-net-next is open again.
+Cc: Kip Broadhurst <kbroadhurst@ti.com>
+Signed-off-by: Udit Kumar <u-kumar1@ti.com>
+---
+ include/dt-bindings/net/ti-dp83867.h | 4 ++--
+ include/dt-bindings/net/ti-dp83869.h | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-Thanks,
-Thorsten
+diff --git a/include/dt-bindings/net/ti-dp83867.h b/include/dt-bindings/net/ti-dp83867.h
+index 6fc4b445d3a1..2b7bc9c692f2 100644
+--- a/include/dt-bindings/net/ti-dp83867.h
++++ b/include/dt-bindings/net/ti-dp83867.h
+@@ -1,10 +1,10 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
++/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
+ /*
+  * Device Tree constants for the Texas Instruments DP83867 PHY
+  *
+  * Author: Dan Murphy <dmurphy@ti.com>
+  *
+- * Copyright:   (C) 2015 Texas Instruments, Inc.
++ * Copyright:   (C) 2015-2024 Texas Instruments, Inc.
+  */
+ 
+ #ifndef _DT_BINDINGS_TI_DP83867_H
+diff --git a/include/dt-bindings/net/ti-dp83869.h b/include/dt-bindings/net/ti-dp83869.h
+index 218b1a64e975..fbf5601070dc 100644
+--- a/include/dt-bindings/net/ti-dp83869.h
++++ b/include/dt-bindings/net/ti-dp83869.h
+@@ -1,10 +1,10 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
++/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
+ /*
+  * Device Tree constants for the Texas Instruments DP83869 PHY
+  *
+  * Author: Dan Murphy <dmurphy@ti.com>
+  *
+- * Copyright:   (C) 2019 Texas Instruments, Inc.
++ * Copyright:   (C) 2019-2024 Texas Instruments, Inc.
+  */
+ 
+ #ifndef _DT_BINDINGS_TI_DP83869_H
+-- 
+2.34.1
+
 
