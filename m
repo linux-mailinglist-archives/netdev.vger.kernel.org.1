@@ -1,108 +1,123 @@
-Return-Path: <netdev+bounces-96968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDC498C879C
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:56:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 834C78C87A2
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:58:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 608101F2341C
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 13:56:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B8E51F22672
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 13:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3448455769;
-	Fri, 17 May 2024 13:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C395576D;
+	Fri, 17 May 2024 13:58:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AZE/axk+"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="KB3cZuft"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A511254FAF;
-	Fri, 17 May 2024 13:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09FB3B1AE;
+	Fri, 17 May 2024 13:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715954170; cv=none; b=IGUaqRL6rtIg2v00WLe/b+M42Tm7b1KkqCIGOhucN/ZgOhZkkMJVq3W01AwkyZaB+TL9jphqpIMEssbW5aYHElCNm5p4QBuQWorcpFICVw0SXBbC6mfplhn37uswtl0gnkkLtK/G6Zw7I6xxoQZAFuMggvaA65KhY+LXPFvKMp0=
+	t=1715954301; cv=none; b=t8LlFNz+kZb2+Bl+1ako4umPB5f+EVA7/uDBKMK7MvxuKSdJ7IZXJVkpX7IvJj3ncyQBp2NOGXW5AlyceO7N+fcn67ljv9yfMgdTVRKrSexcdkTvULq4wYIOi+mupIoMDYkCoBbqxcC3PrD3UtrLopLA7hIKQfcAsa+BUiNRko0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715954170; c=relaxed/simple;
-	bh=LEFMBsPh4x85fiALpW4Jhs0qhfd/PS/cLG9AMrTavD8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kP219Y0Cj9KJ6hwShGLkcww8RWccQA2X6t+KxQp1QyGfbxkUaclvMmigjeHv2v5SKRPGkdSq0hGbGEvCUL3ryD+acNn1xqO3qVa0kRma/rVUGFfIhUAQ76zjk4p/TAPPNLJCjqaHKMM9eVQLRYEQ+UYzL6xRLFN9hBpxRF3GOdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AZE/axk+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Pk/W9e89sqlkjRFyy/G4QXKaCAzosUOTniNUWw5lh80=; b=AZE/axk+2en4FQ+tO3zZeqtkGS
-	OCjIoIK3wrU6ktnmLymgHJHYSsQZ3CZiNqSx+WUFhYqGrBhbYYcjFYJ6z9r1V6rxJLPjk+QE/6rds
-	1DMW9XzEa8prH6ICGlwaWBdW/J92MHP+mjwZQ9MwU2ocqwYBW7TgZRvgAAPB1TZRK26I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s7y43-00FZvK-3j; Fri, 17 May 2024 15:56:03 +0200
-Date: Fri, 17 May 2024 15:56:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Udit Kumar <u-kumar1@ti.com>
-Cc: vigneshr@ti.com, nm@ti.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Kip Broadhurst <kbroadhurst@ti.com>
-Subject: Re: [PATCH] dt-bindings: net: dp8386x: Add MIT license along with
- GPL-2.0
-Message-ID: <41e30085-937a-410a-ac6a-189307a59319@lunn.ch>
-References: <20240517104226.3395480-1-u-kumar1@ti.com>
+	s=arc-20240116; t=1715954301; c=relaxed/simple;
+	bh=+dsbdBjhGrjm4WBAkfNNWSaDLuo2cRZvTPsNHLA+HzM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qsZgYdWxgu2fIaEKQ+vRs0+HRuUxRWeb+FnjGdQiT9pcD3ljuasJdsG2fl2SNUwoEMovepBYh+J1yK0keTDAKKolL5bIcfViDfB+SGB5GUYoV3I8cP9yT2WF5t6KtAunvmRlDOWNTPr117kcD7iFpkFtfWpa0q12eiuLNYz5oWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=KB3cZuft; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1715954300; x=1747490300;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+dsbdBjhGrjm4WBAkfNNWSaDLuo2cRZvTPsNHLA+HzM=;
+  b=KB3cZuftFQW/AdUrm3kFtkMbHGK0LoWT262YTfYYefJk9hcgDVE9QsMp
+   tnddwFR1V8sXslRKW7ebrxo8cnCygsQmQ+ZntxnyY1qCxz1vpLX6GvCju
+   isk8tC18MymYvwWTaRPTvyB7YmUT4t4CxnfsonxMAKIXC7eR9E3z5mJa5
+   U1FDj6oqkTB39jB+0UI3vA/nq1S/DmCAGnBOhfiUDYKi4rWRGcoFE8TDB
+   mNjavp/lC9c5oUeMP1TmzhQLzMIEcCuyTJ41pvkpiJ3yazjMy6DLOUxQ9
+   aRYn402olCqBxJlUI0XfR2nmBOiihJxcFjjlJamJXnPVNr/eyUMN94M/G
+   w==;
+X-CSE-ConnectionGUID: ufAfKQToSxqUayt+FPsL2A==
+X-CSE-MsgGUID: 27KVWmirSw2qpnX6nz50SQ==
+X-IronPort-AV: E=Sophos;i="6.08,167,1712646000"; 
+   d="scan'208";a="25061077"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 May 2024 06:58:18 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 17 May 2024 06:58:15 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Fri, 17 May 2024 06:58:12 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <vladimir.oltean@nxp.com>,
+	<jacob.e.keller@intel.com>
+CC: <UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Horatiu Vultur <horatiu.vultur@microchip.com>
+Subject: [PATCH net v2] net: lan966x: Remove ptp traps in case the ptp is not enabled.
+Date: Fri, 17 May 2024 15:58:08 +0200
+Message-ID: <20240517135808.3025435-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240517104226.3395480-1-u-kumar1@ti.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Fri, May 17, 2024 at 04:12:26PM +0530, Udit Kumar wrote:
-> Modify license to include dual licensing as GPL-2.0-only OR MIT
-> license for TI specific phy header files. This allows for Linux
-> kernel files to be used in other Operating System ecosystems
-> such as Zephyr or FreeBSD.
-> 
-> While at this, update the TI copyright year to sync with current year
-> to indicate license change.
-> 
-> Cc: Kip Broadhurst <kbroadhurst@ti.com>
-> Signed-off-by: Udit Kumar <u-kumar1@ti.com>
-> ---
->  include/dt-bindings/net/ti-dp83867.h | 4 ++--
->  include/dt-bindings/net/ti-dp83869.h | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/dt-bindings/net/ti-dp83867.h b/include/dt-bindings/net/ti-dp83867.h
-> index 6fc4b445d3a1..2b7bc9c692f2 100644
-> --- a/include/dt-bindings/net/ti-dp83867.h
-> +++ b/include/dt-bindings/net/ti-dp83867.h
-> @@ -1,10 +1,10 @@
-> -/* SPDX-License-Identifier: GPL-2.0-only */
-> +/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
->  /*
->   * Device Tree constants for the Texas Instruments DP83867 PHY
->   *
->   * Author: Dan Murphy <dmurphy@ti.com>
->   *
-> - * Copyright:   (C) 2015 Texas Instruments, Inc.
-> + * Copyright:   (C) 2015-2024 Texas Instruments, Inc.
->   */
+Lan966x is adding ptp traps to redirect the ptp frames to the CPU such
+that the HW will not forward these frames anywhere. The issue is that in
+case ptp is not enabled and the timestamping source is et to
+HWTSTAMP_SOURCE_NETDEV then these traps would not be removed on the
+error path.
+Fix this by removing the traps in this case as they are not needed.
 
-IANAL
+Fixes: 54e1ed69c40a ("net: lan966x: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()")
+Suggested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+v1->v2:
+- as suggested by Vladimir, add the check before programming the traps
+  in the first place
+---
+ drivers/net/ethernet/microchip/lan966x/lan966x_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-but about 1/4 of this file was written by Wadim Egorov
-<w.egorov@phytec.de>. It would be good to Cc: him and make sure he
-does not object.
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+index 2635ef8958c80..fbff37067ab78 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+@@ -474,14 +474,14 @@ static int lan966x_port_hwtstamp_set(struct net_device *dev,
+ 	    cfg->source != HWTSTAMP_SOURCE_PHYLIB)
+ 		return -EOPNOTSUPP;
+ 
++	if (cfg->source == HWTSTAMP_SOURCE_NETDEV && !port->lan966x->ptp)
++		return -EOPNOTSUPP;
++
+ 	err = lan966x_ptp_setup_traps(port, cfg);
+ 	if (err)
+ 		return err;
+ 
+ 	if (cfg->source == HWTSTAMP_SOURCE_NETDEV) {
+-		if (!port->lan966x->ptp)
+-			return -EOPNOTSUPP;
+-
+ 		err = lan966x_ptp_hwtstamp_set(port, cfg, extack);
+ 		if (err) {
+ 			lan966x_ptp_del_traps(port);
+-- 
+2.34.1
 
-The other file is fine, it was all Dan Murphy's work.
-
-     Andrew
 
