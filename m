@@ -1,190 +1,132 @@
-Return-Path: <netdev+bounces-96985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6CB58C88DA
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 16:59:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F7F78C8914
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:12:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71FE9288011
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 14:59:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 077311F26E93
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA11C64CE1;
-	Fri, 17 May 2024 14:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F846A8AD;
+	Fri, 17 May 2024 15:11:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A591A2C24;
-	Fri, 17 May 2024 14:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1026996A
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 15:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715957674; cv=none; b=DHQieBxd8A/Sx/FE0+9Nwm6sK38r1t0spkjRrbLWQig/Li3teeyRTRF78mCpH9a4xz8rl/y6ssSWNm1brfgpzzi5UIwmFk6YasXo2rwXb5yLa6t0gtdRG1aZuclOz2li1tFPA0kHbbDYzblsgghjYnh7QtXRG4Am1VurHhMSZ7U=
+	t=1715958710; cv=none; b=Et4fYg6XNfpOu+CKSO2uEF5mKzMgP3P5fZa39Wuu5x/oC9HqxReWry8nVCvAjloh3onDCyOOk9AOpq6nCNWaA9VmU2JQuSmlIhaGONEC1lOCAlfRzzP7f5SiVKizD9MKvkPeAuO4oGTM2bDwAxa1z8EWpoKnn5eQp1PKA1jr9UI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715957674; c=relaxed/simple;
-	bh=64sy/c4phDtnH/izfrGVFEyU4DFcd0VaogA0oKSZmv8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rHh5TjR7bFqp25C/uH8XcvtU0Eu1tPbnkDKU9ST5hDfyWDDEHxse64qA/wAd8gCndvSPKBwh+S2A+wXDhf9AuOtmUqJRA/JYIPH8Aq5qL89YuWrpl0P68suJNHJnaZKv8kORz02bv7qrGgd7RdnjcNoxteOf0C1+9NAD6jlmEZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-From: Kenton Groombridge <concord@gentoo.org>
-To: johannes@sipsolutions.net
-Cc: concord@gentoo.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Kees Cook <keescook@chromium.org>
-Subject: [PATCH v2] wifi: mac80211: Avoid address calculations via out of bounds array indexing
-Date: Fri, 17 May 2024 10:54:20 -0400
-Message-ID: <20240517145420.8891-1-concord@gentoo.org>
-X-Mailer: git-send-email 2.45.0
+	s=arc-20240116; t=1715958710; c=relaxed/simple;
+	bh=JoaVRlStp8RrWSxyOCouhUz7t6oVS8UocMnIZpXzY4c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uHO7BE7fJfORh+NDpZfJpSGFaW7orraLkH7GnnrpmyJxpNwF000js+fWjdk/iusJRK9DeJx+Uf9n4IgcZUD0NIwAlIfoXCIno5O3W9PpP4IED84HQJf5sq5iXJ9TMUM+FpGoeb2lby7jvsL6qmu3yz8NzlCVE9Buh9ZJrKJuF9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garver.life; spf=fail smtp.mailfrom=garver.life; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garver.life
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=garver.life
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-528-FktqgA7BPACkrmQQshGugg-1; Fri,
+ 17 May 2024 11:11:38 -0400
+X-MC-Unique: FktqgA7BPACkrmQQshGugg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 84C8D38C6163;
+	Fri, 17 May 2024 15:11:38 +0000 (UTC)
+Received: from egarver-mac.redhat.com (unknown [10.22.9.146])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B0E58740F;
+	Fri, 17 May 2024 15:11:37 +0000 (UTC)
+From: Eric Garver <eric@garver.life>
+To: netdev@vger.kernel.org
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCH net-next] netfilter: nft_fib: allow from forward/input without iif selector
+Date: Fri, 17 May 2024 11:11:37 -0400
+Message-ID: <20240517151137.89270-1-eric@garver.life>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: garver.life
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=WINDOWS-1252; x-default=true
 
-req->n_channels must be set before req->channels[] can be used.
+This removes the restriction of needing iif selector in the
+forward/input hooks for fib lookups when requested result is
+oif/oifname.
 
-This patch fixes one of the issues encountered in [1].
+Removing this restriction allows "loose" lookups from the forward hooks.
 
-[   83.964252] ------------[ cut here ]------------
-[   83.964255] UBSAN: array-index-out-of-bounds in net/mac80211/scan.c:364:4
-[   83.964258] index 0 is out of range for type 'struct ieee80211_channel *[]'
-[   83.964260] CPU: 0 PID: 1695 Comm: iwd Tainted: G           O    T 6.8.9-gentoo-hardened1 #1
-[   83.964262] Hardware name: System76 Pangolin/Pangolin, BIOS ARB928_V00.01_T0025ASY1_ms 04/20/2023
-[   83.964264] Call Trace:
-[   83.964267]  <TASK>
-[   83.964269]  dump_stack_lvl+0x3f/0xc0
-[   83.964274]  __ubsan_handle_out_of_bounds+0xec/0x110
-[   83.964278]  ieee80211_prep_hw_scan+0x2db/0x4b0
-[   83.964281]  __ieee80211_start_scan+0x601/0x990
-[   83.964284]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964287]  ? cfg80211_scan+0x149/0x250
-[   83.964291]  nl80211_trigger_scan+0x874/0x980
-[   83.964295]  genl_family_rcv_msg_doit+0xe8/0x160
-[   83.964298]  genl_rcv_msg+0x240/0x270
-[   83.964301]  ? __cfi_nl80211_trigger_scan+0x10/0x10
-[   83.964302]  ? __cfi_nl80211_post_doit+0x10/0x10
-[   83.964304]  ? __cfi_nl80211_pre_doit+0x10/0x10
-[   83.964307]  ? __cfi_genl_rcv_msg+0x10/0x10
-[   83.964309]  netlink_rcv_skb+0x102/0x130
-[   83.964312]  genl_rcv+0x23/0x40
-[   83.964314]  netlink_unicast+0x23b/0x340
-[   83.964316]  netlink_sendmsg+0x3a9/0x450
-[   83.964319]  __sys_sendto+0x3ae/0x3c0
-[   83.964324]  __x64_sys_sendto+0x21/0x40
-[   83.964326]  do_syscall_64+0x90/0x150
-[   83.964329]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964331]  ? syscall_exit_work+0xc2/0xf0
-[   83.964333]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964335]  ? syscall_exit_to_user_mode+0x74/0xa0
-[   83.964337]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964339]  ? do_syscall_64+0x9c/0x150
-[   83.964340]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964342]  ? syscall_exit_to_user_mode+0x74/0xa0
-[   83.964344]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964346]  ? do_syscall_64+0x9c/0x150
-[   83.964347]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964349]  ? do_syscall_64+0x9c/0x150
-[   83.964351]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964353]  ? syscall_exit_work+0xc2/0xf0
-[   83.964354]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964356]  ? syscall_exit_to_user_mode+0x74/0xa0
-[   83.964358]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964359]  ? do_syscall_64+0x9c/0x150
-[   83.964361]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964362]  ? do_user_addr_fault+0x488/0x620
-[   83.964366]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964367]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964369]  entry_SYSCALL_64_after_hwframe+0x55/0x5d
-[   83.964372] RIP: 0033:0x6200808578d7
-[   83.964374] Code: 00 00 90 f3 0f 1e fa 41 56 55 41 89 ce 48 83 ec 28 80 3d 7b f7 0d 00 00 74 29 45 31 c9 45 31 c0 41 89 ca b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 71 48 83 c4 28 5d 41 5e c3 66 0f 1f 84 00 00
-[   83.964375] RSP: 002b:0000730c4e821530 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-[   83.964378] RAX: ffffffffffffffda RBX: 000006dbc456c570 RCX: 00006200808578d7
-[   83.964379] RDX: 000000000000005c RSI: 000006dbc45884f0 RDI: 0000000000000004
-[   83.964381] RBP: 0000000000000004 R08: 0000000000000000 R09: 0000000000000000
-[   83.964382] R10: 0000000000000000 R11: 0000000000000246 R12: 000006dbc456c480
-[   83.964383] R13: 000006dbc456c450 R14: 0000000000000000 R15: 000006dbc456c610
-[   83.964386]  </TASK>
-[   83.964386] ---[ end trace ]---
-
-[1] https://bugzilla.kernel.org/show_bug.cgi?id=218810
-
-v1->v2:
-- Drop changes in cfg80211 as requested by Johannes
-
-Co-authored-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Kenton Groombridge <concord@gentoo.org>
+Signed-off-by: Eric Garver <eric@garver.life>
 ---
- net/mac80211/scan.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ net/ipv4/netfilter/nft_fib_ipv4.c | 3 +--
+ net/ipv6/netfilter/nft_fib_ipv6.c | 3 +--
+ net/netfilter/nft_fib.c           | 8 +++-----
+ 3 files changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
-index 73850312580f..b88e99c211ff 100644
---- a/net/mac80211/scan.c
-+++ b/net/mac80211/scan.c
-@@ -358,7 +358,8 @@ static bool ieee80211_prep_hw_scan(struct ieee80211_sub_if_data *sdata)
- 	struct cfg80211_scan_request *req;
- 	struct cfg80211_chan_def chandef;
- 	u8 bands_used = 0;
--	int i, ielen, n_chans;
-+	int i, ielen;
-+	u32 *n_chans;
- 	u32 flags = 0;
- 
- 	req = rcu_dereference_protected(local->scan_req,
-@@ -368,34 +369,34 @@ static bool ieee80211_prep_hw_scan(struct ieee80211_sub_if_data *sdata)
- 		return false;
- 
- 	if (ieee80211_hw_check(&local->hw, SINGLE_SCAN_ON_ALL_BANDS)) {
-+		local->hw_scan_req->req.n_channels = req->n_channels;
-+
- 		for (i = 0; i < req->n_channels; i++) {
- 			local->hw_scan_req->req.channels[i] = req->channels[i];
- 			bands_used |= BIT(req->channels[i]->band);
- 		}
--
--		n_chans = req->n_channels;
- 	} else {
- 		do {
- 			if (local->hw_scan_band == NUM_NL80211_BANDS)
- 				return false;
- 
--			n_chans = 0;
-+			n_chans = &local->hw_scan_req->req.n_channels;
-+			*n_chans = 0;
- 
- 			for (i = 0; i < req->n_channels; i++) {
- 				if (req->channels[i]->band !=
- 				    local->hw_scan_band)
- 					continue;
--				local->hw_scan_req->req.channels[n_chans] =
-+				local->hw_scan_req->req.channels[*n_chans++] =
- 							req->channels[i];
--				n_chans++;
-+
- 				bands_used |= BIT(req->channels[i]->band);
- 			}
- 
- 			local->hw_scan_band++;
--		} while (!n_chans);
-+		} while (!*n_chans);
- 	}
- 
--	local->hw_scan_req->req.n_channels = n_chans;
- 	ieee80211_prepare_scan_chandef(&chandef);
- 
- 	if (req->flags & NL80211_SCAN_FLAG_MIN_PREQ_CONTENT)
--- 
-2.45.0
+diff --git a/net/ipv4/netfilter/nft_fib_ipv4.c b/net/ipv4/netfilter/nft_fib=
+_ipv4.c
+index 9eee535c64dd..975a4a809058 100644
+--- a/net/ipv4/netfilter/nft_fib_ipv4.c
++++ b/net/ipv4/netfilter/nft_fib_ipv4.c
+@@ -116,8 +116,7 @@ void nft_fib4_eval(const struct nft_expr *expr, struct =
+nft_regs *regs,
+ =09=09fl4.daddr =3D iph->daddr;
+ =09=09fl4.saddr =3D get_saddr(iph->saddr);
+ =09} else {
+-=09=09if (nft_hook(pkt) =3D=3D NF_INET_FORWARD &&
+-=09=09    priv->flags & NFTA_FIB_F_IIF)
++=09=09if (nft_hook(pkt) =3D=3D NF_INET_FORWARD)
+ =09=09=09fl4.flowi4_iif =3D nft_out(pkt)->ifindex;
+=20
+ =09=09fl4.daddr =3D iph->saddr;
+diff --git a/net/ipv6/netfilter/nft_fib_ipv6.c b/net/ipv6/netfilter/nft_fib=
+_ipv6.c
+index 36dc14b34388..f95e39e235d3 100644
+--- a/net/ipv6/netfilter/nft_fib_ipv6.c
++++ b/net/ipv6/netfilter/nft_fib_ipv6.c
+@@ -30,8 +30,7 @@ static int nft_fib6_flowi_init(struct flowi6 *fl6, const =
+struct nft_fib *priv,
+ =09=09fl6->daddr =3D iph->daddr;
+ =09=09fl6->saddr =3D iph->saddr;
+ =09} else {
+-=09=09if (nft_hook(pkt) =3D=3D NF_INET_FORWARD &&
+-=09=09    priv->flags & NFTA_FIB_F_IIF)
++=09=09if (nft_hook(pkt) =3D=3D NF_INET_FORWARD)
+ =09=09=09fl6->flowi6_iif =3D nft_out(pkt)->ifindex;
+=20
+ =09=09fl6->daddr =3D iph->saddr;
+diff --git a/net/netfilter/nft_fib.c b/net/netfilter/nft_fib.c
+index 37cfe6dd712d..b58f62195ff3 100644
+--- a/net/netfilter/nft_fib.c
++++ b/net/netfilter/nft_fib.c
+@@ -35,11 +35,9 @@ int nft_fib_validate(const struct nft_ctx *ctx, const st=
+ruct nft_expr *expr,
+ =09switch (priv->result) {
+ =09case NFT_FIB_RESULT_OIF:
+ =09case NFT_FIB_RESULT_OIFNAME:
+-=09=09hooks =3D (1 << NF_INET_PRE_ROUTING);
+-=09=09if (priv->flags & NFTA_FIB_F_IIF) {
+-=09=09=09hooks |=3D (1 << NF_INET_LOCAL_IN) |
+-=09=09=09=09 (1 << NF_INET_FORWARD);
+-=09=09}
++=09=09hooks =3D (1 << NF_INET_PRE_ROUTING) |
++=09=09=09(1 << NF_INET_LOCAL_IN) |
++=09=09=09(1 << NF_INET_FORWARD);
+ =09=09break;
+ =09case NFT_FIB_RESULT_ADDRTYPE:
+ =09=09if (priv->flags & NFTA_FIB_F_IIF)
+--=20
+2.43.0
 
 
