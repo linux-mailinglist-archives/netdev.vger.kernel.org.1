@@ -1,144 +1,94 @@
-Return-Path: <netdev+bounces-96994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D77678C8961
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:32:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD8E88C896A
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:37:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 071321C22BDC
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:32:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ADB71C21EDE
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:37:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E329312D219;
-	Fri, 17 May 2024 15:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFFD12F588;
+	Fri, 17 May 2024 15:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="KFyjp5QG";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dPnNRHpx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eg9uP2tq"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow1-smtp.messagingengine.com (flow1-smtp.messagingengine.com [103.168.172.136])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E49712CD8A;
-	Fri, 17 May 2024 15:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE1E12F39B
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 15:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715959939; cv=none; b=EaAq9GZl0XTa60fyIHcCZINBOct9K5ToWs2JkLr/p4cJahldVvtWUZLWDJQA9ss3M8WL2rZ3kmFOAqXmC2Hs7LkhTFBn/GyZhTiZgpRsv6DrXBRz27IqbgMBQtGEkDF3kBjgOVTZP28nFL79vl9oGgwNvuyFgaMd2AG82PbCUv0=
+	t=1715960237; cv=none; b=CsNs0IJpPADY30LmDjFH6Eqn+5Gr2sbLnWScLDUex/U+ThUq71xwBEnA1yJi9u0JwC0rHgWIKQ+XZCoSXd/Jmpcah/vJv6EuE6YezDOMRE/11h09CwRsRf0TYjslBCScIWL3JYpTYkiooJbDokzJ4qyjq9H8sTFNxpegcRtv7hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715959939; c=relaxed/simple;
-	bh=D+aZeg+2cJFRvQasfMNMmYWH8MS31v4X+wRV4Zfj6AM=;
+	s=arc-20240116; t=1715960237; c=relaxed/simple;
+	bh=s9IKSXjQQ0F0zhaJQllp6OK0JSl6n8PIMwYIr1D3+eo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ayqcw4r9ET+VR8GqSGlYdhjQ9FYvwtIzUHssBAGcTObCNhIT7HB6N6h7YwLCEmSMKhpzWY8SBAtrjW5UdYO1qiD+ILTIFrFjuqxJNziPvuCKQITke1tFmYHZUBwDavpLgYqD5gbJPmSbPsuy+2g85H9bqMK/xB7n/hhmJf0Izq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=KFyjp5QG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dPnNRHpx; arc=none smtp.client-ip=103.168.172.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-	by mailflow.nyi.internal (Postfix) with ESMTP id 88422200450;
-	Fri, 17 May 2024 11:32:16 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Fri, 17 May 2024 11:32:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1715959936;
-	 x=1715967136; bh=s8Q/l0wRHpTp9lBxT46kDXxjSSe7yKH9ZdbIurG921s=; b=
-	KFyjp5QGLxIPQPo4O+zmoE47Jgqxd4Yz/Ph7adPQ819doQ+vUOamctaLYbQaDSkE
-	STG2S4bzMOEA5CslT/UDD9Y7pKT7GBNySNmiVaWJ+NHcJGY4BLU7p91iAUr6OZIo
-	hYwJG1kNRrWyVv4nGK2DMdEtXjkxj/xCbgIZjWFbvNiaPyvJPmSkucmAwwLci3i5
-	wYPhrb+5fvfBtiikiIR4T2F8/z61p3dXUcWrK4tIJ8/DO+rYS5jS30EF8FtN+Do1
-	eqB3VXCW9KlhlSPy6qv/3ctxn+mUO9W8e4o8IkRyWQP/2VE4YY6sNlsYI0j0pZoy
-	W9A7lKeKTdjUVN5ozuH2iw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1715959936; x=
-	1715967136; bh=s8Q/l0wRHpTp9lBxT46kDXxjSSe7yKH9ZdbIurG921s=; b=d
-	PnNRHpxgGOd3y0t1HZgRFwZq0lIa84YUvy7ksSoEKQ6dsraCoxAFp2Ojqdb+pLFP
-	WhNjPExz/Q7yUwZbdDfSvyoncx9yvhy2Wqt/kXDeIiaH+aLkwIh/8cbn9PCr3hNa
-	/lwPttFQO4j1LM6KbomvWoG3QisosZl/i0E5f0Bv0TQ5leEknPqjs/PuQHvP+l9s
-	+nsSrHmxGUVvX/lH7YZ4phwURyx2OK169Y73Z3VLs0ShNEyZz7SWV5XL3kXqMOBV
-	tYtoSs5lG3pPMPutNuBadU7VjC1/W2bVlHqNCs3hhkh7h9tPJS+WWY/2m2Eb0BdJ
-	R+KeeQH8r6lLCZqCD946A==
-X-ME-Sender: <xms:gHhHZi_uoK0ohc3Ob6gTqQ_1YFBMK9BwMXiP7vU3A8F6xXC4Vp6Iew>
-    <xme:gHhHZivAzSBO33oW1odv7C7dFOi_mmb95QGi4mMHbGXQ7ioLokx3_RRAcUtw1Vxhe
-    HXJwpdIqsg2wQ>
-X-ME-Received: <xmr:gHhHZoDMRTtQu9GIwlN8P0cmn1ErQNGXIR45mXKdiZDQPwOMep0gSYBydS8WYBxhcNcB513fL3Qz-Y7QQFyRafHAghAnC3AQCC4Seg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvdehfedgudegvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomhepifhr
-    vghgucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnheple
-    ekheejjeeiheejvdetheejveekudegueeigfefudefgfffhfefteeuieekudefnecuffho
-    mhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
-X-ME-Proxy: <xmx:gHhHZqd-Vr2ozLK8ZN89CLKz5_JvooYw2FTifP2xp1PJekIN-Xigpw>
-    <xmx:gHhHZnO71SM8Pki1pXjseWsw1UcmznmbIHbUnd3u9Cfdu1YfaIKasg>
-    <xmx:gHhHZkm-VFHPtBCePeAys828Z6op_Tp3MI5GgDViB_eHzcYML_dTig>
-    <xmx:gHhHZpss9O8sYpESFJo2an3fRrSxZ1DqU5DX7EZLxnrivDafY6QCbQ>
-    <xmx:gHhHZo_D6DA87FMkIMNExhtlzq06u_JdSDIXNrql534y6tV7vURO7teR>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 17 May 2024 11:32:15 -0400 (EDT)
-Date: Fri, 17 May 2024 17:32:12 +0200
-From: Greg KH <greg@kroah.com>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: Vitor Soares <vitor.soares@toradex.com>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Thomas Kopp <thomas.kopp@microchip.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	LKML <linux-kernel@vger.kernel.org>, stable@vger.kernel.org,
-	Vitor Soares <ivitro@gmail.com>
-Subject: Re: [PATCH v6] can: mcp251xfd: fix infinite loop when xmit fails
-Message-ID: <2024051744-evaluate-dubbed-8433@gregkh>
-References: <20240517134355.770777-1-ivitro@gmail.com>
- <b95de04f-a2f8-4564-b9d4-9c09c47f23c3@web.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XVF5cNRaWcAEsbGmOOJzb3sNd1G0Eyz6QKGsMgDtdPe3hkM04LDbxfHsd+KbHGGaoPDg53bYcX3Nm4Zq+izx3DNSk9TRLAhHH3Dth+6xtardLus5zhEuZ2Bli7Vv6z/x9eGag5VdyCdFVLhI+rW/ffRZPGv1QwwCoIqDOGVbMhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garver.life; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eg9uP2tq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garver.life
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715960234;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2DMaNd1X0EjIWhl5yZx/Dvg4/jtmNGNBT4wiHgYISUE=;
+	b=eg9uP2tq//PbrZzY8DnJGjRZwaBWQcKK9R6q4jJWA0nz/BTM8TlKdeXczyPukxMPWgkZq3
+	pluBR+63NnmS4Jj6CMQhb23dv3J2HagPxVoSflyq7h2qdB+gEgKVYSEq1yWjReYU8vGoh1
+	KL4Z4qsKyMAQzb3OBy0vOkEYqvCUv/4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-167-WVt0THKtMum2QffuosTRYA-1; Fri,
+ 17 May 2024 11:37:12 -0400
+X-MC-Unique: WVt0THKtMum2QffuosTRYA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7EE1538157BA;
+	Fri, 17 May 2024 15:37:12 +0000 (UTC)
+Received: from localhost (unknown [10.22.9.146])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 53AB02026D68;
+	Fri, 17 May 2024 15:37:12 +0000 (UTC)
+Date: Fri, 17 May 2024 11:37:10 -0400
+From: Eric Garver <eric@garver.life>
+To: netdev@vger.kernel.org
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>
+Subject: Re: [PATCH net-next] netfilter: nft_fib: allow from forward/input
+ without iif selector
+Message-ID: <Zkd5pmHsYqN0LBbR@egarver-mac>
+Mail-Followup-To: Eric Garver <eric@garver.life>, netdev@vger.kernel.org,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>
+References: <20240517151137.89270-1-eric@garver.life>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b95de04f-a2f8-4564-b9d4-9c09c47f23c3@web.de>
+In-Reply-To: <20240517151137.89270-1-eric@garver.life>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On Fri, May 17, 2024 at 04:44:18PM +0200, Markus Elfring wrote:
-> …
-> > This patch resolves the issue by starting …
+On Fri, May 17, 2024 at 11:11:37AM -0400, Eric Garver wrote:
+> This removes the restriction of needing iif selector in the
+> forward/input hooks for fib lookups when requested result is
+> oif/oifname.
 > 
-> Will further imperative wordings be more desirable for an improved change description?
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.9#n94
+> Removing this restriction allows "loose" lookups from the forward hooks.
 > 
-> Regards,
-> Markus
-> 
+> Signed-off-by: Eric Garver <eric@garver.life>
+> ---
 
-Hi,
+I mistakenly sent this to the wrong list. Sorry. Please ignore.
 
-This is the semi-friendly patch-bot of Greg Kroah-Hartman.
+I'll repost to netfilter-devel.
 
-Markus, you seem to have sent a nonsensical or otherwise pointless
-review comment to a patch submission on a Linux kernel developer mailing
-list.  I strongly suggest that you not do this anymore.  Please do not
-bother developers who are actively working to produce patches and
-features with comments that, in the end, are a waste of time.
-
-Patch submitter, please ignore Markus's suggestion; you do not need to
-follow it at all.  The person/bot/AI that sent it is being ignored by
-almost all Linux kernel maintainers for having a persistent pattern of
-behavior of producing distracting and pointless commentary, and
-inability to adapt to feedback.  Please feel free to also ignore emails
-from them.
-
-thanks,
-
-greg k-h's patch email bot
 
