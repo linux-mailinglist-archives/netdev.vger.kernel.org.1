@@ -1,129 +1,257 @@
-Return-Path: <netdev+bounces-96831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D477B8C7FBF
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 04:06:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BC768C7FC2
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 04:07:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C9D31F21F8B
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 02:06:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05E091F21412
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 02:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4637417FD;
-	Fri, 17 May 2024 02:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F79E184D;
+	Fri, 17 May 2024 02:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BMs0GACj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MQrxM5WY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF2C1849
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 02:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47239449;
+	Fri, 17 May 2024 02:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715911590; cv=none; b=AwHDpD0AQ0yRCrVFRpj8xjQ7ITqj/dB+tPrlmACS9D7ptOFKrFKnLz0oXLVXc4qowq+wOXa/mX6l4AYhkHJKoPD/riI/nMLLqFBAVHh82NIDZg3JJPB9hOq4eI/PJ9A1udzL/cBWjbB2B0eA52y2x5jBoxwusizUjIri0k4IyH0=
+	t=1715911629; cv=none; b=faiQgePdaoJzOEee8KsGCmb/iVqMS9zP27FdPYhflGxZjpS2LFU11nQhQZYZH2MeZ8RIJv2qLniOOcoE3JIe+QqbUvf/vSwv/4brj4QQoJbHEV/6J8BHy2MT/0SUW4jyfp1cERauuHxh/9AobkZi7bwDye7BnoxstweoQFkVG/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715911590; c=relaxed/simple;
-	bh=SfHVswkbrQHqpzZdDcPeh/wRZ2CUDzHmY8tYWMbsUvI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c3cWACAji5C9a4RVk2zUsP039wGxtHLDYOdIxm1MHOdxYSeUQTHxV2ZbeDjEDiRfE2ZBW4rSa6ngP+BFiINXlRuxw8cgWDQZ6AVXZ02KHBu/mdypGWDTI7grl3SFBd3JjpTClvJubCtCrtnLaXbjN63SOx2zsgqCBJgZzShGE0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BMs0GACj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715911587;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=a2qop7DDk0mOLQghvNp8dV8z552lIH0Gw3RJVGiNIog=;
-	b=BMs0GACjA0A2WaJb8jC/Ve6x/xuA3N6yZz2dSI5PYWpfyN31xW8IQ3yR9gUy+iSWSWmMkz
-	DCVmTP/ymqSnth5+Dcl1qb3fSv+5njHKUQw21WX16IPGgbzLMFGU2u7ZJ+BzDbNqLLmZD4
-	ZOO27/mqPB84BSxE3Elm1CfCLpvZmWk=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-411-4BJudhNhP7Swd-lCXHZ2Jg-1; Thu, 16 May 2024 22:06:26 -0400
-X-MC-Unique: 4BJudhNhP7Swd-lCXHZ2Jg-1
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-6f46eb81892so8099561b3a.0
-        for <netdev@vger.kernel.org>; Thu, 16 May 2024 19:06:25 -0700 (PDT)
+	s=arc-20240116; t=1715911629; c=relaxed/simple;
+	bh=uPdrJJ/OOEpp8mPsh5143oB/e/pJOxHcdBAWzpc0yS8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=loa2tT86aH3Q11e4v/Zh0PYWa8astAW4obrkkdU53kYLi6d5+Z9rZZnUFBWJwt1xnzVVW83WcKGD1YEo8FWHMf/ctuTCGL4oYR3Lc83pSd8bb3JLdjZwLOfkGB+YtHiEcZxCc3aziLEPBKi6ZjhHEMICbUb28HCp+mtJDOyVOBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MQrxM5WY; arc=none smtp.client-ip=209.85.219.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-de45dba15feso8833345276.3;
+        Thu, 16 May 2024 19:07:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715911626; x=1716516426; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DVOKrxiIP+KxjEHkskNezN1+cXMkosqN5I8s0vi9mj0=;
+        b=MQrxM5WY7gmjXy5TJRHWUWZlwZvc7LQ35e5S7HP2n3lQuoKeU84jtSE/EKYlpQl2xQ
+         ls7LqA5ymEz78kX0M8R+QAbMlmUeQu+EKOKMgT1i+FePM1H20XC1KYh+G0LCo4i+dfsY
+         GIq2bl6rUmhQyiD11S5AYbnoq0lp+WS6SoeA2Lv5CyoJbKHAGzOGjjcHpRAn9WShuh6n
+         5wyFavrX4k9bpoQQK4NjKXrKFegqODB6jHK26Ug/TjAG0SmBTZhJpvcb+DxnRMvdy+pK
+         J4v44ZQdYm6JKSnkpwncgY9l5hqwGXZFrJONsXhM1RjTAp9PIrmGF8zTR7xh7PWfc7As
+         vkoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715911585; x=1716516385;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a2qop7DDk0mOLQghvNp8dV8z552lIH0Gw3RJVGiNIog=;
-        b=gTRkTeLVrHrrnE9jJamFOfQ6ygdpnnEioR00wXp4nmH2SOBRhB088SAN2ajFqZHIL0
-         SA+9Dlo1kYJvQmeGkXsCydpgWz9LVwmcOXmrwwlg3HFUUeUxafgZVZwUrQWz32MX6AmU
-         NPaymUCI1w33YdsYcS8tM9t4fg60zCFhxWsKI6CUSv1+St2wcRtIlq1KYx0BKXLqXfVW
-         LCt4qO3CQUZ5JVztX2MnTFp1vrdpKsuh3hq519GDOs6mZD4VlQd+kxe0/emUwV6/nRtB
-         CRk+AQw2LwjaZ3/oIUqA1NSq3MW7vDd6gY3EZiNMb4sA+kc1JXgHnob3Op8Y+niV7Xte
-         IimA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/DapYGzKdys5kRqkt7zIgkdLOGbZbjU9tLhn81dwRhVNDIHVcxeTliDqaEdIByyO5VDdOVyvuxjudGcC8NKIWjjSl2nt2
-X-Gm-Message-State: AOJu0Yye6NGe+z6p0UnxcnJ4scdRggBt8D+fi/QxQE5bYeFcCTFKRy4S
-	0H+ZKxk8c2KRi/fy2hB6bFUO3Vr4bytakTIvte84KmsiYWQpGggEdaYKkQXA1GjupiMQNH+43Vn
-	Txler8UUcraWdWiVRuO+46jQCAO8+XIiYc57Dy9nm/lRHaWDbnhsCjw==
-X-Received: by 2002:a05:6a20:729b:b0:1ab:82fe:910b with SMTP id adf61e73a8af0-1afde1df2b3mr26303599637.58.1715911584932;
-        Thu, 16 May 2024 19:06:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG/9hFAfDVvEiRxBU/C1pVa7/iAU8+CbGaa4VMLjUVVJO21sBSMQyqZTynlZzL/NTGFLkMWuA==
-X-Received: by 2002:a05:6a20:729b:b0:1ab:82fe:910b with SMTP id adf61e73a8af0-1afde1df2b3mr26303585637.58.1715911584524;
-        Thu, 16 May 2024 19:06:24 -0700 (PDT)
-Received: from zeus.elecom ([240b:10:83a2:bd00:6e35:f2f5:2e21:ae3a])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2af2b06sm13699721b3a.167.2024.05.16.19.06.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 May 2024 19:06:24 -0700 (PDT)
-From: Ryosuke Yasuoka <ryasuoka@redhat.com>
-To: krzk@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	syoshida@redhat.com,
-	horms@kernel.org
-Cc: Ryosuke Yasuoka <ryasuoka@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] nfc: nci: Fix handling of zero-length payload packets in nci_rx_work()
-Date: Fri, 17 May 2024 11:06:07 +0900
-Message-ID: <20240517020609.476882-1-ryasuoka@redhat.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1715911626; x=1716516426;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DVOKrxiIP+KxjEHkskNezN1+cXMkosqN5I8s0vi9mj0=;
+        b=GtXC2GcTam/AxI17yI+tDfphzhq5KXhBdcYbqXLCFN+MIS/bccG9Qmk1Lqbr+hCzX+
+         KWMF+3zGgki8YptRVrLvxTHGrKqWpSH+NANtulGCkusHYRY9xwPv6F+PiAjWWrfKN4hg
+         ZW4HGq7QtqnGL0a/5K6W8ciYJ5zgrgbtxl1imFQAvm9iBaQwF1be1QRmwPZNX9H3Nl9/
+         35RyKNgN1lF8GmbC8jg4Y+t8sAziCZtBsc5H3obvZQZtjobk7ZyfjSsaS+XqA8hek4Uv
+         GeCD4Sbz+M1eTlmZU3fATeOPMuvsD2/W2Q1WxCkGvIBw+P6aNEkzAJN9JTYp8dheoINT
+         DZKw==
+X-Gm-Message-State: AOJu0Yw3iXcJcvOf5pxAWuzgg6ta4ogc16xunjVm+k+eonlDvPeO1+E+
+	KDGIbCLnC6d254tRMxPls4Un358wFfBHeoyq1eIBMPvib3TW8isR+PAuAdFu+iHO4Ve41nd2ECK
+	54RrA4+Ina+Gnhvx2grtcuHFmXqmMcSHL
+X-Google-Smtp-Source: AGHT+IHzeKtCtpLCEMVlFJtNJ+/oYWZrU8TrGk2tx36GDm8H5JwR6BIj6q+D6+YDWIIhY4cIdllkridRrJgVk0Tcva0=
+X-Received: by 2002:a25:4e85:0:b0:de8:a770:4812 with SMTP id
+ 3f1490d57ef6-dee4f3149dfmr17678815276.40.1715911626291; Thu, 16 May 2024
+ 19:07:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240510192412.3297104-1-amery.hung@bytedance.com> <20240510192412.3297104-4-amery.hung@bytedance.com>
+In-Reply-To: <20240510192412.3297104-4-amery.hung@bytedance.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 16 May 2024 19:06:55 -0700
+Message-ID: <CAMB2axMa6sGcn69QhzkoG5JijDF+QpBuyWO9aae7hrLrM_EZvA@mail.gmail.com>
+Subject: Re: [RFC PATCH v8 03/20] bpf: Allow struct_ops prog to return
+ referenced kptr
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@kernel.org, sinquersw@gmail.com, 
+	toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com, 
+	xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When nci_rx_work() receives a zero-length payload packet, it should not
-discard the packet and exit the loop. Instead, it should continue
-processing subsequent packets.
+On Fri, May 10, 2024 at 12:24=E2=80=AFPM Amery Hung <ameryhung@gmail.com> w=
+rote:
+>
+> This patch allows a struct_ops program to return a referenced kptr
+> if the struct_ops member has a pointer return type. To make sure the
+> pointer returned to kernel is valid, it needs to be referenced and
+> originally comes from the kernel. That is, it should be acquired
+> through kfuncs or struct_ops "ref_acquried" arguments, but not allocated
+> locally. Besides, null pointer is allowed. Therefore, kernel caller
+> of the struct_ops function consuming the pointer needs to take care of
+> the potential null pointer.
+>
+> The first use case will be Qdisc_ops::dequeue, where a qdisc returns a
+> pointer to the skb to be dequeued.
+>
+> To achieve this, we first allow a reference object to leak through return
+> if it is in the return register and the type matches the return type of t=
+he
+> function. Then, we check whether the pointer to-be-returned is valid in
+> check_return_code().
+>
+> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> ---
+>  kernel/bpf/verifier.c | 50 +++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 46 insertions(+), 4 deletions(-)
+>
+> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> index 06a6edd306fd..2d4a55ead85b 100644
+> --- a/kernel/bpf/verifier.c
+> +++ b/kernel/bpf/verifier.c
+> @@ -10081,16 +10081,36 @@ record_func_key(struct bpf_verifier_env *env, s=
+truct bpf_call_arg_meta *meta,
+>
+>  static int check_reference_leak(struct bpf_verifier_env *env, bool excep=
+tion_exit)
+>  {
+> +       enum bpf_prog_type type =3D resolve_prog_type(env->prog);
+> +       u32 regno =3D exception_exit? BPF_REG_1 : BPF_REG_0;
+> +       struct bpf_reg_state *reg =3D reg_state(env, regno);
+>         struct bpf_func_state *state =3D cur_func(env);
+> +       const struct bpf_prog *prog =3D env->prog;
+> +       const struct btf_type *ret_type =3D NULL;
+>         bool refs_lingering =3D false;
+> +       struct btf *btf;
+>         int i;
+>
+>         if (!exception_exit && state->frameno && !state->in_callback_fn)
+>                 return 0;
+>
+> +       if (type =3D=3D BPF_PROG_TYPE_STRUCT_OPS &&
+> +           reg->type & PTR_TO_BTF_ID && reg->ref_obj_id) {
+> +               btf =3D bpf_prog_get_target_btf(prog);
+> +               ret_type =3D btf_type_by_id(btf, prog->aux->attach_func_p=
+roto->type);
+> +               if (reg->btf_id !=3D ret_type->type) {
+> +                       verbose(env, "Return kptr type, struct %s, doesn'=
+t match function prototype, struct %s\n",
+> +                               btf_type_name(reg->btf, reg->btf_id),
+> +                               btf_type_name(btf, ret_type->type));
+> +                       return -EINVAL;
+> +               }
+> +       }
+> +
+>         for (i =3D 0; i < state->acquired_refs; i++) {
+>                 if (!exception_exit && state->in_callback_fn && state->re=
+fs[i].callback_ref !=3D state->frameno)
+>                         continue;
+> +               if (ret_type && reg->ref_obj_id =3D=3D state->refs[i].id)
+> +                       continue;
+>                 verbose(env, "Unreleased reference id=3D%d alloc_insn=3D%=
+d\n",
+>                         state->refs[i].id, state->refs[i].insn_idx);
+>                 refs_lingering =3D true;
+> @@ -15395,12 +15415,15 @@ static int check_return_code(struct bpf_verifie=
+r_env *env, int regno, const char
+>         const char *exit_ctx =3D "At program exit";
+>         struct tnum enforce_attach_type_range =3D tnum_unknown;
+>         const struct bpf_prog *prog =3D env->prog;
+> -       struct bpf_reg_state *reg;
+> +       struct bpf_reg_state *reg =3D reg_state(env, regno);
+>         struct bpf_retval_range range =3D retval_range(0, 1);
+>         enum bpf_prog_type prog_type =3D resolve_prog_type(env->prog);
+>         int err;
+>         struct bpf_func_state *frame =3D env->cur_state->frame[0];
+>         const bool is_subprog =3D frame->subprogno;
+> +       struct btf *btf =3D bpf_prog_get_target_btf(prog);
+> +       bool st_ops_ret_is_kptr =3D false;
+> +       const struct btf_type *t;
+>
+>         /* LSM and struct_ops func-ptr's return type could be "void" */
+>         if (!is_subprog || frame->in_exception_callback_fn) {
+> @@ -15409,10 +15432,26 @@ static int check_return_code(struct bpf_verifie=
+r_env *env, int regno, const char
+>                         if (prog->expected_attach_type =3D=3D BPF_LSM_CGR=
+OUP)
+>                                 /* See below, can be 0 or 0-1 depending o=
+n hook. */
+>                                 break;
+> -                       fallthrough;
+> +                       if (!prog->aux->attach_func_proto->type)
+> +                               return 0;
+> +                       break;
+>                 case BPF_PROG_TYPE_STRUCT_OPS:
+>                         if (!prog->aux->attach_func_proto->type)
+>                                 return 0;
+> +
+> +                       t =3D btf_type_by_id(btf, prog->aux->attach_func_=
+proto->type);
+> +                       if (btf_type_is_ptr(t)) {
+> +                               /* Allow struct_ops programs to return kp=
+tr or null if
+> +                                * the return type is a pointer type.
+> +                                * check_reference_leak has ensured the r=
+eturning kptr
+> +                                * matches the type of the function proto=
+type and is
+> +                                * the only leaking reference. Thus, we c=
+an safely return
+> +                                * if the pointer is in its unmodified fo=
+rm
+> +                                */
+> +                               if (reg->type & PTR_TO_BTF_ID)
+> +                                       return __check_ptr_off_reg(env, r=
+eg, regno, false);
+> +                               st_ops_ret_is_kptr =3D true;
+> +                       }
+>                         break;
+>                 default:
+>                         break;
+> @@ -15434,8 +15473,6 @@ static int check_return_code(struct bpf_verifier_=
+env *env, int regno, const char
+>                 return -EACCES;
+>         }
+>
+> -       reg =3D cur_regs(env) + regno;
+> -
+>         if (frame->in_async_callback_fn) {
+>                 /* enforce return zero from async callbacks like timer */
+>                 exit_ctx =3D "At async callback return";
+> @@ -15522,6 +15559,11 @@ static int check_return_code(struct bpf_verifier=
+_env *env, int regno, const char
+>         case BPF_PROG_TYPE_NETFILTER:
+>                 range =3D retval_range(NF_DROP, NF_ACCEPT);
+>                 break;
+> +       case BPF_PROG_TYPE_STRUCT_OPS:
+> +               if (!st_ops_ret_is_kptr)
+> +                       return 0;
+> +               range =3D retval_range(0, 0);
+> +               break;
 
-Fixes: d24b03535e5e ("nfc: nci: Fix uninit-value in nci_dev_up and nci_ntf_packet")
-Reported-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
-Signed-off-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
----
-v2
-- Fix commit msg to be clearer to say
-- Remove inappropriate Closes tag
+Arguments and the return for helpers and kfuncs, where we transition
+between bpf program and kernel, can be tagged, so that we can do
+proper checks. struct_ops shares the similar property in that sense,
+but currently lacks the ability to tag the return.
 
- net/nfc/nci/core.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+A discussion was that, here we assume the returning referenced kptr
+"may be null" because that's what Qdisc expects. I think it would make
+sense to only allow it when the return is explicitly tagged with
+MAY_BE_NULL. How about doing so in the stub function name?
 
-diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
-index b133dc55304c..f2ae8b0d81b9 100644
---- a/net/nfc/nci/core.c
-+++ b/net/nfc/nci/core.c
-@@ -1518,8 +1518,7 @@ static void nci_rx_work(struct work_struct *work)
- 
- 		if (!nci_plen(skb->data)) {
- 			kfree_skb(skb);
--			kcov_remote_stop();
--			break;
-+			continue;
- 		}
- 
- 		/* Process frame */
--- 
-2.44.0
 
+>         case BPF_PROG_TYPE_EXT:
+>                 /* freplace program can return anything as its return val=
+ue
+>                  * depends on the to-be-replaced kernel func or bpf progr=
+am.
+> --
+> 2.20.1
+>
 
