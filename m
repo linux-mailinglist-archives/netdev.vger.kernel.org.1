@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-96839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AD538C8006
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 04:41:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D27C98C7FFF
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 04:40:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D33D1C2101D
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 02:41:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8986C1F21779
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 02:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C9A912E7C;
-	Fri, 17 May 2024 02:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72807BA2D;
+	Fri, 17 May 2024 02:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FiuzXOYf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KBMxejEn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4BDB672;
-	Fri, 17 May 2024 02:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F758F6A
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 02:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715913631; cv=none; b=SzD82KORZUnWBL1wgq8m2d0Wwbrom39BLopK13+nPnFb4uIHIjRqffsII/l6WKKEzaKD2Zec97uDOEHRdP6iPFF2v6PGHN9+AegXfFblcwKkZv4SBnVZQY47mzncok6yq3HKcOnNeC+y/C/ZJPjb6qKhAlCoYIeTt/a7G8Vzymo=
+	t=1715913631; cv=none; b=XE3RLfkJsoy2Pxw5YkaogGWtNjPIOQeF+vUTUae32L13yEVZbuMW37NhF6C22sGlgAkHA7g3hf8VVogJap0i/NaGhT34P634WaE/uV3F9GfH+9OagMSgYwhvdGB0GGb+lupPTNC75fmP4nNghiI26TLczF5cEoyW2Im+kNjU7XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715913631; c=relaxed/simple;
-	bh=m4eWWCmy5F3msSmJSIJTtabMQJfBd0k8Q+YIpPqOhwY=;
+	bh=iTWceDwsUlr31w4xO/7wMMOS+8Gu37qNE7EyVhDq5l8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZJKVvZ53rcd/5pKZ3Rx4TJ+cNItoh49n5zO6UUVMxESGDamWNMMTehmieEKCghnOKcP4/awmHeZIRFEk/C9q4eUwdud8XA09rEtR8h/pUFQsUgumJOxVT7zOiQWfiuaHwkkK8ii2aPSR/xfzh7/i8yerqTVtKd+Iqj9xeLTZGro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FiuzXOYf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D648BC4AF12;
+	 In-Reply-To:To:Cc; b=bhJO81VzY8IEzSGRjbrCb3MJkVIjLTJjr9fE47rvHiWXc01E+6d3HjK5xnMB/1eiY82jUv51PxprrU6FHZAO+f2xQDYoG/pK3M/i9Kmhk0EFe2z+2d3RSn01NtxoYO2lco8kGIlVDTzmaRBfrdRKDT/8tzlVPDntaO5uMrEMAkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KBMxejEn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E0FE9C4AF15;
 	Fri, 17 May 2024 02:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715913630;
-	bh=m4eWWCmy5F3msSmJSIJTtabMQJfBd0k8Q+YIpPqOhwY=;
+	bh=iTWceDwsUlr31w4xO/7wMMOS+8Gu37qNE7EyVhDq5l8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FiuzXOYfYj/AE9ngbeRSR9rdck4n67SAkSUPukfi8HbYBtFTC2B5KTRNVRlyxpBU2
-	 RZGMZzaV4qpJmrSDG9ijOwHx8w52g5+guwYU2Nlluv4a0+1oUP49nUP9UIrCZeQsr5
-	 teLae+Fi6FgfG8zySEW6wWPfMl68psq4wqd90/57Q0NVr3Ia5p1mXBJmiHQBHwAiXq
-	 YZpJ6aSPR4IH3TU2uUcSwXkc60n6uLQqpQwwgCrzEFWDclVqrzen1Bhn3z1pQhls8g
-	 G2SVgcXaoPbUM6KdDCr9fB+lHEDfIgliWNhYOYzWxedy8juZf+I5aShZ/igkLnmiuw
-	 Crsso3pWsuvaQ==
+	b=KBMxejEny46IzwlYpjBVlFvomf3ZIRjYWrf9PpelO2sJTsU6N6fKjasGCTAUiiuyF
+	 zLlohruemMLVy7gbuj6EMLHDFjblHNIB/gbnNMKbL7p53splTuTj4Q7RFWpbbsvSE1
+	 B/q2vMqAvvCSJaOUNMHGqcNz4GNPiJbIzyiY58P6VH9sCbIhvSJgS3jiz1ou2i89PE
+	 skUo3HRAyxccb7RAvZgAxROWZCNfH8kztr4b6WlJwP1gs+W92XrHLgZRXDtu+TRfSH
+	 bfyTqTirbuWLXZjiUggpvWXpSSvGbKJnuobpsD53kAbzGVWrOKs9VGaIYhFSKSju6T
+	 tpagEW0hMiiHA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC197C41620;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D66A6C54BDA;
 	Fri, 17 May 2024 02:40:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] virtio_net: Fix missed rtnl_unlock
+Subject: Re: [PATCH net] netrom: fix possible dead-lock in nr_rt_ioctl()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171591363083.2697.864988249934553931.git-patchwork-notify@kernel.org>
+ <171591363087.2697.1088676962296781019.git-patchwork-notify@kernel.org>
 Date: Fri, 17 May 2024 02:40:30 +0000
-References: <20240515163125.569743-1-danielj@nvidia.com>
-In-Reply-To: <20240515163125.569743-1-danielj@nvidia.com>
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- jiri@nvidia.com, edumaset@google.com
+References: <20240515142934.3708038-1-edumazet@google.com>
+In-Reply-To: <20240515142934.3708038-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 15 May 2024 11:31:25 -0500 you wrote:
-> The rtnl_lock would stay locked if allocating promisc_allmulti failed.
-> Also changed the allocation to GFP_KERNEL.
+On Wed, 15 May 2024 14:29:34 +0000 you wrote:
+> syzbot loves netrom, and found a possible deadlock in nr_rt_ioctl [1]
 > 
-> Fixes: ff7c7d9f5261 ("virtio_net: Remove command data from control_buf")
-> Reported-by: Eric Dumazet <edumaset@google.com>
-> Link: https://lore.kernel.org/netdev/CANn89iLazVaUCvhPm6RPJJ0owra_oFnx7Fhc8d60gV-65ad3WQ@mail.gmail.com/
-> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+> Make sure we always acquire nr_node_list_lock before nr_node_lock(nr_node)
+> 
+> [1]
+> WARNING: possible circular locking dependency detected
+> 6.9.0-rc7-syzkaller-02147-g654de42f3fc6 #0 Not tainted
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] virtio_net: Fix missed rtnl_unlock
-    https://git.kernel.org/netdev/net/c/fa033def4171
+  - [net] netrom: fix possible dead-lock in nr_rt_ioctl()
+    https://git.kernel.org/netdev/net/c/e03e7f20ebf7
 
 You are awesome, thank you!
 -- 
