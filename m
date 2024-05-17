@@ -1,197 +1,253 @@
-Return-Path: <netdev+bounces-97027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29C358C8CF4
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 21:49:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C12A8C8D1A
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 21:56:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86ACCB23474
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 19:49:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 139361F25576
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 19:56:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 574AB12FB0D;
-	Fri, 17 May 2024 19:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8ED140E55;
+	Fri, 17 May 2024 19:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Vxz8rqh7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HESN657N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9588E45007
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 19:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A0B140E2B
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 19:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715975373; cv=none; b=JtTgjnKIlajLXFF/UnGlq2WV2oWd3m5QICx09ka6tS9SxmNKGCVyP0rjKNrS3k4bxfMghkU3MDHs06CHpz6fWnmTJHtSfVRlny+Yjm+/cwDOlk3Lm4q1Mq/L0hCnwkWVuzJoQpCV/PO4Y6XtZSVtrMZxRbpZWQg0C/kuFwIC4r4=
+	t=1715975674; cv=none; b=pEK9pcngAZXnpjm0tWlFZqRaVy6tg96uzzqt1PDCGJ0mgO1ZWWNZsh+Bx2e65sKHg8Q9Ek5cj6qRISkUaynetJRY7Y9rRsORAzxS8gKJKlpF4IEhIYMvPPO8iTYY7Rk2MU9NwRFWivH/0TkfEWRljifArdEbktPwmSYeixJKqZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715975373; c=relaxed/simple;
-	bh=0Nj9blmMrWvEhhubnCEXkUK1i7CFuX4cqPmXYCzyIdk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WiX/6jAA+3pqRGeFXI5HZ+6eDoJ7zTgHX+yuMu+N67tRK0uTrOueIE2NYbi0iUFfwAGKHiO09HtzeXoYlXoMDRTu7Ln4gwOR9AUvb0h2ZHm2uiIXHAYc+g3BP7u2E/Z/gh0AkKCpPVre7LmshDpYEkN33KXLeZXZvUthVULMnXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Vxz8rqh7; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-deb99fa47c3so582385276.2
-        for <netdev@vger.kernel.org>; Fri, 17 May 2024 12:49:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1715975369; x=1716580169; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JmvDTTyodSI+XcZWsqtuztFtBkxRRSCDo7mvxANpGII=;
-        b=Vxz8rqh7KMqrKxU74+U0hW8bZJ9rP40hTN3BHU3eRSO0qY5UK0m0HZPRVv5hXrCT7L
-         7jWpbmTCEymmvS+dSpDPR/oIBO27baMMzyVDiI3UKkOq0GtCfOzMpm3IDOapfG4tfqhf
-         MpfJ7kDu7GhttL0OsKedh21UQ4ETL8uiRGL4JW5NAH1u8XmSMBFrsrEglZlVvs27O3bT
-         Napk+zY7SAur6mvnzoT+018k0BTgTsEIjN+9cPX+L9tjt7145+EBdTxegKToVM7pcxVV
-         fKDKTOdTh2QbquOQb4jbsIGiXcYqPPed2c4+zNpRol8pYCjMn7nVkd4ee7/CtobQ3gbt
-         SceA==
+	s=arc-20240116; t=1715975674; c=relaxed/simple;
+	bh=qfAsuOWl0hC/dGi12IhGHukk3mZo3M46eg6IvViHdmc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fqY/qNQXkhJNUkz3H9KJvOjla+AWsN79nL8bhXaZBRhlaJs9GW+O7itgtt2Vxg7y0SEJ3ISGezQnh7e3yNojfLDcvXj7zdLMeZ3XqNMDDAl4LUUbz4/OvF4nV8LPGP/DDx4SlISPwBXhMMjc7PHJNyB/SULUTg+UH92coE3ANS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HESN657N; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715975671;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iGcVskiD6pxYjXs3xmYrHWr55wsmHpoyxvnk3YO92e0=;
+	b=HESN657N/yJYCRO2NoynlIAUDw8SuGiFJsPJHptmJDq+rjbTkYlj1Vb8CyEgCvkPCUX4fj
+	nSPLshZ14A8QMQRTajAHXBePkXerxsdRuvILptgA37WO4jTDYdMOhyK4ENBqVsHPJV0xos
+	teNXdmeVWRaAclwDf0rshDBEAIhD1UU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-202-RPWjTBZAO3WvesxrtQ75RA-1; Fri, 17 May 2024 15:54:27 -0400
+X-MC-Unique: RPWjTBZAO3WvesxrtQ75RA-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4200ebdbf55so37543125e9.1
+        for <netdev@vger.kernel.org>; Fri, 17 May 2024 12:54:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715975369; x=1716580169;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JmvDTTyodSI+XcZWsqtuztFtBkxRRSCDo7mvxANpGII=;
-        b=bl0zbp7PigtZTSiz1hDOpaXpy6a1WeINrRdz+q+rfGmXP2NEyrG9TnXzb3opoeNmIs
-         pc4OrIWqon56XDX67/CfbmpKJwp7ZC+Lpf1aH8m5pIfZTBEDeN2a+8ekXNSl3Sep93vx
-         CvnuXf+RyWP9nwVBWTQN3JA/KYUHhR6+GO6/EL9+LVF5S00R8vEG2/njRDzMJ1HqLQgK
-         XIX3HTs+bOA0AZ0sMhi5gruKPIMA6QOs2QMA5UfXFlwR7mBQGyHFc1duJ7yVN6wuAEPR
-         MZL+/ydI76rWjHpXd6+d2glEIx0zfiyiGwAgllOwNOqBnKhcNOqFLBAwOn7/88FXPdEF
-         bjQw==
-X-Gm-Message-State: AOJu0Ywcpe6+FqClczMy/73wz+XSS3oYslqs0Uk1zcxmLhG97mHw2ACl
-	Lnqsd2SmnPAi4HPZ+xeraF06ZbfQIH7kJTFQMuQN9aYtYBojwP3Q3Xw1L2hEJTbr9bRtnio2Xom
-	0+UBaxWuPb6pbFYY3hPjgwj9Qy9euaQHEmJd7HI3QvrM4fGk=
-X-Google-Smtp-Source: AGHT+IGsbsPMcf3m5f0KQ15GNTX2j9tpXVG7G1p7z67oOrcrMhtINgtZb6Sxeaci+6rPQE0x8ecT306KbYePzgEv8X0=
-X-Received: by 2002:a05:6902:311:b0:dd0:97e8:74e6 with SMTP id
- 3f1490d57ef6-dee4f387774mr23316256276.55.1715975369546; Fri, 17 May 2024
- 12:49:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715975666; x=1716580466;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iGcVskiD6pxYjXs3xmYrHWr55wsmHpoyxvnk3YO92e0=;
+        b=He9iFYAULgMhU3aj45czF2hO0ZZok4UUvqncRZ6LWQLfoeK3qsKOWMmj041s7kCk52
+         ay11USoFxH0P/s0DchuehMpBgXq8JEYcxnLSR3lUAtJwKgJ6uuojm56eKLFRSUgwuM4y
+         lVZFwEJuPvUPUUvCN8481T6A8u7PxXB3rVmhJWMQyPfrtuBakun6CoOOJnVbw+jWKIDc
+         56PIMrUdJGGF4A9MRM1w0s0wSukntdK3QfJr9dUTjbxbJJ6wqBXG3jUJFMQ6iHQ1EwKC
+         4WkkLJp0Qsuyn8eImqc6aINR7C43zVSekdYed0G3U7Qdk/6684P4sCx8p1RRdvARUML7
+         pegg==
+X-Forwarded-Encrypted: i=1; AJvYcCX5JwbQGiNu/IZtdEpRW+WVGcM/4BBt999Uu3tEr2j2WxfsCyCGjLAy0gmjn6l4HkpI1ZBEhOVJO0Bsci9PiXYKZEJQkhJ5
+X-Gm-Message-State: AOJu0Ywu7yyUtBEclkl+1CyFCBLp1Bbmd+vCF4PWnZVQdM6IjOsw0WUW
+	cIZEpRv2VbX3uGZxkNgaGM9oPKGgDU0Hn3+QedDSjDamp2gDeEUrcmudTgfEB7Na1EREh9xFXeh
+	0+3SWjazOVj8VfPKzjGYn0pHJKvAxp/xlDhkMEM8g3ou6zh1PdkRWgA==
+X-Received: by 2002:a05:600c:1914:b0:420:112e:6c1 with SMTP id 5b1f17b1804b1-420112e06d1mr144292935e9.13.1715975666278;
+        Fri, 17 May 2024 12:54:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHj51XinY4vjmIEc/h1fzu4OdgZGt/HVOyIF5sT2vpojTz8FL4AiIG4vUyn8td6j40vq7ZobQ==
+X-Received: by 2002:a05:600c:1914:b0:420:112e:6c1 with SMTP id 5b1f17b1804b1-420112e06d1mr144292615e9.13.1715975665642;
+        Fri, 17 May 2024 12:54:25 -0700 (PDT)
+Received: from localhost (net-188-152-99-152.cust.vodafonedsl.it. [188.152.99.152])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4202de3a79bsm53982065e9.6.2024.05.17.12.54.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 May 2024 12:54:25 -0700 (PDT)
+Date: Fri, 17 May 2024 21:54:23 +0200
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, bpf@vger.kernel.org,
+	pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+	toke@redhat.com, fw@strlen.de, hawk@kernel.org, horms@kernel.org,
+	donhunte@redhat.com
+Subject: Re: [PATCH bpf-next 2/4] netfilter: add bpf_xdp_flow_offload_lookup
+ kfunc
+Message-ID: <Zke172XFjqUGTE6O@lore-desk>
+References: <cover.1715807303.git.lorenzo@kernel.org>
+ <c87caa37757cdf6e323c89748fd0a0408fd47da2.1715807303.git.lorenzo@kernel.org>
+ <CAP01T76razfX1e7BsMbbyecPF+RjtJYoZifR-Um_BAoyPNOyKg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240416152913.1527166-3-omosnace@redhat.com> <085faf37b4728d7c11b05f204b0d9ad6@paul-moore.com>
- <CAFqZXNvm6T9pdWmExgmuODaNupMu3zSfYyb0gebn5AwmJ+86oQ@mail.gmail.com>
- <CAHC9VhTxhcSDfYCK95UsuZixMSRNFtTGkDvBWjpagHw6328PMQ@mail.gmail.com> <CAFqZXNurJZ-q64gxh54YhoO_GZeFzxXE0Yta_X-DqF_CcRSvRA@mail.gmail.com>
-In-Reply-To: <CAFqZXNurJZ-q64gxh54YhoO_GZeFzxXE0Yta_X-DqF_CcRSvRA@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Fri, 17 May 2024 15:49:18 -0400
-Message-ID: <CAHC9VhRjDn3yihw8fpmweWynE9nmcqaCCspM_SpM7ujUnqoGDw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] cipso: make cipso_v4_skbuff_delattr() fully remove
- the CIPSO options
-To: Ondrej Mosnacek <omosnace@redhat.com>
-Cc: netdev@vger.kernel.org, linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2H42TsNIWDJH9FrG"
+Content-Disposition: inline
+In-Reply-To: <CAP01T76razfX1e7BsMbbyecPF+RjtJYoZifR-Um_BAoyPNOyKg@mail.gmail.com>
+
+
+--2H42TsNIWDJH9FrG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 14, 2024 at 7:29=E2=80=AFAM Ondrej Mosnacek <omosnace@redhat.co=
-m> wrote:
-> On Thu, Apr 25, 2024 at 11:48=E2=80=AFPM Paul Moore <paul@paul-moore.com>=
- wrote:
+[...]
+> > +       tuplehash =3D flow_offload_lookup(flow_table, tuple);
+> > +       if (!tuplehash)
+> > +               return ERR_PTR(-ENOENT);
+>=20
+> This is fine to do, but the caller should catch it using IS_ERR_PTR
+> and return NULL.
+> BPF side cannot distinguish ERR_PTR from normal pointer, so this will
+> cause a bad deref in the program.
+
+ack, I will fix it in v2.
+
+>=20
+> > +
+> > +       flow =3D container_of(tuplehash, struct flow_offload,
+> > +                           tuplehash[tuplehash->tuple.dir]);
+> > +       flow_offload_refresh(flow_table, flow, false);
+> > +
+> > +       return tuplehash;
+> > +}
+> > +
+> > +__bpf_kfunc struct flow_offload_tuple_rhash *
+> > +bpf_xdp_flow_offload_lookup(struct xdp_md *ctx,
+> > +                           struct bpf_fib_lookup *fib_tuple,
+> > +                           u32 fib_tuple__sz)
+>=20
+> Do you think the __sz has the intended effect? It only works when the
+> preceding parameter is a void *.
+> If you have a type like struct bpf_fib_lookup, I think it should work
+> fine without taking a size at all.
+
+ack, I will fix it in v2.
+
+>=20
+> > +{
+> > +       struct xdp_buff *xdp =3D (struct xdp_buff *)ctx;
+> > +       struct flow_offload_tuple tuple =3D {
+> > +               .iifidx =3D fib_tuple->ifindex,
+> > +               .l3proto =3D fib_tuple->family,
+> > +               .l4proto =3D fib_tuple->l4_protocol,
+> > +               .src_port =3D fib_tuple->sport,
+> > +               .dst_port =3D fib_tuple->dport,
+> > +       };
+> > +       __be16 proto;
+> > +
+> > +       switch (fib_tuple->family) {
+> > +       case AF_INET:
+> > +               tuple.src_v4.s_addr =3D fib_tuple->ipv4_src;
+> > +               tuple.dst_v4.s_addr =3D fib_tuple->ipv4_dst;
+> > +               proto =3D htons(ETH_P_IP);
+> > +               break;
+> > +       case AF_INET6:
+> > +               tuple.src_v6 =3D *(struct in6_addr *)&fib_tuple->ipv6_s=
+rc;
+> > +               tuple.dst_v6 =3D *(struct in6_addr *)&fib_tuple->ipv6_d=
+st;
+> > +               proto =3D htons(ETH_P_IPV6);
+> > +               break;
+> > +       default:
+> > +               return ERR_PTR(-EINVAL);
+>=20
+> Likewise. While you check IS_ERR_VALUE in selftest, direct dereference
+> will be allowed by verifier, which would crash the kernel.
+> It's better to do something like conntrack kfuncs, where they set
+> opts->error when returning NULL, allowing better debugging in case
+> lookup fails.
+
+ack, I will fix it in v2.
+
+>=20
+> > +       }
+> > +
+> > +       return bpf_xdp_flow_offload_tuple_lookup(xdp->rxq->dev, &tuple,=
+ proto);
+> > +}
+> > +
+> > +__diag_pop()
+> > +
+> > +BTF_KFUNCS_START(nf_ft_kfunc_set)
+> > +BTF_ID_FLAGS(func, bpf_xdp_flow_offload_lookup)
+> > +BTF_KFUNCS_END(nf_ft_kfunc_set)
+> > +
+> > +static const struct btf_kfunc_id_set nf_flow_offload_kfunc_set =3D {
+> > +       .owner =3D THIS_MODULE,
+> > +       .set   =3D &nf_ft_kfunc_set,
+> > +};
+> > +
+> > +int nf_flow_offload_register_bpf(void)
+> > +{
+> > +       return register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP,
+> > +                                        &nf_flow_offload_kfunc_set);
+> > +}
+>=20
+> We should probably also expose it to skb? We just need net_device, so
+> it can work with both XDP and TC progs.
+> That would be similar to how we expose conntrack kfuncs to both XDP
+> and TC progs.
+
+I think we will get very similar results to sw flowtable in this case,
+don't you think?
+
+>=20
+> > +EXPORT_SYMBOL_GPL(nf_flow_offload_register_bpf);
+> > diff --git a/net/netfilter/nf_flow_table_inet.c b/net/netfilter/nf_flow=
+_table_inet.c
+> > index 6eef15648b7b0..b13587238eceb 100644
+> > --- a/net/netfilter/nf_flow_table_inet.c
+> > +++ b/net/netfilter/nf_flow_table_inet.c
+> > @@ -98,6 +98,8 @@ static int __init nf_flow_inet_module_init(void)
+> >         nft_register_flowtable_type(&flowtable_ipv6);
+> >         nft_register_flowtable_type(&flowtable_inet);
 > >
-> > On Wed, Apr 17, 2024 at 9:03=E2=80=AFAM Ondrej Mosnacek <omosnace@redha=
-t.com> wrote:
-> > > On Tue, Apr 16, 2024 at 8:39=E2=80=AFPM Paul Moore <paul@paul-moore.c=
-om> wrote:
-> > > > On Apr 16, 2024 Ondrej Mosnacek <omosnace@redhat.com> wrote:
-> > > > >
-> > > > > As the comment in this function says, the code currently just cle=
-ars the
-> > > > > CIPSO part with IPOPT_NOP, rather than removing it completely and
-> > > > > trimming the packet. This is inconsistent with the other
-> > > > > cipso_v4_*_delattr() functions and with CALIPSO (IPv6).
-> > > >
-> > > > This sentence above implies an equality in handling between those t=
-hree
-> > > > cases that doesn't exist.  IPv6 has a radically different approach =
-to
-> > > > IP options, comparisions between the two aren't really valid.
-> > >
-> > > I don't think it's that radically different.
+> > +       nf_flow_offload_register_bpf();
+> > +
+>=20
+> Error checking needed here? Kfunc registration can fail.
+
+ack, I will fix it.
+
+Regards,
+Lorenzo
+
+>=20
+> >         return 0;
+> >  }
 > >
-> > They are very different in my mind.  The IPv4 vs IPv6 option format
-> > and handling should be fairly obvious and I'm sure there are plenty of
-> > things written that describe the differences and motivations in
-> > excruciating detail so I'm not going to bother trying to do that here;
-> > as usual, Google is your friend.  I will admit that the skbuff vs
-> > socket-based labeling differences are a bit more subtle, but I believe
-> > if you look at how the packets are labeled in the two approaches as
-> > well as how they are managed and hooked into the LSMs you will start
-> > to get a better idea.  If that doesn't convince you that these three
-> > cases are significantly different, I'm not sure what else I can say
-> > other than we have a difference of opinion.  Regardless, I stand by my
-> > original comment that I don't like the text you chose and would like
-> > you to remove or change it.
->
-> Ok, I amended this part for v2 to hopefully better express what I'm
-> alluding to. I also added a paragraph about the routers dropping
-> packets with IP options, which explains the motivation better, anyway.
+> > --
+> > 2.45.0
+> >
+> >
+>=20
 
-Okay, I'll refrain from further comment until I see the v2 patch.
+--2H42TsNIWDJH9FrG
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> I tried to test what you describe - hopefully I got close enough:
->
-> My test setup has 3 VMs (running Fedora 39 from the stock qcow2 image)
-> A, B, and R, connected via separate links as A <--> R <--> B, where R
-> acts as a router between A and B (net.ipv4.ip_forward is set to 1 on
-> R, and the appropriate routes are set on A, B, R).
->
-> The A <--> R link has subnet 10.123.123.0/24, A having address
-> 10.123.123.2 and R having 10.123.123.1.
-> The B <--> R link has subnet 10.123.124.0/24, B having address
-> 10.123.124.2 and R having 10.123.124.1.
->
-> The links are implemented as GRE tunnels over the main network that is
-> shared between the VMs.
->
-> Netlabel configuration on A:
-> netlabelctl cipsov4 add pass doi:16 tags:5
-> netlabelctl map del default
-> netlabelctl map add default address:0.0.0.0/0 protocol:unlbl
-> netlabelctl map add default address:::/0 protocol:unlbl
-> netlabelctl map add default address:10.123.123.0/24 protocol:cipsov4,16
-> netlabelctl map add default address:10.123.124.0/24 protocol:cipsov4,16
->
-> Netlabel configuration on R:
-> netlabelctl cipsov4 add pass doi:16 tags:5
-> netlabelctl map del default
-> netlabelctl map add default address:0.0.0.0/0 protocol:unlbl
-> netlabelctl map add default address:::/0 protocol:unlbl
-> netlabelctl map add default address:10.123.123.0/24 protocol:cipsov4,16
->
-> B has no netlabel configured.
->
-> (I.e. A tries to send CIPSO-labeled packets to B, but R treats the
-> 10.123.124.0/24 network as unlabeled, so should strip/add the CIPSO
-> label when forwarding between A and B.)
->
-> A basic TCP connection worked just fine in both directions with and
-> without these patches applied (I installed the patched kernel on all
-> machines, though it should only matter on machine R). I ignored the
-> actual labels/CIPSO content - i.e. I didn't change the default SELinux
-> policy and put SELinux into permissive mode on machines A and R.
->
-> Capturing the packets on R showed the following IP option content
-> without the patches:
-> A -> R: CIPSO
-> R -> B: NOPs
-> B -> R: (empty)
-> R -> A: CIPSO
->
-> With the patches this changed to:
-> A -> R: CIPSO
-> R -> B: (empty)
-> B -> R: (empty)
-> R -> A: CIPSO
->
-> Is this convincing enough or do you have different scenarios in mind?
+-----BEGIN PGP SIGNATURE-----
 
-Thanks for verifying your patch, the methodology looks good to me, but
-as I mentioned in my previous email I would feel much better if you
-verified this with a different client OS/stack.  Do you have access to
-Windows/MacOS/BSD/non-Linux system you could use in place of B in your
-test above?
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZke17wAKCRA6cBh0uS2t
+rBRdAQCEERfoDpkBBYLgT8dxCY6w8lO1iaQ3rG5xreHO8f7EhAEA20DRSkH9tXWH
+kRcvR5nmCv98ZBrvLTQtYNZ+PfeX6QM=
+=90hE
+-----END PGP SIGNATURE-----
 
---=20
-paul-moore.com
+--2H42TsNIWDJH9FrG--
+
 
