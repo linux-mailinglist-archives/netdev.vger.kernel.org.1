@@ -1,94 +1,195 @@
-Return-Path: <netdev+bounces-96995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD8E88C896A
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:37:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6B3D8C8975
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:40:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ADB71C21EDE
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:37:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 432EA1F257E3
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:40:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFFD12F588;
-	Fri, 17 May 2024 15:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C863A12F5B9;
+	Fri, 17 May 2024 15:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eg9uP2tq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efgBE+zA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE1E12F39B
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 15:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5248112F5A9;
+	Fri, 17 May 2024 15:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715960237; cv=none; b=CsNs0IJpPADY30LmDjFH6Eqn+5Gr2sbLnWScLDUex/U+ThUq71xwBEnA1yJi9u0JwC0rHgWIKQ+XZCoSXd/Jmpcah/vJv6EuE6YezDOMRE/11h09CwRsRf0TYjslBCScIWL3JYpTYkiooJbDokzJ4qyjq9H8sTFNxpegcRtv7hw=
+	t=1715960439; cv=none; b=dRKzplkEDPpCA66HGRt+ycJIpdfq7BL615PN4n4lij8Bl+n5b3MvbtCLT9x1A+DL8gV04ybQixNI5rLtjXMXh44KdKyhaz0MbkSUyNK75TrMqSCh2hZQTz8vQbrm+bZ0SBhgxEED+KjsPsPH2kKWiWww+kFb19AMYFhIaTqwOVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715960237; c=relaxed/simple;
-	bh=s9IKSXjQQ0F0zhaJQllp6OK0JSl6n8PIMwYIr1D3+eo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XVF5cNRaWcAEsbGmOOJzb3sNd1G0Eyz6QKGsMgDtdPe3hkM04LDbxfHsd+KbHGGaoPDg53bYcX3Nm4Zq+izx3DNSk9TRLAhHH3Dth+6xtardLus5zhEuZ2Bli7Vv6z/x9eGag5VdyCdFVLhI+rW/ffRZPGv1QwwCoIqDOGVbMhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garver.life; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eg9uP2tq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garver.life
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715960234;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2DMaNd1X0EjIWhl5yZx/Dvg4/jtmNGNBT4wiHgYISUE=;
-	b=eg9uP2tq//PbrZzY8DnJGjRZwaBWQcKK9R6q4jJWA0nz/BTM8TlKdeXczyPukxMPWgkZq3
-	pluBR+63NnmS4Jj6CMQhb23dv3J2HagPxVoSflyq7h2qdB+gEgKVYSEq1yWjReYU8vGoh1
-	KL4Z4qsKyMAQzb3OBy0vOkEYqvCUv/4=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-167-WVt0THKtMum2QffuosTRYA-1; Fri,
- 17 May 2024 11:37:12 -0400
-X-MC-Unique: WVt0THKtMum2QffuosTRYA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7EE1538157BA;
-	Fri, 17 May 2024 15:37:12 +0000 (UTC)
-Received: from localhost (unknown [10.22.9.146])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 53AB02026D68;
-	Fri, 17 May 2024 15:37:12 +0000 (UTC)
-Date: Fri, 17 May 2024 11:37:10 -0400
-From: Eric Garver <eric@garver.life>
-To: netdev@vger.kernel.org
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>
-Subject: Re: [PATCH net-next] netfilter: nft_fib: allow from forward/input
- without iif selector
-Message-ID: <Zkd5pmHsYqN0LBbR@egarver-mac>
-Mail-Followup-To: Eric Garver <eric@garver.life>, netdev@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>
-References: <20240517151137.89270-1-eric@garver.life>
+	s=arc-20240116; t=1715960439; c=relaxed/simple;
+	bh=iNsDA5SLvPhu0JbRwQ06u+xbMDVE3hHQVYQf02Bb1H0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=tyUA5M+cTPveD5vGrb3UicsbPxY8cq9aMc1HHu+VMWba5D/gI16FGOEFA4JqzZ/Z6zolGk9G0ygz41FNebho8KIhCeLyApB3ypgcGcKd75F8fs40HZEXTlGwYSkx8XpluHAAOGl6ay0IJ4wPYZVzJtAo0Wn1OZ4z7SUI79hs0Yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=efgBE+zA; arc=none smtp.client-ip=209.85.214.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-1eb0e08bfd2so12868965ad.1;
+        Fri, 17 May 2024 08:40:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715960437; x=1716565237; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KeBHstQjIre4Wfpl7kdLCjbinS3o2KJnHNzvvNjFeMA=;
+        b=efgBE+zAOPgMAKpKlPDdN+a1doIdMBMnA5PCJe5gL/1y8bYfNlHc06+ssAStNXrvpN
+         /xuInGfFxot7ehI8gDm7OdWH/7EGSa+FbNwk5C4DG5Jc2rAwEDYGEu10gFKgH1YbFcJX
+         uINa+/7EWO2WDBPqSzG0RJhVrPq54daq6VdxFqqEtNDXFeIx4RQwk9Yla5TXOnBIKkVS
+         /yXgxp4oJsTT+2G/8nKPeVrxgCoRZ/phmZSjWv9Ahb+Odu5ZJOfFwL5LgPRdMU5yPKXZ
+         p8/o4ze3yJyXY4emVi33GM5Xr5Zw+PlXhJ7pgWm5VlFg5umQJWt59UQyFw0SAbsxhoaF
+         5y0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715960437; x=1716565237;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KeBHstQjIre4Wfpl7kdLCjbinS3o2KJnHNzvvNjFeMA=;
+        b=BuXnFlWVr+UD+awvsJlTkkdw1w8TbSr+UBU7+JWUEBTKJkACFtIBsD9M4cN3tCR6Ta
+         KgQ5uM805FO2tG4EOmY1GsGFxXBcr5kBwXCRRv2XBxlV7HvvOSr96SVYafooPnKfx/Uj
+         f8Qwz1vFOofGkEsAOkZZ4mjAaCn4qJ4l7lQ0QNfW81z6BD3CYpEt4E0deXQ6+rQp3HJt
+         GGoE05nIlqs2woojCHSQhO0aNPHBp2HazNuvfOAft2CCY2f8Ixrcut8iBYc4Hb9KEIw+
+         Uh9bSJlySEosTuMly5M8TCjGX7iSrnWQAVdW0Xp6Tw/QgdelT3bLRrVerDpX7iBNGS9T
+         ClOg==
+X-Forwarded-Encrypted: i=1; AJvYcCWIFZ5nUeLzRHcqOmXiJFh+0vLGKB3jaDddPJ9bPdZTUWfUAF0WOkHk/vgA5kt3CxNHM061og0Zjz2uC2JRQZRCQyff3Uiml4ngdwbUv8tG1XwaAVe8K1p4jWhAOR4ryV1Xsu8DykkyUOdN+TI4MXyGdxY+S6SYoizs
+X-Gm-Message-State: AOJu0YxTD2v+vRZouAMyfMN4mUmvBjDALfGypfdXoJaw3D42pKp6E0po
+	zwG7GPp7Wv/e+vRJg2IzOYLwHHSTe953e6NU+XMTgmyfytflrZY4
+X-Google-Smtp-Source: AGHT+IFAxssLZ3RlB8pKZO/643cGL8ZseaQ/GUvaESDKuEXqQJ08vNFDKkMH7OAtEz24bk4QezyrPA==
+X-Received: by 2002:a05:6a00:1824:b0:6ec:ff1b:aa0b with SMTP id d2e1a72fcca58-6f4e02d3698mr24977798b3a.18.1715960437452;
+        Fri, 17 May 2024 08:40:37 -0700 (PDT)
+Received: from localhost.localdomain ([2409:8a00:26be:370:d9bb:b9a0:16e:48c8])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f66e4bed05sm6328779b3a.100.2024.05.17.08.40.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 May 2024 08:40:37 -0700 (PDT)
+From: Fred Li <dracodingfly@gmail.com>
+To: dracodingfly@gmail.com
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	john.fastabend@gmail.com,
+	kafai@fb.com,
+	kpsingh@kernel.org,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	songliubraving@fb.com,
+	yhs@fb.com
+Subject: [PATCH] test_bpf: Add an skb_segment test for a non linear frag_list whose head_frag=1 and gso_size was mangled
+Date: Fri, 17 May 2024 23:40:28 +0800
+Message-Id: <20240517154028.70588-1-dracodingfly@gmail.com>
+X-Mailer: git-send-email 2.32.1 (Apple Git-133)
+In-Reply-To: <20240515144313.61680-1-dracodingfly@gmail.com>
+References: <20240515144313.61680-1-dracodingfly@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240517151137.89270-1-eric@garver.life>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 17, 2024 at 11:11:37AM -0400, Eric Garver wrote:
-> This removes the restriction of needing iif selector in the
-> forward/input hooks for fib lookups when requested result is
-> oif/oifname.
-> 
-> Removing this restriction allows "loose" lookups from the forward hooks.
-> 
-> Signed-off-by: Eric Garver <eric@garver.life>
-> ---
+The patch was based on kernel 6.6.8, the skb properties as
+mentioned in [1]. This test will cause system crash without
+the patch described in [1].
 
-I mistakenly sent this to the wrong list. Sorry. Please ignore.
+[1] https://lore.kernel.org/netdev/20240515144313.61680-1-dracodingfly@gmail.com/
 
-I'll repost to netfilter-devel.
+Signed-off-by: Fred Li <dracodingfly@gmail.com>
+---
+ lib/test_bpf.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
+
+diff --git a/lib/test_bpf.c b/lib/test_bpf.c
+index ecde42162..a38d2d09c 100644
+--- a/lib/test_bpf.c
++++ b/lib/test_bpf.c
+@@ -14706,6 +14706,63 @@ static __init struct sk_buff *build_test_skb_linear_no_head_frag(void)
+ 	return NULL;
+ }
+ 
++static __init struct sk_buff *build_test_skb_head_frag(void)
++{
++	u32 headroom = 192, doffset = 66, alloc_size = 1536;
++	struct sk_buff *skb[2];
++	struct page *page[17];
++	int i, data_size = 125;
++	int j;
++
++	skb[0] = dev_alloc_skb(headroom + alloc_size);
++	if (!skb[0])
++		return NULL;
++
++	skb_reserve(skb[0], headroom + doffset);
++	skb_put(skb[0], data_size);
++	skb[0]->mac_header = 192;
++
++	skb[0]->protocol = htons(ETH_P_IP);
++	skb[0]->network_header = 206;
++
++	for (i = 0; i < 17; i++) {
++		page[i] = alloc_page(GFP_KERNEL);
++		if (!page[i])
++			goto err_page;
++
++		skb_add_rx_frag(skb[0], i, page[i], 0, data_size, data_size);
++	}
++
++	skb[1] = dev_alloc_skb(headroom + alloc_size);
++	if (!skb[1])
++		goto err_page;
++
++	skb_reserve(skb[1], headroom + doffset);
++	skb_put(skb[1], data_size);
++
++	/* setup shinfo */
++	skb_shinfo(skb[0])->gso_size = 75;
++	skb_shinfo(skb[0])->gso_type = SKB_GSO_TCPV4;
++	skb_shinfo(skb[0])->gso_type |= SKB_GSO_UDP_TUNNEL|SKB_GSO_TCP_FIXEDID|SKB_GSO_DODGY;
++	skb_shinfo(skb[0])->gso_segs = 0;
++	skb_shinfo(skb[0])->frag_list = skb[1];
++	skb_shinfo(skb[0])->hwtstamps.hwtstamp = 1000;
++
++	/* adjust skb[0]'s len */
++	skb[0]->len += skb[1]->len;
++	skb[0]->data_len += skb[1]->len;
++	skb[0]->truesize += skb[1]->truesize;
++
++	return skb[0];
++
++err_page:
++	kfree_skb(skb[0]);
++	for (j = 0; j < i; j++)
++		__free_page(page[j]);
++
++	return NULL;
++}
++
+ struct skb_segment_test {
+ 	const char *descr;
+ 	struct sk_buff *(*build_skb)(void);
+@@ -14727,6 +14784,13 @@ static struct skb_segment_test skb_segment_tests[] __initconst = {
+ 			    NETIF_F_LLTX | NETIF_F_GRO |
+ 			    NETIF_F_IPV6_CSUM | NETIF_F_RXCSUM |
+ 			    NETIF_F_HW_VLAN_STAG_TX
++	},
++	{
++		.descr = "gso_with_head_frag",
++		.build_skb = build_test_skb_head_frag,
++		.features = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_GSO_SHIFT |
++			    NETIF_F_TSO_ECN | NETIF_F_TSO_MANGLEID | NETIF_F_TSO6 |
++			    NETIF_F_GSO_SCTP | NETIF_F_GSO_UDP_L4 | NETIF_F_GSO_FRAGLIST
+ 	}
+ };
+ 
+-- 
+2.33.0
 
 
