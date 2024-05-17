@@ -1,92 +1,159 @@
-Return-Path: <netdev+bounces-96845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F19E8C801B
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 05:10:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EE108C8045
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 05:47:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 278B1282FA2
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 03:10:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA22F1F225EC
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 03:47:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 044BEB672;
-	Fri, 17 May 2024 03:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B73BA49;
+	Fri, 17 May 2024 03:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XjplShAr"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="KkFX2Qdv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C340D8F45;
-	Fri, 17 May 2024 03:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E4210A09
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 03:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715915429; cv=none; b=Hz09ewUgiwfuL7tlxFQFo1nOwqrWkm4/4bdoU6hF8Z70tfn/O3Qjz3FUe6TTSFuTFDB7ywlr6UH5LNI8oR1y/p9n2gNX1+uylQZHG3M/R+c3DwN5U3XTKwpeE6DwnCZ/rYdfcZuy3Np2wv78oASFD9n7V+DByOvGRsxvWODUl00=
+	t=1715917630; cv=none; b=X+pbTcyIz8Vmd/6de39JZs6lF7XlsqKm10I5SANnUp3Di5cSK+eG6YaRRNN5Y3ktkwnjXLPxF3T1zu1GVc4ueaOQAu2xYmoA3yS0ZJl7S/nq7JyGTAvsiEw7v+MMeGm+t3gS+e8LmsrARn0KW3MWCnahu0DZost0bVXwiBjBvDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715915429; c=relaxed/simple;
-	bh=ewr5LqD6aFBNjgSdsKy+jHQsXVziy9ZAzxRTdgAdHuI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=I5OBZCBSTwsiQTEpqu7oBLeV/z7jYk/kqLcNdV0xx9xTOxbp3aWosGRcyIKIfEBOxkGUHx5bPNqjgalUoxxwCtZ1QtaDgV5CEln5cw4gyM3yZDIBtzsrhDCbGJ6kiwg9Yxs6p9P8s1x/qym08YVcYCkUMN55NEtgXPyIGKCT6yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XjplShAr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 69B8FC4AF07;
-	Fri, 17 May 2024 03:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715915429;
-	bh=ewr5LqD6aFBNjgSdsKy+jHQsXVziy9ZAzxRTdgAdHuI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XjplShArF2rnbwlAcmCYgpwnFooZFoYCqSus3hGCZDTxetj1qdVHEuf8wyO2YeMwH
-	 c4foFnFpDd49rjAHa1XsZhx0YgBAjXhJ7Qt4SbiRENDP2jAxodfj/RghV/Rvs2fbKK
-	 ZonfRiZg0ggqwa5C1CZWzt7S2UuYjczeDlfbNsTdLuCFhqnNxTRToJR985arGj6oc5
-	 ioORWRwJ6O2l6+tyRFwcMiYBKbqAmMCLdsAdMCH7dWK9y7Ex8fHYk0e+tDNUmm2Q/q
-	 F2tytl+mhrLKNTswwhUbx5RI5JLeoRd+cCUGUbDK8NkCsMTgfvVmkoI0VpdIB/EOtC
-	 Z4b/x+4w5UItQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 546A2C54BDC;
-	Fri, 17 May 2024 03:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1715917630; c=relaxed/simple;
+	bh=60WJPyunhwRDxdqK0jmaca+G8J/J7dfoT/EsRzkUIOM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SM1dfQbNaV7rUCGEx9jg4m7dqUS9wBPoCMBPesNPB78xaIw9KvG38xloVrY8fD8KesqMnSGJ0NdMD5sUZeSRvMPJ5pOUr4Zot1xegg4g7qaOaFqC+I/QKveK2kYNO5YzZkaklEH1EAUY+2x5VUs9v80H/UaF51zDdEUVo0sl+x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=KkFX2Qdv; arc=none smtp.client-ip=209.85.166.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-7d9ef422859so801939f.0
+        for <netdev@vger.kernel.org>; Thu, 16 May 2024 20:47:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google; t=1715917627; x=1716522427; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yDlOiioY4qBdeDaBJ3EMBjG9W4k3e+q2KQuwlwFm/Wg=;
+        b=KkFX2Qdvuhzl5EaGH5xkrhb0yT1vguDmkATYGJXXzKL+60FaUrp0rGhbJAIzha2c8Y
+         +HEYSfsGATA7i7Rcq8GakJDptzuDZE7S2ciBMIyojTlAnot1ibQnXvuSgmCpVNmzm6Pv
+         oG5WBKMzyD2u4NSVuQlS6NsJTg1ucs84pQE9E=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715917627; x=1716522427;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yDlOiioY4qBdeDaBJ3EMBjG9W4k3e+q2KQuwlwFm/Wg=;
+        b=QF/B/o9h/ylOF/zbtQIwV7Yu1NvV6725isTnwLGa2svdqdv/5Cig95n1bwLA/b/4fI
+         hIsCAoC/vGxYz/r6PvZR6fnnah3/tde0Q0DTQVxg3DEA7Oqb+50EPvxz36XrhSTG9zMy
+         1uy4nFiVrVzA+QAX2ZezHOlEEgh2yWTHGfOq5mFOO6nU/M1uGdmt8ncnNf2OEgoBf0TL
+         L3TaZJSmCV3a14T8dsMemBEpGoL2wGlXM9jFtjKGU/aag3stT2CqYipcBogF7Ro3WrvM
+         h6uv8ErWDWj2YKKpAQnF8leLupF5weLeyaZiyOKiyhMt9glhBFSH8b2k4isxcXHSaL0u
+         mOtw==
+X-Forwarded-Encrypted: i=1; AJvYcCWfwaS8AcUMe94cN486/sbuymg8CntSQqKaMMowGywhcD1fm5aqg5YSwmmEacbGoUHUTl6oWq/c9v+u23l+8TTWFhIMl15C
+X-Gm-Message-State: AOJu0YyAm524aOCfCdz1R22SjA70zbFYCZnHm3c0vCsep6E/UlRg9T7y
+	Ez8QRzEkgqk20MgmZBsL/wHQZgxUdDOiao+qvAQyHdlGJEPA0RkXg4oD77Qrwe4=
+X-Google-Smtp-Source: AGHT+IGdK6rFNtMzv/o7w6HNu0tCiqSEnlqZgL7f/KrvB7GNWi1KNGokcDBCge/J7xruX5muwQNDjQ==
+X-Received: by 2002:a5e:c748:0:b0:7e1:d865:e700 with SMTP id ca18e2360f4ac-7e1d865e82emr1709781039f.2.1715917627289;
+        Thu, 16 May 2024 20:47:07 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-489376de473sm4436301173.154.2024.05.16.20.47.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 May 2024 20:47:06 -0700 (PDT)
+Message-ID: <f3bff4ea-507c-419f-8fca-9276281c3b9e@linuxfoundation.org>
+Date: Thu, 16 May 2024 21:47:05 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next] bpftool: fix make dependencies for vmlinux.h
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171591542934.18753.10218221858654904278.git-patchwork-notify@kernel.org>
-Date: Fri, 17 May 2024 03:10:29 +0000
-References: <20240513112658.43691-1-asavkov@redhat.com>
-In-Reply-To: <20240513112658.43691-1-asavkov@redhat.com>
-To: Artem Savkov <asavkov@redhat.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- jstancek@redhat.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 08/66] selftests/cgroup: Drop define _GNU_SOURCE
+To: Tejun Heo <tj@kernel.org>
+Cc: Edward Liaw <edliaw@google.com>, shuah@kernel.org,
+ =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+ =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
+ Christian Brauner <brauner@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Zefan Li
+ <lizefan.x@bytedance.com>, Johannes Weiner <hannes@cmpxchg.org>,
+ Muchun Song <muchun.song@linux.dev>, Michal Hocko <mhocko@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Yosry Ahmed <yosryahmed@google.com>,
+ Nhat Pham <nphamcs@gmail.com>, Chengming Zhou <chengming.zhou@linux.dev>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-team@android.com, linux-security-module@vger.kernel.org,
+ netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+ bpf@vger.kernel.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20240510000842.410729-1-edliaw@google.com>
+ <20240510000842.410729-9-edliaw@google.com>
+ <ZkJHvrwZEqg6RJK5@slm.duckdns.org>
+ <bec3f30e-fc9a-45e2-b6ea-d739b2a2d019@linuxfoundation.org>
+ <ZkYymMDd690uufZy@slm.duckdns.org>
+ <9e72d97a-9a04-4423-a711-0c21c1c8b161@linuxfoundation.org>
+ <ZkZGP9Io6o9Dhh36@slm.duckdns.org>
+ <a8702e6b-0360-493d-bf8b-94dd7f17e7f1@linuxfoundation.org>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <a8702e6b-0360-493d-bf8b-94dd7f17e7f1@linuxfoundation.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to bpf/bpf-next.git (master)
-by Andrii Nakryiko <andrii@kernel.org>:
-
-On Mon, 13 May 2024 13:26:58 +0200 you wrote:
-> With pre-generated vmlinux.h there is no dependency on neither vmlinux
-> nor bootstrap bpftool. Define dependencies separately for both modes.
-> This avoids needless rebuilds in some corner cases.
+On 5/16/24 12:05, Shuah Khan wrote:
+> On 5/16/24 11:45, Tejun Heo wrote:
+>> Hello,
+>>
+>> On Thu, May 16, 2024 at 10:31:13AM -0600, Shuah Khan wrote:
+>>> I am exploring options and leaning towards reverting the patch
+>>>
+>>> daef47b89efd ("selftests: Compile kselftest headers with -D_GNU_SOURCE")
+>>>
+>>> Your amending the PR helps me if I have to send revert. I am sorry
+>>> for the trouble.
+>>>
+>>> I can all of them together in a second update or after the merge window
+>>> closes.
+>>
+>> The cgroup commit is already pulled in unfortunately. Can you please handle
+>> the revert and whatever's necessary to fix up the situation? I'll ask you
+>> what to do with selftest patches from now on.
+>>
 > 
-> Suggested-by: Jan Stancek <jstancek@redhat.com>
-> Signed-off-by: Artem Savkov <asavkov@redhat.com>
+> Thanks for the update. Yes I am working on fixing the situation and
+> will send revert for cgroup test patch as well if necessary.
 > 
-> [...]
+> No worries. It is not a problem for you to handle cgroup test patches
+> in general. I will need your review anyway and letting you handle them
+> reduces the overhead.
+> 
+> This kind of framework change causes needs to be coordinated.
+> I should have held back on the framework change on my part.
+> 
 
-Here is the summary with links:
-  - [bpf-next] bpftool: fix make dependencies for vmlinux.h
-    https://git.kernel.org/bpf/bpf-next/c/83eea61776c9
+As mentioned in the other thread
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+https://lore.kernel.org/linux-kselftest/24975952-b1fa-44a5-bac5-aef538ad0c09@linuxfoundation.org/T/#t
 
+I reverted the following patch and the framework change patch.
+https://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git/log/?h=next
 
+Will send PR to Linus this weekend.
+
+"selftests/cgroup: Drop define _GNU_SOURCE"
+commit c1457d9aad5ee2feafcf85aa9a58ab50500159d2
+
+thanks,
+-- Shuah
 
