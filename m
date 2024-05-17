@@ -1,87 +1,108 @@
-Return-Path: <netdev+bounces-96858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBB7E8C80EA
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 08:25:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 255638C8110
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 08:53:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7718DB219A6
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 06:25:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99621B21740
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 06:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1DE13AEE;
-	Fri, 17 May 2024 06:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="tk+gIjdr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 953FC15AE0;
+	Fri, 17 May 2024 06:53:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B4A134A6;
-	Fri, 17 May 2024 06:25:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103E514F68
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 06:53:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715927135; cv=none; b=CDC+OMVSYHrEjggq5ct3byF/0CdJYcx3dBbjRj+2ntJeCtDvO2eNYoiM0boo9iBaS8KnMgZ4SDUHF/STHvdb8HzwRMoYcM2NIEq8eaLcSqGmkRl/iafQIZ5jaoKBx/ApGSy2HL7d9zKWmZvVnPrQE4ZcnoViz7eIzNXQ4OrQAGE=
+	t=1715928824; cv=none; b=N6yXaNGuceWEvzcAFgQ55dXdvYxXSkp4dsjXtaZmk5tfxsWtErvxOe3Br6rLWAuLLGeL8S7ku69uSbjYH07FTaAFbzw5hCssYpQVjR0dI2jj38MoWTPkoUK5hFVWV5O7KjniX4n8AYBYB49utcdx5tW+K2vzi7bz2GmVIbSIWy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715927135; c=relaxed/simple;
-	bh=qt28qpGihbsLNTy0QXcH6ifyS6+qu1VlVPg9r03RQhY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Yoto5i5D+3PU4geFUPi1iG+Y0m1VIdZQ7+m/70HpksE81gSOipgozfIFwhHMkyxKgjoXbYvsBEDrs5s8M0b8g+UUqYd6BckJyOo2QRpljqdecci3kSv9hGTTNA3HakZRxdZXWqY9fldqDJMZBbTMMXLWzOGXcoAfWwFo/v25x1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=tk+gIjdr; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=qt28qpGihbsLNTy0QXcH6ifyS6+qu1VlVPg9r03RQhY=;
-	t=1715927132; x=1717136732; b=tk+gIjdrr8g9u5ZUUYdHSRIKOd4JG17w4s2NoFRnogztVV8
-	S0z2JARR68+V3lgZQMwqEV6BV94SQiGHcBEaBo0axNfx7WXFf3i2jYS2L3tw2uNaEEuHJkDVUMpN9
-	xtkZNLERmiwppVIegzpN4Cbr6f/3593ecjYD0ukSmZP8yXNDwvrFXZ1AJS9u+8FtFQcZK1Xbz7hZ7
-	0Fx/B11q+/jiy3h6ESPl1Ldz3PAKI6W0EGDz7TpLRkMSYOC9XRD3mBlFG5GSkJue0JHn3EowTprP9
-	aeX5ujB0cKzkWn1y3cEkg4Tvmd1HOrUVQi8xdALnCMIqHAHFpxZFhn4txBm0OGAQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1s7r1p-0000000AVQj-3PVg;
-	Fri, 17 May 2024 08:25:18 +0200
-Message-ID: <e2363a1ca932cf1534f9f006e6cf4f30a8c7a0cd.camel@sipsolutions.net>
-Subject: Re: [PATCH 1/1] wifi: mac80211: Avoid address calculations via out
- of bounds array indexing
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Kenton Groombridge <concord@gentoo.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com,  linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org, keescook@chromium.org, 
- linux-hardening@vger.kernel.org
-Date: Fri, 17 May 2024 08:25:16 +0200
-In-Reply-To: <20240517002352.12717-1-concord@gentoo.org>
-References: <20240517002352.12717-1-concord@gentoo.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1715928824; c=relaxed/simple;
+	bh=e4AmGURiQoCdUvm4XoaEtHNi7FGGv8jjqtBkwypm5Jg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B5kTmChbtiIsP5/e1q5Xi2Om0iD+AGBWfKEXGNhMWs7Jj+JYXmx5ydzuBSMkosdni3M3BpNqgeRu47Kn3GCIh63BvFbwvFuAddUbCEzdyword8sr+BHldP4XJT0BS/yx/HlgtgODFGQRaTzhqDapCnK4cbiO4Bke1d/IY7DP7X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: bizesmtpsz11t1715928715tbvjgs
+X-QQ-Originating-IP: PcrTEei+AZKYxJa24+gwggZjHmm6ram1O7yKIBv509o=
+Received: from lap-jiawenwu.trustnetic.com ( [115.206.162.36])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 17 May 2024 14:51:52 +0800 (CST)
+X-QQ-SSF: 01400000000000L0Z000000A0000000
+X-QQ-FEAT: znfcQSa1hKZOgrmWv5OIupl17g0g6LKJ+pJEnN0zbpC34zbEExcO1qJtH/6Pr
+	Z0lQbnXrt42kXAfT2rQrQZ91RssXFCNtRRiyuL4oAchKYMW5kY2wLrU1N1elb4hxf2pYpw8
+	qgziGjOlAy2vZ5gkyHmIHbkzadzuwailVsF9hLBYJNrsOHr+wYMOs1DG8Xk81KKCTu0pwYS
+	mC4MuPTXwUpTlb/vU4XgvBYPNHwrf09o9961ChxymHP5m5hey+/NPdBg7Mo5oPYZIHquM7X
+	ln1YPZusLT4+FIsTJDWJcaO9DTLS1sM7xx3uDBduXnxTxyfcTl7YhYe1qFK4hmIzBqbj0qY
+	8T/kR3niwWwa6mpigNl95fFjVPD79s2HGiv04RzwYbGhcAulYC2vKW9zDHq4KAXAKOqodTr
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 3430255678895096728
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	horms@kernel.org,
+	andrew@lunn.ch,
+	netdev@vger.kernel.org
+Cc: mengyuanlou@net-swift.com,
+	duanqiangwen@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net v5 0/3] Wangxun fixes
+Date: Fri, 17 May 2024 14:51:37 +0800
+Message-Id: <20240517065140.7148-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-On Thu, 2024-05-16 at 20:23 -0400, Kenton Groombridge wrote:
-> req->n_channels must be set before req->channels[] can be used.
-> Additionally, memory addresses after the "channels" array need to be
-> calculated from the allocation base ("request") instead of the first
-> "out of bounds" index of "channels" to avoid a runtime bounds check
-> warning.
+Fixed some bugs when using ethtool to operate network devices.
 
-Thanks. Can you please drop the cfg80211 parts from this to match the
-subject, the code there is broken in other ways too, I have a fix for
-all of that:
-https://patchwork.kernel.org/project/linux-wireless/patch/20240510113738.41=
-90692ef4ee.I0cb19188be17a8abd029805e3373c0a7777c214c@changeid/
+v4 -> v5:
+- Simplify if...else... to fix features.
 
-johannes
+v3 -> v4:
+- Require both ctag and stag to be enabled or disabled.
+
+v2 -> v3:
+- Drop the first patch.
+
+v1 -> v2:
+- Factor out the same code.
+- Remove statistics printing with more than 64 queues.
+- Detail the commit logs to describe issues.
+- Remove reset flag check in wx_update_stats().
+- Change to set VLAN CTAG and STAG to be consistent.
+
+Jiawen Wu (3):
+  net: wangxun: fix to change Rx features
+  net: wangxun: match VLAN CTAG and STAG features
+  net: txgbe: fix to control VLAN strip
+
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  2 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 56 +++++++++++++++++--
+ drivers/net/ethernet/wangxun/libwx/wx_lib.h   |  2 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  | 22 ++++++++
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  | 18 ++++--
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  1 +
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    | 18 ++++--
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 31 ++++++++++
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  1 +
+ 9 files changed, 137 insertions(+), 14 deletions(-)
+
+-- 
+2.27.0
 
 
