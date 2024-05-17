@@ -1,184 +1,106 @@
-Return-Path: <netdev+bounces-96913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E91558C82CC
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 10:55:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 416AC8C82D0
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 10:56:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAFB61C21009
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 08:55:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BC061C20AE8
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 08:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72B81DA58;
-	Fri, 17 May 2024 08:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4BE14003;
+	Fri, 17 May 2024 08:56:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SSgbPoBg"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Ojt3+cuU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B281CFBC;
-	Fri, 17 May 2024 08:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF54200D2
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 08:56:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715936099; cv=none; b=CACMwLi7s0OBiHmf+A807GkcGR17y4MQlWzPlOIHsoAFX+rUY9XvRtbvVhdC0q8GvIbPrR6WqVdAZ51YWhuLmICCxxXbS/d3X61pmM+QHhfNK9gDxovYlVGNGalFmbtF6wSx4hNaeCgeHZmrp27Kpf5h6l2pnWf6pDFM6A3w+n0=
+	t=1715936183; cv=none; b=KnusgQObgmQufoieHXomtcMt/WrU/2HnYHr8B+YiANFwuSSlNPDSFFWl/GkEHr1ue/iF67WFa3rVPmFrt6uny2KqBdDbhUUZNyFumclwZxWPqVPfeauoWLenA2FBuQkekAbT7TmPo519cK0+dLSPyPY1UcNvDzRYzan3tiodOBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715936099; c=relaxed/simple;
-	bh=iw+dF08yIxyTj1jJ50utoXxxBmfeDsLs/Hd8UVvCMew=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t7HSXF7sjR8mvpVXxof/XwXRcnaYQL6B5C60B5gyi64jkCwpUgWz2iUlHIlns9hPR3/+2JrGGwneLFvTcHFfR9KPsz+AGC6ZBUlPahB5A8071YY2GEWZYB00+/lWvmscZiOFoplPPWzjSmrn90msIIzFWR5hBe7BxclY8osR0Z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SSgbPoBg; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2bd42c81d33so880194a91.1;
-        Fri, 17 May 2024 01:54:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715936098; x=1716540898; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XMmTojAP3FRujDMUgpb3ucGAqyvMxCJuth7y/Wv7FYg=;
-        b=SSgbPoBgBQcqdD1HsGBpHcxJ35WxAA63K3YowbBMLRXngKuM+U9HmiskYkUZkifTDz
-         rakTF0lrpeSQ3MAhzi2VhkkodnSjUhQIZyEWUAVzd+3HzXQSg00Z80WNBJdBDCNgduiG
-         d+v1Qd81kBQAJl6kLDgO0dWC2564gMJiuAQ4V33nntum2oKJPkBKM0GKQRNzKPH7GI2u
-         IGrmONF/2wqwNtp8S16NsA8rNJBT1OhAktRNAUNf4kq6puzNUpii88qC1+G4l2TcbgPW
-         HJrxzKOyiXj5ANA/J5KKGfkISdVU0cbZDmdi2GcaBNE8FQghUKKk2TRC3qu9kceyNf4A
-         a40w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715936098; x=1716540898;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XMmTojAP3FRujDMUgpb3ucGAqyvMxCJuth7y/Wv7FYg=;
-        b=h0/G2CtLT+LN8CcXJRxRG6fIucbiedfj+vQbxbuJ979mqUgFwAtCdDgQ6mxPD8TbAt
-         u5I3I8rYCy9yko0FisSq0MUUia/O6Ek18UkPG0oJcdpV7zKptzq/tLdtI4pHvqTDENhz
-         o69w/gUt9eAdcKiUynPzhT+B/gibd5wff4UPKE1Q2q9Y8+34muPLAdF7AuFZD4VaF9Wc
-         n8UcFWNkT9f/lstTQz6U64G2XeifoNqZO8BYfobrFbllS3RHO7oweRg8G1o16vlaBTVP
-         e7xwESl8QX6Q6BMxwLNQR+7Hohfd7bZjWvKJOY5nFQibhw1aK+/wRk0Fqi3uyRMEVqmn
-         yRtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWpWUGLdkBz+fdX7rMth32N33ECKQefsWAunB1jnwHxoynpBYkQBM+WPyOD3Ztx8P/feJaoUHFHKSStos5UAWFqQ8PyBn0Fxj+DPvS2qH0mJYYHAQ4TOGDeX8nQLfCA0WrcmLT5E0MP
-X-Gm-Message-State: AOJu0YzwOQvye4+6oTYQ86QDkXkzU2qra7+W8fffdea8Tj6nNty7Tbwo
-	ZKSpIa94DYWPVFUFuj1JLw8LO7441reBtdYeHWRPHUuUW0S1JxrA
-X-Google-Smtp-Source: AGHT+IFx+oP2YCwfYKFrxiuGgL4MnlHgZ0Uy8fG6e0o551dqwjs2/ivPpENpoe9mCGVxqnTthWMZYw==
-X-Received: by 2002:a17:90a:7181:b0:2b2:ae4b:9e54 with SMTP id 98e67ed59e1d1-2b6cc772eadmr19708957a91.11.1715936097681;
-        Fri, 17 May 2024 01:54:57 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b6710564bfsm15139734a91.12.2024.05.17.01.54.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 May 2024 01:54:57 -0700 (PDT)
-Date: Fri, 17 May 2024 16:54:52 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, shuah@kernel.org,
-	linux-kselftest@vger.kernel.org, Petr Machata <petrm@nvidia.com>,
-	vladimir.oltean@nxp.com
-Subject: Re: [PATCH net v3] selftests: net: local_termination: annotate the
- expected failures
-Message-ID: <ZkcbXKfLHHg1h15w@Laptop-X1>
-References: <20240516152513.1115270-1-kuba@kernel.org>
+	s=arc-20240116; t=1715936183; c=relaxed/simple;
+	bh=Y6pl6Iz6QgYWmw0ZvRBR0yfSEM/k921ZjnoatfgWBHE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=En+uSkoyQCzH91Vq0rc9fbpclQrZ2fBcajPE9luIPAwscj9Y3JlAsscvzeaK9Xnxi2SnN8bYnR3MWFPDAg1AvZXll+4yKBKDH6oc7O7HNp15OObzrGS+r7GgIIN5Tnf0LoF5rfE1pVVXoxS2Liok6v/L6R1xb7VSsj0F+ZsfbnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Ojt3+cuU; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1s7tNt-0056XN-HQ; Fri, 17 May 2024 10:56:13 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=o2SkN1TPQY7kjyDqqc8YPCO/EM3pPPpIt1rv1viFd9A=; b=Ojt3+cuUfWftc6n+IeEVnM2LWu
+	ktMrDoAyxko3Td4EDCrIeKkYi2+otvnDSs0DVvFazjcfJ7vmbaUrzq0axVaBIC98LdPIoEiu82/kz
+	UVhS5y8s3a5JCWFQJyg61gjuf+ywY66AJAY8RvxW+6wkjXXBqBA3sX9awCtHQuHst6XRRT+ooXnm5
+	vExzBc7t9nlxyv6UqtyyQwOyk3ghmkcsA3W31mXBIQS0PfKv5tAsXX2Jl/S4bSCBrur8KjKrCc3jm
+	JFk5PL7mvpoZEodFK5ILQL21khr5CFk1Ak7wgnqJtLaN12P2RIt4NkYxhxI6ylWiMzqRy3/a/8uY4
+	wUO/eQbQ==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1s7tNs-00064m-RP; Fri, 17 May 2024 10:56:12 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1s7tNb-0040fy-JZ; Fri, 17 May 2024 10:55:55 +0200
+Message-ID: <c0fc4799-ee57-45dc-b13b-0be4711b5cf2@rbox.co>
+Date: Fri, 17 May 2024 10:55:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240516152513.1115270-1-kuba@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/2] af_unix: Fix garbage collection of embryos
+ carrying OOB with SCM_RIGHTS
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org
+References: <734273bc-2415-43b7-9873-26416aab8900@rbox.co>
+ <20240517074742.24709-1-kuniyu@amazon.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20240517074742.24709-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 16, 2024 at 08:25:13AM -0700, Jakub Kicinski wrote:
-> Vladimir said when adding this test:
+On 5/17/24 09:47, Kuniyuki Iwashima wrote:
+> From: Michal Luczaj <mhal@rbox.co>
+> Date: Fri, 17 May 2024 07:59:16 +0200
+>> One question: git send-email automatically adds my Signed-off-by to your
+>> patch (patch 2/2 in this series). Should I leave it that way?
 > 
->   The bridge driver fares particularly badly [...] mainly because
->   it does not implement IFF_UNICAST_FLT.
+> SOB is usually added by someone who changed the diff or merged it.
 > 
-> See commit 90b9566aa5cd ("selftests: forwarding: add a test for
-> local_termination.sh").
-> 
-> We don't want to hide the known gaps, but having a test which
-> always fails prevents us from catching regressions. Report
-> the cases we know may fail as XFAIL.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: liuhangbin@gmail.com
-> CC: shuah@kernel.org
-> CC: linux-kselftest@vger.kernel.org
-> CC: Petr Machata <petrm@nvidia.com>
-> CC: vladimir.oltean@nxp.com
-> 
-> v3:
->  - use xfail_on_veth correctly as a "prefix" call
->  - dropping Vladimir's tags since the code is quite different now
-> v2: https://lore.kernel.org/r/20240509235553.5740-1-kuba@kernel.org/
->  - remove duplicated log_test_xfail
-> v1: https://lore.kernel.org/all/20240509235553.5740-1-kuba@kernel.org/
-> ---
->  .../net/forwarding/local_termination.sh       | 30 +++++++++++--------
->  1 file changed, 18 insertions(+), 12 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/forwarding/local_termination.sh b/tools/testing/selftests/net/forwarding/local_termination.sh
-> index c5b0cbc85b3e..4b364cdf3ef0 100755
-> --- a/tools/testing/selftests/net/forwarding/local_termination.sh
-> +++ b/tools/testing/selftests/net/forwarding/local_termination.sh
-> @@ -155,25 +155,30 @@ run_test()
->  		"$smac > $MACVLAN_ADDR, ethertype IPv4 (0x0800)" \
->  		true
->  
-> -	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address" \
-> -		"$smac > $UNKNOWN_UC_ADDR1, ethertype IPv4 (0x0800)" \
-> -		false
-> +	xfail_on_veth $h1 \
-> +		check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address" \
-> +			"$smac > $UNKNOWN_UC_ADDR1, ethertype IPv4 (0x0800)" \
-> +			false
->  
->  	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address, promisc" \
->  		"$smac > $UNKNOWN_UC_ADDR2, ethertype IPv4 (0x0800)" \
->  		true
->  
-> -	check_rcv $rcv_if_name "Unicast IPv4 to unknown MAC address, allmulti" \
-> -		"$smac > $UNKNOWN_UC_ADDR3, ethertype IPv4 (0x0800)" \
-> -		false
-> +	xfail_on_veth $h1 \
-> +		check_rcv $rcv_if_name \
-> +			"Unicast IPv4 to unknown MAC address, allmulti" \
-> +			"$smac > $UNKNOWN_UC_ADDR3, ethertype IPv4 (0x0800)" \
-> +			false
->  
->  	check_rcv $rcv_if_name "Multicast IPv4 to joined group" \
->  		"$smac > $JOINED_MACV4_MC_ADDR, ethertype IPv4 (0x0800)" \
->  		true
->  
-> -	check_rcv $rcv_if_name "Multicast IPv4 to unknown group" \
-> -		"$smac > $UNKNOWN_MACV4_MC_ADDR1, ethertype IPv4 (0x0800)" \
-> -		false
-> +	xfail_on_veth $h1 \
-> +		check_rcv $rcv_if_name \
-> +			"Multicast IPv4 to unknown group" \
-> +			"$smac > $UNKNOWN_MACV4_MC_ADDR1, ethertype IPv4 (0x0800)" \
-> +			false
->  
->  	check_rcv $rcv_if_name "Multicast IPv4 to unknown group, promisc" \
->  		"$smac > $UNKNOWN_MACV4_MC_ADDR2, ethertype IPv4 (0x0800)" \
-> @@ -187,9 +192,10 @@ run_test()
->  		"$smac > $JOINED_MACV6_MC_ADDR, ethertype IPv6 (0x86dd)" \
->  		true
->  
-> -	check_rcv $rcv_if_name "Multicast IPv6 to unknown group" \
-> -		"$smac > $UNKNOWN_MACV6_MC_ADDR1, ethertype IPv6 (0x86dd)" \
-> -		false
-> +	xfail_on_veth $h1 \
-> +		check_rcv $rcv_if_name "Multicast IPv6 to unknown group" \
-> +			"$smac > $UNKNOWN_MACV6_MC_ADDR1, ethertype IPv6 (0x86dd)" \
-> +			false
->  
->  	check_rcv $rcv_if_name "Multicast IPv6 to unknown group, promisc" \
->  		"$smac > $UNKNOWN_MACV6_MC_ADDR2, ethertype IPv6 (0x86dd)" \
-> -- 
-> 2.45.0
-> 
+> I think it would be better not to add it if not intended.  At least
+> on my laptop, it does not add SOB automatically.
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+Sure, I understand. And the problem was that I had format.signOff = true in
+.gitconfig. Fixed.
+
+> FWIW, my command is like
+> 
+>   git send-email --annotate --cover-letter --thread --no-chain-reply-to \
+>   --subject-prefix "PATCH v1 net-next" \
+
+maintainer-netdev.rst shows an example with a slightly different order:
+"[PATCH net-next v3]". But I guess it doesn't matter?
+
+>   --to "" \
+>   --cc "" \
+>   --cc netdev@vger.kernel.org \
+>   --batch-size 1 --relogin-delay 15 --dry-run HEAD~10
+> 
+> Thanks!
+
 
