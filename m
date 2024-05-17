@@ -1,194 +1,122 @@
-Return-Path: <netdev+bounces-96966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EADA8C8775
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:51:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCE168C8777
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:51:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23F682844FA
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 13:51:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81D612847EC
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 13:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDEA54BD3;
-	Fri, 17 May 2024 13:51:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A61154F8A;
+	Fri, 17 May 2024 13:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="kXTN60hg"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FR67lSmG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09F454BD7
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 13:51:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA56E548EF;
+	Fri, 17 May 2024 13:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715953868; cv=none; b=JICDwmpHqyF/JxdskAnCjjnSEN0kJw92diLvTlpjHAFstMx9W7WP1OHO2sNz+GennphjLZvtCWZRpJuzmZbkbkRl4foSEO3h9QER9Jo4jOfrn4dMCgB8WV3VUiZjCKYfSq8Jw62ZO/1hhuWS31o6tLREyPzNx3GuQFZSXWjG1/I=
+	t=1715953913; cv=none; b=DmxfZ+hJic1ej/+Em9KiVWMfgq4W2ybnTzj0qkD3RyVFEBeRPadrXuYsQkMg83tH2ASUWkSo6j20VsnI+l/dXD3o7AW/9ji/ohanDtU9bD8/WO6o23WDG9EbZOEirTf6klsfSD1ouZ9iqzJTCr0inHFRSdX5JMH+VWIMmfgefFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715953868; c=relaxed/simple;
-	bh=hrdw+xpZVHHGeNHROReDJ0lU3WDkwGrGTjm11LXGpOo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Nv6mg0K03AwnW2kXBBZla4mBUjcdLVreHPlULCg7iGON/66ZGRiGC4rRILKOH/OhJWR6FUHhxlOSLD9IseSFV9F7NWXQdo5AwWYFQzOf6lyqNLWHAhdMJAR74AR7mlZn1byIBr2++i8r2x1kl+Gw0TQvsdaocx7s2W+fnhudqNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=kXTN60hg; arc=none smtp.client-ip=185.125.188.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from hwang4-ThinkPad-T14s-Gen-2a.. (unknown [149.11.192.251])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id D0FA83FA40;
-	Fri, 17 May 2024 13:50:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1715953860;
-	bh=6gxW9Vl+576ign5vW/P5Se5+oW1Bp9cQhGUcs9R2Fk4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-	b=kXTN60hgjnDQTtlDqXdZVUPQwhojOICOTkxD51A16Pi885GfXvKjBTwqCXZCebQLt
-	 3tcLhjdp4uGRbEYbZ1OSf174Rv3zgryn1EyXWzyxT0KErlJKxPOmuD2LaavNLfE+wX
-	 CzXxuCUSTog9JeWfcYKVIWjQo8ENFSYGqh8PbOEFUvCCOKFH33lD9yYaytYlAoPwVw
-	 OvycLkTEEpx2MnLUe0eQ4uOIFBoB0yVERi+06ewsuRE6EHl1rYrCx/ZK34PcWoIi8l
-	 KdD16x1i329x7V8jY6I1qNmb9K90GMRzhw5lil7NoeDTPfd19ujV+NiyqRZC3P2DdJ
-	 ss7Wz5xCLuxpw==
-From: Hui Wang <hui.wang@canonical.com>
-To: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	anthony.l.nguyen@intel.com,
-	vitaly.lifshits@intel.com,
-	dima.ruinskiy@intel.com,
+	s=arc-20240116; t=1715953913; c=relaxed/simple;
+	bh=Ii5G2Pfx0/sTxZXz0bscWvjch8KM33tjPhOPx464tx8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=LJbnfYypt9fjl/kQfPvkOg/7LMPojuD+rF54H2dqZ342uAZRTFbmn+1G4mswhcYPI0epJo7trVU0ltrmIvhGUa+D4TRCfRtNd4fnAef+6dOCESx9CkENSLt2IdhDAyuDMX0+PCGKs4vjScH1r0EFIY0ypt+ZooPi8Uii8iW/9bA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=fail (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FR67lSmG reason="signature verification failed"; arc=none smtp.client-ip=209.85.219.46; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-1eca195a7c8so9380765ad.2;
+        Fri, 17 May 2024 06:51:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715953911; x=1716558711;
+        h=content-transfer-encoding:mime-version:list-unsubscribe
+         :list-subscribe:list-id:precedence:dkim-signature:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=L5iJ2IBlt2gMp832vHsk9p8Pn87cMbPhUJ2Jwd45XuI=;
+        b=NElMT0iBzrWIrqkkLJeGVrFCtE8eVsWNlkUR2nN9Z6557j2FpZMI87aXzEev4VQMLA
+         xMpBu2kJq9Usqy7+2XGeR5gv3xQq4GXC6NznvKyslXpgsacibY1RmiyesNVDCYPFQvlB
+         L+QNd/F7AtRsNj7IxB9PKMEbJMewiw9JWis1fR7ZoxeNZZY8VcXhb1C1xGPEAT29VNEn
+         VhV+0eskp1tUwh4hDIf+Ggp6OxL+rtcBdf7oW6B1RyeY29aNZs+JaiE6qMxXOoiE9vMl
+         tCuECoCxxPDhd+PfMA5xLB2tCiP3M4yCzcuCoA0aE7tcGrj1cVnWDEDvALpKl7QLahBO
+         RKGA==
+X-Forwarded-Encrypted: i=1; AJvYcCXTiykeVOCiBcu3kpCUKdmTAFtzX7ycJLZxA1rnS4u5IETuOuairll7g6mJrekrJTBHw8GemlC91J2pfTNcFPBRmWikmTiBBp5plGVTIc+bsFlvPxxbb4TdBe1cQ8gdlPFlPbSojkh99NW1rX2xn3etNLAOrvh4eVTC
+X-Gm-Message-State: AOJu0YzA1mpDqSlvqlVtLMm9RtMuQzX3GHfri8sKOTgcX6jUqslw4Jc8
+	Zo59Gys8evKMGMzXcB2Xa3b68jGLf5QC4xIP4rSDisklNBj9aIjG
+X-Google-Smtp-Source: AGHT+IGkyb4KKtETu+dEmWgPg5AJ2lUMk6jEPohRDFYv/REpVeufpc+1yhaXaco+xMErVMu7jENFLA==
+X-Received: by 2002:a05:6a20:c909:b0:1ad:999b:de47 with SMTP id adf61e73a8af0-1afde1d7b38mr23355862637.51.1715953911081;
+        Fri, 17 May 2024 06:51:51 -0700 (PDT)
+Received: from localhost.localdomain ([2409:8a00:26be:370:d9bb:b9a0:16e:48c8])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2b300d9sm14724130b3a.215.2024.05.17.06.51.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 May 2024 06:51:50 -0700 (PDT)
+From: Fred Li <dracodingfly@gmail.com>
+To: dracoding@126.com,
+	dracoding <dracodingfly@gmail.com>,
 	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	sasha.neftin@intel.com,
-	naamax.meir@linux.intel.com
-Cc: hui.wang@canonical.com
-Subject: [iwl-net][PATCH v3] e1000e: move force SMBUS near the end of enable_ulp function
-Date: Fri, 17 May 2024 21:50:59 +0800
-Message-Id: <20240517135059.10646-1-hui.wang@canonical.com>
-X-Mailer: git-send-email 2.34.1
+	kuba@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	kafai@fb.com,
+	songliubraving@fb.com,
+	yhs@fb.com,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH] net: Fix the gso BUG_ON that treat the skb which head_frag is true as non head_frag
+Date: Fri, 17 May 2024 21:51:40 +0800
+Message-Id: <66464991ac8ea_54e932947a@willemb.c.googlers.com.notmuch>
+X-Mailer: git-send-email 2.32.1 (Apple Git-133)
+In-Reply-To: <20240515144313.61680-1-dracodingfly@gmail.com>
+References: <20240515144313.61680-1-dracodingfly@gmail.com>
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46]) (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits)) (No client certificate requested) by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B5B145A06; Thu, 16 May 2024 17:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6a3652a74f9so3484026d6.2; Thu, 16 May 2024 10:59:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20230601; t=1715882386; x=1716487186; darn=vger.kernel.org; h=content-transfer-encoding:mime-version:subject:references :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date :message-id:reply-to; bh=c2+WnzvsrG3q05AgFPxDjhS97HlYQRIW0WgMF8TeUeo=; b=FR67lSmG+viUYDkDT6xwHR5ayK1pQRZdqwHJSGA1mbsI4DXrTSYKOD7mo7I8zY8Yxj CEEP8IPKSj9ZpVy3Os1nqjSeMJAy1B+FIGhYT2gmpDlUrqDCOfdSsTWQdh3xMMlj7NMw prFXeiU57uAjcN/osBgLfS32XXZ0ZG8kui/fcD5rsSYANXA64uH/x3rDYNYDeQsvG9de G8MMtpIr1uiST4ACbansycEzu4Xv0PLnRXl1bCRZ7tMEUeyXW98Sb6JR04bMAu+XYAoV /gy/Ph2VyMA5VMSdZmGhY/b2NbLl+0bmiOyZgDfO5mXvi3QnLJ2bJkA1z+GzdbKiZ0Z7 pBkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXtkhtjcGgA2shL+FGFbrPX8lAbsRYK6do47tumH6KpqM9/QcWOffw7PpajU4QEUBUcs8oSFJdflvOagMyh1kzl7hXKtQvjg5NmTKYEaJziWYiDJMXzz5cdn4c/XVrKrVJY
+X-Received: by 2002:a05:6214:5a08:b0:6a0:b594:177e with SMTP id 6a1803df08f44-6a16825a4b1mr207278616d6.57.1715882386314; Thu, 16 May 2024 10:59:46 -0700 (PDT)
+Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112]) by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f187c47sm77551616d6.48.2024.05.16.10.59.45 (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256); Thu, 16 May 2024 10:59:45 -0700 (PDT)
+Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 
-The commit 861e8086029e ("e1000e: move force SMBUS from enable ulp
-function to avoid PHY loss issue") introduces a regression on
-PCH_MTP_I219_LM18 (PCIID: 0x8086550A). Without the referred commit, the
-ethernet works well after suspend and resume, but after applying the
-commit, the ethernet couldn't work anymore after the resume and the
-dmesg shows that the NIC link changes to 10Mbps (1000Mbps originally):
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 
-    [   43.305084] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Up 10 Mbps Full Duplex, Flow Control: Rx/Tx
+> dracoding wrote:
+> > From: Fred Li <dracodingfly@gmail.com>
+> > 
+> > The crashed kernel version is 5.16.20, and I have not test this patch
+> > because I dont find a way to reproduce it, and the mailine may be
+> > has the same problem.
+> 
+> That is a pretty old kernel.
+> 
+> There has been work in this space in the meantime. Such as commit
+> 3dcbdb134f32 ("net: gso: Fix skb_segment splat when splitting gso_size
+> mangled skb having linear-headed frag_list") or commit 9e4b7a99a03a
+> ("net: gso: fix panic on frag_list with mixed head alloc types").
 
-Without the commit, the force SMBUS code will not be executed if
-"return 0" or "goto out" is executed in the enable_ulp(), and in my
-case, the "goto out" is executed since FWSM_FW_VALID is set. But after
-applying the commit, the force SMBUS code will be ran unconditionally.
-
-Here move the force SMBUS code back to enable_ulp() and put it
-immediately ahead of hw->phy.ops.release(hw), this could allow the
-longest settling time as possible for interface in this function and
-doesn't change the original code logic.
-
-The issue was found on a Lenovo laptop with the ethernet hw as below:
-00:1f.6 Ethernet controller [0200]: Intel Corporation Device [8086:550a]
-(rev 20).
-
-And this patch is verified (cable plug and unplug, system suspend
-and resume) on Lenovo laptops with ethernet hw: [8086:550a],
-[8086:550b], [8086:15bb], [8086:15be], [8086:1a1f], [8086:1a1c] and
-[8086:0dc7].
-
-Fixes: 861e8086029e ("e1000e: move force SMBUS from enable ulp function to avoid PHY loss issue")
-Signed-off-by: Hui Wang <hui.wang@canonical.com>
-Acked-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
-In the v3:
-addressed Paul's comment about commit header,
- - Change CH_MTP_I219_LM18 to PCH_MTP_I219_LM18
- - Change Link to link
- - Add a blank line and four spaces indent for [   43.305084] e1000e 0000:00:1f.6
- - Change immediate to immediately
- - Add system info about reproduced the issue and verified the fix
-
- drivers/net/ethernet/intel/e1000e/ich8lan.c | 22 +++++++++++++++++++++
- drivers/net/ethernet/intel/e1000e/netdev.c  | 18 -----------------
- 2 files changed, 22 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-index f9e94be36e97..2e98a2a0bead 100644
---- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
-+++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-@@ -1225,6 +1225,28 @@ s32 e1000_enable_ulp_lpt_lp(struct e1000_hw *hw, bool to_sx)
- 	}
+The mainline kernel is using the commit 9e4b7a99a03a("net: gso: fix panic
+on frag_list with mixed head alloc types") version, but it not work for me.
+It disable NETIF_F_SG only if it has non head_frag skb.I will send a test
+case which will cause the system crash, also in the kernel 6.6.8.
  
- release:
-+	/* Switching PHY interface always returns MDI error
-+	 * so disable retry mechanism to avoid wasting time
-+	 */
-+	e1000e_disable_phy_retry(hw);
-+
-+	/* Force SMBus mode in PHY */
-+	ret_val = e1000_read_phy_reg_hv_locked(hw, CV_SMB_CTRL, &phy_reg);
-+	if (ret_val) {
-+		e1000e_enable_phy_retry(hw);
-+		hw->phy.ops.release(hw);
-+		goto out;
-+	}
-+	phy_reg |= CV_SMB_CTRL_FORCE_SMBUS;
-+	e1000_write_phy_reg_hv_locked(hw, CV_SMB_CTRL, phy_reg);
-+
-+	e1000e_enable_phy_retry(hw);
-+
-+	/* Force SMBus mode in MAC */
-+	mac_reg = er32(CTRL_EXT);
-+	mac_reg |= E1000_CTRL_EXT_FORCE_SMBUS;
-+	ew32(CTRL_EXT, mac_reg);
-+
- 	hw->phy.ops.release(hw);
- out:
- 	if (ret_val)
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index 3692fce20195..cc8c531ec3df 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -6623,7 +6623,6 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
- 	struct e1000_hw *hw = &adapter->hw;
- 	u32 ctrl, ctrl_ext, rctl, status, wufc;
- 	int retval = 0;
--	u16 smb_ctrl;
- 
- 	/* Runtime suspend should only enable wakeup for link changes */
- 	if (runtime)
-@@ -6697,23 +6696,6 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
- 			if (retval)
- 				return retval;
- 		}
--
--		/* Force SMBUS to allow WOL */
--		/* Switching PHY interface always returns MDI error
--		 * so disable retry mechanism to avoid wasting time
--		 */
--		e1000e_disable_phy_retry(hw);
--
--		e1e_rphy(hw, CV_SMB_CTRL, &smb_ctrl);
--		smb_ctrl |= CV_SMB_CTRL_FORCE_SMBUS;
--		e1e_wphy(hw, CV_SMB_CTRL, smb_ctrl);
--
--		e1000e_enable_phy_retry(hw);
--
--		/* Force SMBus mode in MAC */
--		ctrl_ext = er32(CTRL_EXT);
--		ctrl_ext |= E1000_CTRL_EXT_FORCE_SMBUS;
--		ew32(CTRL_EXT, ctrl_ext);
- 	}
- 
- 	/* Ensure that the appropriate bits are set in LPI_CTRL
--- 
-2.34.1
-
 
