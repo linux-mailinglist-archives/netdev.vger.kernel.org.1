@@ -1,166 +1,222 @@
-Return-Path: <netdev+bounces-97012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88CB98C8B27
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 19:37:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6401A8C8BB8
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 19:55:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40CF4281CAE
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:37:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E874A1F26F1F
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754C513E3EB;
-	Fri, 17 May 2024 17:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B371213FD81;
+	Fri, 17 May 2024 17:42:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="emn3CkST"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NeKgtU4L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B50213E028;
-	Fri, 17 May 2024 17:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B28413DDB8
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 17:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715967401; cv=none; b=VGD+W1XxUso2VlvuOvz4lxOKEOG1+CgMdYH21RRFwrGzncpE6uX2rvfoTeeEHPH29OY+v7d//yMlX7Zpm1LmdWg/0Q0Ow6NTNHQM5w2kDcyPbB/vgn1f05c54oSM9ndNq8DwMOIyRgbeC12qwPOBes4JNFpurb5I1nclEbQAOg4=
+	t=1715967725; cv=none; b=IzvpELaUu21FH2L9TmN3IbsXZwaO5EAgkJ8xMEniEm/h5gCq7yJOdMu8pKfxqs1Clq+ibo+V1mLXK881EiUEOCOUZxwT0Kowk3PcpUOq2/EcvrA0wVwmq/2o59XAbRNQlyhPD1+JWsu/kWrwJWrc1dM8zq6i6UsYxi16gYF4FcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715967401; c=relaxed/simple;
-	bh=l7K75G8hEZf6Nf3Gd+zb5LouEwarRLauIdJPMoFivlA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HHDU2a+DAWtPRcmt4C6PNdPbseXKcMelAX2wzvQMYCRqxHPakEdRVvQff3WPguwpodBLpV7fPbdCvZ94NfW0WSvQDuc0Gmbi/M37I2hQcmH6pFp7wlAmn5n+co7hQSDkGkpVMKwa0McBxDQvO/xYNevxFiLG7sf4OWnflrwmeZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=emn3CkST; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	s=arc-20240116; t=1715967725; c=relaxed/simple;
+	bh=5QeAGVqJ7W3aoZIE++lakURa7P8gNVoR3o0ogkSFHoo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZFZpEwlmA/lcx2WjSgb15IoXxE+QDduZmoNdfUH1bWM50oXrDb5Trwi30C41zy0m6GS36YdTwIqo+dCL80HoyVOg9ESop95CIWI88SehogGynPR9Z+G9N1rl417zNUV2Fr3nMpNXxCUwWwV8kBwDGDuQCfsvf4yRiz7iUDnE0Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NeKgtU4L; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1ee954e0aa6so16680785ad.3;
-        Fri, 17 May 2024 10:36:39 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-572e8028e0cso5215359a12.3
+        for <netdev@vger.kernel.org>; Fri, 17 May 2024 10:42:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715967399; x=1716572199; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rzMfxbAB8QJEcJdIySGROcUOqAKXWq8nqUdcExbi1Zk=;
-        b=emn3CkSTmGwb7Ev6REZ9Z3U3XD4Y+jPjdTTKRrd1xunPWgI+cGM6iP3TELOI5V8ATa
-         VbiGe+xcAirEDS5iorMu2B+VEBPivgYYBJAFyyk/dtcE+BdDAEcBR/OSDeMAia+M02aV
-         JtJr53ZjOlMBaf51DPBBJSXIlVEj8/ta7pTQaBfTGVSwemtnu9tMYnJUuHNl2FkBsWa2
-         RY29x4C0oql3h5xd/BScqyiM9KMAjCxcwhA5cszmGMdkeAyAQyWwOl4SEGtmK+Cfk17e
-         ZUmUwjzXpEuOreMImVvNFBtQTMD0YnZzxGLGWYMvA88gK3n/MpOcCwIl6WzZ4yooz3JS
-         JzXA==
+        d=gmail.com; s=20230601; t=1715967721; x=1716572521; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y4rYaEngacx14vokUawF+ysGnO+JctpmOl20s+EzcGg=;
+        b=NeKgtU4LOHU0+5UnoSbJPcg7ZfalkWKJM/m3caZaU1YRvdH9pGju6usB0eAmtzw3qv
+         YBLg2rgDMszeD5vWuNJbnvZrRpZOG1gCPb9bBY6hIx6cg8q8BHtAtyVc88YMxbhh6ZUG
+         2brhrvQCoY4mCwqCnRheRheRWIJ2yHGyjWR6y0Mw2VjgqOQlpLXFFdhtRACGRV8qmekD
+         T/XXUQrOWakiOyfE2UDD4XH6bH20bXeB2wrx+MIdW7YAC0j08y4nILcaOF7V3eBrWNnG
+         ucsxMpmTKPNsnhcgR9XDnQTIotU1hKhCQ2Nk8SFoqB/hs1A76gWX9cYJUDIs4X3Fd/Ci
+         1lew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715967399; x=1716572199;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1715967721; x=1716572521;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rzMfxbAB8QJEcJdIySGROcUOqAKXWq8nqUdcExbi1Zk=;
-        b=tRaBInC5CBZVJiTyNhPeAMF0Mv8ZyhDngT/Ke4lsBz6dnWLTVbrxiYmDGKR3474tHa
-         Jw0S2Pd1w9vB5TttyIKUZ3vkElFqN8D82iwb6kL7vCXbWz+ZO+kOgSp2q2lMeYG13wJ3
-         Pd4jLhwNb/5j//D5V0kA6eEHTeRPM+KlHNN2ZXDOKj2sqnyMigDYM3Yyxzog0n99DW50
-         DbdwYUgj+mBGDnl1Wi3MfB/KObA9dlYM5hJ0VYDOGEqfhhsM9xkE6J3r09MMgCufkcSJ
-         MFPDLIL9Qyg8pNl52R6ymP0RQyefKT1UiQ+E7Y0jutAqKo/SZ6YeNcoI1ileC9aAa4W0
-         uyJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUeikZ+5A7mGmqeVlRxUOHe3Z4BVx7A6SdRIJ9KlcdOS9QSNvCDsre7aHGEDTt/hTkAM3qO0uM2xeP+jtEHZh5JsSeK9A/+tFrYQA1Gt+sOL3ewNO6LlYK9y7DD7mpAtqpfD7DjXB75ufvKHVU6kM3a/elOuYDfutBUvo4a9bI4BCb2VDcyzEXzDexUc9t0in/T8C2XOhPKn7wWpdtpjhPEZSUvfBbj5JIuV5SOt4ozapoAEBa6p9eoNzUqVSV+FTR0IAeRERSnOL6XqGk495fk7J/QsGArESB7IkyWGLl2UfJVr+STIxS8eHdJJiLcNAzso4UUQBPch6E8dfNENIPvXxQAsave+ZjX9aqXjIT96Hz/aHminfcbngd99gozkR8JcHcG37i5SZidszxbbVcf9ugBd6iBJBSvP3YPM6hIvwhrKlXpceN2VyhqUDGta0Y2tQ8Y92YBThBW9tUwaEcwpwLLtnkcoENUdMSzNo1PisKVaRS0s0oNoAWHaeTm033idWAzW8Z6AMcGqpdUZef30iZpnny7DOCCRdx6bdPIPfc8m8lwMbo6DXkdKIQnaqlplZsK6CLKNgppIYSJ7U793bTJTH44UOdcWLKNUTDeK1XJMU+un4iEAjTM4sbk5xfiplNYftumz3+FD+ZUcLZWXKJBMvMx7eT5NA18jT46CIW4oBwdkZsngjutYGEYxbL/3oE5mRVrHB1dgdQB0YljgIrh2vfVWMnSdGUfmhbsUn3exZybXMRR9PJNk7TMh60ZKjaGM3YyEgvEgQVWpZ4sxK1fHIUzkaJHi56sH9Vb1HRQuX6pNOHreK/nEi3g6aW7gIA7T1ww4N6bLeNtZRSJMBfQ7RJIfpa4nB66EJI9p+xXnabbY1FucmTW2fAhf83tzqzRTLEML3+RBqx6xPn5uR2l/K2m0V/YFHhfHKN5kNYIOcc0Y+KpHUPL2A==
-X-Gm-Message-State: AOJu0YyVJKJDHI54++5KLrCtRmLug9WO1yHYT9xtbae1yHeJBFY7OAOO
-	4meyTffhXTst2nI7rjVckVaPWZ7pOCdtS8zLnwvw9MCn/zh6jfsS
-X-Google-Smtp-Source: AGHT+IHJ9PZtASiLb9HJkYrHy1DRhdQlVEuKbRr0NYIRv4Tx+av91BIA0wx1gBcIQQlm9sd2COIQnQ==
-X-Received: by 2002:a17:90a:9606:b0:2b9:a299:928e with SMTP id 98e67ed59e1d1-2b9a29994c9mr10436893a91.24.1715967398710;
-        Fri, 17 May 2024 10:36:38 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b67105666csm15749258a91.8.2024.05.17.10.36.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 May 2024 10:36:38 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Fri, 17 May 2024 10:36:37 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Linux trace kernel <linux-trace-kernel@vger.kernel.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-	freedreno@lists.freedesktop.org, virtualization@lists.linux.dev,
-	linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org,
-	iommu@lists.linux.dev, linux-tegra@vger.kernel.org,
-	netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
-	ath11k@lists.infradead.org, ath12k@lists.infradead.org,
-	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
-	linux-usb@vger.kernel.org, linux-bcachefs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
-	linux-cifs@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-edac@vger.kernel.org, selinux@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-hwmon@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-sound@vger.kernel.org,
-	bpf@vger.kernel.org, linux-wpan@vger.kernel.org,
-	dev@openvswitch.org, linux-s390@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	Julia Lawall <Julia.Lawall@inria.fr>
-Subject: Re: [PATCH] tracing/treewide: Remove second parameter of
- __assign_str()
-Message-ID: <5080f4c5-e0b3-4c2e-9732-f673d7e6ca66@roeck-us.net>
-References: <20240516133454.681ba6a0@rorschach.local.home>
+        bh=Y4rYaEngacx14vokUawF+ysGnO+JctpmOl20s+EzcGg=;
+        b=gtQl5NE2nRgHmE6Q+gYC3fg/Mv3oUga/m0X4kfX9IQtceVZcSL4dmaOHwAiXLOfK0I
+         ung6gniQJGH8NUX1LjgSQRBPHXX5+FYNXWYdtzE50XfP6ybKdex0M/Jj7Kzl+KOHIpqd
+         N4MknCesUR9e4+0xjZ1bzWOwsgPfCSKUb9wppq46mBDoYa3tkGTRW2aeAmEMZGu30d0G
+         EJcI3XGCKBztin4gwXTv3uGdknhHHRjBHt3yJAbdFwlBO3Eli5bOlzTLBLY0KJr9cgek
+         xGfGca/gwBAaiUiWgIxaMx9F4r6ESJypsoiwfycolVIrhXLsFkvl/zjgR/56QWzEurgO
+         EH0g==
+X-Forwarded-Encrypted: i=1; AJvYcCWi/nBkLG6h4HNY/ZfB7Py8OY4rjmc/f+7F3slEQekM6z63mNeGfJyNO/EaetOnhQqlpKriUWJnCK+/9JUWc42PNcr+mFVY
+X-Gm-Message-State: AOJu0YxGkEq0P926eKVnPU8B0BVJgU220bHesIQqDzdT/zEbzzHdMbEW
+	VGT4IVmbDiCpFnDD6mZY8y3gfoqAve2grMxArWthhtrDf8CBDN+BBgWEvw8h2iYtug3rAv+vXMs
+	xbcZMZs6sAzoVPX4VsYpJkd62MwQ=
+X-Google-Smtp-Source: AGHT+IFZqMuqnIEoTFqMm1xpapvpyg53lXzWB6Esl5KuDi5IJSnYymac65uAq4iSl9Hqs3gbmDneU55IxZa44NDArzQ=
+X-Received: by 2002:a17:907:3203:b0:a59:b8e2:a0c5 with SMTP id
+ a640c23a62f3a-a5a2d66b509mr1971177666b.51.1715967720785; Fri, 17 May 2024
+ 10:42:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240516133454.681ba6a0@rorschach.local.home>
+References: <20240517085031.18896-1-kerneljasonxing@gmail.com> <CADVnQymvBSUFcc307N_geXgosJgnrx4nziFcpnX-=jU7PronwA@mail.gmail.com>
+In-Reply-To: <CADVnQymvBSUFcc307N_geXgosJgnrx4nziFcpnX-=jU7PronwA@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 18 May 2024 01:41:23 +0800
+Message-ID: <CAL+tcoDbB2if_=h7XSRU9_i2G=xT+fqmxCU-Mhe438PYcqxj-w@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] tcp: break the limitation of initial receive window
+To: Neal Cardwell <ncardwell@google.com>
+Cc: edumazet@google.com, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, davem@davemloft.net, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 16, 2024 at 01:34:54PM -0400, Steven Rostedt wrote:
-> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
-> 
-> [
->    This is a treewide change. I will likely re-create this patch again in
->    the second week of the merge window of v6.10 and submit it then. Hoping
->    to keep the conflicts that it will cause to a minimum.
-> ]
-> 
-> With the rework of how the __string() handles dynamic strings where it
-> saves off the source string in field in the helper structure[1], the
-> assignment of that value to the trace event field is stored in the helper
-> value and does not need to be passed in again.
-> 
-> This means that with:
-> 
->   __string(field, mystring)
-> 
-> Which use to be assigned with __assign_str(field, mystring), no longer
-> needs the second parameter and it is unused. With this, __assign_str()
-> will now only get a single parameter.
-> 
-> There's over 700 users of __assign_str() and because coccinelle does not
-> handle the TRACE_EVENT() macro I ended up using the following sed script:
-> 
->   git grep -l __assign_str | while read a ; do
->       sed -e 's/\(__assign_str([^,]*[^ ,]\) *,[^;]*/\1)/' $a > /tmp/test-file;
->       mv /tmp/test-file $a;
->   done
-> 
-> I then searched for __assign_str() that did not end with ';' as those
-> were multi line assignments that the sed script above would fail to catch.
-> 
+On Fri, May 17, 2024 at 10:42=E2=80=AFPM Neal Cardwell <ncardwell@google.co=
+m> wrote:
+>
+> On Fri, May 17, 2024 at 4:50=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Since in 2018 one commit a337531b942b ("tcp: up initial rmem to 128KB a=
+nd
+> > SYN rwin to around 64KB") limited received window within 65535, most CD=
+N
+> > team would not benefit from this change because they cannot have a larg=
+e
+> > window to receive a big packet one time especially in long RTT.
+> >
+> > According to RFC 7323, it says:
+> >   "The maximum receive window, and therefore the scale factor, is
+> >    determined by the maximum receive buffer space."
+> >
+> > So we can get rid of this 64k limitation and let the window be tunable =
+if
+> > the user wants to do it within the control of buffer space. Then many
+> > companies, I believe, can have the same behaviour as old days. Besides,
+> > there are many papers conducting various interesting experiments which
+> > have something to do with this window and show good outputs in some cas=
+es.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  net/ipv4/tcp_output.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> > index 95caf8aaa8be..95618d0e78e4 100644
+> > --- a/net/ipv4/tcp_output.c
+> > +++ b/net/ipv4/tcp_output.c
+> > @@ -232,7 +232,7 @@ void tcp_select_initial_window(const struct sock *s=
+k, int __space, __u32 mss,
+> >         if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_workaround_signed_w=
+indows))
+> >                 (*rcv_wnd) =3D min(space, MAX_TCP_WINDOW);
+> >         else
+> > -               (*rcv_wnd) =3D min_t(u32, space, U16_MAX);
+> > +               (*rcv_wnd) =3D space;
+>
+> Hmm, has this patch been tested? This doesn't look like it would work.
 
-Building csky:allmodconfig (and others) ... failed
---------------
-Error log:
-In file included from include/trace/trace_events.h:419,
-                 from include/trace/define_trace.h:102,
-                 from drivers/cxl/core/trace.h:737,
-                 from drivers/cxl/core/trace.c:8:
-drivers/cxl/core/./trace.h:383:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
+Hello Neal,
 
-This is with the patch applied on top of v6.9-8410-gff2632d7d08e.
-So far that seems to be the only build failure.
-Introduced with commit 6aec00139d3a8 ("cxl/core: Add region info to
-cxl_general_media and cxl_dram events"). Guess we'll see more of those
-towards the end of the commit window.
+Thanks for the comment.
 
-Guenter
+Sure, I provided such a patch a few months ago which has been tested
+in production for the customers.
+
+One example of using a much bigger initial receive window:
+client   ---window=3D65535---> server
+client   <---window=3D14600----  server
+client   ---window=3D175616---> server
+
+Then the client could send more data than before in fewer rtt.
+
+Above is the output of tcpdump.
+
+Oh, I just found a similar case:
+https://lore.kernel.org/all/20220213040545.365600-1-tilan7663@gmail.com/
+
+Before this, I always believed I'm not the only one who had such an issue.
+
+>
+> Please note that RFC 7323 says in
+> https://datatracker.ietf.org/doc/html/rfc7323#section-2.2 :
+>
+>    The window field in a segment where the SYN bit is set (i.e., a <SYN>
+>    or <SYN,ACK>) MUST NOT be scaled.
+>
+> Since the receive window field in a SYN is unscaled, that means the
+> TCP wire protocol has no way to convey a receive window in the SYN
+> that is bigger than 64KBytes.
+>
+> That is why this code places a limit of U16_MAX on the value here.
+>
+> If you want to advertise a bigger receive window in the SYN, you'll
+
+No. It's not my original intention.
+
+For SYN packet itself is limited in the __tcp_transmit_skb() as below:
+
+    th->window      =3D htons(min(tp->rcv_wnd, 65535U));
+
+> need to define a new TCP option type, and write an IETF Internet Draft
+> and/or RFC standardizing the new option.
+>
+> If you would like to, instead, submit a patch with a comment
+> explaining that this U16_MAX limit is inherent in the RFC 7323 wire
+> protocol specification, that could make sense.
+
+I quoted from that link:
+--------
+    I'm not trying to make the sender to send more than 64Kib in the
+first RTT. The change will only make the sender to send more starting
+on the second RTT(after first ack received on the data). Instead of
+having the rcv_wnd to grow from 64Kib, the rcv_wnd can start from a
+much larger base value.
+
+    Without the patch:
+
+    RTT:                                1,                   2,
+    3,  ...
+    rcv_wnd:                64KiB,        192KiB,         576KiB,  ...
+
+    With the patch (assume rcv_wnd is set to 512KiB):
+
+    RTT:                                1,                    2,
+     3,   ...
+   rcv_wnd:                64KiB,    1.536MiB,    4.608MiB,  ...
+--------
+
+Another quotation from the paper [1] which has been deployed in Yahoo:
+"By increasing this ICW, small objects stand to be transferred in
+fewer RTTs, which when compounded across all objects on a page can cut
+down the total page load time significantly.
+...
+Luckily, on popular operating systems (except Linux which has a much
+smaller receive window), the initial receive window is quite large
+(64KB-256KB), which would allow for utilizing a larger ICW"
+
+[1]: https://conferences.sigcomm.org/imc/2011/docs/p569.pdf
+
+Thanks,
+Jason
+
+>
+> best regards,
+> neal
 
