@@ -1,419 +1,229 @@
-Return-Path: <netdev+bounces-96869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5F168C8164
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:27:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32D858C816A
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:28:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08F601F22061
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:27:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97EE7B21092
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CE6217756;
-	Fri, 17 May 2024 07:27:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0CA1755A;
+	Fri, 17 May 2024 07:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="BKB5esPM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h/nxxfvV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48FC0171BA
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 07:27:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715930845; cv=none; b=r7BwV6bzMBl24QqaOuNl93Yz2T6YIruJ1i76vMdagxEmLMVD8uTlyEk2FTbelP51hcdZacZBwXsAGaS9Ip/5sfc2GoPCiFHj+8PAgxn9agnCZdisv15zyYZOD4QvL3GtvGYReWpu3U8rYiMLUeW5ymobeZjfbIwgPi8hDsQs4YA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715930845; c=relaxed/simple;
-	bh=RoTjP1lAKKQthfI95ybYQcDv9MmIhNspMO0xKgYegwY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VCe/xJAaMSinscZ9R+Ko0lqE+mVYKHz14tyUONQ/OULF/jL5iWlM1kuC8EHvAP7VU4KspdE5xvlsy00pzcz3PNMwKMcloaVKtHJ13STu9R8/6e2lphyrOHxPu9uvCTl3njCgcz3PmqiOxPSNjnkfjZzheaFpTflcRjZph1mcse4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=BKB5esPM; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6f457853950so705918b3a.0
-        for <netdev@vger.kernel.org>; Fri, 17 May 2024 00:27:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1715930841; x=1716535641; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QpkUquLcJq6T79Qn3SFHtFMU83iODzpP8Vyqkv9V9do=;
-        b=BKB5esPMI6j+xQMKjoqbAJe6ceAxDEECwdh4Mejti3WU01MmIciFQe8KPJbhFOPuVF
-         78PhDcVGxR6rh10Hp6Bj7tQTn0fuhHUUGGFl+npos+3pdgVUorv3mRZnxBfL76WeK4wV
-         QGB45rQ7faJz6RGg9ilbuiYgGTBpNmg12RY4NrG2lCe6FGFjyiFaWyddAqIUKHEEqvOw
-         dKjKhzRsFq8HgE8DXQWOkEZYP0C0AEEjgHjgAU/VRsfLQb9H1069RJ27oHuLLLBqOuHx
-         pleMRQPDzSBzwCVnvfUjOC/cUrfwV1WHtQ1pcpFFT4EdCMG2c35hZNVBP+asLhhj5eEC
-         CdDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715930841; x=1716535641;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QpkUquLcJq6T79Qn3SFHtFMU83iODzpP8Vyqkv9V9do=;
-        b=CT5hzcuvlGYbg7KYw/SMHHQCNzh1qx+F06+0b7K4KHjeqgvSVMErF7xMTEVa4Cyq0A
-         XJsoYI8TCiTuFeoDqb2+Qhn2NhWjscFfGFl9Ec0iRptoopR5n+vPb+5bPYmQf6CTzhis
-         7W2IAt3auZM0tInRt3amDMbgM5Hd6QGlxNEClGiIvV1DaCaBoWBtstA41izhYeMVO4DZ
-         M5mj/5YWQxt8tLGPK0C/73AsONNjpVa6U9DkPnHzKCgX9mP/0o3kjhoJUygYwMZ5Yg9d
-         xqRT80kmkjZVkGFnWmnclXtZSCDlsertMRQBTfajzWbRLL10nYLRVFic/irTcbra7ymn
-         w3mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU76y/+YYEniQAroCn9rtWxFNtWA531OVo8HfzeHwhHUyidSkj0qSozDK/6c1idROTXh/K//1/2U+uPR9MjGqEAjULIn2xG
-X-Gm-Message-State: AOJu0YzOSfBypwSCsuw69cvdiFJ7LTgF6K3pwT65HZ0ufIKboAOwSBKd
-	JKiHzLn/xQiB4qGFJ/W9+8PzxRd35V3TH9ls9yb1PtwOaycj0DmKGGQnYI+HeJ0=
-X-Google-Smtp-Source: AGHT+IFYfkReq3qTdal5aWvWN6d8Yh92XZktlWipnwnGwiPQXzV2gBrKeGqo7Nary0FgR8seqEkX4A==
-X-Received: by 2002:a05:6a20:a115:b0:1ac:3d3c:c1e7 with SMTP id adf61e73a8af0-1afd142f92bmr40384050637.12.1715930841398;
-        Fri, 17 May 2024 00:27:21 -0700 (PDT)
-Received: from [10.84.154.38] ([203.208.167.151])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6340b862572sm12750732a12.37.2024.05.17.00.27.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 May 2024 00:27:21 -0700 (PDT)
-Message-ID: <d66d58f1-219e-450a-91fc-bd08337db77d@bytedance.com>
-Date: Fri, 17 May 2024 15:27:11 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13360171CD
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 07:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715930910; cv=fail; b=fy9tovRTiJXemZqFCie90RBUylZRHU4IIiQvpP5lvP1Gj3DRD77sF8bvjLKoqT2+BPz+wyEW5VZnMOfHU+ETBwYAyxo1XErxcNiykAgtmSSyOJ+h7TimoaU4aMWvRWRtj4svbdGC6GHYY35d/SmKU19OXWa/YkAu3qOW277/gkQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715930910; c=relaxed/simple;
+	bh=Z1PCBboTgbaAxcGGV/p/egaTdajgk31Vs9QdWfKGvmQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Hl3PV3GwshDuCM6Ys+seBfwiTNmzWNwsnzpjEnDyXhqWSq3TpnZA+YnACSBPJEhj66PZocFo2Hj06AJLvmCeuFB6jc8eKYzFUnkjKgUmIEynWkxElfioRe5IDCV8DXg51zz0jALvKwIbxug2MaAle+5fZPv5zDhW7lZUloaD23g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h/nxxfvV; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715930909; x=1747466909;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Z1PCBboTgbaAxcGGV/p/egaTdajgk31Vs9QdWfKGvmQ=;
+  b=h/nxxfvVAEvTXU0dLPAEKfD8+fuDUWsLJPYw5oibap4YeC7ylzqTtEu+
+   oXjAjHJ9A9vUhmQwvow9cKi1MI3JcwSsXyPupYzhMWWSDss0rsoRHrlys
+   bdDluSU59pjcbanPrJTBL4+dq8ih40DZbM7pbaSVZ3ELwAqW7+B8Fzp5s
+   7+brnjB4VqfZxa4afciS+JYFwf6nSVKLzvuqKQMvYklMo4BZ0nFt8jhV9
+   lnIB/tNE7hDgAPf+5MqOPSND5szFdC1BhEWo1tjzRWKVjsUVe7RrG0ss8
+   9BfYEkzMUsmiITTasr5PppFmciShcSsEJcOTUGHah24CmoU7+T4mtOU1G
+   g==;
+X-CSE-ConnectionGUID: xFh3joqtSY+3PwywvSeaTw==
+X-CSE-MsgGUID: XxSh3bQ6TAG6QmP05sWj2Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="11933173"
+X-IronPort-AV: E=Sophos;i="6.08,167,1712646000"; 
+   d="scan'208";a="11933173"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2024 00:28:28 -0700
+X-CSE-ConnectionGUID: RIybzDubQ26GK+uuXm/plA==
+X-CSE-MsgGUID: N8UMCyCeSJKR86Rc6bMTog==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,167,1712646000"; 
+   d="scan'208";a="32303343"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 May 2024 00:28:28 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 17 May 2024 00:28:27 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 17 May 2024 00:28:27 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 17 May 2024 00:28:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=K1Q3gdRq9uOhH2os21apytV19oMLjC7xEjOypmGSPnv0xGyRrIKj+tL6GdtP/c810FcjURzrB0MhPAZkTFDvvyEKfj7A1MAgE9FhiBfYhpD67V4oT0yYkOCep4P/IYynU8r2j63Ex5gRgix16EiXy/EUMBFouFmYbKkAJjTUN3aYvpMyfqkBqCR6/boBcmWF9WvMUbIrDaNe+6XuXwnlXo3Y4o1np3D4ejrazD+hDHFrUBsAAUilwmusAwin4i5xIie/HQChGkPlx7wS/KPSgcMX49eG7sKnIgT8zAKFRKGcI2UMJQcjzEJ1lwQt8Vw4EPeDfoOdBKdyM3uCxquV1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CrKVp2cN7wyoycKE5j0cvZPPhWDGnJJAfJ+jhb0NmQc=;
+ b=bfHcKR11+cBhrImukTlirDS7Xiyqk78Xo65wQaG02hNC8c9FsFURKmWTOnl4dITjyaM7uv5lvsXdeIdRg+HY9UN1hdVeqQDNxP62pj8mPs5GihfskfTTpbxUC0xfKPqOdxZlQW9C70f4l0Wq5aak16UazzqA2QDWauFZmfAtBhHx59Rx/Qryrseed/uPM8FvI64uWAQixcAxSbpkZzc+VgUpBQgk2FqUyMboUuAlT+qjMKVC+vNHkGPJq0NjInbroc7QMkKgRGyFiYdr27Onl/vpFNJlTiJceNpsRA2rxryc6BigtLMHWkYRQZGsxUbOeFhq1o9sJDeYAY+G+GeH1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
+ by CO1PR11MB5156.namprd11.prod.outlook.com (2603:10b6:303:94::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.28; Fri, 17 May
+ 2024 07:28:26 +0000
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4f97:ad9d:79a9:899f]) by CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4f97:ad9d:79a9:899f%6]) with mapi id 15.20.7544.041; Fri, 17 May 2024
+ 07:28:26 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: "Kolacinski, Karol" <karol.kolacinski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "Kolacinski, Karol"
+	<karol.kolacinski@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH v10 iwl-next 01/12] ice: Introduce
+ ice_ptp_hw struct
+Thread-Topic: [Intel-wired-lan] [PATCH v10 iwl-next 01/12] ice: Introduce
+ ice_ptp_hw struct
+Thread-Index: AQHalkysnfYLcV3t0UOO04mx8YpJg7GbKp/Q
+Date: Fri, 17 May 2024 07:28:25 +0000
+Message-ID: <CYYPR11MB8429C9784DED6315F7F2912ABDEE2@CYYPR11MB8429.namprd11.prod.outlook.com>
+References: <20240424133542.113933-16-karol.kolacinski@intel.com>
+In-Reply-To: <20240424133542.113933-16-karol.kolacinski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|CO1PR11MB5156:EE_
+x-ms-office365-filtering-correlation-id: 42fcc4da-a2f8-46cc-fb5f-08dc7642f0d4
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|376005|366007|1800799015|38070700009;
+x-microsoft-antispam-message-info: =?us-ascii?Q?hM6hoGL7YPGZjFeMOk/JklhJP8s9WDcqHRVsEPhb5v6Z2b/hWxkXGXyOshsa?=
+ =?us-ascii?Q?sqfPnk6CZUNnz3y6GKI3UE6rA762S5exwM6gpQteDXa+KpGSHtgHmGi5+sz2?=
+ =?us-ascii?Q?y+3GZckATIV326VQI6eAYXgIsFxUNN5ldEe7hMGcpenyDOvvQ9GIVPiA6hEl?=
+ =?us-ascii?Q?MH/dJ6mBVgH7CFSX3uK/IE95XuW6EhFsvtdQrZ1guxM1gF/wNSaV4yREQLlu?=
+ =?us-ascii?Q?dH7Zr1GkZh2szW4RcLu7Jg4s1aGYJhvficSeD5Lrumjihh/NtvlEL8sLm2NZ?=
+ =?us-ascii?Q?Y/RXuK+JYFYfomjIv+qHsFXkFxQTbBP1PawKMp/39+QVXXtMJGfoAl2n8RJm?=
+ =?us-ascii?Q?UdlR/4CE+vxAn4pN9jLiWkpwLMfE7LzwWFoAdQWn9adkALKRWbnzTXLml0IN?=
+ =?us-ascii?Q?Tpq22UsutJYsteqqi89Ag/S3cken5KWHZMr9Me3wr0GibDW4BJRm5KauSeJJ?=
+ =?us-ascii?Q?exViHpvbDZ6zQ5rpISYM5qQ4fWIM8B3JW+DKqRhfjCRhXQgtIxeZjW/56stP?=
+ =?us-ascii?Q?NMCjilNlJ4CmwI60pK6vpBGcbOmRZ60YImv10OG+3hwxeDeth/Xr62c7DyMO?=
+ =?us-ascii?Q?BmsjVqaaeslmclKTqOsI5EBJOdoSJtQu12rIsPgleJWULK7rcukMMRhDiu08?=
+ =?us-ascii?Q?ABKz4o+0DbNkiVvSBgZOvxijspP1NSuJJmxEZ+mWvPhK/IeFDqkahb8iWbSM?=
+ =?us-ascii?Q?zYILp8EzSGVLGSz8x8qJCnnqGgSmBwdoe2zpE9yjsiRk/g66UbvmuiRsSPMD?=
+ =?us-ascii?Q?mlLDhgONs9197i41mCPy1mXbbmrVZEqfz55TWIzBc4l2ESaRHhW/AkKt8ZjL?=
+ =?us-ascii?Q?87YqhBo3megMDn7+RG/k9kh7HIT6rkLkMFWabVlFaX8iWTtBSsQ/p5gvjD3+?=
+ =?us-ascii?Q?jJpJjaChj0K4gmQvrW5IpNEp/b9evKKd2UiZ8MIEYzxJ7FHRYoHUD8D4EmTW?=
+ =?us-ascii?Q?pfAfowfAFnSKUq+mtTdYJAkN6MPCdzLk3jiOrHrcEQzzucn+ZDlNURz01dlV?=
+ =?us-ascii?Q?FraO3nGQnxkEh73ChAhfv6llDD/dyrGFWuXGbLg8qk7m7Quwj+eVCdph/43j?=
+ =?us-ascii?Q?YdeJAZMCiDoxANE1zFJid57EPZBUU262S4h9apA+Q+QK4qm1bVOsSkpcPh+3?=
+ =?us-ascii?Q?w0hcUgW4dSJz6DaBEFkHMmVq9ksj1TjgHaRh6amvX7IyD/WzwMKLMbNDPJ6y?=
+ =?us-ascii?Q?BF0+ft0vVadlKZW6Npefro+1nxY7r/9AhbSbjGDwDcxmSQ7fcJnyd8SbhjqP?=
+ =?us-ascii?Q?XnMvxyPlINuRHFlkBe1ubi6fxZvIwv22LHqFSvEWVCR8LA1zHogbT3+aV6nF?=
+ =?us-ascii?Q?rteqS32Bw8fZeTyOuUZUw9wD5d5Bt2ZH1PQmRkf89OFawA=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?5WLKiTZwFkqSXZ0xTG+QwgdDRhDsOIF0Ac50puUArE8rmCXPmOP/qDCtn3Ge?=
+ =?us-ascii?Q?fQUHdsOFEcn9952QRGx0ofpwxtmh+jz8nkk8NKqLW6DAjRMB+Kv/9uko8vIT?=
+ =?us-ascii?Q?YGJN5RGfv56VJFgic2aZoy+dey10E3ctqrX0FIf5YqCgkcKxdZU8YDafrj3y?=
+ =?us-ascii?Q?Rcjbgmy2XMpZJbwHg4WUbZUcNTvcHgliFbYwRz9CG2CZZV8i2IJyY8aQzBXY?=
+ =?us-ascii?Q?FkE86M9PG1HlLZDJAZEVRPUzp5yhBjwRJDBH9D+i0/OIcIAWmrZ02EPu1qV7?=
+ =?us-ascii?Q?V/waJB9BLTISKAp/lobP+igYI35JbQaut16bm3chBmhIfbPwITimIoQmP6TG?=
+ =?us-ascii?Q?cYWsJRaijuco2N+GUCifvODC59/1JGlpdD3I8f56E6SqR1o2TwOy1N+IEExX?=
+ =?us-ascii?Q?hDNsmu3uoCI12/H/J5CBiUU/NcqIXawrnvdRRrqSp28K7WS0Os9zNEWjpY6O?=
+ =?us-ascii?Q?mG0hnDLh0pd5PdAJ48m6ZtJ16z/TqIS3C84llPzvxFtETWjeIAeXQRB2JEMF?=
+ =?us-ascii?Q?M1OP5PrAyZvZYCT5rhsm6cqY3sttioxnGWTIMsuAoAUo24339MQEmY2eU+Zw?=
+ =?us-ascii?Q?KHo8tqRz8nok4o9xzID6RqTK3XQN7l+11EScBhpswfKUkJ4JlRNMwfqF2/n5?=
+ =?us-ascii?Q?kGKvJixEbZcywKFEndD/5N+e00QQ8u9fYkzS6rro+sHcUKqAEDEUNCZpDGtR?=
+ =?us-ascii?Q?fJmsBOohYZueuA668aW/X47CjNg0swTaEYGavfYGUkjOFT8ISrlHNCAvW7WR?=
+ =?us-ascii?Q?+8vr8gxZtOlBwsRXg9XiCDHJQ7nfIn4pvXk0SIN6b2EHNz+kNU2TdzNPNF/j?=
+ =?us-ascii?Q?TqukR4BokF0qSbxcxKfTXXonQfpA9OI0IOQTdBw/Med9cnvwjnHAm6Wfavuz?=
+ =?us-ascii?Q?eajWMkrneFYRStcLNSWe6jGvwzjpnOphDPetsIkIvlHt7M3UTBvIAJqzgVKW?=
+ =?us-ascii?Q?84fWagvV1XnSKp91gcnoQckD5/nqQnxw+H/qdioHz82MSETEpGkpwacisd8K?=
+ =?us-ascii?Q?XmIK6OB/YyWufw4Iz+31yfQknKWV5gENDLHif73XCmHWJyuLBXqdGFYtCGEv?=
+ =?us-ascii?Q?iNlTAprxD4tZDI42h8cMbAXrKWNKtROfYi9LLWsrJ+6xLr2L5076Ai7XwrTg?=
+ =?us-ascii?Q?Z9D3QL1N51DCE9WVhVWjnWNF7AU7gYg1Odg51CY1OCELVnsFPYRnjFD7dh3/?=
+ =?us-ascii?Q?5NPLoYhQzsRqKUhYCR1zwcikK0zh4KhUaaCkr8QsEKjSPlhn9rXFn/Udlok4?=
+ =?us-ascii?Q?rRI4PMkpzPWsMP5Xc3Pus4ptTlNXkLPISo1p7tAu7niJTGdX4w6cFf26d2sG?=
+ =?us-ascii?Q?JrbmSYKTESJRvx1LD6rm1ZXDUcRrhvwStMZpstQZkFTOkULid1UsgPE6tazf?=
+ =?us-ascii?Q?GzOoc0OV4Nzf9QMWEb8LAp0cVxVavbPdvcdFdg/Av4Rz14gUrlXVLwDeZKAR?=
+ =?us-ascii?Q?BQlWH/6kSvIbiW46NR0OPKXRPiTWwmnGQ4h15b1a+ucJlQZkooscb+8ZzArq?=
+ =?us-ascii?Q?7loBhjy7xk8kl5luak7vni4x1jhSvlUqcFTSuwQh2a56vOIMHXgsrSJf1fGo?=
+ =?us-ascii?Q?1UEz4WjfjjzUdwxqKoV35/3ycy0L36PFfDa6bYT4Jw+qlxq+nQ5p9eIPsNYN?=
+ =?us-ascii?Q?WQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Re: [PATCH bpf-next] bpf: tcp: Improve bpf write tcp opt
- performance
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: edumazet@google.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
- laoar.shao@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20240515081901.91058-1-zhoufeng.zf@bytedance.com>
- <87seyjwgme.fsf@cloudflare.com>
- <1803b7c0-bc56-46d6-835f-f3802b8b7e00@bytedance.com>
- <87wmnty8yd.fsf@cloudflare.com>
-From: Feng Zhou <zhoufeng.zf@bytedance.com>
-In-Reply-To: <87wmnty8yd.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 42fcc4da-a2f8-46cc-fb5f-08dc7642f0d4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 May 2024 07:28:25.9727
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0EvEXvm5svxS/hls70ya1os1bQCUTamAWvCT5LhUhImmOodQvCXfcvIkITSououKGPO9XfACqukZbAMA4IaeDq79p5hkbwG8/Et6pSBiTjNtembunOLWY9smkw/eaKLs
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5156
+X-OriginatorOrg: intel.com
 
-在 2024/5/17 01:15, Jakub Sitnicki 写道:
-> On Thu, May 16, 2024 at 11:15 AM +08, Feng Zhou wrote:
->> 在 2024/5/15 17:48, Jakub Sitnicki 写道:
->>> On Wed, May 15, 2024 at 04:19 PM +08, Feng zhou wrote:
->>>> From: Feng Zhou <zhoufeng.zf@bytedance.com>
->>>>
->>>> Set the full package write tcp option, the test found that the loss
->>>> will be 20%. If a package wants to write tcp option, it will trigger
->>>> bpf prog three times, and call "tcp_send_mss" calculate mss_cache,
->>>> call "tcp_established_options" to reserve tcp opt len, call
->>>> "bpf_skops_write_hdr_opt" to write tcp opt, but "tcp_send_mss" before
->>>> TSO. Through bpftrace tracking, it was found that during the pressure
->>>> test, "tcp_send_mss" call frequency was 90w/s. Considering that opt
->>>> len does not change often, consider caching opt len for optimization.
->>> You could also make your BPF sock_ops program cache the value and return
->>> the cached value when called for BPF_SOCK_OPS_HDR_OPT_LEN_CB.
->>> If that is in your opinion prohibitevely expensive then it would be good
->>> to see a sample program and CPU cycle measurements (bpftool prog profile).
->>>
->>
->> I'm not referring to the overhead introduced by the time-consuming
->> operation of bpf prog. I have tested that bpf prog does nothing and
->> returns directly, and the loss is still 20%. During the pressure test
->> process, "tcp_send_mss" and "__tcp_transmit_skb" the call frequency per
->> second
->>
->> @[
->>      bpf_skops_hdr_opt_len.isra.46+1
->>      tcp_established_options+730
->>      tcp_current_mss+81
->>      tcp_send_mss+23
->>      tcp_sendmsg_locked+285
->>      tcp_sendmsg+58
->>      sock_sendmsg+48
->>      sock_write_iter+151
->>      new_sync_write+296
->>      vfs_write+165
->>      ksys_write+89
->>      do_syscall_64+89
->>      entry_SYSCALL_64_after_hwframe+68
->> ]: 3671671
->>
->> @[
->>      bpf_skops_write_hdr_opt.isra.47+1
->>      __tcp_transmit_skb+761
->>      tcp_write_xmit+822
->>      __tcp_push_pending_frames+52
->>      tcp_close+813
->>      inet_release+60
->>      __sock_release+55
->>      sock_close+17
->>      __fput+179
->>      task_work_run+112
->>      exit_to_usermode_loop+245
->>      do_syscall_64+456
->>      entry_SYSCALL_64_after_hwframe+68
->> ]: 36125
->>
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
+arol Kolacinski
+> Sent: Wednesday, April 24, 2024 7:00 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Kubalewski, Arkadiusz <arkadiusz.kubalewski@i=
+ntel.com>; Kolacinski, Karol <karol.kolacinski@intel.com>; Nguyen, Anthony =
+L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <przemyslaw.kitszel@int=
+el.com>
+> Subject: [Intel-wired-lan] [PATCH v10 iwl-next 01/12] ice: Introduce ice_=
+ptp_hw struct
+>
+> Create new ice_ptp_hw struct and use it for all HW and PTP-related fields=
+ from struct ice_hw.
+> Replace definitions with struct fields, which values are set accordingly =
+to a specific device.
+>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> ---
+> V4 -> V5: Adjusted RCT in ice_base_incval
+>
+>  drivers/net/ethernet/intel/ice/ice_common.c |  24 ++++
+>  drivers/net/ethernet/intel/ice/ice_common.h |   1 +
+>  drivers/net/ethernet/intel/ice/ice_ptp.c    |  22 ++--
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 134 ++++++++++++--------
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.h |   4 +-
+>  drivers/net/ethernet/intel/ice/ice_type.h   |  17 ++-
+>  6 files changed, 126 insertions(+), 76 deletions(-)
+>
 
-Sorry, The call stack here is copied incorrectly, it is this one.
-
-     bpf_skops_write_hdr_opt.isra.47+1
-     __tcp_transmit_skb+761
-     tcp_write_xmit+822
-     __tcp_push_pending_frames+52
-     tcp_sendmsg_locked+3324
-     tcp_sendmsg+58
-     sock_sendmsg+48
-     sock_write_iter+151
-     new_sync_write+296
-     vfs_write+165
-     ksys_write+89
-     do_syscall_64+89
-     entry_SYSCALL_64_after_hwframe+68
-
->> "tcp_send_mss" before TSO, without packet aggregation, and
->> "__tcp_transmit_skb" after TSO, the gap between the two is
->> 100 times.
-> 
-> All right, we are getting somewhere.
-> 
-> So in your workload bpf_skops_hdr_opt_len more times that you like.
-> And you have determined that by memoizing the BPF
-> skops/BPF_SOCK_OPS_HDR_OPT_LEN_CB result and skipping over part of
-> tcp_established_options you get a performance boost.
-> 
-> Did you first check with perf record to which ops in
-> tcp_established_options are taking up so many cycles?
-> 
-
-bpftrace -e 'k:__cgroup_bpf_run_filter_sock_ops { @[((struct 
-bpf_sock_ops_kern *)arg1)->op, ((struct bpf_sock_ops_kern 
-*)arg1)->args[0]]=count(); } i:s:1 { print(@); clear(@); }' --include 
-'linux/filter.h'
-
-@[12, 0]: 2003
-@[15, 0]: 40952
-@[14, 0]: 40953
-@[14, 1]: 1512647
-
-@[12, 0]: 5580
-@[15, 0]: 45686
-@[14, 0]: 45687
-@[14, 1]: 1481577
-
-BPF_SOCK_OPS_HDR_OPT_LEN_CB   14
-BPF_SOCK_OPS_WRITE_HDR_OPT_CB 15
-
-BPF_WRITE_HDR_TCP_CURRENT_MSS = 1
-
-It can be found that the frequency of bpf prog "BPF_SOCK_OPS_HDR_OPT_LEN_CB"
-triggered by "BPF_WRITE_HDR_TCP_CURRENT_MSS"
-is very high during the pressure test, because
-"tcp_send_mss" call is before TSO, and the package
-has not been pooled.
-
-
-> If it's not the BPF prog, which you have ruled out, then where are we
-> burining cycles? Maybe that is something that can be improved.
-> 
-> Also, in terms on quantifying the improvement - it is 20% in terms of
-> what? Throughput, pps, cycles? And was that a single data point? For
-> multiple measurements there must be some variance (+/- X pp).
-> 
-> Would be great to see some data to back it up.
-> 
-> [...]
-> 
-
-Pressure measurement method:
-
-server: sockperf sr --tcp -i x.x.x.x -p 7654 --daemonize
-client: taskset -c 8 sockperf tp --tcp -i x.x.x.x -p 7654 -m 1200 -t 30
-
-Default mode, no bpf prog:
-
-taskset -c 8 sockperf tp --tcp -i x.x.x.x -p 7654 -m 1200 -t 30
-sockperf: == version #3.10-23.gited92afb185e6 ==
-sockperf[CLIENT] send on:
-[ 0] IP = x.x.x.x    PORT =  7654 # TCP
-sockperf: Warmup stage (sending a few dummy messages)...
-sockperf: Starting test...
-sockperf: Test end (interrupted by timer)
-sockperf: Test ended
-sockperf: Total of 71520808 messages sent in 30.000 sec
-
-sockperf: NOTE: test was performed, using msg-size=1200. For getting 
-maximum throughput consider using --msg-size=1472
-sockperf: Summary: Message Rate is 2384000 [msg/sec]
-sockperf: Summary: BandWidth is 2728.271 MBps (21826.172 Mbps)
-
-perf record --call-graph fp -e cycles:k -C 8 -- sleep 10
-perf report
-
-80.88%--sock_sendmsg
-  79.53%--tcp_sendmsg
-   42.48%--tcp_sendmsg_locked
-    16.23%--_copy_from_iter
-    4.24%--tcp_send_mss
-     3.25%--tcp_current_mss
-
-
-perf top -C 8
-
-19.13%  [kernel]            [k] _raw_spin_lock_bh
-11.75%  [kernel]            [k] copy_user_enhanced_fast_string
-  9.86%  [kernel]            [k] tcp_sendmsg_locked
-  4.44%  sockperf            [.] 
-_Z14client_handlerI10IoRecvfrom9SwitchOff13PongModeNeverEviii
-  4.16%  libpthread-2.28.so  [.] __libc_sendto
-  3.85%  [kernel]            [k] syscall_return_via_sysret
-  2.70%  [kernel]            [k] _copy_from_iter
-  2.48%  [kernel]            [k] entry_SYSCALL_64
-  2.33%  [kernel]            [k] native_queued_spin_lock_slowpath
-  1.89%  [kernel]            [k] __virt_addr_valid
-  1.77%  [kernel]            [k] __check_object_size
-  1.75%  [kernel]            [k] __sys_sendto
-  1.74%  [kernel]            [k] entry_SYSCALL_64_after_hwframe
-  1.42%  [kernel]            [k] __fget_light
-  1.28%  [kernel]            [k] tcp_push
-  1.01%  [kernel]            [k] tcp_established_options
-  0.97%  [kernel]            [k] tcp_send_mss
-  0.94%  [kernel]            [k] syscall_exit_to_user_mode_prepare
-  0.94%  [kernel]            [k] tcp_sendmsg
-  0.86%  [kernel]            [k] tcp_current_mss
-
-Having bpf prog to write tcp opt in all pkts:
-
-taskset -c 8 sockperf tp --tcp -i x.x.x.x -p 7654 -m 1200 -t 30
-sockperf: == version #3.10-23.gited92afb185e6 ==
-sockperf[CLIENT] send on:
-[ 0] IP = x.x.x.x    PORT =  7654 # TCP
-sockperf: Warmup stage (sending a few dummy messages)...
-sockperf: Starting test...
-sockperf: Test end (interrupted by timer)
-sockperf: Test ended
-sockperf: Total of 60636218 messages sent in 30.000 sec
-
-sockperf: NOTE: test was performed, using msg-size=1200. For getting 
-maximum throughput consider using --msg-size=1472
-sockperf: Summary: Message Rate is 2021185 [msg/sec]
-sockperf: Summary: BandWidth is 2313.063 MBps (18504.501 Mbps)
-
-perf record --call-graph fp -e cycles:k -C 8 -- sleep 10
-perf report
-
-80.30%--sock_sendmsg
-  79.02%--tcp_sendmsg
-   54.14%--tcp_sendmsg_locked
-    12.82%--_copy_from_iter
-    12.51%--tcp_send_mss
-     11.77%--tcp_current_mss
-      10.10%--tcp_established_options
-       8.75%--bpf_skops_hdr_opt_len.isra.54
-        5.71%--__cgroup_bpf_run_filter_sock_ops
-         3.32%--bpf_prog_e7ccbf819f5be0d0_tcpopt
-   6.61%--__tcp_push_pending_frames
-    6.60%--tcp_write_xmit
-     5.89%--__tcp_transmit_skb
-
-perf top -C 8
-
-10.98%  [kernel]                           [k] _raw_spin_lock_bh
-  9.04%  [kernel]                           [k] 
-copy_user_enhanced_fast_string
-  7.78%  [kernel]                           [k] tcp_sendmsg_locked
-  3.91%  sockperf                           [.] 
-_Z14client_handlerI10IoRecvfrom9SwitchOff13PongModeNeverEviii
-  3.46%  libpthread-2.28.so                 [.] __libc_sendto
-  3.35%  [kernel]                           [k] syscall_return_via_sysret
-  2.86%  [kernel]                           [k] 
-bpf_skops_hdr_opt_len.isra.54
-  2.16%  [kernel]                           [k] __htab_map_lookup_elem
-  2.11%  [kernel]                           [k] _copy_from_iter
-  2.09%  [kernel]                           [k] entry_SYSCALL_64
-  1.97%  [kernel]                           [k] __virt_addr_valid
-  1.95%  [kernel]                           [k] 
-__cgroup_bpf_run_filter_sock_ops
-  1.95%  [kernel]                           [k] lookup_nulls_elem_raw
-  1.89%  [kernel]                           [k] __fget_light
-  1.42%  [kernel]                           [k] __sys_sendto
-  1.41%  [kernel]                           [k] 
-entry_SYSCALL_64_after_hwframe
-  1.31%  [kernel]                           [k] 
-native_queued_spin_lock_slowpath
-  1.22%  [kernel]                           [k] __check_object_size
-  1.18%  [kernel]                           [k] tcp_established_options
-  1.04%  bpf_prog_e7ccbf819f5be0d0_tcpopt   [k] 
-bpf_prog_e7ccbf819f5be0d0_tcpopt
-
-Compare the above test results, fill up a CPU, you can find that
-the upper limit of qps or BandWidth has a loss of nearly 18-20%.
-Then CPU occupancy, you can find that "tcp_send_mss" has increased 
-significantly.
-
->>>> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
->>>> index 90706a47f6ff..f2092de1f432 100644
->>>> --- a/tools/include/uapi/linux/bpf.h
->>>> +++ b/tools/include/uapi/linux/bpf.h
->>>> @@ -6892,8 +6892,14 @@ enum {
->>>>    	 * options first before the BPF program does.
->>>>    	 */
->>>>    	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
->>>> +	/* Fast path to reserve space in a skb under
->>>> +	 * sock_ops->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB.
->>>> +	 * opt length doesn't change often, so it can save in the tcp_sock. And
->>>> +	 * set BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG to no bpf call.
->>>> +	 */
->>>> +	BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG = (1<<7),
->>> Have you considered a bpf_reserve_hdr_opt() flag instead?
->>> An example or test coverage would to show this API extension in action
->>> would help.
->>>
->>
->> bpf_reserve_hdr_opt () flag can't finish this. I want to optimize
->> that bpf prog will not be triggered frequently before TSO. Provide
->> a way for users to not trigger bpf prog when opt len is unchanged.
->> Then when writing opt, if len changes, clear the flag, and then
->> change opt len in the next package.
-> 
-> I haven't seen a sample using the API extenstion that you're proposing,
-> so I can only guess. But you probably have something like:
-> 
-> SEC("sockops")
-> int sockops_prog(struct bpf_sock_ops *ctx)
-> {
-> 	if (ctx->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB &&
-> 	    ctx->args[0] == BPF_WRITE_HDR_TCP_CURRENT_MSS) {
-> 		bpf_reserve_hdr_opt(ctx, N, 0);
-> 		bpf_sock_ops_cb_flags_set(ctx,
-> 					  ctx->bpf_sock_ops_cb_flags |
-> 					  MY_NEW_FLAG);
-> 		return 1;
-> 	}
-> }
-
-Yes, that's what I expected.
-
-> 
-> I don't understand why you're saying it can't be transformed into:
-> 
-> int sockops_prog(struct bpf_sock_ops *ctx)
-> {
-> 	if (ctx->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB &&
-> 	    ctx->args[0] == BPF_WRITE_HDR_TCP_CURRENT_MSS) {
-> 		bpf_reserve_hdr_opt(ctx, N, MY_NEW_FLAG);
-> 		return 1;
-> 	}
-> }
-
-"bpf_reserve_hdr_opt (ctx, N, MY_NEW_FLAG);"
-
-I don't know what I can do to pass the flag parameter, let
-"bpf_reserve_hdr_opt" return quickly? But this is not useful,
-because the loss caused by the triggering of bpf prog is very
-expensive, and it is still on the hotspot function of sending
-packets, and the TSO has not been completed yet.
-
-> 
-> [...]
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
 
