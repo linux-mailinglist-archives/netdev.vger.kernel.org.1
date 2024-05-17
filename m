@@ -1,200 +1,239 @@
-Return-Path: <netdev+bounces-97016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 402B98C8C01
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 20:00:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71F938C8C44
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 20:35:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1598B22339
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 18:00:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCBC01F22F70
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 18:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF2A13E411;
-	Fri, 17 May 2024 18:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B003C101CF;
+	Fri, 17 May 2024 18:35:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HW4kVh7M"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gkwi/EvW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1121713D88B;
-	Fri, 17 May 2024 18:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D961A2C19
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 18:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715968829; cv=none; b=PKiO8b30p6OKI1lgCG25MzDZk5FWzMcTYuugkgYe04s+sihlm2tdf9MaMWs+mWG+po142+dGrLf5JlsiuHsMOBBfCtQGvPMMVC+fQa8zRVyqtTUiEY6nTQrKb+mYmYpYO3VV4vtyq3OOfEnTZ1XGNAtMXvef5YbBdlrHxeGjU44=
+	t=1715970943; cv=none; b=frxZEQEzlHqcEAqmxlgKFSpG6jeQDd8iCRDvgqGED3yKSnX9vwf9VfrrQPG2+zEaB6Y3wA/aIHfuw1k2Fd8hbqX1IY2NJVSau7vZbN5+lfaNJ1eYSTYq9ES9Zj6/gdCVPejEzlox4JHpqeOG4k1Eejy6hHNQMKhRarwH/I5kfHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715968829; c=relaxed/simple;
-	bh=hozAzpQMXObpbdTk7Ibzjpn2uslGrLTRVG5E8LS6QJA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HwH/jvTwkNY1CGaK1H3l3hV6WqCOVqPoj8nYiJPtHZe5aaDzOerBiTgmTk3dloDvfABHjpRX7HuvVTNvzSZeMtn4gtbXZNoDwdXwxAX1FlNVr29CrBfUPzGS0L5TBZG6j4tzEhSCap+JskwXLYlifjKZJSK1JgyV3g55UGCrATg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HW4kVh7M; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1f08442b7bcso17357805ad.1;
-        Fri, 17 May 2024 11:00:27 -0700 (PDT)
+	s=arc-20240116; t=1715970943; c=relaxed/simple;
+	bh=hNF0da0IkNSpvL/BRbLJm/umeR054dj8n9zbBsCtNeM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WiRYQWTfs+8kuZ/UqswrLkaWPPU5q0sI3ZyyPUYOxwT1+P8Zup6PgX1cgW7A5/+FblmUXLDeZUdQoGajjoTS2CpbCFAJZp2qN85DdEcy44yeEk2bDrBa/Wt7WxsisgtbEks3qnymRHCLKkenKqt7R/7m/AXpKfwxDmfuDKK+D6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gkwi/EvW; arc=none smtp.client-ip=209.85.221.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-4df3d1076b0so312840e0c.1
+        for <netdev@vger.kernel.org>; Fri, 17 May 2024 11:35:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715968827; x=1716573627; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=w/StxRW/VLxGkt1YAzvKzW9ayexnITae0WPMFzYawxM=;
-        b=HW4kVh7Mf1aqJZXkXUCX5NqzIMDENND+Ktu8JZlXTbcrLARq4Fyzu5hfIgcu9+PuXk
-         CzwAEiFryEdp7zEYZ7/kjY3xgqz0AVfUAviZ3qxix3G/MRZzblh3TcDG/y77K5wI4QjU
-         J/RkIYmye0aYTb0f/nC+C2FYHXxqaWSDoHP2HQWFLdxu4Iy74tgchlE5zb+dctwtERMy
-         LesV3t6oNdCrKBrtbW6UZ+0J1f/SId6G3tadCWC0iQDOih0CvZk0/AkeOVjRcrGIKBMO
-         y4S9xD9CM2BG9wvv+E4ikhz0Tyxnz6mLFUEgEnk50X6OyoUMleopoh90qQA1oNVkpieV
-         X9og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715968827; x=1716573627;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1715970941; x=1716575741; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w/StxRW/VLxGkt1YAzvKzW9ayexnITae0WPMFzYawxM=;
-        b=IDJs7MTwPOqL4buqDR7+7ZM98t60Mz+C5/S0KPKrmuSV8fqtqQ4iWoykMMlUQxr/tf
-         KUXQ02RnXauWQ3S4uOgFdNfMF8J5lpgC8gZSGE5t7j5SLBpEo/lelgO56/S/gJ1G/sA7
-         l31h/6zg5PE3UTNozPuNewiDxhiE2MUGpRCOxJtQkPd4beVvhGAeR03/LLv5xXF5NOr/
-         vPNZ1L0VjixrsBuZjPDc8KmBWoQ3aPHKoCSlKCX4htlmDo2VK75VC0t/9KeLJzq3617K
-         V4a7jmRcddD2tzg0c0SzVhkwliqX4MiPI1DVg6+hsc7RNmCwvBAkvRUr91jtk2R8PWFu
-         CnOg==
-X-Forwarded-Encrypted: i=1; AJvYcCUy94UqkqeQllkdcJ0YHsgVItz0lPHKJqBqXnAGtSMnEUhQ8n/D8fnzDg4fQ6rxsh+Cx3vxW/WscXujJ4CKrCN6NK2yKhzuFxT0RZFYX1A6e9KfDcInBfIvO5nDCn3RaTMWuazrCpennqNrm3iGLxxfUGRGrvFRlLAMi5Sk3syVzFg+rffpkFBBMmg3IaflCLpqJRLL5v+BR/WHqseN2JNn5HKo0/B1wmeSmoAkkCkkuSkIJvE0Y4QuXmluo6Pjmlo5TRv5CmjhuJEsSxMVgeTEWmPtUxB/gjbrcm6FWYX04nCZArybyp8hCknYe4+HMehRQfY06ZyFkbE3soa8LNe9NaoJ4YMN74bvHW5FfBzkH9WIk8f1Y6h/R3CZH3ZUq2VWdmPOJj7U+HTVU8cg3vhtmrjxWMV41ez/YApwVMindMJDWtwontSU2MgbDkIKGAspHshumJOeS/eBmzhEW5VwcaxE18c0qY+3ykU9O1nBIG8t8tpm9CD1jNAqSyqjJg2X/wBca4Jhk4sV1biIz4E9QQHjWC2Q8lv33YJYxCxL1q6P4WQL2oFQtwv2R36E0yR3Uvup+zIEy/aTxmm2Vmla34FFEp3qiLppDZ+L0g43G03h+5FT0xhT/S26dAnPbZh9ZgOAUCG5Ltq/Eilawi5t0dnrkHDjTWxt612rwg0fxK79K4V76AAgb+rpvyBfw6Qwr19PJoP/dmcrgqQZS+B5AtK5Kr9MWPVX8csgYh3w+EAMeS85leHvalFLRRfomIC5Jnqp7qoDkc/yP1u5kY6kvBqExnM/t/C87bDv+TKY/DcDZKfdJ6NvOlDcjcxc0wZz4G1ljzQ8sIOdO9RQDCjne2R9mbURnm7zWh5CF/K6f1z+dluq7Mn/kfzTYYcz5fBwAC/Uitkp9Og0Bap/iNfP5yYXn5qzgcRO1h51dODYeRfwzf8ZEdeREMpJ4A==
-X-Gm-Message-State: AOJu0YyRMzm/2Xjrt8z7DljUkzB1tV+7rgEbAl7kKiXNm32QWq1Hj6T5
-	CZaiFp6kBqyRjai0CnM2fhX8k569z67BjPY8VNS1RyKKSQXxs+bW
-X-Google-Smtp-Source: AGHT+IGZDVzcY7OCALKn8Hd9OAI6XcssKSQlDPeH3SNH0EqlCaPwK+7ssdLCEtEMxDGdIwihVzJtAg==
-X-Received: by 2002:a17:903:120e:b0:1e4:6519:816d with SMTP id d9443c01a7336-1ef43f51feamr267718025ad.48.1715968827236;
-        Fri, 17 May 2024 11:00:27 -0700 (PDT)
-Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bf30bfesm159992895ad.175.2024.05.17.11.00.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 May 2024 11:00:26 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <5cff0ff0-48d1-49f8-84f4-bb33571fdf16@roeck-us.net>
-Date: Fri, 17 May 2024 11:00:22 -0700
+        bh=cvzy+cseOO29oDOd57ANYjfML0Ccq0dPd9qo8HfORaQ=;
+        b=Gkwi/EvWeLCGToupfrHpwcSZgYju69pAp9WbzcEpV6OSjigDpixQ1V23WOm6Pu1uoa
+         VRST/j1S5AWMI7z/G7/l45SKCvA523cVJZdFxaXVeY/jp2eq8UscFfgoft4qDGjIVenu
+         QuGMNxi04OoH/rG0PTUeh6mrnvnEv8jBQc4vtf7M5eJ3ENaMUGb71SCePKYPYQYrxLm4
+         b9MaIF379Cih0jEHD81xAlF8qPzXwmq2ROuIasqeSU1HlZKlNYjl0p42fIJ6E2LFjSw+
+         E90B8uGg6uQimF1MqeoYUxmeHibu1dVvvRfR8NBSUUgWlUsojkE8tKs8GAFUGEIUaNY4
+         Lhfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715970941; x=1716575741;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cvzy+cseOO29oDOd57ANYjfML0Ccq0dPd9qo8HfORaQ=;
+        b=J9LcFyuz4mbKwoueBhQQaQBUz/gLg96WonXHlhjb4GJghwClw1XluS2fn3gJ1VAeNG
+         7VULov0fcnJjH1rW/Fr3aHr3d740YEmkiv7GX1tataApx4M9H9irEO7AG9SY5wM7Qzxt
+         R+84ua0gy+1mRNpUB4FuQsKeGdQGE/2NXOCnqAEUBiryJ7w3kSzjEF77Qe0fgk3LX0i3
+         9tLslppzVkJ2cfdfD0yB2SjaGmO+n+q2uQOYaGlBKWvYBGU2dj/dwQpGGV/hHRjYSSrf
+         +vrvEeVdTfbf2rvLL04VFSZ/QksmhnzOgD1N+y4+NxdrGQJ12TkotghUYroKYj0qvh+w
+         +7RQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV9hqBWaLrzM6g7xOpbJhM6BuFfWx5UTB8yUeekXv1jNQ5XqM0v5ZGeAr8hzucctglW4B2ZZw1gTJ9hUqHzdfgNatM1WCx7
+X-Gm-Message-State: AOJu0Yw9cp9R9/NpJ5rKyZCidf4Tqg6hQozDaAqVRdFq5jHmcG5xICz8
+	sXkaE+Tlt76Cz5ZVOgP/5KnP7EQr7PhdFg7R9BwY1EsVs0U5rnWlGmPXQSDOD94Lr0a+VGFi13L
+	PD/wucZ3C/zwWMjph67DFdjdAZ4Aed4tPlOj2
+X-Google-Smtp-Source: AGHT+IEXVXGAXmCq8Bb4wwBo8uhfImQnt3/mJJwfp3wnIo++wgODQWKKkKYE7vHHEiRT0ksUYqbfG9binAF5eiWp4vg=
+X-Received: by 2002:a05:6122:2005:b0:4d3:3446:6bc9 with SMTP id
+ 71dfb90a1353d-4df8835ad1dmr21227267e0c.14.1715970940522; Fri, 17 May 2024
+ 11:35:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] tracing/treewide: Remove second parameter of
- __assign_str()
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
- Linux trace kernel <linux-trace-kernel@vger.kernel.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
- freedreno@lists.freedesktop.org, virtualization@lists.linux.dev,
- linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org, iommu@lists.linux.dev,
- linux-tegra@vger.kernel.org, netdev@vger.kernel.org,
- linux-hyperv@vger.kernel.org, ath10k@lists.infradead.org,
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
- ath12k@lists.infradead.org, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, linux-usb@vger.kernel.org,
- linux-bcachefs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-edac@vger.kernel.org,
- selinux@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-hwmon@vger.kernel.org, io-uring@vger.kernel.org,
- linux-sound@vger.kernel.org, bpf@vger.kernel.org,
- linux-wpan@vger.kernel.org, dev@openvswitch.org, linux-s390@vger.kernel.org,
- tipc-discussion@lists.sourceforge.net, Julia Lawall <Julia.Lawall@inria.fr>
-References: <20240516133454.681ba6a0@rorschach.local.home>
- <5080f4c5-e0b3-4c2e-9732-f673d7e6ca66@roeck-us.net>
- <20240517134834.43e726dd@gandalf.local.home>
-Content-Language: en-US
-From: Guenter Roeck <linux@roeck-us.net>
-Autocrypt: addr=linux@roeck-us.net; keydata=
- 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
- mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
-In-Reply-To: <20240517134834.43e726dd@gandalf.local.home>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240517085031.18896-1-kerneljasonxing@gmail.com>
+ <CADVnQymvBSUFcc307N_geXgosJgnrx4nziFcpnX-=jU7PronwA@mail.gmail.com>
+ <CAL+tcoDbB2if_=h7XSRU9_i2G=xT+fqmxCU-Mhe438PYcqxj-w@mail.gmail.com> <CAL+tcoAQSh9ScCduvhKNW9q8A7dhzA3OPuBde6t2=rsxg8=5Jg@mail.gmail.com>
+In-Reply-To: <CAL+tcoAQSh9ScCduvhKNW9q8A7dhzA3OPuBde6t2=rsxg8=5Jg@mail.gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Fri, 17 May 2024 14:35:22 -0400
+Message-ID: <CADVnQyn1tNaAYyOA98oyV_8d0k8VA24Z4kNVcB3=QLt1Qxz6=w@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] tcp: break the limitation of initial receive window
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: edumazet@google.com, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, davem@davemloft.net, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Yuchung Cheng <ycheng@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/17/24 10:48, Steven Rostedt wrote:
-> On Fri, 17 May 2024 10:36:37 -0700
-> Guenter Roeck <linux@roeck-us.net> wrote:
-> 
->> Building csky:allmodconfig (and others) ... failed
->> --------------
->> Error log:
->> In file included from include/trace/trace_events.h:419,
->>                   from include/trace/define_trace.h:102,
->>                   from drivers/cxl/core/trace.h:737,
->>                   from drivers/cxl/core/trace.c:8:
->> drivers/cxl/core/./trace.h:383:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
->>
->> This is with the patch applied on top of v6.9-8410-gff2632d7d08e.
->> So far that seems to be the only build failure.
->> Introduced with commit 6aec00139d3a8 ("cxl/core: Add region info to
->> cxl_general_media and cxl_dram events"). Guess we'll see more of those
->> towards the end of the commit window.
-> 
-> Looks like I made this patch just before this commit was pulled into
-> Linus's tree.
-> 
-> Which is why I'll apply and rerun the above again probably on Tuesday of
-> next week against Linus's latest.
-> 
-> This patch made it through both an allyesconfig and an allmodconfig, but on
-> the commit I had applied it to, which was:
-> 
->    1b294a1f3561 ("Merge tag 'net-next-6.10' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next")
-> 
-> I'll be compiling those two builds after I update it then.
-> 
+On Fri, May 17, 2024 at 1:49=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Sat, May 18, 2024 at 1:41=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > On Fri, May 17, 2024 at 10:42=E2=80=AFPM Neal Cardwell <ncardwell@googl=
+e.com> wrote:
+> > >
+> > > On Fri, May 17, 2024 at 4:50=E2=80=AFAM Jason Xing <kerneljasonxing@g=
+mail.com> wrote:
+> > > >
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > Since in 2018 one commit a337531b942b ("tcp: up initial rmem to 128=
+KB and
+> > > > SYN rwin to around 64KB") limited received window within 65535, mos=
+t CDN
+> > > > team would not benefit from this change because they cannot have a =
+large
+> > > > window to receive a big packet one time especially in long RTT.
+> > > >
+> > > > According to RFC 7323, it says:
+> > > >   "The maximum receive window, and therefore the scale factor, is
+> > > >    determined by the maximum receive buffer space."
+> > > >
+> > > > So we can get rid of this 64k limitation and let the window be tuna=
+ble if
+> > > > the user wants to do it within the control of buffer space. Then ma=
+ny
+> > > > companies, I believe, can have the same behaviour as old days. Besi=
+des,
+> > > > there are many papers conducting various interesting experiments wh=
+ich
+> > > > have something to do with this window and show good outputs in some=
+ cases.
+> > > >
+> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > ---
+> > > >  net/ipv4/tcp_output.c | 2 +-
+> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> > > > index 95caf8aaa8be..95618d0e78e4 100644
+> > > > --- a/net/ipv4/tcp_output.c
+> > > > +++ b/net/ipv4/tcp_output.c
+> > > > @@ -232,7 +232,7 @@ void tcp_select_initial_window(const struct soc=
+k *sk, int __space, __u32 mss,
+> > > >         if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_workaround_sign=
+ed_windows))
+> > > >                 (*rcv_wnd) =3D min(space, MAX_TCP_WINDOW);
+> > > >         else
+> > > > -               (*rcv_wnd) =3D min_t(u32, space, U16_MAX);
+> > > > +               (*rcv_wnd) =3D space;
+> > >
+> > > Hmm, has this patch been tested? This doesn't look like it would work=
+.
+> >
+> > Hello Neal,
+> >
+> > Thanks for the comment.
+> >
+> > Sure, I provided such a patch a few months ago which has been tested
+> > in production for the customers.
+> >
+> > One example of using a much bigger initial receive window:
+> > client   ---window=3D65535---> server
+> > client   <---window=3D14600----  server
+> > client   ---window=3D175616---> server
+> >
+> > Then the client could send more data than before in fewer rtt.
+> >
+> > Above is the output of tcpdump.
+> >
+> > Oh, I just found a similar case:
+> > https://lore.kernel.org/all/20220213040545.365600-1-tilan7663@gmail.com=
+/
+> >
+> > Before this, I always believed I'm not the only one who had such an iss=
+ue.
+> >
+> > >
+> > > Please note that RFC 7323 says in
+> > > https://datatracker.ietf.org/doc/html/rfc7323#section-2.2 :
+> > >
+> > >    The window field in a segment where the SYN bit is set (i.e., a <S=
+YN>
+> > >    or <SYN,ACK>) MUST NOT be scaled.
+> > >
+> > > Since the receive window field in a SYN is unscaled, that means the
+> > > TCP wire protocol has no way to convey a receive window in the SYN
+> > > that is bigger than 64KBytes.
+> > >
+> > > That is why this code places a limit of U16_MAX on the value here.
+> > >
+> > > If you want to advertise a bigger receive window in the SYN, you'll
+> >
+> > No. It's not my original intention.
+> >
+> > For SYN packet itself is limited in the __tcp_transmit_skb() as below:
+> >
+> >     th->window      =3D htons(min(tp->rcv_wnd, 65535U));
+>
+> With this limitation/protection of the window in SYN packet, It would
+> not break RFC with this patch applied. I try to advertise a bigger
+> initRwnd of ACK in a 3-way shakehand process.
 
-I am currently repeating my test builds with the above errors fixed.
-That should take a couple of hours. I'll let you know how it goes.
+Thanks for the explanation.
 
-Guenter
+I think the confusion arose because in your title ("tcp: break the
+limitation of initial receive window"), I interpreted "initial receive
+window" as the initial receive window advertised on the wire (which is
+limited by protocol spec to 64 kbytes), when you meant the initial
+value of tp->rcv_wnd. There are similar ambiguities in the commit
+message body.
 
+I would suggest resubmitting a version of the patch with a revised
+commit title and commit description, to clarify at least the following
+issues:
+
++ For the patch title, perhaps something like:
+  tcp: remove 64 KByte limit for initial tp->rcv_wnd value
+
++ For the commit description, in the sentence 'Since in 2018 one
+commit a337531b942b ("tcp: up initial rmem to 128KB and SYN rwin to
+around 64KB") limited received window within 65535', please revise
+this to clarify that you are talking about tp->rcv_wnd and not the
+receive window on the wire. For example: 'In 2018 commit a337531b942b
+("tcp: up initial rmem to 128KB and SYN rwin to around 64KB") limited
+the initial value of tp->rcv_wnd to 65535,.'
+
++ For the commit description, please add a note that RFC 7323 limits
+the initial receive window on the wire in a SYN or SYN+ACK to 65535
+bytes, and __tcp_transmit_skb() already ensures that constraint is
+respected, no matter how large tp->rcv_wnd is.
+
++ For the commit description, please include some version of your
+example of the receive window values in a handshake, like:
+
+One example of using a much bigger initial receive window:
+client   --- SYN: rwindow=3D65535 ---> server
+client   <--- SYN+ACK: rwindow=3D14600 ----  server
+client   --- ACK: rwindow=3D175616 ---> server
+
++ For the commit description, please include some version of your
+example of the evolution of the receive window over the first 3 round
+trips, before and after your patch.
+
+thanks,
+neal
 
