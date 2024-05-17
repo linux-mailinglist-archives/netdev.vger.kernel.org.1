@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-96859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D5B78C810F
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 08:53:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A16E8C8114
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 08:54:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C59EC282DA3
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 06:53:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA0E6B21556
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 06:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50C7B14280;
-	Fri, 17 May 2024 06:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895AE14A99;
+	Fri, 17 May 2024 06:54:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82551427B
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 06:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A9D14A83
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 06:54:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715928820; cv=none; b=dGf5brKu2qvYyIIHwjBwhiYa8K9IEpa8x0tjjXN7FI+BchlWXSU4aBIYPDzIOSIZn9HgukSEYbO7WtrOxcrKWJdhEAUKsyyX29gznN6owDgDAu1S+SzaiTzVJye68qwJHIkTBy2iWumXEgB/QOeUyvUE1Lrnl7fY7a6Zc9HTa6U=
+	t=1715928846; cv=none; b=dxh85X2YpwlbfsI/aOYY2cd2/HToa4MkJdrimzE8FsaDLNb8ajqK9rzJx0nqcEx4Bq9I24M3Rt3aT2Z2UH2r8mxyj0Fnl4nKXFFMo27VbFueixlHudZYpl7srs+jIQfNRHO//0Csytvqy3TfYYRipYvJsdtBcCETl+Tp6GLmSck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715928820; c=relaxed/simple;
-	bh=Isw9q+lacS4xFR3TdK4BDvDFNIchijuWj8CLDqaEU1k=;
+	s=arc-20240116; t=1715928846; c=relaxed/simple;
+	bh=SghmxwaN3InCmTiES4IbCJMa/blNS9oTQ9RmIYDLvdo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=c+YTIyhxSfsyhVYZFGKLXwcRUDWAjW3uLXOaVBp38PND0/kHliQmgC/4Ve/CIMScpAONheubBAZMxsMw1zFVI7PNQX9AA/uEu+Od/mabW2Ba7lI0f0mJe01ITzeBsoyD08QDOeONRHnFRAODlc7ehYn9OoeCC7bz72neXDlk3as=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
+	 MIME-Version; b=QmU0JN4DRbPEGSVo6z6yFXKjoN94CJ4s1tjd667uaHfKgE7k5m07gWPO/ga/ohPdkEQEBmmjJnWEVko5BKPxbYYgGmkA17KB4RH8sttRryrmw3aELXqK891dixukR9fpgZW4xFDYnPmKWQFb1KLJ6AW/GeZPKIEHblZq99HNSvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtpsz11t1715928719te9poa
-X-QQ-Originating-IP: MZ4bwugqRUz7KnyYIva/YiItJpoRr6TQ6LYjx7k6rbs=
+X-QQ-mid: bizesmtpsz11t1715928723t0kri0
+X-QQ-Originating-IP: FgP+Bul1XMA/AEHrtZdcspUI6IlYBI+NmZYMNQo5hp0=
 Received: from lap-jiawenwu.trustnetic.com ( [115.206.162.36])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 17 May 2024 14:51:58 +0800 (CST)
+	id ; Fri, 17 May 2024 14:52:02 +0800 (CST)
 X-QQ-SSF: 01400000000000L0Z000000A0000000
-X-QQ-FEAT: LXSsMpCYUN7HA4CRdK6OYhhhYU1lh5HMxxDdiNt0eam8Gdxu/8/a/oLNmMGCG
-	i6GxOyazy6EYy2gSPQ0ieQkYrNKZ64HZZkvMxrIp8BxhD07NYDm6oo+nVb1WzbnhQJ8URHe
-	/gofMd/H7Ni0EpJ+LiQxwBBRhv4G1OzkPJSVAPaBZhh/l80FYwUPYCPPdMZAJi/C98+hp4H
-	UfFDIzRy6uD5+bAmgJRD5CBjE9GVOVEWm9YdcSfkpxogfNRS0DZPi7Y62qau4F3AM1FyWic
-	fYYi1TNJCj4q4QsgSNF5O2rUpYkU0LjjgRvpedLfXb0iTO/lRtZ/wKYoYRUBtx3nZorRt0f
-	SMKookBU1aVICekbIfwS9KTDEttLMBlx9nvwBGcd7hksrmmEuKKwf9OhRj4hOhujO0B2Ymq
-	qSJsRTpX5GY3sseC4QOwXQ==
+X-QQ-FEAT: zMjFVoZKJLJmDRkwYmjsyzNdVWoYEqzzH7JEhQEtZfZJzfAxuFuvrXN7jXcTh
+	z7XRMWh2Pwhdw3xOp78ZrEwinoHbWf0/VFWon330ma4FtOJIq639LcBr9KYYTYx7CM/qEkD
+	RDayIEb8/2q9Za/NTcr/Iz2o8zp+BysyTw7chWxk4Pezar6qt0PrZ2kXX/sdLcSUa5L0WHW
+	Ds+dgrM6R3BFqunOSBKjorsaGuOq41b7SaPa5G8w9NSL+smkUGCq31djlBiRKOrBJzsbDSm
+	lljU17cgat9gqOGPUc/MeM9DZMwu4XQlm0t38klzVYPS81WOGpghyKOWzJ3izwbdVO0L0QK
+	MYU20lfPESe1xEdYWbtrJFl01LBPoe8EhhsQg9liFfnVXX03Ot1neNdo0/6CJOSJ3Z//uk4
+	DjcajniRyGuKiNCA9529Ng==
 X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 18138072189727822758
+X-BIZMAIL-ID: 8709234239134961024
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -55,10 +55,11 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org
 Cc: mengyuanlou@net-swift.com,
 	duanqiangwen@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net v5 1/3] net: wangxun: fix to change Rx features
-Date: Fri, 17 May 2024 14:51:38 +0800
-Message-Id: <20240517065140.7148-2-jiawenwu@trustnetic.com>
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Sai Krishna <saikrishnag@marvell.com>
+Subject: [PATCH net v5 2/3] net: wangxun: match VLAN CTAG and STAG features
+Date: Fri, 17 May 2024 14:51:39 +0800
+Message-Id: <20240517065140.7148-3-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.21.0.windows.1
 In-Reply-To: <20240517065140.7148-1-jiawenwu@trustnetic.com>
 References: <20240517065140.7148-1-jiawenwu@trustnetic.com>
@@ -72,39 +73,115 @@ Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Fix the issue where some Rx features cannot be changed.
+Hardware requires VLAN CTAG and STAG configuration always matches. And
+whether VLAN CTAG or STAG changes, the configuration needs to be changed
+as well.
 
-When using ethtool -K to turn off rx offload, it returns error and
-displays "Could not change any device features". And netdev->features
-is not assigned a new value to actually configure the hardware.
-
-Fixes: 6dbedcffcf54 ("net: libwx: Implement xx_set_features ops")
+Fixes: 6670f1ece2c8 ("net: txgbe: Add netdev features support")
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_lib.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 46 +++++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_lib.h   |  2 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  1 +
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  1 +
+ 4 files changed, 50 insertions(+)
 
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 6fae161cbcb8..667a5675998c 100644
+index 667a5675998c..d0cb09a4bd3d 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -2690,12 +2690,14 @@ int wx_set_features(struct net_device *netdev, netdev_features_t features)
- 		wx->rss_enabled = false;
- 	}
- 
-+	netdev->features = features;
-+
- 	if (changed &
- 	    (NETIF_F_HW_VLAN_CTAG_RX |
- 	     NETIF_F_HW_VLAN_STAG_RX))
- 		wx_set_rx_mode(netdev);
- 
--	return 1;
-+	return 0;
+@@ -2701,6 +2701,52 @@ int wx_set_features(struct net_device *netdev, netdev_features_t features)
  }
  EXPORT_SYMBOL(wx_set_features);
  
++#define NETIF_VLAN_STRIPPING_FEATURES	(NETIF_F_HW_VLAN_CTAG_RX | \
++					 NETIF_F_HW_VLAN_STAG_RX)
++
++#define NETIF_VLAN_INSERTION_FEATURES	(NETIF_F_HW_VLAN_CTAG_TX | \
++					 NETIF_F_HW_VLAN_STAG_TX)
++
++#define NETIF_VLAN_FILTERING_FEATURES	(NETIF_F_HW_VLAN_CTAG_FILTER | \
++					 NETIF_F_HW_VLAN_STAG_FILTER)
++
++netdev_features_t wx_fix_features(struct net_device *netdev,
++				  netdev_features_t features)
++{
++	netdev_features_t changed = netdev->features ^ features;
++	struct wx *wx = netdev_priv(netdev);
++
++	if (changed & NETIF_VLAN_STRIPPING_FEATURES) {
++		if ((features & NETIF_VLAN_STRIPPING_FEATURES) != NETIF_VLAN_STRIPPING_FEATURES &&
++		    (features & NETIF_VLAN_STRIPPING_FEATURES) != 0) {
++			features &= ~NETIF_VLAN_STRIPPING_FEATURES;
++			features |= netdev->features & NETIF_VLAN_STRIPPING_FEATURES;
++			wx_err(wx, "802.1Q and 802.1ad VLAN stripping must be either both on or both off.");
++		}
++	}
++
++	if (changed & NETIF_VLAN_INSERTION_FEATURES) {
++		if ((features & NETIF_VLAN_INSERTION_FEATURES) != NETIF_VLAN_INSERTION_FEATURES &&
++		    (features & NETIF_VLAN_INSERTION_FEATURES) != 0) {
++			features &= ~NETIF_VLAN_INSERTION_FEATURES;
++			features |= netdev->features & NETIF_VLAN_INSERTION_FEATURES;
++			wx_err(wx, "802.1Q and 802.1ad VLAN insertion must be either both on or both off.");
++		}
++	}
++
++	if (changed & NETIF_VLAN_FILTERING_FEATURES) {
++		if ((features & NETIF_VLAN_FILTERING_FEATURES) != NETIF_VLAN_FILTERING_FEATURES &&
++		    (features & NETIF_VLAN_FILTERING_FEATURES) != 0) {
++			features &= ~NETIF_VLAN_FILTERING_FEATURES;
++			features |= netdev->features & NETIF_VLAN_FILTERING_FEATURES;
++			wx_err(wx, "802.1Q and 802.1ad VLAN filtering must be either both on or both off.");
++		}
++	}
++
++	return features;
++}
++EXPORT_SYMBOL(wx_fix_features);
++
+ void wx_set_ring(struct wx *wx, u32 new_tx_count,
+ 		 u32 new_rx_count, struct wx_ring *temp_ring)
+ {
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.h b/drivers/net/ethernet/wangxun/libwx/wx_lib.h
+index ec909e876720..c41b29ea812f 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_lib.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.h
+@@ -30,6 +30,8 @@ int wx_setup_resources(struct wx *wx);
+ void wx_get_stats64(struct net_device *netdev,
+ 		    struct rtnl_link_stats64 *stats);
+ int wx_set_features(struct net_device *netdev, netdev_features_t features);
++netdev_features_t wx_fix_features(struct net_device *netdev,
++				  netdev_features_t features);
+ void wx_set_ring(struct wx *wx, u32 new_tx_count,
+ 		 u32 new_rx_count, struct wx_ring *temp_ring);
+ 
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+index fdd6b4f70b7a..e894e01d030d 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+@@ -499,6 +499,7 @@ static const struct net_device_ops ngbe_netdev_ops = {
+ 	.ndo_start_xmit         = wx_xmit_frame,
+ 	.ndo_set_rx_mode        = wx_set_rx_mode,
+ 	.ndo_set_features       = wx_set_features,
++	.ndo_fix_features       = wx_fix_features,
+ 	.ndo_validate_addr      = eth_validate_addr,
+ 	.ndo_set_mac_address    = wx_set_mac,
+ 	.ndo_get_stats64        = wx_get_stats64,
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index bd4624d14ca0..b3c0058b045d 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -428,6 +428,7 @@ static const struct net_device_ops txgbe_netdev_ops = {
+ 	.ndo_start_xmit         = wx_xmit_frame,
+ 	.ndo_set_rx_mode        = wx_set_rx_mode,
+ 	.ndo_set_features       = wx_set_features,
++	.ndo_fix_features       = wx_fix_features,
+ 	.ndo_validate_addr      = eth_validate_addr,
+ 	.ndo_set_mac_address    = wx_set_mac,
+ 	.ndo_get_stats64        = wx_get_stats64,
 -- 
 2.27.0
 
