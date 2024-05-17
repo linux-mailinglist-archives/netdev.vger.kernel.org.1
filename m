@@ -1,50 +1,73 @@
-Return-Path: <netdev+bounces-96918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E07048C832A
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 11:20:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A118C8334
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 11:23:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68A62282263
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:20:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC007282660
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A648F1EB3E;
-	Fri, 17 May 2024 09:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93DE1EB36;
+	Fri, 17 May 2024 09:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BNqutlHp"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="nXtcsZ96"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826811A28B
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 09:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CA320313
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 09:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715937631; cv=none; b=j8jtFpndeTC4YZ1EKNq38DtFYJxrtIG9m0SKb4rMRvWZ1sQ7Wsswa5nEzMZik9X6zcdU7P+H7CK+iYYpUk9vTIo67Cky4TgKXA4LxrPEWVtw5aFtJp+PaTKhhGsknoGNSEsoWiWajv+81JwHiGeq4kyDTWzA/0xK5U5jrOcWJso=
+	t=1715937790; cv=none; b=n7uWi1OhZFjoxbqN1FBiaivyAIkGujUqUJ8kXVuZPrppmODwzEATh779qqmPu8g9OBmzauoSpmUdK9zOjnNC+E8cT3JX2C82+tyD2w21zhmZ5DdYQvT07GTlCS7B3UvorXJSBWSYJwfu2iRz3kidp8z7ga7305n528ROSLQf+Yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715937631; c=relaxed/simple;
-	bh=/kMu0Se6J6gcVS7Gs+teJuMxbpEzG+RkIAOkHcwjdgQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HlBVMbOPQp7wNLo9QyAusXxbueL83Y3n7oNoJjPr59F5LCPPuv+srk0gtU8eBPziwTpnmOtMOIwUgjp+0tmvCaUpdg7m2ZxefXqFOY3VcArocwxKU3i4FnI/c+Q+ceaCB+EHxd0fbw016VIafLhetR/oXupT2aDzcE82od0sWQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BNqutlHp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F3986C32782;
-	Fri, 17 May 2024 09:20:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715937631;
-	bh=/kMu0Se6J6gcVS7Gs+teJuMxbpEzG+RkIAOkHcwjdgQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BNqutlHpNaETsiJglP5lyQSxjJcYPWJfAZSM4V/EyzZ/nWlzjRgd3k+mfHpB9omDk
-	 +kGfPyGynOYYvUiYW66TS4DzSIDBzP7x/xwZk8iFC2aQY75hxDb4dNi3L5lZZrNNwa
-	 w+KOOVSS03Uv+plYfZSRsYoY1rYoHx0eDCykzVxJH09m2gLs3K2gpTK6uOoOKZPUWu
-	 RIqpCT1gb3LbafT2ovB3gM3ykOP68UQZPyP9XSu4C+KOEU6qSZXp67zgI3tbzJrEVk
-	 bl5byli9picFB61y0fRovFbjKs290FPbPC06mlq73GBV+Mz8IPQxyvaTLmlYcJCl+O
-	 OIkGAlpbz9oMQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E1FE4C433F2;
-	Fri, 17 May 2024 09:20:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1715937790; c=relaxed/simple;
+	bh=ZoQ4JqUZ2GPYyqakX6Qw4SGFqIe8YQSjQBRjmd9I7Wk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Sv8Xs/d/6IuhVqIeMBEzdq70FLXG+kEfD6bubCBKq0cjboP7nU/ihQ+SAkySOokKeI6u9YeJEKxU2oGPQhmHQdpx76zOkSW5DumPQknEC+R/FnUVcEs4yMxWEJwzWy9Er48l1RWiNlyuW/HHDnFQLyiX05jupCGIzlrxzcKLhqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=nXtcsZ96; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1715937789; x=1747473789;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Q5MlM5j8uG26alKvnRIBWo9Y3iGHnRmkxgLO97N0994=;
+  b=nXtcsZ96akOVKQa28lEGhO7WgIcd+uTbGT9K7rmqeAVlkpZ0nke/Z5BP
+   u3VfvTT8osJmOmCzXhKkOgnwWCFXaBHAGngN+xz1JFwFM4Wdd8su7xXkL
+   8rWtYJmMujZIWMM93kNHW1susUA+VHt3Xn927smgZMVOCSeQ/+qRNIVH8
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.08,167,1712620800"; 
+   d="scan'208";a="727039422"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2024 09:23:03 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:7577]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.228:2525] with esmtp (Farcaster)
+ id 35c8b3d5-0af6-4406-90a5-3b2c8a069c06; Fri, 17 May 2024 09:23:03 +0000 (UTC)
+X-Farcaster-Flow-ID: 35c8b3d5-0af6-4406-90a5-3b2c8a069c06
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 17 May 2024 09:23:03 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.119.6.241) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
+ Fri, 17 May 2024 09:22:59 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <mhal@rbox.co>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<shuah@kernel.org>
+Subject: Re: [PATCH net v2 1/2] af_unix: Fix garbage collection of embryos carrying OOB with SCM_RIGHTS
+Date: Fri, 17 May 2024 18:22:50 +0900
+Message-ID: <20240517092250.33314-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <c0fc4799-ee57-45dc-b13b-0be4711b5cf2@rbox.co>
+References: <c0fc4799-ee57-45dc-b13b-0be4711b5cf2@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,46 +75,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5 0/3] Wangxun fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171593763092.29282.8564703865399802343.git-patchwork-notify@kernel.org>
-Date: Fri, 17 May 2024 09:20:30 +0000
-References: <20240517065140.7148-1-jiawenwu@trustnetic.com>
-In-Reply-To: <20240517065140.7148-1-jiawenwu@trustnetic.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux@armlinux.org.uk, horms@kernel.org, andrew@lunn.ch,
- netdev@vger.kernel.org, mengyuanlou@net-swift.com, duanqiangwen@net-swift.com
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D037UWB002.ant.amazon.com (10.13.138.121) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri, 17 May 2024 14:51:37 +0800 you wrote:
-> Fixed some bugs when using ethtool to operate network devices.
+From: Michal Luczaj <mhal@rbox.co>
+Date: Fri, 17 May 2024 10:55:53 +0200
+> On 5/17/24 09:47, Kuniyuki Iwashima wrote:
+> > From: Michal Luczaj <mhal@rbox.co>
+> > Date: Fri, 17 May 2024 07:59:16 +0200
+> >> One question: git send-email automatically adds my Signed-off-by to your
+> >> patch (patch 2/2 in this series). Should I leave it that way?
+> > 
+> > SOB is usually added by someone who changed the diff or merged it.
+> > 
+> > I think it would be better not to add it if not intended.  At least
+> > on my laptop, it does not add SOB automatically.
 > 
-> v4 -> v5:
-> - Simplify if...else... to fix features.
+> Sure, I understand. And the problem was that I had format.signOff = true in
+> .gitconfig. Fixed.
 > 
-> v3 -> v4:
-> - Require both ctag and stag to be enabled or disabled.
+> > FWIW, my command is like
+> > 
+> >   git send-email --annotate --cover-letter --thread --no-chain-reply-to \
+> >   --subject-prefix "PATCH v1 net-next" \
 > 
-> [...]
+> maintainer-netdev.rst shows an example with a slightly different order:
+> "[PATCH net-next v3]". But I guess it doesn't matter?
 
-Here is the summary with links:
-  - [net,v5,1/3] net: wangxun: fix to change Rx features
-    https://git.kernel.org/netdev/net/c/68067f065ee7
-  - [net,v5,2/3] net: wangxun: match VLAN CTAG and STAG features
-    https://git.kernel.org/netdev/net/c/ac71ab7816b6
-  - [net,v5,3/3] net: txgbe: fix to control VLAN strip
-    https://git.kernel.org/netdev/net/c/1d3c6414950b
+It seems patchwork can parse either format. ("net,vX" and "vX,net")
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+https://patchwork.kernel.org/project/netdevbpf/list/
 
