@@ -1,221 +1,156 @@
-Return-Path: <netdev+bounces-97029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 703D28C8D36
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 22:14:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 589A48C8D46
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 22:28:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D73D1C21E47
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 20:14:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 069901F22A6F
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 20:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED0A913DDB0;
-	Fri, 17 May 2024 20:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA0913DDB0;
+	Fri, 17 May 2024 20:28:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kJlAWmsQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X0KOR8ls"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C324A65F;
-	Fri, 17 May 2024 20:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6AFD65C
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 20:28:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715976866; cv=none; b=KdZnhtPnWatu5ZrOWx7Q74jr2crumhfWQYh3RTnJ5XMDZ+Iet238V5svZ2q/GRYVI/Mtu0Lv4PCL4ZYovJhBvV4aqTqTy6TojfmiZsuE5+rpuDkJfZaixGvqjXrTVicRGjimXoA5QVj9C+U33uKi1YNhI4RtN9hgc2O2MZlmco0=
+	t=1715977708; cv=none; b=ZcXa73qL9cEKsUs3j4eIS7l6VPmE3bYbSVDT6IvUVIG49yNTAErbZVApdvyYtWtru+CJMQjNKuhDa9nAnvqWjGtVWQ+vFb5NVnexCvMqml3U3krMCtZLTNZDwrpl5rFT0cHMpEAg8FOUuMJ2GZIKWUmtEamuO9MJiGOeWu9nXRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715976866; c=relaxed/simple;
-	bh=AsAtcPWfIsP/bcM2zWmQJXqUBcqm2UxloNpGZgcPfMk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S/b4jIwbTGdaLZH+F48QOmW1WL9Zx2K4S6sbnbJoTkMmKEtkrFy8TXsh+ubShWCtBuq9IOxfbEz++yC2RUditkh9s3PBuLOcRUJQ7iHWUGutg3lHIjy4CKKx7VIIyjWUD58F8RM5xoGk9rxAbh47qGZfMrpgDa0hwXhxO2FigqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kJlAWmsQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6131FC2BD10;
-	Fri, 17 May 2024 20:14:26 +0000 (UTC)
+	s=arc-20240116; t=1715977708; c=relaxed/simple;
+	bh=ZROc9VrwBMl0NjaXjGn2JI/4h3n53FuL6lyKjP9d+Ls=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=drJZJY+sG2rsd28RFhWQ3ToJCCvhiFoJ1UkmHwdJKuw5MWzx/n+SnvVTph6jtPqht9ViQYaaDmOv8SCvD4J+uLNXLnl3FOv8vTYk4vLMuOQoMVPyDvxD7EIiFovvYHU9IhLI/XxmpsCAMHLJmrTz3mTiu16Fx336TxwSiJCMCr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X0KOR8ls; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 268F7C2BD10;
+	Fri, 17 May 2024 20:28:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715976866;
-	bh=AsAtcPWfIsP/bcM2zWmQJXqUBcqm2UxloNpGZgcPfMk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=kJlAWmsQXHARBSzpy+qzQUO2VA7IuUxC9Md73or2OoIUiMTmAf6JvZc3i+JmLqElz
-	 kg2wNWygGSVywt0xfWSr0Ada7B+Mr8MhCaFbSbHVHhVTJNH2F9pTBdkYg/0Q3JkxAN
-	 l7wNNYMzIQmAlh3uCcV/Qet3/o41aFpJwbJPVKK+bpG+1qT3sYuHIE5tcTViKIGdod
-	 2ZirvQyd/OiwpjAW2XWchSmU2LQvkO0OZ4Lq/Of4kf8QWOZ+F4ix7IFmFQM7/RO5jw
-	 mMObhEs+GxIlNG6ktI71N4cDM4SwdHvN8tuvQ/jQnC/aGomIo3/coK4/W/P2fzTOGo
-	 R1vrV254hYlFg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com
-Subject: [GIT PULL] Networking merge window fixes
-Date: Fri, 17 May 2024 13:14:25 -0700
-Message-ID: <20240517201425.3080823-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.45.0
+	s=k20201202; t=1715977708;
+	bh=ZROc9VrwBMl0NjaXjGn2JI/4h3n53FuL6lyKjP9d+Ls=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X0KOR8lsubVpcNVsY67x+kKam0bXj+W3buDA85s8WlGMDtwUtJHcFyIAzie0WjNzg
+	 Y9gYVEKuGJDUfCFTqx97EG39jt7rSZf+rqQMdFcTno5rThjyavGI7YZ7zMJOJL0HGi
+	 GqpTA4bfbLCQ6mPgvUaO7wc2KqGlyryc4q1S1Uv/myO92T5zTbCWgpVthMCb8cVMt+
+	 Pt9sRe91/5oJD9UgYZGieZXslwUGp7j8Ffs6E6zJSRPtJUIKZhnWKeF/fI4b/asllU
+	 Ngww7PGzIQyGDZPVekCLcs0rbX3geJryszL+GBLzV+NqIowUF9piYMTyZtCu/N/EJg
+	 qejX0G2XjcQhg==
+Date: Fri, 17 May 2024 21:28:22 +0100
+From: Simon Horman <horms@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Florian Westphal <fw@strlen.de>,
+	Glenn Judd <glenn.judd@morganstanley.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+	syzkaller <syzkaller@googlegroups.com>,
+	Yue Sun <samsun1006219@gmail.com>,
+	xingwei lee <xrivendell7@gmail.com>
+Subject: Re: [PATCH v1 net] tcp: Fix shift-out-of-bounds in
+ dctcp_update_alpha().
+Message-ID: <20240517202822.GA477004@kernel.org>
+References: <20240517091626.32772-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240517091626.32772-1-kuniyu@amazon.com>
 
-Hi Linus!
+On Fri, May 17, 2024 at 06:16:26PM +0900, Kuniyuki Iwashima wrote:
+> In dctcp_update_alpha(), we use a module parameter dctcp_shift_g
+> as follows:
+> 
+>   alpha -= min_not_zero(alpha, alpha >> dctcp_shift_g);
+>   ...
+>   delivered_ce <<= (10 - dctcp_shift_g);
+> 
+> It seems syzkaller started fuzzing module parameters and triggered
+> shift-out-of-bounds [0] by setting 100 to dctcp_shift_g:
+> 
+>   memcpy((void*)0x20000080,
+>          "/sys/module/tcp_dctcp/parameters/dctcp_shift_g\000", 47);
+>   res = syscall(__NR_openat, /*fd=*/0xffffffffffffff9cul, /*file=*/0x20000080ul,
+>                 /*flags=*/2ul, /*mode=*/0ul);
+>   memcpy((void*)0x20000000, "100\000", 4);
+>   syscall(__NR_write, /*fd=*/r[0], /*val=*/0x20000000ul, /*len=*/4ul);
+> 
+> Let's limit the max value of dctcp_shift_g by param_set_uint_minmax().
+> 
+> With this patch:
+> 
+>   # echo 10 > /sys/module/tcp_dctcp/parameters/dctcp_shift_g
+>   # cat /sys/module/tcp_dctcp/parameters/dctcp_shift_g
+>   10
+>   # echo 11 > /sys/module/tcp_dctcp/parameters/dctcp_shift_g
+>   -bash: echo: write error: Invalid argument
+> 
+> [0]:
+> UBSAN: shift-out-of-bounds in net/ipv4/tcp_dctcp.c:143:12
+> shift exponent 100 is too large for 32-bit type 'u32' (aka 'unsigned int')
+> CPU: 0 PID: 8083 Comm: syz-executor345 Not tainted 6.9.0-05151-g1b294a1f3561 #2
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> 1.13.0-1ubuntu1.1 04/01/2014
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0x201/0x300 lib/dump_stack.c:114
+>  ubsan_epilogue lib/ubsan.c:231 [inline]
+>  __ubsan_handle_shift_out_of_bounds+0x346/0x3a0 lib/ubsan.c:468
+>  dctcp_update_alpha+0x540/0x570 net/ipv4/tcp_dctcp.c:143
+>  tcp_in_ack_event net/ipv4/tcp_input.c:3802 [inline]
+>  tcp_ack+0x17b1/0x3bc0 net/ipv4/tcp_input.c:3948
+>  tcp_rcv_state_process+0x57a/0x2290 net/ipv4/tcp_input.c:6711
+>  tcp_v4_do_rcv+0x764/0xc40 net/ipv4/tcp_ipv4.c:1937
+>  sk_backlog_rcv include/net/sock.h:1106 [inline]
+>  __release_sock+0x20f/0x350 net/core/sock.c:2983
+>  release_sock+0x61/0x1f0 net/core/sock.c:3549
+>  mptcp_subflow_shutdown+0x3d0/0x620 net/mptcp/protocol.c:2907
+>  mptcp_check_send_data_fin+0x225/0x410 net/mptcp/protocol.c:2976
+>  __mptcp_close+0x238/0xad0 net/mptcp/protocol.c:3072
+>  mptcp_close+0x2a/0x1a0 net/mptcp/protocol.c:3127
+>  inet_release+0x190/0x1f0 net/ipv4/af_inet.c:437
+>  __sock_release net/socket.c:659 [inline]
+>  sock_close+0xc0/0x240 net/socket.c:1421
+>  __fput+0x41b/0x890 fs/file_table.c:422
+>  task_work_run+0x23b/0x300 kernel/task_work.c:180
+>  exit_task_work include/linux/task_work.h:38 [inline]
+>  do_exit+0x9c8/0x2540 kernel/exit.c:878
+>  do_group_exit+0x201/0x2b0 kernel/exit.c:1027
+>  __do_sys_exit_group kernel/exit.c:1038 [inline]
+>  __se_sys_exit_group kernel/exit.c:1036 [inline]
+>  __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1036
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xe4/0x240 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x67/0x6f
+> RIP: 0033:0x7f6c2b5005b6
+> Code: Unable to access opcode bytes at 0x7f6c2b50058c.
+> RSP: 002b:00007ffe883eb948 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+> RAX: ffffffffffffffda RBX: 00007f6c2b5862f0 RCX: 00007f6c2b5005b6
+> RDX: 0000000000000001 RSI: 000000000000003c RDI: 0000000000000001
+> RBP: 0000000000000001 R08: 00000000000000e7 R09: ffffffffffffffc0
+> R10: 0000000000000006 R11: 0000000000000246 R12: 00007f6c2b5862f0
+> R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000001
+>  </TASK>
+> 
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> Reported-by: Yue Sun <samsun1006219@gmail.com>
+> Reported-by: xingwei lee <xrivendell7@gmail.com>
+> Closes: https://lore.kernel.org/netdev/CAEkJfYNJM=cw-8x7_Vmj1J6uYVCWMbbvD=EFmDPVBGpTsqOxEA@mail.gmail.com/
+> Fixes: e3118e8359bb ("net: tcp: add DCTCP congestion control algorithm")
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-The following changes since commit 1b294a1f35616977caddaddf3e9d28e576a1adbc:
-
-  Merge tag 'net-next-6.10' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2024-05-14 19:42:24 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.10-rc0
-
-for you to fetch changes up to fe56d6e4a99a40f50e64d5a8043f1fa838b1f7a1:
-
-  selftests: net: local_termination: annotate the expected failures (2024-05-17 12:26:35 -0700)
-
-----------------------------------------------------------------
-Including fix from Andrii for the issue mentioned in our net-next PR,
-the rest is unremarkable.
-
-Current release - regressions:
-
- - virtio_net: fix missed error path rtnl_unlock after control queue
-   locking rework
-
-Current release - new code bugs:
-
- - bpf: fix KASAN slab-out-of-bounds in percpu_array_map_gen_lookup,
-   caused by missing nested map handling
-
- - drv: dsa: correct initialization order for KSZ88x3 ports
-
-Previous releases - regressions:
-
- - af_packet: do not call packet_read_pending() from tpacket_destruct_skb()
-   fix performance regression
-
- - ipv6: fix route deleting failure when metric equals 0, don't assume
-   0 means not set / default in this case
-
-Previous releases - always broken:
-
- - bridge: couple of syzbot-driven fixes
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-----------------------------------------------------------------
-Andrii Nakryiko (3):
-      libbpf: fix feature detectors when using token_fd
-      bpf: save extended inner map info for percpu array maps as well
-      selftests/bpf: add more variations of map-in-map situations
-
-Chris Lew (1):
-      net: qrtr: ns: Fix module refcnt
-
-Daniel Jurgens (1):
-      virtio_net: Fix missed rtnl_unlock
-
-David S. Miller (1):
-      Merge branch 'wangxun-fixes'
-
-Eric Dumazet (2):
-      netrom: fix possible dead-lock in nr_rt_ioctl()
-      af_packet: do not call packet_read_pending() from tpacket_destruct_skb()
-
-Hangbin Liu (2):
-      selftests/net/lib: no need to record ns name if it already exist
-      selftests/net: reduce xfrm_policy test time
-
-Herve Codina (1):
-      net: lan966x: remove debugfs directory in probe() error path
-
-Jakub Kicinski (3):
-      Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next
-      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-      selftests: net: local_termination: annotate the expected failures
-
-Jiawen Wu (3):
-      net: wangxun: fix to change Rx features
-      net: wangxun: match VLAN CTAG and STAG features
-      net: txgbe: fix to control VLAN strip
-
-Martin KaFai Lau (2):
-      selftests/bpf: Adjust test_access_variable_array after a kernel function name change
-      selftests/bpf: Adjust btf_dump test to reflect recent change in file_operations
-
-Michal Schmidt (1):
-      idpf: don't skip over ethtool tcp-data-split setting
-
-Nikolay Aleksandrov (3):
-      net: bridge: xmit: make sure we have at least eth header len bytes
-      selftests: net: bridge: increase IGMP/MLD exclude timeout membership interval
-      net: bridge: mst: fix vlan use-after-free
-
-Oleksij Rempel (1):
-      net: dsa: microchip: Correct initialization order for KSZ88x3 ports
-
-Puranjay Mohan (2):
-      bpf, docs: Fix the description of 'src' in ALU instructions
-      MAINTAINERS: Update ARM64 BPF JIT maintainer
-
-Ravi Gunasekaran (2):
-      dt-bindings: net: ti: Update maintainers list
-      MAINTAINERS: net: Update reviewers for TI's Ethernet drivers
-
-Ronald Wahl (1):
-      net: ks8851: Fix another TX stall caused by wrong ISR flag handling
-
-Sagar Cheluvegowda (1):
-      dt-bindings: net: qcom: ethernet: Allow dma-coherent
-
-Tom Parkin (1):
-      l2tp: fix ICMP error handling for UDP-encap sockets
-
-Tony Battersby (1):
-      bonding: fix oops during rmmod
-
-xu xin (1):
-      net/ipv6: Fix route deleting failure when metric equals 0
-
- .../bpf/standardization/instruction-set.rst        |  5 +-
- .../devicetree/bindings/net/qcom,ethqos.yaml       |  2 +
- .../devicetree/bindings/net/ti,cpsw-switch.yaml    |  1 -
- .../bindings/net/ti,k3-am654-cpsw-nuss.yaml        |  1 -
- .../devicetree/bindings/net/ti,k3-am654-cpts.yaml  |  1 -
- MAINTAINERS                                        |  3 +-
- drivers/net/bonding/bond_main.c                    | 13 ++---
- drivers/net/dsa/microchip/ksz_dcb.c                | 10 ++++
- drivers/net/ethernet/intel/idpf/idpf_ethtool.c     |  3 +-
- drivers/net/ethernet/micrel/ks8851_common.c        | 18 +------
- .../net/ethernet/microchip/lan966x/lan966x_main.c  |  6 ++-
- drivers/net/ethernet/wangxun/libwx/wx_hw.c         |  2 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c        | 56 ++++++++++++++++++++--
- drivers/net/ethernet/wangxun/libwx/wx_lib.h        |  2 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h       | 22 +++++++++
- drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c   | 18 +++++--
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c      |  1 +
- drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c | 18 +++++--
- drivers/net/ethernet/wangxun/txgbe/txgbe_main.c    | 31 ++++++++++++
- drivers/net/ethernet/wangxun/txgbe/txgbe_type.h    |  1 +
- drivers/net/virtio_net.c                           |  6 +--
- kernel/bpf/map_in_map.c                            |  4 +-
- net/bridge/br_device.c                             |  6 +++
- net/bridge/br_mst.c                                | 16 ++++---
- net/ipv6/route.c                                   |  5 +-
- net/l2tp/l2tp_core.c                               | 44 ++++++++++++-----
- net/netrom/nr_route.c                              | 19 +++-----
- net/packet/af_packet.c                             |  3 +-
- net/qrtr/ns.c                                      | 27 +++++++++++
- tools/lib/bpf/bpf.c                                |  2 +-
- tools/lib/bpf/features.c                           |  2 +-
- tools/testing/selftests/bpf/prog_tests/btf_dump.c  |  2 +-
- tools/testing/selftests/bpf/progs/map_kptr.c       | 10 ++++
- .../bpf/progs/test_access_variable_array.c         |  2 +-
- .../selftests/net/forwarding/bridge_igmp.sh        |  6 +--
- .../testing/selftests/net/forwarding/bridge_mld.sh |  6 +--
- .../selftests/net/forwarding/local_termination.sh  | 30 +++++++-----
- tools/testing/selftests/net/lib.sh                 |  6 ++-
- tools/testing/selftests/net/xfrm_policy.sh         |  4 +-
- 39 files changed, 304 insertions(+), 110 deletions(-)
+Reviewed-by: Simon Horman <horms@kernel.org>
 
