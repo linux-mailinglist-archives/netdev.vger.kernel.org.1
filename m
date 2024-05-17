@@ -1,118 +1,321 @@
-Return-Path: <netdev+bounces-96829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E4268C7FAF
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 03:57:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 193EB8C7FBA
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 04:00:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A3EC284328
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 01:57:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A61602835D0
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 02:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9001D17D2;
-	Fri, 17 May 2024 01:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 138D017FD;
+	Fri, 17 May 2024 02:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="IwtZStbS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jdylU0nP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f67.google.com (mail-lf1-f67.google.com [209.85.167.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1354C69;
-	Fri, 17 May 2024 01:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141B917D2;
+	Fri, 17 May 2024 02:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715911064; cv=none; b=umZwTusOTMNkFrc3RyIjERoVWd7YvhAudOnsmdeLDI3UGM+fU1YxU3A0GFzuNzkWrbLPQtu7s1WvTe3aByBMqRBH7JVuYjf+USJpqbHR/QVm8dHokLY7JomNBRoL1KdSGJ6TT+IZ0DXyPrJlccDjrpWZVCEmzqp79yAsq+MtxsU=
+	t=1715911250; cv=none; b=Au44YpFI2zZgCIHIebPoQSqjBg1sm4g0M27g9pbgpEXUY3/Fwg20tHjm5PEOXjlI8NFqsL+xVLlrX/QP7P7oyHZTIUwGs774TlGBm8nM9jxAwlJxXkZOx8fFrRENvWiwcLfcTPy8Fls6HeEw97fwU7lLdLdEtWkSje49Wu5Fdds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715911064; c=relaxed/simple;
-	bh=TeQwxcoJKMhlE7MRgBjHwcLfIU5flh55tSEr1OeVZTQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=oLX1Hja3UwEd9WNeMwocfueOXuv+rJfQYxJ218Os2bqUS4FsIl4rqCYuNTGYl854OupBvGBbUxFfB7h/mypTZ/4YkJ6XXFvROIyT9wI5CicLHnvQlo0L0jlzYCrRVVy3vx+tpoZ1KO5tK3rNrhGncEmyG83hKsE/Pb6rRwegYXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=IwtZStbS; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44GKMTnE014892;
-	Fri, 17 May 2024 01:57:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:date:subject:mime-version:content-type
-	:content-transfer-encoding:message-id:to:cc; s=qcppdkim1; bh=4Xn
-	mAg2zsv4MMPg4ePcXWEN4bz039q9JRraQWkgbVw0=; b=IwtZStbSk3JYJzAeF0I
-	1mIEr7hmVeHiiFavZnE5+ZnApGP7Sv+azVQpMXZ//cJrZfedETwAax8+f74sj52k
-	RrIqFEFgq688rkyDe3M735wNDvr+YFzaJQgAYdMblvUpYilBZjgpbQvrCrYX610/
-	2JOPwJn3jEroQ2zyOZmrQO0CxWBtIumawuNuzrvjRA4wNTHwUyqFDYknOoPlr4QX
-	xAa8y2UI9dYwY31GFmGxHJeSohzR+QdvbDPsYCSZFVbsVmg7wyLpjQdAShOeuL1Y
-	aqkY0kiY0jcm9C+z47rjwNgPVKfRTdCLYwK+JjwpeRiZ10RaR+mbNIoGHbHkq8V7
-	GeQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3y5e9ct0gb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 May 2024 01:57:34 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44H1vX5K025147
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 May 2024 01:57:33 GMT
-Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 16 May
- 2024 18:57:32 -0700
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Thu, 16 May 2024 18:57:32 -0700
-Subject: [PATCH] vringh: add MODULE_DESCRIPTION()
+	s=arc-20240116; t=1715911250; c=relaxed/simple;
+	bh=6O7EsyByF7AQUdY0sJST9zhchb45YYH+do6TJLgdJqc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s553qZvJWT6NtGCCzojpGeIpfkkNXm2C5RsyxUPeAlR+u9IY9eVexqlGaK/wwd1fQGSRFyEU8vD1QKxRUM9kTi1pK8RkEHYcLQNlFHB7czW0g3Rbk1egco5vzvzfHNYzUR0XXN2PbJTzx09/vkgnCBpRhf+nJm+8rXvQDJa50ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jdylU0nP; arc=none smtp.client-ip=209.85.167.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f67.google.com with SMTP id 2adb3069b0e04-52232d0e5ceso123988e87.0;
+        Thu, 16 May 2024 19:00:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715911246; x=1716516046; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PXf5bOQTREnlmvETyGl7T4t7yZZljEPRi8h67r6MYSc=;
+        b=jdylU0nPr88jls4EkrpnAjEi4xWHOifcYy00fD6Ag9a7FaUg9MB7/cMSVZqzs9cIy8
+         AZGrPpAfqEnqnfSvE02MQHzK8UAYeUOVVG+ktbLeJ5rg0XOca3v8ct8y+FcP0eoR8KHY
+         E7tjUbVqjoFrJ1uYKXDge6txYLlNOmkCFwMPLc3gvedenDKhmtdlnQRlj6r6JQXol65g
+         n9q9SrQ59xTZ9LgBtFIEzRBQXsKLjld5PUbtSKlO2iNdfKm40uQzZzdtmrgKW8eoWbDT
+         zCxAWJXNUo30q+JcayGuHnPVUaf6FldRsNmXputocQCyuNnFT5TpfQcxBGEhUxmWMp+g
+         TQig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715911246; x=1716516046;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PXf5bOQTREnlmvETyGl7T4t7yZZljEPRi8h67r6MYSc=;
+        b=XOM16nbSMFooJ9nKahpp1hpp+8N0kdxoMxGddRMn4pc59B+NnPZfr5hzKY4gYej8Jm
+         VF4lhsTBCwQATdMMV51BEO1QYlQJFnN+liMi8c2JlFawbAfFeJxVKXlI9yvwU9+8Ghe9
+         4w9NrQyIR5rRT3Lu/0i3iJPkP+M6IUZfOmUmdBM5koH66ufiFlBC1YpPOBOefTDXc8Wz
+         hQlNYsa+dMZIn9A4JMOyO2PSxdGN48Yx1rOPoQ0yWWoiyiWS8WyVJTvvgKJIv0+dke83
+         gX3VOlOfbjEPHNuG+5KXAce4ft+9BCiOK32G5cqheLr3uC4twq38V8JCExbC/emDrv/1
+         2Ggg==
+X-Forwarded-Encrypted: i=1; AJvYcCWKiopPOBpA92YdFrNpL7HLVBJqAkvVotMqCoG7OIkIXLZjFhs/9XnlEK5lxwW95Im5lr3ajD7CqsJPrKUeaQ0rkEQL
+X-Gm-Message-State: AOJu0Yxti2N9bRyhxdVNL1Wn1vmYWh9GkxDTGz9VMrz+iNpRSLYyDaxQ
+	5lmt0hud/uZaZxv+BsYkHQDH/OSWBTtYhG1l2DQ+VYj6fFTl3R4JVme0qnrpZnMj+4oQp8pLk1L
+	McoXokqmB04SrtYDxwnaRkCkk/Rg=
+X-Google-Smtp-Source: AGHT+IFzSSppO253rIFFAkQWT6qfadqp/5OC/oIkVJUmC69j1/pCOA/YoGXEmUsCgKd+7VbLJWgPJ2TY6/R5hadVwxE=
+X-Received: by 2002:a05:6512:3605:b0:51f:b781:729d with SMTP id
+ 2adb3069b0e04-5220fd7acf5mr11045154e87.38.1715911245800; Thu, 16 May 2024
+ 19:00:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240516-md-vringh-v1-1-31bf37779a5a@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAIu5RmYC/x3MQQrCQAxA0auUrA1M21HEq4iLzDR2AnYsiZZK6
- d2NLh98/gbGKmxwaTZQXsTkWR3toYFcqI6MMrihC10Mx/aE04CLSh0L5tifQ08cEkXwfla+y/p
- /XW/uRMaYlGouv8ND6nvFiezFivPHU9j3L1yS0c+AAAAA
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>,
-        Jeff Johnson <quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.13.0
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: yXUsnD5gIMwD8PMfWK8PGk4evjt5EaRT
-X-Proofpoint-ORIG-GUID: yXUsnD5gIMwD8PMfWK8PGk4evjt5EaRT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-16_07,2024-05-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- adultscore=0 lowpriorityscore=0 mlxscore=0 clxscore=1011 mlxlogscore=805
- priorityscore=1501 bulkscore=0 malwarescore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405010000 definitions=main-2405170014
+References: <20240510192412.3297104-1-amery.hung@bytedance.com>
+ <20240510192412.3297104-2-amery.hung@bytedance.com> <CAP01T74iSVPnRsAbdNfzXYYS7GsdCSgp3QiaPSzex6d+3J5AAA@mail.gmail.com>
+ <CAMB2axP1C1wVRsq2uDGW0r6-OM8yWvZ9LB0WwEtuSAYsU2T0fg@mail.gmail.com>
+ <CAP01T74mQPMktHJiPoZ7z-UfFCRoxOexpBe_X2v3rLpE5A+WEA@mail.gmail.com> <CAMB2axOho5uoWv6NSJSydtA+Y0OytpaMnqP38aaVaeaG-qdv7A@mail.gmail.com>
+In-Reply-To: <CAMB2axOho5uoWv6NSJSydtA+Y0OytpaMnqP38aaVaeaG-qdv7A@mail.gmail.com>
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date: Fri, 17 May 2024 04:00:08 +0200
+Message-ID: <CAP01T77A9h8Roi6hnonQbtxcfthR9Jar8810swBS=qkdPnazGw@mail.gmail.com>
+Subject: Re: [RFC PATCH v8 01/20] bpf: Support passing referenced kptr to
+ struct_ops programs
+To: Amery Hung <ameryhung@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@kernel.org, 
+	sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, 
+	sdf@google.com, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fix the allmodconfig 'make w=1' issue:
+On Fri, 17 May 2024 at 03:22, Amery Hung <ameryhung@gmail.com> wrote:
+>
+> On Thu, May 16, 2024 at 5:24=E2=80=AFPM Kumar Kartikeya Dwivedi
+> <memxor@gmail.com> wrote:
+> >
+> > On Fri, 17 May 2024 at 02:17, Amery Hung <ameryhung@gmail.com> wrote:
+> > >
+> > > On Thu, May 16, 2024 at 4:59=E2=80=AFPM Kumar Kartikeya Dwivedi
+> > > <memxor@gmail.com> wrote:
+> > > >
+> > > > On Fri, 10 May 2024 at 21:24, Amery Hung <ameryhung@gmail.com> wrot=
+e:
+> > > > >
+> > > > > This patch supports struct_ops programs that acqurie referenced k=
+ptrs
+> > > > > throguh arguments. In Qdisc_ops, an skb is passed to ".enqueue" i=
+n the
+> > > > > first argument. The qdisc becomes the sole owner of the skb and m=
+ust
+> > > > > enqueue or drop the skb. This matches the referenced kptr semanti=
+c
+> > > > > in bpf. However, the existing practice of acquiring a referenced =
+kptr via
+> > > > > a kfunc with KF_ACQUIRE does not play well in this case. Calling =
+kfuncs
+> > > > > repeatedly allows the user to acquire multiple references, while =
+there
+> > > > > should be only one reference to a unique skb in a qdisc.
+> > > > >
+> > > > > The solutioin is to make a struct_ops program automatically acqui=
+re a
+> > > > > referenced kptr through a tagged argument in the stub function. W=
+hen
+> > > > > tagged with "__ref_acquired" (suggestion for a better name?), an
+> > > > > reference kptr (ref_obj_id > 0) will be acquired automatically wh=
+en
+> > > > > entering the program. In addition, only the first read to the arg=
+uement
+> > > > > is allowed and it will yeild a referenced kptr.
+> > > > >
+> > > > > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> > > > > ---
+> > > > >  include/linux/bpf.h         |  3 +++
+> > > > >  kernel/bpf/bpf_struct_ops.c | 17 +++++++++++++----
+> > > > >  kernel/bpf/btf.c            | 10 +++++++++-
+> > > > >  kernel/bpf/verifier.c       | 16 +++++++++++++---
+> > > > >  4 files changed, 38 insertions(+), 8 deletions(-)
+> > > > >
+> > > > > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> > > > > index 9c6a7b8ff963..6aabca1581fe 100644
+> > > > > --- a/include/linux/bpf.h
+> > > > > +++ b/include/linux/bpf.h
+> > > > > @@ -914,6 +914,7 @@ struct bpf_insn_access_aux {
+> > > > >                 struct {
+> > > > >                         struct btf *btf;
+> > > > >                         u32 btf_id;
+> > > > > +                       u32 ref_obj_id;
+> > > > >                 };
+> > > > >         };
+> > > > >         struct bpf_verifier_log *log; /* for verbose logs */
+> > > > > @@ -1416,6 +1417,8 @@ struct bpf_ctx_arg_aux {
+> > > > >         enum bpf_reg_type reg_type;
+> > > > >         struct btf *btf;
+> > > > >         u32 btf_id;
+> > > > > +       u32 ref_obj_id;
+> > > > > +       bool ref_acquired;
+> > > > >  };
+> > > > >
+> > > > >  struct btf_mod_pair {
+> > > > > diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_=
+ops.c
+> > > > > index 86c7884abaf8..bca8e5936846 100644
+> > > > > --- a/kernel/bpf/bpf_struct_ops.c
+> > > > > +++ b/kernel/bpf/bpf_struct_ops.c
+> > > > > @@ -143,6 +143,7 @@ void bpf_struct_ops_image_free(void *image)
+> > > > >  }
+> > > > >
+> > > > >  #define MAYBE_NULL_SUFFIX "__nullable"
+> > > > > +#define REF_ACQUIRED_SUFFIX "__ref_acquired"
+> > > > >  #define MAX_STUB_NAME 128
+> > > > >
+> > > > >  /* Return the type info of a stub function, if it exists.
+> > > > > @@ -204,6 +205,7 @@ static int prepare_arg_info(struct btf *btf,
+> > > > >                             struct bpf_struct_ops_arg_info *arg_i=
+nfo)
+> > > > >  {
+> > > > >         const struct btf_type *stub_func_proto, *pointed_type;
+> > > > > +       bool is_nullable =3D false, is_ref_acquired =3D false;
+> > > > >         const struct btf_param *stub_args, *args;
+> > > > >         struct bpf_ctx_arg_aux *info, *info_buf;
+> > > > >         u32 nargs, arg_no, info_cnt =3D 0;
+> > > > > @@ -240,8 +242,11 @@ static int prepare_arg_info(struct btf *btf,
+> > > > >                 /* Skip arguments that is not suffixed with
+> > > > >                  * "__nullable".
+> > > > >                  */
+> > > > > -               if (!btf_param_match_suffix(btf, &stub_args[arg_n=
+o],
+> > > > > -                                           MAYBE_NULL_SUFFIX))
+> > > > > +               is_nullable =3D btf_param_match_suffix(btf, &stub=
+_args[arg_no],
+> > > > > +                                                    MAYBE_NULL_S=
+UFFIX);
+> > > > > +               is_ref_acquired =3D btf_param_match_suffix(btf, &=
+stub_args[arg_no],
+> > > > > +                                                      REF_ACQUIR=
+ED_SUFFIX);
+> > > > > +               if (!(is_nullable || is_ref_acquired))
+> > > > >                         continue;
+> > > > >
+> > > > >                 /* Should be a pointer to struct */
+> > > > > @@ -269,11 +274,15 @@ static int prepare_arg_info(struct btf *btf=
+,
+> > > > >                 }
+> > > > >
+> > > > >                 /* Fill the information of the new argument */
+> > > > > -               info->reg_type =3D
+> > > > > -                       PTR_TRUSTED | PTR_TO_BTF_ID | PTR_MAYBE_N=
+ULL;
+> > > > >                 info->btf_id =3D arg_btf_id;
+> > > > >                 info->btf =3D btf;
+> > > > >                 info->offset =3D offset;
+> > > > > +               if (is_nullable) {
+> > > > > +                       info->reg_type =3D PTR_TRUSTED | PTR_TO_B=
+TF_ID | PTR_MAYBE_NULL;
+> > > > > +               } else if (is_ref_acquired) {
+> > > > > +                       info->reg_type =3D PTR_TRUSTED | PTR_TO_B=
+TF_ID;
+> > > > > +                       info->ref_acquired =3D true;
+> > > > > +               }
+> > > > >
+> > > > >                 info++;
+> > > > >                 info_cnt++;
+> > > > > diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> > > > > index 8c95392214ed..e462fb4a4598 100644
+> > > > > --- a/kernel/bpf/btf.c
+> > > > > +++ b/kernel/bpf/btf.c
+> > > > > @@ -6316,7 +6316,8 @@ bool btf_ctx_access(int off, int size, enum=
+ bpf_access_type type,
+> > > > >
+> > > > >         /* this is a pointer to another type */
+> > > > >         for (i =3D 0; i < prog->aux->ctx_arg_info_size; i++) {
+> > > > > -               const struct bpf_ctx_arg_aux *ctx_arg_info =3D &p=
+rog->aux->ctx_arg_info[i];
+> > > > > +               struct bpf_ctx_arg_aux *ctx_arg_info =3D
+> > > > > +                       (struct bpf_ctx_arg_aux *)&prog->aux->ctx=
+_arg_info[i];
+> > > > >
+> > > > >                 if (ctx_arg_info->offset =3D=3D off) {
+> > > > >                         if (!ctx_arg_info->btf_id) {
+> > > > > @@ -6324,9 +6325,16 @@ bool btf_ctx_access(int off, int size, enu=
+m bpf_access_type type,
+> > > > >                                 return false;
+> > > > >                         }
+> > > > >
+> > > > > +                       if (ctx_arg_info->ref_acquired && !ctx_ar=
+g_info->ref_obj_id) {
+> > > > > +                               bpf_log(log, "cannot acquire a re=
+ference to context argument offset %u\n", off);
+> > > > > +                               return false;
+> > > > > +                       }
+> > > > > +
+> > > > >                         info->reg_type =3D ctx_arg_info->reg_type=
+;
+> > > > >                         info->btf =3D ctx_arg_info->btf ? : btf_v=
+mlinux;
+> > > > >                         info->btf_id =3D ctx_arg_info->btf_id;
+> > > > > +                       info->ref_obj_id =3D ctx_arg_info->ref_ob=
+j_id;
+> > > > > +                       ctx_arg_info->ref_obj_id =3D 0;
+> > > > >                         return true;
+> > > >
+> > > > I think this is fragile. What if the compiler produces two independ=
+ent
+> > > > paths in the program which read the skb pointer once?
+> > > > Technically, the program is still reading the skb pointer once at r=
+untime.
+> > > > Then you will reset ref_obj_id to 0 when exploring one, and assign =
+as
+> > > > 0 in the other one, causing errors.
+> > > > ctx_arg_info appears to be global for the program.
+> > > >
+> > > > I think the better way would be to check if ref_obj_id is still par=
+t
+> > > > of the reference state.
+> > > > If the ref_obj_id has already been dropped from reference_state, th=
+en
+> > > > any loads should get ref_obj_id =3D 0.
+> > > > That would happen when dropping or enqueueing the skb into qdisc,
+> > > > which would (I presume) do release_reference_state(ref_obj_id).
+> > > > Otherwise, all of them can share the same ref_obj_id. You won't hav=
+e
+> > > > to implement "can only read once" logic,
+> > > > and when you enqueue stuff in the qdisc, all identical copies produ=
+ced
+> > > > from different load instructions will be invalidated.
+> > > > Same ref_obj_id =3D=3D unique ownership of the same object.
+> > > > You can already have multiple copies through rX =3D rY, multiple ct=
+x
+> > > > loads of skb will produce a similar verifier state.
+> > > >
+> > > > So, on entry, assign ctx_arg_info->ref_obj_id uniquely, then on eac=
+h load:
+> > > > if reference_state.find(ctx_arg_info->ref_obj_id) =3D=3D true; then
+> > > > info->ref_obj_id =3D ctx_arg_info->ref_obj_id; else info->ref_obj_i=
+d =3D
+> > > > 0;
+> > > >
+> > > > Let me know if I missed something.
+> > >
+> > > You are right. The current approach will falsely reject valid program=
+s,
+> > > and your suggestion makes sense.
+> >
+> > Also, I wonder whether when ref_obj_id has been released, we should
+> > mark the loaded register as unknown scalar, vs skb with ref_obj_id =3D
+> > 0?
+> > Otherwise right now it will take PTR_TO_BTF_ID | PTR_TRUSTED as
+> > reg_type, and I think verifier will permit reads even if ref_obj_id =3D
+> > 0.
+>
+> If reference_state.find(ctx_arg_info->ref_obj_id) =3D=3D false, I think w=
+e
+> should just return false from btf_ctx_access and reject the program
+> right away.
+>
 
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/vhost/vringh.o
-
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
----
- drivers/vhost/vringh.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-index 7b8fd977f71c..73e153f9b449 100644
---- a/drivers/vhost/vringh.c
-+++ b/drivers/vhost/vringh.c
-@@ -1614,4 +1614,5 @@ EXPORT_SYMBOL(vringh_need_notify_iotlb);
- 
- #endif
- 
-+MODULE_DESCRIPTION("host side of a virtio ring");
- MODULE_LICENSE("GPL");
-
----
-base-commit: 7f094f0e3866f83ca705519b1e8f5a7d6ecce232
-change-id: 20240516-md-vringh-c43803ae0ba4
-
+Hm, yeah, that could be another option as well.
+Might be better than returning a scalar and confusing people on usage later=
+.
 
