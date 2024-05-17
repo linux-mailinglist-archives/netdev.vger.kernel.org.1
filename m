@@ -1,109 +1,189 @@
-Return-Path: <netdev+bounces-96919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0A118C8334
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 11:23:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2E178C836B
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 11:27:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC007282660
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:23:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 210A61C227C5
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:27:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93DE1EB36;
-	Fri, 17 May 2024 09:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="nXtcsZ96"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A369219E1;
+	Fri, 17 May 2024 09:27:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CA320313
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 09:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EF636120;
+	Fri, 17 May 2024 09:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.216.63.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715937790; cv=none; b=n7uWi1OhZFjoxbqN1FBiaivyAIkGujUqUJ8kXVuZPrppmODwzEATh779qqmPu8g9OBmzauoSpmUdK9zOjnNC+E8cT3JX2C82+tyD2w21zhmZ5DdYQvT07GTlCS7B3UvorXJSBWSYJwfu2iRz3kidp8z7ga7305n528ROSLQf+Yg=
+	t=1715938020; cv=none; b=UfKUzPkw9Y4csZjQszm4p3q18nfr45e3ZMLGELx/8bVCqHTFpLKB0m0WtBGjy6tqUYJDM3g8ABYl8ggcf8KWqv3k5Lw6rzl4j+/bFRd79m/COeMsBwSuhccl1PAwyFcf9ElUnFtZSK+2INia4LY2iDnw56WL41MhnE6Ym7fDuBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715937790; c=relaxed/simple;
-	bh=ZoQ4JqUZ2GPYyqakX6Qw4SGFqIe8YQSjQBRjmd9I7Wk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sv8Xs/d/6IuhVqIeMBEzdq70FLXG+kEfD6bubCBKq0cjboP7nU/ihQ+SAkySOokKeI6u9YeJEKxU2oGPQhmHQdpx76zOkSW5DumPQknEC+R/FnUVcEs4yMxWEJwzWy9Er48l1RWiNlyuW/HHDnFQLyiX05jupCGIzlrxzcKLhqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=nXtcsZ96; arc=none smtp.client-ip=207.171.188.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1715937789; x=1747473789;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Q5MlM5j8uG26alKvnRIBWo9Y3iGHnRmkxgLO97N0994=;
-  b=nXtcsZ96akOVKQa28lEGhO7WgIcd+uTbGT9K7rmqeAVlkpZ0nke/Z5BP
-   u3VfvTT8osJmOmCzXhKkOgnwWCFXaBHAGngN+xz1JFwFM4Wdd8su7xXkL
-   8rWtYJmMujZIWMM93kNHW1susUA+VHt3Xn927smgZMVOCSeQ/+qRNIVH8
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.08,167,1712620800"; 
-   d="scan'208";a="727039422"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2024 09:23:03 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:7577]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.228:2525] with esmtp (Farcaster)
- id 35c8b3d5-0af6-4406-90a5-3b2c8a069c06; Fri, 17 May 2024 09:23:03 +0000 (UTC)
-X-Farcaster-Flow-ID: 35c8b3d5-0af6-4406-90a5-3b2c8a069c06
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 17 May 2024 09:23:03 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.119.6.241) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Fri, 17 May 2024 09:22:59 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <mhal@rbox.co>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<shuah@kernel.org>
-Subject: Re: [PATCH net v2 1/2] af_unix: Fix garbage collection of embryos carrying OOB with SCM_RIGHTS
-Date: Fri, 17 May 2024 18:22:50 +0900
-Message-ID: <20240517092250.33314-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <c0fc4799-ee57-45dc-b13b-0be4711b5cf2@rbox.co>
-References: <c0fc4799-ee57-45dc-b13b-0be4711b5cf2@rbox.co>
+	s=arc-20240116; t=1715938020; c=relaxed/simple;
+	bh=dDE02QwcEJgIaN7EsPYpJ/E8ZjuShWfIOgaAUYFyGrI=;
+	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=a98cMfGdPPq6D2zLx62mfYil3PiSSrytH6ifJgnsiZM3XI24+hADVXAe/uSW2SSaXhGXOLCuNsS/5a6iUtHwrFmSl33YlRvqCXZYPMeYM8P3RUcyNoUNF0lgrjwZj0O5nV/sIQD9EYlBepKlDeMg0pLXZYC04sPfInKoEy8Q+h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=63.216.63.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4VghRs6vrLz5R9kB;
+	Fri, 17 May 2024 17:26:49 +0800 (CST)
+Received: from xaxapp01.zte.com.cn ([10.88.99.176])
+	by mse-fl1.zte.com.cn with SMTP id 44H9Qa5F065180;
+	Fri, 17 May 2024 17:26:36 +0800 (+08)
+	(envelope-from ye.xingchen@zte.com.cn)
+Received: from mapi (xaxapp01[null])
+	by mapi (Zmail) with MAPI id mid31;
+	Fri, 17 May 2024 17:26:39 +0800 (CST)
+Date: Fri, 17 May 2024 17:26:39 +0800 (CST)
+X-Zmail-TransId: 2af9664722cf5bc-59194
+X-Mailer: Zmail v1.0
+Message-ID: <20240517172639229ec5bN7VBV7SGEHkSK5K6f@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB002.ant.amazon.com (10.13.138.121) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Mime-Version: 1.0
+From: <ye.xingchen@zte.com.cn>
+To: <davem@davemloft.net>
+Cc: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <corbet@lwn.net>, <dsahern@kernel.org>, <ncardwell@google.com>,
+        <soheil@google.com>, <mfreemon@cloudflare.com>, <lixiaoyan@google.com>,
+        <david.laight@aculab.com>, <haiyangz@microsoft.com>,
+        <ye.xingchen@zte.com.cn>, <netdev@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <xu.xin16@zte.com.cn>, <zhang.yunkai@zte.com.cn>, <fan.yu9@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0XSBpY21wOiBBZGQgaWNtcF90aW1lc3RhbXBfaWdub3JlX2FsbCB0byBjb250cm9sIElDTVBfVElNRVNUQU1Q?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 44H9Qa5F065180
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 664722D9.002/4VghRs6vrLz5R9kB
 
-From: Michal Luczaj <mhal@rbox.co>
-Date: Fri, 17 May 2024 10:55:53 +0200
-> On 5/17/24 09:47, Kuniyuki Iwashima wrote:
-> > From: Michal Luczaj <mhal@rbox.co>
-> > Date: Fri, 17 May 2024 07:59:16 +0200
-> >> One question: git send-email automatically adds my Signed-off-by to your
-> >> patch (patch 2/2 in this series). Should I leave it that way?
-> > 
-> > SOB is usually added by someone who changed the diff or merged it.
-> > 
-> > I think it would be better not to add it if not intended.  At least
-> > on my laptop, it does not add SOB automatically.
-> 
-> Sure, I understand. And the problem was that I had format.signOff = true in
-> .gitconfig. Fixed.
-> 
-> > FWIW, my command is like
-> > 
-> >   git send-email --annotate --cover-letter --thread --no-chain-reply-to \
-> >   --subject-prefix "PATCH v1 net-next" \
-> 
-> maintainer-netdev.rst shows an example with a slightly different order:
-> "[PATCH net-next v3]". But I guess it doesn't matter?
+From: YeXingchen <ye.xingchen@zte.com.cn>
 
-It seems patchwork can parse either format. ("net,vX" and "vX,net")
+The CVE-1999-0524 became a medium risk vulnerability in May of this year.
 
-https://patchwork.kernel.org/project/netdevbpf/list/
+In some embedded systems, firewalls such as iptables maybe cannot to use.
+For embedded systems where firewalls can't be used and devices that don't
+require icmp timestamp, provide the icmp_timestamp_ignore_all interface,
+which ignores all icmp timestamp messages to circumvent the vulnerability.
+
+Signed-off-by: YeXingchen <ye.xingchen@zte.com.cn>
+---
+ Documentation/networking/ip-sysctl.rst                   | 6 ++++++
+ .../networking/net_cachelines/netns_ipv4_sysctl.rst      | 1 +
+ include/net/netns/ipv4.h                                 | 1 +
+ include/uapi/linux/sysctl.h                              | 1 +
+ net/ipv4/icmp.c                                          | 8 ++++++++
+ net/ipv4/sysctl_net_ipv4.c                               | 9 +++++++++
+ 6 files changed, 26 insertions(+)
+
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index bd50df6a5a42..41eb3de61659 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -1441,6 +1441,12 @@ icmp_ratelimit - INTEGER
+
+ 	Default: 1000
+
++icmp_timestamp_ignore_all - BOOLEAN
++	If set non-zero, then the kernel will ignore all ICMP TIMESTAMP
++	requests sent to it.
++
++	Default: 0
++
+ icmp_msgs_per_sec - INTEGER
+ 	Limit maximal number of ICMP packets sent per second from this host.
+ 	Only messages whose type matches icmp_ratemask (see below) are
+diff --git a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
+index 9b87089a84c6..ed72f67c8f72 100644
+--- a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
++++ b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
+@@ -38,6 +38,7 @@ u8                              sysctl_icmp_ignore_bogus_error_responses
+ u8                              sysctl_icmp_errors_use_inbound_ifaddr                                                
+ int                             sysctl_icmp_ratelimit                                                                
+ int                             sysctl_icmp_ratemask                                                                 
++u8                              sysctl_icmp_timestamp_ignore_all
+ u32                             ip_rt_min_pmtu                               -                   -                   
+ int                             ip_rt_mtu_expires                            -                   -                   
+ int                             ip_rt_min_advmss                             -                   -                   
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index c356c458b340..7364c469e7eb 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -113,6 +113,7 @@ struct netns_ipv4 {
+ 	u8 sysctl_icmp_echo_ignore_broadcasts;
+ 	u8 sysctl_icmp_ignore_bogus_error_responses;
+ 	u8 sysctl_icmp_errors_use_inbound_ifaddr;
++	u8 sysctl_icmp_timestamp_ignore_all;
+ 	int sysctl_icmp_ratelimit;
+ 	int sysctl_icmp_ratemask;
+
+diff --git a/include/uapi/linux/sysctl.h b/include/uapi/linux/sysctl.h
+index 8981f00204db..ef8640947f4e 100644
+--- a/include/uapi/linux/sysctl.h
++++ b/include/uapi/linux/sysctl.h
+@@ -426,6 +426,7 @@ enum
+ 	NET_TCP_ALLOWED_CONG_CONTROL=123,
+ 	NET_TCP_MAX_SSTHRESH=124,
+ 	NET_TCP_FRTO_RESPONSE=125,
++	NET_IPV4_ICMP_TIMESTAMP_IGNORE_ALL = 126,
+ };
+
+ enum {
+diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+index ab6d0d98dbc3..6fa5c26cf402 100644
+--- a/net/ipv4/icmp.c
++++ b/net/ipv4/icmp.c
+@@ -1152,6 +1152,11 @@ EXPORT_SYMBOL_GPL(icmp_build_probe);
+ static enum skb_drop_reason icmp_timestamp(struct sk_buff *skb)
+ {
+ 	struct icmp_bxm icmp_param;
++	struct net *net;
++
++	if (READ_ONCE(net->ipv4.sysctl_icmp_timestamp_ignore_all))
++		return SKB_NOT_DROPPED_YET;
++
+ 	/*
+ 	 *	Too short.
+ 	 */
+@@ -1469,6 +1474,9 @@ static int __net_init icmp_sk_init(struct net *net)
+ 	net->ipv4.sysctl_icmp_echo_enable_probe = 0;
+ 	net->ipv4.sysctl_icmp_echo_ignore_broadcasts = 1;
+
++	/* Control parameters for TIMESTAMP replies. */
++	net->ipv4.sysctl_icmp_timestamp_ignore_all = 0;
++
+ 	/* Control parameter - ignore bogus broadcast responses? */
+ 	net->ipv4.sysctl_icmp_ignore_bogus_error_responses = 1;
+
+diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+index 162a0a3b6ba5..b002426c3d9c 100644
+--- a/net/ipv4/sysctl_net_ipv4.c
++++ b/net/ipv4/sysctl_net_ipv4.c
+@@ -651,6 +651,15 @@ static struct ctl_table ipv4_net_table[] = {
+ 		.mode		= 0644,
+ 		.proc_handler	= ipv4_ping_group_range,
+ 	},
++	{
++		.procname	= "icmp_timestamp_ignore_all",
++		.data		= &init_net.ipv4.sysctl_icmp_timestamp_ignore_all,
++		.maxlen		= sizeof(u8),
++		.mode		= 0644,
++		.proc_handler	= proc_dou8vec_minmax,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_ONE
++	},
+ #ifdef CONFIG_NET_L3_MASTER_DEV
+ 	{
+ 		.procname	= "raw_l3mdev_accept",
+-- 
+2.25.1
 
