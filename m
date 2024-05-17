@@ -1,145 +1,241 @@
-Return-Path: <netdev+bounces-96870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 829D98C8167
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:28:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E03FE8C815C
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3917D281E03
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:28:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E833F1C20D51
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D1BD1755A;
-	Fri, 17 May 2024 07:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C64C171BA;
+	Fri, 17 May 2024 07:25:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="KBSuWkDE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BRTCby67"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D119A17557;
-	Fri, 17 May 2024 07:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715930881; cv=none; b=HB0fiAQDQqR4tdXQoF7bExza+Y4J7KHUKzHRWtb1rEM86tZiTy9/7PpbS8OcFYz96HaCjW3HmCBWs+6QfKfX1vz7IApzFfS3jozmgzFY/OA/ZSVzbDegh6NP2Ky/RPHnyOH61sGB1WS7tttiStQSSqE7CIzcel3EuB4OsuGdDGQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715930881; c=relaxed/simple;
-	bh=V9pZqZSgm0WFadTWQjQ7+lXhSwdmCrkdWtj1xIfgeCw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jcM/LUxhyjrJFJw5/Klv8JtLrwYmSv9eYwClcHJcsk4dsCBSBpoZ2ZfKrmZkQOB6wLmM8EtgkjWPKiR2vDrbETIhwJI4wlYjiqNqJUw3JtgkuwiziIbnxbdAMQ9lW4Ig/kC0CdAXU2709ybrtn27U1YTbLtywOni9C53dgbqsWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=KBSuWkDE; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1715930876; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=Ymc8U18af+lJxyPx76zWHby9MgnIgq3GTnFdlP/uLo4=;
-	b=KBSuWkDEASFK5Wj0gOvHsuGGE4Wg7LyY2ZeaEOkjK6azroF4WcE5p3xcQJ3CDyWprmOmrkQS1RC5EkJPi/n2b6IOBOkaP4puqS9YnoLvbO11GNLN6HE6ByzOUMJdQDvNRnJkd68f6DO5wZPIV2AZZldTwiBg8+svocgwyL7GNC8=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067109;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0W6drV.v_1715930399;
-Received: from 30.221.130.119(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W6drV.v_1715930399)
-          by smtp.aliyun-inc.com;
-          Fri, 17 May 2024 15:20:01 +0800
-Message-ID: <cc0480b1-d02a-406c-8b58-aae4ac4aa0ce@linux.alibaba.com>
-Date: Fri, 17 May 2024 15:19:59 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4B115AE0
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 07:25:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715930719; cv=fail; b=Dg1bHbZxlRS8wNv7yqcQ+sIkDJ9FuhWLiGhKM+Qo3PnqM6EBSpGABamOlTBl9RMJZNQGPS4R1bbhX8jyMjFYwYg2mMLGgrxUBuMVMg4T6/eldcL3SrJPt+SEjixGTAXO52+Rq5xX2Ep5IWQN1rNJWoM1hggXKkbawT0F9NeFT6I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715930719; c=relaxed/simple;
+	bh=Mi0nUnn2vsLARj3PNwdUdB1jYbfIIuVthpOuOcJ1qAI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=p8sZyOCubL82griXZJDUy0OMxGPShKJQhYcIrQK50CXSR2QUGGth1CbimLsRCZyYlkZLls6zoA1kshYiFL9hvHj2SagmDf5zggBJ2qDUUfgVHkYhFhYIsBsB6ypG7NdnbY2YbS3jb/p2+w/Ei0hcP1rIlPLZdoZxX8bUjpEALi4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BRTCby67; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715930717; x=1747466717;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Mi0nUnn2vsLARj3PNwdUdB1jYbfIIuVthpOuOcJ1qAI=;
+  b=BRTCby67ZFSQqS1xJgom2le+8VnQE1o6qIlnqXsXM65SU5y/YK3DbmGI
+   VLjjWb3yTSFfNuGH21i4kDayFJd0kj9WthsuIvAVyE2aLnFgWSeu4vIAQ
+   ybhXn8xb8Zyli7vaXJrJHBGj5WfUaRNE5gBT2tXgdtc7tAZHYuc4iH0UE
+   Qo+CZ5+vf4+S1WcJKATa2OyPO9bd2qgdMIJdgEBYmKul85p5KpcHcLEdY
+   l5cQxU5HfbkdJyOB8dIGxfd9hRPTwEMDADaWF42vWS4p5OwlF/zYXr1CL
+   7jBOjr4vHIdtvTZrRyswb3bj+LX70uiBV28PdWJz/JIUlWaSqnbxVNth/
+   w==;
+X-CSE-ConnectionGUID: jdr34r/HSDyupRt0w0KUDw==
+X-CSE-MsgGUID: PuWeQ8RgTrKjIDfS3ZrCNA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="11932718"
+X-IronPort-AV: E=Sophos;i="6.08,167,1712646000"; 
+   d="scan'208";a="11932718"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2024 00:25:15 -0700
+X-CSE-ConnectionGUID: 18mdfl0vQ+CiGMVGW32f8A==
+X-CSE-MsgGUID: EE6PzTwZS1K3W5SaVtJ6hQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,167,1712646000"; 
+   d="scan'208";a="32302232"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 May 2024 00:25:15 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 17 May 2024 00:25:14 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 17 May 2024 00:25:14 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 17 May 2024 00:25:14 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.40) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 17 May 2024 00:25:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dOslYRSiYqv3fuSa5DuaP0AsZqzT+TyveKyCxvNy6et1l0gLbOlyGCvX98W7xfmJj0wNOhE6jAfwpvyhLcxgibHadP88IA30pp71jzZbCk8SWVV7Q5kvXbzQmc7LQN4fkFbigQ/kMnKUr+tvyePTtj6oLKGRTtbSHZRWYVZKmn7OqdbWQ8zfRZXMH43V/ggl8CGWaNxT5vZaOqBM6izwIddd1Qzz0HCffCib1FZCjYF6kFN9PP6FSuKzWO/1Dt/pxaLwXFETxx6aHn/mQ36eoQucRr5+6Bf88YxQGW8Pcg0I0pq3brOXk2oKL/5biwXUFKdPhdQYP2W7lrtSgPGnGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QUiyp2uLgOcMLYNYtncKxHUokc+KI4E9WRdx7nmza20=;
+ b=UnfeFzNkpZ/gW12w9zmf9OSpJcjHgZkVW7V5rZSf5ejoQwXfNLYorsrVO4Ip/L/nVE8cz1EnHObMePMN9WhN1HzQft0ngVC4c0+m8mAy/fcUoNP778EN4JMrhWFwyvnP2WhbiAmpIWot0PyX1RZVRFT9COvDMbLR4R3zIstjc0fRjf8ID5OEgnfuBeyLP6dn1XZrTpPJI96OCE4SQRpzmGuv1gBlHWDfUpH5zWH05vur3ITsQi6kR9GXNPiJy7AnnEnnD1Jm0Ma4VL6I+cKVQ331p+wNNXCcMhycuPiedXhLlRvtXrrekDGHrfL+Xy8tuASAEdxSysT8Lm+zRI0WIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
+ by MW3PR11MB4668.namprd11.prod.outlook.com (2603:10b6:303:54::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.26; Fri, 17 May
+ 2024 07:25:09 +0000
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4f97:ad9d:79a9:899f]) by CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4f97:ad9d:79a9:899f%6]) with mapi id 15.20.7544.041; Fri, 17 May 2024
+ 07:25:09 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: "Kolacinski, Karol" <karol.kolacinski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "Kolacinski, Karol"
+	<karol.kolacinski@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH v10 iwl-next 12/12] ice: Adjust PTP init
+ for 2x50G E825C devices
+Thread-Topic: [Intel-wired-lan] [PATCH v10 iwl-next 12/12] ice: Adjust PTP
+ init for 2x50G E825C devices
+Thread-Index: AQHalkzh8g1CdPL9WkK/bkqtWi0+TbGbKaHQ
+Date: Fri, 17 May 2024 07:25:09 +0000
+Message-ID: <CYYPR11MB842975C2FC5598593A117D70BDEE2@CYYPR11MB8429.namprd11.prod.outlook.com>
+References: <20240424133542.113933-16-karol.kolacinski@intel.com>
+ <20240424133542.113933-27-karol.kolacinski@intel.com>
+In-Reply-To: <20240424133542.113933-27-karol.kolacinski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|MW3PR11MB4668:EE_
+x-ms-office365-filtering-correlation-id: d5bd0c80-cbbe-414c-28ac-08dc76427ba1
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|366007|1800799015|376005|38070700009;
+x-microsoft-antispam-message-info: =?us-ascii?Q?xKzGQNwCuE1mfYiOhBLP3GBG0B83zUOV2LcRUuDPTHUJGScjHoFUnOtXTiLn?=
+ =?us-ascii?Q?mG5bbj3IBfJxLCI75YcrLutxHT0420SxhN3y1ZluFfQ6wtEhFEDZCWYtl5V8?=
+ =?us-ascii?Q?Nov0fDuYIdifd+bt7BejqdCrpsKM2BRk7N0qF4+PlMy9uonc2Z94tF/ADkUe?=
+ =?us-ascii?Q?HxWso28ZySeh6U1YDH0S0bV9pfvmnQTIHdLLd+kPw9iQXk3ON+cw0ozj0Dqb?=
+ =?us-ascii?Q?mKYieF8N+UV9QbqmVOXu6nxqmzUqwXQTjXHk6an7OETMdtpL9soQQd5Qdwsb?=
+ =?us-ascii?Q?AdU6lVnIDnIABxnJe8tcBahIQPgnLjQJjYzRfLw1SKryMkaP+1xZ2dO9Khob?=
+ =?us-ascii?Q?NtyvvaLiGDSUvrhbXqDfm+5wRY2pFC/D9IuFNJ4YTyO5xd4igmfcrTRY25gm?=
+ =?us-ascii?Q?OaDirDh0esAwqNCcrvELa+UO4UAlOfsH1gnCJ6o3oU8cwkcM54sHnqednNye?=
+ =?us-ascii?Q?091eEPQImedHvH1emIHy86xiCKKPA3KTskDYj9zWhmGC9i14ZxRuwo7PsA3P?=
+ =?us-ascii?Q?lN9aq85Gwqh76OEWdzKjYkSOe1UQGoR3R7cmqATCztU/UbhUMVUMY7lUw+88?=
+ =?us-ascii?Q?mLc4ndcC41Tge1sg1Ds+QZF1TMg9Zq02ArtAujMdrNUqn0CMTXAh9NneNwXH?=
+ =?us-ascii?Q?o8+kBhy0h09ajI5D7XfOL0lcuYmV2f2+kMEVWgryS5Z/5vs68TYID2BDsAKh?=
+ =?us-ascii?Q?3yg/GEVMYayhwIsmR02JM3IEDjRUUvADAESisomAwtfI//3a4pHM7sUGTn3U?=
+ =?us-ascii?Q?OPJMLEehUJZeC8nHFLnEjUH9bhZ+0SvqzTrtzNOLsgQZlqiIcdqjQlh3iHHB?=
+ =?us-ascii?Q?CdyyK7TFA29hDlrOiHECxMk+1etDFDcOKPId76ffYu+kOhDQDjNkmfT7OyBl?=
+ =?us-ascii?Q?6YFeZ7XpN4V+2+Rj+rgldUm/u9B0p5qufLYQ309xcUxak0vgQNvd3DN12vQM?=
+ =?us-ascii?Q?RW8Lxtj5SxgaWGqLx5oKvJsa4MzxHj/aAKpWMEQf0arxvC2vwNXVlMDdRIGB?=
+ =?us-ascii?Q?rfaIDEDMOyorR1q9FsMMna1z2xETlUwfsQ+/lQYpOontqWbix2znnr2hoo/U?=
+ =?us-ascii?Q?wDwJ+FwZtVjT95PZnyJXysXB9voh9sJ9J3ZVP2mEdbKQ0+V9y0esjrYpWUAl?=
+ =?us-ascii?Q?9bghCDpqiXgeZiLf5/JOJpXQjxDz/UpocB+VqGFjdH2dpI7tY9UsIcvXUwXQ?=
+ =?us-ascii?Q?bLZG9ZeHMdTxSI+N81w5IfVstp0bDoltsFCfo3L2fbnE3eISh6OYK59Y22uy?=
+ =?us-ascii?Q?pyAt1o5jcZdgfsapc2Ul0Hjre+Wjc5mEMtwtFn5a1n0kN5nfZvYEIlevfI83?=
+ =?us-ascii?Q?eeO3Lk8J+qk06JYvS9X6Z35E+bg8mQHtPAp8Js9+foTwOg=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?5IRB3ae0tMuDuTq2iD9R5seL5lGdKyJIsLvSoQBiln7stOmPpikLlPJzC9Pj?=
+ =?us-ascii?Q?7q42gpfQPi0cclLxK2H7NM9tJ8wztiqTlpWuKj34Gira5BvIDpFki1x7xqPU?=
+ =?us-ascii?Q?XKrzIO2IacyObmw24eqYhPAX1GW+zqGjhT2IdRyRtZPuCg5IUTIKyuwqk5HB?=
+ =?us-ascii?Q?jpVpwpQXc7YwohXDKaNfN7b84QjOcwIJWccoKvA3OoOaw/RiQzkmtE/vKpbi?=
+ =?us-ascii?Q?afGZh2ghueon5rX9EXXeqERZP8LZDHU61wunDIwUuWWirI5j/RwjiN9WQ2bQ?=
+ =?us-ascii?Q?L2ePNwzoIrkC8D3PBzLmCeuoNXv5+x4WNAUq4DEw4RltxnwKLfo0Wk1V+COy?=
+ =?us-ascii?Q?NYvUQDl9MirzH8MbPgmPCPcdEnGSzz3JSxznFoE9BojcSmMhNsR7o4wl1hkK?=
+ =?us-ascii?Q?56xPPMJXrC0Cr5jlajulDTIDzN5HMTF6oBaKTLyctusYitI3KCT4x0YEy8Ai?=
+ =?us-ascii?Q?gH4H2tRIs3l9b/4aDK+pA6qGhsVNGjc2PcIZIvntsGpLdDAvi+xFoEcSeDt+?=
+ =?us-ascii?Q?Z2yCP8TAs54Et36if8ojdoXp/kZlSJRv39Oi1cKSpH1iG26w33yf8j3ptq5r?=
+ =?us-ascii?Q?8uK1J9TlrVfFVk9JriCpSnBU17vOyB19NCnfY4a6ynRDSswlhd7lMCnav8Bh?=
+ =?us-ascii?Q?kd/6JZv1wL/lGtjE3PqrR/SZNELD93VCPl3TRMw0pxY6nU5nKeVj0sCO7hxm?=
+ =?us-ascii?Q?LIDVAXYnepsnfF4AMwekBvReUDQi+0BKHftN/gvLsGN8tgmJ1cPq4ZPn9XCR?=
+ =?us-ascii?Q?QEutQxQ0ONy+SyLwKVqLq4ptVldstRZ2ecRLbC8sMFbKVDxdmfI61OuqE/S9?=
+ =?us-ascii?Q?r5BRdlCljGA4LpXk0AhbNuaM/yqC9GDC6vSPdrN03S78b/qruOslx6nXJYCF?=
+ =?us-ascii?Q?IjQBc3koIeCsJUTVke+70dR0BXH9OsbDFZ7E+MM3DK13PBOP2Nf3pTiEoWJM?=
+ =?us-ascii?Q?wc9z1ij1pxvJG/Tg4SqrLAASIa5cSVgOtrtFq5lVR1BiJXHNk+uDzc5T3SDJ?=
+ =?us-ascii?Q?BeNtInqaZ8bmwHCM9MTNsc92qzaXthG5L/kLk+T2m9y4Idkia5PnMrSyAGIZ?=
+ =?us-ascii?Q?XLZwssS4z77TFe7OcoC7zLtvcsB999nI+FHJaTSPITHo5L0rWM38yH2gPh4s?=
+ =?us-ascii?Q?irfE+2heDnS7zx+eWWrSKCPFU67E6GGTNrUckD19z995mD8ms8yMNWH4a1FP?=
+ =?us-ascii?Q?howcKwjFmh55qjRApYg4eRWO24bFZq570h+vXy4gszSWnCToXqHRNlMzBwUa?=
+ =?us-ascii?Q?FGHV24cCrfUsky5cOAGiAbeFt5ScQ4ManM4KX9H22fOnyHm33hrTTgKU0rb9?=
+ =?us-ascii?Q?Lt0CV5vIH+Xi11sfnnLygbUWuRZ0k7IGaZeTEQ9RxbYL3ebsBl5YFT3k7Xzt?=
+ =?us-ascii?Q?XJozzHNxe3IUYZqTf794O6Opl2613PrUw8UsB+VNwKUnbXVXgCT8OY3dzEmB?=
+ =?us-ascii?Q?BcOMF/N4b+EHnew0wAHTLYMfNWsKTYBJ1WIhIlRVEqIP4bs/gCgR1uvkymPa?=
+ =?us-ascii?Q?AmC4qZnQvqcHl/McigciiUFpQ4wE/MAOoNFlbF970jIGit43++9pnLdz6n+b?=
+ =?us-ascii?Q?m2/vYk0qBgQsPy6eWfeQkHHhuJanbWaGT3OxKR35i2zMC0stNqQpV28iLmle?=
+ =?us-ascii?Q?Xw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: some questions about restrictions in SMC-R v2's implementation
-To: Wenjia Zhang <wenjia@linux.ibm.com>,
- Guangguan Wang <guangguan.wang@linux.alibaba.com>, jaka@linux.ibm.com,
- kgraul@linux.ibm.com
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <6d6e870a-3fbf-4802-9818-32ff46489448@linux.alibaba.com>
- <ba4c7916-d6c4-44b6-a649-1e17c65e87f9@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <ba4c7916-d6c4-44b6-a649-1e17c65e87f9@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5bd0c80-cbbe-414c-28ac-08dc76427ba1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 May 2024 07:25:09.3616
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6Rahppck2m4kMaRuadWx9ragSFo38rdnysITe/YkU9ocrDfBAPbv08ToQQB302Cz4eA573GGZiwmbR7XJoALxwcIrUL4b79TH3gGsCw70Lk6AzX/mb8pqEDvBO9tJ0Oq
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4668
+X-OriginatorOrg: intel.com
 
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
+arol Kolacinski
+> Sent: Wednesday, April 24, 2024 7:00 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Kubalewski, Arkadiusz <arkadiusz.kubalewski@i=
+ntel.com>; Kolacinski, Karol <karol.kolacinski@intel.com>; Nguyen, Anthony =
+L <anthony.l.nguyen@intel.com>
+> Subject: [Intel-wired-lan] [PATCH v10 iwl-next 12/12] ice: Adjust PTP ini=
+t for 2x50G E825C devices
+>
+> From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+>
+> From FW/HW perspective, 2 port topology in E825C devices requires merging=
+ of 2 port mapping internally and breakout mapping externally.
+> As a consequence, it requires different port numbering from PTP code pers=
+pective.
+> For that topology, pf_id can not be used to index PTP ports. Even if the =
+2nd port is identified as port with pf_id =3D 1, all PHY operations need to=
+ be performed as it was port 2. Thus, special mapping is needed for the 2nd=
+ port.
+> This change adds detection of 2x50G topology and applies 'custom'
+> mapping on the 2nd port.
+>
+> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> ---
+> V4 -> V5: - reworded commit mesage
+>           - renamed GLGEN_SWITCH_MODE_CONFIG_SELECT_25X4_ON_SINGLE_QUAD_M=
+ to
+>             GLGEN_SWITCH_MODE_CONFIG_25X4_QUAD_M
+>
+> .../net/ethernet/intel/ice/ice_hw_autogen.h   |  4 ++++
+>  drivers/net/ethernet/intel/ice/ice_ptp.c      |  5 +++++
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 22 +++++++++++++++++++
+>  drivers/net/ethernet/intel/ice/ice_type.h     |  9 ++++++++
+>  4 files changed, 40 insertions(+)
+>
 
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
-On 2024/5/10 17:40, Wenjia Zhang wrote:
-> 
-> 
-> On 07.05.24 07:54, Guangguan Wang wrote:
->> Hi, Wenjia and Jan,
->>
->> When testing SMC-R v2, I found some scenarios where SMC-R v2 should be worked, but due to some restrictions in SMC-R v2's implementation,
->> fallback happened. I want to know why these restrictions exist and what would happen if these restrictions were removed.
->>
->> The first is in the function smc_ib_determine_gid_rcu, where restricts the subnet matching between smcrv2->saddr and the RDMA related netdev.
->> codes here:
->> static int smc_ib_determine_gid_rcu(...)
->> {
->>      ...
->>          in_dev_for_each_ifa_rcu(ifa, in_dev) {
->>              if (!inet_ifa_match(smcrv2->saddr, ifa))
->>                  continue;
->>              subnet_match = true;
->>              break;
->>          }
->>          if (!subnet_match)
->>              goto out;
->>      ...
->> out:
->>      return -ENODEV;
->> }
->> In my testing environment, either server or client, exists two netdevs, eth0 in netnamespace1 and eth0 in netnamespace2. For the sake of clarity
->> in the following text, we will refer to eth0 in netnamespace1 as eth1, and eth0 in netnamespace2 as eth2. The eth1's ip is 192.168.0.3/32 and the
->> eth2's ip is 192.168.0.4/24. The netmask of eth1 must be 32 due to some reasons. The eth1 is a RDMA related netdev, which means the adaptor of eth1
->> has RDMA function. The eth2 has been associated to the eth1's RDMA device using smc_pnet. When testing connection in netnamespace2(using eth2 for
->> SMC-R connection), we got fallback connection, rsn is 0x03010000, due to the above subnet matching restriction. But in this scenario, I think
->> SMC-R should work.
->> In my another testing environment, either server or client, exists two netdevs, eth0 in netnamespace1 and eth1 in netnamespace1. The eth0's ip is
->> 192.168.0.3/24 and the eth1's ip is 192.168.1.4/24. The eth0 is a RDMA related netdev, which means the adaptor of eth0 has RDMA function. The eth1 has
->> been associated to the eth0's RDMA device using smc_pnet. When testing SMC-R connection through eth1, we got fallback connection, rsn is 0x03010000,
->> due to the above subnet matching restriction. In my environment, eth0 and eth1 have the same network connectivity even though they have different
->> subnet. I think SMC-R should work in this scenario.
->>
->> The other is in the function smc_connect_rdma_v2_prepare, where restricts the symmetric configuration of routing between client and server. codes here:
->> static int smc_connect_rdma_v2_prepare(...)
->> {
->>      ...
->>      if (fce->v2_direct) {
->>          memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
->>          ini->smcrv2.uses_gateway = false;
->>      } else {
->>          if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
->>                smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
->>                ini->smcrv2.nexthop_mac,
->>                &ini->smcrv2.uses_gateway))
->>              return SMC_CLC_DECL_NOROUTE;
->>          if (!ini->smcrv2.uses_gateway) {
->>              /* mismatch: peer claims indirect, but its direct */
->>              return SMC_CLC_DECL_NOINDIRECT;
->>          }
->>      }
->>      ...
->> }
->> In my testing environment, server's ip is 192.168.0.3/24, client's ip 192.168.0.4/24, regarding how many netdev in server or client. Server has special
->> route setting due to some other reasons, which results in indirect route from 192.168.0.3/24 to 192.168.0.4/24. Thus, when CLC handshake, client will
->> get fce->v2_direct==false, but client has no special routing setting and will find direct route from 192.168.0.4/24 to 192.168.0.3/24. Due to the above
->> symmetric configuration of routing restriction, we got fallback connection, rsn is 0x030f0000. But I think SMC-R should work in this scenario.
->> And more, why check the symmetric configuration of routing only when server is indirect route?
->>
->> Waiting for your reply.
->>
->> Thanks,
->> Guangguan Wang
->>
-> Hi Guangguan,
-> 
-> Thank you for the questions. We also asked ourselves the same questions a while ago, and also did some research on it. Unfortunately, it was not yet done and I had to delay it because of my vacation last month. Now it's time to pick it up again ;) I'll come back to you as soon as I can give a very 
-> certain answer.
-> 
-> Thanks,
-> Wenjia
-
-Hi Wenjia, is there any new information on the original intent of these designs? :) Thanks!
 
