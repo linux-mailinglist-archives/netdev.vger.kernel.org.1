@@ -1,63 +1,104 @@
-Return-Path: <netdev+bounces-96993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 124CA8C894C
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:24:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D77678C8961
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 432041C222D1
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:24:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 071321C22BDC
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A88E12D201;
-	Fri, 17 May 2024 15:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E329312D219;
+	Fri, 17 May 2024 15:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="ueqelzg1"
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="KFyjp5QG";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dPnNRHpx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-190f.mail.infomaniak.ch (smtp-190f.mail.infomaniak.ch [185.125.25.15])
+Received: from flow1-smtp.messagingengine.com (flow1-smtp.messagingengine.com [103.168.172.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF0954673
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 15:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E49712CD8A;
+	Fri, 17 May 2024 15:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715959492; cv=none; b=HQRWZS6MHtdCO2volNuN6M1NY8M2Bxmlv3x3GCIew4YPNS/HnmYnichwd+ZRngwbNZCN9EbsvaKVxC88vY8yASHHTv7YxEXoKjfmHvMNekb2PaRmSEhHiR51OPY1LYIY3LSIQ2KYd9pn7uy4shG5Mc+YkBNcXGXZA4RWmYMLd6s=
+	t=1715959939; cv=none; b=EaAq9GZl0XTa60fyIHcCZINBOct9K5ToWs2JkLr/p4cJahldVvtWUZLWDJQA9ss3M8WL2rZ3kmFOAqXmC2Hs7LkhTFBn/GyZhTiZgpRsv6DrXBRz27IqbgMBQtGEkDF3kBjgOVTZP28nFL79vl9oGgwNvuyFgaMd2AG82PbCUv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715959492; c=relaxed/simple;
-	bh=cUMkYnXb2sVcgkJHzzstVudL5onkuBflFC5M66AkkAo=;
+	s=arc-20240116; t=1715959939; c=relaxed/simple;
+	bh=D+aZeg+2cJFRvQasfMNMmYWH8MS31v4X+wRV4Zfj6AM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nzZntYegMGJ0RGP2Hl6LKU4I/pQPbgWR2z3a+o9LIlYVt/roFQCSNEW1bmmXjhWHCcOh4l4kwN7gwZ6MWVHxIR8bSNVqgA6Hdj6thwhoDldy8zkrFanaWawvlMdJZXLTQX6q3aOEvoxOZBA5c6l0F/r4gXbG87aW4YLxvk8yozE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=ueqelzg1; arc=none smtp.client-ip=185.125.25.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VgrNl6JJbz13M3;
-	Fri, 17 May 2024 17:24:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1715959479;
-	bh=8cODBbaV2wOKAiX030YC9XoVHmqVf2+m2ed+C0a8c+4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ueqelzg19343f69VenrcasMFnBmalWOXY0aHal5RLHRC3JZaZNw/mA+RojjzK//oI
-	 2fqXEesvnQJpgmXflhkK8FMJqhX18qIrlJtCTCiPqyD5u1zFUkjgcgxaF24m5BO1z8
-	 r4r09+By6TmkuJgehvJPvua7gSEdlisBPA2vXqm8=
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4VgrNl30d9zsjt;
-	Fri, 17 May 2024 17:24:39 +0200 (CEST)
-Date: Fri, 17 May 2024 17:24:41 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, linux-security-module@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Subject: Re: [RFC PATCH v1 03/10] selftests/landlock: Create 'create' test
-Message-ID: <20240517.Wieciequ2iec@digikod.net>
-References: <20240408093927.1759381-1-ivanov.mikhail1@huawei-partners.com>
- <20240408093927.1759381-4-ivanov.mikhail1@huawei-partners.com>
- <ZhPsWKSRrqDiulrg@google.com>
- <9a8b71c6-f72c-7ec0-adee-5828dc41cf44@huawei-partners.com>
- <20240508.Kiqueira8The@digikod.net>
- <986f11a9-1426-a87d-c43e-a86380305a21@huawei-partners.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ayqcw4r9ET+VR8GqSGlYdhjQ9FYvwtIzUHssBAGcTObCNhIT7HB6N6h7YwLCEmSMKhpzWY8SBAtrjW5UdYO1qiD+ILTIFrFjuqxJNziPvuCKQITke1tFmYHZUBwDavpLgYqD5gbJPmSbPsuy+2g85H9bqMK/xB7n/hhmJf0Izq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=KFyjp5QG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dPnNRHpx; arc=none smtp.client-ip=103.168.172.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailflow.nyi.internal (Postfix) with ESMTP id 88422200450;
+	Fri, 17 May 2024 11:32:16 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute1.internal (MEProxy); Fri, 17 May 2024 11:32:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1715959936;
+	 x=1715967136; bh=s8Q/l0wRHpTp9lBxT46kDXxjSSe7yKH9ZdbIurG921s=; b=
+	KFyjp5QGLxIPQPo4O+zmoE47Jgqxd4Yz/Ph7adPQ819doQ+vUOamctaLYbQaDSkE
+	STG2S4bzMOEA5CslT/UDD9Y7pKT7GBNySNmiVaWJ+NHcJGY4BLU7p91iAUr6OZIo
+	hYwJG1kNRrWyVv4nGK2DMdEtXjkxj/xCbgIZjWFbvNiaPyvJPmSkucmAwwLci3i5
+	wYPhrb+5fvfBtiikiIR4T2F8/z61p3dXUcWrK4tIJ8/DO+rYS5jS30EF8FtN+Do1
+	eqB3VXCW9KlhlSPy6qv/3ctxn+mUO9W8e4o8IkRyWQP/2VE4YY6sNlsYI0j0pZoy
+	W9A7lKeKTdjUVN5ozuH2iw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1715959936; x=
+	1715967136; bh=s8Q/l0wRHpTp9lBxT46kDXxjSSe7yKH9ZdbIurG921s=; b=d
+	PnNRHpxgGOd3y0t1HZgRFwZq0lIa84YUvy7ksSoEKQ6dsraCoxAFp2Ojqdb+pLFP
+	WhNjPExz/Q7yUwZbdDfSvyoncx9yvhy2Wqt/kXDeIiaH+aLkwIh/8cbn9PCr3hNa
+	/lwPttFQO4j1LM6KbomvWoG3QisosZl/i0E5f0Bv0TQ5leEknPqjs/PuQHvP+l9s
+	+nsSrHmxGUVvX/lH7YZ4phwURyx2OK169Y73Z3VLs0ShNEyZz7SWV5XL3kXqMOBV
+	tYtoSs5lG3pPMPutNuBadU7VjC1/W2bVlHqNCs3hhkh7h9tPJS+WWY/2m2Eb0BdJ
+	R+KeeQH8r6lLCZqCD946A==
+X-ME-Sender: <xms:gHhHZi_uoK0ohc3Ob6gTqQ_1YFBMK9BwMXiP7vU3A8F6xXC4Vp6Iew>
+    <xme:gHhHZivAzSBO33oW1odv7C7dFOi_mmb95QGi4mMHbGXQ7ioLokx3_RRAcUtw1Vxhe
+    HXJwpdIqsg2wQ>
+X-ME-Received: <xmr:gHhHZoDMRTtQu9GIwlN8P0cmn1ErQNGXIR45mXKdiZDQPwOMep0gSYBydS8WYBxhcNcB513fL3Qz-Y7QQFyRafHAghAnC3AQCC4Seg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvdehfedgudegvdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomhepifhr
+    vghgucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnheple
+    ekheejjeeiheejvdetheejveekudegueeigfefudefgfffhfefteeuieekudefnecuffho
+    mhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
+X-ME-Proxy: <xmx:gHhHZqd-Vr2ozLK8ZN89CLKz5_JvooYw2FTifP2xp1PJekIN-Xigpw>
+    <xmx:gHhHZnO71SM8Pki1pXjseWsw1UcmznmbIHbUnd3u9Cfdu1YfaIKasg>
+    <xmx:gHhHZkm-VFHPtBCePeAys828Z6op_Tp3MI5GgDViB_eHzcYML_dTig>
+    <xmx:gHhHZpss9O8sYpESFJo2an3fRrSxZ1DqU5DX7EZLxnrivDafY6QCbQ>
+    <xmx:gHhHZo_D6DA87FMkIMNExhtlzq06u_JdSDIXNrql534y6tV7vURO7teR>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 17 May 2024 11:32:15 -0400 (EDT)
+Date: Fri, 17 May 2024 17:32:12 +0200
+From: Greg KH <greg@kroah.com>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: Vitor Soares <vitor.soares@toradex.com>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Kopp <thomas.kopp@microchip.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	LKML <linux-kernel@vger.kernel.org>, stable@vger.kernel.org,
+	Vitor Soares <ivitro@gmail.com>
+Subject: Re: [PATCH v6] can: mcp251xfd: fix infinite loop when xmit fails
+Message-ID: <2024051744-evaluate-dubbed-8433@gregkh>
+References: <20240517134355.770777-1-ivitro@gmail.com>
+ <b95de04f-a2f8-4564-b9d4-9c09c47f23c3@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,73 +108,37 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <986f11a9-1426-a87d-c43e-a86380305a21@huawei-partners.com>
-X-Infomaniak-Routing: alpha
+In-Reply-To: <b95de04f-a2f8-4564-b9d4-9c09c47f23c3@web.de>
 
-On Thu, May 16, 2024 at 04:54:58PM +0300, Ivanov Mikhail wrote:
+On Fri, May 17, 2024 at 04:44:18PM +0200, Markus Elfring wrote:
+> …
+> > This patch resolves the issue by starting …
 > 
+> Will further imperative wordings be more desirable for an improved change description?
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.9#n94
 > 
-> 5/8/2024 1:38 PM, Mickaël Salaün wrote:
-> > On Thu, Apr 11, 2024 at 06:58:34PM +0300, Ivanov Mikhail wrote:
-> > > 
-> > > 4/8/2024 4:08 PM, Günther Noack wrote:
+> Regards,
+> Markus
+> 
 
+Hi,
 
-> > > > > +		{
-> > > > > +			TH_LOG("Failed to create socket: %s", strerror(errno));
-> > > > > +		}
-> > > > > +		EXPECT_EQ(0, close(fd));
-> > > > > +	}
-> > > > > +}
-> > > > 
-> > > > This is slightly too much logic in a test helper, for my taste,
-> > > > and the meaning of the true/false argument in the main test below
-> > > > is not very obvious.
-> > > > 
-> > > > Extending the idea from above, if test_socket() was simpler, would it
-> > > > be possible to turn these fixtures into something shorter like this:
-> > > > 
-> > > >     ASSERT_EQ(EAFNOSUPPORT, test_socket(AF_UNSPEC, SOCK_STREAM, 0));
-> > > >     ASSERT_EQ(EACCES, test_socket(AF_UNIX, SOCK_STREAM, 0));
-> > > >     ASSERT_EQ(EACCES, test_socket(AF_UNIX, SOCK_DGRAM, 0));
-> > > >     ASSERT_EQ(EACCES, test_socket(AF_INET, SOCK_STREAM, 0));
-> > > >     // etc.
-> > 
-> > I'd prefer that too.
-> > 
-> > > > 
-> > > > Would that make the tests easier to write, to list out the table of
-> > > > expected values aspect like that, rather than in a fixture?
-> > > > 
-> > > > 
-> > > 
-> > > Initially, I conceived this function as an entity that allows to
-> > > separate the logic associated with the tested methods or usecases from
-> > > the logic of configuring the state of the Landlock ruleset in the
-> > > sandbox.
-> > > 
-> > > But at the moment, `test_socket_create()` is obviously a wrapper over
-> > > socket(2). So for now it's worth removing unnecessary logic.
-> > > 
-> > > But i don't think it's worth removing the fixtures here:
-> > > 
-> > >    * in my opinion, the design of the fixtures is quite convenient.
-> > >      It allows you to separate the definition of the object under test
-> > >      from the test case. E.g. test protocol.create checks the ability of
-> > >      Landlock to restrict the creation of a socket of a certain type,
-> > >      rather than the ability to restrict creation of UNIX, TCP, UDP...
-> > >      sockets
-> > 
-> > I'm not sure to understand, but we need to have positive and negative
-> > tests, potentially in separate TEST_F().
-> 
-> I mean we can use fixtures in order to not add ASSERT_EQ for
-> each protocol, as suggested by Günther. It's gonna look like this:
-> 
->      ASSERT_EQ(EAFNOSUPPORT, test_socket(&self->unspec_srv0));
->      ASSERT_EQ(EACCES, test_socket(&self->srv0));
-> 
-> I think it would make the test easier to read, don't you think so?
+This is the semi-friendly patch-bot of Greg Kroah-Hartman.
 
-Yes, this looks good.
+Markus, you seem to have sent a nonsensical or otherwise pointless
+review comment to a patch submission on a Linux kernel developer mailing
+list.  I strongly suggest that you not do this anymore.  Please do not
+bother developers who are actively working to produce patches and
+features with comments that, in the end, are a waste of time.
+
+Patch submitter, please ignore Markus's suggestion; you do not need to
+follow it at all.  The person/bot/AI that sent it is being ignored by
+almost all Linux kernel maintainers for having a persistent pattern of
+behavior of producing distracting and pointless commentary, and
+inability to adapt to feedback.  Please feel free to also ignore emails
+from them.
+
+thanks,
+
+greg k-h's patch email bot
 
