@@ -1,222 +1,535 @@
-Return-Path: <netdev+bounces-96905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70C328C8267
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 10:08:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B46128C8277
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 10:12:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC7BAB21625
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 08:08:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B1231F225C1
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 08:12:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1718C18C05;
-	Fri, 17 May 2024 08:08:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Ih8tTVGl";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ubPggiqD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1746B1AAA5;
+	Fri, 17 May 2024 08:12:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BAE718EAF;
-	Fri, 17 May 2024 08:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715933315; cv=fail; b=GBp2uW4ieSSgl5hlll6Fvp3gY/rbW+SKEsBMudQscdFx7zbLzTiSx73xAH/A1akFdXGaDanDhCG6zEwfq+R5if00xZ8zRi0cFjHuu5scRqCLd7MeP9OFjGijWh3iQ1gC1RB4FCQ3eh6KgJsAYKRRi2ZmRwNYKtESa/pEtmQKlYc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715933315; c=relaxed/simple;
-	bh=BgmgfUFDj/XaIRlDWNlSXtgIO/hSK87/431iTKLtiQw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=uzcweGwoP2fBNnvu9I/e1+fdAmdk9KW6VkNhfwHN5sKGDf30pMqzttG34krJMiZXbduQWXwY0vXJaEcvFr501zuQJvb1tgdfDD4FIiYrXEUjXZ8+0x/uaEeSBaQ4qoNZQx4cm3nIAbp+OClqpnOdFZntsRnlhjayM6+yHHUP5Rw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Ih8tTVGl; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ubPggiqD; arc=fail smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1715933312; x=1747469312;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=BgmgfUFDj/XaIRlDWNlSXtgIO/hSK87/431iTKLtiQw=;
-  b=Ih8tTVGlSYTNTNLIKg0J7JYYF7dUluqc0ZydvDMTlVR0fHGx2p8zOJkN
-   7mhmH2/QdHdlb+NC/Xbiu6Y3lSC7W9pbuQfL9fdliTUx2Wk3ZGPprkBc0
-   vZBGO4Mj0JydOao8mbNILgZUm1S/uO5TxAl15VeTZXEvyegGS8eqqmWxD
-   2DhYtBRSS3dckq+XZkwptK3XpVBQDMdGd+OKbrRo34FbaloDxyY2jkYOm
-   LsOdwLdWZiSzQjiZfR4+7eT/0rqy1odViawpypNU0KnvYm3G9et6f6BTv
-   ODly+iXrvdWXIYu9VLOeaxSozyoConcZAqZB7UjiT5NB+LzMSSnlAU149
-   g==;
-X-CSE-ConnectionGUID: 9tCEIv3BQM2Q0WSATIOGcQ==
-X-CSE-MsgGUID: 9c5A2f0iTiSAi0KjHyvYEw==
-X-IronPort-AV: E=Sophos;i="6.08,167,1712646000"; 
-   d="scan'208";a="27315248"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 May 2024 01:08:29 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 17 May 2024 01:08:01 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 17 May 2024 01:08:01 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OOUeXi2A8Vnu6Ooo43jS7lXs+xJe29am7XXJ230jvjjzx05RlNtC2e9MvXu92P11uXWjFLONEK8ewTyS8hhRY6VWRuKxwlGYI3i5FEhUfysQAWTy21/UvcXPt0xGkTINDPWWVp9oqJSMlw6EgYR9V7zuuJUpLuIW3rJgcY55SissCXaKhQMNkPmcY9YdHem/cbha0z6ZOyGF/BeE63uYSJ/G8pY4+Jw/vip7tgS6z7W+3bLeV6uNbBt7/qLZV790hdtYMtxoOSiqP0Y8MTLTP3aH8jbtdHPxttxj6GAgVQt8+tJsshopIH2CF4gmgpF/PcpFSYzmCM+BMGo6QZ3+xA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BgmgfUFDj/XaIRlDWNlSXtgIO/hSK87/431iTKLtiQw=;
- b=UyngkOuPp4lCePXm5aOrspqURVWvpEHy61qPps2SmzK8yIhSs4WEP+YEemm0TiFfz+l7Mt6sN5XdogL32x/Obop6ihvr3ApY+jX8Fld0KBgMHkXROTHsU9XzRJvg1jNLNOsc2n7vVICrPzknLfho8A5/grYrck6x/9PXr8wOwnVrWPKvVUx2A/QxdRUuD6Q3oWX+YWsiJakaz5FUxMFT4ck4U8Fh6+g6urmRY8NVhGQPQUckfQNalGCc4KK5HYwtdsHt3LRhb3pnvm4ai/XOKpR+00fIXr66NaL/vkgC60a5fBYh5jH7rfcdH9x6dAso++BjM++z2uoV852KPTnVcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BgmgfUFDj/XaIRlDWNlSXtgIO/hSK87/431iTKLtiQw=;
- b=ubPggiqDc9PB0Fiz+g7qdOylHguQpMQDLUlcoBrAs0hiP2zDzJ61hn5BOcrjqO8RGHxHXj/BjRoLQNnuNtsdg7u543WddVyeOgfSn1XjXTV6Sc+xJkQhQc8FcJc9HAJ57YmTYKD//3vtDVsibgrVxpLMXomV9994WeLciAlKqtoM4wek5DYqIPoHHMnaLhQMpopmCl1i47dulGAQsOtJYS4CGTByuo8rXb5btM8hlGE/VBOjW8LTCKrJmOVHLWEBuQcGy2SLljJwg3DPJPI+O+/RqZb2NIIefDku3Zv7APKenoagORGIyvldj4IDgqtCKsSa/NC/fOz64HVpMG654Q==
-Received: from PH7PR11MB8033.namprd11.prod.outlook.com (2603:10b6:510:246::12)
- by LV3PR11MB8506.namprd11.prod.outlook.com (2603:10b6:408:1bb::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.28; Fri, 17 May
- 2024 08:07:58 +0000
-Received: from PH7PR11MB8033.namprd11.prod.outlook.com
- ([fe80::22a1:16dd:eea9:330c]) by PH7PR11MB8033.namprd11.prod.outlook.com
- ([fe80::22a1:16dd:eea9:330c%2]) with mapi id 15.20.7587.026; Fri, 17 May 2024
- 08:07:57 +0000
-From: <Arun.Ramadoss@microchip.com>
-To: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
-	<Woojung.Huh@microchip.com>, <pabeni@redhat.com>, <o.rempel@pengutronix.de>,
-	<edumazet@google.com>, <f.fainelli@gmail.com>, <kuba@kernel.org>
-CC: <kernel@pengutronix.de>, <dsahern@kernel.org>, <san@skov.dk>,
-	<willemb@google.com>, <linux-kernel@vger.kernel.org>, <hkelam@marvell.com>,
-	<netdev@vger.kernel.org>, <horms@kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net v2 1/1] net: dsa: microchip: Correct initialization
- order for KSZ88x3 ports
-Thread-Topic: [PATCH net v2 1/1] net: dsa: microchip: Correct initialization
- order for KSZ88x3 ports
-Thread-Index: AQHaqBde0TMWcbsjoEuU1w/IM01XVbGbEu+A
-Date: Fri, 17 May 2024 08:07:57 +0000
-Message-ID: <719921337ad06cbaecd6cbb9f8c810a80030488f.camel@microchip.com>
-References: <20240517050121.2174412-1-o.rempel@pengutronix.de>
-In-Reply-To: <20240517050121.2174412-1-o.rempel@pengutronix.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.36.5-0ubuntu1 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR11MB8033:EE_|LV3PR11MB8506:EE_
-x-ms-office365-filtering-correlation-id: da55b63e-d4de-4f0a-e7e5-08dc76487650
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|376005|366007|7416005|1800799015|38070700009;
-x-microsoft-antispam-message-info: =?utf-8?B?QlFMblR3L3F4c2RqUTd2VTFiSURrL1lkeHFUNmtaRFZ2d3pCN1V0RGJ1SXZv?=
- =?utf-8?B?YnBqLzdDaFdIWEszUUp2SndkRmgyQjNPVERzaTlMVFV1ZTR2alM0RmhyQThR?=
- =?utf-8?B?d2JPZG90bVdHMU84aEJvM21jSEdDQUZVeWpZM3g4cVF2cmxpenFCbDZmUHpP?=
- =?utf-8?B?SUJtSUJ4UEd2VGVMWUNlYTMyeVFOclUvYnNTdHZORThsZ1loeXU0eXdLTWVt?=
- =?utf-8?B?a0g5Tkg1QzMyRHRjbk1LbmxXUmE4UFNKbWpqUVNuOUVJZUh2OVhEd2pxRDA1?=
- =?utf-8?B?R0FEM3Z4eVFMN0EwNVZ1M0V5L1kySGs5U05tdEhzQjhQaFcxODNaZmgzZkkz?=
- =?utf-8?B?ODBFVFQ1RTJJdVRPQTBBazFkNytlaXZXTlFuMnpDbm0wUXJyeGY3MVBhdkVT?=
- =?utf-8?B?RE5HVWpTcndic3FJSkVSQ3Baci9hcVBFR1lZYm8xOVQwZS9tNVk5OHV2aTVE?=
- =?utf-8?B?VU1YWFpOd1VEM1pCMzZPTzB4dTRJQS9FQjkwc2pVVnVCQXhZc2lqTFU0YW40?=
- =?utf-8?B?OFF3RzgraGg2aktxNm9OZ3VHTnM1R2NYYk5GMjV3alU5MGFFaVZRYm8yMXBy?=
- =?utf-8?B?Zmd6c2NkTnp2QTdiSUttNlpTbGNJSzFYN3BJU05vOFg4eVIzeE5YNlN0WjZN?=
- =?utf-8?B?YWZLc1ozTDJjYUxZdzFZWWNqRTdqbVVnTUJWemlZTlNRK3MzcUl4TnVlMkZ5?=
- =?utf-8?B?QlBsbXZtZVMwaE9YaWp1QSsraFJPUVVIMWpEalV4bUNBc1IzTHdHMHBRcGg3?=
- =?utf-8?B?Tm43Z2RlcDRxQkoxV3p2Y3FKbCtvelZJcDNFdUJ6SFRkdGRPNXFXRWkxSVo1?=
- =?utf-8?B?eEVFa3lrclBSc3pUbVVMQkxxaU12a09lMFRGVnJCRmxROVNLc01kNVlZYTZw?=
- =?utf-8?B?N0hOcGtvQldZSzNET2sydTZEUVhWSnJ2bnpHSWZvMDVTWGp6dXB2dHFNN1Jn?=
- =?utf-8?B?WTZaQ3pmT3d4MFcyRzgrV3crKzFjRUFhOG1zNHl6MVNOc0NBL3A3WCtyQlZr?=
- =?utf-8?B?OGJoKzJDem1IVTVwSFpLYWJZUWJKU3BpSXJYWFV3TWhDUUJEaUxNL2JIcDl5?=
- =?utf-8?B?YkF5N09aZVdSTUFaMzVDYzdGYlY0Y2g3aW5HZlJjTkU1UDVMcG5jZERsSGZt?=
- =?utf-8?B?T0l6c2F6OWR5QWlwWGNhUE9hYW14SFZkMDkxeHlTMXJHV2xZYVdWRDVzblRW?=
- =?utf-8?B?RVltVUZ6ak1KVXhUV094bkZXNkE2YStaWVBTQ3VaZ0ZJSXd4K3lyMFg2QklP?=
- =?utf-8?B?MHdtY1NvYVQrVG5Ba09LYS84Ump1Wk1jMXBRVlBucHd1ajgvRzVpZVc2Q2lW?=
- =?utf-8?B?VW5wVkdTd0xGZmVQcldFRmJ0YWhJSkx2Yzk3UUtnTWV4MTZJVXFWMUx3Smwx?=
- =?utf-8?B?OU9oa3dzeHRpWjk1bmJ3UlE0Rkgwa1JZSGl2ZlF2MXEyZHpUdzZxQ1ZNVEQ4?=
- =?utf-8?B?NFgxK2FuM0VFTUFRdWp5QmVwKzlIdGdOWkdhais1cDVwSEd3YnVQZVhXVUsz?=
- =?utf-8?B?WlBSVHIyU1cxVDVNQnVac1plM3hmaVlxdXd1NWpiUGRpcE1JOWtCYTBMTnBV?=
- =?utf-8?B?aHB1RzJjRFIxUm5ZZmpqa2x2cnVkM3VPU3o0R0lDdzVzeUtIYXFKNUdOWjhJ?=
- =?utf-8?B?em5EUzZYdHl6MHdVaDcvUFFFSVd1dWtlOFNYRnBsbS9HL1prYjJNRHBIVUFB?=
- =?utf-8?B?RFZzSkY3ampoQW1YeGc5ODRveDM1UGZlVWJQbTBEdFlYZTRhdFRicXJUN3lq?=
- =?utf-8?B?elZ1ZnBGZ3pJVG1kcnVUTjBjR3E5Y25aNjUxd0JMVlZwMTdnZ0tYMkQzN3Bk?=
- =?utf-8?B?OXpTWVBiNElWYUtYQ3dQdz09?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB8033.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(7416005)(1800799015)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TjhmSiszaE56Y3NBWFMvRG5INUZicUxPdjRvb2ZuVk9vUkxDUW9wRWxSdUdt?=
- =?utf-8?B?RzJ1aDh1Tk84Wk8wRCtQSHBuYVZ3a1RQdFJsV0VWTDRpTEY1YTBYaHRvOW5L?=
- =?utf-8?B?TjJPajFSV3RyMEFMc2JlQWRKV295cXNwMTlCdjlqY0JGMVFhdm5EQXZOYWpm?=
- =?utf-8?B?cm1VVXVvRVlPNTJkZWF1WXZjMlRDUk4yNk82b09URjREYnJmRkRiS3dCNXBX?=
- =?utf-8?B?R2tTYkpMYkVLV1Qrakl1ZmdrMEJ5dk9nTHV0WFFQTS9lY0xsRXRlRDRCMlR5?=
- =?utf-8?B?Q2I3amN5enlGSXE3ZWFnemc0aGFkeDF5a045MzFZbVU4NTJLZHhIQVBDVzZ5?=
- =?utf-8?B?NjRzb1JDVGs3Q0dCS1V6UmNWcy9NbEFDeWkrREp1V1Y4d1RucThXczRyTWpY?=
- =?utf-8?B?Qk10aEtWanIxV3hUR1VhSXk4dlJBajFHSGZ6MEcyZW4vYlFLNGpxTmpNYksy?=
- =?utf-8?B?Ym1tWEJMbUs4cm9WeGgremVGaXc2cHJkOUJ2MElmTFlWcnZKek8xdjRDeTY3?=
- =?utf-8?B?Qk8zWFUzWlFRNSs0SVpKUGgvdExrazVFMTN3WlZxWWVISUhTUU05ZzMrdWNl?=
- =?utf-8?B?Mjlvamhia1ZOQng2alIzQWk2cHpLb0xCVTRpck9IM3BFZk5IYjA3REpYVXA0?=
- =?utf-8?B?VFlmYlhxYmVZeDBjSy9aakhOZkcrd2g4ZkpNTHg3VlhvWldKTHpmbkVabUxK?=
- =?utf-8?B?eWRxRS9oOGVrMHMxbTZycTJMaENZT2c2enk1d3E5YzBZWUlRSkY1UlJvYWRE?=
- =?utf-8?B?d3d4YjJCUmFYSFE1SkFKamNEYUhhTSs0akg3MFV4Y2JCUXovandLL2sweWhx?=
- =?utf-8?B?ZE5jbHgvODZPMG1tb2toVWFZQkFPdkxWVjQ5TmRacm1JK1lkYmpqVWJPN25Y?=
- =?utf-8?B?ZTZlTHIwU2JoWEJybzk3ZUtId2xiNk5OVHUxVDhhc0I5dFZWMnREemZFYjFS?=
- =?utf-8?B?WTdsQ3ZwZEo0MitKdGlHdHVLK2ZZaXk2d05QOStoNlJ0ZnVKRHZWSk1qK25M?=
- =?utf-8?B?WHkybWZQQTAzY2lqR3ZHWlZsSVlrQSs4RXAxbnpGRXk0dUxNU3VENHdXRy9r?=
- =?utf-8?B?MFh2Z1AvdE9aWC9vVWhKNWJqa2RaeThqWDlrVUJidDU2RTV5VDhrMTkxNFJl?=
- =?utf-8?B?Zlh1Z1QyRy80b210NmViS0l3S1ZUQ2JsaHNRZmhteVRkN3hXaVhiS2lnM0tv?=
- =?utf-8?B?ajRIZjB6SG9KVU9uZGNLbyszU29qL1NSVzJFc3A4V09Yc1ZQeUJHTFVOcFpy?=
- =?utf-8?B?ak9sblU5TFlFc1dzWXIxdjBoa2gwSVNoTTlMUTlhZUZUUkJiOEF5cXZzOXpi?=
- =?utf-8?B?NTdoK0NwcFo1bEtpZnBWWCtOanRQdytrRitpNTRidndkaUJoSWQ2c3UxZ1dl?=
- =?utf-8?B?M1U3bmZDbVJrQUJuM1kvYW5HeTJMODErdFVDR3NSa2ZZS0Zvc2Q5QXdKV0l6?=
- =?utf-8?B?MUFqTGlKWFdUUG1jWkdRMW5RcWl1M3hGN2lvMzBtZzhKblQ4ZDJJOEJxQmVJ?=
- =?utf-8?B?WFQ4cC9MV0VPVUY0T2FMNVVUNVpiQUZhWlJzTkZ5T2poY2M3QzF3TGhrZUtG?=
- =?utf-8?B?RTVCRWV3MklqcXE5Ry9SL3dSa3VYVGZRYTRLeEx0b0kyNDBGUkJYcXdWSFZW?=
- =?utf-8?B?ejMyK2hvT1c3UkhwelBVU2ZFY2hYTXBMV2JNTGlpL1o1eGk2VWRVaHhLQUgz?=
- =?utf-8?B?Slo5V0JtQi9sV2ZSVkQ5NlM0SnNLM0w5dHBPZ3Z0ODdQVjBoVUIzQ0ZGVTRk?=
- =?utf-8?B?U01paEgxZnphdFFCNUxGNkJieHRQSnR5NFZzTlFUR24yaDZFSXZSbitnUFFO?=
- =?utf-8?B?N0hNYVJuaTVCN1BEVUQ5ZjBwY0lrQXRNZ3NBclRRemRXM2dibkdLc0w0Ym9Q?=
- =?utf-8?B?VVpRbnVJN2NabkFMVjZRdHVrTVc0SVM1U0ZCb1YxTklwaVpxUm1EZFJ1bHRF?=
- =?utf-8?B?eU15dVFEYmJINW9yRWRwVCtERWhpemVZVWh5ZGFYZFFTUlFWV3VYMjBpTXpy?=
- =?utf-8?B?WVM5emNUaGJrc2Q4VnhEYVozby9acS9iYzkvSmNYa3BkaHFmT0Z6QmF1UjF1?=
- =?utf-8?B?RlB1emcybEhCbmdkZ25URlN2RklWZHo5MFhnd1h6eFk3TTZUWE1lUFpQQUxm?=
- =?utf-8?B?bmpVMU1JdUVnak5laXRIWkJ4bHZ0T0dob2lvbzR1Sm9lblBKSlFqSzZhSjlZ?=
- =?utf-8?B?eUE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <397210EB8C04554BAB6BE6E08865CED8@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030DC199C7
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 08:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715933551; cv=none; b=RdzV0tmOM3B4hbSkBVA7MsC9B1+iDHMlf/ctduu+XWclmI5q0kC5DMy8YoeiPU+6R+Pn2SpOQ4ayzYRa5WqbPY1WBNpAcLszsntpRyobyOAhiFIh28IIiHcSsNqajcaLCHNj8itYSkWlu5axsj3/xvAZnIv6qHruIc1Z9ZIr6Bg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715933551; c=relaxed/simple;
+	bh=tDDQ0ehYR2jhArGhB4LyHHs+LIk7ybLcwTACynwtObo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LwcbK/NA33OU9z0ViPuEpGKIXXrzCk78vM0ts52RqWtsiwJulFMyFyEJEPGD6sWWaXLUmLEYLvr86rjkNgdRHRtPflQgDTw3hICXPGMPLqdHFuVBuzBdqlKcAlXEiVVl09kBLYPp4Ty/YL9wdSbWIabbqHvveArHfb7HQGvDqZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.112.247])
+	by gateway (Coremail) with SMTP id _____8Dxd_BnEUdmWuINAA--.33565S3;
+	Fri, 17 May 2024 16:12:23 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.112.247])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxBLlkEUdm2ygkAA--.4775S3;
+	Fri, 17 May 2024 16:12:21 +0800 (CST)
+Message-ID: <9e9302c6-3b52-401f-b9af-1551136c3242@loongson.cn>
+Date: Fri, 17 May 2024 16:12:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB8033.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: da55b63e-d4de-4f0a-e7e5-08dc76487650
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 May 2024 08:07:57.3999
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yRT5mouWRw4bmr5XT0rt7rtvdvxD57RhlBKRdnc9aSPdVwkorjPCC2Pnjf4vPT59qbU4KKi//c7B7WYj2JseBJvWmHe067KEEubLWjtwM2w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8506
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 13/15] net: stmmac: dwmac-loongson: Add
+ Loongson GNET support
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+References: <cover.1714046812.git.siyanteng@loongson.cn>
+ <c97cb15ab77fb9dfdd281640f48dcfc08c6988c0.1714046812.git.siyanteng@loongson.cn>
+ <dcsn7kixduijizlmkhm4jmzevc6dt46gl33orh3z2ohu6otbz2@zlkx3vyvlsur>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <dcsn7kixduijizlmkhm4jmzevc6dt46gl33orh3z2ohu6otbz2@zlkx3vyvlsur>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8AxBLlkEUdm2ygkAA--.4775S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj9fXoW3tF1DXr4UKrWxCrW7Ww1rGrX_yoW8Xw4fuo
+	Z3XFsavw4rKr1xXan7Ka48JFy3XF1ru3Z5trW8Can8ua9Iva15Cry5Cw4fXa9IkFWrKF1U
+	A34rJw1jyFWIqws3l-sFpf9Il3svdjkaLaAFLSUrUUUU0b8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUYG7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_Gr1j6F4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
+	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
+	JF0_Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
+	xGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+	JVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+	vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+	x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAF
+	wI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
 
-T24gRnJpLCAyMDI0LTA1LTE3IGF0IDA3OjAxICswMjAwLCBPbGVrc2lqIFJlbXBlbCB3cm90ZToN
-Cj4gRVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRz
-IHVubGVzcyB5b3UNCj4ga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+IA0KPiBBZGp1c3QgdGhl
-IGluaXRpYWxpemF0aW9uIHNlcXVlbmNlIG9mIEtTWjg4eDMgc3dpdGNoZXMgdG8gZW5hYmxlDQo+
-IDgwMi4xcCBwcmlvcml0eSBjb250cm9sIG9uIFBvcnQgMiBiZWZvcmUgY29uZmlndXJpbmcgUG9y
-dCAxLiBUaGlzDQo+IGNoYW5nZSBlbnN1cmVzIHRoZSBhcHB0cnVzdCBmdW5jdGlvbmFsaXR5IG9u
-IFBvcnQgMSBvcGVyYXRlcw0KPiBjb3JyZWN0bHksIGFzIGl0IGRlcGVuZHMgb24gdGhlIHByaW9y
-aXR5IHNldHRpbmdzIG9mIFBvcnQgMi4gVGhlDQo+IHByaW9yIGluaXRpYWxpemF0aW9uIHNlcXVl
-bmNlIGluY29ycmVjdGx5IGNvbmZpZ3VyZWQgUG9ydCAxIGZpcnN0LA0KPiB3aGljaCBjb3VsZCBs
-ZWFkIHRvIGZ1bmN0aW9uYWwgZGlzY3JlcGFuY2llcy4NCj4gDQo+IEZpeGVzOiBhMWVhNTc3MTBj
-OWQgKCJuZXQ6IGRzYTogbWljcm9jaGlwOiBkY2I6IGFkZCBzcGVjaWFsIGhhbmRsaW5nDQo+IGZv
-ciBLU1o4OFgzIGZhbWlseSIpDQo+IFNpZ25lZC1vZmYtYnk6IE9sZWtzaWogUmVtcGVsIDxvLnJl
-bXBlbEBwZW5ndXRyb25peC5kZT4NCj4gUmV2aWV3ZWQtYnk6IEhhcmlwcmFzYWQgS2VsYW0gPGhr
-ZWxhbUBtYXJ2ZWxsLmNvbT4NCg0KQWNrZWQtYnk6IEFydW4gUmFtYWRvc3MgPGFydW4ucmFtYWRv
-c3NAbWljcm9jaGlwLmNvbT4NCg0K
+Well, let's modify the biggest patch。
+
+在 2024/5/6 05:50, Serge Semin 写道:
+> On Thu, Apr 25, 2024 at 09:11:36PM +0800, Yanteng Si wrote:
+>> There are two types of Loongson DWGMAC. The first type shares the same
+> s/Loongson DWGMAC/Loongson GNET controllers
+OK,
+>
+>> register definitions and has similar logic as dwmac1000. The second type
+>> uses several different register definitions, we think it is necessary to
+>> distinguish rx and tx, so we split these bits into two.
+> s/rx/Rx
+> s/tx/Tx
+
+OK.
+
+>> Simply put, we split some single bit fields into double bits fileds:
+>>
+>>       Name              Tx          Rx
+>>
+>> DMA_INTR_ENA_NIE = 0x00040000 | 0x00020000;
+>> DMA_INTR_ENA_AIE = 0x00010000 | 0x00008000;
+>> DMA_STATUS_NIS   = 0x00040000 | 0x00020000;
+>> DMA_STATUS_AIS   = 0x00010000 | 0x00008000;
+>> DMA_STATUS_FBI   = 0x00002000 | 0x00001000;
+>>
+>> Therefore, when using, TX and RX must be set at the same time.
+>>
+>> How to use them:
+>>   1. Create the Loongson GNET-specific
+>>   stmmac_dma_ops.dma_interrupt()
+>>   stmmac_dma_ops.init_chan()
+>>   methods in the dwmac-loongson.c driver. Adding all the
+>>   Loongson-specific macros
+>>
+>>   2. Create a Loongson GNET-specific platform setup method with the next
+>>   semantics:
+>>      + allocate stmmac_dma_ops instance and initialize it with
+>>        dwmac1000_dma_ops.
+>>      + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
+>>        the pointers to the methods defined in 2.
+>>      + allocate mac_device_info instance and initialize the
+>>        mac_device_info.dma field with a pointer to the new
+>>        stmmac_dma_ops instance.
+>>      + initialize mac_device_info in a way it's done in
+>>        dwmac1000_setup().
+>>
+>>   3. Initialize plat_stmmacenet_data.setup() with the pointer to the
+>>   method created in 2.
+>>
+>> GNET features:
+>>
+>>   Speeds: 10/100/1000Mbps
+>>   DMA-descriptors type: enhanced
+>>   L3/L4 filters availability: support
+>>   VLAN hash table filter: support
+>>   PHY-interface: GMII
+>>   Remote Wake-up support: support
+>>   Mac Management Counters (MMC): support
+>>   Number of additional MAC addresses: 5
+>>   MAC Hash-based filter: support
+>>   Number of ash table size: 256
+>>   DMA chennel number: 0x10 device is 8 and 0x37 device is 1
+>>
+>> Others:
+>>
+>>   GNET integrates both MAC and PHY chips inside.
+>>   GNET device: LS2K2000, LS7A2000, the chip connection between the mac and
+>>               phy of these devices is not normal and requires two rounds of
+>>               negotiation; LS7A2000 does not support half-duplex and
+>>               multi-channel;
+>>
+>>               To enable multi-channel on LS2K2000, you need to turn off
+>>               hardware checksum.
+>>
+>> **Note**: Currently, only the LS2K2000's synopsys_id is 0x10, while the
+>> synopsys_id of other devices are 0x37.
+> The entire commit log looks as a set of information and doesn't
+> explicitly explain what is going on in the patch body. Let's make it a
+> bit more coherent:
+>
+> "Aside with the Loongson GMAC controllers which can be normally found
+> on the LS2K1000 SoC and LS7A1000 chipset, Loongson released a new
+> version of the network controllers called Loongson GNET. It has
+> been synthesized into the new generation LS2K2000 SoC and LS7A2000
+> chipset with the next DW GMAC features enabled:
+>
+>    DW GMAC IP-core: v3.73a
+>    Speeds: 10/100/1000Mbps
+>    Duplex: Full (both versions), Half (LS2K2000 SoC only)
+>    DMA-descriptors type: enhanced
+>    L3/L4 filters availability: Y
+>    VLAN hash table filter: Y
+>    PHY-interface: GMII (PHY is integrated into the chips)
+>    Remote Wake-up support: Y
+>    Mac Management Counters (MMC): Y
+>    Number of additional MAC addresses: 5
+>    MAC Hash-based filter: Y
+>    Hash Table Size: 256
+>    AV feature: Y (LS2K2000 SoC only)
+>    DMA channels: 8 (LS2K2000 SoC), 1 (LS7A2000 chipset)
+>
+> The integrated PHY has a weird problem with switching from the low
+> speeds to 1000Mbps mode. The speedup procedure requires the PHY-link
+> re-negotiation. Besides the LS2K2000 GNET controller the next
+> peculiarities:
+> 1. Split up Tx and Rx DMA IRQ status/mask bits:
+>         Name              Tx          Rx
+>    DMA_INTR_ENA_NIE = 0x00040000 | 0x00020000;
+>    DMA_INTR_ENA_AIE = 0x00010000 | 0x00008000;
+>    DMA_STATUS_NIS   = 0x00040000 | 0x00020000;
+>    DMA_STATUS_AIS   = 0x00010000 | 0x00008000;
+>    DMA_STATUS_FBI   = 0x00002000 | 0x00001000;
+> 2. Custom Synopsys ID hardwired into the GMAC_VERSION.SNPSVER field.
+> It's 0x10 while it should have been 0x37 in accordance with the actual
+> DW GMAC IP-core version.
+>
+> Thus in order to have the Loongson GNET controllers supported let's
+> modify the Loongson DWMAC driver in accordance with all the
+> peculiarities described above:
+>
+> 1. Create the Loongson GNET-specific
+>     stmmac_dma_ops::dma_interrupt()
+>     stmmac_dma_ops::init_chan()
+>     callbacks due to the non-standard DMA IRQ CSR flags layout.
+> 2. Create the Loongson GNET-specific platform setup() method which
+> gets to initialize the DMA-ops with the dwmac1000_dma_ops instance
+> and overrides the callbacks described in 1, and overrides the custom
+> Synopsys ID with the real one in order to have the rest of the
+> HW-specific callbacks correctly detected by the driver core.
+> 3. Make sure the Loongson GNET-specific platform setup() method
+> enables the duplex modes supported by the controller.
+> 4. Provide the plat_stmmacenet_data::fix_mac_speed() callback which
+> will restart the link Auto-negotiation in case of the speed change."
+>
+>
+> See, you don't need to mention the 0x10 ID all the time. Just once and
+> in the place where it's actually relevant.
+OK, Thanks a lot!
+>
+>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+>> ---
+>>   drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
+>>   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 381 +++++++++++++++++-
+>>   2 files changed, 371 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+>> index 9cd62b2110a1..aed6ae80cc7c 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+>> @@ -29,6 +29,7 @@
+>>   /* Synopsys Core versions */
+>>   #define	DWMAC_CORE_3_40		0x34
+>>   #define	DWMAC_CORE_3_50		0x35
+>> +#define	DWMAC_CORE_3_70		0x37
+>>   #define	DWMAC_CORE_4_00		0x40
+>>   #define DWMAC_CORE_4_10		0x41
+>>   #define DWMAC_CORE_5_00		0x50
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> index a16bba389417..68de90c44feb 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> @@ -8,9 +8,71 @@
+>>   #include <linux/device.h>
+>>   #include <linux/of_irq.h>
+>>   #include "stmmac.h"
+>> +#include "dwmac_dma.h"
+>> +#include "dwmac1000.h"
+>> +
+>>
+>> +#define LOONGSON_DWMAC_CORE_1_00	0x10	/* Loongson custom IP */
+> What about using the name like calling as:
+> +#define DWMAC_CORE_LS2K2000		0x10
+> Thus you'll have the name similar to the rest of the DWMAC_CORE_*
+> macros and which would emphasize what the device for which the custom
+> ID is specific.
+OK.
+>
+>> +#define CHANNEL_NUM			8
+>> +
+>> +struct loongson_data {
+>> +	u32 gmac_verion;
+> Let's call it loongson_id thus referring to the
+> stmmac_priv::synopsys_id field.
+OK.
+>
+>> +
+>> +static int loongson_gnet_dma_interrupt(struct stmmac_priv *priv,
+>> +				       void __iomem *ioaddr,
+>> +				       struct stmmac_extra_stats *x,
+>> +				       u32 chan, u32 dir)
+>> +{
+>> +	struct stmmac_pcpu_stats *stats =
+> ...
+>> +	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
+> 0x7ffff != CSR5[15-0]
+
+Hmmm, It should be CSR5[19-0]?
+
+BTW, 0x1ffff != CSR5[15-0], too.
+
+It should be CSR5[16-0], right?
+
+
+>
+>> +	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static void loongson_gnet_fix_speed(void *priv, unsigned int speed,
+>> +				    unsigned int mode)
+>> +{
+>> +	struct loongson_data *ld = (struct loongson_data *)priv;
+>> +	struct net_device *ndev = dev_get_drvdata(ld->dev);
+>> +	struct stmmac_priv *ptr = netdev_priv(ndev);
+>> +
+>> +	/* The controller and PHY don't work well together.
+>> +	 * We need to use the PS bit to check if the controller's status
+>> +	 * is correct and reset PHY if necessary.
+> This doesn't correspond to what you're actually doing. Please align
+> the comment with what is done below (if what I provided in the commit
+> log regarding this problem is correct, use the description here).
+OK, you are right.
+>> +	 * MAC_CTRL_REG.15 is defined by the GMAC_CONTROL_PS macro.
+> useless. please drop
+OK.
+>
+>> +	 */
+>> +	if (speed == SPEED_1000) {
+>>
+>> +
+>> +static struct mac_device_info *loongson_dwmac_setup(void *apriv)
+>> +{
+>> +	struct stmmac_priv *priv = apriv;
+>> +	struct mac_device_info *mac;
+> seems unused. See my next comment.
+No, We're using it. See my next reply.
+>
+>> +	struct stmmac_dma_ops *dma;
+>> +	struct loongson_data *ld;
+>> +	struct pci_dev *pdev;
+>> +
+>> +	ld = priv->plat->bsp_priv;
+>> +	pdev = to_pci_dev(priv->device);
+>> +
+>> +	mac = devm_kzalloc(priv->device, sizeof(*mac), GFP_KERNEL);
+>> +	if (!mac)
+>> +		return NULL;
+> I see you no longer override the ops in dwmac1000_ops. If so this can
+> be dropped.
+No,
+
+Because I pre-initialize the respective "mac" fields as it's done
+in dwmac1000_setup().
+
+>
+>> +
+>> +	dma = devm_kzalloc(priv->device, sizeof(*dma), GFP_KERNEL);
+>> +	if (!dma)
+>> +		return NULL;
+>> +
+>> +	/* The original IP-core version is 0x37 in all Loongson GNET
+> s/0x37/v3.73a
+Yeah!
+>
+>> +	 * (ls2k2000 and ls7a2000), but the GNET HW designers have changed the
+>> +	 * GMAC_VERSION.SNPSVER field to the custom 0x10 value on the Loongson
+>> +	 * ls2k2000 MAC to emphasize the differences: multiple DMA-channels,
+> s/ls2k2000/LS2K2000
+> s/ls7a2000/LS7A2000
+OK.
+>
+>> +	 * AV feature and GMAC_INT_STATUS CSR flags layout. Get back the
+>> +	 * original value so the correct HW-interface would be selected.
+>> +	 */
+>> +	if (ld->gmac_verion == LOONGSON_DWMAC_CORE_1_00) {
+>> +		priv->synopsys_id = DWMAC_CORE_3_70;
+>> +		*dma = dwmac1000_dma_ops;
+>> +		dma->init_chan = loongson_gnet_dma_init_channel;
+>> +		dma->dma_interrupt = loongson_gnet_dma_interrupt;
+>> +		mac->dma = dma;
+>> +	}
+>> +
+>> +	mac->mac = &dwmac1000_ops;
+> Unused?
+Yeah, will be droped!
+>
+>> +	priv->dev->priv_flags |= IFF_UNICAST_FLT;
+>> +
+>> +	/* Pre-initialize the respective "mac" fields as it's done in
+>> +	 * dwmac1000_setup()
+>> +	 */
+>> +	mac->pcsr = priv->ioaddr;
+>> +	mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
+>> +	mac->unicast_filter_entries = priv->plat->unicast_filter_entries;
+>> +	mac->mcast_bits_log2 = 0;
+>> +
+>> +	if (mac->multicast_filter_bins)
+>> +		mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
+>> +
+>> +	/* The GMAC devices with PCI ID 0x7a03 does not support any pause mode.
+>> +	 * The GNET devices without CORE ID 0x10 does not support half-duplex.
+>> +	 */
+> No need to mention the IDs but just the actual devices:
+> 	/* Loongson GMAC doesn't support the flow control. LS2K2000
+> 	 * GNET doesn't support the half-duplex link mode.
+> 	 */
+>
+OK, Thanks.
+>> +	if (pdev->device == PCI_DEVICE_ID_LOONGSON_GMAC) {
+>> +		mac->link.caps = MAC_10 | MAC_100 | MAC_1000;
+>> +	} else {
+>> +		if (ld->gmac_verion == LOONGSON_DWMAC_CORE_1_00)
+>> +			mac->link.caps = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
+>> +					 MAC_10 | MAC_100 | MAC_1000;
+>> +		else
+>> +			mac->link.caps = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
+>> +					 MAC_10FD | MAC_100FD | MAC_1000FD;
+>> +	}
+>> +
+>> +	mac->link.duplex = GMAC_CONTROL_DM;
+>> +	mac->link.speed10 = GMAC_CONTROL_PS;
+>> +	mac->link.speed100 = GMAC_CONTROL_PS | GMAC_CONTROL_FES;
+>> +	mac->link.speed1000 = 0;
+>> +	mac->link.speed_mask = GMAC_CONTROL_PS | GMAC_CONTROL_FES;
+>> +	mac->mii.addr = GMAC_MII_ADDR;
+>> +	mac->mii.data = GMAC_MII_DATA;
+>> +	mac->mii.addr_shift = 11;
+>> +	mac->mii.addr_mask = 0x0000F800;
+>> +	mac->mii.reg_shift = 6;
+>> +	mac->mii.reg_mask = 0x000007C0;
+>> +	mac->mii.clk_csr_shift = 2;
+>> +	mac->mii.clk_csr_mask = GENMASK(5, 2);
+>> +
+>> +	return mac;
+>> +}
+>> +
+>>   static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>>   {
+>>   	struct plat_stmmacenet_data *plat;
+>>   	int ret, i, bus_id, phy_mode;
+>>   	struct stmmac_pci_info *info;
+>>   	struct stmmac_resources res;
+>> +	struct loongson_data *ld;
+>>   	struct device_node *np;
+>>   
+>>   	np = dev_of_node(&pdev->dev);
+>> @@ -122,10 +460,12 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   		return -ENOMEM;
+>>   
+>>   	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
+>> -	if (!plat->dma_cfg) {
+>> -		ret = -ENOMEM;
+>> -		goto err_put_node;
+>> -	}
+>> +	if (!plat->dma_cfg)
+>> +		return -ENOMEM;
+> This change must have been introduced in the patch
+> [PATCH net-next v12 10/15] net: stmmac: dwmac-loongson: Add full PCI support
+> which moves the mdio_node pointer initialization to under the if-clause.
+OK.
+>
+>> +
+>> +	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
+>> +	if (!ld)
+>> +		return -ENOMEM;
+>>   
+>>   	/* Enable pci device */
+>>   	ret = pci_enable_device(pdev);
+>> @@ -171,14 +511,34 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   		plat->phy_interface = phy_mode;
+>>   	}
+>>   
+>> -	pci_enable_msi(pdev);
+> Hm, this must be justified and better being done in a separate patch.
+OK.
+>
+>> +	plat->bsp_priv = ld;
+>> +	plat->setup = loongson_dwmac_setup;
+>> +	ld->dev = &pdev->dev;
+>> +
+>>   	memset(&res, 0, sizeof(res));
+>>   	res.addr = pcim_iomap_table(pdev)[0];
+>> +	ld->gmac_verion = readl(res.addr + GMAC_VERSION) & 0xff;
+>> +
+>> +	switch (ld->gmac_verion) {
+>> +	case LOONGSON_DWMAC_CORE_1_00:
+>> +		plat->rx_queues_to_use = CHANNEL_NUM;
+>> +		plat->tx_queues_to_use = CHANNEL_NUM;
+>> +
+>> +		/* Only channel 0 supports checksum,
+>> +		 * so turn off checksum to enable multiple channels.
+>> +		 */
+>> +		for (i = 1; i < CHANNEL_NUM; i++)
+>> +			plat->tx_queues_cfg[i].coe_unsupported = 1;
+>>   
+>> -	plat->tx_queues_to_use = 1;
+>> -	plat->rx_queues_to_use = 1;
+>> +		ret = loongson_dwmac_config_msi(pdev, plat, &res, np);
+>> +		break;
+>> +	default:	/* 0x35 device and 0x37 device. */
+>> +		plat->tx_queues_to_use = 1;
+>> +		plat->rx_queues_to_use = 1;
+>>   
+> Move the NoF queues (and coe flag) initializations to the respective
+> loongson_*_data() methods.
+OK.
+>
+> Besides I don't see you freeing the IRQ vectors allocated in the
+> loongson_dwmac_config_msi() method neither in probe(), nor in remove()
+> functions. That's definitely wrong. What you need is to have a
+> method antagonistic to loongson_dwmac_config_msi() (like
+> loongson_dwmac_clear_msi()) which would execute the cleanup procedure.
+
+Hmmm, We can free it in struct pci_driver ->remove method.
+
+Just in loongson_dwmac_remove() call
+
+pci_free_irq_vectors(pdev);
+
+
+>
+>> -	ret = loongson_dwmac_config_legacy(pdev, plat, &res, np);
+>> +		ret = loongson_dwmac_config_legacy(pdev, plat, &res, np);
+>> +		break;
+>> +	}
+>>   
+>>   	/* GNET devices with dev revision 0x00 do not support manually
+>>   	 * setting the speed to 1000.
+>> @@ -189,12 +549,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   
+>>   	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+>>   	if (ret)
+>> -		goto err_disable_msi;
+>> +		goto err_disable_device;
+>>   
+>>   	return ret;
+>>   
+>> -err_disable_msi:
+>> -	pci_disable_msi(pdev);
+> Once again. Justify the change. Moreover I don't see you dropping the
+> pci_disable_msi() from the remove() method.
+
+Since we need to check the return value of the allocated msi, we will
+
+restore this change in v13.
+
+
+Thanks,
+
+Yanteng
+
 
