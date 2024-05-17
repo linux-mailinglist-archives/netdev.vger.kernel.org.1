@@ -1,291 +1,261 @@
-Return-Path: <netdev+bounces-96819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 294088C7F27
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 02:24:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 343A08C7F25
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 02:24:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 961371F22B94
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 00:24:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9624C1F22994
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 00:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C524B384;
-	Fri, 17 May 2024 00:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GJr6NR7+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67152393;
+	Fri, 17 May 2024 00:24:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f193.google.com (mail-lj1-f193.google.com [209.85.208.193])
+Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B1B4A0F;
-	Fri, 17 May 2024 00:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95AE384;
+	Fri, 17 May 2024 00:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715905458; cv=none; b=F2VsLaSF4yCo066HgNatVkKDE9/25buo9MgzefJgsHM0FQXpaFvuCsWY8LF7tAROZXji1N78NTeKnJlUYQngOt7dmMqVEZPL7xIa53LH2NQFTigUD2gJMwvtY2gcZuEl2h8hoGKwI19AMkxq4j6cyeezq4qDteTLsV6VE2gdk9U=
+	t=1715905448; cv=none; b=ovdjv6TS3ykrez2R/mdD8qyXHP/IoQttrfB5u1DZkEvP533MsPV9zXiJ3x4NPFd0BuCd94i9FpwLfEbUDDqjrC9Vvjz/+Q+iSPW1CdTDH5CP5dkxgadcgypaxotJ/sF6kYBd8JgbKCgJ/VbO4lQG/zC82VpncB+FeDoWDAZ2FG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715905458; c=relaxed/simple;
-	bh=m8GNM27Kp3f+aok4cNSQAzkt6VYs1F9UMOE7H/mCzDY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qapMrQxueqIVN2pHSQotE68jTh66L2oxDuTsznYcKIxDP4zpA4DywYoq7LpxhuxOmswKrhvcjAUCpN+G2zmv5oLjzGr8zylk4Yq4FoVGiV3/sbTh40B5Hy6pAGn/Dv8uOtbsdo3oXDEFONV9XTAsDQ9K4YbgEBy5ie3BDgfKNGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GJr6NR7+; arc=none smtp.client-ip=209.85.208.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f193.google.com with SMTP id 38308e7fff4ca-2e1fa1f1d9bso710071fa.0;
-        Thu, 16 May 2024 17:24:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715905455; x=1716510255; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VISbYzFniYzs5dXFBlVFa4T0YCB3lGTKJzy0kC0XcF4=;
-        b=GJr6NR7+YuDorWylrlZcbwdPsxp+kgXd5lwF0X7QinnMB3uKyHxrsgIIvBdB3cseoR
-         j9taMv17rXPrHzpvLrjxNLtt+nHnfz5fZY85mUqdyeAmNQ2nz0BqgUV8ZfF8NyOdbM78
-         ITcG+6KO9yHuUSHzqLInD20KsySJflFN31xmT8F+l0kSHsPryUwauikTspMUw6RVaK1r
-         cD+Q7sA0FDCnAcZYsv+5T8OpjlxODonTUL8FSwYq3+ZfrI9HvBya7EhTMMtsy2DsAx9s
-         9FtHopcs06LlSgZnfQ0dgWxUi8HrA9P56pUb1FLxTowfd8DZ1RkxnxV59eXXthbu3j6f
-         sFfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715905455; x=1716510255;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VISbYzFniYzs5dXFBlVFa4T0YCB3lGTKJzy0kC0XcF4=;
-        b=ce8yVuVcZMrm2ud1DHXtwOLrnN1haClnNl5g8hMrcdRebzt9OL6g6sdzlcFEXhItiO
-         3ne8HXjGrvDGDCfM/9RjFMRIs1sNQ3dYf0OdBs1yLwjusS6q7Lhu7Xmyu1wQGCzGCCe6
-         RZTeIky7fyNHGJpDR8+wQUDNPmZiq3Eo9iCkE61CzZhH0eHQzq8JFf2jNNQpQ6jrOtvv
-         Lr0UQcpfvhAwFleUU7kFXNNJi1Icz6ip0qkopVq9CXnvz391z8EvRmlhbAEt7H0QchCs
-         h2YCrC2HAmUTwoBDqDxBzA7h9rgXk2vYT7Cv4DihPlZJsMI7l4zMNHHBodry+D16rV9i
-         d1lg==
-X-Forwarded-Encrypted: i=1; AJvYcCXE9zFwpqn1rdoLUo+2K/2Dm+gsjr8CAFrkdOWwX7ZLAPjwJ9hif407BEdnGd7hntRc87hu5vShBGe7wN98frYx9jdm
-X-Gm-Message-State: AOJu0YxecJbWrmEGcejBF215Hm1Jc8XnLkwzyH8C/vXa6bwMBuBaU0XS
-	XkZ7umiCr/u6APaCswMLd6ZIzzxJJU9WyexbB5MMzuxzIMD6R6qbU6GqKis39V/Gt+C9FM40QHq
-	TkLOZQhnP6E+BCyn6KQbs0hap+f0=
-X-Google-Smtp-Source: AGHT+IFLkit7JE4VjBdvgaRtL4gPkpw+MYKl+BTVWjP0QTia4ZeXBqS83ojRPUGSM3QURFZtxHjcSKuJIc9GsLwYzIM=
-X-Received: by 2002:a2e:984b:0:b0:2e0:3ad2:b371 with SMTP id
- 38308e7fff4ca-2e51fe5875dmr159830181fa.25.1715905454383; Thu, 16 May 2024
- 17:24:14 -0700 (PDT)
+	s=arc-20240116; t=1715905448; c=relaxed/simple;
+	bh=DY1+gNZ3hqdkrbbvjE2dVHk6KHF6kKsV5biyNWTBRJ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CjJVE7jXyGSqZJK81f47yyXwkmU2ubghwPyQeLoh4xqCOXJOH4DVxN+4ccqxNLcr4Il0GgPwvy168qy+dsEOprQhavXRLICNZtt/uOxmZdA8S+oY0ROvc7TR6TPT9b+kfLl2wprNLtHTufSQu6vUnpWN+S8yFtA098SWbMGwbjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
+From: Kenton Groombridge <concord@gentoo.org>
+To: johannes@sipsolutions.net
+Cc: concord@gentoo.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	keescook@chromium.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH 1/1] wifi: mac80211: Avoid address calculations via out of bounds array indexing
+Date: Thu, 16 May 2024 20:23:52 -0400
+Message-ID: <20240517002352.12717-1-concord@gentoo.org>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240510192412.3297104-1-amery.hung@bytedance.com>
- <20240510192412.3297104-2-amery.hung@bytedance.com> <CAP01T74iSVPnRsAbdNfzXYYS7GsdCSgp3QiaPSzex6d+3J5AAA@mail.gmail.com>
- <CAMB2axP1C1wVRsq2uDGW0r6-OM8yWvZ9LB0WwEtuSAYsU2T0fg@mail.gmail.com>
-In-Reply-To: <CAMB2axP1C1wVRsq2uDGW0r6-OM8yWvZ9LB0WwEtuSAYsU2T0fg@mail.gmail.com>
-From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Date: Fri, 17 May 2024 02:23:37 +0200
-Message-ID: <CAP01T74mQPMktHJiPoZ7z-UfFCRoxOexpBe_X2v3rLpE5A+WEA@mail.gmail.com>
-Subject: Re: [RFC PATCH v8 01/20] bpf: Support passing referenced kptr to
- struct_ops programs
-To: Amery Hung <ameryhung@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@kernel.org, 
-	sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, 
-	sdf@google.com, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, 17 May 2024 at 02:17, Amery Hung <ameryhung@gmail.com> wrote:
->
-> On Thu, May 16, 2024 at 4:59=E2=80=AFPM Kumar Kartikeya Dwivedi
-> <memxor@gmail.com> wrote:
-> >
-> > On Fri, 10 May 2024 at 21:24, Amery Hung <ameryhung@gmail.com> wrote:
-> > >
-> > > This patch supports struct_ops programs that acqurie referenced kptrs
-> > > throguh arguments. In Qdisc_ops, an skb is passed to ".enqueue" in th=
-e
-> > > first argument. The qdisc becomes the sole owner of the skb and must
-> > > enqueue or drop the skb. This matches the referenced kptr semantic
-> > > in bpf. However, the existing practice of acquiring a referenced kptr=
- via
-> > > a kfunc with KF_ACQUIRE does not play well in this case. Calling kfun=
-cs
-> > > repeatedly allows the user to acquire multiple references, while ther=
-e
-> > > should be only one reference to a unique skb in a qdisc.
-> > >
-> > > The solutioin is to make a struct_ops program automatically acquire a
-> > > referenced kptr through a tagged argument in the stub function. When
-> > > tagged with "__ref_acquired" (suggestion for a better name?), an
-> > > reference kptr (ref_obj_id > 0) will be acquired automatically when
-> > > entering the program. In addition, only the first read to the argueme=
-nt
-> > > is allowed and it will yeild a referenced kptr.
-> > >
-> > > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> > > ---
-> > >  include/linux/bpf.h         |  3 +++
-> > >  kernel/bpf/bpf_struct_ops.c | 17 +++++++++++++----
-> > >  kernel/bpf/btf.c            | 10 +++++++++-
-> > >  kernel/bpf/verifier.c       | 16 +++++++++++++---
-> > >  4 files changed, 38 insertions(+), 8 deletions(-)
-> > >
-> > > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> > > index 9c6a7b8ff963..6aabca1581fe 100644
-> > > --- a/include/linux/bpf.h
-> > > +++ b/include/linux/bpf.h
-> > > @@ -914,6 +914,7 @@ struct bpf_insn_access_aux {
-> > >                 struct {
-> > >                         struct btf *btf;
-> > >                         u32 btf_id;
-> > > +                       u32 ref_obj_id;
-> > >                 };
-> > >         };
-> > >         struct bpf_verifier_log *log; /* for verbose logs */
-> > > @@ -1416,6 +1417,8 @@ struct bpf_ctx_arg_aux {
-> > >         enum bpf_reg_type reg_type;
-> > >         struct btf *btf;
-> > >         u32 btf_id;
-> > > +       u32 ref_obj_id;
-> > > +       bool ref_acquired;
-> > >  };
-> > >
-> > >  struct btf_mod_pair {
-> > > diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.=
-c
-> > > index 86c7884abaf8..bca8e5936846 100644
-> > > --- a/kernel/bpf/bpf_struct_ops.c
-> > > +++ b/kernel/bpf/bpf_struct_ops.c
-> > > @@ -143,6 +143,7 @@ void bpf_struct_ops_image_free(void *image)
-> > >  }
-> > >
-> > >  #define MAYBE_NULL_SUFFIX "__nullable"
-> > > +#define REF_ACQUIRED_SUFFIX "__ref_acquired"
-> > >  #define MAX_STUB_NAME 128
-> > >
-> > >  /* Return the type info of a stub function, if it exists.
-> > > @@ -204,6 +205,7 @@ static int prepare_arg_info(struct btf *btf,
-> > >                             struct bpf_struct_ops_arg_info *arg_info)
-> > >  {
-> > >         const struct btf_type *stub_func_proto, *pointed_type;
-> > > +       bool is_nullable =3D false, is_ref_acquired =3D false;
-> > >         const struct btf_param *stub_args, *args;
-> > >         struct bpf_ctx_arg_aux *info, *info_buf;
-> > >         u32 nargs, arg_no, info_cnt =3D 0;
-> > > @@ -240,8 +242,11 @@ static int prepare_arg_info(struct btf *btf,
-> > >                 /* Skip arguments that is not suffixed with
-> > >                  * "__nullable".
-> > >                  */
-> > > -               if (!btf_param_match_suffix(btf, &stub_args[arg_no],
-> > > -                                           MAYBE_NULL_SUFFIX))
-> > > +               is_nullable =3D btf_param_match_suffix(btf, &stub_arg=
-s[arg_no],
-> > > +                                                    MAYBE_NULL_SUFFI=
-X);
-> > > +               is_ref_acquired =3D btf_param_match_suffix(btf, &stub=
-_args[arg_no],
-> > > +                                                      REF_ACQUIRED_S=
-UFFIX);
-> > > +               if (!(is_nullable || is_ref_acquired))
-> > >                         continue;
-> > >
-> > >                 /* Should be a pointer to struct */
-> > > @@ -269,11 +274,15 @@ static int prepare_arg_info(struct btf *btf,
-> > >                 }
-> > >
-> > >                 /* Fill the information of the new argument */
-> > > -               info->reg_type =3D
-> > > -                       PTR_TRUSTED | PTR_TO_BTF_ID | PTR_MAYBE_NULL;
-> > >                 info->btf_id =3D arg_btf_id;
-> > >                 info->btf =3D btf;
-> > >                 info->offset =3D offset;
-> > > +               if (is_nullable) {
-> > > +                       info->reg_type =3D PTR_TRUSTED | PTR_TO_BTF_I=
-D | PTR_MAYBE_NULL;
-> > > +               } else if (is_ref_acquired) {
-> > > +                       info->reg_type =3D PTR_TRUSTED | PTR_TO_BTF_I=
-D;
-> > > +                       info->ref_acquired =3D true;
-> > > +               }
-> > >
-> > >                 info++;
-> > >                 info_cnt++;
-> > > diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-> > > index 8c95392214ed..e462fb4a4598 100644
-> > > --- a/kernel/bpf/btf.c
-> > > +++ b/kernel/bpf/btf.c
-> > > @@ -6316,7 +6316,8 @@ bool btf_ctx_access(int off, int size, enum bpf=
-_access_type type,
-> > >
-> > >         /* this is a pointer to another type */
-> > >         for (i =3D 0; i < prog->aux->ctx_arg_info_size; i++) {
-> > > -               const struct bpf_ctx_arg_aux *ctx_arg_info =3D &prog-=
->aux->ctx_arg_info[i];
-> > > +               struct bpf_ctx_arg_aux *ctx_arg_info =3D
-> > > +                       (struct bpf_ctx_arg_aux *)&prog->aux->ctx_arg=
-_info[i];
-> > >
-> > >                 if (ctx_arg_info->offset =3D=3D off) {
-> > >                         if (!ctx_arg_info->btf_id) {
-> > > @@ -6324,9 +6325,16 @@ bool btf_ctx_access(int off, int size, enum bp=
-f_access_type type,
-> > >                                 return false;
-> > >                         }
-> > >
-> > > +                       if (ctx_arg_info->ref_acquired && !ctx_arg_in=
-fo->ref_obj_id) {
-> > > +                               bpf_log(log, "cannot acquire a refere=
-nce to context argument offset %u\n", off);
-> > > +                               return false;
-> > > +                       }
-> > > +
-> > >                         info->reg_type =3D ctx_arg_info->reg_type;
-> > >                         info->btf =3D ctx_arg_info->btf ? : btf_vmlin=
-ux;
-> > >                         info->btf_id =3D ctx_arg_info->btf_id;
-> > > +                       info->ref_obj_id =3D ctx_arg_info->ref_obj_id=
-;
-> > > +                       ctx_arg_info->ref_obj_id =3D 0;
-> > >                         return true;
-> >
-> > I think this is fragile. What if the compiler produces two independent
-> > paths in the program which read the skb pointer once?
-> > Technically, the program is still reading the skb pointer once at runti=
-me.
-> > Then you will reset ref_obj_id to 0 when exploring one, and assign as
-> > 0 in the other one, causing errors.
-> > ctx_arg_info appears to be global for the program.
-> >
-> > I think the better way would be to check if ref_obj_id is still part
-> > of the reference state.
-> > If the ref_obj_id has already been dropped from reference_state, then
-> > any loads should get ref_obj_id =3D 0.
-> > That would happen when dropping or enqueueing the skb into qdisc,
-> > which would (I presume) do release_reference_state(ref_obj_id).
-> > Otherwise, all of them can share the same ref_obj_id. You won't have
-> > to implement "can only read once" logic,
-> > and when you enqueue stuff in the qdisc, all identical copies produced
-> > from different load instructions will be invalidated.
-> > Same ref_obj_id =3D=3D unique ownership of the same object.
-> > You can already have multiple copies through rX =3D rY, multiple ctx
-> > loads of skb will produce a similar verifier state.
-> >
-> > So, on entry, assign ctx_arg_info->ref_obj_id uniquely, then on each lo=
-ad:
-> > if reference_state.find(ctx_arg_info->ref_obj_id) =3D=3D true; then
-> > info->ref_obj_id =3D ctx_arg_info->ref_obj_id; else info->ref_obj_id =
-=3D
-> > 0;
-> >
-> > Let me know if I missed something.
->
-> You are right. The current approach will falsely reject valid programs,
-> and your suggestion makes sense.
+req->n_channels must be set before req->channels[] can be used.
+Additionally, memory addresses after the "channels" array need to be
+calculated from the allocation base ("request") instead of the first
+"out of bounds" index of "channels" to avoid a runtime bounds check
+warning.
 
-Also, I wonder whether when ref_obj_id has been released, we should
-mark the loaded register as unknown scalar, vs skb with ref_obj_id =3D
-0?
-Otherwise right now it will take PTR_TO_BTF_ID | PTR_TRUSTED as
-reg_type, and I think verifier will permit reads even if ref_obj_id =3D
-0.
-This will surely be bad once skb is dropped/enqueued, since the
-program should no longer be able to read such memory.
+This patch is largely influenced by the work in [1] and fixes one or
+more issues reported in [2].
 
->
-> Thanks,
-> Amery
+[   83.964252] ------------[ cut here ]------------
+[   83.964255] UBSAN: array-index-out-of-bounds in net/mac80211/scan.c:364:4
+[   83.964258] index 0 is out of range for type 'struct ieee80211_channel *[]'
+[   83.964260] CPU: 0 PID: 1695 Comm: iwd Tainted: G           O    T 6.8.9-gentoo-hardened1 #1
+[   83.964262] Hardware name: System76 Pangolin/Pangolin, BIOS ARB928_V00.01_T0025ASY1_ms 04/20/2023
+[   83.964264] Call Trace:
+[   83.964267]  <TASK>
+[   83.964269]  dump_stack_lvl+0x3f/0xc0
+[   83.964274]  __ubsan_handle_out_of_bounds+0xec/0x110
+[   83.964278]  ieee80211_prep_hw_scan+0x2db/0x4b0
+[   83.964281]  __ieee80211_start_scan+0x601/0x990
+[   83.964284]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964287]  ? cfg80211_scan+0x149/0x250
+[   83.964291]  nl80211_trigger_scan+0x874/0x980
+[   83.964295]  genl_family_rcv_msg_doit+0xe8/0x160
+[   83.964298]  genl_rcv_msg+0x240/0x270
+[   83.964301]  ? __cfi_nl80211_trigger_scan+0x10/0x10
+[   83.964302]  ? __cfi_nl80211_post_doit+0x10/0x10
+[   83.964304]  ? __cfi_nl80211_pre_doit+0x10/0x10
+[   83.964307]  ? __cfi_genl_rcv_msg+0x10/0x10
+[   83.964309]  netlink_rcv_skb+0x102/0x130
+[   83.964312]  genl_rcv+0x23/0x40
+[   83.964314]  netlink_unicast+0x23b/0x340
+[   83.964316]  netlink_sendmsg+0x3a9/0x450
+[   83.964319]  __sys_sendto+0x3ae/0x3c0
+[   83.964324]  __x64_sys_sendto+0x21/0x40
+[   83.964326]  do_syscall_64+0x90/0x150
+[   83.964329]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964331]  ? syscall_exit_work+0xc2/0xf0
+[   83.964333]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964335]  ? syscall_exit_to_user_mode+0x74/0xa0
+[   83.964337]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964339]  ? do_syscall_64+0x9c/0x150
+[   83.964340]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964342]  ? syscall_exit_to_user_mode+0x74/0xa0
+[   83.964344]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964346]  ? do_syscall_64+0x9c/0x150
+[   83.964347]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964349]  ? do_syscall_64+0x9c/0x150
+[   83.964351]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964353]  ? syscall_exit_work+0xc2/0xf0
+[   83.964354]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964356]  ? syscall_exit_to_user_mode+0x74/0xa0
+[   83.964358]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964359]  ? do_syscall_64+0x9c/0x150
+[   83.964361]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964362]  ? do_user_addr_fault+0x488/0x620
+[   83.964366]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964367]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   83.964369]  entry_SYSCALL_64_after_hwframe+0x55/0x5d
+[   83.964372] RIP: 0033:0x6200808578d7
+[   83.964374] Code: 00 00 90 f3 0f 1e fa 41 56 55 41 89 ce 48 83 ec 28 80 3d 7b f7 0d 00 00 74 29 45 31 c9 45 31 c0 41 89 ca b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 71 48 83 c4 28 5d 41 5e c3 66 0f 1f 84 00 00
+[   83.964375] RSP: 002b:0000730c4e821530 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+[   83.964378] RAX: ffffffffffffffda RBX: 000006dbc456c570 RCX: 00006200808578d7
+[   83.964379] RDX: 000000000000005c RSI: 000006dbc45884f0 RDI: 0000000000000004
+[   83.964381] RBP: 0000000000000004 R08: 0000000000000000 R09: 0000000000000000
+[   83.964382] R10: 0000000000000000 R11: 0000000000000246 R12: 000006dbc456c480
+[   83.964383] R13: 000006dbc456c450 R14: 0000000000000000 R15: 000006dbc456c610
+[   83.964386]  </TASK>
+[   83.964386] ---[ end trace ]---
+[   84.232857] ------------[ cut here ]------------
+[   84.232863] UBSAN: array-index-out-of-bounds in net/wireless/scan.c:893:12
+[   84.232868] index 59 is out of range for type 'struct ieee80211_channel *[]'
+[   84.232870] CPU: 11 PID: 857 Comm: kworker/u32:37 Tainted: G O    T  6.8.9-gentoo-hardened1 #1
+[   84.232875] Hardware name: System76 Pangolin/Pangolin, BIOS ARB928_V00.01_T0025ASY1_ms 04/20/2023
+[   84.232877] Workqueue: events_unbound cfg80211_wiphy_work
+[   84.232886] Call Trace:
+[   84.232889]  <TASK>
+[   84.232892]  dump_stack_lvl+0x3f/0xc0
+[   84.232897]  __ubsan_handle_out_of_bounds+0xec/0x110
+[   84.232902]  cfg80211_scan_6ghz+0xf4d/0xf60
+[   84.232908]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   84.232911]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   84.232914]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   84.232917]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   84.232921]  ___cfg80211_scan_done+0xd6/0x2c0
+[   84.232925]  cfg80211_wiphy_work+0xb9/0x100
+[   84.232929]  process_scheduled_works+0x1d5/0x340
+[   84.232935]  worker_thread+0x214/0x2e0
+[   84.232939]  ? __cfi_worker_thread+0x10/0x10
+[   84.232943]  kthread+0x129/0x140
+[   84.232946]  ? __cfi_kthread+0x10/0x10
+[   84.232949]  ret_from_fork+0x4c/0x60
+[   84.232953]  ? __cfi_kthread+0x10/0x10
+[   84.232955]  ret_from_fork_asm+0x11/0x30
+[   84.232961]  </TASK>
+[   84.232962] ---[ end trace ]---
+
+[1] https://lore.kernel.org/all/20240424220057.work.819-kees@kernel.org/
+[2] https://bugzilla.kernel.org/show_bug.cgi?id=218810
+
+Signed-off-by: Kenton Groombridge <concord@gentoo.org>
+---
+ net/mac80211/scan.c | 17 +++++++++--------
+ net/wireless/scan.c |  9 +++++----
+ 2 files changed, 14 insertions(+), 12 deletions(-)
+
+diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
+index 73850312580f..b88e99c211ff 100644
+--- a/net/mac80211/scan.c
++++ b/net/mac80211/scan.c
+@@ -358,7 +358,8 @@ static bool ieee80211_prep_hw_scan(struct ieee80211_sub_if_data *sdata)
+ 	struct cfg80211_scan_request *req;
+ 	struct cfg80211_chan_def chandef;
+ 	u8 bands_used = 0;
+-	int i, ielen, n_chans;
++	int i, ielen;
++	u32 *n_chans;
+ 	u32 flags = 0;
+ 
+ 	req = rcu_dereference_protected(local->scan_req,
+@@ -368,34 +369,34 @@ static bool ieee80211_prep_hw_scan(struct ieee80211_sub_if_data *sdata)
+ 		return false;
+ 
+ 	if (ieee80211_hw_check(&local->hw, SINGLE_SCAN_ON_ALL_BANDS)) {
++		local->hw_scan_req->req.n_channels = req->n_channels;
++
+ 		for (i = 0; i < req->n_channels; i++) {
+ 			local->hw_scan_req->req.channels[i] = req->channels[i];
+ 			bands_used |= BIT(req->channels[i]->band);
+ 		}
+-
+-		n_chans = req->n_channels;
+ 	} else {
+ 		do {
+ 			if (local->hw_scan_band == NUM_NL80211_BANDS)
+ 				return false;
+ 
+-			n_chans = 0;
++			n_chans = &local->hw_scan_req->req.n_channels;
++			*n_chans = 0;
+ 
+ 			for (i = 0; i < req->n_channels; i++) {
+ 				if (req->channels[i]->band !=
+ 				    local->hw_scan_band)
+ 					continue;
+-				local->hw_scan_req->req.channels[n_chans] =
++				local->hw_scan_req->req.channels[*n_chans++] =
+ 							req->channels[i];
+-				n_chans++;
++
+ 				bands_used |= BIT(req->channels[i]->band);
+ 			}
+ 
+ 			local->hw_scan_band++;
+-		} while (!n_chans);
++		} while (!*n_chans);
+ 	}
+ 
+-	local->hw_scan_req->req.n_channels = n_chans;
+ 	ieee80211_prepare_scan_chandef(&chandef);
+ 
+ 	if (req->flags & NL80211_SCAN_FLAG_MIN_PREQ_CONTENT)
+diff --git a/net/wireless/scan.c b/net/wireless/scan.c
+index 5a5dd3ce497f..e2c979b954f7 100644
+--- a/net/wireless/scan.c
++++ b/net/wireless/scan.c
+@@ -812,6 +812,7 @@ static int cfg80211_scan_6ghz(struct cfg80211_registered_device *rdev)
+ 	LIST_HEAD(coloc_ap_list);
+ 	bool need_scan_psc = true;
+ 	const struct ieee80211_sband_iftype_data *iftd;
++	size_t chan_size;
+ 
+ 	rdev_req->scan_6ghz = true;
+ 
+@@ -877,7 +878,8 @@ static int cfg80211_scan_6ghz(struct cfg80211_registered_device *rdev)
+ 		spin_unlock_bh(&rdev->bss_lock);
+ 	}
+ 
+-	request = kzalloc(struct_size(request, channels, n_channels) +
++	chan_size = struct_size(request, channels, n_channels);
++	request = kzalloc(chan_size +
+ 			  sizeof(*request->scan_6ghz_params) * count +
+ 			  sizeof(*request->ssids) * rdev_req->n_ssids,
+ 			  GFP_KERNEL);
+@@ -888,8 +890,7 @@ static int cfg80211_scan_6ghz(struct cfg80211_registered_device *rdev)
+ 
+ 	*request = *rdev_req;
+ 	request->n_channels = 0;
+-	request->scan_6ghz_params =
+-		(void *)&request->channels[n_channels];
++	request->scan_6ghz_params = (void *)request + chan_size;
+ 
+ 	/*
+ 	 * PSC channels should not be scanned in case of direct scan with 1 SSID
+@@ -985,7 +986,7 @@ static int cfg80211_scan_6ghz(struct cfg80211_registered_device *rdev)
+ 		 * request, so the driver would be able to use them in its
+ 		 * probe requests to discover hidden APs on PSC channels.
+ 		 */
+-		request->ssids = (void *)&request->channels[request->n_channels];
++		request->ssids = (void *)request + chan_size;
+ 		request->n_ssids = rdev_req->n_ssids;
+ 		memcpy(request->ssids, rdev_req->ssids, sizeof(*request->ssids) *
+ 		       request->n_ssids);
+-- 
+2.45.0
+
 
