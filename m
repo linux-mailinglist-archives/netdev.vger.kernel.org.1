@@ -1,86 +1,92 @@
-Return-Path: <netdev+bounces-96973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B5698C8821
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 16:34:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9CC8C882B
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 16:39:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B964C287F0A
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 14:34:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26EFC285F40
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 14:39:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E97A1F93E;
-	Fri, 17 May 2024 14:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF8C399;
+	Fri, 17 May 2024 14:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SvafHAPk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O2tmIfLw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069DC384
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 14:34:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D05657C6;
+	Fri, 17 May 2024 14:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715956445; cv=none; b=pWVCnU5IkVDDJXuv5PhRPik5UdwEj7iqXQsOPF9Usegk1BIJZmP9NCyV1JGOHujNEquDtY2aY/vo/fqvhq9MRZb9SLQN4anCMo4m3SliP3s5edJ8ACoJsc/hQfxA/++r+y/nSCVHKXszaOmFEYXzaAE1tz8jTwnTT08EIKu/6rM=
+	t=1715956765; cv=none; b=rM+aowf6aP1aVx7/QIYJDaq4NuoiakGlkRpeYq6L1N76TQ9EQmLIopkRk47HcVm2o7SjXGd4gDM6B265CaianR67UygRb1rXcmvss9wkHB/K5cpef/j+7XvMsVJt/aaNGfS6rpiO+GNKuL+d7pVoYSpMC84yUo0fWyg2ABQsV4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715956445; c=relaxed/simple;
-	bh=01a5MXQ4SUek3WkrUjvzadT22IhxlkGIlSc4PkC0Tic=;
+	s=arc-20240116; t=1715956765; c=relaxed/simple;
+	bh=3cdbI//fG9tefYk9dE1HYEleskFp8c3t8dyT3UHix8M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M3xL8vfS4K255AqYgi5/GPjaXwS+vzde5dW2ziuj1eTMe/T49z7KuNc6z7IbWNMS3xSUPAFA67T+/x7Ir+3yEcAXyBmWn1ZXT0QffVYfaDvndzDc6Dbjg3Dxgt7oXvpvOFEP7qM+/KAyDIQRMZ9Idu7uKEQICsMnuCtu44ZOjjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SvafHAPk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB36DC32789;
-	Fri, 17 May 2024 14:34:02 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=AKQWkaKo+n5AkNwsJOWMdRcgbmD9lv33Os64JC1dcdZzCI3bMToRJy27e54xkMTAUP0DIhiOJAUZdMZU0DkAGSw/nyUUhRGKeCOzWMvnRiqL2qRGE1pfupYl8t1ICp0J5OGzEdFukDzrB+DEr2OodBl5jA7w3CGXBvfhCLW1QSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O2tmIfLw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41BD3C2BD10;
+	Fri, 17 May 2024 14:39:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715956444;
-	bh=01a5MXQ4SUek3WkrUjvzadT22IhxlkGIlSc4PkC0Tic=;
+	s=k20201202; t=1715956765;
+	bh=3cdbI//fG9tefYk9dE1HYEleskFp8c3t8dyT3UHix8M=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SvafHAPkPxN5ZS6PukxwXlf8KA9z9qwLVusAmiqphV8jkuocQFOoupvsy1JdzvpGT
-	 y2GsotbyXBDdsCj79SEyMnuk6OQq63KyyH3X5Bfjm/J5gTFRJZ2VRdgJFxlAg8+rpB
-	 9S+uxk2tZAvgBQADu9SLqc1jVdRFt2wybWXvXpoU+Igs/uEIRKZh8j0L7lUFT1WDbp
-	 puHCrJZu9/PLg5aOD9eTvOPk5b7q0CZZRf4Y/9cmIfEOBUZRkNnpmff193QSzRZxWo
-	 xP9XQjiFBqD8CRc4zH8l95cUGF8RNWVe68jiUYR6FFFgRXbhH5i+QH+ZdlfuYxPa7P
-	 AupTbkD2FR54g==
-Date: Fri, 17 May 2024 15:34:00 +0100
-From: Simon Horman <horms@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Lebrun <david.lebrun@uclouvain.be>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: Re: [PATCH net] ipv6: sr: fix memleak in seg6_hmac_init_algo
-Message-ID: <20240517143400.GF443576@kernel.org>
-References: <20240517005435.2600277-1-liuhangbin@gmail.com>
+	b=O2tmIfLw5UuLh29Odt878FWDbCbSZLoYg0RSTNlyySrGFGMRApFn8XmrVAGWrWGqX
+	 6uAgH/40n+pQ6I0S0BQ4goJkw1YCaEAQSlDW6I3/bCg2FESY4wcHDCA4+kTkiR9aMn
+	 RNOM4PhSRClOzhXvWnAEx9y5jq9dY5Q4UPbuQ0Ep1lKFYdVtrmLwLRFr2OAyT9nwT8
+	 6fDs55X0g5id9d2OqWU01mjyQLlBbD63wGQxT9TOyZjFKJl6aKqmWUb5Z2vmyE9t83
+	 WGEMAT/sfSlBfCsMbzC1ZwnF/a8exox9jhFkMF6BMXrK7afj2F3GCllwhKitgCESYM
+	 tA4wEyWfRx+7A==
+Date: Fri, 17 May 2024 15:39:20 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Udit Kumar <u-kumar1@ti.com>
+Cc: vigneshr@ti.com, nm@ti.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Kip Broadhurst <kbroadhurst@ti.com>
+Subject: Re: [PATCH] dt-bindings: net: dp8386x: Add MIT license along with
+ GPL-2.0
+Message-ID: <20240517-poster-purplish-9b356ce30248@spud>
+References: <20240517104226.3395480-1-u-kumar1@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="BFsU5jMUN2WDtALy"
+Content-Disposition: inline
+In-Reply-To: <20240517104226.3395480-1-u-kumar1@ti.com>
+
+
+--BFsU5jMUN2WDtALy
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240517005435.2600277-1-liuhangbin@gmail.com>
 
-On Fri, May 17, 2024 at 08:54:35AM +0800, Hangbin Liu wrote:
-> seg6_hmac_init_algo returns without cleaning up the previous allocations
-> if one fails, so it's going to leak all that memory and the crypto tfms.
-> 
-> Update seg6_hmac_exit to only free the memory when allocated, so we can
-> reuse the code directly.
-> 
-> Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
-> Reported-by: Sabrina Dubroca <sd@queasysnail.net>
-> Closes: https://lore.kernel.org/netdev/Zj3bh-gE7eT6V6aH@hog/
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+On Fri, May 17, 2024 at 04:12:26PM +0530, Udit Kumar wrote:
+> Modify license to include dual licensing as GPL-2.0-only OR MIT
+> license for TI specific phy header files. This allows for Linux
+> kernel files to be used in other Operating System ecosystems
+> such as Zephyr or FreeBSD.
 
-Thanks,
+What's wrong with BSD-2-Clause, why not use that?
 
-I agree that this was leaking resources, and that after the updates to
-seg6_hmac_exit included in this patch it can be used to unwind partial
-initialisation in seg6_hmac_init_algo().
+--BFsU5jMUN2WDtALy
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+-----BEGIN PGP SIGNATURE-----
 
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZkdsGAAKCRB4tDGHoIJi
+0kciAQDK14E8urYqaI3ZlTzZh6PZzWSnKCy3CCLh+0+DDJIULwEAymLHRIHihVUF
+V8M02LksJM6/Ar0BzCk+9r/bSAOmzgE=
+=0N2C
+-----END PGP SIGNATURE-----
+
+--BFsU5jMUN2WDtALy--
 
