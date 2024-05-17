@@ -1,133 +1,86 @@
-Return-Path: <netdev+bounces-96986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 346B28C8911
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:11:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B5698C8821
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 16:34:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 658EC1C20A43
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:11:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B964C287F0A
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 14:34:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2794F69D31;
-	Fri, 17 May 2024 15:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E97A1F93E;
+	Fri, 17 May 2024 14:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="tjftkaS/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SvafHAPk"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043B869953;
-	Fri, 17 May 2024 15:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069DC384
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 14:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715958709; cv=none; b=XSNk4hIeu9Sjh/NpotPyG36Ap4yfNekTpNs6eaSz/ABNhNeenwf9jw/AcHGfLPWeojIJhnGFGgU5TYAES8ANxf4KmHFzU8dczOQLZleF7BMe6Ft6MP8kkHX43y2NFaZUZ5VpeliFx/MlHNsa/k9mPRQUIdF5RsryCQM6qP7N8n4=
+	t=1715956445; cv=none; b=pWVCnU5IkVDDJXuv5PhRPik5UdwEj7iqXQsOPF9Usegk1BIJZmP9NCyV1JGOHujNEquDtY2aY/vo/fqvhq9MRZb9SLQN4anCMo4m3SliP3s5edJ8ACoJsc/hQfxA/++r+y/nSCVHKXszaOmFEYXzaAE1tz8jTwnTT08EIKu/6rM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715958709; c=relaxed/simple;
-	bh=SjNsK7n6ceh5K81D0gVfZ4gwulogBfesDWHdGQG2EfA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tVXKacz0aOutPZLBnUGQScKKBmHzGLqyIOWG/rjU5un46/U6DFRdEFZ5m5JdSDiQkI/Bz3MFE4ue7198Pc/pzyTdd+B683A7ftaB5KxO+yVnhGoY26vJmB/4O88+ki/u8hXQ6Iq0JJEw1+QF0feLWNXBlGjlZmzI+9bt/tvGt5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=tjftkaS/; arc=none smtp.client-ip=198.47.23.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44HEHCJi075281;
-	Fri, 17 May 2024 09:17:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1715955432;
-	bh=kt66KMrGkxREF7cMwYO1Us9NDDj6Izf4mMkTPSy7wcw=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=tjftkaS/AgNKcblNHzk9Ud83ecSNxlz1icFl4nmgOV9hulj7sckvUVgEDtwQ7m972
-	 JRH6U3JslShjbDC/2KFuOcshIWzOb21K04eKwS9DaSzFn9QQYuyQDBUlOdZO3YAibD
-	 h40h6u+hPXTzC0UuTR8nQ9RHS/zd3ieQYcdOKVhw=
-Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44HEHCct117536
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 17 May 2024 09:17:12 -0500
-Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 17
- May 2024 09:17:12 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 17 May 2024 09:17:12 -0500
-Received: from [10.249.141.75] ([10.249.141.75])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44HEH7Sw086208;
-	Fri, 17 May 2024 09:17:07 -0500
-Message-ID: <7439c9e1-59cd-4d37-aab8-bc71b6a98a09@ti.com>
-Date: Fri, 17 May 2024 19:47:06 +0530
+	s=arc-20240116; t=1715956445; c=relaxed/simple;
+	bh=01a5MXQ4SUek3WkrUjvzadT22IhxlkGIlSc4PkC0Tic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M3xL8vfS4K255AqYgi5/GPjaXwS+vzde5dW2ziuj1eTMe/T49z7KuNc6z7IbWNMS3xSUPAFA67T+/x7Ir+3yEcAXyBmWn1ZXT0QffVYfaDvndzDc6Dbjg3Dxgt7oXvpvOFEP7qM+/KAyDIQRMZ9Idu7uKEQICsMnuCtu44ZOjjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SvafHAPk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB36DC32789;
+	Fri, 17 May 2024 14:34:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715956444;
+	bh=01a5MXQ4SUek3WkrUjvzadT22IhxlkGIlSc4PkC0Tic=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SvafHAPkPxN5ZS6PukxwXlf8KA9z9qwLVusAmiqphV8jkuocQFOoupvsy1JdzvpGT
+	 y2GsotbyXBDdsCj79SEyMnuk6OQq63KyyH3X5Bfjm/J5gTFRJZ2VRdgJFxlAg8+rpB
+	 9S+uxk2tZAvgBQADu9SLqc1jVdRFt2wybWXvXpoU+Igs/uEIRKZh8j0L7lUFT1WDbp
+	 puHCrJZu9/PLg5aOD9eTvOPk5b7q0CZZRf4Y/9cmIfEOBUZRkNnpmff193QSzRZxWo
+	 xP9XQjiFBqD8CRc4zH8l95cUGF8RNWVe68jiUYR6FFFgRXbhH5i+QH+ZdlfuYxPa7P
+	 AupTbkD2FR54g==
+Date: Fri, 17 May 2024 15:34:00 +0100
+From: Simon Horman <horms@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Lebrun <david.lebrun@uclouvain.be>,
+	Sabrina Dubroca <sd@queasysnail.net>
+Subject: Re: [PATCH net] ipv6: sr: fix memleak in seg6_hmac_init_algo
+Message-ID: <20240517143400.GF443576@kernel.org>
+References: <20240517005435.2600277-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dt-bindings: net: dp8386x: Add MIT license along with
- GPL-2.0
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <vigneshr@ti.com>, <nm@ti.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Kip Broadhurst <kbroadhurst@ti.com>,
-        <w.egorov@phytec.de>
-References: <20240517104226.3395480-1-u-kumar1@ti.com>
- <41e30085-937a-410a-ac6a-189307a59319@lunn.ch>
-Content-Language: en-US
-From: "Kumar, Udit" <u-kumar1@ti.com>
-In-Reply-To: <41e30085-937a-410a-ac6a-189307a59319@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240517005435.2600277-1-liuhangbin@gmail.com>
 
-Thanks Andrew
+On Fri, May 17, 2024 at 08:54:35AM +0800, Hangbin Liu wrote:
+> seg6_hmac_init_algo returns without cleaning up the previous allocations
+> if one fails, so it's going to leak all that memory and the crypto tfms.
+> 
+> Update seg6_hmac_exit to only free the memory when allocated, so we can
+> reuse the code directly.
+> 
+> Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
+> Reported-by: Sabrina Dubroca <sd@queasysnail.net>
+> Closes: https://lore.kernel.org/netdev/Zj3bh-gE7eT6V6aH@hog/
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-On 5/17/2024 7:26 PM, Andrew Lunn wrote:
-> On Fri, May 17, 2024 at 04:12:26PM +0530, Udit Kumar wrote:
->> Modify license to include dual licensing as GPL-2.0-only OR MIT
->> license for TI specific phy header files. This allows for Linux
->> kernel files to be used in other Operating System ecosystems
->> such as Zephyr or FreeBSD.
->>
->> While at this, update the TI copyright year to sync with current year
->> to indicate license change.
->>
->> Cc: Kip Broadhurst <kbroadhurst@ti.com>
->> Signed-off-by: Udit Kumar <u-kumar1@ti.com>
->> ---
->>   include/dt-bindings/net/ti-dp83867.h | 4 ++--
->>   include/dt-bindings/net/ti-dp83869.h | 4 ++--
->>   2 files changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/dt-bindings/net/ti-dp83867.h b/include/dt-bindings/net/ti-dp83867.h
->> index 6fc4b445d3a1..2b7bc9c692f2 100644
->> --- a/include/dt-bindings/net/ti-dp83867.h
->> +++ b/include/dt-bindings/net/ti-dp83867.h
->> @@ -1,10 +1,10 @@
->> -/* SPDX-License-Identifier: GPL-2.0-only */
->> +/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
->>   /*
->>    * Device Tree constants for the Texas Instruments DP83867 PHY
->>    *
->>    * Author: Dan Murphy <dmurphy@ti.com>
->>    *
->> - * Copyright:   (C) 2015 Texas Instruments, Inc.
->> + * Copyright:   (C) 2015-2024 Texas Instruments, Inc.
->>    */
-> IANAL
->
-> but about 1/4 of this file was written by Wadim Egorov
-> <w.egorov@phytec.de>. It would be good to Cc: him and make sure he
-> does not object.
+Thanks,
 
-Wadim is copied.
-Also will take care of copying in next version if any.
+I agree that this was leaking resources, and that after the updates to
+seg6_hmac_exit included in this patch it can be used to unwind partial
+initialisation in seg6_hmac_init_algo().
 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> The other file is fine, it was all Dan Murphy's work.
->
->       Andrew
 
