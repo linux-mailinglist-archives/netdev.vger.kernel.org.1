@@ -1,202 +1,108 @@
-Return-Path: <netdev+bounces-96983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E53C88C885E
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 16:48:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D27F18C8865
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 16:49:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 148FA1C24C98
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 14:48:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CFAD281FC0
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 14:49:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE99629E6;
-	Fri, 17 May 2024 14:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D94B67A0D;
+	Fri, 17 May 2024 14:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ixvJ17XS"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="QNIiwpei"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB05971757;
-	Fri, 17 May 2024 14:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D5E60263;
+	Fri, 17 May 2024 14:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715957196; cv=none; b=oU/EF1EfBsZNuvMpDat4g7S1NjGEUeOvDDNbxIQ8OwSDFzQWRSIP7Efmiudab9YzAb+Zcwh8Zm/6EhvLPwwPoaPP6AD1DNGk2Tu7UvJqjBKU5InZA4ilZ2Y3vrWNNUEdjc80BeGjR+yO8yfIdgzKzBsMKHh+bZGBcQX0wmB0Nj4=
+	t=1715957295; cv=none; b=pwRLH5XlGIZ3CcZZUG5OlTc0LgInhGYbHiXcerPUCcLjMw5RZ5ldKRt3jVDItJjmAO7ZKRpUJeCdKamMSRb3oeZdaCFYlqt8A+b6mAgji8DTYoDe8u4Rd6wkd977P2++vXC9Zp0CPictZOgMno34/bA+8PRijJX8sQm9Q4YkH7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715957196; c=relaxed/simple;
-	bh=WnxVwjgYGJtcoPZ87tCxtUxpJqNACgXajD6ezrDCG4I=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Eh3ia+mZJJTMNG3+hHLTKvpUQbdfPyuufT5X0vyZSrdtkQjEuGa01fAG55onTh7SmBzRk+1zoWzrt6Za8+HO+w/uoUXGSpx8Yg59A9EQWSkUgBJQNpmvj/XQHgtvcKIklmda87vKGsI3dFPV10eRUrvyqtap3ZMx2YIw4dcEjjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ixvJ17XS; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1eb0e08bfd2so11077705ad.1;
-        Fri, 17 May 2024 07:46:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715957194; x=1716561994; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1E5gdZlICe3lq/gDwWvHR3o2K94KvkxWORr8jEuKK78=;
-        b=ixvJ17XSuqQ4El0fKozGFftyw1b7Us6lI6k8Diupf+u7bUCx+/f5FBGwgMvgoRVqCK
-         e0itaRRP0i6NZHZG6vsR6ERILlUJw+viW9FTlJtFVgSVlR3L6EBwJ4ZwI/xcsOg6r1f5
-         uZZScjg8UA9/AZBftVl+vE1GlQ00feJ2oBv0DwW3Fj6gvKgq553iVFZ6Pa9bQl7IpmBL
-         1oinH+cNgYADno6g0WHJ5ChpT0+55e5iczPoU8FgnIzgBwZWiShKFoHIWtwjf7L0KqeL
-         WII3+2Vn6nS6WrIB+vHl4mo9jgVuCK8nYiQVaboNmuMoRa3jE0oXHTYEXrBpFz0yAdqv
-         IDgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715957194; x=1716561994;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1E5gdZlICe3lq/gDwWvHR3o2K94KvkxWORr8jEuKK78=;
-        b=bi6plwDmXjOfb9Ln8IQ0k6K5JMvK2/GwhtAgbCJ2+6Ctgqd7+ujEYbADe6PiwAb9AQ
-         a656Zr025mOsS0l0HuMrgaoDOiFCERtsZZkGRL8v/+GQg2cIcAyaap120go0cKy4snzb
-         2GIlfKiul+2wTYUJqHiru4dF7uakOv+DxnibqV3ktFcJtgnyarqCp8hN2J6lZGABwjoY
-         SgLfQJmKnc+WNoRJkK2gjwVYKZfUeA8iMc55YprPC94B8P331ixEh/3GNWyLKuHacMvo
-         qbegto55MzRHaG8F3PecNuxM4qMfoptGClo09oTytPY4f+eEjBBee50ywiVBTpzdILBa
-         qWyw==
-X-Forwarded-Encrypted: i=1; AJvYcCVWlGEET3N/PVtFvgbZkf419Rx5jPekR9UZfypb2acyK7vPQP9FArPcKNYWnacMvBKg72NuzP9pQMu3wvRRodmmTR3H6kt24vv0vZXM6Rvqvx7obHBX+2zQeJY7KdJWcMJpRHRGVkYCMYowSg2s4+ue9it3pfMGQfWS
-X-Gm-Message-State: AOJu0YwYnnCt/AtyxXgQ6TYn2cwLHS2/vsdUodCexQKlR5Aq23TL9qBo
-	9+GDGKE3OX4Mp49Fi3P/6ZovNL3iU0RkTP57DqNk1f62VLM9tVL5lMd+Jc9zuZo29szv
-X-Google-Smtp-Source: AGHT+IGlrB2ABZOfxviKuEq2qAGBP9HT0HFRenQskQ3kOdrAUJQmjATvt0uOz+tRWRqVGbrjhLcsCA==
-X-Received: by 2002:a17:902:e889:b0:1f0:9938:d260 with SMTP id d9443c01a7336-1f09938d438mr74524725ad.50.1715957194441;
-        Fri, 17 May 2024 07:46:34 -0700 (PDT)
-Received: from devant.hz.ali.com ([47.89.83.81])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c160a1esm158504985ad.279.2024.05.17.07.46.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 May 2024 07:46:34 -0700 (PDT)
-From: Xuewei Niu <niuxuewei97@gmail.com>
-X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-To: stefanha@redhat.com,
-	sgarzare@redhat.com
-Cc: mst@redhat.com,
-	davem@davemloft.net,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: [RFC PATCH 5/5] vsock: Add an ioctl request to get all CIDs
-Date: Fri, 17 May 2024 22:46:07 +0800
-Message-Id: <20240517144607.2595798-6-niuxuewei.nxw@antgroup.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240517144607.2595798-1-niuxuewei.nxw@antgroup.com>
-References: <20240517144607.2595798-1-niuxuewei.nxw@antgroup.com>
+	s=arc-20240116; t=1715957295; c=relaxed/simple;
+	bh=sR1b4hovpLB3+hUo2qFNbqPLLe083HhBBkJ1S7HtDB4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H0ZcNUDcvjHXG88aKHhDaWteZDBPkFMqt/FXVMWy6AH2Z3oDG1BJq6aWHsHVT3zWvQfEu9yTQOScuVu0svuh2vCZPUP8QND9swCsSwWE6CCMFHoXJz2e4IC3tMjSLhJB8u5qJNgaI7zpr8yPgbaZ/W6a5xj6wPYz6OTDv3p+2ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=QNIiwpei; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C99DC2BD10;
+	Fri, 17 May 2024 14:48:12 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="QNIiwpei"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1715957290;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0cBkPJS4a5BxMhrLDaw8NzLtBZZCj9gi/zQctsonxVI=;
+	b=QNIiwpeic5qa/l6WvUy8VnPkDhwOw2O5t+Zqc3jVrwko+I6pojUkkvxst2Jk4OyqKLfd3J
+	wK3xBSDhEAAJSz2SFq6ZkSt6Q5XXRnLGDdX/Nfp8hnhqgf1R4vLiNcFi+jHwY6DQZ+aShR
+	9DLIWT0iMqYDchSnSp1S9+BJggdRqMU=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8ba86458 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Fri, 17 May 2024 14:48:09 +0000 (UTC)
+Date: Fri, 17 May 2024 16:48:02 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Edward Liaw <edliaw@google.com>
+Cc: shuah@kernel.org,
+	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kernel-team@android.com, linux-security-module@vger.kernel.org,
+	netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+	bpf@vger.kernel.org, wireguard@lists.zx2c4.com
+Subject: Re: [PATCH v4 65/66] selftests/wireguard: Drop define _GNU_SOURCE
+Message-ID: <ZkduIlhF2XswiAJr@zx2c4.com>
+References: <20240510000842.410729-1-edliaw@google.com>
+ <20240510000842.410729-66-edliaw@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240510000842.410729-66-edliaw@google.com>
 
-The new request is called `IOCTL_VM_SOCKETS_GET_LOCAL_CIDS`. And the old
-one, `IOCTL_VM_SOCKETS_GET_LOCAL_CID` is retained.
+On Fri, May 10, 2024 at 12:07:22AM +0000, Edward Liaw wrote:
+> _GNU_SOURCE is provided by lib.mk, so it should be dropped to prevent
+> redefinition warnings.
+> 
+> Signed-off-by: Edward Liaw <edliaw@google.com>
+> ---
+>  tools/testing/selftests/wireguard/qemu/init.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/wireguard/qemu/init.c b/tools/testing/selftests/wireguard/qemu/init.c
+> index 3e49924dd77e..08113f3c6189 100644
+> --- a/tools/testing/selftests/wireguard/qemu/init.c
+> +++ b/tools/testing/selftests/wireguard/qemu/init.c
+> @@ -2,8 +2,6 @@
+>  /*
+>   * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+>   */
+> -
+> -#define _GNU_SOURCE
+>  #include <unistd.h>
+>  #include <errno.h>
+>  #include <string.h>
+> -- 
 
-For the transport that supports multi-devices:
-
-* `IOCTL_VM_SOCKETS_GET_LOCAL_CID` returns "-1";
-* `IOCTL_VM_SOCKETS_GET_LOCAL_CIDS` returns a vector of CIDS. The usage is
-shown as following.
-
-```
-struct vsock_local_cids local_cids;
-if ((ret = ioctl(fd, IOCTL_VM_SOCKETS_GET_LOCAL_CIDS, &local_cids))) {
-    perror("failed to get cids");
-    exit(1);
-}
-for (i = 0; i<local_cids.nr; i++) {
-    if (i == (local_cids.nr - 1))
-        printf("%u", local_cids.data[i]);
-    else
-        printf("%u,", local_cids.data[i]);
-}
-```
-
-Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
----
- include/net/af_vsock.h          |  7 +++++++
- include/uapi/linux/vm_sockets.h |  8 ++++++++
- net/vmw_vsock/af_vsock.c        | 19 +++++++++++++++++++
- 3 files changed, 34 insertions(+)
-
-diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-index 25f7dc3d602d..2febc816e388 100644
---- a/include/net/af_vsock.h
-+++ b/include/net/af_vsock.h
-@@ -264,4 +264,11 @@ static inline bool vsock_msgzerocopy_allow(const struct vsock_transport *t)
- {
- 	return t->msgzerocopy_allow && t->msgzerocopy_allow();
- }
-+
-+/**** IOCTL ****/
-+/* Type of return value of IOCTL_VM_SOCKETS_GET_LOCAL_CIDS. */
-+struct vsock_local_cids {
-+	int nr;
-+	unsigned int data[MAX_VSOCK_NUM];
-+};
- #endif /* __AF_VSOCK_H__ */
-diff --git a/include/uapi/linux/vm_sockets.h b/include/uapi/linux/vm_sockets.h
-index 36ca5023293a..01f73fb7af5a 100644
---- a/include/uapi/linux/vm_sockets.h
-+++ b/include/uapi/linux/vm_sockets.h
-@@ -195,8 +195,16 @@ struct sockaddr_vm {
- 
- #define MAX_VSOCK_NUM 16
- 
-+/* Return actual context id if the transport not support vsock
-+ * multi-devices. Otherwise, return `-1U`.
-+ */
-+
- #define IOCTL_VM_SOCKETS_GET_LOCAL_CID		_IO(7, 0xb9)
- 
-+/* Only available in transports that support multiple devices. */
-+
-+#define IOCTL_VM_SOCKETS_GET_LOCAL_CIDS     _IOR(7, 0xba, struct vsock_local_cids)
-+
- /* MSG_ZEROCOPY notifications are encoded in the standard error format,
-  * sock_extended_err. See Documentation/networking/msg_zerocopy.rst in
-  * kernel source tree for more details.
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 3b34be802bf2..2ea2ff52f15b 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -2454,6 +2454,7 @@ static long vsock_dev_do_ioctl(struct file *filp,
- 	u32 __user *p = ptr;
- 	u32 cid = VMADDR_CID_ANY;
- 	int retval = 0;
-+	struct vsock_local_cids local_cids;
- 
- 	switch (cmd) {
- 	case IOCTL_VM_SOCKETS_GET_LOCAL_CID:
-@@ -2469,6 +2470,24 @@ static long vsock_dev_do_ioctl(struct file *filp,
- 			retval = -EFAULT;
- 		break;
- 
-+	case IOCTL_VM_SOCKETS_GET_LOCAL_CIDS:
-+		if (!transport_g2h || !transport_g2h->get_local_cids)
-+			goto fault;
-+
-+		rcu_read_lock();
-+		local_cids.nr = transport_g2h->get_local_cids(local_cids.data);
-+		rcu_read_unlock();
-+
-+		if (local_cids.nr < 0 ||
-+		    copy_to_user(p, &local_cids, sizeof(local_cids)))
-+			goto fault;
-+
-+		break;
-+
-+fault:
-+		retval = -EFAULT;
-+		break;
-+
- 	default:
- 		retval = -ENOIOCTLCMD;
- 	}
--- 
-2.34.1
-
+But this file doesn't use lib.mk.
 
