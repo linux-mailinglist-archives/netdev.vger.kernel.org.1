@@ -1,106 +1,218 @@
-Return-Path: <netdev+bounces-96914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 416AC8C82D0
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 10:56:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAB648C82F6
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 11:07:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BC061C20AE8
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 08:56:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1753CB2127B
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:07:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4BE14003;
-	Fri, 17 May 2024 08:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80361CFBC;
+	Fri, 17 May 2024 09:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Ojt3+cuU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jAcs+NfP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF54200D2
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 08:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC04D10A23
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 09:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715936183; cv=none; b=KnusgQObgmQufoieHXomtcMt/WrU/2HnYHr8B+YiANFwuSSlNPDSFFWl/GkEHr1ue/iF67WFa3rVPmFrt6uny2KqBdDbhUUZNyFumclwZxWPqVPfeauoWLenA2FBuQkekAbT7TmPo519cK0+dLSPyPY1UcNvDzRYzan3tiodOBc=
+	t=1715936861; cv=none; b=Matty/zRgYsopurYdzFykAFDo5buDoHYOXs5Tw15XoQmnKiq6HCqJdcnsd54gRewScGSDFp2u0vc5X0EffnL9P74k/WxsvX+i5vwcNsLIlWZt3gJlBcrGDjVUfCsz3pBULbUGaOyJwnMKFoDU37tOZzv6Y6u8AsduXTPPT11nlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715936183; c=relaxed/simple;
-	bh=Y6pl6Iz6QgYWmw0ZvRBR0yfSEM/k921ZjnoatfgWBHE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=En+uSkoyQCzH91Vq0rc9fbpclQrZ2fBcajPE9luIPAwscj9Y3JlAsscvzeaK9Xnxi2SnN8bYnR3MWFPDAg1AvZXll+4yKBKDH6oc7O7HNp15OObzrGS+r7GgIIN5Tnf0LoF5rfE1pVVXoxS2Liok6v/L6R1xb7VSsj0F+ZsfbnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Ojt3+cuU; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1s7tNt-0056XN-HQ; Fri, 17 May 2024 10:56:13 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=o2SkN1TPQY7kjyDqqc8YPCO/EM3pPPpIt1rv1viFd9A=; b=Ojt3+cuUfWftc6n+IeEVnM2LWu
-	ktMrDoAyxko3Td4EDCrIeKkYi2+otvnDSs0DVvFazjcfJ7vmbaUrzq0axVaBIC98LdPIoEiu82/kz
-	UVhS5y8s3a5JCWFQJyg61gjuf+ywY66AJAY8RvxW+6wkjXXBqBA3sX9awCtHQuHst6XRRT+ooXnm5
-	vExzBc7t9nlxyv6UqtyyQwOyk3ghmkcsA3W31mXBIQS0PfKv5tAsXX2Jl/S4bSCBrur8KjKrCc3jm
-	JFk5PL7mvpoZEodFK5ILQL21khr5CFk1Ak7wgnqJtLaN12P2RIt4NkYxhxI6ylWiMzqRy3/a/8uY4
-	wUO/eQbQ==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1s7tNs-00064m-RP; Fri, 17 May 2024 10:56:12 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1s7tNb-0040fy-JZ; Fri, 17 May 2024 10:55:55 +0200
-Message-ID: <c0fc4799-ee57-45dc-b13b-0be4711b5cf2@rbox.co>
-Date: Fri, 17 May 2024 10:55:53 +0200
+	s=arc-20240116; t=1715936861; c=relaxed/simple;
+	bh=PZw+GXFDGQN6aaySB9ABJU2JqXTtDGCL+Ih8JzZpiSo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PRQPzOAIjbxAG04629a7HLZM3TG+vUuBG9soIKisSOEZnPJQaN/rlAg6rdWl3aOWRz1+airKOv05Vpqd7nmRf3d9fFXTGisL+Q+/EYi7UdI9En7mTDj32UcL7fjcQRhd0bX222ZXkkxM2/ptOmLIptgn9XSTWbDZx0hgwUXbkaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jAcs+NfP; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5210684cee6so486815e87.0
+        for <netdev@vger.kernel.org>; Fri, 17 May 2024 02:07:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715936858; x=1716541658; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OUr5lK2Q/DlQ8HchNosG5H07DrUbI/DvSurqsjD4cbQ=;
+        b=jAcs+NfPwa1AKTsyKMRWGaxiF3ZzpUaD9UV5HBQ6TbHsGo1xufklWKQsJ8Pi+axSfU
+         RkD3ktPziB9z1bQLQYNMTuN503UKfbGwMevQmaIRZytd+Nk8y1rrGMmXZ/CMsAjFVxtm
+         pMUbj3CD8ZzcRuJ4zG9NnxGsuZ489polBdMCRGhGGWPeN3Ajdb33wdiVhtHhKr2wAMIw
+         3RykdKYpVd55ozHKO7onzIEhbjRMgcqU9/FDeeXAHRgOy5zj1mZYpcoyCtbU1Ret+nBo
+         QR3RdCZGPHoSiyzC2CMmArYCXdYfQgjIu5Gi2ZnFAL3/Ohtx+rZr2SoqYKvHXeympnes
+         vbPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715936858; x=1716541658;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OUr5lK2Q/DlQ8HchNosG5H07DrUbI/DvSurqsjD4cbQ=;
+        b=pZvY+unwE3UDcucJD38jbc+yI014Ivst6p+YlaC27QNigSrLwaRNXxkC+FGbPovrr6
+         oFJ5pR0XhuSYlHhYMN4JoTZuXIPomd85ow4hOoz+T+M+izu/pQXrlgsi07Kj9AFVPAPW
+         TtOUfse0HEFnOZwisfBjmkpHi82O6BsxCdBt34kwqaZi5l4eBLIvMoF8au10CElDy/FE
+         YX6aScl64rzj9aHYR0EdgTzQWM6wNLOmoB4LJUDalK73T6l+t2TNPfEP5yx+LlvWs6W/
+         ueSUyhmebdGJ3+JFPK3jsPMgyP2v//ufBUsk1GiwPaFiT+abzEldum8wDaIcY9iMz/CK
+         wi1g==
+X-Forwarded-Encrypted: i=1; AJvYcCWj6nrmgtOlGQTh1l4ZmPbp+9W8Ji2lVdqCp9C0aj6nwVr7lfh6iX+2P6A8GQV8kge9gpiuGaLxQCsKqv3I/NdkLuLqOfeE
+X-Gm-Message-State: AOJu0YzHgzGBWML97lioLz/rDu4ZECwjbE6XhFkbu4KEGF+MTWgVXmBV
+	dc1b/dU8rB0dJEl1rf2sunVsfV/bt5cm2RStW12f6JSRph9gBCPH
+X-Google-Smtp-Source: AGHT+IE5Xop4HexGaIQJP5GhRAqey4TKUJHGctC3nX+TcVr96TNBehZb7VdS8Zm4WNX/T1A0sQAkWw==
+X-Received: by 2002:a19:6449:0:b0:51d:8756:33f3 with SMTP id 2adb3069b0e04-5220fc6d46bmr13470099e87.32.1715936857881;
+        Fri, 17 May 2024 02:07:37 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-521f35ad584sm3242769e87.21.2024.05.17.02.07.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 May 2024 02:07:37 -0700 (PDT)
+Date: Fri, 17 May 2024 12:07:34 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>
+Cc: Huacai Chen <chenhuacai@kernel.org>, andrew@lunn.ch, 
+	hkallweit1@gmail.com, peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, 
+	joabreu@synopsys.com, Jose.Abreu@synopsys.com, linux@armlinux.org.uk, 
+	guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, 
+	siyanteng01@gmail.com
+Subject: Re: [PATCH net-next v12 13/15] net: stmmac: dwmac-loongson: Add
+ Loongson GNET support
+Message-ID: <l3bkpa2bw2gsiir2ybzzin2dusarlvzyai3zge62kxrkfomixb@ryaxhawhgylt>
+References: <7b56eabc-53e1-4fbe-bf92-81bb1c91ddfc@loongson.cn>
+ <kw7fb7mcy7ungrungmbe6z6rmfzswastesx66phtcxxez6vvgw@dal7dt2kj54u>
+ <CAAhV-H4TtoV9LAfhx1+fu40XgDqQ+W-tXt36XoieK87_ucBgcQ@mail.gmail.com>
+ <nt5bjlmul5jchxvx6zzgvbmdsegpwwz7quzt57vfejnxng7smz@abqdfipuclzh>
+ <CAAhV-H5UMJvOtt+YFChqPC1eMkj5UjCEnFJ_YksWjk+uriZPzw@mail.gmail.com>
+ <d2ibcsxpzrhjzjt4zu7tmopgyp6q77omgweobzidsp53yadcgz@x5774dqqs7qr>
+ <CAAhV-H7Fck+cd14RSUkEPrB=6=35JGkHLBCtrYTGD924fYi2VA@mail.gmail.com>
+ <xa2ewgfe3qjljsraet5d77qk3dygcvexnqk5atm5fm5oro3ogp@xctegdmx2srt>
+ <CAAhV-H5JT+QfZgHX7K3HYLFSxuZeer4PdUPjehtyXKcfi=L2oQ@mail.gmail.com>
+ <460a6b52-249e-4d50-8d3e-28cc9da6a01b@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/2] af_unix: Fix garbage collection of embryos
- carrying OOB with SCM_RIGHTS
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org
-References: <734273bc-2415-43b7-9873-26416aab8900@rbox.co>
- <20240517074742.24709-1-kuniyu@amazon.com>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <20240517074742.24709-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <460a6b52-249e-4d50-8d3e-28cc9da6a01b@loongson.cn>
 
-On 5/17/24 09:47, Kuniyuki Iwashima wrote:
-> From: Michal Luczaj <mhal@rbox.co>
-> Date: Fri, 17 May 2024 07:59:16 +0200
->> One question: git send-email automatically adds my Signed-off-by to your
->> patch (patch 2/2 in this series). Should I leave it that way?
+On Fri, May 17, 2024 at 04:42:51PM +0800, Yanteng Si wrote:
+> Hi Huacai, Serge,
 > 
-> SOB is usually added by someone who changed the diff or merged it.
+> 在 2024/5/15 21:55, Huacai Chen 写道:
+> > > > > Once again about the naming. From the retrospective point of view the
+> > > > > so called legacy PCI IRQs (in fact PCI INTx) and the platform IRQs
+> > > > > look similar because these are just the level-type signals connected
+> > > > > to the system IRQ controller. But when it comes to the PCI_Express_,
+> > > > > the implementation is completely different. The PCIe INTx is just the
+> > > > > PCIe TLPs of special type, like MSI. Upon receiving these special
+> > > > > messages the PCIe host controller delivers the IRQ up to the
+> > > > > respective system IRQ controller. So in order to avoid the confusion
+> > > > > between the actual legacy PCI INTx, PCI Express INTx and the just
+> > > > > platform IRQs, it's better to emphasize the actual way of the IRQs
+> > > > > delivery. In this case it's the later method.
+> > > > You are absolutely right, and I think I found a method to use your
+> > > > framework to solve our problems:
+> > > > 
+> > > >     static int loongson_dwmac_config_irqs(struct pci_dev *pdev,
+> > > >                                            struct plat_stmmacenet_data *plat,
+> > > >                                            struct stmmac_resources *res)
+> > > >     {
+> > > >         int i, ret, vecs;
+> > > > 
+> > > >         /* INT NAME | MAC | CH7 rx | CH7 tx | ... | CH0 rx | CH0 tx |
+> > > >          * --------- ----- -------- --------  ...  -------- --------
+> > > >          * IRQ NUM  |  0  |   1    |   2    | ... |   15   |   16   |
+> > > >          */
+> > > >         vecs = plat->rx_queues_to_use + plat->tx_queues_to_use + 1;
+> > > >         ret = pci_alloc_irq_vectors(pdev, 1, vecs, PCI_IRQ_MSI | PCI_IRQ_INTX);
+> > > >         if (ret < 0) {
+> > > >                 dev_err(&pdev->dev, "Failed to allocate PCI IRQs\n");
+> > > >                 return ret;
+> > > >         }
+> > > >        if (ret >= vecs) {
+> > > >                 for (i = 0; i < plat->rx_queues_to_use; i++) {
+> > > >                         res->rx_irq[CHANNELS_NUM - 1 - i] =
+> > > >                                 pci_irq_vector(pdev, 1 + i * 2);
+> > > >                 }
+> > > >                 for (i = 0; i < plat->tx_queues_to_use; i++) {
+> > > >                         res->tx_irq[CHANNELS_NUM - 1 - i] =
+> > > >                                 pci_irq_vector(pdev, 2 + i * 2);
+> > > >                 }
+> > > > 
+> > > >                 plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+> > > >         }
+> > > > 
+> > > >         res->irq = pci_irq_vector(pdev, 0);
+> > > > 
+> > > >       if (np) {
+> > > >           res->irq = of_irq_get_byname(np, "macirq");
+> > > >           if (res->irq < 0) {
+> > > >              dev_err(&pdev->dev, "IRQ macirq not found\n");
+> > > >              return -ENODEV;
+> > > >           }
+> > > > 
+> > > >           res->wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+> > > >           if (res->wol_irq < 0) {
+> > > >              dev_info(&pdev->dev,
+> > > >                   "IRQ eth_wake_irq not found, using macirq\n");
+> > > >              res->wol_irq = res->irq;
+> > > >           }
+> > > > 
+> > > >           res->lpi_irq = of_irq_get_byname(np, "eth_lpi");
+> > > >           if (res->lpi_irq < 0) {
+> > > >              dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+> > > >              return -ENODEV;
+> > > >           }
+> > > >       }
+> > > >         return 0;
+> > > >     }
+> > > > 
+> > > > If your agree, Yanteng can use this method in V13, then avoid furthur changes.
+> > > Since yesterday I have been too relaxed sitting back to explain in
+> > > detail the problems with the code above. Shortly speaking, no to the
+> > > method designed as above.
+
+> > This function is copy-paste from your version which you suggest to
+> > Yanteng, and plus the fallback parts for DT. If you don't want to
+> > discuss it any more, we can discuss after V13.
+
+My conclusion is the same. no to _your_ (Huacai) version of the code.
+I suggest to Huacai dig dipper in the function semantic and find out
+the problems it has. Meanwhile I'll keep relaxing...
+
+> > 
+> > BTW, we cannot remove "res->wol_irq = res->irq", because Loongson
+> > GMAC/GNET indeed supports WoL.
 > 
-> I think it would be better not to add it if not intended.  At least
-> on my laptop, it does not add SOB automatically.
+> Okay, I will not drop it in v13.
 
-Sure, I understand. And the problem was that I had format.signOff = true in
-.gitconfig. Fixed.
+Apparently Huacai isn't well familiar with what he is reviewing. Once
+again the initialization is useless. Drop it.
 
-> FWIW, my command is like
 > 
->   git send-email --annotate --cover-letter --thread --no-chain-reply-to \
->   --subject-prefix "PATCH v1 net-next" \
-
-maintainer-netdev.rst shows an example with a slightly different order:
-"[PATCH net-next v3]". But I guess it doesn't matter?
-
->   --to "" \
->   --cc "" \
->   --cc netdev@vger.kernel.org \
->   --batch-size 1 --relogin-delay 15 --dry-run HEAD~10
+> All right. I have been preparing v13 and will send it as soon as possible.
 > 
-> Thanks!
+> Let's continue the discussion in v13. Of course, I will copy the part that
+> has
+> 
+> not received a clear reply to v13.
+> 
 
+Note the merge window has been opened and the 'net-next' tree is now
+closed. So either you submit your series as RFC or wait for the window
+being closed.
+
+-Serge(y)
+
+> 
+> 
+> Thanks,
+> 
+> Yanteng
+> 
 
