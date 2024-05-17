@@ -1,78 +1,76 @@
-Return-Path: <netdev+bounces-96991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 375DB8C893D
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:21:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 317C68C8918
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:14:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6890C1C22452
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:21:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 638C11C2198B
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:14:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF45812CDBB;
-	Fri, 17 May 2024 15:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09DBC69D3C;
+	Fri, 17 May 2024 15:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LwnM3V7e"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Rfv23b5/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988E212D77C;
-	Fri, 17 May 2024 15:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBB56A325;
+	Fri, 17 May 2024 15:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715959282; cv=none; b=PMwhTVG/W2UYCRrxUSoW6gC/K4ggkayemIzOmVvVUU5M/KNgMC2hiIoCpk++b4fuBF5lLAjCrwIq1RhrjpHOclEzwoMxfh0CgD+9TCuWORskmISZPlXGnpDxG00THFu5bFIR+MJUTGmv3JPdOZ8irY/10bNhWBNCWarw9WCgysQ=
+	t=1715958843; cv=none; b=rndg24dPB31N4lAHtKA56uRrw4tiLPNvkVCD/h83ZQ3Q/Bvo2tUtiK7jCjy4MF44jsunfOJ4Maa87l+MiY3eHwcIXR7vTLKnqgkBmBth1K399iKXWLLybtsy6XCyelU+8b9+RirUPmBrvwTn2qKFmkLf9OrM5rqhT15lBupaRXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715959282; c=relaxed/simple;
-	bh=wOMTQcCv4RXt7oOImw1VgaZvQGn5ykZzqAP4bE+CoMU=;
+	s=arc-20240116; t=1715958843; c=relaxed/simple;
+	bh=b8BwasW2wpCf4km+OXto+ewclPGsdKNXI2hXEUZMm0A=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GBcXrKDLEb0ejP2Qq9GmlCClZLuGesiwuhvmoobFJ1iguqRGZp2dbEk1WghVjkhMYE3Vst8q8uQOsa2lZQh1UWdXtHt531KjAfD27K/4ouMRgCrwOaFAmQ+XboK2aUJ950OAcWvcytTyyjOphpvHRy9dFgCBHz/8DGQv2IjTCWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LwnM3V7e; arc=none smtp.client-ip=217.70.178.240
+	 MIME-Version:Content-Type; b=L2h7EiSS6t+ASdLbWt7WhecClg/Uok9Ct6JxISKNhXHkzx52RiKsIy2MwSvYXSuLuDJgsTGTS9FB1sJJWDwx275Pj6Ix4NiaIYsTI28OVYK2+y4gtD/m/qOR4wJs++eOzaSblp+WxQtI8FhpFxPjSztOldY0H06OSf3Qpf6BJzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Rfv23b5/; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from relay4-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::224])
-	by mslow1.mail.gandi.net (Postfix) with ESMTP id 35ED8C3359;
-	Fri, 17 May 2024 15:13:06 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1B596E0006;
-	Fri, 17 May 2024 15:12:54 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 38FFB60002;
+	Fri, 17 May 2024 15:13:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1715958778;
+	t=1715958839;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=AeTxGtF/EgpBohuFwBuKpus55RrUZBrBwjxJhjj16pM=;
-	b=LwnM3V7eJkdBSvC60vIBB/gpmPTBTg45+MHoX5J3y8e6MIDgjtuDAaAZJ8PO2C/IkLxcT7
-	dgYAigX8S8JnySY+TiK9KFRyJ6asu9Vr9N/2FCiaz+xr0LPFBi76HAX4kqY50rxRcjf97D
-	A8kKU94tWLDMIy6Ey/QDQfO93fYSp5Hq7pqCKrKJtymojYj/tuG6J7U3mhyLW8JBzWDXux
-	bCtkutz/3IvYXnPvFFAIygoP3SvO5+iupK52xZyOdetxcgIw7p2g33CRPx59cdGfUOspqN
-	SZnpVfQ+i8F1qBDKJIKM9OJN6ho4rPhKDmk/fnQC6OIJ5LRkaY9o/f7ry0mhtg==
-Date: Fri, 17 May 2024 17:12:54 +0200
+	bh=b8BwasW2wpCf4km+OXto+ewclPGsdKNXI2hXEUZMm0A=;
+	b=Rfv23b5/HdsOhMcx0s8aGcPQZPDazt8vsyoqc1HVwsEWkgD7QsHCkXUp/hsJolTx32HXDr
+	NSebq+qYhnpRRCOySs6eOlQkM+CrAw2moMP3BBXw/KbQQFRH/PcBvGwNpllONCMXTyPv43
+	/ikugNzujeqdwwfml8K9UIbYhbRw3ebrLd5mhL+LkqSfVUtqxvZ/vdQwfD31cBp/vAxMPd
+	zwd0/2KeqkLvbWWAFIefkrzez32LFsWwNpUABYm3Y92ORlo0lBlS/qYs4uCrjUeAo+J3RE
+	EZENFmsFgrxTmWszoMVPooFz21zlPxz3hXSolzwl04lEuaVY/gMeHu1OyhxmiQ==
+Date: Fri, 17 May 2024 17:13:55 +0200
 From: Kory Maincent <kory.maincent@bootlin.com>
-To: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
 Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
  kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
  <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
  <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu
- Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh
- <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
  <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
  Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
  <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Vladimir Oltean <vladimir.oltean@nxp.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next v12 12/13] net: ethtool: tsinfo: Add support
- for hwtstamp provider and get/set hwtstamp config
-Message-ID: <20240517171254.1e316e69@kmaincent-XPS-13-7390>
-In-Reply-To: <20240504103305.GD3167983@kernel.org>
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>, Alexandra Winter
+ <wintera@linux.ibm.com>
+Subject: Re: [PATCH net-next v12 00/13] net: Make timestamping selectable
+Message-ID: <20240517171355.0a46ad53@kmaincent-XPS-13-7390>
+In-Reply-To: <20240501190925.34c76ada@kernel.org>
 References: <20240430-feature_ptp_netnext-v12-0-2c5f24b6a914@bootlin.com>
-	<20240430-feature_ptp_netnext-v12-12-2c5f24b6a914@bootlin.com>
-	<20240504103305.GD3167983@kernel.org>
+	<20240501190925.34c76ada@kernel.org>
 Organization: bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -85,56 +83,24 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-GND-Sasl: kory.maincent@bootlin.com
 
-On Sat, 4 May 2024 11:33:05 +0100
-Simon Horman <horms@kernel.org> wrote:
+On Wed, 1 May 2024 19:09:25 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-> Hi Kory,
+> On Tue, 30 Apr 2024 17:49:43 +0200 Kory Maincent wrote:
+> > Up until now, there was no way to let the user select the hardware
+> > PTP provider at which time stamping occurs. The stack assumed that PHY =
+time
+> > stamping is always preferred, but some MAC/PHY combinations were buggy.
+> >=20
+> > This series updates the default MAC/PHY default timestamping and aims to
+> > allow the user to select the desired hwtstamp provider administratively=
+. =20
 >=20
-> A few lines beyond this hunk, within the "if (hwtstamp)" block,
-> is the following:
->=20
-> 		cfg->qualifier =3D dev->hwtstamp->qualifier;
->=20
-> Now that dev->hwtstamp is managed using RCU, I don't think it is correct
-> to dereference it directly like this. Rather, the hwtstamp local variable,
-> which has rcu_dereference'd this pointer should be used:
->=20
-> 		 cfg->qualifier =3D hwtstamp->qualifier;
->=20
-> Flagged by Sparse.
+> Looks like there's a linking problem starting with patch 9. On a quick
+> look the functions from a module are now called by build-in code.
 
-Yes indeed, thanks for the report.
-
->=20
-> ...
->=20
-> > diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c =20
->=20
-> ...
->=20
-> > +static int ethnl_tsinfo_dump_one_dev(struct sk_buff *skb, struct
-> > net_device *dev,
-> > +				     struct netlink_callback *cb)
-> > +{
-> > +	struct ethnl_tsinfo_dump_ctx *ctx =3D (void *)cb->ctx;
-> > +	struct ptp_clock *ptp;
-> > +	int ret;
-> > +
-> > +	netdev_for_each_ptp_clock_start(dev, ctx->pos_phcindex, ptp,
-> > +					ctx->pos_phcindex) {
-> > +		ret =3D ethnl_tsinfo_dump_one_ptp(skb, dev, cb, ptp);
-> > +		if (ret < 0 && ret !=3D -EOPNOTSUPP)
-> > +			break;
-> > +		ctx->pos_phcqualifier =3D
-> > HWTSTAMP_PROVIDER_QUALIFIER_PRECISE;
-> > +	}
-> > +
-> > +	return ret; =20
->=20
-> Perhaps it is not possible, but if the loop iterates zero times then
-> ret will be used uninitialised here.
-
-Yes thanks!
+Indeed I have issues in the patch series when building PTP core as module.
+Will fix it. Thanks.
 
 Regards,
 --=20
