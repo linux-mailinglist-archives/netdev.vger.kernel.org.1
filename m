@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-97031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D3478C8D50
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 22:38:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD3098C8D52
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 22:38:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CCE91C22341
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 20:38:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF7BE1C228FD
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 20:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED2C1DFF2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A666266A7;
 	Fri, 17 May 2024 20:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kSMSWEvN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bEnd9VM3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ABD41DFE4
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 20:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8FEF4EE;
+	Fri, 17 May 2024 20:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715978310; cv=none; b=ePv8wuZ5F+r+nAUutQVQ5bbu1leNt+6B+08HvU6htpBaj2PK4Vxf2SysEtVA1xylZ9f0UVEnOU+tyjgHM+F+fymuoY66aS5DOQIjXz5yx1mEa6AVxZ94lihc+v0P9z8wbX3JTFPGOgxqWwSbno+ofZG/Fp42SEerdFeV5sBzYjM=
+	t=1715978310; cv=none; b=QNoOLEUw5IzRTF0hbWToEyWHxuMHmuWZklSFRShv0y5Fm15z1bHnWN8XG8frOUP0ky+2ZdOY4eqt+h8smxZRNwP6Ptlggfad9hUqCapQ6HVr31M0upJw71jQ4l4fTwIEKZCDTHjxfAsF+vFQ361qmlcT3fJAThVUM+XC313LZI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715978310; c=relaxed/simple;
-	bh=QLMynQHY9rMT+v7e6QNMRck3cvDpr3kGp4oIKCQpzPE=;
+	bh=qZxGEu1hAOMmpvEJRGTMEizv4knrf8goXPzI+KOUMZ4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LMAXxcUoIqRMUgJuQKc9jkrSLu0s91JRWfWR+kv4cBujRG+X6IZSONr+zSJC3yEoJ65U2Ldm/JTqxCAFyMoo2Eo8TkFWLdi1z80uChzJ72tO2PrRgc2J/zWMiqcfwWYb+AdictuMQzNlL3bbyiyluR5KMAjbYIFxLYvNMc/gAsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kSMSWEvN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BB223C4AF08;
+	 In-Reply-To:To:Cc; b=QC5jTYi4VLowJ6hH2fkXlP6oYt/Bbg/98jKimmOwCl9D5sDrNB4KpKKXbdF+jyTrS+78urnV6c+RPRi2pPXZ2gmoco6UX0pk2+pbGGwtjaz4eu7Uxb38dbvdK8nmCEmx33HBHDQRKFIOrlyrf0kXih9lTa2uR12bfwaAQ7UFPWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bEnd9VM3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9EC14C32786;
 	Fri, 17 May 2024 20:38:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715978309;
-	bh=QLMynQHY9rMT+v7e6QNMRck3cvDpr3kGp4oIKCQpzPE=;
+	bh=qZxGEu1hAOMmpvEJRGTMEizv4knrf8goXPzI+KOUMZ4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kSMSWEvNuFjdX3soQzyl9wpsjxf4jhp1OAJypGxkbvMLvQAt0xHPKLKnmO256B6VP
-	 7A1yQwOd1sjTcYqAPzRPExfSOVJlb9eQe+Zo60Uom+NNJS4DRE8Ki7zVX4tlDD1Hn8
-	 SeY5ya5nLmPA+itTW9ZMMTp5XSM5I7aBocLb3dILTpum4la3iobCtMo1jN74oO/6Od
-	 pgtgZN7tra/l0LG+FfrkPVQgNwNVnHfvzS8b7nowfBZ9XrtJrE5BVxXlWqPna08GCJ
-	 +3PqaEy9Bkrv7M8TP0mAfi9Ji7n7i9PTWqMHqiw7bbJG+xec7N2tVNW8Y3HAMvKOoo
-	 Yz0AqBTfkppUA==
+	b=bEnd9VM3U/qZtWjrIsDwmUE0L42Qh55OPmYP4nL1IvXRjySNl+FqTith8kqdcZR3g
+	 oBPjZe9ASSV0CvMUAYJ1gs0q2ERuNDG+/UPQDSvafulJ8ln5u4VtY9D1namgHUA0gk
+	 J74WDJ1AG6zoOTjZ4L2gTLPx6MUskfOcIcbppRH9+1tQJtA4FS7Uy8/i4hyIwsa9rH
+	 pvs+V8oEgIXwpDYD6b73OQsKhIcyclreBz1iOi9hhh97olqfMvdVAGWtodQINhEIiC
+	 SdRBjS3GTPpOWHjnIid1Yw2m+7VEYx3DoPMKQJtKA3cBY4CBFNOUve3Zyrp0DGnVyI
+	 cHCwH81nnLZew==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AFCBDC1614E;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8C09FC43336;
 	Fri, 17 May 2024 20:38:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] l2tp: fix ICMP error handling for UDP-encap sockets
+Subject: Re: [PATCH] MAINTAINERS: net: Update reviewers for TI's Ethernet drivers
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171597830971.5541.6670033109325689905.git-patchwork-notify@kernel.org>
+ <171597830956.5541.6328372782096647166.git-patchwork-notify@kernel.org>
 Date: Fri, 17 May 2024 20:38:29 +0000
-References: <20240513172248.623261-1-tparkin@katalix.com>
-In-Reply-To: <20240513172248.623261-1-tparkin@katalix.com>
-To: Tom Parkin <tparkin@katalix.com>
-Cc: netdev@vger.kernel.org
+References: <20240516082545.6412-1-r-gunasekaran@ti.com>
+In-Reply-To: <20240516082545.6412-1-r-gunasekaran@ti.com>
+To: Ravi Gunasekaran <r-gunasekaran@ti.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-omap@vger.kernel.org, s-vadapalli@ti.com, rogerq@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 13 May 2024 18:22:47 +0100 you wrote:
-> Since commit a36e185e8c85
-> ("udp: Handle ICMP errors for tunnels with same destination port on both endpoints")
-> UDP's handling of ICMP errors has allowed for UDP-encap tunnels to
-> determine socket associations in scenarios where the UDP hash lookup
-> could not.
+On Thu, 16 May 2024 13:55:45 +0530 you wrote:
+> Remove myself as reviewer for TI's ethernet drivers
 > 
-> Subsequently, commit d26796ae58940
-> ("udp: check udp sock encap_type in __udp_lib_err")
-> subtly tweaked the approach such that UDP ICMP error handling would be
-> skipped for any UDP socket which has encapsulation enabled.
+> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+> ---
+>  MAINTAINERS | 1 -
+>  1 file changed, 1 deletion(-)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] l2tp: fix ICMP error handling for UDP-encap sockets
-    https://git.kernel.org/netdev/net/c/6e828dc60e50
+  - MAINTAINERS: net: Update reviewers for TI's Ethernet drivers
+    https://git.kernel.org/netdev/net/c/31279b0cb45f
 
 You are awesome, thank you!
 -- 
