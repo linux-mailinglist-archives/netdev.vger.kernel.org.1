@@ -1,94 +1,134 @@
-Return-Path: <netdev+bounces-96934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DA648C849B
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 12:14:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C30268C84A6
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 12:18:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E8051C2282C
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 10:14:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E57471C22BCB
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 10:18:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356092E403;
-	Fri, 17 May 2024 10:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4978E2E62B;
+	Fri, 17 May 2024 10:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="JcSCPqgd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2722E62C;
-	Fri, 17 May 2024 10:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C58879FE;
+	Fri, 17 May 2024 10:18:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715940836; cv=none; b=ZZp6LfbiAVJ3FTR29PKyAlvjSoYQluc/ehFY8g6KD9xbTinyh1D1pBRYT2WuffFD5dh0GpUrSXxbtDZOoZLx63taUUNFvKV8TqbOoByvVonstOWVplo60QCb5tXwmodnvW2TSrP/5XAQqZhuZHpGs80b64UEc01YaMB5C+okjeU=
+	t=1715941110; cv=none; b=D0nYTSHZKJt28+kMWROdr/gssfKZ/5Js4xazYOn+estWPfP2NPU5ews7ofTNLRAcXCiDw23H/ir7+Tefafya+8gTg6Oh6ynvV86jXF3QodvF1+oIHpQx6gdy/KEVDsNgEPNzoRiUju+rwLZr1Cg3byuPrS/j22D+waUBZD7//xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715940836; c=relaxed/simple;
-	bh=3eS4A6sBBete3+3nwqBVB9lVdGi0DqXxA3+ObVoYmKc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C5FGhScNUHsc77NcYvBO7eGCM4tOiEKS3S9h6fdE4UpHrI+t66XG+Ayuncmza/UPGS2am35/vsVaq27lk0hLpI5AhGgIGkLUgRZV9e2m15KWKfLZy9n3WDJNGRi0ReXIIbUZ3Jeq+1LhdSKWHNKUUek1ncfKdSWNtwxIhqviw08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6f453d2c5a1so1139970b3a.2;
-        Fri, 17 May 2024 03:13:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715940834; x=1716545634;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6winQhTaiaX3qtpQtT67k6lYj7ciZqa7ndc5/SwCEuA=;
-        b=i9+4OoW2a1P/roslGyb5ilZrreyRvb2zySHKzCrnrIDS65Wzro41DauLTZr715duCU
-         5bsAETIMTEI+pQqvvV7+iV9cjqrh/yTZRAio8r17I14VFPWdpl2+aWTgyWmfIA4/9E/8
-         mOw3fFnddTBlDpffijelFbudMI4g4kuXizkBPg4XWRQjliuWHromDMn2Zl14aPD6vx8o
-         pvd6YN4dji2CeGWz853LNGrkokhg7mZlJM1S97Y+BR8Dj/rBhzOjremqHCgGPSTOmlZI
-         xLT0+vC25Gymx1pgDE4SwA9nwj+V1QOu7YVdQUgmgzkkO0se6+jy2oUnSKu0U0i8YUip
-         w4WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXtSaMpR0dkPdQxYBafewAV+Yfpqu++w4GxR141Pa0TaC31CuQSaeEBNUsiyeVqKaDMGy/W+YJFs704HYMI9bI4DFgkUdFOUWCCYyy8n6qed0wQr9q073P5Qva5lR1hv6GyplU7W/mh2RKRfUVEsyNNCyW/MwhAJ9Zes/1yWj6Z
-X-Gm-Message-State: AOJu0Yw4kI43o2wVs8Ex4ZwLPvhBa6gwfJWFzK1Q8+UqlqBZen5NbkKK
-	tkiPQCXOwyKBjW5eFohPI7vwBDb4msjn4+GKcdZdvT3qBKfjxZfm
-X-Google-Smtp-Source: AGHT+IG9P8DIxQ8nLaNW5D9C+GvuVUP0c3EKFA8sgKAW6lF1YQHb78ZqQuJdMoV41TSUncZYR6YNVA==
-X-Received: by 2002:a05:6a00:845:b0:6f3:368d:6f64 with SMTP id d2e1a72fcca58-6f4e026b863mr28976797b3a.2.1715940833974;
-        Fri, 17 May 2024 03:13:53 -0700 (PDT)
-Received: from localhost (fpd11144dd.ap.nuro.jp. [209.17.68.221])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f6688ed547sm6734600b3a.165.2024.05.17.03.13.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 May 2024 03:13:53 -0700 (PDT)
-Date: Fri, 17 May 2024 19:13:52 +0900
-From: Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>
-To: Ajit Khaparde <ajit.khaparde@broadcom.com>
-Cc: bhelgaas@google.com, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	andrew.gospodarek@broadcom.com, michael.chan@broadcom.com,
-	kuba@kernel.org, davem@davemloft.net,
-	Andy Gospodarek <gospo@broadcom.com>
-Subject: Re: [PATCH] pci: Add ACS quirk for Broadcom BCM5760X NIC
-Message-ID: <20240517101352.GD202520@rocinante>
-References: <20240510204228.73435-1-ajit.khaparde@broadcom.com>
+	s=arc-20240116; t=1715941110; c=relaxed/simple;
+	bh=SpQPJgD5ifcMb7DMXQffQ8OLyoliyiYJJKgW+mO9s+Y=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AMTyqEJVKASko5Zt+JoZfWphiU02llpTQZMIDtWUh3m8R4O6ED+K+CJ8BC0PbRZuWK5zSexdlzVX/OE539FyfU8i6DXI/B9ytTZnTD4HtZT8+7ZTxTVgQll6ZEVnF13stoOTXq2lD9JdayzP4N/2oYskWfgdpZ7q4edW2pKzzLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=JcSCPqgd; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1715941108; x=1747477108;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SpQPJgD5ifcMb7DMXQffQ8OLyoliyiYJJKgW+mO9s+Y=;
+  b=JcSCPqgd0y49KRPXYTC8+DbVqQ0A0W/u9H2Khu0XqSc4OZfoAgQhso+y
+   TG1j7alXV8liFxkL11m0tQl+fIt1xkXw/sTdtZ+0/x3egOoYv7NeLsxan
+   OkOQiO64+QQLUqsdCAw1KYRUTO1YUbm8ILA85Ortnf2qSgBhA6vzLTRoi
+   UB/UPfut8RG+zUn1EkY7Wn5VCwxwK0CtGJ7t8XjAN/qZU4Fc55vx+31Yp
+   O5DiuVrRv4LPJibL1h4OKxLkYMFbSQa45WjbS+w0wA5cLy0SJvhrTyi+t
+   tV88uOd9k2jwdqovGntUhfvAOMqmqcoWdw4gK+Q5j1hCjKVBDfc34i5Tq
+   g==;
+X-CSE-ConnectionGUID: Azrk/14wTjiVmxHBQWS5nQ==
+X-CSE-MsgGUID: KU0HZz42QG22qF0FR+jm3A==
+X-IronPort-AV: E=Sophos;i="6.08,167,1712646000"; 
+   d="scan'208";a="25633951"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 May 2024 03:18:21 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 17 May 2024 03:18:12 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Fri, 17 May 2024 03:18:12 -0700
+Date: Fri, 17 May 2024 12:18:11 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <jacob.e.keller@intel.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH net] net: lan966x: Remove ptp traps in case the ptp is
+ not enabled.
+Message-ID: <20240517101811.vsqcg7moapixlfpj@DEN-DL-M31836.microchip.com>
+References: <20240514193500.577403-1-horatiu.vultur@microchip.com>
+ <20240514222149.mhwtp3kduebb4zzs@skbuf>
+ <20240516064855.ne6uf3xanns4hh2o@DEN-DL-M31836.microchip.com>
+ <20240517100425.l5ddxbuyxbgx42ti@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <20240510204228.73435-1-ajit.khaparde@broadcom.com>
+In-Reply-To: <20240517100425.l5ddxbuyxbgx42ti@skbuf>
 
-Hello,
-
-> The Broadcom BCM5760X NIC may be a multi-function device.
-> While it does not advertise an ACS capability, peer-to-peer
-> transactions are not possible between the individual functions.
-> So it is ok to treat them as fully isolated.
+The 05/17/2024 13:04, Vladimir Oltean wrote:
 > 
-> Add an ACS quirk for this device so the functions can be in independent
-> IOMMU groups and attached individually to userspace applications using
-> VFIO.
+> On Thu, May 16, 2024 at 08:48:55AM +0200, Horatiu Vultur wrote:
+> > > Alternatively, the -EOPNOTSUPP check could be moved before programming
+> > > the traps in the first place.
+> >
+> > Thanks for the review.
+> > Actually I don't think this alternative will work. In case of PHY
+> > timestamping, we would still like to add those rules regardless if
+> > ptp is enabled on lan966x.
+> >
+> > >
+> > > Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> >
+> > --
+> > /Horatiu
+> 
+> I don't understand why this would not have worked?
+> 
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> index b12d3b8a64fd..1439a36e8394 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> @@ -474,14 +474,14 @@ static int lan966x_port_hwtstamp_set(struct net_device *dev,
+>             cfg->source != HWTSTAMP_SOURCE_PHYLIB)
+>                 return -EOPNOTSUPP;
+> 
+> +       if (cfg->source == HWTSTAMP_SOURCE_NETDEV && !port->lan966x->ptp)
+> +               return -EOPNOTSUPP;
+> +
 
-Applied to acs, thank you!
+This should also work.
+Initially I thought you wanted to have only the check for
+port->lan966x->ptp here. And that is why I said it would not work.
 
-[1/1] PCI: Add ACS quirk for Broadcom BCM5760X NIC
-      https://git.kernel.org/pci/pci/c/694b705cdbf7
+>         err = lan966x_ptp_setup_traps(port, cfg);
+>         if (err)
+>                 return err;
+> 
+>         if (cfg->source == HWTSTAMP_SOURCE_NETDEV) {
+> -               if (!port->lan966x->ptp)
+> -                       return -EOPNOTSUPP;
+> -
+>                 err = lan966x_ptp_hwtstamp_set(port, cfg, extack);
+>                 if (err) {
+>                         lan966x_ptp_del_traps(port);
 
-	Krzysztof
+-- 
+/Horatiu
 
