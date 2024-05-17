@@ -1,189 +1,191 @@
-Return-Path: <netdev+bounces-96854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE4B58C80B1
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:48:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1740A8C80BB
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:55:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E3E51C20F9A
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 05:48:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD601F21D0E
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 05:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BEBE1171A;
-	Fri, 17 May 2024 05:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F451171A;
+	Fri, 17 May 2024 05:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3Et1jeXC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PCqKECc/"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2068.outbound.protection.outlook.com [40.107.236.68])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E441119F;
-	Fri, 17 May 2024 05:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715924888; cv=fail; b=Fg95IPN0kXo2CP2WXTs68tupfu2ssIBZMmouZtAP91R9dPNpotPwNMogyaXHMTN0QY37mP7TtTPdVxTdtoH4RUYmD/vozktccIoBWF/owRcpRo7tX0tWlixEHLV3pd5z9B+GD4Z6Yu1GpoUwY8GCU1PDUrV4TfcLpVB7HrSvRkk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715924888; c=relaxed/simple;
-	bh=5VlVJv5yV6i3Nky/kH+43QM0jpBYuSuOELKYXv6VHTk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mrfMtDa5sbg6MJk5iYVTopH6adH9/QkJiQTCdmp4CjAc8eAyayt/+SL3QDqvoJHRKFDpV2SYPzFVmWSUpxvfWrPfs/GMsmORJFq68b2IUS4BDzEF72D7rjzyXPKuFVpsI6t5E7YLpZgdySmy4R4o09kNPQD7E/mWCAswsbH3WeY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3Et1jeXC; arc=fail smtp.client-ip=40.107.236.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UYCCYQm+tA/IEdJA83YKVOnRvoXcWBHHx4yRkmMMy1+AOkdJrn992cWZw2tMLGBS9dRfttCQjbyxA/lkP7ymi+pCow6l8VSNkgDy+9Anx95RYFoPuTAFwTsAZ85PUzR6tMfnllqm31Bmzupm9r9Q/R5wNb8C2wYGfVzM6SajpPfFo2LhNbneAslwyTUrcMbNKc3ZCkHwGb25lJg+zx5vdCu3qb4gWWdakkNd/B5A2bR5DpdewSa9i2UwMGfZvxwvSO7quo3aZNbXnRPX6xrWH8pfMHoPF1dLfkJ/5Uc+1i+YsRl7l1YSufAZ8AgjxqKVf5k/IgUIMJ3aQ+c8prn2DA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RKz2fyvnyIieCzaxrW453Xa2ySv/BXkmtHsBH8UfvLc=;
- b=WFKtcBOdfEWK8FHnb4RlsG2yZsnNGtCGIXbV5eXDN4Mpb3dO9lvSJal8TJWfs0CM7ogQwIiTDIEe4/wpqef/d4uXBWfyBA3To/uj6oZnNKMCRguZdZR5xRM2XTDkDbtaF8CM9Wt+9ups2N/wRQ5CBrw0qyHP48AL7h3MbPlggRcgZA7HZEw1X1qPRQQvJZLpHulVBp5Xe8HrRNjV2huPpGzXQsamNAhbng55ApSET8rhVbx5hyF/BzoU4+OY8737QPXBkZ9zEJ+rAxtr+EJTtKBsCXFdahF4J4IwaJeX5WbWMWUQrNVc93FzxjoOJpWzI3EjwlG/yKOQaNchmH5v/Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RKz2fyvnyIieCzaxrW453Xa2ySv/BXkmtHsBH8UfvLc=;
- b=3Et1jeXCKYSQO4VItQbLR9KWnseTT48O6KOIPH+OpRsW75FGJntvkigkFSGe56jE9cv3z/okSw0Yd+tZe2984PRysDno0A41SFvqcBHYBivS/beN9qmfqLTSH8weYbDyHjEo062seIemUFU/xRybFw4kC133YdrtJicsuw7kZaY=
-Received: from PH0P220CA0014.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:d3::28)
- by MW4PR12MB5643.namprd12.prod.outlook.com (2603:10b6:303:188::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.30; Fri, 17 May
- 2024 05:48:01 +0000
-Received: from SN1PEPF000252A2.namprd05.prod.outlook.com
- (2603:10b6:510:d3:cafe::81) by PH0P220CA0014.outlook.office365.com
- (2603:10b6:510:d3::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.30 via Frontend
- Transport; Fri, 17 May 2024 05:48:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF000252A2.mail.protection.outlook.com (10.167.242.9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7587.21 via Frontend Transport; Fri, 17 May 2024 05:48:00 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 17 May
- 2024 00:47:59 -0500
-Received: from xhdvineethc40.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Fri, 17 May 2024 00:47:55 -0500
-From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-To: <git@amd.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
-	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <harini.katakam@amd.com>,
-	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<michal.simek@amd.com>
-CC: <vineeth.karumanchi@amd.com>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH net-next v2 2/2] net: phy: xilinx-gmii2rgmii: Adopt clock support
-Date: Fri, 17 May 2024 11:17:45 +0530
-Message-ID: <20240517054745.4111922-3-vineeth.karumanchi@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240517054745.4111922-1-vineeth.karumanchi@amd.com>
-References: <20240517054745.4111922-1-vineeth.karumanchi@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B75B11170D;
+	Fri, 17 May 2024 05:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715925334; cv=none; b=PB/S5e+JTQ1AK5IWrICEC6yTjsOkf0JPzf/Cd6Z0VRf1D0pnaaEbxLDNvm5DmaRbfE0Ngqm4xxmsJALSBQ76i5f0CfcIbwkNM/NxcfgfpAQesq3y1L0iy8HSAwOvcq/wN2f0mfvBxzM9TBd68Owyfia13crsRmxjbGkqAYBIYxE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715925334; c=relaxed/simple;
+	bh=YqE3BWStvb9uNIMxbcNHdjLQhxDoQuJlDFCqiJH5ZgI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ULK0J5ZVcA4e+4C6w781wtOfR0jqkrJLZDUTe7sQcX+CRGM2GgWgPmJV631/EwNVGAEqgJieCumHTmG/s6BY78MeOgfb8/1rItBT/OycNsfmWuj4ebBZtmNi2o4c+BPFnY25hrKkkcOw4YdYon4XwwoEtHOJmAcv2JrpRMqtqD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PCqKECc/; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715925332; x=1747461332;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YqE3BWStvb9uNIMxbcNHdjLQhxDoQuJlDFCqiJH5ZgI=;
+  b=PCqKECc/agYK21CisuksiHMyrlaF6aP0ZaP5+izQwPaNLebSkKZQ3ddv
+   mdAcrVd3sa7S/igk4aosSlIRrpQ4f7SWEF3Au7J/mjwmSWhbTv7jRfdXH
+   vGo/WOjt9ehlrZzD1WNX0Vi5We2iRxF8OB4UhM4b8TSu8DSiEPN83Q1ML
+   WoEwjDjQ/F9blz8+6Snb6EXz7LXHzNIFxgsxJuSHBPO3jCdA9fIodcnqj
+   GFDzTT9YocpghTp5sVV7iNHIcWyP3e7c48C9UW3wBicdmLN9Paipzojyk
+   lHJ8Qqvcj6DQHI4a1NyjSy1HbVVIXdVNtZtcKm9h0YCR0uFbeeUokDG/z
+   g==;
+X-CSE-ConnectionGUID: Pt41iigzRYi7pCA9U74stw==
+X-CSE-MsgGUID: LntxiFcHSxSlTHp+N8Fa3A==
+X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="11567858"
+X-IronPort-AV: E=Sophos;i="6.08,166,1712646000"; 
+   d="scan'208";a="11567858"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 22:55:31 -0700
+X-CSE-ConnectionGUID: jQD61+B+Qn6h7Oi/iQlnfg==
+X-CSE-MsgGUID: OzWH72DnQJWCLQrytcA//A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,166,1712646000"; 
+   d="scan'208";a="36421681"
+Received: from unknown (HELO 108735ec233b) ([10.239.97.151])
+  by orviesa003.jf.intel.com with ESMTP; 16 May 2024 22:55:27 -0700
+Received: from kbuild by 108735ec233b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s7qYg-0000IZ-1t;
+	Fri, 17 May 2024 05:55:15 +0000
+Date: Fri, 17 May 2024 13:49:41 +0800
+From: kernel test robot <lkp@intel.com>
+To: Hou Tao <houtao@huaweicloud.com>, netdev@vger.kernel.org,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Davide Caratti <dcaratti@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org, houtao1@huawei.com
+Subject: Re: [PATCH] net/sched: unregister root_lock_key in the error path of
+ qdisc_alloc()
+Message-ID: <202405171311.SyRzzQjC-lkp@intel.com>
+References: <20240516133035.1050113-1-houtao@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Received-SPF: None (SATLEXMB04.amd.com: vineeth.karumanchi@amd.com does not
- designate permitted sender hosts)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000252A2:EE_|MW4PR12MB5643:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4454c9ba-e816-4cab-6c95-08dc7634e993
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|376005|7416005|1800799015|36860700004|82310400017|921011;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?f82vIei56SXGN+XmAQXnUXRtYrpKFcQRc0I19QPecDCiyWgGDF7J5Ke8eHCI?=
- =?us-ascii?Q?nXRy0WCgpVOzHI136uivAfRqra03VTqeaqyZpXdjvvcFQy9J4Jo2/ufcDHxh?=
- =?us-ascii?Q?fAZ2MwjGUYfikdVt/RtpwPx1iJMt1NYblowKcA+CozdT6mDVws9Mz+nge1/4?=
- =?us-ascii?Q?/pJkgU+BsEtK3khzETHRrAGY5HbEzO20QJrrj5wTSWt4nxVn9EaEJF9zTDmH?=
- =?us-ascii?Q?2V5xo6+tzWsV6XJSQh1YuJLnfc1a8cb27GCwLCUlmaagAQ3LKNWgiOTPTk+D?=
- =?us-ascii?Q?i1t/pS6DYk/uQGtr4ICamki7fv6ndymR9T60KNPqXUvZ9HdAH3LraWBU/Kb7?=
- =?us-ascii?Q?2bLOXMPbb8Jz6WqWxVWwitxV883xw+p3lgWvsdVCggBcizgE9ziW/2HEy2QZ?=
- =?us-ascii?Q?RM6sOm+VL3y0fDClq574LjRjsn413zYzdQQH5DBJTaBTjeNAajsiLg80trlz?=
- =?us-ascii?Q?ly01731B2wi+4UjXBiOgyJv2KSwuNaZu0BNdKtFbo6JqtP6+ddXBxLohSJqU?=
- =?us-ascii?Q?95PLxN8R1wKA1PKSXtrsW7cZWatbzQmtuKc9Z5XLDeF45MzbVxzDPrYny/Va?=
- =?us-ascii?Q?atWBtpj3zuhPHI2rG8S2UDK7vfmJfQ+HerecvpX0tE1vz71nwPnj2Rrh8DJv?=
- =?us-ascii?Q?1CVO6JzXkdue3W/lqCFf7AB3UaA11vrM/qGz3l8sgrd5wFphj53wZksXCOrr?=
- =?us-ascii?Q?JiIzAe1aKyg5eYcwefG3vq8Lq3Eso7weK1HToShTuMecU2/Yyh4vTpbb/n33?=
- =?us-ascii?Q?66El3UoeJhNlqXYgjFC9INqn6YRRG9uvbR5Ifc+goj++8wLVOq1JqYtCL6Ar?=
- =?us-ascii?Q?AxcBylhKo3LnXQp09Vr5CsMXeZxLiPhTpRUIH/oWnPqZwciyxB9hLNWkJILX?=
- =?us-ascii?Q?6seW/a3gBLqI3i5cZPtriNztNpDeFeSnMrkhmM8ODPctiSyGgXoEzDhHxB2k?=
- =?us-ascii?Q?Tn13MRt+XvkB4+7/zJQ/wlO/IJs1UGFGmnlF6T8oFSZCCn+p9WOgjln0ZoMO?=
- =?us-ascii?Q?LDKAyquNFNHPYIirAiA4ruoPrRi509uI2bZbHRc/589mgeSPreUoTRcvWYpI?=
- =?us-ascii?Q?LnhpCOIkpgDo69VBuPYeFgBNgfiZ5ltX2AtE8C/ujlxFWq20eAe4PF6xu9w0?=
- =?us-ascii?Q?1obLgr/g9K33bLpAJWOuBAsOa2aICMVN5p5NK5pAuO8ZoC0qx1i+JoV7TQUV?=
- =?us-ascii?Q?vIgCp7g149mx85UI+Of0B5OOP3bkNBKRtYuLykXFkh1NoZZRoJrnR76g/skE?=
- =?us-ascii?Q?cHK0lDLfqGVSBGZyu5TW2iTXz6QgOkdOpfXIogFw/RbDbmIK4CV7S3GSUKQK?=
- =?us-ascii?Q?Et+/hAlX/rOehTeOb1EUAKA5Kdxbl/m48fJIQtMuKj4MBZcd1RfZ0JhoNLNr?=
- =?us-ascii?Q?KyqMQzauBD30Sm0LionIZ6YJMtuQ?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(36860700004)(82310400017)(921011);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2024 05:48:00.8116
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4454c9ba-e816-4cab-6c95-08dc7634e993
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000252A2.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5643
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240516133035.1050113-1-houtao@huaweicloud.com>
 
-Add clock support to the gmii_to_rgmii IP.
-Make clk optional to keep DTB backward compatibility.
+Hi Hou,
 
-Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
----
- drivers/net/phy/xilinx_gmii2rgmii.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+kernel test robot noticed the following build errors:
 
-diff --git a/drivers/net/phy/xilinx_gmii2rgmii.c b/drivers/net/phy/xilinx_gmii2rgmii.c
-index 7b1bc5fcef9b..7c51daecf18e 100644
---- a/drivers/net/phy/xilinx_gmii2rgmii.c
-+++ b/drivers/net/phy/xilinx_gmii2rgmii.c
-@@ -15,6 +15,7 @@
- #include <linux/mii.h>
- #include <linux/mdio.h>
- #include <linux/phy.h>
-+#include <linux/clk.h>
- #include <linux/of_mdio.h>
- 
- #define XILINX_GMII2RGMII_REG		0x10
-@@ -85,11 +86,17 @@ static int xgmiitorgmii_probe(struct mdio_device *mdiodev)
- 	struct device *dev = &mdiodev->dev;
- 	struct device_node *np = dev->of_node, *phy_node;
- 	struct gmii2rgmii *priv;
-+	struct clk *clkin;
- 
- 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
- 	if (!priv)
- 		return -ENOMEM;
- 
-+	clkin = devm_clk_get_optional_enabled(dev, NULL);
-+	if (IS_ERR(clkin))
-+		return dev_err_probe(dev, PTR_ERR(clkin),
-+					"Failed to get and enable clock from Device Tree\n");
-+
- 	phy_node = of_parse_phandle(np, "phy-handle", 0);
- 	if (!phy_node) {
- 		dev_err(dev, "Couldn't parse phy-handle\n");
+[auto build test ERROR on v6.9]
+[cannot apply to net/main net-next/main linus/master next-20240517]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Hou-Tao/net-sched-unregister-root_lock_key-in-the-error-path-of-qdisc_alloc/20240516-213538
+base:   v6.9
+patch link:    https://lore.kernel.org/r/20240516133035.1050113-1-houtao%40huaweicloud.com
+patch subject: [PATCH] net/sched: unregister root_lock_key in the error path of qdisc_alloc()
+config: openrisc-defconfig (https://download.01.org/0day-ci/archive/20240517/202405171311.SyRzzQjC-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240517/202405171311.SyRzzQjC-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405171311.SyRzzQjC-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   net/sched/sch_generic.c: In function 'qdisc_alloc':
+>> net/sched/sch_generic.c:983:36: error: 'struct Qdisc' has no member named 'root_lock_key'
+     983 |         lockdep_unregister_key(&sch->root_lock_key);
+         |                                    ^~
+
+
+vim +983 net/sched/sch_generic.c
+
+   924	
+   925	struct Qdisc *qdisc_alloc(struct netdev_queue *dev_queue,
+   926				  const struct Qdisc_ops *ops,
+   927				  struct netlink_ext_ack *extack)
+   928	{
+   929		struct Qdisc *sch;
+   930		unsigned int size = sizeof(*sch) + ops->priv_size;
+   931		int err = -ENOBUFS;
+   932		struct net_device *dev;
+   933	
+   934		if (!dev_queue) {
+   935			NL_SET_ERR_MSG(extack, "No device queue given");
+   936			err = -EINVAL;
+   937			goto errout;
+   938		}
+   939	
+   940		dev = dev_queue->dev;
+   941		sch = kzalloc_node(size, GFP_KERNEL, netdev_queue_numa_node_read(dev_queue));
+   942	
+   943		if (!sch)
+   944			goto errout;
+   945		__skb_queue_head_init(&sch->gso_skb);
+   946		__skb_queue_head_init(&sch->skb_bad_txq);
+   947		gnet_stats_basic_sync_init(&sch->bstats);
+   948		spin_lock_init(&sch->q.lock);
+   949	
+   950		if (ops->static_flags & TCQ_F_CPUSTATS) {
+   951			sch->cpu_bstats =
+   952				netdev_alloc_pcpu_stats(struct gnet_stats_basic_sync);
+   953			if (!sch->cpu_bstats)
+   954				goto errout1;
+   955	
+   956			sch->cpu_qstats = alloc_percpu(struct gnet_stats_queue);
+   957			if (!sch->cpu_qstats) {
+   958				free_percpu(sch->cpu_bstats);
+   959				goto errout1;
+   960			}
+   961		}
+   962	
+   963		spin_lock_init(&sch->busylock);
+   964		lockdep_set_class(&sch->busylock,
+   965				  dev->qdisc_tx_busylock ?: &qdisc_tx_busylock);
+   966	
+   967		/* seqlock has the same scope of busylock, for NOLOCK qdisc */
+   968		spin_lock_init(&sch->seqlock);
+   969		lockdep_set_class(&sch->seqlock,
+   970				  dev->qdisc_tx_busylock ?: &qdisc_tx_busylock);
+   971	
+   972		sch->ops = ops;
+   973		sch->flags = ops->static_flags;
+   974		sch->enqueue = ops->enqueue;
+   975		sch->dequeue = ops->dequeue;
+   976		sch->dev_queue = dev_queue;
+   977		sch->owner = -1;
+   978		netdev_hold(dev, &sch->dev_tracker, GFP_KERNEL);
+   979		refcount_set(&sch->refcnt, 1);
+   980	
+   981		return sch;
+   982	errout1:
+ > 983		lockdep_unregister_key(&sch->root_lock_key);
+   984		kfree(sch);
+   985	errout:
+   986		return ERR_PTR(err);
+   987	}
+   988	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
