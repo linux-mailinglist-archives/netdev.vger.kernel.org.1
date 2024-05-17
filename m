@@ -1,110 +1,121 @@
-Return-Path: <netdev+bounces-96988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 317C68C8918
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:14:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABBA28C8926
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:17:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 638C11C2198B
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:14:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49D251F21D79
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09DBC69D3C;
-	Fri, 17 May 2024 15:14:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9A0E12CDAA;
+	Fri, 17 May 2024 15:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Rfv23b5/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cqKk7SPV"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBB56A325;
-	Fri, 17 May 2024 15:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E03848E;
+	Fri, 17 May 2024 15:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715958843; cv=none; b=rndg24dPB31N4lAHtKA56uRrw4tiLPNvkVCD/h83ZQ3Q/Bvo2tUtiK7jCjy4MF44jsunfOJ4Maa87l+MiY3eHwcIXR7vTLKnqgkBmBth1K399iKXWLLybtsy6XCyelU+8b9+RirUPmBrvwTn2qKFmkLf9OrM5rqhT15lBupaRXs=
+	t=1715959036; cv=none; b=bL+9px7ogT9ad6g6h/73SXqH6KKayQF7+baS3IcNuQslFQ5U8i7MQSnIUFTuV1uytcNIjVlPvQYeBRBsxN9LxW/rcbc+SUy3nrGJZcw5qCmKz1lizsztqiSRjzIJGezNSsrIlFXYZypoHf/0RDVlPkfU7zJVr2gv+xcmbmxVI2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715958843; c=relaxed/simple;
-	bh=b8BwasW2wpCf4km+OXto+ewclPGsdKNXI2hXEUZMm0A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L2h7EiSS6t+ASdLbWt7WhecClg/Uok9Ct6JxISKNhXHkzx52RiKsIy2MwSvYXSuLuDJgsTGTS9FB1sJJWDwx275Pj6Ix4NiaIYsTI28OVYK2+y4gtD/m/qOR4wJs++eOzaSblp+WxQtI8FhpFxPjSztOldY0H06OSf3Qpf6BJzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Rfv23b5/; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 38FFB60002;
-	Fri, 17 May 2024 15:13:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1715958839;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b8BwasW2wpCf4km+OXto+ewclPGsdKNXI2hXEUZMm0A=;
-	b=Rfv23b5/HdsOhMcx0s8aGcPQZPDazt8vsyoqc1HVwsEWkgD7QsHCkXUp/hsJolTx32HXDr
-	NSebq+qYhnpRRCOySs6eOlQkM+CrAw2moMP3BBXw/KbQQFRH/PcBvGwNpllONCMXTyPv43
-	/ikugNzujeqdwwfml8K9UIbYhbRw3ebrLd5mhL+LkqSfVUtqxvZ/vdQwfD31cBp/vAxMPd
-	zwd0/2KeqkLvbWWAFIefkrzez32LFsWwNpUABYm3Y92ORlo0lBlS/qYs4uCrjUeAo+J3RE
-	EZENFmsFgrxTmWszoMVPooFz21zlPxz3hXSolzwl04lEuaVY/gMeHu1OyhxmiQ==
-Date: Fri, 17 May 2024 17:13:55 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Willem de Bruijn <willemb@google.com>, Alexandra Winter
- <wintera@linux.ibm.com>
-Subject: Re: [PATCH net-next v12 00/13] net: Make timestamping selectable
-Message-ID: <20240517171355.0a46ad53@kmaincent-XPS-13-7390>
-In-Reply-To: <20240501190925.34c76ada@kernel.org>
-References: <20240430-feature_ptp_netnext-v12-0-2c5f24b6a914@bootlin.com>
-	<20240501190925.34c76ada@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1715959036; c=relaxed/simple;
+	bh=XDE1XXacg5P0IujpikfAHU0Y9gPieO3/IVfHjQkcZlg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s8moc8xYo1kixVTszHhrQn17PFulRLENQKshKFhsBA2KYcQEx0GPn+n7UgJ9lKkFFwctqQVIKY27iIFpVbEJjxyJFL6V/cWCGD5IQSwZYOf7c+rT//rTgJXyuMmPgOIo8pXl3ibrHeJ4GQTtD1hxvk8VkCN/n7odicpF9D6+Dg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cqKk7SPV; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4202c1d19d5so1905475e9.2;
+        Fri, 17 May 2024 08:17:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715959033; x=1716563833; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qSlOywFdXmSejH1bm86IT6wJWx8CxpiYUzDNA5leXbQ=;
+        b=cqKk7SPVD/HZwGZOKMvN1eS/EIjM7A/IhvJT2Jsbd/SYQuqD6n2uhIwUXdOKKFxnS6
+         xRIOHLl/U198MJXIMvZtZgumNTAD/qTraeHYmNsGFxHhIsDQ2tvuou3V02LyCtdQaXRq
+         7J8lSraO+CYMvdDrVUMsfuDtF17gdb/Zjudlgn7+qFLtSlwAH2bYmW3pnPrFzAODfA70
+         GotBqJllWWtXajXGeB13Lgp9axLP4EPOotREUdHXUxtkc00f8PQIzSpFvQxlOAYZiMft
+         5IKr4rAaSfkod6YP7702/8k0azy82HIsSBMRqNRzS5RGFj8xZQfbuDy2SQZaFvqtIlgB
+         e2jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715959033; x=1716563833;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qSlOywFdXmSejH1bm86IT6wJWx8CxpiYUzDNA5leXbQ=;
+        b=RDFBjpapK/zV0nFMsSbWJ0XAJqjzFGbdbHmFZ4NzO23LKrIzlntN1md526MSTR80xS
+         x7vWqS/Yi5S1EUVBYUOONuWhBliOKXsJlg97Xp0NHrOSn1GQTENotmsXcdFHSOYpT+On
+         AcWkSn4PiRwuj+btZtMNLPx0mH0pioZFaYJ+IBk2EoEOZ8Ly7fnEmVtTTJ/rNynjdNGn
+         ZZRY6yGPq2UywAs/PATXtOts0dfhnt4PLoM4o7b+HFJZwRKzh9nTmu9910zOW2Vx8zFV
+         C/l5w8qUVec1EAxvmMhBVhWj3ugAhJzBHCpDalvsIbnz/l8cgw7ZuUHFD+7If39pgtm2
+         axtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV8YzRGDaPUYLB1uAFJ/jlo6UxB6LMR6UsQljHWBk7jQVoBDJgyWxVMQknuGhxmLDdHz9BQUfyyL0unCtvLi59ce7R6lr+y33RtWX4t
+X-Gm-Message-State: AOJu0Yzlbw5ohYJLaSKGsr2KEi8ydzx5s0cCjd/lwghIQgTTgPHOE+iO
+	E3OkpXc7MWSBWEv6TFlFXgfAysY7KzsvrFlMa14Uo9pL9Ltzw7y4
+X-Google-Smtp-Source: AGHT+IG6feH5w7YXMu/zEGOHkxQGCZya2MNVcnOpPRMS98PzupdrkzDPetdrLk33AKaw7YnycpeUTA==
+X-Received: by 2002:adf:f0cf:0:b0:34d:86ef:eefa with SMTP id ffacd0b85a97d-3504aa66a84mr15858711f8f.65.1715959033241;
+        Fri, 17 May 2024 08:17:13 -0700 (PDT)
+Received: from skbuf ([188.25.55.166])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502baad0absm21818639f8f.69.2024.05.17.08.17.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 May 2024 08:17:12 -0700 (PDT)
+Date: Fri, 17 May 2024 18:17:09 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, stephenlangstaff1@gmail.com,
+	aleksander.lobakin@intel.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Alexander Lobakin <alobakin@pm.me>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v2] net: Always descend into dsa/ folder with
+ CONFIG_NET_DSA enabled
+Message-ID: <20240517151709.tb65wut2ue76ghqs@skbuf>
+References: <20240516165631.1929731-1-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240516165631.1929731-1-florian.fainelli@broadcom.com>
 
-On Wed, 1 May 2024 19:09:25 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Thu, May 16, 2024 at 09:56:30AM -0700, Florian Fainelli wrote:
+> Stephen reported that he was unable to get the dsa_loop driver to get
+> probed, and the reason ended up being because he had CONFIG_FIXED_PHY=y
+> in his kernel configuration. As Masahiro explained it:
+> 
+>   "obj-m += dsa/" means everything under dsa/ must be modular.
+> 
+>   If there is a built-in object under dsa/ with CONFIG_NET_DSA=m,
+>   you cannot do  "obj-$(CONFIG_NET_DSA) += dsa/".
+> 
+>   You need to change it back to "obj-y += dsa/".
+> 
+> This was the case here whereby CONFIG_NET_DSA=m, and so the
+> obj-$(CONFIG_FIXED_PHY) += dsa_loop_bdinfo.o rule is not executed and
+> the DSA loop mdio_board info structure is not registered with the
+> kernel, and eventually the device is simply not found.
+> 
+> To preserve the intention of the original commit of limiting the amount
+> of folder descending, conditionally descend into drivers/net/dsa when
+> CONFIG_NET_DSA is enabled.
+> 
+> Fixes: 227d72063fcc ("dsa: simplify Kconfig symbols and dependencies")
+> Reported-by: Stephen Langstaff <stephenlangstaff1@gmail.com>
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> ---
 
-> On Tue, 30 Apr 2024 17:49:43 +0200 Kory Maincent wrote:
-> > Up until now, there was no way to let the user select the hardware
-> > PTP provider at which time stamping occurs. The stack assumed that PHY =
-time
-> > stamping is always preferred, but some MAC/PHY combinations were buggy.
-> >=20
-> > This series updates the default MAC/PHY default timestamping and aims to
-> > allow the user to select the desired hwtstamp provider administratively=
-. =20
->=20
-> Looks like there's a linking problem starting with patch 9. On a quick
-> look the functions from a module are now called by build-in code.
-
-Indeed I have issues in the patch series when building PTP core as module.
-Will fix it. Thanks.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
