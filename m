@@ -1,123 +1,220 @@
-Return-Path: <netdev+bounces-96881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03CA58C81C4
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:52:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2F9B8C81CF
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:55:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58948B20CFA
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:52:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68CF2280D3D
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C804017BA7;
-	Fri, 17 May 2024 07:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="LoCTvtbC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330EF18041;
+	Fri, 17 May 2024 07:54:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9888C179A8
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 07:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C021A28D;
+	Fri, 17 May 2024 07:54:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715932350; cv=none; b=M3WyoTArKQUwhedbLPcRzg10kzjX4A6adIYSmQpQJwQKNfDFXKkuMTVoV1sXr4gkHbFHo6WJVeO+yF3gh1zKGwXxfgeO3s4qQnmZPgypwsFT8fBrc50cX5FnDjfybNIbIu6jDRRrWQ5gQvZiYs1hIMN/ThGEsXhw3pwb+fSlU5A=
+	t=1715932493; cv=none; b=pPttD+tEkkzDyywmg3Qi3Htc3LMeo+eBgGop0F6y7I9STuLDJgJDLLKcDrkLnt3/iukJS7KiRmjWEnLIHJZMF9t/xVBIzRYyp7k25413Cd/k+Fo+nRbH5lSjN78tsJg37q8FQ9hNch3s6x5hzHBmbkHOYMac81EkrH0/rdEGRus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715932350; c=relaxed/simple;
-	bh=/v6sjHG+0+ZKEPpS9tqIzcUKC/LKTqQCiFB7jNWcUX0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=meMM2Qst15ZDs7ZjyHLtG2zXAEEUhh0FoQiAKb1XW0fb6ttmrU4hUC99mjTL8OcOl9kd+392KRyDYFQWrjyOKFwZQt16fiKgVfdQkW2xKTVFUBsfz3SkGRQAcrbFTigqrM7PhymmWf0VVxO/0250rHv6I8+owp+lFdtMaKsM40U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=LoCTvtbC; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3504f34a086so5874272f8f.1
-        for <netdev@vger.kernel.org>; Fri, 17 May 2024 00:52:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1715932347; x=1716537147; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PFTsZHpcHAIaSjKi6HhILgkEVSJRgmc6M+HW7iQenNE=;
-        b=LoCTvtbCtByX3rpJQo7jzVo/VJT7odVD6yTs0M/FlzACrcx7lOgqOm7SRN6sbyjFnS
-         tZAEz87onBfeH/lAQbqY2mKvNAb67XHtwfyN4ePTZWVttMWa8jpgD6b3b/aqKGKcjfcg
-         mBPFBrFnXCJs02gPA9O4QiT1LHoBw6Agv7QOryCpAi/IeUVc46CAaGJsyKbs5y4FP+I+
-         3KxIlKdnFGIuWXPfl0ygkmcI2JHmEEVmhuhFRjBvW5dnZm2X0JOghDuBCLob3kqTNP6/
-         Uxqj2N7tpVH9/DaOhckC20e/4NYRNfhgC3Q7TWyHTjKdJuikzoFMX2XEndwpbuQsJyYb
-         uIbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715932347; x=1716537147;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PFTsZHpcHAIaSjKi6HhILgkEVSJRgmc6M+HW7iQenNE=;
-        b=kZhs6VM2k7JyqcC2dpxt3QiqihHA+tn3vMqEG2b5i7g2zc5clWnzAjmI+/dv1kE/BC
-         ALGr4+kE2Uw4NBOzSFt0uVf2ooSBUnwv8WtslCSKeqCyi3YrCzWKQoaIwuMd1JcM+GRJ
-         gOb+LG1+WVXVqrolNUkRzFlf4TxHr9w6hf65D4a9Bo+TkVBewhcARA3JYC0b3c8rm+ep
-         9EvmXvnBsbzo8flAZUPT7Ab2Q5PGxDQwrBV7x7g9q2oqz736kPDB28VFIpu3shhhICLc
-         3q62NnaM7w60YFZ9CQ7gc0TzsxSP/YlZAR6OxKgg76TrSG2vFayVa9SBbcbkFSi1R9gX
-         cz4g==
-X-Forwarded-Encrypted: i=1; AJvYcCX4RdbQuuGNCOHnTH2m3hl82/CP7FEDNIgYAUn7ZSK+h0vREk8lzUOjQVAkoBCb8wEPxcQiLSD6otAFIV23LsSiI3A3q7/s
-X-Gm-Message-State: AOJu0YzbBG6Q6Xg1HPjcZ9aXu2NCQWTBidv3KgVmjyEMQWvMl511HHSb
-	IgdT+CQ+GcmMXbi6Mbc3cnFQ7sZU6Mku34txrzme925PY3XdKmasTxe1hkzryMU=
-X-Google-Smtp-Source: AGHT+IGuekRx9JCbSJ8aPjEkgDSPx0b09Ah96HfjfNrA2JQkcpnO0zi7rNwoFiUHiHt0SWJgb+QhzA==
-X-Received: by 2002:a5d:618d:0:b0:34c:9393:4c29 with SMTP id ffacd0b85a97d-3504a737a07mr16118061f8f.21.1715932346608;
-        Fri, 17 May 2024 00:52:26 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-351d3bdad9bsm4337495f8f.46.2024.05.17.00.52.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 May 2024 00:52:26 -0700 (PDT)
-Date: Fri, 17 May 2024 09:52:22 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
-	virtualization@lists.linux.dev, ast@kernel.org,
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com
-Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
-Message-ID: <ZkcMthuRwhMsWJgn@nanopsycho.orion>
-References: <20240510072431-mutt-send-email-mst@kernel.org>
- <ZkRlcBU0Nb3O-Kg1@nanopsycho.orion>
- <20240515041909-mutt-send-email-mst@kernel.org>
- <ZkSKo1npMxCVuLfT@nanopsycho.orion>
- <ZkSwbaA74z1QwwJz@nanopsycho.orion>
- <CACGkMEsLfLLwjfHu5MT8Ug0_tS_LASvw-raiXiYx_WHJzMcWbg@mail.gmail.com>
- <ZkXmAjlm-A50m4dx@nanopsycho.orion>
- <20240516083100-mutt-send-email-mst@kernel.org>
- <ZkYlYLFthXVmHOaQ@nanopsycho.orion>
- <20240516150101-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1715932493; c=relaxed/simple;
+	bh=mAJ/eemCKYI0mmS/RQqkcmGXPaboRQM/PtqvexzDy1E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VMQiwPrpJ/tklMtcAX/RZAfp6SydYDi/VRvXy4Y+uIwcnu8h9b5o1IJ8nz9MIAiZK2p+LZHT/u9v5wIBxFLB3nyU+Fkq4LLV8O5MdakfoWwUvtjNliRzl/84QQY28xIEL5VXFc9mhufV8XdU7jlFszE4ynTYLc+Aux9Q16V63eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 44H7rBaaD2158043, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 44H7rBaaD2158043
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 May 2024 15:53:11 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 17 May 2024 15:53:12 +0800
+Received: from RTDOMAIN (172.21.210.160) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 17 May
+ 2024 15:53:11 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <andrew@lunn.ch>, <jiri@resnulli.us>, <horms@kernel.org>,
+        <rkannoth@marvell.com>, <pkshih@realtek.com>, <larry.chiu@realtek.com>,
+        Justin Lai
+	<justinlai0215@realtek.com>
+Subject: [PATCH net-next v19 00/13] Add Realtek automotive PCIe driver
+Date: Fri, 17 May 2024 15:52:49 +0800
+Message-ID: <20240517075302.7653-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240516150101-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-Thu, May 16, 2024 at 09:04:41PM CEST, mst@redhat.com wrote:
->On Thu, May 16, 2024 at 05:25:20PM +0200, Jiri Pirko wrote:
->> 
->> >I'd expect a regression if any to be in a streaming benchmark.
->> 
->> Can you elaborate?
->
->BQL does two things that can hurt throughput:
->- limits amount of data in the queue - can limit bandwidth
->  if we now get queue underruns
->- adds CPU overhead - can limit bandwidth if CPU bound
->
->So checking result of a streaming benchmark seems important.
+This series includes adding realtek automotive ethernet driver
+and adding rtase ethernet driver entry in MAINTAINERS file.
 
-I understand. Didn't see any degradation in TCP_STREAM netperf. But I
-will try to extend the testing.
+This ethernet device driver for the PCIe interface of 
+Realtek Automotive Ethernet Switch,applicable to 
+RTL9054, RTL9068, RTL9072, RTL9075, RTL9068, RTL9071.
 
-Thanks!
+v1 -> v2:
+- Remove redundent debug message.
+- Modify coding rule.
+- Remove other function codes not related to netdev.
 
->
->
->-- 
->MST
->
+v2 -> v3:
+- Remove SR-IOV function - We will add the SR-IOV function together when
+uploading the vf driver in the future.
+- Remove other unnecessary code and macro.
+
+v3 -> v4:
+- Remove function prototype - Our driver does not use recursion, so we
+have reordered the code and removed the function prototypes.
+- Define macro precisely - Improve macro code readability to make the
+source code cleaner.
+
+v4 -> v5:
+- Modify ethtool function - Remove some unnecessary code.
+- Don't use inline function - Let the compiler decide.
+
+v5 -> v6:
+- Some old macro definitions have been removed and replaced with the
+lastest usage.
+- Replace s32 with int to ensure consistency.
+- Clearly point out the objects of the service and remove unnecessary
+struct.
+
+v6 -> v7:
+- Split this driver into multiple patches.
+- Reorganize this driver code and remove redundant code to make this
+driver more concise.
+
+v7 -> v8:
+- Add the function to calculate time mitigation and the function to 
+calculate packet number mitigation. Users can use these two functions 
+to calculate the reg value that needs to be set for the mitigation value
+they want to set.
+- This device is usually used in automotive embedded systems. The page
+pool api will use more memory in receiving packets and requires more 
+verification, so we currently do not plan to use it in this patch.
+
+v8 -> v9:
+- Declare functions that are not extern as static functions and increase
+the size of the character array named name in the rtase_int_vector struct
+to correct the build warning noticed by the kernel test robot.
+
+v9 -> v10:
+- Currently we change to use the page pool api. However, when we allocate
+more than one page to an rx buffer, it will cause system errors
+in some cases. Therefore, we set the rx buffer to fixed size with 3776
+(PAGE_SIZE - SKB_DATA_ALIGN(sizeof(skb_shared_info) )), and the maximum 
+value of mtu is set to 3754(rx buffer size - VLAN_ETH_HLEN - ETH_FCS_LEN).
+- When ndo_tx_timeout is called, it will dump some device information,
+which can be used for debugging.
+- When the mtu is greater than 1500, the device supports checksums
+but not TSO.
+- Fix compiler warnning.
+
+v10 -> v11:
+- Added error handling of rtase_init_ring().
+- Modify the error related to asymmetric pause in rtase_get_settings.
+- Fix compiler error.
+
+v11 -> v12:
+- Use pm_sleep_ptr and related macros.
+- Remove multicast filter limit.
+- Remove VLAN support and CBS offload functions. 
+- Remove redundent code.
+- Fix compiler warnning.
+
+v12 -> v13:
+- Fixed the compiler warning of unuse rtase_suspend() and rtase_resume()
+when there is no define CONFIG_PM_SLEEP.
+
+v13 -> v14:
+- Remove unuse include.
+- call eth_hw_addr_random() to generate random MAC and set device flag 
+- use pci_enable_msix_exact() instead of pci_enable_msix_range() 
+- If dev->dma_mask is non-NULL, dma_set_mask_and_coherent with a 64-bit
+mask will never fail, so remove the part that determines the 32-bit mask.
+- set dev->pcpu_stat_type before register_netdev() and core will allocate
+stats 
+- call NAPI instance at the right location
+
+v14 -> v15:
+- In rtase_open, when the request interrupt fails, all request interrupts
+are freed.
+- When calling netif_device_detach, there is no need to call
+netif_stop_queue.
+- Call netif_tx_disable() instead of stop_queue(), it takes the tx lock so
+there is no need to worry about the packets being transmitted.
+- In rtase_tx_handler, napi budget is no longer used, but a customized
+tx budget is used.
+- Use the start / stop macros from include/net/netdev_queues.h. 
+- Remove redundent code.
+
+v15 -> v16:
+- Re-upload v15 patch set
+
+v16 -> v17:
+- Prefix the names of some rtase-specific macros, structs, and enums.
+- Fix the abnormal problem when returning page_pool resources.
+
+v17 -> v18:
+- Limit the width of each line to 80 colums.
+- Use reverse xmas tree order.
+- Modify the error handling of rtase_alloc_msix and rtase_alloc_interrupt.
+
+v18 -> v19:
+- Use dma_wmb() instead of wmb() to ensure the order of access
+instructions for a memory shared by DMA and CPU.
+- Add error message when allocate dma memory fails.
+- Add .get_eth_mac_stats function to report hardware information.
+- Remove .get_ethtool_stats function.
+- In rtase_tx_csum, when the packet is not ipv6 or ipv4, a warning will
+no longer be issued.
+
+Justin Lai (13):
+  rtase: Add pci table supported in this module
+  rtase: Implement the .ndo_open function
+  rtase: Implement the rtase_down function
+  rtase: Implement the interrupt routine and rtase_poll
+  rtase: Implement hardware configuration function
+  rtase: Implement .ndo_start_xmit function
+  rtase: Implement a function to receive packets
+  rtase: Implement net_device_ops
+  rtase: Implement pci_driver suspend and resume function
+  rtase: Implement ethtool function
+  rtase: Add a Makefile in the rtase folder
+  realtek: Update the Makefile and Kconfig in the realtek folder
+  MAINTAINERS: Add the rtase ethernet driver entry
+
+ MAINTAINERS                                   |    7 +
+ drivers/net/ethernet/realtek/Kconfig          |   19 +
+ drivers/net/ethernet/realtek/Makefile         |    1 +
+ drivers/net/ethernet/realtek/rtase/Makefile   |   10 +
+ drivers/net/ethernet/realtek/rtase/rtase.h    |  326 +++
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 2365 +++++++++++++++++
+ 6 files changed, 2728 insertions(+)
+ create mode 100644 drivers/net/ethernet/realtek/rtase/Makefile
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase.h
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase_main.c
+
+-- 
+2.34.1
+
 
