@@ -1,189 +1,118 @@
-Return-Path: <netdev+bounces-96828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D87BE8C7FA5
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 03:45:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E4268C7FAF
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 03:57:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 162731C2141C
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 01:45:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A3EC284328
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 01:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1FE10FF;
-	Fri, 17 May 2024 01:45:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9001D17D2;
+	Fri, 17 May 2024 01:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="V5aPeKru"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="IwtZStbS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E82EA32
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 01:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1354C69;
+	Fri, 17 May 2024 01:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715910353; cv=none; b=AlxDgE3NnbcB9d/+CZqxZ8HIN8G5LupOieHCHd5ZApPjVhEYRe8DUhnL/4RVh5P89QgjpQgQsZQJOsP0wxxJrHjpnsnKapz4u4sGzZ4MR2uMl06nGSsQc9skWQlLIixAUS3VppugIjhB5jBoejfesIcNC8vSilYCpNzB4IlyU3M=
+	t=1715911064; cv=none; b=umZwTusOTMNkFrc3RyIjERoVWd7YvhAudOnsmdeLDI3UGM+fU1YxU3A0GFzuNzkWrbLPQtu7s1WvTe3aByBMqRBH7JVuYjf+USJpqbHR/QVm8dHokLY7JomNBRoL1KdSGJ6TT+IZ0DXyPrJlccDjrpWZVCEmzqp79yAsq+MtxsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715910353; c=relaxed/simple;
-	bh=4/KMWK+ZGuhRuaDYKF9IxeyIEcAysuwl8Pfmi9WhQAg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m9UnFTyc0XEEshKnuNvfCFbV6vh+qaAWAYF0b805x+4+JMDBWF7vD+n+T42Kk5NUezs4+mHsnKXFbpVE8oIuprHASSwgzIRVynet2M3OicClQPRd8cL/llhfWYS1OdDfiiGhmyDUv2M8hOQSjqgJxFf1ox9PVFDsEpNnTJuAmMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=V5aPeKru; arc=none smtp.client-ip=207.171.188.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1715910351; x=1747446351;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=bbSmciwIH6LocXInzwGIDbMIeeVQSjjLxtsNOiGvTV8=;
-  b=V5aPeKruBmHi+MVCqpkwRbIZzeNcucDaVWmw0lsV3uLSWQklVtZgE4Pn
-   Lq6TKKkC/+B2nPwTpxfI5SKCfZ7JREUfHQkAKKYTDIge4Yqn3menvc/jx
-   xnwVFdgqK8oEfgBr+7QkJWQ2FT2RZtZU+qkjcS7IOqYYuywPIerH5EfIC
-   M=;
-X-IronPort-AV: E=Sophos;i="6.08,166,1712620800"; 
-   d="scan'208";a="726973331"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2024 01:45:45 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:47460]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.13.185:2525] with esmtp (Farcaster)
- id d7edd87c-7d5e-4ef1-8c63-9bab82d5eb6f; Fri, 17 May 2024 01:45:44 +0000 (UTC)
-X-Farcaster-Flow-ID: d7edd87c-7d5e-4ef1-8c63-9bab82d5eb6f
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 17 May 2024 01:45:42 +0000
-Received: from 88665a182662.ant.amazon.com (10.118.251.223) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 17 May 2024 01:45:40 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <mhal@rbox.co>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<shuah@kernel.org>
-Subject: Re: [PATCH net v2 1/2] af_unix: Fix garbage collection of embryos carrying OOB with SCM_RIGHTS
-Date: Fri, 17 May 2024 10:45:29 +0900
-Message-ID: <20240517014529.94140-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240516145457.1206847-2-mhal@rbox.co>
-References: <20240516145457.1206847-2-mhal@rbox.co>
+	s=arc-20240116; t=1715911064; c=relaxed/simple;
+	bh=TeQwxcoJKMhlE7MRgBjHwcLfIU5flh55tSEr1OeVZTQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=oLX1Hja3UwEd9WNeMwocfueOXuv+rJfQYxJ218Os2bqUS4FsIl4rqCYuNTGYl854OupBvGBbUxFfB7h/mypTZ/4YkJ6XXFvROIyT9wI5CicLHnvQlo0L0jlzYCrRVVy3vx+tpoZ1KO5tK3rNrhGncEmyG83hKsE/Pb6rRwegYXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=IwtZStbS; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44GKMTnE014892;
+	Fri, 17 May 2024 01:57:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:date:subject:mime-version:content-type
+	:content-transfer-encoding:message-id:to:cc; s=qcppdkim1; bh=4Xn
+	mAg2zsv4MMPg4ePcXWEN4bz039q9JRraQWkgbVw0=; b=IwtZStbSk3JYJzAeF0I
+	1mIEr7hmVeHiiFavZnE5+ZnApGP7Sv+azVQpMXZ//cJrZfedETwAax8+f74sj52k
+	RrIqFEFgq688rkyDe3M735wNDvr+YFzaJQgAYdMblvUpYilBZjgpbQvrCrYX610/
+	2JOPwJn3jEroQ2zyOZmrQO0CxWBtIumawuNuzrvjRA4wNTHwUyqFDYknOoPlr4QX
+	xAa8y2UI9dYwY31GFmGxHJeSohzR+QdvbDPsYCSZFVbsVmg7wyLpjQdAShOeuL1Y
+	aqkY0kiY0jcm9C+z47rjwNgPVKfRTdCLYwK+JjwpeRiZ10RaR+mbNIoGHbHkq8V7
+	GeQ==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3y5e9ct0gb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 May 2024 01:57:34 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44H1vX5K025147
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 May 2024 01:57:33 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 16 May
+ 2024 18:57:32 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Date: Thu, 16 May 2024 18:57:32 -0700
+Subject: [PATCH] vringh: add MODULE_DESCRIPTION()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC001.ant.amazon.com (10.13.139.241) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20240516-md-vringh-v1-1-31bf37779a5a@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAIu5RmYC/x3MQQrCQAxA0auUrA1M21HEq4iLzDR2AnYsiZZK6
+ d2NLh98/gbGKmxwaTZQXsTkWR3toYFcqI6MMrihC10Mx/aE04CLSh0L5tifQ08cEkXwfla+y/p
+ /XW/uRMaYlGouv8ND6nvFiezFivPHU9j3L1yS0c+AAAAA
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>,
+        Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.13.0
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: yXUsnD5gIMwD8PMfWK8PGk4evjt5EaRT
+X-Proofpoint-ORIG-GUID: yXUsnD5gIMwD8PMfWK8PGk4evjt5EaRT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-16_07,2024-05-15_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ adultscore=0 lowpriorityscore=0 mlxscore=0 clxscore=1011 mlxlogscore=805
+ priorityscore=1501 bulkscore=0 malwarescore=0 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405010000 definitions=main-2405170014
 
-From: Michal Luczaj <mhal@rbox.co>
-Date: Thu, 16 May 2024 16:50:09 +0200
-> GC attempts to explicitly drop oob_skb before purging the hit list.
+Fix the allmodconfig 'make w=1' issue:
 
-Sorry for not catching these in v1,
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/vhost/vringh.o
 
-nit: s/oob_skb/oob_skb's reference/
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+---
+ drivers/vhost/vringh.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> 
-> The problem is with embryos: kfree_skb(u->oob_skb) is never called on an
-> embryo socket, as those sockets are not directly stacked by the SCC walk.
+diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+index 7b8fd977f71c..73e153f9b449 100644
+--- a/drivers/vhost/vringh.c
++++ b/drivers/vhost/vringh.c
+@@ -1614,4 +1614,5 @@ EXPORT_SYMBOL(vringh_need_notify_iotlb);
+ 
+ #endif
+ 
++MODULE_DESCRIPTION("host side of a virtio ring");
+ MODULE_LICENSE("GPL");
 
-", as ..." is not correct and can be just removed.  Here we walk
-through embryos as written in the next paragraph but we forget
-dropping oob_skb's refcnt.
+---
+base-commit: 7f094f0e3866f83ca705519b1e8f5a7d6ecce232
+change-id: 20240516-md-vringh-c43803ae0ba4
 
-> 
-> The python script below [0] sends a listener's fd to its embryo as OOB
-> data.  While GC does collect the embryo's queue, it fails to drop the OOB
-> skb's refcount.  The skb which was in embryo's receive queue stays as
-> unix_sk(sk)->oob_skb and keeps the listener's refcount [1].
-> 
-> Tell GC to dispose embryo's oob_skb.
-> 
-> [0]:
-> from array import array
-> from socket import *
-> 
-> addr = '\x00unix-oob'
-> lis = socket(AF_UNIX, SOCK_STREAM)
-> lis.bind(addr)
-> lis.listen(1)
-> 
-> s = socket(AF_UNIX, SOCK_STREAM)
-> s.connect(addr)
-> scm = (SOL_SOCKET, SCM_RIGHTS, array('i', [lis.fileno()]))
-> s.sendmsg([b'x'], [scm], MSG_OOB)
-> lis.close()
-> 
-> [1]
-> $ grep unix-oob /proc/net/unix
-> $ ./unix-oob.py
-> $ grep unix-oob /proc/net/unix
-> 0000000000000000: 00000002 00000000 00000000 0001 02     0 @unix-oob
-> 0000000000000000: 00000002 00000000 00010000 0001 01  6072 @unix-oob
-> 
-> Fixes: 4090fa373f0e ("af_unix: Replace garbage collection algorithm.")
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-
-with the above corrected, you can add
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-Thanks!
-
-
-> ---
->  net/unix/garbage.c | 23 ++++++++++++++---------
->  1 file changed, 14 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-> index 1f8b8cdfcdc8..dfe94a90ece4 100644
-> --- a/net/unix/garbage.c
-> +++ b/net/unix/garbage.c
-> @@ -342,6 +342,18 @@ enum unix_recv_queue_lock_class {
->  	U_RECVQ_LOCK_EMBRYO,
->  };
->  
-> +static void unix_collect_queue(struct unix_sock *u, struct sk_buff_head *hitlist)
-> +{
-> +	skb_queue_splice_init(&u->sk.sk_receive_queue, hitlist);
-> +
-> +#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-> +	if (u->oob_skb) {
-> +		WARN_ON_ONCE(skb_unref(u->oob_skb));
-> +		u->oob_skb = NULL;
-> +	}
-> +#endif
-> +}
-> +
->  static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist)
->  {
->  	struct unix_vertex *vertex;
-> @@ -365,18 +377,11 @@ static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist
->  
->  				/* listener -> embryo order, the inversion never happens. */
->  				spin_lock_nested(&embryo_queue->lock, U_RECVQ_LOCK_EMBRYO);
-> -				skb_queue_splice_init(embryo_queue, hitlist);
-> +				unix_collect_queue(unix_sk(skb->sk), hitlist);
->  				spin_unlock(&embryo_queue->lock);
->  			}
->  		} else {
-> -			skb_queue_splice_init(queue, hitlist);
-> -
-> -#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-> -			if (u->oob_skb) {
-> -				kfree_skb(u->oob_skb);
-> -				u->oob_skb = NULL;
-> -			}
-> -#endif
-> +			unix_collect_queue(u, hitlist);
->  		}
->  
->  		spin_unlock(&queue->lock);
-> -- 
-> 2.45.0
-> 
 
