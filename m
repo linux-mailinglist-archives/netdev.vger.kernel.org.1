@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-96891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5E138C81DF
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:57:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D2BC8C81E1
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:57:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7176828262E
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:57:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE6571C2096D
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0262BAFB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 864762BCE8;
 	Fri, 17 May 2024 07:57:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SkZDkoN2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B6An5BeS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A095820B3D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CF02260A
 	for <netdev@vger.kernel.org>; Fri, 17 May 2024 07:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715932628; cv=none; b=aBwqhkasWHhYoq4Eo/LclJ+vXxut29XBx8d7SSAK6HEkglFZoHCkOVU7czmpI9mziclqNLAuf5D9ByBRZPcU2UYsl8CSgCP5/p4IXXyVgI6l9+BGuzOdx2WwgwErdmj8kpn53aa3991vR1q7O5jGiILmRsFsq8Rirzy05MoSXXI=
+	t=1715932628; cv=none; b=RBtXmNkbRVLF5eLSLMzVoKHdMMpQyNHwpY243hSxj8A0mmZPMhkCqUSIdEbUgeh/0F7If4rRqdXci/f99YEBhTCN6dQPU7T75wShnnSM2wW3zMPjr/z6SCYx0DOWmpKWYFET8VTLx/F4DncMRzW9LmIixVRItblWd+ut0Y1A+Cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715932628; c=relaxed/simple;
-	bh=j4mDDIQXQY6Yt0ARbhylixXExzCaLztKBD5Eb//BJs8=;
+	bh=0Zhpfwr2bblfm7k3g5cvVUI3dQpNdm2TqtvTSVzfgYM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rEuRbY1fNH4pmaR3r0QyzaNN5cl7HN7FYa3mvG+9zkeFgXJFWlnPC7wPrNBH/iafyyKS9W1/zMriZTzjex19Pbr+YbIKWO61SAd9LglILx8uZvMLwWhxJ8KySGlDxTd2yMJ0r5KEiPqTmoGFlqshOkG/EaV7O+NoBjViVWW69fM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SkZDkoN2; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=Vxt+SSNXPy+rRU99gbLrxj39F/4OEqdNQbDAX1F5i4dVT4u+41g1doSV6G+MviOyaBsDxKWEe3nZugBmH+O6zHbCvzyETAu0OQNRG7Q7glRUEBynIZS4E1rkuqorffu11dTna5NZr/usrB6dRcUC6XyPwfrtQSLqK52eCfVWI1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B6An5BeS; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
@@ -37,24 +37,24 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2+jG2UN45Z0JvX/V83PsUb5yMQORYV9ShWj2nAq73LA=;
-	b=SkZDkoN2G2ApEbmojgEa7uVljqClOgborZlrqoZKewN9a4EuMMG9z+Z400CXVQjUAwFVUA
-	pAW9jdlCrOTWwi67BtraKTYN2UDgdjjwg03VZSFuO8VBY8Spgzq+SuVQdhKD8ZsrSXITDC
-	YX0WN9pQSi6OOSc0ThT8tYrt3NwKGJk=
+	bh=5CsmDbbLDOx1vnhJg69VuCy0uaob3Dg5hNF61pmV/Vg=;
+	b=B6An5BeSavxRjIBc/p/AvsGtjkUW1p5uvPO33ROCQrJfIpWLY6ia57aH7Ts40bVQZKne5X
+	MXNO0kzhxrIpRtfkx5HXpcBcREkFcuIeD9AAUAR/vYqutIiybaECpP0xV3OygYDW65Gj2S
+	TAnq/Mv9IyTeOydkOpvvRaw8IWK1t6g=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-264-_AF1HgkKO6uhxaIdJBA8cg-1; Fri, 17 May 2024 03:56:59 -0400
-X-MC-Unique: _AF1HgkKO6uhxaIdJBA8cg-1
+ us-mta-315-HFKoaS62NtCAXc51ApmXvA-1; Fri, 17 May 2024 03:57:01 -0400
+X-MC-Unique: HFKoaS62NtCAXc51ApmXvA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 19FD6800074;
-	Fri, 17 May 2024 07:56:59 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DAEC5802079;
+	Fri, 17 May 2024 07:57:00 +0000 (UTC)
 Received: from alecto.usersys.redhat.com (unknown [10.43.17.36])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8184828E2;
-	Fri, 17 May 2024 07:56:57 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4E28F740F;
+	Fri, 17 May 2024 07:56:59 +0000 (UTC)
 From: Artem Savkov <asavkov@redhat.com>
 To: Michael Ellerman <mpe@ellerman.id.au>,
 	Nicholas Piggin <npiggin@gmail.com>,
@@ -68,9 +68,9 @@ Cc: Alexei Starovoitov <ast@kernel.org>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Artem Savkov <asavkov@redhat.com>
-Subject: [PATCH 1/5] powerpc64/bpf: jit support for 32bit offset jmp instruction
-Date: Fri, 17 May 2024 09:56:46 +0200
-Message-ID: <20240517075650.248801-2-asavkov@redhat.com>
+Subject: [PATCH 2/5] powerpc64/bpf: jit support for unconditional byte swap
+Date: Fri, 17 May 2024 09:56:47 +0200
+Message-ID: <20240517075650.248801-3-asavkov@redhat.com>
 In-Reply-To: <20240517075650.248801-1-asavkov@redhat.com>
 References: <20240517075650.248801-1-asavkov@redhat.com>
 Precedence: bulk
@@ -82,27 +82,32 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-Add jit support for JMP32_JA instruction. Tested using test_bpf module.
+Add jit support for unconditional byte swap. Tested using BSWAP tests
+from test_bpf module.
 
 Signed-off-by: Artem Savkov <asavkov@redhat.com>
 ---
- arch/powerpc/net/bpf_jit_comp64.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/powerpc/net/bpf_jit_comp64.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/powerpc/net/bpf_jit_comp64.c b/arch/powerpc/net/bpf_jit_comp64.c
-index 8afc14a4a1258..3071205782b15 100644
+index 3071205782b15..97191cf091bbf 100644
 --- a/arch/powerpc/net/bpf_jit_comp64.c
 +++ b/arch/powerpc/net/bpf_jit_comp64.c
-@@ -1053,6 +1053,9 @@ int bpf_jit_build_body(struct bpf_prog *fp, u32 *image, u32 *fimage, struct code
- 		case BPF_JMP | BPF_JA:
- 			PPC_JMP(addrs[i + 1 + off]);
- 			break;
-+		case BPF_JMP32 | BPF_JA:
-+			PPC_JMP(addrs[i + 1 + imm]);
-+			break;
- 
- 		case BPF_JMP | BPF_JGT | BPF_K:
- 		case BPF_JMP | BPF_JGT | BPF_X:
+@@ -699,11 +699,12 @@ int bpf_jit_build_body(struct bpf_prog *fp, u32 *image, u32 *fimage, struct code
+ 		 */
+ 		case BPF_ALU | BPF_END | BPF_FROM_LE:
+ 		case BPF_ALU | BPF_END | BPF_FROM_BE:
++		case BPF_ALU64 | BPF_END | BPF_FROM_LE:
+ #ifdef __BIG_ENDIAN__
+ 			if (BPF_SRC(code) == BPF_FROM_BE)
+ 				goto emit_clear;
+ #else /* !__BIG_ENDIAN__ */
+-			if (BPF_SRC(code) == BPF_FROM_LE)
++			if (BPF_CLASS(code) == BPF_ALU && BPF_SRC(code) == BPF_FROM_LE)
+ 				goto emit_clear;
+ #endif
+ 			switch (imm) {
 -- 
 2.45.0
 
