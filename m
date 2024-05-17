@@ -1,149 +1,285 @@
-Return-Path: <netdev+bounces-96953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E3448C866E
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 14:45:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EEC48C86E6
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:01:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94F73283034
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 12:45:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7FF9282631
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 13:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B17B381BB;
-	Fri, 17 May 2024 12:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F90E4F894;
+	Fri, 17 May 2024 13:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X5/HJtc5"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="Aljr7yDn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3E17F9
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 12:44:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA303AC10
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 13:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715949899; cv=none; b=kLzUGEhniPoNR5bVAh/pXOctwPb5wHvRTrmWcv1OoTOdWS6SsJol5jy28tDArhfdNT+OihNcpEiDc1kWeqWuWOcDCa+0vfwzLralBa7iZfyLK05dSfh9++lzlfX8vaGpubHJgRrTvTQ0Tj5WfVsEeFD+960zMnkMaZyEHmrrWdo=
+	t=1715950855; cv=none; b=coJdFXGb9NUy5pQSdWT+4+HYz4sp49ZuQ7rsuMGGADC84ybXJt0JA29CS4wqAnXL2NE3jHGBbaz9tcRsEb8dFUvm1Wq7OoFpKcp1vHi2UWceo47aqvTfhd29aaNaa4zwJQROc3YlIYBxQJpRSGnuO8gJEJjBfB7qsFNe9TFSB2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715949899; c=relaxed/simple;
-	bh=N4SkCGjshUN4eJuToZsKFaUSBMc/3WhERcLt1nqXB6w=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=rWT9OwPotQf+1CBetByWTQAeNwgQv7IHNwTr0nXBpjivXICqXK34e+SPAD9SY5UC0mkFriXD1iOkCiIFetn9hTWR6KzDU3mRh3HOVF9WEmrM+pazIM2ITqu4CYgJkUsLZb6qZAVMHWaygL4EPxPJnf1Sd6XzWDvcUJT9uFiRzxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X5/HJtc5; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2e564cad1f6so24797691fa.1
-        for <netdev@vger.kernel.org>; Fri, 17 May 2024 05:44:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715949895; x=1716554695; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3PYkTpN4fQGOYaxhQag2GrvMR581M+PXzEscclulAac=;
-        b=X5/HJtc5AVKl2ec1NiHPt29GzL/t66Dntm6VNAdFRtMo2rjS4j5nE7CeCN2IkBsndC
-         sbDemWANnOEPlJwNEQWgJScr7YqjUHHWaFv+2W1HyllCsZ4Ix4Pz/gnty5e+1lqp1+V0
-         MbaI0iu8gY6XC73E7ZpHo7zp56NVOMsin7OJRGxMDw1KNafIVZzj+xbMtXWkKTBMUqyD
-         q2vDNHXKky+WXo8fepa7AExdzNMW0172ORxx0a008gAt449MNa9S2csbrwD5yprCqJvA
-         PnaM7hOjeyqZ41zSro45z7QgpPK3XbjdE/LjvAdtd10GRAXzqm8XJ4N+YmI2e3HNcHBn
-         /tkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715949895; x=1716554695;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3PYkTpN4fQGOYaxhQag2GrvMR581M+PXzEscclulAac=;
-        b=K9rElszhvXbfGBQresaUoS8PZzBbprk0l31eSEfbSauCQGSW+3nRzptc9j0i/xw+CD
-         cNZtMvpYa7cngGhWbJEkIUxhyZEWpvOHIB0W8FjsP11PLJC/1aEtzDvpf0vflKLBqf79
-         2AeTx9flmBtxwg4xkjXUZLLSl1L3maWboy/XEHLOtrp929spz7zO4bncfyjCAQ5SoxEo
-         EDu4nlU/xY4rhEZIQG4sUBdDScF6yGsUkDO61IcxW/TNl6rktgodGHp4Jdncj4Obb1xs
-         EP6euvrfqrkcl50Vr7P4Xl30g1rAUkm7PsDutxS9559Nbe3B+XE9q6wAW3j857K1Wxod
-         ES8w==
-X-Gm-Message-State: AOJu0YykO02+B0r0EsYCoKwNsyZZf/7omAJ+ve8ohjhH5y8E8GXsd3I8
-	IL3kLBBihn0toRS3UoA7YUuDJI5Lew92FF9QfA4nssec7d7Yzqts6v4Qwwn/d6ljgpZRWqaKxrl
-	L2T+6MdSFqViaMj8MU+4/2fVQPLYB04Up
-X-Google-Smtp-Source: AGHT+IFVm9ZhoublnKIWP4W1XYqx7bYhBOuBy9xlYkSieOYIjOX/CS2lF/P3ah+/cZ+x1ofZmOzHz7iOVcAb5eP2bKg=
-X-Received: by 2002:a05:6512:6ca:b0:523:8f5e:4aa0 with SMTP id
- 2adb3069b0e04-5238f5e4b78mr6259101e87.63.1715949895021; Fri, 17 May 2024
- 05:44:55 -0700 (PDT)
+	s=arc-20240116; t=1715950855; c=relaxed/simple;
+	bh=UIkuizklu5c5g73OTrA9x4jnuv1iZjs5q3Zr4yBj9R0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s6MSareEBjUvLgd+IFGHoJIyQlV8r0acaTDFudXVAlbIHJtoe3lL+TY8Hr4MeC0urVU4GrY80ucQvsKbMxOpbibdHFPFdkukaiPZxLo+cYumMfXeBtNzJZJ2Bcdklm4l9KWb/OwzxRsILEjFT1HkdikQiYzoQdXbK1TH2b2g4pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=Aljr7yDn; arc=none smtp.client-ip=185.125.188.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from [10.55.5.117] (unknown [149.11.192.251])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id DF10440EA3;
+	Fri, 17 May 2024 13:00:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1715950848;
+	bh=myvPLjv4bFMc1kb4GvTbprFTOmVtT8sz1hqU3fBSfJg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type;
+	b=Aljr7yDnAGOaoT+bT63vj+O2dd1EaUlHGy7vQyLQrkvSN6jtuHCF0LymqOM0QRZAd
+	 dhhd/xdRaV52khnhBoeu1kAAv9j15IgwlERhV1wR78n935ZcpVWcCQBP6TFZZtXwel
+	 mzcvSkpNkgb+Si7f7ZnEQ5LhBI5ITJ60Nm46udLEVZINMN//Y+HlVFzhIssgRYTGVr
+	 YAnbvxoOmFea5jBPgvtXi0l4VuyN7Bh7nFwZfG+3Ln2Z4zqTIwGGcVbg1SMgfFhIvk
+	 WGdvSqgD863ji6O6aJJhw0LUZiMpspo9rgWT0zZtVGYIvbBca629G7+9vwyUbG/IU+
+	 nEUkdAJjS4uKw==
+Message-ID: <2493e4f7-7043-4408-be99-9ee329cb3db9@canonical.com>
+Date: Fri, 17 May 2024 21:00:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Krishna Kumar <krikku@gmail.com>
-Date: Fri, 17 May 2024 18:14:19 +0530
-Message-ID: <CACLgkEYHqmN-Kf93PNcWKJd5FKtwENxLOk7e7Z-VcxcDfXFdOA@mail.gmail.com>
-Subject: Large TCP_RR performance drop between 5.x and 6.x kernel?
-To: netdev@vger.kernel.org
-Cc: "Krishna Kumar (Engineering)" <krishna.ku@flipkart.com>, vasudeva.sk@flipkart.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v2] e1000e: move force SMBUS near the
+ end of enable_ulp function
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ kuba@kernel.org, anthony.l.nguyen@intel.com, vitaly.lifshits@intel.com,
+ dima.ruinskiy@intel.com, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, sasha.neftin@intel.com, naamax.meir@linux.intel.com,
+ Jacob Keller <jacob.e.keller@intel.com>, Oliver Sang
+ <oliver.sang@intel.com>, Zhang Rui <rui.zhang@intel.com>,
+ regressions@lists.linux.dev
+References: <20240508120604.233166-1-hui.wang@canonical.com>
+ <cdab9b76-e935-4b38-9b5c-496ff8fdfb64@molgen.mpg.de>
+ <7b0a36a5-4265-41e7-b66a-2cd1f01aed42@canonical.com>
+ <8bc68316-fef4-47c0-ad08-ad93f6a4fb30@molgen.mpg.de>
+Content-Language: en-US
+From: Hui Wang <hui.wang@canonical.com>
+In-Reply-To: <8bc68316-fef4-47c0-ad08-ad93f6a4fb30@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Dear maintainers, developers, community,
 
-We are using Debian (Bullseye) across the multiple Flipkart data
-centers in India with many thousands of servers (running QEMU/KVM).
+On 5/17/24 18:07, Paul Menzel wrote:
+> Dear Hui,
+>
+>
+> Thank you for your response.
+>
+>
+> Am 17.05.24 um 11:45 schrieb Hui Wang:
+>>
+>> On 5/17/24 13:45, Paul Menzel wrote:
+>
+>>> Am 08.05.24 um 14:06 schrieb Hui Wang:
+>>>> The commit 861e8086029e ("e1000e: move force SMBUS from enable ulp
+>>>> function to avoid PHY loss issue") introduces a regression on
+>>>> CH_MTP_I219_LM18 (PCIID: 0x8086550A). Without the referred commit, the
+>>>
+>>> *P*CH
+>>>
+>>>> ethernet works well after suspend and resume, but after applying the
+>>>> commit, the ethernet couldn't work anymore after the resume and the
+>>>> dmesg shows that the NIC Link changes to 10Mbps (1000Mbps originally):
+>>>
+>>> 1.  s/Link/link/
+>>> 2.  “couldn’t work” means the reduced bandwidth?
+>>
+>> On my side, once the link changes to 10Mbps, I couldn't ping the 
+>> machine anymore. And as you said, it probably has sth to do with 
+>> switch/router configuration.
+>>
+>>> 3. Please add a blank line and maybe indent the past with four spaces.
+>>>
+>>>> [   43.305084] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Up 10 
+>>>> Mbps Full Duplex, Flow Control: Rx/Tx
+>>>>
+>>>> Without the commit, the force SMBUS code will not be executed if
+>>>> "return 0" or "goto out" is executed in the enable_ulp(), and in my
+>>>> case, the "goto out" is executed since FWSM_FW_VALID is set. But after
+>>>> applying the commit, the force SMBUS code will be ran unconditionally.
+>>>>
+>>>> Here move the force SMBUS code back to enable_ulp() and put it
+>>>> immediate ahead of hw->phy.ops.release(hw), this could allow the
+>>>
+>>> immediate*l*?
+>
+> Sorry, I meant immediate*ly*.
+Got it.
+>
+>>>> longest settling time as possible for interface in this function and
+>>>> doesn't change the original code logic.
+>>>
+>>> Re-ordering code to achieve some waiting time sounds like, it’s not 
+>>> 100 % sure, that the problem won’t occur again?
+>>
+>> Actually this patch not only adds the waiting time, but also restore 
+>> the original code logic:
+>>
+>>   original: On a machine with the CSME, the SMBUS will not be forced, 
+>> accordingly the SMBUS will not be unforced after resume.
+>>
+>>   wrong: On a machine with the CSME, the SMBUS is forced, but the 
+>> SMBUS is not unforced after resume, there is an unbalance. My patch 
+>> could fix this case.
+>
+> Thank you for elaborating. In my opinion, then two commits would be 
+> better. One revert with a description of the problem and documentation 
+> of the test systems. Then the second patch with the fix.
 
-Recently, as part of testing for upgrading systems to Debian 12, we ran into
-a performance regression (~27%) in VMs running on the upgraded hypervisors.
-In both cases, VMs run Debian 12.
+What you said makes sense. But for this particular case, I think it is 
+not necessary since the patch is not that complicated and explanation is 
+already in the commit header.
 
-Hypervisor configuration:
-- 144-core Intel Xeon Icelake (8352V), 750 GB memory, Intel E810 NIC, IRQ
-  and XPS set.
-- System has two bridges - one for hypervisor connectivity (one VF to
-  this bridge), and one for VM (one VF to this bridge). The system has
-  exactly one VM powered on, connected to the second bridge.
-- Command line for both Debian 11 and Debian 12 are similar to the
-  following (except for the vmlinuz* version):
-  BOOT_IMAGE=<path-to-vmlinuz> root=UUID=<uuid> ro rootflags=<xyz>
-      loglevel=7 intel_iommu=on iommu=pt quiet crashkernel=512M
-- VM is pinned to CPUs 1-12 of the host, nothing else is running on the host:
-        NUMA node0 CPU(s):                    0-35,72-107
-        NUMA node1 CPU(s):                    36-71,108-143
-
-VM configuration:
-    - 12 core, 120GB, MQ virtio-net, runs on NUMA socket #0 (no HT) of
-      the host. Always runs Debian 12
-
-We are testing VM performance running on the same bare metal server, which runs
-Debian 11 (5.10.216 kernel and 5.2 QEMU) before upgrading it to Debian 12
-(6.1.90 kernel and 7.2 QEMU). The VM runs Debian 12 in both cases.
-
-VM Test: 32 processes TCP_RR for 60 seconds to another bare-metal server:
-     Debian 11: 440K
-     Debian 12: 320K (27% performance drop).
-
-Packets are well spread across the TX/RX queues on the guest virtio* and the
-VF on the physical host.
-
-We expect some setting that is causing this degradation but we are not
-able to figure out what it is (though we do not make any changes to the
-system after upgrading distribution).
-
-We did the following test, expecting that the degradation is either
-due to the higher kernel or qemu version:
-
-Kernel     QEMU      Rate     Notes
-6.0.2      7.2             320K     Downgrade kernel to lowest 6.x,
-                                                   same QEMU.
-5.10.216   5.2/7.2    440K     Downgrade kernel to Debian 11, any QEMU.
-
-From here on, do manual "bisect" between 5.10.x towards 6.0.2 without changing
-QEMU to identify when it degraded.
-
-5.19.11    7.2          310K     Highest kernel version in Debian 5.x.
-5.16.18    7.2          330K     Go down a version.
-5.15.15    7.2          443K     Good number, start going forward.
-5.16.7     7.2           300K     Bad
-5.15.158   7.2         448K     Now go ahead to find closest
-                                                    version with degrade.
-5.16.1     7.2          340K     Degrades, go back a little.
-5.16.0     7.2          336K     First version after 5.15.158
-
-There's a huge set of changes between 5.15.158 and 5.16.0. So, at this time,
-we are blocked knowing that the last 5.15.158 performed well at 448K while
-the next version reduced to 340K.
-
-Any help on what we could further look for to identify the reason for this
-drop, and if any setting/config change is expected?
+Anyway, I will address the rest comment of you and send a v3 patch.
 
 Thanks,
-- KK
+
+Hui.
+
+>
+>>> Could you please document your test system?
+>> Lenovo Thinkpad P16Gen2 with ethernet card:
+>>
+>> 00:1f.6 Ethernet controller [0200]: Intel Corporation Device 
+>> [8086:550a] (rev 20)
+>>
+>>> Just a side note: Booting Linux 6.9-rc5+ *with kexec* on Supermicro 
+>>> Super Server/X13SAE, BIOS 2.0 10/17/2022 with the network device 
+>>> below, it also came up only with 10 Mbps and Ethernet did not work, 
+>>> for example `ping`. I conjectured though, that the non-working part 
+>>> was due to the switch configuration not allowing 10 Mbps.
+>>>
+>>>     00:1f.6 Ethernet controller [0200]: Intel Corporation Ethernet 
+>>> Connection (17) I219-LM [8086:1a1c] (rev 11)
+>>>
+>> My test and result are same as yours.
+>>
+>> Thanks.
+>
+> Thank you for the confirmation.
+>
+>>> I didn’t find the time to further analyze and report the issue.
+>>>
+>>> Also could this also be related to the regression reported by the 
+>>> kernel test robot [1]?
+>>>
+>>>     00:19.0 Ethernet controller: Intel Corporation Ethernet 
+>>> Connection (3) I218-V (rev 03)
+>>>
+>>>> Fixes: 861e8086029e ("e1000e: move force SMBUS from enable ulp 
+>>>> function to avoid PHY loss issue")
+>>>> Signed-off-by: Hui Wang <hui.wang@canonical.com>
+>>>> Acked-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+>>>> Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+>>>> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+>>>> ---
+>>>> In the v2:
+>>>>   Change "this commit" to "the referred commit" in the commit header
+>>>>   Fix a potential infinite loop if ret_val is not zero
+>>>>   drivers/net/ethernet/intel/e1000e/ich8lan.c | 22 
+>>>> +++++++++++++++++++++
+>>>>   drivers/net/ethernet/intel/e1000e/netdev.c  | 18 -----------------
+>>>>   2 files changed, 22 insertions(+), 18 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c 
+>>>> b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+>>>> index f9e94be36e97..2e98a2a0bead 100644
+>>>> --- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
+>>>> +++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+>>>> @@ -1225,6 +1225,28 @@ s32 e1000_enable_ulp_lpt_lp(struct e1000_hw 
+>>>> *hw, bool to_sx)
+>>>>       }
+>>>>     release:
+>>>> +    /* Switching PHY interface always returns MDI error
+>>>> +     * so disable retry mechanism to avoid wasting time
+>>>> +     */
+>>>> +    e1000e_disable_phy_retry(hw);
+>>>> +
+>>>> +    /* Force SMBus mode in PHY */
+>>>> +    ret_val = e1000_read_phy_reg_hv_locked(hw, CV_SMB_CTRL, 
+>>>> &phy_reg);
+>>>> +    if (ret_val) {
+>>>> +        e1000e_enable_phy_retry(hw);
+>>>> +        hw->phy.ops.release(hw);
+>>>> +        goto out;
+>>>> +    }
+>>>> +    phy_reg |= CV_SMB_CTRL_FORCE_SMBUS;
+>>>> +    e1000_write_phy_reg_hv_locked(hw, CV_SMB_CTRL, phy_reg);
+>>>> +
+>>>> +    e1000e_enable_phy_retry(hw);
+>>>> +
+>>>> +    /* Force SMBus mode in MAC */
+>>>> +    mac_reg = er32(CTRL_EXT);
+>>>> +    mac_reg |= E1000_CTRL_EXT_FORCE_SMBUS;
+>>>> +    ew32(CTRL_EXT, mac_reg);
+>>>> +
+>>>>       hw->phy.ops.release(hw);
+>>>>   out:
+>>>>       if (ret_val)
+>>>> diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c 
+>>>> b/drivers/net/ethernet/intel/e1000e/netdev.c
+>>>> index 3692fce20195..cc8c531ec3df 100644
+>>>> --- a/drivers/net/ethernet/intel/e1000e/netdev.c
+>>>> +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+>>>> @@ -6623,7 +6623,6 @@ static int __e1000_shutdown(struct pci_dev 
+>>>> *pdev, bool runtime)
+>>>>       struct e1000_hw *hw = &adapter->hw;
+>>>>       u32 ctrl, ctrl_ext, rctl, status, wufc;
+>>>>       int retval = 0;
+>>>> -    u16 smb_ctrl;
+>>>>         /* Runtime suspend should only enable wakeup for link 
+>>>> changes */
+>>>>       if (runtime)
+>>>> @@ -6697,23 +6696,6 @@ static int __e1000_shutdown(struct pci_dev 
+>>>> *pdev, bool runtime)
+>>>>               if (retval)
+>>>>                   return retval;
+>>>>           }
+>>>> -
+>>>> -        /* Force SMBUS to allow WOL */
+>>>> -        /* Switching PHY interface always returns MDI error
+>>>> -         * so disable retry mechanism to avoid wasting time
+>>>> -         */
+>>>> -        e1000e_disable_phy_retry(hw);
+>>>> -
+>>>> -        e1e_rphy(hw, CV_SMB_CTRL, &smb_ctrl);
+>>>> -        smb_ctrl |= CV_SMB_CTRL_FORCE_SMBUS;
+>>>> -        e1e_wphy(hw, CV_SMB_CTRL, smb_ctrl);
+>>>> -
+>>>> -        e1000e_enable_phy_retry(hw);
+>>>> -
+>>>> -        /* Force SMBus mode in MAC */
+>>>> -        ctrl_ext = er32(CTRL_EXT);
+>>>> -        ctrl_ext |= E1000_CTRL_EXT_FORCE_SMBUS;
+>>>> -        ew32(CTRL_EXT, ctrl_ext);
+>>>>       }
+>>>>         /* Ensure that the appropriate bits are set in LPI_CTRL
+>
+>
+> Kind regards,
+>
+> Paul
+>
+>
+>>> [1]: 
+>>> https://lore.kernel.org/intel-wired-lan/202405150942.f9b873b1-oliver.sang@intel.com/
 
