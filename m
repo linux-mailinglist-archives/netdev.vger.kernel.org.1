@@ -1,109 +1,194 @@
-Return-Path: <netdev+bounces-96965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0D848C8770
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:49:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EADA8C8775
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:51:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D4E8281FED
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 13:49:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23F682844FA
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 13:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3CC754BEF;
-	Fri, 17 May 2024 13:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDEA54BD3;
+	Fri, 17 May 2024 13:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ehP7IVIY"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="kXTN60hg"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32DEB548EF;
-	Fri, 17 May 2024 13:49:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09F454BD7
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 13:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715953788; cv=none; b=d+0So2haPNQFKFGHU+HQthkg0Tmfsd/8JetX4U2tFr7WPZtJZMltePUFri6Qcm+R5rp1eHNF/hB5t6WTGyh5QcEfoR1q8COvoc1UEOOmG1Ndrxspv83o60tYkTibu9Nsx2aEmfOfRODHYaVX1HTMIylDFr7vkDARm05pCxR52/o=
+	t=1715953868; cv=none; b=JICDwmpHqyF/JxdskAnCjjnSEN0kJw92diLvTlpjHAFstMx9W7WP1OHO2sNz+GennphjLZvtCWZRpJuzmZbkbkRl4foSEO3h9QER9Jo4jOfrn4dMCgB8WV3VUiZjCKYfSq8Jw62ZO/1hhuWS31o6tLREyPzNx3GuQFZSXWjG1/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715953788; c=relaxed/simple;
-	bh=zfMkOZOZZjgIRP4nwmmYsQYWA3FLGwCB0g70lmT6LcQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r1y1ZfoUwgJVJBYANtakXIhb3kslKkqD9vIPRMQRAGWoeOqhObYq88TPKOurCBtjDggjHm6nDVH+Y4KdH4xyX8/cA2HcLDE2dKTlrpxT62QVeqDsG+gVv2Y2HIZZrZhcZRReiDqvo1PoIgk33wSU+xq6jdPMo5ziN3w7IoDgOpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ehP7IVIY; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/ICNmatV/n196PbAHkCh3rR4p2kraFQbw8tCOH/qr2M=; b=ehP7IVIYPNQvBLiyDwvrI7zodb
-	s1dqK41wqH0mETbvXWzraag2uqumIGbWTif/zaERrUVs8YIN7T9V7AVr0/YaYirK8cCFgqBazEBme
-	ju8TTUc0vzI2vNMEzu3zP3j9dXkTDXqRZKIVI2kyUMBljoDUip5POvdKGYHAX+5O1ECo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s7xxr-00FZu4-4B; Fri, 17 May 2024 15:49:39 +0200
-Date: Fri, 17 May 2024 15:49:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, jiri@resnulli.us, horms@kernel.org,
-	rkannoth@marvell.com, pkshih@realtek.com, larry.chiu@realtek.com
-Subject: Re: [PATCH net-next v19 01/13] rtase: Add pci table supported in
- this module
-Message-ID: <d840e007-c819-42df-bc71-536328d4f5d7@lunn.ch>
-References: <20240517075302.7653-1-justinlai0215@realtek.com>
- <20240517075302.7653-2-justinlai0215@realtek.com>
+	s=arc-20240116; t=1715953868; c=relaxed/simple;
+	bh=hrdw+xpZVHHGeNHROReDJ0lU3WDkwGrGTjm11LXGpOo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Nv6mg0K03AwnW2kXBBZla4mBUjcdLVreHPlULCg7iGON/66ZGRiGC4rRILKOH/OhJWR6FUHhxlOSLD9IseSFV9F7NWXQdo5AwWYFQzOf6lyqNLWHAhdMJAR74AR7mlZn1byIBr2++i8r2x1kl+Gw0TQvsdaocx7s2W+fnhudqNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=kXTN60hg; arc=none smtp.client-ip=185.125.188.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from hwang4-ThinkPad-T14s-Gen-2a.. (unknown [149.11.192.251])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id D0FA83FA40;
+	Fri, 17 May 2024 13:50:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1715953860;
+	bh=6gxW9Vl+576ign5vW/P5Se5+oW1Bp9cQhGUcs9R2Fk4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+	b=kXTN60hgjnDQTtlDqXdZVUPQwhojOICOTkxD51A16Pi885GfXvKjBTwqCXZCebQLt
+	 3tcLhjdp4uGRbEYbZ1OSf174Rv3zgryn1EyXWzyxT0KErlJKxPOmuD2LaavNLfE+wX
+	 CzXxuCUSTog9JeWfcYKVIWjQo8ENFSYGqh8PbOEFUvCCOKFH33lD9yYaytYlAoPwVw
+	 OvycLkTEEpx2MnLUe0eQ4uOIFBoB0yVERi+06ewsuRE6EHl1rYrCx/ZK34PcWoIi8l
+	 KdD16x1i329x7V8jY6I1qNmb9K90GMRzhw5lil7NoeDTPfd19ujV+NiyqRZC3P2DdJ
+	 ss7Wz5xCLuxpw==
+From: Hui Wang <hui.wang@canonical.com>
+To: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	anthony.l.nguyen@intel.com,
+	vitaly.lifshits@intel.com,
+	dima.ruinskiy@intel.com,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	sasha.neftin@intel.com,
+	naamax.meir@linux.intel.com
+Cc: hui.wang@canonical.com
+Subject: [iwl-net][PATCH v3] e1000e: move force SMBUS near the end of enable_ulp function
+Date: Fri, 17 May 2024 21:50:59 +0800
+Message-Id: <20240517135059.10646-1-hui.wang@canonical.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240517075302.7653-2-justinlai0215@realtek.com>
+Content-Transfer-Encoding: 8bit
 
-> + *  Below is a simplified block diagram of the chip and its relevant interfaces.
-> + *
-> + *               *************************
-> + *               *                       *
-> + *               *  CPU network device   *
-> + *               *                       *
-> + *               *   +-------------+     *
-> + *               *   |  PCIE Host  |     *
-> + *               ***********++************
-> + *                          ||
-> + *                         PCIE
-> + *                          ||
-> + *      ********************++**********************
-> + *      *            | PCIE Endpoint |             *
-> + *      *            +---------------+             *
-> + *      *                | GMAC |                  *
-> + *      *                +--++--+  Realtek         *
-> + *      *                   ||     RTL90xx Series  *
-> + *      *                   ||                     *
-> + *      *     +-------------++----------------+    *
-> + *      *     |           | MAC |             |    *
-> + *      *     |           +-----+             |    *
-> + *      *     |                               |    *
-> + *      *     |     Ethernet Switch Core      |    *
-> + *      *     |                               |    *
-> + *      *     |   +-----+           +-----+   |    *
-> + *      *     |   | MAC |...........| MAC |   |    *
-> + *      *     +---+-----+-----------+-----+---+    *
-> + *      *         | PHY |...........| PHY |        *
-> + *      *         +--++-+           +--++-+        *
-> + *      *************||****************||***********
-> + *
-> + *  The block of the Realtek RTL90xx series is our entire chip architecture,
-> + *  the GMAC is connected to the switch core, and there is no PHY in between.
+The commit 861e8086029e ("e1000e: move force SMBUS from enable ulp
+function to avoid PHY loss issue") introduces a regression on
+PCH_MTP_I219_LM18 (PCIID: 0x8086550A). Without the referred commit, the
+ethernet works well after suspend and resume, but after applying the
+commit, the ethernet couldn't work anymore after the resume and the
+dmesg shows that the NIC link changes to 10Mbps (1000Mbps originally):
 
-Given this architecture, this driver cannot be used unless there is a
-switch driver as well. This driver is nearly ready to be merged. So
-what are your plans for the switch driver? Do you have a first version
-you can post? That will reassure us you do plan to release a switch
-driver, and not use a SDK in userspace.
+    [   43.305084] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Up 10 Mbps Full Duplex, Flow Control: Rx/Tx
 
-	Andrew
+Without the commit, the force SMBUS code will not be executed if
+"return 0" or "goto out" is executed in the enable_ulp(), and in my
+case, the "goto out" is executed since FWSM_FW_VALID is set. But after
+applying the commit, the force SMBUS code will be ran unconditionally.
+
+Here move the force SMBUS code back to enable_ulp() and put it
+immediately ahead of hw->phy.ops.release(hw), this could allow the
+longest settling time as possible for interface in this function and
+doesn't change the original code logic.
+
+The issue was found on a Lenovo laptop with the ethernet hw as below:
+00:1f.6 Ethernet controller [0200]: Intel Corporation Device [8086:550a]
+(rev 20).
+
+And this patch is verified (cable plug and unplug, system suspend
+and resume) on Lenovo laptops with ethernet hw: [8086:550a],
+[8086:550b], [8086:15bb], [8086:15be], [8086:1a1f], [8086:1a1c] and
+[8086:0dc7].
+
+Fixes: 861e8086029e ("e1000e: move force SMBUS from enable ulp function to avoid PHY loss issue")
+Signed-off-by: Hui Wang <hui.wang@canonical.com>
+Acked-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+In the v3:
+addressed Paul's comment about commit header,
+ - Change CH_MTP_I219_LM18 to PCH_MTP_I219_LM18
+ - Change Link to link
+ - Add a blank line and four spaces indent for [   43.305084] e1000e 0000:00:1f.6
+ - Change immediate to immediately
+ - Add system info about reproduced the issue and verified the fix
+
+ drivers/net/ethernet/intel/e1000e/ich8lan.c | 22 +++++++++++++++++++++
+ drivers/net/ethernet/intel/e1000e/netdev.c  | 18 -----------------
+ 2 files changed, 22 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+index f9e94be36e97..2e98a2a0bead 100644
+--- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
++++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+@@ -1225,6 +1225,28 @@ s32 e1000_enable_ulp_lpt_lp(struct e1000_hw *hw, bool to_sx)
+ 	}
+ 
+ release:
++	/* Switching PHY interface always returns MDI error
++	 * so disable retry mechanism to avoid wasting time
++	 */
++	e1000e_disable_phy_retry(hw);
++
++	/* Force SMBus mode in PHY */
++	ret_val = e1000_read_phy_reg_hv_locked(hw, CV_SMB_CTRL, &phy_reg);
++	if (ret_val) {
++		e1000e_enable_phy_retry(hw);
++		hw->phy.ops.release(hw);
++		goto out;
++	}
++	phy_reg |= CV_SMB_CTRL_FORCE_SMBUS;
++	e1000_write_phy_reg_hv_locked(hw, CV_SMB_CTRL, phy_reg);
++
++	e1000e_enable_phy_retry(hw);
++
++	/* Force SMBus mode in MAC */
++	mac_reg = er32(CTRL_EXT);
++	mac_reg |= E1000_CTRL_EXT_FORCE_SMBUS;
++	ew32(CTRL_EXT, mac_reg);
++
+ 	hw->phy.ops.release(hw);
+ out:
+ 	if (ret_val)
+diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+index 3692fce20195..cc8c531ec3df 100644
+--- a/drivers/net/ethernet/intel/e1000e/netdev.c
++++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+@@ -6623,7 +6623,6 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
+ 	struct e1000_hw *hw = &adapter->hw;
+ 	u32 ctrl, ctrl_ext, rctl, status, wufc;
+ 	int retval = 0;
+-	u16 smb_ctrl;
+ 
+ 	/* Runtime suspend should only enable wakeup for link changes */
+ 	if (runtime)
+@@ -6697,23 +6696,6 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
+ 			if (retval)
+ 				return retval;
+ 		}
+-
+-		/* Force SMBUS to allow WOL */
+-		/* Switching PHY interface always returns MDI error
+-		 * so disable retry mechanism to avoid wasting time
+-		 */
+-		e1000e_disable_phy_retry(hw);
+-
+-		e1e_rphy(hw, CV_SMB_CTRL, &smb_ctrl);
+-		smb_ctrl |= CV_SMB_CTRL_FORCE_SMBUS;
+-		e1e_wphy(hw, CV_SMB_CTRL, smb_ctrl);
+-
+-		e1000e_enable_phy_retry(hw);
+-
+-		/* Force SMBus mode in MAC */
+-		ctrl_ext = er32(CTRL_EXT);
+-		ctrl_ext |= E1000_CTRL_EXT_FORCE_SMBUS;
+-		ew32(CTRL_EXT, ctrl_ext);
+ 	}
+ 
+ 	/* Ensure that the appropriate bits are set in LPI_CTRL
+-- 
+2.34.1
+
 
