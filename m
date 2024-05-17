@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-96924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F6188C8399
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 11:34:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85C1D8C8371
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 11:27:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B55C1C214C0
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:34:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42A6F281D05
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:27:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ACF5224D6;
-	Fri, 17 May 2024 09:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78947200A9;
+	Fri, 17 May 2024 09:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="o/Rff7Tf"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="cQ87vlEp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD3C20B02
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 09:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB602375B;
+	Fri, 17 May 2024 09:27:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715938330; cv=none; b=oJT6CGHpDj0AyTSR0IKDKMjevx5Vz2lV0yOub4pD1A3DdKxZurAXnwMFBsZ9jNgW6QWBJcpTJlOa7t/Tk6ixCf32xUQmAdsaVYGbUaciPmNNWhCiPGKamskdPGZ1lRThOzAu12hcVK2DkI5EDcHLZgREoEDJu0OpXZe5ntTOAcQ=
+	t=1715938071; cv=none; b=hRTN8wvPBAuIF4avvP90B/JIlsSwHZ8bOU8rfn172AD9bScxHUxz32dCKWXrY3YSj+4F9KL+/F0mhpNQTwFUfgaxAQXD3TqhshOqG3zDCRWBWU6qgKofmzeuT3ijjMvO0cUdNNuPQhMfMOfbI7EtbHxCuQ5YNNtdhf6/H1QpgC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715938330; c=relaxed/simple;
-	bh=pLvfs2wkuPdWUKvnQbF+as0kuqbXNTuPzoK72qeAdQM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mK5St/fLoM/3S0MfoINJulKt4PyiZy8rKaEAhUxQYQwKPmHZPJPPv5dD+/J/3SIJLd07thZHTf7ZIV9beirCC43egFhPyKBQtZZhtxPig83bMk8a9Viu5SjIu5Gk5eV7YTUOlRmjrAbvHf9S2ksd01TYk8VkHm+cp4LYHc1EuEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=o/Rff7Tf; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1s7twW-005L3q-9k; Fri, 17 May 2024 11:32:00 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-ID:Date:Subject:Cc:To:From;
-	bh=GktP9RrtK0vi05fOjnT9zi0SQ8iuCCBEsFoEskXI23U=; b=o/Rff7TfwisIau/2rbG4RQC+9u
-	NFqMhK1GiYxLc3bfVwkF0bqX0tVDp0FjUF0JUb7hyxdA62+oVDtQ6bh68/RhR8pKTwuAaLRLHuSNt
-	Qvyxmr09vO2NrWT0wCjUAWqnkhN+q/ZDmHBg315lKJuR2LJb25c2owtWK0Kk9qnF2PwfGxqRZ4s/g
-	Q2Uh6eDew0cgeWBo0NDxigSBM5HIffYokIq5NcY74arqMYRHK1VXnJSr1E93jDhHN0wesK88pcKi/
-	CZJh3etkt1KnbfXNHFosZx47n3Sf/Euf6oeFWPPxiFofhXIns4nriExChIVwQ14JUPGJH7dtkGRSn
-	RyswGCIg==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1s7twV-0002B1-IS; Fri, 17 May 2024 11:31:59 +0200
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1s7twQ-0042Jz-IF; Fri, 17 May 2024 11:31:54 +0200
-From: Michal Luczaj <mhal@rbox.co>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kuniyu@amazon.com,
-	shuah@kernel.org
-Subject: [PATCH v3 net 2/2] selftest: af_unix: Make SCM_RIGHTS into OOB data.
-Date: Fri, 17 May 2024 11:27:02 +0200
-Message-ID: <20240517093138.1436323-3-mhal@rbox.co>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240517093138.1436323-1-mhal@rbox.co>
-References: <20240517093138.1436323-1-mhal@rbox.co>
+	s=arc-20240116; t=1715938071; c=relaxed/simple;
+	bh=QEFcnNgSW7VFtUZqNDydUFcpK6MlFDy6iAS+JARgbiI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S4XwOMxShV2/i4h1PsHnD3aY2DcGUCAbp0RD4EzR8PEMlLLuWMsPs93cX0bFAvDPrtSHntLqzykPqTd+ffk/++QhFkogGUo/2/bndUwsHWg3ZdCKis4f8/Y7KqsqGk0ycaBHt5QoZ/yq9YAqzU4SjC7jg9jg3F7ZncaxVXd6uNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=cQ87vlEp; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1715938070; x=1747474070;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Qyol9/0fjUwTBCD/lu/C9S5eG6ZgCLgdeBC9QyKdG8E=;
+  b=cQ87vlEpylFBo2562e+4PY3LRBChwOKpdzOdmzpar47O/fs72i/vH6LB
+   9zryhUMKNt2koINo5iKs2PHPVa2rXVu9xsjN5bP8b2SA0WS8DLydtW4dO
+   wXlSQpZOi3wj6tFr/xpQ5crk6CT9Onvr6RfBB4Bm8CEGwrSr9nF/ICTNO
+   U=;
+X-IronPort-AV: E=Sophos;i="6.08,167,1712620800"; 
+   d="scan'208";a="401796677"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2024 09:27:46 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:5031]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.175:2525] with esmtp (Farcaster)
+ id 2f9ded0c-3c22-44e3-8595-2cae7b44526a; Fri, 17 May 2024 09:27:45 +0000 (UTC)
+X-Farcaster-Flow-ID: 2f9ded0c-3c22-44e3-8595-2cae7b44526a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 17 May 2024 09:27:43 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.119.6.241) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 17 May 2024 09:27:39 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <samsun1006219@gmail.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>,
+	<xrivendell7@gmail.com>, <kuniyu@amazon.com>
+Subject: Re: [Linux kernel bug] UBSAN: shift-out-of-bounds in dctcp_update_alpha
+Date: Fri, 17 May 2024 18:27:30 +0900
+Message-ID: <20240517092730.34061-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CAEkJfYNJM=cw-8x7_Vmj1J6uYVCWMbbvD=EFmDPVBGpTsqOxEA@mail.gmail.com>
+References: <CAEkJfYNJM=cw-8x7_Vmj1J6uYVCWMbbvD=EFmDPVBGpTsqOxEA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,40 +76,22 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWB001.ant.amazon.com (10.13.139.187) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
+From: Sam Sun <samsun1006219@gmail.com>
+Date: Fri, 17 May 2024 13:03:18 +0800
+> Dear developers and maintainers,
+> 
+> We encountered a shift-out-of-bounds bug while using our modified
+> syzkaller. It was tested against the latest upstream kernel (6.9). The
+> kernel was compiled by clang 14.0.0, and kernel config and C repro are
+> attached to this email. Kernel crash log is listed below.
+> ------------[ cut here ]------------
+> UBSAN: shift-out-of-bounds in net/ipv4/tcp_dctcp.c:143:12
 
-scm_rights.c covers various test cases for inflight file descriptors
-and garbage collector for AF_UNIX sockets.
+Just for the record, I posted a patch:
 
-Currently, SCM_RIGHTS messages are sent with 3-bytes string, and it's
-not good for MSG_OOB cases, as SCM_RIGTS cmsg goes with the first 2-bytes,
-which is non-OOB data.
-
-Let's send SCM_RIGHTS messages with 1-byte character to pack SCM_RIGHTS
-into OOB data.
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- tools/testing/selftests/net/af_unix/scm_rights.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/net/af_unix/scm_rights.c b/tools/testing/selftests/net/af_unix/scm_rights.c
-index bab606c9f1eb..2bfed46e0b19 100644
---- a/tools/testing/selftests/net/af_unix/scm_rights.c
-+++ b/tools/testing/selftests/net/af_unix/scm_rights.c
-@@ -197,8 +197,8 @@ void __send_fd(struct __test_metadata *_metadata,
- 	       const FIXTURE_VARIANT(scm_rights) *variant,
- 	       int inflight, int receiver)
- {
--#define MSG "nop"
--#define MSGLEN 3
-+#define MSG "x"
-+#define MSGLEN 1
- 	struct {
- 		struct cmsghdr cmsghdr;
- 		int fd[2];
--- 
-2.45.0
-
+https://lore.kernel.org/netdev/20240517091626.32772-1-kuniyu@amazon.com/
 
