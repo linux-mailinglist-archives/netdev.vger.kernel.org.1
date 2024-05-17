@@ -1,106 +1,214 @@
-Return-Path: <netdev+bounces-96850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E1C8C809C
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:32:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53BF68C80A9
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:47:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 922201C20F5A
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 05:32:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7233B1C209DE
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 05:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F4310A0B;
-	Fri, 17 May 2024 05:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pefdQCGE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7555810A17;
+	Fri, 17 May 2024 05:47:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D93E101DA
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 05:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF10D28D
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 05:46:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715923917; cv=none; b=GrtbQclmlqmO7w4+R6sx9XZoO+NiDLnztEqBQFp4KHYFrECqdWIku0UtboKXh6Y1IDP3eVyt5JoRhAWhz+mNJ2wXCsHI2isMX964vT5cUlgjjT+d7/6cdG4wUt7kPORbJtW+As11iLW8csN+5yD30XAw/hwL+zbXu7yXooHlAqU=
+	t=1715924823; cv=none; b=kj/nwMcGlEhBVjkpA9jDG7hoSfRu7XJySXCE5FMZkv3RtpCUlvgTPW61v3Oje3zEJsIsZpEdPSqc0iTrBgGrwuOgnaghY8x8FEpd++gm0JwISr7GwEGWkVk8FwtDsNMYsJBc67ho9jBodYTFV+zmYZmChE49ZEWE139eAXqYYnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715923917; c=relaxed/simple;
-	bh=absqiGfvycRZSEK8hB0pz9iDnBjitUNULBRZy+DAKEE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=THWjUzDhMCe6xhId85BrpH6Q5vmx+uZWkkj54YL2NwlOFnuuR7Frkw+M1YVv9q1TuRPqo10HSU5H/S6Ds/h8QROiQeJZmmUa6b5CBCFGOovvPMO5sdTldjuZePmmQGvJfImRq/M6r/oNn8kwHnJcRrw5L9R7I3i1n6qLku9bYbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pefdQCGE; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: ameryhung@gmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1715923914;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EWiH1ntwk6P5FhwO/W2vcC5tpmZ5f241W3D/djzN3rk=;
-	b=pefdQCGEmDzYbSY4gBkHkM8E8m88P60tW27DIGiTGaMQI4RUwK3xEMVz5b3toh+BRlkowk
-	98kWdJtBhGhz52w7BYpeoVK5p6/AdIEs0HYIURemFHqxyqldOQItQBzrAIB9u6dS+iFxwc
-	hfRSHvPPCI8cEWc1A+uY/KayugUWQYQ=
-X-Envelope-To: bpf@vger.kernel.org
-X-Envelope-To: yangpeihao@sjtu.edu.cn
-X-Envelope-To: daniel@iogearbox.net
-X-Envelope-To: andrii@kernel.org
-X-Envelope-To: martin.lau@kernel.org
-X-Envelope-To: sinquersw@gmail.com
-X-Envelope-To: toke@redhat.com
-X-Envelope-To: jhs@mojatatu.com
-X-Envelope-To: jiri@resnulli.us
-X-Envelope-To: sdf@google.com
-X-Envelope-To: xiyou.wangcong@gmail.com
-X-Envelope-To: yepeilin.cs@gmail.com
-X-Envelope-To: netdev@vger.kernel.org
-Message-ID: <7e6f6e7e-bcec-44a2-99d6-ec923f2f305c@linux.dev>
-Date: Thu, 16 May 2024 22:30:32 -0700
+	s=arc-20240116; t=1715924823; c=relaxed/simple;
+	bh=iCZZTbNzevzI2T3SSDcGtKKDNcUPP2gNu+3ZomsN0Mw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=o7lYHstBJkgbeEwKAV7b/pMxYaiv/08MwVNeP0ocrSFA2tLRg9nHCiT8/Z4ccREPlR9L1WxlwUqwKWXemiUwDhMk2ACAGaC19szwPj4Hm0sOJcDLYFlnQMLuVH7gIxTxfPNIEDfcuWi3Ym53eQK1x398Ctw36fYzOmF+QZa/nQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (ip5f5aef9a.dynamic.kabel-deutschland.de [95.90.239.154])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A8F9F61E5FE05;
+	Fri, 17 May 2024 07:45:39 +0200 (CEST)
+Message-ID: <cdab9b76-e935-4b38-9b5c-496ff8fdfb64@molgen.mpg.de>
+Date: Fri, 17 May 2024 07:45:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH v8 03/20] bpf: Allow struct_ops prog to return
- referenced kptr
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@kernel.org, sinquersw@gmail.com,
- toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com,
- xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com, netdev@vger.kernel.org
-References: <20240510192412.3297104-1-amery.hung@bytedance.com>
- <20240510192412.3297104-4-amery.hung@bytedance.com>
- <CAMB2axMa6sGcn69QhzkoG5JijDF+QpBuyWO9aae7hrLrM_EZvA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v2] e1000e: move force SMBUS near the
+ end of enable_ulp function
+To: Hui Wang <hui.wang@canonical.com>
+References: <20240508120604.233166-1-hui.wang@canonical.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAMB2axMa6sGcn69QhzkoG5JijDF+QpBuyWO9aae7hrLrM_EZvA@mail.gmail.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ kuba@kernel.org, anthony.l.nguyen@intel.com, vitaly.lifshits@intel.com,
+ dima.ruinskiy@intel.com, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, sasha.neftin@intel.com, naamax.meir@linux.intel.com,
+ Jacob Keller <jacob.e.keller@intel.com>, Oliver Sang
+ <oliver.sang@intel.com>, Zhang Rui <rui.zhang@intel.com>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240508120604.233166-1-hui.wang@canonical.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 5/16/24 7:06 PM, Amery Hung wrote:
-> Arguments and the return for helpers and kfuncs, where we transition
-> between bpf program and kernel, can be tagged, so that we can do
-> proper checks. struct_ops shares the similar property in that sense,
-> but currently lacks the ability to tag the return.
+Dear Hui,
+
+
+Thank you for your patch.
+
+Am 08.05.24 um 14:06 schrieb Hui Wang:
+> The commit 861e8086029e ("e1000e: move force SMBUS from enable ulp
+> function to avoid PHY loss issue") introduces a regression on
+> CH_MTP_I219_LM18 (PCIID: 0x8086550A). Without the referred commit, the
+
+*P*CH
+
+> ethernet works well after suspend and resume, but after applying the
+> commit, the ethernet couldn't work anymore after the resume and the
+> dmesg shows that the NIC Link changes to 10Mbps (1000Mbps originally):
+
+1.  s/Link/link/
+2.  “couldn’t work” means the reduced bandwidth?
+3.  Please add a blank line and maybe indent the past with four spaces.
+
+> [   43.305084] e1000e 0000:00:1f.6 enp0s31f6: NIC Link is Up 10 Mbps Full Duplex, Flow Control: Rx/Tx
 > 
-> A discussion was that, here we assume the returning referenced kptr
-> "may be null" because that's what Qdisc expects. 
+> Without the commit, the force SMBUS code will not be executed if
+> "return 0" or "goto out" is executed in the enable_ulp(), and in my
+> case, the "goto out" is executed since FWSM_FW_VALID is set. But after
+> applying the commit, the force SMBUS code will be ran unconditionally.
+> 
+> Here move the force SMBUS code back to enable_ulp() and put it
+> immediate ahead of hw->phy.ops.release(hw), this could allow the
 
-As a return value of a kernel function, it usually needs to return error. I was 
-thinking "may be null" is actually the common case if it is not ERR_PTR.
+immediate*l*?
 
-> I think it would make sense to only allow it when the return is explicitly
-> tagged with MAY_BE_NULL. How about doing so in the stub function name?
+> longest settling time as possible for interface in this function and
+> doesn't change the original code logic.
 
-I think this is something internal and qdisc is the only case now. The default 
-is something that could be improved later as a followup and not necessary a blocker?
+Re-ordering code to achieve some waiting time sounds like, it’s not 100 
+% sure, that the problem won’t occur again?
 
-But, yeah, if it is obvious to make the return ptr expectation/tagging 
-consistent to how __nullable means to the argument, it would be nice. Tagging 
-the stub function name like "__ret_null"? That should work. I think it will need 
-some plumbing from bpf_struct_ops.c to the verifier here.
+Could you please document your test system?
+
+Just a side note: Booting Linux 6.9-rc5+ *with kexec* on Supermicro 
+Super Server/X13SAE, BIOS 2.0 10/17/2022 with the network device below, 
+it also came up only with 10 Mbps and Ethernet did not work, for example 
+`ping`. I conjectured though, that the non-working part was due to the 
+switch configuration not allowing 10 Mbps.
+
+     00:1f.6 Ethernet controller [0200]: Intel Corporation Ethernet 
+Connection (17) I219-LM [8086:1a1c] (rev 11)
+
+I didn’t find the time to further analyze and report the issue.
+
+Also could this also be related to the regression reported by the kernel 
+test robot [1]?
+
+     00:19.0 Ethernet controller: Intel Corporation Ethernet Connection 
+(3) I218-V (rev 03)
+
+
+> Fixes: 861e8086029e ("e1000e: move force SMBUS from enable ulp function to avoid PHY loss issue")
+> Signed-off-by: Hui Wang <hui.wang@canonical.com>
+> Acked-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+> Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> ---
+> In the v2:
+>   Change "this commit" to "the referred commit" in the commit header
+>   Fix a potential infinite loop if ret_val is not zero
+>   
+>   drivers/net/ethernet/intel/e1000e/ich8lan.c | 22 +++++++++++++++++++++
+>   drivers/net/ethernet/intel/e1000e/netdev.c  | 18 -----------------
+>   2 files changed, 22 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+> index f9e94be36e97..2e98a2a0bead 100644
+> --- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
+> +++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+> @@ -1225,6 +1225,28 @@ s32 e1000_enable_ulp_lpt_lp(struct e1000_hw *hw, bool to_sx)
+>   	}
+>   
+>   release:
+> +	/* Switching PHY interface always returns MDI error
+> +	 * so disable retry mechanism to avoid wasting time
+> +	 */
+> +	e1000e_disable_phy_retry(hw);
+> +
+> +	/* Force SMBus mode in PHY */
+> +	ret_val = e1000_read_phy_reg_hv_locked(hw, CV_SMB_CTRL, &phy_reg);
+> +	if (ret_val) {
+> +		e1000e_enable_phy_retry(hw);
+> +		hw->phy.ops.release(hw);
+> +		goto out;
+> +	}
+> +	phy_reg |= CV_SMB_CTRL_FORCE_SMBUS;
+> +	e1000_write_phy_reg_hv_locked(hw, CV_SMB_CTRL, phy_reg);
+> +
+> +	e1000e_enable_phy_retry(hw);
+> +
+> +	/* Force SMBus mode in MAC */
+> +	mac_reg = er32(CTRL_EXT);
+> +	mac_reg |= E1000_CTRL_EXT_FORCE_SMBUS;
+> +	ew32(CTRL_EXT, mac_reg);
+> +
+>   	hw->phy.ops.release(hw);
+>   out:
+>   	if (ret_val)
+> diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+> index 3692fce20195..cc8c531ec3df 100644
+> --- a/drivers/net/ethernet/intel/e1000e/netdev.c
+> +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+> @@ -6623,7 +6623,6 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
+>   	struct e1000_hw *hw = &adapter->hw;
+>   	u32 ctrl, ctrl_ext, rctl, status, wufc;
+>   	int retval = 0;
+> -	u16 smb_ctrl;
+>   
+>   	/* Runtime suspend should only enable wakeup for link changes */
+>   	if (runtime)
+> @@ -6697,23 +6696,6 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
+>   			if (retval)
+>   				return retval;
+>   		}
+> -
+> -		/* Force SMBUS to allow WOL */
+> -		/* Switching PHY interface always returns MDI error
+> -		 * so disable retry mechanism to avoid wasting time
+> -		 */
+> -		e1000e_disable_phy_retry(hw);
+> -
+> -		e1e_rphy(hw, CV_SMB_CTRL, &smb_ctrl);
+> -		smb_ctrl |= CV_SMB_CTRL_FORCE_SMBUS;
+> -		e1e_wphy(hw, CV_SMB_CTRL, smb_ctrl);
+> -
+> -		e1000e_enable_phy_retry(hw);
+> -
+> -		/* Force SMBus mode in MAC */
+> -		ctrl_ext = er32(CTRL_EXT);
+> -		ctrl_ext |= E1000_CTRL_EXT_FORCE_SMBUS;
+> -		ew32(CTRL_EXT, ctrl_ext);
+>   	}
+>   
+>   	/* Ensure that the appropriate bits are set in LPI_CTRL
+
+
+Kind regards,
+
+Paul
+
+
+[1]: 
+https://lore.kernel.org/intel-wired-lan/202405150942.f9b873b1-oliver.sang@intel.com/
 
