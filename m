@@ -1,99 +1,150 @@
-Return-Path: <netdev+bounces-96975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B3708C8837
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 16:41:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA63D8C8839
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 16:42:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C6681C23AF8
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 14:41:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7FB31C237BC
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 14:42:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D201A2C2E;
-	Fri, 17 May 2024 14:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 309A41A2C2E;
+	Fri, 17 May 2024 14:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TUflN7Bx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vCnJ+/Uv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F861863F;
-	Fri, 17 May 2024 14:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B26399
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 14:42:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715956889; cv=none; b=DE3aYHZXCIbk6DzSqeR4SrQV777z+SUl34DLlyEQ0aJj5xCvooklI5T9Pndlo2Nk5LxFJCP+y5zNZHF7ROUbyk2Tciw3bWLgi+nLJpeYP6mFghb+qPCfwLQtnTv3Lx9OSTisEPXSZJ2TmLDU2wUBsP2l1Ea1Mor7cKXtrRwzG7Q=
+	t=1715956947; cv=none; b=CZbIVmAX5xtXY8XHM3a9UI6aK7aAXDyAv4e3TUYND/9grNlLtQ96CT9SRo+cI+fnJzGKgtIDbM00T0ukQydI0nMJSnL7GHQmNM53SAjtAy3C/eRV3Jpmr1qNFV2VfJCG2S9PxOOG/fBLSokZKEFNY2eIYZZGkqzKNkxg0NmXLSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715956889; c=relaxed/simple;
-	bh=76Nt0O2hctz5gqI5NrYMMVOVC+VAz16TUsv7w9gd1iY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cG2IbGolpebmiWWylJmt/QpYAfc/RHIgJuW/UhBV5q4PxLpnQckN9IkYawHL6nKez2kthSw7rGOwB8Rx/F82rl6tFJ3HAdYrqHUHER2cQQJqmmjnj8jgmu5Y14d3+D/UfVeJgDl4PPcN+NtJVCISKmqU2C9mlGMR2FAQ/mIJdJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TUflN7Bx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 376B1C2BD10;
-	Fri, 17 May 2024 14:41:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715956888;
-	bh=76Nt0O2hctz5gqI5NrYMMVOVC+VAz16TUsv7w9gd1iY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TUflN7BxRMGJTVijHZpyqwKnd6B/W90RmJmUGRJmKbk2QeYjM7SjmPB+dKpVx5yNU
-	 RgPl/hZuI734O8eyUe2k8kB48/lWR3sgSFdbsByc8Lj1og86bmAA+DS9Jnu5parkpy
-	 8KnE93m8MmEhenEYZH3M0UclX5WnmR7pIGDCpMD4Z7UkB/4m/wg04Kz0KWp/2pxuMd
-	 ELG1wNnngskTUu9eKCGo6FxLyQzkjOIJfzP8vB8m/kDSq0ZJUEj37FaXRWTVMOLvQB
-	 FX/OiWMld1wx7c9ndnBsd5Ljy7pCtCO89nHz9Wz3RNvqKyTLSzmXZXMZwfBVUcyOzm
-	 wupiO3BAmEIUw==
-Date: Fri, 17 May 2024 15:41:24 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Udit Kumar <u-kumar1@ti.com>
-Cc: vigneshr@ti.com, nm@ti.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Kip Broadhurst <kbroadhurst@ti.com>
-Subject: Re: [PATCH] dt-bindings: net: dp8386x: Add MIT license along with
- GPL-2.0
-Message-ID: <20240517-fastball-stable-9332cae850ea@spud>
-References: <20240517104226.3395480-1-u-kumar1@ti.com>
- <20240517-poster-purplish-9b356ce30248@spud>
+	s=arc-20240116; t=1715956947; c=relaxed/simple;
+	bh=ibSlwJS/xLQTxRE6+nhrgDFVHxT8ns7GhMClbT1AoNY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UoZ87S64ENQL+KbTLg3aDH3EpZb/uCsbvxroKkb3WbPVQuDFW7CZ68sm/Juz0/383VmjjtVVVQ3DqW5CTDadBEOowQ7Ay4rtiIRC0NBI13hrjc18WHClX1k3gf630/cGKO4aPuRSIlEon7RhGtw5lyUTVN+K7Z8RMvB2e1asRYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vCnJ+/Uv; arc=none smtp.client-ip=209.85.217.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-47efd204baeso36702137.3
+        for <netdev@vger.kernel.org>; Fri, 17 May 2024 07:42:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715956944; x=1716561744; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z/Y42Q4cTcacy9xZmErwJ9Nk8cQMAhDtmPLEq95nkcA=;
+        b=vCnJ+/UvhXlbKuOSj8FWM4aKjvsyngagiVLkwok5MHUyab4Ai0J0fYtFdfu18qmIuX
+         Me3twv2h/Mt8ZREfEfMBpnY7DkOKeNZQljnle0yNa/5Z97ZsMt0xomABMpshm6yGepdD
+         oDOu9RfSMOV9LzXkUP0ICVHEaiYdDe5TWGgiG0S0Vk/lYE6d5z8UfO22dWGd8uIPyHbN
+         FS7IOXbUTG5nKtpW+7MMiWbTQ60mBl0eUS5q2o1BINuMuNxkJS/tahNdoMZ5OfsNrxPP
+         L5Bon316reknpeRkpANJV3BfqLX6Jtc+/iF5KcKxNpc5Wh5HBDa8MP2ADkK8fdOv9SpN
+         Ph0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715956944; x=1716561744;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Z/Y42Q4cTcacy9xZmErwJ9Nk8cQMAhDtmPLEq95nkcA=;
+        b=rklhh+uyQtmitJ2J8nXNcZRZbxOIlud2OCfSft7d41S6QvNYN8IWfpQMYsO+Ifp+CT
+         zOI9v6AJJZ+Is5bHYshUOfye1Krnx9EqEene8hEvreCZzc20VNWmvgAPpw4nTroe8KiY
+         DDWkXQGA5WAktmsobZIR8uNuxVHapGTzHa18EUcl6yekkD/rcTgrrfrGMzgS+7Doc+Ry
+         QpW7GJCYOG6sgDC25s+Ck5MVUvER6PEuLyPhNu8khRlyqzuZq28y0NQ8mQWXja9UHRZE
+         C0c0mOCOOlCj+zJRH+iXX0edtFy+VuCbfqIJNT/VuiW+dNnupLrRcHqw3hw9V14Iqgne
+         SjMg==
+X-Forwarded-Encrypted: i=1; AJvYcCWXD+szeCZRUIdzIL7H0n+nglWieRuMYAwcU/gmb0LgghgllC7C5aertF3/r1o+RE5O1mFgvfBVsjMYYrEma5Z/wJUxHiiY
+X-Gm-Message-State: AOJu0Ywb+97qNsLm2YaAyIO90txZ4HxAuvxSSqqoKxZP+ihrIykhIMLd
+	Z8BnAM5M3Zro7rtl+K9Du0KKkEmtwiDqpJQK4vMqmv5SkRrA66cy15T3IyiDjO9nPkfjJ1fPwlj
+	hoPkSvmcrB7u2oOsuZb5pL7zKGkjie6JTxgEz
+X-Google-Smtp-Source: AGHT+IHXmZJWp/9+KqHlOTH0i3dBz+cOyec50dBBwXp04uQH3j7PN8Vwvziba1f+1X98Xu53tdbUdbhB63WhkdB6vzo=
+X-Received: by 2002:a05:6102:14aa:b0:47f:2c10:24e2 with SMTP id
+ ada2fe7eead31-48077e5bfaemr25400905137.28.1715956944279; Fri, 17 May 2024
+ 07:42:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="SwZyRbd43sg29RgW"
-Content-Disposition: inline
-In-Reply-To: <20240517-poster-purplish-9b356ce30248@spud>
-
-
---SwZyRbd43sg29RgW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240517085031.18896-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20240517085031.18896-1-kerneljasonxing@gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Fri, 17 May 2024 10:42:01 -0400
+Message-ID: <CADVnQymvBSUFcc307N_geXgosJgnrx4nziFcpnX-=jU7PronwA@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] tcp: break the limitation of initial receive window
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: edumazet@google.com, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, davem@davemloft.net, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 17, 2024 at 03:39:20PM +0100, Conor Dooley wrote:
-> On Fri, May 17, 2024 at 04:12:26PM +0530, Udit Kumar wrote:
-> > Modify license to include dual licensing as GPL-2.0-only OR MIT
-> > license for TI specific phy header files. This allows for Linux
-> > kernel files to be used in other Operating System ecosystems
-> > such as Zephyr or FreeBSD.
->=20
-> What's wrong with BSD-2-Clause, why not use that?
+On Fri, May 17, 2024 at 4:50=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> From: Jason Xing <kernelxing@tencent.com>
+>
+> Since in 2018 one commit a337531b942b ("tcp: up initial rmem to 128KB and
+> SYN rwin to around 64KB") limited received window within 65535, most CDN
+> team would not benefit from this change because they cannot have a large
+> window to receive a big packet one time especially in long RTT.
+>
+> According to RFC 7323, it says:
+>   "The maximum receive window, and therefore the scale factor, is
+>    determined by the maximum receive buffer space."
+>
+> So we can get rid of this 64k limitation and let the window be tunable if
+> the user wants to do it within the control of buffer space. Then many
+> companies, I believe, can have the same behaviour as old days. Besides,
+> there are many papers conducting various interesting experiments which
+> have something to do with this window and show good outputs in some cases=
+.
+>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  net/ipv4/tcp_output.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 95caf8aaa8be..95618d0e78e4 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -232,7 +232,7 @@ void tcp_select_initial_window(const struct sock *sk,=
+ int __space, __u32 mss,
+>         if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_workaround_signed_win=
+dows))
+>                 (*rcv_wnd) =3D min(space, MAX_TCP_WINDOW);
+>         else
+> -               (*rcv_wnd) =3D min_t(u32, space, U16_MAX);
+> +               (*rcv_wnd) =3D space;
 
-I cut myself off, I meant to say:
-What's wrong with BSD-2-Clause, the standard dual license for
-bindings, why not use that?
+Hmm, has this patch been tested? This doesn't look like it would work.
 
---SwZyRbd43sg29RgW
-Content-Type: application/pgp-signature; name="signature.asc"
+Please note that RFC 7323 says in
+https://datatracker.ietf.org/doc/html/rfc7323#section-2.2 :
 
------BEGIN PGP SIGNATURE-----
+   The window field in a segment where the SYN bit is set (i.e., a <SYN>
+   or <SYN,ACK>) MUST NOT be scaled.
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZkdslAAKCRB4tDGHoIJi
-0kTrAQDJ7y89owej/45s2YYuPVZOx3PEXF5YdiHU463IdepEaAEAkgZueywNtp2R
-mfeQk9vGdrOgG7SojmF/AuMPTL0j2Qk=
-=PCfe
------END PGP SIGNATURE-----
+Since the receive window field in a SYN is unscaled, that means the
+TCP wire protocol has no way to convey a receive window in the SYN
+that is bigger than 64KBytes.
 
---SwZyRbd43sg29RgW--
+That is why this code places a limit of U16_MAX on the value here.
+
+If you want to advertise a bigger receive window in the SYN, you'll
+need to define a new TCP option type, and write an IETF Internet Draft
+and/or RFC standardizing the new option.
+
+If you would like to, instead, submit a patch with a comment
+explaining that this U16_MAX limit is inherent in the RFC 7323 wire
+protocol specification, that could make sense.
+
+best regards,
+neal
 
