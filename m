@@ -1,189 +1,103 @@
-Return-Path: <netdev+bounces-96920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2E178C836B
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 11:27:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD0B8C839A
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 11:34:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 210A61C227C5
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:27:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D03A1F215EB
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 09:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A369219E1;
-	Fri, 17 May 2024 09:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14BFB2561F;
+	Fri, 17 May 2024 09:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="e6Vm9Xf9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.35])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EF636120;
-	Fri, 17 May 2024 09:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.216.63.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E812A2260A
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 09:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715938020; cv=none; b=UfKUzPkw9Y4csZjQszm4p3q18nfr45e3ZMLGELx/8bVCqHTFpLKB0m0WtBGjy6tqUYJDM3g8ABYl8ggcf8KWqv3k5Lw6rzl4j+/bFRd79m/COeMsBwSuhccl1PAwyFcf9ElUnFtZSK+2INia4LY2iDnw56WL41MhnE6Ym7fDuBk=
+	t=1715938331; cv=none; b=Y6eKOKc0vorYalaKSwLYLkUuwR2rN2u3gCFAMSpuzuOs6J/9V9Hs6gcNrh9RciXWq+2YrVQWovC5C0cRHl2zIet1LFajdKl4FcM6PZ8F4SWHQrF86tYBlnnUfxXtjlaLVUjtvdbgaWwsMV4rByooMpWvVO5IcltQIzQ/VgU75Bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715938020; c=relaxed/simple;
-	bh=dDE02QwcEJgIaN7EsPYpJ/E8ZjuShWfIOgaAUYFyGrI=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=a98cMfGdPPq6D2zLx62mfYil3PiSSrytH6ifJgnsiZM3XI24+hADVXAe/uSW2SSaXhGXOLCuNsS/5a6iUtHwrFmSl33YlRvqCXZYPMeYM8P3RUcyNoUNF0lgrjwZj0O5nV/sIQD9EYlBepKlDeMg0pLXZYC04sPfInKoEy8Q+h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=63.216.63.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4VghRs6vrLz5R9kB;
-	Fri, 17 May 2024 17:26:49 +0800 (CST)
-Received: from xaxapp01.zte.com.cn ([10.88.99.176])
-	by mse-fl1.zte.com.cn with SMTP id 44H9Qa5F065180;
-	Fri, 17 May 2024 17:26:36 +0800 (+08)
-	(envelope-from ye.xingchen@zte.com.cn)
-Received: from mapi (xaxapp01[null])
-	by mapi (Zmail) with MAPI id mid31;
-	Fri, 17 May 2024 17:26:39 +0800 (CST)
-Date: Fri, 17 May 2024 17:26:39 +0800 (CST)
-X-Zmail-TransId: 2af9664722cf5bc-59194
-X-Mailer: Zmail v1.0
-Message-ID: <20240517172639229ec5bN7VBV7SGEHkSK5K6f@zte.com.cn>
+	s=arc-20240116; t=1715938331; c=relaxed/simple;
+	bh=0VSs6s25YpDWA8+PUcSMIIAWEqznkx6FwMCqso2TSqY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HcpBuXslMBY8iilqZVxbFYxkPjztbjNS0kK/XRr3h9iNjPCxhAMtDKnA4ND901l8GD68UIII4RuROzT6WuwYzVxQRoK7sPJpfoScUgUE66A1mRhgVmYY+O6FTKZLS36KKlJr6Fk7+K+lqHgFnSYyYolafqUjb9ult2aPTRV3D18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=e6Vm9Xf9; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1s7twb-005Aq9-A2; Fri, 17 May 2024 11:32:05 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
+	:Cc:To:From; bh=pdLij7cy7oNK5VAHF4tDtz6YtUMerokbo3fN/MwLl5M=; b=e6Vm9Xf9D6u1D
+	8zvQZS692G9IbyBnbs86JV+12l8Wd6rRix6lKyjJPC2Z9qVKHe4+gLf2xAcrl7eUn82rU9HP0uU9j
+	03BFfKsE8EOswNUCb9a1ErFBQw/Izdb3pk80ij1sFIvOPquWEoCDCQTU4CalFnaT7RkjKBvKD4QBZ
+	mH1CGjJqxj5D88V+/kPUZSiQXrwd9rfU992jgeoHGbEWMffxrLLzKD3W59QuzrxRMobUTP8zbH9ZQ
+	x961FtSnNWIbY1c60g89+nQ1RRD1iS66Gy8J0e/AaBkuNbxkwdXtHCGz2ZlZmnGO3YiUpS6Dvb30z
+	a43j+ErijXgv7kA6F6WnA==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1s7twW-0002B7-TR; Fri, 17 May 2024 11:32:05 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1s7twP-0042Jz-IW; Fri, 17 May 2024 11:31:53 +0200
+From: Michal Luczaj <mhal@rbox.co>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kuniyu@amazon.com,
+	shuah@kernel.org,
+	Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH v3 net 0/2] af_unix: Fix GC and improve selftest
+Date: Fri, 17 May 2024 11:27:00 +0200
+Message-ID: <20240517093138.1436323-1-mhal@rbox.co>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <ye.xingchen@zte.com.cn>
-To: <davem@davemloft.net>
-Cc: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <corbet@lwn.net>, <dsahern@kernel.org>, <ncardwell@google.com>,
-        <soheil@google.com>, <mfreemon@cloudflare.com>, <lixiaoyan@google.com>,
-        <david.laight@aculab.com>, <haiyangz@microsoft.com>,
-        <ye.xingchen@zte.com.cn>, <netdev@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <xu.xin16@zte.com.cn>, <zhang.yunkai@zte.com.cn>, <fan.yu9@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0XSBpY21wOiBBZGQgaWNtcF90aW1lc3RhbXBfaWdub3JlX2FsbCB0byBjb250cm9sIElDTVBfVElNRVNUQU1Q?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 44H9Qa5F065180
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 664722D9.002/4VghRs6vrLz5R9kB
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: YeXingchen <ye.xingchen@zte.com.cn>
+Series deals with AF_UNIX garbage collector mishandling some in-flight
+graph cycles. Embryos carrying OOB packets with SCM_RIGHTS cause issues.
 
-The CVE-1999-0524 became a medium risk vulnerability in May of this year.
+Patch 1/2 fixes the memory leak.
+Patch 2/2 tweaks the selftest for a better OOB coverage.
 
-In some embedded systems, firewalls such as iptables maybe cannot to use.
-For embedded systems where firewalls can't be used and devices that don't
-require icmp timestamp, provide the icmp_timestamp_ignore_all interface,
-which ignores all icmp timestamp messages to circumvent the vulnerability.
+v3:
+  - Patch 1/2: correct the commit message (Kuniyuki)
 
-Signed-off-by: YeXingchen <ye.xingchen@zte.com.cn>
----
- Documentation/networking/ip-sysctl.rst                   | 6 ++++++
- .../networking/net_cachelines/netns_ipv4_sysctl.rst      | 1 +
- include/net/netns/ipv4.h                                 | 1 +
- include/uapi/linux/sysctl.h                              | 1 +
- net/ipv4/icmp.c                                          | 8 ++++++++
- net/ipv4/sysctl_net_ipv4.c                               | 9 +++++++++
- 6 files changed, 26 insertions(+)
+v2: https://lore.kernel.org/netdev/20240516145457.1206847-1-mhal@rbox.co/
+  - Patch 1/2: remove WARN_ON_ONCE() (Kuniyuki)
+  - Combine both patches into a series (Kuniyuki)
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index bd50df6a5a42..41eb3de61659 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -1441,6 +1441,12 @@ icmp_ratelimit - INTEGER
+v1: https://lore.kernel.org/netdev/20240516103049.1132040-1-mhal@rbox.co/
 
- 	Default: 1000
+Kuniyuki Iwashima (1):
+  selftest: af_unix: Make SCM_RIGHTS into OOB data.
 
-+icmp_timestamp_ignore_all - BOOLEAN
-+	If set non-zero, then the kernel will ignore all ICMP TIMESTAMP
-+	requests sent to it.
-+
-+	Default: 0
-+
- icmp_msgs_per_sec - INTEGER
- 	Limit maximal number of ICMP packets sent per second from this host.
- 	Only messages whose type matches icmp_ratemask (see below) are
-diff --git a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
-index 9b87089a84c6..ed72f67c8f72 100644
---- a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
-+++ b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
-@@ -38,6 +38,7 @@ u8                              sysctl_icmp_ignore_bogus_error_responses
- u8                              sysctl_icmp_errors_use_inbound_ifaddr                                                
- int                             sysctl_icmp_ratelimit                                                                
- int                             sysctl_icmp_ratemask                                                                 
-+u8                              sysctl_icmp_timestamp_ignore_all
- u32                             ip_rt_min_pmtu                               -                   -                   
- int                             ip_rt_mtu_expires                            -                   -                   
- int                             ip_rt_min_advmss                             -                   -                   
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index c356c458b340..7364c469e7eb 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -113,6 +113,7 @@ struct netns_ipv4 {
- 	u8 sysctl_icmp_echo_ignore_broadcasts;
- 	u8 sysctl_icmp_ignore_bogus_error_responses;
- 	u8 sysctl_icmp_errors_use_inbound_ifaddr;
-+	u8 sysctl_icmp_timestamp_ignore_all;
- 	int sysctl_icmp_ratelimit;
- 	int sysctl_icmp_ratemask;
+Michal Luczaj (1):
+  af_unix: Fix garbage collection of embryos carrying OOB with
+    SCM_RIGHTS
 
-diff --git a/include/uapi/linux/sysctl.h b/include/uapi/linux/sysctl.h
-index 8981f00204db..ef8640947f4e 100644
---- a/include/uapi/linux/sysctl.h
-+++ b/include/uapi/linux/sysctl.h
-@@ -426,6 +426,7 @@ enum
- 	NET_TCP_ALLOWED_CONG_CONTROL=123,
- 	NET_TCP_MAX_SSTHRESH=124,
- 	NET_TCP_FRTO_RESPONSE=125,
-+	NET_IPV4_ICMP_TIMESTAMP_IGNORE_ALL = 126,
- };
+ net/unix/garbage.c                            | 23 +++++++++++--------
+ .../selftests/net/af_unix/scm_rights.c        |  4 ++--
+ 2 files changed, 16 insertions(+), 11 deletions(-)
 
- enum {
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index ab6d0d98dbc3..6fa5c26cf402 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -1152,6 +1152,11 @@ EXPORT_SYMBOL_GPL(icmp_build_probe);
- static enum skb_drop_reason icmp_timestamp(struct sk_buff *skb)
- {
- 	struct icmp_bxm icmp_param;
-+	struct net *net;
-+
-+	if (READ_ONCE(net->ipv4.sysctl_icmp_timestamp_ignore_all))
-+		return SKB_NOT_DROPPED_YET;
-+
- 	/*
- 	 *	Too short.
- 	 */
-@@ -1469,6 +1474,9 @@ static int __net_init icmp_sk_init(struct net *net)
- 	net->ipv4.sysctl_icmp_echo_enable_probe = 0;
- 	net->ipv4.sysctl_icmp_echo_ignore_broadcasts = 1;
-
-+	/* Control parameters for TIMESTAMP replies. */
-+	net->ipv4.sysctl_icmp_timestamp_ignore_all = 0;
-+
- 	/* Control parameter - ignore bogus broadcast responses? */
- 	net->ipv4.sysctl_icmp_ignore_bogus_error_responses = 1;
-
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index 162a0a3b6ba5..b002426c3d9c 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -651,6 +651,15 @@ static struct ctl_table ipv4_net_table[] = {
- 		.mode		= 0644,
- 		.proc_handler	= ipv4_ping_group_range,
- 	},
-+	{
-+		.procname	= "icmp_timestamp_ignore_all",
-+		.data		= &init_net.ipv4.sysctl_icmp_timestamp_ignore_all,
-+		.maxlen		= sizeof(u8),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dou8vec_minmax,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ONE
-+	},
- #ifdef CONFIG_NET_L3_MASTER_DEV
- 	{
- 		.procname	= "raw_l3mdev_accept",
 -- 
-2.25.1
+2.45.0
+
 
