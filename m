@@ -1,161 +1,143 @@
-Return-Path: <netdev+bounces-96997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 192958C898F
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:47:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 113FD8C89A7
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:57:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDA711F212A4
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:47:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25E2B1C2111E
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:57:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2263B12FB28;
-	Fri, 17 May 2024 15:46:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D015C12F58E;
+	Fri, 17 May 2024 15:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qPsMCEt7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i6QFgWcF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1FED12F5A3;
-	Fri, 17 May 2024 15:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6C6399
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 15:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715960805; cv=none; b=gD8HYbVUMThpuyZ8qsBs01Umko4W99irkrqfgoYL5QZ31P+g+zVhyR+0DoDFCF15cmaqKMiv4xZEK2YF51cfOy9PBkzfZ8scdLOMPD6oeFmouXvGb9nr73C2QmWIR8xR/dti6z3AowYxTM9+o2qmF/aI56LCOCtd67Mc8lOVNoA=
+	t=1715961432; cv=none; b=Q9YygMt9pOZI97TIgHtjE99EJzAQxIQeoiffoyQqCVXvCZkV1HEikOUxl5tHnDiaLs54aHwJIwa96MohW3LTdJ2NTqbXmFQcP5TCNM4nxjm7M3KBAyK23qPQtD0zVvzhEUh7Jtw0s9FaWXTYI7BwsfE+hpo87MbcjwfxSMQXNGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715960805; c=relaxed/simple;
-	bh=EpkhHazhMZ2fwuDobsplhqZvRLo+YDrsHfPiI4NpGv4=;
+	s=arc-20240116; t=1715961432; c=relaxed/simple;
+	bh=1Tz5L7JmgM0dqfyVC49JGKC9pQ7e3W3qDnAlnrlWMUw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tKACy+u1+YztLmWQdjIiCnkGINYxyXb6Ut+09sAoH/qghxGCCU01rG3+LAFET8qc4JwFGgFIxIAxZryqeu80xnpu35x0RC0EodpbWWvApr86E2ooFn8RYqZM6vWE0/WPeIuRQiBUEqaKiBu+vmZWSXuzZ9HDN1J32+/geUD7pw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qPsMCEt7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 111FAC4AF67;
-	Fri, 17 May 2024 15:46:35 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=gPVhsfS5de9zGh4e+qSQWVaW5UrO5IFU4YrWGLYn3P3vaen4ixVz0U5kkqLhXdHjJbae7AdLGa6QkLNZ54ge/YPHmJtd93Lmfk8q9Ont/r+3w9h4LT6Dh26cmg655L6NY1anTm7I1wpHOx8AzJzYjdIzH/s21jPj7xcLv1UXVps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i6QFgWcF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D430EC2BD10;
+	Fri, 17 May 2024 15:57:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715960804;
-	bh=EpkhHazhMZ2fwuDobsplhqZvRLo+YDrsHfPiI4NpGv4=;
+	s=k20201202; t=1715961432;
+	bh=1Tz5L7JmgM0dqfyVC49JGKC9pQ7e3W3qDnAlnrlWMUw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qPsMCEt72a5yEc9EgEt6r+yjYEkV9BPAe1xRO8Mnx0FWUaiC9lvILRG04VRJZWw48
-	 6oi3NhTWACIBMVCpaYFZBzGgjvog9Y2TBWGjwbtg4as/XPHXHwLo0KeYmlix1Tn8jJ
-	 4VeuQ6blAMOigvYJG5R5zp9Slb7rxBGhcGmnSRhVLw3HY2TMrkHzFxNCfy5TM2KOl7
-	 3goZJdJ9Tr8Zr9DvcjkvtgL8pUnnLDDUJrwFLygDVMOs6MaI5wNJFVtqt+sDPTLZKE
-	 8D0fBgS7iYh917OFn63YR+c8+L84i4xjQMciA0V/P7pqzz6WoJLNRgmPCqv4y8iZTU
-	 E4tvvudi2KGsA==
-Date: Fri, 17 May 2024 16:46:32 +0100
-From: Will Deacon <will@kernel.org>
-To: Klara Modin <klarasmodin@gmail.com>
-Cc: Mike Rapoport <rppt@kernel.org>, linux-kernel@vger.kernel.org,
-	Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	b=i6QFgWcFKdzr2D139V5sJc1nSG+9LvQkba9WNRKeT4csx69yb5DXujfDawx7tIZlt
+	 d1fyCh0r+4d/GgrhKebXp8Yt1feNVT+bD3rM3bO9JdGoN+tCm5RIFOIdCL8ieD2llB
+	 6E8E/lOB7/2r3iZQ+S9uZpzEkKJMTkZ/GEO3xvSQsQPpeirYXJRLqjlggN7vba6mkt
+	 vlHZggjUOMGZgLoKJberbM9tpslCh0J5QkCQCkUA5GB5kATrhXiifnptxe74FcWAgx
+	 G4z8zDV+A5striJa9wXNJgY8YkZOieJ6uuElnwPqP3YFOWiEdPCvnQsunrJ1juR+MO
+	 +MB45+fnp95vw==
+Date: Fri, 17 May 2024 16:57:07 +0100
+From: Simon Horman <horms@kernel.org>
+To: Hagar Hemdan <hagarhem@amazon.com>
+Cc: Norbert Manthey <nmanthey@amazon.de>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Donald Dutile <ddutile@redhat.com>,
-	Eric Chanudet <echanude@redhat.com>,
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Liviu Dudau <liviu@dudau.co.uk>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Sam Ravnborg <sam@ravnborg.org>, Song Liu <song@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>, bpf@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org, linux-mm@kvack.org,
-	linux-modules@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	loongarch@lists.linux.dev, netdev@vger.kernel.org,
-	sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH RESEND v8 16/16] bpf: remove CONFIG_BPF_JIT dependency on
- CONFIG_MODULES of
-Message-ID: <20240517154632.GA320@willie-the-truck>
-References: <20240505160628.2323363-1-rppt@kernel.org>
- <20240505160628.2323363-17-rppt@kernel.org>
- <7983fbbf-0127-457c-9394-8d6e4299c685@gmail.com>
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
+	hagarhem@amazon.de
+Subject: Re: [PATCH] net: esp: cleanup esp_output_tail_tcp() in case of
+ unsupported ESPINTCP
+Message-ID: <20240517155707.GG443576@kernel.org>
+References: <20240516080309.1872-1-hagarhem@amazon.com>
+ <20240517122238.GE443576@kernel.org>
+ <20240517131757.GA12613@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7983fbbf-0127-457c-9394-8d6e4299c685@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20240517131757.GA12613@amazon.com>
 
-Hi Klara,
+On Fri, May 17, 2024 at 01:17:57PM +0000, Hagar Hemdan wrote:
+> On Fri, May 17, 2024 at 01:22:38PM +0100, Simon Horman wrote:
+> > On Thu, May 16, 2024 at 08:03:09AM +0000, Hagar Hemdan wrote:
+> > > xmit() functions should consume skb or return error codes in error
+> > > paths.
+> > > When the configuration "CONFIG_INET_ESPINTCP" is not used, the
+> > > implementation of the function "esp_output_tail_tcp" violates this rule.
+> > > The function frees the skb and returns the error code.
+> > > This change removes the kfree_skb from both functions, for both
+> > > esp4 and esp6.
+> > > 
+> > > This should not be reachable in the current code, so this change is just
+> > > a cleanup.
+> > > 
+> > > This bug was discovered and resolved using Coverity Static Analysis
+> > > Security Testing (SAST) by Synopsys, Inc.
+> > > 
+> > > Fixes: e27cca96cd68 ("xfrm: add espintcp (RFC 8229)")
+> > > Signed-off-by: Hagar Hemdan <hagarhem@amazon.com>
+> > 
+> > Hi Hagar,
+> > 
+> > If esp_output() may be the x->type->output callback called from esp_output()
 
-On Fri, May 17, 2024 at 01:00:31AM +0200, Klara Modin wrote:
-> On 2024-05-05 18:06, Mike Rapoport wrote:
-> > From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+Hi Hagar,
+
+FTR, I meant to say "If ... called from xfrm_output_one()",
+but I don't think that effects the direction of the conversation
+at this point.
+
+> > then I agree that this seems to be a problem as it looks like a double free
+> > may occur.
 > > 
-> > BPF just-in-time compiler depended on CONFIG_MODULES because it used
-> > module_alloc() to allocate memory for the generated code.
+> > However, I believe that your proposed fix introduces will result in skb
+> > being leaked leak in the case of esp_output_done() calling
+> > esp_output_tail_tcp(). Perhaps a solution is for esp_output_done()
+> > to free the skb if esp_output_tail_tcp() fails.
 > > 
-> > Since code allocations are now implemented with execmem, drop dependency of
-> > CONFIG_BPF_JIT on CONFIG_MODULES and make it select CONFIG_EXECMEM.
+> > I did not analyse other call-chains, but I think such analysis is needed.
 > > 
-> > Suggested-by: Björn Töpel <bjorn@kernel.org>
-> > Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
-> > ---
-> >   kernel/bpf/Kconfig | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/kernel/bpf/Kconfig b/kernel/bpf/Kconfig
-> > index bc25f5098a25..f999e4e0b344 100644
-> > --- a/kernel/bpf/Kconfig
-> > +++ b/kernel/bpf/Kconfig
-> > @@ -43,7 +43,7 @@ config BPF_JIT
-> >   	bool "Enable BPF Just In Time compiler"
-> >   	depends on BPF
-> >   	depends on HAVE_CBPF_JIT || HAVE_EBPF_JIT
-> > -	depends on MODULES
-> > +	select EXECMEM
-> >   	help
-> >   	  BPF programs are normally handled by a BPF interpreter. This option
-> >   	  allows the kernel to generate native code when a program is loaded
+> > ...
+> Hi Simon,
 > 
-> This does not seem to work entirely. If build with BPF_JIT without module
-> support for my Raspberry Pi 3 B I get warnings in my kernel log (easiest way
-> to trigger it seems to be trying to ssh into it, which fails).
+> I see all calls to esp_output_tail_tcp() is surrounded by the condition
+> "x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP" which I see
+> it is related to enabling of CONFIG_INET_ESPINTCP configuration 
+> (introduced in this commit e27cca96cd68 ("xfrm: add espintcp (RFC 8229)").
+> 
+> For calling of x->type->output (resolved to esp_output()) in
+> xfrm_output_one(), I see there is no double free here as esp_output()
+> calls esp_output_tail() which calls esp_output_tail_tcp() only if 
+> x->encap->encap_type == TCP_ENCAP_ESPINTCP which points to the first 
+> implementation of esp_output_tail_tcp(). This first definition 
+> doesn't free skb.
+> 
+> So my understanding is the 2nd esp_output_tail_tcp() should not be
+> called and this is why I called WARN_ON() as this func is unreachable.
+> Removing free(skb) here is just for silencing double free Coverity 
+> false positive.
+> Is there something else I miss?
 
-Thanks for the report. I was able to reproduce this using QEMU and it
-looks like the problem is because bpf_arch_text_copy() silently fails
-to write to the read-only area as a result of patch_map() faulting and
-the resulting -EFAULT being chucked away.
+Thanks, I missed the important detail that calls to esp_output_tail_tcp()
+are guarded by "x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP".
 
-Please can you try the diff below?
+Assuming that condition is always false if CONFIG_INET_ESPINTCP is not set,
+then I agree with your analysis and I don't see any problems with your
+patch.
 
-Will
-
---->8
-
-diff --git a/arch/arm64/kernel/patching.c b/arch/arm64/kernel/patching.c
-index 255534930368..94b9fea65aca 100644
---- a/arch/arm64/kernel/patching.c
-+++ b/arch/arm64/kernel/patching.c
-@@ -36,7 +36,7 @@ static void __kprobes *patch_map(void *addr, int fixmap)
- 
-        if (image)
-                page = phys_to_page(__pa_symbol(addr));
--       else if (IS_ENABLED(CONFIG_STRICT_MODULE_RWX))
-+       else if (IS_ENABLED(CONFIG_EXECMEM))
-                page = vmalloc_to_page(addr);
-        else
-                return addr;
-
+It might be worth calling out in the commit message that the WARN_ON
+is added because esp_output_tail_tcp() should never be called if
+CONFIG_INET_ESPINTCP is not set.
 
