@@ -1,132 +1,144 @@
-Return-Path: <netdev+bounces-96987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F7F78C8914
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:12:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 375DB8C893D
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 17:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 077311F26E93
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:12:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6890C1C22452
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 15:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F846A8AD;
-	Fri, 17 May 2024 15:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF45812CDBB;
+	Fri, 17 May 2024 15:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LwnM3V7e"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1026996A
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 15:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988E212D77C;
+	Fri, 17 May 2024 15:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715958710; cv=none; b=Et4fYg6XNfpOu+CKSO2uEF5mKzMgP3P5fZa39Wuu5x/oC9HqxReWry8nVCvAjloh3onDCyOOk9AOpq6nCNWaA9VmU2JQuSmlIhaGONEC1lOCAlfRzzP7f5SiVKizD9MKvkPeAuO4oGTM2bDwAxa1z8EWpoKnn5eQp1PKA1jr9UI=
+	t=1715959282; cv=none; b=PMwhTVG/W2UYCRrxUSoW6gC/K4ggkayemIzOmVvVUU5M/KNgMC2hiIoCpk++b4fuBF5lLAjCrwIq1RhrjpHOclEzwoMxfh0CgD+9TCuWORskmISZPlXGnpDxG00THFu5bFIR+MJUTGmv3JPdOZ8irY/10bNhWBNCWarw9WCgysQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715958710; c=relaxed/simple;
-	bh=JoaVRlStp8RrWSxyOCouhUz7t6oVS8UocMnIZpXzY4c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uHO7BE7fJfORh+NDpZfJpSGFaW7orraLkH7GnnrpmyJxpNwF000js+fWjdk/iusJRK9DeJx+Uf9n4IgcZUD0NIwAlIfoXCIno5O3W9PpP4IED84HQJf5sq5iXJ9TMUM+FpGoeb2lby7jvsL6qmu3yz8NzlCVE9Buh9ZJrKJuF9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garver.life; spf=fail smtp.mailfrom=garver.life; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garver.life
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=garver.life
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-528-FktqgA7BPACkrmQQshGugg-1; Fri,
- 17 May 2024 11:11:38 -0400
-X-MC-Unique: FktqgA7BPACkrmQQshGugg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 84C8D38C6163;
-	Fri, 17 May 2024 15:11:38 +0000 (UTC)
-Received: from egarver-mac.redhat.com (unknown [10.22.9.146])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B0E58740F;
-	Fri, 17 May 2024 15:11:37 +0000 (UTC)
-From: Eric Garver <eric@garver.life>
-To: netdev@vger.kernel.org
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH net-next] netfilter: nft_fib: allow from forward/input without iif selector
-Date: Fri, 17 May 2024 11:11:37 -0400
-Message-ID: <20240517151137.89270-1-eric@garver.life>
+	s=arc-20240116; t=1715959282; c=relaxed/simple;
+	bh=wOMTQcCv4RXt7oOImw1VgaZvQGn5ykZzqAP4bE+CoMU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GBcXrKDLEb0ejP2Qq9GmlCClZLuGesiwuhvmoobFJ1iguqRGZp2dbEk1WghVjkhMYE3Vst8q8uQOsa2lZQh1UWdXtHt531KjAfD27K/4ouMRgCrwOaFAmQ+XboK2aUJ950OAcWvcytTyyjOphpvHRy9dFgCBHz/8DGQv2IjTCWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LwnM3V7e; arc=none smtp.client-ip=217.70.178.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay4-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::224])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id 35ED8C3359;
+	Fri, 17 May 2024 15:13:06 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1B596E0006;
+	Fri, 17 May 2024 15:12:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1715958778;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AeTxGtF/EgpBohuFwBuKpus55RrUZBrBwjxJhjj16pM=;
+	b=LwnM3V7eJkdBSvC60vIBB/gpmPTBTg45+MHoX5J3y8e6MIDgjtuDAaAZJ8PO2C/IkLxcT7
+	dgYAigX8S8JnySY+TiK9KFRyJ6asu9Vr9N/2FCiaz+xr0LPFBi76HAX4kqY50rxRcjf97D
+	A8kKU94tWLDMIy6Ey/QDQfO93fYSp5Hq7pqCKrKJtymojYj/tuG6J7U3mhyLW8JBzWDXux
+	bCtkutz/3IvYXnPvFFAIygoP3SvO5+iupK52xZyOdetxcgIw7p2g33CRPx59cdGfUOspqN
+	SZnpVfQ+i8F1qBDKJIKM9OJN6ho4rPhKDmk/fnQC6OIJ5LRkaY9o/f7ry0mhtg==
+Date: Fri, 17 May 2024 17:12:54 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu
+ Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh
+ <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [PATCH net-next v12 12/13] net: ethtool: tsinfo: Add support
+ for hwtstamp provider and get/set hwtstamp config
+Message-ID: <20240517171254.1e316e69@kmaincent-XPS-13-7390>
+In-Reply-To: <20240504103305.GD3167983@kernel.org>
+References: <20240430-feature_ptp_netnext-v12-0-2c5f24b6a914@bootlin.com>
+	<20240430-feature_ptp_netnext-v12-12-2c5f24b6a914@bootlin.com>
+	<20240504103305.GD3167983@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: garver.life
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=WINDOWS-1252; x-default=true
+X-GND-Sasl: kory.maincent@bootlin.com
 
-This removes the restriction of needing iif selector in the
-forward/input hooks for fib lookups when requested result is
-oif/oifname.
+On Sat, 4 May 2024 11:33:05 +0100
+Simon Horman <horms@kernel.org> wrote:
 
-Removing this restriction allows "loose" lookups from the forward hooks.
+> Hi Kory,
+>=20
+> A few lines beyond this hunk, within the "if (hwtstamp)" block,
+> is the following:
+>=20
+> 		cfg->qualifier =3D dev->hwtstamp->qualifier;
+>=20
+> Now that dev->hwtstamp is managed using RCU, I don't think it is correct
+> to dereference it directly like this. Rather, the hwtstamp local variable,
+> which has rcu_dereference'd this pointer should be used:
+>=20
+> 		 cfg->qualifier =3D hwtstamp->qualifier;
+>=20
+> Flagged by Sparse.
 
-Signed-off-by: Eric Garver <eric@garver.life>
----
- net/ipv4/netfilter/nft_fib_ipv4.c | 3 +--
- net/ipv6/netfilter/nft_fib_ipv6.c | 3 +--
- net/netfilter/nft_fib.c           | 8 +++-----
- 3 files changed, 5 insertions(+), 9 deletions(-)
+Yes indeed, thanks for the report.
 
-diff --git a/net/ipv4/netfilter/nft_fib_ipv4.c b/net/ipv4/netfilter/nft_fib=
-_ipv4.c
-index 9eee535c64dd..975a4a809058 100644
---- a/net/ipv4/netfilter/nft_fib_ipv4.c
-+++ b/net/ipv4/netfilter/nft_fib_ipv4.c
-@@ -116,8 +116,7 @@ void nft_fib4_eval(const struct nft_expr *expr, struct =
-nft_regs *regs,
- =09=09fl4.daddr =3D iph->daddr;
- =09=09fl4.saddr =3D get_saddr(iph->saddr);
- =09} else {
--=09=09if (nft_hook(pkt) =3D=3D NF_INET_FORWARD &&
--=09=09    priv->flags & NFTA_FIB_F_IIF)
-+=09=09if (nft_hook(pkt) =3D=3D NF_INET_FORWARD)
- =09=09=09fl4.flowi4_iif =3D nft_out(pkt)->ifindex;
-=20
- =09=09fl4.daddr =3D iph->saddr;
-diff --git a/net/ipv6/netfilter/nft_fib_ipv6.c b/net/ipv6/netfilter/nft_fib=
-_ipv6.c
-index 36dc14b34388..f95e39e235d3 100644
---- a/net/ipv6/netfilter/nft_fib_ipv6.c
-+++ b/net/ipv6/netfilter/nft_fib_ipv6.c
-@@ -30,8 +30,7 @@ static int nft_fib6_flowi_init(struct flowi6 *fl6, const =
-struct nft_fib *priv,
- =09=09fl6->daddr =3D iph->daddr;
- =09=09fl6->saddr =3D iph->saddr;
- =09} else {
--=09=09if (nft_hook(pkt) =3D=3D NF_INET_FORWARD &&
--=09=09    priv->flags & NFTA_FIB_F_IIF)
-+=09=09if (nft_hook(pkt) =3D=3D NF_INET_FORWARD)
- =09=09=09fl6->flowi6_iif =3D nft_out(pkt)->ifindex;
-=20
- =09=09fl6->daddr =3D iph->saddr;
-diff --git a/net/netfilter/nft_fib.c b/net/netfilter/nft_fib.c
-index 37cfe6dd712d..b58f62195ff3 100644
---- a/net/netfilter/nft_fib.c
-+++ b/net/netfilter/nft_fib.c
-@@ -35,11 +35,9 @@ int nft_fib_validate(const struct nft_ctx *ctx, const st=
-ruct nft_expr *expr,
- =09switch (priv->result) {
- =09case NFT_FIB_RESULT_OIF:
- =09case NFT_FIB_RESULT_OIFNAME:
--=09=09hooks =3D (1 << NF_INET_PRE_ROUTING);
--=09=09if (priv->flags & NFTA_FIB_F_IIF) {
--=09=09=09hooks |=3D (1 << NF_INET_LOCAL_IN) |
--=09=09=09=09 (1 << NF_INET_FORWARD);
--=09=09}
-+=09=09hooks =3D (1 << NF_INET_PRE_ROUTING) |
-+=09=09=09(1 << NF_INET_LOCAL_IN) |
-+=09=09=09(1 << NF_INET_FORWARD);
- =09=09break;
- =09case NFT_FIB_RESULT_ADDRTYPE:
- =09=09if (priv->flags & NFTA_FIB_F_IIF)
+>=20
+> ...
+>=20
+> > diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c =20
+>=20
+> ...
+>=20
+> > +static int ethnl_tsinfo_dump_one_dev(struct sk_buff *skb, struct
+> > net_device *dev,
+> > +				     struct netlink_callback *cb)
+> > +{
+> > +	struct ethnl_tsinfo_dump_ctx *ctx =3D (void *)cb->ctx;
+> > +	struct ptp_clock *ptp;
+> > +	int ret;
+> > +
+> > +	netdev_for_each_ptp_clock_start(dev, ctx->pos_phcindex, ptp,
+> > +					ctx->pos_phcindex) {
+> > +		ret =3D ethnl_tsinfo_dump_one_ptp(skb, dev, cb, ptp);
+> > +		if (ret < 0 && ret !=3D -EOPNOTSUPP)
+> > +			break;
+> > +		ctx->pos_phcqualifier =3D
+> > HWTSTAMP_PROVIDER_QUALIFIER_PRECISE;
+> > +	}
+> > +
+> > +	return ret; =20
+>=20
+> Perhaps it is not possible, but if the loop iterates zero times then
+> ret will be used uninitialised here.
+
+Yes thanks!
+
+Regards,
 --=20
-2.43.0
-
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
