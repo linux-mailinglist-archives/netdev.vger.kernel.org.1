@@ -1,191 +1,145 @@
-Return-Path: <netdev+bounces-96855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1740A8C80BB
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:55:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5BC08C80C1
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 07:59:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD601F21D0E
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 05:55:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87AF61F21479
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 05:59:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F451171A;
-	Fri, 17 May 2024 05:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B461118D;
+	Fri, 17 May 2024 05:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PCqKECc/"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="JEjYnpL7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B75B11170D;
-	Fri, 17 May 2024 05:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD74413AC5
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 05:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715925334; cv=none; b=PB/S5e+JTQ1AK5IWrICEC6yTjsOkf0JPzf/Cd6Z0VRf1D0pnaaEbxLDNvm5DmaRbfE0Ngqm4xxmsJALSBQ76i5f0CfcIbwkNM/NxcfgfpAQesq3y1L0iy8HSAwOvcq/wN2f0mfvBxzM9TBd68Owyfia13crsRmxjbGkqAYBIYxE=
+	t=1715925592; cv=none; b=cs3k+hyFtXznVPo1JMAB9w4eSAcr4CQTeNxZhxPL2+BIQ83vqXQ8pFNb8iPV3giwcdMHjODiyO3HBNTqbaK2u4EXWwk/kjcKH2CdfZyg6yWGVFBknKymlnzQLmhudVcB+5sdl0ztpWRgtZzBxfYlWdIbl3CYDsXkMzOChdvTzZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715925334; c=relaxed/simple;
-	bh=YqE3BWStvb9uNIMxbcNHdjLQhxDoQuJlDFCqiJH5ZgI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ULK0J5ZVcA4e+4C6w781wtOfR0jqkrJLZDUTe7sQcX+CRGM2GgWgPmJV631/EwNVGAEqgJieCumHTmG/s6BY78MeOgfb8/1rItBT/OycNsfmWuj4ebBZtmNi2o4c+BPFnY25hrKkkcOw4YdYon4XwwoEtHOJmAcv2JrpRMqtqD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PCqKECc/; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715925332; x=1747461332;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YqE3BWStvb9uNIMxbcNHdjLQhxDoQuJlDFCqiJH5ZgI=;
-  b=PCqKECc/agYK21CisuksiHMyrlaF6aP0ZaP5+izQwPaNLebSkKZQ3ddv
-   mdAcrVd3sa7S/igk4aosSlIRrpQ4f7SWEF3Au7J/mjwmSWhbTv7jRfdXH
-   vGo/WOjt9ehlrZzD1WNX0Vi5We2iRxF8OB4UhM4b8TSu8DSiEPN83Q1ML
-   WoEwjDjQ/F9blz8+6Snb6EXz7LXHzNIFxgsxJuSHBPO3jCdA9fIodcnqj
-   GFDzTT9YocpghTp5sVV7iNHIcWyP3e7c48C9UW3wBicdmLN9Paipzojyk
-   lHJ8Qqvcj6DQHI4a1NyjSy1HbVVIXdVNtZtcKm9h0YCR0uFbeeUokDG/z
-   g==;
-X-CSE-ConnectionGUID: Pt41iigzRYi7pCA9U74stw==
-X-CSE-MsgGUID: LntxiFcHSxSlTHp+N8Fa3A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="11567858"
-X-IronPort-AV: E=Sophos;i="6.08,166,1712646000"; 
-   d="scan'208";a="11567858"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 22:55:31 -0700
-X-CSE-ConnectionGUID: jQD61+B+Qn6h7Oi/iQlnfg==
-X-CSE-MsgGUID: OzWH72DnQJWCLQrytcA//A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,166,1712646000"; 
-   d="scan'208";a="36421681"
-Received: from unknown (HELO 108735ec233b) ([10.239.97.151])
-  by orviesa003.jf.intel.com with ESMTP; 16 May 2024 22:55:27 -0700
-Received: from kbuild by 108735ec233b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s7qYg-0000IZ-1t;
-	Fri, 17 May 2024 05:55:15 +0000
-Date: Fri, 17 May 2024 13:49:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: Hou Tao <houtao@huaweicloud.com>, netdev@vger.kernel.org,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Davide Caratti <dcaratti@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org, houtao1@huawei.com
-Subject: Re: [PATCH] net/sched: unregister root_lock_key in the error path of
- qdisc_alloc()
-Message-ID: <202405171311.SyRzzQjC-lkp@intel.com>
-References: <20240516133035.1050113-1-houtao@huaweicloud.com>
+	s=arc-20240116; t=1715925592; c=relaxed/simple;
+	bh=DPM6VFpVQ8ouz24TF1UVE+4yRBEKbz3V/D/TgB9ijwc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iDpjF2Gh8OEQsojOGcwRSbqKFajxyy8DlECpNCfdUsaWjsfEfVtjEXNWveGklQvcwW5UbnkQBxGkQW9Vm3KNDKquQwh7cN9xDiWvvhsVLWiaCYTxqRZv7dzA68PJUD3dgM0i924qMxBlWaroiTbXXv8NgP2EslORIwwRTlVpIhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=JEjYnpL7; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1s7qd1-004kuG-6L; Fri, 17 May 2024 07:59:39 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=GfzglJlYlciWbxuYO7od6iZDt2abNzo1gKWwJNAJEiU=; b=JEjYnpL7WcrZUCzsXJ7rBX+Rfj
+	/J78XZ2K0/k5EBt4EjIi0qOBWlEkZ/tBocwpXefgvRWSSa2pwhMXYjZSp/xt6YKim5LLA/nCar/lr
+	A2lccONy0bIlqKhDb9himptIUTlzz+NnqFaDBXSUkpLEGhcbqCAU7d8M93lFKXY9JsJvSSVTMSmyl
+	wv9tNyOfrKeANCb48VyjF5qTTUm3A33pdK9iWUQjgs/j3LmajIRuRct0bh+NKp/IoFc4ROmI26+wI
+	XgreV9aAJgbGGEoiubcp7SApiWKTg7gQE5tJXPgda0bt3j75PNgZxXbP+WwE1Ogfmjpup8djQ5maP
+	MZANRM4Q==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1s7qcz-0000Pt-Rh; Fri, 17 May 2024 07:59:37 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1s7qcg-004R6s-5I; Fri, 17 May 2024 07:59:18 +0200
+Message-ID: <734273bc-2415-43b7-9873-26416aab8900@rbox.co>
+Date: Fri, 17 May 2024 07:59:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240516133035.1050113-1-houtao@huaweicloud.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/2] af_unix: Fix garbage collection of embryos
+ carrying OOB with SCM_RIGHTS
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org
+References: <20240516145457.1206847-2-mhal@rbox.co>
+ <20240517014529.94140-1-kuniyu@amazon.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20240517014529.94140-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Hou,
+On 5/17/24 03:45, Kuniyuki Iwashima wrote:
+> From: Michal Luczaj <mhal@rbox.co>
+> Date: Thu, 16 May 2024 16:50:09 +0200
+>> GC attempts to explicitly drop oob_skb before purging the hit list.
+> 
+> Sorry for not catching these in v1,
+> 
+> nit: s/oob_skb/oob_skb's reference/
 
-kernel test robot noticed the following build errors:
+Argh, sorry, I've copy-pasted my own misformulation.
 
-[auto build test ERROR on v6.9]
-[cannot apply to net/main net-next/main linus/master next-20240517]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+>> The problem is with embryos: kfree_skb(u->oob_skb) is never called on an
+>> embryo socket, as those sockets are not directly stacked by the SCC walk.
+> 
+> ", as ..." is not correct and can be just removed.  Here we walk
+> through embryos as written in the next paragraph but we forget
+> dropping oob_skb's refcnt.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Hou-Tao/net-sched-unregister-root_lock_key-in-the-error-path-of-qdisc_alloc/20240516-213538
-base:   v6.9
-patch link:    https://lore.kernel.org/r/20240516133035.1050113-1-houtao%40huaweicloud.com
-patch subject: [PATCH] net/sched: unregister root_lock_key in the error path of qdisc_alloc()
-config: openrisc-defconfig (https://download.01.org/0day-ci/archive/20240517/202405171311.SyRzzQjC-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240517/202405171311.SyRzzQjC-lkp@intel.com/reproduce)
+Oh, I agree we walk through embryos. I wrote that embryos are not _stacked_
+by the SCC walk, i.e. embryos don't appear on the `vertex_stack`. But I
+think you're right, such comment of mine would be incorrect anyway. So,
+removing and resending.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405171311.SyRzzQjC-lkp@intel.com/
+>> The python script below [0] sends a listener's fd to its embryo as OOB
+>> data.  While GC does collect the embryo's queue, it fails to drop the OOB
+>> skb's refcount.  The skb which was in embryo's receive queue stays as
+>> unix_sk(sk)->oob_skb and keeps the listener's refcount [1].
+>>
+>> Tell GC to dispose embryo's oob_skb.
+>>
+>> [0]:
+>> from array import array
+>> from socket import *
+>>
+>> addr = '\x00unix-oob'
+>> lis = socket(AF_UNIX, SOCK_STREAM)
+>> lis.bind(addr)
+>> lis.listen(1)
+>>
+>> s = socket(AF_UNIX, SOCK_STREAM)
+>> s.connect(addr)
+>> scm = (SOL_SOCKET, SCM_RIGHTS, array('i', [lis.fileno()]))
+>> s.sendmsg([b'x'], [scm], MSG_OOB)
+>> lis.close()
+>>
+>> [1]
+>> $ grep unix-oob /proc/net/unix
+>> $ ./unix-oob.py
+>> $ grep unix-oob /proc/net/unix
+>> 0000000000000000: 00000002 00000000 00000000 0001 02     0 @unix-oob
+>> 0000000000000000: 00000002 00000000 00010000 0001 01  6072 @unix-oob
+>>
+>> Fixes: 4090fa373f0e ("af_unix: Replace garbage collection algorithm.")
+>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> 
+> with the above corrected, you can add
+> 
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> 
+> Thanks!
 
-All errors (new ones prefixed by >>):
+All right, thank you.
 
-   net/sched/sch_generic.c: In function 'qdisc_alloc':
->> net/sched/sch_generic.c:983:36: error: 'struct Qdisc' has no member named 'root_lock_key'
-     983 |         lockdep_unregister_key(&sch->root_lock_key);
-         |                                    ^~
+One question: git send-email automatically adds my Signed-off-by to your
+patch (patch 2/2 in this series). Should I leave it that way?
 
+>> ...
 
-vim +983 net/sched/sch_generic.c
-
-   924	
-   925	struct Qdisc *qdisc_alloc(struct netdev_queue *dev_queue,
-   926				  const struct Qdisc_ops *ops,
-   927				  struct netlink_ext_ack *extack)
-   928	{
-   929		struct Qdisc *sch;
-   930		unsigned int size = sizeof(*sch) + ops->priv_size;
-   931		int err = -ENOBUFS;
-   932		struct net_device *dev;
-   933	
-   934		if (!dev_queue) {
-   935			NL_SET_ERR_MSG(extack, "No device queue given");
-   936			err = -EINVAL;
-   937			goto errout;
-   938		}
-   939	
-   940		dev = dev_queue->dev;
-   941		sch = kzalloc_node(size, GFP_KERNEL, netdev_queue_numa_node_read(dev_queue));
-   942	
-   943		if (!sch)
-   944			goto errout;
-   945		__skb_queue_head_init(&sch->gso_skb);
-   946		__skb_queue_head_init(&sch->skb_bad_txq);
-   947		gnet_stats_basic_sync_init(&sch->bstats);
-   948		spin_lock_init(&sch->q.lock);
-   949	
-   950		if (ops->static_flags & TCQ_F_CPUSTATS) {
-   951			sch->cpu_bstats =
-   952				netdev_alloc_pcpu_stats(struct gnet_stats_basic_sync);
-   953			if (!sch->cpu_bstats)
-   954				goto errout1;
-   955	
-   956			sch->cpu_qstats = alloc_percpu(struct gnet_stats_queue);
-   957			if (!sch->cpu_qstats) {
-   958				free_percpu(sch->cpu_bstats);
-   959				goto errout1;
-   960			}
-   961		}
-   962	
-   963		spin_lock_init(&sch->busylock);
-   964		lockdep_set_class(&sch->busylock,
-   965				  dev->qdisc_tx_busylock ?: &qdisc_tx_busylock);
-   966	
-   967		/* seqlock has the same scope of busylock, for NOLOCK qdisc */
-   968		spin_lock_init(&sch->seqlock);
-   969		lockdep_set_class(&sch->seqlock,
-   970				  dev->qdisc_tx_busylock ?: &qdisc_tx_busylock);
-   971	
-   972		sch->ops = ops;
-   973		sch->flags = ops->static_flags;
-   974		sch->enqueue = ops->enqueue;
-   975		sch->dequeue = ops->dequeue;
-   976		sch->dev_queue = dev_queue;
-   977		sch->owner = -1;
-   978		netdev_hold(dev, &sch->dev_tracker, GFP_KERNEL);
-   979		refcount_set(&sch->refcnt, 1);
-   980	
-   981		return sch;
-   982	errout1:
- > 983		lockdep_unregister_key(&sch->root_lock_key);
-   984		kfree(sch);
-   985	errout:
-   986		return ERR_PTR(err);
-   987	}
-   988	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
