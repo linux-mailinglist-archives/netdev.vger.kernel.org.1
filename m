@@ -1,290 +1,186 @@
-Return-Path: <netdev+bounces-96908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-96909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D90128C828F
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 10:29:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D30588C82A6
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 10:43:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CA1B1F21267
-	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 08:29:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 665211F2153C
+	for <lists+netdev@lfdr.de>; Fri, 17 May 2024 08:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF041AAA5;
-	Fri, 17 May 2024 08:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CB2D51cZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5DCA8489;
+	Fri, 17 May 2024 08:42:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF422260A
-	for <netdev@vger.kernel.org>; Fri, 17 May 2024 08:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715934564; cv=fail; b=B4nYHD5snU36XDg2UWFULXCDUdQWdsyzgiNPsjCkCnsdn3GJ4aJ3AUXkj+3MfBrHulXq4tbngjdp/A6xNjnydP70qwA1xJn/G7rpUMMfDWOkPRwR8sCc9+WWnY+wY3z0jgfPlE1cL/1AxWn8KcxSHx4vn+Bn4lOZrFpuMrtJu+U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715934564; c=relaxed/simple;
-	bh=/s5dt3d+yg8gaIuXo6U/xA18XoOhpEKIPQmmM6/e/ck=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=c5dz/wcguLpe9NVCgRLEYmd2/iyBC1dOJJTd8nrwFZXsJpHKOKUCRQWkJgBVjoNU+INjp8s2orn+984/TUnuwV34Qp/nG+GPkqjD6FZHf+b5dwm9GA3Pqu0so/+VHplakvERQfdXJ2odRg7RLDwESUQrossugFJF2gKD7sAWiWc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CB2D51cZ; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715934562; x=1747470562;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/s5dt3d+yg8gaIuXo6U/xA18XoOhpEKIPQmmM6/e/ck=;
-  b=CB2D51cZb/5Fy0LdXsjbteLB6c5gMfm3nRLfWlyNBz5lIW5LL2nLFPem
-   2kL5h86Nzkc8S9gICeOfcRTdcFnN/J3vj0xgSP0RwTXfTG53ivjJ5ubYB
-   6NTp+l3A5TMhUEiT4sRZRNpNydkbX4RpjuLdzlv4VqHiFw02SKgqWxnrF
-   ro26dU81f3mWSCniMt2t2PacEKNE3ERnonl52JqnRWIl9NKaL2vM5qx98
-   2p0e3Wo8F3McfX9K3TuzyxXiRGe3nbadI4TYTHN4rckccNa0KQnSl91wu
-   VFwyPSWAEgjLgDAuzjgZ3wuqF2umaGK2XSBjyY2tKPwg3nNf/kkjuXbwm
-   Q==;
-X-CSE-ConnectionGUID: xjHTvw14SFq5nJrNvv3LFQ==
-X-CSE-MsgGUID: RFjh18ZZSv2yZ+flcw59yQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="22678144"
-X-IronPort-AV: E=Sophos;i="6.08,167,1712646000"; 
-   d="scan'208";a="22678144"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2024 01:29:21 -0700
-X-CSE-ConnectionGUID: SYOGhRV8SLedwSqHB+wsHQ==
-X-CSE-MsgGUID: Xk2H9iQBTseyzbp2R0Nddw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,167,1712646000"; 
-   d="scan'208";a="31819345"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 May 2024 01:29:15 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 17 May 2024 01:29:15 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 17 May 2024 01:29:14 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 17 May 2024 01:29:14 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 17 May 2024 01:29:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RfQroU1g8Ld5EGz8MRH1LyH3Hoojuu6XOG7leEKaasBjicryueUsiqwypt27mpz47HPnJUBnU+gvMO6PK2sqGhufWwkozwbMYiAUM1pm8FmN2/JGcrwqfqKlmedav/VJMTjHmW8NaFQFZYQajapJlwHSnjtm7AgepueH2Es+kxw5bg8j3tShPnE8sph6vDd9Tw7y6Vx2g5Px/3HYrN++kmjQK54aKIEXn6J5dau3kboOe1HZu4eL1fHOePwAXEVUnUZNChWztSEBSqPoBj4ASKSKzosTebm/cQL93GuonbN5Q9lKDK2giGc6rtcyPjeaqavlh8dLXOjjUOch4HdBwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4PwoNKHVigyQNcqMKJd3RFrYlF28hna5uhHvTQKhiBg=;
- b=Iqb6+dKq4d8fqfVSglXhRa7NpOgEQkwtYdb16EmWE7Xla91pAIafr3bNOjAQnhoZ39CG+tsgE3mMSFCn/PPgTAYP5V9RylljJZgBmQ0LM1nvcKFT9KT2CdlCDkAUOh8+j7b27TpiX0rgdrRUWFgWBTLqNy8vq72cTY4s6LkXXv/1wCRCrD0se1ogUZMDzUKEEIWool6EGG3cXA8jlcN+AonTvqmurbGUNzbtqfAaTFyrT99+CY5fAXXraRDz9go0f5EPbJCLu9Dh5oprzU3wNiwgmxHuyHJdBOmSmH372/z4T2NYaPcvhId+5yoqp66cG/HguLUsTadvsdubRonu6Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by PH8PR11MB8062.namprd11.prod.outlook.com (2603:10b6:510:251::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Fri, 17 May
- 2024 08:29:13 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::bfb:c63:7490:93eb]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::bfb:c63:7490:93eb%3]) with mapi id 15.20.7587.025; Fri, 17 May 2024
- 08:29:12 +0000
-Message-ID: <428284fc-232a-41d7-a8cb-f4b01fd84691@intel.com>
-Date: Fri, 17 May 2024 10:29:08 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: implement AQ download pkg
- retry
-Content-Language: en-US
-To: Wojciech Drewek <wojciech.drewek@intel.com>, Brett Creeley
-	<bcreeley@amd.com>, <netdev@vger.kernel.org>
-CC: <intel-wired-lan@lists.osuosl.org>
-References: <20240516140426.60439-1-wojciech.drewek@intel.com>
- <342a9b10-97d7-4720-92ef-a548179b990f@amd.com>
- <eb7293ac-3674-4e89-a11d-a8b8fd470dcd@intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <eb7293ac-3674-4e89-a11d-a8b8fd470dcd@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MI2P293CA0008.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:45::19) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 749C579D0
+	for <netdev@vger.kernel.org>; Fri, 17 May 2024 08:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715935379; cv=none; b=iYZccQ4oqSXWHZEBke9CntwJXWjr+c8XZc368947ZwPx3qshGQMdQYE3uSMXQjGlfoWSEtUdgyd/bjiwLcipna5ybMyVYiLRVxCwUJ8Y03LcxbLwXT1mM8KqhA1pPmN814dhxuyqKUzfu1+im+T6djyYAjJuF7+HuLg+YuDJUPU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715935379; c=relaxed/simple;
+	bh=ND961LWHYSgjd+CllGjBRRnur2vGPw2t/BFZTC8/+wQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mSogXcvMmeieClP19GJPynelaPW4yY02Y4Vw3NIxf/hRGawmiCo0DGWUspOYBTNaN3IvKoTfjmrZ4wvFJj9GGHrU7iUrVg9jPs028bVqxleHsgKejTHmbtziPaDw3BaQrsnf0IP8yRFmXaufPzJm60iOWag4lMUglL947d+OSrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.112.247])
+	by gateway (Coremail) with SMTP id _____8CxBeuOGEdmsOUNAA--.21561S3;
+	Fri, 17 May 2024 16:42:54 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.112.247])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxP1WLGEdmwy4kAA--.4707S3;
+	Fri, 17 May 2024 16:42:52 +0800 (CST)
+Message-ID: <460a6b52-249e-4d50-8d3e-28cc9da6a01b@loongson.cn>
+Date: Fri, 17 May 2024 16:42:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH8PR11MB8062:EE_
-X-MS-Office365-Filtering-Correlation-Id: a6714e74-2092-4686-ef0b-08dc764b6e85
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?NmZtYUYza1kwM05BcERSMDc5QmQ3MU43RTI2VDZrei9wRFlEYy9vZlZ6VmZu?=
- =?utf-8?B?UFFIaGFSbk5XSDNiY056ODhUMnVJQWVHNVh1YkhHaFM1MXJtMHZpS2JXeGJN?=
- =?utf-8?B?SHpIU0w4WW5QMEdPYkF6MG1ZTXdHbWNMQ2J6ZjFjdk1FQ1lhdFM2eWJOT3hZ?=
- =?utf-8?B?cDB5VE04RlpQaFF2Vk9XelpVZXVzeGsxVkNXcHdTM292WFhSMjZqYis5TmJN?=
- =?utf-8?B?R1J2SVBYNWsxcitwV05HMmEwMS9oY1FiSlVaSXFMc3piVmIrRXZPczNjZ04w?=
- =?utf-8?B?aWNSTjAzZ0g0eVFsRmVlQVgyTkVVMjk4ajVjLzJNTkxOTFR5YzR0a29IcGs5?=
- =?utf-8?B?cjkrbll2TW91RmloR3RlbFFyblJmVG5sZm5VNVBNWnc3TG1HcFJmMEdNelJ6?=
- =?utf-8?B?Y2l2ZmkvUWVIQk1sdFBIVFlUVzVkM2F1WEczSzREV3NUc3FOT2FQUFR5eDI5?=
- =?utf-8?B?UjlZY1lzZlRmR2tQV0YrWG9YcWpRWm9jOEZ4ektWb3I1TnQ5S2dxL0tOemdV?=
- =?utf-8?B?OCttNXF0ajZrRXVQL2txMXZkaHU0TEEvdmdIdXEvYzBTZGxJS21CS2F5cTNW?=
- =?utf-8?B?TGdBK3Y3MXdiTnF3S0dVSk5ObTRNYm1UUzliL2JIR2RORTZwUDJ5ZDNRamZ1?=
- =?utf-8?B?OEU2NXpQK05rY3ExS3ZrSzQxRFg2ZXp6OFBteGZhdG1tTEtHZHg3VzdmTGx2?=
- =?utf-8?B?emFib2FtRHl2MEpaa3VQK0RRVWtEaWlKTFhYbXIvVnNuS0FrcWE3djRQb1pK?=
- =?utf-8?B?OU9JUS9VTHlRaThDTVFuNkFBOVFvbjQ5cFdjRkg0bjVZZGVlcGFudEI0K2U0?=
- =?utf-8?B?VHhacGJYRnkrejZvNi9HTTBEQzJwMFVXcDlkSGdpQXZGZ1ZxQnJnYjU2WExz?=
- =?utf-8?B?Z2hFOTVzQzhnRksrU0tvVS9mcWtENFFvTUhTenRiOGRxMXFPbkVWVHhadTZM?=
- =?utf-8?B?enNHaU1pL1VzRHFaMm15Vk95Nlg5V0FONzQ3d0pSN3ZPUXZnbmJEVUJTQUJz?=
- =?utf-8?B?L0pSZS9IMVFONVNENmJXRkRNY2o4WGZGeUM5NlE5cEYxUXZ0bnJVdHBGOWFk?=
- =?utf-8?B?VE1rS3RHeTJqYnhMR1BtZ2RKTHBabVkzZVdQQ3ZQSHZ1dUgzRVJGUUpuL2pW?=
- =?utf-8?B?K0dkMC9RbWRDbVRDN0QwV2lsekp6UEZ2WlR0RS9ucUpVaUUrU0NWUlFvZ05P?=
- =?utf-8?B?ei82Q1NyREZROGxyVW1KSDZxOE1kTjR4ajFBREFDV2ZJMWUwM25rb00xSjM0?=
- =?utf-8?B?MUpaZWtHUlIzVHIrVzFZc2g0SkNuYTZiWThvWS9MYnUxWitsTTVyRTVXQ3ZR?=
- =?utf-8?B?eXRxNDNiL3dwMkxjcmxTQ2JCRG8rbXlNQ0hFTjZieURPRGMrdjlkMjdpcmNQ?=
- =?utf-8?B?RFlPQzBJNWV4OVZBSzdwOEU4YTd5Z0ZaeUhEL1BnRVBObXc1N1VEejN0OUxo?=
- =?utf-8?B?K3pwajhuRjI4a1pyV3ZtVEpjVVJ3bU84cnZjTVVhZzJkZS83V2JOK1QvUkpY?=
- =?utf-8?B?UjRmTjFPZlpINkhDWWdWU1g0M1J2amIxTEZTeEtaM1FneXdWZStSb2lmN1ZT?=
- =?utf-8?B?d0FSSkFBelA5QWUxc3pFUEI3UWxrSnRNU0xQcVJPT1Z4bW5nRGRXdEN2eWdL?=
- =?utf-8?B?SU1ZaitSNjF1N0x4VGg5dGgwWFpScGpPOE5BV0kxTXJzckZ3amUyeitxZmhu?=
- =?utf-8?B?NGswM0RzZDBlWlYzY3FackN0VGhZSEJHSHUvNXhuNEFVcCt4d0YrNmRBPT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bXd3c2RBWGc0L1hMc2E5OUdUZ0JoMytYN2MreTB5ZlRXbW5zTDdIRjlDTno1?=
- =?utf-8?B?VXcreVJsUEVBdWFzd1ZhdkpvTEVISFFzRzZCckpUalBqQlVEUHE2M1hNL0FP?=
- =?utf-8?B?UTByWXVReEN4ZzY2QkxValIwQ3ZlLzZXbXVSdU5hd1N0dkI2MDlGRFY4MlU0?=
- =?utf-8?B?ZmFkY2NwNWhBVnhZVWNOa0pOQWFPNXpQS1Yyd1Y4UWhaNkdkc1B3OGt1R1k0?=
- =?utf-8?B?eHFYWnpnTTVmOHAvdUZqdGhTUUJzb1BEQmpLNXVEbHEySHc1alRKSWZoUWVF?=
- =?utf-8?B?ZTZYazl6SVliZkcwa3dkeGhyZTBHQ2hyaFdaTVg4aWdVcnpmeVVtMjRJMk5w?=
- =?utf-8?B?NENxRm1IQ1d2QUxyRDJDazgyTWFPUGlPN0pqK0hvZVJHNE9aOEVKNXJ6bmhl?=
- =?utf-8?B?V1ZTdzJrTWtjSSttdGcvcUJ6WXc4K2pYMmgreVo0VmFSN0tncVM5SFFVbzNR?=
- =?utf-8?B?bVhaeXJpOFZDWkVVbC9zTTlGR1Y0dERjQXdua25iMlB4aldBZ2kvUUR2S0wv?=
- =?utf-8?B?WXVzMHU0ak9PYncwNk9NSjVYMjlrWGVWVkNkQzV5TEYyZ2lSZ2h1ZC83c2o5?=
- =?utf-8?B?dnc0N0pHbXMrYXkyaCtpUk1ob2xEMlA5eEN1eS8veUNNTkI3UGR3b1BkaXMw?=
- =?utf-8?B?TlhwdVhRaEtTYWp2UmIxS3dMb0JkaFdHSVUveWJuaFIva2tHZzVGcFE3VFRW?=
- =?utf-8?B?bFo0OHN6eGlzdks3dXpFVS9lSm1GandaODJ3dEJFYlZmdGtud04yVVkvMGdn?=
- =?utf-8?B?UElmRkRKT0dNeVFFUkN0d04yVjkxWGNZclNxVXdmMURQNTYxRHVoWmJFOCsy?=
- =?utf-8?B?VFVqTGFxcEZvaHF1OFNwbG5seHVIQjBJK0tld0Fjc1JxbkVmaVlDNjMwU1k1?=
- =?utf-8?B?L3dsV2FwalJEVUhCN1p6NHdOQlJwV2lESXQ4eUJWN3cwNEZPSzQ1dCs4dnpo?=
- =?utf-8?B?bVZYdk5tTnpGUi82bURXMjBaN21qbUJ3d0xseUVUemdjc1d6dWx5dHJFTTd0?=
- =?utf-8?B?anJ0U1U4RjRNa3hNcC95Q0RCazhoYkdmL2NROVFTSmwrYlJPV21qSnc2Tkpt?=
- =?utf-8?B?eFJGWVl3YXZQVzJ2MWt1dzNLZHZETlhEejhCT2JxSlNRWUJQTGppcUFnUTNL?=
- =?utf-8?B?b24yT3VzbHptd0tIY1ZRMmU1RXpFQWZTUTNCK0JYaFA4WjZ3TUw2YjF3TlNB?=
- =?utf-8?B?TE9vWG82eG9lS2lKaitIdHJmTi9OSElvMDFRazYrZG5xUG5FQUkveEx5Ukgw?=
- =?utf-8?B?bE85MHd1dUdZMnVuRzVIN3VjTldSQWRVOXFjRThSWkRNS1dEdkVqaXFJR05v?=
- =?utf-8?B?TXlVQm54ajMvTVE2WmdxTzVEVmhJYlRleUVVdUp4YjByMldmaWI3d0M4amRC?=
- =?utf-8?B?K0VKQnQzWVp0OTZyZkFLR25IOHZTdWpHNFZKbmtRMzZlMVJxSHJFeHo4N0FT?=
- =?utf-8?B?Q2twSW5NekQ3SkdxOHhaNUhTdURkN3hveU81U2ZRaEhBdzBQZmd1b0VEVlRX?=
- =?utf-8?B?dmhyRkdsNDIwaVY3NkZrc043bHgyV29lT2s0ZjJPQi8wcjVpK2MrZEJGbGg2?=
- =?utf-8?B?WVFNSEU3MEhzMUVKR0YwUlBkODhXSXJJdGpHUXE2dU1NMEo3NDQxNHFpNklR?=
- =?utf-8?B?NXgrK2l1eXhvVFRKMjl2YmxEK2dhYlp5VVhXdnBWcnlDZmVnOERjTkdiU21q?=
- =?utf-8?B?VUtpaWpTYmsxbXRGMW1NL21CYjRIYWM5YU95WEVmWUxSdzNZWGUzSVAzNGxh?=
- =?utf-8?B?bTNXWTZubUwwZS9OYWZMK2l4TytFWE1aTmNBSnA1SjNnbmZlUi93VGlsSjVM?=
- =?utf-8?B?cmVxUkpCdlgyNzBVZ2ZtR0VCV2NqOGJPTld3c0lhS3hrZGhoSnpNU2NKU2ZS?=
- =?utf-8?B?cXh2VFZ3R1ZwUWN6RUtHd20rMzU2Zmk5UHJ4Y1JSL1k2NkREUlJlQjNhVEln?=
- =?utf-8?B?NHB5S1NFOUZpRnhEbWpmVXEvbHY5Z1cyTFRta09kMHYwSHV6c25pL3Zxem1t?=
- =?utf-8?B?dnFwQ01VRWFlWWU3dVEwTVVIa2ZoYnNNRlZWUkRlcGFTakJrVVFUcWVOUTZK?=
- =?utf-8?B?SFN2end3RFRBQU5LUnpWQ3NUNENVMUN0cFMxMklPZlg0RW9tRWxkbkx5THRl?=
- =?utf-8?B?VldwWGtzQVpvNkZ6QjZXYWJublJCeTVsbkFScHlSTHh2Mmk1YjJQTi9EQVhV?=
- =?utf-8?B?eXc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6714e74-2092-4686-ef0b-08dc764b6e85
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2024 08:29:12.9405
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qikzmRp0Wz2bStp7fBXOv4Pt8t5VsBRrekX82fEEHiOiApb3aWEKYg7QQI8CZalKjcVOhKPwjcUlm7sKRhhuAbg6PsKVej2cvgUQJV5PFE0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB8062
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 13/15] net: stmmac: dwmac-loongson: Add
+ Loongson GNET support
+To: Huacai Chen <chenhuacai@kernel.org>, Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ linux@armlinux.org.uk, guyinggang@loongson.cn, netdev@vger.kernel.org,
+ chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+References: <pdyqoki5qw4zabz3uv5ff2e2o43htcr6xame652zmbqh23tjji@lt5gmp6m3lkm>
+ <CAAhV-H7Dz0CVysUVVVe4Y8qGxpmwJ0i6y2wKnATzNS=5DR_vZg@mail.gmail.com>
+ <tbjruh7sx7zovj4ypvfmer3tkgp63zrwhsaxj6hpcfc7ljaqes@zyd3acrqchik>
+ <7b56eabc-53e1-4fbe-bf92-81bb1c91ddfc@loongson.cn>
+ <kw7fb7mcy7ungrungmbe6z6rmfzswastesx66phtcxxez6vvgw@dal7dt2kj54u>
+ <CAAhV-H4TtoV9LAfhx1+fu40XgDqQ+W-tXt36XoieK87_ucBgcQ@mail.gmail.com>
+ <nt5bjlmul5jchxvx6zzgvbmdsegpwwz7quzt57vfejnxng7smz@abqdfipuclzh>
+ <CAAhV-H5UMJvOtt+YFChqPC1eMkj5UjCEnFJ_YksWjk+uriZPzw@mail.gmail.com>
+ <d2ibcsxpzrhjzjt4zu7tmopgyp6q77omgweobzidsp53yadcgz@x5774dqqs7qr>
+ <CAAhV-H7Fck+cd14RSUkEPrB=6=35JGkHLBCtrYTGD924fYi2VA@mail.gmail.com>
+ <xa2ewgfe3qjljsraet5d77qk3dygcvexnqk5atm5fm5oro3ogp@xctegdmx2srt>
+ <CAAhV-H5JT+QfZgHX7K3HYLFSxuZeer4PdUPjehtyXKcfi=L2oQ@mail.gmail.com>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <CAAhV-H5JT+QfZgHX7K3HYLFSxuZeer4PdUPjehtyXKcfi=L2oQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8AxP1WLGEdmwy4kAA--.4707S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxZw15XFWxZr4kCFWUCryUJwc_yoW5ur15pr
+	ZxXFZxKryktry7WF4j9ws29r4YyFWDXr48Wr43Aw1Sy3Z0yr93tr1UKrW0k3s7ArZ3uw4j
+	gr1UZFZ3Aa4YyFcCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r1q6r43MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uc_3UUUUU==
 
-On 5/17/24 09:49, Wojciech Drewek wrote:
-> 
-> 
-> On 16.05.2024 18:36, Brett Creeley wrote:
->>
->>
->> On 5/16/2024 7:04 AM, Wojciech Drewek wrote:
->>> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
->>>
->>>
->>> ice_aqc_opc_download_pkg (0x0C40) AQ sporadically returns error due
->>> to FW issue. Fix this by retrying five times before moving to
->>> Safe Mode.
->>>
->>> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
->>> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
->>> ---
->>>    drivers/net/ethernet/intel/ice/ice_ddp.c | 19 +++++++++++++++++--
->>>    1 file changed, 17 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
->>> index ce5034ed2b24..19e2111fcf08 100644
->>> --- a/drivers/net/ethernet/intel/ice/ice_ddp.c
->>> +++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
->>> @@ -1339,6 +1339,7 @@ ice_dwnld_cfg_bufs_no_lock(struct ice_hw *hw, struct ice_buf *bufs, u32 start,
->>>
->>>           for (i = 0; i < count; i++) {
->>>                   bool last = false;
->>> +               int try_cnt = 0;
->>>                   int status;
->>>
->>>                   bh = (struct ice_buf_hdr *)(bufs + start + i);
->>> @@ -1346,8 +1347,22 @@ ice_dwnld_cfg_bufs_no_lock(struct ice_hw *hw, struct ice_buf *bufs, u32 start,
->>>                   if (indicate_last)
->>>                           last = ice_is_last_download_buffer(bh, i, count);
->>>
->>> -               status = ice_aq_download_pkg(hw, bh, ICE_PKG_BUF_SIZE, last,
->>> -                                            &offset, &info, NULL);
->>> +               while (try_cnt < 5) {
->>> +                       status = ice_aq_download_pkg(hw, bh, ICE_PKG_BUF_SIZE,
->>> +                                                    last, &offset, &info,
->>> +                                                    NULL);
->>> +                       if (hw->adminq.sq_last_status != ICE_AQ_RC_ENOSEC &&
->>> +                           hw->adminq.sq_last_status != ICE_AQ_RC_EBADSIG)
->>
->> Are these the only 2 sporadic errors that FW will return?
-> 
-> Yes, that's right. We don't want to retry in case of other errors since those might be valid.
+Hi Huacai, Serge,
 
-I would say that those are the only two non-sporadic errors ;)
-
-> 
->>
->>> +                               break;
->>> +
->>> +                       try_cnt++;
->>> +                       msleep(20);
->>> +               }
->>> +
->>> +               if (try_cnt)
->>> +                       dev_dbg(ice_hw_to_dev(hw),
->>> +                               "ice_aq_download_pkg failed, number of retries: %d\n",
-
-s/retries/attempts/
-(as retries = attempts + 1 ;))
-
->>> +                               try_cnt);
->>
->> If try_cnt is non-zero it doesn't mean the last download failed, it just means one or more attempts to download failed right? Maybe just "ice_aq_download_pkg number of retries: %d" since the if (status) check below will print on failure?
-> 
-> Sounds reasonable, we want this log only because we want to know if we hit this sporadic failure.
-> 
->>
+在 2024/5/15 21:55, Huacai Chen 写道:
+>>>> Once again about the naming. From the retrospective point of view the
+>>>> so called legacy PCI IRQs (in fact PCI INTx) and the platform IRQs
+>>>> look similar because these are just the level-type signals connected
+>>>> to the system IRQ controller. But when it comes to the PCI_Express_,
+>>>> the implementation is completely different. The PCIe INTx is just the
+>>>> PCIe TLPs of special type, like MSI. Upon receiving these special
+>>>> messages the PCIe host controller delivers the IRQ up to the
+>>>> respective system IRQ controller. So in order to avoid the confusion
+>>>> between the actual legacy PCI INTx, PCI Express INTx and the just
+>>>> platform IRQs, it's better to emphasize the actual way of the IRQs
+>>>> delivery. In this case it's the later method.
+>>> You are absolutely right, and I think I found a method to use your
+>>> framework to solve our problems:
 >>>
->>>                   /* Save AQ status from download package */
->>>                   if (status) {
->>> -- 
->>> 2.40.1
+>>>     static int loongson_dwmac_config_irqs(struct pci_dev *pdev,
+>>>                                            struct plat_stmmacenet_data *plat,
+>>>                                            struct stmmac_resources *res)
+>>>     {
+>>>         int i, ret, vecs;
 >>>
+>>>         /* INT NAME | MAC | CH7 rx | CH7 tx | ... | CH0 rx | CH0 tx |
+>>>          * --------- ----- -------- --------  ...  -------- --------
+>>>          * IRQ NUM  |  0  |   1    |   2    | ... |   15   |   16   |
+>>>          */
+>>>         vecs = plat->rx_queues_to_use + plat->tx_queues_to_use + 1;
+>>>         ret = pci_alloc_irq_vectors(pdev, 1, vecs, PCI_IRQ_MSI | PCI_IRQ_INTX);
+>>>         if (ret < 0) {
+>>>                 dev_err(&pdev->dev, "Failed to allocate PCI IRQs\n");
+>>>                 return ret;
+>>>         }
+>>>        if (ret >= vecs) {
+>>>                 for (i = 0; i < plat->rx_queues_to_use; i++) {
+>>>                         res->rx_irq[CHANNELS_NUM - 1 - i] =
+>>>                                 pci_irq_vector(pdev, 1 + i * 2);
+>>>                 }
+>>>                 for (i = 0; i < plat->tx_queues_to_use; i++) {
+>>>                         res->tx_irq[CHANNELS_NUM - 1 - i] =
+>>>                                 pci_irq_vector(pdev, 2 + i * 2);
+>>>                 }
 >>>
+>>>                 plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+>>>         }
+>>>
+>>>         res->irq = pci_irq_vector(pdev, 0);
+>>>
+>>>       if (np) {
+>>>           res->irq = of_irq_get_byname(np, "macirq");
+>>>           if (res->irq < 0) {
+>>>              dev_err(&pdev->dev, "IRQ macirq not found\n");
+>>>              return -ENODEV;
+>>>           }
+>>>
+>>>           res->wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+>>>           if (res->wol_irq < 0) {
+>>>              dev_info(&pdev->dev,
+>>>                   "IRQ eth_wake_irq not found, using macirq\n");
+>>>              res->wol_irq = res->irq;
+>>>           }
+>>>
+>>>           res->lpi_irq = of_irq_get_byname(np, "eth_lpi");
+>>>           if (res->lpi_irq < 0) {
+>>>              dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+>>>              return -ENODEV;
+>>>           }
+>>>       }
+>>>         return 0;
+>>>     }
+>>>
+>>> If your agree, Yanteng can use this method in V13, then avoid furthur changes.
+>> Since yesterday I have been too relaxed sitting back to explain in
+>> detail the problems with the code above. Shortly speaking, no to the
+>> method designed as above.
+> This function is copy-paste from your version which you suggest to
+> Yanteng, and plus the fallback parts for DT. If you don't want to
+> discuss it any more, we can discuss after V13.
+
+All right. I have been preparing v13 and will send it as soon as possible.
+
+Let's continue the discussion in v13. Of course, I will copy the part 
+that has
+
+not received a clear reply to v13.
+
+>
+> BTW, we cannot remove "res->wol_irq = res->irq", because Loongson
+> GMAC/GNET indeed supports WoL.
+
+Okay, I will not drop it in v13.
+
+
+Thanks,
+
+Yanteng
 
 
