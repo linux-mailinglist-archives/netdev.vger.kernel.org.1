@@ -1,109 +1,124 @@
-Return-Path: <netdev+bounces-97062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79CAC8C900C
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 10:49:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 693DE8C9028
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 11:28:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5C961C20E7F
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 08:49:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9208B212B6
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 09:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4679101DE;
-	Sat, 18 May 2024 08:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="YBTt22nx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A19D1B963;
+	Sat, 18 May 2024 09:28:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B81101C5;
-	Sat, 18 May 2024 08:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907FF10A39;
+	Sat, 18 May 2024 09:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716022163; cv=none; b=Kaey154bstIZdWbrSgRXtiPSGcevoEABnv2m+i+ut1T/XgxbQU6sB0+4TxthewSES8HxHQypoYXew6MgbJ2J0oYm8CI090wRxx2aF01itcGh6yNStyXfhJ0m6IC4niwWynvGLM/pkMp6k3ctCsSKYoozPiL7TQifjhOsf5Xjgxg=
+	t=1716024501; cv=none; b=QxGAL9cegqXG9LLvS/TbcOfV1V4verH3nNzV8HD+hnvGHa4PIEbO6SVc2G+HNq95CSUpzqMqBqNXwg636KK+duHEJ26egTK7/uiEcurQhZxbuHc6ffkURDq40MDQ66j+ZHYw3gGWkyJIh8CByf8uqew2VKXJ+b+JuksjNY2RRTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716022163; c=relaxed/simple;
-	bh=IjIvSDsBIS7GEwEEgejfx1W7LzjfEQqGgg6tgJLkiEI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=fR0b0/6BK9B5E4MdHiNGS8AgVErOxsTueVIGRIcKOBM9PksxS/8hth7DQpo40+a6DMVBHJhJBEDFo8Dzcf7/pdj8NlvLfBvu94tGc6nwPzExiw//L4sU4NUuCwhBN6tw4Mkr7TcG3Tq6Z31mh0UHe/ZA62hwtfFJd2cLnKEZrfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=YBTt22nx; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44I8n2f0019546;
-	Sat, 18 May 2024 03:49:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1716022143;
-	bh=RiVGj+qep057xak5y+IC3HmFOlnTGitw34djuHIjJkk=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=YBTt22nxQfVts6M0idawB4no+WP/s9q00yanaiL4pC3OvPLuhWsacn8X+8gbJDjtT
-	 Y99d3QfK7VG35zsqCr5wTpfOCiJXc1UNVPvb0fCRWx98/cTj0Ka7WNUpC7ZZjmiPdg
-	 DLt66Hf7QFjgW7/Bfhcck575caGLHTnw+1RfRYX0=
-Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44I8n2km054452
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sat, 18 May 2024 03:49:02 -0500
-Received: from DLEE101.ent.ti.com (157.170.170.31) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sat, 18
- May 2024 03:49:02 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE101.ent.ti.com
- (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sat, 18 May 2024 03:49:02 -0500
-Received: from [10.249.141.75] ([10.249.141.75])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44I8muuj129612;
-	Sat, 18 May 2024 03:48:57 -0500
-Message-ID: <8e56ea52-9e58-4291-8f7f-4721dd74c72f@ti.com>
-Date: Sat, 18 May 2024 14:18:55 +0530
+	s=arc-20240116; t=1716024501; c=relaxed/simple;
+	bh=KldK1Do+NzU9yPXnEUpSwUlsweS5dKV8/imy6lmdY0I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=OItUOwa2WO4IMoeUT7oLEzycIYJxnvVXOGX5rm8WTTEXhEwp1mOO45iO7SBm8Oh87cCm+Xw2H5VyqDOohfJn10fMgyhsMq/Hq00ZyBdib+PldXsCYvb70DzvnBqabrAVNrE8g30uRuyYmWBk6i16J/WHVz08qTykZ2zGkKzRous=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VhJQr22G4z4f3lVg;
+	Sat, 18 May 2024 17:28:04 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id 93DDE1A01B9;
+	Sat, 18 May 2024 17:28:14 +0800 (CST)
+Received: from ultra.huawei.com (unknown [10.90.53.71])
+	by APP2 (Coremail) with SMTP id Syh0CgBnwvWtdEhmbxE_NQ--.58131S2;
+	Sat, 18 May 2024 17:28:13 +0800 (CST)
+From: Pu Lehui <pulehui@huaweicloud.com>
+To: bpf@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Pu Lehui <pulehui@huawei.com>,
+	Puranjay Mohan <puranjay@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Pu Lehui <pulehui@gmail.com>
+Subject: [PATCH bpf-next v2 0/3] Use bpf_prog_pack for RV64 bpf trampoline
+Date: Sat, 18 May 2024 09:29:14 +0000
+Message-Id: <20240518092917.2771703-1-pulehui@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dt-bindings: net: dp8386x: Add MIT license along with
- GPL-2.0
-To: Conor Dooley <conor@kernel.org>
-CC: <vigneshr@ti.com>, <nm@ti.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Kip Broadhurst <kbroadhurst@ti.com>,
-        <w.egorov@phytec.de>
-References: <20240517104226.3395480-1-u-kumar1@ti.com>
- <20240517-poster-purplish-9b356ce30248@spud>
- <20240517-fastball-stable-9332cae850ea@spud>
-Content-Language: en-US
-From: "Kumar, Udit" <u-kumar1@ti.com>
-In-Reply-To: <20240517-fastball-stable-9332cae850ea@spud>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgBnwvWtdEhmbxE_NQ--.58131S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr43KF1rCFy8Ww4xtw1DZFb_yoW8GFy3pF
+	43Ww13Cw1UXr9rWws3W3yUZF1Sqw48X347GrnrJ34rCF4YvFW8urnY9FWFvFyrWF95C3W0
+	yr1j9Fy5u3WUZ37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkIb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IY
+	c2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
+	026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF
+	0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0x
+	vE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E
+	87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IUbG2NtUUUUU==
+X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
 
-Hi Conor
+We used bpf_prog_pack to aggregate bpf programs into huge page to
+relieve the iTLB pressure on the system. We can apply it to bpf
+trampoline, as Song had been implemented it in core and x86 [0]. This
+patch is going to use bpf_prog_pack to RV64 bpf trampoline. Since Song
+and Puranjay have done a lot of work for bpf_prog_pack on RV64,
+implementing this function will be easy. But one thing to mention is
+that emit_call in RV64 will generate the maximum number of instructions
+during dry run, but during real patching it may be optimized to 1
+instruction due to distance. This is no problem as it does not overflow
+the allocated RO image.
 
-On 5/17/2024 8:11 PM, Conor Dooley wrote:
-> On Fri, May 17, 2024 at 03:39:20PM +0100, Conor Dooley wrote:
->> On Fri, May 17, 2024 at 04:12:26PM +0530, Udit Kumar wrote:
->>> Modify license to include dual licensing as GPL-2.0-only OR MIT
->>> license for TI specific phy header files. This allows for Linux
->>> kernel files to be used in other Operating System ecosystems
->>> such as Zephyr or FreeBSD.
->> What's wrong with BSD-2-Clause, why not use that?
-> I cut myself off, I meant to say:
-> What's wrong with BSD-2-Clause, the standard dual license for
-> bindings, why not use that?
+Tests about regular trampoline and struct_ops trampoline have passed, as
+well as "test_verifier" with no failure cases.
 
-want to be inline with License of top level DTS, which is including this 
-header file
+Link: https://lore.kernel.org/all/20231206224054.492250-1-song@kernel.org [0]
 
-eg
+v2:
+- Emit max number of insns for the "im" addr during dry run to solve OOB issue. (Song)
 
-https://elixir.bootlin.com/linux/latest/source/arch/arm64/boot/dts/ti/k3-j722s-evm.dts#L1 
+v1: https://lore.kernel.org/all/20240123103241.2282122-1-pulehui@huaweicloud.com/
 
+Pu Lehui (3):
+  bpf: Use precise image size for struct_ops trampoline
+  riscv, bpf: Fix out-of-bounds issue when preparing trampoline image
+  riscv, bpf: Use bpf_prog_pack for RV64 bpf trampoline
+
+ arch/riscv/net/bpf_jit_comp64.c | 57 +++++++++++++++++++++++----------
+ kernel/bpf/bpf_struct_ops.c     |  2 +-
+ 2 files changed, 41 insertions(+), 18 deletions(-)
+
+-- 
+2.34.1
 
 
