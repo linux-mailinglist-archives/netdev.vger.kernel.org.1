@@ -1,275 +1,314 @@
-Return-Path: <netdev+bounces-97073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8C9C8C9067
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 12:38:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D64378C906B
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 12:47:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E6481F219B1
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 10:38:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0DDD1C20D2E
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 10:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F8F14A9D;
-	Sat, 18 May 2024 10:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7248E12E63;
+	Sat, 18 May 2024 10:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N/1psPzI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f23mlsYA"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C2F1D688
-	for <netdev@vger.kernel.org>; Sat, 18 May 2024 10:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97731773A
+	for <netdev@vger.kernel.org>; Sat, 18 May 2024 10:47:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716028733; cv=none; b=jl7EATjR/BSkJUqMxJ8gRhv4kO7O7Z0qod/evh1oM2WKozSKBPYOEw6zmhiYEDRupxnsMikm6yR1ZL+UQGnM1cEwg9Alx3sVNEqIno6Nu0G3uQrg2I1CF1BOBxOeC+Ffmy4Z8A34ddO1NnChlP5/DLANk5LuoFr53IyBV0tvVw4=
+	t=1716029267; cv=none; b=aSmAlbM4MulV8Mz8SX/ZGX0fx0ciyGkkILp67wG8eSz7Nuv8+jUQXei265kiWS64PuADXm/Ip0/UwYgSAz1+rN8vD1rbaeb6h6NO5Cuz+XicSmosNwacfuzQQcIJLOMnlKsboWgUK1z7dOcTvUKTHdv6g0zp+9bAKh3uZ6+qIeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716028733; c=relaxed/simple;
-	bh=Z76wQ3TFaCO8AYBFUxqsai9hc2GJxeBw3q+m3iRB310=;
+	s=arc-20240116; t=1716029267; c=relaxed/simple;
+	bh=HFnmgkfspCb14MK6hxS3fOHPoNB1+VO7NApvLkWLLzs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iCfibKpWJow5MtiIUkbqvxg+BU0+rIks/KrHFpTDbk976fUf3OBW8Z3h/LqFWY6YRkcB6ClUHlBnWCGdfIGDBAIDct98/NnCIyWvyFk28JRou5Aih/2XSifwt7d2q/+jbQbdmdY0ReQ8WKxlqhbOIQpc8KzAxS6+ySVXYux6kx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N/1psPzI; arc=none smtp.client-ip=209.85.219.182
+	 To:Cc:Content-Type; b=aO0Pg8xpXY0WS0A0lr6Azir6hjkdU0PMfZErAWskYadQySun6XVAT0Ai/Dig9LYdVEgf2XiyxlFkZgzBhQtZaDRVxpeKPDyDIPX8bhs6Voqpn6mPXphYTxC+I2ttR9rEj1RKPWMReznBzJGBxErVDA/9Tjb9VTD6plCmuXeJgSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f23mlsYA; arc=none smtp.client-ip=209.85.219.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-de5b1e6beceso1117596276.0
-        for <netdev@vger.kernel.org>; Sat, 18 May 2024 03:38:51 -0700 (PDT)
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-df1cfa7f124so1063397276.3
+        for <netdev@vger.kernel.org>; Sat, 18 May 2024 03:47:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716028731; x=1716633531; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1716029265; x=1716634065; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sDp4rpQNRnU5TJVpOZQV86GTVy54p+7oUW9b1UuOjlk=;
-        b=N/1psPzIEV3LwfiaVr+6Yll3qRzR9SbwVhH9kQqLXfCQDE8xSQ6FGQ58qsIS/7er5A
-         PuU3DdJQhd/NA8C8/QFliwDgmqK2oQZMqlh7FB529TzPvOE7ddv9T01OYrz6HSkknFO9
-         8/yCKFeTrwJQWSFqwDO6BELwsw9RrtjhFkAiXjVqXugSMOM1AvSVevNCDDpoMYtg6enU
-         /vKqABuAO1APrYrk3IZuJLbv8mdldh1TS1CNThT86RVgdn07dBsFtx3tMg0Lr9cezZJM
-         GnBvU/Z4nwF+s/giN3MAwtep0qGYFCN0DryTK0Q003lHlFk1rq4+kpfidGpNbtLSnc14
-         L+wQ==
+        bh=27GCOqnE5EEpe5aZzGImCB4UsEWyZlNpfXZNd8t+YCI=;
+        b=f23mlsYAJSIJMF9eh36hhc/Y/dND1rI+cOggKjSr45PbDdhuwLnEGeWs8WUb/GRFiA
+         zpkeFkZCHszsQ5Sclnr540QUaEefamDa+6hY8FeAp1hrtXzkq1zf+88+VZDRIS5zggHY
+         Aq2sWKkXTxDIO+Mm1cCLahwpYRfTkwZGI5bbJpMPv0VR0veUt4HvfGb6E8f1Va3SSmYD
+         XHcV6A9SPdjMoa59h577f1ruJ51+KmCraBKR4Qq3ACmBo6n26feB7ANeHJ2hTAE/nXl5
+         IY9oTlKL3NBYGfcqnqX7K55VQpGd+MeGP/ACBneIFLBuF+xxdU88wGGdgz1KmTYdqShq
+         g03A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716028731; x=1716633531;
+        d=1e100.net; s=20230601; t=1716029265; x=1716634065;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sDp4rpQNRnU5TJVpOZQV86GTVy54p+7oUW9b1UuOjlk=;
-        b=ikwRaE1qZMnE8lBpJLE0JFtsDjVtq2vZkU6RVuWN562JHDLhGmj50XvZWOZYikj3lz
-         cdAJ8M3KiXoY0m+0d+PA19SJ+flJks730UPoLZx4L57FvSM1KUnCgYWrUlYf2JiQYB0F
-         TX9L2FBzoP19ekB/L3D8imJRG3aWND1Osh1wJCptpYq9cAMZIrbfiOONsm6vZCqYINWQ
-         p5IhrxAXRcoyTrlfH3Lt6DNO4oBf8vTL9O7uUfdVxtklYsq63tTeU8rf2gYnGlkM551+
-         mSMUA1Oa6URfaEnF9VPYCI0hllTbVN0NdJUc3OS6vBLeqRz6cSgmxGEpjBwtnIRNxSO7
-         JZFA==
-X-Forwarded-Encrypted: i=1; AJvYcCXXy4ZZ2c0cYYgIiuU9wM4MhHcMDP14cBEqeRWuovydj8rEJ+94txnd/cbi/A0DZsvnRv76f1maosR9+fLyTDYXfPssLFr2
-X-Gm-Message-State: AOJu0YwT7Z9VI4jBo4h0x5j68vPDTmieJQXWUobQBBHMGpt071cMRT5i
-	G1xleEfcN6xCqTC9EwfbbAQjBFwTMAdMnaw7B928gwIduGaS4ewhXRmv2E5BnXksXGz81+/rayI
-	D+p6xo+XsxgrPp3/XdnBLd1KoNxVP3kRm/LRvvA==
-X-Google-Smtp-Source: AGHT+IG0FoKBFiA4pMiSy6AhYzvBK0NRGwtut5XrAFhPw7NEizrpEeM+rZe+iboDo3f7cou7krZmJvTq6fbimd5lex4=
-X-Received: by 2002:a25:d387:0:b0:df4:7142:a168 with SMTP id
- 3f1490d57ef6-df47142a34amr6701572276.45.1716028730549; Sat, 18 May 2024
- 03:38:50 -0700 (PDT)
+        bh=27GCOqnE5EEpe5aZzGImCB4UsEWyZlNpfXZNd8t+YCI=;
+        b=jz/zb/CkFrMAIcl3JctLJa196KkRwIMl72eTgF+Db56vI9kijMh/G623RiFPVvNL3v
+         NK2G4eOCpHRFDjSHH5X+gFO6qeULyPwkKJnBmS3o0eP7A1NybSQ1ytwpmDUKE1cpGW6S
+         y6yFNYnaZwRDhiCKcXP299O083gwpK1QkOO3UjrcGIPWRX8AMJ0NXHaGcIGur6rHRvjT
+         pBHXxXrhR9sjldgrTlsV5IUUENCqhXlWt6zPgGRqXD+tyAAZWYl48284bBY1/w+vrVCy
+         NyVDXeWF+WbPYOmbTg4Z6POxEmR5tIDieDasqkwf2K/ZJAW2VSUh5qIB2THTTgpHZ7wJ
+         Jq1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUz5go2IvG26GLHwpFwxveGh37ztTptdKb4i5PzkgipUUo1oNZUtFBMA8yMxXuC7wKTmb/T5VE9Rb89kWuRv64xbf88yPEi
+X-Gm-Message-State: AOJu0Yy9BuEUOobtJHRINzKNx3icimXy1FBKWQRs+JlurBMJNVD8+8Fc
+	dOO3huHu73Yeyx74ZPlm62FKPe2tFakdiksq2Q7j8lb9pXO4lbXJCJE8eFA9e0EQE551vOfQTOc
+	F5aW4E1ijOYrpuxniJgYKaQzjcUw=
+X-Google-Smtp-Source: AGHT+IEfz9yQJBiewxJdXe5P6INhEXxEVTAZpMPGXnkg+mlI2QcqvMLxfx9Ob9CZgK1/5SoL4X6H49XbY0KVATSzAkY=
+X-Received: by 2002:a25:a1a5:0:b0:de4:603f:cc2a with SMTP id
+ 3f1490d57ef6-dee4f35503fmr23034786276.45.1716029264394; Sat, 18 May 2024
+ 03:47:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1714046812.git.siyanteng@loongson.cn> <e0ea692698171f9c69b80a70607a55805d249c4a.1714046812.git.siyanteng@loongson.cn>
- <arxxtmtifgus4qfai5nkemg46l5ql5ptqfodnflqpf2eenfj57@4x4h3vmcuw5x>
- <29f046d6-67a8-4566-be6a-e2ee73037a94@loongson.cn> <uy3pqd5zqpcdpny4jfdy2a4uwsrp22u755w5ukm3etqhyljr6i@ayup5ikrlx7g>
-In-Reply-To: <uy3pqd5zqpcdpny4jfdy2a4uwsrp22u755w5ukm3etqhyljr6i@ayup5ikrlx7g>
+References: <CAAhV-H4TtoV9LAfhx1+fu40XgDqQ+W-tXt36XoieK87_ucBgcQ@mail.gmail.com>
+ <nt5bjlmul5jchxvx6zzgvbmdsegpwwz7quzt57vfejnxng7smz@abqdfipuclzh>
+ <CAAhV-H5UMJvOtt+YFChqPC1eMkj5UjCEnFJ_YksWjk+uriZPzw@mail.gmail.com>
+ <d2ibcsxpzrhjzjt4zu7tmopgyp6q77omgweobzidsp53yadcgz@x5774dqqs7qr>
+ <CAAhV-H7Fck+cd14RSUkEPrB=6=35JGkHLBCtrYTGD924fYi2VA@mail.gmail.com>
+ <xa2ewgfe3qjljsraet5d77qk3dygcvexnqk5atm5fm5oro3ogp@xctegdmx2srt>
+ <CAAhV-H5JT+QfZgHX7K3HYLFSxuZeer4PdUPjehtyXKcfi=L2oQ@mail.gmail.com>
+ <460a6b52-249e-4d50-8d3e-28cc9da6a01b@loongson.cn> <l3bkpa2bw2gsiir2ybzzin2dusarlvzyai3zge62kxrkfomixb@ryaxhawhgylt>
+ <c09237c6-6661-4744-a9d3-7c3443f2820c@loongson.cn> <ikmwqzwplbnorwrao6afj6t4iksgo4t7jk6to65pnmtqgmalkv@gnrv5cskqlsb>
+In-Reply-To: <ikmwqzwplbnorwrao6afj6t4iksgo4t7jk6to65pnmtqgmalkv@gnrv5cskqlsb>
 From: yanteng si <siyanteng01@gmail.com>
-Date: Sat, 18 May 2024 18:38:39 +0800
-Message-ID: <CAEensMz39F11FUsrsAyyy0WYZsVxL5FJB7=quR0EF_JsRkxvaQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 06/15] net: stmmac: dwmac-loongson: Split up
- the platform data initialization
+Date: Sat, 18 May 2024 18:47:28 +0800
+Message-ID: <CAEensMxS-+RNj8j+QSYnBZzXLQ88M-d-4D=DvNr1y-pW81fAcg@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 13/15] net: stmmac: dwmac-loongson: Add
+ Loongson GNET support
 To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Yanteng Si <siyanteng@loongson.cn>, chenhuacai@kernel.org, andrew@lunn.ch, 
+Cc: Yanteng Si <siyanteng@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, andrew@lunn.ch, 
 	hkallweit1@gmail.com, peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, 
 	joabreu@synopsys.com, Jose.Abreu@synopsys.com, linux@armlinux.org.uk, 
 	guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Serge Semin <fancer.lancer@gmail.com> =E4=BA=8E2024=E5=B9=B45=E6=9C=8813=E6=
-=97=A5=E5=91=A8=E4=B8=80 22:05=E5=86=99=E9=81=93=EF=BC=9A
+Serge Semin <fancer.lancer@gmail.com> =E4=BA=8E2024=E5=B9=B45=E6=9C=8818=E6=
+=97=A5=E5=91=A8=E5=85=AD 00:37=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Fri, May 17, 2024 at 06:37:50PM +0800, Yanteng Si wrote:
+> > Hi Serge,
+> >
+> > =E5=9C=A8 2024/5/17 17:07, Serge Semin =E5=86=99=E9=81=93:
+> > > On Fri, May 17, 2024 at 04:42:51PM +0800, Yanteng Si wrote:
+> > > > Hi Huacai, Serge,
+> > > >
+> > > > =E5=9C=A8 2024/5/15 21:55, Huacai Chen =E5=86=99=E9=81=93:
+> > > > > > > > Once again about the naming. From the retrospective point o=
+f view the
+> > > > > > > > so called legacy PCI IRQs (in fact PCI INTx) and the platfo=
+rm IRQs
+> > > > > > > > look similar because these are just the level-type signals =
+connected
+> > > > > > > > to the system IRQ controller. But when it comes to the PCI_=
+Express_,
+> > > > > > > > the implementation is completely different. The PCIe INTx i=
+s just the
+> > > > > > > > PCIe TLPs of special type, like MSI. Upon receiving these s=
+pecial
+> > > > > > > > messages the PCIe host controller delivers the IRQ up to th=
+e
+> > > > > > > > respective system IRQ controller. So in order to avoid the =
+confusion
+> > > > > > > > between the actual legacy PCI INTx, PCI Express INTx and th=
+e just
+> > > > > > > > platform IRQs, it's better to emphasize the actual way of t=
+he IRQs
+> > > > > > > > delivery. In this case it's the later method.
+> > > > > > > You are absolutely right, and I think I found a method to use=
+ your
+> > > > > > > framework to solve our problems:
+> > > > > > >
+> > > > > > >      static int loongson_dwmac_config_irqs(struct pci_dev *pd=
+ev,
+> > > > > > >                                             struct plat_stmma=
+cenet_data *plat,
+> > > > > > >                                             struct stmmac_res=
+ources *res)
+> > > > > > >      {
+> > > > > > >          int i, ret, vecs;
+> > > > > > >
+> > > > > > >          /* INT NAME | MAC | CH7 rx | CH7 tx | ... | CH0 rx |=
+ CH0 tx |
+> > > > > > >           * --------- ----- -------- --------  ...  -------- =
+--------
+> > > > > > >           * IRQ NUM  |  0  |   1    |   2    | ... |   15   |=
+   16   |
+> > > > > > >           */
+> > > > > > >          vecs =3D plat->rx_queues_to_use + plat->tx_queues_to=
+_use + 1;
+> > > > > > >          ret =3D pci_alloc_irq_vectors(pdev, 1, vecs, PCI_IRQ=
+_MSI | PCI_IRQ_INTX);
+> > > > > > >          if (ret < 0) {
+> > > > > > >                  dev_err(&pdev->dev, "Failed to allocate PCI =
+IRQs\n");
+> > > > > > >                  return ret;
+> > > > > > >          }
+> > > > > > >         if (ret >=3D vecs) {
+> > > > > > >                  for (i =3D 0; i < plat->rx_queues_to_use; i+=
++) {
+> > > > > > >                          res->rx_irq[CHANNELS_NUM - 1 - i] =
+=3D
+> > > > > > >                                  pci_irq_vector(pdev, 1 + i *=
+ 2);
+> > > > > > >                  }
+> > > > > > >                  for (i =3D 0; i < plat->tx_queues_to_use; i+=
++) {
+> > > > > > >                          res->tx_irq[CHANNELS_NUM - 1 - i] =
+=3D
+> > > > > > >                                  pci_irq_vector(pdev, 2 + i *=
+ 2);
+> > > > > > >                  }
+> > > > > > >
+> > > > > > >                  plat->flags |=3D STMMAC_FLAG_MULTI_MSI_EN;
+> > > > > > >          }
+> > > > > > >
+> > > > > > >          res->irq =3D pci_irq_vector(pdev, 0);
+> > > > > > >
+> > > > > > >        if (np) {
+> > > > > > >            res->irq =3D of_irq_get_byname(np, "macirq");
+> > > > > > >            if (res->irq < 0) {
+> > > > > > >               dev_err(&pdev->dev, "IRQ macirq not found\n");
+> > > > > > >               return -ENODEV;
+> > > > > > >            }
+> > > > > > >
+> > > > > > >            res->wol_irq =3D of_irq_get_byname(np, "eth_wake_i=
+rq");
+> > > > > > >            if (res->wol_irq < 0) {
+> > > > > > >               dev_info(&pdev->dev,
+> > > > > > >                    "IRQ eth_wake_irq not found, using macirq\=
+n");
+> > > > > > >               res->wol_irq =3D res->irq;
+> > > > > > >            }
+> > > > > > >
+> > > > > > >            res->lpi_irq =3D of_irq_get_byname(np, "eth_lpi");
+> > > > > > >            if (res->lpi_irq < 0) {
+> > > > > > >               dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+> > > > > > >               return -ENODEV;
+> > > > > > >            }
+> > > > > > >        }
+> > > > > > >          return 0;
+> > > > > > >      }
+> > > > > > >
+> > > > > > > If your agree, Yanteng can use this method in V13, then avoid=
+ furthur changes.
+> > > > > > Since yesterday I have been too relaxed sitting back to explain=
+ in
+> > > > > > detail the problems with the code above. Shortly speaking, no t=
+o the
+> > > > > > method designed as above.
+> > > > > This function is copy-paste from your version which you suggest t=
+o
+> > > > > Yanteng, and plus the fallback parts for DT. If you don't want to
+> > > > > discuss it any more, we can discuss after V13.
+> > > My conclusion is the same. no to _your_ (Huacai) version of the code.
+> > > I suggest to Huacai dig dipper in the function semantic and find out
+> > > the problems it has. Meanwhile I'll keep relaxing...
 > > >
-> > > >           /* Set default value for unicast filter entries */
-> > > >           plat->unicast_filter_entries =3D 1;
-> > > >           /* Set the maxmtu to a default of JUMBO_LEN */
-> > > >           plat->maxmtu =3D JUMBO_LEN;
-> > > > - /* Set default number of RX and TX queues to use */
-> > > > - plat->tx_queues_to_use =3D 1;
-> > > > - plat->rx_queues_to_use =3D 1;
-> > > > -
-> > > >           /* Disable Priority config by default */
-> > > >           plat->tx_queues_cfg[0].use_prio =3D false;
-> > > >           plat->rx_queues_cfg[0].use_prio =3D false;
-> > > > @@ -41,6 +39,12 @@ static int loongson_default_data(struct plat_stm=
-macenet_data *plat)
-> > > >           plat->dma_cfg->pblx8 =3D true;
-> > > >           plat->multicast_filter_bins =3D 256;
-> > > > +}
-> > > > +
-> > > > +static int loongson_gmac_data(struct plat_stmmacenet_data *plat)
-> > > > +{
-> > > > + loongson_default_data(plat);
-> > > > +
-> > > >           return 0;
-> > > >   }
-> > > > @@ -109,11 +113,10 @@ static int loongson_dwmac_probe(struct pci_de=
-v *pdev, const struct pci_device_id
-> > > >           }
-> > > >           plat->phy_interface =3D phy_mode;
-> > > > - plat->mac_interface =3D PHY_INTERFACE_MODE_GMII;
-> > > >           pci_set_master(pdev);
-> > > > - loongson_default_data(plat);
-> > > > + loongson_gmac_data(plat);
-> > > >           pci_enable_msi(pdev);
-> > > >           memset(&res, 0, sizeof(res));
-> > > >           res.addr =3D pcim_iomap_table(pdev)[0];
-> > > > @@ -138,6 +141,9 @@ static int loongson_dwmac_probe(struct pci_dev =
-*pdev, const struct pci_device_id
-> > > >                   goto err_disable_msi;
-> > > >           }
-> > > > + plat->tx_queues_to_use =3D 1;
-> > > > + plat->rx_queues_to_use =3D 1;
-> > > > +
-> > > You can freely move this to loongson_gmac_data() method. And then, in
-> > > the patch adding the GNET-support, you'll be able to provide these fi=
-elds
-> > > initialization in the loongson_gnet_data() method together with the
-> > > plat->tx_queues_cfg[*].coe_unsupported flag init. Thus the probe()
-> > > method will get to be smaller and easier to read, and the
-> > > loongson_*_data() method will be more coherent.
+> > > > > BTW, we cannot remove "res->wol_irq =3D res->irq", because Loongs=
+on
+> > > > > GMAC/GNET indeed supports WoL.
+> > > > Okay, I will not drop it in v13.
+> > > Apparently Huacai isn't well familiar with what he is reviewing. Once
+> > > again the initialization is useless. Drop it.
 > >
-> > As you said, at first glance, putting them in loongson_gnet_data() meth=
-od is
-> > fine,
+>
+> > Hmm, to be honest, I'm still a little confused about this.
 > >
-> > but in LS2K2000:
+> > When we first designed the driver, we looked at intel,See:
 > >
-> >         plat->rx_queues_to_use =3D CHANNEL_NUM;    // CHANNEL_NUM =3D 8=
-;
-> >         plat->tx_queues_to_use =3D CHANNEL_NUM;
+> > $: vim drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c +953
 > >
-> > So we need to distinguish between them. At the same time, we have to
-> > distinguish
+> > static int stmmac_config_single_msi(struct pci_dev *pdev,
+> >                     struct plat_stmmacenet_data *plat,
+> >                     struct stmmac_resources *res)
+> > {
+> >     int ret;
 > >
-> > between LS2K2000 in probe() method. Why not put them inside probe, whic=
-h
-> > will
-> >
-> > save a lot of duplicate code, like this:
-> >
-> >     struct stmmac_resources res;
-> >     struct loongson_data *ld;
-> >
-> > ...
-> >
-> >     memset(&res, 0, sizeof(res));
-> >     res.addr =3D pcim_iomap_table(pdev)[0];
-> >     ld->gmac_verion =3D readl(res.addr + GMAC_VERSION) & 0xff;
-> >
-> >     switch (ld->gmac_verion) {
-> >     case LOONGSON_DWMAC_CORE_1_00:
-> >         plat->rx_queues_to_use =3D CHANNEL_NUM;
-> >         plat->tx_queues_to_use =3D CHANNEL_NUM;
-> >
-> >         /* Only channel 0 supports checksum,
-> >          * so turn off checksum to enable multiple channels.
-> >          */
-> >         for (i =3D 1; i < CHANNEL_NUM; i++)
-> >             plat->tx_queues_cfg[i].coe_unsupported =3D 1;
-> >
-> >         ret =3D loongson_dwmac_config_msi(pdev, plat, &res, np);
-> >         break;
-> >     default:    /* 0x35 device and 0x37 device. */
-> >         plat->tx_queues_to_use =3D 1;
-> >         plat->rx_queues_to_use =3D 1;
-> >
-> >         ret =3D loongson_dwmac_config_legacy(pdev, plat, &res, np);
-> >         break;
+> >     ret =3D pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_ALL_TYPES);
+> >     if (ret < 0) {
+> >         dev_info(&pdev->dev, "%s: Single IRQ enablement failed\n",
+> >              __func__);
+> >         return ret;
 > >     }
-> >     if (ret)
-> >         goto err_disable_device;
 > >
+> >     res->irq =3D pci_irq_vector(pdev, 0);
+> >     res->wol_irq =3D res->irq;
 > >
-> > What do you think?
+> > Why can't we do this?
 > >
-> >
-> > Of course, if you insist, I'm willing to repeat this in the
-> >
-> > loongson_gnet_data() method.
+> > Intel Patch thread link <https://lore.kernel.org/netdev/20210316121823.=
+18659-5-weifeng.voon@intel.com/>
 >
-> Not necessarily. As Huacai earlier suggested you can keep the Loongson
-> ID in the platform private data and have it utilized in the local
-> sub-functions/routines. Like this:
+> First of all the Intel' STMMAC patches isn't something what can be
+> referred to as a good-practice example. A significant part of the
+> mess in the plat_stmmacenet_data structure is their doing.
 >
-> struct loongson_data {
->         u32 loongson_id;
-> };
+> Secondly as I already said several times initializing res->wol_irq
+> with res->irq is _useless_. It's because of the way the WoL IRQ line
+> is requested:
+I see, res->irq will be droped. Thanks.
 >
-> static int loongson_gmac_data(struct pci_dev *pdev,
->                               struct plat_stmmacenet_data *plat)
+> stmmac_request_irq_single(struct net_device *dev)
 > {
->         struct loongson_data *ld =3D plat->bsp_priv;
->
 >         ...
->
->         plat->rx_queues_to_use =3D 1;
->         plat->tx_queues_to_use =3D 1;
->
->         return 0;
+>         if (priv->wol_irq > 0 && priv->wol_irq !=3D dev->irq) {
+>                 ret =3D request_irq(priv->wol_irq, stmmac_interrupt,
+>                                   IRQF_SHARED, dev->name, dev);
+>                 ...
+>         }
+>         ...
 > }
 >
-> static int loongson_gnet_data(struct pci_dev *pdev,
->                               struct plat_stmmacenet_data *plat)
+> stmmac_request_irq_multi_msi(struct net_device *dev)
 > {
->         struct loongson_data *ld =3D plat->bsp_priv;
->
 >         ...
->
->         if (ld->loongson_id =3D=3D DWMAC_CORE_LS2K2000) {
-I did the test and found that at this point in time: loongson_id =3D 0,
-it has not been initialized yet.
-
->
-> static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_de=
-vice_id *id)
-> {
->         struct loongson_data *ld;
+>         if (priv->wol_irq > 0 && priv->wol_irq !=3D dev->irq) {
+>                 int_name =3D priv->int_name_wol;
+>                 sprintf(int_name, "%s:%s", dev->name, "wol");
+>                 ret =3D request_irq(priv->wol_irq,
+>                                   stmmac_mac_interrupt,
+>                                   0, int_name, dev);
+>                 ...
+>         }
 >         ...
+> }
 >
->         ld =3D devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
->         if (!ld)
->                 return -ENOMEM;
->         ...
->         ld->loongson_id =3D readl(res.addr + GMAC_VERSION) & 0xff;
->         plat->bsp_priv =3D ld;
->         ...
->         if (ld->loongson_id =3D=3D DWMAC_CORE_LS2K2000)
->                 ret =3D loongson_dwmac_config_msi(pdev, plat, &res);
->         else
->                 ret =3D loongson_dwmac_config_plat(pdev, plat, &res);
-I'll change loongson_dwmac_config_legacy to loongson_dwmac_config_plat in t=
-he
-next version. And using if-else.
-
+> See, even if you initialize priv->wol_irq with dev->irq (res->irq) it
+> will have the same effect as if you had it left uninitialized
+> (pre-initialized with zero). So from both maintainability and
+> readability points of view it's better to avoid a redundant code
+> especially if it causes an ill coding practice reproduction.
+Oh, I see. Thank you=EF=BC=81
 >
-> It's not "a lot" duplication code. Just two if-else statements, which
-> is fine. But the data-init methods will get to be fully coherent. It's
-> much more important.
-Yes, I agree with you, but it looks like we still need to do the following =
-again
-inside loongson_gnet_data() :
-
-memset(&res, 0, sizeof(res));
-res.addr =3D pcim_iomap_table(pdev)[0];
-ld->loongson_id =3D readl(res.addr + GMAC_VERSION) & 0xff;
-
-
 >
-> * Note switch-case is redundant since you have a single case in there,
-> so if-else would be more than enough.
-I see, Your single case is great=EF=BC=81
+> Interestingly to note that having res->wol_irq initialized with
+> res->irq had been required before another Intel' commit:
+> 8532f613bc78 ("net: stmmac: introduce MSI Interrupt routines for mac, saf=
+ety, RX & TX")
+> (submitted sometime around the commit you are referring to).
+> In that commit Intel' developers themself fixed the semantics in the
+> STMMAC core driver, but didn't bother with fixing the platform drivers
+> and even the Intel' DWMAC PCI driver has been left with that redundant
+> line of the code. Sigh...
+>
+> > Ok, if I'm fast enough, I'll send an RFC to talk about msi and legacy.
+>
+> It's up to you. But please be aware, I'll be busy next week with my
+> own patches cooking up. So I won't be able to actively participate in
+> your patches review.
+Okay, maybe it would be better to send v13 after the window closes.
 
 Thanks,
 Yanteng
