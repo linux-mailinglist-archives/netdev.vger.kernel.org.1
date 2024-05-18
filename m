@@ -1,251 +1,118 @@
-Return-Path: <netdev+bounces-97113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A3D28C9208
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 21:03:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 541818C9238
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 22:25:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 698ABB21C27
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 19:03:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10386281DAA
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 20:25:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF04C481BD;
-	Sat, 18 May 2024 19:03:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADCF954917;
+	Sat, 18 May 2024 20:25:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OrDDLqr3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lCOotVOl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56A71D6A5;
-	Sat, 18 May 2024 19:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD4DBA29
+	for <netdev@vger.kernel.org>; Sat, 18 May 2024 20:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716059017; cv=none; b=u5MoDb9nfFq3tTxhHlQWzp5KYvjxB293G7Dba6ygeYfiQYN63kSqZ3LKy7+cyc3cOD6Oc7QnHbsQuy9pMhyCsTbUQfkFa8GTNPQVSfIz3hhisQXNfyaQED94qoUtckJsZJYVHoIRw92CQ+EKF8k0U/jHQmBzjLiGs3Gt03n00Vs=
+	t=1716063903; cv=none; b=ilVzEVbMtfdocoY3pQmG1NyIoz1ki1W7Cs4P2G8LCBKj3z4aj7bYsOhWCC+jwEA3Xk2HjrzrhbEA+P+LSBRMhWu4kjANbGZnHcA8phwt4rBQ7w/i3KIRsZUhNX6iAfcTEr9WpCi2yfH5SpjNNkKUZ/DO/l0DynakqTrsj5MwJWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716059017; c=relaxed/simple;
-	bh=7rmGpkOatz4do+81lJEjQWDYuejNH0Ay1bs4H11lIbo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XbkIBkEsfhz5pQ/znB+p0su7bjLjhIstPyI+QEokDLjej2J53F7j/+YME1EYC7XVf3mBI2VPa7r3Oh9HdLoE7ZW47Ak2PlgreYgKK9Q+fxAkRmy2sUzi21DhH27+K22Ke0Qx8CcGWrjYqPtJBLuyc04ga6gDkXXQxS6XwB96jr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OrDDLqr3; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716059016; x=1747595016;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7rmGpkOatz4do+81lJEjQWDYuejNH0Ay1bs4H11lIbo=;
-  b=OrDDLqr3JAjJLDw76kjDEM5NvydPMk3Us0Utr2XUOSD02lQDOrQUjtS1
-   qyCEzNUWftvld7/DMb8QGqPrPQB61fKHvEsKo9mLU+6XMEPzVJNdO9SgG
-   tWhno7GUKNNf6fkLmTuU6pX47mt9pmnMggnGVzn0c7fuMG894Br/MONZX
-   6prNopQ7AP9yCBl6dY/mh542MgIJ3EB0z2AGaqnUsP/PcJfbps9yPNSnA
-   vQldzI9A+YyUBxMv0MDwHK+s5i4XIpk7SPgBv7E3BMAWGBcUAoFx46W3g
-   ca5255hG8w5f4TqhKKJIYC0tVPanmiSgbArnIE7iH/FpZHQBdnZG22xPZ
-   A==;
-X-CSE-ConnectionGUID: jJ8bpRuzTm+uDWogYloKHw==
-X-CSE-MsgGUID: OUVNK0U6Q7OkWAlykVfF2A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11076"; a="12075602"
-X-IronPort-AV: E=Sophos;i="6.08,171,1712646000"; 
-   d="scan'208";a="12075602"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2024 12:03:35 -0700
-X-CSE-ConnectionGUID: LUvghvNBQFec0W5tb3HKuw==
-X-CSE-MsgGUID: 1q2z18JQSV6KxmPSeW8J6A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,171,1712646000"; 
-   d="scan'208";a="32533127"
-Received: from unknown (HELO 108735ec233b) ([10.239.97.151])
-  by orviesa006.jf.intel.com with ESMTP; 18 May 2024 12:03:29 -0700
-Received: from kbuild by 108735ec233b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s8PL5-0002YC-1M;
-	Sat, 18 May 2024 19:03:27 +0000
-Date: Sun, 19 May 2024 03:02:40 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1716063903; c=relaxed/simple;
+	bh=EqbqVPgaCDHPrBfiwoucADSzgQAgzBriUz68zPJpF0A=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ZiHgTpaL5+kXeicffia71Bp11D4SXL0NJaPXVUjQ512J1SAqjcOjJlR0a9EDIP03e8Mg0rqdyj+S8hnzUUdMl0DcjNK8397by8V2LzvNevX+BVeSyaksenCRAsALfeN7ulntQ3/jIz3atTuYMKAhuxHEt2jpigugs0EkzKkeYsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lCOotVOl; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5751bcb3139so2431436a12.1
+        for <netdev@vger.kernel.org>; Sat, 18 May 2024 13:25:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716063900; x=1716668700; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kde2T4tOYT5RpAyyKKTezqvTbCUDs5ucfquZ+B4ig0w=;
+        b=lCOotVOlrgM5oeCWCQ9nEWOG+73e8bX7OA/9/mIiOe6IgGuH2X9sTLTqKZvMt4SL0C
+         T5TR8AmyKcSDnvpFAwxxByXHs7E5ytxEg4tHxXjnewMyyA8HddyGAULj9nrZ3twXYLgM
+         99w0UZpi2SJHH9sO50cIyDdboL2r8rsHYuu+eRvdqf8wUvrtoXMkM2pHskSndCWCtsrf
+         ew8PSGiTIbo8I2gxVPzVLU9Mc7gHX125tCOw5nAC5k+fjMDZQZcO8A7gcMb4QW6MyRCf
+         6svKgtuRVLiqBSLM1swDKYOn6GwbZq+8E7ZaCnEXp8h9k9ji9rEx/j3euV3W/iDig2IZ
+         wbJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716063900; x=1716668700;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kde2T4tOYT5RpAyyKKTezqvTbCUDs5ucfquZ+B4ig0w=;
+        b=G5L7m3kxq9QoAzN4C11lnEDSF9j6EzML6+PyqJOBrk3U2D4NB7joUpLwHOmwNFtuuH
+         zR1T80rbGZu0Xwhfk28Fh2TWngfyfkJ8D2PS7thsq+MPFfkWDKXEWtIritAlSXBnVbpQ
+         fHgPhbm5kR/spAs29BwTyt4wte0L8Ct/q0bWoIut/mcwp170XktpIF2F/OKBQP3CLAEY
+         gyU2xHyGpPCq3Oq5v9ol0e4FUEoiSCWzFw3IP0rgAZPVLe7Eelc7q5n5u5ZdLTzDA8/f
+         YAgN2BccFtruKlC/Ize18eOBb5w28e4bQFcMUiFaRtpxvMLSmx3XMVrBEIIOypIF8qX0
+         SMeA==
+X-Gm-Message-State: AOJu0YwPATzhcwrraaS0kHaugt71c01JxRcKfpN3C964qwsU3h10ThoO
+	q4iWYn6+WQkJSnMFK0AacU2uI9ErddjoQQqwQz7GUnwyYDLU9b0=
+X-Google-Smtp-Source: AGHT+IHliKyM92jfYHmJXlYgKSqKNJlGHB+NeXDGwPZAPkjDkmPF/eBIsgECUXhlSWLcv+QRpE6H2A==
+X-Received: by 2002:a17:906:560a:b0:a59:df1d:f5ae with SMTP id a640c23a62f3a-a5a2d5c9dc7mr1594873366b.31.1716063900096;
+        Sat, 18 May 2024 13:25:00 -0700 (PDT)
+Received: from p183 ([46.53.253.16])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5cdeacb2casm403005566b.67.2024.05.18.13.24.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 May 2024 13:24:59 -0700 (PDT)
+Date: Sat, 18 May 2024 23:24:57 +0300
+From: Alexey Dobriyan <adobriyan@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Steven Liu <Steven.Liu@mediatek.com>,
-	"SkyLake.Huang" <skylake.huang@mediatek.com>
-Subject: Re: [PATCH net-next v2 1/5] net: phy: mediatek: Re-organize MediaTek
- ethernet phy drivers
-Message-ID: <202405190214.zVx19jfL-lkp@intel.com>
-References: <20240517102908.12079-2-SkyLake.Huang@mediatek.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Subject: [PATCH] net: set struct net_device::name earlier
+Message-ID: <d116cbdb-4dc5-484a-b53b-fec50f8ef2bf@p183>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240517102908.12079-2-SkyLake.Huang@mediatek.com>
 
-Hi Sky,
+I've tried debugging networking allocations with bpftrace and doing
 
-kernel test robot noticed the following build errors:
+	$dev = (struct net_device*)arg0;
+	printf("dev %s\n", $dev->name);
 
-[auto build test ERROR on next-20240517]
-[cannot apply to net-next/main net/main linus/master v6.9 v6.9-rc7 v6.9-rc6 v6.9]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+doesn't print anything useful in functions called right after netdevice
+allocation. The reason is very simple: dev->name has not been set yet.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sky-Huang/net-phy-mediatek-Re-organize-MediaTek-ethernet-phy-drivers/20240517-184536
-base:   next-20240517
-patch link:    https://lore.kernel.org/r/20240517102908.12079-2-SkyLake.Huang%40mediatek.com
-patch subject: [PATCH net-next v2 1/5] net: phy: mediatek: Re-organize MediaTek ethernet phy drivers
-config: nios2-allmodconfig (https://download.01.org/0day-ci/archive/20240519/202405190214.zVx19jfL-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240519/202405190214.zVx19jfL-lkp@intel.com/reproduce)
+Make name copying much earlier for smoother debugging experience.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405190214.zVx19jfL-lkp@intel.com/
+Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+---
 
-All errors (new ones prefixed by >>):
+ net/core/dev.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mtk_socphy_write_page':
-   mtk-ge-soc.c:(.text+0x70): undefined reference to `__mdiobus_write'
-   mtk-ge-soc.c:(.text+0x70): relocation truncated to fit: R_NIOS2_CALL26 against `__mdiobus_write'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mtk_socphy_read_page':
-   mtk-ge-soc.c:(.text+0xa4): undefined reference to `__mdiobus_read'
-   mtk-ge-soc.c:(.text+0xa4): relocation truncated to fit: R_NIOS2_CALL26 against `__mdiobus_read'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt7981_phy_finetune':
-   mtk-ge-soc.c:(.text+0x150): undefined reference to `phy_write_mmd'
->> mtk-ge-soc.c:(.text+0x150): relocation truncated to fit: R_NIOS2_CALL26 against `phy_write_mmd'
->> nios2-linux-ld: mtk-ge-soc.c:(.text+0x16c): undefined reference to `phy_select_page'
->> mtk-ge-soc.c:(.text+0x16c): relocation truncated to fit: R_NIOS2_CALL26 against `phy_select_page'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x180): undefined reference to `__mdiobus_write'
-   mtk-ge-soc.c:(.text+0x180): relocation truncated to fit: R_NIOS2_CALL26 against `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x194): undefined reference to `__mdiobus_write'
-   mtk-ge-soc.c:(.text+0x194): relocation truncated to fit: R_NIOS2_CALL26 against `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x1a8): undefined reference to `__mdiobus_write'
-   mtk-ge-soc.c:(.text+0x1a8): relocation truncated to fit: R_NIOS2_CALL26 against `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x1bc): undefined reference to `__mdiobus_write'
-   mtk-ge-soc.c:(.text+0x1bc): relocation truncated to fit: R_NIOS2_CALL26 against `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x1d0): undefined reference to `__mdiobus_write'
-   mtk-ge-soc.c:(.text+0x1d0): relocation truncated to fit: R_NIOS2_CALL26 against `__mdiobus_write'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:mtk-ge-soc.c:(.text+0x1e4): more undefined references to `__mdiobus_write' follow
-   drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt7981_phy_finetune':
-   mtk-ge-soc.c:(.text+0x1e4): relocation truncated to fit: R_NIOS2_CALL26 against `__mdiobus_write'
-   mtk-ge-soc.c:(.text+0x1f8): additional relocation overflows omitted from the output
->> nios2-linux-ld: mtk-ge-soc.c:(.text+0x26c): undefined reference to `phy_restore_page'
->> nios2-linux-ld: mtk-ge-soc.c:(.text+0x288): undefined reference to `phy_modify_mmd'
->> nios2-linux-ld: mtk-ge-soc.c:(.text+0x29c): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x2b0): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x2c4): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x2d8): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x2ec): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:mtk-ge-soc.c:(.text+0x300): more undefined references to `phy_write_mmd' follow
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt7981_phy_finetune':
-   mtk-ge-soc.c:(.text+0x380): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x39c): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x3b0): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x3c4): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x3d8): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt7988_phy_finetune':
-   mtk-ge-soc.c:(.text+0x48c): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x4b0): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x4bc): undefined reference to `phy_select_page'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x4d0): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x4e4): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x4f8): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x50c): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x520): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:mtk-ge-soc.c:(.text+0x534): more undefined references to `__mdiobus_write' follow
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt7988_phy_finetune':
-   mtk-ge-soc.c:(.text+0x580): undefined reference to `phy_restore_page'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x59c): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x5b0): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt798x_phy_common_finetune':
-   mtk-ge-soc.c:(.text+0x5fc): undefined reference to `phy_select_page'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x610): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x624): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x638): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x64c): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x660): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:mtk-ge-soc.c:(.text+0x674): more undefined references to `__mdiobus_write' follow
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt798x_phy_common_finetune':
-   mtk-ge-soc.c:(.text+0x774): undefined reference to `phy_restore_page'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt798x_phy_eee':
-   mtk-ge-soc.c:(.text+0x7c8): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x7e0): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x7f8): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x814): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x82c): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:mtk-ge-soc.c:(.text+0x848): more undefined references to `phy_modify_mmd' follow
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt798x_phy_eee':
-   mtk-ge-soc.c:(.text+0x8f8): undefined reference to `phy_select_page'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x90c): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x920): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x934): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x948): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x95c): undefined reference to `__mdiobus_write'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:mtk-ge-soc.c:(.text+0x970): more undefined references to `__mdiobus_write' follow
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt798x_phy_eee':
-   mtk-ge-soc.c:(.text+0xae8): undefined reference to `phy_restore_page'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0xaf4): undefined reference to `phy_select_page'
->> nios2-linux-ld: mtk-ge-soc.c:(.text+0xb08): undefined reference to `__phy_modify'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0xb1c): undefined reference to `__phy_modify'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0xb2c): undefined reference to `phy_restore_page'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0xb44): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `cal_cycle.constprop.0':
-   mtk-ge-soc.c:(.text+0xba0): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0xbbc): undefined reference to `phy_modify_mmd'
->> nios2-linux-ld: mtk-ge-soc.c:(.text+0xbec): undefined reference to `phy_read_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0xc24): undefined reference to `phy_read_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0xc54): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0xc64): undefined reference to `phy_read_mmd'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `tx_vcm_cal_sw':
-   mtk-ge-soc.c:(.text+0xd4c): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0xd64): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0xd80): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0xdcc): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0xde4): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:mtk-ge-soc.c:(.text+0xdfc): more undefined references to `phy_modify_mmd' follow
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `cal_efuse':
-   mtk-ge-soc.c:(.text+0x1710): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt798x_phy_hw_led_on_set':
-   mtk-ge-soc.c:(.text+0x1b4c): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt798x_phy_hw_led_blink_set':
-   mtk-ge-soc.c:(.text+0x1ca8): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt798x_phy_led_hw_control_set':
-   mtk-ge-soc.c:(.text+0x1fa4): undefined reference to `phy_write_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x1fc8): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x1fec): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt798x_phy_led_hw_control_get':
-   mtk-ge-soc.c:(.text+0x2070): undefined reference to `phy_read_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x20a8): undefined reference to `phy_read_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x22b8): undefined reference to `phy_read_mmd'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `mt7988_phy_probe':
-   mtk-ge-soc.c:(.text+0x2344): undefined reference to `devm_phy_package_join'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x2468): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x248c): undefined reference to `phy_modify_mmd'
-   nios2-linux-ld: mtk-ge-soc.c:(.text+0x24f4): undefined reference to `phy_modify_mmd'
->> nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:(.data+0x7c): undefined reference to `genphy_suspend'
->> nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:(.data+0x80): undefined reference to `genphy_resume'
->> nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:(.data+0x94): undefined reference to `genphy_handle_interrupt_no_ack'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:(.data+0x190): undefined reference to `genphy_suspend'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:(.data+0x194): undefined reference to `genphy_resume'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o:(.data+0x1a8): undefined reference to `genphy_handle_interrupt_no_ack'
-   nios2-linux-ld: drivers/net/phy/mediatek/mtk-ge-soc.o: in function `phy_module_init':
-   mtk-ge-soc.c:(.init.text+0x18): undefined reference to `phy_drivers_register'
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -10952,6 +10952,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+ 	dev = PTR_ALIGN(p, NETDEV_ALIGN);
+ 	dev->padded = (char *)dev - (char *)p;
+ 
++	strcpy(dev->name, name);
+ 	ref_tracker_dir_init(&dev->refcnt_tracker, 128, name);
+ #ifdef CONFIG_PCPU_DEV_REFCNT
+ 	dev->pcpu_refcnt = alloc_percpu(int);
+@@ -11015,7 +11016,6 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+ 	if (netif_alloc_rx_queues(dev))
+ 		goto free_all;
+ 
+-	strcpy(dev->name, name);
+ 	dev->name_assign_type = name_assign_type;
+ 	dev->group = INIT_NETDEV_GROUP;
+ 	if (!dev->ethtool_ops)
 
