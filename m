@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-97096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD0C88C9117
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 14:49:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F3378C911E
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 14:49:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97C7428174B
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 12:49:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B002B1F21F51
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 12:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 842D54501C;
-	Sat, 18 May 2024 12:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D7F78C67;
+	Sat, 18 May 2024 12:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="fexKLyd8"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="oy4bA/9i"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF55770FA;
-	Sat, 18 May 2024 12:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23DE777118;
+	Sat, 18 May 2024 12:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716036281; cv=none; b=qQfgq1od/sQ+qujdaPmAY0RkoqpikRRB6Ry7oONVlBOEVWtTywjbFfYK0f9AC+gOUQq/5/dqAcZ7LM7LBR02cV4Vc4ahtufilTuVrIMVgaUSGU7g7rb/ezUWckHSdrp8URepgoQPqUXTwwdWp7+s70zpfH74FN0Ebs+AE6ybyW8=
+	t=1716036284; cv=none; b=B0e8ZtkwBsXyKQypze4rIxRfd2cNJp65o4h6TTK8YAau1JXxViLoJ+MxPSgBbHSxstyIMlZW40l1HSnMkQg6YqPIDUq2NNxlOIbqXBf5h1b0YxIq3mTBIhqCogdfpJsjVq7gXMC51HYtXl4G75aL/ZuIGWXqNITY7xsUP74MWdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716036281; c=relaxed/simple;
-	bh=TkZ8YCzGf3L4/woShJhNStGq6ph3UlMnPIzsSyhl65U=;
+	s=arc-20240116; t=1716036284; c=relaxed/simple;
+	bh=9ikqwUURIJXjmOX0YEggmPaxUl5VbN4VNsrVNZ2xog0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LLxtHjJwS/u923/lxbDxiYARoWKwzXdoXNqxCBBrk6nBVK7Apj6qLyuSMi0e1mDNjSTQ2Hakv99CubinPJin/6qCarBjnL0Kt57yBqs3VbGyRiLSCR8p+eZbkcYdd+Jk3HJtMZJQb7X6l8jCobffrR9g63+82rfQ/9EoNu2jjl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=fexKLyd8; arc=none smtp.client-ip=198.47.23.249
+	 MIME-Version:Content-Type; b=NY3XN1LZR0PMrf1nPYApuchJo6AkXyvZQtDmAshdYPg2hheAJyECMW2aN/p7x5pFZUt9PpvRHAasjyGFuQXfusUOThDIWA9qeO2KDx1vyrHdd+ADAZHA3ENB5i/vsp5dC5/38tUbZ3UVc6qvmDZQyuAPuBL+cvGUGhyqiD/Yftk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=oy4bA/9i; arc=none smtp.client-ip=198.47.23.248
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44ICiK5o017356;
-	Sat, 18 May 2024 07:44:20 -0500
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44ICiPge110184;
+	Sat, 18 May 2024 07:44:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1716036260;
-	bh=bhrgTDMVzI0dP8d/KQcIUJP6wdPok2F5QjLOlXwW5rY=;
+	s=ti-com-17Q1; t=1716036265;
+	bh=lP4vcrz4edMAL+hEj61bfOYsm3giMknUDGXG+pKdxIQ=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=fexKLyd8OlzpsoOiCIHCWanAWn6FgEqgJxW9JEEkeDcJbDPxC7oMezMsQt4DoUe2M
-	 za+kMTvGs69pY1hUWwdwgvWDkykQ5rkjFX5HxjniZVIIHlih+qVSFb4vfZtceLmFsS
-	 sK9nu5OtJ9APr88pxlv4bhQ+IXeRgwZy1cUYHXSU=
-Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44ICiKAF130101
+	b=oy4bA/9irURetstA9Fc5yO+3I4DC1KGhldjpzWdHlZ+6kWzxUjtNQD6XeLlzLCkup
+	 0XhKmadGTcBioI/dBHjnZaUPwJ9uCE/byMKJ5B+AzytVc0CnRwG57KU4vyxCgDNCzu
+	 Aeygm4F0CQmsKNv7kCXRdmeTARvh+sN8dk7HimgY=
+Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44ICiPNs052100
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sat, 18 May 2024 07:44:20 -0500
-Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+	Sat, 18 May 2024 07:44:25 -0500
+Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE102.ent.ti.com
+ (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sat, 18
- May 2024 07:44:20 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
+ May 2024 07:44:25 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sat, 18 May 2024 07:44:20 -0500
+ Frontend Transport; Sat, 18 May 2024 07:44:25 -0500
 Received: from uda0492258.dhcp.ti.com (uda0492258.dhcp.ti.com [172.24.227.9])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44ICgY9c041511;
-	Sat, 18 May 2024 07:44:16 -0500
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44ICgY9d041511;
+	Sat, 18 May 2024 07:44:20 -0500
 From: Siddharth Vadapalli <s-vadapalli@ti.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
         <pabeni@redhat.com>, <corbet@lwn.net>, <rogerq@kernel.org>,
@@ -64,9 +64,9 @@ CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
         <vigneshr@ti.com>, <misael.lopez@ti.com>, <srk@ti.com>,
         <s-vadapalli@ti.com>
-Subject: [RFC PATCH net-next 22/28] net: ethernet: ti: cpsw-proxy-client: implement .get_link ethtool op
-Date: Sat, 18 May 2024 18:12:28 +0530
-Message-ID: <20240518124234.2671651-23-s-vadapalli@ti.com>
+Subject: [RFC PATCH net-next 23/28] net: ethernet: ti: cpsw-proxy-client: add sw tx/rx irq coalescing
+Date: Sat, 18 May 2024 18:12:29 +0530
+Message-ID: <20240518124234.2671651-24-s-vadapalli@ti.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240518124234.2671651-1-s-vadapalli@ti.com>
 References: <20240518124234.2671651-1-s-vadapalli@ti.com>
@@ -80,65 +80,158 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Add the "vport_get_link()" function and register it as the driver's
-.get_link ethtool_ops callback.
+Add coalescing support for the interrupts corresponding to the TX and RX
+DMA Channels using hrtimer.
 
 Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
 ---
- drivers/net/ethernet/ti/cpsw-proxy-client.c | 32 +++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ drivers/net/ethernet/ti/cpsw-proxy-client.c | 57 +++++++++++++++++++--
+ 1 file changed, 53 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/ti/cpsw-proxy-client.c b/drivers/net/ethernet/ti/cpsw-proxy-client.c
-index be42b02c3894..450fc183eaac 100644
+index 450fc183eaac..408c9f78c059 100644
 --- a/drivers/net/ethernet/ti/cpsw-proxy-client.c
 +++ b/drivers/net/ethernet/ti/cpsw-proxy-client.c
-@@ -284,6 +284,7 @@ static int create_request_message(struct cpsw_proxy_req_params *req_params)
- 	case ETHFW_ALLOC_MAC:
- 	case ETHFW_VIRT_PORT_DETACH:
- 	case ETHFW_VIRT_PORT_INFO:
-+	case ETHFW_VIRT_PORT_LINK_STATUS:
- 		common_req_msg = (struct common_request_message *)msg;
- 		req_msg_hdr = &common_req_msg->request_msg_hdr;
- 		break;
-@@ -1184,7 +1185,38 @@ static int vport_rx_poll(struct napi_struct *napi_rx, int budget)
+@@ -58,13 +58,16 @@ struct rx_dma_chan {
+ 	struct k3_cppi_desc_pool	*desc_pool;
+ 	struct k3_udma_glue_rx_channel	*rx_chan;
+ 	struct napi_struct		napi_rx;
++	struct hrtimer			rx_hrtimer;
+ 	u32				rel_chan_idx;
+ 	u32				flow_base;
+ 	u32				flow_offset;
+ 	u32				thread_id;
+ 	u32				num_descs;
+ 	unsigned int			irq;
++	unsigned long			rx_pace_timeout;
+ 	char				rx_chan_name[CHAN_NAME_LEN];
++	bool				rx_irq_disabled;
+ 	bool				in_use;
+ };
+ 
+@@ -74,10 +77,12 @@ struct tx_dma_chan {
+ 	struct k3_cppi_desc_pool	*desc_pool;
+ 	struct k3_udma_glue_tx_channel	*tx_chan;
+ 	struct napi_struct		napi_tx;
++	struct hrtimer			tx_hrtimer;
+ 	u32				rel_chan_idx;
+ 	u32				thread_id;
+ 	u32				num_descs;
+ 	unsigned int			irq;
++	unsigned long			tx_pace_timeout;
+ 	char				tx_chan_name[CHAN_NAME_LEN];
+ 	bool				in_use;
+ };
+@@ -996,8 +1001,15 @@ static int vport_tx_poll(struct napi_struct *napi_tx, int budget)
+ 	if (num_tx >= budget)
+ 		return budget;
+ 
+-	if (napi_complete_done(napi_tx, num_tx))
+-		enable_irq(tx_chn->irq);
++	if (napi_complete_done(napi_tx, num_tx)) {
++		if (unlikely(tx_chn->tx_pace_timeout && !tdown)) {
++			hrtimer_start(&tx_chn->tx_hrtimer,
++				      ns_to_ktime(tx_chn->tx_pace_timeout),
++				      HRTIMER_MODE_REL_PINNED);
++		} else {
++			enable_irq(tx_chn->irq);
++		}
++	}
+ 
+ 	return 0;
+ }
+@@ -1179,12 +1191,38 @@ static int vport_rx_poll(struct napi_struct *napi_rx, int budget)
+ 		num_rx++;
+ 	}
+ 
+-	if (num_rx < budget && napi_complete_done(napi_rx, num_rx))
+-		enable_irq(rx_chn->irq);
++	if (num_rx < budget && napi_complete_done(napi_rx, num_rx)) {
++		if (rx_chn->rx_irq_disabled) {
++			rx_chn->rx_irq_disabled = false;
++			if (unlikely(rx_chn->rx_pace_timeout)) {
++				hrtimer_start(&rx_chn->rx_hrtimer,
++					      ns_to_ktime(rx_chn->rx_pace_timeout),
++					      HRTIMER_MODE_REL_PINNED);
++			} else {
++				enable_irq(rx_chn->irq);
++			}
++		}
++	}
+ 
  	return num_rx;
  }
  
-+static u32 vport_get_link(struct net_device *ndev)
++static enum hrtimer_restart vport_tx_timer_cb(struct hrtimer *timer)
 +{
-+	struct virtual_port *vport = vport_ndev_to_vport(ndev);
-+	struct cpsw_proxy_priv *proxy_priv = vport->proxy_priv;
-+	struct port_link_status_response *pls_resp;
-+	struct cpsw_proxy_req_params *req_p;
-+	struct message resp_msg;
-+	bool link_up;
-+	int ret;
++	struct tx_dma_chan *tx_chn = container_of(timer, struct tx_dma_chan, tx_hrtimer);
 +
-+	if (vport->port_type != VIRT_MAC_ONLY_PORT)
-+		return ethtool_op_get_link(ndev);
-+
-+	mutex_lock(&proxy_priv->req_params_mutex);
-+	req_p = &proxy_priv->req_params;
-+	req_p->request_type = ETHFW_VIRT_PORT_LINK_STATUS;
-+	req_p->token = vport->port_token;
-+	ret = send_request_get_response(proxy_priv, &resp_msg);
-+	mutex_unlock(&proxy_priv->req_params_mutex);
-+	if (ret) {
-+		netdev_err(ndev, "failed to get link status\n");
-+		/* Assume that link is down if status is unknown */
-+		return 0;
-+	}
-+	pls_resp = (struct port_link_status_response *)&resp_msg;
-+	link_up = pls_resp->link_up;
-+
-+	return link_up;
++	enable_irq(tx_chn->irq);
++	return HRTIMER_NORESTART;
 +}
 +
- const struct ethtool_ops cpsw_proxy_client_ethtool_ops = {
-+	.get_link		= vport_get_link,
- };
++static enum hrtimer_restart vport_rx_timer_cb(struct hrtimer *timer)
++{
++	struct rx_dma_chan *rx_chn = container_of(timer, struct rx_dma_chan, rx_hrtimer);
++
++	enable_irq(rx_chn->irq);
++	return HRTIMER_NORESTART;
++}
++
+ static u32 vport_get_link(struct net_device *ndev)
+ {
+ 	struct virtual_port *vport = vport_ndev_to_vport(ndev);
+@@ -1326,6 +1364,7 @@ static void vport_stop(struct virtual_port *vport)
+ 		k3_udma_glue_reset_tx_chn(tx_chn->tx_chan, tx_chn, vport_tx_cleanup);
+ 		k3_udma_glue_disable_tx_chn(tx_chn->tx_chan);
+ 		napi_disable(&tx_chn->napi_tx);
++		hrtimer_cancel(&tx_chn->tx_hrtimer);
+ 	}
  
- static int register_mac(struct virtual_port *vport)
+ 	for (i = 0; i < vport->num_rx_chan; i++) {
+@@ -1336,6 +1375,7 @@ static void vport_stop(struct virtual_port *vport)
+ 		k3_udma_glue_reset_rx_chn(rx_chn->rx_chan, 0, rx_chn, vport_rx_cleanup,
+ 					  false);
+ 		napi_disable(&rx_chn->napi_rx);
++		hrtimer_cancel(&rx_chn->rx_hrtimer);
+ 	}
+ }
+ 
+@@ -1381,6 +1421,10 @@ static int vport_open(struct virtual_port *vport, netdev_features_t features)
+ 	for (i = 0; i < vport->num_rx_chan; i++) {
+ 		rx_chn = &vport->rx_chans[i];
+ 		napi_enable(&rx_chn->napi_rx);
++		if (rx_chn->rx_irq_disabled) {
++			rx_chn->rx_irq_disabled = false;
++			enable_irq(rx_chn->irq);
++		}
+ 	}
+ 
+ 	return 0;
+@@ -1708,11 +1752,15 @@ static int init_netdev(struct cpsw_proxy_priv *proxy_priv, struct virtual_port *
+ 	for (i = 0; i < vport->num_tx_chan; i++) {
+ 		tx_chn = &vport->tx_chans[i];
+ 		netif_napi_add_tx(vport->ndev, &tx_chn->napi_tx, vport_tx_poll);
++		hrtimer_init(&tx_chn->tx_hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
++		tx_chn->tx_hrtimer.function = &vport_tx_timer_cb;
+ 	}
+ 
+ 	for (i = 0; i < vport->num_rx_chan; i++) {
+ 		rx_chn = &vport->rx_chans[i];
+ 		netif_napi_add(vport->ndev, &rx_chn->napi_rx, vport_rx_poll);
++		hrtimer_init(&rx_chn->rx_hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
++		rx_chn->rx_hrtimer.function = &vport_rx_timer_cb;
+ 	}
+ 
+ 	ret = register_netdev(vport->ndev);
+@@ -1771,6 +1819,7 @@ static irqreturn_t rx_irq_handler(int irq, void *dev_id)
+ {
+ 	struct rx_dma_chan *rx_chn = dev_id;
+ 
++	rx_chn->rx_irq_disabled = true;
+ 	disable_irq_nosync(irq);
+ 	napi_schedule(&rx_chn->napi_rx);
+ 
 -- 
 2.40.1
 
