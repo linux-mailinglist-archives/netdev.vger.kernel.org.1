@@ -1,80 +1,84 @@
-Return-Path: <netdev+bounces-97105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AC048C9150
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 15:04:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA908C915C
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 15:21:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C58E1F21C06
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 13:04:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 824AD1F21B61
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 13:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C67B2BCFF;
-	Sat, 18 May 2024 13:04:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E910F38F9A;
+	Sat, 18 May 2024 13:21:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="aA/6Gg9G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R8tE7fhN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CF81F5FA;
-	Sat, 18 May 2024 13:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86EAB1DDC9;
+	Sat, 18 May 2024 13:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716037492; cv=none; b=GLtPH+FyDM/8/Df3gBrShcp5AubgXY0jK34Kwmi4jlTX/l57hYEg12yiT6qiu1VHL5I2/Q1tb4Y5ya5B8L0x0+poCEa7ZpHqLqz/LQ/X2E/Hyo68K2InBJPkvnjxnoa4KN0CJfnqmx6vqVitZhjFJ3U6cbB5OIiOGOBM0bVNcqY=
+	t=1716038471; cv=none; b=eYWdUeiH1/EqT9mUGeUe8mdr6hq/Au/ZaW8Ul8pMhS8c1DkVKQePc2VIZTrK7pQkxhBVFikaJrFe1acePPqPAwMiF8n+jzFqmzOVIr8Qj9wkW9aiSyPRH0Wpy50uJwMcSgROMJuNOfNVaKlZhjuPWDILFCXTWWeUue3IpYhLZ/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716037492; c=relaxed/simple;
-	bh=RUjfpWzPBaoGkwn/Pmm4roGPCc8ljs1SzamDFRicGT8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kHHpdi39+aUSIZv6JCFuRA1+W4D24iJ3C98oSsvJnxOyWxaAenjGnDIjNO9McnYi8GacwVVmhXpxucoW38B2JUKu32+L4M1RJnpOdam4FB8u/Ksaza7YJqZG5z6m99/eKohaaEWo0dsDy0Hd0e39XBrDt0AsQHob8WuAdo4YWKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=aA/6Gg9G; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1716038471; c=relaxed/simple;
+	bh=ZYxibtoXl21fMBJ/iT2ilXjtHq9YVKQtJyijxIzTego=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F8HURuvuUJ9WFi9Oz+m75HCmwkZWDcDWyI3xdW2mzcQ/UqO2FpLy3IwAQh7bGoSCbGMq9Pz42hlfvTwDx6li6NkXYEjahmsMCIRIfJ7easyhsnHsg3wanCB1SkllsvD21Ul+cA4HdXE73AX6iSqsUkmlPGevXbZ+BHaNsCo0nXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R8tE7fhN; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1e3c3aa8938so34680105ad.1;
+        Sat, 18 May 2024 06:21:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1716037492; x=1747573492;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=mrZuWAfje+0i8K+OD1/L6Iu+gflYcACm+4AEdS34KKY=;
-  b=aA/6Gg9G8KBIgeZtUE0F0y9soPDOUDuAwctjZML6fzc+eHMALjKIGs1C
-   hvTRahj+gjGsrv1ILDp+dM1CB7IEUhvaDm7odKaFZEowbnk6vndDaBHWb
-   ppX4M4m9N0sBgCUvSSAu1SMBA1bgNi/SPLSNukXH3giTzDcd1L8kM3QU+
-   s=;
-X-IronPort-AV: E=Sophos;i="6.08,170,1712620800"; 
-   d="scan'208";a="295903782"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2024 13:04:49 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:3208]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.5.77:2525] with esmtp (Farcaster)
- id 84f5121c-7057-4153-b2f9-027c2ef572aa; Sat, 18 May 2024 13:04:47 +0000 (UTC)
-X-Farcaster-Flow-ID: 84f5121c-7057-4153-b2f9-027c2ef572aa
-Received: from EX19D002EUA004.ant.amazon.com (10.252.50.181) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Sat, 18 May 2024 13:04:46 +0000
-Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
- EX19D002EUA004.ant.amazon.com (10.252.50.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Sat, 18 May 2024 13:04:45 +0000
-Received: from dev-dsk-hagarhem-1b-b868d8d5.eu-west-1.amazon.com
- (10.253.65.58) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
- Server id 15.2.1258.28 via Frontend Transport; Sat, 18 May 2024 13:04:44
- +0000
-Received: by dev-dsk-hagarhem-1b-b868d8d5.eu-west-1.amazon.com (Postfix, from userid 23002382)
-	id 8F75520AC2; Sat, 18 May 2024 13:04:43 +0000 (UTC)
-From: Hagar Hemdan <hagarhem@amazon.com>
-To:
-CC: Norbert Manthey <nmanthey@amazon.de>, Hagar Hemdan <hagarhem@amazon.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, David
- Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Sabrina
- Dubroca" <sd@queasysnail.net>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH v2] net: esp: cleanup esp_output_tail_tcp() in case of unsupported ESPINTCP
-Date: Sat, 18 May 2024 13:04:39 +0000
-Message-ID: <20240518130439.20374-1-hagarhem@amazon.com>
-X-Mailer: git-send-email 2.40.1
+        d=gmail.com; s=20230601; t=1716038470; x=1716643270; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GJ5wT+MkOZjGLMc8vRhcbO+teh1jI9whaasnCH7i854=;
+        b=R8tE7fhNFjhfICZmZS+oo4yGKKsM3xDaUDscZcrFPHElYoD0hNqbiPg+dzRbgzsw/d
+         Kn87w5jYqf0Tn9eClSHQmbYOBzkoEIkd3aqyhWDHPjFuxk+66hxZI4gUeDqTQfeLfa5N
+         /kz5SYeHspLH2F0xyea0gO7ofQd7vJlUgrbTLO6KBzMjrNwZjQTlG7/rsCXz5m2tf0Ci
+         p2MJmQFidpBdBPWuFLWOSNgIu+Hzx4uTnfV22Ykl2bWk+2coQl+xdBexbfzSYqa6U+q9
+         eEO4bDBbfedhJCaa5opcR4yk/UaxKy8KW2nGxQs7QQSwefUg3HyUbRPpv5i/isvKKfap
+         wOqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716038470; x=1716643270;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GJ5wT+MkOZjGLMc8vRhcbO+teh1jI9whaasnCH7i854=;
+        b=q10VGrD/o65lZYeJuw7bjOl6k++hDlC9+g7rUwkQmUmeIuEuiin8tiwrt2TFEYJok0
+         D1f0h/6Yw9OW5hg9Ky4GAmrYq5HjMkPNFvyphJtCKIcUnsT+W8OOJlZXzTB/rVr0cT/2
+         FJrjQr+ZcSW459brDNw8jJj2IzldPmcbtCmDHhcWtMFrG1iAPJZwUaPtNuKtDgz3ZS0q
+         LmZRSVhjNePEcd6QgaZSTRwuKZkLs9QUIhx/NoH93WKlluIRYGfgVOZ3bFJqnyW39YpZ
+         pB+WKlcZidkFPHxi2R0x766liKAr0e21b3Vn3qJ3V6usc+547PYgQ1C/BX3xn3Obpd8o
+         MgUA==
+X-Forwarded-Encrypted: i=1; AJvYcCWuT2KcdG/ASmWQIQ+JU2G+YZ3543WN0loAUGGxrfOngTY9nwRCZbEPFnkm3pYQiRYvZfy9EflO4o3PZ/9rQKTNoZkq6TgqW31AwfovYrrkhrTWWwky/s1TjFA4LXswS3nRWqSUzbAb
+X-Gm-Message-State: AOJu0Yzr/xcpR+ICKGC5Z/MXblptepCGKo0mWK0lzJk/OGMbD8nPgaY5
+	5Euv2qx4udlDiVD1qm6uNNRjhh7RpbG7mqwIHnovGH/7SHwQLnYr
+X-Google-Smtp-Source: AGHT+IHRA40vD9NqiZJrLkaVeth/VvcwY6RXCubdVF3ZxZ9m6MXZcozE/8vIKWjWpUcRByLEY4ih4w==
+X-Received: by 2002:a05:6a20:9e4c:b0:1a7:4944:d49 with SMTP id adf61e73a8af0-1afddee52d6mr25397028637.0.1716038469769;
+        Sat, 18 May 2024 06:21:09 -0700 (PDT)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6340b769197sm14480855a12.24.2024.05.18.06.21.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 May 2024 06:21:09 -0700 (PDT)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: ap420073@gmail.com,
+	horms@kernel.org
+Subject: [PATCH net v3] selftests: net: kill smcrouted in the cleanup logic in amt.sh
+Date: Sat, 18 May 2024 13:20:52 +0000
+Message-Id: <20240518132052.1293474-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,57 +86,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-xmit() functions should consume skb or return error codes in error
-paths.
-When the configuration "CONFIG_INET_ESPINTCP" is not set, the
-implementation of the function "esp_output_tail_tcp" violates this rule.
-The function frees the skb and returns the error code.
-This change removes the kfree_skb from both functions, for both
-esp4 and esp6.
-WARN_ON is added because esp_output_tail_tcp() should never be called if
-CONFIG_INET_ESPINTCP is not set.
+The amt.sh requires smcrouted for multicasting routing.
+So, it starts smcrouted before forwarding tests.
+It must be stopped after all tests, but it isn't.
 
-This bug was discovered and resolved using Coverity Static Analysis
-Security Testing (SAST) by Synopsys, Inc.
+To fix this issue, it kills smcrouted in the cleanup logic.
 
-Fixes: e27cca96cd68 ("xfrm: add espintcp (RFC 8229)")
-Signed-off-by: Hagar Hemdan <hagarhem@amazon.com>
+Fixes: c08e8baea78e ("selftests: add amt interface selftest script")
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
- net/ipv4/esp4.c | 3 +--
- net/ipv6/esp6.c | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+The v1 patch is here:
+https://lore.kernel.org/netdev/20240508040643.229383-1-ap420073@gmail.com/
 
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index d33d12421814..e73de3abe37c 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -238,8 +238,7 @@ static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
- #else
- static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
- {
--	kfree_skb(skb);
--
-+	WARN_ON(1);
- 	return -EOPNOTSUPP;
+v3
+ - Do not change shebang.
+
+v2
+ - Headline change.
+ - Kill smcrouted process only if amt.pid exists.
+ - Do not remove the return value.
+ - Remove timeout logic because it was already fixed by following commit
+   4c639b6a7b9d ("selftests: net: move amt to socat for better compatibility")
+ - Fix shebang.
+
+ tools/testing/selftests/net/amt.sh | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftests/net/amt.sh
+index 5175a42cbe8a..7e7ed6c558da 100755
+--- a/tools/testing/selftests/net/amt.sh
++++ b/tools/testing/selftests/net/amt.sh
+@@ -77,6 +77,7 @@ readonly LISTENER=$(mktemp -u listener-XXXXXXXX)
+ readonly GATEWAY=$(mktemp -u gateway-XXXXXXXX)
+ readonly RELAY=$(mktemp -u relay-XXXXXXXX)
+ readonly SOURCE=$(mktemp -u source-XXXXXXXX)
++readonly SMCROUTEDIR="$(mktemp -d)"
+ ERR=4
+ err=0
+ 
+@@ -85,6 +86,11 @@ exit_cleanup()
+ 	for ns in "$@"; do
+ 		ip netns delete "${ns}" 2>/dev/null || true
+ 	done
++	if [ -f "$SMCROUTEDIR/amt.pid" ]; then
++		smcpid=$(< $SMCROUTEDIR/amt.pid)
++		kill $smcpid
++	fi
++	rm -rf $SMCROUTEDIR
+ 
+ 	exit $ERR
  }
- #endif
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index 7371886d4f9f..600402e54ccd 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -255,8 +255,7 @@ static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
- #else
- static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
+@@ -167,7 +173,7 @@ setup_iptables()
+ 
+ setup_mcast_routing()
  {
--	kfree_skb(skb);
--
-+	WARN_ON(1);
- 	return -EOPNOTSUPP;
- }
- #endif
+-	ip netns exec "${RELAY}" smcrouted
++	ip netns exec "${RELAY}" smcrouted -P $SMCROUTEDIR/amt.pid
+ 	ip netns exec "${RELAY}" smcroutectl a relay_src \
+ 		172.17.0.2 239.0.0.1 amtr
+ 	ip netns exec "${RELAY}" smcroutectl a relay_src \
 -- 
-2.40.1
+2.34.1
 
 
