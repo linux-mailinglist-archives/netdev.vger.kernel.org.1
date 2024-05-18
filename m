@@ -1,81 +1,113 @@
-Return-Path: <netdev+bounces-97119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A4AE8C92FA
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 00:04:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39B528C92FF
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 00:46:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20A2FB20D29
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 22:04:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D155D1F21397
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 22:46:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D640760DD3;
-	Sat, 18 May 2024 22:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="M4GnTiCD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9010854FBD;
+	Sat, 18 May 2024 22:46:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2238F49
-	for <netdev@vger.kernel.org>; Sat, 18 May 2024 22:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from iodev.co.uk (iodev.co.uk [46.30.189.100])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74E12BB10
+	for <netdev@vger.kernel.org>; Sat, 18 May 2024 22:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.30.189.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716069860; cv=none; b=czSw0KuFzmjqg/D8JyDGdP6tK+CM21hx9Ja7H/+ujZSrG98rgogueTIZzWqPkdtG8fnjzpDTWnMFTS/NiDS+cquVc3/X+Kr68tCKld/oOL6U4z/zMng7PYKzDi852mqFxjTNUoQa84AcoNL7WKqY8JzobjNyyuQ0FJYSoVsDICU=
+	t=1716072378; cv=none; b=S75SA9RFjKrfYk1tdl2HsG4BGa5vWa7u9xFUog1tE5ejNDPRvdPdhHM1sRW/ZLaqz49bs24OHnagzECWYL1GVToiYm5SXFHDQZ5oJN00CF+Ij/ypoCk1pIeMkSg3IXLSvm+QQtIEbf1jj31jedC6YX918ZnfVB4VB1vuHaD9MiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716069860; c=relaxed/simple;
-	bh=VeBjcltzMKut8sOCnhgTsPC8aek4JCcQturkwx8EwQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VClAiTH7BKXlOmITRlnI5DO9dk/3U5jNYjITlXjDNHMEf2hYkx89WUkDclHS+lWH4kmLHl+9RDAvzlMwTKPmekJkxYWCkKd69Z4nKUyBvzlH40XComTzpTfHIIg+GQThfPquh8I/cl0wakSX0BgZAd6fyEfVXVTkmAiDHMCXLbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=M4GnTiCD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=G8cWDYjIfjfaOL6wCijQz3MHT+A2ObWAp2AqjG8z69k=; b=M4GnTiCDTqucskAlonP8Y1KRr4
-	99XcFq+M+qOaXqFlkD4i34NqQ8hJXeSzcR0udy5IpPaDaN3ftTPd62ho4Hnt7oUKw/TtTnVC9C721
-	xqKROtnL9dtqMWG2b6ucCqjj7d07VhIF+ktSI5YS7qREZqR0B8RCTHKzGgNpGW2Ekv8o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s8S9t-00FdV9-87; Sun, 19 May 2024 00:04:05 +0200
-Date: Sun, 19 May 2024 00:04:05 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexey Dobriyan <adobriyan@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] net: set struct net_device::name earlier
-Message-ID: <1c1dd2da-9541-4d9c-a302-0a961862cedd@lunn.ch>
-References: <d116cbdb-4dc5-484a-b53b-fec50f8ef2bf@p183>
+	s=arc-20240116; t=1716072378; c=relaxed/simple;
+	bh=3msDpjBa/95VOPvvgmY/ZcvR11TsRKP+4LMG5M+NzfQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HJBpotwK8R+crKaBS+lKoOrLnFCV6QPiRL2Hvi1QXWuNxIJhO2odBW4GFWpestLZyGxqGhjDxxukAz3PvWTvXrSLLHUzadIsetd5O1RuEamWwehfDTI/ACGyMVO0U7i/N3bgkYdfTWtrq5HCsVQ6oCVi+uyBK+jaHpJdTLyJdAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iodev.co.uk; spf=pass smtp.mailfrom=iodev.co.uk; arc=none smtp.client-ip=46.30.189.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iodev.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iodev.co.uk
+Received: from localhost (222.red-83-46-228.dynamicip.rima-tde.net [83.46.228.222])
+	by iodev.co.uk (Postfix) with ESMTPSA id CEF552E34C2;
+	Sun, 19 May 2024 00:39:53 +0200 (CEST)
+From: Ismael Luceno <ismael@iodev.co.uk>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	Ismael Luceno <ismael@iodev.co.uk>
+Subject: [iproute2 PATCH] Fix usage of poll.h header
+Date: Sun, 19 May 2024 00:39:44 +0200
+Message-ID: <20240518223946.22032-1-ismael@iodev.co.uk>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d116cbdb-4dc5-484a-b53b-fec50f8ef2bf@p183>
+Content-Transfer-Encoding: 8bit
 
-On Sat, May 18, 2024 at 11:24:57PM +0300, Alexey Dobriyan wrote:
-> I've tried debugging networking allocations with bpftrace and doing
-> 
-> 	$dev = (struct net_device*)arg0;
-> 	printf("dev %s\n", $dev->name);
-> 
-> doesn't print anything useful in functions called right after netdevice
-> allocation. The reason is very simple: dev->name has not been set yet.
-> 
-> Make name copying much earlier for smoother debugging experience.
+Change the legacy <sys/poll.h> to <poll.h> (POSIX.1-2001).
 
-Does this really help? Instead of "" don't you get "eth%d"? The
-expansion of the %d to eth42 does not happen until you register the
-netdev.
+Signed-off-by: Ismael Luceno <ismael@iodev.co.uk>
+---
+ misc/arpd.c   | 2 +-
+ misc/ifstat.c | 2 +-
+ misc/nstat.c  | 2 +-
+ misc/rtacct.c | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-	Andrew
+diff --git a/misc/arpd.c b/misc/arpd.c
+index 65ac6a3828e6..3185620f7a74 100644
+--- a/misc/arpd.c
++++ b/misc/arpd.c
+@@ -14,7 +14,7 @@
+ #include <netdb.h>
+ #include <db_185.h>
+ #include <sys/ioctl.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <sys/uio.h>
+diff --git a/misc/ifstat.c b/misc/ifstat.c
+index 9b93ded32a61..faebe938e598 100644
+--- a/misc/ifstat.c
++++ b/misc/ifstat.c
+@@ -17,7 +17,7 @@
+ #include <sys/file.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/wait.h>
+ #include <sys/stat.h>
+ #include <signal.h>
+diff --git a/misc/nstat.c b/misc/nstat.c
+index 07d010dec35f..fce3e9c1ec79 100644
+--- a/misc/nstat.c
++++ b/misc/nstat.c
+@@ -17,7 +17,7 @@
+ #include <sys/file.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/wait.h>
+ #include <sys/stat.h>
+ #include <signal.h>
+diff --git a/misc/rtacct.c b/misc/rtacct.c
+index 08363bfd4f26..cd84b7f06b9b 100644
+--- a/misc/rtacct.c
++++ b/misc/rtacct.c
+@@ -16,7 +16,7 @@
+ #include <sys/file.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+-#include <sys/poll.h>
++#include <poll.h>
+ #include <sys/wait.h>
+ #include <sys/stat.h>
+ #include <sys/mman.h>
+-- 
+2.44.0
+
 
