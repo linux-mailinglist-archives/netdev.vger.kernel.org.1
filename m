@@ -1,219 +1,169 @@
-Return-Path: <netdev+bounces-97103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7319E8C912C
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 14:51:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AC2E8C913A
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 14:55:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 279362817DC
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 12:51:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 143171F21AF5
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 12:55:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1FC51BC59;
-	Sat, 18 May 2024 12:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E6E2BD18;
+	Sat, 18 May 2024 12:55:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="dthQdYTY"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="uxzheDy7"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB8B7CF16;
-	Sat, 18 May 2024 12:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DFA28379
+	for <netdev@vger.kernel.org>; Sat, 18 May 2024 12:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716036302; cv=none; b=tiWOeikWht4q/gfg7qzx6l/N8F62700a3xMUnu7BcIhFMdbVaKdx18LLbH3LI0vz9CAN8Irf5BLlCZI31GdL7cORYHFtQLVzpTyR5vDniaMGIjKJOHYrikAxsXtliiymC35kYqVCvfJ+2OlvMCvuhpqmkkCNxL0Rf8/wTmTeOCI=
+	t=1716036919; cv=none; b=W4CiVf6jZv5wInPu4Ca7Dkl0vuXNphrlSqzmtqqrzuuZh8hfhM5oKZZINYATHU1U38KG9ufMqEKAxOuQSfIBPpdkQQlmcRaoN5OObr86UVPzU3Yv5a4lPnDhM/goa5Ate9uXrp9YvPUfCXUL+srQhEbm/ySpOj6zYIIUBdLwwUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716036302; c=relaxed/simple;
-	bh=hynyAfgRm5q+1IANofou/nprgd/BjuI4O4e6YgviSjA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R80z6oHbPI5QcxZIspZG6fL9+o5OwG+W4W6/YVpOdBPCxbM+3pY4KAj7xjALVG0PqeMuJhYJIXv5vxcafv2Xztd52VYSSj3S2tD6/OFY0tvVEaKUYIN3jNefI3MT+wbDT2iAOkP/8j3JLQGCtU0dT8IHX8UKlIgppW8fQHi0PBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=dthQdYTY; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44ICimra055098;
-	Sat, 18 May 2024 07:44:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1716036288;
-	bh=VPaREiRTmandW1VVNogQssPNjYrkxOVaQwGJoi1ZkHI=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=dthQdYTYKEVD3XytPwLMxYFpI0/p2qDVk/gPrr+k4aUKGMBysbuvG7bki2vAzEaCk
-	 MXkiXxWtBGnbo7EuaO+4xQM9Wd0z1zNnwL7JXxhXPyl2WXU6qXq7R0fOVNyqUCeaJB
-	 URShu77GUbuGADkhaU5/RULKbY7Fv+b3uNpyx3nw=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44ICimT0018265
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sat, 18 May 2024 07:44:48 -0500
-Received: from DLEE101.ent.ti.com (157.170.170.31) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sat, 18
- May 2024 07:44:48 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE101.ent.ti.com
- (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sat, 18 May 2024 07:44:48 -0500
-Received: from uda0492258.dhcp.ti.com (uda0492258.dhcp.ti.com [172.24.227.9])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44ICgY9i041511;
-	Sat, 18 May 2024 07:44:44 -0500
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <corbet@lwn.net>, <rogerq@kernel.org>,
-        <danishanwar@ti.com>, <vladimir.oltean@nxp.com>
-CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <vigneshr@ti.com>, <misael.lopez@ti.com>, <srk@ti.com>,
-        <s-vadapalli@ti.com>
-Subject: [RFC PATCH net-next 28/28] net: ethernet: ti: cpsw-proxy-client: enable client driver functionality
-Date: Sat, 18 May 2024 18:12:34 +0530
-Message-ID: <20240518124234.2671651-29-s-vadapalli@ti.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240518124234.2671651-1-s-vadapalli@ti.com>
-References: <20240518124234.2671651-1-s-vadapalli@ti.com>
+	s=arc-20240116; t=1716036919; c=relaxed/simple;
+	bh=j1OkeHB51DnH91RK0vXnIN/nA8VFkbY7bZMyLfmmGGI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RJ/6j7eGmo7AgKz6/9kVGe6CaoWRVqzrkFPikbFWfeO5KGBgUJoy+lzLm2RZ3S5s0u73Xmce0Ra7ClmzluI78pWG5S5PWiCFDCHPe3vL+ij7QpeEHZrLFjFrUeGvlRQQVVJK2ZhmQkfb7mWmRspwItFqROlt31umtyw00Qtuoa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=uxzheDy7; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1716036918; x=1747572918;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Ow8Gx2zKDxEfTe7rolkjr/tijY1jZp9Dx6orpLrIFX0=;
+  b=uxzheDy7ukK4JSSqPNb/QP4lj0LBDiDSutoZMdhM430VHeDewMOZxfk4
+   gesdRKbzqcj86SAofze/2IvCNH5d4t+5eHQXNV8UDDSOu7xF8c211tl1k
+   fLYPZeH7kHut4jT6tH/RmxUlSghgZDYcniU0TNrSeIlEM9LdG/ZHxGQDo
+   I=;
+X-IronPort-AV: E=Sophos;i="6.08,170,1712620800"; 
+   d="scan'208";a="726633150"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2024 12:55:11 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:19784]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.39.9:2525] with esmtp (Farcaster)
+ id 581277a6-3f97-470a-9e99-74ee9cc1cd1f; Sat, 18 May 2024 12:55:09 +0000 (UTC)
+X-Farcaster-Flow-ID: 581277a6-3f97-470a-9e99-74ee9cc1cd1f
+Received: from EX19D002EUA004.ant.amazon.com (10.252.50.181) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Sat, 18 May 2024 12:55:09 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (10.250.64.145) by
+ EX19D002EUA004.ant.amazon.com (10.252.50.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Sat, 18 May 2024 12:55:09 +0000
+Received: from dev-dsk-hagarhem-1b-b868d8d5.eu-west-1.amazon.com
+ (10.253.65.58) by mail-relay.amazon.com (10.250.64.145) with Microsoft SMTP
+ Server id 15.2.1258.28 via Frontend Transport; Sat, 18 May 2024 12:55:08
+ +0000
+Received: by dev-dsk-hagarhem-1b-b868d8d5.eu-west-1.amazon.com (Postfix, from userid 23002382)
+	id 1D19D20AC2; Sat, 18 May 2024 12:55:08 +0000 (UTC)
+Date: Sat, 18 May 2024 12:55:08 +0000
+From: Hagar Hemdan <hagarhem@amazon.com>
+To: Simon Horman <horms@kernel.org>
+CC: Norbert Manthey <nmanthey@amazon.de>, Steffen Klassert
+	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Sabrina Dubroca <sd@queasysnail.net>,
+	<netdev@vger.kernel.org>, <hagarhem@amazon.com>
+Subject: Re: [PATCH] net: esp: cleanup esp_output_tail_tcp() in case of
+ unsupported ESPINTCP
+Message-ID: <20240518125508.GA9885@amazon.com>
+References: <20240516080309.1872-1-hagarhem@amazon.com>
+ <20240517122238.GE443576@kernel.org>
+ <20240517131757.GA12613@amazon.com>
+ <20240517155707.GG443576@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240517155707.GG443576@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Use the helpers added so far to enable the client driver functionality.
+On Fri, May 17, 2024 at 04:57:07PM +0100, Simon Horman wrote:
+> On Fri, May 17, 2024 at 01:17:57PM +0000, Hagar Hemdan wrote:
+> > On Fri, May 17, 2024 at 01:22:38PM +0100, Simon Horman wrote:
+> > > On Thu, May 16, 2024 at 08:03:09AM +0000, Hagar Hemdan wrote:
+> > > > xmit() functions should consume skb or return error codes in error
+> > > > paths.
+> > > > When the configuration "CONFIG_INET_ESPINTCP" is not used, the
+> > > > implementation of the function "esp_output_tail_tcp" violates this rule.
+> > > > The function frees the skb and returns the error code.
+> > > > This change removes the kfree_skb from both functions, for both
+> > > > esp4 and esp6.
+> > > > 
+> > > > This should not be reachable in the current code, so this change is just
+> > > > a cleanup.
+> > > > 
+> > > > This bug was discovered and resolved using Coverity Static Analysis
+> > > > Security Testing (SAST) by Synopsys, Inc.
+> > > > 
+> > > > Fixes: e27cca96cd68 ("xfrm: add espintcp (RFC 8229)")
+> > > > Signed-off-by: Hagar Hemdan <hagarhem@amazon.com>
+> > > 
+> > > Hi Hagar,
+> > > 
+> > > If esp_output() may be the x->type->output callback called from esp_output()
+> 
+> Hi Hagar,
+> 
+> FTR, I meant to say "If ... called from xfrm_output_one()",
+> but I don't think that effects the direction of the conversation
+> at this point.
+> 
+> > > then I agree that this seems to be a problem as it looks like a double free
+> > > may occur.
+> > > 
+> > > However, I believe that your proposed fix introduces will result in skb
+> > > being leaked leak in the case of esp_output_done() calling
+> > > esp_output_tail_tcp(). Perhaps a solution is for esp_output_done()
+> > > to free the skb if esp_output_tail_tcp() fails.
+> > > 
+> > > I did not analyse other call-chains, but I think such analysis is needed.
+> > > 
+> > > ...
+> > Hi Simon,
+> > 
+> > I see all calls to esp_output_tail_tcp() is surrounded by the condition
+> > "x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP" which I see
+> > it is related to enabling of CONFIG_INET_ESPINTCP configuration 
+> > (introduced in this commit e27cca96cd68 ("xfrm: add espintcp (RFC 8229)").
+> > 
+> > For calling of x->type->output (resolved to esp_output()) in
+> > xfrm_output_one(), I see there is no double free here as esp_output()
+> > calls esp_output_tail() which calls esp_output_tail_tcp() only if 
+> > x->encap->encap_type == TCP_ENCAP_ESPINTCP which points to the first 
+> > implementation of esp_output_tail_tcp(). This first definition 
+> > doesn't free skb.
+> > 
+> > So my understanding is the 2nd esp_output_tail_tcp() should not be
+> > called and this is why I called WARN_ON() as this func is unreachable.
+> > Removing free(skb) here is just for silencing double free Coverity 
+> > false positive.
+> > Is there something else I miss?
+> 
+> Thanks, I missed the important detail that calls to esp_output_tail_tcp()
+> are guarded by "x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP".
+> 
+> Assuming that condition is always false if CONFIG_INET_ESPINTCP is not set,
+> then I agree with your analysis and I don't see any problems with your
+> patch.
+> 
+> It might be worth calling out in the commit message that the WARN_ON
+> is added because esp_output_tail_tcp() should never be called if
+> CONFIG_INET_ESPINTCP is not set.
 
-Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
----
- drivers/net/ethernet/ti/cpsw-proxy-client.c | 82 +++++++++++++++++++++
- 1 file changed, 82 insertions(+)
+Hi Simon,
 
-diff --git a/drivers/net/ethernet/ti/cpsw-proxy-client.c b/drivers/net/ethernet/ti/cpsw-proxy-client.c
-index 90be8bb0e37d..3eccde764c17 100644
---- a/drivers/net/ethernet/ti/cpsw-proxy-client.c
-+++ b/drivers/net/ethernet/ti/cpsw-proxy-client.c
-@@ -12,6 +12,7 @@
- #include <linux/kernel.h>
- #include <linux/kmemleak.h>
- #include <linux/module.h>
-+#include <linux/of.h>
- #include <linux/rpmsg.h>
- #include <linux/dma/k3-udma-glue.h>
- 
-@@ -2227,9 +2228,33 @@ static void register_notifiers(struct cpsw_proxy_priv *proxy_priv)
- 	}
- }
- 
-+static void show_info(struct cpsw_proxy_priv *proxy_priv)
-+{
-+	struct device *dev = proxy_priv->dev;
-+	struct virtual_port *vport;
-+	u32 i;
-+
-+	dev_info(dev, "%u Virtual Switch Port(s), %u Virtual MAC Only Port(s)\n",
-+		 proxy_priv->num_switch_ports, proxy_priv->num_mac_ports);
-+
-+	for (i = 0; i < proxy_priv->num_virt_ports; i++) {
-+		vport = &proxy_priv->virt_ports[i];
-+
-+		if (vport->port_type == VIRT_SWITCH_PORT)
-+			dev_info(dev, "Virt Port: %u, Type: Switch Port, Iface: %s, Num TX: %u, Num RX: %u, Token: %u\n",
-+				 vport->port_id, vport->ndev->name, vport->num_tx_chan,
-+				 vport->num_rx_chan, vport->port_token);
-+		else
-+			dev_info(dev, "Virt Port: %u, Type: MAC Port, Iface: %s, Num TX: %u, Num RX: %u, Token: %u\n",
-+				 vport->port_id, vport->ndev->name, vport->num_tx_chan,
-+				 vport->num_rx_chan, vport->port_token);
-+	}
-+}
-+
- static int cpsw_proxy_client_probe(struct rpmsg_device *rpdev)
- {
- 	struct cpsw_proxy_priv *proxy_priv;
-+	int ret;
- 
- 	proxy_priv = devm_kzalloc(&rpdev->dev, sizeof(struct cpsw_proxy_priv), GFP_KERNEL);
- 	if (!proxy_priv)
-@@ -2237,22 +2262,79 @@ static int cpsw_proxy_client_probe(struct rpmsg_device *rpdev)
- 
- 	proxy_priv->rpdev = rpdev;
- 	proxy_priv->dev = &rpdev->dev;
-+	proxy_priv->dma_node = of_find_compatible_node(NULL, NULL,
-+						       (const char *)rpdev->id.driver_data);
- 	dev_set_drvdata(proxy_priv->dev, proxy_priv);
- 	dev_dbg(proxy_priv->dev, "driver probed\n");
- 
-+	proxy_priv->req_params.token = ETHFW_TOKEN_NONE;
-+	proxy_priv->req_params.client_id = ETHFW_LINUX_CLIENT_TOKEN;
-+	mutex_init(&proxy_priv->req_params_mutex);
-+	init_completion(&proxy_priv->wait_for_response);
-+
-+	ret = get_virtual_port_info(proxy_priv);
-+	if (ret)
-+		return -EIO;
-+
-+	ret = attach_virtual_ports(proxy_priv);
-+	if (ret)
-+		return -EIO;
-+
-+	ret = allocate_port_resources(proxy_priv);
-+	if (ret)
-+		goto err_attach;
-+
-+	ret = dma_coerce_mask_and_coherent(proxy_priv->dev, DMA_BIT_MASK(48));
-+	if (ret) {
-+		dev_err(proxy_priv->dev, "error setting dma mask: %d\n", ret);
-+		goto err_attach;
-+	}
-+
-+	ret = init_tx_chans(proxy_priv);
-+	if (ret)
-+		goto err_attach;
-+
-+	ret = init_rx_chans(proxy_priv);
-+	if (ret)
-+		goto err_attach;
-+
-+	ret = init_netdevs(proxy_priv);
-+	if (ret)
-+		goto err_attach;
-+
-+	ret = register_dma_irq_handlers(proxy_priv);
-+	if (ret)
-+		goto err_netdevs;
-+
-+	register_notifiers(proxy_priv);
-+	show_info(proxy_priv);
-+
- 	return 0;
-+
-+err_netdevs:
-+	unreg_netdevs(proxy_priv);
-+err_attach:
-+	detach_virtual_ports(proxy_priv);
-+	return ret;
- }
- 
- static void cpsw_proxy_client_remove(struct rpmsg_device *rpdev)
- {
-+	struct cpsw_proxy_priv *proxy_priv;
- 	struct device *dev = &rpdev->dev;
- 
- 	dev_dbg(dev, "driver removed\n");
-+	proxy_priv = dev_get_drvdata(&rpdev->dev);
-+	unregister_notifiers(proxy_priv);
-+	unreg_netdevs(proxy_priv);
-+	destroy_vport_wqs(proxy_priv);
-+	detach_virtual_ports(proxy_priv);
- }
- 
- static struct rpmsg_device_id cpsw_proxy_client_id_table[] = {
- 	{
- 		.name = ETHFW_SERVICE_EP_NAME,
-+		.driver_data = (kernel_ulong_t)"ti,j721e-navss-main-udmap",
- 	},
- 	{},
- };
--- 
-2.40.1
-
+Thanks. yes, I will update the commit msg in rev2.
 
