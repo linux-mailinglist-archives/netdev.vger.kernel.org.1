@@ -1,92 +1,164 @@
-Return-Path: <netdev+bounces-97110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 044618C91E3
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 20:30:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D048C91ED
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 20:46:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF4971F21718
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 18:30:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 443461C20B5F
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 18:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4489853370;
-	Sat, 18 May 2024 18:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A3355769;
+	Sat, 18 May 2024 18:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b="eweixlyF"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="eR1BZGWi"
 X-Original-To: netdev@vger.kernel.org
-Received: from fritzc.com (mail.fritzc.com [213.160.72.247])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3F0D53B;
-	Sat, 18 May 2024 18:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.72.247
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4511D48CFC
+	for <netdev@vger.kernel.org>; Sat, 18 May 2024 18:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716057022; cv=none; b=CkRgOR8nxU7zd07dNz3T56j9f/yUSEK2lVZkwN/IUvSUgOnf3xYS9K2yD0ldaJUwpD1c7is6H3qHViJeRN2aSxjhreoRLPpJvNzGk2ej2hVQ5WkASWt7tqnqwrqXKBXATzmVAbijq7nEd9Z/jlFf47L6Yr4U/aO90jWcpCpY8LA=
+	t=1716057974; cv=none; b=YrPrHNrAmV+/Wznu/0G+2AZDfBSRzSF7848n11o3+0W1McCrvmNIF96b2P6nYfI9y6yTgeKK4nZ9wWWRzhCVx7rz/pt82ks/Rv3alZUWR20O/RkBbyqBxdRU1+T5A/yBWxcsh5GpmKA7MhPhMCpb6rJro80pBrLdOeHLANF8kvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716057022; c=relaxed/simple;
-	bh=QD0AeuS6ruZUVuMGyzujUhdrK/dqTqMUs5qdHROyZ2c=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Q+ihEpARIwOLIPdfnhGKWoyz6KDziqUEl/mcLB6DSnnV8cM0ddpI41C39r/QCbZ0Lt1xovMWgVKQBJEGL3LsdiAw7vi3sfTKKFsZfOOCJNchN3O/4+BbWl+Ht3ryOrNoW0hOWHqiQlwO8SVWlqoUkMdrtOqvVDDuZ0WwERp6g7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de; spf=pass smtp.mailfrom=hexdev.de; dkim=pass (1024-bit key) header.d=fritzc.com header.i=@fritzc.com header.b=eweixlyF; arc=none smtp.client-ip=213.160.72.247
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hexdev.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hexdev.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fritzc.com;
-	s=dkim; h=MIME-Version:Content-Transfer-Encoding:Content-Type:References:
-	In-Reply-To:Date:Cc:To:Reply-To:From:Subject:Message-ID:Sender:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=MQd+r43EMCvOi0g8lQTgHWFiUz5ZmsoKmS6F6rcfff8=; b=eweixlyF1OjlSUo84mXPkdXbv3
-	MvDHsxO3j6jiPPFghHQjd9qz0FYO6H2Nl73/YAMqssQltUWNLRLAi9XHCTsjGRjHPsnbS6NhwLXoP
-	Vk84tgQVBsQ1UGIusAff9ZY72lX5x3/AHZOkqZ5vEELmSZr0WqALJ8lbaIAqlLLhjf5o=;
-Received: from 127.0.0.1
-	by fritzc.com with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim latest)
-	(envelope-from <christoph.fritz@hexdev.de>)
-	id 1s8OoU-0026If-1n;
-	Sat, 18 May 2024 20:29:47 +0200
-Message-ID: <d25357857f49efb38a80ef48becf2a15ecbaa8e4.camel@hexdev.de>
-Subject: Re: [PATCH v4 00/11] LIN Bus support for Linux
-From: Christoph Fritz <christoph.fritz@hexdev.de>
-Reply-To: christoph.fritz@hexdev.de
-To: Ilpo =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Jiri
- Slaby <jirislaby@kernel.org>, Simon Horman <horms@kernel.org>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Marc Kleine-Budde
- <mkl@pengutronix.de>, Oliver Hartkopp <socketcan@hartkopp.net>, Vincent
- Mailhol <mailhol.vincent@wanadoo.fr>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires
- <bentiss@kernel.org>, Sebastian Reichel <sre@kernel.org>, Linus Walleij
- <linus.walleij@linaro.org>
-Cc: Andreas Lauser <andreas.lauser@mercedes-benz.com>, Jonathan Corbet
- <corbet@lwn.net>, Pavel Pisa <pisa@cmp.felk.cvut.cz>,
- linux-can@vger.kernel.org,  netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-input@vger.kernel.org, 
- linux-serial@vger.kernel.org
-Date: Sat, 18 May 2024 20:29:45 +0200
-In-Reply-To: <20240509171736.2048414-1-christoph.fritz@hexdev.de>
-References: <20240509171736.2048414-1-christoph.fritz@hexdev.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.1 (3.52.1-1.fc40app1) 
+	s=arc-20240116; t=1716057974; c=relaxed/simple;
+	bh=zQdyUAfqyEGFQFtZHOsOkjixcTwdwCIOHdjVrBr5h0Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u3BxvK40VKxTBxNXjkCEq/pYfVJKRWWjBpYQSL7rSjEhBoa9zMBGecfH0U2YI0mhQUWrD1UgeLC5U6FBPmNBEn3dqFKWDpoUWCludOje6ks2sTjB1MZhi5ywo3wdYFbO0y0azugoF4DPlLApiyEFKReWd7z/Rdz2E/8A5qyrS6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=eR1BZGWi; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1ee12baa01cso42999655ad.0
+        for <netdev@vger.kernel.org>; Sat, 18 May 2024 11:46:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1716057973; x=1716662773; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gtghe09oJ6h1zM6r9/hcuib2w+0SfFSyUIep5UEjz/8=;
+        b=eR1BZGWiXUpu2rNKW2Dg0cebePtcPzqYX2u5sAFvIGD+F4YpaI4u3yxUrMF+gvTohG
+         affruCAaUkXyjjMKkYm2juD+Qy8Su66gtY7GTZSw/0NV8Lp5VsnFW5Eeuy9jLGUqnduO
+         sfBEHdUFPniJ+ymxgStYAf3knUbYbu13wMvCjt/gGpJUao1H7fIMRVoIo3Zdk0e1j7Jk
+         gGrny5nnCtrzU5wwSTUSnMoslxlmwQHgozR5HStBaLReUsSSObFhENpDWdzmADxItp1p
+         prY4wfdoqXZl+zZLTNCR26qlRpJN3t4e0Nz2ujcdkegRJyydgbisxR10yo8UJA7lcKKl
+         M0sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716057973; x=1716662773;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gtghe09oJ6h1zM6r9/hcuib2w+0SfFSyUIep5UEjz/8=;
+        b=wcKzMd8GBo0YCMWvtda1c9wYsJXJdw6GK7XJRax74Idzkqcus32V7g24ny4QEXORV2
+         cIGCYYCAzXasNyMo4EjdLR48zSouLCNNAF9/qmynJJMpxE2sa+NYsG1IQo2CxMZUIR/F
+         D8jeAiTbKRIUkN6Fh6RAXSTXkHHnf7kThWY9pwlAsQU7ySIwQ2udLRnQS69Shy6IC2uw
+         3f9QNe1589cOeoK2/ge6VbcE7cIx+HLHLEwCWGcOc47mBLTMRsyN0x7O4ksF2aZil/tw
+         Rb0YAdieqzruT5hqI93GoaQZVmCO2jJtF8ZOlV5OEL7p9IAYk9JpvO73YI5v9JTa2JhW
+         hYCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVzSW/GlZ70/wYjq5QVX7BH9cJgLxGqImrFbrEJKy9fb4wm6rW4FXYk2oWUQaNSzJYGNUGR9DdGFQQfbVp2xNZNU/dZOiti
+X-Gm-Message-State: AOJu0Yy8JQwFS9RWoqWQujZo7G6fB5n4RB29ZYrebrHq06OlA0N3j2br
+	ehGw6zALDvo2iaQopwED41noVy6VmRdoR89I8l1eVXF6r2J3Rm8axOYDwLhtqZo=
+X-Google-Smtp-Source: AGHT+IGg0S5X0hOpYwIoBA7prkwh880WzDoU3RkbOFeT/k39JSwrbImT1CJOj9wyUMDIZCVhykRgQw==
+X-Received: by 2002:a05:6a00:1988:b0:6f3:8468:f9d1 with SMTP id d2e1a72fcca58-6f4e02c7d62mr28356985b3a.14.1716057972513;
+        Sat, 18 May 2024 11:46:12 -0700 (PDT)
+Received: from [192.168.1.16] (174-21-188-197.tukw.qwest.net. [174.21.188.197])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2a6656esm16665141b3a.38.2024.05.18.11.46.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 18 May 2024 11:46:11 -0700 (PDT)
+Message-ID: <d85f4ba4-774f-4577-985f-45a5a1866da7@davidwei.uk>
+Date: Sat, 18 May 2024 11:46:09 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 04/14] netdev: support binding dma-buf to
+ netdevice
+Content-Language: en-GB
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Pavel Begunkov <asml.silence@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20240510232128.1105145-1-almasrymina@google.com>
+ <20240510232128.1105145-5-almasrymina@google.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20240510232128.1105145-5-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> This series is introducing basic Local Interconnect Network (LIN)
-> (ISO 17987) [0] support
+On 2024-05-10 16:21, Mina Almasry wrote:
+> +void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
+> +{
+> +	struct netdev_rx_queue *rxq;
+> +	unsigned long xa_idx;
+> +	unsigned int rxq_idx;
+> +
+> +	if (!binding)
+> +		return;
+> +
+> +	if (binding->list.next)
+> +		list_del(&binding->list);
+> +
+> +	xa_for_each(&binding->bound_rxq_list, xa_idx, rxq) {
+> +		if (rxq->mp_params.mp_priv == binding) {
+> +			/* We hold the rtnl_lock while binding/unbinding
+> +			 * dma-buf, so we can't race with another thread that
+> +			 * is also modifying this value. However, the page_pool
+> +			 * may read this config while it's creating its
+> +			 * rx-queues. WRITE_ONCE() here to match the
+> +			 * READ_ONCE() in the page_pool.
+> +			 */
+> +			WRITE_ONCE(rxq->mp_params.mp_ops, NULL);
+> +			WRITE_ONCE(rxq->mp_params.mp_priv, NULL);
+> +
+> +			rxq_idx = get_netdev_rx_queue_index(rxq);
+> +
+> +			netdev_rx_queue_restart(binding->dev, rxq_idx);
 
-I just wanted to let you know that I'm unfortunately personally busy at
-the moment. I will resume addressing the remaining issues with v5
-sometime after the current merge window.
+What if netdev_rx_queue_restart() fails? Depending on where it failed, a
+queue might still be filled from struct net_devmem_dmabuf_binding. This
+is one downside of the current situation with netdev_rx_queue_restart()
+needing to do allocations each time.
 
-thanks
-  -- Christoph
+Perhaps a full reset if individual queue restart fails?
 
 
