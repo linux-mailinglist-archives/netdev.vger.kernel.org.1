@@ -1,179 +1,262 @@
-Return-Path: <netdev+bounces-97047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC8EC8C8EB6
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 02:02:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A073E8C8ECD
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 02:07:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EF301F21F0C
-	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 00:02:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56AED281F62
+	for <lists+netdev@lfdr.de>; Sat, 18 May 2024 00:07:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE500195;
-	Sat, 18 May 2024 00:02:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A3E1A2C0C;
+	Sat, 18 May 2024 00:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HzGw32jH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZNKkIySQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E436B38C
-	for <netdev@vger.kernel.org>; Sat, 18 May 2024 00:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4099445010
+	for <netdev@vger.kernel.org>; Sat, 18 May 2024 00:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715990527; cv=none; b=NMqJHmMkIAaSYRWZoVPaD0wabKJSnPb4IoYEFdmGax8BGsfBPbvrYybsN4Id94CVZ6ZZ9L1mujeqCTHH1nq+5S77eVjdSey3J5EtuLwPi5L97/WAlW6r8CNxWxqhiQB41eIlkQYvAbH556q3vaklS+2XweSFJm2AGJ9zAjMTpM8=
+	t=1715990706; cv=none; b=WaVGyME4EP+G/hrEw1M7CIMksrKaXLN5X+U2BDcPZvXrLXohuJhEp7Lya33n0qw/3D2z27BAt/tRosqsRJULTjSwxO+SOXkUDj1vWrqxIlTuhRO9kKMllwljMAQx57n5Tfq9Ewg9O0gEfScRtA2gY/BsPhICGsZpbZOdtZfNER8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715990527; c=relaxed/simple;
-	bh=rvE2LxZqPHQyJZtg6dadhaDGNtC98nxQIf1cpJLntwY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ihGvVa/EtocSxcDYhhEl9iIBOCOipRt/RxZy6efIQdeVidH5drNFNx6dZqYepE0rFimCs5dJlhgG0R/KqEDDE6iFSEcLa9APLOJDGJ6GD7YMG2yOEQts3YgNEnuDlW1TUjEId9Du25//IBzyrZ6h8bhmYA67pWqZynNVTkX9VUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HzGw32jH; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1715990706; c=relaxed/simple;
+	bh=I0+ea+w7+RYRcboxD3MLZueaJOp7s1MmbtE8e2lkRDA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cbCEnvJat0HWmqHdSIX4QYQQAxY5RaMU+o+GP6lABKczPVkaowEvPGCeMzB1hgJA/eYbvGLwB1Eaedb/OP/Hwj1MglNzoH4clF3+4RILoXhUEIVPX1G9tZCQs8k5gV61rQxCygQCOfqRRAfpKqAC+g2B0mftawIzS2ff1HQPlq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZNKkIySQ; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a5cdd6cfae7so467066766b.0
+        for <netdev@vger.kernel.org>; Fri, 17 May 2024 17:05:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1715990526; x=1747526526;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=tXM5VwUSF/0CAp+6eTNFi6AtU7b9McSfsAhhz2wkZw4=;
-  b=HzGw32jHXN8xgQXn5jduCMiW7UWd9sh5DN6x6J84UW8Li/r1cm0pRIGc
-   G3vs6tHXig/voFKu3DPtKoj0ZSkm5lY3HRZ8Fy33LDEF4GpcMqrIGZV5r
-   67Pb4sg9K06pW8Y4d2x3yvro38/4pY2bLY8JSytaZTZm6oizjVKw72FHu
-   s=;
-X-IronPort-AV: E=Sophos;i="6.08,169,1712620800"; 
-   d="scan'208";a="397266104"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2024 00:02:04 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:44439]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.96:2525] with esmtp (Farcaster)
- id 8435cd26-e051-4ccb-ab7a-8e8d75d6627f; Sat, 18 May 2024 00:02:03 +0000 (UTC)
-X-Farcaster-Flow-ID: 8435cd26-e051-4ccb-ab7a-8e8d75d6627f
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Sat, 18 May 2024 00:02:02 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.8.176) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Sat, 18 May 2024 00:01:58 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, syzkaller
-	<syzkaller@googlegroups.com>
-Subject: [PATCH v1 net] af_unix: Annotate data-race around unix_sk(sk)->addr.
-Date: Sat, 18 May 2024 09:01:48 +0900
-Message-ID: <20240518000148.27947-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+        d=gmail.com; s=20230601; t=1715990702; x=1716595502; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5eyReMuF7Ofh2RKAFqcB9fvMRtrXuh+l2+HjQ0qgsZ8=;
+        b=ZNKkIySQgZr2rgwHTjPcgmbmLxlSlA3oN0GmJjGFEI7XkvcS0kJpqb164MRxuXWzEu
+         gh0SuB09gxrLjH/claSkqnEsPOZB8Oq+v++XoEex79sS3hfquFo7BQanMuzosFTucxzE
+         i9TiFUWcTDw7Wwlxo4lkcAd024vXPFGHWiNC/Lo3TIQFQYL7LuQ1sEu6kekrbUuEdfrX
+         dYWlMsa0/HGXzbAWjpls+OESL55yMheRIjSTz3eQPAvb0lP8GqPO0hyImh7lav5bwBMo
+         pZfU/jzWw+AhmWNf4TpCUULpBnNfRrMmy8qz8W9OR6ko+1Bb1bQJOZbKMa4stzt57Xkn
+         Z1Yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715990702; x=1716595502;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5eyReMuF7Ofh2RKAFqcB9fvMRtrXuh+l2+HjQ0qgsZ8=;
+        b=KXw3YpsmiTo4Jz3XhvmAez4leyzXCxlY7s96+9LvAryv0NzxGmXxpvW06sQKec9qAj
+         5VsnDFce23HCCq6TucRd6sVQdlLleJrAjIa0F95wbxLEPyimYwXOnE4zhX3SEqz70Wak
+         pIa3DRK8pw5pzC0+HieUqmZ6Rzel+f9SI7hGF2tYsR+OZyWhM+iYmB92XG4sTsoBJQRq
+         nNKDk4HStfVv92KM2i/rDnanPKi0SO3nDJliqgmMcO8GQolNNgCWNlJXyUKvH1/91rm4
+         Yx6cIHaJjKE3drJo79J+yMsRv98/6IKJLZCw/42c7BchTDp8kHME3zaIDuUgcqSSCyjz
+         itAg==
+X-Forwarded-Encrypted: i=1; AJvYcCW8CwGfb/Kay3fYVGhHEt/bVWugtCbyOBIYA4FfTWVodgntu3Na73vZ0Konx0FXuiTFL6N5K1AGCvP3udQRFxgSsofYKRJa
+X-Gm-Message-State: AOJu0Yyk0mGCEQPD2TR4Lxdfzw1ehHqqIRuXuuvsN8yd2ndkJ70oSFTB
+	avVaY7TVJ/NslJ9UsqtXzCSJreWNUCyuJeJD4SphOwrVoQPCIBqUhBOMz6H5mRx7qWbU0NUXTk4
+	hagbojbt7GzmHFT0YKVcHyqumotA=
+X-Google-Smtp-Source: AGHT+IHcpWpEPBEOlanqqT4t9Hj/fWN4J92e950F317YxdZ7LFHz18o6DmZz4h+M4wAITmKBkMXNl1c3tXOHkUyFdZE=
+X-Received: by 2002:a17:906:2dd7:b0:a5a:8cc0:8c23 with SMTP id
+ a640c23a62f3a-a5d5ecdc937mr38990066b.27.1715990702212; Fri, 17 May 2024
+ 17:05:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA001.ant.amazon.com (10.13.139.88) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20240517085031.18896-1-kerneljasonxing@gmail.com>
+ <CADVnQymvBSUFcc307N_geXgosJgnrx4nziFcpnX-=jU7PronwA@mail.gmail.com>
+ <CAL+tcoDbB2if_=h7XSRU9_i2G=xT+fqmxCU-Mhe438PYcqxj-w@mail.gmail.com>
+ <CAL+tcoAQSh9ScCduvhKNW9q8A7dhzA3OPuBde6t2=rsxg8=5Jg@mail.gmail.com> <CADVnQyn1tNaAYyOA98oyV_8d0k8VA24Z4kNVcB3=QLt1Qxz6=w@mail.gmail.com>
+In-Reply-To: <CADVnQyn1tNaAYyOA98oyV_8d0k8VA24Z4kNVcB3=QLt1Qxz6=w@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 18 May 2024 08:04:25 +0800
+Message-ID: <CAL+tcoDyegkbrC1fx0onTZe5JqW+JnM9oAoLVQXr2Mj7Zqt7TQ@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] tcp: break the limitation of initial receive window
+To: Neal Cardwell <ncardwell@google.com>
+Cc: edumazet@google.com, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, davem@davemloft.net, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Yuchung Cheng <ycheng@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Once unix_sk(sk)->addr is assigned under net->unx.table.locks,
-*(unix_sk(sk)->addr) and unix_sk(sk)->path are fully set up, and
-unix_sk(sk)->addr is never changed.
+Hello Neal,
 
-unix_getname() and unix_copy_addr() access the two fields locklessly,
-and commit ae3b564179bf ("missing barriers in some of unix_sock ->addr
-and ->path accesses") added smp_store_release() and smp_load_acquire()
-pairs.
+On Sat, May 18, 2024 at 2:35=E2=80=AFAM Neal Cardwell <ncardwell@google.com=
+> wrote:
+>
+> On Fri, May 17, 2024 at 1:49=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > On Sat, May 18, 2024 at 1:41=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
+il.com> wrote:
+> > >
+> > > On Fri, May 17, 2024 at 10:42=E2=80=AFPM Neal Cardwell <ncardwell@goo=
+gle.com> wrote:
+> > > >
+> > > > On Fri, May 17, 2024 at 4:50=E2=80=AFAM Jason Xing <kerneljasonxing=
+@gmail.com> wrote:
+> > > > >
+> > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > >
+> > > > > Since in 2018 one commit a337531b942b ("tcp: up initial rmem to 1=
+28KB and
+> > > > > SYN rwin to around 64KB") limited received window within 65535, m=
+ost CDN
+> > > > > team would not benefit from this change because they cannot have =
+a large
+> > > > > window to receive a big packet one time especially in long RTT.
+> > > > >
+> > > > > According to RFC 7323, it says:
+> > > > >   "The maximum receive window, and therefore the scale factor, is
+> > > > >    determined by the maximum receive buffer space."
+> > > > >
+> > > > > So we can get rid of this 64k limitation and let the window be tu=
+nable if
+> > > > > the user wants to do it within the control of buffer space. Then =
+many
+> > > > > companies, I believe, can have the same behaviour as old days. Be=
+sides,
+> > > > > there are many papers conducting various interesting experiments =
+which
+> > > > > have something to do with this window and show good outputs in so=
+me cases.
+> > > > >
+> > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > > ---
+> > > > >  net/ipv4/tcp_output.c | 2 +-
+> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> > > > > index 95caf8aaa8be..95618d0e78e4 100644
+> > > > > --- a/net/ipv4/tcp_output.c
+> > > > > +++ b/net/ipv4/tcp_output.c
+> > > > > @@ -232,7 +232,7 @@ void tcp_select_initial_window(const struct s=
+ock *sk, int __space, __u32 mss,
+> > > > >         if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_workaround_si=
+gned_windows))
+> > > > >                 (*rcv_wnd) =3D min(space, MAX_TCP_WINDOW);
+> > > > >         else
+> > > > > -               (*rcv_wnd) =3D min_t(u32, space, U16_MAX);
+> > > > > +               (*rcv_wnd) =3D space;
+> > > >
+> > > > Hmm, has this patch been tested? This doesn't look like it would wo=
+rk.
+> > >
+> > > Hello Neal,
+> > >
+> > > Thanks for the comment.
+> > >
+> > > Sure, I provided such a patch a few months ago which has been tested
+> > > in production for the customers.
+> > >
+> > > One example of using a much bigger initial receive window:
+> > > client   ---window=3D65535---> server
+> > > client   <---window=3D14600----  server
+> > > client   ---window=3D175616---> server
+> > >
+> > > Then the client could send more data than before in fewer rtt.
+> > >
+> > > Above is the output of tcpdump.
+> > >
+> > > Oh, I just found a similar case:
+> > > https://lore.kernel.org/all/20220213040545.365600-1-tilan7663@gmail.c=
+om/
+> > >
+> > > Before this, I always believed I'm not the only one who had such an i=
+ssue.
+> > >
+> > > >
+> > > > Please note that RFC 7323 says in
+> > > > https://datatracker.ietf.org/doc/html/rfc7323#section-2.2 :
+> > > >
+> > > >    The window field in a segment where the SYN bit is set (i.e., a =
+<SYN>
+> > > >    or <SYN,ACK>) MUST NOT be scaled.
+> > > >
+> > > > Since the receive window field in a SYN is unscaled, that means the
+> > > > TCP wire protocol has no way to convey a receive window in the SYN
+> > > > that is bigger than 64KBytes.
+> > > >
+> > > > That is why this code places a limit of U16_MAX on the value here.
+> > > >
+> > > > If you want to advertise a bigger receive window in the SYN, you'll
+> > >
+> > > No. It's not my original intention.
+> > >
+> > > For SYN packet itself is limited in the __tcp_transmit_skb() as below=
+:
+> > >
+> > >     th->window      =3D htons(min(tp->rcv_wnd, 65535U));
+> >
+> > With this limitation/protection of the window in SYN packet, It would
+> > not break RFC with this patch applied. I try to advertise a bigger
+> > initRwnd of ACK in a 3-way shakehand process.
+>
+> Thanks for the explanation.
+>
+> I think the confusion arose because in your title ("tcp: break the
+> limitation of initial receive window"), I interpreted "initial receive
+> window" as the initial receive window advertised on the wire (which is
+> limited by protocol spec to 64 kbytes), when you meant the initial
+> value of tp->rcv_wnd. There are similar ambiguities in the commit
+> message body.
+>
+> I would suggest resubmitting a version of the patch with a revised
+> commit title and commit description, to clarify at least the following
+> issues:
+>
+> + For the patch title, perhaps something like:
+>   tcp: remove 64 KByte limit for initial tp->rcv_wnd value
 
-In other functions, we still read unix_sk(sk)->addr locklessly to check
-if the socket is bound, and KCSAN complains about it.  [0]
+Thanks for the help.
 
-Given these functions have no dependency for *(unix_sk(sk)->addr) and
-unix_sk(sk)->path, READ_ONCE() is enough to annotate the data-race.
+I'll update it.
 
-[0]:
-BUG: KCSAN: data-race in unix_bind / unix_listen
+>
+> + For the commit description, in the sentence 'Since in 2018 one
+> commit a337531b942b ("tcp: up initial rmem to 128KB and SYN rwin to
+> around 64KB") limited received window within 65535', please revise
+> this to clarify that you are talking about tp->rcv_wnd and not the
+> receive window on the wire. For example: 'In 2018 commit a337531b942b
+> ("tcp: up initial rmem to 128KB and SYN rwin to around 64KB") limited
+> the initial value of tp->rcv_wnd to 65535,.'
 
-write (marked) to 0xffff88805f8d1840 of 8 bytes by task 13723 on cpu 0:
- __unix_set_addr_hash net/unix/af_unix.c:329 [inline]
- unix_bind_bsd net/unix/af_unix.c:1241 [inline]
- unix_bind+0x881/0x1000 net/unix/af_unix.c:1319
- __sys_bind+0x194/0x1e0 net/socket.c:1847
- __do_sys_bind net/socket.c:1858 [inline]
- __se_sys_bind net/socket.c:1856 [inline]
- __x64_sys_bind+0x40/0x50 net/socket.c:1856
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x46/0x4e
+Got it :)
 
-read to 0xffff88805f8d1840 of 8 bytes by task 13724 on cpu 1:
- unix_listen+0x72/0x180 net/unix/af_unix.c:734
- __sys_listen+0xdc/0x160 net/socket.c:1881
- __do_sys_listen net/socket.c:1890 [inline]
- __se_sys_listen net/socket.c:1888 [inline]
- __x64_sys_listen+0x2e/0x40 net/socket.c:1888
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x46/0x4e
+>
+> + For the commit description, please add a note that RFC 7323 limits
+> the initial receive window on the wire in a SYN or SYN+ACK to 65535
+> bytes, and __tcp_transmit_skb() already ensures that constraint is
+> respected, no matter how large tp->rcv_wnd is.
 
-value changed: 0x0000000000000000 -> 0xffff88807b5b1b40
+Okay, I will add it to avoid future confusion.
 
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 PID: 13724 Comm: syz-executor.4 Not tainted 6.8.0-12822-gcd51db110a7e #12
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+>
+> + For the commit description, please include some version of your
+> example of the receive window values in a handshake, like:
+>
+> One example of using a much bigger initial receive window:
+> client   --- SYN: rwindow=3D65535 ---> server
+> client   <--- SYN+ACK: rwindow=3D14600 ----  server
+> client   --- ACK: rwindow=3D175616 ---> server
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/unix/af_unix.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Agreed.
 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index ca101690e740..92a88ac070ca 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -731,7 +731,7 @@ static int unix_listen(struct socket *sock, int backlog)
- 	if (sock->type != SOCK_STREAM && sock->type != SOCK_SEQPACKET)
- 		goto out;	/* Only stream/seqpacket sockets accept */
- 	err = -EINVAL;
--	if (!u->addr)
-+	if (!READ_ONCE(u->addr))
- 		goto out;	/* No listens on an unbound socket */
- 	unix_state_lock(sk);
- 	if (sk->sk_state != TCP_CLOSE && sk->sk_state != TCP_LISTEN)
-@@ -1369,7 +1369,7 @@ static int unix_dgram_connect(struct socket *sock, struct sockaddr *addr,
- 
- 		if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
- 		     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
--		    !unix_sk(sk)->addr) {
-+		    !READ_ONCE(unix_sk(sk)->addr)) {
- 			err = unix_autobind(sk);
- 			if (err)
- 				goto out;
-@@ -1481,7 +1481,8 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
- 		goto out;
- 
- 	if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
--	     test_bit(SOCK_PASSPIDFD, &sock->flags)) && !u->addr) {
-+	     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
-+	    !READ_ONCE(u->addr)) {
- 		err = unix_autobind(sk);
- 		if (err)
- 			goto out;
-@@ -1951,7 +1952,8 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 	}
- 
- 	if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
--	     test_bit(SOCK_PASSPIDFD, &sock->flags)) && !u->addr) {
-+	     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
-+	    !READ_ONCE(u->addr)) {
- 		err = unix_autobind(sk);
- 		if (err)
- 			goto out;
--- 
-2.30.2
+>
+> + For the commit description, please include some version of your
+> example of the evolution of the receive window over the first 3 round
+> trips, before and after your patch.
 
+I'll revise the body message according to your comments.
+
+Thanks,
+Jason
 
