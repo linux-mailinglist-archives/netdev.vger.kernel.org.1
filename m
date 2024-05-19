@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-97131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B048C94AE
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 14:55:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA40E8C94C3
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 15:19:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1BAB281635
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 12:55:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 335A91F21435
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 13:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A371F45978;
-	Sun, 19 May 2024 12:55:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3D447F6C;
+	Sun, 19 May 2024 13:19:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="BZzJlsLk"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="ccS0E3Ik"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-27.smtpout.orange.fr [80.12.242.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7D0DF58;
-	Sun, 19 May 2024 12:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A4A18059;
+	Sun, 19 May 2024 13:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716123319; cv=none; b=Wk6968E/67FeovUCmeOUBgqCYTUE7uI1w8ndiMoJJAyxCPhs8O3m0hvc2+GKFZDM5H/+6/BBD6xcjgAd3tsPA1h6UkpVFReUI8lzTDLM/iic9spWfZZch/7sQByGNCB9FgCPN98AN9XSTlHKplwdITWFqYKmEKxp1R04YwaDR3U=
+	t=1716124781; cv=none; b=izKUJm+M+J4IZNh1JHiagwFlcyQK7cPiFTYAfNM7/+G66vMIa6xtC1cYypJsiSZ1roKBNBnr1DwADkdUPlBzmCwCUZxVtYr2gjU0WYu4XbMOsEsU2HH8vP6QSTY1dzpDdOAf4g2GQKNf1LyNChre0OQUPKhk2jpvJTvzu/I4AKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716123319; c=relaxed/simple;
-	bh=96ddWgy+DqQkkmfLAmqY9C/dPMMuWMqOSDKoVWxeAKs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DeTQMdZiZIw5wOjloaXukgCuuPx9fMEz8cvfBFtIlTi4dx4E39jUiYmFC3K9PZnxyNyTgN93TQ2Qi0njXnVvLKSDUN76YPEqxIunV4BOb4qLEsZPtD72LdlOXgrDKbX4qqFiehPz0XMACn5dQBr0gQarijaJCRKDXVHcMgBkMeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=BZzJlsLk; arc=none smtp.client-ip=80.12.242.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([86.243.17.157])
-	by smtp.orange.fr with ESMTPA
-	id 8fvNsas0Vml3s8fvOsAwyi; Sun, 19 May 2024 14:46:04 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1716122764;
-	bh=IdukyeSVMol9uozX3qDqOVLoOKjojIJiN8ffYrHylXU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=BZzJlsLkWkm524qgL4YZGWx+ntPz7Rzw0DUp9YfZpHYTMG1V/qZ1j/xA0rqb31b6D
-	 Ze1E4DqsikBm5Ill2qHE+XDEhXWC3ZFehpfiCphM3ASZMwpAAO/CIEfwIM+6x9P6Ky
-	 x6WsGkQgBOq1nHhw0PEBknAxA1z+uduyhETuzPgM3mtjxFIH+esfSPTlHY8a47SGMQ
-	 SbFz/W6Y7B139j0qJ0iTWL1RRCutlXtYtYAzuRhMi6FxijWkz0RdrpRJ5rWmCOJSgo
-	 7QFtAkzsg4qdY6XoRzEF48NImLtbHFx5GWDL1P0HpI1Sm3lFTze6XFl5jLcuLSJln6
-	 2MqonpmJnfoSw==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 19 May 2024 14:46:04 +0200
-X-ME-IP: 86.243.17.157
-Message-ID: <64403766-cc22-4dbe-b4b3-af3ad32fb9ea@wanadoo.fr>
-Date: Sun, 19 May 2024 14:45:59 +0200
+	s=arc-20240116; t=1716124781; c=relaxed/simple;
+	bh=sh/gMqg0EESdbiUTTuj1g+LtsVyzDOYSvCTYuSBIJjk=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=fqWIjGZ7pgUDowvq4FkuCM3TWbm/e2LNwKV8FxnnaDLxkpLa3+jj9uKHJOru6xFt5oBkOIf7uLCyHB8XiZ3QuVke1DmKdqp3wARGbrm/vVV85jzTNPcXHJb4FfRyTm+yFx0jIeIMo+gE1GwDhlWwemP1BOmlHUxhGgz3GMbtBfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=ccS0E3Ik; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1716124743; x=1716729543; i=markus.elfring@web.de;
+	bh=Lk4qtabSjxRoCOhNPQMtKweAUzgftFfZ+B+bn/XHG+k=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=ccS0E3Ik0HkOSnZriJ7WjhcKk1gXHMkl4RsHDnvk6GeroajMkrCcDYdrpPKv5YlS
+	 h4WPqCNARnoSO0UWACkPggHYip0fL1jTAYIRhv9O7SIHA+gtNReC7007g0ZrOoxgJ
+	 t8V6eQb3hQor2YntBYj8Ka1VjJnS89okqmU20hfclNjCa/bsEY4No01pbG18KoTdc
+	 T8l7J6iWdi9pheOH1EVABLQEiTkk6bgxTdVVERVlYGPW9cBonn4vbwUByAoY8dt0J
+	 wZsYfNJgcfbBseDwhBYmEeViXbhbrAJQx3b3HQvL4ruSONrUWQ/WOVCrgJ+Sj53Dm
+	 oQXdV90PNt76xJrHgA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.82.95]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MSIJ0-1rxZYF1vR2-00SjTQ; Sun, 19
+ May 2024 15:19:03 +0200
+Message-ID: <f9470c3b-5f69-41fa-b0f4-ade18053473a@web.de>
+Date: Sun, 19 May 2024 15:18:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,103 +57,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2 net-next] libceph: Use sruct_size() in
- ceph_create_snap_context()
-To: kernel test robot <lkp@intel.com>, Ilya Dryomov <idryomov@gmail.com>,
- Xiubo Li <xiubli@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- ceph-devel@vger.kernel.org
-References: <5b7c72bdb52703bbfa5511ed500aed4babde1308.1716109606.git.christophe.jaillet@wanadoo.fr>
- <202405191909.7qhhefnu-lkp@intel.com>
-Content-Language: en-MW
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <202405191909.7qhhefnu-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: Siddharth Vadapalli <s-vadapalli@ti.com>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kernel-janitors@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ MD Danish Anwar <danishanwar@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+ Roger Quadros <rogerq@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-doc@vger.kernel.org,
+ Misael Lopez Cruz <misael.lopez@ti.com>, Sriramakrishnan <srk@ti.com>,
+ Vignesh Raghavendra <vigneshr@ti.com>
+References: <20240518124234.2671651-13-s-vadapalli@ti.com>
+Subject: Re: [RFC PATCH net-next 12/28] net: ethernet: ti: cpsw-proxy-client:
+ add NAPI RX polling function
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240518124234.2671651-13-s-vadapalli@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:/3uoYAxcF9ekf/7FNbb49aneEw5ylQTjVfmWK1vUXNNqFnCJ0/K
+ MQUmHaPEFke+/dSnp5at7YYkw87y7UiZhVDCXhlkarC5vlD3UUe0e7qkk5kF/zTobHGZFFk
+ vAsepCwlvi/PyhSa6dM0YzWBJpRaDBjtrH++k+9DU6sGvrvlqAVp+zKh4//2vFsGji1q/0R
+ VjM0eXcFcXnJYRC1nv2Bg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:OP4700k9zPo=;VCkvx6LeC7jih8NnSdv6M5q1hla
+ /MVArGVPhR9LytY9FqUrZSLp0u0Rb3gvn0WcDR2AVoipaLTpBYylU27pqltJ2YSUtJgVKVjwb
+ wZ8xFRsdaUVb5zqbTxA06n2SRw2+2svefzJ2/WJ1x7/jcSB2yJOcTXdGmkD4w11YoYj8PPLLD
+ qaDhRPukJebcVcBUUzo2hFfwT97gUR/dX/2j+TLRGFs+ZqDJ+Vfr2BfR+NF4L8fyCBGHTRhF7
+ ZyPBjZVy45SwgI62ZopPawEoXVG0ACuIcqHRbCTFUwtwkERV5oiueNnSHPPx5IQlL5XGQ6oxM
+ RB8gLam/tTY3lQwZKDxJ0ugGsWM4FMkOWIs+VEvGxgQKZuw0L6nnqDIp2qH4OAsxqVZJh+iYG
+ aRfTnsvYe8DEdsXfb+SjnP1AvtZm3oQXOYf6q6lYiphNHhwCY8U7yymEH/wv3N0q8JhV4+0v1
+ 1bzp+yKtezgRK2W88FvZ40/GmoYK6gbLNMUVgHr/fVzy4MPoiUr7DLxUznGtRVzW4UouiMYzN
+ ypAM0XxrURiKWoRQ8vGOGnHnPXXYuve8YZB0kAzTXysjjAE7lqJ5dOsyYWBgYxiH2aJfaA3gW
+ l8VKql/ilmLgNd8JPyomGnKeOZo5Via61cfLlzAv6N/A1/mrk8w8A0ULOxcejsxcA5WKU0/2k
+ D2VBiIdNrnawpco5oRA83MjIkkqNd20k+X/lnoHuRikfnYeO97vriQWRdnMZofpd4FkNqwkP4
+ N+MB+BnUMo/AX/+GRJEliUokzpadtlIFAk0gfwnLZhobz4S5xN/VcE5aDNxpdEGCmNZnbDEbW
+ GHHNaXm8s0+EyBzAAbH1kKM0Fd3P1bOvro39qofQ7rnuM=
 
-Le 19/05/2024 à 13:34, kernel test robot a écrit :
-> Hi Christophe,
-> 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on net-next/main]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Christophe-JAILLET/libceph-Use-__counted_by-in-struct-ceph_snap_context/20240519-172142
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/5b7c72bdb52703bbfa5511ed500aed4babde1308.1716109606.git.christophe.jaillet%40wanadoo.fr
-> patch subject: [PATCH 1/2 net-next] libceph: Use sruct_size() in ceph_create_snap_context()
-> config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20240519/202405191909.7qhhefnu-lkp@intel.com/config)
-> compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240519/202405191909.7qhhefnu-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202405191909.7qhhefnu-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
->     net/ceph/snapshot.c: In function 'ceph_create_snap_context':
->>> net/ceph/snapshot.c:32:25: error: implicit declaration of function 'sruct_size'; did you mean 'struct_size'? [-Werror=implicit-function-declaration]
->        32 |         snapc = kzalloc(sruct_size(snapc, snaps, snap_count), gfp_flags);
->           |                         ^~~~~~~~~~
->           |                         struct_size
->>> net/ceph/snapshot.c:32:43: error: 'snaps' undeclared (first use in this function); did you mean 'snapc'?
->        32 |         snapc = kzalloc(sruct_size(snapc, snaps, snap_count), gfp_flags);
->           |                                           ^~~~~
->           |                                           snapc
->     net/ceph/snapshot.c:32:43: note: each undeclared identifier is reported only once for each function it appears in
->     cc1: some warnings being treated as errors
-> 
-> 
-> vim +32 net/ceph/snapshot.c
-> 
->      11	
->      12	/*
->      13	 * Ceph snapshot contexts are reference counted objects, and the
->      14	 * returned structure holds a single reference.  Acquire additional
->      15	 * references with ceph_get_snap_context(), and release them with
->      16	 * ceph_put_snap_context().  When the reference count reaches zero
->      17	 * the entire structure is freed.
->      18	 */
->      19	
->      20	/*
->      21	 * Create a new ceph snapshot context large enough to hold the
->      22	 * indicated number of snapshot ids (which can be 0).  Caller has
->      23	 * to fill in snapc->seq and snapc->snaps[0..snap_count-1].
->      24	 *
->      25	 * Returns a null pointer if an error occurs.
->      26	 */
->      27	struct ceph_snap_context *ceph_create_snap_context(u32 snap_count,
->      28							gfp_t gfp_flags)
->      29	{
->      30		struct ceph_snap_context *snapc;
->      31	
->    > 32		snapc = kzalloc(sruct_size(snapc, snaps, snap_count), gfp_flags);
+=E2=80=A6
+> +++ b/drivers/net/ethernet/ti/cpsw-proxy-client.c
+=E2=80=A6
+> @@ -988,6 +994,189 @@ static int vport_tx_poll(struct napi_struct *napi_=
+tx, int budget)
+=E2=80=A6
+> +static int vport_rx_packets(struct virtual_port *vport, u32 rx_chan_idx=
+)
+> +{
+=E2=80=A6
+> +	if (unlikely(!netif_running(skb->dev))) {
+> +		dev_kfree_skb_any(skb);
+> +		return -ENODEV;
+> +	}
 
-Ouch!
+I suggest to move such exception handling to the end of this function impl=
+ementation
+so that it can be better reused also by another if branch.
+https://wiki.sei.cmu.edu/confluence/display/c/MEM12-C.+Consider+using+a+go=
+to+chain+when+leaving+a+function+on+error+when+using+and+releasing+resourc=
+es
 
-this was build-tested, but I must have made a mistake when editing the 
-patch file to add the "net-next".
+How do you think about to increase the application of scope-based resource=
+ management
+also for such a software component?
+https://elixir.bootlin.com/linux/v6.9.1/source/include/linux/cleanup.h
 
-Sorry about that.
-I'll resend when the net-next branch will re-open.
-
-CJ
-
->      33		if (!snapc)
->      34			return NULL;
->      35	
->      36		refcount_set(&snapc->nref, 1);
->      37		snapc->num_snaps = snap_count;
->      38	
->      39		return snapc;
->      40	}
->      41	EXPORT_SYMBOL(ceph_create_snap_context);
->      42	
-> 
-
+Regards,
+Markus
 
