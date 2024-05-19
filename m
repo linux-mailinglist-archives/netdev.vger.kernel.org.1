@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-97147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB9548C9754
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 00:58:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E6488C9755
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 00:59:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F2D71F210B3
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 22:58:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35A922810A9
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 22:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72144AEC6;
-	Sun, 19 May 2024 22:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6441D4D9E8;
+	Sun, 19 May 2024 22:59:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Qe1OnrGN"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="BbnBozM/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E961101DB
-	for <netdev@vger.kernel.org>; Sun, 19 May 2024 22:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7726F101DB
+	for <netdev@vger.kernel.org>; Sun, 19 May 2024 22:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716159527; cv=none; b=gYv+hl6lmNu5vnRk4uhIzKLKlxQcCJ2HqjXBcFKWhODsDDPhZSiioLcYqj/Vcp30NuATctghVrHW5WbaOV81pfMg6TTFnX3K/rWFX+HLKcVOYLBxkVE4P6SAkegumCj/9OzWR8F5oiw3nbJB/QPyHicEVVBir69FxaNgB1k5cD8=
+	t=1716159565; cv=none; b=uCSiA0wAWZqNXX4Zn7p9UiFpoLqz42Lmhw8e4H7csgrMdWtHFnGptsuZEJUfPUMfwnPSRRWUg4bc/VseFUTlIeJfh72x4lWLA57RBwQto1p/kRZo+sxHjGv5XCuTraAaCRYY1CNksPpomGA7sw3iWN8XdqfvT29Ulj/Y9C0whOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716159527; c=relaxed/simple;
-	bh=CkpDPMC2Fa+wBeGzSyP/1UANCGURuqQIDYFnhQpiNOk=;
+	s=arc-20240116; t=1716159565; c=relaxed/simple;
+	bh=A7c1TsAQf/Y7hJkEwjkEEE0WngffptY4iAdd30QDJa4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GAcLjSHDlwnCv4nsJj1kpSMzYGnAvfqEM5JNGquFgNpGAUAUL1XWNyuUZCk6J98Ktigb3PapiOQ/hJr+CVYehP9BxLyWC1o8AzcSiWGtMR45qSuQjNwbsy0enxgeR1LAwqb8iQsl8apSEwewgssHFaNNm6Wb1qsGixpIGahR7XA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Qe1OnrGN; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version:Content-Type; b=fPOI6plIt5Wc0MRBfjWnhWDcmGb0nPxX8gFIDaYNG2CH4r+fgedZALjDY/70vEi+oLwPa/txhM0CAcgocibrfUq+FFuGbSdrnByV6/ytm5XP9R1bW9f6INyhvbppMaBI3uODdargwfeDOBk9PDgC+2vJDvkCcb5muvWlWDN4M9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=BbnBozM/; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1ee5235f5c9so55678725ad.2
-        for <netdev@vger.kernel.org>; Sun, 19 May 2024 15:58:45 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1ecddf96313so39961155ad.2
+        for <netdev@vger.kernel.org>; Sun, 19 May 2024 15:59:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1716159525; x=1716764325; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1716159563; x=1716764363; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sPuJpbnWMMW6QgzcmtexpV3ldHkM5KgTcxg7ObCIUKk=;
-        b=Qe1OnrGNO0oL7LM7CT7dYYGjjo27hNAFCNsEJ9IXDgqkYY9UmjXErKPipwIoy7CEyo
-         ConNiVzzXgrCGgmZj39qED8mFVgQQ+ysW9ac8P8x+CZhU8ZIxY5CQYRiZRsrA38/ctSj
-         tp3D2Ps+EVJ6z6nfa+jCE7gYo81QaTvrS7OGsz2dQdjGUD5zmldGmHYpJV1uLKRz8vGC
-         0USCq/hKKcwWMzd9YssV4HvKp1EEOCW9o4p1RLmn++ZssJfifm3xW/hjHMf+tIacCWJ1
-         Lqe5dP/LfQUlY3qq3WayeuOtMJSHE6mEv4H03MqKDEgkcC4AHtGfHkgbxgsTfXgako2c
-         h+aQ==
+        bh=x09uDObDpJNHnRXEU9vnE29zSYza5LxvY7cub7w7qWw=;
+        b=BbnBozM/dRz7caLwnOK93sPt+3at0GSkV8W6zRiefNNQeDAU+oGSiB6j/XVXX7+ur+
+         MkyesfzVIjqBBmVGYyDA4c/sMjqhST9y7ldCgsCo/L/u7dxl6icNy4Pxljyq0fQmj6oD
+         csvoyzNJ/YrneTwRIuTiF0TMqD88w8Lek98Xui5qZwuHS/xXUaR0Foj4NMSTiSriCTeB
+         9/QpTwQVxNoJ7mz5v09ak4tnNSQNSRfMQnH1d8IMiJuu81em3rgEB4Ors9f/5OJ0DV6d
+         b58zjrS2nkP22TI7eUx+E+CEsX+zbA97O9G5vqkqEYK8qWlli9iTZ6XQq6zGsRcZHrUs
+         8pqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716159525; x=1716764325;
+        d=1e100.net; s=20230601; t=1716159563; x=1716764363;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sPuJpbnWMMW6QgzcmtexpV3ldHkM5KgTcxg7ObCIUKk=;
-        b=H9FHQ4vBYTlY+4uAu+5BuQpbmpozfBLWjMUJavqb9gsc/EE3Tes86T0itiZ2G62xNk
-         Ttn9MqCMm2aCe6/p2Buk1aNTysR/vjUzSQRmDXHUipn/uG+KHddy93rlYdrcHh4Z6WEA
-         XfZoF2FQXTdrg+XFe5ZwFDL/RaWBvEM6ckDVK/ek3tjTSQSp8jgwOgBcJRC5lUioyGT5
-         TBmUY82pp4U6kfbaUbJmFQ/ak040FUeoyGYtowzQwgdCKIK+Q6oa+s9Ek3FR0HqcSeqJ
-         8BKecIxICW1TNZiSg1sSKA+jkGI8mPPfBMLapw+uoOPEmH72GIkRAy2/sI3OH3BZc9Jz
-         xcpA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+j6FnWNDlg7KHl63ugDKCHIOfR+kPbQWIWE9toBlI3Uy+ZvyXujYq67xeReyI/57wMGNhJeaXYGasv6y2SEHEB9/GciNu
-X-Gm-Message-State: AOJu0Yxo+lXxIxzjevpTtIBYw8U3//gQOibDqr9++r2LXYja3f5BU9zx
-	dmEkChXC1mPBVuVBhXnrDCMk0838uwQNjluftALZhke8mhlTeBdPZ+A/qIrjntY=
-X-Google-Smtp-Source: AGHT+IGs/eybZsnCmFIPd/d4mteguD5EGy1FrUY55ZxGR/TsQfqqJggA+YuRpqzGuhqGxjOXuIWEcA==
-X-Received: by 2002:a17:902:ec8c:b0:1e1:214:1b7d with SMTP id d9443c01a7336-1ef44059ae4mr315434025ad.61.1716159525191;
-        Sun, 19 May 2024 15:58:45 -0700 (PDT)
+        bh=x09uDObDpJNHnRXEU9vnE29zSYza5LxvY7cub7w7qWw=;
+        b=brpqPmA+6xxYThsSpbr6Co38MC8/yG7gp1vWCJaqyqbGLAZqKQ86fKiHsJyVa29XlW
+         kM6lgCax0qhipN2RjvPDBj+GDeABPtPGC4W/uxcY1ll7O2pzjoEJZml4tA8QTTLmub8a
+         GssiT9NnKTVQpwrpuIZUUjGDwI5u7JpWYPqkEOJhNPR/jZ+76Q+FJ6+EOtwX6Ic4Xp1t
+         X0/HnVLU05CvScv25knfIiHl3chNQ7aXNsOoqUcrWzPCpvY7qKfpC9fP0WQa1DCrHMr4
+         1fcNwBu9NVuZuUa1pY7KgU10UloetC0/nVwHZzbiXtrJiQO9/r6Kb8QrdmWf07C6ooVE
+         rKTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWk9ixa8b7tlUkqwprbQ/rSvnaUo2TcIOvhFC4Hvvh+JOpzu0gPNw3QPBwnL7v+7fAyRPkSdV3RuSbIvqmkfRf3qZmKTPHZ
+X-Gm-Message-State: AOJu0Yyup0NBCCfJ5++ScV8O8feOj9ulf+LjGjvo0hz+zCul97xmBxuE
+	ENfMIjdYLVzM9fF/BYlVcr/Qo1vYf0NcsgwcNlSm+96fLeV0XypO7AQAh4+vG4Q=
+X-Google-Smtp-Source: AGHT+IGSlr4ZLoLjbGRX4HwM7J0TcHsmOU0WnRG+4566s0qvmdUS5yzzxM7uRDFcqa2pa8klpna8hg==
+X-Received: by 2002:a05:6a20:12d0:b0:1b1:d7d1:c0b3 with SMTP id adf61e73a8af0-1b1d7d1c135mr3180784637.27.1716159562941;
+        Sun, 19 May 2024 15:59:22 -0700 (PDT)
 Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bad61c7sm191178375ad.68.2024.05.19.15.58.44
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b6710564b3sm20713236a91.10.2024.05.19.15.59.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 May 2024 15:58:45 -0700 (PDT)
-Date: Sun, 19 May 2024 15:58:43 -0700
+        Sun, 19 May 2024 15:59:22 -0700 (PDT)
+Date: Sun, 19 May 2024 15:59:21 -0700
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: Antony Antony <antony.antony@secunet.com>
 Cc: David Ahern <dsahern@gmail.com>, <netdev@vger.kernel.org>,
@@ -75,12 +75,12 @@ Cc: David Ahern <dsahern@gmail.com>, <netdev@vger.kernel.org>,
  Eyal Birger <eyal.birger@gmail.com>, Nicolas Dichtel
  <nicolas.dichtel@6wind.com>, Sabrina Dubroca <sd@queasysnail.net>,
  "Christian Hopps" <chopps@chopps.org>
-Subject: Re: [PATCH RFC iproute2-next 2/3] xfrm: support xfrm SA direction
- attribute
-Message-ID: <20240519155843.2fc8e95a@hermes.local>
-In-Reply-To: <3c5f04d21ebf5e6c0f6344aef9646a37926a7032.1716143499.git.antony.antony@secunet.com>
+Subject: Re: [PATCH RFC iproute2-next 3/3] xfrm: update ip xfrm state output
+ for SA with direction attribute
+Message-ID: <20240519155921.1429f20e@hermes.local>
+In-Reply-To: <4b4b45dfffeab66c64cf560f20b5317e0a3ad55f.1716143499.git.antony.antony@secunet.com>
 References: <cover.1716143499.git.antony.antony@secunet.com>
-	<3c5f04d21ebf5e6c0f6344aef9646a37926a7032.1716143499.git.antony.antony@secunet.com>
+	<4b4b45dfffeab66c64cf560f20b5317e0a3ad55f.1716143499.git.antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,21 +90,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 19 May 2024 20:37:23 +0200
+On Sun, 19 May 2024 20:37:45 +0200
 Antony Antony <antony.antony@secunet.com> wrote:
 
-> +	if (tb[XFRMA_SA_DIR]) {
-> +		__u8 dir = rta_getattr_u8(tb[XFRMA_SA_DIR]);
-> +
-> +		fprintf(fp, "\tdir ");
-> +		if (dir == XFRM_SA_DIR_IN)
-> +			fprintf(fp, "in");
-> +		else if (dir == XFRM_SA_DIR_OUT)
-> +			fprintf(fp, "out");
-> +		else
-> +			fprintf(fp, " %d", dir);
-> +		fprintf(fp, "%s", _SL_);
+> +	if (sa_dir == XFRM_SA_DIR_OUT) {
+> +		/* would the fail occur on OUT??? */
+> +		fprintf(fp, " failed %u%s", s->integrity_failed, _SL_);
+> +	} else {
+> +		fprintf(fp, "  replay-window %u replay %u failed %u%s",
+> +			s->replay_window, s->replay, s->integrity_failed, _SL_);
 > +	}
 
-JSON output support please
+Errors should be printed to stderr
 
