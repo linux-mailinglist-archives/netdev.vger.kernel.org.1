@@ -1,107 +1,128 @@
-Return-Path: <netdev+bounces-97135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E66CD8C94DE
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 16:00:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBC578C94EE
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 16:13:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A07C328157A
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 14:00:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92EAEB2124F
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 14:13:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225184503A;
-	Sun, 19 May 2024 14:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147B9487B3;
+	Sun, 19 May 2024 14:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Y1C9pHte"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="icFD95q1"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mout.web.de (mout.web.de [217.72.192.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAB08BEA;
-	Sun, 19 May 2024 14:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661291A2C10;
+	Sun, 19 May 2024 14:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716127255; cv=none; b=vEd9OiRMzeU+TW5nmcTocpS2BCxptANcuFM/KYnGh0Y75k0um3fdnNqoN0ukvUpsttBljisiVbhEmRI0LGrpj0drbJcI/8NNaXp6CrU8TY7Ap0w9rUncKixOOEq73UB4TZt4hrFLOsJV63ukRWYjc+T+uHijHkTbSZPlQR5SXjs=
+	t=1716127985; cv=none; b=eRO/mIz9gB+fMn0IOLbkRggatFxG2HSv03d5X6LXHcalKRMAOgDtxq0lEimDWSrXjXLT9KcobRLA4V2yhu0MImHP5NyeuIbLY07HTA/cyK3zjTEgu9sDAxnhkikY++sTIhGByFOrYOxvwUlxLZUyTxCQI5qHsfyTvEVWhJMo42M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716127255; c=relaxed/simple;
-	bh=q29JoiujTS2XkolE6zF5+VhKvwJw4Z7qx2SIZperaRY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qys5xQ58T1atpNBOzkb2jfIhM8RHW6WIrogTvvxmG/pFhC5a0boWMJ/gbmcG2gdy2dX4vA3WSSTSww3DyfXNjYFxwZOAjFfd/TBk+iUONKrPLAskeJBmPd0DgAzwwAE7crS3sZDlELsk71EViYKfA2ogli8nHsRiqIzds9aCmyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Y1C9pHte; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=UYsczhSMQVTcPtKcf8myz36ovdn5xE0T0cUehFANQaI=; b=Y1C9pHtertFWleTQDsvZ5j/0kD
-	TXtqk93sdYj1Ugwm8ZnYXN65UV8D4FvavTl6n2e2IhROmLQi3dmRhHk2F+M6rvGjMj6qHQchnt4h9
-	SYdkWzpkt6/v2p/duAGLGF9cQP1wgwu7tXZAXigVVYSXOoRrvn26Mzetr7R/BW9j3wr6NsrJFtDq9
-	Yw37NPG8xX79BEE4pRHxHXKCpU+LVCrR0/1rjXbPoEaXWYjQ0r2vhxb08qbV1tZnEUvcjvNP9HqWj
-	gCc6QBm6OKThPwIfv2to8eQGh5NsKViokgz0A96Xpx1b0LCrq8YevSfW4u+QGrGBfYhZ8yiM8zE+0
-	DzoCTXcA==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s8h5f-0000000F4a1-07t2;
-	Sun, 19 May 2024 14:00:43 +0000
-Date: Sun, 19 May 2024 15:00:42 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	MD Danish Anwar <danishanwar@ti.com>,
-	Paolo Abeni <pabeni@redhat.com>, Roger Quadros <rogerq@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	LKML <linux-kernel@vger.kernel.org>, linux-doc@vger.kernel.org,
-	Misael Lopez Cruz <misael.lopez@ti.com>,
-	Sriramakrishnan <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
-Subject: Re: [RFC PATCH net-next 12/28] net: ethernet: ti: cpsw-proxy-client:
- add NAPI RX polling function
-Message-ID: <ZkoGCpq1XN4t7wHS@casper.infradead.org>
-References: <20240518124234.2671651-13-s-vadapalli@ti.com>
- <f9470c3b-5f69-41fa-b0f4-ade18053473a@web.de>
+	s=arc-20240116; t=1716127985; c=relaxed/simple;
+	bh=sqrJgiov1S8OV8gwoeyirPsm3GKX/ZNG47C/+9hLNLg=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=U1hThjh2qL1GUvV4p7KDgnRtqPPWgFLX/iWHQ7/Tp1K2wIEpzZPzB7wvBH5oB2x3YyLBp74FoTdewdTQQMWZMkb6uS+BBfgSv2WN33PWOw/gRtMgkWesFbkq564YFHDJEmuHWLiWl57xpNyFlw/NI54A4bNwq+4CLx9h6D4ZUZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=icFD95q1; arc=none smtp.client-ip=217.72.192.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1716127949; x=1716732749; i=markus.elfring@web.de;
+	bh=dAeAJYtoA3G4hdbrQG7B7Q7VA51ccBWxx6sLjghi+pU=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=icFD95q1djTXs/44EJrOyEkwrlRbc44WYWRfYH/8VheFfdpxzEyS75PEFbGwGPo7
+	 nYHl0wHewewtyn4bxtBYTlmsJidR6iRB314KMFEI2Y5mO4ywr6bsrxP86SQI8V2V3
+	 ihLxxJ0psofg6ibA408OHFGdeqSk5MHgyhZvAbQjOqGTvPo5WDjK5OsgMMmKVhduM
+	 0+rIhM3UoSWAlyb6bOf79OZ+WjHKS2frT57eLxXN/3V8BNJSts6AxtJTUoidiGX9L
+	 rkhiaonbJw+utTXdB0CTVWy7HJOG/2OlMCaDClwUXIqYceNjMBtmvQopYWzyJy4VG
+	 B4Kke7ouP2euEjNLdQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.82.95]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1M7ux6-1sCZA72QNe-004wwn; Sun, 19
+ May 2024 16:12:29 +0200
+Message-ID: <2d7edd9b-f11c-4b8d-a63c-cecb104aa91c@web.de>
+Date: Sun, 19 May 2024 16:12:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f9470c3b-5f69-41fa-b0f4-ade18053473a@web.de>
+User-Agent: Mozilla Thunderbird
+To: Siddharth Vadapalli <s-vadapalli@ti.com>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kernel-janitors@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ MD Danish Anwar <danishanwar@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+ Roger Quadros <rogerq@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-doc@vger.kernel.org,
+ Misael Lopez Cruz <misael.lopez@ti.com>, Sriramakrishnan <srk@ti.com>,
+ Vignesh Raghavendra <vigneshr@ti.com>
+References: <20240518124234.2671651-24-s-vadapalli@ti.com>
+Subject: Re: [RFC PATCH net-next 23/28] net: ethernet: ti: cpsw-proxy-client:
+ add sw tx/rx irq coalescing
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240518124234.2671651-24-s-vadapalli@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:gQ/I3jsXIWIpJOWU7j9MO1tyEW0hzfE/+mC7fOg3nJAg0yi+H0d
+ F7q3CJzVJTvvb4u87peGhcLmQAemkoWX6UM0eGOKFTKJpX2DkDKxs+vk5sqkpKwU4QiB2du
+ SaWaZUeD+PxmCgDtiZUx09lS6fHTsMCOnugmnCGiJ26I9hefBVQ67+BEE+bLT/xtsqAWtRA
+ 7dI2Py1WRiPDvzbP7XDGQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:tJ/qgRkzrIo=;jjTDvIgRZp/mIogqIqJa3Eu+L6x
+ G+MT1/nmT0G7Vwx+01dEjtjSL67XhgzGod6vrXX9+C3+sKbuQIa7y/7YJQW8Cay/rO1g6/cQ6
+ vUjj7Izgds1H3rWRVSDX7y5wCpaZibYntk67v2TlQSVrbs94b+qkUP3o96zUVQKfU0UkVCMR/
+ wmBmM/cKJksBFvr3YWNi5G8yEnGdW5Pg5NRLxGJaimrWP37duxIvbSPi967MuCNovY60Z8Tdt
+ /xjRVFjUMIT+nCcfh707SWYga+u3le988OlgY4bQ9vLrqPBSYl2XpS169nUWl005FGDv+NQC2
+ FE01fwbbXoLt2Vgyad+R/tN6oGMmnsJez8zW3UEWD8x90R8c7DXW/QwKfb6yr7UiB1b3yleGx
+ tM6xtgQIxoxnJuCBETJnMIIDSwUftjyD8JupQiVljDfLDwvYxwza946qoWYInpEqEh7SqZ6i/
+ WZWJZSxYWKnSPmGqx3n0r/zpRG3JZz2VtRmOLel+iT/sJa7qgTkQV2L2dF9VvIxHXdOjm1NgF
+ tfu/JI5CeGYTDW+64fCfnosdsREfVHTDiWFeepr10CqWdXPpqyeH3USNLamUvAjvFSErtv57R
+ 5KhLWQezfTaPiHgqxf4zmHKhEwj3iaC9CRAPFTftoYpFymopCxEAaP2JA4nV9nebjgidwBth2
+ cCJQiebpHJ5h7ZSBiATWTZLXzPCJXSCNqjtjYOB8FOGeoYxAIBUUGE0frFUeN1QMAxdTEKc/7
+ po4uxPTKkHm+NnRvhQXzrQ9QomYZiDxN6YUshE7nHwuCi/jTVBWPWMYL8Axr4tRsbkg2Y9DXV
+ yXqqJT7l3jGLdSqxUM23SXvHGGVRDa7wpAc7s7VymyvMI=
 
+=E2=80=A6
+> +++ b/drivers/net/ethernet/ti/cpsw-proxy-client.c
+=E2=80=A6
+> @@ -996,8 +1001,15 @@ static int vport_tx_poll(struct napi_struct *napi_=
+tx, int budget)
+=E2=80=A6
+> +		if (unlikely(tx_chn->tx_pace_timeout && !tdown)) {
+> +			hrtimer_start(&tx_chn->tx_hrtimer,
+> +				      ns_to_ktime(tx_chn->tx_pace_timeout),
+> +				      HRTIMER_MODE_REL_PINNED);
+> +		} else {
+> +			enable_irq(tx_chn->irq);
+> +		}
+=E2=80=A6
+> @@ -1179,12 +1191,38 @@ static int vport_rx_poll(struct napi_struct *nap=
+i_rx, int budget)
+=E2=80=A6
+> +			if (unlikely(rx_chn->rx_pace_timeout)) {
+> +				hrtimer_start(&rx_chn->rx_hrtimer,
+> +					      ns_to_ktime(rx_chn->rx_pace_timeout),
+> +					      HRTIMER_MODE_REL_PINNED);
+> +			} else {
+> +				enable_irq(rx_chn->irq);
+> +			}
+=E2=80=A6
 
-FYI, Markus can be safely ignored.  His opinions are well-established as
-being irrelevant.
+Would you like to omit curly brackets at a few source code places?
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/coding-style.rst?h=3Dv6.9#n197
 
-On Sun, May 19, 2024 at 03:18:52PM +0200, Markus Elfring wrote:
-> …
-> > +++ b/drivers/net/ethernet/ti/cpsw-proxy-client.c
-> …
-> > @@ -988,6 +994,189 @@ static int vport_tx_poll(struct napi_struct *napi_tx, int budget)
-> …
-> > +static int vport_rx_packets(struct virtual_port *vport, u32 rx_chan_idx)
-> > +{
-> …
-> > +	if (unlikely(!netif_running(skb->dev))) {
-> > +		dev_kfree_skb_any(skb);
-> > +		return -ENODEV;
-> > +	}
-> 
-> I suggest to move such exception handling to the end of this function implementation
-> so that it can be better reused also by another if branch.
-> https://wiki.sei.cmu.edu/confluence/display/c/MEM12-C.+Consider+using+a+goto+chain+when+leaving+a+function+on+error+when+using+and+releasing+resources
-> 
-> How do you think about to increase the application of scope-based resource management
-> also for such a software component?
-> https://elixir.bootlin.com/linux/v6.9.1/source/include/linux/cleanup.h
-> 
-> Regards,
-> Markus
-> 
+Regards,
+Markus
 
