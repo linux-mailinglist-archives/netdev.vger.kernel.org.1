@@ -1,190 +1,164 @@
-Return-Path: <netdev+bounces-97126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34E2B8C943C
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 11:43:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 714018C945E
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 13:14:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46BB1B20DCE
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 09:43:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE737B210AC
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 11:14:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA892E84A;
-	Sun, 19 May 2024 09:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ULehZoeb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72BE9433B1;
+	Sun, 19 May 2024 11:14:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C371BBE40
-	for <netdev@vger.kernel.org>; Sun, 19 May 2024 09:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00EA3FB87
+	for <netdev@vger.kernel.org>; Sun, 19 May 2024 11:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716111818; cv=none; b=USaK0ros5I+VDpA1BXc4jKl+Z+Vk90gggPNZvqrfE8NqpQZCkEVUFQzG4uw2L3kVLwvg9ZnvIaJEkeQshL0fAP7twyvJGFRGYMDYsuspCvx/2pKJHIdTnEgShAbHLyR7WcpiRDbDI8iJRAa1EBvhAXdNe655QpssSUz0Gye5ONI=
+	t=1716117273; cv=none; b=OLWNbcXgI0OwbpbDCzqMr2TDJlFJQ3xy6kzhYLiubPfYgfSHhDwrWjJsddlb6zDustq/sMX4qbnjMnrcfnrj0ZSB9Hv0HyKXf2NWwmvdB/ZQ+hb6v58dQWBkTyMod/AFG2g71WXiG2Su34BHUkz6pPSxSeZisYH4ze5mrKXZE/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716111818; c=relaxed/simple;
-	bh=XVYZJf19fhwCKob2ZPTjv3MkpTN7Dd7FH6bhQyS3Dzk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HaLLguj5IttgUifn++xGyI33VAvyWe59dOX0vfIjQ1+ipUgYmER2Mi6XOA3/fJP+uXenI37H1yi+hs98pmdYugGduIPYhkcxvPBJbNKXUZXCThKVb60i43LTRrAwWS1JuypBVBDroPw7wMHAZ1jo9nGDAjXdEQsFEP86Lble4/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ULehZoeb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716111814;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=l+hPEPEJikrCYY8v7MJr/p3bxjRpLE6cykpaByeIXXA=;
-	b=ULehZoeb6wbVFSj7snOVy69RNakb0ptHUmvGq6uke1dTS+YvztIuFPJRC97cYG7xon+K+R
-	T9ehMMFn5wVUPqY8wysC7skaMwA+pvetrKXh4Bd7/JOO80dLwSeVhSn/Ib2zcgh7h0rqfm
-	nlM9S8DFf4k1otgEzKj56n+/8UlzqoE=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-223-05bbU_F6OK-dcwyWMMzqbQ-1; Sun, 19 May 2024 05:43:33 -0400
-X-MC-Unique: 05bbU_F6OK-dcwyWMMzqbQ-1
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-5b2769e8382so11795392eaf.2
-        for <netdev@vger.kernel.org>; Sun, 19 May 2024 02:43:32 -0700 (PDT)
+	s=arc-20240116; t=1716117273; c=relaxed/simple;
+	bh=TE/dYHUWdFqr94tCntvaxfb0WU+Nf8iKVxC8ogi1uXo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=COktVlDJzMJwoqnCyUM9VMDoaKnLJeHENnf7KtBZrkqBTFYn/lwhecI7fZhw84B+NDfbOzRyvlwU3v7PmOxQLkOCDAPQ5iUna636IUUx4ARx0HxYGjLuKI3PrHlWclWUNcA7e1v4ZsH582DUVBMVJUR3+ZgF3OXV25m2+VIFOco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-36d92a840abso80523785ab.1
+        for <netdev@vger.kernel.org>; Sun, 19 May 2024 04:14:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716111812; x=1716716612;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l+hPEPEJikrCYY8v7MJr/p3bxjRpLE6cykpaByeIXXA=;
-        b=ModHnp5bBy41GYdxO1fdr5LC2O6JyEBpHsEKkRhr9QDFi9w10ER83ITm4/Zrh4BYO9
-         zJFM0qeHKJl4x/yOsCOHf74TrIh1CcfD0I7/7EAwxxDnl/Wi7LizgjcNuwv6lfMjRCmB
-         WTyTaZAAVBHTfqaA6dVJaHeY1ydZ2D1qlqsdui0uYvNB276e/PHyHAjM5zLiUTocNVYV
-         aKE4R7PilY5PAZqfb09JDGNm5BgCzphhNhU6FnC8Fv3pW1eQJqZG4OsDGdp3biRRzEQB
-         r0EkJRg86PeV+eEImV4if0tWBD5YmAYLbEc0Ck6A9lb4HK0kFnW31kXLf5/JG6GL68qT
-         riUA==
-X-Forwarded-Encrypted: i=1; AJvYcCV3x5fFb2yb/gcHNBaTPKt4xGwWOBvVcWXa8srrkza35xTYKh/fW/DLbBTz7LumjeCpy6rXFP/Nz+89gGY1y/ltzvcr3cPI
-X-Gm-Message-State: AOJu0Yy7cpTiFRcA7mtKu1pVf734j+VXKt90p+8bcr2UQQ2uUI9179tK
-	5LEnj+CdO7eP58oHHQeixa1BDvd35Irzj6cplT/N9z/CvnJuS8A4s9agv9NPrn/0HTL/uTJ/f5k
-	iH+vo93uGMP6elI8CGSfE9Xqt8+BplUD0th+k2pW4giPyFX6xnAq5SQ==
-X-Received: by 2002:a05:6871:2117:b0:229:7d01:7e03 with SMTP id 586e51a60fabf-24172e1266amr33035208fac.43.1716111812084;
-        Sun, 19 May 2024 02:43:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGt1tMp7gyyVrNXvf2t4LAiDyJ1ABapt5/NoN/KBr74FpK9ackGjMs+w1p3k55TmmXjwAInhw==
-X-Received: by 2002:a05:6871:2117:b0:229:7d01:7e03 with SMTP id 586e51a60fabf-24172e1266amr33035189fac.43.1716111811484;
-        Sun, 19 May 2024 02:43:31 -0700 (PDT)
-Received: from zeus.elecom ([240b:10:83a2:bd00:6e35:f2f5:2e21:ae3a])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2b2d767sm17355304b3a.186.2024.05.19.02.43.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 May 2024 02:43:30 -0700 (PDT)
-From: Ryosuke Yasuoka <ryasuoka@redhat.com>
-To: krzk@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: Ryosuke Yasuoka <ryasuoka@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syoshida@redhat.com,
-	syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail.com
-Subject: [PATCH net v5] nfc: nci: Fix uninit-value in nci_rx_work
-Date: Sun, 19 May 2024 18:43:03 +0900
-Message-ID: <20240519094304.518279-1-ryasuoka@redhat.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1716117271; x=1716722071;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KI/jM/0zAOn5DrFOjZOOmDUv+lX+OMNUuitu/9jvMQA=;
+        b=AJPtt7Mz60gzU9RHMalc1JrbWwsXxKLfRhgxauZsFxXeA5cTd+5BbbrsydHcJtCAME
+         wM+nicU+YtO/NnEELL8tdky5FKZ85GWuYQ5cN8DLEUNF9rYm30dgLcvMsQc5r1yuzoc4
+         jpsgHG7Yn/06db5ul7gYVD2AMnnNjzgH7NtzHMTZGT74N/x7Zz/u0E+jBE6tySg3rqIM
+         zAfg6TqIxMem55kzigJAYsO1ejUqUqQCcN39uCB7KMeJStGxN2YNtKNPQbdz879h+3qV
+         Z4lyLSPlJq7fGT+dhYXKhFNp9iqkhcVQAKUKcVrdSPZq4J/vx5tm5AHfWDmHdgcAgY16
+         mklw==
+X-Forwarded-Encrypted: i=1; AJvYcCUadcI/6f9vYK5L1YA9h0pwyFJb/RneusqhtEeAz4vBfnCxlh87uTxZwlfS8pYl5o/k8UyT/a5ioGYOt3GvsPsumAnp/Gl4
+X-Gm-Message-State: AOJu0YxQB5/80ig73lGx1LNTLZZcVN95ElqOUqzAdSiVRSvB+fiNRq8E
+	v0zE13pP22OAPywSzYUdIcKuVJ9PAAVrvZAALLxz0EDkq88C4ce5d7kx5oJe8JMokOJqknCehKk
+	O3/6aKXgJUE/oV4aF1GRqj/OAhI8dvfx8RkLRt88EEieWTxft5zBgeH0=
+X-Google-Smtp-Source: AGHT+IEbWQvoEqXVGAXqJ5jBYJl/1FuEIv+QevyAC2qAarl9nJ7cOQYrSiaPI4B6+k0+lavWvokDmVGD3v6KU7vPwkDmVI3jE9Wr
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:18cc:b0:36d:d38e:3520 with SMTP id
+ e9e14a558f8ab-36dd38e353cmr1564485ab.4.1716117270997; Sun, 19 May 2024
+ 04:14:30 -0700 (PDT)
+Date: Sun, 19 May 2024 04:14:30 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000054bc390618ccb092@google.com>
+Subject: [syzbot] [wireless?] WARNING in minstrel_ht_update_caps
+From: syzbot <syzbot+d805aca692aded25f888@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-syzbot reported the following uninit-value access issue [1]
+Hello,
 
-nci_rx_work() parses received packet from ndev->rx_q. It should be
-validated header size, payload size and total packet size before
-processing the packet. If an invalid packet is detected, it should be
-silently discarded.
+syzbot found the following issue on:
 
-Fixes: d24b03535e5e ("nfc: nci: Fix uninit-value in nci_dev_up and nci_ntf_packet")
-Reported-and-tested-by: syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=d7b4dc6cd50410152534 [1]
-Signed-off-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
+HEAD commit:    0450d2083be6 Merge tag '6.10-rc-smb-fix' of git://git.samb..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16c09b3f180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=17ffd15f654c98ba
+dashboard link: https://syzkaller.appspot.com/bug?extid=d805aca692aded25f888
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/227283491c2c/disk-0450d208.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d5c9b39757fa/vmlinux-0450d208.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9ab6928507ba/bzImage-0450d208.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d805aca692aded25f888@syzkaller.appspotmail.com
+
+netlink: 32 bytes leftover after parsing attributes in process `syz-executor.3'.
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 6963 at include/net/mac80211.h:6962 rate_lowest_index include/net/mac80211.h:6962 [inline]
+WARNING: CPU: 1 PID: 6963 at include/net/mac80211.h:6962 minstrel_ht_update_caps+0x44a/0x17e0 net/mac80211/rc80211_minstrel_ht.c:1733
+Modules linked in:
+CPU: 1 PID: 6963 Comm: syz-executor.3 Not tainted 6.9.0-syzkaller-08995-g0450d2083be6 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+RIP: 0010:rate_lowest_index include/net/mac80211.h:6962 [inline]
+RIP: 0010:minstrel_ht_update_caps+0x44a/0x17e0 net/mac80211/rc80211_minstrel_ht.c:1733
+Code: da e8 ca bc cf f9 e9 24 ff ff ff e8 80 65 7b f6 eb 17 e8 79 65 7b f6 eb 14 e8 72 65 7b f6 49 c1 fd 38 eb 0c e8 67 65 7b f6 90 <0f> 0b 90 45 31 ed 49 bf 00 00 00 00 00 fc ff df 48 8b 3c 24 4c 8b
+RSP: 0018:ffffc9000929ef80 EFLAGS: 00010287
+RAX: ffffffff8b1acc49 RBX: 000000000000000c RCX: 0000000000040000
+RDX: ffffc90009e54000 RSI: 0000000000004ebd RDI: 0000000000004ebe
+RBP: 0000000000000000 R08: ffffffff8b1acb65 R09: ffff88806ddec008
+R10: dffffc0000000000 R11: ffffed100dbbdd49 R12: 1ffff11008d33614
+R13: 0b00000000000000 R14: ffff88804699b0a0 R15: 0100000000000000
+FS:  00007fb6f84146c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fed23961d58 CR3: 0000000028cca000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ rate_control_rate_init+0x3d1/0x5f0 net/mac80211/rate.c:63
+ sta_apply_auth_flags+0x1b6/0x410 net/mac80211/cfg.c:1710
+ sta_apply_parameters+0xe20/0x1550 net/mac80211/cfg.c:2043
+ ieee80211_add_station+0x3da/0x630 net/mac80211/cfg.c:2109
+ rdev_add_station+0x11d/0x2b0 net/wireless/rdev-ops.h:201
+ nl80211_new_station+0x1d53/0x2550 net/wireless/nl80211.c:7624
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb16/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e5/0x430 net/netlink/af_netlink.c:2564
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7ec/0x980 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x223/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2585
+ ___sys_sendmsg net/socket.c:2639 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2668
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fb6f767cee9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fb6f84140c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fb6f77abf80 RCX: 00007fb6f767cee9
+RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000003
+RBP: 00007fb6f76c949e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007fb6f77abf80 R15: 00007ffe9914aca8
+ </TASK>
+
+
 ---
-v5
-- As Jakub pointed out, add BUILD_BUG_ON() and make the patch simpler.
-  All validating packet size has been done in nci_valid_size() before
-  switch statement.
-- Also, v4 patch changed break to continue when the invalid packet is
-  detected. Since it is unrelated to this patch, leave it in this patch.
-  This fix was proposed in another patch.
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-v4
-- v3 patch uses goto statement and it makes codes complicated. So this
-  patch simply calls kfree_skb inside loop and remove goto statement.
-- [2] inserted kcov_remote_stop() to fix kcov check. However, as we
-  discuss about my v3 patch [3], it should not exit the for statement
-  and should continue processing subsequent packets. This patch removes
-  them and simply insert continue statement.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=19e35f24750d
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-v3
-https://lore.kernel.org/netdev/20240502082323.250739-1-ryasuoka@redhat.com/T/
-- As Simon pointed out, the valid packets will reach invalid_pkt_free
-and kfree_skb(skb) after being handled correctly in switch statement.
-It can lead to double free issues, which is not intended. So this patch
-uses "continue" instead of "break" in switch statement.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-- In the current implementation, once zero payload size is detected, the
-for statement exits. It should continue processing subsequent packets. 
-So this patch just frees skb in invalid_pkt_free when the invalid 
-packets are detected. [3]
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-v2
-https://lore.kernel.org/lkml/20240428134525.GW516117@kernel.org/T/
-
-- The v1 patch only checked whether skb->len is zero. This patch also
-  checks header size, payload size and total packet size.
-
-
-v1
-https://lore.kernel.org/linux-kernel/CANn89iJrQevxPFLCj2P=U+XSisYD0jqrUQpa=zWMXTjj5+RriA@mail.gmail.com/T/
-
-
- net/nfc/nci/core.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
-index b133dc55304c..7a9897fbf4f4 100644
---- a/net/nfc/nci/core.c
-+++ b/net/nfc/nci/core.c
-@@ -1463,6 +1463,19 @@ int nci_core_ntf_packet(struct nci_dev *ndev, __u16 opcode,
- 				 ndev->ops->n_core_ops);
- }
- 
-+static bool nci_valid_size(struct sk_buff *skb)
-+{
-+	BUILD_BUG_ON(NCI_CTRL_HDR_SIZE != NCI_DATA_HDR_SIZE);
-+	unsigned int hdr_size = NCI_CTRL_HDR_SIZE;
-+
-+	if (skb->len < hdr_size ||
-+	    !nci_plen(skb->data) ||
-+	    skb->len < hdr_size + nci_plen(skb->data)) {
-+		return false;
-+	}
-+	return true;
-+}
-+
- /* ---- NCI TX Data worker thread ---- */
- 
- static void nci_tx_work(struct work_struct *work)
-@@ -1516,7 +1529,7 @@ static void nci_rx_work(struct work_struct *work)
- 		nfc_send_to_raw_sock(ndev->nfc_dev, skb,
- 				     RAW_PAYLOAD_NCI, NFC_DIRECTION_RX);
- 
--		if (!nci_plen(skb->data)) {
-+		if (!nci_valid_size(skb)) {
- 			kfree_skb(skb);
- 			kcov_remote_stop();
- 			break;
--- 
-2.44.0
-
+If you want to undo deduplication, reply with:
+#syz undup
 
