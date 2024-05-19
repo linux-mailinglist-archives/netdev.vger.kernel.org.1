@@ -1,164 +1,162 @@
-Return-Path: <netdev+bounces-97127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 714018C945E
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 13:14:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BA9F8C946B
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 13:35:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE737B210AC
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 11:14:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C04B11C20B74
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 11:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72BE9433B1;
-	Sun, 19 May 2024 11:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0652B4436E;
+	Sun, 19 May 2024 11:35:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DTf3aZaV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00EA3FB87
-	for <netdev@vger.kernel.org>; Sun, 19 May 2024 11:14:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538591DA4C;
+	Sun, 19 May 2024 11:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716117273; cv=none; b=OLWNbcXgI0OwbpbDCzqMr2TDJlFJQ3xy6kzhYLiubPfYgfSHhDwrWjJsddlb6zDustq/sMX4qbnjMnrcfnrj0ZSB9Hv0HyKXf2NWwmvdB/ZQ+hb6v58dQWBkTyMod/AFG2g71WXiG2Su34BHUkz6pPSxSeZisYH4ze5mrKXZE/4=
+	t=1716118515; cv=none; b=G4EkGgL0qhpFrKf8EjwLC6eT62eepY+YidIrmN/aTOFznL72AgFkxzHxSYS7gNral59vuuoY46GKG1z/T5A/TJq80nyZ21l6fGStmrrria7qiBVbVsb2S9CayG6khcydO9c9l5vHxMteD3yCXTGNRr0gWSfQq6GhL1v8y01EI9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716117273; c=relaxed/simple;
-	bh=TE/dYHUWdFqr94tCntvaxfb0WU+Nf8iKVxC8ogi1uXo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=COktVlDJzMJwoqnCyUM9VMDoaKnLJeHENnf7KtBZrkqBTFYn/lwhecI7fZhw84B+NDfbOzRyvlwU3v7PmOxQLkOCDAPQ5iUna636IUUx4ARx0HxYGjLuKI3PrHlWclWUNcA7e1v4ZsH582DUVBMVJUR3+ZgF3OXV25m2+VIFOco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-36d92a840abso80523785ab.1
-        for <netdev@vger.kernel.org>; Sun, 19 May 2024 04:14:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716117271; x=1716722071;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KI/jM/0zAOn5DrFOjZOOmDUv+lX+OMNUuitu/9jvMQA=;
-        b=AJPtt7Mz60gzU9RHMalc1JrbWwsXxKLfRhgxauZsFxXeA5cTd+5BbbrsydHcJtCAME
-         wM+nicU+YtO/NnEELL8tdky5FKZ85GWuYQ5cN8DLEUNF9rYm30dgLcvMsQc5r1yuzoc4
-         jpsgHG7Yn/06db5ul7gYVD2AMnnNjzgH7NtzHMTZGT74N/x7Zz/u0E+jBE6tySg3rqIM
-         zAfg6TqIxMem55kzigJAYsO1ejUqUqQCcN39uCB7KMeJStGxN2YNtKNPQbdz879h+3qV
-         Z4lyLSPlJq7fGT+dhYXKhFNp9iqkhcVQAKUKcVrdSPZq4J/vx5tm5AHfWDmHdgcAgY16
-         mklw==
-X-Forwarded-Encrypted: i=1; AJvYcCUadcI/6f9vYK5L1YA9h0pwyFJb/RneusqhtEeAz4vBfnCxlh87uTxZwlfS8pYl5o/k8UyT/a5ioGYOt3GvsPsumAnp/Gl4
-X-Gm-Message-State: AOJu0YxQB5/80ig73lGx1LNTLZZcVN95ElqOUqzAdSiVRSvB+fiNRq8E
-	v0zE13pP22OAPywSzYUdIcKuVJ9PAAVrvZAALLxz0EDkq88C4ce5d7kx5oJe8JMokOJqknCehKk
-	O3/6aKXgJUE/oV4aF1GRqj/OAhI8dvfx8RkLRt88EEieWTxft5zBgeH0=
-X-Google-Smtp-Source: AGHT+IEbWQvoEqXVGAXqJ5jBYJl/1FuEIv+QevyAC2qAarl9nJ7cOQYrSiaPI4B6+k0+lavWvokDmVGD3v6KU7vPwkDmVI3jE9Wr
+	s=arc-20240116; t=1716118515; c=relaxed/simple;
+	bh=isaENKlZ4Dah/OxcrVqJYrYbUtnL+lzE100loLpjCUQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o3AlJ9VGET1T/ldcS4sF7Z/TVWc6hK6XZ8bGf5FtUJ/0FoUovqCsSg1A2Q7SioOKNeeqMUmGps0s2qK7lV/OCLoAL5tHry4aHrnpyVaM+932Mkki9TWs+Dsvlp1tnGAnYY7tv4eTqREcswQ8C/JqORMWK/Fm2CrcZ/87FPVgacI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DTf3aZaV; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716118514; x=1747654514;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=isaENKlZ4Dah/OxcrVqJYrYbUtnL+lzE100loLpjCUQ=;
+  b=DTf3aZaVQPMmuzn00F856J/rZBmXvEvRWBRTWgzMYebe4oyXKAT9XcL0
+   hMfKUqCet2vNnrMZaxv1mkNTnWzoWoiI7IDdO+ViRSD+Q+DsvwF/i/kza
+   fJ3vGH+uJ46BdkPg/v+Yb2AJpDE/XgsYKUkeL4BHL6CwJLPz0bcyTGcng
+   /tJ4uanGZLAuriXtNybGqcfhb7BrLx4NOhXNkOLdXwr52aBl5E3gX4HrE
+   /KxpHTC4mGTeDpdYLPeJat5B8f2+AHppLJKtdqW3zJhlJwmfWzdTu0Cr7
+   6f1O+Vn5Blg9ctkDvSNsIqXGLTiZD3dmEQrWzFh+SDHSmJC/OYmU5vnot
+   A==;
+X-CSE-ConnectionGUID: SYixLLS6R621jPBg8n5KaA==
+X-CSE-MsgGUID: RmLUmSTFSyyJvqxPeh7V0g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11076"; a="12471171"
+X-IronPort-AV: E=Sophos;i="6.08,172,1712646000"; 
+   d="scan'208";a="12471171"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2024 04:35:13 -0700
+X-CSE-ConnectionGUID: e+Fvgo46RiiKvLpMd/vxEA==
+X-CSE-MsgGUID: 8Vz8LuzuRQOvbwnqMjcXGg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,172,1712646000"; 
+   d="scan'208";a="36829411"
+Received: from unknown (HELO 108735ec233b) ([10.239.97.151])
+  by fmviesa004.fm.intel.com with ESMTP; 19 May 2024 04:35:09 -0700
+Received: from kbuild by 108735ec233b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s8eol-0003QC-0d;
+	Sun, 19 May 2024 11:35:07 +0000
+Date: Sun, 19 May 2024 19:34:53 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Ilya Dryomov <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	ceph-devel@vger.kernel.org
+Subject: Re: [PATCH 1/2 net-next] libceph: Use sruct_size() in
+ ceph_create_snap_context()
+Message-ID: <202405191909.7qhhefnu-lkp@intel.com>
+References: <5b7c72bdb52703bbfa5511ed500aed4babde1308.1716109606.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:18cc:b0:36d:d38e:3520 with SMTP id
- e9e14a558f8ab-36dd38e353cmr1564485ab.4.1716117270997; Sun, 19 May 2024
- 04:14:30 -0700 (PDT)
-Date: Sun, 19 May 2024 04:14:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000054bc390618ccb092@google.com>
-Subject: [syzbot] [wireless?] WARNING in minstrel_ht_update_caps
-From: syzbot <syzbot+d805aca692aded25f888@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b7c72bdb52703bbfa5511ed500aed4babde1308.1716109606.git.christophe.jaillet@wanadoo.fr>
 
-Hello,
+Hi Christophe,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build errors:
 
-HEAD commit:    0450d2083be6 Merge tag '6.10-rc-smb-fix' of git://git.samb..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16c09b3f180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=17ffd15f654c98ba
-dashboard link: https://syzkaller.appspot.com/bug?extid=d805aca692aded25f888
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+[auto build test ERROR on net-next/main]
 
-Unfortunately, I don't have any reproducer for this issue yet.
+url:    https://github.com/intel-lab-lkp/linux/commits/Christophe-JAILLET/libceph-Use-__counted_by-in-struct-ceph_snap_context/20240519-172142
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/5b7c72bdb52703bbfa5511ed500aed4babde1308.1716109606.git.christophe.jaillet%40wanadoo.fr
+patch subject: [PATCH 1/2 net-next] libceph: Use sruct_size() in ceph_create_snap_context()
+config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20240519/202405191909.7qhhefnu-lkp@intel.com/config)
+compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240519/202405191909.7qhhefnu-lkp@intel.com/reproduce)
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/227283491c2c/disk-0450d208.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d5c9b39757fa/vmlinux-0450d208.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9ab6928507ba/bzImage-0450d208.xz
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405191909.7qhhefnu-lkp@intel.com/
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d805aca692aded25f888@syzkaller.appspotmail.com
+All errors (new ones prefixed by >>):
 
-netlink: 32 bytes leftover after parsing attributes in process `syz-executor.3'.
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 6963 at include/net/mac80211.h:6962 rate_lowest_index include/net/mac80211.h:6962 [inline]
-WARNING: CPU: 1 PID: 6963 at include/net/mac80211.h:6962 minstrel_ht_update_caps+0x44a/0x17e0 net/mac80211/rc80211_minstrel_ht.c:1733
-Modules linked in:
-CPU: 1 PID: 6963 Comm: syz-executor.3 Not tainted 6.9.0-syzkaller-08995-g0450d2083be6 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-RIP: 0010:rate_lowest_index include/net/mac80211.h:6962 [inline]
-RIP: 0010:minstrel_ht_update_caps+0x44a/0x17e0 net/mac80211/rc80211_minstrel_ht.c:1733
-Code: da e8 ca bc cf f9 e9 24 ff ff ff e8 80 65 7b f6 eb 17 e8 79 65 7b f6 eb 14 e8 72 65 7b f6 49 c1 fd 38 eb 0c e8 67 65 7b f6 90 <0f> 0b 90 45 31 ed 49 bf 00 00 00 00 00 fc ff df 48 8b 3c 24 4c 8b
-RSP: 0018:ffffc9000929ef80 EFLAGS: 00010287
-RAX: ffffffff8b1acc49 RBX: 000000000000000c RCX: 0000000000040000
-RDX: ffffc90009e54000 RSI: 0000000000004ebd RDI: 0000000000004ebe
-RBP: 0000000000000000 R08: ffffffff8b1acb65 R09: ffff88806ddec008
-R10: dffffc0000000000 R11: ffffed100dbbdd49 R12: 1ffff11008d33614
-R13: 0b00000000000000 R14: ffff88804699b0a0 R15: 0100000000000000
-FS:  00007fb6f84146c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fed23961d58 CR3: 0000000028cca000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- rate_control_rate_init+0x3d1/0x5f0 net/mac80211/rate.c:63
- sta_apply_auth_flags+0x1b6/0x410 net/mac80211/cfg.c:1710
- sta_apply_parameters+0xe20/0x1550 net/mac80211/cfg.c:2043
- ieee80211_add_station+0x3da/0x630 net/mac80211/cfg.c:2109
- rdev_add_station+0x11d/0x2b0 net/wireless/rdev-ops.h:201
- nl80211_new_station+0x1d53/0x2550 net/wireless/nl80211.c:7624
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xb16/0xec0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x1e5/0x430 net/netlink/af_netlink.c:2564
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
- netlink_unicast+0x7ec/0x980 net/netlink/af_netlink.c:1361
- netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x223/0x270 net/socket.c:745
- ____sys_sendmsg+0x525/0x7d0 net/socket.c:2585
- ___sys_sendmsg net/socket.c:2639 [inline]
- __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2668
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fb6f767cee9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fb6f84140c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fb6f77abf80 RCX: 00007fb6f767cee9
-RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000003
-RBP: 00007fb6f76c949e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fb6f77abf80 R15: 00007ffe9914aca8
- </TASK>
+   net/ceph/snapshot.c: In function 'ceph_create_snap_context':
+>> net/ceph/snapshot.c:32:25: error: implicit declaration of function 'sruct_size'; did you mean 'struct_size'? [-Werror=implicit-function-declaration]
+      32 |         snapc = kzalloc(sruct_size(snapc, snaps, snap_count), gfp_flags);
+         |                         ^~~~~~~~~~
+         |                         struct_size
+>> net/ceph/snapshot.c:32:43: error: 'snaps' undeclared (first use in this function); did you mean 'snapc'?
+      32 |         snapc = kzalloc(sruct_size(snapc, snaps, snap_count), gfp_flags);
+         |                                           ^~~~~
+         |                                           snapc
+   net/ceph/snapshot.c:32:43: note: each undeclared identifier is reported only once for each function it appears in
+   cc1: some warnings being treated as errors
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+vim +32 net/ceph/snapshot.c
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+    11	
+    12	/*
+    13	 * Ceph snapshot contexts are reference counted objects, and the
+    14	 * returned structure holds a single reference.  Acquire additional
+    15	 * references with ceph_get_snap_context(), and release them with
+    16	 * ceph_put_snap_context().  When the reference count reaches zero
+    17	 * the entire structure is freed.
+    18	 */
+    19	
+    20	/*
+    21	 * Create a new ceph snapshot context large enough to hold the
+    22	 * indicated number of snapshot ids (which can be 0).  Caller has
+    23	 * to fill in snapc->seq and snapc->snaps[0..snap_count-1].
+    24	 *
+    25	 * Returns a null pointer if an error occurs.
+    26	 */
+    27	struct ceph_snap_context *ceph_create_snap_context(u32 snap_count,
+    28							gfp_t gfp_flags)
+    29	{
+    30		struct ceph_snap_context *snapc;
+    31	
+  > 32		snapc = kzalloc(sruct_size(snapc, snaps, snap_count), gfp_flags);
+    33		if (!snapc)
+    34			return NULL;
+    35	
+    36		refcount_set(&snapc->nref, 1);
+    37		snapc->num_snaps = snap_count;
+    38	
+    39		return snapc;
+    40	}
+    41	EXPORT_SYMBOL(ceph_create_snap_context);
+    42	
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
