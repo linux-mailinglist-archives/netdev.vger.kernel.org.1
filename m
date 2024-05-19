@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-97142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AE228C95D5
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 20:37:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023478C95D6
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 20:38:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50249280E59
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 18:37:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C46A1C20854
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 18:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EFE36CDCA;
-	Sun, 19 May 2024 18:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DFE6D1A8;
+	Sun, 19 May 2024 18:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="J4rE3Q45"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="hiNoMrnd"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEC56CDBA
-	for <netdev@vger.kernel.org>; Sun, 19 May 2024 18:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E8C6CDBA
+	for <netdev@vger.kernel.org>; Sun, 19 May 2024 18:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716143857; cv=none; b=UdckYTZazqJ6KU7qejaoXPCxs69vuX+g+/niw8VWdW4QSlsEtr7SRl1445XrrojeBQ7ioL+sdLfb1qT15AD7Pz1sD6ENmmEhLZnM2x4ld3vbk+VC1nkTiafjpPuXrxCU8+nichDpzoCkdS0wJNxExWw6C3K5USSmTpZLQhK94As=
+	t=1716143879; cv=none; b=QrwMN30OiRraEZQPTRE75KrR33Rr0CY/goIDbBrbuuP7OCSRfg93cwx6TWs8Yy//yJpTKV+SVDMBYvo61y+bMZDTDLed8jSRji3gvJOgPXklLQV8RlhVMmkekMcvOVghPgef1SvQTaW0JgDJTaxOGv0K34E7Oxgjn1Qc9HEsaPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716143857; c=relaxed/simple;
-	bh=DCCGhccJ0aVT+829N3CMw3RL3dlaxXnyWFXk8kYgJJ0=;
+	s=arc-20240116; t=1716143879; c=relaxed/simple;
+	bh=vy5n2/KHWByF7ZvVsZ2P0erykSi0eDx3M2ogH5eGv5E=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fjdcyQ6jWP88K8NEe2nZ5Mk8OlQ4JiTbiqWkvLFLvGqTlCJJVI3Ofsvwd1NEtKu2YyKhGGa1BLX1JXZy9uPaF4Tw3TwAqKM7YQcwYOgj756OwqqhDcHJepRz9ZPMRoPYo2GeKgPzFn8lFzcArVkMUW8hjqOLBjhsBWR94iBbZeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=J4rE3Q45; arc=none smtp.client-ip=62.96.220.36
+	 Content-Type:Content-Disposition:In-Reply-To; b=tcI8vuW4VZsNdG74VKs5o2VPaP7ap2OeRr7rUIwnPO8b85sF2z8w3MS2oq9MXbxNXtLcBwq21/OE03msbZwifGtnWfPsKEqfCZqUtulUioKzN0SD3ZcnBZ50nH38BCfI4diUfCTYIwz/tvdH3qgAsY8fh7ZARg/yTc1I5kU5VWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=hiNoMrnd; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 0F8AC201AE;
-	Sun, 19 May 2024 20:37:32 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id 48528201AE;
+	Sun, 19 May 2024 20:37:55 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ldWeor4egJd4; Sun, 19 May 2024 20:37:31 +0200 (CEST)
+	with ESMTP id YXzwmJggZuda; Sun, 19 May 2024 20:37:54 +0200 (CEST)
 Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 545B420185;
-	Sun, 19 May 2024 20:37:31 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 545B420185
+	by a.mx.secunet.com (Postfix) with ESMTPS id 58B3E20185;
+	Sun, 19 May 2024 20:37:54 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 58B3E20185
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1716143851;
-	bh=crgMEc/Ys+JH4Kjo2ReKYOxq84A947rcEVPKuwDfxbU=;
+	s=202301; t=1716143874;
+	bh=9BeWKhxSygLWOvynC7N/pFXeBy2NuJlsHjZnYzNsx0M=;
 	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=J4rE3Q45CfpbWrWJhTKMBM2rgsUX0ZXp8OLsJqGD7+SItNvhPdc8fZUbflLAOc3QX
-	 RJMtpQVb/6i24szAsDAke5zD4x6+B7i2+/Q3ovHxUjJZ2z+q40vlgHnO1Zi8XlHCh0
-	 GEhmmk0eQt3Qwc1OZ6hEPxSFa13VSjkMmyLfC+tdnjtyn0FleckHzSipiuQuS+BLM/
-	 AnCgFGyVaM0Bi+Jh8SdGUfpXid6g19fKoVM+4jkivAffAJQUB/UiJ9AI5ZYcSD+Y+r
-	 wy8BkV+eW2TUpveChw8xYx/HbYVc9Q1HXv3AYAQrok96CifnmX7VU6tDQgOKiaQe0P
-	 bJsxwZjNR+c7Q==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 44CA580004A;
-	Sun, 19 May 2024 20:37:31 +0200 (CEST)
+	b=hiNoMrndUh8Fq9lsmSVLTydZX1O1GQ3nPScQJfbjnZA/bjs+BEnZGxnx/7+XhT64p
+	 u/aGVUoJJRq5ZxR4ic/yeTF072kylT3a3TB28n3xrEEmo2XzpiaEEA4i/VGYnscvV9
+	 Ep8AkrBQtxrKXr6vo7Uf2Z+xzAXQz+JoEIXGoojkUmyIXz0LxY8p9cXRSEWRurtLzk
+	 dyjadNQqn8PNa+DNBPjTsg8k7K9IT7L1u8++W3TNFpmH0PwjZER4iypUUEtjrhvyWL
+	 2OEfhme4+QWo5hT2nVu57GHYddvlpPdIzCC5rr6Ty9yiS4akf4ujKeZuCWbZscolgN
+	 IJVdfspc/ht2w==
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout2.secunet.com (Postfix) with ESMTP id 4B85680004A;
+	Sun, 19 May 2024 20:37:54 +0200 (CEST)
 Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sun, 19 May 2024 20:37:31 +0200
+ 15.1.2507.39; Sun, 19 May 2024 20:37:54 +0200
 Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
  (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sun, 19 May
- 2024 20:37:30 +0200
-Date: Sun, 19 May 2024 20:37:23 +0200
+ 2024 20:37:53 +0200
+Date: Sun, 19 May 2024 20:37:45 +0200
 From: Antony Antony <antony.antony@secunet.com>
 To: Stephen Hemminger <stephen@networkplumber.org>, David Ahern
 	<dsahern@gmail.com>
@@ -74,9 +74,9 @@ CC: <netdev@vger.kernel.org>, <devel@linux-ipsec.org>, Steffen Klassert
  Antony" <antony.antony@secunet.com>, Nicolas Dichtel
 	<nicolas.dichtel@6wind.com>, Sabrina Dubroca <sd@queasysnail.net>, "Christian
  Hopps" <chopps@chopps.org>
-Subject: [PATCH RFC iproute2-next 2/3] xfrm: support xfrm SA direction
- attribute
-Message-ID: <3c5f04d21ebf5e6c0f6344aef9646a37926a7032.1716143499.git.antony.antony@secunet.com>
+Subject: [PATCH RFC iproute2-next 3/3] xfrm: update ip xfrm state output for
+ SA with direction attribute
+Message-ID: <4b4b45dfffeab66c64cf560f20b5317e0a3ad55f.1716143499.git.antony.antony@secunet.com>
 Reply-To: <antony.antony@secunet.com>
 References: <cover.1716143499.git.antony.antony@secunet.com>
 Precedence: bulk
@@ -95,156 +95,363 @@ X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
  mbx-essen-01.secunet.de (10.53.40.197)
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-- Add parsing "ip xfrm state add .. dir [ in|out ]
-- Add printing XFRMA_SA_DIR.
-- allow replay-window 0 on output state with esn
+With the introduction of the new SA direction attribute, I propose
+removing redundant attributes in 'ip xfrm state' output.
 
-Previously:
-ip xfrm state add src 192.1.3.33 dst 192.1.2.23 proto esp spi 1 \
-  reqid 1 mode tunnel aead 'rfc4106(gcm(aes))'  \
-  0x1111111111111111111111111111111111111111 96
-  sel src 192.0.3.0/25 dst 192.0.2.0/25 dir out flag esn
+When the SA has direction set, 'ip xfrm state' output can be simpler,
+as several attributes for the opposite direction become redundant.
 
-Error: esn flag set without replay-window.
+This commit is experimental. Review the output format. Examples of
+the old and new styles are provided below.
 
-When the SA direction is set, kernel only allows oputput SA, with ESN
-and replay-window zero. This change would not affect any existing use
-cases; configuring SA.
+This patch also re-formats the output to provide only direction-specific
+information, reducing confusion.
+
+Main changes:
+- Only show oseq_hi/oseq for output SA.
+- Only show seq_hi/seq for input SA.
+- Show replay-window attributes only for input SA.
+- Show replay-window or ESN replay-window, not both.
+- Use replay-window consistently with ESN and non-ESN.
+  * previously there was replay_window and replay-window.
+
+Here is an exmple of input SA and output SA with ESN set.
+-- input state ip xfrm state
+-- new output wtih dir in --
+ip xfrm state add src 10.1.3.4 dst 10.1.2.3 proto esp spi 3 reqid 2 \
+  mode tunnel aead 'rfc4106(gcm(aes))' \
+  0x2222222222222222222222222222222222222222 96 dir in flag esn \
+  replay-window 36
+
+-- new outpu "ip xfrm state"
+src 10.1.3.4 dst 10.1.2.3
+        proto esp spi 0x00000003 reqid 2 mode tunnel dir in
+        flag esn
+        aead rfc4106(gcm(aes)) 0x2222222222222222222222222222222222222222 96
+        seq-hi 0x0, seq 0x0
+        replay-window 36, bitmap-length 2
+         00000000 00000000
+        sel src 0.0.0.0/0 dst 0.0.0.0/0
+
+-- old output ip xfrm state
+src 10.1.3.4 dst 10.1.2.3
+        proto esp spi 0x00000003 reqid 2 mode tunnel
+        replay-window 0 flag esn
+        aead rfc4106(gcm(aes)) 0x2222222222222222222222222222222222222222 96
+        anti-replay esn context:
+         seq-hi 0x0, seq 0x0, oseq-hi 0x0, oseq 0x0
+         replay_window 36, bitmap-length 2
+         00000000 00000000
+        sel src 0.0.0.0/0 dst 0.0.0.0/0
+
+--- example of output state :
+ip xfrm state add src 10.1.3.4 dst 10.1.2.3 proto esp spi 3 reqid 2 \
+  mode tunnel aead 'rfc4106(gcm(aes))' \
+  0x2222222222222222222222222222222222222222 96 dir out flag esn
+
+-- new output; ip xfrm state
+src 10.1.3.4 dst 10.1.2.3
+        proto esp spi 0x00000003 reqid 2 mode tunnel dir out
+        flag esn
+        aead rfc4106(gcm(aes))
+0x2222222222222222222222222222222222222222 96
+        oseq-hi 0x0, oseq 0x0
+        sel src 0.0.0.0/0 dst 0.0.0.0/0
+
+-- old output;  ip xfrm state
+src 10.1.3.4 dst 10.1.2.3
+        proto esp spi 0x00000003 reqid 2 mode tunnel
+        replay-window 0 flag esn
+        aead rfc4106(gcm(aes)) 0x2222222222222222222222222222222222222222 96
+        anti-replay esn context:
+         seq-hi 0x0, seq 0x0, oseq-hi 0x0, oseq 0x0
+         replay_window 0, bitmap-length 0
+        sel src 0.0.0.0/0 dst 0.0.0.0/0
+
+Noitce minor fixes to output of the following commands when the direction is set.
+Old API and output works the same when the SA direction is not set.
+
+"ip xfrm state"
+"ip -s xfrm state"
+"ip -d xfrm state"
+"ip xfrm monitor"
+"ip -s xfrm monitor"
+"ip -d xfrm monitor"
+
+Please test it and give feedback, did I  miss a white space, tab..
 
 Signed-off-by: Antony Antony <antony.antony@secunet.com>
 ---
- ip/ipxfrm.c     | 12 ++++++++++++
- ip/xfrm_state.c | 44 ++++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 52 insertions(+), 4 deletions(-)
+ ip/ipxfrm.c | 138 ++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 90 insertions(+), 48 deletions(-)
 
 diff --git a/ip/ipxfrm.c b/ip/ipxfrm.c
-index b78c712d..3c0faf62 100644
+index 3c0faf62..d631c28d 100644
 --- a/ip/ipxfrm.c
 +++ b/ip/ipxfrm.c
-@@ -904,6 +904,18 @@ void xfrm_xfrma_print(struct rtattr *tb[], __u16 family, FILE *fp,
- 		fprintf(fp, "tfcpad %u", tfcpad);
- 		fprintf(fp, "%s", _SL_);
+@@ -257,7 +257,8 @@ const char *strxf_ptype(__u8 ptype)
+ 
+ static void xfrm_id_info_print(xfrm_address_t *saddr, struct xfrm_id *id,
+ 			__u8 mode, __u32 reqid, __u16 family, int force_spi,
+-			FILE *fp, const char *prefix, const char *title)
++			__u8 sa_dir, FILE *fp, const char *prefix,
++			const char *title)
+ {
+ 	if (title)
+ 		fputs(title, fp);
+@@ -307,6 +308,15 @@ static void xfrm_id_info_print(xfrm_address_t *saddr, struct xfrm_id *id,
+ 		fprintf(fp, "%u", mode);
+ 		break;
  	}
-+	if (tb[XFRMA_SA_DIR]) {
-+		__u8 dir = rta_getattr_u8(tb[XFRMA_SA_DIR]);
 +
-+		fprintf(fp, "\tdir ");
-+		if (dir == XFRM_SA_DIR_IN)
++	if (sa_dir) {
++		fprintf(fp, " dir ");
++		if (sa_dir == XFRM_SA_DIR_IN)
 +			fprintf(fp, "in");
-+		else if (dir == XFRM_SA_DIR_OUT)
-+			fprintf(fp, "out");
 +		else
-+			fprintf(fp, " %d", dir);
-+		fprintf(fp, "%s", _SL_);
++			fprintf(fp, "out");
++	}
++
+ 	fprintf(fp, "%s", _SL_);
+ }
+ 
+@@ -322,7 +332,7 @@ static const char *strxf_limit(__u64 limit)
+ 	return str;
+ }
+ 
+-static void xfrm_stats_print(struct xfrm_stats *s, FILE *fp,
++static void xfrm_stats_print(struct xfrm_stats *s, __u8 sa_dir, FILE *fp,
+ 			     const char *prefix)
+ {
+ 	if (prefix)
+@@ -331,8 +341,14 @@ static void xfrm_stats_print(struct xfrm_stats *s, FILE *fp,
+ 
+ 	if (prefix)
+ 		fputs(prefix, fp);
+-	fprintf(fp, "  replay-window %u replay %u failed %u%s",
+-		s->replay_window, s->replay, s->integrity_failed, _SL_);
++
++	if (sa_dir == XFRM_SA_DIR_OUT) {
++		/* would the fail occur on OUT??? */
++		fprintf(fp, " failed %u%s", s->integrity_failed, _SL_);
++	} else {
++		fprintf(fp, "  replay-window %u replay %u failed %u%s",
++			s->replay_window, s->replay, s->integrity_failed, _SL_);
 +	}
  }
  
+ static const char *strxf_time(__u64 time)
+@@ -584,7 +600,7 @@ static void xfrm_tmpl_print(struct xfrm_user_tmpl *tmpls, int len,
+ 			fputs(prefix, fp);
+ 
+ 		xfrm_id_info_print(&tmpl->saddr, &tmpl->id, tmpl->mode,
+-				   tmpl->reqid, tmpl->family, 0, fp, prefix, "tmpl ");
++				   tmpl->reqid, tmpl->family, 0, 0, fp, prefix, "tmpl ");
+ 
+ 		if (show_stats > 0 || tmpl->optional) {
+ 			if (prefix)
+@@ -675,6 +691,8 @@ done:
+ void xfrm_xfrma_print(struct rtattr *tb[], __u16 family, FILE *fp,
+ 		      const char *prefix, bool nokeys, bool dir)
+ {
++	__u8 sa_dir =  tb[XFRMA_SA_DIR] ? rta_getattr_u8(tb[XFRMA_SA_DIR]) : 0;
++
+ 	if (tb[XFRMA_MARK]) {
+ 		struct rtattr *rta = tb[XFRMA_MARK];
+ 		struct xfrm_mark *m = RTA_DATA(rta);
+@@ -813,7 +831,6 @@ void xfrm_xfrma_print(struct rtattr *tb[], __u16 family, FILE *fp,
+ 
+ 		if (prefix)
+ 			fputs(prefix, fp);
+-		fprintf(fp, "anti-replay context: ");
+ 
+ 		if (RTA_PAYLOAD(tb[XFRMA_REPLAY_VAL]) < sizeof(*replay)) {
+ 			fprintf(fp, "(ERROR truncated)");
+@@ -822,8 +839,11 @@ void xfrm_xfrma_print(struct rtattr *tb[], __u16 family, FILE *fp,
+ 		}
+ 
+ 		replay = RTA_DATA(tb[XFRMA_REPLAY_VAL]);
+-		fprintf(fp, "seq 0x%x, oseq 0x%x, bitmap 0x%08x",
+-			replay->seq, replay->oseq, replay->bitmap);
++		if (sa_dir == XFRM_SA_DIR_OUT)
++			fprintf(fp, "oseq 0x%x", replay->oseq);
++		else
++			fprintf(fp, "seq 0x%x, oseq 0x%x, bitmap 0x%08x",
++				replay->seq, replay->oseq, replay->bitmap);
+ 		fprintf(fp, "%s", _SL_);
+ 	}
+ 
+@@ -833,36 +853,55 @@ void xfrm_xfrma_print(struct rtattr *tb[], __u16 family, FILE *fp,
+ 
+ 		if (prefix)
+ 			fputs(prefix, fp);
+-		fprintf(fp, "anti-replay esn context:");
++		if (!sa_dir) {
++			fprintf(fp, "anti-replay esn context:");
++			fprintf(fp, "%s", _SL_);
++		}
+ 
+ 		if (RTA_PAYLOAD(tb[XFRMA_REPLAY_ESN_VAL]) < sizeof(*replay)) {
+-			fprintf(fp, "(ERROR truncated)");
++			fprintf(fp, "(ERROR esn truncated)");
+ 			fprintf(fp, "%s", _SL_);
+ 			return;
+ 		}
+-		fprintf(fp, "%s", _SL_);
+ 
+ 		replay = RTA_DATA(tb[XFRMA_REPLAY_ESN_VAL]);
+-		if (prefix)
++
++		if (!sa_dir && prefix)
+ 			fputs(prefix, fp);
+-		fprintf(fp, " seq-hi 0x%x, seq 0x%x, oseq-hi 0x%0x, oseq 0x%0x",
+-			replay->seq_hi, replay->seq, replay->oseq_hi,
+-			replay->oseq);
++		if (!sa_dir)
++			fprintf(fp, " ");
++		if (!sa_dir || sa_dir == XFRM_SA_DIR_IN)
++			fprintf(fp, "seq-hi 0x%x, seq 0x%x",
++				replay->seq_hi, replay->seq);
++		if (!sa_dir)
++			fprintf(fp, " ");
++		if (!sa_dir || sa_dir == XFRM_SA_DIR_OUT)
++			fprintf(fp, "oseq-hi 0x%0x, oseq 0x%0x",
++				replay->oseq_hi, replay->oseq);
+ 		fprintf(fp, "%s", _SL_);
+-		if (prefix)
+-			fputs(prefix, fp);
+-		fprintf(fp, " replay_window %u, bitmap-length %u",
+-			replay->replay_window, replay->bmp_len);
+-		for (i = replay->bmp_len, j = 0; i; i--) {
+-			if (j++ % 8 == 0) {
+-				fprintf(fp, "%s", _SL_);
+-				if (prefix)
+-					fputs(prefix, fp);
++
++		if (sa_dir != XFRM_SA_DIR_OUT) {
++			if (prefix)
++				fputs(prefix, fp);
++			if (!sa_dir)
+ 				fprintf(fp, " ");
++			if (sa_dir)
++				fprintf(fp, "replay-window");
++			else
++				fprintf(fp, "replay_window"); /* for historic reasons */
++			fprintf(fp, " %u, bitmap-length %u", replay->replay_window,
++				replay->bmp_len);
++			for (i = replay->bmp_len, j = 0; i; i--) {
++				if (j++ % 8 == 0) {
++					fprintf(fp, "%s", _SL_);
++					if (prefix)
++						fputs(prefix, fp);
++					fprintf(fp, " ");
++				}
++				fprintf(fp, "%08x ", replay->bmp[i - 1]);
+ 			}
+-			fprintf(fp, "%08x ", replay->bmp[i - 1]);
++			fprintf(fp, "%s", _SL_);
+ 		}
+-		fprintf(fp, "%s", _SL_);
+ 	}
+ 	if (tb[XFRMA_OFFLOAD_DEV]) {
+ 		struct xfrm_user_offload *xuo;
+@@ -904,18 +943,6 @@ void xfrm_xfrma_print(struct rtattr *tb[], __u16 family, FILE *fp,
+ 		fprintf(fp, "tfcpad %u", tfcpad);
+ 		fprintf(fp, "%s", _SL_);
+ 	}
+-	if (tb[XFRMA_SA_DIR]) {
+-		__u8 dir = rta_getattr_u8(tb[XFRMA_SA_DIR]);
+-
+-		fprintf(fp, "\tdir ");
+-		if (dir == XFRM_SA_DIR_IN)
+-			fprintf(fp, "in");
+-		else if (dir == XFRM_SA_DIR_OUT)
+-			fprintf(fp, "out");
+-		else
+-			fprintf(fp, " %d", dir);
+-		fprintf(fp, "%s", _SL_);
+-	}
+ }
+ 
  static int xfrm_selector_iszero(struct xfrm_selector *s)
-diff --git a/ip/xfrm_state.c b/ip/xfrm_state.c
-index 9be65b2f..214d0d07 100644
---- a/ip/xfrm_state.c
-+++ b/ip/xfrm_state.c
-@@ -47,9 +47,9 @@ static void usage(void)
- 		"        [ coa ADDR[/PLEN] ] [ ctx CTX ] [ extra-flag EXTRA-FLAG-LIST ]\n"
- 		"        [ offload [ crypto | packet ] dev DEV dir DIR ]\n"
- 		"        [ output-mark OUTPUT-MARK [ mask MASK ] ]\n"
--		"        [ if_id IF_ID ] [ tfcpad LENGTH ]\n"
-+		"        [ if_id IF_ID ] [ tfcpad LENGTH ] [dir DIR]\n"
- 		"Usage: ip xfrm state allocspi ID [ mode MODE ] [ mark MARK [ mask MASK ] ]\n"
--		"        [ reqid REQID ] [ seq SEQ ] [ min SPI max SPI ]\n"
-+		"        [ reqid REQID ] [ seq SEQ ] [ min SPI max SPI ] [dir DIR]\n"
- 		"Usage: ip xfrm state { delete | get } ID [ mark MARK [ mask MASK ] ]\n"
- 		"Usage: ip xfrm state deleteall [ ID ] [ mode MODE ] [ reqid REQID ]\n"
- 		"        [ flag FLAG-LIST ]\n"
-@@ -290,7 +290,9 @@ static int xfrm_state_modify(int cmd, unsigned int flags, int argc, char **argv)
- 	struct xfrm_replay_state_esn replay_esn = {};
- 	struct xfrm_user_offload xuo = {};
- 	unsigned int ifindex = 0;
--	__u8 dir = 0;
-+	__u8 dir = 0; /* only used with xuo XFRMA_OFFLOAD */
-+	__u8 sa_dir = 0; /* state direction. Should match the above when offload */
+@@ -944,22 +971,30 @@ void xfrm_state_info_print(struct xfrm_usersa_info *xsinfo,
+ {
+ 	char buf[STRBUF_SIZE] = {};
+ 	int force_spi = xfrm_xfrmproto_is_ipsec(xsinfo->id.proto);
++	__u8 sa_dir =  tb[XFRMA_SA_DIR] ? rta_getattr_u8(tb[XFRMA_SA_DIR]) : 0;
++	bool sl = false;
+ 
+ 	xfrm_id_info_print(&xsinfo->saddr, &xsinfo->id, xsinfo->mode,
+-			   xsinfo->reqid, xsinfo->family, force_spi, fp,
++			   xsinfo->reqid, xsinfo->family, force_spi, sa_dir, fp,
+ 			   prefix, title);
+ 
+ 	if (prefix)
+ 		strlcat(buf, prefix, sizeof(buf));
 +
- 	bool is_offload = false, is_packet_offload = false;
- 	__u32 replay_window = 0;
- 	__u32 seq = 0, oseq = 0, seq_hi = 0, oseq_hi = 0;
-@@ -462,6 +464,14 @@ static int xfrm_state_modify(int cmd, unsigned int flags, int argc, char **argv)
- 			NEXT_ARG();
- 			if (get_u32(&tfcpad, *argv, 0))
- 				invarg("value after \"tfcpad\" is invalid", *argv);
-+		} else if (strcmp(*argv, "dir") == 0) {
-+			NEXT_ARG();
-+			if (strcmp(*argv, "in") == 0)
-+				sa_dir = XFRM_SA_DIR_IN;
-+			else if (strcmp(*argv, "out") == 0)
-+				sa_dir = XFRM_SA_DIR_OUT;
-+			else
-+				invarg("value after \"dir\" is invalid", *argv);
- 		} else {
- 			/* try to assume ALGO */
- 			int type = xfrm_algotype_getbyname(*argv);
-@@ -587,7 +597,7 @@ static int xfrm_state_modify(int cmd, unsigned int flags, int argc, char **argv)
- 	}
+ 	strlcat(buf, "\t", sizeof(buf));
  
- 	if (req.xsinfo.flags & XFRM_STATE_ESN &&
--	    replay_window == 0) {
-+	    replay_window == 0 && sa_dir != XFRM_SA_DIR_OUT ) {
- 		fprintf(stderr, "Error: esn flag set without replay-window.\n");
- 		exit(-1);
- 	}
-@@ -760,6 +770,14 @@ static int xfrm_state_modify(int cmd, unsigned int flags, int argc, char **argv)
- 	if (output_mark.m)
- 		addattr32(&req.n, sizeof(req.buf), XFRMA_SET_MARK_MASK, output_mark.m);
- 
-+	if (sa_dir) {
-+		int r = addattr8(&req.n, sizeof(req.buf), XFRMA_SA_DIR, sa_dir);
-+		if (r < 0) {
-+			fprintf(stderr, "XFRMA_SA_DIR failed\n");
-+			exit(1);
-+		}
+-	fputs(buf, fp);
+-	fprintf(fp, "replay-window %u ", xsinfo->replay_window);
+-	if (show_stats > 0)
+-		fprintf(fp, "seq 0x%08u ", xsinfo->seq);
++	if (sa_dir == 0 || (sa_dir == XFRM_SA_DIR_IN && tb[XFRMA_REPLAY_VAL])) {
++		fputs(buf, fp);
++		fprintf(fp, "replay-window %u ", xsinfo->replay_window);
++		if (show_stats > 0)
++			fprintf(fp, "seq 0x%08u ", xsinfo->seq);
++		sl = true;
 +	}
 +
- 	if (rtnl_open_byproto(&rth, 0, NETLINK_XFRM) < 0)
- 		exit(1);
+ 	if (show_stats > 0 || xsinfo->flags) {
+ 		__u8 flags = xsinfo->flags;
  
-@@ -792,6 +810,7 @@ static int xfrm_state_allocspi(int argc, char **argv)
- 	char *maxp = NULL;
- 	struct xfrm_mark mark = {0, 0};
- 	struct nlmsghdr *answer;
-+	__u8 sa_dir = 0;
++		fputs(buf, fp);
+ 		fprintf(fp, "flag ");
+ 		XFRM_FLAG_PRINT(fp, flags, XFRM_STATE_NOECN, "noecn");
+ 		XFRM_FLAG_PRINT(fp, flags, XFRM_STATE_DECAP_DSCP, "decap-dscp");
+@@ -969,8 +1004,10 @@ void xfrm_state_info_print(struct xfrm_usersa_info *xsinfo,
+ 		XFRM_FLAG_PRINT(fp, flags, XFRM_STATE_AF_UNSPEC, "af-unspec");
+ 		XFRM_FLAG_PRINT(fp, flags, XFRM_STATE_ALIGN4, "align4");
+ 		XFRM_FLAG_PRINT(fp, flags, XFRM_STATE_ESN, "esn");
+-		if (flags)
++		if (flags) {
+ 			fprintf(fp, "%x", flags);
++		}
++		sl = true;
+ 	}
+ 	if (show_stats > 0 && tb[XFRMA_SA_EXTRA_FLAGS]) {
+ 		__u32 extra_flags = rta_getattr_u32(tb[XFRMA_SA_EXTRA_FLAGS]);
+@@ -982,12 +1019,17 @@ void xfrm_state_info_print(struct xfrm_usersa_info *xsinfo,
+ 		XFRM_FLAG_PRINT(fp, extra_flags,
+ 				XFRM_SA_XFLAG_OSEQ_MAY_WRAP,
+ 				"oseq-may-wrap");
+-		if (extra_flags)
++		if (extra_flags) {
+ 			fprintf(fp, "%x", extra_flags);
++			sl = true;
++		}
+ 	}
+-	if (show_stats > 0)
++	if (show_stats > 0) {
+ 		fprintf(fp, " (0x%s)", strxf_mask8(xsinfo->flags));
+-	fprintf(fp, "%s", _SL_);
++		sl = true;
++	}
++	if (sl)
++		fprintf(fp, "%s", _SL_);
  
- 	while (argc > 0) {
- 		if (strcmp(*argv, "mode") == 0) {
-@@ -823,6 +842,14 @@ static int xfrm_state_allocspi(int argc, char **argv)
+ 	xfrm_xfrma_print(tb, xsinfo->family, fp, buf, nokeys, true);
  
- 			if (get_u32(&req.xspi.max, *argv, 0))
- 				invarg("value after \"max\" is invalid", *argv);
-+		} else if (strcmp(*argv, "dir") == 0) {
-+			NEXT_ARG();
-+			if (strcmp(*argv, "in") == 0)
-+				sa_dir = XFRM_SA_DIR_IN;
-+			else if (strcmp(*argv, "out") == 0)
-+				sa_dir = XFRM_SA_DIR_OUT;
-+			else
-+				invarg("value after \"dir\" is invalid", *argv);
- 		} else {
- 			/* try to assume ID */
- 			if (idp)
-@@ -875,6 +902,15 @@ static int xfrm_state_allocspi(int argc, char **argv)
- 			req.xspi.max = 0xffff;
+@@ -1002,7 +1044,7 @@ void xfrm_state_info_print(struct xfrm_usersa_info *xsinfo,
+ 
+ 	if (show_stats > 0) {
+ 		xfrm_lifetime_print(&xsinfo->lft, &xsinfo->curlft, fp, buf);
+-		xfrm_stats_print(&xsinfo->stats, fp, buf);
++		xfrm_stats_print(&xsinfo->stats, sa_dir, fp, buf);
  	}
  
-+	if (sa_dir) {
-+		int r = addattr8(&req.n, sizeof(req.buf), XFRMA_SA_DIR, sa_dir);
-+
-+		if (r < 0) {
-+			fprintf(stderr, "XFRMA_SA_DIR failed\n");
-+			exit(1);
-+		}
-+	}
-+
- 	if (mark.m & mark.v) {
- 		int r = addattr_l(&req.n, sizeof(req.buf), XFRMA_MARK,
- 				  (void *)&mark, sizeof(mark));
+ 	if (tb[XFRMA_SEC_CTX])
 -- 
 2.30.2
 
