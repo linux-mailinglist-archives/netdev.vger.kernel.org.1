@@ -1,119 +1,133 @@
-Return-Path: <netdev+bounces-97137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74CD18C9503
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 16:31:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B86158C952B
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 17:31:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3005B281330
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 14:31:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4480BB21074
+	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 15:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68EA8487BE;
-	Sun, 19 May 2024 14:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7791E51D;
+	Sun, 19 May 2024 15:31:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="hsPoZwPb"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bVfau57A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53E5282F0;
-	Sun, 19 May 2024 14:31:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8770D8F58;
+	Sun, 19 May 2024 15:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716129101; cv=none; b=fvOC+G/EBKxhtNhk7jO3QRknlFwhq2e5RX+t4eZadZj/c4UkKBLqlDmNyxAOO4gm+P1EtTdqFjPL8+bCH+CROLqSnd0a4xWsIvZ50LFMNv2TtDFfCeeh47hmpLxyIK7TYFJFbvflAZd3JUxAH1DNTBW4bNWtzGECg6Zr20h92lw=
+	t=1716132692; cv=none; b=k71L/Kvv6rc3o5w/ParzpYLsBV1yD8iceCsV+TOAexbLFo+ZL8ZlRdNFZT7cS2/mwIAoNzPs82ZKrOz3o32YBbnRd+qx0wjrCN6kKnODqrzly3cLfBdEtHyO7xdRBwsbM0mXqinEp7Na9Yr1X06EwxQABdxBHSden3U1KISWN3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716129101; c=relaxed/simple;
-	bh=Bo0hkkNb6n0GtovvowUCH9XaoMAubly47QTAmugCRVU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s621FQX9ZNFVNq98i7jMDtymB+zEiEYnMFK2N7ZK1ZMParFqsBbzhAswyG0V2KmZNAUTpkKNsUHWxYMOmq4OZ3h/zhh7/thMlaOTyJIa/oW64zglqAdYWHqeXIai7hM5PxaUfdZsOP8SfVSNleEbR8NWLEI+kyTBcjGMjf+77aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=hsPoZwPb; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1716129063; x=1716733863; i=markus.elfring@web.de;
-	bh=okgSGZhPXLzsKcF0XXQXyYWpYhHobc+okPiEHtdUg2Q=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=hsPoZwPbyl9kHz9oKkiVu5F5hQDrX/uhpttLkGq4gkskP0mIvN+u6qQazEN6bfC/
-	 w43xpBUftsCLM2XXNgxDG1y9sBiHoGuhSq10V0/KoxjHQuIGWtB+7ilSSykmWL3Jp
-	 8ERJ1VS5bv0Mv7jwXZte9olZWwz3ixQbqL2gLXK+QKuHpoOhzYXfDak0W1ML+DerU
-	 SShKVwM2QtpV/OIefLftCWKA/sI/z3EUROSkm1nVDFvYqmRZ+SmaS7wqbU26EMezB
-	 f6aBh2MXdnjMta+mDlUKkEL9kCxZKwPHxuazKdVB4UGduFzAp8rG7F8XtQxxet4Ea
-	 JywBbyAtGSfdxkUPCw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.82.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N3Gga-1sYnFk3to2-00x6CV; Sun, 19
- May 2024 16:31:03 +0200
-Message-ID: <13c9cf99-48e2-4638-b40e-e5b065421ff3@web.de>
-Date: Sun, 19 May 2024 16:30:58 +0200
+	s=arc-20240116; t=1716132692; c=relaxed/simple;
+	bh=b0DmkzNrx+W6swleqyCrcm/0earbkc2m1lDm2uGiSdA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZEbjTsSEMAecocl9lctTHpmB4BdaoEoqTwZ6eTF6rvV23r0Q4e4x3Ak/zuXevDoAYG5OObs3TYF6LxjD3WpLdefxr/dA4cAgI55qVo02LEuBOLvTuDilFc1teoAKm5vvGHA18ZaKsTVOrQZLBHvQESM8dbBLehQaYfCJD8nqXI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bVfau57A; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/Uig9LqJCJCt5xBuEOZx6meohWHgGKYx6kG+ikgkUrc=; b=bVfau57A2yM0QkCXCzyIbH70lU
+	XD9S5qffJ2EKIVZKB+IQnYBDClpp8ROTA2x9m9T/MzNG9VT/KHR7YDDhPG5CT9gf4DS1I6NJACqQ+
+	9mcshUV/NNxy7G5eXT7oBH06kmucnyZoQgl6lknyC1Uz0vWjV3k9J9ujWlkTcyGd3n4A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s8iVI-00FezC-Ru; Sun, 19 May 2024 17:31:16 +0200
+Date: Sun, 19 May 2024 17:31:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, corbet@lwn.net, rogerq@kernel.org,
+	danishanwar@ti.com, vladimir.oltean@nxp.com, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, vigneshr@ti.com,
+	misael.lopez@ti.com, srk@ti.com
+Subject: Re: [RFC PATCH net-next 01/28] docs: networking: ti: add driver doc
+ for CPSW Proxy Client
+Message-ID: <642c8217-49fe-4c54-8d62-9550202c02c9@lunn.ch>
+References: <20240518124234.2671651-1-s-vadapalli@ti.com>
+ <20240518124234.2671651-2-s-vadapalli@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 12/28] net: ethernet: ti: cpsw-proxy-client: add NAPI RX
- polling function
-To: Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kernel-janitors@vger.kernel.org
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- MD Danish Anwar <danishanwar@ti.com>, Paolo Abeni <pabeni@redhat.com>,
- Roger Quadros <rogerq@kernel.org>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, LKML <linux-kernel@vger.kernel.org>,
- linux-doc@vger.kernel.org, Misael Lopez Cruz <misael.lopez@ti.com>,
- Sriramakrishnan <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
-References: <20240518124234.2671651-13-s-vadapalli@ti.com>
- <f9470c3b-5f69-41fa-b0f4-ade18053473a@web.de>
- <ZkoGCpq1XN4t7wHS@casper.infradead.org>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <ZkoGCpq1XN4t7wHS@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:ZOR+qvZzRR+ttY7PuL03hVIwkfO7x7y7RvXHXJuDeJUFFg/+vou
- BwVgWAInZI7x7d7oE3Dfl/rE7iP1T/eLVCvjjfayyrwhEuhxhwE39O8tzqt3roh2BpMqkGi
- aYy3QlFzjJqzlz3/9G7agOFYGgUOyXJrtimGjGkb4vKKCKR7EUy6tmNPRBVAaWj+dpIz6vc
- aAEpAcp10aXc8VNXn3i0g==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:p3njCTGZjQU=;MM/BtbTKdD1/cFkV9hDHqUuaeAA
- R8CSId/keq81wOpxwHGT/KQ4/EMc9EoKDoFt23MwMKcwbX0IuDzl6HNuffNcsR6AlDHighzfb
- 2B+cutp2WbiKUvJga7TBKBM4przF3nvvKDYzJmSZlEJ2O24l/wZoSBk+S9KLD3Qhl+JqLp0Em
- 1D3zuB5amF58IKbdQDVQ7Pxcf+Y1RTTct+Ayv8q7I9D3GoSbkiRw5K97Tv1ryT0qwrlOGgHFS
- eEy7+ebyN1tir8hvfeVLk1Qys0ls3yvzpSvRFqpEqgdQi44G7Nadm/k0shnia85KtpxgxlKpW
- DthE0qQZIe3mtkDaXSv/xCmphm94gZ3n4/aqVbarmLo6ou7IW4UAbUhALG1dPG0FZNM4JYjey
- cg71B7xYHPic7aLYL7fHJZk5VCXGbcTx1aF003t/t/6VSfGZYRTo+dmAiCWl5RozkCrgIbLYZ
- QkOhjRi1J+a3APsPw0obs+FQOxDy3HXTbW28RPwmLhYvoc/Br1gXrJjcBulS88IqHyWQviK8d
- U/LeOlPk5asXdhWhlkJH2QpJv1u63peW9/GNboafj2B7flO0toWBxDcrBxrf7tPz8juacvrrW
- nVfBGcU71xJdyVS3sr9iBIjat028YQsdef86mkhzfZ6mb+YrBftSIpyQrlqzUaz0PxTAYJKtQ
- ow/iuIjcM6UgdqQPm5kX9tFvzUcPDxqWuzdx8YyHrqIo9gSf/aJuJff9epK0jjydIcxA1vtN5
- ZMzWwujjFG46gOhAZyhKEVjPxSSlXZHk1yH6F/w9vTrNa4jByh+yImhvHVTPa8bqIeTQjSJKp
- iviOXkUr8ycRer9OPgCgyULquV7EQb8P5RSH7uOa71E94=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240518124234.2671651-2-s-vadapalli@ti.com>
 
-> FYI, Markus can be safely ignored.  His opinions are well-established as
-> being irrelevant.
+On Sat, May 18, 2024 at 06:12:07PM +0530, Siddharth Vadapalli wrote:
+> The CPSW Proxy Client driver interfaces with Ethernet Switch Firmware on
+> a remote core to enable Ethernet functionality for applications running
+> on Linux. The Ethernet Switch Firmware (EthFw) is in control of the CPSW
+> Ethernet Switch on the SoC and acts as the Server, offering services to
+> Clients running on various cores.
 
-I hope that views can become more constructive somehow.
+I'm not sure we as a community what this architecture. We want Linux
+to be driving the hardware, not firmware. So expect linux to be
+running the server.
 
+> +The "am65-cpsw-nuss.c" driver in Linux at:
+> +drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> +provides Ethernet functionality for applications on Linux.
+> +It also handles both the control-path and data-path, namely:
+> +Control => Configuration of the CPSW Peripheral
+> +Data => Configuration of the DMA Channels to transmit/receive data
 
-=E2=80=A6
->> https://wiki.sei.cmu.edu/confluence/display/c/MEM12-C.+Consider+using+a=
-+goto+chain+when+leaving+a+function+on+error+when+using+and+releasing+reso=
-urces
-=E2=80=A6
->> https://elixir.bootlin.com/linux/v6.9.1/source/include/linux/cleanup.h
+So nuss is capable of controlling the hardware. nuss has an upper
+interface which is switchdev, and a lower interface which somehow acts
+on the hardware, maybe invoking RPCs into the firmware?
 
-Do linked information sources provide more helpful clarification opportuni=
-ties
-also for undesirable communication difficulties?
+So it is not too big a step to put the server functionality in Linux,
+on top of the nuss driver.
 
-Regards,
-Markus
+Now take a step backwards. This concept of a switch with different
+CPUs attached to it is nothing special.
+
+Some Marvell switches have a Z80 connected to a dedicated port of the
+switch. You can run applications on that Z80. Those applications might
+be as simple as spanning tree, so you can have a white box 8 port
+ethernet switch without needing an external CPU. But there is an SDK,
+you could run any sort of application on the Z80.
+
+The microchip LAN996x switch has a Cortex A7 CPU, but also a PCIe
+interface. Linux can control the switch via the PCIe interface, but
+there could also be applications running on the Cortex.
+
+Look at the Broadcom BCM89586M:
+https://docs.broadcom.com/doc/89586M-PB
+
+It is similar to the microchip device, an M7 CPU, and a PCIe
+interface. It seems like a Linux host could be controlling the switch
+via PCIe, and applications running on the M7.
+
+I expect there are more examples, but you get the idea.
+
+A completely different angle to look at is VF/PF and eswitches. A
+server style CPU running virtual machines, a VM getting a VF passed
+through to it. This is not something i know much about, so we might
+need to pull in some data centre specialists. But we have a different
+CPU, a virtual CPU, making use of part of the switch. Its the same
+concept really.
+
+My main point is, please start with an abstract view of the problem. A
+lot of the solution should be generic, it can be applied to all these
+devices. And then there probably needs to be a small part which is
+specific to TI devices. It could be parts of the solutions already
+exist, e.g. VF/PF have port represents, which might be a useful
+concept here as well. Switchdev exists and provides a generic
+interface for configuring switches...
+
+	Andrew
+
 
