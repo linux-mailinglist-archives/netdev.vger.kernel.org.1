@@ -1,141 +1,115 @@
-Return-Path: <netdev+bounces-97227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5420B8CA206
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 20:35:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C24A8CA2A5
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 21:20:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C16111F220AA
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 18:35:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FC021F21826
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 19:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82CDA137C58;
-	Mon, 20 May 2024 18:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF56137C4E;
+	Mon, 20 May 2024 19:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YgW2sbOq"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hQvWwXGL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E16CA4E;
-	Mon, 20 May 2024 18:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F13137916
+	for <netdev@vger.kernel.org>; Mon, 20 May 2024 19:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716230124; cv=none; b=spFDwuqoJBZWMgOtM3WEUttGhphPap5w8RozQJfBxWz+CjktjJQp46P7l7Njp+R+54NxAaI913dT7Vm+zUbyraHOz4nySxGs6N3Z9zYnPT+6QSQPS3gCx4sWXajvmLFA6DQiJKIDPRus6oxbpB+6WGco4sB2RyONLBnmiy31MKg=
+	t=1716232802; cv=none; b=gGEY8xCShJ+pIwnBtYVjdZooMgwNi1J8MajbOykRJ56gJcX7PToOUzBCn4ZyvqS3mFHp8I1ZHsopdEqomlLkIdM+eBIgZfKVIe8dHlr74bKql69G7FzJy3iZIcxfEbrZwqq2cp7U3qwbFIAQbn4uJTwRYxNiw02qU30Or9jUPqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716230124; c=relaxed/simple;
-	bh=AwKbCrAPiKfPAH09TMrveLnSLPV594VcHa1Y+1Hn4AY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=GUZUDMawhl8axpzCzMmcKys2W6CPHDavH/LMPUkMZ4Lo7sDCXO8Vp0L1ZDfkOmMs6+TrRzxso2Mc3EVQiFfs/IWDwUM/woIu/Z1kzv2Z+wBem5izpMaE7f5BvlNjxL4+YRHKZsxVO9C6CQ5zlFNx/GrfnBaq0w9X6uP/iUI41T0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YgW2sbOq; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7948b7e4e5dso57282185a.1;
-        Mon, 20 May 2024 11:35:22 -0700 (PDT)
+	s=arc-20240116; t=1716232802; c=relaxed/simple;
+	bh=xY1qK0Yx5cJZ0/DOHZqEwDlK7UkPPBcazYLb2quM418=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zhrv+S0iKcQkI7ROy26zw1LkAX5hvkg0dhvRZHATElmz33xWJjhGZukRwDxz6Le/1jtH1Ean2bYcmH4BETJdTyv6jj7SyA7dhsWNwnE3woeT3/e59+SInNdJQol4cbehf8EWUAT6f3Pvdg1XpQ86nK6c4zrlP9W/ZAPSBhww870=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hQvWwXGL; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2e73359b8fbso7517751fa.2
+        for <netdev@vger.kernel.org>; Mon, 20 May 2024 12:20:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716230122; x=1716834922; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=broadcom.com; s=google; t=1716232799; x=1716837599; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bf+hsNbN2/mjYGQxpMdBxi0kuuZ9kpvb2TZzCvDfgnE=;
-        b=YgW2sbOqMV8mfhT9P0djVoVALsPx71gENrbg4Q9gwSKXbkSuzr25sb2QQzcJZMdLAq
-         i6OYMJ64cRTuugM8QVsBZc775pjxyhJnc2OecZmrIUpz/THeQFE0CyjJvaKxeSLZi/mn
-         Mbcuh8oedf/uOyasQlhSQkj+SIzuLPGesRNZGju3a1/Gw3bPgw0brbqdktCtuGcReTPk
-         0IBUT6VOHxFpVj4MK6Fg3VYlYaRDOoMPtEeLoL2NHhJCHb7lcVcWP9np2NUSbr0qiyoV
-         LQYN2i96a2Qj0GEHYoSYnkl++tCJHl0kHQvZAWc/TAhrnsqH90srFuuTwjRKg3gN4p9Z
-         o1wg==
+        bh=xY1qK0Yx5cJZ0/DOHZqEwDlK7UkPPBcazYLb2quM418=;
+        b=hQvWwXGLkdi1sgHhvrfZuqEz7gzenGgRdXqswpU66frg92RS4Hs2h4rNdjQULSF4eO
+         D2y5AcFznv+xQ0j5f40uccd38dyMh+kLxyhw1My2lwRskDJWWO1V1VOrSzbhCd647K0x
+         sqNQ6Wz0Ej8aMpkhH+f0Hgx7TPA9YqFdJecqg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716230122; x=1716834922;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bf+hsNbN2/mjYGQxpMdBxi0kuuZ9kpvb2TZzCvDfgnE=;
-        b=ejSX+szrCil8npGWFtyU/uLfCQ5v7HD+500bw4bzV1CxvIEf7KWV+Cj6zp6MY2DG0L
-         0fkcCpxZ9lepXHeo1rrQnieA2CUETRUn+lR0Z/x4S/dzxAfR5uR4FOXsV5R3mFk+owBv
-         hGKcTXQM9Ol6xW3ClqQMT2xoo+xivZrRO7v7nVVoKOscGQjcPYsaYONLpr4VtPioEgsP
-         Y2hfy8341p6ly1UIq2l6/IvBwkXX9mPGN+CVZC6rjSSO/r+v3Y1muVkAZpThexSAhc0H
-         s8SGWu8F1bg07BMcedFAfq08o41FnzIqZDHgEe6hKKSce233xm1vOBH+wy29IjQYOKwY
-         zJSw==
-X-Forwarded-Encrypted: i=1; AJvYcCWu492a/ZDrJ+Ep1RaFXfJYYEbLFansFpGp1SAOy3AO3+DlzPvSOPzISjc5BLffQX3oCnLRP4SdTpMjVMXwI93dkhc5mWQ1P7b6jXZeGZOt4JB3o0sveeADuXpjkIl0ZmHnE58A
-X-Gm-Message-State: AOJu0Yzk1ElCaLBfNVVX4dm4OBRVBZ8tMNLgZ5AsyJPl12VjfYUNCq1k
-	L7pk6nCTrDurvYdYZMnOo8Pl4lBd7vMyEwodPBqsgWDm6viL7C3x
-X-Google-Smtp-Source: AGHT+IGohNXtz0LEPJwjnemW9t/G73Jo863jyghex5TJqlI74yTIlf327PoYSqeNP/21C3RA1KvZ+Q==
-X-Received: by 2002:ae9:e514:0:b0:792:d9f0:5572 with SMTP id af79cd13be357-792d9f055a9mr2476427185a.20.1716230121669;
-        Mon, 20 May 2024 11:35:21 -0700 (PDT)
-Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-792bf27779fsm1209368085a.21.2024.05.20.11.35.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 May 2024 11:35:21 -0700 (PDT)
-Date: Mon, 20 May 2024 14:35:20 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Chengen Du <chengen.du@canonical.com>, 
- willemdebruijn.kernel@gmail.com
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Chengen Du <chengen.du@canonical.com>
-Message-ID: <664b97e8abe7a_12b4762946f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240520070348.26725-1-chengen.du@canonical.com>
-References: <20240520070348.26725-1-chengen.du@canonical.com>
-Subject: Re: [PATCH] af_packet: Handle outgoing VLAN packets without hardware
- offloading
+        d=1e100.net; s=20230601; t=1716232799; x=1716837599;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xY1qK0Yx5cJZ0/DOHZqEwDlK7UkPPBcazYLb2quM418=;
+        b=ZQbmMJSAQkb6Ryse/6Az7o0z1V7kDMvFnNEL4EgSAoQwSwOnyYNI6AaTHE0CddMmgH
+         Xm9nHSSRSdNppmtobPAMd6BGAZ0Qm7MIYcibnq5x74ZepRkAPJgNBHIRUBYnMLH5RE4/
+         lrziW4vI3zJk/I/oU/JUfm2jfyW5rZPCdrgoZeOif68n8c/8UC5QOwpdpYG6Ry0MoZUo
+         CMVCD3aNJ6WGwz5YCjGR4ltFkPVdbuwdIArT/yvCytIup6EU/ldLe1gTflT58gkNSpBg
+         zhss7OfHq2OUPfluSeI8KLNbKbwxdtMX2wr7ix72aRurh8eqDTdwB/WIZqSbkuq1Gfwm
+         0Dtg==
+X-Gm-Message-State: AOJu0Yx5HVBKN/vN4K2+n4LCcubRtUAhXfq/ELDPhRcKG7SRc1KHNOhr
+	BAZBG//c6r1ZflWNRNuKorshQATcxNLMyBqlusaiWAUbYCu7jfZgCgnYDkiLFDL53PvImv8PeAX
+	ph1K4ZJCcLefFi6bsLdkzJCQIEyVKcpcm3Uj4OEzlYeoqKTzEN9MBPFiQ92kBPcvrc723NpaeFg
+	u33TT0zw7moURj08BPGA==
+X-Google-Smtp-Source: AGHT+IEJBva2Jcefe2Yh+TeHrjvit6WQ7OPmQcczNguOh+mzYdQEwNpQNHy3Ih4usmFhTJBLVYujsIWi1lV8Lrjhv2U=
+X-Received: by 2002:a2e:9f4f:0:b0:2e6:f51e:ec1b with SMTP id
+ 38308e7fff4ca-2e6f51eedd3mr154968421fa.3.1716232799230; Mon, 20 May 2024
+ 12:19:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20240514182050.20931-1-ronak.doshi@broadcom.com>
+ <20240514182050.20931-3-ronak.doshi@broadcom.com> <20240515104626.GE154012@kernel.org>
+ <CAP1Q3XRYGySJQaWe8dvasUGmpZGcYy_g_Xgft2u=hg9R_eqEsQ@mail.gmail.com>
+In-Reply-To: <CAP1Q3XRYGySJQaWe8dvasUGmpZGcYy_g_Xgft2u=hg9R_eqEsQ@mail.gmail.com>
+From: Ronak Doshi <ronak.doshi@broadcom.com>
+Date: Mon, 20 May 2024 12:19:43 -0700
+Message-ID: <CAP1Q3XQKStM5Tn9HZjTdgki4_7RiF8EOf0ksZE9gzZYHNkAFbQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/4] vmxnet3: add latency measurement support in vmxnet3
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Chengen Du wrote:
-> In the outbound packet path, if hardware VLAN offloading is unavailable,
-> the VLAN tag is inserted into the payload but then cleared from the
-> metadata. Consequently, this could lead to a false negative result when
-> checking for the presence of a VLAN tag using skb_vlan_tag_present(),
-> causing the packet sniffing outcome to lack VLAN tag information. As a
-> result, the packet capturing tool may be unable to parse packets as
-> expected.
-> 
-> Signed-off-by: Chengen Du <chengen.du@canonical.com>
+> On Wed, May 15, 2024 at 3:46=E2=80=AFAM Simon Horman <horms@kernel.org> w=
+rote:
+> If not, I would suggest making this feature optional and only compiled
+> for x86. That might mean factoring it out into a different file. I'm
+> unsure.
+I can move the rdpmc code under #if defined(__i386__) ||
+defined(__x86_64__) so that it will be no-op for other architectures.
+Will that be fine?
 
-This is changing established behavior, which itself may confuse
-existing PF_PACKET receivers.
-
-The contract is that the VLAN tag can be observed in the payload or
-as tp_vlan_* fields if it is offloaded.
- 
-> @@ -2457,7 +2464,8 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
->  	sll->sll_halen = dev_parse_header(skb, sll->sll_addr);
->  	sll->sll_family = AF_PACKET;
->  	sll->sll_hatype = dev->type;
-> -	sll->sll_protocol = skb->protocol;
-> +	sll->sll_protocol = eth_type_vlan(skb->protocol) ?
-> +		vlan_eth_hdr(skb)->h_vlan_encapsulated_proto : skb->protocol;
-
-This is a particularly subtle change of behavior.
-
->  		if (skb_vlan_tag_present(skb)) {
->  			aux.tp_vlan_tci = skb_vlan_tag_get(skb);
->  			aux.tp_vlan_tpid = ntohs(skb->vlan_proto);
-> -			aux.tp_status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
-> +		} else if (eth_type_vlan(skb->protocol)) {
-> +			aux.tp_vlan_tci = ntohs(vlan_eth_hdr(skb)->h_vlan_TCI);
-> +			aux.tp_vlan_tpid = ntohs(skb->protocol);
->  		} else {
->  			aux.tp_vlan_tci = 0;
->  			aux.tp_vlan_tpid = 0;
->  		}
-> +		if (aux.tp_vlan_tci || aux.tp_vlan_tpid)
-> +			aux.tp_status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
->  		put_cmsg(msg, SOL_PACKET, PACKET_AUXDATA, sizeof(aux), &aux);
-
-vlan_tci 0 is valid identifier. That's the reason explicit field
-TP_STATUS_VLAN_VALID was added.
-
+--=20
+This electronic communication and the information and any files transmitted=
+=20
+with it, or attached to it, are confidential and are intended solely for=20
+the use of the individual or entity to whom it is addressed and may contain=
+=20
+information that is confidential, legally privileged, protected by privacy=
+=20
+laws, or otherwise restricted from disclosure to anyone else. If you are=20
+not the intended recipient or the person responsible for delivering the=20
+e-mail to the intended recipient, you are hereby notified that any use,=20
+copying, distributing, dissemination, forwarding, printing, or copying of=
+=20
+this e-mail is strictly prohibited. If you received this e-mail in error,=
+=20
+please return the e-mail to the sender, delete it from your computer, and=
+=20
+destroy any printed copy of it.
 
