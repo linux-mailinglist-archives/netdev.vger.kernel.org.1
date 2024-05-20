@@ -1,125 +1,156 @@
-Return-Path: <netdev+bounces-97167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D9418C9AD5
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 11:58:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98B518C9AF3
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 12:05:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2998C281B00
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 09:58:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3804C1F21649
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 10:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63720481CE;
-	Mon, 20 May 2024 09:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9E142044;
+	Mon, 20 May 2024 10:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H5ZEWH+F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f77A5jqj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39286481C0;
-	Mon, 20 May 2024 09:58:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE81D1EA67
+	for <netdev@vger.kernel.org>; Mon, 20 May 2024 10:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716199133; cv=none; b=LXMEVoBtBEHQsgqfVMPAfdQBfx4agxCL1RMdQpPPCRUjdd5H5jCZqkatuQ6ATeMPd6cMA/YJkobC8AFu8Us1AJpDEaMpWnjycZvngG/RAdRHnFnFynm2UaJfBA0tE6OexX2HaNTQGV/FnY/b0tqTiRXk46KpY1Uj0Fsgg7x/LBY=
+	t=1716199506; cv=none; b=el9xgRxW4MZLkT9sunGaqN3zpTcsa1DTPW69xzR6mJeAbahZSQZOxEICYD9jTWsmSu48pddTzjstpF3nP+ATwmiSzI978X6MFepLr5KEVUZ35y1LbZpakAHootVdZ2OHSpOuBY/vV76bhBjYftLiSszg+/6SsnWafMzLBTeNk54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716199133; c=relaxed/simple;
-	bh=5DFkN3Tprj5e+wQJ3KzoBJ39w9B9HhjPq1Ww2oCI7XU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CDNiNOqdRPo5nt/KUH8eFqTe1SMEqEZGALLIrrf2iM3jcnlFTzavB2Jp+4Ni+2CbkVezcdIR3Dimhkb2vOE+CpkLDYUiv9GcEP+5tbYeUIOgKrx+7qgwwYF/dXkdkuJHcOSyun6eezkeukBjTgNBEyLGf8JVg8rY6cQydk/42HE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H5ZEWH+F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B07A6C2BD10;
-	Mon, 20 May 2024 09:58:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716199132;
-	bh=5DFkN3Tprj5e+wQJ3KzoBJ39w9B9HhjPq1Ww2oCI7XU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=H5ZEWH+FyVBQyKjBl17EW/hWdhta5ga3Axflcnb3ea8pRSIpdMydiINrbvIzFf6gV
-	 Pd4X1K9g1PsOCWA4qcS41hmozNfh1MiDuyXd/P5XJvhNRXZocPXftY+FCZHuaqjxTZ
-	 mRRTbi58jwp97SIK63KGgLd0GqGrehcWYllsJi/RdCJGJ8egfuPo72a/yZpu22NENN
-	 lm8XXXCi4bAaSvzOOLalmZQR8t1I1LWeyyc2R4PZu9X6niybtqKJ2YUCIaYccq3cU8
-	 3DBFZKszFnwOE2ABHwnH8J3MVr06OFtzS5A8heeruXRzfwp2exy4KCicw290qp8CRO
-	 YgpcVbMurY+Rg==
-Message-ID: <8947cb3f-39b5-4483-af1d-82d3fa4bb7ad@kernel.org>
-Date: Mon, 20 May 2024 11:58:47 +0200
+	s=arc-20240116; t=1716199506; c=relaxed/simple;
+	bh=oiDaKRoUtICjYZslGN/4Ldn861PCdrMGRQ+QfopV+jI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RnV5mBIf2LDrqsKXU6frZUPO5t7d6C+YyEv08Rt+eaVLa45rtp5uAauuCd1Wyvg9xNbbluUrd89NDG/xyFTaHoqMzQVibzCRACus5lty0ZsvtM8HZj1v1X80MAyf2uZAzk7/8c4Kdl9BOV17QRQ6zS1kPWfVNqqCCicpkFXdFpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f77A5jqj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716199503;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9HQQLcPWzaqUGkC9nCDOvkj5OQLS3KXzzaU4mTKKha4=;
+	b=f77A5jqj2Q379W1aEDMEPqmEpVXf43iQT1hcHVgOPpEl6u8y8KE8EwMPdImnk66HnK69a/
+	8Ri+MXs2ky/dFWLNpuler8CCCCNlTOh3xZhZtWi86GQVQ0Fe4O3dLBlhwmuE2va2jQTyQV
+	OapeucgspNLlQxYhN5UDB3lnEdByvZs=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-152-jAQ7S4t5Mp6W-sSjwM8Qvg-1; Mon,
+ 20 May 2024 06:05:00 -0400
+X-MC-Unique: jAQ7S4t5Mp6W-sSjwM8Qvg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BC2F93813BCD;
+	Mon, 20 May 2024 10:04:59 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.221])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5107B7412;
+	Mon, 20 May 2024 10:04:58 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Christoph Paasch <cpaasch@apple.com>
+Subject: [PATCH net] tcp: ensure sk_showdown is 0 for listening sockets
+Date: Mon, 20 May 2024 12:04:47 +0200
+Message-ID: <8db98a8fbf2ac673b355651852093579a913f3f1.1716199422.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] nfc: nci: Fix handling of zero-length payload
- packets in nci_rx_work()
-To: Ryosuke Yasuoka <ryasuoka@redhat.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- syoshida@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240517020609.476882-1-ryasuoka@redhat.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240517020609.476882-1-ryasuoka@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On 17/05/2024 04:06, Ryosuke Yasuoka wrote:
-> When nci_rx_work() receives a zero-length payload packet, it should not
-> discard the packet and exit the loop. Instead, it should continue
-> processing subsequent packets.
-> 
-> Fixes: d24b03535e5e ("nfc: nci: Fix uninit-value in nci_dev_up and nci_ntf_packet")
-> Reported-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
+Christoph reported the following splat:
 
-That's not a valid tag here. Every bug we find - like hundreds of my
-commits - is reported by us...
+WARNING: CPU: 1 PID: 772 at net/ipv4/af_inet.c:761 __inet_accept+0x1f4/0x4a0
+Modules linked in:
+CPU: 1 PID: 772 Comm: syz-executor510 Not tainted 6.9.0-rc7-g7da7119fe22b #56
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.11.0-2.el7 04/01/2014
+RIP: 0010:__inet_accept+0x1f4/0x4a0 net/ipv4/af_inet.c:759
+Code: 04 38 84 c0 0f 85 87 00 00 00 41 c7 04 24 03 00 00 00 48 83 c4 10 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 ec b7 da fd <0f> 0b e9 7f fe ff ff e8 e0 b7 da fd 0f 0b e9 fe fe ff ff 89 d9 80
+RSP: 0018:ffffc90000c2fc58 EFLAGS: 00010293
+RAX: ffffffff836bdd14 RBX: 0000000000000000 RCX: ffff888104668000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: dffffc0000000000 R08: ffffffff836bdb89 R09: fffff52000185f64
+R10: dffffc0000000000 R11: fffff52000185f64 R12: dffffc0000000000
+R13: 1ffff92000185f98 R14: ffff88810754d880 R15: ffff8881007b7800
+FS:  000000001c772880(0000) GS:ffff88811b280000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fb9fcf2e178 CR3: 00000001045d2002 CR4: 0000000000770ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ inet_accept+0x138/0x1d0 net/ipv4/af_inet.c:786
+ do_accept+0x435/0x620 net/socket.c:1929
+ __sys_accept4_file net/socket.c:1969 [inline]
+ __sys_accept4+0x9b/0x110 net/socket.c:1999
+ __do_sys_accept net/socket.c:2016 [inline]
+ __se_sys_accept net/socket.c:2013 [inline]
+ __x64_sys_accept+0x7d/0x90 net/socket.c:2013
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x58/0x100 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x4315f9
+Code: fd ff 48 81 c4 80 00 00 00 e9 f1 fe ff ff 0f 1f 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 ab b4 fd ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007ffdb26d9c78 EFLAGS: 00000246 ORIG_RAX: 000000000000002b
+RAX: ffffffffffffffda RBX: 0000000000400300 RCX: 00000000004315f9
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
+RBP: 00000000006e1018 R08: 0000000000400300 R09: 0000000000400300
+R10: 0000000000400300 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000040cdf0 R14: 000000000040ce80 R15: 0000000000000055
+ </TASK>
 
-Drop the tag.
+Listener sockets are supposed to have a zero sk_shutdown, as the
+accepted children will inherit such field.
 
-Best regards,
-Krzysztof
+Invoking shutdown() before entering the listener status allows
+violating the above constraint.
+
+After commit 94062790aedb ("tcp: defer shutdown(SEND_SHUTDOWN) for
+TCP_SYN_RECV sockets"), the above causes the child to reach the accept
+syscall in FIN_WAIT1 status.
+
+Address the issue explicitly by clearing sk_shutdown at listen time.
+
+Reported-by: Christoph Paasch <cpaasch@apple.com>
+Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/490
+Fixes: 1da177e4c3fu ("Linux-2.6.12-rc2")
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+Note: the issue above reports an MPTCP reproducer, but I can reproduce
+the issue even using plain TCP sockets only.
+---
+ net/ipv4/inet_connection_sock.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+index 3b38610958ee..dab723fea0cc 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -1269,6 +1269,8 @@ int inet_csk_listen_start(struct sock *sk)
+ 
+ 	reqsk_queue_alloc(&icsk->icsk_accept_queue);
+ 
++	/* closed sockets can have non zero sk_shutdown */
++	WRITE_ONCE(sk->sk_shutdown, 0);
+ 	sk->sk_ack_backlog = 0;
+ 	inet_csk_delack_init(sk);
+ 
+-- 
+2.43.2
 
 
