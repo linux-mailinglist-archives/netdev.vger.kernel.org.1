@@ -1,28 +1,29 @@
-Return-Path: <netdev+bounces-97253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3112D8CA3FB
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 23:51:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 857F68CA3FD
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 23:51:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFD011F22573
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 21:51:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B67FE1C20FD2
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 21:51:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E059D139D19;
-	Mon, 20 May 2024 21:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3322313A3E8;
+	Mon, 20 May 2024 21:50:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F4C1386AB
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6C513957D
 	for <netdev@vger.kernel.org>; Mon, 20 May 2024 21:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716241854; cv=none; b=mV1xsPvwp1FKBsHERDcoZdas9orEJ+aMMXRLAEG+HX2Q04IAXPhmyjWAtEdIT0Wet/LkicY9dUX0ASspuJLGqZ9A/RPvQqwKeJwMC95GC1VS2LTiqsla/PRbOzQ2z+Z6xo8plZdQvnB/XZU/0A06bihAldUiux0Ib5oL/FPoX/8=
+	t=1716241856; cv=none; b=CV4rG9YomTcjGDDbAjiu7RlB8pWfDQtHhZiSKtdOLq2IRDtCIvMeUys7QG2OcofGpAiLwInzTGI+0GjUQfh675iu4UVPxBX2NLxgk+p/5wnBPCQ0EBpYyDdNV+cGeoAnCdTJv90Cd0t1LItfNTidbtDVW+NHJEdSZHVPTAdT1Q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716241854; c=relaxed/simple;
-	bh=wrVmQG3q0c2EgtNe4UTuowNxoiN2Gi47CrhEmr4FuyM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qn6PGMyxlwoQRSGpExmqZUjE0QD6tO/CGPRBX2pOOm70HURYhH2z4nxzSnnD78Zow5lBCyIgdsD7LI9zauGvezMFPlrzb+Buyy6XWRLFb5TmLqVTdqXWx61cSPL/+wsSSEX7BMKW9FL2kNgwr8t/zysMKdLOr8tajF5us+8BeZE=
+	s=arc-20240116; t=1716241856; c=relaxed/simple;
+	bh=xlUDq07T+tvZyjkJXCzpF9aAbi34XmsqnFaij7PDBVU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ndJuWpFIOPVEcM4AlfPNzvYdvhXFqI8wm7cnFGk2aAqTspNGGX0rQ04RXaPr6at9NMuVHFlnxVbNsesBFkf36zqdMSsK2JpiWEMssanjTtJC1ADvRxQwTXZUq1MU3c6FpTkGE2q4bhwOUqXKBaWGGuhqrWvtNKREIk3A5Va4zGY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
@@ -30,18 +31,20 @@ Received: from labnh.int.chopps.org (syn-172-222-091-149.res.spectrum.com [172.2
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id D528A7D06F;
-	Mon, 20 May 2024 21:43:37 +0000 (UTC)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 600677D097;
+	Mon, 20 May 2024 21:43:38 +0000 (UTC)
 From: Christian Hopps <chopps@chopps.org>
 To: devel@linux-ipsec.org
 Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	netdev@vger.kernel.org,
 	Christian Hopps <chopps@chopps.org>,
 	Christian Hopps <chopps@labn.net>
-Subject: [PATCH ipsec-next v1 0/8] Add IP-TFS mode to xfrm
-Date: Mon, 20 May 2024 17:42:38 -0400
-Message-ID: <20240520214255.2590923-1-chopps@chopps.org>
+Subject: [PATCH ipsec-next v2 01/17] xfrm: config: add CONFIG_XFRM_IPTFS
+Date: Mon, 20 May 2024 17:42:39 -0400
+Message-ID: <20240520214255.2590923-2-chopps@chopps.org>
 X-Mailer: git-send-email 2.45.1
+In-Reply-To: <20240520214255.2590923-1-chopps@chopps.org>
+References: <20240520214255.2590923-1-chopps@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,108 +55,41 @@ Content-Transfer-Encoding: 8bit
 
 From: Christian Hopps <chopps@labn.net>
 
-Summary of Changes
-------------------
+Add new Kconfig option to enable IP-TFS (RFC9347) functionality.
 
-This patchset adds a new xfrm mode implementing on-demand IP-TFS. IP-TFS
-(AggFrag encapsulation) has been standardized in RFC9347.
+Signed-off-by: Christian Hopps <chopps@labn.net>
+---
+ net/xfrm/Kconfig | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-  Link: https://www.rfc-editor.org/rfc/rfc9347.txt
+diff --git a/net/xfrm/Kconfig b/net/xfrm/Kconfig
+index d7b16f2c23e9..f0157702718f 100644
+--- a/net/xfrm/Kconfig
++++ b/net/xfrm/Kconfig
+@@ -135,6 +135,22 @@ config NET_KEY_MIGRATE
+ 
+ 	  If unsure, say N.
+ 
++config XFRM_IPTFS
++	tristate "IPsec IP-TFS/AGGFRAG (RFC 9347) encapsulation support"
++	depends on XFRM
++	help
++	  Information on the IP-TFS/AGGFRAG encapsulation can be found
++	  in RFC 9347. This feature supports demand driven (i.e.,
++	  non-constant send rate) IP-TFS to take advantage of the
++	  AGGFRAG ESP payload encapsulation. This payload type
++	  supports aggregation and fragmentation of the inner IP
++	  packet stream which in turn yields higher small-packet
++	  bandwidth as well as reducing MTU/PMTU issues. Congestion
++	  control is unimplementated as the send rate is demand driven
++	  rather than constant.
++
++	  If unsure, say N.
++
+ config XFRM_ESPINTCP
+ 	bool
+ 
+-- 
+2.45.1
 
-This feature supports demand driven (i.e., non-constant send rate)
-IP-TFS to take advantage of the AGGFRAG ESP payload encapsulation. This
-payload type supports aggregation and fragmentation of the inner IP
-packet stream which in turn yields higher small-packet bandwidth as well
-as reducing MTU/PMTU issues. Congestion control is unimplementated as
-the send rate is demand driven rather than constant.
-
-In order to allow loading this fucntionality as a module a set of
-callbacks xfrm_mode_cbs has been added to xfrm as well.
-
-Patchset Changes:
------------------
-
-  23 files changed, 3252 insertions(+), 19 deletions(-)
-  Documentation/networking/xfrm_sysctl.rst |   30 +
-  include/net/netns/xfrm.h                 |    6 +
-  include/net/xfrm.h                       |   40 +
-  include/uapi/linux/in.h                  |    2 +
-  include/uapi/linux/ip.h                  |   16 +
-  include/uapi/linux/ipsec.h               |    3 +-
-  include/uapi/linux/snmp.h                |    3 +
-  include/uapi/linux/xfrm.h                |    9 +-
-  net/ipv4/esp4.c                          |    3 +-
-  net/ipv6/esp6.c                          |    3 +-
-  net/netfilter/nft_xfrm.c                 |    3 +-
-  net/xfrm/Makefile                        |    1 +
-  net/xfrm/trace_iptfs.h                   |  218 +++
-  net/xfrm/xfrm_compat.c                   |   10 +-
-  net/xfrm/xfrm_device.c                   |    4 +-
-  net/xfrm/xfrm_input.c                    |   14 +-
-  net/xfrm/xfrm_iptfs.c                    | 2741 ++++++++++++++++++++++++++++++
-  net/xfrm/xfrm_output.c                   |    6 +
-  net/xfrm/xfrm_policy.c                   |   26 +-
-  net/xfrm/xfrm_proc.c                     |    3 +
-  net/xfrm/xfrm_state.c                    |   60 +
-  net/xfrm/xfrm_sysctl.c                   |   38 +
-  net/xfrm/xfrm_user.c                     |   32 +
-
-Patchset Structure:
--------------------
-
-The first 8 commits are changes to the xfrm infrastructure to support
-the callbacks as well as more generic IP-TFS additions that may be used
-outside the actual IP-TFS implementation.
-
-  - iptfs: config: add CONFIG_XFRM_IPTFS
-  - iptfs: uapi: ip: add ip_tfs_*_hdr packet formats
-  - iptfs: uapi: IPPROTO_AGGFRAG AGGFRAG in ESP
-  - iptfs: sysctl: allow configuration of global default values
-  - iptfs: netlink: add config (netlink) options
-  - iptfs: xfrm: Add mode_cbs module functionality
-  - iptfs: xfrm: add generic iptfs defines and functionality
-
-The last 9+1 commits constitute the IP-TFS implementation constructed in
-layers to make review easier. The first 9 commits all apply to a single
-file `net/xfrm/xfrm_iptfs.c`, the last commit adds a new tracepoint
-header file along with the use of these new tracepoint calls.
-
-  - iptfs: impl: add new iptfs xfrm mode impl
-  - iptfs: impl: add user packet (tunnel ingress) handling
-  - iptfs: impl: share page fragments of inner packets
-  - iptfs: impl: add fragmenting of larger than MTU user packets
-  - iptfs: impl: add basic receive packet (tunnel egress) handling
-  - iptfs: impl: handle received fragmented inner packets
-  - iptfs: impl: add reusing received skb for the tunnel egress packet
-  - iptfs: impl: add skb-fragment sharing code
-  - iptfs: impl: handle reordering of received packets
-  - iptfs: impl: add tracepoint functionality
-
-Patchset History:
------------------
-
-RFCv1 (11/10/2023)
-
-RFCv1 -> RFCv2 (11/12/2023)
-
-  Updates based on feedback from Simon Horman, Antony,
-  Michael Richardson, and kernel test robot.
-
-RFCv2 -> v1 (2/19/2024)
-
-  Updates based on feedback from Sabrina Dubroca, kernel test robot
-
-v1 -> v2 (5/19/2024)
-
-  Updates based on feedback from Sabrina Dubroca, Simon Horman, Antony.
-
-  o Add handling of new netlink SA direction attribute (Antony).
-  o Split single patch/commit of xfrm_iptfs.c (the actual IP-TFS impl)
-    into 9+1 distinct layered functionality commits for aiding review.
-  - xfrm: fix return check on clone() callback
-  - xfrm: add sa_len() callback in xfrm_mode_cbs for copy to user
-  - iptfs: remove unneeded skb free count variable
-  - iptfs: remove unused variable and "breadcrumb" for future code.
-  - iptfs: use do_div() to avoid "__udivd13 missing" link failure.
-  - iptfs: remove some BUG_ON() assertions questioned in review.
 
