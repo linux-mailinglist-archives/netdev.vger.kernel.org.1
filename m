@@ -1,105 +1,95 @@
-Return-Path: <netdev+bounces-97148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E6488C9755
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 00:59:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D0CA48C9786
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 02:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35A922810A9
-	for <lists+netdev@lfdr.de>; Sun, 19 May 2024 22:59:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 755E52810CB
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 00:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6441D4D9E8;
-	Sun, 19 May 2024 22:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B44367;
+	Mon, 20 May 2024 00:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="BbnBozM/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QSZFLAux"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7726F101DB
-	for <netdev@vger.kernel.org>; Sun, 19 May 2024 22:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6231366
+	for <netdev@vger.kernel.org>; Mon, 20 May 2024 00:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716159565; cv=none; b=uCSiA0wAWZqNXX4Zn7p9UiFpoLqz42Lmhw8e4H7csgrMdWtHFnGptsuZEJUfPUMfwnPSRRWUg4bc/VseFUTlIeJfh72x4lWLA57RBwQto1p/kRZo+sxHjGv5XCuTraAaCRYY1CNksPpomGA7sw3iWN8XdqfvT29Ulj/Y9C0whOk=
+	t=1716163827; cv=none; b=jueUGlTF9rn75FZPj/tsf1W7bjSlfHFnKnNANS6GbC8bOc7Z4YZ+HTMhgjxzWBjpydFWhgzermKqdLx6Vvv/3/UmBYMqls/zIglYhMpIh2806uWWZCXCKe8VaVBcd0f9F1Q58gPZHOzJtx6uzyWsU6rxJbSvTJdkZi77Qb9dihU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716159565; c=relaxed/simple;
-	bh=A7c1TsAQf/Y7hJkEwjkEEE0WngffptY4iAdd30QDJa4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fPOI6plIt5Wc0MRBfjWnhWDcmGb0nPxX8gFIDaYNG2CH4r+fgedZALjDY/70vEi+oLwPa/txhM0CAcgocibrfUq+FFuGbSdrnByV6/ytm5XP9R1bW9f6INyhvbppMaBI3uODdargwfeDOBk9PDgC+2vJDvkCcb5muvWlWDN4M9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=BbnBozM/; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1ecddf96313so39961155ad.2
-        for <netdev@vger.kernel.org>; Sun, 19 May 2024 15:59:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1716159563; x=1716764363; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x09uDObDpJNHnRXEU9vnE29zSYza5LxvY7cub7w7qWw=;
-        b=BbnBozM/dRz7caLwnOK93sPt+3at0GSkV8W6zRiefNNQeDAU+oGSiB6j/XVXX7+ur+
-         MkyesfzVIjqBBmVGYyDA4c/sMjqhST9y7ldCgsCo/L/u7dxl6icNy4Pxljyq0fQmj6oD
-         csvoyzNJ/YrneTwRIuTiF0TMqD88w8Lek98Xui5qZwuHS/xXUaR0Foj4NMSTiSriCTeB
-         9/QpTwQVxNoJ7mz5v09ak4tnNSQNSRfMQnH1d8IMiJuu81em3rgEB4Ors9f/5OJ0DV6d
-         b58zjrS2nkP22TI7eUx+E+CEsX+zbA97O9G5vqkqEYK8qWlli9iTZ6XQq6zGsRcZHrUs
-         8pqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716159563; x=1716764363;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x09uDObDpJNHnRXEU9vnE29zSYza5LxvY7cub7w7qWw=;
-        b=brpqPmA+6xxYThsSpbr6Co38MC8/yG7gp1vWCJaqyqbGLAZqKQ86fKiHsJyVa29XlW
-         kM6lgCax0qhipN2RjvPDBj+GDeABPtPGC4W/uxcY1ll7O2pzjoEJZml4tA8QTTLmub8a
-         GssiT9NnKTVQpwrpuIZUUjGDwI5u7JpWYPqkEOJhNPR/jZ+76Q+FJ6+EOtwX6Ic4Xp1t
-         X0/HnVLU05CvScv25knfIiHl3chNQ7aXNsOoqUcrWzPCpvY7qKfpC9fP0WQa1DCrHMr4
-         1fcNwBu9NVuZuUa1pY7KgU10UloetC0/nVwHZzbiXtrJiQO9/r6Kb8QrdmWf07C6ooVE
-         rKTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWk9ixa8b7tlUkqwprbQ/rSvnaUo2TcIOvhFC4Hvvh+JOpzu0gPNw3QPBwnL7v+7fAyRPkSdV3RuSbIvqmkfRf3qZmKTPHZ
-X-Gm-Message-State: AOJu0Yyup0NBCCfJ5++ScV8O8feOj9ulf+LjGjvo0hz+zCul97xmBxuE
-	ENfMIjdYLVzM9fF/BYlVcr/Qo1vYf0NcsgwcNlSm+96fLeV0XypO7AQAh4+vG4Q=
-X-Google-Smtp-Source: AGHT+IGSlr4ZLoLjbGRX4HwM7J0TcHsmOU0WnRG+4566s0qvmdUS5yzzxM7uRDFcqa2pa8klpna8hg==
-X-Received: by 2002:a05:6a20:12d0:b0:1b1:d7d1:c0b3 with SMTP id adf61e73a8af0-1b1d7d1c135mr3180784637.27.1716159562941;
-        Sun, 19 May 2024 15:59:22 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b6710564b3sm20713236a91.10.2024.05.19.15.59.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 May 2024 15:59:22 -0700 (PDT)
-Date: Sun, 19 May 2024 15:59:21 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Antony Antony <antony.antony@secunet.com>
-Cc: David Ahern <dsahern@gmail.com>, <netdev@vger.kernel.org>,
- <devel@linux-ipsec.org>, Steffen Klassert <steffen.klassert@secunet.com>,
- Eyal Birger <eyal.birger@gmail.com>, Nicolas Dichtel
- <nicolas.dichtel@6wind.com>, Sabrina Dubroca <sd@queasysnail.net>,
- "Christian Hopps" <chopps@chopps.org>
-Subject: Re: [PATCH RFC iproute2-next 3/3] xfrm: update ip xfrm state output
- for SA with direction attribute
-Message-ID: <20240519155921.1429f20e@hermes.local>
-In-Reply-To: <4b4b45dfffeab66c64cf560f20b5317e0a3ad55f.1716143499.git.antony.antony@secunet.com>
-References: <cover.1716143499.git.antony.antony@secunet.com>
-	<4b4b45dfffeab66c64cf560f20b5317e0a3ad55f.1716143499.git.antony.antony@secunet.com>
+	s=arc-20240116; t=1716163827; c=relaxed/simple;
+	bh=DeH+m5vuArUUdr5ZEV7gOeqoLD0C9d6BFcMA0oBOvkk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lonn8rn+pfal6ppb+37+qMVY83SJvZd2ckgThtnKdgsYnTFsIJKLz2qPhLrZmaVFRSos0hmEiiyh4TT0itpOz1dU7iPdo8q9KZqmQh1+YsuaR9iaNZ5gokaVFcRxruLXicE18euhTeEFHOnMUWKDUIYBAD5cgEZj1bQzMf3HpkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QSZFLAux; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F0C7C32786;
+	Mon, 20 May 2024 00:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716163827;
+	bh=DeH+m5vuArUUdr5ZEV7gOeqoLD0C9d6BFcMA0oBOvkk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QSZFLAuxezuZeQy+L0VQMwE+mcQMpSn6TnDaKZYtncW6kM8A0QEvgtqA0pPta3XGz
+	 qRJ5h6q7tbmOy15ErMa1XAAnPOGnQMXW7vXvV299zJ4N7vX3UqMOCytIroYvbbibzv
+	 GAU7vRv7emP8fEAtjlqKGK6asf4+VRuusfBtQrCV5BBrLQb2QpneQrAeWHBgy7AvuK
+	 g1VCu3ALldJt8RTNWcfUvUE4EXIoDpRjgrxpK23JrM0k7yHgzPGP8rTXwuubfY4RrC
+	 Bg9uKfcRSitVtQpJ3sFyz2FiSteyvnZPUd3UJhDXyFb/YwVNnB2ICGCqRylDfAYeay
+	 PDkqRlYjRKB6w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1B831C54BB7;
+	Mon, 20 May 2024 00:10:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH ethtool-next v3] netlink: tsinfo: add statistics support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171616382710.15756.16321546641057774553.git-patchwork-notify@kernel.org>
+Date: Mon, 20 May 2024 00:10:27 +0000
+References: <20240508042418.42260-1-rrameshbabu@nvidia.com>
+In-Reply-To: <20240508042418.42260-1-rrameshbabu@nvidia.com>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: netdev@vger.kernel.org, cjubran@nvidia.com, cratiu@nvidia.com,
+ davem@davemloft.net, edumazet@google.com, gal@nvidia.com,
+ jacob.e.keller@intel.com, kuba@kernel.org, mkubecek@suse.cz,
+ pabeni@redhat.com, saeedm@nvidia.com, tariqt@nvidia.com,
+ vadim.fedorenko@linux.dev, wintera@linux.ibm.com
 
-On Sun, 19 May 2024 20:37:45 +0200
-Antony Antony <antony.antony@secunet.com> wrote:
+Hello:
 
-> +	if (sa_dir == XFRM_SA_DIR_OUT) {
-> +		/* would the fail occur on OUT??? */
-> +		fprintf(fp, " failed %u%s", s->integrity_failed, _SL_);
-> +	} else {
-> +		fprintf(fp, "  replay-window %u replay %u failed %u%s",
-> +			s->replay_window, s->replay, s->integrity_failed, _SL_);
-> +	}
+This patch was applied to ethtool/ethtool.git (next)
+by Michal Kubecek <mkubecek@suse.cz>:
 
-Errors should be printed to stderr
+On Tue,  7 May 2024 21:24:12 -0700 you wrote:
+> If stats flag is present, report back statistics for tsinfo if the netlink
+> response body contains statistics information.
+> 
+> Link: https://lore.kernel.org/netdev/20240403212931.128541-1-rrameshbabu@nvidia.com/
+> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [ethtool-next,v3] netlink: tsinfo: add statistics support
+    https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/?id=edf00bab748b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
