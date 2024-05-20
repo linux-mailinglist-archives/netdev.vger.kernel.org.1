@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-97197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33B5B8C9DF8
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 15:17:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D06398C9E3D
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 15:34:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E5D91C2147F
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 13:17:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57D741F2170B
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 13:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5767154789;
-	Mon, 20 May 2024 13:17:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3047136648;
+	Mon, 20 May 2024 13:34:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XrQkqERh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IOp6znxw"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F0C1CD18;
-	Mon, 20 May 2024 13:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404936D1A3;
+	Mon, 20 May 2024 13:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716211069; cv=none; b=Gs2eb9IKv416fCFugFRfJwFCcFWU9NQWCAefeD9m/8bjngTRvUHgJjK2V3AGyLfuBdGgglwZspBdtgoMd+lNXCIW3OPhk+a2X7pr3RB1vEC4eH2fUxcFbmOv5yGMuMXM3h9iMekTryQynJMl9wMRgk1eVEhoa7by2X8C65h5Buk=
+	t=1716212052; cv=none; b=upickSyXgqlG74USX3ISyyJNJeuNrIXAH4cntkHgNIbQ3epVjg54NJOyvjmBotXW5X23PjFW9boo4SR5yQvR4cV9PlCMAR5+GV46dWQAsV19Aiftz57994BluqBoo40EV6u8WSqKwikzxhJiqrAMj0hlsmsXVaRo+E6bDTSy92s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716211069; c=relaxed/simple;
-	bh=2pc9eb/n0fggHWJGm7ZPYFjRKT4X2r90jaagBTnGttA=;
+	s=arc-20240116; t=1716212052; c=relaxed/simple;
+	bh=6l89WwTl0d561bLjFwzCLWKm7Dw0Thg6kC5YSizBDTY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HOaZa0VM5lbF6miFKV0ZfVT9wiCZXfnXHnqb+nBe8O36PRh3iyudSBWv/M/OzWSMH2/Nw/3CnTfJQ1AHODkMMrx2Ztpx+ttDpejdOXi3skcv4h/LUHs9ii9lUZ2Eiu33T2vIh/HdSZsNsQEkha6YL2AbaLyzbornD0Os3HwJ1EI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XrQkqERh; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y6jKV4JBztE4tQ9jH5TikxQ2St4IpgFTUfiekfmV1T382yEVtCWN7+ou6v/0bVaw69B2qhIEFK0GQHJxrZGUgEn6VhSTaqBjuCJ+2AqWpgVxHTnvKaTRWqulWa702tFoJyvEzwUfIrJwwZ6igbWooaZS5mdYeapDVlHbgZKlNCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IOp6znxw; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kBepfuRSnR60+uXpcB5dLLA7csPWcskh8ZUNfZDMcXI=; b=XrQkqERh5PY8JuDZ54IBjmYc/S
-	OzyanipZZToOSnM3CT9RqesnTEe7B0Jyqt1grcLwm8aDN+oJtl4WJbPB7bnKL9VS+SMFDkY+Vxnfv
-	RKQ9FZI+7i1LHL6p064EIw20vAMW/04AgUsPWZkkHiEeFhbvQgVk3eiKbJNRgeqBxWok=;
+	bh=7MTkFW5EKW6VtXAQK1YmzVyloY2FLZZSBaVZDYaOtOU=; b=IOp6znxwuh16I4+DNrVElh1uf3
+	LQPxTYVNYVj4WuzeoZdhZj+T+Gk58XMxXkoBlL6vFSdxP0Ry9C+M7xeZI21ZO79kC7fSlSZO75pSe
+	CUQ4ue2/ndyXxKlu/QhFa2rSXY4PeMxY5Hu06Ef5cqyou1EzKucmfXKbpIjphqf/0uwM=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1s92tR-00FhLz-AJ; Mon, 20 May 2024 15:17:33 +0200
-Date: Mon, 20 May 2024 15:17:33 +0200
+	id 1s939F-00FhPN-Bj; Mon, 20 May 2024 15:33:53 +0200
+Date: Mon, 20 May 2024 15:33:53 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Sky Huang <SkyLake.Huang@mediatek.com>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -58,11 +58,11 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org,
 	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next v3 4/5] net: phy: mediatek: Extend 1G TX/RX link
- pulse time
-Message-ID: <5389c04a-40ff-44a1-9592-05c6dc1a9636@lunn.ch>
+Subject: Re: [PATCH net-next v3 5/5] net: phy: add driver for built-in 2.5G
+ ethernet PHY on MT7988
+Message-ID: <62b19955-23b8-4cd1-b09c-68546f612b44@lunn.ch>
 References: <20240520113456.21675-1-SkyLake.Huang@mediatek.com>
- <20240520113456.21675-5-SkyLake.Huang@mediatek.com>
+ <20240520113456.21675-6-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,91 +71,154 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240520113456.21675-5-SkyLake.Huang@mediatek.com>
+In-Reply-To: <20240520113456.21675-6-SkyLake.Huang@mediatek.com>
 
-> +static void extend_an_new_lp_cnt_limit(struct phy_device *phydev)
+> +static int mt798x_2p5ge_phy_config_init(struct phy_device *phydev)
 > +{
-> +	int mmd_read_ret;
-> +	int ret;
-> +	u32 reg_val;
+> +	struct mtk_i2p5ge_phy_priv *priv = phydev->priv;
+> +	struct device *dev = &phydev->mdio.dev;
+> +	const struct firmware *fw;
+> +	struct pinctrl *pinctrl;
+> +	int ret, i;
+> +	u16 reg;
 > +
-> +	ret = read_poll_timeout(mmd_read_ret = phy_read_mmd, reg_val,
-> +				(mmd_read_ret < 0) || reg_val & MTK_PHY_FINAL_SPEED_1000,
-> +				10000, 1000000, false, phydev,
-> +				MDIO_MMD_VEND1, MTK_PHY_LINK_STATUS_MISC);
-> +	if (mmd_read_ret < 0)
-> +		ret = mmd_read_ret;
-> +	/* If final_speed_1000 is raised, try to extend timeout period
-> +	 * of auto downshift.
-> +	 */
-> + if (!ret) {
-
-If you look at other Linux code, the general pattern is to look if a
-function returned an error. If it does, either return immediately, or
-jump to the end of the function where the cleanup is.
-
-Since this is a void function:
-
-> +	if (mmd_read_ret < 0)
-> +		return;
-
-And then you don't need the
-
-> + if (!ret) {
-
-
-> +		tr_modify(phydev, 0x0, 0xf, 0x3c, AN_NEW_LP_CNT_LIMIT_MASK,
-> +			  FIELD_PREP(AN_NEW_LP_CNT_LIMIT_MASK, 0xf));
-> +		mdelay(1500);
-> +
-> +		ret = read_poll_timeout(mmd_read_ret = tr_read, reg_val,
-> +					(mmd_read_ret < 0) ||
-> +					(reg_val & AN_STATE_MASK) !=
-> +					(AN_STATE_TX_DISABLE << AN_STATE_SHIFT),
-> +					10000, 1000000, false, phydev,
-> +					0x0, 0xf, 0x2);
-> +
-> +		if (mmd_read_ret < 0)
-> +			ret = mmd_read_ret;
-> +
-> +		if (!ret) {
-
-This if can also be removed.
-
-> +			mdelay(625);
-> +			tr_modify(phydev, 0x0, 0xf, 0x3c, AN_NEW_LP_CNT_LIMIT_MASK,
-> +				  FIELD_PREP(AN_NEW_LP_CNT_LIMIT_MASK, 0x8));
-> +			mdelay(500);
-> +			tr_modify(phydev, 0x0, 0xf, 0x3c, AN_NEW_LP_CNT_LIMIT_MASK,
-> +				  FIELD_PREP(AN_NEW_LP_CNT_LIMIT_MASK, 0xf));
+> +	if (!priv->fw_loaded) {
+> +		if (!priv->md32_en_cfg_base || !priv->pmb_addr) {
+> +			dev_err(dev, "MD32_EN_CFG base & PMB addresses aren't valid\n");
+> +			return -EINVAL;
 > +		}
-> +	}
-
-One question i have is, should this really be a void function? What
-does it mean if read_poll_timeout() returns an error? Why is it safe
-to ignore it? Why not return the error?
-
-> +}
 > +
-> +int mtk_gphy_cl22_read_status(struct phy_device *phydev)
+
+https://www.kernel.org/doc/html/latest/process/coding-style.html
+
+  6) Functions
+
+  Functions should be short and sweet, and do just one thing. They
+  should fit on one or two screenfuls of text (the ISO/ANSI screen
+  size is 80x24, as we all know), and do one thing and do that well.
+
+This is a big function, which does multiple things. Maybe pull the
+downloading of firmware into a helper.
+
+> +		ret = request_firmware(&fw, MT7988_2P5GE_PMB, dev);
+> +		if (ret) {
+> +			dev_err(dev, "failed to load firmware: %s, ret: %d\n",
+> +				MT7988_2P5GE_PMB, ret);
+> +			return ret;
+> +		}
+> +
+> +		if (fw->size != MT7988_2P5GE_PMB_SIZE) {
+> +			dev_err(dev, "Firmware size 0x%zx != 0x%x\n",
+> +				fw->size, MT7988_2P5GE_PMB_SIZE);
+> +			return -EINVAL;
+> +		}
+> +
+> +		reg = readw(priv->md32_en_cfg_base);
+> +		if (reg & MD32_EN) {
+> +			phy_set_bits(phydev, MII_BMCR, BMCR_RESET);
+> +			usleep_range(10000, 11000);
+> +		}
+> +		phy_set_bits(phydev, MII_BMCR, BMCR_PDOWN);
+> +
+> +		/* Write magic number to safely stall MCU */
+> +		phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x800e, 0x1100);
+> +		phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x800f, 0x00df);
+> +
+> +		for (i = 0; i < MT7988_2P5GE_PMB_SIZE - 1; i += 4)
+> +			writel(*((uint32_t *)(fw->data + i)), priv->pmb_addr + i);
+> +		release_firmware(fw);
+> +
+> +		writew(reg & ~MD32_EN, priv->md32_en_cfg_base);
+> +		writew(reg | MD32_EN, priv->md32_en_cfg_base);
+> +		phy_set_bits(phydev, MII_BMCR, BMCR_RESET);
+> +		/* We need a delay here to stabilize initialization of MCU */
+> +		usleep_range(7000, 8000);
+> +		dev_info(dev, "Firmware loading/trigger ok.\n");
+> +
+> +		priv->fw_loaded = true;
+
+So there is no way to know if this has already happened? Maybe the
+bootloader downloaded the firmware so it could TFTP boot? Linux will
+download the firmware again, which is a waste of time.
+
+> +		iounmap(priv->md32_en_cfg_base);
+> +		iounmap(priv->pmb_addr);
+> +	}
+> +
+> +	/* Setup LED */
+> +	phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED0_ON_CTRL,
+> +			 MTK_PHY_LED_ON_POLARITY | MTK_PHY_LED_ON_LINK10 |
+> +			 MTK_PHY_LED_ON_LINK100 | MTK_PHY_LED_ON_LINK1000 |
+> +			 MTK_PHY_LED_ON_LINK2500);
+> +	phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED1_ON_CTRL,
+> +			 MTK_PHY_LED_ON_FDX | MTK_PHY_LED_ON_HDX);
+> +
+> +	pinctrl = devm_pinctrl_get_select(&phydev->mdio.dev, "i2p5gbe-led");
+
+Calls to devm_pinctrl_get_select() is pretty unusual in drivers:
+
+https://elixir.bootlin.com/linux/latest/C/ident/devm_pinctrl_get_select
+
+Why is this needed? Generally, the DT file should describe the needed
+pinmux setting, without needed anything additionally.
+
+> +static int mt798x_2p5ge_phy_get_features(struct phy_device *phydev)
 > +{
 > +	int ret;
 > +
-> +	ret = genphy_read_status(phydev);
+> +	ret = genphy_c45_pma_read_abilities(phydev);
 > +	if (ret)
 > +		return ret;
 > +
-> +	if (phydev->autoneg == AUTONEG_ENABLE && !phydev->autoneg_complete) {
-> +		ret = phy_read(phydev, MII_CTRL1000);
-> +		if ((ret & ADVERTISE_1000FULL) || (ret & ADVERTISE_1000HALF))
-> +			extend_an_new_lp_cnt_limit(phydev);
-> +	}
+> +	/* We don't support HDX at MAC layer on mt7988. So mask phy's HDX capabilities here. */
+
+So you make it clear, the MAC does not support half duplex. The MAC
+should then remove it, not the PHY.
+
+> +	linkmode_clear_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT, phydev->supported);
 > +
 > +	return 0;
+> +}
+> +
+> +static int mt798x_2p5ge_phy_read_status(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	/* When MDIO_STAT1_LSTATUS is raised genphy_c45_read_link(), this phy actually
+> +	 * hasn't finished AN. So use CL22's link update function instead.
+> +	 */
+> +	ret = genphy_update_link(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	phydev->speed = SPEED_UNKNOWN;
+> +	phydev->duplex = DUPLEX_UNKNOWN;
+> +	phydev->pause = 0;
+> +	phydev->asym_pause = 0;
+> +
+> +	/* We'll read link speed through vendor specific registers down below. So remove
+> +	 * phy_resolve_aneg_linkmode (AN on) & genphy_c45_read_pma (AN off).
+> +	 */
+> +	if (phydev->autoneg == AUTONEG_ENABLE && phydev->autoneg_complete) {
+> +		ret = genphy_c45_read_lpa(phydev);
+> +		if (ret < 0)
+> +			return ret;
+> +
+> +		/* Clause 45 doesn't define 1000BaseT support. Read the link partner's 1G
+> +		 * advertisement via Clause 22
+> +		 */
+> +		ret = phy_read(phydev, MII_STAT1000);
+> +		if (ret < 0)
+> +			return ret;
+> +		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, ret);
+> +	} else if (phydev->autoneg == AUTONEG_DISABLE) {
+> +		return -EOPNOTSUPP;
+> +	}
 
-If extend_an_new_lp_cnt_limit() fails, what does it mean? Do we
-actually want mtk_gphy_cl22_read_status() to indicate something has
-gone wrong? Or does extend_an_new_lp_cnt_limit() failing not matter?
+It is a bit late doing this now. The user requested this a long time
+ago, and it will be hard to understand why it now returns EOPNOTSUPP.
+You should check for AUTONEG_DISABLE in config_aneg() and return the
+error there.
 
-	Andrew
+      Andrew
 
