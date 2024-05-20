@@ -1,88 +1,99 @@
-Return-Path: <netdev+bounces-97232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E3028CA31D
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 22:06:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84EFD8CA32F
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 22:18:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 490F0281ABA
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 20:06:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF1161C210F4
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 20:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF79137C26;
-	Mon, 20 May 2024 20:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E66136988;
+	Mon, 20 May 2024 20:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XU8tlNpY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b7VD5wz+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8492826AC1;
-	Mon, 20 May 2024 20:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE536A2D;
+	Mon, 20 May 2024 20:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716235575; cv=none; b=sxgNn2OTy4tV5ERWf9hPWg84XgLcphXc+1yRs2tBHfzFIzTnTP8vGmPPH1Bwos3H7TnslEboTXiEwyDOEaL0igirNUW9tczqMoeOXCQ9ri1gNgkrZWgJJ9uinf/GdoDxmMyG6tORDw6YMNbUspnsLVSQgaj5SAfiFZk0hPzC2uU=
+	t=1716236289; cv=none; b=mpYs3VveP2BrZ1kuZFj6LOXSNcKbUqvM7yde9WplhPbGOBLjbdE/RzgDR9hVEE9oFK0VUK6GNQ0ZjCPa2a1QsEtnkv396R+p/Zu2uR1Kaoc2DSeTaXCgE5xx1p3jtu4O7GP2A4oNu8pima90rxJgiFkBwyfCyhwm5GDozT+8mcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716235575; c=relaxed/simple;
-	bh=KXcQBuEjJkcM2zPf7EMgL19fpMvPGUqTBm5eaSkFGa8=;
+	s=arc-20240116; t=1716236289; c=relaxed/simple;
+	bh=LcKby/XxbtDN9O7Z30k0Ah2AUXHNqqqz9xCEDpiWHdw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SlALS7HY/zS8GAT6yf50DoLSuJiIouSXoD1vv3/pdGZJirWoZeEnKFeXlqaVcNgTOA1M1t14g9ppBkWl7EcTQEuOc/nyawBcJf4Vb3h7cS5xiMXWiUHslK3iBVMv+ZpU7i1SQ+ghM3b5CKZfOwaJegoA3PYXs7sZ+pxOoAJoUBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XU8tlNpY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30F02C2BD10;
-	Mon, 20 May 2024 20:06:12 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=E2xEpEzMPHYqkdi4b8GGWRSxa+XGdBXdi15+OBUWlh09KeNXv7BdZA7JEuiZ4gLZEdw/dAlIhk1+Z3Anze7/lzoHv4uhQ2r8HEbv0EIjiPViBnZVP8CQ2scdEmISnPT3Ia+jYbP8h118U8QF6uBIYXWropFmdr7x/4hBGCrpgE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b7VD5wz+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E5FEC2BD10;
+	Mon, 20 May 2024 20:18:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716235575;
-	bh=KXcQBuEjJkcM2zPf7EMgL19fpMvPGUqTBm5eaSkFGa8=;
+	s=k20201202; t=1716236288;
+	bh=LcKby/XxbtDN9O7Z30k0Ah2AUXHNqqqz9xCEDpiWHdw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XU8tlNpY45f9KM6cK/uvLQNvB2eZjfVJBpAv3moZx+0ZbLwkCEhq5mTMQbvp2s2Xj
-	 hK3lrRYr/PWCkN+tLGwoo5z6lw9Ew8Rg2Lxh6vU/i1iVHYqRRI9bvb0def88afPPZc
-	 YG+cOYCu7pZtAXXDIXR3R88MtK0gk6dP6Ezd0XLt799rFQnC86SH7TETvJyqPefDLC
-	 qkq5wPp0JK/Rgpv55ZAbU8ZhpcRj+jQmkBVv/3f6vi82PZ1QwgRDgz1KvPEN6qh6mH
-	 XBajGiYZLf3X7W358WwQmpiEWxZV3FsH0Zk7tur01U7yA217XAzHjo3/UTqiM4VSMJ
-	 nOF7ZcyuiDPig==
-Date: Mon, 20 May 2024 21:06:10 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ronak Doshi <ronak.doshi@broadcom.com>
-Cc: netdev@vger.kernel.org,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/4] vmxnet3: add latency measurement support in
- vmxnet3
-Message-ID: <20240520200610.GD764145@kernel.org>
-References: <20240514182050.20931-1-ronak.doshi@broadcom.com>
- <20240514182050.20931-3-ronak.doshi@broadcom.com>
- <20240515104626.GE154012@kernel.org>
- <CAP1Q3XRYGySJQaWe8dvasUGmpZGcYy_g_Xgft2u=hg9R_eqEsQ@mail.gmail.com>
- <CAP1Q3XQKStM5Tn9HZjTdgki4_7RiF8EOf0ksZE9gzZYHNkAFbQ@mail.gmail.com>
+	b=b7VD5wz+D67o/zSiHS9pLgUjHtdcUFeR+MoeScDi8mcuPr1aQFtCySAHB4axmvtNO
+	 Yoq16cjAnhSDsZR//gUc3lPrhdZrfTPpux4gxc7lgBnHSK37H2l1zZAIhpaRyRc+wM
+	 h9gNGsbfmCxTYmtiXbdrQXpS4hsYXx8p7Gxhz+ruL7Ph5Epkj+1A1BikxAIJGEVug+
+	 kIMYiSUeQVWqf70N9yxSAZZE4z7f9K0gw5ShQpt47vJmE319UnO/VrxCieyD8rllXG
+	 M9byGZTyriphKf9Ks2aVCH5wlVZZ6klcba3bRLqYM5BB9Jf9iMGVZzrwFSUgC/36D4
+	 btsPK/+vIYUxA==
+Date: Mon, 20 May 2024 15:18:07 -0500
+From: Rob Herring <robh@kernel.org>
+To: Conor Dooley <conor@kernel.org>
+Cc: "Kumar, Udit" <u-kumar1@ti.com>, vigneshr@ti.com, nm@ti.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, krzk+dt@kernel.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Kip Broadhurst <kbroadhurst@ti.com>,
+	w.egorov@phytec.de
+Subject: Re: [PATCH] dt-bindings: net: dp8386x: Add MIT license along with
+ GPL-2.0
+Message-ID: <20240520201807.GA1410789-robh@kernel.org>
+References: <20240517104226.3395480-1-u-kumar1@ti.com>
+ <20240517-poster-purplish-9b356ce30248@spud>
+ <20240517-fastball-stable-9332cae850ea@spud>
+ <8e56ea52-9e58-4291-8f7f-4721dd74c72f@ti.com>
+ <20240520-discard-fanatic-f8e686a4faad@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAP1Q3XQKStM5Tn9HZjTdgki4_7RiF8EOf0ksZE9gzZYHNkAFbQ@mail.gmail.com>
+In-Reply-To: <20240520-discard-fanatic-f8e686a4faad@spud>
 
-On Mon, May 20, 2024 at 12:19:43PM -0700, Ronak Doshi wrote:
-> > On Wed, May 15, 2024 at 3:46 AM Simon Horman <horms@kernel.org> wrote:
-> > If not, I would suggest making this feature optional and only compiled
-> > for x86. That might mean factoring it out into a different file. I'm
-> > unsure.
-> I can move the rdpmc code under #if defined(__i386__) ||
-> defined(__x86_64__) so that it will be no-op for other architectures.
-> Will that be fine?
+On Mon, May 20, 2024 at 06:17:52PM +0100, Conor Dooley wrote:
+> On Sat, May 18, 2024 at 02:18:55PM +0530, Kumar, Udit wrote:
+> > Hi Conor
+> > 
+> > On 5/17/2024 8:11 PM, Conor Dooley wrote:
+> > > On Fri, May 17, 2024 at 03:39:20PM +0100, Conor Dooley wrote:
+> > > > On Fri, May 17, 2024 at 04:12:26PM +0530, Udit Kumar wrote:
+> > > > > Modify license to include dual licensing as GPL-2.0-only OR MIT
+> > > > > license for TI specific phy header files. This allows for Linux
+> > > > > kernel files to be used in other Operating System ecosystems
+> > > > > such as Zephyr or FreeBSD.
+> > > > What's wrong with BSD-2-Clause, why not use that?
+> > > I cut myself off, I meant to say:
+> > > What's wrong with BSD-2-Clause, the standard dual license for
+> > > bindings, why not use that?
+> > 
+> > want to be inline with License of top level DTS, which is including this
+> > header file
+> 
+> Unless there's a specific reason to use MIT (like your legal won't even
+> allow you to use BSD-2-Clause) then please just use the normal license
+> for bindings here.
 
-Hi Ronak,
+Aligning with the DTS files is enough reason for me as that's where 
+these files are used. If you need to pick a permissive license for both, 
+then yes, use BSD-2-Clause. Better yet, ask your lawyer.
 
-I think that it would be an good improvement, as long as the result is a
-working driver for other architectures.
-
-Perhaps #ifdef CONFIG_X86 can be used as the guard.
-I also would suggest using rdpmc helpers if possible.
+Rob
 
