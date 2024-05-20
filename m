@@ -1,99 +1,145 @@
-Return-Path: <netdev+bounces-97233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84EFD8CA32F
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 22:18:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96D528CA37C
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 22:42:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF1161C210F4
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 20:18:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B0851F213F6
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 20:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E66136988;
-	Mon, 20 May 2024 20:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B6E13A414;
+	Mon, 20 May 2024 20:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b7VD5wz+"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="c5qDFkTd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE536A2D;
-	Mon, 20 May 2024 20:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564C913A3EC
+	for <netdev@vger.kernel.org>; Mon, 20 May 2024 20:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716236289; cv=none; b=mpYs3VveP2BrZ1kuZFj6LOXSNcKbUqvM7yde9WplhPbGOBLjbdE/RzgDR9hVEE9oFK0VUK6GNQ0ZjCPa2a1QsEtnkv396R+p/Zu2uR1Kaoc2DSeTaXCgE5xx1p3jtu4O7GP2A4oNu8pima90rxJgiFkBwyfCyhwm5GDozT+8mcQ=
+	t=1716237720; cv=none; b=uQ+eC8xxIW/PTCFq2k/9xjIXp8Ym+3PruQe/czDq8BoKwWRebjumN7MiAHSU4OUdiNaoieSTeo3flPeY1UQznwtF8Lct/5Moo+jf0/JOMi8ycJYS82h6IcKRJy24kCrwUpe6q52m6qiQuj6aj6R8E5eq1jw4qQEdNH1C0XPEmf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716236289; c=relaxed/simple;
-	bh=LcKby/XxbtDN9O7Z30k0Ah2AUXHNqqqz9xCEDpiWHdw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E2xEpEzMPHYqkdi4b8GGWRSxa+XGdBXdi15+OBUWlh09KeNXv7BdZA7JEuiZ4gLZEdw/dAlIhk1+Z3Anze7/lzoHv4uhQ2r8HEbv0EIjiPViBnZVP8CQ2scdEmISnPT3Ia+jYbP8h118U8QF6uBIYXWropFmdr7x/4hBGCrpgE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b7VD5wz+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E5FEC2BD10;
-	Mon, 20 May 2024 20:18:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716236288;
-	bh=LcKby/XxbtDN9O7Z30k0Ah2AUXHNqqqz9xCEDpiWHdw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b7VD5wz+D67o/zSiHS9pLgUjHtdcUFeR+MoeScDi8mcuPr1aQFtCySAHB4axmvtNO
-	 Yoq16cjAnhSDsZR//gUc3lPrhdZrfTPpux4gxc7lgBnHSK37H2l1zZAIhpaRyRc+wM
-	 h9gNGsbfmCxTYmtiXbdrQXpS4hsYXx8p7Gxhz+ruL7Ph5Epkj+1A1BikxAIJGEVug+
-	 kIMYiSUeQVWqf70N9yxSAZZE4z7f9K0gw5ShQpt47vJmE319UnO/VrxCieyD8rllXG
-	 M9byGZTyriphKf9Ks2aVCH5wlVZZ6klcba3bRLqYM5BB9Jf9iMGVZzrwFSUgC/36D4
-	 btsPK/+vIYUxA==
-Date: Mon, 20 May 2024 15:18:07 -0500
-From: Rob Herring <robh@kernel.org>
-To: Conor Dooley <conor@kernel.org>
-Cc: "Kumar, Udit" <u-kumar1@ti.com>, vigneshr@ti.com, nm@ti.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, krzk+dt@kernel.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Kip Broadhurst <kbroadhurst@ti.com>,
-	w.egorov@phytec.de
-Subject: Re: [PATCH] dt-bindings: net: dp8386x: Add MIT license along with
- GPL-2.0
-Message-ID: <20240520201807.GA1410789-robh@kernel.org>
-References: <20240517104226.3395480-1-u-kumar1@ti.com>
- <20240517-poster-purplish-9b356ce30248@spud>
- <20240517-fastball-stable-9332cae850ea@spud>
- <8e56ea52-9e58-4291-8f7f-4721dd74c72f@ti.com>
- <20240520-discard-fanatic-f8e686a4faad@spud>
+	s=arc-20240116; t=1716237720; c=relaxed/simple;
+	bh=KLAoNg3lNimMGEM1iK1E2E71QyftAe7H7PKPd5zQpd0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YfMenHP3H6iS4Tx6ulQoR+OV9YjXG+vWzgotd+D5Z62tQahRPlQj8tm2i9lETE+J5bd0tNNtnAYmEfsD0+8uY+6Ut/5BZPht4ulhDk6Ggdd+SB1TdBHiEZVu5nGpqMkE2w6WfXRz4px+V5bwtJoQGG+Xz6IwYr04gbeXAUnnLr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=c5qDFkTd; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1ed835f3c3cso20662875ad.3
+        for <netdev@vger.kernel.org>; Mon, 20 May 2024 13:41:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1716237717; x=1716842517; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=P7tYjQOKUhhyypRv+20xcgSB/ZPEIGDyWUW6MmS8mUM=;
+        b=c5qDFkTdGW/PkzxKKeC19A10gpemAfXqRD6QFIiBGcrWjQH1Yk+DMgRZ3sUkWVjUvl
+         uLnSjKX+gueJ2JS0QjrZNiYu46IoGMT9W2buQcHovUkMTpVVJET65QI083rLJGQheHly
+         WwaDX5m+tO054qE1Ukf/NgHLlcam90K0hLJGQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716237717; x=1716842517;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P7tYjQOKUhhyypRv+20xcgSB/ZPEIGDyWUW6MmS8mUM=;
+        b=GF4q/JwOo94yVA29fAF70/HT433SxA99HJ7gSAV5birjPO7ESkuo22ObOGNoYl9tse
+         FKMlTnO3hbg4PzMz2JoSa1i1f+DfGaiJPivb3zc1zmgpASIFyc4j05OE9l7wZRc6CedW
+         TR0suXY9a8dNqHhwn9joIRVLqiP5EvUE7Htyn1UfWYPVVQz8Jopg99jev+J/wp6i477h
+         NB2Fhmx5QKio1f6HH8/T1c6TNhNK5iVm9jjDSuaCr36pvHMmnmLcev3MlEHcCyPJxHcA
+         YyQ0nbRwxmUH9n3Q4nBjCpxDmoVrvY+wRrPNoj44d0WUTariYmgHS3bRT3eLxhnP1ycF
+         Xyeg==
+X-Forwarded-Encrypted: i=1; AJvYcCXnhV9WyCJXwu7ngz4Uh5+8z91h7fm8Ja9RVt0isrPm2iggWwv25HQjpRf2mmdngA3rzXdJX0tohIQg7Po1TemiaKjy8Iz5
+X-Gm-Message-State: AOJu0YwldmdMG1Au8Iyn3hCgO2qWBqZWS2EXo3yCLnFG+PjQvKHrg5Nd
+	bjKv3OrVKqu7eKr0iOcgIP0e/LTdkz2UVH+gLQLjdvKHLRL+7UupPh5ROXZ6ww==
+X-Google-Smtp-Source: AGHT+IGUEKmCgcmIHfXp6npZuZGjuJx5A/FAe7BpLxOGHhZPiMoBvbnihDQpbFMwZRHpWh2syWfS+Q==
+X-Received: by 2002:a17:902:e54d:b0:1f3:590:71d9 with SMTP id d9443c01a7336-1f3059073f7mr34219075ad.2.1716237717581;
+        Mon, 20 May 2024 13:41:57 -0700 (PDT)
+Received: from dianders.sjc.corp.google.com ([2620:15c:9d:2:cd20:112a:72ca:4425])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bbde9d7sm213068255ad.106.2024.05.20.13.41.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 May 2024 13:41:57 -0700 (PDT)
+From: Douglas Anderson <dianders@chromium.org>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Hayes Wang <hayeswang@realtek.com>
+Cc: danielgeorgem@google.com,
+	Douglas Anderson <dianders@chromium.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Grant Grundler <grundler@chromium.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next 1/2] r8152: If inaccessible at resume time, issue a reset
+Date: Mon, 20 May 2024 13:41:11 -0700
+Message-ID: <20240520134108.net-next.1.Ibeda5c0772812ce18953150da5a0888d2d875150@changeid>
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240520-discard-fanatic-f8e686a4faad@spud>
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 20, 2024 at 06:17:52PM +0100, Conor Dooley wrote:
-> On Sat, May 18, 2024 at 02:18:55PM +0530, Kumar, Udit wrote:
-> > Hi Conor
-> > 
-> > On 5/17/2024 8:11 PM, Conor Dooley wrote:
-> > > On Fri, May 17, 2024 at 03:39:20PM +0100, Conor Dooley wrote:
-> > > > On Fri, May 17, 2024 at 04:12:26PM +0530, Udit Kumar wrote:
-> > > > > Modify license to include dual licensing as GPL-2.0-only OR MIT
-> > > > > license for TI specific phy header files. This allows for Linux
-> > > > > kernel files to be used in other Operating System ecosystems
-> > > > > such as Zephyr or FreeBSD.
-> > > > What's wrong with BSD-2-Clause, why not use that?
-> > > I cut myself off, I meant to say:
-> > > What's wrong with BSD-2-Clause, the standard dual license for
-> > > bindings, why not use that?
-> > 
-> > want to be inline with License of top level DTS, which is including this
-> > header file
-> 
-> Unless there's a specific reason to use MIT (like your legal won't even
-> allow you to use BSD-2-Clause) then please just use the normal license
-> for bindings here.
+If we happened to get a USB transfer error during the transition to
+suspend then the usb_queue_reset_device() that r8152_control_msg()
+calls will get dropped on the floor. This is because
+usb_lock_device_for_reset() (which usb_queue_reset_device() uses)
+silently fails if it's called when a device is suspended or if too
+much time passes.
 
-Aligning with the DTS files is enough reason for me as that's where 
-these files are used. If you need to pick a permissive license for both, 
-then yes, use BSD-2-Clause. Better yet, ask your lawyer.
+Let's resolve this by resetting the device ourselves in r8152's
+resume() function.
 
-Rob
+NOTE: due to timing, it's _possible_ that we could end up with two USB
+resets: the one queued previously and the one called from the resume()
+patch. This didn't happen in test cases I ran, though it's conceivably
+possible. We can't easily know if this happened since
+usb_queue_reset_device() can just silently drop the reset request. In
+any case, it's not expected that this is a problem since the two
+resets can't run at the same time (because of the device lock) and it
+should be OK to reset the device twice. If somehow the double-reset
+causes problems we could prevent resets from being queued up while
+suspend is running.
+
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+---
+
+ drivers/net/usb/r8152.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index 19df1cd9f072..6a3f4b2114ee 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -8554,6 +8554,19 @@ static int rtl8152_system_resume(struct r8152 *tp)
+ 		usb_submit_urb(tp->intr_urb, GFP_NOIO);
+ 	}
+ 
++	/* If the device is RTL8152_INACCESSIBLE here then we should do a
++	 * reset. This is important because the usb_lock_device_for_reset()
++	 * that happens as a result of usb_queue_reset_device() will silently
++	 * fail if the device was suspended or if too much time passed.
++	 *
++	 * NOTE: The device is locked here so we can directly do the reset.
++	 * We don't need usb_lock_device_for_reset() because that's just a
++	 * wrapper over device_lock() and device_resume() (which calls us)
++	 * does that for us.
++	 */
++	if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
++		usb_reset_device(tp->udev);
++
+ 	return 0;
+ }
+ 
+-- 
+2.45.0.rc1.225.g2a3ae87e7f-goog
+
 
