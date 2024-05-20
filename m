@@ -1,132 +1,115 @@
-Return-Path: <netdev+bounces-97157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43788C995D
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 09:34:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 010078C99AE
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 10:17:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8330A1F212E2
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 07:34:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E7681C211C0
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 08:17:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B7E1B27D;
-	Mon, 20 May 2024 07:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2A91BC23;
+	Mon, 20 May 2024 08:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dd/rE/3v"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AFFA18C3B;
-	Mon, 20 May 2024 07:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE5CE554;
+	Mon, 20 May 2024 08:17:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716190461; cv=none; b=jh54qpNhlrq+l0swgglca46bGIM0lstwwuB82ZODrEwXBLW65pcibs9tsjmHJJpQmLORf+stTgLNpbVfIjsdHekntuxnGwNHogHW1tyqrfuA8S9Nj4JVsIj8xTCGAvh96lox/o8nPcR9yq1i1i/dGshYStrnSP89CJBZMGWAjEw=
+	t=1716193026; cv=none; b=f6K+LpuBSccMOlxnMUBvRSVS4gwGiIYBY7irJtoxLe06AHiSIk7JzY0yyL/S/VVGmh5Sj/SBx/+1UXLEl2Nioy6RsKf73HF55CeXJaDALg/7ZCEq5a7LN4kcILjCZxLUaZF3ifQSq7xvVvBdsvaFMrT5bnxF/D2TZiqXJsJ9Ic0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716190461; c=relaxed/simple;
-	bh=w0nWP4OpzxjTteaJdbehBz/NP4ETwZZeVrDtaMvHGWQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ckYno2tRQVEgRmWO/VPa2gfRX83dWQCG2xbdis5S6bEoURjEJ8oZpKiMNslJpfsHxicTRjANvITA2NTQgpq8yUr/YDbvjQJso2l1LoLSqhnlfa/feJXpHAA96VTluQgNBe279kfwUYRpcIkSupW1m8oD3Vnamgtc0y2vXppd1uc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=162.243.161.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from gui.. (unknown [115.206.161.197])
-	by mail-app2 (Coremail) with SMTP id by_KCgDHUaC9_EpmpJkFAQ--.208S4;
-	Mon, 20 May 2024 15:33:19 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH v1 net] cfg80211: pmsr: use correct nla_get_uX functions
-Date: Mon, 20 May 2024 15:33:11 +0800
-Message-Id: <20240520073311.44117-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1716193026; c=relaxed/simple;
+	bh=kC+d8Eaw9kodIS1Eil070H+nDygrxbdBOm02pE9boGA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=XlwR0d7/P7i+I38RUFr47i5xxBKyQB/MJImw3gjGc+slXHxD/LIkBViU2dsp3zbtSY3Tvp7PPwlbg7t3rsiRe8xOV+ZWjt54to2AKXkMU+g2q2D+a+MqOv89IBgbIpC82OfQ2PLEWlICK47zuTBnQoczaI5SK+HuXJi0j982FDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dd/rE/3v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B61B1C2BD10;
+	Mon, 20 May 2024 08:17:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716193025;
+	bh=kC+d8Eaw9kodIS1Eil070H+nDygrxbdBOm02pE9boGA=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Dd/rE/3vfvnNvgm4jqnquecuI0lLlhp6XTXYgZRrD8kEy3TPSttDY+vXCbjcAfanl
+	 s7ePrWNapHb2RMZIiy7JRIz2FG4fbmNA0FHG2SY3ekjAVDicSzMGs2jOILqKIafc6Z
+	 UauUq0wEQnwwT5RbXYs10zTO+i1vJLEShjm9XYz3brVPguuhAn9jX1fwcehbAphBDe
+	 x/uVwYYg+WR9V4E95TPtbhVAphOcIwbv9Vnrb62GKK6i6inN5qYPenUpX3WygV4DM4
+	 +inpC/lnkVMH7ADm4WErJgqAbAUxDb4Yrd4pP0HpUBph5JSJfI0Bu59X+6BFp3Pdz/
+	 iH5HwboNPnYyw==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/3] doc: mptcp: new general doc and fixes
+Date: Mon, 20 May 2024 10:16:39 +0200
+Message-Id: <20240520-upstream-net-20240520-mptcp-doc-v1-0-e3ad294382cb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:by_KCgDHUaC9_EpmpJkFAQ--.208S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxXF13tFW5Cw1Dtry7tFWUArb_yoW5WrW8pF
-	4kta95t3Z8Xw1kZrykCw18WF9FqF17Arn3CFW3uF1fCr4vga45twnrWr4jqa1DA3s5W395
-	tr1vyay8Cw15KFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkm14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
-	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r1q
-	6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOcGS2YC/z2NQQqDMBBFryKzdiCOSqFXkS7C+G1nYQxJKgXx7
+ g0uXL4P77+DMpIh07M5KGG3bFuo0LUN6ceHN9jmyiROBjeK42/MJcGvHFD4XtdYNPK8KWN8eO1
+ FMHil+hITFvtdhYmqQ6/z/AN75srjdgAAAA==
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Gregory Detal <gregory.detal@gmail.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1262; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=kC+d8Eaw9kodIS1Eil070H+nDygrxbdBOm02pE9boGA=;
+ b=kA0DAAgB9reCT0JpoHMByyZiAGZLBv2jod6cd9tvMvkwvroD6mP6HHY6GUB18jxjO71RxM/aY
+ YkCMwQAAQgAHRYhBOjLhfdodwV6bif3eva3gk9CaaBzBQJmSwb9AAoJEPa3gk9CaaBzOFYP/0vm
+ WDAQ9BgTjAGaolMs2FiBrCSi6fbRhQCg1z2j0YBx+8nO3ZhLKsGr3Ygf2h5p0Bmbr1qRDaa+C2O
+ lj4kK8vmzGxomoBmQsOIAMFMzDr1jJf1xWt8PnTLykNQOgwcVkAiVtuWkB6JhK+Rgx4ydFSIjY8
+ PO3fHSyhZhtqGE0aaXPgb8KbmBXU9qylnQPyQYUsrwtfvMPZ8v3ccgkxhSCyc/UkeugE/xk8zpX
+ 9Ks4qAzpGEZ/gPLM2X2dDCJsxdv+O7i8MXe2L3Z5y2o6AOmoltYXssjmffRhva8NIhUKXR0HL1T
+ nbH0ZFBnYY7xmQpLiLBoaatl3ZViGeUyZpG8PidaTMyrBhHjHDgCGRYO91FFLBZjALVtoD/3hZX
+ d5p00Xm+4J9go6Zgf1OsPjmQ+SwFvzG9c5WTc/GJdJbSjqDcK32B4X8MbhaAcR9uvJQPoec3VOs
+ +Gj1UU+XPLIxUn3kMzQb3N7RQTVUMoM/ho6TF/aHP0Dr+2AADEJ4sTqhBM7ryVksHt0kE2hKfZY
+ WbYC8zPj20xZ2xQPQ2MGDwWZsOOdjW5LxbSjD38L8MHORU6X2DcXJI3sX0IivNfR1HculLWsYq/
+ uILbohHC7oqJ9bzKbymEeuXaGl6PiD9+sJf2eyenNWYku41nmJYFyAPSuuLAo4kL04W/FO3yKDw
+ w08y+
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-The commit 9bb7e0f24e7e ("cfg80211: add peer measurement with FTM
-initiator API") defines four attributes, which are
+A general documentation about MPTCP was missing since its introduction
+in v5.6. The last patch adds a new 'mptcp' page in the 'networking'
+documentation.
 
-- `NL80211_PMSR_FTM_REQ_ATTR_NUM_BURSTS_EXP` with NLA_U8 type
-- `NL80211_PMSR_FTM_REQ_ATTR_BURST_PERIOD` with NLA_U16 type
-- `NL80211_PMSR_FTM_REQ_ATTR_BURST_DURATION` with NLA_U8 type
-- `NL80211_PMSR_FTM_REQ_ATTR_NUM_FTMR_RETRIES` with NLA_U8 type
+The first patch is a fix for a missing sysctl entry introduced in v6.10
+rc0, and the second one reorder the sysctl entries.
 
-However, the consumers of these attributes in `pmsr_parse_ftm` blindly
-all use `nla_get_u32`, which is incorrect. Hence, fix these with correct
-`nla_get_u8` and `nla_get_u16`.
+These patches can be applied without conflicts on top of the 'net' tree
+and the 'docs-next' one. They are currently based on top of the current
+'net' tree because the first patch is a fix for a patch that is not in
+'docs-next' yet.
 
-Fixes: 9bb7e0f24e7e ("cfg80211: add peer measurement with FTM initiator API")
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- net/wireless/pmsr.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Matthieu Baerts (NGI0) (3):
+      doc: mptcp: add missing 'available_schedulers' entry
+      doc: mptcp: alphabetical order
+      doc: new 'mptcp' page in 'networking'
 
-diff --git a/net/wireless/pmsr.c b/net/wireless/pmsr.c
-index e106dcea3977..c569c37da317 100644
---- a/net/wireless/pmsr.c
-+++ b/net/wireless/pmsr.c
-@@ -56,7 +56,7 @@ static int pmsr_parse_ftm(struct cfg80211_registered_device *rdev,
- 	out->ftm.burst_period = 0;
- 	if (tb[NL80211_PMSR_FTM_REQ_ATTR_BURST_PERIOD])
- 		out->ftm.burst_period =
--			nla_get_u32(tb[NL80211_PMSR_FTM_REQ_ATTR_BURST_PERIOD]);
-+			nla_get_u16(tb[NL80211_PMSR_FTM_REQ_ATTR_BURST_PERIOD]);
- 
- 	out->ftm.asap = !!tb[NL80211_PMSR_FTM_REQ_ATTR_ASAP];
- 	if (out->ftm.asap && !capa->ftm.asap) {
-@@ -75,7 +75,7 @@ static int pmsr_parse_ftm(struct cfg80211_registered_device *rdev,
- 	out->ftm.num_bursts_exp = 0;
- 	if (tb[NL80211_PMSR_FTM_REQ_ATTR_NUM_BURSTS_EXP])
- 		out->ftm.num_bursts_exp =
--			nla_get_u32(tb[NL80211_PMSR_FTM_REQ_ATTR_NUM_BURSTS_EXP]);
-+			nla_get_u8(tb[NL80211_PMSR_FTM_REQ_ATTR_NUM_BURSTS_EXP]);
- 
- 	if (capa->ftm.max_bursts_exponent >= 0 &&
- 	    out->ftm.num_bursts_exp > capa->ftm.max_bursts_exponent) {
-@@ -88,7 +88,7 @@ static int pmsr_parse_ftm(struct cfg80211_registered_device *rdev,
- 	out->ftm.burst_duration = 15;
- 	if (tb[NL80211_PMSR_FTM_REQ_ATTR_BURST_DURATION])
- 		out->ftm.burst_duration =
--			nla_get_u32(tb[NL80211_PMSR_FTM_REQ_ATTR_BURST_DURATION]);
-+			nla_get_u8(tb[NL80211_PMSR_FTM_REQ_ATTR_BURST_DURATION]);
- 
- 	out->ftm.ftms_per_burst = 0;
- 	if (tb[NL80211_PMSR_FTM_REQ_ATTR_FTMS_PER_BURST])
-@@ -107,7 +107,7 @@ static int pmsr_parse_ftm(struct cfg80211_registered_device *rdev,
- 	out->ftm.ftmr_retries = 3;
- 	if (tb[NL80211_PMSR_FTM_REQ_ATTR_NUM_FTMR_RETRIES])
- 		out->ftm.ftmr_retries =
--			nla_get_u32(tb[NL80211_PMSR_FTM_REQ_ATTR_NUM_FTMR_RETRIES]);
-+			nla_get_u8(tb[NL80211_PMSR_FTM_REQ_ATTR_NUM_FTMR_RETRIES]);
- 
- 	out->ftm.request_lci = !!tb[NL80211_PMSR_FTM_REQ_ATTR_REQUEST_LCI];
- 	if (out->ftm.request_lci && !capa->ftm.request_lci) {
+ Documentation/networking/index.rst        |   1 +
+ Documentation/networking/mptcp-sysctl.rst |  74 +++++++-------
+ Documentation/networking/mptcp.rst        | 156 ++++++++++++++++++++++++++++++
+ MAINTAINERS                               |   2 +-
+ 4 files changed, 197 insertions(+), 36 deletions(-)
+---
+base-commit: 4b377b4868ef17b040065bd468668c707d2477a5
+change-id: 20240520-upstream-net-20240520-mptcp-doc-e57ac322e4ac
+
+Best regards,
 -- 
-2.34.1
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
