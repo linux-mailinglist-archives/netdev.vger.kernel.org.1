@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-97194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 618818C9DC6
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 15:02:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65B518C9DD2
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 15:06:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 890211C20BEA
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 13:02:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 216B62853E9
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 13:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A35135A58;
-	Mon, 20 May 2024 13:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 054B0135A5A;
+	Mon, 20 May 2024 13:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UN2Dj719"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="R2Ea1JSc"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765DF13440A;
-	Mon, 20 May 2024 13:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C471FC0E;
+	Mon, 20 May 2024 13:06:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716210165; cv=none; b=lrFdFvGFciXbGt/6A2ZrNI7AYy8rdIVGOOnMYBUASGCm5+2YhZhO4bFW5rHwYcoIkotKDxtsgWAGrFFqMeiljupFA+64s81vmGWKDzx9RQ8KK4dJyqib/QB4+NPXR9pGoAmjSN9VBO4JeZ0HZx4eY8XSJCA4Ei6U6/RlJOtZH9Y=
+	t=1716210393; cv=none; b=diUSLvUMu6jFc5bwW4r5ko7/D6C/4LhhcuxxoNKDTm2Ro8NcDxRtX3KNISFltwUGaimCBi/Nb7YHA//3DCkcxI99Rj+0VbaCp0kdxctvD6psfdkV85IukMAgDXQwm8M9BfudSv+/oNTTrJIF39gTJn9WmTiVSM58e3E5x3+SufI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716210165; c=relaxed/simple;
-	bh=NqFfNspuNN/u5d6QKlAxvgR1hDJF0mvILHw8f7JFhmM=;
+	s=arc-20240116; t=1716210393; c=relaxed/simple;
+	bh=4+7CddW5We0wU9iMakq2yje3RrOQvVyLh/AcczxCx+Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O0QK/e2x9Kjn+8NzcRnNbZ0vokRMAfxNxPFixAz5QMAR+JuzIeLNYWwCGfWl75+Or+O9qvjx2AGp2aNnPybb5OAqI1/e6X1NKybM7cdJONNEoKBURCjCVdcP3MZ/W93kPpOLsEcbAhJzlon6pMljIec+51uyYf7ssfVbTQ/ah6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UN2Dj719; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=IgHD/CH5PyS5tnlqIFu2B2OERLQ3QuZhN/qI99I3qFOqPF4GkOrYHJWEhlVlmFkFtPeFv9tnr5xIUgwjFX7m+3vIKip1YjvQpMbE6rI5Z5ZOHFkMChP4GCfGdMaMqKm/VyNDQdrYk5Pbiq905ItrOmJCFKdhe8NakIMA2wH+TD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=R2Ea1JSc; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,37 +36,32 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=j0jIAAuXSP3n0MB/pRJJ3f6EEsygUxZ+BPC7VxBGXp8=; b=UN2Dj7198lyU3K4EVT86LEI9IQ
-	cdtpjZUJU1lns6OAl9EJhTDzjCIZ6Amc/gU+q4KDrYk/EKjrZ5/cOduBfsuv5zno3WL2ocpqj6mjH
-	c7IU4uWoyZtQm4NTJxf5g4ntGMbjOrfxZ6ix/ZG8fj1o2PGdp4DGWTOG0LN5/REsWfl8=;
+	bh=GVH3hd6GTpYUkd0MY/d50j19yuf6w01ci9ep2ahCSAo=; b=R2Ea1JScnnU0BdrEbQd+F4498S
+	ygj9NGUqj58arOvsoKndxyCcd/jBizW5dFkNtI/7zYtyuReuMoacQezcV9qS0u/WHrlqNlTRyJUnL
+	sfBfRXL5FQELA+o4febjKFzHG4gD0tII+AeTa8BJD57MoULVoI/1ay/tQfPnJNR7B7Uw=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1s92ej-00FhFN-La; Mon, 20 May 2024 15:02:21 +0200
-Date: Mon, 20 May 2024 15:02:21 +0200
+	id 1s92ib-00FhHS-Ei; Mon, 20 May 2024 15:06:21 +0200
+Date: Mon, 20 May 2024 15:06:21 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dqfext@gmail.com" <dqfext@gmail.com>,
-	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"daniel@makrotopia.org" <daniel@makrotopia.org>,
-	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>
-Subject: Re: [PATCH net-next v2 5/5] net: phy: add driver for built-in 2.5G
- ethernet PHY on MT7988
-Message-ID: <8a5f14f4-4cd9-48b5-a62c-711800cee942@lunn.ch>
-References: <20240517102908.12079-1-SkyLake.Huang@mediatek.com>
- <20240517102908.12079-6-SkyLake.Huang@mediatek.com>
- <cc0f67de-171e-45e1-90d9-b6b40ec71827@lunn.ch>
- <283c893aa17837e7189a852af4f88662cda5536f.camel@mediatek.com>
+To: Sky Huang <SkyLake.Huang@mediatek.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Steven Liu <Steven.Liu@mediatek.com>
+Subject: Re: [PATCH net-next v3 0/5] net: phy: mediatek: Introduce
+ mtk-phy-lib and add 2.5Gphy support
+Message-ID: <7f99f50b-b5c4-4a90-b32e-f2f7f5ce8e9b@lunn.ch>
+References: <20240520113456.21675-1-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,49 +70,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <283c893aa17837e7189a852af4f88662cda5536f.camel@mediatek.com>
+In-Reply-To: <20240520113456.21675-1-SkyLake.Huang@mediatek.com>
 
-> > Is there a version available anywhere for the firmware?
-> > 
-> Currently, I use "$md5sum /lib/firmware/mediatek/mt7988/i2p5ge-phy-
-> pmb.bin" command to check version.
+On Mon, May 20, 2024 at 07:34:51PM +0800, Sky Huang wrote:
+> From: "SkyLake.Huang" <skylake.huang@mediatek.com>
+> 
+> Re-organize MTK ethernet phy drivers and integrate common manipulations
+> into mtk-phy-lib. Also, add support for build-in 2.5Gphy on MT7988.
+> 
+> v2:
+> - Apply correct PATCH tag.
+> - Break LED/Token ring/Extend-link-pulse-time features into 3 patches.
+> - Fix contents according to v1 comments.
+> 
+> v3:
+> - Fix patch 4/5 & 5/5 according to v2 comments.
 
-An md5sum is not really a version. How do you tell if one md5sum is
-newer or older than another?
+Ideally state what you actually changed. The purpose of this history
+is to remind reviewers what they said, so they can
 
-Is there is an MDIO register you can read to get the version? Or a
-version in a header in the firmware file?
+1) Check if anything has been missed
+2) Check if the changes made fit to the review comments.
 
-> > > +static int mt798x_2p5ge_phy_get_features(struct phy_device
-> > *phydev)
-> > > +{
-> > > +int ret;
-> > > +
-> > > +ret = genphy_c45_pma_read_abilities(phydev);
-> > > +if (ret)
-> > > +return ret;
-> > > +
-> > > +/* We don't support HDX at MAC layer on mt7988.
-> > 
-> > That is a MAC limitation, so it should be the MAC which disables
-> > this,
-> > not the Phy.
-> > 
-> Actually this phy is strictly binded to (XFI)MAC on this platform.
-> So I directly disable HDX feature of PHY.
+So please include a one line summary per change made.
 
-Sorry, i don't follow your answer:
+> - Rebase code and now this patch series can apply to net-next tree.
 
-Can the PHY do half duplex?
-Can the MAC do half duplex?
-
-The part which cannot do half-duplex should be the part which disables
-half-duplex.
-
-You should be able to take any vendors MAC and any vendors PHY and put
-them together, if they have the same MII interface. Say this PHY does
-support half duplex. And some other vendors MAC supports half
-duplex. We want it to work.
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#netdev-faq
 
 	Andrew
 
