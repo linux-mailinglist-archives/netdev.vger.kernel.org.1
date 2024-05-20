@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-97166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5796D8C9AD0
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 11:57:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D9418C9AD5
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 11:58:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12D4B281A6F
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 09:57:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2998C281B00
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 09:58:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E60481C0;
-	Mon, 20 May 2024 09:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63720481CE;
+	Mon, 20 May 2024 09:58:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CpQwPz4F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H5ZEWH+F"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A98B481AA;
-	Mon, 20 May 2024 09:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39286481C0;
+	Mon, 20 May 2024 09:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716199038; cv=none; b=b6Yztrgo19E+WyVjQBI2eCPQdBYSnAW/q5AyJk59BFmSravHaZ3Amc4CgE6PKSc9I7chag7CiiG28DseibugAP9NIYhg2jvbmaCsXX7enJtkTVCKCskCf/aSIxzPeYdAO9Ow6AkZ8nemM3j0haP/1HFkbV7ZzCGo+9i7CPRtG7M=
+	t=1716199133; cv=none; b=LXMEVoBtBEHQsgqfVMPAfdQBfx4agxCL1RMdQpPPCRUjdd5H5jCZqkatuQ6ATeMPd6cMA/YJkobC8AFu8Us1AJpDEaMpWnjycZvngG/RAdRHnFnFynm2UaJfBA0tE6OexX2HaNTQGV/FnY/b0tqTiRXk46KpY1Uj0Fsgg7x/LBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716199038; c=relaxed/simple;
-	bh=HAZNjDgSrlri/l7/2sSm0PgdmiazDso7ZHTn27qp3w4=;
+	s=arc-20240116; t=1716199133; c=relaxed/simple;
+	bh=5DFkN3Tprj5e+wQJ3KzoBJ39w9B9HhjPq1Ww2oCI7XU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cgIRUx3kQZtLng0ZVmqkzMx66Ow0YVssAkxBSd+psVC1H10k3N/cvrSr6uYGk244vtrbgqWmlkAcNmdumn+BmjvLWF9eoWG0l/ur/W8llyjTX4KUJT5skF9fohClDGi+4U1zZPiXbQ0sidyVcxDFqmWo+Re2xI1zG4k8UwXV2IY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CpQwPz4F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55DA0C2BD10;
-	Mon, 20 May 2024 09:57:15 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=CDNiNOqdRPo5nt/KUH8eFqTe1SMEqEZGALLIrrf2iM3jcnlFTzavB2Jp+4Ni+2CbkVezcdIR3Dimhkb2vOE+CpkLDYUiv9GcEP+5tbYeUIOgKrx+7qgwwYF/dXkdkuJHcOSyun6eezkeukBjTgNBEyLGf8JVg8rY6cQydk/42HE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H5ZEWH+F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B07A6C2BD10;
+	Mon, 20 May 2024 09:58:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716199038;
-	bh=HAZNjDgSrlri/l7/2sSm0PgdmiazDso7ZHTn27qp3w4=;
+	s=k20201202; t=1716199132;
+	bh=5DFkN3Tprj5e+wQJ3KzoBJ39w9B9HhjPq1Ww2oCI7XU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CpQwPz4FYqik+KFKwffU3xiNov+7zrvZPhUXsCPbmDagPyqHgtJIfcVpkIUyaoO5c
-	 F+jsEd6YOYLTedikTJ+nMMRs7QfloJUvhT+zAIt4StquwIDPzkEJUbwhFsnA+emUS0
-	 tSTFI43Nk12QsTvb5sLRR+4KD1JIhbT7eWx7Is8GTWJZremSKqRV7BrfGahuH3ixF9
-	 NiC225fxJlYXmcHGeikn2LWQ8egNLApjYLn2sA3JjrNNoO6XAwfQENbO3OI6SiA/fS
-	 pMXf5D/fVzZu1y1vf6MXclePsYLYxKUBD+iRbK/noqI443+Rczw/uMpZ9uAJYa0ndP
-	 J1NCUHdPly6XQ==
-Message-ID: <88c9c7bf-ee32-4fcd-a2ce-12a589fe844f@kernel.org>
-Date: Mon, 20 May 2024 11:57:12 +0200
+	b=H5ZEWH+FyVBQyKjBl17EW/hWdhta5ga3Axflcnb3ea8pRSIpdMydiINrbvIzFf6gV
+	 Pd4X1K9g1PsOCWA4qcS41hmozNfh1MiDuyXd/P5XJvhNRXZocPXftY+FCZHuaqjxTZ
+	 mRRTbi58jwp97SIK63KGgLd0GqGrehcWYllsJi/RdCJGJ8egfuPo72a/yZpu22NENN
+	 lm8XXXCi4bAaSvzOOLalmZQR8t1I1LWeyyc2R4PZu9X6niybtqKJ2YUCIaYccq3cU8
+	 3DBFZKszFnwOE2ABHwnH8J3MVr06OFtzS5A8heeruXRzfwp2exy4KCicw290qp8CRO
+	 YgpcVbMurY+Rg==
+Message-ID: <8947cb3f-39b5-4483-af1d-82d3fa4bb7ad@kernel.org>
+Date: Mon, 20 May 2024 11:58:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,12 +50,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v5] nfc: nci: Fix uninit-value in nci_rx_work
+Subject: Re: [PATCH net v2] nfc: nci: Fix handling of zero-length payload
+ packets in nci_rx_work()
 To: Ryosuke Yasuoka <ryasuoka@redhat.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- syoshida@redhat.com, syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail.com
-References: <20240519094304.518279-1-ryasuoka@redhat.com>
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ syoshida@redhat.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240517020609.476882-1-ryasuoka@redhat.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -101,26 +102,22 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240519094304.518279-1-ryasuoka@redhat.com>
+In-Reply-To: <20240517020609.476882-1-ryasuoka@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 19/05/2024 11:43, Ryosuke Yasuoka wrote:
-> syzbot reported the following uninit-value access issue [1]
-> 
-> nci_rx_work() parses received packet from ndev->rx_q. It should be
-> validated header size, payload size and total packet size before
-> processing the packet. If an invalid packet is detected, it should be
-> silently discarded.
+On 17/05/2024 04:06, Ryosuke Yasuoka wrote:
+> When nci_rx_work() receives a zero-length payload packet, it should not
+> discard the packet and exit the loop. Instead, it should continue
+> processing subsequent packets.
 > 
 > Fixes: d24b03535e5e ("nfc: nci: Fix uninit-value in nci_dev_up and nci_ntf_packet")
-> Reported-and-tested-by: syzbot+d7b4dc6cd50410152534@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=d7b4dc6cd50410152534 [1]
-> Signed-off-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
-> ---
-> v5
+> Reported-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+That's not a valid tag here. Every bug we find - like hundreds of my
+commits - is reported by us...
+
+Drop the tag.
 
 Best regards,
 Krzysztof
