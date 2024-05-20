@@ -1,71 +1,47 @@
-Return-Path: <netdev+bounces-97236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C74D28CA3DC
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 23:43:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3112D8CA3FB
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 23:51:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA3E31C2111D
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 21:43:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFD011F22573
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 21:51:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5C9139CFC;
-	Mon, 20 May 2024 21:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="seD2tPjl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E059D139D19;
+	Mon, 20 May 2024 21:50:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20731369BA;
-	Mon, 20 May 2024 21:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F4C1386AB
+	for <netdev@vger.kernel.org>; Mon, 20 May 2024 21:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716241420; cv=none; b=GpyGbjCqvdQoMSb39e/nSTWgpr9J5jcQI3N3V5b2AwHowpwVMbj4abYd1ErlOy9livOE1NqZPFPQxLn0aIxYZ7cKKfOR7DRpRWM+LyYNaAfGCCuzGchfjP+S0YxY4/X0N9pbsTr8onBIfP8+5UDdnnlMxWWcfXygxw44qA/lva4=
+	t=1716241854; cv=none; b=mV1xsPvwp1FKBsHERDcoZdas9orEJ+aMMXRLAEG+HX2Q04IAXPhmyjWAtEdIT0Wet/LkicY9dUX0ASspuJLGqZ9A/RPvQqwKeJwMC95GC1VS2LTiqsla/PRbOzQ2z+Z6xo8plZdQvnB/XZU/0A06bihAldUiux0Ib5oL/FPoX/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716241420; c=relaxed/simple;
-	bh=7WNiq+m24TdoDjrU3CX4peS8kSGwsRE718xgtAGf3kA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qWDNnsVGHX/ngbpKuE7ipFiqnKOmceqOi6ItxLNSyeHWzVOrttpW0gQrtd++r1F+EZ7UTWwnM29yFOOaXHeno8m5+jsuSHZemQffVhQLVKHkCHq/0Syba8ZXQJyOL9Vt/v+ujRbfzNSMCYyl98CFMIvAmf+uNXtILEp93e1zeeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=seD2tPjl; arc=none smtp.client-ip=178.60.130.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
-	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=nRaPtaGD+w2O2Xn9ZyX0XaVoJoGCp+hsvN0C/YGO87c=; b=seD2tPjl1ZuwN0XVfUGP6eptAZ
-	sFqT3ZVRnQ4KqYU0/klnL16OJ0w3SqdGWyuVocLw0s/PyXaC3lihbPnHFNs/GRN+I1D2GZhP29Nzz
-	2kHJofFAuP3jC+m2TLcP9Tu+ehaq3Dw04E7GbMMeErovazgcOFOZwCyIfTh9LKHjKWLNWS7IIJT9y
-	WNCpjMzEf/93DsWb/lNQpCXSPXxxThgIWgOvi2kFq8i2ISpnqetMY7LWu+FAbJ0m8obXdUD8wEHgj
-	1FAL8ZBXb8vi04I3ClMPdQnmybbmItKk68GvzVudO4TLEE7HUFm8VbPU73PCKtAPVtZXy2LtCtaUx
-	+M4tjvZQ==;
-Received: from 179-125-79-244-dinamico.pombonet.net.br ([179.125.79.244] helo=quatroqueijos.lan)
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1s9Amv-00AOaJ-Mf; Mon, 20 May 2024 23:43:22 +0200
-From: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
-To: netdev@vger.kernel.org
-Cc: Cong Wang <cong.wang@bytedance.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	bpf@vger.kernel.org,
-	kernel-dev@igalia.com,
-	Thadeu Lima de Souza Cascardo <cascardo@igalia.com>,
-	syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com,
-	stable@vger.kernel.org
-Subject: [PATCH net] sock_map: avoid race between sock_map_close and sk_psock_put
-Date: Mon, 20 May 2024 18:41:53 -0300
-Message-Id: <20240520214153.847619-1-cascardo@igalia.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1716241854; c=relaxed/simple;
+	bh=wrVmQG3q0c2EgtNe4UTuowNxoiN2Gi47CrhEmr4FuyM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qn6PGMyxlwoQRSGpExmqZUjE0QD6tO/CGPRBX2pOOm70HURYhH2z4nxzSnnD78Zow5lBCyIgdsD7LI9zauGvezMFPlrzb+Buyy6XWRLFb5TmLqVTdqXWx61cSPL/+wsSSEX7BMKW9FL2kNgwr8t/zysMKdLOr8tajF5us+8BeZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from labnh.int.chopps.org (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id D528A7D06F;
+	Mon, 20 May 2024 21:43:37 +0000 (UTC)
+From: Christian Hopps <chopps@chopps.org>
+To: devel@linux-ipsec.org
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org,
+	Christian Hopps <chopps@chopps.org>,
+	Christian Hopps <chopps@labn.net>
+Subject: [PATCH ipsec-next v1 0/8] Add IP-TFS mode to xfrm
+Date: Mon, 20 May 2024 17:42:38 -0400
+Message-ID: <20240520214255.2590923-1-chopps@chopps.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,106 +50,110 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-sk_psock_get will return NULL if the refcount of psock has gone to 0, which
-will happen when the last call of sk_psock_put is done. However,
-sk_psock_drop may not have finished yet, so the close callback will still
-point to sock_map_close despite psock being NULL.
+From: Christian Hopps <chopps@labn.net>
 
-This can be reproduced with a thread deleting an element from the sock map,
-while the second one creates a socket, adds it to the map and closes it.
+Summary of Changes
+------------------
 
-That will trigger the WARN_ON_ONCE:
+This patchset adds a new xfrm mode implementing on-demand IP-TFS. IP-TFS
+(AggFrag encapsulation) has been standardized in RFC9347.
 
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 7220 at net/core/sock_map.c:1701 sock_map_close+0x2a2/0x2d0 net/core/sock_map.c:1701
-Modules linked in:
-CPU: 1 PID: 7220 Comm: syz-executor380 Not tainted 6.9.0-syzkaller-07726-g3c999d1ae3c7 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-RIP: 0010:sock_map_close+0x2a2/0x2d0 net/core/sock_map.c:1701
-Code: df e8 92 29 88 f8 48 8b 1b 48 89 d8 48 c1 e8 03 42 80 3c 20 00 74 08 48 89 df e8 79 29 88 f8 4c 8b 23 eb 89 e8 4f 15 23 f8 90 <0f> 0b 90 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d e9 13 26 3d 02
-RSP: 0018:ffffc9000441fda8 EFLAGS: 00010293
-RAX: ffffffff89731ae1 RBX: ffffffff94b87540 RCX: ffff888029470000
-RDX: 0000000000000000 RSI: ffffffff8bcab5c0 RDI: ffffffff8c1faba0
-RBP: 0000000000000000 R08: ffffffff92f9b61f R09: 1ffffffff25f36c3
-R10: dffffc0000000000 R11: fffffbfff25f36c4 R12: ffffffff89731840
-R13: ffff88804b587000 R14: ffff88804b587000 R15: ffffffff89731870
-FS:  000055555e080380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 00000000207d4000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- unix_release+0x87/0xc0 net/unix/af_unix.c:1048
- __sock_release net/socket.c:659 [inline]
- sock_close+0xbe/0x240 net/socket.c:1421
- __fput+0x42b/0x8a0 fs/file_table.c:422
- __do_sys_close fs/open.c:1556 [inline]
- __se_sys_close fs/open.c:1541 [inline]
- __x64_sys_close+0x7f/0x110 fs/open.c:1541
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fb37d618070
-Code: 00 00 48 c7 c2 b8 ff ff ff f7 d8 64 89 02 b8 ff ff ff ff eb d4 e8 10 2c 00 00 80 3d 31 f0 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
-RSP: 002b:00007ffcd4a525d8 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007fb37d618070
-RDX: 0000000000000010 RSI: 00000000200001c0 RDI: 0000000000000004
-RBP: 0000000000000000 R08: 0000000100000000 R09: 0000000100000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
+  Link: https://www.rfc-editor.org/rfc/rfc9347.txt
 
-Use sk_psock, which will only check that the pointer is not been set to
-NULL yet, which should only happen after the callbacks are restored. If,
-then, a reference can still be gotten, we may call sk_psock_stop and cancel
-psock->work.
+This feature supports demand driven (i.e., non-constant send rate)
+IP-TFS to take advantage of the AGGFRAG ESP payload encapsulation. This
+payload type supports aggregation and fragmentation of the inner IP
+packet stream which in turn yields higher small-packet bandwidth as well
+as reducing MTU/PMTU issues. Congestion control is unimplementated as
+the send rate is demand driven rather than constant.
 
-After that change, the reproducer does not trigger the WARN_ON_ONCE
-anymore.
+In order to allow loading this fucntionality as a module a set of
+callbacks xfrm_mode_cbs has been added to xfrm as well.
 
-Reported-by: syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=07a2e4a1a57118ef7355
-Fixes: aadb2bb83ff7 ("sock_map: Fix a potential use-after-free in sock_map_close()")
-Fixes: 5b4a79ba65a1 ("bpf, sockmap: Don't let sock_map_{close,destroy,unhash} call itself")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
----
- net/core/sock_map.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+Patchset Changes:
+-----------------
 
-diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-index 9402889840bf..13267e667a4c 100644
---- a/net/core/sock_map.c
-+++ b/net/core/sock_map.c
-@@ -1680,19 +1680,23 @@ void sock_map_close(struct sock *sk, long timeout)
- 
- 	lock_sock(sk);
- 	rcu_read_lock();
--	psock = sk_psock_get(sk);
-+	psock = sk_psock(sk);
- 	if (unlikely(!psock)) {
-+		saved_close = READ_ONCE(sk->sk_prot)->close;
- 		rcu_read_unlock();
- 		release_sock(sk);
--		saved_close = READ_ONCE(sk->sk_prot)->close;
- 	} else {
- 		saved_close = psock->saved_close;
- 		sock_map_remove_links(sk, psock);
-+		psock = sk_psock_get(sk);
- 		rcu_read_unlock();
--		sk_psock_stop(psock);
-+		if (psock)
-+			sk_psock_stop(psock);
- 		release_sock(sk);
--		cancel_delayed_work_sync(&psock->work);
--		sk_psock_put(sk, psock);
-+		if (psock) {
-+			cancel_delayed_work_sync(&psock->work);
-+			sk_psock_put(sk, psock);
-+		}
- 	}
- 
- 	/* Make sure we do not recurse. This is a bug.
--- 
-2.34.1
+  23 files changed, 3252 insertions(+), 19 deletions(-)
+  Documentation/networking/xfrm_sysctl.rst |   30 +
+  include/net/netns/xfrm.h                 |    6 +
+  include/net/xfrm.h                       |   40 +
+  include/uapi/linux/in.h                  |    2 +
+  include/uapi/linux/ip.h                  |   16 +
+  include/uapi/linux/ipsec.h               |    3 +-
+  include/uapi/linux/snmp.h                |    3 +
+  include/uapi/linux/xfrm.h                |    9 +-
+  net/ipv4/esp4.c                          |    3 +-
+  net/ipv6/esp6.c                          |    3 +-
+  net/netfilter/nft_xfrm.c                 |    3 +-
+  net/xfrm/Makefile                        |    1 +
+  net/xfrm/trace_iptfs.h                   |  218 +++
+  net/xfrm/xfrm_compat.c                   |   10 +-
+  net/xfrm/xfrm_device.c                   |    4 +-
+  net/xfrm/xfrm_input.c                    |   14 +-
+  net/xfrm/xfrm_iptfs.c                    | 2741 ++++++++++++++++++++++++++++++
+  net/xfrm/xfrm_output.c                   |    6 +
+  net/xfrm/xfrm_policy.c                   |   26 +-
+  net/xfrm/xfrm_proc.c                     |    3 +
+  net/xfrm/xfrm_state.c                    |   60 +
+  net/xfrm/xfrm_sysctl.c                   |   38 +
+  net/xfrm/xfrm_user.c                     |   32 +
 
+Patchset Structure:
+-------------------
+
+The first 8 commits are changes to the xfrm infrastructure to support
+the callbacks as well as more generic IP-TFS additions that may be used
+outside the actual IP-TFS implementation.
+
+  - iptfs: config: add CONFIG_XFRM_IPTFS
+  - iptfs: uapi: ip: add ip_tfs_*_hdr packet formats
+  - iptfs: uapi: IPPROTO_AGGFRAG AGGFRAG in ESP
+  - iptfs: sysctl: allow configuration of global default values
+  - iptfs: netlink: add config (netlink) options
+  - iptfs: xfrm: Add mode_cbs module functionality
+  - iptfs: xfrm: add generic iptfs defines and functionality
+
+The last 9+1 commits constitute the IP-TFS implementation constructed in
+layers to make review easier. The first 9 commits all apply to a single
+file `net/xfrm/xfrm_iptfs.c`, the last commit adds a new tracepoint
+header file along with the use of these new tracepoint calls.
+
+  - iptfs: impl: add new iptfs xfrm mode impl
+  - iptfs: impl: add user packet (tunnel ingress) handling
+  - iptfs: impl: share page fragments of inner packets
+  - iptfs: impl: add fragmenting of larger than MTU user packets
+  - iptfs: impl: add basic receive packet (tunnel egress) handling
+  - iptfs: impl: handle received fragmented inner packets
+  - iptfs: impl: add reusing received skb for the tunnel egress packet
+  - iptfs: impl: add skb-fragment sharing code
+  - iptfs: impl: handle reordering of received packets
+  - iptfs: impl: add tracepoint functionality
+
+Patchset History:
+-----------------
+
+RFCv1 (11/10/2023)
+
+RFCv1 -> RFCv2 (11/12/2023)
+
+  Updates based on feedback from Simon Horman, Antony,
+  Michael Richardson, and kernel test robot.
+
+RFCv2 -> v1 (2/19/2024)
+
+  Updates based on feedback from Sabrina Dubroca, kernel test robot
+
+v1 -> v2 (5/19/2024)
+
+  Updates based on feedback from Sabrina Dubroca, Simon Horman, Antony.
+
+  o Add handling of new netlink SA direction attribute (Antony).
+  o Split single patch/commit of xfrm_iptfs.c (the actual IP-TFS impl)
+    into 9+1 distinct layered functionality commits for aiding review.
+  - xfrm: fix return check on clone() callback
+  - xfrm: add sa_len() callback in xfrm_mode_cbs for copy to user
+  - iptfs: remove unneeded skb free count variable
+  - iptfs: remove unused variable and "breadcrumb" for future code.
+  - iptfs: use do_div() to avoid "__udivd13 missing" link failure.
+  - iptfs: remove some BUG_ON() assertions questioned in review.
 
