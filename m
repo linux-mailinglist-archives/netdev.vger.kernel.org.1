@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-97206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 508F68C9F00
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 16:49:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C70DB8C9F09
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 16:54:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5F1D1F23489
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 14:49:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55CC41F21FEF
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 14:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D40136669;
-	Mon, 20 May 2024 14:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5335613699A;
+	Mon, 20 May 2024 14:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WTBLkH4K"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="buZ6LNZB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2345353E07
-	for <netdev@vger.kernel.org>; Mon, 20 May 2024 14:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FECA1E878
+	for <netdev@vger.kernel.org>; Mon, 20 May 2024 14:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716216570; cv=none; b=kM1OT+zIi6bvOsLJ2x712Uin7/nYu9n1niAVdLS9TZsuml25M+MF75Nw8tPs9KyPzFUJR3+2yjBVYJM9me3N/jBa4iNHiXzgreClv/csJWLliDXjAYEw4PjpSuX+6PLvP7G89PtU0gBvmWvPoiU93GWC7fVEZTe6/Qt9xLXr4t0=
+	t=1716216838; cv=none; b=hI4DcXgGdrj+f/PbeMSA25OrqW0mCwqQILmkiEHNw6zvt79YBjOP2WW0F1DslzNk/9PV3Pf9czlRkmCt2dk36EQdqwFsnWAImpzJJsep5iGf2BwYRfWHKkqxe7ohT1ENYs+PVOYLvUuvke9rXuAprA6DVBKs/+naeyxQH+IdRc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716216570; c=relaxed/simple;
-	bh=GNBGYaVWprk8mAxBWbFOXfvRk0qekKt53UjIM8rg1L0=;
+	s=arc-20240116; t=1716216838; c=relaxed/simple;
+	bh=oJBRL1jaJxMoxt+4X4Mhn3BGgw1NStuUFa9QtTEw810=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PtRR8XVSGJ9A5nY5BNKn8Psric6HnRpi8ncpsISkvMMQcpH72VMCVgma4WMy6TcIO46HmmUyHddnRmgGkje8Px3agaUDyjztKqmwsdMkjS4qyGpuH6o8g9RK+cWTy8ZPWZks+TJqnINkC5a9p3fb1tO9ph26EtQoSfYVohIsbEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WTBLkH4K; arc=none smtp.client-ip=209.85.208.43
+	 To:Cc:Content-Type; b=a7LV3hPjMfFo5+L1FMojOYfBWBL0kmBrSRGXUI4R3YAVjP5AuydmgVcexyVYs7zNrEQYpOh4UZHlWV7KKtnbha3ni/pBMEn0JUq7po7TxHbd4I4Y51Imb9cTL4hQ5TznpVXUxMwuJEWHVPN1LGHpRHISnUDueHEHcqHJzmNcdD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=buZ6LNZB; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so14090a12.0
-        for <netdev@vger.kernel.org>; Mon, 20 May 2024 07:49:28 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-41ff3a5af40so81715e9.1
+        for <netdev@vger.kernel.org>; Mon, 20 May 2024 07:53:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716216567; x=1716821367; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1716216835; x=1716821635; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DgP4Ze8xegln7lSB6uUkPHSfhiV/X15GfUfzqgKOmLg=;
-        b=WTBLkH4KSoShC7dVonGjJ+bOzc5Rty3vGiDsComBPZ58e28jY3pGZ3D6vp+i3ytxid
-         PZEqKS6dAyxHdORC56QsA/J2HaRRZ0MDEoiLJpPa3nlNSRhVtDn8abo8pJI8Ea0mjRdp
-         Tr69q0RMgLqHaHFbcL01rd+uyTtYHW+A5BFxhERy6DO8Y4qrwQHmKK5zmU4/RjwWyT66
-         iwbWA56pYUjylQX6R0nBWPtc0ZpmY0Ke9/u/JJMmsn1G9b7rTdKPqP/OSSqgpv2WhjhL
-         e8CndGKCGpPv0wxJ2uFL1LHOkZBgCeIxgWHUp1OtM+6MyXs/t/KuebLv0H5EtB/Zby7p
-         kxCQ==
+        bh=FXVtHGAXh4sfliNi2GN3o5Z0Xw9C+JEN0vgpuab7ots=;
+        b=buZ6LNZB6TNy+RtD6wr3Rlc1DK//MDToJnBCAbAZnMi1nRZPnvCmwKjdku928AsB8I
+         q13hOHilw2a4V0SJrT/1yyTTKCEjf6iCWSJaQq6H6kKovr0BLz7wH1wrMfA4tg2Tqrcc
+         XE8JXBG7EAYufx6wj9OJ0Io3c/YqopzxEnKz4AT7DcKIv3GEl1mS4coI7S5rXK2UyboY
+         We9Qj42PDPejixgNvkIg6KkqELiatRy1+OT+DPEPk2OPTuCbHbkn1OiCli+x3EqOtbcQ
+         MHLeu+68OqwOkM1iD6gBfBRTLUMkYtj9fTvlrrS6EgrOKA9ybsehGUXvwlFzctjXcVk/
+         iNRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716216567; x=1716821367;
+        d=1e100.net; s=20230601; t=1716216835; x=1716821635;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DgP4Ze8xegln7lSB6uUkPHSfhiV/X15GfUfzqgKOmLg=;
-        b=E3F3S1jWs2TvvpiaAQp9v19bkE/nyFTBXCFhtgfzkKOHmqeVvryHv3uj26lxtZrCJJ
-         elE19BqaGVk7uQCltWTOTa7Z45nl3fd8mUglYATElR1txiiv82Ezd7I1ly7P4tOLYr/F
-         9O3AvS26/yo+aN4gxJBx0o/vt0Snj4qv3U/cEHLjC8oorFcJUgA+NS9BMvShv5xB5ui2
-         zH1qn5k60VHAICcG6gT+SWD9I1lBRuvnvSzQnYG/Pll5pEy7BQ0usj3zGdzC/YNHdz6X
-         xbwxeukDbbuKGWaGUyVnY8tyTHjLHHpzKj2gjt4Tnj35NclVaWT1ycZHOEW329Az7D6h
-         6DaA==
-X-Gm-Message-State: AOJu0Yw/o+WKXVI3ARqxqbW4bDEfSg7WnHdHVPs2h8PUfWV238mz7mQR
-	a3wfNnd5Xyqo/R+uAPsiFrHufA5i1RLKP4aESlcGvtfGoFLfAXsixY4QIP6ba5GHqcr+wFHcQ9A
-	0v9LJ6xzjTfVv0WWCffTJpWx/TgVeuyGYkt+1
-X-Google-Smtp-Source: AGHT+IEfdiBj1o9x+SzUq3UIntTzpRyzuGJPsZm0juRau1nwwElMBue2oFzyspuvdIfWLN0Tec8C8LfZlVE+rIjK1Ro=
-X-Received: by 2002:aa7:d39a:0:b0:572:a33d:437f with SMTP id
- 4fb4d7f45d1cf-5752a70fc1cmr278391a12.2.1716216567008; Mon, 20 May 2024
- 07:49:27 -0700 (PDT)
+        bh=FXVtHGAXh4sfliNi2GN3o5Z0Xw9C+JEN0vgpuab7ots=;
+        b=I3JTBRAAKWzhuN4TRYV4psco/G2KAgP3oXWUZGAsXO864jKqO6cog5oc8pUlNCIgpQ
+         6dJtVxkOzz+P2Pj3JDgXhNtrHXCEhZp/wXl2L73TZMun8eHafd9iCWjKC45D0MgIHemk
+         w0L6pHQJS2wZVNz+WRqtbpQLop7UuKb9/wWxFRo/peO7KqE0LChPJIR/5RhaOspNAIVd
+         xBfpNlAJ+/It+ayhE/D3Xz3ghtBOdkULGC57+gYB8JAfklTGqCTfEqd7F5LtPhh40pnu
+         WQdsNlH16FMbFVjobv0qOesORvzhFtZGI4XmRPWc45x0H75zvIIux/SlOqkqqRv91Is2
+         9ZlQ==
+X-Gm-Message-State: AOJu0YwXYi67n3+JWwfd0t3VIQLUg9LpUDE3Je2M/QIt+DDoZal9gp2K
+	7LnmQdb/ntqbAEh7FwuyfO2OJbBE4drail6Xz42HASEvsIa3y23Qve6s+1bOlPRK72h1IH6qSv2
+	iTLA7hciPcWENX6h/YaPIyhG8/YV8MmRIf5UsIr+SQUoRgHb1+rbO
+X-Google-Smtp-Source: AGHT+IEh5lZe4YbrbTPUlG0NvhC+1yVDZOGOt0yQcoJB+VW1VX773OX47RaO4v4i4q7V8cSrjOYgvBB9hRiP+h6WoqU=
+X-Received: by 2002:a05:600c:34c5:b0:41b:e55c:8dca with SMTP id
+ 5b1f17b1804b1-420e1f76868mr3215065e9.7.1716216834397; Mon, 20 May 2024
+ 07:53:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,8 +75,8 @@ References: <8db98a8fbf2ac673b355651852093579a913f3f1.1716199422.git.pabeni@redh
  <CANn89iLM7xjUOJeA1mt2Ng2j6K2_9OLrc0014PM0U+TOKcvt0Q@mail.gmail.com> <48cf7e9764eef299c55a9f9af03ab5d9dbe8c658.camel@redhat.com>
 In-Reply-To: <48cf7e9764eef299c55a9f9af03ab5d9dbe8c658.camel@redhat.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 20 May 2024 16:49:12 +0200
-Message-ID: <CANn89i+gGYpCojJ8=zzZfpwTWhPF6T+rWqstu1D1rGLjoaa-xQ@mail.gmail.com>
+Date: Mon, 20 May 2024 16:53:43 +0200
+Message-ID: <CANn89i+1Ozg7zztkFug8LuyTEPnX2R3GCrQX=H8cuzPdfW-x6A@mail.gmail.com>
 Subject: Re: [PATCH net] tcp: ensure sk_showdown is 0 for listening sockets
 To: Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
@@ -222,12 +222,12 @@ sten()...
 >                    TCPF_CLOSING | TCPF_CLOSE_WAIT |
 >                    TCPF_CLOSE)));
 >
-> I guess.
->
-> Thanks!
->
-> Paolo
->
->
->
+
+Please send a v2.
+
+I am not sure why we need a WARN_ON() to begin with, the socket is
+still private.
+
+Even the lock_sock(sk2)/release_sock(sk2) pair in inet_accept() seems overk=
+ill.
 
