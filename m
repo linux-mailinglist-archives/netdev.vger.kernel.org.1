@@ -1,91 +1,96 @@
-Return-Path: <netdev+bounces-97170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D51D8C9B00
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 12:08:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F2AF8C9B01
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 12:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B84FB212DE
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 10:08:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 878491C20AFF
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 10:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E5A4D58A;
-	Mon, 20 May 2024 10:08:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2594D595;
+	Mon, 20 May 2024 10:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="gKIC9PEk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e/Zy/CPt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532F44C624
-	for <netdev@vger.kernel.org>; Mon, 20 May 2024 10:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B2D4C624;
+	Mon, 20 May 2024 10:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716199722; cv=none; b=mCHKAfHKgdplP11RjbRWlruc2sAhjS/s1sbCbbXJeWtDBV9Ow14jbDnBBSdTb5vCJUX2BypoXCqXjW4APo0/nD3wZXQRZ9vadZRE6Rx6QT1Y0NOYBHzVS9UHI+JCZXtS9LRNJIchjGs7tbEY+eltZdSybocuN9Sfdi8PA2s93Bc=
+	t=1716199829; cv=none; b=au48su5c+vLF6neFqVMxgKRi3KVHtGYhadhbaWyYrLPC7rk7hc+uWIoLnssgji6PfleTXWWUgZAqslneiZAqhsUpytr/6C1lKr/5Cgeilhp13EK5rTCtSgZM3jUyhYp99kaeMFtMvP6bFAvbXCmBbbu4BdyC3aiT4nUsWkajGkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716199722; c=relaxed/simple;
-	bh=YH+dlNTqQYr3J4wDFVlPpuyE21hsTOLsCLCyKuzkWr4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IZApJf74soPTFPjSjwbC4aHLOvqiTEHOwrKbJhS1VV+DkfRu6AJGUE8kFl570TpYBbsAY+hL0E1oKvE7iACTaL2h/swphIg8snmN9IqRygW4Xsw/Gfr1Q9qfnJtEL7gDvoG1J39qL/9R0WBljNa0Y+YyP04jEwGkbj8ZBTcHnMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=gKIC9PEk; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-572a93890d1so7870210a12.3
-        for <netdev@vger.kernel.org>; Mon, 20 May 2024 03:08:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1716199717; x=1716804517; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YH+dlNTqQYr3J4wDFVlPpuyE21hsTOLsCLCyKuzkWr4=;
-        b=gKIC9PEkSbD5k6qEeAUBmTKapbMGaM8F9bBz2p4zh+TKxz1iZJOiEBPgZVgA57Qk6q
-         yPaHBCL9Wd+05bFqiT5+tIG/5S6KLoTip8IXPK3GU8rvwveMuuETgLl4MZnM2/eJoWxu
-         EwjkrpPHXEPYi2c9u5c8r2qUeubJ0oNGd+bDd6RBHURzJMTrhLiSie3i9HvjLATJdXuN
-         COB+NQ5v7jqHqEUiXkwnIpACKYC78Z+gXRBYWXIDf38oUELjAt+1a+eGyWAmXLSNuzsZ
-         37tN1SwOlm9otKslhP25kFupRMxqSOPCSCD53VbP6qwoUjxsmJEORye+9ToLHhE6yaom
-         pEFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716199717; x=1716804517;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YH+dlNTqQYr3J4wDFVlPpuyE21hsTOLsCLCyKuzkWr4=;
-        b=snfQxoCWVH2t8wTDgOd6Ybi1E6iWaoiSIErUY/R4PHlSd1EY6TEzgHH55cxw1/PFob
-         P7l0a3RtENCihAQF/T5BZYuLfMjFnd8zNUGOkJu2PFRA2pp61MTA0tWWNcEbzXeNmhB+
-         87NxW7yR8IhVMlWejf1jde7WfeKilCxnIFh6PW3qbatat+sP+uhjiW9q/vA5gvwlhOLJ
-         ZsOp+/PseMncUQd8+oYkzArw0zADzBOZO+jthwe5uhNZaOncj3nyYCroqVpqUlkCTCSO
-         oxdqYbTaahKhdbOxiP8ptk+OmlBCP0e0SrobWFqB4pUlxB3trI5OWibNLYYJOmp0g3Zf
-         km3w==
-X-Gm-Message-State: AOJu0Yz5+fchOHrAb617W8jIqzJhy44opPIz6uB4XTtyG8Yho71gfQpa
-	phnlvBGB7Xt1zCrKwWXlqNHKwe6N2L9o5peDwqnLVtpeLKn7SI6xVTWyEfu3n/4=
-X-Google-Smtp-Source: AGHT+IFlElcrNnu2NkgaONWm5xMrcbsN0oXL0JLXpQsiYVN1MTheKcbL70Ar0XpSbekbs6ypVFBaRg==
-X-Received: by 2002:a50:aa94:0:b0:56b:cecb:a4c8 with SMTP id 4fb4d7f45d1cf-5734d70603cmr30261278a12.39.1716199717224;
-        Mon, 20 May 2024 03:08:37 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57509d459desm5095355a12.61.2024.05.20.03.08.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 May 2024 03:08:36 -0700 (PDT)
-Date: Mon, 20 May 2024 12:08:32 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Ismael Luceno <ismael@iodev.co.uk>
-Cc: netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>
-Subject: Re: [iproute2 PATCH] Fix usage of poll.h header
-Message-ID: <ZkshIGzdbLTR5dJq@nanopsycho.orion>
-References: <20240518223946.22032-1-ismael@iodev.co.uk>
+	s=arc-20240116; t=1716199829; c=relaxed/simple;
+	bh=TNK9Jar8YJmnNeoHJ9Ha26Z++4zG5iduTJAAtSVf+IM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RJXGoj1xMKCR8z+ozKWpmVDR8eTT2EdertxJN2xgFAWcXdThIIhW9hVOxDn0MNEzvE7++45ft+X/tkImbrZF+wmRSRxRZkkFGSX0eNaObVWJILEEK51Rh9tjIk8KcSOjkPZe8QchnHY6299YrjB2e0ttBbhSH5sheKV/9Vz5oG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e/Zy/CPt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6916CC32786;
+	Mon, 20 May 2024 10:10:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716199828;
+	bh=TNK9Jar8YJmnNeoHJ9Ha26Z++4zG5iduTJAAtSVf+IM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=e/Zy/CPtqaqE2CvEKLArDsFHeqGbt6RDBhgQKr7MGY0XDmMxNKzdhSL9jiFvBW++h
+	 M6Jnko0fA06Kn/k47Ce5VSXOX1bQxQANwRXvKYk7bUm9lz63Iu6UZ5sah6pWXHuTS8
+	 m27CiHRS9BJBfbrMbgAAcnZu9z8qwh78SSDsNuGbzRvvlcBWnkWCgkJuspRmN14H6w
+	 /1jo3V5cblLk1fucf6YvDCr3kz5+D4Os+8KfyHQxQ/IFlsc7Nv8UGpum8Oo6md9rCw
+	 Xec/N+9O8giYux0ajVlQJbY5K1yO8N2+ItkPqYmzbH5nYs0cW9aPr/sPJH7P3wm4Pd
+	 G2E39XaoI+w4g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5007CC54BD4;
+	Mon, 20 May 2024 10:10:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240518223946.22032-1-ismael@iodev.co.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: Always descend into dsa/ folder with
+ CONFIG_NET_DSA enabled
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171619982832.25234.9983760519411876794.git-patchwork-notify@kernel.org>
+Date: Mon, 20 May 2024 10:10:28 +0000
+References: <20240516165631.1929731-1-florian.fainelli@broadcom.com>
+In-Reply-To: <20240516165631.1929731-1-florian.fainelli@broadcom.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, stephenlangstaff1@gmail.com,
+ aleksander.lobakin@intel.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com, f.fainelli@gmail.com,
+ alobakin@pm.me, linux-kernel@vger.kernel.org
 
-Sun, May 19, 2024 at 12:39:44AM CEST, ismael@iodev.co.uk wrote:
->Change the legacy <sys/poll.h> to <poll.h> (POSIX.1-2001).
->
->Signed-off-by: Ismael Luceno <ismael@iodev.co.uk>
+Hello:
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 16 May 2024 09:56:30 -0700 you wrote:
+> Stephen reported that he was unable to get the dsa_loop driver to get
+> probed, and the reason ended up being because he had CONFIG_FIXED_PHY=y
+> in his kernel configuration. As Masahiro explained it:
+> 
+>   "obj-m += dsa/" means everything under dsa/ must be modular.
+> 
+>   If there is a built-in object under dsa/ with CONFIG_NET_DSA=m,
+>   you cannot do  "obj-$(CONFIG_NET_DSA) += dsa/".
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] net: Always descend into dsa/ folder with CONFIG_NET_DSA enabled
+    https://git.kernel.org/netdev/net/c/b1fa60ec252f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
