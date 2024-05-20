@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-97249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE7068CA3EB
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 23:44:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 896278CA3E9
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 23:44:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DC811C216BB
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 21:44:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD1841C216C3
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 21:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E37813AA3C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0811C13A89B;
 	Mon, 20 May 2024 21:43:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E16A13A3E9
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E1C13A25E
 	for <netdev@vger.kernel.org>; Mon, 20 May 2024 21:43:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716241429; cv=none; b=SRJn6WuEdsgCIqiu8FznXB3KaGArVEPVphQXBXQvKQK4QaPH51UiViLLLeFJEQedTvi0u+5RGVZBX5a9Yd9KmtUDqriez3PRSDE/b4hum3NSFqERhgjJ4ntUxa2KCfpvAxGMIOHON75PePZ735pm6hVYC2q3IzjA0YG4POTu7oo=
+	t=1716241428; cv=none; b=eYMx0nPybyw6TKq9baORTGO+0UzySjZZ14cr5Dml7YXwkDaxxtrIay0GlxYqSalUlVRlrSsGvhfwwIGYFK+xIqw06ZHAfT3oGO7ugcspFB5RUVH95oYmVBCtysMpDKLroYx0cSaneJbeAV67VTmBLA0WM+5j2fSP9hO5ejIOLZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716241429; c=relaxed/simple;
-	bh=CiZuOkydTQeb5bv6kvytlKYYAnXDEQUbdRFcNd+cJ3A=;
+	s=arc-20240116; t=1716241428; c=relaxed/simple;
+	bh=e2BrnnXebgb5I7Dwxn4f4WkF9sgL5DLzSphkprMrGog=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EHKR/NMMwif5ns5XFJGGnnnnS2nbq6Igzk6AyH6aLGlWA5ZOcLGkQC49kGmHGFxosrCgrkJL/SRbdSoM0G/Yp7lyHd/oDfUmhyqhHmm0NMfpBDDh7Ytc+INodBgsIkoKakFB686ifa6ItuCw63d0JNzNzOOryFh5Ejs2y2WGPR4=
+	 MIME-Version; b=MqxNin0fk41BNqf9qre5i891Rnm2cgSAOWAlVvSNa3rPOnfvRaflZAQveXXAXROjBhLo2e8PYpblw1aApwMAOFgkaGms3INX1nX8FIla1xs4kawYpsGWIf/vbfcPA8EUVBJAkcVPddMcTTKCehHGScj6tSIaQYZHACyz81KaF6A=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
@@ -31,7 +31,7 @@ Received: from labnh.int.chopps.org (syn-172-222-091-149.res.spectrum.com [172.2
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 464317D136;
+	by smtp.chopps.org (Postfix) with ESMTPSA id A343C7D137;
 	Mon, 20 May 2024 21:43:44 +0000 (UTC)
 From: Christian Hopps <chopps@chopps.org>
 To: devel@linux-ipsec.org
@@ -39,9 +39,9 @@ Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	netdev@vger.kernel.org,
 	Christian Hopps <chopps@chopps.org>,
 	Christian Hopps <chopps@labn.net>
-Subject: [PATCH ipsec-next v2 16/17] xfrm: iptfs: handle reordering of received packets
-Date: Mon, 20 May 2024 17:42:54 -0400
-Message-ID: <20240520214255.2590923-17-chopps@chopps.org>
+Subject: [PATCH ipsec-next v2 17/17] xfrm: iptfs: add tracepoint functionality
+Date: Mon, 20 May 2024 17:42:55 -0400
+Message-ID: <20240520214255.2590923-18-chopps@chopps.org>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240520214255.2590923-1-chopps@chopps.org>
 References: <20240520214255.2590923-1-chopps@chopps.org>
@@ -55,620 +55,408 @@ Content-Transfer-Encoding: 8bit
 
 From: Christian Hopps <chopps@labn.net>
 
-Handle the receipt of the outer tunnel packets out-of-order. Pointers to
-the out-of-order packets are saved in a window (array) awaiting needed
-prior packets. When the required prior packets are received the now
-in-order packets are then passed on to the regular packet receive code.
-A timer is used to consider missing earlier packet as lost so the
-algorithm will advance.
+Add tracepoints to the IP-TFS code.
 
 Signed-off-by: Christian Hopps <chopps@labn.net>
 ---
- net/xfrm/xfrm_iptfs.c | 487 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 475 insertions(+), 12 deletions(-)
+ net/xfrm/trace_iptfs.h | 218 +++++++++++++++++++++++++++++++++++++++++
+ net/xfrm/xfrm_iptfs.c  |  60 ++++++++++++
+ 2 files changed, 278 insertions(+)
+ create mode 100644 net/xfrm/trace_iptfs.h
 
+diff --git a/net/xfrm/trace_iptfs.h b/net/xfrm/trace_iptfs.h
+new file mode 100644
+index 000000000000..0425f051572f
+--- /dev/null
++++ b/net/xfrm/trace_iptfs.h
+@@ -0,0 +1,218 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* xfrm_trace_iptfs.h
++ *
++ * August 12 2023, Christian Hopps <chopps@labn.net>
++ *
++ * Copyright (c) 2023, LabN Consulting, L.L.C.
++ */
++
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM iptfs
++
++#if !defined(_TRACE_IPTFS_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACE_IPTFS_H
++
++#include <linux/kernel.h>
++#include <linux/skbuff.h>
++#include <linux/tracepoint.h>
++#include <net/ip.h>
++
++struct xfrm_iptfs_data;
++
++TRACE_EVENT(iptfs_egress_recv,
++	    TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u16 blkoff),
++	    TP_ARGS(skb, xtfs, blkoff),
++	    TP_STRUCT__entry(__field(struct sk_buff *, skb)
++			     __field(void *, head)
++			     __field(void *, head_pg_addr)
++			     __field(void *, pg0addr)
++			     __field(u32, skb_len)
++			     __field(u32, data_len)
++			     __field(u32, headroom)
++			     __field(u32, tailroom)
++			     __field(u32, tail)
++			     __field(u32, end)
++			     __field(u32, pg0off)
++			     __field(u8, head_frag)
++			     __field(u8, frag_list)
++			     __field(u8, nr_frags)
++			     __field(u16, blkoff)),
++	    TP_fast_assign(__entry->skb = skb;
++			   __entry->head = skb->head;
++			   __entry->skb_len = skb->len;
++			   __entry->data_len = skb->data_len;
++			   __entry->headroom = skb_headroom(skb);
++			   __entry->tailroom = skb_tailroom(skb);
++			   __entry->tail = skb->tail;
++			   __entry->end = skb->end;
++			   __entry->head_frag = skb->head_frag;
++			   __entry->frag_list = (bool)skb_shinfo(skb)->frag_list;
++			   __entry->nr_frags = skb_shinfo(skb)->nr_frags;
++			   __entry->blkoff = blkoff;
++			   __entry->head_pg_addr = page_address(virt_to_head_page(skb->head));
++			   __entry->pg0addr = (__entry->nr_frags
++					       ? page_address(netmem_to_page(skb_shinfo(skb)->frags[0].netmem))
++					       : NULL);
++			   __entry->pg0off = (__entry->nr_frags
++					      ? skb_shinfo(skb)->frags[0].offset
++					      : 0);
++		    ),
++	    TP_printk("EGRESS: skb=%p len=%u data_len=%u headroom=%u head_frag=%u frag_list=%u nr_frags=%u blkoff=%u\n\t\ttailroom=%u tail=%u end=%u head=%p hdpgaddr=%p pg0->addr=%p pg0->data=%p pg0->off=%u",
++		      __entry->skb, __entry->skb_len, __entry->data_len, __entry->headroom,
++		      __entry->head_frag, __entry->frag_list, __entry->nr_frags, __entry->blkoff,
++		      __entry->tailroom, __entry->tail, __entry->end, __entry->head,
++		      __entry->head_pg_addr, __entry->pg0addr, __entry->pg0addr + __entry->pg0off,
++		      __entry->pg0off)
++	)
++
++DECLARE_EVENT_CLASS(iptfs_ingress_preq_event,
++		    TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs,
++			     u32 pmtu, u8 was_gso),
++		    TP_ARGS(skb, xtfs, pmtu, was_gso),
++		    TP_STRUCT__entry(__field(struct sk_buff *, skb)
++				     __field(u32, skb_len)
++				     __field(u32, data_len)
++				     __field(u32, pmtu)
++				     __field(u32, queue_size)
++				     __field(u32, proto_seq)
++				     __field(u8, proto)
++				     __field(u8, was_gso)
++			    ),
++		    TP_fast_assign(__entry->skb = skb;
++				   __entry->skb_len = skb->len;
++				   __entry->data_len = skb->data_len;
++				   __entry->queue_size =
++					xtfs->cfg.max_queue_size - xtfs->queue_size;
++				   __entry->proto = __trace_ip_proto(ip_hdr(skb));
++				   __entry->proto_seq = __trace_ip_proto_seq(ip_hdr(skb));
++				   __entry->pmtu = pmtu;
++				   __entry->was_gso = was_gso;
++			    ),
++		    TP_printk("INGRPREQ: skb=%p len=%u data_len=%u qsize=%u proto=%u proto_seq=%u pmtu=%u was_gso=%u",
++			      __entry->skb, __entry->skb_len, __entry->data_len,
++			      __entry->queue_size, __entry->proto, __entry->proto_seq,
++			      __entry->pmtu, __entry->was_gso));
++
++DEFINE_EVENT(iptfs_ingress_preq_event, iptfs_enqueue,
++	     TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u32 pmtu, u8 was_gso),
++	     TP_ARGS(skb, xtfs, pmtu, was_gso));
++
++DEFINE_EVENT(iptfs_ingress_preq_event, iptfs_no_queue_space,
++	     TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u32 pmtu, u8 was_gso),
++	     TP_ARGS(skb, xtfs, pmtu, was_gso));
++
++DEFINE_EVENT(iptfs_ingress_preq_event, iptfs_too_big,
++	     TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u32 pmtu, u8 was_gso),
++	     TP_ARGS(skb, xtfs, pmtu, was_gso));
++
++DECLARE_EVENT_CLASS(iptfs_ingress_postq_event,
++		    TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff, struct iphdr *iph),
++		    TP_ARGS(skb, mtu, blkoff, iph),
++		    TP_STRUCT__entry(__field(struct sk_buff *, skb)
++				     __field(u32, skb_len)
++				     __field(u32, data_len)
++				     __field(u32, mtu)
++				     __field(u32, proto_seq)
++				     __field(u16, blkoff)
++				     __field(u8, proto)),
++		    TP_fast_assign(__entry->skb = skb;
++				   __entry->skb_len = skb->len;
++				   __entry->data_len = skb->data_len;
++				   __entry->mtu = mtu;
++				   __entry->blkoff = blkoff;
++				   __entry->proto = iph ? __trace_ip_proto(iph) : 0;
++				   __entry->proto_seq = iph ? __trace_ip_proto_seq(iph) : 0;
++			    ),
++		    TP_printk("INGRPSTQ: skb=%p len=%u data_len=%u mtu=%u blkoff=%u proto=%u proto_seq=%u",
++			      __entry->skb, __entry->skb_len, __entry->data_len, __entry->mtu,
++			      __entry->blkoff, __entry->proto, __entry->proto_seq));
++
++DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_dequeue,
++	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
++		      struct iphdr *iph),
++	     TP_ARGS(skb, mtu, blkoff, iph));
++
++DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_fragmenting,
++	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
++		      struct iphdr *iph),
++	     TP_ARGS(skb, mtu, blkoff, iph));
++
++DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_final_fragment,
++	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
++		      struct iphdr *iph),
++	     TP_ARGS(skb, mtu, blkoff, iph));
++
++DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_toobig,
++	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
++		      struct iphdr *iph),
++	     TP_ARGS(skb, mtu, blkoff, iph));
++
++TRACE_EVENT(iptfs_ingress_nth_peek,
++	    TP_PROTO(struct sk_buff *skb, u32 remaining),
++	    TP_ARGS(skb, remaining),
++	    TP_STRUCT__entry(__field(struct sk_buff *, skb)
++			     __field(u32, skb_len)
++			     __field(u32, remaining)),
++	    TP_fast_assign(__entry->skb = skb;
++			   __entry->skb_len = skb->len;
++			   __entry->remaining = remaining;
++		    ),
++	    TP_printk("INGRPSTQ: NTHPEEK: skb=%p len=%u remaining=%u",
++		      __entry->skb, __entry->skb_len, __entry->remaining));
++
++TRACE_EVENT(iptfs_ingress_nth_add, TP_PROTO(struct sk_buff *skb, u8 share_ok),
++	    TP_ARGS(skb, share_ok),
++	    TP_STRUCT__entry(__field(struct sk_buff *, skb)
++			     __field(u32, skb_len)
++			     __field(u32, data_len)
++			     __field(u8, share_ok)
++			     __field(u8, head_frag)
++			     __field(u8, pp_recycle)
++			     __field(u8, cloned)
++			     __field(u8, shared)
++			     __field(u8, nr_frags)
++			     __field(u8, frag_list)
++		    ),
++	    TP_fast_assign(__entry->skb = skb;
++			   __entry->skb_len = skb->len;
++			   __entry->data_len = skb->data_len;
++			   __entry->share_ok = share_ok;
++			   __entry->head_frag = skb->head_frag;
++			   __entry->pp_recycle = skb->pp_recycle;
++			   __entry->cloned = skb_cloned(skb);
++			   __entry->shared = skb_shared(skb);
++			   __entry->nr_frags = skb_shinfo(skb)->nr_frags;
++			   __entry->frag_list = (bool)skb_shinfo(skb)->frag_list;
++		    ),
++	    TP_printk("INGRPSTQ: NTHADD: skb=%p len=%u data_len=%u share_ok=%u head_frag=%u pp_recycle=%u cloned=%u shared=%u nr_frags=%u frag_list=%u",
++		      __entry->skb, __entry->skb_len, __entry->data_len, __entry->share_ok,
++		      __entry->head_frag, __entry->pp_recycle, __entry->cloned, __entry->shared,
++		      __entry->nr_frags, __entry->frag_list));
++
++DECLARE_EVENT_CLASS(iptfs_timer_event,
++		    TP_PROTO(struct xfrm_iptfs_data *xtfs, u64 time_val),
++		    TP_ARGS(xtfs, time_val),
++		    TP_STRUCT__entry(__field(u64, time_val)
++				     __field(u64, set_time)),
++		    TP_fast_assign(__entry->time_val = time_val;
++				   __entry->set_time = xtfs->iptfs_settime;
++			    ),
++		    TP_printk("TIMER: set_time=%llu time_val=%llu",
++			      __entry->set_time, __entry->time_val));
++
++DEFINE_EVENT(iptfs_timer_event, iptfs_timer_start,
++	     TP_PROTO(struct xfrm_iptfs_data *xtfs, u64 time_val),
++	     TP_ARGS(xtfs, time_val));
++
++DEFINE_EVENT(iptfs_timer_event, iptfs_timer_expire,
++	     TP_PROTO(struct xfrm_iptfs_data *xtfs, u64 time_val),
++	     TP_ARGS(xtfs, time_val));
++
++#endif /* _TRACE_IPTFS_H */
++
++/* This part must be outside protection */
++#undef TRACE_INCLUDE_PATH
++#define TRACE_INCLUDE_PATH ../../net/xfrm
++#undef TRACE_INCLUDE_FILE
++#define TRACE_INCLUDE_FILE trace_iptfs
++#include <trace/define_trace.h>
 diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-index f8b7cf6f4b01..12b59411fbf0 100644
+index 12b59411fbf0..1173d5f9f3fd 100644
 --- a/net/xfrm/xfrm_iptfs.c
 +++ b/net/xfrm/xfrm_iptfs.c
-@@ -38,8 +38,14 @@
+@@ -18,6 +18,7 @@
+ #include <crypto/aead.h>
  
- #define IPTFS_HRTIMER_MODE HRTIMER_MODE_REL_SOFT
+ #include "xfrm_inout.h"
++#include "trace_iptfs.h"
  
-+struct skb_wseq {
-+	struct sk_buff *skb;
-+	u64 drop_time;
-+};
+ /* IPTFS encap (header) values. */
+ #define IPTFS_SUBTYPE_BASIC 0
+@@ -87,6 +88,39 @@ static enum hrtimer_restart iptfs_drop_timer(struct hrtimer *me);
+ /* Utility Functions */
+ /* ================= */
+ 
++static u32 __trace_ip_proto(struct iphdr *iph)
++{
++	if (iph->version == 4)
++		return iph->protocol;
++	return ((struct ipv6hdr *)iph)->nexthdr;
++}
 +
- struct xfrm_iptfs_config {
- 	bool dont_frag : 1;
-+	u16 reorder_win_size;
- 	u32 pkt_size;	    /* outer_packet_size or 0 */
- 	u32 max_queue_size; /* octets */
- };
-@@ -57,12 +63,16 @@ struct xfrm_iptfs_data {
- 	time64_t iptfs_settime;	    /* time timer was set */
- 	u32 payload_mtu;	    /* max payload size */
- 
--	/* Tunnel egress */
-+	/* Tunnel input reordering */
-+	bool w_seq_set;		  /* true after first seq received */
-+	u64 w_wantseq;		  /* expected next sequence */
-+	struct skb_wseq *w_saved; /* the saved buf array */
-+	u32 w_savedlen;		  /* the saved len (not size) */
- 	spinlock_t drop_lock;
- 	struct hrtimer drop_timer;
- 	u64 drop_time_ns;
- 
--	/* Tunnel egress reassembly */
-+	/* Tunnel input reassembly */
- 	struct sk_buff *ra_newskb; /* new pkt being reassembled */
- 	u64 ra_wantseq;		   /* expected next sequence */
- 	u8 ra_runt[6];		   /* last pkt bytes from last skb */
-@@ -834,13 +844,13 @@ static u32 iptfs_reassem_cont(struct xfrm_iptfs_data *xtfs, u64 seq,
++static u32 __trace_ip_proto_seq(struct iphdr *iph)
++{
++	void *nexthdr;
++	u32 protocol = 0;
++
++	if (iph->version == 4) {
++		nexthdr = (void *)(iph + 1);
++		protocol = iph->protocol;
++	} else if (iph->version == 6) {
++		nexthdr = (void *)(((struct ipv6hdr *)(iph)) + 1);
++		protocol = ((struct ipv6hdr *)(iph))->nexthdr;
++	}
++	switch (protocol) {
++	case IPPROTO_ICMP:
++		return ntohs(((struct icmphdr *)nexthdr)->un.echo.sequence);
++	case IPPROTO_ICMPV6:
++		return ntohs(((struct icmp6hdr *)nexthdr)->icmp6_sequence);
++	case IPPROTO_TCP:
++		return ntohl(((struct tcphdr *)nexthdr)->seq);
++	case IPPROTO_UDP:
++		return ntohs(((struct udphdr *)nexthdr)->source);
++	default:
++		return 0;
++	}
++}
++
+ static u64 __esp_seq(struct sk_buff *skb)
+ {
+ 	u64 seq = ntohl(XFRM_SKB_CB(skb)->seq.input.low);
+@@ -402,6 +436,13 @@ static int skb_copy_bits_seq(struct skb_seq_state *st, int offset, void *to,
+ 	}
  }
  
- /**
-- * iptfs_input() - handle receipt of iptfs payload
-+ * iptfs_input_ordered() - handle next in order IPTFS payload.
-  * @x: xfrm state
-- * @skb: the packet
-+ * @skb: current packet
-  *
-  * Process the IPTFS payload in `skb` and consume it afterwards.
-  */
--static int iptfs_input(struct xfrm_state *x, struct sk_buff *skb)
-+static int iptfs_input_ordered(struct xfrm_state *x, struct sk_buff *skb)
- {
- 	u8 hbytes[sizeof(struct ipv6hdr)];
- 	struct ip_iptfs_cc_hdr iptcch;
-@@ -1163,11 +1173,375 @@ static int iptfs_input(struct xfrm_state *x, struct sk_buff *skb)
- 		kfree_skb(skb);
++/* ================================== */
++/* IPTFS Trace Event Definitions      */
++/* ================================== */
++
++#define CREATE_TRACE_POINTS
++#include "trace_iptfs.h"
++
+ /* ================================== */
+ /* IPTFS Receiving (egress) Functions */
+ /* ================================== */
+@@ -891,6 +932,8 @@ static int iptfs_input_ordered(struct xfrm_state *x, struct sk_buff *skb)
+ 	}
+ 	data = sizeof(*ipth);
+ 
++	trace_iptfs_egress_recv(skb, xtfs, be16_to_cpu(ipth->block_offset));
++
+ 	/* Set data past the basic header */
+ 	if (ipth->subtype == IPTFS_SUBTYPE_CC) {
+ 		/* Copy the rest of the CC header */
+@@ -1791,6 +1834,7 @@ static int iptfs_output_collect(struct net *net, struct sock *sk,
+ 		 */
+ 		if (!ok) {
+ nospace:
++			trace_iptfs_no_queue_space(skb, xtfs, pmtu, was_gso);
+ 			XFRM_INC_STATS(dev_net(skb->dev),
+ 				       LINUX_MIB_XFRMOUTNOQSPACE);
+ 			kfree_skb_reason(skb, SKB_DROP_REASON_FULL_RING);
+@@ -1801,6 +1845,7 @@ static int iptfs_output_collect(struct net *net, struct sock *sk,
+ 		 * enqueue.
+ 		 */
+ 		if (xtfs->cfg.dont_frag && iptfs_is_too_big(sk, skb, pmtu)) {
++			trace_iptfs_too_big(skb, xtfs, pmtu, was_gso);
+ 			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
+ 			continue;
+ 		}
+@@ -1809,6 +1854,8 @@ static int iptfs_output_collect(struct net *net, struct sock *sk,
+ 		ok = iptfs_enqueue(xtfs, skb);
+ 		if (!ok)
+ 			goto nospace;
++
++		trace_iptfs_enqueue(skb, xtfs, pmtu, was_gso);
  	}
  
--	/* We always have dealt with the input SKB, either we are re-using it,
--	 * or we have freed it. Return EINPROGRESS so that xfrm_input stops
--	 * processing it.
-+	return 0;
-+}
+ 	/* Start a delay timer if we don't have one yet */
+@@ -1816,6 +1863,7 @@ static int iptfs_output_collect(struct net *net, struct sock *sk,
+ 		hrtimer_start(&xtfs->iptfs_timer, xtfs->init_delay_ns,
+ 			      IPTFS_HRTIMER_MODE);
+ 		xtfs->iptfs_settime = ktime_get_raw_fast_ns();
++		trace_iptfs_timer_start(xtfs, xtfs->init_delay_ns);
+ 	}
+ 
+ 	spin_unlock_bh(&x->lock);
+@@ -1913,6 +1961,7 @@ static int iptfs_copy_create_frags(struct sk_buff **skbp,
+ 	to_copy = skb->len - offset;
+ 	while (to_copy) {
+ 		/* Send all but last fragment to allow agg. append */
++		trace_iptfs_first_fragmenting(nskb, mtu, to_copy, NULL);
+ 		list_add_tail(&nskb->list, &sublist);
+ 
+ 		/* FUTURE: if the packet has an odd/non-aligning length we could
+@@ -1938,6 +1987,8 @@ static int iptfs_copy_create_frags(struct sk_buff **skbp,
+ 
+ 	/* return last fragment that will be unsent (or NULL) */
+ 	*skbp = nskb;
++	if (nskb)
++		trace_iptfs_first_final_fragment(nskb, mtu, blkoff, NULL);
+ 
+ 	/* trim the original skb to MTU */
+ 	if (!err)
+@@ -2042,6 +2093,8 @@ static int iptfs_first_skb(struct sk_buff **skbp, struct xfrm_iptfs_data *xtfs,
+ 	/* We've split these up before queuing */
+ 	BUG_ON(skb_is_gso(skb));
+ 
++	trace_iptfs_first_dequeue(skb, mtu, 0, ip_hdr(skb));
 +
-+/* ------------------------------- */
-+/* Input (Egress) Re-ordering Code */
-+/* ------------------------------- */
-+
-+static void __vec_shift(struct xfrm_iptfs_data *xtfs, u32 shift)
-+{
-+	u32 savedlen = xtfs->w_savedlen;
-+
-+	if (shift > savedlen)
-+		shift = savedlen;
-+	if (shift != savedlen)
-+		memcpy(xtfs->w_saved, xtfs->w_saved + shift,
-+		       (savedlen - shift) * sizeof(*xtfs->w_saved));
-+	memset(xtfs->w_saved + savedlen - shift, 0,
-+	       shift * sizeof(*xtfs->w_saved));
-+	xtfs->w_savedlen -= shift;
-+}
-+
-+static void __reorder_past(struct xfrm_iptfs_data *xtfs, struct sk_buff *inskb,
-+			   struct list_head *freelist)
-+{
-+	list_add_tail(&inskb->list, freelist);
-+}
-+
-+static u32 __reorder_drop(struct xfrm_iptfs_data *xtfs, struct list_head *list)
-+
-+{
-+	struct skb_wseq *s, *se;
-+	const u32 savedlen = xtfs->w_savedlen;
-+	time64_t now = ktime_get_raw_fast_ns();
-+	u32 count = 0;
-+	u32 scount = 0;
-+
-+	BUG_ON(!savedlen);
-+	if (xtfs->w_saved[0].drop_time > now)
-+		goto set_timer;
-+
-+	++xtfs->w_wantseq;
-+
-+	/* Keep flushing packets until we reach a drop time greater than now. */
-+	s = xtfs->w_saved;
-+	se = s + savedlen;
-+	do {
-+		/* Walking past empty slots until we reach a packet */
-+		for (; s < se && !s->skb; s++)
-+			if (s->drop_time > now)
-+				goto outerdone;
-+		/* Sending packets until we hit another empty slot. */
-+		for (; s < se && s->skb; scount++, s++)
-+			list_add_tail(&s->skb->list, list);
-+	} while (s < se);
-+outerdone:
-+
-+	count = s - xtfs->w_saved;
-+	if (count) {
-+		xtfs->w_wantseq += count;
-+
-+		/* Shift handled slots plus final empty slot into slot 0. */
-+		__vec_shift(xtfs, count);
-+	}
-+
-+	if (xtfs->w_savedlen) {
-+set_timer:
-+		/* Drifting is OK */
-+		hrtimer_start(&xtfs->drop_timer,
-+			      xtfs->w_saved[0].drop_time - now,
-+			      IPTFS_HRTIMER_MODE);
-+	}
-+	return scount;
-+}
-+
-+static void __reorder_this(struct xfrm_iptfs_data *xtfs, struct sk_buff *inskb,
-+			   struct list_head *list)
-+{
-+	struct skb_wseq *s, *se;
-+	const u32 savedlen = xtfs->w_savedlen;
-+	u32 count = 0;
-+
-+	/* Got what we wanted. */
-+	list_add_tail(&inskb->list, list);
-+	++xtfs->w_wantseq;
-+	if (!savedlen)
-+		return;
-+
-+	/* Flush remaining consecutive packets. */
-+
-+	/* Keep sending until we hit another missed pkt. */
-+	for (s = xtfs->w_saved, se = s + savedlen; s < se && s->skb; s++)
-+		list_add_tail(&s->skb->list, list);
-+	count = s - xtfs->w_saved;
-+	if (count)
-+		xtfs->w_wantseq += count;
-+
-+	/* Shift handled slots plus final empty slot into slot 0. */
-+	__vec_shift(xtfs, count + 1);
-+}
-+
-+/* Set the slot's drop time and all the empty slots below it until reaching a
-+ * filled slot which will already be set.
-+ */
-+static void iptfs_set_window_drop_times(struct xfrm_iptfs_data *xtfs, int index)
-+{
-+	const u32 savedlen = xtfs->w_savedlen;
-+	struct skb_wseq *s = xtfs->w_saved;
-+	time64_t drop_time;
-+
-+	assert_spin_locked(&xtfs->drop_lock);
-+
-+	if (savedlen > index + 1) {
-+		/* we are below another, our drop time and the timer are already set */
-+		BUG_ON(xtfs->w_saved[index + 1].drop_time !=
-+		       xtfs->w_saved[index].drop_time);
-+		return;
-+	}
-+	/* we are the most future so get a new drop time. */
-+	drop_time = ktime_get_raw_fast_ns();
-+	drop_time += xtfs->drop_time_ns;
-+
-+	/* Walk back through the array setting drop times as we go */
-+	s[index].drop_time = drop_time;
-+	while (index-- > 0 && !s[index].skb)
-+		s[index].drop_time = drop_time;
-+
-+	/* If we walked all the way back, schedule the drop timer if needed */
-+	if (index == -1 && !hrtimer_is_queued(&xtfs->drop_timer))
-+		hrtimer_start(&xtfs->drop_timer, xtfs->drop_time_ns,
-+			      IPTFS_HRTIMER_MODE);
-+}
-+
-+static void __reorder_future_fits(struct xfrm_iptfs_data *xtfs,
-+				  struct sk_buff *inskb,
-+				  struct list_head *freelist)
-+{
-+	const u32 nslots = xtfs->cfg.reorder_win_size + 1;
-+	const u64 inseq = __esp_seq(inskb);
-+	const u64 wantseq = xtfs->w_wantseq;
-+	const u64 distance = inseq - wantseq;
-+	const u32 savedlen = xtfs->w_savedlen;
-+	const u32 index = distance - 1;
-+
-+	BUG_ON(distance >= nslots);
-+
-+	/* Handle future sequence number received which fits in the window.
-+	 *
-+	 * We know we don't have the seq we want so we won't be able to flush
-+	 * anything.
+ 	/* Simple case -- it fits. `mtu` accounted for all the overhead
+ 	 * including the basic IPTFS header.
  	 */
--	return -EINPROGRESS;
-+
-+	/* slot count is 4, saved size is 3 savedlen is 2
-+	 *
-+	 * "window boundary" is based on the fixed window size
-+	 * distance is also slot number
-+	 * index is an array index (i.e., - 1 of slot)
-+	 * : : - implicit NULL after array len
-+	 *
-+	 *          +--------- used length (savedlen == 2)
-+	 *          |   +----- array size (nslots - 1 == 3)
-+	 *          |   |   + window boundary (nslots == 4)
-+	 *          V   V | V
-+	 *                |
-+	 *  0   1   2   3 |   slot number
-+	 * ---  0   1   2 |   array index
-+	 *     [-] [b] : :|   array
-+	 *
-+	 * "2" "3" "4" *5*|   seq numbers
-+	 *
-+	 * We receive seq number 5
-+	 * distance == 3 [inseq(5) - w_wantseq(2)]
-+	 * index == 2 [distance(6) - 1]
-+	 */
-+
-+	if (xtfs->w_saved[index].skb) {
-+		/* a dup of a future */
-+		list_add_tail(&inskb->list, freelist);
-+		return;
-+	}
-+
-+	xtfs->w_saved[index].skb = inskb;
-+	xtfs->w_savedlen = max(savedlen, index + 1);
-+	iptfs_set_window_drop_times(xtfs, index);
-+}
-+
-+static void __reorder_future_shifts(struct xfrm_iptfs_data *xtfs,
-+				    struct sk_buff *inskb,
-+				    struct list_head *list,
-+				    struct list_head *freelist)
-+{
-+	const u32 nslots = xtfs->cfg.reorder_win_size + 1;
-+	const u64 inseq = __esp_seq(inskb);
-+	u32 savedlen = xtfs->w_savedlen;
-+	u64 wantseq = xtfs->w_wantseq;
-+	struct sk_buff *slot0 = NULL;
-+	u64 distance, extra_drops, s0seq;
-+	struct skb_wseq *wnext;
-+	u32 beyond, shifting, slot;
-+
-+	BUG_ON(inseq <= wantseq);
-+	distance = inseq - wantseq;
-+	BUG_ON(distance <= nslots - 1);
-+	beyond = distance - (nslots - 1);
-+
-+	/* Handle future sequence number received.
-+	 *
-+	 * IMPORTANT: we are at least advancing w_wantseq (i.e., wantseq) by 1
-+	 * b/c we are beyond the window boundary.
-+	 *
-+	 * We know we don't have the wantseq so that counts as a drop.
-+	 */
-+
-+	/* ex: slot count is 4, array size is 3 savedlen is 2, slot 0 is the
-+	 * missing sequence number.
-+	 *
-+	 * the final slot at savedlen (index savedlen - 1) is always occupied.
-+	 *
-+	 * beyond is "beyond array size" not savedlen.
-+	 *
-+	 *          +--------- array length (savedlen == 2)
-+	 *          |   +----- array size (nslots - 1 == 3)
-+	 *          |   |   +- window boundary (nslots == 4)
-+	 *          V   V | V
-+	 *                |
-+	 *  0   1   2   3 |   slot number
-+	 * ---  0   1   2 |   array index
-+	 *     [b] [c] : :|   array
-+	 *                |
-+	 * "2" "3" "4" "5"|*6*  seq numbers
-+	 *
-+	 * We receive seq number 6
-+	 * distance == 4 [inseq(6) - w_wantseq(2)]
-+	 * newslot == distance
-+	 * index == 3 [distance(4) - 1]
-+	 * beyond == 1 [newslot(4) - lastslot((nslots(4) - 1))]
-+	 * shifting == 1 [min(savedlen(2), beyond(1)]
-+	 * slot0_skb == [b], and should match w_wantseq
-+	 *
-+	 *                +--- window boundary (nslots == 4)
-+	 *  0   1   2   3 | 4   slot number
-+	 * ---  0   1   2 | 3   array index
-+	 *     [b] : : : :|     array
-+	 * "2" "3" "4" "5" *6*  seq numbers
-+	 *
-+	 * We receive seq number 6
-+	 * distance == 4 [inseq(6) - w_wantseq(2)]
-+	 * newslot == distance
-+	 * index == 3 [distance(4) - 1]
-+	 * beyond == 1 [newslot(4) - lastslot((nslots(4) - 1))]
-+	 * shifting == 1 [min(savedlen(1), beyond(1)]
-+	 * slot0_skb == [b] and should match w_wantseq
-+	 *
-+	 *                +-- window boundary (nslots == 4)
-+	 *  0   1   2   3 | 4   5   6   slot number
-+	 * ---  0   1   2 | 3   4   5   array index
-+	 *     [-] [c] : :|             array
-+	 * "2" "3" "4" "5" "6" "7" *8*  seq numbers
-+	 *
-+	 * savedlen = 2, beyond = 3
-+	 * iter 1: slot0 == NULL, missed++, lastdrop = 2 (2+1-1), slot0 = [-]
-+	 * iter 2: slot0 == NULL, missed++, lastdrop = 3 (2+2-1), slot0 = [c]
-+	 * 2 < 3, extra = 1 (3-2), missed += extra, lastdrop = 4 (2+2+1-1)
-+	 *
-+	 * We receive seq number 8
-+	 * distance == 6 [inseq(8) - w_wantseq(2)]
-+	 * newslot == distance
-+	 * index == 5 [distance(6) - 1]
-+	 * beyond == 3 [newslot(6) - lastslot((nslots(4) - 1))]
-+	 * shifting == 2 [min(savedlen(2), beyond(3)]
-+	 *
-+	 * slot0_skb == NULL changed from [b] when "savedlen < beyond" is true.
-+	 */
-+
-+	/* Now send any packets that are being shifted out of saved, and account
-+	 * for missing packets that are exiting the window as we shift it.
-+	 */
-+
-+	/* If savedlen > beyond we are shifting some, else all. */
-+	shifting = min(savedlen, beyond);
-+
-+	/* slot0 is the buf that just shifted out and into slot0 */
-+	slot0 = NULL;
-+	s0seq = wantseq;
-+	wnext = xtfs->w_saved;
-+	for (slot = 1; slot <= shifting; slot++, wnext++) {
-+		/* handle what was in slot0 before we occupy it */
-+		if (slot0)
-+			list_add_tail(&slot0->list, list);
-+		s0seq++;
-+		slot0 = wnext->skb;
-+		wnext->skb = NULL;
-+	}
-+
-+	/* slot0 is now either NULL (in which case it's what we now are waiting
-+	 * for, or a buf in which case we need to handle it like we received it;
-+	 * however, we may be advancing past that buffer as well..
-+	 */
-+
-+	/* Handle case where we need to shift more than we had saved, slot0 will
-+	 * be NULL iff savedlen is 0, otherwise slot0 will always be
-+	 * non-NULL b/c we shifted the final element, which is always set if
-+	 * there is any saved, into slot0.
-+	 */
-+	if (savedlen < beyond) {
-+		extra_drops = beyond - savedlen;
-+		if (savedlen == 0) {
-+			BUG_ON(slot0);
-+			s0seq += extra_drops;
-+		} else {
-+			extra_drops--; /* we aren't dropping what's in slot0 */
-+			BUG_ON(!slot0);
-+			list_add_tail(&slot0->list, list);
-+			s0seq += extra_drops + 1;
-+		}
-+		slot0 = NULL;
-+		/* slot0 has had an empty slot pushed into it */
-+	}
-+
-+	/* Remove the entries */
-+	__vec_shift(xtfs, beyond);
-+
-+	/* Advance want seq */
-+	xtfs->w_wantseq += beyond;
-+
-+	/* Process drops here when implementing congestion control */
-+
-+	/* We've shifted. plug the packet in at the end. */
-+	xtfs->w_savedlen = nslots - 1;
-+	xtfs->w_saved[xtfs->w_savedlen - 1].skb = inskb;
-+	iptfs_set_window_drop_times(xtfs, xtfs->w_savedlen - 1);
-+
-+	/* if we don't have a slot0 then we must wait for it */
-+	if (!slot0)
-+		return;
-+
-+	/* If slot0, seq must match new want seq */
-+	BUG_ON(xtfs->w_wantseq != __esp_seq(slot0));
-+
-+	/* slot0 is valid, treat like we received expected. */
-+	__reorder_this(xtfs, slot0, list);
-+}
-+
-+/* Receive a new packet into the reorder window. Return a list of ordered
-+ * packets from the window.
-+ */
-+static void iptfs_input_reorder(struct xfrm_iptfs_data *xtfs,
-+				struct sk_buff *inskb, struct list_head *list,
-+				struct list_head *freelist)
-+{
-+	const u32 nslots = xtfs->cfg.reorder_win_size + 1;
-+	u64 inseq = __esp_seq(inskb);
-+	u64 wantseq;
-+
-+	assert_spin_locked(&xtfs->drop_lock);
-+
-+	if (unlikely(!xtfs->w_seq_set)) {
-+		xtfs->w_seq_set = true;
-+		xtfs->w_wantseq = inseq;
-+	}
-+	wantseq = xtfs->w_wantseq;
-+
-+	if (likely(inseq == wantseq))
-+		__reorder_this(xtfs, inskb, list);
-+	else if (inseq < wantseq)
-+		__reorder_past(xtfs, inskb, freelist);
-+	else if ((inseq - wantseq) < nslots)
-+		__reorder_future_fits(xtfs, inskb, freelist);
-+	else
-+		__reorder_future_shifts(xtfs, inskb, list, freelist);
- }
+@@ -2143,6 +2196,7 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
+ 			XFRM_INC_STATS(dev_net(skb->dev),
+ 				       LINUX_MIB_XFRMOUTERROR);
  
- /**
-@@ -1192,23 +1566,90 @@ static int iptfs_input(struct xfrm_state *x, struct sk_buff *skb)
-  */
- static enum hrtimer_restart iptfs_drop_timer(struct hrtimer *me)
- {
-+	struct sk_buff *skb, *next;
-+	struct list_head freelist, list;
- 	struct xfrm_iptfs_data *xtfs;
- 	struct xfrm_state *x;
-+	u32 count;
++			trace_iptfs_first_toobig(skb, mtu, 0, ip_hdr(skb));
+ 			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
+ 			continue;
+ 		}
+@@ -2190,6 +2244,7 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
+ 		 * case.
+ 		 */
+ 		while ((skb2 = skb_peek(list))) {
++			trace_iptfs_ingress_nth_peek(skb2, remaining);
+ 			if (skb2->len > remaining)
+ 				break;
  
- 	xtfs = container_of(me, typeof(*xtfs), drop_timer);
- 	x = xtfs->x;
+@@ -2227,6 +2282,8 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
+ 			skb->len += skb2->len;
+ 			remaining -= skb2->len;
  
--	/* Drop any in progress packet */
- 	spin_lock(&xtfs->drop_lock);
++			trace_iptfs_ingress_nth_add(skb2, share_ok);
 +
-+	INIT_LIST_HEAD(&list);
-+	INIT_LIST_HEAD(&freelist);
-+
-+	/* Drop any in progress packet */
-+
- 	if (xtfs->ra_newskb) {
- 		kfree_skb(xtfs->ra_newskb);
- 		xtfs->ra_newskb = NULL;
- 	}
-+
-+	/* Now drop as many packets as we should from the reordering window
-+	 * saved array
-+	 */
-+	count = xtfs->w_savedlen ? __reorder_drop(xtfs, &list) : 0;
-+
- 	spin_unlock(&xtfs->drop_lock);
+ 			if (share_ok) {
+ 				iptfs_consume_frags(skb, skb2);
+ 			} else {
+@@ -2276,6 +2333,9 @@ static enum hrtimer_restart iptfs_delay_timer(struct hrtimer *me)
+ 	 * already).
+ 	 */
  
-+	if (count) {
-+		list_for_each_entry_safe(skb, next, &list, list) {
-+			skb_list_del_init(skb);
-+			(void)iptfs_input_ordered(x, skb);
-+		}
-+	}
++	trace_iptfs_timer_expire(
++		xtfs, (unsigned long long)(ktime_get_raw_fast_ns() - settime));
++
+ 	iptfs_output_queued(x, &list);
+ 
  	return HRTIMER_NORESTART;
- }
- 
-+/**
-+ * iptfs_input() - handle receipt of iptfs payload
-+ * @x: xfrm state
-+ * @skb: the packet
-+ *
-+ * We have an IPTFS payload order it if needed, then process newly in order
-+ * packets.
-+ */
-+static int iptfs_input(struct xfrm_state *x, struct sk_buff *skb)
-+{
-+	struct list_head freelist, list;
-+	struct xfrm_iptfs_data *xtfs = x->mode_data;
-+	struct sk_buff *next;
-+
-+	/* Fast path for no reorder window. */
-+	if (xtfs->cfg.reorder_win_size == 0) {
-+		iptfs_input_ordered(x, skb);
-+		goto done;
-+	}
-+
-+	/* Fetch list of in-order packets from the reordering window as well as
-+	 * a list of buffers we need to now free.
-+	 */
-+	INIT_LIST_HEAD(&list);
-+	INIT_LIST_HEAD(&freelist);
-+
-+	spin_lock(&xtfs->drop_lock);
-+	iptfs_input_reorder(xtfs, skb, &list, &freelist);
-+	spin_unlock(&xtfs->drop_lock);
-+
-+	list_for_each_entry_safe(skb, next, &list, list) {
-+		skb_list_del_init(skb);
-+		(void)iptfs_input_ordered(x, skb);
-+	}
-+
-+	list_for_each_entry_safe(skb, next, &freelist, list) {
-+		skb_list_del_init(skb);
-+		kfree_skb(skb);
-+	}
-+done:
-+	/* We always have dealt with the input SKB, either we are re-using it,
-+	 * or we have freed it. Return EINPROGRESS so that xfrm_input stops
-+	 * processing it.
-+	 */
-+	return -EINPROGRESS;
-+}
-+
- /* ================================= */
- /* IPTFS Sending (ingress) Functions */
- /* ================================= */
-@@ -2010,6 +2451,7 @@ static int iptfs_user_init(struct net *net, struct xfrm_state *x,
- 	struct xfrm_iptfs_config *xc;
- 
- 	xc = &xtfs->cfg;
-+	xc->reorder_win_size = net->xfrm.sysctl_iptfs_reorder_window;
- 	xc->max_queue_size = net->xfrm.sysctl_iptfs_max_qsize;
- 	xtfs->init_delay_ns =
- 		(u64)net->xfrm.sysctl_iptfs_init_delay * NSECS_IN_USEC;
-@@ -2018,6 +2460,13 @@ static int iptfs_user_init(struct net *net, struct xfrm_state *x,
- 
- 	if (attrs[XFRMA_IPTFS_DONT_FRAG])
- 		xc->dont_frag = true;
-+	if (attrs[XFRMA_IPTFS_REORDER_WINDOW])
-+		xc->reorder_win_size =
-+			nla_get_u16(attrs[XFRMA_IPTFS_REORDER_WINDOW]);
-+	/* saved array is for saving 1..N seq nums from wantseq */
-+	if (xc->reorder_win_size)
-+		xtfs->w_saved = kcalloc(xc->reorder_win_size,
-+					sizeof(*xtfs->w_saved), GFP_KERNEL);
- 	if (attrs[XFRMA_IPTFS_PKT_SIZE]) {
- 		xc->pkt_size = nla_get_u32(attrs[XFRMA_IPTFS_PKT_SIZE]);
- 		if (!xc->pkt_size) {
-@@ -2054,7 +2503,7 @@ static unsigned int iptfs_sa_len(const struct xfrm_state *x)
- 
- 	if (xc->dont_frag)
- 		l += nla_total_size(0);
--	l += nla_total_size(sizeof(u16));
-+	l += nla_total_size(sizeof(xc->reorder_win_size));
- 	l += nla_total_size(sizeof(xc->pkt_size));
- 	l += nla_total_size(sizeof(xc->max_queue_size));
- 	l += nla_total_size(sizeof(u32)); /* drop time usec */
-@@ -2075,7 +2524,7 @@ static int iptfs_copy_to_user(struct xfrm_state *x, struct sk_buff *skb)
- 		if (ret)
- 			return ret;
- 	}
--	ret = nla_put_u16(skb, XFRMA_IPTFS_REORDER_WINDOW, 0);
-+	ret = nla_put_u16(skb, XFRMA_IPTFS_REORDER_WINDOW, xc->reorder_win_size);
- 	if (ret)
- 		return ret;
- 	ret = nla_put_u32(skb, XFRMA_IPTFS_PKT_SIZE, xc->pkt_size);
-@@ -2137,6 +2586,14 @@ static int iptfs_clone(struct xfrm_state *x, struct xfrm_state *orig)
- 		return -ENOMEM;
- 
- 	xtfs->ra_newskb = NULL;
-+	if (xtfs->cfg.reorder_win_size) {
-+		xtfs->w_saved = kcalloc(xtfs->cfg.reorder_win_size,
-+					sizeof(*xtfs->w_saved), GFP_KERNEL);
-+		if (!xtfs->w_saved) {
-+			kfree_sensitive(xtfs);
-+			return -ENOMEM;
-+		}
-+	}
- 
- 	err = __iptfs_init_state(x, xtfs);
- 	if (err)
-@@ -2164,6 +2621,7 @@ static int iptfs_create_state(struct xfrm_state *x)
- static void iptfs_delete_state(struct xfrm_state *x)
- {
- 	struct xfrm_iptfs_data *xtfs = x->mode_data;
-+	struct skb_wseq *s, *se;
- 
- 	if (!xtfs)
- 		return;
-@@ -2176,6 +2634,11 @@ static void iptfs_delete_state(struct xfrm_state *x)
- 	if (xtfs->ra_newskb)
- 		kfree_skb(xtfs->ra_newskb);
- 
-+	for (s = xtfs->w_saved, se = s + xtfs->w_savedlen; s < se; s++)
-+		if (s->skb)
-+			kfree_skb(s->skb);
-+
-+	kfree_sensitive(xtfs->w_saved);
- 	kfree_sensitive(xtfs);
- 
- 	module_put(x->mode_cbs->owner);
 -- 
 2.45.1
 
