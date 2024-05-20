@@ -1,159 +1,113 @@
-Return-Path: <netdev+bounces-97250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EA2B8CA3EC
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 23:46:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C52F8CA540
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 01:53:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FE1D1C21077
-	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 21:46:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9A4D1C214D9
+	for <lists+netdev@lfdr.de>; Mon, 20 May 2024 23:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4200B137C25;
-	Mon, 20 May 2024 21:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A221386CC;
+	Mon, 20 May 2024 23:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MTdmrQfE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E092C1847
-	for <netdev@vger.kernel.org>; Mon, 20 May 2024 21:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A528FA2D
+	for <netdev@vger.kernel.org>; Mon, 20 May 2024 23:53:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716241576; cv=none; b=sAfI+o7qdDjyXapw+L5Rmh1lcGnBsMIG5zbLKbdDk6HT+u/UUcicRlM1cbrdC7tZOqZMbbf+2PmPFI0/8OQwaBhBkc75D1LU+vYNDYVWnZqMXLXD1JNALX71lE0FDGNjf39jbnqo2txgUsK28MZsUsETfXy4qEhxG8eXYjCwwZQ=
+	t=1716249210; cv=none; b=X2oFm3lxUgPJf7ecdo6l6A6m4E+bec+dsZ/vQM5Vd/CR/5l5JdR8vm0xex76CXSWQClU0kbZCNrqClYef3rZTp92Iz09nDtpBj9GB3NEog9VQMJDLYMTjV6OviZIjCsQnYvqAwaEnLLm1qH/q57A1SfsH8seksPYQWpyyFBynw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716241576; c=relaxed/simple;
-	bh=wrVmQG3q0c2EgtNe4UTuowNxoiN2Gi47CrhEmr4FuyM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OlZuC/LeCeM5PUaxQEkm9NVEOCN79lXWZj+bVmYdGvOq4O+mr0NEoUXm8oWV0N8tTDEIpl4o0acSlw8t0QCCJ064XwgZmtdR0W6GZN8e5Hxg8yTS4uMAOGcrZ61tzaSShpeckeDQIcVKpslQON4ye1+dL2OrYCYZR+mAf7RoJbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from labnh.int.chopps.org (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 1A6E17D138;
-	Mon, 20 May 2024 21:46:14 +0000 (UTC)
-From: Christian Hopps <chopps@chopps.org>
-To: devel@linux-ipsec.org
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org,
-	Christian Hopps <chopps@chopps.org>,
-	Christian Hopps <chopps@labn.net>
-Subject: [PATCH ipsec-next v2 0/17] Add IP-TFS mode to xfrm
-Date: Mon, 20 May 2024 17:45:58 -0400
-Message-ID: <20240520214558.2592618-1-chopps@chopps.org>
-X-Mailer: git-send-email 2.45.1
+	s=arc-20240116; t=1716249210; c=relaxed/simple;
+	bh=x+EKiowODG5X+fkqOSbqrJoIHtEXFXTbIPAPqy4yU3w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cmMpU3+UMlbuRI/Kyx374z10PK+VIbmnyGAN3cqGU+nT0oo4dR750QvyFbYAdTmhtwGJ6INKdtYfEBYNvs/ty3kZLAerIFis6Juu0oPawqIcsIM7vq8NdSCaqVYFYDFN4wd+Q966GcL2i+cPQcoMCj2z0PP7muoQYEKbHXXmEoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MTdmrQfE; arc=none smtp.client-ip=95.215.58.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: brad@faucet.nz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1716249204;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IG3pDjesBduiqqkxCNEFP3pxyRLYTneq5hI70cFf9HY=;
+	b=MTdmrQfEmestsFfWkLhC7ayTjwN+7sZBz1w/BYhhzAwVvC3X50MA7HutkGqSppNqmvnTIh
+	Qc5KkB2oUpEyQYcGYLUZgSy2Eu7OKF/Bch/X5Bv/bHqe8ulbI9g9SSyNewkQkwvDus3Aox
+	iHRn/KIpQntNqnyso2GgowrZLrOINAI=
+X-Envelope-To: lorenzo@kernel.org
+X-Envelope-To: memxor@gmail.com
+X-Envelope-To: pablo@netfilter.org
+X-Envelope-To: davem@davemloft.net
+X-Envelope-To: kuba@kernel.org
+X-Envelope-To: pabeni@redhat.com
+X-Envelope-To: ast@kernel.org
+X-Envelope-To: daniel@iogearbox.net
+X-Envelope-To: andrii@kernel.org
+X-Envelope-To: song@kernel.org
+X-Envelope-To: john.fastabend@gmail.com
+X-Envelope-To: sdf@google.com
+X-Envelope-To: jolsa@kernel.org
+X-Envelope-To: netfilter-devel@vger.kernel.org
+X-Envelope-To: coreteam@netfilter.org
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: bpf@vger.kernel.org
+Message-ID: <e160d17a-cc09-4548-9542-84886a40fe3d@linux.dev>
+Date: Mon, 20 May 2024 16:52:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v3 2/2] selftests/bpf: Update tests for new ct
+ zone opts for nf_conntrack kfuncs
+To: Brad Cowie <brad@faucet.nz>
+Cc: lorenzo@kernel.org, memxor@gmail.com, pablo@netfilter.org,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, song@kernel.org,
+ john.fastabend@gmail.com, sdf@google.com, jolsa@kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
+References: <20240508043033.52311-1-brad@faucet.nz>
+ <20240508050450.88356-1-brad@faucet.nz>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240508050450.88356-1-brad@faucet.nz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Christian Hopps <chopps@labn.net>
+On 5/7/24 10:04 PM, Brad Cowie wrote:
+> @@ -84,16 +102,6 @@ nf_ct_test(struct nf_conn *(*lookup_fn)(void *, struct bpf_sock_tuple *, u32,
+>   	else
+>   		test_einval_bpf_tuple = opts_def.error;
+>   
+> -	opts_def.reserved[0] = 1;
+> -	ct = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
+> -		       sizeof(opts_def));
+> -	opts_def.reserved[0] = 0;
+> -	opts_def.l4proto = IPPROTO_TCP;
+> -	if (ct)
+> -		bpf_ct_release(ct);
+> -	else
+> -		test_einval_reserved = opts_def.error;
+> -
+>   	opts_def.netns_id = -2;
+>   	ct = lookup_fn(ctx, &bpf_tuple, sizeof(bpf_tuple.ipv4), &opts_def,
 
-Summary of Changes
-------------------
+This non-zero reserved[0] test is still valid and useful. How about create a new 
+test_einval_reserved_new for testing the new struct?
 
-This patchset adds a new xfrm mode implementing on-demand IP-TFS. IP-TFS
-(AggFrag encapsulation) has been standardized in RFC9347.
+pw-bot: cr
 
-  Link: https://www.rfc-editor.org/rfc/rfc9347.txt
-
-This feature supports demand driven (i.e., non-constant send rate)
-IP-TFS to take advantage of the AGGFRAG ESP payload encapsulation. This
-payload type supports aggregation and fragmentation of the inner IP
-packet stream which in turn yields higher small-packet bandwidth as well
-as reducing MTU/PMTU issues. Congestion control is unimplementated as
-the send rate is demand driven rather than constant.
-
-In order to allow loading this fucntionality as a module a set of
-callbacks xfrm_mode_cbs has been added to xfrm as well.
-
-Patchset Changes:
------------------
-
-  23 files changed, 3252 insertions(+), 19 deletions(-)
-  Documentation/networking/xfrm_sysctl.rst |   30 +
-  include/net/netns/xfrm.h                 |    6 +
-  include/net/xfrm.h                       |   40 +
-  include/uapi/linux/in.h                  |    2 +
-  include/uapi/linux/ip.h                  |   16 +
-  include/uapi/linux/ipsec.h               |    3 +-
-  include/uapi/linux/snmp.h                |    3 +
-  include/uapi/linux/xfrm.h                |    9 +-
-  net/ipv4/esp4.c                          |    3 +-
-  net/ipv6/esp6.c                          |    3 +-
-  net/netfilter/nft_xfrm.c                 |    3 +-
-  net/xfrm/Makefile                        |    1 +
-  net/xfrm/trace_iptfs.h                   |  218 +++
-  net/xfrm/xfrm_compat.c                   |   10 +-
-  net/xfrm/xfrm_device.c                   |    4 +-
-  net/xfrm/xfrm_input.c                    |   14 +-
-  net/xfrm/xfrm_iptfs.c                    | 2741 ++++++++++++++++++++++++++++++
-  net/xfrm/xfrm_output.c                   |    6 +
-  net/xfrm/xfrm_policy.c                   |   26 +-
-  net/xfrm/xfrm_proc.c                     |    3 +
-  net/xfrm/xfrm_state.c                    |   60 +
-  net/xfrm/xfrm_sysctl.c                   |   38 +
-  net/xfrm/xfrm_user.c                     |   32 +
-
-Patchset Structure:
--------------------
-
-The first 8 commits are changes to the xfrm infrastructure to support
-the callbacks as well as more generic IP-TFS additions that may be used
-outside the actual IP-TFS implementation.
-
-  - iptfs: config: add CONFIG_XFRM_IPTFS
-  - iptfs: uapi: ip: add ip_tfs_*_hdr packet formats
-  - iptfs: uapi: IPPROTO_AGGFRAG AGGFRAG in ESP
-  - iptfs: sysctl: allow configuration of global default values
-  - iptfs: netlink: add config (netlink) options
-  - iptfs: xfrm: Add mode_cbs module functionality
-  - iptfs: xfrm: add generic iptfs defines and functionality
-
-The last 9+1 commits constitute the IP-TFS implementation constructed in
-layers to make review easier. The first 9 commits all apply to a single
-file `net/xfrm/xfrm_iptfs.c`, the last commit adds a new tracepoint
-header file along with the use of these new tracepoint calls.
-
-  - iptfs: impl: add new iptfs xfrm mode impl
-  - iptfs: impl: add user packet (tunnel ingress) handling
-  - iptfs: impl: share page fragments of inner packets
-  - iptfs: impl: add fragmenting of larger than MTU user packets
-  - iptfs: impl: add basic receive packet (tunnel egress) handling
-  - iptfs: impl: handle received fragmented inner packets
-  - iptfs: impl: add reusing received skb for the tunnel egress packet
-  - iptfs: impl: add skb-fragment sharing code
-  - iptfs: impl: handle reordering of received packets
-  - iptfs: impl: add tracepoint functionality
-
-Patchset History:
------------------
-
-RFCv1 (11/10/2023)
-
-RFCv1 -> RFCv2 (11/12/2023)
-
-  Updates based on feedback from Simon Horman, Antony,
-  Michael Richardson, and kernel test robot.
-
-RFCv2 -> v1 (2/19/2024)
-
-  Updates based on feedback from Sabrina Dubroca, kernel test robot
-
-v1 -> v2 (5/19/2024)
-
-  Updates based on feedback from Sabrina Dubroca, Simon Horman, Antony.
-
-  o Add handling of new netlink SA direction attribute (Antony).
-  o Split single patch/commit of xfrm_iptfs.c (the actual IP-TFS impl)
-    into 9+1 distinct layered functionality commits for aiding review.
-  - xfrm: fix return check on clone() callback
-  - xfrm: add sa_len() callback in xfrm_mode_cbs for copy to user
-  - iptfs: remove unneeded skb free count variable
-  - iptfs: remove unused variable and "breadcrumb" for future code.
-  - iptfs: use do_div() to avoid "__udivd13 missing" link failure.
-  - iptfs: remove some BUG_ON() assertions questioned in review.
+[ Sorry for the delay. I have some backlog. ].
 
