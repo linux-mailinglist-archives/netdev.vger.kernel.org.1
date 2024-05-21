@@ -1,132 +1,169 @@
-Return-Path: <netdev+bounces-97337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E51028CAE84
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 14:48:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A593E8CAED5
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 15:05:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 147641C213F0
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 12:48:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A68428379B
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 13:05:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB81487BC;
-	Tue, 21 May 2024 12:48:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C827710E;
+	Tue, 21 May 2024 13:05:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WS0nnLue"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="RQVItXt0";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="FYzzdApz"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72632F5B;
-	Tue, 21 May 2024 12:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F82757F7;
+	Tue, 21 May 2024 13:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716295695; cv=none; b=Yj93+ikYfDmTptvmNkCSBr84GoEX3arj1jMsG6JRche+EeuBH31B3jpxgx3DFRN4fgD2FVW+PCulkSWV5Qc85nSbIUHRY47HjHdRbsKYYy74ZF0F9eeaU3qp/VNKeLGlQppyTicRdJJx8YBbueNGs+SN63lOwI9ryCfxD2a9QHk=
+	t=1716296716; cv=none; b=g3BWpb+xeNcoLDGgW/Mkzt22ju6R9ax8VIoagTk8aznvcMQadjrJgHthr30TVnGSMkvTMpbANNXb5TMLV3YG8IETKV24saa0ORDzNXRitzN6992T/inOSsm/ads7HSC2hkYwsBiizR83mk871qSCrBpjc4U2vE07iZNb2ngcoDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716295695; c=relaxed/simple;
-	bh=WH6yHvZe8ZnUhsEU59EABadEg8fdoJa3lZaDRDvNCIM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jHXM7nh0zHkBBgrcBlBnbvKNWOaLMyomSoRj/lbY4EnThABqdZ0d2WtdXzcx+fSWVAI7KVsOm/ocYR2rzgMesKTkAUT1VCVog3xHDpdAezk8XiSJH7XZtR+RP5xlKaOU6GkS2KpmqOIKLAHROX38wQxmZijw3cTAC+q/R1+m51k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WS0nnLue; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Ubv672vfpBfLZf0g0gqsR9OC8qCCoIkzl2ciJouZUwg=; b=WS0nnLuevgRcN5fKDdqcjtMzBH
-	WNi1Fp5E4puGALwTpiMuOEB1UGAN3YooKD6lYWKjiiaM7/3Uf3dGcDE+bIRVcXL5yuQFx/oIWOMPA
-	V5Nv7PjFhaphyUCya/FcAUIm2X/iCUt0JJAGdOK6LsQQ9c3466KdaEVf/v2tdn5p0Z28=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s9OuJ-00Fl8b-QO; Tue, 21 May 2024 14:47:55 +0200
-Date: Tue, 21 May 2024 14:47:55 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Larry Chiu <larry.chiu@realtek.com>
-Cc: Justin Lai <justinlai0215@realtek.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"horms@kernel.org" <horms@kernel.org>,
-	Ping-Ke Shih <pkshih@realtek.com>
-Subject: Re: [PATCH net-next v19 01/13] rtase: Add pci table supported in
- this module
-Message-ID: <97e30c5f-1656-46d0-b06c-3607a90ec96f@lunn.ch>
-References: <20240517075302.7653-1-justinlai0215@realtek.com>
- <20240517075302.7653-2-justinlai0215@realtek.com>
- <d840e007-c819-42df-bc71-536328d4f5d7@lunn.ch>
- <e5d7a77511f746bdb0b38b6174ef5de4@realtek.com>
+	s=arc-20240116; t=1716296716; c=relaxed/simple;
+	bh=poYwZzFrROnVvrzaB1PisgarOajrVBSZw1xGHbZ6Mkw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=HHkzcn/A/y8b6/e44D2yRBLalsN/1nn8TUyvH/RAPu3sQ1xTh9dn9a8Eiyg25AS+Mn4YgBVANdbwVIltBM3GCtK+mC8hcEQud0mQnX9GxDntfGgQgp9p7QTFTi1ruUO1osTW4eev1IXsG3JYdtKQEG4CtjOEMHLiMgsx1ZWYcZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=RQVItXt0; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=FYzzdApz reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1716296713; x=1747832713;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=pyP6xgaP2ZcvnjLNb6y+BeqcJGYFyeQAlt1mSCVUPeI=;
+  b=RQVItXt0R2p5Y2s0dTb1QU49IAr40pTBR5w4jXxeCuzgwkMRzLO/TrG8
+   x8jnPbPKD+WnTUQ9yUmsJ7gwMLQJ/+gwgPnOr7EotSZFRtXp1ZCXp4RBl
+   xCV67DPErzd61G5e/RUyiQoLUp6UemLVF5gBc+iGv+5za1EyEcmLi295e
+   7aXeJZ5/2g1PAx53PW4IT7/LMOiVdOT3GpylSWJZh3FHBV7lm/vdeaxNa
+   1f1SyaD2uxcOeE2BtNlwW0yQP6lERFttCCXx7rMD+Kl0kuEEXKWJeDjdQ
+   9FP3VcZD/SuDoQc75Q6VDDAMkuIUxif7qBwukHQZ5lWZmgr7xuUpcRm1w
+   g==;
+X-CSE-ConnectionGUID: awLlqhjFQ96EEj94Va4gnw==
+X-CSE-MsgGUID: NUkJL+sDSL+9wLBhfnwFFg==
+X-IronPort-AV: E=Sophos;i="6.08,177,1712613600"; 
+   d="scan'208";a="36993950"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 21 May 2024 15:05:04 +0200
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 28CB0170EC5;
+	Tue, 21 May 2024 15:04:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1716296700;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=pyP6xgaP2ZcvnjLNb6y+BeqcJGYFyeQAlt1mSCVUPeI=;
+	b=FYzzdApz7tThIukYDrKmqX0u82ATqsGuqgWPsfl8vZIJur7Sx2eHrQc03VPYaIwXt63pu1
+	UlxCZQlnPmSAXaSQFy1bvSyGSgyaXP+yRenRPZxx22jMtDK7pnxKW63unjZ22tTi20XoEx
+	kfJh+/jRnDdAKNrFPumJtITBV0Lcy35YTQfqHnAgATCsYHcdPjZzc9/5JtVyWvqpWvc73f
+	Nj8D36fUp2HTXSgT9ZMZOmFIb7Kps97g8txEBt2uYM/wBU8i/BXsfRlFY8zdJoKPs/QmVQ
+	/moIaEly32masjAq/+u9T4RqGs7sbgYQcH7C0Wu8j7Kw4iibYZ0H6Dsh5UnITw==
+From: Gregor Herburger <gregor.herburger@ew.tq-group.com>
+Subject: [PATCH v3 0/8] can: mcp251xfd: add gpio functionality
+Date: Tue, 21 May 2024 15:04:50 +0200
+Message-Id: <20240521-mcp251xfd-gpio-feature-v3-0-7f829fefefc2@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e5d7a77511f746bdb0b38b6174ef5de4@realtek.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAPObTGYC/4XNsQ6DIBSF4VcxzMUAFdROfY+mA+JFGRQKSm2M7
+ 1506dA0Hf+T3O+uKIA3ENAlW5GHaIKxY4rzKUOql2MH2LSpESOsIAUt8aAc43TRLe6csViDnGY
+ PmNWSNlpI1fACpWPnQZvlgG/31L0Jk/Wv40+k+/qXjBQT3CiiBNUtURW5wjOfHrjzdna5sgPa4
+ cg+GCfiJ8YSJihvqNCyKqv6G9u27Q2C3JhbDwEAAA==
+To: Marc Kleine-Budde <mkl@pengutronix.de>, 
+ Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+ Thomas Kopp <thomas.kopp@microchip.com>, 
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux@ew.tq-group.com, gregor.herburger@ew.tq-group.com, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1716296697; l=2868;
+ i=gregor.herburger@ew.tq-group.com; s=20230829; h=from:subject:message-id;
+ bh=poYwZzFrROnVvrzaB1PisgarOajrVBSZw1xGHbZ6Mkw=;
+ b=UK5smkXVZ8q2P0ligQzIDJHupAMROG4DJZG8zeqDxt7DvCzWSH+lyPZM8+UbwEm5iZG1G80Pv
+ cgILKhUfBmYDe5WhOPUz40zyVM6DjUYH5MFn1w1jlazytDxOjRyGIxh
+X-Developer-Key: i=gregor.herburger@ew.tq-group.com; a=ed25519;
+ pk=+eRxwX7ikXwazcRjlOjj2/tbDmfVZdDLoW+xLZbQ4h4=
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, May 21, 2024 at 06:20:04AM +0000, Larry Chiu wrote:
-> 
-> >> + *  Below is a simplified block diagram of the chip and its relevant interfaces.
-> >> + *
-> >> + *               *************************
-> >> + *               *                       *
-> >> + *               *  CPU network device   *
-> >> + *               *                       *
-> >> + *               *   +-------------+     *
-> >> + *               *   |  PCIE Host  |     *
-> >> + *               ***********++************
-> >> + *                          ||
-> >> + *                         PCIE
-> >> + *                          ||
-> >> + *      ********************++**********************
-> >> + *      *            | PCIE Endpoint |             *
-> >> + *      *            +---------------+             *
-> >> + *      *                | GMAC |                  *
-> >> + *      *                +--++--+  Realtek         *
-> >> + *      *                   ||     RTL90xx Series  *
-> >> + *      *                   ||                     *
-> >> + *      *     +-------------++----------------+    *
-> >> + *      *     |           | MAC |             |    *
-> >> + *      *     |           +-----+             |    *
-> >> + *      *     |                               |    *
-> >> + *      *     |     Ethernet Switch Core      |    *
-> >> + *      *     |                               |    *
-> >> + *      *     |   +-----+           +-----+   |    *
-> >> + *      *     |   | MAC |...........| MAC |   |    *
-> >> + *      *     +---+-----+-----------+-----+---+    *
-> >> + *      *         | PHY |...........| PHY |        *
-> >> + *      *         +--++-+           +--++-+        *
-> >> + *      *************||****************||***********
-> >> + *
-> >> + *  The block of the Realtek RTL90xx series is our entire chip 
-> >> + architecture,
-> >> + *  the GMAC is connected to the switch core, and there is no PHY in between.
-> >
-> >Given this architecture, this driver cannot be used unless there is a switch driver as well. This driver is nearly ready to be merged. So what are your plans for the switch driver? Do you have a first version you can post? That will reassure us you do plan to release a switch driver, and not use a SDK in userspace.
-> >
-> >        Andrew
-> 
-> Hi Andrew,
-> This GMAC is configured after the switch is boot-up and does not require a switch driver to work.
+Hi all,
 
-But if you cannot configure the switch, it is pointless passing the
-switch packets. The Linux architecture is that Linux needs to be able
-to control the switch somehow. There needs to be a driver with the
-switchdev API on its upper side which connects it to the Linux network
-stack. Ideally the lower side of this driver can directly write switch
-registers. Alternatively it can make some sort of RPC to firmware
-which configures the switch.
+The mcp251xfd allows two pins to be configured as GPIOs. This series
+adds support for this feature.
 
-Before committing this MAC driver, we will want to be convinced there
-is a switchdev driver for the switch.
+The GPIO functionality is controlled with the IOCON register which has
+an erratum.
 
-	Andrew
+Patch 1-3 from https://lore.kernel.org/linux-can/20240429-mcp251xfd-runtime_pm-v1-0-c26a93a66544@pengutronix.de/
+Patch 4 refactor of no-crc functions to prepare workaround for non-crc writes
+Patch 5 is the fix/workaround for the aforementioned erratum
+Patch 6 only configure pin1 for rx-int
+Patch 7 adds the gpio support
+Patch 8 updates dt-binding
+
+---
+Changes in v3:
+- Implement workaround for non-crc writes
+- Configure only Pin1 for rx-int feature
+- moved errata check to .gather_write callback function
+- Added MCP251XFD_REG_IOCON_*() macros
+- Added Marcs suggestions
+- Collect Krzysztofs Acked-By
+- Link to v2: https://lore.kernel.org/r/20240506-mcp251xfd-gpio-feature-v2-0-615b16fa8789@ew.tq-group.com
+
+Changes in v2:
+- picked Marcs patches from https://lore.kernel.org/linux-can/20240429-mcp251xfd-runtime_pm-v1-0-c26a93a66544@pengutronix.de/
+- Drop regcache
+- Add pm_runtime in mcp251xfd_gpio_request/mcp251xfd_gpio_free
+- Implement mcp251xfd_gpio_get_multiple/mcp251xfd_gpio_set_multiple
+- Move check for rx_int/gpio conflict to mcp251xfd_gpio_request
+- Link to v1: https://lore.kernel.org/r/20240417-mcp251xfd-gpio-feature-v1-0-bc0c61fd0c80@ew.tq-group.com
+
+---
+Gregor Herburger (5):
+      can: mcp251xfd: utilize gather_write function for all non-CRC writes
+      can: mcp251xfd: add workaround for errata 5
+      can: mcp251xfd: only configure PIN1 when rx_int is set
+      can: mcp251xfd: add gpio functionality
+      dt-bindings: can: mcp251xfd: add gpio-controller property
+
+Marc Kleine-Budde (3):
+      can: mcp251xfd: properly indent labels
+      can: mcp251xfd: move mcp251xfd_timestamp_start()/stop() into mcp251xfd_chip_start/stop()
+      can: mcp251xfd: move chip sleep mode into runtime pm
+
+ .../bindings/net/can/microchip,mcp251xfd.yaml      |   5 +
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c     | 338 ++++++++++++++++-----
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-dump.c     |   2 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c   | 116 +++++--
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c      |   2 +-
+ .../net/can/spi/mcp251xfd/mcp251xfd-timestamp.c    |   7 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c       |   2 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd.h          |  11 +
+ 8 files changed, 389 insertions(+), 94 deletions(-)
+---
+base-commit: 1fdad13606e104ff103ca19d2d660830cb36d43e
+change-id: 20240417-mcp251xfd-gpio-feature-29a1bf6acb54
+
+Best regards,
+-- 
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
+
 
