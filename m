@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-97332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFCE28CAD7B
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 13:40:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61DE28CADA4
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 13:51:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8224F1F232A5
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 11:40:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D04128312B
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 11:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA926CDCC;
-	Tue, 21 May 2024 11:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BB774404;
+	Tue, 21 May 2024 11:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oECgWpz6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EAT5eBH0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 673516CDA9
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 11:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55DE763F1
+	for <netdev@vger.kernel.org>; Tue, 21 May 2024 11:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716291628; cv=none; b=erVOuXQspx62fEb3gazCiISGf5m8UuAb5QTTnaRvjTVydo9k6OAAVFP1fynGSPlQRjrzlSuMcNIPZG25N8l5KMqgwOflSnaHmdpsOe1RSW7bOiUnDy7V0lPyl4hJGGZ5X67bQQfGoPRvaDQIqdICodITV/8gax1cuY5vNL2590A=
+	t=1716292228; cv=none; b=h9/c+azWSxSTQ0s/OTx0eByCSihDrs2u9m1AVeWQuYYdJFjx8r6N0PCBJvOWcG6r6nhkjGZKphTpYY2fyhe7wNmXWbIvbArzJzauaby6VRAH1cuTa3xwCGb8rPvwevMTyDPl7WmuLgZkbAK5o1ix9jvEwLJ/wBufK21EWTeGkCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716291628; c=relaxed/simple;
-	bh=eNfQgrHEF11LFxEG/is2/mNYsuWIvr5E3THKlfmYwmk=;
+	s=arc-20240116; t=1716292228; c=relaxed/simple;
+	bh=c3hMXERiqI4LlSBAOoZGQWiiM4vCYcA3natUvqE+E4A=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=V1D775vy374u9qWDAG+tfM5nvE11vQ7A4Gndbj3e9IvsSIQ5WFd7ZJ3/9RUwNTVFrXsPVmidzxGH02XcIG4kbD9Z12w7t+h28I4kQ17mRIeVLobX59TyqcXfGOeRGoNRjrRTlt9mt2gI4cmKbWtxemN3o98hmFNpqyoAREJURw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oECgWpz6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F3C63C32789;
-	Tue, 21 May 2024 11:40:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ry5Y/vxvTA+BKId6tWRzIqklFuUJCnjKdREj47U/ZYneg0JywisqBtsZBKnwcoKyPC0xVdXqzRpDddzrP085Y4F5OuwBTmVdrnCHGzDDFEViwnx/enohWPcvFxlMU2iSaX8NsX04EN0oWDguOw6dlv1Qo1vT3prysOECbqynY18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EAT5eBH0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8CF5FC32789;
+	Tue, 21 May 2024 11:50:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716291628;
-	bh=eNfQgrHEF11LFxEG/is2/mNYsuWIvr5E3THKlfmYwmk=;
+	s=k20201202; t=1716292228;
+	bh=c3hMXERiqI4LlSBAOoZGQWiiM4vCYcA3natUvqE+E4A=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oECgWpz6wjrn4ggNF0ScjzOsWYe6cQfwd0COroczcEMVAtAWkbqzg2A+Dttj4aVzb
-	 pK6E7od501qnjMew4AXh9kqmWG4mOWi10ViP8+mMv1ePakfU4qetGGMNWqo+T1hEjS
-	 iidMvi00BedRlkDhOnN2QXubbN15hQYdOeXf0eaQ6IIWeUYbgW9c9GIM1UW0SAC9QV
-	 pTSuzZ8QVRNw0SodxaprOo4xRvkljNnWO1QzWhWLOiDNJ1jbdpkqEq5SrwFdYPM5bn
-	 o/bMwC22JMazCS/6lQf5AC++ghf0KupSDXJatVxcguo0KyM4c4ZBcSIcayPvGlZSJD
-	 AZTRhHU3MDMyg==
+	b=EAT5eBH0KspsNd5lDx86oQ5jY1zACb95t+tkWdd68xrBEeyx1vwgSppJwWOBu7HXR
+	 uKMYbFfv/MdEfhRwH0fCmqDTkqPmmGuar7Jr20ObPfN838jWV7E0IBEoqQUfGSDE4V
+	 hNkk3YBmuParAm7zggUhinUUG75G5qs5Zp/Wg4/HsP1OqDUpRSxx+Is9sg9jrxLSrz
+	 H5PBZu+HRf+CxcHGbAg0mFWnwMiRxy29SdPoehMFkL1G7NdcWSaUj0uorvGHGA7+HU
+	 1Wb8ugBSrJAlwrMwymegMcCKH6oG8zxUwV563nrCmU0ifwtDKaxZKtw0tBFBUeaTU9
+	 OEriSwitgUOMQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DF1CEC54BB1;
-	Tue, 21 May 2024 11:40:27 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6E060C54BD4;
+	Tue, 21 May 2024 11:50:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net] tcp: Fix shift-out-of-bounds in dctcp_update_alpha().
+Subject: Re: [PATCH v3 net 0/2] af_unix: Fix GC and improve selftest
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171629162791.2441.4940438583643333022.git-patchwork-notify@kernel.org>
-Date: Tue, 21 May 2024 11:40:27 +0000
-References: <20240517091626.32772-1-kuniyu@amazon.com>
-In-Reply-To: <20240517091626.32772-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, daniel@iogearbox.net, fw@strlen.de,
- glenn.judd@morganstanley.com, kuni1840@gmail.com, netdev@vger.kernel.org,
- syzkaller@googlegroups.com, samsun1006219@gmail.com, xrivendell7@gmail.com
+ <171629222844.9323.10296602270935017581.git-patchwork-notify@kernel.org>
+Date: Tue, 21 May 2024 11:50:28 +0000
+References: <20240517093138.1436323-1-mhal@rbox.co>
+In-Reply-To: <20240517093138.1436323-1-mhal@rbox.co>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, kuniyu@amazon.com, shuah@kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Fri, 17 May 2024 18:16:26 +0900 you wrote:
-> In dctcp_update_alpha(), we use a module parameter dctcp_shift_g
-> as follows:
+On Fri, 17 May 2024 11:27:00 +0200 you wrote:
+> Series deals with AF_UNIX garbage collector mishandling some in-flight
+> graph cycles. Embryos carrying OOB packets with SCM_RIGHTS cause issues.
 > 
->   alpha -= min_not_zero(alpha, alpha >> dctcp_shift_g);
->   ...
->   delivered_ce <<= (10 - dctcp_shift_g);
+> Patch 1/2 fixes the memory leak.
+> Patch 2/2 tweaks the selftest for a better OOB coverage.
+> 
+> v3:
+>   - Patch 1/2: correct the commit message (Kuniyuki)
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1,net] tcp: Fix shift-out-of-bounds in dctcp_update_alpha().
-    https://git.kernel.org/netdev/net/c/3ebc46ca8675
+  - [v3,net,1/2] af_unix: Fix garbage collection of embryos carrying OOB with SCM_RIGHTS
+    https://git.kernel.org/netdev/net/c/041933a1ec7b
+  - [v3,net,2/2] selftest: af_unix: Make SCM_RIGHTS into OOB data.
+    https://git.kernel.org/netdev/net/c/e060e433e512
 
 You are awesome, thank you!
 -- 
