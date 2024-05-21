@@ -1,93 +1,137 @@
-Return-Path: <netdev+bounces-97314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B0828CAB88
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 12:10:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DF2F8CAB90
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 12:13:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12CFA282905
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 10:10:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD314B20910
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 10:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B424F6CDD0;
-	Tue, 21 May 2024 10:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009E46BFA3;
+	Tue, 21 May 2024 10:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aSTaiM8A"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0ualeSL0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909616CDBD
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 10:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C416756B7B
+	for <netdev@vger.kernel.org>; Tue, 21 May 2024 10:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716286229; cv=none; b=AAczFJDW4aZ8evW0ecbTfKHbYe+s1zppfsRY8ilH0RVwo/1IpSxYDbpbjf5u299uGdqYDiO3+QrF6Uimbz7647cC/iVnCmnRIjMdyhF0n5LS6H4sNwpWIRHMhrdmRXk5xV74gr0h9JUXQpJQX7rjqubL3YrGxOCNBpXC7HtHo9U=
+	t=1716286378; cv=none; b=GLE1k9G2+UIh0pgPHew4Bg9l0vEvu4YqLkAjr04Y2FgAJgm/UkB8/cIRfehB09wzpZqLBfbQyAj9r7MGHZFB9l9mIDbejwjeXosV73BcSDemMZXPDnqxevS0jQPj+Kawc4K1VkCxl8WyWV0GeLgW9yk9JxCWgJH2GWlJcfmWu3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716286229; c=relaxed/simple;
-	bh=TjJ6Xc2lw1xumu+o9ZZ7ipzDZy+ngsvzPUHL6OKjqfE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mYb1ujGAy0p8xsApqIRwHeOLH0CS3K99HJbW5KMG1GADkGZbI4GJwGpy5+112VuaeZapEO7mrzCokK1YVDm+hqkiCVNfOu96DyM3V1m8YneYOAGcOZWQvv8J9enykiOnlP2otalwlb61VttolfMhSPY/3ItzT45eunUxwxwsm1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aSTaiM8A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 18C68C4AF07;
-	Tue, 21 May 2024 10:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716286229;
-	bh=TjJ6Xc2lw1xumu+o9ZZ7ipzDZy+ngsvzPUHL6OKjqfE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aSTaiM8Ayc1ZqYpPKFOWMnIbigVPJd5FSnZU1qfwv2yHwC639lctRlUKMPvQS19IV
-	 HSXUYUGxHpOkvK5YjxF4MwMkPS2YaSmUH0lr0AfiWXoJX/Pf0IyacilwWO10dDhW2v
-	 glw/c/RmYDxY/Tmg0pFXVQalF7SOHnniG6s0hstMLg3JJrKJwVLGYxD/X/joIEnDL6
-	 85cvbabqL8FLr+f8dgAc+mpPOchB816N1Ts8503ulldtY0N4Wzr/x/F+v71Lhtgyxy
-	 2RB6Wh7p2aI6v+Kj2KlwxpPol/dcZtgryMdmWnzBkDVaa7B+c8Uva/et5QC3Kbqwir
-	 YSEKOePM4YXrw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 05DD5C54BB1;
-	Tue, 21 May 2024 10:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1716286378; c=relaxed/simple;
+	bh=81iT+BRUUjSYJEu3/Hs3xxwawY0+QNRshNXe8/WnHhk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pFCS6Kz5TXCxNRAj2AnnhOV7s5WbXoY+P1hGe4pxgHu1+z5jYiap97yi1hs7hZkDrG4Bu5JxnFXiTkIVKLb/8ys7DEesMU0dr+LElbN4MTUshpbk/3yUqQdRFxsZXcPLnyYifKmFVL+lRWXt3vREyP+IG+faChaSDQCbr/fWrIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0ualeSL0; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-572a1b3d6baso28280a12.1
+        for <netdev@vger.kernel.org>; Tue, 21 May 2024 03:12:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716286375; x=1716891175; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9kT03MirJEvh1ObmDBHbmFe/vTGdLYHTa2/ZsDS+/7c=;
+        b=0ualeSL0OTDKGUitegsOWhJSKXgWj/vEzVjDLywu7SRwjmmoBP/mcwnyisZrBdB+uA
+         VOZOG6HktCNsnVvhd/pvWMVYufzvdVaQi3fBdzoabC/qj1U+dPfkrH2P41qRxWnfhqNr
+         9O8jHnuWfAm7fwOavZV7zDtxgyKCOn1I0MggJQb0cwsKnUXj0G4ZTfQXzREtnxI5+OrH
+         hfHZFR6O3Z3OPn/h07NsKGLljsv07oG0R9ORyExfSAwWvm5YU8cSgJgwsMEV9rwIc8Ui
+         BXc35Rvsv16DXyzG5ei/1t11AIajeOnAhsEP+84xIOhDeTV+zfxkD1hHJVY0RbentShe
+         XSFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716286375; x=1716891175;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9kT03MirJEvh1ObmDBHbmFe/vTGdLYHTa2/ZsDS+/7c=;
+        b=L5vwwGv6J9TWBl+R5DmeUKQztb8fjel0HAkNT34ft5YmG9n+MsyOm+Rmakeq12xjeK
+         +Fi/0zXKmtC6Z+qAgJYoU6DZ+5NRZqsWS78y9tNJ5z9mtXJFIUqDiJLnijq+NWH2St/E
+         PjklNBWZlGf8oGsMXl+FYnOlNe10qbzBVrLGQuBf5e3XqmguAL+eYhZlxsc1Gt6wDI6c
+         zXmUwFFpnbn6RuK3wSWel3kGcDURP4+nGjGwDZ42cIoTF/LynZ681e7ymmUbkril8BIH
+         a9k6kf2p1qWi5EhWJlZ4Ifsxh+zFtAtdRayISXlA/6scCtdgIPoGLuPo4UTcbPxGcDIQ
+         DMtg==
+X-Forwarded-Encrypted: i=1; AJvYcCUyBmgJiUG1Kv2GzSMdwehPTHC8UW9hD8lWRocN+f/KuszttO4bmDLOrpAEaRDnF9Hr5xcyTbzQpnlxP6H8CRrdMXyUGkVT
+X-Gm-Message-State: AOJu0YyJPia2Ao5AjCQKLzNdwBDN9OhOBl7wOIgkbp9hygWDv6JXPf3+
+	h1Jij+RKYU7/JVYl7Lkz009IRN0itzEFutfXUhomKoMsu01PmIzK+KcI2R986S3vYCFa9KkK7/B
+	HEnU/pNe6uUC+lvMI8MCfKzanvGa/GlZ3OVOVMkRe+gECsH7+ng==
+X-Google-Smtp-Source: AGHT+IEvwBuxs7E1wXHaSzZxDTNxHo3qNU+rWKNZRAxDs810d6PdEN3s/+5hXyUMyzh20Wm7D/dctYMKLLO+0879h+0=
+X-Received: by 2002:a50:e60e:0:b0:574:e7e1:35bf with SMTP id
+ 4fb4d7f45d1cf-5752c8c2675mr473194a12.7.1716286374837; Tue, 21 May 2024
+ 03:12:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v6 net] af_unix: Update unix_sk(sk)->oob_skb under
- sk_receive_queue lock.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171628622901.9229.14757241708226262407.git-patchwork-notify@kernel.org>
-Date: Tue, 21 May 2024 10:10:29 +0000
-References: <20240516134835.8332-1-kuniyu@amazon.com>
-In-Reply-To: <20240516134835.8332-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kuni1840@gmail.com, mhal@rbox.co, netdev@vger.kernel.org,
- billy@starlabs.sg
+References: <TYAPR01MB64091EA3717FC588B4ACF045C4ED2@TYAPR01MB6409.jpnprd01.prod.outlook.com>
+ <1f42042dbfe9b413cded5e5d59cd3933ec08ed08.camel@redhat.com>
+In-Reply-To: <1f42042dbfe9b413cded5e5d59cd3933ec08ed08.camel@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 21 May 2024 12:12:40 +0200
+Message-ID: <CANn89iLgAEPQF934aNFk5o0mhHUdYra8UYRFxep1oyqk3SsEtQ@mail.gmail.com>
+Subject: Re: Potential violation of RFC793 3.9, missing challenge ACK
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: hotaka.miyazaki@cybertrust.co.jp, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Tue, May 21, 2024 at 11:47=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On Thu, 2024-05-16 at 16:12 +0900, hotaka.miyazaki@cybertrust.co.jp
+> wrote:
+> > Hello.
+> >
+> > I have a question about the following part of the tcp_ack function in n=
+et/ipv4/tcp_input.c.
+> > ```
+> >       /* If the ack includes data we haven't sent yet, discard
+> >       * this segment (RFC793 Section 3.9).
+> >       */
+> >       if (after(ack, tp->snd_nxt))
+> >         return -SKB_DROP_REASON_TCP_ACK_UNSENT_DATA;
+> > ```
+> > I think that this part violates RFC793 3.9 (and the equivalent part in =
+RFC9293 (3.10.7.4)).
+> >
+> > According to the RFC, =E2=80=9CIf the ACK acks something not yet sent (=
+SEG.ACK > SND.NXT) then send an ACK, drop the segment, and return=E2=80=9C =
+[1].
+> > However, the code appears not to ack before discarding a segment.
+>
+> Note that in some cases the ack is generated by the caller, see:
+>
+> https://elixir.bootlin.com/linux/latest/source/net/ipv4/tcp_input.c#L6703
+>
+> In any case not sending the challenge ack does not look a violation to
+> me, as the RFC suggest (it uses 'should') and does not impose (with a
+> 'must') such acks . Sending them back too freely opens-up to possible
+> security issue.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Yes, this behavior was added in 2009, we lived 15 years with it.
 
-On Thu, 16 May 2024 22:48:35 +0900 you wrote:
-> Billy Jheng Bing-Jhong reported a race between __unix_gc() and
-> queue_oob().
-> 
-> __unix_gc() tries to garbage-collect close()d inflight sockets,
-> and then if the socket has MSG_OOB in unix_sk(sk)->oob_skb, GC
-> will drop the reference and set NULL to it locklessly.
-> 
-> [...]
+I do not see a pressing reason to send challenge acks here.
 
-Here is the summary with links:
-  - [v6,net] af_unix: Update unix_sk(sk)->oob_skb under sk_receive_queue lock.
-    https://git.kernel.org/netdev/net/c/9841991a446c
+Hotaka, please explain why this would help a valid use case (I am not
+speaking of broken middleboxes)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>
+> side note, @Eric: it looks like we can send 2 challenge ack for half-
+> closed socket hitting RFC 5961 5.2 mitigations?!?
 
+Sorry, can you elaborate ?
 
+>
+> Cheers,
+>
+> Paolo
+>
 
