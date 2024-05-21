@@ -1,160 +1,160 @@
-Return-Path: <netdev+bounces-97324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD17A8CAC42
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 12:33:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EDCE8CAC51
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 12:34:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 184AB1F211CE
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 10:33:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEB57282732
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 10:34:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FDE200C7;
-	Tue, 21 May 2024 10:33:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E176CDD5;
+	Tue, 21 May 2024 10:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UhMg8R+q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VIchhHxi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4377C14290
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 10:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF0B6CDC2;
+	Tue, 21 May 2024 10:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716287593; cv=none; b=D6Cl2Jl6ozNOoB8k9EdmmIRq/mcFD8oR00/D754ivHyDU7K4///EE2hMzt7NrjGL7lXS9QAWWROPBfu8iQluczy+jlVNg3wWxrBGyPe3MT4miBXZMiB2GLprrn4a2FwOsIH3E9J4W03yR3U5arLVckI27fng+GQkRomC0GAaG5A=
+	t=1716287686; cv=none; b=GxJlV10pdRUwG8Iu0hAvqPdQnNEijbmxpqsrhy0onzXCGK3527+CaKN/bAkulBFUZqIMkx0zfS33V4tpe3S+ewxNddBsJy4kCm3GMyGrQ6g1HUYxCd/MXziE8hH77Ol+ZJLu1IMwxPJbvfZOFiycaiXcgynWFs5Xmt1seTWsA3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716287593; c=relaxed/simple;
-	bh=nKtZCK95q3WIA7a/neNnZykCH9FD3SoZ8Fu1Wu32e+o=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TopFtRQDiA7/q+7gET8aep8xaCT1df0+BQrYvl7edoJagK/3JHqap4Viv8xdLvq+4tQUjQcP5dBaRtlYQJWOpzoCuml+hS62zmtI4xGhNrFUPnBWmoMrNR1Qj+veeHTevSyO3/fhRFlOpENuPms6KDBUvfeOZ9O11d3Wcem7NFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UhMg8R+q; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716287591;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=zprPOgGnQP55TZ56eaxD3hCEQCJeTwYwS5iOQZCPEco=;
-	b=UhMg8R+q3DK2B+zdte1jfaKeKXzao8aYNAxXL+pZLn1cfh5WHiy/zEb1tO460s5jXdauD6
-	WZ/oYPa1wT2uBGMIa7TrJGubIQptFXXKGqW2P5Ywtkvl/CyXDgKFG+zGYuLz05iypcuTzj
-	aXCJTB5zW+JJKWe1y9uWx+quP5DU9oA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-404-GDGV_hvZO5GEsY7FRR8G9Q-1; Tue, 21 May 2024 06:33:10 -0400
-X-MC-Unique: GDGV_hvZO5GEsY7FRR8G9Q-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-351d48fd1bcso638648f8f.3
-        for <netdev@vger.kernel.org>; Tue, 21 May 2024 03:33:09 -0700 (PDT)
+	s=arc-20240116; t=1716287686; c=relaxed/simple;
+	bh=CXiGuTveBYvikiaixrSuzN6fvkoLiUDszUlj3xGQpqA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=PpQxu3n9bkLKaufseUqCDNdRctJqPQylmbn+Trdsi8HIZxaHTsVGhYNCaGq8Z1TPk8mh+0CKg1LiS0Phy8WYtOuMSJNZMqG3omAxOOucXATYoupFdgOkNBWE4xurX76VOniAi9CGxEhEpPJ6VOHBkwro3TucBs6DCVtNhjlPb7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VIchhHxi; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1f0937479f8so100825035ad.3;
+        Tue, 21 May 2024 03:34:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716287684; x=1716892484; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3sehLpck2yDqjDYvjgEiEstrq/QyxjTksSBaL92La0k=;
+        b=VIchhHxiDLNJ+BMv013vvKhrqTZL6H9jVpweToPDwUKRq2gbeZuZj+w2ZWk6ooTC/D
+         bK7aPBzkW98ZGOYyiQTMOjF/STx/H4y9QuQUhaNb/G2sGQE2/7oVNrPkudZ6CWsNhVUp
+         pK2hFlctQ59wGXHhmSeQ5MRQTeD/InVYxzweLmG1qniBaV/8i6KITqq2+cFEBR0s9CRV
+         514hS89YcL5O8OzVYT6hJzTpcWUmDTdGz2i2gwrp7Jm8zoy8nwv7zd2xRuBF/yQ1xb3r
+         FiuoIp9ngV4cvMc28iWNLyCAads5CrmxFAizssFySOakULLtgKVsNBjQnuTp+5LXSFmG
+         PDnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716287588; x=1716892388;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
+        d=1e100.net; s=20230601; t=1716287684; x=1716892484;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zprPOgGnQP55TZ56eaxD3hCEQCJeTwYwS5iOQZCPEco=;
-        b=IC8PQGIj0pNDQhoWSj5834/RDDvpQX1hNdibR8QlyOJPVFuk8gzr0yh3AYPinpDzIq
-         17nOjjuOYcK9LSZwk2HLqfYamqVvTGlo7AdT6FhFsYUojvtb1QZSzHAevsBRheVQ/chY
-         G1InKFCIcm/AeCQoYQV1mRGfQE9SfmjE9f84R8odpgFf/0k/RV7ykOIFHr+zhlslPOdu
-         7A+svQCnQoC+pPIxGZ9ja0GCkribkTaOPmSIaSwN0FGCYKBRJVjAqPjYtnPU3jhakuNC
-         ONCASJzvfR0zFbTknp/yqRDTbfuOBwy1g1nJQh9ILq1f1Tdhr8XG/p4YgrlfLVzsCy/d
-         g/6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVN9m9Qb76LRhz735Sr1XiDBhK7zi3UPELFka7KX3mBiMCvmv1fnidIgBrTuTmOCPt+uOTZoqoTZPLImMxMLTW3xYk+ZEuP
-X-Gm-Message-State: AOJu0YzTqhJH7kPby0p0Yhg0+YJlMtSAJmxIgpBALSC23zuJeOCrAIcc
-	Zz9bTD2iUu4ALvUl3oDYg3jjU7Yhr1HxDsaCztkmu0e0rOc/ESewNe/7chBPC5bz/8PEBehejsr
-	llJ35SJEYYuLb4fB+7btw0vJdL8U78Y0k/4euS5CXSb/wMrqEm0AfjlsEakqxSw==
-X-Received: by 2002:a05:600c:3b86:b0:418:f770:ba0 with SMTP id 5b1f17b1804b1-41fea52ef14mr239542655e9.0.1716287588566;
-        Tue, 21 May 2024 03:33:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFPsVWYJusKzgO4kHGMvFlNH3SENvmzNTmKlXyWC+OT76rCUx5nyvxNzUqWFJyRmF1VtrPx/g==
-X-Received: by 2002:a05:600c:3b86:b0:418:f770:ba0 with SMTP id 5b1f17b1804b1-41fea52ef14mr239542505e9.0.1716287588182;
-        Tue, 21 May 2024 03:33:08 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b094:ab10:29ae:cdc:4db4:a22a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41fccce25casm455622005e9.20.2024.05.21.03.33.06
+        bh=3sehLpck2yDqjDYvjgEiEstrq/QyxjTksSBaL92La0k=;
+        b=lK1Vj3Pk51KcGdUfV8eZS2oUXMN+tizkBExlwEvzACXuoiQbSNzL8Difv4cKVlO/3x
+         g1C2jSkNlSm5G25Hdn7AN4wVKqnp/v4uofsloNyW2eMa6DLotv3cxAE+J4zKYw0stGQg
+         b5rx8bESr5Rb4cuTRcDbGOD9TaVjGUOsaoNbnpRIbLdj/ABEgg4YoigVu5T40AeYGJDd
+         9CUPN2PDtrc496RlWVlKc2lSsLO1GttRvJcYmFtmwS5dzzimppK4UQi8R3WtA1HdyeCR
+         s+WYBNLGSfjm+uMcT9L+kXsNW8+WFfZCdBPswf3eT+mu9NAo+iD5Vy90C686C8RZbsXT
+         WZ0A==
+X-Forwarded-Encrypted: i=1; AJvYcCV5YIlRVs2FDQxFThvvqIIEv7AJNd1XhFl0nN0GjBfmz6GZS6mkIp0OdS27x9D6osAG72Xf9MeFh3LTdKg12aC7cFxSjahZpDWhFRTlot0COHlegvwb3VffAOtF9eYSTUg58hMa
+X-Gm-Message-State: AOJu0YxwTWY6SngaD1I97zDrK9geU/5Fbd4IYRP7IiAIzRF0dVUa27DL
+	D7DvpRkesuS+kTXcaoH906QTH0F+BOrtYeNSdb+PoLqWt2/uW4al
+X-Google-Smtp-Source: AGHT+IE25aL/4/zxxn8w2FeumCv7Id50mPpsNfynpk5yhqLATIeyR5dw4/rKWteVt4uHrqMDd2BZXQ==
+X-Received: by 2002:a17:903:184:b0:1f3:704:8304 with SMTP id d9443c01a7336-1f307048b69mr40697395ad.9.1716287683934;
+        Tue, 21 May 2024 03:34:43 -0700 (PDT)
+Received: from libra05 ([143.248.188.128])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f312268e60sm4851155ad.15.2024.05.21.03.34.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 May 2024 03:33:07 -0700 (PDT)
-Message-ID: <9c065f7fe03e158998289c88b9f99eb5336f9776.camel@redhat.com>
-Subject: Re: Potential violation of RFC793 3.9, missing challenge ACK
-From: Paolo Abeni <pabeni@redhat.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: hotaka.miyazaki@cybertrust.co.jp, netdev@vger.kernel.org
-Date: Tue, 21 May 2024 12:33:05 +0200
-In-Reply-To: <CANn89iLgAEPQF934aNFk5o0mhHUdYra8UYRFxep1oyqk3SsEtQ@mail.gmail.com>
-References: 
-	<TYAPR01MB64091EA3717FC588B4ACF045C4ED2@TYAPR01MB6409.jpnprd01.prod.outlook.com>
-	 <1f42042dbfe9b413cded5e5d59cd3933ec08ed08.camel@redhat.com>
-	 <CANn89iLgAEPQF934aNFk5o0mhHUdYra8UYRFxep1oyqk3SsEtQ@mail.gmail.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        Tue, 21 May 2024 03:34:43 -0700 (PDT)
+Date: Tue, 21 May 2024 19:34:38 +0900
+From: Yewon Choi <woni9911@gmail.com>
+To: Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: "Dae R. Jeong" <threeearcat@gmail.com>
+Subject: [PATCH net v2] tls: fix missing memory barrier in tls_init
+Message-ID: <Zkx4vjSFp0mfpjQ2@libra05>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Tue, 2024-05-21 at 12:12 +0200, Eric Dumazet wrote:
-> On Tue, May 21, 2024 at 11:47=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> >=20
-> > On Thu, 2024-05-16 at 16:12 +0900, hotaka.miyazaki@cybertrust.co.jp
-> > wrote:
-> > > Hello.
-> > >=20
-> > > I have a question about the following part of the tcp_ack function in=
- net/ipv4/tcp_input.c.
-> > > ```
-> > >       /* If the ack includes data we haven't sent yet, discard
-> > >       * this segment (RFC793 Section 3.9).
-> > >       */
-> > >       if (after(ack, tp->snd_nxt))
-> > >         return -SKB_DROP_REASON_TCP_ACK_UNSENT_DATA;
-> > > ```
-> > > I think that this part violates RFC793 3.9 (and the equivalent part i=
-n RFC9293 (3.10.7.4)).
-> > >=20
-> > > According to the RFC, =E2=80=9CIf the ACK acks something not yet sent=
- (SEG.ACK > SND.NXT) then send an ACK, drop the segment, and return=E2=80=
-=9C [1].
-> > > However, the code appears not to ack before discarding a segment.
-> >=20
-> > Note that in some cases the ack is generated by the caller, see:
-> >=20
-> > https://elixir.bootlin.com/linux/latest/source/net/ipv4/tcp_input.c#L67=
-03
-> >=20
-> > In any case not sending the challenge ack does not look a violation to
-> > me, as the RFC suggest (it uses 'should') and does not impose (with a
-> > 'must') such acks . Sending them back too freely opens-up to possible
-> > security issue.
->=20
-> Yes, this behavior was added in 2009, we lived 15 years with it.
->=20
-> I do not see a pressing reason to send challenge acks here.
->=20
-> Hotaka, please explain why this would help a valid use case (I am not
-> speaking of broken middleboxes)
->=20
-> >=20
-> > side note, @Eric: it looks like we can send 2 challenge ack for half-
-> > closed socket hitting RFC 5961 5.2 mitigations?!?
->=20
-> Sorry, can you elaborate ?
+From: Dae R. Jeong <threeearcat@gmail.com>
 
-Oops, I did not consider __tcp_oow_rate_limited() nor
-FLAG_NO_CHALLENGE_ACK.
+In tls_init(), a write memory barrier is missing, and store-store
+reordering may cause NULL dereference in tls_{setsockopt,getsockopt}.
 
-The code path I was looking at is:
-https://elixir.bootlin.com/linux/latest/source/net/ipv4/tcp_input.c#L6703
-reaching:
-https://elixir.bootlin.com/linux/latest/source/net/ipv4/tcp_input.c#L3874
-Indeed no duplicate acks, sorry for the noise.
+CPU0                               CPU1
+-----                              -----
+// In tls_init()
+// In tls_ctx_create()
+ctx = kzalloc()
+ctx->sk_proto = READ_ONCE(sk->sk_prot) -(1)
 
-Paolo
+// In update_sk_prot()
+WRITE_ONCE(sk->sk_prot, tls_prots)     -(2)
+
+                                   // In sock_common_setsockopt()
+                                   READ_ONCE(sk->sk_prot)->setsockopt()
+
+                                   // In tls_{setsockopt,getsockopt}()
+                                   ctx->sk_proto->setsockopt()    -(3)
+
+In the above scenario, when (1) and (2) are reordered, (3) can observe
+the NULL value of ctx->sk_proto, causing NULL dereference.
+
+To fix it, we rely on rcu_assign_pointer() which implies the release
+barrier semantic. By moving rcu_assign_pointer() after ctx->sk_proto is
+initialized, we can ensure that ctx->sk_proto are visible when
+changing sk->sk_prot.
+
+Fixes: d5bee7374b68 ("net/tls: Annotate access to sk_prot with READ_ONCE/WRITE_ONCE")
+Signed-off-by: Yewon Choi <woni9911@gmail.com>
+Signed-off-by: Dae R. Jeong <threeearcat@gmail.com>
+Link: https://lore.kernel.org/netdev/ZU4OJG56g2V9z_H7@dragonet/T/
+---
+v2:
+  - We don't get rid of tls_ctx_create() because it is called in multiple 
+    places (tls_init(), tls_toe_bypass()). Instead, just move 
+    rcu_assign_pointer() to the last of tls_ctx_create(). If needed, removing 
+    tls_ctx_create() can be considered as later patch.
+  - Added Fixes tag
+v1: https://lore.kernel.org/all/ZU4Mk_RfzvRpwkmX@dragonet/
+
+ net/tls/tls_main.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index b4674f03d71a..90b7f253d363 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -816,9 +816,17 @@ struct tls_context *tls_ctx_create(struct sock *sk)
+ 		return NULL;
+ 
+ 	mutex_init(&ctx->tx_lock);
+-	rcu_assign_pointer(icsk->icsk_ulp_data, ctx);
+ 	ctx->sk_proto = READ_ONCE(sk->sk_prot);
+ 	ctx->sk = sk;
++	/* Release semantic of rcu_assign_pointer() ensures that
++	 * ctx->sk_proto is visible before changing sk->sk_prot in
++	 * update_sk_prot(), and prevents reading uninitialized value in
++	 * tls_{getsockopt, setsockopt}. Note that we do not need a
++	 * read barrier in tls_{getsockopt,setsockopt} as there is an
++	 * address dependency between sk->sk_proto->{getsockopt,setsockopt}
++	 * and ctx->sk_proto.
++	 */
++	rcu_assign_pointer(icsk->icsk_ulp_data, ctx);
+ 	return ctx;
+ }
+ 
+-- 
+2.43.0
 
 
