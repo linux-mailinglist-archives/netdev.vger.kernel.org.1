@@ -1,206 +1,188 @@
-Return-Path: <netdev+bounces-97380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CF0D8CB2A8
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 19:14:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B0E48CB2DA
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 19:25:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D4751C2186C
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 17:14:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 072AA1F25433
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 17:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8518B142910;
-	Tue, 21 May 2024 17:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74A0148FF8;
+	Tue, 21 May 2024 17:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3a2GsbEi"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AKHJbxhM"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2085.outbound.protection.outlook.com [40.107.212.85])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DEF22F11
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 17:14:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716311670; cv=fail; b=n+yhD99XXlOXAODyKXkvIpD8mJ+ImDhmEmt9/bVFxTnOFMGQSptVKBaPZEGyPNolh2qFelqktMb4OXOGjxFnsYTdkeNVr6z6q+hJVq3PHY8nfTFJZonVVRnlCYVMBtnh5t0aH7B7Wmzw2Fqpu9M5+OPqt551Yf5UXJ3fOypLrtM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716311670; c=relaxed/simple;
-	bh=AN5jJYioB/CYjMsMk7lFSHMEw8YPX/RBOpBm+r0EHlw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=kyk+tUAU4PRddmbfvCbraiJwMt0rEudZRtf1sbABGYMzo54GQbj4VL+81ZGp4r3mpUOLNtsWEbwxQnBGzR3Uap5Qdl6sr6zQJKfU9oOrWT95QEt6XM95z6Zfb7C+Km290631W+wqTECURu2CVHfHhoF6hfcPSjcW9U4gVWrTks4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3a2GsbEi; arc=fail smtp.client-ip=40.107.212.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BlinSu7XenAV544phAJ1XljGdWB84b19TYfUlCSptJOIT5Zxzu+UpMFKpZyWKog55C/cTPGigPChkk0+hizhvi5MhNJwYHKbfG7LiT03HhwuMg/X3SHseoYFRuBCfnQQFF5MIKT2ZhG01ynF4+0dt1yPI4r5kOWVIVhG3i4BkBcYfRHoSD/qeLmLHas57Bfy8psvTAr0dfVu6yCY5OAM/esdN4VUbwRjUk/4kqCpfeVGCgJGAAbyuycre7EgIY2vScLO9Ac0xdQcfVpLzIHjgrdSlJuYKhQmQgOGyhEVY8bCHC3cKok83HDH/8BYTIBldhfNrXu5JQxz+l7PSmpvNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YiT29AKhRQHvBqk50ZQYV6s+C4Pb2lvLDVSAWOLaUv4=;
- b=k6hKCqT2URkOrZ5/gqf/xlEqrTpeyFGkbuqaN2V/IhqjGuvYrKCEi0v6RAHXIptHFyEcRCnp7t3mUd1U6oU57Tp12/iIWkry7qbPWCD4DnKGDf4+M6sfCNDi4EMU42/KCiQkNrHw1Lak/bN53yj+G35+/WWrYx5zUH9ntGjHWWkDeGX3aqyymhmDrwDzH9R9/B9r8EX0OmghAJq1vlt7ppRVcNNSqY3UHC9COrLJmgKsDmfGsibFXhKKkvUDN7orkQBkknKvJLIMwtkgjkEy4TKX+Zrpy4mX2v8Zz6sAZBijNj/ysQkuoti+2wLggNTGWr9kCjfUzd6Y+Wh6K64BAQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YiT29AKhRQHvBqk50ZQYV6s+C4Pb2lvLDVSAWOLaUv4=;
- b=3a2GsbEiZQiiWU/yiT36dQKR9NrKPlJhLgdYFHggKcH9vcr/xxFtnqzkFEBUSbptTnWiXv5A0D2kn7ySndJf2hkQemxciZT9bT8ZiC6pcZLfQeP3/tF8DTQvOucr420q6xKZbsqnf1aCt2W7jigzSL3cAKjltAx62TW3pL0pkX4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- CH0PR12MB8579.namprd12.prod.outlook.com (2603:10b6:610:182::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.36; Tue, 21 May
- 2024 17:14:26 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb%7]) with mapi id 15.20.7587.030; Tue, 21 May 2024
- 17:14:26 +0000
-Message-ID: <e68cf441-e877-4cf8-98c6-86b6067364a8@amd.com>
-Date: Tue, 21 May 2024 10:14:24 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/7] ionic: small fixes for 6.10
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, brett.creeley@amd.com,
- drivers@pensando.io
-References: <20240521013715.12098-1-shannon.nelson@amd.com>
- <20240521140631.GF764145@kernel.org>
-Content-Language: en-US
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <20240521140631.GF764145@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR07CA0076.namprd07.prod.outlook.com
- (2603:10b6:a03:12b::17) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B2B148FF1;
+	Tue, 21 May 2024 17:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716312025; cv=none; b=IKvZP9B8f+wpAVI6/7MYCbdi7qfobx9HxjvvkxES3/bdcTPupJF4eeNRwI9USrsvRX9AZnSNf6LjlZzsMtrlqxcXH+4Kc5oG3gOz3Oz99qnyverfkde6TW1G5DpB5/zWKkJIRYhrCcDq/Wgawmwdn3Zhf9YtnGmf6BxRrgIIHI8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716312025; c=relaxed/simple;
+	bh=sLZewRsrmNpaJP7tTnB+1/BI0Dnn4A+0e+vApcxPRK4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dnQ6XsooZYActmRj5DqKq4KamkfGQuZqPgo/RcsOu5IxOobFP95FwCm/v8o7IVsZCOf5w0Cwb2vCcBS3RqvCrvF8hOjrkRQZk0uYRb5LKvsonVfBQfz+NVwfxtipfOG34UPmDLAQB4DHJyhEfpNMNFVqtBUceG7wAtPove5fL90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AKHJbxhM; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=RJd+jLDj+nE6uz28VeZVLjgHVLytLup2I3KEv0uM3ZI=; b=AKHJbxhM8E812pfN+rbN0A7Ynb
+	lb5RZeWMAMx0mSYA/q4bjkMOiudDWCg4Sse12fhYsvum5aFfc7jwBbEFdaOaJDWNZFO1PM2QyEoEb
+	+MY3XeYM8qtLfBKxEwNwsDo9LLpoDjqIqbrYS03jPvAnTmZzR8qRXxoROLSaUXYGm8rY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s9T9k-00Fm5g-V6; Tue, 21 May 2024 19:20:08 +0200
+Date: Tue, 21 May 2024 19:20:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"dqfext@gmail.com" <dqfext@gmail.com>,
+	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
+	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"daniel@makrotopia.org" <daniel@makrotopia.org>,
+	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>
+Subject: Re: [PATCH net-next v3 5/5] net: phy: add driver for built-in 2.5G
+ ethernet PHY on MT7988
+Message-ID: <5b437ed2-1404-47f8-a320-f44dee98dfee@lunn.ch>
+References: <20240520113456.21675-1-SkyLake.Huang@mediatek.com>
+ <20240520113456.21675-6-SkyLake.Huang@mediatek.com>
+ <62b19955-23b8-4cd1-b09c-68546f612b44@lunn.ch>
+ <f7bc69930796b3797dc0e31237267e045a86f823.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|CH0PR12MB8579:EE_
-X-MS-Office365-Filtering-Correlation-Id: f378676d-2965-4929-6482-08dc79b97772
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|1800799015;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Nk0yTHU4VjdzaVFtK3dXQTVOU1JIRGRLdzJVSStQcXRjY3dWam1rdGNSejk0?=
- =?utf-8?B?M2t2Wm9lZ3lGa1pXSVQzdWoybXZLTlhtR2pwUjBWRGVRcytQclVMUzJ0dVMv?=
- =?utf-8?B?VVNCZ1crOURZak5mdkJGS3UyQVBZeFZtWTFucDBQaWwyRURxQ2k1R1lGWEQz?=
- =?utf-8?B?UHlHK09OVThxQUhHRis2UjZocWdOZXVuUE9nakplT1JOWTczb0paU3REc09P?=
- =?utf-8?B?OGQvTS9Pb25kdDNjTmxxc2E4OWd3UG9kYlJWeC8ydXM1dTJnRlRTUU1DTkYr?=
- =?utf-8?B?bWtnK1ZDVnFKZzl1eXNaWXNYRDVDK2xZd2ozTUpVaitOK1NtRmdTeHNzUkFS?=
- =?utf-8?B?MEFrZVI1RGJuTzh0NnRya0dabld3d25lNENiVFNSVlV6UFhLMGRvaUFCYmVo?=
- =?utf-8?B?R3BOOUdyQ3o2RDhKbmRRTSs1Z1hmMGsvV0FaeVFxUWNrbkpoVHdhUVJ6Uko0?=
- =?utf-8?B?Y1RHOHhUOFhhR24rZENrQkJoSnIrWm5DY1h2NWpwR0pzak5zaFBvYnp0dUJt?=
- =?utf-8?B?YXdKeHlzdUpDN3BldGZWMUdobzJQaUpnT21scGZRNXBvTElLc044cDkvRDE0?=
- =?utf-8?B?QzJERURzWjBDdGU0dkNQVjRoN0FCZGhVOFlWNTM5SHVhNzJiWlJrclMvNTJP?=
- =?utf-8?B?TjNqU2pJblc2TkJWczZwVDd1ckZ3NWJRS1dYM0RKVlEzWW5Ja1lWYWhOUDBi?=
- =?utf-8?B?MkNhWURWYXVhZ0hONnNDUk9yS3BjRmIvbi9oODFJV2hGT09MbG9sWjRDTXYz?=
- =?utf-8?B?MGxYUVlLSHBYckVxckM1TmJoUDhtUUxNTmZqdUdpUTZqeXk4T3QyYVNIdzd2?=
- =?utf-8?B?TDJPTkdvTW85TU04TG5mSEFyRnJ5SkJRcTFjTDFwNGpjd0U1eVk3VS81a0tm?=
- =?utf-8?B?YTdPd0ZCU1d2RDZ5SHQwYi8zYUd5d1FXd2JOaXdCREdkTjZVZzNaNDc5T0Nt?=
- =?utf-8?B?Ly9rR21nR2F4N0NMcExOYmp5VWxVU3AzWStKbzRmU0dsSkttSXAvOUhWbmVE?=
- =?utf-8?B?a1NsOFB1V1YyVXVKYUtEK1JhNEh3eDZiS2l5UFZpQlNzSGUyRXIxMVVmTWxK?=
- =?utf-8?B?YWIwdy9BdGJueExYMnNxdEd5dnc2YVZWNHdjTitBSVZMMDVoM2lHT2R4LzhT?=
- =?utf-8?B?KzJHQ0UzL0NsYUtkelFUdTVwdnRBLzRaLzYrTFV3Lyt1MHBMTXBXSndhUHYz?=
- =?utf-8?B?LzZsZXRFZ2tYZE1JbnQyZmNlT3ZTTnpHRElMdm5FZlVWTUJGY2ZvY0VSdXFz?=
- =?utf-8?B?RGRaQ21Xb09Da3FVOWhCNjRoejNwTmpqZHc1WVBaL3FTZlJoYjQ4eFE3dHgw?=
- =?utf-8?B?MnJPRnhBS3R6S3ZlUllmTFhlakxKWjFPUUNoWWpWeWMyOW5FZG1sRWUxWTNi?=
- =?utf-8?B?TGlXWFZybmtqV2UrTzBCdTVRVXZJRi9SUHRwWVRGdkF0ZWo2Qk9tVUx2Tmg0?=
- =?utf-8?B?STJnK29ENWV3S3lkMGNHSnQrWGtBMDFsRmx2S29lTWJpcG1qTGdpbkdmYjNL?=
- =?utf-8?B?WDFmeWJQT1A4ZExQWldydFlrVEgrYjF6ZDE2cUpjd28rVzNZdkxZRzRQWmtG?=
- =?utf-8?B?MXFzZjdOeHRJOU0waGxoWmhUa045WEhEN2tvZUl3Yno3Tm1MSW1aNmZQc1N6?=
- =?utf-8?B?QWdBR09qNmJrNzdlQ0U5bEZ0OFZWMXRiOTFnR3I3dVNOdWxqWldBUDRXTHVD?=
- =?utf-8?B?UkFxRU1TTlI1RklPM1BlVHFyWk1meEZOSUplMHVHa3JlcXBmcUJ4MFRBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NmIzWldCMk1iVmFyOXFIVWt2VlFuSWc1NE0wZkhjN2JQRFZ4MW5aUEVqSnJP?=
- =?utf-8?B?bjNPOXlubUlvOVZ3YzdVeHZGTHFibGZZSEI3R05TN2p4Zzc1T3k5THYvL2pw?=
- =?utf-8?B?ekdGZm1lTVFxSVhjbS9FQkxTTlV6SXE5eHpkb25Gd1dRWEo0bWZvdHZoRXpw?=
- =?utf-8?B?MURLbXdyZDZ5dWRaN3dLNEQxOEU4NW5RWlFESWs4MnovV0g3bVdyRnBObVZX?=
- =?utf-8?B?d2swTklCVGF4ak5RWEhMZHhWNzJ0SExtWG9VT2FEMFhOZUNqdlFicW4wam42?=
- =?utf-8?B?OUpyM3pnbXVuSU5kMm1aRWhRYWFZVStNdmNNcjRzbTF1M3hEZ0V6VXNUUWk2?=
- =?utf-8?B?VkJzNEFqT25CeHBaZEprQk52ajdYTkxkNGJkU05KRGN5RWJVbnVmcFY3c1Ex?=
- =?utf-8?B?S2NuVjgrS3VOVnRPaklUTE5zbE1jcENjaHFlUWdldUIxajRibC9RaWlPUE5R?=
- =?utf-8?B?VHRPYmR2WHZpSjI5VUlmRU05T0FMTHlZMXFnOG8wVjhrZTJMQlMyNjdaNWlo?=
- =?utf-8?B?c3Fvc1VQVms4Tld0cDFoZ2FJNDJrRHl4cE1vQ2lOa1JkNlZKS2MxOWQ2K1li?=
- =?utf-8?B?bHdTWWRCbkVtNGgvRExPQnBYa1FEeGhhWlR5S3NUcm02YVh2M0grdVFQSFg4?=
- =?utf-8?B?UHBRTkw0TkR5K1BuQ3dkd1FEVmtqOHV3UThhUnpETXFrMDllblk0VFJNVkFD?=
- =?utf-8?B?c2I5bk1iMzlybXJScXlYVFdseXYrTytZVGFQSFdnVWQ5a1Z4NnhncmtxbEZG?=
- =?utf-8?B?VG5LS08zV2t1SlRlMU14ZTFKekViS1NjU0p6Y0hFMTFZa0VJSW5IZmNOSzVi?=
- =?utf-8?B?YkJ4VTEwbVM2dDdjT2htUFc2cWtlQmZERWYyQ1MrMjI5UUdkNUJSSGJiYkJK?=
- =?utf-8?B?RmZ1U3BkSkdkRDFCcGtHeFF3dS9ZWVlmRHZuT1RxMDJpUnlOMWtFUzl1SCtp?=
- =?utf-8?B?Y3VGQXFhK0FIR25IaW9lV1BmS3BKL3lnOTFIclpQK1Y0SjRQc0ttK0lNRmxm?=
- =?utf-8?B?T1VzN1FyNDhjVkMwSzlFZ2huYm4xRXM1d056OVFjUDZpcEk3RjIzY3RxWG5x?=
- =?utf-8?B?eFdmdy9wSjJOVzJDY0RTOWVWNDVFcWN5a2FPUW5iOW9MRVdjaGZpVTFhQ3VY?=
- =?utf-8?B?RGJTdlNJeWdIaitGYnhMWktQSGkydFcvK0lKWEd6b0VmeXI5bDA1ZnNkSUda?=
- =?utf-8?B?ZCs4VWdjZ0dRYjk0KzdXYTRHUGNjb01hMTIyQXoyYStadlVDYWVnaFJ1YzR4?=
- =?utf-8?B?QWlsS1Y1RWZIYkloazF0cmhnWU5Vajhqa1V2Wkx6TXJkOEoxNS9DSnljbVVH?=
- =?utf-8?B?aTRURXI2YkJ0c1RhWmZ5M2lwN2V2REtsd1hseS9zK0t1YzhoMi8wYzlIcE5S?=
- =?utf-8?B?MDZBc0xiMytzVzJvN3c4Q3BFd1VEWFVFa2tkaU9RNjJ2Vlo2dkJXR0NhZ1ZC?=
- =?utf-8?B?U0ZSbE1CbmVyaE5yaTM4SUZOOHpzZW5MUjRWeWVYTmliTk9UMmRIR1g5STIx?=
- =?utf-8?B?TkhPcVR4WEVLS2FTU3FrQkJIVFZMdklzc1JPbkh0Ujl2cTdZR1BiRWlkTHJU?=
- =?utf-8?B?aWx6TGowWkNvaDd1c3V5QVBtaE45L3hSMkZnLzF2TUxGbTNUN3g4KzZucW8w?=
- =?utf-8?B?blJzeVRQY0l3Y1lPRTV3WVdNUWFxY3NLbmpwcGJFbm5HME1UemMveUNDVVNp?=
- =?utf-8?B?VDN1NEJTc3o5cThlRVZZQ2d4dVRVVVZqV0hMQzh2MzVXOU5UL01rM1NlNmZp?=
- =?utf-8?B?NlRpVTRpQzRxVXVGWjc0b2UxWjc1d3BvSkhjSVFVS0ZvMjJTZlRrMDBiM0NI?=
- =?utf-8?B?VytrNzE3SlhRRS9jS05vMCtIWWUrTW1aalFQUGNhaUZTRTFjTkJPTTNlVERn?=
- =?utf-8?B?NEM1S1oyMUFDQ1VSQllXN0o3dDdDampQMzUydnM0SGdMVElVclhjWjZVVDFp?=
- =?utf-8?B?L1AvR1FnQjFqZGpnYnVTV29PRSt6V1VwZ3NhTXNwRGNOdHRaVm1uaVJpdVF5?=
- =?utf-8?B?V2oyb1h3NmRoUUszWk95eVBxcVNTT0ZSSnhyNm1YUSsrNU5zaVE2UmI2dG1R?=
- =?utf-8?B?MjJlMC9YdE5zeGdRcnNPeWVCeVl1djcvVFQyY2wzL2NBTFl3RExzT2RHdzNZ?=
- =?utf-8?Q?hEv9nQ2OCbFnySO7v+pcDrOXR?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f378676d-2965-4929-6482-08dc79b97772
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2024 17:14:26.1088
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Cf3YCUPog35vWZKlo6gxZLio6YruSTS135lBe5uetd7OW6XyLXgp+kKA1ihiFl2Kg0yjAYfhfhTEQiwnv5c3gw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8579
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f7bc69930796b3797dc0e31237267e045a86f823.camel@mediatek.com>
 
-On 5/21/2024 7:06 AM, Simon Horman wrote:
-> On Mon, May 20, 2024 at 06:37:08PM -0700, Shannon Nelson wrote:
->> These are a few minor fixes for the ionic driver to clean
->> up a some little things that have been waiting for attention.
->>
->> Brett Creeley (3):
->>    ionic: Pass ionic_txq_desc to ionic_tx_tso_post
->>    ionic: Mark error paths in the data path as unlikely
->>    ionic: Use netdev_name() function instead of netdev->name
->>
->> Shannon Nelson (4):
->>    ionic: fix potential irq name truncation
->>    ionic: Reset LIF device while restarting LIF
->>    ionic: only sync frag_len in first buffer of xdp
->>    ionic: fix up ionic_if.h kernel-doc issues
+>     That is to say, for safety, we need to load firmware again right
+> atfer booting into Linux kernel. Actually, this takes just about 11ms.
+
+Since this is only 11ms, its not a big deal. If this was going over
+MDIO it would be much slower and then it does become significant.
+
+> > > +/* Setup LED */
+> > > +phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED0_ON_CTRL,
+> > > + MTK_PHY_LED_ON_POLARITY | MTK_PHY_LED_ON_LINK10 |
+> > > + MTK_PHY_LED_ON_LINK100 | MTK_PHY_LED_ON_LINK1000 |
+> > > + MTK_PHY_LED_ON_LINK2500);
+> > > +phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED1_ON_CTRL,
+> > > + MTK_PHY_LED_ON_FDX | MTK_PHY_LED_ON_HDX);
+> > > +
+> > > +pinctrl = devm_pinctrl_get_select(&phydev->mdio.dev, "i2p5gbe-
+> > led");
+> > 
+> > Calls to devm_pinctrl_get_select() is pretty unusual in drivers:
+> > 
+> > 
+> https://elixir.bootlin.com/linux/latest/C/ident/devm_pinctrl_get_select
+> > 
+> > Why is this needed? Generally, the DT file should describe the needed
+> > pinmux setting, without needed anything additionally.
+> > 
+> This is needed because we need to switch to i2p5gbe-led pinmux group
+> after we set correct polarity. Or LED may blink unexpectedly.
+
+Since this is unusual, you should add a comment. Also, does the device
+tree binding explain this? I expect most DT authors are used to
+listing all the needed pins in the default pinmux node, and so will do
+that, unless there is a comment in the binding advising against it.
+
+> > It is a bit late doing this now. The user requested this a long time
+> > ago, and it will be hard to understand why it now returns EOPNOTSUPP.
+> > You should check for AUTONEG_DISABLE in config_aneg() and return the
+> > error there.
+> > 
+> >       Andrew
+> Maybe I shouldn't return EOPNOTSUPP in config_aneg directly?
+> In this way, _phy_state_machine will be broken if I trigger "$ ethtool
+> -s ethtool eth1 autoneg off"
 > 
-> Hi Shannon and Brett,
+> [  520.781368] ------------[ cut here ]------------
+> root@OpenWrt:/# [  520.785978] _phy_start_aneg+0x0/0xa4: returned: -95
+> [  520.792263] WARNING: CPU: 3 PID: 423 at drivers/net/phy/phy.c:1254 _phy_state_machine+0x78/0x258
+> [  520.801039] Modules linked in:
+> [  520.804087] CPU: 3 PID: 423 Comm: kworker/u16:4 Tainted: G        W          6.8.0-rc7-next-20240306-bpi-r3+ #102
+> [  520.814335] Hardware name: MediaTek MT7988A Reference Board (DT)
+> [  520.820330] Workqueue: events_power_efficient phy_state_machine
+> [  520.826240] pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> [  520.833190] pc : _phy_state_machine+0x78/0x258
+> [  520.837623] lr : _phy_state_machine+0x78/0x258
+> [  520.842056] sp : ffff800084b7bd30
+> [  520.845360] x29: ffff800084b7bd30 x28: 0000000000000000 x27: 0000000000000000
+> [  520.852487] x26: ffff000000c56900 x25: ffff000000c56980 x24: ffff000000012ac0
+> [  520.859613] x23: ffff00000001d005 x22: ffff000000fdf000 x21: 0000000000000001
+> [  520.866738] x20: 0000000000000004 x19: ffff000003a90000 x18: ffffffffffffffff
+> [  520.873864] x17: 0000000000000000 x16: 0000000000000000 x15: ffff800104b7b977
+> [  520.880988] x14: 0000000000000000 x13: 0000000000000183 x12: 00000000ffffffea
+> [  520.888114] x11: 0000000000000001 x10: 0000000000000001 x9 : ffff8000837222f0
+> [  520.895239] x8 : 0000000000017fe8 x7 : c0000000ffffefff x6 : 0000000000000001
+> [  520.902365] x5 : 0000000000000000 x4 : 0000000000000000 x3 : 0000000000000000
+> [  520.909490] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff000004120000
+> [  520.916615] Call trace:
+> [  520.919052]  _phy_state_machine+0x78/0x258
+> [  520.923139]  phy_state_machine+0x2c/0x80
+> [  520.927051]  process_one_work+0x178/0x31c
+> [  520.931054]  worker_thread+0x280/0x494
+> [  520.934795]  kthread+0xe4/0xe8
+> [  520.937841]  ret_from_fork+0x10/0x20
+> [  520.941408] ---[ end trace 0000000000000000 ]---
 > 
-> All of these patches look like good improvements to me.
-> However, it is only obvious to me why patch 2/7 is a bug fix
-> suitable for net. Would the other patches be better targeted
-> at net-next once it reopens?
+> Now I prefer to give a warning like this, in
+> mt798x_2p5ge_phy_config_aneg():
+> if (phydev->autoneg == AUTONEG_DISABLE) {
+> 	dev_warn(&phydev->mdio.dev, "Once AN off is set, this phy can't
+> link.\n");
+> 	return genphy_c45_pma_setup_forced(phydev);
+> }
 
-Hi Simon,
+That is ugly.
 
-As always, thanks for taking a look at the set.
+Ideally we should fix phylib to support a PHY which cannot do fixed
+link. I suggest you first look at phy_ethtool_ksettings_set() and see
+what it does if passed cmd->base.autoneg == True, but
+ETHTOOL_LINK_MODE_Autoneg_BIT is not set in supported, because the PHY
+does not support autoneg. Is that handled? Does it return EOPNOTSUPP?
+Understanding this might help you implement the opposite.
 
-All of these patches are fixing existing code, whether by cleaning up 
-compiler warnings (1, 7), tweaking for slightly better code (3, 4), 
-getting rid of open coding instances (5), and fixing bad behavior (2,6). 
-  It seems to me these fit under the "fixes to existing code" mentioned 
-in our Documentation/process/maintainer-netdev.rst guidelines.
+The opposite is however not easy. There is no linkmode bit indicating
+a PHY can do forced settings. The BMSR has a bit indicating the PHY is
+capable of auto-neg, which is used to set
+ETHTOOL_LINK_MODE_Autoneg_BIT. However there is no bit to indicate the
+PHY supports forced configuration. The standard just assumes all PHYs
+which are standard conforming can do forced settings. And i think this
+is the first PHY we have come across which is broken like this.
 
-Thanks,
-sln
+So maybe we cannot fix this in phylib. In that case, the MAC drivers
+ksetting_set() should check if the user is attempting to disable
+autoneg, and return -EOPNOTSUPP. And i would keep the stack trace
+above, which will help developers understand they need the MAC to help
+out work around the broken PHY. You can probably also simplify the PHY
+driver, take out any code which tries to handle forced settings.
+
+	Andrew
+
+
 
