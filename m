@@ -1,137 +1,135 @@
-Return-Path: <netdev+bounces-97315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DF2F8CAB90
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 12:13:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCFF08CAC11
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 12:23:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD314B20910
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 10:13:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77DD22809A8
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 10:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009E46BFA3;
-	Tue, 21 May 2024 10:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B6B36EB41;
+	Tue, 21 May 2024 10:16:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0ualeSL0"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="Zs6huBgF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C416756B7B
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 10:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846A36D1D2;
+	Tue, 21 May 2024 10:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716286378; cv=none; b=GLE1k9G2+UIh0pgPHew4Bg9l0vEvu4YqLkAjr04Y2FgAJgm/UkB8/cIRfehB09wzpZqLBfbQyAj9r7MGHZFB9l9mIDbejwjeXosV73BcSDemMZXPDnqxevS0jQPj+Kawc4K1VkCxl8WyWV0GeLgW9yk9JxCWgJH2GWlJcfmWu3c=
+	t=1716286569; cv=none; b=IGUxvpgez4gypJYCy9DRiHkws62a03zVXdjHY82u+b/4uNcTGA3T3wj/6paXEqEP1tgeFncdmJ+5G4tJ/x/Ti5yQ4aOZF7pkIvg7TJtJxMyr97xZQBFdplGnkKBTNHh9jQ9ilnEb4TRbIHG2tG3+yQf8d7OvbgWyNQh5Qu9+SIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716286378; c=relaxed/simple;
-	bh=81iT+BRUUjSYJEu3/Hs3xxwawY0+QNRshNXe8/WnHhk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pFCS6Kz5TXCxNRAj2AnnhOV7s5WbXoY+P1hGe4pxgHu1+z5jYiap97yi1hs7hZkDrG4Bu5JxnFXiTkIVKLb/8ys7DEesMU0dr+LElbN4MTUshpbk/3yUqQdRFxsZXcPLnyYifKmFVL+lRWXt3vREyP+IG+faChaSDQCbr/fWrIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0ualeSL0; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-572a1b3d6baso28280a12.1
-        for <netdev@vger.kernel.org>; Tue, 21 May 2024 03:12:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716286375; x=1716891175; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9kT03MirJEvh1ObmDBHbmFe/vTGdLYHTa2/ZsDS+/7c=;
-        b=0ualeSL0OTDKGUitegsOWhJSKXgWj/vEzVjDLywu7SRwjmmoBP/mcwnyisZrBdB+uA
-         VOZOG6HktCNsnVvhd/pvWMVYufzvdVaQi3fBdzoabC/qj1U+dPfkrH2P41qRxWnfhqNr
-         9O8jHnuWfAm7fwOavZV7zDtxgyKCOn1I0MggJQb0cwsKnUXj0G4ZTfQXzREtnxI5+OrH
-         hfHZFR6O3Z3OPn/h07NsKGLljsv07oG0R9ORyExfSAwWvm5YU8cSgJgwsMEV9rwIc8Ui
-         BXc35Rvsv16DXyzG5ei/1t11AIajeOnAhsEP+84xIOhDeTV+zfxkD1hHJVY0RbentShe
-         XSFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716286375; x=1716891175;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9kT03MirJEvh1ObmDBHbmFe/vTGdLYHTa2/ZsDS+/7c=;
-        b=L5vwwGv6J9TWBl+R5DmeUKQztb8fjel0HAkNT34ft5YmG9n+MsyOm+Rmakeq12xjeK
-         +Fi/0zXKmtC6Z+qAgJYoU6DZ+5NRZqsWS78y9tNJ5z9mtXJFIUqDiJLnijq+NWH2St/E
-         PjklNBWZlGf8oGsMXl+FYnOlNe10qbzBVrLGQuBf5e3XqmguAL+eYhZlxsc1Gt6wDI6c
-         zXmUwFFpnbn6RuK3wSWel3kGcDURP4+nGjGwDZ42cIoTF/LynZ681e7ymmUbkril8BIH
-         a9k6kf2p1qWi5EhWJlZ4Ifsxh+zFtAtdRayISXlA/6scCtdgIPoGLuPo4UTcbPxGcDIQ
-         DMtg==
-X-Forwarded-Encrypted: i=1; AJvYcCUyBmgJiUG1Kv2GzSMdwehPTHC8UW9hD8lWRocN+f/KuszttO4bmDLOrpAEaRDnF9Hr5xcyTbzQpnlxP6H8CRrdMXyUGkVT
-X-Gm-Message-State: AOJu0YyJPia2Ao5AjCQKLzNdwBDN9OhOBl7wOIgkbp9hygWDv6JXPf3+
-	h1Jij+RKYU7/JVYl7Lkz009IRN0itzEFutfXUhomKoMsu01PmIzK+KcI2R986S3vYCFa9KkK7/B
-	HEnU/pNe6uUC+lvMI8MCfKzanvGa/GlZ3OVOVMkRe+gECsH7+ng==
-X-Google-Smtp-Source: AGHT+IEvwBuxs7E1wXHaSzZxDTNxHo3qNU+rWKNZRAxDs810d6PdEN3s/+5hXyUMyzh20Wm7D/dctYMKLLO+0879h+0=
-X-Received: by 2002:a50:e60e:0:b0:574:e7e1:35bf with SMTP id
- 4fb4d7f45d1cf-5752c8c2675mr473194a12.7.1716286374837; Tue, 21 May 2024
- 03:12:54 -0700 (PDT)
+	s=arc-20240116; t=1716286569; c=relaxed/simple;
+	bh=vAOqnR+Fv5r79O/IVstnv+R3j79l4ZRsczg9ZZRzCuM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gggk26rovW0nQUY+NgJ2D/9A3TOm8hF2QjgE4JPwDitXAmMxVCM0uw3Fu+YcGMp1hwMKGN8fMjQJHKhRp9DSAeJUoS/9yltAmisfXi4Rt8fRFQAGuz1W63oaT5/fVoNZcsFcj8Oxc8HUERaUuRcdDt6jAkl/9z6lLysgiLDXlzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=Zs6huBgF; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 1ba8f68c175b11efb92737409a0e9459-20240521
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=Wuo82/CjSuzvS9rorGjFVfi+CheqmElwoEW/3RaeBDc=;
+	b=Zs6huBgFqI9NtWlnNWWFIcpwBm3ePDKr9Bxi5Of/RpiFLxzB02NfttN7KRW+Cud14r7/Kc+epIecDMIjrSuCL6pRPEXg8yv8VAhH0TLZJLjLvc6v8jHU8rG1ppzoWOIAcxjSKhp/rzOAwEP+Kf81DA6H/YybHOoPoHQyx5c4dA4=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:82359ce4-768b-45c4-b7af-81f079f0eac3,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:82c5f88,CLOUDID:4880a087-8d4f-477b-89d2-1e3bdbef96d1,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 1ba8f68c175b11efb92737409a0e9459-20240521
+Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw01.mediatek.com
+	(envelope-from <skylake.huang@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 103214835; Tue, 21 May 2024 18:15:54 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ MTKMBS09N1.mediatek.inc (172.21.101.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 21 May 2024 18:15:53 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Tue, 21 May 2024 18:15:53 +0800
+From: Sky Huang <SkyLake.Huang@mediatek.com>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel Golle
+	<daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
+	<SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+CC: Steven Liu <Steven.Liu@mediatek.com>, SkyLake.Huang
+	<skylake.huang@mediatek.com>
+Subject: [PATCH net-next v4 0/5] net: phy: mediatek: Introduce mtk-phy-lib and add 2.5Gphy support
+Date: Tue, 21 May 2024 18:15:43 +0800
+Message-ID: <20240521101548.9286-1-SkyLake.Huang@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <TYAPR01MB64091EA3717FC588B4ACF045C4ED2@TYAPR01MB6409.jpnprd01.prod.outlook.com>
- <1f42042dbfe9b413cded5e5d59cd3933ec08ed08.camel@redhat.com>
-In-Reply-To: <1f42042dbfe9b413cded5e5d59cd3933ec08ed08.camel@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 21 May 2024 12:12:40 +0200
-Message-ID: <CANn89iLgAEPQF934aNFk5o0mhHUdYra8UYRFxep1oyqk3SsEtQ@mail.gmail.com>
-Subject: Re: Potential violation of RFC793 3.9, missing challenge ACK
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: hotaka.miyazaki@cybertrust.co.jp, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-MTK: N
 
-On Tue, May 21, 2024 at 11:47=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> On Thu, 2024-05-16 at 16:12 +0900, hotaka.miyazaki@cybertrust.co.jp
-> wrote:
-> > Hello.
-> >
-> > I have a question about the following part of the tcp_ack function in n=
-et/ipv4/tcp_input.c.
-> > ```
-> >       /* If the ack includes data we haven't sent yet, discard
-> >       * this segment (RFC793 Section 3.9).
-> >       */
-> >       if (after(ack, tp->snd_nxt))
-> >         return -SKB_DROP_REASON_TCP_ACK_UNSENT_DATA;
-> > ```
-> > I think that this part violates RFC793 3.9 (and the equivalent part in =
-RFC9293 (3.10.7.4)).
-> >
-> > According to the RFC, =E2=80=9CIf the ACK acks something not yet sent (=
-SEG.ACK > SND.NXT) then send an ACK, drop the segment, and return=E2=80=9C =
-[1].
-> > However, the code appears not to ack before discarding a segment.
->
-> Note that in some cases the ack is generated by the caller, see:
->
-> https://elixir.bootlin.com/linux/latest/source/net/ipv4/tcp_input.c#L6703
->
-> In any case not sending the challenge ack does not look a violation to
-> me, as the RFC suggest (it uses 'should') and does not impose (with a
-> 'must') such acks . Sending them back too freely opens-up to possible
-> security issue.
+From: "SkyLake.Huang" <skylake.huang@mediatek.com>
 
-Yes, this behavior was added in 2009, we lived 15 years with it.
+e-organize MTK ethernet phy drivers and integrate common manipulations
+into mtk-phy-lib. Also, add support for build-in 2.5Gphy on MT7988.
 
-I do not see a pressing reason to send challenge acks here.
+v2:
+- Apply correct PATCH tag.
+- Break LED/Token ring/Extend-link-pulse-time features into 3 patches.
+- Fix contents according to v1 comments.
 
-Hotaka, please explain why this would help a valid use case (I am not
-speaking of broken middleboxes)
+v3:
+- Fix patch 4/5 & 5/5. Please see changes in 4/5 & 5/5's commit log.
+- Rebase code and now this patch series can apply to net-next tree.
 
->
-> side note, @Eric: it looks like we can send 2 challenge ack for half-
-> closed socket hitting RFC 5961 5.2 mitigations?!?
+v4:
+- Fix patch 4/5 & 5/5. Please see changes in 4/5 & 5/5's commit log.
 
-Sorry, can you elaborate ?
+SkyLake.Huang (5):
+  net: phy: mediatek: Re-organize MediaTek ethernet phy drivers
+  net: phy: mediatek: Move LED and read/write page helper functions into
+    mtk phy lib
+  net: phy: mediatek: Add token ring access helper functions in
+    mtk-phy-lib
+  net: phy: mediatek: Extend 1G TX/RX link pulse time
+  net: phy: add driver for built-in 2.5G ethernet PHY on MT7988
 
->
-> Cheers,
->
-> Paolo
->
+ MAINTAINERS                                   |   7 +-
+ drivers/net/phy/Kconfig                       |  17 +-
+ drivers/net/phy/Makefile                      |   3 +-
+ drivers/net/phy/mediatek-ge.c                 | 111 ----
+ drivers/net/phy/mediatek/Kconfig              |  38 ++
+ drivers/net/phy/mediatek/Makefile             |   5 +
+ drivers/net/phy/mediatek/mtk-2p5ge.c          | 419 ++++++++++++++
+ .../mtk-ge-soc.c}                             | 528 ++++++------------
+ drivers/net/phy/mediatek/mtk-ge.c             | 244 ++++++++
+ drivers/net/phy/mediatek/mtk-phy-lib.c        | 385 +++++++++++++
+ drivers/net/phy/mediatek/mtk.h                | 108 ++++
+ 11 files changed, 1387 insertions(+), 478 deletions(-)
+ delete mode 100644 drivers/net/phy/mediatek-ge.c
+ create mode 100644 drivers/net/phy/mediatek/Kconfig
+ create mode 100644 drivers/net/phy/mediatek/Makefile
+ create mode 100644 drivers/net/phy/mediatek/mtk-2p5ge.c
+ rename drivers/net/phy/{mediatek-ge-soc.c => mediatek/mtk-ge-soc.c} (77%)
+ create mode 100644 drivers/net/phy/mediatek/mtk-ge.c
+ create mode 100644 drivers/net/phy/mediatek/mtk-phy-lib.c
+ create mode 100644 drivers/net/phy/mediatek/mtk.h
+
+-- 
+2.18.0
+
 
