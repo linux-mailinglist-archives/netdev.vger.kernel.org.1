@@ -1,111 +1,121 @@
-Return-Path: <netdev+bounces-97395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C13F8CB436
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 21:27:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D7788CB440
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 21:30:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DDAB1F22F11
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 19:27:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CEF01C20D6F
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 19:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349F1149004;
-	Tue, 21 May 2024 19:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3E84DA0C;
+	Tue, 21 May 2024 19:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="oL5DUW+t"
+	dkim=pass (2048-bit key) header.d=libre.computer header.i=@libre.computer header.b="kavSZDTc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2BF148857
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 19:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BF91DFE8
+	for <netdev@vger.kernel.org>; Tue, 21 May 2024 19:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716319638; cv=none; b=c8jaRa8T/9wyNxIkclhLG5/i86tnmqMgkYB2+v64ya6USMlz7t0/Ys/8ZFTMF4hOdB1CtGCAMSElHBxRK46jn4BnwxOQqA4xWh4U2yo4W/maOWBt/ltQtkC092vusf9NU5elteqbVuVqZWefeRnCnRdwwm+uK/04H8BuhuRD+fM=
+	t=1716319846; cv=none; b=kIqzQajvHlE2vJIjvljvUdCywfXqtH7qQChEF1k9k1ihxx/E0oPmQnxATyVXUOeYWJleKY82C2JSgr45JX1YHqtjPW6FI46N+65RjkK6OwFtzrE9zS9c9Aj80kr8px0BbWQ/HISZ7Xzp17uy7tfCM8ruA1Zi4BBb8ECp6RUZqKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716319638; c=relaxed/simple;
-	bh=/5LJJk96zOYAd1s3zbgIV8x3/5mg3XuUvE6Gz54Fo9M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TPzBbHd9gK5DbL9xvP9QtKuNHqWeI4VeGXaRarQ9IauTS8RTxU9AE/ZFqO4wqbjGAY5PBe4A7MLYkXxEb3Z5Od806LV/lnGx6fJhhBmqU6QCUrFl9P1EEYw9c53HVJ986h8TvUgtjFcFL13Q5B82dEfQOzdMqH6VFXjW8aF0GvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=oL5DUW+t; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2b12b52fbe0so629211a91.0
-        for <netdev@vger.kernel.org>; Tue, 21 May 2024 12:27:16 -0700 (PDT)
+	s=arc-20240116; t=1716319846; c=relaxed/simple;
+	bh=uN497LMSSrTG2otGHW/OSlKS89nLU98TjsFNGvgc7BM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Dn5vkUOLZcYTUm1cPx5no9gs+Unc9eiRpZ539bnUZbBJJFqI902OHqpjdv8772jJLjMxxn43MI7pyvnoUKqn6qo+OUIeiFVIKJeT8Z4sJxq3pnmHVXXrnS0nzBqpseUB1DTpYcbp+QCcEsMTWbLMgrkN+XD+Wz8sdX2UJMrqGYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=libre.computer; spf=none smtp.mailfrom=libretech.co; dkim=pass (2048-bit key) header.d=libre.computer header.i=@libre.computer header.b=kavSZDTc; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=libre.computer
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=libretech.co
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2e724bc46c4so30021381fa.2
+        for <netdev@vger.kernel.org>; Tue, 21 May 2024 12:30:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1716319636; x=1716924436; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=libre.computer; s=google; t=1716319843; x=1716924643; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uD54di9/3KSU1csIqNnGenHNf0jpGZ/KT+RBkitwoy0=;
-        b=oL5DUW+t9tu852crd+Tvfp10LqzekHCOCQI6xKNGjgNk/2bj4cjPs1PaAqmd0e6skQ
-         2gzhyepU0axvhBLkT5Cwd9QsyzWOlXbVSupaKDtNn2DqIe5OQOjkdtpaEBwHnr7oyduW
-         /DZeMZQp3MOoFlLpfi/ZyivXDKmE9BfS+qnsBACXI87D8MJuuRc3j30h1vxcHJR6Ij5t
-         Q4jAr4qrqb/h8vUqrQLJYNyK684GHvxtFptc+I36HDdom22xXvkLeEEMdXuj5wNjSnji
-         Ba7ZX40c82nFFYFWuAO9ezTJtAT97rrCyKYu5ROB+s4X/kPzNnNcmRFVAzoJIzckBb4g
-         AWTw==
+        bh=mScw330//XjyClrpxvPSs6MjpV33vzEHLROrLRihprk=;
+        b=kavSZDTcn7rkZP0vQJurkWAiSxIvcuo6LFF+9CDER3XgvhYFXv5Z4j/NnoyVaNohm0
+         bS+jcz+jKe0DC89YD1U+LaQrQyfDA9YN2AQ4xpz1TlSjqENrTDYbcfIXEsKnmyrsC7d1
+         ZMAVkvnxp3SYfNwplbnJ9PBMoJ2boNCK41F6VIDMU3rgl9wdFQ0P6SbAnhDHTYVthnvp
+         Uik/tjE9JQC85s1uwQ4RHCamJsztnREWg1XGQySxFyj92zLrc2YmRSi9nvF94bnbc8dh
+         gqB1PZeed2XMRx+q37Z4GCnLxl2FsgMutg3afp3E8XRp8dl5dPS3T2tR0NunrULGmkfh
+         ZeFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716319636; x=1716924436;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1716319843; x=1716924643;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uD54di9/3KSU1csIqNnGenHNf0jpGZ/KT+RBkitwoy0=;
-        b=Ewutt4k9Z7Lc/AcyEpGNc48E9JMeLc2nk8TjLliqi3UcBGKW7blQCOKbWIy/KMz+EM
-         pV9ivP2BSyE7EZ2PrJy6wDoC9OxqCPaF3Ok7vksUlTK1xcKr/lODhTLjuDm30h+mdhSx
-         ot6/ZLXDzPz4Ooeiis5Arw08oQpFaZLxVhIeo/uqDhHkA/wwVNpJKHXLlToHhHoEpwx4
-         ZaJTibM3frmFeT6t+jHcNBeki44s+Z4+33rcwPu4vZAmzSidxEly32p/wmDu0DdYacXA
-         cRD3/RNyTClYUVKD2c4oS2xzcWt5Khcs29tIqdqps8ru5pDZAKj+ra3eqWmNipERpqIL
-         aYiA==
-X-Forwarded-Encrypted: i=1; AJvYcCUmM7vSTvnF6TVGwvSC/ExTcTN9o1pojdQMMEkrscQtsWVIuQ9OtwF/3+uGuQTskxtTDqv7uhGqq7/n737t5SeIhpAwJGGA
-X-Gm-Message-State: AOJu0Yy0IdylVUcQ1Wc20dtIRhXZV8HFxOO2w3ct3vCe6Aqc7PSgyoen
-	0igpo593V0TZF3T78l6GhJvDH1VSKsyBlfDebkgTF7udUxeW68r7jtPK0Gx86nM=
-X-Google-Smtp-Source: AGHT+IF7ocvNRXtIXYpalAtaN0Dh0bbHXRi/WE9QPHxj0DWnjICpXcIVasXK6+CaNoVHhEww2YEOfg==
-X-Received: by 2002:a17:90a:dc0a:b0:2b2:4c3f:cf08 with SMTP id 98e67ed59e1d1-2bd9efdc164mr153109a91.0.1716319635697;
-        Tue, 21 May 2024 12:27:15 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2bd92b3d2b0sm1760535a91.3.2024.05.21.12.27.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 May 2024 12:27:15 -0700 (PDT)
-Date: Tue, 21 May 2024 12:27:12 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Hans Schultz <schultz.hans@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, Hans
- Schultz <schultz.hans+netdev@gmail.com>, Roopa Prabhu <roopa@nvidia.com>,
- Nikolay Aleksandrov <nikolay@nvidia.com>, linux-kernel@vger.kernel.org,
- bridge@lists.linux-foundation.org
-Subject: Re: [PATCH net-next 1/4] net: bridge: Add support for bridge port
- in locked mode
-Message-ID: <20240521122712.3d09b03c@hermes.local>
-In-Reply-To: <20220207100742.15087-2-schultz.hans+netdev@gmail.com>
-References: <20220207100742.15087-1-schultz.hans+netdev@gmail.com>
-	<20220207100742.15087-2-schultz.hans+netdev@gmail.com>
+        bh=mScw330//XjyClrpxvPSs6MjpV33vzEHLROrLRihprk=;
+        b=YkgFkvdGBvxtkpYf7rEdEjECIsG6iJjNzDU3XeC0qTCg/dUX3PsCaczQR8sQYI7st2
+         3EzkewoAkcljprd7bveR6rzw+YNhtcdH6nxv2MCS5IKIY8QKmsNqzx3hdb5T4z+jCZv8
+         U8hCNu/I+oJ/hUcqxe9MfbRj2RV9lWWxC+xX+OCfGeL4YGq+NZ2CJnIlqQn2FSVpuVUV
+         mo7esgGp0+4+sbVBXizJMXskmqmjyWeA0sGzTvb/R+bcQi1tQ65xG2FK56AP/2gID5QH
+         +siv72C8mVM7rVvsgSvFmU+5IAX0fpULNySg7ceiTewnv98Ya3jvcbdlG/gjgmNcFM8z
+         y/2w==
+X-Forwarded-Encrypted: i=1; AJvYcCWa4q8xrkUTgK2D0gekYM7JdQdr9NXghfokQJ7oJ8iyasfG1OtHD49xU2XUrShz7a8yznYYS2C5INvNBtEy/hcpLr0XZk6x
+X-Gm-Message-State: AOJu0Yy2B+nP1b7K50l04+uUnB1jfQ+fBx4IuWr+2WocuTOIOU5DwTLm
+	F1ltPCw3T+kGukLWMBoMcgXM4Qxf8eIKSmnNKytGmj8XmkDLQiwOyC1B1rtlL8d1X4bHtfox68j
+	w+iZtViewDr4ITu2LtRlhl67lkOOkHoBLt9YU
+X-Google-Smtp-Source: AGHT+IFN7IRJY5kiBiKBEGefkggLY3iU8MsJap6OuX1crsyCiwkXjeBbDTmfMBuiSArK98CecXCUx/Cf3hDAe9Yiprk=
+X-Received: by 2002:a2e:3206:0:b0:2e0:c81c:25da with SMTP id
+ 38308e7fff4ca-2e51ff5fb1bmr232817751fa.30.1716319843220; Tue, 21 May 2024
+ 12:30:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <CACqvRUbx-KsrMwCHYQS6eGXBohynD8Q1CQx=8=9VhqZi13BCQQ@mail.gmail.com>
+ <Zkz1Au7njclh1r3g@shell.armlinux.org.uk>
+In-Reply-To: <Zkz1Au7njclh1r3g@shell.armlinux.org.uk>
+From: Da Xue <da@libre.computer>
+Date: Tue, 21 May 2024 15:30:31 -0400
+Message-ID: <CACqvRUYo+KJJjq+AtpLpZhS9WrTUoGuCJ0ZV-7=fy0zvD=xF7A@mail.gmail.com>
+Subject: Re: [PATCH] net: mdio: meson-gxl set 28th bit in eth_reg2
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Da Xue <da@libre.computer>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, 
+	Jerome Brunet <jbrunet@baylibre.com>, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-stable <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon,  7 Feb 2022 11:07:39 +0100
-Hans Schultz <schultz.hans@gmail.com> wrote:
+On Tue, May 21, 2024 at 3:24=E2=80=AFPM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Tue, May 21, 2024 at 02:56:45PM -0400, Da Xue wrote:
+> > @@ -65,7 +66,7 @@ static void gxl_enable_internal_mdio(struct
+> > gxl_mdio_mux *priv)
+> >   * The only constraint is that it must match the one in
+> >   * drivers/net/phy/meson-gxl.c to properly match the PHY.
+> >   */
+> > - writel(FIELD_PREP(REG2_PHYID, EPHY_GXL_ID),
+> > + writel(REG2_RESERVED_28 | FIELD_PREP(REG2_PHYID, EPHY_GXL_ID),
+> >          priv->regs + ETH_REG2);
+> >
+> >   /* Enable the internal phy */
+>
+> In addition to what Andrew said, you need to look at how you're sending
+> patches - this patch looks like it has been whitespace damaged, which
+> means it can't be applied.
 
-> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-> index 6218f93f5c1a..8fa2648fbc83 100644
-> --- a/include/uapi/linux/if_link.h
-> +++ b/include/uapi/linux/if_link.h
-> @@ -532,6 +532,7 @@ enum {
->  	IFLA_BRPORT_GROUP_FWD_MASK,
->  	IFLA_BRPORT_NEIGH_SUPPRESS,
->  	IFLA_BRPORT_ISOLATED,
-> +	IFLA_BRPORT_LOCKED,
->  	IFLA_BRPORT_BACKUP_PORT,
->  	IFLA_BRPORT_MRP_RING_OPEN,
->  	IFLA_BRPORT_MRP_IN_OPEN,
+Thanks for the feedback. There's 2 reserved ranges in that register
+with no further descriptions available.
+If naming the bit offset after the field range is OK, I will make edit
+and submit a V2 though send-email.
 
-NAK
-This is userspace API, adding a new value in enum in the middle
-will reorder the numbers and break ABI.
+>
+> --
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
