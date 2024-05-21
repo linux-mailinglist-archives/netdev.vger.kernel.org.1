@@ -1,87 +1,90 @@
-Return-Path: <netdev+bounces-97401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6C3B8CB4C3
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 22:37:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 486BE8CB4F6
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 22:55:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9ECAC1F22B23
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 20:37:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9AB6B210E7
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 20:55:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2261487D4;
-	Tue, 21 May 2024 20:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bk0XI5tv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4882149C66;
+	Tue, 21 May 2024 20:55:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA248208D0;
-	Tue, 21 May 2024 20:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD301494D8
+	for <netdev@vger.kernel.org>; Tue, 21 May 2024 20:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716323868; cv=none; b=e8tXNBvi6rKRTHIZfp4aYZibK6PJW/dGJhGCqj8kJKurqY29pHaL0hsJbqdw3SJML2X7UopvNoUD38UzabmOWRy6M3SFX97Ov2n/6ukK2pxCN3l+I1XH1npNTxyIZPc10I+MjtD4u/5NVF/afe/RaFrSXaX2BtPUbI13cB1O1n4=
+	t=1716324907; cv=none; b=k7pOrqtddEm4A6rgSH6uixltABbRoUVtMX4bf2WTguueAceo4Mduwz3UYg6g9KIHaJgXmcOh92o1WNGqv/DC9N2KZoGj2D1Z8j0Tntqyieh0VIiXiTnn4fckiKa6oHzaZq7zH8KFD6I7ZWnvJBR0Ot1i/mYmK1Mzo5oVc9GZbA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716323868; c=relaxed/simple;
-	bh=B9ViOYqXgDpQjV19AK5VUQQ4TV/W0LZcZ1p/e/v3QyU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aTZqcmQBJ1+fXpZRHge+3YXpSDZGCQ6l6pt7p/QyVV0o2Pgp9/FeM7Z5bSTVdqNjIWI2E4uUy2BZ4fUOPcel6ZlmKQO2sKebjvALzN2WbUcs1H0yGsEHWNqTiMqiwzv1m+hW+U6aspEjQ5nxBXZ16Otq9B9BQM5mV/aW/aswjPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bk0XI5tv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9NLbNUDlzC2jcO08AefJjvDOuFA0wNb9S8kYwaE3wt4=; b=bk0XI5tv5egsQIv1BwYpYtr4T4
-	62h+8SAf9m3BGEYEmvolS+Ux2TyeGE7hvRr8FslC7hEgdYQkkmzsWGi6JPeEI6OjFd5MZxwfuqg2r
-	75fvqdxUc765PwSoAXJ2yZ+0OALvTGlPTz+0J5/mw0uX/e7C954wnI9xFM2YlUFhBW4s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s9WEn-00Fmf6-2T; Tue, 21 May 2024 22:37:33 +0200
-Date: Tue, 21 May 2024 22:37:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Thomas Kopp <thomas.kopp@microchip.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, linux@ew.tq-group.com
-Subject: Re: [PATCH v3 7/8] can: mcp251xfd: add gpio functionality
-Message-ID: <e24b16a1-2a69-4aea-9ad0-135ed0a87547@lunn.ch>
-References: <20240521-mcp251xfd-gpio-feature-v3-0-7f829fefefc2@ew.tq-group.com>
- <20240521-mcp251xfd-gpio-feature-v3-7-7f829fefefc2@ew.tq-group.com>
+	s=arc-20240116; t=1716324907; c=relaxed/simple;
+	bh=R3fCvTgotTxLXsi65QkeFqLB7siU1DAP4itw793zAbc=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=GW6aGodPCVvNLKMPvRE3N563Gu/Vm5J35ripVldID903+PTKEUB9Vtn37/PQbUngiVJpOMRgCSOfkiIZ187gBGDNEMeUNIPSNSnC7IFHcA+bToBNpPm45IurJkH7NaTib9ywhHUE7OCwdJdzEr77sLwiTQXKR47sxmdD7ZEZICU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36d98ad0c7eso689305ab.3
+        for <netdev@vger.kernel.org>; Tue, 21 May 2024 13:55:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716324905; x=1716929705;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oEiS+NAbk5RMjDOg7D+8NkoQTQW7Txc26tuIznMSR5s=;
+        b=JLDiYRdj85YqYV3oNZ02EEGx60muCS1ZSDjCBPIV3qAuLlYcsTQz4PI9KSdpO0cVBS
+         5uShd+pyeFYAH2XsAG4TwZdTmss8sqV5gW2Lwt88BB0nwF7oTT14grOvm3Mu/KN6UCYQ
+         hDR0bZ+8YsjTvKBr6ox/yJKckHyLjbVw3OXTu7tMmrHX4ao6ZxRQk/Pij7Kdx/JjBAAC
+         HjgOz9vU3libujW9X5I4+i4M+36bfwCjpAR5Y4UXJB3AUl3jOMK7YhTmLUfbaFxHdIk7
+         T0VXu1/rdZgZ6NWvj4VzQkDiyPAqY6NBZQ4ldT9TvZaso1aAeF8IzMsyCxTQlqpoiE43
+         kLEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVwgDIvbR6B5pe2ri+Fs6bbO5EDfh/jyk4M5JQhaXp05wZ9yGNrajQ5s23xnBOiDfcnCp4AMW6oSJhERYjL1vGRkUoStUs6
+X-Gm-Message-State: AOJu0YwvL+icUoLWSETuLHSrs0flBKW7Xck+dm5MLF7Qv105rkqrFHxJ
+	+NjNrsoClJPblBLyRDxAQeTAK651k4LqPGjTO2mpMoKjayDc99YF7nZBLJx6ahUe7l6jhFUEdbU
+	h+7msV2bsZRGvRlMjw0ZWb5wNcRJN1DXAoDUrJ9/ZjhkwNzQMl0OgHGc=
+X-Google-Smtp-Source: AGHT+IF7myKplMlP2iRDvN1xabnHS0FA63h1KOBMghTZeFYqaElRBXr7o65M7k9nw8WSfPfwjJ6wDj86smTt4N+eBmVJhPMRD2fe
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240521-mcp251xfd-gpio-feature-v3-7-7f829fefefc2@ew.tq-group.com>
+X-Received: by 2002:a05:6e02:20eb:b0:36b:f8:e87e with SMTP id
+ e9e14a558f8ab-371f6e0e1d4mr205215ab.1.1716324905771; Tue, 21 May 2024
+ 13:55:05 -0700 (PDT)
+Date: Tue, 21 May 2024 13:55:05 -0700
+In-Reply-To: <87jzjnxaqf.fsf@cloudflare.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000053f7c10618fd0878@google.com>
+Subject: Re: [syzbot] [net?] [bpf?] possible deadlock in sock_hash_delete_elem (2)
+From: syzbot <syzbot+ec941d6e24f633a59172@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, xrivendell7@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, May 21, 2024 at 03:04:57PM +0200, Gregor Herburger wrote:
-> The mcp251xfd devices allow two pins to be configured as gpio. Add this
-> functionality to driver.
+Hello,
 
-I have a basic understanding of GPIO drivers, which is probably more
-than average for netdev reviewers. This code looks O.K. to me, but i
-would prefer you run it by the GPIO maintainers, since that is there
-domain of expertise. I don't think any are in Cc:
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-    Andrew
+Reported-and-tested-by: syzbot+ec941d6e24f633a59172@syzkaller.appspotmail.com
 
----
-pw-bot: cr
+Tested on:
+
+commit:         8d00547e MAINTAINERS: Add myself as reviewer of ARM64 ..
+git tree:       bpf
+console output: https://syzkaller.appspot.com/x/log.txt?x=133dc97c980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=17ffd15f654c98ba
+dashboard link: https://syzkaller.appspot.com/bug?extid=ec941d6e24f633a59172
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=11caabe0980000
+
+Note: testing is done by a robot and is best-effort only.
 
