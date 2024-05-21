@@ -1,320 +1,304 @@
-Return-Path: <netdev+bounces-97293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FB0E8CA916
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 09:38:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B71538CA92E
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 09:43:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 730D11C210C7
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 07:38:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D898282CDA
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 07:43:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF0F50A6E;
-	Tue, 21 May 2024 07:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7F751C43;
+	Tue, 21 May 2024 07:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="AY0ceuEV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AK0FpUDz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE6C256A
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 07:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EEF50A75
+	for <netdev@vger.kernel.org>; Tue, 21 May 2024 07:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716277098; cv=none; b=IE6Ifag/QOo5pEIuCrz3YWNmdvymLTE7vfLJbMKsVZXt44Lvti0OS7z+J+f0ITBQdR4LkpYMa4sBxQ/zlcLyXCrmzS9+XR+3gUfZthsOjZh9yCQCtq7kS6+uGMvYcwYB0p3QFUFglLtdJJ84O69J9u7RwViRQhXPPlDh9aS+NGw=
+	t=1716277392; cv=none; b=dMA6btduvVUlZ5eXYxS/dCQ+tPc7hq6CUSq26UIH22jZYKX6fnBjkJeoT8svsgdNDBjyg0+qZw7XVe9UJJaxAbfvdBVKPLXXIWD2OajqRXlxeXAxrxQLZFIYDW2kKq1q4PWwSSy4yAYMZiBrwLHcB2KMy0Ao71TugwBj14X2dmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716277098; c=relaxed/simple;
-	bh=FwIRMnyUp5kd3NuY0l6H6P957sNYMECc/Afd4x7jI0g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OkN5k9kcVJYaKeDJd7FmGmmviJtbyNOGGIZqlsCBugdHFEBiQ2Ffif/C69XvLbSRVFhfIvzoFyuMsCE5kxyTHW7G397hcMLezLRTYEqNH6JX2fy1O9dQYcQk3Mb/dO5SrGOng4+hZRiDfTI4q9V9AzA4Pzh6ha3OZ2vGxXidDt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=AY0ceuEV; arc=none smtp.client-ip=217.79.154.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
-X-Virus-Scanned: amavisd-new at emenem.pl
-Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
-	(authenticated bits=0)
-	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 44L7c4eQ002808
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 21 May 2024 09:38:05 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
-	t=1716277086; bh=t7UpYBHGY7Wq8MymFqkl3bxG72ubJEcZ5cnXZlniOqY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=AY0ceuEVEOWWqHxQVu8SkB3v12Em0yrqv4IzZ1GfDJPEnJMgD+TtrOc2wigi6LRXl
-	 JAzZ905227BqZd+YaZAfMD0DHvgnKoOu5e+H+gGHZj/kYhgIHdQDTbpyMFElLFKewe
-	 m56ZNlayXi+LxIcOV4xplq3/KiVuR4k3sZ0968pU=
-Message-ID: <3d6364f3-a5c6-4c96-b958-0036da349754@ans.pl>
-Date: Tue, 21 May 2024 00:38:02 -0700
+	s=arc-20240116; t=1716277392; c=relaxed/simple;
+	bh=ch4oGfjHl91KjHkzPadPQD0wi7M17UfQKr5G4CxvkbQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IyDoMQJmOnjyEo8WtZS72JaEnJEL6xBwXhtqD7EPzqTMS+sUqzKiWRd2Bkre7yY2KrCchN+uVHBZHzV4J79toN/3MAhFLfCy8N714F7CufTPa6qqHeBhsTy9+QS3I4L5AEfgw5CygxVqxJl90Xf5w3FcQcpnBsOSat4rAg56GoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AK0FpUDz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716277389;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BZtp98ZfVx6NwFSDvaEFw7gJ/PNxdR3lx8VEW78mLjY=;
+	b=AK0FpUDzPbAtQJlKoj/5Aum7ddowIB5MqHq0bf4Xs1SM3ct68tnL9smkUSJ18igbM7oTtT
+	qrtCEDoPwdcrYP0y9XwUg0KI8exn6AnFCKy1eRO/LkEGJ8AsjRDTmQ/mTNGPi0lU1UB2bc
+	6BZlw2dLRTRtxEEGXV5NlqBR7d5xpy4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-224-RNuzJQ5kOOyAte12seLKzw-1; Tue, 21 May 2024 03:43:07 -0400
+X-MC-Unique: RNuzJQ5kOOyAte12seLKzw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-34dc34c758fso7254341f8f.0
+        for <netdev@vger.kernel.org>; Tue, 21 May 2024 00:43:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716277387; x=1716882187;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BZtp98ZfVx6NwFSDvaEFw7gJ/PNxdR3lx8VEW78mLjY=;
+        b=CkWcZiWs67+oZrfXrf08Pc0KMIUUVcKZiLr6fsqS/L4ntqIht5erVEoIPu8SL3fmpW
+         Sljji3gUBKT+uc2WVW/p46DFPsEqjhGKBkBLYDTCj1lNJHruOf4LPKJiFXFFi38iCq5h
+         aNuYMpVE87FfZL9GXLPzK/VKWbepiE6B9wbCu4ETtBwl9sI6yDNdeGiNFa537S+cJEWX
+         UNh88VvQrQbYpTAaRjKJn+ZImWatINmfHOeaSoweFhh8gHPZeYg+fD2PZ9yu8OzNm5Pb
+         02MwiyfvsJ3h2SCxv0+47Flogb9L7jdUw3tjD9c3gUQkpDvDgcnXWhn3lSZejCPf2BVl
+         yB+w==
+X-Forwarded-Encrypted: i=1; AJvYcCUu8uAwSIIb9oqcnjYVnlcC0Xr7DFkI4diig4Tj7N5qjVVpq6zHlsO8UFBLCZw7rg394s27kRb78ap9Eg/du+ahB1F85fXY
+X-Gm-Message-State: AOJu0YySCnU2E4PeHNh9RbpUeKv/s3VcNmx83cyCsCtduFPcrnN3qZ41
+	W7dyxJwWvSW9UhawFd2PfXsuM6nFbna6MJRgcujqsLC0ejBql2XlezgtIc6qH8gyhNYBnry4BWn
+	oUst8pXkDMqJ53yLEhXC6gKNXEh1kNz106C+omZ0lR7QF9Ez9AS9C0w==
+X-Received: by 2002:a5d:4402:0:b0:34e:bdf9:3301 with SMTP id ffacd0b85a97d-3504a61c6f4mr22147952f8f.8.1716277386552;
+        Tue, 21 May 2024 00:43:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE+zxcpMBld81ADTjhroUOZkiTwlIMC9dAnNZlYvPceMPnNbWKg4u5ZQk9a9XTLSY2Qzg7Z5A==
+X-Received: by 2002:a5d:4402:0:b0:34e:bdf9:3301 with SMTP id ffacd0b85a97d-3504a61c6f4mr22147931f8f.8.1716277386036;
+        Tue, 21 May 2024 00:43:06 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc7:240:5a20:b565:3672:6f2b:3d2d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b895887sm31050009f8f.40.2024.05.21.00.43.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 May 2024 00:43:05 -0700 (PDT)
+Date: Tue, 21 May 2024 03:43:01 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>,
+	Gia-Khanh Nguyen <gia-khanh.nguyen@oracle.com>
+Subject: Re: [PATCH net-next] virtio-net: synchronize operstate with admin
+ state on up/down
+Message-ID: <20240521034255-mutt-send-email-mst@kernel.org>
+References: <20240520010302.68611-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: "netlink error: Invalid argument" with ethtool-5.13+ on recent
- kernels due to "ethtool: Add netlink handler for getmodule (-m)" -
- 25b64c66f58d3df0ad7272dda91c3ab06fe7a303, also no SFP-DOM support via
- netlink?
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: Moshe Shemesh <moshe@nvidia.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl>
- <apfg6yonp66gp4z6sdzrfin7tdyctfomhahhitqmcipuxkewpw@gmr5xlybvfsf>
- <31f6f39b-f7f3-46cc-8c0d-1dbcc69c3254@ans.pl>
- <7nz6fvq6aaclh3xoazgqzw3kzc7vgmsufzyu4slsqhjht7dlpl@qyu63otcswga>
-From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
-Content-Language: en-US
-In-Reply-To: <7nz6fvq6aaclh3xoazgqzw3kzc7vgmsufzyu4slsqhjht7dlpl@qyu63otcswga>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240520010302.68611-1-jasowang@redhat.com>
 
-On 21.05.2024 at 00:34, Michal Kubecek wrote:
-> On Tue, May 21, 2024 at 12:02:47AM -0700, Krzysztof Olędzki wrote:
->> # ./ethtool  --version
->> ethtool version 6.7
->>
->> # ./ethtool --debug 3 -m eth3
-> [...]
->> sending genetlink packet (76 bytes):
->>     msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
->> received genetlink packet (96 bytes):
->>     msg length 96 error errno=-22
->> netlink error: Invalid argument
+On Mon, May 20, 2024 at 09:03:02AM +0800, Jason Wang wrote:
+> This patch synchronize operstate with admin state per RFC2863.
 > 
-> Can you do it with "--debug 0x12" or "--debug 0x1e"? It would tell us
-> which request failed and that might give some hint where does this
-> EINVAL come from.
+> This is done by trying to toggle the carrier upon open/close and
+> synchronize with the config change work. This allows propagate status
+> correctly to stacked devices like:
+> 
+> ip link add link enp0s3 macvlan0 type macvlan
+> ip link set link enp0s3 down
+> ip link show
+> 
+> Before this patch:
+> 
+> 3: enp0s3: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000
+>     link/ether 00:00:05:00:00:09 brd ff:ff:ff:ff:ff:ff
+> ......
+> 5: macvlan0@enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+>     link/ether b2:a9:c5:04:da:53 brd ff:ff:ff:ff:ff:ff
+> 
+> After this patch:
+> 
+> 3: enp0s3: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000
+>     link/ether 00:00:05:00:00:09 brd ff:ff:ff:ff:ff:ff
+> ...
+> 5: macvlan0@enp0s3: <NO-CARRIER,BROADCAST,MULTICAST,UP,M-DOWN> mtu 1500 qdisc noqueue state LOWERLAYERDOWN mode DEFAULT group default qlen 1000
+>     link/ether b2:a9:c5:04:da:53 brd ff:ff:ff:ff:ff:ff
+> 
+> Cc: Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>
+> Cc: Gia-Khanh Nguyen <gia-khanh.nguyen@oracle.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-Sure,
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-# ./ethtool --debug 0x12 -m eth3
-sending genetlink packet (32 bytes):
-    msg length 32 genl-ctrl
-    CTRL_CMD_GETFAMILY
-        CTRL_ATTR_FAMILY_NAME = "ethtool"
-received genetlink packet (956 bytes):
-    msg length 956 genl-ctrl
-    CTRL_CMD_NEWFAMILY
-        CTRL_ATTR_FAMILY_NAME = "ethtool"
-        CTRL_ATTR_FAMILY_ID = 21
-        CTRL_ATTR_VERSION = 1
-        CTRL_ATTR_HDRSIZE = 0
-        CTRL_ATTR_MAXATTR = 0
-        CTRL_ATTR_OPS
-            [1]
-                CTRL_ATTR_OP_ID = 1
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [2]
-                CTRL_ATTR_OP_ID = 2
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [3]
-                CTRL_ATTR_OP_ID = 3
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [4]
-                CTRL_ATTR_OP_ID = 4
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [5]
-                CTRL_ATTR_OP_ID = 5
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [6]
-                CTRL_ATTR_OP_ID = 6
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [7]
-                CTRL_ATTR_OP_ID = 7
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [8]
-                CTRL_ATTR_OP_ID = 8
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [9]
-                CTRL_ATTR_OP_ID = 9
-                CTRL_ATTR_OP_FLAGS = 0x0000001e
-            [10]
-                CTRL_ATTR_OP_ID = 10
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [11]
-                CTRL_ATTR_OP_ID = 11
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [12]
-                CTRL_ATTR_OP_ID = 12
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [13]
-                CTRL_ATTR_OP_ID = 13
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [14]
-                CTRL_ATTR_OP_ID = 14
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [15]
-                CTRL_ATTR_OP_ID = 15
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [16]
-                CTRL_ATTR_OP_ID = 16
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [17]
-                CTRL_ATTR_OP_ID = 17
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [18]
-                CTRL_ATTR_OP_ID = 18
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [19]
-                CTRL_ATTR_OP_ID = 19
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [20]
-                CTRL_ATTR_OP_ID = 20
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [21]
-                CTRL_ATTR_OP_ID = 21
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [22]
-                CTRL_ATTR_OP_ID = 22
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [23]
-                CTRL_ATTR_OP_ID = 23
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [24]
-                CTRL_ATTR_OP_ID = 24
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [25]
-                CTRL_ATTR_OP_ID = 25
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [26]
-                CTRL_ATTR_OP_ID = 26
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [27]
-                CTRL_ATTR_OP_ID = 27
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [28]
-                CTRL_ATTR_OP_ID = 28
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [29]
-                CTRL_ATTR_OP_ID = 29
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [30]
-                CTRL_ATTR_OP_ID = 30
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [31]
-                CTRL_ATTR_OP_ID = 31
-                CTRL_ATTR_OP_FLAGS = 0x0000001e
-            [32]
-                CTRL_ATTR_OP_ID = 32
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [33]
-                CTRL_ATTR_OP_ID = 33
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [34]
-                CTRL_ATTR_OP_ID = 34
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [35]
-                CTRL_ATTR_OP_ID = 35
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [36]
-                CTRL_ATTR_OP_ID = 36
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [37]
-                CTRL_ATTR_OP_ID = 37
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [38]
-                CTRL_ATTR_OP_ID = 38
-                CTRL_ATTR_OP_FLAGS = 0x0000000a
-            [39]
-                CTRL_ATTR_OP_ID = 39
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [40]
-                CTRL_ATTR_OP_ID = 40
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-            [41]
-                CTRL_ATTR_OP_ID = 41
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [42]
-                CTRL_ATTR_OP_ID = 42
-                CTRL_ATTR_OP_FLAGS = 0x0000000e
-            [43]
-                CTRL_ATTR_OP_ID = 43
-                CTRL_ATTR_OP_FLAGS = 0x0000001a
-        CTRL_ATTR_MCAST_GROUPS
-            [1]
-                CTRL_ATTR_MCAST_GRP_ID = 5
-                CTRL_ATTR_MCAST_GRP_NAME = "monitor"
-received genetlink packet (36 bytes):
-    msg length 36 error errno=0
-sending genetlink packet (76 bytes):
-    msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
-    ETHTOOL_MSG_MODULE_EEPROM_GET
-        ETHTOOL_A_MODULE_EEPROM_HEADER
-            ETHTOOL_A_HEADER_DEV_NAME = "eth3"
-        ETHTOOL_A_MODULE_EEPROM_LENGTH = 128
-        ETHTOOL_A_MODULE_EEPROM_OFFSET = 0
-        ETHTOOL_A_MODULE_EEPROM_PAGE = 0
-        ETHTOOL_A_MODULE_EEPROM_BANK = 0
-        ETHTOOL_A_MODULE_EEPROM_I2C_ADDRESS = 80
-received genetlink packet (176 bytes):
-    msg length 176 ethool ETHTOOL_MSG_MODULE_EEPROM_GET_REPLY
-    ETHTOOL_MSG_MODULE_EEPROM_GET_REPLY
-        ETHTOOL_A_MODULE_EEPROM_HEADER
-            ETHTOOL_A_HEADER_DEV_INDEX = 7
-            ETHTOOL_A_HEADER_DEV_NAME = "eth3"
-        ETHTOOL_A_MODULE_EEPROM_DATA =
-            0d 00 02 00  00 00 00 00  00 05 00 00  00 00 00 00
-            00 00 00 00  00 00 27 71  00 00 80 0e  00 00 00 00
-            00 00 16 48  00 00 00 00  00 00 0c f1  00 00 00 00
-            00 00 1f 93  00 00 00 00  00 00 00 00  00 00 00 00
-            00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00
-            00 00 00 00  00 00 00 00  00 00 00 00  00 03 00 00
-            00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00
-            00 00 00 00  00 03 01 00  00 00 00 00  00 00 00 00
-received genetlink packet (36 bytes):
-    msg length 36 error errno=0
-sending genetlink packet (76 bytes):
-    msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
-    ETHTOOL_MSG_MODULE_EEPROM_GET
-        ETHTOOL_A_MODULE_EEPROM_HEADER
-            ETHTOOL_A_HEADER_DEV_NAME = "eth3"
-        ETHTOOL_A_MODULE_EEPROM_LENGTH = 128
-        ETHTOOL_A_MODULE_EEPROM_OFFSET = 128
-        ETHTOOL_A_MODULE_EEPROM_PAGE = 0
-        ETHTOOL_A_MODULE_EEPROM_BANK = 0
-        ETHTOOL_A_MODULE_EEPROM_I2C_ADDRESS = 80
-received genetlink packet (176 bytes):
-    msg length 176 ethool ETHTOOL_MSG_MODULE_EEPROM_GET_REPLY
-    ETHTOOL_MSG_MODULE_EEPROM_GET_REPLY
-        ETHTOOL_A_MODULE_EEPROM_HEADER
-            ETHTOOL_A_HEADER_DEV_INDEX = 7
-            ETHTOOL_A_HEADER_DEV_NAME = "eth3"
-        ETHTOOL_A_MODULE_EEPROM_DATA =
-            0d 00 0c 00  00 30 00 00  00 00 00 01  00 00 00 00
-            00 00 00 00  41 56 41 47  4f 20 20 20  20 20 20 20
-            20 20 20 20  00 00 17 6a  33 33 32 2d  30 30 33 33
-            35 20 20 20  20 20 20 20  41 30 42 68  07 d0 46 71
-            00 00 0f de  51 44 32 35  31 33 37 30  20 20 20 20
-            20 20 20 20  31 33 30 36  32 31 20 20  08 00 00 29
-            00 4e 54 41  50 03 3b 06  00 3b 06 00  3b 06 00 00
-            00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 f9
-received genetlink packet (36 bytes):
-    msg length 36 error errno=0
-sending genetlink packet (76 bytes):
-    msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
-    ETHTOOL_MSG_MODULE_EEPROM_GET
-        ETHTOOL_A_MODULE_EEPROM_HEADER
-            ETHTOOL_A_HEADER_DEV_NAME = "eth3"
-        ETHTOOL_A_MODULE_EEPROM_LENGTH = 128
-        ETHTOOL_A_MODULE_EEPROM_OFFSET = 128
-        ETHTOOL_A_MODULE_EEPROM_PAGE = 3
-        ETHTOOL_A_MODULE_EEPROM_BANK = 0
-        ETHTOOL_A_MODULE_EEPROM_I2C_ADDRESS = 80
-received genetlink packet (96 bytes):
-    msg length 96 error errno=-22
-netlink error: Invalid argument
-offending message:
-    ETHTOOL_MSG_MODULE_EEPROM_GET
-        ETHTOOL_A_MODULE_EEPROM_HEADER
-            ETHTOOL_A_HEADER_DEV_NAME = "eth3"
-        ETHTOOL_A_MODULE_EEPROM_LENGTH = 128
-        ETHTOOL_A_MODULE_EEPROM_OFFSET = 128
-        ETHTOOL_A_MODULE_EEPROM_PAGE = 3
-        ETHTOOL_A_MODULE_EEPROM_BANK = 0
-        ETHTOOL_A_MODULE_EEPROM_I2C_ADDRESS = 80
-
-
-Krzysztof
+> ---
+>  drivers/net/virtio_net.c | 94 +++++++++++++++++++++++++++-------------
+>  1 file changed, 63 insertions(+), 31 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 4e1a0fc0d555..24d880a5023d 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -433,6 +433,12 @@ struct virtnet_info {
+>  	/* The lock to synchronize the access to refill_enabled */
+>  	spinlock_t refill_lock;
+>  
+> +	/* Is config change enabled? */
+> +	bool config_change_enabled;
+> +
+> +	/* The lock to synchronize the access to config_change_enabled */
+> +	spinlock_t config_change_lock;
+> +
+>  	/* Work struct for config space updates */
+>  	struct work_struct config_work;
+>  
+> @@ -623,6 +629,20 @@ static void disable_delayed_refill(struct virtnet_info *vi)
+>  	spin_unlock_bh(&vi->refill_lock);
+>  }
+>  
+> +static void enable_config_change(struct virtnet_info *vi)
+> +{
+> +	spin_lock_irq(&vi->config_change_lock);
+> +	vi->config_change_enabled = true;
+> +	spin_unlock_irq(&vi->config_change_lock);
+> +}
+> +
+> +static void disable_config_change(struct virtnet_info *vi)
+> +{
+> +	spin_lock_irq(&vi->config_change_lock);
+> +	vi->config_change_enabled = false;
+> +	spin_unlock_irq(&vi->config_change_lock);
+> +}
+> +
+>  static void enable_rx_mode_work(struct virtnet_info *vi)
+>  {
+>  	rtnl_lock();
+> @@ -2421,6 +2441,25 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
+>  	return err;
+>  }
+>  
+> +static void virtnet_update_settings(struct virtnet_info *vi)
+> +{
+> +	u32 speed;
+> +	u8 duplex;
+> +
+> +	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_SPEED_DUPLEX))
+> +		return;
+> +
+> +	virtio_cread_le(vi->vdev, struct virtio_net_config, speed, &speed);
+> +
+> +	if (ethtool_validate_speed(speed))
+> +		vi->speed = speed;
+> +
+> +	virtio_cread_le(vi->vdev, struct virtio_net_config, duplex, &duplex);
+> +
+> +	if (ethtool_validate_duplex(duplex))
+> +		vi->duplex = duplex;
+> +}
+> +
+>  static int virtnet_open(struct net_device *dev)
+>  {
+>  	struct virtnet_info *vi = netdev_priv(dev);
+> @@ -2439,6 +2478,18 @@ static int virtnet_open(struct net_device *dev)
+>  			goto err_enable_qp;
+>  	}
+>  
+> +	/* Assume link up if device can't report link status,
+> +	   otherwise get link status from config. */
+> +	netif_carrier_off(dev);
+> +	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
+> +		enable_config_change(vi);
+> +		schedule_work(&vi->config_work);
+> +	} else {
+> +		vi->status = VIRTIO_NET_S_LINK_UP;
+> +		virtnet_update_settings(vi);
+> +		netif_carrier_on(dev);
+> +	}
+> +
+>  	return 0;
+>  
+>  err_enable_qp:
+> @@ -2875,12 +2926,19 @@ static int virtnet_close(struct net_device *dev)
+>  	disable_delayed_refill(vi);
+>  	/* Make sure refill_work doesn't re-enable napi! */
+>  	cancel_delayed_work_sync(&vi->refill);
+> +	/* Make sure config notification doesn't schedule config work */
+> +	disable_config_change(vi);
+> +	/* Make sure status updating is cancelled */
+> +	cancel_work_sync(&vi->config_work);
+>  
+>  	for (i = 0; i < vi->max_queue_pairs; i++) {
+>  		virtnet_disable_queue_pair(vi, i);
+>  		cancel_work_sync(&vi->rq[i].dim.work);
+>  	}
+>  
+> +	vi->status &= ~VIRTIO_NET_S_LINK_UP;
+> +	netif_carrier_off(dev);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -4583,25 +4641,6 @@ static void virtnet_init_settings(struct net_device *dev)
+>  	vi->duplex = DUPLEX_UNKNOWN;
+>  }
+>  
+> -static void virtnet_update_settings(struct virtnet_info *vi)
+> -{
+> -	u32 speed;
+> -	u8 duplex;
+> -
+> -	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_SPEED_DUPLEX))
+> -		return;
+> -
+> -	virtio_cread_le(vi->vdev, struct virtio_net_config, speed, &speed);
+> -
+> -	if (ethtool_validate_speed(speed))
+> -		vi->speed = speed;
+> -
+> -	virtio_cread_le(vi->vdev, struct virtio_net_config, duplex, &duplex);
+> -
+> -	if (ethtool_validate_duplex(duplex))
+> -		vi->duplex = duplex;
+> -}
+> -
+>  static u32 virtnet_get_rxfh_key_size(struct net_device *dev)
+>  {
+>  	return ((struct virtnet_info *)netdev_priv(dev))->rss_key_size;
+> @@ -5163,7 +5202,10 @@ static void virtnet_config_changed(struct virtio_device *vdev)
+>  {
+>  	struct virtnet_info *vi = vdev->priv;
+>  
+> -	schedule_work(&vi->config_work);
+> +	spin_lock_irq(&vi->config_change_lock);
+> +	if (vi->config_change_enabled)
+> +		schedule_work(&vi->config_work);
+> +	spin_unlock_irq(&vi->config_change_lock);
+>  }
+>  
+>  static void virtnet_free_queues(struct virtnet_info *vi)
+> @@ -5706,6 +5748,7 @@ static int virtnet_probe(struct virtio_device *vdev)
+>  	INIT_WORK(&vi->config_work, virtnet_config_changed_work);
+>  	INIT_WORK(&vi->rx_mode_work, virtnet_rx_mode_work);
+>  	spin_lock_init(&vi->refill_lock);
+> +	spin_lock_init(&vi->config_change_lock);
+>  
+>  	if (virtio_has_feature(vdev, VIRTIO_NET_F_MRG_RXBUF)) {
+>  		vi->mergeable_rx_bufs = true;
+> @@ -5901,17 +5944,6 @@ static int virtnet_probe(struct virtio_device *vdev)
+>  		goto free_unregister_netdev;
+>  	}
+>  
+> -	/* Assume link up if device can't report link status,
+> -	   otherwise get link status from config. */
+> -	netif_carrier_off(dev);
+> -	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
+> -		schedule_work(&vi->config_work);
+> -	} else {
+> -		vi->status = VIRTIO_NET_S_LINK_UP;
+> -		virtnet_update_settings(vi);
+> -		netif_carrier_on(dev);
+> -	}
+> -
+>  	for (i = 0; i < ARRAY_SIZE(guest_offloads); i++)
+>  		if (virtio_has_feature(vi->vdev, guest_offloads[i]))
+>  			set_bit(guest_offloads[i], &vi->guest_offloads);
+> -- 
+> 2.31.1
 
 
