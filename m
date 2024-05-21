@@ -1,100 +1,134 @@
-Return-Path: <netdev+bounces-97349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E9E28CAF3C
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 15:16:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE7858CAF48
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 15:19:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7F64B20AD1
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 13:16:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 643871F218B4
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 13:19:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD783D982;
-	Tue, 21 May 2024 13:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3987F6BB37;
+	Tue, 21 May 2024 13:19:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zFDyqK+G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ow23eEFc"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1297D1CD32;
-	Tue, 21 May 2024 13:15:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDE74F8A1;
+	Tue, 21 May 2024 13:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716297360; cv=none; b=IRgMuSfJYXFHoB/wqKzmSP1o1bFS91INyFGgRtWMJhJoIWoxAtsYrM+v3CRG4UmCpeF2WwDACgiKY6C/t1mfiBNAbMmgpwWiC0LuDHojbZKY0ve+cqQdz5y8DOEg8cVQshqise3D725hCpRkghtm15CPTs/PeliQb3UCog96fB0=
+	t=1716297592; cv=none; b=Z/SMsL7LMYmYw46ivGHzC9AXIshFXWd1NAx2WH9N0o8kmeKD09bIS/Zp+IehIL/FJ+H3ifq+LWnNApfSxXcIjC0EtR2YQ7OLzSdl6rRkNSgpDuyD9LhbwKHOAj2s7RGkQFLuRZVpcgvt87rGqedu96mtikTY112+n8Xej1gQIkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716297360; c=relaxed/simple;
-	bh=IOeI3hHTxpKJRxqMJz94Ukn6BOnC5xNHpbHdHmceGH4=;
+	s=arc-20240116; t=1716297592; c=relaxed/simple;
+	bh=Fw44D5ZDxbrWGw8WLCi/dURG/HilOXbuM/gWbouzp2A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TZ7Zt1Q2J7iwQjrIMcSU9gO29Rjvw67qzqrYQT2yAMD6Ch12QYXMvyTw86tTaurZterF9vXpyTCaOUruEHZfxuRpXLMus+mRWRLe5TUIxLQ31lQIDciohXwXvUStNil/RdgDXiceU3dGQOctFAyz7CuRhXFjpT7V5nLA9ngPAa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zFDyqK+G; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=BFRehB/GDW22WEVdSVIndBEfguGCbpOMzZOO/CrlY5Y=; b=zFDyqK+Gfj3rf8gORrZJRRY6b4
-	mfuVqCNU39JlBT6l5vhjeF+ZSDPOFpY4CAwAJ6rOIZf2R533tkFBYX0RvH1VM+rgG4tAua7x12BeJ
-	R7/YdlQAEpSyDNOj5WUQgYTkalfcPrBpr+NJeSYqj5qgvH9bFcYPgGMkUsfm+FxNT8Ss=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1s9PLD-00FlFs-Hj; Tue, 21 May 2024 15:15:43 +0200
-Date: Tue, 21 May 2024 15:15:43 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sky Huang <SkyLake.Huang@mediatek.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=aXB1fW3dwYUnMB5TtDOPRB/pKNo6KPCcX5BuuwLYkqVvBrCOF2bcnbCKbf9Xnq8q9HBEuZ3FZ4qMlxKLWMXn1UHCE/9XySeTu2MDCappFAtd0q5d5g7Gn8wdqCahMwMH/vVnmeWYMUyDz07Kb5OPRb/Dwe4nYkCJEvHLN5D+JrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ow23eEFc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20B76C32786;
+	Tue, 21 May 2024 13:19:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716297591;
+	bh=Fw44D5ZDxbrWGw8WLCi/dURG/HilOXbuM/gWbouzp2A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ow23eEFcZk9QNj4O05Dr2gPM8iLaS5yK4X4T+PnwkTjCgyMYdVk4JAFAGOPEcRsCs
+	 8jvavdtxmQDr/y8QgEsaz+78m5WCNEniYxkznqN9ApNHUD90j0CV7y6F+ERb7gksE6
+	 0MFTxZYCmW3T2M1okaMZkbsq8ejJXFYhGJ62ZL/XdRP+v0UMXv+6G5tdxa4BvcyZ9h
+	 QStBVqOoOxdYQs1mso8ZBieR1Eni+fazIZNrv/YgWvRvoWwbmsEaVATX4TfSVzi2xx
+	 Y7VkiVCtkWU2KvyRe1k3AxCLSpIcPki4nf4Iqu8SXkn6A0ktcziz1Z/JOD3VDvvJU7
+	 Ss/LE1UFF9bUA==
+Date: Tue, 21 May 2024 15:19:48 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	bpf <bpf@vger.kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next v4 0/5] net: phy: mediatek: Introduce
- mtk-phy-lib and add 2.5Gphy support
-Message-ID: <80186a3c-8e9a-4a7e-9ead-6773c0bf0ebf@lunn.ch>
-References: <20240521101548.9286-1-SkyLake.Huang@mediatek.com>
+	netfilter-devel <netfilter-devel@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Simon Horman <horms@kernel.org>, donhunte@redhat.com,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Subject: Re: [PATCH bpf-next v2 3/4] samples/bpf: Add bpf sample to offload
+ flowtable traffic to xdp
+Message-ID: <ZkyfdIDbElsaILT1@lore-rh-laptop>
+References: <cover.1716026761.git.lorenzo@kernel.org>
+ <8b9e194a4cb04af838035183694c85242f78e626.1716026761.git.lorenzo@kernel.org>
+ <CAADnVQLV4=mQ3+2baLhfJi_m6A72khNxUhcgPuv+sdQqE7skgA@mail.gmail.com>
+ <87ttira2na.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="LOi/9RCDxpjG24/l"
 Content-Disposition: inline
-In-Reply-To: <20240521101548.9286-1-SkyLake.Huang@mediatek.com>
+In-Reply-To: <87ttira2na.fsf@toke.dk>
 
-On Tue, May 21, 2024 at 06:15:43PM +0800, Sky Huang wrote:
-> From: "SkyLake.Huang" <skylake.huang@mediatek.com>
-> 
-> e-organize MTK ethernet phy drivers and integrate common manipulations
-> into mtk-phy-lib. Also, add support for build-in 2.5Gphy on MT7988.
-> 
-> v2:
-> - Apply correct PATCH tag.
-> - Break LED/Token ring/Extend-link-pulse-time features into 3 patches.
-> - Fix contents according to v1 comments.
-> 
-> v3:
-> - Fix patch 4/5 & 5/5. Please see changes in 4/5 & 5/5's commit log.
-> - Rebase code and now this patch series can apply to net-next tree.
-> 
-> v4:
-> - Fix patch 4/5 & 5/5. Please see changes in 4/5 & 5/5's commit log.
 
-Please slow down. Discussion on the previous version has not come to a
-conclusion yet. Posting a new version just wastes reviewer time.
+--LOi/9RCDxpjG24/l
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Also, we are in the merge window at the moment, so nothing is going to
-get merged until it closes.
+> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+>=20
+> > On Sat, May 18, 2024 at 3:13=E2=80=AFAM Lorenzo Bianconi <lorenzo@kerne=
+l.org> wrote:
+> >>
+> >> Introduce xdp_flowtable_offload bpf sample to offload sw flowtable log=
+ic
+> >> in xdp layer if hw flowtable is not available or does not support a
+> >> specific kind of traffic.
+> >>
+> >> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> >> ---
+> >>  samples/bpf/Makefile                     |   7 +-
+> >>  samples/bpf/xdp_flowtable_offload.bpf.c  | 591 +++++++++++++++++++++++
+> >>  samples/bpf/xdp_flowtable_offload_user.c | 128 +++++
+> >>  3 files changed, 725 insertions(+), 1 deletion(-)
+> >>  create mode 100644 samples/bpf/xdp_flowtable_offload.bpf.c
+> >>  create mode 100644 samples/bpf/xdp_flowtable_offload_user.c
+> >
+> > I feel this sample code is dead on arrival.
+> > Make selftest more real if you want people to use it as an example,
+> > but samples dir is just a dumping ground.
+> > We shouldn't be adding anything to it.
+>=20
+> Agreed. We can integrate a working sample into xdp-tools instead :)
 
-	Andrew
+ack fine, I can post a patch for xdp-tools.
+
+Regards,
+Lorenzo
+
+>=20
+> -Toke
+>=20
+
+--LOi/9RCDxpjG24/l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZkyfcAAKCRA6cBh0uS2t
+rC2hAP90R0KOfB8EylHLyXDT6ua6eqWWhhV4ItjgF1Ld0VxMywEA8tG2Q5GhCWxx
+kyeU0WT+V3+GYLts7EzNSBW+ZUIvwww=
+=hWW1
+-----END PGP SIGNATURE-----
+
+--LOi/9RCDxpjG24/l--
 
