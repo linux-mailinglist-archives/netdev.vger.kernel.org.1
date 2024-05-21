@@ -1,95 +1,131 @@
-Return-Path: <netdev+bounces-97333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61DE28CADA4
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 13:51:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A27248CADF2
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 14:12:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D04128312B
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 11:51:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 080BEB23379
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 12:12:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BB774404;
-	Tue, 21 May 2024 11:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9963B76025;
+	Tue, 21 May 2024 12:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EAT5eBH0"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="bZd2oRfu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55DE763F1
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 11:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BB075803;
+	Tue, 21 May 2024 12:12:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716292228; cv=none; b=h9/c+azWSxSTQ0s/OTx0eByCSihDrs2u9m1AVeWQuYYdJFjx8r6N0PCBJvOWcG6r6nhkjGZKphTpYY2fyhe7wNmXWbIvbArzJzauaby6VRAH1cuTa3xwCGb8rPvwevMTyDPl7WmuLgZkbAK5o1ix9jvEwLJ/wBufK21EWTeGkCs=
+	t=1716293552; cv=none; b=QpEpemPU22EpH2IBr1v0wJvNtFD6v063zDQ5jRPHxK2syYYYDRjoSTm1elL6SUgLv7K6QZoysEXkj2xEO4y5fEvo67O1rL9lXBC57gNEEPLK9TR0IpWjgTTD4tFTONledsNGerNx6GX3GgGy3zSZpSWEdUFXn4DnFsaHoUH/nfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716292228; c=relaxed/simple;
-	bh=c3hMXERiqI4LlSBAOoZGQWiiM4vCYcA3natUvqE+E4A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ry5Y/vxvTA+BKId6tWRzIqklFuUJCnjKdREj47U/ZYneg0JywisqBtsZBKnwcoKyPC0xVdXqzRpDddzrP085Y4F5OuwBTmVdrnCHGzDDFEViwnx/enohWPcvFxlMU2iSaX8NsX04EN0oWDguOw6dlv1Qo1vT3prysOECbqynY18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EAT5eBH0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8CF5FC32789;
-	Tue, 21 May 2024 11:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716292228;
-	bh=c3hMXERiqI4LlSBAOoZGQWiiM4vCYcA3natUvqE+E4A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EAT5eBH0KspsNd5lDx86oQ5jY1zACb95t+tkWdd68xrBEeyx1vwgSppJwWOBu7HXR
-	 uKMYbFfv/MdEfhRwH0fCmqDTkqPmmGuar7Jr20ObPfN838jWV7E0IBEoqQUfGSDE4V
-	 hNkk3YBmuParAm7zggUhinUUG75G5qs5Zp/Wg4/HsP1OqDUpRSxx+Is9sg9jrxLSrz
-	 H5PBZu+HRf+CxcHGbAg0mFWnwMiRxy29SdPoehMFkL1G7NdcWSaUj0uorvGHGA7+HU
-	 1Wb8ugBSrJAlwrMwymegMcCKH6oG8zxUwV563nrCmU0ifwtDKaxZKtw0tBFBUeaTU9
-	 OEriSwitgUOMQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6E060C54BD4;
-	Tue, 21 May 2024 11:50:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1716293552; c=relaxed/simple;
+	bh=h0Oo0u4hQ+QRXSLJiXBTA++cyqDIus27IbVzDtn13Ng=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XSVMexL0LaZeXSdv4SLyVc/aKuiojoGpxmj/qWs0nTYY/qRgW886eTXCU2pw0Du3ptze3CcgkJaGAEXklfhxzKcjaEf8QjJ6u6b1wDy7O1Lf8wrMiYqiaUYfwmKp7wqO5qB26I9+tA/b+fh+sfmReFE4Q8mowU905qpMMEqfPVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=bZd2oRfu; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44LCC5ng103274;
+	Tue, 21 May 2024 07:12:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1716293525;
+	bh=VA+sG18CvzhI4DKfHZ9IEpAa6kujOkUdi/5UyYLhoRg=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=bZd2oRfuR9ZwysK9K94z5AOvJ8vnnOm2KUenLR/dXrockW9bL4C0jI5fv1bxCTlqx
+	 ngO5SibvjY8HtCeJ+CPYaOfgR1/d++E4w9EPe8/jfek5VzNMAT1+U3+zRQlseqZ9Vj
+	 0gBMA5xtN5sJ0oOus/rjGKFH9aqbQIWyiab8gZIg=
+Received: from DFLE109.ent.ti.com (dfle109.ent.ti.com [10.64.6.30])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44LCC5Kl072918
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 21 May 2024 07:12:05 -0500
+Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 21
+ May 2024 07:12:05 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 21 May 2024 07:12:05 -0500
+Received: from localhost (uda0492258.dhcp.ti.com [172.24.227.9])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44LCC42T030983;
+	Tue, 21 May 2024 07:12:05 -0500
+Date: Tue, 21 May 2024 17:42:03 +0530
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Siddharth Vadapalli <s-vadapalli@ti.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <corbet@lwn.net>, <rogerq@kernel.org>, <danishanwar@ti.com>,
+        <vladimir.oltean@nxp.com>, <netdev@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <vigneshr@ti.com>,
+        <misael.lopez@ti.com>, <srk@ti.com>
+Subject: Re: [RFC PATCH net-next 01/28] docs: networking: ti: add driver doc
+ for CPSW Proxy Client
+Message-ID: <0b0c1b07-756e-439e-bfc5-53824fd2a61c@ti.com>
+References: <20240518124234.2671651-1-s-vadapalli@ti.com>
+ <20240518124234.2671651-2-s-vadapalli@ti.com>
+ <642c8217-49fe-4c54-8d62-9550202c02c9@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net 0/2] af_unix: Fix GC and improve selftest
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171629222844.9323.10296602270935017581.git-patchwork-notify@kernel.org>
-Date: Tue, 21 May 2024 11:50:28 +0000
-References: <20240517093138.1436323-1-mhal@rbox.co>
-In-Reply-To: <20240517093138.1436323-1-mhal@rbox.co>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, kuniyu@amazon.com, shuah@kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <642c8217-49fe-4c54-8d62-9550202c02c9@lunn.ch>
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 17 May 2024 11:27:00 +0200 you wrote:
-> Series deals with AF_UNIX garbage collector mishandling some in-flight
-> graph cycles. Embryos carrying OOB packets with SCM_RIGHTS cause issues.
+On Sun, May 19, 2024 at 05:31:16PM +0200, Andrew Lunn wrote:
+> On Sat, May 18, 2024 at 06:12:07PM +0530, Siddharth Vadapalli wrote:
+> > The CPSW Proxy Client driver interfaces with Ethernet Switch Firmware on
+> > a remote core to enable Ethernet functionality for applications running
+> > on Linux. The Ethernet Switch Firmware (EthFw) is in control of the CPSW
+> > Ethernet Switch on the SoC and acts as the Server, offering services to
+> > Clients running on various cores.
 > 
-> Patch 1/2 fixes the memory leak.
-> Patch 2/2 tweaks the selftest for a better OOB coverage.
+> I'm not sure we as a community what this architecture. We want Linux
+> to be driving the hardware, not firmware. So expect linux to be
+> running the server.
 > 
-> v3:
->   - Patch 1/2: correct the commit message (Kuniyuki)
+> > +The "am65-cpsw-nuss.c" driver in Linux at:
+> > +drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> > +provides Ethernet functionality for applications on Linux.
+> > +It also handles both the control-path and data-path, namely:
+> > +Control => Configuration of the CPSW Peripheral
+> > +Data => Configuration of the DMA Channels to transmit/receive data
 > 
-> [...]
+> So nuss is capable of controlling the hardware. nuss has an upper
+> interface which is switchdev, and a lower interface which somehow acts
+> on the hardware, maybe invoking RPCs into the firmware?
+> 
+> So it is not too big a step to put the server functionality in Linux,
+> on top of the nuss driver.
 
-Here is the summary with links:
-  - [v3,net,1/2] af_unix: Fix garbage collection of embryos carrying OOB with SCM_RIGHTS
-    https://git.kernel.org/netdev/net/c/041933a1ec7b
-  - [v3,net,2/2] selftest: af_unix: Make SCM_RIGHTS into OOB data.
-    https://git.kernel.org/netdev/net/c/e060e433e512
+Andrew,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thank you for reviewing the patch and sharing your feedback. While I
+have come across other Switch Designs / Architecture, I am yet to go
+through the one you have mentioned below. I will go through it in detail
+and will follow up with my understanding in a future reply. This reply
+is intended to be an acknowledgment that I have read your feedback.
+I also wanted to clarify the use-case which this series targets. The
+requirements of the use-case are:
+1. Independent Ethernet Switch functionality: Switch operation and
+configuration when Linux is not functional (Fast startup, Low Power
+Mode, Safety use-cases).
+2. Dynamic Ethernet Switch configuration changes performed based on the
+applications which run on various cores.
 
+[...]
 
+Regards,
+Siddharth.
 
