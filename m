@@ -1,172 +1,372 @@
-Return-Path: <netdev+bounces-97363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A9D38CB0B9
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 16:49:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 573E08CB0F4
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 17:03:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A6AB1F2347D
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 14:49:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1EC21F2206E
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 15:03:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE2FD762E0;
-	Tue, 21 May 2024 14:49:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D7B7F487;
+	Tue, 21 May 2024 15:03:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CCOoIxTe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WTw5xDRa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFF71E87C
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 14:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BFE114A8E;
+	Tue, 21 May 2024 15:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716302983; cv=none; b=Sk85vVpRUYDHEPj4q2JVqst4NqI60C5sbWdCJqh9jnqGZr8Z0QTVu/wSHCqQAD9HHWaVVcAUwWl2wA3jkUYveER/TP4ddrzK3SebbGfV7yh9SqszRoKryLuc2qIuW2TxkvPhXhxaIRfsggp6cZiG59DDGXjhVYhB2Enz+4XIJRY=
+	t=1716303799; cv=none; b=gyVBKzNYhJPfloCtLo7saNJ+jBD7lkBBAOnShdUSbAieceY2ZMkjAZfkSpkCiFJdbypwIwRmvizRodzKirscx1VZWti2XgR5d/KFGT+q/pcYmMLGiKkcZpbPveEkpW1h/ojWHtp+orqRLIje3hc4E9gU2anoHAs4vZ2yFqDuVv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716302983; c=relaxed/simple;
-	bh=kc5w2PkHZ9cvU/u/JPzujA+YKbOvjeKG2iVe07fS000=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jupOGHMHkmDMhTn8eRKYeQftgbdnaKbI8cOJDS4uselnk+iNf0G2Xqg9eUgAsH0ZibAEaBcHBxpd++5FxHwLkVNreeNJx18B/o+7P2SG/SNXhhQLlkEMSM7cXuWuLE28QzEhMFmVcHX4jVkU797Af32bAWRu3DiUQiR0Wj72hYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CCOoIxTe; arc=none smtp.client-ip=209.85.210.178
+	s=arc-20240116; t=1716303799; c=relaxed/simple;
+	bh=/Y45I9chualZW+99/xoX3FB3cef6Agtm2HzDJwduKhQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=closqjYh89QdM6QW2woCQYnSXHZde8ymAyZm51r4oyxhLuWPYy54IADNl1NoAU7sriMbx09j+JWucDyB26K2gchIBaSxstws6BwbsiBA5AsXSl5XTpymlTduobcbdsrV9zQqQw449NOQz48jeYf/HmJj3b1NlvS1Suuytd32X84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WTw5xDRa; arc=none smtp.client-ip=209.85.219.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6f4f2b1c997so412941b3a.0
-        for <netdev@vger.kernel.org>; Tue, 21 May 2024 07:49:41 -0700 (PDT)
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-de607ab52f4so3761022276.2;
+        Tue, 21 May 2024 08:03:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716302981; x=1716907781; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gElkWZYoiosZEVwshbfNZwy0DCArJyB+G3iEWleFK4g=;
-        b=CCOoIxTeQGouXO6gBRou2QfhyiO/I6h5tRongw9bqMormtfNCub5nyup8BwvKpbdFb
-         X0TEF+EkEpCzMQsr8IvNdrMx5l5lr6ysSKAoSEOvTDNg3xFqC/Aar4JVAfX0l/T0xrce
-         sk51n5HS/BZKUrsi+EMSkB5hRC07hFsMMRA8ZWtmgts8ZCZTX0HNGrSiVlm3AzujkS2h
-         +AxVnlz+LF8fQQqfGX260f/91lz0idIn8BUyxy3LgPfJaksxFGDNlYYKJWp2xfOapW1w
-         vpFVeHB6yxQtCZwsXRWkHPMuKKNptEvIFFKjYGFA0msDFlGP8/NJBcJbKPWRU2SDAUwG
-         1cRA==
+        d=gmail.com; s=20230601; t=1716303796; x=1716908596; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=plXb3HCiPEnMJ4Iwt03yRxfneXkmAp+BT/TZjTSpOCE=;
+        b=WTw5xDRa1w1wYS4lXl0atZz/RMwQ9c0jC+jv1JvDmiR99VtRwfzDLvZYrepXGQZMlW
+         Y8MNqa5tonN34ZwtCE4hGLOa5+B//Uch/5U+Q9TNwkx/iza2Aujg7gpGQsozordyir1g
+         JH7rIp1bSrlrwXtZHMW0CN8yIIrGyBtBx4VmJwxM9VcU1d/joJOBMFlrrm9otXvlUVBE
+         mBESgXUGlQD/TvQ800UJgRnvqubXh7OTntYpozwDat3TOy+YAfoFbfa2nayEt8/+U8vS
+         HeukYyP6Tpq0nTCaDAxWB4KCw3S0fQprVJaBwVup30Wd8Bz2woZTaO5Pmf0GYQ1/i9ob
+         ZgzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716302981; x=1716907781;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gElkWZYoiosZEVwshbfNZwy0DCArJyB+G3iEWleFK4g=;
-        b=mRr/nEIgEce1+S97zj319ice5EaRvLqWcy7nHM5BfEkqFHJ8oF/+Pe6Y1qQtFmF3M6
-         CTl9vgB2ex4GmAtR+vMKgucKNULAWSqKeB1IIjQ7i5PzpOVM6P9mce4pqLPuCHkTXBAB
-         CceSPw1STokiYHJcGVjO76jDF483kWvlWmo/BkzvLb3xAi6o77cY1oxUIhBvscatHiJg
-         O0gkWLKOVXlLFImUBTJjTm9OIWY5tX4PeU5u4YCBzNqf7kO2SWs7u+2dawUq2I6JMiGt
-         kKvjE+jb7JLczYsCkWuen4QOfVKlwLuGdSHEbMAxdyf9IfSOS2pyd5s8gP1SHO7NVVA6
-         xQaA==
-X-Gm-Message-State: AOJu0YwNFa+Xtf5kz+PkKvsv5XPeVn9kFcT0YCEjlJ72BTme8JlkGchd
-	XJhDKqbUxGQ+m4X0bh7yE+tnz4KniSMH6TaplEO31q3LeEcpnk+3
-X-Google-Smtp-Source: AGHT+IHQo/MenlCpuZlSxD/r8lum4MnGbuSx76VXxA+r3QsMEdbcmSwFqFJjKMjsEt1hAlIoxUHFsQ==
-X-Received: by 2002:a05:6a00:1824:b0:6ec:ff1b:aa0b with SMTP id d2e1a72fcca58-6f4e02d3698mr35147450b3a.18.1716302981355;
-        Tue, 21 May 2024 07:49:41 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([111.201.28.17])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2a66691sm21539834b3a.16.2024.05.21.07.49.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 May 2024 07:49:40 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	kuniyu@amazon.com
-Cc: netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>,
-	syzbot+2eca27bdcb48ed330251@syzkaller.appspotmail.com
-Subject: [PATCH net] Revert "rds: tcp: Fix use-after-free of net in reqsk_timer_handler()."
-Date: Tue, 21 May 2024 22:49:30 +0800
-Message-Id: <20240521144930.23805-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+        d=1e100.net; s=20230601; t=1716303796; x=1716908596;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=plXb3HCiPEnMJ4Iwt03yRxfneXkmAp+BT/TZjTSpOCE=;
+        b=efdbTCyJFVHlWPEobPHtNGJI8r3TYR4f/9cRgesWFL+Aywgp6fcnElWfDl2yKaEnCG
+         +QpynDVbW9F0QOyfYYRxBXZZ//46pi/an018HMDL+RBenEhjpAVTc5l2tz8VcVOiIslW
+         Ld/HOgIRJobDnXb4WH4YU8oFSGbWEB/nnqurSl26GKNVX7p4nnMlN7voHuYz4dmByIBX
+         2yoPtKyOqKOpuxJjbNcmWMBzhfYO99veKfj/23Oh9ByoY3yNPTvDuNbqHjv+nxXYXr29
+         Lspwud46YxkVNaDNlvduBirvN9Fzp3dr7V2Z/NSzHHGrlBH1rkcmUBATumw6dHb9Ng/0
+         ocYg==
+X-Forwarded-Encrypted: i=1; AJvYcCUfWOi93bAv4Wyo2SjCXBBW4lK+WupbceNdnchSdlgRZ/WFDjhpFJRvEYMjqRPafM2kdGzwCS4+vAJShN8djV/F+eSE
+X-Gm-Message-State: AOJu0YycZK8cNrE4O+6EKgm0AthbjDGiUby1GWRTCQ8yYzoz8+aUmVB1
+	7xe7IJXpuKDUItZ/II3zOgGVDi9uJJdANRD0kdaAPAPYd0eWgaWbK5XHi/JGziHnQbjDdctJ2SV
+	bVAif89Ckf9wcdLM/15K1MV8JuPk=
+X-Google-Smtp-Source: AGHT+IGUuqbQYXCoNra15W9/annAoNJjZtPceihDgrpvO/JeqUFz4HsBA4iQGIf6uYFH7CgfBmgeGJ5o/sNfVJivz1M=
+X-Received: by 2002:a25:6850:0:b0:de0:f753:ad25 with SMTP id
+ 3f1490d57ef6-dee4f324aa3mr31525812276.1.1716303796245; Tue, 21 May 2024
+ 08:03:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240510192412.3297104-1-amery.hung@bytedance.com>
+ <20240510192412.3297104-18-amery.hung@bytedance.com> <ZkwRuEExDs8QnVu1@google.com>
+In-Reply-To: <ZkwRuEExDs8QnVu1@google.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Tue, 21 May 2024 08:03:04 -0700
+Message-ID: <CAMB2axOmZbZgqZdWjdAL0__uHgZCtK8G0ABoKCizk16NkQdpTQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v8 17/20] selftests: Add a basic fifo qdisc test
+To: Stanislav Fomichev <sdf@google.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@kernel.org, 
+	sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jason Xing <kernelxing@tencent.com>
+On Mon, May 20, 2024 at 8:15=E2=80=AFPM Stanislav Fomichev <sdf@google.com>=
+ wrote:
+>
+> On 05/10, Amery Hung wrote:
+> > This selftest shows a bare minimum fifo qdisc, which simply enqueues sk=
+bs
+> > into the back of a bpf list and dequeues from the front of the list.
+> >
+> > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> > ---
+> >  .../selftests/bpf/prog_tests/bpf_qdisc.c      | 161 ++++++++++++++++++
+> >  .../selftests/bpf/progs/bpf_qdisc_common.h    |  23 +++
+> >  .../selftests/bpf/progs/bpf_qdisc_fifo.c      |  83 +++++++++
+> >  3 files changed, 267 insertions(+)
+> >  create mode 100644 tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> >  create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_common.=
+h
+> >  create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fifo.c
+> >
+> > diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c b/tools=
+/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> > new file mode 100644
+> > index 000000000000..295d0216e70f
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> > @@ -0,0 +1,161 @@
+> > +#include <linux/pkt_sched.h>
+> > +#include <linux/rtnetlink.h>
+> > +#include <test_progs.h>
+> > +
+> > +#include "network_helpers.h"
+> > +#include "bpf_qdisc_fifo.skel.h"
+> > +
+> > +#ifndef ENOTSUPP
+> > +#define ENOTSUPP 524
+> > +#endif
+> > +
+> > +#define LO_IFINDEX 1
+> > +
+> > +static const unsigned int total_bytes =3D 10 * 1024 * 1024;
+> > +static int stop;
+> > +
+> > +static void *server(void *arg)
+> > +{
+> > +     int lfd =3D (int)(long)arg, err =3D 0, fd;
+> > +     ssize_t nr_sent =3D 0, bytes =3D 0;
+> > +     char batch[1500];
+> > +
+> > +     fd =3D accept(lfd, NULL, NULL);
+> > +     while (fd =3D=3D -1) {
+> > +             if (errno =3D=3D EINTR)
+> > +                     continue;
+> > +             err =3D -errno;
+> > +             goto done;
+> > +     }
+> > +
+> > +     if (settimeo(fd, 0)) {
+> > +             err =3D -errno;
+> > +             goto done;
+> > +     }
+> > +
+> > +     while (bytes < total_bytes && !READ_ONCE(stop)) {
+> > +             nr_sent =3D send(fd, &batch,
+> > +                            MIN(total_bytes - bytes, sizeof(batch)), 0=
+);
+> > +             if (nr_sent =3D=3D -1 && errno =3D=3D EINTR)
+> > +                     continue;
+> > +             if (nr_sent =3D=3D -1) {
+> > +                     err =3D -errno;
+> > +                     break;
+> > +             }
+> > +             bytes +=3D nr_sent;
+> > +     }
+> > +
+> > +     ASSERT_EQ(bytes, total_bytes, "send");
+> > +
+> > +done:
+> > +     if (fd >=3D 0)
+> > +             close(fd);
+> > +     if (err) {
+> > +             WRITE_ONCE(stop, 1);
+> > +             return ERR_PTR(err);
+> > +     }
+> > +     return NULL;
+> > +}
+> > +
+> > +static void do_test(char *qdisc)
+> > +{
+> > +     DECLARE_LIBBPF_OPTS(bpf_tc_hook, hook, .ifindex =3D LO_IFINDEX,
+> > +                         .attach_point =3D BPF_TC_QDISC,
+> > +                         .parent =3D TC_H_ROOT,
+> > +                         .handle =3D 0x8000000,
+> > +                         .qdisc =3D qdisc);
+> > +     struct sockaddr_in6 sa6 =3D {};
+> > +     ssize_t nr_recv =3D 0, bytes =3D 0;
+> > +     int lfd =3D -1, fd =3D -1;
+> > +     pthread_t srv_thread;
+> > +     socklen_t addrlen =3D sizeof(sa6);
+> > +     void *thread_ret;
+> > +     char batch[1500];
+> > +     int err;
+> > +
+> > +     WRITE_ONCE(stop, 0);
+> > +
+> > +     err =3D bpf_tc_hook_create(&hook);
+> > +     if (!ASSERT_OK(err, "attach qdisc"))
+> > +             return;
+> > +
+> > +     lfd =3D start_server(AF_INET6, SOCK_STREAM, NULL, 0, 0);
+> > +     if (!ASSERT_NEQ(lfd, -1, "socket")) {
+> > +             bpf_tc_hook_destroy(&hook);
+> > +             return;
+> > +     }
+> > +
+> > +     fd =3D socket(AF_INET6, SOCK_STREAM, 0);
+> > +     if (!ASSERT_NEQ(fd, -1, "socket")) {
+> > +             bpf_tc_hook_destroy(&hook);
+> > +             close(lfd);
+> > +             return;
+> > +     }
+> > +
+> > +     if (settimeo(lfd, 0) || settimeo(fd, 0))
+> > +             goto done;
+> > +
+> > +     err =3D getsockname(lfd, (struct sockaddr *)&sa6, &addrlen);
+> > +     if (!ASSERT_NEQ(err, -1, "getsockname"))
+> > +             goto done;
+> > +
+> > +     /* connect to server */
+> > +     err =3D connect(fd, (struct sockaddr *)&sa6, addrlen);
+> > +     if (!ASSERT_NEQ(err, -1, "connect"))
+> > +             goto done;
+> > +
+> > +     err =3D pthread_create(&srv_thread, NULL, server, (void *)(long)l=
+fd);
+> > +     if (!ASSERT_OK(err, "pthread_create"))
+> > +             goto done;
+> > +
+> > +     /* recv total_bytes */
+> > +     while (bytes < total_bytes && !READ_ONCE(stop)) {
+> > +             nr_recv =3D recv(fd, &batch,
+> > +                            MIN(total_bytes - bytes, sizeof(batch)), 0=
+);
+> > +             if (nr_recv =3D=3D -1 && errno =3D=3D EINTR)
+> > +                     continue;
+> > +             if (nr_recv =3D=3D -1)
+> > +                     break;
+> > +             bytes +=3D nr_recv;
+> > +     }
+> > +
+> > +     ASSERT_EQ(bytes, total_bytes, "recv");
+> > +
+> > +     WRITE_ONCE(stop, 1);
+> > +     pthread_join(srv_thread, &thread_ret);
+> > +     ASSERT_OK(IS_ERR(thread_ret), "thread_ret");
+> > +
+> > +done:
+> > +     close(lfd);
+> > +     close(fd);
+> > +
+> > +     bpf_tc_hook_destroy(&hook);
+> > +     return;
+> > +}
+> > +
+> > +static void test_fifo(void)
+> > +{
+> > +     struct bpf_qdisc_fifo *fifo_skel;
+> > +     struct bpf_link *link;
+> > +
+> > +     fifo_skel =3D bpf_qdisc_fifo__open_and_load();
+> > +     if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
+> > +             return;
+> > +
+> > +     link =3D bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
+> > +     if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
+> > +             bpf_qdisc_fifo__destroy(fifo_skel);
+> > +             return;
+> > +     }
+> > +
+> > +     do_test("bpf_fifo");
+> > +
+> > +     bpf_link__destroy(link);
+> > +     bpf_qdisc_fifo__destroy(fifo_skel);
+> > +}
+> > +
+> > +void test_bpf_qdisc(void)
+> > +{
+> > +     if (test__start_subtest("fifo"))
+> > +             test_fifo();
+> > +}
+> > diff --git a/tools/testing/selftests/bpf/progs/bpf_qdisc_common.h b/too=
+ls/testing/selftests/bpf/progs/bpf_qdisc_common.h
+> > new file mode 100644
+> > index 000000000000..96ab357de28e
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/bpf/progs/bpf_qdisc_common.h
+> > @@ -0,0 +1,23 @@
+> > +#ifndef _BPF_QDISC_COMMON_H
+> > +#define _BPF_QDISC_COMMON_H
+> > +
+> > +#define NET_XMIT_SUCCESS        0x00
+> > +#define NET_XMIT_DROP           0x01    /* skb dropped                =
+  */
+> > +#define NET_XMIT_CN             0x02    /* congestion notification    =
+  */
+> > +
+> > +#define TC_PRIO_CONTROL  7
+> > +#define TC_PRIO_MAX      15
+> > +
+> > +void bpf_skb_set_dev(struct sk_buff *skb, struct Qdisc *sch) __ksym;
+> > +u32 bpf_skb_get_hash(struct sk_buff *p) __ksym;
+> > +void bpf_skb_release(struct sk_buff *p) __ksym;
+> > +void bpf_qdisc_skb_drop(struct sk_buff *p, struct bpf_sk_buff_ptr *to_=
+free) __ksym;
+> > +void bpf_qdisc_watchdog_schedule(struct Qdisc *sch, u64 expire, u64 de=
+lta_ns) __ksym;
+> > +bool bpf_qdisc_find_class(struct Qdisc *sch, u32 classid) __ksym;
+> > +int bpf_qdisc_create_child(struct Qdisc *sch, u32 min,
+> > +                        struct netlink_ext_ack *extack) __ksym;
+> > +int bpf_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch, u32 clas=
+sid,
+> > +                   struct bpf_sk_buff_ptr *to_free_list) __ksym;
+> > +struct sk_buff *bpf_qdisc_dequeue(struct Qdisc *sch, u32 classid) __ks=
+ym;
+> > +
+> > +#endif
+> > diff --git a/tools/testing/selftests/bpf/progs/bpf_qdisc_fifo.c b/tools=
+/testing/selftests/bpf/progs/bpf_qdisc_fifo.c
+> > new file mode 100644
+> > index 000000000000..433fd9c3639c
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/bpf/progs/bpf_qdisc_fifo.c
+> > @@ -0,0 +1,83 @@
+> > +#include <vmlinux.h>
+> > +#include "bpf_experimental.h"
+> > +#include "bpf_qdisc_common.h"
+> > +
+> > +char _license[] SEC("license") =3D "GPL";
+> > +
+> > +#define private(name) SEC(".data." #name) __hidden __attribute__((alig=
+ned(8)))
+> > +
+> > +private(B) struct bpf_spin_lock q_fifo_lock;
+> > +private(B) struct bpf_list_head q_fifo __contains_kptr(sk_buff, bpf_li=
+st);
+> > +
+> > +unsigned int q_limit =3D 1000;
+> > +unsigned int q_qlen =3D 0;
+> > +
+> > +SEC("struct_ops/bpf_fifo_enqueue")
+> > +int BPF_PROG(bpf_fifo_enqueue, struct sk_buff *skb, struct Qdisc *sch,
+> > +          struct bpf_sk_buff_ptr *to_free)
+> > +{
+> > +     q_qlen++;
+> > +     if (q_qlen > q_limit) {
+> > +             bpf_qdisc_skb_drop(skb, to_free);
+> > +             return NET_XMIT_DROP;
+> > +     }
+>
+> [..]
+>
+> > +     bpf_spin_lock(&q_fifo_lock);
+> > +     bpf_list_excl_push_back(&q_fifo, &skb->bpf_list);
+> > +     bpf_spin_unlock(&q_fifo_lock);
+>
+> Can you also expand a bit on the locking here and elsewhere? And how it
+> interplays with TCQ_F_NOLOCK?
+>
+> As I mentioned at lsfmmbpf, I don't think there is a lot of similar
+> locking in the existing C implementations? So why do we need it here?
 
-This reverts commit 2a750d6a5b365265dbda33330a6188547ddb5c24.
+The locks are required to prevent catastrophic concurrent accesses to
+bpf graphs. The verifier will check 1) if there is a spin_lock in the
+same struct with a list head or rbtree root, and 2) the lock is held
+when accessing the list or rbtree.
 
-Syzbot[1] reported the drecrement of reference count hits leaking memory.
+Since we have the safety guarantee provided by the verifier, I think
+there is an opportunity to allow qdisc users to set TCQ_F_NOLOCK. I will
+check if qdisc kfuncs are TCQ_F_NOLOCK safe though. Let me know if I
+missed anything.
 
-If we failed in setup_net() and try to undo the setup process, the
-reference now is 1 which shouldn't be decremented. However, it happened
-actually.
-
-After applying this patch which allows us to check the reference first,
-it will not hit zero anymore in tcp_twsk_purge() without calling
-inet_twsk_purge() one more time.
-
-[1]
-refcount_t: decrement hit 0; leaking memory.
-WARNING: CPU: 3 PID: 1396 at lib/refcount.c:31 refcount_warn_saturate+0x1ed/0x210 lib/refcount.c:31
-Modules linked in:
-CPU: 3 PID: 1396 Comm: syz-executor.3 Not tainted 6.9.0-syzkaller-07370-g33e02dc69afb #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:refcount_warn_saturate+0x1ed/0x210 lib/refcount.c:31
-RSP: 0018:ffffc9000480fa70 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc9002ce28000
-RDX: 0000000000040000 RSI: ffffffff81505406 RDI: 0000000000000001
-RBP: ffff88804d8b3f80 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000002 R12: ffff88804d8b3f80
-R13: ffff888031c601c0 R14: ffffc900013c04f8 R15: 000000002a3e5567
-FS:  00007f56d897c6c0(0000) GS:ffff88806b300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b3182b000 CR3: 0000000034ed6000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- __refcount_dec include/linux/refcount.h:336 [inline]
- refcount_dec include/linux/refcount.h:351 [inline]
- inet_twsk_kill+0x758/0x9c0 net/ipv4/inet_timewait_sock.c:70
- inet_twsk_deschedule_put net/ipv4/inet_timewait_sock.c:221 [inline]
- inet_twsk_purge+0x725/0x890 net/ipv4/inet_timewait_sock.c:304
- tcp_twsk_purge+0x115/0x150 net/ipv4/tcp_minisocks.c:402
- tcp_sk_exit_batch+0x1c/0x170 net/ipv4/tcp_ipv4.c:3522
- ops_exit_list+0x128/0x180 net/core/net_namespace.c:178
- setup_net+0x714/0xb40 net/core/net_namespace.c:375
- copy_net_ns+0x2f0/0x670 net/core/net_namespace.c:508
- create_new_namespaces+0x3ea/0xb10 kernel/nsproxy.c:110
- unshare_nsproxy_namespaces+0xc0/0x1f0 kernel/nsproxy.c:228
- ksys_unshare+0x419/0x970 kernel/fork.c:3323
- __do_sys_unshare kernel/fork.c:3394 [inline]
- __se_sys_unshare kernel/fork.c:3392 [inline]
- __x64_sys_unshare+0x31/0x40 kernel/fork.c:3392
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f56d7c7cee9
-
-Fixes: 2a750d6a5b36 ("rds: tcp: Fix use-after-free of net in reqsk_timer_handler().")
-Reported-by: syzbot+2eca27bdcb48ed330251@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=2eca27bdcb48ed330251
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
-The reverted patch trying to solve another issue causes unexpected error as above. I
-think that issue can be properly analyzed and handled later. So can we revert it first?
----
- net/ipv4/tcp_minisocks.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index b93619b2384b..46e6f9db4227 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -399,6 +399,10 @@ void tcp_twsk_purge(struct list_head *net_exit_list)
- 			/* Even if tw_refcount == 1, we must clean up kernel reqsk */
- 			inet_twsk_purge(net->ipv4.tcp_death_row.hashinfo);
- 		} else if (!purged_once) {
-+			/* The last refcount is decremented in tcp_sk_exit_batch() */
-+			if (refcount_read(&net->ipv4.tcp_death_row.tw_refcount) == 1)
-+				continue;
-+
- 			inet_twsk_purge(&tcp_hashinfo);
- 			purged_once = true;
- 		}
--- 
-2.37.3
-
+Thanks,
+Amery
 
