@@ -1,133 +1,100 @@
-Return-Path: <netdev+bounces-97346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C2978CAEF5
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 15:07:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26BF78CAEFC
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 15:08:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 382D2283E12
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 13:07:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 582871C218D2
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 13:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EB97F7C8;
-	Tue, 21 May 2024 13:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B28770F1;
+	Tue, 21 May 2024 13:07:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="hAuFPgbN";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="Z/hUAcDu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oJVH025p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E5EB7B3F3;
-	Tue, 21 May 2024 13:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430862F5B;
+	Tue, 21 May 2024 13:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716296764; cv=none; b=aaEw/6d0V7MQiB4t5jVKjec6vyC68+kDlMK6+ZvMT02aagIDIbD366CLt3NUtcxRP0GgXDnpIr/ben1dEedr13bHRowg5dmaGW7/vHQxxtxvbHwIrf2aLHaYcuOnPvqZct9q4bXXqUOOubatpKB3AtHu0DZZe16KFkHjRL5aTmU=
+	t=1716296871; cv=none; b=cLd4X+6ftz6X0PamaaQdmzE5vnd37QMcdKg6Adq9AH/eTDygcHovfLlk8zACyMjdkbaBlwnGyouUrlO5hKoIqoxh47DyTLxLj4HW8cCI5SAeTv4XINRR3hrMxJhPlvMBQ5T9hjnTTEveXToT92KIT/4ur5dmfAKHFMMgkQI0E+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716296764; c=relaxed/simple;
-	bh=OdGZx35Xq/K2qo+2VemsbuBTb2vtHnLZgwqnHGj6dHs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GILLvq71Ax03dbdu45AocppqC/GhNGARUw+5NuGS6f22qCs9hslsz704tR54m+wvitWpUW79tZ0hR/GJ+4G60RrDIyqyL3xJnErCavRB+/QMZDSOLdOjxnGelmtweKPKwEYplqhfTFff2z//wG9vUs4kMqr/UZZTW9/ay7V3lU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=hAuFPgbN; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=Z/hUAcDu reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1716296762; x=1747832762;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=cyyRUEqHorrucwPwnV8fQCfXT5oEDfauIgMMG9jC7FM=;
-  b=hAuFPgbNbE6YxOzCaxidKU48CLM6k5JBbdVfJhpDvaPW6oUSStJDcZe9
-   IynwEwK1wKTW0cXqJuLGLaXXRe2oaxURPgzr7Y2XwzWf7UBGt0fJ2SYlj
-   yLRSKFIdq2+hsBJ5/ebv+cfY7miT4xbRtfRTKPCsL5xmdU2G0Jnb4U19g
-   4pV5ZTRWng4GvBpBoJG448x2xztwUG398VIaN8NPLu1FO6EvgZgNsOLyB
-   c1dulWIB3umG8broKycb4eV2Yapn6L+HotIH1QZsochv2XsYyCENOEx3f
-   lOfYyj5D0FuulxEHWMSn/wpdt/2+lEYJfp85qjqXkrDWEd/QJ+ZWeQnVw
-   Q==;
-X-CSE-ConnectionGUID: EzwhYIOMRsKrcBGmmEQETA==
-X-CSE-MsgGUID: sLkcEvnaQ2e3HC/gI/hpXA==
-X-IronPort-AV: E=Sophos;i="6.08,177,1712613600"; 
-   d="scan'208";a="36993994"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 21 May 2024 15:06:00 +0200
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4B2A9175C07;
-	Tue, 21 May 2024 15:05:56 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1716296756;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=cyyRUEqHorrucwPwnV8fQCfXT5oEDfauIgMMG9jC7FM=;
-	b=Z/hUAcDuc2Bbp1gD15KjQG8nmyP3JXEm7GkmbGTYEjj+OFm3AkjE/6QpHA4bAOkH5DxEok
-	BJVar5t6BbetcJboOylCuUoTE+imBIi0tcW64Y7l3SWCx7mcG6/o8LvS745VdRjKcdcDZ3
-	IKZWR/OX1bCeIqch1ykalhwPkq9k4kz2QVUmdzUvKs12gpbuLQQAc9DBrzcy1YhuLPumBS
-	sk3+jsjDnQfORPKnLStCsa3TTk9+GaWTn2ia2b07c2GVthB/7C+cs6teJ4tTKE4aA8QSpe
-	BMR1jQNTk1IHfhrYgNftyR00PLs18YeHMAuwpbhN8YzPVQy9E562qsomeCKNGQ==
-From: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Date: Tue, 21 May 2024 15:04:58 +0200
-Subject: [PATCH v3 8/8] dt-bindings: can: mcp251xfd: add gpio-controller
- property
+	s=arc-20240116; t=1716296871; c=relaxed/simple;
+	bh=0r2A/v5zTLGjt/RcEPdSyLJqs1OI5TzLsZItAT64RbY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uovEL2ZQTpbs89R8ZfyCx+CDfDDxbzswXzoyeqGRlLL04nNAIYm/5/jYB8DXamHHLEIsZ55e3KA5AZ6XTDpRMA8Om73lCjN21osg50s3MkoUcmw8Xny48GWkAsbSXtM9Lo++PTYjuvwfGi0Atf4CLMEZMy69ZzhI39LiU02hx64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oJVH025p; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3KgJPyI97V1XLw0zpYFO1oZq2MkLIkhIRp0FEGTpZBA=; b=oJVH025pAQT0RkiLtpNrQZ1+9u
+	cywTqk37o2uuwJYoLlW21CCtQd+ksuGpH5iT1M7aMHO4ms6WqqNyx3ElPpfv5+X9eIV9KpJi66htl
+	ZUsqBPEfIx8h2YqypRKHhHv9+UNcHnOYuswu8gD5Ct1MZhHzlZhRbW+tAe9sA7NkSzSc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s9PDQ-00FlD2-6J; Tue, 21 May 2024 15:07:40 +0200
+Date: Tue, 21 May 2024 15:07:40 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, corbet@lwn.net, rogerq@kernel.org,
+	danishanwar@ti.com, vladimir.oltean@nxp.com, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, vigneshr@ti.com,
+	misael.lopez@ti.com, srk@ti.com
+Subject: Re: [RFC PATCH net-next 01/28] docs: networking: ti: add driver doc
+ for CPSW Proxy Client
+Message-ID: <e99109c0-b0b4-43db-a7c7-dedb5753aaf9@lunn.ch>
+References: <20240518124234.2671651-1-s-vadapalli@ti.com>
+ <20240518124234.2671651-2-s-vadapalli@ti.com>
+ <642c8217-49fe-4c54-8d62-9550202c02c9@lunn.ch>
+ <0b0c1b07-756e-439e-bfc5-53824fd2a61c@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240521-mcp251xfd-gpio-feature-v3-8-7f829fefefc2@ew.tq-group.com>
-References: <20240521-mcp251xfd-gpio-feature-v3-0-7f829fefefc2@ew.tq-group.com>
-In-Reply-To: <20240521-mcp251xfd-gpio-feature-v3-0-7f829fefefc2@ew.tq-group.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>, 
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
- Thomas Kopp <thomas.kopp@microchip.com>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
- linux@ew.tq-group.com, gregor.herburger@ew.tq-group.com, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1716296697; l=932;
- i=gregor.herburger@ew.tq-group.com; s=20230829; h=from:subject:message-id;
- bh=OdGZx35Xq/K2qo+2VemsbuBTb2vtHnLZgwqnHGj6dHs=;
- b=3ius/kJSj1KX4cPP4zFqWQVMTg2McgvCYpq90oozVXbiamCIH9N9OBoo4+Ow7AkCmHxlBsdBS
- 3RTlKrKcGoEAeovzC+nIf2LTBjDZz0oI+vDq9fhGFCyUntw+jS2MICX
-X-Developer-Key: i=gregor.herburger@ew.tq-group.com; a=ed25519;
- pk=+eRxwX7ikXwazcRjlOjj2/tbDmfVZdDLoW+xLZbQ4h4=
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0b0c1b07-756e-439e-bfc5-53824fd2a61c@ti.com>
 
-The mcp251xfd has two pins that can be used as gpio. Add gpio-controller
-property to binding description.
+> Andrew,
+> 
+> Thank you for reviewing the patch and sharing your feedback. While I
+> have come across other Switch Designs / Architecture, I am yet to go
+> through the one you have mentioned below. I will go through it in detail
+> and will follow up with my understanding in a future reply. This reply
+> is intended to be an acknowledgment that I have read your feedback.
+> I also wanted to clarify the use-case which this series targets. The
+> requirements of the use-case are:
+> 1. Independent Ethernet Switch functionality: Switch operation and
+> configuration when Linux is not functional (Fast startup, Low Power
+> Mode, Safety use-cases).
+> 2. Dynamic Ethernet Switch configuration changes performed based on the
+> applications which run on various cores.
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Signed-off-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
----
- Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml | 5 +++++
- 1 file changed, 5 insertions(+)
+Please make sure these requirements are clearly stated in the design.
 
-diff --git a/Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml b/Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml
-index 2a98b26630cb..e9605a75c45b 100644
---- a/Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml
-+++ b/Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml
-@@ -49,6 +49,11 @@ properties:
-       Must be half or less of "clocks" frequency.
-     maximum: 20000000
- 
-+  gpio-controller: true
-+
-+  "#gpio-cells":
-+    const: 2
-+
- required:
-   - compatible
-   - reg
+The support for switches in Linux has initially come from big data
+centre switches, and smaller SOHO switches you found in OpenWRT class
+devices. The switchdev model has worked well so far for these use
+cases. However, i do understand you have additional requirements.
 
--- 
-2.34.1
+Ideally we want to extend the existing model to support additional use
+cases, not create a second parallel model. And we want a vendor
+agnostic extensions of the switchdev model, something which all
+automotive vendors can use, and non-automotive systems which have a
+similar architecture.
 
+	Andrew
 
