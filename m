@@ -1,351 +1,335 @@
-Return-Path: <netdev+bounces-97276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBED48CA6A5
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 05:09:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EF2F8CA6B4
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 05:15:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E57C2B2164B
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 03:09:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92DFE1F21A3F
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 03:15:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6248617545;
-	Tue, 21 May 2024 03:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913F6182DF;
+	Tue, 21 May 2024 03:15:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wiwynn.com header.i=@wiwynn.com header.b="Nnj1fXRR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WEKqPsHI"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2071.outbound.protection.outlook.com [40.107.255.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B501078B;
-	Tue, 21 May 2024 03:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.255.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716260974; cv=fail; b=CqDr2wxtb5ZMV/8YBAHy4/Nz+EOc6sS8oZHRfYAXltibMUMKLKwVT5tiX2SrR4+dpbSesm9xybTt4lhm5w4hUh6Vd+lqfcje6wOwM+0r01dCQ6q2VT8gRV8YR3im0MSxmoD4/CaJdgn3DjnmP3rBraSKO9Nacc9KeGfCPKJ71mU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716260974; c=relaxed/simple;
-	bh=HpPJxtvSRd2MidkJ+CvJEsXnkDHl9JEwBnw8hESO53U=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=UhD90fKyB7N8pVs0lY98Fr+9z5v2xle3v3pdDnvHRGcC/y4zzv0R1qJTagG6sG2PSGTn/FKAUqxJOtkCjkUGgncF5s/DEQ2TegZk+w9K0VjAZjtR92TkB+dN83GzNmUeDAnXevA256Nxf/dgWhxI4xXq8H+dscEtY7XLZR6NBDk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wiwynn.com; spf=pass smtp.mailfrom=wiwynn.com; dkim=pass (2048-bit key) header.d=wiwynn.com header.i=@wiwynn.com header.b=Nnj1fXRR; arc=fail smtp.client-ip=40.107.255.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wiwynn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wiwynn.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SNfMYvt1QOMbUeAEoX7pHw6d6Iy2vOyNz00whu0lZFZ0Y1MjpQbeZaEiLX0zByD0eedPjNMRyjlBF0dUUCvqAmv3Ww15Ja7FZFA88WNP52ctwttA7rUPmxsU7+VStzkgSN0y4KHTAU9wXzTC5T+XV2TEA643HhNPNGE0/n1clJBMV3Zup1QXO9ZcVL+1M8M0zPBxxyzIciAZm4xp3NUNDkiNpeSiVYGL1XB5ILFj3oUciiW1A4Wogsdo5wxhDpMPrT+pay1YHMJsDPq1K8VjfhOG88GJd5fiNfOrXJJTacSvU5YfAHRHPEMCmGmfZEMTKtcNwOBIb0f+UbZaBxxiYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yXdsrX0cYGZL/aomMDm+5gf/T0QwsuL2dkgtYbCiIjU=;
- b=fPXR25neoyXn3ZyeqBjNZigaTUIEANrOZTSH9WxAK4f+OTsQUZcbXqZxAjYSSV9hg9L6G0Pylvwqao5nLA+/Vaa2qZUS39EPtkTlGb0qwxB/c/OeELxkQiy2wn+TyDQ9pbRSMjsIne2KPGOarHhlZnz2EOJ1UFjlbW74UXfap3/PjUEA9ObreQwz5QqqMFZIF4iz7DfUoD/f9TgXkjKsNc+nb7L+fOgAPzlVl7jtT9aRqI6Bb5XEW5YNVz7M+88v38CFl7+6qLZTjwPlyW80OsV6OhscfkiMemcuZq85Ppr3fuEWXWBHs60rRP5SzrnFu7beoXafjHV7bax38C8gWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 211.20.1.79) smtp.rcpttodomain=stwcx.xyz smtp.mailfrom=wiwynn.com; dmarc=fail
- (p=quarantine sp=quarantine pct=100) action=quarantine
- header.from=wiwynn.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wiwynn.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yXdsrX0cYGZL/aomMDm+5gf/T0QwsuL2dkgtYbCiIjU=;
- b=Nnj1fXRRAdS2m1qdg1a8NH5/PJc2+VbxaP4XN8MItyl5sW1LN3BltP07rhsShx7gnvTI6oR1K9OhHK0dotgg/6ANib7C5DtIewaIyzFfgRk9w1VJ/e53M4C0fSG2NZioJ4Zw/TfbEYFK5yL2oYa5i850vHcL56SVYR+Vt3pW4XzW1keo3uDT/OsLuNqP1hlbTs6r14v4bpVG05ufffNb2g2Mqn5B0rdqLjAnxx23i5iI5tX1OEvEcQajVhrbtYKKjKIYupaY7yRKuuGLUZBuO9j7eCIGppRs5EZbXv25Z3jWCAk5xRa9/uRRFqbxF85dxH6tsCOc1aCqQFFvFAbpsg==
-Received: from SG2PR02CA0025.apcprd02.prod.outlook.com (2603:1096:3:18::13) by
- PUZPR04MB6316.apcprd04.prod.outlook.com (2603:1096:301:fc::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7587.35; Tue, 21 May 2024 03:09:27 +0000
-Received: from SG2PEPF000B66CF.apcprd03.prod.outlook.com
- (2603:1096:3:18:cafe::59) by SG2PR02CA0025.outlook.office365.com
- (2603:1096:3:18::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.36 via Frontend
- Transport; Tue, 21 May 2024 03:09:26 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 211.20.1.79)
- smtp.mailfrom=wiwynn.com; dkim=none (message not signed)
- header.d=none;dmarc=fail action=quarantine header.from=wiwynn.com;
-Received-SPF: Fail (protection.outlook.com: domain of wiwynn.com does not
- designate 211.20.1.79 as permitted sender) receiver=protection.outlook.com;
- client-ip=211.20.1.79; helo=localhost.localdomain;
-Received: from localhost.localdomain (211.20.1.79) by
- SG2PEPF000B66CF.mail.protection.outlook.com (10.167.240.23) with Microsoft
- SMTP Server id 15.20.7611.14 via Frontend Transport; Tue, 21 May 2024
- 03:09:25 +0000
-From: DelphineCCChiu <delphine_cc_chiu@wiwynn.com>
-To: patrick@stwcx.xyz,
-	Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: DelphineCCChiu <delphine_cc_chiu@wiwynn.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1] net/ncsi: Fix the multi thread manner of NCSI driver
-Date: Tue, 21 May 2024 11:09:21 +0800
-Message-Id: <20240521030922.3973426-1-delphine_cc_chiu@wiwynn.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041E528FA
+	for <netdev@vger.kernel.org>; Tue, 21 May 2024 03:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716261308; cv=none; b=L1MyWK3LmiSQE2Da9TKG4SOBJwjO/SLl7XFCO29UCAFxpCrwryNYf6FTebOpf07UOFVHpR2gHv5R9jXCGGQZYb9pSyJaz6ixDGQSemsWsSBeFAXAEUTYOgW7P4NBz0wPFr93v1+ur+hHwOLH2OzjEv2Zn2jEKLi6hYlMzr8rc+0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716261308; c=relaxed/simple;
+	bh=iHysDecOttwIFdH4smp5oFCmHAlrwA4qmEKVYK8hNXY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LzUYZOM0HCcq9+ZYEdv1o/iO+VZ1ge+zW2+PnMLuM7ZXupRMT524jbg3+EaS9QrpRBfcaZy+ocOPuhoLChOH2POIPn+9cz42Fj+jvLVeONX8hk1xZNNEKou0yILfSI8EZGTYmI5HQXtgi4SVj5hVkd8se28TxXDJIZNa0VqzxLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WEKqPsHI; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6f44dcb8eb0so6848048b3a.1
+        for <netdev@vger.kernel.org>; Mon, 20 May 2024 20:15:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716261306; x=1716866106; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8rofaiJOkgI0u+L/hMvBVHKuVQV1ohwi1Ww3tpTCPoc=;
+        b=WEKqPsHICbdHC+l/VUDZS3nNWmJqL/kiYS7/NkUQLg2apGruvHTt63lxSzy6TBEa6p
+         W7Fi0AAZtFeRjymM7PBoHiQkQAdcz9WDWDyAK1TxCoYjm53faw6leNCt6umwPA64qYV4
+         zofyQgU95Fmhc87Zkr8keQbCKpf4rrUm+9yEvZxhOa183XAtf1hjtiF7mVKxnZu1Wqsf
+         VM/LURlmIWP4GCVXfz6/A+duHuXYToBLHwJhaOHImDomCT7m7KOSn0XfJJ0+btIKy0s1
+         +kEfhte//Gwu6Jx2I1sQPDGpZOsI1mWTH7S3r9JV9PkjHwKvvVCDk6ADKn4SOzaX+zE5
+         1How==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716261306; x=1716866106;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8rofaiJOkgI0u+L/hMvBVHKuVQV1ohwi1Ww3tpTCPoc=;
+        b=U4bHUJhtVY08iQZUkbxuEQ83iy41Q8tGpzlsWx9Zkr7MKCyym+fcJgvzfy0orf0VUQ
+         IhFobI9LJ896f/Vm5xHcQ7UOn3URV8jDv68escr5WBQ6oRAkJSuf2T9j4srf/q4cqI1y
+         Sj6PJZrhttrjtGWWit7xtbuMc99WgBZ1jT11JXZl3ZUnZA0jzvLFYrMPF+C7Hs8HAMom
+         cha69cW4qH5vvY6omGnv1qNqiiLnerlJ5rCM6/U3Cq8/RuJ5XYphyTB/UrYzi28ux7EE
+         8EjRsHIvPPLEEZdKwlM+ClRADzGeBpNttnGkvelRV0IkpCN/7cfe9nfv9LqbRA4H9PXW
+         RFAQ==
+X-Gm-Message-State: AOJu0Yxv+8mPtqb2RSly3PDKrqhk37TPmN1Xx7Vt/peUkrPvozkv7BR5
+	/nNxS21/KIdjv70RsRP3747HqREowt0NrXNQ+QaDTrRm29qeBKyggzT0bl1eVHqMJw==
+X-Google-Smtp-Source: AGHT+IFSnTDwSKRETum7a5rl6TifbFmC49dhr+wfOyP2QWT5i+3rjrf5XuyAJDIr716nOVQXixFr0bc=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a05:6a00:1384:b0:6ec:f5b8:58cc with SMTP id
+ d2e1a72fcca58-6f4e0395b9dmr1224901b3a.6.1716261306229; Mon, 20 May 2024
+ 20:15:06 -0700 (PDT)
+Date: Mon, 20 May 2024 20:15:04 -0700
+In-Reply-To: <20240510192412.3297104-18-amery.hung@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SG2PEPF000B66CF:EE_|PUZPR04MB6316:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: d222ee36-4805-4beb-68fc-08dc79436bfd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|82310400017|376005|1800799015|36860700004;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?lxO/X8fPTtPssDfK0J7XIzHvtCQi7dyIg2gTeSFrYDlJK+Mpf0IS4c4eXLKU?=
- =?us-ascii?Q?yjYk8xdqClm3SaQGIOMH7gaUc2TFZA3WhxmeVxTEI4JOey3zw6/VFzXX33ik?=
- =?us-ascii?Q?o5b+SRTOEushrQNOxUrqNIByULRmz6VPIBXzHl6cJudfv7WNPPGGT6jjmtqn?=
- =?us-ascii?Q?uZYryOTk3bwebYfN2jeendiLs6D1mrzzOQUgOnFJTZ8GY20KV7yTDuC3ErRl?=
- =?us-ascii?Q?eqV6M1wdweIPZ557TpKKfvleVkRHkGpZ5+QZW3+A0qcOj5j2+c8Pt+pEeSnL?=
- =?us-ascii?Q?KPJtApo4247v41hbT9+802pM+JyTeJ8+JAvpq9Aoum3IA03BJgkwoSMd8haA?=
- =?us-ascii?Q?UyV4xLGvTmuSvZ3lYpTyMUxX51WbBgM4BrDL1SYVl16cwps9EER+ktRpk1Hy?=
- =?us-ascii?Q?DFW79MfNgqG4CJ3RKyGpUTTHKGJsUClgAt5PuCyTmaZixn5VFHf2U+0w6ACp?=
- =?us-ascii?Q?W1fEYWKAMQ+MBDt2jb9FiixNC6et/boy8vwBEQ+8oPsV2sYYU9q7V/UBEIyA?=
- =?us-ascii?Q?QJ0MfSVB32tkxkuorsMveSvsEVppSyjRUTcEd2MXmCl1II3ibMT3Kf2R1430?=
- =?us-ascii?Q?mwNJIAYfqNAf3EeB3hoL2ULsftElJNAcVG9rmIZ3RoGd8z5d8zA1LB7D4NX7?=
- =?us-ascii?Q?R5uGVFiGr3jaHqSulpcLeaDnwzXPt2DRrxdDvfe+S1ITDOTfWSylAKWt0VVO?=
- =?us-ascii?Q?RRPVSOTpAGulIK4EfnTuBjkA8BxZ5y66tspORu7VNppOX+hh3kwRppwhCEJe?=
- =?us-ascii?Q?kvPBIesCRQ8ilq97pWWr9v3+sdGYozdD1pLeGh+sUIRIDTL41VhsxTjclEl5?=
- =?us-ascii?Q?9nqJ5JVIbTNBKDCxXpsWrcpAzy3CH09Bu8aByhEYLxtBUdDGElgsLk8vFMml?=
- =?us-ascii?Q?FT8j/rXUTFD/4Y3RhGcWSvBCR0eRJdtKYWM39rtd7zGQl4sMRpFPBs8PnBYM?=
- =?us-ascii?Q?K83kMkRHk9/QlMEAVgEXiYCYg1IEdd+OhtPwPaxA8tgY6IwMOLd4PuuNE889?=
- =?us-ascii?Q?BrhU++gwA/CZm/O9lGQosKyEeEMGEki6zVYDUARgGwIyvOaJv6nN6TpHuW1v?=
- =?us-ascii?Q?UrHajdvGhXyZUJqOWjBYBWLO3VkqsPIQfZ3P/0/gfAZ7THIFRAes8gxxaJ3y?=
- =?us-ascii?Q?Fj7g16OzvkUebUNOaAhesVfNcN6cEmyVRnsF5L5FiwIKkUwlQK8rxtgfLzvI?=
- =?us-ascii?Q?T8lI6sEa+LsRIFuymni2jhWO3op2T3RCOmvRYhlwcapft7HxRDXYflJ7DZpO?=
- =?us-ascii?Q?C6oylWQoMDZxVDR5gldDN3Xs7xTgWX39dRIAzcONFdEtUJxx+jL2F/wpvttg?=
- =?us-ascii?Q?+dVIfSjXLmaoZ6AuYYROYn/WAPugrVZEoH791By+hl9PJBQbtfBVZUT+hQGN?=
- =?us-ascii?Q?NmeI9Tw=3D?=
-X-Forefront-Antispam-Report:
-	CIP:211.20.1.79;CTRY:TW;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:localhost.localdomain;PTR:211-20-1-79.hinet-ip.hinet.net;CAT:NONE;SFS:(13230031)(82310400017)(376005)(1800799015)(36860700004);DIR:OUT;SFP:1101;
-X-OriginatorOrg: wiwynn.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2024 03:09:25.5682
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d222ee36-4805-4beb-68fc-08dc79436bfd
-X-MS-Exchange-CrossTenant-Id: da6e0628-fc83-4caf-9dd2-73061cbab167
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=da6e0628-fc83-4caf-9dd2-73061cbab167;Ip=[211.20.1.79];Helo=[localhost.localdomain]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SG2PEPF000B66CF.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PUZPR04MB6316
+Mime-Version: 1.0
+References: <20240510192412.3297104-1-amery.hung@bytedance.com> <20240510192412.3297104-18-amery.hung@bytedance.com>
+Message-ID: <ZkwRuEExDs8QnVu1@google.com>
+Subject: Re: [RFC PATCH v8 17/20] selftests: Add a basic fifo qdisc test
+From: Stanislav Fomichev <sdf@google.com>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@kernel.org, 
+	sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+Content-Type: text/plain; charset="utf-8"
 
-Currently NCSI driver will send several NCSI commands back to back without
-waiting the response of previous NCSI command or timeout in some state
-when NIC have multi channel. This operation against the single thread
-manner defined by NCSI SPEC(section 6.3.2.3 in DSP0222_1.1.1)
+On 05/10, Amery Hung wrote:
+> This selftest shows a bare minimum fifo qdisc, which simply enqueues skbs
+> into the back of a bpf list and dequeues from the front of the list.
+> 
+> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> ---
+>  .../selftests/bpf/prog_tests/bpf_qdisc.c      | 161 ++++++++++++++++++
+>  .../selftests/bpf/progs/bpf_qdisc_common.h    |  23 +++
+>  .../selftests/bpf/progs/bpf_qdisc_fifo.c      |  83 +++++++++
+>  3 files changed, 267 insertions(+)
+>  create mode 100644 tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+>  create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_common.h
+>  create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fifo.c
+> 
+> diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> new file mode 100644
+> index 000000000000..295d0216e70f
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> @@ -0,0 +1,161 @@
+> +#include <linux/pkt_sched.h>
+> +#include <linux/rtnetlink.h>
+> +#include <test_progs.h>
+> +
+> +#include "network_helpers.h"
+> +#include "bpf_qdisc_fifo.skel.h"
+> +
+> +#ifndef ENOTSUPP
+> +#define ENOTSUPP 524
+> +#endif
+> +
+> +#define LO_IFINDEX 1
+> +
+> +static const unsigned int total_bytes = 10 * 1024 * 1024;
+> +static int stop;
+> +
+> +static void *server(void *arg)
+> +{
+> +	int lfd = (int)(long)arg, err = 0, fd;
+> +	ssize_t nr_sent = 0, bytes = 0;
+> +	char batch[1500];
+> +
+> +	fd = accept(lfd, NULL, NULL);
+> +	while (fd == -1) {
+> +		if (errno == EINTR)
+> +			continue;
+> +		err = -errno;
+> +		goto done;
+> +	}
+> +
+> +	if (settimeo(fd, 0)) {
+> +		err = -errno;
+> +		goto done;
+> +	}
+> +
+> +	while (bytes < total_bytes && !READ_ONCE(stop)) {
+> +		nr_sent = send(fd, &batch,
+> +			       MIN(total_bytes - bytes, sizeof(batch)), 0);
+> +		if (nr_sent == -1 && errno == EINTR)
+> +			continue;
+> +		if (nr_sent == -1) {
+> +			err = -errno;
+> +			break;
+> +		}
+> +		bytes += nr_sent;
+> +	}
+> +
+> +	ASSERT_EQ(bytes, total_bytes, "send");
+> +
+> +done:
+> +	if (fd >= 0)
+> +		close(fd);
+> +	if (err) {
+> +		WRITE_ONCE(stop, 1);
+> +		return ERR_PTR(err);
+> +	}
+> +	return NULL;
+> +}
+> +
+> +static void do_test(char *qdisc)
+> +{
+> +	DECLARE_LIBBPF_OPTS(bpf_tc_hook, hook, .ifindex = LO_IFINDEX,
+> +			    .attach_point = BPF_TC_QDISC,
+> +			    .parent = TC_H_ROOT,
+> +			    .handle = 0x8000000,
+> +			    .qdisc = qdisc);
+> +	struct sockaddr_in6 sa6 = {};
+> +	ssize_t nr_recv = 0, bytes = 0;
+> +	int lfd = -1, fd = -1;
+> +	pthread_t srv_thread;
+> +	socklen_t addrlen = sizeof(sa6);
+> +	void *thread_ret;
+> +	char batch[1500];
+> +	int err;
+> +
+> +	WRITE_ONCE(stop, 0);
+> +
+> +	err = bpf_tc_hook_create(&hook);
+> +	if (!ASSERT_OK(err, "attach qdisc"))
+> +		return;
+> +
+> +	lfd = start_server(AF_INET6, SOCK_STREAM, NULL, 0, 0);
+> +	if (!ASSERT_NEQ(lfd, -1, "socket")) {
+> +		bpf_tc_hook_destroy(&hook);
+> +		return;
+> +	}
+> +
+> +	fd = socket(AF_INET6, SOCK_STREAM, 0);
+> +	if (!ASSERT_NEQ(fd, -1, "socket")) {
+> +		bpf_tc_hook_destroy(&hook);
+> +		close(lfd);
+> +		return;
+> +	}
+> +
+> +	if (settimeo(lfd, 0) || settimeo(fd, 0))
+> +		goto done;
+> +
+> +	err = getsockname(lfd, (struct sockaddr *)&sa6, &addrlen);
+> +	if (!ASSERT_NEQ(err, -1, "getsockname"))
+> +		goto done;
+> +
+> +	/* connect to server */
+> +	err = connect(fd, (struct sockaddr *)&sa6, addrlen);
+> +	if (!ASSERT_NEQ(err, -1, "connect"))
+> +		goto done;
+> +
+> +	err = pthread_create(&srv_thread, NULL, server, (void *)(long)lfd);
+> +	if (!ASSERT_OK(err, "pthread_create"))
+> +		goto done;
+> +
+> +	/* recv total_bytes */
+> +	while (bytes < total_bytes && !READ_ONCE(stop)) {
+> +		nr_recv = recv(fd, &batch,
+> +			       MIN(total_bytes - bytes, sizeof(batch)), 0);
+> +		if (nr_recv == -1 && errno == EINTR)
+> +			continue;
+> +		if (nr_recv == -1)
+> +			break;
+> +		bytes += nr_recv;
+> +	}
+> +
+> +	ASSERT_EQ(bytes, total_bytes, "recv");
+> +
+> +	WRITE_ONCE(stop, 1);
+> +	pthread_join(srv_thread, &thread_ret);
+> +	ASSERT_OK(IS_ERR(thread_ret), "thread_ret");
+> +
+> +done:
+> +	close(lfd);
+> +	close(fd);
+> +
+> +	bpf_tc_hook_destroy(&hook);
+> +	return;
+> +}
+> +
+> +static void test_fifo(void)
+> +{
+> +	struct bpf_qdisc_fifo *fifo_skel;
+> +	struct bpf_link *link;
+> +
+> +	fifo_skel = bpf_qdisc_fifo__open_and_load();
+> +	if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
+> +		return;
+> +
+> +	link = bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
+> +	if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
+> +		bpf_qdisc_fifo__destroy(fifo_skel);
+> +		return;
+> +	}
+> +
+> +	do_test("bpf_fifo");
+> +
+> +	bpf_link__destroy(link);
+> +	bpf_qdisc_fifo__destroy(fifo_skel);
+> +}
+> +
+> +void test_bpf_qdisc(void)
+> +{
+> +	if (test__start_subtest("fifo"))
+> +		test_fifo();
+> +}
+> diff --git a/tools/testing/selftests/bpf/progs/bpf_qdisc_common.h b/tools/testing/selftests/bpf/progs/bpf_qdisc_common.h
+> new file mode 100644
+> index 000000000000..96ab357de28e
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/bpf_qdisc_common.h
+> @@ -0,0 +1,23 @@
+> +#ifndef _BPF_QDISC_COMMON_H
+> +#define _BPF_QDISC_COMMON_H
+> +
+> +#define NET_XMIT_SUCCESS        0x00
+> +#define NET_XMIT_DROP           0x01    /* skb dropped                  */
+> +#define NET_XMIT_CN             0x02    /* congestion notification      */
+> +
+> +#define TC_PRIO_CONTROL  7
+> +#define TC_PRIO_MAX      15
+> +
+> +void bpf_skb_set_dev(struct sk_buff *skb, struct Qdisc *sch) __ksym;
+> +u32 bpf_skb_get_hash(struct sk_buff *p) __ksym;
+> +void bpf_skb_release(struct sk_buff *p) __ksym;
+> +void bpf_qdisc_skb_drop(struct sk_buff *p, struct bpf_sk_buff_ptr *to_free) __ksym;
+> +void bpf_qdisc_watchdog_schedule(struct Qdisc *sch, u64 expire, u64 delta_ns) __ksym;
+> +bool bpf_qdisc_find_class(struct Qdisc *sch, u32 classid) __ksym;
+> +int bpf_qdisc_create_child(struct Qdisc *sch, u32 min,
+> +			   struct netlink_ext_ack *extack) __ksym;
+> +int bpf_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch, u32 classid,
+> +		      struct bpf_sk_buff_ptr *to_free_list) __ksym;
+> +struct sk_buff *bpf_qdisc_dequeue(struct Qdisc *sch, u32 classid) __ksym;
+> +
+> +#endif
+> diff --git a/tools/testing/selftests/bpf/progs/bpf_qdisc_fifo.c b/tools/testing/selftests/bpf/progs/bpf_qdisc_fifo.c
+> new file mode 100644
+> index 000000000000..433fd9c3639c
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/bpf_qdisc_fifo.c
+> @@ -0,0 +1,83 @@
+> +#include <vmlinux.h>
+> +#include "bpf_experimental.h"
+> +#include "bpf_qdisc_common.h"
+> +
+> +char _license[] SEC("license") = "GPL";
+> +
+> +#define private(name) SEC(".data." #name) __hidden __attribute__((aligned(8)))
+> +
+> +private(B) struct bpf_spin_lock q_fifo_lock;
+> +private(B) struct bpf_list_head q_fifo __contains_kptr(sk_buff, bpf_list);
+> +
+> +unsigned int q_limit = 1000;
+> +unsigned int q_qlen = 0;
+> +
+> +SEC("struct_ops/bpf_fifo_enqueue")
+> +int BPF_PROG(bpf_fifo_enqueue, struct sk_buff *skb, struct Qdisc *sch,
+> +	     struct bpf_sk_buff_ptr *to_free)
+> +{
+> +	q_qlen++;
+> +	if (q_qlen > q_limit) {
+> +		bpf_qdisc_skb_drop(skb, to_free);
+> +		return NET_XMIT_DROP;
+> +	}
 
-According to NCSI SPEC(section 6.2.13.1 in DSP0222_1.1.1), we should probe
-one channel at a time by sending NCSI commands (Clear initial state, Get
-version ID, Get capabilities...), than repeat this steps until the max
-number of channels which we got from NCSI command (Get capabilities) has
-been probed.
+[..]
 
-Signed-off-by: DelphineCCChiu <delphine_cc_chiu@wiwynn.com>
----
- net/ncsi/internal.h    |  1 +
- net/ncsi/ncsi-manage.c | 80 +++++++++++++++++++++---------------------
- net/ncsi/ncsi-rsp.c    |  4 ++-
- 3 files changed, 44 insertions(+), 41 deletions(-)
+> +	bpf_spin_lock(&q_fifo_lock);
+> +	bpf_list_excl_push_back(&q_fifo, &skb->bpf_list);
+> +	bpf_spin_unlock(&q_fifo_lock);
 
-diff --git a/net/ncsi/internal.h b/net/ncsi/internal.h
-index 374412ed780b..ea641491cb01 100644
---- a/net/ncsi/internal.h
-+++ b/net/ncsi/internal.h
-@@ -343,6 +343,7 @@ struct ncsi_dev_priv {
- 	bool                multi_package;   /* Enable multiple packages   */
- 	bool                mlx_multi_host;  /* Enable multi host Mellanox */
- 	u32                 package_whitelist; /* Packages to configure    */
-+	unsigned char       max_channel;     /* Num of channels to probe   */
- };
- 
- struct ncsi_cmd_arg {
-diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
-index 745c788f1d1d..57e2518ab8ac 100644
---- a/net/ncsi/ncsi-manage.c
-+++ b/net/ncsi/ncsi-manage.c
-@@ -470,6 +470,7 @@ static void ncsi_suspend_channel(struct ncsi_dev_priv *ndp)
- 	struct ncsi_package *np;
- 	struct ncsi_channel *nc, *tmp;
- 	struct ncsi_cmd_arg nca;
-+	static unsigned char channel_index;
- 	unsigned long flags;
- 	int ret;
- 
-@@ -510,17 +511,19 @@ static void ncsi_suspend_channel(struct ncsi_dev_priv *ndp)
- 
- 		break;
- 	case ncsi_dev_state_suspend_gls:
--		ndp->pending_req_num = np->channel_num;
-+		ndp->pending_req_num = 1;
- 
- 		nca.type = NCSI_PKT_CMD_GLS;
- 		nca.package = np->id;
-+		nca.channel = channel_index;
-+		ret = ncsi_xmit_cmd(&nca);
-+		if (ret)
-+			goto error;
-+		channel_index++;
- 
--		nd->state = ncsi_dev_state_suspend_dcnt;
--		NCSI_FOR_EACH_CHANNEL(np, nc) {
--			nca.channel = nc->id;
--			ret = ncsi_xmit_cmd(&nca);
--			if (ret)
--				goto error;
-+		if (channel_index == ndp->max_channel) {
-+			channel_index = 0;
-+			nd->state = ncsi_dev_state_suspend_dcnt;
- 		}
- 
- 		break;
-@@ -1345,9 +1348,9 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
- {
- 	struct ncsi_dev *nd = &ndp->ndev;
- 	struct ncsi_package *np;
--	struct ncsi_channel *nc;
- 	struct ncsi_cmd_arg nca;
--	unsigned char index;
-+	unsigned char package_index;
-+	static unsigned char channel_index;
- 	int ret;
- 
- 	nca.ndp = ndp;
-@@ -1362,8 +1365,8 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
- 		/* Deselect all possible packages */
- 		nca.type = NCSI_PKT_CMD_DP;
- 		nca.channel = NCSI_RESERVED_CHANNEL;
--		for (index = 0; index < 8; index++) {
--			nca.package = index;
-+		for (package_index = 0; package_index < NCSI_MAX_PACKAGE; package_index++) {
-+			nca.package = package_index;
- 			ret = ncsi_xmit_cmd(&nca);
- 			if (ret)
- 				goto error;
-@@ -1423,23 +1426,6 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
- 
- 		nd->state = ncsi_dev_state_probe_cis;
- 		break;
--	case ncsi_dev_state_probe_cis:
--		ndp->pending_req_num = NCSI_RESERVED_CHANNEL;
--
--		/* Clear initial state */
--		nca.type = NCSI_PKT_CMD_CIS;
--		nca.package = ndp->active_package->id;
--		for (index = 0; index < NCSI_RESERVED_CHANNEL; index++) {
--			nca.channel = index;
--			ret = ncsi_xmit_cmd(&nca);
--			if (ret)
--				goto error;
--		}
--
--		nd->state = ncsi_dev_state_probe_gvi;
--		if (IS_ENABLED(CONFIG_NCSI_OEM_CMD_KEEP_PHY))
--			nd->state = ncsi_dev_state_probe_keep_phy;
--		break;
- 	case ncsi_dev_state_probe_keep_phy:
- 		ndp->pending_req_num = 1;
- 
-@@ -1452,14 +1438,17 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
- 
- 		nd->state = ncsi_dev_state_probe_gvi;
- 		break;
-+	case ncsi_dev_state_probe_cis:
- 	case ncsi_dev_state_probe_gvi:
- 	case ncsi_dev_state_probe_gc:
- 	case ncsi_dev_state_probe_gls:
- 		np = ndp->active_package;
--		ndp->pending_req_num = np->channel_num;
-+		ndp->pending_req_num = 1;
- 
--		/* Retrieve version, capability or link status */
--		if (nd->state == ncsi_dev_state_probe_gvi)
-+		/* Clear initial state Retrieve version, capability or link status */
-+		if (nd->state == ncsi_dev_state_probe_cis)
-+			nca.type = NCSI_PKT_CMD_CIS;
-+		else if (nd->state == ncsi_dev_state_probe_gvi)
- 			nca.type = NCSI_PKT_CMD_GVI;
- 		else if (nd->state == ncsi_dev_state_probe_gc)
- 			nca.type = NCSI_PKT_CMD_GC;
-@@ -1467,19 +1456,29 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
- 			nca.type = NCSI_PKT_CMD_GLS;
- 
- 		nca.package = np->id;
--		NCSI_FOR_EACH_CHANNEL(np, nc) {
--			nca.channel = nc->id;
--			ret = ncsi_xmit_cmd(&nca);
--			if (ret)
--				goto error;
--		}
-+		nca.channel = channel_index;
- 
--		if (nd->state == ncsi_dev_state_probe_gvi)
-+		ret = ncsi_xmit_cmd(&nca);
-+		if (ret)
-+			goto error;
-+
-+		if (nd->state == ncsi_dev_state_probe_cis) {
-+			nd->state = ncsi_dev_state_probe_gvi;
-+			if (IS_ENABLED(CONFIG_NCSI_OEM_CMD_KEEP_PHY) && channel_index == 0)
-+				nd->state = ncsi_dev_state_probe_keep_phy;
-+		} else if (nd->state == ncsi_dev_state_probe_gvi) {
- 			nd->state = ncsi_dev_state_probe_gc;
--		else if (nd->state == ncsi_dev_state_probe_gc)
-+		} else if (nd->state == ncsi_dev_state_probe_gc) {
- 			nd->state = ncsi_dev_state_probe_gls;
--		else
-+		} else {
-+			nd->state = ncsi_dev_state_probe_cis;
-+			channel_index++;
-+		}
-+
-+		if (channel_index == ndp->max_channel) {
-+			channel_index = 0;
- 			nd->state = ncsi_dev_state_probe_dp;
-+		}
- 		break;
- 	case ncsi_dev_state_probe_dp:
- 		ndp->pending_req_num = 1;
-@@ -1780,6 +1779,7 @@ struct ncsi_dev *ncsi_register_dev(struct net_device *dev,
- 		ndp->requests[i].ndp = ndp;
- 		timer_setup(&ndp->requests[i].timer, ncsi_request_timeout, 0);
- 	}
-+	ndp->max_channel = NCSI_RESERVED_CHANNEL;
- 
- 	spin_lock_irqsave(&ncsi_dev_lock, flags);
- 	list_add_tail_rcu(&ndp->node, &ncsi_dev_list);
-diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
-index bee290d0f48b..246b120ad3c1 100644
---- a/net/ncsi/ncsi-rsp.c
-+++ b/net/ncsi/ncsi-rsp.c
-@@ -795,12 +795,13 @@ static int ncsi_rsp_handler_gc(struct ncsi_request *nr)
- 	struct ncsi_rsp_gc_pkt *rsp;
- 	struct ncsi_dev_priv *ndp = nr->ndp;
- 	struct ncsi_channel *nc;
-+	struct ncsi_package *np;
- 	size_t size;
- 
- 	/* Find the channel */
- 	rsp = (struct ncsi_rsp_gc_pkt *)skb_network_header(nr->rsp);
- 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
--				      NULL, &nc);
-+				      &np, &nc);
- 	if (!nc)
- 		return -ENODEV;
- 
-@@ -835,6 +836,7 @@ static int ncsi_rsp_handler_gc(struct ncsi_request *nr)
- 	 */
- 	nc->vlan_filter.bitmap = U64_MAX;
- 	nc->vlan_filter.n_vids = rsp->vlan_cnt;
-+	np->ndp->max_channel = rsp->channel_cnt;
- 
- 	return 0;
- }
--- 
-2.25.1
+Can you also expand a bit on the locking here and elsewhere? And how it
+interplays with TCQ_F_NOLOCK?
 
+As I mentioned at lsfmmbpf, I don't think there is a lot of similar
+locking in the existing C implementations? So why do we need it here?
 
