@@ -1,184 +1,172 @@
-Return-Path: <netdev+bounces-97362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 317808CB088
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 16:32:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A9D38CB0B9
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 16:49:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B08E51F2133A
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 14:32:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A6AB1F2347D
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 14:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2283513D615;
-	Tue, 21 May 2024 14:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE2FD762E0;
+	Tue, 21 May 2024 14:49:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q36JYCTN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CCOoIxTe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8109E13D53C;
-	Tue, 21 May 2024 14:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFF71E87C
+	for <netdev@vger.kernel.org>; Tue, 21 May 2024 14:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716301948; cv=none; b=XsLxEew0QogBAAmJLF9CMJQoHLNO0M8l9OItl6He9oQiujuhgDO4QzvkhVug+sZDcgMCbkurB5syJ4+59htGm4BSBGLv2n+vgIjQ0sfzCOKvNPpqgS0vtq0iGkzch+0+TyK0emjhGDKWFk6XSAEXquKIlqqkX4HwhxXieDOl4f0=
+	t=1716302983; cv=none; b=Sk85vVpRUYDHEPj4q2JVqst4NqI60C5sbWdCJqh9jnqGZr8Z0QTVu/wSHCqQAD9HHWaVVcAUwWl2wA3jkUYveER/TP4ddrzK3SebbGfV7yh9SqszRoKryLuc2qIuW2TxkvPhXhxaIRfsggp6cZiG59DDGXjhVYhB2Enz+4XIJRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716301948; c=relaxed/simple;
-	bh=FzeSwI1swDQh0J0EmXCLScyhvTMLWCKOY3XckRIY5FE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jcT/vHAGj7/+LvymQFXV7sTGB/cZtLT8XcvIbH7HL0qANamFYS6NMI0z5s/ikUfZDAtYPiYPDoWTwSmoYjRaJL3OTlT3trE4n1jbD3GsZSv+AVUamUJUslT5hGa7Uj368Kw7Zhqrt8y1Ts5opbE4EZVCjkNi2T/uhVjDhvFi54g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q36JYCTN; arc=none smtp.client-ip=209.85.128.173
+	s=arc-20240116; t=1716302983; c=relaxed/simple;
+	bh=kc5w2PkHZ9cvU/u/JPzujA+YKbOvjeKG2iVe07fS000=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jupOGHMHkmDMhTn8eRKYeQftgbdnaKbI8cOJDS4uselnk+iNf0G2Xqg9eUgAsH0ZibAEaBcHBxpd++5FxHwLkVNreeNJx18B/o+7P2SG/SNXhhQLlkEMSM7cXuWuLE28QzEhMFmVcHX4jVkU797Af32bAWRu3DiUQiR0Wj72hYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CCOoIxTe; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-61df903aa05so40014957b3.3;
-        Tue, 21 May 2024 07:32:26 -0700 (PDT)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6f4f2b1c997so412941b3a.0
+        for <netdev@vger.kernel.org>; Tue, 21 May 2024 07:49:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716301945; x=1716906745; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N5XWsM+JWN05sn6G/e4ijgQ/tt/d9nOoRE4e8j05XU4=;
-        b=Q36JYCTNu3dWMhnSuXY2N5iBtjlBNsFN7jV9RfJqIWP55VjUCkBZG3mVIqVksSw5pp
-         TOn7BY6xQQ/qXt1uG+jceT2cUiXc165N8CMhEmamDlktpEP/shXHnjQ9tNkfPngoUPGc
-         nlRKgSnRT0VmokaBE1s7VIezmAO+nMR+ZFHP4ObPUZA/KTZIlLANZTWgEniWWLmBivJ8
-         JHHF6MJtH9M5DW8Txww8YheRr/5SGtnF/QlVOjUzuumqTVw8XsvVPIcCYrkvqTX4WQI5
-         E+7eGx5qxmv3yVwH6bKO9aZnG6zAHsusYiPTN6NMrwTcGi8wJ1FgHJkdhhE5aJvh0vwm
-         dfNg==
+        d=gmail.com; s=20230601; t=1716302981; x=1716907781; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gElkWZYoiosZEVwshbfNZwy0DCArJyB+G3iEWleFK4g=;
+        b=CCOoIxTeQGouXO6gBRou2QfhyiO/I6h5tRongw9bqMormtfNCub5nyup8BwvKpbdFb
+         X0TEF+EkEpCzMQsr8IvNdrMx5l5lr6ysSKAoSEOvTDNg3xFqC/Aar4JVAfX0l/T0xrce
+         sk51n5HS/BZKUrsi+EMSkB5hRC07hFsMMRA8ZWtmgts8ZCZTX0HNGrSiVlm3AzujkS2h
+         +AxVnlz+LF8fQQqfGX260f/91lz0idIn8BUyxy3LgPfJaksxFGDNlYYKJWp2xfOapW1w
+         vpFVeHB6yxQtCZwsXRWkHPMuKKNptEvIFFKjYGFA0msDFlGP8/NJBcJbKPWRU2SDAUwG
+         1cRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716301945; x=1716906745;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N5XWsM+JWN05sn6G/e4ijgQ/tt/d9nOoRE4e8j05XU4=;
-        b=VjMNotfnb6tpta+n61RHdoS67DUT88I38fBxDebQrouv495H5XCBLnGF0xg9lku7xQ
-         prycFvagf0j18lnmiknXTwEiUlSNVu/lq01im1ZgDd4y++xKFL/jOgt9ieJJSn9cwXY9
-         4Ty55QvVXoZciZrt4imm4eD4sCLI0/q7X6bkdsbBUiSFQMjMmKq//pfCA0pUtk58gnoc
-         Es4/+oculb7Mws3gU6napc1aTm/GiodSDJt01vIANMwQj5Irui912qi7tp1RXaTzNmp+
-         2oD5+VUrl+cH+v3zTsxZ7pLxdraPJHIwnq6/i+fyYDB16P7MFQc1drMzhbt0+rgaA9G0
-         rocw==
-X-Forwarded-Encrypted: i=1; AJvYcCWNEWOclTI05N9D9rxgTMz+YVHCTvwPyY2sSMlASKjOsiIzG3rICfSi12KmZd3FHi8p1gD2PEkrnjuRxYVo+MBn9qRZV2ELjqijEg==
-X-Gm-Message-State: AOJu0YzzHmtLoxjhdAIvOqngwnJEDWw7fR8tH8+qxhkLeA1Vg3IlsmY7
-	y0TDCcWF5rvq0iOcM2/dU5CWsBiLKcrf2zv9pTzLbUNnmftLIAvnhrLJA94aetIlR+OnlMR3fCn
-	jpdF18lCQBbyTG28sEKamUjKgqXc=
-X-Google-Smtp-Source: AGHT+IFMFG7woVoqwWAxNu3j2H1Fc3n3gZWkyf5XluLQjyaRUVueGmZuDtm1CyyeSERqIG003prntULMQSMAZiKkjrc=
-X-Received: by 2002:a25:bf89:0:b0:dc2:2f4b:c9d8 with SMTP id
- 3f1490d57ef6-dee4f336a6dmr42286374276.16.1716301945351; Tue, 21 May 2024
- 07:32:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716302981; x=1716907781;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gElkWZYoiosZEVwshbfNZwy0DCArJyB+G3iEWleFK4g=;
+        b=mRr/nEIgEce1+S97zj319ice5EaRvLqWcy7nHM5BfEkqFHJ8oF/+Pe6Y1qQtFmF3M6
+         CTl9vgB2ex4GmAtR+vMKgucKNULAWSqKeB1IIjQ7i5PzpOVM6P9mce4pqLPuCHkTXBAB
+         CceSPw1STokiYHJcGVjO76jDF483kWvlWmo/BkzvLb3xAi6o77cY1oxUIhBvscatHiJg
+         O0gkWLKOVXlLFImUBTJjTm9OIWY5tX4PeU5u4YCBzNqf7kO2SWs7u+2dawUq2I6JMiGt
+         kKvjE+jb7JLczYsCkWuen4QOfVKlwLuGdSHEbMAxdyf9IfSOS2pyd5s8gP1SHO7NVVA6
+         xQaA==
+X-Gm-Message-State: AOJu0YwNFa+Xtf5kz+PkKvsv5XPeVn9kFcT0YCEjlJ72BTme8JlkGchd
+	XJhDKqbUxGQ+m4X0bh7yE+tnz4KniSMH6TaplEO31q3LeEcpnk+3
+X-Google-Smtp-Source: AGHT+IHQo/MenlCpuZlSxD/r8lum4MnGbuSx76VXxA+r3QsMEdbcmSwFqFJjKMjsEt1hAlIoxUHFsQ==
+X-Received: by 2002:a05:6a00:1824:b0:6ec:ff1b:aa0b with SMTP id d2e1a72fcca58-6f4e02d3698mr35147450b3a.18.1716302981355;
+        Tue, 21 May 2024 07:49:41 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([111.201.28.17])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2a66691sm21539834b3a.16.2024.05.21.07.49.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 May 2024 07:49:40 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: edumazet@google.com,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	kuniyu@amazon.com
+Cc: netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>,
+	syzbot+2eca27bdcb48ed330251@syzkaller.appspotmail.com
+Subject: [PATCH net] Revert "rds: tcp: Fix use-after-free of net in reqsk_timer_handler()."
+Date: Tue, 21 May 2024 22:49:30 +0800
+Message-Id: <20240521144930.23805-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <46ydfjtpinm3py3zt6lltxje4cpdvuugaatbvx4y27m7wxc2hz@4wdtoq7yfrd5>
-In-Reply-To: <46ydfjtpinm3py3zt6lltxje4cpdvuugaatbvx4y27m7wxc2hz@4wdtoq7yfrd5>
-From: Chris Maness <christopher.maness@gmail.com>
-Date: Tue, 21 May 2024 07:32:14 -0700
-Message-ID: <CANnsUMEyMqyNv-3gtqb60=KsDv1fxDska+QFNMzDtW0J7Pw48g@mail.gmail.com>
-Subject: Re: [PATCH v2] ax25: Fix refcount imbalance on inbound connections
-To: Lars Kellogg-Stedman <lars@oddbit.com>
-Cc: netdev@vger.kernel.org, linux-hams@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Should I expect to this downstream in 6.9.2?
+From: Jason Xing <kernelxing@tencent.com>
 
--Chris KQ6UP
+This reverts commit 2a750d6a5b365265dbda33330a6188547ddb5c24.
 
-On Tue, May 21, 2024 at 7:26=E2=80=AFAM Lars Kellogg-Stedman <lars@oddbit.c=
-om> wrote:
->
-> The first version of this patch was posted only to the linux-hams
-> mailing list. It has been difficult to get the patch reviewed, but the
-> patch has now been tested successfully by three people (that includes
-> me) who have all verified that it prevents the crashes that were
-> previously plaguing inbound ax.25 connections.
->
-> Related discussions:
->
-> - https://marc.info/?l=3Dlinux-hams&m=3D171629285223248&w=3D2
-> - https://marc.info/?l=3Dlinux-hams&m=3D171270115728031&w=3D2
->
-> >8------------------------------------------------------8<
->
-> When releasing a socket in ax25_release(), we call netdev_put() to
-> decrease the refcount on the associated ax.25 device. However, the
-> execution path for accepting an incoming connection never calls
-> netdev_hold(). This imbalance leads to refcount errors, and ultimately
-> to kernel crashes.
->
-> A typical call trace for the above situation looks like this:
->
->     Call Trace:
->     <TASK>
->     ? show_regs+0x64/0x70
->     ? __warn+0x83/0x120
->     ? refcount_warn_saturate+0xb2/0x100
->     ? report_bug+0x158/0x190
->     ? prb_read_valid+0x20/0x30
->     ? handle_bug+0x3e/0x70
->     ? exc_invalid_op+0x1c/0x70
->     ? asm_exc_invalid_op+0x1f/0x30
->     ? refcount_warn_saturate+0xb2/0x100
->     ? refcount_warn_saturate+0xb2/0x100
->     ax25_release+0x2ad/0x360
->     __sock_release+0x35/0xa0
->     sock_close+0x19/0x20
->     [...]
->
-> On reboot (or any attempt to remove the interface), the kernel gets
-> stuck in an infinite loop:
->
->     unregister_netdevice: waiting for ax0 to become free. Usage count =3D=
- 0
->
-> This patch corrects these issues by ensuring that we call netdev_hold()
-> and ax25_dev_hold() for new connections in ax25_accept(), balancing the
-> calls to netdev_put() and ax25_dev_put() in ax25_release.
->
-> Fixes: 7d8a3a477b
-> Signed-off-by: Lars Kellogg-Stedman <lars@oddbit.com>
-> ---
->  net/ax25/af_ax25.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/net/ax25/af_ax25.c b/net/ax25/af_ax25.c
-> index 8077cf2ee44..ff921272d40 100644
-> --- a/net/ax25/af_ax25.c
-> +++ b/net/ax25/af_ax25.c
-> @@ -1381,6 +1381,8 @@ static int ax25_accept(struct socket *sock, struct =
-socket *newsock,
->         DEFINE_WAIT(wait);
->         struct sock *sk;
->         int err =3D 0;
-> +       ax25_cb *ax25;
-> +       ax25_dev *ax25_dev;
->
->         if (sock->state !=3D SS_UNCONNECTED)
->                 return -EINVAL;
-> @@ -1434,6 +1436,10 @@ static int ax25_accept(struct socket *sock, struct=
- socket *newsock,
->         kfree_skb(skb);
->         sk_acceptq_removed(sk);
->         newsock->state =3D SS_CONNECTED;
-> +       ax25 =3D sk_to_ax25(newsk);
-> +       ax25_dev =3D ax25->ax25_dev;
-> +       netdev_hold(ax25_dev->dev, &ax25->dev_tracker, GFP_ATOMIC);
-> +       ax25_dev_hold(ax25_dev);
->
->  out:
->         release_sock(sk);
-> --
-> 2.45.1
->
-> --
-> Lars Kellogg-Stedman <lars@oddbit.com> | larsks @ {irc,twitter,github}
-> http://blog.oddbit.com/                | N1LKS
->
+Syzbot[1] reported the drecrement of reference count hits leaking memory.
 
+If we failed in setup_net() and try to undo the setup process, the
+reference now is 1 which shouldn't be decremented. However, it happened
+actually.
 
---=20
-Thanks,
-Chris Maness
+After applying this patch which allows us to check the reference first,
+it will not hit zero anymore in tcp_twsk_purge() without calling
+inet_twsk_purge() one more time.
+
+[1]
+refcount_t: decrement hit 0; leaking memory.
+WARNING: CPU: 3 PID: 1396 at lib/refcount.c:31 refcount_warn_saturate+0x1ed/0x210 lib/refcount.c:31
+Modules linked in:
+CPU: 3 PID: 1396 Comm: syz-executor.3 Not tainted 6.9.0-syzkaller-07370-g33e02dc69afb #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:refcount_warn_saturate+0x1ed/0x210 lib/refcount.c:31
+RSP: 0018:ffffc9000480fa70 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc9002ce28000
+RDX: 0000000000040000 RSI: ffffffff81505406 RDI: 0000000000000001
+RBP: ffff88804d8b3f80 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000002 R12: ffff88804d8b3f80
+R13: ffff888031c601c0 R14: ffffc900013c04f8 R15: 000000002a3e5567
+FS:  00007f56d897c6c0(0000) GS:ffff88806b300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b3182b000 CR3: 0000000034ed6000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ __refcount_dec include/linux/refcount.h:336 [inline]
+ refcount_dec include/linux/refcount.h:351 [inline]
+ inet_twsk_kill+0x758/0x9c0 net/ipv4/inet_timewait_sock.c:70
+ inet_twsk_deschedule_put net/ipv4/inet_timewait_sock.c:221 [inline]
+ inet_twsk_purge+0x725/0x890 net/ipv4/inet_timewait_sock.c:304
+ tcp_twsk_purge+0x115/0x150 net/ipv4/tcp_minisocks.c:402
+ tcp_sk_exit_batch+0x1c/0x170 net/ipv4/tcp_ipv4.c:3522
+ ops_exit_list+0x128/0x180 net/core/net_namespace.c:178
+ setup_net+0x714/0xb40 net/core/net_namespace.c:375
+ copy_net_ns+0x2f0/0x670 net/core/net_namespace.c:508
+ create_new_namespaces+0x3ea/0xb10 kernel/nsproxy.c:110
+ unshare_nsproxy_namespaces+0xc0/0x1f0 kernel/nsproxy.c:228
+ ksys_unshare+0x419/0x970 kernel/fork.c:3323
+ __do_sys_unshare kernel/fork.c:3394 [inline]
+ __se_sys_unshare kernel/fork.c:3392 [inline]
+ __x64_sys_unshare+0x31/0x40 kernel/fork.c:3392
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f56d7c7cee9
+
+Fixes: 2a750d6a5b36 ("rds: tcp: Fix use-after-free of net in reqsk_timer_handler().")
+Reported-by: syzbot+2eca27bdcb48ed330251@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=2eca27bdcb48ed330251
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+The reverted patch trying to solve another issue causes unexpected error as above. I
+think that issue can be properly analyzed and handled later. So can we revert it first?
+---
+ net/ipv4/tcp_minisocks.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index b93619b2384b..46e6f9db4227 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -399,6 +399,10 @@ void tcp_twsk_purge(struct list_head *net_exit_list)
+ 			/* Even if tw_refcount == 1, we must clean up kernel reqsk */
+ 			inet_twsk_purge(net->ipv4.tcp_death_row.hashinfo);
+ 		} else if (!purged_once) {
++			/* The last refcount is decremented in tcp_sk_exit_batch() */
++			if (refcount_read(&net->ipv4.tcp_death_row.tw_refcount) == 1)
++				continue;
++
+ 			inet_twsk_purge(&tcp_hashinfo);
+ 			purged_once = true;
+ 		}
+-- 
+2.37.3
+
 
