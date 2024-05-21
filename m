@@ -1,134 +1,169 @@
-Return-Path: <netdev+bounces-97291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D06C8CA8AD
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 09:17:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B23CE8CA900
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 09:34:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCFEA282182
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 07:17:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D81C282368
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 07:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DEC41A94;
-	Tue, 21 May 2024 07:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F1D50A75;
+	Tue, 21 May 2024 07:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="C2pAZj5G"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2/Sh7kKk";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FUX4KBuy";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2/Sh7kKk";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FUX4KBuy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BBE179BD
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 07:17:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABCA54F5FE
+	for <netdev@vger.kernel.org>; Tue, 21 May 2024 07:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716275830; cv=none; b=naQP3ipWWfLPPNoNY8PvJDv/2tVKNgekRXNSOVjck635kb0W8a8TBzCyqKyAVMWfGGllmrenquvUGadJ4Ea0QGiBKxkEhnMy9U6fyLaVbnH2gwS7wF2SpwqHPdbzb1lcQhgmm3d9Hj0JJPlIJEIKagFrlnuMWAc8NAq2w7An5PI=
+	t=1716276886; cv=none; b=XOm65LyrDMPOR6mC2USTGuHiVfCar8q/j3nd7/o1lJe8QAyBHHat6VaoUpkbJhJzWnVzIXlgLuk5oyLtvTPTbNXf73wU+aDOe/6o2djELRxZmDIKFjkVWgJkgBUjQnYreiPxKw4owG3VQk9iDqkndXQK9jWDjJNbBqwJzlfOJlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716275830; c=relaxed/simple;
-	bh=l7enup/cm2PIF/ABdE4cX357KBqHaHJn+NJPuIBwaSs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ktjqlDjEX99Mwvaz3Z+RqTfAKy8SC/8+flmdjVuR+AKGMbbugpLZN83ygJp5YcHHYcqS6wG+nWzN5so+e0WX6OX8VdZ5hu0tMOfh+w8lFv9Hhqh9TzaHcbtJoNPrZI+hRtnNa/PECgBEqJPpLDexciP9Zi3dklKQhzK9FtBKRGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=C2pAZj5G; arc=none smtp.client-ip=217.79.154.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
-X-Virus-Scanned: amavisd-new at emenem.pl
-Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
-	(authenticated bits=0)
-	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 44L7GvA1001752
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 21 May 2024 09:16:59 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
-	t=1716275820; bh=1sZ8H9AdmPLHPXG6qkzlCzivooSwKukcmEfEXaTBGws=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To;
-	b=C2pAZj5G9rXyCP/EAc4UsOttqEoOGh7pysYBfBIlOnTTHvnPf9uB+qZMVDbzDWcNs
-	 NP5Uzpf0o94rruOr1FrbkHgB0B1eZxB7JhLwGRLKf7CTgpoAj38A8ZCx4H8s7xRLl+
-	 7UEcuNgY/fzs0P1T83DyAZsy5FIqLpk78k+hmNcY=
-Message-ID: <43f55709-4234-41e3-b6c4-8a069ea7ac6a@ans.pl>
-Date: Tue, 21 May 2024 00:16:56 -0700
+	s=arc-20240116; t=1716276886; c=relaxed/simple;
+	bh=L/FHNnC4gijZUaqKQIUp9M5ESip42784NINWVVrAcsU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GU2FoVEgKeakzJmomAJxvdX5i5qB2M6FXVBhnG54bbTP9O8KhY3S0DSCpeX+aY0OB2erY6Rdl2uYl0CjjW9LAwKZ3vvR06gsYFqiNqsPmEf3mmA2JXorEgsjpUClyCT2JS6g6UeA6zFRwAVrCeWEytzw6DMqkpcjvlcTZfa+QKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2/Sh7kKk; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FUX4KBuy; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2/Sh7kKk; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FUX4KBuy; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.100.225.114])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id E479A34599;
+	Tue, 21 May 2024 07:34:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1716276882; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3m1uQFJVMaYLH3NnqWlp5hAisJoP7dugO5mR2Bi13tk=;
+	b=2/Sh7kKkMVQor4F+Wj/yoYIYutFVb/2HbH1rYX9cMTkAtwYrmHJe2004Inf9Er9a9h7vWF
+	0UJKdfk1EEjzgIk31qimYn3iuADqPx/HIj9Jq7oT1hNbPXcZZq+dfncWHbWNYJ6G/QMLxx
+	LnQ9494YiL2CnxtoC0VWcCbBcjZyiTw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1716276882;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3m1uQFJVMaYLH3NnqWlp5hAisJoP7dugO5mR2Bi13tk=;
+	b=FUX4KBuym1aOmJN1OSZIGy9orh8xM5PRxarNlZkTyrfQPbFDrhh3eXkiEa2hVBfey6dHqL
+	aapST2ojtdtWJpBg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1716276882; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3m1uQFJVMaYLH3NnqWlp5hAisJoP7dugO5mR2Bi13tk=;
+	b=2/Sh7kKkMVQor4F+Wj/yoYIYutFVb/2HbH1rYX9cMTkAtwYrmHJe2004Inf9Er9a9h7vWF
+	0UJKdfk1EEjzgIk31qimYn3iuADqPx/HIj9Jq7oT1hNbPXcZZq+dfncWHbWNYJ6G/QMLxx
+	LnQ9494YiL2CnxtoC0VWcCbBcjZyiTw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1716276882;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3m1uQFJVMaYLH3NnqWlp5hAisJoP7dugO5mR2Bi13tk=;
+	b=FUX4KBuym1aOmJN1OSZIGy9orh8xM5PRxarNlZkTyrfQPbFDrhh3eXkiEa2hVBfey6dHqL
+	aapST2ojtdtWJpBg==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id C9F8720131; Tue, 21 May 2024 09:34:42 +0200 (CEST)
+Date: Tue, 21 May 2024 09:34:42 +0200
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Krzysztof =?utf-8?Q?Ol=C4=99dzki?= <ole@ans.pl>
+Cc: Moshe Shemesh <moshe@nvidia.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: "netlink error: Invalid argument" with ethtool-5.13+ on recent
+ kernels due to "ethtool: Add netlink handler for getmodule (-m)" -
+ 25b64c66f58d3df0ad7272dda91c3ab06fe7a303, also no SFP-DOM support via
+ netlink?
+Message-ID: <7nz6fvq6aaclh3xoazgqzw3kzc7vgmsufzyu4slsqhjht7dlpl@qyu63otcswga>
+References: <9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl>
+ <apfg6yonp66gp4z6sdzrfin7tdyctfomhahhitqmcipuxkewpw@gmr5xlybvfsf>
+ <31f6f39b-f7f3-46cc-8c0d-1dbcc69c3254@ans.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: "netlink error: Invalid argument" with ethtool-5.13+ on recent
- kernels due to "ethtool: Add netlink handler for getmodule (-m)" -
- 25b64c66f58d3df0ad7272dda91c3ab06fe7a303, also no SFP-DOM support via
- netlink?
-From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: Moshe Shemesh <moshe@nvidia.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl>
- <apfg6yonp66gp4z6sdzrfin7tdyctfomhahhitqmcipuxkewpw@gmr5xlybvfsf>
- <31f6f39b-f7f3-46cc-8c0d-1dbcc69c3254@ans.pl>
-Content-Language: en-US
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ipmpfv42kj4e7pvb"
+Content-Disposition: inline
 In-Reply-To: <31f6f39b-f7f3-46cc-8c0d-1dbcc69c3254@ans.pl>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.34 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SIGNED_PGP(-2.00)[];
+	LONG_SUBJ(1.56)[208];
+	SUBJECT_ENDS_QUESTION(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_ONE(0.00)[1];
+	TO_DN_SOME(0.00)[]
+X-Spam-Score: -3.34
+X-Spam-Flag: NO
 
-On 21.05.2024 at 00:02, Krzysztof Olędzki wrote:
-> -vladyslavt@nvidia.com (User unknown).
-> 
-> Hi Michal,
-> 
-> On 20.05.2024 at 23:55, Michal Kubecek wrote:
->> On Mon, May 20, 2024 at 11:26:56PM -0700, Krzysztof Olędzki wrote:
->>> Hi,
->>>
->>> After upgrading from 5.4-stable to 6.6-stable I noticed that modern ethtool -m stopped working with ports where I have QSFP modules installed in my CX3 / CX3-Pro cards.
->>>
->>> Git bisect identified the following patch as being responsible for the issue:
->>> https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/?id=25b64c66f58d3df0ad7272dda91c3ab06fe7a303
->>
->> Sounds like the issue that was fixed by commit 1a1dcfca4d67 ("ethtool:
->> Fix SFF-8472 transceiver module identification"). Can you try ethtool
->> version 6.7?
-> 
-> Yes, forgot to mention - this problem also exists in ethtool-6.7:
-> 
+
+--ipmpfv42kj4e7pvb
+Content-Type: text/plain; charset=iso-8859-2
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, May 21, 2024 at 12:02:47AM -0700, Krzysztof Ol=EAdzki wrote:
 > # ./ethtool  --version
 > ethtool version 6.7
-> 
+>=20
 > # ./ethtool --debug 3 -m eth3
-> sending genetlink packet (32 bytes):
->     msg length 32 genl-ctrl
-> received genetlink packet (956 bytes):
->     msg length 956 genl-ctrl
-> received genetlink packet (36 bytes):
->     msg length 36 error errno=0
-> sending genetlink packet (76 bytes):
->     msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
-> received genetlink packet (52 bytes):
->     msg length 52 ethool ETHTOOL_MSG_MODULE_EEPROM_GET_REPLY
-> received genetlink packet (36 bytes):
->     msg length 36 error errno=0
-> sending genetlink packet (76 bytes):
->     msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
-> received genetlink packet (176 bytes):
->     msg length 176 ethool ETHTOOL_MSG_MODULE_EEPROM_GET_REPLY
-> received genetlink packet (36 bytes):
->     msg length 36 error errno=0
-> sending genetlink packet (76 bytes):
->     msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
-> received genetlink packet (176 bytes):
->     msg length 176 ethool ETHTOOL_MSG_MODULE_EEPROM_GET_REPLY
-> received genetlink packet (36 bytes):
->     msg length 36 error errno=0
+[...]
 > sending genetlink packet (76 bytes):
 >     msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
 > received genetlink packet (96 bytes):
->     msg length 96 error errno=-22
+>     msg length 96 error errno=3D-22
 > netlink error: Invalid argument
 
-That said, DOM seems to work since 5.19 because it includes:
- https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/sfpid.c?id=fb92de62eeb1cfbb21f57d60491798df762556d3
+Can you do it with "--debug 0x12" or "--debug 0x1e"? It would tell us
+which request failed and that might give some hint where does this
+EINVAL come from.
 
-Sorry, got confused with my git bisect.
+Michal
 
-So, we are down to the main issue - Invalid argument for QSFP.
 
-Thanks,
- Krzysztof
+--ipmpfv42kj4e7pvb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmZMTo4ACgkQ538sG/LR
+dpWCZAgAo4S9Kyg909yU4mzWC3hiJj+qAnQN83X6UJLhV6R7uLfiWKqqz5xZ6ZtT
+9uaPHy6UXhgUywAJ7Rf76eYFcENy/+xtPEEcbGLJROl6eyRpmjmMd+SSoeWRfMnC
+RnUp9Eg4m6AV6LiEqcC0RScIJoOQsQfg6Evwh8VdTae1J3yhh5M36k/ngje3l1Yc
+YUNq8fjTBXzO+OIylVlyrRt3+9t3vCjmc76KvaM1azwHI6XYcSNcLKosG3cY4crE
+8rddLIevwFTdlq6uiAZTzQrhJOsiiIGiogWm/wZhkhxN/rj+IsJmIQJtS3J0ij7P
+uND/yefF5MtpGR8Qb5nnMaM0UVgK8A==
+=Thbn
+-----END PGP SIGNATURE-----
+
+--ipmpfv42kj4e7pvb--
 
