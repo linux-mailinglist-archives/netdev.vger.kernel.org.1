@@ -1,162 +1,163 @@
-Return-Path: <netdev+bounces-97354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5D338CAF8E
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 15:42:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EB998CAFA5
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 15:47:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12F391C214EC
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 13:42:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B15EB2297C
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 13:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03B07CF39;
-	Tue, 21 May 2024 13:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC0D7603F;
+	Tue, 21 May 2024 13:47:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CIrtqfG8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RdnWDP7a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506EF71B48
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 13:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8C055783;
+	Tue, 21 May 2024 13:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716298953; cv=none; b=QOIyBzgMMgDcaUsxDf8rjHeZ764dBOg39uY3wr8DrwSC+A8R4XMJwO+6NPHGHa29bKyyoICo8NjwYZhqoAc3Qq8T1GndlFNHnKtFa+fKriQtnsUyuS+WTBZztoxcwebf4OUCh3mLQcqSN2CgpS2mV6CSmyZjSbfZqQwBvcw9QMQ=
+	t=1716299265; cv=none; b=PDoljsqvqX+n3LrNxUmiiTaVaW0TjtoPorr8zQICNkHeWjmGp5Una96MX6l4u/g6EhTljrHRr9WxYcKDMoZulNzSx1/TEpgdXyL7ChtfakafPD862DCQX98ynEjCTyR3xDLRkCfe1qIKLKoGedmwnW5SlGI19N9BLaeNEgV74CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716298953; c=relaxed/simple;
-	bh=+JR1omy9SObZJ2zGVJmFzzwtbk5Zk7FZoFxFgZop9lM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d7CtxGinFS9x4b/NosidX6Kq11WIcuwtbC1azPex3YMo6i06pRULCtfYoESFGCGl8hVnu4ArqjpIYQGmxE+Gb8QWYlyib08e6ts32JemlY49LW+GNfB2jJHk15Kap7T8vfXPdeoGLMiU9hNyrgOuWHPJ/Hl5PvrqecI4RYuWzxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CIrtqfG8; arc=none smtp.client-ip=209.85.161.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5b53350921fso862150eaf.3
-        for <netdev@vger.kernel.org>; Tue, 21 May 2024 06:42:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716298950; x=1716903750; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YNMKmRwVQjKjZ8sjAy/G/XrKhwj5L0pb23pBrhzGkI8=;
-        b=CIrtqfG8cV4N4qoQyoiku2m+3vxvYjlNhgcuxUDM0kArNvfb4eKvsskrU28hnzRdwY
-         RrLQeJJwTTxXB5TT5uxMIibL/rDK6oC1f1x2txT3RRPEPkF4WzKTQ23E9hSm3Dk7GnZb
-         G2Aw6rr0PZzoVZOqfRqMUemUvIcdfomd6eeaCRdkqhxTmwIL1tpw5xF5/iQjw4DcOeac
-         GqRs88j7G/JrxXSubJVR/nodwnp0B4iA8znqeIdpAO82l8ILLNOa5/2VfhfiCuCv5G/W
-         QlipLNjxrgDegnxFcFI70zDfnlK1Umbz09+4tA7bLzNNYmF/H3q4cThFWzmY2Kg6jDIc
-         cuyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716298950; x=1716903750;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YNMKmRwVQjKjZ8sjAy/G/XrKhwj5L0pb23pBrhzGkI8=;
-        b=VjmeOw3QiCnYTqy1tJa391PioJtvg9JRzYaEKRYgfoQlGFeBRzDx2YEGBEuURWg44B
-         d34VjgX/KBpeTUMtVzsgemPeebUPwnXI7WT2FeXFDrc3Cs+yb1PBxhQT8r6X07l6Fd9B
-         ivF3AVnA0+Jo3w7VeMuCVv8U+7gfDEN5DdpXxSSWCIbhoR6gsTi719c8kxp2dRs98gSW
-         j8sY/rZ80AcINHapqBH0KociDvVTfZc8G+b2djWYzCzBldnqrc+iHiH/nzGdnnfd7p7z
-         bzRTovdulQEQecMkr10oDi+QJ5Z24fkf08cuhBEObOpedLli4T98QguO/WnRjvA03ewV
-         Yc1w==
-X-Gm-Message-State: AOJu0YzERppVvMrYHHDo01YY5p34n85KnY6yCERAvq+DJzX/5bfSsTHF
-	wpuQQRAxvOAWi1axf5dcunImH6SeFDjQM0SeL0mYnXnV55uft/EFGnfTOm4d
-X-Google-Smtp-Source: AGHT+IFnWkLg7qOdsbC2nas25H0tywQgMPJPNHvMzujImx+9g4nI8pTvWv380VKvGDn6QyIuKWHBCg==
-X-Received: by 2002:a05:6359:4588:b0:186:1d2a:a457 with SMTP id e5c5f4694b2df-193bb656353mr3536872755d.15.1716298950152;
-        Tue, 21 May 2024 06:42:30 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([111.201.28.17])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2a66686sm20758977b3a.29.2024.05.21.06.42.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 May 2024 06:42:29 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	ncardwell@google.com
-Cc: netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net] tcp: remove 64 KByte limit for initial tp->rcv_wnd value
-Date: Tue, 21 May 2024 21:42:20 +0800
-Message-Id: <20240521134220.12510-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1716299265; c=relaxed/simple;
+	bh=Rs0778QKzKCdk0BVA98zOTHQl+mRFeefvwXEHJ/1we8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IByw8ck5vaj1XHI2O2ap/sJNIdV21FiO9lHDyTBb4x8Q+KWkSMT8wTSb2LhzealfEULxF8v0VqnPVYvkqzjxbbYixCmvw8Amvwxz0ezX1JkZEgwAU0u/WXNEsBeG4chMc6fK6iwi2Ri4/cwodsu2HYLeQQs+uKpTPJ+3iMR77B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RdnWDP7a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEC6CC2BD11;
+	Tue, 21 May 2024 13:47:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716299264;
+	bh=Rs0778QKzKCdk0BVA98zOTHQl+mRFeefvwXEHJ/1we8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RdnWDP7adAioYkB3/+Il09h51NgpF8SMAVZyOlo4p1vHsDU8W/MmkscYN3ZaqPUvh
+	 LJJyfhttBT1gQbWzZA65iJeGWv8wz+cfco9WKnizzAj4wSwPNVeM6kXOtfvJ4VxIC/
+	 dKTVtxVgFa0pORmupAShSMqwC9XPkDPG0YVZBHckGuCWfwRbis10RHmhNEm6ZftgNK
+	 GZp1T6A/upBmVnSxgjJoNZU+xemHpmENftx9Etor5hVqexWIToaxjbOpVh+eYiI2Mm
+	 fFfbLAACqP4MQk/LeEay0vniuHCpwirjQeLw/3fxCUglIuP+4KEpcYTmG6SEWS1+Es
+	 O1BAaRNoj3u9A==
+Date: Tue, 21 May 2024 14:47:39 +0100
+From: Simon Horman <horms@kernel.org>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>, Diogo Ivo <diogo.ivo@siemens.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>
+Subject: Re: [PATCH net] net: ti: icssg_prueth: Fix NULL pointer dereference
+ in prueth_probe()
+Message-ID: <20240521134739.GE764145@kernel.org>
+References: <20240521-icssg-prueth-fix-v1-1-b4b17b1433e9@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240521-icssg-prueth-fix-v1-1-b4b17b1433e9@bootlin.com>
 
-From: Jason Xing <kernelxing@tencent.com>
++ Andrew Lunn, Diogo Ivo, Vignesh Raghavendra
+  Not trimming reply to provide context for these people
 
-Recently, we had some servers upgraded to the latest kernel and noticed
-the indicator from the user side showed worse results than before. It is
-caused by the limitation of tp->rcv_wnd.
+On Tue, May 21, 2024 at 02:44:11PM +0200, Romain Gantois wrote:
+> In the prueth_probe() function, if one of the calls to emac_phy_connect()
+> fails due to of_phy_connect() returning NULL, then the subsequent call to
+> phy_attached_info() will dereference a NULL pointer.
+> 
+> Check the return code of emac_phy_connect and fail cleanly if there is an
+> error.
+> 
+> Fixes: 128d5874c082 ("net: ti: icssg-prueth: Add ICSSG ethernet driver")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
 
-In 2018 commit a337531b942b ("tcp: up initial rmem to 128KB and SYN rwin
-to around 64KB") limited the initial value of tp->rcv_wnd to 65535, most
-CDN teams would not benefit from this change because they cannot have a
-large window to receive a big packet, which will be slowed down especially
-in long RTT. Small rcv_wnd means slow transfer speed, to some extent. It's
-the side effect for the latency/time-sensitive users.
+For Networking patches, please consider seeding the CC
+list using ./scripts/get_maintainer.pl this.patch.
+I've added the people who seemed to be missing.
 
-To avoid future confusion, current change doesn't affect the initial
-receive window on the wire in a SYN or SYN+ACK packet which are set within
-65535 bytes according to RFC 7323 also due to the limit in
-__tcp_transmit_skb():
+The patch itself looks good to me.
 
-    th->window      = htons(min(tp->rcv_wnd, 65535U));
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-In one word, __tcp_transmit_skb() already ensures that constraint is
-respected, no matter how large tp->rcv_wnd is. The change doesn't violate
-RFC.
-
-Let me provide one example if with or without the patch:
-Before:
-client   --- SYN: rwindow=65535 ---> server
-client   <--- SYN+ACK: rwindow=65535 ----  server
-client   --- ACK: rwindow=65536 ---> server
-Note: for the last ACK, the calculation is 512 << 7.
-
-After:
-client   --- SYN: rwindow=65535 ---> server
-client   <--- SYN+ACK: rwindow=65535 ----  server
-client   --- ACK: rwindow=175232 ---> server
-Note: I use the following command to make it work:
-ip route change default via [ip] dev eth0 metric 100 initrwnd 120
-For the last ACK, the calculation is 1369 << 7.
-
-When we apply such a patch, having a large rcv_wnd if the user tweak this
-knob can help transfer data more rapidly and save some rtts.
-
-Fixes: a337531b942b ("tcp: up initial rmem to 128KB and SYN rwin to around 64KB")
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
-v1
-Link: https://lore.kernel.org/all/20240518025008.70689-1-kerneljasonxing@gmail.com/
-1. refine the changelog (Eric)
-2. add fixes tag to make sure the fix is backported (Eric)
-
-RFC v2
-Link: https://lore.kernel.org/all/20240517085031.18896-1-kerneljasonxing@gmail.com/
-1. revise the title and body messages (Neal)
----
- net/ipv4/tcp_output.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 95caf8aaa8be..95618d0e78e4 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -232,7 +232,7 @@ void tcp_select_initial_window(const struct sock *sk, int __space, __u32 mss,
- 	if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_workaround_signed_windows))
- 		(*rcv_wnd) = min(space, MAX_TCP_WINDOW);
- 	else
--		(*rcv_wnd) = min_t(u32, space, U16_MAX);
-+		(*rcv_wnd) = space;
- 
- 	if (init_rcv_wnd)
- 		*rcv_wnd = min(*rcv_wnd, init_rcv_wnd * mss);
--- 
-2.37.3
-
+> ---
+> Hello everyone,
+> 
+> There is a possible NULL pointer dereference in the prueth_probe() function of
+> the icssg_prueth driver. I discovered this while testing a platform with one
+> PRUETH MAC enabled out of the two available.
+> 
+> These are the requirements to reproduce the bug:
+> 
+> prueth_probe() is called
+> either eth0_node or eth1_node is not NULL
+> in emac_phy_connect: of_phy_connect() returns NULL
+> 
+> Then, the following leads to the NULL pointer dereference:
+> 
+> prueth->emac[PRUETH_MAC0]->ndev->phydev is set to NULL
+> prueth->emac[PRUETH_MAC0]->ndev->phydev is passed to phy_attached_info()
+> -> phy_attached_print() dereferences phydev which is NULL
+> 
+> This series provides a fix by checking the return code of emac_phy_connect().
+> 
+> Best Regards,
+> 
+> Romain
+> ---
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> index 7c9e9518f555a..1ea3fbd5e954e 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> @@ -1039,7 +1039,12 @@ static int prueth_probe(struct platform_device *pdev)
+>  
+>  		prueth->registered_netdevs[PRUETH_MAC0] = prueth->emac[PRUETH_MAC0]->ndev;
+>  
+> -		emac_phy_connect(prueth->emac[PRUETH_MAC0]);
+> +		ret = emac_phy_connect(prueth->emac[PRUETH_MAC0]);
+> +		if (ret) {
+> +			dev_err(dev,
+> +				"can't connect to MII0 PHY, error -%d", ret);
+> +			goto netdev_unregister;
+> +		}
+>  		phy_attached_info(prueth->emac[PRUETH_MAC0]->ndev->phydev);
+>  	}
+>  
+> @@ -1051,7 +1056,12 @@ static int prueth_probe(struct platform_device *pdev)
+>  		}
+>  
+>  		prueth->registered_netdevs[PRUETH_MAC1] = prueth->emac[PRUETH_MAC1]->ndev;
+> -		emac_phy_connect(prueth->emac[PRUETH_MAC1]);
+> +		ret = emac_phy_connect(prueth->emac[PRUETH_MAC1]);
+> +		if (ret) {
+> +			dev_err(dev,
+> +				"can't connect to MII1 PHY, error %d", ret);
+> +			goto netdev_unregister;
+> +		}
+>  		phy_attached_info(prueth->emac[PRUETH_MAC1]->ndev->phydev);
+>  	}
+>  
+> 
+> ---
+> base-commit: e4a87abf588536d1cdfb128595e6e680af5cf3ed
+> change-id: 20240521-icssg-prueth-fix-03b03064c5ce
+> 
+> Best regards,
+> -- 
+> Romain Gantois <romain.gantois@bootlin.com>
+> 
+> 
 
