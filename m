@@ -1,57 +1,88 @@
-Return-Path: <netdev+bounces-97366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 277708CB16A
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 17:34:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB79D8CB15C
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 17:29:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE20628417E
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 15:34:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33F69B22548
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 15:29:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 990C4770FD;
-	Tue, 21 May 2024 15:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780AE14430D;
+	Tue, 21 May 2024 15:28:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Lds5eCrj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M5MoUKjs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7120F26AC1;
-	Tue, 21 May 2024 15:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3511FDD
+	for <netdev@vger.kernel.org>; Tue, 21 May 2024 15:28:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716305635; cv=none; b=io9oRLMgqX8e38ObFZFOUSfsDjr4zs3H0nPu63K/Q7ZBHG2Y59aSyDj+VI9sokpQmEtNQVQ3H/hV0nGYwF4QX/IUgBNwLWSWlIp8dLMK9cULxRZ88zXNeOQNoU3xceQmZQMx5yzSrZlYeR9uFXDEVnzfB7jr4YRVFDAWVrix/GQ=
+	t=1716305331; cv=none; b=JTVo2npQ8jGFGoBi3JrNJpUkfrt0CU1nOqYI7GL9WLuf/P1jTOAgatRhE01cs0JmoJIuF2Xh8n54XMtqUcy2BlAxMSPasofZ0HBySWOoYiGYt/+mPMXLiOuULZoOe+G3whG3gtujNzRFCZfri0tbK2kl5HFzXKr8GRBOOeTe+uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716305635; c=relaxed/simple;
-	bh=O9XjgHG+T3xbYU7g2Z9jc6upLuBKh2a4UcoeY/vQHG8=;
+	s=arc-20240116; t=1716305331; c=relaxed/simple;
+	bh=QdvNN4ux3vftozDxbS9yFQvNqh/YWSRTOOgZELawYjM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tunmUpH52h9ljI8eRokFHnQTo5twvizPWpRYa+I7VHYxl1LPg1aKp1cPhNF6JavGrYQ+NjdJMd8+FOd2ydbm1kDBZLDsYFQ6n+lXmF4Fp91Rz+JhoC1nVHTVGecmRCN3wmm9HTUiNJJHaKeX/324cH72kVQuZjloXdtquAdDgbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Lds5eCrj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97900C2BD11;
-	Tue, 21 May 2024 15:33:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1716305635;
-	bh=O9XjgHG+T3xbYU7g2Z9jc6upLuBKh2a4UcoeY/vQHG8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Lds5eCrjHulxNnsx7XMbbHqAyYrpvCx0WP3iJrVQf+2fl5JqcvJmXhczkBYKh1XMs
-	 bRvxZb5tW8HK9epJdaLTLpGhGD/1SvQp5MRgYocZZpObV2h8xFosEP7KQCID7EHewt
-	 jwmvUUkTpFsyUyl7lF8U/9WZPvwGy75xGmNSH/9I=
-Date: Tue, 21 May 2024 17:26:02 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Oleksandr Tymoshenko <ovt@google.com>
-Cc: srish.srinivasan@broadcom.com, ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com, borisp@nvidia.com, davejwatson@fb.com,
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	john.fastabend@gmail.com, kuba@kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, sashal@kernel.org, sd@queasysnail.net,
-	stable@vger.kernel.org, vakul.garg@nxp.com,
-	vasavi.sirnapalli@broadcom.com
-Subject: Re: [PATCH 6.1.y] net: tls: handle backlogging of crypto requests
-Message-ID: <2024052144-improper-quarterly-0852@gregkh>
-References: <20240328123805.3886026-1-srish.srinivasan@broadcom.com>
- <20240521105838.2239567-1-ovt@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uCYARQS5EnWNuK9+q+8pMSmjxpvcbZNtFRragzANh17UbYMahiMGiPcdXNv3b8dQ6bvgHyxelDvJ5R4j8/43pC+44WFLGYH4z6bPTSdTASOjgTe/zgxnEhMmNJALtdVzHsa8vlDFU7Fv+mdCSP3gxTRxjhNV2XJHGg3g5diFPkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M5MoUKjs; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716305328;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RvalVcpeJBX7T4B/fcPMOd0QFgC1iXDiyKWmYajeijk=;
+	b=M5MoUKjsUZaorPK5vXzjwBbgCpUWysY1tzkX7YQJ5uh7TfpdQRBrxQhcg72p1czaxNTczP
+	ICj6pmfDYoLRgN3tcwlQwianiVNw3D4KChkfIoyyjRPhmFhMb3XTrseg207LcwDugRMMO6
+	rGGS9jIYDuFnB9Kl7bD7zsY1LeIt2TE=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-80-zGI1ygxWNgGwPGS0zQZzbA-1; Tue, 21 May 2024 11:28:47 -0400
+X-MC-Unique: zGI1ygxWNgGwPGS0zQZzbA-1
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1ec48e36217so108669735ad.3
+        for <netdev@vger.kernel.org>; Tue, 21 May 2024 08:28:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716305326; x=1716910126;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RvalVcpeJBX7T4B/fcPMOd0QFgC1iXDiyKWmYajeijk=;
+        b=HzKhCsyxrFDJjogE4eK2cixSOFcgLNDfrZEZZ/Hw/Zjw6HleC9C0gyiO4E8tW2b5uB
+         hPdD7LR6kbFhO+6EOy2TS083QniWUtf7bgqyISSklLpA3wEUWh0cRx+898lNT/SwLubY
+         CVwww+E3Hj0uWKhXU/MW8Mm16XJvY0LlB0I7BSGGxyYpTuPERW8uTWbpUm1atVf6WCij
+         t1WCkGw0VUrOnxYUPUM9BTH4hk8EjUe1iZl5rlQaHqyN0sdjm5ptqreruJMWmDP1vNbq
+         jkvcTTjgpKsWr9vhhUphbjpzHtUAhS9agozTnSQ5gVpUvkqWJfbfojbj5WX9NJJcwLAX
+         sj0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVY4cCXV7oDT08XVMtpt9lN7wtw987/rQCe9WbWYK/EH4+TswveERqsT2/9OwY8E3ofix/pPF2zOrpS5Js1UrcC+0SOmpGY
+X-Gm-Message-State: AOJu0Yxw6z9hVgLBBUwpuYvyP70m8g4Iygph1PjeY0M123JGgWN1r7JQ
+	ng294vKD2FvjOLbv+rLMQ99cburTokKCO4jTsmi56lLvgXf9FuXzEq+HaGjsZF4eIYVRfRki8rg
+	B2njNbAgK/apb0Q6/yfVN9ZJbF93PR5yyBBo//Rj10wmcgAlU8aYR+w==
+X-Received: by 2002:a17:902:bcc4:b0:1ee:c491:ab62 with SMTP id d9443c01a7336-1ef43d2ea47mr294190355ad.25.1716305326126;
+        Tue, 21 May 2024 08:28:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFx1n4JLjA52CrbGijWG8t6of/hs9QNgynVg+bR4Tq3GlBgh09Hyleep4PO0WPhhy+YxSgScg==
+X-Received: by 2002:a17:902:bcc4:b0:1ee:c491:ab62 with SMTP id d9443c01a7336-1ef43d2ea47mr294189915ad.25.1716305325600;
+        Tue, 21 May 2024 08:28:45 -0700 (PDT)
+Received: from zeus ([240b:10:83a2:bd00:6e35:f2f5:2e21:ae3a])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f2ff0b9027sm39741685ad.94.2024.05.21.08.28.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 May 2024 08:28:44 -0700 (PDT)
+Date: Wed, 22 May 2024 00:28:41 +0900
+From: Ryosuke Yasuoka <ryasuoka@redhat.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, syoshida@redhat.com, horms@kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] nfc: nci: Fix handling of zero-length payload
+ packets in nci_rx_work()
+Message-ID: <Zky9qU3QKziLAQDN@zeus>
+References: <20240517020609.476882-1-ryasuoka@redhat.com>
+ <8947cb3f-39b5-4483-af1d-82d3fa4bb7ad@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,18 +91,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240521105838.2239567-1-ovt@google.com>
+In-Reply-To: <8947cb3f-39b5-4483-af1d-82d3fa4bb7ad@kernel.org>
 
-On Tue, May 21, 2024 at 10:58:38AM +0000, Oleksandr Tymoshenko wrote:
-> Hello,
+On Mon, May 20, 2024 at 11:58:47AM +0200, Krzysztof Kozlowski wrote:
+> On 17/05/2024 04:06, Ryosuke Yasuoka wrote:
+> > When nci_rx_work() receives a zero-length payload packet, it should not
+> > discard the packet and exit the loop. Instead, it should continue
+> > processing subsequent packets.
+> > 
+> > Fixes: d24b03535e5e ("nfc: nci: Fix uninit-value in nci_dev_up and nci_ntf_packet")
+> > Reported-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
 > 
-> As far as I understand this issue also affects kernel 5.15. Are there any plans
-> to backport it to 5.15?
+> That's not a valid tag here. Every bug we find - like hundreds of my
+> commits - is reported by us...
+> 
+> Drop the tag.
+> 
+> Best regards,
+> Krzysztof
 
-Why not provide a working backport if you are interested in the 5.15.y
-kernel tree?
+Thank you for pointing me out, Krzysztof. I didn't understand how to use
+Reported-by tag correctly. Now I'm clear.
+Yes, I remove the tag and send a new patch.
 
-thanks,
+Very sorry for sending this patch again and again.
 
-greg k-h
+Ryosuke
+
 
