@@ -1,155 +1,151 @@
-Return-Path: <netdev+bounces-97335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 758788CAE61
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 14:35:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 775428CAE79
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 14:43:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06D5E1F220A1
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 12:35:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB79AB21AA3
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 12:43:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EAB75811;
-	Tue, 21 May 2024 12:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4AF763F1;
+	Tue, 21 May 2024 12:43:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="OpYhDLpM"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="T0TPkoOP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF58219EA
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 12:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36D428E7;
+	Tue, 21 May 2024 12:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716294921; cv=none; b=R5NJkcJEXkORh+e8v5Jegsz3YGpvciS1zWBN6cUTTWv0iTb+gMnisdo3eIeYp85hu4ivto5cgjzyj1lBi/m1DQIDQO1LOXw++4IWtQWBSCkDQixophOcXvWIM0JQhBiO6QlSQz+O0cYkFwrEip63cPjP5cLb0yUQn6ZnJ5BlzCY=
+	t=1716295428; cv=none; b=Y3oOMtxWyvR2bDzxBzF10HjwRLnfHc2d3htezVCWPUu5cMMwkLm/knt60fzHIeI1vPyhcRNZPYka0qoTq3v4Rn8BxCrsO61/KIMDEJXrkkvPLtNuEr/sg8XejYwNnmiQxNlhlj7sNIj1i20pVGvkwUW72wvd2Ke527xEf7iEU8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716294921; c=relaxed/simple;
-	bh=HABtfUr6wHg3IQCNHw1tVM/wml9YbMFqp7NRcxzIM7E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=omjiqgZjNCYs0GP0rc+sAp5j/GRmLjLpS/PuUMFOn+w6x4NfRIhcL0pk6QfTNsP+nTGHwheood8VG/hol5v9SHU1cOY58a0M4RAkT4JptJjcffrfg8Pj2FT4xyV/NLjNJWKFsdoF3l6SGNVr5NUv8B+lHOdB6W8fQEfKrgURtRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=OpYhDLpM; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-61b4cbb8834so31612207b3.0
-        for <netdev@vger.kernel.org>; Tue, 21 May 2024 05:35:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1716294919; x=1716899719; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HABtfUr6wHg3IQCNHw1tVM/wml9YbMFqp7NRcxzIM7E=;
-        b=OpYhDLpMLM8lLhtihAB6isC1D6iEbKLV4XElofJyWwccS01evQBUC2+CmKFtxJNdnI
-         AZYa3cv2pNyj05py8TwIpmKjddlHHyCJ1I8f9oIXkYDVuAwdoLx9FjI4vysc9R4JjgXP
-         HR0u0tianbw4S8+XC3ac1+kAqzne72nzg9FGeegWy2x9Rl8Cr6XKeE9VAkWoSB/CLVvS
-         ++II1p7uyuJSkzGogb2kyStt2ZoT6zq7GkRgMnpR0hK2fh8kMx908Y36mKWNH25E8eNy
-         mOfl/iJvwgzBfYcVg3gkJMiulRTPqVzVK+7jWWhZGQhZ+45xAVl/HKhUl23vW+Ej1SIT
-         iOwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716294919; x=1716899719;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HABtfUr6wHg3IQCNHw1tVM/wml9YbMFqp7NRcxzIM7E=;
-        b=pkP6v0VOqI/8NXFQNG5yVnwCoZ1tw2YuKLQ7euyHTAknRq/a15gG9YTQm6GbEj2GKQ
-         V/ETcVAiO+b87Go69G+C5zHfl1sS14hNtNyzGNDLpnxh6LfbBgWmjaw9seezIQ8W0iaF
-         Ohair3V7gZWKMrYn84tD2yCSE3R/BVL355lLjkJwsmF4bfDYkghIeHT4Af+mZUxX698t
-         4oSzpWXNsjKaog+fyiUZItuRseGIUdkN5DhZGkWAoHzNpDKNDh9FjNk0mjxmO6uxHLNr
-         eX57hV4N2gN0yd43RIF50LTZpDNQwQZr89Y958/2v5+g3dGJvQO/8+5GYnsBQMEJmCnH
-         qlrg==
-X-Forwarded-Encrypted: i=1; AJvYcCW19H/6DjItLnGrS0vf28UneWNkzFZaXeCT17IJPZx0mOXvSASjQCWJXcN4ob6nIe6T7NcyI6Prbbv6VVvmMhT3DkBfoCDf
-X-Gm-Message-State: AOJu0Yx48TYKUrvSuNam+TdtPHJfYhEBJpFwFvVvmB217B8rIFcKZb9R
-	f1EApTxiU8Weqldsem8EIL2wbafEoAu0QvtHvUENSzQ0fvujWgOU8uEt0o11vckY3pF5KpIpna+
-	O2b+5jQ8WRpXM8LECFEC3REpY7ktWrEb1CMbl
-X-Google-Smtp-Source: AGHT+IGqgZEJHg+PMqQ32lsx1dAhh3ttCrHFm4uv/mja2rTb8hQ0HnLwXjrEHlI97NnkZQEQkD5JwEVrMFVyjVMsc0Q=
-X-Received: by 2002:a05:690c:60c1:b0:61b:92d9:f7e8 with SMTP id
- 00721157ae682-622affc09ebmr399755867b3.23.1716294919363; Tue, 21 May 2024
- 05:35:19 -0700 (PDT)
+	s=arc-20240116; t=1716295428; c=relaxed/simple;
+	bh=De/fD9//lDT8ckW0UEfL/y/2vXEAMHB5t/X7InMzgMc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=J+spu9DUGdMtd3CGqI/Me2G5OVeBLqW2C4jG63mVQygRrwiAQ4eQ/p+TGjvnppIEuwl38Ar8YXw2HdsEzU3K3xuBHts/AXiWJm2LOk92izSgE2u9ylzWYmxN6A2oPbv6DVpBkAgAKX7U3quf8vUgoeA0eUpvi0lFCGRQSu3DkB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=T0TPkoOP; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C39972000D;
+	Tue, 21 May 2024 12:43:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1716295423;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sBHQDVV1jw6tvsDFIyAbBrREYTF4ioSRIEty/E5nqPU=;
+	b=T0TPkoOP0Oln6RdV1lZQCjpQhTbgt3GaQ2j94Yw+Z8ea1ETp/x9tnsAhm4sBjHTyc6FJgn
+	ytWWeoxfxTEk9DRNo9H0PwHB7pR2Pneu3gAkZMBkMNmRjUKRSysG1FysIfeyhisO+FGl/C
+	1M0B2q6KFUg4mUr/1La3Z1dM/N8QS2k8w0lqGNJNER9rQ48bQBD3G7P1A2yjXX43m5bIiF
+	PPYfG4iD+8h8bvYfzF+aqwAynnJ4FrKOTo9mpAs0uERH4ylCAm5P8jy+o+JUEya2/dc16T
+	04ABdjNOV7G8j+J1cf9hnRsL52YYj1FjUXuFLcv32oLzhnCOb8y2jKxLCeGxXA==
+From: Romain Gantois <romain.gantois@bootlin.com>
+Date: Tue, 21 May 2024 14:44:11 +0200
+Subject: [PATCH net] net: ti: icssg_prueth: Fix NULL pointer dereference in
+ prueth_probe()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240410140141.495384-1-jhs@mojatatu.com> <41736ea4e81666e911fee5b880d9430ffffa9a58.camel@redhat.com>
- <CAM0EoM=982OctjvSQpx0kR7e+JnQLhvZ=sM-tNB4xNiu7nhH5Q@mail.gmail.com>
- <CAM0EoM=VhVn2sGV40SYttQyaiCn8gKaKHTUqFxB_WzKrayJJfQ@mail.gmail.com>
- <87cf4830e2e46c1882998162526e108fb424a0f7.camel@redhat.com>
- <CAM0EoMkJwR0K-fF7qo0PfRw4Sf+=2L0L=rOcH5A2ELwagLrZMw@mail.gmail.com>
- <CAM0EoMmfDoZ9_ZdK-ZjHjFAjuNN8fVK+R57_UaFqAm=wA0AWVA@mail.gmail.com>
- <82ee1013ca0164053e9fb1259eaf676343c430e8.camel@redhat.com>
- <CAADnVQLugkg+ahAapskRaE86=RnwpY8v=Nre8pn=sa4fTEoTyA@mail.gmail.com>
- <CAM0EoM=2wHem54vTeVq4H1W5pawYuHNt-aS9JyG8iQORbaw5pA@mail.gmail.com> <CAM0EoMmCz5usVSLq_wzR3s7UcaKifa-X58zr6hkPXuSBnwFX3w@mail.gmail.com>
-In-Reply-To: <CAM0EoMmCz5usVSLq_wzR3s7UcaKifa-X58zr6hkPXuSBnwFX3w@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 21 May 2024 08:35:07 -0400
-Message-ID: <CAM0EoMmsB5jHZ=4oJc_Yzm=RFDUHWh9yexdG6_bPFS4_CFuiog@mail.gmail.com>
-Subject: On the NACKs on P4TC patches
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
-	Network Development <netdev@vger.kernel.org>, "Chatterjee, Deb" <deb.chatterjee@intel.com>, 
-	Anjali Singhai Jain <anjali.singhai@intel.com>, "Limaye, Namrata" <namrata.limaye@intel.com>, 
-	tom Herbert <tom@sipanda.io>, Marcelo Ricardo Leitner <mleitner@redhat.com>, 
-	"Shirshyad, Mahesh" <Mahesh.Shirshyad@amd.com>, "Osinski, Tomasz" <tomasz.osinski@intel.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, 
-	Khalid Manaa <khalidm@nvidia.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
-	"Jain, Vipin" <Vipin.Jain@amd.com>, "Daly, Dan" <dan.daly@intel.com>, 
-	Andy Fingerhut <andy.fingerhut@gmail.com>, Chris Sommers <chris.sommers@keysight.com>, 
-	Matty Kadosh <mattyk@nvidia.com>, bpf <bpf@vger.kernel.org>, lwn@lwn.net
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240521-icssg-prueth-fix-v1-1-b4b17b1433e9@bootlin.com>
+X-B4-Tracking: v=1; b=H4sIABqXTGYC/x2MQQ5AQAwAvyI9a1K7y8FXxIFV9LJki0jE3zWOM
+ 8nMA8pZWKEtHsh8icqWDKqygLgOaWGUyRgcuUC1q1Ci6oJ7PvlYcZYbyY/kqQmxjgyW7ZlN/8s
+ OEh/Qv+8HZjSKXWcAAAA=
+To: MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+ Romain Gantois <romain.gantois@bootlin.com>
+X-Mailer: b4 0.13.0
+X-GND-Sasl: romain.gantois@bootlin.com
 
-As stated a few times, we strongly disagree with the nature of the
-Nacks from Alexei, Daniel and John. We dont think there is good ground
-for the Nacks.
+In the prueth_probe() function, if one of the calls to emac_phy_connect()
+fails due to of_phy_connect() returning NULL, then the subsequent call to
+phy_attached_info() will dereference a NULL pointer.
 
-A brief history on the P4TC patches:
+Check the return code of emac_phy_connect and fail cleanly if there is an
+error.
 
-We posted V1 in January 2023. The main objection then was that we
-needed to use eBPF. After some discussion and investigation on our
-part we found that using kfuncs would satisfy our goals as well as the
-objections raised. We posted 28 RFC patches looking for feedback from
-eBPF and other folks with V2 in May 2023 - these patches were not
-ready but we were nevertheless soliciting for feedback. By Version 7
-in October/2023 we removed the RFC tag (meaning we are asking for
-inclusion). In Version 8 we sent the first 15 patches as series
-1(following netdev rules that allow only 15 patches); 5 of these
-patches are trivial tc core patches. Starting with V8 and upto V14 the
-releases were mostly suggested changes (much thanks to folks who made
-suggestions for technical changes) and at one point it was a bug fix
-for an issue caught by our syzkaller instance.
+Fixes: 128d5874c082 ("net: ti: icssg-prueth: Add ICSSG ethernet driver")
+Cc: stable@vger.kernel.org
+Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
+---
+Hello everyone,
 
-When it seemed like Paolo was heading towards applying series 1 given
-the feedback, Alexei nacked patch 14 when we released V14, see:
-https://lore.kernel.org/bpf/20240404122338.372945-5-jhs@mojatatu.com/
-V15 only change was adding Alexei's nack. V15 was followed by Daniel
-and then John also nacking the same patch 14. V16's only change was to
-add these extra Nacks.
+There is a possible NULL pointer dereference in the prueth_probe() function of
+the icssg_prueth driver. I discovered this while testing a platform with one
+PRUETH MAC enabled out of the two available.
 
-At that point(v16) i asked for the series to be applied despite the
-Nacks because, frankly, the Nacks have no merit. Paolo was not
-comfortable applying patches with Nacks and tried to mediate. In his
-mediation effort he asked if we could remove eBPF - and our answer was
-no because after all that time we have become dependent on it and
-frankly there was no technical reason not to use eBPF. Paolo then
-asked if we could satisfy one of the points Alexei raised in terms of
-clearing table entries when an eBPF program was unloaded. We spent a
-week investigating and came to a conclusion that we could do it as a
-compromise (even though it is not something fitting to our
-requirements and there is existing code that we copied from doing
-exactly what Alexei is objecting to). Alexei rejected this offer. This
-puts Paolo in a difficult position because it is clear there is no
-compromise to be had. I feel we are in uncharted teritory.
+These are the requirements to reproduce the bug:
 
-Since we are in a quagmire, I am asking for a third party mediator to
-review the objections and validate if they have merit.
-I have created a web page to capture all the objections raised by the
-3 gents over a period of time at:
-https://github.com/p4tc-dev/pushback-patches
-If any of the 3 people feel i have misrepresented their objections or
-missed an important detail please let me know and i will fix the page.
+prueth_probe() is called
+either eth0_node or eth1_node is not NULL
+in emac_phy_connect: of_phy_connect() returns NULL
 
-cheers,
-jamal
+Then, the following leads to the NULL pointer dereference:
+
+prueth->emac[PRUETH_MAC0]->ndev->phydev is set to NULL
+prueth->emac[PRUETH_MAC0]->ndev->phydev is passed to phy_attached_info()
+-> phy_attached_print() dereferences phydev which is NULL
+
+This series provides a fix by checking the return code of emac_phy_connect().
+
+Best Regards,
+
+Romain
+---
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index 7c9e9518f555a..1ea3fbd5e954e 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -1039,7 +1039,12 @@ static int prueth_probe(struct platform_device *pdev)
+ 
+ 		prueth->registered_netdevs[PRUETH_MAC0] = prueth->emac[PRUETH_MAC0]->ndev;
+ 
+-		emac_phy_connect(prueth->emac[PRUETH_MAC0]);
++		ret = emac_phy_connect(prueth->emac[PRUETH_MAC0]);
++		if (ret) {
++			dev_err(dev,
++				"can't connect to MII0 PHY, error -%d", ret);
++			goto netdev_unregister;
++		}
+ 		phy_attached_info(prueth->emac[PRUETH_MAC0]->ndev->phydev);
+ 	}
+ 
+@@ -1051,7 +1056,12 @@ static int prueth_probe(struct platform_device *pdev)
+ 		}
+ 
+ 		prueth->registered_netdevs[PRUETH_MAC1] = prueth->emac[PRUETH_MAC1]->ndev;
+-		emac_phy_connect(prueth->emac[PRUETH_MAC1]);
++		ret = emac_phy_connect(prueth->emac[PRUETH_MAC1]);
++		if (ret) {
++			dev_err(dev,
++				"can't connect to MII1 PHY, error %d", ret);
++			goto netdev_unregister;
++		}
+ 		phy_attached_info(prueth->emac[PRUETH_MAC1]->ndev->phydev);
+ 	}
+ 
+
+---
+base-commit: e4a87abf588536d1cdfb128595e6e680af5cf3ed
+change-id: 20240521-icssg-prueth-fix-03b03064c5ce
+
+Best regards,
+-- 
+Romain Gantois <romain.gantois@bootlin.com>
+
 
