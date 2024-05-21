@@ -1,219 +1,136 @@
-Return-Path: <netdev+bounces-97283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B63238CA7C8
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 07:58:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ADB98CA7F3
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 08:20:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60FD3282A59
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 05:58:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB2DDB20FD0
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 06:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A21B4206E;
-	Tue, 21 May 2024 05:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010E23F8F1;
+	Tue, 21 May 2024 06:20:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zulu616.server4you.de (mail.csgraf.de [85.25.223.15])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E6720EB;
-	Tue, 21 May 2024 05:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.25.223.15
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADEF219ED;
+	Tue, 21 May 2024 06:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716271122; cv=none; b=eGGfoKBPNQcWgffKLWoj+1OgzhhzJcQwGlETIvBl73AHYCa8IXBI1dUpbNosQh1uhzqL46YnulZ72+hP1T9ZiP8hwDsyqkFubqFXzhwVYqQaHD1SCPgG4Q68HFzNPSl01h0mfquPa4yaehbsNBj3bKOjFIWQSB2BytMf+9f9yH8=
+	t=1716272445; cv=none; b=fnI8/BsAxSsPYwSyAjkEnJj0HYi2OFCPJVsq08NZ99u38XiGhJW9dCpktopv8CWsoyW02xfrhDcieUvstG0nCVI1HT4NWHIVgTMlijyodyxQSBzXHPrkfSUIv1zFBcCtYd6IFCUhgrHXyS8yyoJay7JlsqxfivAEesu+LkLvGZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716271122; c=relaxed/simple;
-	bh=2tBIfekw7EOyeqfZj5XyURtUTH8bntiRehCEAfN9lRI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WN5u/6gwMIqNBcEJBj9NyEoPa9tKbSiUh7LbmTp3PC4wXivbBhXcrFskfbS7k0T7pitNtL4BaSmFZ+Soe/mqTDlO1fLJeUD6g7YWgPTZdTWOmUmwznQcxUXkKzRilBWTy99WVvQj7L+D497VDNDAndxPghWuyhAWK2fxRwEtClw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csgraf.de; spf=pass smtp.mailfrom=csgraf.de; arc=none smtp.client-ip=85.25.223.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csgraf.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgraf.de
-Received: from [172.16.45.73] (unknown [195.142.177.30])
-	by csgraf.de (Postfix) with ESMTPSA id 57BE460800CF;
-	Tue, 21 May 2024 07:50:25 +0200 (CEST)
-Message-ID: <3a62a9d1-5864-4f00-bcf0-2c64552ee90c@csgraf.de>
-Date: Tue, 21 May 2024 08:50:22 +0300
+	s=arc-20240116; t=1716272445; c=relaxed/simple;
+	bh=Xh6d491DDdpGmslXz15RAaeZh0mydbiKq45shHXbaTY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:Content-Type:
+	 MIME-Version; b=sbm5sORVLPgi0ZIODmy2O1zTm3uCcz4hyyIO8LkEABkTeC1bloIlZCqRp7/vO/bry3VXfGbLpM5xmqYdaDvjozUpP5fV80H+JMtJq4Xdz9d7flA4BGv3KPbvyexM4RMheLfkSo73HOBZoHxI5Dda2AG0JGmaieDmzqhtKhqXZJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 44L6K43t82253130, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 44L6K43t82253130
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 May 2024 14:20:04 +0800
+Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 21 May 2024 14:20:04 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 21 May 2024 14:20:04 +0800
+Received: from RTEXMBS03.realtek.com.tw ([fe80::b9ff:7c04:a2d:c266]) by
+ RTEXMBS03.realtek.com.tw ([fe80::b9ff:7c04:a2d:c266%2]) with mapi id
+ 15.01.2507.035; Tue, 21 May 2024 14:20:04 +0800
+From: Larry Chiu <larry.chiu@realtek.com>
+To: Justin Lai <justinlai0215@realtek.com>, Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org" <horms@kernel.org>,
+        Ping-Ke Shih <pkshih@realtek.com>
+Subject: RE: [PATCH net-next v19 01/13] rtase: Add pci table supported in this module
+Thread-Topic: [PATCH net-next v19 01/13] rtase: Add pci table supported in
+ this module
+Thread-Index: AQHaqC9Rjgvgl8xidUGsWwGzPtgZ5LGa66SAgAZDQWCAAA0PoA==
+Date: Tue, 21 May 2024 06:20:04 +0000
+Message-ID: <e5d7a77511f746bdb0b38b6174ef5de4@realtek.com>
+References: <20240517075302.7653-1-justinlai0215@realtek.com>
+ <20240517075302.7653-2-justinlai0215@realtek.com>
+ <d840e007-c819-42df-bc71-536328d4f5d7@lunn.ch> 
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: How to implement message forwarding from one CID to another in
- vhost driver
-To: Dorjoy Chowdhury <dorjoychy111@gmail.com>,
- Stefano Garzarella <sgarzare@redhat.com>
-Cc: virtualization@lists.linux.dev, kvm@vger.kernel.org,
- netdev@vger.kernel.org, Alexander Graf <graf@amazon.com>, stefanha@redhat.com
-References: <CAFfO_h7xsn7Gsy7tFZU2UKcg_LCHY3M26iTuSyhFG-k-24h6_g@mail.gmail.com>
- <4i525r6irzjgibqqtrs3qzofqfifws2k3fmzotg37pyurs5wkd@js54ugamyyin>
- <CAFfO_h7iNYc3jrDvnAxTyaGWMxM9YK29DAGYux9s1ve32tuEBw@mail.gmail.com>
-Content-Language: en-US
-From: Alexander Graf <agraf@csgraf.de>
-In-Reply-To: <CAFfO_h7iNYc3jrDvnAxTyaGWMxM9YK29DAGYux9s1ve32tuEBw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-Howdy,
 
-On 20.05.24 14:44, Dorjoy Chowdhury wrote:
-> Hey Stefano,
+>> + *  Below is a simplified block diagram of the chip and its relevant in=
+terfaces.
+>> + *
+>> + *               *************************
+>> + *               *                       *
+>> + *               *  CPU network device   *
+>> + *               *                       *
+>> + *               *   +-------------+     *
+>> + *               *   |  PCIE Host  |     *
+>> + *               ***********++************
+>> + *                          ||
+>> + *                         PCIE
+>> + *                          ||
+>> + *      ********************++**********************
+>> + *      *            | PCIE Endpoint |             *
+>> + *      *            +---------------+             *
+>> + *      *                | GMAC |                  *
+>> + *      *                +--++--+  Realtek         *
+>> + *      *                   ||     RTL90xx Series  *
+>> + *      *                   ||                     *
+>> + *      *     +-------------++----------------+    *
+>> + *      *     |           | MAC |             |    *
+>> + *      *     |           +-----+             |    *
+>> + *      *     |                               |    *
+>> + *      *     |     Ethernet Switch Core      |    *
+>> + *      *     |                               |    *
+>> + *      *     |   +-----+           +-----+   |    *
+>> + *      *     |   | MAC |...........| MAC |   |    *
+>> + *      *     +---+-----+-----------+-----+---+    *
+>> + *      *         | PHY |...........| PHY |        *
+>> + *      *         +--++-+           +--++-+        *
+>> + *      *************||****************||***********
+>> + *
+>> + *  The block of the Realtek RTL90xx series is our entire chip=20
+>> + architecture,
+>> + *  the GMAC is connected to the switch core, and there is no PHY in be=
+tween.
 >
-> Thanks for the reply.
+>Given this architecture, this driver cannot be used unless there is a swit=
+ch driver as well. This driver is nearly ready to be merged. So what are yo=
+ur plans for the switch driver? Do you have a first version you can post? T=
+hat will reassure us you do plan to release a switch driver, and not use a =
+SDK in userspace.
 >
->
-> On Mon, May 20, 2024, 2:55 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
->> Hi Dorjoy,
->>
->> On Sat, May 18, 2024 at 04:17:38PM GMT, Dorjoy Chowdhury wrote:
->>> Hi,
->>>
->>> Hope you are doing well. I am working on adding AWS Nitro Enclave[1]
->>> emulation support in QEMU. Alexander Graf is mentoring me on this work. A v1
->>> patch series has already been posted to the qemu-devel mailing list[2].
->>>
->>> AWS nitro enclaves is an Amazon EC2[3] feature that allows creating isolated
->>> execution environments, called enclaves, from Amazon EC2 instances, which are
->>> used for processing highly sensitive data. Enclaves have no persistent storage
->>> and no external networking. The enclave VMs are based on Firecracker microvm
->>> and have a vhost-vsock device for communication with the parent EC2 instance
->>> that spawned it and a Nitro Secure Module (NSM) device for cryptographic
->>> attestation. The parent instance VM always has CID 3 while the enclave VM gets
->>> a dynamic CID. The enclave VMs can communicate with the parent instance over
->>> various ports to CID 3, for example, the init process inside an enclave sends a
->>> heartbeat to port 9000 upon boot, expecting a heartbeat reply, letting the
->>> parent instance know that the enclave VM has successfully booted.
->>>
->>> The plan is to eventually make the nitro enclave emulation in QEMU standalone
->>> i.e., without needing to run another VM with CID 3 with proper vsock
->> If you don't have to launch another VM, maybe we can avoid vhost-vsock
->> and emulate virtio-vsock in user-space, having complete control over the
->> behavior.
->>
->> So we could use this opportunity to implement virtio-vsock in QEMU [4]
->> or use vhost-user-vsock [5] and customize it somehow.
->> (Note: vhost-user-vsock already supports sibling communication, so maybe
->> with a few modifications it fits your case perfectly)
->>
->> [4] https://gitlab.com/qemu-project/qemu/-/issues/2095
->> [5] https://github.com/rust-vmm/vhost-device/tree/main/vhost-device-vsock
->
->
-> Thanks for letting me know. Right now I don't have a complete picture
-> but I will look into them. Thank you.
->>
->>
->>> communication support. For this to work, one approach could be to teach the
->>> vhost driver in kernel to forward CID 3 messages to another CID N
->> So in this case both CID 3 and N would be assigned to the same QEMU
->> process?
->
->
-> CID N is assigned to the enclave VM. CID 3 was supposed to be the
-> parent VM that spawns the enclave VM (this is how it is in AWS, where
-> an EC2 instance VM spawns the enclave VM from inside it and that
-> parent EC2 instance always has CID 3). But in the QEMU case as we
-> don't want a parent VM (we want to run enclave VMs standalone) we
-> would need to forward the CID 3 messages to host CID. I don't know if
-> it means CID 3 and CID N is assigned to the same QEMU process. Sorry.
+>        Andrew
 
-
-There are 2 use cases here:
-
-1) Enclave wants to treat host as parent (default). In this scenario, 
-the "parent instance" that shows up as CID 3 in the Enclave doesn't 
-really exist. Instead, when the Enclave attempts to talk to CID 3, it 
-should really land on CID 0 (hypervisor). When the hypervisor tries to 
-connect to the Enclave on port X, it should look as if it originates 
-from CID 3, not CID 0.
-
-2) Multiple parent VMs. Think of an actual cloud hosting scenario. Here, 
-we have multiple "parent instances". Each of them thinks it's CID 3. 
-Each can spawn an Enclave that talks to CID 3 and reach the parent. For 
-this case, I think implementing all of virtio-vsock in user space is the 
-best path forward. But in theory, you could also swizzle CIDs to make 
-random "real" CIDs appear as CID 3.
-
-
->
->> Do you have to allocate 2 separate virtio-vsock devices, one for the
->> parent and one for the enclave?
->
->
-> If there is a parent VM, then I guess both parent and enclave VMs need
-> virtio-vsock devices.
->
->>> (set to CID 2 for host) i.e., it patches CID from 3 to N on incoming messages
->>> and from N to 3 on responses. This will enable users of the
->> Will these messages have the VMADDR_FLAG_TO_HOST flag set?
->>
->> We don't support this in vhost-vsock yet, if supporting it helps, we
->> might, but we need to better understand how to avoid security issues, so
->> maybe each device needs to explicitly enable the feature and specify
->> from which CIDs it accepts packets.
->
->
-> I don't know about the flag. So I don't know if it will be set. Sorry.
-
-
- From the guest's point of view, the parent (CID 3) is just another VM. 
-Since Linux as of
-
-  https://patchwork.ozlabs.org/project/netdev/patch/20201204170235.84387-4-andraprs@amazon.com/#2594117
-
-always sets VMADDR_FLAG_TO_HOST when local_CID > 0 && remote_CID > 0, I 
-would say the message has the flag set.
-
-How would you envision the host to implement the flag? Would the host 
-allow user space to listen on any CID and hence receive the respective 
-target connections? And wouldn't listening on CID 0 then mean you're 
-effectively listening to "any" other CID? Thinking about that a bit 
-more, that may be just what we need, yes :)
-
-
->
->
->>> nitro-enclave machine
->>> type in QEMU to run the necessary vsock server/clients in the host machine
->>> (some defaults can be implemented in QEMU as well, for example, sending a reply
->>> to the heartbeat) which will rid them of the cumbersome way of running another
->>> whole VM with CID 3. This way, users of nitro-enclave machine in QEMU, could
->>> potentially also run multiple enclaves with their messages for CID 3 forwarded
->>> to different CIDs which, in QEMU side, could then be specified using a new
->>> machine type option (parent-cid) if implemented. I guess in the QEMU side, this
->>> will be an ioctl call (or some other way) to indicate to the host kernel that
->>> the CID 3 messages need to be forwarded. Does this approach of
->> What if there is already a VM with CID = 3 in the system?
->
->
-> Good question! I don't know what should happen in this case.
-
-
-See case 2 above :). In a nutshell, I don't think it'd be legal to have 
-a real CID 3 in that scenario.
-
-
->
->
->>> forwarding CID 3 messages to another CID sound good?
->> It seems too specific a case, if we can generalize it maybe we could
->> make this change, but we would like to avoid complicating vhost-vsock
->> and keep it as simple as possible to avoid then having to implement
->> firewalls, etc.
->>
->> So first I would see if vhost-user-vsock or the QEMU built-in device is
->> right for this use-case.
-> Thanks you! I will check everything out and reach out if I need
-> further guidance about what needs to be done. And sorry as I wasn't
-> able to answer some of your questions.
-
-
-As mentioned above, I think there is merit for both. I personally care a 
-lot more for case 1 over case 2: We already have a working 
-implementation of Nitro Enclaves in a Cloud setup. What is missing is a 
-way to easily run a Nitro Enclave locally for development.
-
-
-Alex
-
+Hi Andrew,
+This GMAC is configured after the switch is boot-up and does not require a =
+switch driver to work.
 
