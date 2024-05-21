@@ -1,84 +1,103 @@
-Return-Path: <netdev+bounces-97306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 949E18CAAC2
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 11:26:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E83808CAAD7
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 11:34:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FBF5280AA5
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 09:26:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BD431C2180A
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 09:34:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3EC35478B;
-	Tue, 21 May 2024 09:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11FE54BF6;
+	Tue, 21 May 2024 09:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="JFufAA5+"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66CFB50A6E;
-	Tue, 21 May 2024 09:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322AD51C30
+	for <netdev@vger.kernel.org>; Tue, 21 May 2024 09:34:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716283570; cv=none; b=KXfjc2kL4RSUUWGVR0Hu1l/pFbNgPC8N73a6CyQf4Hpl6AanDx7neAmdHf5Eb99xacUVh8S4HJ7Brz68HFFbMrVLV9tX1qyYOVYOQfr/z55GbL/nAvSXGGeYugGU+OhyO66pJQk8Onx0j2VYdoRJiH4lun2YOa0Gcp0NgEABs5M=
+	t=1716284074; cv=none; b=E8osfYEo48fzr46YZWnauQsid+05E7VCErq82PsfrTH1NKFVsX4bPZ4qH7ZlVrCdosn176lsFwJ30N1LZy6BlvvsfXts69mxKx2i8Y2eTwIrnRYtM0/F1waiKGS+BtAD3Gg8NSWnp6x0je43/a4chf/oEogVTWWb8yyr3QTc7VM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716283570; c=relaxed/simple;
-	bh=qp8oBdFsawfuJIIVhfh79qxmfUvb81lWJfUIcUyDsCM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NVR3KxNtmeyKOP2H1nhiLqMjSpUg3u29lCdPRxNyqXOeSjxeQCBt6SucDjGVEdAQUSVI0MeiSlZ/qNgQzx9X6ia2LDP0IezLiRN9IWC7PWl/vM1WQ1rMH/xqe3pFVjx1ZHT8WLUzHHfEJRxmAsmyb6wkLn8n/wdIboiJ5JAhvPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1s9Ljy-0007Zk-GI; Tue, 21 May 2024 11:25:11 +0200
-Date: Tue, 21 May 2024 11:25:02 +0200
-From: Florian Westphal <fw@strlen.de>
-To: ye.xingchen@zte.com.cn
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, corbet@lwn.net, dsahern@kernel.org,
-	ncardwell@google.com, soheil@google.com, haiyangz@microsoft.com,
-	lixiaoyan@google.com, mfreemon@cloudflare.com,
-	david.laight@aculab.com, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	fan.yu9@zte.com.cn, he.peilin@zte.com.cn, xu.xin16@zte.com.cn,
-	yang.yang29@zte.com.cn, yang.guang5@zte.com.cn,
-	zhang.yunkai@zte.com.cn
-Subject: Re: [PATCH net-next v2] icmp: Add icmp_timestamp_ignore_all to
- control ICMP_TIMESTAMP
-Message-ID: <20240521092502.GB2980@breakpoint.cc>
-References: <20240520165335899feIJEvG6iuT4f7FBU6ctk@zte.com.cn>
+	s=arc-20240116; t=1716284074; c=relaxed/simple;
+	bh=ysWv9GoBBUuwfVc7hAmoQucfPyZ8KMUuKGe5XPesY0s=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Jyg4lJpLuhTurJN9FDjf7Ax7NoV3Uiqqvua3RrbFn3DhDMzQ/t0V9qkbLnR+/3yuaztVuUJ+cJRvN5F+FJEvMzNMxT+CxadDR9hgy+hzbGkLe0CMn4eR+O14cuNcu+IT6racRRUlC0tzGnrEcr+EjPc9GIyii2/qHAU2Fj3swg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=JFufAA5+; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=ub6OzTzRGfFGXZBWQpuCvJ8dIqibXht22WVKrr+hdYI=; b=JFufAA5+E7nzvILT7AJTGtklCj
+	E1enJIGj5K7D7KZzn/+Td878JxF4ksXloocwUyy6k4BOg0UZNtytNI2A0NIcqP3qgsUas+63LEPXD
+	WtNQD26gF4/q/sMubLhr87z3pIy70U2KC76fu0cUq58+tGOQEshv3UCewNXonx0Cxf+YfLTpCMN7I
+	vXyI0CFEcVyp6DqFM/fFjT/aVVyEPLda31JaaYzyqOQqA9tbu4IbYC6z74Pc7YoKdbVDBA2NNG8/6
+	v1EA0jhr7nghdFMI1AHTg7aeIzeqohUJfrPmPnEMtnby+WdcLZ4A3pNnkqNVkOyVE5LZEYif3m9GZ
+	fepPlybQ==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1s9Lst-000Oiy-N0; Tue, 21 May 2024 11:34:15 +0200
+Received: from [81.6.34.132] (helo=localhost.localdomain)
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1s9Lst-000D4T-0D;
+	Tue, 21 May 2024 11:34:15 +0200
+Subject: Re: [PATCH net] af_packet: do not call packet_read_pending() from
+ tpacket_destruct_skb()
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Neil Horman <nhorman@tuxdriver.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+References: <20240515163358.4105915-1-edumazet@google.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <88fd86e5-b834-ce88-f396-3759dfa61aff@iogearbox.net>
+Date: Tue, 21 May 2024 11:34:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240520165335899feIJEvG6iuT4f7FBU6ctk@zte.com.cn>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20240515163358.4105915-1-edumazet@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27282/Tue May 21 10:30:22 2024)
 
-ye.xingchen@zte.com.cn <ye.xingchen@zte.com.cn> wrote:
-> From: YeXingchen <ye.xingchen@zte.com.cn>
+On 5/15/24 6:33 PM, Eric Dumazet wrote:
+> trafgen performance considerably sank on hosts with many cores
+> after the blamed commit.
 > 
-> The CVE-1999-0524 vulnerability is associated with ICMP
-> timestamp messages, which can be exploited to conduct 
-> a denial-of-service (DoS) attack. In the Vulnerability
-> Priority Rating (VPR) system, this vulnerability was 
-> rated as a medium risk in May of this year.
-> Link:https://www.tenable.com/plugins/nessus/10113
+> packet_read_pending() is very expensive, and calling it
+> in af_packet fast path defeats Daniel intent in commit
+> b013840810c2 ("packet: use percpu mmap tx frame pending refcount")
+> 
+> tpacket_destruct_skb() makes room for one packet, we can immediately
+> wakeup a producer, no need to completely drain the tx ring.
+> 
+> Fixes: 89ed5b519004 ("af_packet: Block execution of tasks waiting for transmit to complete in AF_PACKET")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Neil Horman <nhorman@tuxdriver.com>
+> Cc: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 
-Please explain at least one scenario where this is a problem.
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
 
-AFAICS there is none and Linux is not affected by this.
-
-> To protect embedded systems that cannot run firewalls
-> from attacks exploiting the CVE-1999-0524 vulnerability,
-> the icmp_timestamp_ignore_all sysctl is offered as
-
-If there is an actual problem, then this should be on by default
-or the entire feature should be removed.
-
-But I don't think there is a problem in the first place.
+Thanks Eric!
 
