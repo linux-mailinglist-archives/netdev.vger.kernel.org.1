@@ -1,84 +1,98 @@
-Return-Path: <netdev+bounces-97359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFBDD8CB00D
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 16:08:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 94C888CB057
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 16:24:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A94542838A9
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 14:08:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23B45281593
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 14:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB617F7CE;
-	Tue, 21 May 2024 14:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7A8212FF7B;
+	Tue, 21 May 2024 14:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ngBK63Z3"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RCIW0InT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9257F7C8
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 14:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2B812FB35;
+	Tue, 21 May 2024 14:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716300486; cv=none; b=Gn23riOf1C00IGwG5k66Ct8KE1L1LVOSi2yRaLwTRnlKo6ghRiH/rzuqWno+cnTOG9uMds5UDRIfyvcAYyBAbnUco1WobqLrF64H3mXLuYl8141uYb6LHIoAU2/b4iAE1xZiZ2A4kU4JPU4TIGwqDz3XVTdMU3bTx228vhCG0R8=
+	t=1716301445; cv=none; b=gmO2/XMgSDHxE59VlTw31z5ERMNEnXRpHoRV2sbau+W0n74ERh1vhpg5a2j6ok1OL+YJp7UB+0kSUFPNCE6UME1sPBHA28NwNUuq8piPr0D+nOJ21F34q9Xll3pRBu1qQ0JRQqdZGztTVEhrpAolRhKOge0+ixDuMWC4bggIO+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716300486; c=relaxed/simple;
-	bh=rKYukvrI5TbGiEI6itS2BS5Fa/jpJmyU1H2tO7zeKd4=;
+	s=arc-20240116; t=1716301445; c=relaxed/simple;
+	bh=Ufb8V9EXfBATCWAkkaDHd9SSjQcvqH4KeGWG5MbMraM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hPGUH6kpb1h0VL8oNl71TsBsDU8T5IbESRwyWpetsLQHy9qfYD5tyn40DZpTngmDPcYuk/h2S6/qfhsVAFBJdi70ILwGYCcY9+JzF0ilfOyLjrW+crcvQb3DFM9ra3+6G/83RHFS8t9Re3Wgh/H+sqd0Jt1zTAERjW+YZ0o49Ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ngBK63Z3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFD99C32786;
-	Tue, 21 May 2024 14:08:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716300485;
-	bh=rKYukvrI5TbGiEI6itS2BS5Fa/jpJmyU1H2tO7zeKd4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ngBK63Z3Ail2UgiJU3h+fvXxDm20KzVjjj/PTMgBAcqUykNv6IMP74oGVznicnry+
-	 2SoKUtci3kApVsD81ryE6Ap9EvfFyWyHZPIHPTnbCF9NynI0B804yoaXKj0zUnMaR0
-	 t4EC18c9rqb4Age+CKalYi3NmsFvg7L/i96I4R4y5/5c74pYdGTAaQlHa/BcN5HOBP
-	 5PXnkIVv5F1+zzyosWIlp87gbSw6wD55a8IbbpQ85660AROvY3xXpaxEAE31HBQ60d
-	 mCGKf2YTaiK9SafuqSN1It6Li2669UEwf3B6LivuXAtry7XXsRA4vA/Do+ksldpzpN
-	 HdKncLk4qaNqg==
-Date: Tue, 21 May 2024 15:06:31 +0100
-From: Simon Horman <horms@kernel.org>
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, brett.creeley@amd.com,
-	drivers@pensando.io
-Subject: Re: [PATCH net 0/7] ionic: small fixes for 6.10
-Message-ID: <20240521140631.GF764145@kernel.org>
-References: <20240521013715.12098-1-shannon.nelson@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LS8c6Y6r/rG+Jc6UaZJsIe3/XCr3pOiFM5o+5bvgQUFtpSDOd/rOWPw+I0Ni4hUd7kFIEikGIWvHyjavA3taz1s2Y6DVk53HrbfZrf6DkZwuTCWd4eD7ab2Tqb4M3rsToe8AfJkfTnnJt5yNZKFqc9kDC3rD0I4mdZEpNzCK11M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RCIW0InT; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=Tbk+wAckI7ORsUezlOoBQgzIj7S/QOcUIP0Sm5u3+ZQ=; b=RCIW0InT9c6CkHpwaXWKUslILM
+	wfV9AWbKMedHc/FwlBmxyT8cdpp7PLtOn9mWgY4CASuTe5E6GH3InTKuzibwwV9cu8g0UXm3csKcY
+	jJoihHKXsjC3/Aio3Ana0S6Idpg+43QklOI9jd6SGwkDjLzPXWqs5edFmkSyVSyHm5rQBqxsSUkl8
+	js2TFxYLQG+/BPTuZEqhT8MK83kMuLTJfrsX4NR+QATb9X4UdG8Pk7vzKlqqHllilH363uhQR4y/F
+	A01rvslh3xmh0Hb6pPHDkr5hWgflcM1P9NKVFVYt9n2DF+cr6+frnNETe5mGgJ1uOV7PkoRCmYgmX
+	38kGJr2g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s9QPL-00000000AG1-0CtD;
+	Tue, 21 May 2024 14:24:03 +0000
+Date: Tue, 21 May 2024 07:24:03 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: =?iso-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>
+Cc: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
+	Allison Henderson <allison.henderson@oracle.com>,
+	Manjunath Patil <manjunath.b.patil@oracle.com>,
+	Mark Zhang <markzhang@nvidia.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Shiraz Saleem <shiraz.saleem@intel.com>,
+	Yang Li <yang.lee@linux.alibaba.com>
+Subject: Re: [PATCH v2 0/6] rds: rdma: Add ability to force GFP_NOIO
+Message-ID: <Zkyug8ZQP_4ULAeA@infradead.org>
+References: <20240515125342.1069999-1-haakon.bugge@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240521013715.12098-1-shannon.nelson@amd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240515125342.1069999-1-haakon.bugge@oracle.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, May 20, 2024 at 06:37:08PM -0700, Shannon Nelson wrote:
-> These are a few minor fixes for the ionic driver to clean
-> up a some little things that have been waiting for attention.
+On Wed, May 15, 2024 at 02:53:36PM +0200, Håkon Bugge wrote:
+> This series enables RDS and the RDMA stack to be used as a block I/O
+> device. This to support a filesystem on top of a raw block device
+> which uses RDS and the RDMA stack as the network transport layer.
 > 
-> Brett Creeley (3):
->   ionic: Pass ionic_txq_desc to ionic_tx_tso_post
->   ionic: Mark error paths in the data path as unlikely
->   ionic: Use netdev_name() function instead of netdev->name
-> 
-> Shannon Nelson (4):
->   ionic: fix potential irq name truncation
->   ionic: Reset LIF device while restarting LIF
->   ionic: only sync frag_len in first buffer of xdp
->   ionic: fix up ionic_if.h kernel-doc issues
+> Under intense memory pressure, we get memory reclaims. Assume the
+> filesystem reclaims memory, goes to the raw block device, which calls
+> into RDS, which calls the RDMA stack. Now, if regular GFP_KERNEL
+> allocations in RDS or the RDMA stack require reclaims to be fulfilled,
+> we end up in a circular dependency.
 
-Hi Shannon and Brett,
+Use of network block devices or file systems from the local system
+simply isn't supported in the Linux reclaim hierchary.  Trying to
+hack in through module options for code you haven't even submitted
+is a complete nogo.
 
-All of these patches look like good improvements to me.
-However, it is only obvious to me why patch 2/7 is a bug fix
-suitable for net. Would the other patches be better targeted
-at net-next once it reopens?
+NAK.
+
 
