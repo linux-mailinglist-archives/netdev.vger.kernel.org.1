@@ -1,169 +1,320 @@
-Return-Path: <netdev+bounces-97292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B23CE8CA900
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 09:34:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FB0E8CA916
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 09:38:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D81C282368
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 07:34:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 730D11C210C7
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 07:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F1D50A75;
-	Tue, 21 May 2024 07:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF0F50A6E;
+	Tue, 21 May 2024 07:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2/Sh7kKk";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FUX4KBuy";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2/Sh7kKk";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FUX4KBuy"
+	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="AY0ceuEV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABCA54F5FE
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 07:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE6C256A
+	for <netdev@vger.kernel.org>; Tue, 21 May 2024 07:38:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716276886; cv=none; b=XOm65LyrDMPOR6mC2USTGuHiVfCar8q/j3nd7/o1lJe8QAyBHHat6VaoUpkbJhJzWnVzIXlgLuk5oyLtvTPTbNXf73wU+aDOe/6o2djELRxZmDIKFjkVWgJkgBUjQnYreiPxKw4owG3VQk9iDqkndXQK9jWDjJNbBqwJzlfOJlI=
+	t=1716277098; cv=none; b=IE6Ifag/QOo5pEIuCrz3YWNmdvymLTE7vfLJbMKsVZXt44Lvti0OS7z+J+f0ITBQdR4LkpYMa4sBxQ/zlcLyXCrmzS9+XR+3gUfZthsOjZh9yCQCtq7kS6+uGMvYcwYB0p3QFUFglLtdJJ84O69J9u7RwViRQhXPPlDh9aS+NGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716276886; c=relaxed/simple;
-	bh=L/FHNnC4gijZUaqKQIUp9M5ESip42784NINWVVrAcsU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GU2FoVEgKeakzJmomAJxvdX5i5qB2M6FXVBhnG54bbTP9O8KhY3S0DSCpeX+aY0OB2erY6Rdl2uYl0CjjW9LAwKZ3vvR06gsYFqiNqsPmEf3mmA2JXorEgsjpUClyCT2JS6g6UeA6zFRwAVrCeWEytzw6DMqkpcjvlcTZfa+QKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2/Sh7kKk; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FUX4KBuy; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2/Sh7kKk; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FUX4KBuy; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.100.225.114])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id E479A34599;
-	Tue, 21 May 2024 07:34:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1716276882; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3m1uQFJVMaYLH3NnqWlp5hAisJoP7dugO5mR2Bi13tk=;
-	b=2/Sh7kKkMVQor4F+Wj/yoYIYutFVb/2HbH1rYX9cMTkAtwYrmHJe2004Inf9Er9a9h7vWF
-	0UJKdfk1EEjzgIk31qimYn3iuADqPx/HIj9Jq7oT1hNbPXcZZq+dfncWHbWNYJ6G/QMLxx
-	LnQ9494YiL2CnxtoC0VWcCbBcjZyiTw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1716276882;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3m1uQFJVMaYLH3NnqWlp5hAisJoP7dugO5mR2Bi13tk=;
-	b=FUX4KBuym1aOmJN1OSZIGy9orh8xM5PRxarNlZkTyrfQPbFDrhh3eXkiEa2hVBfey6dHqL
-	aapST2ojtdtWJpBg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1716276882; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3m1uQFJVMaYLH3NnqWlp5hAisJoP7dugO5mR2Bi13tk=;
-	b=2/Sh7kKkMVQor4F+Wj/yoYIYutFVb/2HbH1rYX9cMTkAtwYrmHJe2004Inf9Er9a9h7vWF
-	0UJKdfk1EEjzgIk31qimYn3iuADqPx/HIj9Jq7oT1hNbPXcZZq+dfncWHbWNYJ6G/QMLxx
-	LnQ9494YiL2CnxtoC0VWcCbBcjZyiTw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1716276882;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3m1uQFJVMaYLH3NnqWlp5hAisJoP7dugO5mR2Bi13tk=;
-	b=FUX4KBuym1aOmJN1OSZIGy9orh8xM5PRxarNlZkTyrfQPbFDrhh3eXkiEa2hVBfey6dHqL
-	aapST2ojtdtWJpBg==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id C9F8720131; Tue, 21 May 2024 09:34:42 +0200 (CEST)
-Date: Tue, 21 May 2024 09:34:42 +0200
-From: Michal Kubecek <mkubecek@suse.cz>
-To: Krzysztof =?utf-8?Q?Ol=C4=99dzki?= <ole@ans.pl>
-Cc: Moshe Shemesh <moshe@nvidia.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: "netlink error: Invalid argument" with ethtool-5.13+ on recent
- kernels due to "ethtool: Add netlink handler for getmodule (-m)" -
- 25b64c66f58d3df0ad7272dda91c3ab06fe7a303, also no SFP-DOM support via
- netlink?
-Message-ID: <7nz6fvq6aaclh3xoazgqzw3kzc7vgmsufzyu4slsqhjht7dlpl@qyu63otcswga>
-References: <9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl>
- <apfg6yonp66gp4z6sdzrfin7tdyctfomhahhitqmcipuxkewpw@gmr5xlybvfsf>
- <31f6f39b-f7f3-46cc-8c0d-1dbcc69c3254@ans.pl>
+	s=arc-20240116; t=1716277098; c=relaxed/simple;
+	bh=FwIRMnyUp5kd3NuY0l6H6P957sNYMECc/Afd4x7jI0g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OkN5k9kcVJYaKeDJd7FmGmmviJtbyNOGGIZqlsCBugdHFEBiQ2Ffif/C69XvLbSRVFhfIvzoFyuMsCE5kxyTHW7G397hcMLezLRTYEqNH6JX2fy1O9dQYcQk3Mb/dO5SrGOng4+hZRiDfTI4q9V9AzA4Pzh6ha3OZ2vGxXidDt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=AY0ceuEV; arc=none smtp.client-ip=217.79.154.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
+X-Virus-Scanned: amavisd-new at emenem.pl
+Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
+	(authenticated bits=0)
+	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 44L7c4eQ002808
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 21 May 2024 09:38:05 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
+	t=1716277086; bh=t7UpYBHGY7Wq8MymFqkl3bxG72ubJEcZ5cnXZlniOqY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=AY0ceuEVEOWWqHxQVu8SkB3v12Em0yrqv4IzZ1GfDJPEnJMgD+TtrOc2wigi6LRXl
+	 JAzZ905227BqZd+YaZAfMD0DHvgnKoOu5e+H+gGHZj/kYhgIHdQDTbpyMFElLFKewe
+	 m56ZNlayXi+LxIcOV4xplq3/KiVuR4k3sZ0968pU=
+Message-ID: <3d6364f3-a5c6-4c96-b958-0036da349754@ans.pl>
+Date: Tue, 21 May 2024 00:38:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ipmpfv42kj4e7pvb"
-Content-Disposition: inline
-In-Reply-To: <31f6f39b-f7f3-46cc-8c0d-1dbcc69c3254@ans.pl>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.34 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SIGNED_PGP(-2.00)[];
-	LONG_SUBJ(1.56)[208];
-	SUBJECT_ENDS_QUESTION(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_ONE(0.00)[1];
-	TO_DN_SOME(0.00)[]
-X-Spam-Score: -3.34
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: "netlink error: Invalid argument" with ethtool-5.13+ on recent
+ kernels due to "ethtool: Add netlink handler for getmodule (-m)" -
+ 25b64c66f58d3df0ad7272dda91c3ab06fe7a303, also no SFP-DOM support via
+ netlink?
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: Moshe Shemesh <moshe@nvidia.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl>
+ <apfg6yonp66gp4z6sdzrfin7tdyctfomhahhitqmcipuxkewpw@gmr5xlybvfsf>
+ <31f6f39b-f7f3-46cc-8c0d-1dbcc69c3254@ans.pl>
+ <7nz6fvq6aaclh3xoazgqzw3kzc7vgmsufzyu4slsqhjht7dlpl@qyu63otcswga>
+From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
+Content-Language: en-US
+In-Reply-To: <7nz6fvq6aaclh3xoazgqzw3kzc7vgmsufzyu4slsqhjht7dlpl@qyu63otcswga>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+On 21.05.2024 at 00:34, Michal Kubecek wrote:
+> On Tue, May 21, 2024 at 12:02:47AM -0700, Krzysztof Olędzki wrote:
+>> # ./ethtool  --version
+>> ethtool version 6.7
+>>
+>> # ./ethtool --debug 3 -m eth3
+> [...]
+>> sending genetlink packet (76 bytes):
+>>     msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
+>> received genetlink packet (96 bytes):
+>>     msg length 96 error errno=-22
+>> netlink error: Invalid argument
+> 
+> Can you do it with "--debug 0x12" or "--debug 0x1e"? It would tell us
+> which request failed and that might give some hint where does this
+> EINVAL come from.
+
+Sure,
+
+# ./ethtool --debug 0x12 -m eth3
+sending genetlink packet (32 bytes):
+    msg length 32 genl-ctrl
+    CTRL_CMD_GETFAMILY
+        CTRL_ATTR_FAMILY_NAME = "ethtool"
+received genetlink packet (956 bytes):
+    msg length 956 genl-ctrl
+    CTRL_CMD_NEWFAMILY
+        CTRL_ATTR_FAMILY_NAME = "ethtool"
+        CTRL_ATTR_FAMILY_ID = 21
+        CTRL_ATTR_VERSION = 1
+        CTRL_ATTR_HDRSIZE = 0
+        CTRL_ATTR_MAXATTR = 0
+        CTRL_ATTR_OPS
+            [1]
+                CTRL_ATTR_OP_ID = 1
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [2]
+                CTRL_ATTR_OP_ID = 2
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [3]
+                CTRL_ATTR_OP_ID = 3
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [4]
+                CTRL_ATTR_OP_ID = 4
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [5]
+                CTRL_ATTR_OP_ID = 5
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [6]
+                CTRL_ATTR_OP_ID = 6
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [7]
+                CTRL_ATTR_OP_ID = 7
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [8]
+                CTRL_ATTR_OP_ID = 8
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [9]
+                CTRL_ATTR_OP_ID = 9
+                CTRL_ATTR_OP_FLAGS = 0x0000001e
+            [10]
+                CTRL_ATTR_OP_ID = 10
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [11]
+                CTRL_ATTR_OP_ID = 11
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [12]
+                CTRL_ATTR_OP_ID = 12
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [13]
+                CTRL_ATTR_OP_ID = 13
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [14]
+                CTRL_ATTR_OP_ID = 14
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [15]
+                CTRL_ATTR_OP_ID = 15
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [16]
+                CTRL_ATTR_OP_ID = 16
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [17]
+                CTRL_ATTR_OP_ID = 17
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [18]
+                CTRL_ATTR_OP_ID = 18
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [19]
+                CTRL_ATTR_OP_ID = 19
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [20]
+                CTRL_ATTR_OP_ID = 20
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [21]
+                CTRL_ATTR_OP_ID = 21
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [22]
+                CTRL_ATTR_OP_ID = 22
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [23]
+                CTRL_ATTR_OP_ID = 23
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [24]
+                CTRL_ATTR_OP_ID = 24
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [25]
+                CTRL_ATTR_OP_ID = 25
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [26]
+                CTRL_ATTR_OP_ID = 26
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [27]
+                CTRL_ATTR_OP_ID = 27
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [28]
+                CTRL_ATTR_OP_ID = 28
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [29]
+                CTRL_ATTR_OP_ID = 29
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [30]
+                CTRL_ATTR_OP_ID = 30
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [31]
+                CTRL_ATTR_OP_ID = 31
+                CTRL_ATTR_OP_FLAGS = 0x0000001e
+            [32]
+                CTRL_ATTR_OP_ID = 32
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [33]
+                CTRL_ATTR_OP_ID = 33
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [34]
+                CTRL_ATTR_OP_ID = 34
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [35]
+                CTRL_ATTR_OP_ID = 35
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [36]
+                CTRL_ATTR_OP_ID = 36
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [37]
+                CTRL_ATTR_OP_ID = 37
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [38]
+                CTRL_ATTR_OP_ID = 38
+                CTRL_ATTR_OP_FLAGS = 0x0000000a
+            [39]
+                CTRL_ATTR_OP_ID = 39
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [40]
+                CTRL_ATTR_OP_ID = 40
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+            [41]
+                CTRL_ATTR_OP_ID = 41
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [42]
+                CTRL_ATTR_OP_ID = 42
+                CTRL_ATTR_OP_FLAGS = 0x0000000e
+            [43]
+                CTRL_ATTR_OP_ID = 43
+                CTRL_ATTR_OP_FLAGS = 0x0000001a
+        CTRL_ATTR_MCAST_GROUPS
+            [1]
+                CTRL_ATTR_MCAST_GRP_ID = 5
+                CTRL_ATTR_MCAST_GRP_NAME = "monitor"
+received genetlink packet (36 bytes):
+    msg length 36 error errno=0
+sending genetlink packet (76 bytes):
+    msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
+    ETHTOOL_MSG_MODULE_EEPROM_GET
+        ETHTOOL_A_MODULE_EEPROM_HEADER
+            ETHTOOL_A_HEADER_DEV_NAME = "eth3"
+        ETHTOOL_A_MODULE_EEPROM_LENGTH = 128
+        ETHTOOL_A_MODULE_EEPROM_OFFSET = 0
+        ETHTOOL_A_MODULE_EEPROM_PAGE = 0
+        ETHTOOL_A_MODULE_EEPROM_BANK = 0
+        ETHTOOL_A_MODULE_EEPROM_I2C_ADDRESS = 80
+received genetlink packet (176 bytes):
+    msg length 176 ethool ETHTOOL_MSG_MODULE_EEPROM_GET_REPLY
+    ETHTOOL_MSG_MODULE_EEPROM_GET_REPLY
+        ETHTOOL_A_MODULE_EEPROM_HEADER
+            ETHTOOL_A_HEADER_DEV_INDEX = 7
+            ETHTOOL_A_HEADER_DEV_NAME = "eth3"
+        ETHTOOL_A_MODULE_EEPROM_DATA =
+            0d 00 02 00  00 00 00 00  00 05 00 00  00 00 00 00
+            00 00 00 00  00 00 27 71  00 00 80 0e  00 00 00 00
+            00 00 16 48  00 00 00 00  00 00 0c f1  00 00 00 00
+            00 00 1f 93  00 00 00 00  00 00 00 00  00 00 00 00
+            00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00
+            00 00 00 00  00 00 00 00  00 00 00 00  00 03 00 00
+            00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 00
+            00 00 00 00  00 03 01 00  00 00 00 00  00 00 00 00
+received genetlink packet (36 bytes):
+    msg length 36 error errno=0
+sending genetlink packet (76 bytes):
+    msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
+    ETHTOOL_MSG_MODULE_EEPROM_GET
+        ETHTOOL_A_MODULE_EEPROM_HEADER
+            ETHTOOL_A_HEADER_DEV_NAME = "eth3"
+        ETHTOOL_A_MODULE_EEPROM_LENGTH = 128
+        ETHTOOL_A_MODULE_EEPROM_OFFSET = 128
+        ETHTOOL_A_MODULE_EEPROM_PAGE = 0
+        ETHTOOL_A_MODULE_EEPROM_BANK = 0
+        ETHTOOL_A_MODULE_EEPROM_I2C_ADDRESS = 80
+received genetlink packet (176 bytes):
+    msg length 176 ethool ETHTOOL_MSG_MODULE_EEPROM_GET_REPLY
+    ETHTOOL_MSG_MODULE_EEPROM_GET_REPLY
+        ETHTOOL_A_MODULE_EEPROM_HEADER
+            ETHTOOL_A_HEADER_DEV_INDEX = 7
+            ETHTOOL_A_HEADER_DEV_NAME = "eth3"
+        ETHTOOL_A_MODULE_EEPROM_DATA =
+            0d 00 0c 00  00 30 00 00  00 00 00 01  00 00 00 00
+            00 00 00 00  41 56 41 47  4f 20 20 20  20 20 20 20
+            20 20 20 20  00 00 17 6a  33 33 32 2d  30 30 33 33
+            35 20 20 20  20 20 20 20  41 30 42 68  07 d0 46 71
+            00 00 0f de  51 44 32 35  31 33 37 30  20 20 20 20
+            20 20 20 20  31 33 30 36  32 31 20 20  08 00 00 29
+            00 4e 54 41  50 03 3b 06  00 3b 06 00  3b 06 00 00
+            00 00 00 00  00 00 00 00  00 00 00 00  00 00 00 f9
+received genetlink packet (36 bytes):
+    msg length 36 error errno=0
+sending genetlink packet (76 bytes):
+    msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
+    ETHTOOL_MSG_MODULE_EEPROM_GET
+        ETHTOOL_A_MODULE_EEPROM_HEADER
+            ETHTOOL_A_HEADER_DEV_NAME = "eth3"
+        ETHTOOL_A_MODULE_EEPROM_LENGTH = 128
+        ETHTOOL_A_MODULE_EEPROM_OFFSET = 128
+        ETHTOOL_A_MODULE_EEPROM_PAGE = 3
+        ETHTOOL_A_MODULE_EEPROM_BANK = 0
+        ETHTOOL_A_MODULE_EEPROM_I2C_ADDRESS = 80
+received genetlink packet (96 bytes):
+    msg length 96 error errno=-22
+netlink error: Invalid argument
+offending message:
+    ETHTOOL_MSG_MODULE_EEPROM_GET
+        ETHTOOL_A_MODULE_EEPROM_HEADER
+            ETHTOOL_A_HEADER_DEV_NAME = "eth3"
+        ETHTOOL_A_MODULE_EEPROM_LENGTH = 128
+        ETHTOOL_A_MODULE_EEPROM_OFFSET = 128
+        ETHTOOL_A_MODULE_EEPROM_PAGE = 3
+        ETHTOOL_A_MODULE_EEPROM_BANK = 0
+        ETHTOOL_A_MODULE_EEPROM_I2C_ADDRESS = 80
 
 
---ipmpfv42kj4e7pvb
-Content-Type: text/plain; charset=iso-8859-2
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Krzysztof
 
-On Tue, May 21, 2024 at 12:02:47AM -0700, Krzysztof Ol=EAdzki wrote:
-> # ./ethtool  --version
-> ethtool version 6.7
->=20
-> # ./ethtool --debug 3 -m eth3
-[...]
-> sending genetlink packet (76 bytes):
->     msg length 76 ethool ETHTOOL_MSG_MODULE_EEPROM_GET
-> received genetlink packet (96 bytes):
->     msg length 96 error errno=3D-22
-> netlink error: Invalid argument
-
-Can you do it with "--debug 0x12" or "--debug 0x1e"? It would tell us
-which request failed and that might give some hint where does this
-EINVAL come from.
-
-Michal
-
-
---ipmpfv42kj4e7pvb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmZMTo4ACgkQ538sG/LR
-dpWCZAgAo4S9Kyg909yU4mzWC3hiJj+qAnQN83X6UJLhV6R7uLfiWKqqz5xZ6ZtT
-9uaPHy6UXhgUywAJ7Rf76eYFcENy/+xtPEEcbGLJROl6eyRpmjmMd+SSoeWRfMnC
-RnUp9Eg4m6AV6LiEqcC0RScIJoOQsQfg6Evwh8VdTae1J3yhh5M36k/ngje3l1Yc
-YUNq8fjTBXzO+OIylVlyrRt3+9t3vCjmc76KvaM1azwHI6XYcSNcLKosG3cY4crE
-8rddLIevwFTdlq6uiAZTzQrhJOsiiIGiogWm/wZhkhxN/rj+IsJmIQJtS3J0ij7P
-uND/yefF5MtpGR8Qb5nnMaM0UVgK8A==
-=Thbn
------END PGP SIGNATURE-----
-
---ipmpfv42kj4e7pvb--
 
