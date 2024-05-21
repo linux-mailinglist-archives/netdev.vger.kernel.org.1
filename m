@@ -1,131 +1,184 @@
-Return-Path: <netdev+bounces-97367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A74828CB178
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 17:36:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB5E8CB186
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 17:39:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62A5128176B
-	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 15:36:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A1AB1F22A4C
+	for <lists+netdev@lfdr.de>; Tue, 21 May 2024 15:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB40144D36;
-	Tue, 21 May 2024 15:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63ED146A97;
+	Tue, 21 May 2024 15:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ItcG5UDS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KwITdQ4g"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36040144D16
-	for <netdev@vger.kernel.org>; Tue, 21 May 2024 15:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDAF0446B4;
+	Tue, 21 May 2024 15:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716305711; cv=none; b=dl6Y4agPWDTtpdlRJqM0SfrIYbFAwRhbxCy50SI04c6AndW4WJiY1SmqLVoomvvDH3gR6wMl8tJFtsUSDhgN7yoptoP2pVFQxZ/qYqafRRDy2+UNxMCE7bgMcyXG5Ma3a9DjjUy6v2LkfTkANMajuW4ZNx/n+zW0ib1MDX0kEZc=
+	t=1716305947; cv=none; b=ZBLlZ4aug7YL+0Za06gp37+qKGPV1+DEvCXLi4CBE9NRHNBQiAs5j+ssiiFE1I69DZ80sLhMF9HvzLNvpQpEK192+QFvoQbKOhNsJox0lDlj8uiQ8iBF2cpQF1ZqWx+BpwdFmoQrK7IQXmvfeZTxxIaakiMaVt4KO8a3hv9Ay3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716305711; c=relaxed/simple;
-	bh=yNK90+Fu3/Egv6BUzfR2b4UhSJudcMdn2qAYCS/ruB0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WEJeDT09qEdc7yLoTd2yOwwXe3aB0i/SBZFTrQaGHtOQxJFNH+HoQriP1sjJYVQuzKuPGT3RExThFdq3fdzPWbFhn0cJF6hPLEyzkk0VKHhxAgnCn/I9IAeidDw7q2koP8CEnHSp7/FugogZ9kjRWqAO8+IixBVhWrgN4I2sH48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ItcG5UDS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716305709;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=dhL1Q+jWnYDABNtKHJSo7WSr7N/mSKlyJQWOyp5Mr2I=;
-	b=ItcG5UDSx+rE26ZZtec08EfjD6dZ73qx9Zux+fds6ZDdtQeCB9M3LXKkAX8m0DtP6tQXb+
-	bxvMFj1dOhxwcAQTnFKmMVXRev2WigkXnfKTyPiBeogfPOU2rv4iD6kkaxoERxewDOrRZZ
-	kffj09+RlrapifyFGTrCszWBKZVlrSQ=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-381-EAR_zu1OPjiATrZTrRr3TQ-1; Tue, 21 May 2024 11:35:07 -0400
-X-MC-Unique: EAR_zu1OPjiATrZTrRr3TQ-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2b4330e57b6so12740412a91.2
-        for <netdev@vger.kernel.org>; Tue, 21 May 2024 08:35:07 -0700 (PDT)
+	s=arc-20240116; t=1716305947; c=relaxed/simple;
+	bh=SaoDykVHDT1haqx/gobymWgMMDw49xu2u/ehUnA457s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IAzxM2hx7LY3UirLuYNC7fWFW0OkhRtzcTOKOGq33qcHXJAb1DEdXERBFuW/+I4XOYXJFUbRbNOvY+As0SktBc2pblptmi+2I4t5OMryVu3y6kjl3l7/y0FTtXCnpiG7c4n0k05SVChQLXvRuJaDKy3JOorKBUtFRbt0MNWGXlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KwITdQ4g; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2e1fa824504so50413911fa.0;
+        Tue, 21 May 2024 08:39:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716305944; x=1716910744; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Re8Wl04dqGPF7qQ9KzoZRZT9kKy3SUlswFv2Sj3Vy1Q=;
+        b=KwITdQ4gtEzQKyC1uafxOdr/5QHc9+PBSIHoFNJwmcXyy3Ply8NLEWh/dhiiL9ylYb
+         GH3CSQtelaFDz3GYZvpmBv038A/F+AVEBdPfgo3QSTG2vhkqzpC7WlVeYNV/G8vrcNgk
+         Wfucfb/w00TNrKgMch1M5+3j9M6xGI5rh3tEmo8zijDhgchA9RJ30ZbU48qQDKwysNSm
+         OkWmapsKz1M4keo7ACeW84qFcU0QZU5yyN+Ju2fS90rXMKgt5UaY3kC083dNiZ8bsEEv
+         B9RCuxEiMLMwJ7hDLtNFxMuVDiXkpTbDiRyaG1qCoWkwmJ5NhMzEfwWRyOH7sZRlkf7G
+         9DiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716305706; x=1716910506;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dhL1Q+jWnYDABNtKHJSo7WSr7N/mSKlyJQWOyp5Mr2I=;
-        b=DhfQ/wKrR8OZT54JG3DSgrbB4t40xhrpNRWDX1ujGq/xkOaq4q1gFBMjHK3nkJWwld
-         PW7EFWhg0BaHRiufv0U2GpSa0ZPqi8LIx9a2xwNRuD4SIY0nsiY7jhNioo6fcCnMgGAq
-         vtqPvCx2o65tHKmya+5HqXIjezYxroMSEvKvTqVou1fmFQiMf384AmCnSRPq53FjHhSk
-         t0EhdwmAT/sLZjV1vpabdMOnoVwwb91bufHwPw+cF5sf8WFlAj8JhA9SiQKfNmv71da+
-         dkHP+qKDBnVO84OTLvtWR6N6/fro0xfHOW+DFWvxmF9EQAQM9udASw0qGsvRn9VSJvDy
-         2udQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW+vRzoGK2R05MY6J49CcWJMIoFA1k+7TzL8dxqmXibiuOP3tJ+At0W636PmjNCMVbQ9HfHVFdTLRtDHE88PeKO6dMyfIGT
-X-Gm-Message-State: AOJu0YxkH6J56vaMs8oY94EmaXYrX+BgBNsMUvxBNUnVlexSvZIF3bo1
-	b1OZ4ZdWmXMzRUVtj4InQkuU3nO70TRI4oCosprXER6SL4iaptGP/Rv1uGwn66LvZNI6j5xQUaj
-	SkJ/qYg0ewp1MEEcUWpHoDbBH2XF5lhflN4t4yfOMVsipS1X7x9axaw==
-X-Received: by 2002:a17:90a:17ef:b0:2b6:ab87:5434 with SMTP id 98e67ed59e1d1-2b6ccd9ec2amr34415232a91.35.1716305706571;
-        Tue, 21 May 2024 08:35:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG0tskduGSJKFC3yV7n4L+QWe03s7d30NZ0FNcJ84NxEFgxCHGmSxbxr/In+XYHJkoDv0vXpw==
-X-Received: by 2002:a17:90a:17ef:b0:2b6:ab87:5434 with SMTP id 98e67ed59e1d1-2b6ccd9ec2amr34415189a91.35.1716305705973;
-        Tue, 21 May 2024 08:35:05 -0700 (PDT)
-Received: from zeus.elecom ([240b:10:83a2:bd00:6e35:f2f5:2e21:ae3a])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b67158c30bsm21819678a91.39.2024.05.21.08.35.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 May 2024 08:35:05 -0700 (PDT)
-From: Ryosuke Yasuoka <ryasuoka@redhat.com>
-To: krzk@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: Ryosuke Yasuoka <ryasuoka@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syoshida@redhat.com
-Subject: [PATCH net v3] nfc: nci: Fix handling of zero-length payload packets in nci_rx_work()
-Date: Wed, 22 May 2024 00:34:42 +0900
-Message-ID: <20240521153444.535399-1-ryasuoka@redhat.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1716305944; x=1716910744;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Re8Wl04dqGPF7qQ9KzoZRZT9kKy3SUlswFv2Sj3Vy1Q=;
+        b=NaACMrIZG1kIy+CP/G2rahlebpYGvVSI57dmUNYIoRpgKBKNbiMapClwoO4nH7j152
+         fMqCx8+Fx53uIKyqBgXf4Hl2Cv7Oa8pdgPvIoDv9EFIjjgZEHxvLYI/bj0PvIC22cNXt
+         HJFHx9JKE28D27g4tRpIM0lR2eneFP4AfmIy2UY7nMmBmeEc22fJyH1NguFTFJ5Ird8i
+         4pjd3mCWkM8ddU4UINngIcuwcK3FKDkbsCmvp5cYW6G1n7eloJzDuwudnWtqREruBPea
+         1tCVg0m2j4L168VVfy0xnoq47ZQTXS9lpHe0Pj4iksSD5HE/V67WPBM9SsQDtGyTaZs8
+         oq9w==
+X-Forwarded-Encrypted: i=1; AJvYcCXrBs9LHGFJrBuk/T403KjeJsFwetJYRjdSkFAExi1utniFaVds4dt0TuZI4R2Q9iRcZaLBA0as0y4LFgUysYdvn6Dn0raHqp97g/F3kTinZ9ps7RA3GPqJmlooT2RtES9+ZfZNqryJYxcpciDnF+im4vxc3Lc+a8Mf
+X-Gm-Message-State: AOJu0Yxree6V//rhlX+vM8qXcEKdklmdnfmKnRj9a2ae6cGRg4/unjsX
+	C+U7tvLzqw1qHZDJbZjEhrgwBHt6U7nr9ZSYfnvqb4b4TZXvlR6iiz4KujzjpR0G3unEnXTkg65
+	ZB2LmhTNBacpKETp8aTGR/665+/M=
+X-Google-Smtp-Source: AGHT+IFaGIESxaIVgOuXFNadzUbBxUG8lqP5Jsv9vQbu94Ihc13oMyxcq9BJ/Wa9ujLSsAIJ+axGQK/3JuRVLT8D5pc=
+X-Received: by 2002:a2e:9e48:0:b0:2e5:67bc:6f2 with SMTP id
+ 38308e7fff4ca-2e567bc07c3mr158550351fa.44.1716305943818; Tue, 21 May 2024
+ 08:39:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <838e7959-a360-4ac1-b36a-a3469236129b@I-love.SAKURA.ne.jp>
+In-Reply-To: <838e7959-a360-4ac1-b36a-a3469236129b@I-love.SAKURA.ne.jp>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 21 May 2024 08:38:52 -0700
+Message-ID: <CAADnVQKuPJv-GNH9SAWL-esSERMXJmSamWRe7AG3cW=NTnf51w@mail.gmail.com>
+Subject: Re: [PATCH] bpf, sockmap: defer sk_psock_free_link() using RCU
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When nci_rx_work() receives a zero-length payload packet, it should not
-discard the packet and exit the loop. Instead, it should continue
-processing subsequent packets.
+On Sun, May 12, 2024 at 12:22=E2=80=AFAM Tetsuo Handa
+<penguin-kernel@i-love.sakura.ne.jp> wrote:
+>
+> If a BPF program is attached to kfree() event, calling kfree()
+> with psock->link_lock held triggers lockdep warning.
+>
+> Defer kfree() using RCU so that the attached BPF program runs
+> without holding psock->link_lock.
+>
+> Reported-by: syzbot+ec941d6e24f633a59172@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3Dec941d6e24f633a59172
+> Tested-by: syzbot+ec941d6e24f633a59172@syzkaller.appspotmail.com
+> Reported-by: syzbot+a4ed4041b9bea8177ac3@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3Da4ed4041b9bea8177ac3
+> Tested-by: syzbot+a4ed4041b9bea8177ac3@syzkaller.appspotmail.com
+> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> ---
+>  include/linux/skmsg.h | 7 +++++--
+>  net/core/skmsg.c      | 2 ++
+>  net/core/sock_map.c   | 2 ++
+>  3 files changed, 9 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> index a509caf823d6..66590f20b777 100644
+> --- a/include/linux/skmsg.h
+> +++ b/include/linux/skmsg.h
+> @@ -66,7 +66,10 @@ enum sk_psock_state_bits {
+>  };
+>
+>  struct sk_psock_link {
+> -       struct list_head                list;
+> +       union {
+> +               struct list_head        list;
+> +               struct rcu_head         rcu;
+> +       };
+>         struct bpf_map                  *map;
+>         void                            *link_raw;
+>  };
+> @@ -418,7 +421,7 @@ static inline struct sk_psock_link *sk_psock_init_lin=
+k(void)
+>
+>  static inline void sk_psock_free_link(struct sk_psock_link *link)
+>  {
+> -       kfree(link);
+> +       kfree_rcu(link, rcu);
+>  }
+>
+>  struct sk_psock_link *sk_psock_link_pop(struct sk_psock *psock);
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index fd20aae30be2..9cebfeecd3c9 100644
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
+> @@ -791,10 +791,12 @@ static void sk_psock_link_destroy(struct sk_psock *=
+psock)
+>  {
+>         struct sk_psock_link *link, *tmp;
+>
+> +       rcu_read_lock();
+>         list_for_each_entry_safe(link, tmp, &psock->link, list) {
+>                 list_del(&link->list);
+>                 sk_psock_free_link(link);
+>         }
+> +       rcu_read_unlock();
+>  }
+>
+>  void sk_psock_stop(struct sk_psock *psock)
+> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+> index 8598466a3805..8bec4b7a8ec7 100644
+> --- a/net/core/sock_map.c
+> +++ b/net/core/sock_map.c
+> @@ -142,6 +142,7 @@ static void sock_map_del_link(struct sock *sk,
+>         bool strp_stop =3D false, verdict_stop =3D false;
+>         struct sk_psock_link *link, *tmp;
+>
+> +       rcu_read_lock();
+>         spin_lock_bh(&psock->link_lock);
 
-Fixes: d24b03535e5e ("nfc: nci: Fix uninit-value in nci_dev_up and nci_ntf_packet")
-Signed-off-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
----
-v3
-- Remove inappropriate Reported-by tag
+I think this is incorrect.
+spin_lock_bh may sleep in RT and it won't be safe to do in rcu cs.
 
-v2
-- Fix commit msg to be clearer to say
-- Remove inappropriate Closes tag
+pw-bot: cr
 
- net/nfc/nci/core.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
-index 7a9897fbf4f4..f456a5911e7d 100644
---- a/net/nfc/nci/core.c
-+++ b/net/nfc/nci/core.c
-@@ -1531,8 +1531,7 @@ static void nci_rx_work(struct work_struct *work)
- 
- 		if (!nci_valid_size(skb)) {
- 			kfree_skb(skb);
--			kcov_remote_stop();
--			break;
-+			continue;
- 		}
- 
- 		/* Process frame */
--- 
-2.44.0
-
+>         list_for_each_entry_safe(link, tmp, &psock->link, list) {
+>                 if (link->link_raw =3D=3D link_raw) {
+> @@ -159,6 +160,7 @@ static void sock_map_del_link(struct sock *sk,
+>                 }
+>         }
+>         spin_unlock_bh(&psock->link_lock);
+> +       rcu_read_unlock();
+>         if (strp_stop || verdict_stop) {
+>                 write_lock_bh(&sk->sk_callback_lock);
+>                 if (strp_stop)
+> --
+> 2.34.1
+>
 
