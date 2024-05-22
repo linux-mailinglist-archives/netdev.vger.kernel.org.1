@@ -1,146 +1,109 @@
-Return-Path: <netdev+bounces-97556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBAE38CC248
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 15:40:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AEC68CC25C
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 15:45:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CD081F243F1
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 13:40:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E4DE1F24831
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 13:45:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9D414039E;
-	Wed, 22 May 2024 13:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7D81E877;
+	Wed, 22 May 2024 13:45:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="DhfVII0i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uOhXImGb"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D9514037D;
-	Wed, 22 May 2024 13:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FAC21E4AB;
+	Wed, 22 May 2024 13:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716385213; cv=none; b=JjinZMxZ9fzdPKAPsJvfOvonqSC1iK09Ktpk/5foK+BN21mwD2ZJT7jhXIZiIeMS9BIkHGUw0CLErcfjE5YbuNdtXtojmyFb1d/d7qVQQmzMg9H74MFsRMuXjP7v51vcSifnsjAE2Sy9ELhE9bQpJZi0cBltbRrcEwMLMRrqMmY=
+	t=1716385521; cv=none; b=NGnVe0ZSfQQWo97aQCsdas3VXqb7umX/SQFqrLLnKJzYdJy3fK4Kjyw8NdDmY33URr9koSHpFR/C8XVDTM+pzZOGb6RYKeg8Ut6AFEkoz0H6Ehl+uD6NwTWkvMKNmo76f1x0dZ/hhmZXi6Q2N90/wtG2kaK1r0/+siNcL0yjjyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716385213; c=relaxed/simple;
-	bh=KlcfgZBOLuLi9UUyHSlAq0UwDQgF6FqjZB64J+brl1U=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ihmEwwb+ee43hG8zx747uOQWoTH6i6qF88oqD71F5MSvA+J47o0Rc+AU2zPDvtCP63UkpIFgx/5Ae415j65/Dtg3XSFPMVNFdwamUcxXHbeMgz5gS7/mFyw3AhMvP5qbfU5rA3sB6Q1gdqfGrH1sL9sytUqIr9eP/B18nR2j7ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=DhfVII0i; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44MDe1Co116757;
-	Wed, 22 May 2024 08:40:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1716385201;
-	bh=156ErfcH2Ob6eWxrQ7Lwe485QGxB7cdVxE6jta+DSgo=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=DhfVII0iLK0gq+ozg5PPwd/mDyAosw6OPZ9sTL7PieLseF7ZPPiTyXnaZmZSXWskI
-	 KPA4rPF+pJNUp/JiIfNB5yg+jCDMtIz+lL+sM4FbXyUbdwQpd8hLDwoPmpv7JBxpf5
-	 QcfjEwj1ovtlrLNnCqq7yjXBZB2FFONaw1ODEOBg=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44MDe13j016785
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 22 May 2024 08:40:01 -0500
-Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 22
- May 2024 08:40:01 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 22 May 2024 08:40:01 -0500
-Received: from localhost (uda0133052.dhcp.ti.com [128.247.81.232])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44MDe1Q8022418;
-	Wed, 22 May 2024 08:40:01 -0500
-Date: Wed, 22 May 2024 08:40:01 -0500
-From: Nishanth Menon <nm@ti.com>
-To: Conor Dooley <conor@kernel.org>
-CC: Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        "Kumar,
- Udit" <u-kumar1@ti.com>, <vigneshr@ti.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Kip Broadhurst
-	<kbroadhurst@ti.com>, <w.egorov@phytec.de>
-Subject: Re: [PATCH] dt-bindings: net: dp8386x: Add MIT license along with
- GPL-2.0
-Message-ID: <20240522134001.tjgvzglufwmi3k75@imitate>
-References: <20240517104226.3395480-1-u-kumar1@ti.com>
- <20240517-poster-purplish-9b356ce30248@spud>
- <20240517-fastball-stable-9332cae850ea@spud>
- <8e56ea52-9e58-4291-8f7f-4721dd74c72f@ti.com>
- <20240520-discard-fanatic-f8e686a4faad@spud>
- <20240520201807.GA1410789-robh@kernel.org>
- <e257de5f54d361da692820f72048ed06a8673380.camel@redhat.com>
- <20240522-vanquish-twirl-4f767578ee8d@spud>
+	s=arc-20240116; t=1716385521; c=relaxed/simple;
+	bh=1W4kFLAzSSYWvoPap3Xf2bjJpHvLN+WISbxmEp4RrVY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m9HKI/kf9/ecLq5BSh1LANenxZecigaB8KOp8cpM1VVZqAN79uk1FoxuaJIsJW4vnNTzT9RflH1JnDh/kvQtfuSW9XpIcBJLRiSlQO9yQDkzXYKVlUaiiwV+E65DTOkfbpCe2o+TUsIfL1Iz1ydPnmEOvrQBmnaXSHoecRO8ygY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uOhXImGb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B5B2C2BBFC;
+	Wed, 22 May 2024 13:45:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716385521;
+	bh=1W4kFLAzSSYWvoPap3Xf2bjJpHvLN+WISbxmEp4RrVY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uOhXImGb+N3fAigARf5tCSwGCGfUFadbRsPHhIGLyd6wHgF6eaRnXJCR3fcgNXTM4
+	 rFeSTGVpUSDqVgAbUFRZN3PXdFVeI0Qgg99IlKSDyAuXXYqd7EeA+mHAPaAioyGqNC
+	 1VZDUMuG5/dmuudCij+lg6Kl8B7Q/eViJ1iFdJCCcOxghjvWhnd6SivfV/8TpqCLvq
+	 9Z1WgVFzTGW+vdj9RdT+Gj3M9TqO6chUHkSsH/Jd6u0SpZWMnT++9IoVqF5/nJ61Ti
+	 nE1BBhie5DvUsIVXyOfgRG7hZtZrOPZvKqct7zsp0FK6OqjuJE5K20mguejIrje6rP
+	 vDrzS1VDiCFuA==
+Date: Wed, 22 May 2024 06:45:19 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: Ido Schimmel <idosch@nvidia.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
+ "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "sdf@google.com"
+ <sdf@google.com>, "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
+ "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
+ "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+ "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
+ "ahmed.zaki@intel.com" <ahmed.zaki@intel.com>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, "shayagr@amazon.com" <shayagr@amazon.com>,
+ "paul.greenwalt@intel.com" <paul.greenwalt@intel.com>, "jiri@resnulli.us"
+ <jiri@resnulli.us>, "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>, Petr Machata
+ <petrm@nvidia.com>
+Subject: Re: [PATCH net-next v5 04/10] ethtool: Add flashing transceiver
+ modules' firmware notifications ability
+Message-ID: <20240522064519.3e980390@kernel.org>
+In-Reply-To: <DM6PR12MB451687C3C54323473716621ED8EB2@DM6PR12MB4516.namprd12.prod.outlook.com>
+References: <20240424133023.4150624-1-danieller@nvidia.com>
+	<20240424133023.4150624-5-danieller@nvidia.com>
+	<20240429201130.5fad6d05@kernel.org>
+	<DM6PR12MB45168DC7D9D9D7A5AE3E2B2DD81A2@DM6PR12MB4516.namprd12.prod.outlook.com>
+	<20240430130302.235d612d@kernel.org>
+	<ZjH1DCu0rJTL_RYz@shredder>
+	<20240501073758.3da76601@kernel.org>
+	<DM6PR12MB451687C3C54323473716621ED8EB2@DM6PR12MB4516.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240522-vanquish-twirl-4f767578ee8d@spud>
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 11:25-20240522, Conor Dooley wrote:
-> On Wed, May 22, 2024 at 10:04:39AM +0200, Paolo Abeni wrote:
-> > On Mon, 2024-05-20 at 15:18 -0500, Rob Herring wrote:
-> > > On Mon, May 20, 2024 at 06:17:52PM +0100, Conor Dooley wrote:
-> > > > On Sat, May 18, 2024 at 02:18:55PM +0530, Kumar, Udit wrote:
-> > > > > Hi Conor
-> > > > > 
-> > > > > On 5/17/2024 8:11 PM, Conor Dooley wrote:
-> > > > > > On Fri, May 17, 2024 at 03:39:20PM +0100, Conor Dooley wrote:
-> > > > > > > On Fri, May 17, 2024 at 04:12:26PM +0530, Udit Kumar wrote:
-> > > > > > > > Modify license to include dual licensing as GPL-2.0-only OR MIT
-> > > > > > > > license for TI specific phy header files. This allows for Linux
-> > > > > > > > kernel files to be used in other Operating System ecosystems
-> > > > > > > > such as Zephyr or FreeBSD.
-> > > > > > > What's wrong with BSD-2-Clause, why not use that?
-> > > > > > I cut myself off, I meant to say:
-> > > > > > What's wrong with BSD-2-Clause, the standard dual license for
-> > > > > > bindings, why not use that?
-> > > > > 
-> > > > > want to be inline with License of top level DTS, which is including this
-> > > > > header file
-> > > > 
-> > > > Unless there's a specific reason to use MIT (like your legal won't even
-> > > > allow you to use BSD-2-Clause) then please just use the normal license
-> > > > for bindings here.
-> > > 
-> > > Aligning with the DTS files is enough reason for me as that's where 
-> > > these files are used. If you need to pick a permissive license for both, 
-> > > then yes, use BSD-2-Clause. Better yet, ask your lawyer.
-> > 
-> > Conor would you agree with Rob? - my take is that he is ok with this
-> > patch.
+On Wed, 22 May 2024 13:08:43 +0000 Danielle Ratson wrote:
+> 1. Add a new unicast function to netlink.c:
+> void *ethnl_unicast_put(struct sk_buff *skb, u32 portid, u32 seq, u8 cmd)
 > 
-> I don't think whether or not I agree matters, Rob said it's fine so it's
-> fine.
+> 2. Use it in the notification function instead of the multicast previously used along with genlmsg_unicast().
+> 'portid' and 'seq' taken from genl_info(), are added to the struct ethtool_module_fw_flash, which is accessible from the work item.
+> 
+> 3. Create a global list that holds nodes from type struct ethtool_module_fw_flash() and add it as a field in the struct ethtool_module_fw_flash.
+> Before scheduling a work, a new node is added to the list.
 
-Just to close the loop here: Udit pointed me to this thread and having
-gone through this already[1] with internal TI teams, the feedback we
-have gotten from our licensing team (including legal) is to go with
-GPL2 or MIT. BSD (2 and 3 clauses) were considered, but due to varied
-reasons, dropped.
+Makes sense.
 
-That said, Udit, since you are touching this, please update in the next
-revision:
-Copyright:   (C) 2015-2024 Texas Instruments, Inc.
- to
-Copyright (C) 2015-2024 Texas Instruments Incorporated - https://www.ti.com/
+> 4. Add a new netlink notifier that when the relevant event takes place, deletes the node from the list, wait until the end of the work item, with cancel_work_sync() and free allocations.
 
-[1] https://serenity.dal.design.ti.com/lore/linux-patch-review/20240109231804.3879513-1-nm@ti.com/
+What's the "relevant event" in this case? Closing of the socket that
+user had issued the command on?
 
--- 
-Regards,
-Nishanth Menon
-Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
+Easiest way to "notice" the socket got closed would probably be to
+add some info to genl_sk_priv_*(). ->sock_priv_destroy() will get
+called. But you can also get a close notification in the family 
+->unbind callback.
+
+I'm on the fence whether we should cancel the work. We could just
+mark the command as 'no socket present' and stop sending notifications.
+Not sure which is better..
 
