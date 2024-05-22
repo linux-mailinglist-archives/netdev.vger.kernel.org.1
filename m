@@ -1,150 +1,125 @@
-Return-Path: <netdev+bounces-97613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E3A38CC5B7
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 19:40:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE15E8CC5C3
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 19:45:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59A811C20909
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 17:40:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CEF9286829
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 17:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9692F1422DC;
-	Wed, 22 May 2024 17:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38602762E0;
+	Wed, 22 May 2024 17:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="lbnWxyF2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bDr7EHc1"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B457D071;
-	Wed, 22 May 2024 17:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01277710E
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 17:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716399610; cv=none; b=aqTtbg2KZVPE8Uueg0fuOyahzddNqMpKtglre52/mpRxViO9QufZKkH0BAPchzQsIMfqWhVGg5dhaHY4EsL6v2puDrzN7crJMQBOwtogcYHl89xmlXOJKk3qlOWRIJ1mbvrjnagoC6l474d8Xl4aWYkiHsgku1HDf/BmceO2/e4=
+	t=1716399907; cv=none; b=dOBOxHfsm+wcKhgDregu4HLGe3e1grqajr/RTVpj2/WHOKwtz0U6dsMHAmUiiQDmBo5lA27oBeoLYWh8iN9LKbhSJezwOoAX2vpTG9wJPStnztE0GmKdt53wX23XP+88FS1PDrstANXra/6tSeQXGbfZSkNTXDc4D+u21I6P3do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716399610; c=relaxed/simple;
-	bh=rvyON9Eez4+bgszygh1Bb1QcvHtLRDv9uBENZwvOqgk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=HvuITG6YRcU1FX9yt3/PCgs1pnJwCTFalA9vy9unmW2pvjPU017MJPiWb3+fG6qWIlhiqQoRYbMuTZfqHbLDTSfPxIdx61NswSMpfAvt/V6zx1kdv9Em/bRhajoHmfECDLnlfKePb8W3mD6yiKgbNO5U2dYwk2naenum8xyLxak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=lbnWxyF2; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44MHdgZ2058268;
-	Wed, 22 May 2024 12:39:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1716399583;
-	bh=96umGE7Q8x9vdEdBBDF/Aa24QRAMgPy3dYLj6BJie8k=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=lbnWxyF2XCnoOX2VMR21xaTV+WQlRqXc/+PCmgxkXrFUkHlyUtAJfF5OrLaPD67J5
-	 h4u5U7qoxy7u9LjpgIUxZtzcTN7ZR19a1eHDhfv3e7HpnWER/dJDV0ahkhykCG26CQ
-	 rvtKjnvwJGPpfelmmrHdOBvyrC94axaVqDm/HUxw=
-Received: from DLEE101.ent.ti.com (dlee101.ent.ti.com [157.170.170.31])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44MHdgTM024507
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 22 May 2024 12:39:42 -0500
-Received: from DLEE101.ent.ti.com (157.170.170.31) by DLEE101.ent.ti.com
- (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 22
- May 2024 12:39:42 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE101.ent.ti.com
- (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 22 May 2024 12:39:42 -0500
-Received: from [10.249.141.75] ([10.249.141.75])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44MHdaJM018757;
-	Wed, 22 May 2024 12:39:37 -0500
-Message-ID: <c2fe8d96-677a-4779-b46b-1c50698ef6a0@ti.com>
-Date: Wed, 22 May 2024 23:09:36 +0530
+	s=arc-20240116; t=1716399907; c=relaxed/simple;
+	bh=3aciCKn2C/o/gcIQNjenoGJmglB3BvsgYJj98ymPKks=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c5F3XtnSmsj1fF/zJinoYrx1VaPUEtuVIRxSxoJZvKAiql90zPnXO/9Zxf/IYuehRJsnAu9xNbjlmg78rDu4kNUNzFKkeQciI2G6dFsZkqQzW3njgr68UsnQ7ZQoQwbexobI/Cj9pWM/bGPvO7Maw0wi/LqGLaUl2+Mo9i0uiyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bDr7EHc1; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso645a12.1
+        for <netdev@vger.kernel.org>; Wed, 22 May 2024 10:45:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716399904; x=1717004704; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=46egnT16tVwxmfnNBO145wZ0ppbM6j0s2l6EqdlS1tY=;
+        b=bDr7EHc1MQM5ge0wW8OyziytM+KI9E3eZrfmhBpB7f0+41x3yLL9B1B6ElILkf29yO
+         Pk8CobJhB3P8uOybyqMajfjrh99bd+lgZo+zxeBdSiJpC7BWjSFdtt2wnwuZ9t9H+Ycd
+         b1/Pb4jUGgbxIUoPA559+8ouk0/BKWUo9Hf79eerxdA1XwJpx6KzXMwes3KXToRoZPvu
+         MVe3Zz+NNTK4CuFUwIVrMzK9XJ5QLzrnAT6T3tl/er7MmBxzu8mgRuhx+1Nmsg9RdGTC
+         AfUE5qhwqdndruylfGtcaxXTqklGRid7IdYw3uY0QiLCeI4lEI4l/c5HezuDjyn6hpqF
+         1Saw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716399904; x=1717004704;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=46egnT16tVwxmfnNBO145wZ0ppbM6j0s2l6EqdlS1tY=;
+        b=YEJzs7zl9XJmSFJ2GSsbT4kkNMW01yIHCjZE0fTbLVstOMPPzCG8x4iHlA0mXZjrBQ
+         Z6fh/DrY7aJMhozEcXBAT1lpgY6Zqbe7z3lyp0tf8agzwneiqAU7CGZ1Juvw0qgijsK+
+         ZxJJHJ5dWdOwmAiSB9duQn2H+zVGFVfLLsDN7WHWsLC2P48+bEcdv6JhcNcQDA/R9iG8
+         cbN5BGb8jmOqX9yDzpNCdanDiSKcwVBBtn5MGurkaEXej5cNsIWVKzeYA/J7ZM2fogWt
+         +zHb4zQXbw5VeeTsN8WOJPohnhcDTqKtj0lToAtGpM2FlzAHuWidkALkjSVYvANcF/T8
+         Vt/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUe7BqHyU0P58fgE1QF/3b0nZcgqDaW/XAyXHO3ntrM8SHKfvRwSlQraEIm5JJf/xf08SXJw5OYRjsJySRjO+oRxbVx8Ikx
+X-Gm-Message-State: AOJu0YzTVP+2aY9KYPXo0wfaZT1RLO4yp+zIG7DG7+H8nkDcwarxdUiw
+	4UXx+j06KLHUYlSf4WAkzExc48lZ063DC+gN2V9TdIFHv7osUfR9NkfBOvUgRnwg74ZpIHZQDMa
+	vf3yxoUUjwcKQoEs15QNKsxST2uSHJWeLUa5k
+X-Google-Smtp-Source: AGHT+IEv8xe30GVN53LXujFuOLIK2Susr76GRSHxvaCa6Bcn17UOTkMRnicosfESbnqEFHs+NH8WrFmg8Sb7+erv/0Q=
+X-Received: by 2002:a05:6402:2685:b0:572:e6fb:ab07 with SMTP id
+ 4fb4d7f45d1cf-5783237b9e4mr236808a12.7.1716399903775; Wed, 22 May 2024
+ 10:45:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dt-bindings: net: dp8386x: Add MIT license along with
- GPL-2.0
-To: Nishanth Menon <nm@ti.com>, Conor Dooley <conor@kernel.org>,
-        Rob Herring
-	<robh@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Andrew Lunn
-	<andrew@lunn.ch>
-CC: <vigneshr@ti.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Kip Broadhurst <kbroadhurst@ti.com>,
-        <w.egorov@phytec.de>, <u-kumar1@ti.com>
-References: <20240517104226.3395480-1-u-kumar1@ti.com>
- <20240517-poster-purplish-9b356ce30248@spud>
- <20240517-fastball-stable-9332cae850ea@spud>
- <8e56ea52-9e58-4291-8f7f-4721dd74c72f@ti.com>
- <20240520-discard-fanatic-f8e686a4faad@spud>
- <20240520201807.GA1410789-robh@kernel.org>
- <e257de5f54d361da692820f72048ed06a8673380.camel@redhat.com>
- <20240522-vanquish-twirl-4f767578ee8d@spud>
- <20240522134001.tjgvzglufwmi3k75@imitate>
-Content-Language: en-US
-From: "Kumar, Udit" <u-kumar1@ti.com>
-In-Reply-To: <20240522134001.tjgvzglufwmi3k75@imitate>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+References: <20240522005913.3540131-1-edliaw@google.com> <6caf3332-9ed9-4257-9532-4fd71c465c0d@linuxfoundation.org>
+ <20240522101349.565a745e@kernel.org>
+In-Reply-To: <20240522101349.565a745e@kernel.org>
+From: Edward Liaw <edliaw@google.com>
+Date: Wed, 22 May 2024 10:44:36 -0700
+Message-ID: <CAG4es9VZ3r34sUkp31+GCrA_XOq6WqwUUitPMQFViLL83mezYg@mail.gmail.com>
+Subject: Re: [PATCH v5 00/68] Define _GNU_SOURCE for sources using
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Shuah Khan <skhan@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	shuah@kernel.org, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	Christian Brauner <brauner@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kernel-team@android.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks all for review
-
-On 5/22/2024 7:10 PM, Nishanth Menon wrote:
-> On 11:25-20240522, Conor Dooley wrote:
->> On Wed, May 22, 2024 at 10:04:39AM +0200, Paolo Abeni wrote:
->>> On Mon, 2024-05-20 at 15:18 -0500, Rob Herring wrote:
->>>> On Mon, May 20, 2024 at 06:17:52PM +0100, Conor Dooley wrote:
->>>>> On Sat, May 18, 2024 at 02:18:55PM +0530, Kumar, Udit wrote:
->>>>>> Hi Conor
->>>>>>
->>>>>> On 5/17/2024 8:11 PM, Conor Dooley wrote:
->>>>>>> On Fri, May 17, 2024 at 03:39:20PM +0100, Conor Dooley wrote:
->>>>>>>> On Fri, May 17, 2024 at 04:12:26PM +0530, Udit Kumar wrote:
->>>>>>>>> Modify license to include dual licensing as GPL-2.0-only OR MIT
->>>>>>>>> license for TI specific phy header files. This allows for Linux
->>>>>>>>> kernel files to be used in other Operating System ecosystems
->>>>>>>>> such as Zephyr or FreeBSD.
->>>>>>>> What's wrong with BSD-2-Clause, why not use that?
->>>>>>> I cut myself off, I meant to say:
->>>>>>> What's wrong with BSD-2-Clause, the standard dual license for
->>>>>>> bindings, why not use that?
->>>>>> want to be inline with License of top level DTS, which is including this
->>>>>> header file
->>>>> Unless there's a specific reason to use MIT (like your legal won't even
->>>>> allow you to use BSD-2-Clause) then please just use the normal license
->>>>> for bindings here.
->>>> Aligning with the DTS files is enough reason for me as that's where
->>>> these files are used. If you need to pick a permissive license for both,
->>>> then yes, use BSD-2-Clause. Better yet, ask your lawyer.
->>> Conor would you agree with Rob? - my take is that he is ok with this
->>> patch.
->> I don't think whether or not I agree matters, Rob said it's fine so it's
->> fine.
-> Just to close the loop here: Udit pointed me to this thread and having
-> gone through this already[1] with internal TI teams, the feedback we
-> have gotten from our licensing team (including legal) is to go with
-> GPL2 or MIT. BSD (2 and 3 clauses) were considered, but due to varied
-> reasons, dropped.
+On Wed, May 22, 2024 at 10:13=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
 >
-> That said, Udit, since you are touching this, please update in the next
-> revision:
-> Copyright:   (C) 2015-2024 Texas Instruments, Inc.
->   to
-> Copyright (C) 2015-2024 Texas Instruments Incorporated - https://www.ti.com/
-
-
-will post v2 with these changes after merge window is open.
-
-Along with that in v2 will copy other contributors as well, who are 
-including these files.
-
-
-> [1] https://serenity.dal.design.ti.com/lore/linux-patch-review/20240109231804.3879513-1-nm@ti.com/
+> On Wed, 22 May 2024 10:19:33 -0600 Shuah Khan wrote:
+> > On 5/21/24 18:56, Edward Liaw wrote:
+> > > Centralizes the definition of _GNU_SOURCE into KHDR_INCLUDES and remo=
+ves
+> > > redefinitions of _GNU_SOURCE from source code.
+> > >
+> > > 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> > > asprintf into kselftest_harness.h, which is a GNU extension and needs
+> >
+> > Easier solution to define LINE_MAX locally. In gerenal it is advisable
+> > to not add local defines, but it is desirable in some cases to avoid
+> > churn like this one.
 >
+> Will the patch that Andrew applied:
+> https://lore.kernel.org/all/20240519213733.2AE81C32781@smtp.kernel.org/
+> make its way to Linus? As you say that's a much simpler fix.
+
+Right, this patch series may be unnecessary after all, since the
+problem is fixed by that patch.
+
+It might be better to drop the series unless it is desirable to
+centralize the declaration of _GNU_SOURCE to the root Makefile /
+lib.mk.  If that is still wanted, maybe a more palatable approach
+would be to surround every instance of #define _GNU_SOURCE with
+#ifndef _GNU_SOURCE first, then induce the change to CFLAGS in lib.mk.
+That would prevent a partial merge from triggering build warnings.
 
