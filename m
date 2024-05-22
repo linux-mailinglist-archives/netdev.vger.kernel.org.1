@@ -1,393 +1,293 @@
-Return-Path: <netdev+bounces-97536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0151C8CBFB8
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 12:54:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 120DF8CBFBD
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 12:55:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB234283A5A
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:54:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC606283AC1
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:55:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81DD9824AA;
-	Wed, 22 May 2024 10:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56B6F8248D;
+	Wed, 22 May 2024 10:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="c1avhj8M"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R0mmt+YM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f65.google.com (mail-ed1-f65.google.com [209.85.208.65])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A7E824A3
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 10:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5869280C15
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 10:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716375118; cv=none; b=c9lbFUw8paTLGls8ShdYyzMeKebr8xXnbpzPAIdfr7/8+DCKy3gRPCD+UxOLP6ocLH2EK4UFkgudxCjL79kXBn7ETH1PPSszG2rS8pKFxKFixdtjBUZqpcDbEYQnCsRbRP8unipECtLaB/KF1sgjPgbRfuqLEpGsAs0vMVPqzRI=
+	t=1716375261; cv=none; b=tiwVUXgwVvM5mwQjSbXvHeFKJshN3oIfNUWWjmbZkiJEhcfTAM66HTXmeaTcexBJw/DNAmwx/V72S6opnXEtUwWxo8GALgYD1dpvxQY14Z2F60Nny4GBdg2jxDilwZg0Js6SQh296QqkjjUMblD3Ln9uciEtX2xCQ2StF3IN+mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716375118; c=relaxed/simple;
-	bh=eT5cvfFtV7KJcmfLYYbQswmpUfzeHMicawRIj+4llGY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B6cyd2PrhnWuF+s3rXlyGkNwaHluXMnO6OgVf0hw/dpUDFfDY0NHbI64jH0b9kR3H+4pMmNmntgHJwlCcb16Xug4Qjp1Oo7yS+SHX6hrb0IH9t+dTQjCGtgK4IMDIu8V8vOEIEkCVGpnyNfPf+NSz8+BeHTnoD7kizyCWgL4ucI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=c1avhj8M; arc=none smtp.client-ip=209.85.208.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f65.google.com with SMTP id 4fb4d7f45d1cf-5731ffcc905so11166876a12.2
-        for <netdev@vger.kernel.org>; Wed, 22 May 2024 03:51:55 -0700 (PDT)
+	s=arc-20240116; t=1716375261; c=relaxed/simple;
+	bh=qHm3lFVwqXW1+cMSW5B8x6VuK0Y84P2PEnAzXkO4keM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=krWxa9JjuN0Wr4oLV/LuKWQJEaDsfAnNilaDXuxzPT98i9eZ70s5VopeGhkZB/YHYdfzGA11m7+sdmcUFV4942kVKLQ91BRnedWbPY2Ey0609ZOOwEPo7mzvHbMllLW1TMpr8e8WGvPFR3vpBMVg+tntYzCLUQlrvDt6ypmd4eE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R0mmt+YM; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso10168a12.1
+        for <netdev@vger.kernel.org>; Wed, 22 May 2024 03:54:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1716375114; x=1716979914; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ghTNkZfAKme/wRI+4Y7TB/HrhXD9rnXF6sA7XTI4lZw=;
-        b=c1avhj8MvtWXll4LVvNBMn2jHJS+R9vReEQxxa5Bx7NnOXB0jbrVCVpf4FdUITN4uE
-         PAO5i3ZK5sNHsC/7KM782AjUJ77tYKL6i2sI5Lmr6+5sT62jGuFAEUEgdcBqfSZZI9aR
-         4Sod6WyyPQb5+fypYoqosqprKf5h0iIV9CgEuUSKHBb6rbCZfW2Yq1PuDtvjylgBWD+q
-         hJEMwLkI4HutHCiGzwXXDMxYJQeVZjv+eQdRc1WchhmIRJiRdefdl1F9HBsB+bMunodc
-         MvB+/znvDuZwbbccprAX9OYI99WcClqmvHwzIBwJqEQo3GVLxXwD0Iv8k305EeVn8jRv
-         kYfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716375114; x=1716979914;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1716375258; x=1716980058; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ghTNkZfAKme/wRI+4Y7TB/HrhXD9rnXF6sA7XTI4lZw=;
-        b=tni3i6kAghz5vc5cMG9YDTE6WYBnApXuqwDV1izJPp+1Fwqn2EFa+5HQu3OrMqtrHO
-         HwPn7tA79I67rkwd5WZ8oKrRm/CMy5o1W5ZmJJ9JzMx7uaZasMtVi/hLjNZGZSXphTdp
-         4RlRrwGTPeKscLCKTyuVCRUEBDW5C7RtokOnfmWCOq64kd0X/VmCPIvHA3cUqi5JiYO0
-         Np1KHYmDTMh921+RmsxxVQ7+3cjaXjXZRlRdXWK3XmgJpRvVy2kM5RyFbw2VOZlx4XSz
-         EPNrlJIxTC5QQ/ZV/xmF6hYnlwOG1xu2+xcmzVhczMIwFIfmz2ZD+Y32ORYG95QXxwPP
-         0TWQ==
-X-Gm-Message-State: AOJu0YzxRhF2o6BldGbSQxhGp66o8bfM4H9UOAdHc0Ex81cgIqHE/AGw
-	RsBgd9sKV2FiZuwOuEcEp1tDUR35fdYmGWxJzctJmme75hbp+U6kqwoqi7D31aE=
-X-Google-Smtp-Source: AGHT+IHlDbPiZlU4hRf9ARuh/0mZL2UizPRbMzEm6yU1chMsOCSA3uyiE+bGSpRpH1O77p9GZ6tfGQ==
-X-Received: by 2002:a50:930e:0:b0:573:5c17:f6f2 with SMTP id 4fb4d7f45d1cf-57832a2d13bmr1084635a12.24.1716375113785;
-        Wed, 22 May 2024 03:51:53 -0700 (PDT)
-Received: from localhost (78-80-19-19.customers.tmcz.cz. [78.80.19.19])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-574f6b8b9d7sm10375237a12.82.2024.05.22.03.51.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 03:51:53 -0700 (PDT)
-Date: Wed, 22 May 2024 12:51:51 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net 2/2] Revert "virtio_net: Add a lock for per queue RX
- coalesce"
-Message-ID: <Zk3OR9FOQjGBmHGn@nanopsycho.orion>
-References: <20240522034548.58131-1-hengqi@linux.alibaba.com>
- <20240522034548.58131-3-hengqi@linux.alibaba.com>
- <Zk2pskOYxnSdNf-O@nanopsycho.orion>
- <1716367939.5198305-3-hengqi@linux.alibaba.com>
+        bh=PuEVJnC0J0HPuTrxv7IQQZ00dFVjxx8LoRr0T6vmq7E=;
+        b=R0mmt+YM2ekajsubNB7Ap6MdVNiSIl8MO+j3SyVlv8KfOHmI1qD5gV//99mB/aaAjq
+         kkOJu0+miCoiu3evJEiUPFOp2yl5r+aPFTQavIZFBXzX08dhvV8/yfI5fEhXrRFmn6Y3
+         dtg9RtkJuYtBifWpBzpl8mrgtzpiC6Rmr6xXUu65yhUkDyZaq6HpZ5np8RyaH49XJKas
+         0B4eD7HevxBCcQi8MJjDRdEMLDeN5jOJ1yyNJjmXH3KEjMvqjRNQJlAv+mbb6av0//Ca
+         BodPW5y00ZFkwz+tVDK+hxF4w7UrIALggNwL4NXLN04Gf857V/cSVqqVlQW7+FttBQ2t
+         mhoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716375258; x=1716980058;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PuEVJnC0J0HPuTrxv7IQQZ00dFVjxx8LoRr0T6vmq7E=;
+        b=ZTkQvcq5NyTABagD9J5iMtr+eUtBLXfnFF/JoXdzHKfExRjo8ZWyggmOjPo4Xf0taC
+         ef0eeskRnqeXCT7IQQ4VLnk4UOAqs8HoIyPPJ13+G6uFlNZvZ7V1mXXQtWYHBBImNnd1
+         DEsU2XVy+m+QUNEw5cg6vPv0j3NezxvtL5DW3QGZeUQ6OvdnkgNILA0sKZJUUkW03BXr
+         +Rd4SVSj9gtq2NRDIEkWB3zJA/RUGb5kFNJCPCfbSWLGxfX+X2RdFmsZego+aK4HTzBs
+         RQecUEH1WSka9pSyEpef6ahwvJsnMIPXpolpDYrURvEwDIVrBiwjcIz3YkaMIrkqtOXa
+         FE/w==
+X-Forwarded-Encrypted: i=1; AJvYcCWR4kxpLwyl0HDoCHSgGJAlZxM19BG40UmVzUQQrpxmCt6UgjRm5qEPIUHsKwSWLOujQNY7v8WNvM+arpS8W37xlwDGzPBk
+X-Gm-Message-State: AOJu0Yyf68FtkL6PLXsVWmL8PomyOA95eRtrC2vAF22wex8Rgenf5fwp
+	HsaiyKYhqt13jUyDVmJ7Sd+2sJFlA9NlwXX9+dhhC4mQR/Ek82vbBeGV+Tp6aIYh6twqS2FjlYv
+	2fKmuNjoN/Gk8ZnJWt3y6sRvO7+/V9OzAON6p
+X-Google-Smtp-Source: AGHT+IEHEJ0JJpcb0VQj9J4tv4oIFDWGXRxfXVjKgfhYcYqJJrS6EkIKr9FTkW0va5uK2BfAQ+XlkklgC4D28GTFBbI=
+X-Received: by 2002:a05:6402:2904:b0:578:33c0:f00e with SMTP id
+ 4fb4d7f45d1cf-57833c0f3a4mr83098a12.0.1716375257097; Wed, 22 May 2024
+ 03:54:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1716367939.5198305-3-hengqi@linux.alibaba.com>
+References: <20240521144930.23805-1-kerneljasonxing@gmail.com>
+ <CANn89iLL+DZA=CyPG+1Lcu1XRcPkc3pHKKQ4X9tm9MoeF7FPYQ@mail.gmail.com>
+ <CAL+tcoAKEv2WOV-4k5kDa2EJMGp_h0bW3jhYZrQ9aiK+s4AcOQ@mail.gmail.com>
+ <CANn89iKAGeR9CX1cOSXFK8CH-d9bS_sHvU1DhGvhvt7CmCSsAg@mail.gmail.com> <CAL+tcoBWna3J80Kx5=R4khOgvG8Dcyb22nf3wx_dW+5Jcz+AMA@mail.gmail.com>
+In-Reply-To: <CAL+tcoBWna3J80Kx5=R4khOgvG8Dcyb22nf3wx_dW+5Jcz+AMA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 22 May 2024 12:53:24 +0200
+Message-ID: <CANn89iLyvjv+q9iYQVbZt6yY8eWXUULBFVs7DAZG2DWs+3nQ1A@mail.gmail.com>
+Subject: Re: [PATCH net] Revert "rds: tcp: Fix use-after-free of net in reqsk_timer_handler()."
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, kuniyu@amazon.com, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, 
+	syzbot+2eca27bdcb48ed330251@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Wed, May 22, 2024 at 10:52:19AM CEST, hengqi@linux.alibaba.com wrote:
->On Wed, 22 May 2024 10:15:46 +0200, Jiri Pirko <jiri@resnulli.us> wrote:
->> Wed, May 22, 2024 at 05:45:48AM CEST, hengqi@linux.alibaba.com wrote:
->> >This reverts commit 4d4ac2ececd3c42a08dd32a6e3a4aaf25f7efe44.
->> 
->> This commit does not exist in -net or -net-next.
+On Wed, May 22, 2024 at 12:42=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.=
+com> wrote:
 >
->It definitely exists in net-next :):
->https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=4d4ac2ececd3c42a08dd32a6e3a4aaf25f7efe44
+> On Wed, May 22, 2024 at 2:51=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Wed, May 22, 2024 at 8:28=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
+il.com> wrote:
+> > >
+> > > Hello Eric,
+> > >
+> > > On Tue, May 21, 2024 at 11:49=E2=80=AFPM Eric Dumazet <edumazet@googl=
+e.com> wrote:
+> > > >
+> > > > On Tue, May 21, 2024 at 4:49=E2=80=AFPM Jason Xing <kerneljasonxing=
+@gmail.com> wrote:
+> > > > >
+> > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > >
+> > > > > This reverts commit 2a750d6a5b365265dbda33330a6188547ddb5c24.
+> > > > >
+> > > > > Syzbot[1] reported the drecrement of reference count hits leaking=
+ memory.
+> > > > >
+> > > > > If we failed in setup_net() and try to undo the setup process, th=
+e
+> > > > > reference now is 1 which shouldn't be decremented. However, it ha=
+ppened
+> > > > > actually.
+> > > > >
+> > > > > After applying this patch which allows us to check the reference =
+first,
+> > > > > it will not hit zero anymore in tcp_twsk_purge() without calling
+> > > > > inet_twsk_purge() one more time.
+> > > > >
+> > > > > [1]
+> > > > > refcount_t: decrement hit 0; leaking memory.
+> > > > > WARNING: CPU: 3 PID: 1396 at lib/refcount.c:31 refcount_warn_satu=
+rate+0x1ed/0x210 lib/refcount.c:31
+> > > > > Modules linked in:
+> > > > > CPU: 3 PID: 1396 Comm: syz-executor.3 Not tainted 6.9.0-syzkaller=
+-07370-g33e02dc69afb #0
+> > > > > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-d=
+ebian-1.16.2-1 04/01/2014
+> > > > > RIP: 0010:refcount_warn_saturate+0x1ed/0x210 lib/refcount.c:31
+> > > > > RSP: 0018:ffffc9000480fa70 EFLAGS: 00010282
+> > > > > RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc9002ce28000
+> > > > > RDX: 0000000000040000 RSI: ffffffff81505406 RDI: 0000000000000001
+> > > > > RBP: ffff88804d8b3f80 R08: 0000000000000001 R09: 0000000000000000
+> > > > > R10: 0000000000000000 R11: 0000000000000002 R12: ffff88804d8b3f80
+> > > > > R13: ffff888031c601c0 R14: ffffc900013c04f8 R15: 000000002a3e5567
+> > > > > FS:  00007f56d897c6c0(0000) GS:ffff88806b300000(0000) knlGS:00000=
+00000000000
+> > > > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > > > CR2: 0000001b3182b000 CR3: 0000000034ed6000 CR4: 0000000000350ef0
+> > > > > Call Trace:
+> > > > >  <TASK>
+> > > > >  __refcount_dec include/linux/refcount.h:336 [inline]
+> > > > >  refcount_dec include/linux/refcount.h:351 [inline]
+> > > > >  inet_twsk_kill+0x758/0x9c0 net/ipv4/inet_timewait_sock.c:70
+> > > > >  inet_twsk_deschedule_put net/ipv4/inet_timewait_sock.c:221 [inli=
+ne]
+> > > > >  inet_twsk_purge+0x725/0x890 net/ipv4/inet_timewait_sock.c:304
+> > > > >  tcp_twsk_purge+0x115/0x150 net/ipv4/tcp_minisocks.c:402
+> > > > >  tcp_sk_exit_batch+0x1c/0x170 net/ipv4/tcp_ipv4.c:3522
+> > > > >  ops_exit_list+0x128/0x180 net/core/net_namespace.c:178
+> > > > >  setup_net+0x714/0xb40 net/core/net_namespace.c:375
+> > > > >  copy_net_ns+0x2f0/0x670 net/core/net_namespace.c:508
+> > > > >  create_new_namespaces+0x3ea/0xb10 kernel/nsproxy.c:110
+> > > > >  unshare_nsproxy_namespaces+0xc0/0x1f0 kernel/nsproxy.c:228
+> > > > >  ksys_unshare+0x419/0x970 kernel/fork.c:3323
+> > > > >  __do_sys_unshare kernel/fork.c:3394 [inline]
+> > > > >  __se_sys_unshare kernel/fork.c:3392 [inline]
+> > > > >  __x64_sys_unshare+0x31/0x40 kernel/fork.c:3392
+> > > > >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> > > > >  do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
+> > > > >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> > > > > RIP: 0033:0x7f56d7c7cee9
+> > > > >
+> > > > > Fixes: 2a750d6a5b36 ("rds: tcp: Fix use-after-free of net in reqs=
+k_timer_handler().")
+> > > > > Reported-by: syzbot+2eca27bdcb48ed330251@syzkaller.appspotmail.co=
+m
+> > > > > Closes: https://syzkaller.appspot.com/bug?extid=3D2eca27bdcb48ed3=
+30251
+> > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > > ---
+> > > > > The reverted patch trying to solve another issue causes unexpecte=
+d error as above. I
+> > > > > think that issue can be properly analyzed and handled later. So c=
+an we revert it first?
+> > > > > ---
+> > > > >  net/ipv4/tcp_minisocks.c | 4 ++++
+> > > > >  1 file changed, 4 insertions(+)
+> > > > >
+> > > > > diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+> > > > > index b93619b2384b..46e6f9db4227 100644
+> > > > > --- a/net/ipv4/tcp_minisocks.c
+> > > > > +++ b/net/ipv4/tcp_minisocks.c
+> > > > > @@ -399,6 +399,10 @@ void tcp_twsk_purge(struct list_head *net_ex=
+it_list)
+> > > > >                         /* Even if tw_refcount =3D=3D 1, we must =
+clean up kernel reqsk */
+> > > > >                         inet_twsk_purge(net->ipv4.tcp_death_row.h=
+ashinfo);
+> > > > >                 } else if (!purged_once) {
+> > > > > +                       /* The last refcount is decremented in tc=
+p_sk_exit_batch() */
+> > > > > +                       if (refcount_read(&net->ipv4.tcp_death_ro=
+w.tw_refcount) =3D=3D 1)
+> > > > > +                               continue;
+> > > > > +
+> > > > >                         inet_twsk_purge(&tcp_hashinfo);
+> > > > >                         purged_once =3D true;
+> > > > >                 }
+> > > > > --
+> > > >
+> > > > This can not be a fix for a race condition.
+> > > >
+> > > > By definition a TW has a refcount on tcp_death_row.tw_refcount   on=
+ly
+> > > > if its timer is armed.
+> > > >
+> > > > And inet_twsk_deschedule_put() does
+> > > >
+> > > > if (del_timer_sync(&tw->tw_timer))
+> > > >     inet_twsk_kill(tw);
+> > > >
+> > > > I think you need to provide a full explanation, instead of a shot i=
+n the dark.
+> > > >
+> > > > Before releasing this syzbot, I thought that maybe the refcount_inc=
+()
+> > > > was done too late,
+> > > > but considering other invariants, this should not matter.
+> > > >
+> > > > diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait=
+_sock.c
+> > > > index e28075f0006e333897ad379ebc8c87fc3f9643bd..d8f4d93c45331be64d7=
+0af96de33f783870e1dcc
+> > > > 100644
+> > > > --- a/net/ipv4/inet_timewait_sock.c
+> > > > +++ b/net/ipv4/inet_timewait_sock.c
+> > > > @@ -255,8 +255,8 @@ void __inet_twsk_schedule(struct
+> > > > inet_timewait_sock *tw, int timeo, bool rearm)
+> > > >
+> > > >                 __NET_INC_STATS(twsk_net(tw), kill ? LINUX_MIB_TIME=
+WAITKILLED :
+> > > >                                                      LINUX_MIB_TIME=
+WAITED);
+> > > > -               BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
+> > > >                 refcount_inc(&tw->tw_dr->tw_refcount);
+> > > > +               BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
+> > > >         } else {
+> > > >                 mod_timer_pending(&tw->tw_timer, jiffies + timeo);
+> > > >         }
+> > >
+> > > Thanks for your information.
+> > >
+> > > What you wrote is right, I think for a while. In
+> > > inet_twsk_deschedule_put(), there are two possible cases:
+> > > 1) if it finds the timer is armed, then it can kill the tw socket by
+> > > decrementing the refcount in the right way. So it's a good/lucky thin=
+g
+> > > for us.
+> > > or
+> > > 2) if it misses the point, then the tw socket arms the timer which
+> > > will expire in 60 seconds in the initialization phase. The tw socket
+> > > would have a chance to be destroyed when the timer expires.
+> > >
+> > > It seems that you don't think your code could solve the race issue?
+> >
+> > inet_twsk_schedule(tw) is called while the tw refcount is still 0, so
+> > this tw can be be found in  inet_twsk_purge()
+> > at the same time. Look at inet_twsk_hashdance() for details.
+>
+> Yes, after inet_twsk_purge() finds the tw, there are two cases like my
+> previous email said after applying your code.
+>
+> For 1) case, everything is good. inet_twsk_purge() will finish it up
+> because it can decrement the refcount safely.
+>
+> For 2) case, even though inet_twsk_purge() finds it, it's not the time
+> to destroy it until the expired tw timer will finally handle the
+> process of destruction by calling inet_twsk_kill(), right? Let the
+> timer handle the destruction until its end of life, which I think is a
+> normal process for all the timewait sockets.
+>
+> The only difference in 2) case is that inet_twsk_purge() calls
+> inet_twsk_put() twice while tw_timer_handler() only calls it one time.
+>
+> Am I missing something?
 
-Correct.
+You are missing that inet_twsk_deschedule_put() is doing :
 
+if (del_timer_sync(&tw->tw_timer))
+    inet_twsk_kill(tw);
 
->
->> 
->> >
->> >When the following snippet is run, lockdep will complain[1].
->> >
->> >  /* Acquire all queues dim_locks */
->> >  for (i = 0; i < vi->max_queue_pairs; i++)
->> >	  mutex_lock(&vi->rq[i].dim_lock);
->> >
->> >At the same time, too many queues will cause lockdep to be more irritable,
->> >which can be alleviated by using mutex_lock_nested(), however, there are
->> >still new warning when the number of queues exceeds MAX_LOCKDEP_SUBCLASSES.
->> >So I would like to gently revert this commit, although it brings
->> >unsynchronization that is not so concerned:
->> >  1. When dim is enabled, rx_dim_work may modify the coalescing parameters.
->> >     Users may read dirty coalescing parameters if querying.
->> >  2. When dim is switched from enabled to disabled, a spurious dim worker
->> >     maybe scheduled, but this can be handled correctly by rx_dim_work.
->> >
->> >[1]
->> >========================================================
->> >WARNING: possible recursive locking detected
->> >6.9.0-rc7+ #319 Not tainted
->> >--------------------------------------------
->> >ethtool/962 is trying to acquire lock:
->> >
->> >but task is already holding lock:
->> >
->> >other info that might help us debug this:
->> >Possible unsafe locking scenario:
->> >
->> >      CPU0
->> >      ----
->> > lock(&vi->rq[i].dim_lock);
->> > lock(&vi->rq[i].dim_lock);
->> >
->> >*** DEADLOCK ***
->> >
->> > May be due to missing lock nesting notation
->> >
->> >3 locks held by ethtool/962:
->> > #0: ffffffff82dbaab0 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40
->> > #1: ffffffff82dad0a8 (rtnl_mutex){+.+.}-{3:3}, at:
->> >				ethnl_default_set_doit+0xbe/0x1e0
->> >
->> >stack backtrace:
->> >CPU: 6 PID: 962 Comm: ethtool Not tainted 6.9.0-rc7+ #319
->> >Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
->> >	   rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
->> >Call Trace:
->> > <TASK>
->> > dump_stack_lvl+0x79/0xb0
->> > check_deadlock+0x130/0x220
->> > __lock_acquire+0x861/0x990
->> > lock_acquire.part.0+0x72/0x1d0
->> > ? lock_acquire+0xf8/0x130
->> > __mutex_lock+0x71/0xd50
->> > virtnet_set_coalesce+0x151/0x190
->> > __ethnl_set_coalesce.isra.0+0x3f8/0x4d0
->> > ethnl_set_coalesce+0x34/0x90
->> > ethnl_default_set_doit+0xdd/0x1e0
->> > genl_family_rcv_msg_doit+0xdc/0x130
->> > genl_family_rcv_msg+0x154/0x230
->> > ? __pfx_ethnl_default_set_doit+0x10/0x10
->> > genl_rcv_msg+0x4b/0xa0
->> > ? __pfx_genl_rcv_msg+0x10/0x10
->> > netlink_rcv_skb+0x5a/0x110
->> > genl_rcv+0x28/0x40
->> > netlink_unicast+0x1af/0x280
->> > netlink_sendmsg+0x20e/0x460
->> > __sys_sendto+0x1fe/0x210
->> > ? find_held_lock+0x2b/0x80
->> > ? do_user_addr_fault+0x3a2/0x8a0
->> > ? __lock_release+0x5e/0x160
->> > ? do_user_addr_fault+0x3a2/0x8a0
->> > ? lock_release+0x72/0x140
->> > ? do_user_addr_fault+0x3a7/0x8a0
->> > __x64_sys_sendto+0x29/0x30
->> > do_syscall_64+0x78/0x180
->> > entry_SYSCALL_64_after_hwframe+0x76/0x7e
->> >
->> >Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
->> 
->> Fixes tag missing.
->
->IIUC,
->
->  "This reverts commit 4d4ac2ececd3c42a08dd32a6e3a4aaf25f7efe44."
->
->has provided a traceback way, which is not fixing other patches,
->but fixing itself. So we do not need fixes tag.
+You can not have both tw_timer_handler() and
+inet_twsk_deschedule_put() calling inet_twsk_kill(tw);
 
-For submissions to -net, you always need the Fixes tag. As this fixes
-bug introduced by 4d4ac2ececd3c42a08dd32a6e3a4aaf25f7efe44, you should
-put that in "Fixes".
-
-
->
->Thanks.
->
->> 
->> 
->> >---
->> > drivers/net/virtio_net.c | 53 +++++++++-------------------------------
->> > 1 file changed, 12 insertions(+), 41 deletions(-)
->> >
->> >diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> >index 1cad06cef230..e4a1dff2a64a 100644
->> >--- a/drivers/net/virtio_net.c
->> >+++ b/drivers/net/virtio_net.c
->> >@@ -316,9 +316,6 @@ struct receive_queue {
->> > 	/* Is dynamic interrupt moderation enabled? */
->> > 	bool dim_enabled;
->> > 
->> >-	/* Used to protect dim_enabled and inter_coal */
->> >-	struct mutex dim_lock;
->> >-
->> > 	/* Dynamic Interrupt Moderation */
->> > 	struct dim dim;
->> > 
->> >@@ -2368,10 +2365,6 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
->> > 	/* Out of packets? */
->> > 	if (received < budget) {
->> > 		napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
->> >-		/* Intentionally not taking dim_lock here. This may result in a
->> >-		 * spurious net_dim call. But if that happens virtnet_rx_dim_work
->> >-		 * will not act on the scheduled work.
->> >-		 */
->> > 		if (napi_complete && rq->dim_enabled)
->> > 			virtnet_rx_dim_update(vi, rq);
->> > 	}
->> >@@ -3247,11 +3240,9 @@ static int virtnet_set_ringparam(struct net_device *dev,
->> > 				return err;
->> > 
->> > 			/* The reason is same as the transmit virtqueue reset */
->> >-			mutex_lock(&vi->rq[i].dim_lock);
->> > 			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i,
->> > 							       vi->intr_coal_rx.max_usecs,
->> > 							       vi->intr_coal_rx.max_packets);
->> >-			mutex_unlock(&vi->rq[i].dim_lock);
->> > 			if (err)
->> > 				return err;
->> > 		}
->> >@@ -4257,7 +4248,6 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
->> > 	struct virtio_net_ctrl_coal_rx *coal_rx __free(kfree) = NULL;
->> > 	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
->> > 	struct scatterlist sgs_rx;
->> >-	int ret = 0;
->> > 	int i;
->> > 
->> > 	if (rx_ctrl_dim_on && !virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
->> >@@ -4267,22 +4257,16 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
->> > 			       ec->rx_max_coalesced_frames != vi->intr_coal_rx.max_packets))
->> > 		return -EINVAL;
->> > 
->> >-	/* Acquire all queues dim_locks */
->> >-	for (i = 0; i < vi->max_queue_pairs; i++)
->> >-		mutex_lock(&vi->rq[i].dim_lock);
->> >-
->> > 	if (rx_ctrl_dim_on && !vi->rx_dim_enabled) {
->> > 		vi->rx_dim_enabled = true;
->> > 		for (i = 0; i < vi->max_queue_pairs; i++)
->> > 			vi->rq[i].dim_enabled = true;
->> >-		goto unlock;
->> >+		return 0;
->> > 	}
->> > 
->> > 	coal_rx = kzalloc(sizeof(*coal_rx), GFP_KERNEL);
->> >-	if (!coal_rx) {
->> >-		ret = -ENOMEM;
->> >-		goto unlock;
->> >-	}
->> >+	if (!coal_rx)
->> >+		return -ENOMEM;
->> > 
->> > 	if (!rx_ctrl_dim_on && vi->rx_dim_enabled) {
->> > 		vi->rx_dim_enabled = false;
->> >@@ -4300,10 +4284,8 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
->> > 
->> > 	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
->> > 				  VIRTIO_NET_CTRL_NOTF_COAL_RX_SET,
->> >-				  &sgs_rx)) {
->> >-		ret = -EINVAL;
->> >-		goto unlock;
->> >-	}
->> >+				  &sgs_rx))
->> >+		return -EINVAL;
->> > 
->> > 	vi->intr_coal_rx.max_usecs = ec->rx_coalesce_usecs;
->> > 	vi->intr_coal_rx.max_packets = ec->rx_max_coalesced_frames;
->> >@@ -4311,11 +4293,8 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
->> > 		vi->rq[i].intr_coal.max_usecs = ec->rx_coalesce_usecs;
->> > 		vi->rq[i].intr_coal.max_packets = ec->rx_max_coalesced_frames;
->> > 	}
->> >-unlock:
->> >-	for (i = vi->max_queue_pairs - 1; i >= 0; i--)
->> >-		mutex_unlock(&vi->rq[i].dim_lock);
->> > 
->> >-	return ret;
->> >+	return 0;
->> > }
->> > 
->> > static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
->> >@@ -4339,24 +4318,19 @@ static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
->> > 					     u16 queue)
->> > {
->> > 	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
->> >+	bool cur_rx_dim = vi->rq[queue].dim_enabled;
->> > 	u32 max_usecs, max_packets;
->> >-	bool cur_rx_dim;
->> > 	int err;
->> > 
->> >-	mutex_lock(&vi->rq[queue].dim_lock);
->> >-	cur_rx_dim = vi->rq[queue].dim_enabled;
->> > 	max_usecs = vi->rq[queue].intr_coal.max_usecs;
->> > 	max_packets = vi->rq[queue].intr_coal.max_packets;
->> > 
->> > 	if (rx_ctrl_dim_on && (ec->rx_coalesce_usecs != max_usecs ||
->> >-			       ec->rx_max_coalesced_frames != max_packets)) {
->> >-		mutex_unlock(&vi->rq[queue].dim_lock);
->> >+			       ec->rx_max_coalesced_frames != max_packets))
->> > 		return -EINVAL;
->> >-	}
->> > 
->> > 	if (rx_ctrl_dim_on && !cur_rx_dim) {
->> > 		vi->rq[queue].dim_enabled = true;
->> >-		mutex_unlock(&vi->rq[queue].dim_lock);
->> > 		return 0;
->> > 	}
->> > 
->> >@@ -4369,8 +4343,10 @@ static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
->> > 	err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, queue,
->> > 					       ec->rx_coalesce_usecs,
->> > 					       ec->rx_max_coalesced_frames);
->> >-	mutex_unlock(&vi->rq[queue].dim_lock);
->> >-	return err;
->> >+	if (err)
->> >+		return err;
->> >+
->> >+	return 0;
->> > }
->> > 
->> > static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
->> >@@ -4404,7 +4380,6 @@ static void virtnet_rx_dim_work(struct work_struct *work)
->> > 
->> > 	qnum = rq - vi->rq;
->> > 
->> >-	mutex_lock(&rq->dim_lock);
->> > 	if (!rq->dim_enabled)
->> > 		goto out;
->> > 
->> >@@ -4420,7 +4395,6 @@ static void virtnet_rx_dim_work(struct work_struct *work)
->> > 	}
->> > out:
->> > 	dim->state = DIM_START_MEASURE;
->> >-	mutex_unlock(&rq->dim_lock);
->> > }
->> > 
->> > static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
->> >@@ -4558,13 +4532,11 @@ static int virtnet_get_per_queue_coalesce(struct net_device *dev,
->> > 		return -EINVAL;
->> > 
->> > 	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
->> >-		mutex_lock(&vi->rq[queue].dim_lock);
->> > 		ec->rx_coalesce_usecs = vi->rq[queue].intr_coal.max_usecs;
->> > 		ec->tx_coalesce_usecs = vi->sq[queue].intr_coal.max_usecs;
->> > 		ec->tx_max_coalesced_frames = vi->sq[queue].intr_coal.max_packets;
->> > 		ec->rx_max_coalesced_frames = vi->rq[queue].intr_coal.max_packets;
->> > 		ec->use_adaptive_rx_coalesce = vi->rq[queue].dim_enabled;
->> >-		mutex_unlock(&vi->rq[queue].dim_lock);
->> > 	} else {
->> > 		ec->rx_max_coalesced_frames = 1;
->> > 
->> >@@ -5396,7 +5368,6 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
->> > 
->> > 		u64_stats_init(&vi->rq[i].stats.syncp);
->> > 		u64_stats_init(&vi->sq[i].stats.syncp);
->> >-		mutex_init(&vi->rq[i].dim_lock);
->> > 	}
->> > 
->> > 	return 0;
->> >-- 
->> >2.32.0.3.g01195cf9f
->> >
->> >
+Take a look at del_timer_sync()
 
