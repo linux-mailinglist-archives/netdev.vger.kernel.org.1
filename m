@@ -1,127 +1,86 @@
-Return-Path: <netdev+bounces-97607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA1AA8CC4F5
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 18:37:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B7FD8CC50B
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 18:44:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A44E1280E4A
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 16:37:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 112FBB21CC5
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 16:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 945C21411E0;
-	Wed, 22 May 2024 16:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD685141981;
+	Wed, 22 May 2024 16:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WvNIz+RM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="q4LFV16n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2826AD7;
-	Wed, 22 May 2024 16:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71761411E0;
+	Wed, 22 May 2024 16:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716395837; cv=none; b=Rtl7Pu8jl4pvGJkyDXO2+F2X3amMQN2lH2OojrBBThnKLwD5X/xz1hBdKxJ3PyNI5DOmq7HV029ieuX8VMkbmPppSk3z5TDPFSfnBYpDv7PX1qpPVZHqi7/Hp2aXreAYLQRgIKpKv8EAigyzJodu2MCx9kpjHcC2d7JEWoXUyog=
+	t=1716396276; cv=none; b=hc5cFsNwX9Gq4tJ07kWhn5YEr2RZq+qiiHzs2EcflDHG6m6UD/iwafdaxjGE+GCPn7ZKmlePQ1w7f4zlrEGN1Oz1jcN8cFdSyD0cBf8FeXMrP1Y9dPnN8RpTX5N3QGYC+YIrMSr5EnMGjvjf/6wxRwcYnriWjKiEIp47BAuuZHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716395837; c=relaxed/simple;
-	bh=OPRA3FUZBoBovwiYjKJevz+MzGYuVGCZhkXsOEfajWc=;
+	s=arc-20240116; t=1716396276; c=relaxed/simple;
+	bh=mRzXmGLEv1Sl8l3NlQK6F2G7/wyMGAx0/1jAxVbxsrE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VmgFOM50uaeJwcKX/l44sshmm9hanpKDXIIFICelyCvJ97aSjjnBb+JYZsUbiAuucBg3bOL0NDGGhne0XDZ+BBxE3YeyEuJkNwgPdhklnsoPr51fhD3ScLt0WrmntjnBNH5wMGBXYvj6xTRoRM0Ra7a8OFOQdTw1yIn2/G0dGUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WvNIz+RM; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6f447976de7so2478044b3a.1;
-        Wed, 22 May 2024 09:37:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716395835; x=1717000635; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6fLC3+2/b8athVdAjNdAdtF6LJlJTIZGeSogYFaPPNA=;
-        b=WvNIz+RMTssQIqK/92L1ML1KhSoEFSUkxGHmtevwR6MZwMoTNJhuU3ooRXeCGQiFIh
-         aJNZZQrPRTK+wGTkUPXrjMUxUEl3mACQIil8bC/eyN5eVG3lc+R1ihffG3PR1NMlvZrR
-         e1EssjC4MpFUT/uCyRnif0B2jKStrOBUxce7bYrQJRHzigqJ/Po7JPtMyFVDrjGO3/6b
-         858iQKxYLzL8Y1Ul+rAmu05kmT4HSmdlArn+qpBd/6AYzG5Wru4xcHbMNREDnLGDNmNB
-         z1hIqiAB7kVKn+2WBfVox2v6CLVMxylo0iyfBJWgNnnAcQw0uBca+xeo5s9UrLuNHdGI
-         3ygw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716395835; x=1717000635;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6fLC3+2/b8athVdAjNdAdtF6LJlJTIZGeSogYFaPPNA=;
-        b=Nm/Ldw6Z6mUk2Fp+jN7uF3J8IgLV06Lj7fN96t4Kw5QDH+c1U4+AuIl/ApjsOPieZj
-         kfmZiZnAi9Q1CzlFLiuchnZuJLG3GTV9OZoT2z/RpzqoKI4+0h8nhDcBEVZC7UC75q6J
-         zTugcvWIHVHJlnH1qQHN4e3tFnadSXKJr9iqQtzu+Kl9r4ZFu8SQmD0ofnbC8rMhFJom
-         pEVVM8nTOxPa1wf8wu61DCBgm092Lt1nJJwifIKkLLn5kFoMf0/WEK6xcVpRuzL92p0l
-         KzefCzuzkw1gquZVukFZ9HwLO257BHrfHlmVOpJ7m6uDF0r1UCusSjx7PDDsd85MFwIZ
-         4LVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXTG1BirEnnXqXNYYud8NBmof9+r6+jlhQndLolubalUFEWNk8PYLnKg1VvOFhMmrvapVGNKvOB7OzEpblkzeiZGqU1kheVkwomwG7pLqJsV2Vpt2UVuIzv3k4HPgh8xIzniIq5
-X-Gm-Message-State: AOJu0YwvW8dUenJTt9ng/t5l4rhugA1T7t+HEF/apHYcrP+d33XrlgNv
-	j8PGv7uUIO9BOurpqXzOdjDsm49Mw89SMsi4rzwfd3gwxXjmQjYk
-X-Google-Smtp-Source: AGHT+IGsNVFpNsjJl6nkL6TcIWCfQ9Nnc1YXfE65lJq1XVOE0KT/iyLfgR5YJyvil4mu7PUBbhaJSg==
-X-Received: by 2002:a05:6a20:431c:b0:1af:cc48:3e25 with SMTP id adf61e73a8af0-1b1f874d86bmr2766603637.10.1716395835293;
-        Wed, 22 May 2024 09:37:15 -0700 (PDT)
-Received: from localhost (dhcp-141-239-159-203.hawaiiantel.net. [141.239.159.203])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0bada410sm241322635ad.69.2024.05.22.09.37.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 09:37:14 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Wed, 22 May 2024 06:37:13 -1000
-From: Tejun Heo <tj@kernel.org>
-To: =?iso-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>
-Cc: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	Manjunath Patil <manjunath.b.patil@oracle.com>,
-	Mark Zhang <markzhang@nvidia.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Shiraz Saleem <shiraz.saleem@intel.com>,
-	Yang Li <yang.lee@linux.alibaba.com>
-Subject: Re: [PATCH v3 1/6] workqueue: Inherit per-process allocation flags
-Message-ID: <Zk4fOU8NCn755vv3@slm.duckdns.org>
-References: <20240522135444.1685642-1-haakon.bugge@oracle.com>
- <20240522135444.1685642-3-haakon.bugge@oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=imJA4b+JlujEKhx8VzZUD/RV7s8F8i6FxCPTaInL7i8DxXc0q+udeB5P5ELWSvysL/gXydlPovJzQSaCIrLVAzxSD7QBzQrwJrGcP1LMbs4XWQl+DOY2c/k82xf1qGJasV+oNJ4UBfB9jeJZe842OjSPE+wSS0byLq+WbgCrNt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=q4LFV16n; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8Tfw1C5OBMTMu+sGe3XwcpMYANF6JY3ZkgMDDdPK8dI=; b=q4LFV16nCNg0Rizqr8jyU8IGeF
+	AjtVn6vUasE2rVcjVzpGjksb+mOa2kwZMbL6rNU7JJjcpLXBfMmDxfdHYK8aoo0cVuGwSRc+d5w0N
+	epsyLBEy/O/26r6YIZoOrJF3Yw+//6cD8xyzgTBE+WTCQdIoCKLEvFocS7Yc1Y3oK29U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s9p4g-00Fppo-EO; Wed, 22 May 2024 18:44:22 +0200
+Date: Wed, 22 May 2024 18:44:22 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: steve.glendinning@shawell.net, UNGLinuxDriver@microchip.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: usb: smsc95xx: configure external LEDs function for
+ EVB-LAN8670-USB
+Message-ID: <9c19e0a1-b65c-416a-833c-1a4c3b63fa2f@lunn.ch>
+References: <20240522140817.409936-1-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240522135444.1685642-3-haakon.bugge@oracle.com>
+In-Reply-To: <20240522140817.409936-1-Parthiban.Veerasooran@microchip.com>
 
-Hello,
+On Wed, May 22, 2024 at 07:38:17PM +0530, Parthiban Veerasooran wrote:
+> By default, LAN9500A configures the external LEDs to the below function.
+> nSPD_LED -> Speed Indicator
+> nLNKA_LED -> Link and Activity Indicator
+> nFDX_LED -> Full Duplex Link Indicator
+> 
+> But, EVB-LAN8670-USB uses the below external LEDs function which can be
+> enabled by writing 1 to the LED Select (LED_SEL) bit in the LAN9500A.
+> nSPD_LED -> Speed Indicator
+> nLNKA_LED -> Link Indicator
+> nFDX_LED -> Activity Indicator
 
-On Wed, May 22, 2024 at 03:54:34PM +0200, Håkon Bugge wrote:
-> --- a/include/linux/workqueue.h
-> +++ b/include/linux/workqueue.h
-> @@ -406,9 +406,18 @@ enum wq_flags {
->  	__WQ_DRAINING		= 1 << 16, /* internal: workqueue is draining */
->  	__WQ_ORDERED		= 1 << 17, /* internal: workqueue is ordered */
->  	__WQ_LEGACY		= 1 << 18, /* internal: create*_workqueue() */
-> +	__WQ_MEMALLOC		= 1 << 19, /* internal: execute work with MEMALLOC */
-> +	__WQ_MEMALLOC_NOFS      = 1 << 20, /* internal: execute work with MEMALLOC_NOFS */
-> +	__WQ_MEMALLOC_NOIO      = 1 << 21, /* internal: execute work with MEMALLOC_NOIO */
-> +	__WQ_MEMALLOC_NORECLAIM = 1 << 22, /* internal: execute work with MEMALLOC_NORECLAIM */
-> +	__WQ_MEMALLOC_NOWARN    = 1 << 23, /* internal: execute work with MEMALLOC_NOWARN */
-> +	__WQ_MEMALLOC_PIN	= 1 << 24, /* internal: execute work with MEMALLOC_PIN */
+What else can the LEDs indicate?
 
-Please use a separate field w/ gfp_t. You can probably add it to
-workqueue_attrs.
+> +	/* Set LED Select (LED_SEL) bit for the external LED pins functionality
+> +	 * in the Microchip's EVB-LAN8670-USB 10BASE-T1S Ethernet device which
 
-Thanks.
+Is this a function of the USB dongle? Or a function of the PHY?
 
--- 
-tejun
+	Andrew
 
