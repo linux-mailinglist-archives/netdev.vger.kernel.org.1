@@ -1,226 +1,174 @@
-Return-Path: <netdev+bounces-97509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD2F48CBCAC
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:09:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CE7C8CBCB4
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:12:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DF301F21687
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 08:09:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FBA51C209F5
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 08:12:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1417E56B;
-	Wed, 22 May 2024 08:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C27E7F47F;
+	Wed, 22 May 2024 08:12:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="VLIYO4Y4"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="LjOqOWgK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E163A182DB
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 08:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8727E761
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 08:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716365380; cv=none; b=LZsqgkkb6pUQRFmPJ+QXepJVMZz7LBkKNCq9H99PNaSFrhMAMEXA0iluEavD2tDDZhLie+4mWRulHxtE6Zig+nsSZNJY4ypPvulF95yRe6dB46516+xAJfrlG3Vu9+hlKzq3hdjSjLjdJs8wDvLH2V8y3NT3u18HK/frtImuOyA=
+	t=1716365558; cv=none; b=Mrpx5OhztIilAibitaKcOf5Mw2AO1KvVUv6EC/lQd6Ip2JNTlMwv+w1k7/dZAx8OUrd8sEE3kBGu+D7QuQK7sY6rO244pAcgVJbBdbqbqwnQMsSp7ssdmYbL0eAInCPDVmxhOIWUPO7X20xG/xyiPyqKP/gTkZDC7jCTRFR2RrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716365380; c=relaxed/simple;
-	bh=HTSAkOfvYuC9hUkLVTxjoov6viq5nfiMgRTmN1j9YxY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NINvTTsQSP2lBuRK3EduHv3x+qm5ylhbJNgDidNzWlxAJBOJn+PfNnttSxjVsPkUC3ACbXvkOVIRnr/scuPFMeAhjtFkhdJktN4oULZNrq+2v7cLFpNC7PGOow91M7tJ/ZN1b5Xici5dAyrLUO0Ga043Db/e3xr2ZiQnOvduV7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=VLIYO4Y4; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a5a89787ea4so878277566b.2
-        for <netdev@vger.kernel.org>; Wed, 22 May 2024 01:09:38 -0700 (PDT)
+	s=arc-20240116; t=1716365558; c=relaxed/simple;
+	bh=vk3R4KQmfANWHCtH/ne6qcs8DBfl3MeC7hEtlJRxLJM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VZtT6To7sar3GsPXD+Q/IImau/DyqbpyRJVV1XAoc8LQl4btyNgZj2bvbwrCxtosJ8uQTf95UM3Gqig/pOcHTSzCkw3kFYh/4yyiN/Imb6MZvxuPUZ3wafqmdzHeagNDzygzhIKcRpupcQFQaqGe7OrNzhgu9rcdBMvzpJbJNP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=LjOqOWgK; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-573061776e8so9802183a12.1
+        for <netdev@vger.kernel.org>; Wed, 22 May 2024 01:12:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1716365377; x=1716970177; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xq9ju8yuRG9zlq1ssdeG2Wi6UKR7EhZ3LYktIzrnaHw=;
-        b=VLIYO4Y4pOfw/LsXaZoNTlfDuhqJh5ZD6FGYyxtK0Bi0Zt68JDbiH1zciTC/Rg5I73
-         cmHv0OfLrEZ31EEZ6qk0/SGiNjm9Oul4Qgve3POm2DwqdbacohQmCLKA1grnVeYOrgZq
-         2gg5BchGSQysOelk6IFEpGm06vsgRKYlmgYIW38dsqsZYQkALC2DKruQvreFzKYlCWAD
-         nLbOWbkY/KwFiLfYih0w9hpraH7D0g0SPdS6HaQg0Q6IdWKcg2fiVhWIv6OsMpd93XQw
-         TMYFf7a7uZqgBhBaPMv8UFMpdEoNMiCASPz7iXGSqFXCKLYDLdGsXg/FIpYz2LYn/KQz
-         d84A==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1716365553; x=1716970353; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Kq/162D2wbBA4dLFrzt19khbj/72lrfhJsWvQj91jBo=;
+        b=LjOqOWgKNDU8JsancRPMx0hepDLcJb7jbQ60/H1Q2+gxunpYOSJT61D//FlrSYZZ82
+         0yhvvcO/fiZkI0zfxZtLEninHPSD4u2Hu9Uj99b9t/+PPQlWsN6MEtcxMvdrPMDCp3Bi
+         xHQNzWwP8C1VkpvA6pWMmtO6lY9JfJvsXSqXhj4OjA9y7cmHwJPNnAfLfRKiCAa77ZJy
+         fq40YgEtvVfrthKyH6rnNqEZHe8L9SaEDSCH1QdUQQ+7yx5kCOSvZYAihhKPpq+HmHA2
+         0eZilSCV/5+O9rayLL0yTIHiPUkSQ0blz3q/6kcR6+MP42x+K6beHf2UVv6zrC1Lupc9
+         oVqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716365377; x=1716970177;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Xq9ju8yuRG9zlq1ssdeG2Wi6UKR7EhZ3LYktIzrnaHw=;
-        b=nKhvj8A64a2E1Vv5Nq3fn0sjQafNVSBXqLMSBBsbf/aCYp1GuCwF/vZ0eYsaHIr1ek
-         t3zrfPqGNmk7CC7b7V8waV8QpvW/g7DuMJRz5hCWK76kOnf8Sbe40TzPM1vzx8TOxxPA
-         XYtNoiAT++FFNThK6CMsyBvfw0SRKZuf2zpq2o5eRvF1Vo46bnBLaGIsc4TV9h+1MOT4
-         riXJWjMKc8W3gCjI7MyZRxoTAZ0CqylY9VDaAaDuLPySM77oRR2mRJ1VQzXCv5FhmLgD
-         /vvqvXAH2BdZc2zcBnPxnBoZWH0pFz+PUj17BYfDq9pfJmC/+Rmkw1HvG535Bd0Pgy3P
-         c+gg==
-X-Gm-Message-State: AOJu0YzSvXQV3x7lmlA0zc6upKVp9EkwcnQeaOkCOwOuIqB8LDOLjA9n
-	k3jw+Ge63CUeD5SIeCOSQUzCFoX3xsZai0jGZzZL2c0CGEBK22O9wEMdmtr8cDU=
-X-Google-Smtp-Source: AGHT+IGstuf+E6eoUXnXG3g0majoDgIfzyLmMnkjz+pFVkzINmxxHBKor7gJYutVvHOmkXgyMqtPhw==
-X-Received: by 2002:a17:906:259a:b0:a59:a0b6:638 with SMTP id a640c23a62f3a-a622819aea3mr68572366b.61.1716365377206;
-        Wed, 22 May 2024 01:09:37 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2dc::49:b7])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a179c7df7sm1728517866b.111.2024.05.22.01.09.36
+        d=1e100.net; s=20230601; t=1716365553; x=1716970353;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Kq/162D2wbBA4dLFrzt19khbj/72lrfhJsWvQj91jBo=;
+        b=gWWyHcvidwbHHkVCcQzQ3bkWYlD8L5CH4lDNlBARdfaMhouuh0y0KD+/eciGpuPfLN
+         J9vN/kwwOGlSQNSb9MulcX6AF0KAmKT7vH0kq49KQ3DAB4YIrbkM4piWP6cTgbHKzg0d
+         9Sjufsxh2d6zQaUIMwR66Yq+7YM/242dw9URqyA/8V+KJ4TBnveIKfUNOv74wK8yaRef
+         SpDoqNtq9xgE9cNVjXbahAn1I98XS+ryqyHYhbnjo127W7aATkJdH6Zb60uUg/0chO1W
+         6bG+6nCcwKNjaqM2NnIj6GM/iL2hQuqxurywfYVjYCcrc13hPN4UWIhCttnly4/jZ5Fg
+         84tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWYzWROJsuD8v2RROhL6l23G7M7pfPkZcl7VTmRtkqpiAem0qOg1vN8IqSPTICw7dR5lzop7T3TY74twR15QRj7qphZFL2P
+X-Gm-Message-State: AOJu0Yyyn3W2PQ38TfS0f89vyFRpvcpGxToyA0Xtfh535hrK0ZDrId0R
+	iVv/1F9MxeajG80NdMgV5ZM5GvKzBw+h5slDtVsiejjzjpq3NjqkiIYbQjeo+6k=
+X-Google-Smtp-Source: AGHT+IFmGsT5K8VSmmgd8IG9bBCFaCKxwzGK4lUKVOSdutPIUuQU+nsgWONTZd2FTHrPdyDKP/mxVA==
+X-Received: by 2002:a50:99d0:0:b0:574:eba7:4741 with SMTP id 4fb4d7f45d1cf-57832c641bamr691855a12.42.1716365552935;
+        Wed, 22 May 2024 01:12:32 -0700 (PDT)
+Received: from localhost (78-80-19-19.customers.tmcz.cz. [78.80.19.19])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5782859f7ffsm1464361a12.83.2024.05.22.01.12.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 01:09:36 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>
-Subject: [PATCH bpf-next] selftests/bpf: test_sockmap, use section names understood by libbpf
-Date: Wed, 22 May 2024 10:09:36 +0200
-Message-Id: <20240522080936.2475833-1-jakub@cloudflare.com>
-X-Mailer: git-send-email 2.40.1
+        Wed, 22 May 2024 01:12:32 -0700 (PDT)
+Date: Wed, 22 May 2024 10:12:30 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, yuehaibing@huawei.com,
+	larysa.zaremba@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 net-next] ila: avoid genlmsg_reply when not ila_map
+ found
+Message-ID: <Zk2o7nmCfQstc7LP@nanopsycho.orion>
+References: <20240522031537.51741-1-linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240522031537.51741-1-linma@zju.edu.cn>
 
-libbpf can deduce program type and attach type from the ELF section name.
-We don't need to pass it out-of-band if we switch to libbpf convention [1].
+Wed, May 22, 2024 at 05:15:37AM CEST, linma@zju.edu.cn wrote:
+>The current ila_xlat_nl_cmd_get_mapping will call genlmsg_reply even if
+>not ila_map found with user provided parameters. Then an empty netlink
+>message will be sent and cause a WARNING like below.
+>
+>WARNING: CPU: 1 PID: 7709 at include/linux/skbuff.h:2524 __dev_queue_xmit+0x241b/0x3b60 net/core/dev.c:4171
+>Modules linked in:
+>Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+>RIP: 0010:skb_assert_len include/linux/skbuff.h:2524 [inline]
+>RIP: 0010:__dev_queue_xmit+0x241b/0x3b60 net/core/dev.c:4171
+>RSP: 0018:ffffc9000f90f228 EFLAGS: 00010282
+>RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+>RDX: 0000000000040000 RSI: ffffffff816968a8 RDI: fffff52001f21e37
+>RBP: ffff8881077f2d3a R08: 0000000000000005 R09: 0000000000000000
+>R10: 0000000080000000 R11: 0000000000000000 R12: dffffc0000000000
+>R13: 0000000000000000 R14: ffff8881077f2c90 R15: ffff8881077f2c80
+>FS:  00007fb8be338700(0000) GS:ffff888135c00000(0000) knlGS:0000000000000000
+>CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>CR2: 000000c00ca8a000 CR3: 0000000105e17000 CR4: 0000000000150ee0
+>Call Trace:
+> <TASK>
+> dev_queue_xmit include/linux/netdevice.h:3008 [inline]
+> __netlink_deliver_tap_skb net/netlink/af_netlink.c:307 [inline]
+> __netlink_deliver_tap net/netlink/af_netlink.c:325 [inline]
+> netlink_deliver_tap+0x9e4/0xc40 net/netlink/af_netlink.c:338
+> __netlink_sendskb net/netlink/af_netlink.c:1263 [inline]
+> netlink_sendskb net/netlink/af_netlink.c:1272 [inline]
+> netlink_unicast+0x6ac/0x7f0 net/netlink/af_netlink.c:1360
+> nlmsg_unicast include/net/netlink.h:1067 [inline]
+> genlmsg_unicast include/net/genetlink.h:372 [inline]
+> genlmsg_reply include/net/genetlink.h:382 [inline]
+> ila_xlat_nl_cmd_get_mapping+0x589/0x950 net/ipv6/ila/ila_xlat.c:493
+> genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:756
+> genl_family_rcv_msg net/netlink/genetlink.c:833 [inline]
+> genl_rcv_msg+0x441/0x780 net/netlink/genetlink.c:850
+> netlink_rcv_skb+0x153/0x400 net/netlink/af_netlink.c:2540
+> genl_rcv+0x24/0x40 net/netlink/genetlink.c:861
+> netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+> netlink_unicast+0x543/0x7f0 net/netlink/af_netlink.c:1345
+> netlink_sendmsg+0x917/0xe10 net/netlink/af_netlink.c:1921
+> sock_sendmsg_nosec net/socket.c:714 [inline]
+> sock_sendmsg+0xcf/0x120 net/socket.c:734
+> ____sys_sendmsg+0x6eb/0x810 net/socket.c:2482
+> ___sys_sendmsg+0x110/0x1b0 net/socket.c:2536
+> __sys_sendmsg+0xf3/0x1c0 net/socket.c:2565
+> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+> entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>RIP: 0033:0x7fb8bd68f359
+>Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+>RSP: 002b:00007fb8be338168 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+>RAX: ffffffffffffffda RBX: 00007fb8bd7bbf80 RCX: 00007fb8bd68f359
+>RDX: 0000000000000000 RSI: 0000000020000100 RDI: 0000000000000005
+>RBP: 00007fb8bd6da498 R08: 0000000000000000 R09: 0000000000000000
+>R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+>R13: 00007ffc22fb52af R14: 00007fb8be338300 R15: 0000000000022000
+>
+>Do nullptr check and assign -EINVAL ret if no ila_map found.
+>
+>Signed-off-by: Lin Ma <linma@zju.edu.cn>
 
-[1] https://docs.kernel.org/bpf/libbpf/program_types.html
+You should aim -net tree and add appropriate Fixes tag here.
 
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
----
- .../selftests/bpf/progs/test_sockmap_kern.h   | 17 +++++-----
- tools/testing/selftests/bpf/test_sockmap.c    | 31 -------------------
- 2 files changed, 9 insertions(+), 39 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_kern.h b/tools/testing/selftests/bpf/progs/test_sockmap_kern.h
-index 99d2ea9fb658..3dff0813730b 100644
---- a/tools/testing/selftests/bpf/progs/test_sockmap_kern.h
-+++ b/tools/testing/selftests/bpf/progs/test_sockmap_kern.h
-@@ -92,7 +92,7 @@ struct {
- 	__uint(value_size, sizeof(int));
- } tls_sock_map SEC(".maps");
- 
--SEC("sk_skb1")
-+SEC("sk_skb/stream_parser")
- int bpf_prog1(struct __sk_buff *skb)
- {
- 	int *f, two = 2;
-@@ -104,7 +104,7 @@ int bpf_prog1(struct __sk_buff *skb)
- 	return skb->len;
- }
- 
--SEC("sk_skb2")
-+SEC("sk_skb/stream_verdict")
- int bpf_prog2(struct __sk_buff *skb)
- {
- 	__u32 lport = skb->local_port;
-@@ -151,7 +151,7 @@ static inline void bpf_write_pass(struct __sk_buff *skb, int offset)
- 		memcpy(c + offset, "PASS", 4);
- }
- 
--SEC("sk_skb3")
-+SEC("sk_skb/stream_verdict")
- int bpf_prog3(struct __sk_buff *skb)
- {
- 	int err, *f, ret = SK_PASS;
-@@ -233,7 +233,7 @@ int bpf_sockmap(struct bpf_sock_ops *skops)
- 	return 0;
- }
- 
--SEC("sk_msg1")
-+SEC("sk_msg")
- int bpf_prog4(struct sk_msg_md *msg)
- {
- 	int *bytes, zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5;
-@@ -263,7 +263,7 @@ int bpf_prog4(struct sk_msg_md *msg)
- 	return SK_PASS;
- }
- 
--SEC("sk_msg2")
-+SEC("sk_msg")
- int bpf_prog6(struct sk_msg_md *msg)
- {
- 	int zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, key = 0;
-@@ -308,7 +308,7 @@ int bpf_prog6(struct sk_msg_md *msg)
- #endif
- }
- 
--SEC("sk_msg3")
-+SEC("sk_msg")
- int bpf_prog8(struct sk_msg_md *msg)
- {
- 	void *data_end = (void *)(long) msg->data_end;
-@@ -329,7 +329,8 @@ int bpf_prog8(struct sk_msg_md *msg)
- 
- 	return SK_PASS;
- }
--SEC("sk_msg4")
-+
-+SEC("sk_msg")
- int bpf_prog9(struct sk_msg_md *msg)
- {
- 	void *data_end = (void *)(long) msg->data_end;
-@@ -347,7 +348,7 @@ int bpf_prog9(struct sk_msg_md *msg)
- 	return SK_PASS;
- }
- 
--SEC("sk_msg5")
-+SEC("sk_msg")
- int bpf_prog10(struct sk_msg_md *msg)
- {
- 	int *bytes, *start, *end, *start_push, *end_push, *start_pop, *pop;
-diff --git a/tools/testing/selftests/bpf/test_sockmap.c b/tools/testing/selftests/bpf/test_sockmap.c
-index 4499b3cfc3a6..ddc6a9cef36f 100644
---- a/tools/testing/selftests/bpf/test_sockmap.c
-+++ b/tools/testing/selftests/bpf/test_sockmap.c
-@@ -1783,30 +1783,6 @@ char *map_names[] = {
- 	"tls_sock_map",
- };
- 
--int prog_attach_type[] = {
--	BPF_SK_SKB_STREAM_PARSER,
--	BPF_SK_SKB_STREAM_VERDICT,
--	BPF_SK_SKB_STREAM_VERDICT,
--	BPF_CGROUP_SOCK_OPS,
--	BPF_SK_MSG_VERDICT,
--	BPF_SK_MSG_VERDICT,
--	BPF_SK_MSG_VERDICT,
--	BPF_SK_MSG_VERDICT,
--	BPF_SK_MSG_VERDICT,
--};
--
--int prog_type[] = {
--	BPF_PROG_TYPE_SK_SKB,
--	BPF_PROG_TYPE_SK_SKB,
--	BPF_PROG_TYPE_SK_SKB,
--	BPF_PROG_TYPE_SOCK_OPS,
--	BPF_PROG_TYPE_SK_MSG,
--	BPF_PROG_TYPE_SK_MSG,
--	BPF_PROG_TYPE_SK_MSG,
--	BPF_PROG_TYPE_SK_MSG,
--	BPF_PROG_TYPE_SK_MSG,
--};
--
- static int populate_progs(char *bpf_file)
- {
- 	struct bpf_program *prog;
-@@ -1825,13 +1801,6 @@ static int populate_progs(char *bpf_file)
- 		return -1;
- 	}
- 
--	bpf_object__for_each_program(prog, obj) {
--		bpf_program__set_type(prog, prog_type[i]);
--		bpf_program__set_expected_attach_type(prog,
--						      prog_attach_type[i]);
--		i++;
--	}
--
- 	i = bpf_object__load(obj);
- 	i = 0;
- 	bpf_object__for_each_program(prog, obj) {
--- 
-2.40.1
-
+>---
+> net/ipv6/ila/ila_xlat.c | 2 ++
+> 1 file changed, 2 insertions(+)
+>
+>diff --git a/net/ipv6/ila/ila_xlat.c b/net/ipv6/ila/ila_xlat.c
+>index 67e8c9440977..63b8fe1b8255 100644
+>--- a/net/ipv6/ila/ila_xlat.c
+>+++ b/net/ipv6/ila/ila_xlat.c
+>@@ -483,6 +483,8 @@ int ila_xlat_nl_cmd_get_mapping(struct sk_buff *skb, struct genl_info *info)
+> 				    info->snd_portid,
+> 				    info->snd_seq, 0, msg,
+> 				    info->genlhdr->cmd);
+>+	} else {
+>+		ret = -EINVAL;
+> 	}
+> 
+> 	rcu_read_unlock();
+>-- 
+>2.34.1
+>
+>
 
