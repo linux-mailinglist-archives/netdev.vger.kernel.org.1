@@ -1,73 +1,69 @@
-Return-Path: <netdev+bounces-97593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C6558CC393
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 16:53:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9855D8CC39A
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 16:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 034E82814E3
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 14:53:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 548402837F2
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 14:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9721CD16;
-	Wed, 22 May 2024 14:53:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B1DC1D6AA;
+	Wed, 22 May 2024 14:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Gqv+jWF2"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="huZXihql"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C97E18645
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 14:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB6E1CD16;
+	Wed, 22 May 2024 14:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716389609; cv=none; b=Xsu9ihrA9TfVDw78L4Ucex5ify/od7j/h3rfdR760y+vVMFFkmcLUx+xELU3MkC4cusIzjpsGrj0juuHGTVNnQy/hv+GtCxqH3neexHtYt0cqXCLcEiEEj2n7yb+wQAn9veT5h4OOJ/MePy/DztbtXahMZbw73NVx/r3A7wi4cc=
+	t=1716389862; cv=none; b=oQgeVkQpSp0a3THbLs24m39zaqowijXZWDKDC9WGBjuhevqcmlaiKctaPDIbRrOa7Y20vGQKO6uckgdEFJB3FSHvdzXpd9RGhzjP1qiwQpUFO9Hel+0OVAAme7rsz5nJ+Sea6hhG1pauiFoz+Lck+d7TibnhMd6l3zpK+BRBhBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716389609; c=relaxed/simple;
-	bh=aOGxFH+6nyPi7nJ7BqkXsmKGX5qYEWCNNSRQAF20bak=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V8+SrxprMkw3Y9QGODyyLXOC1Pl79XtxT7bewa0orcLiYKAmQY+4ggHmnytWw3WwgC30kYB18/Yey18LnrnLVDYRWMd7ieBqnOhmjWQmsyomljYQm6hkj+uSqibB5uTlrKvfpup7IKbF9YoUrvGKnrZ9F4U/ByvvXCnbLU6lLhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Gqv+jWF2; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1716389608; x=1747925608;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=SgRSyqCqMHmxrxmT9lz/LMiB14np5R4uzyb1tWGIkDw=;
-  b=Gqv+jWF2Gb/M+Yd4vE+/BYhfbYW2p8yj0QLyrlz9Xfq/Su8pYv4pFI19
-   X6jYzAp+asp5Txzfzl+6R1/F7x6y9BCPMAj5ZNA2f4CCbSFv5e0RWmPEE
-   zjDWo22d37Kivsbyla15LHXAfHangFglnyIvEwleRkq1aTODinBhJ7EWT
-   I=;
-X-IronPort-AV: E=Sophos;i="6.08,181,1712620800"; 
-   d="scan'208";a="296816174"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2024 14:53:24 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:41267]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.50:2525] with esmtp (Farcaster)
- id cae9aef9-08a5-4217-afe6-5a0347d643f4; Wed, 22 May 2024 14:53:23 +0000 (UTC)
-X-Farcaster-Flow-ID: cae9aef9-08a5-4217-afe6-5a0347d643f4
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 22 May 2024 14:53:23 +0000
-Received: from 88665a182662.ant.amazon.com (10.143.93.121) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 22 May 2024 14:53:19 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pabeni@redhat.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<syzkaller@googlegroups.com>
-Subject: Re: [PATCH v1 net] af_unix: Annotate data-race around unix_sk(sk)->addr.
-Date: Wed, 22 May 2024 23:53:09 +0900
-Message-ID: <20240522145309.74255-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <6a187b65c4b2e487461e5d3b2270670586841d84.camel@redhat.com>
-References: <6a187b65c4b2e487461e5d3b2270670586841d84.camel@redhat.com>
+	s=arc-20240116; t=1716389862; c=relaxed/simple;
+	bh=pQBNxtCwqRBfHoza8gVPTs0GuyS6y6tCfPhw6gYt354=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SI0cdOQwx4qE3xwRnwnSdeF4ZAvsW7dZg/vtXYAGvxRLQAgdvq2hC7s1brxFLlceVUybbtRcjEiX6Pdx5c3s9WmBUD2qL3vU7Kko7fHqqJexBeqlBNXExmjCDocjO5QtAfvbGkbcvDhEZ8n8Mz9LY3G6KY7xNo9d6PdrBrg8QdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=huZXihql; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.17.1.19/8.17.1.19) with ESMTP id 44MAY754003497;
+	Wed, 22 May 2024 07:57:22 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=TyrAxx8h6NEXxO7Pi0+xsoDGCi8mE5xhc9IsGWQSqow=;
+ b=huZXihql1JAtHwyasgD22Nnt4F/3UYluzYvm3mBeUax7eYrbhwfvzJLPgbeQ9oyQw9Z6
+ DAl5XJpenyMMfvWi39oI3uuw0/yTXfqcsYBeP/I4d4xJUKC33GeucNYFbKw8o1VeHWoi
+ 4V15vGLvPOxAPgLaGh4tR0eBqxzHWIwK9YVPI4S/KurSCcgcYOTQNcpRAgY5n4NVPm0D
+ 8IhfRkKAXoXcI2PFrUBWTEPOphyrnV1r38weWywULoRYcNlaZgeQnb++pUc/leHY/MGo
+ CJx2bejohhB9aRQrF0qlXL8hMTaaRemljWWZBJvTFsyLpK8nU57M1mXLhnxa0MtPMF4W Fg== 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+	by m0001303.ppops.net (PPS) with ESMTPS id 3y91bsnsv4-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 22 May 2024 07:57:21 -0700
+Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:1c::1b) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server id
+ 15.2.1544.11; Wed, 22 May 2024 14:57:19 +0000
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Martin KaFai Lau
+	<martin.lau@linux.dev>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        "Alexei
+ Starovoitov" <ast@kernel.org>,
+        Mykola Lysenko <mykolal@fb.com>, Jakub
+ Kicinski <kuba@kernel.org>
+CC: Vadim Fedorenko <vadfed@meta.com>, <bpf@vger.kernel.org>,
+        <netdev@vger.kernel.org>
+Subject: [PATCH bpf-next 1/2] bpf: add CHECKSUM_COMPLETE to bpf test progs
+Date: Wed, 22 May 2024 07:57:10 -0700
+Message-ID: <20240522145712.3523593-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,133 +72,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA001.ant.amazon.com (10.13.139.112) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-Proofpoint-GUID: pBLwyzx2-0S20J3Zgxk5dAvGL5BbwQHW
+X-Proofpoint-ORIG-GUID: pBLwyzx2-0S20J3Zgxk5dAvGL5BbwQHW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-22_08,2024-05-22_01,2024-05-17_01
 
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Wed, 22 May 2024 10:52:19 +0200
-> On Sat, 2024-05-18 at 09:01 +0900, Kuniyuki Iwashima wrote:
-> > Once unix_sk(sk)->addr is assigned under net->unx.table.locks,
-> > *(unix_sk(sk)->addr) and unix_sk(sk)->path are fully set up, and
-> > unix_sk(sk)->addr is never changed.
-> > 
-> > unix_getname() and unix_copy_addr() access the two fields locklessly,
-> > and commit ae3b564179bf ("missing barriers in some of unix_sock ->addr
-> > and ->path accesses") added smp_store_release() and smp_load_acquire()
-> > pairs.
-> > 
-> > In other functions, we still read unix_sk(sk)->addr locklessly to check
-> > if the socket is bound, and KCSAN complains about it.  [0]
-> > 
-> > Given these functions have no dependency for *(unix_sk(sk)->addr) and
-> > unix_sk(sk)->path, READ_ONCE() is enough to annotate the data-race.
-> > 
-> > [0]:
-> > BUG: KCSAN: data-race in unix_bind / unix_listen
-> > 
-> > write (marked) to 0xffff88805f8d1840 of 8 bytes by task 13723 on cpu 0:
-> >  __unix_set_addr_hash net/unix/af_unix.c:329 [inline]
-> >  unix_bind_bsd net/unix/af_unix.c:1241 [inline]
-> >  unix_bind+0x881/0x1000 net/unix/af_unix.c:1319
-> >  __sys_bind+0x194/0x1e0 net/socket.c:1847
-> >  __do_sys_bind net/socket.c:1858 [inline]
-> >  __se_sys_bind net/socket.c:1856 [inline]
-> >  __x64_sys_bind+0x40/0x50 net/socket.c:1856
-> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> >  do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
-> >  entry_SYSCALL_64_after_hwframe+0x46/0x4e
-> > 
-> > read to 0xffff88805f8d1840 of 8 bytes by task 13724 on cpu 1:
-> >  unix_listen+0x72/0x180 net/unix/af_unix.c:734
-> >  __sys_listen+0xdc/0x160 net/socket.c:1881
-> >  __do_sys_listen net/socket.c:1890 [inline]
-> >  __se_sys_listen net/socket.c:1888 [inline]
-> >  __x64_sys_listen+0x2e/0x40 net/socket.c:1888
-> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> >  do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
-> >  entry_SYSCALL_64_after_hwframe+0x46/0x4e
-> > 
-> > value changed: 0x0000000000000000 -> 0xffff88807b5b1b40
-> > 
-> > Reported by Kernel Concurrency Sanitizer on:
-> > CPU: 1 PID: 13724 Comm: syz-executor.4 Not tainted 6.8.0-12822-gcd51db110a7e #12
-> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-> > 
-> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > Reported-by: syzkaller <syzkaller@googlegroups.com>
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >  net/unix/af_unix.c | 10 ++++++----
-> >  1 file changed, 6 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> > index ca101690e740..92a88ac070ca 100644
-> > --- a/net/unix/af_unix.c
-> > +++ b/net/unix/af_unix.c
-> > @@ -731,7 +731,7 @@ static int unix_listen(struct socket *sock, int backlog)
-> >  	if (sock->type != SOCK_STREAM && sock->type != SOCK_SEQPACKET)
-> >  		goto out;	/* Only stream/seqpacket sockets accept */
-> >  	err = -EINVAL;
-> > -	if (!u->addr)
-> > +	if (!READ_ONCE(u->addr))
-> >  		goto out;	/* No listens on an unbound socket */
-> >  	unix_state_lock(sk);
-> >  	if (sk->sk_state != TCP_CLOSE && sk->sk_state != TCP_LISTEN)
-> > @@ -1369,7 +1369,7 @@ static int unix_dgram_connect(struct socket *sock, struct sockaddr *addr,
-> >  
-> >  		if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
-> >  		     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
-> > -		    !unix_sk(sk)->addr) {
-> > +		    !READ_ONCE(unix_sk(sk)->addr)) {
-> >  			err = unix_autobind(sk);
-> >  			if (err)
-> >  				goto out;
-> > @@ -1481,7 +1481,8 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
-> >  		goto out;
-> >  
-> >  	if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
-> > -	     test_bit(SOCK_PASSPIDFD, &sock->flags)) && !u->addr) {
-> > +	     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
-> > +	    !READ_ONCE(u->addr)) {
-> >  		err = unix_autobind(sk);
-> >  		if (err)
-> >  			goto out;
-> > @@ -1951,7 +1952,8 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
-> >  	}
-> >  
-> >  	if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
-> > -	     test_bit(SOCK_PASSPIDFD, &sock->flags)) && !u->addr) {
-> > +	     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
-> > +	    !READ_ONCE(u->addr)) {
-> >  		err = unix_autobind(sk);
-> >  		if (err)
-> >  			goto out;
-> 
-> There are a few other places where ->addr is accessed lockless (under
-> the bindlock, but prior to acquiring the table spinlock, e.g.
-> unix_bind_* and unix_autobind. The latter is suspect as it's called
-> right after the touched code. Why are such spots not relevant here?
+Add special flag to validate that TC BPF program properly updates
+checksum information in skb.
 
-When u->addr is set, bindlock and the hash table lock are held.
-unix_bind_(abstract|bsd)() and unix_autobind() are all serialised
-by bindlock, so ->addr check after acquiring bindlock is not
-lockless actually.
+Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+---
+ include/uapi/linux/bpf.h       |  2 ++
+ net/bpf/test_run.c             | 19 ++++++++++++++++++-
+ tools/include/uapi/linux/bpf.h |  2 ++
+ 3 files changed, 22 insertions(+), 1 deletion(-)
 
+diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+index 90706a47f6ff..f7d458d88111 100644
+--- a/include/uapi/linux/bpf.h
++++ b/include/uapi/linux/bpf.h
+@@ -1425,6 +1425,8 @@ enum {
+ #define BPF_F_TEST_RUN_ON_CPU	(1U << 0)
+ /* If set, XDP frames will be transmitted after processing */
+ #define BPF_F_TEST_XDP_LIVE_FRAMES	(1U << 1)
++/* If set, apply CHECKSUM_COMPLETE to skb and validate the checksum */
++#define BPF_F_TEST_SKB_CHECKSUM_COMPLETE	(1U << 2)
+ 
+ /* type for BPF_ENABLE_STATS */
+ enum bpf_stats_type {
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index f6aad4ed2ab2..841552785c65 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -974,10 +974,13 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 	int hh_len = ETH_HLEN;
+ 	struct sk_buff *skb;
+ 	struct sock *sk;
++	__wsum csum;
++	__sum16 sum;
+ 	void *data;
+ 	int ret;
+ 
+-	if (kattr->test.flags || kattr->test.cpu || kattr->test.batch_size)
++	if ((kattr->test.flags & ~BPF_F_TEST_SKB_CHECKSUM_COMPLETE) ||
++	    kattr->test.cpu || kattr->test.batch_size)
+ 		return -EINVAL;
+ 
+ 	data = bpf_test_init(kattr, kattr->test.data_size_in,
+@@ -1025,6 +1028,12 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 
+ 	skb_reserve(skb, NET_SKB_PAD + NET_IP_ALIGN);
+ 	__skb_put(skb, size);
++
++	if (kattr->test.flags & BPF_F_TEST_SKB_CHECKSUM_COMPLETE) {
++		skb->csum = skb_checksum(skb, 0, skb->len, 0);
++		skb->ip_summed = CHECKSUM_COMPLETE;
++	}
++
+ 	if (ctx && ctx->ifindex > 1) {
+ 		dev = dev_get_by_index(net, ctx->ifindex);
+ 		if (!dev) {
+@@ -1079,6 +1088,14 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 	}
+ 	convert_skb_to___skb(skb, ctx);
+ 
++	if (kattr->test.flags & BPF_F_TEST_SKB_CHECKSUM_COMPLETE) {
++		csum = skb_checksum(skb, 0, skb->len, 0);
++		if (skb->csum != csum) {
++			ret = -EINVAL;
++			goto out;
++		}
++	}
++
+ 	size = skb->len;
+ 	/* bpf program can never convert linear skb to non-linear */
+ 	if (WARN_ON_ONCE(skb_is_nonlinear(skb)))
+diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+index 90706a47f6ff..f7d458d88111 100644
+--- a/tools/include/uapi/linux/bpf.h
++++ b/tools/include/uapi/linux/bpf.h
+@@ -1425,6 +1425,8 @@ enum {
+ #define BPF_F_TEST_RUN_ON_CPU	(1U << 0)
+ /* If set, XDP frames will be transmitted after processing */
+ #define BPF_F_TEST_XDP_LIVE_FRAMES	(1U << 1)
++/* If set, apply CHECKSUM_COMPLETE to skb and validate the checksum */
++#define BPF_F_TEST_SKB_CHECKSUM_COMPLETE	(1U << 2)
+ 
+ /* type for BPF_ENABLE_STATS */
+ enum bpf_stats_type {
+-- 
+2.43.0
 
-> 
-> Also the  newu->addr/otheru->addr handling in unix_stream_connect()
-> looks suspect.
-
-u->addr is set before the socket is put into the hash table, and
-it never changes after bind().
-
-otheru is found by unix_find_other() from the hash table, and then
-we access ->addr in unix_stream_connect().  So, there is no race.
-
-Also, newu is a child socket created by connect() and does not exist
-in the hash table but has ->addr set.  At this moment, no one can
-read its ->addr, and smp_store_release() publishes it for the later
-->getname() in case the child socket is accept()ed.
-
-Thanks!
 
