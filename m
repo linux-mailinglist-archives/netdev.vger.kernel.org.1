@@ -1,83 +1,65 @@
-Return-Path: <netdev+bounces-97484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB8038CB969
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 05:05:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 822B88CB990
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 05:15:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A29BF282117
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 03:05:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24CF21F246AB
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 03:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58B641C71;
-	Wed, 22 May 2024 03:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0F0642070;
+	Wed, 22 May 2024 03:15:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LPQ3Hg+D"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ebrf31jA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB034C89;
-	Wed, 22 May 2024 03:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9856657CA6;
+	Wed, 22 May 2024 03:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716347120; cv=none; b=omJsc519p8S/EzB7f/mBo8yIyZGEHwdqGSxrq3RmDpw2zUEZETyHoAHfmmPSgFlmrT9NMopnVb1efFpgJfYmccBXLv1uKB06xzG90yOL0V5wFhzK3qL3bvWEfSPYQWBhtq1e2eWqj3stDKDGiKS4FuBEbGtoYpxeEaoh3ehVdWc=
+	t=1716347701; cv=none; b=Iots8qRtOkE4/Q9SIAK9J5ciWVgLkXx2aFKJaj0mgFq6BP0CMVsCfQB5nTWGyB10nxQhsXMH+S7eoXw5+ZTJ+uBxMfOVIZyyFenqrxac5uruChKuiBAdQC+7v8eyMWgq9DZkcVojBuVho6UtSypjRtF45cEsD+/hSW0Nhq1EGL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716347120; c=relaxed/simple;
-	bh=nn98KQgF6EabfuJ9VzVzyr9fZf6eQZ1dpnixOK2mkXo=;
+	s=arc-20240116; t=1716347701; c=relaxed/simple;
+	bh=ChglAZipxV2i+Kmf05G6SqfC7g6IDrIHEQA4dmpQ+eM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qWte0KxXOqsxa30Qi3yycz3Ugvz96RVngL4AxJP2CPPKr378/4ShlDTA9eJKjX93H8yLsMTy0cJBTLEpaqpvfXePNRWoLZYZeBX9KiSIb5Xvqp5HjMlx/y8HIUfD7yZBDPXHxFTuv11LeAAIK4K8TbowkNwQbcrg8M2ZaiJBKww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LPQ3Hg+D; arc=none smtp.client-ip=209.85.161.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5b3241373adso2847490eaf.2;
-        Tue, 21 May 2024 20:05:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716347118; x=1716951918; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J1laiRgyKO2AM2rgUwjP5Z21bRDF06AQd/g6ZI5X5xY=;
-        b=LPQ3Hg+D/ILHIzWU6TCjXqYSm59z9acVlSrUuS7Se1EHTgh0XlJJhXEnBG1Xl0yiid
-         rlGVLGILv4/0uD/01Gdm88gRwh38tqMq44ZEJFGB/AtqtuM1h+Q6rGwmIMoZLosaHeyK
-         q9s7a18mifyCg7U0Bzo2KepyD4xRCM1FKBnYv4Ftm5ISMFrtdfl0gJ99TySsrf04aNEU
-         PjQcaRQRqJgDcYvKfHTez4grHxPS2iERN++mEYVfnUAQZN+Fn1XfoE2D/3l07N5R89U0
-         /do+iJW7agDPMHzNvM4vSR+t2OYyTcrYU12mEfalHGanxzbBCh7k3FVAEKKY53U8OLYm
-         2cxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716347118; x=1716951918;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J1laiRgyKO2AM2rgUwjP5Z21bRDF06AQd/g6ZI5X5xY=;
-        b=Gft89xJuIKomtCRbvZ/z1QaSYCtUmDZaxSG0AGnA2tbsf0CtbhNIxE80RH9rSxH6ao
-         dyh2hy1AcLRfkAzqYgHzZw8u/beTwES7NAWE1TpOZr6i7AZ8P40fnn63VMW3HpMuTjPE
-         zdg7Spxlzq/j/nmH/xeuhR1k7Q4GL/r4qGDCP/rqtJLleOriAGKB+DPywM+3ohIujdcr
-         o0JVRp0Uj2mg5gO2GlZt32JO2emGrxKnwBjTerw8OjnLt9f5E5G0qix4LoRb4j0Dcv04
-         ew95uEfCSaVN1hdEn9rm8Gw4FlWTOhyb6b0fo0ivIJutIbHov6v4J1fHYDyH3r7zOUcN
-         9NHg==
-X-Forwarded-Encrypted: i=1; AJvYcCXfajkfO1Nm4gmnTw+baWkW50ZMSigJqjr/nQRWX3QawveNmVJ9YjBlavWIIkEpn02UH3OwcaEmdOtyJ75gE1egHqgBf9PprM07yxjinidpVldVZkE8Rtc743qvomFlCNbxR2BIzlNv
-X-Gm-Message-State: AOJu0YwNXysiam+0MMGvDXAOpV+r2gxa4SdalorIFsDfkAIGrmbLzqtq
-	9zVb8VUTmVd73SZMfo5My/E0tLDuP+TadciE+A6wMND+yBDHtk1jFYjIvIN8lqzU6Q==
-X-Google-Smtp-Source: AGHT+IFokm8KIr1EB2cOdu1VcpDt4iaD+Z0Aj3LSXub2lRaUKdubHTRtjVFSaV04Lb4lrypeeAYOPw==
-X-Received: by 2002:a05:6358:8003:b0:186:f45:391a with SMTP id e5c5f4694b2df-1979214497fmr94730755d.28.1716347117650;
-        Tue, 21 May 2024 20:05:17 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-634103f67e8sm21423276a12.69.2024.05.21.20.05.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 May 2024 20:05:16 -0700 (PDT)
-Date: Wed, 22 May 2024 11:05:12 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Geliang Tang <geliang@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Geliang Tang <tanggeliang@kylinos.cn>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net] selftests: hsr: Fix "File exists" errors for hsr_ping
-Message-ID: <Zk1g6CRsvSids1Vs@Laptop-X1>
-References: <db256340b909f8b6f8bb7f9e42dbe71c228993b6.1716280848.git.tanggeliang@kylinos.cn>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VUsjwyONVkF1RGUy32WRekU4UjglMvl0r1r4UaYUbfkveTo08mrTgnqzLF3zRZFb4+OAn8rTP2cSi992sh1zFgx5ZuTV7VO0SLOfxMi3zGx2aDZS2QaR3njROSnadomKB8rg8agoz9a7HLb57521bFHVdk04YZrQDqfjmLkKE3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ebrf31jA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ml/iZayzMliUKM4mSTJoLQHObAM5gqhB0ErOZcdzWh8=; b=Ebrf31jA/1hC4iw7JHnXa04yJM
+	tAuosdP8SRk+X/gOTDxpg86xjpgtUZ62f5jXr2ecsr98iRFJ8XuT6T84KNgTfJcmwGSxa39fo2oAk
+	lxu5dZqqAsfZ2WjXlk8HYqo7NDDzM5cZ+mbXkNQpnW4FJZH0ieH7OVOc+7RUSBJRbsto=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s9cR7-00FnqS-VJ; Wed, 22 May 2024 05:14:41 +0200
+Date: Wed, 22 May 2024 05:14:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: Xiaolei Wang <xiaolei.wang@windriver.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [net PATCH] net: fec: free fec queue when fec_enet_mii_init()
+ fails
+Message-ID: <8bbf2c1d-5083-4321-bded-f83aba5428fa@lunn.ch>
+References: <20240522021317.1113689-1-xiaolei.wang@windriver.com>
+ <PAXPR04MB8510B1D6C8B77D7E154CC6CF88EB2@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,81 +68,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <db256340b909f8b6f8bb7f9e42dbe71c228993b6.1716280848.git.tanggeliang@kylinos.cn>
+In-Reply-To: <PAXPR04MB8510B1D6C8B77D7E154CC6CF88EB2@PAXPR04MB8510.eurprd04.prod.outlook.com>
 
-On Tue, May 21, 2024 at 04:49:44PM +0800, Geliang Tang wrote:
-> From: Geliang Tang <tanggeliang@kylinos.cn>
-> 
-> The hsr_ping test reports the following errors:
-> 
->  INFO: preparing interfaces for HSRv0.
->  INFO: Initial validation ping.
->  INFO: Longer ping test.
->  INFO: Cutting one link.
->  INFO: Delay the link and drop a few packages.
->  INFO: All good.
->  INFO: preparing interfaces for HSRv1.
->  RTNETLINK answers: File exists
->  RTNETLINK answers: File exists
->  RTNETLINK answers: File exists
->  RTNETLINK answers: File exists
->  RTNETLINK answers: File exists
->  RTNETLINK answers: File exists
->  Error: ipv4: Address already assigned.
->  Error: ipv6: address already assigned.
->  Error: ipv4: Address already assigned.
->  Error: ipv6: address already assigned.
->  Error: ipv4: Address already assigned.
->  Error: ipv6: address already assigned.
->  INFO: Initial validation ping.
-> 
-> That is because the cleanup code for the 2nd round test before
-> "setup_hsr_interfaces 1" is removed incorrectly in commit 680fda4f6714
-> ("test: hsr: Remove script code already implemented in lib.sh").
-> 
-> This patch fixes it by adding a new helper delete_hsr_interfaces() to
-> delete all interfaces before "setup_hsr_interfaces 1".
-> 
-> Fixes: 680fda4f6714 ("test: hsr: Remove script code already implemented in lib.sh")
-> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> ---
->  tools/testing/selftests/net/hsr/hsr_ping.sh | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/hsr/hsr_ping.sh b/tools/testing/selftests/net/hsr/hsr_ping.sh
-> index 790294c8af83..0be1d5f78dab 100755
-> --- a/tools/testing/selftests/net/hsr/hsr_ping.sh
-> +++ b/tools/testing/selftests/net/hsr/hsr_ping.sh
-> @@ -166,6 +166,14 @@ setup_hsr_interfaces()
->  	ip -net "$ns3" link set hsr3 up
->  }
->  
-> +delete_hsr_interfaces()
-> +{
-> +	echo "INFO: delete interfaces."
-> +	ip -net "$ns1" link del ns1eth1
-> +	ip -net "$ns1" link del ns1eth2
-> +	ip -net "$ns3" link del ns3eth2
-> +}
-> +
->  check_prerequisites
->  setup_ns ns1 ns2 ns3
->  
-> @@ -174,6 +182,8 @@ trap cleanup_all_ns EXIT
->  setup_hsr_interfaces 0
->  do_complete_ping_test
->  
-> +delete_hsr_interfaces
-> +
+> The commit 59d0f7465644 ("net: fec: init multi queue date structure")
+> was the first to introduce this issue, commit 619fee9eb13b
+> ("net: fec: fix the potential memory leak in fec_enet_init() ")
+> fixed this, but it does not seem to be completely fixed.
 
-nit: you can also just re-setup the namespaces, which will delete previous ns
-and create new one. e.g.
+This fix is also not great, and i would say the initial design is
+really the problem. There needs to be a function which is the opposite
+of fec_enet_init(). It can then be called in the probe cleanup code,
+and in fec_drv_remove() which also appears to leak the queues.
 
-setup_ns ns1 ns2 ns3
-
->  setup_hsr_interfaces 1
->  do_complete_ping_test
-
-
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+    Andrew
 
