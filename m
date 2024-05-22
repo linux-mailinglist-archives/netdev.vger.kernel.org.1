@@ -1,582 +1,325 @@
-Return-Path: <netdev+bounces-97543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F7A08CC06C
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 13:39:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75AEA8CC078
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 13:41:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80CA71C224E2
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 11:39:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B379283DB8
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 11:41:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EB782891;
-	Wed, 22 May 2024 11:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F36612F365;
+	Wed, 22 May 2024 11:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="fExDxptm"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="WCDiwaJp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5E982872;
-	Wed, 22 May 2024 11:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C01F12DDBF;
+	Wed, 22 May 2024 11:41:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716377956; cv=none; b=bAf9L0//9GHs6d8H5pkgRgqYz0K+C9g0Lp3+DhDB4CjYNprCx+DtTJ8QpHfDZXv2Jjz5/HCWr55PazaHvFvCMsafvexR1HJzgUnCc4OmDHU+9RABK1rD0VpqSg2jkPpAPDZ8WUo/U0R6dlbMGnY4bMUNIizedbtVs05akTqc5AE=
+	t=1716378111; cv=none; b=SEkxLtbvyjiWhTCx4CPZ7k84HRxdSEmfjg10H+9rKC6DJV6krDbDGEij6p/jdbVP+/4BIDgkA4F1Q1AUDDt1nbWzNtC0guvnUwJc6wO6pyDgEtxyV2OnIzYUFKwt/aNRt8YvmWvjDtXyb2TAig7JIRs6rbz5ctZQbUPwzqtBKtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716377956; c=relaxed/simple;
-	bh=qzeEhLTzs3eTNWP52PvPXTOCTVAC4cnYjnTvXRJDqSA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ksndL9fNv0o8ivjaJ38hZ0Gvsjo/OAWQBqpX34QB+hpwc089WamECMdnUb1ytJ5KH8ILLf0dOG11uW0MZwQKNcvj4kJnCbld8mAJPqRfisJ9ckPtm5C3Vjckvke+0jajtZ2OFspXPEc670jkRQoZxGgh1jut9/TZCN5LcYPlrOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=fExDxptm; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1716377949;
-	bh=T7hwOciwEG7iW2YNr+Xb5zEpDJdYct6VLjO7wu3h6+M=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=fExDxptmOA1ZSBB8xILHuo+g5d9pnDr+gR2+aReyz1hwAEBlwW/3iwjUlD1hnTEmG
-	 eA1vZxGg0bxdqYvvOme893JMvPZDyjRFLSpiuLAzyZ0iZWGnIpVKyKWWtIVKma2G7/
-	 Rg7co25wUK9x9Ebrx0r4DW6dLKAI05Whuh3dd1ZXpPI4GpQHa4mSzt77UKIHiY2eWT
-	 UBhjxtb8tn0I/wMw2U11NeLoZUX6EpTI1FkeqVv9+iwKVttRBgMvWg95hcwSqTTluh
-	 5+tm4FjS5taa9sbuplMiXUFrc95YTPe5HoXH4OmQ8ha6sGO6z0ioAemRHxTrq+mQWz
-	 4SD7rY3kvZpPA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Vkq893BX3z4wyY;
-	Wed, 22 May 2024 21:39:05 +1000 (AEST)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Edward Liaw <edliaw@google.com>, shuah@kernel.org, =?utf-8?Q?Micka?=
- =?utf-8?Q?=C3=ABl_Sala=C3=BCn?=
- <mic@digikod.net>, =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>,
- Christian Brauner
- <brauner@kernel.org>, Richard Cochran <richardcochran@gmail.com>, Paul
- Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard
- Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, "Naveen N. Rao"
- <naveen.n.rao@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kernel-team@android.com, Edward Liaw <edliaw@google.com>,
- linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
- linux-riscv@lists.infradead.org, bpf@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v5 44/68] selftests/powerpc: Drop define _GNU_SOURCE
-In-Reply-To: <20240522005913.3540131-45-edliaw@google.com>
-References: <20240522005913.3540131-1-edliaw@google.com>
- <20240522005913.3540131-45-edliaw@google.com>
-Date: Wed, 22 May 2024 21:39:01 +1000
-Message-ID: <87r0du2i0a.fsf@mail.lhotse>
+	s=arc-20240116; t=1716378111; c=relaxed/simple;
+	bh=6kOScnqq1f3Lup96PmP+FiM2VqT68vsjDqx1Kl8E/3Y=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=uXmwp4ngkFNtsa0qHqXnGTH3nsoBYgkPvrjlg1+iZtyooX7pOBV+LhoTDC1e1QwcRzxZzFnBXKqIpjfAhO97ylN4f94L+z3LB25VVfzu6gh8K36DEgEpcvWdYLqQKfcLbsKeuL2dB6pM2HIELUuLbyJFvc+v75XldQ0zYhdV+XI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=WCDiwaJp; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1716378104; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=G7AvbOTwQvGlz5AgqSfZcaQhKwQJQMPhSdT/huU+DmE=;
+	b=WCDiwaJpGnhtWV4/CeEpd0yEAMbxXitpXiOSZb3EnCquOKfxchdECp8R07hVxtPbgu07GwoSOURjWt2QRBQho/IzvAEOQBeFiTPbhRBpXEh4ksSdukcsQ9YijXE58ldUxe6uMyRF6DshQ4Zo7zivkkwiHuVgIwQHWRO0F42U65c=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=32;SR=0;TI=SMTPD_---0W7.TVQP_1716378101;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W7.TVQP_1716378101)
+          by smtp.aliyun-inc.com;
+          Wed, 22 May 2024 19:41:42 +0800
+Message-ID: <1716377965.6866436-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [GIT PULL] virtio: features, fixes, cleanups
+Date: Wed, 22 May 2024 19:39:25 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org,
+ netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ anton.yakovlev@opensynergy.com,
+ bartosz.golaszewski@linaro.org,
+ christophe.jaillet@wanadoo.fr,
+ dave.jiang@intel.com,
+ david@redhat.com,
+ eperezma@redhat.com,
+ herbert@gondor.apana.org.au,
+ jasowang@redhat.com,
+ jiri@nvidia.com,
+ jiri@resnulli.us,
+ johannes@sipsolutions.net,
+ krzysztof.kozlowski@linaro.org,
+ lingshan.zhu@intel.com,
+ linus.walleij@linaro.org,
+ lizhijian@fujitsu.com,
+ martin.petersen@oracle.com,
+ maxime.coquelin@redhat.com,
+ michael.christie@oracle.com,
+ sgarzare@redhat.com,
+ stevensd@chromium.org,
+ sudeep.holla@arm.com,
+ syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com,
+ u.kleine-koenig@pengutronix.de,
+ viresh.kumar@linaro.org,
+ yuxue.liu@jaguarmicro.com,
+ Srujana Challa <schalla@marvell.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,Jason Wang <jasowang@redhat.com>
+References: <20240522060301-mutt-send-email-mst@kernel.org>
+ <1716373365.1499481-1-xuanzhuo@linux.alibaba.com>
+ <20240522073727-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240522073727-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
 
-Edward Liaw <edliaw@google.com> writes:
-> _GNU_SOURCE is provided by lib.mk, so it should be dropped to prevent
-> redefinition warnings.
-
-Most of these tests build with -Werror, so the duplicate define is
-actually a hard error. Can you put this patch earlier in the series at
-least?
-
-cheers
-
-> Signed-off-by: Edward Liaw <edliaw@google.com>
-> ---
->  tools/testing/selftests/powerpc/benchmarks/context_switch.c    | 2 --
->  tools/testing/selftests/powerpc/benchmarks/exec_target.c       | 2 --
->  tools/testing/selftests/powerpc/benchmarks/fork.c              | 2 --
->  tools/testing/selftests/powerpc/benchmarks/futex_bench.c       | 3 ---
->  tools/testing/selftests/powerpc/dexcr/hashchk_test.c           | 3 ---
->  tools/testing/selftests/powerpc/dscr/dscr_default_test.c       | 3 ---
->  tools/testing/selftests/powerpc/dscr/dscr_explicit_test.c      | 3 ---
->  tools/testing/selftests/powerpc/dscr/dscr_sysfs_thread_test.c  | 1 -
->  tools/testing/selftests/powerpc/mm/exec_prot.c                 | 2 --
->  tools/testing/selftests/powerpc/mm/pkey_exec_prot.c            | 2 --
->  tools/testing/selftests/powerpc/mm/pkey_siginfo.c              | 2 --
->  tools/testing/selftests/powerpc/mm/tlbie_test.c                | 2 --
->  tools/testing/selftests/powerpc/papr_vpd/papr_vpd.c            | 1 -
->  tools/testing/selftests/powerpc/pmu/count_instructions.c       | 3 ---
->  tools/testing/selftests/powerpc/pmu/count_stcx_fail.c          | 3 ---
->  tools/testing/selftests/powerpc/pmu/ebb/ebb.c                  | 3 ---
->  .../testing/selftests/powerpc/pmu/ebb/instruction_count_test.c | 3 ---
->  tools/testing/selftests/powerpc/pmu/event.c                    | 2 --
->  tools/testing/selftests/powerpc/pmu/lib.c                      | 3 ---
->  tools/testing/selftests/powerpc/pmu/per_event_excludes.c       | 3 ---
->  tools/testing/selftests/powerpc/ptrace/perf-hwbreak.c          | 3 ---
->  tools/testing/selftests/powerpc/ptrace/ptrace-syscall.c        | 2 --
->  tools/testing/selftests/powerpc/signal/sig_sc_double_restart.c | 1 -
->  tools/testing/selftests/powerpc/signal/sigreturn_kernel.c      | 3 ---
->  tools/testing/selftests/powerpc/signal/sigreturn_vdso.c        | 3 ---
->  tools/testing/selftests/powerpc/syscalls/ipc_unmuxed.c         | 2 --
->  tools/testing/selftests/powerpc/tm/tm-exec.c                   | 2 --
->  tools/testing/selftests/powerpc/tm/tm-poison.c                 | 2 --
->  .../testing/selftests/powerpc/tm/tm-signal-context-force-tm.c  | 2 --
->  tools/testing/selftests/powerpc/tm/tm-signal-sigreturn-nt.c    | 2 --
->  tools/testing/selftests/powerpc/tm/tm-tmspr.c                  | 2 --
->  tools/testing/selftests/powerpc/tm/tm-trap.c                   | 2 --
->  tools/testing/selftests/powerpc/tm/tm-unavailable.c            | 2 --
->  tools/testing/selftests/powerpc/utils.c                        | 3 ---
->  34 files changed, 79 deletions(-)
+On Wed, 22 May 2024 07:38:01 -0400, "Michael S. Tsirkin" <mst@redhat.com> w=
+rote:
+> On Wed, May 22, 2024 at 06:22:45PM +0800, Xuan Zhuo wrote:
+> > On Wed, 22 May 2024 06:03:01 -0400, "Michael S. Tsirkin" <mst@redhat.co=
+m> wrote:
+> > > Things to note here:
+> > >
+> > > - the new Marvell OCTEON DPU driver is not here: latest v4 keeps caus=
+ing
+> > >   build failures on mips. I deferred the pull hoping to get it in
+> > >   and I might merge a new version post rc1
+> > >   (supposed to be ok for new drivers as they can't cause regressions),
+> > >   but we'll see.
+> > > - there are also a couple bugfixes under review, to be merged after r=
+c1
+> > > - I merged a trivial patch (removing a comment) that also got
+> > >   merged through net.
+> > >   git handles this just fine and it did not seem worth it
+> > >   rebasing to drop it.
+> > > - there is a trivial conflict in the header file. Shouldn't be any
+> > >   trouble to resolve, but fyi the resolution by Stephen is here
+> > > 	diff --cc drivers/virtio/virtio_mem.c
+> > > 	index e8355f55a8f7,6d4dfbc53a66..000000000000
+> > > 	--- a/drivers/virtio/virtio_mem.c
+> > > 	+++ b/drivers/virtio/virtio_mem.c
+> > > 	@@@ -21,7 -21,7 +21,8 @@@
+> > > 	  #include <linux/bitmap.h>
+> > > 	  #include <linux/lockdep.h>
+> > > 	  #include <linux/log2.h>
+> > > 	 +#include <linux/vmalloc.h>
+> > > 	+ #include <linux/suspend.h>
+> > >   Also see it here:
+> > >   https://lore.kernel.org/all/20240423145947.142171f6@canb.auug.org.a=
+u/
+> > >
+> > >
+> > >
+> > > The following changes since commit 18daea77cca626f590fb140fc11e3a43c5=
+d41354:
+> > >
+> > >   Merge tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm =
+(2024-04-30 12:40:41 -0700)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/=
+for_linus
+> > >
+> > > for you to fetch changes up to 0b8dbbdcf2e42273fbac9b752919e2e5b2abac=
+21:
+> > >
+> > >   Merge tag 'for_linus' into vhost (2024-05-12 08:15:28 -0400)
+> > >
+> > > ----------------------------------------------------------------
+> > > virtio: features, fixes, cleanups
+> > >
+> > > Several new features here:
+> > >
+> > > - virtio-net is finally supported in vduse.
+> > >
+> > > - Virtio (balloon and mem) interaction with suspend is improved
+> > >
+> > > - vhost-scsi now handles signals better/faster.
+> > >
+> > > - virtio-net now supports premapped mode by default,
+> > >   opening the door for all kind of zero copy tricks.
+> > >
+> > > Fixes, cleanups all over the place.
+> > >
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > >
+> > > ----------------------------------------------------------------
+> > > Christophe JAILLET (1):
+> > >       vhost-vdpa: Remove usage of the deprecated ida_simple_xx() API
+> > >
+> > > David Hildenbrand (1):
+> > >       virtio-mem: support suspend+resume
+> > >
+> > > David Stevens (2):
+> > >       virtio_balloon: Give the balloon its own wakeup source
+> > >       virtio_balloon: Treat stats requests as wakeup events
+> > >
+> > > Eugenio P=E9=96=9Eez (2):
+> > >       MAINTAINERS: add Eugenio P=E9=96=9Eez as reviewer
+> > >       MAINTAINERS: add Eugenio P=E9=96=9Eez as reviewer
+> > >
+> > > Jiri Pirko (1):
+> > >       virtio: delete vq in vp_find_vqs_msix() when request_irq() fails
+> > >
+> > > Krzysztof Kozlowski (24):
+> > >       virtio: balloon: drop owner assignment
+> > >       virtio: input: drop owner assignment
+> > >       virtio: mem: drop owner assignment
+> > >       um: virt-pci: drop owner assignment
+> > >       virtio_blk: drop owner assignment
+> > >       bluetooth: virtio: drop owner assignment
+> > >       hwrng: virtio: drop owner assignment
+> > >       virtio_console: drop owner assignment
+> > >       crypto: virtio - drop owner assignment
+> > >       firmware: arm_scmi: virtio: drop owner assignment
+> > >       gpio: virtio: drop owner assignment
+> > >       drm/virtio: drop owner assignment
+> > >       iommu: virtio: drop owner assignment
+> > >       misc: nsm: drop owner assignment
+> > >       net: caif: virtio: drop owner assignment
+> > >       net: virtio: drop owner assignment
+> > >       net: 9p: virtio: drop owner assignment
+> > >       vsock/virtio: drop owner assignment
+> > >       wifi: mac80211_hwsim: drop owner assignment
+> > >       nvdimm: virtio_pmem: drop owner assignment
+> > >       rpmsg: virtio: drop owner assignment
+> > >       scsi: virtio: drop owner assignment
+> > >       fuse: virtio: drop owner assignment
+> > >       sound: virtio: drop owner assignment
+> > >
+> > > Li Zhijian (1):
+> > >       vdpa: Convert sprintf/snprintf to sysfs_emit
+> > >
+> > > Maxime Coquelin (6):
+> > >       vduse: validate block features only with block devices
+> > >       vduse: Temporarily fail if control queue feature requested
+> > >       vduse: enable Virtio-net device type
+> > >       vduse: validate block features only with block devices
+> > >       vduse: Temporarily fail if control queue feature requested
+> > >       vduse: enable Virtio-net device type
+> > >
+> > > Michael S. Tsirkin (2):
+> > >       Merge tag 'stable/vduse-virtio-net' into vhost
+> > >       Merge tag 'for_linus' into vhost
+> > >
+> > > Mike Christie (9):
+> > >       vhost-scsi: Handle vhost_vq_work_queue failures for events
+> > >       vhost-scsi: Handle vhost_vq_work_queue failures for cmds
+> > >       vhost-scsi: Use system wq to flush dev for TMFs
+> > >       vhost: Remove vhost_vq_flush
+> > >       vhost_scsi: Handle vhost_vq_work_queue failures for TMFs
+> > >       vhost: Use virtqueue mutex for swapping worker
+> > >       vhost: Release worker mutex during flushes
+> > >       vhost_task: Handle SIGKILL by flushing work and exiting
+> > >       kernel: Remove signal hacks for vhost_tasks
+> > >
+> > > Uwe Kleine-K=E9=B0=8Aig (1):
+> > >       virtio-mmio: Convert to platform remove callback returning void
+> > >
+> > > Xuan Zhuo (7):
+> > >       virtio_ring: introduce dma map api for page
+> > >       virtio_ring: enable premapped mode whatever use_dma_api
+> > >       virtio_net: replace private by pp struct inside page
+> > >       virtio_net: big mode support premapped
+> > >       virtio_net: enable premapped by default
+> > >       virtio_net: rx remove premapped failover code
+> > >       virtio_net: remove the misleading comment
+> >
+> > Hi Michael,
+> >
+> > As we discussed here:
+> >
+> > 	http://lore.kernel.org/all/CACGkMEuyeJ9mMgYnnB42=3Dhw6umNuo=3Dagn7VBqB=
+qYPd7GN=3D+39Q@mail.gmail.com
+> >
+> > This patch set has been abandoned.
 >
-> diff --git a/tools/testing/selftests/powerpc/benchmarks/context_switch.c b/tools/testing/selftests/powerpc/benchmarks/context_switch.c
-> index 96554e2794d1..0b245572bd45 100644
-> --- a/tools/testing/selftests/powerpc/benchmarks/context_switch.c
-> +++ b/tools/testing/selftests/powerpc/benchmarks/context_switch.c
-> @@ -4,8 +4,6 @@
->   *
->   * Copyright (C) 2015 Anton Blanchard <anton@au.ibm.com>, IBM
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <errno.h>
->  #include <sched.h>
->  #include <string.h>
-> diff --git a/tools/testing/selftests/powerpc/benchmarks/exec_target.c b/tools/testing/selftests/powerpc/benchmarks/exec_target.c
-> index c14b0fc1edde..8646540037d8 100644
-> --- a/tools/testing/selftests/powerpc/benchmarks/exec_target.c
-> +++ b/tools/testing/selftests/powerpc/benchmarks/exec_target.c
-> @@ -5,8 +5,6 @@
->   *
->   * Copyright 2018, Anton Blanchard, IBM Corp.
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <unistd.h>
->  #include <sys/syscall.h>
->  
-> diff --git a/tools/testing/selftests/powerpc/benchmarks/fork.c b/tools/testing/selftests/powerpc/benchmarks/fork.c
-> index d312e638cb37..327231646a2a 100644
-> --- a/tools/testing/selftests/powerpc/benchmarks/fork.c
-> +++ b/tools/testing/selftests/powerpc/benchmarks/fork.c
-> @@ -5,8 +5,6 @@
->   *
->   * Copyright 2018, Anton Blanchard, IBM Corp.
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <assert.h>
->  #include <errno.h>
->  #include <getopt.h>
-> diff --git a/tools/testing/selftests/powerpc/benchmarks/futex_bench.c b/tools/testing/selftests/powerpc/benchmarks/futex_bench.c
-> index 017057090490..0483a13c88f9 100644
-> --- a/tools/testing/selftests/powerpc/benchmarks/futex_bench.c
-> +++ b/tools/testing/selftests/powerpc/benchmarks/futex_bench.c
-> @@ -2,9 +2,6 @@
->  /*
->   * Copyright 2016, Anton Blanchard, Michael Ellerman, IBM Corp.
->   */
-> -
-> -#define _GNU_SOURCE
-> -
->  #include <stdio.h>
->  #include <sys/syscall.h>
->  #include <time.h>
-> diff --git a/tools/testing/selftests/powerpc/dexcr/hashchk_test.c b/tools/testing/selftests/powerpc/dexcr/hashchk_test.c
-> index 645224bdc142..2499ab7fe563 100644
-> --- a/tools/testing/selftests/powerpc/dexcr/hashchk_test.c
-> +++ b/tools/testing/selftests/powerpc/dexcr/hashchk_test.c
-> @@ -1,7 +1,4 @@
->  // SPDX-License-Identifier: GPL-2.0+
-> -
-> -#define _GNU_SOURCE
-> -
->  #include <errno.h>
->  #include <fcntl.h>
->  #include <limits.h>
-> diff --git a/tools/testing/selftests/powerpc/dscr/dscr_default_test.c b/tools/testing/selftests/powerpc/dscr/dscr_default_test.c
-> index 60ab02525b79..fe6aff1e5dad 100644
-> --- a/tools/testing/selftests/powerpc/dscr/dscr_default_test.c
-> +++ b/tools/testing/selftests/powerpc/dscr/dscr_default_test.c
-> @@ -9,9 +9,6 @@
->   * Copyright 2012, Anton Blanchard, IBM Corporation.
->   * Copyright 2015, Anshuman Khandual, IBM Corporation.
->   */
-> -
-> -#define _GNU_SOURCE
-> -
->  #include "dscr.h"
->  
->  #include <pthread.h>
-> diff --git a/tools/testing/selftests/powerpc/dscr/dscr_explicit_test.c b/tools/testing/selftests/powerpc/dscr/dscr_explicit_test.c
-> index e2268e9183a8..93b6efdc2eef 100644
-> --- a/tools/testing/selftests/powerpc/dscr/dscr_explicit_test.c
-> +++ b/tools/testing/selftests/powerpc/dscr/dscr_explicit_test.c
-> @@ -15,9 +15,6 @@
->   * Copyright 2012, Anton Blanchard, IBM Corporation.
->   * Copyright 2015, Anshuman Khandual, IBM Corporation.
->   */
-> -
-> -#define _GNU_SOURCE
-> -
->  #include "dscr.h"
->  #include "utils.h"
->  
-> diff --git a/tools/testing/selftests/powerpc/dscr/dscr_sysfs_thread_test.c b/tools/testing/selftests/powerpc/dscr/dscr_sysfs_thread_test.c
-> index 191ed126f118..ace7d23492c1 100644
-> --- a/tools/testing/selftests/powerpc/dscr/dscr_sysfs_thread_test.c
-> +++ b/tools/testing/selftests/powerpc/dscr/dscr_sysfs_thread_test.c
-> @@ -9,7 +9,6 @@
->   *
->   * Copyright 2015, Anshuman Khandual, IBM Corporation.
->   */
-> -#define _GNU_SOURCE
->  #include "dscr.h"
->  
->  static int test_thread_dscr(unsigned long val)
-> diff --git a/tools/testing/selftests/powerpc/mm/exec_prot.c b/tools/testing/selftests/powerpc/mm/exec_prot.c
-> index db75b2225de1..65712597cc68 100644
-> --- a/tools/testing/selftests/powerpc/mm/exec_prot.c
-> +++ b/tools/testing/selftests/powerpc/mm/exec_prot.c
-> @@ -6,8 +6,6 @@
->   *
->   * Test if applying execute protection on pages works as expected.
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <string.h>
-> diff --git a/tools/testing/selftests/powerpc/mm/pkey_exec_prot.c b/tools/testing/selftests/powerpc/mm/pkey_exec_prot.c
-> index 0af4f02669a1..5cf72cd9694d 100644
-> --- a/tools/testing/selftests/powerpc/mm/pkey_exec_prot.c
-> +++ b/tools/testing/selftests/powerpc/mm/pkey_exec_prot.c
-> @@ -6,8 +6,6 @@
->   * Test if applying execute protection on pages using memory
->   * protection keys works as expected.
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <string.h>
-> diff --git a/tools/testing/selftests/powerpc/mm/pkey_siginfo.c b/tools/testing/selftests/powerpc/mm/pkey_siginfo.c
-> index 2db76e56d4cb..fcaa591abf88 100644
-> --- a/tools/testing/selftests/powerpc/mm/pkey_siginfo.c
-> +++ b/tools/testing/selftests/powerpc/mm/pkey_siginfo.c
-> @@ -8,8 +8,6 @@
->   * attempted to be protected by two different keys from two competing
->   * threads at the same time.
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <string.h>
-> diff --git a/tools/testing/selftests/powerpc/mm/tlbie_test.c b/tools/testing/selftests/powerpc/mm/tlbie_test.c
-> index 48344a74b212..512cd405de92 100644
-> --- a/tools/testing/selftests/powerpc/mm/tlbie_test.c
-> +++ b/tools/testing/selftests/powerpc/mm/tlbie_test.c
-> @@ -14,8 +14,6 @@
->   * and copy it back to the original area. This helps us to detect if any
->   * store continued to happen after we marked the memory PROT_READ.
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <stdio.h>
->  #include <sys/mman.h>
->  #include <sys/types.h>
-> diff --git a/tools/testing/selftests/powerpc/papr_vpd/papr_vpd.c b/tools/testing/selftests/powerpc/papr_vpd/papr_vpd.c
-> index d6f99eb9be65..0b9b20668fa4 100644
-> --- a/tools/testing/selftests/powerpc/papr_vpd/papr_vpd.c
-> +++ b/tools/testing/selftests/powerpc/papr_vpd/papr_vpd.c
-> @@ -1,5 +1,4 @@
->  // SPDX-License-Identifier: GPL-2.0-only
-> -#define _GNU_SOURCE
->  #include <errno.h>
->  #include <fcntl.h>
->  #include <stdlib.h>
-> diff --git a/tools/testing/selftests/powerpc/pmu/count_instructions.c b/tools/testing/selftests/powerpc/pmu/count_instructions.c
-> index a3984ef1e96a..57d63ff75397 100644
-> --- a/tools/testing/selftests/powerpc/pmu/count_instructions.c
-> +++ b/tools/testing/selftests/powerpc/pmu/count_instructions.c
-> @@ -2,9 +2,6 @@
->  /*
->   * Copyright 2013, Michael Ellerman, IBM Corp.
->   */
-> -
-> -#define _GNU_SOURCE
-> -
->  #include <stdio.h>
->  #include <stdbool.h>
->  #include <string.h>
-> diff --git a/tools/testing/selftests/powerpc/pmu/count_stcx_fail.c b/tools/testing/selftests/powerpc/pmu/count_stcx_fail.c
-> index 2070a1e2b3a5..5d3bbd38528d 100644
-> --- a/tools/testing/selftests/powerpc/pmu/count_stcx_fail.c
-> +++ b/tools/testing/selftests/powerpc/pmu/count_stcx_fail.c
-> @@ -2,9 +2,6 @@
->   * Copyright 2013, Michael Ellerman, IBM Corp.
->   * Licensed under GPLv2.
->   */
-> -
-> -#define _GNU_SOURCE
-> -
->  #include <stdio.h>
->  #include <stdbool.h>
->  #include <string.h>
-> diff --git a/tools/testing/selftests/powerpc/pmu/ebb/ebb.c b/tools/testing/selftests/powerpc/pmu/ebb/ebb.c
-> index 21537d6eb6b7..e99a455e8c2e 100644
-> --- a/tools/testing/selftests/powerpc/pmu/ebb/ebb.c
-> +++ b/tools/testing/selftests/powerpc/pmu/ebb/ebb.c
-> @@ -2,9 +2,6 @@
->  /*
->   * Copyright 2014, Michael Ellerman, IBM Corp.
->   */
-> -
-> -#define _GNU_SOURCE	/* For CPU_ZERO etc. */
-> -
->  #include <sched.h>
->  #include <sys/wait.h>
->  #include <setjmp.h>
-> diff --git a/tools/testing/selftests/powerpc/pmu/ebb/instruction_count_test.c b/tools/testing/selftests/powerpc/pmu/ebb/instruction_count_test.c
-> index eed338b18e11..ab3f888922d6 100644
-> --- a/tools/testing/selftests/powerpc/pmu/ebb/instruction_count_test.c
-> +++ b/tools/testing/selftests/powerpc/pmu/ebb/instruction_count_test.c
-> @@ -2,9 +2,6 @@
->  /*
->   * Copyright 2014, Michael Ellerman, IBM Corp.
->   */
-> -
-> -#define _GNU_SOURCE
-> -
->  #include <stdio.h>
->  #include <stdbool.h>
->  #include <string.h>
-> diff --git a/tools/testing/selftests/powerpc/pmu/event.c b/tools/testing/selftests/powerpc/pmu/event.c
-> index 0c1c1bdba081..5468bd2c3c5b 100644
-> --- a/tools/testing/selftests/powerpc/pmu/event.c
-> +++ b/tools/testing/selftests/powerpc/pmu/event.c
-> @@ -2,8 +2,6 @@
->  /*
->   * Copyright 2013, Michael Ellerman, IBM Corp.
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <unistd.h>
->  #include <sys/syscall.h>
->  #include <string.h>
-> diff --git a/tools/testing/selftests/powerpc/pmu/lib.c b/tools/testing/selftests/powerpc/pmu/lib.c
-> index 321357987408..fa208701dbdc 100644
-> --- a/tools/testing/selftests/powerpc/pmu/lib.c
-> +++ b/tools/testing/selftests/powerpc/pmu/lib.c
-> @@ -2,9 +2,6 @@
->  /*
->   * Copyright 2014, Michael Ellerman, IBM Corp.
->   */
-> -
-> -#define _GNU_SOURCE	/* For CPU_ZERO etc. */
-> -
->  #include <errno.h>
->  #include <sched.h>
->  #include <setjmp.h>
-> diff --git a/tools/testing/selftests/powerpc/pmu/per_event_excludes.c b/tools/testing/selftests/powerpc/pmu/per_event_excludes.c
-> index ad32a09a6540..066e0c4799fd 100644
-> --- a/tools/testing/selftests/powerpc/pmu/per_event_excludes.c
-> +++ b/tools/testing/selftests/powerpc/pmu/per_event_excludes.c
-> @@ -2,9 +2,6 @@
->  /*
->   * Copyright 2014, Michael Ellerman, IBM Corp.
->   */
-> -
-> -#define _GNU_SOURCE
-> -
->  #include <elf.h>
->  #include <limits.h>
->  #include <stdio.h>
-> diff --git a/tools/testing/selftests/powerpc/ptrace/perf-hwbreak.c b/tools/testing/selftests/powerpc/ptrace/perf-hwbreak.c
-> index e374c6b7ace6..1f7e3c63742d 100644
-> --- a/tools/testing/selftests/powerpc/ptrace/perf-hwbreak.c
-> +++ b/tools/testing/selftests/powerpc/ptrace/perf-hwbreak.c
-> @@ -16,9 +16,6 @@
->   *
->   * Copyright (C) 2018 Michael Neuling, IBM Corporation.
->   */
-> -
-> -#define _GNU_SOURCE
-> -
->  #include <unistd.h>
->  #include <assert.h>
->  #include <sched.h>
-> diff --git a/tools/testing/selftests/powerpc/ptrace/ptrace-syscall.c b/tools/testing/selftests/powerpc/ptrace/ptrace-syscall.c
-> index 3353210dcdbd..6e5294c1b60b 100644
-> --- a/tools/testing/selftests/powerpc/ptrace/ptrace-syscall.c
-> +++ b/tools/testing/selftests/powerpc/ptrace/ptrace-syscall.c
-> @@ -8,8 +8,6 @@
->   * test, and it was adapted to run on Powerpc by
->   * Breno Leitao <leitao@debian.org>
->   */
-> -#define _GNU_SOURCE
-> -
->  #include <sys/ptrace.h>
->  #include <sys/types.h>
->  #include <sys/wait.h>
-> diff --git a/tools/testing/selftests/powerpc/signal/sig_sc_double_restart.c b/tools/testing/selftests/powerpc/signal/sig_sc_double_restart.c
-> index e3972264615b..8bad5e65bbb7 100644
-> --- a/tools/testing/selftests/powerpc/signal/sig_sc_double_restart.c
-> +++ b/tools/testing/selftests/powerpc/signal/sig_sc_double_restart.c
-> @@ -18,7 +18,6 @@
->   *  that sucker at the same time.  Same for multiple signals of any kind
->   *  interrupting that sucker on 64bit...
->   */
-> -#define _GNU_SOURCE
->  #include <sys/types.h>
->  #include <sys/wait.h>
->  #include <sys/syscall.h>
-> diff --git a/tools/testing/selftests/powerpc/signal/sigreturn_kernel.c b/tools/testing/selftests/powerpc/signal/sigreturn_kernel.c
-> index 0a1b6e591eee..772c3373560f 100644
-> --- a/tools/testing/selftests/powerpc/signal/sigreturn_kernel.c
-> +++ b/tools/testing/selftests/powerpc/signal/sigreturn_kernel.c
-> @@ -2,9 +2,6 @@
->  /*
->   * Test that we can't sigreturn to kernel addresses, or to kernel mode.
->   */
-> -
-> -#define _GNU_SOURCE
-> -
->  #include <stdio.h>
->  #include <signal.h>
->  #include <stdlib.h>
-> diff --git a/tools/testing/selftests/powerpc/signal/sigreturn_vdso.c b/tools/testing/selftests/powerpc/signal/sigreturn_vdso.c
-> index e282fff0fe25..d5aecd2c4b95 100644
-> --- a/tools/testing/selftests/powerpc/signal/sigreturn_vdso.c
-> +++ b/tools/testing/selftests/powerpc/signal/sigreturn_vdso.c
-> @@ -5,9 +5,6 @@
->   *
->   * See handle_rt_signal64() and setup_trampoline() in signal_64.c
->   */
-> -
-> -#define _GNU_SOURCE
-> -
->  #include <errno.h>
->  #include <stdio.h>
->  #include <signal.h>
-> diff --git a/tools/testing/selftests/powerpc/syscalls/ipc_unmuxed.c b/tools/testing/selftests/powerpc/syscalls/ipc_unmuxed.c
-> index 4c582524aeb3..a49c699d86d4 100644
-> --- a/tools/testing/selftests/powerpc/syscalls/ipc_unmuxed.c
-> +++ b/tools/testing/selftests/powerpc/syscalls/ipc_unmuxed.c
-> @@ -5,8 +5,6 @@
->   * This test simply tests that certain syscalls are implemented. It doesn't
->   * actually exercise their logic in any way.
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <errno.h>
->  #include <stdio.h>
->  #include <unistd.h>
-> diff --git a/tools/testing/selftests/powerpc/tm/tm-exec.c b/tools/testing/selftests/powerpc/tm/tm-exec.c
-> index c59919d6710d..8cfc859dcf37 100644
-> --- a/tools/testing/selftests/powerpc/tm/tm-exec.c
-> +++ b/tools/testing/selftests/powerpc/tm/tm-exec.c
-> @@ -8,8 +8,6 @@
->   * It makes little sense for after an exec() call for the previously
->   * suspended transaction to still exist.
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <errno.h>
->  #include <inttypes.h>
->  #include <libgen.h>
-> diff --git a/tools/testing/selftests/powerpc/tm/tm-poison.c b/tools/testing/selftests/powerpc/tm/tm-poison.c
-> index a7bbf034b5bb..1b3a596a6a51 100644
-> --- a/tools/testing/selftests/powerpc/tm/tm-poison.c
-> +++ b/tools/testing/selftests/powerpc/tm/tm-poison.c
-> @@ -11,8 +11,6 @@
->   * present child's poison will leak into parent's f31 or vr31 registers,
->   * otherwise, poison will never leak into parent's f31 and vr31 registers.
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <unistd.h>
-> diff --git a/tools/testing/selftests/powerpc/tm/tm-signal-context-force-tm.c b/tools/testing/selftests/powerpc/tm/tm-signal-context-force-tm.c
-> index 421cb082f6be..f28ba2828df6 100644
-> --- a/tools/testing/selftests/powerpc/tm/tm-signal-context-force-tm.c
-> +++ b/tools/testing/selftests/powerpc/tm/tm-signal-context-force-tm.c
-> @@ -15,8 +15,6 @@
->   * This test never fails (as returning EXIT_FAILURE). It either succeeds,
->   * or crash the kernel (on a buggy kernel).
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <signal.h>
-> diff --git a/tools/testing/selftests/powerpc/tm/tm-signal-sigreturn-nt.c b/tools/testing/selftests/powerpc/tm/tm-signal-sigreturn-nt.c
-> index 06b801906f27..73f8e7dd5a1a 100644
-> --- a/tools/testing/selftests/powerpc/tm/tm-signal-sigreturn-nt.c
-> +++ b/tools/testing/selftests/powerpc/tm/tm-signal-sigreturn-nt.c
-> @@ -8,8 +8,6 @@
->   * It returns from the signal handler with the CPU at suspended state, but
->   * without setting usercontext MSR Transaction State (TS) fields.
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <signal.h>
-> diff --git a/tools/testing/selftests/powerpc/tm/tm-tmspr.c b/tools/testing/selftests/powerpc/tm/tm-tmspr.c
-> index dd5ddffa28b7..01118f7db1b2 100644
-> --- a/tools/testing/selftests/powerpc/tm/tm-tmspr.c
-> +++ b/tools/testing/selftests/powerpc/tm/tm-tmspr.c
-> @@ -22,8 +22,6 @@
->   *    	(b) abort transaction
->   *	(c) check TEXASR to see if FS has been corrupted
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <unistd.h>
-> diff --git a/tools/testing/selftests/powerpc/tm/tm-trap.c b/tools/testing/selftests/powerpc/tm/tm-trap.c
-> index 97cb74768e30..164b345b5bd3 100644
-> --- a/tools/testing/selftests/powerpc/tm/tm-trap.c
-> +++ b/tools/testing/selftests/powerpc/tm/tm-trap.c
-> @@ -26,8 +26,6 @@
->   * the endianness is verified on subsequent traps to determine if the
->   * endianness "flipped back" to the native endianness (BE).
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <error.h>
->  #include <stdio.h>
->  #include <stdlib.h>
-> diff --git a/tools/testing/selftests/powerpc/tm/tm-unavailable.c b/tools/testing/selftests/powerpc/tm/tm-unavailable.c
-> index 6bf1b65b020d..712267831112 100644
-> --- a/tools/testing/selftests/powerpc/tm/tm-unavailable.c
-> +++ b/tools/testing/selftests/powerpc/tm/tm-unavailable.c
-> @@ -13,8 +13,6 @@
->   * corruption, but only for registers vs0 and vs32, which are respectively
->   * representatives of FP and VEC/Altivec reg sets.
->   */
-> -
-> -#define _GNU_SOURCE
->  #include <error.h>
->  #include <stdio.h>
->  #include <stdlib.h>
-> diff --git a/tools/testing/selftests/powerpc/utils.c b/tools/testing/selftests/powerpc/utils.c
-> index e5f2d8735c64..664722a01636 100644
-> --- a/tools/testing/selftests/powerpc/utils.c
-> +++ b/tools/testing/selftests/powerpc/utils.c
-> @@ -2,9 +2,6 @@
->  /*
->   * Copyright 2013-2015, Michael Ellerman, IBM Corp.
->   */
-> -
-> -#define _GNU_SOURCE	/* For CPU_ZERO etc. */
-> -
->  #include <elf.h>
->  #include <errno.h>
->  #include <fcntl.h>
-> -- 
-> 2.45.1.288.g0e0cd299f1-goog
+> You mean I should drop it? OK.
+
+YES. As I discussed with Jason.
+
+>
+> > And you miss
+> >
+> > 	https://lore.kernel.org/all/20240424091533.86949-1-xuanzhuo@linux.alib=
+aba.com/
+
+And this.
+
+Thanks.
+
+
+> >
+> > Thanks.
+> >
+> > >
+> > > Yuxue Liu (2):
+> > >       vp_vdpa: Fix return value check vp_vdpa_request_irq
+> > >       vp_vdpa: don't allocate unused msix vectors
+> > >
+> > > Zhu Lingshan (1):
+> > >       MAINTAINERS: apply maintainer role of Intel vDPA driver
+> > >
+> > >  MAINTAINERS                                   |  10 +-
+> > >  arch/um/drivers/virt-pci.c                    |   1 -
+> > >  drivers/block/virtio_blk.c                    |   1 -
+> > >  drivers/bluetooth/virtio_bt.c                 |   1 -
+> > >  drivers/char/hw_random/virtio-rng.c           |   1 -
+> > >  drivers/char/virtio_console.c                 |   2 -
+> > >  drivers/crypto/virtio/virtio_crypto_core.c    |   1 -
+> > >  drivers/firmware/arm_scmi/virtio.c            |   1 -
+> > >  drivers/gpio/gpio-virtio.c                    |   1 -
+> > >  drivers/gpu/drm/virtio/virtgpu_drv.c          |   1 -
+> > >  drivers/iommu/virtio-iommu.c                  |   1 -
+> > >  drivers/misc/nsm.c                            |   1 -
+> > >  drivers/net/caif/caif_virtio.c                |   1 -
+> > >  drivers/net/virtio_net.c                      | 248 ++++++++++++++++=
++---------
+> > >  drivers/net/wireless/virtual/mac80211_hwsim.c |   1 -
+> > >  drivers/nvdimm/virtio_pmem.c                  |   1 -
+> > >  drivers/rpmsg/virtio_rpmsg_bus.c              |   1 -
+> > >  drivers/scsi/virtio_scsi.c                    |   1 -
+> > >  drivers/vdpa/vdpa.c                           |   2 +-
+> > >  drivers/vdpa/vdpa_user/vduse_dev.c            |  24 ++-
+> > >  drivers/vdpa/virtio_pci/vp_vdpa.c             |  27 ++-
+> > >  drivers/vhost/scsi.c                          |  70 +++++---
+> > >  drivers/vhost/vdpa.c                          |   6 +-
+> > >  drivers/vhost/vhost.c                         | 130 ++++++++++----
+> > >  drivers/vhost/vhost.h                         |   3 +-
+> > >  drivers/virtio/virtio_balloon.c               |  85 +++++----
+> > >  drivers/virtio/virtio_input.c                 |   1 -
+> > >  drivers/virtio/virtio_mem.c                   |  69 ++++++-
+> > >  drivers/virtio/virtio_mmio.c                  |   6 +-
+> > >  drivers/virtio/virtio_pci_common.c            |   4 +-
+> > >  drivers/virtio/virtio_ring.c                  |  59 +++++-
+> > >  fs/coredump.c                                 |   4 +-
+> > >  fs/fuse/virtio_fs.c                           |   1 -
+> > >  include/linux/sched/vhost_task.h              |   3 +-
+> > >  include/linux/virtio.h                        |   7 +
+> > >  include/uapi/linux/virtio_mem.h               |   2 +
+> > >  kernel/exit.c                                 |   5 +-
+> > >  kernel/signal.c                               |   4 +-
+> > >  kernel/vhost_task.c                           |  53 ++++--
+> > >  net/9p/trans_virtio.c                         |   1 -
+> > >  net/vmw_vsock/virtio_transport.c              |   1 -
+> > >  sound/virtio/virtio_card.c                    |   1 -
+> > >  42 files changed, 578 insertions(+), 265 deletions(-)
+> > >
+>
 
