@@ -1,122 +1,89 @@
-Return-Path: <netdev+bounces-97615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 052318CC5CE
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 19:47:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D509E8CC657
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 20:32:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B559D283D73
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 17:47:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 583B2B2160E
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 18:32:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5242145B3B;
-	Wed, 22 May 2024 17:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 524418004E;
+	Wed, 22 May 2024 18:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="akvgZ3UT"
+	dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b="oiHAQExv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp99.iad3b.emailsrvr.com (smtp99.iad3b.emailsrvr.com [146.20.161.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA282145B1A
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 17:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94031BF2A
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 18:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=146.20.161.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716400041; cv=none; b=Sz+FiIWAmsmAvVtQw34IeJZgqO6aLIy7pi43zm8Ch/A+Lo4dYXWOrCLvicmnLfihZZCcjp+wVTQAYVFob5audyxe8mpdbcSwuJHbeX23OwnIjgQBnIdTy/1Oah8WSdZBSgXYmCIs6aNWOvvP5DI59DVsq/G/Ccs3pBdVpXvuI9w=
+	t=1716402723; cv=none; b=FcxHz4vabo7NX1UYwBZiyJAEXMHEefFxjLYJSiU0D+oaeZJbfCeV11VeK7MxIEepH2Y5i9DOWbKUTXxXjww9kihDQZMZr1WxLyekb7d/lOtRGiJ/6Z000AIHolaD1vhmVH1r0S3qT/BqRN4Bk8B1PXV9+/L2XBAPFr5vtY2NGMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716400041; c=relaxed/simple;
-	bh=l/aqMP/pAxxQNkv1cpn6DL6g6yJONydNx3Emd5onJIQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=btj5veDkLWS3VFlmggkfAByF/uRM5gB2V5xjoFnyzPuixvOYxUBQuBH4dD5higYLpkYu2meQnt5a9l+P3kDmtbuG92SrSNhIxpGXJKiROAjVmazh1AzBP3oZBQhPEIohDRwrvQFaNME19pF07z9usbjMOxUTC5foqJ1UCNDRy0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=akvgZ3UT; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-572f6c56cdaso1419a12.0
-        for <netdev@vger.kernel.org>; Wed, 22 May 2024 10:47:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716400037; x=1717004837; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bxpzkj4h24ckPZbqXAVMFddkCZE0Xyra0TpA42yUw6Y=;
-        b=akvgZ3UTlTl9+ivduLm+K+kDJXBgX7m9rh6LWIoJ5H2KbLUZiAEB+xALqgtsTGcreC
-         /iGvWquaYv1hZkIID9rsWH+bYGPL6cSEsuu9vwcfp8yYhRq43Gc0JxhJxl5pavZeNLgf
-         V5pUTOKdLZycj5x8roYhHYzdODB4RXw2uQ5wRgrNK2r5wdpnM1rukZEcDTa7gomOZaIe
-         8gv/LNbpNsqpwDslxTRQeWL5ogIzMRe4J1F6OlwOJyEZK87fsy8x8cx251k/J+4mmtgv
-         CgJxGH85eI1EexL14QfqlkKsmNLAOqijklgJtii18KpWAe9UOs0ibb0ysTJhD2wrnZDm
-         6cPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716400037; x=1717004837;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bxpzkj4h24ckPZbqXAVMFddkCZE0Xyra0TpA42yUw6Y=;
-        b=ibplPLATMKHUGm9fZFMAuwXexlPxbyhUQ8HOhqhdbHlUW1VpnvVKdxKYrhvvUcVzlt
-         UUly2EQ7iUKq3Biqw1CHc4LZP4w66AX9RkIfSSwb1Or1Dr9TSVfeXXVRYIDWcTABBoEw
-         KR5HRYRKwsFju/gb1q5NZvRXRHxGpnbvWw5Qul85H8M/Gyu8hIIuTn3T5gRVkmQa1mPa
-         xwoo0JeK4nvD8jR7yyGlV5szzVvfLGzzXofoJlpfXzGc3VzLeeeQ1i1Yqti39rZD2HYp
-         wBIiomWPGSj6vOgoYESKcXOYTp5Nxz1/wvNqSIwuSdRAAxg9qF6r0i4+12gJxxAIKMDx
-         Dtag==
-X-Forwarded-Encrypted: i=1; AJvYcCVmaId54bFmBIeDnvx2m/zqjZsw3sFYrWJLdP9Chn3hAF2YCT9khWOqRntZQsF0R+tgcnHsGyKzwR4FCxGYk+xwl/8dcRbr
-X-Gm-Message-State: AOJu0YwiYj8npUIWkV5rOZEzNfKe2LEzVOia9qyY3bxRLRLKkdTfZUlG
-	gHqKsqyIbVo5lfXhA72AzOjdq8c63x3iFLRj75Zl+z0BukkQGf+c7QbUFyBp4uHubhySTumb39z
-	9bZrB8IvKRW3f4BjSWhX8yrNhTDi552Mz9fcH
-X-Google-Smtp-Source: AGHT+IEhvV3LATx35FZqHosI0UhkBDI1Niq/eTXGrnklxwDEu8dQhBOKQ05jw+yjdKEjHZAcrzgbp92SS4Zf1xFsuR0=
-X-Received: by 2002:a05:6402:50cf:b0:572:57d8:4516 with SMTP id
- 4fb4d7f45d1cf-5782f9f7e7bmr285506a12.2.1716400037143; Wed, 22 May 2024
- 10:47:17 -0700 (PDT)
+	s=arc-20240116; t=1716402723; c=relaxed/simple;
+	bh=H0zTzTCjK4soBCluEyuZgoRZslqdQkTfZ1JW+hfHOHk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bfYdjQOoDBdkCklEm8PokDyv/aRzhtc7wxQHhtWhomSGcDxDu+S4jr1vrJrQWWg04lYY97k2IxTccpbg+wcjW78I8+O3wkD/qUj4LrLpX5hKZb6yzvEj3N01PCbfrhuJl5cdKVBbUPxTfK0hljmQ0+Z2SmOIcq50oa7i+LmtEiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com; spf=pass smtp.mailfrom=oddbit.com; dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b=oiHAQExv; arc=none smtp.client-ip=146.20.161.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oddbit.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=oddbit.com;
+	s=20180920-g2b7aziw; t=1716402337;
+	bh=H0zTzTCjK4soBCluEyuZgoRZslqdQkTfZ1JW+hfHOHk=;
+	h=Date:From:To:Subject:From;
+	b=oiHAQExvHkQi+FCTU5AkFRv2ZiD9ZGEeVITNRlYY063hcU6W35WH5upv66LG7QzoG
+	 tmeD+QECQ5J9Ek8s9qPl0ZVBvhWdF3An4TzhsqeKR7JsONYA7HLFcJmhJtO4x+b2cZ
+	 eSHiW+ZkWgb3DrXMR1NQ5l6GyEfnywhpikrZ1/Xw=
+X-Auth-ID: lars@oddbit.com
+Received: by smtp5.relay.iad3b.emailsrvr.com (Authenticated sender: lars-AT-oddbit.com) with ESMTPSA id EB525400C8;
+	Wed, 22 May 2024 14:25:36 -0400 (EDT)
+Date: Wed, 22 May 2024 14:25:36 -0400
+From: Lars Kellogg-Stedman <lars@oddbit.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3] ax25: Fix refcount imbalance on inbound connections
+Message-ID: <yzz225joxbxptlrdqjr4u2cwk4myactk6ozz7bfpv25dqbzri4@mz5ocbxbefxp>
+References: <46ydfjtpinm3py3zt6lltxje4cpdvuugaatbvx4y27m7wxc2hz@4wdtoq7yfrd5>
+ <20240521182323.600609-3-lars@oddbit.com>
+ <20240522100701.4d9edf99@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240522005913.3540131-1-edliaw@google.com> <20240522005913.3540131-3-edliaw@google.com>
- <94b73291-5b8a-480d-942d-cfc72971c2f5@sirena.org.uk>
-In-Reply-To: <94b73291-5b8a-480d-942d-cfc72971c2f5@sirena.org.uk>
-From: Edward Liaw <edliaw@google.com>
-Date: Wed, 22 May 2024 10:46:50 -0700
-Message-ID: <CAG4es9WAASaSG+Xgp31-kLT3G8wpeT5vAqbCA4r=Z8G_zAF73w@mail.gmail.com>
-Subject: Re: [PATCH v5 02/68] kselftest: Desecalate reporting of missing _GNU_SOURCE
-To: Mark Brown <broonie@kernel.org>
-Cc: shuah@kernel.org, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
-	Christian Brauner <brauner@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Kees Cook <keescook@chromium.org>, 
-	Andy Lutomirski <luto@amacapital.net>, Will Drewry <wad@chromium.org>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kernel-team@android.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240522100701.4d9edf99@kernel.org>
+X-Classification-ID: 227f8a22-6abb-4b73-b50d-84d59eab2358-1-1
 
-On Wed, May 22, 2024 at 4:21=E2=80=AFAM Mark Brown <broonie@kernel.org> wro=
-te:
->
-> On Wed, May 22, 2024 at 12:56:48AM +0000, Edward Liaw wrote:
->
-> > to make stopping builds early replace the static_assert() with a
-> > missing without making the error more severe than it already was.  This
-> > will be moot once the issue is fixed properly but reduces the disruptio=
-n
-> > while that happens.
-> >
-> > Signed-off-by: Mark Brown <broonie@kernel.org>
-> > Reviewed-by: Kees Cook <keescook@chromium.org>
-> > ---
-> >  tools/testing/selftests/kselftest_harness.h | 2 +-
->
-> You've not provided a Signed-off-by for this so people can't do anything
-> with it, please see Documentation/process/submitting-patches.rst for
-> details on what this is and why it's important.
+On Wed, May 22, 2024 at 10:07:01AM GMT, Jakub Kicinski wrote:
+> correct fixes tag for this hash would be:
+> 
+> Fixes: 7d8a3a477b3e ("ax25: Fix ax25 session cleanup problems")
 
-Sorry, my mistake, I forgot to add it after cherry-picking.  If added
-in a reply like so would it suffice, or would I need to send another
-patch?
+Jakub,
 
-Signed-off-by: Edward Liaw <edliaw@google.com>
+Thanks for the correction; I'll submit a new patch with a correct Fixes:
+tag, but...
+
+> Please CC maintainers (per script/get_maintainer.pl)
+
+...the ax.25 tree is currently orphaned:
+
+    AX.25 NETWORK LAYER
+    L:	linux-hams@vger.kernel.org
+    S:	Orphan
+    W:	https://linux-ax25.in-berlin.de
+    F:	include/net/ax25.h
+    F:	include/uapi/linux/ax25.h
+    F:	net/ax25/
+
+-- 
+Lars Kellogg-Stedman <lars@oddbit.com> | larsks @ {irc,twitter,github}
+http://blog.oddbit.com/                | N1LKS
 
