@@ -1,353 +1,217 @@
-Return-Path: <netdev+bounces-97517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13FB78CBD5F
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:57:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DABAA8CBD4F
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:52:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82753B20B5D
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 08:57:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F19D2814AE
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 08:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307C87F486;
-	Wed, 22 May 2024 08:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5D58002F;
+	Wed, 22 May 2024 08:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="u6C7hrS5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6okhUiW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007347E572
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 08:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303117E583
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 08:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716368217; cv=none; b=FXpweJmgBYeDtGigRXgFlz6eRpjaKGKvY5bFoJn7gOq2G9G84hYV4sQItHhiuK9EPxwbdnGOWcQawxumMod4j9sFHYY4sB6eZfJx9Dr6u5PFTyLeu4csL/7kB4PYQBAgU0Vy7FmFBiRCqxNn3r6o/s2dRpiFH0W1vGx1MbOmxh0=
+	t=1716367947; cv=none; b=Hd32pBcwsJ63+d/ktJ1o+TUOwHwXtdD9zE7EukeD32Qo/bBVq6mpGcTKB7RFM4Kf0TFpe0tMl72LdQkBA4txWVT2xV6agm5czcDffGVcW6ClWajIsOPbqdm7FVGFqck4Cs27lUGHjf3BmHJbnBuzRIS3cNgpmIgyyyZgy5aW6wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716368217; c=relaxed/simple;
-	bh=fm5FtQjT4BgXdD1xG7tZS7Pfej/GCUUtCkBNRwWRAOc=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=Y83c//v5VhL0N9bFPeilIDJl+ExYHx/xmssdWIInbxUnN3Q32E6o8PRIlEoAw2GupGQB2YN3LRyHGdYPLGn2H1gC7iVOveAFLzFwZoLqU/bhcsKUNQBGWRUEZDbn8cy6phP4q8Fw7iPxkZv+kBCv6mGhUpOWfUsV8Yvdcm++h3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=u6C7hrS5; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1716368210; h=Message-ID:Subject:Date:From:To;
-	bh=YHoxTOZr2rxRFk9CRi8bwGNj1PyJeeAm+f6ODQpF9Z8=;
-	b=u6C7hrS5QavG7PAaG51Bd8ienk63++BhmZkmbbZIl3Eoa4Ud8zPfN09AX+nsxphSLxtg6aIy/ilimnVNKO8iEgAWRvleW48PSzLOQ8SKubG9UTLRGZTTQSvJ5HQ7E4j4320jWncjEcgGINvAG19b8dtetPImavrz5GHLMpLaCFM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045046011;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0W7-lteN_1716368208;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W7-lteN_1716368208)
-          by smtp.aliyun-inc.com;
-          Wed, 22 May 2024 16:56:49 +0800
-Message-ID: <1716367939.5198305-3-hengqi@linux.alibaba.com>
-Subject: Re: [PATCH net 2/2] Revert "virtio_net: Add a lock for per queue RX coalesce"
-Date: Wed, 22 May 2024 16:52:19 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org,
- virtualization@lists.linux.dev,
- Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20240522034548.58131-1-hengqi@linux.alibaba.com>
- <20240522034548.58131-3-hengqi@linux.alibaba.com>
- <Zk2pskOYxnSdNf-O@nanopsycho.orion>
-In-Reply-To: <Zk2pskOYxnSdNf-O@nanopsycho.orion>
+	s=arc-20240116; t=1716367947; c=relaxed/simple;
+	bh=1a0tijc7EepbdlV49Y8gUMIe2Lw23vq46ZftZaywC7k=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=nks34gutJUjWtzba/D8keEmE0PqzHzskjjTaYjLV7VoeAnLmLfmESzUs9m3WzgBnFpaogLxAEPIZfeQqEvOhEf71PkYqEmmdn9QFNa+ciFEOzbM3iTeeWMJElf74YQLyxvVzuQCM4MVm0J6yah+yo1sod32KNkepv1vcUzr1YwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q6okhUiW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716367945;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=x8Z/+64QvbiN0Qdg5uYolDNncR4gIyQttw+JmN+I2dk=;
+	b=Q6okhUiWr+xxXxNJYxe9PGW7AVo02aDYaHYoMJx+x0qBwYHEo7E9CUXsViBINtQu/ZG7c4
+	3w4ips/WHn5tc0CmwZP+G6kA9aBh6Qy0MYMTmbuvwRt7Pc0bJZq0DuUild15lXfJY+Os03
+	9JeuMh+A+KRjf8oZ/rm6amILxSqfd0k=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-672-Lg4HwWTzPnapa62Hxz7aAg-1; Wed, 22 May 2024 04:52:23 -0400
+X-MC-Unique: Lg4HwWTzPnapa62Hxz7aAg-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-51ffdd3524eso2311306e87.3
+        for <netdev@vger.kernel.org>; Wed, 22 May 2024 01:52:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716367942; x=1716972742;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=x8Z/+64QvbiN0Qdg5uYolDNncR4gIyQttw+JmN+I2dk=;
+        b=KXERmT5YxcZfiBY+N9jx6qoEq5aIf2xBQhkEECTswdCtTJTqQyRvJxyvC8ADXpI+S0
+         siIA0Ph7dRGtGg0kFUuzOxOIQBwv8+pL1SPi/XiwAiaH/jiuoFTWaIbUUvW0fUH5o3UH
+         VbHtIXJL+V8oLupswtZBdpk7n2Xm7NDnn2jkLsLN8wZmtYDpic305wWjQ7WUjG23LsrA
+         gvtUqXnro7+zxok8VAlgvZtbE3EqIE8KwWC8mExIEw7KZLthevYSzoJVH2bqUWBAhewc
+         ySqlki27QV0VIxxGM6qPArlhekSFw7AAFkleOJKyH0PPw6V7e0WYQqKVJziZ6xM/RERL
+         XAiA==
+X-Forwarded-Encrypted: i=1; AJvYcCXY/IT+m4ERtsi5needRZVsjwADsfSaquLN2Ok63Pn1+kZmtT8gPbZYzXc7MEQ3ckbx/xRB/H9Ecn846ZLGZJjsdaZK6Aa5
+X-Gm-Message-State: AOJu0YytzerwYhVG2O1b/TdcyG0pUtLppTop2pLWcDdB4hshUFtFnq9M
+	Whus/ct3uDW8fdIxlu/1GS7KivejsVRDEDm9fenLBWtveirHFUv+y5AdIUgJCaqDYPsLrSOJBJi
+	WJWaLcg1jCg82FUkWbRu+SVRO4RVUWsmPPwba5CFX8UHrAYWnu4MVbg==
+X-Received: by 2002:a05:6512:2814:b0:516:c241:a912 with SMTP id 2adb3069b0e04-526bda691a6mr908744e87.1.1716367941953;
+        Wed, 22 May 2024 01:52:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEXwnvRNmTipJ0Yq4wnXDUw/O8voEpeIJO7dw1Ln+lXyjoX4tpnJ1XdMGry0hSnthoMtB5zAw==
+X-Received: by 2002:a05:6512:2814:b0:516:c241:a912 with SMTP id 2adb3069b0e04-526bda691a6mr908730e87.1.1716367941486;
+        Wed, 22 May 2024 01:52:21 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b094:ab10::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502bbbc887sm33471422f8f.98.2024.05.22.01.52.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 May 2024 01:52:20 -0700 (PDT)
+Message-ID: <6a187b65c4b2e487461e5d3b2270670586841d84.camel@redhat.com>
+Subject: Re: [PATCH v1 net] af_unix: Annotate data-race around
+ unix_sk(sk)->addr.
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+ syzkaller <syzkaller@googlegroups.com>
+Date: Wed, 22 May 2024 10:52:19 +0200
+In-Reply-To: <20240518000148.27947-1-kuniyu@amazon.com>
+References: <20240518000148.27947-1-kuniyu@amazon.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 
-On Wed, 22 May 2024 10:15:46 +0200, Jiri Pirko <jiri@resnulli.us> wrote:
-> Wed, May 22, 2024 at 05:45:48AM CEST, hengqi@linux.alibaba.com wrote:
-> >This reverts commit 4d4ac2ececd3c42a08dd32a6e3a4aaf25f7efe44.
-> 
-> This commit does not exist in -net or -net-next.
+On Sat, 2024-05-18 at 09:01 +0900, Kuniyuki Iwashima wrote:
+> Once unix_sk(sk)->addr is assigned under net->unx.table.locks,
+> *(unix_sk(sk)->addr) and unix_sk(sk)->path are fully set up, and
+> unix_sk(sk)->addr is never changed.
+>=20
+> unix_getname() and unix_copy_addr() access the two fields locklessly,
+> and commit ae3b564179bf ("missing barriers in some of unix_sock ->addr
+> and ->path accesses") added smp_store_release() and smp_load_acquire()
+> pairs.
+>=20
+> In other functions, we still read unix_sk(sk)->addr locklessly to check
+> if the socket is bound, and KCSAN complains about it.  [0]
+>=20
+> Given these functions have no dependency for *(unix_sk(sk)->addr) and
+> unix_sk(sk)->path, READ_ONCE() is enough to annotate the data-race.
+>=20
+> [0]:
+> BUG: KCSAN: data-race in unix_bind / unix_listen
+>=20
+> write (marked) to 0xffff88805f8d1840 of 8 bytes by task 13723 on cpu 0:
+>  __unix_set_addr_hash net/unix/af_unix.c:329 [inline]
+>  unix_bind_bsd net/unix/af_unix.c:1241 [inline]
+>  unix_bind+0x881/0x1000 net/unix/af_unix.c:1319
+>  __sys_bind+0x194/0x1e0 net/socket.c:1847
+>  __do_sys_bind net/socket.c:1858 [inline]
+>  __se_sys_bind net/socket.c:1856 [inline]
+>  __x64_sys_bind+0x40/0x50 net/socket.c:1856
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x46/0x4e
+>=20
+> read to 0xffff88805f8d1840 of 8 bytes by task 13724 on cpu 1:
+>  unix_listen+0x72/0x180 net/unix/af_unix.c:734
+>  __sys_listen+0xdc/0x160 net/socket.c:1881
+>  __do_sys_listen net/socket.c:1890 [inline]
+>  __se_sys_listen net/socket.c:1888 [inline]
+>  __x64_sys_listen+0x2e/0x40 net/socket.c:1888
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x46/0x4e
+>=20
+> value changed: 0x0000000000000000 -> 0xffff88807b5b1b40
+>=20
+> Reported by Kernel Concurrency Sanitizer on:
+> CPU: 1 PID: 13724 Comm: syz-executor.4 Not tainted 6.8.0-12822-gcd51db110=
+a7e #12
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-=
+gd239552ce722-prebuilt.qemu.org 04/01/2014
+>=20
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  net/unix/af_unix.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index ca101690e740..92a88ac070ca 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -731,7 +731,7 @@ static int unix_listen(struct socket *sock, int backl=
+og)
+>  	if (sock->type !=3D SOCK_STREAM && sock->type !=3D SOCK_SEQPACKET)
+>  		goto out;	/* Only stream/seqpacket sockets accept */
+>  	err =3D -EINVAL;
+> -	if (!u->addr)
+> +	if (!READ_ONCE(u->addr))
+>  		goto out;	/* No listens on an unbound socket */
+>  	unix_state_lock(sk);
+>  	if (sk->sk_state !=3D TCP_CLOSE && sk->sk_state !=3D TCP_LISTEN)
+> @@ -1369,7 +1369,7 @@ static int unix_dgram_connect(struct socket *sock, =
+struct sockaddr *addr,
+> =20
+>  		if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
+>  		     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
+> -		    !unix_sk(sk)->addr) {
+> +		    !READ_ONCE(unix_sk(sk)->addr)) {
+>  			err =3D unix_autobind(sk);
+>  			if (err)
+>  				goto out;
+> @@ -1481,7 +1481,8 @@ static int unix_stream_connect(struct socket *sock,=
+ struct sockaddr *uaddr,
+>  		goto out;
+> =20
+>  	if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
+> -	     test_bit(SOCK_PASSPIDFD, &sock->flags)) && !u->addr) {
+> +	     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
+> +	    !READ_ONCE(u->addr)) {
+>  		err =3D unix_autobind(sk);
+>  		if (err)
+>  			goto out;
+> @@ -1951,7 +1952,8 @@ static int unix_dgram_sendmsg(struct socket *sock, =
+struct msghdr *msg,
+>  	}
+> =20
+>  	if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
+> -	     test_bit(SOCK_PASSPIDFD, &sock->flags)) && !u->addr) {
+> +	     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
+> +	    !READ_ONCE(u->addr)) {
+>  		err =3D unix_autobind(sk);
+>  		if (err)
+>  			goto out;
 
-It definitely exists in net-next :):
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=4d4ac2ececd3c42a08dd32a6e3a4aaf25f7efe44
+There are a few other places where ->addr is accessed lockless (under
+the bindlock, but prior to acquiring the table spinlock, e.g.
+unix_bind_* and unix_autobind. The latter is suspect as it's called
+right after the touched code. Why are such spots not relevant here?
 
-> 
-> >
-> >When the following snippet is run, lockdep will complain[1].
-> >
-> >  /* Acquire all queues dim_locks */
-> >  for (i = 0; i < vi->max_queue_pairs; i++)
-> >	  mutex_lock(&vi->rq[i].dim_lock);
-> >
-> >At the same time, too many queues will cause lockdep to be more irritable,
-> >which can be alleviated by using mutex_lock_nested(), however, there are
-> >still new warning when the number of queues exceeds MAX_LOCKDEP_SUBCLASSES.
-> >So I would like to gently revert this commit, although it brings
-> >unsynchronization that is not so concerned:
-> >  1. When dim is enabled, rx_dim_work may modify the coalescing parameters.
-> >     Users may read dirty coalescing parameters if querying.
-> >  2. When dim is switched from enabled to disabled, a spurious dim worker
-> >     maybe scheduled, but this can be handled correctly by rx_dim_work.
-> >
-> >[1]
-> >========================================================
-> >WARNING: possible recursive locking detected
-> >6.9.0-rc7+ #319 Not tainted
-> >--------------------------------------------
-> >ethtool/962 is trying to acquire lock:
-> >
-> >but task is already holding lock:
-> >
-> >other info that might help us debug this:
-> >Possible unsafe locking scenario:
-> >
-> >      CPU0
-> >      ----
-> > lock(&vi->rq[i].dim_lock);
-> > lock(&vi->rq[i].dim_lock);
-> >
-> >*** DEADLOCK ***
-> >
-> > May be due to missing lock nesting notation
-> >
-> >3 locks held by ethtool/962:
-> > #0: ffffffff82dbaab0 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40
-> > #1: ffffffff82dad0a8 (rtnl_mutex){+.+.}-{3:3}, at:
-> >				ethnl_default_set_doit+0xbe/0x1e0
-> >
-> >stack backtrace:
-> >CPU: 6 PID: 962 Comm: ethtool Not tainted 6.9.0-rc7+ #319
-> >Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-> >	   rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-> >Call Trace:
-> > <TASK>
-> > dump_stack_lvl+0x79/0xb0
-> > check_deadlock+0x130/0x220
-> > __lock_acquire+0x861/0x990
-> > lock_acquire.part.0+0x72/0x1d0
-> > ? lock_acquire+0xf8/0x130
-> > __mutex_lock+0x71/0xd50
-> > virtnet_set_coalesce+0x151/0x190
-> > __ethnl_set_coalesce.isra.0+0x3f8/0x4d0
-> > ethnl_set_coalesce+0x34/0x90
-> > ethnl_default_set_doit+0xdd/0x1e0
-> > genl_family_rcv_msg_doit+0xdc/0x130
-> > genl_family_rcv_msg+0x154/0x230
-> > ? __pfx_ethnl_default_set_doit+0x10/0x10
-> > genl_rcv_msg+0x4b/0xa0
-> > ? __pfx_genl_rcv_msg+0x10/0x10
-> > netlink_rcv_skb+0x5a/0x110
-> > genl_rcv+0x28/0x40
-> > netlink_unicast+0x1af/0x280
-> > netlink_sendmsg+0x20e/0x460
-> > __sys_sendto+0x1fe/0x210
-> > ? find_held_lock+0x2b/0x80
-> > ? do_user_addr_fault+0x3a2/0x8a0
-> > ? __lock_release+0x5e/0x160
-> > ? do_user_addr_fault+0x3a2/0x8a0
-> > ? lock_release+0x72/0x140
-> > ? do_user_addr_fault+0x3a7/0x8a0
-> > __x64_sys_sendto+0x29/0x30
-> > do_syscall_64+0x78/0x180
-> > entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> >
-> >Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> 
-> Fixes tag missing.
+Also the  newu->addr/otheru->addr handling in unix_stream_connect()
+looks suspect.
 
-IIUC,
+Thanks,
 
-  "This reverts commit 4d4ac2ececd3c42a08dd32a6e3a4aaf25f7efe44."
+Paolo
 
-has provided a traceback way, which is not fixing other patches,
-but fixing itself. So we do not need fixes tag.
-
-Thanks.
-
-> 
-> 
-> >---
-> > drivers/net/virtio_net.c | 53 +++++++++-------------------------------
-> > 1 file changed, 12 insertions(+), 41 deletions(-)
-> >
-> >diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> >index 1cad06cef230..e4a1dff2a64a 100644
-> >--- a/drivers/net/virtio_net.c
-> >+++ b/drivers/net/virtio_net.c
-> >@@ -316,9 +316,6 @@ struct receive_queue {
-> > 	/* Is dynamic interrupt moderation enabled? */
-> > 	bool dim_enabled;
-> > 
-> >-	/* Used to protect dim_enabled and inter_coal */
-> >-	struct mutex dim_lock;
-> >-
-> > 	/* Dynamic Interrupt Moderation */
-> > 	struct dim dim;
-> > 
-> >@@ -2368,10 +2365,6 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
-> > 	/* Out of packets? */
-> > 	if (received < budget) {
-> > 		napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
-> >-		/* Intentionally not taking dim_lock here. This may result in a
-> >-		 * spurious net_dim call. But if that happens virtnet_rx_dim_work
-> >-		 * will not act on the scheduled work.
-> >-		 */
-> > 		if (napi_complete && rq->dim_enabled)
-> > 			virtnet_rx_dim_update(vi, rq);
-> > 	}
-> >@@ -3247,11 +3240,9 @@ static int virtnet_set_ringparam(struct net_device *dev,
-> > 				return err;
-> > 
-> > 			/* The reason is same as the transmit virtqueue reset */
-> >-			mutex_lock(&vi->rq[i].dim_lock);
-> > 			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i,
-> > 							       vi->intr_coal_rx.max_usecs,
-> > 							       vi->intr_coal_rx.max_packets);
-> >-			mutex_unlock(&vi->rq[i].dim_lock);
-> > 			if (err)
-> > 				return err;
-> > 		}
-> >@@ -4257,7 +4248,6 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
-> > 	struct virtio_net_ctrl_coal_rx *coal_rx __free(kfree) = NULL;
-> > 	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
-> > 	struct scatterlist sgs_rx;
-> >-	int ret = 0;
-> > 	int i;
-> > 
-> > 	if (rx_ctrl_dim_on && !virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-> >@@ -4267,22 +4257,16 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
-> > 			       ec->rx_max_coalesced_frames != vi->intr_coal_rx.max_packets))
-> > 		return -EINVAL;
-> > 
-> >-	/* Acquire all queues dim_locks */
-> >-	for (i = 0; i < vi->max_queue_pairs; i++)
-> >-		mutex_lock(&vi->rq[i].dim_lock);
-> >-
-> > 	if (rx_ctrl_dim_on && !vi->rx_dim_enabled) {
-> > 		vi->rx_dim_enabled = true;
-> > 		for (i = 0; i < vi->max_queue_pairs; i++)
-> > 			vi->rq[i].dim_enabled = true;
-> >-		goto unlock;
-> >+		return 0;
-> > 	}
-> > 
-> > 	coal_rx = kzalloc(sizeof(*coal_rx), GFP_KERNEL);
-> >-	if (!coal_rx) {
-> >-		ret = -ENOMEM;
-> >-		goto unlock;
-> >-	}
-> >+	if (!coal_rx)
-> >+		return -ENOMEM;
-> > 
-> > 	if (!rx_ctrl_dim_on && vi->rx_dim_enabled) {
-> > 		vi->rx_dim_enabled = false;
-> >@@ -4300,10 +4284,8 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
-> > 
-> > 	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
-> > 				  VIRTIO_NET_CTRL_NOTF_COAL_RX_SET,
-> >-				  &sgs_rx)) {
-> >-		ret = -EINVAL;
-> >-		goto unlock;
-> >-	}
-> >+				  &sgs_rx))
-> >+		return -EINVAL;
-> > 
-> > 	vi->intr_coal_rx.max_usecs = ec->rx_coalesce_usecs;
-> > 	vi->intr_coal_rx.max_packets = ec->rx_max_coalesced_frames;
-> >@@ -4311,11 +4293,8 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
-> > 		vi->rq[i].intr_coal.max_usecs = ec->rx_coalesce_usecs;
-> > 		vi->rq[i].intr_coal.max_packets = ec->rx_max_coalesced_frames;
-> > 	}
-> >-unlock:
-> >-	for (i = vi->max_queue_pairs - 1; i >= 0; i--)
-> >-		mutex_unlock(&vi->rq[i].dim_lock);
-> > 
-> >-	return ret;
-> >+	return 0;
-> > }
-> > 
-> > static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
-> >@@ -4339,24 +4318,19 @@ static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
-> > 					     u16 queue)
-> > {
-> > 	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
-> >+	bool cur_rx_dim = vi->rq[queue].dim_enabled;
-> > 	u32 max_usecs, max_packets;
-> >-	bool cur_rx_dim;
-> > 	int err;
-> > 
-> >-	mutex_lock(&vi->rq[queue].dim_lock);
-> >-	cur_rx_dim = vi->rq[queue].dim_enabled;
-> > 	max_usecs = vi->rq[queue].intr_coal.max_usecs;
-> > 	max_packets = vi->rq[queue].intr_coal.max_packets;
-> > 
-> > 	if (rx_ctrl_dim_on && (ec->rx_coalesce_usecs != max_usecs ||
-> >-			       ec->rx_max_coalesced_frames != max_packets)) {
-> >-		mutex_unlock(&vi->rq[queue].dim_lock);
-> >+			       ec->rx_max_coalesced_frames != max_packets))
-> > 		return -EINVAL;
-> >-	}
-> > 
-> > 	if (rx_ctrl_dim_on && !cur_rx_dim) {
-> > 		vi->rq[queue].dim_enabled = true;
-> >-		mutex_unlock(&vi->rq[queue].dim_lock);
-> > 		return 0;
-> > 	}
-> > 
-> >@@ -4369,8 +4343,10 @@ static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
-> > 	err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, queue,
-> > 					       ec->rx_coalesce_usecs,
-> > 					       ec->rx_max_coalesced_frames);
-> >-	mutex_unlock(&vi->rq[queue].dim_lock);
-> >-	return err;
-> >+	if (err)
-> >+		return err;
-> >+
-> >+	return 0;
-> > }
-> > 
-> > static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
-> >@@ -4404,7 +4380,6 @@ static void virtnet_rx_dim_work(struct work_struct *work)
-> > 
-> > 	qnum = rq - vi->rq;
-> > 
-> >-	mutex_lock(&rq->dim_lock);
-> > 	if (!rq->dim_enabled)
-> > 		goto out;
-> > 
-> >@@ -4420,7 +4395,6 @@ static void virtnet_rx_dim_work(struct work_struct *work)
-> > 	}
-> > out:
-> > 	dim->state = DIM_START_MEASURE;
-> >-	mutex_unlock(&rq->dim_lock);
-> > }
-> > 
-> > static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
-> >@@ -4558,13 +4532,11 @@ static int virtnet_get_per_queue_coalesce(struct net_device *dev,
-> > 		return -EINVAL;
-> > 
-> > 	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-> >-		mutex_lock(&vi->rq[queue].dim_lock);
-> > 		ec->rx_coalesce_usecs = vi->rq[queue].intr_coal.max_usecs;
-> > 		ec->tx_coalesce_usecs = vi->sq[queue].intr_coal.max_usecs;
-> > 		ec->tx_max_coalesced_frames = vi->sq[queue].intr_coal.max_packets;
-> > 		ec->rx_max_coalesced_frames = vi->rq[queue].intr_coal.max_packets;
-> > 		ec->use_adaptive_rx_coalesce = vi->rq[queue].dim_enabled;
-> >-		mutex_unlock(&vi->rq[queue].dim_lock);
-> > 	} else {
-> > 		ec->rx_max_coalesced_frames = 1;
-> > 
-> >@@ -5396,7 +5368,6 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
-> > 
-> > 		u64_stats_init(&vi->rq[i].stats.syncp);
-> > 		u64_stats_init(&vi->sq[i].stats.syncp);
-> >-		mutex_init(&vi->rq[i].dim_lock);
-> > 	}
-> > 
-> > 	return 0;
-> >-- 
-> >2.32.0.3.g01195cf9f
-> >
-> >
 
