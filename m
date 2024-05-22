@@ -1,92 +1,182 @@
-Return-Path: <netdev+bounces-97652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 862F18CC955
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 01:02:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E2038CC956
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 01:03:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2478D1F21FB5
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 23:02:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F09B1C21864
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 23:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760D080C04;
-	Wed, 22 May 2024 23:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7739D145B14;
+	Wed, 22 May 2024 23:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b="QAGOE1q6"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="JUdz3Dmz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-in-1.gedalya.net (mail.gedalya.net [170.39.119.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0D301E4AF
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 23:02:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.39.119.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD5314198A
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 23:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716418962; cv=none; b=piTNdbXSYIaIy4U08mTatvBUy3vpM/x83N9axepEHCnJp7Iw9A/HoWb0yzZ7ym3c6x+bMDYPk6xFdcxXyfi5boIEJlzYEtwC8hzQJfeuYjiVPEJsLeBW1AcGJHKbOUEphg52sdCOm0X/Wvk2yXpPoAcIlTBDxnGq1o1/KGId7Mc=
+	t=1716419019; cv=none; b=Mh8WI4UNXnBfx3g2cIsPBru3IjrDnaXv4o9KLHXDnTNB974Ck9GBi8vPm/Ws8zLRs3a+FP46Ia2FGOBVNSQ9td7NjjURXdUooyl/uQrQXWg7RsekOGHVI1AMle5/fp/O2tQTPwQZ5hyETZKFcoeXExHD/FYYNvI7Oq6kO5ZFMO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716418962; c=relaxed/simple;
-	bh=1PLwRNGUwi1sVzI0YA6hsn7ehjvr7ZDNrwLUePNPges=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WGnFSzwMffS1VibwPXhhjRXGf505t1qKbcmUk0cLU5/tZVt8oBKmgxH/SGfIhGnMawg816ABPFBopcmTKfm4dG7irgdN+ID3eJ6vrA02/XWMQQs6aA8rPyQ3qmrS4MKAeLYt8X43ldxBKovmX7kqdn6Be6o8jn7SQyFTxxG/cWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net; spf=pass smtp.mailfrom=gedalya.net; dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b=QAGOE1q6; arc=none smtp.client-ip=170.39.119.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gedalya.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gedalya.net
-	; s=rsa1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description;
-	bh=1PLwRNGUwi1sVzI0YA6hsn7ehjvr7ZDNrwLUePNPges=; b=QAGOE1q6XYKvkQKfsHV4XkXLMW
-	VH1poTBRxFNEJPWCDtutuQQ8BV0KFcGGYSPY8awfi3q3OqvqbuNHn6bJcuQgQI+WyFPqqy1EOY6Yi
-	MMpSGJqyFaGk3VWTy/bNN5fwTeRjRTFE87j6CaVIFKqWND7O+lL6PtNpA9V59S3vBYlYhsNPUgbFl
-	NZ5R34C2ClycLKdldiOw9rp/Rn6SYTQBRsk270GPf+19lGBkkw0kCYF7x0qd3Mbg3yS94AYCpPhm/
-	T8EEn6bqGiBZoj8hQIpSYg26P5wW3esnMEraCndweUGgFQySnZbuIrOuTYGxcAkakT7slAtAefJB0
-	B//9WDtg==;
-Received: from [192.168.9.10]
-	by smtp-in-1.gedalya.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <gedalya@gedalya.net>)
-	id 1s9uyk-000ezQ-1K;
-	Wed, 22 May 2024 23:02:38 +0000
-Message-ID: <e13fe956-a52f-4b51-a84e-8bcf860bb8cf@gedalya.net>
-Date: Thu, 23 May 2024 07:02:35 +0800
+	s=arc-20240116; t=1716419019; c=relaxed/simple;
+	bh=6JnRfOUTXPOqxN0RZeaMz/x6ygj/VkQ/oWDRETDPK5Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bdozciJvRlex4tAT1JNBEIydG566/OrADFpO5lhKqTiqc9HOqGAiRUFx3o13kGKRMCd3AsrcSLq4ljz41T6C1O+Mi3xZ/GgAImKZHIeeS0pu3ifwHJ204cje4s+iBfqmp+Yr2nCBQBAqYnUhcTJpHKJG/dv63k3V/uBSkPz/UGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=JUdz3Dmz; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-628c1f09f5cso2174727b3.1
+        for <netdev@vger.kernel.org>; Wed, 22 May 2024 16:03:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1716419016; x=1717023816; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I5mjy3aKB+H5UlrlmRHA+Kx1ufZA6V8d9nt7uDVjCn4=;
+        b=JUdz3DmzR+kW1qYIaHAlElnGeY9a6iPyyavQZ7XS329gWDRahJJD6qNVT561uSU8C7
+         9uKKtbDEmR3nJfdeeQLqLq05K1nlDg3DmNGxqA09aF6Jy99jJJAxxaOmAV7Rwau4Px8+
+         io4yvenv2vm8MuNf4X99AFpgMsS21+VVJkQ5igTl8KFMgz4eB4oLz/vAHqfhKnaWytwQ
+         xWhFytSI2jT7GJegPbDqfrWJlChCrFZrcgNakSwBhDy8vSryEKUKMQu9Aa2PelxGhPPW
+         B8aIVIEU8q/IqbbJ8edQEFbW8RF6j/Q5gSVspgzBrsh8QTevFj1AkPDQOMetjSmhHKSa
+         Iqiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716419016; x=1717023816;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I5mjy3aKB+H5UlrlmRHA+Kx1ufZA6V8d9nt7uDVjCn4=;
+        b=YeUHjHxj4WfE9SLfUAZUyoUc7t8vt61kr9hRDbqvab36oBu8Cqrfeu/vh6WEUGYLYb
+         WuT9epatQIHJFA0SIVr4avnTUO/w76cvHvK+6jyPI9rY71vAoOnpsZA5VSHoODxEwI94
+         9DGrE3UM34RE1ZGCJGOPigbqOOCxqtVIYbPcqC5SP2YoVtOmmXM4/7Bby0xeiJ4/iHdt
+         GoPXzp7i7MJHYUMOv8g/1tkieVvN0DqmCPX0PTSXM0Gu4arfXL0PxGM/MAmfwV8UhUEN
+         XnMsYIjMRDDChpml5yiXIUfhUODkqr/InJDhSxAwfKP2iEzGo7/8qTc7RFFl0RFYPYrl
+         0v/g==
+X-Forwarded-Encrypted: i=1; AJvYcCU5Tc2sIDjRTGDvU2ZB7k1FYQkXZRYnuiiFGy+yLLNxCUHXWwO/sqr+MLTRv0yQQcB25WWM22Lwv6tr6t/3csWnCAstwTDD
+X-Gm-Message-State: AOJu0YwuZj2PcqufaDzacLxc1zxU6eF2bPzjUTCiM7jY5aCutZW2raip
+	sMKZnlzKz7hYkI9Cbo71R+5sV0vqyx2dzpa9hMATRJAk199QSJqgrVGOokPkOGRlctlRkJtCcYe
+	kFGNaqTgMo4pKViEj1r7al+6+5AFlGCGqCAco
+X-Google-Smtp-Source: AGHT+IE32zJbirVoB/b8oseDN5EeMiTJ7Pk/b0T44Ur/WkUq8PCxIM8L6EH3ngBU70ZPJjCvz3vQ/JkvLvuh09i8buU=
+X-Received: by 2002:a81:6d90:0:b0:627:96bd:b28 with SMTP id
+ 00721157ae682-627e4873f3amr38788367b3.46.1716419016178; Wed, 22 May 2024
+ 16:03:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] [resend] color: default to dark background
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Dragan Simic <dsimic@manjaro.org>, netdev@vger.kernel.org
-References: <E1s9rpA-00000006Jy7-18Q5@ws2.gedalya.net>
- <20240522135721.7da9b30c@hermes.local>
- <67841f35-a2bb-49a5-becd-db2defe4e4fa@gedalya.net>
- <2866a9935b3fa3eafe51625b5bdfaa30@manjaro.org>
- <20240522143354.0214e054@hermes.local>
- <5b8dfe40-e72e-4310-85b5-aa607bad1638@gedalya.net>
- <20240522155234.6180d92d@hermes.local>
-Content-Language: en-US
-From: Gedalya <gedalya@gedalya.net>
-In-Reply-To: <20240522155234.6180d92d@hermes.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240410140141.495384-1-jhs@mojatatu.com> <41736ea4e81666e911fee5b880d9430ffffa9a58.camel@redhat.com>
+ <CAM0EoM=982OctjvSQpx0kR7e+JnQLhvZ=sM-tNB4xNiu7nhH5Q@mail.gmail.com>
+ <CAM0EoM=VhVn2sGV40SYttQyaiCn8gKaKHTUqFxB_WzKrayJJfQ@mail.gmail.com>
+ <87cf4830e2e46c1882998162526e108fb424a0f7.camel@redhat.com>
+ <CAM0EoMkJwR0K-fF7qo0PfRw4Sf+=2L0L=rOcH5A2ELwagLrZMw@mail.gmail.com>
+ <CAM0EoMmfDoZ9_ZdK-ZjHjFAjuNN8fVK+R57_UaFqAm=wA0AWVA@mail.gmail.com>
+ <82ee1013ca0164053e9fb1259eaf676343c430e8.camel@redhat.com>
+ <CAADnVQLugkg+ahAapskRaE86=RnwpY8v=Nre8pn=sa4fTEoTyA@mail.gmail.com>
+ <CAM0EoM=2wHem54vTeVq4H1W5pawYuHNt-aS9JyG8iQORbaw5pA@mail.gmail.com>
+ <CAM0EoMmCz5usVSLq_wzR3s7UcaKifa-X58zr6hkPXuSBnwFX3w@mail.gmail.com>
+ <CAM0EoMmsB5jHZ=4oJc_Yzm=RFDUHWh9yexdG6_bPFS4_CFuiog@mail.gmail.com> <20240522151933.6f422e63@kernel.org>
+In-Reply-To: <20240522151933.6f422e63@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 22 May 2024 19:03:24 -0400
+Message-ID: <CAM0EoMmFrp5X5OzMbum5i_Bjng7Bhtk1YvWpacW6FV6Oy-3avg@mail.gmail.com>
+Subject: Re: On the NACKs on P4TC patches
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Network Development <netdev@vger.kernel.org>, "Chatterjee, Deb" <deb.chatterjee@intel.com>, 
+	Anjali Singhai Jain <anjali.singhai@intel.com>, "Limaye, Namrata" <namrata.limaye@intel.com>, 
+	tom Herbert <tom@sipanda.io>, Marcelo Ricardo Leitner <mleitner@redhat.com>, 
+	"Shirshyad, Mahesh" <Mahesh.Shirshyad@amd.com>, "Osinski, Tomasz" <tomasz.osinski@intel.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, Khalid Manaa <khalidm@nvidia.com>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	"Jain, Vipin" <Vipin.Jain@amd.com>, "Daly, Dan" <dan.daly@intel.com>, 
+	Andy Fingerhut <andy.fingerhut@gmail.com>, Chris Sommers <chris.sommers@keysight.com>, 
+	Matty Kadosh <mattyk@nvidia.com>, bpf <bpf@vger.kernel.org>, lwn@lwn.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/23/24 6:52 AM, Stephen Hemminger wrote:
+On Wed, May 22, 2024 at 6:19=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Hi Jamal!
+>
+> On Tue, 21 May 2024 08:35:07 -0400 Jamal Hadi Salim wrote:
+> > At that point(v16) i asked for the series to be applied despite the
+> > Nacks because, frankly, the Nacks have no merit. Paolo was not
+> > comfortable applying patches with Nacks and tried to mediate. In his
+> > mediation effort he asked if we could remove eBPF - and our answer was
+> > no because after all that time we have become dependent on it and
+> > frankly there was no technical reason not to use eBPF.
+>
+> I'm not fully clear on who you're appealing to, and I may be missing
+> some points. But maybe it will be more useful than hurtful if I clarify
+> my point of view.
+>
+> AFAIU BPF folks disagree with the use of their subsystem, and they
+> point out that P4 pipelines can be implemented using BPF in the first
+> place.
+> To which you reply that you like (a highly dated type of) a netlink
+> interface, and (handwavey) ability to configure the data path SW or
+> HW via the same interface.
 
-> Overall, I am concerned that changing this will upset existing users.
-> Not that it is impossible, just need more consensus and testing.
+It's not what I "like" , rather it is a requirement to support both
+s/w and h/w offload. The TC model is the traditional approach to
+deploy these models. I addressed the same comment you are making above
+in #1a and #1b  (https://github.com/p4tc-dev/pushback-patches).
 
-Makes sense.
-It seems that possible negative impact would be when the following are all true:
+OTOH, "BPF folks disagree with the use of their subsystem" is a
+problematic statement. Is BPF infra for the kernel community or is it
+something the ebpf folks can decide, at their whim, to allow who they
+like to use or not. We are not changing any BPF code. And there's
+already a case where the interfaces are used exactly as we used them
+in the conntrack code i pointed to in the page (we literally copied
+that code). Why is it ok for conntrack code to use exactly the same
+approach but not us?
 
-1. Users actually using color. For debian and derivatives, up until now this
-would have been people enabling color themselves.
-Debian's recent enabling color by default was the impetus for this issue.
+> AFAICT there's some but not very strong support for P4TC,
 
-2. Using light background.
+I dont agree. Paolo asked this question and afaik Intel, AMD (both
+build P4-native NICs) and the folks interested in the MS DASH project
+responded saying they are in support. Look at who is being Cced. A lot
+of these folks who attend biweekly discussion calls on P4TC. Sample:
+https://lore.kernel.org/netdev/IA0PR17MB7070B51A955FB8595FFBA5FB965E2@IA0PR=
+17MB7070.namprd17.prod.outlook.com/
 
-3. Not using COLORFGBG, or setting it incorrectly.
+> and it
+> doesn't benefit or solve any problems of the broader networking stack
+> (e.g. expressing or configuring parser graphs in general)
+>
 
+I am not sure where the parser thing comes from - the parser is
+generated as eBPF.
 
+> So from my perspective, the submission is neither technically strong
+> enough, nor broadly useful enough to consider making questionable precede=
+nts
+> for, i.e. to override maintainers on how their subsystems are extended.
+
+I believe as a community nobody should just have the power to nack
+things just because - as i stated in the page, not even Linus. That
+code doesnt touch anything to do with eBPF maintainers (meaning things
+they have to fix when an issue shows up) neither does it "extend" as
+you state any ebpf code and it is all part of the networking
+subsystem. Sure,  anybody has the right to nack but  I contend that
+nacks should be based on technical reasons. I have listed all the
+objections in that page and how i have responded to them over time.
+Someone needs to look at those objectively and say if they are valid.
+The arguement made so far(By Paolo and now by you)  is "we cant
+override maintainers on how their subsystems are used" then we are in
+uncharted territory, thats why i am asking for arbitration.
+
+cheers,
+jamal
 
