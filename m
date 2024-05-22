@@ -1,82 +1,85 @@
-Return-Path: <netdev+bounces-97510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CE7C8CBCB4
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:12:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74F2C8CBCBD
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:15:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FBA51C209F5
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 08:12:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF796B219B1
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 08:15:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C27E7F47F;
-	Wed, 22 May 2024 08:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D94267E0F6;
+	Wed, 22 May 2024 08:15:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="LjOqOWgK"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="RUevMas/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8727E761
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 08:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F0F77F30
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 08:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716365558; cv=none; b=Mrpx5OhztIilAibitaKcOf5Mw2AO1KvVUv6EC/lQd6Ip2JNTlMwv+w1k7/dZAx8OUrd8sEE3kBGu+D7QuQK7sY6rO244pAcgVJbBdbqbqwnQMsSp7ssdmYbL0eAInCPDVmxhOIWUPO7X20xG/xyiPyqKP/gTkZDC7jCTRFR2RrY=
+	t=1716365751; cv=none; b=e7pJ8FLtUoITePPbB4QT9N2mRuJJ/6HN1NumHz+ayCU7J7k8dmw7pXxVCZxWygQQY2n5QN/W6E6wCqSqjxcZcelbrAKaU60hEPOgrv6EdHh9X2u9eyJCa4C8151rF1emNHaS5KvFu7kBoVlj/+nFZE7DDpDdYv+5x63YWuBMMcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716365558; c=relaxed/simple;
-	bh=vk3R4KQmfANWHCtH/ne6qcs8DBfl3MeC7hEtlJRxLJM=;
+	s=arc-20240116; t=1716365751; c=relaxed/simple;
+	bh=wLKk7Vqlj6B58mPDQFHEZTGCHQI1AwWd1MZqpYQ4Ut4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VZtT6To7sar3GsPXD+Q/IImau/DyqbpyRJVV1XAoc8LQl4btyNgZj2bvbwrCxtosJ8uQTf95UM3Gqig/pOcHTSzCkw3kFYh/4yyiN/Imb6MZvxuPUZ3wafqmdzHeagNDzygzhIKcRpupcQFQaqGe7OrNzhgu9rcdBMvzpJbJNP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=LjOqOWgK; arc=none smtp.client-ip=209.85.208.52
+	 Content-Type:Content-Disposition:In-Reply-To; b=bGX8gCC3A6FFrAh5pvBdIV+BFTA/CBl6v8nJzvH5Dy/QHXYuzwKK0BN2FIuaY9bdCCI3KRHBTMqbWynayseKj5QGWt9YpO3IOan1B7zAtILEuyTa5jYMAHVrOdqIRYImprTR566madQg8v/c9WlVtavBhm2iJxKsCidxgW1F4nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=RUevMas/; arc=none smtp.client-ip=209.85.208.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-573061776e8so9802183a12.1
-        for <netdev@vger.kernel.org>; Wed, 22 May 2024 01:12:34 -0700 (PDT)
+Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-571ba432477so11017440a12.1
+        for <netdev@vger.kernel.org>; Wed, 22 May 2024 01:15:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1716365553; x=1716970353; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1716365748; x=1716970548; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kq/162D2wbBA4dLFrzt19khbj/72lrfhJsWvQj91jBo=;
-        b=LjOqOWgKNDU8JsancRPMx0hepDLcJb7jbQ60/H1Q2+gxunpYOSJT61D//FlrSYZZ82
-         0yhvvcO/fiZkI0zfxZtLEninHPSD4u2Hu9Uj99b9t/+PPQlWsN6MEtcxMvdrPMDCp3Bi
-         xHQNzWwP8C1VkpvA6pWMmtO6lY9JfJvsXSqXhj4OjA9y7cmHwJPNnAfLfRKiCAa77ZJy
-         fq40YgEtvVfrthKyH6rnNqEZHe8L9SaEDSCH1QdUQQ+7yx5kCOSvZYAihhKPpq+HmHA2
-         0eZilSCV/5+O9rayLL0yTIHiPUkSQ0blz3q/6kcR6+MP42x+K6beHf2UVv6zrC1Lupc9
-         oVqQ==
+        bh=6MhPNRcnuyP7BkD8fC61aKpxOVUnapMjMRFkNKjZ+XU=;
+        b=RUevMas/jNorUjqDdcFAbeM8tk+17HiXntHFEH1Vq0w0VMD9jlIXyRGbp54aI8uu2n
+         6/hshxKjH5S9/RO015Z/VaPlFPJBEyBtMzn8A57gjG65lBItYGeey3cL4y/kNv/qCSG2
+         OiLo62Yge1fhSeGgYbXrqgeulAjXoNaOo3jEtSb5xP0ifcnv137Yf+oO1RVjRkD9JjPp
+         in/3kyeK1w58LSRpwpq3VAytjVpvD4qlVEC2tJMLjIUYvnBLm58cUcw5kFIGKYhg9gRK
+         GhrGBXmGbX9nusSQqOsbHjw8SFr//rNgG0EcNgKkq1H+e2MizIXyK1W6fDtA6Yg5c0l7
+         yAMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716365553; x=1716970353;
+        d=1e100.net; s=20230601; t=1716365748; x=1716970548;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Kq/162D2wbBA4dLFrzt19khbj/72lrfhJsWvQj91jBo=;
-        b=gWWyHcvidwbHHkVCcQzQ3bkWYlD8L5CH4lDNlBARdfaMhouuh0y0KD+/eciGpuPfLN
-         J9vN/kwwOGlSQNSb9MulcX6AF0KAmKT7vH0kq49KQ3DAB4YIrbkM4piWP6cTgbHKzg0d
-         9Sjufsxh2d6zQaUIMwR66Yq+7YM/242dw9URqyA/8V+KJ4TBnveIKfUNOv74wK8yaRef
-         SpDoqNtq9xgE9cNVjXbahAn1I98XS+ryqyHYhbnjo127W7aATkJdH6Zb60uUg/0chO1W
-         6bG+6nCcwKNjaqM2NnIj6GM/iL2hQuqxurywfYVjYCcrc13hPN4UWIhCttnly4/jZ5Fg
-         84tQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWYzWROJsuD8v2RROhL6l23G7M7pfPkZcl7VTmRtkqpiAem0qOg1vN8IqSPTICw7dR5lzop7T3TY74twR15QRj7qphZFL2P
-X-Gm-Message-State: AOJu0Yyyn3W2PQ38TfS0f89vyFRpvcpGxToyA0Xtfh535hrK0ZDrId0R
-	iVv/1F9MxeajG80NdMgV5ZM5GvKzBw+h5slDtVsiejjzjpq3NjqkiIYbQjeo+6k=
-X-Google-Smtp-Source: AGHT+IFmGsT5K8VSmmgd8IG9bBCFaCKxwzGK4lUKVOSdutPIUuQU+nsgWONTZd2FTHrPdyDKP/mxVA==
-X-Received: by 2002:a50:99d0:0:b0:574:eba7:4741 with SMTP id 4fb4d7f45d1cf-57832c641bamr691855a12.42.1716365552935;
-        Wed, 22 May 2024 01:12:32 -0700 (PDT)
+        bh=6MhPNRcnuyP7BkD8fC61aKpxOVUnapMjMRFkNKjZ+XU=;
+        b=C+6Ssu96inPtH12gQs7eenHfu01AqHyZRFCbBU0ZYbfJfacOy2ZQCIK4xX4PTbSpL0
+         QbFw3/zZsAPyFgZFwmioMuYX0Tr6a1rwvY35eQDlgGDyfP4c7Ykva3ewjQChyoxXp82o
+         wAsWUBnHs+TDQRgBCnB6oM4TaRqJvkPLzSGFbp7bsiw2iLx9JhfXHgWk8EA0BsMfqCZw
+         iHRoZN5W79rmpDKoAb2W0f+gNX3ApUAfNg4vnDVLg8z/gGg+iVbJw/tX9J/tqlbjiIUw
+         ml81HzFGVgD3e5VxJrfI/6dEk+CcW44Ohq2K5Sgz3MmN3Eid9wGNWISRes66ejBXRj4K
+         TTXg==
+X-Gm-Message-State: AOJu0YwGF2Wl4NFVc+ZYnA9pVVUjzze4uSX0rPDpMkN8qN4QWeAvA9Og
+	5drA4K8LrJN+G+HfGlTZolsY3QA6yY53gX5BNt8o5lTyLFPhtDLPvc+luUH05h8=
+X-Google-Smtp-Source: AGHT+IFgjUs3XYXnJ5gpRUo7z32zTzlS8onNa4URoJ9xhLqosNIblJ/8IieAwPMrjeeg4nqbXKq1Uw==
+X-Received: by 2002:a17:907:1749:b0:a61:c730:ac57 with SMTP id a640c23a62f3a-a622818fb09mr89506366b.74.1716365748367;
+        Wed, 22 May 2024 01:15:48 -0700 (PDT)
 Received: from localhost (78-80-19-19.customers.tmcz.cz. [78.80.19.19])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5782859f7ffsm1464361a12.83.2024.05.22.01.12.31
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a1792228csm1749728566b.92.2024.05.22.01.15.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 01:12:32 -0700 (PDT)
-Date: Wed, 22 May 2024 10:12:30 +0200
+        Wed, 22 May 2024 01:15:47 -0700 (PDT)
+Date: Wed, 22 May 2024 10:15:46 +0200
 From: Jiri Pirko <jiri@resnulli.us>
-To: Lin Ma <linma@zju.edu.cn>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, yuehaibing@huawei.com,
-	larysa.zaremba@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 net-next] ila: avoid genlmsg_reply when not ila_map
- found
-Message-ID: <Zk2o7nmCfQstc7LP@nanopsycho.orion>
-References: <20240522031537.51741-1-linma@zju.edu.cn>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net 2/2] Revert "virtio_net: Add a lock for per queue RX
+ coalesce"
+Message-ID: <Zk2pskOYxnSdNf-O@nanopsycho.orion>
+References: <20240522034548.58131-1-hengqi@linux.alibaba.com>
+ <20240522034548.58131-3-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,90 +88,278 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240522031537.51741-1-linma@zju.edu.cn>
+In-Reply-To: <20240522034548.58131-3-hengqi@linux.alibaba.com>
 
-Wed, May 22, 2024 at 05:15:37AM CEST, linma@zju.edu.cn wrote:
->The current ila_xlat_nl_cmd_get_mapping will call genlmsg_reply even if
->not ila_map found with user provided parameters. Then an empty netlink
->message will be sent and cause a WARNING like below.
+Wed, May 22, 2024 at 05:45:48AM CEST, hengqi@linux.alibaba.com wrote:
+>This reverts commit 4d4ac2ececd3c42a08dd32a6e3a4aaf25f7efe44.
+
+This commit does not exist in -net or -net-next.
+
 >
->WARNING: CPU: 1 PID: 7709 at include/linux/skbuff.h:2524 __dev_queue_xmit+0x241b/0x3b60 net/core/dev.c:4171
->Modules linked in:
->Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
->RIP: 0010:skb_assert_len include/linux/skbuff.h:2524 [inline]
->RIP: 0010:__dev_queue_xmit+0x241b/0x3b60 net/core/dev.c:4171
->RSP: 0018:ffffc9000f90f228 EFLAGS: 00010282
->RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
->RDX: 0000000000040000 RSI: ffffffff816968a8 RDI: fffff52001f21e37
->RBP: ffff8881077f2d3a R08: 0000000000000005 R09: 0000000000000000
->R10: 0000000080000000 R11: 0000000000000000 R12: dffffc0000000000
->R13: 0000000000000000 R14: ffff8881077f2c90 R15: ffff8881077f2c80
->FS:  00007fb8be338700(0000) GS:ffff888135c00000(0000) knlGS:0000000000000000
->CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->CR2: 000000c00ca8a000 CR3: 0000000105e17000 CR4: 0000000000150ee0
+>When the following snippet is run, lockdep will complain[1].
+>
+>  /* Acquire all queues dim_locks */
+>  for (i = 0; i < vi->max_queue_pairs; i++)
+>	  mutex_lock(&vi->rq[i].dim_lock);
+>
+>At the same time, too many queues will cause lockdep to be more irritable,
+>which can be alleviated by using mutex_lock_nested(), however, there are
+>still new warning when the number of queues exceeds MAX_LOCKDEP_SUBCLASSES.
+>So I would like to gently revert this commit, although it brings
+>unsynchronization that is not so concerned:
+>  1. When dim is enabled, rx_dim_work may modify the coalescing parameters.
+>     Users may read dirty coalescing parameters if querying.
+>  2. When dim is switched from enabled to disabled, a spurious dim worker
+>     maybe scheduled, but this can be handled correctly by rx_dim_work.
+>
+>[1]
+>========================================================
+>WARNING: possible recursive locking detected
+>6.9.0-rc7+ #319 Not tainted
+>--------------------------------------------
+>ethtool/962 is trying to acquire lock:
+>
+>but task is already holding lock:
+>
+>other info that might help us debug this:
+>Possible unsafe locking scenario:
+>
+>      CPU0
+>      ----
+> lock(&vi->rq[i].dim_lock);
+> lock(&vi->rq[i].dim_lock);
+>
+>*** DEADLOCK ***
+>
+> May be due to missing lock nesting notation
+>
+>3 locks held by ethtool/962:
+> #0: ffffffff82dbaab0 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40
+> #1: ffffffff82dad0a8 (rtnl_mutex){+.+.}-{3:3}, at:
+>				ethnl_default_set_doit+0xbe/0x1e0
+>
+>stack backtrace:
+>CPU: 6 PID: 962 Comm: ethtool Not tainted 6.9.0-rc7+ #319
+>Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+>	   rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
 >Call Trace:
 > <TASK>
-> dev_queue_xmit include/linux/netdevice.h:3008 [inline]
-> __netlink_deliver_tap_skb net/netlink/af_netlink.c:307 [inline]
-> __netlink_deliver_tap net/netlink/af_netlink.c:325 [inline]
-> netlink_deliver_tap+0x9e4/0xc40 net/netlink/af_netlink.c:338
-> __netlink_sendskb net/netlink/af_netlink.c:1263 [inline]
-> netlink_sendskb net/netlink/af_netlink.c:1272 [inline]
-> netlink_unicast+0x6ac/0x7f0 net/netlink/af_netlink.c:1360
-> nlmsg_unicast include/net/netlink.h:1067 [inline]
-> genlmsg_unicast include/net/genetlink.h:372 [inline]
-> genlmsg_reply include/net/genetlink.h:382 [inline]
-> ila_xlat_nl_cmd_get_mapping+0x589/0x950 net/ipv6/ila/ila_xlat.c:493
-> genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:756
-> genl_family_rcv_msg net/netlink/genetlink.c:833 [inline]
-> genl_rcv_msg+0x441/0x780 net/netlink/genetlink.c:850
-> netlink_rcv_skb+0x153/0x400 net/netlink/af_netlink.c:2540
-> genl_rcv+0x24/0x40 net/netlink/genetlink.c:861
-> netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
-> netlink_unicast+0x543/0x7f0 net/netlink/af_netlink.c:1345
-> netlink_sendmsg+0x917/0xe10 net/netlink/af_netlink.c:1921
-> sock_sendmsg_nosec net/socket.c:714 [inline]
-> sock_sendmsg+0xcf/0x120 net/socket.c:734
-> ____sys_sendmsg+0x6eb/0x810 net/socket.c:2482
-> ___sys_sendmsg+0x110/0x1b0 net/socket.c:2536
-> __sys_sendmsg+0xf3/0x1c0 net/socket.c:2565
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
->RIP: 0033:0x7fb8bd68f359
->Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
->RSP: 002b:00007fb8be338168 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
->RAX: ffffffffffffffda RBX: 00007fb8bd7bbf80 RCX: 00007fb8bd68f359
->RDX: 0000000000000000 RSI: 0000000020000100 RDI: 0000000000000005
->RBP: 00007fb8bd6da498 R08: 0000000000000000 R09: 0000000000000000
->R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
->R13: 00007ffc22fb52af R14: 00007fb8be338300 R15: 0000000000022000
+> dump_stack_lvl+0x79/0xb0
+> check_deadlock+0x130/0x220
+> __lock_acquire+0x861/0x990
+> lock_acquire.part.0+0x72/0x1d0
+> ? lock_acquire+0xf8/0x130
+> __mutex_lock+0x71/0xd50
+> virtnet_set_coalesce+0x151/0x190
+> __ethnl_set_coalesce.isra.0+0x3f8/0x4d0
+> ethnl_set_coalesce+0x34/0x90
+> ethnl_default_set_doit+0xdd/0x1e0
+> genl_family_rcv_msg_doit+0xdc/0x130
+> genl_family_rcv_msg+0x154/0x230
+> ? __pfx_ethnl_default_set_doit+0x10/0x10
+> genl_rcv_msg+0x4b/0xa0
+> ? __pfx_genl_rcv_msg+0x10/0x10
+> netlink_rcv_skb+0x5a/0x110
+> genl_rcv+0x28/0x40
+> netlink_unicast+0x1af/0x280
+> netlink_sendmsg+0x20e/0x460
+> __sys_sendto+0x1fe/0x210
+> ? find_held_lock+0x2b/0x80
+> ? do_user_addr_fault+0x3a2/0x8a0
+> ? __lock_release+0x5e/0x160
+> ? do_user_addr_fault+0x3a2/0x8a0
+> ? lock_release+0x72/0x140
+> ? do_user_addr_fault+0x3a7/0x8a0
+> __x64_sys_sendto+0x29/0x30
+> do_syscall_64+0x78/0x180
+> entry_SYSCALL_64_after_hwframe+0x76/0x7e
 >
->Do nullptr check and assign -EINVAL ret if no ila_map found.
->
->Signed-off-by: Lin Ma <linma@zju.edu.cn>
+>Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
 
-You should aim -net tree and add appropriate Fixes tag here.
+Fixes tag missing.
+
 
 >---
-> net/ipv6/ila/ila_xlat.c | 2 ++
-> 1 file changed, 2 insertions(+)
+> drivers/net/virtio_net.c | 53 +++++++++-------------------------------
+> 1 file changed, 12 insertions(+), 41 deletions(-)
 >
->diff --git a/net/ipv6/ila/ila_xlat.c b/net/ipv6/ila/ila_xlat.c
->index 67e8c9440977..63b8fe1b8255 100644
->--- a/net/ipv6/ila/ila_xlat.c
->+++ b/net/ipv6/ila/ila_xlat.c
->@@ -483,6 +483,8 @@ int ila_xlat_nl_cmd_get_mapping(struct sk_buff *skb, struct genl_info *info)
-> 				    info->snd_portid,
-> 				    info->snd_seq, 0, msg,
-> 				    info->genlhdr->cmd);
->+	} else {
->+		ret = -EINVAL;
+>diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>index 1cad06cef230..e4a1dff2a64a 100644
+>--- a/drivers/net/virtio_net.c
+>+++ b/drivers/net/virtio_net.c
+>@@ -316,9 +316,6 @@ struct receive_queue {
+> 	/* Is dynamic interrupt moderation enabled? */
+> 	bool dim_enabled;
+> 
+>-	/* Used to protect dim_enabled and inter_coal */
+>-	struct mutex dim_lock;
+>-
+> 	/* Dynamic Interrupt Moderation */
+> 	struct dim dim;
+> 
+>@@ -2368,10 +2365,6 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
+> 	/* Out of packets? */
+> 	if (received < budget) {
+> 		napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
+>-		/* Intentionally not taking dim_lock here. This may result in a
+>-		 * spurious net_dim call. But if that happens virtnet_rx_dim_work
+>-		 * will not act on the scheduled work.
+>-		 */
+> 		if (napi_complete && rq->dim_enabled)
+> 			virtnet_rx_dim_update(vi, rq);
+> 	}
+>@@ -3247,11 +3240,9 @@ static int virtnet_set_ringparam(struct net_device *dev,
+> 				return err;
+> 
+> 			/* The reason is same as the transmit virtqueue reset */
+>-			mutex_lock(&vi->rq[i].dim_lock);
+> 			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i,
+> 							       vi->intr_coal_rx.max_usecs,
+> 							       vi->intr_coal_rx.max_packets);
+>-			mutex_unlock(&vi->rq[i].dim_lock);
+> 			if (err)
+> 				return err;
+> 		}
+>@@ -4257,7 +4248,6 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
+> 	struct virtio_net_ctrl_coal_rx *coal_rx __free(kfree) = NULL;
+> 	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
+> 	struct scatterlist sgs_rx;
+>-	int ret = 0;
+> 	int i;
+> 
+> 	if (rx_ctrl_dim_on && !virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
+>@@ -4267,22 +4257,16 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
+> 			       ec->rx_max_coalesced_frames != vi->intr_coal_rx.max_packets))
+> 		return -EINVAL;
+> 
+>-	/* Acquire all queues dim_locks */
+>-	for (i = 0; i < vi->max_queue_pairs; i++)
+>-		mutex_lock(&vi->rq[i].dim_lock);
+>-
+> 	if (rx_ctrl_dim_on && !vi->rx_dim_enabled) {
+> 		vi->rx_dim_enabled = true;
+> 		for (i = 0; i < vi->max_queue_pairs; i++)
+> 			vi->rq[i].dim_enabled = true;
+>-		goto unlock;
+>+		return 0;
 > 	}
 > 
-> 	rcu_read_unlock();
+> 	coal_rx = kzalloc(sizeof(*coal_rx), GFP_KERNEL);
+>-	if (!coal_rx) {
+>-		ret = -ENOMEM;
+>-		goto unlock;
+>-	}
+>+	if (!coal_rx)
+>+		return -ENOMEM;
+> 
+> 	if (!rx_ctrl_dim_on && vi->rx_dim_enabled) {
+> 		vi->rx_dim_enabled = false;
+>@@ -4300,10 +4284,8 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
+> 
+> 	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
+> 				  VIRTIO_NET_CTRL_NOTF_COAL_RX_SET,
+>-				  &sgs_rx)) {
+>-		ret = -EINVAL;
+>-		goto unlock;
+>-	}
+>+				  &sgs_rx))
+>+		return -EINVAL;
+> 
+> 	vi->intr_coal_rx.max_usecs = ec->rx_coalesce_usecs;
+> 	vi->intr_coal_rx.max_packets = ec->rx_max_coalesced_frames;
+>@@ -4311,11 +4293,8 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
+> 		vi->rq[i].intr_coal.max_usecs = ec->rx_coalesce_usecs;
+> 		vi->rq[i].intr_coal.max_packets = ec->rx_max_coalesced_frames;
+> 	}
+>-unlock:
+>-	for (i = vi->max_queue_pairs - 1; i >= 0; i--)
+>-		mutex_unlock(&vi->rq[i].dim_lock);
+> 
+>-	return ret;
+>+	return 0;
+> }
+> 
+> static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
+>@@ -4339,24 +4318,19 @@ static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
+> 					     u16 queue)
+> {
+> 	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
+>+	bool cur_rx_dim = vi->rq[queue].dim_enabled;
+> 	u32 max_usecs, max_packets;
+>-	bool cur_rx_dim;
+> 	int err;
+> 
+>-	mutex_lock(&vi->rq[queue].dim_lock);
+>-	cur_rx_dim = vi->rq[queue].dim_enabled;
+> 	max_usecs = vi->rq[queue].intr_coal.max_usecs;
+> 	max_packets = vi->rq[queue].intr_coal.max_packets;
+> 
+> 	if (rx_ctrl_dim_on && (ec->rx_coalesce_usecs != max_usecs ||
+>-			       ec->rx_max_coalesced_frames != max_packets)) {
+>-		mutex_unlock(&vi->rq[queue].dim_lock);
+>+			       ec->rx_max_coalesced_frames != max_packets))
+> 		return -EINVAL;
+>-	}
+> 
+> 	if (rx_ctrl_dim_on && !cur_rx_dim) {
+> 		vi->rq[queue].dim_enabled = true;
+>-		mutex_unlock(&vi->rq[queue].dim_lock);
+> 		return 0;
+> 	}
+> 
+>@@ -4369,8 +4343,10 @@ static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
+> 	err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, queue,
+> 					       ec->rx_coalesce_usecs,
+> 					       ec->rx_max_coalesced_frames);
+>-	mutex_unlock(&vi->rq[queue].dim_lock);
+>-	return err;
+>+	if (err)
+>+		return err;
+>+
+>+	return 0;
+> }
+> 
+> static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
+>@@ -4404,7 +4380,6 @@ static void virtnet_rx_dim_work(struct work_struct *work)
+> 
+> 	qnum = rq - vi->rq;
+> 
+>-	mutex_lock(&rq->dim_lock);
+> 	if (!rq->dim_enabled)
+> 		goto out;
+> 
+>@@ -4420,7 +4395,6 @@ static void virtnet_rx_dim_work(struct work_struct *work)
+> 	}
+> out:
+> 	dim->state = DIM_START_MEASURE;
+>-	mutex_unlock(&rq->dim_lock);
+> }
+> 
+> static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
+>@@ -4558,13 +4532,11 @@ static int virtnet_get_per_queue_coalesce(struct net_device *dev,
+> 		return -EINVAL;
+> 
+> 	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
+>-		mutex_lock(&vi->rq[queue].dim_lock);
+> 		ec->rx_coalesce_usecs = vi->rq[queue].intr_coal.max_usecs;
+> 		ec->tx_coalesce_usecs = vi->sq[queue].intr_coal.max_usecs;
+> 		ec->tx_max_coalesced_frames = vi->sq[queue].intr_coal.max_packets;
+> 		ec->rx_max_coalesced_frames = vi->rq[queue].intr_coal.max_packets;
+> 		ec->use_adaptive_rx_coalesce = vi->rq[queue].dim_enabled;
+>-		mutex_unlock(&vi->rq[queue].dim_lock);
+> 	} else {
+> 		ec->rx_max_coalesced_frames = 1;
+> 
+>@@ -5396,7 +5368,6 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
+> 
+> 		u64_stats_init(&vi->rq[i].stats.syncp);
+> 		u64_stats_init(&vi->sq[i].stats.syncp);
+>-		mutex_init(&vi->rq[i].dim_lock);
+> 	}
+> 
+> 	return 0;
 >-- 
->2.34.1
+>2.32.0.3.g01195cf9f
 >
 >
 
