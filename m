@@ -1,90 +1,90 @@
-Return-Path: <netdev+bounces-97516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DABAA8CBD4F
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:52:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03BEA8CBD8D
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 11:13:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F19D2814AE
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 08:52:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26B931C20DDB
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 09:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5D58002F;
-	Wed, 22 May 2024 08:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1710980600;
+	Wed, 22 May 2024 09:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6okhUiW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SHBYrTBs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303117E583
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 08:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0737FBAE
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 09:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716367947; cv=none; b=Hd32pBcwsJ63+d/ktJ1o+TUOwHwXtdD9zE7EukeD32Qo/bBVq6mpGcTKB7RFM4Kf0TFpe0tMl72LdQkBA4txWVT2xV6agm5czcDffGVcW6ClWajIsOPbqdm7FVGFqck4Cs27lUGHjf3BmHJbnBuzRIS3cNgpmIgyyyZgy5aW6wY=
+	t=1716369226; cv=none; b=BlSQUh0ZD+/IfcIomvGcr2H1cQ4CjfpBpUq5N4A5/vl/SznW1dzMuK5FrsKdYWsOf68tF6yFjG5QrqasuhP5hQOV8aRfwXixPBLv2hATCrQthfEJ5tkYNpxo89sBZaXPxVDvzN/9EtEHsvU2hX6/YAhqetKj0N3WV49yKLPw6Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716367947; c=relaxed/simple;
-	bh=1a0tijc7EepbdlV49Y8gUMIe2Lw23vq46ZftZaywC7k=;
+	s=arc-20240116; t=1716369226; c=relaxed/simple;
+	bh=8CawFPvWSZIP9JTwqdkwkq1/zPEWEbPmysHWGS1x128=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nks34gutJUjWtzba/D8keEmE0PqzHzskjjTaYjLV7VoeAnLmLfmESzUs9m3WzgBnFpaogLxAEPIZfeQqEvOhEf71PkYqEmmdn9QFNa+ciFEOzbM3iTeeWMJElf74YQLyxvVzuQCM4MVm0J6yah+yo1sod32KNkepv1vcUzr1YwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q6okhUiW; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:MIME-Version; b=USaDo3EeDmMPtlXUATv4M5Tb6hr3PBnYeyGX8SyegDG2pjKezD8aff9TnhWd8RKvSXypZeJP/dgbTK3+Lk3I7G8V+tGyBDKOFqOsmgh2zuyIFwwDBSvXfi7x1QIeVtnMG6x0l86DyKpi8vonVi+iK8+l1E+mA4tut4x0bH4jtHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SHBYrTBs; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716367945;
+	s=mimecast20190719; t=1716369223;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=x8Z/+64QvbiN0Qdg5uYolDNncR4gIyQttw+JmN+I2dk=;
-	b=Q6okhUiWr+xxXxNJYxe9PGW7AVo02aDYaHYoMJx+x0qBwYHEo7E9CUXsViBINtQu/ZG7c4
-	3w4ips/WHn5tc0CmwZP+G6kA9aBh6Qy0MYMTmbuvwRt7Pc0bJZq0DuUild15lXfJY+Os03
-	9JeuMh+A+KRjf8oZ/rm6amILxSqfd0k=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ilVQWBrwL5RwP+01/JpwvwSpKn8bRsUxUAFHD0KHiuU=;
+	b=SHBYrTBsEAgsS8Dwo/brAFgLwE51uIKD9G+gJruKcDqsNPDwwJpnhA7cexNeq2MaptCPSu
+	C2Qtr6hJAFWIRSuDXntkKLKGnh3JH8w6iVxfiI/Pbm2IXOoeI0ezYJ7xvt/AK7/ov+kMGR
+	02tJfVO2/j3XOMDIZO5FhOjCsh+9C2k=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-672-Lg4HwWTzPnapa62Hxz7aAg-1; Wed, 22 May 2024 04:52:23 -0400
-X-MC-Unique: Lg4HwWTzPnapa62Hxz7aAg-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-51ffdd3524eso2311306e87.3
-        for <netdev@vger.kernel.org>; Wed, 22 May 2024 01:52:23 -0700 (PDT)
+ us-mta-361-iKHhwVmvNNWKxvHFd0hDqQ-1; Wed, 22 May 2024 05:13:41 -0400
+X-MC-Unique: iKHhwVmvNNWKxvHFd0hDqQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-354d4404a76so136783f8f.2
+        for <netdev@vger.kernel.org>; Wed, 22 May 2024 02:13:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716367942; x=1716972742;
+        d=1e100.net; s=20230601; t=1716369220; x=1716974020;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
          :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x8Z/+64QvbiN0Qdg5uYolDNncR4gIyQttw+JmN+I2dk=;
-        b=KXERmT5YxcZfiBY+N9jx6qoEq5aIf2xBQhkEECTswdCtTJTqQyRvJxyvC8ADXpI+S0
-         siIA0Ph7dRGtGg0kFUuzOxOIQBwv8+pL1SPi/XiwAiaH/jiuoFTWaIbUUvW0fUH5o3UH
-         VbHtIXJL+V8oLupswtZBdpk7n2Xm7NDnn2jkLsLN8wZmtYDpic305wWjQ7WUjG23LsrA
-         gvtUqXnro7+zxok8VAlgvZtbE3EqIE8KwWC8mExIEw7KZLthevYSzoJVH2bqUWBAhewc
-         ySqlki27QV0VIxxGM6qPArlhekSFw7AAFkleOJKyH0PPw6V7e0WYQqKVJziZ6xM/RERL
-         XAiA==
-X-Forwarded-Encrypted: i=1; AJvYcCXY/IT+m4ERtsi5needRZVsjwADsfSaquLN2Ok63Pn1+kZmtT8gPbZYzXc7MEQ3ckbx/xRB/H9Ecn846ZLGZJjsdaZK6Aa5
-X-Gm-Message-State: AOJu0YytzerwYhVG2O1b/TdcyG0pUtLppTop2pLWcDdB4hshUFtFnq9M
-	Whus/ct3uDW8fdIxlu/1GS7KivejsVRDEDm9fenLBWtveirHFUv+y5AdIUgJCaqDYPsLrSOJBJi
-	WJWaLcg1jCg82FUkWbRu+SVRO4RVUWsmPPwba5CFX8UHrAYWnu4MVbg==
-X-Received: by 2002:a05:6512:2814:b0:516:c241:a912 with SMTP id 2adb3069b0e04-526bda691a6mr908744e87.1.1716367941953;
-        Wed, 22 May 2024 01:52:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEXwnvRNmTipJ0Yq4wnXDUw/O8voEpeIJO7dw1Ln+lXyjoX4tpnJ1XdMGry0hSnthoMtB5zAw==
-X-Received: by 2002:a05:6512:2814:b0:516:c241:a912 with SMTP id 2adb3069b0e04-526bda691a6mr908730e87.1.1716367941486;
-        Wed, 22 May 2024 01:52:21 -0700 (PDT)
+        bh=ilVQWBrwL5RwP+01/JpwvwSpKn8bRsUxUAFHD0KHiuU=;
+        b=Dy0ZcF0AtqLAoNV+UL8yLzQfwi2l4aRUIKM86qVweqkL9UUOGEx6EzB0xW6/twRNAJ
+         KIO2du2pqn0LKhuEzc5p/zhsT5lQ5ccw1YH8/X+jvS0E9yHTMpydA3ceIl0upG4VJSac
+         WC99TbwZZel/3Rvk9ig5Gb6HHVmacXXgbOJJAPbPPgtvN50H++/YDOWXCtCdjSGqFfcR
+         inTdBKnx8qSCEocAwYOc1UcLjEjrAFhFG+mnWbTGC1hFDQFlYdr2PTqq9TkW4eEnRqg/
+         Hh6aYr7VqIYZ0R3waOn6BHg4229dWlsZVmuEcIMw3imTkodkEOHoiC+gCBgniIyiL7i7
+         1r7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUeidApsQv6WorRqVVcKJy33UP4Aw1N5QIogDszG9b6PISILFpwBvgAONH9NQso1kIKPu2gqndf2Ue0WpoIQ/EdpKwuymrf
+X-Gm-Message-State: AOJu0Yw5/+QLms7RZOCUUCTGch6BpQX2+uUVBlrqsMBEbf3PkZ3Q6M/p
+	m07Aa2JucEmkK4oCqorsysePQOS6T2KiL1hmJKyHLoe/8ydvnSKealcuVD3quu2rcvfVGX9ZKGV
+	tFBBNs7F0HtLyJz+QRWW1fxPQPcmDxMa6/xxvOD+rAk3NGKbcXqHwWA==
+X-Received: by 2002:a05:6000:707:b0:34d:b5d6:fe4b with SMTP id ffacd0b85a97d-354d8db8103mr1104388f8f.4.1716369220078;
+        Wed, 22 May 2024 02:13:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGt/BxL8jWjN/Qps/0RbVSfOP9/0Fw9JweCD36eUHU45FOSp0UgZ1UWy+mYeiE9YGtx6dxRwA==
+X-Received: by 2002:a05:6000:707:b0:34d:b5d6:fe4b with SMTP id ffacd0b85a97d-354d8db8103mr1104370f8f.4.1716369219677;
+        Wed, 22 May 2024 02:13:39 -0700 (PDT)
 Received: from gerbillo.redhat.com ([2a0d:3341:b094:ab10::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502bbbc887sm33471422f8f.98.2024.05.22.01.52.20
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502bbbc7easm33637996f8f.110.2024.05.22.02.13.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 01:52:20 -0700 (PDT)
-Message-ID: <6a187b65c4b2e487461e5d3b2270670586841d84.camel@redhat.com>
-Subject: Re: [PATCH v1 net] af_unix: Annotate data-race around
- unix_sk(sk)->addr.
+        Wed, 22 May 2024 02:13:39 -0700 (PDT)
+Message-ID: <c60009edfc0e5f3bd389860ff9d0224b32e39ee0.camel@redhat.com>
+Subject: Re: [PATCH v1 net] af_unix: Annotate data-races around sk->sk_hash.
 From: Paolo Abeni <pabeni@redhat.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- syzkaller <syzkaller@googlegroups.com>
-Date: Wed, 22 May 2024 10:52:19 +0200
-In-Reply-To: <20240518000148.27947-1-kuniyu@amazon.com>
-References: <20240518000148.27947-1-kuniyu@amazon.com>
+To: Dmitry Vyukov <dvyukov@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Kuniyuki Iwashima
+ <kuni1840@gmail.com>,  netdev@vger.kernel.org, syzkaller
+ <syzkaller@googlegroups.com>
+Date: Wed, 22 May 2024 11:13:37 +0200
+In-Reply-To: <CACT4Y+afQ-Y-Lt=A8LGv5zrAcb29a2TEweCqiqCuU+iL9xAkSw@mail.gmail.com>
+References: <20240518011346.36248-1-kuniyu@amazon.com>
+	 <CACT4Y+afQ-Y-Lt=A8LGv5zrAcb29a2TEweCqiqCuU+iL9xAkSw@mail.gmail.com>
 Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
@@ -99,116 +99,133 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Sat, 2024-05-18 at 09:01 +0900, Kuniyuki Iwashima wrote:
-> Once unix_sk(sk)->addr is assigned under net->unx.table.locks,
-> *(unix_sk(sk)->addr) and unix_sk(sk)->path are fully set up, and
-> unix_sk(sk)->addr is never changed.
+On Tue, 2024-05-21 at 06:16 +0200, Dmitry Vyukov wrote:
+> On Sat, 18 May 2024 at 03:14, 'Kuniyuki Iwashima' via syzkaller
+> <syzkaller@googlegroups.com> wrote:
+> >=20
+> > syzkaller reported data-race of sk->sk_hash in unix_autobind() [0],
+> > and the same ones exist in unix_bind_bsd() and unix_bind_abstract().
+> >=20
+> > The three bind() functions prefetch sk->sk_hash locklessly and
+> > use it later after validating that unix_sk(sk)->addr is NULL under
+> > unix_sk(sk)->bindlock.
+> >=20
+> > The prefetched sk->sk_hash is the hash value of unbound socket set
+> > in unix_create1() and does not change until bind() completes.
+> >=20
+> > There could be a chance that sk->sk_hash changes after the lockless
+> > read.  However, in such a case, non-NULL unix_sk(sk)->addr is visible
+> > under unix_sk(sk)->bindlock, and bind() returns -EINVAL without using
+> > the prefetched value.
+> >=20
+> > The KCSAN splat is false-positive, but let's use WRITE_ONCE() and
+> > READ_ONCE() to silence it.
+> >=20
+> > [0]:
+> > BUG: KCSAN: data-race in unix_autobind / unix_autobind
+> >=20
+> > write to 0xffff888034a9fb88 of 4 bytes by task 4468 on cpu 0:
+> >  __unix_set_addr_hash net/unix/af_unix.c:331 [inline]
+> >  unix_autobind+0x47a/0x7d0 net/unix/af_unix.c:1185
+> >  unix_dgram_connect+0x7e3/0x890 net/unix/af_unix.c:1373
+> >  __sys_connect_file+0xd7/0xe0 net/socket.c:2048
+> >  __sys_connect+0x114/0x140 net/socket.c:2065
+> >  __do_sys_connect net/socket.c:2075 [inline]
+> >  __se_sys_connect net/socket.c:2072 [inline]
+> >  __x64_sys_connect+0x40/0x50 net/socket.c:2072
+> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >  do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
+> >  entry_SYSCALL_64_after_hwframe+0x46/0x4e
+> >=20
+> > read to 0xffff888034a9fb88 of 4 bytes by task 4465 on cpu 1:
+> >  unix_autobind+0x28/0x7d0 net/unix/af_unix.c:1134
+> >  unix_dgram_connect+0x7e3/0x890 net/unix/af_unix.c:1373
+> >  __sys_connect_file+0xd7/0xe0 net/socket.c:2048
+> >  __sys_connect+0x114/0x140 net/socket.c:2065
+> >  __do_sys_connect net/socket.c:2075 [inline]
+> >  __se_sys_connect net/socket.c:2072 [inline]
+> >  __x64_sys_connect+0x40/0x50 net/socket.c:2072
+> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >  do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
+> >  entry_SYSCALL_64_after_hwframe+0x46/0x4e
+> >=20
+> > value changed: 0x000000e4 -> 0x000001e3
+> >=20
+> > Reported by Kernel Concurrency Sanitizer on:
+> > CPU: 1 PID: 4465 Comm: syz-executor.0 Not tainted 6.8.0-12822-gcd51db11=
+0a7e #12
+> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-=
+0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+> >=20
+> > Fixes: afd20b9290e1 ("af_unix: Replace the big lock with small locks.")
+> > Reported-by: syzkaller <syzkaller@googlegroups.com>
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >  net/unix/af_unix.c | 9 ++++-----
+> >  1 file changed, 4 insertions(+), 5 deletions(-)
+> >=20
+> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> > index 92a88ac070ca..e92b45e21664 100644
+> > --- a/net/unix/af_unix.c
+> > +++ b/net/unix/af_unix.c
+> > @@ -327,8 +327,7 @@ static void __unix_set_addr_hash(struct net *net, s=
+truct sock *sk,
+> >  {
+> >         __unix_remove_socket(sk);
+> >         smp_store_release(&unix_sk(sk)->addr, addr);
+> > -
+> > -       sk->sk_hash =3D hash;
+> > +       WRITE_ONCE(sk->sk_hash, hash);
+> >         __unix_insert_socket(net, sk);
+> >  }
+> >=20
+> > @@ -1131,7 +1130,7 @@ static struct sock *unix_find_other(struct net *n=
+et,
+> >=20
+> >  static int unix_autobind(struct sock *sk)
+> >  {
+> > -       unsigned int new_hash, old_hash =3D sk->sk_hash;
+> > +       unsigned int new_hash, old_hash =3D READ_ONCE(sk->sk_hash);
+> >         struct unix_sock *u =3D unix_sk(sk);
+> >         struct net *net =3D sock_net(sk);
+> >         struct unix_address *addr;
+> > @@ -1195,7 +1194,7 @@ static int unix_bind_bsd(struct sock *sk, struct =
+sockaddr_un *sunaddr,
+> >  {
+> >         umode_t mode =3D S_IFSOCK |
+> >                (SOCK_INODE(sk->sk_socket)->i_mode & ~current_umask());
+> > -       unsigned int new_hash, old_hash =3D sk->sk_hash;
+> > +       unsigned int new_hash, old_hash =3D READ_ONCE(sk->sk_hash);
+> >         struct unix_sock *u =3D unix_sk(sk);
+> >         struct net *net =3D sock_net(sk);
+> >         struct mnt_idmap *idmap;
+> > @@ -1261,7 +1260,7 @@ static int unix_bind_bsd(struct sock *sk, struct =
+sockaddr_un *sunaddr,
+> >  static int unix_bind_abstract(struct sock *sk, struct sockaddr_un *sun=
+addr,
+> >                               int addr_len)
+> >  {
+> > -       unsigned int new_hash, old_hash =3D sk->sk_hash;
+> > +       unsigned int new_hash, old_hash =3D READ_ONCE(sk->sk_hash);
+> >         struct unix_sock *u =3D unix_sk(sk);
+> >         struct net *net =3D sock_net(sk);
+> >         struct unix_address *addr;
 >=20
-> unix_getname() and unix_copy_addr() access the two fields locklessly,
-> and commit ae3b564179bf ("missing barriers in some of unix_sock ->addr
-> and ->path accesses") added smp_store_release() and smp_load_acquire()
-> pairs.
 >=20
-> In other functions, we still read unix_sk(sk)->addr locklessly to check
-> if the socket is bound, and KCSAN complains about it.  [0]
 >=20
-> Given these functions have no dependency for *(unix_sk(sk)->addr) and
-> unix_sk(sk)->path, READ_ONCE() is enough to annotate the data-race.
+> Hi,
 >=20
-> [0]:
-> BUG: KCSAN: data-race in unix_bind / unix_listen
->=20
-> write (marked) to 0xffff88805f8d1840 of 8 bytes by task 13723 on cpu 0:
->  __unix_set_addr_hash net/unix/af_unix.c:329 [inline]
->  unix_bind_bsd net/unix/af_unix.c:1241 [inline]
->  unix_bind+0x881/0x1000 net/unix/af_unix.c:1319
->  __sys_bind+0x194/0x1e0 net/socket.c:1847
->  __do_sys_bind net/socket.c:1858 [inline]
->  __se_sys_bind net/socket.c:1856 [inline]
->  __x64_sys_bind+0x40/0x50 net/socket.c:1856
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x46/0x4e
->=20
-> read to 0xffff88805f8d1840 of 8 bytes by task 13724 on cpu 1:
->  unix_listen+0x72/0x180 net/unix/af_unix.c:734
->  __sys_listen+0xdc/0x160 net/socket.c:1881
->  __do_sys_listen net/socket.c:1890 [inline]
->  __se_sys_listen net/socket.c:1888 [inline]
->  __x64_sys_listen+0x2e/0x40 net/socket.c:1888
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x46/0x4e
->=20
-> value changed: 0x0000000000000000 -> 0xffff88807b5b1b40
->=20
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 1 PID: 13724 Comm: syz-executor.4 Not tainted 6.8.0-12822-gcd51db110=
-a7e #12
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-=
-gd239552ce722-prebuilt.qemu.org 04/01/2014
->=20
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: syzkaller <syzkaller@googlegroups.com>
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  net/unix/af_unix.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->=20
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index ca101690e740..92a88ac070ca 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -731,7 +731,7 @@ static int unix_listen(struct socket *sock, int backl=
-og)
->  	if (sock->type !=3D SOCK_STREAM && sock->type !=3D SOCK_SEQPACKET)
->  		goto out;	/* Only stream/seqpacket sockets accept */
->  	err =3D -EINVAL;
-> -	if (!u->addr)
-> +	if (!READ_ONCE(u->addr))
->  		goto out;	/* No listens on an unbound socket */
->  	unix_state_lock(sk);
->  	if (sk->sk_state !=3D TCP_CLOSE && sk->sk_state !=3D TCP_LISTEN)
-> @@ -1369,7 +1369,7 @@ static int unix_dgram_connect(struct socket *sock, =
-struct sockaddr *addr,
-> =20
->  		if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
->  		     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
-> -		    !unix_sk(sk)->addr) {
-> +		    !READ_ONCE(unix_sk(sk)->addr)) {
->  			err =3D unix_autobind(sk);
->  			if (err)
->  				goto out;
-> @@ -1481,7 +1481,8 @@ static int unix_stream_connect(struct socket *sock,=
- struct sockaddr *uaddr,
->  		goto out;
-> =20
->  	if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
-> -	     test_bit(SOCK_PASSPIDFD, &sock->flags)) && !u->addr) {
-> +	     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
-> +	    !READ_ONCE(u->addr)) {
->  		err =3D unix_autobind(sk);
->  		if (err)
->  			goto out;
-> @@ -1951,7 +1952,8 @@ static int unix_dgram_sendmsg(struct socket *sock, =
-struct msghdr *msg,
->  	}
-> =20
->  	if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
-> -	     test_bit(SOCK_PASSPIDFD, &sock->flags)) && !u->addr) {
-> +	     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
-> +	    !READ_ONCE(u->addr)) {
->  		err =3D unix_autobind(sk);
->  		if (err)
->  			goto out;
+> I don't know much about this code, but perhaps these accesses must be
+> protected by bindlock instead?
+> It shouldn't autobind twice, right? Perhaps the code just tried to
+> save a line of code and moved the reads to the variable declaration
+> section.
 
-There are a few other places where ->addr is accessed lockless (under
-the bindlock, but prior to acquiring the table spinlock, e.g.
-unix_bind_* and unix_autobind. The latter is suspect as it's called
-right after the touched code. Why are such spots not relevant here?
+I also think that sk_hash is/should be under bindlock protection, and
+thus moving the read should be better.
 
-Also the  newu->addr/otheru->addr handling in unix_stream_connect()
-looks suspect.
+Otherwise even the first sk->sk_hash in unix_insert_bsd_socket() would
+be=C2=A0'lockless' - prior/outside to the table lock.
 
 Thanks,
 
