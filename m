@@ -1,273 +1,140 @@
-Return-Path: <netdev+bounces-97618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 904C38CC66F
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 20:39:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 608398CC675
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 20:40:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D160FB21044
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 18:39:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91D481C2182C
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 18:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F303C145FF0;
-	Wed, 22 May 2024 18:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8718145FFB;
+	Wed, 22 May 2024 18:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G5ZRqznk"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ZiAfGJ8/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522B9145FE4;
-	Wed, 22 May 2024 18:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B9B1420D2
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 18:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716403171; cv=none; b=ldzYusBqtyR/wMuf40svIe2Y2dBeYsSHimIRZu5vDiT265xiqIMBO8bQCWqXkjpIdw/gUPQ/0Rim17jrtcbRjfC3pFme0d+TW71z0so0DsBp83snxOISWa9kYedxofC/vDOCv8Pou529LdzN+INx1LXZhE2KoiELbsThfB89Esk=
+	t=1716403240; cv=none; b=PtApixauElakadzr2cqMawem6GiRdEaMT3loN/OmfvEOJz1S0+0IV+1jHjqN9SAeW3o96/LMkp5UMM64uBc5L8v5ec7L7htVtrOzv5JrJmQbmkAIqIz3TiMUAarRDqI1SR1WPpNFVDLJW/y2iBWfM4YCqB4pHsIcBoOA3pvp0Qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716403171; c=relaxed/simple;
-	bh=S9l5v3KZf0QNF6xsXNUPid3YSFPvJ5dX6CaHgGPpHAs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=K8X+G+VEeXtggLbZz020izimDHDDbCrOVU0lcy0/AAJfi9tvUMaghF+sBm4IkhhvU5DGmfTv4yblwLLFhsUYO2Urddrsb4JGu3v4Dyvm802g2nL+uhNcb2P8bXRat9L4h0vCmB6c+DgLOaerochs4gP52jmfKfI9BVabGJKhTLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G5ZRqznk; arc=none smtp.client-ip=209.85.167.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3c9cc681e4fso2675287b6e.0;
-        Wed, 22 May 2024 11:39:30 -0700 (PDT)
+	s=arc-20240116; t=1716403240; c=relaxed/simple;
+	bh=pvfNI1321JVtef7N+59lYxiObUuoIkn6QTtflB1MBjE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Jmgk/8BFp0Ry6MWTPK3F3geDfpjPq8uLNCfRC4QDpDExZRj6LJOyjaxBamgFhCw7/bZj4VEJiOvrXVTCjYCQc4S/nD91KEni6ZoQR7HgRlcEW7ylBTT68swhOyFCYcfxTBtxNty8ZQ4lSbt7CXB8a1r90dtLOj/7vu+TlooZ8oA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ZiAfGJ8/; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7e1b8718926so44520339f.2
+        for <netdev@vger.kernel.org>; Wed, 22 May 2024 11:40:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716403169; x=1717007969; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IMQOMsUvJoKTJuwjZqFeLcXEOOFPxcU27IS0vsncKk4=;
-        b=G5ZRqznk0ERbXVhGoCGJog8r4sSzfmiUMwXoFY9I+22k2nX9kuJGKZCDGBSOmvbOdt
-         PjqQ6SqQ8jQocI35MRvMJsXE8m5ZoAMCRBQzGnyf3BJZbiFIXOfL3e4U9M3GeAAzUiWS
-         BwIg2If4s6g+0x14l5l/YtuveupVJelR/BM/Ojb7oek+1Ls4nCVwsQdk4yxUE7cC4hBm
-         ZLALmq0pd3eNSZ1gaJyr6NI54DbgVI9EFn1BkClOGrDzqmnyWHfbVQ0oYI31XDu2Qlqv
-         oyb0INOwtWi22mTUpcC0Mdv9XIxT4uCTtSvnSN4wYil9r6PynNYuTevkFkvtoNi04rND
-         be6w==
+        d=linuxfoundation.org; s=google; t=1716403238; x=1717008038; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2CkJWPtWzq2cjcP7a09if5B9kWWmXWyc6FlwIT3mHR0=;
+        b=ZiAfGJ8/7Tp3Wp5CYTquG8GZV24qMCLf0ceknIzVUcWQ/8PEFow+ystDmKwo3No7nx
+         Gs0VPJw/OIHVC7sIc/TknKQExOnL7DRsjptWGKUDfxLt4Hpfmkob/lyeltGGr/tH1dpJ
+         g8lwbAoUPdmzQL8TWpUmDt1wjZrxz0Fp1sbNU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716403169; x=1717007969;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=IMQOMsUvJoKTJuwjZqFeLcXEOOFPxcU27IS0vsncKk4=;
-        b=mmXcbFAS1o3+N3tnRFbpdQ9L2DNuuo5dH6RWVPlbPpVF99MKG55pPxFWzTYpvHHMaG
-         Aynd9guk3VbFHWkHjDCCIdVzaOd/wgF3AyF7KmZMG6lnlOI213Ixx54iU/4KOGlD48kb
-         kQYqbuGJ5rFlrvFFgTLUE+PBuEWnnc9jkNMJLqIDkhI2T0EZW85tg6dIJjQjj/BvxGJB
-         pfGQnkMsM5io/msE3rP+SFBEv17dVbkiCpwJ8I/P7ayVug8/T4kC64ZWAPaMegZPHLoj
-         mIhXRMsuAb3rJQeDdRAwEeg5L+C/jfOrK9wvzDITon6If69HZwUGPZ2/eTKXErGnQnxM
-         2cqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXP7/T5a/Bn7ss3gv29ON5aOyc+x07qC3KGT4d8pfPXjcCtq3chTqv78zhrwq5N6R2NyD6aaiyphi+FH+nAGW1QjGB4CPwrspgTipmv6RjO5T17qqAKlBczUJTOBw8yBSOfAHMP
-X-Gm-Message-State: AOJu0Yz+DPSXyYPF7XFT7Yw0FvxYdilsGUV7zPs7E4bl9jv3Vbfw8CwZ
-	8syt57akh5GXjHNXyxAJ/RdPzimyBjwgZWnt2gAeJot8jhpPy5gX
-X-Google-Smtp-Source: AGHT+IExmyD0PBTyUzdJ3U6VoqRAzkhELP89U8CERAJNzdfVN4KWvETkrs+Ft7k1qJLZzlFpx1yyPA==
-X-Received: by 2002:a05:6808:183:b0:3c8:2c1c:a39b with SMTP id 5614622812f47-3cdb64c6f81mr3738323b6e.32.1716403169288;
-        Wed, 22 May 2024 11:39:29 -0700 (PDT)
-Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-793017facabsm732376785a.88.2024.05.22.11.39.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 11:39:28 -0700 (PDT)
-Date: Wed, 22 May 2024 14:39:28 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Chengen Du <chengen.du@canonical.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <664e3be092d6a_184f2f29441@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAPza5qfZ8JPkt4Ez1My=gfpT7VfHo75N01fLQdFaojBv2whi8w@mail.gmail.com>
-References: <20240520070348.26725-1-chengen.du@canonical.com>
- <664b97e8abe7a_12b4762946f@willemb.c.googlers.com.notmuch>
- <CAPza5qcGyfcUYOoznci4e=1eaScVTgkzAhXfKSG3bTzC=aOwew@mail.gmail.com>
- <eaf33ba66cbdc639b0209b232f892ec8a52a1f21.camel@redhat.com>
- <664ca1651b66_14f7a8294cb@willemb.c.googlers.com.notmuch>
- <CAPza5qfZ8JPkt4Ez1My=gfpT7VfHo75N01fLQdFaojBv2whi8w@mail.gmail.com>
-Subject: Re: [PATCH] af_packet: Handle outgoing VLAN packets without hardware
- offloading
+        d=1e100.net; s=20230601; t=1716403238; x=1717008038;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2CkJWPtWzq2cjcP7a09if5B9kWWmXWyc6FlwIT3mHR0=;
+        b=HrzF1DHfeeY+EkuDMZVWXDN+xS3FR87eg40ilUeupX4lfwpFEkW3eWYKiSzFWVMRU2
+         UXuJ2k/xdQHvoADDuR7ktjqdDCv9cJJLWuo2YVuYxP5JCF8pYnfyaVt5/gKXOwjLrL4H
+         Rqr4K4PBKemB+naV7NLjN3RVyPia+GjNfgYjj8IBdWuwUQZeJ5oemqOtwCcVBd77K5KY
+         BaaOXuAm04Yp7C3LOtICAnCmpkWC2yEdJ/fhSa1kJxEEMOpY0JLLfRZZ54zCQqWSNtoV
+         IZZbrX+rbYcWsKapfDP92EE9XqnHhMWOCqvV5j+lWQ+g5H+jwbSW9QBUpaA19lCBgr9I
+         La/A==
+X-Forwarded-Encrypted: i=1; AJvYcCW+m0Th76JBcSqc+Ro2EcCt26Pm4MOPwc2SInFMpfH7tEDQsQ2m2KIXtE/s4VDNReH60MRCHOec7LFg/umY9QG3fUvhcrtU
+X-Gm-Message-State: AOJu0YxnIvR6Z28mAw4gTJfxaFacuf4k7LZiddMbErdERxKlNM2zfJjw
+	ww63XBfgftfqDhjMBLqnlyyWZ8CGY7xkexv7T4s8VOzMjOiHmLxxg3yK+rhdwec=
+X-Google-Smtp-Source: AGHT+IHfJbSzf9eR6h+5NiCKdgJYC/D5h2NHJ2n/qeMndC5IVVrtGPtwRsxEDeIFRtYop2k9g8p2Vw==
+X-Received: by 2002:a05:6602:420a:b0:7de:b279:fb3e with SMTP id ca18e2360f4ac-7e37db353b9mr293535939f.1.1716403238250;
+        Wed, 22 May 2024 11:40:38 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-48a42b0e43dsm4496318173.101.2024.05.22.11.40.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 May 2024 11:40:37 -0700 (PDT)
+Message-ID: <7a7d6b6c-0f28-4ffe-9bf2-a25c088636db@linuxfoundation.org>
+Date: Wed, 22 May 2024 12:40:36 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 00/68] Define _GNU_SOURCE for sources using
+To: Edward Liaw <edliaw@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, shuah@kernel.org,
+ =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+ =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
+ Christian Brauner <brauner@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ "David S. Miller" <davem@davemloft.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kernel-team@android.com,
+ linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+ linux-riscv@lists.infradead.org, bpf@vger.kernel.org,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20240522005913.3540131-1-edliaw@google.com>
+ <6caf3332-9ed9-4257-9532-4fd71c465c0d@linuxfoundation.org>
+ <20240522101349.565a745e@kernel.org>
+ <CAG4es9VZ3r34sUkp31+GCrA_XOq6WqwUUitPMQFViLL83mezYg@mail.gmail.com>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <CAG4es9VZ3r34sUkp31+GCrA_XOq6WqwUUitPMQFViLL83mezYg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Chengen Du wrote:
-> Hi Paolo,
-> =
+On 5/22/24 11:44, Edward Liaw wrote:
+> On Wed, May 22, 2024 at 10:13 AM Jakub Kicinski <kuba@kernel.org> wrote:
+>>
+>> On Wed, 22 May 2024 10:19:33 -0600 Shuah Khan wrote:
+>>> On 5/21/24 18:56, Edward Liaw wrote:
+>>>> Centralizes the definition of _GNU_SOURCE into KHDR_INCLUDES and removes
+>>>> redefinitions of _GNU_SOURCE from source code.
+>>>>
+>>>> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+>>>> asprintf into kselftest_harness.h, which is a GNU extension and needs
+>>>
+>>> Easier solution to define LINE_MAX locally. In gerenal it is advisable
+>>> to not add local defines, but it is desirable in some cases to avoid
+>>> churn like this one.
+>>
+>> Will the patch that Andrew applied:
+>> https://lore.kernel.org/all/20240519213733.2AE81C32781@smtp.kernel.org/
+>> make its way to Linus? As you say that's a much simpler fix.
+> 
 
-> Thank you for your useful suggestions and information.
-> =
+Thank you Jakub. Yes. This is a simpler fix.
 
-> Hi Willem,
-> =
+> Right, this patch series may be unnecessary after all, since the
+> problem is fixed by that patch.
+> 
+> It might be better to drop the series unless it is desirable to
+> centralize the declaration of _GNU_SOURCE to the root Makefile /
+> lib.mk.  If that is still wanted, maybe a more palatable approach
+> would be to surround every instance of #define _GNU_SOURCE with
+> #ifndef _GNU_SOURCE first, then induce the change to CFLAGS in lib.mk.
+> That would prevent a partial merge from triggering build warnings.
 
-> The issue initially stems from libpcap [1].
-> Upon their further investigation, another issue was discovered,
-> leading to a kernel request [2] that describes the problem in detail.
-> =
+Please drop this series.
 
-> In essence, the kernel does not provide VLAN information if hardware
-> VLAN offloading is unavailable in cooked mode.
-> The TCI-TPID is missing because the prb_fill_vlan_info() function in
-> af_packet.c does not modify the tp_vlan_tci/tp_vlan_tpid values since
-> the information is in the payload and not in the sk_buff struct.
-> In cooked mode, the L2 header is stripped, preventing the receiver
-> from determining the correct TCI-TPID value.
-> Additionally, the protocol in SLL is incorrect, which means the
-> receiver cannot parse the L3 header correctly.
-> =
-
-> To reproduce the issue, please follow these steps:
-> 1. ip link add link ens18 ens18.24 type vlan id 24
-> 2. ifconfig ens18.24 1.0.24.1/24
-> 3. ping -n 1.0.24.3 > /dev/null 2>&1 &
-> 4. tcpdump -nn -i any -Q out not tcp and not udp
-> =
-
-> The attached experiment results show that the protocol is incorrectly
-> parsed as IPv4, which leads to inaccurate outcomes.
-> =
-
-> Thanks to Paolo's suggestion, I propose that we add a new bit in the
-> status to indicate the presence of VLAN information in the payload and
-> modify the header's entry (i.e., tp_vlan_tci/tp_vlan_tpid)
-> accordingly.
-> For the sll_protocol part, we can introduce a new member in the
-> sockaddr_ll struct to represent the VLAN-encapsulated protocol, if
-> applicable.
-> =
-
-> In my humble opinion, this approach will not affect current users who
-> rely on the status to handle VLAN parsing, and the sll_protocol will
-> remain unchanged.
-> Please kindly provide your feedback on this proposal, as there may be
-> important points I have overlooked.
-> If this approach seems feasible, I will submit a new version next week.=
-
-> Your assistance and opinions on this issue are important to me, and I
-> truly appreciate them.
-> =
-
-> Best regards,
-> Chengen Du
-> =
-
-> [1] https://github.com/the-tcpdump-group/libpcap/issues/1105
-> [2] https://marc.info/?l=3Dlinux-netdev&m=3D165074467517201&w=3D4
-
-This is all super helpful context and will have to make it into the
-commit message.
-
-So if I understand correctly the issue is inconsistency about whether
-VLAN tags are L2 or L3, and information getting lost along the way.
-
-SOCK_DGRAM mode removes everything up to skb_network_offset, which
-also removes the VLAN tags. But it does not update skb->protocol.
-
-msg_name includes sockaddr_ll.sll_protocol which is set to
-skb->protocol.
-
-So the process gets a packet with purported protocol ETH_P_8021Q
-starting beginning at an IP or IPv6 header.
-
-A few alternatives to address this:
-
-1. insert the VLAN tag back into the packet, with an skb_push.
-2. prepare the data as if it is a VLAN offloaded packet:
-   pass the VLAN information through PACKET_AUXDATA.
-3. pull not up to skb_network_offset, but pull mac_len.
-
-Your patch does the second.
-
-I think the approach is largely sound, with a few issues to consider:
-- QinQ. The current solution just passes the protocol in the outer tag
-- Other L2.5, like MPLS. This solution does not work for those.
-  (if they need a fix, and the same network_offset issue applies.)
-
-3 would solve all these cases, I think. But is a larger diversion from
-established behavior.
-
-> On Tue, May 21, 2024 at 9:28=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Paolo Abeni wrote:
-> > > On Tue, 2024-05-21 at 11:31 +0800, Chengen Du wrote:
-> > > > I would appreciate any suggestions you could offer, as I am not a=
-s
-> > > > familiar with this area as you are.
-> > > >
-> > > > I encountered an issue while capturing packets using tcpdump, whi=
-ch
-> > > > leverages the libpcap library for sniffing functionalities.
-> > > > Specifically, when I use "tcpdump -i any" to capture packets and
-> > > > hardware VLAN offloading is unavailable, some bogus packets appea=
-r.
-> >
-> > Bogus how exactly?
-> >
-> > > > In this scenario, Linux uses cooked-mode capture (SLL) for the "a=
-ny"
-> > > > device, reading from a PF_PACKET/SOCK_DGRAM socket instead of the=
-
-> > > > usual PF_PACKET/SOCK_RAW socket.
-> >
-> > Trying to extract L2 or VLAN information from the any device may be
-> > the real issue here.
-> >
-> > > >
-> > > > Using SOCK_DGRAM instead of SOCK_RAW means that the Linux socket =
-code
-> > > > does not supply the packet's link-layer header.
-> > > > Based on the code in af_packet.c, SOCK_DGRAM strips L2 headers fr=
-om
-> > > > the original packets and provides SLL for some L2 information.
-> > >
-> > > > From the receiver's perspective, the VLAN information can only be=
-
-> > > > parsed from SLL, which causes issues if the kernel stores VLAN
-> > > > information in the payload.
-> >
-> > ETH_HLEN is pulled, but the VLAN tag is still present, right?
-> >
-> > > >
-> > > > As you mentioned, this modification affects existing PF_PACKET re=
-ceivers.
-> > > > For example, libpcap needs to change how it parses VLAN packets w=
-ith
-> > > > the PF_PACKET/SOCK_RAW socket.
-> > > > The lack of VLAN information in SLL may prevent the receiver from=
-
-> > > > properly decoding the L3 frame in cooked mode.
-> > > >
-> > > > I am new to this area and would appreciate it if you could kindly=
-
-> > > > correct any misunderstandings I might have about the mechanism.
-> > > > I would also be grateful for any insights you could share on this=
- issue.
-> > > > Additionally, I am passionate about contributing to resolving thi=
-s
-> > > > issue and am willing to work on patches based on your suggestions=
-.
-> > >
-> > > One possible way to address the above in a less invasive manner, co=
-uld
-> > > be allocating a new TP_STATUS_VLAN_HEADER_IS_PRESENT bit, set it fo=
-r
-> > > SLL when the vlan is not stripped by H/W and patch tcpdump to inter=
-pret
-> > > such info.
-> >
-> > Any change must indeed not break existing users. It's not sufficient
-> > to change pcap/tcpdump. There are lots of other PF_PACKET users out
-> > there. Related, it is helpful to verify that tcpdump agrees to a patc=
-h
-> > before we change the ABI for it.
-
+thanks,
+-- Shuah
 
 
