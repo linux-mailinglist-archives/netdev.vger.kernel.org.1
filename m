@@ -1,250 +1,197 @@
-Return-Path: <netdev+bounces-97548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F16498CC0E3
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 14:09:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD558CC157
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 14:38:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69ED61F23DFB
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 12:09:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13E5F1F236D4
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 12:38:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC4813D61A;
-	Wed, 22 May 2024 12:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E3B13D607;
+	Wed, 22 May 2024 12:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/idJjV9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pXoVaK1o"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A23313D600
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 12:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 196BE13D604;
+	Wed, 22 May 2024 12:37:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716379733; cv=none; b=sEbvuLWVJJnsGnkQdVqsVVrTCGYMmpmEfbANH0O+pyV7nhG3JW75cCnRw98GFn0mhq7BxjwAASMWe46MGskLZtb/uXU4UoEJAdykQmwZUEdEwuIlONSyI4thD6+0xh73vrG2i0A0ryErRi47do9HW2bDrV0ramUVW4pYz0mzpL0=
+	t=1716381482; cv=none; b=f0lIHW79CkEzzUzUH4r8gN1INVMgImmWJksBZRmPzXymqdxyEjk+aKaY4Iz0wurlSdhX+sA8IAG3mZCVAzijq66tj/egytlgam/xa4uJUVZndQh2uBVkqT9l5vc9qDzx7p/uXPUnW6dcHKTbRjhzwtMQZOUpTI/bYb7Cj596+Rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716379733; c=relaxed/simple;
-	bh=lCQVcNdlujNqsrb4RnySvZeW3rfwvKxSXFjC+djQKik=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bSxADTJ3aDjVi6S5vmAk9qK3+7+0tTNZU8yP+/jj2kqhFoEgi/Or/EaUymeTnqH/PEcQJht6tV5ajuOmWnAJ/uwcjVPEWGSbVEDkPzS2I3LfCatZgT8uSH0E8eShwQ5S0jDEc9K6T4rCOu+j+BK4NBzOt4VvbD4Qyx6wJPWpeaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R/idJjV9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716379730;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=m8ofHR/zkZq2uTNi/EY8s+4Ty4W1/mxnDHsktYBgmZQ=;
-	b=R/idJjV9YD7zzeAykT1l6SY6D99rwvsdyXK0WjpOkklLJZsJdhHAy5fA7SmikbJgPjxzNS
-	IF0m03AM6HAd5+3RNHE6JQ+6+dCpBB9gO/Hn3pCb2NeuRg53DnffE1a5FZIcNb2dPUn5Xq
-	GxPR6dK8FZkLPWROg9mJxRatBtu2pTM=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-483-JAPR3VdfMfi4QE_9HYneug-1; Wed, 22 May 2024 08:08:48 -0400
-X-MC-Unique: JAPR3VdfMfi4QE_9HYneug-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2e1d2d29f97so314651fa.1
-        for <netdev@vger.kernel.org>; Wed, 22 May 2024 05:08:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716379724; x=1716984524;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m8ofHR/zkZq2uTNi/EY8s+4Ty4W1/mxnDHsktYBgmZQ=;
-        b=Ng93Vgb3zWRe7QS0a4/7yaqaNIE4b9EUladLZr8FhJKXpVqWN8Jp+R/iPOda/jm96B
-         sZL5lcc3pG+Mmai7l/jE4Y0h9mPIs6o/EAuff3QjwqlR+ITaYbptLEiGnvetR8bhKJv8
-         fpO6oVaoroSbYS/huG4drkylmt/207LsocGWlAOfx9fWFUFo/iwWgKB+J6bY9BFVdeFF
-         nrN4veCYe7PY668HedGvfoyDdexnt9WEQgKnvxSoqQVxXYoy4c0TPgxxYqkpTTRJm/dr
-         fOLCTziusFMu2CpUGATe1Ibub+PfE3cms5MWpkc7Iw4MNG8hIaXMQTkeQdF3ZdLv/B5z
-         Ef+A==
-X-Forwarded-Encrypted: i=1; AJvYcCXO1DHJ0kHnHT64sP4U/c3/lCyiNK1C34daXR0lmjwfQ80o6IPhldX8sVeJk5bV+lX4PXJiT6XSwlPfwL6P+nS46EvLvcrH
-X-Gm-Message-State: AOJu0YzJkOa4TmXaHLaarRfcKTbiRoTP0Uf/5EgsTPWcYUWOSJUsYp/G
-	BAod7T3WoePxRmh2H0XQTRw5Atex3HHoNDwCKSkYJEokkLVKptasganJZe1jPiY4GXSmxBiOOTS
-	YcuIAiCi7XynGgbq5uBz3RlHzTJy6FwU0pPyPD1785bKjkVwJeY5jIHFkt8YT7g==
-X-Received: by 2002:ac2:5e26:0:b0:523:68bf:9d55 with SMTP id 2adb3069b0e04-526bf07ee3dmr1034393e87.2.1716379723965;
-        Wed, 22 May 2024 05:08:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHGbShGZTyDoasgCPxoWeag611DATTlc3plDJxcUwiepdiBTodpC/4FdFDfus0WiMjljRzXKw==
-X-Received: by 2002:ac2:5e26:0:b0:523:68bf:9d55 with SMTP id 2adb3069b0e04-526bf07ee3dmr1034368e87.2.1716379723394;
-        Wed, 22 May 2024 05:08:43 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b094:ab10::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b8a777dsm33952098f8f.50.2024.05.22.05.08.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 05:08:42 -0700 (PDT)
-Message-ID: <13b77d180c2bad74d6749a6c34190a10134bd6fa.camel@redhat.com>
-Subject: Re: [PATCH net] sock_map: avoid race between sock_map_close and
- sk_psock_put
-From: Paolo Abeni <pabeni@redhat.com>
-To: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>, 
-	netdev@vger.kernel.org
-Cc: Cong Wang <cong.wang@bytedance.com>, Jakub Sitnicki
- <jakub@cloudflare.com>,  Eric Dumazet <edumazet@google.com>, Daniel
- Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, 
- kernel-dev@igalia.com,
- syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com, 
- stable@vger.kernel.org
-Date: Wed, 22 May 2024 14:08:41 +0200
-In-Reply-To: <20240520214153.847619-1-cascardo@igalia.com>
-References: <20240520214153.847619-1-cascardo@igalia.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
- 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
- iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
- sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1716381482; c=relaxed/simple;
+	bh=uR+0GaiOK4i57o+GVRmrTDVdSaQ4AgJhLI6wd822j+M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a7/U5p7qVfUtGU3Q1QQoq59mc0y0krrHInvkBH1P+GrRotUAB/7qj4CI+iCoqz9SjTjSughMpXEm+gLuM1Xsyug2nrBc0PvpJPTTahwSk+bUjDJvEYM7WZdc3ZCF7fLccedBZODNt35N/uJAmi4t+eY6zpnfilScX/T6uo9uaLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pXoVaK1o; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=AHlzVsmTWLPaYW8yXMskOSpDpuqcxd7LLht6Va77Reo=; b=pXoVaK1o7949NTgXfzSplILPFz
+	TwtBZUJ36PoLt6gqL9sbnhR3aGHZzWfLQETUErxCWW68lTqlSJgAoKkmNPTldHoaSAPUCmvsV0YmZ
+	Hleu4zCDPaF3l/4SnTW5XLPipv18Fp3YJ0Ghj8WH7qg2CQ7bRoeLqvH4C9iybmRo0+Lw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s9lE6-00Foyi-5u; Wed, 22 May 2024 14:37:50 +0200
+Date: Wed, 22 May 2024 14:37:50 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Larry Chiu <larry.chiu@realtek.com>
+Cc: Justin Lai <justinlai0215@realtek.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"jiri@resnulli.us" <jiri@resnulli.us>,
+	"horms@kernel.org" <horms@kernel.org>,
+	Ping-Ke Shih <pkshih@realtek.com>
+Subject: Re: [PATCH net-next v19 01/13] rtase: Add pci table supported in
+ this module
+Message-ID: <7aab03ba-d8ed-4c9c-8bfd-b2bbed0a922d@lunn.ch>
+References: <20240517075302.7653-1-justinlai0215@realtek.com>
+ <20240517075302.7653-2-justinlai0215@realtek.com>
+ <d840e007-c819-42df-bc71-536328d4f5d7@lunn.ch>
+ <e5d7a77511f746bdb0b38b6174ef5de4@realtek.com>
+ <97e30c5f-1656-46d0-b06c-3607a90ec96f@lunn.ch>
+ <f9133a36bbae41138c3080f8f6282bfd@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f9133a36bbae41138c3080f8f6282bfd@realtek.com>
 
-On Mon, 2024-05-20 at 18:41 -0300, Thadeu Lima de Souza Cascardo wrote:
-> sk_psock_get will return NULL if the refcount of psock has gone to 0, whi=
-ch
-> will happen when the last call of sk_psock_put is done. However,
-> sk_psock_drop may not have finished yet, so the close callback will still
-> point to sock_map_close despite psock being NULL.
->=20
-> This can be reproduced with a thread deleting an element from the sock ma=
-p,
-> while the second one creates a socket, adds it to the map and closes it.
->=20
-> That will trigger the WARN_ON_ONCE:
->=20
-> ------------[ cut here ]------------
-> WARNING: CPU: 1 PID: 7220 at net/core/sock_map.c:1701 sock_map_close+0x2a=
-2/0x2d0 net/core/sock_map.c:1701
-> Modules linked in:
-> CPU: 1 PID: 7220 Comm: syz-executor380 Not tainted 6.9.0-syzkaller-07726-=
-g3c999d1ae3c7 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 04/02/2024
-> RIP: 0010:sock_map_close+0x2a2/0x2d0 net/core/sock_map.c:1701
-> Code: df e8 92 29 88 f8 48 8b 1b 48 89 d8 48 c1 e8 03 42 80 3c 20 00 74 0=
-8 48 89 df e8 79 29 88 f8 4c 8b 23 eb 89 e8 4f 15 23 f8 90 <0f> 0b 90 48 83=
- c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d e9 13 26 3d 02
-> RSP: 0018:ffffc9000441fda8 EFLAGS: 00010293
-> RAX: ffffffff89731ae1 RBX: ffffffff94b87540 RCX: ffff888029470000
-> RDX: 0000000000000000 RSI: ffffffff8bcab5c0 RDI: ffffffff8c1faba0
-> RBP: 0000000000000000 R08: ffffffff92f9b61f R09: 1ffffffff25f36c3
-> R10: dffffc0000000000 R11: fffffbfff25f36c4 R12: ffffffff89731840
-> R13: ffff88804b587000 R14: ffff88804b587000 R15: ffffffff89731870
-> FS:  000055555e080380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000000 CR3: 00000000207d4000 CR4: 0000000000350ef0
-> Call Trace:
->  <TASK>
->  unix_release+0x87/0xc0 net/unix/af_unix.c:1048
->  __sock_release net/socket.c:659 [inline]
->  sock_close+0xbe/0x240 net/socket.c:1421
->  __fput+0x42b/0x8a0 fs/file_table.c:422
->  __do_sys_close fs/open.c:1556 [inline]
->  __se_sys_close fs/open.c:1541 [inline]
->  __x64_sys_close+0x7f/0x110 fs/open.c:1541
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fb37d618070
-> Code: 00 00 48 c7 c2 b8 ff ff ff f7 d8 64 89 02 b8 ff ff ff ff eb d4 e8 1=
-0 2c 00 00 80 3d 31 f0 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff=
- ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
-> RSP: 002b:00007ffcd4a525d8 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-> RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007fb37d618070
-> RDX: 0000000000000010 RSI: 00000000200001c0 RDI: 0000000000000004
-> RBP: 0000000000000000 R08: 0000000100000000 R09: 0000000100000000
-> R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
->  </TASK>
->=20
-> Use sk_psock, which will only check that the pointer is not been set to
-> NULL yet, which should only happen after the callbacks are restored. If,
-> then, a reference can still be gotten, we may call sk_psock_stop and canc=
-el
-> psock->work.
->=20
-> After that change, the reproducer does not trigger the WARN_ON_ONCE
-> anymore.
->=20
-> Reported-by: syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D07a2e4a1a57118ef7355
-> Fixes: aadb2bb83ff7 ("sock_map: Fix a potential use-after-free in sock_ma=
-p_close()")
-> Fixes: 5b4a79ba65a1 ("bpf, sockmap: Don't let sock_map_{close,destroy,unh=
-ash} call itself")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
-> ---
->  net/core/sock_map.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
->=20
-> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-> index 9402889840bf..13267e667a4c 100644
-> --- a/net/core/sock_map.c
-> +++ b/net/core/sock_map.c
-> @@ -1680,19 +1680,23 @@ void sock_map_close(struct sock *sk, long timeout=
-)
-> =20
->  	lock_sock(sk);
->  	rcu_read_lock();
-> -	psock =3D sk_psock_get(sk);
-> +	psock =3D sk_psock(sk);
->  	if (unlikely(!psock)) {
-> +		saved_close =3D READ_ONCE(sk->sk_prot)->close;
->  		rcu_read_unlock();
->  		release_sock(sk);
-> -		saved_close =3D READ_ONCE(sk->sk_prot)->close;
->  	} else {
->  		saved_close =3D psock->saved_close;
->  		sock_map_remove_links(sk, psock);
-> +		psock =3D sk_psock_get(sk);
->  		rcu_read_unlock();
-> -		sk_psock_stop(psock);
-> +		if (psock)
-> +			sk_psock_stop(psock);
->  		release_sock(sk);
-> -		cancel_delayed_work_sync(&psock->work);
-> -		sk_psock_put(sk, psock);
-> +		if (psock) {
-> +			cancel_delayed_work_sync(&psock->work);
-> +			sk_psock_put(sk, psock);
-> +		}
->  	}
-> =20
->  	/* Make sure we do not recurse. This is a bug.
+On Wed, May 22, 2024 at 04:43:11AM +0000, Larry Chiu wrote:
+> 
+> > On Tue, May 21, 2024 at 06:20:04AM +0000, Larry Chiu wrote:
+> > >
+> > > >> + *  Below is a simplified block diagram of the chip and its relevant
+> > interfaces.
+> > > >> + *
+> > > >> + *               *************************
+> > > >> + *               *                       *
+> > > >> + *               *  CPU network device   *
+> > > >> + *               *                       *
+> > > >> + *               *   +-------------+     *
+> > > >> + *               *   |  PCIE Host  |     *
+> > > >> + *               ***********++************
+> > > >> + *                          ||
+> > > >> + *                         PCIE
+> > > >> + *                          ||
+> > > >> + *      ********************++**********************
+> > > >> + *      *            | PCIE Endpoint |             *
+> > > >> + *      *            +---------------+             *
+> > > >> + *      *                | GMAC |                  *
+> > > >> + *      *                +--++--+  Realtek         *
+> > > >> + *      *                   ||     RTL90xx Series  *
+> > > >> + *      *                   ||                     *
+> > > >> + *      *     +-------------++----------------+    *
+> > > >> + *      *     |           | MAC |             |    *
+> > > >> + *      *     |           +-----+             |    *
+> > > >> + *      *     |                               |    *
+> > > >> + *      *     |     Ethernet Switch Core      |    *
+> > > >> + *      *     |                               |    *
+> > > >> + *      *     |   +-----+           +-----+   |    *
+> > > >> + *      *     |   | MAC |...........| MAC |   |    *
+> > > >> + *      *     +---+-----+-----------+-----+---+    *
+> > > >> + *      *         | PHY |...........| PHY |        *
+> > > >> + *      *         +--++-+           +--++-+        *
+> > > >> + *      *************||****************||***********
+> > > >> + *
+> > > >> + *  The block of the Realtek RTL90xx series is our entire chip
+> > > >> + architecture,
+> > > >> + *  the GMAC is connected to the switch core, and there is no PHY in
+> > between.
+> > > >
+> > > >Given this architecture, this driver cannot be used unless there is a switch
+> > > >driver as well. This driver is nearly ready to be merged. So what are your
+> > > >plans for the switch driver? Do you have a first version you can post? That
+> > > >will reassure us you do plan to release a switch driver, and not use a SDK in
+> > > >userspace.
+> > > >
+> > > >        Andrew
+> > >
+> > > Hi Andrew,
+> > > This GMAC is configured after the switch is boot-up and does not require a
+> > > switch driver to work.
+> > 
+> > But if you cannot configure the switch, it is pointless passing the switch
+> > packets. The Linux architecture is that Linux needs to be able to control the
+> > switch somehow. There needs to be a driver with the switchdev API on its
+> > upper side which connects it to the Linux network stack. Ideally the lower
+> > side of this driver can directly write switch registers. Alternatively it can make
+> > some sort of RPC to firmware which configures the switch.
+> > 
+> > Before committing this MAC driver, we will want to be convinced there is a
+> > switchdev driver for the switch.
+> > 
+> >         Andrew
+> 
+> 
+> I know what you mean.
+> But actually this GMAC works like a NIC connected to an Ethernet Switch not a 
+> management port, its packets communicating with other ports.
 
-As a personal opinion I think the code will become simple reordering
-the condition, something alike:
+Linux has two different models for switches.
 
-	if (psock) {
-		saved_close =3D psock->saved_close;
- 		sock_map_remove_links(sk, psock);
-		psock =3D sk_psock_get(sk);
-		if (!psock)
-			goto no_psock;
- 		rcu_read_unlock();
-		sk_psock_stop(psock);
- 		release_sock(sk);
-		cancel_delayed_work_sync(&psock->work);
-		sk_psock_put(sk, psock);
-	} else {
-no_psock:
-		saved_close =3D READ_ONCE(sk->sk_prot)->close;
- 		rcu_read_unlock();
- 		release_sock(sk);
-	}
+The first is switchdev. Linux has a netdev per port of the switch, and
+use you those netdev's to manage the switch, just as if they are
+individual NICs.
 
-Overall looks safe to me, but I would appreciate an explicit ack from
-Jakub S. or John.
+The second is very, very old, since the beginning of Ethernet
+switches. The cable comes out of the machine and plugs into the
+switch. Linux has no idea there is a switch there, the switch is just
+part of the magic if networking. This also means Linux cannot manage
+the switch, it is a different box, a different administration domain.
 
-Cheers,
+The second model does not really work here. The switch is not in
+another box at the end of a cable. It is integrated into the SoC!
+ 
+> The PCIe Endpoint is a multi-function device, the other function is used to 
+> control the switch register, we are still working on where to put this driver in 
+> Linux. We thought it should be separated into different device drivers, or you 
+> think we should register two pcie functions in this driver.
 
-Paolo
+Look at the architecture of other switch drivers. There are two broad
+categories.
 
+1) Pure switchdev drivers, e.g. mellanox, sparx5, prestera. There is
+one driver which provides both the netdev interfaces per port, and
+implements the switchdev API for managing the switch.
+
+2) DSA + switchdev, e.g. mv88e6xxx, rtl8365, starfigher2, etc. These
+use a conventional NIC to provide the conduit to pass packets to the
+switch. These packets have additional headers, added by a tag driver,
+indicating which port a packet should go out. And there is a switch
+driver, which makes use of the DSA framework to manage the switch. DSA
+provides the netdev per port.
+
+This is actually something i ask you about with version 1 of the
+patches. I've forget what your answer was, and we concentrated on
+getting your code up to mainline quality. Now it is time to go back to
+that question.
+
+How do you control where a packet passed over this GMAC NIC goes
+within the switch? Is there an additional header? Are their fields in
+the DMA descriptor?
+
+If your hardware is DSA like, you can write another driver which binds
+to a different PCI function. If however you use DMA descriptors, you
+need a pure switchdev driver, one driver which binds to multiple PCI
+functions.
+
+	Andrew
 
