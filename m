@@ -1,151 +1,193 @@
-Return-Path: <netdev+bounces-97599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EBB48CC437
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 17:37:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA1F68CC445
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 17:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B14A282BB8
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 15:37:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FE76283097
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 15:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C0CB768EC;
-	Wed, 22 May 2024 15:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027737D3E6;
+	Wed, 22 May 2024 15:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Top1XGc2"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="oOfJXJD3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31741171C;
-	Wed, 22 May 2024 15:37:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1267D08D
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 15:40:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716392267; cv=none; b=FMK5ixOCcNUaWppvyEfrIVHoQ8z0oz8AzK74CfAhA0oP3FEH+V4Zmz12tC7N2sJrV/o+4eMFT6NtfZeaClX+MdmjJkVyS/dL5/1bL88FCywBwLCmS1AdW2IwYDdxWYqjS2CSFnP0fT17PfTSIbf3/wT0GVv6QeFpdlh59h+L9v4=
+	t=1716392424; cv=none; b=szk1pDJQUsSVziclPsTT1KbmKqvp0pMeiBb8OkX/WKnW3TxZfW2gxQFcbChwfE/L3khZOIQ60FWxHnTgXOdfU/m7qMVzFuz0Yfb15cIsrK6Y2t3a34tH0CCqP9pK5Tb6P3vUk9WzqmnipSIDKfhC8P7zfPn2BgkSdOZ7DLeGr4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716392267; c=relaxed/simple;
-	bh=3YRIw4xGban3ncUZ5m5pmLWIF/RlgCbtMqm+fj2vRaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y2TCnEWQzGiWlXOBYfpBomqri8QoJuRPD7+TBosNAtsrFoOxiQlPerZ92L+ZPIRxG2UnpdpmACEBjBSNSsnf4rLPuXeDzR52N4SXSsqBk2pZxA0IqaBDkf1DuutfjZkJF63+euH6YqF2xRqmcIujUGfQZGfKmuia5iPfnmmxDbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Top1XGc2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8B1CC32782;
-	Wed, 22 May 2024 15:37:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716392267;
-	bh=3YRIw4xGban3ncUZ5m5pmLWIF/RlgCbtMqm+fj2vRaI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Top1XGc2EHvGIykobL/WY78wXCOg+w5a4zd0y+dm/qbjgLc3q8SxDIdiRjmoZ86wb
-	 YhJIwjF46lMw4UK0f8u8YsgrBaGhFsYQlTNuLvWr1u+agWobGjDF/uiq5K0cK128UQ
-	 CcvCU86D7bVM9PLCUxcU2L7FQX4eItVjH53WQUg1MybMFRNRn3slIElFLu6+9XqA/P
-	 3vKKHlbIyt7BpajuUSElOlmtwdgGQ3HGN/BNYKbRNLMyZcBlakr6zGLI7shq3cE4Kg
-	 ROzqsFUBHWpdAx+gmTocP4lAfeg265n7ButbzdW08WCtA/zL8n3tbGELt1J07MYYX7
-	 iVeXCwGpt4mvw==
-Date: Wed, 22 May 2024 16:37:42 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Nishanth Menon <nm@ti.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-	"Kumar, Udit" <u-kumar1@ti.com>, vigneshr@ti.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Kip Broadhurst <kbroadhurst@ti.com>, w.egorov@phytec.de
-Subject: Re: [PATCH] dt-bindings: net: dp8386x: Add MIT license along with
- GPL-2.0
-Message-ID: <20240522-trash-unshaven-226dba991c3f@spud>
-References: <20240517104226.3395480-1-u-kumar1@ti.com>
- <20240517-poster-purplish-9b356ce30248@spud>
- <20240517-fastball-stable-9332cae850ea@spud>
- <8e56ea52-9e58-4291-8f7f-4721dd74c72f@ti.com>
- <20240520-discard-fanatic-f8e686a4faad@spud>
- <20240520201807.GA1410789-robh@kernel.org>
- <e257de5f54d361da692820f72048ed06a8673380.camel@redhat.com>
- <20240522-vanquish-twirl-4f767578ee8d@spud>
- <20240522134001.tjgvzglufwmi3k75@imitate>
+	s=arc-20240116; t=1716392424; c=relaxed/simple;
+	bh=bNx6/ZQWgw65zfW+QRyiN3xErXI2/6JQ2avBpYCx1Bk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gWgLRSRBDoqqxgDwixoYugTSCFzXJ0ZEqCEwDkq4A5RPLRi39vbmQIBJf4xA/s98SM4qfhahI+45m5k19AAB+Qxy2Nf0O35PSUXwZ9H7/58JHuStfSASn6qO1PjP3ggAoa5i1mlebxvtlQRqeMOCyB2zl98npcotgdMBjG9quEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=oOfJXJD3; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1716392424; x=1747928424;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=A/cehJs/FMjhGJAhLqlP2WEYrm/EApNbQRXiCI9S3wk=;
+  b=oOfJXJD3gWAB25RSrBrcbcfQZ+H55ldC3xZV9YsebuenWv0JlcyAln6v
+   zIqyengCPcWAsyP5ike/wcfTjK7SdQH02aokR1+EZ5K+x9IrXzaHjEpKk
+   +ZFhnUFM7qXa/3Jt93m/PuQ61fbc7XgI1TJLE8e6SaeHpQVZ42bQ/YSAS
+   8=;
+X-IronPort-AV: E=Sophos;i="6.08,181,1712620800"; 
+   d="scan'208";a="402966234"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2024 15:40:21 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:19548]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.50:2525] with esmtp (Farcaster)
+ id 92cca7dd-4fc4-433f-a0d0-4ee1a09b9dc2; Wed, 22 May 2024 15:40:19 +0000 (UTC)
+X-Farcaster-Flow-ID: 92cca7dd-4fc4-433f-a0d0-4ee1a09b9dc2
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 22 May 2024 15:40:19 +0000
+Received: from 88665a182662.ant.amazon.com (10.143.93.121) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
+ Wed, 22 May 2024 15:40:15 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, syzkaller
+	<syzkaller@googlegroups.com>
+Subject: [PATCH v2 net] af_unix: Annotate data-race around unix_sk(sk)->addr.
+Date: Thu, 23 May 2024 00:40:02 +0900
+Message-ID: <20240522154002.77857-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ppzR8UWyzGuYSJha"
-Content-Disposition: inline
-In-Reply-To: <20240522134001.tjgvzglufwmi3k75@imitate>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWA002.ant.amazon.com (10.13.139.12) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
+Once unix_sk(sk)->addr is assigned under net->unx.table.locks and
+unix_sk(sk)->bindlock, *(unix_sk(sk)->addr) and unix_sk(sk)->path are
+fully set up, and unix_sk(sk)->addr is never changed.
 
---ppzR8UWyzGuYSJha
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+unix_getname() and unix_copy_addr() access the two fields locklessly,
+and commit ae3b564179bf ("missing barriers in some of unix_sock ->addr
+and ->path accesses") added smp_store_release() and smp_load_acquire()
+pairs.
 
-On Wed, May 22, 2024 at 08:40:01AM -0500, Nishanth Menon wrote:
-> On 11:25-20240522, Conor Dooley wrote:
-> > On Wed, May 22, 2024 at 10:04:39AM +0200, Paolo Abeni wrote:
-> > > On Mon, 2024-05-20 at 15:18 -0500, Rob Herring wrote:
-> > > > On Mon, May 20, 2024 at 06:17:52PM +0100, Conor Dooley wrote:
-> > > > > On Sat, May 18, 2024 at 02:18:55PM +0530, Kumar, Udit wrote:
-> > > > > > Hi Conor
-> > > > > >=20
-> > > > > > On 5/17/2024 8:11 PM, Conor Dooley wrote:
-> > > > > > > On Fri, May 17, 2024 at 03:39:20PM +0100, Conor Dooley wrote:
-> > > > > > > > On Fri, May 17, 2024 at 04:12:26PM +0530, Udit Kumar wrote:
-> > > > > > > > > Modify license to include dual licensing as GPL-2.0-only =
-OR MIT
-> > > > > > > > > license for TI specific phy header files. This allows for=
- Linux
-> > > > > > > > > kernel files to be used in other Operating System ecosyst=
-ems
-> > > > > > > > > such as Zephyr or FreeBSD.
-> > > > > > > > What's wrong with BSD-2-Clause, why not use that?
-> > > > > > > I cut myself off, I meant to say:
-> > > > > > > What's wrong with BSD-2-Clause, the standard dual license for
-> > > > > > > bindings, why not use that?
-> > > > > >=20
-> > > > > > want to be inline with License of top level DTS, which is inclu=
-ding this
-> > > > > > header file
-> > > > >=20
-> > > > > Unless there's a specific reason to use MIT (like your legal won'=
-t even
-> > > > > allow you to use BSD-2-Clause) then please just use the normal li=
-cense
-> > > > > for bindings here.
-> > > >=20
-> > > > Aligning with the DTS files is enough reason for me as that's where=
-=20
-> > > > these files are used. If you need to pick a permissive license for =
-both,=20
-> > > > then yes, use BSD-2-Clause. Better yet, ask your lawyer.
-> > >=20
-> > > Conor would you agree with Rob? - my take is that he is ok with this
-> > > patch.
-> >=20
-> > I don't think whether or not I agree matters, Rob said it's fine so it's
-> > fine.
->=20
-> Just to close the loop here: Udit pointed me to this thread and having
-> gone through this already[1] with internal TI teams, the feedback we
-> have gotten from our licensing team (including legal) is to go with
-> GPL2 or MIT. BSD (2 and 3 clauses) were considered, but due to varied
-> reasons, dropped.
+In other functions, we still read unix_sk(sk)->addr locklessly to check
+if the socket is bound, and KCSAN complains about it.  [0]
 
-> [1] https://serenity.dal.design.ti.com/lore/linux-patch-review/2024010923=
-1804.3879513-1-nm@ti.com/
+Given these functions have no dependency for *(unix_sk(sk)->addr) and
+unix_sk(sk)->path, READ_ONCE() is enough to annotate the data-race.
 
-FWIW, this is some internal-only link.
+Note that it is safe to access unix_sk(sk)->addr locklessly if the socket
+is found in the hash table.  For example, the lockless read of otheru->addr
+in unix_stream_connect() is safe.
 
+Note also that newu->addr there is of the child socket that is still not
+accessible from userspace, and smp_store_release() publishes the address
+in case the socket is accept()ed and unix_getname() / unix_copy_addr()
+is called.
 
---ppzR8UWyzGuYSJha
-Content-Type: application/pgp-signature; name="signature.asc"
+[0]:
+BUG: KCSAN: data-race in unix_bind / unix_listen
 
------BEGIN PGP SIGNATURE-----
+write (marked) to 0xffff88805f8d1840 of 8 bytes by task 13723 on cpu 0:
+ __unix_set_addr_hash net/unix/af_unix.c:329 [inline]
+ unix_bind_bsd net/unix/af_unix.c:1241 [inline]
+ unix_bind+0x881/0x1000 net/unix/af_unix.c:1319
+ __sys_bind+0x194/0x1e0 net/socket.c:1847
+ __do_sys_bind net/socket.c:1858 [inline]
+ __se_sys_bind net/socket.c:1856 [inline]
+ __x64_sys_bind+0x40/0x50 net/socket.c:1856
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x46/0x4e
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZk4RRgAKCRB4tDGHoIJi
-0m8iAP9jFWjwj8aEFrkB3HLKIlQDhPOWBuiUMMerAM0cG0KaMgD+NODN0v5Iasoe
-aS9UOo2PdFpVa3pipDsLL4zD3r8rkwE=
-=rWro
------END PGP SIGNATURE-----
+read to 0xffff88805f8d1840 of 8 bytes by task 13724 on cpu 1:
+ unix_listen+0x72/0x180 net/unix/af_unix.c:734
+ __sys_listen+0xdc/0x160 net/socket.c:1881
+ __do_sys_listen net/socket.c:1890 [inline]
+ __se_sys_listen net/socket.c:1888 [inline]
+ __x64_sys_listen+0x2e/0x40 net/socket.c:1888
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x4f/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x46/0x4e
 
---ppzR8UWyzGuYSJha--
+value changed: 0x0000000000000000 -> 0xffff88807b5b1b40
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 1 PID: 13724 Comm: syz-executor.4 Not tainted 6.8.0-12822-gcd51db110a7e #12
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzkaller <syzkaller@googlegroups.com>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+v2: Add explanation why lockless read of otheru->addr is safe in
+    unix_stream_connect()
+
+v1: https://lore.kernel.org/netdev/20240518000148.27947-1-kuniyu@amazon.com/
+---
+ net/unix/af_unix.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index ca101690e740..92a88ac070ca 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -731,7 +731,7 @@ static int unix_listen(struct socket *sock, int backlog)
+ 	if (sock->type != SOCK_STREAM && sock->type != SOCK_SEQPACKET)
+ 		goto out;	/* Only stream/seqpacket sockets accept */
+ 	err = -EINVAL;
+-	if (!u->addr)
++	if (!READ_ONCE(u->addr))
+ 		goto out;	/* No listens on an unbound socket */
+ 	unix_state_lock(sk);
+ 	if (sk->sk_state != TCP_CLOSE && sk->sk_state != TCP_LISTEN)
+@@ -1369,7 +1369,7 @@ static int unix_dgram_connect(struct socket *sock, struct sockaddr *addr,
+ 
+ 		if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
+ 		     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
+-		    !unix_sk(sk)->addr) {
++		    !READ_ONCE(unix_sk(sk)->addr)) {
+ 			err = unix_autobind(sk);
+ 			if (err)
+ 				goto out;
+@@ -1481,7 +1481,8 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+ 		goto out;
+ 
+ 	if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
+-	     test_bit(SOCK_PASSPIDFD, &sock->flags)) && !u->addr) {
++	     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
++	    !READ_ONCE(u->addr)) {
+ 		err = unix_autobind(sk);
+ 		if (err)
+ 			goto out;
+@@ -1951,7 +1952,8 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	}
+ 
+ 	if ((test_bit(SOCK_PASSCRED, &sock->flags) ||
+-	     test_bit(SOCK_PASSPIDFD, &sock->flags)) && !u->addr) {
++	     test_bit(SOCK_PASSPIDFD, &sock->flags)) &&
++	    !READ_ONCE(u->addr)) {
+ 		err = unix_autobind(sk);
+ 		if (err)
+ 			goto out;
+-- 
+2.30.2
+
 
