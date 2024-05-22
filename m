@@ -1,80 +1,84 @@
-Return-Path: <netdev+bounces-97621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D68FF8CC69C
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 20:55:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851B08CC6CC
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 21:21:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1342B1C2198B
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 18:55:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DD50281BB4
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 19:21:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFC714659F;
-	Wed, 22 May 2024 18:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B5E1422B0;
+	Wed, 22 May 2024 19:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HcjI3aEZ"
+	dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b="RxTiNusr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-in-1.gedalya.net (mail.gedalya.net [170.39.119.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8346B142621;
-	Wed, 22 May 2024 18:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B091CD51E
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 19:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.39.119.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716404099; cv=none; b=U5CYLjvsPlk8uCH47sHVZh/zGJ6kf175SYqEubX7vXVUsq4k5eV4Cc8RZSgDmGqyZVPPITHy3yVHOw4c6jOYGKZQKsj0W0jopIdmoni2YUg0UuwUVcqnNAvFgJxznMnusdkiK2t88uBB9KbjrCGqdZW+eiPRgdL9sIB8+MJYwVk=
+	t=1716405672; cv=none; b=kF80KGV53Hy0api2FFSXZCMOvoHw94OdgQRTFBjNqSuAF5P+4tTAw4r0sNe//1B32d+MFr7yykyklmpFcplT7o7jd2IpGrtoh859qCmFwEjt9sZZexgnzLxffARDYrWzd/A8F+Vmav8AHdB5t7ORw46St84wnVIHwltxHD2ZPUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716404099; c=relaxed/simple;
-	bh=AJDbIwZZLkNBkgAXspeW7IDZ79hlwr0DhW6dRqxnk6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fvC/GXOAzVkFwh7yXUZBy/r4+9usaoR7UCnW3c14Y275NJ6c4fJiP+Ri86ZVBonn56up6XjKMPg8Hg/OW8kmJyNhrn7bbxtaz8FjSAmFUPrxYtdHiBiVTaw/4SguBKPnJnGYK7LqaWtJf50iLEDqKa4KhXbsxW5q/aHqyXkMNkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HcjI3aEZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB4B9C2BBFC;
-	Wed, 22 May 2024 18:54:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716404099;
-	bh=AJDbIwZZLkNBkgAXspeW7IDZ79hlwr0DhW6dRqxnk6Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HcjI3aEZdYC9r0mQQaV3YPTP7U+V+HZaw+dv2wkABfSDL2t3UNG6cifmoFzCg2cuk
-	 niu5Inu0UX4jwvBzXVxymatLBPIbVZ1Mu6C/sTrZ/+5QLPBBA7UYlEbB3Fph7yaiwe
-	 uSEaetw6Zy0sOTyZERMDkXdBQxZc4uQssgslRLPp1BTtLro8KmZBwcaXgQyIi4REbY
-	 bKuTMPYStA5FeANHOiori9CkwxbXIVyA2DWfA1VbtVunleMuFemyBpIVWkuSWHMP2H
-	 LFHggYly5CJHmxZS8+wB1uO8aU56U3SgOR9usBH29tPViv8u457YDeNpcqwxQ6p328
-	 kcqru0noJqt6Q==
-Date: Wed, 22 May 2024 11:54:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lars Kellogg-Stedman <lars@oddbit.com>
-Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3] ax25: Fix refcount imbalance on inbound connections
-Message-ID: <20240522115458.3634a1ae@kernel.org>
-In-Reply-To: <yzz225joxbxptlrdqjr4u2cwk4myactk6ozz7bfpv25dqbzri4@mz5ocbxbefxp>
-References: <46ydfjtpinm3py3zt6lltxje4cpdvuugaatbvx4y27m7wxc2hz@4wdtoq7yfrd5>
-	<20240521182323.600609-3-lars@oddbit.com>
-	<20240522100701.4d9edf99@kernel.org>
-	<yzz225joxbxptlrdqjr4u2cwk4myactk6ozz7bfpv25dqbzri4@mz5ocbxbefxp>
+	s=arc-20240116; t=1716405672; c=relaxed/simple;
+	bh=Sk5zse0IhIruaguXl992OXCDVIoIwnGTwaTDKG2jJqI=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=i7OO/QTM74vhIP/wYr10uJXoswWbbG7pdHEmL3dcZFmbciuJZM+u2+IpI9wr6GCGUVezGQtQy762yICqbiPAficsQoih8NEWSeFzZP+DHAydU7ib5vFYd1jV9ioiSXWDTVmbpczrc6jWsky+QILRZJBdCx3Ir/wVvN81TWPSeMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net; spf=pass smtp.mailfrom=gedalya.net; dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b=RxTiNusr; arc=none smtp.client-ip=170.39.119.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gedalya.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gedalya.net
+	; s=rsa1; h=Content-Transfer-Encoding:Content-Type:Subject:From:To:
+	MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
+	Content-Description; bh=Sk5zse0IhIruaguXl992OXCDVIoIwnGTwaTDKG2jJqI=; b=RxTiN
+	usrlFplFAc2Hv5RRtPHfdnULRvKFAgMWcqV9oooz9yO4FXnX6Gm+mXxxorM6Y3OqN+ZRFooaLWRVL
+	axEElRr0KuPkMW6JNfhcTugCjDhd7GeN+0WjnHgBMWMw5MazT1lMqF88hEqSTPlpH+VOirBwB7Aqw
+	gBGWv0680WkcPMk6BvoVvBeHJpCX27OQcuzDZYPvzipz5lZyJQdzziR62raq+8rewszSCwAb0Pops
+	u5TJdtI8zg0uLAGr1jIELUavQFruR61/PLS6jNpr5PoKTqGamm7bLg5Kz+9+Xh8IVBhY3qAZdG6h5
+	0lCJ1Bxb9njuO8jSUxTNE3kw9Zzqw==;
+Received: from [192.168.9.10]
+	by smtp-in-1.gedalya.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <gedalya@gedalya.net>)
+	id 1s9rWP-000ecY-0K
+	for netdev@vger.kernel.org;
+	Wed, 22 May 2024 19:21:09 +0000
+Message-ID: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
+Date: Thu, 23 May 2024 03:21:07 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+To: netdev@vger.kernel.org
+Content-Language: en-US
+From: Gedalya <gedalya@gedalya.net>
+Subject: iproute2: color output should assume dark background
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Wed, 22 May 2024 14:25:36 -0400 Lars Kellogg-Stedman wrote:
-> > Please CC maintainers (per script/get_maintainer.pl)  
-> 
-> ...the ax.25 tree is currently orphaned:
-> 
->     AX.25 NETWORK LAYER
->     L:	linux-hams@vger.kernel.org
->     S:	Orphan
->     W:	https://linux-ax25.in-berlin.de
->     F:	include/net/ax25.h
->     F:	include/uapi/linux/ax25.h
->     F:	net/ax25/
+Hello,
 
-Fair point, but get_maintainer acts in a bit of a hierarchical fashion,
-so since we don't have AX25 maintainer and dedicated tree - the general
-networking maintainers should get CCed
+Debian is now building iproute2 with color output on by default. This brings attention to the fact that iproute2 defaults to a color palette suitable for light backgrounds.
+
+The COLORFGBG environment variable, if present and correctly set would select a dark background. However COLORFGBG is neither ubiquitous nor standard. It wouldn't typically be present in a non-graphical vt, nor is it presnet in XFCE and many other desktop environments.
+
+Dark backgrounds seem to be the more common default, and it seems many people stick to that in actual use.
+
+The dark blue used by the ip command for IPv6 addresses is particularly hard to read on a dark background. It's really important for the ip command to provide basic usability e.g. when manually bringing up networking at the console in an emergency. I find that fiddling with extra details just to disable or improve the colors would be an unwelcome nuisance in such situations, but the Debian maintainer outright refuses to revert this change, without explanation or discussion.
+
+Instead the maintainer suggested I submit a patch upstream, which I will do. I've never contributed here before, so your patience and guidance would be very highly appreciated.
+
+Ref: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1071582
+
+Thanks,
+
+Gedalya
+
+
 
