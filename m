@@ -1,135 +1,126 @@
-Return-Path: <netdev+bounces-97587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4C0E8CC30C
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 16:19:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 547FB8CC323
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 16:22:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D89B1F222D7
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 14:19:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E76E283545
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 14:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3587E147C7D;
-	Wed, 22 May 2024 14:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22DF14039D;
+	Wed, 22 May 2024 14:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="OhtK3LO6";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="Xtvp2Z9F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nNFOnYu0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80D2B1474B8;
-	Wed, 22 May 2024 14:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728DA13DBA4;
+	Wed, 22 May 2024 14:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716387403; cv=none; b=GL9AB7ZjqE1F8cV4Z5t4ZYkM8KWz1F7zBb22AAKBhOFImSubfVvq1FC8Rk2+M0IzPmvWP535gbZvFiuj/xnWO0saznXSqi3fvgSw7us3Hj6Kwe682SIuuTwGtvZVwAkiO1IWHfwnAjg/0hmMARQKPTzT+gpOLsRiKxp/6quR6Hw=
+	t=1716387734; cv=none; b=uXasys1KXPcd/fJUVgWdnF9fASOO5i54/HDuUM5Hrsoe2MIPUCVmdJ7uvy/7Ty8BE8k5bOQnCZDgZ+m3lNUoHHUbY6QHZke6Jhn2UhuQvhWcFIi5Jac5JAZa0Jdff0fpyTlx9G7dNcbckNz4wJvtJq6btroeiMhdP8ZDC8bWs7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716387403; c=relaxed/simple;
-	bh=OdGZx35Xq/K2qo+2VemsbuBTb2vtHnLZgwqnHGj6dHs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=fSu7gLo86DopVopCeJyCkYgnqz8SsX/ZZwUBsNtc3ti/urA+9W9KOMVQxQTSeqjs8haB+YYbgYoqmZBD6Evm8d7TJLkU+yGHowfRggbHHBfbVB8EqIhgGY4Yhstjc/OCQc2G5edSltY7OMF30VeriA923LZWivye6IUsUAmmmFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=OhtK3LO6; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=Xtvp2Z9F reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1716387401; x=1747923401;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=cyyRUEqHorrucwPwnV8fQCfXT5oEDfauIgMMG9jC7FM=;
-  b=OhtK3LO6mQK1CAu941DUpr0sFsYbPAPQ4uoLBWCfwPBL815os6fZIAfD
-   +MOrWEFmyU3SSg2/18qGngy3b1am7PH7iVeGpULZlTBZQkKslpLAtSd8B
-   +vBId8I3DPMvHnx2G/v29rjATRcVxq6zOTSZ4syWwHNDjJdsDMiOPm7BL
-   rJvLnOD5CgngDcfgG2IRrq5Lntcj14FTFda/e6nHq6yvVQSfWAXMyNXND
-   8yGSJrDiqNG5Qgs+b/r7YediSdiXfs/erCs1vuj6FzavUPx+CWX3VSKjZ
-   /4skJkTiJG2Yh0Q3G9BpGZ890P6W6Gr31uC9qs3jQ87Pcfm61I2EXitqR
-   g==;
-X-CSE-ConnectionGUID: BDwKn6HkTBi+ipyCzc3sRA==
-X-CSE-MsgGUID: 26cSOEZTSQS/O1T9RwEotA==
-X-IronPort-AV: E=Sophos;i="6.08,179,1712613600"; 
-   d="scan'208";a="37017683"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 22 May 2024 16:16:40 +0200
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C163316EF06;
-	Wed, 22 May 2024 16:16:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1716387395;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=cyyRUEqHorrucwPwnV8fQCfXT5oEDfauIgMMG9jC7FM=;
-	b=Xtvp2Z9F7vtHnA4uHwqzd40sVd/Le0dBcX3UpZTVqoSUvxjJM1GJ/jCqtNkTAi69/lSCfe
-	vEpoYeR2EQAD0vWJ/3BNCWqWsuR9cmL2Y5Kmmu/MUlg4ICc/L0pXPDzhdXxU4H4PB3FnEd
-	H9Q0d2VSDH+SUjDq2B4v610Y04YjLOn6BusDF4b6iPJ9Ps9Kc4qhev2UY90bSHRjI9DO5l
-	8Vse0Tvngqq4wNHWEtcRK3bs2uycKS1E2r2np8W2LL4IlG7V2UFNxYCz0eSjrFEkGAYzLh
-	YDldi4w3XNcKVjIriev3PR2xjA8xzwpKNnAG/pmwD9PeStyjLLc7vBfK0/wMOg==
-From: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Date: Wed, 22 May 2024 16:15:25 +0200
-Subject: [PATCH RESEND v3 8/8] dt-bindings: can: mcp251xfd: add
- gpio-controller property
+	s=arc-20240116; t=1716387734; c=relaxed/simple;
+	bh=LJl1i0W4EXotAHG6nsa5glp9lSWgRODR5PILl5J3OSg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OXINBOWXb/Bz04vcRiK3lzMy+JVcg1WG+8bzFjwS89e1mhubKohpejkHTPOI4mCaWf4O7CEN1SogqKwGdFkw5WtQHMwW1qCPYXEuTs5Cmxn9+btoja6wB2scUT0JO8XLGk6CZdaeQfg3MGIeh0IJwK4qcFkvyYQ2zRSLKwCdC8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nNFOnYu0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74F5AC32782;
+	Wed, 22 May 2024 14:22:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716387734;
+	bh=LJl1i0W4EXotAHG6nsa5glp9lSWgRODR5PILl5J3OSg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nNFOnYu0LvkD8jM3Vk8qKMcoXnpxPkVdqgLyLfw+dILH0Kdt5fZXmclevA15f04kT
+	 07NipmFqpRIHZB9riYNK+1jSpi+Imnt4kMQv7dx2z6XkhiKKJ7KEf3RkdS3XXUUQCi
+	 et2ECh+Tr9FAnlKvtqx1UCkt/G/qvhK9msrujcDRcBFFs/quWOXkkdt8OiXoeSPfwF
+	 1l4pJjFbha7C5H4wnOwDL6dhHyxbjuTZ7XK9Z7VJfsh6p/JVxfI3xGIoEGVdqV1lng
+	 R2KBjPWJ8vh2ThlCZbf7ukqmkIUbBZsPxRztxFFpAnMTsgtljNhl4fp4Aik/88KiM+
+	 9Vbo26v2RIhUA==
+Date: Wed, 22 May 2024 07:22:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: Ido Schimmel <idosch@nvidia.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
+ "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "sdf@google.com"
+ <sdf@google.com>, "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
+ "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
+ "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+ "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
+ "ahmed.zaki@intel.com" <ahmed.zaki@intel.com>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, "shayagr@amazon.com" <shayagr@amazon.com>,
+ "paul.greenwalt@intel.com" <paul.greenwalt@intel.com>, "jiri@resnulli.us"
+ <jiri@resnulli.us>, "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>, Petr Machata
+ <petrm@nvidia.com>
+Subject: Re: [PATCH net-next v5 04/10] ethtool: Add flashing transceiver
+ modules' firmware notifications ability
+Message-ID: <20240522072212.7a21c84b@kernel.org>
+In-Reply-To: <DM6PR12MB451677DBA41EA8A622D3D446D8EB2@DM6PR12MB4516.namprd12.prod.outlook.com>
+References: <20240424133023.4150624-1-danieller@nvidia.com>
+	<20240424133023.4150624-5-danieller@nvidia.com>
+	<20240429201130.5fad6d05@kernel.org>
+	<DM6PR12MB45168DC7D9D9D7A5AE3E2B2DD81A2@DM6PR12MB4516.namprd12.prod.outlook.com>
+	<20240430130302.235d612d@kernel.org>
+	<ZjH1DCu0rJTL_RYz@shredder>
+	<20240501073758.3da76601@kernel.org>
+	<DM6PR12MB451687C3C54323473716621ED8EB2@DM6PR12MB4516.namprd12.prod.outlook.com>
+	<20240522064519.3e980390@kernel.org>
+	<DM6PR12MB451677DBA41EA8A622D3D446D8EB2@DM6PR12MB4516.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240522-mcp251xfd-gpio-feature-v3-8-8829970269c5@ew.tq-group.com>
-References: <20240522-mcp251xfd-gpio-feature-v3-0-8829970269c5@ew.tq-group.com>
-In-Reply-To: <20240522-mcp251xfd-gpio-feature-v3-0-8829970269c5@ew.tq-group.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>, 
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
- Thomas Kopp <thomas.kopp@microchip.com>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
- linux@ew.tq-group.com, gregor.herburger@ew.tq-group.com, 
- Linus Walleij <linus.walleij@linaro.org>, 
- Bartosz Golaszewski <brgl@bgdev.pl>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1716387339; l=932;
- i=gregor.herburger@ew.tq-group.com; s=20230829; h=from:subject:message-id;
- bh=OdGZx35Xq/K2qo+2VemsbuBTb2vtHnLZgwqnHGj6dHs=;
- b=OHtY6KgFHG+iBUfU0YBi281KIdVWaWQqMvJEoo8s8rPb9hdJExEcAPRb2QmRbXMuZTf4sVFDy
- jVRGwKMAsJ5BCrxiESFhn31aXVnwvNGsvafRMVWsvi6jf3Rv++Lck6U
-X-Developer-Key: i=gregor.herburger@ew.tq-group.com; a=ed25519;
- pk=+eRxwX7ikXwazcRjlOjj2/tbDmfVZdDLoW+xLZbQ4h4=
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-The mcp251xfd has two pins that can be used as gpio. Add gpio-controller
-property to binding description.
+On Wed, 22 May 2024 13:56:11 +0000 Danielle Ratson wrote:
+> > > 4. Add a new netlink notifier that when the relevant event takes plac=
+e, =20
+> > deletes the node from the list, wait until the end of the work item, wi=
+th
+> > cancel_work_sync() and free allocations.
+> >=20
+> > What's the "relevant event" in this case? Closing of the socket that us=
+er had
+> > issued the command on? =20
+>=20
+> The event should match the below:
+> event =3D=3D NETLINK_URELEASE && notify->protocol =3D=3D NETLINK_GENERIC
+>=20
+> Then iterate over the list to look for work that matches the dev and port=
+id.
+> The socket doesn=E2=80=99t close until the work is done in that case.=20
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Signed-off-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
----
- Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml | 5 +++++
- 1 file changed, 5 insertions(+)
+Okay, good, yes. I think you can use one of the callbacks I mentioned
+below to achieve the same thing with less complexity than the notifier.
 
-diff --git a/Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml b/Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml
-index 2a98b26630cb..e9605a75c45b 100644
---- a/Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml
-+++ b/Documentation/devicetree/bindings/net/can/microchip,mcp251xfd.yaml
-@@ -49,6 +49,11 @@ properties:
-       Must be half or less of "clocks" frequency.
-     maximum: 20000000
- 
-+  gpio-controller: true
-+
-+  "#gpio-cells":
-+    const: 2
-+
- required:
-   - compatible
-   - reg
+> > Easiest way to "notice" the socket got closed would probably be to add =
+some
+> > info to genl_sk_priv_*(). ->sock_priv_destroy() will get called. But yo=
+u can also
+> > get a close notification in the family =20
+> > ->unbind callback. =20
+> >=20
+> > I'm on the fence whether we should cancel the work. We could just mark =
+the
+> > command as 'no socket present' and stop sending notifications.
+> > Not sure which is better.. =20
+>=20
+> Is there a scenario that we hit this event and won't intend to cancel the=
+ work?=20
 
--- 
-2.34.1
-
+I think it's up to us. I don't see any legit reason for user space to
+intentionally cancel the flashing. So the only option is that user space
+is either buggy or has crashed, and the socket got closed before
+flashing finished. Right?
 
