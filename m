@@ -1,288 +1,77 @@
-Return-Path: <netdev+bounces-97571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32F1F8CC2A8
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 15:59:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 731688CC2AB
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 15:59:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD3352836D0
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 13:59:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4D581C22ADE
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 13:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB6A14882D;
-	Wed, 22 May 2024 13:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C0F1411E0;
+	Wed, 22 May 2024 13:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YsjodTtQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WuFOrhMx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184A613F44F;
-	Wed, 22 May 2024 13:55:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD4D1411D2
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 13:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716386146; cv=none; b=GqjelPWLGrUG4FFFyFG3OcSm2d+zavim+EktIWkfBKLKpjIrRYsiWHH9+iSauaZ0lQWmyHDQwJBaFsGb9GShx38YsxcLwtaUfYX7Wu7tcZpNDTbfKeJ7d2XmOGrxxpuwoScvCakz01L0XCVnS2VEaW1mDZ4tz4ek5T6IJ4yvTvY=
+	t=1716386152; cv=none; b=AHNJgB4DQ3hDEH3KGF8B9TKMrc551ssS/bAzXIRoS9mj5pgT1YUf1TiS90D6wMVZprcIbabuALp+olmwUHSw1+ADEguJ31wGZjRAw9YAzH9AsS7fgLP/lT/HUCwS+70CpjFqrxzISeKayDCoxGe0D5ahDtFS5BdL28QfWgogkZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716386146; c=relaxed/simple;
-	bh=Fv4RgdofNF0g1JF1RNb7kP1z5vab40UP16jtAY2qMKY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K0bdUs79/6ytcnaJZ6tNIp5X6zEH+GqjXRDlDJfh4kgZwd8EnHGESH45vNHiXenZnMjbz8mbl5VFAmv7+fa0RZucL/6jUSYvEs210VasvwqxD7HxXTGLbcDCN6spqYNK6NYMbsdl0sApHpo3n7PIPdOCHQwGoXX/RvDb0jdV84U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=YsjodTtQ; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44MCqdEr013781;
-	Wed, 22 May 2024 13:55:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2023-11-20;
- bh=cjEST1jMAgisAXPjhkC6jVf+PoUCWzwnDuoQDxOX6/o=;
- b=YsjodTtQ2/cQ+NNKK2zGwVP68kZYMxe8mr4oFhj/27bFMZ15T/FdiSux5vH56bZokVF3
- p02XGtQkMcO7lCqOZR3yg+5ZEJ0CNIbVD4V3Z8rd0fhG8/F8t95LXK3DvdhiQBUMMtf5
- Jzgrj70BuxDvFqCuWa5H6WX7X4qGUCSHdA/DHzMeJ59WhM43RYz/2rBpKLSUaYb+34jU
- BZv6iR76VQ4leDqUVF//dQYhhDoO9LOcbocw5r5HxAhTqCmMNIspcZw0yajCL5Uoh7vZ
- oUkvcwa+ugYW1q2zxymQByLz7ITVJFVriLSffworKkvhplgd7V3Qu2sZ2SZKUvzzObow Kg== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3y6mcdyt6r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 22 May 2024 13:55:30 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 44MC6s1B019593;
-	Wed, 22 May 2024 13:55:29 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3y6js98tsn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 22 May 2024 13:55:29 +0000
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44MDsm3M016070;
-	Wed, 22 May 2024 13:55:29 GMT
-Received: from lab61.no.oracle.com (lab61.no.oracle.com [10.172.144.82])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3y6js98su1-13;
-	Wed, 22 May 2024 13:55:28 +0000
-From: =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>
-To: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-        Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Tejun Heo <tj@kernel.org>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Allison Henderson <allison.henderson@oracle.com>,
-        Manjunath Patil <manjunath.b.patil@oracle.com>,
-        Mark Zhang <markzhang@nvidia.com>,
-        =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Shiraz Saleem <shiraz.saleem@intel.com>,
-        Yang Li <yang.lee@linux.alibaba.com>
-Subject: [PATCH v3 6/6] workqueue: Inherit per-process allocation flags
-Date: Wed, 22 May 2024 15:54:44 +0200
-Message-Id: <20240522135444.1685642-13-haakon.bugge@oracle.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240522135444.1685642-1-haakon.bugge@oracle.com>
-References: <20240522135444.1685642-1-haakon.bugge@oracle.com>
+	s=arc-20240116; t=1716386152; c=relaxed/simple;
+	bh=+tMwcoL79gLi0nujiJ3sXxygAakt7dyZpS/QD3y71Vg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=THz3E03Zq25Hj9Bj2RUIYcUqXDGohtTovhkl9dqdveSE3Da8WyMpaxgal3ip7R+pIiKePmNtaSAkvuPXlESEVabvcse04LDxohclgZROQIS0XQJOLPep6geBxi5W6F+wN6oBXXueI+r0ilZWZdm3X9g0F63ye9ePEu5Yh+repG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WuFOrhMx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 771CBC2BBFC;
+	Wed, 22 May 2024 13:55:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716386151;
+	bh=+tMwcoL79gLi0nujiJ3sXxygAakt7dyZpS/QD3y71Vg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WuFOrhMxd6OGw7EhgVcxQIxL2QDntzvGop7QZLr7iyjCf/I8VwmRmdV5KqiYwbgFh
+	 sfUeJQswkHs8detrPRlGxZhq3Vk8kI5gKTleYS+fz8iG7KL4dhgXOWob0raRfl+vpZ
+	 TH7II8l+IkmbUd5U67JQxGNrqLQDSNMuCtUS8a26JBj+23B55WWdpN/IY6wlJx6gpG
+	 l0lJ9WxIZcNk9cGRgfZtChjCH5Pf5R1mQORYcRQa+A/urZlQiGXtbfd+W4cq8BEyPq
+	 4iLQ39GrZg0PDyoadPx9h5CNQ34mO6VL+1sIYCU2ZtMS/W1bH6nR+onWDjty699kIz
+	 lK42GJv9ZFAMQ==
+Date: Wed, 22 May 2024 06:55:50 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Ken Milmore <ken.milmore@gmail.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Realtek
+ linux nic maintainers <nic_swsd@realtek.com>, Eric Dumazet
+ <edumazet@google.com>
+Subject: Re: r8169: Crash with TX segmentation offload on RTL8125
+Message-ID: <20240522065550.32d37359@kernel.org>
+In-Reply-To: <75df2de0-9e32-475d-886c-0e65d7cfba1e@gmail.com>
+References: <b18ea747-252a-44ad-b746-033be1784114@gmail.com>
+	<75df2de0-9e32-475d-886c-0e65d7cfba1e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-22_07,2024-05-22_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 spamscore=0
- adultscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2405220093
-X-Proofpoint-ORIG-GUID: eUWMZFAEmmP3H6GkpJe4GjZk2_mD0AC3
-X-Proofpoint-GUID: eUWMZFAEmmP3H6GkpJe4GjZk2_mD0AC3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-For drivers/modules running inside a memalloc_flags_{save,restore}
-region, if a work-queue is created, we make sure work executed on the
-work-queue inherits the same flag(s).
+On Fri, 17 May 2024 15:21:00 -0700 Florian Fainelli wrote:
+> > The patch below fixes the problem, by simply reading nr_frags a bit later, after the checksum stage.  
+> 
+> Yeah, that's an excellent catch and one that is bitten us before, too:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=20d1f2d1b024f6be199a3bedf1578a1d21592bc5
+> 
+> unclear what we would do in skb_shinfo() to help driver writers, rather 
+> than rely upon code inspection to find such bugs.
 
-This in order to conditionally enable drivers to work aligned with
-block I/O devices. This commit makes sure that any work queued later
-on work-queues created during module initialization, when current's
-flags has any of the PF_MEMALLOC* set, will inherit the same flags.
-
-We do this in order to enable drivers to be used as a network block
-I/O device. This in order to support XFS or other file-systems on top
-of a raw block device which uses said drivers as the network transport
-layer.
-
-Under intense memory pressure, we get memory reclaims. Assume the
-file-system reclaims memory, goes to the raw block device, which calls
-into said drivers. Now, if regular GFP_KERNEL allocations in the
-drivers require reclaims to be fulfilled, we end up in a circular
-dependency.
-
-We break this circular dependency by:
-
-1. Force all allocations in the drivers to use GFP_NOIO, by means of a
-   parenthetic use of memalloc_flags_{save,restore} on all relevant
-   entry points, setting/clearing the PF_MEMALLOC_NOIO bit.
-
-2. Make sure work-queues inherits current->flags
-   wrt. PF_MEMALLOC_NOIO, such that work executed on the
-   work-queue inherits the same flag(s). That is what this commit
-   contributes with.
-
-Signed-off-by: Håkon Bugge <haakon.bugge@oracle.com>
-
----
-
-v2 -> v3:
-   * Add support for all PF_MEMALLOC* flags
-   * Re-worded commit message
-
-v1 -> v2:
-   * Added missing hunk in alloc_workqueue()
----
- include/linux/workqueue.h |  9 ++++++
- kernel/workqueue.c        | 60 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+)
-
-diff --git a/include/linux/workqueue.h b/include/linux/workqueue.h
-index fb39938945365..f8c87f824272b 100644
---- a/include/linux/workqueue.h
-+++ b/include/linux/workqueue.h
-@@ -406,9 +406,18 @@ enum wq_flags {
- 	__WQ_DRAINING		= 1 << 16, /* internal: workqueue is draining */
- 	__WQ_ORDERED		= 1 << 17, /* internal: workqueue is ordered */
- 	__WQ_LEGACY		= 1 << 18, /* internal: create*_workqueue() */
-+	__WQ_MEMALLOC		= 1 << 19, /* internal: execute work with MEMALLOC */
-+	__WQ_MEMALLOC_NOFS      = 1 << 20, /* internal: execute work with MEMALLOC_NOFS */
-+	__WQ_MEMALLOC_NOIO      = 1 << 21, /* internal: execute work with MEMALLOC_NOIO */
-+	__WQ_MEMALLOC_NORECLAIM = 1 << 22, /* internal: execute work with MEMALLOC_NORECLAIM */
-+	__WQ_MEMALLOC_NOWARN    = 1 << 23, /* internal: execute work with MEMALLOC_NOWARN */
-+	__WQ_MEMALLOC_PIN	= 1 << 24, /* internal: execute work with MEMALLOC_PIN */
- 
- 	/* BH wq only allows the following flags */
- 	__WQ_BH_ALLOWS		= WQ_BH | WQ_HIGHPRI,
-+
-+	__WQ_PF_MEMALLOC_MASK	= PF_MEMALLOC | PF_MEMALLOC_NOFS | PF_MEMALLOC_NOIO |
-+				  PF_MEMALLOC_NORECLAIM | PF_MEMALLOC_NOWARN | PF_MEMALLOC_PIN,
- };
- 
- enum wq_consts {
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index 003474c9a77d0..28ed6b9556e91 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -51,6 +51,7 @@
- #include <linux/uaccess.h>
- #include <linux/sched/isolation.h>
- #include <linux/sched/debug.h>
-+#include <linux/sched/mm.h>
- #include <linux/nmi.h>
- #include <linux/kvm_para.h>
- #include <linux/delay.h>
-@@ -3113,6 +3114,28 @@ static bool manage_workers(struct worker *worker)
- 	return true;
- }
- 
-+static unsigned int wq_build_memalloc_flags(struct pool_workqueue *pwq)
-+{
-+	unsigned int pf_flags = 0;
-+
-+#define BUILD_PF_FLAGS_FROM_WQ(name)			\
-+	do {						\
-+		if (pwq->wq->flags & __WQ_ ## name)	\
-+			pf_flags |= PF_ ## name;	\
-+	} while (0)
-+
-+	BUILD_PF_FLAGS_FROM_WQ(MEMALLOC);
-+	BUILD_PF_FLAGS_FROM_WQ(MEMALLOC_NOFS);
-+	BUILD_PF_FLAGS_FROM_WQ(MEMALLOC_NOIO);
-+	BUILD_PF_FLAGS_FROM_WQ(MEMALLOC_NORECLAIM);
-+	BUILD_PF_FLAGS_FROM_WQ(MEMALLOC_NOWARN);
-+	BUILD_PF_FLAGS_FROM_WQ(MEMALLOC_PIN);
-+
-+#undef BUILD_PF_FLAGS_FROM_WQ
-+
-+	return pf_flags;
-+}
-+
- /**
-  * process_one_work - process single work
-  * @worker: self
-@@ -3136,6 +3159,8 @@ __acquires(&pool->lock)
- 	unsigned long work_data;
- 	int lockdep_start_depth, rcu_start_depth;
- 	bool bh_draining = pool->flags & POOL_BH_DRAINING;
-+	unsigned int memalloc_flags = wq_build_memalloc_flags(pwq);
-+	unsigned int memalloc_flags_old;
- #ifdef CONFIG_LOCKDEP
- 	/*
- 	 * It is permissible to free the struct work_struct from
-@@ -3148,6 +3173,10 @@ __acquires(&pool->lock)
- 
- 	lockdep_copy_map(&lockdep_map, &work->lockdep_map);
- #endif
-+	/* Set inherited alloc flags */
-+	if (memalloc_flags)
-+		memalloc_flags_old = memalloc_flags_save(memalloc_flags);
-+
- 	/* ensure we're on the correct CPU */
- 	WARN_ON_ONCE(!(pool->flags & POOL_DISASSOCIATED) &&
- 		     raw_smp_processor_id() != pool->cpu);
-@@ -3284,6 +3313,10 @@ __acquires(&pool->lock)
- 
- 	/* must be the last step, see the function comment */
- 	pwq_dec_nr_in_flight(pwq, work_data);
-+
-+	/* Restore alloc flags */
-+	if (memalloc_flags)
-+		memalloc_flags_restore(memalloc_flags_old);
- }
- 
- /**
-@@ -5637,6 +5670,30 @@ static void wq_adjust_max_active(struct workqueue_struct *wq)
- 	} while (activated);
- }
- 
-+/**
-+ * wq_set_memalloc_flags - Test current->flags for PF_MEMALLOC_FOO_BAR
-+ * flag bits and set the corresponding __WQ_MEMALLOC_FOO_BAR in the
-+ * WQ's flags variable.
-+ * @flags_ptr: Pointer to wq->flags
-+ */
-+static void wq_set_memalloc_flags(unsigned int *flags_ptr)
-+{
-+#define TEST_PF_SET_WQ(name)				\
-+	do {						\
-+		if (current->flags & PF_ ## name)	\
-+			*flags_ptr |= __WQ_ ## name;	\
-+	} while (0)
-+
-+	TEST_PF_SET_WQ(MEMALLOC);
-+	TEST_PF_SET_WQ(MEMALLOC_NOFS);
-+	TEST_PF_SET_WQ(MEMALLOC_NOIO);
-+	TEST_PF_SET_WQ(MEMALLOC_NORECLAIM);
-+	TEST_PF_SET_WQ(MEMALLOC_NOWARN);
-+	TEST_PF_SET_WQ(MEMALLOC_PIN);
-+
-+#undef TEST_PF_SET_WQ
-+}
-+
- __printf(1, 4)
- struct workqueue_struct *alloc_workqueue(const char *fmt,
- 					 unsigned int flags,
-@@ -5695,6 +5752,9 @@ struct workqueue_struct *alloc_workqueue(const char *fmt,
- 
- 	/* init wq */
- 	wq->flags = flags;
-+	if (current->flags & __WQ_PF_MEMALLOC_MASK)
-+		wq_set_memalloc_flags(&wq->flags);
-+
- 	wq->max_active = max_active;
- 	wq->min_active = min(max_active, WQ_DFL_MIN_ACTIVE);
- 	wq->saved_max_active = wq->max_active;
--- 
-2.31.1
-
+I wonder if we should add a "error injection" hook under DEBUG_NET
+to force re-allocation of skbs in any helper which may cause it?
 
