@@ -1,299 +1,425 @@
-Return-Path: <netdev+bounces-97526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE40A8CBEE3
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 12:03:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 499DB8CBF6C
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 12:45:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63CD3282125
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:03:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEAA31F236F0
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379DF81AA7;
-	Wed, 22 May 2024 10:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420748002E;
+	Wed, 22 May 2024 10:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UKE5+R0D"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="xAy40Q09"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC087E761
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 10:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07AE1CFA8
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 10:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716372195; cv=none; b=iSQxXTZbmx86fLlZ29WYyJM66iarePtSVYk6upVsJP3FrLhyGIURq8m9oWPgi8VQrwn9eb1Aj87hMEzyjVR5N6UgLwik/TnVVzrTzJ5vyLRVUta+9IFmPAvpmtD9pN7A2ixyxJ8E2UieAmh3Uv180/VOxh5kbbk1yYKZj4nbyBc=
+	t=1716374748; cv=none; b=WBwmyTTCNGK6LOrpmOzAv/yJaIwlRss+u3IwqdCCxxox5xJY/yRv99Lvceac4UtLGcw9AaECuVprBlcFPsfIAA2VAYeSG5KPl6/JIxokcnU2VOBhios/PHf6m9wJrLfaTBEB6sEPX9PUvLQBJifb2IAkfjWdJ7/bCAjg8JqER0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716372195; c=relaxed/simple;
-	bh=KT41JCa9HFl7P78kOZALNdAss8MmzSOhVIiGOp14XbQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=rRZRB/n0bRnWRhIgRmuGKwhXDdqcPPMbxsek+aU8ngoo2oBDpNwQBglM7JoQ7z8qhWjfx26ycEMk8T1k4ygmH1xj6X1GXt5ANTpumUCloQgEAYAnlNXm6Gbz7KuvzMxRERM5JkH1dPMBptsQIq5ri2mfOpn37GPbc0kwy5qGuXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UKE5+R0D; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716372192;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=knfGlOrM7SmmEuODKlCIaTFOFJa3qZNF92wFTYElUIQ=;
-	b=UKE5+R0DVdD/aYNlE097EMOHxIyi/fysskgWajEtKHwXP3dwh9Db4wO98b6dAUZ3g8TSU7
-	mQbDcp/uf8YIBCU+9aDbnNQO1p93mMgOcasTvV/bI0Szf3KugzGQ096KNp7Q3I50ExuTjE
-	IeYfl+qRELJqHFUVKI7BFNY02qFYWHk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-73-H1iUtoBZPX2X6J5SGOLdqQ-1; Wed, 22 May 2024 06:03:09 -0400
-X-MC-Unique: H1iUtoBZPX2X6J5SGOLdqQ-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-34d7a7585d7so9720029f8f.2
-        for <netdev@vger.kernel.org>; Wed, 22 May 2024 03:03:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716372189; x=1716976989;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=knfGlOrM7SmmEuODKlCIaTFOFJa3qZNF92wFTYElUIQ=;
-        b=vOR/ZgyhAVbBMNdhnb5CCneoFc97ypFKnN2XSglKeRl7BDzTETQH7W7G7IDi3a+65O
-         n6/P2+3W8XuV6J26eHcJzr6CwnVGgnBwvCHI4/GLHG2y8aLwiJ793nzdJuQuMn5l4oou
-         0fh7JXJroFHd47pc06UyVJf8zQUCs0r5DLtjkqwqOxowPO4Iyt3yV/OaDtBT0uMjrO4n
-         BiTp6EBUneDKDU0VtI2xJtKP50edOTR0ZgwVO2WFAEW63iRTWJ5WqwnrNqpR1WL3Hofa
-         cZ8GPriW51//oLqnH32wh9kne79Wi5yFXt0jJnhqxexqE7hd28KUtLNo4Qz1mGgAhdhi
-         cAdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVBwf9zocFyR/4p5rvxKBR4PZhAU3/OKAPpf+5+lqcy8mJCPrOwEVrqpGVBtzJq0TBL1Hw3wTiwn4E3IXfj2Lt2Qjv+Q0jC
-X-Gm-Message-State: AOJu0YyA+WKZC8ReLPwUg88ia4MyzlUJI2JJhGQGEo21pUFNWTIiCF6l
-	KepPS6AUXrUVkHEiOV58G2xA2ezSXnGjYG0vRo0YrKGSRkUfBw1fyEKkrWCS8Xy+UloO33lHCqT
-	8wq5wbuIRRGh21Fz6xySrGLVyLfxSmHlivkrKJVxuqkanoqGgFiDUwQ==
-X-Received: by 2002:a05:6000:e81:b0:354:f2af:6ad2 with SMTP id ffacd0b85a97d-354f2af6ce6mr86040f8f.68.1716372188544;
-        Wed, 22 May 2024 03:03:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE4JD4hy648Vl10cTnw4UbRyOyD5/qdj2GTs8Izvh3XRzHLEkKuquqGU7Hg07yqa0KXqcFVVg==
-X-Received: by 2002:a05:6000:e81:b0:354:f2af:6ad2 with SMTP id ffacd0b85a97d-354f2af6ce6mr85988f8f.68.1716372187889;
-        Wed, 22 May 2024 03:03:07 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:55d:e862:558a:a573:a176:1825])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b8a78e8sm34236941f8f.61.2024.05.22.03.03.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 03:03:07 -0700 (PDT)
-Date: Wed, 22 May 2024 06:03:01 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	anton.yakovlev@opensynergy.com, bartosz.golaszewski@linaro.org,
-	christophe.jaillet@wanadoo.fr, dave.jiang@intel.com,
-	david@redhat.com, eperezma@redhat.com, herbert@gondor.apana.org.au,
-	jasowang@redhat.com, jiri@nvidia.com, jiri@resnulli.us,
-	johannes@sipsolutions.net, krzysztof.kozlowski@linaro.org,
-	lingshan.zhu@intel.com, linus.walleij@linaro.org,
-	lizhijian@fujitsu.com, martin.petersen@oracle.com,
-	maxime.coquelin@redhat.com, michael.christie@oracle.com,
-	mst@redhat.com, sgarzare@redhat.com, stevensd@chromium.org,
-	sudeep.holla@arm.com,
-	syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com,
-	u.kleine-koenig@pengutronix.de, viresh.kumar@linaro.org,
-	xuanzhuo@linux.alibaba.com, yuxue.liu@jaguarmicro.com,
-	Srujana Challa <schalla@marvell.com>
-Subject: [GIT PULL] virtio: features, fixes, cleanups
-Message-ID: <20240522060301-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1716374748; c=relaxed/simple;
+	bh=tXi9oAreMCCPCwVA01pH5TIg4zikM7DhuX5qsVp5FWU=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=jQBVPaLawN7t40UVdC/lEofNjY1vajpF+ucF/1g6ynoxHveohWy2SoxZ24sN9+aWkP3VGGgs5o8On5fAl3KSm2am3f4nXGnNiu4BGYulEbqEMB5gPpNteCrSvLf+BmgIeadK1kQ01ZNV4N0olDbNWAskL+jyowLnwkkZe8axlH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=xAy40Q09; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1716374741; h=Message-ID:Subject:Date:From:To;
+	bh=fkW/DORss1j6psn8gLpEOT+ds5XufCv1wVUKXWoLDUk=;
+	b=xAy40Q099nNiLegrIhUf/eAs3/Kjc7E3owEJ4IFM1UMYMBQIo/sglStNH9tl3qBHntQRLALM5+HaievHNNz05pn4TSvxPfl5MTDRp3eBLocIL2eaA1fQfTq092veZpBTzBM0Rxtiq4EW0y2Z9bM9Fw7gN+fmB5H3pC6bemJyhWo=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R281e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067112;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0W7.NPVT_1716374739;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W7.NPVT_1716374739)
+          by smtp.aliyun-inc.com;
+          Wed, 22 May 2024 18:45:41 +0800
+Message-ID: <1716371423.4910805-4-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net 2/2] Revert "virtio_net: Add a lock for per queue RX coalesce"
+Date: Wed, 22 May 2024 17:50:23 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>,
+ netdev@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20240522034548.58131-1-hengqi@linux.alibaba.com>
+ <20240522034548.58131-3-hengqi@linux.alibaba.com>
+ <Zk2pskOYxnSdNf-O@nanopsycho.orion>
+ <1716367939.5198305-3-hengqi@linux.alibaba.com>
+ <20240522053046-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240522053046-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Mutt-Fcc: =sent
 
-Things to note here:
+On Wed, 22 May 2024 05:44:43 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Wed, May 22, 2024 at 04:52:19PM +0800, Heng Qi wrote:
+> > On Wed, 22 May 2024 10:15:46 +0200, Jiri Pirko <jiri@resnulli.us> wrote:
+> > > Wed, May 22, 2024 at 05:45:48AM CEST, hengqi@linux.alibaba.com wrote:
+> > > >This reverts commit 4d4ac2ececd3c42a08dd32a6e3a4aaf25f7efe44.
+> > > 
+> > > This commit does not exist in -net or -net-next.
+> > 
+> > It definitely exists in net-next :):
+> > https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=4d4ac2ececd3c42a08dd32a6e3a4aaf25f7efe44
+> > 
+> > > 
+> > > >
+> > > >When the following snippet is run, lockdep will complain[1].
+> > > >
+> > > >  /* Acquire all queues dim_locks */
+> > > >  for (i = 0; i < vi->max_queue_pairs; i++)
+> > > >	  mutex_lock(&vi->rq[i].dim_lock);
+> > > >
+> > > >At the same time, too many queues will cause lockdep to be more irritable,
+> > > >which can be alleviated by using mutex_lock_nested(), however, there are
+> > > >still new warning when the number of queues exceeds MAX_LOCKDEP_SUBCLASSES.
+> > > >So I would like to gently revert this commit, although it brings
+> > > >unsynchronization that is not so concerned:
+> 
+> It's really hard to read this explanation.
+> 
+> I think you mean is:
+> 
+> 	When the following snippet is run, lockdep will report a deadlock[1].
+> 
+> 	  /* Acquire all queues dim_locks */
+> 	  for (i = 0; i < vi->max_queue_pairs; i++)
+> 		  mutex_lock(&vi->rq[i].dim_lock);
+> 
+> 	There's no deadlock here because the vq locks
+> 	are always taken in the same order, but lockdep can not figure it
+> 	out, and we can not make each lock a separate class because
+> 	there can be more than MAX_LOCKDEP_SUBCLASSES of vqs.
+> 
+> 	However, dropping the lock is harmless.
 
-- the new Marvell OCTEON DPU driver is not here: latest v4 keeps causing
-  build failures on mips. I deferred the pull hoping to get it in
-  and I might merge a new version post rc1
-  (supposed to be ok for new drivers as they can't cause regressions),
-  but we'll see.
-- there are also a couple bugfixes under review, to be merged after rc1
-- I merged a trivial patch (removing a comment) that also got
-  merged through net.
-  git handles this just fine and it did not seem worth it
-  rebasing to drop it.
-- there is a trivial conflict in the header file. Shouldn't be any
-  trouble to resolve, but fyi the resolution by Stephen is here
-	diff --cc drivers/virtio/virtio_mem.c
-	index e8355f55a8f7,6d4dfbc53a66..000000000000
-	--- a/drivers/virtio/virtio_mem.c
-	+++ b/drivers/virtio/virtio_mem.c
-	@@@ -21,7 -21,7 +21,8 @@@
-	  #include <linux/bitmap.h>
-	  #include <linux/lockdep.h>
-	  #include <linux/log2.h>
-	 +#include <linux/vmalloc.h>
-	+ #include <linux/suspend.h>
-  Also see it here:
-  https://lore.kernel.org/all/20240423145947.142171f6@canb.auug.org.au/
+Right.
 
+> 
+> 
+> 
+> > > >  1. When dim is enabled, rx_dim_work may modify the coalescing parameters.
+> > > >     Users may read dirty coalescing parameters if querying.
+> 
+> 
+> ... anyway?
+> 
+> > > >  2. When dim is switched from enabled to disabled, a spurious dim worker
+> > > >     maybe scheduled, but this can be handled correctly by rx_dim_work.
+> 
+> may be -> is?
 
+Ok.
 
-The following changes since commit 18daea77cca626f590fb140fc11e3a43c5d41354:
+> How is this handled exactly?
 
-  Merge tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm (2024-04-30 12:40:41 -0700)
+Consider the following two scenarios a and b:
 
-are available in the Git repository at:
+a.
+  1. dim is on
+  2. net_dim call schedules a worker
+  3. dim is turning off
+  4. The worker checks that dim is off and then exits after restoring dim's state.
+  5. The worker will not be scheduled until the next time dim is enabled.
+ 
+b.
+  1. dim is on
+  2. net_dim call schedules a worker
+  3. The worker checks that dim is on and keeps going
+  4. dim is turning off
+  5. The worker successfully configure this parameter to the device.
+  6. The worker will not be scheduled until the next time dim is enabled.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> 
+> > > >
+> > > >[1]
+> > > >========================================================
+> > > >WARNING: possible recursive locking detected
+> > > >6.9.0-rc7+ #319 Not tainted
+> > > >--------------------------------------------
+> > > >ethtool/962 is trying to acquire lock:
+> > > >
+> > > >but task is already holding lock:
+> > > >
+> > > >other info that might help us debug this:
+> > > >Possible unsafe locking scenario:
+> > > >
+> > > >      CPU0
+> > > >      ----
+> > > > lock(&vi->rq[i].dim_lock);
+> > > > lock(&vi->rq[i].dim_lock);
+> > > >
+> > > >*** DEADLOCK ***
+> > > >
+> > > > May be due to missing lock nesting notation
+> > > >
+> > > >3 locks held by ethtool/962:
+> > > > #0: ffffffff82dbaab0 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40
+> > > > #1: ffffffff82dad0a8 (rtnl_mutex){+.+.}-{3:3}, at:
+> > > >				ethnl_default_set_doit+0xbe/0x1e0
+> > > >
+> > > >stack backtrace:
+> > > >CPU: 6 PID: 962 Comm: ethtool Not tainted 6.9.0-rc7+ #319
+> > > >Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> > > >	   rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+> > > >Call Trace:
+> > > > <TASK>
+> > > > dump_stack_lvl+0x79/0xb0
+> > > > check_deadlock+0x130/0x220
+> > > > __lock_acquire+0x861/0x990
+> > > > lock_acquire.part.0+0x72/0x1d0
+> > > > ? lock_acquire+0xf8/0x130
+> > > > __mutex_lock+0x71/0xd50
+> > > > virtnet_set_coalesce+0x151/0x190
+> > > > __ethnl_set_coalesce.isra.0+0x3f8/0x4d0
+> > > > ethnl_set_coalesce+0x34/0x90
+> > > > ethnl_default_set_doit+0xdd/0x1e0
+> > > > genl_family_rcv_msg_doit+0xdc/0x130
+> > > > genl_family_rcv_msg+0x154/0x230
+> > > > ? __pfx_ethnl_default_set_doit+0x10/0x10
+> > > > genl_rcv_msg+0x4b/0xa0
+> > > > ? __pfx_genl_rcv_msg+0x10/0x10
+> > > > netlink_rcv_skb+0x5a/0x110
+> > > > genl_rcv+0x28/0x40
+> > > > netlink_unicast+0x1af/0x280
+> > > > netlink_sendmsg+0x20e/0x460
+> > > > __sys_sendto+0x1fe/0x210
+> > > > ? find_held_lock+0x2b/0x80
+> > > > ? do_user_addr_fault+0x3a2/0x8a0
+> > > > ? __lock_release+0x5e/0x160
+> > > > ? do_user_addr_fault+0x3a2/0x8a0
+> > > > ? lock_release+0x72/0x140
+> > > > ? do_user_addr_fault+0x3a7/0x8a0
+> > > > __x64_sys_sendto+0x29/0x30
+> > > > do_syscall_64+0x78/0x180
+> > > > entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> > > >
+> > > >Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> > > 
+> > > Fixes tag missing.
+> > 
+> > IIUC,
+> > 
+> >   "This reverts commit 4d4ac2ececd3c42a08dd32a6e3a4aaf25f7efe44."
+> > 
+> > has provided a traceback way, which is not fixing other patches,
+> > but fixing itself. So we do not need fixes tag.
+> > 
+> > Thanks.
+> 
+> Providing the subject of the reverted commit is helpful.
+> Adding:
+> 
+> Fixes: 4d4ac2ececd3 ("virtio_net: Add a lock for per queue RX coalesce")
+> 
+> is a standard way to do that.
+> 
+> 
 
-for you to fetch changes up to 0b8dbbdcf2e42273fbac9b752919e2e5b2abac21:
+Will add.
 
-  Merge tag 'for_linus' into vhost (2024-05-12 08:15:28 -0400)
+Thanks.
 
-----------------------------------------------------------------
-virtio: features, fixes, cleanups
-
-Several new features here:
-
-- virtio-net is finally supported in vduse.
-
-- Virtio (balloon and mem) interaction with suspend is improved
-
-- vhost-scsi now handles signals better/faster.
-
-- virtio-net now supports premapped mode by default,
-  opening the door for all kind of zero copy tricks.
-
-Fixes, cleanups all over the place.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Christophe JAILLET (1):
-      vhost-vdpa: Remove usage of the deprecated ida_simple_xx() API
-
-David Hildenbrand (1):
-      virtio-mem: support suspend+resume
-
-David Stevens (2):
-      virtio_balloon: Give the balloon its own wakeup source
-      virtio_balloon: Treat stats requests as wakeup events
-
-Eugenio Pérez (2):
-      MAINTAINERS: add Eugenio Pérez as reviewer
-      MAINTAINERS: add Eugenio Pérez as reviewer
-
-Jiri Pirko (1):
-      virtio: delete vq in vp_find_vqs_msix() when request_irq() fails
-
-Krzysztof Kozlowski (24):
-      virtio: balloon: drop owner assignment
-      virtio: input: drop owner assignment
-      virtio: mem: drop owner assignment
-      um: virt-pci: drop owner assignment
-      virtio_blk: drop owner assignment
-      bluetooth: virtio: drop owner assignment
-      hwrng: virtio: drop owner assignment
-      virtio_console: drop owner assignment
-      crypto: virtio - drop owner assignment
-      firmware: arm_scmi: virtio: drop owner assignment
-      gpio: virtio: drop owner assignment
-      drm/virtio: drop owner assignment
-      iommu: virtio: drop owner assignment
-      misc: nsm: drop owner assignment
-      net: caif: virtio: drop owner assignment
-      net: virtio: drop owner assignment
-      net: 9p: virtio: drop owner assignment
-      vsock/virtio: drop owner assignment
-      wifi: mac80211_hwsim: drop owner assignment
-      nvdimm: virtio_pmem: drop owner assignment
-      rpmsg: virtio: drop owner assignment
-      scsi: virtio: drop owner assignment
-      fuse: virtio: drop owner assignment
-      sound: virtio: drop owner assignment
-
-Li Zhijian (1):
-      vdpa: Convert sprintf/snprintf to sysfs_emit
-
-Maxime Coquelin (6):
-      vduse: validate block features only with block devices
-      vduse: Temporarily fail if control queue feature requested
-      vduse: enable Virtio-net device type
-      vduse: validate block features only with block devices
-      vduse: Temporarily fail if control queue feature requested
-      vduse: enable Virtio-net device type
-
-Michael S. Tsirkin (2):
-      Merge tag 'stable/vduse-virtio-net' into vhost
-      Merge tag 'for_linus' into vhost
-
-Mike Christie (9):
-      vhost-scsi: Handle vhost_vq_work_queue failures for events
-      vhost-scsi: Handle vhost_vq_work_queue failures for cmds
-      vhost-scsi: Use system wq to flush dev for TMFs
-      vhost: Remove vhost_vq_flush
-      vhost_scsi: Handle vhost_vq_work_queue failures for TMFs
-      vhost: Use virtqueue mutex for swapping worker
-      vhost: Release worker mutex during flushes
-      vhost_task: Handle SIGKILL by flushing work and exiting
-      kernel: Remove signal hacks for vhost_tasks
-
-Uwe Kleine-König (1):
-      virtio-mmio: Convert to platform remove callback returning void
-
-Xuan Zhuo (7):
-      virtio_ring: introduce dma map api for page
-      virtio_ring: enable premapped mode whatever use_dma_api
-      virtio_net: replace private by pp struct inside page
-      virtio_net: big mode support premapped
-      virtio_net: enable premapped by default
-      virtio_net: rx remove premapped failover code
-      virtio_net: remove the misleading comment
-
-Yuxue Liu (2):
-      vp_vdpa: Fix return value check vp_vdpa_request_irq
-      vp_vdpa: don't allocate unused msix vectors
-
-Zhu Lingshan (1):
-      MAINTAINERS: apply maintainer role of Intel vDPA driver
-
- MAINTAINERS                                   |  10 +-
- arch/um/drivers/virt-pci.c                    |   1 -
- drivers/block/virtio_blk.c                    |   1 -
- drivers/bluetooth/virtio_bt.c                 |   1 -
- drivers/char/hw_random/virtio-rng.c           |   1 -
- drivers/char/virtio_console.c                 |   2 -
- drivers/crypto/virtio/virtio_crypto_core.c    |   1 -
- drivers/firmware/arm_scmi/virtio.c            |   1 -
- drivers/gpio/gpio-virtio.c                    |   1 -
- drivers/gpu/drm/virtio/virtgpu_drv.c          |   1 -
- drivers/iommu/virtio-iommu.c                  |   1 -
- drivers/misc/nsm.c                            |   1 -
- drivers/net/caif/caif_virtio.c                |   1 -
- drivers/net/virtio_net.c                      | 248 +++++++++++++++++---------
- drivers/net/wireless/virtual/mac80211_hwsim.c |   1 -
- drivers/nvdimm/virtio_pmem.c                  |   1 -
- drivers/rpmsg/virtio_rpmsg_bus.c              |   1 -
- drivers/scsi/virtio_scsi.c                    |   1 -
- drivers/vdpa/vdpa.c                           |   2 +-
- drivers/vdpa/vdpa_user/vduse_dev.c            |  24 ++-
- drivers/vdpa/virtio_pci/vp_vdpa.c             |  27 ++-
- drivers/vhost/scsi.c                          |  70 +++++---
- drivers/vhost/vdpa.c                          |   6 +-
- drivers/vhost/vhost.c                         | 130 ++++++++++----
- drivers/vhost/vhost.h                         |   3 +-
- drivers/virtio/virtio_balloon.c               |  85 +++++----
- drivers/virtio/virtio_input.c                 |   1 -
- drivers/virtio/virtio_mem.c                   |  69 ++++++-
- drivers/virtio/virtio_mmio.c                  |   6 +-
- drivers/virtio/virtio_pci_common.c            |   4 +-
- drivers/virtio/virtio_ring.c                  |  59 +++++-
- fs/coredump.c                                 |   4 +-
- fs/fuse/virtio_fs.c                           |   1 -
- include/linux/sched/vhost_task.h              |   3 +-
- include/linux/virtio.h                        |   7 +
- include/uapi/linux/virtio_mem.h               |   2 +
- kernel/exit.c                                 |   5 +-
- kernel/signal.c                               |   4 +-
- kernel/vhost_task.c                           |  53 ++++--
- net/9p/trans_virtio.c                         |   1 -
- net/vmw_vsock/virtio_transport.c              |   1 -
- sound/virtio/virtio_card.c                    |   1 -
- 42 files changed, 578 insertions(+), 265 deletions(-)
-
+> 
+> 
+> > > 
+> > > 
+> > > >---
+> > > > drivers/net/virtio_net.c | 53 +++++++++-------------------------------
+> > > > 1 file changed, 12 insertions(+), 41 deletions(-)
+> > > >
+> > > >diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > >index 1cad06cef230..e4a1dff2a64a 100644
+> > > >--- a/drivers/net/virtio_net.c
+> > > >+++ b/drivers/net/virtio_net.c
+> > > >@@ -316,9 +316,6 @@ struct receive_queue {
+> > > > 	/* Is dynamic interrupt moderation enabled? */
+> > > > 	bool dim_enabled;
+> > > > 
+> > > >-	/* Used to protect dim_enabled and inter_coal */
+> > > >-	struct mutex dim_lock;
+> > > >-
+> > > > 	/* Dynamic Interrupt Moderation */
+> > > > 	struct dim dim;
+> > > > 
+> > > >@@ -2368,10 +2365,6 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
+> > > > 	/* Out of packets? */
+> > > > 	if (received < budget) {
+> > > > 		napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
+> > > >-		/* Intentionally not taking dim_lock here. This may result in a
+> > > >-		 * spurious net_dim call. But if that happens virtnet_rx_dim_work
+> > > >-		 * will not act on the scheduled work.
+> > > >-		 */
+> > > > 		if (napi_complete && rq->dim_enabled)
+> > > > 			virtnet_rx_dim_update(vi, rq);
+> > > > 	}
+> > > >@@ -3247,11 +3240,9 @@ static int virtnet_set_ringparam(struct net_device *dev,
+> > > > 				return err;
+> > > > 
+> > > > 			/* The reason is same as the transmit virtqueue reset */
+> > > >-			mutex_lock(&vi->rq[i].dim_lock);
+> > > > 			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i,
+> > > > 							       vi->intr_coal_rx.max_usecs,
+> > > > 							       vi->intr_coal_rx.max_packets);
+> > > >-			mutex_unlock(&vi->rq[i].dim_lock);
+> > > > 			if (err)
+> > > > 				return err;
+> > > > 		}
+> > > >@@ -4257,7 +4248,6 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
+> > > > 	struct virtio_net_ctrl_coal_rx *coal_rx __free(kfree) = NULL;
+> > > > 	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
+> > > > 	struct scatterlist sgs_rx;
+> > > >-	int ret = 0;
+> > > > 	int i;
+> > > > 
+> > > > 	if (rx_ctrl_dim_on && !virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
+> > > >@@ -4267,22 +4257,16 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
+> > > > 			       ec->rx_max_coalesced_frames != vi->intr_coal_rx.max_packets))
+> > > > 		return -EINVAL;
+> > > > 
+> > > >-	/* Acquire all queues dim_locks */
+> > > >-	for (i = 0; i < vi->max_queue_pairs; i++)
+> > > >-		mutex_lock(&vi->rq[i].dim_lock);
+> > > >-
+> > > > 	if (rx_ctrl_dim_on && !vi->rx_dim_enabled) {
+> > > > 		vi->rx_dim_enabled = true;
+> > > > 		for (i = 0; i < vi->max_queue_pairs; i++)
+> > > > 			vi->rq[i].dim_enabled = true;
+> > > >-		goto unlock;
+> > > >+		return 0;
+> > > > 	}
+> > > > 
+> > > > 	coal_rx = kzalloc(sizeof(*coal_rx), GFP_KERNEL);
+> > > >-	if (!coal_rx) {
+> > > >-		ret = -ENOMEM;
+> > > >-		goto unlock;
+> > > >-	}
+> > > >+	if (!coal_rx)
+> > > >+		return -ENOMEM;
+> > > > 
+> > > > 	if (!rx_ctrl_dim_on && vi->rx_dim_enabled) {
+> > > > 		vi->rx_dim_enabled = false;
+> > > >@@ -4300,10 +4284,8 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
+> > > > 
+> > > > 	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
+> > > > 				  VIRTIO_NET_CTRL_NOTF_COAL_RX_SET,
+> > > >-				  &sgs_rx)) {
+> > > >-		ret = -EINVAL;
+> > > >-		goto unlock;
+> > > >-	}
+> > > >+				  &sgs_rx))
+> > > >+		return -EINVAL;
+> > > > 
+> > > > 	vi->intr_coal_rx.max_usecs = ec->rx_coalesce_usecs;
+> > > > 	vi->intr_coal_rx.max_packets = ec->rx_max_coalesced_frames;
+> > > >@@ -4311,11 +4293,8 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
+> > > > 		vi->rq[i].intr_coal.max_usecs = ec->rx_coalesce_usecs;
+> > > > 		vi->rq[i].intr_coal.max_packets = ec->rx_max_coalesced_frames;
+> > > > 	}
+> > > >-unlock:
+> > > >-	for (i = vi->max_queue_pairs - 1; i >= 0; i--)
+> > > >-		mutex_unlock(&vi->rq[i].dim_lock);
+> > > > 
+> > > >-	return ret;
+> > > >+	return 0;
+> > > > }
+> > > > 
+> > > > static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
+> > > >@@ -4339,24 +4318,19 @@ static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
+> > > > 					     u16 queue)
+> > > > {
+> > > > 	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
+> > > >+	bool cur_rx_dim = vi->rq[queue].dim_enabled;
+> > > > 	u32 max_usecs, max_packets;
+> > > >-	bool cur_rx_dim;
+> > > > 	int err;
+> > > > 
+> > > >-	mutex_lock(&vi->rq[queue].dim_lock);
+> > > >-	cur_rx_dim = vi->rq[queue].dim_enabled;
+> > > > 	max_usecs = vi->rq[queue].intr_coal.max_usecs;
+> > > > 	max_packets = vi->rq[queue].intr_coal.max_packets;
+> > > > 
+> > > > 	if (rx_ctrl_dim_on && (ec->rx_coalesce_usecs != max_usecs ||
+> > > >-			       ec->rx_max_coalesced_frames != max_packets)) {
+> > > >-		mutex_unlock(&vi->rq[queue].dim_lock);
+> > > >+			       ec->rx_max_coalesced_frames != max_packets))
+> > > > 		return -EINVAL;
+> > > >-	}
+> > > > 
+> > > > 	if (rx_ctrl_dim_on && !cur_rx_dim) {
+> > > > 		vi->rq[queue].dim_enabled = true;
+> > > >-		mutex_unlock(&vi->rq[queue].dim_lock);
+> > > > 		return 0;
+> > > > 	}
+> > > > 
+> > > >@@ -4369,8 +4343,10 @@ static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
+> > > > 	err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, queue,
+> > > > 					       ec->rx_coalesce_usecs,
+> > > > 					       ec->rx_max_coalesced_frames);
+> > > >-	mutex_unlock(&vi->rq[queue].dim_lock);
+> > > >-	return err;
+> > > >+	if (err)
+> > > >+		return err;
+> > > >+
+> > > >+	return 0;
+> > > > }
+> > > > 
+> > > > static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
+> > > >@@ -4404,7 +4380,6 @@ static void virtnet_rx_dim_work(struct work_struct *work)
+> > > > 
+> > > > 	qnum = rq - vi->rq;
+> > > > 
+> > > >-	mutex_lock(&rq->dim_lock);
+> > > > 	if (!rq->dim_enabled)
+> > > > 		goto out;
+> > > > 
+> > > >@@ -4420,7 +4395,6 @@ static void virtnet_rx_dim_work(struct work_struct *work)
+> > > > 	}
+> > > > out:
+> > > > 	dim->state = DIM_START_MEASURE;
+> > > >-	mutex_unlock(&rq->dim_lock);
+> > > > }
+> > > > 
+> > > > static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
+> > > >@@ -4558,13 +4532,11 @@ static int virtnet_get_per_queue_coalesce(struct net_device *dev,
+> > > > 		return -EINVAL;
+> > > > 
+> > > > 	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
+> > > >-		mutex_lock(&vi->rq[queue].dim_lock);
+> > > > 		ec->rx_coalesce_usecs = vi->rq[queue].intr_coal.max_usecs;
+> > > > 		ec->tx_coalesce_usecs = vi->sq[queue].intr_coal.max_usecs;
+> > > > 		ec->tx_max_coalesced_frames = vi->sq[queue].intr_coal.max_packets;
+> > > > 		ec->rx_max_coalesced_frames = vi->rq[queue].intr_coal.max_packets;
+> > > > 		ec->use_adaptive_rx_coalesce = vi->rq[queue].dim_enabled;
+> > > >-		mutex_unlock(&vi->rq[queue].dim_lock);
+> > > > 	} else {
+> > > > 		ec->rx_max_coalesced_frames = 1;
+> > > > 
+> > > >@@ -5396,7 +5368,6 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
+> > > > 
+> > > > 		u64_stats_init(&vi->rq[i].stats.syncp);
+> > > > 		u64_stats_init(&vi->sq[i].stats.syncp);
+> > > >-		mutex_init(&vi->rq[i].dim_lock);
+> > > > 	}
+> > > > 
+> > > > 	return 0;
+> > > >-- 
+> > > >2.32.0.3.g01195cf9f
+> > > >
+> > > >
+> 
 
