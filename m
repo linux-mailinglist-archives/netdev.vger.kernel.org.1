@@ -1,102 +1,115 @@
-Return-Path: <netdev+bounces-97648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 313978CC8EE
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 00:17:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41D098CC8F6
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 00:19:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D55B01F219D8
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 22:17:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECC291F21BA6
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 22:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E331474B8;
-	Wed, 22 May 2024 22:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB551482F8;
+	Wed, 22 May 2024 22:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b="gG8Z7TsK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RHKpYa7T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-in-1.gedalya.net (mail.gedalya.net [170.39.119.235])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85467C081
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 22:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.39.119.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0EA1474BE;
+	Wed, 22 May 2024 22:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716416218; cv=none; b=lyTUAU7uiH64wV/gVgVDb9shMnwju2MJjmkP3HfNrTCCI6E/9HYSsI9rjVpS/QOZYzT0W5hiw806TuMcOQEv1fV6Akdl8a51guMTU3gG5ONNZjqzB/5sw0LFH8FBvA6MkGLt84510EEIvwi0j6GGjhnvoG8WkMZ5ZUMfaAbMc1Q=
+	t=1716416375; cv=none; b=IDxPdVR+MScmDGCGg78WCCEwojJ2HrYKzk1Rgb4Pt6YTMpOrwVm0x2P/sWARSXk7dw+hjZc/OIsfZ9L8/KNYQWbz9QpR7VR53Tchd8ImU7Sh3qW2CAn5ApLcXdAMX0nuMqFs8YxXaF6kF3RpvluLcudxyB6sdy77fLSNCIe3v/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716416218; c=relaxed/simple;
-	bh=GTY1UL3ISuBXBH1b8ZdpROf0vanIEWsIZCi9JOsQ1hs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MAr7hex+tQTclZl2gdb/OWpo4w6L0+FKKsLjS/UjilRqotcyd4QHvPve4poH7Au1+6XK8zCtbOS3REtksI36uxq/KCbJvZXG+sCMEpkVOFGF8z9zvM1o+RV3V23GKKsbNEaf81JL77LE6HHDyA2WtLe+CXcyi5uBaXGsTiB4lO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net; spf=pass smtp.mailfrom=gedalya.net; dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b=gG8Z7TsK; arc=none smtp.client-ip=170.39.119.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gedalya.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gedalya.net
-	; s=rsa1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description;
-	bh=GTY1UL3ISuBXBH1b8ZdpROf0vanIEWsIZCi9JOsQ1hs=; b=gG8Z7TsKDW30vkqL/e5/Er9us3
-	Czkp0sMjI+Lkyma2vmdVlCax12NLARFOvw7N/Cerz1cmN2vgN+99EyeKO8uas+e6Zuvjr1XsgxSDw
-	JsAIfZ29DQ4JUlqbQzfJE0A64haZsYb/y8Y5c8b2f2Kx7jzN/HorCbCJL40ztlBzm9E25of/UF58c
-	eXmjTCIFax4zkaus5IDir225KTHvyfvqivAlsTrAvklY7JNdT2iIoEORgARPu5sQ/C1dsdFrVcTU6
-	ZvHDCj08H+A4oqjq1Upt2K9XJ/LMwlPZbxTjdKx85wIOFb9GntNpbTm2sGAdRerKh8VZOvKok4S/s
-	TetWPX3A==;
-Received: from [192.168.9.10]
-	by smtp-in-1.gedalya.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <gedalya@gedalya.net>)
-	id 1s9uGU-000evo-1P;
-	Wed, 22 May 2024 22:16:54 +0000
-Message-ID: <f0f54f62-1c76-4fb8-8e8e-b2a11049b156@gedalya.net>
-Date: Thu, 23 May 2024 06:16:51 +0800
+	s=arc-20240116; t=1716416375; c=relaxed/simple;
+	bh=9Gp8ARWt+LlbhxAZ1UqjpmYMBLgcgTXITVrydyGORUQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S/QG4W04JJk0NDI2CU1eTPiEHMEdzD+mFBPKrKtqeHZdgy3mghRO4uEdu6dQTCzfeYiGcGQ8BytDT+j0HSqSrPlnu73MP36buhdPj8HlbrdYxZciN9UmOVwtMvPFKqwhAUumzdbE5ngxByd+EBxF0SIrIeKdC7dQvCa4op3YgJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RHKpYa7T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3201FC2BBFC;
+	Wed, 22 May 2024 22:19:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716416375;
+	bh=9Gp8ARWt+LlbhxAZ1UqjpmYMBLgcgTXITVrydyGORUQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RHKpYa7TbtWSJG1vNWcBKi+yR7pTJVMPf0rYI+FTCJ0I6aq4eXx1hCJrcsqDn8wnP
+	 mr7WBi6Jn/CnGJu6Btoz1R7sovDGnjkEhnJ8aSuDj0R8WDU3GL3mQSatqmC9Jn342N
+	 t09xo4ZnvD1ytEMZkkKPIEx7Ea5Am4qKP7vZpKlCG2yyb7ZXSMOEKT+JdgIqCc0DRQ
+	 7Wm4NqPEMZZZ9fmunGVmowpPZBTejgzzKdy4pN/dhinIuxL1Es+d7DMJkKdMeWL0mM
+	 RXMDTVKU53zNxdPfJ1+ZLUvtZDeqGaKCCVs9+IE4I+EVej+cRou4NrvJpyiRgKqFyK
+	 cZogCn1FpTZTw==
+Date: Wed, 22 May 2024 15:19:33 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov
+ <alexei.starovoitov@gmail.com>, Network Development
+ <netdev@vger.kernel.org>, "Chatterjee, Deb" <deb.chatterjee@intel.com>,
+ Anjali Singhai Jain <anjali.singhai@intel.com>, "Limaye, Namrata"
+ <namrata.limaye@intel.com>, tom Herbert <tom@sipanda.io>, Marcelo Ricardo
+ Leitner <mleitner@redhat.com>, "Shirshyad, Mahesh"
+ <Mahesh.Shirshyad@amd.com>, "Osinski, Tomasz" <tomasz.osinski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Cong Wang <xiyou.wangcong@gmail.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Vlad
+ Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, Khalid Manaa
+ <khalidm@nvidia.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
+ <toke@redhat.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, "Jain, Vipin" <Vipin.Jain@amd.com>, "Daly, Dan"
+ <dan.daly@intel.com>, Andy Fingerhut <andy.fingerhut@gmail.com>, Chris
+ Sommers <chris.sommers@keysight.com>, Matty Kadosh <mattyk@nvidia.com>, bpf
+ <bpf@vger.kernel.org>, lwn@lwn.net
+Subject: Re: On the NACKs on P4TC patches
+Message-ID: <20240522151933.6f422e63@kernel.org>
+In-Reply-To: <CAM0EoMmsB5jHZ=4oJc_Yzm=RFDUHWh9yexdG6_bPFS4_CFuiog@mail.gmail.com>
+References: <20240410140141.495384-1-jhs@mojatatu.com>
+	<41736ea4e81666e911fee5b880d9430ffffa9a58.camel@redhat.com>
+	<CAM0EoM=982OctjvSQpx0kR7e+JnQLhvZ=sM-tNB4xNiu7nhH5Q@mail.gmail.com>
+	<CAM0EoM=VhVn2sGV40SYttQyaiCn8gKaKHTUqFxB_WzKrayJJfQ@mail.gmail.com>
+	<87cf4830e2e46c1882998162526e108fb424a0f7.camel@redhat.com>
+	<CAM0EoMkJwR0K-fF7qo0PfRw4Sf+=2L0L=rOcH5A2ELwagLrZMw@mail.gmail.com>
+	<CAM0EoMmfDoZ9_ZdK-ZjHjFAjuNN8fVK+R57_UaFqAm=wA0AWVA@mail.gmail.com>
+	<82ee1013ca0164053e9fb1259eaf676343c430e8.camel@redhat.com>
+	<CAADnVQLugkg+ahAapskRaE86=RnwpY8v=Nre8pn=sa4fTEoTyA@mail.gmail.com>
+	<CAM0EoM=2wHem54vTeVq4H1W5pawYuHNt-aS9JyG8iQORbaw5pA@mail.gmail.com>
+	<CAM0EoMmCz5usVSLq_wzR3s7UcaKifa-X58zr6hkPXuSBnwFX3w@mail.gmail.com>
+	<CAM0EoMmsB5jHZ=4oJc_Yzm=RFDUHWh9yexdG6_bPFS4_CFuiog@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] [resend] color: default to dark background
-To: Stephen Hemminger <stephen@networkplumber.org>,
- Dragan Simic <dsimic@manjaro.org>
-Cc: netdev@vger.kernel.org
-References: <E1s9rpA-00000006Jy7-18Q5@ws2.gedalya.net>
- <20240522135721.7da9b30c@hermes.local>
- <67841f35-a2bb-49a5-becd-db2defe4e4fa@gedalya.net>
- <2866a9935b3fa3eafe51625b5bdfaa30@manjaro.org>
- <20240522143354.0214e054@hermes.local>
-Content-Language: en-US
-From: Gedalya <gedalya@gedalya.net>
-In-Reply-To: <20240522143354.0214e054@hermes.local>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 5/23/24 5:33 AM, Stephen Hemminger wrote:
+Hi Jamal!
 
-> The color handling of iproute2 was inherited from other utilities such as vim.
-> There doesn't appear to be any library or standardization, all this ad-hoc.
+On Tue, 21 May 2024 08:35:07 -0400 Jamal Hadi Salim wrote:
+> At that point(v16) i asked for the series to be applied despite the
+> Nacks because, frankly, the Nacks have no merit. Paolo was not
+> comfortable applying patches with Nacks and tried to mediate. In his
+> mediation effort he asked if we could remove eBPF - and our answer was
+> no because after all that time we have become dependent on it and
+> frankly there was no technical reason not to use eBPF.
 
-Looking at the vim code, and playing around with the program, I
-have a few observations.
+I'm not fully clear on who you're appealing to, and I may be missing
+some points. But maybe it will be more useful than hurtful if I clarify
+my point of view.
 
-The snippet you quoted isn't doing anything brilliant. It just
-assumes that certain types of terminals are dark, regardless of
-the implementation and configuration. All you can really say is
-that terminals are often dark which is what I was saying here in
-the first place.
+AFAIU BPF folks disagree with the use of their subsystem, and they
+point out that P4 pipelines can be implemented using BPF in the first
+place.
+To which you reply that you like (a highly dated type of) a netlink
+interface, and (handwavey) ability to configure the data path SW or 
+HW via the same interface.
 
-I'm not seeing any justification for assuming dark in certain
-cases and light otherwise. The code just happens to be that way.
+AFAICT there's some but not very strong support for P4TC, and it
+doesn't benefit or solve any problems of the broader networking stack
+(e.g. expressing or configuring parser graphs in general)
 
-More importantly, vim does happen to actually work. So far I was
-only able to get it to show dark blue on a black background by
-setting TERM=ansi.
-
-The results are what is important. Vim has its own various color
-palettes and it's a serious full-screen app, uses the terminfo
-library, its support for terminals is much more complex than just
-two palettes. One way or another, we need to fix this, probably
-not by linking against ncurses, and "assuming terminal backgrounds
-are light" isn't the nugget of wisdom vim has to offer.
-
+So from my perspective, the submission is neither technically strong
+enough, nor broadly useful enough to consider making questionable precedents
+for, i.e. to override maintainers on how their subsystems are extended.
 
