@@ -1,135 +1,272 @@
-Return-Path: <netdev+bounces-97502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B99B98CBC14
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 09:31:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E038CBC21
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 09:35:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F221FB21028
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 07:31:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D889B216C3
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 07:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7BC770E4;
-	Wed, 22 May 2024 07:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=paloaltonetworks.com header.i=@paloaltonetworks.com header.b="Gl8uFERd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD12E3EA86;
+	Wed, 22 May 2024 07:35:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00169c01.pphosted.com (mx0a-00169c01.pphosted.com [67.231.148.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2F113FF9
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 07:31:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107A937153
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 07:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716363104; cv=none; b=Po+T2mHELd1+DdqiG4xum/f2BajsyhtcpV19424MMkUplIroo72upeYQoYzj0hamNbrAeZXSqBnKkjkytUbkFaSkXxBESQowaI08PvrVCjJ4/l1ws9KfyFLV3RjyqHYmi31CCJgeRQMXSnOf20MfTkl9up+pR/1eEZzjDwPCOOk=
+	t=1716363330; cv=none; b=Yb90O/pLq0AUxA9yxI7Onu49sZPfDLHN2dMjq5uPcEbugXNNoxB2Eoqbpod7RaLpT0UWXUmeY48x/Zb/k2D/Y063wNyAfhRfQ+dvdemTpB4B1LPWEpsx5p9RSQf3h7pzrS6AZS8iXNpYaef2KuWzwzJl44SMiuDBRRwI0pO3V54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716363104; c=relaxed/simple;
-	bh=HMhKu2Zjmnj2Xd/DKZgooJ7r37CEB9DNShLdFSu/K/4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XRnTyDK+5MsXBaJ/TkTMGEPaWVA5HhwdY6EGsxisD/RtEd5o6oJ+BYCuUqA7xhmxPoYqA5o6Hzzyp7W74Cg5B/ldqMl94lc/n8fnz9oQv7N7CwFaW5Slg5vkRR09Ih28eDhvvduTvo3hNeBOFDt69Hye+X7IG2E7Lv1gsmIKGJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paloaltonetworks.com; spf=pass smtp.mailfrom=paloaltonetworks.com; dkim=fail (0-bit key) header.d=paloaltonetworks.com header.i=@paloaltonetworks.com header.b=Gl8uFERd reason="key not found in DNS"; arc=none smtp.client-ip=67.231.148.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paloaltonetworks.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paloaltonetworks.com
-Received: from pps.filterd (m0281123.ppops.net [127.0.0.1])
-	by mx0b-00169c01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44M1UtLJ010920;
-	Wed, 22 May 2024 00:31:19 -0700
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0b-00169c01.pphosted.com (PPS) with ESMTPS id 3y8sw6dw2h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 May 2024 00:31:19 -0700 (PDT)
-Received: from m0281123.ppops.net (m0281123.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 44M7PUHd010877;
-	Wed, 22 May 2024 00:31:18 -0700
-Received: from webmail.paloaltonetworks.com (webmail.paloaltonetworks.com [199.167.52.51] (may be forged))
-	by mx0b-00169c01.pphosted.com (PPS) with ESMTPS id 3y8sw6dw2f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 May 2024 00:31:18 -0700 (PDT)
-Received: from localhost.localdomain (unknown [10.196.72.55])
-	by webmail.paloaltonetworks.com (Postfix) with ESMTPA id 35E2E7F5A7;
-	Wed, 22 May 2024 00:31:15 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 webmail.paloaltonetworks.com 35E2E7F5A7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=paloaltonetworks.com; s=mail; t=1716363077;
-	bh=1XvVZHpaN4/AVvZbPKq9OUb8euwGn7/+2aMNkZ73CnY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Gl8uFERdToxXOzUHqvrDGGZb99lVYD+A3iK+v+1bqQwQpHdYVLFLm03XOvZeczEzf
-	 MeS4xVFWff2SKhkNmvmGmV8Cc4gEQB30xL2QjvjYcrXQm1wGjeJQTtgJXm8LLWSazo
-	 wbUkAvUjDgWwrnb7byQsgRlk6Y8x+A4Cw9MZbs8M=
-From: Roded Zats <rzats@paloaltonetworks.com>
-To: benve@cisco.com, satishkh@cisco.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: orcohen@paloaltonetworks.com, rzats@paloaltonetworks.com,
-        netdev@vger.kernel.org
-Subject: [PATCH net v2] enic: Validate length of nl attributes in enic_set_vf_port
-Date: Wed, 22 May 2024 10:30:44 +0300
-Message-Id: <20240522073044.33519-1-rzats@paloaltonetworks.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <81d39fab6a85981b28329a67b454ca92e7e377f8.camel@redhat.com>
-References: <81d39fab6a85981b28329a67b454ca92e7e377f8.camel@redhat.com>
+	s=arc-20240116; t=1716363330; c=relaxed/simple;
+	bh=27YeOgU9n+2JnbEP7AI0ZiCxh7SWkOh/eHC8kZMjR9c=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HSXwNI6eyZ1Ll+LygQKX11xfE5USWAiyH05jZQY2P7bFetzxg8U9XLYqAFeeRjEOT5/a3TLVnu+Do82XovmN5L5Qh3xBJ6smEvsP/qV/h/Ju/ZvH6NmhQgt8KTpQfkQWrfu9Qmpq0UNxgLxY3lQskUQ6mIEhIfRUf8mlFOLtdgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-7e1b97c1b19so1423437539f.3
+        for <netdev@vger.kernel.org>; Wed, 22 May 2024 00:35:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716363328; x=1716968128;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9Q5q8AaUX0JxkzzcSIhVsJoloFPyWPCpnZx3kqc1VwY=;
+        b=nGJk1f/C12pVOEv+ZjJOpb0FISgvpddAbJBOrXpzVgkKGag2M8xMZU8gIL8bZLnrnN
+         2DCCGpMdVOHQV61vt494Szpn0ULcJCiYrGZQOMBFkSRcILsCKjgLjToGDspXegxCWFVU
+         BmnfGzwbjWZ8D6acCQ5T8xW2vTHsLbFPAOI7yX1h+YzgxP0UJmaTE3mVtGzMJGlL11tH
+         FlRnZ8HpZNsFz+A1jDPz12Bo+LZu1WXi/YhEq3cLhTodSmhuZRdv+Zmx1ebZCci2DBPa
+         y0HgbPR7+xT764Yldb9usvJlNzAeG92BguJR6zV0ZEYYIDZ3cb/gMfS//VK+AF9XI5KX
+         AYww==
+X-Forwarded-Encrypted: i=1; AJvYcCXKygvf/EduBSF5YK9sAaRwt4jP8GgYzdYUxBwS75no0AlBSP3YV4E5lfaCFSWeUVwy9cZYZ5axz0e5XUM9d2YLGDur+HnK
+X-Gm-Message-State: AOJu0YyQgE5XjuQUo8jpaMv6fU3sKudFYmB0ptQuZMR2pht/d9kJf/M8
+	nq+5zRm5A0hjHLD3F1Lxw/hyszyuvsSAQaV/UwK7QrVCQBG5ncmYCd8yWGVJWiwAU9fip4pfahu
+	UvskykLRvMfWNB5LKIElIrKjgBHrvx9cTrA27nhUOw2d0h9eHindmk5Q=
+X-Google-Smtp-Source: AGHT+IG7KuhTuUsbyvFuhQSFQdYuJwCXQYPxfaBD/+Rq4TQnD6DB7GkKGIDMArv3Us7rBJXZM8yh7yGDAwe/TvkdtnBm9J9Rw84g
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6602:6d0b:b0:7de:d6a0:dbe1 with SMTP id
+ ca18e2360f4ac-7e38b0e8c2bmr2094639f.2.1716363328313; Wed, 22 May 2024
+ 00:35:28 -0700 (PDT)
+Date: Wed, 22 May 2024 00:35:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007d6a8c061905fa5a@google.com>
+Subject: [syzbot] [bpf?] possible deadlock in get_partial_node
+From: syzbot <syzbot+9045c0a3d5a7f1b119f7@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-enic_set_vf_port assumes that the nl attribute IFLA_PORT_PROFILE
-is of length PORT_PROFILE_MAX and that the nl attributes
-IFLA_PORT_INSTANCE_UUID, IFLA_PORT_HOST_UUID are of length PORT_UUID_MAX.
-These attributes are validated (in the function do_setlink in rtnetlink.c)
-using the nla_policy ifla_port_policy. The policy defines IFLA_PORT_PROFILE
-as NLA_STRING, IFLA_PORT_INSTANCE_UUID as NLA_BINARY and
-IFLA_PORT_HOST_UUID as NLA_STRING. That means that the length validation
-using the policy is for the max size of the attributes and not on exact
-size so the length of these attributes might be less than the sizes that
-enic_set_vf_port expects. This might cause an out of bands
-read access in the memcpys of the data of these
-attributes in enic_set_vf_port.
+Hello,
 
-Fixes: f8bd909183ac ("net: Add ndo_{set|get}_vf_port support for enic dynamic vnics")
-Signed-off-by: Roded Zats <rzats@paloaltonetworks.com>
+syzbot found the following issue on:
+
+HEAD commit:    4b377b4868ef kprobe/ftrace: fix build error due to bad fun..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1295df6c980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=17ffd15f654c98ba
+dashboard link: https://syzkaller.appspot.com/bug?extid=9045c0a3d5a7f1b119f7
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6f4c61bc9252/disk-4b377b48.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/841f1b24d3a1/vmlinux-4b377b48.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/017b655dca3d/bzImage-4b377b48.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9045c0a3d5a7f1b119f7@syzkaller.appspotmail.com
+
+======================================================
+WARNING: possible circular locking dependency detected
+6.9.0-syzkaller-08544-g4b377b4868ef #0 Not tainted
+------------------------------------------------------
+syz-executor.0/10441 is trying to acquire lock:
+ffff88801504e318 (&n->list_lock){-.-.}-{2:2}, at: get_partial_node+0x36/0x280 mm/slub.c:2601
+
+but task is already holding lock:
+ffff88802b82c9f8 (&trie->lock){-.-.}-{2:2}, at: trie_update_elem+0xc8/0xc00 kernel/bpf/lpm_trie.c:333
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #1 (&trie->lock){-.-.}-{2:2}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
+       trie_delete_elem+0x96/0x6a0 kernel/bpf/lpm_trie.c:462
+       0xffffffffa0001fe2
+       bpf_dispatcher_nop_func include/linux/bpf.h:1243 [inline]
+       __bpf_prog_run include/linux/filter.h:691 [inline]
+       bpf_prog_run include/linux/filter.h:698 [inline]
+       __bpf_trace_run kernel/trace/bpf_trace.c:2403 [inline]
+       bpf_trace_run2+0x2ec/0x540 kernel/trace/bpf_trace.c:2444
+       trace_contention_end+0x114/0x140 include/trace/events/lock.h:122
+       __pv_queued_spin_lock_slowpath+0xb81/0xdc0 kernel/locking/qspinlock.c:557
+       pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:584 [inline]
+       queued_spin_lock_slowpath+0x42/0x50 arch/x86/include/asm/qspinlock.h:51
+       queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
+       do_raw_spin_lock+0x272/0x370 kernel/locking/spinlock_debug.c:116
+       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:111 [inline]
+       _raw_spin_lock_irqsave+0xe1/0x120 kernel/locking/spinlock.c:162
+       __put_partials+0x61/0x130 mm/slub.c:2900
+       put_cpu_partial+0x17c/0x250 mm/slub.c:2995
+       __slab_free+0x2ea/0x3d0 mm/slub.c:4224
+       qlink_free mm/kasan/quarantine.c:163 [inline]
+       qlist_free_all+0x5e/0xc0 mm/kasan/quarantine.c:179
+       kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
+       __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:322
+       kasan_slab_alloc include/linux/kasan.h:201 [inline]
+       slab_post_alloc_hook mm/slub.c:3871 [inline]
+       slab_alloc_node mm/slub.c:3918 [inline]
+       kmem_cache_alloc_node+0x194/0x390 mm/slub.c:3961
+       __alloc_skb+0x1c3/0x440 net/core/skbuff.c:656
+       alloc_skb include/linux/skbuff.h:1308 [inline]
+       sock_wmalloc+0xab/0x120 net/core/sock.c:2643
+       l2tp_ip_sendmsg+0x1b1/0x1670 net/l2tp/l2tp_ip.c:439
+       sock_sendmsg_nosec net/socket.c:730 [inline]
+       __sock_sendmsg+0x1a6/0x270 net/socket.c:745
+       ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+       ___sys_sendmsg net/socket.c:2638 [inline]
+       __sys_sendmmsg+0x3b2/0x740 net/socket.c:2724
+       __do_sys_sendmmsg net/socket.c:2753 [inline]
+       __se_sys_sendmmsg net/socket.c:2750 [inline]
+       __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2750
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (&n->list_lock){-.-.}-{2:2}:
+       check_prev_add kernel/locking/lockdep.c:3134 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+       validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
+       get_partial_node+0x36/0x280 mm/slub.c:2601
+       get_partial mm/slub.c:2715 [inline]
+       ___slab_alloc+0xa81/0x12e0 mm/slub.c:3572
+       __slab_alloc mm/slub.c:3682 [inline]
+       __slab_alloc_node mm/slub.c:3735 [inline]
+       slab_alloc_node mm/slub.c:3908 [inline]
+       __do_kmalloc_node mm/slub.c:4038 [inline]
+       __kmalloc_node+0x2db/0x4f0 mm/slub.c:4046
+       kmalloc_node include/linux/slab.h:648 [inline]
+       bpf_map_kmalloc_node+0xd3/0x1c0 kernel/bpf/syscall.c:422
+       lpm_trie_node_alloc kernel/bpf/lpm_trie.c:299 [inline]
+       trie_update_elem+0x1cd/0xc00 kernel/bpf/lpm_trie.c:342
+       bpf_map_update_value+0x4d3/0x540 kernel/bpf/syscall.c:203
+       generic_map_update_batch+0x60d/0x900 kernel/bpf/syscall.c:1889
+       bpf_map_do_batch+0x3e0/0x690 kernel/bpf/syscall.c:5196
+       __sys_bpf+0x377/0x810
+       __do_sys_bpf kernel/bpf/syscall.c:5794 [inline]
+       __se_sys_bpf kernel/bpf/syscall.c:5792 [inline]
+       __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5792
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&trie->lock);
+                               lock(&n->list_lock);
+                               lock(&trie->lock);
+  lock(&n->list_lock);
+
+ *** DEADLOCK ***
+
+2 locks held by syz-executor.0/10441:
+ #0: ffffffff8e333d20 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
+ #0: ffffffff8e333d20 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
+ #0: ffffffff8e333d20 (rcu_read_lock){....}-{1:2}, at: bpf_map_update_value+0x3c4/0x540 kernel/bpf/syscall.c:202
+ #1: ffff88802b82c9f8 (&trie->lock){-.-.}-{2:2}, at: trie_update_elem+0xc8/0xc00 kernel/bpf/lpm_trie.c:333
+
+stack backtrace:
+CPU: 1 PID: 10441 Comm: syz-executor.0 Not tainted 6.9.0-syzkaller-08544-g4b377b4868ef #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
+ check_prev_add kernel/locking/lockdep.c:3134 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+ validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+ __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+ _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
+ get_partial_node+0x36/0x280 mm/slub.c:2601
+ get_partial mm/slub.c:2715 [inline]
+ ___slab_alloc+0xa81/0x12e0 mm/slub.c:3572
+ __slab_alloc mm/slub.c:3682 [inline]
+ __slab_alloc_node mm/slub.c:3735 [inline]
+ slab_alloc_node mm/slub.c:3908 [inline]
+ __do_kmalloc_node mm/slub.c:4038 [inline]
+ __kmalloc_node+0x2db/0x4f0 mm/slub.c:4046
+ kmalloc_node include/linux/slab.h:648 [inline]
+ bpf_map_kmalloc_node+0xd3/0x1c0 kernel/bpf/syscall.c:422
+ lpm_trie_node_alloc kernel/bpf/lpm_trie.c:299 [inline]
+ trie_update_elem+0x1cd/0xc00 kernel/bpf/lpm_trie.c:342
+ bpf_map_update_value+0x4d3/0x540 kernel/bpf/syscall.c:203
+ generic_map_update_batch+0x60d/0x900 kernel/bpf/syscall.c:1889
+ bpf_map_do_batch+0x3e0/0x690 kernel/bpf/syscall.c:5196
+ __sys_bpf+0x377/0x810
+ __do_sys_bpf kernel/bpf/syscall.c:5794 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5792 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5792
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f9c7b07cee9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f9c7bd5e0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007f9c7b1ac050 RCX: 00007f9c7b07cee9
+RDX: 0000000000000038 RSI: 0000000020000240 RDI: 000000000000001a
+RBP: 00007f9c7b0c949e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000006e R14: 00007f9c7b1ac050 R15: 00007fffe20416d8
+ </TASK>
+
+
 ---
- drivers/net/ethernet/cisco/enic/enic_main.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-index f604119efc80..5f26fc3ad655 100644
---- a/drivers/net/ethernet/cisco/enic/enic_main.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-@@ -1117,18 +1117,30 @@ static int enic_set_vf_port(struct net_device *netdev, int vf,
- 	pp->request = nla_get_u8(port[IFLA_PORT_REQUEST]);
- 
- 	if (port[IFLA_PORT_PROFILE]) {
-+		if (nla_len(port[IFLA_PORT_PROFILE]) != PORT_PROFILE_MAX) {
-+			memcpy(pp, &prev_pp, sizeof(*pp));
-+			return -EINVAL;
-+		}
- 		pp->set |= ENIC_SET_NAME;
- 		memcpy(pp->name, nla_data(port[IFLA_PORT_PROFILE]),
- 			PORT_PROFILE_MAX);
- 	}
- 
- 	if (port[IFLA_PORT_INSTANCE_UUID]) {
-+		if (nla_len(port[IFLA_PORT_INSTANCE_UUID]) != PORT_UUID_MAX) {
-+			memcpy(pp, &prev_pp, sizeof(*pp));
-+			return -EINVAL;
-+		}
- 		pp->set |= ENIC_SET_INSTANCE;
- 		memcpy(pp->instance_uuid,
- 			nla_data(port[IFLA_PORT_INSTANCE_UUID]), PORT_UUID_MAX);
- 	}
- 
- 	if (port[IFLA_PORT_HOST_UUID]) {
-+		if (nla_len(port[IFLA_PORT_HOST_UUID]) != PORT_UUID_MAX) {
-+			memcpy(pp, &prev_pp, sizeof(*pp));
-+			return -EINVAL;
-+		}
- 		pp->set |= ENIC_SET_HOST;
- 		memcpy(pp->host_uuid,
- 			nla_data(port[IFLA_PORT_HOST_UUID]), PORT_UUID_MAX);
--- 
-2.39.3 (Apple Git-146)
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
