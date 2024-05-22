@@ -1,99 +1,111 @@
-Return-Path: <netdev+bounces-97519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2086D8CBDA6
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 11:20:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 960648CBDCF
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 11:27:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5EF81F23289
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 09:20:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50BDD2825FE
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 09:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 167658060D;
-	Wed, 22 May 2024 09:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zcgnz/v3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A29080C13;
+	Wed, 22 May 2024 09:27:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D394D2D047;
-	Wed, 22 May 2024 09:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8708F80628
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 09:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716369630; cv=none; b=bWbTqgePgWjPU2+Q+WfbvK+5pfx0PzicVgbp0Oal7KQY18C5OZYOiU4EtiXWZL8oa8q3snVboWfXYzykdLXLJxqea5NN3HClVNN7PI4XYjcGOUe13Z/PlfWq4mE1La/eh0g9q1xjg6tl34t+ACuwuByfOGYCJfxZjRmO8G9edhM=
+	t=1716370021; cv=none; b=iWCk4M08l0od9i4T9jUyvSL8eQqPZgtrXyC1qSAvI104Ta4DdBMqLbUtxswO/Vub72i2g8OX1raMYDB16akvc6TyYWaXGhYe+ND5q9QPaEK/0lRN6X3Iw9TZFI+xO/FbEYocvJ4UzejApy5cXII1hsRU1f1tlKzy+MgpkDhRJwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716369630; c=relaxed/simple;
-	bh=xZs+ye5qwNKov0tLlq5iXfmZRCL5RvXS0tDyXCyIVYM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cfCTcE5+9u4PL5D40b/j+rR7f72PVd6hap/ddTMOYecjIFj7PwVMkqSoESlu27Jl9Y1OUfjXipyAqhQnVss7aHzfeNcJ/eaK5trC5Dc6GDysQUlFv4y7eBHMbwZ7T7KFK11qKQFrSWxRjRRM52lcgYTRwGmFEbC4F1DES1Kschg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zcgnz/v3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D76BC32781;
-	Wed, 22 May 2024 09:20:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716369629;
-	bh=xZs+ye5qwNKov0tLlq5iXfmZRCL5RvXS0tDyXCyIVYM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Zcgnz/v3xLpANv3pLHA5JZSj6Eml9zBnDwCrG33JwY/tXdM/srH4fSUHG00m+4X2/
-	 nAmBkCaFldyF1DyeMCQbMQLGxvqRrljwPSUYfozmADSwLbmQKEde/JNY2yNjUVVUax
-	 T2zddxxoaTWKVQFK2M8Sq1LSMQw80ZOK5zv/O0rgNnaHTQ4i0WPRPmeTV9EpeQhf3S
-	 d6xrQMdkc5LCflI4Trt6hiI30OvFcbz9MPlFh8PPxZlLcW8JuLokNWqZbvYQeSbLrs
-	 R+MQh4qtkunJaEEAnb+eCkPiS4Y1BA0NvBrelwySPp3kBd7WNHNmDugHiquTbNF52Q
-	 IcElKkdn8QWdg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3C09CC4361B;
-	Wed, 22 May 2024 09:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1716370021; c=relaxed/simple;
+	bh=bdTgcLfs9cPHOL1bX3cQFTsw986kHNMQSwNr5GohWDk=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=QGBCO81E6W9PamF/uEIby7rshAPbwJkvwJD7I7qKLEwfPbXWY0Mg1tDbUKRWgGVy4Hjq8D9NpXTZCfXzUElf/46W5mABTRlNeZBwk0fpujdPpUz+bTyWryoMOAOhAvjQ/cGXzVQxzSMYuqaQollcB//w4hBC45q5f89nN9B8Y0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from ja.int.chopps.org.chopps.org (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 403D87D0B9;
+	Wed, 22 May 2024 09:26:53 +0000 (UTC)
+References: <cover.1716143499.git.antony.antony@secunet.com>
+ <3c5f04d21ebf5e6c0f6344aef9646a37926a7032.1716143499.git.antony.antony@secunet.com>
+ <20240519155843.2fc8e95a@hermes.local>
+User-agent: mu4e 1.8.14; emacs 28.2
+From: Christian Hopps <chopps@chopps.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Antony Antony <antony.antony@secunet.com>, David Ahern
+ <dsahern@gmail.com>, netdev@vger.kernel.org, devel@linux-ipsec.org,
+ Steffen Klassert <steffen.klassert@secunet.com>, Eyal Birger
+ <eyal.birger@gmail.com>, Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, Christian Hopps <chopps@chopps.org>
+Subject: Re: [PATCH RFC iproute2-next 2/3] xfrm: support xfrm SA direction
+ attribute
+Date: Wed, 22 May 2024 05:26:13 -0400
+In-reply-to: <20240519155843.2fc8e95a@hermes.local>
+Message-ID: <m2y18242oz.fsf@ja.int.chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH V2 net] net: mana: Fix the extra HZ in mana_hwc_send_request
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171636962924.3713.1861130025429857473.git-patchwork-notify@kernel.org>
-Date: Wed, 22 May 2024 09:20:29 +0000
-References: <1716185104-31658-1-git-send-email-schakrabarti@linux.microsoft.com>
-In-Reply-To: <1716185104-31658-1-git-send-email-schakrabarti@linux.microsoft.com>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
- yury.norov@gmail.com, leon@kernel.org, cai.huoqing@linux.dev,
- ssengar@linux.microsoft.com, vkuznets@redhat.com, tglx@linutronix.de,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- schakrabarti@microsoft.com, stable@vger.kernel.org
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sun, 19 May 2024 23:05:04 -0700 you wrote:
-> Commit 62c1bff593b7 added an extra HZ along with msecs_to_jiffies.
-> This patch fixes that.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 62c1bff593b7 ("net: mana: Configure hwc timeout from hardware")
-> Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-> Reviewed-by: Dexuan Cui <decui@microsoft.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [V2,net] net: mana: Fix the extra HZ in mana_hwc_send_request
-    https://git.kernel.org/netdev/net/c/9c91c7fadb17
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+--=-=-=
+Content-Type: text/plain; format=flowed
 
 
+Stephen Hemminger <stephen@networkplumber.org> writes:
+
+> On Sun, 19 May 2024 20:37:23 +0200
+> Antony Antony <antony.antony@secunet.com> wrote:
+>
+>> +	if (tb[XFRMA_SA_DIR]) {
+>> +		__u8 dir = rta_getattr_u8(tb[XFRMA_SA_DIR]);
+>> +
+>> +		fprintf(fp, "\tdir ");
+>> +		if (dir == XFRM_SA_DIR_IN)
+>> +			fprintf(fp, "in");
+>> +		else if (dir == XFRM_SA_DIR_OUT)
+>> +			fprintf(fp, "out");
+>> +		else
+>> +			fprintf(fp, " %d", dir);
+>> +		fprintf(fp, "%s", _SL_);
+>> +	}
+>
+> JSON output support please
+
+I would think this should be a different patchset since it would be totally new for iproute xfrm, right?
+
+Thanks,
+Chris.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmZNulwSHGNob3Bwc0Bj
+aG9wcHMub3JnAAoJEC4dgw7XuDAlRa8P/35uenY4fQkWXevASh1QNoGNlegX33JF
+7mPIv+ViJYUcsjY5cuJnJDbqosRy+z8MeCfToAXioO5PUwKd77ZUlvQc8ZEHubar
+3R1zFu4h31fCcdbHqlFxreKQ53PT+A5hduxTFTCwCe+T+Zuas4u/5/3uowB4n37O
+XaxJ42qevGOrywJ1t8OFnt3Cl+8AguiZMfDOVa7goGjon4idnWM+Su7Zu4qjPHCo
+GyUdLRzSjGMuAFKYlMIHrEianzF8ESyjgtQ0poich5n1t4w52vDC84S5AM8Kn90f
+3QqgmhW6Q71NPpl+ilaPhAj2q2WIQJdHsrnbrAk7qRNGpFOVZAv/8u6yV7qOB4+1
+KGMgCEdze1F+C4Eak9zCHiZpJAxgEHJhTZFpTfTBhiaBIl2J1z2mU64cwLUDWrhP
+F0a+nC1FRT0T4VVBkA/5BMVqZsWDhAd4/j9Ldyg0EV4AJh1O66GeHNRGyK6Eb13s
+mlf3eyB97O9ehnhEmMAoy1lwRStBjG+UVhLSgkowRze+/hvKitvUjCna4GDWP6u3
+l+jmxqfd2zD8PganILMfFXEenQmaA93sTp6oa3hf+gPLkaS9JZMHKU2K07SnzbbQ
+kGKXC4WCXiSzPtaKFSUmjUBjWxBR8ujXtMWvB6CCoTQ8lKNx5NeLGk/JXqpTjPOC
+dGYBZYz3iUm5
+=owLx
+-----END PGP SIGNATURE-----
+--=-=-=--
 
