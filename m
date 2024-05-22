@@ -1,118 +1,226 @@
-Return-Path: <netdev+bounces-97508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A66B8CBCA8
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:08:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2F48CBCAC
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:09:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B76E1C211FC
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 08:08:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DF301F21687
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 08:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E23C7E765;
-	Wed, 22 May 2024 08:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1417E56B;
+	Wed, 22 May 2024 08:09:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="ClT7YY9+";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="mSm9zJ5k"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="VLIYO4Y4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00FD770FB;
-	Wed, 22 May 2024 08:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E163A182DB
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 08:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716365292; cv=none; b=IJ1K6+5NkY9N6erPaflo46lDhpPNMuAi/qNjzDSoWBqBBXf7soQ+8W0TQn4tdG5I/emJMYQ9rxi8JM8gptR/nIILZTuQd3MB/ptUcT26RiK3AUEIO9J3ZHN+nplt2Tv71VjFpmxBnwgNIzN3nkDUAIC/cGt8sKaBWIk7K352FqA=
+	t=1716365380; cv=none; b=LZsqgkkb6pUQRFmPJ+QXepJVMZz7LBkKNCq9H99PNaSFrhMAMEXA0iluEavD2tDDZhLie+4mWRulHxtE6Zig+nsSZNJY4ypPvulF95yRe6dB46516+xAJfrlG3Vu9+hlKzq3hdjSjLjdJs8wDvLH2V8y3NT3u18HK/frtImuOyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716365292; c=relaxed/simple;
-	bh=Kdse38lEoCzIDa5LclYD/dbJ1jVST51Gu79d5x8j6L8=;
-	h=Subject:Date:From:To:Cc:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jmfTYzBxRzAnCFuu7k1rDh0nXr9oMFc2RY/1o8dqbK0I2MxyjEVUZ8RluaM3SuP2x8YeUPh0QFl4KjNey+JvbVggjC318j/QR9W6EhQ3xgvLZ4i7oKR+MBiwWmNHVbXo+8LLzvKjo6DAoNXVuzGkMFE+r2UFO/9qT1x56OUR1po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=ClT7YY9+; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=mSm9zJ5k reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+	s=arc-20240116; t=1716365380; c=relaxed/simple;
+	bh=HTSAkOfvYuC9hUkLVTxjoov6viq5nfiMgRTmN1j9YxY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NINvTTsQSP2lBuRK3EduHv3x+qm5ylhbJNgDidNzWlxAJBOJn+PfNnttSxjVsPkUC3ACbXvkOVIRnr/scuPFMeAhjtFkhdJktN4oULZNrq+2v7cLFpNC7PGOow91M7tJ/ZN1b5Xici5dAyrLUO0Ga043Db/e3xr2ZiQnOvduV7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=VLIYO4Y4; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a5a89787ea4so878277566b.2
+        for <netdev@vger.kernel.org>; Wed, 22 May 2024 01:09:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1716365288; x=1747901288;
-  h=date:from:to:cc:message-id:references:mime-version:
-   content-transfer-encoding:in-reply-to:subject;
-  bh=09Rm6E2T3nXPkfUBf2UBfoCcjD58pN6xKwuBm2Gg+UQ=;
-  b=ClT7YY9+PpcQJOFEdOhAnluuMUrPEy/PnWkIocm6rmLF/p+fabSj68hW
-   S6nSboTy/rmIZrOsXR5P/s7Q5ezdKgOvzQUwSFJrkrVN2T5ZBgn6gtV//
-   WrKjt0d53IEaa0mbmnoLZt0cbTkMY8VR0ouyDG8/1tsCEghV5AYCxeDjz
-   M0/A6vbJhNq176ss8MD/u0rKL7WvyynCrO2VGwKqEzKgD1wK2V5tHEKS7
-   gwf16cNlQVXg3DkRWZlt2TQWgnuFTcrr2Jgly9ISM7O2X7mUyyMOcA7Ka
-   85VgGWNdjJLUplz385FZTUr0QH0Fg+jCQRsHuCDWOTWHPgV0GjbYTlybQ
-   w==;
-X-CSE-ConnectionGUID: gFwN2NN1Qu6aWgszxRa3eQ==
-X-CSE-MsgGUID: ECvYO5EFTpWPfIjRtpHF5A==
-X-IronPort-AV: E=Sophos;i="6.08,179,1712613600"; 
-   d="scan'208";a="37008058"
-Subject: Re: Re: [PATCH v3 7/8] can: mcp251xfd: add gpio functionality
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 22 May 2024 10:08:04 +0200
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4BB97161199;
-	Wed, 22 May 2024 10:07:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1716365280;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=09Rm6E2T3nXPkfUBf2UBfoCcjD58pN6xKwuBm2Gg+UQ=;
-	b=mSm9zJ5kHiPXGPpCpULTKHgD7+Ji00sP0rwSz7TsJQRWfz/uBhM5BC6s7YoDElISW6ONHo
-	VljszIj7NUpTDWFNV1fEuuCAPvh/2KsOMOXY5OVh5t/GaPXkeVmtmBh7H0MHJeav51JW7H
-	HN4JRTZcBab8aQ3mvsaLzuPx6yEGx1j7tcRGri7RUZyOflbBq2t3PiThpXW6D35dub/62c
-	BT1ykPaIPSddqJsdzGVSEm80jcvStsKl1jdI8PovuAJn/cEpx7UF4vaDTmcEu7jm6NmS2p
-	940v2Pn8MrsM5vsbQkl5cnjUwNmm+giNBMOT/e7TsGkOJJNYRmBScroiyOcv5A==
-Date: Wed, 22 May 2024 10:07:52 +0200
-From: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Thomas Kopp <thomas.kopp@microchip.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, linux@ew.tq-group.com
-Message-ID: <Zk2n2JEzqbBkn9/7@herburgerg-w2>
-References: <20240521-mcp251xfd-gpio-feature-v3-0-7f829fefefc2@ew.tq-group.com>
- <20240521-mcp251xfd-gpio-feature-v3-7-7f829fefefc2@ew.tq-group.com>
- <e24b16a1-2a69-4aea-9ad0-135ed0a87547@lunn.ch>
+        d=cloudflare.com; s=google09082023; t=1716365377; x=1716970177; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xq9ju8yuRG9zlq1ssdeG2Wi6UKR7EhZ3LYktIzrnaHw=;
+        b=VLIYO4Y4pOfw/LsXaZoNTlfDuhqJh5ZD6FGYyxtK0Bi0Zt68JDbiH1zciTC/Rg5I73
+         cmHv0OfLrEZ31EEZ6qk0/SGiNjm9Oul4Qgve3POm2DwqdbacohQmCLKA1grnVeYOrgZq
+         2gg5BchGSQysOelk6IFEpGm06vsgRKYlmgYIW38dsqsZYQkALC2DKruQvreFzKYlCWAD
+         nLbOWbkY/KwFiLfYih0w9hpraH7D0g0SPdS6HaQg0Q6IdWKcg2fiVhWIv6OsMpd93XQw
+         TMYFf7a7uZqgBhBaPMv8UFMpdEoNMiCASPz7iXGSqFXCKLYDLdGsXg/FIpYz2LYn/KQz
+         d84A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716365377; x=1716970177;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Xq9ju8yuRG9zlq1ssdeG2Wi6UKR7EhZ3LYktIzrnaHw=;
+        b=nKhvj8A64a2E1Vv5Nq3fn0sjQafNVSBXqLMSBBsbf/aCYp1GuCwF/vZ0eYsaHIr1ek
+         t3zrfPqGNmk7CC7b7V8waV8QpvW/g7DuMJRz5hCWK76kOnf8Sbe40TzPM1vzx8TOxxPA
+         XYtNoiAT++FFNThK6CMsyBvfw0SRKZuf2zpq2o5eRvF1Vo46bnBLaGIsc4TV9h+1MOT4
+         riXJWjMKc8W3gCjI7MyZRxoTAZ0CqylY9VDaAaDuLPySM77oRR2mRJ1VQzXCv5FhmLgD
+         /vvqvXAH2BdZc2zcBnPxnBoZWH0pFz+PUj17BYfDq9pfJmC/+Rmkw1HvG535Bd0Pgy3P
+         c+gg==
+X-Gm-Message-State: AOJu0YzSvXQV3x7lmlA0zc6upKVp9EkwcnQeaOkCOwOuIqB8LDOLjA9n
+	k3jw+Ge63CUeD5SIeCOSQUzCFoX3xsZai0jGZzZL2c0CGEBK22O9wEMdmtr8cDU=
+X-Google-Smtp-Source: AGHT+IGstuf+E6eoUXnXG3g0majoDgIfzyLmMnkjz+pFVkzINmxxHBKor7gJYutVvHOmkXgyMqtPhw==
+X-Received: by 2002:a17:906:259a:b0:a59:a0b6:638 with SMTP id a640c23a62f3a-a622819aea3mr68572366b.61.1716365377206;
+        Wed, 22 May 2024 01:09:37 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2dc::49:b7])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a179c7df7sm1728517866b.111.2024.05.22.01.09.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 May 2024 01:09:36 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Subject: [PATCH bpf-next] selftests/bpf: test_sockmap, use section names understood by libbpf
+Date: Wed, 22 May 2024 10:09:36 +0200
+Message-Id: <20240522080936.2475833-1-jakub@cloudflare.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <e24b16a1-2a69-4aea-9ad0-135ed0a87547@lunn.ch>
-X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, May 21, 2024 at 10:37:33PM +0200, Andrew Lunn wrote:
-> On Tue, May 21, 2024 at 03:04:57PM +0200, Gregor Herburger wrote:
-> > The mcp251xfd devices allow two pins to be configured as gpio. Add this
-> > functionality to driver.
-> 
-> I have a basic understanding of GPIO drivers, which is probably more
-> than average for netdev reviewers. This code looks O.K. to me, but i
-> would prefer you run it by the GPIO maintainers, since that is there
-> domain of expertise. I don't think any are in Cc:
-Hi Andrew,
+libbpf can deduce program type and attach type from the ELF section name.
+We don't need to pass it out-of-band if we switch to libbpf convention [1].
 
-ok i will resend with the GPIO maintainers in Cc.
+[1] https://docs.kernel.org/bpf/libbpf/program_types.html
 
-Best regards
-Gregor
+Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+---
+ .../selftests/bpf/progs/test_sockmap_kern.h   | 17 +++++-----
+ tools/testing/selftests/bpf/test_sockmap.c    | 31 -------------------
+ 2 files changed, 9 insertions(+), 39 deletions(-)
+
+diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_kern.h b/tools/testing/selftests/bpf/progs/test_sockmap_kern.h
+index 99d2ea9fb658..3dff0813730b 100644
+--- a/tools/testing/selftests/bpf/progs/test_sockmap_kern.h
++++ b/tools/testing/selftests/bpf/progs/test_sockmap_kern.h
+@@ -92,7 +92,7 @@ struct {
+ 	__uint(value_size, sizeof(int));
+ } tls_sock_map SEC(".maps");
+ 
+-SEC("sk_skb1")
++SEC("sk_skb/stream_parser")
+ int bpf_prog1(struct __sk_buff *skb)
+ {
+ 	int *f, two = 2;
+@@ -104,7 +104,7 @@ int bpf_prog1(struct __sk_buff *skb)
+ 	return skb->len;
+ }
+ 
+-SEC("sk_skb2")
++SEC("sk_skb/stream_verdict")
+ int bpf_prog2(struct __sk_buff *skb)
+ {
+ 	__u32 lport = skb->local_port;
+@@ -151,7 +151,7 @@ static inline void bpf_write_pass(struct __sk_buff *skb, int offset)
+ 		memcpy(c + offset, "PASS", 4);
+ }
+ 
+-SEC("sk_skb3")
++SEC("sk_skb/stream_verdict")
+ int bpf_prog3(struct __sk_buff *skb)
+ {
+ 	int err, *f, ret = SK_PASS;
+@@ -233,7 +233,7 @@ int bpf_sockmap(struct bpf_sock_ops *skops)
+ 	return 0;
+ }
+ 
+-SEC("sk_msg1")
++SEC("sk_msg")
+ int bpf_prog4(struct sk_msg_md *msg)
+ {
+ 	int *bytes, zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5;
+@@ -263,7 +263,7 @@ int bpf_prog4(struct sk_msg_md *msg)
+ 	return SK_PASS;
+ }
+ 
+-SEC("sk_msg2")
++SEC("sk_msg")
+ int bpf_prog6(struct sk_msg_md *msg)
+ {
+ 	int zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, key = 0;
+@@ -308,7 +308,7 @@ int bpf_prog6(struct sk_msg_md *msg)
+ #endif
+ }
+ 
+-SEC("sk_msg3")
++SEC("sk_msg")
+ int bpf_prog8(struct sk_msg_md *msg)
+ {
+ 	void *data_end = (void *)(long) msg->data_end;
+@@ -329,7 +329,8 @@ int bpf_prog8(struct sk_msg_md *msg)
+ 
+ 	return SK_PASS;
+ }
+-SEC("sk_msg4")
++
++SEC("sk_msg")
+ int bpf_prog9(struct sk_msg_md *msg)
+ {
+ 	void *data_end = (void *)(long) msg->data_end;
+@@ -347,7 +348,7 @@ int bpf_prog9(struct sk_msg_md *msg)
+ 	return SK_PASS;
+ }
+ 
+-SEC("sk_msg5")
++SEC("sk_msg")
+ int bpf_prog10(struct sk_msg_md *msg)
+ {
+ 	int *bytes, *start, *end, *start_push, *end_push, *start_pop, *pop;
+diff --git a/tools/testing/selftests/bpf/test_sockmap.c b/tools/testing/selftests/bpf/test_sockmap.c
+index 4499b3cfc3a6..ddc6a9cef36f 100644
+--- a/tools/testing/selftests/bpf/test_sockmap.c
++++ b/tools/testing/selftests/bpf/test_sockmap.c
+@@ -1783,30 +1783,6 @@ char *map_names[] = {
+ 	"tls_sock_map",
+ };
+ 
+-int prog_attach_type[] = {
+-	BPF_SK_SKB_STREAM_PARSER,
+-	BPF_SK_SKB_STREAM_VERDICT,
+-	BPF_SK_SKB_STREAM_VERDICT,
+-	BPF_CGROUP_SOCK_OPS,
+-	BPF_SK_MSG_VERDICT,
+-	BPF_SK_MSG_VERDICT,
+-	BPF_SK_MSG_VERDICT,
+-	BPF_SK_MSG_VERDICT,
+-	BPF_SK_MSG_VERDICT,
+-};
+-
+-int prog_type[] = {
+-	BPF_PROG_TYPE_SK_SKB,
+-	BPF_PROG_TYPE_SK_SKB,
+-	BPF_PROG_TYPE_SK_SKB,
+-	BPF_PROG_TYPE_SOCK_OPS,
+-	BPF_PROG_TYPE_SK_MSG,
+-	BPF_PROG_TYPE_SK_MSG,
+-	BPF_PROG_TYPE_SK_MSG,
+-	BPF_PROG_TYPE_SK_MSG,
+-	BPF_PROG_TYPE_SK_MSG,
+-};
+-
+ static int populate_progs(char *bpf_file)
+ {
+ 	struct bpf_program *prog;
+@@ -1825,13 +1801,6 @@ static int populate_progs(char *bpf_file)
+ 		return -1;
+ 	}
+ 
+-	bpf_object__for_each_program(prog, obj) {
+-		bpf_program__set_type(prog, prog_type[i]);
+-		bpf_program__set_expected_attach_type(prog,
+-						      prog_attach_type[i]);
+-		i++;
+-	}
+-
+ 	i = bpf_object__load(obj);
+ 	i = 0;
+ 	bpf_object__for_each_program(prog, obj) {
 -- 
-TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht München, HRB 105018
-Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
-https://www.tq-group.com/
+2.40.1
+
 
