@@ -1,104 +1,102 @@
-Return-Path: <netdev+bounces-97647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 334808CC8D2
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 00:10:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 313978CC8EE
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 00:17:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C61EEB20FE8
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 22:10:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D55B01F219D8
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 22:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0C7145FEA;
-	Wed, 22 May 2024 22:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E331474B8;
+	Wed, 22 May 2024 22:16:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ODDZJX6f"
+	dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b="gG8Z7TsK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-in-1.gedalya.net (mail.gedalya.net [170.39.119.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB06980617;
-	Wed, 22 May 2024 22:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85467C081
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 22:16:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.39.119.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716415829; cv=none; b=jwDaRyIRvbznDgYb9XdQAF0Y1IOzjOm1+jbjxpTxHMkpSAVLAmocZZwDML35uqlUat1iBQ/6/URilaOwGzGxXp1Cz/+xHSdf6hNPnNDDhuvLWYWyQUeonBimpJGdJYpX+hbtNh6lITjbETb6NaWwVhNRlkqzuZ6XkLhl2MaI6pQ=
+	t=1716416218; cv=none; b=lyTUAU7uiH64wV/gVgVDb9shMnwju2MJjmkP3HfNrTCCI6E/9HYSsI9rjVpS/QOZYzT0W5hiw806TuMcOQEv1fV6Akdl8a51guMTU3gG5ONNZjqzB/5sw0LFH8FBvA6MkGLt84510EEIvwi0j6GGjhnvoG8WkMZ5ZUMfaAbMc1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716415829; c=relaxed/simple;
-	bh=oSFNzMpDKtK4eH1YetPIyVYw4X0A4rqOFX0DW5tdTNc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mD123gVt3PddbyPPfcaA2B7cMYr+2jMIJQBCFuerI5IZwC0F3lten2ekcf8x/3W7Zk8rdfi31Qi54SJU0eJENVFVLIp0x4VzQq9BAf6YEQ5XaIB3brSTvQ/eyFP3XV0ZCSrkcKInTCihY8fyM3un9UBUoUhYJ8AzGwdGlWlXN20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ODDZJX6f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7C33DC32781;
-	Wed, 22 May 2024 22:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716415829;
-	bh=oSFNzMpDKtK4eH1YetPIyVYw4X0A4rqOFX0DW5tdTNc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ODDZJX6faefd3ZMlCma75vd8YuzK2IBEBbPsiJiErLHTIqhie1EY2gjtENuJKNO/w
-	 AMOHu7huK5i/b6Oi8231Od5OxJaNiwVEdhjCNkn/aeo/brPfPda17gDL3nwRi0/XA7
-	 spU8wPqzcFohQ5JtVHvjrc0eZrtkTTOxzgoCQrKJw5cwamIFEuWMUpze/rn/m2ggE3
-	 MSkXnJV2MSOhn0JfcRhNK7hYbKQLaAm+7JS7w2j7/9Aw7nmzjV5kNyuzLQpV3Bnrxc
-	 JTSwNhc/2cKbqGUyGVZekDUhkAZ6VTRat/Z+t9RqpKtYl9+wYz86QApKYO0aKpnc0J
-	 FOZqgawrDYOPQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5F9BAC4361C;
-	Wed, 22 May 2024 22:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1716416218; c=relaxed/simple;
+	bh=GTY1UL3ISuBXBH1b8ZdpROf0vanIEWsIZCi9JOsQ1hs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MAr7hex+tQTclZl2gdb/OWpo4w6L0+FKKsLjS/UjilRqotcyd4QHvPve4poH7Au1+6XK8zCtbOS3REtksI36uxq/KCbJvZXG+sCMEpkVOFGF8z9zvM1o+RV3V23GKKsbNEaf81JL77LE6HHDyA2WtLe+CXcyi5uBaXGsTiB4lO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net; spf=pass smtp.mailfrom=gedalya.net; dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b=gG8Z7TsK; arc=none smtp.client-ip=170.39.119.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gedalya.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gedalya.net
+	; s=rsa1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description;
+	bh=GTY1UL3ISuBXBH1b8ZdpROf0vanIEWsIZCi9JOsQ1hs=; b=gG8Z7TsKDW30vkqL/e5/Er9us3
+	Czkp0sMjI+Lkyma2vmdVlCax12NLARFOvw7N/Cerz1cmN2vgN+99EyeKO8uas+e6Zuvjr1XsgxSDw
+	JsAIfZ29DQ4JUlqbQzfJE0A64haZsYb/y8Y5c8b2f2Kx7jzN/HorCbCJL40ztlBzm9E25of/UF58c
+	eXmjTCIFax4zkaus5IDir225KTHvyfvqivAlsTrAvklY7JNdT2iIoEORgARPu5sQ/C1dsdFrVcTU6
+	ZvHDCj08H+A4oqjq1Upt2K9XJ/LMwlPZbxTjdKx85wIOFb9GntNpbTm2sGAdRerKh8VZOvKok4S/s
+	TetWPX3A==;
+Received: from [192.168.9.10]
+	by smtp-in-1.gedalya.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <gedalya@gedalya.net>)
+	id 1s9uGU-000evo-1P;
+	Wed, 22 May 2024 22:16:54 +0000
+Message-ID: <f0f54f62-1c76-4fb8-8e8e-b2a11049b156@gedalya.net>
+Date: Thu, 23 May 2024 06:16:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v4 1/2] net: netfilter: Make ct zone opts
- configurable for bpf ct helpers
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171641582938.6470.8952877618010663411.git-patchwork-notify@kernel.org>
-Date: Wed, 22 May 2024 22:10:29 +0000
-References: <20240522050712.732558-1-brad@faucet.nz>
-In-Reply-To: <20240522050712.732558-1-brad@faucet.nz>
-To: Brad Cowie <brad@faucet.nz>
-Cc: bpf@vger.kernel.org, martin.lau@linux.dev, lorenzo@kernel.org,
- memxor@gmail.com, pablo@netfilter.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- song@kernel.org, john.fastabend@gmail.com, sdf@google.com, jolsa@kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] [resend] color: default to dark background
+To: Stephen Hemminger <stephen@networkplumber.org>,
+ Dragan Simic <dsimic@manjaro.org>
+Cc: netdev@vger.kernel.org
+References: <E1s9rpA-00000006Jy7-18Q5@ws2.gedalya.net>
+ <20240522135721.7da9b30c@hermes.local>
+ <67841f35-a2bb-49a5-becd-db2defe4e4fa@gedalya.net>
+ <2866a9935b3fa3eafe51625b5bdfaa30@manjaro.org>
+ <20240522143354.0214e054@hermes.local>
+Content-Language: en-US
+From: Gedalya <gedalya@gedalya.net>
+In-Reply-To: <20240522143354.0214e054@hermes.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On 5/23/24 5:33 AM, Stephen Hemminger wrote:
 
-This series was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+> The color handling of iproute2 was inherited from other utilities such as vim.
+> There doesn't appear to be any library or standardization, all this ad-hoc.
 
-On Wed, 22 May 2024 17:07:11 +1200 you wrote:
-> Add ct zone id and direction to bpf_ct_opts so that arbitrary ct zones
-> can be used for xdp/tc bpf ct helper functions bpf_{xdp,skb}_ct_alloc
-> and bpf_{xdp,skb}_ct_lookup.
-> 
-> Signed-off-by: Brad Cowie <brad@faucet.nz>
-> ---
-> v2 -> v3:
->   - Remove whitespace changes
->   - Add reserved padding options
->   - If ct_zone_id is set when opts size isn't 16, return -EINVAL
->   - Remove ct_zone_flags
->     (not used by nf_conntrack_alloc or nf_conntrack_find_get)
-> 
-> [...]
+Looking at the vim code, and playing around with the program, I
+have a few observations.
 
-Here is the summary with links:
-  - [bpf-next,v4,1/2] net: netfilter: Make ct zone opts configurable for bpf ct helpers
-    https://git.kernel.org/bpf/bpf-next/c/ece4b2969041
-  - [bpf-next,v4,2/2] selftests/bpf: Update tests for new ct zone opts for nf_conntrack kfuncs
-    https://git.kernel.org/bpf/bpf-next/c/a87f34e742d2
+The snippet you quoted isn't doing anything brilliant. It just
+assumes that certain types of terminals are dark, regardless of
+the implementation and configuration. All you can really say is
+that terminals are often dark which is what I was saying here in
+the first place.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I'm not seeing any justification for assuming dark in certain
+cases and light otherwise. The code just happens to be that way.
 
+More importantly, vim does happen to actually work. So far I was
+only able to get it to show dark blue on a black background by
+setting TERM=ansi.
+
+The results are what is important. Vim has its own various color
+palettes and it's a serious full-screen app, uses the terminfo
+library, its support for terminals is much more complex than just
+two palettes. One way or another, we need to fix this, probably
+not by linking against ncurses, and "assuming terminal backgrounds
+are light" isn't the nugget of wisdom vim has to offer.
 
 
