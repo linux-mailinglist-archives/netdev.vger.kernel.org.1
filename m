@@ -1,121 +1,156 @@
-Return-Path: <netdev+bounces-97540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE7678CC01D
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 13:21:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 564B68CC05F
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 13:38:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E06B81C20B96
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 11:21:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11BA0284112
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 11:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16BA1824AE;
-	Wed, 22 May 2024 11:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E9A8287D;
+	Wed, 22 May 2024 11:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iqoFvCWh"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="W96hvT8j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF44B7BB17;
-	Wed, 22 May 2024 11:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E1356B72;
+	Wed, 22 May 2024 11:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716376884; cv=none; b=TvLAslyCFTCo8dvVguiaRJEIkMaLUbHmsQ+gfp7jSUOOSelEHTjHrLUHHBILFwSF8aMj/cyMXdI0WH+hR5BUEwvlpPsQ3QaQrPmxSHkdNHMv971h30AaKMltHiYwrREtYY3AD4rzhLb9SjBBr9UYO15ebhD7ZHV9nqzY2cesFhY=
+	t=1716377886; cv=none; b=Xy/7OeacX2bng/FDOiIGZ98gZwLGwubaDMtC2slju0neMq4YgiWCDLGSKfFN25bzh0fgauwSgLbrgvGPRHXmH71R0uhlOJ1FlLpWnXuhZjqRxmluxQQ9irfYPPpHxlFmE6vQjokksFk5v4oSeVQqVHnTXfgdbiFXVY2cHvQ1tIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716376884; c=relaxed/simple;
-	bh=6LFpisAJ3P2zL/wDbYfaPPwjur7WX2IAIulJ4g4PAAA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wz5THzjwdF61xfazNIQ31tJw8M5E9l/0U5gw6Xt4p1p96CfOLQDXijUBs/Ur8uMPGSRGZLWT9VJgbmFA4xpiQz0AuyNrKlarpichlDBFrl10+kEMWV5NrN0A2ysLxxy19TQrp7eQ+MLGFiQaFhdimIXrc8ZikNWo4WPixondnDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iqoFvCWh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A68AEC2BD11;
-	Wed, 22 May 2024 11:21:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716376883;
-	bh=6LFpisAJ3P2zL/wDbYfaPPwjur7WX2IAIulJ4g4PAAA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iqoFvCWhL06a+t3NwIiHw7f7YkYWr6An8TRv4o2dAlkTeFZh0noWkl8eHYPTJ7/L2
-	 TbYkFtaSP/IxDAkggFuA7DKY5bcZ8xT8qT4RVKbVJ9gdUQj9VrIdQqwiwRrEXLsqdA
-	 wwyDT+5UTEQj/NZLNW0BfAxrgiC0oXA0JtJYoD5IWAvOZ+Hm7CWjxwkEJtxqrBYgLo
-	 nWePa0mTUVjoCIZAWcNj7VvrxBbLdGB0OYgAeCBR/quUErwE7SWWeoscdX0UkNVTGN
-	 z6woD/4Ji2GtDcuFgtx1+D7X5zz1NYYsVcAVcd8paZo/ykOopjL94IV7OfzK2D7O37
-	 7LyBbaoe1ptyA==
-Date: Wed, 22 May 2024 12:21:14 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Edward Liaw <edliaw@google.com>
-Cc: shuah@kernel.org, =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Kees Cook <keescook@chromium.org>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Will Drewry <wad@chromium.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, kernel-team@android.com,
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
-	linux-riscv@lists.infradead.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v5 02/68] kselftest: Desecalate reporting of missing
- _GNU_SOURCE
-Message-ID: <94b73291-5b8a-480d-942d-cfc72971c2f5@sirena.org.uk>
-References: <20240522005913.3540131-1-edliaw@google.com>
- <20240522005913.3540131-3-edliaw@google.com>
+	s=arc-20240116; t=1716377886; c=relaxed/simple;
+	bh=j+W4GcZJGISa77lDIEBfrxFXmjiKU9BCqC2sLBGFabQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n+jToij07stIaBg40NI60QgTrxjCrFF8JCT3NU78ijVQmA8UDxZvTvIqEN8KkCCIIAPp6yzGdh4mKllncAuR+/slRQ2J+vaalucOZvN7JWIZUPOw2iW1MqBmNLLgkKhkuDvybabMHnWHEJzmlq+YGCap5RWIdp2ktAnID5fT2aQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=W96hvT8j; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44MBDjON004375;
+	Wed, 22 May 2024 11:37:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=tLtkLaJdZcABEuKym7kQ0uGy5iDx/Mdabykmq2f/jnw=;
+ b=W96hvT8jTsH9kRl7AZDQ+nNDpUDzk3m954evYLx301G0VZel/cWErybTqmIh4ProGWGl
+ dQGcdL8jFGKIgGUASAYCTZ7hZO0u8ozgeeRAV59Kq1alfSomqiWWljVjpw0kAsLuY+qm
+ kx6ExyANJdff/8Rabx0tg6D00oM+ElKLWGKD6v5MpOuAcFnJfMGHHxwJnefc26HsYlEZ
+ or43uwWG/wGmzEX6dOP4WiLERsDhwCDVAUpv40AVhfgn0LN54wb2qKpGoiKn3l/RwJj8
+ YmfcZrbj/fNx7mglqcfzEjUtC2AmXZIxrPlcZRRpgdu6YDXOcNad+J6xtS+nrVyNukBe cQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y9fmw022k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 22 May 2024 11:37:36 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44MBbaA4009010;
+	Wed, 22 May 2024 11:37:36 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y9fmw022f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 22 May 2024 11:37:36 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44M8c9gK008090;
+	Wed, 22 May 2024 11:37:35 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3y79c338t2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 22 May 2024 11:37:35 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44MBbVUM48693692
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 22 May 2024 11:37:33 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BC51D2004B;
+	Wed, 22 May 2024 11:37:31 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 75D4120043;
+	Wed, 22 May 2024 11:37:29 +0000 (GMT)
+Received: from [9.203.115.195] (unknown [9.203.115.195])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 22 May 2024 11:37:29 +0000 (GMT)
+Message-ID: <922473a0-7e74-45e8-9929-154d0590d124@linux.ibm.com>
+Date: Wed, 22 May 2024 17:07:28 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="WIFHs1Yh6LyJ3Qfq"
-Content-Disposition: inline
-In-Reply-To: <20240522005913.3540131-3-edliaw@google.com>
-X-Cookie: Bridge ahead.  Pay troll.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/5] powerpc64/bpf: jit support for unconditional byte
+ swap
+To: Artem Savkov <asavkov@redhat.com>, Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240517075650.248801-1-asavkov@redhat.com>
+ <20240517075650.248801-3-asavkov@redhat.com>
+Content-Language: en-US
+From: Hari Bathini <hbathini@linux.ibm.com>
+In-Reply-To: <20240517075650.248801-3-asavkov@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: B1XldeUENKxGYq5S-5rVvIhGUSDaHHY-
+X-Proofpoint-GUID: X_i3t_4zqRLlNLATCKOrtc6kfWhvOpTC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-22_05,2024-05-22_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
+ mlxscore=0 spamscore=0 malwarescore=0 adultscore=0 priorityscore=1501
+ suspectscore=0 lowpriorityscore=0 clxscore=1011 mlxlogscore=999
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2405220077
 
 
---WIFHs1Yh6LyJ3Qfq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 22, 2024 at 12:56:48AM +0000, Edward Liaw wrote:
-
-> to make stopping builds early replace the static_assert() with a
-> missing without making the error more severe than it already was.  This
-> will be moot once the issue is fixed properly but reduces the disruption
-> while that happens.
->=20
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> Reviewed-by: Kees Cook <keescook@chromium.org>
+On 17/05/24 1:26 pm, Artem Savkov wrote:
+> Add jit support for unconditional byte swap. Tested using BSWAP tests
+> from test_bpf module.
+> 
+> Signed-off-by: Artem Savkov <asavkov@redhat.com>
 > ---
->  tools/testing/selftests/kselftest_harness.h | 2 +-
+>   arch/powerpc/net/bpf_jit_comp64.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/powerpc/net/bpf_jit_comp64.c b/arch/powerpc/net/bpf_jit_comp64.c
+> index 3071205782b15..97191cf091bbf 100644
+> --- a/arch/powerpc/net/bpf_jit_comp64.c
+> +++ b/arch/powerpc/net/bpf_jit_comp64.c
+> @@ -699,11 +699,12 @@ int bpf_jit_build_body(struct bpf_prog *fp, u32 *image, u32 *fimage, struct code
+>   		 */
+>   		case BPF_ALU | BPF_END | BPF_FROM_LE:
+>   		case BPF_ALU | BPF_END | BPF_FROM_BE:
 
-You've not provided a Signed-off-by for this so people can't do anything
-with it, please see Documentation/process/submitting-patches.rst for
-details on what this is and why it's important.
+> +		case BPF_ALU64 | BPF_END | BPF_FROM_LE:
 
---WIFHs1Yh6LyJ3Qfq
-Content-Type: application/pgp-signature; name="signature.asc"
+A comment here indicating this case does unconditional swap
+could improve readability.
 
------BEGIN PGP SIGNATURE-----
+Other than this minor nit, the patchset looks good to me.
+Also, tested the changes with test_bpf module and selftests.
+For the series..
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZN1SkACgkQJNaLcl1U
-h9ALrgf/W2wyJyKvxhDmFrYgFJhxqTL7kAvJooFztcjGspGzZ11XMWpg5qCx0HHS
-CMQ056M6KjXP56PoyIJZUlgKZS/iTbNbN16CdgfzNjmm+bVoyI7RnHG5VU5ynmuC
-BgqlUZvPgjjEyxrdq3VZTEnGRMkOhSyGofvXfHkmTyxG6iPMEQP7oBAiYyKitqw1
-p16mfKVsFOWMVIa4Pz7N6DrB/DYMdLs+nmaueOfuqShFo4LwGkaP5f0ey5OFLqk4
-RSB8dbe74T8sqtlAiC+2eAHk4PIT7tsmiyAK1n80aE2bf+JBR4hWjhrniS1JKSoW
-znqrGa5yeQ/laQLifd57Xg0iW8mesw==
-=umSn
------END PGP SIGNATURE-----
+Reviewed-by: Hari Bathini <hbathini@linux.ibm.com>
 
---WIFHs1Yh6LyJ3Qfq--
+>   #ifdef __BIG_ENDIAN__
+>   			if (BPF_SRC(code) == BPF_FROM_BE)
+>   				goto emit_clear;
+>   #else /* !__BIG_ENDIAN__ */
+> -			if (BPF_SRC(code) == BPF_FROM_LE)
+> +			if (BPF_CLASS(code) == BPF_ALU && BPF_SRC(code) == BPF_FROM_LE)
+>   				goto emit_clear;
+>   #endif
+>   			switch (imm) {
 
