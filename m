@@ -1,145 +1,299 @@
-Return-Path: <netdev+bounces-97525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9BDC8CBE6C
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 11:45:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE40A8CBEE3
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 12:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49A8E1F2333C
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 09:45:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63CD3282125
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 10:03:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12E781205;
-	Wed, 22 May 2024 09:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379DF81AA7;
+	Wed, 22 May 2024 10:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kj38TorU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UKE5+R0D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 674AA22086;
-	Wed, 22 May 2024 09:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC087E761
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 10:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716371118; cv=none; b=iFDiKDHP8iG5TCGKSPHkEnSQsqYaPzfOqEaNJEb00Y7WuXmZbWLokK50YaFo54GHS5dW3mndT9kNTv6XbA55LiSDxN6WtDdISrUrn9INhna0WiHzPn8XJfYIIB3kuoqn2y2630WKFhMtYHHagTdAy7LD87OSIZRfWFRa882rSFE=
+	t=1716372195; cv=none; b=iSQxXTZbmx86fLlZ29WYyJM66iarePtSVYk6upVsJP3FrLhyGIURq8m9oWPgi8VQrwn9eb1Aj87hMEzyjVR5N6UgLwik/TnVVzrTzJ5vyLRVUta+9IFmPAvpmtD9pN7A2ixyxJ8E2UieAmh3Uv180/VOxh5kbbk1yYKZj4nbyBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716371118; c=relaxed/simple;
-	bh=qYv4awJponJVTMURVaZCUK355/IK5Q/ijJovQLrQtFU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d2+id9wPV9oovfhNV4U1hcC2rogtzxSMz0OjWYZCFIRMZXAWd6FWZQAzO62tXLOjVs8cU2Rji+V46v3uK5wkpyJyehnjYIVPB6q3TbUxv2nMqeMDFEZzpBEqOJG69zBw9BM2+JqA9PfKsSo4zCglJ2d3/bY0wqgZw7YV1O30Qpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kj38TorU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78E4DC2BD11;
-	Wed, 22 May 2024 09:45:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716371118;
-	bh=qYv4awJponJVTMURVaZCUK355/IK5Q/ijJovQLrQtFU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Kj38TorUK3Ojrmadg1u8VdLR0WVyWCyAWIEgg1euDZ6fb6GvkQ0ZUgxfy67dfsCMr
-	 3YY+zLCy3lA/mGrqLsX8cD4JmYqhOZPUYyoBXO6KoC7cgO9KaKnuDgfCn8ocxWRGwX
-	 n2UIejO7Bm4sDN9NNfSLSBjC7F1p8kio3kgGEY3T/5fvv5KktLbuT82itc37KQAjH2
-	 tSGF19M513bgiROjKC/09B17zwmg7YOiprq+/pceAhNsTOxqxShIShqFVrsZlBckdr
-	 RAajctdyAluqYfhGGiRP1F3cLTjnK0EVayaiZD9P2CYvfS7OXsDcEEp0ISdhHbCX7M
-	 /DcN1FhIwLTjQ==
-Message-ID: <33c849d2-994b-4380-a177-88412e698615@kernel.org>
-Date: Wed, 22 May 2024 11:45:07 +0200
+	s=arc-20240116; t=1716372195; c=relaxed/simple;
+	bh=KT41JCa9HFl7P78kOZALNdAss8MmzSOhVIiGOp14XbQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=rRZRB/n0bRnWRhIgRmuGKwhXDdqcPPMbxsek+aU8ngoo2oBDpNwQBglM7JoQ7z8qhWjfx26ycEMk8T1k4ygmH1xj6X1GXt5ANTpumUCloQgEAYAnlNXm6Gbz7KuvzMxRERM5JkH1dPMBptsQIq5ri2mfOpn37GPbc0kwy5qGuXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UKE5+R0D; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716372192;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=knfGlOrM7SmmEuODKlCIaTFOFJa3qZNF92wFTYElUIQ=;
+	b=UKE5+R0DVdD/aYNlE097EMOHxIyi/fysskgWajEtKHwXP3dwh9Db4wO98b6dAUZ3g8TSU7
+	mQbDcp/uf8YIBCU+9aDbnNQO1p93mMgOcasTvV/bI0Szf3KugzGQ096KNp7Q3I50ExuTjE
+	IeYfl+qRELJqHFUVKI7BFNY02qFYWHk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-73-H1iUtoBZPX2X6J5SGOLdqQ-1; Wed, 22 May 2024 06:03:09 -0400
+X-MC-Unique: H1iUtoBZPX2X6J5SGOLdqQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-34d7a7585d7so9720029f8f.2
+        for <netdev@vger.kernel.org>; Wed, 22 May 2024 03:03:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716372189; x=1716976989;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=knfGlOrM7SmmEuODKlCIaTFOFJa3qZNF92wFTYElUIQ=;
+        b=vOR/ZgyhAVbBMNdhnb5CCneoFc97ypFKnN2XSglKeRl7BDzTETQH7W7G7IDi3a+65O
+         n6/P2+3W8XuV6J26eHcJzr6CwnVGgnBwvCHI4/GLHG2y8aLwiJ793nzdJuQuMn5l4oou
+         0fh7JXJroFHd47pc06UyVJf8zQUCs0r5DLtjkqwqOxowPO4Iyt3yV/OaDtBT0uMjrO4n
+         BiTp6EBUneDKDU0VtI2xJtKP50edOTR0ZgwVO2WFAEW63iRTWJ5WqwnrNqpR1WL3Hofa
+         cZ8GPriW51//oLqnH32wh9kne79Wi5yFXt0jJnhqxexqE7hd28KUtLNo4Qz1mGgAhdhi
+         cAdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVBwf9zocFyR/4p5rvxKBR4PZhAU3/OKAPpf+5+lqcy8mJCPrOwEVrqpGVBtzJq0TBL1Hw3wTiwn4E3IXfj2Lt2Qjv+Q0jC
+X-Gm-Message-State: AOJu0YyA+WKZC8ReLPwUg88ia4MyzlUJI2JJhGQGEo21pUFNWTIiCF6l
+	KepPS6AUXrUVkHEiOV58G2xA2ezSXnGjYG0vRo0YrKGSRkUfBw1fyEKkrWCS8Xy+UloO33lHCqT
+	8wq5wbuIRRGh21Fz6xySrGLVyLfxSmHlivkrKJVxuqkanoqGgFiDUwQ==
+X-Received: by 2002:a05:6000:e81:b0:354:f2af:6ad2 with SMTP id ffacd0b85a97d-354f2af6ce6mr86040f8f.68.1716372188544;
+        Wed, 22 May 2024 03:03:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE4JD4hy648Vl10cTnw4UbRyOyD5/qdj2GTs8Izvh3XRzHLEkKuquqGU7Hg07yqa0KXqcFVVg==
+X-Received: by 2002:a05:6000:e81:b0:354:f2af:6ad2 with SMTP id ffacd0b85a97d-354f2af6ce6mr85988f8f.68.1716372187889;
+        Wed, 22 May 2024 03:03:07 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc7:55d:e862:558a:a573:a176:1825])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b8a78e8sm34236941f8f.61.2024.05.22.03.03.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 May 2024 03:03:07 -0700 (PDT)
+Date: Wed, 22 May 2024 06:03:01 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	anton.yakovlev@opensynergy.com, bartosz.golaszewski@linaro.org,
+	christophe.jaillet@wanadoo.fr, dave.jiang@intel.com,
+	david@redhat.com, eperezma@redhat.com, herbert@gondor.apana.org.au,
+	jasowang@redhat.com, jiri@nvidia.com, jiri@resnulli.us,
+	johannes@sipsolutions.net, krzysztof.kozlowski@linaro.org,
+	lingshan.zhu@intel.com, linus.walleij@linaro.org,
+	lizhijian@fujitsu.com, martin.petersen@oracle.com,
+	maxime.coquelin@redhat.com, michael.christie@oracle.com,
+	mst@redhat.com, sgarzare@redhat.com, stevensd@chromium.org,
+	sudeep.holla@arm.com,
+	syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com,
+	u.kleine-koenig@pengutronix.de, viresh.kumar@linaro.org,
+	xuanzhuo@linux.alibaba.com, yuxue.liu@jaguarmicro.com,
+	Srujana Challa <schalla@marvell.com>
+Subject: [GIT PULL] virtio: features, fixes, cleanups
+Message-ID: <20240522060301-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net 0/3] doc: mptcp: new general doc and fixes
-Content-Language: en-GB
-To: Paolo Abeni <pabeni@redhat.com>, mptcp@lists.linux.dev,
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Gregory Detal <gregory.detal@gmail.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240520-upstream-net-20240520-mptcp-doc-v1-0-e3ad294382cb@kernel.org>
- <8945a5ae3f94572daae42d4bfdc326bcf0889964.camel@redhat.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
- YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
- c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
- WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
- CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
- nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
- TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
- nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
- VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
- 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
- YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
- AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
- EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
- /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
- MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
- cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
- iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
- jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
- 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
- VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
- BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
- ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
- 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
- 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
- 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
- mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
- Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
- Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
- Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
- x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
- V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
- Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
- HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
- 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
- Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
- voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
- KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
- UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
- vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
- mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
- JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <8945a5ae3f94572daae42d4bfdc326bcf0889964.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Mutt-Fcc: =sent
 
-Hi Paolo,
+Things to note here:
 
-On 22/05/2024 11:35, Paolo Abeni wrote:
-> Hi,
-> 
-> On Mon, 2024-05-20 at 10:16 +0200, Matthieu Baerts (NGI0) wrote:
->> A general documentation about MPTCP was missing since its introduction
->> in v5.6. The last patch adds a new 'mptcp' page in the 'networking'
->> documentation.
->>
->> The first patch is a fix for a missing sysctl entry introduced in v6.10
->> rc0, and the second one reorder the sysctl entries.
->>
->> These patches can be applied without conflicts on top of the 'net' tree
->> and the 'docs-next' one. They are currently based on top of the current
->> 'net' tree because the first patch is a fix for a patch that is not in
->> 'docs-next' yet.
->>
->> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> 
-> These patches are IMHO net-next material. If you don't mind I'll defer
-> them.
+- the new Marvell OCTEON DPU driver is not here: latest v4 keeps causing
+  build failures on mips. I deferred the pull hoping to get it in
+  and I might merge a new version post rc1
+  (supposed to be ok for new drivers as they can't cause regressions),
+  but we'll see.
+- there are also a couple bugfixes under review, to be merged after rc1
+- I merged a trivial patch (removing a comment) that also got
+  merged through net.
+  git handles this just fine and it did not seem worth it
+  rebasing to drop it.
+- there is a trivial conflict in the header file. Shouldn't be any
+  trouble to resolve, but fyi the resolution by Stephen is here
+	diff --cc drivers/virtio/virtio_mem.c
+	index e8355f55a8f7,6d4dfbc53a66..000000000000
+	--- a/drivers/virtio/virtio_mem.c
+	+++ b/drivers/virtio/virtio_mem.c
+	@@@ -21,7 -21,7 +21,8 @@@
+	  #include <linux/bitmap.h>
+	  #include <linux/lockdep.h>
+	  #include <linux/log2.h>
+	 +#include <linux/vmalloc.h>
+	+ #include <linux/suspend.h>
+  Also see it here:
+  https://lore.kernel.org/all/20240423145947.142171f6@canb.auug.org.au/
 
-No problem, my bad, I thought it was OK to send new doc about existing
-features and missing items to -net. I will re-send them next week,
-targetting net-next then.
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+
+The following changes since commit 18daea77cca626f590fb140fc11e3a43c5d41354:
+
+  Merge tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm (2024-04-30 12:40:41 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to 0b8dbbdcf2e42273fbac9b752919e2e5b2abac21:
+
+  Merge tag 'for_linus' into vhost (2024-05-12 08:15:28 -0400)
+
+----------------------------------------------------------------
+virtio: features, fixes, cleanups
+
+Several new features here:
+
+- virtio-net is finally supported in vduse.
+
+- Virtio (balloon and mem) interaction with suspend is improved
+
+- vhost-scsi now handles signals better/faster.
+
+- virtio-net now supports premapped mode by default,
+  opening the door for all kind of zero copy tricks.
+
+Fixes, cleanups all over the place.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Christophe JAILLET (1):
+      vhost-vdpa: Remove usage of the deprecated ida_simple_xx() API
+
+David Hildenbrand (1):
+      virtio-mem: support suspend+resume
+
+David Stevens (2):
+      virtio_balloon: Give the balloon its own wakeup source
+      virtio_balloon: Treat stats requests as wakeup events
+
+Eugenio Pérez (2):
+      MAINTAINERS: add Eugenio Pérez as reviewer
+      MAINTAINERS: add Eugenio Pérez as reviewer
+
+Jiri Pirko (1):
+      virtio: delete vq in vp_find_vqs_msix() when request_irq() fails
+
+Krzysztof Kozlowski (24):
+      virtio: balloon: drop owner assignment
+      virtio: input: drop owner assignment
+      virtio: mem: drop owner assignment
+      um: virt-pci: drop owner assignment
+      virtio_blk: drop owner assignment
+      bluetooth: virtio: drop owner assignment
+      hwrng: virtio: drop owner assignment
+      virtio_console: drop owner assignment
+      crypto: virtio - drop owner assignment
+      firmware: arm_scmi: virtio: drop owner assignment
+      gpio: virtio: drop owner assignment
+      drm/virtio: drop owner assignment
+      iommu: virtio: drop owner assignment
+      misc: nsm: drop owner assignment
+      net: caif: virtio: drop owner assignment
+      net: virtio: drop owner assignment
+      net: 9p: virtio: drop owner assignment
+      vsock/virtio: drop owner assignment
+      wifi: mac80211_hwsim: drop owner assignment
+      nvdimm: virtio_pmem: drop owner assignment
+      rpmsg: virtio: drop owner assignment
+      scsi: virtio: drop owner assignment
+      fuse: virtio: drop owner assignment
+      sound: virtio: drop owner assignment
+
+Li Zhijian (1):
+      vdpa: Convert sprintf/snprintf to sysfs_emit
+
+Maxime Coquelin (6):
+      vduse: validate block features only with block devices
+      vduse: Temporarily fail if control queue feature requested
+      vduse: enable Virtio-net device type
+      vduse: validate block features only with block devices
+      vduse: Temporarily fail if control queue feature requested
+      vduse: enable Virtio-net device type
+
+Michael S. Tsirkin (2):
+      Merge tag 'stable/vduse-virtio-net' into vhost
+      Merge tag 'for_linus' into vhost
+
+Mike Christie (9):
+      vhost-scsi: Handle vhost_vq_work_queue failures for events
+      vhost-scsi: Handle vhost_vq_work_queue failures for cmds
+      vhost-scsi: Use system wq to flush dev for TMFs
+      vhost: Remove vhost_vq_flush
+      vhost_scsi: Handle vhost_vq_work_queue failures for TMFs
+      vhost: Use virtqueue mutex for swapping worker
+      vhost: Release worker mutex during flushes
+      vhost_task: Handle SIGKILL by flushing work and exiting
+      kernel: Remove signal hacks for vhost_tasks
+
+Uwe Kleine-König (1):
+      virtio-mmio: Convert to platform remove callback returning void
+
+Xuan Zhuo (7):
+      virtio_ring: introduce dma map api for page
+      virtio_ring: enable premapped mode whatever use_dma_api
+      virtio_net: replace private by pp struct inside page
+      virtio_net: big mode support premapped
+      virtio_net: enable premapped by default
+      virtio_net: rx remove premapped failover code
+      virtio_net: remove the misleading comment
+
+Yuxue Liu (2):
+      vp_vdpa: Fix return value check vp_vdpa_request_irq
+      vp_vdpa: don't allocate unused msix vectors
+
+Zhu Lingshan (1):
+      MAINTAINERS: apply maintainer role of Intel vDPA driver
+
+ MAINTAINERS                                   |  10 +-
+ arch/um/drivers/virt-pci.c                    |   1 -
+ drivers/block/virtio_blk.c                    |   1 -
+ drivers/bluetooth/virtio_bt.c                 |   1 -
+ drivers/char/hw_random/virtio-rng.c           |   1 -
+ drivers/char/virtio_console.c                 |   2 -
+ drivers/crypto/virtio/virtio_crypto_core.c    |   1 -
+ drivers/firmware/arm_scmi/virtio.c            |   1 -
+ drivers/gpio/gpio-virtio.c                    |   1 -
+ drivers/gpu/drm/virtio/virtgpu_drv.c          |   1 -
+ drivers/iommu/virtio-iommu.c                  |   1 -
+ drivers/misc/nsm.c                            |   1 -
+ drivers/net/caif/caif_virtio.c                |   1 -
+ drivers/net/virtio_net.c                      | 248 +++++++++++++++++---------
+ drivers/net/wireless/virtual/mac80211_hwsim.c |   1 -
+ drivers/nvdimm/virtio_pmem.c                  |   1 -
+ drivers/rpmsg/virtio_rpmsg_bus.c              |   1 -
+ drivers/scsi/virtio_scsi.c                    |   1 -
+ drivers/vdpa/vdpa.c                           |   2 +-
+ drivers/vdpa/vdpa_user/vduse_dev.c            |  24 ++-
+ drivers/vdpa/virtio_pci/vp_vdpa.c             |  27 ++-
+ drivers/vhost/scsi.c                          |  70 +++++---
+ drivers/vhost/vdpa.c                          |   6 +-
+ drivers/vhost/vhost.c                         | 130 ++++++++++----
+ drivers/vhost/vhost.h                         |   3 +-
+ drivers/virtio/virtio_balloon.c               |  85 +++++----
+ drivers/virtio/virtio_input.c                 |   1 -
+ drivers/virtio/virtio_mem.c                   |  69 ++++++-
+ drivers/virtio/virtio_mmio.c                  |   6 +-
+ drivers/virtio/virtio_pci_common.c            |   4 +-
+ drivers/virtio/virtio_ring.c                  |  59 +++++-
+ fs/coredump.c                                 |   4 +-
+ fs/fuse/virtio_fs.c                           |   1 -
+ include/linux/sched/vhost_task.h              |   3 +-
+ include/linux/virtio.h                        |   7 +
+ include/uapi/linux/virtio_mem.h               |   2 +
+ kernel/exit.c                                 |   5 +-
+ kernel/signal.c                               |   4 +-
+ kernel/vhost_task.c                           |  53 ++++--
+ net/9p/trans_virtio.c                         |   1 -
+ net/vmw_vsock/virtio_transport.c              |   1 -
+ sound/virtio/virtio_card.c                    |   1 -
+ 42 files changed, 578 insertions(+), 265 deletions(-)
 
 
