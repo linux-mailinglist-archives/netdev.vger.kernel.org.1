@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-97465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B9198CB81A
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 03:22:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E546F8CB820
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 03:22:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F5DA1C20A2B
-	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 01:22:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85F14B20C71
+	for <lists+netdev@lfdr.de>; Wed, 22 May 2024 01:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71EAA158867;
-	Wed, 22 May 2024 01:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18EDB158A17;
+	Wed, 22 May 2024 01:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Co+AbFUT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CKKlEEYW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040E6158851
-	for <netdev@vger.kernel.org>; Wed, 22 May 2024 01:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761FD158A05
+	for <netdev@vger.kernel.org>; Wed, 22 May 2024 01:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716339737; cv=none; b=X5wvGAIWgp/NvsTLG+GrV2ethCay4yGAqHBaEYFZXyhtHV1ViDOuHnZLIIVpjJ02Vaee7QFVjeqqcs9leuKUHPcLNC7NGlS9p9TWRDUtngjWKSHu5kt2pOfpQdQOwmJbFAbykaWvZvmbh/S7KYOpbezzj3KyPx3mP4i9tDA8v7c=
+	t=1716339740; cv=none; b=m20PT6lWYcqWyDvSy0u6xh+ZizWYbHUu7mclPRY/lG9wx/WxuabwfsPm2kazx5PN6jwGU6iY4blPbEOXKwd36dgapD/7PjiNYFThA7mCNmkmuOWQ79jXc7fDlX39+uq0ouu8PoZeuEd+gh7YIF+DecsCrbr4v8pM70lY7u5Elfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716339737; c=relaxed/simple;
-	bh=zPNuHZmW6nYPA4b1ssPkMnA//ewKrdDtUiQgRbu9K8Q=;
+	s=arc-20240116; t=1716339740; c=relaxed/simple;
+	bh=6sKEuw4EVR0IjH9p2JPj0dqFuh+QrksESybdQuYCbp4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sxrLniZ4rSGd8N97sdRbpKvVy4q1xdLRpY4g2EUimukhbqQ7Kv8/97audF1hifPl41digvYRJD9HC/wD5ZjnYChvUIYnAsqOyD04ORn6xC6wLgnpWEvXlS2dAw2oCqZ0CV1953QjrxqcEXqa2Of/dnaMRkO4JKM8+k1tYZLl8u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Co+AbFUT; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=n+ItXkqJSyRj8IVAKlAz6RGQwRHcEzkdC0zx4FszLz5EzZOAhfBtqiGFXcx8PjrInrJZBgSzt0b/rKMe6lFwi7US/LCGqe9uo505P0U5iD3hsOT4rOcIWmsI8mW34WAfdM5MZt8RizMemUEMipF26HaPnVwbukcBanEvLRmLiBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CKKlEEYW; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-62079696c58so236964477b3.0
-        for <netdev@vger.kernel.org>; Tue, 21 May 2024 18:02:15 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61be4601434so265602977b3.3
+        for <netdev@vger.kernel.org>; Tue, 21 May 2024 18:02:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716339735; x=1716944535; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1716339737; x=1716944537; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3QBjORy9CCAcoNFplhmp+lv83AAPBVpYWXZaRSdbesY=;
-        b=Co+AbFUTTk92+sYWVFc6TgN7gG64uIDmTRw1xaqg5rOk8Vx4BVfuVjToCVWUyBB8cM
-         nPfGDcNdaK0Ilsvba5jzM+NRdBowFKLeJ6ElhqgrGlsUknD7uvIJMTkH2m4HPw2jdLdj
-         JEc5c8OQbtcdDA77sD6w3FIiQKvoRgwwyr1VFvyQk7/W4TRrYQEd2YnM8hec0Che5OBO
-         86p9daPVHIPkOF4Mh5YZ4K4l/UDA/qw3vNPjK29efLX6+wy2pfBFOizFJYZZ/yEwYUZz
-         4yhtw3foM0pI1QOWqe9ldfASdvPy2vQvt/+dUNW4vZHKKiu8BQr4B710+/uZcAv9knYn
-         FPyw==
+        bh=2p/91SZXiolultWfykg7Se/3Y6CJnO46NmIdpmtDTd8=;
+        b=CKKlEEYWF+NfTDnKd8/N6EsXuD83wZZn0uhGBJvjGnaoPdsTet98ronmi/8o6oWGCc
+         8lHK/RThrOjmrkpYd/HX6cXv0q1M/hfAyY9+7MVIX9ppTgCtIxrTOx5yD0DmDQTmJ+4T
+         IQNlxjAiwW7mFP9izBD5avmaaRwRr5a7yvmiZ/HRQj/qnzaJX1wAyGsCrMCymvWpREVO
+         r4t+8BLfd0veriBNFHmmAZgQHTTH0VqB5BfUN4llgyt9qvOL9to37hDilnc4OL5swrkZ
+         31BaTtcMVMwdaaW2pruyIfCfPiio6SAc9xKVF3HRLs3Mq+0yNgN/8urIWxZnVWoZM6OQ
+         fY3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716339735; x=1716944535;
+        d=1e100.net; s=20230601; t=1716339737; x=1716944537;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3QBjORy9CCAcoNFplhmp+lv83AAPBVpYWXZaRSdbesY=;
-        b=d0qPNbKhFGJEmBWScZlS5pHHOj/9CtX0aZW4Kucfe7lJwEWA9Bwv+intgGh6GPaheR
-         SzfA4E5KOoK0bgkBWNz2nhbhRwjLN4+oFTSp4ROqVuPYSXQnphITVffyo8mOWwhioa0w
-         PxypiWSLzlUBTDI2xFpJlUM0uTJ6FWcEboGjpKQvmXjFLQYKwv0ngONGenU2d3W30fOg
-         B5thrm7BPvGHDNFAB7gUIsL/90qWCfz3z4EO1GIw8dO1Z7rsudn6it1TGEVYS+HA+Bbv
-         D6tXVguX2FrdusNmQsk1MHCLuIR768DgoMpUENhMrfGClkJEThlgroP3l2dxBOJQyqJB
-         H8RQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVyEAB9q411Hs9mpADVlZ6UtINyXxcAcrLsbleRXUpTy6jU/6bJYYffre3qoezbXScFtJ1guWvqBE3GLXvln7dLxpyvY4n/
-X-Gm-Message-State: AOJu0Yytv+9q/7qiGwKQwrFc3B3inM30QHFa4miKxfJEhigmn2Wi7VP5
-	5ENweWaeijFxRzVvKuJXUUolFoyB35SR8n47fWW0GApAbeaqh7Es5cBYWkGRuhJG7EbPRpSHQwU
-	kIw==
-X-Google-Smtp-Source: AGHT+IGZAosXDprDp/opSzocer/3U9rmGdxYzPmyOuGueK6WGHlw53mh3NJVeBX+ZfzcX387bGW84sonKH8=
+        bh=2p/91SZXiolultWfykg7Se/3Y6CJnO46NmIdpmtDTd8=;
+        b=SzLzZpHkjTs4/3c3pW3dZSmNKflIxYS0JLP0P+52B8EBbqOEhhntnr9o5s/MFBDjpu
+         IFt8Ckl2GiY+glXJBUdLlqtm3WyKrqzkm4LLkpBHQZqMQzrUbTxce6az19JrabUSBk3Y
+         II4RpQgiDQ7uxJrgeRwKdOM5lZ5KbtzaAJjzpGtozii716AUR0iimlBa0fSTkSh1Qiy0
+         2vcnXQ8KO1XDyAmegCGiSf5zrSgQ3dDOyBbA/qGSDg1xsZB2PU+RGjt1tlBvvsxSCtxU
+         ck6H5sR2Cfj7J0IyAWdpw/VvtWR2j+AWm/Q8SO7CIpNCAuswRFSV0iIVpZnio+m6Do1l
+         dLfA==
+X-Forwarded-Encrypted: i=1; AJvYcCXwqQUQiHbwwYUmq192fgZ8iQ69R5znhvdLzMAVStzAZCwIzTOWk1p7VYXy4+gPH1XmG9QTJQn+6cAQInY6jFFPP2knDwKm
+X-Gm-Message-State: AOJu0YwIPi+cL0AIXRy4l8G18PNQjz1rO7qNu0lpxc4+80f9rqRcCAbR
+	Mowfcj/LRM3bvqBAQdUZCJIScb3XBsBwwo5O87G7isQUoV4hqUO+qienYYLo8O8EjrkiAAKQR6B
+	TNg==
+X-Google-Smtp-Source: AGHT+IGfhOk9YJsYNy8CZV+lV+R/zOJsJYrZoh4Vhc9wR+bdPu7ruFNEsPOKmbOVrGY3YMxlYG3w5xawAtE=
 X-Received: from edliaw.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:305d])
- (user=edliaw job=sendgmr) by 2002:a81:4849:0:b0:61b:791a:9850 with SMTP id
- 00721157ae682-627e4891fcdmr1675237b3.9.1716339735130; Tue, 21 May 2024
- 18:02:15 -0700 (PDT)
-Date: Wed, 22 May 2024 00:57:42 +0000
+ (user=edliaw job=sendgmr) by 2002:a0d:d80d:0:b0:627:dad9:bf54 with SMTP id
+ 00721157ae682-627e48c3490mr1899317b3.10.1716339737591; Tue, 21 May 2024
+ 18:02:17 -0700 (PDT)
+Date: Wed, 22 May 2024 00:57:43 +0000
 In-Reply-To: <20240522005913.3540131-1-edliaw@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240522005913.3540131-1-edliaw@google.com>
 X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <20240522005913.3540131-57-edliaw@google.com>
-Subject: [PATCH v5 56/68] selftests/sigaltstack: Drop define _GNU_SOURCE
+Message-ID: <20240522005913.3540131-58-edliaw@google.com>
+Subject: [PATCH v5 57/68] selftests/sgx: Compile with -D_GNU_SOURCE
 From: Edward Liaw <edliaw@google.com>
 To: shuah@kernel.org, "=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?=" <mic@digikod.net>, 
 	"=?UTF-8?q?G=C3=BCnther=20Noack?=" <gnoack@google.com>, Christian Brauner <brauner@kernel.org>, 
@@ -83,34 +83,52 @@ To: shuah@kernel.org, "=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?=" <mic@digikod.net>
 	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
 	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
 	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Edward Liaw <edliaw@google.com>, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>
 Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kernel-team@android.com, Edward Liaw <edliaw@google.com>, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, bpf@vger.kernel.org
+	kernel-team@android.com, linux-security-module@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-riscv@lists.infradead.org, bpf@vger.kernel.org, 
+	kernel test robot <oliver.sang@intel.com>, linux-sgx@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-_GNU_SOURCE is provided by lib.mk, so it should be dropped to prevent
-redefinition warnings.
+Add -D_GNU_SOURCE to HOST_CFLAGS and remove #define _GNU_SOURCE.
 
+Fixes: 809216233555 ("selftests/harness: remove use of LINE_MAX")
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Closes: https://lore.kernel.org/oe-lkp/202404301040.3bea5782-oliver.sang@intel.com
 Signed-off-by: Edward Liaw <edliaw@google.com>
 ---
- tools/testing/selftests/sigaltstack/sas.c | 2 --
- 1 file changed, 2 deletions(-)
+ tools/testing/selftests/sgx/Makefile    | 2 +-
+ tools/testing/selftests/sgx/sigstruct.c | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/sigaltstack/sas.c b/tools/testing/selftests/sigaltstack/sas.c
-index 07227fab1cc9..36b510de0195 100644
---- a/tools/testing/selftests/sigaltstack/sas.c
-+++ b/tools/testing/selftests/sigaltstack/sas.c
-@@ -6,8 +6,6 @@
-  * If that succeeds, then swapcontext() can be used inside sighandler safely.
-  *
-  */
--
+diff --git a/tools/testing/selftests/sgx/Makefile b/tools/testing/selftests/sgx/Makefile
+index 867f88ce2570..272da790d9ae 100644
+--- a/tools/testing/selftests/sgx/Makefile
++++ b/tools/testing/selftests/sgx/Makefile
+@@ -12,7 +12,7 @@ OBJCOPY := $(CROSS_COMPILE)objcopy
+ endif
+ 
+ INCLUDES := -I$(top_srcdir)/tools/include
+-HOST_CFLAGS := -Wall -Werror -g $(INCLUDES) -fPIC
++HOST_CFLAGS := -Wall -Werror -g $(INCLUDES) -fPIC -D_GNU_SOURCE
+ HOST_LDFLAGS := -z noexecstack -lcrypto
+ ENCL_CFLAGS += -Wall -Werror -static-pie -nostdlib -ffreestanding -fPIE \
+ 	       -fno-stack-protector -mrdrnd $(INCLUDES)
+diff --git a/tools/testing/selftests/sgx/sigstruct.c b/tools/testing/selftests/sgx/sigstruct.c
+index d73b29becf5b..200034a0fee5 100644
+--- a/tools/testing/selftests/sgx/sigstruct.c
++++ b/tools/testing/selftests/sgx/sigstruct.c
+@@ -1,7 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*  Copyright(c) 2016-20 Intel Corporation. */
+ 
 -#define _GNU_SOURCE
- #include <signal.h>
- #include <stdio.h>
- #include <stdlib.h>
+ #include <assert.h>
+ #include <getopt.h>
+ #include <stdbool.h>
 -- 
 2.45.1.288.g0e0cd299f1-goog
 
