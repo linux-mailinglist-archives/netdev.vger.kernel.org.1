@@ -1,87 +1,155 @@
-Return-Path: <netdev+bounces-97809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B34288CD571
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 16:13:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 892A98CD573
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 16:14:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69A931F2230A
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:13:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43E9A284078
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7968414A627;
-	Thu, 23 May 2024 14:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AAFD14AD02;
+	Thu, 23 May 2024 14:14:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b="RLCB5VpC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eJIlhh11"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-in-1.gedalya.net (mail.gedalya.net [170.39.119.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8F613C68A
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 14:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.39.119.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F08C13B790
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 14:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716473630; cv=none; b=Vnqi2yG+2+S9vEy4CBTmBSvNp6yu0lwrc0LT57Qgl9ymfrDgKthhuVP/Q+WgpRmWguXaWTeYdkCEp2lqrrN8CtxMYpPzdf7V86Fvc+onfNZs30Badx8zVQrDklQOKY2UaNyyI9yr1jjd1TzSNcH9U8CsOkWLdbSbro27IaNgSSI=
+	t=1716473681; cv=none; b=OyRpxH24J+wFZIKP3dGTFZG4ZBgaasW8ITIXTxk9b9cj/4s7m4PA9eq82psCIWopL48p774pa3YEIrClyzK556IsMKve0mxhzttsP/d2kYwqcD8vuze36FcfDKQTh56y5QkOg9RxGT5djwZKuuu/vW2+iIwBpkG837hCO+NDbJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716473630; c=relaxed/simple;
-	bh=RVU35K+F06HhvEOYvYqs/+L957RxtCK7pbk0AtOcTC8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E2IQO0eROyFNAyLGNM/rwPpSnBGIM892bpnloNXhAzChwGfhmhPBjsldEdDq//3d0iMAEzUxQ48gkh0glH5CrSQcqTrsqP86t7RqnolE8SkZW6dkB6zbOphROr07kcY3bSCvhNgo39T+cAeWIdUQdqrF9spgNKVxX2FWWqW1N+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net; spf=pass smtp.mailfrom=gedalya.net; dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b=RLCB5VpC; arc=none smtp.client-ip=170.39.119.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gedalya.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gedalya.net
-	; s=rsa1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description;
-	bh=pFW0N8e/RhW7LDtu6in3zTyE6pOWXtEK79pByjPqM1I=; b=RLCB5VpCTqBfMR5PNSJX8lT3RE
-	8zUlROcgmFOXwY2Q6zYXNPmH0vVvOTCozqGHdAqJ+RLv0H/0QZjJtb3VwvarvR+KIYdwIDdjZJTWn
-	Qf62m1+0aFq3GdXfx0pcTcXMYdnOvJzGayp2jy8mY/XJKg1RFJVvLJxwuYrq2nKBnnzhLOWkLnXvy
-	tbSlDGDFUixCh1R3HCwcv0SxoQbLtyGNOdoBFPx0sYn3A4O6LlsvY1gCirnej1zOdYFbGcbYOsezR
-	ETTapB9OJtijFVvB/nrU0DjzHp4hMOrNrEhRFDAHd+28ipkp6Yft9CliTcCkGoJ1Lys7R7K1+Sz7M
-	vXTNk2AA==;
-Received: from [192.168.9.176]
-	by smtp-in-1.gedalya.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <gedalya@gedalya.net>)
-	id 1sA9CU-000gJx-12;
-	Thu, 23 May 2024 14:13:46 +0000
-Message-ID: <1b404d0c-d807-4410-b028-f606d7182789@gedalya.net>
-Date: Thu, 23 May 2024 22:13:43 +0800
+	s=arc-20240116; t=1716473681; c=relaxed/simple;
+	bh=JV9uoM5FQvJqnjAV3sjLAhLXHdVnTRuwd8ibXXOKsfs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aYt2V7qbkJb7SXKJ+0SK/18cYxKL/Euc53vAuKyBQSKLsxR9Ocqirzk8xZC46n4nz4Ha7PCG0wBau/RWmoO28IF9kuDp0wGRdLFt8UenATm3tYJv6o0RHUwq4ZfTnXHlHIrXMwtZvZFqxb8EZbXxqvdsOwXcgKNliSxtFKj6gsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eJIlhh11; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-792b8bca915so510218885a.2
+        for <netdev@vger.kernel.org>; Thu, 23 May 2024 07:14:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716473679; x=1717078479; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ruoIRsxxq78XBJFRYWM8va4yMNJ1UjHoBCVatwOWJHM=;
+        b=eJIlhh11GVJq5PhJF6nZJv15CZNnPERKDRJOF4dEodBq7qxfQDmq1IVNwBFq7Xgdn2
+         j1wmD9GUPikHUGOZIZ1DDcuDLYz392o/mJIy5uZxkaRTB76vcPBxJURp1n/6YM6kRPrS
+         4JNRezofhWQ/FFsKeDboiGuge6IP2u/ZwRUCqFv4IoCTr4/FhCeBm9Z86SRuPzbimF4w
+         Z0+Le0IfeNRpSFqIgYT7rueeMTpiqTmNiAvWBMmCK48SqHDijL6gAl1KgPx/YdGGb7tx
+         7sqfxjEWI+9m5wcYCtf3E7Nrq9ilMWZ6zK34f/3PqzxEnX+tWmYlgLLKZttkKLxLPx3F
+         LCTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716473679; x=1717078479;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ruoIRsxxq78XBJFRYWM8va4yMNJ1UjHoBCVatwOWJHM=;
+        b=hv/xj4JbEpCylS2/yjnK/+6NRvoEmc7q7PUOUhxz6CTcwR/WA82sxJkTO8/dP925o1
+         TNXvEq8eJcnY4kN2besIDZcKPpWjGtFmN00N9bNk3A6nvllExwXPmNaev7Ku/b75YWDF
+         H2SDKG2B0VAabALUUXfjAmr4ET75CHdlDPOfuTYAZkOZ1azocXiBXIBNP2jxPLszZmyS
+         EIzlRMAwzrnYBUOY+OqEnjLBTFJct+dUev5EaMoNzk/KBbz6e+dEyoENnh4+18GyayGR
+         GsI2/Ah3skk0oI+tfOWysk1PO1m6gSvxqhk9abBo4lND4dV50Ly/6I4hkLTdnop0tp66
+         5eCg==
+X-Gm-Message-State: AOJu0YwdnGKxXi5NqmDlH8R2Z5M99W51jlSSt9Xjdih3hO6fY+HHFLHw
+	hdr5sGV01CEALfJ7kLXXlboTCrQnG3K2xpNYkeNOycLqkK/8KuNPjArjSA==
+X-Google-Smtp-Source: AGHT+IFcvQlZlvi2CawruXrXeaZmMR9HX69MkBhC2EwpbEcrAv8qGUsbTUsH7tB+sVBnK50pTvrtEQ==
+X-Received: by 2002:a05:620a:5d8f:b0:794:a72f:b6f4 with SMTP id af79cd13be357-794a72fb6f7mr104500685a.18.1716473678746;
+        Thu, 23 May 2024 07:14:38 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7931777fdf2sm636351185a.78.2024.05.23.07.14.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 May 2024 07:14:38 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	richardbgobert@gmail.com,
+	Willem de Bruijn <willemb@google.com>,
+	syzkaller <syzkaller@googlegroups.com>
+Subject: [PATCH net] net: gro: initialize network_offset in network layer
+Date: Thu, 23 May 2024 10:13:45 -0400
+Message-ID: <20240523141434.1752483-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: iproute2: color output should assume dark background
-To: Dragan Simic <dsimic@manjaro.org>
-Cc: Sirius <sirius@trudheim.com>, netdev@vger.kernel.org
-References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
- <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
- <96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
- <Zk722SwDWVe35Ssu@photonic.trudheim.com>
- <e4695ecb95bbf76d8352378c1178624c@manjaro.org>
- <449db665-0285-4283-972f-1b6d5e6e71a1@gedalya.net>
- <7d67d9e72974472cc61dba6d8bdaf79a@manjaro.org>
- <7cfcca05-95d0-4be0-9b50-ec77bf3e766c@gedalya.net>
- <ef4f8fdb9f941be1213382d6aea35a46@manjaro.org>
-Content-Language: en-US
-From: Gedalya <gedalya@gedalya.net>
-In-Reply-To: <ef4f8fdb9f941be1213382d6aea35a46@manjaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 5/23/24 10:07 PM, Dragan Simic wrote:
-> I think it would be best to start a gargantuan quest for having COLORFGBG
-> set properly for all kinds of different terminal emulators. Including the
-> Linux virtual console, which may come last. 
+From: Willem de Bruijn <willemb@google.com>
 
-And you'll still need a default and the default will at all times be 
-_something_, and it being that something would be justified by.. well.. 
-something?
+Syzkaller was able to trigger
 
+    kernel BUG at net/core/gro.c:424 !
+    RIP: 0010:gro_pull_from_frag0 net/core/gro.c:424 [inline]
+    RIP: 0010:gro_try_pull_from_frag0 net/core/gro.c:446 [inline]
+    RIP: 0010:dev_gro_receive+0x242f/0x24b0 net/core/gro.c:571
+
+Due to using an incorrect NAPI_GRO_CB(skb)->network_offset.
+
+The referenced commit sets this offset to 0 in skb_gro_reset_offset.
+That matches the expected case in dev_gro_receive:
+
+        pp = INDIRECT_CALL_INET(ptype->callbacks.gro_receive,
+                                ipv6_gro_receive, inet_gro_receive,
+                                &gro_list->list, skb);
+
+But syzkaller injected an skb with protocol ETH_P_TEB into an ip6gre
+device (by writing the IP6GRE encapsulated version to a TAP device).
+The result was a first call to eth_gro_receive, and thus an extra
+ETH_HLEN in network_offset that should not be there. First issue hit
+is when computing offset from network header in ipv6_gro_pull_exthdrs.
+
+Initialize both offsets in the network layer gro_receive.
+
+This pairs with all reads in gro_receive, which use
+skb_gro_receive_network_offset().
+
+Fixes: 186b1ea73ad8 ("net: gro: use cb instead of skb->network_header")
+Reported-by: syzkaller <syzkaller@googlegroups.com>
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+CC: Richard Gobert <richardbgobert@gmail.com>
+---
+ net/ipv4/af_inet.c     | 2 +-
+ net/ipv6/ip6_offload.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index 86cce7e9c2d1..add3e291a301 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -1532,7 +1532,7 @@ struct sk_buff *inet_gro_receive(struct list_head *head, struct sk_buff *skb)
+ 	}
+ 
+ 	NAPI_GRO_CB(skb)->flush |= flush;
+-	NAPI_GRO_CB(skb)->inner_network_offset = off;
++	NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark] = off;
+ 
+ 	/* Note : No need to call skb_gro_postpull_rcsum() here,
+ 	 * as we already checked checksum over ipv4 header was 0
+diff --git a/net/ipv6/ip6_offload.c b/net/ipv6/ip6_offload.c
+index bd5aff97d8b1..9822163428b0 100644
+--- a/net/ipv6/ip6_offload.c
++++ b/net/ipv6/ip6_offload.c
+@@ -236,7 +236,7 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
+ 	if (unlikely(!iph))
+ 		goto out;
+ 
+-	NAPI_GRO_CB(skb)->inner_network_offset = off;
++	NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark] = off;
+ 
+ 	flush += ntohs(iph->payload_len) != skb->len - hlen;
+ 
+-- 
+2.45.1.288.g0e0cd299f1-goog
 
 
