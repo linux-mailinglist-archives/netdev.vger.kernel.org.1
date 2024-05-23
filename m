@@ -1,231 +1,317 @@
-Return-Path: <netdev+bounces-97733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F6E8CCF18
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 11:25:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0606A8CCF1F
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 11:26:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E46E11C22504
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:25:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 735DC1F23A95
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:26:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E2313D26E;
-	Thu, 23 May 2024 09:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC2013DBA0;
+	Thu, 23 May 2024 09:24:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Pse96kh6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YwTWsmQS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B2613D272
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 09:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DB37E0F1
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 09:24:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716456043; cv=none; b=E+Uqhfy3HWf5Pe9R8C/3K3mEWt7WCJbTPeT7uJNWbKS1P5xGizexXawc+hPvcZWIV/bi3zbj0pxmjPhvbeA/+UJT9yPkRv05xyiwj5s5zxLHYRSfWwj7Z5cgvI7zjTHAgmnBYqUJXV+OChZXdIZE2kJBk5gNK9We63lSIDSEEZs=
+	t=1716456268; cv=none; b=qjLjyyDRjpJ+ig+McrguIw1v4u9AKwobKY/A8Co5A3NvTomgaD6Rh3K7E6N0ISglKQvJ54ZQeHZrkKjgdEBTO7zXQYknUfOb8LtYpDxBk2ITGOy7ln99h0H3AivBy2Jyz18geFz64OzOgrIV6+9V/QtEbu8ywppdW8tt0oJKsEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716456043; c=relaxed/simple;
-	bh=94d5/oSqTkvjD/KY6c2YVR9F9k2BN2fRmDjJ39wq5Sg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Jt5FxAetBErJZQRIPDt66upnzvgDVDg6lQy887/YBs0dHlA5af46yYNXpy3fG+TZoDsNL/gbTox7Tolz13NTSm9TucFVawawx0SBrXY5mVfKAPQ9CDecSTAL7OnUigF7H6ihFGAoGxQDueEzNq9GFWNRvkT9QqdbFpYucJU3WJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Pse96kh6; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a5a7d28555bso1153554266b.1
-        for <netdev@vger.kernel.org>; Thu, 23 May 2024 02:20:39 -0700 (PDT)
+	s=arc-20240116; t=1716456268; c=relaxed/simple;
+	bh=TNRJF/wAAHQVQnqQt5pxJj0RdsmD90mW+36XoNhSuAU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dpB28Z9xiIk6etElZmv9XgQg7slVTbnLzfgClhFNEta3c7L9Sg2AwQQkCD56FTWvmifj5DjIkPy9ATDo4KDndNCagcVk2FSHJT47W/CzTr/fpsffjAgEJ2F7Vkl3ZXTYUXpBQvPEx5nHqqFKKx5lkKZ5fOF8q1D0qCCJReIlMRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YwTWsmQS; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56e1f3462caso11874648a12.3
+        for <netdev@vger.kernel.org>; Thu, 23 May 2024 02:24:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1716456038; x=1717060838; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QK9RuoYhlxelHJ6udsAT+Znd+osUJmMprr3f23XbBpA=;
-        b=Pse96kh6N/z56o6vuy6CmaVa4OeReakHJywIP+v1CTMcOcxnX4M9VyPh6o5OKZJCSY
-         /RbhmBn/1VhF7uomYnhfpOhFE9Fiw+z7AeNxeuBV1JbHDHb6GP053eSvlwBfCcWRKiWL
-         CzngLQ+twF9pCgOHrIs2XHhNKgwI7nqf2vZmB2a6JpGZXy/kp+E6WdCNXIaO9snu3phk
-         Tj15LMg88p1l3iK3UZSNXNib0oyDHBkqGG6+u+GrJt7j2luPPLdXD6ivb/viTzDH9vMl
-         37GoiPK3WRE+AybMN644C9Bns766RxuAxxKGqUL+BaHdL8rrD7ssz7WucznuVP2+yNnL
-         GeSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716456038; x=1717060838;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1716456264; x=1717061064; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QK9RuoYhlxelHJ6udsAT+Znd+osUJmMprr3f23XbBpA=;
-        b=pPUwgqrBLw40vd7Yw5SxK9kkXYSfdf+Ls68WWQldZB8Ke6Xq1athai6aI7LnffnjBS
-         hGzcUvFhOPUNsB84NmBbOdhNA9/ykMG4b+1figxsUjxnWmR6ABZo9h6w4gHKGXS9ARd0
-         q1yWdVGtUYl26nwDrrlBiAe284El/OElGAtbCr3ZUfVv3tfPo3TiCURYR5uU2FbtmV9s
-         3+fOuwnTv1QIf7WEzaquXRHnkhXqivoAMtmUXqt9bRG81j2VCZ3H2cbE1iluZ7SMrhP4
-         AXKycNCJYvhyDZ3dVwD0TaO04Pjuz8/Z1mMPSvgg7LHpk8+TXmx5dQqABVMWrRM2bom7
-         sM4g==
-X-Forwarded-Encrypted: i=1; AJvYcCVpxK0Hk1UnjImHefHRycQlXxigzBQYzNUyvVu9mwRheN501rz2r8fsejWAjfsnNX5+f/IwDNMO7qsP9OOYZRB6Lj9HE9nN
-X-Gm-Message-State: AOJu0Yxh/6dGN6QcQInrKowMzzpaDAzW3TLNPK6dBEp/uZ45TmAzmTkL
-	CcBuAbQ15Hwrf+ZBVta+ZObyJfj+zNVJYA78FvhzpefIqUrfzBx6CAGsH3kRE6I=
-X-Google-Smtp-Source: AGHT+IHaRRUmk9/ojesCZSw0pu6t7iLCgemv1oVsaVm6FEiJHVFVYXktX1PcNEw1MSrfPMXMUW+h/w==
-X-Received: by 2002:a17:906:c795:b0:a59:9ef3:f6df with SMTP id a640c23a62f3a-a6228095499mr299640666b.22.1716456038411;
-        Thu, 23 May 2024 02:20:38 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:47])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a179263d9sm1919803366b.95.2024.05.23.02.20.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 May 2024 02:20:36 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>,
-  netdev@vger.kernel.org,  Cong Wang <cong.wang@bytedance.com>,  Eric
- Dumazet <edumazet@google.com>,  Daniel Borkmann <daniel@iogearbox.net>,
-  John Fastabend <john.fastabend@gmail.com>,  "David S. Miller"
- <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>,  Alexei
- Starovoitov <ast@kernel.org>,  bpf@vger.kernel.org,
-  kernel-dev@igalia.com,
-  syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com,
-  stable@vger.kernel.org
-Subject: Re: [PATCH net] sock_map: avoid race between sock_map_close and
- sk_psock_put
-In-Reply-To: <58032b8049696566704e1941f909159a2f6c9af8.camel@redhat.com>
-	(Paolo Abeni's message of "Thu, 23 May 2024 09:52:45 +0200")
-References: <20240520214153.847619-1-cascardo@igalia.com>
-	<13b77d180c2bad74d6749a6c34190a10134bd6fa.camel@redhat.com>
-	<58032b8049696566704e1941f909159a2f6c9af8.camel@redhat.com>
-User-Agent: mu4e 1.12.4; emacs 29.1
-Date: Thu, 23 May 2024 11:20:34 +0200
-Message-ID: <87h6eox4t9.fsf@cloudflare.com>
+        bh=nONB5XjIQa2MEYn5E34w+H4Nd7szsJasVqs3Le681bM=;
+        b=YwTWsmQS0wZk/DDnY/byTcmRGMJ6Mqd53pSgxKZCeKMRIQOvOJUJFp234juvQ6mzWs
+         aULb5rMkkdrMgT5m8RTH8lxy6GJbBXxgr5yyXCCUTiwpa8m5HsKuJwyBdtURTt+LKIAf
+         pofN9Djj7t8rKFswyr+QnDveluP0DWyncWPJ4WKqpcsYJStnCCau/Bo8zxJBxMvg10ln
+         pKXhB9RzRg5OZpmB0FnQ5bkH5xdDzkngu7w8kcnvmIZWEsULaFnV8INV21UNfHhcN7Uj
+         Wvi0zgUOFZ5y6FJ7eP9Ju+Z2SxM2qQn44IaSpX5qB7UvXpV59Xl01WtGouIvCBKyG6Qu
+         cJVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716456264; x=1717061064;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nONB5XjIQa2MEYn5E34w+H4Nd7szsJasVqs3Le681bM=;
+        b=fjVnEc4SEz0aRNdzRD5vNpCPEm5UlwZv+9lN/Fp2/OW7LzRLjbn+PFfsE6UO20x0x1
+         hWPanV7Jo/vSWla3IVe7ZVS4AB7djtIcEpw2xlH1dcGN4qjuk5qVJ2WRcthg6FcRPUII
+         V3cVC88acu80IiubMxtyPg6E+0bEoVOt/O+qJv+MqMs4gKOX8jVccRPYyAmM7EgkbP+4
+         mckDD0EVsDojtInzYMNX+xhYVeyfzBHlevU02X/hvGGboeIx3YxJKU7DKb+LB/ufNUYh
+         a59+ws+OlYgZwVyN3iwkLdJybtpT/+arvtJCTbrOL1oA93y9zK+y8UX4QJwEQloOwkBc
+         RPTA==
+X-Forwarded-Encrypted: i=1; AJvYcCWxdRtJJr8DDFAXIVcsobG1mR42FYjlTdq6O8aEKIxnt7AqQ2qVUA40xCN/4UOJEQ35WlxgK5MsiAR2BmKXaavgsAZdOhl9
+X-Gm-Message-State: AOJu0YzoyhBtv8rpjBmGPvyQrvGHtcFRFuUnVU0GEonHK0qMu02hhD9A
+	Oe98CVxvncgdQO8A14J5BuqOGdSjSdaUmd1Dj4h2x8xU/aGTsaYHFjno6dw1Q+g639EMUuhG5uC
+	oCt9D9309l1UkmhQTCNRsmXDhHfM=
+X-Google-Smtp-Source: AGHT+IGkvgXGsU+dLT9pmBtVI+C1855bsQxex992WZZKI64/wWlO2JL4WadGgrkGd0CpjUfmQAWWzTxSsJSz1LNPhGc=
+X-Received: by 2002:a17:907:8026:b0:a5a:278f:7830 with SMTP id
+ a640c23a62f3a-a6228084b17mr225440266b.26.1716456264059; Thu, 23 May 2024
+ 02:24:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240523050357.43941-1-kerneljasonxing@gmail.com> <CANn89i+y32YsDyUSyAvVswZTUaYTNjA=zGYmV5JXrCqa5EEHJA@mail.gmail.com>
+In-Reply-To: <CANn89i+y32YsDyUSyAvVswZTUaYTNjA=zGYmV5JXrCqa5EEHJA@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 23 May 2024 17:23:47 +0800
+Message-ID: <CAL+tcoD--Zb-1Qd1suMmP1yqRj879W67s0XEx2GLx-orBpZn_g@mail.gmail.com>
+Subject: Re: [PATCH v2 net] tcp: fix a race when purging the netns and
+ allocating tw socket
+To: Eric Dumazet <edumazet@google.com>
+Cc: dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, kuniyu@amazon.com, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, 
+	syzbot+2eca27bdcb48ed330251@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 23, 2024 at 09:52 AM +02, Paolo Abeni wrote:
-> On Wed, 2024-05-22 at 14:08 +0200, Paolo Abeni wrote:
->> On Mon, 2024-05-20 at 18:41 -0300, Thadeu Lima de Souza Cascardo wrote:
->> > sk_psock_get will return NULL if the refcount of psock has gone to 0, which
->> > will happen when the last call of sk_psock_put is done. However,
->> > sk_psock_drop may not have finished yet, so the close callback will still
->> > point to sock_map_close despite psock being NULL.
->> > 
->> > This can be reproduced with a thread deleting an element from the sock map,
->> > while the second one creates a socket, adds it to the map and closes it.
->> > 
->> > That will trigger the WARN_ON_ONCE:
->> > 
->> > ------------[ cut here ]------------
->> > WARNING: CPU: 1 PID: 7220 at net/core/sock_map.c:1701 sock_map_close+0x2a2/0x2d0 net/core/sock_map.c:1701
->> > Modules linked in:
->> > CPU: 1 PID: 7220 Comm: syz-executor380 Not tainted 6.9.0-syzkaller-07726-g3c999d1ae3c7 #0
->> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
->> > RIP: 0010:sock_map_close+0x2a2/0x2d0 net/core/sock_map.c:1701
->> > Code: df e8 92 29 88 f8 48 8b 1b 48 89 d8 48 c1 e8 03 42 80 3c 20 00 74 08 48 89 df e8 79 29 88 f8 4c 8b 23 eb 89 e8 4f 15 23 f8 90 <0f> 0b 90 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d e9 13 26 3d 02
->> > RSP: 0018:ffffc9000441fda8 EFLAGS: 00010293
->> > RAX: ffffffff89731ae1 RBX: ffffffff94b87540 RCX: ffff888029470000
->> > RDX: 0000000000000000 RSI: ffffffff8bcab5c0 RDI: ffffffff8c1faba0
->> > RBP: 0000000000000000 R08: ffffffff92f9b61f R09: 1ffffffff25f36c3
->> > R10: dffffc0000000000 R11: fffffbfff25f36c4 R12: ffffffff89731840
->> > R13: ffff88804b587000 R14: ffff88804b587000 R15: ffffffff89731870
->> > FS:  000055555e080380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
->> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> > CR2: 0000000000000000 CR3: 00000000207d4000 CR4: 0000000000350ef0
->> > Call Trace:
->> >  <TASK>
->> >  unix_release+0x87/0xc0 net/unix/af_unix.c:1048
->> >  __sock_release net/socket.c:659 [inline]
->> >  sock_close+0xbe/0x240 net/socket.c:1421
->> >  __fput+0x42b/0x8a0 fs/file_table.c:422
->> >  __do_sys_close fs/open.c:1556 [inline]
->> >  __se_sys_close fs/open.c:1541 [inline]
->> >  __x64_sys_close+0x7f/0x110 fs/open.c:1541
->> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->> >  do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
->> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->> > RIP: 0033:0x7fb37d618070
->> > Code: 00 00 48 c7 c2 b8 ff ff ff f7 d8 64 89 02 b8 ff ff ff ff eb d4 e8 10 2c 00 00 80 3d 31 f0 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
->> > RSP: 002b:00007ffcd4a525d8 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
->> > RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007fb37d618070
->> > RDX: 0000000000000010 RSI: 00000000200001c0 RDI: 0000000000000004
->> > RBP: 0000000000000000 R08: 0000000100000000 R09: 0000000100000000
->> > R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
->> > R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
->> >  </TASK>
->> > 
->> > Use sk_psock, which will only check that the pointer is not been set to
->> > NULL yet, which should only happen after the callbacks are restored. If,
->> > then, a reference can still be gotten, we may call sk_psock_stop and cancel
->> > psock->work.
->> > 
->> > After that change, the reproducer does not trigger the WARN_ON_ONCE
->> > anymore.
->> > 
->> > Reported-by: syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com
->> > Closes: https://syzkaller.appspot.com/bug?extid=07a2e4a1a57118ef7355
->> > Fixes: aadb2bb83ff7 ("sock_map: Fix a potential use-after-free in sock_map_close()")
->> > Fixes: 5b4a79ba65a1 ("bpf, sockmap: Don't let sock_map_{close,destroy,unhash} call itself")
->> > Cc: stable@vger.kernel.org
->> > Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
->> > ---
->> >  net/core/sock_map.c | 14 +++++++++-----
->> >  1 file changed, 9 insertions(+), 5 deletions(-)
->> > 
->> > diff --git a/net/core/sock_map.c b/net/core/sock_map.c
->> > index 9402889840bf..13267e667a4c 100644
->> > --- a/net/core/sock_map.c
->> > +++ b/net/core/sock_map.c
->> > @@ -1680,19 +1680,23 @@ void sock_map_close(struct sock *sk, long timeout)
->> >  
->> >  	lock_sock(sk);
->> >  	rcu_read_lock();
->> > -	psock = sk_psock_get(sk);
->> > +	psock = sk_psock(sk);
->> >  	if (unlikely(!psock)) {
->> > +		saved_close = READ_ONCE(sk->sk_prot)->close;
->> >  		rcu_read_unlock();
->> >  		release_sock(sk);
->> > -		saved_close = READ_ONCE(sk->sk_prot)->close;
->> >  	} else {
->> >  		saved_close = psock->saved_close;
->> >  		sock_map_remove_links(sk, psock);
->> > +		psock = sk_psock_get(sk);
->> >  		rcu_read_unlock();
->> > -		sk_psock_stop(psock);
->> > +		if (psock)
->> > +			sk_psock_stop(psock);
->> >  		release_sock(sk);
->> > -		cancel_delayed_work_sync(&psock->work);
->> > -		sk_psock_put(sk, psock);
->> > +		if (psock) {
->> > +			cancel_delayed_work_sync(&psock->work);
->> > +			sk_psock_put(sk, psock);
->> > +		}
->> >  	}
->> >  
->> >  	/* Make sure we do not recurse. This is a bug.
->> 
->> As a personal opinion I think the code will become simple reordering
->> the condition, something alike:
->> 
->> 	if (psock) {
->> 		saved_close = psock->saved_close;
->>  		sock_map_remove_links(sk, psock);
->> 		psock = sk_psock_get(sk);
->> 		if (!psock)
->> 			goto no_psock;
->>  		rcu_read_unlock();
->> 		sk_psock_stop(psock);
->>  		release_sock(sk);
->> 		cancel_delayed_work_sync(&psock->work);
->> 		sk_psock_put(sk, psock);
->> 	} else {
->> no_psock:
->> 		saved_close = READ_ONCE(sk->sk_prot)->close;
+On Thu, May 23, 2024 at 3:19=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
-> FTR, the above is wrong, should be:
+> On Thu, May 23, 2024 at 7:04=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Syzbot[1] reported the drecrement of reference count hits leaking memor=
+y.
+> >
+> > Race condition:
+> >    CPU 0                      CPU 1
+> >    -----                      -----
+> > inet_twsk_purge            tcp_time_wait
+> > inet_twsk_deschedule_put   __inet_twsk_schedule
+> >                            mod_timer(tw_timer...
+> > del_timer_sync
+> > inet_twsk_kill
+> > refcount_dec(tw_refcount)[1]
+> >                            refcount_inc(tw_refcount)[2]
+> >
+> > Race case happens because [1] decrements refcount first before [2].
+> >
+> > After we reorder the mod_timer() and refcount_inc() in the initializati=
+on
+> > phase, we can use the status of timer as an indicator to test if we wan=
+t
+> > to destroy the tw socket in inet_twsk_purge() or postpone it to
+> > tw_timer_handler().
+> >
+> > After this patch applied, we get four possible cases:
+> > 1) if we can see the armed timer during the initialization phase
+> >    CPU 0                      CPU 1
+> >    -----                      -----
+> > inet_twsk_purge            tcp_time_wait
+> > inet_twsk_deschedule_put   __inet_twsk_schedule
+> >                            refcount_inc(tw_refcount)
+> >                            mod_timer(tw_timer...
+> > test if the timer is queued
+> > //timer is queued
+> > del_timer_sync
+> > inet_twsk_kill
+> > refcount_dec(tw_refcount)
+> > Note: we finish it up in the purge process.
+> >
+> > 2) if we fail to see the armed timer during the initialization phase
+> >    CPU 0                      CPU 1
+> >    -----                      -----
+> > inet_twsk_purge            tcp_time_wait
+> > inet_twsk_deschedule_put   __inet_twsk_schedule
+> >                            refcount_inc(tw_refcount)
+> > test if the timer is queued
+> > //timer isn't queued
+> > postpone
+> >                            mod_timer(tw_timer...
+> > Note: later, in another context, expired timer will finish up tw socket
+> >
+> > 3) if we're seeing a running timer after the initialization phase
+> >    CPU 0                      CPU 1                    CPU 2
+> >    -----                      -----                    -----
+> >                            tcp_time_wait
+> >                            __inet_twsk_schedule
+> >                            refcount_inc(tw_refcount)
+> >                            mod_timer(tw_timer...
+> >                            ...(around 1 min)...
+> > inet_twsk_purge
+> > inet_twsk_deschedule_put
+> > test if the timer is queued
+> > // timer is running
+> > skip                                              tw_timer_handler
+> > Note: CPU 2 is destroying the timewait socket
+> >
+> > 4) if we're seeing a pending timer after the initialization phase
+> >    CPU 0                      CPU 1
+> >    -----                      -----
+> >                            tcp_time_wait
+> >                            __inet_twsk_schedule
+> >                            refcount_inc(tw_refcount)
+> >                            mod_timer(tw_timer...
+> >                            ...(< 1 min)...
+> > inet_twsk_purge
+> > inet_twsk_deschedule_put
+> > test if the timer is queued
+> > // timer is queued
+> > del_timer_sync
+> > inet_twsk_kill
+> >
+> > Therefore, only making sure that we either call inet_twsk_purge() or
+> > call tw_timer_handler() to destroy the timewait socket, we can
+> > handle all the cases as above.
+> >
+> > [1]
+> > refcount_t: decrement hit 0; leaking memory.
+> > WARNING: CPU: 3 PID: 1396 at lib/refcount.c:31 refcount_warn_saturate+0=
+x1ed/0x210 lib/refcount.c:31
+> > Modules linked in:
+> > CPU: 3 PID: 1396 Comm: syz-executor.3 Not tainted 6.9.0-syzkaller-07370=
+-g33e02dc69afb #0
+> > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-=
+1.16.2-1 04/01/2014
+> > RIP: 0010:refcount_warn_saturate+0x1ed/0x210 lib/refcount.c:31
+> > RSP: 0018:ffffc9000480fa70 EFLAGS: 00010282
+> > RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc9002ce28000
+> > RDX: 0000000000040000 RSI: ffffffff81505406 RDI: 0000000000000001
+> > RBP: ffff88804d8b3f80 R08: 0000000000000001 R09: 0000000000000000
+> > R10: 0000000000000000 R11: 0000000000000002 R12: ffff88804d8b3f80
+> > R13: ffff888031c601c0 R14: ffffc900013c04f8 R15: 000000002a3e5567
+> > FS:  00007f56d897c6c0(0000) GS:ffff88806b300000(0000) knlGS:00000000000=
+00000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 0000001b3182b000 CR3: 0000000034ed6000 CR4: 0000000000350ef0
+> > Call Trace:
+> >  <TASK>
+> >  __refcount_dec include/linux/refcount.h:336 [inline]
+> >  refcount_dec include/linux/refcount.h:351 [inline]
+> >  inet_twsk_kill+0x758/0x9c0 net/ipv4/inet_timewait_sock.c:70
+> >  inet_twsk_deschedule_put net/ipv4/inet_timewait_sock.c:221 [inline]
+> >  inet_twsk_purge+0x725/0x890 net/ipv4/inet_timewait_sock.c:304
+> >  tcp_twsk_purge+0x115/0x150 net/ipv4/tcp_minisocks.c:402
+> >  tcp_sk_exit_batch+0x1c/0x170 net/ipv4/tcp_ipv4.c:3522
+> >  ops_exit_list+0x128/0x180 net/core/net_namespace.c:178
+> >  setup_net+0x714/0xb40 net/core/net_namespace.c:375
+> >  copy_net_ns+0x2f0/0x670 net/core/net_namespace.c:508
+> >  create_new_namespaces+0x3ea/0xb10 kernel/nsproxy.c:110
+> >  unshare_nsproxy_namespaces+0xc0/0x1f0 kernel/nsproxy.c:228
+> >  ksys_unshare+0x419/0x970 kernel/fork.c:3323
+> >  __do_sys_unshare kernel/fork.c:3394 [inline]
+> >  __se_sys_unshare kernel/fork.c:3392 [inline]
+> >  __x64_sys_unshare+0x31/0x40 kernel/fork.c:3392
+> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >  do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
+> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> > RIP: 0033:0x7f56d7c7cee9
+> >
+> > Fixes: 2a750d6a5b36 ("rds: tcp: Fix use-after-free of net in reqsk_time=
+r_handler().")
+> > Reported-by: syzbot+2eca27bdcb48ed330251@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=3D2eca27bdcb48ed330251
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> > v2
+> > Link: https://lore.kernel.org/all/20240521144930.23805-1-kerneljasonxin=
+g@gmail.com/
+> > 1. Use timer as a flag to test if we can safely destroy the timewait so=
+cket
+> > based on top of the patch Eric wrote.
+> > 2. change the title and add more explanation into body message.
+> > ---
+> >  net/ipv4/inet_timewait_sock.c | 11 +++++++++--
+> >  1 file changed, 9 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_soc=
+k.c
+> > index e28075f0006e..b890d1c280a1 100644
+> > --- a/net/ipv4/inet_timewait_sock.c
+> > +++ b/net/ipv4/inet_timewait_sock.c
+> > @@ -255,8 +255,8 @@ void __inet_twsk_schedule(struct inet_timewait_sock=
+ *tw, int timeo, bool rearm)
+> >
+> >                 __NET_INC_STATS(twsk_net(tw), kill ? LINUX_MIB_TIMEWAIT=
+KILLED :
+> >                                                      LINUX_MIB_TIMEWAIT=
+ED);
+> > -               BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
+> >                 refcount_inc(&tw->tw_dr->tw_refcount);
+> > +               BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
+> >         } else {
+> >                 mod_timer_pending(&tw->tw_timer, jiffies + timeo);
+> >         }
+> > @@ -301,7 +301,14 @@ void inet_twsk_purge(struct inet_hashinfo *hashinf=
+o)
+> >                         rcu_read_unlock();
+> >                         local_bh_disable();
+> >                         if (state =3D=3D TCP_TIME_WAIT) {
+> > -                               inet_twsk_deschedule_put(inet_twsk(sk))=
+;
+> > +                               struct inet_timewait_sock *tw =3D inet_=
+twsk(sk);
+> > +
+> > +                               /* If the timer is armed, we can safely=
+ destroy
+> > +                                * it, or else we postpone the process =
+of destruction
+> > +                                * to tw_timer_handler().
+> > +                                */
+> > +                               if (timer_pending(&tw->tw_timer))
+> > +                                       inet_twsk_deschedule_put(tw);
 >
-> 		saved_close = READ_ONCE(sk->sk_prot)->close;
-> no_psock:
 >
->>  		rcu_read_unlock();
->>  		release_sock(sk);
->> 	}
+> This patch is not needed, and a timer_pending() would be racy anywau.
 >
-> /P
+> As already explained, del_timer_sync() takes care of this with proper loc=
+king.
+>
+> inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
+> {
+>   if (del_timer_sync(&tw->tw_timer))
+>      inet_twsk_kill(tw);
+>   inet_twsk_put(tw);
+> }
 
-Paolo's version does read better to me as well.
+Sorry, I'm lost. But now I understand what I wrote in the morning is
+not correct...
+
+After rethinking about this, only reordering the mod_timer() and
+refcount_inc() in the initialization phase (just like the patch you
+wrote) can ensure safety.
+
+CPU 0 uses del_timer_sync() to detect if the timer is running while
+CPU 1 mod_timer() and then increments the refcount.
+
+1) If CPU 0 sees the queued timer which means the tw socket has done
+incrementing refcount, then CPU 0 can kill (inet_twsk_kill()) the
+socket.
+
+2) If CPU 0 cannot see the queued timer (and will not kill the
+socket), then CPU 1 will call mod_timer() and expire in one minute.
+Another cpu will call inet_twsk_kill() to clear tw socket at last.
+
+The patch you provided seems to solve the race issue in the right
+way... I cannot see the problem of it :(
+
+So what is the problem to be solved with your patch? Thanks for your
+patience and help.
+
+Thanks,
+Jason
 
