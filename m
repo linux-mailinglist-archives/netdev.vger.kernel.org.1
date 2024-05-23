@@ -1,73 +1,76 @@
-Return-Path: <netdev+bounces-97792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B2188CD3E8
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:20:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F228CD3FB
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:21:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 169552852AE
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:20:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E5A8285621
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:21:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 804C814A4EC;
-	Thu, 23 May 2024 13:19:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997A214B95B;
+	Thu, 23 May 2024 13:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kwHW8QLQ"
+	dkim=pass (1024-bit key) header.d=trudheim.com header.i=@trudheim.com header.b="gVRNPmJr"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from ste-pvt-msa1.bahnhof.se (ste-pvt-msa1.bahnhof.se [213.80.101.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FFF813BAE2;
-	Thu, 23 May 2024 13:19:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3E814A4FF
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 13:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.80.101.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716470378; cv=none; b=slIFeQ05CW5QCdwvajpCgtdYGth6JU8lLoERYnTvls7eo5hKlroi+G7WYFOMSdIJ890OqZODnS8yCj/fEccQnObRH2fk/jcQyUn2gY3FvjBu6ePl9ctWb9pr7IEwjh77TmSY12VbMGf6AKSQNEpxzsW/+zIHK3H/Gm8Zgwt43p0=
+	t=1716470409; cv=none; b=PrDfEMyX5OJuN8qw5AmvZExZLUFTiOioYbZcTUOwkiJmB6dkQYKRxGkWSfluKIpmbu2uOyu+OXK7ysCQ8ngqmGoM+J8AhGGX1UNHBj2L7MErniOfeHdrgNXgMJp9gAlnkhBqKucyjkmk7sGQNMwrnTz33D+YeuZ3KxO/x4zK1fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716470378; c=relaxed/simple;
-	bh=jyxo9p4uVhwZUAylTa6buVEfnCjBkMepgy3hN7Xyyks=;
+	s=arc-20240116; t=1716470409; c=relaxed/simple;
+	bh=9AElXtsEgsyUytkFmE/oFMbshBvRTekdYNMmzobCvbk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RlRTa2t1YKMRZexO2qiUsyOd+iKW5J+2kH4j7lMyYDvRzZ0+flRP5eJ+4JSQAjo+A3jPRHvIoPcoTalDNHth5BvPE3jcmtlBo2oizwQGUALnJ05qFFq0eJvcEinql+VluI7M+/nXWrvThfV1agnUS+0iDxV81XK+1BGJN9HyYng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kwHW8QLQ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kSyNDjDZ0dzFM+bYy7w8Y6dF6a+vjfjExuRSY5VdsbM=; b=kwHW8QLQdbuUICTR7zapd6XwzK
-	LRw67GDL6zRWUp6qB73AA7z5Lyb1oK8rYoZyF2WmbzlAqYnbQl1QL7wCdAYesx2WAW6r6lqBT8pzi
-	qCEIW7P5FT0x8PDDlasLA32RFOFgBkpeGElT4CIVDcbb2RYPvI9NKCuMXzvuIuphi4jE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sA8Ly-00FtVH-0i; Thu, 23 May 2024 15:19:30 +0200
-Date: Thu, 23 May 2024 15:19:30 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Larry Chiu <larry.chiu@realtek.com>
-Cc: Justin Lai <justinlai0215@realtek.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"horms@kernel.org" <horms@kernel.org>,
-	Ping-Ke Shih <pkshih@realtek.com>
-Subject: Re: [PATCH net-next v19 01/13] rtase: Add pci table supported in
- this module
-Message-ID: <8c6ad434-ba3a-4acf-9b10-9dff8efd4ee5@lunn.ch>
-References: <20240517075302.7653-1-justinlai0215@realtek.com>
- <20240517075302.7653-2-justinlai0215@realtek.com>
- <d840e007-c819-42df-bc71-536328d4f5d7@lunn.ch>
- <e5d7a77511f746bdb0b38b6174ef5de4@realtek.com>
- <97e30c5f-1656-46d0-b06c-3607a90ec96f@lunn.ch>
- <f9133a36bbae41138c3080f8f6282bfd@realtek.com>
- <7aab03ba-d8ed-4c9c-8bfd-b2bbed0a922d@lunn.ch>
- <5270598ca3fc4712ac46600fcc844d73@realtek.com>
- <0ec88b78-a9d3-4934-96cb-083b2abf7e2b@lunn.ch>
- <48072595c9c344fea9c268fd81e4d06e@realtek.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=C1g1JtBIX1ERwuNVJau1FGnZq9UG3J//6w5g2POEaBag0P5qrCXLtaoUKudk5IwElv84ibrIvL647xuzq+TTw4Ow86fIOTKLTj7SE0amg5Y9sX0NkUK9FYZ65nCKA/LoPYRyT2J2LnWM5m/ej616oklCbjdoe3rX4UhMjWl1wWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trudheim.com; spf=pass smtp.mailfrom=trudheim.com; dkim=pass (1024-bit key) header.d=trudheim.com header.i=@trudheim.com header.b=gVRNPmJr; arc=none smtp.client-ip=213.80.101.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trudheim.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trudheim.com
+Received: from localhost (localhost [127.0.0.1])
+	by ste-pvt-msa1.bahnhof.se (Postfix) with ESMTP id 03F943F932;
+	Thu, 23 May 2024 15:20:03 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at bahnhof.se
+X-Spam-Flag: NO
+X-Spam-Score: -2.099
+X-Spam-Level:
+Authentication-Results: ste-pvt-msa1.bahnhof.se (amavisd-new);
+	dkim=pass (1024-bit key) header.d=trudheim.com
+Received: from ste-pvt-msa1.bahnhof.se ([127.0.0.1])
+	by localhost (ste-pvt-msa1.bahnhof.se [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id g8kqtkSDln1F; Thu, 23 May 2024 15:20:01 +0200 (CEST)
+Received: 
+	by ste-pvt-msa1.bahnhof.se (Postfix) with ESMTPA id 5E5783F7D7;
+	Thu, 23 May 2024 15:19:58 +0200 (CEST)
+Received: from photonic.trudheim.com (photonic.trudheim.com [IPv6:2001:470:28:a8::5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by trudheim.com (Postfix) with ESMTPSA id 2AD2013B71B5;
+	Thu, 23 May 2024 15:19:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=trudheim.com;
+	s=trudheim; t=1716470395;
+	bh=9AElXtsEgsyUytkFmE/oFMbshBvRTekdYNMmzobCvbk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=gVRNPmJrd9xtMxb4wZZbneKLd87cVnw7+3h3X2hC/OdcnJYjCsjJqQ90JghEXCIfY
+	 FfgdUs1AS7RHJ2nUfcHrW5dHe/fOqg/9EiHv3Jc1c+x/bXooj+W2DByD3Fk/fOT522
+	 lQboLn7dsaMAlAFoqWM61WzVTIY1ufPlEoh/WWLk=
+Date: Thu, 23 May 2024 15:19:54 +0200
+From: Sirius <sirius@trudheim.com>
+To: Gedalya <gedalya@gedalya.net>
+Cc: Dragan Simic <dsimic@manjaro.org>, netdev@vger.kernel.org
+Subject: Re: iproute2: color output should assume dark background
+Message-ID: <Zk9CehhJvVINJmAz@photonic.trudheim.com>
+References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
+ <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
+ <96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
+ <Zk722SwDWVe35Ssu@photonic.trudheim.com>
+ <e4695ecb95bbf76d8352378c1178624c@manjaro.org>
+ <449db665-0285-4283-972f-1b6d5e6e71a1@gedalya.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,51 +79,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <48072595c9c344fea9c268fd81e4d06e@realtek.com>
+In-Reply-To: <449db665-0285-4283-972f-1b6d5e6e71a1@gedalya.net>
+Autocrypt: addr=sirius@trudheim.com; keydata=
+	mDMEZfWzYhYJKwYBBAHaRw8BAQdA12OXNGLFcQh7/u0TP9+LmaZCQcDJ5ikNVUR6Uv++NQy0HFN
+	pcml1cyA8c2lyaXVzQHRydWRoZWltLmNvbT6IkAQTFggAOBYhBP4MEykW8GvNTTxpa4Pq//Pg5C
+	PuBQJl9bNiAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEIPq//Pg5CPuatYA/3QLv92lC
+	7xfhdf7NgmqipA+DXyobhzn9JgwLpRQQcu0AQD77L+EQ3aiyga7NR15r2IRC4DDLFK9Mnsbvi+K
+	ZHmdBbg4BGX1s2ISCisGAQQBl1UBBQEBB0AZotbLXS2sTulJhpCsxrd9be2zedV47TV8CInC4nt
+	9PQMBCAeIeAQYFggAIBYhBP4MEykW8GvNTTxpa4Pq//Pg5CPuBQJl9bNiAhsMAAoJEIPq//Pg5C
+	PubFIA/3d2DFaXz0WJ1zq/tSacU7fckFQ7KFwddlyI7Y+IiosmAQCnBrV+e1iJXnZRSZCGBu+Xt
+	BMLXZe+WKVyzQ0/AWV5Ag==
+X-MailScanner-ID: 2AD2013B71B5.A3FD9
+X-MailScanner: Found to be clean
+X-MailScanner-From: sirius@trudheim.com
 
-On Thu, May 23, 2024 at 06:29:55AM +0000, Larry Chiu wrote:
-> 
-> > > Thank you very much for your clear reply.
-> > >
-> > > As I mentioned, it works like a NIC connected to an Ethernet Switch, not a
-> > > Management port.
-> > > The packets from this GMAC are routed according to switch rules such as
-> > > ACL, L2, .... and it does not control packet forwarding through any special
-> > > header or descriptor. In this case, we have our switch tool which is used
-> > > for provisioning these rules in advance. Once the switch boots up, the
-> > > rules will be configured into the switch after the initialization. With this
-> > > driver and the provisioning by our switch tool, it can make switch forward
-> > > the frame as what you want. So it's not a DSA like device.
-> > 
-> > How does spanning tree work? You need to send bridge PDUs out specific
-> > ports. Or do you not support STP and your network must never have
-> > loops otherwise it dies in a broadcast storm? That does not sound very
-> > reliable.
-> > 
-> > There are other protocols which require sending packets out specific
-> > ports. Are they simply not supported?
-> > 
-> This port is not a CPU port, nor a management port, and therefore does not 
-> manage any protocols of the switch. These protocols are implemented by the
-> CPU inside the Ethernet switch core.
+In days of yore (Thu, 23 May 2024), Gedalya thus quoth: 
+> Yes, echo -ne '\e]11;?\a' works on _some_ (libvte-based) terminals but not
+> all. And a core networking utility should be allowed to focus on, ehhm,
+> networking rather than oddities of a myriad terminals.
 
-So STP is on the switch CPU. Linux will run PTP as a leaf node, and
-rely on the switch also running PTP to manage PTP between the upstream
-port and the downstream port towards linux. IGMP snooping runs on the
-switch, and needs to listen to IGMP joins Linux sends out, etc.
+Then it perhaps should not add colour to the output in the first place and
+focus solely on the networking.
 
-Do you have Linux running on the switch CPU? So you can reuse all the
-existing networking code and applications like ptp4l, or have the
-re-invented it all?
+A suggestion would be the iproute2 package revert the option to compile
+colourised output as default, sticking to plain text output as that
+require zero assumptions about the user terminal. Carry on offering the
+'-c' switch to enable it at runtime.
 
-> This driver just service the transmit/receive packets for one port in the RTL90xx
-> with PCIe interface. Other programs that the switch needs to execute are
-> managed by the CPU inside the switch core.
+-- 
+Kind regards,
 
-So you are following the 40 year old model, a cable to an external
-device. Just be aware, it is an external device. Your interface to it
-is SNMP, telnet, http. It is very unlikely a kernel driver will be
-allowed to communicate with the switch.
-
-	Andrew
+/S
 
