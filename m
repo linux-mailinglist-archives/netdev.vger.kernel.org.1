@@ -1,116 +1,102 @@
-Return-Path: <netdev+bounces-97825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24F788CD642
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 16:55:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B11A8CD644
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 16:56:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5CAE283BF1
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:55:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45840283E6D
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:56:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABE16B641;
-	Thu, 23 May 2024 14:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C255538A;
+	Thu, 23 May 2024 14:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R0Jwi1Lv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWZHyph8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377DC2901
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 14:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E124428
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 14:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716476102; cv=none; b=QkEB3rCyxldD2a+bz8LbL+fIHPfL+UvI7r8ybwd+zPsVWnFMGjK5FceTGTuB33Dbbq1EeoZ5Can0d9E7GqrAwU5MwCXsGRjSZ3r3AX5mvM1cm2Rbe8Eyj6fCNRlMZXIodrUkP0vjMd0tw+0w4zZYDBFqlXWDhBruPo9/mvT0pKQ=
+	t=1716476173; cv=none; b=j3O6k+Ajl+TVs8ae4/y48UAfs99sJzd+cQcVrZT3XfwKRP7e8fzgwzWdV28gWqK1dk/HhHdlSkxpHQRn9sXdXECSOiNP+O9KFhuQvuve7WB7r/wIY7M+xN5A4D/CjkQUrSFsBvNkni2pJLUV+7XvNReBfw3wAQpiWJPnrrCgCKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716476102; c=relaxed/simple;
-	bh=IXR7S6Gc+F3sudLsZ8LWQ+6UJawqmAovn5NH00L+sI4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c2nO+ewOCxTswqGK92IpZ0CYUHsfa29jyFHFoy/fQRL70ScoPYMtIhWE8kMNghEOk6sjE1EhwKncsgr7pLO9SLk+iXFtVys4nywoOwqtPuGDimXs1JBbiXyOLDS4rXDFNLtaUWtd9R0Ee46TN6lI8XnDUIyw1Rhr4VZ4EAV3Ako=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R0Jwi1Lv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716476100;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F/IspulZ7ogp/9/Ev8vDQ4CFOVYGCYWHCfNnAnEppwY=;
-	b=R0Jwi1LvTtjeblyOL1lclj2ZEvTnTTRLg41l4MkQv/HR4xEP7tF2+m961Rqu4TpQ5oAd9/
-	jrrAn73lG+op0ABDFKhL5L2PwoTSkyhGN2U5W+OGSM3vlHnwGJvwrNQx7rGXk9viUdLWn9
-	tjMm8iWKiScMzNTmN1f3wE+TKh1HJgE=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-99-xrfTH3txNaeX2zDpEGdM4w-1; Thu, 23 May 2024 10:54:57 -0400
-X-MC-Unique: xrfTH3txNaeX2zDpEGdM4w-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2e1e7954970so12879541fa.2
-        for <netdev@vger.kernel.org>; Thu, 23 May 2024 07:54:57 -0700 (PDT)
+	s=arc-20240116; t=1716476173; c=relaxed/simple;
+	bh=1g9By/Ki/GssaDgNBFBcK8MtxIyzUQ98mMwiLIKul9k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S5vf9ttT4pm3t119OJ+0IvP/13bpyo0Q2Il8uFzLZseFBb5JEUjrElvRcIvqGDAYWgXz6sibsz9ZP9pscL/z91TvRxf8D7DXQCq+R8fbZwF8GpDImBZhxPRYVl3jdIh0XXg/DlPg52jSr7INotJsjIXG0QVdwgMtFc+AzBmQxoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hWZHyph8; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-36dd37767dfso14119895ab.1
+        for <netdev@vger.kernel.org>; Thu, 23 May 2024 07:56:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716476171; x=1717080971; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1g9By/Ki/GssaDgNBFBcK8MtxIyzUQ98mMwiLIKul9k=;
+        b=hWZHyph8fckI+imr8NhUoVacTj82VMtpg+wA2lhuq4/NbAlCIqycpxQJZaVPbSA635
+         gRyLMds71qZKivOFh3P5iQfFR8dRB98C0XBgneTrw7nwG96CrLgOVodLYMhErZDd6rLO
+         y+PnMjD7coJgWy3AjrjhNSa6yBgmWzIaSTLqg7m7aYrDW6SaDR5aK6hjrnsVQTONjbHH
+         SX2NPiKRiC8vz3QBSrf88yWdOJGvK5L7i6B/qzIkarJMZlIk3r3VvCkGZqq+Jbm98qoo
+         VvtzS2L4kNP9NOrMztmXZcgkAUwkuh0qZhDyrN3nlpNzqwArvUGMhRddDn5zvygkEMPw
+         gBJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716476096; x=1717080896;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F/IspulZ7ogp/9/Ev8vDQ4CFOVYGCYWHCfNnAnEppwY=;
-        b=bdrzmtNt1MJXfPNJdHoLpTkte3N1TRulfu+FA7qt5y9cpnlXUKFJ/rllKl3+B2JlsN
-         jGkWmBameNtP8S+kZQwVHFDdx35zo4cQp+xEE5l5V6gWE6ZB78lrFh5QssECz3MzF2Ha
-         ola+FL6cVaQewU3v0Ujz1h3GJflI+FjYCUfbKl9sWlS/cigW8GYWNxcUmrGsC5BO7emN
-         Jc5I5/1k0BsLwj935cCVsUp3mA1sS2zuKxUgwsZEvLvUKv+5mdItgBLJ84iP0PgE5RSN
-         gHDkvZlJqzJsUBwLeFRXu0JsucM0HPJRLLGqO0mLqlwmNhNsWnc1VqawUOjhTqrUxb8D
-         WRYg==
-X-Forwarded-Encrypted: i=1; AJvYcCW9dJavPMKMxpsK1Wgaw9/ghX4ckclDSiiKrUJedfjufuUOxcziDQ3Y3wlxpHPRNjaSKgWb6lBbucdAEk1QDIUzLJY2Rvxn
-X-Gm-Message-State: AOJu0YyQiyRU/CXWBtzEKRw+dCODqo5zA7CNBfC1X666k7zQMbPfrggC
-	eYEo47+MqL+88Lvmw5JqdENJ97sHeKnq/OnBXsOt6LnmkSlENyXvXBtW4Td5LAN+HBhVt5qhXAl
-	fKX7rdWZqUxArSVaf1tmeWDIwUdVqMfoR/XdfqFR/lTOJQSYyLQ08VQ==
-X-Received: by 2002:a2e:9042:0:b0:2e5:4e76:42df with SMTP id 38308e7fff4ca-2e94953fb10mr43723541fa.33.1716476096193;
-        Thu, 23 May 2024 07:54:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGC0bLoBdXb54NPxLQ4coOeZyHZBFadFkv6sukQZSvxP4AKs7iWObQtZZHt9eGMKoAkua8+hQ==
-X-Received: by 2002:a2e:9042:0:b0:2e5:4e76:42df with SMTP id 38308e7fff4ca-2e94953fb10mr43723241fa.33.1716476095561;
-        Thu, 23 May 2024 07:54:55 -0700 (PDT)
-Received: from redhat.com ([2.52.29.103])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5cdeacb2casm1095429066b.67.2024.05.23.07.54.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 May 2024 07:54:55 -0700 (PDT)
-Date: Thu, 23 May 2024 10:54:40 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuewei Niu <niuxuewei97@gmail.com>
-Cc: stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: Re: [RFC PATCH 0/5] vsock/virtio: Add support for multi-devices
-Message-ID: <20240523104010-mutt-send-email-mst@kernel.org>
-References: <20240517144607.2595798-1-niuxuewei.nxw@antgroup.com>
+        d=1e100.net; s=20230601; t=1716476171; x=1717080971;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1g9By/Ki/GssaDgNBFBcK8MtxIyzUQ98mMwiLIKul9k=;
+        b=DrOENfAesKJy631xK0LQ8/y4InEefcpqxBYx86yAWxaiuEaajTXDF8ZNLXaIF7QJ43
+         to0NWNxOEB2EB0hSJeOtWXY6G2SDlEtM1CuN4OJxP36Icpc441Vw2YJfd5+IfgyqISsh
+         DYeliLI8XwHmfkwwQJnKWtuAJ/2y21APYc0x2Yjy9em0IocANoDg9FFbzSrYzxv8pcA1
+         Nk8bO9RlfVNJbasU2rUjFT5lVHyhaIVlKJILMF8+L0T3jeon7lOlLsG4l9DYZ+GbwPa8
+         TityKp7f7dvatMjOk+ugUNW95h/QqYBXOZhvZw8QQLDvGaQOVx3/mu5hECroL+vTeADq
+         mScA==
+X-Forwarded-Encrypted: i=1; AJvYcCVcXl4YYkt1OaVE/+tHdfC3RV8LXunY24vwrH7oyaLoSrMNOpttYFckj59RAw6nKsuRsN52G54MEosvxd949RrxChPFK3wt
+X-Gm-Message-State: AOJu0YwsS2ldSFJjboQNrUgDa9i+uNHc8rBSe3ai5j27aDLd7Ut9BJ1M
+	iqH+Xri3+ylhbzbdyBKi8DOrApMa7PeG93IJWATf6OChHRBItQ2U
+X-Google-Smtp-Source: AGHT+IGtsOHgStkNl8H544mgrtVZnHAYvefGN7p6ICwbPk/1bo9nzBLQKQvS83qBlHOZJkeeZ4LqRg==
+X-Received: by 2002:a05:6e02:1d98:b0:36c:513c:e7f1 with SMTP id e9e14a558f8ab-371fbb110b9mr52834125ab.31.1716476170627;
+        Thu, 23 May 2024 07:56:10 -0700 (PDT)
+Received: from ?IPV6:2601:282:1e81:c7a0:5108:8443:63ed:1abc? ([2601:282:1e81:c7a0:5108:8443:63ed:1abc])
+        by smtp.googlemail.com with ESMTPSA id e9e14a558f8ab-36cb9e222edsm76148275ab.87.2024.05.23.07.56.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 May 2024 07:56:10 -0700 (PDT)
+Message-ID: <f5d0722c-0608-48bc-9863-eef6ea21b388@gmail.com>
+Date: Thu, 23 May 2024 08:56:07 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240517144607.2595798-1-niuxuewei.nxw@antgroup.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC iproute2-next 2/3] xfrm: support xfrm SA direction
+ attribute
+To: Christian Hopps <chopps@chopps.org>,
+ Stephen Hemminger <stephen@networkplumber.org>
+Cc: Antony Antony <antony.antony@secunet.com>, netdev@vger.kernel.org,
+ devel@linux-ipsec.org, Steffen Klassert <steffen.klassert@secunet.com>,
+ Eyal Birger <eyal.birger@gmail.com>,
+ Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+ Sabrina Dubroca <sd@queasysnail.net>
+References: <cover.1716143499.git.antony.antony@secunet.com>
+ <3c5f04d21ebf5e6c0f6344aef9646a37926a7032.1716143499.git.antony.antony@secunet.com>
+ <20240519155843.2fc8e95a@hermes.local> <m2y18242oz.fsf@ja.int.chopps.org>
+Content-Language: en-US
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <m2y18242oz.fsf@ja.int.chopps.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 17, 2024 at 10:46:02PM +0800, Xuewei Niu wrote:
->  include/linux/virtio_vsock.h            |   2 +-
->  include/net/af_vsock.h                  |  25 ++-
->  include/uapi/linux/virtio_vsock.h       |   1 +
->  include/uapi/linux/vm_sockets.h         |  14 ++
->  net/vmw_vsock/af_vsock.c                | 116 +++++++++--
->  net/vmw_vsock/virtio_transport.c        | 255 ++++++++++++++++++------
->  net/vmw_vsock/virtio_transport_common.c |  16 +-
->  net/vmw_vsock/vsock_loopback.c          |   4 +-
->  8 files changed, 352 insertions(+), 81 deletions(-)
+On 5/22/24 3:26 AM, Christian Hopps wrote:
+> I would think this should be a different patchset since it would be
+> totally new for iproute xfrm, right?
 
-As any change to virtio device/driver interface, this has to
-go through the virtio TC. Please subscribe at
-virtio-comment+subscribe@lists.linux.dev and then
-contact the TC at virtio-comment@lists.linux.dev
-
-You will likely eventually need to write a spec draft document, too.
-
--- 
-MST
-
+yea, ip-xfrm does not have any json support at the moment.
 
