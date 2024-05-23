@@ -1,149 +1,144 @@
-Return-Path: <netdev+bounces-97838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7489E8CD710
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 17:30:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3B8A8CD730
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 17:35:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5DFEB20E9C
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:30:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2EBC1C21B43
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC46BF9EB;
-	Thu, 23 May 2024 15:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A374611711;
+	Thu, 23 May 2024 15:35:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pu4I1US3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SGe5+DXX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808DD7482;
-	Thu, 23 May 2024 15:30:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9C0125C1
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 15:35:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716478248; cv=none; b=YlRXlM0SBgs0RQwDyUafalta9J4Ut4Ua7otXiRmdtvin2llGr6QnzRmnP9yc6bf3YwVvJtpE0m2iZJmG1WMmi3y40j58B3Dj8o+ycBI3aTV1DHWL7qgrr4lJKv12yE/JPN6ukWPoH1brRQElNXU0hugIrA9kwhZgFxV6sl/7cC4=
+	t=1716478547; cv=none; b=UpSgMm8TMZ/PEswHSbjS3XO/Twxxv6pG5VnB6mYjF0a+hUthVzRPFOdkvAtC8QvnYWvMCBFCBjlTx8FPTTjSfyFBNNPA7gYF+oKSJUErllpnAMQwsBGthvhTvayYGO5IAaCFKCdvStafO8+gzDRDaa5qnYbr5+CGuDycET3yFIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716478248; c=relaxed/simple;
-	bh=+V3h8W+KJStcQS0bJvgI6ZikZdXVS5bHliBgARFsatM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SblTcHQEQhxGzgRlKrt9PmI4GHM+kU8t9muCa1zK/iW7xMDfkjbZXnBKJROkHA2GfswdkwhQnv8oxxdoRY2s0m14aHvFdWEVXrQgkN8mZtjO6x0oMOvfdNK3BJIXXu1A0SQCHCIkl0urCAnQphYBEkNGSqy/xH/3D19P0I4GyTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pu4I1US3; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-5dca1efad59so2947021a12.2;
-        Thu, 23 May 2024 08:30:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716478247; x=1717083047; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+TJ/vg4jZgddhB/QmYZWS0itIk/bB/u3eDv8r97s2to=;
-        b=Pu4I1US3tWmAAWcVjpPxlGffdqLIBJ2ALOCahT761XleA1GHrrXgc3rA6FyK5TSYfI
-         CedOmEJMzobSsMyQ71FXl5KdRHqofoATZgTblh7R/lDyJFTvfZ+sB/dS8hq4LXqHcoTf
-         w8Yz/3xJS/b3+eO9+JJH2IomIPgfUg5egLpcFs5F1arzjB3spF5UcGTLBguiYgip+eSK
-         317gjGaGLuv9+Pxiv41mZFdhHnjWIMJ/RKvCqQGZTC3OPy6loy6JW62xJg1uTzs8cc2e
-         FL7E5A57UiCt4VacST6ZIi/aPw29a8ou2IHNF+XhurREalC1G/XZaa0kP2jrRIm9jRp3
-         QptQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716478247; x=1717083047;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+TJ/vg4jZgddhB/QmYZWS0itIk/bB/u3eDv8r97s2to=;
-        b=N7R1nasLBrK45dE2KKHHlcBgE9Hziq0NoswvOPfCWoLB6aViKnSLjEFvssfTsVWh6p
-         LiAcijYhVTafBuafOjFqpPHkQPDUWxvLGDd3l57nPY1LdkzLKrlDjodz1N0BOV0NMTzL
-         0bCVn543e9l3jI4VLwPTeQD0zarzRJQwUhDmFhBmELVud+/t40WDG2jNSsaUFHSq2+iu
-         G41mOfuVUVy7oYXUwh7zrDdmIspMQ1y8u+5SHgDSTQt+6boc/fK6g0RH8wSg9ipIhiv9
-         M0CERnUGdCzMGccDuRVUiMSMEHUMk0c+CXVvJj6Oi7/I1vf0z7eRzqDMxls7tcRPW9b1
-         1NWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXGeFQOS+rLk2I1c38v0wuBwdT4R0uIDVY8pDBAgbOFuf4kUUhp+/HS4DW/LJAUDH07xblHgtclbCcDE/1c7hM2QJjXPpN27kJC7smw
-X-Gm-Message-State: AOJu0Yx9DyeQuTS5nLNS5sDbPyc0iIvOwiYZMnoRcJKdJmzsSkTIfMK+
-	3Eh3RFXPDRrn22IapfpzrEZKIMQDTaDektj+8ZpXw1bkWTD3IFY9Z6sGUUGk
-X-Google-Smtp-Source: AGHT+IHJrh81xzTofpC0t+3Be/hM4LaYvb7jB+O2cq/ubsGUArSBEkaGGRYh8xm1XWtp/wIeJLmZ/w==
-X-Received: by 2002:a17:90a:8b04:b0:2bd:9bd4:359c with SMTP id 98e67ed59e1d1-2bd9f5bda81mr5246508a91.40.1716478246701;
-        Thu, 23 May 2024 08:30:46 -0700 (PDT)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a804792315sm58076726d6.91.2024.05.23.08.30.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 May 2024 08:30:46 -0700 (PDT)
-Message-ID: <1da4f523-aa96-40fe-9c08-06d5743a3f27@gmail.com>
-Date: Thu, 23 May 2024 08:30:43 -0700
+	s=arc-20240116; t=1716478547; c=relaxed/simple;
+	bh=0AygUOOfb7Jmkd09bgF12TrFzYdmLy1WVQlgpNnZmjw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lTgp5b9deGeHJskpeTOeg+a85bH4V2JJ56LUXEfj0tuFugZnEq3diu5QorBqMslLqd5CKw0Eyvfq4lIfaW3KFJ1yEsM7Hm63eNSVbJVxaHapuAEOnTj70x3k8YNGOpnDLfPlI02abA21zV1theXp3dwLI1flyhjqhYz6KmpzcWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SGe5+DXX; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=w9KG2jwfUz29bQgrc0zfowgb4vcxljBfubkOWGE3Y74=; b=SGe5+DXXN6DyksybK9D9inDvTw
+	wtJzaGB8eSbl2pbBnU3SB6frau3fJAr7O/cJgG+xMiceL3C4aUue/qf98YHpDlO+plrvQRbOnP/iB
+	6Q7Ip9+B/alLdlUfsgLQ+xZh6dIPlXPFVpTUVKCJhdc+U3kmPYYoqik0+ht820hZ/e2s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sAATl-00Fu39-0k; Thu, 23 May 2024 17:35:41 +0200
+Date: Thu, 23 May 2024 17:35:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Krzysztof =?utf-8?Q?Ol=C4=99dzki?= <ole@ans.pl>
+Cc: Ido Schimmel <idosch@nvidia.com>, Michal Kubecek <mkubecek@suse.cz>,
+	Moshe Shemesh <moshe@nvidia.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	tariqt@nvidia.com
+Subject: Re: "netlink error: Invalid argument" with ethtool-5.13+ on recent
+ kernels due to "ethtool: Add netlink handler for getmodule (-m)" -
+ 25b64c66f58d3df0ad7272dda91c3ab06fe7a303, also no SFP-DOM support via
+ netlink?
+Message-ID: <de8f9536-7a00-43b2-8020-44d5370b722c@lunn.ch>
+References: <9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl>
+ <apfg6yonp66gp4z6sdzrfin7tdyctfomhahhitqmcipuxkewpw@gmr5xlybvfsf>
+ <31f6f39b-f7f3-46cc-8c0d-1dbcc69c3254@ans.pl>
+ <7nz6fvq6aaclh3xoazgqzw3kzc7vgmsufzyu4slsqhjht7dlpl@qyu63otcswga>
+ <3d6364f3-a5c6-4c96-b958-0036da349754@ans.pl>
+ <0d65385b-a59d-4dd0-a351-2c66a11068f8@lunn.ch>
+ <c3726cb7-6eff-43c6-a7d4-1e931d48151f@ans.pl>
+ <Zk2vfmI7qnBMxABo@shredder>
+ <f9cec087-d3e1-4d06-b645-47429316feb7@lunn.ch>
+ <1bee73de-d4c3-456d-8cee-f76eee7194b0@ans.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: micrel: set soft_reset callback to
- genphy_soft_reset for KSZ8061
-To: Mathieu Othacehe <othacehe@gnu.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Karim Ben Houcine <karim.benhoucine@landisgyr.com>
-References: <20240521065406.4233-1-othacehe@gnu.org>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
- xGlkaOSDuu09rxuW+69Y2f1TzjFuGpBk4ysWOR85O2Nx8AJ6fYGCoeTbovrNlGT1M9obSFGQ
- X3IzRnWoqlfudjTO5TKoqkbOgpYqIo5n1QbEjCCwCwCg3DOH/4ug2AUUlcIT9/l3pGvoRJ0E
- AICDzi3l7pmC5IWn2n1mvP5247urtHFs/uusE827DDj3K8Upn2vYiOFMBhGsxAk6YKV6IP0d
- ZdWX6fqkJJlu9cSDvWtO1hXeHIfQIE/xcqvlRH783KrihLcsmnBqOiS6rJDO2x1eAgC8meAX
- SAgsrBhcgGl2Rl5gh/jkeA5ykwbxA/9u1eEuL70Qzt5APJmqVXR+kWvrqdBVPoUNy/tQ8mYc
- nzJJ63ng3tHhnwHXZOu8hL4nqwlYHRa9eeglXYhBqja4ZvIvCEqSmEukfivk+DlIgVoOAJbh
- qIWgvr3SIEuR6ayY3f5j0f2ejUMYlYYnKdiHXFlF9uXm1ELrb0YX4GMHz80nRmxvcmlhbiBG
- YWluZWxsaSA8Zi5mYWluZWxsaUBnbWFpbC5jb20+wmYEExECACYCGyMGCwkIBwMCBBUCCAME
- FgIDAQIeAQIXgAUCVF/S8QUJHlwd3wAKCRBhV5kVtWN2DvCVAJ4u4/bPF4P3jxb4qEY8I2gS
- 6hG0gACffNWlqJ2T4wSSn+3o7CCZNd7SLSDOw00ESM+4EhAQAL/o09boR9D3Vk1Tt7+gpYr3
- WQ6hgYVON905q2ndEoA2J0dQxJNRw3snabHDDzQBAcqOvdi7YidfBVdKi0wxHhSuRBfuOppu
- pdXkb7zxuPQuSveCLqqZWRQ+Cc2QgF7SBqgznbe6Ngout5qXY5Dcagk9LqFNGhJQzUGHAsIs
- hap1f0B1PoUyUNeEInV98D8Xd/edM3mhO9nRpUXRK9Bvt4iEZUXGuVtZLT52nK6Wv2EZ1TiT
- OiqZlf1P+vxYLBx9eKmabPdm3yjalhY8yr1S1vL0gSA/C6W1o/TowdieF1rWN/MYHlkpyj9c
- Rpc281gAO0AP3V1G00YzBEdYyi0gaJbCEQnq8Vz1vDXFxHzyhgGz7umBsVKmYwZgA8DrrB0M
- oaP35wuGR3RJcaG30AnJpEDkBYHznI2apxdcuTPOHZyEilIRrBGzDwGtAhldzlBoBwE3Z3MY
- 31TOpACu1ZpNOMysZ6xiE35pWkwc0KYm4hJA5GFfmWSN6DniimW3pmdDIiw4Ifcx8b3mFrRO
- BbDIW13E51j9RjbO/nAaK9ndZ5LRO1B/8Fwat7bLzmsCiEXOJY7NNpIEpkoNoEUfCcZwmLrU
- +eOTPzaF6drw6ayewEi5yzPg3TAT6FV3oBsNg3xlwU0gPK3v6gYPX5w9+ovPZ1/qqNfOrbsE
- FRuiSVsZQ5s3AAMFD/9XjlnnVDh9GX/r/6hjmr4U9tEsM+VQXaVXqZuHKaSmojOLUCP/YVQo
- 7IiYaNssCS4FCPe4yrL4FJJfJAsbeyDykMN7wAnBcOkbZ9BPJPNCbqU6dowLOiy8AuTYQ48m
- vIyQ4Ijnb6GTrtxIUDQeOBNuQC/gyyx3nbL/lVlHbxr4tb6YkhkO6shjXhQh7nQb33FjGO4P
- WU11Nr9i/qoV8QCo12MQEo244RRA6VMud06y/E449rWZFSTwGqb0FS0seTcYNvxt8PB2izX+
- HZA8SL54j479ubxhfuoTu5nXdtFYFj5Lj5x34LKPx7MpgAmj0H7SDhpFWF2FzcC1bjiW9mjW
- HaKaX23Awt97AqQZXegbfkJwX2Y53ufq8Np3e1542lh3/mpiGSilCsaTahEGrHK+lIusl6mz
- Joil+u3k01ofvJMK0ZdzGUZ/aPMZ16LofjFA+MNxWrZFrkYmiGdv+LG45zSlZyIvzSiG2lKy
- kuVag+IijCIom78P9jRtB1q1Q5lwZp2TLAJlz92DmFwBg1hyFzwDADjZ2nrDxKUiybXIgZp9
- aU2d++ptEGCVJOfEW4qpWCCLPbOT7XBr+g/4H3qWbs3j/cDDq7LuVYIe+wchy/iXEJaQVeTC
- y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
- X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240521065406.4233-1-othacehe@gnu.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1bee73de-d4c3-456d-8cee-f76eee7194b0@ans.pl>
 
-
-
-On 5/20/2024 11:54 PM, Mathieu Othacehe wrote:
-> Following a similar reinstate for the KSZ8081 and KSZ9031.
+> > Before you do that, please could you work on ethtool. I would say it
+> > has a bug. It has been provided with 256 bytes of SPF data. It should
+> > be able to decode that and print it in human readable format. So the
+> > EINVAL should not be considered fatal to decoding.
 > 
-> Older kernels would use the genphy_soft_reset if the PHY did not implement
-> a .soft_reset.
+> Yes, I was also thinking this way. Luckily, similar to the situation with the mlx4 driver, all the logic is there - sff8636_dom_parse() checks if map->page_03h is set and if not, just returns gracefully.
 > 
-> The KSZ8061 errata described here:
-> https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ8061-Errata-DS80000688B.pdf
-> and worked around with 232ba3a51c ("net: phy: Micrel KSZ8061: link failure after cable connect")
-> is back again without this soft reset.
-> 
-> Fixes: 6e2d85ec0559 ("net: phy: Stop with excessive soft reset")
-> Tested-by: Karim Ben Houcine <karim.benhoucine@landisgyr.com>
-> Signed-off-by: Mathieu Othacehe <othacehe@gnu.org>
+> So, all we need to do is modify sff8636_memory_map_init_pages():
+> @@ -1038,7 +1039,7 @@
+>         sff8636_request_init(&request, 0x3, SFF8636_PAGE_SIZE);
+>         ret = nl_get_eeprom_page(ctx, &request);
+>         if (ret < 0)
+> -               return ret;
+> +               return 0;
+>         map->page_03h = request.data - SFF8636_PAGE_SIZE;
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+Nice. Please submit a patch.
+
+I see there is a discussion about if there should be a warning here or
+not. The problem we have is that some NICs offload getting data from
+the SFP to firmware, and the firmware does not support more than
+getting the first page. The IOCTL API returned whatever the was
+available, and ethtool would decode what it was given. With the change
+to the newer API, ethtool can ask for any page. Those devices using
+limited firmware cannot fulfil the request, and are going to return an
+error, either -EOPNOTSUPP, or maybe -EINVAL. We don't want ethtool to
+regress, so being silent is probably the correct thing to do.
+
+It does however hide bugs in drivers, but we can maybe find them via
+testing. It would be nice to have CI/CD test which runs ethtool using
+both the IOCTL interface and the netlink and compares the output. The
+IOCTL output should be a subset of the netlink output. In this case,
+it clearly is not a subset.
+
+> Finally, as I was looking at the code in fallback_set_params() I started thinking if the length check is actually correct?
+> 
+> I think instead of:
+>  if (offset >= modinfo->eeprom_len)
+> we may want:
+>  if (offset + length > modinfo->eeprom_len)
+> 
+
+> I don't know if it is safe to assume we always read a single page
+> and cross page reads are not allowed and even if so, that we should
+> rely on this instead of checking the len explicitly? What do you
+> think?
+
+Cross page reads are not allowed by the netlink API. SFPs do funny
+things when you do a cross page read. I forget the details, but it is
+something like it wraps around within the same 1/2 page. However, SFPs
+vendors like to ignore the standard, don't feel they need to conform
+to it, and i would not be surprised if some do continue the read in
+the next page because that is simpler, or they could not be bothered
+to read the standard in detail. By defining the API to not allow cross
+page reads, or even cross 1/2 page reads, we avoid this mess. This
+validation should happen at a higher level, where the netlink
+parameters are validated for the call.
+
+You can probably test this:
+
+       ethtool -m|--dump-module-eeprom|--module-info devname [raw on|off]
+              [hex on|off] [offset N] [length N]
+
+You probably need hex on, and then can then set offset and length and
+see if the validation works.
+
+    Andrew
 
