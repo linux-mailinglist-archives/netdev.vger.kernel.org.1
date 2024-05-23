@@ -1,93 +1,290 @@
-Return-Path: <netdev+bounces-97724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65DFC8CCE3F
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 10:40:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9453F8CCE92
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 10:48:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CF7D1F21E87
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 08:40:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C838281719
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 08:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E2613C68E;
-	Thu, 23 May 2024 08:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E144C13CF9D;
+	Thu, 23 May 2024 08:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LVDeRR1C"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NmS8w3D3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4702B46AF;
-	Thu, 23 May 2024 08:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB8CE13C836
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 08:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716453630; cv=none; b=TAVTkOXFJIZCJuIoq9oOGCs3mD0MAAwlh6yW7dM3+qeLm1LCNhDqGCzhmRPAPGy048xEenr/wCWPlFtVNPdUqTlFgkvPhr9NBmp4cXn+ElfHS1E9EmZJ0eDcXNcLAUGEwF+LgaaGZNWHkuM1u5Ud/SAsvnOlxS2aOu5pi7zJYk4=
+	t=1716453943; cv=none; b=lVUxDmDiGEr84gnt/ySsQbHYOy1fio270PnXBxmZhuCn1lehVLP2FfxzFbgOfc2bXegcGVY16wBW5TWq/1qL2Ynp5O4t4Xvv2fiuD2Thg84sZUPCWczOKAHOCfFgB7tE94+VRBKy4Qgp7ehGX0FULDv27ku3Qz9KMSOLTP95S7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716453630; c=relaxed/simple;
-	bh=kbHhwAWP8Z7bFGTHzEbqc6OzFN7pcvsE+U/vqmsMpMA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WBEtRTDKM6tqOPIzj/JUPkMGVLBQN6lOF9Jat5soJF29XfdKUBg3kVUbZW5bHOduGiB5s+iDYBpxfyQlWcmqRdzXmOJglfzODbgXAqiD2W8Z5GO5eE4FNtocB/CzaP5MAL6/8gYeO+v8rnMun05AAG0+T3paURTLCbod28P63Ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LVDeRR1C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CD53AC3277B;
-	Thu, 23 May 2024 08:40:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716453629;
-	bh=kbHhwAWP8Z7bFGTHzEbqc6OzFN7pcvsE+U/vqmsMpMA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LVDeRR1CfwixVECxR4GHdQdWvSI79ZUvumNKnX1BXsQaCUHDBTmEOQLPiggQogAZf
-	 2HaoAcu+Xz/0lVHac/aOCEyZcUegpy/1eSRZJYJx7C/4VCwlrv9AyhqSxIpzYm8Osh
-	 9Be2Cr/+oMhNxoD2p5zrdg0Qvj9ua4ys7xxrcITSKDU1ffvxNjUokh79S8Hxr/b3hQ
-	 zupTeXqiHY1/jHRwJfn8Fwcg1Z7KP1gaNTUzEZasYezRdJsS1ntgBbmjZL3tqdE65d
-	 SjxoeWz+pZbmc8wVYSM7ECzLY6n/GIgbauVJtmRHVHq4ieMRsrPnojEGl4ZzphFDC+
-	 HX94QnvcF9nlg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BF51CC54BB3;
-	Thu, 23 May 2024 08:40:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1716453943; c=relaxed/simple;
+	bh=Klg5na3ir6Jo0XD2KlZcjnpaAqZv6WA9rKQrs/j+V6g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nTpHK9t9AdKTTMpfJB3Gt0iO5fb+usnF9xLlnjVp2oEGsH6r+8Hp2hQ5ji3zcKpBVbsGCf1CiHp8p4JowF6jbt5zIzqf+IdzL9hjBONAj39k4bcSpKmHShxtLNP9C9lTENw2hsPs57CC5yfAISE/nSeNfJvaU6tD1+wC0euan/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NmS8w3D3; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716453940;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RpFPE8buedMm/3/WAIhw3hDkX+HooBF5TiKTfpx87wc=;
+	b=NmS8w3D3WiPucSAz36F0rjjqbdnTVlGVA6lQPjbcyZi1mBMmXSgyhlV7AHtTr8C79im5oX
+	l7voxiKrWXVQM9PmhucSn535xARH3yLtRFxPi32pQ2/YWHRTkuM/RuShfK/pg1s3VVF/bl
+	nn3RKNeRTB3tdG3YO/XA/cbyllp9iv0=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-48-NPldUoo_P2-LmMyAH88CuA-1; Thu, 23 May 2024 04:45:38 -0400
+X-MC-Unique: NPldUoo_P2-LmMyAH88CuA-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6ab9862b082so274006d6.1
+        for <netdev@vger.kernel.org>; Thu, 23 May 2024 01:45:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716453938; x=1717058738;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RpFPE8buedMm/3/WAIhw3hDkX+HooBF5TiKTfpx87wc=;
+        b=CSq8IzNtAys+xUAsp+T5/2JL4foO4pUx/48iAjfEouLkxOsocnjtYOmzsy/+Ygn+GI
+         S3srZ0K3twTX25r4C2cKTQT5XswwUHvnqhV95fuRUYESPhpySfuY0GA1fl9EMN9rfXSL
+         kLChUlRkMC+btmgKDnFzR/9Aesi19mMTrcGGhLZ8xhduOk+GS8Fap2JuN50oOh8JXgs3
+         NyglJbpp8Ka91JvgGua7rCAEiapR/IA8mh1wLyfTJ0cJx5jQE/CDhZuIAL30PhKc8UuB
+         AkqgGXln5QrLuEELIfdWvW4azgjbW+4GDzd1efWBzIR1ZPSVJjFbjiWo/WgIPi2MChY1
+         1Upg==
+X-Forwarded-Encrypted: i=1; AJvYcCXZO/cJqlawwSj4bCi5rur73O2JB2Y2sGUPTISGWAemFKaVaPGd0rY1i35a0eQd6TbKo01nWO1mzmzgYOUec9QPt1czn667
+X-Gm-Message-State: AOJu0YyKrLrJXkbWO6BVK4NLYAtd0YTvg9yzkY+YL9rulJ7JoGTulzhb
+	eyAwowA6ZFEetjzXh8wLEeaixBNgEFh2Ep2/w4emFBk4SLZJhAS3ZcPHQC+oyuOekKydhoqV330
+	SxnpD5E/wQnh3Awo8pCrRkfJkNywUdJ3gC1R1BXw95rmrrEHDvMRq2g==
+X-Received: by 2002:a05:6214:4905:b0:6ab:8e10:8125 with SMTP id 6a1803df08f44-6ab8e1082c5mr22234836d6.2.1716453938126;
+        Thu, 23 May 2024 01:45:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFloMOgtR73Qon0kqp6JglicbZzgw8fwbykGxI2ZjtqO7BGrJ2ZQZCtjJd5lr8hvXwBh4rS0g==
+X-Received: by 2002:a05:6214:4905:b0:6ab:8e10:8125 with SMTP id 6a1803df08f44-6ab8e1082c5mr22234746d6.2.1716453937791;
+        Thu, 23 May 2024 01:45:37 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-53-30-109.retail.telecomitalia.it. [79.53.30.109])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a35e6c34a1sm75492576d6.14.2024.05.23.01.45.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 May 2024 01:45:37 -0700 (PDT)
+Date: Thu, 23 May 2024 10:45:31 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Alexander Graf <agraf@csgraf.de>
+Cc: Dorjoy Chowdhury <dorjoychy111@gmail.com>, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org, 
+	Alexander Graf <graf@amazon.com>, stefanha@redhat.com
+Subject: Re: How to implement message forwarding from one CID to another in
+ vhost driver
+Message-ID: <6wn6ikteeanqmds2i7ar4wvhgj42pxpo2ejwbzz5t2i5cw3kov@omiadvu6dv6n>
+References: <CAFfO_h7xsn7Gsy7tFZU2UKcg_LCHY3M26iTuSyhFG-k-24h6_g@mail.gmail.com>
+ <4i525r6irzjgibqqtrs3qzofqfifws2k3fmzotg37pyurs5wkd@js54ugamyyin>
+ <CAFfO_h7iNYc3jrDvnAxTyaGWMxM9YK29DAGYux9s1ve32tuEBw@mail.gmail.com>
+ <3a62a9d1-5864-4f00-bcf0-2c64552ee90c@csgraf.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] testing: net-drv: use stats64 for testing
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171645362977.5739.7006263152240239033.git-patchwork-notify@kernel.org>
-Date: Thu, 23 May 2024 08:40:29 +0000
-References: <20240520235850.190041-1-jdamato@fastly.com>
-In-Reply-To: <20240520235850.190041-1-jdamato@fastly.com>
-To: Joe Damato <jdamato@fastly.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, nalramli@fastly.com,
- shuah@kernel.org, kuba@kernel.org, davem@davemloft.net,
- linux-kselftest@vger.kernel.org
+In-Reply-To: <3a62a9d1-5864-4f00-bcf0-2c64552ee90c@csgraf.de>
 
-Hello:
+On Tue, May 21, 2024 at 08:50:22AM GMT, Alexander Graf wrote:
+>Howdy,
+>
+>On 20.05.24 14:44, Dorjoy Chowdhury wrote:
+>>Hey Stefano,
+>>
+>>Thanks for the reply.
+>>
+>>
+>>On Mon, May 20, 2024, 2:55 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>>Hi Dorjoy,
+>>>
+>>>On Sat, May 18, 2024 at 04:17:38PM GMT, Dorjoy Chowdhury wrote:
+>>>>Hi,
+>>>>
+>>>>Hope you are doing well. I am working on adding AWS Nitro Enclave[1]
+>>>>emulation support in QEMU. Alexander Graf is mentoring me on this work. A v1
+>>>>patch series has already been posted to the qemu-devel mailing list[2].
+>>>>
+>>>>AWS nitro enclaves is an Amazon EC2[3] feature that allows creating isolated
+>>>>execution environments, called enclaves, from Amazon EC2 instances, which are
+>>>>used for processing highly sensitive data. Enclaves have no persistent storage
+>>>>and no external networking. The enclave VMs are based on Firecracker microvm
+>>>>and have a vhost-vsock device for communication with the parent EC2 instance
+>>>>that spawned it and a Nitro Secure Module (NSM) device for cryptographic
+>>>>attestation. The parent instance VM always has CID 3 while the enclave VM gets
+>>>>a dynamic CID. The enclave VMs can communicate with the parent instance over
+>>>>various ports to CID 3, for example, the init process inside an enclave sends a
+>>>>heartbeat to port 9000 upon boot, expecting a heartbeat reply, letting the
+>>>>parent instance know that the enclave VM has successfully booted.
+>>>>
+>>>>The plan is to eventually make the nitro enclave emulation in QEMU standalone
+>>>>i.e., without needing to run another VM with CID 3 with proper vsock
+>>>If you don't have to launch another VM, maybe we can avoid vhost-vsock
+>>>and emulate virtio-vsock in user-space, having complete control over the
+>>>behavior.
+>>>
+>>>So we could use this opportunity to implement virtio-vsock in QEMU [4]
+>>>or use vhost-user-vsock [5] and customize it somehow.
+>>>(Note: vhost-user-vsock already supports sibling communication, so maybe
+>>>with a few modifications it fits your case perfectly)
+>>>
+>>>[4] https://gitlab.com/qemu-project/qemu/-/issues/2095
+>>>[5] https://github.com/rust-vmm/vhost-device/tree/main/vhost-device-vsock
+>>
+>>
+>>Thanks for letting me know. Right now I don't have a complete picture
+>>but I will look into them. Thank you.
+>>>
+>>>
+>>>>communication support. For this to work, one approach could be to teach the
+>>>>vhost driver in kernel to forward CID 3 messages to another CID N
+>>>So in this case both CID 3 and N would be assigned to the same QEMU
+>>>process?
+>>
+>>
+>>CID N is assigned to the enclave VM. CID 3 was supposed to be the
+>>parent VM that spawns the enclave VM (this is how it is in AWS, where
+>>an EC2 instance VM spawns the enclave VM from inside it and that
+>>parent EC2 instance always has CID 3). But in the QEMU case as we
+>>don't want a parent VM (we want to run enclave VMs standalone) we
+>>would need to forward the CID 3 messages to host CID. I don't know if
+>>it means CID 3 and CID N is assigned to the same QEMU process. Sorry.
+>
+>
+>There are 2 use cases here:
+>
+>1) Enclave wants to treat host as parent (default). In this scenario, 
+>the "parent instance" that shows up as CID 3 in the Enclave doesn't 
+>really exist. Instead, when the Enclave attempts to talk to CID 3, it 
+>should really land on CID 0 (hypervisor). When the hypervisor tries to 
+>connect to the Enclave on port X, it should look as if it originates 
+>from CID 3, not CID 0.
+>
+>2) Multiple parent VMs. Think of an actual cloud hosting scenario. 
+>Here, we have multiple "parent instances". Each of them thinks it's 
+>CID 3. Each can spawn an Enclave that talks to CID 3 and reach the 
+>parent. For this case, I think implementing all of virtio-vsock in 
+>user space is the best path forward. But in theory, you could also 
+>swizzle CIDs to make random "real" CIDs appear as CID 3.
+>
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Thank you for clarifying the use cases!
 
-On Mon, 20 May 2024 23:58:43 +0000 you wrote:
-> Testing a network device that has large numbers of bytes/packets may
-> overflow. Using stats64 when comparing fixes this problem.
-> 
-> I tripped on this while iterating on a qstats patch for mlx5. See below
-> for confirmation without my added code that this is a bug.
-> 
-> Before this patch (with added debugging output):
-> 
-> [...]
+Also for case 1, vhost-vsock doesn't support CID 0, so in my opinion 
+it's easier to go into user-space with vhost-user-vsock or the built-in 
+device.
 
-Here is the summary with links:
-  - [net] testing: net-drv: use stats64 for testing
-    https://git.kernel.org/netdev/net/c/a61a459f5822
+Maybe initially with vhost-user-vsock it's easier because we already 
+have some thing that works and supports sibling communication (for case 
+2).
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>
+>>
+>>>Do you have to allocate 2 separate virtio-vsock devices, one for the
+>>>parent and one for the enclave?
+>>
+>>
+>>If there is a parent VM, then I guess both parent and enclave VMs need
+>>virtio-vsock devices.
+>>
+>>>>(set to CID 2 for host) i.e., it patches CID from 3 to N on incoming messages
+>>>>and from N to 3 on responses. This will enable users of the
+>>>Will these messages have the VMADDR_FLAG_TO_HOST flag set?
+>>>
+>>>We don't support this in vhost-vsock yet, if supporting it helps, we
+>>>might, but we need to better understand how to avoid security issues, so
+>>>maybe each device needs to explicitly enable the feature and specify
+>>>from which CIDs it accepts packets.
+>>
+>>
+>>I don't know about the flag. So I don't know if it will be set. Sorry.
+>
+>
+>From the guest's point of view, the parent (CID 3) is just another VM. 
+>Since Linux as of
+>
+> https://patchwork.ozlabs.org/project/netdev/patch/20201204170235.84387-4-andraprs@amazon.com/#2594117
+>
+>always sets VMADDR_FLAG_TO_HOST when local_CID > 0 && remote_CID > 0, I 
+>would say the message has the flag set.
+>
+>How would you envision the host to implement the flag? Would the host 
+>allow user space to listen on any CID and hence receive the respective 
+>target connections? And wouldn't listening on CID 0 then mean you're 
+>effectively listening to "any" other CID? Thinking about that a bit 
+>more, that may be just what we need, yes :)
 
+No, wait. The flag I had guessed only to implement sibling 
+communication, so the host doesn't re-forward those packets to sockets 
+opened by applications in the host, but only to other VMs in the same 
+host. So the host would always only have CID 2 assigned (CID 0 is not 
+supported by vhost-vsock).
+
+>
+>
+>>
+>>
+>>>>nitro-enclave machine
+>>>>type in QEMU to run the necessary vsock server/clients in the host machine
+>>>>(some defaults can be implemented in QEMU as well, for example, sending a reply
+>>>>to the heartbeat) which will rid them of the cumbersome way of running another
+>>>>whole VM with CID 3. This way, users of nitro-enclave machine in QEMU, could
+>>>>potentially also run multiple enclaves with their messages for CID 3 forwarded
+>>>>to different CIDs which, in QEMU side, could then be specified using a new
+>>>>machine type option (parent-cid) if implemented. I guess in the QEMU side, this
+>>>>will be an ioctl call (or some other way) to indicate to the host kernel that
+>>>>the CID 3 messages need to be forwarded. Does this approach of
+>>>What if there is already a VM with CID = 3 in the system?
+>>
+>>
+>>Good question! I don't know what should happen in this case.
+>
+>
+>See case 2 above :). In a nutshell, I don't think it'd be legal to 
+>have a real CID 3 in that scenario.
+
+Yeah, with vhost-vsock we can't, but with vhost-user-vsock I think is 
+fine since the guest CID is local for each instance. The host only sees
+the unix socket (like with firecracker).
+
+>
+>
+>>
+>>
+>>>>forwarding CID 3 messages to another CID sound good?
+>>>It seems too specific a case, if we can generalize it maybe we could
+>>>make this change, but we would like to avoid complicating vhost-vsock
+>>>and keep it as simple as possible to avoid then having to implement
+>>>firewalls, etc.
+>>>
+>>>So first I would see if vhost-user-vsock or the QEMU built-in device is
+>>>right for this use-case.
+>>Thanks you! I will check everything out and reach out if I need
+>>further guidance about what needs to be done. And sorry as I wasn't
+>>able to answer some of your questions.
+>
+>
+>As mentioned above, I think there is merit for both. I personally care 
+>a lot more for case 1 over case 2: We already have a working 
+>implementation of Nitro Enclaves in a Cloud setup. What is missing is 
+>a way to easily run a Nitro Enclave locally for development.
+
+If both are fine, then I would go more on modifying vhost-user-vsock or 
+adding a built-in device in QEMU.
+We have more freedom and also easier to update/debug.
+
+Thanks,
+Stefano
 
 
