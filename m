@@ -1,100 +1,88 @@
-Return-Path: <netdev+bounces-97822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DB0F8CD5DF
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 16:33:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D58F68CD600
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 16:41:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2901A281BA8
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:33:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 138B61C209F1
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:41:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93ED1EA74;
-	Thu, 23 May 2024 14:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72B4B149E1E;
+	Thu, 23 May 2024 14:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b="XMTZ6+8i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QL0ITScb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-in-1.gedalya.net (mail.gedalya.net [170.39.119.235])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19CDD1DDC5
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 14:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.39.119.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415E112B16E;
+	Thu, 23 May 2024 14:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716474791; cv=none; b=mP2r2MY3E8mEGTTNlBao6CGdqxXBgFeo83L67qBGctqYdgbByuHDPdAJ07mVhDkobRdhNWTZCsshuw9GJPXYcFwcrz9MeB57LH1/bCvPuX4dIajU4OV8m5hit2J1NM1QQ+gT3qSBMnsbcTTNNmGyY3GyFS8iL2GuyHbB6kiRFkA=
+	t=1716475262; cv=none; b=HATgfDUk9yMVVbUPE/L90FgTj0oHapFzPakhjtKuItwRsITMOXRwTGi4Xa7sBj937Aeb66knz7Rwt+qr2TZKPGJ8oZJha+5d3H6aMUjfBqnw7FWdJoEgg7UHxgWmJXPCJKm6X2TE1Bo5fFfgp+YyQq9GA0XD/hU5Zg5KuR99/Jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716474791; c=relaxed/simple;
-	bh=uf+1pKISWU1W1bsEZ9yu8nOnvfwvExxyGz5feHHQj0Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g1pLMkdJDsZ82l1b1nCUC5FwOpDEnvwKsu3caWJxCfAiWA5w833HiNPbJFc0NP2bPFh1z8r+db/ZfB6DtbpUcTez+W/exRuMWGp4NUG0Fr/DqeVsI3SjxNTFyPJK6H6IczuPXBmP2/RKajkX5lwyiJ9TaOtHgllPKPJq+OxTEp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net; spf=pass smtp.mailfrom=gedalya.net; dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b=XMTZ6+8i; arc=none smtp.client-ip=170.39.119.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gedalya.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gedalya.net
-	; s=rsa1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description;
-	bh=zqmi0H1J3g3AdHqY0I6QaW6Pr8YwdrhqsT8pC/36uAA=; b=XMTZ6+8ips+zlMSCjd3+l50MiG
-	iwgWAGj1+VZACRxGBj9lFqSb5GSZwAB8VsgrHpOlLOUgDE65hk7BcNsTgSAvZTN7douxbLyACS784
-	coh5I7Bi9fvUScz/WvwFKoBrYUDq35klHyBvClijSKPLoeyQhAEQ0B3/E9kc7nwDEOx47wRkxqJrR
-	JnsaxAvqJt3l9SNCRVElsNjxgK0tuHJfxkVmgKw3icDK45zbyccpndQfyfpJ8yP/TOIhDyAcut0Rt
-	H4P8Dnpmw5CqokVD3GVwvWHC5daavAZ883wEVIZv1CT/L6t0j6VZrHgBMcy0F2TuY08a8wcayUD3q
-	DAzQoy+Q==;
-Received: from [192.168.9.176]
-	by smtp-in-1.gedalya.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <gedalya@gedalya.net>)
-	id 1sA9VC-000gLf-30;
-	Thu, 23 May 2024 14:33:07 +0000
-Message-ID: <94d43b6d-74ae-4544-b443-32d8da044b75@gedalya.net>
-Date: Thu, 23 May 2024 22:33:03 +0800
+	s=arc-20240116; t=1716475262; c=relaxed/simple;
+	bh=J37CGLNwT838ydiPOn9Wa6R1GLXsTn7/JsoUPCz/9dA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a4D8mRUV1IKJcOC6ewY3iKTdTbeIzj7LSbjK36hznVEzjSFp2nHKuDzzkkok54KzRkj35IYKSzNK66cciP4ygXrjICGV39R55TrNa595sj83vRlzPv7zbMLl88h3Yb1IbtPMQBBzs15YxP25Pr92ZLPqZZOv8hB7csYhOsaMJtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QL0ITScb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 691CFC32781;
+	Thu, 23 May 2024 14:40:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716475261;
+	bh=J37CGLNwT838ydiPOn9Wa6R1GLXsTn7/JsoUPCz/9dA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QL0ITScbbOElyfsR8elZCh9+T26SCaCcvQY3y5R5ZErz7XlJr8cGb2NGmFhunkSjP
+	 cITBqRd84LFpB13U5tk01oDerbVk9RsQ6uki2Mszgi36x6DwPcX47b8iCLGMzU1DIn
+	 mriaNCfssuXKrVDwwUMOiH8T7eaVEKkLIUfq+V5z4a8hCAHJPhQU74SJQFbg7N7/sI
+	 Bu4kgdEUwC5Q3mP1JAQbwISITePJ6A66gwDfPHABhlw3d7KGoUc1yG4OVdthA4OjFE
+	 eSVKtlhbQ4Ew5MkwW+DOQyy4629bKolE5X55VjGbks+vGaII+YCE40XZMY/MtiZTpM
+	 vCyUIoS4mPFag==
+Date: Thu, 23 May 2024 15:40:56 +0100
+From: Simon Horman <horms@kernel.org>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: steve.glendinning@shawell.net, UNGLinuxDriver@microchip.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: usb: smsc95xx: fix changing LED_SEL bit value
+ updated from EEPROM
+Message-ID: <20240523144056.GO883722@kernel.org>
+References: <20240523085314.167650-1-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: iproute2: color output should assume dark background
-To: Dragan Simic <dsimic@manjaro.org>
-Cc: Sirius <sirius@trudheim.com>, netdev@vger.kernel.org
-References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
- <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
- <96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
- <Zk722SwDWVe35Ssu@photonic.trudheim.com>
- <e4695ecb95bbf76d8352378c1178624c@manjaro.org>
- <449db665-0285-4283-972f-1b6d5e6e71a1@gedalya.net>
- <7d67d9e72974472cc61dba6d8bdaf79a@manjaro.org>
- <1d0a0772-8b9a-48d6-a0f1-4b58abe62f5e@gedalya.net>
- <c6f8288c43666dc55a1b7de1b2eea56a@manjaro.org>
- <c535f22f-bdf6-446e-ba73-1df291a504f9@gedalya.net>
- <c41ee2a968d1b839b8b9c7a3571ad107@manjaro.org>
-Content-Language: en-US
-From: Gedalya <gedalya@gedalya.net>
-In-Reply-To: <c41ee2a968d1b839b8b9c7a3571ad107@manjaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240523085314.167650-1-Parthiban.Veerasooran@microchip.com>
 
-On 5/23/24 10:24 PM, Dragan Simic wrote:
-> I had in mind setting COLORFGBG to dark background that way, not some
-> shell magic that would change it dynamically. 
+On Thu, May 23, 2024 at 02:23:14PM +0530, Parthiban Veerasooran wrote:
+> LED Select (LED_SEL) bit in the LED General Purpose IO Configuration
+> register is used to determine the functionality of external LED pins
+> (Speed Indicator, Link and Activity Indicator, Full Duplex Link
+> Indicator). The default value for this bit is 0 when no EEPROM is
+> present. If a EEPROM is present, the default value is the value of the
+> LED Select bit in the Configuration Flags of the EEPROM. A USB Reset or
+> Lite Reset (LRST) will cause this bit to be restored to the image value
+> last loaded from EEPROM, or to be set to 0 if no EEPROM is present.
+> 
+> While configuring the dual purpose GPIO/LED pins to LED outputs in the
+> LED General Purpose IO Configuration register, the LED_SEL bit is changed
+> as 0 and resulting the configured value from the EEPROM is cleared. The
+> issue is fixed by using read-modify-write approach.
+> 
+> Fixes: f293501c61c5 ("smsc95xx: configure LED outputs")
+> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+> ---
+>  drivers/net/usb/smsc95xx.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
 
-It's far far easier to just do color palette overrides in your terminal 
-emulator.
-
-The "Dark Pastels" preset in XFCE Terminal makes everything just work. 
-Both iproute2 palettes work fine.
-
-Anyone who really cares about colors can and should dive into the topic 
-(not me). Once your graphical desktop is up and configured you'll be 
-just fine.
-
-The only real issue here is force-enabling colors where they are least 
-welcome (crashed server, vt, no mouse, black background, just let me do 
-my work please).
-
-This entire discussion has gone way way way out of control.
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
