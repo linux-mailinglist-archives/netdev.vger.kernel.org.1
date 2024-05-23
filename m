@@ -1,142 +1,482 @@
-Return-Path: <netdev+bounces-97905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 016368CDD1D
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 01:08:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D32358CDD56
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 01:14:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC5D11F21108
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 23:08:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D6412856A4
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 23:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1C584D25;
-	Thu, 23 May 2024 23:08:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47EE128807;
+	Thu, 23 May 2024 23:14:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q6eMtWCt"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="dzMcrFd9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E83763E6
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 23:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8363128396
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 23:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716505689; cv=none; b=tGgtcFv86tXoOyLVxfEIJIsch2DRBWwI1+X0UBEHZltTGcnQ1XnXBbNs0XE4prU18m3oGo/kHzX/0il77g1Rncx+Q5IO8blY3ZW1YcpeNMnN+ruEsUXOObWYNpufZdH15PI/Qq40LF7KokmLkM/qjYfEP3vLcuL0dTfZSlU7j+M=
+	t=1716506052; cv=none; b=gPIGMxnD1hZJL0E9GZAl/Lw+KTz0+tydIg8oqD+G+CLTVGUJ70z3QQKYYVqs5tUMph6SfGcZB+Jd3cdM36Yc6EQ9FtAcECQBFcxFU+D70DAukgKBVwCBf/F2YJDKpsm2pHGwylFLyF6+mFtL2ku+LqgUwkNJe2eHkCni+t7u7JY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716505689; c=relaxed/simple;
-	bh=gihntfmlXSCPgySU39ZDL42EWptVVVgV5ckQPtL5RqY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=oJjwvyb+U3YePgI2+W/U5eMd+z0s5jlRdpDDveMT70ZUTXuttOUgFklxGPKa6PObvwGsPoNyr4cJSoOMjUJPCC/xvasE/3zJ2EvZvndJFfbDBW3MEPKEPGGL+ATRCFk43amma7eFygUves9HF+bzojYZO1yGI6a3Cl++H60PjMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q6eMtWCt; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716505687; x=1748041687;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=gihntfmlXSCPgySU39ZDL42EWptVVVgV5ckQPtL5RqY=;
-  b=Q6eMtWCtv2EDv4jdGQSnQ2iOlIVdpC1p8ZoPRW6JzNjaJeVBDBA4jAsA
-   d6DeCODI1w8zFgEXMza9TpKje8JE6gJy8JuzU89epOttsVhr4OI49QCnn
-   QdouDYz7sQFemDZL44n7vIKN9RfLnRe28VY7Q5/Tu7dvJJpoSqBJLzpnG
-   0fj0jVe1aymYNg3ZSXDMjdGBCEoc9buepAQR1iffdnPnsoBA+ly+BTl4Q
-   6uWghR///gOgbA6nIwlrnEvTUaNIk+Ygy5XSPo9hlR3BZBgOUOF8OdY1V
-   +50LZ3Al3CxpbDffwneMe/Xtr7WogHXwSbggB26hJuWGD35Zc4EaJ9B7W
-   A==;
-X-CSE-ConnectionGUID: n7ZZZCRBQpqqnHaAvrSjmg==
-X-CSE-MsgGUID: yUobLwj3QeyEfiIeIuHUZA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11081"; a="13092596"
-X-IronPort-AV: E=Sophos;i="6.08,183,1712646000"; 
-   d="scan'208";a="13092596"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2024 16:08:07 -0700
-X-CSE-ConnectionGUID: MXB6VdeTRGe2tPL3cShl0w==
-X-CSE-MsgGUID: FKL+uV7pScuf91j++mUn/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,183,1712646000"; 
-   d="scan'208";a="65035725"
-Received: from kinlongk-desk.amr.corp.intel.com (HELO vcostago-mobl3) ([10.124.222.79])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2024 16:08:06 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, Eric Dumazet
- <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, Vladimir
- Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net] net/sched: taprio: fix duration_to_length()
-In-Reply-To: <20240523134549.160106-1-edumazet@google.com>
-References: <20240523134549.160106-1-edumazet@google.com>
-Date: Thu, 23 May 2024 16:08:06 -0700
-Message-ID: <87o78w1609.fsf@intel.com>
+	s=arc-20240116; t=1716506052; c=relaxed/simple;
+	bh=bqUQkuXa5kp27cqFOixrQzjm+RinRMNHFY9xJMPCqPY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QuMT+xurYg0e+0kHg7zahR2jrpW0XxatmYNkCUgj6yYwN5jCiBfuetZZZIWe+Imz75WOu8OSVeqTVGrxuCfCR2drT8l84ge36Q5XJCgjugCsNzMcHN9yK/L0HndsLUV61CaYiLdTX3z8D+CS/anG+vOSWj/Y02sZ8REgz7sXwjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=dzMcrFd9; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6f8e85a0a5bso307655b3a.0
+        for <netdev@vger.kernel.org>; Thu, 23 May 2024 16:14:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1716506050; x=1717110850; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5v+Mh8DcM9ZZz6+1Jz08GF1tfpanRbRhlOGSA8bIUtI=;
+        b=dzMcrFd9RA2Bu9ZnFiMxKNvMruVJTXtla3WP+8oOwKB9Y8+8ZFw7J3450cqAFgRlVF
+         CzCbWNZrI5riy7a1aKl7tOHyjtgoG/3jDe81+Ra74w8L4DseG3NHq/IOZHblY4o+f+Lh
+         hIiKlLczw8YxbvFkfyp7dQzMkn30mCLYuQOV0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716506050; x=1717110850;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5v+Mh8DcM9ZZz6+1Jz08GF1tfpanRbRhlOGSA8bIUtI=;
+        b=hziOutHU4TakdsW381cpf+uJ4dTXEkcYjLdJ70SNMfUG3WzAaUeyeeHPXBRV2vRsd9
+         tFcNrvc6l/20afkvJs5jHbrVSnL/ewK+OwVaVNiwp5G3v7KzKmyFDn9thbFD1HZLnAmz
+         /reKtfSe/3HUJx5/81SSx2z63mDS60WqSdlSmHTLvOcFjbxUSAMU7uBthbCss0vtL0Os
+         W+a9CN0eQn604cg+D8JNUNlTHiz6rAz8jzyvha1coI6Vt35h1LflHU0hYY8rXSO3qSM8
+         Q/xC5tBObk4ZQxYVoztF0JX2UduU+4aY3cKJUVqP1SwtvpWxriqvjOM+zt2nHwnWRRjv
+         xCoA==
+X-Forwarded-Encrypted: i=1; AJvYcCW0zzPk5PKuJ4yWRIaIMkJd1GceFBpsfU6LjLx4SSd8S9LvM4znig32+MRpIuHpzuJk1dpkYDCA5kueqg1ksXKhlDokL3MP
+X-Gm-Message-State: AOJu0YzDHQLaAw1qI8dzOWZwj32OnQ/B8/Qu5MInDiZOtQA8E25bRinM
+	7WPXyZ9NROCZ7iNyE3FAJvMgdhwpSTlLozPNuYftRFDIqq7Qji7EitMdxfFIxjg=
+X-Google-Smtp-Source: AGHT+IGhpSFrW3EsmDvV7gbNf4c5jA0OTuQNdVk0jNnic9AE29ORS82XyAU8uFAtgK48adalj3zPcw==
+X-Received: by 2002:a05:6a21:6da3:b0:1af:d0bc:d149 with SMTP id adf61e73a8af0-1b212cc4f79mr1130220637.6.1716506049867;
+        Thu, 23 May 2024 16:14:09 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f8fd4d51a2sm131842b3a.189.2024.05.23.16.14.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 May 2024 16:14:09 -0700 (PDT)
+Date: Thu, 23 May 2024 16:14:06 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	zyjzyj2000@gmail.com, nalramli@fastly.com,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next v2 1/1] net/mlx5e: Add per queue netdev-genl
+ stats
+Message-ID: <Zk_NvjDmik2ofw8c@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Tariq Toukan <ttoukan.linux@gmail.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	zyjzyj2000@gmail.com, nalramli@fastly.com,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>
+References: <20240510041705.96453-1-jdamato@fastly.com>
+ <20240510041705.96453-2-jdamato@fastly.com>
+ <230701b9-c52a-4b59-9969-4cd5a5d697f4@gmail.com>
+ <ZkRiBQXlWPPTNKFf@LQ3V64L9R2>
+ <68225941-f3c3-4335-8f3d-edee43f59033@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <68225941-f3c3-4335-8f3d-edee43f59033@gmail.com>
 
-Eric Dumazet <edumazet@google.com> writes:
+On Thu, May 23, 2024 at 10:27:54AM +0300, Tariq Toukan wrote:
+> 
+> 
+> On 15/05/2024 10:19, Joe Damato wrote:
+> > On Tue, May 14, 2024 at 09:44:37PM +0300, Tariq Toukan wrote:
+> > > 
+> > > 
+> > > On 10/05/2024 7:17, Joe Damato wrote:
+> > > > Add functions to support the netdev-genl per queue stats API.
+> > > > 
+> > > > ./cli.py --spec netlink/specs/netdev.yaml \
+> > > > --dump qstats-get --json '{"scope": "queue"}'
+> > > > 
+> > > > ...snip
+> > > > 
+> > > >    {'ifindex': 7,
+> > > >     'queue-id': 62,
+> > > >     'queue-type': 'rx',
+> > > >     'rx-alloc-fail': 0,
+> > > >     'rx-bytes': 105965251,
+> > > >     'rx-packets': 179790},
+> > > >    {'ifindex': 7,
+> > > >     'queue-id': 0,
+> > > >     'queue-type': 'tx',
+> > > >     'tx-bytes': 9402665,
+> > > >     'tx-packets': 17551},
+> > > > 
+> > > > ...snip
+> > > > 
+> > > > Also tested with the script tools/testing/selftests/drivers/net/stats.py
+> > > > in several scenarios to ensure stats tallying was correct:
+> > > > 
+> > > > - on boot (default queue counts)
+> > > > - adjusting queue count up or down (ethtool -L eth0 combined ...)
+> > > > - adding mqprio TCs
+> > > > 
+> > > > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > > > ---
+> > > >    .../net/ethernet/mellanox/mlx5/core/en_main.c | 144 ++++++++++++++++++
+> > > >    1 file changed, 144 insertions(+)
+> > > > 
+> > > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> > > > index ffe8919494d5..4a675d8b31b5 100644
+> > > > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> > > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> > > > @@ -39,6 +39,7 @@
+> > > >    #include <linux/debugfs.h>
+> > > >    #include <linux/if_bridge.h>
+> > > >    #include <linux/filter.h>
+> > > > +#include <net/netdev_queues.h>
+> > > >    #include <net/page_pool/types.h>
+> > > >    #include <net/pkt_sched.h>
+> > > >    #include <net/xdp_sock_drv.h>
+> > > > @@ -5282,6 +5283,148 @@ static bool mlx5e_tunnel_any_tx_proto_supported(struct mlx5_core_dev *mdev)
+> > > >    	return (mlx5_vxlan_allowed(mdev->vxlan) || mlx5_geneve_tx_allowed(mdev));
+> > > >    }
+> > > > +static void mlx5e_get_queue_stats_rx(struct net_device *dev, int i,
+> > > > +				     struct netdev_queue_stats_rx *stats)
+> > > > +{
+> > > > +	struct mlx5e_priv *priv = netdev_priv(dev);
+> > > > +
+> > > > +	if (mlx5e_is_uplink_rep(priv))
+> > > > +		return;
+> > > > +
+> > > > +	struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
+> > > > +	struct mlx5e_rq_stats *xskrq_stats = &channel_stats->xskrq;
+> > > > +	struct mlx5e_rq_stats *rq_stats = &channel_stats->rq;
+> > > > +
+> > > 
+> > > Don't we allow variable declaration only at the beginning of a block?
+> > > Is this style accepted in the networking subsystem?
+> > > 
+> > > > +	stats->packets = rq_stats->packets + xskrq_stats->packets;
+> > > > +	stats->bytes = rq_stats->bytes + xskrq_stats->bytes;
+> > > > +	stats->alloc_fail = rq_stats->buff_alloc_err +
+> > > > +			    xskrq_stats->buff_alloc_err;
+> > > > +}
+> > > > +
+> > > > +static void mlx5e_get_queue_stats_tx(struct net_device *dev, int i,
+> > > > +				     struct netdev_queue_stats_tx *stats)
+> > > > +{
+> > > > +	struct mlx5e_priv *priv = netdev_priv(dev);
+> > > > +	struct net_device *netdev = priv->netdev;
+> > > > +	struct mlx5e_txqsq *sq;
+> > > > +	int j;
+> > > > +
+> > > > +	if (mlx5e_is_uplink_rep(priv))
+> > > > +		return;
+> > > > +
+> > > > +	for (j = 0; j < netdev->num_tx_queues; j++) {
+> > > > +		sq = priv->txq2sq[j];
+> > > 
+> > > No sq instance in case interface is down.
+> > 
+> > This seems easily fixable by checking:
+> > 
+> >    priv->channels.num > 0
+> > 
+> 
+> yes, or test_bit(MLX5E_STATE_OPENED, &priv->state).
+> 
+> > > This should be a simple arithmetic calculation.
+> > 
+> > I'm not sure why I can't use txq2sq? Please see below for my
+> > explanation about why I think txq2sq might be all I need.
+> > 
+> > > Need to expose the proper functions for this calculation, and use it here
+> > > and in the sq create flows.
+> > 
+> > I re-read the code several times and my apologies, but I am probably
+> > still missing something.
+> > 
+> > I don't think a calculation function is necessary (see below), but
+> > if one is really needed, I'd probably add something like:
+> > 
+> >    static inline int tc_to_txq_ix(struct mlx5e_channel *c,
+> >                                   struct mlx5e_params *params,
+> >                                   int tc)
+> >    {
+> >           return c->ix + tc * params->num_channels;
+> 
+> We need the opposite direction.
+> 
+> The goal is to calculate the proper pair of (ch_ix, tc) in order to access
+> the correct sq_stats struct in the stats array:
+> priv->channel_stats[ch_ix]->sq[tc];
+> 
+> Given i in [0, real_num_tx_queues), we should extract the pair as follows:
+> 
+> ch_ix = i % params->num_channels;
+> tc = i / params->num_channels;
 
-> duration_to_length() is incorrectly using div_u64()
-> instead of div64_u64().
->
-> syzbot reported:
->
-> Oops: divide error: 0000 [#1] PREEMPT SMP KASAN PTI
-> CPU: 1 PID: 15391 Comm: syz-executor.0 Not tainted 6.9.0-syzkaller-08544-g4b377b4868ef #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
->  RIP: 0010:div_u64_rem include/linux/math64.h:29 [inline]
->  RIP: 0010:div_u64 include/linux/math64.h:130 [inline]
->  RIP: 0010:duration_to_length net/sched/sch_taprio.c:259 [inline]
->  RIP: 0010:taprio_update_queue_max_sdu+0x287/0x870 net/sched/sch_taprio.c:288
-> Code: be 08 00 00 00 e8 99 5b 6a f8 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 13 59 6a f8 48 8b 03 89 c1 48 89 e8 31 d2 <48> f7 f1 48 89 c5 48 83 7c 24 50 00 4c 8b 74 24 30 74 47 e8 c1 19
-> RSP: 0018:ffffc9000506eb38 EFLAGS: 00010246
-> RAX: 0000000000001f40 RBX: ffff88802f3562e0 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffff88802f3562e0
-> RBP: 0000000000001f40 R08: ffff88802f3562e7 R09: 1ffff11005e6ac5c
-> R10: dffffc0000000000 R11: ffffed1005e6ac5d R12: 00000000ffffffff
-> R13: dffffc0000000000 R14: ffff88801ef59400 R15: 00000000003f0008
-> FS:  00007fee340bf6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000001b2c524000 CR3: 0000000024a52000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->   taprio_change+0x2dce/0x42d0 net/sched/sch_taprio.c:1911
->   taprio_init+0x9da/0xc80 net/sched/sch_taprio.c:2112
->   qdisc_create+0x9d4/0x11a0 net/sched/sch_api.c:1355
->   tc_modify_qdisc+0xa26/0x1e40 net/sched/sch_api.c:1777
->   rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6595
->   netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2564
->   netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
->   netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
->   netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
->   sock_sendmsg_nosec net/socket.c:730 [inline]
->   __sock_sendmsg+0x221/0x270 net/socket.c:745
->   ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
->   ___sys_sendmsg net/socket.c:2638 [inline]
->   __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fee3327cee9
->
-> Fixes: fed87cc6718a ("net/sched: taprio: automatically calculate queueMaxSDU based on TC gate durations")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> ---
+Thanks -- yea I should have been more clear that I know we need the
+opposite direction and what the formula is, but thank you for
+confirming that.
 
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> >    }
+> > 
+> > And call it from mlx5e_open_sqs.
+> > 
+> > But, I don't understand why any calculation is needed in
+> > mlx5e_get_queue_stats_tx. Please see below for explanation.
+> > 
+> > > 
+> > > Here it seems that you need a very involved user, so he passes the correct
+> > > index i of the SQ that he's interested in..
+> > > 
+> > > > +		if (sq->ch_ix == i) {
+> > > 
+> > > So you're looking for the first SQ on channel i?
+> > > But there might be multiple SQs on channel i...
+> > > Also, this SQ might be already included in the base stats.
+> > > In addition, this i might be too large for a channel index (num_tx_queues
+> > > can be 8 * num_channels)
+> > > 
+> > > The logic here (of mapping from i in num_tx_queues to SQ stats) needs
+> > > careful definition.
+> > 
+> > I read your comments a few times and read the mlx5 source and I am
+> > probably still missing something obvious here; my apologies.
+> > 
+> > In net/core/netdev-genl.c, calls to the driver's get_queue_stats_tx
+> > appear to pass [0, netdev->real_num_tx_queues) as i.
+> > 
+> > I think this means i is a txq_ix in mlx5, because mlx5 sets
+> > netdev->real_num_tx_queues in mlx5e_update_tx_netdev_queues, as:
+> > 
+> >    nch * ntc + qos_queues
+> > 
+> > which when expanded is
+> > 
+> >    priv->channels.params.num_channels * mlx5e_get_dcb_num_tc + qos_queues
+> > 
+> > So, net/core/netdev-genl.c will be using 0 up to that expression as
+> > i when calling mlx5e_get_queue_stats_tx.
+> > 
+> 
+> Right.
+> 
+> > In mlx5:
+> >    - mlx5e_activate_priv_channels calls mlx5e_build_txq_maps which
+> >      generates priv->txq2sq[txq_ix] = sq for every mlx5e_get_dcb_num_tc
+> >      of every priv->channels.num.
+> > This seems to happen every time mlx5e_activate_priv_channels is
+> > called, which I think means that priv->txq2sq is always up to date
+> > and will give the right sq for a given txq_ix (assuming the device
+> > isn't down).
+> > 
+> 
+> Right.
+> 
+> > Putting all of this together, I think that mlx5e_get_queue_stats_tx
+> > might need to be something like:
+> > 
+> >    mutex_lock(&priv->state_lock);
+> >    if (priv->channels.num > 0) {
+> >            sq = priv->txq2sq[i];
+> >            stats->packets = sq->stats->packets;
+> >            stats->bytes = sq->stats->bytes;
+> >    }
+> >    mutex_unlock(&priv->state_lock);
+> > 
+> 
+> Right.
+> But you can also access the sq_stats directly without going through the sq.
+> This is important as the channels might be down.
 
+Right, OK, thanks that makes sense to me.
+ 
+> 
+> > Is this still incorrect somehow?
+> > 
+> > If so, could you explain a bit more about why a calculation is
+> > needed? It seems like txq2sq would provide the mapping from txq_ix's
+> > (which is what mlx5e_get_queue_stats_tx gets as 'i') and an sq,
+> > which seems like all I would need?
+> > 
+> > Sorry if I am still not following here.
+> > 
+> 
+> I see two possible solutions:
+> 
+> 1.
+> a. in the base, sum all stats for entries that are no longer available in
+> the current configuration (independently to if the netdev is up or down),
+> like sqs for ch_ix >= params->num_channels.
+> b. in mlx5e_get_queue_stats_tx, access the sq_stats without going through
+> the sq (as it might not exist), this will be done for all i in 0 ti
+> real_num_tx_queues.
+> 
+> 2.
+> a. in the base, sum all stats for all non existing sqs. if interface is
+> down, then no sqs exist, so you sum the whole array.
+> b. in mlx5e_get_queue_stats_tx, go through the txq2sq and the sq, if it
+> exists, if interface is down just return empty stats.
+> 
+> I don't have strong preference, although #1 looks slightly better to me.
 
--- 
-Vinicius
+I think if I am understanding what you wrote correctly the
+implementation I did for v2 for the base combined with the txq2sq
+mapping I proposed above is equal to solution #2 you describe. I
+think.
+
+That said...  I can understand why you might prefer solution #1 so I
+will start over and try implementing that one for the v3.
+
+Thanks for the guidance.
+
+> > > > +			stats->packets = sq->stats->packets;
+> > > > +			stats->bytes = sq->stats->bytes;
+> > > > +			return;
+> > > > +		}
+> > > > +	}
+> > > > +}
+> > > > +
+> > > > +static void mlx5e_get_base_stats(struct net_device *dev,
+> > > > +				 struct netdev_queue_stats_rx *rx,
+> > > > +				 struct netdev_queue_stats_tx *tx)
+> > > > +{
+> > > > +	struct mlx5e_priv *priv = netdev_priv(dev);
+> > > > +	int i, j;
+> > > > +
+> > > > +	if (!mlx5e_is_uplink_rep(priv)) {
+> > > > +		rx->packets = 0;
+> > > > +		rx->bytes = 0;
+> > > > +		rx->alloc_fail = 0;
+> > > > +
+> > > > +		/* compute stats for deactivated RX queues
+> > > > +		 *
+> > > > +		 * if priv->channels.num == 0 the device is down, so compute
+> > > > +		 * stats for every queue.
+> > > > +		 *
+> > > > +		 * otherwise, compute only the queues which have been deactivated.
+> > > > +		 */
+> > > > +		if (priv->channels.num == 0)
+> > > > +			i = 0;
+> > > > +		else
+> > > > +			i = priv->channels.params.num_channels;
+> > > > +
+> > > > +		for (; i < priv->stats_nch; i++) {
+> > > > +			struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
+> > > > +			struct mlx5e_rq_stats *xskrq_stats = &channel_stats->xskrq;
+> > > > +			struct mlx5e_rq_stats *rq_stats = &channel_stats->rq;
+> > > > +
+> > > > +			rx->packets += rq_stats->packets + xskrq_stats->packets;
+> > > > +			rx->bytes += rq_stats->bytes + xskrq_stats->bytes;
+> > > > +			rx->alloc_fail += rq_stats->buff_alloc_err +
+> > > > +					  xskrq_stats->buff_alloc_err;
+> > > 
+> > > Isn't this equivalent to mlx5e_get_queue_stats_rx(i) ?
+> > > 
+> > > > +		}
+> > > > +
+> > > > +		if (priv->rx_ptp_opened) {
+> > > > +			struct mlx5e_rq_stats *rq_stats = &priv->ptp_stats.rq;
+> > > > +
+> > > > +			rx->packets += rq_stats->packets;
+> > > > +			rx->bytes += rq_stats->bytes;
+> > > > +		}
+> > > > +	}
+> > > > +
+> > > > +	tx->packets = 0;
+> > > > +	tx->bytes = 0;
+> > > > +
+> > > > +	/* three TX cases to handle:
+> > > > +	 *
+> > > > +	 * case 1: priv->channels.num == 0, get the stats for every TC
+> > > > +	 *         on every queue.
+> > > > +	 *
+> > > > +	 * case 2: priv->channel.num > 0, so get the stats for every TC on
+> > > > +	 *         every deactivated queue.
+> > > > +	 *
+> > > > +	 * case 3: the number of TCs has changed, so get the stats for the
+> > > > +	 *         inactive TCs on active TX queues (handled in the second loop
+> > > > +	 *         below).
+> > > > +	 */
+> > > > +	if (priv->channels.num == 0)
+> > > > +		i = 0;
+> > > > +	else
+> > > > +		i = priv->channels.params.num_channels;
+> > > > +
+> > > 
+> > > All reads/writes to priv->channels must be under the priv->state_lock.
+> > > 
+> > > > +	for (; i < priv->stats_nch; i++) {
+> > > > +		struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
+> > > > +
+> > > > +		for (j = 0; j < priv->max_opened_tc; j++) {
+> > > > +			struct mlx5e_sq_stats *sq_stats = &channel_stats->sq[j];
+> > > > +
+> > > > +			tx->packets += sq_stats->packets;
+> > > > +			tx->bytes += sq_stats->bytes;
+> > > > +		}
+> > > > +	}
+> > > > +
+> > > > +	/* Handle case 3 described above. */
+> > > > +	for (i = 0; i < priv->channels.params.num_channels; i++) {
+> > > > +		struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
+> > > > +		u8 dcb_num_tc = mlx5e_get_dcb_num_tc(&priv->channels.params);
+> > > > +
+> > > > +		for (j = dcb_num_tc; j < priv->max_opened_tc; j++) {
+> > > > +			struct mlx5e_sq_stats *sq_stats = &channel_stats->sq[j];
+> > > > +
+> > > > +			tx->packets += sq_stats->packets;
+> > > > +			tx->bytes += sq_stats->bytes;
+> > > > +		}
+> > > > +	}
+> > > > +
+> > > > +	if (priv->tx_ptp_opened) {
+> > > > +		for (j = 0; j < priv->max_opened_tc; j++) {
+> > > > +			struct mlx5e_sq_stats *sq_stats = &priv->ptp_stats.sq[j];
+> > > > +
+> > > > +			tx->packets    += sq_stats->packets;
+> > > > +			tx->bytes      += sq_stats->bytes;
+> > > > +		}
+> > > > +	}
+> > > > +}
+> > > > +
+> > > > +static const struct netdev_stat_ops mlx5e_stat_ops = {
+> > > > +	.get_queue_stats_rx     = mlx5e_get_queue_stats_rx,
+> > > > +	.get_queue_stats_tx     = mlx5e_get_queue_stats_tx,
+> > > > +	.get_base_stats         = mlx5e_get_base_stats,
+> > > > +};
+> > > > +
+> > > >    static void mlx5e_build_nic_netdev(struct net_device *netdev)
+> > > >    {
+> > > >    	struct mlx5e_priv *priv = netdev_priv(netdev);
+> > > > @@ -5299,6 +5442,7 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
+> > > >    	netdev->watchdog_timeo    = 15 * HZ;
+> > > > +	netdev->stat_ops          = &mlx5e_stat_ops;
+> > > >    	netdev->ethtool_ops	  = &mlx5e_ethtool_ops;
+> > > >    	netdev->vlan_features    |= NETIF_F_SG;
 
