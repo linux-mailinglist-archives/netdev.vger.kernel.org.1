@@ -1,317 +1,162 @@
-Return-Path: <netdev+bounces-97734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0606A8CCF1F
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 11:26:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C98448CCF3F
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 11:27:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 735DC1F23A95
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:26:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DFBD287A11
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC2013DBA0;
-	Thu, 23 May 2024 09:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A2D13CF9D;
+	Thu, 23 May 2024 09:26:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YwTWsmQS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SVZk4p31"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DB37E0F1
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 09:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F364F8BB
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 09:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716456268; cv=none; b=qjLjyyDRjpJ+ig+McrguIw1v4u9AKwobKY/A8Co5A3NvTomgaD6Rh3K7E6N0ISglKQvJ54ZQeHZrkKjgdEBTO7zXQYknUfOb8LtYpDxBk2ITGOy7ln99h0H3AivBy2Jyz18geFz64OzOgrIV6+9V/QtEbu8ywppdW8tt0oJKsEM=
+	t=1716456413; cv=none; b=cEDKbUBic3EHmBZqFP9y55XrHGNySdATNCsFXfdLFfYnZzPeH8j39hLEcgFeWiJEagEr+lVKOWiDPVY2ObdGvuFM1OjENdEMs46woLZUVO9VZWWc4odVCE56xIvGZ8CnrA7QrFArexSEPGfVJ3mBDRP63S5FifwrkNLTELOL8Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716456268; c=relaxed/simple;
-	bh=TNRJF/wAAHQVQnqQt5pxJj0RdsmD90mW+36XoNhSuAU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dpB28Z9xiIk6etElZmv9XgQg7slVTbnLzfgClhFNEta3c7L9Sg2AwQQkCD56FTWvmifj5DjIkPy9ATDo4KDndNCagcVk2FSHJT47W/CzTr/fpsffjAgEJ2F7Vkl3ZXTYUXpBQvPEx5nHqqFKKx5lkKZ5fOF8q1D0qCCJReIlMRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YwTWsmQS; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56e1f3462caso11874648a12.3
-        for <netdev@vger.kernel.org>; Thu, 23 May 2024 02:24:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716456264; x=1717061064; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nONB5XjIQa2MEYn5E34w+H4Nd7szsJasVqs3Le681bM=;
-        b=YwTWsmQS0wZk/DDnY/byTcmRGMJ6Mqd53pSgxKZCeKMRIQOvOJUJFp234juvQ6mzWs
-         aULb5rMkkdrMgT5m8RTH8lxy6GJbBXxgr5yyXCCUTiwpa8m5HsKuJwyBdtURTt+LKIAf
-         pofN9Djj7t8rKFswyr+QnDveluP0DWyncWPJ4WKqpcsYJStnCCau/Bo8zxJBxMvg10ln
-         pKXhB9RzRg5OZpmB0FnQ5bkH5xdDzkngu7w8kcnvmIZWEsULaFnV8INV21UNfHhcN7Uj
-         Wvi0zgUOFZ5y6FJ7eP9Ju+Z2SxM2qQn44IaSpX5qB7UvXpV59Xl01WtGouIvCBKyG6Qu
-         cJVg==
+	s=arc-20240116; t=1716456413; c=relaxed/simple;
+	bh=JAYFrGgwYS8HfWrSnz/neCHT8hu2MGuUU/8snl7KE+o=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HyoO41PMpArqm0des52XPsU9MSLuXCj4L8bPqIzLFpIHBn1mS9ky+3LMO804XFHjXRubLD/QtvD+F5AxZ5XmAquvMQMOdx8GG8YJu6vluv4kXHHdLobezULk7PZX64Mge4tEg53yG3vFmfFtI4ElLlL2xyclamQvk6mgg05Xrew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SVZk4p31; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716456410;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=HKdhJA1OuoIvsTtBmTZlDesLkRNCmxNuqAHFhZzRfDI=;
+	b=SVZk4p31WoayMdBDKKksXL0GYo7r0S65hfZajJUpOYgo2Vm7p8ytwTDD0mcNLcMY/aYe69
+	IEvCB1o8PiNI1MMjSwLjpscm5LSPRopBoOjiQmJp0PdLcf7LY5CeZmhvNyPxihQpTI6ZFv
+	laj+a16gdDbX80yQdbIW4v9cT+6JX94=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-8qlymK8AMQ6nQpWaB2gjPg-1; Thu, 23 May 2024 05:26:48 -0400
+X-MC-Unique: 8qlymK8AMQ6nQpWaB2gjPg-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-354f875056dso91539f8f.0
+        for <netdev@vger.kernel.org>; Thu, 23 May 2024 02:26:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716456264; x=1717061064;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nONB5XjIQa2MEYn5E34w+H4Nd7szsJasVqs3Le681bM=;
-        b=fjVnEc4SEz0aRNdzRD5vNpCPEm5UlwZv+9lN/Fp2/OW7LzRLjbn+PFfsE6UO20x0x1
-         hWPanV7Jo/vSWla3IVe7ZVS4AB7djtIcEpw2xlH1dcGN4qjuk5qVJ2WRcthg6FcRPUII
-         V3cVC88acu80IiubMxtyPg6E+0bEoVOt/O+qJv+MqMs4gKOX8jVccRPYyAmM7EgkbP+4
-         mckDD0EVsDojtInzYMNX+xhYVeyfzBHlevU02X/hvGGboeIx3YxJKU7DKb+LB/ufNUYh
-         a59+ws+OlYgZwVyN3iwkLdJybtpT/+arvtJCTbrOL1oA93y9zK+y8UX4QJwEQloOwkBc
-         RPTA==
-X-Forwarded-Encrypted: i=1; AJvYcCWxdRtJJr8DDFAXIVcsobG1mR42FYjlTdq6O8aEKIxnt7AqQ2qVUA40xCN/4UOJEQ35WlxgK5MsiAR2BmKXaavgsAZdOhl9
-X-Gm-Message-State: AOJu0YzoyhBtv8rpjBmGPvyQrvGHtcFRFuUnVU0GEonHK0qMu02hhD9A
-	Oe98CVxvncgdQO8A14J5BuqOGdSjSdaUmd1Dj4h2x8xU/aGTsaYHFjno6dw1Q+g639EMUuhG5uC
-	oCt9D9309l1UkmhQTCNRsmXDhHfM=
-X-Google-Smtp-Source: AGHT+IGkvgXGsU+dLT9pmBtVI+C1855bsQxex992WZZKI64/wWlO2JL4WadGgrkGd0CpjUfmQAWWzTxSsJSz1LNPhGc=
-X-Received: by 2002:a17:907:8026:b0:a5a:278f:7830 with SMTP id
- a640c23a62f3a-a6228084b17mr225440266b.26.1716456264059; Thu, 23 May 2024
- 02:24:24 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716456407; x=1717061207;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HKdhJA1OuoIvsTtBmTZlDesLkRNCmxNuqAHFhZzRfDI=;
+        b=XB2ElLNo8JpWpARDsGGmaBlzsU4mcmEA4GiOrANMiytq6MxydyIUSpmB8FWRe/iQ8x
+         temudbC8K/DpbPn192RifytuywyS/eiikHmWcn4f/DCvFDTFBnJbJuRu/BlC32ruS3r2
+         IqfIjU7guXGHeCLEM1Gi0TtEOImmzWEN1Sn3HOeFfbED9lX1RuAbTofZSGNK6+CeYOy8
+         YueRqfNZcGUYtjjmfJAUnoXN8Fn8FBtD1ATj/ZTIs80DYMCK2S3RLXBomzq+Tq3Asr9m
+         iM3Jhc3ArmDEXgKIJMPxjDYRmuyUkLRbWZ9Se77tZ7y9Fb64QlZA0Sy7NGIdkLo4eEeu
+         UyrA==
+X-Forwarded-Encrypted: i=1; AJvYcCWr1QR8xJa0HChu19GRm+pvpZob+bPMWPbJPPSeejopaDXV4BOjU9RWQnlgWL1gOWk/8/lLiNohTluY7JtOasg8dbvwTuAP
+X-Gm-Message-State: AOJu0YzxFYlmAx9D+pAV0g81KMY6IXp8x6HLpaNVzFMlZYTIL65rdt+O
+	nUo/03zKN3CKM4dJwoxmRrUwNtMFu2imL1VWBUnLLhaFIh09EMRbRIbE2VTDicarcq+LCQa6KGL
+	8qv/dcvQ5UVSrbm4H7vfKVpgYMXDvjHKzphpA04pNYpwSQy+84++Zfg==
+X-Received: by 2002:adf:eac5:0:b0:354:c3c0:e601 with SMTP id ffacd0b85a97d-354d8bb2529mr3233945f8f.0.1716456407633;
+        Thu, 23 May 2024 02:26:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHWcnLVYix1DRW7sXtNhoy2PeZnLMyU+nMP7RUVXyrj7h2EIeXu2Vz7KmipixkDTbIXF34p4A==
+X-Received: by 2002:adf:eac5:0:b0:354:c3c0:e601 with SMTP id ffacd0b85a97d-354d8bb2529mr3233928f8f.0.1716456407260;
+        Thu, 23 May 2024 02:26:47 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b094:ab10:29ae:cdc:4db4:a22a])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-354fc599876sm591264f8f.10.2024.05.23.02.26.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 May 2024 02:26:46 -0700 (PDT)
+Message-ID: <e20cde161e014616d0b4969f2bec22cd80ca2c5a.camel@redhat.com>
+Subject: Re: [PATCH net 4/6] netfilter: nft_payload: skbuff vlan metadata
+ mangle support
+From: Paolo Abeni <pabeni@redhat.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org, 
+	edumazet@google.com, fw@strlen.de
+Date: Thu, 23 May 2024 11:26:45 +0200
+In-Reply-To: <20240522231355.9802-5-pablo@netfilter.org>
+References: <20240522231355.9802-1-pablo@netfilter.org>
+	 <20240522231355.9802-5-pablo@netfilter.org>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240523050357.43941-1-kerneljasonxing@gmail.com> <CANn89i+y32YsDyUSyAvVswZTUaYTNjA=zGYmV5JXrCqa5EEHJA@mail.gmail.com>
-In-Reply-To: <CANn89i+y32YsDyUSyAvVswZTUaYTNjA=zGYmV5JXrCqa5EEHJA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 23 May 2024 17:23:47 +0800
-Message-ID: <CAL+tcoD--Zb-1Qd1suMmP1yqRj879W67s0XEx2GLx-orBpZn_g@mail.gmail.com>
-Subject: Re: [PATCH v2 net] tcp: fix a race when purging the netns and
- allocating tw socket
-To: Eric Dumazet <edumazet@google.com>
-Cc: dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>, 
-	syzbot+2eca27bdcb48ed330251@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 23, 2024 at 3:19=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, May 23, 2024 at 7:04=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Syzbot[1] reported the drecrement of reference count hits leaking memor=
-y.
-> >
-> > Race condition:
-> >    CPU 0                      CPU 1
-> >    -----                      -----
-> > inet_twsk_purge            tcp_time_wait
-> > inet_twsk_deschedule_put   __inet_twsk_schedule
-> >                            mod_timer(tw_timer...
-> > del_timer_sync
-> > inet_twsk_kill
-> > refcount_dec(tw_refcount)[1]
-> >                            refcount_inc(tw_refcount)[2]
-> >
-> > Race case happens because [1] decrements refcount first before [2].
-> >
-> > After we reorder the mod_timer() and refcount_inc() in the initializati=
-on
-> > phase, we can use the status of timer as an indicator to test if we wan=
-t
-> > to destroy the tw socket in inet_twsk_purge() or postpone it to
-> > tw_timer_handler().
-> >
-> > After this patch applied, we get four possible cases:
-> > 1) if we can see the armed timer during the initialization phase
-> >    CPU 0                      CPU 1
-> >    -----                      -----
-> > inet_twsk_purge            tcp_time_wait
-> > inet_twsk_deschedule_put   __inet_twsk_schedule
-> >                            refcount_inc(tw_refcount)
-> >                            mod_timer(tw_timer...
-> > test if the timer is queued
-> > //timer is queued
-> > del_timer_sync
-> > inet_twsk_kill
-> > refcount_dec(tw_refcount)
-> > Note: we finish it up in the purge process.
-> >
-> > 2) if we fail to see the armed timer during the initialization phase
-> >    CPU 0                      CPU 1
-> >    -----                      -----
-> > inet_twsk_purge            tcp_time_wait
-> > inet_twsk_deschedule_put   __inet_twsk_schedule
-> >                            refcount_inc(tw_refcount)
-> > test if the timer is queued
-> > //timer isn't queued
-> > postpone
-> >                            mod_timer(tw_timer...
-> > Note: later, in another context, expired timer will finish up tw socket
-> >
-> > 3) if we're seeing a running timer after the initialization phase
-> >    CPU 0                      CPU 1                    CPU 2
-> >    -----                      -----                    -----
-> >                            tcp_time_wait
-> >                            __inet_twsk_schedule
-> >                            refcount_inc(tw_refcount)
-> >                            mod_timer(tw_timer...
-> >                            ...(around 1 min)...
-> > inet_twsk_purge
-> > inet_twsk_deschedule_put
-> > test if the timer is queued
-> > // timer is running
-> > skip                                              tw_timer_handler
-> > Note: CPU 2 is destroying the timewait socket
-> >
-> > 4) if we're seeing a pending timer after the initialization phase
-> >    CPU 0                      CPU 1
-> >    -----                      -----
-> >                            tcp_time_wait
-> >                            __inet_twsk_schedule
-> >                            refcount_inc(tw_refcount)
-> >                            mod_timer(tw_timer...
-> >                            ...(< 1 min)...
-> > inet_twsk_purge
-> > inet_twsk_deschedule_put
-> > test if the timer is queued
-> > // timer is queued
-> > del_timer_sync
-> > inet_twsk_kill
-> >
-> > Therefore, only making sure that we either call inet_twsk_purge() or
-> > call tw_timer_handler() to destroy the timewait socket, we can
-> > handle all the cases as above.
-> >
-> > [1]
-> > refcount_t: decrement hit 0; leaking memory.
-> > WARNING: CPU: 3 PID: 1396 at lib/refcount.c:31 refcount_warn_saturate+0=
-x1ed/0x210 lib/refcount.c:31
-> > Modules linked in:
-> > CPU: 3 PID: 1396 Comm: syz-executor.3 Not tainted 6.9.0-syzkaller-07370=
--g33e02dc69afb #0
-> > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-=
-1.16.2-1 04/01/2014
-> > RIP: 0010:refcount_warn_saturate+0x1ed/0x210 lib/refcount.c:31
-> > RSP: 0018:ffffc9000480fa70 EFLAGS: 00010282
-> > RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc9002ce28000
-> > RDX: 0000000000040000 RSI: ffffffff81505406 RDI: 0000000000000001
-> > RBP: ffff88804d8b3f80 R08: 0000000000000001 R09: 0000000000000000
-> > R10: 0000000000000000 R11: 0000000000000002 R12: ffff88804d8b3f80
-> > R13: ffff888031c601c0 R14: ffffc900013c04f8 R15: 000000002a3e5567
-> > FS:  00007f56d897c6c0(0000) GS:ffff88806b300000(0000) knlGS:00000000000=
-00000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 0000001b3182b000 CR3: 0000000034ed6000 CR4: 0000000000350ef0
-> > Call Trace:
-> >  <TASK>
-> >  __refcount_dec include/linux/refcount.h:336 [inline]
-> >  refcount_dec include/linux/refcount.h:351 [inline]
-> >  inet_twsk_kill+0x758/0x9c0 net/ipv4/inet_timewait_sock.c:70
-> >  inet_twsk_deschedule_put net/ipv4/inet_timewait_sock.c:221 [inline]
-> >  inet_twsk_purge+0x725/0x890 net/ipv4/inet_timewait_sock.c:304
-> >  tcp_twsk_purge+0x115/0x150 net/ipv4/tcp_minisocks.c:402
-> >  tcp_sk_exit_batch+0x1c/0x170 net/ipv4/tcp_ipv4.c:3522
-> >  ops_exit_list+0x128/0x180 net/core/net_namespace.c:178
-> >  setup_net+0x714/0xb40 net/core/net_namespace.c:375
-> >  copy_net_ns+0x2f0/0x670 net/core/net_namespace.c:508
-> >  create_new_namespaces+0x3ea/0xb10 kernel/nsproxy.c:110
-> >  unshare_nsproxy_namespaces+0xc0/0x1f0 kernel/nsproxy.c:228
-> >  ksys_unshare+0x419/0x970 kernel/fork.c:3323
-> >  __do_sys_unshare kernel/fork.c:3394 [inline]
-> >  __se_sys_unshare kernel/fork.c:3392 [inline]
-> >  __x64_sys_unshare+0x31/0x40 kernel/fork.c:3392
-> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> >  do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
-> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > RIP: 0033:0x7f56d7c7cee9
-> >
-> > Fixes: 2a750d6a5b36 ("rds: tcp: Fix use-after-free of net in reqsk_time=
-r_handler().")
-> > Reported-by: syzbot+2eca27bdcb48ed330251@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=3D2eca27bdcb48ed330251
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> > v2
-> > Link: https://lore.kernel.org/all/20240521144930.23805-1-kerneljasonxin=
-g@gmail.com/
-> > 1. Use timer as a flag to test if we can safely destroy the timewait so=
-cket
-> > based on top of the patch Eric wrote.
-> > 2. change the title and add more explanation into body message.
-> > ---
-> >  net/ipv4/inet_timewait_sock.c | 11 +++++++++--
-> >  1 file changed, 9 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_soc=
-k.c
-> > index e28075f0006e..b890d1c280a1 100644
-> > --- a/net/ipv4/inet_timewait_sock.c
-> > +++ b/net/ipv4/inet_timewait_sock.c
-> > @@ -255,8 +255,8 @@ void __inet_twsk_schedule(struct inet_timewait_sock=
- *tw, int timeo, bool rearm)
-> >
-> >                 __NET_INC_STATS(twsk_net(tw), kill ? LINUX_MIB_TIMEWAIT=
-KILLED :
-> >                                                      LINUX_MIB_TIMEWAIT=
-ED);
-> > -               BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
-> >                 refcount_inc(&tw->tw_dr->tw_refcount);
-> > +               BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
-> >         } else {
-> >                 mod_timer_pending(&tw->tw_timer, jiffies + timeo);
-> >         }
-> > @@ -301,7 +301,14 @@ void inet_twsk_purge(struct inet_hashinfo *hashinf=
-o)
-> >                         rcu_read_unlock();
-> >                         local_bh_disable();
-> >                         if (state =3D=3D TCP_TIME_WAIT) {
-> > -                               inet_twsk_deschedule_put(inet_twsk(sk))=
-;
-> > +                               struct inet_timewait_sock *tw =3D inet_=
-twsk(sk);
-> > +
-> > +                               /* If the timer is armed, we can safely=
- destroy
-> > +                                * it, or else we postpone the process =
-of destruction
-> > +                                * to tw_timer_handler().
-> > +                                */
-> > +                               if (timer_pending(&tw->tw_timer))
-> > +                                       inet_twsk_deschedule_put(tw);
->
->
-> This patch is not needed, and a timer_pending() would be racy anywau.
->
-> As already explained, del_timer_sync() takes care of this with proper loc=
-king.
->
-> inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
-> {
->   if (del_timer_sync(&tw->tw_timer))
->      inet_twsk_kill(tw);
->   inet_twsk_put(tw);
-> }
+On Thu, 2024-05-23 at 01:13 +0200, Pablo Neira Ayuso wrote:
+> @@ -801,21 +801,79 @@ struct nft_payload_set {
+>  	u8			csum_flags;
+>  };
+> =20
+> +/* This is not struct vlan_hdr. */
+> +struct nft_payload_vlan_hdr {
+> +        __be16          h_vlan_proto;
+> +        __be16          h_vlan_TCI;
+> +};
+> +
+> +static bool
+> +nft_payload_set_vlan(const u32 *src, struct sk_buff *skb, u8 offset, u8 =
+len,
+> +		     int *vlan_hlen)
+> +{
+> +	struct nft_payload_vlan_hdr *vlanh;
+> +	__be16 vlan_proto;
+> +	__be16 vlan_tci;
+> +
+> +	if (offset >=3D offsetof(struct vlan_ethhdr, h_vlan_encapsulated_proto)=
+) {
+> +		*vlan_hlen =3D VLAN_HLEN;
+> +		return true;
+> +	}
+> +
+> +	switch (offset) {
+> +	case offsetof(struct vlan_ethhdr, h_vlan_proto):
+> +		if (len =3D=3D 2) {
+> +			vlan_proto =3D nft_reg_load16(src);
 
-Sorry, I'm lost. But now I understand what I wrote in the morning is
-not correct...
+I'm sorry but the above introduces build warning due to endianess
+mismatch (host -> be)
 
-After rethinking about this, only reordering the mod_timer() and
-refcount_inc() in the initialization phase (just like the patch you
-wrote) can ensure safety.
+> +			skb->vlan_proto =3D vlan_proto;
+> +		} else if (len =3D=3D 4) {
+> +			vlanh =3D (struct nft_payload_vlan_hdr *)src;
+> +			__vlan_hwaccel_put_tag(skb, vlanh->h_vlan_proto,
+> +					       ntohs(vlanh->h_vlan_TCI));
+> +		} else {
+> +			return false;
+> +		}
+> +		break;
+> +	case offsetof(struct vlan_ethhdr, h_vlan_TCI):
+> +		if (len !=3D 2)
+> +			return false;
+> +
+> +		vlan_tci =3D ntohs(nft_reg_load16(src));
 
-CPU 0 uses del_timer_sync() to detect if the timer is running while
-CPU 1 mod_timer() and then increments the refcount.
+Similar things here htons() expect a be short int and is receiving a
+u16, vlan_tci is 'be' and the assigned data uses host endianess.
 
-1) If CPU 0 sees the queued timer which means the tw socket has done
-incrementing refcount, then CPU 0 can kill (inet_twsk_kill()) the
-socket.
 
-2) If CPU 0 cannot see the queued timer (and will not kill the
-socket), then CPU 1 will call mod_timer() and expire in one minute.
-Another cpu will call inet_twsk_kill() to clear tw socket at last.
+Could you please address the above?
 
-The patch you provided seems to solve the race issue in the right
-way... I cannot see the problem of it :(
+Thanks!
 
-So what is the problem to be solved with your patch? Thanks for your
-patience and help.
+Paolo
 
-Thanks,
-Jason
+
+
 
