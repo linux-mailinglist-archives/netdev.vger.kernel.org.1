@@ -1,206 +1,123 @@
-Return-Path: <netdev+bounces-97827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 094A38CD647
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 16:57:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36FDB8CD662
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 16:59:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D9C81F21319
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:57:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B701DB21970
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2E9538A;
-	Thu, 23 May 2024 14:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3CDC6AAD;
+	Thu, 23 May 2024 14:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N6VGJm1p"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Sk31XbXz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A0163AE;
-	Thu, 23 May 2024 14:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F09107A8
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 14:59:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716476220; cv=none; b=ac5nIZtmfffaT2yoYz9Ccsp12CT+lyVmDjI3oZv5UokSSL0B6kArBxY2Hfr+GY5BwNc2kUlH2OeLe0Dt0Bl1trVjlGT5jav2nVS13EFPXu5n9i8K5kFbn8Tggd51ZabwWYIR0FoRfwnM7ZKzfeh9VwFmKIU1VvvnaxovRk8qqgM=
+	t=1716476347; cv=none; b=gLmPN1ljeGN7h3xEAmgl3ryWR+FNS37r7h2/N7K0bsgHDllfDwxmtv7fCXMiMzQEtF7Lq/87I8I4wu9615iQRFO7d3p6Edb7COP4/ouFpt9XMBRllzWJZj5KawrC36FhVy7EoWWpjWgPKiRVnngxIroMvlfsqUX8IOjcm0pA0Fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716476220; c=relaxed/simple;
-	bh=1Uyd6Gp1YnOEExiV+9mu+CUUEcJwVrOLr4XhnQB6PFQ=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=OldeY/3vfa23YcafUf0sFg/bCBwJYR+VRff6xGn5qh0GARUcY5veaHmhPDbdoCsLAfjNSpdho1XmI3nmPxmI0c18C48eDvWMbCkFL4vxwRvQrk6kgx/kTb/9J5pRzmOSenlUyT8NDGIiY+2gVjBqm8b4yhLVc0yGSd+3MLNmyp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N6VGJm1p; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6aad7449f22so31327736d6.2;
-        Thu, 23 May 2024 07:56:59 -0700 (PDT)
+	s=arc-20240116; t=1716476347; c=relaxed/simple;
+	bh=waqLVeSOTG9HutmNeYzprcb7faVdy74a5jBbGny0QS0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IezAoalyiWNn99XBFP/taxgUJYCLnX+ERPKSyGRC0g5lc9ydml9+bKtYJcpKh+ryBJQI0vKzHrTmNSOJfdRBCx5irHfWEQicBv9idz7rg5GbbNW3LPrkW5JDL57FNkstGjBHCjU9ETTeU748gv+LdRjMtePzbB2u5fJR2jNdMM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Sk31XbXz; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1ec69e3dbcfso20425055ad.0
+        for <netdev@vger.kernel.org>; Thu, 23 May 2024 07:59:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716476218; x=1717081018; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1716476344; x=1717081144; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=q+mePM4Xne1E4x8+ow+ZaszHQg+h8CNowkD8wINqySE=;
-        b=N6VGJm1pWHNZhMlxt97oDp3FF244YWfeNuc+RpTUgK3ARG2pj/JdQdYhMIx3Ojo9SV
-         JZ0AbV3f51XDobIytdCUAXfTq+Rj9dRI6wMTUjN9mNo/1Bk4+WNCQNeNLzYD34D8F8XP
-         FgiQDWw+G5Bhy/Af9yDo9pqMULiygR9IpYpR34mIRD8q0JMuISP2mCH6Ux+XjNau9eK7
-         aUipKQn6eX5mpzodD1WmXtQpbpQ94aJjS4iWU8YblsVc2QCCG91U441HrGdBPJOyq5wB
-         XQxe25K/bkr06MbTlvakPQyqckaercL5WB1GEpSeW+JkbE/CQbU3tciFLBQ2QOguHbEz
-         3w9w==
+        bh=/TSDbFlTWX5JkoFUvJumAR8Ry/7EWefOz6CCNrT3lqE=;
+        b=Sk31XbXzJQQS1WSu8izoTxcDnwL9o8H7hqGgRedpbq4G6DXOE7NWeXXiNb/QMHfRCU
+         P75HwGERHgSfY7F1BQ9gfNIKFe32oyut70odCtq3lndNeEId0LmKKvcEn4Pr7SUKAGzq
+         N3lB0SsKiknfjjN4jtsvxRId9R46B88ilPJkbIgGCrnASdFYLzMfrf87dzFvkPIQIdi8
+         7OY5/QZhTZrjHYSOejG/WdUfT51BMKwrSl8MDt3Syn6r4+Vxuaj1zXwTf1/xGLbxSLkk
+         yD1agpRYWNHx7ExdsNnNWUfon1tmWIvxTVJ+uO0PntvOoExw+G1Qbk6YmeH71ZVwGFmz
+         HF2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716476218; x=1717081018;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=q+mePM4Xne1E4x8+ow+ZaszHQg+h8CNowkD8wINqySE=;
-        b=HEWiXGeteDFCf5r0rd2wDq1/OLtYlSHbhJM/GG9BsSwuIHtwany0haeoHXn/zN+nce
-         cmZCVUTLsrg3CU4PYtN0BW6gB2LwPfI5W4OZDIGu8Ogj2wKE5jcLVMZ5UO7havCyAO92
-         Z6kP7eU4uo1+WW3m+jLS4SAB/J0G6/6uxmFiwYKypNpkaDrOxkpWAOQ+zjnhLbzQxCij
-         FBq/gcpe5Om+kO14a3axIHb3G/GwUaL6p2js0a/ax0oZHWsESWME3pvCZg4iKb/eVrLR
-         xYSIznxMlq0GjpC0JRvJrfEcmCGb6jLXd0AqYs5da+ciDFJSV8u7PZ7yWyHLJsMp5SUA
-         dz+A==
-X-Forwarded-Encrypted: i=1; AJvYcCX3Sl0//fvRITuwAht5i6NX6lXtFP0OLa/FEWig8VVohPyussIY/a+NVwmdqSQ3PyJs3oGd6gJLB4w4ZnmJ71QSPewLkjEg4ADVGn0pp8uCXZwl0Q2ug9uFIKJfWv6mm7ss34us
-X-Gm-Message-State: AOJu0YyZbauVVjo/IWWJPyAv0r5CPqROY3Zf5mAjJO7ZMVDig6Qf+fI7
-	YqdiX0EsFV2JtGbsHDjZOYgg/l99isrMceilK6oVmYIdnhUm0Afd
-X-Google-Smtp-Source: AGHT+IFXHl7FOkYyWnd4ZupbCLRP21rTO/GIvxmkXy2yhkFSoR2n70m8wSzwulJ7ytty/xslaMX4Fg==
-X-Received: by 2002:a05:6214:53c4:b0:6a9:d1b3:9790 with SMTP id 6a1803df08f44-6ab7f354d44mr74996986d6.22.1716476218042;
-        Thu, 23 May 2024 07:56:58 -0700 (PDT)
-Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f1ccd4esm144437886d6.97.2024.05.23.07.56.57
+        d=1e100.net; s=20230601; t=1716476344; x=1717081144;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/TSDbFlTWX5JkoFUvJumAR8Ry/7EWefOz6CCNrT3lqE=;
+        b=vjct8cpLWflU+JNpL5RxoVKaAS0nw/QEQW5IC9ugw9FHrMD/dqc71JfLj3b/PhTAUi
+         LM3S6JxH+KmXx4h1mnXknLCRMFdB4IHALijKzWwjS99RmkNkYUzJYXPg681Owx3ZIDNT
+         3MCnFqyOBvQjh3hTpkTJ1nqmbK4l6j10RVVbifN3hItBpAPyZZ1fPi7qFTV3McN721aa
+         QM6hTchi7hA+HE8IPk9SmPz0rzm0j1LxWZUiYJmqe45QT4DmEex8S9ZWXP7/WGNfeGMg
+         IBye+O1xx7PvYi023PIuNf8QOAyvwCYw49lNeB9/t6la0BpTK7QjQ2vPo35eJ512EKHH
+         g/VA==
+X-Forwarded-Encrypted: i=1; AJvYcCWvnKpMRMip0j0KhirGa7bcf3+6jZyoJYS8eF2NIIyriuLV9keAfKDhfwFryKDbDIvJdcyb2EPhizAhPiE0Rr6CxXFJPJaM
+X-Gm-Message-State: AOJu0YxuAjENSo2d/rkyQDzopxfoW2l0+U/P6zguair1Bm5GKnaxMouA
+	LeD6m5xoo7aUyvC1XX3LSAraAY/+fxdDjjSnGbO2/xBbm4phFbBdjC/L5i7ULlI=
+X-Google-Smtp-Source: AGHT+IGmU2k/lyis+ORS1Przc8TsMwvXKNF79BbCa68mAbE3mSZXt5L454XdnWssav3PoRuyR6LieA==
+X-Received: by 2002:a17:902:650d:b0:1f3:43a8:bd34 with SMTP id d9443c01a7336-1f343a8bf08mr14146365ad.27.1716476344568;
+        Thu, 23 May 2024 07:59:04 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c1364fesm257489845ad.249.2024.05.23.07.59.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 May 2024 07:56:57 -0700 (PDT)
-Date: Thu, 23 May 2024 10:56:56 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Chengen Du <chengen.du@canonical.com>, 
- willemdebruijn.kernel@gmail.com
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Chengen Du <chengen.du@canonical.com>
-Message-ID: <664f5938d2bef_1b5d2429467@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240520070348.26725-1-chengen.du@canonical.com>
-References: <20240520070348.26725-1-chengen.du@canonical.com>
-Subject: Re: [PATCH] af_packet: Handle outgoing VLAN packets without hardware
- offloading
+        Thu, 23 May 2024 07:59:04 -0700 (PDT)
+Date: Thu, 23 May 2024 07:59:04 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Gedalya <gedalya@gedalya.net>
+Cc: Dragan Simic <dsimic@manjaro.org>, Sirius <sirius@trudheim.com>,
+ netdev@vger.kernel.org
+Subject: Re: iproute2: color output should assume dark background
+Message-ID: <20240523075904.16f3599b@hermes.local>
+In-Reply-To: <94d43b6d-74ae-4544-b443-32d8da044b75@gedalya.net>
+References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
+	<Zk7kiFLLcIM27bEi@photonic.trudheim.com>
+	<96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
+	<Zk722SwDWVe35Ssu@photonic.trudheim.com>
+	<e4695ecb95bbf76d8352378c1178624c@manjaro.org>
+	<449db665-0285-4283-972f-1b6d5e6e71a1@gedalya.net>
+	<7d67d9e72974472cc61dba6d8bdaf79a@manjaro.org>
+	<1d0a0772-8b9a-48d6-a0f1-4b58abe62f5e@gedalya.net>
+	<c6f8288c43666dc55a1b7de1b2eea56a@manjaro.org>
+	<c535f22f-bdf6-446e-ba73-1df291a504f9@gedalya.net>
+	<c41ee2a968d1b839b8b9c7a3571ad107@manjaro.org>
+	<94d43b6d-74ae-4544-b443-32d8da044b75@gedalya.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Chengen Du wrote:
-> In the outbound packet path, if hardware VLAN offloading is unavailable,
-> the VLAN tag is inserted into the payload but then cleared from the
-> metadata. Consequently, this could lead to a false negative result when
-> checking for the presence of a VLAN tag using skb_vlan_tag_present(),
-> causing the packet sniffing outcome to lack VLAN tag information. As a
-> result, the packet capturing tool may be unable to parse packets as
-> expected.
+On Thu, 23 May 2024 22:33:03 +0800
+Gedalya <gedalya@gedalya.net> wrote:
+
+> On 5/23/24 10:24 PM, Dragan Simic wrote:
+> > I had in mind setting COLORFGBG to dark background that way, not some
+> > shell magic that would change it dynamically.   
 > 
-> Signed-off-by: Chengen Du <chengen.du@canonical.com>
-
-Fixes tag and Cc: stable.
-
-As discussed please add more detail to the commit message that
-explains the bug. And/or add a Link: for instance to the github
-issue.
-
-> ---
->  net/packet/af_packet.c | 25 +++++++++++++++++++------
->  1 file changed, 19 insertions(+), 6 deletions(-)
+> It's far far easier to just do color palette overrides in your terminal 
+> emulator.
 > 
-> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> index ea3ebc160e25..73e9acb1875b 100644
-> --- a/net/packet/af_packet.c
-> +++ b/net/packet/af_packet.c
-> @@ -1010,12 +1010,15 @@ static void prb_fill_vlan_info(struct tpacket_kbdq_core *pkc,
->  	if (skb_vlan_tag_present(pkc->skb)) {
->  		ppd->hv1.tp_vlan_tci = skb_vlan_tag_get(pkc->skb);
->  		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->vlan_proto);
-> -		ppd->tp_status = TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
-> +	} else if (eth_type_vlan(pkc->skb->protocol)) {
-> +		ppd->hv1.tp_vlan_tci = ntohs(vlan_eth_hdr(pkc->skb)->h_vlan_TCI);
-> +		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->protocol);
->  	} else {
->  		ppd->hv1.tp_vlan_tci = 0;
->  		ppd->hv1.tp_vlan_tpid = 0;
-> -		ppd->tp_status = TP_STATUS_AVAILABLE;
->  	}
-> +	ppd->tp_status = (ppd->hv1.tp_vlan_tci || ppd->hv1.tp_vlan_tpid) ?
-> +		TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID : TP_STATUS_AVAILABLE;
-
-Don't move this out of the original branch and don't make the valid
-conditional on the value of tp_vlan_tci. Just duplicating the line
-to both branches is fine. Here and below.
-
->  }
->  
->  static void prb_run_all_ft_ops(struct tpacket_kbdq_core *pkc,
-> @@ -2427,11 +2430,15 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
->  		if (skb_vlan_tag_present(skb)) {
->  			h.h2->tp_vlan_tci = skb_vlan_tag_get(skb);
->  			h.h2->tp_vlan_tpid = ntohs(skb->vlan_proto);
-> -			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
-> +		} else if (eth_type_vlan(skb->protocol)) {
-> +			h.h2->tp_vlan_tci = ntohs(vlan_eth_hdr(skb)->h_vlan_TCI);
-> +			h.h2->tp_vlan_tpid = ntohs(skb->protocol);
->  		} else {
->  			h.h2->tp_vlan_tci = 0;
->  			h.h2->tp_vlan_tpid = 0;
->  		}
-> +		if (h.h2->tp_vlan_tci || h.h2->tp_vlan_tpid)
-> +			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
->  		memset(h.h2->tp_padding, 0, sizeof(h.h2->tp_padding));
->  		hdrlen = sizeof(*h.h2);
->  		break;
-> @@ -2457,7 +2464,8 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
->  	sll->sll_halen = dev_parse_header(skb, sll->sll_addr);
->  	sll->sll_family = AF_PACKET;
->  	sll->sll_hatype = dev->type;
-> -	sll->sll_protocol = skb->protocol;
-> +	sll->sll_protocol = eth_type_vlan(skb->protocol) ?
-> +		vlan_eth_hdr(skb)->h_vlan_encapsulated_proto : skb->protocol;
-
-For QinQ you probably want the true network protocol, not the inner
-VLAN tag.
->  	sll->sll_pkttype = skb->pkt_type;
->  	if (unlikely(packet_sock_flag(po, PACKET_SOCK_ORIGDEV)))
->  		sll->sll_ifindex = orig_dev->ifindex;
-> @@ -3482,7 +3490,8 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->  		/* Original length was stored in sockaddr_ll fields */
->  		origlen = PACKET_SKB_CB(skb)->sa.origlen;
->  		sll->sll_family = AF_PACKET;
-> -		sll->sll_protocol = skb->protocol;
-> +		sll->sll_protocol = eth_type_vlan(skb->protocol) ?
-> +			vlan_eth_hdr(skb)->h_vlan_encapsulated_proto : skb->protocol;
->  	}
->  
->  	sock_recv_cmsgs(msg, sk, skb);
-> @@ -3538,11 +3547,15 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->  		if (skb_vlan_tag_present(skb)) {
->  			aux.tp_vlan_tci = skb_vlan_tag_get(skb);
->  			aux.tp_vlan_tpid = ntohs(skb->vlan_proto);
-> -			aux.tp_status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
-> +		} else if (eth_type_vlan(skb->protocol)) {
-> +			aux.tp_vlan_tci = ntohs(vlan_eth_hdr(skb)->h_vlan_TCI);
-> +			aux.tp_vlan_tpid = ntohs(skb->protocol);
->  		} else {
->  			aux.tp_vlan_tci = 0;
->  			aux.tp_vlan_tpid = 0;
->  		}
-> +		if (aux.tp_vlan_tci || aux.tp_vlan_tpid)
-> +			aux.tp_status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
->  		put_cmsg(msg, SOL_PACKET, PACKET_AUXDATA, sizeof(aux), &aux);
->  	}
->  
-> -- 
-> 2.40.1
+> The "Dark Pastels" preset in XFCE Terminal makes everything just work. 
+> Both iproute2 palettes work fine.
 > 
+> Anyone who really cares about colors can and should dive into the topic 
+> (not me). Once your graphical desktop is up and configured you'll be 
+> just fine.
+> 
+> The only real issue here is force-enabling colors where they are least 
+> welcome (crashed server, vt, no mouse, black background, just let me do 
+> my work please).
+> 
+> This entire discussion has gone way way way out of control.
 
-
+Fits perfect with "what color for the bike shed"
 
