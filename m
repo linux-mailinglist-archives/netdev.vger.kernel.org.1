@@ -1,97 +1,79 @@
-Return-Path: <netdev+bounces-97892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC2BA8CDB12
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 21:47:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A56AC8CDB2F
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 22:02:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 412E0B22DD7
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 19:47:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29AA2B2312D
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 20:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0031E84A3F;
-	Thu, 23 May 2024 19:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506FE84A30;
+	Thu, 23 May 2024 20:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s3ZdVm4J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YzYWjv9y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE7684A36
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 19:46:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2899F53E31;
+	Thu, 23 May 2024 20:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716493611; cv=none; b=iiaCbHq/izKCIO7PVtTlqT6FXKJOFQMe5jYFzb6tlzTGlRw+40UpyKKn9zBd/qzjqeBqZMkFmXD1xbGwDjBlf/Cl4x+ymckb7qq9N0yOwCxnAxhFr3dZn9HIpgCtoXThtVopgGtT5Vyu+wMP1V0k0dzRnN7GfdJvOvQy6O2dNKw=
+	t=1716494570; cv=none; b=si3+RFSvCs9IaD721CuQ/OApfaSeX8AAi//GgWSfycSI/bIBLUytURSh9BUBqFd47JRwwCMb3C/rBUK/4bRkRbXFFfIud6O2TbBbvbqCb8Dq/Hr7zvchMBcAsXHhaH0O/+SwiONnLWQ8aFrXiU7uPxlBp7vgSSmAebHv3yScu5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716493611; c=relaxed/simple;
-	bh=LTFuzqo/cdgV6wXIved8UzB8UVSoC25saxxFqeXXg+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FcfLy7JYF8NtglW3Oa6MZvqZXrZFezF696nHL7dkM67huYKtZOOKjdfjNLsd0LQRGDLW9a8Jr681zAM/ENDS0X74coNK21dNmud0xk6Cd8lTryj8XXhfPcJV9uorDfEvGuv2+Rpw0Za5Y4gWFxqJxyy0FBOoi1pAgFA87EMmxSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s3ZdVm4J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 364D2C2BD10;
-	Thu, 23 May 2024 19:46:50 +0000 (UTC)
+	s=arc-20240116; t=1716494570; c=relaxed/simple;
+	bh=OIjNckgATrIkeg88ERlWSV+GtAfRcUDG3/S8uGy05OI=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=OCmH3Sb0z2rksmkwmHzgNpLKNN8EUceStwRzMi+I0dSahWiqNqK5Ce1eZzG69VfPn33j6Q01McCpSAryNT/uaIJ9zaAYDL0cjxDcsevg0EV9uKDFGsfp+PzNdtAdqAb13hpwx+GBBN9D0ayJotDSKOecbsGtmF+bFgC8PZjIqfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YzYWjv9y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 00B84C32789;
+	Thu, 23 May 2024 20:02:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716493611;
-	bh=LTFuzqo/cdgV6wXIved8UzB8UVSoC25saxxFqeXXg+A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s3ZdVm4JyE4tnKat0sRRJSV4yzgANMr8bQLDZxzQ3LDxJh9eJYIL/lO2apaLKv7rM
-	 3MjuO/kWFEO81/E6W1xX/FsFyb1ZIwmppzvD9bbGVAtmFmQ31DNgpJtyhICnQ7k38z
-	 TFi14jXYfofJrPs2tkpqDJ3yZVp8wiiX7/1PP1l9scnf99jzlcLLBbtg3i36o8eQtY
-	 lMIx2x/k/HZ6lYYXgG4yoqOj/aBv7OipxXSFvJ183SKAsiVwzwmadHzCEh5PsAb38T
-	 lL5p+ct2GNvdqlfEts7lNd/OsxY7qopggZ29QIMfKbu+EgT2M/5XvjlTQSvcazKILn
-	 +sTvqBPPpsUNQ==
-Date: Thu, 23 May 2024 20:46:46 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev <netdev@vger.kernel.org>,
-	David Miller <davem@davemloft.net>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: Re: [PATCH net 2/2] ice: fix accounting if a VLAN already exists
-Message-ID: <20240523194646.GQ883722@kernel.org>
-References: <20240523-net-2024-05-23-intel-net-fixes-v1-0-17a923e0bb5f@intel.com>
- <20240523-net-2024-05-23-intel-net-fixes-v1-2-17a923e0bb5f@intel.com>
+	s=k20201202; t=1716494570;
+	bh=OIjNckgATrIkeg88ERlWSV+GtAfRcUDG3/S8uGy05OI=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=YzYWjv9yu70vSqrJ2PD0IIz1XOK3FmmTZL0nwHl24X2V4NyG7AKjXyE6PJB1P2amG
+	 qs4AadeIx66W6oz4wXynlA3orhqW5VDO/cDE9WQHUUdj6qdzDYeP/SQY3BbSokkRXz
+	 +RZfcfqBoGPnO908RQMli+KRvEeXmLHLKHAyzwbpyU2g9ncU3kGuy5s3v7UCccjVZL
+	 DjPJa9J1nLloro5e5QBY46YlYC0alcoIO+lQh9VU8bbBAZUgV4hQ0A53sc8xMlBPub
+	 19YEEKDOfEGdglY5ySLMz1FVVI+Qbn5ShsAdgFvnejaa6DVYoVUNdjBRnBtu4DoLYL
+	 JEx2I4n+s8zsA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EA05FC54BB2;
+	Thu, 23 May 2024 20:02:49 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.10-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240523161524.82511-1-pabeni@redhat.com>
+References: <20240523161524.82511-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240523161524.82511-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.10-rc1
+X-PR-Tracked-Commit-Id: c71e3a5cffd5309d7f84444df03d5b72600cc417
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 66ad4829ddd0b5540dc0b076ef2818e89c8f720e
+Message-Id: <171649456994.26887.15819093666961155589.pr-tracker-bot@kernel.org>
+Date: Thu, 23 May 2024 20:02:49 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240523-net-2024-05-23-intel-net-fixes-v1-2-17a923e0bb5f@intel.com>
 
-On Thu, May 23, 2024 at 10:45:30AM -0700, Jacob Keller wrote:
-> The ice_vsi_add_vlan() function is used to add a VLAN filter for the target
-> VSI. This function prepares a filter in the switch table for the given VSI.
-> If it succeeds, the vsi->num_vlan counter is incremented.
-> 
-> It is not considered an error to add a VLAN which already exists in the
-> switch table, so the function explicitly checks and ignores -EEXIST. The
-> vsi->num_vlan counter is still incremented.
-> 
-> This seems incorrect, as it means we can double-count in the case where the
-> same VLAN is added twice by the caller. The actual table will have one less
-> filter than the count.
-> 
-> The ice_vsi_del_vlan() function similarly checks and handles the -ENOENT
-> condition for when deleting a filter that doesn't exist. This flow only
-> decrements the vsi->num_vlan if it actually deleted a filter.
-> 
-> The vsi->num_vlan counter is used only in a few places, primarily related
-> to tracking the number of non-zero VLANs. If the vsi->num_vlans gets out of
-> sync, then ice_vsi_num_non_zero_vlans() will incorrectly report more VLANs
-> than are present, and ice_vsi_has_non_zero_vlans() could return true
-> potentially in cases where there are only VLAN 0 filters left.
-> 
-> Fix this by only incrementing the vsi->num_vlan in the case where we
-> actually added an entry, and not in the case where the entry already
-> existed.
-> 
-> Fixes: a1ffafb0b4a4 ("ice: Support configuring the device to Double VLAN Mode")
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+The pull request you sent on Thu, 23 May 2024 18:15:24 +0200:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.10-rc1
 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/66ad4829ddd0b5540dc0b076ef2818e89c8f720e
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
