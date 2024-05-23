@@ -1,136 +1,130 @@
-Return-Path: <netdev+bounces-97873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38DD78CD9B3
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 20:13:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A89C48CD9CA
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 20:23:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C61E41F2189E
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 18:13:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DB92B225FE
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 18:23:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E07D7FBD2;
-	Thu, 23 May 2024 18:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E558D43AB4;
+	Thu, 23 May 2024 18:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2X/9CXkz"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QgtG7xdf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA7936B17
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 18:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0837A1F5E6
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 18:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716488003; cv=none; b=FCmXp+BIpQg49suaWa99rArIrB8j/ZAJ2Oek3mgENqyk/Fi9pA+QFejtXIaqPDO1A93CcDyh/tkmq4w0bN2B+sCQmWrb1vyhisp8fQ7aZvQy2M6QlQSJX6PuAf50F4xY4GVEwSdgNe7hBdvMBPipH6Q4kTcwk9nGL1pepmP8KgM=
+	t=1716488596; cv=none; b=L17UrBVnBLpPSWa43WKgx8JylmnOF3uprFjXr+RCMCQ31QbauXkB8XFWPMrdLwiWlUWd8naHnt2uO1FNYynwY0M2gx7J4T2JO0JZh/u1RNyNd53iVxS4eT0jlJmwWZREQn9FsWo7a0IZjZXkGSAJfa6tLfvZznG0JEn5XLj7Bw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716488003; c=relaxed/simple;
-	bh=zsnTKCdVkvI0k+jxRH2TuSi7PFifNDtiAicq3/1spJA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=grn8uc7HmWb7nxZ3be/Bd3UGXX5pgA40zAJ9iCmf1dCIxbr8HWVWKNtEQ1UUGEngCDGTb6jIBy+auWD/DtGM+Q09scxH4fMfm1LJUiB/hLThbZopBq9pnmvI75ToUMyUZvNhEbw7EbfyDCUgwpwt4MlFGHAimZlZ/dbU43DU8QE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2X/9CXkz; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso1236a12.1
-        for <netdev@vger.kernel.org>; Thu, 23 May 2024 11:13:21 -0700 (PDT)
+	s=arc-20240116; t=1716488596; c=relaxed/simple;
+	bh=YpLORyNL0Z5yk+8up8p9RuJQ5UV1uELRAJgfKqVMjik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lTSNn0f3yhRNPLSCdntCkW36TTz7dPx43psn+BO8MXcXbpQ7cw4hDaTBQVmYv2OjSo3dfEd3XhKQ283tQva61UtliqULWXglm7GkLNfMgYLrVYkmpEUIKzlY2v1qZWFwlDnEwIpyR77+F07/tqtVYTMWKwBqJUbbmUYUWUN8FxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QgtG7xdf; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-42011507a54so13943595e9.0
+        for <netdev@vger.kernel.org>; Thu, 23 May 2024 11:23:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716488000; x=1717092800; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TmV9pjx2Z/cgyKoVK6PJ6k9Fa04AQ2nQf51yC2c36Uc=;
-        b=2X/9CXkzUa2XXZf7Pc6ONJBU1W/rvJ4wSpgHYq2AexrqD9KxQIdkteHQRvbnQ7Nu6i
-         7whqhSAEFey88amyy43L2nGMCCb0zl7EGVf/rhm5gJDBD/dh3BYxadgIe1Aqizu+n8eR
-         tNloqYgm7JQBR/3xPhVDvsIBPrEGgxdT5WXve8uf7mnGdFHCBRwPRG/xj1LdXVzGqImg
-         Nl9fVZJgYUt/kPF/b0R2I6DAMQh6feIwKOe08Y/wIoAnTySIUhOn9JwpKy5kHDhkEahl
-         WEgwfKhhrey4SacY6KSCQ+5jzUB+5lhy68+PkmDMEC/aFnI9Cp8ad69dRLJxTH6ybTeo
-         3r4A==
+        d=linaro.org; s=google; t=1716488593; x=1717093393; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=T0KoAdrCeMFcRSCQt6aCHjBcz1Lyjopl+ImFWGgoJ3w=;
+        b=QgtG7xdfyrrG9oXgNjuPaCgxPCnpTacfJKnKnFdmX4+NfQmgfDMy7oeVeHkQLPDc1M
+         wDIP/ySG9RhyjBuzc+evjo6pNBgYoNp7El9C1NYSSRVDOfAKfRHQKtXDzLfny84QJNxp
+         pBocDIbMicg9/z1swDdDrRVJsGD36nPi7z8VIejNefyRiKpIhwHZOnNgP6C8e6H5cw3D
+         lQB/42/LvK4QKqU3MPQlgKHIzY+6PMcNPAVGW3AMI/ANZdNGhp8NjZ3VurnznE4nWugc
+         eGyOVNP398HMVYCVw1V7VZ4uc8/N4Ja1ysaxkhp7xtGBptZpiyyYGzdYl2vKv7bcxmSa
+         mG/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716488000; x=1717092800;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TmV9pjx2Z/cgyKoVK6PJ6k9Fa04AQ2nQf51yC2c36Uc=;
-        b=MSPwUR7j/goZzkHS/CSDoHiLsf9tVpWlM3ZxjEq6y6lqI163grPXzqIkOyC2X3pw9j
-         DV2IKn9nR2D9hbShlYXSN8eZ3JdcxiWKAIrx2YPCOg9P48N5Vy7Ozt48ePIFo/GPAHWh
-         VIkiQd8jMJv2N9aSyual1vPOer2WdL2CAL8ePpV0WkamEKhnNucy08hSj+r2LtGXpx6E
-         /rrlVy8w8Y84Xpl8KE8jHN5yfwi2OxbYfjq2m/er3t5OnTBldz+QW2wlH/hE9eP9AX4B
-         NMeYnK/lF5Sgs15pcPPapRHuhT/bIxPa/TU4bDrzdhJOff7VftCiUgqtZdXWWEhmVYqL
-         sA4A==
-X-Forwarded-Encrypted: i=1; AJvYcCW1MM2wqQLAyVAC1uVH4XqQVFol2GMX+YtHZj+DE82SFwnYbAEytiaPlq+Je873T2HikyovbEGZ6BnZJXj4MqRdrpq4RBr8
-X-Gm-Message-State: AOJu0Yxtp+PTbatlR6HWs9oOPGgIq6ABhhhpB8oBVSSbp6JdEGoJ2kny
-	XauOXEpFb3SPh1ttMmhLDHuOf6e8A+KcmBDi3LGRT0+H0mY7lnT8SrTgCPbMdsav+cuxVWwAhCy
-	k5gbQYZnLYQIW55CikJ9kfSK7nnBJJDIuQXId
-X-Google-Smtp-Source: AGHT+IH4XyN34wwdQO+LD1omzn19g4Z0hsO4LF5HJg6/COqxImkywXTVpGaksCMO62vMlBB+i2WN/mYDnRwwA5mbJXU=
-X-Received: by 2002:aa7:c941:0:b0:578:33c0:f00e with SMTP id
- 4fb4d7f45d1cf-578510d677dmr19276a12.0.1716487999947; Thu, 23 May 2024
- 11:13:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716488593; x=1717093393;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T0KoAdrCeMFcRSCQt6aCHjBcz1Lyjopl+ImFWGgoJ3w=;
+        b=QzPc14ulJQmB6zYPWKPXjtmKbLY+ZPbYeVQJwYloGAr7h85ejnVT1Q+CMG6xW8Avcw
+         64ok8O2AmV5up5ATLW30rtJjU51YEQ+44HZuNcPt896uOw7cSuP8JxLapfPC41hYPpbj
+         x+AbAdqi8aUOrY4+Vif73W82TFl0sHSJJsjklzQM9XhjUawQ/A28l9LpTwqCOOVKD9as
+         yFl5d8s6UdhOX4t3F+bs2cwPsaIxLSjS9MvUxoFy+zKsXboRNPk4U8m2a+U2zj8eHGv3
+         +J6p/GERGP1UonEHfoq6Sq4C9iKQMfjdV36VylWDiKmP4Km0oRWrQFwNbbD6lE5nGtgN
+         kEzA==
+X-Forwarded-Encrypted: i=1; AJvYcCXkLF7Q7RRzIp573oJA5UXJ7637U0ua2socoBumh+Vf+tz+jJP/RNkJUn8P2XrdP7zJc3AA1nLOnfm86GqU8KJDa8npeM6Z
+X-Gm-Message-State: AOJu0Yz+TPE8BbMfYFxiYmXVddk31eB6GpCxsOQ0v9EyjAJfNmHe0UW8
+	oS69Q2MF+Y/KY6Q78ieD1T7SVxqyDsTFsZU3dMEZ924ewO22vWvum60Fhs82avYhtrNUMBFwNXc
+	N
+X-Google-Smtp-Source: AGHT+IF2EUkBbtjoxY0yn3TjeLKgqYZNDfBbPj7Rfpf6qhx+77pv2KbhnygJndDp17D3vM4GOa5WZg==
+X-Received: by 2002:a05:600c:1c24:b0:420:1a72:69dd with SMTP id 5b1f17b1804b1-421081b9359mr1928915e9.10.1716488593136;
+        Thu, 23 May 2024 11:23:13 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42100f69850sm31273065e9.26.2024.05.23.11.23.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 May 2024 11:23:12 -0700 (PDT)
+Date: Thu, 23 May 2024 21:23:08 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Dan Cross <crossd@gmail.com>
+Cc: lars@oddbit.com, Duoming Zhou <duoming@zju.edu.cn>,
+	linux-hams@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v4] ax25: Fix refcount imbalance on inbound connections
+Message-ID: <61368681-64b5-43f7-9a6d-5e56b188a826@moroto.mountain>
+References: <20240522183133.729159-2-lars@oddbit.com>
+ <8fe7e2fe-3b73-45aa-b10c-23b592c6dd05@moroto.mountain>
+ <CAEoi9W45jE_K6yDYdndYOTm375+r70gHuh3rWEtB729rUxNUWA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240522005913.3540131-1-edliaw@google.com> <20240522005913.3540131-3-edliaw@google.com>
- <94b73291-5b8a-480d-942d-cfc72971c2f5@sirena.org.uk> <CAG4es9WAASaSG+Xgp31-kLT3G8wpeT5vAqbCA4r=Z8G_zAF73w@mail.gmail.com>
- <9e2677ec-1d54-4969-907b-112b71ef8dd3@nvidia.com> <d5471e30-227d-4e6d-9bbd-90a74bd9006b@linuxfoundation.org>
-In-Reply-To: <d5471e30-227d-4e6d-9bbd-90a74bd9006b@linuxfoundation.org>
-From: Edward Liaw <edliaw@google.com>
-Date: Thu, 23 May 2024 11:12:52 -0700
-Message-ID: <CAG4es9XU2fMo7hBv81vpn1JGKFWt9gExOhyAyRtOc-5OR5eiLQ@mail.gmail.com>
-Subject: Re: [PATCH v5 02/68] kselftest: Desecalate reporting of missing _GNU_SOURCE
-To: Shuah Khan <skhan@linuxfoundation.org>
-Cc: John Hubbard <jhubbard@nvidia.com>, Mark Brown <broonie@kernel.org>, shuah@kernel.org, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
-	Christian Brauner <brauner@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Kees Cook <keescook@chromium.org>, 
-	Andy Lutomirski <luto@amacapital.net>, Will Drewry <wad@chromium.org>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kernel-team@android.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEoi9W45jE_K6yDYdndYOTm375+r70gHuh3rWEtB729rUxNUWA@mail.gmail.com>
 
-On Thu, May 23, 2024 at 11:02=E2=80=AFAM Shuah Khan <skhan@linuxfoundation.=
-org> wrote:
->
-> On 5/22/24 20:28, John Hubbard wrote:
-> > On 5/22/24 10:46 AM, Edward Liaw wrote:
-> >> On Wed, May 22, 2024 at 4:21=E2=80=AFAM Mark Brown <broonie@kernel.org=
-> wrote:
-> >>> On Wed, May 22, 2024 at 12:56:48AM +0000, Edward Liaw wrote:
-> > ...
-> >>> You've not provided a Signed-off-by for this so people can't do anyth=
-ing
-> >>> with it, please see Documentation/process/submitting-patches.rst for
-> >>> details on what this is and why it's important.
-> >>
-> >> Sorry, my mistake, I forgot to add it after cherry-picking.  If added
+On Thu, May 23, 2024 at 11:22:43AM -0400, Dan Cross wrote:
+> On Thu, May 23, 2024 at 11:05 AM Dan Carpenter <dan.carpenter@linaro.org> wrote:
+> > > [snip]
 > >
-> > Adding this to your .gitconfig would cover you for cases like this, I t=
-hink
-> > it's pretty common to do this:
-> >
-> > [format]
-> >      signoff =3D true
-> >
-> >
+> > I've already said that I don't think the patch is correct and offered
+> > an alternative which takes a reference in accept() but also adds a
+> > matching put()...  But I can't really test my patch so if we're going to
+> > do something that we know is wrong, I'd prefer to just revert Duoming's
+> > patch.
+> 
+> Dan, may I ask how you determined that Lars's patch is incorrect?
 
-Thanks Mark, I'll add that.
+The problem is that accept() and ax25_release() are not mirrored pairs.
+We're just taking the reference and never dropping it.  Which fixes the
+use after free but introduces a leak.
 
->
-> Mark, Edward,
->
-> Is this patch still necessary of the series is dropped?
->
-> thanks,
-> -- Shuah
->
+> Testing so far indicates that it works as expected. On the other hand,
+> Lars tested your patch and found that it did not address the
+> underlying issue
+> (https://marc.info/?l=linux-hams&m=171646940902757&w=2).
 
-No, it is not necessary anymore.
+Yeah.  I've said a couple times that my patch wasn't complete.  I keep
+hoping that Duoming will chime in here...
+
+> 
+> If I may suggest a path forward, given that observed results show that
+> Lars's patch works as expected, perhaps we can commit that and then
+> work to incorporate a more robust ref counting strategy a la your
+> patch?
+
+The argument for this patch is that it works in testing even though we
+think it's not totally correct.  That's not really a good argument.
+Like we can revert patches that clearly don't work so we could revert
+Duoming's patch, but when we're adding code then that should work.
+
+regards,
+dan carpenter
+
 
