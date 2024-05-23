@@ -1,95 +1,93 @@
-Return-Path: <netdev+bounces-97802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE6D88CD507
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:50:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BC368CD509
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:50:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45E76B22C2E
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:50:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC82BB22AB2
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB59713C693;
-	Thu, 23 May 2024 13:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2ABD14A08F;
+	Thu, 23 May 2024 13:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jf/gE9r/"
+	dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b="jiLkt1B9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-in-1.gedalya.net (mail.gedalya.net [170.39.119.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E391E520;
-	Thu, 23 May 2024 13:50:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9E61482F9
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 13:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.39.119.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716472233; cv=none; b=uBjBIPZw3phm6FygI3CenZfnxrz313ZWNZHTEh/K0qx7hzB7xWJMyb6XF5XiQmcMdAxeR8VgwlTVD5+aQ3T9ATPJl7RBmJF10ashh2zofPWVu+doHPnLeVmdb12agllDEQn/NT/clRfjP8QMg+YoN2j0mSF+PSPoW3GK+Mx9C2U=
+	t=1716472246; cv=none; b=MRY7hgR4bq75ExpjVpJk8UOPp3osa3XLT4tkdPfAvdj6kow7XC1sG56zon7dR6uOyQFAXXoAllKCBiTsZOedD9r9eZIhh1L0jx83vA3EqakOWJIDrXvrkDnE+z5zry1dn/sdtnL9xbfnNptS1osy3LOl5WyCujoT/uIKzRJ1bqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716472233; c=relaxed/simple;
-	bh=0FPVxqB8MsuRU7zVBGwoH7CD4rdtZo3sn9+8u1bSIEs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ns0phGDLKKLWqgjEvsZUEIRKiI2O+0t48pwLTBL1uowXxcoxkkVnQqLxCXu68FHMhcUnxlBNlW8vUIn8ms0Ko8M7yjqa6x805PWAPiohmbLAJECxe0BynCjKvsF9xJzScX3i7LSLiy51P0IeCA74V7M26QrLBf4g1ZC8S7ZVVE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jf/gE9r/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 734C5C32781;
-	Thu, 23 May 2024 13:50:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716472233;
-	bh=0FPVxqB8MsuRU7zVBGwoH7CD4rdtZo3sn9+8u1bSIEs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Jf/gE9r/9WlOfXaseYRYcUo6kh6mQ9PcUTEmKHL5UOxEDlQd9XeVsGHXmP930rUcI
-	 zPM6TVEpFgcNUsLDiX4vmBcUmEdooRftz9/2oUpgLaLvMnyeRY6k2QwJnb+VoD7C9G
-	 zdjXjUNLwlYQ+Og8TZfJhNYu/N7M9w1izlV0mzAij3JDmB0ZRBs7QPnRJR2gtL+olg
-	 a3RiXdh5AtbbLWm3wWbRORW2r2AgxGbBK3Ht4vkknCg2sAZG3qpVoMfoguRJf9bHI8
-	 n2TwJwlAmhVdtbZnNFBeqNpLgTYK41S+nIvuFLsMX9TsFdbfSwCOdfgKhtIR68Hii3
-	 WD1a36VcLJbpg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5D1ECCF21F1;
-	Thu, 23 May 2024 13:50:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1716472246; c=relaxed/simple;
+	bh=C8lxaj7mvYkvQkjrTFO1bC8I3nONBbXxa5nriwUsiMo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TqTOnwUxnA3mhnNqot/EPV0QXLBF8MuYVHi0dey5Xicxxs2e15mXeeuXGituwj1MdkCDTIzk72qNEiEArDMZgdtcBYZMfVdX5mJk+alsZ4FDgiN65B7ZNMV1HtMxCYvRQ2RK2VsZaEUXMDsr1I40diZmVTzcXreRlS+gI1IB4vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net; spf=pass smtp.mailfrom=gedalya.net; dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b=jiLkt1B9; arc=none smtp.client-ip=170.39.119.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gedalya.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gedalya.net
+	; s=rsa1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description;
+	bh=BdwlC9epp1dmbhO0ZvwJj8S81/14cxa37dIDymUcbZk=; b=jiLkt1B9o36zuqA2yW5yvQD9sH
+	DVik20+EyngSs1LtVCg++hmMUK0/EUHfNZ8ZLQ2SMVfq0g9cLOklIQCaWTj2f3phiG++sB1XyWih8
+	ryYeH4Tlca8OAPDqqEZanFQHEUnMq7glVQuYWkVD2I3k2uYj2jTsP5UW8hDlVQAOPgPjI8ggwDsLH
+	sNmPEP71D0n5j4NmZBpcuTDWf7OH9KfVFkjj005fi0Cp4xKZF6OBMydORDSYaa66Q4Uh9lTn4j/hz
+	lZjZxXW+aVnGp5yoc5PY22jaqc5Aeanl2L5xJPaYrBbRxdAyDz6IAwj3uaU1H3hQ4ujd8ak1Lvxt4
+	MMzRYBiw==;
+Received: from [192.168.9.176]
+	by smtp-in-1.gedalya.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <gedalya@gedalya.net>)
+	id 1sA8q9-000gHQ-2K;
+	Thu, 23 May 2024 13:50:41 +0000
+Message-ID: <7cfcca05-95d0-4be0-9b50-ec77bf3e766c@gedalya.net>
+Date: Thu, 23 May 2024 21:50:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] r8169: Fix possible ring buffer corruption on
- fragmented Tx packets.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171647223337.20832.10658924978055829464.git-patchwork-notify@kernel.org>
-Date: Thu, 23 May 2024 13:50:33 +0000
-References: <27ead18b-c23d-4f49-a020-1fc482c5ac95@gmail.com>
-In-Reply-To: <27ead18b-c23d-4f49-a020-1fc482c5ac95@gmail.com>
-To: Ken Milmore <ken.milmore@gmail.com>
-Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, nic_swsd@realtek.com,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: iproute2: color output should assume dark background
+To: Dragan Simic <dsimic@manjaro.org>
+Cc: Sirius <sirius@trudheim.com>, netdev@vger.kernel.org
+References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
+ <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
+ <96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
+ <Zk722SwDWVe35Ssu@photonic.trudheim.com>
+ <e4695ecb95bbf76d8352378c1178624c@manjaro.org>
+ <449db665-0285-4283-972f-1b6d5e6e71a1@gedalya.net>
+ <7d67d9e72974472cc61dba6d8bdaf79a@manjaro.org>
+Content-Language: en-US
+From: Gedalya <gedalya@gedalya.net>
+In-Reply-To: <7d67d9e72974472cc61dba6d8bdaf79a@manjaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On 5/23/24 9:23 PM, Dragan Simic wrote:
+>> And what about linux virtual terminals (a.k.a non-graphical consoles)?
+>
+> In my 25+ years of Linux experience, I've never seen one with a 
+> background
+> color other than black. 
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+You kind of missed my question: Do we make a new rule where a correctly 
+set COLORFGBG is mandatory for linux vt?
 
-On Tue, 21 May 2024 23:45:50 +0100 you wrote:
-> An issue was found on the RTL8125b when transmitting small fragmented
-> packets, whereby invalid entries were inserted into the transmit ring
-> buffer, subsequently leading to calls to dma_unmap_single() with a null
-> address.
-> 
-> This was caused by rtl8169_start_xmit() not noticing changes to nr_frags
-> which may occur when small packets are padded (to work around hardware
-> quirks) in rtl8169_tso_csum_v2().
-> 
-> [...]
+That's what I meant. The fact that both vt and graphical terminal 
+emulators tend to be dark is another point.
 
-Here is the summary with links:
-  - [net,v2] r8169: Fix possible ring buffer corruption on fragmented Tx packets.
-    https://git.kernel.org/netdev/net/c/c71e3a5cffd5
+My point is you can't rely on COLORFGBG. You can only use it if/when set.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+A reasonable default is needed.
 
 
 
