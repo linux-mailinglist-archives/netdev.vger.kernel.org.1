@@ -1,141 +1,139 @@
-Return-Path: <netdev+bounces-97699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA6808CCC72
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 08:48:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5AAD8CCC68
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 08:45:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBC731C20A78
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 06:48:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C7972838D8
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 06:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF26E13C685;
-	Thu, 23 May 2024 06:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD6313C82D;
+	Thu, 23 May 2024 06:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=trudheim.com header.i=@trudheim.com header.b="VoBkcQVK"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="oypN2mHm"
 X-Original-To: netdev@vger.kernel.org
-Received: from ste-pvt-msa1.bahnhof.se (ste-pvt-msa1.bahnhof.se [213.80.101.70])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B272DEC5
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 06:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.80.101.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962F713C69A
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 06:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716446918; cv=none; b=HDAY/nbCh28LGu/BmCAv5wjmywmoKa85PbudK9dVKbTfR1CMMrKR3c6L/gHl/nUjtmVgjkuNHU6h5d9D5te+7H2g+m8PN4o9nuwOYW2dYqSBIrxCh0CE1jN38sOBVtqXBt7oRu6hVDvRsp7rFDGVPG/glErDShkUgyS+f3GH/Mk=
+	t=1716446707; cv=none; b=iDMsO9lQBNvOEOFCx0QJdbE69NhGICJ5eRv/gg4qepMICVs2aJRgWNgEk5SinKeCBhGEvWjRdSXB2krHWldNKBxpxB6S/O50awzFVUAN80GhDQqGwPeoJGLD8H5LCPrl6Fni2TK7N6P7h6FwcVr9MkiVPZHHBWfyPB+zKOfksIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716446918; c=relaxed/simple;
-	bh=zsj4Zo+gcnm2Fbjx8fu4XlnNgVixHHqGce4SSfLKHfY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ks2dOMNyPv/U5B4I5qlfWjJ6RXKnFBVJukN9lBBWBzwKkk4umxe7lZHgkdLA8EzUtF3XQ4UL9qbAajlWPb9X9Dc6dhxQ8/QomqLVN0Th0grVqJ1wulPDsIc7vU3SpwOCoN5DIAkkNBYy2JmaLMpOMWdY/GVdwHsO/jfNcKbdZ4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trudheim.com; spf=pass smtp.mailfrom=trudheim.com; dkim=pass (1024-bit key) header.d=trudheim.com header.i=@trudheim.com header.b=VoBkcQVK; arc=none smtp.client-ip=213.80.101.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trudheim.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trudheim.com
+	s=arc-20240116; t=1716446707; c=relaxed/simple;
+	bh=EM8a77A2iiFqyEnlYVvRUbtWs6By5icLa68Sa/dY1sg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B8wV42NgYdhoOfhgnKbCNG6j4bp8zM0eRHGKDa9jADykMAXoQLEzYz2GYe1JlJDLdnxCMa9Ute/DKu4Aget5oJMvH5204jznGDVUfAZepKbxU+RkchYw1EYwUBA7VhU/HfB5iP5Mnn8Dx+dcWT96A+g6vYPuU9LsOXdCJiZL2GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=oypN2mHm; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by ste-pvt-msa1.bahnhof.se (Postfix) with ESMTP id A94283F42D;
-	Thu, 23 May 2024 08:39:13 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at bahnhof.se
-X-Spam-Flag: NO
-X-Spam-Score: -0.2
-X-Spam-Level:
-Authentication-Results: ste-pvt-msa1.bahnhof.se (amavisd-new);
-	dkim=pass (1024-bit key) header.d=trudheim.com
-Received: from ste-pvt-msa1.bahnhof.se ([127.0.0.1])
-	by localhost (ste-pvt-msa1.bahnhof.se [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id etGxyT--jXR2; Thu, 23 May 2024 08:39:11 +0200 (CEST)
-Received: 
-	by ste-pvt-msa1.bahnhof.se (Postfix) with ESMTPA id EB53E3F42C;
-	Thu, 23 May 2024 08:39:10 +0200 (CEST)
-Received: from photonic.trudheim.com (photonic.trudheim.com [IPv6:2001:470:28:a8::5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	by a.mx.secunet.com (Postfix) with ESMTP id 9D62520854;
+	Thu, 23 May 2024 08:44:57 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id d9qEVe9sUX4c; Thu, 23 May 2024 08:44:57 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by trudheim.com (Postfix) with ESMTPSA id 431ED13A7E79;
-	Thu, 23 May 2024 08:39:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=trudheim.com;
-	s=trudheim; t=1716446345;
-	bh=zsj4Zo+gcnm2Fbjx8fu4XlnNgVixHHqGce4SSfLKHfY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=VoBkcQVKt7DUgvpmW95IWSo9u8Wfu12ePgKvT8eS+OsOe4X2XHIp+LmhO5RqqCazr
-	 Z8kQLpt4pgmVRmWV0nhMIgAVDsx601iWtAp/iySKfmJXg5ce963CwjlXr28VO+uiGb
-	 BQ9FHfSxzyFW6knIy4Afgfv6MfEyhwYn+zqY/53M=
-Date: Thu, 23 May 2024 08:39:04 +0200
-From: Sirius <sirius@trudheim.com>
-To: Gedalya <gedalya@gedalya.net>
-Cc: netdev@vger.kernel.org
-Subject: Re: iproute2: color output should assume dark background
-Message-ID: <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
-References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
+	by a.mx.secunet.com (Postfix) with ESMTPS id 11EFC2083B;
+	Thu, 23 May 2024 08:44:57 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 11EFC2083B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1716446697;
+	bh=2V/wG8w0jyt+Fah1IaXk36eL0w8oceM2xybCoa0vqaM=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=oypN2mHmLuCKODOHbgC/WCs56Vf7c+yJSP0BtFABuyaHMOLvPm23fOESmuoeTbc3+
+	 xq/gdalqAOZwhiYsPmGXTQ/24xLeHex+szmr2aTi5Ej3EKzIErI2542APnijTYOIEV
+	 9xGrMQOOIrzS7mX0DtLv061K9tnG6oa8lF5SLqX5uHZE+hFQfIEF/b3c49hZemPHDI
+	 XbxNT3ybDB0wdv9Y/Pa9UVUTOWsFlTL4eXQZWI5YW6AemFu5F+IpRfEiwLAc+wlMUC
+	 LIUa5Ef1qManQZ0/XiuCivxLGD8HxzpIK7b3JTe1dZihAJ4rw2eZ9PHytMxq583+B+
+	 wX+Aicpvms2XA==
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout1.secunet.com (Postfix) with ESMTP id 01EDB80004A;
+	Thu, 23 May 2024 08:44:56 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 23 May 2024 08:44:56 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 23 May
+ 2024 08:44:56 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 1CB133180A0F; Thu, 23 May 2024 08:44:56 +0200 (CEST)
+Date: Thu, 23 May 2024 08:44:56 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Jianbo Liu <jianbol@nvidia.com>
+CC: Leon Romanovsky <leonro@nvidia.com>, "edumazet@google.com"
+	<edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"fw@strlen.de" <fw@strlen.de>
+Subject: Re: [PATCH net] net: drop secpath extension before skb deferral free
+Message-ID: <Zk7l6MChwKkjbTJx@gauss3.secunet.de>
+References: <20240513100246.85173-1-jianbol@nvidia.com>
+ <CANn89iLLk5PvbMa20C=eS0m=chAsgzY-fWnyEsp6L5QouDPcNg@mail.gmail.com>
+ <be732cc7427e09500467e30dd09dac621226568f.camel@nvidia.com>
+ <CANn89i+BGcnzJutnUFm_y-Xx66gBCh0yhgq_umk5YFMuFf6C4g@mail.gmail.com>
+ <14d383ebd61980ecf07430255a2de730257d3dde.camel@nvidia.com>
+ <Zk28Lg9/n59Kdsp1@gauss3.secunet.de>
+ <4d6e7b9c11c24eb4d9df593a9cab825549dd02c2.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Disposition: inline
-In-Reply-To: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
-Autocrypt: addr=sirius@trudheim.com; keydata=
-	mDMEZfWzYhYJKwYBBAHaRw8BAQdA12OXNGLFcQh7/u0TP9+LmaZCQcDJ5ikNVUR6Uv++NQy0HFN
-	pcml1cyA8c2lyaXVzQHRydWRoZWltLmNvbT6IkAQTFggAOBYhBP4MEykW8GvNTTxpa4Pq//Pg5C
-	PuBQJl9bNiAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEIPq//Pg5CPuatYA/3QLv92lC
-	7xfhdf7NgmqipA+DXyobhzn9JgwLpRQQcu0AQD77L+EQ3aiyga7NR15r2IRC4DDLFK9Mnsbvi+K
-	ZHmdBbg4BGX1s2ISCisGAQQBl1UBBQEBB0AZotbLXS2sTulJhpCsxrd9be2zedV47TV8CInC4nt
-	9PQMBCAeIeAQYFggAIBYhBP4MEykW8GvNTTxpa4Pq//Pg5CPuBQJl9bNiAhsMAAoJEIPq//Pg5C
-	PubFIA/3d2DFaXz0WJ1zq/tSacU7fckFQ7KFwddlyI7Y+IiosmAQCnBrV+e1iJXnZRSZCGBu+Xt
-	BMLXZe+WKVyzQ0/AWV5Ag==
-X-MailScanner-ID: 431ED13A7E79.A524F
-X-MailScanner: Found to be clean
-X-MailScanner-From: sirius@trudheim.com
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4d6e7b9c11c24eb4d9df593a9cab825549dd02c2.camel@nvidia.com>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-In days of yore (Thu, 23 May 2024), Gedalya thus quoth: 
-> Hello,
-
-Good morning,
-
-> Debian is now building iproute2 with color output on by default. This
-> brings attention to the fact that iproute2 defaults to a color palette
-> suitable for light backgrounds.
+On Thu, May 23, 2024 at 02:22:38AM +0000, Jianbo Liu wrote:
+> On Wed, 2024-05-22 at 11:34 +0200, Steffen Klassert wrote:
+> > 
+> > Maybe we should directly remove the device from the xfrm_state
+> > when the decice goes down, this should catch all the cases.
+> > 
+> > I think about something like this (untested) patch:
+> > 
+> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> > index 0c306473a79d..ba402275ab57 100644
+> > --- a/net/xfrm/xfrm_state.c
+> > +++ b/net/xfrm/xfrm_state.c
+> > @@ -867,7 +867,11 @@ int xfrm_dev_state_flush(struct net *net, struct
+> > net_device *dev, bool task_vali
+> >                                 xfrm_state_hold(x);
+> >                                 spin_unlock_bh(&net-
+> > >xfrm.xfrm_state_lock);
+> >  
+> > -                               err = xfrm_state_delete(x);
+> > +                               spin_lock_bh(&x->lock);
+> > +                               err = __xfrm_state_delete(x);
+> > +                               xfrm_dev_state_free(x);
+> > +                               spin_unlock_bh(&x->lock);
+> > +
+> >                                 xfrm_audit_state_delete(x, err ? 0 :
+> > 1,
+> >                                                         task_valid);
+> >                                 xfrm_state_put(x);
+> > 
+> > The secpath is still attached to all skbs, but the hang on device
+> > unregister should go away.
 > 
-> The COLORFGBG environment variable, if present and correctly set would
-> select a dark background. However COLORFGBG is neither ubiquitous nor
-> standard. It wouldn't typically be present in a non-graphical vt, nor is
-> it presnet in XFCE and many other desktop environments.
-> 
-> Dark backgrounds seem to be the more common default, and it seems many
-> people stick to that in actual use.
+> It didn't fix the issue.
 
-FWIW, I use a light background as that is easier for me to read.
+Do you have a backtrace of the ref_tracker?
 
-Might I suggest that instead of fueling a bikeshed war about what terminal
-background should be used, read what the background is of the console and
-adapt the foreground colours to that. I would guess that means holding two
-sets of the eight colours and if the background is "dark", use the lighter
-set and if the background is "light", use the darker set. Then the
-variable is superfluous.
+Is that with packet offload?
 
-Make it usable for everyone rather than just a subset of users based on
-personal preference.
-
-> The dark blue used by the ip command for IPv6 addresses is particularly
-> hard to read on a dark background. It's really important for the ip
-> command to provide basic usability e.g. when manually bringing up
-> networking at the console in an emergency. I find that fiddling with
-> extra details just to disable or improve the colors would be an
-> unwelcome nuisance in such situations, but the Debian maintainer
-> outright refuses to revert this change, without explanation or
-> discussion.
-> 
-> Instead the maintainer suggested I submit a patch upstream, which I will
-> do. I've never contributed here before, so your patience and guidance
-> would be very highly appreciated.
-> 
-> Ref: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1071582
-
-Kudos for that.
-
--- 
-Kind regards,
-
-/S
+Looks like we need to remove the device from the xfrm_policy
+too if packet offload is used.
 
