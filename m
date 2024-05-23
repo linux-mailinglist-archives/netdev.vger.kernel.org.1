@@ -1,74 +1,70 @@
-Return-Path: <netdev+bounces-97722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E10F88CCE13
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 10:15:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B36468CCE1A
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 10:18:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8325F1F210ED
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 08:15:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4ED71C20B5A
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 08:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8546213B2B2;
-	Thu, 23 May 2024 08:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E5C13C9BE;
+	Thu, 23 May 2024 08:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=trudheim.com header.i=@trudheim.com header.b="aPOfNiqr"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XKFAr1GJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pio-pvt-msa2.bahnhof.se (pio-pvt-msa2.bahnhof.se [79.136.2.41])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4926413B2A0
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 08:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.136.2.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4D77CF39;
+	Thu, 23 May 2024 08:18:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716452141; cv=none; b=Pbfoto0cUDZnFjFeLjsGGf/AFsLsxwK1Glrd1tltbzgOZ5Fjy1QZLVIv1GHoSUQeXvCwTK8VheS0Aw+N5Vi6L6M1A7mnqPlKcG7jKGE7jZ0SHiQ96+gwv4JSjLEePp6WpPDp5Rlw2VEKzTKN5yhoq2eRyXdEq7sUgHdCSQyobUg=
+	t=1716452302; cv=none; b=o4nGNEAZGGz6wefsbRyezq/a98C6PKuDpf0lguHjqf75Q7kbpP+DwqanPdZXtq+tKrNt6fKuBkztbXsSsooZFPK47CYxF9uZEtJCVa1dhvwLSo5+rehj8kRUCxtCMFdQJeGijQLdaOT1giWQ5WJmTkXAGt3NcMjy3hPIOe1yeiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716452141; c=relaxed/simple;
-	bh=bxUddqk3a4EHLTOx7U3m6dTvxlq9Zw3qmQAtFkrdLBc=;
+	s=arc-20240116; t=1716452302; c=relaxed/simple;
+	bh=W1EJy3uQTcCeTDDtvxDKkfXdw1GfkMNaXSPZiWwzij8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qgUAbSj7unjOzXaMHGiEQ/DiyA+PGg3Fb0Pb9kk39u3eID5FqcAuLYHm53iJgdt0cZQsWQzCcIDXTm/mPv/fI1Cu5uZziR2s21/O7ErcMO1CtqHI/Mlun009PKOIDaXMXd386JuihNy4/zpDaAmzOjk6yULXW3OPxsbb6eM7xxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trudheim.com; spf=pass smtp.mailfrom=trudheim.com; dkim=pass (1024-bit key) header.d=trudheim.com header.i=@trudheim.com header.b=aPOfNiqr; arc=none smtp.client-ip=79.136.2.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trudheim.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trudheim.com
-Received: from localhost (localhost [127.0.0.1])
-	by pio-pvt-msa2.bahnhof.se (Postfix) with ESMTP id BAE953F496;
-	Thu, 23 May 2024 10:05:53 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at bahnhof.se
-X-Spam-Flag: NO
-X-Spam-Score: -2.099
-X-Spam-Level:
-Authentication-Results: pio-pvt-msa2.bahnhof.se (amavisd-new);
-	dkim=pass (1024-bit key) header.d=trudheim.com
-Received: from pio-pvt-msa2.bahnhof.se ([127.0.0.1])
-	by localhost (pio-pvt-msa2.bahnhof.se [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nsqEyh0V-I3W; Thu, 23 May 2024 10:05:52 +0200 (CEST)
-Received: 
-	by pio-pvt-msa2.bahnhof.se (Postfix) with ESMTPA id 9A3683F422;
-	Thu, 23 May 2024 10:05:52 +0200 (CEST)
-Received: from photonic.trudheim.com (photonic.trudheim.com [IPv6:2001:470:28:a8::5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by trudheim.com (Postfix) with ESMTPSA id 4936713AB202;
-	Thu, 23 May 2024 10:05:49 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=trudheim.com;
-	s=trudheim; t=1716451549;
-	bh=bxUddqk3a4EHLTOx7U3m6dTvxlq9Zw3qmQAtFkrdLBc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=aPOfNiqr+8bMRp9kTjA2zmiNXQxiguc2rC8LvNC1PNmQ0mpIPbmuXS+nbT3cBZyjl
-	 tXgncJ1WB9lLskbXfztI0j/eDjOvsuDUQd0wFwcBM84IrXrVxVkKCTE2zSiQt6pyNs
-	 2RZvflSkzbJ2fFf5wApj3QtOyL4V7oSN5YXlZFXE=
-Date: Thu, 23 May 2024 10:05:48 +0200
-From: Sirius <sirius@trudheim.com>
-To: Gedalya <gedalya@gedalya.net>
-Cc: netdev@vger.kernel.org
-Subject: Re: iproute2: color output should assume dark background
-Message-ID: <Zk743CuHshWWVJq5@photonic.trudheim.com>
-References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
- <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
- <96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
- <Zk722SwDWVe35Ssu@photonic.trudheim.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ckjMHYoDfJfhBd7n1J5pqIjIeIa3PSJ9GP3/fCsVA9nW3d2zp6gs7DuDo15VWeFX1si4WOzepW2BqiHO95h4qyFxFf6aqQSlD7unCUrr3MpUm9fH7RYMcLRIX9KTrh7TYBPv5DqPb49axHllwSOSfDyJxBYuX98Q5AGJSxZwWGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XKFAr1GJ; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=W1EJy3uQTcCeTDDtvxDKkfXdw1GfkMNaXSPZiWwzij8=; b=XKFAr1GJJmpkVh7yZJc5BvdDtI
+	8i5Rk56l5wngYvrrIbWqP3+akuy/paJB1MALpyklH1OcpnOKPO4wFvTjHm56ueNiADXNSaS7XJHvV
+	zc/czPEqw/SpcetP2PnNxBUrHOu2JOqffwCBPCjvUHriJB610I/yewU7U06ZzeRxcgTCD6+JWCiSS
+	Yfw/4fST7OrSI4bS1xZDN0GWV244s2CkR1/YqB249GZ5+HnFeZ7X7/jK/SCgD0GMxFv6sQk1J83oL
+	BU3Tj/IqaywjlH0zWoYCvkv2Sxc3oqlZdnFO7BfAOjf3ZiakhM1uvQ4LIWpwK7Bka9lZqa+NNEDJR
+	SGpV4XDQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sA3eR-00000005Ubo-2u6M;
+	Thu, 23 May 2024 08:18:15 +0000
+Date: Thu, 23 May 2024 01:18:15 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: =?iso-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>
+Cc: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
+	Allison Henderson <allison.henderson@oracle.com>,
+	Manjunath Patil <manjunath.b.patil@oracle.com>,
+	Mark Zhang <markzhang@nvidia.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Shiraz Saleem <shiraz.saleem@intel.com>,
+	Yang Li <yang.lee@linux.alibaba.com>
+Subject: Re: [PATCH v3 0/6] rds: rdma: Add ability to force GFP_NOIO
+Message-ID: <Zk77x71LCqlgIING@infradead.org>
+References: <20240522135444.1685642-1-haakon.bugge@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,46 +73,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zk722SwDWVe35Ssu@photonic.trudheim.com>
-Autocrypt: addr=sirius@trudheim.com; keydata=
-	mDMEZfWzYhYJKwYBBAHaRw8BAQdA12OXNGLFcQh7/u0TP9+LmaZCQcDJ5ikNVUR6Uv++NQy0HFN
-	pcml1cyA8c2lyaXVzQHRydWRoZWltLmNvbT6IkAQTFggAOBYhBP4MEykW8GvNTTxpa4Pq//Pg5C
-	PuBQJl9bNiAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEIPq//Pg5CPuatYA/3QLv92lC
-	7xfhdf7NgmqipA+DXyobhzn9JgwLpRQQcu0AQD77L+EQ3aiyga7NR15r2IRC4DDLFK9Mnsbvi+K
-	ZHmdBbg4BGX1s2ISCisGAQQBl1UBBQEBB0AZotbLXS2sTulJhpCsxrd9be2zedV47TV8CInC4nt
-	9PQMBCAeIeAQYFggAIBYhBP4MEykW8GvNTTxpa4Pq//Pg5CPuBQJl9bNiAhsMAAoJEIPq//Pg5C
-	PubFIA/3d2DFaXz0WJ1zq/tSacU7fckFQ7KFwddlyI7Y+IiosmAQCnBrV+e1iJXnZRSZCGBu+Xt
-	BMLXZe+WKVyzQ0/AWV5Ag==
-X-MailScanner-ID: 4936713AB202.A38D2
-X-MailScanner: Found to be clean
-X-MailScanner-From: sirius@trudheim.com
+In-Reply-To: <20240522135444.1685642-1-haakon.bugge@oracle.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-In days of yore (Thu, 23 May 2024), Sirius thus quoth: 
-> In days of yore (Thu, 23 May 2024), Gedalya thus quoth: 
-> > On 5/23/24 2:39 PM, Sirius wrote:
-> > > read what the background is of the console
-> > That's COLORFGBG. It is set by some terminal emulators as a way to
-> > advertise the colors being used.
-> > 
-> > I'm no expert but AFAIK there is no uniform way to do this that is
-> > supported by all major terminal emulators.
-> 
-> https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Control-Bytes_-Characters_-and-Sequences
-> https://stackoverflow.com/questions/2507337/how-to-determine-a-terminals-background-color
-> 
-> If you colour the output, then handling the prospect that the background
-> might not be the assumed colour kind of comes with the territory.
-> Or you deliberately set the background colour to something so that it is
-> not undefined. That is what the ANSI colour sequences can do when you use
-> strings like \e[32;47m where you deliberately set the background.
+Still NAK with the same reason as the previous round.
 
-https://github.com/dalance/termbg
-
-Someone already did the hard work. Just use that library and you can
-detect the background colour or whether a theme is light or dark.
-
--- 
-Kind regards,
-
-/S
 
