@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-97769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BD5C8CD14C
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:34:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE5AB8CD160
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:39:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7363F1C210FE
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 11:34:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8399D283537
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 11:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6B8A13E3F2;
-	Thu, 23 May 2024 11:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B8113D2A8;
+	Thu, 23 May 2024 11:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="pyEp80TW"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="afHhOJku"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF91BBA2F;
-	Thu, 23 May 2024 11:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630AD13C8FF;
+	Thu, 23 May 2024 11:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716464062; cv=none; b=uJrURL4VyzmNXCD+B4fEjiYY9IlxyOIr9bbFXgWecHo93pC8cDhZk8vaJRd0B5S9v6LLXxzlc8N614+ZIDBMb6YLlkyepXgIb1SKOWA5kqVz+AfntsmZdnG7L+OeYuXBbl2XxY97PqSP5LCJb1P7qafyNmFfLLY1MksswI4AuYw=
+	t=1716464377; cv=none; b=IGFYMlQa9mb86VR1d/boQcocNhytiVG18OBDEJAMB6zLtOV6FX2fDeNhUyEJYNmwKKnJ9hnAhF7Mz8lEU4atzVoSF8jSJAFlgmF4IFHdeo+pzJxuVnlqwGR1Mm5cV0+vBYvlvbjovH7ZoxJY9bB8oCPNHSB5DMZhcyw29Gv7mBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716464062; c=relaxed/simple;
-	bh=x/F9LRjG86L3igI7XUfcG8NAtYjBAyxlWrjUdapL0ck=;
+	s=arc-20240116; t=1716464377; c=relaxed/simple;
+	bh=w8jWi4je3moYWW+1PYvpd/udmlXfbZl7Sd4Y1C15ytQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ImVzH5xAqDhYoNRA1f9xyfRXSUCYnA+E8t7PERliOPXVu2e4J9NB72hHmjQLXj355lOEfPHKCwT3AY8MpJtENM7kb354Zdc98GMqM/iG2ot5sbbDUyepBZTzabmD7a9GFYFQSSCS59p81N4tHxOumSn4FRGNFTMAeDq8R22PphY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=pyEp80TW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E556AC2BD10;
-	Thu, 23 May 2024 11:34:21 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=k843cHp+vxm0Nm1PrUxCQ3EBLpU9GFL82rQ9pAjgIqMUAJiag8S0MW2lDxBGToxZoOb01GKOtBQt6YJpQn16NlyOTHhNQC+Mrk3QnQb5OkQ1Im5ARZFlqFt3ppM2GHpMgIUgD7HIIKQKi1Arx+v3kHeM4GIhy4h6gpcQBdG8f08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=afHhOJku; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BC9AC2BD10;
+	Thu, 23 May 2024 11:39:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1716464062;
-	bh=x/F9LRjG86L3igI7XUfcG8NAtYjBAyxlWrjUdapL0ck=;
+	s=korg; t=1716464376;
+	bh=w8jWi4je3moYWW+1PYvpd/udmlXfbZl7Sd4Y1C15ytQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pyEp80TWjGEXXzsl7LKL/sF7j4OiR8gs1hAuVpOqVjVeuTO4/kp4xmDeSQApKv1bx
-	 JYyfLyKfBA2rhv7AwyvxpxJvf2Vg1V4Hmf/qkLLVInDU2kKts6PZhqz8WHu9UN2gdW
-	 lM6mqSGXN7vTkfGjL6Qbr7JP2p+1wzRrqRSL29qI=
-Date: Thu, 23 May 2024 13:34:19 +0200
+	b=afHhOJkuYLsVxCYBTtHV3QORq9M6VymtysX0aI3oGjhH+DDXgI3uNQwJbJDUs0j0i
+	 kXOOju9Ebt3TnPwFu7HQ1ekanI44kUifR+NxJbCLh4o1tl5ecLcRMG/HadQXe4eV2r
+	 wY4rxjpAYPuFUH2bMlFFhuWJ0OPL1Pnz8VORbEGE=
+Date: Thu, 23 May 2024 13:39:34 +0200
 From: Greg KH <gregkh@linuxfoundation.org>
 To: Zhengchao Shao <shaozhengchao@huawei.com>
 Cc: stable@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
@@ -47,7 +47,7 @@ Cc: stable@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
 	yuehaibing@huawei.com
 Subject: Re: [PATCH stable,5.15 0/2] Revert the patchset for fix
  CVE-2024-26865
-Message-ID: <2024052355-doze-implicate-236d@gregkh>
+Message-ID: <2024052305-almanac-reseal-9f91@gregkh>
 References: <20240506030554.3168143-1-shaozhengchao@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -63,11 +63,10 @@ On Mon, May 06, 2024 at 11:05:52AM +0800, Zhengchao Shao wrote:
 > There's no "pernet" variable in the struct hashinfo. The "pernet" variable
 > is introduced from v6.1-rc1. Revert pre-patch and post-patch.
 
-I do not understand, why are these reverts needed?
+But right now, there is no "pernet" variable in the tree.
 
-How does the code currently build if there is no variable here?
-
-confused,
+I'm confused, what are you trying to do here by reverting these two
+commits?  Why are reverts required?
 
 greg k-h
 
