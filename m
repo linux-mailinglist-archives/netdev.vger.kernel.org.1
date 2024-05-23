@@ -1,132 +1,111 @@
-Return-Path: <netdev+bounces-97705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 163DE8CCD1A
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:36:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A7D8CCD31
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:43:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 478C91C210EA
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 07:36:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE243B217D6
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 07:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83AA813B59C;
-	Thu, 23 May 2024 07:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D8413C9CD;
+	Thu, 23 May 2024 07:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VMvJA7Az"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="DTgbxwgq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1E8339A0;
-	Thu, 23 May 2024 07:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE343B29D;
+	Thu, 23 May 2024 07:43:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716449807; cv=none; b=mguWZbjEKxJYoVyQfDoMRFik1ftngBNydcGUmNTLCA/odoCN2CALrTK2qv0MAZgSsMuHDNucjI+Pb+OiRBSPx2Ns3+GSAK+GXrnnMKQDHj0bCBT3a7NujLVWK7SgLDDGjGJe75vvdz+G4BZJy14GuwKp4RSmKNZR/c2hG9hH6ag=
+	t=1716450207; cv=none; b=OfErQklekUbhkI5XnI+Ejg2JVexbgxcc58FyFwnK+OUw7H/YW0RioDBBrt4CZTT16hVJgTRt1uTttmFQc98R9rr3+VmBG5GoMiaNtEqEnymNUER0tpbSGWt4czb822GKD5zcmRJ5s+fryZSECwpI39W4vsj++uwt+novHnQ9owk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716449807; c=relaxed/simple;
-	bh=1dupYVzHMBIKdXDOUWquSr5ptPsMO6bdaJA+3SW+QhU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=POtlYyuc7VrzbP65lbq8ImFLPYS56qEVok68IokJzR7QSzqbGMJ0Js3OEFEHGGErJtI4ND1lYOB4WXWdzfPgHp0OlHf6cS94msniqoc1pOTzW+D0zXB1daVrc52nMuUNR0wyrfYcCi/sVQM+9WIPHoXC+RTW7EbwST6N7h8QMqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=VMvJA7Az; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44N4lN0u003907;
-	Thu, 23 May 2024 00:36:32 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	pfpt0220; bh=omQIKGTAw0G43e4lrwbPbbU3X9ktPiGbrIhpY/YNGhc=; b=VMv
-	JA7AzJZE+IaJUdNgurzGrAQePD6KUw980a3J0VMgJYm3EswaKkgd24uwtzqErcW5
-	T5yjQkxlGNuF7Fmm0/mnXEx7brERpAUpgKgMs4ggwGKvU3eQx8i4zPtTAnSdIor4
-	VIE9dvjAkhgsmtw9Oau82L36cah/lym9zp95tgnlMYpl9Pm5oGzxVHBfqdWmjh3f
-	sgUAjr+3Zzff3naypVk0xywzOCizmeWjIz8J/OIYjXfk8FRL1eQ6g59bsn8CN3WN
-	mNCnDLc8pApAuW+wkx1xaLzYfKNb4w8HPozmi9LHu3EKk1gzMNl1zK3VRaCDGb3p
-	CXLdg8odH6an93Jexpg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3y9y310eb4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 May 2024 00:36:32 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 23 May 2024 00:36:31 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 23 May 2024 00:36:31 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 110C63F7045;
-	Thu, 23 May 2024 00:36:27 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-        <davem@davemloft.net>, <sbhatta@marvell.com>, <gakula@marvell.com>,
-        <sgoutham@marvell.com>, <naveenm@marvell.com>
-Subject: [net] Octeontx2-pf: Free send queue buffers incase of leaf to inner
-Date: Thu, 23 May 2024 13:06:26 +0530
-Message-ID: <20240523073626.4114-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1716450207; c=relaxed/simple;
+	bh=hx8x5NT6gYjGcXh/GIKgZ9Q3VtbgTcRowFPOrTkUOQI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kOB0YjeGSzH6/LC24Jmxgz/jvIXvpZxNEPjAxyUHNQErgjrewF+G+TSBEVKfuJrN9lvjPFZbpd0ttHnifiw2ACg2LIScwhS229+OzxHFk3fdIL+SyZtK9qVOTMd6rQtC/GltWKVTiNoGuyL3Fe74BfpwN2vu7TUArTVGQb+2Nks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=DTgbxwgq; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1716450205; x=1747986205;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=hx8x5NT6gYjGcXh/GIKgZ9Q3VtbgTcRowFPOrTkUOQI=;
+  b=DTgbxwgqcLlp/+G2Qp+g73mG6VhHF2nSlKORlOQ336Dj0yHBStzzNCbx
+   LDKPgTlt56HDCVGQRImPyXAWle5CvfkZ2Z0oyfKE+Z02Z+xLl1IimgAzi
+   8oS3GayvdruJVzhdOH/33Bk5+ViuVKRLbw4TGL5n+y3epHTg38eXqMqBb
+   m0OLMwKSICHuv9ZvfBhUsvj/IHWsCRHl1YzYRkaRwUCkom4N8xU0YkgRY
+   s4q0QcgZpfs7GCV6yKZAuVMC8BYmkSYw9Pgiu35Bl05zuraZ58PBarCCm
+   mJ3kLhx4HuTpsdjKmkzYqDuc6BvqB9brxfKUSW20THHqiBZyoJyAUbHwO
+   g==;
+X-CSE-ConnectionGUID: fDMj33hCS5iEOCfkyK243g==
+X-CSE-MsgGUID: v3vEib1/SUGLu1Ii73sKbw==
+X-IronPort-AV: E=Sophos;i="6.08,181,1712646000"; 
+   d="scan'208";a="26474956"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 May 2024 00:43:23 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 23 May 2024 00:42:33 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Thu, 23 May 2024 00:42:31 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net] net: micrel: Fix lan8841_config_intr after getting out of sleep mode
+Date: Thu, 23 May 2024 09:42:26 +0200
+Message-ID: <20240523074226.3540332-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-GUID: EYgap4YHGi4DU8Dsp84L535Q8sqcytRG
-X-Proofpoint-ORIG-GUID: EYgap4YHGi4DU8Dsp84L535Q8sqcytRG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-23_04,2024-05-22_01,2024-05-17_01
 
-There are two type of classes. "Leaf classes" that are  the
-bottom of the class hierarchy. "Inner classes" that are neither
-the root class nor leaf classes. QoS rules can only specify leaf
-classes as targets for traffic.
+When the interrupt is enabled, the function lan8841_config_intr tries to
+clear any pending interrupts by reading the interrupt status, then
+checks the return value for errors and then continue to enable the
+interrupt. It has been seen that once the system gets out of sleep mode,
+the interrupt status has the value 0x400 meaning that the PHY detected
+that the link was in low power. That is correct value but the problem is
+that the check is wrong.  We try to check for errors but we return an
+error also in this case which is not an error. Therefore fix this by
+returning only when there is an error.
 
-			 Root
-		        /  \
-		       /    \
-                      1      2
-                             /\
-                            /  \
-                           4    5
-               classes 1,4 and 5 are leaf classes.
-               class 2 is a inner class.
-
-When a leaf class made as inner, or vice versa, resources associated
-with send queue (send queue buffers and transmit schedulers) are not
-getting freed.
-
-Fixes: 5e6808b4c68d ("octeontx2-pf: Add support for HTB offload")
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Fixes: a8f1a19d27ef ("net: micrel: Add support for lan8841 PHY")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 ---
- drivers/net/ethernet/marvell/octeontx2/nic/qos.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/phy/micrel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-index 070711df612e..edac008099c0 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-@@ -1422,7 +1422,10 @@ static int otx2_qos_leaf_to_inner(struct otx2_nic *pfvf, u16 classid,
- 	otx2_qos_read_txschq_cfg(pfvf, node, old_cfg);
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 13e30ea7eec5d..79477f0c90d82 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -4029,7 +4029,7 @@ static int lan8841_config_intr(struct phy_device *phydev)
  
- 	/* delete the txschq nodes allocated for this node */
-+	otx2_qos_disable_sq(pfvf, qid);
-+	otx2_qos_free_hw_node_schq(pfvf, node);
- 	otx2_qos_free_sw_node_schq(pfvf, node);
-+	pfvf->qos.qid_to_sqmap[qid] = OTX2_QOS_INVALID_SQ;
+ 	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
+ 		err = phy_read(phydev, LAN8814_INTS);
+-		if (err)
++		if (err < 0)
+ 			return err;
  
- 	/* mark this node as htb inner node */
- 	WRITE_ONCE(node->qid, OTX2_QOS_QID_INNER);
-@@ -1632,6 +1635,7 @@ static int otx2_qos_leaf_del_last(struct otx2_nic *pfvf, u16 classid, bool force
- 		dwrr_del_node = true;
- 
- 	/* destroy the leaf node */
-+	otx2_qos_disable_sq(pfvf, qid);
- 	otx2_qos_destroy_node(pfvf, node);
- 	pfvf->qos.qid_to_sqmap[qid] = OTX2_QOS_INVALID_SQ;
- 
+ 		/* Enable / disable interrupts. It is OK to enable PTP interrupt
 -- 
-2.17.1
+2.34.1
 
 
