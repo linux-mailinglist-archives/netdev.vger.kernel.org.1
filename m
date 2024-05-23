@@ -1,73 +1,50 @@
-Return-Path: <netdev+bounces-97729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 687C68CCEA6
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 10:53:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 074288CCEB2
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 11:00:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 921C2B224BD
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 08:53:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9102BB20B9F
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:00:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E10A13D240;
-	Thu, 23 May 2024 08:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 400C913CABF;
+	Thu, 23 May 2024 09:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="mUlfm8Lk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKLLuiGs"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68F2339A0;
-	Thu, 23 May 2024 08:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C27413C9B9
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 09:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716454419; cv=none; b=pQ3J4B1ASnWlIrG8jVdjrp+w0taHTj6gv4V0mwsq/MNizCZCs0N9ccip0chC8Ma2S85H4IeBg8624LcW/4gA/siPEcWXLqAapsXxbD3lavjfqJheytM6eZJ5X/wDmpPYXYcntebfNoqZCcxA01cT5meA4EPSm649mkXrDNmVpOk=
+	t=1716454830; cv=none; b=m07I2uaGoOL6J4j3NVZdGseaZEnh0Qch7TUWilQBiRzY9ZU5+2hfuLkHuMN0t3b48t+8aeKtVoclSbvoBGdK88EcpjIztIa54u8BNhETPEeE3UWXoDztTjVSdreZ6Cu316uhLtVRkxSLjRq3UnJO0vZGOHLLQmgiiLECJ8i6w2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716454419; c=relaxed/simple;
-	bh=f+FM0Szq7PCxoqI/dTytc3od6T5lYIl+Cf/sm7v/EZk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=te93kWul4wFr8+NsneF6x5t7Em0Lne3EKx4vwNEyiQ1oceKdMonNo74aC7dM4ytigfyl/b5CJ+C2REXzHGKZtM83YLkPWHLl1+e/slV1UMA3jViK0YPstzVgg8eg7f39CxpZ6cDMzuOJsMwnzszCS+Ntx4/1gPrQXFFpZYC02a4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=mUlfm8Lk; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1716454418; x=1747990418;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=f+FM0Szq7PCxoqI/dTytc3od6T5lYIl+Cf/sm7v/EZk=;
-  b=mUlfm8LknpJilAKLZ/v8Ti5dukx8fZ3iSQ0lg4+C2Su+FOgJFUo1mNv4
-   5i33v/fqHUQ8xHoCjOmvyh/eIEilGZMkWIOb5rbo8TX5plkxiM7V1cFK/
-   ZZ6i5UUxbQOqwbD2HPLB4IPvUb17gsyS5GzlRW6zgwOU9d4IgJ1u4wuwC
-   Dq2vtZ/xCsLkvYNEOk6xEdRqBxxlJODgqfRqDFl9+yvdPxzDkcfyu0/U8
-   KYdTYG/hel+VECimt/7wlmt7sg5vR8Vgy2svlAp+69WO2z8C/TvrbVlBe
-   E7iExowHWJbvSm/7zHTmDQ15lc4C2KXmYlRDaX+mzcMRKnfyi/no8Uu1B
-   g==;
-X-CSE-ConnectionGUID: W9KaXAE6RECszhEZa8KEWg==
-X-CSE-MsgGUID: d514tyr7Q9KlyWa+X27VZA==
-X-IronPort-AV: E=Sophos;i="6.08,182,1712646000"; 
-   d="scan'208";a="25876177"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 May 2024 01:53:36 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 23 May 2024 01:53:21 -0700
-Received: from che-ll-i17164.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Thu, 23 May 2024 01:53:17 -0700
-From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-To: <steve.glendinning@shawell.net>, <UNGLinuxDriver@microchip.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Parthiban Veerasooran
-	<Parthiban.Veerasooran@microchip.com>
-Subject: [PATCH] net: usb: smsc95xx: fix changing LED_SEL bit value updated from EEPROM
-Date: Thu, 23 May 2024 14:23:14 +0530
-Message-ID: <20240523085314.167650-1-Parthiban.Veerasooran@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1716454830; c=relaxed/simple;
+	bh=vQo7r9qQMrbUH1RG8pZdKZdwLId9bd3kdsavzhUfGGs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=N+z9eO68e6C8Qg/TpAFoec8a70MONw8MoaiEPmnxQLu+NU9hddm/SxFx28k5i0mAxfrixT8cbuNvjAxj5R3iolxmSU5YtB4hPxTiiBmJ0DNExf5hDIoRYGsP0YU8hpMxLKbetqbHuAR2R+Ey/YlmW/VFeOHAQ7WUKWD85Y5Ntbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKLLuiGs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9D238C32782;
+	Thu, 23 May 2024 09:00:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716454829;
+	bh=vQo7r9qQMrbUH1RG8pZdKZdwLId9bd3kdsavzhUfGGs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FKLLuiGsQf5T5BkJ1rJih/lyvrpskOLiZyGoiftF5kXJEozmBQDUO1Qy6jRVYUOCA
+	 wH8lRS1Mg5wCLp4DM9qzR3E8gjrBtxQOl05x9J+HktuzGX80l+S62Gg9bVzD/T1ARw
+	 +9wUJ/LMylbk15baMfov9TPDNlS7vvlEMbsKqo0MMi1CIDX1tuaWcCRRF+mTh4CSss
+	 5BkiGPgDSyR+PsEZV7xLhWkEeKCHtaRcC6JAdsIwI/njEuGBna+tghECekPTxsD9Yt
+	 SlSLazJUYPWLC2kSw/P0MnA7AaG17GBoBKaKLNLxXsDtYrJFanXKOPOzxl9eLg6j84
+	 DWZhVht4KKDQA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8ABEAC54BB2;
+	Thu, 23 May 2024 09:00:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,61 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Subject: Re: [PATCH net] Revert "ixgbe: Manual AN-37 for troublesome link
+ partners for X550 SFI"
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171645482956.18839.2859960511467827703.git-patchwork-notify@kernel.org>
+Date: Thu, 23 May 2024 09:00:29 +0000
+References: <20240520-net-2024-05-20-revert-silicom-switch-workaround-v1-1-50f80f261c94@intel.com>
+In-Reply-To: <20240520-net-2024-05-20-revert-silicom-switch-workaround-v1-1-50f80f261c94@intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org, jeffd@silicom-usa.com,
+ kernel.org-fo5k2w@ycharbi.fr
 
-LED Select (LED_SEL) bit in the LED General Purpose IO Configuration
-register is used to determine the functionality of external LED pins
-(Speed Indicator, Link and Activity Indicator, Full Duplex Link
-Indicator). The default value for this bit is 0 when no EEPROM is
-present. If a EEPROM is present, the default value is the value of the
-LED Select bit in the Configuration Flags of the EEPROM. A USB Reset or
-Lite Reset (LRST) will cause this bit to be restored to the image value
-last loaded from EEPROM, or to be set to 0 if no EEPROM is present.
+Hello:
 
-While configuring the dual purpose GPIO/LED pins to LED outputs in the
-LED General Purpose IO Configuration register, the LED_SEL bit is changed
-as 0 and resulting the configured value from the EEPROM is cleared. The
-issue is fixed by using read-modify-write approach.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Fixes: f293501c61c5 ("smsc95xx: configure LED outputs")
-Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
----
- drivers/net/usb/smsc95xx.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+On Mon, 20 May 2024 17:21:27 -0700 you wrote:
+> This reverts commit 565736048bd5f9888990569993c6b6bfdf6dcb6d.
+> 
+> According to the commit, it implements a manual AN-37 for some
+> "troublesome" Juniper MX5 switches. This appears to be a workaround for a
+> particular switch.
+> 
+> It has been reported that this causes a severe breakage for other switches,
+> including a Cisco 3560CX-12PD-S.
+> 
+> [...]
 
-diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
-index cbea24666479..8e82184be5e7 100644
---- a/drivers/net/usb/smsc95xx.c
-+++ b/drivers/net/usb/smsc95xx.c
-@@ -879,7 +879,7 @@ static int smsc95xx_start_rx_path(struct usbnet *dev)
- static int smsc95xx_reset(struct usbnet *dev)
- {
- 	struct smsc95xx_priv *pdata = dev->driver_priv;
--	u32 read_buf, write_buf, burst_cap;
-+	u32 read_buf, burst_cap;
- 	int ret = 0, timeout;
- 
- 	netif_dbg(dev, ifup, dev->net, "entering smsc95xx_reset\n");
-@@ -1003,10 +1003,13 @@ static int smsc95xx_reset(struct usbnet *dev)
- 		return ret;
- 	netif_dbg(dev, ifup, dev->net, "ID_REV = 0x%08x\n", read_buf);
- 
-+	ret = smsc95xx_read_reg(dev, LED_GPIO_CFG, &read_buf);
-+	if (ret < 0)
-+		return ret;
- 	/* Configure GPIO pins as LED outputs */
--	write_buf = LED_GPIO_CFG_SPD_LED | LED_GPIO_CFG_LNK_LED |
--		LED_GPIO_CFG_FDX_LED;
--	ret = smsc95xx_write_reg(dev, LED_GPIO_CFG, write_buf);
-+	read_buf |= LED_GPIO_CFG_SPD_LED | LED_GPIO_CFG_LNK_LED |
-+		    LED_GPIO_CFG_FDX_LED;
-+	ret = smsc95xx_write_reg(dev, LED_GPIO_CFG, read_buf);
- 	if (ret < 0)
- 		return ret;
- 
+Here is the summary with links:
+  - [net] Revert "ixgbe: Manual AN-37 for troublesome link partners for X550 SFI"
+    https://git.kernel.org/netdev/net/c/b35b1c0b4e16
 
-base-commit: 4b377b4868ef17b040065bd468668c707d2477a5
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
