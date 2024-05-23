@@ -1,194 +1,167 @@
-Return-Path: <netdev+bounces-97731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3EF58CCEC6
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 11:09:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B24C08CCED3
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 11:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2F272821F4
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:09:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 377A51F21E06
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:15:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F3313D240;
-	Thu, 23 May 2024 09:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5740C13D26B;
+	Thu, 23 May 2024 09:15:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="28JvoKxa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kh11Bsrr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f68.google.com (mail-ej1-f68.google.com [209.85.218.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2476A13CF93
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 09:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B7013CF93
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 09:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716455357; cv=none; b=HU/M10cZWg7y/xy64uFMQM+G3P231PGL5ryomw0NzMiPnfpRepRL+WE2h2Op9XPCmHK2B4ilPsN3JxXTfhpNGAqGrKSZQdyxMT0/4IKMd1it+h0oevd86lTxARpBUS0dz0YD7KUal/S0yNs8x6kb8vRuaFXex/7NPMP5jrHspJw=
+	t=1716455701; cv=none; b=fIZeYcXMX0TplpFr8jfKymcoTmv1IgbQ2CFPynRCiqhnMoLz/0dsQE7RlU72IkoCUKmvfQyHUkPzm3v03DwFIS9X5YMBzAjq0CYkQHoRqUtwRCwuhO4hc+x1Qn1qFfJVH6OPx7fsBia13aT7bir6OLVXLYG4alfLwi5hRITxTDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716455357; c=relaxed/simple;
-	bh=2JYubz4Ps7KPt7XXfcnmfocab4Yao251kcNtVlyrwQg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t96cwkgTJ7HQNX/HyBUACWsHvgWCSUNwIRv2MfvQKQZehkvwbefKGBJJM8STouMfLgga+kz0NBA3QwBqFg9VAP0HpU4wC0Y9w5Rg9Yxbbmv1IW2NXludrfVELF8OoStcxWueiUaIBjxM74Wfc+ejF613OWaUzVoXUuR4WLaK8MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=28JvoKxa; arc=none smtp.client-ip=209.85.218.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f68.google.com with SMTP id a640c23a62f3a-a5a5cce2ce6so988085766b.3
-        for <netdev@vger.kernel.org>; Thu, 23 May 2024 02:09:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1716455353; x=1717060153; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b5SD+2Q/n2VCUhgMsXmzgdogRkao4DuVxoUJaRKE3zs=;
-        b=28JvoKxa7Z2+KJslT11ZqKmXKZ4gRhyo2zbV7CQLvaITVKEzsH+FYQ8u6aePylETVj
-         0JQlfazPyNIHgM1zcA5i5cHqy63wLo1MO13wOsaUG4ogPE2kABn5st1R7f9rjqOgulb9
-         94bIaqqeShdDckGjC6gcLk+s0pMp016YVRIZH8U3GKoWkYDSzEjvKHzistX69QXls+QT
-         tZet7ORg6VpUPks7ErFQ1yXvr8zYLZDELaZIknRu21ICesgbe4sp7W3Dbjt5ZChvdjTn
-         hFnQXTtYYfOQEP4dQqluQ3kvsuuvqvwFma3n36wcRZotLw5eFdo+taVR/ow/XVOvfOwK
-         aUWw==
+	s=arc-20240116; t=1716455701; c=relaxed/simple;
+	bh=/lMyxSjqLAl6OgWHts/xND+IPoIxTxQRqei4HueBex0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mp5BBN0r7L54rC0YRjC6jn+nFDw0aTT334EbFxHeeOVEOjvLOg/2t0jAkPXsxY20XCI2G+yCBI/XhOqd9L6lyQ+bnGTXh7HH2rqu2bvL37fkZa3OCGRl3Ixiab0hGUjwbPV4WnXw2aqvlBFzG8dtfSZRccjnIo7fdnHfSQeYYf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kh11Bsrr; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716455698;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Z1PA5QvJHm8ykHTiGZm5aAca1OGkhXqgReaXY3/hb/k=;
+	b=Kh11BsrrmgaMTLw/6ARNc5JgGaol1+oPbNrllapKjK25kVDOTB3cm7fkIEN8/8CqyWfdZu
+	vv2bv0lhefQvoSSj1hLzkFkHAZxu7IPOHObQcmGptZt7n2iu7JO8Y/AGT34Z7ksh2BS4fW
+	Zl4/qT8pQWyF4byAukr1P8jSvSMuOCE=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-552-S6Bw9_bEPD6Vg5QdgqNIMw-1; Thu, 23 May 2024 05:14:56 -0400
+X-MC-Unique: S6Bw9_bEPD6Vg5QdgqNIMw-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-792c88ab364so26946185a.3
+        for <netdev@vger.kernel.org>; Thu, 23 May 2024 02:14:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716455353; x=1717060153;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b5SD+2Q/n2VCUhgMsXmzgdogRkao4DuVxoUJaRKE3zs=;
-        b=DixfwS1q87mvT+J+PkycrlzbSxk7LgPch9W52u/QtqpxqcvsstsVjH+BREgtwrfipP
-         elZaMwesdB2kzq3uF2E5nMJn/YiZq0oNKxrzxwPPOybQRa8/TbvfPlbre4XiErMoFPz4
-         N7wTzLU0/lnZJqIHY7hibTjSCW62hruzaIejUNS4u6rKkNCykgKOkS9vFBRGFuuZkvtt
-         rax5TdsjQ1z+tZ7nsJowqHdlDq9e0oKf0r5RWakS9zzShvGrPHCYHbY7xilmPfYkCsQG
-         dFINSgAWuvewLFpxcN/tRrUMs5E9I1GdGZo+pqt3/6qbMrpE95IP0LyW2EEIKrJR6W32
-         SUEg==
-X-Gm-Message-State: AOJu0YxgMF6Nyt7dCdI4CZGK9qzuz8+CBV+9TV9j7db5aOu52Y5XXAEq
-	HSt4M918rifu9EVZ+vyBHw20rSZmfFaYgFNn1al8CBmN786OrM62+Q7dz55uEog=
-X-Google-Smtp-Source: AGHT+IGIKGAZV9XaKjWzU+vREJX1dK+rJPHwqt9SCZ2GLUEZ7Q56Oak3zmq8tVmP7jrz5tuX6zi6zA==
-X-Received: by 2002:a17:906:ae41:b0:a59:f3f9:d24c with SMTP id a640c23a62f3a-a6228171dafmr272969466b.76.1716455353073;
-        Thu, 23 May 2024 02:09:13 -0700 (PDT)
-Received: from localhost (78-80-19-19.customers.tmcz.cz. [78.80.19.19])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a691870absm1444913866b.124.2024.05.23.02.09.11
+        d=1e100.net; s=20230601; t=1716455696; x=1717060496;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z1PA5QvJHm8ykHTiGZm5aAca1OGkhXqgReaXY3/hb/k=;
+        b=CJtAbZ8pSiTejS3tln7T41XxB19jZ7zwaV8Lcc6HiOIObZtoqbws38pihnywVTLCfv
+         PXVu3Jjmr6+oiYxd5Dk3lFjtaiA2xVWCAusEgEBST/H/hNpoGkQZB7RyzUCW9pp8lmU8
+         TBSkRO+7ZjxWZBRRdQth1KzW3v6bwwPNXnfmwTC03S6/W+pNHFKqGPvJUMXLJUqK+6/H
+         y8hncooJWO/yn7edO7D9N+JqUwLHDSsyKe0NMK9AKgrrQv+ywx+Tz/FcObOlg7vKUYvb
+         zdJQ8Y0HUowZVsTypLWb3RRhrOr1OJjpokZ6hENs+6DbVTVn21Qw1fbiw/vGLbcdjizU
+         1Ozg==
+X-Forwarded-Encrypted: i=1; AJvYcCUoVE7vSI9pKTv7seZ9KUmTuEQhvmVaoVT0lnMIy+7ui6q1QXqx1rbUZjFB+PtaLVA+DTwlGb8Z4cdC70n1D4nC6o2UB+Kd
+X-Gm-Message-State: AOJu0Yxa6sAcMGNA1iY/MRBgo9v0+hZct5XwdK8HiPtkfGKB1D9CnBOw
+	+yAEC5AzYYsjgNa9FpzYshwXGJcT5uCkpsWRNLWUd6zN93P/xZa18iERwDlTwrywn63LGwPOjQB
+	t5kxeY7qZGPsJpUA1jJOhtu2BDiCZdwUisbRolbvjLxmjWwi2EY9skA==
+X-Received: by 2002:a05:622a:1a27:b0:437:ca6d:13f1 with SMTP id d75a77b69052e-43f9e0b65e2mr43549911cf.2.1716455696286;
+        Thu, 23 May 2024 02:14:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IElwc+jZj9lrO25a2CjKzzWCgMw9ch4Fg63jKPkRB/jxh+xOlJFXYNQENPC+6K3Ua0ypfW6GQ==
+X-Received: by 2002:a05:622a:1a27:b0:437:ca6d:13f1 with SMTP id d75a77b69052e-43f9e0b65e2mr43549701cf.2.1716455695822;
+        Thu, 23 May 2024 02:14:55 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b094:ab10:29ae:cdc:4db4:a22a])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43e09f7862asm156096621cf.91.2024.05.23.02.14.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 May 2024 02:09:12 -0700 (PDT)
-Date: Thu, 23 May 2024 11:09:10 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net v2 2/2] Revert "virtio_net: Add a lock for per queue
- RX coalesce"
-Message-ID: <Zk8Hts3HrzFMV0p9@nanopsycho.orion>
-References: <20240523074651.3717-1-hengqi@linux.alibaba.com>
- <20240523074651.3717-3-hengqi@linux.alibaba.com>
+        Thu, 23 May 2024 02:14:55 -0700 (PDT)
+Message-ID: <e21fa14dd33ddac7dcdd08a50fcad3f87a8f76aa.camel@redhat.com>
+Subject: Re: [PATCH v2 net] net: fec: avoid lock evasion when reading
+ pps_enable
+From: Paolo Abeni <pabeni@redhat.com>
+To: Wei Fang <wei.fang@nxp.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, shenwei.wang@nxp.com, xiaoning.wang@nxp.com, 
+	richardcochran@gmail.com, andrew@lunn.ch, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Date: Thu, 23 May 2024 11:14:52 +0200
+In-Reply-To: <20240521023800.17102-1-wei.fang@nxp.com>
+References: <20240521023800.17102-1-wei.fang@nxp.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240523074651.3717-3-hengqi@linux.alibaba.com>
 
-Thu, May 23, 2024 at 09:46:51AM CEST, hengqi@linux.alibaba.com wrote:
->This reverts commit 4d4ac2ececd3c42a08dd32a6e3a4aaf25f7efe44.
->
->When the following snippet is run, lockdep will report a deadlock[1].
->
->  /* Acquire all queues dim_locks */
->  for (i = 0; i < vi->max_queue_pairs; i++)
->          mutex_lock(&vi->rq[i].dim_lock);
->
->There's no deadlock here because the vq locks are always taken
->in the same order, but lockdep can not figure it out, and we
->can not make each lock a separate class because there can be more
->than MAX_LOCKDEP_SUBCLASSES of vqs.
->
->However, dropping the lock is harmless:
->  1. If dim is enabled, modifications made by dim worker to coalescing
->     params may cause the user's query results to be dirty data.
->  2. In scenarios (a) and (b), a spurious dim worker is scheduled,
->     but this can be handled correctly:
->     (a)
->       1. dim is on
->       2. net_dim call schedules a worker
->       3. dim is turning off
->       4. The worker checks that dim is off and then exits after
->          restoring dim's state.
->       5. The worker will not be scheduled until the next time dim is on.
->
->     (b)
->       1. dim is on
->       2. net_dim call schedules a worker
->       3. The worker checks that dim is on and keeps going
->       4. dim is turning off
->       5. The worker successfully configure this parameter to the device.
->       6. The worker will not be scheduled until the next time dim is on.
->
->[1]
->========================================================
->WARNING: possible recursive locking detected
->6.9.0-rc7+ #319 Not tainted
->--------------------------------------------
->ethtool/962 is trying to acquire lock:
->
->but task is already holding lock:
->
->other info that might help us debug this:
->Possible unsafe locking scenario:
->
->      CPU0
->      ----
-> lock(&vi->rq[i].dim_lock);
-> lock(&vi->rq[i].dim_lock);
->
->*** DEADLOCK ***
->
-> May be due to missing lock nesting notation
->
->3 locks held by ethtool/962:
-> #0: ffffffff82dbaab0 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40
-> #1: ffffffff82dad0a8 (rtnl_mutex){+.+.}-{3:3}, at:
->				ethnl_default_set_doit+0xbe/0x1e0
->
->stack backtrace:
->CPU: 6 PID: 962 Comm: ethtool Not tainted 6.9.0-rc7+ #319
->Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
->	   rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
->Call Trace:
-> <TASK>
-> dump_stack_lvl+0x79/0xb0
-> check_deadlock+0x130/0x220
-> __lock_acquire+0x861/0x990
-> lock_acquire.part.0+0x72/0x1d0
-> ? lock_acquire+0xf8/0x130
-> __mutex_lock+0x71/0xd50
-> virtnet_set_coalesce+0x151/0x190
-> __ethnl_set_coalesce.isra.0+0x3f8/0x4d0
-> ethnl_set_coalesce+0x34/0x90
-> ethnl_default_set_doit+0xdd/0x1e0
-> genl_family_rcv_msg_doit+0xdc/0x130
-> genl_family_rcv_msg+0x154/0x230
-> ? __pfx_ethnl_default_set_doit+0x10/0x10
-> genl_rcv_msg+0x4b/0xa0
-> ? __pfx_genl_rcv_msg+0x10/0x10
-> netlink_rcv_skb+0x5a/0x110
-> genl_rcv+0x28/0x40
-> netlink_unicast+0x1af/0x280
-> netlink_sendmsg+0x20e/0x460
-> __sys_sendto+0x1fe/0x210
-> ? find_held_lock+0x2b/0x80
-> ? do_user_addr_fault+0x3a2/0x8a0
-> ? __lock_release+0x5e/0x160
-> ? do_user_addr_fault+0x3a2/0x8a0
-> ? lock_release+0x72/0x140
-> ? do_user_addr_fault+0x3a7/0x8a0
-> __x64_sys_sendto+0x29/0x30
-> do_syscall_64+0x78/0x180
-> entry_SYSCALL_64_after_hwframe+0x76/0x7e
->
->Fixes: 4d4ac2ececd3 ("virtio_net: Add a lock for per queue RX coalesce")
->Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+On Tue, 2024-05-21 at 10:38 +0800, Wei Fang wrote:
+> The assignment of pps_enable is protected by tmreg_lock, but the read
+> operation of pps_enable is not. So the Coverity tool reports a lock
+> evasion warning which may cause data race to occur when running in a
+> multithread environment. Although this issue is almost impossible to
+> occur, we'd better fix it, at least it seems more logically reasonable,
+> and it also prevents Coverity from continuing to issue warnings.
+>=20
+> Fixes: 278d24047891 ("net: fec: ptp: Enable PPS output based on ptp clock=
+")
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
+> V2 changes:
+> Moved the assignment positions of pps_channel and reload_period.
+> ---
+>  drivers/net/ethernet/freescale/fec_ptp.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/freescale/fec_ptp.c b/drivers/net/ether=
+net/freescale/fec_ptp.c
+> index 181d9bfbee22..e32f6724f568 100644
+> --- a/drivers/net/ethernet/freescale/fec_ptp.c
+> +++ b/drivers/net/ethernet/freescale/fec_ptp.c
+> @@ -104,14 +104,13 @@ static int fec_ptp_enable_pps(struct fec_enet_priva=
+te *fep, uint enable)
+>  	struct timespec64 ts;
+>  	u64 ns;
+> =20
+> -	if (fep->pps_enable =3D=3D enable)
+> -		return 0;
+> -
+> -	fep->pps_channel =3D DEFAULT_PPS_CHANNEL;
+> -	fep->reload_period =3D PPS_OUPUT_RELOAD_PERIOD;
+> -
+>  	spin_lock_irqsave(&fep->tmreg_lock, flags);
+> =20
+> +	if (fep->pps_enable =3D=3D enable) {
+> +		spin_unlock_irqrestore(&fep->tmreg_lock, flags);
+> +		return 0;
+> +	}
+> +
+>  	if (enable) {
+>  		/* clear capture or output compare interrupt status if have.
+>  		 */
+> @@ -532,6 +531,9 @@ static int fec_ptp_enable(struct ptp_clock_info *ptp,
+>  	int ret =3D 0;
+> =20
+>  	if (rq->type =3D=3D PTP_CLK_REQ_PPS) {
+> +		fep->pps_channel =3D DEFAULT_PPS_CHANNEL;
+> +		fep->reload_period =3D PPS_OUPUT_RELOAD_PERIOD;
+> +
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+I think this does not address Eric's concern on V1, the initialization
+still basically happens in the same scope.
+
+On the flip side, quickly skimming over the ptp core code, it looks
+like that the ptp core will always call this function under ptp-
+>pincfg_mux mutex protection or at device unregistration time.
+
+AFAICS that makes pps_channel and reload_period update safe, so overall
+patch LGTM and I'll apply it soon.
+
+Thanks,
+
+Paolo
+
 
