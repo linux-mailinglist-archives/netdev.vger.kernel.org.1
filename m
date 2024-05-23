@@ -1,157 +1,156 @@
-Return-Path: <netdev+bounces-97799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98DA18CD4ED
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:39:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C9118CD501
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:45:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46B5A286044
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:39:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5248B281F0A
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E691014A4F1;
-	Thu, 23 May 2024 13:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 588C813B5AF;
+	Thu, 23 May 2024 13:45:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b="Y9SHNvLo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1vNrikzh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-in-1.gedalya.net (mail.gedalya.net [170.39.119.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBFD13B7BC
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 13:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.39.119.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85701E520
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 13:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716471562; cv=none; b=pzcozdHYQ6wsxEU2FWunsHL/25JOlryyGFV6sD3E//zTbk2pfOpbT5ek4uCOfw19eNh4YJCRmrZrd0NX4DjVQPf9J9RjZmR/vw2dEB1bBR5scSXZJt5H0N41KS/mCTvRkfNbRkBOduo/Vij4Ya0kZNbp2pux0A67cYG+Hb+a1WY=
+	t=1716471954; cv=none; b=cD2TRG6YuPEuHBjWPENDZ83qJ1AVV0825fW++2VibBwnzbBuPevpQ7WmZYUyvavgPP+75GxCA5PTn+z4QgNF7u+TJTozOneBeq6m96CX2/JmaV/KG2pRUubd9kAgXrU1mz1vlc9rl51uiNSdlSG5Hl3FX7NM8Dtii3Xo0YpO9Gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716471562; c=relaxed/simple;
-	bh=8T0lWtmnYMaubAQTVBls379erdZvPIMoMxzh0j4T+SQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LTZlBpuU/6a7yXBh+h8o5uM0Jw2/rdYVhfcpLuqCWopFV+4tIPYUyKeIgiilhUKwN3IREJnUpNzh3yL8I0qZFdI+7Uq4o1KiABP8IKdAlUIDj8ZHNlmvnKGV290BtXb9M1u/nEp0YBRZ+IYZeQFNckYE0hssB2zwRgUpDJFTvz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net; spf=pass smtp.mailfrom=gedalya.net; dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b=Y9SHNvLo; arc=none smtp.client-ip=170.39.119.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gedalya.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gedalya.net
-	; s=rsa1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description;
-	bh=rg99GQ3O6+JuUSWdHbid6QML4XUYIU1j9Dyr0J5Jv78=; b=Y9SHNvLoo05wmSgjcC3J55nc1H
-	nzGgi2YkSVGszduETLFgKVsN3/dFxpA3Ie7HZtSirmyXjOrgNtc4m1kaOeaQBg7tIMIUbakposn0M
-	sPtUJJCfAMzdUwql+r3dNmpUerjoPhV2eezGvyrkxRGeW2o2jKbGWWmSWTL+BOj5bo9zCqHXwbre2
-	7bABeDJRyFnPVqvk6GuiPlmoDf4Zzx3fVhEcJUbb42v9BRJjxPbFCo2FyN5NDFTzdv8PDb94m2T6K
-	niMWDpU+3fhiWXnfCcFAxY/YFxIb+uV+gzpn/HOPmQCWhHodMJ6stLfDfSSBJxmrIqzC8JpvpBrwn
-	+hAi1z7A==;
-Received: from [192.168.9.176]
-	by smtp-in-1.gedalya.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <gedalya@gedalya.net>)
-	id 1sA8f7-000gGY-2J;
-	Thu, 23 May 2024 13:39:18 +0000
-Message-ID: <1d0a0772-8b9a-48d6-a0f1-4b58abe62f5e@gedalya.net>
-Date: Thu, 23 May 2024 21:39:14 +0800
+	s=arc-20240116; t=1716471954; c=relaxed/simple;
+	bh=OzqQ7ZtWdDLUZJLHrbKbrWnY/Rdm+uHgPWDk46cJqDU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DUeuftJrF0T0lv8I3XHsrzzlTblgvTo7UQ8D44v2RgWhhonRnMwJNyOjXKMTs/noIP4mvItb0FSgxQUe7ho12vyP0Yhi1s57Ry+GBoOve4xau/Vae8pT+sUk/Xxl3JGMGg3VLf35/6Nq0novUb82eh11FsZysk/bXUVr1W2qvu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1vNrikzh; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-627751b5411so169921537b3.2
+        for <netdev@vger.kernel.org>; Thu, 23 May 2024 06:45:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716471952; x=1717076752; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=KxCDAEpMrYECfUC8qI4PiDnyUD/2qCgYje7o/4Qm36g=;
+        b=1vNrikzhCYVVaFW9enJPASeas2hTJqfuMXcrhcgMKN4nh6f3Lax3Z+ALh4ydkK6Gb6
+         Xa3gky5l9fnlo/PhJ7hQIUAcU0Ynp3in3ubPnvpE56OL/A1TREV092mejpMJPhjM4Uzz
+         NwSzdBUlTKxVX0tAxA/Epe0oTyDhhL5n2KejktvY8HjTDI69mxtDt/KVNdkJwf4q28gb
+         Q0cyj6NzDa9miSmrI9wWEb8qwa6bv2JMfx7LodwnViz95WjQyZyPiMzf3LutVWiDbWqO
+         J+hwY2k9JVWO0CEpw+XWW5i11VYXdOs9iCh/EwRekBAScLRajrD588pZCAm8LNmqQ8M8
+         WgWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716471952; x=1717076752;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KxCDAEpMrYECfUC8qI4PiDnyUD/2qCgYje7o/4Qm36g=;
+        b=wsZw3hEEoaiVN8PfL1QsWq0QD/dvLouMBSEJ9OQaaR46IgFPj03nsoIfjDE44isyeJ
+         fQpJ3zk7nRDOEo+R8ML2Rphrct6sAjREblD7mnPqp7e1NTG/Bok8wWkweGQl28apoQN7
+         Dm7CWxD0ZXNgzmha/2Gw3+BRPU/qazphZsa0KpD2aOGdLtjNkP8/LbJUOM2vuKQJXY1H
+         bRvbeo9rU9Yvd8c3gPwk56FYbTsZUR72KQEo9zdak8KJFm7CXDTdcRzxP1RX4+Zt3Qtw
+         cV/r9WYqM2hlyusX9do3+aARVp4GR1oQUQF8DjZ5nv3kJcC8UwDBFzNb1k6eqWDLk+jb
+         69kg==
+X-Forwarded-Encrypted: i=1; AJvYcCVAd2eOfKR1mg9NlL5sJ2474DMpDm+Z0BMfiajdt7XjEaU54TK2SuZUOWuINCrI1FXCZyv66GogvRu2Bym89lNs4r4gAe6r
+X-Gm-Message-State: AOJu0YxQtpvm9T9e+vgl/fXDHeG3fJSuWVKnLEYot2zBuKwfMAJG6sKm
+	Fz0H+6uhTYxBoiY70DAmynmcrgUv5r+WLvPJIwIR1o4q6o3dTlmbcl0cO7IJlZSco403dT0hioR
+	NnacdIP8pGQ==
+X-Google-Smtp-Source: AGHT+IFRzT5/iQMElp6VFjB3KdYwS2zksWgVtXT0GvOp9OpkSThhh/f7YS6/wLQmboVzoHGbU2OgWrgSGdoTIg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:72c:b0:df6:dc61:7877 with SMTP
+ id 3f1490d57ef6-df6dc617ec2mr509011276.12.1716471951783; Thu, 23 May 2024
+ 06:45:51 -0700 (PDT)
+Date: Thu, 23 May 2024 13:45:49 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: iproute2: color output should assume dark background
-To: Dragan Simic <dsimic@manjaro.org>
-Cc: Sirius <sirius@trudheim.com>, netdev@vger.kernel.org
-References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
- <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
- <96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
- <Zk722SwDWVe35Ssu@photonic.trudheim.com>
- <e4695ecb95bbf76d8352378c1178624c@manjaro.org>
- <449db665-0285-4283-972f-1b6d5e6e71a1@gedalya.net>
- <7d67d9e72974472cc61dba6d8bdaf79a@manjaro.org>
-Content-Language: en-US
-From: Gedalya <gedalya@gedalya.net>
-In-Reply-To: <7d67d9e72974472cc61dba6d8bdaf79a@manjaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
+Message-ID: <20240523134549.160106-1-edumazet@google.com>
+Subject: [PATCH net] net/sched: taprio: fix duration_to_length()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 5/23/24 9:23 PM, Dragan Simic wrote:
+duration_to_length() is incorrectly using div_u64()
+instead of div64_u64().
 
->> For what problem?
->> Obviously, for the problem your patch attempts to solve.
+syzbot reported:
 
-When nothing is indicated and a genuine _guess_ must be made, or a _default_ should be set, should that be dark or light?
-This is not a coding question.
-All defaults should be good in some situations and bad in fewer situations.
-Having a default does not preclude reducing the number of cases it is relied upon. Those are different matters.
+Oops: divide error: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 1 PID: 15391 Comm: syz-executor.0 Not tainted 6.9.0-syzkaller-08544-g4b377b4868ef #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+ RIP: 0010:div_u64_rem include/linux/math64.h:29 [inline]
+ RIP: 0010:div_u64 include/linux/math64.h:130 [inline]
+ RIP: 0010:duration_to_length net/sched/sch_taprio.c:259 [inline]
+ RIP: 0010:taprio_update_queue_max_sdu+0x287/0x870 net/sched/sch_taprio.c:288
+Code: be 08 00 00 00 e8 99 5b 6a f8 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 13 59 6a f8 48 8b 03 89 c1 48 89 e8 31 d2 <48> f7 f1 48 89 c5 48 83 7c 24 50 00 4c 8b 74 24 30 74 47 e8 c1 19
+RSP: 0018:ffffc9000506eb38 EFLAGS: 00010246
+RAX: 0000000000001f40 RBX: ffff88802f3562e0 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffff88802f3562e0
+RBP: 0000000000001f40 R08: ffff88802f3562e7 R09: 1ffff11005e6ac5c
+R10: dffffc0000000000 R11: ffffed1005e6ac5d R12: 00000000ffffffff
+R13: dffffc0000000000 R14: ffff88801ef59400 R15: 00000000003f0008
+FS:  00007fee340bf6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b2c524000 CR3: 0000000024a52000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+  taprio_change+0x2dce/0x42d0 net/sched/sch_taprio.c:1911
+  taprio_init+0x9da/0xc80 net/sched/sch_taprio.c:2112
+  qdisc_create+0x9d4/0x11a0 net/sched/sch_api.c:1355
+  tc_modify_qdisc+0xa26/0x1e40 net/sched/sch_api.c:1777
+  rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6595
+  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2564
+  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+  netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+  netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
+  sock_sendmsg_nosec net/socket.c:730 [inline]
+  __sock_sendmsg+0x221/0x270 net/socket.c:745
+  ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+  ___sys_sendmsg net/socket.c:2638 [inline]
+  __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fee3327cee9
 
->> Yes I asked Debian in the first place to leave colors disabled by
->> default, but nevertheless `ip` is still broken for most users if and
->> when colors are enabled, whether at runtime or build time.
-> Well, the coloring support in ip(8) can't be broken if the users
-> configure it at runtime accordingly, i.e. following the background
-> color configured in their terminal emulator(s), right?
+Fixes: fed87cc6718a ("net/sched: taprio: automatically calculate queueMaxSDU based on TC gate durations")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+---
+ net/sched/sch_taprio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Absolutely right. The manpage says so and it is tested, working.
-
->>> If Debian configures the terminal emulators it ships to use dark
->>> background,
->> Do they? Or is that the nearly universal default?
-> Frankly, I don't know for sure because I don't use many different
-> terminal emulators, but you as the submitter of this patch perhaps
-> should know that better.  However, terminal emulators must be
-> configured somehow, because it makes no sense whatsoever that they're
-> having their background colors hardcoded.
-
-If you use the word "configure" to refer to the default behavior, set by 
-upstream and not modified by the distribution, then fine, yes.
-
-It's just a way of saying "terminals tend to be dark".
-
->>> why not configure the ip(8) utility the same way, i.e. by setting
->>> COLORFGBG in files placed in the /etc/profile.d directory,
->> COLORFGBG where set is automatically set by the terminal emulator. It
->> would be more sensible to add this feature to more terminal emulators,
->> upstream.
-> Of course, but that would take a lot of time, both to implement it
-> everywhere and for the new feature to reach the users.  Shipping
-> a few additional files in the /etc/profile.d directory would be a
-> reasonable stopgap measure.
-No, it would be totally broken as explained.
->> Should Debian come up with a patch that magically adjusts this
->> variable every time the user changes their background color (in one
->> terminal emulator... and another color in another terminal
->> emulator...?)
-> That's a valid concern.  Perhaps some documentation could be provided,
-> to help the users who alter their background colors.
-
-Already documented in the iputils2 manpage and elsewhere.
-
->> And what about linux virtual terminals (a.k.a non-graphical consoles)?
->>
-> In my 25+ years of Linux experience, I've never seen one with a
-> background color other than black.
-
-Which is why it's such a reasonable assumption for iputils2 to male.
-
-(BTW I have seen non-black vt colors... just happens to be true. But not 
-so common)
-
->> In summary, if the best we can do is manually set COLORFGBG when using
->> a light background then that's the best we can do. I don't see how
->> Debian can possibly help with that.
->> On the iproute2 side, a rock-bottom ultimate default background color
->> assumption will always be needed and that should be dark.
-> As others already pointed out, "should be light" or "should be dark"
-> can be seen as personal preference.
-
-It can and should be seen as begging the question of what is more common 
-in the reality out there.
-
-The matter of personal preference is whether deep blue on black is a bad 
-choice.
-
-What is the more common background color is a question of fact, not 
-preference. We don't get to have preferred facts. I just do not know how 
-to find out what the fact is, so I must use reserved language and say I 
-_think_ dark is more common.
-
+diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+index 1ab17e8a72605385280fad9b7f656a6771236acc..827fb81fc63a098304bad198fadd4aed55d1fec4 100644
+--- a/net/sched/sch_taprio.c
++++ b/net/sched/sch_taprio.c
+@@ -256,7 +256,8 @@ static int length_to_duration(struct taprio_sched *q, int len)
+ 
+ static int duration_to_length(struct taprio_sched *q, u64 duration)
+ {
+-	return div_u64(duration * PSEC_PER_NSEC, atomic64_read(&q->picos_per_byte));
++	return div64_u64(duration * PSEC_PER_NSEC,
++			 atomic64_read(&q->picos_per_byte));
+ }
+ 
+ /* Sets sched->max_sdu[] and sched->max_frm_len[] to the minimum between the
+-- 
+2.45.1.288.g0e0cd299f1-goog
 
 
