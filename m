@@ -1,118 +1,160 @@
-Return-Path: <netdev+bounces-97840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 298668CD745
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 17:37:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A59B8CD758
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 17:39:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88CFC281A29
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:37:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6DD61F21128
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EEB710A22;
-	Thu, 23 May 2024 15:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669331170F;
+	Thu, 23 May 2024 15:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HE7xFRLp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HQkXh993"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA5E1171D
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 15:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B70C107A8;
+	Thu, 23 May 2024 15:39:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716478674; cv=none; b=VSjm62vwEYWhDpmp7COS0wIPnfCL/4/WeE5DbeNKaGqswESesinmBArHfI4aN7voKem2Qpds8dQe4KggJ2oVNB2JUWgGqamOuPQSbka2YrzIyqJf/nQNxTgCHfgzvY6b4CBOi9PpsSgr8M/EuJA23qRHa5dLNsqDMOH3JalaOq0=
+	t=1716478785; cv=none; b=p+JnV7bFZoVXIB5w/+jQxdgj4VR2IPgWzaqVjug7uKcCPEmFgJFq+qcVyKx+WnVmLMebFOCLUrF0oe8Y3r2iFUZOde5F8F0NuEOIMF/QBkUA9fv6TG0D+Y97pyQyqE/rPv1An3tgZqC6oiCI0PNA+G4LOHaxJW179DzbHK0tA9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716478674; c=relaxed/simple;
-	bh=ewb8fAokVh1uQ0gRHgNv2zxSiN0gJC+JwoHXf21T4v0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fVDkuoxNT8FiGq+mIcPvg4jaF3qCRCWNI46HbYeUdPNIlesoRyiGLonnTsSoYKheYXFEowZZvDqGRc8UDuHZEz/ZxhX7czNMAIRmeLGQ2h+Qkme2QCrOftb9VxRbprDWg7I8u7bRYzmcuXJy0iWqmSbUNos6OGjqI7YDMKUQJy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HE7xFRLp; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-df4e1f0f315so2069764276.0
-        for <netdev@vger.kernel.org>; Thu, 23 May 2024 08:37:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716478672; x=1717083472; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ewb8fAokVh1uQ0gRHgNv2zxSiN0gJC+JwoHXf21T4v0=;
-        b=HE7xFRLps8EJfsNYg5RZ253mvkfMwu7+96p8f2KBR7mkdAOACHEpxztrkvSWvtXlzk
-         8TQ/CYdaUy66XspxV0kikdkGeDFU4p1DOuElZUMEAqo240ruJ/U+Q99sZBMjMGtdUHGT
-         lHWhmSy+nfDjigAW9aQik2pScZim+qkdrwO5bkLREWTK0yk7mJGAGdA2DhlX/jDfbjI3
-         JcVBBvdejid6Zc176G22qNsFgfNFq2K+rD1XRtun5kOa82NatIEr1/h0RWnN9/b6uZYw
-         BhsS0CBwWQTy5jGIDVjf2l/nAzzdNScqo0twRW8F5W2g3y5jZiCeq57Fv78lricvHpFs
-         CKCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716478672; x=1717083472;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ewb8fAokVh1uQ0gRHgNv2zxSiN0gJC+JwoHXf21T4v0=;
-        b=xSLWxf9eUJpGWMIBjgS2c6YC1crqK9o3nvlqYMTpywrOyw5iLB6IoeKqCmUIwkOKWj
-         2HyGlZzSSD9fncmvGd2/i2VLDiN/pSuJgVJaRjmwZiUFunQxAHcpvZ8yp6/r1FKsM1Hx
-         LRkEUo/aYSXYsFTCU6wOApbDOvUvisqQuPoHmuZmDgl/H5I7Gu/tcV2A+Jz1XrlVQ6E0
-         UdgyNyGkvYcL/1KA6UkLulEhGnxA0XlEtq7fbCLQ1VAoO10IR7oAeb1IWCvQprGVtQoH
-         3MnrC3BQpuuCUhM9HuNnawYJ+ODlP74h+BuTqkO1C2WLAwkl+Y6fvk+X45QhfWM9crfh
-         qBmg==
-X-Forwarded-Encrypted: i=1; AJvYcCW3hvqcRa96y0d/faHbgse7bDkp5l8WNxGqK9EDrGYT0q02yfKilC78DAFiMlARY+jPg/dKxkC6jdJin/wpyfinbE8mQ1rM
-X-Gm-Message-State: AOJu0YwEZLkw/KLUvmVASTy2Fpm+VpEWn48wqDwbW3vON/l+DXA3Ovdy
-	r8P3Ehe/XG3PsqWKL9PiKv7GXfjHt+h9AgpJadUKW1wRr4yGutLogCzigXM3n4CZGAqLpgxlRf0
-	hsbD5pG43V0ViOfA20qzzYQlOndCQwux8seRj
-X-Google-Smtp-Source: AGHT+IGgFNC2tZCwC/lfU2Q4vYmbDOVL7a7JJKq/dj1q1jdeW2odf65j2e5ZxP0ptH++FK9NrmpVnVUtkXg2XvZLEqk=
-X-Received: by 2002:a25:aa91:0:b0:dee:7fc3:ad6a with SMTP id
- 3f1490d57ef6-df4e0dd1f39mr5569839276.56.1716478671700; Thu, 23 May 2024
- 08:37:51 -0700 (PDT)
+	s=arc-20240116; t=1716478785; c=relaxed/simple;
+	bh=clvydRDm/63x4impppU2AwpkDHe7T/Btp/JH1hYc6t8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Eh7QqHJpXv+3VNBDrg8u1FZ4tyvzI9NL/eLpLMJ5see2M+8k3W/NUSdlAQxZbVUyJqP9y/GU9ON3gGISrUhy7K+AnCb26bwnv9/5XA5Mk5u91H5/NpQwj1BRn6H/vPXDO0wFDS9jnmrdjBIHSIkWcOt3QwI4UIcLrk9QJnMyQ5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HQkXh993; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43417C4AF0A;
+	Thu, 23 May 2024 15:39:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716478784;
+	bh=clvydRDm/63x4impppU2AwpkDHe7T/Btp/JH1hYc6t8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HQkXh993tlC0PovOExg8HJKVu0BEAR/d2p2/AyntoasSUTkaxiymc1d7Tn6kJJ5N7
+	 5JRk2YKzqGxjfv4J8b+rkXiPXdqziBdb/XnfUuDZ+SOTfvrZE9SEOsMIl5UqDLU3PN
+	 7NaeIhEaFpo4BCsnHH8o8z1tj/csyvUMY45U8m5oiPxWYN+oQOsceoENXIM8J/iQBt
+	 CiqjwzFLOHeqmJ23Q1SHx2RTKi7PlyoX/t5wcyzAy/ISnVCOYO5cCmae5i+oSpHsSn
+	 D2iInNqpp4kJmnfNOqw117AsudIt2VcXnEzaaQRBia1GHcd7hf9jw55HxH6gK7GGOH
+	 jSClC7gvRRpEw==
+Date: Thu, 23 May 2024 08:39:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby
+ <jirislaby@kernel.org>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jonathan Lemon
+ <jonathan.lemon@gmail.com>, linux-serial@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v2 net] ptp: ocp: adjust serial port symlink creation
+Message-ID: <20240523083943.6ecb60d9@kernel.org>
+In-Reply-To: <20240510110405.15115-1-vadim.fedorenko@linux.dev>
+References: <20240510110405.15115-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240523130528.60376-1-edumazet@google.com>
-In-Reply-To: <20240523130528.60376-1-edumazet@google.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 23 May 2024 11:37:35 -0400
-Message-ID: <CADVnQy=MGsnuKet_FjXh8a32+bDAE5e3kF716MXb7aNjT0ihFw@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: reduce accepted window in NEW_SYN_RECV state
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 23, 2024 at 9:05=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> Jason commit made checks against ACK sequence less strict
-> and can be exploited by attackers to establish spoofed flows
-> with less probes.
->
-> Innocent users might use tcp_rmem[1] =3D=3D 1,000,000,000,
-> or something more reasonable.
->
-> An attacker can use a regular TCP connection to learn the server
-> initial tp->rcv_wnd, and use it to optimize the attack.
->
-> If we make sure that only the announced window (smaller than 65535)
-> is used for ACK validation, we force an attacker to use
-> 65537 packets to complete the 3WHS (assuming server ISN is unknown)
->
-> Fixes: 378979e94e95 ("tcp: remove 64 KByte limit for initial tp->rcv_wnd =
-value")
-> Link: https://datatracker.ietf.org/meeting/119/materials/slides-119-tcpm-=
-ghost-acks-00
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Jason Xing <kernelxing@tencent.com>
-> Cc: Neal Cardwell <ncardwell@google.com>
+On Fri, 10 May 2024 11:04:05 +0000 Vadim Fedorenko wrote:
+> The commit b286f4e87e32 ("serial: core: Move tty and serdev to be children
+> of serial core port device") changed the hierarchy of serial port devices
+> and device_find_child_by_name cannot find ttyS* devices because they are
+> no longer directly attached. Add some logic to restore symlinks creation
+> to the driver for OCP TimeCard.
+> 
+> Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 > ---
+> v2:
+>  add serial/8250 maintainers
+> ---
+>  drivers/ptp/ptp_ocp.c | 30 +++++++++++++++++++++---------
+>  1 file changed, 21 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> index ee2ced88ab34..50b7cb9db3be 100644
+> --- a/drivers/ptp/ptp_ocp.c
+> +++ b/drivers/ptp/ptp_ocp.c
+> @@ -25,6 +25,8 @@
+>  #include <linux/crc16.h>
+>  #include <linux/dpll.h>
+>  
+> +#include "../tty/serial/8250/8250.h"
 
-Acked-by: Neal Cardwell <ncardwell@google.com>
+Hi Greg, Jiri, does this look reasonable to you?
+The cross tree include raises an obvious red flag.
 
-Thanks, Eric!
+Should serial / u8250 provide a more official API?
+Can we use device_for_each_child() to deal with the extra
+layer in the hierarchy?
 
-neal
+>  #define PCI_VENDOR_ID_FACEBOOK			0x1d9b
+>  #define PCI_DEVICE_ID_FACEBOOK_TIMECARD		0x0400
+>  
+> @@ -4330,11 +4332,9 @@ ptp_ocp_symlink(struct ptp_ocp *bp, struct device *child, const char *link)
+>  }
+>  
+>  static void
+> -ptp_ocp_link_child(struct ptp_ocp *bp, const char *name, const char *link)
+> +ptp_ocp_link_child(struct ptp_ocp *bp, struct device *dev, const char *name, const char *link)
+>  {
+> -	struct device *dev, *child;
+> -
+> -	dev = &bp->pdev->dev;
+> +	struct device *child;
+>  
+>  	child = device_find_child_by_name(dev, name);
+>  	if (!child) {
+> @@ -4349,27 +4349,39 @@ ptp_ocp_link_child(struct ptp_ocp *bp, const char *name, const char *link)
+>  static int
+>  ptp_ocp_complete(struct ptp_ocp *bp)
+>  {
+> +	struct device *dev, *port_dev;
+> +	struct uart_8250_port *port;
+>  	struct pps_device *pps;
+>  	char buf[32];
+>  
+> +	dev = &bp->pdev->dev;
+> +
+>  	if (bp->gnss_port.line != -1) {
+> +		port = serial8250_get_port(bp->gnss_port.line);
+> +		port_dev = (struct device *)port->port.port_dev;
+>  		sprintf(buf, "ttyS%d", bp->gnss_port.line);
+> -		ptp_ocp_link_child(bp, buf, "ttyGNSS");
+> +		ptp_ocp_link_child(bp, port_dev, buf, "ttyGNSS");
+>  	}
+>  	if (bp->gnss2_port.line != -1) {
+> +		port = serial8250_get_port(bp->gnss2_port.line);
+> +		port_dev = (struct device *)port->port.port_dev;
+>  		sprintf(buf, "ttyS%d", bp->gnss2_port.line);
+> -		ptp_ocp_link_child(bp, buf, "ttyGNSS2");
+> +		ptp_ocp_link_child(bp, port_dev, buf, "ttyGNSS2");
+>  	}
+>  	if (bp->mac_port.line != -1) {
+> +		port = serial8250_get_port(bp->mac_port.line);
+> +		port_dev = (struct device *)port->port.port_dev;
+>  		sprintf(buf, "ttyS%d", bp->mac_port.line);
+> -		ptp_ocp_link_child(bp, buf, "ttyMAC");
+> +		ptp_ocp_link_child(bp, port_dev, buf, "ttyMAC");
+>  	}
+>  	if (bp->nmea_port.line != -1) {
+> +		port = serial8250_get_port(bp->nmea_port.line);
+> +		port_dev = (struct device *)port->port.port_dev;
+>  		sprintf(buf, "ttyS%d", bp->nmea_port.line);
+> -		ptp_ocp_link_child(bp, buf, "ttyNMEA");
+> +		ptp_ocp_link_child(bp, port_dev, buf, "ttyNMEA");
+>  	}
+>  	sprintf(buf, "ptp%d", ptp_clock_index(bp->ptp));
+> -	ptp_ocp_link_child(bp, buf, "ptp");
+> +	ptp_ocp_link_child(bp, dev, buf, "ptp");
+>  
+>  	pps = pps_lookup_dev(bp->ptp);
+>  	if (pps)
+
 
