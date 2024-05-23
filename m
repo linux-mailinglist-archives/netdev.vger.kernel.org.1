@@ -1,256 +1,168 @@
-Return-Path: <netdev+bounces-97712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D19D8CCD55
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:52:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EF228CCD5A
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:54:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D8DB1F21C58
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 07:52:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFA4B1F21FB9
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 07:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2058C13C9BE;
-	Thu, 23 May 2024 07:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE3713CF8E;
+	Thu, 23 May 2024 07:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hHESov31"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="yBaEPaHv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646701869
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 07:52:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D06C13C9BE
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 07:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716450774; cv=none; b=BKPG1Kh/l20FBapZEyMKgvAzY3jJfsd3ZJ60JwgjSeH3KUzzry0fGoCouD5QPAPXAJVHhU7Ez+FkyjTyFVdXSsvA3ZniAqNtHtjRoKukmxQS6jAyKpLXUuu2qjMGj6+aCIxfaUGMO+zN6oV3BueUdpd2srhXUC3TVNVKe0zUka4=
+	t=1716450867; cv=none; b=T/knBPR3v3BGEEj1nw++pzFnCQ783jdgSjYSdNcWOEqMlJbUDbL/JL+e0wB7SHNmu1CTv4cRW+NS3VwZKWCmrUdeNCrGCWqLH0k23w5MKtAWX7arunurWzOW9ZRhrlMEP3IoMxoGp9AROZlY58i7kR16dtYxhI/keYWoi2a1P58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716450774; c=relaxed/simple;
-	bh=bLX4kzxrFGZHQiWmD9NNZxR00UUlvn3yUWnR4d0/nLU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Lkb8VC0whnSBsF1ObIZ30jtBfcr6/aCwmULIkQcsQEM9iUsHbng7BJz7Y1X8LeKNeW1QTiWsmzG4BACHVzmypWr4kD+OQ6/7mD4BvG7x9bSQFRa14ZBGfI4Kw9B31P5C9K5s2crEEnxnZB6XGFsjCTh2jhTl2lJcLGd8nDpciIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hHESov31; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716450771;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=jfUml5xcQaIZ5iYf7eZB8yPQBcGlGRP0fYnYVl9vols=;
-	b=hHESov312VEuswfbrUL5TL2yzDtdNwo6HepS2XYBSoIElFx2N94ffEbfTBaexAdJ0/NXI5
-	uV1l3eDsFHA5jHVI3Zr0miY65OaTxly94BHt1KwWbVHUilG/WK4OJv3LbpSpSAtr+VJHRd
-	if7CialJ0N0FH885ymqZKzSRs0IHRmY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-541-k3z6yOpzNUyTzAWKpsI-UA-1; Thu, 23 May 2024 03:52:49 -0400
-X-MC-Unique: k3z6yOpzNUyTzAWKpsI-UA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-35501b579e2so1586f8f.1
-        for <netdev@vger.kernel.org>; Thu, 23 May 2024 00:52:49 -0700 (PDT)
+	s=arc-20240116; t=1716450867; c=relaxed/simple;
+	bh=6TUTSQLYTCUXIs3aeg91Rm5y9++WOvlHb8bfQgVmnOo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yht7U5rMzlv7caFImyV+Xa1O1aCg0GVclhn7igAOuLNljwlTNGbmw3M0b0viSRPPhEFCdiJqOGQz7LcSBziTfjZ6G2say0l7zSGoUecJMIVPm/+uRTcHp2DOBWdvDy7cJokuL3peAZRAr+pTlg7PbUuFRNcY1yU4VL5fhl5dnw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=yBaEPaHv; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2e1fa824504so71383781fa.0
+        for <netdev@vger.kernel.org>; Thu, 23 May 2024 00:54:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1716450863; x=1717055663; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NO+7TP5WD33s7UxZDGhnr50qHmYrw+DG3n3RuvKTKAk=;
+        b=yBaEPaHvMhb6JhqKTT7NICNmNkBb7AcJDdinIQxt+Wje26d/lB74llcw+xJ14oGq7Y
+         ouXflFjtN89OI5+MsRnSXoLZeIeBGLMA/IwU1pNP1Tt3rGGrry9WgiLr59WZDgWBTxzs
+         oEA1aQddfbDiSMHJNNbg5YbOzAxjwmtKCvqU8eEHX+rLJUws4au4BtmPpe4QXOkYlraH
+         V1vckaPyMShn6cGqZD9DzzVxiVZgCTtftqhnSzXOVp/SEFVpZFUIbdjx7lKYko2NKHwY
+         KQyBKvoS7LrmFvis3zY5OnNaWQaEHz3I+NBCrI8YGy+JWg4O/no0cLyR3mSgy+rq5feb
+         c3tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716450768; x=1717055568;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jfUml5xcQaIZ5iYf7eZB8yPQBcGlGRP0fYnYVl9vols=;
-        b=WAXujXdVGR0wwmPDHT/nDWkzn3wEV/G0CrZUn0F2JAH+/q2fQlN9WCFipInubw5r2/
-         Mqh5tbjmnLGEcfgFJ+nNlFtkjz7Brq5cZrAOj0TvPgTd+BCa7t8AIIRXQmMX+6gL75wD
-         LgV3Mymc5XsVO28tPfP6ImS5oVpCcncMgChX92RnxNiKP/HvBz1Y5GFdN0kyffmvBU10
-         bSlXmkQ9k2CTC4wfDVcWw1HzcSnf+FHTpc7aY3cuq27NDVpc3l/H4hib2WcY2mwU0b5U
-         h5Byb0Lt7YDsePCxNBpY0Hn0dzFVXlQI7BSGO+lT0hIUydF1D+8idIyMRbU+uCs62EDD
-         nocg==
-X-Forwarded-Encrypted: i=1; AJvYcCW5he9ftUntdyk2JOxwp1YXS+VZDzvpkq0+D6R5g4IQBxGWICjVkyMi924kM43chHRXUYQF8Tis58X803kSvJlbLjeOZdyJ
-X-Gm-Message-State: AOJu0YyTx+V7gMCZGuvY/Q6jAwjDgU7lG3+oLxxDJg3p8ritOkL1EG28
-	VIsTau81H/oNQCQCL0t3mr2yOvt8a0A9C7fvy1bvk0ia00GJuy4N9UATS3bHcvfm1lZFdyfyFD7
-	P8P0VTFnKvBw45uc+vJuLXMHhIOZxwviTyZpxc4cLWtKXSWUZLbKxvg==
-X-Received: by 2002:a05:6000:707:b0:34d:b5d6:fe4b with SMTP id ffacd0b85a97d-354d8db8103mr3637653f8f.4.1716450767863;
-        Thu, 23 May 2024 00:52:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEOezpAuDnzTSwr7aUgCeLnph2ngObjaT/PPgOctfTwjGglWH20lXf1q7t4KFZ5W8MM4AjJTg==
-X-Received: by 2002:a05:6000:707:b0:34d:b5d6:fe4b with SMTP id ffacd0b85a97d-354d8db8103mr3637625f8f.4.1716450767391;
-        Thu, 23 May 2024 00:52:47 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b094:ab10:29ae:cdc:4db4:a22a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502baad058sm35873297f8f.66.2024.05.23.00.52.45
+        d=1e100.net; s=20230601; t=1716450863; x=1717055663;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NO+7TP5WD33s7UxZDGhnr50qHmYrw+DG3n3RuvKTKAk=;
+        b=N+WIFIoMiBWIdanRswOMRS3Te0WrctRCEpcfwZPuP4nAQXrc6bdsnqEIUGi+VSU19W
+         s3Du30HyyaL/fKNEgP078NzcolZBc07/VYrZ2ItBW0SnAHVnY9OeKEIkkvDUqC19xQJ5
+         NCqIeEsdt/BAUFwYb4ExAXKK7a0LAZ1Mrtrbyk3HiBh+ALAH7iiBnrZv4NXRgG+QCfS7
+         pV53YB3AxcHhA80AIHvbt8T9b23FtcDg6HGQd2iB7ZO70+FNBv6ptsDsxOEhXsUDlwJQ
+         oozFPG6OdsHBSnZj3BHBuLmqLT+eBPypp23AGMPE/9R+P8EZ9zAz3uER2bZ6MUVKjdJD
+         0j4A==
+X-Forwarded-Encrypted: i=1; AJvYcCUQK8P9zMgl4Ee0XyyFnd2Dln9LCS2CYEGlAzGrmElNjb9GFSze3X6b9beLsjbO7tQ9Au331SfmphymQX9NQqySFKvgHRJH
+X-Gm-Message-State: AOJu0YwJALNv9Xdg4QUlNzoULmRrzmuhoRj/750k4Eh4Pns6fcszELkB
+	NhnWxhtOHIX93Oyr4TkDAwSPHs6JgrvLJaRwYBUpkPeJ+rFVMC0n8uyKnRrsGpg=
+X-Google-Smtp-Source: AGHT+IG1TPrM5IWcLsL0gQR7Oe9oP76a2EOliWzZVJoOaGxGy+vZJRo/X57iPhY+5O8GnBw4G2JH9A==
+X-Received: by 2002:a2e:874c:0:b0:2e7:2907:a63b with SMTP id 38308e7fff4ca-2e94946e2bfmr26921751fa.21.1716450862499;
+        Thu, 23 May 2024 00:54:22 -0700 (PDT)
+Received: from blmsp.fritz.box ([2001:4091:a246:821e:6f3b:6b50:4762:8343])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502baad074sm36501833f8f.70.2024.05.23.00.54.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 May 2024 00:52:46 -0700 (PDT)
-Message-ID: <58032b8049696566704e1941f909159a2f6c9af8.camel@redhat.com>
-Subject: Re: [PATCH net] sock_map: avoid race between sock_map_close and
- sk_psock_put
-From: Paolo Abeni <pabeni@redhat.com>
-To: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>, 
-	netdev@vger.kernel.org
-Cc: Cong Wang <cong.wang@bytedance.com>, Jakub Sitnicki
- <jakub@cloudflare.com>,  Eric Dumazet <edumazet@google.com>, Daniel
- Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, 
- kernel-dev@igalia.com,
- syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com, 
- stable@vger.kernel.org
-Date: Thu, 23 May 2024 09:52:45 +0200
-In-Reply-To: <13b77d180c2bad74d6749a6c34190a10134bd6fa.camel@redhat.com>
-References: <20240520214153.847619-1-cascardo@igalia.com>
-	 <13b77d180c2bad74d6749a6c34190a10134bd6fa.camel@redhat.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        Thu, 23 May 2024 00:54:22 -0700 (PDT)
+From: Markus Schneider-Pargmann <msp@baylibre.com>
+To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Nishanth Menon <nm@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>
+Cc: Vibhore Vardhan <vibhore@ti.com>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Dhruva Gole <d-gole@ti.com>,
+	=?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Markus Schneider-Pargmann <msp@baylibre.com>
+Subject: [PATCH 0/7] can: m_can: Add am62 wakeup support
+Date: Thu, 23 May 2024 09:53:40 +0200
+Message-ID: <20240523075347.1282395-1-msp@baylibre.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed, 2024-05-22 at 14:08 +0200, Paolo Abeni wrote:
-> On Mon, 2024-05-20 at 18:41 -0300, Thadeu Lima de Souza Cascardo wrote:
-> > sk_psock_get will return NULL if the refcount of psock has gone to 0, w=
-hich
-> > will happen when the last call of sk_psock_put is done. However,
-> > sk_psock_drop may not have finished yet, so the close callback will sti=
-ll
-> > point to sock_map_close despite psock being NULL.
-> >=20
-> > This can be reproduced with a thread deleting an element from the sock =
-map,
-> > while the second one creates a socket, adds it to the map and closes it=
-.
-> >=20
-> > That will trigger the WARN_ON_ONCE:
-> >=20
-> > ------------[ cut here ]------------
-> > WARNING: CPU: 1 PID: 7220 at net/core/sock_map.c:1701 sock_map_close+0x=
-2a2/0x2d0 net/core/sock_map.c:1701
-> > Modules linked in:
-> > CPU: 1 PID: 7220 Comm: syz-executor380 Not tainted 6.9.0-syzkaller-0772=
-6-g3c999d1ae3c7 #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS=
- Google 04/02/2024
-> > RIP: 0010:sock_map_close+0x2a2/0x2d0 net/core/sock_map.c:1701
-> > Code: df e8 92 29 88 f8 48 8b 1b 48 89 d8 48 c1 e8 03 42 80 3c 20 00 74=
- 08 48 89 df e8 79 29 88 f8 4c 8b 23 eb 89 e8 4f 15 23 f8 90 <0f> 0b 90 48 =
-83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d e9 13 26 3d 02
-> > RSP: 0018:ffffc9000441fda8 EFLAGS: 00010293
-> > RAX: ffffffff89731ae1 RBX: ffffffff94b87540 RCX: ffff888029470000
-> > RDX: 0000000000000000 RSI: ffffffff8bcab5c0 RDI: ffffffff8c1faba0
-> > RBP: 0000000000000000 R08: ffffffff92f9b61f R09: 1ffffffff25f36c3
-> > R10: dffffc0000000000 R11: fffffbfff25f36c4 R12: ffffffff89731840
-> > R13: ffff88804b587000 R14: ffff88804b587000 R15: ffffffff89731870
-> > FS:  000055555e080380(0000) GS:ffff8880b9500000(0000) knlGS:00000000000=
-00000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 0000000000000000 CR3: 00000000207d4000 CR4: 0000000000350ef0
-> > Call Trace:
-> >  <TASK>
-> >  unix_release+0x87/0xc0 net/unix/af_unix.c:1048
-> >  __sock_release net/socket.c:659 [inline]
-> >  sock_close+0xbe/0x240 net/socket.c:1421
-> >  __fput+0x42b/0x8a0 fs/file_table.c:422
-> >  __do_sys_close fs/open.c:1556 [inline]
-> >  __se_sys_close fs/open.c:1541 [inline]
-> >  __x64_sys_close+0x7f/0x110 fs/open.c:1541
-> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> >  do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
-> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > RIP: 0033:0x7fb37d618070
-> > Code: 00 00 48 c7 c2 b8 ff ff ff f7 d8 64 89 02 b8 ff ff ff ff eb d4 e8=
- 10 2c 00 00 80 3d 31 f0 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 =
-ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
-> > RSP: 002b:00007ffcd4a525d8 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-> > RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007fb37d618070
-> > RDX: 0000000000000010 RSI: 00000000200001c0 RDI: 0000000000000004
-> > RBP: 0000000000000000 R08: 0000000100000000 R09: 0000000100000000
-> > R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-> > R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-> >  </TASK>
-> >=20
-> > Use sk_psock, which will only check that the pointer is not been set to
-> > NULL yet, which should only happen after the callbacks are restored. If=
-,
-> > then, a reference can still be gotten, we may call sk_psock_stop and ca=
-ncel
-> > psock->work.
-> >=20
-> > After that change, the reproducer does not trigger the WARN_ON_ONCE
-> > anymore.
-> >=20
-> > Reported-by: syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=3D07a2e4a1a57118ef7355
-> > Fixes: aadb2bb83ff7 ("sock_map: Fix a potential use-after-free in sock_=
-map_close()")
-> > Fixes: 5b4a79ba65a1 ("bpf, sockmap: Don't let sock_map_{close,destroy,u=
-nhash} call itself")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
-> > ---
-> >  net/core/sock_map.c | 14 +++++++++-----
-> >  1 file changed, 9 insertions(+), 5 deletions(-)
-> >=20
-> > diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-> > index 9402889840bf..13267e667a4c 100644
-> > --- a/net/core/sock_map.c
-> > +++ b/net/core/sock_map.c
-> > @@ -1680,19 +1680,23 @@ void sock_map_close(struct sock *sk, long timeo=
-ut)
-> > =20
-> >  	lock_sock(sk);
-> >  	rcu_read_lock();
-> > -	psock =3D sk_psock_get(sk);
-> > +	psock =3D sk_psock(sk);
-> >  	if (unlikely(!psock)) {
-> > +		saved_close =3D READ_ONCE(sk->sk_prot)->close;
-> >  		rcu_read_unlock();
-> >  		release_sock(sk);
-> > -		saved_close =3D READ_ONCE(sk->sk_prot)->close;
-> >  	} else {
-> >  		saved_close =3D psock->saved_close;
-> >  		sock_map_remove_links(sk, psock);
-> > +		psock =3D sk_psock_get(sk);
-> >  		rcu_read_unlock();
-> > -		sk_psock_stop(psock);
-> > +		if (psock)
-> > +			sk_psock_stop(psock);
-> >  		release_sock(sk);
-> > -		cancel_delayed_work_sync(&psock->work);
-> > -		sk_psock_put(sk, psock);
-> > +		if (psock) {
-> > +			cancel_delayed_work_sync(&psock->work);
-> > +			sk_psock_put(sk, psock);
-> > +		}
-> >  	}
-> > =20
-> >  	/* Make sure we do not recurse. This is a bug.
->=20
-> As a personal opinion I think the code will become simple reordering
-> the condition, something alike:
->=20
-> 	if (psock) {
-> 		saved_close =3D psock->saved_close;
->  		sock_map_remove_links(sk, psock);
-> 		psock =3D sk_psock_get(sk);
-> 		if (!psock)
-> 			goto no_psock;
->  		rcu_read_unlock();
-> 		sk_psock_stop(psock);
->  		release_sock(sk);
-> 		cancel_delayed_work_sync(&psock->work);
-> 		sk_psock_put(sk, psock);
-> 	} else {
-> no_psock:
-> 		saved_close =3D READ_ONCE(sk->sk_prot)->close;
+Hi,
 
-FTR, the above is wrong, should be:
+am62, am62a and am62p support Partial-IO, a poweroff SoC state with a
+few pin groups being active for wakeup.
 
-		saved_close =3D READ_ONCE(sk->sk_prot)->close;
-no_psock:
+To support mcu_mcan0 and mcu_mcan1 wakeup for the mentioned SoCs, the
+series introduces a notion of wake-on-lan for m_can. If the user decides
+to enable wake-on-lan for a m_can device, the device is set to wakeup
+enabled. A 'wakeup' pinctrl state is selected to enable wakeup flags for
+the relevant pins. If wake-on-lan is disabled the default pinctrl is
+selected.
 
->  		rcu_read_unlock();
->  		release_sock(sk);
-> 	}
+It is based on v6.9-rc1.
 
-/P
+This series is part of a bigger topic to support Partial-IO on am62,
+am62a and am62p. Partial-IO is a poweroff state in which some pins are
+able to wakeup the SoC. In detail MCU m_can and two serial port pins can
+trigger the wakeup.
+
+These two other series are relevant for the support of Partial-IO:
+
+ - firmware: ti_sci: Partial-IO support
+ - serial: 8250: omap: Add am62 wakeup support
+
+A test branch is available here that includes all patches required to
+test Partial-IO:
+
+https://gitlab.baylibre.com/msp8/linux/-/tree/integration/am62-lp-sk-partialio/v6.9?ref_type=heads
+
+After enabling Wake-on-LAN the system can be powered off and will enter
+the Partial-IO state in which it can be woken up by activity on the
+specific pins:
+    ethtool -s can0 wol p
+    ethtool -s can1 wol p
+    poweroff
+
+I tested these patches on am62-lp-sk.
+
+Best,
+Markus
+
+Markus Schneider-Pargmann (6):
+  dt-bindings: can: m_can: Add wakeup-source property
+  dt-bindings: can: m_can: Add wakeup pinctrl state
+  can: m_can: Map WoL to device_set_wakeup_enable
+  can: m_can: Support pinctrl wakeup state
+  arm64: dts: ti: k3-am62: Mark mcu_mcan0/1 as wakeup-source
+  arm64: dts: ti: k3-am62a-mcu: Mark mcu_mcan0/1 as wakeup-source
+
+Vibhore Vardhan (1):
+  arm64: dts: ti: k3-am62p-mcu: Mark mcu_mcan0/1 as wakeup-source
+
+ .../bindings/net/can/bosch,m_can.yaml         | 20 +++++++++
+ arch/arm64/boot/dts/ti/k3-am62-mcu.dtsi       |  2 +
+ arch/arm64/boot/dts/ti/k3-am62a-mcu.dtsi      |  2 +
+ arch/arm64/boot/dts/ti/k3-am62p-mcu.dtsi      |  2 +
+ drivers/net/can/m_can/m_can.c                 | 43 +++++++++++++++++++
+ drivers/net/can/m_can/m_can.h                 |  4 ++
+ 6 files changed, 73 insertions(+)
+
+-- 
+2.43.0
 
 
