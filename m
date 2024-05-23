@@ -1,178 +1,128 @@
-Return-Path: <netdev+bounces-97797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BC5D8CD497
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:26:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 053368CD3B5
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:18:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4FD51F230E0
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:26:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B41E2283608
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3573D14AD0C;
-	Thu, 23 May 2024 13:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270CC14B963;
+	Thu, 23 May 2024 13:17:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="XloqCdMY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MaKmJTU/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C70313BAC3;
-	Thu, 23 May 2024 13:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF98713A897;
+	Thu, 23 May 2024 13:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716470761; cv=none; b=ZKoH5NVvv8jlw396T34g+faqLG5CSy/maCOwWGtB56GsvkZC/22N6dYQj0HqrSUGPiny5hntSs4TTFuGAC5d9or6H2Z7gt8Loa1PrOw3iF5S7JODDucUsrxZ/vDJhIVJ2Zl0nO7InC2ctjRDibyHCpQNicULbj5SE012dIrcsSA=
+	t=1716470267; cv=none; b=Sx4ad3eBHzjrwJYlShq/Guss6XVqZFfKdlhamt9BBfxLsT8Xt1wrbAVDUDjYVaOMnmetq8MGzSVneDmSaimqRWsQOjlhqiEnujom3z/ORx0IqP8Oh3H+n3llqeV0eU4vyitLc+HRLhOiokT7js4RMgtPM5p9NbFg+z7lJ4J1tAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716470761; c=relaxed/simple;
-	bh=f/oxHXUbFIWaQ+ViiCGL5kOIzgHUlBSfpA1+uYOV8mI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mW1F/B5VmbfZMD+RosOMo3FpMVZo11f+mFtXSYM5LpoxgeoImUUJU8Isp8zlBHqMOGE6cBJ9VhpRpEt579vQJyPalui/i9FOIRx2kpYZW17vdn+F0prP6jZIWms/T0jlTEdhB0SuXcxucZPsmiPkC62msUgDcX8HL9wJ1xsu6X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=XloqCdMY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89038C2BD10;
-	Thu, 23 May 2024 13:26:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1716470760;
-	bh=f/oxHXUbFIWaQ+ViiCGL5kOIzgHUlBSfpA1+uYOV8mI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XloqCdMYfABJtIkMbWFcPs1SWyAgkLX7O77hp/iE4NT8fy8pKBhRrG+vEJi1KqNN2
-	 UBgBpeYqeb7yh3rbK5PRwKE26boWJ7sA6f3xKl6hg2xDIDH7usvm4CvLCdlqqS90va
-	 IZNAvpxlgBz8b4TVeGSRo7VJjYQYqrDrQgHXUYk0=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
+	s=arc-20240116; t=1716470267; c=relaxed/simple;
+	bh=YjxDl1qQvJLbI7CoFRNnlkwjjIbQpYwYvmdsXfobHJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LSGumkf3m3wyT9Skc6y6rH3IxyRpy9MXmaExe735VazthbDpnlMupm1N4aKispMV4YKLCFC2zvg4UL0sdA04/6o05C5LgSP68lV4VvLHJFV3oMi7fv3TiH/ie8s18UuPwTByZuOYIAxyeLo1/FzDqh/QEL2uurtpt9XJFxoGiws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MaKmJTU/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6053C32786;
+	Thu, 23 May 2024 13:17:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716470266;
+	bh=YjxDl1qQvJLbI7CoFRNnlkwjjIbQpYwYvmdsXfobHJg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MaKmJTU/iS0pIIfN8usqIyj8MvyBtIJ16dcfxAzoYDE0uFLhzjM60MKbiXIDM7EFj
+	 FomaG3mM96YmzQe/dYg7/9hcwYBK21wX37GoqhD0lbnFP4du30TlKfWC7HgqkQ0Tia
+	 CQVmKwE2wfblNqTHnw2Ks/zf35Y7NDYwAkGEmmr6KgFhZNTSNljRCxbd/7qtITt7MX
+	 OVSI/5vZf6/hDGRM6V/Hf1XA17l6Ec/f1Uy5gGS66/cxZ6IWk+9KWCcjcEfJpVIikC
+	 rXgnUk6h/lC7+aDZxaGHZwm1bKASAjWvovD9GaHn1yVGzsO43TKkZXVdzFIFlsoBDS
+	 054pHjsu/3IPw==
+Date: Thu, 23 May 2024 14:17:41 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ying Hsu <yinghsu@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+	pmenzel@molgen.mpg.de, chromeos-bluetooth-upstreaming@chromium.org,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	Ronald Wahl <ronald.wahl@raritan.com>
-Subject: [PATCH 6.6 078/102] net: ks8851: Fix another TX stall caused by wrong ISR flag handling
-Date: Thu, 23 May 2024 15:13:43 +0200
-Message-ID: <20240523130345.408565178@linuxfoundation.org>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240523130342.462912131@linuxfoundation.org>
-References: <20240523130342.462912131@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Add vendor-specific packet classification
+ for ISO data
+Message-ID: <20240523131741.GN883722@kernel.org>
+References: <20240523060934.2883716-1-yinghsu@chromium.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240523060934.2883716-1-yinghsu@chromium.org>
 
-6.6-stable review patch.  If anyone has any objections, please let me know.
+On Thu, May 23, 2024 at 06:09:31AM +0000, Ying Hsu wrote:
+> When HCI raw sockets are opened, the Bluetooth kernel module doesn't
+> track CIS/BIS connections. User-space applications have to identify
+> ISO data by maintaining connection information and look up the mapping
+> for each ACL data packet received. Besides, btsnoop log captured in
+> kernel couldn't tell ISO data from ACL data in this case.
+> 
+> To avoid additional lookups, this patch introduces vendor-specific
+> packet classification for Intel BT controllers to distinguish
+> ISO data packets from ACL data packets.
+> 
+> Signed-off-by: Ying Hsu <yinghsu@chromium.org>
+> ---
+> Tested LE audio unicast recording on a ChromeOS device with Intel AX211
+> 
+> Changes in v2:
+> - Adds vendor-specific packet classificaton in hci_dev.
+> - Keeps reclassification in hci_recv_frame.
+> 
+>  drivers/bluetooth/btusb.c        | 19 +++++++++++++++++++
+>  include/net/bluetooth/hci_core.h |  1 +
+>  net/bluetooth/hci_core.c         | 16 ++++++++++++++++
+>  3 files changed, 36 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 79aefdb3324d..75561e749c50 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -966,6 +966,24 @@ static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
+>  	gpiod_set_value_cansleep(reset_gpio, 0);
+>  }
+>  
+> +#define BT_USB_INTEL_ISODATA_HANDLE_BASE 0x900
+> +
+> +static u8 btusb_intel_classify_pkt_type(struct hci_dev *hdev, struct sk_buff *skb)
+> +{
+> +	/*
+> +	 * Distinguish ISO data packets form ACL data packets
+> +	 * based on their conneciton handle value range.
 
-------------------
+nit: connection
 
-From: Ronald Wahl <ronald.wahl@raritan.com>
+> +	 */
+> +	if (hci_skb_pkt_type(skb) == HCI_ACLDATA_PKT) {
+> +		__u16 handle = __le16_to_cpu(hci_acl_hdr(skb)->handle);
+> +
+> +		if (hci_handle(handle) >= BT_USB_INTEL_ISODATA_HANDLE_BASE)
+> +			return HCI_ISODATA_PKT;
+> +	}
+> +
+> +	return hci_skb_pkt_type(skb);
+> +}
+> +
+>  #define RTK_DEVCOREDUMP_CODE_MEMDUMP		0x01
+>  #define RTK_DEVCOREDUMP_CODE_HW_ERR		0x02
+>  #define RTK_DEVCOREDUMP_CODE_CMD_TIMEOUT	0x03
 
-commit 317a215d493230da361028ea8a4675de334bfa1a upstream.
-
-Under some circumstances it may happen that the ks8851 Ethernet driver
-stops sending data.
-
-Currently the interrupt handler resets the interrupt status flags in the
-hardware after handling TX. With this approach we may lose interrupts in
-the time window between handling the TX interrupt and resetting the TX
-interrupt status bit.
-
-When all of the three following conditions are true then transmitting
-data stops:
-
-  - TX queue is stopped to wait for room in the hardware TX buffer
-  - no queued SKBs in the driver (txq) that wait for being written to hw
-  - hardware TX buffer is empty and the last TX interrupt was lost
-
-This is because reenabling the TX queue happens when handling the TX
-interrupt status but if the TX status bit has already been cleared then
-this interrupt will never come.
-
-With this commit the interrupt status flags will be cleared before they
-are handled. That way we stop losing interrupts.
-
-The wrong handling of the ISR flags was there from the beginning but
-with commit 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX
-buffer overrun") the issue becomes apparent.
-
-Fixes: 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX buffer overrun")
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org # 5.10+
-Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/net/ethernet/micrel/ks8851_common.c |   18 +-----------------
- 1 file changed, 1 insertion(+), 17 deletions(-)
-
---- a/drivers/net/ethernet/micrel/ks8851_common.c
-+++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -328,7 +328,6 @@ static irqreturn_t ks8851_irq(int irq, v
- {
- 	struct ks8851_net *ks = _ks;
- 	struct sk_buff_head rxq;
--	unsigned handled = 0;
- 	unsigned long flags;
- 	unsigned int status;
- 	struct sk_buff *skb;
-@@ -336,24 +335,17 @@ static irqreturn_t ks8851_irq(int irq, v
- 	ks8851_lock(ks, &flags);
- 
- 	status = ks8851_rdreg16(ks, KS_ISR);
-+	ks8851_wrreg16(ks, KS_ISR, status);
- 
- 	netif_dbg(ks, intr, ks->netdev,
- 		  "%s: status 0x%04x\n", __func__, status);
- 
--	if (status & IRQ_LCI)
--		handled |= IRQ_LCI;
--
- 	if (status & IRQ_LDI) {
- 		u16 pmecr = ks8851_rdreg16(ks, KS_PMECR);
- 		pmecr &= ~PMECR_WKEVT_MASK;
- 		ks8851_wrreg16(ks, KS_PMECR, pmecr | PMECR_WKEVT_LINK);
--
--		handled |= IRQ_LDI;
- 	}
- 
--	if (status & IRQ_RXPSI)
--		handled |= IRQ_RXPSI;
--
- 	if (status & IRQ_TXI) {
- 		unsigned short tx_space = ks8851_rdreg16(ks, KS_TXMIR);
- 
-@@ -365,20 +357,12 @@ static irqreturn_t ks8851_irq(int irq, v
- 		if (netif_queue_stopped(ks->netdev))
- 			netif_wake_queue(ks->netdev);
- 		spin_unlock(&ks->statelock);
--
--		handled |= IRQ_TXI;
- 	}
- 
--	if (status & IRQ_RXI)
--		handled |= IRQ_RXI;
--
- 	if (status & IRQ_SPIBEI) {
- 		netdev_err(ks->netdev, "%s: spi bus error\n", __func__);
--		handled |= IRQ_SPIBEI;
- 	}
- 
--	ks8851_wrreg16(ks, KS_ISR, handled);
--
- 	if (status & IRQ_RXI) {
- 		/* the datasheet says to disable the rx interrupt during
- 		 * packet read-out, however we're masking the interrupt
-
-
+...
 
