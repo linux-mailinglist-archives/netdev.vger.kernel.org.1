@@ -1,105 +1,101 @@
-Return-Path: <netdev+bounces-97766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 486E98CD0E2
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:10:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BFBA8CD137
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:29:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE7511F21F72
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 11:10:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC40A281B5F
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 11:29:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D519F1448D3;
-	Thu, 23 May 2024 11:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10EB11474AE;
+	Thu, 23 May 2024 11:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fqBaU8R4"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="EhHrlFZS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B126613C8F4
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 11:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10BD7EEE7;
+	Thu, 23 May 2024 11:29:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716462629; cv=none; b=cY2yHplgmlrDeV0us9Et8LPByeaOKXrTEDkfvHQ/gT3Cjl+WHnGyPndCOxpdHP7QxKmMIOFcc97yLSFBGzRobuJB7e+IAD1C9HZRhkc4RVk1/zYDxRqd5crToHcANVROMSVQ65sdtQRmsM8EAj3jarbxP6Vu7QuR1M/CMYtO6mE=
+	t=1716463782; cv=none; b=e7kbihbUQe04RHGarkbuhkPGhPlEMHeXpRA7kmSWZF98RNUk47TBGLxrvZYQPcHWrgN/ktUpX36ZalmASYptk3xLO/c/9o2M/1dKD+GtcgIYOBWqshVaickK5YmmU41xm/TpRjMROp6MhMo90vuQFsBgyNger9ABRc9aPVx4tNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716462629; c=relaxed/simple;
-	bh=5AS2s14mlS2q2THpaIG1P6rcpbcrXvSisbCyUrKYYgY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=naeEf0llpF8PqzZ3V14PLpkf/Jv/n04yxuwR2pCG7ft+RYKV/ahh6D/9fIeOr+WPDzZI+R3vUih2XA2jX5SNWQ6/RIZ8sKQqTbKfFEUAlrniel9hi3pn714Qzyn66TMsmYLdAw5TpJZPVrxNmxOWGjUoFmrlniPLxBruvjEJVts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fqBaU8R4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 37204C3277B;
-	Thu, 23 May 2024 11:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716462629;
-	bh=5AS2s14mlS2q2THpaIG1P6rcpbcrXvSisbCyUrKYYgY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fqBaU8R4Ch5+bjANrWriDHHtQyGhAoHEUd6eLSI5DohgkMVjP86za4/qILMxQJFFe
-	 //yLJEMSscVlZeq2v2n5wyePAIbkgxBkP9mb66lYlXgsRrMEhQ2tcwQm7PxeMBTb//
-	 AMXhqtSG4jiwnOj+cm20foYvnBvDYPJG1E3hFYGNYXRS2r4Y4c5GDre0YnWj6pFdeS
-	 ULhzyPy9LpxQhWElfkWx0GjftcLBlSt2mnk7cjzSPtvwqdyYx2xWSt94GYudjlpJtP
-	 n2RqXbwN/9izjKfE3Hoqmoo//fjsxTeRTAKUUDMDRQfQjHMlS4Kyj6vAW9WWbUV1T7
-	 n4QsFmiK5j88Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 224DAC43333;
-	Thu, 23 May 2024 11:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1716463782; c=relaxed/simple;
+	bh=4ge3E4ZeokmDbphVFHM0rLp+VaYRYn80/b7KG19Gj7U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AnNeaFOMtWA3OGzqt94CBqvDyOrR4Iug1z5JSugJgDNGtq8EDOlIZDtFJiwDtIKsQlGmmcr0Znx8hG8EFeMT1/V7E5RkSYp2ysYul8Tak4xcM4ScLTvCXoTpK6kAsZGmtoualAetHu05iy2/ciBd74HkXv0ffzmvb4QQ13hox88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=EhHrlFZS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0832BC2BD10;
+	Thu, 23 May 2024 11:29:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1716463781;
+	bh=4ge3E4ZeokmDbphVFHM0rLp+VaYRYn80/b7KG19Gj7U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EhHrlFZSs4w4Dnio6EdIgcwKrA7hyOKaGwzuAXqROf5ukvGWcBjwDZi8P8gaYn2EN
+	 wJZEA0p9jlyTeIvotrlGQ/kcf2I4e7cqjN3eUHwMFyrTXHvAGE1YBWMhQzNjQHwGvV
+	 y609h1SvU9lS4YR1OScmuuijFhvnQ/niwFl9iuXw=
+Date: Thu, 23 May 2024 13:29:38 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Doug Berger <opendmb@gmail.com>
+Cc: stable@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH stable 5.4 0/2] net: bcmgenet: revisit MAC reset
+Message-ID: <2024052332-cinnamon-oppose-98a9@gregkh>
+References: <20240516211153.140679-1-opendmb@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/2] intel: Interpret .set_channels() input
- differently
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171646262913.15895.17957174467563014841.git-patchwork-notify@kernel.org>
-Date: Thu, 23 May 2024 11:10:29 +0000
-References: <20240521-iwl-net-2024-05-14-set-channels-fixes-v2-0-7aa39e2e99f1@intel.com>
-In-Reply-To: <20240521-iwl-net-2024-05-14-set-channels-fixes-v2-0-7aa39e2e99f1@intel.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
- larysa.zaremba@intel.com, michal.swiatkowski@linux.intel.com,
- chandanx.rout@intel.com, himasekharx.reddy.pucha@intel.com,
- maciej.fijalkowski@intel.com, przemyslaw.kitszel@intel.com,
- igor.bagnucki@intel.com, krishneil.k.singh@intel.com, horms@kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240516211153.140679-1-opendmb@gmail.com>
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 21 May 2024 12:39:52 -0700 you wrote:
-> The ice and idpf drivers can trigger a crash with AF_XDP due to incorrect
-> interpretation of the asymmetric Tx and Rx parameters in their
-> .set_channels() implementations:
+On Thu, May 16, 2024 at 02:11:51PM -0700, Doug Berger wrote:
+> Commit 3a55402c9387 ("net: bcmgenet: use RGMII loopback for MAC
+> reset") was intended to resolve issues with reseting the UniMAC
+> core within the GENET block by providing better control over the
+> clocks used by the UniMAC core. Unfortunately, it is not
+> compatible with all of the supported system configurations so an
+> alternative method must be applied.
 > 
-> 1. ethtool -l <IFNAME> -> combined: 40
-> 2. Attach AF_XDP to queue 30
-> 3. ethtool -L <IFNAME> rx 15 tx 15
->    combined number is not specified, so command becomes {rx_count = 15,
->    tx_count = 15, combined_count = 40}.
-> 4. ethnl_set_channels checks, if there are any AF_XDP of queues from the
->    new (combined_count + rx_count) to the old one, so from 55 to 40, check
->    does not trigger.
-> 5. the driver interprets `rx 15 tx 15` as 15 combined channels and deletes
->    the queue that AF_XDP is attached to.
+> This commit set provides such an alternative. The first commit
+> reverts the previous change and the second commit provides the
+> alternative reset sequence that addresses the concerns observed
+> with the previous implementation.
 > 
-> [...]
+> This replacement implementation should be applied to the stable
+> branches wherever commit 3a55402c9387 ("net: bcmgenet: use RGMII
+> loopback for MAC reset") has been applied.
+> 
+> Unfortunately, reverting that commit may conflict with some
+> restructuring changes introduced by commit 4f8d81b77e66 ("net:
+> bcmgenet: Refactor register access in bcmgenet_mii_config").
+> The first commit in this set has been manually edited to
+> resolve the conflict on stable/linux-5.4.y.
+> 
+> Doug Berger (2):
+>   Revert "net: bcmgenet: use RGMII loopback for MAC reset"
+>   net: bcmgenet: keep MAC in reset until PHY is up
+> 
+>  .../net/ethernet/broadcom/genet/bcmgenet.c    | 10 ++---
+>  .../ethernet/broadcom/genet/bcmgenet_wol.c    |  6 ++-
+>  drivers/net/ethernet/broadcom/genet/bcmmii.c  | 39 +++----------------
+>  3 files changed, 16 insertions(+), 39 deletions(-)
+> 
+> -- 
+> 2.34.1
+> 
+> 
 
-Here is the summary with links:
-  - [net,v2,1/2] ice: Interpret .set_channels() input differently
-    https://git.kernel.org/netdev/net/c/05d6f442f31f
-  - [net,v2,2/2] idpf: Interpret .set_channels() input differently
-    https://git.kernel.org/netdev/net/c/5e7695e0219b
+Both now queued up, thanks.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+greg k-h
 
