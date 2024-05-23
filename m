@@ -1,189 +1,98 @@
-Return-Path: <netdev+bounces-97898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71EEA8CDBB8
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 23:06:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2E838CDBD3
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 23:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CF5B28362C
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 21:06:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 901EF2860ED
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 21:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA18127E04;
-	Thu, 23 May 2024 21:06:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF36C84A4A;
+	Thu, 23 May 2024 21:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nLOmcoFH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BJkYhAS2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA41947F5D
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 21:06:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C1E14A82;
+	Thu, 23 May 2024 21:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716498373; cv=none; b=Yv8ey7Z0zgrBF4fVd8uYnBf55kdIzdYNY/LdDms81Fy7v3xMlG1B9q9q6TXyPE/bd4PRIqlS0Jy7iVS93dUe2P6yxugMrsT9O9xkXG6VrU4sit96dpisshaOyGbKvCxqHfct4/toP3Us3W1EnpoDeR3CegbPiw7AANGV2/PkWw0=
+	t=1716499232; cv=none; b=UBX9Ye9jXmH9qwFzMRq5fwl1VEWokuYhGDvJDenbbzdfWQ9LEtjzp1cYQMv+J5s7K6ChEOpzWP4O3LUqyP/hNWexOnHQR8Rfm7qL052JvLuO9Yp/OnVq6LzHIRkBJ+/+0MfR+XWsopMvbGd85jNVZPxnTI7yj381bKaCDr1vO9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716498373; c=relaxed/simple;
-	bh=FWP16rPLoiB93aLa4YgyuYQEJ8Wq3im02rMOxmEa1Es=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rhsnu31tgCl0P6yNQQqBBR9oFEEPETeRDxDFwubMl+dKcZGVUjTxiWs9P8cKm63UHu8ebLsvTRX+Mfg9fIKBsW9A/lVyYxeNUgWV4+Fcj2ff79VdS9GgCOtlJAC0tgd+ScqoL05R4o3LLvKsV+QKi4AaR0pxBaaB/5ZjSlOJWes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nLOmcoFH; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: gregkh@linuxfoundation.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1716498369;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+HYZrZuq8Ojw1nrvcRxGdj7LQnRliXR58D/HkwOvCk8=;
-	b=nLOmcoFHCbXf9wwsA/5h7s4ORWVEJFCcBHfgZDOJKGQKu60hOcwVPTedqtWq/aPsm698fA
-	ThOdpwVGi8sGk24l3xg6HGcIh+Ed6CHuQnwAElsh6ruyXday2mFSlmsrv96jAhkQ020XUz
-	opxM5CNK/JxykYHsvoVK9hllKm5jop4=
-X-Envelope-To: kuba@kernel.org
-X-Envelope-To: jirislaby@kernel.org
-X-Envelope-To: jonathan.lemon@gmail.com
-X-Envelope-To: linux-serial@vger.kernel.org
-X-Envelope-To: netdev@vger.kernel.org
-Message-ID: <9a65d299-2c3f-43b4-a3c7-4dca397dafaa@linux.dev>
-Date: Thu, 23 May 2024 22:06:05 +0100
+	s=arc-20240116; t=1716499232; c=relaxed/simple;
+	bh=jTjkNKGExpJBKmG7zWy/AKQEUbl8V5IN2OYICFQ6Q0Q=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hXfVrEZgNgsbQiZCdS64U/Er4WTYCwbwTN5c/UUFoUzZqxODWexEfP/YCu0dfDPn89gWnPB9Jiu2p5LukI68S6mxdlrTd5DBBUxon0nxwIPpEnLGDBt3E2Ddke1OVgYmouoNDESSdVWUyNuOFNAlE0addy9Ef6NqnN8ko+gTiDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BJkYhAS2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3271AC3277B;
+	Thu, 23 May 2024 21:20:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716499232;
+	bh=jTjkNKGExpJBKmG7zWy/AKQEUbl8V5IN2OYICFQ6Q0Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BJkYhAS29VwBfFPZbs/+s1kpFkUB3zhaz6bCnz7AnQEZQ1U/t3HZZl3s5r4csf61N
+	 pGeScF+lta/zy1vo3Qb9UI43wkX58JJBEHJy3O/cdqDGLqmq/3E49URpV/fsk21898
+	 0iUNpwMBzA3h7zADJrrDkRkDh31S1j0IytUorAH7bSh+xlVSyneBpYd2CqRXXnAP+B
+	 N57L704gS9eNh5Ycl5w0eCdPhUZVRBsmkNAA8Wi2eiE7WQBYM/LeddAiHwNaMgS8Ed
+	 4bZ0latRcTsXTR9qka1HougXl5pF85U3dfdPXznfxyR78M6mkQBMOVEkEJvOmTqZqb
+	 mgoMkMavmDC8A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 16370C54BB3;
+	Thu, 23 May 2024 21:20:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 net] ptp: ocp: adjust serial port symlink creation
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Slaby <jirislaby@kernel.org>,
- Jonathan Lemon <jonathan.lemon@gmail.com>, linux-serial@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240510110405.15115-1-vadim.fedorenko@linux.dev>
- <20240523083943.6ecb60d9@kernel.org>
- <2024052349-tapestry-astronaut-0de1@gregkh>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <2024052349-tapestry-astronaut-0de1@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v8 0/3] Replace mono_delivery_time with tstamp_type
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171649923208.17278.8893614240560861833.git-patchwork-notify@kernel.org>
+Date: Thu, 23 May 2024 21:20:32 +0000
+References: <20240509211834.3235191-1-quic_abchauha@quicinc.com>
+In-Reply-To: <20240509211834.3235191-1-quic_abchauha@quicinc.com>
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ahalaney@redhat.com, willemdebruijn.kernel@gmail.com, martin.lau@kernel.org,
+ martin.lau@linux.dev, daniel@iogearbox.net, bpf@vger.kernel.org,
+ kernel@quicinc.com
 
-On 23/05/2024 17:26, Greg Kroah-Hartman wrote:
-> On Thu, May 23, 2024 at 08:39:43AM -0700, Jakub Kicinski wrote:
->> On Fri, 10 May 2024 11:04:05 +0000 Vadim Fedorenko wrote:
->>> The commit b286f4e87e32 ("serial: core: Move tty and serdev to be children
->>> of serial core port device") changed the hierarchy of serial port devices
->>> and device_find_child_by_name cannot find ttyS* devices because they are
->>> no longer directly attached. Add some logic to restore symlinks creation
->>> to the driver for OCP TimeCard.
->>>
->>> Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
->>> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->>> ---
->>> v2:
->>>   add serial/8250 maintainers
->>> ---
->>>   drivers/ptp/ptp_ocp.c | 30 +++++++++++++++++++++---------
->>>   1 file changed, 21 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
->>> index ee2ced88ab34..50b7cb9db3be 100644
->>> --- a/drivers/ptp/ptp_ocp.c
->>> +++ b/drivers/ptp/ptp_ocp.c
->>> @@ -25,6 +25,8 @@
->>>   #include <linux/crc16.h>
->>>   #include <linux/dpll.h>
->>>   
->>> +#include "../tty/serial/8250/8250.h"
->>
->> Hi Greg, Jiri, does this look reasonable to you?
->> The cross tree include raises an obvious red flag.
+Hello:
+
+This series was applied to bpf/bpf-next.git (master)
+by Martin KaFai Lau <martin.lau@kernel.org>:
+
+On Thu,  9 May 2024 14:18:31 -0700 you wrote:
+> Patch 1 :- This patch takes care of only renaming the mono delivery
+> timestamp to tstamp_type with no change in functionality of
+> existing available code in kernel also
+> Starts assigning tstamp_type with either mono or real and
+> introduces a new enum in the skbuff.h, again no change in functionality
+> of the existing available code in kernel , just making the code scalable.
 > 
-> Yeah, that looks wrong.
-> 
->> Should serial / u8250 provide a more official API?
-> 
-> If it needs to, but why is this driver poking around in here at all?
+> [...]
 
-Hi Greg!
+Here is the summary with links:
+  - [bpf-next,v8,1/3] net: Rename mono_delivery_time to tstamp_type for scalabilty
+    https://git.kernel.org/bpf/bpf-next/c/4d25ca2d6801
+  - [bpf-next,v8,2/3] net: Add additional bit to support clockid_t timestamp type
+    https://git.kernel.org/bpf/bpf-next/c/1693c5db6ab8
+  - [bpf-next,v8,3/3] selftests/bpf: Handle forwarding of UDP CLOCK_TAI packets
+    https://git.kernel.org/bpf/bpf-next/c/c34e3ab2a76e
 
-Well, the original idea was to have symlinks with self-explanatory names
-to real serial devices exposed by PCIe device.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> 
->> Can we use device_for_each_child() to deal with the extra
->> layer in the hierarchy?
-> 
-> Or a real function where needed?
-
-yep.
-
-> 
->>
->>>   #define PCI_VENDOR_ID_FACEBOOK			0x1d9b
->>>   #define PCI_DEVICE_ID_FACEBOOK_TIMECARD		0x0400
->>>   
->>> @@ -4330,11 +4332,9 @@ ptp_ocp_symlink(struct ptp_ocp *bp, struct device *child, const char *link)
->>>   }
->>>   
->>>   static void
->>> -ptp_ocp_link_child(struct ptp_ocp *bp, const char *name, const char *link)
->>> +ptp_ocp_link_child(struct ptp_ocp *bp, struct device *dev, const char *name, const char *link)
->>>   {
->>> -	struct device *dev, *child;
->>> -
->>> -	dev = &bp->pdev->dev;
->>> +	struct device *child;
->>>   
->>>   	child = device_find_child_by_name(dev, name);
->>>   	if (!child) {
->>> @@ -4349,27 +4349,39 @@ ptp_ocp_link_child(struct ptp_ocp *bp, const char *name, const char *link)
->>>   static int
->>>   ptp_ocp_complete(struct ptp_ocp *bp)
->>>   {
->>> +	struct device *dev, *port_dev;
->>> +	struct uart_8250_port *port;
->>>   	struct pps_device *pps;
->>>   	char buf[32];
->>>   
->>> +	dev = &bp->pdev->dev;
->>> +
->>>   	if (bp->gnss_port.line != -1) {
->>> +		port = serial8250_get_port(bp->gnss_port.line);
->>> +		port_dev = (struct device *)port->port.port_dev;
-> 
-> That cast is not going to go well.  How do you know this is always
-> true?
-
-AFAIU, port_dev starts with struct dev always. That's why it's safe.
-
-> 
-> What was the original code attempting to do?  It feels like that was
-> wrong to start with if merely moving things around the device tree
-> caused anything to break here.  That is not how the driver core is
-> supposed to be used at all.
->
-
-We just want to have a symlink with meaningful name to real tty device,
-exposed by PCIe device. We provide up to 4 serial ports - GNSS, GNSS2,
-MAC and NMEA, to user space and we don't want user space to guess which
-one is which. We do have user space application which relies on symlinks
-to discover features.
-
-We don't use device tree because it's PCIe device with pre-defined
-functions, so I don't see any other way to get this info and properly
-create symlinks.
-
-Thanks,
-Vadim
-
-
-> thanks,
-> 
-> greg k-h
 
 
