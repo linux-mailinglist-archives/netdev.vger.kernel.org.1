@@ -1,172 +1,126 @@
-Return-Path: <netdev+bounces-97753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C628CD06F
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 12:37:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F0248CD075
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 12:40:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EF36281378
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 10:37:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8E1F1C21DD5
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 10:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52F8E13D521;
-	Thu, 23 May 2024 10:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46AE13FD6A;
+	Thu, 23 May 2024 10:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="CYK+LW3Y";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="H7/k1CL2";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="CYK+LW3Y";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="H7/k1CL2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNiNoSJA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7486113D286
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 10:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D1713CFAF
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 10:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716460652; cv=none; b=RtYwraEgUS2zmn8R+v5NFztmVbmwpvMxNKhN7OocPv1jHIebeJuDkbNWbIwRLpa3UVgq6B7aNeORFlCJfXY1lJypGU+hAadCtTRlFgzmxx0/td7zqsbKmyUqHOyMNeBiQLDGYECKFSK7Xdjpj0RsH9HkW5gZqkRY4X2VnIpfmNs=
+	t=1716460828; cv=none; b=YJzUrDZApyxQsYNnH2RExv7w+PKrT0YwqItieube5bBzcX7mOAOL9Ceumgysju14etcX5nl++0N5FzKz+o0p6w3xeCY6h2xmkj38zzF3+9fZoH43PSr1NlWG4wsOR0FkTmXonrKn6cw6GShvWxQO8xdonLDTNVhhgF1HaGo8Jeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716460652; c=relaxed/simple;
-	bh=/1KBVwjzgcWkBaQvXJzCXdCnX2ss4+FGZS/CNUAbWBg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BWT47JtPeuJ1E4y9XkTUakahmW0n9QoTFeNCEQIOs8s1KlO7dv/uKeaw30MwZc8Xs6eG1JU+fycLQmfSt0ca6+VGoBazgZnzE6z9i1qNx5oo18NsQOKZuT+E4ZhVJJyb3VSem6KHBtqhDhoxDevFg7vXxrJ2qKLCd1VV9Mbjq24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=CYK+LW3Y; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=H7/k1CL2; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=CYK+LW3Y; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=H7/k1CL2; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.100.200.14])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8EB9622529;
-	Thu, 23 May 2024 10:37:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1716460648; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/1KBVwjzgcWkBaQvXJzCXdCnX2ss4+FGZS/CNUAbWBg=;
-	b=CYK+LW3YJgfJohiINUGL6ajc51etK5X7uIhHx3cvdRgagDL3BMG6yzmx91tGTBnU90FQLG
-	4DWt2HlzZQOTWeAD7F81WLF8iOiXf/iWZTjiuEtyg7rvbkrWdvzS4X76hvm/svGGBEYNFq
-	iBi8kyH5Mi3WDws+5BbGGe35gjaAqTk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1716460648;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/1KBVwjzgcWkBaQvXJzCXdCnX2ss4+FGZS/CNUAbWBg=;
-	b=H7/k1CL2VLy+q1NjKICKSoU03WbBESTvrD0W5/4U89TbHCEmtVzCvblK8BnQpJlXIqhXGe
-	IgGjwd2KyD6P//Aw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1716460648; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/1KBVwjzgcWkBaQvXJzCXdCnX2ss4+FGZS/CNUAbWBg=;
-	b=CYK+LW3YJgfJohiINUGL6ajc51etK5X7uIhHx3cvdRgagDL3BMG6yzmx91tGTBnU90FQLG
-	4DWt2HlzZQOTWeAD7F81WLF8iOiXf/iWZTjiuEtyg7rvbkrWdvzS4X76hvm/svGGBEYNFq
-	iBi8kyH5Mi3WDws+5BbGGe35gjaAqTk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1716460648;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/1KBVwjzgcWkBaQvXJzCXdCnX2ss4+FGZS/CNUAbWBg=;
-	b=H7/k1CL2VLy+q1NjKICKSoU03WbBESTvrD0W5/4U89TbHCEmtVzCvblK8BnQpJlXIqhXGe
-	IgGjwd2KyD6P//Aw==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id 7C68D20131; Thu, 23 May 2024 12:37:28 +0200 (CEST)
-Date: Thu, 23 May 2024 12:37:28 +0200
-From: Michal Kubecek <mkubecek@suse.cz>
-To: Krzysztof =?utf-8?Q?Ol=C4=99dzki?= <ole@ans.pl>
-Cc: Andrew Lunn <andrew@lunn.ch>, Ido Schimmel <idosch@nvidia.com>, 
-	Moshe Shemesh <moshe@nvidia.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	tariqt@nvidia.com
-Subject: Re: "netlink error: Invalid argument" with ethtool-5.13+ on recent
- kernels due to "ethtool: Add netlink handler for getmodule (-m)" -
- 25b64c66f58d3df0ad7272dda91c3ab06fe7a303, also no SFP-DOM support via
- netlink?
-Message-ID: <2pg2m5byszc7qbzxii3ag2v5kzptny2vv4nssatfwrixy4gdd6@fvvnwy2gccsb>
-References: <9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl>
- <apfg6yonp66gp4z6sdzrfin7tdyctfomhahhitqmcipuxkewpw@gmr5xlybvfsf>
- <31f6f39b-f7f3-46cc-8c0d-1dbcc69c3254@ans.pl>
- <7nz6fvq6aaclh3xoazgqzw3kzc7vgmsufzyu4slsqhjht7dlpl@qyu63otcswga>
- <3d6364f3-a5c6-4c96-b958-0036da349754@ans.pl>
- <0d65385b-a59d-4dd0-a351-2c66a11068f8@lunn.ch>
- <c3726cb7-6eff-43c6-a7d4-1e931d48151f@ans.pl>
- <Zk2vfmI7qnBMxABo@shredder>
- <f9cec087-d3e1-4d06-b645-47429316feb7@lunn.ch>
- <1bee73de-d4c3-456d-8cee-f76eee7194b0@ans.pl>
+	s=arc-20240116; t=1716460828; c=relaxed/simple;
+	bh=1niubsiRMPPp9x1NGdg3+MgYXbDsKG/8qo1urWMaL0Y=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=GLNHGLw/BVVQFkM3chopAwLApos5WNg/QRXGzUGAKkEQQxCZvzmklkBPWX0LbRlna3XA/Wr0p8h2JNuSFC4lL966AAe0iK+wWUHTS/Hc8WBI46uwtJvU6dclrIVUY2pAi0PRQja2K/IKSdk2jqlROP+c8Pr8EE67PAMaQMpnl98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hNiNoSJA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 53DF3C32782;
+	Thu, 23 May 2024 10:40:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716460828;
+	bh=1niubsiRMPPp9x1NGdg3+MgYXbDsKG/8qo1urWMaL0Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hNiNoSJA08Qfk1kHB/G2jnAPa1eG04Ad5U3ZJSdaBPjxEmDOcAKh9F8Bx6wtn8Cn3
+	 q7Iu/9zw/WmFEqJvdkyNL1HWewMqDgkGzmE+vWtAJ5ExdiN//uTzXukob8e1sY9fZO
+	 fHcRB31x+BZJkkTmD2W8H4lHt4BM/iY/Uhd7g0J4PnWhIHt4Bfm0C8LF+EU0ZA8cdL
+	 hca8Nt5UnoKX+owGv0m8jVY6PkVhGZm3YB27fxUjHkFRUFWAHXzQO63+Kf+kgp8RAP
+	 7VGkN++tFBkVh0fMWiNHFc3ifWE29DodVhAEmyIUquFdZFTc9roXab8GglnNxge3I7
+	 QSd1CxA9mMwFw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3DA59C54BB2;
+	Thu, 23 May 2024 10:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tomvusl3scdpzy6f"
-Content-Disposition: inline
-In-Reply-To: <1bee73de-d4c3-456d-8cee-f76eee7194b0@ans.pl>
-X-Spam-Flag: NO
-X-Spam-Score: -3.34
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.34 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SIGNED_PGP(-2.00)[];
-	LONG_SUBJ(1.56)[208];
-	SUBJECT_ENDS_QUESTION(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_COUNT_ONE(0.00)[1];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	ARC_NA(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6]
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] net: relax socket state check at accept time.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171646082824.30155.5215615405031483910.git-patchwork-notify@kernel.org>
+Date: Thu, 23 May 2024 10:40:28 +0000
+References: <23ab880a44d8cfd967e84de8b93dbf48848e3d8c.1716299669.git.pabeni@redhat.com>
+In-Reply-To: <23ab880a44d8cfd967e84de8b93dbf48848e3d8c.1716299669.git.pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, cpaasch@apple.com, ncardwell@google.com
+
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 21 May 2024 16:01:00 +0200 you wrote:
+> Christoph reported the following splat:
+> 
+> WARNING: CPU: 1 PID: 772 at net/ipv4/af_inet.c:761 __inet_accept+0x1f4/0x4a0
+> Modules linked in:
+> CPU: 1 PID: 772 Comm: syz-executor510 Not tainted 6.9.0-rc7-g7da7119fe22b #56
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.11.0-2.el7 04/01/2014
+> RIP: 0010:__inet_accept+0x1f4/0x4a0 net/ipv4/af_inet.c:759
+> Code: 04 38 84 c0 0f 85 87 00 00 00 41 c7 04 24 03 00 00 00 48 83 c4 10 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 ec b7 da fd <0f> 0b e9 7f fe ff ff e8 e0 b7 da fd 0f 0b e9 fe fe ff ff 89 d9 80
+> RSP: 0018:ffffc90000c2fc58 EFLAGS: 00010293
+> RAX: ffffffff836bdd14 RBX: 0000000000000000 RCX: ffff888104668000
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: dffffc0000000000 R08: ffffffff836bdb89 R09: fffff52000185f64
+> R10: dffffc0000000000 R11: fffff52000185f64 R12: dffffc0000000000
+> R13: 1ffff92000185f98 R14: ffff88810754d880 R15: ffff8881007b7800
+> FS:  000000001c772880(0000) GS:ffff88811b280000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007fb9fcf2e178 CR3: 00000001045d2002 CR4: 0000000000770ef0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> PKRU: 55555554
+> Call Trace:
+>  <TASK>
+>  inet_accept+0x138/0x1d0 net/ipv4/af_inet.c:786
+>  do_accept+0x435/0x620 net/socket.c:1929
+>  __sys_accept4_file net/socket.c:1969 [inline]
+>  __sys_accept4+0x9b/0x110 net/socket.c:1999
+>  __do_sys_accept net/socket.c:2016 [inline]
+>  __se_sys_accept net/socket.c:2013 [inline]
+>  __x64_sys_accept+0x7d/0x90 net/socket.c:2013
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0x58/0x100 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> RIP: 0033:0x4315f9
+> Code: fd ff 48 81 c4 80 00 00 00 e9 f1 fe ff ff 0f 1f 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 ab b4 fd ff c3 66 2e 0f 1f 84 00 00 00 00
+> RSP: 002b:00007ffdb26d9c78 EFLAGS: 00000246 ORIG_RAX: 000000000000002b
+> RAX: ffffffffffffffda RBX: 0000000000400300 RCX: 00000000004315f9
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
+> RBP: 00000000006e1018 R08: 0000000000400300 R09: 0000000000400300
+> R10: 0000000000400300 R11: 0000000000000246 R12: 0000000000000000
+> R13: 000000000040cdf0 R14: 000000000040ce80 R15: 0000000000000055
+>  </TASK>
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net] net: relax socket state check at accept time.
+    https://git.kernel.org/netdev/net/c/26afda78cda3
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---tomvusl3scdpzy6f
-Content-Type: text/plain; charset=iso-8859-2
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, May 22, 2024 at 10:29:43PM -0700, Krzysztof Ol=EAdzki wrote:
-> Do you think it would make sense to print a warning in such situation,
-> or just handle this silently?
-
-Unless part of the data not being available is something that should be
-expected to happen even if there is nothing wrong (which doesn't seem to
-be the case), there should IMHO be a warning that the information shown
-is incomplete.
-
-I would also consider a short comment in the code explaining that
-returning 0 after request failure is intentional.
-
-Michal
-
---tomvusl3scdpzy6f
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmZPHGMACgkQ538sG/LR
-dpWrMwf+PTsWEjYH1ihuSvdPPQ3ulvU+GFV8WMicy7NZ/f3deb8BsaWsNkmqlok/
-HpWceGBVm/f/vN9rHmBT2urPRaq2mx94NzERsvVLxDbePtCRPo5Vjm7Ce7PlUcNF
-pOlkjMfAbMWhckuOKRUx+4IyNU2nW7/bHiPGNXWQV5BsZSwoUJ/0QxfJxDTFA93c
-23YFLQ4DdVxIeKX8eumxDiHe/y3Knfl047+02ps+TW0MUqedoovCKFEk2izQpXQ5
-i/Xnj1Sml6yGsBIjtGYUo+sCRMKVlv4YxkclPNSgF/O1vyb8Y/cwj8l25+7L2Ai1
-pTYT+yjYxV24uStwuwlov0ZlJAbBBw==
-=xDnj
------END PGP SIGNATURE-----
-
---tomvusl3scdpzy6f--
 
