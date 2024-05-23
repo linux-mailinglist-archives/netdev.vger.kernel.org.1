@@ -1,70 +1,64 @@
-Return-Path: <netdev+bounces-97807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D1EF8CD567
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 16:11:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F32E8CD568
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 16:12:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6505283FFB
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:11:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04714B20B29
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:11:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B276113C68A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2B313D621;
 	Thu, 23 May 2024 14:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=trudheim.com header.i=@trudheim.com header.b="JwCUwr7g"
+	dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b="cBdzmu9Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from ste-pvt-msa1.bahnhof.se (ste-pvt-msa1.bahnhof.se [213.80.101.70])
+Received: from smtp-in-1.gedalya.net (mail.gedalya.net [170.39.119.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583A67FBD2
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 14:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.80.101.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E16813B7BE
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 14:11:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.39.119.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716473512; cv=none; b=A2oPHnJhgRDIZrnyDBpN4G27FOvWNMfpRIraXzUgxCZ2b4LbV22JCzNFCodWvc18po4xL6fMd3D+KkvIjpbash5EfmSLZCzZsqUW05F1DfrMDp/uiEOXX1RMZrFqM1iBCA7ysHUuqQ2Ruu8DviJoFDKgJAcTpM86gDiEKNDepSU=
+	t=1716473512; cv=none; b=GUNsjThflGFHBdVs5L6U/F2nSa74yElbC2D8N9ssMnGPeOxlsElE3cZhHHL/4lc3zWphRed/35Jbcw2oV22O1CU9Jx6spWJH1TYnH7CLogwdhxkjC2FKGSLOnP7OMHo+d3qAddJEaA35mvbwFWz+e9BCuuaxblpOB6i7OK4KBZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1716473512; c=relaxed/simple;
-	bh=CoZ6hkeGPQ684Hjq4V5WM8hzBykOFWa4rgX8z02U0IE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bxFhiCtnvwp3rxWq/mO9eXyEM4tkfOloyh4vMQSeRiNJTUnbnbRC4aUkemf94Ti4wnbqlagVlCDiVZNH3CCAfMh7qiglaaDmiNrbhY1IKLr8uKE7XMtp0Pq3/t8z0Rvalj4ND9ULTze8kyGLm/gj7FRh2drfIfBpx7rAF+Cv/pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trudheim.com; spf=pass smtp.mailfrom=trudheim.com; dkim=pass (1024-bit key) header.d=trudheim.com header.i=@trudheim.com header.b=JwCUwr7g; arc=none smtp.client-ip=213.80.101.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trudheim.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trudheim.com
-Received: from localhost (localhost [127.0.0.1])
-	by ste-pvt-msa1.bahnhof.se (Postfix) with ESMTP id 3BFCA3F5EA;
-	Thu, 23 May 2024 16:11:44 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at bahnhof.se
-X-Spam-Flag: NO
-X-Spam-Score: -2.099
-X-Spam-Level:
-Authentication-Results: ste-pvt-msa1.bahnhof.se (amavisd-new);
-	dkim=pass (1024-bit key) header.d=trudheim.com
-Received: from ste-pvt-msa1.bahnhof.se ([127.0.0.1])
-	by localhost (ste-pvt-msa1.bahnhof.se [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QXfpofC__X2h; Thu, 23 May 2024 16:11:43 +0200 (CEST)
-Received: 
-	by ste-pvt-msa1.bahnhof.se (Postfix) with ESMTPA id F36B93F4C1;
-	Thu, 23 May 2024 16:11:40 +0200 (CEST)
-Received: from photonic.trudheim.com (photonic.trudheim.com [IPv6:2001:470:28:a8::5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by trudheim.com (Postfix) with ESMTPSA id E501A13B9166;
-	Thu, 23 May 2024 16:11:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=trudheim.com;
-	s=trudheim; t=1716473497;
-	bh=CoZ6hkeGPQ684Hjq4V5WM8hzBykOFWa4rgX8z02U0IE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=JwCUwr7gkZ7X7Mb6cxW2CUeNdbqH5lZZi3SdhBJFzsspSSRrCfxCPUuHB5sAxwGEv
-	 eGzD5iJ+CCJLF+yUk8UqtGNWJDp9Wgv8zcgXOKRUkbp3nCALFFIImp/N7f690y2O5e
-	 NBFk17K+LxCFPrtGk0qH+UA4kqRjMExQwzBEX83Q=
-Date: Thu, 23 May 2024 16:11:36 +0200
-From: Sirius <sirius@trudheim.com>
-To: Gedalya <gedalya@gedalya.net>
-Cc: Dragan Simic <dsimic@manjaro.org>, netdev@vger.kernel.org
+	bh=RQGNtjvYnkg1hKRxTFFaFowcrvWD/Penss2kcFPrCtE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Phnm4mGy55NvWmNLnaZY0SDcNRQtkq01GtGozuOv8xPEiOiVBzSt/s+2PNcalfYU4UZpk1U017Qjjlo9UzjPJqj9Lejx5wzK97PVbiYu8Ri2HYokox18haZXbEh0aU0b51sFKh0NUF5B7xjjw5LLDZuQR6ENNnu9Qx7deNFIUG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net; spf=pass smtp.mailfrom=gedalya.net; dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b=cBdzmu9Y; arc=none smtp.client-ip=170.39.119.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gedalya.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gedalya.net
+	; s=rsa1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description;
+	bh=90Pf3AcyvD96Y/GrNvIuxxpAET850FleAdFOj6IXGjQ=; b=cBdzmu9YtblT6UfMwAQMx74IAL
+	d4KPkSka225i9ck0ZJQYd2nf5L5WDw1idMqNR2SqN7bCbbaQAbxnj6OZD0T7YFQ8Oid/FeL1y6zn2
+	vxe90297FSVdKhmr/bAsV+/diq9KQ/KbkdFHYj8STvvkh5TQbXpPwILCN4XJp0aSps93eGCdkA5LG
+	Mf0uh23xUjzloXR3apvR0v3E6Up5fzCX2j0r+RUlvNcRSQqajaUoEmXNRrs+WVR8bp249tXF19mLz
+	LlknLouCf9wr078MJY9rG2yHYxJqzhsWE7Th0a7QGRFnacsyLh+Ru5TdQum/hTE4JT9F5S8LgUsrt
+	lFTxcanQ==;
+Received: from [192.168.9.176]
+	by smtp-in-1.gedalya.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <gedalya@gedalya.net>)
+	id 1sA9AW-000gJf-3A;
+	Thu, 23 May 2024 14:11:45 +0000
+Message-ID: <c535f22f-bdf6-446e-ba73-1df291a504f9@gedalya.net>
+Date: Thu, 23 May 2024 22:11:41 +0800
+Precedence: bulk
+X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: iproute2: color output should assume dark background
-Message-ID: <Zk9OmHeaX1UC8Cxf@photonic.trudheim.com>
+To: Dragan Simic <dsimic@manjaro.org>
+Cc: Sirius <sirius@trudheim.com>, netdev@vger.kernel.org
 References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
  <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
  <96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
@@ -72,59 +66,41 @@ References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
  <e4695ecb95bbf76d8352378c1178624c@manjaro.org>
  <449db665-0285-4283-972f-1b6d5e6e71a1@gedalya.net>
  <7d67d9e72974472cc61dba6d8bdaf79a@manjaro.org>
- <7cfcca05-95d0-4be0-9b50-ec77bf3e766c@gedalya.net>
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7cfcca05-95d0-4be0-9b50-ec77bf3e766c@gedalya.net>
-Autocrypt: addr=sirius@trudheim.com; keydata=
-	mDMEZfWzYhYJKwYBBAHaRw8BAQdA12OXNGLFcQh7/u0TP9+LmaZCQcDJ5ikNVUR6Uv++NQy0HFN
-	pcml1cyA8c2lyaXVzQHRydWRoZWltLmNvbT6IkAQTFggAOBYhBP4MEykW8GvNTTxpa4Pq//Pg5C
-	PuBQJl9bNiAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEIPq//Pg5CPuatYA/3QLv92lC
-	7xfhdf7NgmqipA+DXyobhzn9JgwLpRQQcu0AQD77L+EQ3aiyga7NR15r2IRC4DDLFK9Mnsbvi+K
-	ZHmdBbg4BGX1s2ISCisGAQQBl1UBBQEBB0AZotbLXS2sTulJhpCsxrd9be2zedV47TV8CInC4nt
-	9PQMBCAeIeAQYFggAIBYhBP4MEykW8GvNTTxpa4Pq//Pg5CPuBQJl9bNiAhsMAAoJEIPq//Pg5C
-	PubFIA/3d2DFaXz0WJ1zq/tSacU7fckFQ7KFwddlyI7Y+IiosmAQCnBrV+e1iJXnZRSZCGBu+Xt
-	BMLXZe+WKVyzQ0/AWV5Ag==
-X-MailScanner-ID: E501A13B9166.A5D06
-X-MailScanner: Found to be clean
-X-MailScanner-From: sirius@trudheim.com
+ <1d0a0772-8b9a-48d6-a0f1-4b58abe62f5e@gedalya.net>
+ <c6f8288c43666dc55a1b7de1b2eea56a@manjaro.org>
+Content-Language: en-US
+From: Gedalya <gedalya@gedalya.net>
+In-Reply-To: <c6f8288c43666dc55a1b7de1b2eea56a@manjaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-In days of yore (Thu, 23 May 2024), Gedalya thus quoth: 
-> On 5/23/24 9:23 PM, Dragan Simic wrote:
-> > > And what about linux virtual terminals (a.k.a non-graphical consoles)?
-> > 
-> > In my 25+ years of Linux experience, I've never seen one with a
-> > background
-> > color other than black.
-> 
-> You kind of missed my question: Do we make a new rule where a correctly
-> set COLORFGBG is mandatory for linux vt?
-> 
-> That's what I meant. The fact that both vt and graphical terminal
-> emulators tend to be dark is another point.
-> 
-> My point is you can't rely on COLORFGBG. You can only use it if/when set.
-> 
-> A reasonable default is needed.
+On 5/23/24 10:02 PM, Dragan Simic wrote:
+> See, once something becomes de facto standard, or some kind of de facto
+> standard, it becomes quite hard to change it.  It's often required to
+> offer much greater flexibility instead of just changing it.
+>
+Flexibility is offered by the COLORFGBG variable. The entire time we've 
+been talking only about cases where that is not set.
 
-For the colours like blue and magenta, using \e[34;1m and \e[35;1m would
-make it more readable against dark background. And testing with a dark
-background right now, that would suffice the other colours are not
-problematic to read. (It uses the "bright" version of the two colours
-rather than the usual.)
+Again, it is good to reduce to a minimum reliance on defaults. But aside 
+from having a default the remaining option is to refuse to produce 
+colors when COLORFGBG is not set, even when the user is explicitly 
+asking for colors.
 
-That would be a miniscule change to iproute2 and would resolve the
-problem no matter what background is used. I need to test with schemas
-like solarized light and dark as well, as they are finicky.
+>>> everywhere and for the new feature to reach the users.  Shipping
+>>> a few additional files in the /etc/profile.d directory would be a
+>>> reasonable stopgap measure.
+>>
+>> No, it would be totally broken as explained.
+>
+> It would be broken only for those users who change their background
+> color to some light color.  Though, it would be broken even with your
+> patch applied, right?  I see no difference in the end results, for the
+> users that reconfigure their terminals that way.
+>
+/etc/profile.d is shell session configuration.
 
--- 
-Kind regards,
+If you want you can come up with shell magic that would set environment 
+variables depending on which terminal environment the shell is running in.
 
-/S
 
