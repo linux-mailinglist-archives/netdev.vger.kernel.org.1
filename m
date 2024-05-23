@@ -1,117 +1,116 @@
-Return-Path: <netdev+bounces-97864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 332478CD913
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 19:18:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 676868CD958
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 19:46:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E20D1283614
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 17:18:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C60AB282119
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 17:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A1721364;
-	Thu, 23 May 2024 17:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEDAB1BC39;
+	Thu, 23 May 2024 17:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZvTDjx95"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XH3sobeJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADBA7F481;
-	Thu, 23 May 2024 17:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D4AA953
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 17:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716484677; cv=none; b=kkrXJCUV9Msan2Ta+zb4faRczctsAcDBdofWwLseKF/oWK3knJK65sLYlNny2ZHYjQg8n4Aq/x+evGDK8qR451OJwk6QJd1J7hi63Pqjz4LnuROMhfy/E1WJ1LcOMmxot8+lXZ43zJbjbKLSc6lFS2lb2gLj/DB4zdsc5YR9ZPw=
+	t=1716486361; cv=none; b=Yk0Wee/JVCXwwDLIKoeqoJz/wmuyhq41Q2wy9e9aF3Lsx7V301fz/iweWoPMlTHBQlVSwO2GzY195IUy1JliP6/9djYi7G2UEBv4vMUTfuFb70TDjHw1hPMeH1yV9YFtP8gAQj6OKG3Q9uE3vDl82q2u7+jedMzHOOCqZBmGyaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716484677; c=relaxed/simple;
-	bh=4DkinzDiJDJS1Ql5eStXQ4vQlwTn1UEISiw2ImwQHFw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cjioluwag0CAff2Y7HHx9eOX4WHDwqTKdnw27WlUZAoYBJNQ6tgg2P8PDfpmjauqfD4tfycjW8SonMdMNuuFBvfu8pv0NrvUrRT7pl4SjqEofGgUWEGi/V19prTCUbgCvll5I3fZ2DiwS6rx2wiKv5EEzgggqKi5I8E6CmsbrhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZvTDjx95; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB8B4C2BD10;
-	Thu, 23 May 2024 17:17:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716484677;
-	bh=4DkinzDiJDJS1Ql5eStXQ4vQlwTn1UEISiw2ImwQHFw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ZvTDjx958B8uTjExsNmhgPDCNuwcQG2OpDZhgQwVTM1/S+B4wrNGa4IXWZBbg+2wB
-	 WWxl0zQOwIkFga4s0L1WTVEUdTylyEm4w/m27BH83Xjwxp2JssqzZrhQGnZWyAzaa1
-	 tltXfTv8aetTMwKoO7FxrSbhA1wihnnPuh9PunAGV7T6hO4ryF16gxEgvtFGae6B6a
-	 YFIvyJr01uNCKrzspmfeSls976LzXscHcRTsig1UTs3E3Hi39dgNFEGg2AIxw5YmLX
-	 pwVTraf0ODLqmVM9ub28kdNccScbxQ8TeQdVcXQVz9RyqH51PDN0i4clbMQ7aYvLCb
-	 jQbovYUr+yJFA==
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] dt-bindings: net: pse-pd: ti,tps23881: Fix missing "additionalProperties" constraints
-Date: Thu, 23 May 2024 12:17:50 -0500
-Message-ID: <20240523171750.2837331-1-robh@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1716486361; c=relaxed/simple;
+	bh=BeE2gFVzSG4StC8kL+So0txKtcyZ5Ah+xHwIKe6ydHI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mCvSRzTxmLXUNReWfXct4LoljB0sjdfUNhkFVTtXK8G6/Gv+wDLS6mQl4iXceTPcO7MXSe2VqiY7X16RzGZsnOEY+u+fm3tlLqglAG2maOeZ1vFKPF2SAwNDjD4gfCV8nFpGChYaZpGufPjGD6Lys15ePXADj64DiF34bga+K9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XH3sobeJ; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716486360; x=1748022360;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=BeE2gFVzSG4StC8kL+So0txKtcyZ5Ah+xHwIKe6ydHI=;
+  b=XH3sobeJOXTUuY7bKi4yX5/Nkh632YPK061TGibodB2RWBxrvcXr6ItB
+   Ehsi4+Ae3CSNb79NNXUUofWlKZKn7IA/vkKD83CUMShZ+ZyMAOjZhpGtD
+   2P7WfxUsXvt6M7B2YIhrn+UX1Y5RS61ZPP3fadI4tj8JIPW9z2sONozyw
+   PQST7VK1tsA8m/6GFGInlQGjJzbqs/X10MUoBwL768jLCq4x4nGBO4JyO
+   kJMSG64OjR1e7gxJASaNUaMFxZmPv9dQuKeIy9oRRQzkB1vmAqXBuQSAq
+   fLXGlT5OnPxlRPlkl7X+BZktz1iWn9hZGjFZ/oxrh88v10fhuJE3sXHQ/
+   g==;
+X-CSE-ConnectionGUID: 5hG/LO+QT/mPZfwywt2ntw==
+X-CSE-MsgGUID: LKZ9GUp3T4uHzu8/nOwIpQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11081"; a="12675510"
+X-IronPort-AV: E=Sophos;i="6.08,183,1712646000"; 
+   d="scan'208";a="12675510"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2024 10:46:00 -0700
+X-CSE-ConnectionGUID: hxndgXa1QYWtRKDJktnKkw==
+X-CSE-MsgGUID: JRvNGXgOR+K90GAbfCP2jw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,183,1712646000"; 
+   d="scan'208";a="33719177"
+Received: from jekeller-desk.amr.corp.intel.com ([10.166.241.1])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2024 10:45:59 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net 0/2] Intel Wired LAN Driver Updates 2024-05-23 (ice,
+ idpf)
+Date: Thu, 23 May 2024 10:45:28 -0700
+Message-Id: <20240523-net-2024-05-23-intel-net-fixes-v1-0-17a923e0bb5f@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALiAT2YC/x3MUQqAIBAE0KvEfrdgmkVdJfqIXGshLDQikO7e1
+ uebGSZDosiUoC8yRLo48R4EVVnAvE5hIWQnBq10raw2GOjED6gsCjmctP2h55sStl1deWNco50
+ FOTki/YV8DCAzGJ/nBTocLMF1AAAA
+To: Jakub Kicinski <kuba@kernel.org>, netdev <netdev@vger.kernel.org>, 
+ David Miller <davem@davemloft.net>
+Cc: Jacob Keller <jacob.e.keller@intel.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Michal Kubiak <michal.kubiak@intel.com>, 
+ Wojciech Drewek <wojciech.drewek@intel.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Krishneil Singh <krishneil.k.singh@intel.com>, 
+ Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+X-Mailer: b4 0.13.0
 
-The child nodes are missing "additionalProperties" constraints which
-means any undocumented properties or child nodes are allowed. Add the
-constraints and all the undocumented properties exposed by the fix.
+This series contains two fixes which finished up testing.
 
-Fixes: f562202fedad ("dt-bindings: net: pse-pd: Add bindings for TPS23881 PSE controller")
-Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+First, Alexander fixes an issue in idpf caused by enabling NAPI and
+interrupts prior to actually allocating the Rx buffers.
+
+Second, Jacob fixes the ice driver VSI VLAN counting logic to ensure that
+addition and deletion of VLANs properly manages the total VSI count.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- .../bindings/net/pse-pd/ti,tps23881.yaml       | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+Alexander Lobakin (1):
+      idpf: don't enable NAPI and interrupts prior to allocating Rx buffers
 
-diff --git a/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml b/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
-index 4147adb11e10..6992d56832bf 100644
---- a/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
-+++ b/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
-@@ -29,13 +29,31 @@ properties:
-       of the ports conversion matrix that establishes relationship between
-       the logical ports and the physical channels.
-     type: object
-+    additionalProperties: false
-+
-+    properties:
-+      "#address-cells":
-+        const: 1
-+
-+      "#size-cells":
-+        const: 0
- 
-     patternProperties:
-       '^channel@[0-7]$':
-         type: object
-+        additionalProperties: false
-+
-+        properties:
-+          reg:
-+            maxItems: 1
-+
-         required:
-           - reg
- 
-+    required:
-+      - "#address-cells"
-+      - "#size-cells"
-+
- unevaluatedProperties: false
- 
- required:
+Jacob Keller (1):
+      ice: fix accounting if a VLAN already exists
+
+ drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c | 11 ++++++-----
+ drivers/net/ethernet/intel/idpf/idpf_lib.c        |  1 +
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c       | 12 +++++++-----
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h       |  1 +
+ 4 files changed, 15 insertions(+), 10 deletions(-)
+---
+base-commit: c71e3a5cffd5309d7f84444df03d5b72600cc417
+change-id: 20240523-net-2024-05-23-intel-net-fixes-7941f33d62d5
+
+Best regards,
 -- 
-2.43.0
+Jacob Keller <jacob.e.keller@intel.com>
 
 
