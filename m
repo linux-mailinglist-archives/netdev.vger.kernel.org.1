@@ -1,118 +1,108 @@
-Return-Path: <netdev+bounces-97835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94F4F8CD6DE
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 17:18:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E53B8CD6FC
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 17:23:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6A401C21A52
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:18:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A57E1F2517C
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:23:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E1D101CA;
-	Thu, 23 May 2024 15:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 403FC10A22;
+	Thu, 23 May 2024 15:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b="AlnkmY12"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jeysNl6O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-in-1.gedalya.net (mail.gedalya.net [170.39.119.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD6E125AC
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 15:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.39.119.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D432171AB;
+	Thu, 23 May 2024 15:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716477477; cv=none; b=RSxVyMZLCEjrjWFLgrQW0VY8ltCurDOfIpJNLUMmSCJabMzGe3ZrgroxInWdz1u6g4hXyuCL2Zcxq2tUcKc9uLaITArWooCuqYvuXvXNz8D8eB5/zhV1rnCZOGgt+W2mssif4iUeacruasZk8jUYfq9Dva0OCqBVZiEPNYuaRUc=
+	t=1716477804; cv=none; b=VDHThA4CewgsmOl6z+W/yo/6gpNWnLWays49rOnDAb5GHKU2kThqJcIMuTUrBhBEL61q6545cZxMLSM5OY3pifOvD4akf1MkndenAktPcGIMrm5VrE9Xj7rBOL3nhTR46tC2xhjKuoW/aj+Yk6zvNAh8tQdyZeY+rKo6H3ONLyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716477477; c=relaxed/simple;
-	bh=dw0GRxDMpwNNnRAXQSVKch6Bufz5DNxd7l8Af3GWA20=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Uy/oOThHCB8Y5mV2CVG8W0DBmAaa+bhCfXxJYCgYQBYsqkist2CeayND3xGVsBik9yTY1YeaNfBcm961mPsU5MnP+JyA+bVbxQaPR9VVlensqxOQy/eHRJ3Sjx4ujXcFS8QvigkQ6AnxtuYuwZbnjEUdA+6SJJiyAaki4AlYJSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net; spf=pass smtp.mailfrom=gedalya.net; dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b=AlnkmY12; arc=none smtp.client-ip=170.39.119.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gedalya.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gedalya.net
-	; s=rsa1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description;
-	bh=bEpX6LA+YlkrHvAzQ0I4cUTviWGDbs3dSlUJTOEl7Z4=; b=AlnkmY12r0hw/7O6XQ6bcbnBrZ
-	PjXMsMueyEiZ2q4rz9SOcYYFJVHWhM1rD6/zU3biDPDjmZ7X6kET0cFcCl4iUkrY7Uj0AUK0DSkln
-	bV66cXOm6wwwwZ65Ll7IcTTGcr5MvZt5C17ssLQLzOm8s1JJu+0a+wEE5gx1aR8fmfk+kP0MiarA3
-	kvjrZRpHVAoDDa27gmIL9CJlEw+lHjfVNt2vICeJtBwBJ6etCMMlaVAmLby4TvyESvs+qB9WAeJEC
-	Iy+J7X6iDafVvWnOYXPhW8gfhjzaiJi/sE4d42dVlkyQBhMjNOHNvt8UxZoqjcefjK9RSYZHsd2RC
-	KAzTTR0A==;
-Received: from [192.168.9.176]
-	by smtp-in-1.gedalya.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <gedalya@gedalya.net>)
-	id 1sAACS-000gPz-1d;
-	Thu, 23 May 2024 15:17:48 +0000
-Message-ID: <8a1402f2-04bb-475f-a496-059470ce9bbd@gedalya.net>
-Date: Thu, 23 May 2024 23:17:44 +0800
+	s=arc-20240116; t=1716477804; c=relaxed/simple;
+	bh=gm2akDKV+K/A+SKv5Rv3py5A35ux/uSRgjaqBzbM2bY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uGVw1UcBfbMQT9DGknRChkql2KSQy0T4cRYSHw2U/0QeJBVzRg8yOTikJn0tjZOIWtPtpHVHh28rnVNrLzCYUN2R8uFltRFNl11Me98g/ZgRyf0kTzRQIAWXYADFY+0A0jK1S6bKEGqd3weapoU7aXBy8xEAMftMSUMpEzZGKEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jeysNl6O; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2e576057c2bso115711121fa.1;
+        Thu, 23 May 2024 08:23:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716477800; x=1717082600; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hIqLG9Ip1R2q7phAuful+Soh0Fz/9vGd1c4u2HUfpDE=;
+        b=jeysNl6OMAztloUZQM7vaSjwpOw7+5zjHYxdDgO9KTk4qEIqvhrrc24MNCIGq+ViMR
+         4iQAADlEFNeENUOMj+H5y3r/99qQn45tiXjr6AQrlDzyzPN+jBKueL+nHkwntBjjvSAM
+         8pZZ4XkAHITyz/lw1Lk1/jdXyt70rxHNfZPrmloS+c8sbAJQdZVM3XUT+63GidiCQGZC
+         qnK3iTIVY/c+gc8mMnUUC7CB1wSCDoLpyVhHUV3AVCc05V+loJ8OFUy+YnZHYPafEJxM
+         /Pl17qFVuu+CIH3l2a2kWCaAouEMYugR09kvHrM64fQnL0QJ+LDf57LLIHQN+RYI2phe
+         orYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716477800; x=1717082600;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hIqLG9Ip1R2q7phAuful+Soh0Fz/9vGd1c4u2HUfpDE=;
+        b=IVe+ehk4cDNCWYtAAseNLfYuer+QwjYLWIo5HV9TEw9Y4uDeXXqDO6zDz2qTSHNhdM
+         vQQK+/TLXDvK6/LeL/Sc8KhpdP8fWL5pca8wKqBqTsFDPflqZsX+fPtmEPx+eRwO58sj
+         8AakBWuDQ+K+54g2HMNBcxUIIM+NZeBJpr/ZQdFuZdP8JRAkKd9q7vxcpuovd6zfpUyt
+         /fHIUjOj8YuthLL/FetTiDr35X9Xa8HfUpwVAF6/0vcRvd+Ekjv5YaM36FR4cYwhUxLa
+         JbEgORQ4FJgSrFjII+BGnByMOt8vWJoDVUmoaix+V6eR2NUXGBy0lEqyNneIDvmAOTPy
+         iGcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUSXsXG4rmPsQu5wJ5i4nSDVeh6vvOQ51DbS1lKYRXTcBIZU3K+DLi5tKRo5Pl7RTmQ909EuJ6U2RZxzAJyF5XSvwrr/bmV+ZtIXcq3hha2AMh67otvmnB1poxprl4XMytfeg==
+X-Gm-Message-State: AOJu0YxIGP/XUua9jKOKwQLmeg4OG/Ilb3PegeCiPGFlh5G5/6WepJXr
+	r/mcOsI2euyhaD32YEQCjZTLroBQ2dkrZsELKSpTphP1+uWFn+Y5zX4Vl+6Mm0aF9dt7fhA3mne
+	4nUYvo21mFm50f+NW2qy/24/rm6u/z5VFgiU=
+X-Google-Smtp-Source: AGHT+IG76fvNn/u89EljjsSKy4xcgB9RvwpblSMHQd6gEi2y9bHr9QW0VGAxGM8UhtXYlJpRRo47a5f3oRrISa7ASkA=
+X-Received: by 2002:a05:651c:10a7:b0:2e9:485d:45a4 with SMTP id
+ 38308e7fff4ca-2e949466b84mr41158321fa.16.1716477800065; Thu, 23 May 2024
+ 08:23:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: iproute2: color output should assume dark background
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Dragan Simic <dsimic@manjaro.org>, Sirius <sirius@trudheim.com>,
- netdev@vger.kernel.org
-References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
- <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
- <96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
- <Zk722SwDWVe35Ssu@photonic.trudheim.com>
- <e4695ecb95bbf76d8352378c1178624c@manjaro.org>
- <449db665-0285-4283-972f-1b6d5e6e71a1@gedalya.net>
- <7d67d9e72974472cc61dba6d8bdaf79a@manjaro.org>
- <1d0a0772-8b9a-48d6-a0f1-4b58abe62f5e@gedalya.net>
- <c6f8288c43666dc55a1b7de1b2eea56a@manjaro.org>
- <c535f22f-bdf6-446e-ba73-1df291a504f9@gedalya.net>
- <c41ee2a968d1b839b8b9c7a3571ad107@manjaro.org>
- <94d43b6d-74ae-4544-b443-32d8da044b75@gedalya.net>
- <20240523075904.16f3599b@hermes.local>
-Content-Language: en-US
-From: Gedalya <gedalya@gedalya.net>
-In-Reply-To: <20240523075904.16f3599b@hermes.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240522183133.729159-2-lars@oddbit.com> <8fe7e2fe-3b73-45aa-b10c-23b592c6dd05@moroto.mountain>
+In-Reply-To: <8fe7e2fe-3b73-45aa-b10c-23b592c6dd05@moroto.mountain>
+From: Dan Cross <crossd@gmail.com>
+Date: Thu, 23 May 2024 11:22:43 -0400
+Message-ID: <CAEoi9W45jE_K6yDYdndYOTm375+r70gHuh3rWEtB729rUxNUWA@mail.gmail.com>
+Subject: Re: [PATCH v4] ax25: Fix refcount imbalance on inbound connections
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: lars@oddbit.com, Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/23/24 10:59 PM, Stephen Hemminger wrote:
-> Fits perfect with "what color for the bike shed"
+On Thu, May 23, 2024 at 11:05=E2=80=AFAM Dan Carpenter <dan.carpenter@linar=
+o.org> wrote:
+> > [snip]
+>
+> I've already said that I don't think the patch is correct and offered
+> an alternative which takes a reference in accept() but also adds a
+> matching put()...  But I can't really test my patch so if we're going to
+> do something that we know is wrong, I'd prefer to just revert Duoming's
+> patch.
 
-I'd love it if someone actually commented on my patch.
+Dan, may I ask how you determined that Lars's patch is incorrect?
+Testing so far indicates that it works as expected. On the other hand,
+Lars tested your patch and found that it did not address the
+underlying issue
+(https://marc.info/?l=3Dlinux-hams&m=3D171646940902757&w=3D2).
 
-Currently, iproute2 does produce colored output when COLORFGBG is unset. 
-If that remains unchanged:
+If I may suggest a path forward, given that observed results show that
+Lars's patch works as expected, perhaps we can commit that and then
+work to incorporate a more robust ref counting strategy a la your
+patch?
 
-         It selects a certain palette.
-
-Does everyone here think that keeping the current selection best serves 
-the majority of users?
-
-It's a simple question.
-
-It seems to me that it should revolve around a guesstimation of what 
-background colors people are using. Or maybe I'm wrong.
-
-No one is arguing here about what colors anyone _should_ be using. I 
-also think it's misguided to regard an issue of unreadable output as 
-trivial. Using a black background is something you can choose away from, 
-except in an emergency, and not so much on vt. And navy blue on black is 
-just hard to read. Poor contrast. If you can read that easier than 
-others then fine, good for you, but this is about usability, it has 
-literally nothing to do with personal taste.
-
--------
-
-Alternative approaches: default to light bg, but select dark bg when 
-TERM=linux (linux vt), I'd be happy to write the patch.
-
-I'd like to try to alter the colors as suggested by Sirius, and if 
-everyone agrees I'd like to also stick to defaulting to dark bg if not 
-indicated otherwise.
-
-
+        - Dan C.
 
