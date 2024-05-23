@@ -1,275 +1,224 @@
-Return-Path: <netdev+bounces-97814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 105B98CD5A1
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 16:23:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 587318CD5A3
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 16:23:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8460F1F22179
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:23:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5576281595
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F0014B963;
-	Thu, 23 May 2024 14:23:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7DD14BFA8;
+	Thu, 23 May 2024 14:23:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bD1ekbqg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UvSXR7qA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D606C146D79;
-	Thu, 23 May 2024 14:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53ED14BF90;
+	Thu, 23 May 2024 14:23:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716474219; cv=none; b=GeBdRwjxPb+adqn4zemiHVwjX6ov0O4EcocSbO2uPxAQRTSpFjxiSMU43Hdqoe4E0FALBSdFaf3+y6R524VL50+Xn3kIN++eK5DB7De37XS+gOoWCcv2FRkixvCQyZI1L8YtEr99i40uDpmbHdsbZVo409rPzCdQL+axVeCHs6g=
+	t=1716474224; cv=none; b=nOiMtFZebmeUaLR7bEC3BMh3zcdqYMk+FlRcYj2sXwo5kVQQ1emcYvYT66CujZBsPRZ+i9CiVvrvXB8u/1XNrLqLCaZEINsFJ0I95ZkxSg6La+xJviIEfOes2Hm5pOkEylNkjNwGY+Mh2WQzo9umYR16IRlLt64ufu65qYBBev8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716474219; c=relaxed/simple;
-	bh=4VzasgoIp8iJLru273gUC7Xd/2sk70oHQiDhBedMMCg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CTOJISDplEXZBTI3Z6gmcBkvDUcNwgoyrMq36qKJpVCU/aPIkBFnFIp2QAinnLwcudpHnp1bB7wMnoL+u1GY86/RQOOVifD9qPGQy0icRnyo9fDor9KGU+kjD4TpyJAcEKswpBf79nfQtqNA+q0FBM+hZn5j1dBXyfRu+RR0rgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bD1ekbqg; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716474216; x=1748010216;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4VzasgoIp8iJLru273gUC7Xd/2sk70oHQiDhBedMMCg=;
-  b=bD1ekbqgzVpQXZb5h1UWVtDp7Opuh5hRBBX8N91vPvC211NKp8qDWsr3
-   U0/WBCqQvfmzP7+ETOl2+E/Y6ZNGlIzstRj9UblFRNMB+pZ+/WnzRfC5g
-   V8FQOoJBuWwdwjOpH4C7vL1XX0B0LoUUK8SZki4o5xkNKIxUqd6KAoak/
-   d9E6drf+Sejys+xEZMfCgEa8hj5h3Zlds3GfNYsF8bJAa0MEFmDjVCcrg
-   j4B54vgl4ETvRllbKZZKPvQ8elEjH0iLnKNFikm75uLfnZ2LomeR40TeR
-   bwwcmMuRCCVxZtPDYvIdb0wErcWhms/XQkiwE8j6gMjOEKpgUGsPV93Dg
-   A==;
-X-CSE-ConnectionGUID: g7a+o12BRyilohoStH6POw==
-X-CSE-MsgGUID: IlypowyQTHGQWg9E2bhXdw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11081"; a="12970413"
-X-IronPort-AV: E=Sophos;i="6.08,182,1712646000"; 
-   d="scan'208";a="12970413"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2024 07:23:36 -0700
-X-CSE-ConnectionGUID: M0o0v+VlStSju+7ngdqoRQ==
-X-CSE-MsgGUID: gX6pI8JsQOCgJtA9p4Gcfg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,182,1712646000"; 
-   d="scan'208";a="38463983"
-Received: from unknown (HELO 0610945e7d16) ([10.239.97.151])
-  by orviesa003.jf.intel.com with ESMTP; 23 May 2024 07:23:34 -0700
-Received: from kbuild by 0610945e7d16 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sA9Lu-0002yb-2g;
-	Thu, 23 May 2024 14:23:30 +0000
-Date: Thu, 23 May 2024 22:22:44 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vadim Fedorenko <vadfed@meta.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next 1/2] bpf: add CHECKSUM_COMPLETE to bpf test progs
-Message-ID: <202405232220.e9PuO2yW-lkp@intel.com>
-References: <20240522145712.3523593-1-vadfed@meta.com>
+	s=arc-20240116; t=1716474224; c=relaxed/simple;
+	bh=yrGCGjJOaGbQ0l/A8VzBNklsCpurFdk/1Chj5MJVhT0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SMR+ciuRBx9NLqJdXUQdAfSf70Ck9EBLGu8W9fnRvuWP47k0kWm3lMrWBbQfvnDG9KE3frQVeN8FojJTQJCUIpkSn0PYv///5NueET8zVvB0aQFtJimelbvWO91kypfMkrrEiYP+csIBF++ugoAxYf+hHObLntDZwSjKsbpAi+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UvSXR7qA; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2e951296784so8340761fa.1;
+        Thu, 23 May 2024 07:23:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716474221; x=1717079021; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JG/V5KaB4zeIXCOM315hO8c28tW7uX6d2gIJRmze4Sk=;
+        b=UvSXR7qA9OdaXZbX96iV2lNFOxmYzi8ZG0WPc7xoJFozc/5Mkb9uEoMyZz90/1VhRC
+         xnEZYkwdu9wQ+w+pXEjtkoSjn8rcpGloXWgV9JtkuQIU2+wWLDYG6WAxipWY0MfQ8hTH
+         ErXn3/NYOsSf8nGkXhDPL6haPELb2jRey9lKn9IGLEZGxSVOZ9yzMLkP97XZE3yJwxKy
+         TahwFtEa+Zua2vA9b7BUuojdGymiasM0UU3YjK9pLZrICyo61B/mrheTjrZc9zbPn8c7
+         U+91VMz3+11GOvqyoyYJ/VlfMamTJgeWkT5DQnlm+bS1L7O18NgRy/bwvvlK/Zs0OYQl
+         oOYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716474221; x=1717079021;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JG/V5KaB4zeIXCOM315hO8c28tW7uX6d2gIJRmze4Sk=;
+        b=inLvXStIaRKsoyp8pr5U+LarSRXM02C1EKQ0PyznliLQhAA7y9WatJC1Tuzomu7hBq
+         b49+1x5SaDkJYgl4JHXhf+3SWceMDdX+8/jxlV37HTLVXffz5Zz8rDkEXV/4cXv9JYn3
+         k3XWvHmQ0gY/LTQZQYbJ2zM2cexzBLvnF8pVH6E4YHyJI9Og9BwJLcyidot2aPZ5RXsM
+         MS1x/Gzq7XNYCHYxWCNkK67ulo5P8HmDJznAzRWfw8FkJUXnuS5VxEPCubZhbaVnK9RB
+         cjk7MsifZgONdBU5+4Y1H7KfWjBmiDMhh/6Nux5ibd/4PXUK5U2a1KeUCgpueX3GLYP6
+         Adhw==
+X-Forwarded-Encrypted: i=1; AJvYcCV4PjwWuqoXVc8HsbmUBfe6crwhWtUNdkL+rNjA+QJ1fPgURJSyXRENlo0hz9l8v0Yobyuk4l6YN9aGwQp9U8TQRo4UZtRJ+5GrkOIJvSgJ5Yj8eTlrfLy3rs8Z5MU565Jiqqc6
+X-Gm-Message-State: AOJu0YxAve2eq4/yOnA56SYqJmraHMNga/qOCwMF2SGfa6Dk/ZMnPAlz
+	M68N8KGhwAxOL0vM3mhI0foIzotKIDWTOVKFfo0x2Ucdbk9iXSH78hpJ/bYHIaY85nOHc0U0JJA
+	d0PiXeFSIGVGPFceZJkyJymbtBZY=
+X-Google-Smtp-Source: AGHT+IGiRbs1hDX03MTpGZZ2hY8YXqvy0WZ9IOUYqgmmAlA8zEqhk35ziVBDHsEFXF6DXxoKy9iv4DOcHv0cMorh2Bc=
+X-Received: by 2002:a2e:80ca:0:b0:2e7:1621:89d0 with SMTP id
+ 38308e7fff4ca-2e951b4ee15mr8234391fa.2.1716474220912; Thu, 23 May 2024
+ 07:23:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240522145712.3523593-1-vadfed@meta.com>
+References: <20240523060934.2883716-1-yinghsu@chromium.org>
+In-Reply-To: <20240523060934.2883716-1-yinghsu@chromium.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 23 May 2024 10:23:23 -0400
+Message-ID: <CABBYNZKwLTri10NfQ07sywymPCFq2mwvb8==Zjn1QMD-kwpobA@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Add vendor-specific packet classification
+ for ISO data
+To: Ying Hsu <yinghsu@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, pmenzel@molgen.mpg.de, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Vadim,
+Hi Ying,
 
-kernel test robot noticed the following build warnings:
+On Thu, May 23, 2024 at 2:09=E2=80=AFAM Ying Hsu <yinghsu@chromium.org> wro=
+te:
+>
+> When HCI raw sockets are opened, the Bluetooth kernel module doesn't
+> track CIS/BIS connections. User-space applications have to identify
+> ISO data by maintaining connection information and look up the mapping
+> for each ACL data packet received. Besides, btsnoop log captured in
+> kernel couldn't tell ISO data from ACL data in this case.
+>
+> To avoid additional lookups, this patch introduces vendor-specific
+> packet classification for Intel BT controllers to distinguish
+> ISO data packets from ACL data packets.
+>
+> Signed-off-by: Ying Hsu <yinghsu@chromium.org>
+> ---
+> Tested LE audio unicast recording on a ChromeOS device with Intel AX211
+>
+> Changes in v2:
+> - Adds vendor-specific packet classificaton in hci_dev.
+> - Keeps reclassification in hci_recv_frame.
+>
+>  drivers/bluetooth/btusb.c        | 19 +++++++++++++++++++
+>  include/net/bluetooth/hci_core.h |  1 +
+>  net/bluetooth/hci_core.c         | 16 ++++++++++++++++
+>  3 files changed, 36 insertions(+)
+>
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 79aefdb3324d..75561e749c50 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -966,6 +966,24 @@ static void btusb_intel_cmd_timeout(struct hci_dev *=
+hdev)
+>         gpiod_set_value_cansleep(reset_gpio, 0);
+>  }
+>
+> +#define BT_USB_INTEL_ISODATA_HANDLE_BASE 0x900
+> +
+> +static u8 btusb_intel_classify_pkt_type(struct hci_dev *hdev, struct sk_=
+buff *skb)
 
-[auto build test WARNING on bpf-next/master]
+We might as well move this to btintel.c since it should not be USB specific=
+.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/selftests-bpf-validate-CHECKSUM_COMPLETE-option/20240522-225856
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20240522145712.3523593-1-vadfed%40meta.com
-patch subject: [PATCH bpf-next 1/2] bpf: add CHECKSUM_COMPLETE to bpf test progs
-config: arm64-defconfig (https://download.01.org/0day-ci/archive/20240523/202405232220.e9PuO2yW-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240523/202405232220.e9PuO2yW-lkp@intel.com/reproduce)
+> +{
+> +       /*
+> +        * Distinguish ISO data packets form ACL data packets
+> +        * based on their conneciton handle value range.
+> +        */
+> +       if (hci_skb_pkt_type(skb) =3D=3D HCI_ACLDATA_PKT) {
+> +               __u16 handle =3D __le16_to_cpu(hci_acl_hdr(skb)->handle);
+> +
+> +               if (hci_handle(handle) >=3D BT_USB_INTEL_ISODATA_HANDLE_B=
+ASE)
+> +                       return HCI_ISODATA_PKT;
+> +       }
+> +
+> +       return hci_skb_pkt_type(skb);
+> +}
+> +
+>  #define RTK_DEVCOREDUMP_CODE_MEMDUMP           0x01
+>  #define RTK_DEVCOREDUMP_CODE_HW_ERR            0x02
+>  #define RTK_DEVCOREDUMP_CODE_CMD_TIMEOUT       0x03
+> @@ -4451,6 +4469,7 @@ static int btusb_probe(struct usb_interface *intf,
+>                 /* Transport specific configuration */
+>                 hdev->send =3D btusb_send_frame_intel;
+>                 hdev->cmd_timeout =3D btusb_intel_cmd_timeout;
+> +               hdev->classify_pkt_type =3D btusb_intel_classify_pkt_type=
+;
+>
+>                 if (id->driver_info & BTUSB_INTEL_NO_WBS_SUPPORT)
+>                         btintel_set_flag(hdev, INTEL_ROM_LEGACY_NO_WBS_SU=
+PPORT);
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
+_core.h
+> index 9231396fe96f..7b7068a84ff7 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -649,6 +649,7 @@ struct hci_dev {
+>         int (*get_codec_config_data)(struct hci_dev *hdev, __u8 type,
+>                                      struct bt_codec *codec, __u8 *vnd_le=
+n,
+>                                      __u8 **vnd_data);
+> +       u8 (*classify_pkt_type)(struct hci_dev *hdev, struct sk_buff *skb=
+);
+>  };
+>
+>  #define HCI_PHY_HANDLE(handle) (handle & 0xff)
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index b3ee9ff17624..8b817a99cefd 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -2941,15 +2941,31 @@ int hci_reset_dev(struct hci_dev *hdev)
+>  }
+>  EXPORT_SYMBOL(hci_reset_dev);
+>
+> +static u8 hci_dev_classify_pkt_type(struct hci_dev *hdev, struct sk_buff=
+ *skb)
+> +{
+> +       if (hdev->classify_pkt_type)
+> +               return hdev->classify_pkt_type(hdev, skb);
+> +
+> +       return hci_skb_pkt_type(skb);
+> +}
+> +
+>  /* Receive frame from HCI drivers */
+>  int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
+>  {
+> +       u8 dev_pkt_type;
+> +
+>         if (!hdev || (!test_bit(HCI_UP, &hdev->flags)
+>                       && !test_bit(HCI_INIT, &hdev->flags))) {
+>                 kfree_skb(skb);
+>                 return -ENXIO;
+>         }
+>
+> +       /* Check if the driver agree with packet type classification */
+> +       dev_pkt_type =3D hci_dev_classify_pkt_type(hdev, skb);
+> +       if (hci_skb_pkt_type(skb) !=3D dev_pkt_type) {
+> +               hci_skb_pkt_type(skb) =3D dev_pkt_type;
+> +       }
+> +
+>         switch (hci_skb_pkt_type(skb)) {
+>         case HCI_EVENT_PKT:
+>                 break;
+> --
+> 2.45.1.288.g0e0cd299f1-goog
+>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405232220.e9PuO2yW-lkp@intel.com/
 
-All warnings (new ones prefixed by >>):
-
-   net/bpf/test_run.c: In function 'bpf_prog_test_run_skb':
->> net/bpf/test_run.c:978:17: warning: unused variable 'sum' [-Wunused-variable]
-     978 |         __sum16 sum;
-         |                 ^~~
-
-
-vim +/sum +978 net/bpf/test_run.c
-
-   963	
-   964	int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
-   965				  union bpf_attr __user *uattr)
-   966	{
-   967		bool is_l2 = false, is_direct_pkt_access = false;
-   968		struct net *net = current->nsproxy->net_ns;
-   969		struct net_device *dev = net->loopback_dev;
-   970		u32 size = kattr->test.data_size_in;
-   971		u32 repeat = kattr->test.repeat;
-   972		struct __sk_buff *ctx = NULL;
-   973		u32 retval, duration;
-   974		int hh_len = ETH_HLEN;
-   975		struct sk_buff *skb;
-   976		struct sock *sk;
-   977		__wsum csum;
- > 978		__sum16 sum;
-   979		void *data;
-   980		int ret;
-   981	
-   982		if ((kattr->test.flags & ~BPF_F_TEST_SKB_CHECKSUM_COMPLETE) ||
-   983		    kattr->test.cpu || kattr->test.batch_size)
-   984			return -EINVAL;
-   985	
-   986		data = bpf_test_init(kattr, kattr->test.data_size_in,
-   987				     size, NET_SKB_PAD + NET_IP_ALIGN,
-   988				     SKB_DATA_ALIGN(sizeof(struct skb_shared_info)));
-   989		if (IS_ERR(data))
-   990			return PTR_ERR(data);
-   991	
-   992		ctx = bpf_ctx_init(kattr, sizeof(struct __sk_buff));
-   993		if (IS_ERR(ctx)) {
-   994			kfree(data);
-   995			return PTR_ERR(ctx);
-   996		}
-   997	
-   998		switch (prog->type) {
-   999		case BPF_PROG_TYPE_SCHED_CLS:
-  1000		case BPF_PROG_TYPE_SCHED_ACT:
-  1001			is_l2 = true;
-  1002			fallthrough;
-  1003		case BPF_PROG_TYPE_LWT_IN:
-  1004		case BPF_PROG_TYPE_LWT_OUT:
-  1005		case BPF_PROG_TYPE_LWT_XMIT:
-  1006			is_direct_pkt_access = true;
-  1007			break;
-  1008		default:
-  1009			break;
-  1010		}
-  1011	
-  1012		sk = sk_alloc(net, AF_UNSPEC, GFP_USER, &bpf_dummy_proto, 1);
-  1013		if (!sk) {
-  1014			kfree(data);
-  1015			kfree(ctx);
-  1016			return -ENOMEM;
-  1017		}
-  1018		sock_init_data(NULL, sk);
-  1019	
-  1020		skb = slab_build_skb(data);
-  1021		if (!skb) {
-  1022			kfree(data);
-  1023			kfree(ctx);
-  1024			sk_free(sk);
-  1025			return -ENOMEM;
-  1026		}
-  1027		skb->sk = sk;
-  1028	
-  1029		skb_reserve(skb, NET_SKB_PAD + NET_IP_ALIGN);
-  1030		__skb_put(skb, size);
-  1031	
-  1032		if (kattr->test.flags & BPF_F_TEST_SKB_CHECKSUM_COMPLETE) {
-  1033			skb->csum = skb_checksum(skb, 0, skb->len, 0);
-  1034			skb->ip_summed = CHECKSUM_COMPLETE;
-  1035		}
-  1036	
-  1037		if (ctx && ctx->ifindex > 1) {
-  1038			dev = dev_get_by_index(net, ctx->ifindex);
-  1039			if (!dev) {
-  1040				ret = -ENODEV;
-  1041				goto out;
-  1042			}
-  1043		}
-  1044		skb->protocol = eth_type_trans(skb, dev);
-  1045		skb_reset_network_header(skb);
-  1046	
-  1047		switch (skb->protocol) {
-  1048		case htons(ETH_P_IP):
-  1049			sk->sk_family = AF_INET;
-  1050			if (sizeof(struct iphdr) <= skb_headlen(skb)) {
-  1051				sk->sk_rcv_saddr = ip_hdr(skb)->saddr;
-  1052				sk->sk_daddr = ip_hdr(skb)->daddr;
-  1053			}
-  1054			break;
-  1055	#if IS_ENABLED(CONFIG_IPV6)
-  1056		case htons(ETH_P_IPV6):
-  1057			sk->sk_family = AF_INET6;
-  1058			if (sizeof(struct ipv6hdr) <= skb_headlen(skb)) {
-  1059				sk->sk_v6_rcv_saddr = ipv6_hdr(skb)->saddr;
-  1060				sk->sk_v6_daddr = ipv6_hdr(skb)->daddr;
-  1061			}
-  1062			break;
-  1063	#endif
-  1064		default:
-  1065			break;
-  1066		}
-  1067	
-  1068		if (is_l2)
-  1069			__skb_push(skb, hh_len);
-  1070		if (is_direct_pkt_access)
-  1071			bpf_compute_data_pointers(skb);
-  1072		ret = convert___skb_to_skb(skb, ctx);
-  1073		if (ret)
-  1074			goto out;
-  1075		ret = bpf_test_run(prog, skb, repeat, &retval, &duration, false);
-  1076		if (ret)
-  1077			goto out;
-  1078		if (!is_l2) {
-  1079			if (skb_headroom(skb) < hh_len) {
-  1080				int nhead = HH_DATA_ALIGN(hh_len - skb_headroom(skb));
-  1081	
-  1082				if (pskb_expand_head(skb, nhead, 0, GFP_USER)) {
-  1083					ret = -ENOMEM;
-  1084					goto out;
-  1085				}
-  1086			}
-  1087			memset(__skb_push(skb, hh_len), 0, hh_len);
-  1088		}
-  1089		convert_skb_to___skb(skb, ctx);
-  1090	
-  1091		if (kattr->test.flags & BPF_F_TEST_SKB_CHECKSUM_COMPLETE) {
-  1092			csum = skb_checksum(skb, 0, skb->len, 0);
-  1093			if (skb->csum != csum) {
-  1094				ret = -EINVAL;
-  1095				goto out;
-  1096			}
-  1097		}
-  1098	
-  1099		size = skb->len;
-  1100		/* bpf program can never convert linear skb to non-linear */
-  1101		if (WARN_ON_ONCE(skb_is_nonlinear(skb)))
-  1102			size = skb_headlen(skb);
-  1103		ret = bpf_test_finish(kattr, uattr, skb->data, NULL, size, retval,
-  1104				      duration);
-  1105		if (!ret)
-  1106			ret = bpf_ctx_finish(kattr, uattr, ctx,
-  1107					     sizeof(struct __sk_buff));
-  1108	out:
-  1109		if (dev && dev != net->loopback_dev)
-  1110			dev_put(dev);
-  1111		kfree_skb(skb);
-  1112		sk_free(sk);
-  1113		kfree(ctx);
-  1114		return ret;
-  1115	}
-  1116	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--=20
+Luiz Augusto von Dentz
 
