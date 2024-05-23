@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-97795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 057828CD428
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:22:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BC5D8CD497
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:26:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 370911C22359
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:22:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4FD51F230E0
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:26:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FDA14A604;
-	Thu, 23 May 2024 13:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3573D14AD0C;
+	Thu, 23 May 2024 13:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="1DiIk+qm"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="XloqCdMY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3831F13C3D8;
-	Thu, 23 May 2024 13:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C70313BAC3;
+	Thu, 23 May 2024 13:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716470521; cv=none; b=VNd50DoXktzlfFfFe4dyrpTvmTKTnV8+35qA2j98UAOSXZTehSoRn+ujEFyoEvMFk/a3ZLQUX8yoIXlzS4jVvQLxm1JXsN+y4TY0KP9fi997O/7omgpTG/AsXRcRuv+gFVYot4Iv632LH/C1ZfTVft87tjdKd4F9il3ya1ee4Ho=
+	t=1716470761; cv=none; b=ZKoH5NVvv8jlw396T34g+faqLG5CSy/maCOwWGtB56GsvkZC/22N6dYQj0HqrSUGPiny5hntSs4TTFuGAC5d9or6H2Z7gt8Loa1PrOw3iF5S7JODDucUsrxZ/vDJhIVJ2Zl0nO7InC2ctjRDibyHCpQNicULbj5SE012dIrcsSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716470521; c=relaxed/simple;
-	bh=Kj9mnkguZksjRUd8X+oukDSd1TeuQkq1vL8/hhgSwrA=;
+	s=arc-20240116; t=1716470761; c=relaxed/simple;
+	bh=f/oxHXUbFIWaQ+ViiCGL5kOIzgHUlBSfpA1+uYOV8mI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d2CyzgcLtLJiTbbP/w3Uzyxz6vps5dkXPS295IRzEbTAfuuciZ5GxfYww0F8Xj5WRKOUu/Sg5CE6f5jV2/TnyHMU8R24HeIi9wjjwpHM8bJ3FPhfatm7tlZim90+i0fODyf72Sb2TREy21vaXhX5HsqDL74ZjZmcltUJ6kbasSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=1DiIk+qm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B766DC32781;
-	Thu, 23 May 2024 13:22:00 +0000 (UTC)
+	 MIME-Version; b=mW1F/B5VmbfZMD+RosOMo3FpMVZo11f+mFtXSYM5LpoxgeoImUUJU8Isp8zlBHqMOGE6cBJ9VhpRpEt579vQJyPalui/i9FOIRx2kpYZW17vdn+F0prP6jZIWms/T0jlTEdhB0SuXcxucZPsmiPkC62msUgDcX8HL9wJ1xsu6X8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=XloqCdMY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89038C2BD10;
+	Thu, 23 May 2024 13:26:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1716470521;
-	bh=Kj9mnkguZksjRUd8X+oukDSd1TeuQkq1vL8/hhgSwrA=;
+	s=korg; t=1716470760;
+	bh=f/oxHXUbFIWaQ+ViiCGL5kOIzgHUlBSfpA1+uYOV8mI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=1DiIk+qmOR3OVhWQfuRbIJ7qVRMEgDKneLJS9VNPU6J8YXiWx+ZlSiH6IUv2gTyfN
-	 26rLoP7xG7YzZkIXG5VW8mT2dWelfxbvS5BR1pfU8PXWeuSEQtWJFjKrR3QHh3+nC7
-	 2+ys4bKD56/bR8lOWx+S1pmGseF1BsXqaV6oY4bw=
+	b=XloqCdMYfABJtIkMbWFcPs1SWyAgkLX7O77hp/iE4NT8fy8pKBhRrG+vEJi1KqNN2
+	 UBgBpeYqeb7yh3rbK5PRwKE26boWJ7sA6f3xKl6hg2xDIDH7usvm4CvLCdlqqS90va
+	 IZNAvpxlgBz8b4TVeGSRo7VJjYQYqrDrQgHXUYk0=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -49,12 +49,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org,
 	Ronald Wahl <ronald.wahl@raritan.com>
-Subject: [PATCH 6.8 02/23] net: ks8851: Fix another TX stall caused by wrong ISR flag handling
-Date: Thu, 23 May 2024 15:13:29 +0200
-Message-ID: <20240523130329.840598598@linuxfoundation.org>
+Subject: [PATCH 6.6 078/102] net: ks8851: Fix another TX stall caused by wrong ISR flag handling
+Date: Thu, 23 May 2024 15:13:43 +0200
+Message-ID: <20240523130345.408565178@linuxfoundation.org>
 X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240523130329.745905823@linuxfoundation.org>
-References: <20240523130329.745905823@linuxfoundation.org>
+In-Reply-To: <20240523130342.462912131@linuxfoundation.org>
+References: <20240523130342.462912131@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -66,7 +66,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.8-stable review patch.  If anyone has any objections, please let me know.
+6.6-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
