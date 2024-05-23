@@ -1,85 +1,143 @@
-Return-Path: <netdev+bounces-97676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 821718CCA6E
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 03:47:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC4308CCA7F
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 03:52:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF68B1C20E12
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 01:47:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1377C1C2012A
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 01:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F075A34;
-	Thu, 23 May 2024 01:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6443EA34;
+	Thu, 23 May 2024 01:52:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4mkv5SM/"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [20.231.56.155])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0074685;
-	Thu, 23 May 2024 01:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=20.231.56.155
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5A24685
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 01:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716428819; cv=none; b=b5n4lfPlG9+VVB4L4hs8L5x5UbPhHfekYkIat4vmxjKZhug3asacRJUkFYxsSZBH4YKLKMuZHANHvZxmlXc+QGq8twsz+DYqrhztOIxe+gKSai0hoB/9z6PG/ej8xhdCRsBPVv1Ej/wP2Pv88pZXc1oOjwqgL/+Jm8AhD9HNNiE=
+	t=1716429135; cv=none; b=LXGC4XyzumKNT7C/DXjzAPees4EucszqDa7SiySIcKrdYZyv0vOpDCnFcflNh24wo/kTh+iaYBKm0QDhrPzUUyd/iWkXkVzSquQiNxR9+Wdepo2nnRyfNs+FHG3P494fdAUKTbQFWpur8PJebyEhB1NGpMPjLYLjUGnOJD3zKpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716428819; c=relaxed/simple;
-	bh=qTz1td/mi0RpM4QoyHCs5wFBn/jKg7dIfQXTpEFTgo4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=L0NLvvwaYZnwtv1LLAflW8UWQGnSdnUMJLOOyNVByumNFFZFmp0YJVjgBfs5OyZk7gT4QVYFcQ5RYBFw96OPCIYQbjoq5AohzBOVs/Ez4cpKU6/+2W1sd8vn5grN4IM5Cm2FgxhZ3xZdzrHDGdv1XweJfWoCy39YE/Cx5TOMwfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=20.231.56.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from linma$zju.edu.cn ( [42.120.103.56] ) by
- ajax-webmail-mail-app3 (Coremail) ; Thu, 23 May 2024 09:44:15 +0800
- (GMT+08:00)
-Date: Thu, 23 May 2024 09:44:15 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Simon Horman" <horms@kernel.org>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, yuehaibing@huawei.com,
-	larysa.zaremba@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 net-next] ila: avoid genlmsg_reply when not ila_map
- found
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT5 build
- 20231205(37e20f0e) Copyright (c) 2002-2024 www.mailtech.cn zju.edu.cn
-In-Reply-To: <20240522170302.GA883722@kernel.org>
-References: <20240522031537.51741-1-linma@zju.edu.cn>
- <20240522170302.GA883722@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1716429135; c=relaxed/simple;
+	bh=Y9CowDEKybjwzmTUjQClMd88FG1Lf6m6nIuAUNC/Q9s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d4/uhT/XGdsthiZL8KhsUaIyzovsbJPW7UEX1YiQa92mDMd0p0dav/B/DXA7HD9ID9KaTf8pehGJtvBkIXzhaXRe1AByrEpS+yA/tYSh49BKOspu3o1myiQoC+kkm/61lnsXlVBk2X5xMIBwyu/pw7dtLjmAFzs0BNFNjNoGs0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4mkv5SM/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=12UiUkZyn04S4KeHyjnJv8NbT2RkA+iVfABYi+JqkUE=; b=4mkv5SM/1D9us8PIr4vPAiD28k
+	XsiH8CJ84A3weQTWqWCoatRX6WEJsJtX6IhExfqGChJ5rUAlKr8hrHnWL4hwLDzLlIKDdFnF9n/ci
+	KqHT6Rsnx7Q7c+UT5iD8zHEKCkhG01zsVHqUZw1TSm71FEWnEeJDX9JRZgpuFXcbM0Rg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1s9xcm-00FrAm-UD; Thu, 23 May 2024 03:52:08 +0200
+Date: Thu, 23 May 2024 03:52:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Glinka <daniel.glinka@avantys.de>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: net: dsa: mv88e6xxx: Help needed: Serdes with SFP not working
+ with mv88e6320 on Linux 5.4
+Message-ID: <6d0f1043-cf3a-4364-84e0-8dec32f8b838@lunn.ch>
+References: <BEZP281MB27764168226DAC7547D7AD6990EB2@BEZP281MB2776.DEUP281.PROD.OUTLOOK.COM>
+ <0d5cfd1d-f3a8-485c-944d-f2d193633aa7@lunn.ch>
+ <BEZP281MB277651F9154F2814398038C790F42@BEZP281MB2776.DEUP281.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <44456b54.180f2.18fa31eca2b.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cC_KCgBn4Vhwn05mtGbmAA--.26237W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwMCEmZDiAoQOgAos1
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BEZP281MB277651F9154F2814398038C790F42@BEZP281MB2776.DEUP281.PROD.OUTLOOK.COM>
 
-SGkgU2ltb24uCgo+IAo+IEhpIExpbiBNYSwKPiAKPiBUaGUgbGluZXMgaW1tZWRpYXRlbHkgYWJv
-dmUgdGhvc2UgY292ZXJlZCBieSB0aGlzIHBhdGNoIGFyZSBhcyBmb2xsb3dzOgo+IAo+IAlyZXQg
-PSAtRVNSQ0g7Cj4gCWlsYSA9IGlsYV9sb29rdXBfYnlfcGFyYW1zKCZ4cCwgaWxhbik7Cj4gCWlm
-IChpbGEpIHsKPiAJCXJldCA9IGlsYV9kdW1wX2luZm8oaWxhLAo+IAo+ID4gQEAgLTQ4Myw2ICs0
-ODMsOCBAQCBpbnQgaWxhX3hsYXRfbmxfY21kX2dldF9tYXBwaW5nKHN0cnVjdCBza19idWZmICpz
-a2IsIHN0cnVjdCBnZW5sX2luZm8gKmluZm8pCj4gPiAgCQkJCSAgICBpbmZvLT5zbmRfcG9ydGlk
-LAo+ID4gIAkJCQkgICAgaW5mby0+c25kX3NlcSwgMCwgbXNnLAo+ID4gIAkJCQkgICAgaW5mby0+
-Z2VubGhkci0+Y21kKTsKPiA+ICsJfSBlbHNlIHsKPiA+ICsJCXJldCA9IC1FSU5WQUw7Cj4gPiAg
-CX0KPiA+ICAKPiA+ICAJcmN1X3JlYWRfdW5sb2NrKCk7Cj4gCj4gQW5kIHRoZSBsaW5lcyBmb2xs
-b3dpbmcsIHVwIHRvIHRoZSBlbmQgb2YgdGhlIGZ1bmN0aW9uLCBhcmU6Cj4gCj4gCWlmIChyZXQg
-PCAwKQo+IAkJZ290byBvdXRfZnJlZTsKPiAKPiAJcmV0dXJuIGdlbmxtc2dfcmVwbHkobXNnLCBp
-bmZvKTsKPiAKPiBvdXRfZnJlZToKPiAJbmxtc2dfZnJlZShtc2cpOwo+IAlyZXR1cm4gcmV0Owo+
-IAo+IEJ5IG15IHJlYWRpbmcsIHdpdGhvdXQgeW91ciBwYXRjaCwgaWYgaWxhIGlzIG5vdCBmb3Vu
-ZCAoTlVMTCkKPiB0aGVuIHJldCB3aWxsIGJlIC1FU1JDSCwgYW5kIGdlbmxtc2dfcmVwbHkgd2ls
-bCBub3QgYmUgY2FsbGVkLgo+IAo+IEkgZmVlbCB0aGF0IEkgYW0gbWlzc2luZyBzb21ldGhpbmcg
-aGVyZS4KCk9oIG15IGJhZCwgaXQgc2VlbXMgdGhpcyBidWcgd2FzIGFscmVhZHkgZml4ZWQgYnkg
-dGhlCmNvbW1pdCA2OTNhYTJjMGQ5YjYgKCJpbGE6IGRvIG5vdCBnZW5lcmF0ZSBlbXB0eSBtZXNz
-YWdlcwppbiBpbGFfeGxhdF9ubF9jbWRfZ2V0X21hcHBpbmcoKSIpIGxhc3QgeWVhci4KQW5kIG15
-IGRhdGVkIGtlcm5lbCBkb2VzIG5vdCBhcHBseSB0aGF0IG9uZS4KClRoYW5rcyBmb3IgcmVtaW5k
-aW5nIG1lIG9mIHRoaXMgZmFsc2UgYWxhcm0uCgpSZWdhcmRzCkxpbgo=
+> > What SFP do you have in the SFP cage? Are you sure it needs 1000BaseX?
+> > Most fibre SFPs do, but if it is copper, it probably wants SGMII.
+
+Russel is better at reading these things, but...
+
+> 
+> This is the SFP cage we are using:
+>         Identifier                                : 0x03 (SFP)
+>         Extended identifier                       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
+>         Connector                                 : 0x0b (Optical pigtail)
+>         Transceiver codes                         : 0x18 0x00 0x00 0x01 0x40 0x08 0x00 0x80 0x00
+>         Transceiver type                          : 10G Ethernet: 10G Base-SR
+>         Transceiver type                          : Infiniband: 1X SX
+>         Transceiver type                          : Ethernet: 1000BASE-SX
+
+Why is it saying 10G, but 1000BASE-SX?
+
+>         Transceiver type                          : FC: short distance (S)
+>         Transceiver type                          : Active Cable
+>         Transceiver type                          : FC: 1200 MBytes/sec
+>         Encoding                                  : 0x06 (64B/66B)
+>         Active Cu cmplnce.                        : 0x03 (unknown) [SFF-8472 rev10.4 only]
+>         Vendor name                               : municom
+>         Vendor OUI                                : 00:1b:21
+>         Vendor PN                                 : MUN-AOC-SFP+-001
+>         Vendor rev                                : Rev1
+>         Option values                             : 0x00 0x1a
+>         Option                                    : RX_LOS implemented
+>         Option                                    : TX_FAULT implemented
+>         Option                                    : TX_DISABLE implemented
+>         Vendor SN                                 : SA1708250054
+>         Date code                                 : 170825
+>         Optical diagnostics support               : Yes
+> 
+> >> The link is reported as down but is directly wired to the SFP which
+> >> reports the link is up.
+> >
+> > How do you know the SFP reports the link is up?
+> 
+> This is the SFP state:
+> Module state: present
+> Module probe attempts: 0 0
+> Device state: up
+> Main state: link_up
+> Fault recovery remaining retries: 5
+> PHY probe remaining retries: 12
+> moddef0: 1
+> rx_los: 0
+> tx_fault: 0
+> tx_disable: 0
+> 
+> When I pull the Cable it reports link_down.
+> 
+> >> Therefore I forced the link up in the port control register.
+> 
+> > You should not need to do this. You need to understand why the switch
+> > thinks it is down.
+> 
+> >> We are using the 5.4 kernel and currently have no option to upgrade to a later version.
+> 
+> > If you have no option to upgrade to a later version it suggests you
+> > are using a vendor crap tree? If so, you should ask your vendor for
+> > support. Why else use a vendor crap tree?
+> >
+> > What is actually stopping you from using a mainline kernel? Ideally
+> > you want to debug the issue using net-next, or maybe 6.9. Once you get
+> > it working and merged to mainline, you can then backport what is
+> > needed to the vendor crap kernel.
+> 
+> We need a feature which was dropped in 5.15.
+
+If you are willing to Maintain the feature, you might be able to bring
+it back. You could try submitting a patch adding it back, and include
+a change to MAINTAINERS listing yourself. It does however require you
+to actually look after it for the next decade...
+
+   Andrew
+
 
