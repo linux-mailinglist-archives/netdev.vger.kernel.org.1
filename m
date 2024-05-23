@@ -1,58 +1,75 @@
-Return-Path: <netdev+bounces-97786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2F288CD319
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:02:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 03DE08CD31B
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:02:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A87C828509D
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:02:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B35C52852AE
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ABD814A4C1;
-	Thu, 23 May 2024 13:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBDEA145B10;
+	Thu, 23 May 2024 13:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QbP0Y189"
+	dkim=pass (1024-bit key) header.d=trudheim.com header.i=@trudheim.com header.b="fIy3KR07"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from ste-pvt-msa1.bahnhof.se (ste-pvt-msa1.bahnhof.se [213.80.101.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F6413B7BC;
-	Thu, 23 May 2024 13:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C24813B7BC
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 13:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.80.101.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716469328; cv=none; b=XIIOugmZyiVVEKqNuWWpdyB05D5b7NWF5kh0Ee8poKvgbzgzt1CXo54lbV2tU6ycQSGczB2Rj80ncbO180qBrkhzQKfegExllsa8kCo0vTaMBBGMaqwJiCX5TMLBnCS/rSUfp+Bc965URKH5Nwok5Q6ushOE7i2ErvvQ6Lty6vw=
+	t=1716469344; cv=none; b=p7D4y2e4pGfhruL7M+MwWxbHqlrul4HC7ooHyDJUXlhVALJvY/GJv25gzrurGZ5bWIHsieWxnhxum+ojvSi+debTx6jFaODr5ZxXJNgfyT8VvyLZ+oV7Sis7+XJGiagkXOM6YNFVwGA16bZKYpTTzbLw2GcZXyDaGCCWRVhwf0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716469328; c=relaxed/simple;
-	bh=xyTHuhkTsGkxCewXIYtJbN5u25VhvmjpyGsoQHV0W9k=;
+	s=arc-20240116; t=1716469344; c=relaxed/simple;
+	bh=3vlQF44J1b4CyBF2yMWkr19UWK9V17ZpghGNzWcchHY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=utA1UPnvQMkjVEvg0rRPtM/UpTz4P2nzCrZCAuQGjaCWu3pBd27OeYqkwJI0MWy5PkgmDzt1ljR6hJB5nPjq0HE+yv/vQLSR73kQpCjTAnavSzrcvh4w/ntai4dQxLT/CM4FJd2ShUnbg7Micrboy6bbmgUH+wdqvxdWrLyo05E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QbP0Y189; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=UTBLLIVYfkg4QE6/jefBW6vdILy6/+yw6lYO8WeGjC0=; b=QbP0Y189CLpNctPQTudUmRk1Hp
-	CnoFA3HBpff5S8O7cAr0W5DFAGb9qCv4zmMenPG2OPe0x4VxqZCTxIY4K7LCo/SjXD5tDAL9HwW6G
-	+pkUcOHCK5khO6K64DMxwScxrxlM3e0S+CnEouAx/DgecW8LdkiTLRR2cv8BXLo5CjZk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sA84x-00FtRZ-90; Thu, 23 May 2024 15:01:55 +0200
-Date: Thu, 23 May 2024 15:01:55 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Xiaolei Wang <xiaolei.wang@windriver.com>
-Cc: wei.fang@nxp.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, imx@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [v2 PATCH] net: fec: free fec queue when fec_probe() fails or
- fec_drv_remove()
-Message-ID: <ca1c4de5-537a-4aa9-851d-d37ce800fdac@lunn.ch>
-References: <20240523062920.2472432-1-xiaolei.wang@windriver.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DyJnSKSfeKbxipCaAL4hr1IRsRXZhGLyEcW5FLfFcG6Qt0LEFI4fVCY6HZoZmqurkvr/JuL+2OCJkboHNKbeiRvvY22qDitlk4sBkPgPXkXgu4yWl6lrh7lmLKazpzFwKZdN3YTlx56ntpmqZLwyhXJ5HyXOAmnt/nKBwoxPXqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trudheim.com; spf=pass smtp.mailfrom=trudheim.com; dkim=pass (1024-bit key) header.d=trudheim.com header.i=@trudheim.com header.b=fIy3KR07; arc=none smtp.client-ip=213.80.101.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trudheim.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trudheim.com
+Received: from localhost (localhost [127.0.0.1])
+	by ste-pvt-msa1.bahnhof.se (Postfix) with ESMTP id 73C463F40E;
+	Thu, 23 May 2024 15:02:15 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at bahnhof.se
+X-Spam-Flag: NO
+X-Spam-Score: -2.099
+X-Spam-Level:
+Authentication-Results: ste-pvt-msa1.bahnhof.se (amavisd-new);
+	dkim=pass (1024-bit key) header.d=trudheim.com
+Received: from ste-pvt-msa1.bahnhof.se ([127.0.0.1])
+	by localhost (ste-pvt-msa1.bahnhof.se [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id auOyB8l8Hm1n; Thu, 23 May 2024 15:02:14 +0200 (CEST)
+Received: 
+	by ste-pvt-msa1.bahnhof.se (Postfix) with ESMTPA id 77F0B3F265;
+	Thu, 23 May 2024 15:02:09 +0200 (CEST)
+Received: from photonic.trudheim.com (photonic.trudheim.com [IPv6:2001:470:28:a8::5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by trudheim.com (Postfix) with ESMTPSA id 8893113B6650;
+	Thu, 23 May 2024 15:02:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=trudheim.com;
+	s=trudheim; t=1716469327;
+	bh=3vlQF44J1b4CyBF2yMWkr19UWK9V17ZpghGNzWcchHY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=fIy3KR07hZoaLr6nWyQVBOeRrvhPDd1jNxHNInuCN4l9fm6f5VViFf4Kr15ZuFj4R
+	 79+PTRLF1BsqqXOg5t3xOG0OKUFpapCNjATQtBmMKdC1xU7/nulp+VRhXP3UT8yOP7
+	 VW9USk9vwJogX21/H0tka8cn+sjT6hIGbNLgG0Cg=
+Date: Thu, 23 May 2024 15:02:06 +0200
+From: Sirius <sirius@trudheim.com>
+To: Dragan Simic <dsimic@manjaro.org>
+Cc: Gedalya <gedalya@gedalya.net>, netdev@vger.kernel.org
+Subject: Re: iproute2: color output should assume dark background
+Message-ID: <Zk8-Tq733F8pgMB4@photonic.trudheim.com>
+References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
+ <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
+ <96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
+ <Zk722SwDWVe35Ssu@photonic.trudheim.com>
+ <e4695ecb95bbf76d8352378c1178624c@manjaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,37 +78,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240523062920.2472432-1-xiaolei.wang@windriver.com>
+In-Reply-To: <e4695ecb95bbf76d8352378c1178624c@manjaro.org>
+Autocrypt: addr=sirius@trudheim.com; keydata=
+	mDMEZfWzYhYJKwYBBAHaRw8BAQdA12OXNGLFcQh7/u0TP9+LmaZCQcDJ5ikNVUR6Uv++NQy0HFN
+	pcml1cyA8c2lyaXVzQHRydWRoZWltLmNvbT6IkAQTFggAOBYhBP4MEykW8GvNTTxpa4Pq//Pg5C
+	PuBQJl9bNiAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEIPq//Pg5CPuatYA/3QLv92lC
+	7xfhdf7NgmqipA+DXyobhzn9JgwLpRQQcu0AQD77L+EQ3aiyga7NR15r2IRC4DDLFK9Mnsbvi+K
+	ZHmdBbg4BGX1s2ISCisGAQQBl1UBBQEBB0AZotbLXS2sTulJhpCsxrd9be2zedV47TV8CInC4nt
+	9PQMBCAeIeAQYFggAIBYhBP4MEykW8GvNTTxpa4Pq//Pg5CPuBQJl9bNiAhsMAAoJEIPq//Pg5C
+	PubFIA/3d2DFaXz0WJ1zq/tSacU7fckFQ7KFwddlyI7Y+IiosmAQCnBrV+e1iJXnZRSZCGBu+Xt
+	BMLXZe+WKVyzQ0/AWV5Ag==
+X-MailScanner-ID: 8893113B6650.A4609
+X-MailScanner: Found to be clean
+X-MailScanner-From: sirius@trudheim.com
 
-On Thu, May 23, 2024 at 02:29:20PM +0800, Xiaolei Wang wrote:
-> commit 59d0f7465644 ("net: fec: init multi queue date structure")
-> allocates multiple queues, which should be cleaned up when fec_probe()
-> fails or fec_drv_remove(), otherwise a memory leak will occur.
+In days of yore (Thu, 23 May 2024), Dragan Simic thus quoth: 
+> On 2024-05-23 09:57, Sirius wrote:
+> > Maybe colouring the output by default isn't such a wise idea as
+> > utilities reading the output now must strip control-codes before the
+> > output can be parsed. Why not leave it as an option via the -c[olor]
+> > switch like before?
 > 
-> unreferenced object 0xffffff8010350000 (size 8192):
->   comm "kworker/u8:3", pid 39, jiffies 4294893562
->   hex dump (first 32 bytes):
->     02 00 00 00 00 00 00 00 00 50 06 8a c0 ff ff ff  .........P......
->     e0 6f 06 8a c0 ff ff ff 00 50 06 8a c0 ff ff ff  .o.......P......
->   backtrace (crc f1b8b79f):
->     [<0000000057d2c6ae>] kmemleak_alloc+0x34/0x40
->     [<000000003c413e60>] kmalloc_trace+0x2f8/0x460
->     [<00000000663f64e6>] fec_probe+0x1364/0x3a04
->     [<0000000024d7e427>] platform_probe+0xc4/0x198
->     [<00000000293aa124>] really_probe+0x17c/0x4f0
->     [<00000000dfd1e0f3>] __driver_probe_device+0x158/0x2c4
-> 
-> Fixes: 59d0f7465644 ("net: fec: init multi queue date structure")
-> Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
+> How about this as a possible solution...  If Debian configures the
+> terminal emulators it ships to use dark background, why not configure
+> the ip(8) utility the same way, i.e. by setting COLORFGBG in files
+> placed in the /etc/profile.d directory, which would also be shipped by
+> Debian?
 
-Please read what i suggested. It is good to have code which is
-symmetric. probe() and remove() should be opposites of each other.
-probe() calls fec_enet_init(). So it would be good to have remove()
-call fec_enet_deinit() which does the opposite. We then have symmetry.
+That makes more sense.
 
-Is there anything else in fec_enet_init() which needs undoing? A rule
-of thumb: If you find a bug, look around, there might be others
-nearby. Maybe leaking the queues is not the only problem?
+> That wouldn't be a perfect solution, of course, but would be more
+> consistent.  Debian ships terminal emulators configured one way, so the
+> ip(8) should also be shipped configured (mind you, not patched) the same
+> way.
 
-	Andrew
+This is a much better argument - Thank you. Something for the
+distributions to consider should they turn on the colour by default.
+
+-- 
+Kind regards,
+
+/S
 
