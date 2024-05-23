@@ -1,148 +1,91 @@
-Return-Path: <netdev+bounces-97781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35A5F8CD285
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:46:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7374D8CD259
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDCB8283D43
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 12:46:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F43E282305
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 12:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952421474BC;
-	Thu, 23 May 2024 12:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5E8146016;
+	Thu, 23 May 2024 12:36:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b="KZGqXl3D"
+	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="Bd49Prd4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp88.iad3a.emailsrvr.com (smtp88.iad3a.emailsrvr.com [173.203.187.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0C1149E14
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 12:46:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.203.187.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35726149C6B
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 12:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716468410; cv=none; b=d5Z01GpqsuO4RSbCOG6gwcbBHNZR459RL+XD7u10PhMnL2JewEN0vt40vDKl6qiSn4QoZcwhmMDKkBmFSrY5+fwuTZXGJNWKXx+fXT3oijtIiBDy0Ests6p30QaSJCEPp2YruiYWo5yrCcAKiRA/xNuUkcc3IBq/T052cVfBz1M=
+	t=1716467819; cv=none; b=LTw7g2Xdx6Mqe6D9SwPyIdB7jfjkLXlD+Hrh5fZnhKu0UENeSnT+MSBhcnSlW5R7Jc+KKIwz+5dt4qIQ4qwowBZLckR63l94VX+QCyeV8x3vdIYINSEb53ydb0i5UZkxkmGnlDrYcpfy9NNVbJrUpm8kqJ+Gc4pLnyQyAYUTOQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716468410; c=relaxed/simple;
-	bh=D+9CyojCG0QsdHiaLTmHpkJ9/iJKbWZ7oDwEFE14eHE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fTnJaeeV96O7NmHqdt5TmDkIoXzkK9XTEVXLWyUcRvhZW4AMoiIctqUJXdf1pekgWdqEa6tbN5PLkyxX+LY0ketID7kAwMK+b4MekdELjw0UZ9NPJODVMHCEc8PURPxCviJ7DdrE7lHRfZEHQQ6NWGyFd20okFhVJWHrHyBNUMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com; spf=pass smtp.mailfrom=oddbit.com; dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b=KZGqXl3D; arc=none smtp.client-ip=173.203.187.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oddbit.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=oddbit.com;
-	s=20180920-g2b7aziw; t=1716467431;
-	bh=D+9CyojCG0QsdHiaLTmHpkJ9/iJKbWZ7oDwEFE14eHE=;
-	h=Date:From:To:Subject:From;
-	b=KZGqXl3DYdYsQiRvMuirfdkI+85PAnGgWDiuOxM2lkZEPchN8opaMhXO9maTzqrsf
-	 xd/9+TtwhcUY+0UTFGnjPDtikudW20T7w11S7WFtCiOnUcBQhbcYcGl91Y/qTHUCYz
-	 8DybFiqqApc/aTJa9MYvD+hgSDBXf+OHdCKOD/y8=
-X-Auth-ID: lars@oddbit.com
-Received: by smtp28.relay.iad3a.emailsrvr.com (Authenticated sender: lars-AT-oddbit.com) with ESMTPSA id 5276651D3;
-	Thu, 23 May 2024 08:30:31 -0400 (EDT)
-Date: Thu, 23 May 2024 08:30:31 -0400
-From: Lars Kellogg-Stedman <lars@oddbit.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Duoming Zhou <duoming@zju.edu.cn>, linux-hams@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org, 
-	edumazet@google.com, davem@davemloft.net, jreuter@yaina.de
-Subject: Re: [PATCH net] ax25: Fix refcount leak issues of ax25_dev
-Message-ID: <lglyhi7ptj6oeiqkd263dxb6pvvqpjipfu7mvs4tgsexk5fmoc@ekcfnsavpipe>
-References: <20240501060218.32898-1-duoming@zju.edu.cn>
- <my4l7ljo35dnwxl33maqhyvw7666dmuwtduwtyhnzdlb6bbf5m@5sbp4tvg246f>
- <78ae8aa0-eac5-4ade-8e85-0479a22e98a3@moroto.mountain>
- <ekgwuycs3hioz6vve57e6z7igovpls6s644rvdxpxqqr7v7is6@u5lqegkuwcex>
- <1e14f4f1-29dd-4fe5-8010-de7df0866e93@moroto.mountain>
- <movur4qy7wwavdyw2ugwfsz6kvshrqlvx32ym3fyx5gg66llge@citxuw5ztgwc>
- <eb5oil2exor2bq5n3pn62575phxjdex6wdjwwjxjd3pd4je55o@4k4iu2xobel5>
- <79dc1067-76dc-43b2-9413-7754f96fe08e@moroto.mountain>
+	s=arc-20240116; t=1716467819; c=relaxed/simple;
+	bh=KmIe3kCdoN1OCNBcX5KpTkX70h3LEp5/sLsVyzf9NqM=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=HSHDQSR47Ocvxkj+kgAV/KNdUpfcAxwelrqNahEWaFGlUreg2tEc5ZtBxxAYuVpJ84x/iEec5b+22zNZLUfMllo23RefvYdAhhGbEhLh7P5klhAq5GD/jhhmGHFmQ3i/eylRyCgQJU11pMpb+b0mzyiigG0F09GKMu2u/7+qgQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=Bd49Prd4; arc=none smtp.client-ip=116.203.91.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <79dc1067-76dc-43b2-9413-7754f96fe08e@moroto.mountain>
-X-Classification-ID: dbc2286a-f004-44d5-96b8-3fbf2be9d2c4-1-1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
+	t=1716467808;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7Szw9nI/OdMNTJnOun7glK6eEnQ7TsdPPkkgWuIY+Is=;
+	b=Bd49Prd41YCBCL7Xygehpf3K3YSrYechenu6eeQJX5ouQeCXXRq5fH98cdBdhGB9vvcz2z
+	t7WlIndJp4aAhnyrJAmOQP+BXVpCj0dwklE+tZmB8T1AcymJJGnnd2E4k0xl9EweDOFrvn
+	xTMsASz0xOmjAtsnNvOb+NwDJ8WD7dia4DttXbS6y/y/Q0S+/+h2eZdvSzOTOholvIeRfS
+	+xJK8ZRCI8AsLW6A34wFwgH6EEDjWADg4riY4FJVjf2QakarcK25nU4adVA2XbmI+yT6n4
+	Q8JxV7aRaUZcPpt80fJ9Ie2C1YqxWqgCfQYHEpq67q6pO8nr4Iz+FxgQzYhIfQ==
+Date: Thu, 23 May 2024 14:36:46 +0200
+From: Dragan Simic <dsimic@manjaro.org>
+To: Sirius <sirius@trudheim.com>
+Cc: Gedalya <gedalya@gedalya.net>, netdev@vger.kernel.org
+Subject: Re: iproute2: color output should assume dark background
+In-Reply-To: <Zk722SwDWVe35Ssu@photonic.trudheim.com>
+References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
+ <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
+ <96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
+ <Zk722SwDWVe35Ssu@photonic.trudheim.com>
+Message-ID: <e4695ecb95bbf76d8352378c1178624c@manjaro.org>
+X-Sender: dsimic@manjaro.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Authentication-Results: ORIGINATING;
+	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
 
-Dan,
+On 2024-05-23 09:57, Sirius wrote:
+> Maybe colouring the output by default isn't such a wise idea as 
+> utilities
+> reading the output now must strip control-codes before the output can 
+> be
+> parsed. Why not leave it as an option via the -c[olor] switch like 
+> before?
 
-Apologies, I missed the patch when you first posted it. Thanks for the
-pointer.
+How about this as a possible solution...  If Debian configures the 
+terminal
+emulators it ships to use dark background, why not configure the ip(8) 
+utility
+the same way, i.e. by setting COLORFGBG in files placed in the 
+/etc/profile.d
+directory, which would also be shipped by Debian?
 
-On Tue, May 07, 2024 at 11:08:14AM GMT, Dan Carpenter wrote:
-> This patch might not work because of the netdev_hold/put() thing...
-
-I think that's the case. It's the netdev_hold/netdev_put imbalance that
-is causing the kernel issues; with your patch applied, we still see a
-failure in ax25_release:
-
-    refcount_t: decrement hit 0; leaking memory.
-
-The patch I've posted resolves this issue and runs without any errors.
-
-The complete trace is:
-
-------------[ cut here ]------------
-refcount_t: decrement hit 0; leaking memory.
-WARNING: CPU: 1 PID: 88 at lib/refcount.c:31 refcount_warn_saturate+0x109/0x120
-
-CPU: 1 PID: 88 Comm: axwrapper Not tainted 6.9.0-ax25-09869-g6d35085a1f38 #140
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-2.fc40 04/01/2014
-RIP: 0010:refcount_warn_saturate+0x109/0x120
-Code: f2 33 82 c6 05 34 62 f2 00 01 e8 22 14 9d ff 0f 0b 5d c3 cc cc cc cc 48 c7 c7 58 f2 33 82 c6 05 17 62 f2 00 01 e8 07 14 9d ff <0f> 0b 5d c3 cc cc cc cc 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40
-RSP: 0018:ffffc90000447d00 EFLAGS: 00010292
-RAX: 000000000000002c RBX: ffff888101142510 RCX: 0000000000000000
-RDX: 0000000000000001 RSI: ffffc90000447b88 RDI: 00000000ffffefff
-The system is gRBP: ffffc90000447d00 R08: 00000000ffffefff R09: ffffffff824a4b88
-R10: ffffffff8244cbe0 R11: ffffc90000447ad8 R12: 0000000000000000
-oing down NOW!R13: ffffc90000447d18 R14: ffff888101142000 R15: ffff88810222a0c0
-
-FS:  0000000000000000(0000) GS:ffff88813bd00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-Sent SIGTERM toCR2: 000055d73c5f5040 CR3: 000000000242c000 CR4: 00000000000006b0
-Call Trace:
- all processes <TASK>
-
- ? show_regs.part.0+0x22/0x30
- ? show_regs.cold+0x8/0xd
- ? refcount_warn_saturate+0x109/0x120
- ? __warn.cold+0x97/0xd5
- ? refcount_warn_saturate+0x109/0x120
- ? report_bug+0x114/0x160
- ? console_unlock+0x55/0xd0
- ? handle_bug+0x42/0x80
- ? exc_invalid_op+0x1c/0x70
- ? asm_exc_invalid_op+0x1f/0x30
- ? refcount_warn_saturate+0x109/0x120
- ref_tracker_free+0x163/0x170
- ax25_release+0x129/0x3c0
- sock_close+0x45/0xb0
- __fput+0x94/0x2a0
- ____fput+0x12/0x20
- task_work_run+0x61/0x90
- do_exit+0x2f5/0x9f0
- ? handle_mm_fault+0x197/0x300
- do_group_exit+0x38/0x90
- __x64_sys_exit_group+0x1c/0x20
- x64_sys_call+0x1269/0x1d00
- do_syscall_64+0x55/0x120
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-RIP: 0033:0x7f8e7711abce
-Code: Unable to access opcode bytes at 0x7f8e7711aba4.
-RSP: 002b:00007ffed9c905d8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f8e7711abce
-RDX: 00007f8e7711ae66 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 00007ffed9c90628 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 000055d73c5f2030
-R13: 00007ffed9c90658 R14: 0000000000000000 R15: 00007ffed9c90620
- </TASK>
----[ end trace 0000000000000000 ]---
-
--- 
-Lars Kellogg-Stedman <lars@oddbit.com> | larsks @ {irc,twitter,github}
-http://blog.oddbit.com/                | N1LKS
+That wouldn't be a perfect solution, of course, but would be more 
+consistent.
+Debian ships terminal emulators configured one way, so the ip(8) should 
+also
+be shipped configured (mind you, not patched) the same way.
 
