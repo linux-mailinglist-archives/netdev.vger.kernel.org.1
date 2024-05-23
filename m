@@ -1,98 +1,140 @@
-Return-Path: <netdev+bounces-97772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED348CD187
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:51:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D369B8CD1C0
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 14:06:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6012F1F223A9
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 11:51:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89D251F21F13
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 12:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 545A813BC05;
-	Thu, 23 May 2024 11:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305E213BC0A;
+	Thu, 23 May 2024 12:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="j69GnM6l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KNJcSTxU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2973E13BAFB;
-	Thu, 23 May 2024 11:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F294E13B5B0;
+	Thu, 23 May 2024 12:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716465064; cv=none; b=k8VSuPWnV1BP5u5u8sbxVB/anGxrQQt3944qj5YKJ2nNSUwjVXMs1qdyhJC1O2D91zyklUgVZOVyTz3OjSFwFgOfxz4JmKnOsyxdxsLA+f5qUKzY1KfiP73OKS/TY9ZvS8vZbXLDcJd+1ZuL9zDPCPVc+LgPFnHhoE63yxH86ks=
+	t=1716465990; cv=none; b=gzT3qb9syDQq1irTsMGqyMeYez8gOXvmUC7lSzy/n5VizY6O9gKqGDospITizaBbLfhx/orDwgkNjeAUwqImdpapHWSA3dI7PRzBQOekYJmxfFoza9sJFHWDngQN3XI1JCzGDkqotWbBr2TIySd/cj3VPJEi9+XkzSbh6JvPvhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716465064; c=relaxed/simple;
-	bh=u0YkCFRTcTzKFzBamw33g0wiWbg4CD2Oj29HPPLaiG8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MA5XkT1DtEYpRll4ik+VPs7fXrc5VfTpkOYwJleW9Lkau/aQI64YISy1VzOii1P9ssR+xcBdR75MVX4/AYDAQrbHtz64Dm7GYV28nsH+IUu0cyH5Lu75DAhI9ErwNNYna7193zHdUVnK9Bhr/xitsjBQB8oD4xV1gHdOWrfym5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=j69GnM6l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F859C2BD10;
-	Thu, 23 May 2024 11:51:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1716465064;
-	bh=u0YkCFRTcTzKFzBamw33g0wiWbg4CD2Oj29HPPLaiG8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j69GnM6lUKEsUvLF6CSUTdJnZUzjyrOfSUiLri50hnx12fMUur5J2bi7ll6TSVuXq
-	 v+KPSJ1nwGadce/sXyARB69vMXNmVhEJy62ni9Nqc1+/D2f1fiAzZef+LwDWCgUIWf
-	 19ZCntMxQhbtk4FI0wqtRRQe39JmlDVtNGYsizeg=
-Date: Thu, 23 May 2024 13:51:01 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Yenchia Chen <yenchia.chen@mediatek.com>
-Cc: stable@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Eric Dumazet <edumazet@google.com>, Sasha Levin <sashal@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Zhengchao Shao <shaozhengchao@huawei.com>,
-	Ryosuke Yasuoka <ryasuoka@redhat.com>, Thomas Graf <tgraf@suug.ch>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 5.15 0/2] netlink, fix issues caught by syzbot
-Message-ID: <2024052354-cubical-taste-44e8@gregkh>
-References: <20240515073644.32503-1-yenchia.chen@mediatek.com>
+	s=arc-20240116; t=1716465990; c=relaxed/simple;
+	bh=32RUCdj43ocdMDqq7keOomYt+BgvvmixO708yHMa+eQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VQ3+/6piLWLskZ8lx/aoJbo1zau3Jt/GAtrvaNGcmZQem5ci9lrfk46evOpw82fEUfSqU6qVz6HxzU+1OnFAOH5DNOLZULhp3Vt4MxWfB7UZ3Oz/gs9JU2I5L+Elsaa375PHATfJmnnUU8EW8h30bhk4A2OgYcPP3Glg8rkcrfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KNJcSTxU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D84EC2BD10;
+	Thu, 23 May 2024 12:06:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716465989;
+	bh=32RUCdj43ocdMDqq7keOomYt+BgvvmixO708yHMa+eQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=KNJcSTxUu8K+ogmrX8Cx/Yhk5Yw6kqXODXQkaS/j9ASQMUE25BtMSJJrR7F87kY8Z
+	 /aoIAd0HUOj+kK+Mhk/9dP92Z+HUOj/yTYFo8REhN/rWj5aPb0N7KXop4QdmEy6m2v
+	 kah62sRA9gOrAP0MnGiIftmzgF2BUxc2yUa94jbZKIWPOc7d7SDIWeHbkDqTbtZF2G
+	 vE15jKe4aY/JOrAZ76GVURi+M7iMjpWQCKImJSDSBSzLD8GgGSbdLkLOzf0kFk/agq
+	 42bpGp8PfmPPiRvcT7X1PKfmyGT0AUEn1YkzlGtM/ItYZjRKwEBvt8+dvnXzCvfAWr
+	 jciEirHymfpOA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: bpf@vger.kernel.org
+Cc: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	lorenzo.bianconi@redhat.com,
+	toke@redhat.com,
+	fw@strlen.de,
+	hawk@kernel.org,
+	horms@kernel.org,
+	donhunte@redhat.com,
+	memxor@gmail.com
+Subject: [PATCH v3 bpf-next 0/3] netfilter: Add the capability to offload flowtable in XDP layer
+Date: Thu, 23 May 2024 14:06:15 +0200
+Message-ID: <cover.1716465377.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240515073644.32503-1-yenchia.chen@mediatek.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 15, 2024 at 03:36:36PM +0800, Yenchia Chen wrote:
-> From: "yenchia.chen" <yenchia.chen@mediatek.com>
-> 
-> Hi,
-> 
-> We think 5.15.y could pick these commits.
-> 
-> Below is the mainline commit:
-> 
-> netlink: annotate lockless accesses to nlk->max_recvmsg_len
-> [ Upstream commit a1865f2e7d10dde00d35a2122b38d2e469ae67ed ]
-> 
-> netlink: annotate data-races around sk->sk_err
-> [ Upstream commit d0f95894fda7d4f895b29c1097f92d7fee278cb2 ]
-> 
-> Eric Dumazet (2):
->   netlink: annotate lockless accesses to nlk->max_recvmsg_len
->   netlink: annotate data-races around sk->sk_err
-> 
->  net/netlink/af_netlink.c | 23 +++++++++++++----------
->  1 file changed, 13 insertions(+), 10 deletions(-)
-> 
-> -- 
-> 2.18.0
-> 
-> 
+Introduce bpf_xdp_flow_lookup kfunc in order to perform the lookup of
+a given flowtable entry based on the fib tuple of incoming traffic.
+bpf_xdp_flow_lookup can be used as building block to offload in XDP
+the sw flowtable processing when the hw support is not available.
 
-All now queued up, thanks.
+This series has been tested running the xdp_flowtable_offload eBPF program
+on an ixgbe 10Gbps NIC (eno2) in order to XDP_REDIRECT the TCP traffic to
+a veth pair (veth0-veth1) based on the content of the nf_flowtable as soon
+as the TCP connection is in the established state:
 
-greg k-h
+[tcp client] (eno1) == LAN == (eno2) xdp_flowtable_offload [XDP_REDIRECT] --> veth0 == veth1 [tcp server]
+
+table inet filter {
+	flowtable ft {
+		hook ingress priority filter
+		devices = { eno2, veth0 }
+	}
+	chain forward {
+		type filter hook forward priority filter
+		meta l4proto { tcp, udp } flow add @ft
+	}
+}
+
+-  sw flowtable [1 TCP stream, T = 300s]: ~ 6.2 Gbps
+- xdp flowtable [1 TCP stream, T = 300s]: ~ 7.6 Gbps
+
+-  sw flowtable [3 TCP stream, T = 300s]: ~ 7.7 Gbps
+- xdp flowtable [3 TCP stream, T = 300s]: ~ 8.8 Gbps
+
+Changes since v2:
+- introduce bpf_flowtable_opts struct in bpf_xdp_flow_lookup signature
+- get rid of xdp_flowtable_offload bpf sample
+- get rid of test_xdp_flowtable.sh for selftest and rely on prog_tests instead
+- rename bpf_xdp_flow_offload_lookup in bpf_xdp_flow_lookup
+Changes since v1:
+- return NULL in bpf_xdp_flow_offload_lookup kfunc in case of error
+- take into account kfunc registration possible failures
+Changes since RFC:
+- fix compilation error if BTF is not enabled
+
+Florian Westphal (1):
+  netfilter: nf_tables: add flowtable map for xdp offload
+
+Lorenzo Bianconi (2):
+  netfilter: add bpf_xdp_flow_lookup kfunc
+  selftests/bpf: Add selftest for bpf_xdp_flow_lookup kfunc
+
+ include/net/netfilter/nf_flow_table.h         |  12 ++
+ net/netfilter/Makefile                        |   5 +
+ net/netfilter/nf_flow_table_bpf.c             | 117 ++++++++++++
+ net/netfilter/nf_flow_table_inet.c            |   2 +-
+ net/netfilter/nf_flow_table_offload.c         | 161 ++++++++++++++++-
+ tools/testing/selftests/bpf/config            |  13 ++
+ .../selftests/bpf/prog_tests/xdp_flowtable.c  | 168 ++++++++++++++++++
+ .../selftests/bpf/progs/xdp_flowtable.c       | 145 +++++++++++++++
+ 8 files changed, 620 insertions(+), 3 deletions(-)
+ create mode 100644 net/netfilter/nf_flow_table_bpf.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_flowtable.c
+ create mode 100644 tools/testing/selftests/bpf/progs/xdp_flowtable.c
+
+-- 
+2.45.1
+
 
