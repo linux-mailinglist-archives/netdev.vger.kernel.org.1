@@ -1,214 +1,279 @@
-Return-Path: <netdev+bounces-97761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7E1C8CD09C
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 12:46:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E52FB8CD0A4
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 12:47:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1CCE1C2288F
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 10:46:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 147C41C22BC0
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 10:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6933813D2B9;
-	Thu, 23 May 2024 10:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1679214431B;
+	Thu, 23 May 2024 10:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W6RWxS2G"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GWlZ/vD6"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CF87E578
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 10:45:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ABC313E884
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 10:46:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716461158; cv=none; b=G0rJ5s54irazcTywFFwWy6zQ1yoIQvwhAKH8pq95ZjtykdbkBqheQMr0NpXU/v2p+8/DK4Bh0ggoxsK3keJZsdzExaKwqTFAgCP+K00Z4ZGoRIYlEp4M5lKK8CCShlJjSacMbd0oFrvMhOZAbIHbJkKGbuO8gpIzAYvgD5rm6p0=
+	t=1716461213; cv=none; b=p4sVdUR2RLA/8L4QW00+nqC4IAnFb7QUCjK8nOMVYUOMQA+uSxZx+FLJAra3vI2wtlgpUG0G/24XIPJbsm4rlrDkGwSfQh3coOwYJZG5sv90Z4jTAMwhf2BfMSMK4GEnIVBMczrNVSq571A0k/3VPvht4G4DtSUG7X87gbYl5TU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716461158; c=relaxed/simple;
-	bh=+30TEOUWzw8uVDSprmsUuB0N4ph4VHKOtlgrAVTx4Xw=;
+	s=arc-20240116; t=1716461213; c=relaxed/simple;
+	bh=iQ3P7ytni9AIjalxjfPLxS1i4uht+yfn7fa1wRJhkPE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pXVn385jNZ5UtM+SPqkrial96r3thO9f6L3DXO/V24dI+MLI2KqYsAMxLJtvJz4byX0NHQoUtd1jMKJUPpiJuaK+rliQjLtTRg/VywTKZ7WwBXEKp1jD8umsFzguPMOiUl/ULxcllveQ3KlqwQ+JnUmkEIMcPNKwHHToulqv7dI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W6RWxS2G; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=iqglufQOmaeKRhWgLWJKV1ChkiPPONSV6rShpTNeaKwLXBOYo9dno4G+n/faT7OZWfP/VRWvoV758Ot89uoRXEkoAOYQUqgtlR4arblvAJw08xhoN1ZpOOPbo1yvJyEQm+b5gnGfrZrn77xhMoaGxHdq/d550yzPRMkmygDiyuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GWlZ/vD6; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716461155;
+	s=mimecast20190719; t=1716461210;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=juhsDEScRvI3YVyUAk4M5qNp/ka5CUgsay8JZp9KViI=;
-	b=W6RWxS2G7o2SHLOgOs7KRL6fkUL+VJhEwTrB2c8ildV3XUmjssR46APdWk4C1X6MC7k/Tb
-	vAGUUhr3+cSskXFT1vz/GpN46KyH/rjPhzHsUN/MKBdXxWedU0hYhMW6LTEkt76iiIZVGP
-	j6bLSBxXauM47G+gDKOeg5xZlTWL0ns=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ZyjB8EQOWovyipEoWCgaFp7DoAbCqwJISn6BYO3MOco=;
+	b=GWlZ/vD6zXp96PEJlq5qkNbd3bgYR932mHdvmMo5kU8UBnOi7hRjpoo3ad7zEQwqPgsSzG
+	ExYpUWELsuhzNPFTbjkbx0DyOR95lRWqUo3j1HNy5yjkTqgJf3qjHuhf0Fs1iwariPS8Mh
+	PekWhj62qOYcDjdBIC60mrEXj5zyBoQ=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-615-oU8USzi-Opq7cB0ekKg4-A-1; Thu, 23 May 2024 06:45:54 -0400
-X-MC-Unique: oU8USzi-Opq7cB0ekKg4-A-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-792bd1dc658so348915385a.1
-        for <netdev@vger.kernel.org>; Thu, 23 May 2024 03:45:54 -0700 (PDT)
+ us-mta-161-9jpFaUekMlOwraWIRkqz_w-1; Thu, 23 May 2024 06:46:49 -0400
+X-MC-Unique: 9jpFaUekMlOwraWIRkqz_w-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-43f95c2f135so36779951cf.0
+        for <netdev@vger.kernel.org>; Thu, 23 May 2024 03:46:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716461153; x=1717065953;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=juhsDEScRvI3YVyUAk4M5qNp/ka5CUgsay8JZp9KViI=;
-        b=mzmX7MV/txY14daL1SHlejS2NO7Q8ktjJsN2prKACa3tBjeccoPo3XbV4eZ538H9nS
-         CdXvmUtsF2+TXPyJIqkB+6Kv0MgOtrRdx8duiQgvPppzXr1Uy91Rj7CQPRvDYvuiX3mp
-         KmdK6KIWQ/MJU9l8i7/1YPIkWXSi9D0WiID0n+iR1KgEG9wZAdgP7BktiWtMbk13bNjY
-         L8OcoqIzov0zCJ2UxgGNi4NxtTMriO3O2MoUuvo+/Z3SmMy0oHrg2cUJs4DAIZSP2Hss
-         dR0ahB1sxDaPzT3aCXyqzNitIxzekru9nfJFnqlvodaWkHW+vZpzsQoA0nxmjs8bBuNs
-         wFUw==
-X-Forwarded-Encrypted: i=1; AJvYcCXu6lpR3Yvw7gu0sZn9QTxyq8Vs6JpG90yTQ1dIuiXhNHtmE6zV7GcSYlpA1wE3KvEiDew0UBDE+tczRA80kUYYtVyR46y5
-X-Gm-Message-State: AOJu0Yz1f8cz7t+eZ0bfrKX67WOMhjVoEgrslA+zLp3dcqMo/qLu24tJ
-	tzldkZM3Tu+ysXJY4IGgFXdwVfU+kH8nhyHVvwHLtxeq8Q/T1pCsP0T5xrFNV95+16U02m9qY59
-	6cZoISnjZ38fdXdgX1eb2kIdyEPeBMC3VD6HSN0ENeM8R/bEb1LbLrA==
-X-Received: by 2002:a05:620a:270b:b0:790:c15b:e192 with SMTP id af79cd13be357-794a0a2d290mr321635785a.32.1716461153536;
-        Thu, 23 May 2024 03:45:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IECiVS/3SMXiEgz7MPG9qy81SLUPLSxWskDIfwdUcbJG/sFDMV5fNyBeSkgTZeUX0rHbNuuqA==
-X-Received: by 2002:a05:620a:270b:b0:790:c15b:e192 with SMTP id af79cd13be357-794a0a2d290mr321631485a.32.1716461153014;
-        Thu, 23 May 2024 03:45:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716461209; x=1717066009;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZyjB8EQOWovyipEoWCgaFp7DoAbCqwJISn6BYO3MOco=;
+        b=Yh0zVs2DyrWUwPDO1AFWwE8LaaMxSqqTGmuW57OJeo/YhliFZDrai1/5iDk+Ih2udz
+         lJoxQKVZn+M2GMkyjsWX9G/g/Popw7B2cyA9rHabinYi45/4ECckFCAzaY3w3eZ2kein
+         cOvsAFKapONgYvc9GkqzRPI7znVicH8PofMsvahzgIBSWtndt9BQoN8cdvv7qZXyzoXV
+         5UI41BEdtfDTz6OM2YPIkB8uEqh+3IiSIlQv+N3dJ+godjbHZt/L9C5wyaH/hYGV4JyK
+         +wtu6E942KV5pB8LiKVDvRLozeHi3vU8IbdhvbRlK1ZYkWpP1wRHuwgmv4jq6TN7NLbH
+         x5Xw==
+X-Forwarded-Encrypted: i=1; AJvYcCVPj9GeHiIfX3J9zNlEhwhicVqRnffC3GL6Mdu6+WoOg/i44u4MgU4fw6y8ABgVoSRr5XxCg+PpUZuUtqKb83qGDPGo4Y7d
+X-Gm-Message-State: AOJu0Yzk6pLRM81uQwozlUdTkqtIXh0y7lqBskpRaQ3HwyM6JWUb01W1
+	q1cy2YSXBn4Hi9JJS3EYpzTCRPatJps6yixW2TuOgK7gqhxj52/Pl8pAElBVEQh/SELsuvJEisl
+	Pq4b/P6/sn370sVfrgq1kEzS8Lj3edtW001AmgbBNLNaHiF9Va5DU4Q==
+X-Received: by 2002:ac8:5dd0:0:b0:434:5008:3bd3 with SMTP id d75a77b69052e-43f9e0c5b39mr62062431cf.23.1716461208550;
+        Thu, 23 May 2024 03:46:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHB/iXgse940hkckYv02XgQCMFgs44epPyBlQeySAf2cYExIFsi0YPz/luKMHz3Bh96Do23dw==
+X-Received: by 2002:ac8:5dd0:0:b0:434:5008:3bd3 with SMTP id d75a77b69052e-43f9e0c5b39mr62062221cf.23.1716461208092;
+        Thu, 23 May 2024 03:46:48 -0700 (PDT)
 Received: from sgarzare-redhat (host-79-53-30-109.retail.telecomitalia.it. [79.53.30.109])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43e3818469csm103371101cf.55.2024.05.23.03.45.51
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43e19256258sm139970761cf.49.2024.05.23.03.46.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 May 2024 03:45:52 -0700 (PDT)
-Date: Thu, 23 May 2024 12:45:48 +0200
+        Thu, 23 May 2024 03:46:47 -0700 (PDT)
+Date: Thu, 23 May 2024 12:46:44 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Xuewei Niu <niuxuewei97@gmail.com>
 Cc: stefanha@redhat.com, mst@redhat.com, davem@davemloft.net, 
 	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: Re: [RFC PATCH 5/5] vsock: Add an ioctl request to get all CIDs
-Message-ID: <azemyxjihhrvjv6k3xufubo4wcujescrlpa5ucfbmora3cvfyv@2mi62ffijnj2>
+Subject: Re: [RFC PATCH 0/5] vsock/virtio: Add support for multi-devices
+Message-ID: <hloqtbnyooawma2fhfvtblgabiebonskfkoky2invqasikhg42@gwvmreq2ysy6>
 References: <20240517144607.2595798-1-niuxuewei.nxw@antgroup.com>
- <20240517144607.2595798-6-niuxuewei.nxw@antgroup.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20240517144607.2595798-6-niuxuewei.nxw@antgroup.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240517144607.2595798-1-niuxuewei.nxw@antgroup.com>
 
-On Fri, May 17, 2024 at 10:46:07PM GMT, Xuewei Niu wrote:
->The new request is called `IOCTL_VM_SOCKETS_GET_LOCAL_CIDS`. And the old
->one, `IOCTL_VM_SOCKETS_GET_LOCAL_CID` is retained.
+Hi,
+thanks for this RFC!
+
+On Fri, May 17, 2024 at 10:46:02PM GMT, Xuewei Niu wrote:
+># Motivition
 >
->For the transport that supports multi-devices:
+>Vsock is a lightweight and widely used data exchange mechanism between host
+>and guest. Kata Containers, a secure container runtime, leverages the
+>capability to exchange control data between the shim and the kata-agent.
 >
->* `IOCTL_VM_SOCKETS_GET_LOCAL_CID` returns "-1";
+>The Linux kernel only supports one vsock device for virtio-vsock transport,
+>resulting in the following limitations:
+>
+>* Poor performance isolation: All vsock connections share the same
+>virtqueue.
 
-What about returning the default CID (lower prio)?
+This might be fixed if we implement multi-queue in virtio-vsock.
 
->* `IOCTL_VM_SOCKETS_GET_LOCAL_CIDS` returns a vector of CIDS. The usage 
->is
->shown as following.
+>* Cannot enable more than one backend: Virtio-vsock, vhost-vsock, and
+>vhost-user-vsock cannot be enabled simultaneously on the transport.
+>
+>We’d like to transfer networking data, such as TSI (Transparent Socket
+>Impersonation), over vsock via the vhost-user protocol to reduce overhead.
+>However, by default, the vsock device is occupied by the kata-agent.
+>
+># Usages
+>
+>Principle: **Supporting virtio-vsock multi-devices while also being
+>compatible with existing ones.**
+>
+>## Connection from Guest to Host
+>
+>There are two valuable questions to take about:
+>
+>1. How to be compatible with the existing usages?
+>2. How do we specify a virtio-vsock device?
+>
+>### Question 1
+>
+>Before we delve into question 1, I'd like to provide a piece of pseudocode
+>as an example of one of the existing use cases from the guest's
+>perspective.
+>
+>Assuming there is one virtio-vsock device with CID 4. One of existing
+>usages to connect to host is shown as following.
 >
 >```
->struct vsock_local_cids local_cids;
->if ((ret = ioctl(fd, IOCTL_VM_SOCKETS_GET_LOCAL_CIDS, &local_cids))) {
->    perror("failed to get cids");
->    exit(1);
->}
->for (i = 0; i<local_cids.nr; i++) {
->    if (i == (local_cids.nr - 1))
->        printf("%u", local_cids.data[i]);
->    else
->        printf("%u,", local_cids.data[i]);
->}
+>fd = socket(AF_VSOCK);
+>connect(fd, 2, 1234);
+>n = write(fd, buffer);
 >```
 >
->Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
->---
-> include/net/af_vsock.h          |  7 +++++++
-> include/uapi/linux/vm_sockets.h |  8 ++++++++
-> net/vmw_vsock/af_vsock.c        | 19 +++++++++++++++++++
-> 3 files changed, 34 insertions(+)
+>The result is that a connection is established from the guest (4, ?) to the
+>host (2, 1234), where "?" denotes a random port.
 >
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index 25f7dc3d602d..2febc816e388 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -264,4 +264,11 @@ static inline bool vsock_msgzerocopy_allow(const struct vsock_transport *t)
-> {
-> 	return t->msgzerocopy_allow && t->msgzerocopy_allow();
-> }
->+
->+/**** IOCTL ****/
->+/* Type of return value of IOCTL_VM_SOCKETS_GET_LOCAL_CIDS. */
->+struct vsock_local_cids {
->+	int nr;
->+	unsigned int data[MAX_VSOCK_NUM];
->+};
-> #endif /* __AF_VSOCK_H__ */
->diff --git a/include/uapi/linux/vm_sockets.h b/include/uapi/linux/vm_sockets.h
->index 36ca5023293a..01f73fb7af5a 100644
->--- a/include/uapi/linux/vm_sockets.h
->+++ b/include/uapi/linux/vm_sockets.h
->@@ -195,8 +195,16 @@ struct sockaddr_vm {
+>In the context of multi-devices, there are more than two devices. If the
+>users don’t specify one CID explicitly, the kernel becomes confused about
+>which device to use. The new implementation should be compatible with the
+>old one.
 >
-> #define MAX_VSOCK_NUM 16
+>We expanded the virtio-vsock specification to address this issue. The
+>specification now includes a new field called "order".
+>
+>```
+>struct virtio_vsock_config {
+>  __le64 guest_cid;
+>  __le64 order;
+>} _attribute_((packed));
+>```
+>
+>In the phase of virtio-vsock driver probing, the guest kernel reads 
+>from
+>VMM to get the order of each device. **We stipulate that the device with the
+>smallest order is regarded as the default device**(this mechanism functions
+>as a 'default gateway' in networking).
+>
+>Assuming there are three virtio-vsock devices: device1 (CID=3), device2
+>(CID=4), and device3 (CID=5). The arrangement of the list is as follows
+>from the perspective of the guest kernel:
+>
+>```
+>virtio_vsock_list =
+>virtio_vsock { cid: 4, order: 0 } -> virtio_vsock { cid: 3, order: 1 } -> virtio_vsock { cid: 5, order: 10 }
+>```
+>
+>At this time, the guest kernel realizes that the device2 (CID=4) is the
+>default device. Execute the same code as before.
+>
+>```
+>fd = socket(AF_VSOCK);
+>connect(fd, 2, 1234);
+>n = write(fd, buffer);
+>```
+>
+>A connection will be established from the guest (4, ?) to the host (2, 1234).
 
-Okay, now I see why you need this in the UAPI, but pleace try to follow
-other defines.
+It seems that only the one with order 0 is used here though, so what is 
+the ordering for?
+Wouldn't it suffice to simply indicate the default device (e.g., like 
+the default gateway for networking)?
 
-What about VM_SOCKETS_MAX_DEVS ?
+>
+>### Question 2
+>
+>Now, the user wants to specify a device instead of the default one. An
+>explicit binding operation is required to be performed.
+>
+>Use the device (CID=3), where “-1” represents any port, the kernel will
 
+We have a macro: VMADDR_PORT_ANY (which is -1)
+
+>search an available port automatically.
 >
->+/* Return actual context id if the transport not support vsock
->+ * multi-devices. Otherwise, return `-1U`.
->+ */
->+
-> #define IOCTL_VM_SOCKETS_GET_LOCAL_CID		_IO(7, 0xb9)
+>```
+>fd = socket(AF_VSOCK);
+>bind(fd, 3, -1);
+>connect(fd, 2, 1234);)
+>n = write(fd, buffer);
+>```
 >
->+/* Only available in transports that support multiple devices. */
->+
->+#define IOCTL_VM_SOCKETS_GET_LOCAL_CIDS     _IOR(7, 0xba, struct vsock_local_cids)
->+
-> /* MSG_ZEROCOPY notifications are encoded in the standard error format,
->  * sock_extended_err. See Documentation/networking/msg_zerocopy.rst in
->  * kernel source tree for more details.
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 3b34be802bf2..2ea2ff52f15b 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -2454,6 +2454,7 @@ static long vsock_dev_do_ioctl(struct file *filp,
-> 	u32 __user *p = ptr;
-> 	u32 cid = VMADDR_CID_ANY;
-> 	int retval = 0;
->+	struct vsock_local_cids local_cids;
+>Use the device (CID=4).
 >
-> 	switch (cmd) {
-> 	case IOCTL_VM_SOCKETS_GET_LOCAL_CID:
->@@ -2469,6 +2470,24 @@ static long vsock_dev_do_ioctl(struct file *filp,
-> 			retval = -EFAULT;
-> 		break;
+>```
+>fd = socket(AF_VSOCK);
+>bind(fd, 4, -1);
+>connect(fd, 2, 1234);
+>n = write(fd, buffer);
+>```
 >
->+	case IOCTL_VM_SOCKETS_GET_LOCAL_CIDS:
->+		if (!transport_g2h || !transport_g2h->get_local_cids)
->+			goto fault;
->+
->+		rcu_read_lock();
->+		local_cids.nr = transport_g2h->get_local_cids(local_cids.data);
->+		rcu_read_unlock();
->+
->+		if (local_cids.nr < 0 ||
->+		    copy_to_user(p, &local_cids, sizeof(local_cids)))
->+			goto fault;
->+
->+		break;
->+
->+fault:
->+		retval = -EFAULT;
->+		break;
->+
-> 	default:
-> 		retval = -ENOIOCTLCMD;
-> 	}
->-- 
->2.34.1
+>## Connection from Host to Guest
 >
+>Connection from host to guest is quite similar to the existing usages. The
+>device’s CID is specified by the bind operation.
+>
+>Listen at the device (CID=3)’s port 10000.
+>
+>```
+>fd = socket(AF_VSOCK);
+>bind(fd, 3, 10000);
+>listen(fd);
+>new_fd = accept(fd, &host_cid, &host_port);
+>n = write(fd, buffer);
+>```
+>
+>Listen at the device (CID=4)’s port 10000.
+>
+>```
+>fd = socket(AF_VSOCK);
+>bind(fd, 4, 10000);
+>listen(fd);
+>new_fd = accept(fd, &host_cid, &host_port);
+>n = write(fd, buffer);
+>```
+>
+># Use Cases
+>
+>We've completed a POC with Kata Containers, Ztunnel, which is a
+>purpose-built per-node proxy for Istio ambient mesh, and TSI. Please refer
+>to the following link for more details.
+>
+>Link: https://bit.ly/4bdPJbU
+
+Thank you for this RFC, I left several comments in the patches, we still 
+have some work to do, but I think it is something we can support :-)
+
+Here I summarize the things that I think we need to fix:
+1. Avoid adding transport-specific things in af_vsock.c
+    We need to have a generic API to allow other transports to implement
+    the same functionality.
+2. We need to add negotiation of a new feature in virtio/vhost transports
+    We need to enable or disable support depending on whether the
+    feature is negotiated, since guest and host may not support it.
+3. Re-work the patch order for bisectability (more detail on patches 3/4)
+4. Do we really need the order or just a default device?
+5. Check if we can add some tests in tools/testing/vsock
+6. When we agree on the RFC, we should discuss the spec changes in the
+    virtio ML before sending a non-RFC series on Linux
+
+These are the main things, but I left other comments in the patches.
+
+Thanks,
+Stefano
 
 
