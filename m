@@ -1,282 +1,456 @@
-Return-Path: <netdev+bounces-97703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1C0D8CCCE8
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:19:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89A8F8CCD00
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 09:28:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5BBC1C21AD0
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 07:19:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BA93282990
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 07:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4948013CA81;
-	Thu, 23 May 2024 07:19:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 607ED13C9DC;
+	Thu, 23 May 2024 07:28:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GKMFIRxV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UYBbpD+W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D1A3B29D
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 07:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1403CF51;
+	Thu, 23 May 2024 07:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716448772; cv=none; b=dUHoRDpXJMWfErCve+fhzkG2kyVTcS7SewVlwFFXDXCrx61hPwUkMzlN8bejCi23IKV/d2e1bj6ZzTq4LV4x2uf/LpEn66mZfkeNfNVqSR8br2/8gW78QX6MmA8VWWRr7SXkMVBIg9c1gaA1ddiiIp9yc0w67xsh8KdGA9vycF8=
+	t=1716449284; cv=none; b=QQyooO+GHvG8xGyfo9mrbD5xHFg6jTYmhZPS7soOClK4rjw/MCWKTOd8ux4HPzF/OjFCXNysaXEORIKNsBebCKPOkujmxhpEkMUk5Xb3cg7z8vNH+XVYGuF9c5tI8q/J66Ic6Ltq+eTGqt40zf98LJNnim2fiR7lU0MBLgbVMOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716448772; c=relaxed/simple;
-	bh=72+TkwMAsCajDH567dbzWg+sRaHNzsPBqqGPiOGn3zs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HsBhHwlz2l2fKurBeGcvdgR18QVFlS+Z3q+neLiSX6YKB/JRFxXrahDHvd2rnZevz0RJ3K2Jb+YEPsE3aZs/nSGvVpWYcKZInR1Yv/Pn3e5KvFVmvEQ/hWOz9wREc843Pg+TRdCryPRLs0Q6fGiauVjtuvuD2PO64H1U4AP2iLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GKMFIRxV; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-41ff3a5af40so35595e9.1
-        for <netdev@vger.kernel.org>; Thu, 23 May 2024 00:19:29 -0700 (PDT)
+	s=arc-20240116; t=1716449284; c=relaxed/simple;
+	bh=dbQ1zA0hMCiYq0xZ6uYNu5O6nicAdG1uIGOE/78xGg0=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:References:
+	 In-Reply-To:Content-Type; b=aFCArMI0x9BsbukLDLvm6pXN3W0Hgf0UF9sfsQrPu0a/hzJtLydQPBu6dk/tpdFM+qQm6BB8U+aWqioXrl2rMomMcO+TvBT5cCGLL0vG/+M6oYZp+8AvjdEPDpgbhEWdTFV16LWLRHjXLzr5A0cHqQ+cxRSQM5sThSCUDeqljWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UYBbpD+W; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a623cf23927so113171866b.0;
+        Thu, 23 May 2024 00:28:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716448768; x=1717053568; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QSEkqCu/pEBgdew3T6+nkUjZJSZvHB7RfkbZGjTqM3s=;
-        b=GKMFIRxVJRSLU2jHrfxD1SPOBOIKIzV7uMIpQ4m3Xp7ty51Cp5kNZBX+E0eCMzx5ac
-         ihuBYfkBgSTE/B+MWeRbZ15Zz0ZLaudWidzYtJpfL4dbxjvSd3GtvlTo4Qe9r/q47Po5
-         vRsYwyLXWySiFpAvDNhcRAj+VNRb1w/ebgJpNsFvjmj6KmL0CKe3HA3r99QSHAex1jSq
-         onIzKIh3XblYbtXJLd2/u7kU0VqQ3FJngwBvF4biDvvJ40cDVofCN5k5FzDw/PhnhFUd
-         aGWAgQei7JT5ZoocizHt99Q5qzYpORxNqQt6f9X7vlV7g/ra97IEdXIaBrykTr/gVMHF
-         bDAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716448768; x=1717053568;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20230601; t=1716449280; x=1717054080; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :to:subject:from:user-agent:mime-version:date:message-id:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QSEkqCu/pEBgdew3T6+nkUjZJSZvHB7RfkbZGjTqM3s=;
-        b=U3q2EgHDw2uHYbNT6na4BtuEy3KPlwM1Tive+EyeIHvfXysGJWXdH4bN9vFyGknNz5
-         87n8XhQWd2Ze68xe1YULp/HuncADy/Mp2ELf76FyR6byqUWbrKFcXz367CnHVm0BgNek
-         aN08vGOoGSa4BMdwhmaR+jZfssMmLPT3hFU9J6kUF4mQkCCLNeOZOYJaoEfiec7VeOic
-         A27REL3zlQEIYA5QmSvhFQBqCRfJopeun3DZQ9c7Ji8o7M5uSjGAxkwMFwzPSa5O+0u+
-         1TQdngcgtZDlKIXbfYco1FyJLMXVaCD81ICNu9z83NIAgfW0fC+ds+l4/0oGx1jo5RrH
-         oR9g==
-X-Forwarded-Encrypted: i=1; AJvYcCUJTgotIx3S87Z+kNBhihHp+wGHTsShNge2rmwDtus5KucCWVQmFJRoUvksduJfCOlr0+/NZCuCtZijtkL2/3x7bpYQEOC0
-X-Gm-Message-State: AOJu0YxfJLYyZ3Z9tpXbgnsX70WWFcJHk/i8VyeHIj7b4Go2m2DIEnEw
-	MjUKN9KI0NHJtJ5AOywr/mImbF/1SYKdmNUBzGl+LtzUQqr/+uVbmpFiv7hs+EnD3FlivdX9Tiz
-	bVnwZCD5kftVoekTpPoRh+X4Wvwee6ijnsM3D
-X-Google-Smtp-Source: AGHT+IEYq4J2CSsA+bifPOFq8gro1VGR5Nnmsupnjtfp1u9pokU1DR+YZ8cJeTcVLeLXI0kNWNREyJvZ4M93kVIhH3I=
-X-Received: by 2002:a05:600c:1da7:b0:41c:a1b:2476 with SMTP id
- 5b1f17b1804b1-421016291fcmr1109075e9.6.1716448768250; Thu, 23 May 2024
- 00:19:28 -0700 (PDT)
+        bh=ztK1B8LJ6Qg/XjmvoFi7X/nQ7NpaJ1m645YbkJDt3Lg=;
+        b=UYBbpD+WnayzG3AsDhRv8IlOscuR6UJOyvLKTIDCCti80CE2Ba4XNSiw4cos9Sq8LE
+         YptMEq6Ln1Y7BRYkLLyKAiVfnM9XhKejuWLQH0YH2kagg5erbqxZxDbA8bhzO4eJSHel
+         40G7reVNu3FlJ5kgv+2Dnw2Ttchh0H+urdwlQabBmZwme5fiMOkMUypp7wdYlxHswfrh
+         /dUg4auG9ekwMiubbMF9b9nwCll6rPhk+dEOjd2kLJiq+Ovp1GU+/hGLoMaWJCk1u51z
+         UI5Q5nABLqs9tXm0kO5b+cIPh1xnjEGEfR9BENVOGMKQkf6eOkDVe+g4DOBBc2fmqQR/
+         D9+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716449280; x=1717054080;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ztK1B8LJ6Qg/XjmvoFi7X/nQ7NpaJ1m645YbkJDt3Lg=;
+        b=NkyzHmmc34zjkHVqFC2cpqq3DJj1wCfKA7a3L1NfYwhJJcF2ZmKT+cmTBubmyhGeAQ
+         +aKRHmMSulWYlzlV2OqmUImoEVSNSudswLQdxODNs6EB4qkGWnmTYxssG3whoqql3d3Z
+         T9k37H/basCcOF1zut1RJ3OteV+td/xmOMZMuWEqCGPJgIfVK8+mNgMljV0+1tppFDMt
+         74x2WU1L1Ozy2TUU+aW5LQSXkLwL7N1tPIN+k9bMmGlpFmWrrl7sVzwlte4SgSGPu+g/
+         ayG2NYxPNZDlH+rwVMWxJRNKyBMWQNfAegPbPfROSiBb1JzhcIkSPQieJ8ywRSUNQCre
+         kfPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUzvZFcOlBjWgbqWbZT7S6zb6RhbSqeAKy64kuq/VjULInsEvLyVmM5RrBb2b/eLJiBHaW1sFQnuQy/8CDTFtZFJC7gVUSbZ8uaR+Qzfkrp88RbCBQLq2AtLbACXvg9xIa+LCd3VeQ4CDh2QmQXi24/1OuXKbJOy9NG0P0M7sXCeQ==
+X-Gm-Message-State: AOJu0Yx1UFHI4Ry15f/2pJE3SdCiVDjZ85GRZSOaKHNGvJrRfcOc+3ny
+	eHUs13qtbSY0HaEV2c21thbp9Dq6LiFhmXtxChst44XollW1tq/k
+X-Google-Smtp-Source: AGHT+IEaLiBCRuYYgeVlPJ5W3rDX1Lckw/fQ21dksdMpOlIYZIyfTKGBXeI4xCT+g+32linp1GNZEg==
+X-Received: by 2002:a17:907:130f:b0:a59:a3ad:c3f6 with SMTP id a640c23a62f3a-a623e8cb2bbmr106331366b.3.1716449280130;
+        Thu, 23 May 2024 00:28:00 -0700 (PDT)
+Received: from [172.27.49.176] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5cfbd73547sm952888366b.171.2024.05.23.00.27.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 May 2024 00:27:59 -0700 (PDT)
+Message-ID: <68225941-f3c3-4335-8f3d-edee43f59033@gmail.com>
+Date: Thu, 23 May 2024 10:27:54 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240523050357.43941-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20240523050357.43941-1-kerneljasonxing@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 23 May 2024 09:19:13 +0200
-Message-ID: <CANn89i+y32YsDyUSyAvVswZTUaYTNjA=zGYmV5JXrCqa5EEHJA@mail.gmail.com>
-Subject: Re: [PATCH v2 net] tcp: fix a race when purging the netns and
- allocating tw socket
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>, 
-	syzbot+2eca27bdcb48ed330251@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, May 23, 2024 at 7:04=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> Syzbot[1] reported the drecrement of reference count hits leaking memory.
->
-> Race condition:
->    CPU 0                      CPU 1
->    -----                      -----
-> inet_twsk_purge            tcp_time_wait
-> inet_twsk_deschedule_put   __inet_twsk_schedule
->                            mod_timer(tw_timer...
-> del_timer_sync
-> inet_twsk_kill
-> refcount_dec(tw_refcount)[1]
->                            refcount_inc(tw_refcount)[2]
->
-> Race case happens because [1] decrements refcount first before [2].
->
-> After we reorder the mod_timer() and refcount_inc() in the initialization
-> phase, we can use the status of timer as an indicator to test if we want
-> to destroy the tw socket in inet_twsk_purge() or postpone it to
-> tw_timer_handler().
->
-> After this patch applied, we get four possible cases:
-> 1) if we can see the armed timer during the initialization phase
->    CPU 0                      CPU 1
->    -----                      -----
-> inet_twsk_purge            tcp_time_wait
-> inet_twsk_deschedule_put   __inet_twsk_schedule
->                            refcount_inc(tw_refcount)
->                            mod_timer(tw_timer...
-> test if the timer is queued
-> //timer is queued
-> del_timer_sync
-> inet_twsk_kill
-> refcount_dec(tw_refcount)
-> Note: we finish it up in the purge process.
->
-> 2) if we fail to see the armed timer during the initialization phase
->    CPU 0                      CPU 1
->    -----                      -----
-> inet_twsk_purge            tcp_time_wait
-> inet_twsk_deschedule_put   __inet_twsk_schedule
->                            refcount_inc(tw_refcount)
-> test if the timer is queued
-> //timer isn't queued
-> postpone
->                            mod_timer(tw_timer...
-> Note: later, in another context, expired timer will finish up tw socket
->
-> 3) if we're seeing a running timer after the initialization phase
->    CPU 0                      CPU 1                    CPU 2
->    -----                      -----                    -----
->                            tcp_time_wait
->                            __inet_twsk_schedule
->                            refcount_inc(tw_refcount)
->                            mod_timer(tw_timer...
->                            ...(around 1 min)...
-> inet_twsk_purge
-> inet_twsk_deschedule_put
-> test if the timer is queued
-> // timer is running
-> skip                                              tw_timer_handler
-> Note: CPU 2 is destroying the timewait socket
->
-> 4) if we're seeing a pending timer after the initialization phase
->    CPU 0                      CPU 1
->    -----                      -----
->                            tcp_time_wait
->                            __inet_twsk_schedule
->                            refcount_inc(tw_refcount)
->                            mod_timer(tw_timer...
->                            ...(< 1 min)...
-> inet_twsk_purge
-> inet_twsk_deschedule_put
-> test if the timer is queued
-> // timer is queued
-> del_timer_sync
-> inet_twsk_kill
->
-> Therefore, only making sure that we either call inet_twsk_purge() or
-> call tw_timer_handler() to destroy the timewait socket, we can
-> handle all the cases as above.
->
-> [1]
-> refcount_t: decrement hit 0; leaking memory.
-> WARNING: CPU: 3 PID: 1396 at lib/refcount.c:31 refcount_warn_saturate+0x1=
-ed/0x210 lib/refcount.c:31
-> Modules linked in:
-> CPU: 3 PID: 1396 Comm: syz-executor.3 Not tainted 6.9.0-syzkaller-07370-g=
-33e02dc69afb #0
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.=
-16.2-1 04/01/2014
-> RIP: 0010:refcount_warn_saturate+0x1ed/0x210 lib/refcount.c:31
-> RSP: 0018:ffffc9000480fa70 EFLAGS: 00010282
-> RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc9002ce28000
-> RDX: 0000000000040000 RSI: ffffffff81505406 RDI: 0000000000000001
-> RBP: ffff88804d8b3f80 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000002 R12: ffff88804d8b3f80
-> R13: ffff888031c601c0 R14: ffffc900013c04f8 R15: 000000002a3e5567
-> FS:  00007f56d897c6c0(0000) GS:ffff88806b300000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000001b3182b000 CR3: 0000000034ed6000 CR4: 0000000000350ef0
-> Call Trace:
->  <TASK>
->  __refcount_dec include/linux/refcount.h:336 [inline]
->  refcount_dec include/linux/refcount.h:351 [inline]
->  inet_twsk_kill+0x758/0x9c0 net/ipv4/inet_timewait_sock.c:70
->  inet_twsk_deschedule_put net/ipv4/inet_timewait_sock.c:221 [inline]
->  inet_twsk_purge+0x725/0x890 net/ipv4/inet_timewait_sock.c:304
->  tcp_twsk_purge+0x115/0x150 net/ipv4/tcp_minisocks.c:402
->  tcp_sk_exit_batch+0x1c/0x170 net/ipv4/tcp_ipv4.c:3522
->  ops_exit_list+0x128/0x180 net/core/net_namespace.c:178
->  setup_net+0x714/0xb40 net/core/net_namespace.c:375
->  copy_net_ns+0x2f0/0x670 net/core/net_namespace.c:508
->  create_new_namespaces+0x3ea/0xb10 kernel/nsproxy.c:110
->  unshare_nsproxy_namespaces+0xc0/0x1f0 kernel/nsproxy.c:228
->  ksys_unshare+0x419/0x970 kernel/fork.c:3323
->  __do_sys_unshare kernel/fork.c:3394 [inline]
->  __se_sys_unshare kernel/fork.c:3392 [inline]
->  __x64_sys_unshare+0x31/0x40 kernel/fork.c:3392
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f56d7c7cee9
->
-> Fixes: 2a750d6a5b36 ("rds: tcp: Fix use-after-free of net in reqsk_timer_=
-handler().")
-> Reported-by: syzbot+2eca27bdcb48ed330251@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D2eca27bdcb48ed330251
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
-> v2
-> Link: https://lore.kernel.org/all/20240521144930.23805-1-kerneljasonxing@=
-gmail.com/
-> 1. Use timer as a flag to test if we can safely destroy the timewait sock=
-et
-> based on top of the patch Eric wrote.
-> 2. change the title and add more explanation into body message.
-> ---
->  net/ipv4/inet_timewait_sock.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
->
-> diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.=
-c
-> index e28075f0006e..b890d1c280a1 100644
-> --- a/net/ipv4/inet_timewait_sock.c
-> +++ b/net/ipv4/inet_timewait_sock.c
-> @@ -255,8 +255,8 @@ void __inet_twsk_schedule(struct inet_timewait_sock *=
-tw, int timeo, bool rearm)
->
->                 __NET_INC_STATS(twsk_net(tw), kill ? LINUX_MIB_TIMEWAITKI=
-LLED :
->                                                      LINUX_MIB_TIMEWAITED=
-);
-> -               BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
->                 refcount_inc(&tw->tw_dr->tw_refcount);
-> +               BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
->         } else {
->                 mod_timer_pending(&tw->tw_timer, jiffies + timeo);
->         }
-> @@ -301,7 +301,14 @@ void inet_twsk_purge(struct inet_hashinfo *hashinfo)
->                         rcu_read_unlock();
->                         local_bh_disable();
->                         if (state =3D=3D TCP_TIME_WAIT) {
-> -                               inet_twsk_deschedule_put(inet_twsk(sk));
-> +                               struct inet_timewait_sock *tw =3D inet_tw=
-sk(sk);
-> +
-> +                               /* If the timer is armed, we can safely d=
-estroy
-> +                                * it, or else we postpone the process of=
- destruction
-> +                                * to tw_timer_handler().
-> +                                */
-> +                               if (timer_pending(&tw->tw_timer))
-> +                                       inet_twsk_deschedule_put(tw);
+User-Agent: Mozilla Thunderbird
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+Subject: Re: [PATCH net-next v2 1/1] net/mlx5e: Add per queue netdev-genl
+ stats
+To: Joe Damato <jdamato@fastly.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, zyjzyj2000@gmail.com, nalramli@fastly.com,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ "open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20240510041705.96453-1-jdamato@fastly.com>
+ <20240510041705.96453-2-jdamato@fastly.com>
+ <230701b9-c52a-4b59-9969-4cd5a5d697f4@gmail.com>
+ <ZkRiBQXlWPPTNKFf@LQ3V64L9R2>
+Content-Language: en-US
+In-Reply-To: <ZkRiBQXlWPPTNKFf@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-This patch is not needed, and a timer_pending() would be racy anywau.
 
-As already explained, del_timer_sync() takes care of this with proper locki=
-ng.
+On 15/05/2024 10:19, Joe Damato wrote:
+> On Tue, May 14, 2024 at 09:44:37PM +0300, Tariq Toukan wrote:
+>>
+>>
+>> On 10/05/2024 7:17, Joe Damato wrote:
+>>> Add functions to support the netdev-genl per queue stats API.
+>>>
+>>> ./cli.py --spec netlink/specs/netdev.yaml \
+>>> --dump qstats-get --json '{"scope": "queue"}'
+>>>
+>>> ...snip
+>>>
+>>>    {'ifindex': 7,
+>>>     'queue-id': 62,
+>>>     'queue-type': 'rx',
+>>>     'rx-alloc-fail': 0,
+>>>     'rx-bytes': 105965251,
+>>>     'rx-packets': 179790},
+>>>    {'ifindex': 7,
+>>>     'queue-id': 0,
+>>>     'queue-type': 'tx',
+>>>     'tx-bytes': 9402665,
+>>>     'tx-packets': 17551},
+>>>
+>>> ...snip
+>>>
+>>> Also tested with the script tools/testing/selftests/drivers/net/stats.py
+>>> in several scenarios to ensure stats tallying was correct:
+>>>
+>>> - on boot (default queue counts)
+>>> - adjusting queue count up or down (ethtool -L eth0 combined ...)
+>>> - adding mqprio TCs
+>>>
+>>> Signed-off-by: Joe Damato <jdamato@fastly.com>
+>>> ---
+>>>    .../net/ethernet/mellanox/mlx5/core/en_main.c | 144 ++++++++++++++++++
+>>>    1 file changed, 144 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+>>> index ffe8919494d5..4a675d8b31b5 100644
+>>> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+>>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+>>> @@ -39,6 +39,7 @@
+>>>    #include <linux/debugfs.h>
+>>>    #include <linux/if_bridge.h>
+>>>    #include <linux/filter.h>
+>>> +#include <net/netdev_queues.h>
+>>>    #include <net/page_pool/types.h>
+>>>    #include <net/pkt_sched.h>
+>>>    #include <net/xdp_sock_drv.h>
+>>> @@ -5282,6 +5283,148 @@ static bool mlx5e_tunnel_any_tx_proto_supported(struct mlx5_core_dev *mdev)
+>>>    	return (mlx5_vxlan_allowed(mdev->vxlan) || mlx5_geneve_tx_allowed(mdev));
+>>>    }
+>>> +static void mlx5e_get_queue_stats_rx(struct net_device *dev, int i,
+>>> +				     struct netdev_queue_stats_rx *stats)
+>>> +{
+>>> +	struct mlx5e_priv *priv = netdev_priv(dev);
+>>> +
+>>> +	if (mlx5e_is_uplink_rep(priv))
+>>> +		return;
+>>> +
+>>> +	struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
+>>> +	struct mlx5e_rq_stats *xskrq_stats = &channel_stats->xskrq;
+>>> +	struct mlx5e_rq_stats *rq_stats = &channel_stats->rq;
+>>> +
+>>
+>> Don't we allow variable declaration only at the beginning of a block?
+>> Is this style accepted in the networking subsystem?
+>>
+>>> +	stats->packets = rq_stats->packets + xskrq_stats->packets;
+>>> +	stats->bytes = rq_stats->bytes + xskrq_stats->bytes;
+>>> +	stats->alloc_fail = rq_stats->buff_alloc_err +
+>>> +			    xskrq_stats->buff_alloc_err;
+>>> +}
+>>> +
+>>> +static void mlx5e_get_queue_stats_tx(struct net_device *dev, int i,
+>>> +				     struct netdev_queue_stats_tx *stats)
+>>> +{
+>>> +	struct mlx5e_priv *priv = netdev_priv(dev);
+>>> +	struct net_device *netdev = priv->netdev;
+>>> +	struct mlx5e_txqsq *sq;
+>>> +	int j;
+>>> +
+>>> +	if (mlx5e_is_uplink_rep(priv))
+>>> +		return;
+>>> +
+>>> +	for (j = 0; j < netdev->num_tx_queues; j++) {
+>>> +		sq = priv->txq2sq[j];
+>>
+>> No sq instance in case interface is down.
+> 
+> This seems easily fixable by checking:
+> 
+>    priv->channels.num > 0
+> 
 
-inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
-{
-  if (del_timer_sync(&tw->tw_timer))
-     inet_twsk_kill(tw);
-  inet_twsk_put(tw);
-}
+yes, or test_bit(MLX5E_STATE_OPENED, &priv->state).
+
+>> This should be a simple arithmetic calculation.
+> 
+> I'm not sure why I can't use txq2sq? Please see below for my
+> explanation about why I think txq2sq might be all I need.
+> 
+>> Need to expose the proper functions for this calculation, and use it here
+>> and in the sq create flows.
+> 
+> I re-read the code several times and my apologies, but I am probably
+> still missing something.
+> 
+> I don't think a calculation function is necessary (see below), but
+> if one is really needed, I'd probably add something like:
+> 
+>    static inline int tc_to_txq_ix(struct mlx5e_channel *c,
+>                                   struct mlx5e_params *params,
+>                                   int tc)
+>    {
+>           return c->ix + tc * params->num_channels;
+
+We need the opposite direction.
+
+The goal is to calculate the proper pair of (ch_ix, tc) in order to 
+access the correct sq_stats struct in the stats array:
+priv->channel_stats[ch_ix]->sq[tc];
+
+Given i in [0, real_num_tx_queues), we should extract the pair as follows:
+
+ch_ix = i % params->num_channels;
+tc = i / params->num_channels;
+
+>    }
+> 
+> And call it from mlx5e_open_sqs.
+> 
+> But, I don't understand why any calculation is needed in
+> mlx5e_get_queue_stats_tx. Please see below for explanation.
+> 
+>>
+>> Here it seems that you need a very involved user, so he passes the correct
+>> index i of the SQ that he's interested in..
+>>
+>>> +		if (sq->ch_ix == i) {
+>>
+>> So you're looking for the first SQ on channel i?
+>> But there might be multiple SQs on channel i...
+>> Also, this SQ might be already included in the base stats.
+>> In addition, this i might be too large for a channel index (num_tx_queues
+>> can be 8 * num_channels)
+>>
+>> The logic here (of mapping from i in num_tx_queues to SQ stats) needs
+>> careful definition.
+> 
+> I read your comments a few times and read the mlx5 source and I am
+> probably still missing something obvious here; my apologies.
+> 
+> In net/core/netdev-genl.c, calls to the driver's get_queue_stats_tx
+> appear to pass [0, netdev->real_num_tx_queues) as i.
+> 
+> I think this means i is a txq_ix in mlx5, because mlx5 sets
+> netdev->real_num_tx_queues in mlx5e_update_tx_netdev_queues, as:
+> 
+>    nch * ntc + qos_queues
+> 
+> which when expanded is
+> 
+>    priv->channels.params.num_channels * mlx5e_get_dcb_num_tc + qos_queues
+> 
+> So, net/core/netdev-genl.c will be using 0 up to that expression as
+> i when calling mlx5e_get_queue_stats_tx.
+> 
+
+Right.
+
+> In mlx5:
+>    - mlx5e_activate_priv_channels calls mlx5e_build_txq_maps which
+>      generates priv->txq2sq[txq_ix] = sq for every mlx5e_get_dcb_num_tc
+>      of every priv->channels.num.
+>   
+> This seems to happen every time mlx5e_activate_priv_channels is
+> called, which I think means that priv->txq2sq is always up to date
+> and will give the right sq for a given txq_ix (assuming the device
+> isn't down).
+> 
+
+Right.
+
+> Putting all of this together, I think that mlx5e_get_queue_stats_tx
+> might need to be something like:
+> 
+>    mutex_lock(&priv->state_lock);
+>    if (priv->channels.num > 0) {
+>            sq = priv->txq2sq[i];
+>            stats->packets = sq->stats->packets;
+>            stats->bytes = sq->stats->bytes;
+>    }
+>    mutex_unlock(&priv->state_lock);
+> 
+
+Right.
+But you can also access the sq_stats directly without going through the 
+sq. This is important as the channels might be down.
+
+
+> Is this still incorrect somehow?
+> 
+> If so, could you explain a bit more about why a calculation is
+> needed? It seems like txq2sq would provide the mapping from txq_ix's
+> (which is what mlx5e_get_queue_stats_tx gets as 'i') and an sq,
+> which seems like all I would need?
+> 
+> Sorry if I am still not following here.
+> 
+
+I see two possible solutions:
+
+1.
+a. in the base, sum all stats for entries that are no longer available 
+in the current configuration (independently to if the netdev is up or 
+down), like sqs for ch_ix >= params->num_channels.
+b. in mlx5e_get_queue_stats_tx, access the sq_stats without going 
+through the sq (as it might not exist), this will be done for all i in 0 
+ti real_num_tx_queues.
+
+2.
+a. in the base, sum all stats for all non existing sqs. if interface is 
+down, then no sqs exist, so you sum the whole array.
+b. in mlx5e_get_queue_stats_tx, go through the txq2sq and the sq, if it 
+exists, if interface is down just return empty stats.
+
+I don't have strong preference, although #1 looks slightly better to me.
+
+
+>>> +			stats->packets = sq->stats->packets;
+>>> +			stats->bytes = sq->stats->bytes;
+>>> +			return;
+>>> +		}
+>>> +	}
+>>> +}
+>>> +
+>>> +static void mlx5e_get_base_stats(struct net_device *dev,
+>>> +				 struct netdev_queue_stats_rx *rx,
+>>> +				 struct netdev_queue_stats_tx *tx)
+>>> +{
+>>> +	struct mlx5e_priv *priv = netdev_priv(dev);
+>>> +	int i, j;
+>>> +
+>>> +	if (!mlx5e_is_uplink_rep(priv)) {
+>>> +		rx->packets = 0;
+>>> +		rx->bytes = 0;
+>>> +		rx->alloc_fail = 0;
+>>> +
+>>> +		/* compute stats for deactivated RX queues
+>>> +		 *
+>>> +		 * if priv->channels.num == 0 the device is down, so compute
+>>> +		 * stats for every queue.
+>>> +		 *
+>>> +		 * otherwise, compute only the queues which have been deactivated.
+>>> +		 */
+>>> +		if (priv->channels.num == 0)
+>>> +			i = 0;
+>>> +		else
+>>> +			i = priv->channels.params.num_channels;
+>>> +
+>>> +		for (; i < priv->stats_nch; i++) {
+>>> +			struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
+>>> +			struct mlx5e_rq_stats *xskrq_stats = &channel_stats->xskrq;
+>>> +			struct mlx5e_rq_stats *rq_stats = &channel_stats->rq;
+>>> +
+>>> +			rx->packets += rq_stats->packets + xskrq_stats->packets;
+>>> +			rx->bytes += rq_stats->bytes + xskrq_stats->bytes;
+>>> +			rx->alloc_fail += rq_stats->buff_alloc_err +
+>>> +					  xskrq_stats->buff_alloc_err;
+>>
+>> Isn't this equivalent to mlx5e_get_queue_stats_rx(i) ?
+>>
+>>> +		}
+>>> +
+>>> +		if (priv->rx_ptp_opened) {
+>>> +			struct mlx5e_rq_stats *rq_stats = &priv->ptp_stats.rq;
+>>> +
+>>> +			rx->packets += rq_stats->packets;
+>>> +			rx->bytes += rq_stats->bytes;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	tx->packets = 0;
+>>> +	tx->bytes = 0;
+>>> +
+>>> +	/* three TX cases to handle:
+>>> +	 *
+>>> +	 * case 1: priv->channels.num == 0, get the stats for every TC
+>>> +	 *         on every queue.
+>>> +	 *
+>>> +	 * case 2: priv->channel.num > 0, so get the stats for every TC on
+>>> +	 *         every deactivated queue.
+>>> +	 *
+>>> +	 * case 3: the number of TCs has changed, so get the stats for the
+>>> +	 *         inactive TCs on active TX queues (handled in the second loop
+>>> +	 *         below).
+>>> +	 */
+>>> +	if (priv->channels.num == 0)
+>>> +		i = 0;
+>>> +	else
+>>> +		i = priv->channels.params.num_channels;
+>>> +
+>>
+>> All reads/writes to priv->channels must be under the priv->state_lock.
+>>
+>>> +	for (; i < priv->stats_nch; i++) {
+>>> +		struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
+>>> +
+>>> +		for (j = 0; j < priv->max_opened_tc; j++) {
+>>> +			struct mlx5e_sq_stats *sq_stats = &channel_stats->sq[j];
+>>> +
+>>> +			tx->packets += sq_stats->packets;
+>>> +			tx->bytes += sq_stats->bytes;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	/* Handle case 3 described above. */
+>>> +	for (i = 0; i < priv->channels.params.num_channels; i++) {
+>>> +		struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
+>>> +		u8 dcb_num_tc = mlx5e_get_dcb_num_tc(&priv->channels.params);
+>>> +
+>>> +		for (j = dcb_num_tc; j < priv->max_opened_tc; j++) {
+>>> +			struct mlx5e_sq_stats *sq_stats = &channel_stats->sq[j];
+>>> +
+>>> +			tx->packets += sq_stats->packets;
+>>> +			tx->bytes += sq_stats->bytes;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	if (priv->tx_ptp_opened) {
+>>> +		for (j = 0; j < priv->max_opened_tc; j++) {
+>>> +			struct mlx5e_sq_stats *sq_stats = &priv->ptp_stats.sq[j];
+>>> +
+>>> +			tx->packets    += sq_stats->packets;
+>>> +			tx->bytes      += sq_stats->bytes;
+>>> +		}
+>>> +	}
+>>> +}
+>>> +
+>>> +static const struct netdev_stat_ops mlx5e_stat_ops = {
+>>> +	.get_queue_stats_rx     = mlx5e_get_queue_stats_rx,
+>>> +	.get_queue_stats_tx     = mlx5e_get_queue_stats_tx,
+>>> +	.get_base_stats         = mlx5e_get_base_stats,
+>>> +};
+>>> +
+>>>    static void mlx5e_build_nic_netdev(struct net_device *netdev)
+>>>    {
+>>>    	struct mlx5e_priv *priv = netdev_priv(netdev);
+>>> @@ -5299,6 +5442,7 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
+>>>    	netdev->watchdog_timeo    = 15 * HZ;
+>>> +	netdev->stat_ops          = &mlx5e_stat_ops;
+>>>    	netdev->ethtool_ops	  = &mlx5e_ethtool_ops;
+>>>    	netdev->vlan_features    |= NETIF_F_SG;
 
