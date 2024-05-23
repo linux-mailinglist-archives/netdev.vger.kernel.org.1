@@ -1,113 +1,142 @@
-Return-Path: <netdev+bounces-97794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62F228CD3FB
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:21:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 263BD8CD446
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 15:23:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E5A8285621
-	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:21:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8E951F21795
+	for <lists+netdev@lfdr.de>; Thu, 23 May 2024 13:23:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997A214B95B;
-	Thu, 23 May 2024 13:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F066314A4DC;
+	Thu, 23 May 2024 13:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=trudheim.com header.i=@trudheim.com header.b="gVRNPmJr"
+	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="OrdR7WEd"
 X-Original-To: netdev@vger.kernel.org
-Received: from ste-pvt-msa1.bahnhof.se (ste-pvt-msa1.bahnhof.se [213.80.101.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3E814A4FF
-	for <netdev@vger.kernel.org>; Thu, 23 May 2024 13:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.80.101.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4893414532F
+	for <netdev@vger.kernel.org>; Thu, 23 May 2024 13:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716470409; cv=none; b=PrDfEMyX5OJuN8qw5AmvZExZLUFTiOioYbZcTUOwkiJmB6dkQYKRxGkWSfluKIpmbu2uOyu+OXK7ysCQ8ngqmGoM+J8AhGGX1UNHBj2L7MErniOfeHdrgNXgMJp9gAlnkhBqKucyjkmk7sGQNMwrnTz33D+YeuZ3KxO/x4zK1fI=
+	t=1716470590; cv=none; b=H/4vT+l7iDfi8TwKpXNnkoWy7bXEsMtIHFfmSuyoK9h+8dLbLTR3C2Ke3yeoK10qyeM+FIwpMA/9WrRqxDNV31a9thWtH0mqqmg361Uvvnw2TidsBdi1z6X/ALBB3B1BaUMlU2zLFVQHb2pz5UsYN6JkQycFsaG42JgFOmPVirc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716470409; c=relaxed/simple;
-	bh=9AElXtsEgsyUytkFmE/oFMbshBvRTekdYNMmzobCvbk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C1g1JtBIX1ERwuNVJau1FGnZq9UG3J//6w5g2POEaBag0P5qrCXLtaoUKudk5IwElv84ibrIvL647xuzq+TTw4Ow86fIOTKLTj7SE0amg5Y9sX0NkUK9FYZ65nCKA/LoPYRyT2J2LnWM5m/ej616oklCbjdoe3rX4UhMjWl1wWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trudheim.com; spf=pass smtp.mailfrom=trudheim.com; dkim=pass (1024-bit key) header.d=trudheim.com header.i=@trudheim.com header.b=gVRNPmJr; arc=none smtp.client-ip=213.80.101.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trudheim.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trudheim.com
-Received: from localhost (localhost [127.0.0.1])
-	by ste-pvt-msa1.bahnhof.se (Postfix) with ESMTP id 03F943F932;
-	Thu, 23 May 2024 15:20:03 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at bahnhof.se
-X-Spam-Flag: NO
-X-Spam-Score: -2.099
-X-Spam-Level:
-Authentication-Results: ste-pvt-msa1.bahnhof.se (amavisd-new);
-	dkim=pass (1024-bit key) header.d=trudheim.com
-Received: from ste-pvt-msa1.bahnhof.se ([127.0.0.1])
-	by localhost (ste-pvt-msa1.bahnhof.se [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id g8kqtkSDln1F; Thu, 23 May 2024 15:20:01 +0200 (CEST)
-Received: 
-	by ste-pvt-msa1.bahnhof.se (Postfix) with ESMTPA id 5E5783F7D7;
-	Thu, 23 May 2024 15:19:58 +0200 (CEST)
-Received: from photonic.trudheim.com (photonic.trudheim.com [IPv6:2001:470:28:a8::5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by trudheim.com (Postfix) with ESMTPSA id 2AD2013B71B5;
-	Thu, 23 May 2024 15:19:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=trudheim.com;
-	s=trudheim; t=1716470395;
-	bh=9AElXtsEgsyUytkFmE/oFMbshBvRTekdYNMmzobCvbk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=gVRNPmJrd9xtMxb4wZZbneKLd87cVnw7+3h3X2hC/OdcnJYjCsjJqQ90JghEXCIfY
-	 FfgdUs1AS7RHJ2nUfcHrW5dHe/fOqg/9EiHv3Jc1c+x/bXooj+W2DByD3Fk/fOT522
-	 lQboLn7dsaMAlAFoqWM61WzVTIY1ufPlEoh/WWLk=
-Date: Thu, 23 May 2024 15:19:54 +0200
-From: Sirius <sirius@trudheim.com>
-To: Gedalya <gedalya@gedalya.net>
-Cc: Dragan Simic <dsimic@manjaro.org>, netdev@vger.kernel.org
-Subject: Re: iproute2: color output should assume dark background
-Message-ID: <Zk9CehhJvVINJmAz@photonic.trudheim.com>
-References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
- <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
- <96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
- <Zk722SwDWVe35Ssu@photonic.trudheim.com>
- <e4695ecb95bbf76d8352378c1178624c@manjaro.org>
- <449db665-0285-4283-972f-1b6d5e6e71a1@gedalya.net>
+	s=arc-20240116; t=1716470590; c=relaxed/simple;
+	bh=5kj+pJxNyDro3O4oKgBMJW+N0JELwTb6wvwLqArfn98=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=aofC000pBo3YNXPb3cQ3hbr081dtHhhqYKcE/55ATuJgHKCka+1g+sVRufhtdYGFQ4Kp+g7JgZ8ygmiQmDtVIYJicNC5drYLe1TfPdLIKRIBPeke4LvvFWdvuF4TFhJYrN++YzBCKqBnFrSdekgPaHhFkWXC6HBo9Hz7QEXlw8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=OrdR7WEd; arc=none smtp.client-ip=116.203.91.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
+	t=1716470585;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zDVIJyF/H22HVMkIRJNmZL9WxECGT3a8/OIURmowZ1M=;
+	b=OrdR7WEdA1IubmdJbmchlgaQy8JF6SNjRzQCq4AaDKZsd+S3Bu2smBVDaeho48X+hN5/zA
+	KkLFKwpk4PTWYA8l1E5XBJdmreM2aIMzEcOX2oA6tti9mJ2VbtR0EZ+s2TVyYq+hkCF+kN
+	JWL+NyW/dxXnWnWbKQNSNgpKe6wIm/GBMFmTZ8MsVuD+Eij1s/wmgcFa3tHO0VzSVxl/1h
+	+0Ned7LcQj91yDRiPOfP6mGahbqqu5w1OsclwWP3so6iDII3iqECP6AGelyFttWmS1bZGR
+	PfQKjNcMQyHmlxFNJrkxbXyLuDZZ6OuUWXDfckVIPqXIexEMTH+ggz2WyhysvA==
+Date: Thu, 23 May 2024 15:23:05 +0200
+From: Dragan Simic <dsimic@manjaro.org>
+To: Gedalya <gedalya@gedalya.net>
+Cc: Sirius <sirius@trudheim.com>, netdev@vger.kernel.org
+Subject: Re: iproute2: color output should assume dark background
 In-Reply-To: <449db665-0285-4283-972f-1b6d5e6e71a1@gedalya.net>
-Autocrypt: addr=sirius@trudheim.com; keydata=
-	mDMEZfWzYhYJKwYBBAHaRw8BAQdA12OXNGLFcQh7/u0TP9+LmaZCQcDJ5ikNVUR6Uv++NQy0HFN
-	pcml1cyA8c2lyaXVzQHRydWRoZWltLmNvbT6IkAQTFggAOBYhBP4MEykW8GvNTTxpa4Pq//Pg5C
-	PuBQJl9bNiAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEIPq//Pg5CPuatYA/3QLv92lC
-	7xfhdf7NgmqipA+DXyobhzn9JgwLpRQQcu0AQD77L+EQ3aiyga7NR15r2IRC4DDLFK9Mnsbvi+K
-	ZHmdBbg4BGX1s2ISCisGAQQBl1UBBQEBB0AZotbLXS2sTulJhpCsxrd9be2zedV47TV8CInC4nt
-	9PQMBCAeIeAQYFggAIBYhBP4MEykW8GvNTTxpa4Pq//Pg5CPuBQJl9bNiAhsMAAoJEIPq//Pg5C
-	PubFIA/3d2DFaXz0WJ1zq/tSacU7fckFQ7KFwddlyI7Y+IiosmAQCnBrV+e1iJXnZRSZCGBu+Xt
-	BMLXZe+WKVyzQ0/AWV5Ag==
-X-MailScanner-ID: 2AD2013B71B5.A3FD9
-X-MailScanner: Found to be clean
-X-MailScanner-From: sirius@trudheim.com
+References: <173e0ec8-583a-4d5a-931f-81d08e43fe2b@gedalya.net>
+ <Zk7kiFLLcIM27bEi@photonic.trudheim.com>
+ <96b17bae-47f7-4b2d-8874-7fb89ecc052a@gedalya.net>
+ <Zk722SwDWVe35Ssu@photonic.trudheim.com>
+ <e4695ecb95bbf76d8352378c1178624c@manjaro.org>
+ <449db665-0285-4283-972f-1b6d5e6e71a1@gedalya.net>
+Message-ID: <7d67d9e72974472cc61dba6d8bdaf79a@manjaro.org>
+X-Sender: dsimic@manjaro.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Authentication-Results: ORIGINATING;
+	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
 
-In days of yore (Thu, 23 May 2024), Gedalya thus quoth: 
-> Yes, echo -ne '\e]11;?\a' works on _some_ (libvte-based) terminals but not
-> all. And a core networking utility should be allowed to focus on, ehhm,
-> networking rather than oddities of a myriad terminals.
+On 2024-05-23 15:04, Gedalya wrote:
+> On 5/23/24 8:36 PM, Dragan Simic wrote:
+>> On 2024-05-23 09:57, Sirius wrote:
+>> How about this as a possible solution...
+> 
+> For what problem?
 
-Then it perhaps should not add colour to the output in the first place and
-focus solely on the networking.
+Obviously, for the problem your patch attempts to solve.
 
-A suggestion would be the iproute2 package revert the option to compile
-colourised output as default, sticking to plain text output as that
-require zero assumptions about the user terminal. Carry on offering the
-'-c' switch to enable it at runtime.
+> Yes I asked Debian in the first place to leave colors disabled by
+> default, but nevertheless `ip` is still broken for most users if and
+> when colors are enabled, whether at runtime or build time.
 
--- 
-Kind regards,
+Well, the coloring support in ip(8) can't be broken if the users
+configure it at runtime accordingly, i.e. following the background
+color configured in their terminal emulator(s), right?  Or am I
+misunderstanding something?
 
-/S
+>> If Debian configures the terminal emulators it ships to use dark
+>> background,
+> 
+> Do they? Or is that the nearly universal default?
+
+Frankly, I don't know for sure because I don't use many different
+terminal emulators, but you as the submitter of this patch perhaps
+should know that better.  However, terminal emulators must be
+configured somehow, because it makes no sense whatsoever that they're
+having their background colors hardcoded.
+
+>> why not configure the ip(8) utility the same way, i.e. by setting
+>> COLORFGBG in files placed in the /etc/profile.d directory,
+> 
+> COLORFGBG where set is automatically set by the terminal emulator. It
+> would be more sensible to add this feature to more terminal emulators,
+> upstream.
+
+Of course, but that would take a lot of time, both to implement it
+everywhere and for the new feature to reach the users.  Shipping
+a few additional files in the /etc/profile.d directory would be a
+reasonable stopgap measure.
+
+> Should Debian come up with a patch that magically adjusts this
+> variable every time the user changes their background color (in one
+> terminal emulator... and another color in another terminal
+> emulator...?)
+
+That's a valid concern.  Perhaps some documentation could be provided,
+to help the users who alter their background colors.
+
+> And what about linux virtual terminals (a.k.a non-graphical consoles)?
+
+In my 25+ years of Linux experience, I've never seen one with a 
+background
+color other than black.
+
+> In summary, if the best we can do is manually set COLORFGBG when using
+> a light background then that's the best we can do. I don't see how
+> Debian can possibly help with that.
+> 
+> On the iproute2 side, a rock-bottom ultimate default background color
+> assumption will always be needed and that should be dark.
+
+As others already pointed out, "should be light" or "should be dark"
+can be seen as personal preference.
+
+> Yes, echo -ne '\e]11;?\a' works on _some_ (libvte-based) terminals but
+> not all. And a core networking utility should be allowed to focus on,
+> ehhm, networking rather than oddities of a myriad terminals.
+
+In an ideal world, yes.
 
