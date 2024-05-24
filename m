@@ -1,72 +1,77 @@
-Return-Path: <netdev+bounces-97953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A6BC8CE4A9
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 13:07:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCC418CE4DD
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 13:31:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2D8B2822AA
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 11:07:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F3001F21643
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 11:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BF4385C58;
-	Fri, 24 May 2024 11:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137C784FA7;
+	Fri, 24 May 2024 11:31:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="gSyW0ChT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ccx6URR+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D355442078;
-	Fri, 24 May 2024 11:07:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5C29475;
+	Fri, 24 May 2024 11:31:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716548846; cv=none; b=heyrKxMDIEHm27jnvV1kwnYF+TtUpMwvsqnO8F/WnuHcdyauQccn1y7x/VJ+zqkifkKIrqgLmWB2nJYg+et2L/9vo9xyAS1iLhcKQciVcsw1TUl8tLEnpZx0bkt9rP28tzPcm07ixUrhE9TZtb2Tso+qRLWcePC9EzYaWG6WBx4=
+	t=1716550309; cv=none; b=gQum9D1PQyGm1GkYBUZwT0kfWshL5KropXd1mjaJWY0ljfXXOjRpTXlSPzGlvcK209BRaB0OvoliO9a/+w5s74mbwcQHHfs0oHYgFtmU0uZx1kxV4PFSKkiHm+3ai9jAY5UlNny8n3h2z7yEOCsW3aeNiR6OF9Zu/A2V3s8T18o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716548846; c=relaxed/simple;
-	bh=c0wTFKp9XQXRgUFgtFgR9AuRbrYxnV5EJTEpQx/c25k=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DUAmyIKn5LdP1+RaE8dYtP/BUx9a9uAs0/eJlPhstoyZ110TdwVWWF8OA1OXn36Y3hTnwUwdIfiA7oWVKat1fqe1aQ7acucMoMiC7J+zWqfKWHk4N5LwsSOr9RnvdSTJ6fhoojtx6weH+dh56uV3rC57u1ZypWQcj0sVWu36kBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=gSyW0ChT; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44NLuDih024404;
-	Fri, 24 May 2024 04:07:20 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=7geuP4fh0kfWIQEG10bAFf8y5oNk1kPaQirayNWOM44=;
- b=gSyW0ChTNZZ35+nDi3kwoUmzSNIAm95ciUh3TbCZg7Ee8HhXgBVcB7kNtRpKMzmes8wH
- Do62wydCh2US3wT7Lr53EuQUpwOKe+MXBjapYmDZX3EL2nAUE9emdlWWLpWD7ItvoECm
- ClaxWCGwRBw7M9qJ+mou6SP74QBBzWG220j/ZS+3AJH6bT7MvONddGthwRA4PyYW1A43
- ScuUJ4TDuTuoldKjLRtCJ/XdFY0rNqFVD25v0ZQ91TbkdkXMXQYkTLu/brJAKqQ+W9s8
- g4E3ePXQ9JLJzwhm6/OyCSqy3K2v/DppgybAm30pqu++yHUiv2KSnAPTmKAdWq+ZFYlT LQ== 
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3y9xf4sf0n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Fri, 24 May 2024 04:07:20 -0700
-Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::8) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server id
- 15.2.1544.11; Fri, 24 May 2024 11:07:16 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Martin KaFai Lau
-	<martin.lau@linux.dev>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        "Alexei
- Starovoitov" <ast@kernel.org>,
-        Mykola Lysenko <mykolal@fb.com>, Jakub
- Kicinski <kuba@kernel.org>
-CC: Vadim Fedorenko <vadfed@meta.com>, <bpf@vger.kernel.org>,
-        <netdev@vger.kernel.org>
-Subject: [PATCH bpf-next v2 2/2] selftests: bpf: validate CHECKSUM_COMPLETE option
-Date: Fri, 24 May 2024 04:06:59 -0700
-Message-ID: <20240524110659.3612077-2-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240524110659.3612077-1-vadfed@meta.com>
-References: <20240524110659.3612077-1-vadfed@meta.com>
+	s=arc-20240116; t=1716550309; c=relaxed/simple;
+	bh=4LBvQetF7IAlYlAy82ZKXQGvBJrIruYN4l+FdhPRo9w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WRlVrxzBlFHOTQ2WxHCfqEwQ1ey6OEct0aiaLA5WgXP/U8kVWNGuLGhj8f7ovi2KGsPuvlDp6+Qj+StuUjt+aSbJ07lUGohhvzLC+Lp0BJNzlNHMvcEoiF+/9C/0IB+JkMglqupLA0rQlzs+SlQBEXFaRE2V14oWWRXnjq3t3kA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ccx6URR+; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716550307; x=1748086307;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4LBvQetF7IAlYlAy82ZKXQGvBJrIruYN4l+FdhPRo9w=;
+  b=Ccx6URR+0/PFlO5Oi0HFar46OGN8+NDZoFhUPE4AoKv+LUGrRo/xNAHR
+   IL7xkrudYYTck6uFd2FUq16jEAVZuJRFaQ7y23y8Fv7DZyt06iw+vB4as
+   pIg7RiXuFROyV5R4Grx5UwPsNMrCk/qEHyqLflV5bZCSjzoIAV/l8oL/T
+   +8S3M3ZH2vLcAeUqbjeZB7LjCMpCNCBVnuLy5UO0czpqIkLTjCu6k0MKZ
+   XoH8/EEpw5+6xWEC5OkVBpszY1hwDbscNvVCmsPaW78B8zaItZPu5h+Wu
+   JDN1ZqYe5OkORKZs56OuVaQN8cl754LdmsLwcifObwGGXDpKd5DNqQN2K
+   g==;
+X-CSE-ConnectionGUID: 8+O3WPpLRv60RzEBxqHjbA==
+X-CSE-MsgGUID: UF7FIWG7QUGbTWqGMC7ktQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11081"; a="12772021"
+X-IronPort-AV: E=Sophos;i="6.08,185,1712646000"; 
+   d="scan'208";a="12772021"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2024 04:31:46 -0700
+X-CSE-ConnectionGUID: MbmgJak5T4+/wMghuBMT4Q==
+X-CSE-MsgGUID: knQZ5qdJTr6hmbJRHeoo3w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,185,1712646000"; 
+   d="scan'208";a="38432250"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmviesa003.fm.intel.com with ESMTP; 24 May 2024 04:31:44 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] page_pool: fix &page_pool_params kdoc issues
+Date: Fri, 24 May 2024 13:28:59 +0200
+Message-ID: <20240524112859.2757403-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,63 +79,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: BQWtFhvrcmBDTI_P6unpYnXPktkhWNWs
-X-Proofpoint-GUID: BQWtFhvrcmBDTI_P6unpYnXPktkhWNWs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-24_04,2024-05-23_01,2024-05-17_01
 
-Adjust skb program test to run with checksum validation.
+After the tagged commit, @netdev got documented twice and the kdoc
+script didn't notice that. Remove the second description added later
+and move the initial one according to the field position.
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+After merging commit 5f8e4007c10d ("kernel-doc: fix
+struct_group_tagged() parsing"), kdoc requires to describe struct
+groups as well. &page_pool_params has 2 struct groups which
+generated new warnings, describe them to resolve this.
+
+Fixes: 403f11ac9ab7 ("page_pool: don't use driver-set flags field directly")
+Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
- .../selftests/bpf/prog_tests/test_skb_pkt_end.c       |  1 +
- tools/testing/selftests/bpf/progs/skb_pkt_end.c       | 11 ++++++++++-
- 2 files changed, 11 insertions(+), 1 deletion(-)
+ include/net/page_pool/types.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_skb_pkt_end.c b/tools/testing/selftests/bpf/prog_tests/test_skb_pkt_end.c
-index ae93411fd582..09ca13bdf6ca 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_skb_pkt_end.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_skb_pkt_end.c
-@@ -11,6 +11,7 @@ static int sanity_run(struct bpf_program *prog)
- 		.data_in = &pkt_v4,
- 		.data_size_in = sizeof(pkt_v4),
- 		.repeat = 1,
-+		.flags = BPF_F_TEST_SKB_CHECKSUM_COMPLETE,
- 	);
+diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+index b088d131aeb0..7e8477057f3d 100644
+--- a/include/net/page_pool/types.h
++++ b/include/net/page_pool/types.h
+@@ -45,16 +45,17 @@ struct pp_alloc_cache {
  
- 	prog_fd = bpf_program__fd(prog);
-diff --git a/tools/testing/selftests/bpf/progs/skb_pkt_end.c b/tools/testing/selftests/bpf/progs/skb_pkt_end.c
-index db4abd2682fc..3bb4451524a1 100644
---- a/tools/testing/selftests/bpf/progs/skb_pkt_end.c
-+++ b/tools/testing/selftests/bpf/progs/skb_pkt_end.c
-@@ -33,6 +33,8 @@ int main_prog(struct __sk_buff *skb)
- 	struct iphdr *ip = NULL;
- 	struct tcphdr *tcp;
- 	__u8 proto = 0;
-+	int urg_ptr;
-+	u32 offset;
- 
- 	if (!(ip = get_iphdr(skb)))
- 		goto out;
-@@ -48,7 +50,14 @@ int main_prog(struct __sk_buff *skb)
- 	if (!tcp)
- 		goto out;
- 
--	return tcp->urg_ptr;
-+	urg_ptr = tcp->urg_ptr;
-+
-+	/* Checksum validation part */
-+	proto++;
-+	offset = sizeof(struct ethhdr) + offsetof(struct iphdr, protocol);
-+	bpf_skb_store_bytes(skb, offset, &proto, sizeof(proto), BPF_F_RECOMPUTE_CSUM);
-+
-+	return urg_ptr;
- out:
- 	return -1;
- }
+ /**
+  * struct page_pool_params - page pool parameters
++ * @fast:	params accessed frequently on hotpath
+  * @order:	2^order pages on allocation
+  * @pool_size:	size of the ptr_ring
+  * @nid:	NUMA node id to allocate from pages from
+  * @dev:	device, for DMA pre-mapping purposes
+- * @netdev:	netdev this pool will serve (leave as NULL if none or multiple)
+  * @napi:	NAPI which is the sole consumer of pages, otherwise NULL
+  * @dma_dir:	DMA mapping direction
+  * @max_len:	max DMA sync memory size for PP_FLAG_DMA_SYNC_DEV
+  * @offset:	DMA sync address offset for PP_FLAG_DMA_SYNC_DEV
+- * @netdev:	corresponding &net_device for Netlink introspection
++ * @slow:	params with slowpath access only (initialization and Netlink)
++ * @netdev:	netdev this pool will serve (leave as NULL if none or multiple)
+  * @flags:	PP_FLAG_DMA_MAP, PP_FLAG_DMA_SYNC_DEV, PP_FLAG_SYSTEM_POOL
+  */
+ struct page_pool_params {
 -- 
-2.43.0
+2.45.1
 
 
