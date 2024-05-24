@@ -1,69 +1,72 @@
-Return-Path: <netdev+bounces-98034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE2178CEB8C
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 22:57:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F6168CEB8E
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 22:57:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E45D1F22812
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 20:57:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 076DA1F2191E
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 20:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4C0130AFD;
-	Fri, 24 May 2024 20:54:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59791130E47;
+	Fri, 24 May 2024 20:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mVXT5RPU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XjdZxCjC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC634130E26;
-	Fri, 24 May 2024 20:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31490130E21;
+	Fri, 24 May 2024 20:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716584055; cv=none; b=fM1+00+/IXv+Ha+rQJgIf97G3oYnkzEazUIN7KD68SwdTi7kjlSur96As22Q7e/SJH0Nvs7h+BuZtw/OANC6QBG95m5hs6zJpxl2SKKjxr4njMLvn6b2n6gmzzQA+0EAo2D24IayrkpC0PcXQ4xDg2yNlou5NRixN8ZU39MOp9g=
+	t=1716584057; cv=none; b=cwzGPMEe8pgNsKI1DLo4kil9Q+J5t9FaiQuX26SJn6dFxJHr83yqKxvOoc+4vr7EZM+VmB95V8++Zt8R7I4i9rloTTYfoVOUxBD+fJnX3J7UNu1Zw8X5qvDpLGOlBXIi2q6wKzdWUHsCj6K5fOCfhdwjEdxi1b3MB7QXIOhmfqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716584055; c=relaxed/simple;
-	bh=Ve7X6dyEMERtZnZM16/JR6dn1SwSIRT0GeLiibot1wM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=oI5eXd5lTO4DXMo8qq5U33LPn4dgm2PsTguZgZT0aFYvnxTotDq4saiJHZl4Uuh19HaFJUKIyVvlnJ9RYyLrEQMD/6xsD+mwooYPtn7VHEznWwChAO7Porj6I9uLdZZFsyMNu1QCi4NU+ZGiKidjdmDituEdHVMi4gdG37bso4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mVXT5RPU; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1716584057; c=relaxed/simple;
+	bh=86//rcYE3WwZQ3Xu8526JJiv4dFfatP6BN/CNFFdTvs=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=CSVGnlO30WYdwBvjecFgabfICkU5Q9EJn5HFU7XMI2hbjkBsSJQz2YIwFsPldK3WjrOREjEwZLjTEpUTqMbbBI22eYt+WrRk3A8eTlmjrdmo0uJl60gnkPSBDCKc3EeUt0r3KKFNLyQj6Kr9EZ754/sdluuCQApNMczKH+WcRkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XjdZxCjC; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-420180b5897so33375365e9.3;
-        Fri, 24 May 2024 13:54:13 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4210aa00c94so7831585e9.1;
+        Fri, 24 May 2024 13:54:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716584052; x=1717188852; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XWRTTdI4Emy4KPvUWY+g9XFXaK4zGbMUIGkTkuZ3J94=;
-        b=mVXT5RPUR18cihQ+SnrHsMynZDqQV+rozHmTjb9YYjmVEis6/sS9kt7mvb8DpzDDDQ
-         uMcr7mnsS7oKCeJUuw0MyzpxW+BOQ/t4k5EbJd0kaVlXh9T3onaualkGCGLAaVUVHVbj
-         5kYeb5IgtiSoCwZ7o3ADqrCoTdDaBD/Zgb/k3qlRNezCtOatptkkxMGMjzSpp+dZPoBn
-         fL2gncjv+BuoL+Zs6XPFleiyPL3LWkz2bCCZEhEHJqqcypYSZH9bYesyIMWGmaWNt+6N
-         wA27PI3WOi0gYT0xp9JiCku5MAYJAW3rzPCXL+emJzxB2/nYP7CnPoP02SE2hmEswrFn
-         4Q/w==
+        d=gmail.com; s=20230601; t=1716584053; x=1717188853; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y8XyAgFR6Pvtph11isYR2fM4H27nmoavoGUly6HMI20=;
+        b=XjdZxCjCl7vgmFfHq5U9ShgfAQeLnAoj+ZFbftCn79e01C6JG1lDx3PoxGASgUr0KV
+         eulCA3cIRK2nCS16f7rliv3iDB3z2pnRM5JFJn7ILqO0Y5pCvkWQgjqLytBFpWkB7Mk+
+         GpaEIraM0OYMHSQiiLhiGKeNUUWNnNIIsMmUaNpHO23TVYmuYAzIxrDOaXn03C3k1rd/
+         UWhr3C9Kf/BJ2G8pWmaMh8dKAPfRe2Ul1wB0erHXbi7g5LJGJRtsG6ddJlSGeU4I/S+d
+         KkAvAakgYbU5UNAAUaTl5Cz8maHPcME6aAwjZ5w8zegBKlg/Etg7jfHLqs9Zz/Ra9fS5
+         2PIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716584052; x=1717188852;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XWRTTdI4Emy4KPvUWY+g9XFXaK4zGbMUIGkTkuZ3J94=;
-        b=BdXlJCaJQW+s0QNFOmtaEPDp5cOqMcdhbrZc2MLwAJAOdULGc7b7WthkhpmDhAu67W
-         zN4inmQ6g5LwgyFxGt40t00Xg19cNPyNO2dElIP/rAkdbie/dhUMW4aF/kflYRpOYBWR
-         lNzw0SFjIzsz6GMx7Gpd07RHytl0cA9UXIFnQaU86GR1ZAIxCGwxhwtPWDNMfzkEDKGC
-         MxlIHvl9MHWKjzV8KSJo9xZEqK0O1I6vq5+rgEDuieXAdpwsnNu7oo2dG2h/pK8mN3mF
-         pw8DV9uIOMFyn8NnBLfhDMvp1VgEMq9spzyG8bwPn4W3fUVNhZsOl/mWbQwZIBQH/w75
-         fJHg==
-X-Forwarded-Encrypted: i=1; AJvYcCVYwZYi/ApRU6BqU5cyIMOoozUNdtry2fH/0ieV0HtB1zzYjOVKih7iTTZIzpM7uinh2aCOOw5lKdhJMbmtPSNhqSE9NJb/fkH3KcC+/jK91LZEqLK6dEcV142PKNbB4DWdceWs
-X-Gm-Message-State: AOJu0Ywh4HP9NdlN5vfdn71mIsjeZhxNt5yzsIenKRl4P5/trpiv++86
-	QO3QYRxt2hJ4j8jWbcdtsrAuRJFKmC/YaQ+2AWoO7vrlbuRaRW0Y
-X-Google-Smtp-Source: AGHT+IHz67D/PKHB/qAFQ99/xKvzocO2qTCa9eD8A9d7Zruwfd5cyIbJUgCkkDN+xzgZAGtdfdkibQ==
-X-Received: by 2002:a05:600c:19cf:b0:416:88f9:f5ea with SMTP id 5b1f17b1804b1-42108a0b891mr28044335e9.34.1716584051785;
-        Fri, 24 May 2024 13:54:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716584053; x=1717188853;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y8XyAgFR6Pvtph11isYR2fM4H27nmoavoGUly6HMI20=;
+        b=whzeNoC7O2eOtHId9zji3OyuDkumciGECShy9XDCOpPdognhYEskp0+7siH3R43V2Z
+         LnYO36EVmZNNCTxxNj3pQGkrmIDm+28SB0jAMmsKVXHhuiAscFkQVKog5Mptv7ZmDN6T
+         0vd/RHyxJaMoPTgx84KFU+RVmL0KJpc/tNXhl/7eultM91QNeFeqW6+sEf/nFZsB6QLY
+         YzKx6LFueH12r3wwtWHOAMjNesgPl6SuINzZGlXOtNArbNvrL7rRDDRIaHjq8dnOStGn
+         5PSeASHqdeL7UVncXfgRFZaoRAILsQd1kTrngkhHY4euc5cAwV4XUeIBlHm/sbGVEuMf
+         +Vqg==
+X-Forwarded-Encrypted: i=1; AJvYcCWYfbf295c1Cg1SyjaVK7kWZCvqI8d45mYf4duNcQniKvmDonITQ8YuVqYX5JFX4OgW7er5uWJ8FujnjnTyB4I//fdarx2NiQ6e0vMZXCvmqrtxVanu29FFEg9ljUSrT0SeFnxR
+X-Gm-Message-State: AOJu0YyqGetZZdVO55h5nFKqP6N237I2j6JcpltzCG4R5+3S4gzGrO4A
+	BhRsBLDC9SbsfcD4Ew95vGl1f5UShUUBciz1cQOpXN+6np/0cmT3
+X-Google-Smtp-Source: AGHT+IFIIsYBEYBZVqMg4Gd1fXTDuMs9Kcv4xVhxSV8cufRys6XwOarQEkJc+AWfMfFu0HH34OogMw==
+X-Received: by 2002:a05:600c:3b1f:b0:418:f760:abfb with SMTP id 5b1f17b1804b1-421089ccdfamr26508845e9.5.1716584053102;
+        Fri, 24 May 2024 13:54:13 -0700 (PDT)
 Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-420fc82eeb4sm44332315e9.0.2024.05.24.13.54.10
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-420fc82eeb4sm44332315e9.0.2024.05.24.13.54.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 May 2024 13:54:11 -0700 (PDT)
+        Fri, 24 May 2024 13:54:12 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
@@ -79,10 +82,12 @@ To: Andrew Lunn <andrew@lunn.ch>,
 	=?UTF-8?q?Pawe=C5=82=20Owoc?= <frut3k7@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [RFC PATCH net-next 1/2] net: phy: aquantia: move priv and hw stat to header
-Date: Fri, 24 May 2024 22:53:43 +0200
-Message-ID: <20240524205346.20960-1-ansuelsmth@gmail.com>
+Subject: [RFC PATCH net-next 2/2] net: phy: aquantia: add support for PHY LEDs
+Date: Fri, 24 May 2024 22:53:44 +0200
+Message-ID: <20240524205346.20960-2-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240524205346.20960-1-ansuelsmth@gmail.com>
+References: <20240524205346.20960-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,125 +96,405 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In preparation for LEDs support, move priv and hw stat to header to
-reference priv struct also in other .c outside aquantia.main
+From: Daniel Golle <daniel@makrotopia.org>
 
+Aquantia Ethernet PHYs got 3 LED output pins which are typically used
+to indicate link status and activity.
+Add a minimal LED controller driver supporting the most common uses
+with the 'netdev' trigger as well as software-driven forced control of
+the LEDs.
+
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+[ rework indentation, fix checkpatch error and improve some functions ]
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- drivers/net/phy/aquantia/aquantia.h      | 38 ++++++++++++++++++++++++
- drivers/net/phy/aquantia/aquantia_main.c | 37 -----------------------
- 2 files changed, 38 insertions(+), 37 deletions(-)
+ drivers/net/phy/aquantia/Makefile        |   2 +-
+ drivers/net/phy/aquantia/aquantia.h      |  40 ++++++
+ drivers/net/phy/aquantia/aquantia_leds.c | 150 +++++++++++++++++++++++
+ drivers/net/phy/aquantia/aquantia_main.c |  63 +++++++++-
+ 4 files changed, 252 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/net/phy/aquantia/aquantia_leds.c
 
+diff --git a/drivers/net/phy/aquantia/Makefile b/drivers/net/phy/aquantia/Makefile
+index aa77fb63c8ec..c6c4d494ee2a 100644
+--- a/drivers/net/phy/aquantia/Makefile
++++ b/drivers/net/phy/aquantia/Makefile
+@@ -1,5 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+-aquantia-objs			+= aquantia_main.o aquantia_firmware.o
++aquantia-objs			+= aquantia_main.o aquantia_firmware.o aquantia_leds.o
+ ifdef CONFIG_HWMON
+ aquantia-objs			+= aquantia_hwmon.o
+ endif
 diff --git a/drivers/net/phy/aquantia/aquantia.h b/drivers/net/phy/aquantia/aquantia.h
-index 1c19ae74ad2b..c79b33d95628 100644
+index c79b33d95628..c0e1fd9d7152 100644
 --- a/drivers/net/phy/aquantia/aquantia.h
 +++ b/drivers/net/phy/aquantia/aquantia.h
-@@ -87,6 +87,18 @@
- #define VEND1_GLOBAL_RSVD_STAT9_MODE		GENMASK(7, 0)
- #define VEND1_GLOBAL_RSVD_STAT9_1000BT2		0x23
+@@ -63,6 +63,28 @@
+ #define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_OVD	BIT(6)
+ #define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL	BIT(0)
  
-+/* MDIO_MMD_C22EXT */
-+#define MDIO_C22EXT_STAT_SGMII_RX_GOOD_FRAMES		0xd292
-+#define MDIO_C22EXT_STAT_SGMII_RX_BAD_FRAMES		0xd294
-+#define MDIO_C22EXT_STAT_SGMII_RX_FALSE_CARRIER		0xd297
-+#define MDIO_C22EXT_STAT_SGMII_TX_GOOD_FRAMES		0xd313
-+#define MDIO_C22EXT_STAT_SGMII_TX_BAD_FRAMES		0xd315
-+#define MDIO_C22EXT_STAT_SGMII_TX_FALSE_CARRIER		0xd317
-+#define MDIO_C22EXT_STAT_SGMII_TX_COLLISIONS		0xd318
-+#define MDIO_C22EXT_STAT_SGMII_TX_LINE_COLLISIONS	0xd319
-+#define MDIO_C22EXT_STAT_SGMII_TX_FRAME_ALIGN_ERR	0xd31a
-+#define MDIO_C22EXT_STAT_SGMII_TX_RUNT_FRAMES		0xd31b
++#define VEND1_GLOBAL_LED_PROV			0xc430
++#define AQR_LED_PROV(x)				(VEND1_GLOBAL_LED_PROV + (x))
++#define VEND1_GLOBAL_LED_PROV_LINK2500		BIT(14)
++#define VEND1_GLOBAL_LED_PROV_LINK5000		BIT(15)
++#define VEND1_GLOBAL_LED_PROV_FORCE_ON		BIT(8)
++#define VEND1_GLOBAL_LED_PROV_LINK10000		BIT(7)
++#define VEND1_GLOBAL_LED_PROV_LINK1000		BIT(6)
++#define VEND1_GLOBAL_LED_PROV_LINK100		BIT(5)
++#define VEND1_GLOBAL_LED_PROV_RX_ACT		BIT(3)
++#define VEND1_GLOBAL_LED_PROV_TX_ACT		BIT(2)
++#define VEND1_GLOBAL_LED_PROV_ACT_STRETCH	GENMASK(0, 1)
 +
- #define VEND1_GLOBAL_INT_STD_STATUS		0xfc00
- #define VEND1_GLOBAL_INT_VEND_STATUS		0xfc01
- 
-@@ -113,6 +125,32 @@
++#define VEND1_GLOBAL_LED_PROV_LINK_MASK		(VEND1_GLOBAL_LED_PROV_LINK100 | \
++						 VEND1_GLOBAL_LED_PROV_LINK1000 | \
++						 VEND1_GLOBAL_LED_PROV_LINK10000 | \
++						 VEND1_GLOBAL_LED_PROV_LINK5000 | \
++						 VEND1_GLOBAL_LED_PROV_LINK2500)
++
++#define VEND1_GLOBAL_LED_DRIVE			0xc438
++#define VEND1_GLOBAL_LED_DRIVE_VDD		BIT(1)
++#define AQR_LED_DRIVE(x)			(VEND1_GLOBAL_LED_DRIVE + (x))
++
+ #define VEND1_THERMAL_PROV_HIGH_TEMP_FAIL	0xc421
+ #define VEND1_THERMAL_PROV_LOW_TEMP_FAIL	0xc422
+ #define VEND1_THERMAL_PROV_HIGH_TEMP_WARN	0xc423
+@@ -125,6 +147,8 @@
  #define VEND1_GLOBAL_INT_VEND_MASK_GLOBAL2	BIT(1)
  #define VEND1_GLOBAL_INT_VEND_MASK_GLOBAL3	BIT(0)
  
-+struct aqr107_hw_stat {
-+	const char *name;
-+	int reg;
-+	int size;
-+};
++#define AQR_MAX_LEDS				3
 +
-+#define SGMII_STAT(n, r, s) { n, MDIO_C22EXT_STAT_SGMII_ ## r, s }
-+static const struct aqr107_hw_stat aqr107_hw_stats[] = {
-+	SGMII_STAT("sgmii_rx_good_frames",	    RX_GOOD_FRAMES,	26),
-+	SGMII_STAT("sgmii_rx_bad_frames",	    RX_BAD_FRAMES,	26),
-+	SGMII_STAT("sgmii_rx_false_carrier_events", RX_FALSE_CARRIER,	 8),
-+	SGMII_STAT("sgmii_tx_good_frames",	    TX_GOOD_FRAMES,	26),
-+	SGMII_STAT("sgmii_tx_bad_frames",	    TX_BAD_FRAMES,	26),
-+	SGMII_STAT("sgmii_tx_false_carrier_events", TX_FALSE_CARRIER,	 8),
-+	SGMII_STAT("sgmii_tx_collisions",	    TX_COLLISIONS,	 8),
-+	SGMII_STAT("sgmii_tx_line_collisions",	    TX_LINE_COLLISIONS,	 8),
-+	SGMII_STAT("sgmii_tx_frame_alignment_err",  TX_FRAME_ALIGN_ERR,	16),
-+	SGMII_STAT("sgmii_tx_runt_frames",	    TX_RUNT_FRAMES,	22),
-+};
-+
-+#define AQR107_SGMII_STAT_SZ ARRAY_SIZE(aqr107_hw_stats)
-+
-+struct aqr107_priv {
-+	u64 sgmii_stats[AQR107_SGMII_STAT_SZ];
-+};
-+
+ struct aqr107_hw_stat {
+ 	const char *name;
+ 	int reg;
+@@ -149,6 +173,7 @@ static const struct aqr107_hw_stat aqr107_hw_stats[] = {
+ 
+ struct aqr107_priv {
+ 	u64 sgmii_stats[AQR107_SGMII_STAT_SZ];
++	unsigned long leds_active_low;
+ };
+ 
  #if IS_REACHABLE(CONFIG_HWMON)
- int aqr_hwmon_probe(struct phy_device *phydev);
- #else
+@@ -158,3 +183,18 @@ static inline int aqr_hwmon_probe(struct phy_device *phydev) { return 0; }
+ #endif
+ 
+ int aqr_firmware_load(struct phy_device *phydev);
++
++int aqr_phy_led_blink_set(struct phy_device *phydev, u8 index,
++			  unsigned long *delay_on,
++			  unsigned long *delay_off);
++int aqr_phy_led_brightness_set(struct phy_device *phydev,
++			       u8 index, enum led_brightness value);
++int aqr_phy_led_hw_is_supported(struct phy_device *phydev, u8 index,
++				unsigned long rules);
++int aqr_phy_led_hw_control_get(struct phy_device *phydev, u8 index,
++			       unsigned long *rules);
++int aqr_phy_led_hw_control_set(struct phy_device *phydev, u8 index,
++			       unsigned long rules);
++int aqr_phy_led_active_low_set(struct phy_device *phydev, int index, bool enable);
++int aqr_phy_led_polarity_set(struct phy_device *phydev, int index,
++			     unsigned long modes);
+diff --git a/drivers/net/phy/aquantia/aquantia_leds.c b/drivers/net/phy/aquantia/aquantia_leds.c
+new file mode 100644
+index 000000000000..47bcc6d70945
+--- /dev/null
++++ b/drivers/net/phy/aquantia/aquantia_leds.c
+@@ -0,0 +1,150 @@
++// SPDX-License-Identifier: GPL-2.0
++/* LED driver for Aquantia PHY
++ *
++ * Author: Daniel Golle <daniel@makrotopia.org>
++ */
++
++#include <linux/phy.h>
++
++#include "aquantia.h"
++
++int aqr_phy_led_brightness_set(struct phy_device *phydev,
++			       u8 index, enum led_brightness value)
++{
++	if (index > 2)
++		return -EINVAL;
++
++	return phy_modify_mmd(phydev, MDIO_MMD_VEND1, AQR_LED_PROV(index),
++			      VEND1_GLOBAL_LED_PROV_LINK_MASK |
++			      VEND1_GLOBAL_LED_PROV_FORCE_ON |
++			      VEND1_GLOBAL_LED_PROV_RX_ACT |
++			      VEND1_GLOBAL_LED_PROV_TX_ACT,
++			      value ? VEND1_GLOBAL_LED_PROV_FORCE_ON : 0);
++}
++
++static const unsigned long supported_triggers = (BIT(TRIGGER_NETDEV_LINK) |
++						 BIT(TRIGGER_NETDEV_LINK_100) |
++						 BIT(TRIGGER_NETDEV_LINK_1000) |
++						 BIT(TRIGGER_NETDEV_LINK_2500) |
++						 BIT(TRIGGER_NETDEV_LINK_5000) |
++						 BIT(TRIGGER_NETDEV_LINK_10000)  |
++						 BIT(TRIGGER_NETDEV_RX) |
++						 BIT(TRIGGER_NETDEV_TX));
++
++int aqr_phy_led_hw_is_supported(struct phy_device *phydev, u8 index,
++				unsigned long rules)
++{
++	if (index >= AQR_MAX_LEDS)
++		return -EINVAL;
++
++	/* All combinations of the supported triggers are allowed */
++	if (rules & ~supported_triggers)
++		return -EOPNOTSUPP;
++
++	return 0;
++}
++
++int aqr_phy_led_hw_control_get(struct phy_device *phydev, u8 index,
++			       unsigned long *rules)
++{
++	int val;
++
++	if (index >= AQR_MAX_LEDS)
++		return -EINVAL;
++
++	val = phy_read_mmd(phydev, MDIO_MMD_VEND1, AQR_LED_PROV(index));
++	if (val < 0)
++		return val;
++
++	*rules = 0;
++	if (val & VEND1_GLOBAL_LED_PROV_LINK100)
++		*rules |= BIT(TRIGGER_NETDEV_LINK_100);
++
++	if (val & VEND1_GLOBAL_LED_PROV_LINK1000)
++		*rules |= BIT(TRIGGER_NETDEV_LINK_1000);
++
++	if (val & VEND1_GLOBAL_LED_PROV_LINK2500)
++		*rules |= BIT(TRIGGER_NETDEV_LINK_2500);
++
++	if (val & VEND1_GLOBAL_LED_PROV_LINK5000)
++		*rules |= BIT(TRIGGER_NETDEV_LINK_5000);
++
++	if (val & VEND1_GLOBAL_LED_PROV_LINK10000)
++		*rules |= BIT(TRIGGER_NETDEV_LINK_10000);
++
++	if (val & VEND1_GLOBAL_LED_PROV_RX_ACT)
++		*rules |= BIT(TRIGGER_NETDEV_RX);
++
++	if (val & VEND1_GLOBAL_LED_PROV_TX_ACT)
++		*rules |= BIT(TRIGGER_NETDEV_TX);
++
++	return 0;
++}
++
++int aqr_phy_led_hw_control_set(struct phy_device *phydev, u8 index,
++			       unsigned long rules)
++{
++	u16 val = 0;
++
++	if (index >= AQR_MAX_LEDS)
++		return -EINVAL;
++
++	if (rules & (BIT(TRIGGER_NETDEV_LINK_100) | BIT(TRIGGER_NETDEV_LINK)))
++		val |= VEND1_GLOBAL_LED_PROV_LINK100;
++
++	if (rules & (BIT(TRIGGER_NETDEV_LINK_1000) | BIT(TRIGGER_NETDEV_LINK)))
++		val |= VEND1_GLOBAL_LED_PROV_LINK1000;
++
++	if (rules & (BIT(TRIGGER_NETDEV_LINK_2500) | BIT(TRIGGER_NETDEV_LINK)))
++		val |= VEND1_GLOBAL_LED_PROV_LINK2500;
++
++	if (rules & (BIT(TRIGGER_NETDEV_LINK_5000) | BIT(TRIGGER_NETDEV_LINK)))
++		val |= VEND1_GLOBAL_LED_PROV_LINK5000;
++
++	if (rules & (BIT(TRIGGER_NETDEV_LINK_10000) | BIT(TRIGGER_NETDEV_LINK)))
++		val |= VEND1_GLOBAL_LED_PROV_LINK10000;
++
++	if (rules & BIT(TRIGGER_NETDEV_RX))
++		val |= VEND1_GLOBAL_LED_PROV_RX_ACT;
++
++	if (rules & BIT(TRIGGER_NETDEV_TX))
++		val |= VEND1_GLOBAL_LED_PROV_TX_ACT;
++
++	return phy_modify_mmd(phydev, MDIO_MMD_VEND1, AQR_LED_PROV(index),
++			      VEND1_GLOBAL_LED_PROV_LINK_MASK |
++			      VEND1_GLOBAL_LED_PROV_FORCE_ON |
++			      VEND1_GLOBAL_LED_PROV_RX_ACT |
++			      VEND1_GLOBAL_LED_PROV_TX_ACT, val);
++}
++
++int aqr_phy_led_active_low_set(struct phy_device *phydev, int index, bool enable)
++{
++	return phy_modify_mmd(phydev, MDIO_MMD_VEND1, AQR_LED_DRIVE(index),
++			      VEND1_GLOBAL_LED_DRIVE_VDD, enable);
++}
++
++int aqr_phy_led_polarity_set(struct phy_device *phydev, int index, unsigned long modes)
++{
++	struct aqr107_priv *priv = phydev->priv;
++	bool active_low = false;
++	u32 mode;
++
++	if (index >= AQR_MAX_LEDS)
++		return -EINVAL;
++
++	for_each_set_bit(mode, &modes, __PHY_LED_MODES_NUM) {
++		switch (mode) {
++		case PHY_LED_ACTIVE_LOW:
++			active_low = true;
++			break;
++		default:
++			return -EINVAL;
++		}
++	}
++
++	/* Save LED driver vdd state to restore on SW reset */
++	if (active_low)
++		priv->leds_active_low |= BIT(index);
++
++	return aqr_phy_led_active_low_set(phydev, index, active_low);
++}
 diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
-index d34cdec47636..252123d12efb 100644
+index 252123d12efb..6c14355744b7 100644
 --- a/drivers/net/phy/aquantia/aquantia_main.c
 +++ b/drivers/net/phy/aquantia/aquantia_main.c
-@@ -84,49 +84,12 @@
- #define MDIO_AN_RX_VEND_STAT3			0xe832
- #define MDIO_AN_RX_VEND_STAT3_AFR		BIT(0)
+@@ -475,7 +475,9 @@ static void aqr107_chip_info(struct phy_device *phydev)
  
--/* MDIO_MMD_C22EXT */
--#define MDIO_C22EXT_STAT_SGMII_RX_GOOD_FRAMES		0xd292
--#define MDIO_C22EXT_STAT_SGMII_RX_BAD_FRAMES		0xd294
--#define MDIO_C22EXT_STAT_SGMII_RX_FALSE_CARRIER		0xd297
--#define MDIO_C22EXT_STAT_SGMII_TX_GOOD_FRAMES		0xd313
--#define MDIO_C22EXT_STAT_SGMII_TX_BAD_FRAMES		0xd315
--#define MDIO_C22EXT_STAT_SGMII_TX_FALSE_CARRIER		0xd317
--#define MDIO_C22EXT_STAT_SGMII_TX_COLLISIONS		0xd318
--#define MDIO_C22EXT_STAT_SGMII_TX_LINE_COLLISIONS	0xd319
--#define MDIO_C22EXT_STAT_SGMII_TX_FRAME_ALIGN_ERR	0xd31a
--#define MDIO_C22EXT_STAT_SGMII_TX_RUNT_FRAMES		0xd31b
--
- /* Sleep and timeout for checking if the Processor-Intensive
-  * MDIO operation is finished
-  */
- #define AQR107_OP_IN_PROG_SLEEP		1000
- #define AQR107_OP_IN_PROG_TIMEOUT	100000
- 
--struct aqr107_hw_stat {
--	const char *name;
--	int reg;
--	int size;
--};
--
--#define SGMII_STAT(n, r, s) { n, MDIO_C22EXT_STAT_SGMII_ ## r, s }
--static const struct aqr107_hw_stat aqr107_hw_stats[] = {
--	SGMII_STAT("sgmii_rx_good_frames",	    RX_GOOD_FRAMES,	26),
--	SGMII_STAT("sgmii_rx_bad_frames",	    RX_BAD_FRAMES,	26),
--	SGMII_STAT("sgmii_rx_false_carrier_events", RX_FALSE_CARRIER,	 8),
--	SGMII_STAT("sgmii_tx_good_frames",	    TX_GOOD_FRAMES,	26),
--	SGMII_STAT("sgmii_tx_bad_frames",	    TX_BAD_FRAMES,	26),
--	SGMII_STAT("sgmii_tx_false_carrier_events", TX_FALSE_CARRIER,	 8),
--	SGMII_STAT("sgmii_tx_collisions",	    TX_COLLISIONS,	 8),
--	SGMII_STAT("sgmii_tx_line_collisions",	    TX_LINE_COLLISIONS,	 8),
--	SGMII_STAT("sgmii_tx_frame_alignment_err",  TX_FRAME_ALIGN_ERR,	16),
--	SGMII_STAT("sgmii_tx_runt_frames",	    TX_RUNT_FRAMES,	22),
--};
--#define AQR107_SGMII_STAT_SZ ARRAY_SIZE(aqr107_hw_stats)
--
--struct aqr107_priv {
--	u64 sgmii_stats[AQR107_SGMII_STAT_SZ];
--};
--
- static int aqr107_get_sset_count(struct phy_device *phydev)
+ static int aqr107_config_init(struct phy_device *phydev)
  {
- 	return AQR107_SGMII_STAT_SZ;
+-	int ret;
++	struct aqr107_priv *priv = phydev->priv;
++	u32 led_active_low;
++	int ret, index = 0;
+ 
+ 	/* Check that the PHY interface type is compatible */
+ 	if (phydev->interface != PHY_INTERFACE_MODE_SGMII &&
+@@ -496,7 +498,19 @@ static int aqr107_config_init(struct phy_device *phydev)
+ 	if (!ret)
+ 		aqr107_chip_info(phydev);
+ 
+-	return aqr107_set_downshift(phydev, MDIO_AN_VEND_PROV_DOWNSHIFT_DFLT);
++	ret = aqr107_set_downshift(phydev, MDIO_AN_VEND_PROV_DOWNSHIFT_DFLT);
++	if (ret)
++		return ret;
++
++	/* Restore LED polarity state after reset */
++	for_each_set_bit(led_active_low, &priv->leds_active_low, AQR_MAX_LEDS) {
++		ret = aqr_phy_led_active_low_set(phydev, index, led_active_low);
++		if (ret)
++			return ret;
++		index++;
++	}
++
++	return 0;
+ }
+ 
+ static int aqcs109_config_init(struct phy_device *phydev)
+@@ -786,6 +800,11 @@ static struct phy_driver aqr_driver[] = {
+ 	.get_strings	= aqr107_get_strings,
+ 	.get_stats	= aqr107_get_stats,
+ 	.link_change_notify = aqr107_link_change_notify,
++	.led_brightness_set = aqr_phy_led_brightness_set,
++	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
++	.led_hw_control_set = aqr_phy_led_hw_control_set,
++	.led_hw_control_get = aqr_phy_led_hw_control_get,
++	.led_polarity_set = aqr_phy_led_polarity_set,
+ },
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQCS109),
+@@ -805,6 +824,11 @@ static struct phy_driver aqr_driver[] = {
+ 	.get_strings	= aqr107_get_strings,
+ 	.get_stats	= aqr107_get_stats,
+ 	.link_change_notify = aqr107_link_change_notify,
++	.led_brightness_set = aqr_phy_led_brightness_set,
++	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
++	.led_hw_control_set = aqr_phy_led_hw_control_set,
++	.led_hw_control_get = aqr_phy_led_hw_control_get,
++	.led_polarity_set = aqr_phy_led_polarity_set,
+ },
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQR111),
+@@ -824,6 +848,11 @@ static struct phy_driver aqr_driver[] = {
+ 	.get_strings	= aqr107_get_strings,
+ 	.get_stats	= aqr107_get_stats,
+ 	.link_change_notify = aqr107_link_change_notify,
++	.led_brightness_set = aqr_phy_led_brightness_set,
++	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
++	.led_hw_control_set = aqr_phy_led_hw_control_set,
++	.led_hw_control_get = aqr_phy_led_hw_control_get,
++	.led_polarity_set = aqr_phy_led_polarity_set,
+ },
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQR111B0),
+@@ -843,6 +872,11 @@ static struct phy_driver aqr_driver[] = {
+ 	.get_strings	= aqr107_get_strings,
+ 	.get_stats	= aqr107_get_stats,
+ 	.link_change_notify = aqr107_link_change_notify,
++	.led_brightness_set = aqr_phy_led_brightness_set,
++	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
++	.led_hw_control_set = aqr_phy_led_hw_control_set,
++	.led_hw_control_get = aqr_phy_led_hw_control_get,
++	.led_polarity_set = aqr_phy_led_polarity_set,
+ },
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQR405),
+@@ -869,6 +903,11 @@ static struct phy_driver aqr_driver[] = {
+ 	.get_strings	= aqr107_get_strings,
+ 	.get_stats	= aqr107_get_stats,
+ 	.link_change_notify = aqr107_link_change_notify,
++	.led_brightness_set = aqr_phy_led_brightness_set,
++	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
++	.led_hw_control_set = aqr_phy_led_hw_control_set,
++	.led_hw_control_get = aqr_phy_led_hw_control_get,
++	.led_polarity_set = aqr_phy_led_polarity_set,
+ },
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQR412),
+@@ -906,6 +945,11 @@ static struct phy_driver aqr_driver[] = {
+ 	.get_strings    = aqr107_get_strings,
+ 	.get_stats      = aqr107_get_stats,
+ 	.link_change_notify = aqr107_link_change_notify,
++	.led_brightness_set = aqr_phy_led_brightness_set,
++	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
++	.led_hw_control_set = aqr_phy_led_hw_control_set,
++	.led_hw_control_get = aqr_phy_led_hw_control_get,
++	.led_polarity_set = aqr_phy_led_polarity_set,
+ },
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQR113C),
+@@ -925,6 +969,11 @@ static struct phy_driver aqr_driver[] = {
+ 	.get_strings    = aqr107_get_strings,
+ 	.get_stats      = aqr107_get_stats,
+ 	.link_change_notify = aqr107_link_change_notify,
++	.led_brightness_set = aqr_phy_led_brightness_set,
++	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
++	.led_hw_control_set = aqr_phy_led_hw_control_set,
++	.led_hw_control_get = aqr_phy_led_hw_control_get,
++	.led_polarity_set = aqr_phy_led_polarity_set,
+ },
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQR114C),
+@@ -944,6 +993,11 @@ static struct phy_driver aqr_driver[] = {
+ 	.get_strings    = aqr107_get_strings,
+ 	.get_stats      = aqr107_get_stats,
+ 	.link_change_notify = aqr107_link_change_notify,
++	.led_brightness_set = aqr_phy_led_brightness_set,
++	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
++	.led_hw_control_set = aqr_phy_led_hw_control_set,
++	.led_hw_control_get = aqr_phy_led_hw_control_get,
++	.led_polarity_set = aqr_phy_led_polarity_set,
+ },
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQR813),
+@@ -963,6 +1017,11 @@ static struct phy_driver aqr_driver[] = {
+ 	.get_strings	= aqr107_get_strings,
+ 	.get_stats	= aqr107_get_stats,
+ 	.link_change_notify = aqr107_link_change_notify,
++	.led_brightness_set = aqr_phy_led_brightness_set,
++	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
++	.led_hw_control_set = aqr_phy_led_hw_control_set,
++	.led_hw_control_get = aqr_phy_led_hw_control_get,
++	.led_polarity_set = aqr_phy_led_polarity_set,
+ },
+ };
+ 
 -- 
 2.43.0
 
