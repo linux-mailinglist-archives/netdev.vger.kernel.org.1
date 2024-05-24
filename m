@@ -1,111 +1,190 @@
-Return-Path: <netdev+bounces-97982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F6928CE706
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 16:30:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 623CF8CE74F
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 16:47:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD85C281F8E
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 14:30:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BFAA1C21152
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 14:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD0986655;
-	Fri, 24 May 2024 14:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 789E886629;
+	Fri, 24 May 2024 14:47:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="SyKRYPXt"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="X6b7v7xX"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C12B85268;
-	Fri, 24 May 2024 14:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77EB2BAF3;
+	Fri, 24 May 2024 14:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716561036; cv=none; b=VqvHZv7LVUidyM6lqzFhzhjWyXTed4e3dNNUAQBVGoXp8KhMJyZDduOdrSWUnABGLwtOUXzd2AJ8yAZcCHoQ1DwiwupF+UOTWGBH2wx9+gWcv06j8vJg1ftIk9tmrXtlJE8NHThrvuqxJy+kBOQdCGSHY25RjNiZaq4l0cTe3SU=
+	t=1716562068; cv=none; b=YELmJhvorgIqei+XFAapYRz7CiM9LV+n2zU7VsVN8e26VAbaR9btHy6vwMUCSw0Uv+VqYPK0LiGqammLAPGP7fwmyEDLdoF9Nequ3a2hwdU+23rCkOMAdfZbHrwwIYsxfjSDphl8o6tI9nVl+YGUnv26FeTAD660ZU6d3azZujQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716561036; c=relaxed/simple;
-	bh=qFRZhnD/p+pLSzPnbjviQjaEYa6hMFFXlAZTDb+RQxI=;
-	h=Subject:From:To:Cc:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=W8sl5dcqgjxmZCXDY9E0CW8ZaCIRdPq3xs1YV8WJh/qvcOQ0OYJjCvE0IjivOtod/e2xIOJlM7lZ2YIBzra68jptSGv9JrC2tStZewXAHjUq22G82fh/rJkwhp3ppNfDKmRy79S6qkg5tkPFVmvgBpDdfX/cYDccuHd2r4ihKIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=SyKRYPXt; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:References:Cc:To:From:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=6NBTN3gP3XRC5yswrkvPve4S2HuHh2J1YMADcEHnH60=; b=SyKRYPXtSci/rwupCzQlINgP9T
-	kF4JVznumiUoZygiZAAzfcEkbtRuuqhKjt1OSU2ogHKR4AQp/1KvAyuud7IZxpXpWf1ZDlUyCGUZQ
-	Ao1CqnDPIWouyI6gscH0RKwnWJcQhb5L1zK80Kd6MJWpKe2zq3CZV0cyOM7pFoE2A4NmNaBEyqP0+
-	OkgYy7dwg2qxpawBp2Yud7h8K1HBzDhtw6f22sKwpqizv0p1tNA8TupR0qGkcykAHX533gWzq7B0W
-	dVfNEFu9OBV7hN4I3qZax0FZgNghx6J3d2cJ7XaPyf7u3oUXgneyeVSsp5ijtlU/851/2eTIZNMKI
-	83mG55qA==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sAVwF-0005YE-Sl; Fri, 24 May 2024 16:30:31 +0200
-Received: from [178.197.248.14] (helo=linux.home)
-	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sAVwF-0006Pc-2e;
-	Fri, 24 May 2024 16:30:31 +0200
-Subject: Re: [PATCH bpf 3/5] netkit: Fix syncing peer device mtu with primary
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: Nikolay Aleksandrov <razor@blackwall.org>, martin.lau@kernel.org
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, Joe Stringer <joe@cilium.io>
-References: <20240524130115.9854-1-daniel@iogearbox.net>
- <20240524130115.9854-3-daniel@iogearbox.net>
- <984f7580-890d-4644-b8ad-144505a882e4@blackwall.org>
- <b6465a83-0aae-72be-5050-f9de85d3bf31@iogearbox.net>
-Message-ID: <36e9b554-96d1-641f-d521-245dc8a7463f@iogearbox.net>
-Date: Fri, 24 May 2024 16:30:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1716562068; c=relaxed/simple;
+	bh=1BYXmgN7udHWcL+OkJLf8ckhKsGB6dLjT7Ru1SeyaY4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Jedaq6lrfW5o0dYrjLtF91sFmtkA5Z7nJG50/z1c6aJ5caueLh2dW33vTH+REgBM7Vlp5P/NFi28GIE2o/UuLbxxTMCjmF2ovCML+h34LhvOhbTKMpqGvEIhl5lMZf+Yrwi+sq6ii3hduXhJeHaoK3sHCSjNq9ncz2dCbA+GZNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=X6b7v7xX; arc=none smtp.client-ip=178.60.130.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=GAm6SuMCXIOFlOJm80hD0+OtxP9VsZ++oPDngmQ1KLU=; b=X6b7v7xX2Zl1SQRZaUKBDG0t14
+	gYf0F1qlHvyCxE1urg2qG6EabrbsR1mTl1TWV/+xytzr0BveyxDtsAPYgamZyQlxWSU72kgQokua/
+	ulCanMjlRpIiAKWEQTAEkEt1xgVuM/eDjfeVjjv8yo+J60idrN7eAKbqbhj/KHoaCcBrNo1plmhrB
+	if8SgBFNyhCF2zs099f5kGYe2Oz48u+ZbH6ngBgsincxdqXkW4y7N8KqbWsNDJhliiDeKW2ItppF3
+	sAibBKcwMk61Pikwz68lHp9F7AHS92ucRWUwF448bXu2n9d3VMEZfCPY6lI4fkU2BG6AH+zzif34o
+	jkm007ew==;
+Received: from 179-125-79-244-dinamico.pombonet.net.br ([179.125.79.244] helo=quatroqueijos.lan)
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1sAWCk-00C18E-S8; Fri, 24 May 2024 16:47:35 +0200
+From: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
+To: netdev@vger.kernel.org
+Cc: Cong Wang <cong.wang@bytedance.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	bpf@vger.kernel.org,
+	kernel-dev@igalia.com,
+	Thadeu Lima de Souza Cascardo <cascardo@igalia.com>,
+	syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] sock_map: avoid race between sock_map_close and sk_psock_put
+Date: Fri, 24 May 2024 11:47:02 -0300
+Message-Id: <20240524144702.1178377-1-cascardo@igalia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <b6465a83-0aae-72be-5050-f9de85d3bf31@iogearbox.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27285/Fri May 24 10:30:55 2024)
 
-On 5/24/24 4:20 PM, Daniel Borkmann wrote:
-> On 5/24/24 4:15 PM, Nikolay Aleksandrov wrote:
->> On 5/24/24 16:01, Daniel Borkmann wrote:
->>> Implement the ndo_change_mtu callback in netkit in order to align the MTU
->>> to the primary device. This is needed in order to sync MTUs to the latter
->>> from the control plane (e.g. Cilium) which does not have access into the
->>> Pod's netns.
->>>
->>> Fixes: 35dfaad7188c ("netkit, bpf: Add bpf programmable net device")
->>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
->>> Cc: Joe Stringer <joe@cilium.io>
->>> ---
->>>   drivers/net/netkit.c | 20 ++++++++++++++++++++
->>>   1 file changed, 20 insertions(+)
->>>
->>
->> This one has unexpected behaviour IMO. If the app sets the MTU and we
->> silently overwrite, then it may continue working and thinking the MTU
->> was changed leading to unexpected problems. I think it'd be better to
->> keep the MTU synced explicitly (e.g. when set on main device, then
->> set it on peer as well) and error out when trying to set it without
->> the proper capabilities.
-> 
-> Makes sense, I'll look into this, thanks Nik!
+sk_psock_get will return NULL if the refcount of psock has gone to 0, which
+will happen when the last call of sk_psock_put is done. However,
+sk_psock_drop may not have finished yet, so the close callback will still
+point to sock_map_close despite psock being NULL.
 
-I'll drop this one for now, and have a future extension on nk device
-creation to lock such attributes or not so its flexible.
+This can be reproduced with a thread deleting an element from the sock map,
+while the second one creates a socket, adds it to the map and closes it.
 
-Thanks,
-Daniel
+That will trigger the WARN_ON_ONCE:
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 7220 at net/core/sock_map.c:1701 sock_map_close+0x2a2/0x2d0 net/core/sock_map.c:1701
+Modules linked in:
+CPU: 1 PID: 7220 Comm: syz-executor380 Not tainted 6.9.0-syzkaller-07726-g3c999d1ae3c7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+RIP: 0010:sock_map_close+0x2a2/0x2d0 net/core/sock_map.c:1701
+Code: df e8 92 29 88 f8 48 8b 1b 48 89 d8 48 c1 e8 03 42 80 3c 20 00 74 08 48 89 df e8 79 29 88 f8 4c 8b 23 eb 89 e8 4f 15 23 f8 90 <0f> 0b 90 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d e9 13 26 3d 02
+RSP: 0018:ffffc9000441fda8 EFLAGS: 00010293
+RAX: ffffffff89731ae1 RBX: ffffffff94b87540 RCX: ffff888029470000
+RDX: 0000000000000000 RSI: ffffffff8bcab5c0 RDI: ffffffff8c1faba0
+RBP: 0000000000000000 R08: ffffffff92f9b61f R09: 1ffffffff25f36c3
+R10: dffffc0000000000 R11: fffffbfff25f36c4 R12: ffffffff89731840
+R13: ffff88804b587000 R14: ffff88804b587000 R15: ffffffff89731870
+FS:  000055555e080380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 00000000207d4000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ unix_release+0x87/0xc0 net/unix/af_unix.c:1048
+ __sock_release net/socket.c:659 [inline]
+ sock_close+0xbe/0x240 net/socket.c:1421
+ __fput+0x42b/0x8a0 fs/file_table.c:422
+ __do_sys_close fs/open.c:1556 [inline]
+ __se_sys_close fs/open.c:1541 [inline]
+ __x64_sys_close+0x7f/0x110 fs/open.c:1541
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fb37d618070
+Code: 00 00 48 c7 c2 b8 ff ff ff f7 d8 64 89 02 b8 ff ff ff ff eb d4 e8 10 2c 00 00 80 3d 31 f0 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
+RSP: 002b:00007ffcd4a525d8 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
+RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007fb37d618070
+RDX: 0000000000000010 RSI: 00000000200001c0 RDI: 0000000000000004
+RBP: 0000000000000000 R08: 0000000100000000 R09: 0000000100000000
+R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+
+Use sk_psock, which will only check that the pointer is not been set to
+NULL yet, which should only happen after the callbacks are restored. If,
+then, a reference can still be gotten, we may call sk_psock_stop and cancel
+psock->work.
+
+As suggested by Paolo Abeni, reorder the condition so the control flow is
+less convoluted.
+
+After that change, the reproducer does not trigger the WARN_ON_ONCE
+anymore.
+
+Suggested-by: Paolo Abeni <pabeni@redhat.com>
+Reported-by: syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=07a2e4a1a57118ef7355
+Fixes: aadb2bb83ff7 ("sock_map: Fix a potential use-after-free in sock_map_close()")
+Fixes: 5b4a79ba65a1 ("bpf, sockmap: Don't let sock_map_{close,destroy,unhash} call itself")
+Cc: stable@vger.kernel.org
+Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
+---
+
+v2: change control flow as suggested by Paolo Abeni
+
+v1: https://lore.kernel.org/netdev/20240520214153.847619-1-cascardo@igalia.com/
+
+---
+ net/core/sock_map.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+index 9402889840bf..c3179567a99a 100644
+--- a/net/core/sock_map.c
++++ b/net/core/sock_map.c
+@@ -1680,19 +1680,23 @@ void sock_map_close(struct sock *sk, long timeout)
+ 
+ 	lock_sock(sk);
+ 	rcu_read_lock();
+-	psock = sk_psock_get(sk);
+-	if (unlikely(!psock)) {
+-		rcu_read_unlock();
+-		release_sock(sk);
+-		saved_close = READ_ONCE(sk->sk_prot)->close;
+-	} else {
++	psock = sk_psock(sk);
++	if (likely(psock)) {
+ 		saved_close = psock->saved_close;
+ 		sock_map_remove_links(sk, psock);
++		psock = sk_psock_get(sk);
++		if (unlikely(!psock))
++			goto no_psock;
+ 		rcu_read_unlock();
+ 		sk_psock_stop(psock);
+ 		release_sock(sk);
+ 		cancel_delayed_work_sync(&psock->work);
+ 		sk_psock_put(sk, psock);
++	} else {
++		saved_close = READ_ONCE(sk->sk_prot)->close;
++no_psock:
++		rcu_read_unlock();
++		release_sock(sk);
+ 	}
+ 
+ 	/* Make sure we do not recurse. This is a bug.
+-- 
+2.34.1
+
 
