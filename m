@@ -1,190 +1,156 @@
-Return-Path: <netdev+bounces-97961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E51178CE584
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 14:51:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9897C8CE594
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 15:01:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B11E2829FF
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 12:51:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0501E1F21D15
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 13:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831E586273;
-	Fri, 24 May 2024 12:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008F886621;
+	Fri, 24 May 2024 13:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="NcSFB3mz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACAE86250
-	for <netdev@vger.kernel.org>; Fri, 24 May 2024 12:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28653381BB;
+	Fri, 24 May 2024 13:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716555089; cv=none; b=jreeZ+FtYMd/EXWxdKityOoclWNMbmA+tX23lZHv8Xi/dEbumCG/bDFeRbyk4rzbn9sDxFMylDqdL/4+stfieKHNZTXi2aG2pwP6ctq1u34nvZc7tQVzH5j1VjH8WTeJY4jws2SarrbxQftLkqwXa6j7IjzwnjU5z7vOUqpWVh4=
+	t=1716555690; cv=none; b=pIJPXXUhrGmfnIGxvoX5/TF0YjZlfoS0BMNVUoCkXEU9I9TwEV6MDj9zPsXEwMJ8KT/mxpmMO446gzlYwqB2UKVhBQCAIVePnsQsQqrsm9ZRYCBsRJB0nxli7bQsqbG1U9CGKxyUxO4EzU8xuJc94ViIIZcTB9d51jrmd++5bww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716555089; c=relaxed/simple;
-	bh=EqnsROPwTP3ntkopFkdrZelWoz/7Hj+16Nwvgg65sKg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=fFFCXj4bfa5NClfHPprJyZvG79BhShYb2EtSHhwsOYfa9gczDjpzuOOFmsL8xpEGlZHYogrG6uTEa9HfYlJjLxmSdPr8QzO9fXwgjrEbwQO5w4FVFcDj2VfawwQg/gcLmZJxJpk3HY8HXRfIDVRdK9hMAMuxFl8pxPOYxO0OwjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-372f268d124so26363125ab.1
-        for <netdev@vger.kernel.org>; Fri, 24 May 2024 05:51:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716555087; x=1717159887;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LWR8v6vD/ml9vWdL1nuV53C5OuiUbXhFWnnf57JGgQk=;
-        b=FMJvrBPDR+9tifDA2vfyOf2uwhifApaLfFgQ3ggtdHVGP53JMIgLwAOVeNxFIP2f00
-         VtZ1vylTRRzJTd8Cv4eTRwGE1v/nC9QSLYYY8TutySlARCoNeEzjnoiu3Bv7DVCcFl7Y
-         syFAn8zHLEkgh53XehlERl+c/kh/frGufBEnbDDl8Xik1aRgw0/V0UCT2fRY0nhfAx/C
-         9a1SE3KICEj2MEUZLWqeNo3isiMtoCnSpmcbv7Qt+ydLSgAgxcp71aPLbV0JGQ6qXDPB
-         SAX+VErDxS8SQEoZDWXFpi/CEYSXTn4kGsQmoglfsDuuGomTWP2Yu5JgUaURsgzhBYCn
-         gaPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUp8P/g93HoVf7nnMxiOSCVu6LkBBebZxSlXgn4pM3gyW2xnNPMU0hfXsuckx++YvTPvsysAra7NMUit4GChBTTA/a6iVlw
-X-Gm-Message-State: AOJu0Yzi4t+MOoBw+DvjjWzWzaD7lzGphxJes7zwY2QlaKrO3RjY1MM1
-	FnV47nTmBG0pxPiq7refidrxmItLrxs5m3Wc4gycDR4c7LsVGJfPngOuhBDSMcnAvphg9JB3maK
-	s7Vnc9tudOzytHi0QDPWxNwrtExPvwcJ9NDAisAmHJF0cPo6HvK0E0a8=
-X-Google-Smtp-Source: AGHT+IE1JjcpjaC2BHnwYpKEH7AuYjloe9wjM4YYnL2XHbMZ/dpvGBz6q/CpNKjGQ+cByz1cp/TWPBDwuHY7CRbbM77uGI0dct+4
+	s=arc-20240116; t=1716555690; c=relaxed/simple;
+	bh=Ud/amTmy8TIjZHtX7j6S78UPtRg0drlr5dAgUU+d/uU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aGgcGWFQ+OFiKAdjToJMg/Chm755jSWTQZqgesNdsTydPdbrk/GnLZIcHlriK7NUYEqvLKEsHdCutjQc7Fax24hWR1Yj7037YChHe8ZWFAw0PkWH+GlAjQ4yqsxEpAArz74t9cSoG0Hf3IeA6BZ7s+065NLCczpMG9bKkPv9pYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=NcSFB3mz; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=2zCTSxqHxcraLH5KniLKHOznN5mQK5vs9BG5356v/Vo=; b=NcSFB3mzlSLUPKJ/d4BPTK9/vq
+	mgP03acMhlRoyxL6rMc4xoxvgYSi0iju5N0tugSoyZgQKwzDRiX7ar2U0ujFvcFUceiijk86JZh8q
+	bldM7HjhVkgrblU0HoQy7xQfUD+S1HIcigx3E0C8MdP4hIrFEWNYQOY4hXy7KzyHIIZ1rP0D0anJQ
+	tBgECAyAN+uNnwsSamsmXIypY0smHf5SDhC8WKjI4/Hr3iY96ATUOxvKKmLP0ar6kJVkzLPXqjJpF
+	vq91N7N6EEiwmwAF+mrirOIIcwFUHcWNwjlqpP4oIvrB/nwd3nZy7tds2Y0JiZS5U83r/xPEtpCFE
+	t6/r7cOg==;
+Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sAUXw-000K4w-VL; Fri, 24 May 2024 15:01:21 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: martin.lau@kernel.org
+Cc: razor@blackwall.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>
+Subject: [PATCH bpf 1/5] netkit: Fix setting mac address in l2 mode
+Date: Fri, 24 May 2024 15:01:11 +0200
+Message-Id: <20240524130115.9854-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d9b:b0:36f:c675:fe8e with SMTP id
- e9e14a558f8ab-3737b350f33mr2429995ab.4.1716555087179; Fri, 24 May 2024
- 05:51:27 -0700 (PDT)
-Date: Fri, 24 May 2024 05:51:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000035941f061932a077@google.com>
-Subject: [syzbot] [net?] KMSAN: kernel-infoleak in __skb_datagram_iter (4)
-From: syzbot <syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27285/Fri May 24 10:30:55 2024)
 
-Hello,
+When running Cilium connectivity test suite with netkit in L2 mode, we
+found that it is expected to be able to specify a custom MAC address for
+the devices, in particular, cilium-cni obtains the specified MAC address
+by querying the endpoint and sets the MAC address of the interface inside
+the Pod. Thus, fix the missing support in netkit for L2 mode.
 
-syzbot found the following issue on:
-
-HEAD commit:    101b7a97143a Merge tag 'acpi-6.10-rc1' of git://git.kernel..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15633df4980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7ac2f8c387a23814
-dashboard link: https://syzkaller.appspot.com/bug?extid=0c85cae3350b7d486aee
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/4f673334a91c/disk-101b7a97.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8e6db59f4091/vmlinux-101b7a97.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7e5782387c9d/bzImage-101b7a97.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
-BUG: KMSAN: kernel-infoleak in copy_to_user_iter lib/iov_iter.c:24 [inline]
-BUG: KMSAN: kernel-infoleak in iterate_ubuf include/linux/iov_iter.h:29 [inline]
-BUG: KMSAN: kernel-infoleak in iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
-BUG: KMSAN: kernel-infoleak in iterate_and_advance include/linux/iov_iter.h:271 [inline]
-BUG: KMSAN: kernel-infoleak in _copy_to_iter+0x366/0x24b0 lib/iov_iter.c:185
- instrument_copy_to_user include/linux/instrumented.h:114 [inline]
- copy_to_user_iter lib/iov_iter.c:24 [inline]
- iterate_ubuf include/linux/iov_iter.h:29 [inline]
- iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
- iterate_and_advance include/linux/iov_iter.h:271 [inline]
- _copy_to_iter+0x366/0x24b0 lib/iov_iter.c:185
- copy_to_iter include/linux/uio.h:196 [inline]
- simple_copy_to_iter net/core/datagram.c:532 [inline]
- __skb_datagram_iter+0x185/0x1000 net/core/datagram.c:420
- skb_copy_datagram_iter+0x5c/0x200 net/core/datagram.c:546
- skb_copy_datagram_msg include/linux/skbuff.h:4070 [inline]
- netlink_recvmsg+0x432/0x1610 net/netlink/af_netlink.c:1962
- sock_recvmsg_nosec net/socket.c:1046 [inline]
- sock_recvmsg+0x2c4/0x340 net/socket.c:1068
- ____sys_recvmsg+0x18a/0x620 net/socket.c:2803
- ___sys_recvmsg+0x223/0x840 net/socket.c:2845
- __sys_recvmsg net/socket.c:2875 [inline]
- __do_sys_recvmsg net/socket.c:2885 [inline]
- __se_sys_recvmsg net/socket.c:2882 [inline]
- __x64_sys_recvmsg+0x304/0x4a0 net/socket.c:2882
- x64_sys_call+0x38ff/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:48
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was stored to memory at:
- pskb_expand_head+0x30f/0x19d0 net/core/skbuff.c:2271
- netlink_trim+0x2c2/0x330 net/netlink/af_netlink.c:1317
- netlink_broadcast_filtered+0x82/0x23b0 net/netlink/af_netlink.c:1523
- nlmsg_multicast_filtered include/net/netlink.h:1111 [inline]
- nlmsg_multicast include/net/netlink.h:1130 [inline]
- nlmsg_notify+0x15f/0x2f0 net/netlink/af_netlink.c:2602
- rtnl_notify+0xc3/0xf0 net/core/rtnetlink.c:757
- wireless_nlevent_flush net/wireless/wext-core.c:354 [inline]
- wireless_nlevent_process+0xfe/0x250 net/wireless/wext-core.c:414
- process_one_work kernel/workqueue.c:3267 [inline]
- process_scheduled_works+0xa81/0x1bd0 kernel/workqueue.c:3348
- worker_thread+0xea5/0x1560 kernel/workqueue.c:3429
- kthread+0x3e2/0x540 kernel/kthread.c:389
- ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Uninit was stored to memory at:
- wireless_send_event+0x566/0x1020 net/wireless/wext-core.c:580
- ioctl_standard_iw_point+0x12e5/0x13c0
- compat_standard_call+0x179/0x310 net/wireless/wext-core.c:1110
- wext_ioctl_dispatch+0x234/0xa30 net/wireless/wext-core.c:1016
- compat_wext_handle_ioctl+0x1ae/0x2f0 net/wireless/wext-core.c:1139
- compat_sock_ioctl+0x26b/0x1370 net/socket.c:3525
- __do_compat_sys_ioctl fs/ioctl.c:1004 [inline]
- __se_compat_sys_ioctl+0x791/0x1090 fs/ioctl.c:947
- __ia32_compat_sys_ioctl+0x93/0xe0 fs/ioctl.c:947
- ia32_sys_call+0x1481/0x40a0 arch/x86/include/generated/asm/syscalls_32.h:55
- do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
- __do_fast_syscall_32+0xb4/0x120 arch/x86/entry/common.c:386
- do_fast_syscall_32+0x38/0x80 arch/x86/entry/common.c:411
- do_SYSENTER_32+0x1f/0x30 arch/x86/entry/common.c:449
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-
-Local variable iwp created at:
- compat_standard_call+0x48/0x310 net/wireless/wext-core.c:1097
- wext_ioctl_dispatch+0x234/0xa30 net/wireless/wext-core.c:1016
-
-Bytes 60-63 of 64 are uninitialized
-Memory access of size 64 starts at ffff88804af03180
-Data copied to user address 00007fff5690c968
-
-CPU: 0 PID: 4697 Comm: dhcpcd Tainted: G        W          6.9.0-syzkaller-02339-g101b7a97143a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-=====================================================
-
-
+Fixes: 35dfaad7188c ("netkit, bpf: Add bpf programmable net device")
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/netkit.c | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+index a4d2e76a8d58..272894053e2c 100644
+--- a/drivers/net/netkit.c
++++ b/drivers/net/netkit.c
+@@ -155,6 +155,16 @@ static void netkit_set_multicast(struct net_device *dev)
+ 	/* Nothing to do, we receive whatever gets pushed to us! */
+ }
+ 
++static int netkit_set_macaddr(struct net_device *dev, void *sa)
++{
++	struct netkit *nk = netkit_priv(dev);
++
++	if (nk->mode != NETKIT_L2)
++		return -EOPNOTSUPP;
++
++	return eth_mac_addr(dev, sa);
++}
++
+ static void netkit_set_headroom(struct net_device *dev, int headroom)
+ {
+ 	struct netkit *nk = netkit_priv(dev), *nk2;
+@@ -198,6 +208,7 @@ static const struct net_device_ops netkit_netdev_ops = {
+ 	.ndo_start_xmit		= netkit_xmit,
+ 	.ndo_set_rx_mode	= netkit_set_multicast,
+ 	.ndo_set_rx_headroom	= netkit_set_headroom,
++	.ndo_set_mac_address	= netkit_set_macaddr,
+ 	.ndo_get_iflink		= netkit_get_iflink,
+ 	.ndo_get_peer_dev	= netkit_peer_dev,
+ 	.ndo_get_stats64	= netkit_get_stats,
+@@ -300,9 +311,11 @@ static int netkit_validate(struct nlattr *tb[], struct nlattr *data[],
+ 
+ 	if (!attr)
+ 		return 0;
+-	NL_SET_ERR_MSG_ATTR(extack, attr,
+-			    "Setting Ethernet address is not supported");
+-	return -EOPNOTSUPP;
++	if (nla_len(attr) != ETH_ALEN)
++		return -EINVAL;
++	if (!is_valid_ether_addr(nla_data(attr)))
++		return -EADDRNOTAVAIL;
++	return 0;
+ }
+ 
+ static struct rtnl_link_ops netkit_link_ops;
+@@ -365,6 +378,9 @@ static int netkit_new_link(struct net *src_net, struct net_device *dev,
+ 		strscpy(ifname, "nk%d", IFNAMSIZ);
+ 		ifname_assign_type = NET_NAME_ENUM;
+ 	}
++	if (mode != NETKIT_L2 &&
++	    (tb[IFLA_ADDRESS] || tbp[IFLA_ADDRESS]))
++		return -EOPNOTSUPP;
+ 
+ 	net = rtnl_link_get_net(src_net, tbp);
+ 	if (IS_ERR(net))
+@@ -379,7 +395,7 @@ static int netkit_new_link(struct net *src_net, struct net_device *dev,
+ 
+ 	netif_inherit_tso_max(peer, dev);
+ 
+-	if (mode == NETKIT_L2)
++	if (mode == NETKIT_L2 && !(ifmp && tbp[IFLA_ADDRESS]))
+ 		eth_hw_addr_random(peer);
+ 	if (ifmp && dev->ifindex)
+ 		peer->ifindex = ifmp->ifi_index;
+@@ -402,7 +418,7 @@ static int netkit_new_link(struct net *src_net, struct net_device *dev,
+ 	if (err < 0)
+ 		goto err_configure_peer;
+ 
+-	if (mode == NETKIT_L2)
++	if (mode == NETKIT_L2 && !tb[IFLA_ADDRESS])
+ 		eth_hw_addr_random(dev);
+ 	if (tb[IFLA_IFNAME])
+ 		nla_strscpy(dev->name, tb[IFLA_IFNAME], IFNAMSIZ);
+-- 
+2.34.1
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
