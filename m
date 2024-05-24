@@ -1,118 +1,150 @@
-Return-Path: <netdev+bounces-97993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C9E28CE795
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 17:12:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39EB78CE75E
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 16:56:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0F071F2198F
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 15:12:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA305281F3F
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 14:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CE212D762;
-	Fri, 24 May 2024 15:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51A712C498;
+	Fri, 24 May 2024 14:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Lgbs4UWG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K4TX5gbI"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDBB412C559;
-	Fri, 24 May 2024 15:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916A412C53B
+	for <netdev@vger.kernel.org>; Fri, 24 May 2024 14:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716563534; cv=none; b=kKNFgL/wUhbJC6ZcSwDZbuCfEMf0NQy6rdY8C35sueKVrBkpuNPaZi2suXA/aLu/6vxqAuvxEdu7JEEgqYpDiYxDH2ZbT52Vdy94dIje+IK3nw9fvQjQh+hnLN3RbqvMzY+6f/WqNQvApyyH6RTQQssKRlz44W6aYeNQeRexshM=
+	t=1716562562; cv=none; b=pVZAR+JFpHQ/CE18PhI506MPta/8565W/D+Qc8bYVU9J63QZdw18HUJr9eCL89rV66KrRlpS4QIX1ZmnM7nEzbDdeJZl4yhD9y/f7Z15UyF5ZzKLPHJCmDx7exkAN8id+Ka2PZSOBdoWpoaeBllb/tcCgXV3Gz7RBfzmOKN+0JE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716563534; c=relaxed/simple;
-	bh=SVI3WhlLExOoWKwGPl5ap9cOpfECIdAMOgdQmpUFK+s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yfj7Sq0ht/M8fT2hclIXnrSR3AAalxQsXStr8+YODEWZ3jQJ8wUKngTCrrGt9cyXbsSThQpHdh3q8av3LqmBLJDhnA7WuKlcCcDtqbzqdcF5fi/bs3vYAwKIPK/W/wRVXL/6jECjae9Wc7LrLHLBH0YFBVBWkSj+3I/87JCMgnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Lgbs4UWG; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=2X44s7jUXHqpi4aq2fwiihAgByLF7GEFK84JVQQEeII=; b=Lgbs4UWGrCt4ZRKtqr0/1q7vy1
-	tFeE9uZFTSb/s//CBJ1g+68JwxlrkrPIVczSnO5CTND53Ukb67GUF92VtEEUMOq1EjnfRLaEe7mcq
-	Ps2+EMYn7cDN57BLx92ElE57ElmjuVPJmPvuOCR56lJERMuxDkluPNmIcDqs4hq55OJh4dzo8NKRu
-	bHLls/Nrc2UBjI8afk63VzP1TVGCyycG+OLgS7YUKUMzWTRuZ+TFt8favgcYgpXdUiSGbMRbqWDC7
-	3Hxnn6Wzwy63UZ2+agDkG+IKZshrzawF54Jiu2aMfY6D3oEBLx1OpU/CF7sEmh97cmWf4b7DBcyqm
-	Wr0oZWnQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42268)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sAWaG-0005NO-2m;
-	Fri, 24 May 2024 16:11:52 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sAWaF-000834-RO; Fri, 24 May 2024 16:11:51 +0100
-Date: Fri, 24 May 2024 16:11:51 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	parthiban.veerasooran@microchip.com
-Subject: Re: [PATCH 1/1] net: phy: microchip_t1s: enable lan865x revb1
-Message-ID: <ZlCuNxe65D3QPeA1@shell.armlinux.org.uk>
-References: <20240524140706.359537-1-ramon.nordin.rodriguez@ferroamp.se>
- <20240524140706.359537-2-ramon.nordin.rodriguez@ferroamp.se>
+	s=arc-20240116; t=1716562562; c=relaxed/simple;
+	bh=AewH8JA9HIUsgxrnXtqykExha6GUv7XIEJDRz2IYeDM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=b8ITg57DRiEEuBTNVGcbmvBKGnDV6Xy3tU/CgRmJzPMVuRwRYEP4+g6rNo5u1pf+kfMiIMUP9/plHmfWB7bOEgj5/iwtOMhyz/z6wxcz6Hi2DVAKU3hcg5UR2z85Ax589+ZLtANHEitGRX9uR5tM83eSN+ugEpFjlIcCQY0NCtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K4TX5gbI; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716562561; x=1748098561;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AewH8JA9HIUsgxrnXtqykExha6GUv7XIEJDRz2IYeDM=;
+  b=K4TX5gbIWXLeWGZJTiyvDDckCRuJga7W2GMygGId20yDQpjgyaI0YA/7
+   eihc+kCvsi4SpRewAxEgmvS7v+dArz1mr+Uuc6PdfgW8CrVOUvQvBVnVV
+   fAqR83MIp0qtCiv/eCcD5bW9LXrzxHlM13Gr3XuDOG7RHWBMIabmhBplq
+   oV62ocEWkFpmAvQyVvjDnuQvheQ2aoF+EZWORQwQLTooe6IZAyu/vWU3p
+   WyJ5PWuDGexicJrQ2Av/xkV8uHEYV1ql6VSIMuifSgnbutliDmeIx3xbj
+   2Z0+nROQLMJrimeULMx6qUaZc/IcKfACDNk18ykHt6JPTdU5dBIcfGFmQ
+   g==;
+X-CSE-ConnectionGUID: AV0iI9sxRHaUJFyLsy2esg==
+X-CSE-MsgGUID: A0EKjKK5Q+KkhKeAkucl9g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11082"; a="24070365"
+X-IronPort-AV: E=Sophos;i="6.08,185,1712646000"; 
+   d="scan'208";a="24070365"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2024 07:56:00 -0700
+X-CSE-ConnectionGUID: yHEWC3Q6QxaR5iqWHDubaQ==
+X-CSE-MsgGUID: pP9nWGpRSeyjY+TNx+xF6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,185,1712646000"; 
+   d="scan'208";a="33946047"
+Received: from amlin-018-251.igk.intel.com (HELO localhost.localdomain) ([10.102.18.251])
+  by orviesa010.jf.intel.com with ESMTP; 24 May 2024 07:55:57 -0700
+From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	pmenzel@molgen.mpg.de,
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Subject: [PATCH iwl-next v6 0/7] ixgbe: Add support for Intel(R) E610 device
+Date: Fri, 24 May 2024 17:13:04 +0200
+Message-Id: <20240524151311.78939-1-piotr.kwapulinski@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240524140706.359537-2-ramon.nordin.rodriguez@ferroamp.se>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, May 24, 2024 at 04:07:06PM +0200, Ramón Nordin Rodriguez wrote:
-> +/* this func is copy pasted from Parthibans ongoing work with oa_tc6
-> + * see https://lore.kernel.org/netdev/20240418125648.372526-7-Parthiban.Veerasooran@microchip.com/
-> + */
+Add initial support for Intel(R) E610 Series of network devices. The E610
+is based on X550 but adds firmware managed link, enhanced security
+capabilities and support for updated server manageability.
 
-Oh dear...
+This patch series adds low level support for the following features and
+enables link management.
 
-> +static int lan865x_phy_read_mmd(struct phy_device *phydev, int devnum,
-> +				u16 regnum)
-> +{
-> +	struct mii_bus *bus = phydev->mdio.bus;
-> +	int addr = phydev->mdio.addr;
-> +
-> +	return bus->read_c45(bus, addr, devnum, regnum);
-> +}
-> +
-> +/* this func is copy pasted from Parthibans ongoing work with oa_tc6
-> + * see https://lore.kernel.org/netdev/20240418125648.372526-7-Parthiban.Veerasooran@microchip.com/
-> + */
-> +static int lan865x_phy_write_mmd(struct phy_device *phydev, int devnum,
-> +				 u16 regnum, u16 val)
-> +{
-> +	struct mii_bus *bus = phydev->mdio.bus;
-> +	int addr = phydev->mdio.addr;
-> +
-> +	return bus->write_c45(bus, addr, devnum, regnum, val);
-> +}
+Piotr Kwapulinski (7):
+  ixgbe: Add support for E610 FW Admin Command Interface
+  ixgbe: Add support for E610 device capabilities detection
+  ixgbe: Add link management support for E610 device
+  ixgbe: Add support for NVM handling in E610 device
+  ixgbe: Add ixgbe_x540 multiple header inclusion protection
+  ixgbe: Clean up the E610 link management related code
+  ixgbe: Enable link management in E610 device
 
-So you need both of these to (dangerously) read and write the C45
-address using a devnum with bit 31 set. Please at the very least
-take the MDIO bus lock so the locking of these operations remains
-consistent.
-
-I'm not sure that abusing the interface by setting bit 31 in the
-device address, which is supposed to be between 0 and 31 is
-something we're prepared to entertain.
+ drivers/net/ethernet/intel/ixgbe/Makefile     |    4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h      |   14 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |    3 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_common.c   |   19 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c   |    3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 2545 +++++++++++++++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |   75 +
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |    6 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |    3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  430 ++-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.c  |    4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  |    5 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |   71 +-
+ .../ethernet/intel/ixgbe/ixgbe_type_e610.h    | 1062 +++++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c |   12 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.h |    7 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c |   29 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h |   20 +
+ 18 files changed, 4265 insertions(+), 47 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+V1 -> V2:
+  - fix for no previous prototypes for ixgbe_set_fw_drv_ver_x550,
+    ixgbe_set_ethertype_anti_spoofing_x550 and
+    ixgbe_set_source_address_pruning_x550
+  - fix variable type mismatch: u16, u32, u64
+  - fix inaccurate doc for ixgbe_aci_desc
+  - remove extra buffer allocation in ixgbe_aci_send_cmd_execute
+  - replace custom loops with generic fls64 in ixgbe_get_media_type_e610
+  - add buffer caching and optimization in ixgbe_aci_send_cmd
+V2 -> V3:
+  - revert ixgbe_set_eee_capable inlining
+  - update copyright date
+V3 -> V4:
+  - cleanup local variables in ixgbe_get_num_per_func
+  - remove redundant casting in ixgbe_aci_disable_rxen
+V4 -> V5:
+  - remove unnecessary structure members initialization
+  - remove unnecessary casting
+  - fix comments
+V5 -> V6:
+  - create dedicated patch for ixgbe_x540 multiple header inclusion protection
+  - extend debug messages
+  - add descriptive constant for Receive Address Registers
+  - remove unrelated changes
+  - create dedicated patch for code cleanup
+  - remove and cleanup of some conditions
+  - spelling fixes
+  
+Eventually I decided not to create a dedicated patch for ixgbe_schedule_fw_event(). In order it makes sense it would require to extract some extra event code as well. This extra code is explicitly dedicated to link management i.e. to what the specific patch implements.
+
+2.31.1
+
 
