@@ -1,190 +1,109 @@
-Return-Path: <netdev+bounces-97983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 623CF8CE74F
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 16:47:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 908878CE752
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 16:51:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BFAA1C21152
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 14:47:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFEA6B210CC
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 14:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 789E886629;
-	Fri, 24 May 2024 14:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BFE312BF34;
+	Fri, 24 May 2024 14:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="X6b7v7xX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3KCexhg7"
 X-Original-To: netdev@vger.kernel.org
-Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77EB2BAF3;
-	Fri, 24 May 2024 14:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BD12BAF3;
+	Fri, 24 May 2024 14:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716562068; cv=none; b=YELmJhvorgIqei+XFAapYRz7CiM9LV+n2zU7VsVN8e26VAbaR9btHy6vwMUCSw0Uv+VqYPK0LiGqammLAPGP7fwmyEDLdoF9Nequ3a2hwdU+23rCkOMAdfZbHrwwIYsxfjSDphl8o6tI9nVl+YGUnv26FeTAD660ZU6d3azZujQ=
+	t=1716562275; cv=none; b=o5esppe4lnM92lp57Yev3xmRk8YobTOMesYN1rYIoukmOyLIUWx3CAYZ0Sx9330hMD+C/r93kw6zFgJ6D/68c+Ja+begerOmY5kBsgQB6rjR00+jBvQGwi/UAXYqheMiIoXYU+gj0chzXz8ucKDbT6bP7m64MWdjp/uKXFWmbLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716562068; c=relaxed/simple;
-	bh=1BYXmgN7udHWcL+OkJLf8ckhKsGB6dLjT7Ru1SeyaY4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Jedaq6lrfW5o0dYrjLtF91sFmtkA5Z7nJG50/z1c6aJ5caueLh2dW33vTH+REgBM7Vlp5P/NFi28GIE2o/UuLbxxTMCjmF2ovCML+h34LhvOhbTKMpqGvEIhl5lMZf+Yrwi+sq6ii3hduXhJeHaoK3sHCSjNq9ncz2dCbA+GZNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=X6b7v7xX; arc=none smtp.client-ip=178.60.130.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
-	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=GAm6SuMCXIOFlOJm80hD0+OtxP9VsZ++oPDngmQ1KLU=; b=X6b7v7xX2Zl1SQRZaUKBDG0t14
-	gYf0F1qlHvyCxE1urg2qG6EabrbsR1mTl1TWV/+xytzr0BveyxDtsAPYgamZyQlxWSU72kgQokua/
-	ulCanMjlRpIiAKWEQTAEkEt1xgVuM/eDjfeVjjv8yo+J60idrN7eAKbqbhj/KHoaCcBrNo1plmhrB
-	if8SgBFNyhCF2zs099f5kGYe2Oz48u+ZbH6ngBgsincxdqXkW4y7N8KqbWsNDJhliiDeKW2ItppF3
-	sAibBKcwMk61Pikwz68lHp9F7AHS92ucRWUwF448bXu2n9d3VMEZfCPY6lI4fkU2BG6AH+zzif34o
-	jkm007ew==;
-Received: from 179-125-79-244-dinamico.pombonet.net.br ([179.125.79.244] helo=quatroqueijos.lan)
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1sAWCk-00C18E-S8; Fri, 24 May 2024 16:47:35 +0200
-From: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
-To: netdev@vger.kernel.org
-Cc: Cong Wang <cong.wang@bytedance.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	bpf@vger.kernel.org,
-	kernel-dev@igalia.com,
-	Thadeu Lima de Souza Cascardo <cascardo@igalia.com>,
-	syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com,
-	stable@vger.kernel.org
-Subject: [PATCH net v2] sock_map: avoid race between sock_map_close and sk_psock_put
-Date: Fri, 24 May 2024 11:47:02 -0300
-Message-Id: <20240524144702.1178377-1-cascardo@igalia.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1716562275; c=relaxed/simple;
+	bh=SPu4GI7WlkmJaXShM+lFsDtYUKL+8xfKGCieEDmX8bc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j+oP0sBy7uqz2BVYOkMOhsXapp6dq/7Rl+7ih/8lxV9K5819s+HYGgW1OM+5wzMXtFi4LYr7jfM8Rg/09I5jLjRglrDBYEEirLz+q0uu2R9lVif8diW6fxrECkJbCThI2XyDOpS5Sz1HHuol3NHUQCSuTcIWLy3DVuN+UL87/gM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3KCexhg7; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=GV/QsjEvDtrhh/ZaXZqdvmVcpw7ReZRze9VGzicNnAo=; b=3KCexhg73Y03UA5lUAYDBBkSIo
+	TvXOKhmEyaz7DCfsb4AyRCFL5tGRInrmjgxHjCvr6TgT9JnO06oCPnAi67Z1dbri4Dl7kQnnY0wPz
+	xMpBpvyU/DG6ql12hp9znHX1F6QfUBjXz2RvfaQstu7sWYlgWDmbzrH7RiiVsVveCg84=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sAWFp-00FxZ4-Kb; Fri, 24 May 2024 16:50:45 +0200
+Date: Fri, 24 May 2024 16:50:45 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	parthiban.veerasooran@microchip.com
+Subject: Re: [PATCH net 0/1] phy: microchip_t1s: lan865x rev.b1 support
+Message-ID: <99f56020-9293-4e6b-8c2a-986af8c3dd79@lunn.ch>
+References: <20240524140706.359537-1-ramon.nordin.rodriguez@ferroamp.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240524140706.359537-1-ramon.nordin.rodriguez@ferroamp.se>
 
-sk_psock_get will return NULL if the refcount of psock has gone to 0, which
-will happen when the last call of sk_psock_put is done. However,
-sk_psock_drop may not have finished yet, so the close callback will still
-point to sock_map_close despite psock being NULL.
+> Far as I can tell the phy-driver cannot access some of the regs necessary
+> for probing the hardware and performing the init/fixup without going
+> over the spi interface.
+> The MMDCTRL register (used with indirect access) can address
+> 
+> * PMA - mms 3
+> * PCS - mms 2
+> * Vendor specific / PLCA - mms 4
+> 
+> This driver needs to access mms (memory map seleector)
+> * mac registers - mms 1,
+> * vendor specific / PLCA - mms 4
+> * vencor specific - mms 10
 
-This can be reproduced with a thread deleting an element from the sock map,
-while the second one creates a socket, adds it to the map and closes it.
+In general, a MAC should not be touching the PHY, and the PHY should
+not be touching the MAC. This rule is because you should not assume
+you have a specific MAC+PHY pair. However, this is one blob of
+silicon, so we can relax that a bit if needed.
 
-That will trigger the WARN_ON_ONCE:
+So it sounds like Microchip have mixed up the register address spaces
+:-(
 
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 7220 at net/core/sock_map.c:1701 sock_map_close+0x2a2/0x2d0 net/core/sock_map.c:1701
-Modules linked in:
-CPU: 1 PID: 7220 Comm: syz-executor380 Not tainted 6.9.0-syzkaller-07726-g3c999d1ae3c7 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-RIP: 0010:sock_map_close+0x2a2/0x2d0 net/core/sock_map.c:1701
-Code: df e8 92 29 88 f8 48 8b 1b 48 89 d8 48 c1 e8 03 42 80 3c 20 00 74 08 48 89 df e8 79 29 88 f8 4c 8b 23 eb 89 e8 4f 15 23 f8 90 <0f> 0b 90 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d e9 13 26 3d 02
-RSP: 0018:ffffc9000441fda8 EFLAGS: 00010293
-RAX: ffffffff89731ae1 RBX: ffffffff94b87540 RCX: ffff888029470000
-RDX: 0000000000000000 RSI: ffffffff8bcab5c0 RDI: ffffffff8c1faba0
-RBP: 0000000000000000 R08: ffffffff92f9b61f R09: 1ffffffff25f36c3
-R10: dffffc0000000000 R11: fffffbfff25f36c4 R12: ffffffff89731840
-R13: ffff88804b587000 R14: ffff88804b587000 R15: ffffffff89731870
-FS:  000055555e080380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 00000000207d4000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- unix_release+0x87/0xc0 net/unix/af_unix.c:1048
- __sock_release net/socket.c:659 [inline]
- sock_close+0xbe/0x240 net/socket.c:1421
- __fput+0x42b/0x8a0 fs/file_table.c:422
- __do_sys_close fs/open.c:1556 [inline]
- __se_sys_close fs/open.c:1541 [inline]
- __x64_sys_close+0x7f/0x110 fs/open.c:1541
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fb37d618070
-Code: 00 00 48 c7 c2 b8 ff ff ff f7 d8 64 89 02 b8 ff ff ff ff eb d4 e8 10 2c 00 00 80 3d 31 f0 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
-RSP: 002b:00007ffcd4a525d8 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007fb37d618070
-RDX: 0000000000000010 RSI: 00000000200001c0 RDI: 0000000000000004
-RBP: 0000000000000000 R08: 0000000100000000 R09: 0000000100000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
+I guess this also means there is no discrete version of this PHY,
+because where would these registers be?
 
-Use sk_psock, which will only check that the pointer is not been set to
-NULL yet, which should only happen after the callbacks are restored. If,
-then, a reference can still be gotten, we may call sk_psock_stop and cancel
-psock->work.
+Do any of the registers in the wrong address space need to be poked at
+runtime? By that i mean config_aneg(), read_status(). Or are they only
+needed around the time the PHY is probed?
 
-As suggested by Paolo Abeni, reorder the condition so the control flow is
-less convoluted.
+How critical is the ordering? Could we have the Microchip MAC driver
+probe. It instantiates the TC6 framework which registers the MDIO bus
+and probes the PHY. Can the MAC driver then complete the PHY setup
+using the registers in the wrong address space? Does it need to access
+any PHY registers in the correct address space? The MAC driver should
+be able to do this before phy_start()
 
-After that change, the reproducer does not trigger the WARN_ON_ONCE
-anymore.
+Does MMS 0 register 1 "PHY Identification Register" give enough
+information to know it is a B1 PHY? The standard suggests it is a
+straight copy of PHY registers 2 and 3. So the MAC driver does not
+need to touch PHY registers, we are not totally violating the
+layering...
 
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Reported-by: syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=07a2e4a1a57118ef7355
-Fixes: aadb2bb83ff7 ("sock_map: Fix a potential use-after-free in sock_map_close()")
-Fixes: 5b4a79ba65a1 ("bpf, sockmap: Don't let sock_map_{close,destroy,unhash} call itself")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
----
-
-v2: change control flow as suggested by Paolo Abeni
-
-v1: https://lore.kernel.org/netdev/20240520214153.847619-1-cascardo@igalia.com/
-
----
- net/core/sock_map.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
-
-diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-index 9402889840bf..c3179567a99a 100644
---- a/net/core/sock_map.c
-+++ b/net/core/sock_map.c
-@@ -1680,19 +1680,23 @@ void sock_map_close(struct sock *sk, long timeout)
- 
- 	lock_sock(sk);
- 	rcu_read_lock();
--	psock = sk_psock_get(sk);
--	if (unlikely(!psock)) {
--		rcu_read_unlock();
--		release_sock(sk);
--		saved_close = READ_ONCE(sk->sk_prot)->close;
--	} else {
-+	psock = sk_psock(sk);
-+	if (likely(psock)) {
- 		saved_close = psock->saved_close;
- 		sock_map_remove_links(sk, psock);
-+		psock = sk_psock_get(sk);
-+		if (unlikely(!psock))
-+			goto no_psock;
- 		rcu_read_unlock();
- 		sk_psock_stop(psock);
- 		release_sock(sk);
- 		cancel_delayed_work_sync(&psock->work);
- 		sk_psock_put(sk, psock);
-+	} else {
-+		saved_close = READ_ONCE(sk->sk_prot)->close;
-+no_psock:
-+		rcu_read_unlock();
-+		release_sock(sk);
- 	}
- 
- 	/* Make sure we do not recurse. This is a bug.
--- 
-2.34.1
+	Andrew
 
 
