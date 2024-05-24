@@ -1,158 +1,97 @@
-Return-Path: <netdev+bounces-98021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D49E48CE95C
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 20:13:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 172FF8CE96D
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 20:23:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7557C281C2C
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 18:13:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 488551C20A84
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 18:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297C43BBC0;
-	Fri, 24 May 2024 18:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402843BBED;
+	Fri, 24 May 2024 18:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b="gq4HrcxL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X5BObF1N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6443B293
-	for <netdev@vger.kernel.org>; Fri, 24 May 2024 18:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69B43BBD9
+	for <netdev@vger.kernel.org>; Fri, 24 May 2024 18:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716574385; cv=none; b=P+2ccSAKbfH9P06m6+uKWauq4txZvu+5VA79smGFSdYpwzDwBaLZvM+DhhTLwM0URV07MotC76iWMDDq9/Sr+vcDtvz7jK5MFs3NrU77OVjr8MFxX1mGkeFthg6kbzVKE7IB8PRkqGylBcFmfj3rWx0MT3PNXv7+/ishYwpSTgE=
+	t=1716575010; cv=none; b=dGxZyXbKCLQTCtQHUCIYpTOAJ9o7broA2EoSs6ZDUN9a7m2auRDuadXAlI8pSaDoCJ1dZe/iip86Ck9pJQxn/EPU0qvIWt7f1XbqmNVGzYbf0I1Y1N1tI+Bl7fbnkoxbMG4QjMRz88zifp+wkUjklKE8RHnCSVZdscq/V5cgj0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716574385; c=relaxed/simple;
-	bh=6YjW4gPlBJUm+qGoxCi73uLtqlLtfdqeWevPkQB22lc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ciaF6qTIdBU7XWgKMdNwuSAVdC/jL9t+sh8hrSbTVw84J2Ht24KBFz16jsecT0FxOgetRa6NjkDryVf833N1C97z9qtFXrOXFdYdgqBttbhULfuhIzwoNTUxvl4NCmTs0F6nkx2sxu130oW7jJt2gTaYYQjKryGWmvOVZw2stZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se; spf=fail smtp.mailfrom=ferroamp.se; dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b=gq4HrcxL; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=ferroamp.se
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2e95a7622cfso13772791fa.2
-        for <netdev@vger.kernel.org>; Fri, 24 May 2024 11:13:02 -0700 (PDT)
+	s=arc-20240116; t=1716575010; c=relaxed/simple;
+	bh=ssaZ2ZvQLO2+x5T1AnbVNh8qvDSMflzkHf9RSXN9t7A=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Mu4SxZj55DU9oPhZY+RyLEH4I96mJKf3zeAguPHgTD5btQDTp+iH95L5iAvTDlpS0Yz6CNm6czZtXNJWNpoSVKqRWx5+EoTqQ9X6OwigYA9eVSkKh3UGXLUW7q48QXJVMH9E9Rmi6KXcjd6V3zonLEDduUR/eUBP52z/7YvvSp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X5BObF1N; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2bf5bb2a414so1151924a91.1
+        for <netdev@vger.kernel.org>; Fri, 24 May 2024 11:23:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ferroamp-se.20230601.gappssmtp.com; s=20230601; t=1716574381; x=1717179181; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PAb4E/ylNY4nYQpT5wwWxISxDYgnB6L1bhxHr5GF4gY=;
-        b=gq4HrcxLbKcxY4xGNxp/Wu5SbfLAYE356WysmVfak2yJxK1BspdOUQ+nAqg5tB0D4P
-         iv7L7bBRRealMxEwq53JkLg020P8VpKLo5M/G6x4Jzkr6uHMXWaOIwAPeF5KN0wtb7Ok
-         xvKyMrdMt6htLQmd5Axqw7miYa2HWikILGcugvB/K4k9T981yrb0cch5FM7k1csFZpgQ
-         +tOvDhJfoiyZCUq0Bm+og2RKbo6U9AWXQUwAfVs494bWacPorBIcQwmIVSzapJvG/amB
-         SjFNMzsh3ssKOvtk3udQo1MCyRIGkfXO778MlMxr1zwYTS5Fw7euwy45Xq7lGH8xQdMJ
-         GuGw==
+        d=google.com; s=20230601; t=1716575008; x=1717179808; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OAohSQ62YVirLGMyGzfikcZH1eASapmzNWEJeAHAMIA=;
+        b=X5BObF1NxsgwRyZUMc93SiZ01l/yY/SpIGfivOLmUMtgGnXEAEmAnCUeLiNET//BMi
+         qqSbU5SGf+J8q9N2iXSgxi2sRKPju6PryXUzYYDCmufWVy5t7pIY8AbE886bgQuJHtPu
+         CeYpj7kRS9J6WXRzGWAjra2WlpUMLHss7Pfsz4bO5bG/bsU+ZV6FBb6DOMLf9pJVieGJ
+         FrTo1uzhk10kwg4shXLqCsjoBocVxddW7EU032pYObwPVaIHxF9RSjConOOjmbz4O4Hm
+         Za8kmOm3hfbv3Vil/FpxEnQ7y+1+tHHXO+LFnkbiN18+rsYveImAOfmXjvGdO9jkcIoL
+         JfYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716574381; x=1717179181;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PAb4E/ylNY4nYQpT5wwWxISxDYgnB6L1bhxHr5GF4gY=;
-        b=mxXXHDMCD9CoXGqepJ0XA/EHIaSUoQEspO5M3IKdgcrtH000XmSfKFpFg9Fla8LvBl
-         jxlye5iB1PFIJjvys18bJ4edacYNFdqnuSuKYmFi708FUkhWuripQRx+P0fDzcLrOY+v
-         0YBm/2/4et9C8vsdXDs/jgO6SkhlxloHUbthLulr+izGT7FyZ5Aj4No2jvHOCJBT38iJ
-         4TMBtmiUnjNpT65xIXs4dmN5KLbjicOk0ZU/U2RU30T4L1Pfu+hjO4y6Ld8YXDGSPc56
-         D19bw4Yt2/IXphUB33yg1ZrYl2uE+N3yu/s5zBVpomlUXh9N5FbVvmxsjFvp0z/REFJT
-         y8nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW18fIcyJxG3z9p0+oVTH/G7RSf459wfpLbwapqAazk3W0y7if9JshdEU8BZ+4rg0dI/G/j5NMj2CoQtz/zNJ9sMarBiu0j
-X-Gm-Message-State: AOJu0Yw/w9xcVPc0qJ+2+yKN+trKo3R4pYohd0nG2vrQJo+qTbRECh/E
-	dcyACiLyBS3Fok3SZfEe4QAjrDUMQgC7nXa04u430kN33yhiRrogGVNzQRcNwvY=
-X-Google-Smtp-Source: AGHT+IGquvASHix50Y6m7trq1iJckrrLIxXAt0DDnEtvLQfEYyKMu5W3KCNL43t4St1VdKAYYOiaXA==
-X-Received: by 2002:a05:651c:10a5:b0:2e7:f9a4:ee07 with SMTP id 38308e7fff4ca-2e95b280f73mr19336131fa.53.1716574380842;
-        Fri, 24 May 2024 11:13:00 -0700 (PDT)
-Received: from minibuilder (c83-249-74-52.bredband.tele2.se. [83.249.74.52])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2e95bdcd234sm2874081fa.99.2024.05.24.11.12.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 May 2024 11:13:00 -0700 (PDT)
-Date: Fri, 24 May 2024 20:12:58 +0200
-From: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
-To: Parthiban.Veerasooran@microchip.com
-Cc: andrew@lunn.ch, Pier.Beruto@onsemi.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, saeedm@nvidia.com, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	corbet@lwn.net, linux-doc@vger.kernel.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, Horatiu.Vultur@microchip.com,
-	ruanjinjie@huawei.com, Steen.Hegelund@microchip.com,
-	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
-	Thorsten.Kummermehr@microchip.com, Selvamani.Rajagopal@onsemi.com,
-	Nicolas.Ferre@microchip.com, benjamin.bigler@bernformulastudent.ch
-Subject: Re: [PATCH net-next v4 05/12] net: ethernet: oa_tc6: implement error
- interrupts unmasking
-Message-ID: <ZlDYqoMNkb-ZieSZ@minibuilder>
-References: <ZjNorUP-sEyMCTG0@builder>
- <ae801fb9-09e0-49a3-a928-8975fe25a893@microchip.com>
- <fd5d0d2a-7562-4fb1-b552-6a11d024da2f@lunn.ch>
- <BY5PR02MB678683EADBC47A29A4F545A59D1C2@BY5PR02MB6786.namprd02.prod.outlook.com>
- <ZkG2Kb_1YsD8T1BF@minibuilder>
- <708d29de-b54a-40a4-8879-67f6e246f851@lunn.ch>
- <ZkIakC6ixYpRMiUV@minibuilder>
- <6e4207cd-2bd5-4f5b-821f-bc87c1296367@microchip.com>
- <ZkUtx1Pj6alRhYd6@minibuilder>
- <e75d1bbe-0902-4ee9-8fe9-e3b7fc9bf3cb@microchip.com>
+        d=1e100.net; s=20230601; t=1716575008; x=1717179808;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OAohSQ62YVirLGMyGzfikcZH1eASapmzNWEJeAHAMIA=;
+        b=hxsHD+MOXtaeJy/Uxe3t0VMad8b02evqNGb5BPyoSOEA1iW2pz0ZQB/7LsKmq7WEnI
+         xHqkGRNmFRVczsopeFEPslwUDJ0pGDaT0tZIUYo7qpX65qwSvJaFp/qhAO/Vmktt0sxr
+         8mOuYHYxw9ErDW93TZ1L6fGOMw1vswaQ3pfbBnv4Img/kVlWRH23H0zqPj3B64hy9xZZ
+         fU4+ugvwSUFxu8nMbJqjkFIX1kcG+/sCvSxT7vMQdjsCmfJM2Yvr+TdpzJYO4dMXmLdX
+         QtDGJo0FxaFu9nnFoHrzhFUkMDM5tcuok/87zBXAYNatpuk98iae8NUFx7Fqq3KINVcN
+         e9OA==
+X-Forwarded-Encrypted: i=1; AJvYcCWcrp6Q4JpB9JuN72RJ74URfnCHFqtGl9QL63f2lQ8BoRwtJKqsR1m6nJhwVKMPYBYFWG5VXFTsO8br9hVvnqNllg1OsKvw
+X-Gm-Message-State: AOJu0YzGrfp1uDiiXF11DIXUuFo5XeBk/CW2GxC+PCaz8dLNwzBj9GX0
+	3OoNC8BFGlZotUYmrgowt40RBqtRDyEN1SQF31k7Wdhb0VsiUQhhSQeT5sqTZdvoxQ==
+X-Google-Smtp-Source: AGHT+IHzDvKhdXYqjAO0NqxWnqhEY3Nbf+Yi1HEclwUlPxnuo1q7VEycBUlP7Lw6z9KNCM7cruACNwc=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a17:90a:ec09:b0:2bd:e2fd:a084 with SMTP id
+ 98e67ed59e1d1-2bf5f407ca9mr7606a91.6.1716575008161; Fri, 24 May 2024 11:23:28
+ -0700 (PDT)
+Date: Fri, 24 May 2024 11:23:26 -0700
+In-Reply-To: <20240524163619.26001-1-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e75d1bbe-0902-4ee9-8fe9-e3b7fc9bf3cb@microchip.com>
+Mime-Version: 1.0
+References: <20240524163619.26001-1-daniel@iogearbox.net>
+Message-ID: <ZlDa3Wk0djxSd2AW@google.com>
+Subject: Re: [PATCH bpf v2 1/4] netkit: Fix setting mac address in l2 mode
+From: Stanislav Fomichev <sdf@google.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: martin.lau@kernel.org, razor@blackwall.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 
-> >>>> Is it doing this in an endless cycle?
-> >>>
-> >>> Exactly, so what I'm seeing is when the driver livelocks the macphy is
-> >>> periodically pulling the irq pin low, the driver clears the interrupt
-> >>> and repeat.
-> >> If I understand correctly, you are keep on getting interrupt without
-> >> indicating anything in the footer?. Are you using LAN8650 Rev.B0 or B1?.
-> >> If it is B0 then can you try with Rev.B1 once?
-> >>
-
-After a considerable ammount of headscratching it seems that disabling collision
-detection on the macphy is the only way of getting it stable.
-When PLCA is enabled it's expected that CD causes problems, when running
-in CSMA/CD mode it was unexpected (for me at least).
-
-Disabling collision detection was discussed here 
-https://lore.kernel.org/netdev/20231127104045.96722-1-ramon.nordin.rodriguez@ferroamp.se/
-in a patchset that I haven't gotten around to testing through properly
-and fixing up, but now it's definetly a priority.
-
-Rev.b0 and b1 gives similar results in this domain, though I'm getting
-lower throughput and it's easier/faster to get the internal error state
-on rev.b1.
-
-When CD is disabled both chip revs seems stable in all of my testing.
-
-> > 
-> > I'll check the footer content, thanks for the tip!
-> > 
-> > All testing has bee done with Rev.B0, we've located a set of B1 chips.
-> > So we'll get on resoldering and rerunning the test scenario.
-> Thanks for the consideration. But be informed that the internal PHY 
-> initial settings are updated for the Rev.B1. But the one from the 
-> mainline still supports for Rev.B0. So that microchip_t1s.c to be 
-> updated to support Rev.B1.
-
-I posted a suggestion for how to bringup rev.b1
-https://lore.kernel.org/netdev/20240524140706.359537-1-ramon.nordin.rodriguez@ferroamp.se/
-
-I should have prefaced the cover letter with 'ugly hacks ahead'.
-
+On 05/24, Daniel Borkmann wrote:
+> When running Cilium connectivity test suite with netkit in L2 mode, we
+> found that it is expected to be able to specify a custom MAC address for
+> the devices, in particular, cilium-cni obtains the specified MAC address
+> by querying the endpoint and sets the MAC address of the interface inside
+> the Pod. Thus, fix the missing support in netkit for L2 mode.
 > 
-> Also I am in talk with our design team that whether the updated initial 
-> settings for B1 are also applicable for B0. If so, then we will have 
-> only one updated initial setting which supports both B0 and B1.
+> Fixes: 35dfaad7188c ("netkit, bpf: Add bpf programmable net device")
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Any update on this?
+For the series:
 
-I will submit a new revision of the lan8670 revc + disable collision
-detection pathset where CD is disabled regardless of operating mode.
-
-R
+Acked-by: Stanislav Fomichev <sdf@google.com>
 
