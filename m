@@ -1,119 +1,94 @@
-Return-Path: <netdev+bounces-98045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66CB08CEBF4
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 23:55:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92A9F8CEC48
+	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 00:05:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95B671C20F0A
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 21:55:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0C2F282A28
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 22:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0257C083;
-	Fri, 24 May 2024 21:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE1F8595B;
+	Fri, 24 May 2024 22:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Fe29KHR2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LXeKuu8v"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F0E50263;
-	Fri, 24 May 2024 21:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E045522334
+	for <netdev@vger.kernel.org>; Fri, 24 May 2024 22:05:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716587700; cv=none; b=bnkh4hd7vO6OBFpUJO6Uvg8NKKFoy1asxawnaAO2DrlweXMNkELwzOWgMtWZdWChCCcsXBcDt53u6D8PFmmqiXbtoZj+aTM1v3QpY9v2C/gER8eqszSV/do89J/FbdIytgSLjOj02p2dKoImMFcVRLWUbKtZe2VgyMVemzVenKE=
+	t=1716588317; cv=none; b=DpsfYXbNhAoteAmy2nut1NSACJR0PmASRFotxR5bph4ltpo9LHyFxeAsEgqvbCseUHqJWeHWpFJl04Od3fTIiMeES+OKL0wRQtlnOR1NZuJUb3ZDybIBJ1HZkJy9fEDQxBDlWq44MHv/fSnotRW1IRtp6WpyEI86udt5quI7l1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716587700; c=relaxed/simple;
-	bh=uBiB2OxIx+QLLDkp21EN3GZ/wnImGVQhH+E8hIwA0Ks=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k3vgXzkgGQfnfPIBaZf9BdRId90MJj4s6lncbIVawmsWaH385g7O01Y23r5SkOcFkKRvw2EgGoigWomazY0cV7gWTXErB0pBtI7AnJaYW3Pt15Mmf9Dol3241oqITGXuZs7w+xjw8PhY3eSIf6NXcUU4vrgnEXrEGJHbZTgTfQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Fe29KHR2; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=VdMjgCwAEWh/I3uCmfOdWHsSn/IkPKaLvDRwty7frmQ=; b=Fe29KHR2AGqq+pANkZ4ABkXHPg
-	vOVNjsmL92X6gbMm8PiuwC1ibX8LedLrH1wO+waAmbMghdMoi2JammC62Aue9lfFMaco5AiRFRKDZ
-	onujCaw8kRqnmUxay7NoFnWFu+0wf13IqL6dIX7gED3u+znXoXZeZOxw3KjcU4sjfJPw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sAcs8-00FypH-S3; Fri, 24 May 2024 23:54:44 +0200
-Date: Fri, 24 May 2024 23:54:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Piergiorgio Beruto <Pier.Beruto@onsemi.com>
-Cc: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>,
-	"Parthiban.Veerasooran@microchip.com" <Parthiban.Veerasooran@microchip.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"Horatiu.Vultur@microchip.com" <Horatiu.Vultur@microchip.com>,
-	"ruanjinjie@huawei.com" <ruanjinjie@huawei.com>,
-	"Steen.Hegelund@microchip.com" <Steen.Hegelund@microchip.com>,
-	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
-	"UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>,
-	"Thorsten.Kummermehr@microchip.com" <Thorsten.Kummermehr@microchip.com>,
-	"Nicolas.Ferre@microchip.com" <Nicolas.Ferre@microchip.com>,
-	"benjamin.bigler@bernformulastudent.ch" <benjamin.bigler@bernformulastudent.ch>
-Subject: Re: [PATCH net-next v4 00/12] Add support for OPEN Alliance
- 10BASE-T1x MACPHY Serial Interface
-Message-ID: <0581b64a-dd7a-43d7-83f7-657ae93cefe5@lunn.ch>
-References: <5f73edc0-1a25-4d03-be21-5b1aa9e933b2@lunn.ch>
- <32160a96-c031-4e5a-bf32-fd5d4dee727e@lunn.ch>
- <2d9f523b-99b7-485d-a20a-80d071226ac9@microchip.com>
- <6ba7e1c8-5f89-4a0e-931f-3c117ccc7558@lunn.ch>
- <8b9f8c10-e6bf-47df-ad83-eaf2590d8625@microchip.com>
- <44cd0dc2-4b37-4e2f-be47-85f4c0e9f69c@lunn.ch>
- <b941aefd-dbc5-48ea-b9f4-30611354384d@microchip.com>
- <BYAPR02MB5958A4D667D13071E023B18F83F52@BYAPR02MB5958.namprd02.prod.outlook.com>
- <6e4c8336-2783-45dd-b907-6b31cf0dae6c@lunn.ch>
- <BY5PR02MB6786619C0A0FCB2BEDC2F90D9DF52@BY5PR02MB6786.namprd02.prod.outlook.com>
+	s=arc-20240116; t=1716588317; c=relaxed/simple;
+	bh=vMs4YOFyURRUecmo+heZ0QP1vl0nQXNhHlhE/KbRYOY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TO4xWc0YR7Wz0clXiO+rXe9e05BnFvxGPKktsK1b/9L2e30lcZqwp1YpQvlph3iKSFNldZT2/u1LHxKLLmm6m5Da1usHONO3NRyE2+n/XhF1MM+XMFBcTFd0J0wuS+VMdsZOZCNq5pdD4GMs9GuC4Csn6q9GZ7Kz11OVPK5AWXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LXeKuu8v; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: daniel@iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1716588309;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kBTv/qqIYfqBTTKh2uCV1BhEjT7Zq6TCkav6UKyskPU=;
+	b=LXeKuu8vM3N0Ll/buFd5U2uLqOjsYVaN/0eKYWhPJkbUwVK950uDsZfuRQ8q8dibcqCkM8
+	TOSQjGDyZdz9dG/KjI9IcgOyvi1Y/t5vKW+uvbusNQl/zRGHTdlBXE1sUsMb5EVsWmaBF0
+	iCea4cjUHduqNwfj4Kwt+h8NYM7AEag=
+X-Envelope-To: razor@blackwall.org
+X-Envelope-To: bpf@vger.kernel.org
+X-Envelope-To: netdev@vger.kernel.org
+Message-ID: <31b97318-38fc-4540-a4a9-201c619c4412@linux.dev>
+Date: Fri, 24 May 2024 15:05:03 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BY5PR02MB6786619C0A0FCB2BEDC2F90D9DF52@BY5PR02MB6786.namprd02.prod.outlook.com>
+Subject: Re: [PATCH bpf v2 4/4] selftests/bpf: Add netkit test for pkt_type
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: razor@blackwall.org, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20240524163619.26001-1-daniel@iogearbox.net>
+ <20240524163619.26001-4-daniel@iogearbox.net>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240524163619.26001-4-daniel@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-> In reality, it is not the PHY having register in MMS12, and not even
-> the MAC. These are really "chip-specific" registers, unrelated to
-> networking (e.g., GPIOs, HW diagnostics, etc.).
+On 5/24/24 9:36 AM, Daniel Borkmann wrote:
+> diff --git a/tools/testing/selftests/bpf/progs/test_tc_link.c b/tools/testing/selftests/bpf/progs/test_tc_link.c
+> index 992400acb957..b64fcb70ef2f 100644
+> --- a/tools/testing/selftests/bpf/progs/test_tc_link.c
+> +++ b/tools/testing/selftests/bpf/progs/test_tc_link.c
+> @@ -4,6 +4,7 @@
+>   
+>   #include <linux/bpf.h>
+>   #include <linux/if_ether.h>
+> +#include <linux/if_packet.h>
 
-Having a GPIO driver within the MAC driver is O.K. For hardware
-diagnostics you should be using devlink, which many MAC drivers
-have. So i don't see a need for the PHY driver to access MMS 12.
+The set looks good.
 
-Anyway, we can do a real review when you post your code.
+A minor thing is that I am hitting this compilation issue in my environment:
 
-> Although, I think it is a good idea anyway to allow the MACPHY
-> drivers to hook into / extend the MDIO access functions.  If
-> anything, because of the hacks you mentioned. But also to allow
-> vendor-specific extensions.
+In file included from progs/test_tc_link.c:7:
+In file included from /usr/include/linux/if_packet.h:5:
+In file included from /usr/include/asm/byteorder.h:5:
+In file included from /usr/include/linux/byteorder/little_endian.h:13:
+/usr/include/linux/swab.h:136:8: error: unknown type name '__always_inline'
+   136 | static __always_inline unsigned long __swab(const unsigned long y)
+       |        ^
 
-But we don't want vendor specific extensions. OS 101, the OS is there
-to make all hardware look the same. And in general, it is not often
-that vendors actually come up with anything unique. And if they do,
-and it is useful, other vendors will copy it. So rather than doing
-vendor specific extensions, you should be thinking about how to export
-it in a way which is common across multiple vendors.
-
-   Andrew
+Adding '#include <linux/stddef.h>' solved it. If the addition is fine, this can 
+be adjusted before landing.
 
