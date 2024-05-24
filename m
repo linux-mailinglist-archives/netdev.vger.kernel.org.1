@@ -1,122 +1,113 @@
-Return-Path: <netdev+bounces-98025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8E368CEA50
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 21:34:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE5368CEA65
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 21:37:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1069B1C20A37
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 19:34:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEDFC1C20BA8
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 19:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118FE5BAC3;
-	Fri, 24 May 2024 19:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2BBD6F077;
+	Fri, 24 May 2024 19:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kuQQw5jh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UC82gvEE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75EF41CFB2;
-	Fri, 24 May 2024 19:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D405CDF0
+	for <netdev@vger.kernel.org>; Fri, 24 May 2024 19:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716579243; cv=none; b=sDZGJB4DIYYlAV8nFs9nTZacXUSVkyfvvTmi0uyq2yuhkVaCx1KhPwnqX4Rw+Ea7i3iBnjp2rOfbi49wq7tyA9v+PbGdMLlqxV27q95dO2VDSQ59dW4VdRhvzwZZ7aVCDgatGvA4VJG9YlFNol+ewl9oOkTtofZxbtF2oOxrJCM=
+	t=1716579394; cv=none; b=nSOEERdF7kbt1/SU6P5Y2/bztjlr3zOdaqN1YngFr+HY0w3c15TdzphP2W/01JroTYKdGC+PmeibAioqVlMdNGlrcc7T6T/zm3ZgukWdEdfp+ULW7ByWI9UKN5iqpQjPBM6VQVfwG011uhKTS7kPz80JGzbpMb6XGv4hZGGsxG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716579243; c=relaxed/simple;
-	bh=5owtB7N7sYNPWMNez38xq1JpwdPsm3eY7gGG9HRQMLg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ljFySFGxzmpOM7ub8yQPs+cKmsZbqP3oEBErseD83aKTkfVYPH7CQKiqYo2Ku5eu+3Aw5FifrZDYdfdtJW0kr64Xd8d87M5HfJelwe9ie7SNJo8ttDd1BKrwvj3KiD6ZtLZutG32g6dvas21mSHlSLcN6NLCRpvjuhylJnTuBsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kuQQw5jh; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-351d309bbcfso2394882f8f.3;
-        Fri, 24 May 2024 12:34:01 -0700 (PDT)
+	s=arc-20240116; t=1716579394; c=relaxed/simple;
+	bh=HJBagJuG1zng10ixqnK3bOcoIIg9Rh+Y800A1x539vQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=b5k0R8qTsoq1AMQZJF0MopIT0g1LeOIqgu/49bxKj+caL5kh7zZ93R8gafvCX52SraHAVpbZrp3kK4LdoBpl+wQ+al8b0A55zMqKDdbZT0ttMacbeIcQFkrFDKl0Ykud9pkhCMOWJYLP0YEhmgpgc6MrSk0t2eiC26v1em9DhXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UC82gvEE; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-df77195db65so1128581276.1
+        for <netdev@vger.kernel.org>; Fri, 24 May 2024 12:36:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716579240; x=1717184040; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5owtB7N7sYNPWMNez38xq1JpwdPsm3eY7gGG9HRQMLg=;
-        b=kuQQw5jh2U7ynZ8CqOUNjX/73FDIiHPSwtivAiqj1K3BmmZrFmnnmZUI1+Htly12WQ
-         4YGoWiwct3rN/cBXFbzFQuxdAQREwrG7sxPhRUHJRUnPV241VkJalwR3qH8szyxym12r
-         LU6TRZGA2wVh74KHJcX48YkVYm+XcFG5LDU5nmAoUtpUzmBZNQYbiJGMCbK+FSKJst3l
-         8uuzxTrDFuzfc6o+8lw+FNkDBYszV9TPE3cBeQj4i+xk22kVq1KbWwEn19mBNfg0OLET
-         QaXdlcXA8JiVszE9lTbAQjz8paTMplUG7bDkDAlY3cLHYxqViiJGHWuqg9nw4jp6biSp
-         bGVw==
+        d=google.com; s=20230601; t=1716579392; x=1717184192; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=NjVlLbP+kmbzK1MilNFsjZIVbl/zLU3jSGoRPY3YR1A=;
+        b=UC82gvEEF8bQhACyQLi/zI8pQ06fN2q9U8W2J3kLaD5M11RXQBkSGPah3j0jMKjCyY
+         CSo4uaR+z4EbbuiDQnspvq8800LK/FbA2Q5haSa5ojLu7G8nis+mo3kFjSvOqGTg+EF8
+         rRYPV92eEZvsXYk1VY0mMFAF4ViZcYE1QUGjtCyWDyrC10uDuGh9fSJrGFS1q1kvW7MT
+         MdqMdNys0XHYXvjDIf2K6ARSfIMG54TsSNa2CtmjSYYyW1pI9PuSrdkdOIdBQJdQLGYQ
+         py9ATQfI59wo1wYqNUwHW3OsE1rdwWLuxtpgv4Jn5lrnyGt6N9veCgWK2pSSac4eOt+w
+         J3dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716579240; x=1717184040;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5owtB7N7sYNPWMNez38xq1JpwdPsm3eY7gGG9HRQMLg=;
-        b=Zee+hIGtNPzn6Szl25xyN5qsoJhSwvxp8mPIOTvoiHmy/JjY+2eObOlH/CKPpAquiy
-         FSDj9rl13RYdX9ODSmxogob6al31ITerOtdEfxHf4c76sVZhJXABq2LOc3lUGSZdgXFs
-         tGug9RjbNzZ2xA49UTtld6poIEhQFk58BgYwCkT91mp7yOf+qEmxhphjnzzjF4MUYOmq
-         uDWf0VQ1Kdv87rl+bPo0Gg9WifIv/xj8QPrJGWeT5+SswdhUWYK4a6mVnGrSumM0nMag
-         I5IDfclFl9ESf5XgCMv0p6XFcjkXo5UlEZjTR++TBhhN47PTZxZCSV/5fQrvTgyu/HEG
-         xcBg==
-X-Forwarded-Encrypted: i=1; AJvYcCXqZU3KKB/K1sT0b9o+40CEgA6edMXPPNu+G7vn1yCjQazcQURWgpthi4tKR+5y3oH59/adsmj20PreVmy4oGBDky8xiwHLW/LfvwdbIp7dAglc0hCRX+GXcEQV
-X-Gm-Message-State: AOJu0YwOuJ8Od8m4Sc9g5+nFuxaTsByiUICCkAYtN9OpA46ADCGI6or1
-	i94oFnH5QYuxyFYeRD4AjsugEwjg7oRBeBSS/ONLkIA51r/DsbEi6mqCasYWBlMR0Lqr8gPYQst
-	G6YPlMlzCgcThvP9g/8qUeHYPKS8=
-X-Google-Smtp-Source: AGHT+IGF+DtPnkp/OUyjdDrjTVCLmbxKWp4HcZUGyz+IcSi2Bk7m0AS5OW0YzvDXoy+bse4Pr9W4CZ7ZyVyFWyX9GI4=
-X-Received: by 2002:a05:6000:d88:b0:354:f34c:646f with SMTP id
- ffacd0b85a97d-3552fe020afmr2168724f8f.58.1716579239553; Fri, 24 May 2024
- 12:33:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716579392; x=1717184192;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NjVlLbP+kmbzK1MilNFsjZIVbl/zLU3jSGoRPY3YR1A=;
+        b=CUXHbXvAZw4YLEz2kjc+SiyTFTWuCnnpunTr9bSLSMCRHpBQE+T6nE3MtDoEbaeLMo
+         488iJhzsB8eUtqkZ+URQL2WwWdEzntm49CGORnIUqtdSses8EvHk94nvrEtPSDx+LroV
+         VASDIzNanT48ht5eV5zVjiMElV9nMPOquE9j9j8BXyc3sEv/aAHN8sJOS1f3wsvEaPYv
+         n9q3Cb9NOFQEun9dlR/XX5oy0bDTPdkQ9gf4d4zH5gBUqbjmRM43xuEtPjUEDMHK7XwR
+         m/fnfF/vgFCTjTzKysSLjPA7WZeLh3THao+TIu0U08L0tcRyH5hhvPVxLB2sUnY9vIM8
+         tRaA==
+X-Forwarded-Encrypted: i=1; AJvYcCU9znjNY0arZ/Z/ZBJ5lMsyoyua/24kry71fcVxjV8Yhu5hZ7q5tUL2JgJZjENs/GenXlMUeL+io7dV8yHdCUiK8ti1LlAS
+X-Gm-Message-State: AOJu0YysuZRHk1CpGvp3ztGdxTU81sJD9KD8elaUIphzC0xtORhNAHzh
+	bc9BLAocoI1nOXFPnoNdzl2yimZ4iPh5oG1+8+335044YqsVPqbQt0glBeOfJiODbTJHaHDTJQX
+	+oTjgCH3Wlg==
+X-Google-Smtp-Source: AGHT+IEQziFpb55GuqnWGaJS8nFCqY5BqR+eokfPfsS2TqtXOEXh9Qx7rJELSn7QpoIE3HjlIBK2U5p2UEIcRQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:150b:b0:df2:eaac:d811 with SMTP
+ id 3f1490d57ef6-df77221f771mr300242276.10.1716579392185; Fri, 24 May 2024
+ 12:36:32 -0700 (PDT)
+Date: Fri, 24 May 2024 19:36:26 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240510192412.3297104-1-amery.hung@bytedance.com>
- <20240510192412.3297104-19-amery.hung@bytedance.com> <6ad06909-7ef4-4f8c-be97-fe5c73bc14a3@linux.dev>
-In-Reply-To: <6ad06909-7ef4-4f8c-be97-fe5c73bc14a3@linux.dev>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 24 May 2024 12:33:47 -0700
-Message-ID: <CAADnVQLLqy=MTK_u2FMrxUEZRojYPUZrc-ZG=Gcj-=SaH9Q=XA@mail.gmail.com>
-Subject: Re: [RFC PATCH v8 18/20] selftests: Add a bpf fq qdisc to selftest
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Amery Hung <ameryhung@gmail.com>, Network Development <netdev@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, yangpeihao@sjtu.edu.cn, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Kui-Feng Lee <sinquersw@gmail.com>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, Stanislav Fomichev <sdf@google.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Peilin Ye <yepeilin.cs@gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
+Message-ID: <20240524193630.2007563-1-edumazet@google.com>
+Subject: [PATCH net 0/4] tcp: fix tcp_poll() races
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 23, 2024 at 11:25=E2=80=AFPM Martin KaFai Lau <martin.lau@linux=
-.dev> wrote:
->
-> > +
-> > +unsigned long time_next_delayed_flow =3D ~0ULL;
-> > +unsigned long unthrottle_latency_ns =3D 0ULL;
-> > +unsigned long ktime_cache =3D 0;
-> > +unsigned long dequeue_now;
-> > +unsigned int fq_qlen =3D 0;
->
-> I suspect some of these globals may be more natural if it is stored priva=
-te to
-> an individual Qdisc instance. i.e. qdisc_priv(). e.g. in the sch_mq setup=
-.
->
-> A high level idea is to allow the SEC(".struct_ops.link") to specify its =
-own
-> Qdisc_ops.priv_size.
->
-> The bpf prog could use it as a simple u8 array memory area to write anyth=
-ing but
-> the verifier can't learn a lot from it. It will be more useful if it can =
-work
-> like map_value(s) to the verifier such that the verifier can also see the
-> bpf_rb_root/bpf_list_head/bpf_spin_lock...etc.
+Flakes in packetdrill tests stressing epoll_wait()
+were root caused to bad ordering in tcp_write_err()
 
-Qdisc_ops.priv_size is too qdsic specific.
-imo using globals here is fine. bpf prog can use hash map or arena
-to store per-netdev or per-qdisc data.
-The less custom things the better.
+Namely, we have to call sk_error_report() after
+tcp_done().
+
+When fixing this issue, we discovered tcp_abort(),
+tcp_v4_err() and tcp_v6_err() had similar issues.
+
+Since tcp_reset() has the correct ordering,
+first patch takes part of it and creates
+tcp_done_with_error() helper.
+
+Eric Dumazet (4):
+  tcp: add tcp_done_with_error() helper
+  tcp: fix race in tcp_write_err()
+  tcp: fix races in tcp_abort()
+  tcp: fix races in tcp_v[46]_err()
+
+ include/net/tcp.h    |  1 +
+ net/ipv4/tcp.c       |  7 ++-----
+ net/ipv4/tcp_input.c | 25 +++++++++++++++++--------
+ net/ipv4/tcp_ipv4.c  |  5 +----
+ net/ipv4/tcp_timer.c |  5 ++---
+ net/ipv6/tcp_ipv6.c  |  4 +---
+ 6 files changed, 24 insertions(+), 23 deletions(-)
+
+-- 
+2.45.1.288.g0e0cd299f1-goog
+
 
