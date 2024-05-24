@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-98029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 464158CEA68
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 21:37:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 518C48CEA69
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 21:37:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01D74283EE9
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 19:37:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E076AB2207E
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 19:37:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6320784DEA;
-	Fri, 24 May 2024 19:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39A6284D0B;
+	Fri, 24 May 2024 19:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JuQB0fyq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vsCmZlFx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66FB82C6B
-	for <netdev@vger.kernel.org>; Fri, 24 May 2024 19:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB78984DFD
+	for <netdev@vger.kernel.org>; Fri, 24 May 2024 19:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716579400; cv=none; b=G0s3I2M5MFJaQfvfkyA3HxECJTuk/fYXRzBB1AVGb0I2XpdmpDZD+D+hh9QRTrss0AS6rtgOsXNqjqV+S3N3vrKLpMWlofStz0lEJbGOjqoKlUUb8X6a/ORyYpO/vP2IlBT0Hd32YXvw2rckrYHI/n6BVlBykvNpZdfq1KweLis=
+	t=1716579402; cv=none; b=RngzRlkMm7rSC+6Ep705rkCKr2Wk4tmWyXJ5PgNSfCoIKb4fp1kcLd08k0XJ8jJ1/WtazOs+Mj+Fm1XLjeP4Mfzqp4uUsEP03W16jPA8I7EQIbeM0nZcFG9uN5zWS+67pVlQ+qDkn03bFxywjLwlI4kACseL6ndorqRCDx7fT0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716579400; c=relaxed/simple;
-	bh=lZqCcbBBSv/qSgtNoIFYGw2Ni6oSIM/K3urRq5cWbbs=;
+	s=arc-20240116; t=1716579402; c=relaxed/simple;
+	bh=nwY4a6uCgWev5GNG+aDQeObLSEQw497lbarZGqgL6KI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DEJJM13gr1VDYGD87hSn+sxkQbZfXmp+udYHsylf/6D39LQ7I+ee9usf3qMN4d7Y6lHk0cVqAMF1mHyh8VUu/eVfZICsfawHK3Iio4+yGde9kdImEoJdv5aeM3GE3hWurEZVrNduuNTjEXR/n+1T8Li+A9jrAdnZoCu7Sj90ltQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JuQB0fyq; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=O7hSLTkxXqKFY4UYcPR0hDFVaJnk95MDDrzzoG6oKIZFBIf2ew1NBTKLJe8CV8kekiuQ5K6z8Cic6umAV9pPfS9SbSpot6ir6Ua7xYjtZTkefX5SaRTtfRXsrEoBct/QRyi0RsVqOpC2YhhvHZ3l6A/18pvE3y9NJn6V0P+JtrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vsCmZlFx; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62a083d9346so9397907b3.2
-        for <netdev@vger.kernel.org>; Fri, 24 May 2024 12:36:38 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df4d631a4c1so961663276.1
+        for <netdev@vger.kernel.org>; Fri, 24 May 2024 12:36:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716579398; x=1717184198; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1716579400; x=1717184200; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gsG7/RSHQ8OJJlmUs4RpmmIk8Jl50XRVFFzBF5rUTZ0=;
-        b=JuQB0fyq8IM1IG++r3bgAwaYH535GoAj7GM6NKSLenztabYwcyjovpzQs6r5SejVTm
-         EtoINNV7o3BG1JtFa+BrSlrdIzh3+j8hYI85vFudPs5WQusBISBcbtPRZJLC4YD3gR7D
-         dJm+wAT8KaQcCNWq7Syv2+4iAfKeyjzytmsC53YtlPyQ5Q/qZALmFXlZcBGRzzTqb1Re
-         deQfrjlhPTGaDj27ootSwQ0o0RI2PkY0NwLWYMj2nmSpJwniPPkgm9NuStYZ9ZL4XjLq
-         1VgVMX7BEVK7710CFpsXVkLjE3cg82s+iiHtrMh5BDZ+3ndno7MAbF6+OerF7VXTr9J1
-         TmQQ==
+        bh=Da2shUIvj+ymaVnO7Kn/JRSXGfAaQ5BBjgrAnxRBjs0=;
+        b=vsCmZlFxwQwIvybhvmngTo5eLbxpURq8fchpXfpuANm8MePRk1kLO/lrvDpaS2TB8n
+         rrFQlo9EvmJvgSyXWqy442XtJJjBYidQDELzkEPSI19LPkt7gpxGRYmRIVJ/MPJ279c6
+         r3DD2r1uWm3H1k7J1AlX3IIj7LhMXLLJRYAsrky61o+eARQEgtMOneQ88HU+gHmDdRsh
+         ae/elYcD1g65AQnnBA9Q1vMBcg/jaD4M0dfs9/1QgvXLCZLcNVL5+0VB5taEZm4jIC4Q
+         k6izQWDwQjBo0ycYwLM6N3UP6cnYu18d5SOYJq0cnSog13ANqAERgic8CmcgZ7TzOnWk
+         R12A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716579398; x=1717184198;
+        d=1e100.net; s=20230601; t=1716579400; x=1717184200;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gsG7/RSHQ8OJJlmUs4RpmmIk8Jl50XRVFFzBF5rUTZ0=;
-        b=H3nxj2vvRj3JGauRatRVsbfkjNGCC2LtIZTbGTd8vkjO2KGCbL0tziqJdlMAT2yYHO
-         py0JthjcfsPg018c5LY3vNULUJ4J/f/wl5BeX6eqfIEqxkdCfHV5cr+hqcz03o7eWDSL
-         tQIcgDAqPucfxdoXLhNGI3skWJlCxdoDjc/VhuhSyMGLR0DEYuR9+36J6IlFFejQvaKO
-         PL7KNlQr3W71SfwKF4gLyFMOV9TlGJvwymQQMvUqXqPBo9gsHQkywqKAUesyZxczDPFF
-         bbRHamH0/oW8URY1QlOlHsDNrVgUuWsZTkOrG8u/2rOXW6tO0CjYK8+zThcwuxW14o+X
-         ybiA==
-X-Forwarded-Encrypted: i=1; AJvYcCWfdO2bAVourplF8j7HZEPFtq0yWoTSxcOzo2ZuOK/0+VFqCK8uGI3wSkCz+7hB62fSMuC3gZfoOTxrCQVo4+GXqHHIUlXx
-X-Gm-Message-State: AOJu0YyN5zj1Frglh1P8ytUUCCgmxAFgMtm6OoBiLqO48+Kv4ZjmYh9h
-	C9DBvLVvTo0qNTPDAwtV3X0Gd0ptI4l0D9RhqvaOY0KgQQ879aLZUE98tbiq3ufHkYaqg+8N6fq
-	1CU3ZLl4nVg==
-X-Google-Smtp-Source: AGHT+IGcwDx2vMkSrJqcDooXIkomI87Eo1saJUFpDFWk8OUZhyOzEZKOOMGmW5N+rlwpBbEIOgIaXhp1kAs7SQ==
+        bh=Da2shUIvj+ymaVnO7Kn/JRSXGfAaQ5BBjgrAnxRBjs0=;
+        b=uvdfHFICcc+VVvWuFRXSf515cFSWdCKYvduQFOBkovR5osJivsarMP0RuNjSFQzwcI
+         asQk8hcoYOPTk6bVpxodc/HyIBKlItxu3FiaVlUIjQvDL3IAxq1MfIaQt6L02QQamQ5H
+         TI/hWNnLNB6k3Gz+NwhwMVLGkBuCwOsdU9LdxXC2ZsJMwB16FcCcTpDpN+Qmp4sZRbJi
+         RxlqNU5xQEXNwwikER03wy7YauLZ035qx1PfSEJpYBxcQkUPyZzbEVMkRMuWs4JlJ7Q4
+         OXuVv+KrgtABvNuupfcPSHYOCyd5tXpIxBmkAkp/frJ8PSY5UQEm2mMNy0FiRq/3Ufnn
+         aQ1w==
+X-Forwarded-Encrypted: i=1; AJvYcCWYgV/gOmdB0imQI8WVlKgcnjDJQN4WiyyHTgQuR/+Xn96E/1dcKXj7xrKeQac+MOTGXPFPio22LmqFVxkvAGmZhlhVb+Ar
+X-Gm-Message-State: AOJu0YwntX6nIrK746GagoXhDjmlDx4fDV16pTT64RKBEBTLqaxFTPEX
+	VuuXm6/DccWdDHGtKZpnD22N5LTPvQm/M/bi3ZM/5k692/doT1yUmYVsFrIFet/FbIsDEtYs7f9
+	ZaXvjMLgipw==
+X-Google-Smtp-Source: AGHT+IEHQaBLUQxjsmT7W3h2zRuecy2h4RS6+Mw1rKDtuee+Kczg6ynNzVB3uX8qpwJANadP5u++ZU5n+YdBPA==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1207:b0:dee:7884:acc7 with SMTP
- id 3f1490d57ef6-df77214fd6dmr262134276.1.1716579397957; Fri, 24 May 2024
- 12:36:37 -0700 (PDT)
-Date: Fri, 24 May 2024 19:36:29 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:154a:b0:df4:628c:3045 with SMTP
+ id 3f1490d57ef6-df7721f39eamr261134276.8.1716579399767; Fri, 24 May 2024
+ 12:36:39 -0700 (PDT)
+Date: Fri, 24 May 2024 19:36:30 +0000
 In-Reply-To: <20240524193630.2007563-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240524193630.2007563-1-edumazet@google.com>
 X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <20240524193630.2007563-4-edumazet@google.com>
-Subject: [PATCH net 3/4] tcp: fix races in tcp_abort()
+Message-ID: <20240524193630.2007563-5-edumazet@google.com>
+Subject: [PATCH net 4/4] tcp: fix races in tcp_v[46]_err()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,39 +83,59 @@ Cc: Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, eric.dumazet@g
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-tcp_abort() has the same issue than the one fixed in the prior patch
-in tcp_write_err().
+These functions have races when they:
 
-In order to get consistent results from tcp_poll(), we must call
-sk_error_report() after tcp_done().
+1) Write sk->sk_err  [A]
+2) call sk_error_report(sk) [B]
+3) call tcp_done(sk)
 
-We can use tcp_done_with_error() to centralize this logic.
+As described in prior patches in this series:
 
-Fixes: c1e64e298b8c ("net: diag: Support destroying TCP sockets.")
+[A] An smp_wmb() is missing.
+[B] We should call tcp_done() before sk_error_report(sk)
+    to have consistent tcp_poll() results on SMP hosts.
+
+Use tcp_done_with_error() where we centralized the
+correct sequence.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/tcp.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ net/ipv4/tcp_ipv4.c | 5 +----
+ net/ipv6/tcp_ipv6.c | 4 +---
+ 2 files changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 2a8f8d8676ff1d30ea9f8cd47ccf9236940eb299..741cd35d0d7d66bfafe5d85b4c4d97d042613a61 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4577,13 +4577,10 @@ int tcp_abort(struct sock *sk, int err)
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 30ef0c8f5e92d301c31ea1a05f662c1fc4cf37af..09192c786d145ee97058b6bab61d96274a883aef 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -613,10 +613,7 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
  
- 	if (!sock_flag(sk, SOCK_DEAD)) {
- 		WRITE_ONCE(sk->sk_err, err);
--		/* This barrier is coupled with smp_rmb() in tcp_poll() */
--		smp_wmb();
--		sk_error_report(sk);
- 		if (tcp_need_reset(sk->sk_state))
- 			tcp_send_active_reset(sk, GFP_ATOMIC,
- 					      SK_RST_REASON_NOT_SPECIFIED);
--		tcp_done(sk);
-+		tcp_done_with_error(sk);
- 	}
+ 		if (!sock_owned_by_user(sk)) {
+ 			WRITE_ONCE(sk->sk_err, err);
+-
+-			sk_error_report(sk);
+-
+-			tcp_done(sk);
++			tcp_done_with_error(sk);
+ 		} else {
+ 			WRITE_ONCE(sk->sk_err_soft, err);
+ 		}
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 4c3605485b68e7c333a0144df3d685b3db9ff45d..41ddc7c768ce957ff64aac6de4a2a59227e7c7ff 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -492,9 +492,7 @@ static int tcp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
  
- 	bh_unlock_sock(sk);
+ 		if (!sock_owned_by_user(sk)) {
+ 			WRITE_ONCE(sk->sk_err, err);
+-			sk_error_report(sk);		/* Wake people up to see the error (see connect in sock.c) */
+-
+-			tcp_done(sk);
++			tcp_done_with_error(sk);
+ 		} else {
+ 			WRITE_ONCE(sk->sk_err_soft, err);
+ 		}
 -- 
 2.45.1.288.g0e0cd299f1-goog
 
