@@ -1,51 +1,71 @@
-Return-Path: <netdev+bounces-97929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 081FA8CE29F
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 10:50:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F4428CE2A9
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 10:56:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7B80283166
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 08:50:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEB0128272F
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 08:56:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1073D128375;
-	Fri, 24 May 2024 08:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A62128376;
+	Fri, 24 May 2024 08:56:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="pksfY+HR"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2115A84E03;
-	Fri, 24 May 2024 08:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1DC29AB;
+	Fri, 24 May 2024 08:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716540591; cv=none; b=aTxsanzdwqxyv47YmoMTR2Wz88b0yWzQEV9mKWgwrU+rgQQ9nmcm2MCMV4AMRDUOqD/Xor5Iu40W8yI130p0cqQ8+8UwaVsEJTH/n4toDNh/v9BR5bEw8HctUtQHp0lUmw9GGlnVBeEk6S+LjjSNKVUqCvH/6bpdgNVtjGvJwTQ=
+	t=1716541007; cv=none; b=NYFoFCKkwrN2hroC20+pTW4g3xxvK+rdPxIh08hToj2a4P9cfKDbUHH8k6SZmlOLwLZ9ITg3OeUBuwkGfLIStPczzQSelm6kKF2Uy5vUQSeFNGYHSJdGbaBclZst4x5CDHK3GS3uPgMGQittIcoyEq6VD6EgxSeH8fRxzwpz1nM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716540591; c=relaxed/simple;
-	bh=+fyQmmBghd4ru55U3wBh/VC//Mi2k+SSW6qveTaC+5s=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XBlValNcdrq3p+/OTmyB216es0IEYYjfuCKZuMYSVGmmypWFoO5fAEvbjCVg/1pUFF7Y1pm6bXVHujPM0oFyWwxQXlfDBzW8A6ve8eQdDOXMV5lb3p11rmlN82SwdFfci2pzlEHFWpVYbFeIdjzUu8NXrpKqhrajWKMPvhufqn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4VlzCh4RbFz2Cj36;
-	Fri, 24 May 2024 16:46:08 +0800 (CST)
-Received: from canpemm500007.china.huawei.com (unknown [7.192.104.62])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4FB891A0188;
-	Fri, 24 May 2024 16:49:39 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 24 May
- 2024 16:49:38 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <jhs@mojatatu.com>, <xiyou.wangcong@gmail.com>,
-	<jiri@resnulli.us>, <yuehaibing@huawei.com>, <hannes@stressinduktion.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net] net/sched: Add xmit_recursion level in sch_direct_xmit()
-Date: Fri, 24 May 2024 16:51:08 +0800
-Message-ID: <20240524085108.1430317-1-yuehaibing@huawei.com>
+	s=arc-20240116; t=1716541007; c=relaxed/simple;
+	bh=zOnNjjQlnZgw6plWUTz4wcNjAHRlI4pl9KHutj3RZ/E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XGbmyW1oQyHpF8dQhmsfHCelHH7jhliMLMGvx25b5GJg1xC8HWUBSwv0KnsgH8QLY/q4cgWtirnXWhF2mgoV6dnaObcHXMp7ujDNuJprcmWAM6Kf5Xc4GZbeKLxLonjomQknYUdTI/OfnJuAyUmnGzpxeIDZ7TvmfZGvgHOkC8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=pksfY+HR; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1716541005; x=1748077005;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=zOnNjjQlnZgw6plWUTz4wcNjAHRlI4pl9KHutj3RZ/E=;
+  b=pksfY+HR8ZJVV9iuv/h5dNjDLUmuTok94OgUv/217b/WEhfURwzfdDI9
+   ZMUCTBsNhOFycIsavrmPzi8mvxG1dfEbtadNFcne/g0+iR7+h9ir1DUwh
+   1AZ2yYLbbOtclVidqTLz4m6BEP3jQv7Eknfav6lyJksoaMJ7UTftml+dB
+   +EeDGYvaryADFUTNayllfzPXD1dzZYhS9QXw7CRmwInZbHPNZC+wIopEu
+   OW0By2JVJvdC7zakI3E2A2bfXiF93RFutP7The16+9LmMOKgrrJNzqE0R
+   i9LYpxnq5/caGpoxJ4I5DFxgkJ0DtRVBRyKzb2Moj/8ULG3/jdchM4p9t
+   Q==;
+X-CSE-ConnectionGUID: DvDbo6VsSsGYja2SLKTuBw==
+X-CSE-MsgGUID: m7rZXmPxTPSVDRTPhGUGBg==
+X-IronPort-AV: E=Sophos;i="6.08,185,1712646000"; 
+   d="scan'208";a="26047010"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 May 2024 01:56:43 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 24 May 2024 01:56:36 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Fri, 24 May 2024 01:56:34 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <sumang@marvell.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net v2] net: micrel: Fix lan8841_config_intr after getting out of sleep mode
+Date: Fri, 24 May 2024 10:53:50 +0200
+Message-ID: <20240524085350.359812-1-horatiu.vultur@microchip.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,137 +75,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500007.china.huawei.com (7.192.104.62)
 
-packet from PF_PACKET socket ontop of an IPv6-backed ipvlan device will hit
-WARN_ON_ONCE() in sk_mc_loop() through sch_direct_xmit() path while ipvlan
-device has qdisc queue.
+When the interrupt is enabled, the function lan8841_config_intr tries to
+clear any pending interrupts by reading the interrupt status, then
+checks the return value for errors and then continue to enable the
+interrupt. It has been seen that once the system gets out of sleep mode,
+the interrupt status has the value 0x400 meaning that the PHY detected
+that the link was in low power. That is correct value but the problem is
+that the check is wrong.  We try to check for errors but we return an
+error also in this case which is not an error. Therefore fix this by
+returning only when there is an error.
 
-WARNING: CPU: 2 PID: 0 at net/core/sock.c:775 sk_mc_loop+0x2d/0x70
-Modules linked in: sch_netem ipvlan rfkill cirrus drm_shmem_helper sg drm_kms_helper
-CPU: 2 PID: 0 Comm: swapper/2 Kdump: loaded Not tainted 6.9.0+ #279
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-RIP: 0010:sk_mc_loop+0x2d/0x70
-Code: fa 0f 1f 44 00 00 65 0f b7 15 f7 96 a3 4f 31 c0 66 85 d2 75 26 48 85 ff 74 1c
-RSP: 0018:ffffa9584015cd78 EFLAGS: 00010212
-RAX: 0000000000000011 RBX: ffff91e585793e00 RCX: 0000000002c6a001
-RDX: 0000000000000000 RSI: 0000000000000040 RDI: ffff91e589c0f000
-RBP: ffff91e5855bd100 R08: 0000000000000000 R09: 3d00545216f43d00
-R10: ffff91e584fdcc50 R11: 00000060dd8616f4 R12: ffff91e58132d000
-R13: ffff91e584fdcc68 R14: ffff91e5869ce800 R15: ffff91e589c0f000
-FS:  0000000000000000(0000) GS:ffff91e898100000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f788f7c44c0 CR3: 0000000008e1a000 CR4: 00000000000006f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- ? __warn+0x83/0x130
- ? sk_mc_loop+0x2d/0x70
- ? report_bug+0x18e/0x1a0
- ? handle_bug+0x3c/0x70
- ? exc_invalid_op+0x18/0x70
- ? asm_exc_invalid_op+0x1a/0x20
- ? sk_mc_loop+0x2d/0x70
- ip6_finish_output2+0x31e/0x590
- ? nf_hook_slow+0x43/0xf0
- ip6_finish_output+0x1f8/0x320
- ? __pfx_ip6_finish_output+0x10/0x10
- ipvlan_xmit_mode_l3+0x22a/0x2a0 [ipvlan]
- ipvlan_start_xmit+0x17/0x50 [ipvlan]
- dev_hard_start_xmit+0x8c/0x1d0
- sch_direct_xmit+0xa2/0x390
- __qdisc_run+0x66/0xd0
- net_tx_action+0x1ca/0x270
- handle_softirqs+0xd6/0x2b0
- __irq_exit_rcu+0x9b/0xc0
- sysvec_apic_timer_interrupt+0x75/0x90
- </IRQ>
-
-Fixes: f60e5990d9c1 ("ipv6: protect skb->sk accesses from recursive dereference inside the stack")
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+Fixes: a8f1a19d27ef ("net: micrel: Add support for lan8841 PHY")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 ---
- include/linux/netdevice.h | 17 +++++++++++++++++
- net/core/dev.h            | 17 -----------------
- net/sched/sch_generic.c   |  8 +++++---
- 3 files changed, 22 insertions(+), 20 deletions(-)
+v1->v2:
+- do the same also in case the interrupts are disabled.
+---
+ drivers/net/phy/micrel.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index d20c6c99eb88..7c0c9e9b045e 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3261,6 +3261,23 @@ static inline int dev_recursion_level(void)
- 	return this_cpu_read(softnet_data.xmit.recursion);
- }
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 13e30ea7eec5d..c0773d74d5104 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -4029,7 +4029,7 @@ static int lan8841_config_intr(struct phy_device *phydev)
  
-+#define XMIT_RECURSION_LIMIT	8
-+static inline bool dev_xmit_recursion(void)
-+{
-+	return unlikely(__this_cpu_read(softnet_data.xmit.recursion) >
-+			XMIT_RECURSION_LIMIT);
-+}
+ 	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
+ 		err = phy_read(phydev, LAN8814_INTS);
+-		if (err)
++		if (err < 0)
+ 			return err;
+ 
+ 		/* Enable / disable interrupts. It is OK to enable PTP interrupt
+@@ -4045,6 +4045,14 @@ static int lan8841_config_intr(struct phy_device *phydev)
+ 			return err;
+ 
+ 		err = phy_read(phydev, LAN8814_INTS);
++		if (err < 0)
++			return err;
 +
-+static inline void dev_xmit_recursion_inc(void)
-+{
-+	__this_cpu_inc(softnet_data.xmit.recursion);
-+}
-+
-+static inline void dev_xmit_recursion_dec(void)
-+{
-+	__this_cpu_dec(softnet_data.xmit.recursion);
-+}
-+
- void __netif_schedule(struct Qdisc *q);
- void netif_schedule_queue(struct netdev_queue *txq);
++		/* Getting a positive value doesn't mean that is an error, it
++		 * just indicates what was the status. Therefore make sure to
++		 * clear the value and say that there is no error.
++		 */
++		err = 0;
+ 	}
  
-diff --git a/net/core/dev.h b/net/core/dev.h
-index b7b518bc2be5..49345ad7350b 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -149,21 +149,4 @@ static inline void xdp_do_check_flushed(struct napi_struct *napi) { }
- struct napi_struct *napi_by_id(unsigned int napi_id);
- void kick_defer_list_purge(struct softnet_data *sd, unsigned int cpu);
- 
--#define XMIT_RECURSION_LIMIT	8
--static inline bool dev_xmit_recursion(void)
--{
--	return unlikely(__this_cpu_read(softnet_data.xmit.recursion) >
--			XMIT_RECURSION_LIMIT);
--}
--
--static inline void dev_xmit_recursion_inc(void)
--{
--	__this_cpu_inc(softnet_data.xmit.recursion);
--}
--
--static inline void dev_xmit_recursion_dec(void)
--{
--	__this_cpu_dec(softnet_data.xmit.recursion);
--}
--
- #endif
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index 2a637a17061b..74d9b43b7767 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -339,11 +339,13 @@ bool sch_direct_xmit(struct sk_buff *skb, struct Qdisc *q,
- 
- 	if (likely(skb)) {
- 		HARD_TX_LOCK(dev, txq, smp_processor_id());
--		if (!netif_xmit_frozen_or_stopped(txq))
-+		if (!netif_xmit_frozen_or_stopped(txq)) {
-+			dev_xmit_recursion_inc();
- 			skb = dev_hard_start_xmit(skb, dev, txq, &ret);
--		else
-+			dev_xmit_recursion_dec();
-+		} else {
- 			qdisc_maybe_clear_missed(q, txq);
--
-+		}
- 		HARD_TX_UNLOCK(dev, txq);
- 	} else {
- 		if (root_lock)
+ 	return err;
 -- 
 2.34.1
 
