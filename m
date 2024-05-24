@@ -1,75 +1,74 @@
-Return-Path: <netdev+bounces-97979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542BE8CE6B8
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 16:12:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D1BE8CE6CB
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 16:15:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B79E3B20C31
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 14:12:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E32D1C21388
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 14:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D45E12C46D;
-	Fri, 24 May 2024 14:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFBB512C47A;
+	Fri, 24 May 2024 14:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="L9hdbzvv"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="w2eY3gpI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9DB986146
-	for <netdev@vger.kernel.org>; Fri, 24 May 2024 14:11:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345A785C7A
+	for <netdev@vger.kernel.org>; Fri, 24 May 2024 14:15:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716559921; cv=none; b=YxoldzyXgVeddmrb/iJD6N73IDsoHxbov9wElkPUPFvVrHkI07Tn+WcI49nEiad6ZQQ+lMQsjviWBv8c5RqhKA3N4rp1wn0jkOgJyZLV1fJZStv8XY53lipgHOxnF1WRZBOFqKUSoyCse0zWBq3bZnh3H5DWicybmHuJRL4Lzxc=
+	t=1716560119; cv=none; b=RJARddE0m2dG5v/PaILqXcCRznQJtfUmXDhMhHSEp7phEdCp1rVhgeBUeYZc53K4XkSKyqo2ViY3dmTlSb0QFujnEW2CIk7sLrpmQfodrPogf/G82CB+LPOlqAHo+ux7pzVxAvZ/2ehuMBKykEctZdO9h8t2T8Jtmd7wQ8xPMVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716559921; c=relaxed/simple;
-	bh=IabFXdK1At6rAlruejf2EGb8m7U53NAFeZqP3ULay4g=;
+	s=arc-20240116; t=1716560119; c=relaxed/simple;
+	bh=3oyL1xg979Wd3JmqihENBu4Vnp+k+yMhGiZu/42vP/o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cGlxjVTSaUdbtj81twx0L58T+BOUGUou6ankUWjUU11HYpYuO7GOweGEpvJMvFTN0hglY056SfBeZ4ZYZjrOqnL4IWI2FXmbqKYmdJN4+7lyfM8RF9Gou/WXdn+F4GS++lj5yt7rPeg+OCqf709+BSTQ0dkkC8214cDtoRGKBNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=L9hdbzvv; arc=none smtp.client-ip=209.85.208.49
+	 In-Reply-To:Content-Type; b=eizMqLq+6uikoljIka/+9QQOLQC0sDjOmgFOHZRuwkrMFjbe3EFnciKzDMLl/YaU1e3lAG+qvbVZL/x59iEZjzpuwEsVNTZwKU8+fqNAAJVq+EM/xoZ65bNgcRWAkP1cOLkfmAW11WcsYDyBCd0DihYZjc/PhRBNg43R4tLenNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=w2eY3gpI; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-57857e0f462so793027a12.0
-        for <netdev@vger.kernel.org>; Fri, 24 May 2024 07:11:58 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a620a28e95cso534045966b.3
+        for <netdev@vger.kernel.org>; Fri, 24 May 2024 07:15:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1716559917; x=1717164717; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1716560116; x=1717164916; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=HsACPan+7+fDxhlVELR38Uhnge7xZ0aAXq4rQh82pOI=;
-        b=L9hdbzvvsyGxb8z0azsYQzGCW4Zo9LlnApovCtJXBFmtNGtQ4qaqvL31doRd/NTQFU
-         va3ApQjdV4Zzhn7xgLMGyfkgP3/V57EtTly42jftUKMfiB7Owik5oTgsIYwcLOBgG0qn
-         1aoHuziMVyKW54M+qeoJ2gSRBLn7VHdcfuztl76qi1B2rJvu3fsW53rWAk4lwFvkaedw
-         lIyr2GsaVjPE8SBtq4UZecZZZKTB1BbwqEkgS3cIRY+bC7SK9S3kgaIJkq7GKj010SDP
-         MjKHIc0y011n5X4ivQuWu3NBnZ3ihR6tU25t9aUCWTZMEqx2OEyn/609K6SYbJZZZPtp
-         avhw==
+        bh=bzH9/kd4g2Cv9SF58a2TQf0rXcjP1nTT2vaKMFNbqB8=;
+        b=w2eY3gpI11fWOWyHAyD0HJ78a9x6kByT8Y0ozlox4j0FPw3MV5uivr+bi8WM14fnem
+         nwE/Rmto8M3Dpx7WHnMHzxKuL+yxqJzhCl6uOz+M5fgiuYm3lkDH9wTlOitxmqBnIhfN
+         rXdNnJTHArK7ED/FGTCUoKjXT6sGJKzkkr7gfd116NY/ja36dFa5ULzq2h5zuzMVWnXS
+         CuGfz9AKQp10euoM7xufWPihAKuR1AaNOaD7yIVinWXWiYOffkn6u8bYu4NdyKmbLyEb
+         nW/mWV79cWrNQ3i1XSPVtBGsbzJpwffSKfzA9x96pdXrgWk23ig/FhZeSOnBKc95mY3F
+         pmNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716559917; x=1717164717;
+        d=1e100.net; s=20230601; t=1716560116; x=1717164916;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HsACPan+7+fDxhlVELR38Uhnge7xZ0aAXq4rQh82pOI=;
-        b=TljhN09OAP2ykEgQW8pnYcjAxVLeEigC+1lNKqRfPsxukxy9neKTv2U3W8ZpWMg0t4
-         1LzT8ZC2YbUWgBitPDAg1DvHzOdhoZtQooh7WLSXTpGUFtCOgoLRJa1ez5/SIsPtBESz
-         1aO4FjvvMkBD+1TgDxG4gIErBHxbzynVVHEPe26BpeehtveaVtp3XIbcld4u3agNMOLk
-         yDXGJHEH34YYRpv0TSJjMblJKOmab12W8kO42i4ZEERFwTs/qp7paJZpGy5CJOVOCPIk
-         YNvsrpkeW6zvNkMbtEPTzvTPzgQn2aCMXGfTbLDaxYZK2dpZrjd8LXfN/5nezgbqDZ64
-         Xdpw==
-X-Forwarded-Encrypted: i=1; AJvYcCV9YMsDeMeFgf8v3ojpiljgBOqVEoNOHrWQN66jjnanSoMfK15CXSJud3dbYzV3zOYTnRNxyk4RBIxtxhZTNanUZgXZTwP0
-X-Gm-Message-State: AOJu0YxkgUH8El4WAbEdx6ROaHqNgWxxtSD4llVlsk/TKDQnwxZ00fV8
-	orXrNS8uVc+e8UlQdFwRVa++kTjCkCgHYSXSij3+Iwb8n81IxlToNAjY42rfyJvca3NZPYsoceD
-	Wihw=
-X-Google-Smtp-Source: AGHT+IFKYKCsLX0YcetJZsmUugX6A1EiLE5b8aIZsssDksU0f7onCfJsLs85xFAQG4d/F3dt8oW8kA==
-X-Received: by 2002:a17:906:2961:b0:a62:2e8b:2ca9 with SMTP id a640c23a62f3a-a626536c040mr136947366b.67.1716559917159;
-        Fri, 24 May 2024 07:11:57 -0700 (PDT)
+        bh=bzH9/kd4g2Cv9SF58a2TQf0rXcjP1nTT2vaKMFNbqB8=;
+        b=GnqUV1CXaczUv/j281bT5bSjLKUIN17x3/xUTF18EHn1FTz22DmHLpGXbj0CntADGo
+         CGm5UCVUPvqLbW/d26CZTFCUqkHvizGekQ1DoQEGqrhqimJwDVxMt7MYnJ4qwbszSQ/P
+         JD9DPzQjLLrvdRzRGx4y41CqfmuzgYDPDYaMrYZVG1VUOa3+D3hopweodeJ/YKG0/SeB
+         L71I4Y1lLeQnQe5A4NPfgH2/PYWyjiebaTHk0A3fJuaEx5KweVGugBjj8pbVIbHcr8FE
+         w46OkbPHIISMuoxx9xnxAO0+3V3kU7ljnWEZ8hpiNDRxnWKTlOSi1+sfLoqJAWIsF3yf
+         4k1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV/NdVBmQtomklKCqlgPszzJXDs2S2YPN49QQGwJEYoy1H7Op8P9xZS2DXhleMScYdljDbjcTHoHpnWDKa6lNjpROX2vOsn
+X-Gm-Message-State: AOJu0YzoYjV5rGIFoJ1GRTynuYMG0UBGy6OVHgpiFeSQn/K5e1x4GKBO
+	hU2FqAHtbXBSUXfAqbXVem6FE3lx0nEaRRZ+pEhl7CvKpooou/clI0ukO+RudJ0=
+X-Google-Smtp-Source: AGHT+IGW2my8QyFWm1svam7c8xLj4ilWKCOALaSOb4lBdLbBSSDNHKB6XgBLJ47V+U2VDEkOGE8lJA==
+X-Received: by 2002:a17:907:170c:b0:a59:efd3:9d with SMTP id a640c23a62f3a-a628cd3826amr25637766b.58.1716560116405;
+        Fri, 24 May 2024 07:15:16 -0700 (PDT)
 Received: from [172.20.4.8] (92-64-183-131.biz.kpn.net. [92.64.183.131])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a626c97a429sm137597466b.97.2024.05.24.07.11.56
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a626cc8da2asm138130466b.179.2024.05.24.07.15.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 May 2024 07:11:56 -0700 (PDT)
-Message-ID: <4635a45e-7e49-4ffb-a769-8a5dd8095ae6@blackwall.org>
-Date: Fri, 24 May 2024 17:11:51 +0300
+        Fri, 24 May 2024 07:15:15 -0700 (PDT)
+Message-ID: <984f7580-890d-4644-b8ad-144505a882e4@blackwall.org>
+Date: Fri, 24 May 2024 17:15:14 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,47 +76,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf 2/5] netkit: Fix pkt_type override upon netkit pass
- verdict
+Subject: Re: [PATCH bpf 3/5] netkit: Fix syncing peer device mtu with primary
 Content-Language: en-US
 To: Daniel Borkmann <daniel@iogearbox.net>, martin.lau@kernel.org
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, Joe Stringer <joe@cilium.io>
 References: <20240524130115.9854-1-daniel@iogearbox.net>
- <20240524130115.9854-2-daniel@iogearbox.net>
+ <20240524130115.9854-3-daniel@iogearbox.net>
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240524130115.9854-2-daniel@iogearbox.net>
+In-Reply-To: <20240524130115.9854-3-daniel@iogearbox.net>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 5/24/24 16:01, Daniel Borkmann wrote:
-> When running Cilium connectivity test suite with netkit in L2 mode, we
-> found that compared to tcx a few tests were failing which pushed traffic
-> into an L7 proxy sitting in host namespace. The problem in particular is
-> around the invocation of eth_type_trans() in netkit.
-> 
-> In case of tcx, this is run before the tcx ingress is triggered inside
-> host namespace and thus if the BPF program uses the bpf_skb_change_type()
-> helper the newly set type is retained. However, in case of netkit, the
-> late eth_type_trans() invocation overrides the earlier decision from the
-> BPF program which eventually leads to the test failure.
-> 
-> Instead of eth_type_trans(), split out the relevant parts, meaning, reset
-> of mac header and call to eth_skb_pkt_type() before the BPF program is run
-> in order to have the same behavior as with tcx, and refactor a small helper
-> called eth_skb_pull_mac() which is run in case it's passed up the stack
-> where the mac header must be pulled. With this all connectivity tests pass.
+> Implement the ndo_change_mtu callback in netkit in order to align the MTU
+> to the primary device. This is needed in order to sync MTUs to the latter
+> from the control plane (e.g. Cilium) which does not have access into the
+> Pod's netns.
 > 
 > Fixes: 35dfaad7188c ("netkit, bpf: Add bpf programmable net device")
 > Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: Joe Stringer <joe@cilium.io>
 > ---
->  drivers/net/netkit.c        | 4 +++-
->  include/linux/etherdevice.h | 8 ++++++++
->  net/ethernet/eth.c          | 4 +---
->  3 files changed, 12 insertions(+), 4 deletions(-)
+>  drivers/net/netkit.c | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
 > 
 
-Interesting find, looks good to me. :)
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
-
+This one has unexpected behaviour IMO. If the app sets the MTU and we
+silently overwrite, then it may continue working and thinking the MTU
+was changed leading to unexpected problems. I think it'd be better to
+keep the MTU synced explicitly (e.g. when set on main device, then
+set it on peer as well) and error out when trying to set it without
+the proper capabilities.
 
 
