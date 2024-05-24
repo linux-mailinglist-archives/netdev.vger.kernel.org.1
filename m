@@ -1,97 +1,101 @@
-Return-Path: <netdev+bounces-98022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 172FF8CE96D
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 20:23:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C8258CE9F2
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 20:34:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 488551C20A84
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 18:23:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B03CF1F24CB8
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 18:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402843BBED;
-	Fri, 24 May 2024 18:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BACBF42ABD;
+	Fri, 24 May 2024 18:32:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X5BObF1N"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZBNDhN4m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69B43BBD9
-	for <netdev@vger.kernel.org>; Fri, 24 May 2024 18:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE7141C85;
+	Fri, 24 May 2024 18:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716575010; cv=none; b=dGxZyXbKCLQTCtQHUCIYpTOAJ9o7broA2EoSs6ZDUN9a7m2auRDuadXAlI8pSaDoCJ1dZe/iip86Ck9pJQxn/EPU0qvIWt7f1XbqmNVGzYbf0I1Y1N1tI+Bl7fbnkoxbMG4QjMRz88zifp+wkUjklKE8RHnCSVZdscq/V5cgj0w=
+	t=1716575535; cv=none; b=m+uzyGfEmiwDN4NWtGl06CngDHXH1nEiDC7ntx609UJUTKffBDc7RCcRwst8BdGFLhl+YWr9aIBZlWTEqgdvoR/Skp2hJTZvx/RE3PUKn3pRBmM0dSttOgWsmiSj5IStrKkc4jqIij9g63i8vehDi6QpkXf2DFCf35m5IAJtfvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716575010; c=relaxed/simple;
-	bh=ssaZ2ZvQLO2+x5T1AnbVNh8qvDSMflzkHf9RSXN9t7A=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Mu4SxZj55DU9oPhZY+RyLEH4I96mJKf3zeAguPHgTD5btQDTp+iH95L5iAvTDlpS0Yz6CNm6czZtXNJWNpoSVKqRWx5+EoTqQ9X6OwigYA9eVSkKh3UGXLUW7q48QXJVMH9E9Rmi6KXcjd6V3zonLEDduUR/eUBP52z/7YvvSp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X5BObF1N; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2bf5bb2a414so1151924a91.1
-        for <netdev@vger.kernel.org>; Fri, 24 May 2024 11:23:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716575008; x=1717179808; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OAohSQ62YVirLGMyGzfikcZH1eASapmzNWEJeAHAMIA=;
-        b=X5BObF1NxsgwRyZUMc93SiZ01l/yY/SpIGfivOLmUMtgGnXEAEmAnCUeLiNET//BMi
-         qqSbU5SGf+J8q9N2iXSgxi2sRKPju6PryXUzYYDCmufWVy5t7pIY8AbE886bgQuJHtPu
-         CeYpj7kRS9J6WXRzGWAjra2WlpUMLHss7Pfsz4bO5bG/bsU+ZV6FBb6DOMLf9pJVieGJ
-         FrTo1uzhk10kwg4shXLqCsjoBocVxddW7EU032pYObwPVaIHxF9RSjConOOjmbz4O4Hm
-         Za8kmOm3hfbv3Vil/FpxEnQ7y+1+tHHXO+LFnkbiN18+rsYveImAOfmXjvGdO9jkcIoL
-         JfYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716575008; x=1717179808;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OAohSQ62YVirLGMyGzfikcZH1eASapmzNWEJeAHAMIA=;
-        b=hxsHD+MOXtaeJy/Uxe3t0VMad8b02evqNGb5BPyoSOEA1iW2pz0ZQB/7LsKmq7WEnI
-         xHqkGRNmFRVczsopeFEPslwUDJ0pGDaT0tZIUYo7qpX65qwSvJaFp/qhAO/Vmktt0sxr
-         8mOuYHYxw9ErDW93TZ1L6fGOMw1vswaQ3pfbBnv4Img/kVlWRH23H0zqPj3B64hy9xZZ
-         fU4+ugvwSUFxu8nMbJqjkFIX1kcG+/sCvSxT7vMQdjsCmfJM2Yvr+TdpzJYO4dMXmLdX
-         QtDGJo0FxaFu9nnFoHrzhFUkMDM5tcuok/87zBXAYNatpuk98iae8NUFx7Fqq3KINVcN
-         e9OA==
-X-Forwarded-Encrypted: i=1; AJvYcCWcrp6Q4JpB9JuN72RJ74URfnCHFqtGl9QL63f2lQ8BoRwtJKqsR1m6nJhwVKMPYBYFWG5VXFTsO8br9hVvnqNllg1OsKvw
-X-Gm-Message-State: AOJu0YzGrfp1uDiiXF11DIXUuFo5XeBk/CW2GxC+PCaz8dLNwzBj9GX0
-	3OoNC8BFGlZotUYmrgowt40RBqtRDyEN1SQF31k7Wdhb0VsiUQhhSQeT5sqTZdvoxQ==
-X-Google-Smtp-Source: AGHT+IHzDvKhdXYqjAO0NqxWnqhEY3Nbf+Yi1HEclwUlPxnuo1q7VEycBUlP7Lw6z9KNCM7cruACNwc=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a17:90a:ec09:b0:2bd:e2fd:a084 with SMTP id
- 98e67ed59e1d1-2bf5f407ca9mr7606a91.6.1716575008161; Fri, 24 May 2024 11:23:28
- -0700 (PDT)
-Date: Fri, 24 May 2024 11:23:26 -0700
-In-Reply-To: <20240524163619.26001-1-daniel@iogearbox.net>
+	s=arc-20240116; t=1716575535; c=relaxed/simple;
+	bh=ZDW6n8R+BbYSZWdXmek/HnmZttNw+oIvTXE643uclug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IBB7v3MZp6cuFpgSbcwxh+lznojv0HHHE5ZNMt3mqKQa/G9hNTiyTpXJ+YBRPk+WwLCsHJWb2uXC15CqohFz0VMxLWNaRSkV3bUDJ8l8me7wnfRd4myt4Ly43tifRzH4geqvtQxdhxM8XCe88/qDlonN5fzLbtiLhv3eFePDaE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZBNDhN4m; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=K03GNtWVmJPKVVQMTb7a854Ol2QjAiRCHfbNxrRekzI=; b=ZBNDhN4mHvJ+uJ7Nn43x5PtElC
+	zwBeXSm6fuQRM4NIbuYbs9Kl7sLYc+iR+wt45j4h7nP19aW5ivLR03hIftzsQLAEZhRvWh+1xR7iX
+	PZMUtXY2lqOGXzjbZ90YrnzQ+QS4Wddd3IHXLoojOMBK5ApH7u5Y6nSWOG5axhfStUWI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sAZhp-00FyHj-J9; Fri, 24 May 2024 20:31:53 +0200
+Date: Fri, 24 May 2024 20:31:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
+Cc: Parthiban.Veerasooran@microchip.com, Pier.Beruto@onsemi.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
+	linux-doc@vger.kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, Horatiu.Vultur@microchip.com,
+	ruanjinjie@huawei.com, Steen.Hegelund@microchip.com,
+	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+	Thorsten.Kummermehr@microchip.com, Selvamani.Rajagopal@onsemi.com,
+	Nicolas.Ferre@microchip.com, benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v4 05/12] net: ethernet: oa_tc6: implement error
+ interrupts unmasking
+Message-ID: <7aaff08b-a770-4d93-b691-e89b4c40625e@lunn.ch>
+References: <ae801fb9-09e0-49a3-a928-8975fe25a893@microchip.com>
+ <fd5d0d2a-7562-4fb1-b552-6a11d024da2f@lunn.ch>
+ <BY5PR02MB678683EADBC47A29A4F545A59D1C2@BY5PR02MB6786.namprd02.prod.outlook.com>
+ <ZkG2Kb_1YsD8T1BF@minibuilder>
+ <708d29de-b54a-40a4-8879-67f6e246f851@lunn.ch>
+ <ZkIakC6ixYpRMiUV@minibuilder>
+ <6e4207cd-2bd5-4f5b-821f-bc87c1296367@microchip.com>
+ <ZkUtx1Pj6alRhYd6@minibuilder>
+ <e75d1bbe-0902-4ee9-8fe9-e3b7fc9bf3cb@microchip.com>
+ <ZlDYqoMNkb-ZieSZ@minibuilder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240524163619.26001-1-daniel@iogearbox.net>
-Message-ID: <ZlDa3Wk0djxSd2AW@google.com>
-Subject: Re: [PATCH bpf v2 1/4] netkit: Fix setting mac address in l2 mode
-From: Stanislav Fomichev <sdf@google.com>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: martin.lau@kernel.org, razor@blackwall.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZlDYqoMNkb-ZieSZ@minibuilder>
 
-On 05/24, Daniel Borkmann wrote:
-> When running Cilium connectivity test suite with netkit in L2 mode, we
-> found that it is expected to be able to specify a custom MAC address for
-> the devices, in particular, cilium-cni obtains the specified MAC address
-> by querying the endpoint and sets the MAC address of the interface inside
-> the Pod. Thus, fix the missing support in netkit for L2 mode.
-> 
-> Fixes: 35dfaad7188c ("netkit, bpf: Add bpf programmable net device")
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+> After a considerable ammount of headscratching it seems that disabling collision
+> detection on the macphy is the only way of getting it stable.
+> When PLCA is enabled it's expected that CD causes problems, when running
+> in CSMA/CD mode it was unexpected (for me at least).
 
-For the series:
+Now we are back to, why is your system different? What is triggering a
+collision for you, but not Parthiban?
 
-Acked-by: Stanislav Fomichev <sdf@google.com>
+There is nothing in the standard about reporting a collision. So this
+is a Microchip extension? So the framework is not doing anything when
+it happens, which will explain why it becomes a storm.... Until we do
+have a mechanism to handle vendor specific interrupts, the frame work
+should disable them all, to avoid this storm.
+
+Does the datasheet document what to do on a collision? How are you
+supposed to clear the condition?
+
+       Andrew
 
