@@ -1,264 +1,234 @@
-Return-Path: <netdev+bounces-98052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 532E08CEC92
-	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 01:03:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F16D28CED0D
+	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 01:55:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2E2E1F21D7B
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 23:03:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D3151F21997
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 23:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61D0384FB3;
-	Fri, 24 May 2024 23:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759AF158862;
+	Fri, 24 May 2024 23:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QtBQLjnQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RyFiXJw2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A422CA5
-	for <netdev@vger.kernel.org>; Fri, 24 May 2024 23:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716591833; cv=fail; b=um58ybqQ87aOD1x8HYkBv3LQUwczHv9mmQQJViLmGk4+OipGL3mkpe0qtOSi4Aw4LZKjsY8C/cCzWAdo/dwgv02Zl8rYt2c7Du10bJJ2lcvikBn2bEWaRaCjXV+SUVIGmGMVI++k6W+Zi3yshSXgVPRzLT/yWEiAt++AFlbdLhs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716591833; c=relaxed/simple;
-	bh=bFpGq3vymOm1Eo52UeU7EJd3WKqZzQNFk1WJDodw8GM=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ibnXtXY+MALd4rDpPXlE5VPuky0Qdxebd/TxDjcUpe0C8NYUaIx93oOpuFVrmDLzUs0QmT2/tEwPWMcFfUFIcZy3JB6b3hFvDNyhCDQY+onh15DopkNCz7gJQcvz5dJtuN6yAvwdTJwBJf1YfvFcLmZDsMJFmI8ApBi/Gu+HUoc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QtBQLjnQ; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716591831; x=1748127831;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=bFpGq3vymOm1Eo52UeU7EJd3WKqZzQNFk1WJDodw8GM=;
-  b=QtBQLjnQFfdoGo73d2QrBPOZOy6y8/0sqBOfMCPgMuw/0ZfK3mx+YYK0
-   beMhWAZGVjXRYM4xFLL9uGpAW4WZJuibYSSub//oRWj5T65rAMDJdT6dv
-   i3nmciCpXRuYaTpW4pzcmAf9GnIZ3yTaQM+C5HDsmBrLO/JwEiYgJTyBX
-   va9ZtZ1h2lNt00eonlLfDFt5eEykdz5/NgqTm+XuGkpb4+NGft8qmhovY
-   cwc9N4KbcBlZZdgbf3CO6B+KA7I1rxioO8m45hYLv3vIPZ0+idAmBUzZV
-   ZbRY2N85d2I/nm1tBwsbVpn3xVcuIVbXPQH1uO4+xR8h70+yIEg/ZIJp1
-   g==;
-X-CSE-ConnectionGUID: IiVTCAmTRtqG90z90nQ88A==
-X-CSE-MsgGUID: TxiG9g1jSYOJQz282IprhA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11082"; a="12922664"
-X-IronPort-AV: E=Sophos;i="6.08,186,1712646000"; 
-   d="scan'208";a="12922664"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2024 16:03:51 -0700
-X-CSE-ConnectionGUID: yGhc4WTHQ+uqhzQr4Ed/xg==
-X-CSE-MsgGUID: nrCiHxsZQVywFtMTw4JTXw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,186,1712646000"; 
-   d="scan'208";a="64969038"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 May 2024 16:03:51 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 24 May 2024 16:03:50 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 24 May 2024 16:03:49 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 24 May 2024 16:03:49 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 24 May 2024 16:03:49 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XUrfLFsF8x3PSXS7afNwsINH5qR5vyc1bhdB0C76IQTrlAD86jt8SHxL9aXTAZBK3LZgX8gwzQ21bBX+xeMgCWzVk+tUhWbUZTanvA4hxbCc35HgCNQI9do2kFzo+YbgHoJc7LRX9OfIVUgBOGrx2gjqnWS6BcnrJK+dsB47v63IEgNxdvlkaAZKRe8YSej8CPRl7AdM9fjgmhfxoZKpxzTy0R71kWJoenEk39cnwRxNMZWsobCLfkhFCJ4Ra5qQpTSRKnTiBjx/C7bgFRFgTfT/6jpfuAb+RMEhwbQs0VU62Yw9M5PQ154i7uQsq3eS/ZVKfPrQWTNW4WRwgKyUXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=o/DTniqazigMcj3B0HtjbYRzvzCMp0kHDfBH+j6+Ki8=;
- b=Lu+qVzRdovFwJRCMoC2/DT7LifG/3XYKv9NMvYG/YCNa2y9cOv5T0xI27qrTLCyFSWrWHbqQR8x1XPsyTIB/jqtEXCIVFgcJWPWrxfnXBB7j+lZ38KcSe81jdhu/sH/NLZapF/Pk2FzhkeglYKEgAlJYCyylpTc8R8jLaUt4rYvYcMeD3xaT0zyB4Zsty2TgNjAx144odasK/kXocvzupv15Ezqf2HDNfUQA/ALVd2dRfXUgZkfsYwxS/b3vC2Uff8G8C9LSkfsGOvqgrzY7pHvS8vsRFerbTg61sFc8X0mUpwNIRlJPJZwETouqK/9APYWiSLKMaKTzeAcjFdhxzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by BY1PR11MB8125.namprd11.prod.outlook.com (2603:10b6:a03:528::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.22; Fri, 24 May
- 2024 23:03:47 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%5]) with mapi id 15.20.7611.016; Fri, 24 May 2024
- 23:03:47 +0000
-Message-ID: <2566823f-34b0-4c37-bf2f-fa5f1f31a7d6@intel.com>
-Date: Fri, 24 May 2024 16:03:45 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v6 1/7] ixgbe: Add support for E610 FW Admin
- Command Interface
-To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>, <pmenzel@molgen.mpg.de>, Stefan Wegrzyn
-	<stefan.wegrzyn@intel.com>, Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-References: <20240524151311.78939-1-piotr.kwapulinski@intel.com>
- <20240524151311.78939-2-piotr.kwapulinski@intel.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20240524151311.78939-2-piotr.kwapulinski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0245.namprd04.prod.outlook.com
- (2603:10b6:303:88::10) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8DB1292E4;
+	Fri, 24 May 2024 23:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716594893; cv=none; b=G42tcfohwhNtAMzWXAN0VIJPIyXScYhLtCkBV/4qpIqYXk7mIuyGo5vDZndkT4G7AbGSHiGtWpcD5WHCwyBWMK2HPIcfM5oyru4Rw3zJAixa0+0s/jv5eQHJ16ZdDvqIJZCKDGlcCDpLpv7dN5uk7q68ptItN6ceIwWpelh5d7M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716594893; c=relaxed/simple;
+	bh=9DnuW1gDNSGDKpcsuZLDlVt/2NqfQfe1GpK00VwMA8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mbxwbd20uqGZpMhq4mz7WYQPNeds9ETNy0p9IxWoul1axhj2FWWs8u39ydjR0G+smohMFT9IjVuJP4S/YNiGbJd+8zC5WZUo+UX2J4zK5JdpErkSpuVzepZyeOu1J1F0alZLWzsbZr5FykWb/x/J0EUhryX8MByQtLDGmAueLQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RyFiXJw2; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2e95a60dfcdso17235511fa.1;
+        Fri, 24 May 2024 16:54:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716594890; x=1717199690; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=C88HQP5ECIo5q+E9ZVdMutmLc/H0bpLfC6cu4zCL6Cc=;
+        b=RyFiXJw2ddj/qwUW8y7QNZr0Y0nppwcrRfVYSg8e4HjJ0HiImnes9sntGDHH9+gEB5
+         tsQ+bde4puckeSy70ro8QYQm00Bblssc10e6Kj48YoSAvayWPbIqtAGfoldgjDfQVRNQ
+         qnPipqsnmVz/aepwyS8OPaM3lmMMf6lC4dZdRdLtDljeIyZslLC0cfgAQEsWV67LL7Dp
+         A5KhBZ/zq5re1jL5ocdWCKZG83cghC83IXyZiobLa9WknmVpFuk39r5yMwK4hGj3YsNf
+         JqUN+vBYSRJosCuvYvBOHxy1+8+2zkF44BMue8igE5UokW3NhKbcN3VaLA35VlCsV6q/
+         mufA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716594890; x=1717199690;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C88HQP5ECIo5q+E9ZVdMutmLc/H0bpLfC6cu4zCL6Cc=;
+        b=VzoKmSTa2Wlu6BSD0pmz4opgofIFNeARrRADMlI06gIFMHdyBxIIFR28s1a1hk4U6A
+         76snWm7OMrjW07i+ziDGRvHXEgmZQ30jQxeJd6y9YVi5SsMY024PExRp9wGMWNz89ZDP
+         sKJPWagNz7rXEj/C440JJCXaJlBaqoFWVEJrjTLTBXBGK+2nNFSp3PqShfL0VhmDlj/f
+         lKKRd3cJDH5lE0atGul3H5Nc+DmVInR/YPEV96vRdEAVbmc89pHYr3YUQK1BFzWldr46
+         Czy2pNJWmWcbupedUwtar72ygJi4ZqjwsWdcLmEtfmjxGgFCUgGmHh4/22Gfiqt46JHZ
+         LLxw==
+X-Forwarded-Encrypted: i=1; AJvYcCWmFvdeWZPzPOT1Ati3rPI+PcvA7R7Clrh3Eka2OWdyr8T8a39K6rvTB65wx3wWPYQTaFiCWLl/78AQ2SkhrIgB8l2s/xw2ArL3F3/7igjg8vffyiioqND+7exi
+X-Gm-Message-State: AOJu0Yy8mvdn0qnObB0oFH+mR5hCL5sabSTCED+wljUsrEWeK7dzgfY6
+	7d4FFN++sqDv+ILlUsBWlmgYHvBnRVzhGmoCg2qx9mh8XYrZzEGV
+X-Google-Smtp-Source: AGHT+IGPDifZXrabnPpbv6zVtd/c3VSXjEPZ2PEC19yup66VheQQcXkaOsrXspa9CrV/nawuWkBEsA==
+X-Received: by 2002:a05:651c:222:b0:2e6:f3af:c6aa with SMTP id 38308e7fff4ca-2e95b28aeb0mr24028551fa.40.1716594889276;
+        Fri, 24 May 2024 16:54:49 -0700 (PDT)
+Received: from mobilestation ([95.79.182.53])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2e95bcd7bbcsm4020781fa.32.2024.05.24.16.54.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 May 2024 16:54:48 -0700 (PDT)
+Date: Sat, 25 May 2024 02:54:46 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Jose Abreu <joabreu@synopsys.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH RFC 0/6] net: stmmac: convert stmmac "pcs" to phylink
+Message-ID: <5c5xphkjbadimi3y3wzvv2hhlancxiwdtnikgl6pdv6jbbfmqu@tmfnjuxyygud>
+References: <ZkDuJAx7atDXjf5m@shell.armlinux.org.uk>
+ <y2iz5uhcj5xh3dtpg3rnxap4qgvmgavzkf6qd7c2vqysmll3yx@drhs7upgpojz>
+ <ZkKghpox1r6ZqtyB@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|BY1PR11MB8125:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2c0b12fd-ad52-42c8-e961-08dc7c45c417
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|1800799015|366007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?d2hTRis0YWRPT2tiREd4Q2prdVRIME81NlN2WHZNcmhKRUFtWDBPSjJ3cUsx?=
- =?utf-8?B?Q2E3bERrdCtpNDN1RkowS0ZQejkzclNiejdSVVFWYjNJZHBNNHVtR0Rtd0lL?=
- =?utf-8?B?eGxtQWgvaklDV0pFNkVVcVB6S3A5WE5lRkpxSWVrYUNYaFZzRkp3YWE2T3R5?=
- =?utf-8?B?OXNCOU1SdCtVQ3ZWbXQzNDZQRW1QOGxaODNVNXN0eXBXQjRHQVZXcGpLbVVZ?=
- =?utf-8?B?Si9hVit6NC9Lb0dQaDhIbElJZTFXRDdmOFdMcno4T1IyaEZ4Mm11aWpqMy9t?=
- =?utf-8?B?aUtvYm9hdDBIalhmQVJ5eDhUZ2IyWXhqejBacFJPTlMwTmV6UnFUNStQMmZp?=
- =?utf-8?B?bkdLK25IbnE4ekRYSDQ1Z21JREh6T2pLKzQzNXVJajhZb2ZQMG1DeWpEVjRt?=
- =?utf-8?B?OEg2aFFtWmRWaS8yRUpPSGhTeFFrd2NKUE44eTNEamMrK2IrRXRvTlVIbW83?=
- =?utf-8?B?R0RyazRkdzVXRms2NXVkMmxSUU1oMWR6NFVTUmZNanRXeDdHZStCcEJHK3hy?=
- =?utf-8?B?N0xqSUo0OCsvMGIyVUo3KzBCZGNacmNFYSsxc2NGNlBmNThMeEY1dU5zbHl3?=
- =?utf-8?B?UlAyZ1JOYUxRN2U2UXo3bVlrWlg3cmc4bVJUcWRUNDRIanRON0xPRk1ER29l?=
- =?utf-8?B?VVVESmFCQVFva2xDcU9WL1ZZVjF0YkhWZGtVYmpRZWx6QXFrRDBmWlJ3OGdu?=
- =?utf-8?B?d2JOcjZTMlBJbzNsT2FxTHZNdzNTVUhsYW5nL1ZNWmRlSFZMM2E0WXkyS3hz?=
- =?utf-8?B?bEVWODZUQWhoblAxOG1NRG9UY2lPRUlkcG8yUVl0QWhDdDcweFJ6UkUvc2JH?=
- =?utf-8?B?RWNQWFQ0MHErZUdmUmZMQXZRaUpRUVRVOFVqVXhxaDlwNHV1TVBlZnYrMUlI?=
- =?utf-8?B?NUlDajhTSVhYYUZTNFNSTENNWnRLNGlJOXdNUHRwdHBEOTk1UHJmS0drV3dL?=
- =?utf-8?B?ZWwwSWMxcDFBMENUN0NERjU3cnF3MGVqZHYycnZXeDRkVkdBbTUwajU4eHVZ?=
- =?utf-8?B?MlVCbjk1eitaR1drVTFPK1UraHRZcnJNbmdwc2k0Mjl0U2JIQWx0czl1MHZ5?=
- =?utf-8?B?aXVVSVdaSTV0TzlnbVIvbkNFUEZxUUs4MFBrT3JKV2lKUHBpQlZWdG5vN0Zt?=
- =?utf-8?B?MDBGNlB1SldDd214NHNhRy9ndjVEelNWNEhkaDk4TW5SRTcvb251aWRGVVo2?=
- =?utf-8?B?YkwrNUw5ME9aak1ObzNnT2tBR3FoV21Gd1UyT2Y4bWowYTJBZmYydjlrNVh3?=
- =?utf-8?B?MG51aGxXdHhWM2ZyUjkwSnZTcGJzWnNRajdWdW1PSGI0UUNuc0IwLzg2UlZQ?=
- =?utf-8?B?elNQNCszT3NqNWJTdUozY0hFRlZtZEN5eEE4WkpmMUhrdzNwYzdIYURaZGE3?=
- =?utf-8?B?MmsvWXhqNUxzTWlmUXUwODRiOXhmaFJoajd5MWJkaFVFK0VhaWxZZzh6WUFP?=
- =?utf-8?B?WDFVNGIwODlVSWNxTnAzYVVLRnRWSHVPemNYckJONWFMMW1QclM3YjVLblVH?=
- =?utf-8?B?ZjhtRmtWRk0rUlg0bFV1dCtDRTllSmVsbHpwMzBqb2EyVVVmQ1Jmc3Frc1Yz?=
- =?utf-8?B?MEhjQzVoMEdUb3RrenFiS296NEttZmt5REU4WG12T3d0bVdFdHlJOXluZjdQ?=
- =?utf-8?B?dmZLSGdnZ3ZRSEx3ZTZCeEhEcnlFR0Q1eE9nSStzdFNwajFLZENxSTBDM2E0?=
- =?utf-8?B?Y2ExWUJFckZwZ25GdnErbkMxKzAzUXJhVGcycXg0SG5RSk56amFQYmV3PT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?elNKdGxINVBPK2U1dUZkVjRNZVIwR2hjMzFaZnlmQWtsWmsvQ0dkMEtlenVu?=
- =?utf-8?B?dDFrRGNZOCtieklJY0ZxR0p1YnpaY3hTWDhzQjFUWm1HZUU4dFRaRExUUkpy?=
- =?utf-8?B?OVl0MXV1cmczQm9INE1aNjRrY3NXK281QkZJZkJoZGpHZ2VNMWliMm95K3V4?=
- =?utf-8?B?Vmw2NWJhUnVLOUZ1ZHhGcFZaamt4am94YXN3cG81R3Vnb3REc2t3SERWbFNy?=
- =?utf-8?B?eDE4OU9hUUl1S2NzYTEydnpFT3o4N2tZYWt0bFc4b1dyay9tcTJ0czROZ3lk?=
- =?utf-8?B?TmJmMmYzakRLMEtCSGtYMTVoYTlta08xdnd4eXlra0p0SlR6VER0UjZjVzln?=
- =?utf-8?B?cXEzWXpPRXNkT1l1eGhURDJnTFdZRzVISGt5a1ZKQmlzL0s3NjBEWUEzekVk?=
- =?utf-8?B?VHFZM21nK1hLVDZrQm1kMzNNdDU2eDV0SWVtdTFaTFF6YXh1dHdCdVNsK09N?=
- =?utf-8?B?VTF4cnhOSUJmY25sV2dIQkwrcjdRMVRhNG1TZjRRaGF6YlBpVXpkQXJhM3h4?=
- =?utf-8?B?dzhxRlZMd2VuTTVXYyt1WUEzQVpKanVoYVdmOGFZVEQxUVZBRjdHMlNVTk1x?=
- =?utf-8?B?bHplemIza3ppblNWdTFsQmRoRk5LV1RiK1FpeXF0ZkNHeGsyOGxDaWZVNE9M?=
- =?utf-8?B?ODIrNHRzQkdscFRvQkhuN2VnQ0FZWHdyQ0VIdkZPU1ZIL3ZwMmxSTm9jNTQy?=
- =?utf-8?B?SjlBY2l5ZXNaVnloQkRVYUlNRkJSOWVSQVo5YlZETTFqb2p0VThKa1pBaTF6?=
- =?utf-8?B?bDVNRnNON29RNjV4bW1oSk1CRWRwYXVuWHVGZG9zazFONFoyc1lqT051TjJj?=
- =?utf-8?B?TUV6RE1WS1NsTDdiMTlZbjBKUllHTHdrRlhidWl2dEJRU3Bzb1NYME9wajhm?=
- =?utf-8?B?NTVhMDRpRURiZ0Facm1qVm1qZFJkem1tV1BVWURPK3JhRTNJR2o3SnBNb3Q3?=
- =?utf-8?B?SmEvUkV2Z1lkZCtrUklpVmE5SU1QQUZkNGMxR3V5MDdOblhEUkpQS0ppcit2?=
- =?utf-8?B?ZDNUQk9EdjlBMVNNV3FLZnEzV2dCaVpBWnJMWW13b3dpZFh6TWZuNmNvSWU5?=
- =?utf-8?B?VE5lTWVzNDdyK3hZWVFQZDQ4SjBtbHR0Um5LNDZFYWtUdXMyZFdSSE95YWRR?=
- =?utf-8?B?bnhvTnV0ODlSYXNHRTNHQmVGYU12SkZSYkRlQ3FTMWNRb01qQS9WQjducjhL?=
- =?utf-8?B?NmF4ZjBkS00xSDF4Q0JWNE1pS25DajM0d0hPY1FCUUZNb2FjT0JWYlBvdEcz?=
- =?utf-8?B?eGpCTmxoTnpxemJoZElBMkhwQlpyT0pRaVJoMlpaQm5ZU2lhT283ZCtDV2Vj?=
- =?utf-8?B?SE9rUml2TWhOT3k1bzVsTzhsNWxMS28xUVRXbnhSSkJNeHlmTjFoZ25EN0Nk?=
- =?utf-8?B?cDFPa2ZhZWVMSEhUSXdaVzcwR29tQjVvbElsM3NmQnljcmRuUTlzazhXeDRX?=
- =?utf-8?B?ZGxNLzVZL3pNZERsNXdoUjQvY0JxeDhhQkNOS1I5LzM0RWFWRWhrV0tETmtS?=
- =?utf-8?B?SzBEL0JsdHpIQVQzcXRnK3lJc2s1eWdCd0pUc1ArajRyR054dk10UXFUcHBW?=
- =?utf-8?B?eG9xRFlrUTJOR0ZWc1JuM0hUd0hxMDkrR0g0TGxmYzZmeGZOUHQyb2lZUEw2?=
- =?utf-8?B?b1c4UkxPSEhOQ3psaE1BNEQyRlFUTjJyN3V0c2tHL0daWnpMdHZld2VtRHZl?=
- =?utf-8?B?YlFpUUxxNU1SWllITTI1NHhCWDgxQVN0RzBGSC82NTk4SDBWRG1Mb2xVMVdw?=
- =?utf-8?B?SkRGN1JKWWY4WVhhVnIveHNjUzcrYnhqaXk5Ni8wRUJPU1J5YzBGSnBvZVhw?=
- =?utf-8?B?RDZjdVpWS1laM0w4VnYxVnAzbDFFUXVNN0xQcEE3OWZFUzdSUHltWnBnamQv?=
- =?utf-8?B?Tm96Y0lLVEFWaWhiVFN6MnpMNG0rUWM2YldqMEtaSXhUR1VOZ0hzc0RjNVpY?=
- =?utf-8?B?QUxWVWVGY2YwS2xkK3BLa1NBVUVtMmYwRVVSMFFrR1FXQ3RkSFh4TjMxNDY2?=
- =?utf-8?B?NHFxS3h6dUVhK3dOYWN3ZWczck9yNEtRbnJ0TUJCck52WXQwbWtrWmtXQ1Zp?=
- =?utf-8?B?TTMxYXZDNGpqODluNWZtYVh6ZS9EZFlPN21HZjE0VDJYMnpWblp0dlBwTGxx?=
- =?utf-8?B?bno4Vm9yU2FyRElQNGFQcGQ5WHNZYTEvaU1jNmhhdmthRGdUZEpCN2FSODZ1?=
- =?utf-8?B?WlE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2c0b12fd-ad52-42c8-e961-08dc7c45c417
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 May 2024 23:03:47.2814
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0NmTZ+deFQ0DqNHqMMpnoi2ja+1ZvyVIio0DSPPBEzFYwXTuUCJYKDz3oDDE1qTxdQHdosURyEQXo3SLgNLfMTi0iaKURMC5TtH9V3rqPwc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR11MB8125
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZkKghpox1r6ZqtyB@shell.armlinux.org.uk>
 
+Hi Russell
 
-
-On 5/24/2024 8:13 AM, Piotr Kwapulinski wrote:
-> Add low level support for Admin Command Interface (ACI). ACI is the
-> Firmware interface used by a driver to communicate with E610 adapter. Add
-> the following ACI features:
-> - data structures, macros, register definitions
-> - commands handling
-> - events handling
+On Tue, May 14, 2024 at 12:21:42AM +0100, Russell King (Oracle) wrote:
+> On Tue, May 14, 2024 at 02:04:00AM +0300, Serge Semin wrote:
+> > Hi Russell
+> > 
+> > I'll give your series a try later on this week on my DW GMAC with the
+> > RGMII interface (alas I don't have an SGMII capable device, so can't
+> > help with the AN-part testing).
 > 
-> Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-> Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-> ---
->  drivers/net/ethernet/intel/ixgbe/Makefile     |    4 +-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c |  492 ++++++++
->  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |   19 +
->  drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |   71 +-
->  .../ethernet/intel/ixgbe/ixgbe_type_e610.h    | 1061 +++++++++++++++++
->  5 files changed, 1641 insertions(+), 6 deletions(-)
->  create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
->  create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
->  create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
+> Thanks!
 > 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/Makefile b/drivers/net/ethernet/intel/ixgbe/Makefile
-> index 4fb0d9e..e0444ae 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/Makefile
-> +++ b/drivers/net/ethernet/intel/ixgbe/Makefile
-> @@ -1,5 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0
-> -# Copyright(c) 1999 - 2018 Intel Corporation.
-> +# Copyright(c) 1999 - 2024 Intel Corporation.
->  #
->  # Makefile for the Intel(R) 10GbE PCI Express ethernet driver
->  #
-> @@ -9,7 +9,7 @@ obj-$(CONFIG_IXGBE) += ixgbe.o
->  ixgbe-objs := ixgbe_main.o ixgbe_common.o ixgbe_ethtool.o \
->                ixgbe_82599.o ixgbe_82598.o ixgbe_phy.o ixgbe_sriov.o \
->                ixgbe_mbx.o ixgbe_x540.o ixgbe_x550.o ixgbe_lib.o ixgbe_ptp.o \
-> -              ixgbe_xsk.o
-> +              ixgbe_xsk.o ixgbe_e610.o
->  
+> > Today I've made a brief glance on it
+> > and already noted a few places which may require a fix to make the
+> > change working for RGMII (at least the RGSMIIIS IRQ must be got back
+> > enabled). After making the patch set working for my device in what
+> > form would you prefer me to submit the fixes? As incremental patches
+> > in-reply to this thread?
+> 
+> I think it depends on where the issues are.
+> 
+> If they are addressing issues that are also present in the existing
+> code, then it would make sense to get those patched as the driver
+> stands today, because backporting them to stable would be easier.
+> 
+> If they are for "new" issues, given that this patch series is more
+> or less experimental, I would prefer to roll them into these
+> patches. As mentioned, when it comes to submitting these patches,
+> the way I've split them wouldn't make much sense, but it does
+> make sense for where I am with it. Hence, I'll want to resplit
+> the series into something better for submission than it currently
+> is. If you want to reply to this thread, that is fine.
 
-This has conflicts with the work to change the Makefiles to use -y
-instead of -objs, which results in being unable to have the NIPA
-automation validate the patch before I apply it.
+I've just submitted the fixes for your series
+https://lore.kernel.org/netdev/20240524210304.9164-1-fancer.lancer@gmail.com/
+which make it working well on my hardware: DW GMAC v3.73 with RGMII
+PHY interface connected to the Micrel KSZ9031RNX PHY. (For a lucky
+coincident the PHY happen to support the link status sent in-band up
+to the MAC.) So as long as the managed="in-band-status" property is
+specified the PCS subsystem gets the link-status by means of the
+pcs_get_state() callback. The status change is signaled by means of
+the RGSMIIIS IRQ.  For that to work the Patch 2 of my series was
+required (and of course Patch 1 which prevents the IRQs flood).
 
-Could you rebase this on top of the current next-queue dev-queue branch?
+I'm sorry for submitting the series only today. First I had to dig
+deeper into the way the RGMII In-band/PCS-block of the controller
+works. Then I needed some time to study the STMMAC PCS-code and to
+debug the problems fixed in my series. So I finished testing your
+patchset on this Monday. Then I decided to spend sometime for making
+the PCS implementation looking more optimized based on the knowledge I
+gained during the debugging. But as it's normal for the STMMAC driver
+(which sucks indeed) a few days wasn't enough for that, because due to
+the driver being overwhelmed with duty hacks any more-or-less invasive
+refactoring may lead to regressions here or there. So I stuck right at
+the first step of getting the "snps,ps-speed" and the MAC2MAC mode
+well implemented...(
 
-Thanks,
-Jake
+Anyway here is the key points regarding the RGMII In-band and
+PCS-interface implemented in the DW GMAC and DW QoS Eth
+controllers/drivers:
+
+1. Intermediate PCS for which the plat_stmmacenet_data::mac_interface
+field and the "mac-mode" property was introduced isn't the case of the
+PCS embedded into the DW GMAC and DW QoS Eth IP-cores by Synopsys.
+That was some another PCS likely specific for the Altera SoC FPGA
+platform (dwmac-socfpga.c).
+
+2. RGMII: There is no any PCS-block utilized in case of the RGMII PHY
+interface (that's why HWFEATURE.PCSSEL flag isn't set). The networking
+controller provides a way to pick up the RGMII In-band status
+delivered from the attached PHY. The in-band status is updated in the
+GMAC_RGSMIIIS (DW GMAC) and in the GMAC_PHYIF_CTRLSTATUS (DW QoS Eth)
+registers and signalled via the RGSMIIIS MAC IRQ.
+
+3. SGMII: The interface implementation has a PCS-block so the
+HWFEATURE.PCSSEL flag is set. But the auto-negotiation procedure
+complies to the SGMII specification: no ability advertisement. SGMII
+PHY sends the control information back to the MAC by means of the
+tx_config_Reg[15:0] register. MAC either acknowledges the update or
+not. The control information retrieved from the PHY is reflected in
+the GMAC_RGSMIIIS (DW GMAC) and in the GMAC_PHYIF_CTRLSTATUS (DW QoS
+Eth) registers. The only AN-related CSR available for the SGMII
+interface are GMAC_AN_CTRL(x) and GMAC_AN_STATUS(x) since no
+advertisement implied by the specification.
+
+4. RGMII/SGMII/SMII: Note CSR-wise the tx_config_Reg[15:0] register
+mapping is the same for all of these interfaces. It's available in the
+GMAC_RGSMIIIS (DW GMAC) and in the GMAC_PHYIF_CTRLSTATUS (DW QoS Eth)
+CSRs: in case of the DW GMAC it's GMAC_RGSMIIIS[0:15] bits, but in
+case of DW QoS Eth it's GMAC_PHYIF_CTRLSTATUS[16:31]. (This info can
+be useful to create a common dwmac_inband_pcs_get_state() method
+implementation in the stmmac_pcs.c module.)
+
+5. TBI/RTBI: It has a traditional auto-negotiation procedure fully
+complying to the IEEE 802.3z C37 specification with the link abilities
+advertisement. RBI/RTBI don't imply any in-band link status detection
+so the GMAC_RGSMIIIS (DW GMAC) and in the GMAC_PHYIF_CTRLSTATUS (DW
+QoS Eth) CSRs aren't available for these interfaces.
+
+6. RGMII/SGMII/SMII: In order to have the Link Speed
+(GMAC_CONTROL.{PS,FES}), Duplex mode (GMAC_CONTROL.DM) and Link
+Up/Down bit (GMAC_CONTROL.LUD or GMAC_PHYIF_CTRLSTATUS.LUD)
+transferred from MAC to the attached PHY or to another MAC via
+tx_config_Reg[15:0], the GMAC_CONTROL.TC (DW GMAC) or
+GMAC_PHYIF_CTRLSTATUS.TC (DW QoS Eth) flags must be set. Just a note
+seeing the current PCS implementation doesn't do that even in case of
+the fixed Port-select speed setup (when snps,ps-speed property is
+specified).
+
+
+Based on the info above I was going to extend your stmmac_pcs.c module
+with the inband link status (retrieved via the tx_config_Reg[15:0])
+parsing method; create more basic PCS-ops in the framework of the
+dwmac1000_core.c and dwmac4_core.c modules, and the common
+phylink_pcs_ops in the stmmac_main.c module using those basic PCS-ops.
+But as I mentioned before I was stuck on the fixed Port-select speed
+implementation. It's activated via the "snps,ps-speed" property. If
+it's specified the AN_Control.SGMRAL flag will be set which makes the
+SGMII interface working with a fixed speed pre-initialized in the
+MAC_CONFIG.{PS,FES} fields. First of all I wasn't sure whether the
+MAC2MAC functionality it's utilized for, can be applicable for
+non-SGMII interface. Secondly the port speed fixing is performed
+behind the phylink back. It's possible to have the speed setting being
+updated later in framework of the mac_link_up() callback. So I have
+some doubts that the current "snps,ps-speed"-based fixed port speed
+implementation is fully correct.
+
+That's the stage at which I decided to stop further researches and
+sent my series of fixes to you.
+
+-Serge(y)
+
+> 
+> There's still a few netif_carrier_off()/netif_carrier_on()s left
+> in the driver even after this patch series, but I think they're in
+> more obscure paths, but I will also want to address those as well.
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
