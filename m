@@ -1,77 +1,50 @@
-Return-Path: <netdev+bounces-97954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCC418CE4DD
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 13:31:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 882B28CE4EB
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 13:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F3001F21643
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 11:31:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2966A1F21B39
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 11:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137C784FA7;
-	Fri, 24 May 2024 11:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6083386242;
+	Fri, 24 May 2024 11:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ccx6URR+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f/t+YlXf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5C29475;
-	Fri, 24 May 2024 11:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346C2433A4;
+	Fri, 24 May 2024 11:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716550309; cv=none; b=gQum9D1PQyGm1GkYBUZwT0kfWshL5KropXd1mjaJWY0ljfXXOjRpTXlSPzGlvcK209BRaB0OvoliO9a/+w5s74mbwcQHHfs0oHYgFtmU0uZx1kxV4PFSKkiHm+3ai9jAY5UlNny8n3h2z7yEOCsW3aeNiR6OF9Zu/A2V3s8T18o=
+	t=1716550830; cv=none; b=OPHh0AeaRyJqZtpQVRN94JdJRc9ZssSqb5hdG9jznXmfJtuVZ4sNbpwVKuMOsneTGLcszc/2GUEIHyRsgVInbtwiyKDGBdi8wr7OLaDUWQUGPxTulZK+EgsW8wtriyJk10mxGEdrfDuhwNhs5ynNLqfmKJTSmzfC5Ss5Yg3dkcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716550309; c=relaxed/simple;
-	bh=4LBvQetF7IAlYlAy82ZKXQGvBJrIruYN4l+FdhPRo9w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WRlVrxzBlFHOTQ2WxHCfqEwQ1ey6OEct0aiaLA5WgXP/U8kVWNGuLGhj8f7ovi2KGsPuvlDp6+Qj+StuUjt+aSbJ07lUGohhvzLC+Lp0BJNzlNHMvcEoiF+/9C/0IB+JkMglqupLA0rQlzs+SlQBEXFaRE2V14oWWRXnjq3t3kA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ccx6URR+; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716550307; x=1748086307;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=4LBvQetF7IAlYlAy82ZKXQGvBJrIruYN4l+FdhPRo9w=;
-  b=Ccx6URR+0/PFlO5Oi0HFar46OGN8+NDZoFhUPE4AoKv+LUGrRo/xNAHR
-   IL7xkrudYYTck6uFd2FUq16jEAVZuJRFaQ7y23y8Fv7DZyt06iw+vB4as
-   pIg7RiXuFROyV5R4Grx5UwPsNMrCk/qEHyqLflV5bZCSjzoIAV/l8oL/T
-   +8S3M3ZH2vLcAeUqbjeZB7LjCMpCNCBVnuLy5UO0czpqIkLTjCu6k0MKZ
-   XoH8/EEpw5+6xWEC5OkVBpszY1hwDbscNvVCmsPaW78B8zaItZPu5h+Wu
-   JDN1ZqYe5OkORKZs56OuVaQN8cl754LdmsLwcifObwGGXDpKd5DNqQN2K
-   g==;
-X-CSE-ConnectionGUID: 8+O3WPpLRv60RzEBxqHjbA==
-X-CSE-MsgGUID: UF7FIWG7QUGbTWqGMC7ktQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11081"; a="12772021"
-X-IronPort-AV: E=Sophos;i="6.08,185,1712646000"; 
-   d="scan'208";a="12772021"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2024 04:31:46 -0700
-X-CSE-ConnectionGUID: MbmgJak5T4+/wMghuBMT4Q==
-X-CSE-MsgGUID: knQZ5qdJTr6hmbJRHeoo3w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,185,1712646000"; 
-   d="scan'208";a="38432250"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa003.fm.intel.com with ESMTP; 24 May 2024 04:31:44 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] page_pool: fix &page_pool_params kdoc issues
-Date: Fri, 24 May 2024 13:28:59 +0200
-Message-ID: <20240524112859.2757403-1-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.45.1
+	s=arc-20240116; t=1716550830; c=relaxed/simple;
+	bh=KQY3xqXY4b0WUCiY/yDkJ1BTG4PoCIuLFe0eHGjoJzs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=OX6H0Z8CLTF4lgt8AWpBYhkJre18ywknb3l4UaaAiaQkw1q1E83MvqVgtQypddUrd8VU4+4socbxshLDlgD53kmq+VdqXwGe4pCLTi/iqJ42ggfi6YW3O6sgm3IdGTbh+BGTem/r0xJUsoCTq0jy7NKEae9vIv1t4yZfmgdtAjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f/t+YlXf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 88BE7C3277B;
+	Fri, 24 May 2024 11:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716550829;
+	bh=KQY3xqXY4b0WUCiY/yDkJ1BTG4PoCIuLFe0eHGjoJzs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=f/t+YlXfMCVfI9ayEdS037pVDq6M9uaIeQecOY5jirbRTgBqkSCPipRzXounCxOrJ
+	 AQjPe9wX1fMTZevwmerERkKl9AuzTwU8UmX8gcVjHql8zt70Cg/TdhRh4SNqI7Lh3t
+	 Zqa8wYQ2Ngw3Dfq76QhHdofqS4k3Oa//JlX+UWPtDcw38Q4bq3dQXjlngp2Oztf2mW
+	 nDy5r6mxNinIQQ3nJxctzVOhWjaWSHtscTUU911sbnZ5jd8VBTqEbIHZua3IaYjReU
+	 8WnMw5qjMyBl9sRQCKW1p0zgrKOo1FK1+5jDY/E1jK/eoD93FiS0xOAc9ov4DRcZdI
+	 ioJdqIqZQ+89w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 77EF7CF21E0;
+	Fri, 24 May 2024 11:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,47 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: phy: micrel: set soft_reset callback to
+ genphy_soft_reset for KSZ8061
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171655082948.14489.8867165637123853171.git-patchwork-notify@kernel.org>
+Date: Fri, 24 May 2024 11:40:29 +0000
+References: <20240521065406.4233-1-othacehe@gnu.org>
+In-Reply-To: <20240521065406.4233-1-othacehe@gnu.org>
+To: Mathieu Othacehe <othacehe@gnu.org>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ f.fainelli@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ karim.benhoucine@landisgyr.com
 
-After the tagged commit, @netdev got documented twice and the kdoc
-script didn't notice that. Remove the second description added later
-and move the initial one according to the field position.
+Hello:
 
-After merging commit 5f8e4007c10d ("kernel-doc: fix
-struct_group_tagged() parsing"), kdoc requires to describe struct
-groups as well. &page_pool_params has 2 struct groups which
-generated new warnings, describe them to resolve this.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Fixes: 403f11ac9ab7 ("page_pool: don't use driver-set flags field directly")
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/net/page_pool/types.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+On Tue, 21 May 2024 08:54:06 +0200 you wrote:
+> Following a similar reinstate for the KSZ8081 and KSZ9031.
+> 
+> Older kernels would use the genphy_soft_reset if the PHY did not implement
+> a .soft_reset.
+> 
+> The KSZ8061 errata described here:
+> https://ww1.microchip.com/downloads/en/DeviceDoc/KSZ8061-Errata-DS80000688B.pdf
+> and worked around with 232ba3a51c ("net: phy: Micrel KSZ8061: link failure after cable connect")
+> is back again without this soft reset.
+> 
+> [...]
 
-diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-index b088d131aeb0..7e8477057f3d 100644
---- a/include/net/page_pool/types.h
-+++ b/include/net/page_pool/types.h
-@@ -45,16 +45,17 @@ struct pp_alloc_cache {
- 
- /**
-  * struct page_pool_params - page pool parameters
-+ * @fast:	params accessed frequently on hotpath
-  * @order:	2^order pages on allocation
-  * @pool_size:	size of the ptr_ring
-  * @nid:	NUMA node id to allocate from pages from
-  * @dev:	device, for DMA pre-mapping purposes
-- * @netdev:	netdev this pool will serve (leave as NULL if none or multiple)
-  * @napi:	NAPI which is the sole consumer of pages, otherwise NULL
-  * @dma_dir:	DMA mapping direction
-  * @max_len:	max DMA sync memory size for PP_FLAG_DMA_SYNC_DEV
-  * @offset:	DMA sync address offset for PP_FLAG_DMA_SYNC_DEV
-- * @netdev:	corresponding &net_device for Netlink introspection
-+ * @slow:	params with slowpath access only (initialization and Netlink)
-+ * @netdev:	netdev this pool will serve (leave as NULL if none or multiple)
-  * @flags:	PP_FLAG_DMA_MAP, PP_FLAG_DMA_SYNC_DEV, PP_FLAG_SYSTEM_POOL
-  */
- struct page_pool_params {
+Here is the summary with links:
+  - net: phy: micrel: set soft_reset callback to genphy_soft_reset for KSZ8061
+    https://git.kernel.org/netdev/net/c/128d54fbcb14
+
+You are awesome, thank you!
 -- 
-2.45.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
