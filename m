@@ -1,249 +1,163 @@
-Return-Path: <netdev+bounces-97975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 624B68CE69D
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 16:04:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 607B28CE6A7
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 16:08:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A98AB214BD
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 14:04:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 837E31C20D9E
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 14:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E4312BF38;
-	Fri, 24 May 2024 14:04:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D3612C468;
+	Fri, 24 May 2024 14:08:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="Zcm30jR3"
+	dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b="odr2+K57"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF1012C461
-	for <netdev@vger.kernel.org>; Fri, 24 May 2024 14:04:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3118638DC8
+	for <netdev@vger.kernel.org>; Fri, 24 May 2024 14:08:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716559476; cv=none; b=V/nRXKLiZ2DWqzKFHZ6psMYfjt+cneTImdjDnrO2UGgoJp+ToDCm+rtUOtZWx/F8gsQMwfBtwoPfmWgcEubFcC5Xu4ocHN383OblmSEg2JDkXfMC8dcitAjfRcz5AUzg7xzPipwu15+WAXr+u+o9/hDLbYEdOPjhps7ZglJsVJ0=
+	t=1716559699; cv=none; b=mgJuaBvpACeAknDBazR3VAGwUW1TFq+IKLVH3vsQEId0awIcyrASenEA+uTYTRUX3CGm6kjytGXnjg0CcAUCNYxVjg9MBz6FYhoEkhAN2zaXv3zSaoJ63Erg0VBG4eHM+6+P1Ub3AY5QqKt1/ly8qOgFANgQsYrg9FkfP1YXZME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716559476; c=relaxed/simple;
-	bh=OQRUGmqH7p8q0TZ8UDyzXz9YCJ1OKHSOJS5ShBfUsiY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QQLhTVUV91i8ocoTdfwQq18SfTnWJy2AIQq6aYrfnPTs6ukdFst9W/JnIpXiS2nWe1T9u/4BJrntzyoAfca8STI2rylweo3zSav8p52kFdjPnGkwGOLFYKhQFnCCbz3CUP3WaqJGjvzEmoUG/F8QM1hme6E10zxyEqLa/JQVXzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=Zcm30jR3; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com [209.85.208.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id A0FA93F456
-	for <netdev@vger.kernel.org>; Fri, 24 May 2024 14:04:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1716559470;
-	bh=E/RPD6hDIUky/ZMLcvb6p1QR9dziudjaKxoHx5ZJMx4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=Zcm30jR3+I2B37W7jlmsXTS3fMVr1SHDTIGAGsqAA7rSrjQawuT2ZZOblDataMZJz
-	 U7GjS84VBU+sE9wv1RLkMf3MRQb8vtLC0apM+LqBkuZ8mfP0AJQfjdMVF3g017qFjj
-	 sBnI4hP82C1BWehVn5sd3C463O15q2UQwx+2/TAf+a3iOUrfC7j6hBXbnsIIhrYPTy
-	 3cGFtZgmlgo1CJ+2PwWYHhDpJgr5hEhRISYJSbEA/b43sb9zKXciog4ZYT7YkT59U+
-	 ppZyHLv18Gj48AbY7PXRjZaOSRGm/9EhB8xCUrUDp8O7/mjvWpb6uz5M56Gii/tVYP
-	 DN26UJu18vekg==
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-57851ed8879so809635a12.1
-        for <netdev@vger.kernel.org>; Fri, 24 May 2024 07:04:30 -0700 (PDT)
+	s=arc-20240116; t=1716559699; c=relaxed/simple;
+	bh=KmSHqkLEACdJA5JkR30IvcQRznw1fQacuNaMNWW7CGo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qfm8FkaxU7RP8GPUHgfauRMH2WrEreIJOgpR8RX9yB4crogSpMRkuho4msksmgayc2ZCj1HPdxDVRBDGQwAe1otZ3JzNCqKKByLbGuGoosSrvDTM0cUHAdCB6FTAQTqouAbgZGe0lyqLQtkvE2aa+wATzBDuagyZtyUTLlUz0wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se; spf=fail smtp.mailfrom=ferroamp.se; dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b=odr2+K57; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ferroamp.se
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=ferroamp.se
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52962423ed8so993709e87.2
+        for <netdev@vger.kernel.org>; Fri, 24 May 2024 07:08:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ferroamp-se.20230601.gappssmtp.com; s=20230601; t=1716559695; x=1717164495; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uw+x2I02cfRHY66/tRD0BbH08xb2ysdRK1VqCkSSMhk=;
+        b=odr2+K5794KfAlnHQfv3jmJprvLU5Ldl2F9XkrNTBKpUXH1kX/S1IYvICFpuvUc5ww
+         qNF0hJXVdV+DArSgY0DJK17bMPzkjZxqP0TR0k3Vgi4RnQ8KC/47trDn3HlTv9DOfWDR
+         WK70Yd1chGEX6XoS+5jxleiE2Nn3r0pW+ry/HHHkdsG8wqtkmtNaqnkHkWadvTGFLrq+
+         6xqruHT/1h3nA6pB70+34tV/LrxaPImm5+k2PFUSujN3gA9TghcDB34thG5tiWM2+3l/
+         ugawdQLHMBUYSpf+emCoSuocm0nSgI6lNwUZo7DwrxjSQSnc//YV4Y9xF8cxcrCAjwyi
+         ed6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716559470; x=1717164270;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E/RPD6hDIUky/ZMLcvb6p1QR9dziudjaKxoHx5ZJMx4=;
-        b=D+Iisjq1H4FtsAkjE0250tdQIPppA5vhg5pToHosPfsabL8XdDEez7EfQqRW+hr2Ca
-         GuJ2qIzT9+COW7qx534UrYLpDF0wd15SQZdABNYyavvFBiDgAOHe5MA19D13aFWIR5Iq
-         p63sIXg//zlgOVpxKEBgv+ETV59d5EUC+I+ETDcuyOR1Ko2kQuA0FJrKpfV5qpEHp2HG
-         ApMJaEVk+eM+extVtRHlO4yVXT4DU9clP/ndvEjkj1vpM+FR9t34Us8xhoclYeqsUEN/
-         GMxYcqbbJJxUy02EGh7icroSBJ6z+ve+REFY7X9u+DdcqGxfbi9liYuPmMGNRh9ersG/
-         flSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXY6x8m69Skr6m26K0kUPA6P1ULfenAYDt9I5zVTe4pyCn3ad+XTGzTpcroQDcIwDUlMUPdulTX3bDrm26EjjvW0xKHofrM
-X-Gm-Message-State: AOJu0YwAPvmssn0Gcyy+0z4/tBHE+JTqMYKPN8+r8Ibz7qxLlGCaY4nf
-	+95TUBWW7++dDboqVI+/yEfja/uoIHg4JKY1Hjf/qQDmeF0NtFD2a+p30Xxbu6UzOtrlCCci5xn
-	/P5hogdna3eu9shymfeNXDvC05kmieV06uJ4ZLf7cyEDTuq9ChckDUPjX4G529qPdNjqwPgFohW
-	8/1ZUYgZ5kc8GQRvK75vFtVJW4WkjH3FEcik/iXfi9T7gB
-X-Received: by 2002:a17:907:764c:b0:a59:bbea:14e8 with SMTP id a640c23a62f3a-a623e8f6f41mr432494366b.17.1716559470310;
-        Fri, 24 May 2024 07:04:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEql+GAkjUup3w0xI5yrgomfUNWLGb5V5DxEcnO2p9Dl7TWFLzTL/sXrafxV4fOQVrDWDhJg/PcRsDvbxVe2i4=
-X-Received: by 2002:a17:907:764c:b0:a59:bbea:14e8 with SMTP id
- a640c23a62f3a-a623e8f6f41mr432492866b.17.1716559469945; Fri, 24 May 2024
- 07:04:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716559695; x=1717164495;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Uw+x2I02cfRHY66/tRD0BbH08xb2ysdRK1VqCkSSMhk=;
+        b=bhNfRNsTOAS53zD6O3wiXfOhKtuAAKGd7j6+rKZ5OP/BpKH4xNCzfKeDqxTakWqzyY
+         OTR/yh54EB+Qo+8IfRWvY1r0IhlzoheIKuza11oY6BoJo2OEFm/INqxr3uo9BjukHp/A
+         enea1W80qepS9wN0ZpDfuGbI66lG9a090eRmjoLR16bbs4lhPc7aC+C9pwVIxwSHe6c6
+         DbKYYIdD8VdAn0ZiQ0H4FH8yltjAxFK/uLleouZ3LEzyX/MGaNEKsZ4qzDZY6pH+OCDd
+         +5p0YAND2cIIJP6q6j4yPmR4kWBGqxt9WZ705Aj7Y0jmOrVY0hoBrkSsUy6CwiiM3/d3
+         f00g==
+X-Forwarded-Encrypted: i=1; AJvYcCXVtcPUPePKysI1l19PDdIz3GD4XXhIf9VznrFVl9ZPRnI1E+KFmqm+bzKoFbu7jG3kY8N8/PBtVTciZhLRTaiiPw6G4HtG
+X-Gm-Message-State: AOJu0Ywjc2fzXVb7aXupkRm+Tx/8LD201GKtpQNgRLZOGObgPbN/iG3l
+	FaaKHT5MKhET77fQfo7iIJMvkV1xXjAleYNgC7hjlmOxengyRBuW0+nnIyJ07p2IRulQb0HYZkr
+	B
+X-Google-Smtp-Source: AGHT+IHikd5bcFxVugcTWkXTYj6tWsPERSNIKCxhLOzj5DEmZPLVfbyUeeIG0OEv6qkAYQxT9EkvLg==
+X-Received: by 2002:a05:6512:238d:b0:51e:7fa6:d59f with SMTP id 2adb3069b0e04-52966bb200fmr2244010e87.53.1716559695152;
+        Fri, 24 May 2024 07:08:15 -0700 (PDT)
+Received: from localhost.localdomain ([185.117.107.42])
+        by smtp.googlemail.com with ESMTPSA id 2adb3069b0e04-5296ee4a9cfsm185474e87.75.2024.05.24.07.08.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 May 2024 07:08:14 -0700 (PDT)
+From: =?UTF-8?q?Ram=C3=B3n=20Nordin=20Rodriguez?= <ramon.nordin.rodriguez@ferroamp.se>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: parthiban.veerasooran@microchip.com,
+	=?UTF-8?q?Ram=C3=B3n=20Nordin=20Rodriguez?= <ramon.nordin.rodriguez@ferroamp.se>
+Subject: [PATCH net 0/1] phy: microchip_t1s: lan865x rev.b1 support
+Date: Fri, 24 May 2024 16:07:05 +0200
+Message-ID: <20240524140706.359537-1-ramon.nordin.rodriguez@ferroamp.se>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240520070348.26725-1-chengen.du@canonical.com> <664f5938d2bef_1b5d2429467@willemb.c.googlers.com.notmuch>
-In-Reply-To: <664f5938d2bef_1b5d2429467@willemb.c.googlers.com.notmuch>
-From: Chengen Du <chengen.du@canonical.com>
-Date: Fri, 24 May 2024 22:04:18 +0800
-Message-ID: <CAPza5qc+m6aK0hOn8m1OxnmNVibJQn-VFXBAnjrca+UrcmEW4g@mail.gmail.com>
-Subject: Re: [PATCH] af_packet: Handle outgoing VLAN packets without hardware offloading
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Willem,
+Hi,
+Let me first prepend this submission with 4 points:
 
-Thank you for your reply.
+* this is not in a merge-ready state
+* some code has been copied from the ongoing oa_tc6 work by Parthiban
+* this has to interop with code not yet merged (oa_tc6)
+* Microchip is looking into if rev.b0 can use the rev.b1 init procedure
 
-Please allow me to briefly summarize to ensure we are in agreement on
-the solution.
+The ongoing work by Parthiban Veerasooran is probably gonna get at least
+one more revision
+(https://lore.kernel.org/netdev/20240418125648.372526-1-Parthiban.Veerasooran@microchip.com/)
 
-Firstly, I will submit a patch to add a new bit in the status to
-indicate the presence of VLAN information in the payload and modify
-the header's entry accordingly.
-A new member will be added to the sockaddr_ll struct to represent the
-VLAN-encapsulated protocol, thus avoiding direct modification of the
-sll_protocol.
+I'm publishing this early as it could benefit some of the discussions in
+the oa_tc6 threads, as well as giving other devs the possibility
+massaging things to a state where they can use the rev.b1 chip (rev.b0
+is eol).
+And I need feedback on how to wrap this up.
 
-Following this patch, I will work on enabling the link layer header
-via a socket option.
+Far as I can tell the phy-driver cannot access some of the regs necessary
+for probing the hardware and performing the init/fixup without going
+over the spi interface.
+The MMDCTRL register (used with indirect access) can address
 
-If there are no ambiguities, I will submit the patch next week.
-Your assistance and suggestions are highly appreciated.
+* PMA - mms 3
+* PCS - mms 2
+* Vendor specific / PLCA - mms 4
 
-Best regards,
-Chengen Du
+This driver needs to access mms (memory map seleector)
+* mac registers - mms 1,
+* vendor specific / PLCA - mms 4
+* vencor specific - mms 10
 
-On Thu, May 23, 2024 at 10:57=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Chengen Du wrote:
-> > In the outbound packet path, if hardware VLAN offloading is unavailable=
-,
-> > the VLAN tag is inserted into the payload but then cleared from the
-> > metadata. Consequently, this could lead to a false negative result when
-> > checking for the presence of a VLAN tag using skb_vlan_tag_present(),
-> > causing the packet sniffing outcome to lack VLAN tag information. As a
-> > result, the packet capturing tool may be unable to parse packets as
-> > expected.
-> >
-> > Signed-off-by: Chengen Du <chengen.du@canonical.com>
->
-> Fixes tag and Cc: stable.
->
-> As discussed please add more detail to the commit message that
-> explains the bug. And/or add a Link: for instance to the github
-> issue.
->
-> > ---
-> >  net/packet/af_packet.c | 25 +++++++++++++++++++------
-> >  1 file changed, 19 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> > index ea3ebc160e25..73e9acb1875b 100644
-> > --- a/net/packet/af_packet.c
-> > +++ b/net/packet/af_packet.c
-> > @@ -1010,12 +1010,15 @@ static void prb_fill_vlan_info(struct tpacket_k=
-bdq_core *pkc,
-> >       if (skb_vlan_tag_present(pkc->skb)) {
-> >               ppd->hv1.tp_vlan_tci =3D skb_vlan_tag_get(pkc->skb);
-> >               ppd->hv1.tp_vlan_tpid =3D ntohs(pkc->skb->vlan_proto);
-> > -             ppd->tp_status =3D TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_=
-TPID_VALID;
-> > +     } else if (eth_type_vlan(pkc->skb->protocol)) {
-> > +             ppd->hv1.tp_vlan_tci =3D ntohs(vlan_eth_hdr(pkc->skb)->h_=
-vlan_TCI);
-> > +             ppd->hv1.tp_vlan_tpid =3D ntohs(pkc->skb->protocol);
-> >       } else {
-> >               ppd->hv1.tp_vlan_tci =3D 0;
-> >               ppd->hv1.tp_vlan_tpid =3D 0;
-> > -             ppd->tp_status =3D TP_STATUS_AVAILABLE;
-> >       }
-> > +     ppd->tp_status =3D (ppd->hv1.tp_vlan_tci || ppd->hv1.tp_vlan_tpid=
-) ?
-> > +             TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID : TP_STA=
-TUS_AVAILABLE;
->
-> Don't move this out of the original branch and don't make the valid
-> conditional on the value of tp_vlan_tci. Just duplicating the line
-> to both branches is fine. Here and below.
->
-> >  }
-> >
-> >  static void prb_run_all_ft_ops(struct tpacket_kbdq_core *pkc,
-> > @@ -2427,11 +2430,15 @@ static int tpacket_rcv(struct sk_buff *skb, str=
-uct net_device *dev,
-> >               if (skb_vlan_tag_present(skb)) {
-> >                       h.h2->tp_vlan_tci =3D skb_vlan_tag_get(skb);
-> >                       h.h2->tp_vlan_tpid =3D ntohs(skb->vlan_proto);
-> > -                     status |=3D TP_STATUS_VLAN_VALID | TP_STATUS_VLAN=
-_TPID_VALID;
-> > +             } else if (eth_type_vlan(skb->protocol)) {
-> > +                     h.h2->tp_vlan_tci =3D ntohs(vlan_eth_hdr(skb)->h_=
-vlan_TCI);
-> > +                     h.h2->tp_vlan_tpid =3D ntohs(skb->protocol);
-> >               } else {
-> >                       h.h2->tp_vlan_tci =3D 0;
-> >                       h.h2->tp_vlan_tpid =3D 0;
-> >               }
-> > +             if (h.h2->tp_vlan_tci || h.h2->tp_vlan_tpid)
-> > +                     status |=3D TP_STATUS_VLAN_VALID | TP_STATUS_VLAN=
-_TPID_VALID;
-> >               memset(h.h2->tp_padding, 0, sizeof(h.h2->tp_padding));
-> >               hdrlen =3D sizeof(*h.h2);
-> >               break;
-> > @@ -2457,7 +2464,8 @@ static int tpacket_rcv(struct sk_buff *skb, struc=
-t net_device *dev,
-> >       sll->sll_halen =3D dev_parse_header(skb, sll->sll_addr);
-> >       sll->sll_family =3D AF_PACKET;
-> >       sll->sll_hatype =3D dev->type;
-> > -     sll->sll_protocol =3D skb->protocol;
-> > +     sll->sll_protocol =3D eth_type_vlan(skb->protocol) ?
-> > +             vlan_eth_hdr(skb)->h_vlan_encapsulated_proto : skb->proto=
-col;
->
-> For QinQ you probably want the true network protocol, not the inner
-> VLAN tag.
-> >       sll->sll_pkttype =3D skb->pkt_type;
-> >       if (unlikely(packet_sock_flag(po, PACKET_SOCK_ORIGDEV)))
-> >               sll->sll_ifindex =3D orig_dev->ifindex;
-> > @@ -3482,7 +3490,8 @@ static int packet_recvmsg(struct socket *sock, st=
-ruct msghdr *msg, size_t len,
-> >               /* Original length was stored in sockaddr_ll fields */
-> >               origlen =3D PACKET_SKB_CB(skb)->sa.origlen;
-> >               sll->sll_family =3D AF_PACKET;
-> > -             sll->sll_protocol =3D skb->protocol;
-> > +             sll->sll_protocol =3D eth_type_vlan(skb->protocol) ?
-> > +                     vlan_eth_hdr(skb)->h_vlan_encapsulated_proto : sk=
-b->protocol;
-> >       }
-> >
-> >       sock_recv_cmsgs(msg, sk, skb);
-> > @@ -3538,11 +3547,15 @@ static int packet_recvmsg(struct socket *sock, =
-struct msghdr *msg, size_t len,
-> >               if (skb_vlan_tag_present(skb)) {
-> >                       aux.tp_vlan_tci =3D skb_vlan_tag_get(skb);
-> >                       aux.tp_vlan_tpid =3D ntohs(skb->vlan_proto);
-> > -                     aux.tp_status |=3D TP_STATUS_VLAN_VALID | TP_STAT=
-US_VLAN_TPID_VALID;
-> > +             } else if (eth_type_vlan(skb->protocol)) {
-> > +                     aux.tp_vlan_tci =3D ntohs(vlan_eth_hdr(skb)->h_vl=
-an_TCI);
-> > +                     aux.tp_vlan_tpid =3D ntohs(skb->protocol);
-> >               } else {
-> >                       aux.tp_vlan_tci =3D 0;
-> >                       aux.tp_vlan_tpid =3D 0;
-> >               }
-> > +             if (aux.tp_vlan_tci || aux.tp_vlan_tpid)
-> > +                     aux.tp_status |=3D TP_STATUS_VLAN_VALID | TP_STAT=
-US_VLAN_TPID_VALID;
-> >               put_cmsg(msg, SOL_PACKET, PACKET_AUXDATA, sizeof(aux), &a=
-ux);
-> >       }
-> >
-> > --
-> > 2.40.1
-> >
->
->
+Far as I can tell, mms 1 and 10 are only accessible via spi. In the
+oa_tc6 patches this is enabled by the oa_tc6 framework by populating the
+mdiobus->read/write_c45 funcs.
+
+In order to access any mms I needed I added the following change in the
+oa_tc6.c module
+
+static int oa_tc6_get_phy_c45_mms(int devnum)
+ {
++       if(devnum & BIT(31))
++               return devnum & GENMASK(30, 0);
+
+Which corresponds to the 'mms | BIT(31)' snippets in this commit, this
+is really not how things should be handled, and I need input on how to
+proceed here.
+
+Here we get into a weird spot, this driver will need changes in the
+oa_tc6 submission, but it's weird to submit support for yet another phy
+with that patchset (in my opinion).
+
+This has been tested with a lan8650 rev.b1 chip on one end and a lan8670
+usb eval board on the other end. Performance is rather lacking, the
+rev.b0 reaches close to the 10Mbit/s limit, but b.1 only gets about
+~4Mbit/s, with the same results when PLCA enabled or disabled.
+
+I suggest that this patch is left to brew until the oa_tc6 changes are
+accepted, at which time this is fixed up.
+
+Ramón Nordin Rodriguez (1):
+  net: phy: microchip_t1s: enable lan865x revb1
+
+ drivers/net/phy/microchip_t1s.c | 189 ++++++++++++++++++++++++++++----
+ 1 file changed, 166 insertions(+), 23 deletions(-)
+
+-- 
+2.43.0
+
 
