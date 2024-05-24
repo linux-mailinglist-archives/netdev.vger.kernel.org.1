@@ -1,136 +1,105 @@
-Return-Path: <netdev+bounces-97999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A0D8CE847
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 17:52:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEE658CE84C
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 17:54:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46BD61F21641
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 15:52:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62CE1281963
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 15:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 557FB12C49F;
-	Fri, 24 May 2024 15:52:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D65412E1CD;
+	Fri, 24 May 2024 15:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pITfvZRh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IQvJheCf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2865126F04
-	for <netdev@vger.kernel.org>; Fri, 24 May 2024 15:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECFF12CD81;
+	Fri, 24 May 2024 15:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716565953; cv=none; b=iUNFqfDtreAe9QKvEYVNpQ5SIOc1+F2DmNpbkxLc5frR/5FJfG08oRiJIuuqzaJCFRN1+Kl/t5HoZ6kK0uOvcfSZAECxXATcIvHrCYdsUOUs8w6/hjRmm2FECrNIGOySCq9Srnzu9P9gOvurOFtV609LB1ahWnk7QVglbQyqkcc=
+	t=1716566056; cv=none; b=CEvp3yhqlkNrGndsAmUfUvSFBqxjHWkR5xXnHgB1wSz1Vm5gXuJcHotZpVFD/Z4ceUEYLi+ARBb8MR+bllDg7oEmdDg0mM3WZQ8za5vV1Q26JZzZZIyRh7TRLoLCh6SQdfMN1GaM6Hpm1w4lztv/lg6FxvKju4zvZ9n7ivQ2pY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716565953; c=relaxed/simple;
-	bh=yJ7lJCpbC9fMmD/ag8df8UaOX++uju3u39h1FMPE2hY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WRPNjOsop9vnaybRmqPMLsZB0ikdgXEkS73M3wHprn8qkPk4HSAA3/WL1Eicx4i6uEMDRGjSUp0dLdmF+Mv99q+sP4CDmV9F1Cv6LzmCZelCHt6Cmp8j9iQ9HMi7ieDChgO1/pi/iKTxwobzQ/PmSXSVjnm2YdgtlNzmBmpjokI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pITfvZRh; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so16819a12.0
-        for <netdev@vger.kernel.org>; Fri, 24 May 2024 08:52:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716565949; x=1717170749; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NzGX0CP/H8BaHhk4z3K59ZI2pjkcBBIz6sF8ILE7vzE=;
-        b=pITfvZRhFJSFOqL+m24b84E5Os4NJxIh06tgrmBeg0FsFM5Zzlm8N6WsQ7qRXonaC1
-         LPAHJnbxaot5OKph3Ixs4HD/TxfkMpB0rvIunlp9GET56pn8qPdtMiB7ZG+TcO7CyD+1
-         DFSO7f27+2UwwRnyPHha/k5nmCXfU9dj2ZN6vOi0OjVybLnyEDxtsRMkSEqLstId4lIl
-         tjI4z8dxPmxF3mWc7TiH+Nf6UpuJk8JKcR8wWBDxH41uvQaR+cMTuqHDQT6lablwlTuB
-         td7jTvK40TivHmjeyyU29wDyrujFhf4Zc0DRXLVw9pEPc1aMzcpIgsWNZn6vV646vTSV
-         oF1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716565949; x=1717170749;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NzGX0CP/H8BaHhk4z3K59ZI2pjkcBBIz6sF8ILE7vzE=;
-        b=hhaUbnEhSnhQG9yKhwHDjuHPH2NR2xVe7kpj5IrjNP/MEB8xGdJYEs2IalNbYB8ZRk
-         bvkqwv947io1I0LAncyXvDM//haZ9cm143Utykcoi3BknG2SvRmazM04rIdzCiJj6ENe
-         LE87WctenQDRGxjFKeIodz9CIL2e+miEsPB4YoKR2GAzdgu3gfY/4UGDpuZNPAqgKdlK
-         1sPnABPF67/gYmgq33GzQIDXcwpMDsSW2OAiLu6lym5wVTCdA8Z4kgIZE3o38HOkbzfp
-         8fAAT100On4rhaWuIBMiA2jE3mP4sjg2R+qe+GCWU6JWw2uaeN7UiczXKeMPy/eqAEip
-         3Y/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUn/257oZGQ+p/qA4AfSGFD2NSwgKAgyrqCScZq0Gu04r4dyUM5GMMIq67X1H7/Fq/SHlfMdZOVd+iz49oiLkyE9pOycMd4
-X-Gm-Message-State: AOJu0YxfXaKr8XZ85KrmHEgXSylNZmMgiiweOijnou8zXFz72Nyg1kfO
-	A3HKvPuHBw3YE7CsPTX76hH466gQiGWGdX87Yuq1Bno9rV4VWJrpV5voaBovPbo5Bu14VsDn//+
-	1YGeSB/ZHXRj8pk9CIKIP9moz77J1MFt8YixS
-X-Google-Smtp-Source: AGHT+IEZeslY1h9j9CCmD24z8wuv/oWb2BeUpYOjuE4PHIhWMGmbE+aoV8NgRKRVIhwt1p4ufs2U5WjNB9ffi77OVxg=
-X-Received: by 2002:a05:6402:706:b0:578:5d8a:8ff6 with SMTP id
- 4fb4d7f45d1cf-5785d8a96ebmr127249a12.2.1716565949168; Fri, 24 May 2024
- 08:52:29 -0700 (PDT)
+	s=arc-20240116; t=1716566056; c=relaxed/simple;
+	bh=+Pq8Ay0wvcb7Etnygr3YARipsS/gX3bUE7ZtLQZNb+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YvB8dIz/I6lK28J6ty99SxHDx+cJ0K9pkxjjyidrNelt9dfMMEuhhH5Ol8N0iWuAbOJRv553SjhK5/GtSINELqnqPTi9pF5uU0nf1FzWQ/xNS+XPV63HLwBYjTxL0v9px0xgarAqxkrPSL9mQy5KydJS+QxXcEH1lOydJ1Y0zA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IQvJheCf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MV8cl0rOGCTFcJnTsA5zvFiTquGTr/gV2k/m7gDsWG4=; b=IQvJheCf08SL2R5FzIUr3qIfsc
+	IzMIZ0eIwz7vKm8f4p86ki3xUrLeYmy/XCtrU95+Ch702s+sxm1aRpBcOqCCE8wo1tTN6k2GzaeC4
+	r4n1v+rd40kqOqWXg5XHy+dsYG6keBnzRs5Xsc2H8T+r9x68fWuDfzYnEAJiUSKZXAd8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sAXF3-00Fxnh-Rc; Fri, 24 May 2024 17:54:01 +0200
+Date: Fri, 24 May 2024 17:54:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Xiaolei Wang <xiaolei.wang@windriver.com>
+Cc: wei.fang@nxp.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, imx@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net v3 PATCH] net:fec: Add fec_enet_deinit()
+Message-ID: <9eb45fe8-a0df-4b5d-88a3-ed61f9e320f1@lunn.ch>
+References: <20240524050528.4115581-1-xiaolei.wang@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240523134549.160106-1-edumazet@google.com> <20240524153948.57ueybbqeyb33lxj@skbuf>
- <CANn89iKwinmr=XnsA=N0NiGJhMvZKXuehPmViniMFo7PQeePWQ@mail.gmail.com>
-In-Reply-To: <CANn89iKwinmr=XnsA=N0NiGJhMvZKXuehPmViniMFo7PQeePWQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 24 May 2024 17:52:17 +0200
-Message-ID: <CANn89iKtp6S1guEb75nswR=baG4KN11s9m+HQZQ+v_ig3tOUfg@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: taprio: fix duration_to_length()
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>, 
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240524050528.4115581-1-xiaolei.wang@windriver.com>
 
-On Fri, May 24, 2024 at 5:50=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Fri, May 24, 2024 at 5:39=E2=80=AFPM Vladimir Oltean <vladimir.oltean@=
-nxp.com> wrote:
-> >
-> > On Thu, May 23, 2024 at 01:45:49PM +0000, Eric Dumazet wrote:
-> > > duration_to_length() is incorrectly using div_u64()
-> > > instead of div64_u64().
-> > > ---
-> > >  net/sched/sch_taprio.c | 3 ++-
-> > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-> > > index 1ab17e8a72605385280fad9b7f656a6771236acc..827fb81fc63a098304bad=
-198fadd4aed55d1fec4 100644
-> > > --- a/net/sched/sch_taprio.c
-> > > +++ b/net/sched/sch_taprio.c
-> > > @@ -256,7 +256,8 @@ static int length_to_duration(struct taprio_sched=
- *q, int len)
-> > >
-> > >  static int duration_to_length(struct taprio_sched *q, u64 duration)
-> > >  {
-> > > -     return div_u64(duration * PSEC_PER_NSEC, atomic64_read(&q->pico=
-s_per_byte));
-> > > +     return div64_u64(duration * PSEC_PER_NSEC,
-> > > +                      atomic64_read(&q->picos_per_byte));
-> > >  }
-> >
-> > There's a netdev_dbg() in taprio_set_picos_per_byte(). Could you turn
-> > that on? I'm curious what was the q->picos_per_byte value that triggere=
-d
-> > the 64-bit division fault. There are a few weird things about
-> > q->picos_per_byte's representation and use as an atomic64_t (s64) type.
->
->
-> No repro yet.
->
-> Anything with 32 low order bits cleared would trigger a divide by 0.
->
-> (1ULL << 32) picoseconds is only 4.294 ms
+On Fri, May 24, 2024 at 01:05:28PM +0800, Xiaolei Wang wrote:
+> When fec_probe() fails or fec_drv_remove() needs to release the
+> fec queue and remove a NAPI context, therefore add a function
+> corresponding to fec_enet_init() and call fec_enet_deinit() which
+> does the opposite to release memory and remove a NAPI context.
+> 
+> Fixes: 59d0f7465644 ("net: fec: init multi queue date structure")
+> Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
+> Reviewed-by: Wei Fang <wei.fang@nxp.com>
+> ---
+> v1 -> v2
+>  - Add fec_enet_free_queue() in fec_drv_remove()
+> v2 -> v3
+>  - Add fec_enet_deinit()
+> 
+>  drivers/net/ethernet/freescale/fec_main.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+> index a72d8a2eb0b3..881ece735dcf 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
+> @@ -4130,6 +4130,14 @@ static int fec_enet_init(struct net_device *ndev)
+>  	return ret;
+>  }
+>  
+> +static void fec_enet_deinit(struct net_device *ndev)
+> +{
+> +	struct fec_enet_private *fep = netdev_priv(ndev);
+> +
+> +	netif_napi_del(&fep->napi);
+> +	fec_enet_free_queue(ndev);
+> +}
 
-BTW, just a reminder, div_u64() is a divide by a 32bit value...
+That is much better, and using the correct structure helped you find
+other bug....
 
-static inline u64 div_u64(u64 dividend, u32 divisor)
-...
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
