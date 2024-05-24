@@ -1,214 +1,237 @@
-Return-Path: <netdev+bounces-98039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 978198CEBA1
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 23:04:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0BB88CEBA6
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 23:04:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BABCE1C21796
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 21:04:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4C361C20ECD
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 21:04:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8952212C495;
-	Fri, 24 May 2024 21:03:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A326484DF5;
+	Fri, 24 May 2024 21:04:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m6EFTu0s"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XxzO/4W7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5C186134;
-	Fri, 24 May 2024 21:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716584608; cv=none; b=aAerPGxL5BxUzUnofBU3R6tQzJBI4cKcARcKnYj4ocSEXV8bQptC8dpc+Y3qERV97OakLJWQR9LvU75pTD1buLOK4HAC/Mh4+3RqOzBmDxAlRbe9NmK+He8fUjHL/yqw4gSjmtx+ScVI8Ddq4KXEAsMvWw7Uw4iPlEB/1sQX8fQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716584608; c=relaxed/simple;
-	bh=2+xqMRQGLIjTOS81Zq0gKeXzmKGYY1z4ywWc8kW4mAg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oxRWfWUak2/nM4wO1mKkBT08vJ7TA/Y9G13W/ppP05JnkVPEmJOCorcT0N4svizlOkrcvQgBOzkaMACYT6egpdyH+5IEWiibhwiNAw7wwVX49Tcd20ETdo0hq+rxYKT3zjjEnbbzTQuZE1zRRddJnu9JauerNjNj0PE83opJ7KE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m6EFTu0s; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-529646df247so1279356e87.3;
-        Fri, 24 May 2024 14:03:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716584605; x=1717189405; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6SsA/DX4FQd1mwIvYQLseyq3XbpKYYuZmRUlHTPnong=;
-        b=m6EFTu0s2pP20C32HFzg94WJbzyue+Esc5/8jhEbh0LtHXxHmC5Z0X05ZeU+HR45yk
-         SbouVuGHrFQIJAGL+icTAB+mdEWBW6ymdmO7jkt6MSpNxHJgJoGpywxNECgRjmsZCsPk
-         /Rj8/ygw6kZtp181wTdHB/ZUxWj8JKs/cFxzFQ+YyAjPGvWO71CQuOcX2epoIBd9k/H6
-         Zw9+tY5v2pB91H8Vjsi48U6A8SPPAPu+Hyq4R/CsTHciYGcWGoa/CJu5zqxBW6PDQOSJ
-         7/lbrvRqRN8QSgxIdNVuysFyM+1Q09qwSgnNoNqEg/kjLC8a4zVvwCKnq5b0gQZ1/WG4
-         dIDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716584605; x=1717189405;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6SsA/DX4FQd1mwIvYQLseyq3XbpKYYuZmRUlHTPnong=;
-        b=eTmMtP1RbxyOaScf3HX//DhNJNoyQwV9m7sj7/+nxzq7jrVvDkToEYrBHdnGgkcaIR
-         bEwKgk/NJ0pvWqslmrHPIHwdIFI1ER/fhXONOGRabEx50nIJ3v4t8rG1eDMAkfK0YPjs
-         NqZI954Ne7vT7E/5TU4vAViiGAzHOpoz5sxMbNSe9w1Cr/mLqZl17loZsEYSy5iT20S3
-         q0MPpjoshvtY8loF765AW1Cx6E5Z2kMsuGMZRbprLVFNpF1Z3aNHfSgKpzIXXuKf5CML
-         XtotB2fnziNAOCXVev343yYY0OU9sL8VjLgPzTwZ1QW9UI8JkiH3YAfV189QP9rql2mX
-         qGBw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZwu7vK3yf/+xyYvURQKHDGb5O9vMrOyGtY58MeNpoxO5vfwYbJe5MKIvAF09+5BdXbFq6SKlX0/ryj3MxRW46ctu19gJ43208upi1pO2y1rPe65c8C+o5KqKmU/a57ivynoEinGsEqXMyeRf8ZX+s2n+pFC+IQ2M7
-X-Gm-Message-State: AOJu0YxrFiPOCLeV0Qxjg3l/EhGsIwpwQTwqzHz0dEGxcQd/YYlaOg/E
-	CeoJcRmG40hEVFVJF1uYNO6vHd1OXIvYkO6jq8CJPjms14D7WPRn
-X-Google-Smtp-Source: AGHT+IG0PT+7TnzaGJ6HfS/LUBBacBaRk08p6C1KaUcsx5/G5OJ+ElDL8rqeNbSK5PYnnNXLPfqj6Q==
-X-Received: by 2002:ac2:454c:0:b0:523:a924:3268 with SMTP id 2adb3069b0e04-52964109a01mr1779610e87.6.1716584604952;
-        Fri, 24 May 2024 14:03:24 -0700 (PDT)
-Received: from localhost ([95.79.182.53])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5297066bcd6sm237510e87.164.2024.05.24.14.03.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 May 2024 14:03:24 -0700 (PDT)
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Russell King <linux@armlinux.org.uk>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH RFC net-next 3/3] net: stmmac: Drop TBI/RTBI PCS flags
-Date: Sat, 25 May 2024 00:02:59 +0300
-Message-ID: <20240524210304.9164-3-fancer.lancer@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240524210304.9164-1-fancer.lancer@gmail.com>
-References: <ZkDuJAx7atDXjf5m@shell.armlinux.org.uk>
- <20240524210304.9164-1-fancer.lancer@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B5E5EE80
+	for <netdev@vger.kernel.org>; Fri, 24 May 2024 21:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716584675; cv=fail; b=UzYUxUzQ8D1rJ220OPfTk9+32IBqTVMknohzUUp38EuH4TTEm6eJZQgHj4Jlgoti1FXKbZeXoSV7Q8YTInTwrGUPw5YfbPWWTDOjvBTZP9UUQEu2ex1TjvBMKpH0Bo+DLrmx1Y+bDEGIOHr7MJGmgrYa1q5+Fs1yjdG49QYRJWo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716584675; c=relaxed/simple;
+	bh=4HuMdIZ64I3SsanEmECoRyNrDbRbn1qFPpA0VeCGhp4=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KOwAnAeYMRZzxwrjio0n+Bbczo/oFECVHx87j1+fXoh9sqviyVjNm7celldZx9So1i/wHZl+dx4QZnJQQ8OK/DQKICIRir49BtNtMXnlZbB4XrZm4mixdilxYRVa0nZlHpOK5g31wbemPbvUJf0Sr8hioJsxFTuFfvCgAeYeiiA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XxzO/4W7; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716584674; x=1748120674;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=4HuMdIZ64I3SsanEmECoRyNrDbRbn1qFPpA0VeCGhp4=;
+  b=XxzO/4W7Ae/XczswY//hLpK/LShml7Ilf+gwLevPeNGRXtt+qZoZouuj
+   yBq57sEQqFyvEMn67i4gGCoObQ7pd3/WTumHWMETVNeq3nm24iWm06b9f
+   +2PWOba+1UjEGYeUAfc73otkYSSph9htLVBLmp1CdCKnb3aafGBEBpK5r
+   H21Vj4e2NCwASIHAXAhbxE5HffQvtR+dWHi0lEZZjq6MGdL2tOhLBO0/7
+   x95xo8TDcfuLiR4ouLV0gL3OWpPYbifQwsoorJ6gsHUB9HjcPaAuz0rnH
+   CTBoU3sO3bCBWF937GF1yzBv0qPq70xE7sHSRpEXDRvF2+CCZ/R52n6Ue
+   Q==;
+X-CSE-ConnectionGUID: E7lQERIYTVulvLuEsQL+LA==
+X-CSE-MsgGUID: PemkpIO3REOMAwsu8d+T4g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11082"; a="13099795"
+X-IronPort-AV: E=Sophos;i="6.08,186,1712646000"; 
+   d="scan'208";a="13099795"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2024 14:04:34 -0700
+X-CSE-ConnectionGUID: 9NKKHl4rTX2YE0ScGoLeyw==
+X-CSE-MsgGUID: d7pMSU+RTPOg4maqQV50HA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,186,1712646000"; 
+   d="scan'208";a="38929963"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 May 2024 14:04:33 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 24 May 2024 14:04:32 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 24 May 2024 14:04:32 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 24 May 2024 14:04:32 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ERSpl0kNY7A956vMeA7e5pO0czaQrRk0x/ZqxZVUrO2wOY2tjqtZ2PZSTL0iIspQ7qq71blXLk2t/ksq3QRL6HQeUIStNgckUI7U2FyY0Vek4N83eBWI9urYIs7Iotor2mg5c8jnF5hqinywuuo/y3srrTlxHGAyw+N6ghiEa44tpihoqdDo9Y6oJNaLy4kDuzpmln1MVT7jag+SFrxRIrjlrg9s5b+TwA3s3o9rtMZFBLMpr0FuTpGbKytNOi+KnHFD3W/KfWr/KQDmYFsZZjY8fRWUcLgkuZ+9r7LWuNGdlJzBCTA+Xfonn665KrdKTbAnqOsFhwUPrh8BJCmMHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0Cl5X4ax8zaaS/3jYLpJ4hsfOI412l0Em+5ZjxdkHMU=;
+ b=D/5H+NMF+z78nhiNvsPgQh3dlnJFKE8o2Mqk5YHlZ/UcXRaURQLaSVYcL59h4NRxuQYbqne77sKHfxybRK2FTvzSyy38TQ/uP4+z4Sul9ubsWGlHiFdzOnbYBEX7O3w4rPyp3m2DXBcjDvVWmixcwDItJRtU8G7jOWpSPyUDHpMUEvHLVi17PXCAJsbm0jl0MxpK5IxmuDDwBK/bcw95gb2H6/nCI3jkVQhDOmMgyvjyoko9MgjYvRbAkVE5Wijirtr8yqOSxkewCw+1+OORcydv7niBAbNVReuWXGZh8xHn/RiiQx7pN2dtgBTFAYJTCGab0GaDU1KjjEfP49f5rg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by CYYPR11MB8431.namprd11.prod.outlook.com (2603:10b6:930:c7::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.36; Fri, 24 May
+ 2024 21:04:30 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%5]) with mapi id 15.20.7611.016; Fri, 24 May 2024
+ 21:04:30 +0000
+Message-ID: <28f2d06d-7ddc-4b98-bc58-b560028611ed@intel.com>
+Date: Fri, 24 May 2024 14:04:28 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next] ice: use irq_update_affinity_hint()
+To: Michal Schmidt <mschmidt@redhat.com>, Jesse Brandeburg
+	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, Nitesh Narayan Lal <nitesh@redhat.com>, "Thomas
+ Gleixner" <tglx@linutronix.de>
+References: <20240522231256.587985-1-mschmidt@redhat.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20240522231256.587985-1-mschmidt@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR02CA0025.namprd02.prod.outlook.com
+ (2603:10b6:303:16d::11) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|CYYPR11MB8431:EE_
+X-MS-Office365-Filtering-Correlation-Id: 55beacac-0848-4793-410c-08dc7c351a8b
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|1800799015|366007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?NFNlaVJJRFhIT2JQQ1BzWXhLdnJ4dysrN09BSlJCQVpzekcvRnFVb05Dcldi?=
+ =?utf-8?B?L09uVG5MeTd2dWVpT04wZWFCU3V5UHI2anY3L1dXWW10dXRBQ1ZZWks5bEpD?=
+ =?utf-8?B?dXppWGV4Tm9GU3VqSTVzOVUwUER6QTZTZ05INGFOTkVkeXNKQXczd0ZEa2xX?=
+ =?utf-8?B?d2FPTUliWFhNTlNDcDg2S2p2OVhFSjM5T1I2ZnVBVmV2cU9FSmd6cVZKS0xF?=
+ =?utf-8?B?SHl2RWxFTUxvOFd1TmgreldtT1JsV2xhWlNBeVJCMStzSFNGcEdPaDBocG9m?=
+ =?utf-8?B?MTdiZG4vdnlGUFNXYjN5SzcxbU43UWNxS1dLOWJVd3ViZlE1V0dzd1dYQkt3?=
+ =?utf-8?B?V3ViNFNUaFl3R3dmZXBKSmprRlA3QUI4a2xwdit6N3ZlWDB4Q0dBa3RQZEho?=
+ =?utf-8?B?OUwzZDlUa2l0OHNSZTQwdzJEVkx2emhoTSszS04yd21kKzZFL1N5M29QWDdX?=
+ =?utf-8?B?ZDNqT0l0dk1aKzBlc0hZb2p1aE9SU2tJaEJBL2orYkFaYjNyTWxvQlBFN0E0?=
+ =?utf-8?B?UFZQY28ySGwvdHpzazQ1ODdUMEtBZXZPSTYwRkt4RjVNQVdGTlFhaXlQM081?=
+ =?utf-8?B?dHVOUmk5bWlqQWxJd0tuMVRqKy9sN2NnaXZCZU5jVzk0VDJZcktacVdwSFhl?=
+ =?utf-8?B?K2xBVTlpR0Nvbm5VNVF5VUVkNXcwTk16SmVaUXZoMytINVhBZVV5RWh1MUxq?=
+ =?utf-8?B?c0c5QzBVenZCUmdIcEpjZUM0Z1FYaHFZKy9Md2ZSLzQwT0pmQzdNMEFJWWlX?=
+ =?utf-8?B?ZXRTWnJtU0h3OWVZQmJhSk1DRFpRbWZ6VHNJVVJCTWJXWXlrZ2haT2o3U2Nn?=
+ =?utf-8?B?SzZMWHI2aHpNT0VxSzNsSUlNcEgwNDdxRFhwYUdCUUQyaDhTaTFDbVVTdDNS?=
+ =?utf-8?B?UFVwZXJYTS80eDRzVmVYcEJKL0lUQmx3bURMMGFjb2kzZ25wdkZtVW40ZEg5?=
+ =?utf-8?B?bi9mTWt2VUUvajJ4VkpHaWozZFdKTU5hL1Y3Vk1ZdUQ0T2grNmcxMkhqUHFt?=
+ =?utf-8?B?WDd5dHMzWTl6dWxzZ2xHRjJ6TDFJUllMeDdSWkVxVVhQMmM4Q2ZkaGVzK05o?=
+ =?utf-8?B?S1hIRFh0NElrblVnakRlL2ppZFBiQ1hIeDdObUI0TTZRMXROSExmbG1tR2p2?=
+ =?utf-8?B?bDB3N0tud0ZLVExpaWZQZkxVNWRLOXJ0R0Fib3paVmF1cmJ1R0ZqMEd4Z0I4?=
+ =?utf-8?B?TWJDUndaZ0ZjY3dHR2RKUE9KVkRYOTR4VVRMWE85NHNyK1JraC9CdzJQemtY?=
+ =?utf-8?B?MllSU2syMUt3OE5wNy9NSXBDd1ZyenZNZ3RPbDhrSWFmSXpyNlU1VGQyQXNz?=
+ =?utf-8?B?bkJGWHJGYlFnQkpsUUtCSFo2SjVvVWJYUjYrMm5DMURWZFFpeGtlSkJ6cW1J?=
+ =?utf-8?B?SjI3UkR0dEtaZlhDaHhrS0xnelJqaGwrbEttOWlWTVVtdnU3d0xGdjZLMW5Q?=
+ =?utf-8?B?c080TU9hWmhTZTJ4cCsxVTFJVTBOS1VWbHRPeEtTdHYxRndQSmJXUC9UQmo4?=
+ =?utf-8?B?RHBSVHFrWVVLV1RjREo4SHdYaDFZM3BxaDBQbXlEMjg4VGM5c21Gd1VERDFK?=
+ =?utf-8?B?RzNFd0RVQ0NSclF4RUV1MHErTHdZWFE2Q09TK3lZTkgwK01PNHN6bjVPWnQr?=
+ =?utf-8?Q?vBX4H3A/Pmj2byggE5vRl39L3fvnL1Yfj0jrW6UibSYM=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZXJFRHJvSWwrZDJ2RUd4dDRZTXNPWTRhTnpFNDE2cFlBYndXR09pWVZ5YmFv?=
+ =?utf-8?B?QVVXVHgyZTAwb0g4emo1TWh4S0U5dTZYQ0FhRlBjY1owejgrcGkvcFlyUnBr?=
+ =?utf-8?B?dzg0S01lVGxJYmdTbGNWVlZPYXlKVG1jQTVkNWxmeFRYeG5KMi9yOVgwdmll?=
+ =?utf-8?B?cnNmTnMrTjRHMU1hdFZTdEJVdW9TL3c2OGkzZXJwUGx1UE1DejNUVnhrbzI3?=
+ =?utf-8?B?TlE3WVZLNGhZWUNiQjRodHI2bGh4WmZrUjBhZ3prVDRZZTdGb0JtbWt2VTVa?=
+ =?utf-8?B?aHhVMEtrQmxqbjJmZnN1MHRBWWZtTFIvSTFJcEZDaHZHYVVBTzhrOHZpeFRU?=
+ =?utf-8?B?bjNWWnFTSE85em1HS20wYytWVC8wMyt1U0g1OHJKQWtKWFJ1Nlp3NHpjNzFl?=
+ =?utf-8?B?OGhnZnhxWmhxdm10Vk8vQmhNQWppenVrQUx0N282a1VrME5wMmdnRnp2UnU0?=
+ =?utf-8?B?VzZSajZVUER4TG1UdEM3STdGWE1GVDRtT0ZyaU13M3VYdytOUy9CbWx4dy8w?=
+ =?utf-8?B?VXpVYytTMFZZdlpkL0xwdTB5a05zeFBsSGFHY0M3L29MZzVpeFlZNlVXanJ1?=
+ =?utf-8?B?OC9WQUVEMGdrK1VFZEt3cHQxWklvb3NVRUNmODVyZnFzYmh1ZnBsYWlPd0ZI?=
+ =?utf-8?B?dzNKaFFmNHpsNXVsajg3MkxROTJueGV4RjlOTG1jQ0tTbmp5VHRHMWVNRXJM?=
+ =?utf-8?B?N2ptY1E2WWlEQmxGL3VWWEdmVTBHbXlrUklrK2NnVUp5VS9EYVlLWENVOTM5?=
+ =?utf-8?B?NnJaL0xKTk9Hdk9lUHR6TGtNR0NCRk5NS3l2UTBTYWZVS004Q3RTdFlwQXRi?=
+ =?utf-8?B?WFNPQnpHK3UxSjIvZ0xpc2U4anV2OWJjOEkvODVMUkpWZmJoaGdFemc1WVlk?=
+ =?utf-8?B?Umt5N21aazRSSDJlYkdMZ1pSM2t2QUpYb1ZJUHROQXRJTDZrYXhMK1p3ZGh1?=
+ =?utf-8?B?SE1vNWxqV1hOKzVNZHlLZGpsUG43MndocjJUUHJFalZSYXdlaEZIWSs3SlBy?=
+ =?utf-8?B?bzdPQm1vM09RZHdPaDFtTlI0ai93REhSU3hjQUpiK1pvakFnaisxQnF0OE1l?=
+ =?utf-8?B?dUFmTGxrV0U1SjVVaVZ1MnZqeDhNMHdLQnVrbkt6eGtta3lUOTM1UjFxUlg2?=
+ =?utf-8?B?VmZJNzhzUnF3RmE3eUhVWXc4aFAwSlFsTlBPZ3pBZjlYeFkxSVEvSDE1V29t?=
+ =?utf-8?B?QWhOdHZudERqeWlLSXpDcWNHdXF1OFdEdEtNS08xdHJUU00rMzFySXBDSHNT?=
+ =?utf-8?B?VUE1NFR2akNYK2s1QlFGOVpFbnowTmg2RXJQbXNHVzhiUXpaUHJPbU8rQ2Z6?=
+ =?utf-8?B?RGVIdnhSUlNQS1pLb1g4MlpFRkhIVmdDcjZvZmZDZWZQT01QT055b1F2bTBG?=
+ =?utf-8?B?a0dxaWtHNmdBM1c5SWZiazUwOFQzaEpmOWpXQVNmM0tReTh1WmdHRGxTTHRx?=
+ =?utf-8?B?Y2hsUHloTmtlelhrcHF6WDBZbmpKUlVJRVdXRElhTkd4NE9BQUVmZ0p2SEh1?=
+ =?utf-8?B?K0xlLzRFR1RPVDhzWjlFK2tWNzVhQkowVlVFSzVNV0hTQ0EvSi9ISFNCTVFi?=
+ =?utf-8?B?eXlqaitVSFJtR3JiTHljVE1OMjNqV0VSWFovZENkM2QrZ2RaNlVLNnpQbUZa?=
+ =?utf-8?B?cG5FSzRUUDhnK2lnMzVMbllsUkpnTFpSS1A2ZmNRckNXZkZGNlFjSWZFdWw0?=
+ =?utf-8?B?bUYzemE1VnFidlIyRTRGaXVvbnAvb2JFMFRKelJhdmtFK05zTE40eVBSdDNr?=
+ =?utf-8?B?QWFXYlRqL2V6ek14QnZMNm4zZ2Fsd0w5d3ZIZ1ZLbm9wK2VpNHE4WmFTeUZU?=
+ =?utf-8?B?ZGlkYmVMNmFUWW1tYXFjcVVlUXJxdGtWeC8vdW40OVhxSW5hTVcyUnlFcWFk?=
+ =?utf-8?B?WG45TEdNSTMvTmQ1TFQva2JsT2FIRG53QVVaZUlNd0JFNVBzblRIb1BVdDZG?=
+ =?utf-8?B?Mm9pbWZjVmp5QWVKU1hhZk4vMFVpU2VZcFJpY1RkWWIzSE5ITzJndWFUdWw1?=
+ =?utf-8?B?czJmZm4wbndMT3BicHI2cW82UERYZFY2aDZGaFpIU2VrbEVFWmZXQTByYVdK?=
+ =?utf-8?B?UUxnckJrQTd6WmhJa2xLUzJNaG9zQzRUNGNrUi9FOTNMcGNJRDZOWStNTDFO?=
+ =?utf-8?B?bWkrNW5aT0lLZHlrRUJQdDNjQS9zaGVrbDRMNzdUQ2dWUDRLZ3hSMWxFNlpX?=
+ =?utf-8?B?QUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 55beacac-0848-4793-410c-08dc7c351a8b
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 May 2024 21:04:30.1568
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2ttZOa5OWvHB0mLZvdBveXZo5o/UGGr+hJcHkClWFoJvQGwtMLKGmd1AQ9f21UKPxR5R8wuxqzrx9ylma48if54+ocLNmhoH/Ssu8ksrYWM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8431
+X-OriginatorOrg: intel.com
 
-First of all the flags are never set by any of the driver parts. If nobody
-have them set then the respective statements will always have the same
-result. Thus the statements can be simplified or even dropped with no risk
-to break things.
 
-Secondly shall any of the TBI or RTBI flag is set the MDIO-bus
-registration will be bypassed. Why? It really seems weird. It's perfectly
-fine to have a TBI/RTBI-capable PHY configured over the MDIO bus
-interface.
 
-Based on the notes above the TBI/RTBI PCS flags can be freely dropped thus
-simplifying the driver code.
+On 5/22/2024 4:12 PM, Michal Schmidt wrote:
+> irq_set_affinity_hint() is deprecated. Use irq_update_affinity_hint()
+> instead. This removes the side-effect of actually applying the affinity.
+> 
+> The driver does not really need to worry about spreading its IRQs across
+> CPUs. The core code already takes care of that.
+> On the contrary, when the driver applies affinities by itself, it breaks
+> the users' expectations:
+>  1. The user configures irqbalance with IRQBALANCE_BANNED_CPULIST in
+>     order to prevent IRQs from being moved to certain CPUs that run a
+>     real-time workload.
+>  2. ice reconfigures VSIs at runtime due to a MIB change
+>     (ice_dcb_process_lldp_set_mib_change). Reopening a VSI resets the
+>     affinity in ice_vsi_req_irq_msix().
+>  3. ice has no idea about irqbalance's config, so it may move an IRQ to
+>     a banned CPU. The real-time workload suffers unacceptable latency.
+> 
+> I am not sure if updating the affinity hints is at all useful, because
+> irqbalance ignores them since 2016 ([1]), but at least it's harmless.
+> 
+> This ice change is similar to i40e commit d34c54d1739c ("i40e: Use
+> irq_update_affinity_hint()").
+> 
+> [1] https://github.com/Irqbalance/irqbalance/commit/dcc411e7bfdd
+> 
 
-Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/common.h  |  2 -
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 37 ++++++-------------
- 2 files changed, 11 insertions(+), 28 deletions(-)
+This is sent tagged for next, but the commit description reads more like
+it fixes deployments running irqbalance. Would it make sense to mark
+this with Fixes and target net instead?
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-index b02b905bc892..40a930ea4ff3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/common.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-@@ -268,8 +268,6 @@ struct stmmac_safety_stats {
- /* PCS defines */
- #define STMMAC_PCS_RGMII	(1 << 0)
- #define STMMAC_PCS_SGMII	(1 << 1)
--#define STMMAC_PCS_TBI		(1 << 2)
--#define STMMAC_PCS_RTBI		(1 << 3)
- 
- #define SF_DMA_MODE 1		/* DMA STORE-AND-FORWARD Operation Mode */
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 6c4e90b1fea3..06f95dfdf09e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -471,13 +471,6 @@ bool stmmac_eee_init(struct stmmac_priv *priv)
- {
- 	int eee_tw_timer = priv->eee_tw_timer;
- 
--	/* Using PCS we cannot dial with the phy registers at this stage
--	 * so we do not support extra feature like EEE.
--	 */
--	if (priv->hw->pcs == STMMAC_PCS_TBI ||
--	    priv->hw->pcs == STMMAC_PCS_RTBI)
--		return false;
--
- 	/* Check if MAC core supports the EEE feature. */
- 	if (!priv->dma_cap.eee)
- 		return false;
-@@ -3945,9 +3938,7 @@ static int __stmmac_open(struct net_device *dev,
- 	if (ret < 0)
- 		return ret;
- 
--	if (priv->hw->pcs != STMMAC_PCS_TBI &&
--	    priv->hw->pcs != STMMAC_PCS_RTBI &&
--	    (!priv->hw->xpcs ||
-+	if ((!priv->hw->xpcs ||
- 	     xpcs_get_an_mode(priv->hw->xpcs, mode) != DW_AN_C73) &&
- 	    !priv->hw->lynx_pcs) {
- 		ret = stmmac_init_phy(dev);
-@@ -7724,16 +7715,12 @@ int stmmac_dvr_probe(struct device *device,
- 	if (!pm_runtime_enabled(device))
- 		pm_runtime_enable(device);
- 
--	if (priv->hw->pcs != STMMAC_PCS_TBI &&
--	    priv->hw->pcs != STMMAC_PCS_RTBI) {
--		/* MDIO bus Registration */
--		ret = stmmac_mdio_register(ndev);
--		if (ret < 0) {
--			dev_err_probe(priv->device, ret,
--				      "%s: MDIO bus (id: %d) registration failed\n",
--				      __func__, priv->plat->bus_id);
--			goto error_mdio_register;
--		}
-+	ret = stmmac_mdio_register(ndev);
-+	if (ret < 0) {
-+		dev_err_probe(priv->device, ret,
-+			      "MDIO bus (id: %d) registration failed\n",
-+			      priv->plat->bus_id);
-+		goto error_mdio_register;
- 	}
- 
- 	if (priv->plat->speed_mode_2500)
-@@ -7776,9 +7763,7 @@ int stmmac_dvr_probe(struct device *device,
- 	phylink_destroy(priv->phylink);
- error_xpcs_setup:
- error_phy_setup:
--	if (priv->hw->pcs != STMMAC_PCS_TBI &&
--	    priv->hw->pcs != STMMAC_PCS_RTBI)
--		stmmac_mdio_unregister(ndev);
-+	stmmac_mdio_unregister(ndev);
- error_mdio_register:
- 	stmmac_napi_del(ndev);
- error_hw_init:
-@@ -7817,9 +7802,9 @@ void stmmac_dvr_remove(struct device *dev)
- 	if (priv->plat->stmmac_rst)
- 		reset_control_assert(priv->plat->stmmac_rst);
- 	reset_control_assert(priv->plat->stmmac_ahb_rst);
--	if (priv->hw->pcs != STMMAC_PCS_TBI &&
--	    priv->hw->pcs != STMMAC_PCS_RTBI)
--		stmmac_mdio_unregister(ndev);
-+
-+	stmmac_mdio_unregister(ndev);
-+
- 	destroy_workqueue(priv->wq);
- 	mutex_destroy(&priv->lock);
- 	bitmap_free(priv->af_xdp_zc_qps);
--- 
-2.43.0
-
+> Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
 
