@@ -1,578 +1,430 @@
-Return-Path: <netdev+bounces-97921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-97922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB0438CE0F0
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 08:18:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EBBD8CE0FC
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 08:25:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EE4E1F21E7D
-	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 06:18:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F228A1F21E3C
+	for <lists+netdev@lfdr.de>; Fri, 24 May 2024 06:25:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8659D12836A;
-	Fri, 24 May 2024 06:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E22F5FDA7;
+	Fri, 24 May 2024 06:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iKuHShVI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA03383BE
-	for <netdev@vger.kernel.org>; Fri, 24 May 2024 06:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02591487BF
+	for <netdev@vger.kernel.org>; Fri, 24 May 2024 06:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716531509; cv=none; b=AC4ZN7J553cWe6bMGOKug7N7Iwg2uSH+AlcLc8jps/5LbHCbm+XGGOJk+h5yi9SmfPBpkc193pxDLu+V8XeFEyp1ldYKY37z76fCOSGp+WDd7D5OCIx/zPqfqxwzYIdJO10659OOh2BnniKKeJxUc8wAsd5GWrZtlX0Z7eGRoRM=
+	t=1716531912; cv=none; b=XuJj6OsxpRdsc2k957hYgN7v9xyoWxaQ4pgnkoaUtnCxbpRPGpTJUBQh520Z3VaQjjy5DfpaB2CkcZttMrJo+HHuNcThb/vvKLdFuOKaJt0WKwYO5zUecp2MGFVnF8iPtWE8PZUDUv5rIH944h+dJsml/tOs4oq6dWFer86jT70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716531509; c=relaxed/simple;
-	bh=irwvMJuabM/LE3ZP5E9X062DdIUthg83LdFaKiToKyQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=r2O7sz+i19g5i3uAEV0MxiqtAFXl2frciJd31J4NvFzfrIyslmO30TbCaZZyK8UPV17fe7a8XaeSzeI6AI/Zyxvb0mkGmeO/jZuZeaB+gYiBRFjhvzpAqRA8eWjpFgHMT0cbC9rGDrUTQVdfAZr+J8f7LceeLaQp0wFPsszmz7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3737ee417baso1184975ab.1
-        for <netdev@vger.kernel.org>; Thu, 23 May 2024 23:18:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716531506; x=1717136306;
-        h=content-transfer-encoding:to:from:subject:message-id:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BNgu4oddCQYnVQUvBsGea594F0HKpe6UHOO7M9fsFuc=;
-        b=JQZ/RuF2cneMBMEjM4gG/xXLLjSHH+QyuKzqOA/jiDOg4foXSP9I/tspx1FwN2HCsU
-         xpJKZGSUhMmFKMj+wM/8f/xeCdWcku2jDNzxHTabiZWMKMtbb3haU1wnLiDYPXWElGZB
-         NPwhf3KTd5sSAvW9YKH0vsIfn6+FigB3Zyy2OfqCyvWZwyburA/pu+Upy5OkSLWaaJrN
-         8mSatG061DPU2OL5OACv41RJugKFItuqH02OzaS8Z8U1kO0DzhpZPP3cSZfnpq826+Hp
-         G4eOVT/s8m5lGfChhhWpYzfaBqxh5R8qhuoBraj6k85yjNteS6+A6WTAHyJLQnISSrD5
-         3eqA==
-X-Forwarded-Encrypted: i=1; AJvYcCWfTknKVh9aO0uexkey3QNwzyT0kmkqSkBlEk/sMXBV73LLyYEk1SUNSKTh3889CWqzwLpYvYinCrbvJ8mM+XDmfG6ral6v
-X-Gm-Message-State: AOJu0YwzPzrkR00D3YEVls9vGZtxigRSqO0eN8RlzeEncqEpjT/tX5SD
-	z4Ipvhx7TnZ5fXW8RbpsQwUS3OKnRcVO6NZhFKvTHw7uBTUADHEa15fh0ZGaMp95LNAb3rNm0el
-	shD3HAecdRWLDej1wNcUdiCraAOLGpAwHIeBFohxSw/fuV3XLSmJ01gU=
-X-Google-Smtp-Source: AGHT+IGX/IoYA4ysHtyGmoHYjoFauld/xbpuOYFS7/TY05ffRVlnIETC6a1+jU0LC3iGAjmOdg0Fm6EhTUdO1YhxZQN0MnNWUi3m
+	s=arc-20240116; t=1716531912; c=relaxed/simple;
+	bh=Th/wyoN5I6NBJ4KJcZvy+3OjavZOYx9qbaCggK9xVcQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GZBgXQ0ZMSmGPZh/peg5NAz6ltRNNXU6eSiAapuld+xXMoEPXEVeI5yBy1TwU00uBWSyIf6K8agsI+YP75huMNMMnVgsWXniIG2ddt5RrnhSDRTAbavh/qTmB7BcPUG/9O7heVKHVTWdpzjx7z88OFWZPfiHqauzGw/87KEH+x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iKuHShVI; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: ameryhung@gmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1716531902;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rkHP8bSt0iaT2ujp25iEOhPoAZerzEA6zarFKTD8Q2c=;
+	b=iKuHShVII5TP39KcxM9fGTLAo1+eA3QS1IBrPCBD1mrq7qmkVK7/ohOiglfH9Hn52k06tu
+	kauBgHkigicYCUag6Rax2PZx9nGUZ6YJkoOGM4k2FAZaDiGgBvuYs3omg5JxZFfiC8aE7h
+	Bexu+OtXjOuFD8aLaOp/NItUnH9PELw=
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: bpf@vger.kernel.org
+X-Envelope-To: yangpeihao@sjtu.edu.cn
+X-Envelope-To: daniel@iogearbox.net
+X-Envelope-To: andrii@kernel.org
+X-Envelope-To: martin.lau@kernel.org
+X-Envelope-To: sinquersw@gmail.com
+X-Envelope-To: toke@redhat.com
+X-Envelope-To: jhs@mojatatu.com
+X-Envelope-To: jiri@resnulli.us
+X-Envelope-To: sdf@google.com
+X-Envelope-To: xiyou.wangcong@gmail.com
+X-Envelope-To: yepeilin.cs@gmail.com
+Message-ID: <6ad06909-7ef4-4f8c-be97-fe5c73bc14a3@linux.dev>
+Date: Thu, 23 May 2024 23:24:52 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1887:b0:371:a225:45b5 with SMTP id
- e9e14a558f8ab-3737ac8695emr1192695ab.1.1716531506472; Thu, 23 May 2024
- 23:18:26 -0700 (PDT)
-Date: Thu, 23 May 2024 23:18:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b07bfb06192d228b@google.com>
-Subject: [syzbot] [net?] [input?] [usb?] INFO: rcu detected stall in sendmsg (4)
-From: syzbot <syzbot+9c0539eda655673bdaa4@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [RFC PATCH v8 18/20] selftests: Add a bpf fq qdisc to selftest
+To: Amery Hung <ameryhung@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn,
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@kernel.org,
+ sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us,
+ sdf@google.com, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+References: <20240510192412.3297104-1-amery.hung@bytedance.com>
+ <20240510192412.3297104-19-amery.hung@bytedance.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20240510192412.3297104-19-amery.hung@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello,
+On 5/10/24 12:24 PM, Amery Hung wrote:
+> This test implements a more sophisticated qdisc using bpf. The bpf fair-
+> queueing (fq) qdisc gives each flow an equal chance to transmit data. It
+> also respects the timestamp of skb for rate limiting. The implementation
+> does not prevent hash collision of flows nor does it recycle flows.
 
-syzbot found the following issue on:
+Does it hit some issue to handle the flow collision (just curious if there are 
+missing pieces to do this)?
 
-HEAD commit:    61307b7be41a Merge tag 'mm-stable-2024-05-17-19-19' of git.=
-.
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D13f55634980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3De7d2f006659b877
-dashboard link: https://syzkaller.appspot.com/bug?extid=3D9c0539eda655673bd=
-aa4
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Deb=
-ian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D10311eb298000=
-0
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D12e9f1dc980000
+> The bpf fq also takes the chance to communicate packet drop information
+> with a bpf clsact EDT rate limiter using bpf maps. With the info, the
+> rate limiter can compenstate the delay caused by packet drops in qdisc
+> to maintain the throughput.
+> 
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0de598381836/disk-=
-61307b7b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/69ea7aec70a4/vmlinux-=
-61307b7b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/07111fc20846/bzI=
-mage-61307b7b.xz
+> diff --git a/tools/testing/selftests/bpf/progs/bpf_qdisc_fq.c b/tools/testing/selftests/bpf/progs/bpf_qdisc_fq.c
+> new file mode 100644
+> index 000000000000..5118237da9e4
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/bpf_qdisc_fq.c
+> @@ -0,0 +1,660 @@
+> +#include <vmlinux.h>
+> +#include <bpf/bpf_helpers.h>
+> +#include "bpf_experimental.h"
+> +#include "bpf_qdisc_common.h"
+> +
+> +char _license[] SEC("license") = "GPL";
+> +
+> +#define NSEC_PER_USEC 1000L
+> +#define NSEC_PER_SEC 1000000000L
+> +#define PSCHED_MTU (64 * 1024 + 14)
+> +
+> +#define NUM_QUEUE_LOG 10
+> +#define NUM_QUEUE (1 << NUM_QUEUE_LOG)
+> +#define PRIO_QUEUE (NUM_QUEUE + 1)
+> +#define COMP_DROP_PKT_DELAY 1
+> +#define THROTTLED 0xffffffffffffffff
+> +
+> +/* fq configuration */
+> +__u64 q_flow_refill_delay = 40 * 10000; //40us
+> +__u64 q_horizon = 10ULL * NSEC_PER_SEC;
+> +__u32 q_initial_quantum = 10 * PSCHED_MTU;
+> +__u32 q_quantum = 2 * PSCHED_MTU;
+> +__u32 q_orphan_mask = 1023;
+> +__u32 q_flow_plimit = 100;
+> +__u32 q_plimit = 10000;
+> +__u32 q_timer_slack = 10 * NSEC_PER_USEC;
+> +bool q_horizon_drop = true;
+> +
+> +bool q_compensate_tstamp;
+> +bool q_random_drop;
+> +
+> +unsigned long time_next_delayed_flow = ~0ULL;
+> +unsigned long unthrottle_latency_ns = 0ULL;
+> +unsigned long ktime_cache = 0;
+> +unsigned long dequeue_now;
+> +unsigned int fq_qlen = 0;
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit=
-:
-Reported-by: syzbot+9c0539eda655673bdaa4@syzkaller.appspotmail.com
+I suspect some of these globals may be more natural if it is stored private to 
+an individual Qdisc instance. i.e. qdisc_priv(). e.g. in the sch_mq setup.
 
-rcu: INFO: rcu_preempt self-detected stall on CPU
-rcu: 	0-...!: (7 ticks this GP) idle=3D5024/1/0x4000000000000000 softirq=3D=
-8175/8175 fqs=3D0
-rcu: 	(t=3D11029 jiffies g=3D8665 q=3D111 ncpus=3D2)
-rcu: rcu_preempt kthread starved for 11029 jiffies! g8665 f0x0 RCU_GP_WAIT_=
-FQS(5) ->state=3D0x0 ->cpu=3D0
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expec=
-ted behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:28752 pid:17    tgid:1=
-7    ppid:2      flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0xe7/0x350 kernel/sched/core.c:6837
- schedule_timeout+0x136/0x2a0 kernel/time/timer.c:2581
- rcu_gp_fqs_loop+0x1eb/0xb00 kernel/rcu/tree.c:2000
- rcu_gp_kthread+0x271/0x380 kernel/rcu/tree.c:2202
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-CPU: 0 PID: 4533 Comm: udevd Not tainted 6.9.0-syzkaller-09429-g61307b7be41=
-a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Goo=
-gle 04/02/2024
-RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152=
- [inline]
-RIP: 0010:_raw_spin_unlock_irqrestore+0x31/0x80 kernel/locking/spinlock.c:1=
-94
-Code: f5 53 48 8b 74 24 10 48 89 fb 48 83 c7 18 e8 16 10 82 f6 48 89 df e8 =
-fe 8c 82 f6 f7 c5 00 02 00 00 75 23 9c 58 f6 c4 02 75 37 <bf> 01 00 00 00 e=
-8 75 cd 73 f6 65 8b 05 06 1b 1a 75 85 c0 74 16 5b
-RSP: 0018:ffffc90000007a48 EFLAGS: 00000246
-RAX: 0000000000000002 RBX: ffff888023414000 RCX: 1ffffffff285644e
-RDX: 0000000000000000 RSI: ffffffff8b2cab60 RDI: ffffffff8b8faa00
-RBP: 0000000000000246 R08: 0000000000000001 R09: fffffbfff284be6a
-R10: ffffffff9425f357 R11: 0000000000000003 R12: ffff8880243de478
-R13: ffff8880243de480 R14: dffffc0000000000 R15: ffff8880243de478
-FS:  00007f58b93bdc80(0000) GS:ffff8880b9200000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f58b9410d80 CR3: 000000007cfb8000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
- dummy_timer+0x1e16/0x3940 drivers/usb/gadget/udc/dummy_hcd.c:2001
- call_timer_fn+0x1a0/0x610 kernel/time/timer.c:1792
- expire_timers kernel/time/timer.c:1843 [inline]
- __run_timers+0x74b/0xaf0 kernel/time/timer.c:2417
- __run_timer_base kernel/time/timer.c:2428 [inline]
- __run_timer_base kernel/time/timer.c:2421 [inline]
- run_timer_base+0x111/0x190 kernel/time/timer.c:2437
- run_timer_softirq+0x1a/0x40 kernel/time/timer.c:2447
- handle_softirqs+0x216/0x8f0 kernel/softirq.c:554
- __do_softirq kernel/softirq.c:588 [inline]
- invoke_softirq kernel/softirq.c:428 [inline]
- __irq_exit_rcu kernel/softirq.c:637 [inline]
- irq_exit_rcu+0xbb/0x120 kernel/softirq.c:649
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline=
-]
- sysvec_apic_timer_interrupt+0x95/0xb0 arch/x86/kernel/apic/apic.c:1043
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:=
-702
-RIP: 0010:arch_static_branch arch/x86/include/asm/jump_label.h:27 [inline]
-RIP: 0010:__slub_debug_enabled mm/slab.h:510 [inline]
-RIP: 0010:kmem_cache_debug_flags mm/slab.h:531 [inline]
-RIP: 0010:kmem_cache_debug mm/slub.c:230 [inline]
-RIP: 0010:__slab_free+0x39/0x4d0 mm/slub.c:4253
-Code: 41 54 53 48 83 e4 f0 48 83 c4 80 48 89 54 24 08 48 8d 54 24 40 48 89 =
-7c 24 30 48 89 d7 48 89 4c 24 10 b9 08 00 00 00 f3 48 ab <0f> 1f 44 00 00 4=
-8 c7 04 24 00 00 00 00 c6 44 24 3e 00 66 44 89 44
-RSP: 0018:ffffc90003d27730 EFLAGS: 00000287
-RAX: 0000000000000000 RBX: ffff888015442140 RCX: 0000000000000000
-RDX: ffffc90003d27770 RSI: ffffea00008e5200 RDI: ffffc90003d277b0
-RBP: ffffc90003d277e0 R08: 0000000000000001 R09: ffffffff81e9db49
-R10: 0000000000000000 R11: 0000000000000001 R12: ffff888078e4a000
-R13: 0000000000000000 R14: ffffc90003d27828 R15: ffffea00008e5200
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x4e/0x140 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x192/0x1e0 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:322
- kasan_slab_alloc include/linux/kasan.h:201 [inline]
- slab_post_alloc_hook mm/slub.c:3940 [inline]
- slab_alloc_node mm/slub.c:4000 [inline]
- kmem_cache_alloc_node_noprof+0x153/0x310 mm/slub.c:4043
- kmalloc_reserve+0x18b/0x2c0 net/core/skbuff.c:575
- __alloc_skb+0x164/0x380 net/core/skbuff.c:666
- alloc_skb include/linux/skbuff.h:1308 [inline]
- netlink_alloc_large_skb+0x69/0x130 net/netlink/af_netlink.c:1210
- netlink_sendmsg+0x689/0xd70 net/netlink/af_netlink.c:1880
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0xab5/0xc90 net/socket.c:2585
- ___sys_sendmsg+0x135/0x1e0 net/socket.c:2639
- __sys_sendmsg+0x117/0x1f0 net/socket.c:2668
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f58b8f24a4b
-Code: ff 89 ef 48 89 04 24 e8 22 56 f9 ff 48 8b 04 24 48 83 c4 20 5d c3 c3 =
-64 8b 04 25 18 00 00 00 85 c0 75 20 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff f=
-f 76 6d 48 8b 15 ae c3 0c 00 f7 d8 64 89 02 48 83
-RSP: 002b:00007ffe73c0e2d8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00005610f4ae1240 RCX: 00007f58b8f24a4b
-RDX: 0000000000000000 RSI: 00007ffe73c0e2e8 RDI: 0000000000000004
-RBP: 00005610f4b0e290 R08: 0000000000000001 R09: 3039abbe55c8e597
-R10: 1999999999999999 R11: 0000000000000246 R12: 0000000000000000
-R13: 00000000000000c4 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-Mem-Info:
-active_anon:3729 inactive_anon:0 isolated_anon:0
- active_file:0 inactive_file:15360 isolated_file:0
- unevictable:768 dirty:3 writeback:0
- slab_reclaimable:9244 slab_unreclaimable:79848
- mapped:2131 shmem:1251 pagetables:547
- sec_pagetables:0 bounce:0
- kernel_misc_reclaimable:0
- free:1491166 free_pcp:372 free_cma:0
-Node 0 active_anon:14916kB inactive_anon:0kB active_file:0kB inactive_file:=
-61364kB unevictable:1536kB isolated(anon):0kB isolated(file):0kB mapped:852=
-4kB dirty:8kB writeback:0kB shmem:3468kB shmem_thp:0kB shmem_pmdmapped:0kB =
-anon_thp:0kB writeback_tmp:0kB kernel_stack:8496kB pagetables:2188kB sec_pa=
-getables:0kB all_unreclaimable? no
-Node 1 active_anon:0kB inactive_anon:0kB active_file:0kB inactive_file:76kB=
- unevictable:1536kB isolated(anon):0kB isolated(file):0kB mapped:0kB dirty:=
-4kB writeback:0kB shmem:1536kB shmem_thp:0kB shmem_pmdmapped:0kB anon_thp:0=
-kB writeback_tmp:0kB kernel_stack:16kB pagetables:0kB sec_pagetables:0kB al=
-l_unreclaimable? no
-Node 0 DMA free:15360kB boost:0kB min:204kB low:252kB high:300kB reserved_h=
-ighatomic:0KB active_anon:0kB inactive_anon:0kB active_file:0kB inactive_fi=
-le:0kB unevictable:0kB writepending:0kB present:15992kB managed:15360kB mlo=
-cked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:0kB
-lowmem_reserve[]: 0 2565 2567 0 0
-Node 0 DMA32 free:1992068kB boost:0kB min:35052kB low:43812kB high:52572kB =
-reserved_highatomic:0KB active_anon:14892kB inactive_anon:0kB active_file:0=
-kB inactive_file:59552kB unevictable:1536kB writepending:8kB present:312933=
-2kB managed:2654792kB mlocked:0kB bounce:0kB free_pcp:1456kB local_pcp:760k=
-B free_cma:0kB
-lowmem_reserve[]: 0 0 1 0 0
-Node 0 Normal free:28kB boost:0kB min:24kB low:28kB high:32kB reserved_high=
-atomic:0KB active_anon:24kB inactive_anon:0kB active_file:0kB inactive_file=
-:1812kB unevictable:0kB writepending:0kB present:1048576kB managed:1896kB m=
-locked:0kB bounce:0kB free_pcp:32kB local_pcp:8kB free_cma:0kB
-lowmem_reserve[]: 0 0 0 0 0
-Node 1 Normal free:3957208kB boost:0kB min:54828kB low:68532kB high:82236kB=
- reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB active_file:0kB =
-inactive_file:76kB unevictable:1536kB writepending:4kB present:4194304kB ma=
-naged:4109120kB mlocked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:=
-0kB
-lowmem_reserve[]: 0 0 0 0 0
-Node 0 DMA: 0*4kB 0*8kB 0*16kB 0*32kB 0*64kB 0*128kB 0*256kB 0*512kB 1*1024=
-kB (U) 1*2048kB (M) 3*4096kB (M) =3D 15360kB
-Node 0 DMA32: 724*4kB (UM) 1149*8kB (UME) 213*16kB (UME) 15*32kB (UME) 5*64=
-kB (E) 1*128kB (U) 3*256kB (ME) 1*512kB (U) 2*1024kB (ME) 1*2048kB (E) 481*=
-4096kB (M) =3D 1991976kB
-Node 0 Normal: 1*4kB (M) 1*8kB (M) 1*16kB (M) 0*32kB 0*64kB 0*128kB 0*256kB=
- 0*512kB 0*1024kB 0*2048kB 0*4096kB =3D 28kB
-Node 1 Normal: 6*4kB (UM) 8*8kB (UM) 8*16kB (UM) 12*32kB (UM) 6*64kB (U) 2*=
-128kB (U) 1*256kB (M) 2*512kB (UM) 0*1024kB 1*2048kB (U) 965*4096kB (M) =3D=
- 3957208kB
-Node 0 hugepages_total=3D0 hugepages_free=3D0 hugepages_surp=3D0 hugepages_=
-size=3D1048576kB
-Node 0 hugepages_total=3D2 hugepages_free=3D2 hugepages_surp=3D0 hugepages_=
-size=3D2048kB
-Node 1 hugepages_total=3D0 hugepages_free=3D0 hugepages_surp=3D0 hugepages_=
-size=3D1048576kB
-Node 1 hugepages_total=3D2 hugepages_free=3D2 hugepages_surp=3D0 hugepages_=
-size=3D2048kB
-16611 total pagecache pages
-0 pages in swap cache
-Free swap  =3D 0kB
-Total swap =3D 0kB
-2097051 pages RAM
-0 pages HighMem/MovableOnly
-401759 pages reserved
-0 pages cma reserved
-Mem-Info:
-active_anon:3734 inactive_anon:0 isolated_anon:0
- active_file:0 inactive_file:15360 isolated_file:0
- unevictable:768 dirty:0 writeback:0
- slab_reclaimable:9186 slab_unreclaimable:79492
- mapped:2131 shmem:1229 pagetables:570
- sec_pagetables:0 bounce:0
- kernel_misc_reclaimable:0
- free:1491784 free_pcp:96 free_cma:0
-Node 0 active_anon:14936kB inactive_anon:0kB active_file:0kB inactive_file:=
-61364kB unevictable:1536kB isolated(anon):0kB isolated(file):0kB mapped:852=
-4kB dirty:0kB writeback:0kB shmem:3380kB shmem_thp:0kB shmem_pmdmapped:0kB =
-anon_thp:0kB writeback_tmp:0kB kernel_stack:8624kB pagetables:2280kB sec_pa=
-getables:0kB all_unreclaimable? no
-Node 1 active_anon:0kB inactive_anon:0kB active_file:0kB inactive_file:76kB=
- unevictable:1536kB isolated(anon):0kB isolated(file):0kB mapped:0kB dirty:=
-0kB writeback:0kB shmem:1536kB shmem_thp:0kB shmem_pmdmapped:0kB anon_thp:0=
-kB writeback_tmp:0kB kernel_stack:16kB pagetables:0kB sec_pagetables:0kB al=
-l_unreclaimable? no
-Node 0 DMA free:15360kB boost:0kB min:204kB low:252kB high:300kB reserved_h=
-ighatomic:0KB active_anon:0kB inactive_anon:0kB active_file:0kB inactive_fi=
-le:0kB unevictable:0kB writepending:0kB present:15992kB managed:15360kB mlo=
-cked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:0kB
-lowmem_reserve[]: 0 2565 2567 0 0
-Node 0 DMA32 free:1994540kB boost:0kB min:35052kB low:43812kB high:52572kB =
-reserved_highatomic:0KB active_anon:14912kB inactive_anon:0kB active_file:0=
-kB inactive_file:59552kB unevictable:1536kB writepending:0kB present:312933=
-2kB managed:2654792kB mlocked:0kB bounce:0kB free_pcp:352kB local_pcp:160kB=
- free_cma:0kB
-lowmem_reserve[]: 0 0 1 0 0
-Node 0 Normal free:28kB boost:0kB min:24kB low:28kB high:32kB reserved_high=
-atomic:0KB active_anon:24kB inactive_anon:0kB active_file:0kB inactive_file=
-:1812kB unevictable:0kB writepending:0kB present:1048576kB managed:1896kB m=
-locked:0kB bounce:0kB free_pcp:32kB local_pcp:8kB free_cma:0kB
-lowmem_reserve[]: 0 0 0 0 0
-Node 1 Normal free:3957208kB boost:0kB min:54828kB low:68532kB high:82236kB=
- reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB active_file:0kB =
-inactive_file:76kB unevictable:1536kB writepending:0kB present:4194304kB ma=
-naged:4109120kB mlocked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:=
-0kB
-lowmem_reserve[]: 0 0 0 0 0
-Node 0 DMA: 0*4kB 0*8kB 0*16kB 0*32kB 0*64kB 0*128kB 0*256kB 0*512kB 1*1024=
-kB (U) 1*2048kB (M) 3*4096kB (M) =3D 15360kB
-Node 0 DMA32: 815*4kB (UM) 1206*8kB (UME) 56*16kB (UME) 58*32kB (UME) 49*64=
-kB (UME) 3*128kB (UM) 2*256kB (ME) 1*512kB (U) 2*1024kB (ME) 1*2048kB (E) 4=
-81*4096kB (M) =3D 1994476kB
-Node 0 Normal: 1*4kB (M) 1*8kB (M) 1*16kB (M) 0*32kB 0*64kB 0*128kB 0*256kB=
- 0*512kB 0*1024kB 0*2048kB 0*4096kB =3D 28kB
-Node 1 Normal: 6*4kB (UM) 8*8kB (UM) 8*16kB (UM) 12*32kB (UM) 6*64kB (U) 2*=
-128kB (U) 1*256kB (M) 2*512kB (UM) 0*1024kB 1*2048kB (U) 965*4096kB (M) =3D=
- 3957208kB
-Node 0 hugepages_total=3D0 hugepages_free=3D0 hugepages_surp=3D0 hugepages_=
-size=3D1048576kB
-Node 0 hugepages_total=3D2 hugepages_free=3D2 hugepages_surp=3D0 hugepages_=
-size=3D2048kB
-Node 1 hugepages_total=3D0 hugepages_free=3D0 hugepages_surp=3D0 hugepages_=
-size=3D1048576kB
-Node 1 hugepages_total=3D2 hugepages_free=3D2 hugepages_surp=3D0 hugepages_=
-size=3D2048kB
-16589 total pagecache pages
-0 pages in swap cache
-Free swap  =3D 0kB
-Total swap =3D 0kB
-2097051 pages RAM
-0 pages HighMem/MovableOnly
-401759 pages reserved
-0 pages cma reserved
-Mem-Info:
-active_anon:3734 inactive_anon:0 isolated_anon:0
- active_file:0 inactive_file:15360 isolated_file:0
- unevictable:768 dirty:0 writeback:0
- slab_reclaimable:9186 slab_unreclaimable:79492
- mapped:2131 shmem:1229 pagetables:570
- sec_pagetables:0 bounce:0
- kernel_misc_reclaimable:0
- free:1491583 free_pcp:285 free_cma:0
-Node 0 active_anon:14936kB inactive_anon:0kB active_file:0kB inactive_file:=
-61364kB unevictable:1536kB isolated(anon):0kB isolated(file):0kB mapped:852=
-4kB dirty:0kB writeback:0kB shmem:3380kB shmem_thp:0kB shmem_pmdmapped:0kB =
-anon_thp:0kB writeback_tmp:0kB kernel_stack:8652kB pagetables:2280kB sec_pa=
-getables:0kB all_unreclaimable? no
-Node 1 active_anon:0kB inactive_anon:0kB active_file:0kB inactive_file:76kB=
- unevictable:1536kB isolated(anon):0kB isolated(file):0kB mapped:0kB dirty:=
-0kB writeback:0kB shmem:1536kB shmem_thp:0kB shmem_pmdmapped:0kB anon_thp:0=
-kB writeback_tmp:0kB kernel_stack:16kB pagetables:0kB sec_pagetables:0kB al=
-l_unreclaimable? no
-Node 0 DMA free:15360kB boost:0kB min:204kB low:252kB high:300kB reserved_h=
-ighatomic:0KB active_anon:0kB inactive_anon:0kB active_file:0kB inactive_fi=
-le:0kB unevictable:0kB writepending:0kB present:15992kB managed:15360kB mlo=
-cked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:0kB
-lowmem_reserve[]: 0 2565 2567 0 0
-Node 0 DMA32 free:1993736kB boost:0kB min:35052kB low:43812kB high:52572kB =
-reserved_highatomic:0KB active_anon:14912kB inactive_anon:0kB active_file:0=
-kB inactive_file:59552kB unevictable:1536kB writepending:0kB present:312933=
-2kB managed:2654792kB mlocked:0kB bounce:0kB free_pcp:1108kB local_pcp:916k=
-B free_cma:0kB
-lowmem_reserve[]: 0 0 1 0 0
-Node 0 Normal free:28kB boost:0kB min:24kB low:28kB high:32kB reserved_high=
-atomic:0KB active_anon:24kB inactive_anon:0kB active_file:0kB inactive_file=
-:1812kB unevictable:0kB writepending:0kB present:1048576kB managed:1896kB m=
-locked:0kB bounce:0kB free_pcp:32kB local_pcp:8kB free_cma:0kB
-lowmem_reserve[]: 0 0 0 0 0
-Node 1 Normal free:3957208kB boost:0kB min:54828kB low:68532kB high:82236kB=
- reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB active_file:0kB =
-inactive_file:76kB unevictable:1536kB writepending:0kB present:4194304kB ma=
-naged:4109120kB mlocked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:=
-0kB
-lowmem_reserve[]: 0 0 0 0 0
-Node 0 DMA: 0*4kB 0*8kB 0*16kB 0*32kB 0*64kB 0*128kB 0*256kB 0*512kB 1*1024=
-kB (U) 1*2048kB (M) 3*4096kB (M) =3D 15360kB
-Node 0 DMA32: 654*4kB (UM) 1192*8kB (UME) 56*16kB (UME) 58*32kB (UME) 49*64=
-kB (UME) 3*128kB (UM) 2*256kB (ME) 1*512kB (U) 2*1024kB (ME) 1*2048kB (E) 4=
-81*4096kB (M) =3D 1993720kB
-Node 0 Normal: 1*4kB (M) 1*8kB (M) 1*16kB (M) 0*32kB 0*64kB 0*128kB 0*256kB=
- 0*512kB 0*1024kB 0*2048kB 0*4096kB =3D 28kB
-Node 1 Normal: 6*4kB (UM) 8*8kB (UM) 8*16kB (UM) 12*32kB (UM) 6*64kB (U) 2*=
-128kB (U) 1*256kB (M) 2*512kB (UM) 0*1024kB 1*2048kB (U) 965*4096kB (M) =3D=
- 3957208kB
-Node 0 hugepages_total=3D0 hugepages_free=3D0 hugepages_surp=3D0 hugepages_=
-size=3D1048576kB
-Node 0 hugepages_total=3D2 hugepages_free=3D2 hugepages_surp=3D0 hugepages_=
-size=3D2048kB
-Node 1 hugepages_total=3D0 hugepages_free=3D0 hugepages_surp=3D0 hugepages_=
-size=3D1048576kB
-Node 1 hugepages_total=3D2 hugepages_free=3D2 hugepages_surp=3D0 hugepages_=
-size=3D2048kB
-16589 total pagecache pages
-0 pages in swap cache
-Free swap  =3D 0kB
-Total swap =3D 0kB
-2097051 pages RAM
-0 pages HighMem/MovableOnly
-401759 pages reserved
-0 pages cma reserved
-Mem-Info:
-active_anon:3721 inactive_anon:0 isolated_anon:0
- active_file:0 inactive_file:15360 isolated_file:0
- unevictable:768 dirty:0 writeback:0
- slab_reclaimable:9222 slab_unreclaimable:79492
- mapped:2131 shmem:1239 pagetables:556
- sec_pagetables:0 bounce:0
- kernel_misc_reclaimable:0
- free:1491351 free_pcp:502 free_cma:0
-Node 0 active_anon:14884kB inactive_anon:0kB active_file:0kB inactive_file:=
-61364kB unevictable:1536kB isolated(anon):0kB isolated(file):0kB mapped:852=
-4kB dirty:0kB writeback:0kB shmem:3420kB shmem_thp:0kB shmem_pmdmapped:0kB =
-anon_thp:0kB writeback_tmp:0kB kernel_stack:8624kB pagetables:2224kB sec_pa=
-getables:0kB all_unreclaimable? no
-Node 1 active_anon:0kB inactive_anon:0kB active_file:0kB inactive_file:76kB=
- unevictable:1536kB isolated(anon):0kB isolated(file):0kB mapped:0kB dirty:=
-0kB writeback:0kB shmem:1536kB shmem_thp:0kB shmem_pmdmapped:0kB anon_thp:0=
-kB writeback_tmp:0kB kernel_stack:16kB pagetables:0kB sec_pagetables:0kB al=
-l_unreclaimable? no
-Node 0 DMA free:15360kB boost:0kB min:204kB low:252kB high:300kB reserved_h=
-ighatomic:0KB active_anon:0kB inactive_anon:0kB active_file:0kB inactive_fi=
-le:0kB unevictable:0kB writepending:0kB present:15992kB managed:15360kB mlo=
-cked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:0kB
-lowmem_reserve[]: 0 2565 2567 0 0
-Node 0 DMA32 free:1992808kB boost:0kB min:35052kB low:43812kB high:52572kB =
-reserved_highatomic:0KB active_anon:14860kB inactive_anon:0kB active_file:0=
-kB inactive_file:59552kB unevictable:1536kB writepending:0kB present:312933=
-2kB managed:2654792kB mlocked:0kB bounce:0kB free_pcp:1976kB local_pcp:1008=
-kB free_cma:0kB
-lowmem_reserve[]: 0 0 1 0 0
-Node 0 Normal free:28kB boost:0kB min:24kB low:28kB high:32kB reserved_high=
-atomic:0KB active_anon:24kB inactive_anon:0kB active_file:0kB inactive_file=
-:1812kB unevictable:0kB writepending:0kB present:1048576kB managed:1896kB m=
-locked:0kB bounce:0kB free_pcp:32kB local_pcp:8kB free_cma:0kB
-lowmem_reserve[]: 0 0 0 0 0
-Node 1 Normal free:3957208kB boost:0kB min:54828kB low:68532kB high:82236kB=
- reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB active_file:0kB =
-inactive_file:76kB unevictable:1536kB writepending:0kB present:4194304kB ma=
-naged:4109120kB mlocked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:=
-0kB
-lowmem_reserve[]: 0 0 0 0 0
-Node 0 DMA: 0*4kB 0*8kB 0*16kB 0*32kB 0*64kB 0*128kB 0*256kB 0*512kB 1*1024=
-kB (U) 1*2048kB (M) 3*4096kB (M) =3D 15360kB
-Node 0 DMA32: 638*4kB (UM) 1185*8kB (UE) 13*16kB (UM) 62*32kB (UE) 49*64kB =
-(UME) 3*128kB (UM) 1*256kB (E) 1*512kB (U) 2*1024kB (ME) 1*2048kB (E) 481*4=
-096kB (M) =3D 1992784kB
-Node 0 Normal: 1*4kB (M) 1*8kB (M) 1*16kB (M) 0*32kB 0*64kB 0*128kB 0*256kB=
- 0*512kB 0*1024kB 0*2048kB 0*4096kB =3D 28kB
-Node 1 Normal: 6*4kB (UM) 8*8kB (UM) 8*16kB (UM) 12*32kB (UM) 6*64kB (U) 2*=
-128kB (U) 1*256kB (M) 2*512kB (UM) 0*1024kB 1*2048kB (U) 965*4096kB (M) =3D=
- 3957208kB
-Node 0 hugepages_total=3D0 hugepages_free=3D0 hugepages_surp=3D0 hugepages_=
-size=3D1048576kB
-Node 0 hugepages_total=3D2 hugepages_free=3D2 hugepages_surp=3D0 hugepages_=
-size=3D2048kB
-Node 1 hugepages_total=3D0 hugepages_free=3D0 hugepages_surp=3D0 hugepages_=
-size=3D1048576kB
-Node 1 hugepages_total=3D2 hugepages_free=3D2 hugepages_surp=3D0 hugepages_=
-size=3D2048kB
-16599 total pagecache pages
-0 pages in swap cache
-Free swap  =3D 0kB
-Total swap =3D 0kB
-2097051 pages RAM
-0 pages HighMem/MovableOnly
-401759 pages reserved
-0 pages cma reserved
-Mem-Info:
-active_anon:3748 inactive_anon:0 isolated_anon:0
- active_file:0 inactive_file:15360 isolated_file:0
- unevictable:768 dirty:0 writeback:0
- slab_reclaimable:9238 slab_unreclaimable:79752
- mapped:2131 shmem:1237 pagetables:570
- sec_pagetables:0 bounce:0
- kernel_misc_reclaimable:0
- free:1491436 free_pcp:153 free_cma:0
-Node 0 active_anon:14992kB inactive_anon:0kB active_file:0kB inactive_file:=
-61364kB unevictable:1536kB isolated(anon):0kB isolated(file):0kB mapped:852=
-4kB dirty:0kB writeback:0kB shmem:3412kB shmem_thp:0kB shmem_pmdmapped:0kB =
-anon_thp:0kB writeback_tmp:0kB kernel_stack:8624kB pagetables:2280kB sec_pa=
-getables:0kB all_unreclaimable? no
-Node 1 active_anon:0kB inactive_anon:0kB active_file:0kB inactive_file:76kB=
- unevictable:1536kB isolated(anon):0kB isolated(file):0kB mapped:0kB dirty:=
-0kB writeback:0kB shmem:1536kB shmem_thp:0kB shmem_pmdmapped:0kB anon_thp:0=
-kB writeback_tmp:0kB kernel_stack:16kB pagetables:0kB sec_pagetables:0kB al=
-l_unreclaimable? no
-Node 0 DMA free:15360kB boost:0kB min:204kB low:252kB high:300kB reserved_h=
-ighatomic:0KB active_anon:0kB inactive_anon:0kB active_file:0kB inactive_fi=
-le:0kB unevictable:0kB writepending:0kB present:15992kB managed:15360kB mlo=
-cked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:0kB
-lowmem_reserve[]: 0 2565 2567 0 0
-Node 0 DMA32 free:1993148kB boost:0kB min:35052kB low:43812kB high:52572kB =
-reserved_highatomic:0KB active_anon:14968kB inactive_anon:0kB active_file:0=
-kB inactive_file:59552kB unevictable:1536kB writepending:0kB present:312933=
-2kB managed:2654792kB mlocked:0kB bounce:0kB free_pcp:580kB local_pcp:0kB f=
-ree_cma:0kB
-lowmem_reserve[]: 0 0 1 0 0
-Node 0 Normal free:28kB boost:0kB min:24kB low:28kB high:32kB reserved_high=
-atomic:0KB active_anon:24kB inactive_anon:0kB active_file:0kB inactive_file=
-:1812kB unevictable:0kB writepending:0kB present:1048576kB managed:1896kB m=
-locked:0kB bounce:0kB free_pcp:32kB local_pcp:8kB free_cma:0kB
-lowmem_reserve[]: 0 0 0 0 0
-Node 1 Normal free:3957208kB boost:0kB min:54828kB low:68532kB high:82236kB=
- reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB active_file:0kB =
-inactive_file:76kB unevictable:1536kB writepending:0kB present:4194304kB ma=
-naged:4109120kB mlocked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:=
-0kB
-lowmem_reserve[]: 0 0 0 0 0
-Node 0 DMA: 0*4kB 0*8kB 0*16kB 0*32kB 0*64kB 0*128kB 0*256kB 0*512kB 1*1024=
-kB (U) 1*2048kB (M) 3*4096kB (M) =3D 15360kB
-Node 0 DMA32: 975*4kB (UM) 1198*8kB (UME) 281*16kB (UE) 30*32kB (UME) 6*64k=
-B (UE) 2*128kB (UM) 3*256kB (UME) 1*512kB (U) 2*1024kB (ME) 2*2048kB (UE) 4=
-80*4096kB (M) =3D 1993084kB
-Node 0 Normal: 1*4kB (M) 1*8kB (M) 1*16kB (M) 0*32kB 0*64kB 0*128kB 0*256kB=
- 0*512kB 0*1024kB 0*2048kB 0*4096kB =3D 28kB
-Node 1 Normal: 6*4kB (UM) 8*8kB (UM) 8*16kB (UM) 12*32kB (UM) 6*64kB (U) 2*=
-128kB (U) 1*256kB (M) 2*512kB (UM) 0*1024kB 1*2048kB (U) 965*4096kB (M) =3D=
- 3957208kB
-Node 0 hugepages_total=3D0 hugepages_free=3D0 hugepages_surp=3D0 hugepages_=
-size=3D1048576kB
-Node 0 hugepages_total=3D2 hugepages_free=3D2 hugepages_surp=3D0 hugepages_=
-size=3D2048kB
-Node 1 hugepages_total=3D0 hugepages_free=3D0 hugepages_surp=3D0 hugepages_=
-size=3D1048576kB
-Node 1 hugepages_total=3D2 hugepages_free=3D2 hugepages_surp=3D0 hugepages_=
-size=3D2048kB
-16597 total pagecache pages
-0 pages in swap cache
-Free swap  =3D 0kB
-Total swap =3D 0kB
-2097051 pages RAM
-0 pages HighMem/MovableOnly
-401759 pages reserved
-0 pages cma reserved
+A high level idea is to allow the SEC(".struct_ops.link") to specify its own 
+Qdisc_ops.priv_size.
 
+The bpf prog could use it as a simple u8 array memory area to write anything but 
+the verifier can't learn a lot from it. It will be more useful if it can work 
+like map_value(s) to the verifier such that the verifier can also see the 
+bpf_rb_root/bpf_list_head/bpf_spin_lock...etc.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> +
+> +struct fq_flow_node {
+> +	u32 hash;
+> +	int credit;
+> +	u32 qlen;
+> +	u32 socket_hash;
+> +	u64 age;
+> +	u64 time_next_packet;
+> +	struct bpf_list_node list_node;
+> +	struct bpf_rb_node rb_node;
+> +	struct bpf_rb_root queue __contains_kptr(sk_buff, bpf_rbnode);
+> +	struct bpf_spin_lock lock;
+> +	struct bpf_refcount refcount;
+> +};
+> +
+> +struct dequeue_nonprio_ctx {
+> +	bool dequeued;
+> +	u64 expire;
+> +};
+> +
+> +struct fq_stashed_flow {
+> +	struct fq_flow_node __kptr *flow;
+> +};
+> +
+> +struct stashed_skb {
+> +	struct sk_buff __kptr *skb;
+> +};
+> +
+> +/* [NUM_QUEUE] for TC_PRIO_CONTROL
+> + * [0, NUM_QUEUE - 1] for other flows
+> + */
+> +struct {
+> +	__uint(type, BPF_MAP_TYPE_ARRAY);
+> +	__type(key, __u32);
+> +	__type(value, struct fq_stashed_flow);
+> +	__uint(max_entries, NUM_QUEUE + 1);
+> +} fq_stashed_flows SEC(".maps");
+> +
+> +struct {
+> +	__uint(type, BPF_MAP_TYPE_HASH);
+> +	__type(key, __u32);
+> +	__type(value, __u64);
+> +	__uint(pinning, LIBBPF_PIN_BY_NAME);
+> +	__uint(max_entries, 16);
+> +} rate_map SEC(".maps");
+> +
+> +struct {
+> +	__uint(type, BPF_MAP_TYPE_HASH);
+> +	__type(key, __u32);
+> +	__type(value, __u64);
+> +	__uint(pinning, LIBBPF_PIN_BY_NAME);
+> +	__uint(max_entries, 16);
+> +} comp_map SEC(".maps");
+> +
+> +#define private(name) SEC(".data." #name) __hidden __attribute__((aligned(8)))
+> +
+> +private(A) struct bpf_spin_lock fq_delayed_lock;
+> +private(A) struct bpf_rb_root fq_delayed __contains(fq_flow_node, rb_node);
+> +
+> +private(B) struct bpf_spin_lock fq_new_flows_lock;
+> +private(B) struct bpf_list_head fq_new_flows __contains(fq_flow_node, list_node);
+> +
+> +private(C) struct bpf_spin_lock fq_old_flows_lock;
+> +private(C) struct bpf_list_head fq_old_flows __contains(fq_flow_node, list_node);
+> +
+> +private(D) struct bpf_spin_lock fq_stashed_skb_lock;
+> +private(D) struct bpf_list_head fq_stashed_skb __contains_kptr(sk_buff, bpf_list);
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+[ ... ]
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+> +SEC("struct_ops/bpf_fq_enqueue")
+> +int BPF_PROG(bpf_fq_enqueue, struct sk_buff *skb, struct Qdisc *sch,
+> +	     struct bpf_sk_buff_ptr *to_free)
+> +{
+> +	struct iphdr *iph = (void *)(long)skb->data + sizeof(struct ethhdr);
+> +	u64 time_to_send, jiffies, delay_ns, *comp_ns, *rate;
+> +	struct fq_flow_node *flow = NULL, *flow_copy;
+> +	struct fq_stashed_flow *sflow;
+> +	u32 hash, daddr, sk_hash;
+> +	bool connected;
+> +
+> +	if (q_random_drop & (bpf_get_prandom_u32() > ~0U * 0.90))
+> +		goto drop;
+> +
+> +	if (fq_qlen >= q_plimit)
+> +		goto drop;
+> +
+> +	if (!skb->tstamp) {
+> +		time_to_send = ktime_cache = bpf_ktime_get_ns();
+> +	} else {
+> +		if (fq_packet_beyond_horizon(skb)) {
+> +			ktime_cache = bpf_ktime_get_ns();
+> +			if (fq_packet_beyond_horizon(skb)) {
+> +				if (q_horizon_drop)
+> +					goto drop;
+> +
+> +				skb->tstamp = ktime_cache + q_horizon;
+> +			}
+> +		}
+> +		time_to_send = skb->tstamp;
+> +	}
+> +
+> +	if (fq_classify(skb, &hash, &sflow, &connected, &sk_hash) < 0)
+> +		goto drop;
+> +
+> +	flow = bpf_kptr_xchg(&sflow->flow, flow);
+> +	if (!flow)
+> +		goto drop; //unexpected
+> +
+> +	if (hash != PRIO_QUEUE) {
+> +		if (connected && flow->socket_hash != sk_hash) {
+> +			flow->credit = q_initial_quantum;
+> +			flow->socket_hash = sk_hash;
+> +			if (fq_flow_is_throttled(flow)) {
+> +				/* mark the flow as undetached. The reference to the
+> +				 * throttled flow in fq_delayed will be removed later.
+> +				 */
+> +				flow_copy = bpf_refcount_acquire(flow);
+> +				flow_copy->age = 0;
+> +				fq_flows_add_tail(&fq_old_flows, &fq_old_flows_lock, flow_copy);
+> +			}
+> +			flow->time_next_packet = 0ULL;
+> +		}
+> +
+> +		if (flow->qlen >= q_flow_plimit) {
+> +			bpf_kptr_xchg_back(&sflow->flow, flow);
+> +			goto drop;
+> +		}
+> +
+> +		if (fq_flow_is_detached(flow)) {
+> +			if (connected)
+> +				flow->socket_hash = sk_hash;
+> +
+> +			flow_copy = bpf_refcount_acquire(flow);
+> +
+> +			jiffies = bpf_jiffies64();
+> +			if ((s64)(jiffies - (flow_copy->age + q_flow_refill_delay)) > 0) {
+> +				if (flow_copy->credit < q_quantum)
+> +					flow_copy->credit = q_quantum;
+> +			}
+> +			flow_copy->age = 0;
+> +			fq_flows_add_tail(&fq_new_flows, &fq_new_flows_lock, flow_copy);
+> +		}
+> +	}
+> +
+> +	skb->tstamp = time_to_send;
+> +
+> +	bpf_spin_lock(&flow->lock);
+> +	bpf_rbtree_excl_add(&flow->queue, &skb->bpf_rbnode, skb_tstamp_less);
+> +	bpf_spin_unlock(&flow->lock);
+> +
+> +	flow->qlen++;
+> +	bpf_kptr_xchg_back(&sflow->flow, flow);
+> +
+> +	fq_qlen++;
+> +	return NET_XMIT_SUCCESS;
+> +
+> +drop:
+> +	if (q_compensate_tstamp) {
+> +		bpf_probe_read_kernel(&daddr, sizeof(daddr), &iph->daddr);
+> +		rate = bpf_map_lookup_elem(&rate_map, &daddr);
+> +		comp_ns = bpf_map_lookup_elem(&comp_map, &daddr);
+> +		if (rate && comp_ns) {
+> +			delay_ns = (u64)qdisc_skb_cb(skb)->pkt_len * NSEC_PER_SEC / (*rate);
+> +			__sync_fetch_and_add(comp_ns, delay_ns);
+> +		}
+> +	}
+> +	bpf_qdisc_skb_drop(skb, to_free);
+> +	return NET_XMIT_DROP;
+> +}
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+[ ... ]
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+> +SEC("struct_ops/bpf_fq_dequeue")
+> +struct sk_buff *BPF_PROG(bpf_fq_dequeue, struct Qdisc *sch)
+> +{
+> +	struct dequeue_nonprio_ctx cb_ctx = {};
+> +	struct sk_buff *skb = NULL;
+> +
+> +	skb = fq_dequeue_prio();
+> +	if (skb) {
+> +		bpf_skb_set_dev(skb, sch);
+> +		return skb;
+> +	}
+> +
+> +	ktime_cache = dequeue_now = bpf_ktime_get_ns();
+> +	fq_check_throttled();
+> +	bpf_loop(q_plimit, fq_dequeue_nonprio_flows, &cb_ctx, 0);
+> +
+> +	skb = get_stashed_skb();
+> +
+> +	if (skb) {
+> +		bpf_skb_set_dev(skb, sch);
+> +		return skb;
+> +	}
+> +
+> +	if (cb_ctx.expire)
+> +		bpf_qdisc_watchdog_schedule(sch, cb_ctx.expire, q_timer_slack);
+> +
+> +	return NULL;
+> +}
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+The enqueue and dequeue are using the bpf map (e.g. arraymap) or global var 
+(also an arraymap). Potentially, the map can be shared by different qdisc 
+instances (sch) and they could be attached to different net devices also. Not 
+sure if there is potentail issue? e.g. the bpf_fq_reset below.
+or a bpf prog dequeue a skb with a different skb->dev.
 
-If you want to undo deduplication, reply with:
-#syz undup
+> +
+> +static int
+> +fq_reset_flows(u32 index, void *ctx)
+> +{
+> +	struct bpf_list_node *node;
+> +	struct fq_flow_node *flow;
+> +
+> +	bpf_spin_lock(&fq_new_flows_lock);
+> +	node = bpf_list_pop_front(&fq_new_flows);
+> +	bpf_spin_unlock(&fq_new_flows_lock);
+> +	if (!node) {
+> +		bpf_spin_lock(&fq_old_flows_lock);
+> +		node = bpf_list_pop_front(&fq_old_flows);
+> +		bpf_spin_unlock(&fq_old_flows_lock);
+> +		if (!node)
+> +			return 1;
+> +	}
+> +
+> +	flow = container_of(node, struct fq_flow_node, list_node);
+> +	bpf_obj_drop(flow);
+> +
+> +	return 0;
+> +}
+> +
+> +static int
+> +fq_reset_stashed_flows(u32 index, void *ctx)
+> +{
+> +	struct fq_flow_node *flow = NULL;
+> +	struct fq_stashed_flow *sflow;
+> +
+> +	sflow = bpf_map_lookup_elem(&fq_stashed_flows, &index);
+> +	if (!sflow)
+> +		return 0;
+> +
+> +	flow = bpf_kptr_xchg(&sflow->flow, flow);
+> +	if (flow)
+> +		bpf_obj_drop(flow);
+> +
+> +	return 0;
+> +}
+> +
+> +SEC("struct_ops/bpf_fq_reset")
+> +void BPF_PROG(bpf_fq_reset, struct Qdisc *sch)
+> +{
+> +	bool unset_all = true;
+> +	fq_qlen = 0;
+> +	bpf_loop(NUM_QUEUE + 1, fq_reset_stashed_flows, NULL, 0);
+> +	bpf_loop(NUM_QUEUE, fq_reset_flows, NULL, 0);
+> +	bpf_loop(NUM_QUEUE, fq_unset_throttled_flows, &unset_all, 0);
+
+I am not sure if it can depend on a bpf prog to do cleanup/reset. What if it 
+missed to drop some skb which potentially could hold up resources like sk/dev/netns?
+
+A quick thought is that the struct_ops knows all the bpf progs and each prog 
+tracks the used map in prog->aux->used_maps. The kernel can clean it up. 
+However, the map may still be used by other Qdisc instances.
+
+It may be easier if the skb can only be enqueued somewhere in the qdisc_priv() 
+and then cleans up its own qdisc_priv during reset.
+
+> +	return;
+> +}
+> +
+> +SEC(".struct_ops")
+> +struct Qdisc_ops fq = {
+> +	.enqueue   = (void *)bpf_fq_enqueue,
+> +	.dequeue   = (void *)bpf_fq_dequeue,
+> +	.reset     = (void *)bpf_fq_reset,
+> +	.id        = "bpf_fq",
+> +};
+
 
