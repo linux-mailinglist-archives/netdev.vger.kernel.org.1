@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-98057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A8118CEE4E
-	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 11:33:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B8D18CEE5A
+	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 11:42:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12FCDB21156
-	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 09:33:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D3491C20AB4
+	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 09:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E96138E;
-	Sat, 25 May 2024 09:33:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D6E19479;
+	Sat, 25 May 2024 09:42:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="yMAdpl81"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B099D208CA;
-	Sat, 25 May 2024 09:33:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC34D23748;
+	Sat, 25 May 2024 09:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716629593; cv=none; b=JnwZxJ9OZJOx6Pdxva1nC5CRiXeBE6bJzIK45K9H2SHdvPkQ5EZaZA4yaxWiEJjzalDLs9ywiLxF7gEnDJz0Gft6DfnzQqdbOKDUipPIolID4DaLewdYbDzfhjZ6++1k4ESCAJ959TePkhnCaVq0MgJLktitqVAxRAa3t8gzW8k=
+	t=1716630159; cv=none; b=PshV3MAgOhJByqbs6laMAnBymC7xAFGabyobXsCCChUntyZBmIKHCsovThreMRBatbJdaPXYNbJSKO7e4HHqj0OOvjbiUfbd0OO/m/zOQMKnRCPnPaQ24X1vJ+sK0dzUbU2y4ID0avqkUe2T4oJ3DLuBZf4VZjJYIrUpeuZSHIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716629593; c=relaxed/simple;
-	bh=3KU+N5w5b+nXWgR3j9pvDZ1+lQWYW70U6jBOnLm+zBo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=u5M1xNRWiGXImWRoqTXJf4nHDe95e8myKXQImaS5hw9UbVzTO2aZf1CRRVgHTII5N6nt3TjeOsXwdKByZZiaezNM1pHD2RAV8dpUtxM49kZVq9HfdzI74+OJECZzGCnJIQbWgCBwP44cNZ5s/V+nW5VM8ubM4SHBBgws5GMa0XE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Vmc6P3PC8zkXdT;
-	Sat, 25 May 2024 17:28:45 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id E32C618007A;
-	Sat, 25 May 2024 17:33:01 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sat, 25 May 2024 17:33:01 +0800
-Message-ID: <92bc4c96-9aaa-056c-e59a-4396d19a9f58@huawei.com>
-Date: Sat, 25 May 2024 17:33:00 +0800
+	s=arc-20240116; t=1716630159; c=relaxed/simple;
+	bh=RiSBNerJeUUysE1tNmEwQ7JhpvQEcx5D1JY07vm8CDk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q0IGa6JaEkL2hC23v/MCdowFz4d7rVZAoKlvEeUl9Ulch49FUCtTPsQi83Xw3/q7VYTle/5Qdl7v8KaqPspkn8UdzOzgsoGqJ3gkzN+3G7t7do3Wp+L9qwp0rRQ/g55qAvIGO/OOjekj/nFliMmKoLFwwKbtOj6zN0nSKNC+V7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=yMAdpl81; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6B53C2BD11;
+	Sat, 25 May 2024 09:42:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1716630158;
+	bh=RiSBNerJeUUysE1tNmEwQ7JhpvQEcx5D1JY07vm8CDk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=yMAdpl81sfNgGy7j+B0YCqpyYdzYRX4+s42aHXoFFYdBwh9fTsRq1DqKyKgVhgL7r
+	 AcTJTF5SXYmx8JnVz6q8RYOfiedQQkUPPxomKqF7i0udoHJfoe3yVIphKqSYWgXJiJ
+	 8kGhjIOoPpROt8jhL7B6UB9hfEqNIsKEakGA9icg=
+Date: Sat, 25 May 2024 11:42:40 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: shaozhengchao <shaozhengchao@huawei.com>
+Cc: stable@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
+	kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, kuba@kernel.org,
+	edumazet@google.com, kuniyu@amazon.com, weiyongjun1@huawei.com,
+	yuehaibing@huawei.com
+Subject: Re: [PATCH stable,5.15 0/2] Revert the patchset for fix
+ CVE-2024-26865
+Message-ID: <2024052511-aflutter-outsider-4917@gregkh>
+References: <20240506030554.3168143-1-shaozhengchao@huawei.com>
+ <2024052355-doze-implicate-236d@gregkh>
+ <92bc4c96-9aaa-056c-e59a-4396d19a9f58@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH stable,5.15 0/2] Revert the patchset for fix
- CVE-2024-26865
-To: Greg KH <gregkh@linuxfoundation.org>
-CC: <stable@vger.kernel.org>, <netdev@vger.kernel.org>, <davem@davemloft.net>,
-	<kuznet@ms2.inr.ac.ru>, <yoshfuji@linux-ipv6.org>, <kuba@kernel.org>,
-	<edumazet@google.com>, <kuniyu@amazon.com>, <weiyongjun1@huawei.com>,
-	<yuehaibing@huawei.com>
-References: <20240506030554.3168143-1-shaozhengchao@huawei.com>
- <2024052355-doze-implicate-236d@gregkh>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <2024052355-doze-implicate-236d@gregkh>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <92bc4c96-9aaa-056c-e59a-4396d19a9f58@huawei.com>
 
-
-
-On 2024/5/23 19:34, Greg KH wrote:
-> On Mon, May 06, 2024 at 11:05:52AM +0800, Zhengchao Shao wrote:
->> There's no "pernet" variable in the struct hashinfo. The "pernet" variable
->> is introduced from v6.1-rc1. Revert pre-patch and post-patch.
+On Sat, May 25, 2024 at 05:33:00PM +0800, shaozhengchao wrote:
 > 
-> I do not understand, why are these reverts needed?
 > 
-> How does the code currently build if there is no variable here?
-> 
-> confused,
-> 
-> greg k-h
-Hi greg:
-   If only the first patch is merged, compilation will fail.
-There's no "pernet" variable in the struct hashinfo.
+> On 2024/5/23 19:34, Greg KH wrote:
+> > On Mon, May 06, 2024 at 11:05:52AM +0800, Zhengchao Shao wrote:
+> > > There's no "pernet" variable in the struct hashinfo. The "pernet" variable
+> > > is introduced from v6.1-rc1. Revert pre-patch and post-patch.
+> > 
+> > I do not understand, why are these reverts needed?
+> > 
+> > How does the code currently build if there is no variable here?
+> > 
+> > confused,
+> > 
+> > greg k-h
+> Hi greg:
+>   If only the first patch is merged, compilation will fail.
+> There's no "pernet" variable in the struct hashinfo.
 
-Thank you
+But both patches are merged together here.  Does the released kernel
+versions fail to build somehow?
 
-Zhengchao Shao
+thanks,
+
+greg k-h
 
