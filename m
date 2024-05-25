@@ -1,137 +1,119 @@
-Return-Path: <netdev+bounces-98063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4767B8CEF60
-	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 16:47:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1180B8CEFEF
+	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 17:51:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC6AFB2100C
-	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 14:47:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42B9B1C20E9F
+	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 15:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19F55914C;
-	Sat, 25 May 2024 14:47:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2AA6376F4;
+	Sat, 25 May 2024 15:51:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cRxskZAt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePvQPLFn"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6F31DA5F;
-	Sat, 25 May 2024 14:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D731BE6F;
+	Sat, 25 May 2024 15:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716648442; cv=none; b=lquj4C+9al7Y1Dlbgxp4cATmW+VUBeszHMuPUz0iAhUDQhsfkBbX+nmqFnOUo59ieofRuulEUfkpXuuaiJHh5E0Tzl2tft1SnnCf8p4khv0G/gEGN7WsB/WeNl8AIK+/QU6YYn2L6K+KGEsVRQdN6gk/F5jMvcy8OOo1rS3aXAc=
+	t=1716652297; cv=none; b=QcCh9YHwjscv9yc8TvqS8EgHrsgBe7x7OkwpZSrQPVCHsKGXST0nx30VHNQAzvrdrTAZzJapWrdvKGMInBHdevxopcvIJR5wJNsqMfFmFNcKSFOoqDXBnC8TimNnJbW+8o0TlK3avmQChZ1nUdXuOVYf93+6UN52kvSRV3n+rUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716648442; c=relaxed/simple;
-	bh=6SNUBZnUp2ArjVrrFS12NGWBhTJdFWYGEK88cZiZ2qw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pu7HI1RR2V8+XLzJLzmQn3tewg3v3euriub9oCkgNFn2MGuPX3OPjAHOukqDTypGznmNGJASSHZs0hWZQAA8qnuAWCXKL185JtoG8z1dQBkqwO7uEUOZubpnnxtFk3trHMiMVTlsGWo/CId3Iniwdkli4+0pVC64av2bfvVDeyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cRxskZAt; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=S39VWHs+4+yu6rI13z80G8Whc59XWseFYI8qC5dVnV8=; b=cRxskZAt0VbPLbJn8T2zCktqb6
-	2Fkbg2gxwpuW6v35cOL5uyINjv0HqJW6qc2oC+zCSNKPs+ShNuCLp6HUpit4RD47E92hxoU/HjvYE
-	jwqk6rc6Uul7JFWGUTKpaYWcnZLfpbtQ9T77aD69teCDcW+cCKAWuMZqvBi+aFcYmuBw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sAsfh-00G095-Qn; Sat, 25 May 2024 16:46:57 +0200
-Date: Sat, 25 May 2024 16:46:57 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Piergiorgio Beruto <Pier.Beruto@onsemi.com>
-Cc: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>,
-	"Parthiban.Veerasooran@microchip.com" <Parthiban.Veerasooran@microchip.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"Horatiu.Vultur@microchip.com" <Horatiu.Vultur@microchip.com>,
-	"ruanjinjie@huawei.com" <ruanjinjie@huawei.com>,
-	"Steen.Hegelund@microchip.com" <Steen.Hegelund@microchip.com>,
-	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
-	"UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>,
-	"Thorsten.Kummermehr@microchip.com" <Thorsten.Kummermehr@microchip.com>,
-	"Nicolas.Ferre@microchip.com" <Nicolas.Ferre@microchip.com>,
-	"benjamin.bigler@bernformulastudent.ch" <benjamin.bigler@bernformulastudent.ch>
-Subject: Re: [PATCH net-next v4 00/12] Add support for OPEN Alliance
- 10BASE-T1x MACPHY Serial Interface
-Message-ID: <056f54b1-45d4-4ef8-872e-6321e3d98e7d@lunn.ch>
-References: <2d9f523b-99b7-485d-a20a-80d071226ac9@microchip.com>
- <6ba7e1c8-5f89-4a0e-931f-3c117ccc7558@lunn.ch>
- <8b9f8c10-e6bf-47df-ad83-eaf2590d8625@microchip.com>
- <44cd0dc2-4b37-4e2f-be47-85f4c0e9f69c@lunn.ch>
- <b941aefd-dbc5-48ea-b9f4-30611354384d@microchip.com>
- <BYAPR02MB5958A4D667D13071E023B18F83F52@BYAPR02MB5958.namprd02.prod.outlook.com>
- <6e4c8336-2783-45dd-b907-6b31cf0dae6c@lunn.ch>
- <BY5PR02MB6786619C0A0FCB2BEDC2F90D9DF52@BY5PR02MB6786.namprd02.prod.outlook.com>
- <0581b64a-dd7a-43d7-83f7-657ae93cefe5@lunn.ch>
- <BY5PR02MB6786209192CB9B8A6EF5261F9DF52@BY5PR02MB6786.namprd02.prod.outlook.com>
+	s=arc-20240116; t=1716652297; c=relaxed/simple;
+	bh=jftO7f5NblNwnoz76DDIOK9hIE11fOzhi5My8DHfobs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=luy+dM3ubAwDLQMRlMp1fOjB0+tCuY3T/9Kl9PzZG4VdayfiHPUEVg5uv3I876Lw5KdpT4V8QICmaioIluJNSWERz88OrT6YfAjNyIZGP2ckB+frMMCJpIH5AYHtuIA4t2Dim2CFgvn6hFTZV/6LRR3Jpts83in7OHJ8PpvUTrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ePvQPLFn; arc=none smtp.client-ip=209.85.210.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6f855b2499cso1429703a34.1;
+        Sat, 25 May 2024 08:51:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716652295; x=1717257095; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jftO7f5NblNwnoz76DDIOK9hIE11fOzhi5My8DHfobs=;
+        b=ePvQPLFnmnS9534kA94R7O5QGjRZyY+9j9QAjmRbMWacxgRShsdLExtTwJK1X8hm1S
+         Bpecyy6UzG9pFLVEdimzDHP198pL5EJIl4UCfOpcK5/bjHoMz6EdK1tRbp6tFiyl5ouq
+         cQzTWWMH8/75q4M3IWZeIxIBd36fnpIhvYWFWzv9QDGsee90K9uDuCEQncoIHnjw4fC4
+         rfjouvgCx+uyzFfeSWQBoIOj2p8su/gP5jpg5/4I8U9S3BuFfIfAiEIee0zUYdzkYlBw
+         roQhkB5hmwmNhutskjKxsLrphEyHtWQrxqRNYEd0qTVfe5TMlpxvPGK650MevBKTGSCO
+         A+JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716652295; x=1717257095;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jftO7f5NblNwnoz76DDIOK9hIE11fOzhi5My8DHfobs=;
+        b=sFhujmKAFQn7pvMur3JL/iPW3hzqAWNkPiSwZzNAYlTu5myx/bIyusMUBstNtJAVnT
+         p9GZ0TocAkcVcji25TKcPwolW26GLjJ/clBWSMnWTcz4cUUupJPehOPcJ1+XGR89LKfS
+         ZwLjS8uxrry91XDBUwAhiz8rTlO8tcB7DNa4BU3gN81NTDONOb31FXpF0xy3D3C2fKn5
+         KCrvZUuiDlhXaVGiZC9kYcva8o7PKS6aNmJbnXr+xpbmO7pD1axFELVCfxj0QVnlkqqA
+         xwuEiTzUCuLyzmGaYb+KldYco75HHZoby9tNzuPsxINdZd+beR/HftULwxTIWvLNcDdd
+         we5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXLEPsuJWVUuFIDy/8M7k08hD9N6tS6PUtWytx1eY1PGtAq/fons6ehVVKaZgM+768hiEs9XzzjDr2yvXZkEWuAKNgRTInrDUAH0Sz8oFaDAw394g8KeepVz6dy1t3CLotXC6UB
+X-Gm-Message-State: AOJu0YydoQm9UrwxxLFtYsT2YSmEd/NCseRMVAGl7BAcobVzeYhlxVU2
+	q7RHlGetOwUbS5jQaBLFHpJbFLW7VUO7uiWItpdLT2V7UJY51nl+
+X-Google-Smtp-Source: AGHT+IHrmbsOOcQ49qAJB30roJGLb+SK1iSkJK1I5lClQNllEJRqyiW6A/NgNM4QCAk508qYT0Ex/g==
+X-Received: by 2002:a05:6870:c6a8:b0:24c:ce54:49c2 with SMTP id 586e51a60fabf-24cce544a74mr3787029fac.34.1716652295450;
+        Sat, 25 May 2024 08:51:35 -0700 (PDT)
+Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ac0710865fsm17874786d6.71.2024.05.25.08.51.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 25 May 2024 08:51:34 -0700 (PDT)
+Date: Sat, 25 May 2024 11:51:34 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Chengen Du <chengen.du@canonical.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ alexandre.ferrieux@orange.com
+Message-ID: <66520906120ae_215a8029466@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAPza5qc+m6aK0hOn8m1OxnmNVibJQn-VFXBAnjrca+UrcmEW4g@mail.gmail.com>
+References: <20240520070348.26725-1-chengen.du@canonical.com>
+ <664f5938d2bef_1b5d2429467@willemb.c.googlers.com.notmuch>
+ <CAPza5qc+m6aK0hOn8m1OxnmNVibJQn-VFXBAnjrca+UrcmEW4g@mail.gmail.com>
+Subject: Re: [PATCH] af_packet: Handle outgoing VLAN packets without hardware
+ offloading
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BY5PR02MB6786209192CB9B8A6EF5261F9DF52@BY5PR02MB6786.namprd02.prod.outlook.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 24, 2024 at 10:08:54PM +0000, Piergiorgio Beruto wrote:
-> > Having a GPIO driver within the MAC driver is O.K. For hardware diagnostics you should be using devlink, which many MAC drivers have. So i don't see a need for the PHY driver to access MMS 12.
+> Firstly, I will submit a patch to add a new bit in the status to
+> indicate the presence of VLAN information in the payload and modify
+> the header's entry accordingly.
+> A new member will be added to the sockaddr_ll struct to represent the
+> VLAN-encapsulated protocol, thus avoiding direct modification of the
+> sll_protocol.
 
-> But the MAC driver might need to access MMS-es for vendor specific
-> stuff. In our case, there is a model specific register we need to
-> access during probe.
+See my earlier comments to your v1 patch. It's a minor respin. Please
+don't add new members.
 
-Which is fine, and currently supported. Look at the Microchip driver,
-it access some registers at startup. The framwork just provides the
-core of moving packets around, and MDIO access. The rest is up to MAC
-driver.
+> Following this patch, I will work on enabling the link layer header
+> via a socket option.
 
-> Fair enough, let's keep it for "hacks" then. Still, I think there
-> are features that -initially- are kind of vendor specific, but in
-> the long run they turn into standards or de-facto standards.
+Let's focus on the VLAN for now.
 
-> I assume we want to help this happening (step-wise), don't we?
+Any expansion of the ABI requires a very clear path to use. I'd like
+to see the pcap and tcpdump (or wireshark) changes that use it.
 
-Maybe, but maybe not. We have been developing MAC drivers for over 25
-years. There are a number of mechanisms for exporting things to user
-space. We have to see if your features fit one of them.
-
-> For example, one big feature I think at some point we should
-> understand how to deal with, is topology discovery for multi-drop.
-> Maybe you've heard about it already, but in short it is a feature
-> that allows one PHY to measure the distance (or rather, the
-> propagation delay) to another node on the same multi-drop segment.
-
-> Knowing the cable Tpd (~5ns/m), this allows you to get also the physical distance.
-
-We already have something very similar to this. Cable testing results
-which make use of Time Domain Reflectromitery. I would look at
-re-using the API as much as possible.
-
-> In my view, we should probably create some PHY extensions in the
-> kernel to activate the physical layer part, leaving the "protocol"
-> to the userland.  May I ask your opinion?
-
-Please look at how cable testing works.
-
-       Andrew
+First, we need to even understand better why anything is using
+SOCK_DGRAM when access to L2.5 headers is important, and whether the
+process can convert to using SOCK_RAW instead.
 
