@@ -1,137 +1,233 @@
-Return-Path: <netdev+bounces-98061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D9F78CEEC5
-	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 13:48:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBBC68CEF3E
+	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 16:14:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20A371F213BF
-	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 11:48:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 125BB1C208E0
+	for <lists+netdev@lfdr.de>; Sat, 25 May 2024 14:14:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF0239FE5;
-	Sat, 25 May 2024 11:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2596D4D9EC;
+	Sat, 25 May 2024 14:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K5jjNaZU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6FE31A83
-	for <netdev@vger.kernel.org>; Sat, 25 May 2024 11:48:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82754481A6
+	for <netdev@vger.kernel.org>; Sat, 25 May 2024 14:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716637704; cv=none; b=BmNYBXHe1E0h+GPkT4rbbLSmnKl7yQYpUMzgq0P5mK/JZEDFT9NNrYPphHSMdmDQIPcFKAY1pkC89KvDolVxOIHHZkt7m0CygvVoGtueGKEIlHA1Wk/l3Oeq826y2HJPd1CFu23jx/ePZsVOmrbVR3dJhUGI+1fVFd4EyGSNLLE=
+	t=1716646473; cv=none; b=GbgXMu82VvQHM06fbLK56phThTJkwOAYmMbu1ShTPwrSpn+bF5OD/wpQoftvnRv6eKnsziSJlkC5iwiUNSF3MVTuz+NmXk/J8BOwrJl6Wxqz/tcy0ipeUjtVp1cPGqIZb4InteH7u3O4r25ttcKwnfDifIRREXTtcO4udQw8FuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716637704; c=relaxed/simple;
-	bh=0qbYg6aOqdNGPthjuPeNfOsUkCVqJnS1vSrM7z/Xv4I=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Am2Js5mCM5BWZHqyD0i9EG8F8tX91bpGeiVP1vSmV0tigKw2jypE1IkfbGGVW/oJ3mJ3OyUVvKa1hxvmx/BP1fY8uGdIvZgxMzOx/Nbgm2YTze5+IuUiFijwNEYHCB097LqDcWQ0W/olWusCXd6Ac67/bkENcuMpX7yElAy0/Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3737b3276a0so19357345ab.3
-        for <netdev@vger.kernel.org>; Sat, 25 May 2024 04:48:23 -0700 (PDT)
+	s=arc-20240116; t=1716646473; c=relaxed/simple;
+	bh=tygnWgpAB9RwItXTQF1LhohGr4eX3wQ0BjW/uD9xOy8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pAee8sdh3K7pV4WwmrvMl8e8UIQ5J1jxR0szO5Wjnh87jGA4gfn8wFH3F5Tqj7ClUAejtJ2b/AB8mIhRzOe2A1brgAg+PXBtvh0D+AsW8IwBIzwLI8OydaeEEgmFkjqrAlk9Xl1Hn+BEhsfNBttz0GGzZBwB9crDX18Ny12sM4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K5jjNaZU; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-627ea4e0becso40329067b3.0
+        for <netdev@vger.kernel.org>; Sat, 25 May 2024 07:14:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716646469; x=1717251269; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OeEQ7gYo8UIeO3e0dQAJbwuy61j11X0psjvoeDyZ6fI=;
+        b=K5jjNaZUxKhwQeiZFvt46W4llX2Jxb+tA9+A5VGAdHmIgTKsiLfCvBMyKBNyFCvJye
+         R1HhC8kIjx/YyI7Oacz0qqMA2fHf6Ydbj/lH4ua8/EjLVP/dIaayudpjROdLJPQD+Ujx
+         fzkAAQdu4Z0EfKEcojzmSTTrPFXlTcGCZw6pY92hG2zaUc2Tx2pcbKclbkchgicBFft5
+         Vv7bdrwRxPyyhhn6M6LOaLGRnK1v2EvdS6rlPoFXZwOZrb3uVav+kwWMU+aI4ySz3D1b
+         W6G9G42geKZWwZEUVr7Bgrfx65nI5xR4vpAUFQITSjoZsfwjnqMNMHbSUI1HDmLx48tH
+         kDCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716637702; x=1717242502;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ktky9nzPSQla9DzbbACpPeWbHWXchC8XncDgsXpz46k=;
-        b=F+TMCvqdeBKFbwtRhYXQGO8h2cvbuY6kk3CWpQz3ypoXOlmGxq4jMJcAu85B2FJuIs
-         J6uyZZFo6qzfkOJQA5HRxU8FA+rJW96FtiH2qk3ZArrBFfoRN6x8HT4F6Vq7mXoMpb/Y
-         WnqZD9Lo6u6Gd9AF+oyMot7stbP63yA2WFMdLDo5ihFyJ9oxirKFsgCayaW7xSkdjO3N
-         WbmjPPEgjtqRKtOdF02r9xc0bqrn3hpEwBq9Awp+b7ZTJqvAZ1Qy3mEahor9d2/l+JAG
-         eRKKWTHoziAY5SzqIlxUnOyE7vsh8oReu5dnkb89oE8KOqR1P6rec4JM7s0EVlNcCh6i
-         snPg==
-X-Forwarded-Encrypted: i=1; AJvYcCWtHV+ZThwUIOhpznMbyOmj2JZxKONbR4RpdMNzke9BuJ2+WL0GbivcbIajmAKf63z3HWdzw1xX4AjE1vzeN2QVhpSFikZc
-X-Gm-Message-State: AOJu0YzGEAK4cGr2kt2nXaMBrQtYXYMUKQX5DcLLFed7aU3YRKcMJEl3
-	Qqvs3a7Fd5y2NPtcsH9BAJdmMdmnfuwiSgV7aWNw2e4rJ2uFNeDiWX2wSVIs8vGURnKz/Ac6aEF
-	b7RqKf95lIrH9L2xXWPivgrXdafXOWR5ONH63s78CJedPJ4E6lroHCtk=
-X-Google-Smtp-Source: AGHT+IGe8h11cGjjZ/CIXvDVFFpXTvnx6rQVT5A5q3eStHc8rVFExwNMB7uUTqrJn4pa+s0Y7nGEwLfY3g11+x4u1p2Qpo0nx90g
+        d=1e100.net; s=20230601; t=1716646469; x=1717251269;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OeEQ7gYo8UIeO3e0dQAJbwuy61j11X0psjvoeDyZ6fI=;
+        b=jrwz0zbOkRmTf55w73n/RyrFvzgSj1tRhS/3ZHdTO384/Bd/Vxvi2/xVoSdZkqvash
+         OQQmLocittEN4tiwOtnlMjwvbFE8C4yvheKWQK8PjZVyBeME++BhP4f9sf98aNCOnMxE
+         hljaWlNWE4ye+Iqr2ddlkwRyNytvnwC9YMuDVgxwWdh/c1SDudXPCFoRUByhM9GSVtHj
+         SHDeIHQoa2VmfVUjkyXoqbOpyDq5y8esFcnf3+E2jSLEw8y7tqNgxD2ChY9gN0NSQ0RV
+         nl0mQY3f8ZCYBoraeAF2kptvmU6h2SCHhmVJEfgd+yo+3msAsQMpbWwJRKu0C/flJb40
+         SY0g==
+X-Forwarded-Encrypted: i=1; AJvYcCVMsfbyFLJ7LW6dUkXqhLtycZm6r0XSv8r/V3GNMvVgvoz1MTXlbktyo9J71Njc0gK7hcfORNlQVaWwdhzmBe6uxhE8AaSf
+X-Gm-Message-State: AOJu0YyySx11W1A8YoeDYILEUfpBpXcbOc5S1BkrWelBYyi9jKqEeSZQ
+	enSQk4YvyeA31z7XV5bhvGMN3XyvURih7Pu+dHbEVafQXd6q9ZM7l4fMqyoMIhlqKuo5tDV2btj
+	e12dOwzGegHuRQifqScaKdcLNOQzZXjaI93na
+X-Google-Smtp-Source: AGHT+IEXbzpGQRKkc9dODGQoxtEFRr1uTVrFesUOBgOBGBePOns3zqGuFadznqg1R3ZB59pn4V2pw/9vElGGRXYOOLA=
+X-Received: by 2002:a81:b666:0:b0:61a:dfd6:fd6d with SMTP id
+ 00721157ae682-62a08da9ae4mr47261007b3.25.1716646469271; Sat, 25 May 2024
+ 07:14:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c566:0:b0:36c:5228:462 with SMTP id
- e9e14a558f8ab-3737b31cb5fmr3359085ab.3.1716637702796; Sat, 25 May 2024
- 04:48:22 -0700 (PDT)
-Date: Sat, 25 May 2024 04:48:22 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007bc4a8061945dc37@google.com>
-Subject: [syzbot] [wireless?] INFO: task hung in regdb_fw_cb
-From: syzbot <syzbot+9d8f809bfaab2e794297@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <20240524193630.2007563-1-edumazet@google.com> <20240524193630.2007563-2-edumazet@google.com>
+In-Reply-To: <20240524193630.2007563-2-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Sat, 25 May 2024 10:14:09 -0400
+Message-ID: <CADVnQyk6CkWU-mETm9yM65Me91aVRr5ngXi2hkD6aETakB+c2w@mail.gmail.com>
+Subject: Re: [PATCH net 1/4] tcp: add tcp_done_with_error() helper
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Fri, May 24, 2024 at 3:36=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> tcp_reset() ends with a sequence that is carefuly ordered.
+>
+> We need to fix [e]poll bugs in the following patches,
+> it makes sense to use a common helper.
+>
+> Suggested-by: Neal Cardwell <ncardwell@google.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  include/net/tcp.h    |  1 +
+>  net/ipv4/tcp.c       |  2 +-
+>  net/ipv4/tcp_input.c | 25 +++++++++++++++++--------
+>  3 files changed, 19 insertions(+), 9 deletions(-)
+>
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index 060e95b331a286ad7c355be11dc03250d2944920..2e7150f6755a5f5bf7b45454d=
+a0b33c5fac78183 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -677,6 +677,7 @@ void tcp_skb_collapse_tstamp(struct sk_buff *skb,
+>  /* tcp_input.c */
+>  void tcp_rearm_rto(struct sock *sk);
+>  void tcp_synack_rtt_meas(struct sock *sk, struct request_sock *req);
+> +void tcp_done_with_error(struct sock *sk);
+>  void tcp_reset(struct sock *sk, struct sk_buff *skb);
+>  void tcp_fin(struct sock *sk);
+>  void tcp_check_space(struct sock *sk);
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 681b54e1f3a64387787738ab6495531b8abe1771..2a8f8d8676ff1d30ea9f8cd47=
+ccf9236940eb299 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -598,7 +598,7 @@ __poll_t tcp_poll(struct file *file, struct socket *s=
+ock, poll_table *wait)
+>                  */
+>                 mask |=3D EPOLLOUT | EPOLLWRNORM;
+>         }
+> -       /* This barrier is coupled with smp_wmb() in tcp_reset() */
+> +       /* This barrier is coupled with smp_wmb() in tcp_done_with_error(=
+) */
+>         smp_rmb();
+>         if (READ_ONCE(sk->sk_err) ||
+>             !skb_queue_empty_lockless(&sk->sk_error_queue))
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 9c04a9c8be9dfaa0ec2437b3748284e57588b216..5af716f1bc74e095d22f64d60=
+5624decfe27cefe 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -4436,6 +4436,22 @@ static enum skb_drop_reason tcp_sequence(const str=
+uct tcp_sock *tp,
+>         return SKB_NOT_DROPPED_YET;
+>  }
+>
+> +
+> +void tcp_done_with_error(struct sock *sk)
+> +{
+> +       /* Our caller wrote a value into sk->sk_err.
+> +        * This barrier is coupled with smp_rmb() in tcp_poll()
+> +        */
+> +       smp_wmb();
+> +
+> +       tcp_write_queue_purge(sk);
+> +       tcp_done(sk);
+> +
+> +       if (!sock_flag(sk, SOCK_DEAD))
+> +               sk_error_report(sk);
+> +}
+> +EXPORT_SYMBOL(tcp_done_with_error);
+> +
+>  /* When we get a reset we do this. */
+>  void tcp_reset(struct sock *sk, struct sk_buff *skb)
+>  {
+> @@ -4460,14 +4476,7 @@ void tcp_reset(struct sock *sk, struct sk_buff *sk=
+b)
+>         default:
+>                 WRITE_ONCE(sk->sk_err, ECONNRESET);
+>         }
+> -       /* This barrier is coupled with smp_rmb() in tcp_poll() */
+> -       smp_wmb();
+> -
+> -       tcp_write_queue_purge(sk);
+> -       tcp_done(sk);
+> -
+> -       if (!sock_flag(sk, SOCK_DEAD))
+> -               sk_error_report(sk);
+> +       tcp_done_with_error(sk);
+>  }
+>
+>  /*
+> --
 
-syzbot found the following issue on:
+Thanks, Eric!
 
-HEAD commit:    8f6a15f095a6 Merge tag 'cocci-for-6.10' of git://git.kerne..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12363a34980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6be91306a8917025
-dashboard link: https://syzkaller.appspot.com/bug?extid=9d8f809bfaab2e794297
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Thinking about this more, I wonder if there is another aspect to this issue=
+.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+I am thinking about this part of tcp_done():
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/02867060d65d/disk-8f6a15f0.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4bb75fbf6fb1/vmlinux-8f6a15f0.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/fd38cadddf33/bzImage-8f6a15f0.xz
+void tcp_done(struct sock *sk)
+{
+...
+        sk->sk_shutdown =3D SHUTDOWN_MASK;
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9d8f809bfaab2e794297@syzkaller.appspotmail.com
+        if (!sock_flag(sk, SOCK_DEAD))
+                sk->sk_state_change(sk);
 
-INFO: task kworker/0:2:927 blocked for more than 143 seconds.
-      Not tainted 6.9.0-syzkaller-10323-g8f6a15f095a6 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/0:2     state:D stack:23760 pid:927   tgid:927   ppid:2      flags:0x00004000
-Workqueue: events request_firmware_work_func
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0x1796/0x4a00 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
- regdb_fw_cb+0x82/0x1c0 net/wireless/reg.c:1017
- request_firmware_work_func+0x1a4/0x280 drivers/base/firmware_loader/main.c:1167
- process_one_work kernel/workqueue.c:3231 [inline]
- process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-INFO: task kworker/0:5:5157 blocked for more than 143 seconds.
-      Not tainted 6.9.0-syzkaller-10323-g8f6a15f095a6 #0
+The tcp_poll() code reads sk->sk_shutdown to decide whether to set
+EPOLLHUP and other bits. However, sk->sk_shutdown is not set until
+here in tcp_done(). And in the tcp_done() code there is no smp_wmb()
+to ensure that the sk->sk_shutdown is visible to other CPUs before
+tcp_done() calls sk->sk_state_change() to wake up threads sleeping on
+sk->sk_wq.
 
+So AFAICT we could have cases where this sk->sk_state_change() (or the
+later sk_error_report()?) wakes a thread doing a tcp_poll() on another
+CPU, and the tcp_poll() code may correctly see the sk->sk_err because
+it was updated before the smp_wmb() in tcp_done_with_error(), but may
+fail to see the "sk->sk_shutdown =3D SHUTDOWN_MASK" write because that
+happened after the smp_wmb() in tcp_done_with_error().
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+So AFAICT  maybe we need two changes?
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+(1) AFAICT the call to smp_wmb() should actually instead be inside
+tcp_done(), after we set sk->sk_shutdown?
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+void tcp_done(struct sock *sk)
+{
+        ...
+        sk->sk_shutdown =3D SHUTDOWN_MASK;
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+        /* Ensure previous writes to sk->sk_err, sk->sk_state,
+         * sk->sk_shutdown are visible to others.
+         * This barrier is coupled with smp_rmb() in tcp_poll()
+         */
+        smp_wmb();
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+        if (!sock_flag(sk, SOCK_DEAD))
+                sk->sk_state_change(sk);
 
-If you want to undo deduplication, reply with:
-#syz undup
+(2) Correspondingly, AFAICT the tcp_poll() call to smp_rmb() should be
+before tcp_poll() first reads sk->sk_shutdown, rather than right
+before it reads sk->sk_err?
+
+thanks,
+neal
 
