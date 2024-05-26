@@ -1,130 +1,160 @@
-Return-Path: <netdev+bounces-98109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D4CC8CF6B0
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 01:16:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1AA68CF6D5
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 01:38:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 116E928183B
-	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 23:16:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49FFB1F21862
+	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 23:38:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC5313A26E;
-	Sun, 26 May 2024 23:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="OL4fRYvU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55600135417;
+	Sun, 26 May 2024 23:38:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50EE613A25D;
-	Sun, 26 May 2024 23:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC640AD52
+	for <netdev@vger.kernel.org>; Sun, 26 May 2024 23:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716765407; cv=none; b=UX/pGHLSbtfInorE8ADdHCE67tfX3zDtvvE77GX1ylCOxr2UwlTAlH0IjdjLippISmUNwA0GU55PqpQMkVXS3m+znDHqPUlfeV23TXynw0hGHoe6twy8NL/u+YdKRRoy/WuRieyxXjrelyzgtT4/JAfDcaue8arD3DebeKbtqsU=
+	t=1716766707; cv=none; b=Yj/NYqjXttJLxYKxXFsHZsmbmrKu3jPkm7TNoqR2WeKtnjSr66/JHRnXBWLEPXZRtGyDbZAtyTaiingJ3bssbEyh7dqq+Cq4HgbPdsJjoB/s6IPlK4vvyOdNIjtO/Qns+2uTUmDIJAeeIDSc+YYp4XaIouDpK0BBKtTae7m4KrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716765407; c=relaxed/simple;
-	bh=SvVxcy4zMXIcrzfOIMksqGi6f1D0W3cEUvoQRvmyQ+g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SqkHtv7F2Q3k6FIcR97sO2svCnC8JZevdwRqLVgrwbXGvh0zvEdqv6bjAAv7Uv6lhDkwjPrpg9XzrQIeSDp3WohKm4K29Ljml4IBEExrP0ZzUoqvm5ecf8vzHUl5wxPTGQ8XlkddPABjfO8rZeO53upQHsl1JHpxgt7Ev2gLAUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=OL4fRYvU; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ot5qxpOdV4cX5rE/iGFXy1muUxNUF/yleqvpYYQ3M8g=; b=OL4fRYvUj2vlYQcic+AubpHxWg
-	vQbBoyx7gi852a6z4WdpY7WQiA17tXOh8vsWLI1sCXprThm4GO8KEj6T5tmph1RqoSWBrHESLW4pj
-	fX+N/D5cNzaEaqBl6JeDunhrjj/z+gaa3uJhG7WNaUmWXKqAUcYNKHsDMkpPiXpOugp7UmTHVGgP8
-	ZcbaRlk6+5fdBohlYB5N4krXhNYXNnVfdXJJWVloOgOYJGTN4WpMiXQtlEvKj/3d9l61mOJn+3RWG
-	OdnVw01j6AxKn/FQ3dQNRy7WK/t1ieELjQuEsXPAsIFKXU+sVTqQKGLCM1dLA7BKQYii2bHBhLUcJ
-	uWofdJNA==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1sBN6X-00BDZN-0l;
-	Sun, 26 May 2024 23:16:41 +0000
-Date: Mon, 27 May 2024 00:16:41 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH][CFT][experimental] net/socket.c: use straight
- fdget/fdput (resend)
-Message-ID: <20240526231641.GB2118490@ZenIV>
-References: <20240526034506.GZ2118490@ZenIV>
- <CAHk-=wjWFM9iPa8a+0apgvBoLv5PsYeQPViuf-zmkLiCGVQEww@mail.gmail.com>
- <20240526192721.GA2118490@ZenIV>
- <CAHk-=wixYUyQcS9tDNVvnCvEi37puqqpQ=CN+zP=a9Q9Fp5e-Q@mail.gmail.com>
+	s=arc-20240116; t=1716766707; c=relaxed/simple;
+	bh=OgZQkhk4M3QzNUouobsj/ggKB851CXj5IFz03CSHFfQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MfJHT7iOvpuY7bj9IVH86/r3AK8usklXauCOsLbhPUgmqAUHYhsBj16SR6wcVw3IAk50+Sy/pxUfvfVZVfqQD8zJdzb3otfe8MpS2WM6A/YIeD9PKjQ5AmIu6PaJWbWrbz0q18pCeZTkIoXHYIgfWc/6nqE30MJOwzdU+NryqmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-7eacf25a50aso30746639f.1
+        for <netdev@vger.kernel.org>; Sun, 26 May 2024 16:38:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716766705; x=1717371505;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NmpGlWcVb54KSVRxuIU/rPXHZN3svTORindBW+z2u1c=;
+        b=RGDj7IVFxLG1nF71STLBnxgi+7IRPwVht7DjWmwvY51ichF0xR8x5oikVP1lgYDTLE
+         ZtCa0nfrvRmjvkBzlV4XG/kUhy7xeLkrv3GbdYazX/AI9X9wfwqB2N/usX09zyViahX4
+         kElSz4RdBd84nY6baMPnM2ScclQsTH+LYuXrmP5WP4JhmR4bywumPlrDtKiVz0fmebEE
+         fQX21ybXzslvlFuVygI3dTvn3pS67PvNCpmNDluJzoXm2Tc9VxYeNGlzxjTjnSBYAi2l
+         TWUyUQg8nN8keGG6jzQZt4EctRXm3Rtbj5OEtuOmsfEUqqGGFPYzf5Eonay4jPa35JKl
+         IGnw==
+X-Forwarded-Encrypted: i=1; AJvYcCWOvitLJ1q1a2da1QZD2D0iRYjFLuZXFnd1MJ3CuqsyKHr6df0Dbl5PMYrigHZZxHmt7QD8OKl474+c9LXIMBVTryF3CMQ7
+X-Gm-Message-State: AOJu0Ywwf1AygSCWIRUSAxOu7tHttcUAUdIbNqC1RT9UIX2RQZA9rdGK
+	6mf5ioT2gIeCC8pBtGUe/GBnFnaUJhzH9d++6H4DgK3wo2dYrvRdNICDavLXZDNspo6A0N2o1u0
+	ZSNkvV2J1xNiMIXdZifDRXNJ7mT3hQYrL4BhQDOrLS01FtZWQDTiOHyI=
+X-Google-Smtp-Source: AGHT+IF9mNXWQHEpg3LfjbpsWVS4Ypo8kEnu8VToq+k6LogrMkmiFwwJUggtNx9Lo2LUwt7FRGK9LplKJ76wjRqltIkhXWWnCUbm
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wixYUyQcS9tDNVvnCvEi37puqqpQ=CN+zP=a9Q9Fp5e-Q@mail.gmail.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+X-Received: by 2002:a05:6602:60c4:b0:7de:e0de:bafb with SMTP id
+ ca18e2360f4ac-7e8c66537ffmr22045939f.2.1716766704979; Sun, 26 May 2024
+ 16:38:24 -0700 (PDT)
+Date: Sun, 26 May 2024 16:38:24 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009ce262061963e5e4@google.com>
+Subject: [syzbot] [hams?] WARNING: refcount bug in ax25_release (3)
+From: syzbot <syzbot+33841dc6aa3e1d86b78a@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jreuter@yaina.de, 
+	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, May 26, 2024 at 03:16:37PM -0700, Linus Torvalds wrote:
+Hello,
 
-> Hopefully in most cases the compiler sees the previous test for
-> fd.file, realizes the new test is unnecessary and optimizes it away.
+syzbot found the following issue on:
 
-It does.
+HEAD commit:    56fb6f92854f Merge tag 'drm-next-2024-05-25' of https://gi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17e2d748980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=34e05c35ec964e75
+dashboard link: https://syzkaller.appspot.com/bug?extid=33841dc6aa3e1d86b78a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-> Except we most definitely pass around 'struct fd *' in some places (at
-> least ovlfs), so I doubt that  will be the case everywhere.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-... and those places need care, really.  I've done that review
-quite recently.  I don't think you'd been on Cc in related thread...
-<checks> nope.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6f3028c1d0fa/disk-56fb6f92.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/81203e55e7d0/vmlinux-56fb6f92.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/37bf21eee59d/bzImage-56fb6f92.xz
 
-|| Another is overlayfs ovl_real_fdget() and ovl_real_fdget_meta().
-|| Those two are arguably too clever for their readers' good.
-|| It's still "borrow or clone, and remember which one had it been",
-|| but that's mixed with returning errors:
-||         err = ovl_read_fdget(file, &fd);
-|| may construct and store a junk value in fd if err is non-zero.
-|| Not a bug, but only because all callers remember to ignore that
-|| value in such case.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+33841dc6aa3e1d86b78a@syzkaller.appspotmail.com
 
-Junk value as in e.g. <ERR_PTR(-EIO), FDPUT_FPUT>; it's trivial
-to avoid (
-		file = ovl_open_realfile(file, &realpath);
-		if (IS_ERR(file))
-			return ERR_PTR(file);
-                real->flags = FDPUT_FPUT;
-                real->file = file;
-		return 0;
-instead of
-                real->flags = FDPUT_FPUT;
-                real->file = ovl_open_realfile(file, &realpath);
+------------[ cut here ]------------
+refcount_t: decrement hit 0; leaking memory.
+WARNING: CPU: 1 PID: 19983 at lib/refcount.c:31 refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:31
+Modules linked in:
+CPU: 1 PID: 19983 Comm: syz-executor.4 Not tainted 6.9.0-syzkaller-12277-g56fb6f92854f #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+RIP: 0010:refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:31
+Code: b2 00 00 00 e8 27 b8 ef fc 5b 5d c3 cc cc cc cc e8 1b b8 ef fc c6 05 fc 35 f0 0a 01 90 48 c7 c7 a0 bf 1e 8c e8 47 e8 b1 fc 90 <0f> 0b 90 90 eb d9 e8 fb b7 ef fc c6 05 d9 35 f0 0a 01 90 48 c7 c7
+RSP: 0018:ffffc9001b83f908 EFLAGS: 00010246
+RAX: 2a301f9112304400 RBX: ffff88807b02a664 RCX: 0000000000040000
+RDX: ffffc9000b33b000 RSI: 000000000000ca38 RDI: 000000000000ca39
+RBP: 0000000000000004 R08: ffffffff815846c2 R09: 1ffffffff25ededb
+R10: dffffc0000000000 R11: fffffbfff25ededc R12: ffff88807b02a620
+R13: 0000000000000000 R14: ffff88807b02a664 R15: dffffc0000000000
+FS:  00007f475dfe66c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ff2b9901723 CR3: 000000007ac0a000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __refcount_dec include/linux/refcount.h:336 [inline]
+ refcount_dec include/linux/refcount.h:351 [inline]
+ ref_tracker_free+0x6af/0x7e0 lib/ref_tracker.c:236
+ netdev_tracker_free include/linux/netdevice.h:4058 [inline]
+ netdev_put include/linux/netdevice.h:4075 [inline]
+ ax25_release+0x368/0x950 net/ax25/af_ax25.c:1069
+ __sock_release net/socket.c:659 [inline]
+ sock_close+0xbc/0x240 net/socket.c:1421
+ __fput+0x406/0x8b0 fs/file_table.c:422
+ task_work_run+0x24f/0x310 kernel/task_work.c:180
+ get_signal+0x15e6/0x1740 kernel/signal.c:2681
+ arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:310
+ exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0xc9/0x370 kernel/entry/common.c:218
+ do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f475d27cee9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f475dfe60c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
+RAX: 0000000000000000 RBX: 00007f475d3ac050 RCX: 00007f475d27cee9
+RDX: 0000000000000019 RSI: 0000000000000101 RDI: 0000000000000004
+RBP: 00007f475d2c949e R08: 0000000000000010 R09: 0000000000000000
+R10: 00000000200002c0 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000006e R14: 00007f475d3ac050 R15: 00007ffd8cfeadc8
+ </TASK>
 
-                return PTR_ERR_OR_ZERO(real->file);
-we have there right now and similar for <ERR_PTR(-EPERM), 0> pairs),
-but note that anything like your switch to struct-wrapped unsigned long
-would need similar massage there anyway.
 
-> What would make more sense is if you make the "fd_empty()" test be
-> about the _flags_, and then both the fp_empty() test and the test
-> inside fdput() would be testing the same things.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Umm...  What encoding would you use?
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-> Sadly, we'd need another bit in the flags. One option is easy enough -
-> we'd just have to make 'struct file' always be 8-byte aligned, which
-> it effectively always is.
-> 
-> Or we'd need to make the rule be that FDPUT_POS_UNLOCK only gets set
-> if FDPUT_FPUT is set.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Huh?  That makes no sense - open a file, fork, and there you go;
-same file reference in unshared descriptor tables in child and parent.
-You definitely don't want to bump refcount on fdget_pos() in either
-and you don't want to lose read/write/lseek serialization.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-FDPUT_FPUT is *not* a property of file; it's about the original
-reference to file not being guaranteed to stay pinned for the lifetime
-of struct fd in question...
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
