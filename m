@@ -1,149 +1,210 @@
-Return-Path: <netdev+bounces-98107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CED4F8CF681
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 00:17:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF2EB8CF69B
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 01:07:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C11DB211D1
-	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 22:17:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B6CF28183A
+	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 23:06:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD3A383AC;
-	Sun, 26 May 2024 22:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A7513A25E;
+	Sun, 26 May 2024 23:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="PaJeakmI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Revskb8s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07A4AD52
-	for <netdev@vger.kernel.org>; Sun, 26 May 2024 22:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643808BE7;
+	Sun, 26 May 2024 23:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716761819; cv=none; b=hJo8zG768AhvybY+OntsJa6owExIoJmultoOR4jCAo+XfFR20TSdUKbDqSAoTcPL2uVRSs0FQeCWB3SXizd6XoL7OU2e6f6Iegx9hwSAg0NBk4sXq4Q/nix+q1lN6IRILQZ5rRlL/kXzTLGL79mC8jgGLb8Yio22dok6TO6kZaU=
+	t=1716764816; cv=none; b=abP3gNfnMI1UyvB3Y3xVGIIefuLPPPuGDwQ/KU4aNE/ors78dgATiAiYV58bPUSpTBPmF23pXZOExud50JZBRaaYyPtuc4v1VQ9GmgcRYe3sDlNn4aU5z8yquQV+mixIglMuaxXIfRcmVKbba2C+KEnWWI4v0djQvEERVOxty98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716761819; c=relaxed/simple;
-	bh=cJJPOPhaSnsG9a5ZvYQMl/CwRR+CoGzIrsqGAa81OUE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gYL0whDHqsmlyHDnO3WeIwRPEyRekplTK8wxycUY3J5FidHYS9ti6ZfjDMuwYYTo1cJaDmtc2QvKU4trloNGOfFFESUsvgc9dy6UxYm+xTEye6YiKm21Km37/1vvhSZVmlg+tshYwOOFE7dCO1t1ReZbpJTvTuo+5znTaUjL1C4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=PaJeakmI; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2e96f298fbdso14921971fa.1
-        for <netdev@vger.kernel.org>; Sun, 26 May 2024 15:16:56 -0700 (PDT)
+	s=arc-20240116; t=1716764816; c=relaxed/simple;
+	bh=tV9a6uconUwR7erk4Id3zTcW3RE9e+fvV73JW2n3cZQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LwSu2zy27PNZI0oiNdns8qCIFhfUXTT8MrSyITRPeyoXrpvo2ETyiWMOuQuRD5IvoPgbxlHmhQwCpEOPU1601ax7JS1/WK9hDOJcTcpRCs0/zxUgGmz9EP32KfWdAlShGMjUmaqJ+7xfMVJzjQ61W8vSKf3Xq5Htz+v5PXN0oUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Revskb8s; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-371c97913cdso23242925ab.3;
+        Sun, 26 May 2024 16:06:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1716761815; x=1717366615; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yj9aRr4TiFbyRovrKUlKbqQvT+nJ7qhCAc9UhOWM9Fs=;
-        b=PaJeakmIFTdhRWC6J9Rt7vJ+Aczv/UQEDHDnyMVtGc0853FDzG6UuXmzgi7/KP9ZHq
-         nYlkW5sbSLFaBak5tcmsnkI8vivH2oELrVclXlA9Z+9E7a2xnk8mz4/sVs1J/Nv7lKap
-         m64v88Y1qgEUFVHZiudcFpv1w4QmfnGAu3M9Y=
+        d=gmail.com; s=20230601; t=1716764813; x=1717369613; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zJqtAAqlFhCcDbb4ROnfcMhXZWMT8rTzCRv8aWFfHq8=;
+        b=Revskb8snfzPYIUc/CVXgSpm1cW12KIki3TvZQ3+1GDMlgPqdD8pzM7KL3aMgrxEUp
+         pshChCrD0Inol+opqr/21kgYmQyH2CSPFpMHZsRdWzWwrDf4BrD+1YUBbpS15pajBG8H
+         xml7OkFnqOpM58PrNnvDbv4q9Y/+qK029gSJ5RvGD3DD7dFwQlOUqPi7DB9uxB1+Pxqo
+         pHMghCZfakew1B7oHyL65k1HCfOUDc9JHaVkk82sJ8/NTtsFj6G90Ayvu+IwYQAaMPVy
+         NSceWW/IQgpzikm0SfOsWj807MYJ1t7ltSafcKb11IzDKBI7g476BZK3nwBKtbEREQvm
+         9juQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716761815; x=1717366615;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1716764813; x=1717369613;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Yj9aRr4TiFbyRovrKUlKbqQvT+nJ7qhCAc9UhOWM9Fs=;
-        b=v+lv7VZy9uKPjfA1kkf1BiQOCLWigR/1St1n1bGwvHHYV9K6Wrw4QPKlhr7YpA6kI3
-         tOLrunP7lD/u7Lhrl/KcQd99fCLhsNJVtFA+u+SY2Y1hLDFwiTJPe0sUyrpZijWDYDOT
-         KN3qz6SKc2+X3zx3CgaZHbnNa+i/KV9vUNRjIJVHQxm5i2mvZ2jnT/nzWLTzZnV+CZMe
-         wkOVKYgmsTjnfLFiDjdMzvDR+btu2ctnF6mCuKbokrxADyMMLLyFU9nq0KB7TxqbSV+f
-         0nOU6bwUOckoTMwU2TbAQ63eHYfARlmxRhEu0mEJvtNLRN0rE7L4LZqfAvYbAX/C8/X9
-         Qbqg==
-X-Gm-Message-State: AOJu0YzTbVF0Qp4qqhVy3ipMm0lpcG4X7arZkKV06J3M8SC0kW6Us0Xh
-	H7NEfz1KQ5g/BcoNa4tcEDwV1kimKIHE39s7N/gIxvbrWlvJHNJmlYrzRzt28roj/PCf7KShyEM
-	ra2UeSw==
-X-Google-Smtp-Source: AGHT+IF5JdbhlJkaK+OwPFijrZbVKg6pqhRKCGQUX43b8bXLNucVHtjJxm+dh92/59QUKn9HbtlczA==
-X-Received: by 2002:a2e:83d6:0:b0:2e7:1b8:7b77 with SMTP id 38308e7fff4ca-2e95b0c163cmr48924461fa.22.1716761814647;
-        Sun, 26 May 2024 15:16:54 -0700 (PDT)
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com. [209.85.218.49])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-578524bc4d8sm4995288a12.94.2024.05.26.15.16.54
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 May 2024 15:16:54 -0700 (PDT)
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a62614b9ae1so345981966b.0
-        for <netdev@vger.kernel.org>; Sun, 26 May 2024 15:16:54 -0700 (PDT)
-X-Received: by 2002:a17:906:48d8:b0:a59:a7b7:2b8e with SMTP id
- a640c23a62f3a-a62643e0787mr526403766b.29.1716761813805; Sun, 26 May 2024
- 15:16:53 -0700 (PDT)
+        bh=zJqtAAqlFhCcDbb4ROnfcMhXZWMT8rTzCRv8aWFfHq8=;
+        b=PGa7+DwAtdM2vSH+L8k9vYDkgtQg6QNz0eG5OtoHV50PEAX3TKZYpCn3JWqlrYYgWY
+         TY/HACU0CiL0RDEbaCyPsXZ15LoV3JCc7nttx0XT2zzPJXMIjScnkVxqdpqmLxzA8toV
+         O/+R+rCxXfADW6JOqzb9J+p7CC5zZVDnDQtCyVp1VCepQ1lnG3Rr16iMoUiSBBsArtBb
+         5Tp3JDV8uUL6KA9JmanGKaCMelBqxr/W2zA5iXgXx97vmOGH/qiS+W+72hjOquRPQ3nB
+         SEkMMFx3XykFSmCjmDMZkGOH353dzr2jgfkCnBgV8r3HHHkFSSP5Lc/qtADpmvAJai2R
+         15hQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUP2JvDmySuABtfwwD9Az+JvxcSo3eXa/ptkUqVOO1z5iOtYonVwNzWszRd0SNLOdLKjPb9xEtlXfBzVsEqmaghs6+Z
+X-Gm-Message-State: AOJu0YyciyXCBqoe4MzFMGJ7Qn3RUs+VyW4ygMKsqcLbXkzxY+y4bfBD
+	I7tE+jhwUuhyeU7pJSAHMOPUStM6A3G6bd4LJY/ykdxsvYP3VZpKjYxrUQ==
+X-Google-Smtp-Source: AGHT+IE201ttVYgZcyG2D3k1Vy2ZngvDdVtaBQx71rVja7N8HAXvNtKmfkWyaYbH3Fovx5pjX5yBiQ==
+X-Received: by 2002:a05:6e02:178d:b0:371:44f7:b9c0 with SMTP id e9e14a558f8ab-3737b2f8c57mr108095665ab.9.1716764813126;
+        Sun, 26 May 2024 16:06:53 -0700 (PDT)
+Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:ea8b:d923:f46f:eef5])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6822073f067sm4855338a12.5.2024.05.26.16.06.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 May 2024 16:06:52 -0700 (PDT)
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-mm@kvack.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	bpf@vger.kernel.org,
+	Cong Wang <cong.wang@bytedance.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Mike Rapoport <rppt@kernel.org>
+Subject: [Patch bpf] vmalloc: relax is_vmalloc_or_module_addr() check
+Date: Sun, 26 May 2024 16:06:48 -0700
+Message-Id: <20240526230648.188550-1-xiyou.wangcong@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240526034506.GZ2118490@ZenIV> <CAHk-=wjWFM9iPa8a+0apgvBoLv5PsYeQPViuf-zmkLiCGVQEww@mail.gmail.com>
- <20240526192721.GA2118490@ZenIV>
-In-Reply-To: <20240526192721.GA2118490@ZenIV>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sun, 26 May 2024 15:16:37 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wixYUyQcS9tDNVvnCvEi37puqqpQ=CN+zP=a9Q9Fp5e-Q@mail.gmail.com>
-Message-ID: <CAHk-=wixYUyQcS9tDNVvnCvEi37puqqpQ=CN+zP=a9Q9Fp5e-Q@mail.gmail.com>
-Subject: Re: [PATCH][CFT][experimental] net/socket.c: use straight fdget/fdput (resend)
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Sun, 26 May 2024 at 12:27, Al Viro <viro@zeniv.linux.org.uk> wrote:
->
-> Not really.  The real reason is different - there is a constraint on
-> possible values of struct fd.  No valid instance can ever have NULL
-> file and non-zero flags.
->
-> The usual pattern is this:
+From: Cong Wang <cong.wang@bytedance.com>
 
-[ snip snip ]
+After commit 2c9e5d4a0082 ("bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of")
+CONFIG_BPF_JIT does not depend on CONFIG_MODULES any more and bpf jit
+also uses the MODULES_VADDR ~ MODULES_END memory region. But
+is_vmalloc_or_module_addr() still checks CONFIG_MODULES, which then
+returns false for a bpf jit memory region when CONFIG_MODULES is not
+defined. It leads to the following kernel BUG:
 
-Ugh. I still hate it, including your new version. I suspect it will
-easily generate the extra test at fd_empty() time, and your new
-version would instead just move that extra test at fdput() time
-instead.
+[    1.567023] ------------[ cut here ]------------
+[    1.567883] kernel BUG at mm/vmalloc.c:745!
+[    1.568477] Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN NOPTI
+[    1.569367] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.9.0+ #448
+[    1.570247] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+[    1.570786] RIP: 0010:vmalloc_to_page+0x48/0x1ec
+[    1.570786] Code: 0f 00 00 e8 eb 1a 05 00 b8 37 00 00 00 48 ba fe ff ff ff ff 1f 00 00 4c 03 25 76 49 c6 02 48 c1 e0 28 48 01 e8 48 39 d0 76 02 <0f> 0b 4c 89 e7 e8 bf 1a 05 00 49 8b 04 24 48 a9 9f ff ff ff 0f 84
+[    1.570786] RSP: 0018:ffff888007787960 EFLAGS: 00010212
+[    1.570786] RAX: 000036ffa0000000 RBX: 0000000000000640 RCX: ffffffff8147e93c
+[    1.570786] RDX: 00001ffffffffffe RSI: dffffc0000000000 RDI: ffffffff840e32c8
+[    1.570786] RBP: ffffffffa0000000 R08: 0000000000000000 R09: 0000000000000000
+[    1.570786] R10: ffff888007787a88 R11: ffffffff8475d8e7 R12: ffffffff83e80ff8
+[    1.570786] R13: 0000000000000640 R14: 0000000000000640 R15: 0000000000000640
+[    1.570786] FS:  0000000000000000(0000) GS:ffff88806cc00000(0000) knlGS:0000000000000000
+[    1.570786] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.570786] CR2: ffff888006a01000 CR3: 0000000003e80000 CR4: 0000000000350ef0
+[    1.570786] Call Trace:
+[    1.570786]  <TASK>
+[    1.570786]  ? __die_body+0x1b/0x58
+[    1.570786]  ? die+0x31/0x4b
+[    1.570786]  ? do_trap+0x9d/0x138
+[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+[    1.570786]  ? do_error_trap+0xcd/0x102
+[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+[    1.570786]  ? handle_invalid_op+0x2f/0x38
+[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+[    1.570786]  ? exc_invalid_op+0x2b/0x41
+[    1.570786]  ? asm_exc_invalid_op+0x16/0x20
+[    1.570786]  ? vmalloc_to_page+0x26/0x1ec
+[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+[    1.570786]  __text_poke+0xb6/0x458
+[    1.570786]  ? __pfx_text_poke_memcpy+0x10/0x10
+[    1.570786]  ? __pfx___mutex_lock+0x10/0x10
+[    1.570786]  ? __pfx___text_poke+0x10/0x10
+[    1.570786]  ? __pfx_get_random_u32+0x10/0x10
+[    1.570786]  ? srso_return_thunk+0x5/0x5f
+[    1.570786]  text_poke_copy_locked+0x70/0x84
+[    1.570786]  text_poke_copy+0x32/0x4f
+[    1.570786]  bpf_arch_text_copy+0xf/0x27
+[    1.570786]  bpf_jit_binary_pack_finalize+0x26/0x5a
+[    1.570786]  bpf_int_jit_compile+0x576/0x8ad
+[    1.570786]  ? __pfx_bpf_int_jit_compile+0x10/0x10
+[    1.570786]  ? srso_return_thunk+0x5/0x5f
+[    1.570786]  ? __kmalloc_node_track_caller+0x2b5/0x2e0
+[    1.570786]  bpf_prog_select_runtime+0x7c/0x199
+[    1.570786]  bpf_prepare_filter+0x1e9/0x25b
+[    1.570786]  ? __pfx_bpf_prepare_filter+0x10/0x10
+[    1.570786]  ? srso_return_thunk+0x5/0x5f
+[    1.570786]  ? _find_next_bit+0x29/0x7e
+[    1.570786]  bpf_prog_create+0xb8/0xe0
+[    1.570786]  ptp_classifier_init+0x75/0xa1
+[    1.570786]  ? __pfx_ptp_classifier_init+0x10/0x10
+[    1.570786]  ? srso_return_thunk+0x5/0x5f
+[    1.570786]  ? register_pernet_subsys+0x36/0x42
+[    1.570786]  ? srso_return_thunk+0x5/0x5f
+[    1.570786]  sock_init+0x99/0xa3
+[    1.570786]  ? __pfx_sock_init+0x10/0x10
+[    1.570786]  do_one_initcall+0x104/0x2c4
+[    1.570786]  ? __pfx_do_one_initcall+0x10/0x10
+[    1.570786]  ? parameq+0x25/0x2d
+[    1.570786]  ? rcu_is_watching+0x1c/0x3c
+[    1.570786]  ? trace_kmalloc+0x81/0xb2
+[    1.570786]  ? srso_return_thunk+0x5/0x5f
+[    1.570786]  ? __kmalloc+0x29c/0x2c7
+[    1.570786]  ? srso_return_thunk+0x5/0x5f
+[    1.570786]  do_initcalls+0xf9/0x123
+[    1.570786]  kernel_init_freeable+0x24f/0x289
+[    1.570786]  ? __pfx_kernel_init+0x10/0x10
+[    1.570786]  kernel_init+0x19/0x13a
+[    1.570786]  ret_from_fork+0x24/0x41
+[    1.570786]  ? __pfx_kernel_init+0x10/0x10
+[    1.570786]  ret_from_fork_asm+0x1a/0x30
+[    1.570786]  </TASK>
+[    1.570819] ---[ end trace 0000000000000000 ]---
+[    1.571463] RIP: 0010:vmalloc_to_page+0x48/0x1ec
+[    1.572111] Code: 0f 00 00 e8 eb 1a 05 00 b8 37 00 00 00 48 ba fe ff ff ff ff 1f 00 00 4c 03 25 76 49 c6 02 48 c1 e0 28 48 01 e8 48 39 d0 76 02 <0f> 0b 4c 89 e7 e8 bf 1a 05 00 49 8b 04 24 48 a9 9f ff ff ff 0f 84
+[    1.574632] RSP: 0018:ffff888007787960 EFLAGS: 00010212
+[    1.575129] RAX: 000036ffa0000000 RBX: 0000000000000640 RCX: ffffffff8147e93c
+[    1.576097] RDX: 00001ffffffffffe RSI: dffffc0000000000 RDI: ffffffff840e32c8
+[    1.577084] RBP: ffffffffa0000000 R08: 0000000000000000 R09: 0000000000000000
+[    1.578077] R10: ffff888007787a88 R11: ffffffff8475d8e7 R12: ffffffff83e80ff8
+[    1.578810] R13: 0000000000000640 R14: 0000000000000640 R15: 0000000000000640
+[    1.579823] FS:  0000000000000000(0000) GS:ffff88806cc00000(0000) knlGS:0000000000000000
+[    1.580992] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.581869] CR2: ffff888006a01000 CR3: 0000000003e80000 CR4: 0000000000350ef0
+[    1.582800] Kernel panic - not syncing: Fatal exception
+[    1.583765] ---[ end Kernel panic - not syncing: Fatal exception ]---
 
-Hopefully in most cases the compiler sees the previous test for
-fd.file, realizes the new test is unnecessary and optimizes it away.
+Fixes: 2c9e5d4a0082 ("bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of")
+Cc: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Mike Rapoport (IBM) <rppt@kernel.org>
+Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+---
+ mm/vmalloc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Except we most definitely pass around 'struct fd *' in some places (at
-least ovlfs), so I doubt that  will be the case everywhere.
+diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+index 125427cbdb87..168a5c7c2fdf 100644
+--- a/mm/vmalloc.c
++++ b/mm/vmalloc.c
+@@ -714,7 +714,7 @@ int is_vmalloc_or_module_addr(const void *x)
+ 	 * and fall back on vmalloc() if that fails. Others
+ 	 * just put it in the vmalloc space.
+ 	 */
+-#if defined(CONFIG_MODULES) && defined(MODULES_VADDR)
++#if defined(MODULES_VADDR)
+ 	unsigned long addr = (unsigned long)kasan_reset_tag(x);
+ 	if (addr >= MODULES_VADDR && addr < MODULES_END)
+ 		return 1;
+-- 
+2.34.1
 
-What would make more sense is if you make the "fd_empty()" test be
-about the _flags_, and then both the fp_empty() test and the test
-inside fdput() would be testing the same things.
-
-Sadly, we'd need another bit in the flags. One option is easy enough -
-we'd just have to make 'struct file' always be 8-byte aligned, which
-it effectively always is.
-
-Or we'd need to make the rule be that FDPUT_POS_UNLOCK only gets set
-if FDPUT_FPUT is set.
-
-Because I think we could have even a two-bit tag value have that "no fd" case:
-
- 00 - no fd
- 01 - fd but no need for fput
- 10 - fd needs fput
- 11 - fd needs pos unlock and fput
-
-but as it is, that's not what we have. Right now we have
-
-  00 - no fd or fd with no need for fput ("look at fd.file to decide")
-  01 - fd needs fput
-  10 - fd pos unlock but no fput
-  11 - fd pos unlock and fput
-
-but that 10 case looks odd to me. Why would we ever need a pos unlock
-but no fput? The reason we don't need an fput is that we're the only
-thread that has access to the file pointer, but that also implies that
-we shouldn't need to lock the position.
-
-So now I've just confused myself. Why *do* we have that 10 pattern?
-
-Adding a separate bit would certainly avoid any complexity, and then
-you'd have "flags==0 means no file pointer" and the "fd_empty()" test
-would then make the fdput) test obviously unnecessary in the usual
-pattern.
-
-             Linus
 
