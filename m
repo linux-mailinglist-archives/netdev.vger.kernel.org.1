@@ -1,52 +1,61 @@
-Return-Path: <netdev+bounces-98099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 552BB8CF50E
-	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 19:27:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E5EF8CF512
+	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 19:32:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2C72280FA3
-	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 17:27:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3A03281063
+	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 17:32:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66919535C4;
-	Sun, 26 May 2024 17:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3BAB5FB94;
+	Sun, 26 May 2024 17:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="w1c0xEUe"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="hNU8iFsl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout3.routing.net (mxout3.routing.net [134.0.28.8])
+Received: from mxout4.routing.net (mxout4.routing.net [134.0.28.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B008F40;
-	Sun, 26 May 2024 17:27:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580B658105;
+	Sun, 26 May 2024 17:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716744458; cv=none; b=UyoyHGfkPInIHuZ/7vhbeGY9VYSLd2IA4jCHjWShJbrOTYuxQIEvclZLo44dAOPpnEvr9W+azHvMmSXl20q/CdQaPHuf/mWCODNgyGoSmbR/MyYKisNz+2Is/eol8aPWWIxMSXZfzVhROO1Ro80Em3PfU8SsOpPxZ8vEvjHSru0=
+	t=1716744776; cv=none; b=JW1k9Vfu50ej0paxOc9vaidqk81Wg+qLA6B4vvQy3ZGImUOYHvwpwfmu5g4yFPMMDivUqXz4nt/BK5G5+237K9N4KVnOGMM2Afcs+RIez+Sx/77IY2dqi2qMYdV55zGzCALABajwoVUDYK0H48g0eDbx9CvnaaNFgbSOTEsUv8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716744458; c=relaxed/simple;
+	s=arc-20240116; t=1716744776; c=relaxed/simple;
 	bh=gMVISDvt27PqArWWAYMROWxlMPEWKBZrhuZFwb21ZKk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=egWYJ5+HsxOzHU8gMLeQJgrwz1u7p/wKCURhTLVghi+Helmi5alUVl1XWF+8vtxgoJTrx6T7AnSOL7Pba16SHBb223nIfqpVexHDnN7KoSzgtd4qCShGPZZAVElQ+3hwW4NxpHSJJWG7xP6rfiYfFIAxSp62hU5ux+RQyStJNOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=w1c0xEUe; arc=none smtp.client-ip=134.0.28.8
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YAzGzcQR1uL+qvtJDVd4AMoxJx/EMfoNCoCGUDZIou5zU6e3wFGSKo0HipTHswwbGYOvcoxsnGwNSc1n/1cjNUKLx0k3kTYjtJvLoUVm5sxUUd1WMmHdaq8h5WEiTVyNZmv46Hz+VPTVBnJKOQ5UTwsO82iKempO+TVbJpz7u9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=hNU8iFsl; arc=none smtp.client-ip=134.0.28.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbox1.masterlogin.de (unknown [192.168.10.88])
-	by mxout3.routing.net (Postfix) with ESMTP id EDE7460144;
-	Sun, 26 May 2024 17:21:46 +0000 (UTC)
+Received: from mxbox4.masterlogin.de (unknown [192.168.10.79])
+	by mxout4.routing.net (Postfix) with ESMTP id 3753A100106;
+	Sun, 26 May 2024 17:23:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1716744107;
+	s=20200217; t=1716744201;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
 	bh=gynUFeKlK7bwR/LNfSPExiIbRZQ2pzBMdaawzedPczQ=;
-	b=w1c0xEUeZdaYLS7WwJ5AngC3BOPaOe1j+5V15sNDXx5l476D7V5CNMQ4pNDdyzr4pSO2Bq
-	1LeVxlf5qoczz8qT9pnMruHii9hQ0zf+Yb5294tnOEInS8XYu3ttbbmm6FZRdORZjVgEJ2
-	7wGa46ztBrVxnopMnf7+I/sO1r0SEEg=
+	b=hNU8iFslxZcBlu/h5juR+tTS9mjzgIa+OFxpnGM1NTmv9xFFDyUE954EX7Snlp9dFlaeXx
+	0nLXm2e7PS3Ei9Co6TYABdh//toyX7WBY4vzQ28axdsaJQcJKUKovSDprT3jgTfNV1LDzX
+	xDovgR1FWPje028LytnutQCqK2KyC3k=
 Received: from frank-G5.. (fttx-pool-157.180.226.247.bambit.de [157.180.226.247])
-	by mxbox1.masterlogin.de (Postfix) with ESMTPSA id 3EEDE4003D;
-	Sun, 26 May 2024 17:21:46 +0000 (UTC)
+	by mxbox4.masterlogin.de (Postfix) with ESMTPSA id 245798020D;
+	Sun, 26 May 2024 17:23:20 +0000 (UTC)
 From: Frank Wunderlich <linux@fw-web.de>
-To: 
+To: Felix Fietkau <nbd@nbd.name>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 Cc: Frank Wunderlich <frank-w@public-files.de>,
 	John Crispin <john@phrozen.org>,
 	netdev@vger.kernel.org,
@@ -55,8 +64,8 @@ Cc: Frank Wunderlich <frank-w@public-files.de>,
 	linux-mediatek@lists.infradead.org,
 	Daniel Golle <daniel@makrotopia.org>
 Subject: [net] net: ethernet: mtk_eth_soc: handle dma buffer size soc specific
-Date: Sun, 26 May 2024 19:21:37 +0200
-Message-Id: <20240526172137.60770-1-linux@fw-web.de>
+Date: Sun, 26 May 2024 19:23:11 +0200
+Message-Id: <20240526172311.61081-1-linux@fw-web.de>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -65,7 +74,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Mail-ID: a2f1974f-838e-443e-b974-70058ff4522b
+X-Mail-ID: bb23b2ea-0cd9-4a4a-a53c-e29530ba1449
 
 From: Frank Wunderlich <frank-w@public-files.de>
 
