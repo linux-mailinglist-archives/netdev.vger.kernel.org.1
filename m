@@ -1,210 +1,130 @@
-Return-Path: <netdev+bounces-98108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF2EB8CF69B
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 01:07:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D4CC8CF6B0
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 01:16:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B6CF28183A
-	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 23:06:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 116E928183B
+	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 23:16:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A7513A25E;
-	Sun, 26 May 2024 23:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC5313A26E;
+	Sun, 26 May 2024 23:16:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Revskb8s"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="OL4fRYvU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643808BE7;
-	Sun, 26 May 2024 23:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50EE613A25D;
+	Sun, 26 May 2024 23:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716764816; cv=none; b=abP3gNfnMI1UyvB3Y3xVGIIefuLPPPuGDwQ/KU4aNE/ors78dgATiAiYV58bPUSpTBPmF23pXZOExud50JZBRaaYyPtuc4v1VQ9GmgcRYe3sDlNn4aU5z8yquQV+mixIglMuaxXIfRcmVKbba2C+KEnWWI4v0djQvEERVOxty98=
+	t=1716765407; cv=none; b=UX/pGHLSbtfInorE8ADdHCE67tfX3zDtvvE77GX1ylCOxr2UwlTAlH0IjdjLippISmUNwA0GU55PqpQMkVXS3m+znDHqPUlfeV23TXynw0hGHoe6twy8NL/u+YdKRRoy/WuRieyxXjrelyzgtT4/JAfDcaue8arD3DebeKbtqsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716764816; c=relaxed/simple;
-	bh=tV9a6uconUwR7erk4Id3zTcW3RE9e+fvV73JW2n3cZQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LwSu2zy27PNZI0oiNdns8qCIFhfUXTT8MrSyITRPeyoXrpvo2ETyiWMOuQuRD5IvoPgbxlHmhQwCpEOPU1601ax7JS1/WK9hDOJcTcpRCs0/zxUgGmz9EP32KfWdAlShGMjUmaqJ+7xfMVJzjQ61W8vSKf3Xq5Htz+v5PXN0oUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Revskb8s; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-371c97913cdso23242925ab.3;
-        Sun, 26 May 2024 16:06:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716764813; x=1717369613; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zJqtAAqlFhCcDbb4ROnfcMhXZWMT8rTzCRv8aWFfHq8=;
-        b=Revskb8snfzPYIUc/CVXgSpm1cW12KIki3TvZQ3+1GDMlgPqdD8pzM7KL3aMgrxEUp
-         pshChCrD0Inol+opqr/21kgYmQyH2CSPFpMHZsRdWzWwrDf4BrD+1YUBbpS15pajBG8H
-         xml7OkFnqOpM58PrNnvDbv4q9Y/+qK029gSJ5RvGD3DD7dFwQlOUqPi7DB9uxB1+Pxqo
-         pHMghCZfakew1B7oHyL65k1HCfOUDc9JHaVkk82sJ8/NTtsFj6G90Ayvu+IwYQAaMPVy
-         NSceWW/IQgpzikm0SfOsWj807MYJ1t7ltSafcKb11IzDKBI7g476BZK3nwBKtbEREQvm
-         9juQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716764813; x=1717369613;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zJqtAAqlFhCcDbb4ROnfcMhXZWMT8rTzCRv8aWFfHq8=;
-        b=PGa7+DwAtdM2vSH+L8k9vYDkgtQg6QNz0eG5OtoHV50PEAX3TKZYpCn3JWqlrYYgWY
-         TY/HACU0CiL0RDEbaCyPsXZ15LoV3JCc7nttx0XT2zzPJXMIjScnkVxqdpqmLxzA8toV
-         O/+R+rCxXfADW6JOqzb9J+p7CC5zZVDnDQtCyVp1VCepQ1lnG3Rr16iMoUiSBBsArtBb
-         5Tp3JDV8uUL6KA9JmanGKaCMelBqxr/W2zA5iXgXx97vmOGH/qiS+W+72hjOquRPQ3nB
-         SEkMMFx3XykFSmCjmDMZkGOH353dzr2jgfkCnBgV8r3HHHkFSSP5Lc/qtADpmvAJai2R
-         15hQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUP2JvDmySuABtfwwD9Az+JvxcSo3eXa/ptkUqVOO1z5iOtYonVwNzWszRd0SNLOdLKjPb9xEtlXfBzVsEqmaghs6+Z
-X-Gm-Message-State: AOJu0YyciyXCBqoe4MzFMGJ7Qn3RUs+VyW4ygMKsqcLbXkzxY+y4bfBD
-	I7tE+jhwUuhyeU7pJSAHMOPUStM6A3G6bd4LJY/ykdxsvYP3VZpKjYxrUQ==
-X-Google-Smtp-Source: AGHT+IE201ttVYgZcyG2D3k1Vy2ZngvDdVtaBQx71rVja7N8HAXvNtKmfkWyaYbH3Fovx5pjX5yBiQ==
-X-Received: by 2002:a05:6e02:178d:b0:371:44f7:b9c0 with SMTP id e9e14a558f8ab-3737b2f8c57mr108095665ab.9.1716764813126;
-        Sun, 26 May 2024 16:06:53 -0700 (PDT)
-Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:ea8b:d923:f46f:eef5])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6822073f067sm4855338a12.5.2024.05.26.16.06.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 May 2024 16:06:52 -0700 (PDT)
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux-mm@kvack.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	bpf@vger.kernel.org,
-	Cong Wang <cong.wang@bytedance.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Mike Rapoport <rppt@kernel.org>
-Subject: [Patch bpf] vmalloc: relax is_vmalloc_or_module_addr() check
-Date: Sun, 26 May 2024 16:06:48 -0700
-Message-Id: <20240526230648.188550-1-xiyou.wangcong@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1716765407; c=relaxed/simple;
+	bh=SvVxcy4zMXIcrzfOIMksqGi6f1D0W3cEUvoQRvmyQ+g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SqkHtv7F2Q3k6FIcR97sO2svCnC8JZevdwRqLVgrwbXGvh0zvEdqv6bjAAv7Uv6lhDkwjPrpg9XzrQIeSDp3WohKm4K29Ljml4IBEExrP0ZzUoqvm5ecf8vzHUl5wxPTGQ8XlkddPABjfO8rZeO53upQHsl1JHpxgt7Ev2gLAUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=OL4fRYvU; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=ot5qxpOdV4cX5rE/iGFXy1muUxNUF/yleqvpYYQ3M8g=; b=OL4fRYvUj2vlYQcic+AubpHxWg
+	vQbBoyx7gi852a6z4WdpY7WQiA17tXOh8vsWLI1sCXprThm4GO8KEj6T5tmph1RqoSWBrHESLW4pj
+	fX+N/D5cNzaEaqBl6JeDunhrjj/z+gaa3uJhG7WNaUmWXKqAUcYNKHsDMkpPiXpOugp7UmTHVGgP8
+	ZcbaRlk6+5fdBohlYB5N4krXhNYXNnVfdXJJWVloOgOYJGTN4WpMiXQtlEvKj/3d9l61mOJn+3RWG
+	OdnVw01j6AxKn/FQ3dQNRy7WK/t1ieELjQuEsXPAsIFKXU+sVTqQKGLCM1dLA7BKQYii2bHBhLUcJ
+	uWofdJNA==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1sBN6X-00BDZN-0l;
+	Sun, 26 May 2024 23:16:41 +0000
+Date: Mon, 27 May 2024 00:16:41 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH][CFT][experimental] net/socket.c: use straight
+ fdget/fdput (resend)
+Message-ID: <20240526231641.GB2118490@ZenIV>
+References: <20240526034506.GZ2118490@ZenIV>
+ <CAHk-=wjWFM9iPa8a+0apgvBoLv5PsYeQPViuf-zmkLiCGVQEww@mail.gmail.com>
+ <20240526192721.GA2118490@ZenIV>
+ <CAHk-=wixYUyQcS9tDNVvnCvEi37puqqpQ=CN+zP=a9Q9Fp5e-Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wixYUyQcS9tDNVvnCvEi37puqqpQ=CN+zP=a9Q9Fp5e-Q@mail.gmail.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-From: Cong Wang <cong.wang@bytedance.com>
+On Sun, May 26, 2024 at 03:16:37PM -0700, Linus Torvalds wrote:
 
-After commit 2c9e5d4a0082 ("bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of")
-CONFIG_BPF_JIT does not depend on CONFIG_MODULES any more and bpf jit
-also uses the MODULES_VADDR ~ MODULES_END memory region. But
-is_vmalloc_or_module_addr() still checks CONFIG_MODULES, which then
-returns false for a bpf jit memory region when CONFIG_MODULES is not
-defined. It leads to the following kernel BUG:
+> Hopefully in most cases the compiler sees the previous test for
+> fd.file, realizes the new test is unnecessary and optimizes it away.
 
-[    1.567023] ------------[ cut here ]------------
-[    1.567883] kernel BUG at mm/vmalloc.c:745!
-[    1.568477] Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN NOPTI
-[    1.569367] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.9.0+ #448
-[    1.570247] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-[    1.570786] RIP: 0010:vmalloc_to_page+0x48/0x1ec
-[    1.570786] Code: 0f 00 00 e8 eb 1a 05 00 b8 37 00 00 00 48 ba fe ff ff ff ff 1f 00 00 4c 03 25 76 49 c6 02 48 c1 e0 28 48 01 e8 48 39 d0 76 02 <0f> 0b 4c 89 e7 e8 bf 1a 05 00 49 8b 04 24 48 a9 9f ff ff ff 0f 84
-[    1.570786] RSP: 0018:ffff888007787960 EFLAGS: 00010212
-[    1.570786] RAX: 000036ffa0000000 RBX: 0000000000000640 RCX: ffffffff8147e93c
-[    1.570786] RDX: 00001ffffffffffe RSI: dffffc0000000000 RDI: ffffffff840e32c8
-[    1.570786] RBP: ffffffffa0000000 R08: 0000000000000000 R09: 0000000000000000
-[    1.570786] R10: ffff888007787a88 R11: ffffffff8475d8e7 R12: ffffffff83e80ff8
-[    1.570786] R13: 0000000000000640 R14: 0000000000000640 R15: 0000000000000640
-[    1.570786] FS:  0000000000000000(0000) GS:ffff88806cc00000(0000) knlGS:0000000000000000
-[    1.570786] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.570786] CR2: ffff888006a01000 CR3: 0000000003e80000 CR4: 0000000000350ef0
-[    1.570786] Call Trace:
-[    1.570786]  <TASK>
-[    1.570786]  ? __die_body+0x1b/0x58
-[    1.570786]  ? die+0x31/0x4b
-[    1.570786]  ? do_trap+0x9d/0x138
-[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-[    1.570786]  ? do_error_trap+0xcd/0x102
-[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-[    1.570786]  ? handle_invalid_op+0x2f/0x38
-[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-[    1.570786]  ? exc_invalid_op+0x2b/0x41
-[    1.570786]  ? asm_exc_invalid_op+0x16/0x20
-[    1.570786]  ? vmalloc_to_page+0x26/0x1ec
-[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-[    1.570786]  __text_poke+0xb6/0x458
-[    1.570786]  ? __pfx_text_poke_memcpy+0x10/0x10
-[    1.570786]  ? __pfx___mutex_lock+0x10/0x10
-[    1.570786]  ? __pfx___text_poke+0x10/0x10
-[    1.570786]  ? __pfx_get_random_u32+0x10/0x10
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  text_poke_copy_locked+0x70/0x84
-[    1.570786]  text_poke_copy+0x32/0x4f
-[    1.570786]  bpf_arch_text_copy+0xf/0x27
-[    1.570786]  bpf_jit_binary_pack_finalize+0x26/0x5a
-[    1.570786]  bpf_int_jit_compile+0x576/0x8ad
-[    1.570786]  ? __pfx_bpf_int_jit_compile+0x10/0x10
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  ? __kmalloc_node_track_caller+0x2b5/0x2e0
-[    1.570786]  bpf_prog_select_runtime+0x7c/0x199
-[    1.570786]  bpf_prepare_filter+0x1e9/0x25b
-[    1.570786]  ? __pfx_bpf_prepare_filter+0x10/0x10
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  ? _find_next_bit+0x29/0x7e
-[    1.570786]  bpf_prog_create+0xb8/0xe0
-[    1.570786]  ptp_classifier_init+0x75/0xa1
-[    1.570786]  ? __pfx_ptp_classifier_init+0x10/0x10
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  ? register_pernet_subsys+0x36/0x42
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  sock_init+0x99/0xa3
-[    1.570786]  ? __pfx_sock_init+0x10/0x10
-[    1.570786]  do_one_initcall+0x104/0x2c4
-[    1.570786]  ? __pfx_do_one_initcall+0x10/0x10
-[    1.570786]  ? parameq+0x25/0x2d
-[    1.570786]  ? rcu_is_watching+0x1c/0x3c
-[    1.570786]  ? trace_kmalloc+0x81/0xb2
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  ? __kmalloc+0x29c/0x2c7
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  do_initcalls+0xf9/0x123
-[    1.570786]  kernel_init_freeable+0x24f/0x289
-[    1.570786]  ? __pfx_kernel_init+0x10/0x10
-[    1.570786]  kernel_init+0x19/0x13a
-[    1.570786]  ret_from_fork+0x24/0x41
-[    1.570786]  ? __pfx_kernel_init+0x10/0x10
-[    1.570786]  ret_from_fork_asm+0x1a/0x30
-[    1.570786]  </TASK>
-[    1.570819] ---[ end trace 0000000000000000 ]---
-[    1.571463] RIP: 0010:vmalloc_to_page+0x48/0x1ec
-[    1.572111] Code: 0f 00 00 e8 eb 1a 05 00 b8 37 00 00 00 48 ba fe ff ff ff ff 1f 00 00 4c 03 25 76 49 c6 02 48 c1 e0 28 48 01 e8 48 39 d0 76 02 <0f> 0b 4c 89 e7 e8 bf 1a 05 00 49 8b 04 24 48 a9 9f ff ff ff 0f 84
-[    1.574632] RSP: 0018:ffff888007787960 EFLAGS: 00010212
-[    1.575129] RAX: 000036ffa0000000 RBX: 0000000000000640 RCX: ffffffff8147e93c
-[    1.576097] RDX: 00001ffffffffffe RSI: dffffc0000000000 RDI: ffffffff840e32c8
-[    1.577084] RBP: ffffffffa0000000 R08: 0000000000000000 R09: 0000000000000000
-[    1.578077] R10: ffff888007787a88 R11: ffffffff8475d8e7 R12: ffffffff83e80ff8
-[    1.578810] R13: 0000000000000640 R14: 0000000000000640 R15: 0000000000000640
-[    1.579823] FS:  0000000000000000(0000) GS:ffff88806cc00000(0000) knlGS:0000000000000000
-[    1.580992] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.581869] CR2: ffff888006a01000 CR3: 0000000003e80000 CR4: 0000000000350ef0
-[    1.582800] Kernel panic - not syncing: Fatal exception
-[    1.583765] ---[ end Kernel panic - not syncing: Fatal exception ]---
+It does.
 
-Fixes: 2c9e5d4a0082 ("bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of")
-Cc: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Mike Rapoport (IBM) <rppt@kernel.org>
-Signed-off-by: Cong Wang <cong.wang@bytedance.com>
----
- mm/vmalloc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Except we most definitely pass around 'struct fd *' in some places (at
+> least ovlfs), so I doubt that  will be the case everywhere.
 
-diff --git a/mm/vmalloc.c b/mm/vmalloc.c
-index 125427cbdb87..168a5c7c2fdf 100644
---- a/mm/vmalloc.c
-+++ b/mm/vmalloc.c
-@@ -714,7 +714,7 @@ int is_vmalloc_or_module_addr(const void *x)
- 	 * and fall back on vmalloc() if that fails. Others
- 	 * just put it in the vmalloc space.
- 	 */
--#if defined(CONFIG_MODULES) && defined(MODULES_VADDR)
-+#if defined(MODULES_VADDR)
- 	unsigned long addr = (unsigned long)kasan_reset_tag(x);
- 	if (addr >= MODULES_VADDR && addr < MODULES_END)
- 		return 1;
--- 
-2.34.1
+... and those places need care, really.  I've done that review
+quite recently.  I don't think you'd been on Cc in related thread...
+<checks> nope.
 
+|| Another is overlayfs ovl_real_fdget() and ovl_real_fdget_meta().
+|| Those two are arguably too clever for their readers' good.
+|| It's still "borrow or clone, and remember which one had it been",
+|| but that's mixed with returning errors:
+||         err = ovl_read_fdget(file, &fd);
+|| may construct and store a junk value in fd if err is non-zero.
+|| Not a bug, but only because all callers remember to ignore that
+|| value in such case.
+
+Junk value as in e.g. <ERR_PTR(-EIO), FDPUT_FPUT>; it's trivial
+to avoid (
+		file = ovl_open_realfile(file, &realpath);
+		if (IS_ERR(file))
+			return ERR_PTR(file);
+                real->flags = FDPUT_FPUT;
+                real->file = file;
+		return 0;
+instead of
+                real->flags = FDPUT_FPUT;
+                real->file = ovl_open_realfile(file, &realpath);
+
+                return PTR_ERR_OR_ZERO(real->file);
+we have there right now and similar for <ERR_PTR(-EPERM), 0> pairs),
+but note that anything like your switch to struct-wrapped unsigned long
+would need similar massage there anyway.
+
+> What would make more sense is if you make the "fd_empty()" test be
+> about the _flags_, and then both the fp_empty() test and the test
+> inside fdput() would be testing the same things.
+
+Umm...  What encoding would you use?
+
+> Sadly, we'd need another bit in the flags. One option is easy enough -
+> we'd just have to make 'struct file' always be 8-byte aligned, which
+> it effectively always is.
+> 
+> Or we'd need to make the rule be that FDPUT_POS_UNLOCK only gets set
+> if FDPUT_FPUT is set.
+
+Huh?  That makes no sense - open a file, fork, and there you go;
+same file reference in unshared descriptor tables in child and parent.
+You definitely don't want to bump refcount on fdget_pos() in either
+and you don't want to lose read/write/lseek serialization.
+
+FDPUT_FPUT is *not* a property of file; it's about the original
+reference to file not being guaranteed to stay pinned for the lifetime
+of struct fd in question...
 
