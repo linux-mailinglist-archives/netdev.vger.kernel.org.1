@@ -1,795 +1,187 @@
-Return-Path: <netdev+bounces-98103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF94A8CF59A
-	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 21:27:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1307E8CF609
+	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 22:55:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CB461F21122
-	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 19:27:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B40DE28100D
+	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 20:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B855231;
-	Sun, 26 May 2024 19:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="o0RoMyxE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C0C139D11;
+	Sun, 26 May 2024 20:55:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D45E3D7A;
-	Sun, 26 May 2024 19:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B014139CFC
+	for <netdev@vger.kernel.org>; Sun, 26 May 2024 20:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716751648; cv=none; b=DVlkCBHz+2gtK/9Iy82pDXM5DTUpZZlO+3Gj8XQEMblD+cSQxRwi35OnPT4I9jGQv06xcQcjvvCofj57Fm6bHQM77M16OiIuzthttPVpub6Lt1EyZxLNCCm/AiZd73bqPYDDL0vj7UUGXxLlqCxXxs8vKUJO1RdVFpH5qe4OX8c=
+	t=1716756931; cv=none; b=is5MSfnkW/A6s9uxhY8fjZl+T/OYGnbUiYnQWehfSwv/Wa1D+6ssWt7UbYihDRy7fyGPbQg03cCi6+USxFBz3YNrkb+I32hDeMNgGB67Q2JB0n21jK1GgjcJxX9G7LqSPwztLL87UyiMQV9G6TgdzVnlQOVSs8x9MyxueErNMkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716751648; c=relaxed/simple;
-	bh=j1tKlngUwHRDvrDWzEn31iDoP7RWqYSq3eZ6tMkrO8I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q+gnJRdx+gC3e4GXm8nT694zA5iRYK+NKMAt2DjLF2XhPgfBoS9zZb3fOyc5NCjldtC0nsVLhK08WQtyiO19P3Rkzg6K9DD46Gm39ZHIXhpWa8/3PdfQtf89LyJNyGEr7uregorol4MRmRQrn3JfRgaNYBcCJY8GL1lNZ9KK+rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=o0RoMyxE; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=PWeDNmJwb4qflUeNI92eTQ6r8maE2ZdDswYHGaax3C4=; b=o0RoMyxE4f/S3QQLBbgxcXI9sE
-	4t7/BgGwtiyN+d38sgnewpojhZTvV2MZla+UEWfIZS4qiaSJz0fyQJz/iUPEKApscNRA3GXQB5Gp5
-	gi+KXKgjwI6bCNbhyi1CT33XFGZzTVZAJUWr4Y5XPb42b0pcFIKTC0jiTyk4LMd7u3YTg21NbzV4m
-	qWqgZJPMgF2bn2RIMukd+L2cwOck6EDthlpLUvxD76fr0nvxGmubSiF4D3zqqAmOJFvMO7gDLSwo0
-	M9gaWCYqOXZtjzZ8cVTQArrz3SbAtMx1zEWTeY8QX/k2+MAc1BmV6su5PdQ7Ex3a6pk8vbxEPRk2F
-	++SwXcWg==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1sBJWb-00Ah8P-1C;
-	Sun, 26 May 2024 19:27:21 +0000
-Date: Sun, 26 May 2024 20:27:21 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH][CFT][experimental] net/socket.c: use straight
- fdget/fdput (resend)
-Message-ID: <20240526192721.GA2118490@ZenIV>
-References: <20240526034506.GZ2118490@ZenIV>
- <CAHk-=wjWFM9iPa8a+0apgvBoLv5PsYeQPViuf-zmkLiCGVQEww@mail.gmail.com>
+	s=arc-20240116; t=1716756931; c=relaxed/simple;
+	bh=UImQxAPOx24VQj0f4Xlu8jEy6VeoT2nd6Lxbc1zqsKA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=g57DHLgUClbFqd5ETVLazSDBn3tfeteezuz2XDkJzhG5WuypM4DvCiZCiBbp/R+zYtKLZFFMEYp+7Yd3s+GGYi/6V8MQ+hib5wYnpCFpfMcyfKabKaNVmAAm6eS9K0Yf6xcxedPEBkVygJ06Rwes0JqCTnEmcmw31flRVPmioEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-37458393465so2902075ab.0
+        for <netdev@vger.kernel.org>; Sun, 26 May 2024 13:55:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716756928; x=1717361728;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=T8Ff/1i31+BE7EFvYOmkzv6BYjG0wA2YgwTzF6+Ho68=;
+        b=r7XKOYl1IjvqxmC4jUjli9ZSazedrMMdP2EXLT7oOJp/T4nj0IbaF27AvVxto1wE3n
+         ihGZE2oiG5Kfn9Xjp3hCc8SLFlJwkc3+6jI8gdIvIQV61WTNe40So4kdPIdaxPKyj3gw
+         B2AZNZttDHF/v8iy7Zxj0bAgEWdHyBXSYs6ZeMZRWsxvmFjEXF9eEgRQNiOJBASnTrFi
+         /xjVOProTrPPENFOCpZ3LGwuYKWyYyEU7FIVUxKayVKnB4YHAZV7bce9IWU7QLU3gJZR
+         OA5a2QM8F0rOCwrnrIw6idVuzs88hqstTucLEcjpqUk8WssU8EG5ySc9yJjClDs4qlmu
+         Wn0A==
+X-Forwarded-Encrypted: i=1; AJvYcCWolp1xW/RbeG4pu2YytyZLX3SNktRkN+JKBWI4UQJnSANHkjsCZJOSI5/X96+lLAe0VqgMJWm3ud5gmKZxJo1gFBGA4Lgc
+X-Gm-Message-State: AOJu0YzAaoXqQUvUydcLugZ11yqoSxkL9rimONfcsQZhGqgKohgifJlW
+	pSpHfTcm/+TG8x2bxb8wpIsXaR+gqqRC5Zq4+1/2WvKv6Q0lzim1pxZXs5HO8ZxSF+F8b8TwdbS
+	xbzPcAeSD72CgDLhd+h4uAt7Xu8RCCn32KJKwnxwpJA6xBmc7GOT7JqI=
+X-Google-Smtp-Source: AGHT+IHKtIYDeim0+FderWP+Oqk6I75pKU2LVNzMNywyRdzmWMGswo8cRl9x+ksnl0xQupaLUAzmDNKQenn7vTK7+xQVqHqKHx/q
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wjWFM9iPa8a+0apgvBoLv5PsYeQPViuf-zmkLiCGVQEww@mail.gmail.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+X-Received: by 2002:a05:6e02:1c09:b0:374:5382:72be with SMTP id
+ e9e14a558f8ab-37453827482mr1696825ab.3.1716756928762; Sun, 26 May 2024
+ 13:55:28 -0700 (PDT)
+Date: Sun, 26 May 2024 13:55:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e7a9080619619e8a@google.com>
+Subject: [syzbot] [wireless?] general protection fault in ieee80211_unregister_hw
+From: syzbot <syzbot+b48ecffcca0f460a4cf4@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, May 25, 2024 at 10:07:39PM -0700, Linus Torvalds wrote:
-> On Sat, 25 May 2024 at 20:45, Al Viro <viro@zeniv.linux.org.uk> wrote:
-> >
-> > Checking the theory that the important part in sockfd_lookup_light() is
-> > avoiding needless file refcount operations, not the marginal reduction
-> > of the register pressure from not keeping a struct file pointer in the
-> > caller.
-> 
-> Yeah, the register pressure thing is not likely an issue. That said, I
-> think we can fix it.
-> 
-> > If that's true, we should get the same benefits from straight fdget()/fdput().
-> 
-> Agreed.
-> 
-> That said, your patch is just horrendous.
-> 
-> > +static inline bool fd_empty(struct fd f)
-> > +{
-> > +       // better code with gcc that way
-> > +       return unlikely(!(f.flags | (unsigned long)f.file));
-> > +}
-> 
-> Ok, this is disgusting. I went all "WTF?"
-> 
-> And then looked at why you would say that testing two different fields
-> in a 'struct fd' would possibly be better than just checking one.
-> 
-> And I see why that's the case - it basically short-circuits the
-> (inlined) __to_fd() logic, and the compiler can undo it and look at
-> the original single-word value.
+Hello,
 
-Not really.  The real reason is different - there is a constraint on
-possible values of struct fd.  No valid instance can ever have NULL
-file and non-zero flags.
+syzbot found the following issue on:
 
-The usual pattern is this:
+HEAD commit:    2a8120d7b482 Merge tag 's390-6.10-2' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1574fadc980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5dd4fde1337a9e18
+dashboard link: https://syzkaller.appspot.com/bug?extid=b48ecffcca0f460a4cf4
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: i386
 
-	fd = something;
-	if (!fd.file)
-		return -EBADF;
-	// we know that fd.file != NULL
-	....
-	fdput(fd);
-	return something_else;
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Switch to __cleanup would expand into something like
-	fd = something;
-	if (!fd.file) {
-		fdput(fd);
-		return -EBADF;
-	}
-	// we know that fd.file != NULL
-	...
-	fdput(fd);
-	return something_else;
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-2a8120d7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/78c72ae6bdaf/vmlinux-2a8120d7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/99dbb805b738/bzImage-2a8120d7.xz
 
-Look at the early exit there in more details:
-	if (!fd.file) {
-		if (fd.flags & FDPUT_FPUT)
-			fput(fd.file);	// would oops
-		return -EBADF;
-	}
-It *is* correct, but only because NULL fd.file can only happen
-with zero fd.flags, so this fput() call is a dead code.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b48ecffcca0f460a4cf4@syzkaller.appspotmail.com
 
-Boths your and mine variants are equivalent to this:
-	if (!fd.file && !fd.flags) {
-		fpdut(fd); 	// compiler will eliminate it
-		return -EBADF;
-	}
-	// we assume that fd.file is non-NULL now
-	...
-	fdput(fd);
-	return something_else;
-and IMO both attack the problem at the wrong place.  If we
-keep the check as it is (NULL fd.file) and turn fdput() into
-	if ((fd.flags & FDPUT_FPUT) && fd.file)
-		fput(fd.file);
-we will get obviously correct behaviour with good code generation -
-pretty much all current users of fdput() are downstream of
-the check that fd.file is non-NULL and gcc will be able to optimize
-the second part of condition away.
+Oops: general protection fault, probably for non-canonical address 0xe01ffbf11002a963: 0000 [#1] PREEMPT SMP KASAN NOPTI
+KASAN: maybe wild-memory-access in range [0x00ffff8880154b18-0x00ffff8880154b1f]
+CPU: 2 PID: 1185 Comm: kworker/u32:10 Not tainted 6.9.0-syzkaller-10713-g2a8120d7b482 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Workqueue: netns cleanup_net
+RIP: 0010:__lock_acquire+0xe3e/0x3b30 kernel/locking/lockdep.c:5005
+Code: 11 00 00 39 05 b3 cf 1f 12 0f 82 be 05 00 00 ba 01 00 00 00 e9 e4 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 0f 85 82 1f 00 00 49 81 3c 24 a0 3d e3 92 0f 84 98 f2
+RSP: 0018:ffffc90006ecf7a0 EFLAGS: 00010006
+RAX: dffffc0000000000 RBX: 0000000000000001 RCX: 0000000000000000
+RDX: 001ffff11002a963 RSI: ffff888020952440 RDI: 00ffff8880154b18
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000001
+R10: ffffffff8fe29817 R11: 0000000000000004 R12: 00ffff8880154b18
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff88802c200000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f711b1cd440 CR3: 000000002686c000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ lock_acquire kernel/locking/lockdep.c:5754 [inline]
+ lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
+ __raw_spin_lock_irq include/linux/spinlock_api_smp.h:119 [inline]
+ _raw_spin_lock_irq+0x36/0x50 kernel/locking/spinlock.c:170
+ put_pwq_unlocked kernel/workqueue.c:1662 [inline]
+ put_pwq_unlocked kernel/workqueue.c:1655 [inline]
+ destroy_workqueue+0x5df/0xaa0 kernel/workqueue.c:5851
+ ieee80211_unregister_hw+0x276/0x3a0 net/mac80211/main.c:1676
+ mac80211_hwsim_del_radio+0x266/0x370 drivers/net/wireless/virtual/mac80211_hwsim.c:5576
+ hwsim_exit_net+0x33f/0x6d0 drivers/net/wireless/virtual/mac80211_hwsim.c:6453
+ ops_exit_list+0xb0/0x180 net/core/net_namespace.c:173
+ cleanup_net+0x5b7/0xbf0 net/core/net_namespace.c:640
+ process_one_work+0x958/0x1ad0 kernel/workqueue.c:3231
+ process_scheduled_works kernel/workqueue.c:3312 [inline]
+ worker_thread+0x6c8/0xf70 kernel/workqueue.c:3393
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__lock_acquire+0xe3e/0x3b30 kernel/locking/lockdep.c:5005
+Code: 11 00 00 39 05 b3 cf 1f 12 0f 82 be 05 00 00 ba 01 00 00 00 e9 e4 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 0f 85 82 1f 00 00 49 81 3c 24 a0 3d e3 92 0f 84 98 f2
+RSP: 0018:ffffc90006ecf7a0 EFLAGS: 00010006
+RAX: dffffc0000000000 RBX: 0000000000000001 RCX: 0000000000000000
+RDX: 001ffff11002a963 RSI: ffff888020952440 RDI: 00ffff8880154b18
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000001
+R10: ffffffff8fe29817 R11: 0000000000000004 R12: 00ffff8880154b18
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff88802c200000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f711b1cd440 CR3: 000000002686c000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	11 00                	adc    %eax,(%rax)
+   2:	00 39                	add    %bh,(%rcx)
+   4:	05 b3 cf 1f 12       	add    $0x121fcfb3,%eax
+   9:	0f 82 be 05 00 00    	jb     0x5cd
+   f:	ba 01 00 00 00       	mov    $0x1,%edx
+  14:	e9 e4 00 00 00       	jmp    0xfd
+  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  20:	fc ff df
+  23:	4c 89 e2             	mov    %r12,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  2e:	0f 85 82 1f 00 00    	jne    0x1fb6
+  34:	49 81 3c 24 a0 3d e3 	cmpq   $0xffffffff92e33da0,(%r12)
+  3b:	92
+  3c:	0f                   	.byte 0xf
+  3d:	84                   	.byte 0x84
+  3e:	98                   	cwtl
+  3f:	f2                   	repnz
 
-IOW, we don't disturb the existing explicit callers and the
-only implicit ones (from __cleanup()) that might get an extra
-check are the ones on failure exits between getting fd and
-checking it to be empty.  Not a lot of those...
 
-How about the following?
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-commit b3692a6e34e9dcfb1d9705782bc928bd04d5640d
-Author: Al Viro <viro@zeniv.linux.org.uk>
-Date:   Sat May 25 23:32:20 2024 -0400
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-    [experimental] net/socket.c: use straight fdget/fdput
-    
-    Checking the theory that the important part in sockfd_lookup_light() is
-    avoiding needless file refcount operations, not the marginal reduction
-    of the register pressure from not keeping a struct file pointer in the
-    caller.
-    
-    If that's true, we should get the same benefits from straight fdget()/fdput().
-    And AFAICS with sane use of CLASS(fd) we can get a better code generation...
-    
-    Would be nice if somebody tested it on networking test suites (including
-    benchmarks)...
-    
-    Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-diff --git a/include/linux/file.h b/include/linux/file.h
-index 45d0f4800abd..c482c1e39ebc 100644
---- a/include/linux/file.h
-+++ b/include/linux/file.h
-@@ -29,12 +29,6 @@ extern struct file *alloc_file_pseudo_noaccount(struct inode *, struct vfsmount
- extern struct file *alloc_file_clone(struct file *, int flags,
- 	const struct file_operations *);
- 
--static inline void fput_light(struct file *file, int fput_needed)
--{
--	if (fput_needed)
--		fput(file);
--}
--
- struct fd {
- 	struct file *file;
- 	unsigned int flags;
-@@ -44,7 +38,7 @@ struct fd {
- 
- static inline void fdput(struct fd fd)
- {
--	if (fd.flags & FDPUT_FPUT)
-+	if ((fd.flags & FDPUT_FPUT) && fd.file)
- 		fput(fd.file);
- }
- 
-@@ -76,6 +70,11 @@ static inline struct fd fdget_pos(int fd)
- 	return __to_fd(__fdget_pos(fd));
- }
- 
-+static inline bool fd_empty(struct fd f)
-+{
-+	return unlikely(!f.file);
-+}
-+
- static inline void fdput_pos(struct fd f)
- {
- 	if (f.flags & FDPUT_POS_UNLOCK)
-diff --git a/net/socket.c b/net/socket.c
-index e416920e9399..297293797df2 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -510,7 +510,7 @@ static int sock_map_fd(struct socket *sock, int flags)
- 
- struct socket *sock_from_file(struct file *file)
- {
--	if (file->f_op == &socket_file_ops)
-+	if (likely(file->f_op == &socket_file_ops))
- 		return file->private_data;	/* set in sock_alloc_file */
- 
- 	return NULL;
-@@ -550,24 +550,6 @@ struct socket *sockfd_lookup(int fd, int *err)
- }
- EXPORT_SYMBOL(sockfd_lookup);
- 
--static struct socket *sockfd_lookup_light(int fd, int *err, int *fput_needed)
--{
--	struct fd f = fdget(fd);
--	struct socket *sock;
--
--	*err = -EBADF;
--	if (f.file) {
--		sock = sock_from_file(f.file);
--		if (likely(sock)) {
--			*fput_needed = f.flags & FDPUT_FPUT;
--			return sock;
--		}
--		*err = -ENOTSOCK;
--		fdput(f);
--	}
--	return NULL;
--}
--
- static ssize_t sockfs_listxattr(struct dentry *dentry, char *buffer,
- 				size_t size)
- {
-@@ -1834,23 +1816,25 @@ int __sys_bind(int fd, struct sockaddr __user *umyaddr, int addrlen)
- {
- 	struct socket *sock;
- 	struct sockaddr_storage address;
--	int err, fput_needed;
--
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (sock) {
--		err = move_addr_to_kernel(umyaddr, addrlen, &address);
--		if (!err) {
--			err = security_socket_bind(sock,
--						   (struct sockaddr *)&address,
--						   addrlen);
--			if (!err)
--				err = READ_ONCE(sock->ops)->bind(sock,
--						      (struct sockaddr *)
--						      &address, addrlen);
--		}
--		fput_light(sock->file, fput_needed);
--	}
--	return err;
-+	CLASS(fd, f)(fd);
-+	int err;
-+
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
-+
-+	err = move_addr_to_kernel(umyaddr, addrlen, &address);
-+	if (unlikely(err))
-+		return err;
-+
-+	err = security_socket_bind(sock, (struct sockaddr *)&address, addrlen);
-+	if (unlikely(err))
-+		return err;
-+
-+	return READ_ONCE(sock->ops)->bind(sock,
-+					  (struct sockaddr *)&address, addrlen);
- }
- 
- SYSCALL_DEFINE3(bind, int, fd, struct sockaddr __user *, umyaddr, int, addrlen)
-@@ -1867,21 +1851,24 @@ SYSCALL_DEFINE3(bind, int, fd, struct sockaddr __user *, umyaddr, int, addrlen)
- int __sys_listen(int fd, int backlog)
- {
- 	struct socket *sock;
--	int err, fput_needed;
-+	CLASS(fd, f)(fd);
- 	int somaxconn;
-+	int err;
- 
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (sock) {
--		somaxconn = READ_ONCE(sock_net(sock->sk)->core.sysctl_somaxconn);
--		if ((unsigned int)backlog > somaxconn)
--			backlog = somaxconn;
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
- 
--		err = security_socket_listen(sock, backlog);
--		if (!err)
--			err = READ_ONCE(sock->ops)->listen(sock, backlog);
-+	somaxconn = READ_ONCE(sock_net(sock->sk)->core.sysctl_somaxconn);
-+	if ((unsigned int)backlog > somaxconn)
-+		backlog = somaxconn;
-+
-+	err = security_socket_listen(sock, backlog);
-+	if (!err)
-+		err = READ_ONCE(sock->ops)->listen(sock, backlog);
- 
--		fput_light(sock->file, fput_needed);
--	}
- 	return err;
- }
- 
-@@ -1992,17 +1979,12 @@ static int __sys_accept4_file(struct file *file, struct sockaddr __user *upeer_s
- int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
- 		  int __user *upeer_addrlen, int flags)
- {
--	int ret = -EBADF;
--	struct fd f;
-+	CLASS(fd, f)(fd);
- 
--	f = fdget(fd);
--	if (f.file) {
--		ret = __sys_accept4_file(f.file, upeer_sockaddr,
-+	if (fd_empty(f))
-+		return -EBADF;
-+	return __sys_accept4_file(f.file, upeer_sockaddr,
- 					 upeer_addrlen, flags);
--		fdput(f);
--	}
--
--	return ret;
- }
- 
- SYSCALL_DEFINE4(accept4, int, fd, struct sockaddr __user *, upeer_sockaddr,
-@@ -2054,20 +2036,18 @@ int __sys_connect_file(struct file *file, struct sockaddr_storage *address,
- 
- int __sys_connect(int fd, struct sockaddr __user *uservaddr, int addrlen)
- {
--	int ret = -EBADF;
--	struct fd f;
-+	struct sockaddr_storage address;
-+	CLASS(fd, f)(fd);
-+	int ret;
- 
--	f = fdget(fd);
--	if (f.file) {
--		struct sockaddr_storage address;
-+	if (fd_empty(f))
-+		return -EBADF;
- 
--		ret = move_addr_to_kernel(uservaddr, addrlen, &address);
--		if (!ret)
--			ret = __sys_connect_file(f.file, &address, addrlen, 0);
--		fdput(f);
--	}
-+	ret = move_addr_to_kernel(uservaddr, addrlen, &address);
-+	if (ret)
-+		return ret;
- 
--	return ret;
-+	return __sys_connect_file(f.file, &address, addrlen, 0);
- }
- 
- SYSCALL_DEFINE3(connect, int, fd, struct sockaddr __user *, uservaddr,
-@@ -2086,26 +2066,25 @@ int __sys_getsockname(int fd, struct sockaddr __user *usockaddr,
- {
- 	struct socket *sock;
- 	struct sockaddr_storage address;
--	int err, fput_needed;
-+	CLASS(fd, f)(fd);
-+	int err;
- 
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (!sock)
--		goto out;
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
- 
- 	err = security_socket_getsockname(sock);
- 	if (err)
--		goto out_put;
-+		return err;
- 
- 	err = READ_ONCE(sock->ops)->getname(sock, (struct sockaddr *)&address, 0);
- 	if (err < 0)
--		goto out_put;
--	/* "err" is actually length in this case */
--	err = move_addr_to_user(&address, err, usockaddr, usockaddr_len);
-+		return err;
- 
--out_put:
--	fput_light(sock->file, fput_needed);
--out:
--	return err;
-+	/* "err" is actually length in this case */
-+	return move_addr_to_user(&address, err, usockaddr, usockaddr_len);
- }
- 
- SYSCALL_DEFINE3(getsockname, int, fd, struct sockaddr __user *, usockaddr,
-@@ -2124,26 +2103,25 @@ int __sys_getpeername(int fd, struct sockaddr __user *usockaddr,
- {
- 	struct socket *sock;
- 	struct sockaddr_storage address;
--	int err, fput_needed;
-+	CLASS(fd, f)(fd);
-+	int err;
- 
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (sock != NULL) {
--		const struct proto_ops *ops = READ_ONCE(sock->ops);
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
- 
--		err = security_socket_getpeername(sock);
--		if (err) {
--			fput_light(sock->file, fput_needed);
--			return err;
--		}
-+	err = security_socket_getpeername(sock);
-+	if (err)
-+		return err;
- 
--		err = ops->getname(sock, (struct sockaddr *)&address, 1);
--		if (err >= 0)
--			/* "err" is actually length in this case */
--			err = move_addr_to_user(&address, err, usockaddr,
--						usockaddr_len);
--		fput_light(sock->file, fput_needed);
--	}
--	return err;
-+	err = READ_ONCE(sock->ops)->getname(sock, (struct sockaddr *)&address, 1);
-+	if (err < 0)
-+		return err;
-+
-+	/* "err" is actually length in this case */
-+	return move_addr_to_user(&address, err, usockaddr, usockaddr_len);
- }
- 
- SYSCALL_DEFINE3(getpeername, int, fd, struct sockaddr __user *, usockaddr,
-@@ -2162,16 +2140,13 @@ int __sys_sendto(int fd, void __user *buff, size_t len, unsigned int flags,
- {
- 	struct socket *sock;
- 	struct sockaddr_storage address;
--	int err;
- 	struct msghdr msg;
--	int fput_needed;
-+	CLASS(fd, f)(fd);
-+	int err;
- 
- 	err = import_ubuf(ITER_SOURCE, buff, len, &msg.msg_iter);
- 	if (unlikely(err))
- 		return err;
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (!sock)
--		goto out;
- 
- 	msg.msg_name = NULL;
- 	msg.msg_control = NULL;
-@@ -2181,20 +2156,22 @@ int __sys_sendto(int fd, void __user *buff, size_t len, unsigned int flags,
- 	if (addr) {
- 		err = move_addr_to_kernel(addr, addr_len, &address);
- 		if (err < 0)
--			goto out_put;
-+			return err;
- 		msg.msg_name = (struct sockaddr *)&address;
- 		msg.msg_namelen = addr_len;
- 	}
-+
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
-+
- 	flags &= ~MSG_INTERNAL_SENDMSG_FLAGS;
- 	if (sock->file->f_flags & O_NONBLOCK)
- 		flags |= MSG_DONTWAIT;
- 	msg.msg_flags = flags;
--	err = __sock_sendmsg(sock, &msg);
--
--out_put:
--	fput_light(sock->file, fput_needed);
--out:
--	return err;
-+	return __sock_sendmsg(sock, &msg);
- }
- 
- SYSCALL_DEFINE6(sendto, int, fd, void __user *, buff, size_t, len,
-@@ -2229,14 +2206,17 @@ int __sys_recvfrom(int fd, void __user *ubuf, size_t size, unsigned int flags,
- 	};
- 	struct socket *sock;
- 	int err, err2;
--	int fput_needed;
-+	CLASS(fd, f)(fd);
-+
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
- 
- 	err = import_ubuf(ITER_DEST, ubuf, size, &msg.msg_iter);
- 	if (unlikely(err))
- 		return err;
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (!sock)
--		goto out;
- 
- 	if (sock->file->f_flags & O_NONBLOCK)
- 		flags |= MSG_DONTWAIT;
-@@ -2248,9 +2228,6 @@ int __sys_recvfrom(int fd, void __user *ubuf, size_t size, unsigned int flags,
- 		if (err2 < 0)
- 			err = err2;
- 	}
--
--	fput_light(sock->file, fput_needed);
--out:
- 	return err;
- }
- 
-@@ -2325,17 +2302,16 @@ int __sys_setsockopt(int fd, int level, int optname, char __user *user_optval,
- {
- 	sockptr_t optval = USER_SOCKPTR(user_optval);
- 	bool compat = in_compat_syscall();
--	int err, fput_needed;
- 	struct socket *sock;
-+	CLASS(fd, f)(fd);
- 
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (!sock)
--		return err;
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
- 
--	err = do_sock_setsockopt(sock, compat, level, optname, optval, optlen);
--
--	fput_light(sock->file, fput_needed);
--	return err;
-+	return do_sock_setsockopt(sock, compat, level, optname, optval, optlen);
- }
- 
- SYSCALL_DEFINE5(setsockopt, int, fd, int, level, int, optname,
-@@ -2391,20 +2367,17 @@ EXPORT_SYMBOL(do_sock_getsockopt);
- int __sys_getsockopt(int fd, int level, int optname, char __user *optval,
- 		int __user *optlen)
- {
--	int err, fput_needed;
- 	struct socket *sock;
--	bool compat;
-+	CLASS(fd, f)(fd);
- 
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (!sock)
--		return err;
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
- 
--	compat = in_compat_syscall();
--	err = do_sock_getsockopt(sock, compat, level, optname,
-+	return do_sock_getsockopt(sock, in_compat_syscall(), level, optname,
- 				 USER_SOCKPTR(optval), USER_SOCKPTR(optlen));
--
--	fput_light(sock->file, fput_needed);
--	return err;
- }
- 
- SYSCALL_DEFINE5(getsockopt, int, fd, int, level, int, optname,
-@@ -2430,15 +2403,16 @@ int __sys_shutdown_sock(struct socket *sock, int how)
- 
- int __sys_shutdown(int fd, int how)
- {
--	int err, fput_needed;
- 	struct socket *sock;
-+	CLASS(fd, f)(fd);
- 
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (sock != NULL) {
--		err = __sys_shutdown_sock(sock, how);
--		fput_light(sock->file, fput_needed);
--	}
--	return err;
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
-+
-+	return __sys_shutdown_sock(sock, how);
- }
- 
- SYSCALL_DEFINE2(shutdown, int, fd, int, how)
-@@ -2654,22 +2628,20 @@ long __sys_sendmsg_sock(struct socket *sock, struct msghdr *msg,
- long __sys_sendmsg(int fd, struct user_msghdr __user *msg, unsigned int flags,
- 		   bool forbid_cmsg_compat)
- {
--	int fput_needed, err;
- 	struct msghdr msg_sys;
- 	struct socket *sock;
-+	CLASS(fd, f)(fd);
-+
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
- 
- 	if (forbid_cmsg_compat && (flags & MSG_CMSG_COMPAT))
- 		return -EINVAL;
- 
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (!sock)
--		goto out;
--
--	err = ___sys_sendmsg(sock, msg, &msg_sys, flags, NULL, 0);
--
--	fput_light(sock->file, fput_needed);
--out:
--	return err;
-+	return ___sys_sendmsg(sock, msg, &msg_sys, flags, NULL, 0);
- }
- 
- SYSCALL_DEFINE3(sendmsg, int, fd, struct user_msghdr __user *, msg, unsigned int, flags)
-@@ -2684,13 +2656,20 @@ SYSCALL_DEFINE3(sendmsg, int, fd, struct user_msghdr __user *, msg, unsigned int
- int __sys_sendmmsg(int fd, struct mmsghdr __user *mmsg, unsigned int vlen,
- 		   unsigned int flags, bool forbid_cmsg_compat)
- {
--	int fput_needed, err, datagrams;
-+	int err, datagrams;
- 	struct socket *sock;
- 	struct mmsghdr __user *entry;
- 	struct compat_mmsghdr __user *compat_entry;
- 	struct msghdr msg_sys;
- 	struct used_address used_address;
- 	unsigned int oflags = flags;
-+	CLASS(fd, f)(fd);
-+
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
- 
- 	if (forbid_cmsg_compat && (flags & MSG_CMSG_COMPAT))
- 		return -EINVAL;
-@@ -2700,10 +2679,6 @@ int __sys_sendmmsg(int fd, struct mmsghdr __user *mmsg, unsigned int vlen,
- 
- 	datagrams = 0;
- 
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (!sock)
--		return err;
--
- 	used_address.name_len = UINT_MAX;
- 	entry = mmsg;
- 	compat_entry = (struct compat_mmsghdr __user *)mmsg;
-@@ -2739,8 +2714,6 @@ int __sys_sendmmsg(int fd, struct mmsghdr __user *mmsg, unsigned int vlen,
- 		cond_resched();
- 	}
- 
--	fput_light(sock->file, fput_needed);
--
- 	/* We only return an error if no datagrams were able to be sent */
- 	if (datagrams != 0)
- 		return datagrams;
-@@ -2862,22 +2835,20 @@ long __sys_recvmsg_sock(struct socket *sock, struct msghdr *msg,
- long __sys_recvmsg(int fd, struct user_msghdr __user *msg, unsigned int flags,
- 		   bool forbid_cmsg_compat)
- {
--	int fput_needed, err;
- 	struct msghdr msg_sys;
- 	struct socket *sock;
-+	CLASS(fd, f)(fd);
-+
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
- 
- 	if (forbid_cmsg_compat && (flags & MSG_CMSG_COMPAT))
- 		return -EINVAL;
- 
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (!sock)
--		goto out;
--
--	err = ___sys_recvmsg(sock, msg, &msg_sys, flags, 0);
--
--	fput_light(sock->file, fput_needed);
--out:
--	return err;
-+	return ___sys_recvmsg(sock, msg, &msg_sys, flags, 0);
- }
- 
- SYSCALL_DEFINE3(recvmsg, int, fd, struct user_msghdr __user *, msg,
-@@ -2894,31 +2865,32 @@ static int do_recvmmsg(int fd, struct mmsghdr __user *mmsg,
- 			  unsigned int vlen, unsigned int flags,
- 			  struct timespec64 *timeout)
- {
--	int fput_needed, err, datagrams;
-+	int err, datagrams;
- 	struct socket *sock;
- 	struct mmsghdr __user *entry;
- 	struct compat_mmsghdr __user *compat_entry;
- 	struct msghdr msg_sys;
- 	struct timespec64 end_time;
- 	struct timespec64 timeout64;
-+	CLASS(fd, f)(fd);
- 
- 	if (timeout &&
- 	    poll_select_set_timeout(&end_time, timeout->tv_sec,
- 				    timeout->tv_nsec))
- 		return -EINVAL;
- 
--	datagrams = 0;
-+	if (fd_empty(f))
-+		return -EBADF;
-+	sock = sock_from_file(f.file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
- 
--	sock = sockfd_lookup_light(fd, &err, &fput_needed);
--	if (!sock)
--		return err;
-+	datagrams = 0;
- 
- 	if (likely(!(flags & MSG_ERRQUEUE))) {
- 		err = sock_error(sock->sk);
--		if (err) {
--			datagrams = err;
--			goto out_put;
--		}
-+		if (err)
-+			return err;
- 	}
- 
- 	entry = mmsg;
-@@ -2975,12 +2947,10 @@ static int do_recvmmsg(int fd, struct mmsghdr __user *mmsg,
- 	}
- 
- 	if (err == 0)
--		goto out_put;
-+		return datagrams;
- 
--	if (datagrams == 0) {
--		datagrams = err;
--		goto out_put;
--	}
-+	if (datagrams == 0)
-+		return err;
- 
- 	/*
- 	 * We may return less entries than requested (vlen) if the
-@@ -2995,9 +2965,6 @@ static int do_recvmmsg(int fd, struct mmsghdr __user *mmsg,
- 		 */
- 		WRITE_ONCE(sock->sk->sk_err, -err);
- 	}
--out_put:
--	fput_light(sock->file, fput_needed);
--
- 	return datagrams;
- }
- 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
