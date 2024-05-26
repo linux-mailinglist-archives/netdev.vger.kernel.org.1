@@ -1,116 +1,125 @@
-Return-Path: <netdev+bounces-98084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C629A8CF3E7
-	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 12:12:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 749B08CF3F7
+	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 12:57:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 011AF1C20A96
-	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 10:12:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6E0B1C20BE6
+	for <lists+netdev@lfdr.de>; Sun, 26 May 2024 10:57:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02ADC9454;
-	Sun, 26 May 2024 10:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735CEB660;
+	Sun, 26 May 2024 10:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="jfoKv5KH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mkUfQALU"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068BC944D;
-	Sun, 26 May 2024 10:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1EB946C
+	for <netdev@vger.kernel.org>; Sun, 26 May 2024 10:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716718348; cv=none; b=sjS+j+wW7ZZY93+6zdG+Y9HiOQFW0zhe73ES25znda5DsMTt8cvgTVHLcidPoQcSZqO50BUBJqUi+myxuJY4WwzOA2lgwW4df7Cv8YCpcw7e5L+uXYK7ylT1wZ+7aQTK7Z80gX76pUdtNdgokpm1Cp+YjfKlR7f7yOFFybCADGk=
+	t=1716721038; cv=none; b=G8GNw8ftg9+qGDAsAi4RTJmwSZPwqDgsEQ+oo6kz/5FA9oAANEzIFxNobzeW5spMY69KKSWIPOvnlNKGLxmvGfV/vI3fdwPVA4fqdgM72gE0OpMbTTWeqVJmdrN+ID99khLR64ysYsyqNR03c5+7bURJZuxmXnOwYVfmMBn3Yv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716718348; c=relaxed/simple;
-	bh=8oUxUxZJg4KKPtTzJx66f3/wv9+1zWEIBduvh5jiAkE=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=KJQ1fSqZIkAkg0fNtc7CdgPatvXJCmH0XnwZ6ygrZjOzoDX2C9TnWcGtDXzpUCzu7vuBEi9iVgYntcDmFBT7odbQAU+RNQRsK8oOghTBlTp0qsaaa4En9gnYfkdlPZ9jqel4HbhZO2qMy+l3A7jDR0XfNQeaZRukDOXtZhR2aZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=jfoKv5KH; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=N3C2+7Y+QSPTOxNU7PnuOKCuJ1uAfob26BSoj4QvzwI=; b=jfoKv5KHLQ73zNzGwZvRcNvqPv
-	T8cWw8FZdMu4W3lrVLXSDbrEoSV7qOIPSUWI4zffoNoj531VUwQ/8SQ2PIqBCBjfVBPrsyqkAuvSE
-	pPqxwbx2M/mCBs0YMLm8A5wNF7xxJjBgJFzPq7dvF1Nj27z7Zp6Qg07CxDzwINQ3kz81ZBGE57HFH
-	KCg2DNDJ1JfAZYkD/H+waXC8thZIXwyAf7H0KxdoFV9JVeHBEsI45HLif6XtFCVgMXHPrBTxMhMLW
-	tdK8UiHYUpY8IsPqCnfT7O+Hp84BrEYpiygqOChvm6Z8JiWTlvmJUbUCrzm3URNqWl5wI9W9Fk9xT
-	A9QnJoMw==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sBArR-000HrP-5c; Sun, 26 May 2024 12:12:17 +0200
-Received: from [178.197.248.14] (helo=linux.home)
-	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sBArQ-000J3i-2z;
-	Sun, 26 May 2024 12:12:16 +0200
-Subject: Re: [PATCH bpf v2 4/4] selftests/bpf: Add netkit test for pkt_type
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>, bpf <bpf@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>
-References: <20240524163619.26001-1-daniel@iogearbox.net>
- <20240524163619.26001-4-daniel@iogearbox.net>
- <31b97318-38fc-4540-a4a9-201c619c4412@linux.dev>
- <CAADnVQK5nL2Pkh0pUanHvVh0auYmdbc2yEfMxquknoX0vjiUAA@mail.gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <36231a20-ebe1-5846-9609-f895c4379596@iogearbox.net>
-Date: Sun, 26 May 2024 12:12:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1716721038; c=relaxed/simple;
+	bh=QJZKS5XK50PFb7yB5dE8Z2KwtFi2UIIE2VpRvjS2mvk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iQUAbORyYBwYJBTNsUAXp/eajRucem/v511mcZJhCVnRsNPXMkMjBZwSqYOGDhohIpTEhVBjtyE4tSE4uTzjfTV6dbNglA0sA07c0T/K4ZjWhScPQOW2FN7yVKqryP4HhKb0T8+7YGjC0hHJIoCa6oyFmv5satUGTHEkHXdxs2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mkUfQALU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 339E7C2BD10;
+	Sun, 26 May 2024 10:57:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716721037;
+	bh=QJZKS5XK50PFb7yB5dE8Z2KwtFi2UIIE2VpRvjS2mvk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mkUfQALUPIAnqLna55993P0mpcZuLuR8DLpbQSpcLewCdNeF2H4tbPN3zgmxSZclO
+	 G85eWcMokxL/xjanp4J9Nizk4OqT6AMZAI4v0q2BmVHt4SFTGzH2odH2drNblMvlsd
+	 nM4hRP3jYsJaZvNOJHqhClfJZ2zoXEIGbffZ3Wg9Bsekui3AOzFaWln9yWfXf5v4QL
+	 ZfGh5LNk5RiG7nmQ7wZyfGEj2dBgWZzuy3oyJl7SUR3GxdEfZVjUZ5l2Dus+KgeMok
+	 aZr3ovUhiKELqnSMOQmMSpE0fMZ8G28QSe/maIe/1HN51IpOMnHFZGplhRuJjH09su
+	 KDysA8J7LF8wg==
+Date: Sun, 26 May 2024 13:57:13 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Jianbo Liu <jianbol@nvidia.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"fw@strlen.de" <fw@strlen.de>
+Subject: Re: [PATCH net] net: drop secpath extension before skb deferral free
+Message-ID: <20240526105713.GB96190@unreal>
+References: <20240513100246.85173-1-jianbol@nvidia.com>
+ <CANn89iLLk5PvbMa20C=eS0m=chAsgzY-fWnyEsp6L5QouDPcNg@mail.gmail.com>
+ <be732cc7427e09500467e30dd09dac621226568f.camel@nvidia.com>
+ <CANn89i+BGcnzJutnUFm_y-Xx66gBCh0yhgq_umk5YFMuFf6C4g@mail.gmail.com>
+ <14d383ebd61980ecf07430255a2de730257d3dde.camel@nvidia.com>
+ <Zk28Lg9/n59Kdsp1@gauss3.secunet.de>
+ <4d6e7b9c11c24eb4d9df593a9cab825549dd02c2.camel@nvidia.com>
+ <Zk7l6MChwKkjbTJx@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAADnVQK5nL2Pkh0pUanHvVh0auYmdbc2yEfMxquknoX0vjiUAA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27287/Sun May 26 10:27:50 2024)
+In-Reply-To: <Zk7l6MChwKkjbTJx@gauss3.secunet.de>
 
-On 5/25/24 7:55 PM, Alexei Starovoitov wrote:
-> On Fri, May 24, 2024 at 3:05â€¯PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
->>
->> On 5/24/24 9:36 AM, Daniel Borkmann wrote:
->>> diff --git a/tools/testing/selftests/bpf/progs/test_tc_link.c b/tools/testing/selftests/bpf/progs/test_tc_link.c
->>> index 992400acb957..b64fcb70ef2f 100644
->>> --- a/tools/testing/selftests/bpf/progs/test_tc_link.c
->>> +++ b/tools/testing/selftests/bpf/progs/test_tc_link.c
->>> @@ -4,6 +4,7 @@
->>>
->>>    #include <linux/bpf.h>
->>>    #include <linux/if_ether.h>
->>> +#include <linux/if_packet.h>
->>
->> The set looks good.
->>
->> A minor thing is that I am hitting this compilation issue in my environment:
->>
->> In file included from progs/test_tc_link.c:7:
->> In file included from /usr/include/linux/if_packet.h:5:
->> In file included from /usr/include/asm/byteorder.h:5:
->> In file included from /usr/include/linux/byteorder/little_endian.h:13:
->> /usr/include/linux/swab.h:136:8: error: unknown type name '__always_inline'
->>     136 | static __always_inline unsigned long __swab(const unsigned long y)
->>         |        ^
->>
->> Adding '#include <linux/stddef.h>' solved it. If the addition is fine, this can
->> be adjusted before landing.
+On Thu, May 23, 2024 at 08:44:56AM +0200, Steffen Klassert wrote:
+> On Thu, May 23, 2024 at 02:22:38AM +0000, Jianbo Liu wrote:
+> > On Wed, 2024-05-22 at 11:34 +0200, Steffen Klassert wrote:
+> > > 
+> > > Maybe we should directly remove the device from the xfrm_state
+> > > when the decice goes down, this should catch all the cases.
+> > > 
+> > > I think about something like this (untested) patch:
+> > > 
+> > > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> > > index 0c306473a79d..ba402275ab57 100644
+> > > --- a/net/xfrm/xfrm_state.c
+> > > +++ b/net/xfrm/xfrm_state.c
+> > > @@ -867,7 +867,11 @@ int xfrm_dev_state_flush(struct net *net, struct
+> > > net_device *dev, bool task_vali
+> > >                                 xfrm_state_hold(x);
+> > >                                 spin_unlock_bh(&net-
+> > > >xfrm.xfrm_state_lock);
+> > >  
+> > > -                               err = xfrm_state_delete(x);
+> > > +                               spin_lock_bh(&x->lock);
+> > > +                               err = __xfrm_state_delete(x);
+> > > +                               xfrm_dev_state_free(x);
+> > > +                               spin_unlock_bh(&x->lock);
+> > > +
+> > >                                 xfrm_audit_state_delete(x, err ? 0 :
+> > > 1,
+> > >                                                         task_valid);
+> > >                                 xfrm_state_put(x);
+> > > 
+> > > The secpath is still attached to all skbs, but the hang on device
+> > > unregister should go away.
+> > 
+> > It didn't fix the issue.
 > 
-> I hit the same build issue. So added stddef.h before if_packet.h as
-> Martin suggested before applying.
+> Do you have a backtrace of the ref_tracker?
+> 
+> Is that with packet offload?
 
-Awesome, thanks all!
+We saw same failure with crypto and packet offloads.
+
+> 
+> Looks like we need to remove the device from the xfrm_policy
+> too if packet offload is used.
+
+When we debugged it, we found that this line [1] was responsible for
+elevated reference count. XFRM policy cleaned properly.
+
+Thanks
+
+[1] https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c#L332
+
+> 
 
