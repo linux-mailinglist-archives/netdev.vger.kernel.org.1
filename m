@@ -1,69 +1,71 @@
-Return-Path: <netdev+bounces-98328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B519A8D0EAF
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 22:39:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C22E18D0EB0
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 22:40:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BED41F20990
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 20:39:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76042282E58
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 20:40:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3812161302;
-	Mon, 27 May 2024 20:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBAA161320;
+	Mon, 27 May 2024 20:39:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JFsMqxNH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aV0rN5tq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608BF5338D
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 20:39:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B255338D
+	for <netdev@vger.kernel.org>; Mon, 27 May 2024 20:39:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716842392; cv=none; b=Gd35/23Fq+044LN1lnhdKLR2fYlW9rD8ycsR77hlOPQzzYBGEgl7vzGqdQPoP/047g79kSRYxWivRxYUNsycxWv6K3BIHwcKZUD1mjum2wqpn2MQnxlabsiCouU1WtbXMLUoKE0tTjTq9BvYVN7Hkq2Eprw1KV/P8D210V51xVw=
+	t=1716842396; cv=none; b=cxe/zj86WHDhGlGLW+ES6aM6EImrf1n+5izD+DBX4pSW+CeE5o3Oyig10D50RvBZv578w881NCAEGECuvCzDd7EHH2ac7tOw4Y9qWEX3NViJbFGYIM9vWRs4IrPXyqjVkbbGJ/k6k1JpFadCwBjWfpPJLrhdm7GkAvllaxOkhog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716842392; c=relaxed/simple;
-	bh=y3SaBZWrFFdixotQVCBsLOUIqzjxZl3pSkLJF+5JpCw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pstdPQtwHsulp+qC+zpSAUJzoHY3yMrZkLHGsLAFxapF23c6Pmq4QBXrxhbj+EaGxUtellMVl7J57ZS5dQIDi8lrPbZooyKDEpM6S1hcFGOgaxpdl7Ac4l1Shz5v2OuDL3zUDx4k14VYAe1u/vJlvMEAP40BB7DS7bbb1dbwBzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JFsMqxNH; arc=none smtp.client-ip=209.85.216.52
+	s=arc-20240116; t=1716842396; c=relaxed/simple;
+	bh=hkrb8EtUe+8MwV15uhT+Dlmk+MxjLy1kUYvKEVt7WAA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=AjdjUzpIW1M81TX8g/vmAYRbu9IKzUuQizg582NuNlhsq9Ncr6pxWVQvD2zCeG9vGw+rHnk66K77KNxhxGg0JpYZAaypdeRlYzE7yme93AU9Vet5nAE8mLbMoFTvkce3qdPrrD+uvMqDJyRp3go0WC0CsnQb7ArRbFq4FrBSQVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aV0rN5tq; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2bded7f6296so22916a91.1
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 13:39:51 -0700 (PDT)
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2bf5ba9a2c5so19507a91.0
+        for <netdev@vger.kernel.org>; Mon, 27 May 2024 13:39:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716842390; x=1717447190; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rn8wXa/3Ch862EZ59Oun3kTVZ4HawI4VG+gRexoDIEU=;
-        b=JFsMqxNHOClHGuRExRUoxlv3FMC9LbFfxR0kQnMvvuTS4HRusp0EdaK2BKzixcOwfK
-         rRBZ1CvnAFyznkLb8vxBm1dC4er+MoB2Qq/CinHhKENnR2jl6vnj7wIQV2sAhYaQ8yWp
-         ud2VGrNvH7Iu+3NNQBBCh9GQLOwo8TrsTjTX25twctxOj/YlEPbTFztblngy51X/8mFU
-         uI95B6jYUg5nz7RTjMqfmrPlFpHiE8cRu7chzxNzTCBxSxPT7mpFcR4Kbl2OYfsTTmsv
-         hrlXm/t+Cm8luqX9biu1pcfwguxw6qDFTa9l43u3BhY7uXeWUQFwNvIpSmPK5spzrBaf
-         6g0w==
+        d=gmail.com; s=20230601; t=1716842394; x=1717447194; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T1bcZtywl4gv9RxhVaIh8Vqw04D0WxYuVcQPOWfj5pc=;
+        b=aV0rN5tqMgTyZP1BLT9xR5ntYtKvEp51QMw/7kkflRG3nRn3DMz58HO5njGBgPl/NW
+         Fp0RrSNA4SycjoHzlXAh+SiwQbfJhhYLqUlda9G/YvRprWCDLNRXkoCaRrThb1l1KzFY
+         ew255pcuQ+fYnxqqmzfLeXZWpB4t/uHqYr4EaXjzmisBYkxD/uSqM360yvdzdLwbZpd8
+         hyGlq3b9YLWc1scEGE09HdpPmC5UMJyPBysKYUH/1RsU5/tJrWg0RT1eSa5bxva7SrHv
+         fAvB2fnm0F35lxyrW1upwvpOYVpmrxFseJNUdxdK3324FsBFNp/GiNLYVXnNeHQTw6Cc
+         bYiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716842390; x=1717447190;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rn8wXa/3Ch862EZ59Oun3kTVZ4HawI4VG+gRexoDIEU=;
-        b=tEbuTiWfnGXFBSYQLn8alsHk+U9WtcGGsuEXgRlcGlX1LeJplWCekHtBSqqzP7SBZH
-         O/Vxon3lf1AO/C8tIvJMKndGYyC1utIEQshxP4w3HcC7gIBOuoPelSAZNtI14phEqInz
-         eSm83Vs6c+AC5pyRVbVkCr+eKKByeb8Q2HxK0aMkeJWoockslYjBJ1/hLWTzon3ZNSjK
-         Q88YiC3bjZB17R5yjvJEg1r4Q/Lpj2byEcyGPHm3jljL7qCBNGaJp30zbbNJWpSFpMYi
-         ZrVqKE67oYfywMz1RxwyWM0NEE1gw/VOsYURHtZV1WCHzxUCWqpDNw3kRNzeB3MRnpbd
-         eBYA==
-X-Gm-Message-State: AOJu0YyMCI82olPYZAqGWWmIwyFcy0eK40Ymp/48SyUvb3+r8ysdvQCM
-	XLA0loZ7KcA6MLPzyQv+Irf8Vpxsq2UiGUU1Ivu1Un/IT7LllwynL9Hv2YNj
-X-Google-Smtp-Source: AGHT+IFHhW4KNHLwHS4oww6AMDULDdgaY19riC7sWZTTyjXlYMpD5tAtxMRnVo/iwh7LAwlEO771Ug==
-X-Received: by 2002:a17:902:d4c8:b0:1f2:ffbc:7156 with SMTP id d9443c01a7336-1f4486ae484mr118059785ad.1.1716842390324;
-        Mon, 27 May 2024 13:39:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716842394; x=1717447194;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T1bcZtywl4gv9RxhVaIh8Vqw04D0WxYuVcQPOWfj5pc=;
+        b=ZI+2i9VKd8EB2RtLLJCZ7nQRH15guyk1M24ZPG4EfjnUhA9uC1ZkeT7m4WxJB94xwb
+         +2jehDEG8v1RdM48LyUTPH0EY3JfD7WPcWeQs8X94BJt+jniLiXZOdcY15wOeUPRDMp7
+         V2opkQPtWilut0T99UilMMpOcmzBwKwljH3S673ixB0vim4u0ZyETiTgo9xKfPq42uGJ
+         b61rwUb9EwEpVHjzyMBfAHGG2kpijQ8pMBYUsK2JETvdiPHrWlT46Me0c38g8FzNzaSe
+         L7asL5jJm4ammn3tHJA7qfKd5vqghMM45jq4Nkvf5aG2X7wfhZ4CRbsd3F/bENFQumHU
+         Jefg==
+X-Gm-Message-State: AOJu0YzfKrxAEB9YxsPUuQmISicmgaZEwZdc79i3U6CJ7XWOnXowsXDW
+	pvCm5CyR86fp3BWT+MI0tu4Dk6mxzWzwkuXT4lHNflpnswumsz8riNc7tArZ
+X-Google-Smtp-Source: AGHT+IGx9pwd7GhRv7Ssf7aa0tYAO5OJSlzgnCvnqs1HyyiRPzr/c+ATxW9HzSY+C/kuYweIbV/3wQ==
+X-Received: by 2002:a05:6a20:1056:b0:1a7:91b0:9ba3 with SMTP id adf61e73a8af0-1b212e526d2mr10436308637.4.1716842393723;
+        Mon, 27 May 2024 13:39:53 -0700 (PDT)
 Received: from rpi.. (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f4960ca3f6sm26502925ad.164.2024.05.27.13.39.47
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f4960ca3f6sm26502925ad.164.2024.05.27.13.39.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 May 2024 13:39:50 -0700 (PDT)
+        Mon, 27 May 2024 13:39:52 -0700 (PDT)
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -75,10 +77,12 @@ Cc: andrew@lunn.ch,
 	hfdevel@gmx.net,
 	naveenm@marvell.com,
 	jdamato@fastly.com
-Subject: [PATCH net-next v7 0/6] add ethernet driver for Tehuti Networks TN40xx chips
-Date: Tue, 28 May 2024 05:39:22 +0900
-Message-Id: <20240527203928.38206-1-fujita.tomonori@gmail.com>
+Subject: [PATCH net-next v7 1/6] net: tn40xx: add pci driver for Tehuti Networks TN40xx chips
+Date: Tue, 28 May 2024 05:39:23 +0900
+Message-Id: <20240527203928.38206-2-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240527203928.38206-1-fujita.tomonori@gmail.com>
+References: <20240527203928.38206-1-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,99 +91,149 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patchset adds a new 10G ethernet driver for Tehuti Networks
-TN40xx chips. Note in mainline, there is a driver for Tehuti Networks
-(drivers/net/ethernet/tehuti/tehuti.[hc]), which supports TN30xx
-chips.
+This just adds the scaffolding for an ethernet driver for Tehuti
+Networks TN40xx chips.
 
-Multiple vendors (DLink, Asus, Edimax, QNAP, etc) developed adapters
-based on TN40xx chips. Tehuti Networks went out of business but the
-drivers are still distributed under GPL2 with some of the hardware
-(and also available on some sites). With some changes, I try to
-upstream this driver with a new PHY driver in Rust.
-
-The major change is replacing the PHY abstraction layer in the original
-driver with phylink. TN40xx chips are used with various PHY hardware
-(AMCC QT2025, TI TLK10232, Aqrate AQR105, and Marvell MV88X3120,
-MV88X3310, and MV88E2010).
-
-I've also been working on a new PHY driver for QT2025 in Rust [1]. For
-now, I enable only adapters using QT2025 PHY in the PCI ID table of
-this driver. I've tested this driver and the QT2025 PHY driver with
-Edimax EN-9320 10G adapter and 10G-SR SFP+. In mainline, there are PHY
-drivers for AQR105 and Marvell PHYs, which could work for some TN40xx
-adapters with this driver.
-
-To make reviewing easier, this patchset has only basic functions. Once
-merged, I'll submit features like ethtool support.
-
-v7:
-- use page pool API for rx allocation
-- fix NAPI API misuse
-- fix error checking of mdio write
-v6: https://lore.kernel.org/netdev/20240512085611.79747-2-fujita.tomonori@gmail.com/
-- use the firmware for TN30xx chips
-- move link up/down code to phylink's mac_link_up/mac_link_down callbacks
-- clean up mdio access code
-v5: https://lore.kernel.org/netdev/20240508113947.68530-1-fujita.tomonori@gmail.com/
-- remove dma_set_mask_and_coherent fallback
-- count tx_dropped
-- use ndo_get_stats64 instead of ndo_get_stats
-- remove unnecessary __packed attribute
-- fix NAPI API usage
-- rename tn40_recycle_skb to tn40_recycle_rx_buffer
-- avoid high order page allocation (the maximum is order-1 now)
-v4: https://lore.kernel.org/netdev/20240501230552.53185-1-fujita.tomonori@gmail.com/
-- fix warning on 32bit build
-- fix inline warnings
-- fix header file inclusion
-- fix TN40_NDEV_TXQ_LEN
-- remove 'select PHYLIB' in Kconfig
-- fix access to phydev
-- clean up readx_poll_timeout_atomic usage
-v3: https://lore.kernel.org/netdev/20240429043827.44407-1-fujita.tomonori@gmail.com/
-- remove driver version
-- use prefixes tn40_/TN40_ for all function, struct and define names
-v2: https://lore.kernel.org/netdev/20240425010354.32605-1-fujita.tomonori@gmail.com/
-- split mdio patch into mdio and phy support
-- add phylink support
-- clean up mdio read/write
-- use the standard bit operation macros
-- use upper_32/lower_32_bits macro
-- use tn40_ prefix instead of bdx_
-- fix Sparse errors
-- fix compiler warnings
-- fix style issues
-v1: https://lore.kernel.org/netdev/20240415104352.4685-1-fujita.tomonori@gmail.com/
-
-[1] https://lore.kernel.org/netdev/20240415104701.4772-1-fujita.tomonori@gmail.com/
-
-
-FUJITA Tomonori (6):
-  net: tn40xx: add pci driver for Tehuti Networks TN40xx chips
-  net: tn40xx: add register defines
-  net: tn40xx: add basic Tx handling
-  net: tn40xx: add basic Rx handling
-  net: tn40xx: add mdio bus support
-  net: tn40xx: add phylink support
-
- MAINTAINERS                             |    8 +-
- drivers/net/ethernet/tehuti/Kconfig     |   15 +
- drivers/net/ethernet/tehuti/Makefile    |    3 +
- drivers/net/ethernet/tehuti/tn40.c      | 1769 +++++++++++++++++++++++
- drivers/net/ethernet/tehuti/tn40.h      |  233 +++
- drivers/net/ethernet/tehuti/tn40_mdio.c |  143 ++
- drivers/net/ethernet/tehuti/tn40_phy.c  |   73 +
- drivers/net/ethernet/tehuti/tn40_regs.h |  245 ++++
- 8 files changed, 2488 insertions(+), 1 deletion(-)
+Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+---
+ MAINTAINERS                          |  8 +++-
+ drivers/net/ethernet/tehuti/Kconfig  | 12 ++++++
+ drivers/net/ethernet/tehuti/Makefile |  3 ++
+ drivers/net/ethernet/tehuti/tn40.c   | 55 ++++++++++++++++++++++++++++
+ drivers/net/ethernet/tehuti/tn40.h   | 11 ++++++
+ 5 files changed, 88 insertions(+), 1 deletion(-)
  create mode 100644 drivers/net/ethernet/tehuti/tn40.c
  create mode 100644 drivers/net/ethernet/tehuti/tn40.h
- create mode 100644 drivers/net/ethernet/tehuti/tn40_mdio.c
- create mode 100644 drivers/net/ethernet/tehuti/tn40_phy.c
- create mode 100644 drivers/net/ethernet/tehuti/tn40_regs.h
 
-
-base-commit: 66ad4829ddd0b5540dc0b076ef2818e89c8f720e
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 27367ad339ea..a25e620f385e 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -22141,7 +22141,13 @@ TEHUTI ETHERNET DRIVER
+ M:	Andy Gospodarek <andy@greyhouse.net>
+ L:	netdev@vger.kernel.org
+ S:	Supported
+-F:	drivers/net/ethernet/tehuti/*
++F:	drivers/net/ethernet/tehuti/tehuti.*
++
++TEHUTI TN40XX ETHERNET DRIVER
++M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
++L:	netdev@vger.kernel.org
++S:	Supported
++F:	drivers/net/ethernet/tehuti/tn40*
+ 
+ TELECOM CLOCK DRIVER FOR MCPL0010
+ M:	Mark Gross <markgross@kernel.org>
+diff --git a/drivers/net/ethernet/tehuti/Kconfig b/drivers/net/ethernet/tehuti/Kconfig
+index 8735633765a1..849e3b4a71c1 100644
+--- a/drivers/net/ethernet/tehuti/Kconfig
++++ b/drivers/net/ethernet/tehuti/Kconfig
+@@ -23,4 +23,16 @@ config TEHUTI
+ 	help
+ 	  Tehuti Networks 10G Ethernet NIC
+ 
++config TEHUTI_TN40
++	tristate "Tehuti Networks TN40xx 10G Ethernet adapters"
++	depends on PCI
++	help
++	  This driver supports 10G Ethernet adapters using Tehuti Networks
++	  TN40xx chips. Currently, adapters with Applied Micro Circuits
++	  Corporation QT2025 are supported; Tehuti Networks TN9310,
++	  DLink DXE-810S, ASUS XG-C100F, and Edimax EN-9320.
++
++	  To compile this driver as a module, choose M here: the module
++	  will be called tn40xx.
++
+ endif # NET_VENDOR_TEHUTI
+diff --git a/drivers/net/ethernet/tehuti/Makefile b/drivers/net/ethernet/tehuti/Makefile
+index 13a0ddd62088..1c468d99e476 100644
+--- a/drivers/net/ethernet/tehuti/Makefile
++++ b/drivers/net/ethernet/tehuti/Makefile
+@@ -4,3 +4,6 @@
+ #
+ 
+ obj-$(CONFIG_TEHUTI) += tehuti.o
++
++tn40xx-y := tn40.o
++obj-$(CONFIG_TEHUTI_TN40) += tn40xx.o
+diff --git a/drivers/net/ethernet/tehuti/tn40.c b/drivers/net/ethernet/tehuti/tn40.c
+new file mode 100644
+index 000000000000..6ec436120d18
+--- /dev/null
++++ b/drivers/net/ethernet/tehuti/tn40.c
+@@ -0,0 +1,55 @@
++// SPDX-License-Identifier: GPL-2.0+
++/* Copyright (c) Tehuti Networks Ltd. */
++
++#include <linux/pci.h>
++
++#include "tn40.h"
++
++static int tn40_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
++{
++	int ret;
++
++	ret = pci_enable_device(pdev);
++	if (ret)
++		return ret;
++	ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
++	if (ret) {
++		dev_err(&pdev->dev, "failed to set DMA mask.\n");
++		goto err_disable_device;
++	}
++	return 0;
++err_disable_device:
++	pci_disable_device(pdev);
++	return ret;
++}
++
++static void tn40_remove(struct pci_dev *pdev)
++{
++	pci_disable_device(pdev);
++}
++
++static const struct pci_device_id tn40_id_table[] = {
++	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
++			 PCI_VENDOR_ID_TEHUTI, 0x3015) },
++	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
++			 PCI_VENDOR_ID_DLINK, 0x4d00) },
++	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
++			 PCI_VENDOR_ID_ASUSTEK, 0x8709) },
++	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
++			 PCI_VENDOR_ID_EDIMAX, 0x8103) },
++	{ }
++};
++
++static struct pci_driver tn40_driver = {
++	.name = TN40_DRV_NAME,
++	.id_table = tn40_id_table,
++	.probe = tn40_probe,
++	.remove = tn40_remove,
++};
++
++module_pci_driver(tn40_driver);
++
++MODULE_DEVICE_TABLE(pci, tn40_id_table);
++MODULE_AUTHOR("Tehuti networks");
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Tehuti Network TN40xx Driver");
+diff --git a/drivers/net/ethernet/tehuti/tn40.h b/drivers/net/ethernet/tehuti/tn40.h
+new file mode 100644
+index 000000000000..a5c5b558f56c
+--- /dev/null
++++ b/drivers/net/ethernet/tehuti/tn40.h
+@@ -0,0 +1,11 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/* Copyright (c) Tehuti Networks Ltd. */
++
++#ifndef _TN40_H_
++#define _TN40_H_
++
++#define TN40_DRV_NAME "tn40xx"
++
++#define PCI_VENDOR_ID_EDIMAX 0x1432
++
++#endif /* _TN40XX_H */
 -- 
 2.34.1
 
