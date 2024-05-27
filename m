@@ -1,235 +1,242 @@
-Return-Path: <netdev+bounces-98262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5659D8D067E
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 17:47:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F0D68D0659
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 17:40:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 592E0B2CCE2
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 15:31:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28626B2310B
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 15:36:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292D415EFDE;
-	Mon, 27 May 2024 15:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C897317E91D;
+	Mon, 27 May 2024 15:36:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V0LfVciY"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="jYwzqRHa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870A415E5D6
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 15:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716823647; cv=none; b=fOwP8L0BrDgXoacqN6Gp//clGB9X8ZyCbfv8GAFmTTkSLHT5+hlNXTalB8WdE9ZM8lvQqviL+QPP7tOIj1Zh0VI6GuVoKNdwIaxs8hQQlcy9INDikLiGqEB8lNLapn/H54m4vwbOiFdJ2vz/j5ncUpLrFlWsaEuFfRPqwJ5KWGU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716823647; c=relaxed/simple;
-	bh=EH+uzBvIrlF2QnIH5v9HOVinZLSRxlGtcJDv3fu4nA8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=g9Lfy1f+JW+IQda8Qe8ofx/PQSMDVDMHFJUWEK320TEUZxdy/TtWM4cII2d2j2+dKEv5YatvSG6dWXRHlCELZVyYRlqF+vcTFrhsm18llGj39n322wjXhRsxWvNJx9jyaoPnjZi8LRVxfwxbqMu6q/XLfrqXJ7nkMOGw0RA34H4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V0LfVciY; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df771dcec5cso4790331276.2
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 08:27:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716823644; x=1717428444; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JgReQBAL8ooUhubet2sIcyqcKqExZySvMhVpx5G+EiE=;
-        b=V0LfVciYxHZFrEmclkYq9PhEhnZ4xyDE2XD/iexbUJJUp8v6j4XLYd7qN1bP8m0ghz
-         QjlLyUtkClO2c28We2kIZTSvynOH76DRZSG0miQDRQZzXAnEir6+E+Q1Ba6fady7IXdB
-         GGva0vxRjv1srHsD6h9gk/Np5VrT9nH4iSGU+swaQHWiKFCxJnzsSxu9834lAcJtLWrA
-         Lh5idHjTdSYPIFizf2IqjNANKIDSRu11uI7nFgLV26R+6OEzB/SWD1Qwz7TYQ/wB1sEN
-         0cBdwPFgEFnp43zPkhn+ItzS7o4Fw4fYW0cFrLbFPNzCDa6aIqe6gzhkqH4+Xs30HwON
-         Fv6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716823644; x=1717428444;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JgReQBAL8ooUhubet2sIcyqcKqExZySvMhVpx5G+EiE=;
-        b=BCJr3FEeArgVj6btWKh5SMrdjbnu3tl09yiUBlfIP/3Er0g/u6kOSFfoBh2V6Lln7G
-         qJRrQvGNLolTmvXpwXwRQOXoCnKfPc51PazVI4TduNm/2lPPqch7HcBD5kGfpTW8NdBr
-         WX9wZSZC4XkuKj6iGRcb47TnG5QDXZidi8kAlBirAlCGLgLmwhNdv0qGjNEg+VFcgP7c
-         EMlH5CIz7BSgcBlD0T+0KnU1vtAnpFGc+hCJongI/f6dpG2knimWJjeW0F53Mnz+XHZL
-         3+8CKjTIvCR9+tEjTbhUY1duRumesxl/dNn7yBivJHqnuqxd2YMvpdvUbf/yaxxgfe+w
-         5cHA==
-X-Forwarded-Encrypted: i=1; AJvYcCXQCoeUoqcJ7nQXu1tkNoojtjIjbL5XCRsbPY95Xt5EjCALLo5KBUPgMZumHIBeghEEQhyucHwo6PUKGJctVYWQ6Ucl9iam
-X-Gm-Message-State: AOJu0YxgUP1AzzpITKu6JsxYLlZwCEXYR/dp4rm/p3Vz0bG7TPRF8Mo9
-	RJfQmV2Q2Yctm3RaJevQ+pQW7GgBIeNpNG+1kLpGKaWPLiH+acVed2oMWDX8/mHAJbhD+Uc5pUj
-	fcg==
-X-Google-Smtp-Source: AGHT+IEcMK/eb/1S9GxInlxz3v6B37pxwZZVCeVpsfVMsox8htgY0igmkWFUPucJUSd/a6wou/SqCeNEezw=
-X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
- (user=gnoack job=sendgmr) by 2002:a05:6902:1805:b0:df7:68c5:98d5 with SMTP id
- 3f1490d57ef6-df77218599dmr2681802276.5.1716823644525; Mon, 27 May 2024
- 08:27:24 -0700 (PDT)
-Date: Mon, 27 May 2024 17:27:22 +0200
-In-Reply-To: <20240524093015.2402952-4-ivanov.mikhail1@huawei-partners.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219D379E1;
+	Mon, 27 May 2024 15:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716824208; cv=fail; b=FyC3WdbA0kRdYORQu/moDHJa1HQQNQJuaMzTG2Jx0JJbyHySjDQHTVeRKhOFuuzA/8PE8+ZG6oGUNdKCOLqd3kNNyBp2jBXIUY42OOw8/ZOOZzV5QTyCxLVUN/J+9fjBwiPOp8Hx0trG828ocBtVTdY41PlQHbAin2BrMvBjDf8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716824208; c=relaxed/simple;
+	bh=WbtsxmCGwszSrQOqugluLQkDrjX/H1A13aA+8/kvnt8=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=g/Wlb7XWJkCWZ/cp/GUZod0C4cAcLqPzMGnz7Fu+SZs35wUceFsvJ26v4fdp1jiZbFEai+oicir7UilAPDfkXXKz/xFzQR3fUHLsbkFC3WP+VsHyNwAk0htH+RGOvIxXvrr3rClBgHJQJKGH6VLTL0ilH1v4ODkwSyYRSjnmY5I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=jYwzqRHa; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44R9bfSs010731;
+	Mon, 27 May 2024 08:36:26 -0700
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2168.outbound.protection.outlook.com [104.47.57.168])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3ycqpyh6gd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 27 May 2024 08:36:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ts7miYEmX9vgekXxdSsshl5U/XaxnkrbxguLw9V+OzfM+TUWaga/NggwRzFhKe9jYNXnKEMwtIDHsTvelPnvdE+gTDT5eKaKZj9wWk4lWVzYIiCzRPgyz8dsemjPmsX8C+iUpKVpav/piHlr0y3PU5+snst5Zw4KBMEsihcUOOScpniLiTc+mTRa28fguC9ho9r64wB7boBhMPz2zrVxbfN3r43Y6noVYnCHnXRoFIEEFGNjPeu3eIXNDiSeQkgpJnk8XVkV75097lswimqU1PHkKFfm/Dz582UNSICZoqW2rj868243ENIn2ELMbKA/5IGgPkddiZ865Q8Mazi9zw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WbtsxmCGwszSrQOqugluLQkDrjX/H1A13aA+8/kvnt8=;
+ b=i7WZek9i1Smse9Y4f7Kd2EBzxlVgpXK6yZ9E5s7K5ud/il2PyekHzoB4+SIGujbvOeaLyaRduLPH3kcHNuyb0l1+NQPdiSwS7ClDdZo6/9BHH5ygMhJT0JxqlBtl6VIHzQuofaaFuSZ5EcQiNpbazmGXsKVtaXSYTaoANy1kwNz41CYut+50sxVm1oyWS+pF5OC7lwZvc0algcDN811RNdkA9q+Si1UERHL/SmaFWzp/fJOGqPZkeH1+utiTuqHaSTteFC5wlhWgjQb35fJnL3PWWrIJCjsqsTirO7O2XATisxJygoHfnhX94YLHKTBDNutVJkXEGGynyPFsD4Pyiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WbtsxmCGwszSrQOqugluLQkDrjX/H1A13aA+8/kvnt8=;
+ b=jYwzqRHablnreCAYC/tTM96GYRURAGlYbci8vvuwUO5uRySagWnbYP665iS75ZbL6jiElei6hUPIMc9OPDl1PiNYrrZ9VRyRsMT3bOtsLPhxxeiGhcL6lB+T0L++scKNMtm5SIsmpV41r+uMxPkHfewMo4DhILA/uS+D6FK+RE4=
+Received: from BY3PR18MB4737.namprd18.prod.outlook.com (2603:10b6:a03:3c8::7)
+ by SJ0PR18MB5188.namprd18.prod.outlook.com (2603:10b6:a03:418::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.29; Mon, 27 May
+ 2024 15:36:22 +0000
+Received: from BY3PR18MB4737.namprd18.prod.outlook.com
+ ([fe80::1598:abb8:3973:da4e]) by BY3PR18MB4737.namprd18.prod.outlook.com
+ ([fe80::1598:abb8:3973:da4e%5]) with mapi id 15.20.7611.025; Mon, 27 May 2024
+ 15:36:22 +0000
+From: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+To: "Ng, Boon Khai" <boon.khai.ng@intel.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        "David S .
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>,
+        "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "Ang, Tien Sung" <tien.sung.ang@intel.com>,
+        "G Thomas, Rohan" <rohan.g.thomas@intel.com>,
+        "Looi, Hong Aun"
+	<hong.aun.looi@intel.com>,
+        Andy Shevchenko
+	<andriy.shevchenko@linux.intel.com>,
+        Ilpo Jarvinen
+	<ilpo.jarvinen@linux.intel.com>
+Subject: RE: [EXTERNAL] [Enable Designware XGMAC VLAN Stripping Feature v2
+ 1/1] net: stmmac: dwxgmac2: Add support for HW-accelerated VLAN Stripping
+Thread-Topic: [EXTERNAL] [Enable Designware XGMAC VLAN Stripping Feature v2
+ 1/1] net: stmmac: dwxgmac2: Add support for HW-accelerated VLAN Stripping
+Thread-Index: AQHasBkWheaSobs03U+dZKCIDRr6V7Gq42wggAAv24CAACMg8A==
+Date: Mon, 27 May 2024 15:36:22 +0000
+Message-ID: 
+ <BY3PR18MB4737DAE0AD482B9660676F6BC6F02@BY3PR18MB4737.namprd18.prod.outlook.com>
+References: <20240527093339.30883-1-boon.khai.ng@intel.com>
+ <20240527093339.30883-2-boon.khai.ng@intel.com>
+ <BY3PR18MB47372537A64134BCE2A4F589C6F02@BY3PR18MB4737.namprd18.prod.outlook.com>
+ <DM8PR11MB5751CE01703FFF7CB62DAF9BC1F02@DM8PR11MB5751.namprd11.prod.outlook.com>
+In-Reply-To: 
+ <DM8PR11MB5751CE01703FFF7CB62DAF9BC1F02@DM8PR11MB5751.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY3PR18MB4737:EE_|SJ0PR18MB5188:EE_
+x-ms-office365-filtering-correlation-id: d94afb32-3fc8-4afc-4df8-08dc7e62c339
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: 
+ BCL:0;ARA:13230031|7416005|1800799015|376005|366007|921011|38070700009;
+x-microsoft-antispam-message-info: 
+ =?us-ascii?Q?IHok2lZuvhX0Dh1LrhdlOjqZChTlrCvKhPmb1atewaJuxaWXWLacuj3YcGDM?=
+ =?us-ascii?Q?lz7II5wka9OZbEGGcAOfjETOtn0Ew6zLGbJHceQoypkWVoJIFFaS6/heafSu?=
+ =?us-ascii?Q?UDkHGs26SrvHTIY1E9Z4X0o/S4O4lPyyMO64lqhE19bIVs1Kfb7vE6wh9hen?=
+ =?us-ascii?Q?t9Ykg3b0dzPo5N2+/JQhFv1m4glFg0EjIvsMzc/vbMciKgKUrmMzH6Wj9veV?=
+ =?us-ascii?Q?BiD2ziYgAXYtsuc9MUP8+SMYtl+g0cvii4W7efuF41a+4d6uBu+yKnwwphFM?=
+ =?us-ascii?Q?Iyn84l9FEj5RAtQoYpP7EKM6uJ8yfXGPpZeqgmFBSVGH62tlfoCXqvjXlxC6?=
+ =?us-ascii?Q?oVHVzEhnF8es7d91gFuaTPLb47UjCOJYBKYf1GYAk98XDA0r0kbu0y97RWaW?=
+ =?us-ascii?Q?+63cmgsrfN9EiPMffmDZmal83YEYY+f+1/89gi3TH9HVqJWtwCP8YC1LUnGu?=
+ =?us-ascii?Q?+UHNsy10vcoCLY6vKpQQPMJEP4T2d8xeUW59KuKbY+VH71ojnViH0s4DvPH6?=
+ =?us-ascii?Q?wzoTX03kBwFUa5iaW5A7GIIhDf/60J323Jmjjs2oxd/vZYWyd7yimMj1l3/M?=
+ =?us-ascii?Q?KYXO6TpybqRBiqTmXLaE3HIM/8pezy9vHykx8XxaSYAsP8+g/I1ePfycIwNp?=
+ =?us-ascii?Q?BKWfPE40pSKb3XKpUCS7qZs4QcSppN5ZTX35JZ3FhODqJty2o1PluLxnpQBF?=
+ =?us-ascii?Q?UNRwAWzzmRrR/cfNd9KLNNXHuQOaZBMP/4SwhWWipqzcfsETBKGfXyFp2v0l?=
+ =?us-ascii?Q?nvcid8zH2sRYxLzIPM9gEcouJRIyIFZdILMsiQBoYHfLW6fXYiJ2xAi1Ouon?=
+ =?us-ascii?Q?qGf5Ng9VPjP20iPpAaQKbrpa1qSBgcjogPU4dNpsSFFkQ88k18m4rM5nd00D?=
+ =?us-ascii?Q?mXc59IzN01YDcNCwJlW2ywGRlbw11GoxWjv0Qj6xuoFjlaPMWxXjNkABEZd8?=
+ =?us-ascii?Q?mJQskQJDG4uK1t9z96RY6uheiIVm2YUaRiR+sdfh+7xc1BopqgK3FAtn4fuy?=
+ =?us-ascii?Q?oLfKDErttdYHfhfbajeXyCIWzhbJn2lGcIjF4hGvVtHTsUg6y2kEUraFVv3H?=
+ =?us-ascii?Q?B9Qpa4L4mBqVajzCdPmwca5FUzwAsGoRRt0azvAqacTzuewmT57zGxSIPEJs?=
+ =?us-ascii?Q?p0E5vl6h0sGEX4DObA5m4f66PQFGOllrQSleAXchkrUBwSokzFrHfq6ss42E?=
+ =?us-ascii?Q?EUIGa4Itpwxnpl6aBtjwsr1gLrANJNGaOOsx07uKBp01ekDFRJJ9S1alwjIF?=
+ =?us-ascii?Q?Bb4Bidml4RinKC77MhOu5cBUhJxEFrPB3+a6XfKuWe2OueS+QHNNdNcZIyk9?=
+ =?us-ascii?Q?yjM=3D?=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4737.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(366007)(921011)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?NjV8b+wmBhYeBAd8zqvkD5Vg+75mqJlzII5y4CYwwlpEN7RVoP0hSECpPF/d?=
+ =?us-ascii?Q?Aw5FeqFKXB4xapKIBLOUCXLIjGbinM2bYgE7SyPtT2RlnPHsnrByALPWnpFM?=
+ =?us-ascii?Q?PMroSstb6oNmAuy563ViElFZSUCUD+T9dmT7QM13w0b+soSX9UV9q1d956x7?=
+ =?us-ascii?Q?GfzMgyObnuG+ZygixopzQ1hha77hXEfmHNCQbRcS8M26ww7igS4rdBy1Ay/e?=
+ =?us-ascii?Q?TrfjxFgrMkqjFa6o6YTRN4yaV9UwRu91ZpJbxeJ3sVyiLLse8cJVICAKoyp0?=
+ =?us-ascii?Q?EJOkAJGCZ5LLgfWinms++AYNkn6I58Erz0Mjtamld1aeyQpMqkCFnDgv4Xw8?=
+ =?us-ascii?Q?HrB4UgjhpIpNleHHjUvYyKiurJEFuq0rsV5e8lm5BeO4xF+iJc4NYaQusz+/?=
+ =?us-ascii?Q?ds1q4QOTm/s1CeNoXXLHArexFIKzliRwTGeXKAUKBYQxyzFFD/Cl9WBM078G?=
+ =?us-ascii?Q?RLAd1TcJU+5BRxx8qmw5Z8ZVEPUebawoboMySVBkXNs4GYONGH1oFdV+E2us?=
+ =?us-ascii?Q?YWvBagbKHwYxpRHUOOH98LKmYzNy8L66fkcI9cJq2gCchBUG9kOovnVAAlWx?=
+ =?us-ascii?Q?OWGfprZzLa219LjT5J9I5K7ddopEsJK3/KIbuYQIdkdJhlAXSGoUV/ypTsTk?=
+ =?us-ascii?Q?lz2CJKp6HFzTo0s6eO9z4ksK29XJPemtAeWIjRdazCd/XlhpG0uB+8kdL0eq?=
+ =?us-ascii?Q?DitG2nINd/nfd8cal5mOxmHb3DmwU7rFD1AlTxTqRNdot6ictod79ljHSLNp?=
+ =?us-ascii?Q?8c70ognHf5wI3Aqay0OTYmNm0v0EvxW/+X+EiXSkQGuJHd5dpGoxQuSgJtiR?=
+ =?us-ascii?Q?h6Vn+PiCYdJAvbROgGLBAjHyQhYSNaDnzgP8yHV3v5+trugT4kT9A6SJlO+h?=
+ =?us-ascii?Q?ovqAK0E93jPMZXK1pfJKj8vMkS7tIHmd+Jpg9WxAY2dycjyWwqvSmQzTdnd8?=
+ =?us-ascii?Q?itHl9v8MKmmrRfg1WRwZLTtl2phImxFmpcGDC/mxpSLloDxVHxkIIvuykKfb?=
+ =?us-ascii?Q?tGWBMlyWE6+3mJaEllFeNDVeGrimjGTEO13/tZkpfohfc02tqDoXJlD93z9q?=
+ =?us-ascii?Q?KccsbSIuUjAMOWXfvLvMOuS7j2i3d5Ul0st87BeCpdTzgT3nWyjoQD7vdh2z?=
+ =?us-ascii?Q?ZvIhG0V47iueUHsHYC/Qo6cScd+O63+nRsSwMfedzEgZMeofCcYbGJAtY7Gc?=
+ =?us-ascii?Q?4HCfjYVptI6RVQI7ESPOPVZF3BHlo260z5p92jRyKTF5GBaSdBqRQawg4gHf?=
+ =?us-ascii?Q?quqbDTnX1RTS1jvy0pOC+fV2fzpe5EvyHTMvxJbwEiIM64nqSrwXP0Xz9EKc?=
+ =?us-ascii?Q?fZ+IwQEmZObTN9UBa3NKd2u5uauzWq9lcthP/tJ8NHqwH2lvzTcccoKsrEsZ?=
+ =?us-ascii?Q?FbxxZHrvHQWDSSvq1moVaZ0P9MRsRQYGOgLS6MrNcbWN+6FLKRouCbzAUp3M?=
+ =?us-ascii?Q?K6EWswdcAahM+DoOJJf8107OYXjT3mZxPS9iKAIOB6EWCcgSsXyBN0aCaNwR?=
+ =?us-ascii?Q?HwVNUVSsVpb4bvL1jA22AcXY+O50VidEGbiIEbbCWvtE1FUwxhnF6krddGtb?=
+ =?us-ascii?Q?9vjP85oRmqC+39kdO+MTkmFnBHAwPGRtXsHGu2mf?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240524093015.2402952-1-ivanov.mikhail1@huawei-partners.com> <20240524093015.2402952-4-ivanov.mikhail1@huawei-partners.com>
-Message-ID: <ZlSmAhLV00iry6we@google.com>
-Subject: Re: [RFC PATCH v2 03/12] selftests/landlock: Add protocol.create to
- socket tests
-From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4737.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d94afb32-3fc8-4afc-4df8-08dc7e62c339
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2024 15:36:22.6398
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6fC4Xw3LjzSuA0keYiX2qY5ZcfVrS+Pq61f5ZctKBuWzpltmqEd74LZVL8c2m44/mP5jYerYTMxTmUZ05YWfjA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR18MB5188
+X-Proofpoint-GUID: aBWER19B_235upXKTaKvt_vhTl4ZGnWy
+X-Proofpoint-ORIG-GUID: aBWER19B_235upXKTaKvt_vhTl4ZGnWy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-27_04,2024-05-27_01,2024-05-17_01
 
-On Fri, May 24, 2024 at 05:30:06PM +0800, Mikhail Ivanov wrote:
-> Initiate socket_test.c selftests. Add protocol fixture for tests
-> with changeable family-type values. Only most common variants of
-> protocols (like ipv4-tcp,ipv6-udp, unix) were added.
-> Add simple socket access right checking test.
+
+
+> -----Original Message-----
+> From: Ng, Boon Khai <boon.khai.ng@intel.com>
+> Sent: Monday, May 27, 2024 6:58 PM
+> To: Sunil Kovvuri Goutham <sgoutham@marvell.com>; Alexandre Torgue
+> <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>;
+> David S . Miller <davem@davemloft.net>; Eric Dumazet
+> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> <pabeni@redhat.com>; Maxime Coquelin <mcoquelin.stm32@gmail.com>;
+> netdev@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com; linux-
+> arm-kernel@lists.infradead.org; linux-kernel@vger.kernel.org; Ang, Tien S=
+ung
+> <tien.sung.ang@intel.com>; G Thomas, Rohan <rohan.g.thomas@intel.com>;
+> Looi, Hong Aun <hong.aun.looi@intel.com>; Andy Shevchenko
+> <andriy.shevchenko@linux.intel.com>; Ilpo Jarvinen
+> <ilpo.jarvinen@linux.intel.com>
+> Subject: RE: [Enable Designware XGMAC VLAN Stripping Feature
+> v2 1/1] net: stmmac: dwxgmac2: Add support for HW-accelerated VLAN
+> Stripping
 >=20
-> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-> ---
+..........
+
+> > > 1/1] net: stmmac: dwxgmac2: Add support for HW-accelerated VLAN
+> > > Stripping
+> > >
+> >
+> > New features should be submitted against 'net-next' instead of 'net'.
 >=20
-> Changes since v1:
-> * Replaces test_socket_create() and socket_variant() helpers
->   with test_socket().
-> * Renames domain to family in protocol fixture.
-> * Remove AF_UNSPEC fixture entry and add unspec_srv0 fixture field to
->   check AF_UNSPEC socket creation case.
-> * Formats code with clang-format.
-> * Refactors commit message.
-> ---
->  .../testing/selftests/landlock/socket_test.c  | 181 ++++++++++++++++++
->  1 file changed, 181 insertions(+)
->  create mode 100644 tools/testing/selftests/landlock/socket_test.c
+> Hi Sunil, I was cloning the repo from net-next, but how to choose the
+> destination as 'net-next'?
+
+While creating patch you can add appropriate prefix .. like below
+git format-patch --subject-prefix=3D"net-next PATCH"
+git format-patch --subject-prefix=3D"net PATCH"
+
 >=20
-> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testi=
-ng/selftests/landlock/socket_test.c
-> new file mode 100644
-> index 000000000000..4c51f89ed578
-> --- /dev/null
-> +++ b/tools/testing/selftests/landlock/socket_test.c
-> @@ -0,0 +1,181 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Landlock tests - Socket
-> + *
-> + * Copyright =C2=A9 2024 Huawei Tech. Co., Ltd.
-> + * Copyright =C2=A9 2024 Microsoft Corporation
+> > Also 'net-next' is currently closed.
+>=20
+> I see, may I know when the next opening period is? Thanks
 
-It looked to me like these patches came from Huawei?
-Was this left by accident?
+Please track=20
+https://patchwork.hopto.org/net-next.html
 
-
-> + */
-> +
-> +#define _GNU_SOURCE
-> +
-> +#include <errno.h>
-> +#include <linux/landlock.h>
-> +#include <sched.h>
-> +#include <string.h>
-> +#include <sys/prctl.h>
-> +#include <sys/socket.h>
-> +
-> +#include "common.h"
-> +
-> +/* clang-format off */
-> +
-> +#define ACCESS_LAST LANDLOCK_ACCESS_SOCKET_CREATE
-> +
-> +#define ACCESS_ALL ( \
-> +	LANDLOCK_ACCESS_SOCKET_CREATE)
-> +
-> +/* clang-format on */
-
-It does not look like clang-format would really mess up this format in a ba=
-d
-way.  Maybe we can remove the "clang-format off" section here and just writ=
-e the
-"#define"s on one line?
-
-ACCESS_ALL is unused in this commit.
-Should it be introduced in a subsequent commit instead?
-
-
-> +static int test_socket(const struct service_fixture *const srv)
-> +{
-> +	int fd;
-> +
-> +	fd =3D socket(srv->protocol.family, srv->protocol.type | SOCK_CLOEXEC, =
-0);
-> +	if (fd < 0)
-> +		return errno;
-> +	/*
-> +	 * Mixing error codes from close(2) and socket(2) should not lead to an=
-y
-> +	 * (access type) confusion for this test.
-> +	 */
-> +	if (close(fd) !=3D 0)
-> +		return errno;
-> +	return 0;
-> +}
-
-I personally find that it helps me remember if these test helpers have the =
-same
-signature as the syscall that they are exercising.  (But I don't feel very
-strongly about it.  Just a suggestion.)
-
-
-> [...]
->
-> +TEST_F(protocol, create)
-> +{
-> +	const struct landlock_ruleset_attr ruleset_attr =3D {
-> +		.handled_access_socket =3D LANDLOCK_ACCESS_SOCKET_CREATE,
-> +	};
-> +	const struct landlock_socket_attr create_socket_attr =3D {
-> +		.allowed_access =3D LANDLOCK_ACCESS_SOCKET_CREATE,
-> +		.family =3D self->srv0.protocol.family,
-> +		.type =3D self->srv0.protocol.type,
-> +	};
-> +
-> +	int ruleset_fd;
-> +
-> +	/* Allowed create */
-> +	ruleset_fd =3D
-> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-> +	ASSERT_LE(0, ruleset_fd);
-> +
-> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
-> +				       &create_socket_attr, 0));
-> +
-> +	enforce_ruleset(_metadata, ruleset_fd);
-> +	EXPECT_EQ(0, close(ruleset_fd));
-> +
-> +	ASSERT_EQ(0, test_socket(&self->srv0));
-> +	ASSERT_EQ(EAFNOSUPPORT, test_socket(&self->unspec_srv0));
-> +
-> +	/* Denied create */
-> +	ruleset_fd =3D
-> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-> +	ASSERT_LE(0, ruleset_fd);
-> +
-> +	enforce_ruleset(_metadata, ruleset_fd);
-> +	EXPECT_EQ(0, close(ruleset_fd));
-> +
-> +	ASSERT_EQ(EACCES, test_socket(&self->srv0));
-> +	ASSERT_EQ(EAFNOSUPPORT, test_socket(&self->unspec_srv0));
-
-Should we exhaustively try out the other combinations (other than selv->srv=
-0)
-here?  I assume socket() should always fail for these?
-
-(If you are alredy doing this in another commit that I have not looked at y=
-et,
-please ignore this comment.)
-
-=E2=80=94G=C3=BCnther
 
