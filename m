@@ -1,237 +1,201 @@
-Return-Path: <netdev+bounces-98298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD60D8D093F
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 19:15:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D9B58D097A
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 19:39:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0073DB212FF
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 17:15:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1923B25BFB
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 17:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD280139D1B;
-	Mon, 27 May 2024 17:15:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CEEB15EFD8;
+	Mon, 27 May 2024 17:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="UqEHkVvt"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="FE/m8D2D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648EF1DA58;
-	Mon, 27 May 2024 17:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5120315E5A0;
+	Mon, 27 May 2024 17:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716830142; cv=none; b=Na84P9U1yQR9rtAVzuZPKhfLkZjJUB7GjOuB3eWMYkBDZboOgfmQuaPSGmNwnChxkB49HYEQF1pJA8IJ65HxBVOtQkZj2Ycnchx8jpfidio6BmfEK6rDS4r46YgKLQl4OcK4fJviVf3axrO3zqFb8ACFfDBBS0ozUrFwoc7/gcI=
+	t=1716831552; cv=none; b=eSn8SxOR+Kpnq9eacXIyV5LQIpgcqJKJxywSU6Pk1+RpaXEGV1p7pzj1eeRQVE2rcIOGwGXFMwKmD/DNuox3q0Uozaf2IhqILyH0KmfdgCSs6MCXcuEZVD0VTaUi2VqHBHu9X6yC44QBlBOeLpVSP5ecnlA/OoS/VCmUDB6leQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716830142; c=relaxed/simple;
-	bh=pt31EGsdEkZo53lwke3HcCRzxGGuWyxitKe94ccVdnc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aqwtRQGWtsX2y7Hd5szTU0/3skq47uNHB+JFgz0/ToGtqYHrQJASBDf3lvw3e+GmXQPAJSCuGforz9TghXWpUBUEcLcr6Mwh36o2SOzZ9J9WWkxKCy/NU/2zffDm/m+oIqMckJfAR0stL/taGZ0lQANWDdC2Jgy/i3u9KYP+Ouc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=UqEHkVvt; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 4533540E01E8;
-	Mon, 27 May 2024 17:08:10 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id bimxyUlM5shO; Mon, 27 May 2024 17:08:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1716829686; bh=zzMPJ6U6LHHCwo8zSeCN578JvIc5clkBHFvMwav3ulA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UqEHkVvtmndf7yBXhPjClvB23jAwbCH2y9mrqWuQVDLzPL5LKRkma5X0WAIXAslDI
-	 OWVmIJ6/GQh6MyHgNXH12gJzDPwF0OdhwM57t/S13aSva8RZqSNOaZBXycdRifKOfv
-	 0nvKCVZHTyaWAw7nHg6JeCT936cjd8IHWbDZetP9R64GkqGGbhn/Rq2o5O1lyk3xV/
-	 nYbgRJAb6ONjxRmC5hUl9xcu+okxrmSuyhHurHx00V4k20COwpr6rwpzQwAnyXHLMV
-	 m+czfkJWEL1NjV2TVhDcJ7mBL7mIdcM1fI5dycnLvxv1o9EI8YpByQh6R2sDWMk4An
-	 cyNP5dzV8x2tieKXMH4ReySNhZogLEwuhTGWdRnt928uQUmNRt4zprDoIAHQL2n21X
-	 lXVQ8ULIoVGrW3v4XqisVCko5CYOCA7b7kJ3zZKQ0w+pU8jRgndQBA4PekevN9v4C/
-	 w3YVJhZ84GxfQ2Jik3lPfedBlRPhMRAq2l2f+Vcoqu4HBD5/+MgUTgLY61H9GyG6+u
-	 foPRRlYX+NMMmBytfFA9fURUfzSdFIQaPgb/IPIcecIx2VtLoNK4Odm8q386PsdDba
-	 yPB0wl/TmUP+FPiUpIIrpy1wELmaq/xXv7yeZPb769FOhG57ozS+Z17YhfsAIYc+rJ
-	 8LVjMkN2N08NqOt51W4fqTAo=
-Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2CF0E40E016A;
-	Mon, 27 May 2024 17:07:41 +0000 (UTC)
-Date: Mon, 27 May 2024 19:07:34 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com,
-	tglx@linutronix.de, x86@kernel.org, netdev@vger.kernel.org,
-	richardcochran@gmail.com, linux-input@vger.kernel.org,
-	dmitry.torokhov@gmail.com, zackr@vmware.com,
-	linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
-	timothym@vmware.com, akaher@vmware.com,
-	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
-	tzimmermann@suse.de, mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com, horms@kernel.org,
-	kirill.shutemov@linux.intel.com
-Subject: Re: [PATCH v10 1/8] x86/vmware: Introduce VMware hypercall API
-Message-ID: <20240527170734.GCZlS91uXD68HRN1na@fat_crate.local>
-References: <20240523191446.54695-1-alexey.makhalov@broadcom.com>
- <20240523191446.54695-2-alexey.makhalov@broadcom.com>
+	s=arc-20240116; t=1716831552; c=relaxed/simple;
+	bh=goVdYu7r26wJ0sXKjwoIL9ttC9JisKqyD4m+gDIxmoY=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=mq+JBSZrolReFs6mnrrUDg8q4JIUrxjZrXy75H008IIT3MPpw9aANpIX9ciUORd2QOItoSKxipKdM2PKibD/BTH395YXWT3H0V/kxK4Lj1/tfycQm+tGnmWSpRS9h2WT52geO8k1NkhFU7FHaxO3HmaiOV6nu/P8KiAU5Gv2V/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=FE/m8D2D; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=et6LmSUIQ8i5W3yfJk1TquNJGf0VY0XegwDDTqD1iSs=; b=FE/m8D2DdK6Fiz8JfjGoNybaEQ
+	CCoQST7PdCwxMcksKMbxCoIBgOwSGvyOwVqKGdczluJn9h/g7+Zy319z26rCxgZl4o6VOQ3y1wztI
+	di6WmGTJqxXlXqvjJ/SIFU/3GledcP0SgMTtdchFg0wNYFJBGxpztbisCoglSAXxZBu/sF++q4OlB
+	7kIHPnlpXiFNHNKNZuI3/weVsug8WlvqADNTPOx5dM4Hgi5BzahzAuK3OwqBQMhNKixaJibmberOq
+	SugU7l07nX2xkgoFlJTDgHqFnk8z4G8/i47v0ztrSy4rcKhruIUXByBmzKrP8IU5HPDmJOYa5yuU2
+	V1GmfTvw==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sBeJM-000KAa-Ql; Mon, 27 May 2024 19:39:04 +0200
+Received: from [178.197.248.14] (helo=linux.home)
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sBeJM-0004ko-2N;
+	Mon, 27 May 2024 19:39:04 +0200
+Subject: Re: [Patch bpf] vmalloc: relax is_vmalloc_or_module_addr() check
+To: Mike Rapoport <rppt@kernel.org>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org,
+ linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
+ bpf@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
+ Luis Chamberlain <mcgrof@kernel.org>
+References: <20240526230648.188550-1-xiyou.wangcong@gmail.com>
+ <1f39f888-989f-658b-a107-90ffe1347d0f@iogearbox.net>
+ <ZlSKjd6-6-no-x9W@kernel.org>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <f9e6d91c-22ac-5322-a2d1-5e1d10c683d2@iogearbox.net>
+Date: Mon, 27 May 2024 19:39:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240523191446.54695-2-alexey.makhalov@broadcom.com>
+In-Reply-To: <ZlSKjd6-6-no-x9W@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27288/Mon May 27 10:29:01 2024)
 
-On Thu, May 23, 2024 at 12:14:39PM -0700, Alexey Makhalov wrote:
-> +#define VMWARE_HYPERCALL						\
-> +	ALTERNATIVE_3("",						\
-> +		      "jmp .Lport_call%=", X86_FEATURE_HYPERVISOR,	\
-> +		      "jmp .Lvmcall%=", X86_FEATURE_VMCALL,		\
-> +		      "vmmcall\n\t"					\
-> +		      "jmp .Lend%=", X86_FEATURE_VMW_VMMCALL)		\
-> +		      "cmpb $"						\
-> +			__stringify(CPUID_VMWARE_FEATURES_ECX_VMMCALL)	\
-> +			", %[mode]\n\t"					\
-> +		      "jg .Lvmcall%=\n\t"				\
-> +		      "je .Lvmmcall%=\n\t"				\
-> +		      ".Lport_call%=: movw %[port], %%dx\n\t"		\
-> +		      "inl (%%dx), %%eax\n\t"				\
-> +		      "jmp .Lend%=\n\t"					\
-> +		      ".Lvmmcall%=: vmmcall\n\t"			\
-> +		      "jmp .Lend%=\n\t"					\
-> +		      ".Lvmcall%=: vmcall\n\t"				\
-> +		      ".Lend%=:"
+On 5/27/24 3:28 PM, Mike Rapoport wrote:
+> On Mon, May 27, 2024 at 03:11:50PM +0200, Daniel Borkmann wrote:
+>> On 5/27/24 1:06 AM, Cong Wang wrote:
+>>> From: Cong Wang <cong.wang@bytedance.com>
+>>>
+>>> After commit 2c9e5d4a0082 ("bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of")
+>>> CONFIG_BPF_JIT does not depend on CONFIG_MODULES any more and bpf jit
+>>> also uses the MODULES_VADDR ~ MODULES_END memory region. But
+>>> is_vmalloc_or_module_addr() still checks CONFIG_MODULES, which then
+>>> returns false for a bpf jit memory region when CONFIG_MODULES is not
+>>> defined. It leads to the following kernel BUG:
+>>>
+>>> [    1.567023] ------------[ cut here ]------------
+>>> [    1.567883] kernel BUG at mm/vmalloc.c:745!
+>>> [    1.568477] Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN NOPTI
+>>> [    1.569367] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.9.0+ #448
+>>> [    1.570247] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+>>> [    1.570786] RIP: 0010:vmalloc_to_page+0x48/0x1ec
+>>> [    1.570786] Code: 0f 00 00 e8 eb 1a 05 00 b8 37 00 00 00 48 ba fe ff ff ff ff 1f 00 00 4c 03 25 76 49 c6 02 48 c1 e0 28 48 01 e8 48 39 d0 76 02 <0f> 0b 4c 89 e7 e8 bf 1a 05 00 49 8b 04 24 48 a9 9f ff ff ff 0f 84
+>>> [    1.570786] RSP: 0018:ffff888007787960 EFLAGS: 00010212
+>>> [    1.570786] RAX: 000036ffa0000000 RBX: 0000000000000640 RCX: ffffffff8147e93c
+>>> [    1.570786] RDX: 00001ffffffffffe RSI: dffffc0000000000 RDI: ffffffff840e32c8
+>>> [    1.570786] RBP: ffffffffa0000000 R08: 0000000000000000 R09: 0000000000000000
+>>> [    1.570786] R10: ffff888007787a88 R11: ffffffff8475d8e7 R12: ffffffff83e80ff8
+>>> [    1.570786] R13: 0000000000000640 R14: 0000000000000640 R15: 0000000000000640
+>>> [    1.570786] FS:  0000000000000000(0000) GS:ffff88806cc00000(0000) knlGS:0000000000000000
+>>> [    1.570786] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>> [    1.570786] CR2: ffff888006a01000 CR3: 0000000003e80000 CR4: 0000000000350ef0
+>>> [    1.570786] Call Trace:
+>>> [    1.570786]  <TASK>
+>>> [    1.570786]  ? __die_body+0x1b/0x58
+>>> [    1.570786]  ? die+0x31/0x4b
+>>> [    1.570786]  ? do_trap+0x9d/0x138
+>>> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+>>> [    1.570786]  ? do_error_trap+0xcd/0x102
+>>> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+>>> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+>>> [    1.570786]  ? handle_invalid_op+0x2f/0x38
+>>> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+>>> [    1.570786]  ? exc_invalid_op+0x2b/0x41
+>>> [    1.570786]  ? asm_exc_invalid_op+0x16/0x20
+>>> [    1.570786]  ? vmalloc_to_page+0x26/0x1ec
+>>> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+>>> [    1.570786]  __text_poke+0xb6/0x458
+>>> [    1.570786]  ? __pfx_text_poke_memcpy+0x10/0x10
+>>> [    1.570786]  ? __pfx___mutex_lock+0x10/0x10
+>>> [    1.570786]  ? __pfx___text_poke+0x10/0x10
+>>> [    1.570786]  ? __pfx_get_random_u32+0x10/0x10
+>>> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+>>> [    1.570786]  text_poke_copy_locked+0x70/0x84
+>>> [    1.570786]  text_poke_copy+0x32/0x4f
+>>> [    1.570786]  bpf_arch_text_copy+0xf/0x27
+>>> [    1.570786]  bpf_jit_binary_pack_finalize+0x26/0x5a
+>>> [    1.570786]  bpf_int_jit_compile+0x576/0x8ad
+>>> [    1.570786]  ? __pfx_bpf_int_jit_compile+0x10/0x10
+>>> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+>>> [    1.570786]  ? __kmalloc_node_track_caller+0x2b5/0x2e0
+>>> [    1.570786]  bpf_prog_select_runtime+0x7c/0x199
+>>> [    1.570786]  bpf_prepare_filter+0x1e9/0x25b
+>>> [    1.570786]  ? __pfx_bpf_prepare_filter+0x10/0x10
+>>> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+>>> [    1.570786]  ? _find_next_bit+0x29/0x7e
+>>> [    1.570786]  bpf_prog_create+0xb8/0xe0
+>>> [    1.570786]  ptp_classifier_init+0x75/0xa1
+>>> [    1.570786]  ? __pfx_ptp_classifier_init+0x10/0x10
+>>> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+>>> [    1.570786]  ? register_pernet_subsys+0x36/0x42
+>>> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+>>> [    1.570786]  sock_init+0x99/0xa3
+>>> [    1.570786]  ? __pfx_sock_init+0x10/0x10
+>>> [    1.570786]  do_one_initcall+0x104/0x2c4
+>>> [    1.570786]  ? __pfx_do_one_initcall+0x10/0x10
+>>> [    1.570786]  ? parameq+0x25/0x2d
+>>> [    1.570786]  ? rcu_is_watching+0x1c/0x3c
+>>> [    1.570786]  ? trace_kmalloc+0x81/0xb2
+>>> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+>>> [    1.570786]  ? __kmalloc+0x29c/0x2c7
+>>> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+>>> [    1.570786]  do_initcalls+0xf9/0x123
+>>> [    1.570786]  kernel_init_freeable+0x24f/0x289
+>>> [    1.570786]  ? __pfx_kernel_init+0x10/0x10
+>>> [    1.570786]  kernel_init+0x19/0x13a
+>>> [    1.570786]  ret_from_fork+0x24/0x41
+>>> [    1.570786]  ? __pfx_kernel_init+0x10/0x10
+>>> [    1.570786]  ret_from_fork_asm+0x1a/0x30
+>>> [    1.570786]  </TASK>
+>>> [    1.570819] ---[ end trace 0000000000000000 ]---
+>>> [    1.571463] RIP: 0010:vmalloc_to_page+0x48/0x1ec
+>>> [    1.572111] Code: 0f 00 00 e8 eb 1a 05 00 b8 37 00 00 00 48 ba fe ff ff ff ff 1f 00 00 4c 03 25 76 49 c6 02 48 c1 e0 28 48 01 e8 48 39 d0 76 02 <0f> 0b 4c 89 e7 e8 bf 1a 05 00 49 8b 04 24 48 a9 9f ff ff ff 0f 84
+>>> [    1.574632] RSP: 0018:ffff888007787960 EFLAGS: 00010212
+>>> [    1.575129] RAX: 000036ffa0000000 RBX: 0000000000000640 RCX: ffffffff8147e93c
+>>> [    1.576097] RDX: 00001ffffffffffe RSI: dffffc0000000000 RDI: ffffffff840e32c8
+>>> [    1.577084] RBP: ffffffffa0000000 R08: 0000000000000000 R09: 0000000000000000
+>>> [    1.578077] R10: ffff888007787a88 R11: ffffffff8475d8e7 R12: ffffffff83e80ff8
+>>> [    1.578810] R13: 0000000000000640 R14: 0000000000000640 R15: 0000000000000640
+>>> [    1.579823] FS:  0000000000000000(0000) GS:ffff88806cc00000(0000) knlGS:0000000000000000
+>>> [    1.580992] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>> [    1.581869] CR2: ffff888006a01000 CR3: 0000000003e80000 CR4: 0000000000350ef0
+>>> [    1.582800] Kernel panic - not syncing: Fatal exception
+>>> [    1.583765] ---[ end Kernel panic - not syncing: Fatal exception ]---
+>>>
+>>> Fixes: 2c9e5d4a0082 ("bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of")
+>>> Cc: Luis Chamberlain <mcgrof@kernel.org>
+>>> Cc: Mike Rapoport (IBM) <rppt@kernel.org>
+>>> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+>>
+>> Thanks for the fix!
+>>
+>> Mike/Luis, do you plan to pick this up or rather prefer if we route it to
+>> Linus (with your Ack assuming it looks good to you)?
+> 
+> I'm fine with routing this via bpf, but usually vmalloc patches go via mm
+> tree, so it's more up to Andrew.
 
-So applied (and with minor fixups for the proper indentation, see end of
-this mail) this looks like this:
+All good, so once Cong sends v2, lets have Andrew pick up the fix.
 
-.pushsection .altinstructions,"a"
- .long 661b - .
- .long 6641f - .
- .4byte ( 4*32+31)
- .byte 663b-661b
- .byte 6651f-6641f
- .long 661b - .
- .long 6642f - .
- .4byte ( 8*32+18)
- .byte 663b-661b
- .byte 6652f-6642f
- .long 661b - .
- .long 6643f - .
- .4byte ( 8*32+19)
- .byte 663b-661b
- .byte 6653f-6643f
-.popsection
-.pushsection .altinstr_replacement, "ax"
-# ALT: replacement 1
-6641:
-        jmp .Lport_call72
-6651:
-# ALT: replacement 2
-6642:
-        jmp .Lvmcall72
-6652:
-# ALT: replacement 3
-6643:
-        vmmcall
-        jmp .Lend72
-6653:
-.popsection
-        cmpb $((((1UL))) << (0)), vmware_hypercall_mode(%rip)   # vmware_hypercall_mode
-        jg .Lvmcall72
-        je .Lvmmcall72
-.Lport_call72:
-        movw $22104, %dx        #
-        inl (%dx), %eax
-        jmp .Lend72
-.Lvmmcall72:
-        vmmcall
-        jmp .Lend72 
-.Lvmcall72:
-        vmcall
-.Lend72:
-
----
-
-so AFAICT, you want three things:
-
-1. X86_FEATURE_HYPERVISOR - that is always set when running as a guest.
-   For that it should do:
-
-        movw $22104, %dx        #
-        inl (%dx), %eax
-
-2. X86_FEATURE_VMCALL:
-
-	vmcall
-
-3. X86_FEATURE_VMW_VMMCALL:
-
-	vmmcall
-
-So why don't you simply do that?
-
-vmware_set_capabilities() sets vmware_hypercall_mode *and* those feature
-flags at the same time.
-
-And you either support VMCALL or VMMCALL so the first thing should be the
-fallback for some ancient crap.
-
-IOW, your hypercall alternative should simply be:
-
-	ALTERNATIVE_2("vmcall", "vmmcall", X86_FEATURE_VMW_VMMCALL, "movw %[port], %%dx; "inl (%%dx), %%eax", X86_FEATURE_HYPERVISOR);
-
-without any more silly dance?
-
-Hmmm?
-
----
-
-Fixup indentation for proper .s output:
-
-diff --git a/arch/x86/include/asm/vmware.h b/arch/x86/include/asm/vmware.h
-index 5114f4c75c54..8be877d8bb7c 100644
---- a/arch/x86/include/asm/vmware.h
-+++ b/arch/x86/include/asm/vmware.h
-@@ -70,17 +70,18 @@ extern u8 vmware_hypercall_mode;
- 		      "jmp .Lvmcall%=", X86_FEATURE_VMCALL,		\
- 		      "vmmcall\n\t"					\
- 		      "jmp .Lend%=", X86_FEATURE_VMW_VMMCALL)		\
--		      "cmpb $"						\
--			__stringify(CPUID_VMWARE_FEATURES_ECX_VMMCALL)	\
--			", %[mode]\n\t"					\
-+		      "\tcmpb $" __stringify(CPUID_VMWARE_FEATURES_ECX_VMMCALL) ", %[mode]\n\t" \
- 		      "jg .Lvmcall%=\n\t"				\
--		      "je .Lvmmcall%=\n\t"				\
--		      ".Lport_call%=: movw %[port], %%dx\n\t"		\
-+		      "je .Lvmmcall%=\n"				\
-+		      ".Lport_call%=:\n\t"				\
-+		      "movw %[port], %%dx\n\t"				\
- 		      "inl (%%dx), %%eax\n\t"				\
--		      "jmp .Lend%=\n\t"					\
--		      ".Lvmmcall%=: vmmcall\n\t"			\
--		      "jmp .Lend%=\n\t"					\
--		      ".Lvmcall%=: vmcall\n\t"				\
-+		      "jmp .Lend%=\n"					\
-+		      ".Lvmmcall%=:\n\t"				\
-+		      "vmmcall\n\t"					\
-+		      "jmp .Lend%=\n"					\
-+		      ".Lvmcall%=:\n\t"					\
-+		      "vmcall\n"					\
- 		      ".Lend%=:"
- 
- static inline
-
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+Daniel
 
